@@ -2,6 +2,7 @@
 """budget.py — a build's rework budget: one per build, frozen at Design's exit, drawn by every repetition and never by contention (TOOL-dDeclaredLoop-30).
 
     python budget.py draw --build <slug> --cause <cause> --item <item>
+    python budget.py draw --request <key> | --request-text <file> --rows <file> --cause <cause> --item <item>
     python budget.py value
     python budget.py target --build <slug> --item <item>
     python budget.py ending --build <slug> [--explain]
@@ -64,6 +65,17 @@ another build or the remote caused, which draws nothing; `count_returns` counts 
 `unit`, `ask` or `on-exhausted`; `budget_state` answers `open <spent>/<total>`, `spent` or
 `unfrozen <spent>/<total>`.
 
+THE PRE-CLAIM BUDGET (TOOL-dPlacedRequest-14). A request loops at entry before any build exists: placed,
+refused by its check and placed again, or claimed under a slug another session holds and retried. Its
+budget is keyed to the request's content key, `--request <key>`, or `--request-text <file>`, the key
+`request.py`'s `derive_request_content_key` computes from the text, so no intake record is read. Its
+total is the base of `flow.rework-budget`, since a request has no units and nothing is frozen. Its rows
+live on the request record `refs/gov/requests/<key>`, one parented commit per row, which the unattended
+driver's `--request-draw` reads and writes; `--rows <file>` is that ref's first-parent messages, each
+opened by a `\\x01` byte, and `read_request_rows` counts the `draw · <cause> · <item> · <spent>/<total>`
+lines of the messages whose header is `gov-request <key>`, a typed figure ignored, a malformed one
+named on stderr and never counted. `derive_request_draw` answers the next row and writes nothing.
+
 THE ENDING (TOOL-dDeclaredLoop-31). `derive_ending(value, units)` answers the ending a spent budget takes
 under `flow.on-exhausted`'s `value`, `units` each unit's status: `park-for-owner` and `close-incomplete`
 answer themselves; `best-effort-ending`, the default, answers `land-green` where every unit not `WONTDO`
@@ -77,6 +89,8 @@ Exit: `draw` prints `loop: budget · drawn · <row>` and exits 0, `loop: budget 
 `loop: unarmed · <why>`, exit 2, where the policy or memory-tree kit does not resolve, never a default.
 After a `drawn` or `exhausted` verdict, one `loop: budget · disagrees · <row> · typed <a>, derived <b>`
 line per disagreeing row of the build drawn on, in the order read, so the verdict stays the first line.
+A request's draw prints `draw · <cause> · <item> · <spent>/<total>` and exits 0, or `exhausted ·
+<spent>/<total>` and exits 3, and refuses as a build's does, a `patch:` cause among them.
 `value` prints `base <n> per-unit <n>`. `target` prints `loop: budget · target · <answer>`, exit 0,
 `promotion_target`'s answer for a blocking item as the budget stands, `unit` or `on-exhausted`, which
 the unattended driver reads after a round's draw (TOOL-dDeclaredLoop-32); it draws nothing. `ending` prints
@@ -101,7 +115,8 @@ host temp directory, runs the case and prints `held` or `MISSED`; `--selftest` r
 WHAT THIS DOES NOT CHECK: two racing draws, which are two rows; a row typed by hand with a right
 ordinal; two distinct draws minting one id, in one second with the same 24 random bits, which count
 as one; two byte-identical rows written before the id, which a union merge of the record keeps once;
-the `research` cause's site, which no writer reaches yet.
+the `research` cause's site on a build, which no writer reaches yet; and that a request's draw names
+the lap its caller made, the cause and item being the caller's word.
 """
 import argparse
 import ast
@@ -113,8 +128,10 @@ import pathlib
 import re
 import secrets
 import shutil
+import subprocess
 import sys
 import tempfile
+import time
 
 sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).absolute().parent
@@ -122,14 +139,16 @@ if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from adapt import read_disposition_release, read_run_file  # noqa: E402
 from loop_lib import (LoopError, check_conf_name, derive_conf_constants, derive_conf_reads,  # noqa: E402
-                      derive_fixture_boundary, load_tree_lib, read_memory_tree, resolve_memory_root, resolve_memory_root_source, run_selftest_cases)
+                      derive_fixture_boundary, load_tree_lib, read_memory_tree, resolve_kit_dir, resolve_memory_root, resolve_memory_root_source, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (BUDGET_FIELDS, FX_BUILD, FX_SPEC, FX_UNIT, VALUE,  # noqa: E402
                              check_transition_channels, read_build_specs, read_build_unit_ids,
                              read_record_channels, read_transition_commits, read_transition_records,
                              read_transitions, render_transition_trailer, write_transition, write_transition_plant,
                              write_transition_record)
-from loop_witness import read_git, remove_tree, run_fixture_git, write_fixture_files  # noqa: E402
+from loop_witness import (FIXTURE_REMOTE, read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git,  # noqa: E402
+                          write_fixture_files)
+from request import KEY_HEX, derive_request_content_key, read_request_text  # noqa: E402
 
 SAY = "loop"
 BUDGET_KEY = "flow.rework-budget"
@@ -157,6 +176,13 @@ SUFFIXED = re.compile(r"(.*) · budget (\S+)")
 TRAILER_ROWS = {"budget": re.compile(r"frozen@(\d+)@(\d+)"), "draw": re.compile(r"([^@]+)@(.+)@(\d+)\+(\d+)")}
 #: The driver's archive pathspec: every record its preflight rotated, whatever phase it ended in.
 ROTATED = "RUN.*.md"
+#: A request's pre-claim row (TOOL-dPlacedRequest-14), the header word of each commit on its record, and the
+#: byte the driver opens each first-parent message with in `--rows`.
+REQUEST_ROW = re.compile(r"draw · (\S+) · (\S+) · (\d+)/(\d+)")
+REQUEST_HEADER = "gov-request"
+REQUEST_SEP = "\x01"
+#: The item a pre-claim plant's slug retry draws on, the claiming item's own tag.
+CLAIM_ITEM = "item.entry.claim"
 PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass drawn on each lap, nine laps",
           "before-freeze": "designing back to planning and forward again, four laps, then a fifth route back",
           "stale-verdict": "a gates verdict staled by another build's landing, re-verified",
@@ -224,6 +250,22 @@ PLANTS = {"mint-each-lap": "frozen at two units, a unit minted and fix-pass draw
                              "memory-tree kit's tree_lib unlocatable, blocked from import, unparseable, raising "
                              "at import and lacking both names the loop_lib reads, then a module calling each "
                              "conf reader the loop_lib declares, in three spellings"}
+#: The pre-claim plants (TOOL-dPlacedRequest-14 AC1 to AC6), each over a placement fixture, a bare scratch
+#: remote, the unattended driver's `--request-draw` and `placement.py` run as processes.
+REQUEST_PLANTS = {"placement-loop": "one recorded request placed, its check refusing each time: four re-placements "
+                                    "drawing 1/4 to 4/4, then a fifth exhausted, writing no block",
+                  "no-intake": "the same loop with no intake record and no request ref, the record created at the "
+                               "first draw, then the rows keyed by --request-text",
+                  "rows-on-ref": "two draws on a recorded request: two row commits, each parented on the tip before "
+                                 "it, and no line of the request's text on the remote",
+                  "two-nodes": "two clones drawing on one key at once, the second's push held until the first wrote",
+                  "unreachable": "a draw and a re-placement with the remote unreachable, then a kept text keying to "
+                                 "another request, a key with neither record nor kept text, and a deleted record "
+                                 "created again from its kept text",
+                  "slug-retry": "the claiming item's slug retry drawn as entry.claim draws it, the cause retry, then "
+                                "budget.py's own request refusals and a malformed row",
+                  "owner-after-exhausted": "a spent request placed again, then placed by the owner's record"}
+PLANTS.update(REQUEST_PLANTS)
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
 PLANT_TRAILER = '[transitions]\nrecord = ["trailer"]\n'
 PLANT_SPEC = "# TOOL-%s-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n"
@@ -235,12 +277,17 @@ def read_budget_value(root):
     """`(base, per-unit, route-backs)` at HEAD of `root`. ValueError naming the key on a policy refusal
     or a value of neither form; LookupError where the policy kit does not resolve."""
     policy, _guard = read_policy_kit()
-    got = {}
-    for key in (BUDGET_KEY, ROUTE_KEY):
+
+    def read_one(key):
         try:
-            got[key] = policy.resolve(key, str(root), "HEAD").value
+            return policy.resolve(key, str(root), "HEAD").value
         except policy.Refusal as e:
             raise ValueError("%s does not resolve at HEAD: %s" % (key, e)) from None
+
+    # one call per key, each passing its constant by name, so reader coverage reads both
+    # (TOOL-dLandedOwners-2)
+    got = {BUDGET_KEY: read_one(BUDGET_KEY)}
+    got[ROUTE_KEY] = read_one(ROUTE_KEY)
     value = got[BUDGET_KEY]
     hit = re.fullmatch(r"([0-9]+)\+([0-9]+)", value) if isinstance(value, str) else None
     if hit:
@@ -470,13 +517,7 @@ def record_draw(build, cause, item, root=".", lines=None, moves=None, notes=None
     where `merges` is one, a draw committed to a log record adds `(record, its merge attribute)` to it.
     ValueError on a cause outside `CAUSES`, a derived cause given, an item outside `VALUE`, or a
     build with no home, a patch build with no run-state file under that rule among them."""
-    if cause.startswith(PATCH):
-        raise ValueError("the cause %s is derived: a patch build's draw is named patch:<its slug> from its "
-                         "scenario, so it is never given" % cause)
-    if cause not in CAUSES:
-        raise ValueError("the cause %s is outside the closed set: %s %s<slug>" % (cause, " ".join(CAUSES), PATCH))
-    if not VALUE.fullmatch(item or ""):
-        raise ValueError("the item %r is outside [A-Za-z0-9._:+@-]+" % item)
+    check_draw_cause(cause, item)
     root = pathlib.Path(root).absolute()
     moves = read_transitions(build, root) if moves is None else moves
     origin, suffix = derive_patch_origin(build, root, moves), ""
@@ -516,6 +557,75 @@ def record_draw(build, cause, item, root=".", lines=None, moves=None, notes=None
     if merges is not None:   # TOOL-dDeclaredLoop-67 S34: the record's merge rule, read once
         merges.append((held["home"], read_merge_attribute(root, held["home"])))
     return "drawn", row
+
+
+def check_draw_cause(cause, item):
+    """None where `cause` is one of `CAUSES` and `item` a value of `VALUE`; ValueError naming the cause for a
+    `patch:` cause, which is derived and never given, or one outside the closed set, and naming the item."""
+    if cause.startswith(PATCH):
+        raise ValueError("the cause %s is derived: a patch build's draw is named patch:<its slug> from its "
+                         "scenario, so it is never given" % cause)
+    if cause not in CAUSES:
+        raise ValueError("the cause %s is outside the closed set: %s %s<slug>" % (cause, " ".join(CAUSES), PATCH))
+    if not VALUE.fullmatch(item or ""):
+        raise ValueError("the item %r is outside [A-Za-z0-9._:+@-]+" % item)
+
+
+# ------------------------------------------------------------------------------------------ the pre-claim budget
+def read_request_rows(text, key):
+    """`(rows, malformed)` of request `key`'s record, `text` its first-parent messages each opened by
+    `REQUEST_SEP`, as the unattended driver's `--request-draw` hands them over: `rows` each draw row's
+    `(cause, item)` in the order read, `malformed` each line opening `draw` outside the grammar or the
+    closed cause set, and the header of each message that is no `gov-request <key>`. A row's typed figures
+    are never read: the count is the rows'."""
+    rows, malformed = [], []
+    for msg in text.split(REQUEST_SEP):
+        lines = [ln.rstrip("\r") for ln in msg.split("\n") if ln.strip()]
+        if not lines:
+            continue
+        if lines[0] != "%s %s" % (REQUEST_HEADER, key):
+            malformed.append(lines[0])
+            continue
+        for line in lines[1:]:
+            if not line.startswith("draw"):
+                continue
+            hit = REQUEST_ROW.fullmatch(line)
+            if hit and hit.group(1) in CAUSES and VALUE.fullmatch(hit.group(2)):
+                rows.append(hit.group(1, 2))
+            else:
+                malformed.append(line)
+    return rows, malformed
+
+
+def derive_request_draw(cause, item, spent, total):
+    """`("draw", "draw · <cause> · <item> · <spent + 1>/<total>")` for a request whose record holds `spent`
+    rows of `total`, or `("exhausted", "exhausted · <spent>/<total>")` once they meet. It writes nothing:
+    the driver's `--request-draw` commits the row. ValueError as `check_draw_cause` refuses."""
+    check_draw_cause(cause, item)
+    if spent >= total:
+        return "exhausted", "exhausted · %d/%d" % (spent, total)
+    return "draw", "draw · %s · %s · %d/%d" % (cause, item, spent + 1, total)
+
+
+def print_request_draw(args, root):
+    """`draw --request <key> | --request-text <file> --rows <file>`: the line `derive_request_draw` answers,
+    its exit 0 or 3, each malformed row named on stderr first. ValueError for a key that is no content key,
+    a text that does not key, no `--rows` or a cause refused; OSError where a file cannot be read;
+    LookupError where the policy or memory-tree kit does not resolve."""
+    if args.rows is None:
+        raise ValueError("a request's draw takes --rows <file>, its record's first-parent messages")
+    if args.request_text is not None:
+        key = derive_request_content_key(read_request_text(args.request_text))
+    elif re.fullmatch(r"[0-9a-f]{%d}" % KEY_HEX, args.request):
+        key = args.request
+    else:
+        raise ValueError("--request %r is no content key of %d hex digits" % (args.request, KEY_HEX))
+    rows, malformed = read_request_rows(pathlib.Path(args.rows).read_bytes().decode("utf-8", "replace"), key)
+    for line in malformed:
+        print("%s: budget · malformed request row, not counted · %s" % (SAY, line), file=sys.stderr)
+    answer, said = derive_request_draw(args.cause, args.item, len(rows), read_budget_value(root)[0])
+    print(said)
+    return 3 if answer == "exhausted" else 0
 
 
 def write_budget_rows(path, rows, record):
@@ -576,9 +686,224 @@ def write_budget_plant(top, case):
     run_fixture_git(top, "commit", "-q", "--allow-empty", "-m", "the budget plant")
 
 
+def run_request_draw_plant(case):
+    """One plant of `REQUEST_PLANTS`: its lines, then `loop: fixture · <case> · held` or `MISSED <why>`; 0 held,
+    1 missed, 2 where a kit does not resolve."""
+    from placement import (FX_DONE, FX_LIVE, OWNER_ITEM, PLACE_ITEM, parse_placement_blocks, read_fleet_user,
+                           write_placement_fixture)
+    from probe import read_build_records
+    top = pathlib.Path(tempfile.mkdtemp(prefix="loop-rq-")).absolute()
+    misses, held = [], None
+    try:
+        print("%s: fixture · plant %s · %s" % (SAY, case, PLANTS[case]))
+
+        def check(cond, why):
+            """A miss named where `cond` does not hold."""
+            if not cond:
+                misses.append(why)
+
+        driver = resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
+        bash = resolve_bash(driver)
+        if bash is None:
+            raise LookupError("no bash can run %s" % driver.as_posix())
+        env = read_clean_env(USERNAME=read_fleet_user(), CLAUDE_CODE_SESSION_ID="s-fx", GOV_RUNLOG="0",
+                             PYTHONIOENCODING="utf-8")
+        root = write_placement_fixture(top, 'placement = "declared-checked"\n', driver=True, remote=True)
+        origin = top / "origin.git"
+        store = pathlib.Path(run_fixture_git(root, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "requests"
+        text = "Keep the lander's push bounded, zq-budget-marker-14\n"
+        key = derive_request_content_key(text)
+        write_fixture_files(store, {"%s.md" % key: text})
+        ref = "refs/gov/requests/%s" % key
+
+        def run_tool(argv, repo=root, put=None):
+            """`(exit, output)` of `argv` run as a process in `repo` under the plant's environment, echoed."""
+            p = subprocess.run(argv, cwd=str(repo), capture_output=True, text=True, encoding="utf-8", errors="replace",
+                               env=dict(env, **(put or {})), timeout=900)
+            out = (p.stdout + p.stderr).strip()
+            print("%s: fixture · %s · exit %d · %s" % (SAY, " ".join(argv[2:4]), p.returncode, out.replace("\n", " / ")[-500:]))
+            return p.returncode, out
+
+        def run_driver_verb(*argv, repo=root):
+            """The unattended driver run in `repo` with `argv`."""
+            return run_tool([bash, driver.as_posix(), *argv], repo)
+
+        def run_draw(cause="route-back", item=PLACE_ITEM, repo=root):
+            """One `--request-draw` of the plant's request."""
+            return run_driver_verb("--request-draw", key, "--cause", cause, "--item", item, repo=repo)
+
+        def run_placement_verb(*argv):
+            """`placement.py` run in the fixture with `argv` and the plant's request."""
+            return run_tool([sys.executable, str(KIT / "placement.py"), *argv, "--request", key])
+
+        def read_ref_rows():
+            """`[(sha, parents, message)]` of the remote's request ref, newest first along its first parents."""
+            rc, out = read_git(origin, "log", "--first-parent", "--format=%x01%H%x02%P%x02%B", ref)
+            return [tuple(m.split("\x02", 2)) for m in out.split("\x01") if m.strip()] if rc == 0 else []
+
+        def read_block_count():
+            """The blocks of the request's placement file."""
+            return len(parse_placement_blocks(store / ("%s.placement" % key)))
+
+        if case != "no-intake":   # the request recorded first, by the driver's own verb
+            rc, out = run_driver_verb("--request", (store / ("%s.md" % key)).as_posix())
+            check(rc == 0 and "recorded %s" % ref in out, "the request was not recorded: %s" % out[-200:])
+        if case in ("placement-loop", "no-intake"):   # AC1, AC2
+            check(case != "no-intake" or not read_ref_rows(), "the no-intake plant began with a request ref")
+            place = ("place", "--declared", "continue", FX_DONE)
+            rc, out = run_placement_verb(*place)
+            check(rc == 0 and "draw · " not in out, "the first placement drew or did not place: %s" % out[-200:])
+            for lap in range(1, 6):
+                rc, out = run_placement_verb("check")
+                check(rc == 1 and "refused — continue" in out, "check %d did not refuse: %s" % (lap, out[-200:]))
+                rc, out = run_placement_verb(*place)
+                if lap <= 4:
+                    check(rc == 0 and "draw · route-back · %s · %d/4" % (PLACE_ITEM, lap) in out,
+                          "re-placement %d did not draw %d/4: %s" % (lap, lap, out[-200:]))
+                else:
+                    check(rc == 3 and "placement: pre-claim budget exhausted — %s · 4/4" % key in out,
+                          "re-placement 5 was not refused exhausted: %s" % out[-200:])
+            check(read_block_count() == 5, "the loop wrote %d blocks, not 5" % read_block_count())
+            check(len(read_ref_rows()) == 5, "the request ref holds %d commits, not the create and 4 rows" % len(read_ref_rows()))
+            if case == "no-intake":
+                check(read_git(origin, "rev-parse", "--verify", ref)[0] == 0,
+                      "no record keyed request_content_key of the text, %s, was created" % key)
+                rows = top / "rows.txt"
+                rows.write_bytes(read_git(origin, "log", "--first-parent", "--format=%x01%B", ref)[1].encode("utf-8"))
+                rc, out = run_tool([sys.executable, str(KIT / "budget.py"), "draw", "--request-text",
+                                    (store / ("%s.md" % key)).as_posix(), "--rows", str(rows), "--cause", "route-back",
+                                    "--item", PLACE_ITEM])
+                check(rc == 3 and out == "exhausted · 4/4", "--request-text over the ref's rows answered %r" % out)
+        elif case == "rows-on-ref":   # AC3
+            for lap in (1, 2):
+                rc, out = run_draw()
+                check(rc == 0 and out.endswith("draw · route-back · %s · %d/4" % (PLACE_ITEM, lap)),
+                      "draw %d answered %r" % (lap, out[-200:]))
+            got = read_ref_rows()
+            print("%s: fixture · ref · %s" % (SAY, " | ".join("%s<-%s %s" % (s[:7], p[:7] or "none", m.strip().replace("\n", " "))
+                                                       for s, p, m in got)))
+            check(len(got) == 3 and got[0][1] == got[1][0] and got[1][1] == got[2][0] and not got[2][1],
+                  "the row commits are not each parented on the tip before them")
+            check([m.strip().split("\n")[-1] for _s, _p, m in got[:2]] ==
+                  ["draw · route-back · %s · 2/4" % PLACE_ITEM, "draw · route-back · %s · 1/4" % PLACE_ITEM]
+                  and all(m.startswith("gov-request %s" % key) for _s, _p, m in got), "the row messages read %r" % got)
+            check("zq-budget-marker-14" not in read_git(origin, "cat-file", "--batch-all-objects", "--batch")[1],
+                  "a line of the request's text reached the remote")
+        elif case == "two-nodes":   # AC4: the second clone's push held until the first has written
+            shutil.copytree(root, top / "c2")   # a second clone, its untracked driver conf carried with it
+            shim, at, go = top / "shim", (top / "at").as_posix(), (top / "go").as_posix()
+            shim.mkdir()
+            write_fixture_files(shim, {"git": '#!/bin/sh\ncase " $* " in *" push "*) if [ ! -e "%s.done" ]; then '
+                                              ': > "%s"; n=0; while [ ! -e "%s" ] && [ $n -lt 1500 ]; do sleep 0.2; '
+                                              'n=$((n+1)); done; : > "%s.done"; fi ;; esac\nexec "%s" "$@"\n'
+                                              % (at, at, go, at, pathlib.Path(shutil.which("git")).as_posix())})
+            held = subprocess.Popen([bash, driver.as_posix(), "--request-draw", key, "--cause", "route-back", "--item",
+                                     PLACE_ITEM], cwd=str(top / "c2"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                    text=True, encoding="utf-8", errors="replace",
+                                    env=dict(env, PATH=shim.as_posix() + os.pathsep + env.get("PATH", "")))
+            for _n in range(1500):
+                if os.path.exists(at) or held.poll() is not None:
+                    break
+                time.sleep(0.2)
+            check(os.path.exists(at), "the second clone's draw never reached its push")
+            rc, out = run_draw()
+            check(rc == 0 and out.endswith("· 1/4"), "the first clone drew %r, not 1/4" % out[-200:])
+            pathlib.Path(go).write_bytes(b"")
+            out = held.communicate(timeout=900)[0].strip()
+            print("%s: fixture · second clone · exit %d · %s" % (SAY, held.returncode, out.replace("\n", " / ")))
+            check(held.returncode == 0 and out.endswith("· 2/4") and out.count("lost the race, re-read") == 1,
+                  "the second clone did not re-read once and draw 2/4: %r" % out[-300:])
+            counts = [m.strip().split(" · ")[-1] for _s, _p, m in read_ref_rows()[:2]]
+            check(counts == ["2/4", "1/4"], "the ref's rows read %r, not 2/4 over 1/4" % counts)
+        elif case == "unreachable":   # AC4, then the placement that draws nothing writes no block (S6)
+            place = ("place", "--declared", "continue", FX_DONE)
+            run_placement_verb(*place)
+            run_placement_verb("check")
+            run_fixture_git(root, "remote", "set-url", FIXTURE_REMOTE, (top / "gone.git").as_posix())
+            rc, out = run_draw()
+            check(rc == 2 and "not drawn, contention" in out, "an unreachable remote answered %d %r" % (rc, out[-200:]))
+            rc, out = run_placement_verb(*place)
+            check(rc == 2 and "pre-claim draw not recorded — " in out and "drew nothing, so no block is written" in out
+                  and read_block_count() == 1,
+                  "a re-placement with the remote unreachable answered %d, %d blocks: %r" % (rc, read_block_count(), out[-200:]))
+            run_fixture_git(root, "remote", "set-url", FIXTURE_REMOTE, origin.as_posix())
+            check(len(read_ref_rows()) == 1, "an unreachable draw added a row")
+            write_fixture_files(store, {"abcdefabcdef.md": "Words that key to another request\n"})
+            rc, out = run_driver_verb("--request-draw", "abcdefabcdef", "--cause", "route-back", "--item", PLACE_ITEM)
+            check(rc == 2 and ", not abcdefabcdef, so no record is created" in out and len(read_git(origin, "for-each-ref", "refs/gov/requests")[1].splitlines()) == 1,
+                  "a kept text keying to another request answered %d %r" % (rc, out[-200:]))
+            # TOOL-dPlacedRequest-34 AC41: neither a record nor a kept text draws nothing and creates no ref;
+            # a record deleted from the origin is created again from the kept text, parentless, under the row.
+            rc, out = run_driver_verb("--request-draw", "0123456789ab", "--cause", "route-back", "--item", PLACE_ITEM)
+            check(rc == 2 and "--request <file>" in out
+                  and read_git(origin, "rev-parse", "-q", "--verify", "refs/gov/requests/0123456789ab")[0] != 0,
+                  "a key with no record and no kept text answered %d %r, or a ref was created" % (rc, out[-200:]))
+            gone = read_git(origin, "update-ref", "-d", ref)[0] == 0 and read_git(origin, "rev-parse", "-q", "--verify", ref)[0] != 0
+            rc, out = run_draw()
+            got = read_ref_rows()
+            check(gone and rc == 0 and out.endswith("draw · route-back · %s · 1/4" % PLACE_ITEM) and len(got) == 2
+                  and got[0][1] == got[1][0] and not got[1][1],
+                  "a deleted record with its kept text answered %d %r over %d commit(s), not a row on a re-created "
+                  "parentless record" % (rc, out[-200:], len(got)))
+        elif case == "slug-retry":   # AC5: the draw entry.claim makes before a fresh slug, TOOL-dPlacedRequest-21's site
+            rc, out = run_draw(item=CLAIM_ITEM)
+            check(rc == 0 and out.endswith("draw · route-back · %s · 1/4" % CLAIM_ITEM), "the slug retry drew %r" % out)
+            rc, out = run_draw(cause="retry", item=CLAIM_ITEM)
+            check(rc == 2 and "the cause retry is outside the closed set" in out, "the cause retry answered %r" % out)
+            check(len(read_ref_rows()) == 2, "the refused cause added a row")
+            rows = top / "rows.txt"   # the record's messages, one malformed row and one under another key appended
+            rows.write_bytes((read_git(origin, "log", "--first-parent", "--format=%x01%B", ref)[1] +
+                              "\n\x01%s %s\n\ndraw · route-back · %s · two/4\n\x01%s 0123456789ab\n\ndraw · route-back · "
+                              "%s · 1/4\n" % (REQUEST_HEADER, key, PLACE_ITEM, REQUEST_HEADER, PLACE_ITEM)).encode("utf-8"))
+            budget = [sys.executable, str(KIT / "budget.py"), "draw"]
+            for argv, owed in ((["--request", key, "--rows", str(rows)], (0, "draw · route-back · %s · 2/4" % PLACE_ITEM)),
+                               (["--request", "XYZ", "--rows", str(rows)], (2, "'XYZ' is no content key")),
+                               (["--request", key], (2, "takes --rows <file>")),
+                               (["--build", FX_LIVE, "--rows", str(rows)], (2, "--rows is a request's record"))):
+                rc, out = run_tool(budget + argv + ["--cause", "route-back", "--item", PLACE_ITEM])
+                check(rc == owed[0] and owed[1] in out, "budget.py draw %s answered %d %r" % (" ".join(argv[:2]), rc, out[-300:]))
+                if argv[2:3] == ["--rows"] and argv[0] == "--request" and rc == 0:
+                    check("malformed request row, not counted · draw · route-back · %s · two/4" % PLACE_ITEM in out
+                          and "not counted · %s 0123456789ab" % REQUEST_HEADER in out,
+                          "the malformed rows were not named: %r" % out[-300:])
+        elif case == "owner-after-exhausted":   # AC6
+            place = ("place", "--declared", "continue", FX_DONE)
+            run_placement_verb(*place)
+            run_placement_verb("check")
+            for _lap in range(4):
+                run_draw()
+            rc, out = run_placement_verb(*place)
+            check(rc == 3 and "pre-claim budget exhausted" in out, "the spent request was placed: %s" % out[-200:])
+            write_fixture_files(root, {".governance/policy.toml": 'placement = "owner-places"\n'})
+            rel = read_build_records().write_disposition(str(root), FX_LIVE, "TOOL-%s-1" % FX_LIVE, OWNER_ITEM, "amend",
+                                                         "terminal")
+            run_fixture_git(root, "add", "-A")
+            run_fixture_git(root, "commit", "-q", "-m", "the owner places")
+            run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "main")
+            run_fixture_git(root, "fetch", "-q", FIXTURE_REMOTE)
+            rc, out = run_placement_verb("place", "--owner", str(root / rel))
+            check(rc == 0 and "placer owner" in out and "draw · " not in out, "the owner's placement answered %s" % out[-200:])
+            check(read_block_count() == 2 and len(read_ref_rows()) == 5,
+                  "the owner's placement left %d blocks and %d ref commits, not 2 and 5" % (read_block_count(), len(read_ref_rows())))
+    except LookupError as e:
+        print("%s: fixture · %s · unarmed: %s" % (SAY, case, e))
+        return 2
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError, ValueError) as e:
+        misses.append("the plant could not run: %s" % (getattr(e, "stderr", None) or e))
+    finally:
+        if held is not None and held.poll() is None:
+            held.kill()
+            held.communicate()
+        remove_tree(top)
+    print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
+    return 0 if not misses else 1
+
+
 def run_budget_plant(case):
     """One plant: its lines, then `loop: fixture · <case> · held` or `MISSED <why>`; 0 held, 1 missed, 2
     where a kit does not resolve."""
+    if case in REQUEST_PLANTS:
+        return run_request_draw_plant(case)
     top = pathlib.Path(tempfile.mkdtemp(prefix="loop-budget-")).absolute()
     misses, here = [], os.getcwd()
     try:
@@ -1535,10 +1860,19 @@ def main(argv):
             print("base %d per-unit %d" % (base, per))
             return 0
         if argv[:1] == ["draw"]:
-            ap = argparse.ArgumentParser(prog="budget.py draw", description="draw one repetition on a build's budget")
-            for flag in ("--build", "--cause", "--item"):
+            ap = argparse.ArgumentParser(prog="budget.py draw", description="draw one repetition on a build's budget, "
+                                                                            "or on a request's before any build exists")
+            who = ap.add_mutually_exclusive_group(required=True)
+            for flag in ("--build", "--request", "--request-text"):
+                who.add_argument(flag)
+            for flag in ("--cause", "--item"):
                 ap.add_argument(flag, required=True)
+            ap.add_argument("--rows")
             args = ap.parse_args(argv[1:])
+            if args.build is None:   # TOOL-dPlacedRequest-14: the pre-claim budget, keyed to the request
+                return print_request_draw(args, root)
+            if args.rows is not None:
+                raise ValueError("--rows is a request's record; a build's draw reads its own homes")
             notes, merges = [], []
             answer, said = record_draw(args.build, args.cause, args.item, root, notes=notes, merges=merges)
             if answer == "exhausted":
@@ -1586,7 +1920,7 @@ def main(argv):
     except (ValueError, OSError) as e:
         print("%s: budget · refused · %s" % (SAY, e))
         return 2
-    print("usage: python budget.py draw --build <slug> --cause <%s> --item <item> | value | target --build <slug> --item <item> | ending --build <slug> [--explain] | origin --build <slug> | --fixture --plant <%s> "
+    print("usage: python budget.py draw --build <slug> | --request <key> --rows <file> | --request-text <file> --rows <file> --cause <%s> --item <item> | value | target --build <slug> --item <item> | ending --build <slug> [--explain] | origin --build <slug> | --fixture --plant <%s> "
           "| --selftest" % ("|".join(CAUSES), "|".join(PLANTS)), file=sys.stderr)
     return 2
 

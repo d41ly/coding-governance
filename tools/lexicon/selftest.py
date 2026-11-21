@@ -18,6 +18,7 @@ import contextlib
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -177,12 +178,27 @@ def build_tempdir():
     `TemporaryDirectory(ignore_cleanup_errors=True)`: the latter is newer than some interpreters
     this kit meets in an adopter's tree, whose floor is not gov's python-floor.txt, and guessing
     wrong is a TypeError on an adopter first run.
+
+    NOT `ignore_errors=True` itself, though: each dir is a git repo, and git writes its objects
+    READ-ONLY, so on Windows every unlink there raised, was swallowed and the whole tree survived.
+    The hook clears the bit and retries; a refusal it cannot clear is still swallowed.
     """
+    def set_writable(func, path, _exc):
+        try:
+            os.chmod(path, stat.S_IWRITE)
+            func(path)
+        except OSError:
+            pass
+
     td = tempfile.mkdtemp()
     try:
         yield td
     finally:
-        shutil.rmtree(td, ignore_errors=True)
+        # `onexc` replaced `onerror` in 3.12; feature-detected for an adopter's older python.
+        try:
+            shutil.rmtree(td, **{"onexc" if sys.version_info >= (3, 12) else "onerror": set_writable})
+        except OSError:
+            pass
 
 
 KIT = Path(__file__).resolve().parent
@@ -441,6 +457,25 @@ check("P1 red: an undeclared leading token reds", code != 0 and "P1 verb" in out
 check("P1 red names the file", "core/a.py" in out, out)
 check("P1 red names the identifier", "frobnicate_index" in out, out)
 check("P1 red names the offending token", "'frobnicate'" in out, out)
+
+# ---- HOME-GRADED (TOOL-dHomeGraded-1 S2) --------------------------------------------------------
+# The same offender, claimed by a receipt `engine` row at gov's bytes, is gov's to grade and leaves
+# the corpus; the receipt itself sits in the deployer's state dir, whose `json` LANGS never declares.
+# Then the row records other bytes than the file holds, and the offender is graded again. One line,
+# no newline: the fixture writes text mode, and a line end would move the blob's bytes per platform.
+import hashlib  # noqa: E402 — the blob id a receipt row records
+import json  # noqa: E402
+
+_kit_src = "def frobnicate_index(): pass"
+_kit_oid = hashlib.sha1(f"blob {len(_kit_src)}\0{_kit_src}".encode()).hexdigest()
+for _label, _oid, _red in (("at gov's bytes leaves the corpus", _kit_oid, False),
+                           ("recording other bytes is graded", "0" * 40, True)):
+    code, out = run_case({"core/a.py": _kit_src, "core/b.py": "def build_index(): pass",
+                          ".governance/install.json": json.dumps({"files": [
+                              {"path": "core/a.py", "role": "engine", "oid": _oid, "gov_oid": _oid}]})},
+                         BASE_CONF)
+    check(f"home-graded: a receipt engine row {_label}",
+          (code != 0, "frobnicate_index" in out, "UNDECLARED EXTENSIONS" in out) == (_red, _red, False), out)
 
 # ---- P2: the banned-suffix predicate ------------------------------------------------------------
 code, out = run_case({"core/a.py": "def build_x():\n    pass\n\n\nclass ThingManager:\n    pass\n"}, BASE_CONF)

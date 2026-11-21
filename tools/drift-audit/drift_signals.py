@@ -123,6 +123,10 @@ EVIDENCE_GLOBS: list[str] = PRODUCT_GLOBS + [
     # and a live spec is one of the subjects it measures, so a row names the spec's path without
     # claiming any of its work shipped. Admitted, a size row is a citation of every spec it holds.
     ":(exclude)*template-size-*.txt",
+    # THE UNSCANNED-READERS LIST, for the size registries' reason. Policy reader coverage keys each
+    # row by the tracked FILE PATH where a key's value is consumed, and a record's file name carries
+    # its unit id, so a row names that id without claiming any of its work shipped.
+    ":(exclude)*/unscanned-readers.txt",
 ]
 
 # --------------------------------------------------------------------------------------------

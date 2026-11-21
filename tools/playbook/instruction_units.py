@@ -23,6 +23,7 @@ reader and its active set (PLAY-dOrderedCharter-1).
     python instruction_units.py drive --check [--root <dir>] [--charter <path>]  # the rows and the charter, both ways
     python instruction_units.py map [--root <dir>]               # the map in the charter's envelope, for the replay
     python instruction_units.py legacy --list            # the legacy list's seed: each file no lock row renders from units
+    python instruction_units.py pockets [--root <dir>] (--room <bytes> | --all)  # the card's level-2 units
 
 `LEVELS` is the one place an envelope, a unit row, a card or a map reads a level from: a tuple whose index is
 the level, so `len(LEVELS)` is the ladder's height and `LEVELS[n]` a level's name. `PLATFORM` names the
@@ -90,6 +91,15 @@ a row carries `hold`, one `held —` line saying the held document reads at its 
 `preset —` line, `PRESET_LINE_PENDING` until presets exist. MAP (PLAY-dOrderedCharter-4) prints it inside
 the charter row's envelope for the session replay, each level line cut at `MAP_LINE_BYTES`; a map past
 `MAP_CAP_BYTES` exits 2 with one `instruction-map:` line, as does a registry it cannot read, never 1.
+
+THE POCKETS (TOOL-dPlacedRequest-9 S3). POCKETS prints the orientation card's `## pockets` section: the
+level-2 units the card's slot composes, gov's units and the overlay's at HEAD through `overlay.py`'s
+`derive_slot_units` with the selector `reader.card`, each one whole `- <text>` line from `render_unit`, in
+the composition's order. `--room <n>` prints at most `<n>` bytes: the heading, the longest run of lines from
+the first that fits beside the closing `- … (+<k>) — instruction_units.py pockets --all` line, `<k>` the
+units left out, and no closing line when every line fits; a room too small for the heading and the closing
+line for every unit prints nothing, exit 0. `--all` prints every line. No unit prints `- none declared`. A
+refused read, composition or render exits 1 with one line, a malformed argv 2.
 
 THE DRIVE TABLE (PLAY-dOrderedCharter-6). Each kit's descriptor may carry `[[drive]]` rows, `stage`, `role`,
 `command` and `when`, which the renderer composes into the charter's drive section for the kits the target's
@@ -1490,6 +1500,47 @@ def run_map(root=None) -> tuple[list, int]:
     return text.splitlines(), 0
 
 
+#: TOOL-dPlacedRequest-9 S3: the card's reader, the level its units sit at, and the section's two fixed lines
+POCKETS_SELECTOR = "reader.card"
+POCKETS_LEVEL = 2
+POCKETS_HEADING = "## pockets"
+POCKETS_NONE = "- none declared"
+
+
+def run_pockets(root=None, room=None) -> tuple[list, int]:
+    """S3: the card's `## pockets` section, every line with `room` None, else at most `room` bytes of whole
+    lines. Exit 0 with the lines, none where the room cannot hold the heading and the closing line; 1 with
+    one line on a refused read, composition or render."""
+    if str(KIT_DIR) not in sys.path:
+        sys.path.insert(0, str(KIT_DIR))
+    import overlay as ov  # inside the body: overlay imports this module
+    try:
+        root = pathlib.Path(root or run_git(".", "rev-parse", "--show-toplevel").strip())
+        units = read_units(root)
+        repo = ov.read_overlay(root)
+        exclude = ov.read_excluded_tags(root) if units else set()
+        policy_reader = ov.derive_policy_reader(root)
+        chosen = ov.derive_slot_units(units, repo.units, POCKETS_SELECTOR, exclude,
+                                      ov.derive_fixed_units(units, root), policy_reader)[0]
+        lines = [f"- {render_unit(u, policy_reader, root)}" for u in chosen if u.level == POCKETS_LEVEL]
+    except (ValueError, OSError, RuntimeError) as exc:  # OverlayRefused, UnitRowError, LevelError, TagError
+        return [f"pockets: refused · {str(exc).splitlines()[0] if str(exc) else type(exc).__name__}"], 1
+    body = lines or [POCKETS_NONE]
+
+    def derive_size(rows) -> int:
+        return sum(len(r.encode("utf-8")) + 1 for r in rows)
+
+    if room is None or derive_size([POCKETS_HEADING, *body]) <= room:
+        return [POCKETS_HEADING, *body], 0
+    if not lines:
+        return [], 0
+    for keep in range(len(lines) - 1, -1, -1):
+        out = [POCKETS_HEADING, *lines[:keep], f"- … (+{len(lines) - keep}) — instruction_units.py pockets --all"]
+        if derive_size(out) <= room:
+            return out, 0
+    return [], 0
+
+
 def read_drive(root, engine_dir=KIT_DIR) -> tuple[list, list]:
     """(the drive rows of the kits `root`'s deploy answers select, in render order; the roles kit's workflows)."""
     import render_playbook as rp
@@ -2772,7 +2823,7 @@ PLANTS = {"parse": arm_parse, "tags": arm_tags, "priority": arm_priority, "state
 def run_fixture(plant=None) -> tuple[list, int]:
     """Each plant in a throwaway repository, the caller's git variables aside (PLAY-dOrderedCharter-69 S1)."""
     load_memory_tree_path()
-    from deviation_join import set_env_aside
+    from deviation_join import remove_tree, set_env_aside
     from tree_lib import GIT_ENV_LEAKS
     out, failed = [], 0
     for name in [plant] if plant else list(PLANTS):
@@ -2785,7 +2836,7 @@ def run_fixture(plant=None) -> tuple[list, int]:
                 PLANTS[name](case)
                 failed += case.failed
         finally:
-            shutil.rmtree(top, ignore_errors=True)
+            remove_tree(top)   # not ignore_errors: git's objects are read-only on Windows
     out.append(f"{SAY}: fixture · {'FAILED' if failed else 'green'} · {failed} expectation(s) failed")
     return out, 1 if failed else 0
 
@@ -2825,6 +2876,16 @@ def main(argv) -> int:
             lines, rc = run_legacy_list(pathlib.Path(run_git(KIT_DIR, "rev-parse", "--show-toplevel").strip()))
         elif argv[:1] == ["map"] and (len(argv) == 1 or (len(argv) == 3 and argv[1] == "--root")):
             lines, rc = run_map(argv[2] if len(argv) == 3 else None)
+        elif argv[:1] == ["pockets"]:
+            rest = argv[1:]
+            top = rest[1] if rest[:1] == ["--root"] and len(rest) > 1 else None
+            mode = rest[2:] if top is not None else rest
+            if mode == ["--all"]:
+                lines, rc = run_pockets(top)
+            elif len(mode) == 2 and mode[0] == "--room" and mode[1].isascii() and mode[1].isdigit():
+                lines, rc = run_pockets(top, int(mode[1]))
+            else:
+                lines, rc = [__doc__.split("\n\n")[1]], 2
         elif argv[:1] == ["fixture"] and (len(argv) == 1 or (len(argv) == 3 and argv[1] == "--plant")):
             plant = argv[2] if len(argv) == 3 else None
             if plant is not None and plant not in PLANTS:

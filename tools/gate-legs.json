@@ -225,6 +225,33 @@
     ]
   },
   {
+    "name": "shell hygiene (a stage committed with no staged-diff test)",
+    "tag": "leg.gate-lint.shell-hygiene-a-stage-committed-with-no-staged-diff-test",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "catches a commit after an untested stage in a shell file",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/sh_hygiene.py",
+      "--stage-commits",
+      "memory/project/stage-commit-sites.txt",
+      ".",
+      ":!*.test.sh",
+      ":!memory/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "portability",
+    "enforces": [
+      "practice.portable.line-endings"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
     "name": "shell-hygiene selftest",
     "tag": "leg.gate-lint.shell-hygiene-selftest",
     "tests": [
@@ -2518,7 +2545,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 4370,
+    "ceiling": 6480,
     "stage": [
       "step.test"
     ]
@@ -3868,6 +3895,7 @@
       "{prefix}/memory-tree/asbuilt_view.py",
       "{prefix}/memory-tree/deviation_join.py",
       "{prefix}/memory-tree/routed_commits.py",
+      "{prefix}/memory-tree/commit_trailers.py",
       "{prefix}/memory-tree/row_grammar.py",
       "{prefix}/roles/roles_lib.py",
       "{prefix}/roles/render_agents.py",
@@ -4488,6 +4516,94 @@
     "ceiling": 120,
     "enforces": [
       "principle.p23"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "loop request fixtures",
+    "tag": "leg.gov.loop-request-fixtures",
+    "tests": [
+      "feature.loop"
+    ],
+    "purpose": "plants a request's content key through its key verb",
+    "argv": [
+      "python",
+      "{prefix}/loop/request.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 120,
+    "enforces": [
+      "principle.p40"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "loop probe fixtures",
+    "tag": "leg.gov.loop-probe-fixtures",
+    "tests": [
+      "feature.loop"
+    ],
+    "purpose": "plants every break of the probe program",
+    "argv": [
+      "python",
+      "{prefix}/loop/probe.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": [
+      "principle.p31"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "loop placement fixtures",
+    "tag": "leg.gov.loop-placement-fixtures",
+    "tests": [
+      "feature.loop"
+    ],
+    "purpose": "plants every case of the placement predicate",
+    "argv": [
+      "python",
+      "{prefix}/loop/placement.py",
+      "--fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 200,
+    "enforces": [
+      "principle.p22"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "loop claim fixtures",
+    "tag": "leg.gov.loop-claim-fixtures",
+    "tests": [
+      "feature.loop"
+    ],
+    "purpose": "plants every case of the entry claim against a bare remote",
+    "argv": [
+      "python",
+      "{prefix}/loop/claim.py",
+      "--fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": [
+      "principle.p39"
     ],
     "stage": [
       "step.test"

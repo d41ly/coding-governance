@@ -48,6 +48,7 @@ import json
 import os
 import pathlib
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -424,7 +425,17 @@ def check_git_arms():
             else:
                 os.environ[k] = v
         # ponytail: a leaked directory in the OS temp dir beats a red leg from a held handle on Windows.
-        shutil.rmtree(base, ignore_errors=True)
+        # Not ignore_errors: git writes its objects read-only, so those are made writable and retried.
+        def set_writable(func, path, _exc):
+            try:
+                os.chmod(path, stat.S_IWRITE)
+                func(path)
+            except OSError:
+                pass
+        try:
+            shutil.rmtree(base, **{"onexc" if sys.version_info >= (3, 12) else "onerror": set_writable})
+        except OSError:
+            pass
 
 
 def main(argv):

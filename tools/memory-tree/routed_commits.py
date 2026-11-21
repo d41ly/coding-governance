@@ -1431,7 +1431,8 @@ def run_selftest() -> int:
             "TOOL-dDeclaredLoop-40 AC5 a trailer key table of no rows reads the floor keys, with the note",
             f"{got.stdout}\n{got.stderr}")
     finally:
-        shutil.rmtree(root, ignore_errors=True)
+        import deviation_join  # noqa: E402  its remover: git's objects are read-only on Windows
+        deviation_join.remove_tree(root)
     print(f"{SAY} selftest: {'all arms held' if not failed else f'{len(failed)} arm(s) FAILED'}")
     return 1 if failed else 0
 

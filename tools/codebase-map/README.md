@@ -86,7 +86,7 @@ project specifics live in exactly two files the adopting repo owns.
   out. A symbol is a SEAM when fan-in plus installs reaches `SEAM_FANIN_THRESHOLD`, here and in
   `gen_map.py --seed-affordances` alike; installs never move the ranking order.
 - `adopt-codebase-map.sh --scaffold` — the one-shot adopter.
-- `.codebase-map.conf.example` — per-repo conf (MAP_ROOT · GATE_FILE · MAP_DIFF_CMD).
+- `.codebase-map.conf.example` — per-repo conf (MAP_ROOT · GATE_FILE · MAP_DIFF_CMD · GEN_MAP_PYTHON, the interpreter command `gen_map.py` hands itself to when the extractors need the application's own environment).
 - `selftest.py` — the kit's own contract check (`python <kit>/selftest.py`).
 
 ## Adopt (per project)

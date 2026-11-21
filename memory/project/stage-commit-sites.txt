@@ -1,0 +1,3 @@
+# ledger · stage-commit-sites · key site path,class · direction shrink-only · drain hunk
+skills/session-kickoff/card-compaction.fixture.sh	unchecked-stage	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+tools/unattended/pass-tree.sh	unchecked-stage	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded

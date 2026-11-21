@@ -292,5 +292,41 @@ def main() -> int:
     return 1 if stale else 0
 
 
+#: set in the environment of a run `GEN_MAP_PYTHON` started, so that run maps and never hands off again
+REEXEC_MARK = "GEN_MAP_REEXEC"
+
+
+def run_declared_python() -> int | None:
+    """Hand this run to the interpreter `.codebase-map.conf` names in `GEN_MAP_PYTHON`, or None to
+    run here (TOOL-dHomeGraded-3 S1).
+
+    An adopter's extractors import its own application, so the map can only be built where that
+    application's packages are installed. Run-gates' regen step and the lander spawn this file under
+    the interpreter gov's resolver picks, floored at 3.15 for gov's own code, which an adopter's
+    application environment may sit below: adopter ic's extractors import FastAPI from a 3.12 venv. The
+    key is a command, split like a shell word list, as `MAP_DIFF_CMD` is: `uv run --project
+    services/api python`. The run it starts carries REEXEC_MARK and maps in place. A command that
+    cannot start exits 2 naming the key; unset, nothing changes."""
+    if os.environ.get(REEXEC_MARK):
+        return None
+    cmd = (m.load_conf().get("GEN_MAP_PYTHON") or "").strip()
+    if not cmd:
+        return None
+    import shlex
+    import shutil
+    import subprocess
+    argv = shlex.split(cmd, posix=True)
+    if not argv:
+        return None
+    exe = shutil.which(argv[0]) or argv[0]
+    try:
+        return subprocess.call([exe, *argv[1:], os.path.abspath(__file__), *sys.argv[1:]],
+                               env=dict(os.environ, **{REEXEC_MARK: "1"}))
+    except OSError as exc:
+        print(f"gen_map: GEN_MAP_PYTHON={cmd!r} in {m.CONF_NAME} could not start: {exc}", file=sys.stderr)
+        return 2
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    _handed = run_declared_python()
+    sys.exit(main() if _handed is None else _handed)

@@ -4115,6 +4115,26 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
           and (t / ".governance" / "policy.toml").read_bytes() == pol0, up.stdout + up.stderr)
 
 
+def check_kickoff_facts_step() -> None:
+    """TOOL-dPlacedRequest-9 AC1 AC3 AC4 AC5 AC6 AC7 AC9, and the step's and the verb's refusals — the step's `--fixture --plant <case>` for every
+    case it declares, each under `-I` as the runner runs a step, each in its own throwaway repository: an
+    exit 0 and no FAIL line is the case held. The cases are read from the step's own usage refusal, so a
+    joining plant arms its own case here."""
+    step_py = HERE / "steps" / "kickoff_facts_to_overlay.py"
+    probe = subprocess.run([sys.executable, "-I", str(step_py), "--fixture", "--plant", "?"], capture_output=True,
+                           text=True, encoding="utf-8", errors="replace", timeout=120)
+    found = _re.search(r"the plants are (.+)$", probe.stderr, _re.M)
+    cases = found[1].split(", ") if found else []
+    check("[dPR-9] LIVENESS the step names its fixture's plants, sixteen of them", probe.returncode == 2
+          and len(cases) == 16, probe.stdout + probe.stderr)
+    for case in cases:
+        p = subprocess.run([sys.executable, "-I", str(step_py), "--fixture", "--plant", case], capture_output=True,
+                           text=True, encoding="utf-8", errors="replace", timeout=900)
+        check(f"[dPR-9] the step's fixture case {case} holds: exit 0 and no FAIL line",
+              p.returncode == 0 and not _re.search(r"^FAIL ", p.stdout, _re.M) and " · 0 failed" in p.stdout,
+              p.stdout + p.stderr)
+
+
 def check_review_rounds_step(tmp: pathlib.Path) -> None:
     """TOOL-dDeclaredLoop-21 AC7 — S7's up, down and witness argvs over scratch targets, each run under
     `-I` as the runner runs it, with every `raise Refusal` site of `review_rounds.py` and of the shared
@@ -6543,6 +6563,7 @@ def main() -> int:
         check_upgrade_steps(tmp / "dsp")
         check_succession(tmp / "dsc")
         check_fanout_step(tmp / "dfs")
+        check_kickoff_facts_step()
         check_review_rounds_step(tmp / "drr")
         check_inherited_red_step(tmp / "dir")
         check_receipt_schema(tmp / "drs")
@@ -17097,7 +17118,9 @@ user_skills = "/tmp/gk-fake-skills"
         # and asserts the command SUCCEEDS, which is only meaningful because the same list through
         # argv is asserted to FAIL right after it.
         import tempfile as _tf4
-        _d4 = _tf4.mkdtemp()
+        # Under main's TemporaryDirectory: git's read-only objects survive the rmtree below on
+        # Windows, and that directory's own cleanup clears them.
+        _d4 = _tf4.mkdtemp(dir=td)
         _r4 = pathlib.Path(_d4)
         subprocess.run(["git", "init", "-q", str(_r4)], capture_output=True)
         subprocess.run(["git", "-C", str(_r4), "config", "user.email", "t@t"], capture_output=True)
@@ -19955,6 +19978,65 @@ user_skills = "/tmp/gk-fake-skills"
               and ("agent-instructions wiring", "demo") in read_owned13(_t13c)
               and "the gate-leg step refused" not in _u13c.stdout,
               _u13c.stdout[-1400:] + _u13c.stderr[-600:])
+
+        # ---- [dHG-1 S5]. A RETIRED KIT'S LEG LEAVES WITH THE KIT. The receipt records two legs of a
+        # ---- kit no descriptor declares, both in the runner: one at its recorded argv, one the
+        # ---- target edited. `update --write` removes the first from the runner and both from the
+        # ---- receipt; the edited one stays in the runner as the target's own.
+        _g5r = build_gov13("dhg5")
+        _t5r = build_target13("dhg5")
+        run_gov13(_g5r, "apply", "--target", str(_t5r))
+        settle(_t5r, "after apply")
+        _gone = [{"name": "retired wiring", "kit": "retired-kit", "argv": ["bash", "scripts/retired/check.sh"]},
+                 {"name": "retired edited", "kit": "retired-kit", "argv": ["bash", "scripts/retired/edit.sh"]}]
+        _rc5r = read_receipt13(_t5r)
+        _rc5r["gate_runner"]["emitted"] += [dict(e, guard=[], subject="repo") for e in _gone]
+        (_t5r / ".governance" / "install.json").write_text(
+            json.dumps(_rc5r, indent=2) + NL13, encoding="utf-8", newline="\n")
+        _lg5r = json.loads((_t5r / "scripts" / "gate-legs.json").read_text(encoding="utf-8"))
+        _lg5r += [{"name": _gone[0]["name"], "argv": _gone[0]["argv"]},
+                  {"name": _gone[1]["name"], "argv": [*_gone[1]["argv"], "--theirs"]}]
+        (_t5r / "scripts" / "gate-legs.json").write_text(
+            json.dumps(_lg5r, indent=2) + NL13, encoding="utf-8", newline="\n")
+        settle(_t5r, "the receipt records a retired kit's legs")
+        write_vintage13(_g5r)
+        _u5r = run_gov13(_g5r, "update", "--target", str(_t5r), "--write")
+        _left5r = [e.get("name") for e in json.loads(
+            (_t5r / "scripts" / "gate-legs.json").read_text(encoding="utf-8"))]
+        check("[dHG-1 AC5] update --write drops a retired kit's untouched leg from the runner and keeps "
+              "the one the target edited",
+              "retired wiring" not in _left5r and "retired edited" in _left5r
+              and "dropped   leg 'retired wiring'" in _u5r.stdout
+              and "released  leg 'retired edited'" in _u5r.stdout,
+              f"{_left5r} · " + _u5r.stdout[-1400:] + _u5r.stderr[-600:])
+        check("[dHG-1 AC5] ...and the restamped receipt claims neither, while the live kit's leg stays",
+              not any(n.startswith("retired ") for n, _k in read_owned13(_t5r))
+              and any(k == "demo" for _n, k in read_owned13(_t5r)),
+              str(read_owned13(_t5r)))
+
+        # ---- [dHG-2 S1]. A RETIRED ROW A LIVE ROW SUPERSEDES LEAVES. The receipt gains a
+        # ---- `retired-edited` row at the path an `engine` row already carries, the shape a seed rule's
+        # ---- row leaves when `apply` moves its file to an engine row; `update --write` reaps it, and
+        # ---- the sums sidecar lists the path once.
+        _g2r = build_gov13("dhg2")
+        _t2r = build_target13("dhg2")
+        run_gov13(_g2r, "apply", "--target", str(_t2r))
+        settle(_t2r, "after apply")
+        _rc2r = read_receipt13(_t2r)
+        _live2r = next(f for f in _rc2r["files"] if f.get("role") == "engine" and f.get("sha256"))
+        _rc2r["files"].append(dict(_live2r, role="retired-edited", kit="retired-seed", sha256="0" * 64))
+        (_t2r / ".governance" / "install.json").write_text(
+            json.dumps(_rc2r, indent=2) + NL13, encoding="utf-8", newline="\n")
+        settle(_t2r, "the receipt carries a superseded retired row")
+        write_vintage13(_g2r)
+        _u2r = run_gov13(_g2r, "update", "--target", str(_t2r), "--write")
+        _rows2r = [f for f in read_receipt13(_t2r)["files"] if f.get("path") == _live2r["path"]]
+        _sums2r = (_t2r / ".governance" / "install.sums").read_text(encoding="utf-8")
+        check("[dHG-2 AC1] update --write reaps the retired row a live engine row supersedes",
+              [f.get("role") for f in _rows2r] == ["engine"]
+              and f"reaped    row '{_live2r['path']}'" in _u2r.stdout
+              and _sums2r.count(" " + _live2r["path"]) == 1,
+              f"{[f.get('role') for f in _rows2r]} · " + _u2r.stdout[-1200:] + _u2r.stderr[-400:])
 
         # ---- [dRB-16]. A NARROWER APPLY KEEPS THE CARRIED KIT'S LEG OWNERSHIP TOO.
         # ---- TOOL-dRedressedBar-12 keeps a kit the selection did not name in the receipt's `kits`,

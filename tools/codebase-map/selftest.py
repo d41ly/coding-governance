@@ -474,6 +474,7 @@ def test_remedy_paths_are_real(tmp: Path):
     got = run(f"{PFX}{KIT_NAME}/gen_map.py", "--scaffold")
     assert got.returncode == 0, got.stdout + got.stderr
 
+
     # S4 of TOOL-aRepatriatedFork-25: the legacy constant a pre-1.1 GATE_FILE reads names THIS
     # install's generator, so an old gate at a prefix prints a command that exists.
     got = run("-c", f"import sys; sys.path.insert(0, {str(kit)!r}); import map_lib as m; print(m.REGEN_CMD)")
@@ -519,6 +520,39 @@ def test_remedy_paths_are_real(tmp: Path):
     # the generated artifacts carry the same real prefix (they are the remedy's other home)
     inv = (repo / "memory" / "map" / "generated" / "inventories.json").read_text(encoding="utf-8")
     assert f"{PFX}{KIT_NAME}/gen_map.py" in inv, inv[:400]
+
+
+def test_gen_map_declared_python(tmp: Path):
+    """TOOL-dHomeGraded-3 AC1: `GEN_MAP_PYTHON` hands the run to the command it names, with the run's
+    own arguments; a run that already carries GEN_MAP_REEXEC, or a conf with no key, maps in place."""
+    import gen_map as gm
+    root = tmp / "declared"
+    root.mkdir()
+    exe = sys.executable.replace(chr(92), "/")
+    # exits 7 only when the handed argument list ends in `--check`, whose last letter is k (chr 107)
+    (root / m.CONF_NAME).write_text(
+        f"GEN_MAP_PYTHON=\"{exe} -c 'import sys; sys.exit(7 if sys.argv[-1].endswith(chr(107)) else 3)'\"\n",
+        encoding="utf-8")
+    saved_env = {k: os.environ.get(k) for k in ("CODEBASE_MAP_ROOT", gm.REEXEC_MARK)}
+    saved_argv = sys.argv
+    try:
+        os.environ["CODEBASE_MAP_ROOT"] = str(root)
+        os.environ.pop(gm.REEXEC_MARK, None)
+        sys.argv = ["gen_map.py", "--check"]
+        got = gm.run_declared_python()
+        assert got == 7, f"GEN_MAP_PYTHON was not handed the run with its arguments: {got!r}"
+        os.environ[gm.REEXEC_MARK] = "1"
+        assert gm.run_declared_python() is None, "a handed-off run handed off again"
+        os.environ.pop(gm.REEXEC_MARK, None)
+        (root / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+        assert gm.run_declared_python() is None, "a conf with no GEN_MAP_PYTHON handed the run off"
+    finally:
+        sys.argv = saved_argv
+        for k, v in saved_env.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
 
 
 def test_coverage_directions():
@@ -1875,6 +1909,9 @@ def main() -> int:
         )
     failures += check_guarded("js definition probe ⊇ the lexicon's own set (TOOL-dClosedLexicon-12)",
                       test_js_probe_against_the_lexicon)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gen_map hands its run to GEN_MAP_PYTHON (TOOL-dHomeGraded-3)",
+                          lambda: test_gen_map_declared_python(Path(td)))
     failures += check("coverage both directions + ratchet guards", test_coverage_directions)
     failures += check("dossier contract fails loud", test_parse_contract)
     failures += check("the optional stage key: a list carried, a string refused (TOOL-dDeclaredLoop-4)", test_stage_key)

@@ -216,3 +216,9 @@ memory/builds/aTwinnedPass/README.md	bound	1	7dbe0c8d9d2ca46a849065c73ad9cf721c4
 memory/builds/aPiecewiseGrade/README.md	bound	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 memory/builds/aHastenedSweep/README.md	bound	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 memory/builds/aTrimmedWait/README.md	bound	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+memory/builds/dHomeGraded/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+memory/builds/dLandedOwners/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+memory/builds/dSettledStage/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+memory/builds/dSkippedRecord/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+memory/builds/dSweptScratch/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+memory/builds/dTrackedAtlas/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded

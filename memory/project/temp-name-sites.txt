@@ -1,6 +1,7 @@
 # ledger · temp-name-sites · key site path,class · direction shrink-only · drain hunk
 .githooks/pre-push	fixed-temp	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-skills/session-kickoff/manifest-check.sh	fixed-temp	3	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+skills/session-kickoff/card-store.fixture.sh	fixed-temp	8	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+skills/session-kickoff/manifest-check.sh	fixed-temp	5	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/branch-reconcile/adopt-branch-reconcile.sh	fixed-temp	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/check-template-size.sh	fixed-temp	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/check-wiring.sh	fixed-temp	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
@@ -8,6 +9,8 @@ tools/codebase-map/adopt-codebase-map.sh	fixed-temp	1	7dbe0c8d9d2ca46a849065c73a
 tools/lib/health-log.sh	fixed-temp	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/memory-recall/adopt-memory-recall.sh	fixed-temp	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/memory-tree/adopt-memory-tree.sh	fixed-temp	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+tools/push-main.sh	fixed-temp	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+tools/run-gates/post-merge.sh	fixed-temp	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 tools/run-gates/run-gates.sh	fixed-temp	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/runlog/adopt-runlog.sh	fixed-temp	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/unattended/adopt-unattended.sh	fixed-temp	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded

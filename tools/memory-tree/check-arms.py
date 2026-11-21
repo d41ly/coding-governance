@@ -762,6 +762,43 @@ def parse_ceilings(conf: dict) -> tuple:
     return out, bad
 
 
+# >>> home_graded_py — canonical copy: home_graded.py in gov's lib dir (byte-identical; gated)
+def derive_home_graded(root):
+    """The set of tracked paths under `root` that a `.governance/install.json` `engine` row installed
+    at gov's own bytes (`oid` == `gov_oid`) and that still hash to them. Empty when there is no
+    receipt, it does not read, or the hash fails: the caller then grades every path, as before."""
+    import json
+    import pathlib
+    import subprocess
+    root = pathlib.Path(root)
+    try:
+        rows = json.loads((root / ".governance" / "install.json").read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        return set()
+    want = {}
+    for row in rows:
+        if not isinstance(row, dict) or row.get("role") != "engine":
+            continue
+        path, oid = row.get("path"), row.get("oid")
+        if isinstance(path, str) and isinstance(oid, str) and oid and oid == row.get("gov_oid") \
+                and ".." not in path.split("/") and (root / path).is_file():
+            want[path] = oid
+    if not want:
+        return set()
+    paths = sorted(want)
+    try:
+        out = subprocess.run(["git", "hash-object", "--stdin-paths"], cwd=str(root),
+                             input="".join(p + "\n" for p in paths), capture_output=True,
+                             text=True, encoding="utf-8")
+    except OSError:
+        return set()
+    got = out.stdout.split()
+    if out.returncode != 0 or len(got) != len(paths):
+        return set()
+    return {p for p, oid in zip(paths, got) if oid == want[p]}
+# <<< home_graded_py
+
+
 def check_families(root: str, census: dict, log: str) -> tuple:
     """-> (problems, report lines) for every tracked `<stem>.families.txt` sidecar.
 
@@ -772,6 +809,10 @@ def check_families(root: str, census: dict, log: str) -> tuple:
     """
     bad, lines = [], []
     sidecars = sorted(p for p in run("git", "ls-files", cwd=root).split("\n") if p.endswith(FAMILIES_SUFFIX))
+    # A SIDECAR GOV INSTALLED AT ITS OWN BYTES cites gov's decisions (TOOL-dHomeGraded-1 S3): its rows
+    # were raised by gov's owner and recorded in gov's DECISIONS.md, which no adopter carries. Its
+    # shape, patterns and ceilings are still graded here; only the decision join is gov's.
+    home = derive_home_graded(root)
     for rel in sidecars:
         gate = rel[:-len(FAMILIES_SUFFIX)] + ".sh"
         if gate not in census:
@@ -793,7 +834,7 @@ def check_families(root: str, census: dict, log: str) -> tuple:
             except re.error as exc:
                 bad.append(f"check-arms: {rel}:{i} family {name} carries a pattern that does not compile ({exc})")
                 continue
-            if not check_id_carried(ident, log):
+            if rel not in home and not check_id_carried(ident, log):
                 bad.append(f"check-arms: {rel}:{i} family {name} names {ident}, which no DECISIONS.md row "
                            f"carries — a family ceiling is raised by a recorded decision or not at all")
             got = sum(1 for msg in census[gate] if pat.search(msg))
@@ -1660,6 +1701,19 @@ def cmd_selftest() -> int:
                                      families="dead\t1\t2026-10-12\tTOOL-tBudget-1\t^no such refusal\n")
         arm("AC7: a family pattern matching no refusal site reds naming the family",
             f"{BF}:1 family dead matches no refusal site in {BG}", lambda: cmd_check(tb7, cb7))
+        # HOME-GRADED (TOOL-dHomeGraded-1 S3): a sidecar naming a decision this log lacks reds, and the
+        # same sidecar claimed by a receipt engine row at gov's bytes cites gov's log and is green.
+        gfam = fam.replace("TOOL-tBudget-1", "TOOL-tBudget-9")
+        for hn, homed in (("b12", False), ("b13", True)):
+            th, ch = build_budget_tree(hn, f"{BG}:3:2026-10-12:TOOL-tBudget-1", families=gfam)
+            if homed:
+                oid = run("git", "hash-object", BF, cwd=th).strip()
+                _w(os.path.join(th, ".governance", "install.json"), '{"files": [{"path": "%s", "role": '
+                   '"engine", "oid": "%s", "gov_oid": "%s"}]}' % (BF, oid, oid))
+            arm("S3 home-graded: a gov-installed sidecar's decision is gov's, so this log is not asked"
+                if homed else "S3 control: a sidecar naming a decision this log lacks reds",
+                "" if homed else "family alpha names TOOL-tBudget-9, which no DECISIONS.md row carries",
+                lambda th=th, ch=ch: cmd_check(th, ch))
 
         tb8, cb8 = build_budget_tree("b8", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
                                      rows=render_retirement_row(BG, "beta refusal message here"))

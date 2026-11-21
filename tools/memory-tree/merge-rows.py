@@ -1360,7 +1360,7 @@ def read_tables(lines: list[str]) -> tuple[str, dict]:
 
 
 # PLAY-dOrderedCharter-52: the table class's envelope, one row per reachable `(base, ours, theirs[, agreement])`
-# state; a state with no row is a conflict, never a side. The driver's suite enumerates it for totality.
+# state; a state with no row is a conflict, never a side. The driver's suite enumerates every state.
 TABLE_ENVELOPE = {
     ("present", "unchanged", "unchanged"): "base",
     ("present", "changed", "unchanged"): "ours",

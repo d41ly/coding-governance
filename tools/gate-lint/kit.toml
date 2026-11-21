@@ -59,6 +59,10 @@ the kit ships no adopter and no rendered artifact, so there is nothing for this 
 # repository's shell tree and not about the kit that ships the scanner, and NO guard, because it
 # grades every tracked `*.sh`: no subset of paths bounds it, and a guard could only make it skip the
 # file that just broke.
+# NO REGISTRY ARGUMENT IS NOT AN EMPTY ONE when the target holds the default (TOOL-dHomeGraded-1 S7): each
+# mode then reads `<MEMORY_ROOT>/project/<its registry>.txt`, the path the home rows below name, so an
+# adopter declares its own sites there without editing gov's emitted row, which govkit reports as drift.
+# A kit file installed at gov's own bytes is not graded in an adopter at all: gov grades it here.
 [[gate_leg]]
 tag = "leg.gate-lint.shell-hygiene-a-loop-fed-by-a-command-substitution"
 tests = ["feature.gate-lint"]
@@ -166,6 +170,39 @@ argv = [
   "{prefix}/gate-lint/sh_hygiene.py",
   "--temp-names",
   "memory/project/temp-name-sites.txt",
+  ".",
+  ":!*.test.sh",
+  ":!memory/",
+]
+guard = []
+chunk = "product"
+ceiling = 300
+
+# The stage-commit lint, the scanner's fifth mode (TOOL-dSettledStage-2). `subject = "repo"` and no
+# guard for the loop scan's reason: a commit after a stage nothing tested can arrive in any shell file.
+# The argv passes no registry, so an adopter's first run grades against an empty declaration and lists
+# every site it carries — the posture of the four legs above. The home repository's row passes its
+# registry and excludes its suites and its memory tree, as the temp-name row does: a suite's fixture
+# repositories commit what they just staged. It enforces the line-endings rule: the stage it catches
+# untested is the one a tree dirty by line endings alone normalises back to the committed bytes.
+[[gate_leg]]
+tag = "leg.gate-lint.shell-hygiene-a-stage-committed-with-no-staged-diff-test"
+tests = ["feature.gate-lint"]
+pack = "portability"
+enforces = ["practice.portable.line-endings"]
+name = "shell hygiene (a stage committed with no staged-diff test)"
+subject = "repo"
+purpose = "catches a commit after an untested stage in a shell file"
+argv = ["python3", "{kit}/sh_hygiene.py", "--stage-commits"]
+guard = []
+stage = ["step.test"]
+
+[gate_leg.gov]
+argv = [
+  "python3",
+  "{prefix}/gate-lint/sh_hygiene.py",
+  "--stage-commits",
+  "memory/project/stage-commit-sites.txt",
   ".",
   ":!*.test.sh",
   ":!memory/",
@@ -413,6 +450,19 @@ fields = ["path", "class"]
 drain = "hunk"
 direction = "shrink-only"
 home = "memory/project/temp-name-sites.txt"
+
+# The stage-commit lint's population (TOOL-dSettledStage-2), converted onto the ledger grammar at the
+# landing merge of TOOL-dWitnessedBar-16's conversion over it; its seed reads the home back, as the
+# temp-name population's does.
+[[ledger]]
+population = "stage-commit-sites"
+leg = "shell hygiene (a stage committed with no staged-diff test)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "stage-commit-sites"]
+key = "site"
+fields = ["path", "class"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/stage-commit-sites.txt"
 
 # THE PORTABILITY PACK'S POPULATIONS (TOOL-dWitnessedBar-24 S13): each seed is the scanner's own mode
 # with `--measure`, over the population gov's leg argv grades, printing each key's fields then its count.

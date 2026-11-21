@@ -608,9 +608,14 @@ BIND_HEAD_LINES = 12
 # `keep_tails.py` alone. `flake` (TOOL-dWitnessedBar-8 S3) is one `test.flakes` run's per-leg verdicts,
 # written through `write_record` by the run-gates kit's `verdict_flow.py flakes` alone. `gate-health`
 # (TOOL-dWitnessedBar-1 S4) is one gate-health measurement, the reliability bar derived from the flake records,
-# written through `write_record` by the drift kit's `drift_report.py --gate-health --write` alone.
+# written through `write_record` by the drift kit's `drift_report.py --gate-health --write` alone. `card`
+# (TOOL-dPlacedRequest-2 S8) is a build's orientation card at one step, its snapshot, written by the
+# kickoff engine through the factory's `write_record`, no door. `probe-trigger` and `probe`
+# (TOOL-dPlacedRequest-7 S6) are a probe opened at an item boundary and the probe it opened, its head, its
+# method, its run lines and its verdict, written by the loop kit's probe.py through `write_record`, no door.
 TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition", "acceptance",
-                      "transition", "recommendation", "widen", "leg-tail", "flake", "gate-health")
+                      "transition", "recommendation", "widen", "leg-tail", "flake", "gate-health", "card",
+                      "probe-trigger", "probe")
 RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally

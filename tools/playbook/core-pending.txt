@@ -19,13 +19,11 @@ principle	principle.p25	dBoundRoles
 principle	principle.p27	dOrderedCharter
 principle	principle.p29	dBoundRoles
 principle	principle.p30	dTotalRecall
-principle	principle.p31	dPlacedRequest
 principle	principle.p32	dPlacedRequest
 principle	principle.p34	dOrderedCharter
 principle	principle.p35	dTrueNorth
 principle	principle.p36	dWellOiledMachine
 principle	principle.p37	dSafePassage
-principle	principle.p40	dPlacedRequest
 principle	principle.p41	dTrueNorth
 practice	practice.yagni	dWitnessedBar
 practice	practice.reuse	dWitnessedBar
@@ -62,6 +60,7 @@ leg	build-method size	dWitnessedBar
 leg	unattended protocol size	dWitnessedBar
 leg	unattended skill size	dWitnessedBar
 leg	kickoff engine size <=18KiB	dWitnessedBar
+leg	shell hygiene (a stage committed with no staged-diff test)	dWitnessedBar
 leg	spawn budget (forks per hot entrypoint)	dWitnessedBar
 leg	shell-hygiene selftest	dWitnessedBar
 leg	powershell hygiene selftest	dWitnessedBar

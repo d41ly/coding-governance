@@ -571,6 +571,8 @@ def test_empty_live_scope_exits_three_not_one():
             del os.environ["PROCMON_ROOT"]
         else:
             os.environ["PROCMON_ROOT"] = prior
+        for d in (tree, quiet):   # no git in either, so nothing read-only is left behind
+            shutil.rmtree(d, ignore_errors=True)
 
 
 # ================================================================ classify (unit 3)

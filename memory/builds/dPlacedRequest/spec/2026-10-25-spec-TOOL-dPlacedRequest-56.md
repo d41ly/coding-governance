@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-56 — the round-4 promotions' minors: fresh race attempts, failures staged so they take, one oracle contract, and criteria that read the places they name
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-8 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,8 +12,17 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-56-deviation-561.md](../build/2026-10-25-build-TOOL-dPlacedRequest-56-deviation-561.md) | deviation | — |
 | [2026-10-25-build-TOOL-dPlacedRequest-56-deviation-562.md](../build/2026-10-25-build-TOOL-dPlacedRequest-56-deviation-562.md) | deviation | — |
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-build-TOOL-dPlacedRequest-56-1-acceptance-ledger.md](../build/2026-11-20-build-TOOL-dPlacedRequest-56-1-acceptance-ledger.md) | journal | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-1-runlog-d54afa03.md](../build/2026-11-21-build-TOOL-dPlacedRequest-1-runlog-d54afa03.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-96 TOOL-dPlacedRequest-97 TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 TOOL-dPlacedRequest-100 |
+| [2026-11-21-build-TOOL-dPlacedRequest-56-deviation-711.md](../build/2026-11-21-build-TOOL-dPlacedRequest-56-deviation-711.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-56-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-56-1-spec-writer.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-56-orders-29-30-reground-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-56-orders-29-30-reground-brief.md) | research | TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 |
 | [2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -22,13 +31,10 @@
 The spec audit of the round-4 promotions
 (`memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-50-spec-audit.md`)
 exited CONVERGED with 25 confirmed findings. Its three highs are units 53, 54 and 55. This unit is
-the batch BUILD-METHOD M4 makes of the rest: 12 MEDIUM and 10 LOW findings by raw id, one scope item
-per id, each naming its finding and, in brackets, the review item holding it (M1 to M9, L1 to L7).
-Six review items hold two ids each (M1: 7 and 18; M2: 2 and 23; M5: 9 and 25; L1: 4 and 20; L2: 5
-and 10; L3: 6 and 11), and M1 restates H1's defect, which unit 53 closes at HIGH. Each id still gets
-its own item and its own observation. The minors land on eight units, so this unit repairs none in
-particular and sits above every unit of the build, at order 29, after units 53 to 55 at 28.
-Criterion ACn observes item Sn.
+the batch `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it`
+makes of the rest: 12 MEDIUM and 10 LOW findings by raw id, one scope item per id, each naming its
+finding and, in brackets, the review item holding it (M1 to M9, L1 to L7). It sits above every unit
+of the build, at order 29, after units 53 to 55 at 28.
 
 | Item | Finding | Severity | Lands on |
 |---|---|---|---|
@@ -49,273 +55,364 @@ Criterion ACn observes item Sn.
 | S21 | 21 (L6) | LOW | unit 51 |
 | S22 | 26 (L7) | LOW | unit 52 |
 
+Every unit the minors land on is now CLOSED, the charter's P19 keeps built work out of in-place
+rewrites, and a builder writes no spec. Re-grounded on 2026-11-20 against the tree at `61b097906` by
+`2026-11-20-prompt-TOOL-dPlacedRequest-56-orders-29-30-reground-brief`, each item is one of four
+kinds. The scope ids are kept so the siblings that cite them still resolve, and criterion ACn
+observes item Sn.
+
+| Kind | Items |
+|---|---|
+| builds a product change still owed | S7, S8, S20, S22 |
+| carries the one version oracle, §4's block, observed by a probe | S6, S10 |
+| observes built code or a record by a probe | S3, S4, S12, S14, S16, S21 |
+| closed by a landed unit, or resolved in §4 as text a closed spec froze | S1, S2, S5, S9, S11, S13, S15, S17 to S19 |
+
+Narrowed from rev-7: no item edits a spec; the race's fresh-clone attempts and their arm are not
+built, since unit 52's rebuilt block resets each attempt another way; the `flat` note, the sequence
+lines and the measurement of unit 34 are not made, since their targets are closed or moot.
+
 ## 2. Scope (IN)
 
-Every edit to another unit's spec is in place, one rev bump per spec with its §9 line naming this
-unit and the items it carries.
-
-- **S1** — finding 7 (M1). 52's "named in two places" criteria observe each place. AC1 extracts 48's
-  S2 paragraph and its §3 Edges, AC6 48's S1 paragraph and its §5 risks line, and AC9 43's S22
-  paragraph and its AC22 bullet, each by the `awk` paragraph form 52 S15 uses, and each extract must
-  name the pattern (`S25`, `43 S30`, `48128`). Unit 53's occurrence counts stay beside them. Observed
-  by AC1.
-- **S2** — finding 18 (M1). Under 52 §6's `flat` definition, one sentence: `grep -c` over `flat`
-  answers present or absent only, and a count of 2 or more is `grep -o '<pat>' | wc -l`. Observed by
-  AC2.
-- **S3** — finding 2 (M2). Each attempt of 52's placed race runs on a fresh fixture, a new unit-19
-  clone and bare remote, so no stored `requests/<key>.md`, `.typed` line or remote record an earlier
-  attempt wrote is met. 52 S4 and its §4 sketch state it. Observed by AC3.
-- **S4** — finding 23 (M2). The rest of the per-attempt reset. The arm records the health log's line
-  count when `$h/held` appears and reads only lines past it for `node-lock-broken`. "Never placed"
-  fails the arm at once, as 48 S3 says. An A still running at its bound is killed and waited for
-  before the next attempt. 52 S3, S4 and the §4 sketch state it. Observed by AC4.
-- **S5** — finding 3 (M3). 50 §4 Files touched and 48 §4 Files touched each say that the other unit
-  writes `tools/unattended/unattended.test.sh` at order 25, so the two passes run in sequence.
-  Observed by AC5.
-- **S6** — finding 8 (M4). The oracle's `rev-list --count` ends its revisions with `--`, and `n` is
-  checked numeric before use: `case $n in ''|*[!0-9]*) echo 'version oracle: rev-list failed'; exit
-  2;; esac`. Written into 44 §4 and 52's §4 sketch; 52 §4 Evidence names the deep-path failure.
-  Observed by AC6.
-- **S7** — finding 9 (M5). 52 AC19 and its §7 arm line stage the scratch-directory skip with a file
-  where the directory should be: `: > "$s/f"; CARD_DIR="$s/f/sub"`. The built case in
-  `skills/session-kickoff/manifest-check.test.sh` stages it so, and neither text says "unwritable".
-  Observed by AC7.
-- **S8** — finding 25 (M5). Before it judges the cell, that case asserts its stage took effect:
-  `mkdir -p "$CARD_DIR"` fails, else the case fails naming the stage. Observed by AC8.
-- **S9** — finding 12 (M6). One fixture description. 51 S2 is rewritten so 45 AC2 cites
-  `TOOL-dPlacedRequest-44` §6's fixture by its count, two branch commits and `· 2 commits`, and runs
-  each row's command on it; 45 AC2 is restated to that citation and holds no second description of
-  the fixture. 52 S14's "as 51 S2 writes it" points at the citation, and 52 AC14 checks that 45 AC2
-  names `TOOL-dPlacedRequest-44` and holds no `--no-ff`. Observed by AC9.
-- **S10** — finding 13 (M7), the skeptic's corrected fix, its 44 §8 half being S19's. 44 is restated
-  to the oracle units 52, 54 and 55 leave: S2 and the §5 error line read exit 2 on an empty walk; §5
-  risks names the fact-1 derivation with the own-merge test, a missing or foreign merge exiting 2;
-  the §4 Evidence observations and the Alternatives bullet name the same derivation; and AC3 runs on
-  52 AC13's `git commit-tree -p <tip> -p <base>` merge carrying the lander's subject. 43 AC24 reads
-  "header line, exit 0, no `KIT_` line". Observed by AC10.
-- **S11** — finding 19 (M8). 52 §4 Evidence measures unit 34 with every pending edit applied (52
-  S11's AC59 text as `TOOL-dPlacedRequest-54` S3 cuts it, the §9 lines of 49, 52 and 54) after a
-  `gen_build_index.py --write` render, and records the figure, its date and the margin under 48128.
-  Observed by AC11.
-- **S12** — finding 24 (M9). 51 AC1 gains the absence of 45 rev-2's row: `grep -cE 'git log
-  --first-parent <base>\.\.HEAD` *\|'` over the record prints 0, its red observed by planting that
-  row in a scratch copy. 51 AC2 also runs the `--name-status` form and expects `M
-  tools/unattended/unattended.sh` under the merge. A record that still holds the rev-2 row is
-  corrected in place. Observed by AC12.
-- **S13** — finding 4 (L1). 51 S1's second row reads "`git log --first-parent -p <base>..HEAD`, or
-  `--name-status`", the spelling of 51 §4 and AC1. Observed by AC13.
-- **S14** — finding 20 (L1). One spelling, observed: the string AC1 greps for appears in 51's S1
-  paragraph, its §4 table and its AC1 bullet alike. Observed by AC14.
-- **S15** — finding 5 (L2). Every `grep -cF` in 51 AC1 passes its pattern through `-e`. Observed by
-  AC15.
-- **S16** — finding 10 (L2). Each command 51 AC1 spells is run once, as written, over the record at
-  this unit's pass; 51 §4 Evidence records that each exited 0 or 1. Observed by AC16.
-- **S17** — finding 6 (L3). 50 §4 Evidence cites 47 by label, S1 and AC1 to AC3, with no line
-  numbers. Observed by AC17.
-- **S18** — finding 11 (L3). The same shape in the other round-4 promotion that has it: 52 AC15's
-  "43's `:168`" names 43's §3 hands-off edge to 48 by label. Observed by AC18.
-- **S19** — finding 14 (L4). 44 §8 F1 is amended in place to (a'), the lander's fact-1 derivation
-  with the own-merge test, refusing with exit 2, "superseded by `TOOL-dPlacedRequest-52` F1 and
-  `TOOL-dPlacedRequest-54` F1"; 52 F1 names 44 F1 as the decision it supersedes. Observed by AC19.
-- **S20** — finding 15 (L5). The torn stamp joins its siblings. 47 AC4 gains a third row, a middle
-  commit whose `seen-utc` is `2026-10-2`, expected `live`, in 47's arm; 52 AC21's second clause
-  points at that row instead of planting its own chain. 52's Edges gain a consumes-from
-  `TOOL-dPlacedRequest-50`, mirrored by a hands-off in 50. Observed by AC20.
-- **S21** — finding 21 (L6). 51 §5 observability reads "none: the description line `gotchas.py`
-  prints is unchanged; the pair is named in the record body". Observed by AC21.
-- **S22** — finding 26 (L7). 52 S26 states that the first `renews:` line of a commit wins, as
-  `read_claims` keeps the first occurrence of every key (`tools/unattended/unattended.sh:2171`).
-  52 AC26 gains the row of §4, and the built walk reads the first line. Observed by AC22.
+- **S1** — finding 7 (M1). Closed by `TOOL-dPlacedRequest-52` rev-10: its AC1 counts nothing, its AC6
+  is out with its S6, and its AC9 reads the checker's size join, so no criterion of 52 names a
+  pattern in two places (52's §4 "The folds (F4)"). NOT OBSERVED here: spec text.
+- **S2** — finding 18 (M1). Closed by the same rev: the `flat` definition went with the last
+  criterion that read it. NOT OBSERVED here: spec text.
+- **S3** — finding 2 (M2). Satisfied by unit 52's rebuilt race block, the `TOOL-dPlacedRequest-48`
+  block of `tools/unattended/unattended.test.sh`. Each of its three attempts writes A's and B's texts
+  with the marker `zq-race-marker-48-<n>`, so the key is new to the store and no stored
+  `requests/<key>.md`, `.typed` line or origin ref of an earlier attempt is met. Before A starts it
+  clears the handshake files `$pr_h/once`, `$pr_h/held` and `$pr_h/release`, which sit outside the
+  clone (`TOOL-dPlacedRequest-58`'s fold, F5). Left, its observation. Observed by AC3.
+- **S4** — finding 23 (M2). Satisfied by the same block. It counts the clone's `health.log` before A
+  and reads only the lines past that count for `node-lock-broken` on `requests.lock`; `request race
+  never placed` stops the attempts at once; A is waited for on every attempt, its hold bounded by
+  the stub; and a `jobs -p` row asserts no job is left. Left, its observation. Observed by AC3.
+- **S5** — finding 3 (M3). Resolved in §4: units 48 and 50 are CLOSED, so the two order-25 passes
+  ran and no sequence line is owed. NOT OBSERVED here: spec text.
+- **S6** — finding 8 (M4). §4's block is the build's one version oracle: spec 55's block with its
+  count line corrected. `git rev-list … --count "$r" --` ends its revisions with `--`, and `n` is
+  checked numeric before use, else `version oracle: rev-list failed` and exit 2. Spec 55's block is
+  superseded there and is not edited (F4). Observed by AC6.
+- **S7** — finding 9 (M5). `skills/session-kickoff/manifest-check.test.sh` gains the case no
+  criterion stages today. It evaluates `skills/session-kickoff/manifest-check.sh#derive_claims_line`
+  through the suite's `eval "$(awk …)"` seam, writes a file at `$s/f`, sets `CARD_DIR="$s/f/sub"`,
+  and expects the cell's `claims — skipped: no scratch directory under` line. The case names no
+  `chmod`. Observed by AC7.
+- **S8** — finding 25 (M5). Before it calls the function, the case asserts its stage took:
+  `mkdir -p "$CARD_DIR"` fails, else the case fails `the scratch-directory stage did not take` and
+  judges no cell. Observed by AC8.
+- **S9** — finding 12 (M6). Closed by `TOOL-dPlacedRequest-44` rev-9 and `TOOL-dPlacedRequest-45`:
+  45's AC2 names `TOOL-dPlacedRequest-44` AC2's fixture and holds no `--no-ff`, as 52's S14 records.
+  NOT OBSERVED here: spec text.
+- **S10** — finding 13 (M7). The exit contract units 52, 54 and 55 leave stands in §4's block: an
+  empty walk exits 2, and a merge that is not this build's own exits 2. Spec 44's text and 43's AC24
+  are frozen and name spec 44's block, which spec 55 superseded and §4 supersedes in turn. Observed
+  by AC6.
+- **S11** — finding 19 (M8). Closed by `TOOL-dPlacedRequest-43` S22, as 52's S9 records: the size join
+  reads the cap `tools/check-spec-tokens.py#read_size_ceilings` answers over live specs only, and
+  unit 34 is CLOSED, so no edit S11 named is made and no ceiling is typed. NOT OBSERVED here: unit 34
+  sits outside the size join's population.
+- **S12** — finding 24 (M9). Satisfied: the record
+  `memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md` holds no rev-2 row, and 51's
+  AC1 and AC2 are frozen. Left, the absence observed with its red. Observed by AC12.
+- **S13** — finding 4 (L1). Resolved in §4: 51's S1 is frozen, and the record and 51's §4 and AC1
+  spell the row `--first-parent -p <base>..HEAD`. NOT OBSERVED here: spec text.
+- **S14** — finding 20 (L1). Left, the one grepped string observed where it is graded: the record
+  holds the spelling 51's AC1 greps for. Observed by AC16.
+- **S15** — finding 5 (L2). Closed by 51 rev-3, whose AC1 passes every `grep -cF` pattern after
+  `-e`. NOT OBSERVED here: spec text; AC16 runs those commands.
+- **S16** — finding 10 (L2). Left, the run: each command 51's AC1 spells runs once over the record
+  and exits 0. Spec 51 is frozen, so this unit's acceptance ledger records it. Observed by AC16.
+- **S17** — finding 6 (L3). Resolved in §4: 50's §4 Evidence is frozen. NOT OBSERVED here: spec
+  text.
+- **S18** — finding 11 (L3). Closed by 52 rev-10, which carries no AC15. NOT OBSERVED here: spec text.
+- **S19** — finding 14 (L4). Resolved in §4: 44's F1 is frozen, 52's F1 names
+  `TOOL-dPlacedRequest-54` F1 as superseding its pick, and §4's block runs no merge-base form.
+  NOT OBSERVED here: spec text.
+- **S20** — finding 15 (L5). A torn stamp joins its siblings in the `TOOL-dPlacedRequest-47` block
+  of `tools/unattended/unattended.test.sh`, as §4's torn-stamp row: a three-commit `renews: no`
+  tenure whose middle commit's only feed line carries `2026-10-2` reads `live`, and a scratch copy
+  whose walk keeps no ISO-shape test reads it `unknown -`. Spec 47 carries no AC4 and 52 no AC21, so
+  the row is this unit's own. Observed by AC20.
+- **S21** — finding 21 (L6). Closed by 51 rev-3, whose §5 observability line says `gotchas.py`
+  prints the record's name, description and path. Left, its observation. Observed by AC21.
+- **S22** — finding 26 (L7). Satisfied in the walk: `tools/unattended/unattended.sh#read_claims`
+  reads a `renews:` line only while `cr` holds its sentinel, so a commit's first line wins. Left, the
+  row no suite stages, §4's duplicate-key row: a tip carrying `renews: no` then `renews: -` reads
+  `stale`, and a scratch copy whose match keeps the last line reads it `live`. Observed by AC22.
 
 ## 3. Non-goals (OUT)
 
-- No second mechanism for a high: units 53, 54 and 55 own findings 1, 16 and 22. S1 and S2 sit beside
-  unit 53's counts, and S6, S10 and S19 restate the oracle as units 54 and 55 leave it.
-- No renumbering of any order: S5 records the sequence line for a pair of order-25 passes in text,
-  and the dispatch's recorded write sets are what sequence them (BUILD-METHOD M6).
-- No new gate leg, no lint over spec criteria and no new bug-class record: each arm joins an existing
-  suite, and the closing review's left-shift decides any record (BUILD-METHOD M8).
-- No edit to `TOOL-dPlacedRequest-34`: S11 measures it after unit 54's cut.
+- No edit to any spec but this one: every unit the minors land on is CLOSED (F3).
+- No second mechanism for a high: units 53, 54 and 55 own findings 1, 16 and 22.
+- No race arm: unit 52's rebuilt block holds S3 and S4, and `TOOL-dPlacedRequest-58` owns the absence
+  test of its handshake clear.
+- No base read: `TOOL-dPlacedRequest-57` S1 spells it, and the close passes it to §4's block.
+- No renumbering of any order, and no change to the driver: the walk already reads the first line.
+- No new gate leg, no lint over spec criteria and no new bug-class record: each row joins an existing
+  suite, and the closing review's left-shift decides any record
+  (`doc.build-method#m8-closing-the-build`).
 
 ### Edges
 
-- **consumes-from** `TOOL-dPlacedRequest-52` — §6's `flat` note and AC1, AC6, AC9, AC14, AC15, AC19, AC21 and AC26, S3, S4, S14, S26, §4's sketches and Evidence, Edges and F1, which S1 to S4, S6 to S9, S11, S18 to S20 and S22 amend
-- **consumes-from** `TOOL-dPlacedRequest-44` — S2, §4, §5, AC3 and §8 F1, which S6, S10 and S19 restate to one oracle contract
-- **consumes-from** `TOOL-dPlacedRequest-43` — AC24, which S10 restates to the oracle's header line and exit 0
-- **consumes-from** `TOOL-dPlacedRequest-45` — AC2, which S9 makes cite 44's fixture by count
-- **consumes-from** `TOOL-dPlacedRequest-47` — AC4's rows and its arm, which S20 extends with the torn-stamp row
-- **consumes-from** `TOOL-dPlacedRequest-48` — §4 Files touched, which S5 gives its sequence line
-- **consumes-from** `TOOL-dPlacedRequest-50` — §4 Files touched, Evidence and Edges, which S5, S17 and S20 amend
-- **consumes-from** `TOOL-dPlacedRequest-51` — S1, S2, §4 Evidence, §5, AC1 and AC2, which S9 and S12 to S16 and S21 amend
-- **consumes-from** `TOOL-dPlacedRequest-53` — 52's occurrence counts, beside which S1 and S2 observe each place and note what `grep -c` answers
-- **consumes-from** `TOOL-dPlacedRequest-54` — the own-merge test and 34 AC59's one-line cut, which S10 and S19 restate in 44 and S11 measures unit 34 after
-- **consumes-from** `TOOL-dPlacedRequest-55` — the oracle's captured walk, after which S6 guards the count line
-- **consumes-from** `TOOL-dPlacedRequest-57` — 34 AC59 without its base, after which S11 measures unit 34; that unit's pass runs first at this order
-- **hands-off** `TOOL-dPlacedRequest-58` — S3, §4's per-attempt sketch, AC3 and the race arm, which that unit gives the handshake reset; AC3 is read again at that unit's pass
-- **hands-off** `TOOL-dPlacedRequest-59` — S4, S11, S19, S22, §3, §4, §5, §10 and AC5, which that unit's minors amend; a unit 34 over 48128 at this pass, and AC10 and AC19 while 44 F1's options keep the phrases they count, are read at that unit's pass
-- **hands-off** `TOOL-dPlacedRequest-61` — §1, the consumes-from edge to 57, the header order and AC5 as unit 59 restates it, which that unit's items for findings 3 and 10 amend
+- **consumes-from** `TOOL-dPlacedRequest-52` — the rebuilt race block and the rev-10 text, which S1 to S4, S18 and S22 observe or record closed
+- **consumes-from** `TOOL-dPlacedRequest-44` — §4's block and F1, frozen, which §4's block supersedes through spec 55's
+- **consumes-from** `TOOL-dPlacedRequest-43` — AC24, frozen, whose oracle §4 resolves to its block
+- **consumes-from** `TOOL-dPlacedRequest-45` — AC2, frozen, which S9 records closed
+- **consumes-from** `TOOL-dPlacedRequest-47` — the observer clock block of the suite, which S20 extends with the torn-stamp row
+- **consumes-from** `TOOL-dPlacedRequest-48` — the placed-race block as unit 52 rebuilt it, which S3 observes, and its Files touched, frozen, which S5 resolves
+- **consumes-from** `TOOL-dPlacedRequest-50` — §4, frozen, which S5 and S17 resolve
+- **consumes-from** `TOOL-dPlacedRequest-51` — AC1, §5 and the record, which S12 to S16 and S21 observe
+- **consumes-from** `TOOL-dPlacedRequest-53` — 52's AC1, AC6 and AC9 as that unit left them, which S1 records closed
+- **consumes-from** `TOOL-dPlacedRequest-54` — the own-merge test, which §4's block carries
+- **consumes-from** `TOOL-dPlacedRequest-55` — §4's block, frozen, which this unit's block supersedes with the count line corrected
+- **hands-off** `TOOL-dPlacedRequest-57` — §4's block, which that unit's AC1 runs with the observing run's base
+- **hands-off** `TOOL-dPlacedRequest-58` — S3 and AC3, which name the handshake clear unit 52's block makes, folded at this rev; that unit builds the absence test
+- **hands-off** `TOOL-dPlacedRequest-59` — S4, S11, S19, S22, §3, §4, §5 and §10 as this rev leaves them, which that unit's minors amend
+- **hands-off** `TOOL-dPlacedRequest-61` — §1, the header order and the edge to 57, which that unit's items for findings 3 and 10 amend
 - **hands-off** `TOOL-dPlacedRequest-63` — §3's renumbering bullet, which that unit's item for finding 18 restates
 
 ## 4. Design
 
-### The placed race, per attempt (S3, S4)
+### The oracle the close runs (S6, S10)
 
+```bash
+base=$1
+git rev-parse -q --verify "$base^{commit}" >/dev/null \
+  || { echo "version oracle: base does not resolve"; exit 2; }
+t=$(git rev-list --first-parent --min-parents=2 --max-count=1 HEAD --)
+case "$(git log -1 --format=%s "${t:-HEAD}" --)" in
+  "merge: dPlacedRequest — land onto "*) own=1 ;; *) own=0 ;; esac
+if [ -z "$t" ] || [ "$own" = 0 ] || git merge-base --is-ancestor "$t" "$base"; then
+  echo "version oracle: no prepared merge on HEAD"; exit 2; fi
+r="$t^1..$t^2"
+n=$(git rev-list --no-merges --invert-grep --grep='^mint:' --count "$r" --)
+case $n in ''|*[!0-9]*) echo "version oracle: rev-list failed"; exit 2 ;; esac
+echo "version oracle: ${t:0:8}^1..${t:0:8}^2 · $n commits"
+[ "$n" -gt 0 ] || { echo "version oracle: walked no commit of the build"; exit 2; }
+w=$(git log --no-merges --invert-grep --grep='^mint:' -p "$r" \
+      -- tools/unattended/unattended.sh tools/run-gates/run-gates.sh) \
+  || { echo "version oracle: the walk failed"; exit 2; }
+if printf '%s\n' "$w" | grep -E '^[+-]KIT_(UNATTENDED|RUN_GATES)_VERSION='; then exit 1; fi
+exit 0
 ```
-attempt 1..3:
-  fresh unit-19 clone and bare remote; m = lines in the health log
-  A in background; wait for $h/held (30 s bound), else fail "request race never placed"
-  stamp th; B to its end; stamp tb
-  touch $h/release; wait for A (bound), else kill A and wait
-  tb - th <= NODE_LOCK_BOUND and no node-lock-broken past line m -> judge AC1's asserts, stop
-  else -> discard this attempt
-every attempt overran -> fail "request race placed past the lock bound"
-```
+
+It is spec 55's block with one line changed and one added. The count ends its revisions with `--`,
+so git never weighs the range as a path, and a count that is empty or not a number refuses by name
+instead of reading as an empty walk. Every other line, refusal and exit is spec 55's.
+
+### Where it runs, and what it supersedes
+
+- The close runs this block once, on the prepared merge, after `--phase VERIFYING` and the last
+  `push-main.sh --prepare`, with the base `TOOL-dPlacedRequest-57` S1 reads as its one argument.
+- Spec 55's §4 block, "The oracle the close runs", is superseded by this one and is not edited.
+  Spec 44's block, which spec 55 superseded, stays superseded. Spec 55's AC1 to AC5 name the shapes
+  this block is measured on (AC6).
+- Specs 43, 44, 52 and 54 name an earlier block. Each is CLOSED, so its text stands as built, and
+  this section is where the close finds the one block it runs (P19).
+
+### The placed race as unit 52 rebuilt it (S3, S4, F5)
+
+The block's loop, `tools/unattended/unattended.test.sh@7448c3f6:21728`, per attempt: clear the three
+handshake files; write `a.md` and `b.md` with the attempt's marker; count `health.log`; start A and
+wait for `held` (never placed stops the loop); run B; touch `release` and wait for A; read the log
+past the count; keep the attempt or discard it. Unit 58 ordered 56's S3 and race sketch to carry the
+clear. The built block clears before A, so S3 names the clear and AC3 observes it. Unit 58's absence
+test is that unit's own (F5).
+
+### The torn-stamp row (S20)
+
+In the `TOOL-dPlacedRequest-47` block, after its AC3 row, with that block's helpers:
+
+| Commit | `renews` | Feed line |
+|---|---|---|
+| tip | `no` | sighted 60 s ago, the ref's newest line (PINNED) |
+| middle | `no` | one line, its `seen-utc` the torn `2026-10-2` |
+| opener | `no` | sighted 3600 s ago (PINNED) |
+
+On the driver the middle commit is unsighted and read past, the opener stands for the beat, and the
+row prints `live` under the 24-hour default bound. The copy `torn.sh` under `$oc_copy` replaces the
+walk's clause `!(x[2] in want) || x[6] !~ /…Z$/` with `!(x[2] in want)`; that clause is the walk's
+alone, since `read_first_seen` reads no `want`. On the copy the torn stamp sorts before `thr`, the
+walk stops at the middle commit, and `read_first_seen` still reads that beat unsighted:
+`unknown -`. A `same` row checks the driver carries the clause once and the copy not at all.
 
 ### The duplicate-key row (S22)
 
+After the `DPR46 AC3` loop, in its shape: a tip written by `add_lease_commit` with the whole-line
+argument `$'renews: no\nrenews: -'`, sighted 60 s ago (PINNED), over a `renews: no` commit sighted
+3600000 s ago (PINNED). The driver keeps `no`, reads on, and prints `stale`. The copy `last-line.sh`
+matches `/^renews:/` without `cr == "\001"`, keeps `-`, stops there, and prints `live`.
+
+### The scratch-directory case (S7, S8)
+
+```bash
+eval "$(awk '/^derive_claims_line\(\) \{/,/^}$/' "$CHECK")"
+s=$(mktemp -d); : > "$s/f"; CARD_DIR="$s/f/sub"
+if mkdir -p "$CARD_DIR" 2>/dev/null; then fail "the scratch-directory stage did not take"
+else check_eq "…" "claims — skipped: no scratch directory under $CARD_DIR to capture the read in" \
+  "$(derive_claims_line write)"; fi
 ```
-commit    renews lines           seen-utc                expect
-tip       renews: no             a minute ago
-middle    renews: no, renews: -  a minute ago
-start     renews: no             1,000 hours ago         stale  (first line wins)
-red copy  the walk keeps the last renews: line           live
-```
+
+The skip returns before `run_driver_bounded`, so no driver stub is needed. `CARD_DIR` is derived
+from the git common dir in the script, so the case sets it in its own shell after the `eval`.
+
+### The closed specs' text (S1, S2, S5, S9, S11, S13, S15, S17 to S19)
+
+The closing mechanism is P19: a CLOSED spec is a frozen record, so its text stands as built, and the
+fact each finding asked for stands here, or in the code this unit builds.
+
+- S1, S2, S18: 52 rev-10 carries no `flat`, no AC6 and no AC15, and its AC1 and AC9 count nothing.
+- S5: the order-25 passes of 48 and 50 ran and closed; a sequence line would order nothing.
+- S9: 45's AC2 names 44's AC2 fixture; 52's S14 records it.
+- S11: unit 34 measured 53340 bytes on 2026-11-20 (PINNED), CLOSED and outside the size join.
+- S13, S15: 51's S1 spells the row `--first-parent <base>..HEAD` with `-p` or `--name-status`, and
+  its §4 table and AC1 spell `--first-parent -p <base>..HEAD`; AC16 greps the record for the latter.
+- S17: 50's §4 Evidence cites 47 as built; 47 is CLOSED and its labels stand.
+- S19: 44's F1 keeps "the merge-base form elsewhere"; 52's F1 names 54's F1 as superseding, and the
+  one block above runs fact 1 and no merge-base form.
 
 ### Evidence
 
-- `skills/session-kickoff/manifest-check.sh:653-654` skips only when `mkdir -p "$CARD_DIR" && mktemp
-  -d "$CARD_DIR/.claims.XXXXXX"` fails; the review's skeptic measured `chmod 555` leaving `mktemp -d`
-  working under Git Bash on NTFS, and a file in the directory's place failing `mkdir -p` with "Not a
-  directory".
-- `tools/unattended/unattended.sh:2171` keeps a key only when `!(k in v)`, the first occurrence.
-- `tools/memory-tree/gotchas.py:276-279` takes `description` from the front matter and no body text.
-- 52 AC15 cites 43 at `:168`, which today is 43's hands-off edge to 48; 50 §4 Evidence cites 47 at
-  `:33-35` and `:111-120`, where 47 now holds S1 at :34 and AC1 to AC3 at :114, :118 and :121. Read
-  2026-10-25.
-- Unit 34 measured 47490 bytes at rev-7 and 47782 at rev-8, after this round's edge line to unit 54,
-  on 2026-10-25: 346 under 48128 before any edit S11 names. PINNED at that date.
+- Measured 2026-11-20 on node a with git 2.54.0.windows.1, in the fixture of spec 55's §4 Evidence
+  under the session scratch root, the base its root commit: this block printed the header ending
+  `· 2 commits` and both version lines, exit 1 (2 PINNED); a stacked `records: close` commit read the
+  same; a base naming no commit printed `base does not resolve`, exit 2; a merge built by
+  `git commit-tree -p <tip> -p <base>` printed `· 0 commits` and `walked no commit of the build`,
+  exit 2. PINNED at that date.
+- Under a stub `git` first on `PATH`, exiting 128 with no output on a `rev-list` call carrying
+  `--count`, this block printed `rev-list failed`, exit 2, and spec 55's block printed an `integer
+  expected` error and `walked no commit of the build`, exit 2: a failed count read as an empty walk.
+- The review's deep-path failure did not reproduce on node a: from working directories of 197 to 247
+  characters (PINNED), spec 55's count line without `--` printed 2 (PINNED), with `core.longpaths` set
+  true in the user config and with it overridden false. The `--` costs nothing where it is not needed.
+- In this worktree, with the run's base read as `TOOL-dPlacedRequest-57` S1 reads it, the block
+  printed `no prepared merge on HEAD`, exit 2.
+- `derive_claims_line` under the `eval` seam, with a file in `CARD_DIR`'s parent place, printed the
+  skip line, and `mkdir -p` failed with "Not a directory"; a `chmod 555` directory left `mkdir -p`
+  working under Git Bash on NTFS. Measured 2026-11-20.
+- `read_claims` admits a feed line to `seen` only when `seen-utc` is ISO-shaped, and sets `cr` only
+  from its sentinel; read 2026-11-20 in `tools/unattended/unattended.sh#read_claims`.
+- `grep -cE` for the rev-2 row over the record printed 0; each of 51's AC1 commands printed 1 and
+  exited 0. Measured 2026-11-20.
 
 ### Files touched (estimate)
 
-- `memory/builds/dPlacedRequest/spec/`: the specs of units 43, 44, 45, 47, 48, 50, 51 and 52, each
-  edit a rev bump with its §9 line
-- `tools/unattended/unattended.test.sh`: S3, S4, S20 and S22 in their arms
-- `tools/unattended/unattended.sh`: S22's first-line read, where the built walk reads another line
-- `skills/session-kickoff/manifest-check.test.sh`: S7 and S8
-- `memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md`: S12, where 51's pass left the
-  rev-2 row
+- `tools/unattended/unattended.test.sh`: S20's and S22's rows and copies, and `FLOOR_ASSERTIONS` and
+  `FLOOR_SHARD_8`, each with a `RAISED` comment
+- `skills/session-kickoff/manifest-check.test.sh`: S7 and S8's case and its `FLOOR_ASSERTIONS`
 
 ### Alternatives rejected
 
-- **Two batches.** S9 and S12 to S16 and S21 land on unit 51 and write only 51, 45 and the record, a
-  write set disjoint from the rest. Split off, that half repairs unit 51 and takes order 27 while this
-  half takes 29, so the two never build concurrently, which is the only reason M4 admits a second
-  batch.
-- **Reset the race's files in place (S3).** It needs every path an attempt writes named and kept
-  current; a fresh clone and remote reset all of them, the unnamed ones included, for at most two
-  more fixture builds.
-- **Counts alone for the two places (S1).** Two mentions inside one paragraph reach 2 and pass a
-  criterion that names two places.
+- **A fresh unit-19 clone per race attempt (rev-7's S3).** Unit 52's block resets by a new key and
+  the clear; a second reset beside it is a copy of one already built.
+- **Edit spec 55's block in place.** P19 keeps it as built; a later text superseding it is how spec 55
+  itself treated spec 44.
+- **The block in `TOOL-dPlacedRequest-57`'s §4, beside the base read.** That unit changes no line of
+  the block; this one does, and the block lives with its last correction.
+- **The deep path as the red case.** It does not reproduce on node a; the stub stages the failure the
+  guard reads, on every node.
 
 ## 5. Production-readiness checklist
 
-- security — S22 makes a duplicate `renews` key read as the strict reader reads it, so a `-` line
-  cannot turn a stale take-over check `live`.
-- perf / scale — S3 builds at most three fixtures per arm run; the oracle gains one `case`.
-- error / empty / loading states — S4 fails an unplaced race at once; S6 and S8 name their failures.
-- observability — S4's health-log read names only its own attempt's event.
-- risks — S7's staging relies on `mkdir -p` refusing a path under a file, measured on Git Bash.
+- security — none: a read of local history, and two test rows over scratch fixtures.
+- perf / scale — the oracle gains one `case`; each suite gains a few fixture commits.
+- error / empty / loading states — a failed count exits 2 named (S6); a stage that did not take
+  fails named (S8).
+- observability — the oracle's refusal names the count; each row's label names its shape.
+- risks — the torn row's red rests on `2026-10-2` sorting before `thr`, true of every date this
+  build runs on; S7's stage rests on `mkdir -p` refusing a path under a file, measured on Git Bash.
 - testing — the probes of §6 and the arms of §7.
 - migration — none: every surface is new in this build.
-- user docs — none beyond the specs and one class record.
+- user docs — none: test code and criterion text.
 
 ## 6. Acceptance criteria
 
-`flat <file>` is `TOOL-dPlacedRequest-52` §6's. The fixtures are the named units': unit 19's clones for
-the race, unit 26's chains for the walk, and unit 52's oracle fixture under `%TEMP%`, each
-`RUN_CLAIMS=on` unless stated.
-
-- **AC1** — When 52's AC1, AC6 and AC9 extractions run over the built 48 and 43, 48's S2 and its Edges
-  each name `S25`, 48's S1 and its §5 risks line each name `43 S30`, and 43's S22 and AC22 each name
-  `48128`. Red when: two mentions in one paragraph satisfy a criterion that names two places.
-- **AC2** — When 52 §6 is read, the sentence under `flat` names `grep -o` and "present or absent".
-  Red when: a reader takes `grep -c` over `flat` for a count.
-- **AC3** — When 52's placed-race arm runs with B delayed 11 s on attempt 1 only, the arm prints two
-  distinct clone paths, and attempt 2's A exits 0 with `.typed` holding s1 alone and one remote
-  record. Red when: attempt 2 meets attempt 1's stored copy and reads `never placed` or `collision`.
-- **AC4** — When that run ends it passes, naming `node-lock-broken` for attempt 1 alone; with a
-  pass-through `cp`, it fails `request race never placed` on attempt 1; after either, `ps` lists no
-  `--request` process of the arm. Red when: an earlier attempt's event marks a later one, or A
-  outlives the arm.
-- **AC5** — When `grep -n 'in sequence' 2026-10-25-spec-TOOL-dPlacedRequest-48.md 2026-10-25-spec-TOOL-dPlacedRequest-50.md | grep -F tools/unattended/unattended.test.sh`
-  runs, it prints one line from each spec, each naming the other unit. Red when: two passes of one
-  order write one suite file with no sequence line.
-- **AC6** — When the oracle runs on 52's fixture from a working directory more than 180 characters
-  deep, its header ends `· 2 commits`; with a stub `git` whose `rev-list --count` alone prints
-  nothing, it prints `rev-list failed` and exits 2. Red when: a deep path reads as an empty walk.
-  fixture: built by the probe under `%TEMP%`; the deep path reproduces on Windows only.
-- **AC7** — When the manifest-check case stages `CARD_DIR="$s/f/sub"` under a file `$s/f`,
-  `derive_claims_line` prints `claims — skipped: no scratch directory under`, and `grep -c chmod`
-  over that case prints 0. Red when: the stage leaves the directory creatable and the skip never runs.
-- **AC8** — When the case's stage is swapped for `chmod 555` on a directory under Git Bash, the case
-  fails naming its stage and judges no cell. Red when: a stage that did not take is judged as a pass.
-- **AC9** — When 45's AC2 bullet is read, it names `TOOL-dPlacedRequest-44` and `· 2 commits` and holds
-  no `--no-ff`, and 52 AC14 checks both. Red when: 45 describes the shared fixture a second time.
-- **AC10** — When `flat 2026-10-25-spec-TOOL-dPlacedRequest-44.md | grep -oE 'merge-base (form|origin)' | wc -l`
-  runs it prints 0, `grep -oE 'walked no commit[^.]*exits 1'` over the same prints nothing, 43 AC24
-  names `exit 0`, and on 44 AC3's `commit-tree` merge the oracle prints `walked no commit of the build`
-  and exits 2. Red when: a reader of 44 meets two exit contracts for one oracle.
-- **AC11** — When `gen_build_index.py --write` has rendered after every edit S11 names, `wc -c` of
-  unit 34's spec prints at most 48128, and 52 §4 Evidence states that figure with its date.
-  Red when: the ceiling is set without measuring the file it bounds.
-  figure: DERIVED at observation.
-- **AC12** — When `grep -cE 'git log --first-parent <base>\.\.HEAD` *\|'` runs over the record, it
-  prints 0, and over a scratch copy with 45 rev-2's row planted it prints 1; 51 AC2's `--name-status`
-  run prints `M tools/unattended/unattended.sh` under the merge. Red when: a stale row stands beside
-  its correction.
-- **AC13** — When 51's S1 paragraph is extracted by the `awk` form of 52 S15 and squeezed, it holds
-  `git log --first-parent -p <base>..HEAD`. Red when: S1 spells the row another way.
-- **AC14** — When `grep -cF -e 'git log --first-parent -p <base>..HEAD'` runs over 51's S1 extract, its
-  §4 table and its AC1 bullet, each prints at least 1. Red when: one grepped string has two spellings.
-- **AC15** — When `grep -n 'grep -cF'` runs over 51, every hit passes its pattern after `-e`.
-  Red when: a pattern beginning `--` parses as an option.
-- **AC16** — When each command 51 AC1 spells runs as written over the record, each exits 0 or 1 and
-  none prints `unknown option`. Red when: a criterion errors before it measures.
-- **AC17** — When ``grep -nE '\(`:[0-9]' 2026-10-25-spec-TOOL-dPlacedRequest-50.md`` runs, it prints
-  nothing, and 50 §4 Evidence names 47's S1 and AC1 to AC3. Red when: evidence cites a sibling's
-  moved lines.
-- **AC18** — When 52's AC15 bullet is read, it names 43's §3 hands-off edge to 48 and holds no `:168`.
-  Red when: a criterion cites a sibling spec by a line that moves.
-- **AC19** — When `flat 2026-10-25-spec-TOOL-dPlacedRequest-44.md | grep -o 'merge-base form elsewhere' | wc -l`
-  runs, it prints 0, 44 F1 names `TOOL-dPlacedRequest-52`, and 52 F1 names 44 F1. Red when: 44 keeps
-  a live resolution for a form no oracle runs.
-- **AC20** — When 47's arm runs AC4's three rows over the built walk, the unset, `-` and `2026-10-2`
-  rows each print `live`, and the `2026-10-2` row prints `stale` on a scratch copy without 52 S21's
-  shape test; 52's and 50's Edges carry the paired edge. Red when: the torn-stamp chain is planted
-  twice.
+- **AC3** — When
+  `awk '/THE REQUEST RACE, PLACED/{f=1} f; f&&/^rm -rf "\$LF"$/{exit}' tools/unattended/unattended.test.sh`
+  cuts the race block from the suite, its `for pr_n in 1 2 3` loop holds
+  `rm -rf "$pr_h/once" "$pr_h/held" "$pr_h/release"`, `zq-race-marker-48-%s`, `pr_e0=` and
+  `tail -n "+$((pr_e0 + 1))"`, and the block holds the `jobs -p` row.
+  Red when: an attempt meets a key, a handshake file or a log line an earlier attempt wrote.
+- **AC6** — When §4's block runs in spec 55's fixture under `%TEMP%`, on each shape of spec 55's AC1
+  to AC5 it prints what that criterion names; with a stub `git` whose `rev-list --count` exits 128
+  and prints nothing, it prints `version oracle: rev-list failed` and exits 2, where spec 55's block
+  prints `walked no commit of the build`.
+  Red when: a count that failed reads as an empty walk.
+  fixture: built by the probe under `%TEMP%`, not held in the tree.
+  figure: the count PINNED at 2, the fixture's two branch commits.
+- **AC7** — When the S7 case runs, `derive_claims_line write` prints
+  `claims — skipped: no scratch directory under` and the staged path, and the case's own lines,
+  `awk '/TOOL-dPlacedRequest-56 AC7/,/^$/' skills/session-kickoff/manifest-check.test.sh`, hold no
+  `chmod`.
+  Red when: the stage leaves the directory creatable and the skip never runs.
+- **AC8** — When a scratch copy of the case stages a `chmod 555` directory under Git Bash instead of
+  the file, the case fails `the scratch-directory stage did not take` and judges no cell.
+  Red when: a stage that did not take is judged as a pass.
+- **AC12** — When `grep -cE 'git log --first-parent <base>\.\.HEAD` *\|'` runs over
+  `memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md`, it prints 0, and over a
+  scratch copy with that row planted it prints 1.
+  Red when: a stale row stands beside its correction.
+- **AC16** — When each `grep -cF -e` command 51's AC1 spells runs over the record, each exits 0 and
+  prints 1, the `--first-parent -p <base>..HEAD` one included.
+  Red when: a criterion errors before it measures, or one grepped string has two spellings.
+  figure: each count DERIVED by its `grep`.
+- **AC20** — When the torn-stamp row runs, `read_clock_row` prints `live` on `$SCRIPT` and
+  `unknown -` on `$oc_copy/torn.sh`.
+  Red when: a torn `seen-utc` ages a lease.
 - **AC21** — When `python tools/memory-tree/gotchas.py --for-paths tools/unattended/unattended.sh`
-  runs, the record's line is its front-matter description, and 51 §5 says so. Red when: §5 claims an
-  effect the command does not show.
-- **AC22** — When the §4 duplicate-key row runs, `--claims` prints `stale`; the red copy prints
-  `live`. Red when: a duplicate `renews` key resolves otherwise than `read_claims` reads it.
+  runs, the record's checklist entry prints its front-matter `description`, the field `build_record`
+  in `tools/memory-tree/gotchas.py` reads.
+  Red when: the checklist prints body text as the record's line.
+- **AC22** — When the duplicate-key row runs, `read_clock_row` prints `stale` on `$SCRIPT` and `live`
+  on `$oc_copy/last-line.sh`.
+  Red when: a duplicate `renews` key resolves otherwise than the first line.
 
 ## 7. Gates
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `govkit selfcheck` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
 
-New arm: tools/unattended/unattended.test.sh · covers AC3 AC4 AC20 AC22 · the race's fresh attempts, the torn-stamp row and the duplicate-key row, each staged against the arm or walk as unit 52 leaves it · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
-New arm: skills/session-kickoff/manifest-check.test.sh · covers AC7 AC8 · a file in `CARD_DIR`'s parent place, staged against a `chmod` stage that does not take · none
+New arm: tools/unattended/unattended.test.sh · covers AC20 AC22 · the torn-stamp row against a copy without the walk's ISO-shape clause, the duplicate-key row against a copy keeping the last `renews:` line · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8` move by the rows gained · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: skills/session-kickoff/manifest-check.test.sh · covers AC7 AC8 · a file in `CARD_DIR`'s parent place, staged against a `chmod 555` stage that does not take · `FLOOR_ASSERTIONS` rises by the rows gained
 
 ## 8. Open questions
 
 - **F1 — How does each race attempt start clean (S3)?** (a) A fresh unit-19 clone and bare remote
   per attempt; (b) the stored copy, `.typed` and the remote's request ref reset in place. (b) must
   name every write an attempt makes and stay current with it. RESOLVED (agent, 2026-10-25,
-  delegated): (a), rung 3, the review's first fix judged sound. widens: none · relaxes: none
+  delegated): (a), rung 3, the review's first fix judged sound. widens: none · relaxes: none.
+  Overtaken by unit 52's rebuilt block, whose attempt-numbered key and clear reset every write an
+  attempt makes; S3 observes it (F3).
 - **F2 — How are the named places observed (S1)?** (a) One extract per named place beside unit 53's
   counts; (b) the counts alone. (b) passes two mentions in one paragraph. RESOLVED (agent,
   2026-10-25, delegated): (a), rung 3, the review's second fix judged sound. widens: none · relaxes:
-  none
+  none. Overtaken by 52 rev-10, whose criteria count nothing; S1 records it closed.
+- **F3 — What becomes of an item that edits a CLOSED spec?** (a) A product change still owed is built
+  and observed, and a text-only finding is resolved in §4 naming P19; (b) the closed spec is edited
+  with a rev bump; (c) the item is dropped unrecorded. (b) rewrites built work; (c) loses the fact.
+  Recommendation: (a). RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; P19 freezes every unit
+  these minors land on, and the kinds table of §1 sorts each item by what the tree holds.
+  widens: none · relaxes: none
+- **F4 — Where does the oracle with the corrected count live, so the close runs one?** (a) In this
+  spec's §4, whole, naming spec 55's block superseded and never edited; (b) a one-line patch here
+  the close applies to spec 55's block; (c) spec 55's block edited. (b) makes the close assemble two
+  texts; (c) rewrites a CLOSED spec. Recommendation: (a). RESOLVED (agent, 2026-11-20, delegated):
+  (a), rung 3; of the four re-grounded units only this one changes a line of the block, so it is the
+  last to correct it, and `TOOL-dPlacedRequest-57` names this block. widens: none · relaxes: none
+- **F5 — Is the amendment `TOOL-dPlacedRequest-58` orders to this spec made at a pass or now?** (a)
+  Now, once, in this text: S3 names the handshake clear the built block makes and AC3 observes it,
+  and unit 58 reduces to observing that text beside its own absence test; (b) at unit 58's pass, by
+  a builder. (b) has a builder write a spec, which no builder does. Recommendation: (a).
+  RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; this spec is DEFERRED, so the amendment is a
+  spec act the re-grounding makes once, as the brief's fold rule names. widens: none · relaxes: none
+- **F6 — Is the count guard kept when node a does not reproduce the deep-path failure?** (a) Keep `--`
+  and the numeric guard, staging the failure by a stub `git`; (b) take the item out as unreproduced;
+  (c) keep the deep path as the red case. (b) leaves a failed count reading as an empty walk, which
+  the stub shows on any node; (c) is a red no node here can observe. Recommendation: (a).
+  RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; the review reproduced it on the same git
+  release, and the stub observes the guard everywhere. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -327,19 +424,35 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC7 AC8 · a fi
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the consumes-from edge to `TOOL-dPlacedRequest-57` and the hands-off edges to `TOOL-dPlacedRequest-58` and `TOOL-dPlacedRequest-59`, mirroring theirs.
 - rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-6 promotions: the hands-off edge to `TOOL-dPlacedRequest-61`, mirroring its consumes-from.
 - rev-5 · 2026-10-25 · §3 · the disposal of the spec audit of the round-7 promotions: the hands-off edge to `TOOL-dPlacedRequest-63`, mirroring its consumes-from.
+- rev-6 · 2026-11-19 · §7 · the spec-token checker's guards join: §4 Files touched names `tools/unattended/unattended.sh`, which `tools/gate-legs.json` lists in the guard of leg `tier2-review self-test`, so §7's leg line names that leg.
+- rev-7 · 2026-11-19 · §4 Files touched · §7 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 17 (M8), this unit's own pass
+  regenerates `memory/map/generated/`, named in Files touched, and §7 names its leg.
+- rev-8 · 2026-11-20 · §1 · §2 S1 to S22 · §3 · §4 · §5 ·
+  §6 AC3 AC6 AC7 AC8 AC12 AC16 AC20 AC21 AC22 · §7 · §8 F1 to F6 · §10 · re-grounded by
+  `2026-11-20-prompt-TOOL-dPlacedRequest-56-orders-29-30-reground-brief`: every unit the minors land
+  on is CLOSED, so no item edits a spec (F3) and §1 sorts the items by kind; §4 carries the one
+  version oracle whole, spec 55's block with the count guarded, naming spec 55's block superseded
+  (F4); `TOOL-dPlacedRequest-58`'s amendment folded into S3 and AC3 (F5); the race items observe
+  unit 52's rebuilt block; the scratch-directory case, the torn-stamp row and the duplicate-key row
+  are the product left; the edge with `TOOL-dPlacedRequest-57` turned to a hands-off, that unit
+  running this block; line citations swapped for symbol citations and a blob pin, and the build
+  method's sections for their alias tags.
 
 ## 10. Reuse audit
 
-Each item extends the unit its finding names, and the new code reuses four seams: unit 19's fixture
-builder for S3, the `awk` paragraph extraction 52 S15 uses for S1 and S13, the first-occurrence rule
-of `read_claims` (`tools/unattended/unattended.sh:2171`) for S22, and the scratch-directory skip of
-`derive_claims_line` (`skills/session-kickoff/manifest-check.sh:653-654`) for S7.
-`python tools/codebase-map/reuse_lookup.py "reset every piece of state a retried test attempt wrote
-before the next attempt"` ranked `before`, `plan_state` and `resolve_state_dir`, name stems only,
-none a retry reset: no existing seam fits beyond unit 19's fixture. `python
-tools/memory-recall/query.py "how is a spec audit's minor findings batch promoted into one unit that
-amends several specs"` returned TOOL-aDistilledCharter-7, `TOOL-dPlacedRequest-52`,
-TOOL-aGraftedHelix-32 and `TOOL-dPlacedRequest-49`, batches of the same kind; none disagrees with
-source.
+The seams extended: the oracle of `TOOL-dPlacedRequest-55`'s §4, kept whole but for its count line;
+the observer clock fixture of the `TOOL-dPlacedRequest-47` block, `add_lease_commit`,
+`add_claim_sighting`, `read_clock_row` and its `${oc_src/…/…}` copies, for S20 and S22; and the
+`eval "$(awk …)"` function seam of `skills/session-kickoff/manifest-check.test.sh`, already used for
+`resolve_kit_dir`, for S7. The brief's named seam, the governance-ref factory
+`tools/unattended/unattended.sh#write_gov_ref`, writes refs, and this unit writes none.
+`python tools/codebase-map/reuse_lookup.py "stage a failing scratch directory for a card cell skip in
+a test"`, run 2026-11-20, ranked `fail`, `scratch`, `skip` and `build_scratch_tree`, name stems
+only, none a stage for this skip; `python tools/codebase-map/reuse_lookup.py "test row for a torn
+feed timestamp in the lease walk"` ranked `rows`, `row` and `walk`, none a lease row: no existing
+seam fits beyond the three above. `python tools/memory-recall/query.py "re-ground a deferred minors
+batch whose target specs are closed so a builder can build it"` with the terms below returned the
+order-25 and unit-43 re-grounding briefs of this build and their returns; none disagrees with source.
 
-Recall terms used: minors batch promote medium low spec audit round finding item amend in place edge mirror
+Recall terms used: re-ground deferred minors batch closed spec P19 frozen fold superseded oracle torn stamp duplicate renews

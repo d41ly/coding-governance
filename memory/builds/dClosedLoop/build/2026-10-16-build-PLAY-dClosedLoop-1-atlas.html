@@ -1,3 +1,6 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Closed Loop Atlas</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <!--
@@ -37,7 +40,7 @@
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
 code, .mono { font-family: var(--f-mono); font-size: 0.86em; }
 code { background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; word-break: break-word; }
 button { font: inherit; color: inherit; }
@@ -204,6 +207,15 @@ select.pick { padding: 6px 8px; border: 1px solid var(--line-2); border-radius: 
 .cedge { fill: none; stroke: var(--line-2); stroke-width: 1.5; }
 .cedge.hot { stroke: var(--accent); stroke-width: 2.5; }
 .bar-h { fill: var(--bad); } .bar-m { fill: var(--warn); } .bar-l { fill: var(--line-2); }
+/* Where each build stands (TOOL-dTrackedAtlas-2): a landed node is filled, a node whose next run can start or runs is outlined in the signal colour. */
+.cnode.run-landed rect.body, .cnode.run-landed-carrying rect.body { fill: var(--ok-soft); }
+.cnode.run-landed-carrying rect.body { stroke-dasharray: 6 3; }
+.cnode.next-startable:not(.on) rect.body, .cnode.next-running:not(.on) rect.body { stroke: var(--signal); stroke-width: 2; }
+.cnode.next-held:not(.on) rect.body, .cnode.next-stale:not(.on) rect.body { stroke: var(--warn); stroke-width: 2; stroke-dasharray: 3 2; }
+.run-table td { vertical-align: top; }
+.run-table .sub { display: block; color: var(--muted); font-size: 12.5px; }
+.clause-list { margin: 0; padding-left: 18px; font-size: 13.5px; display: grid; gap: 4px; }
+.clause-list .changed { color: var(--signal); font-family: var(--f-mono); font-size: 11.5px; }
 
 /* Progress */
 .rail { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr); }
@@ -907,7 +919,7 @@ tr[data-medge].on td { background: var(--accent-soft); }
     var head = el('div');
     head.appendChild(el('div', { class: 'eyebrow', text: 'Today against the target' }));
     head.appendChild(el('h1', { class: 'view-title', text: 'What changes, area by area' }));
-    head.appendChild(el('p', { class: 'lede' }, 'Today is the product as the design rounds measured it. The target is what the converged design specifies. The change between them is the gap register: every distance, each owned by one chain build.'));
+    head.appendChild(el('p', { class: 'lede' }, 'The measured sections are the baseline: the product as the design rounds measured it, from ' + esc(D.baseline.measured[0]) + ' to ' + esc(D.baseline.measured[1]) + '. The target is what the converged design specifies. The change between them is the gap register: every distance, each owned by one chain build. The "Landed since" column names the chain builds that have landed against each area since the baseline.'));
     v.appendChild(head);
     var all = sevCount(D.gaps.map(function (g) { return g.id; }));
     var stats = el('div', { class: 'chips' });
@@ -918,7 +930,7 @@ tr[data-medge].on td { background: var(--accent-soft); }
 
     var two = el('div', { class: 'cmp-two' });
     var t = el('div', { class: 'panel box side today' });
-    t.appendChild(el('div', { class: 'side-label', text: 'Today: an implicit loop' }));
+    t.appendChild(el('div', { class: 'side-label', text: 'The baseline: an implicit loop' }));
     t.appendChild(el('div', { class: 'ref-line' })).appendChild(refChip(D.loops.today.path, D.loops.today.id));
     t.appendChild(el('div', { class: 'scroll-box' })).appendChild(mdDiv(bodyOf(SEC[D.loops.today.path + '#' + D.loops.today.id]), 'loop-today'));
     var g = el('div', { class: 'panel box side target' });
@@ -939,7 +951,7 @@ tr[data-medge].on td { background: var(--accent-soft); }
 
     var tw = el('div', { class: 'panel scroll-x' });
     var tb = el('table', { class: 'data', id: 'area-table' });
-    tb.innerHTML = '<thead><tr><th>Area</th><th>Layer</th><th>Today, measured in</th><th>Target</th><th>Gaps</th><th>Owned by</th></tr></thead>';
+    tb.innerHTML = '<thead><tr><th>Area</th><th>Layer</th><th>Baseline, measured in</th><th>Target</th><th>Gaps</th><th>Owned by</th><th>Landed since</th></tr></thead>';
     var body = el('tbody');
     D.areas.forEach(function (a) {
       var c = sevCount(a.gaps), n = a.gaps.length;
@@ -951,6 +963,7 @@ tr[data-medge].on td { background: var(--accent-soft); }
       tr.appendChild(el('td', { class: 'num' }, gapBar(c, n) + n + (c.HIGH ? ' · ' + c.HIGH + ' high' : '')));
       var owners = uniq(a.gaps.map(function (id) { return GAP[id].owner; }));
       var td6 = el('td'); var w6 = el('div', { class: 'ichips' }); owners.forEach(function (o) { w6.appendChild(buildChip(o)); }); td6.appendChild(w6); tr.appendChild(td6);
+      var td7 = el('td'); var w7 = el('div', { class: 'ichips' }); a.landed.forEach(function (o) { w7.appendChild(buildChip(o)); }); td7.appendChild(a.landed.length ? w7 : el('span', { class: 'muted', text: 'none' })); tr.appendChild(td7);
       tr.addEventListener('click', function (ev) { if (ev.target.closest('button')) return; select('area', a.key); var d = $('#area-detail'); if (d) d.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
       body.appendChild(tr);
     });
@@ -987,7 +1000,7 @@ tr[data-medge].on td { background: var(--accent-soft); }
     host.appendChild(head);
     var two = el('div', { class: 'cmp-two' });
     var t = el('div', { class: 'panel box side today' });
-    t.appendChild(el('div', { class: 'side-label', text: 'Today, as measured' }));
+    t.appendChild(el('div', { class: 'side-label', text: 'Baseline, measured ' + datesText(a.measured) }));
     a.today.forEach(function (r) {
       var s = SEC[r.path + '#' + r.id];
       t.appendChild(el('div', { class: 'ref-line' })).appendChild(refChip(r.path, r.id));
@@ -1014,8 +1027,22 @@ tr[data-medge].on td { background: var(--accent-soft); }
     });
     tb.appendChild(body); tw.appendChild(tb); c.appendChild(tw);
     host.appendChild(c);
+    var since = el('div', { class: 'panel box side' });
+    since.appendChild(el('div', { class: 'side-label', text: 'Since the baseline' }));
+    if (!a.landed.length) since.appendChild(el('p', { class: 'how', text: 'No build owning this area\'s gaps has landed since the baseline.' }));
+    a.landed.forEach(function (b) {
+      var s = STATE[b], mine = a.gaps.filter(function (id) { return GAP[id].owner === b; }).sort(bySev);
+      var row = el('div', { class: 'ref-line' });
+      row.appendChild(buildChip(b));
+      row.appendChild(el('span', null, ' ' + esc(runLabel(s)) + ' · <code>' + esc(s.landing.sha.slice(0, 9)) + '</code> ' + esc(s.landing.subject)));
+      since.appendChild(row);
+      since.appendChild(el('div', { class: 'sub-head', text: 'Its gaps in this area: ' + plural(mine.length, 'gap') }));
+      since.appendChild(chips(mine, gapChip));
+    });
+    host.appendChild(since);
     highlight();
   }
+  function datesText(ds) { return ds.length > 1 ? ds.slice(0, -1).join(', ') + ' and ' + ds[ds.length - 1] : ds.join(''); }
   function targetNodes(a) {
     var t = a.target, out = [];
     if (t.step) {
@@ -1098,8 +1125,9 @@ tr[data-medge].on td { background: var(--accent-soft); }
     inspector('Today against the target', a.title, false, [
       kvList([['Layer', a.layer || 'every layer'], ['Register stages', a.stages.join(', ') || 'none: the gaps its record cites'], ['Target', targetName(a)],
               ['Gaps', a.gaps.length + ' · ' + c.HIGH + ' high · ' + c.MED + ' medium · ' + c.LOW + ' low']]),
-      block('Today, measured in', null, chips(a.today, function (r) { return refChip(r.path, r.id); })),
+      block('Baseline, measured in', esc(datesText(a.measured)), chips(a.today, function (r) { return refChip(r.path, r.id); })),
       block('Owned by', null, chips(owners, buildChip)),
+      block('Landed since', a.landed.length ? null : '<span class="muted">none</span>', a.landed.length ? chips(a.landed, buildChip) : null),
       block('Its gaps, by severity', null, chips(a.gaps.slice().sort(bySev), gapChip))
     ]);
   }
@@ -1578,12 +1606,52 @@ tr[data-medge].on td { background: var(--accent-soft); }
 
   // Chain
   var gapFilter = { sev: 'all', owner: 'all', q: '' };
+  // Where each build stands: TOOL-dTrackedAtlas-1's state document, read at one commit (TOOL-dTrackedAtlas-2).
+  var ST = D.state, STATE = {}; ST.builds.forEach(function (b) { STATE[b.slug] = b; });
+  var NEXT_LABEL = { startable: 'can start', running: 'running', held: 'held', stale: 'stale claim', waiting: 'waiting' };
+  function runLabel(b) {
+    var s = b.build_run.state;
+    return s === 'landed' ? 'landed' : s === 'landed-carrying' ? 'landed, carrying ' + b.build_run.carried.length : 'not landed';
+  }
+  function stateLabel(b) { return b.next.state === 'done' ? runLabel(b) : NEXT_LABEL[b.next.state] || b.next.state; }
+  function statePill(b) {
+    var kind = b.next.state === 'done' ? 'done' : b.next.state === 'waiting' ? 'todo' : 'open';
+    return '<span class="state-pill ' + kind + '">' + esc(stateLabel(b)) + '</span>';
+  }
+  function landingText(l) { return l ? l.sha.slice(0, 9) + ' ' + l.subject : 'none'; }
+  function countsText(b) { return b.units + ' · ' + Object.keys(b.counts).map(function (k) { return b.counts[k] + ' ' + k; }).join(' · '); }
+  function claimText(c) { return c ? c.status + (c.node ? ' on ' + c.node : '') + (c.stale ? ', stale' : '') : 'none'; }
   views.chain = function (v) {
     var head = el('div');
     head.appendChild(el('div', { class: 'eyebrow', text: 'The chain that builds it' }));
     head.appendChild(el('h1', { class: 'view-title', text: D.chain.length + ' builds own every gap once' }));
     head.appendChild(el('p', { class: 'lede' }, 'Each build is a child of the builds it depends on, and each gap in the register belongs to exactly one build. The bars show each build\'s gaps by severity.'));
     v.appendChild(head);
+    var stats = el('div', { class: 'chips' });
+    [[ST.landed.length, 'landed'], [ST.startable.length, 'can start'], [ST.running.length, 'running or held']].forEach(function (p) {
+      stats.appendChild(el('span', { class: 'chip' }, '<b>' + p[0] + '</b>' + esc(p[1])));
+    });
+    v.appendChild(stats);
+    v.appendChild(el('p', { class: 'lede' }, 'Where each build stands at commit <code>' + esc(ST.commit.slice(0, 9)) + '</code>, ' + esc(ST.subject) + (ST.claims_read ? '. Claims are read from the claim cache.' : '. No claim was read.')));
+    var rw = el('div', { class: 'panel scroll-x' });
+    var rt = el('table', { class: 'data run-table', id: 'run-table' });
+    rt.innerHTML = '<thead><tr><th>Build</th><th>Spec run</th><th>Build run</th><th>Landing</th><th>Units</th><th>Open forks</th><th>Deviations</th><th>Claim</th><th>Next</th></tr></thead>';
+    var rb = el('tbody');
+    ST.builds.forEach(function (b) {
+      var tr = el('tr', { class: 'clickable', 'data-build': b.slug });
+      tr.appendChild(el('td', { class: 'key' }, esc(b.slug)));
+      tr.appendChild(el('td', null, b.spec_run.done ? 'done' : 'not done'));
+      tr.appendChild(el('td', null, esc(runLabel(b))));
+      tr.appendChild(el('td', null, b.landing ? '<code>' + esc(b.landing.sha.slice(0, 9)) + '</code><span class="sub">' + esc(b.landing.subject) + '</span>' : '<span class="muted">none</span>'));
+      tr.appendChild(el('td', { class: 'num' }, esc(countsText(b))));
+      tr.appendChild(el('td', null, b.forked && b.forked.length ? esc(b.forked.join(', ')) : '<span class="muted">none</span>'));
+      tr.appendChild(el('td', { class: 'num' }, b.deviations ? String(b.deviations.length) : '<span class="muted">unread</span>'));
+      tr.appendChild(el('td', null, esc(claimText(b.claim))));
+      tr.appendChild(el('td', null, statePill(b) + (b.next.waiting_on.length ? '<span class="sub">waiting on ' + esc(b.next.waiting_on.join(', ')) + '</span>' : '')));
+      tr.addEventListener('click', function () { select('build', b.slug); });
+      rb.appendChild(tr);
+    });
+    rt.appendChild(rb); rw.appendChild(rt); v.appendChild(rw);
     var p = el('div', { class: 'panel diagram chain-svg scroll-x' });
     p.appendChild(chainDiagram()); v.appendChild(p);
     var bar = el('div', { class: 'toolbar' });
@@ -1654,10 +1722,10 @@ tr[data-medge].on td { background: var(--accent-soft); }
       });
     });
     Object.keys(depth).forEach(function (b) {
-      var c = BUILD[b], x = X[b] - NW / 2, y = Y(b);
-      var g = sv('g', { class: 'svg-node cnode' + (c ? '' : ' root'), 'data-build': b });
+      var c = BUILD[b], s = STATE[b], x = X[b] - NW / 2, y = Y(b);
+      var g = sv('g', { class: 'svg-node cnode' + (c ? '' : ' root') + (s ? ' run-' + s.build_run.state + ' next-' + s.next.state : ''), 'data-build': b });
       g.appendChild(sv('rect', { x: x, y: y, width: NW, height: NH, rx: 6, class: 'body' }));
-      g.appendChild(sv('text', { x: x + 12, y: y + 19, class: 'c-stage' }, c ? c.stage : 'this design build'));
+      g.appendChild(sv('text', { x: x + 12, y: y + 19, class: 'c-stage' }, c ? c.stage + (s ? ' · ' + stateLabel(s) : '') : 'this design build'));
       g.appendChild(sv('text', { x: x + 12, y: y + 38, class: 'c-slug' }, b));
       if (c) {
         var cnt = { HIGH: 0, MED: 0, LOW: 0 };
@@ -1682,10 +1750,37 @@ tr[data-medge].on td { background: var(--accent-soft); }
       d.innerHTML = '<span class="gid">' + esc(id) + '</span><span><span class="sev ' + esc(g.sev) + '">' + esc(g.sev) + '</span> <span class="muted">' + esc(g.stage) + '</span></span><p>' + md(g.gap) + '</p>';
       gl.appendChild(d);
     });
+    var s = STATE[name], cl = D.asBuilt[name] || [];
+    var changed = cl.filter(function (r) { return r.since !== 'baseline'; }).length;
+    var ul = el('ul', { class: 'clause-list' });
+    cl.forEach(function (r) {
+      ul.appendChild(el('li', null, '<code>' + esc(r.clause) + '</code> ' + md(r.text) +
+        (r.since !== 'baseline' ? ' <span class="changed">changed by ' + esc(r.since.replace(/^deviation /, '')) + '</span>' : '')));
+    });
+    var carried = s.build_run.carried;
+    var units = el('div', null, md(countsText(s)));
+    if (carried.length) {
+      units.appendChild(el('div', { class: 'sub-head', text: 'Carried forward' }));
+      units.appendChild(miniTable(['Unit', 'Verb', 'Ask'], carried.map(function (u) { return [u.unit || '', u.verb || '', u.ask || '']; })));
+    }
+    var revs = s.revisions || {};
     inspector('Chain build · ' + c.stage, name, true, [
+      block('Where it stands', null, kvList([['Spec run', s.spec_run.done ? 'done' : 'not done'], ['Build run', runLabel(s)],
+        ['Landing', landingText(s.landing)], ['Next state', s.next.state === 'done' ? 'done' : NEXT_LABEL[s.next.state] || s.next.state],
+        ['Waiting on', s.next.waiting_on.join(', ') || 'nothing'],
+        ['Claim', s.claim ? s.claim.status + ' · node ' + (s.claim.node || 'none') + ' · beat ' + (s.claim.beat_utc || 'none') + ' · ' + (s.claim.stale ? 'stale' : s.claim.stale === false ? 'fresh' : 'staleness unread') : 'none']])),
       block('Parents', null, chips(c.parents, function (p) { return BUILD[p] ? buildChip(p) : el('span', { class: 'ichip' }, esc(p)); })),
       children.length ? block('Children', null, chips(children, buildChip)) : null,
-      block('Planned units', md(c.units)),
+      block('Runs', null, s.runs.length ? miniTable(['Record', 'Kind', 'Phase', 'Landings'], s.runs.map(function (r) {
+        return [r.record, r.kind || 'unread', r.phase || 'none', r.landings.map(landingText).join('; ') || 'none'];
+      })) : el('p', { class: 'muted', text: 'none' })),
+      block('Units', null, units),
+      block('Open forks', esc(s.forked && s.forked.length ? s.forked.join(', ') : 'none')),
+      block('Revisions', null, Object.keys(revs).length ? miniTable(['Unit', 'Revision'], Object.keys(revs).map(function (u) { return [u, revs[u] == null ? 'unread' : 'rev-' + revs[u]]; })) : el('p', { class: 'muted', text: 'none' })),
+      block('Deviation records', null, s.deviations && s.deviations.length ? miniTable(['Id', 'Hand', 'Risk', 'Cause'], s.deviations.map(function (d) {
+        return [d.id, String(d.hand == null ? '' : d.hand), String(d.risk == null ? '' : d.risk), String(d.cause == null ? '' : d.cause)];
+      })) : el('p', { class: 'muted', text: 'none' })),
+      block('Clauses as built', esc(plural(cl.length, 'clause') + ' · ' + changed + ' changed since the design baseline ' + D.baseline.design.slice(0, 9)), ul),
       block(c.gaps.length + ' gaps owned', null, gl)
     ]);
   }
@@ -2210,7 +2305,7 @@ tr[data-medge].on td { background: var(--accent-soft); }
   }
   $$('.tab').forEach(function (t) { t.addEventListener('click', function () { goView(t.getAttribute('data-view')); }); });
   window.addEventListener('hashchange', function () { show(location.hash.slice(1)); });
-  $('#derived').textContent = plural(D.records.length, 'record') + ' · latest revision ' + D.latest + ' · digest ' + D.digest;
+  $('#derived').textContent = plural(D.records.length, 'record') + ' · latest revision ' + D.latest + ' · digest ' + D.digest + ' · generated from ' + D.stamp.commit.slice(0, 12) + ' · inputs ' + D.stamp.digest.slice(0, 12) + (D.stamp.dirty.length ? ' · ' + plural(D.stamp.dirty.length, 'uncommitted input') : '');
   function sizeTop() { document.documentElement.style.setProperty('--top-h', $('.top').offsetHeight + 'px'); }
   window.addEventListener('resize', sizeTop); sizeTop();
   var start = location.hash.slice(1) || memo('atlas.view') || 'overview';

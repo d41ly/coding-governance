@@ -26,7 +26,10 @@ into deploying (`TREE_GATED_MOVE`) carries no `--field tree=<hash>` whose full p
 runner's `<common dir>/gate-verdict/<hash>`, reads GREEN (TOOL-dWitnessedBar-4 S6); resolves `--witness`
 to HEAD or an ancestor of it, adding `stand-in=<owner>` where the item has a `[[stand-in]]` row and
 `composition=<sha8>`, the commit HEAD names (`composition.py`, TOOL-dDeclaredLoop-26), which a `--field`
-may not give; adds `scenario=<tags>`, the scenarios the build runs under joined by `+`, and
+may not give; refuses a move into `designing` of a build whose claim body, as `claim.py`'s `read_claim_body`
+reads this node's cache of `refs/gov/claims/<slug>`, says `disposition: patch` while `check_patch_ratified`
+holds it under `patch.ratify` = `owner`, naming that key and the owner item, exit 2 (TOOL-dPlacedRequest-21
+S6); adds `scenario=<tags>`, the scenarios the build runs under joined by `+`, and
 `scenario-settled=<entries>` where a conflict settled, both derived by `scenario.py`'s
 `derive_move_scenarios` and never given, printing `loop: scenario · unread · <why>` and recording neither
 where the scenario composition at HEAD is unarmed (TOOL-dDeclaredLoop-27); refuses a staged index; where the build's previous move was pinned at another commit,
@@ -416,7 +419,8 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     """Record one build move in the repository at `root`, an absolute path: `(move fields, the commit's
     sha or None, [record paths], the line or None, [order lines])`, the order lines `loop: order · <path>`
     per `item-ended` order or one `loop: composition · unread · <why>`, after a `loop: scenario · unread`
-    line where the scenario composition is unarmed. TransitionRefused where no row holds the move;
+    line where the scenario composition is unarmed, then the build card follow's `card —` lines
+    (`write_card_follow`, TOOL-dPlacedRequest-2 S4). TransitionRefused where no row holds the move;
     ValueError on a value, witness, index, policy read, tag resolver or scenario conflict refused, writing
     no record; LookupError where a kit it reads does not resolve."""
     from composition import PINNED, derive_composition_revision, read_step_composition, write_ended_orders
@@ -425,6 +429,15 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     chosen = read_cached_channels(root, "HEAD", cache)
     data, where = read_definition(KIT)
     row, to = derive_move("build", state, item, outcome, facts, read_transition_rows(data, where))
+    if to == "designing":   # a placed patch waits on its owner's ratification (TOOL-dPlacedRequest-21 S6)
+        from claim import PatchHeld, check_patch_ratified, read_anchor_unit, read_claim_body
+        if read_claim_body(root, build).get("disposition") == "patch":
+            held = check_patch_ratified(root, build)
+            if held in ("held", "rejected"):
+                raise PatchHeld("patch.ratify is owner and %s's patch is %s: the owner item ratify %s, item.entry.claim "
+                                "disposed ratified under %s, releases the record into designing"
+                                % (build, "rejected for good" if held == "rejected" else "unratified", build,
+                                   read_anchor_unit(root, build)))
     sha = resolve_commit(root, witness)
     if sha is None:
         raise ValueError("--witness %s names no commit in %s" % (witness, root.as_posix()))
@@ -575,7 +588,55 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         if prior is not None:
             newest.write_bytes(prior)
         raise
+    # the build's card follows the move, its last step (TOOL-dPlacedRequest-2 S4); the move stands whatever it prints
+    said += write_card_follow(root, build, to, to in read_transition_rows(data, where)["terminal"])
     return move, commit, wrote, render_transition_line(move) if "micro-format" in chosen else None, said
+
+
+#: The kickoff engine the card follow runs, homed as the roles kit's handoff finds it (TOOL-dPlacedRequest-2 S4).
+KICKOFF_HOME, KICKOFF_ENGINE = "session-kickoff", "manifest-check.sh"
+#: The follow's bound in seconds: the engine's own reads and its push are each bounded inside it.
+CARD_FOLLOW_BOUND_S = 120
+
+
+def resolve_kickoff_engine(root):
+    """The kickoff engine, an optional sibling: through the inline kit resolver from this kit, else the ONE
+    file of that name `root` tracks, since gov homes that kit under `skills/`, where no probe walks. None
+    when neither answers, or the index names two."""
+    from loop_lib import resolve_kit_dir
+    try:
+        return resolve_kit_dir(KICKOFF_HOME, KICKOFF_ENGINE, KIT) / KICKOFF_ENGINE
+    except LookupError:
+        pass
+    rc, out = read_git(root, "ls-files", "--", KICKOFF_ENGINE, "*/" + KICKOFF_ENGINE)
+    hits = [ln for ln in out.splitlines() if ln.strip()] if rc == 0 else []
+    return pathlib.Path(root, hits[0]) if len(hits) == 1 and pathlib.Path(root, hits[0]).is_file() else None
+
+
+def write_card_follow(root, build, state, terminal):
+    """The build card follows a recorded move: `manifest-check.sh --card --follow --build <build> --to <state>`,
+    `--terminal` where the state is in the `terminal` set, run in `root` with stdin closed and a bound. ->
+    its printed lines, or one `card — skipped:` line where no engine or bash resolves or the run does not
+    answer. Never raises: the move stands whatever the card does."""
+    import subprocess
+    from loop_witness import read_clean_env, resolve_bash
+    engine = resolve_kickoff_engine(root)
+    if engine is None:
+        return ["card — skipped: no kickoff engine"]
+    bash = resolve_bash(engine.as_posix())
+    if bash is None:
+        return ["card — skipped: no bash runs the kickoff engine %s" % engine.as_posix()]
+    argv = [bash, engine.as_posix(), "--card", "--follow", "--build", build, "--to", state]
+    try:
+        p = subprocess.run(argv + ["--terminal"] * bool(terminal), cwd=str(root), stdin=subprocess.DEVNULL,
+                           capture_output=True, encoding="utf-8", errors="replace", timeout=CARD_FOLLOW_BOUND_S,
+                           env=read_clean_env())
+    except (OSError, subprocess.SubprocessError) as e:
+        return ["card — skipped: the follow did not answer: %s" % e]
+    lines = [ln for ln in p.stdout.splitlines() if ln.strip()]
+    if p.returncode != 0 and not lines:
+        lines = ["card — skipped: the follow exited %d: %s" % (p.returncode, (p.stderr.strip() or "no output").split("\n")[0])]
+    return lines
 
 
 # ------------------------------------------------------------------------------------------ the check

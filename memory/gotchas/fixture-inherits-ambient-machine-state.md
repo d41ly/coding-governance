@@ -95,3 +95,21 @@ came back empty, and `update-ref` printed `not a valid SHA1`. Fixed with the dri
 `config user.` lines on the bare repo. The "Where it bit" paragraph above is no longer true of node
 `a`: it now carries a global identity, so only an emptied global config
 (`GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1`) reproduces the failure there.
+
+## It bit again in the lander's fenced-landing block
+
+`tools/push-main.test.sh` makes its fenced-landing fixture, arms 42 to 54, with a launcher that
+execed the live unattended driver, so the fixture's own lease acquire read the live
+`tools/playbook/fleet.toml` and the ambient `GOV_NODE`. It looked hermetic: its user and session were
+planted. A node exporting `GOV_NODE`, a roster without the fixture's user, or an adopter whose
+registry carries other tags refused that acquire, and the block printed a skip naming an absent
+dependency; with no assertion floor the suite still ended `all cases ok`, every fenced-landing arm a
+silent pass. Fixed by TOOL-dPlacedRequest-98: the fixture copies the driver's kit and the playbook kit
+into a scratch kit tree whose `fleet.toml` holds its own two rows, the launcher runs that copy with
+`GOV_NODE` unset, a fixture that cannot be made is a failure naming the acquire's own line, and the
+suite pins its count against `FLOOR_ASSERTIONS` wherever no dependency skip fired.
+
+The registry a fixture's driver resolves, and the node variable that selects a row of it, join the
+list above. The rule for every suite's skip: a skip is admissible only when the dependency is
+genuinely absent, never when a fixture step failed. A skip branch whose condition includes the
+fixture's own success reads every fixture failure as an absent dependency.

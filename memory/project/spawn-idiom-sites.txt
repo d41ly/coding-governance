@@ -271,8 +271,8 @@ tools/unattended/stop-guard.test.sh	path-subst	4	7dbe0c8d9d2ca46a849065c73ad9cf7
 tools/unattended/stop-guard.test.sh	var-pipe	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/unattended/unattended.sh	cat-file	6	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/unattended/unattended.sh	date-fmt	8	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/unattended.sh	path-subst	13	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/unattended.sh	printf-subst	8	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+tools/unattended/unattended.sh	path-subst	12	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+tools/unattended/unattended.sh	printf-subst	7	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/unattended/unattended.sh	pure-fn-subst	44	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/unattended/unattended.sh	var-pipe	62	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/unattended/unattended.test.sh	cat-file	17	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded

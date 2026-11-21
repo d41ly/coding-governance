@@ -382,6 +382,16 @@ def load_toml(path: pathlib.Path) -> dict:
         raise Refusal(f"{path.as_posix()} is not valid TOML: {e}") from e
 
 
+def derive_withheld_names(kit_dir: pathlib.Path) -> list[str]:
+    """The file names the kit at `kit_dir` withholds from installs: each `include` of each `[[files]]`
+    rule of its `kit.toml` whose `role` is `project-owned`, in rule order, a string include read as a
+    one-name list, read through `load_toml`. A fixture copying a kit source spreads these into its
+    ignore list, so no copy restates a withheld name (TOOL-dLandedOwners-4 S9)."""
+    rules = load_toml(pathlib.Path(kit_dir) / "kit.toml").get("files", [])
+    return [n for r in rules if r.get("role") == "project-owned"
+            for n in (r.get("include") if isinstance(r.get("include"), list) else [r.get("include")])]
+
+
 def surface_paths(root: pathlib.Path, globs: list[str]) -> set[str]:
     """Tracked paths inside the declared surface, as repo-relative posix strings.
 
@@ -4460,6 +4470,28 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 if dropped and not guards:
                     print(f"govkit {verb} — gate leg '{nm}': UNGUARDED "
                           f"({len(dropped)} guard(s) dropped: {dropped[0][1]})")
+        # A RETIRED KIT'S LEG LEAVES WITH THE KIT (TOOL-dHomeGraded-1 S5). The carry below keeps every
+        # prior row whose kit is outside this run's scope, and a retired kit is outside every scope,
+        # so its row stayed in the runner after its files were withdrawn and ran a deleted script:
+        # agent-instructions' wiring leg exited 127 on every adopter that took its retirement. A row
+        # is ORPHANED when its kit is in no descriptor gov reads AND no descriptor declares a leg of
+        # its name, so a renamed kit whose successor carries the leg keeps it through the claim path
+        # above. An orphan whose runner row still holds the recorded argv is gov's and is removed;
+        # one the target changed is left in the runner as theirs. Either way the receipt stops
+        # claiming it, since gov no longer ships anything that could stand behind it.
+        _declared = {leg.get("name") for _d, _p in descs.values() for leg in _d.get("gate_leg", [])}
+        _orphaned = {e.get("name") for e in prior
+                     if e.get("kit") and e.get("kit") not in descs and e.get("name") not in _declared}
+        for _e in (e for e in prior if e.get("name") in _orphaned):
+            _at = next((i for i, row in enumerate(existing) if row.get("name") == _e.get("name")), None)
+            if _at is not None and existing[_at].get("argv") == _e.get("argv"):
+                del existing[_at]
+                print(f"  dropped   leg '{_e.get('name')}' — kit {_e.get('kit')} is in no descriptor "
+                      f"gov reads and no descriptor declares the leg")
+            elif _at is not None:
+                print(f"  released  leg '{_e.get('name')}' — kit {_e.get('kit')} is in no descriptor, "
+                      f"and the runner's row differs from the one recorded, so it stays as the "
+                      f"target's own")
         if len(r.problems) == _legs_problems_before:
             rf.parent.mkdir(parents=True, exist_ok=True)
             # S6, AND SINCE DEPL-cMendedVintage-21 IT IS ONE HELPER RATHER THAN THIS SITE'S OWN
@@ -4483,7 +4515,8 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
             # carried too, which is the safe direction: this run cannot prove it owns one.
             if carry_out_of_scope:
                 _scope = set(selection)
-                emitted = [e for e in prior if e.get("kit") not in _scope] + emitted
+                emitted = [e for e in prior if e.get("kit") not in _scope
+                           and e.get("name") not in _orphaned] + emitted
         else:
             # WITHHELD IS SAID OUT LOUD. Silence here is what let a target end up with no manifest
             # and a receipt claiming N emitted legs it never wrote.
@@ -13045,6 +13078,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
     if withdrawn_rows:
         receipt["files"] = [f for f in receipt["files"] if f not in withdrawn_rows]
+
+    # A RETIRED ROW A LIVE ROW SUPERSEDES LEAVES (TOOL-dHomeGraded-2 S1). `apply --kits playbook-render`
+    # writes the charter template as an `engine` row at the path the retired `playbook` seed rule
+    # wrote, and the seed's row stays, so the receipt carries two rows for one path and
+    # `install.sums` two hashes for one file, one of them for bytes the tree no longer holds. A
+    # `retired-edited` row only keeps the target's bytes while nothing else claims them; once a row of
+    # another role owns the path, those bytes are that row's, and the retired row is dropped.
+    if write:
+        _live_paths = {f.get("path") for f in receipt["files"] if f.get("role") != "retired-edited"}
+        _superseded = [f for f in receipt["files"]
+                       if f.get("role") == "retired-edited" and f.get("path") in _live_paths]
+        for _f in _superseded:
+            print(f"  reaped    row '{_f.get('path')}' (retired-edited, kit {_f.get('kit')}) — a live "
+                  f"row claims the same path, so the retired row describes bytes the tree no longer holds")
+        if _superseded:
+            receipt["files"] = [f for f in receipt["files"] if f not in _superseded]
 
     # The receipt is re-stamped ONLY on a clean run. Stamping it on a run that REFUSED rows is how a
     # schema-1 receipt whose role-distrust arm fired gets promoted to schema 2 — and the next run then

@@ -545,6 +545,7 @@ Cite ids, never line numbers.
 | [TOOL-dIndexedDesign-28](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-14 | 2026-10-28 | THE ### Bug classes FIELD DOES NOT READ THE SCOUT.… |
 | [TOOL-dIndexedDesign-29](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-20 | 2026-10-28 | ROW F6 READS NO FEATURE-LEVEL RE-ENTRY. TOOL-dDeclaredLoop-13's row F6… |
 | [TOOL-dIndexedDesign-30](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-20 | 2026-10-28 | TWO DECLARED-DIRECTION CLASSIFIERS. PLAY-dOrderedCharter-36 S5 specs a… |
+| [TOOL-dLandedOwners-5](../builds/dLandedOwners/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | DDECLAREDLOOP'S PENDING REVIEW CYCLE ROW READS STALE NOW THAT ITS BUILD… |
 | [TOOL-dLinkedLibrary-26](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | MED | TOOL-dLinkedLibrary-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dLinkedLibrary-27](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-1 | 2026-10-26 | A REUSE ENTRY BESIDE ITS DOSSIER IS NO OVERLAY PART.… |
 | [TOOL-dLinkedLibrary-28](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-2 | 2026-10-26 | THE HOUSE INDEX HAS TWO SPECCED HOMES. TOOL-aScoutedSeam-1 S10 specs a… |
@@ -565,16 +566,25 @@ Cite ids, never line numbers.
 | [TOOL-dMispairedQuote-6](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | resolveLiteralEnd opener-tests only the OPENING quote, so a mispairing… |
 | [TOOL-dMispairedQuote-8](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | checkLiteralOpen admits a quote after an OPERATOR or punctuation, which… |
 | [TOOL-dNarrowedAnchor-3](../builds/dNarrowedAnchor/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | BUDGET_gate_selftest was DERIVED, never observed, and the derivation… |
-| [TOOL-dPlacedRequest-22](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | MED | TOOL-dPlacedRequest-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [TOOL-dPlacedRequest-65](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE RESUME OVERRIDE READS THE IMPORT LINE, NOT THE FIXTURE.… |
-| [TOOL-dPlacedRequest-66](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE FEED CENSUS SEES ONLY LEASE-SHAPED PUSHES. TOOL-dPlacedRequest-13… |
-| [TOOL-dPlacedRequest-67](../builds/dPlacedRequest/BACKLOG.md) | OPEN | HIGH | — | 2026-10-26 | A DECLARED WAIT DOES NOT RENEW ITS LEASE. Under leases.renewal:… |
-| [TOOL-dPlacedRequest-68](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE PLACEMENT BLOCK CARRIES NO RE-ENTRY. TOOL-dFurnishedOrders-16… |
-| [TOOL-dPlacedRequest-69](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE TESTER'S ACTOR IS SPELLED TWO WAYS. TOOL-dPlacedRequest-7's item… |
-| [TOOL-dPlacedRequest-70](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE CLOSE'S FOLLOW WRITES A SECOND TERMINAL CARD.… |
-| [TOOL-dPlacedRequest-71](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | AN OFFER NAMES A NODE, NEVER A SESSION. TOOL-dPlacedRequest-20 S1… |
-| [TOOL-dPlacedRequest-73](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | A CARD KEY READ THROUGH read_card_policy HAS NO READER.… |
-| [TOOL-dPlacedRequest-74](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE PRE-PUSH HOOK. TOOL-dWitnessedBar-73 S6 put… |
+| [TOOL-dPlacedRequest-22](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dPlacedRequest-74](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-answers-to-one-question EARNED A GATE AT ITS SECOND… |
+| [TOOL-dPlacedRequest-75](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS observed-by-claim-no-arm-discharges EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-76](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS rule-stated-with-no-check-that-fails EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-77](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS amendment-leaves-its-other-half-standing EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-78](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS decision-re-derived-by-a-second-process EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-79](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS retirement-inventory-misses-readers-by-value EARNED A GATE AT… |
+| [TOOL-dPlacedRequest-80](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-guards-one-question-two-answers EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-81](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS a-folded-field-leaves-its-row-shape-docs-behind EARNED A GATE… |
+| [TOOL-dPlacedRequest-82](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS criterion-asserts-what-its-own-command-cannot-show EARNED A… |
+| [TOOL-dPlacedRequest-83](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS spec-names-code-its-base-lacks EARNED A GATE AT ITS SECOND… |
+| [TOOL-dPlacedRequest-87](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-readers-of-one-config-one-re-derived EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-90](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS a-spelling-change-strands-its-readers EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-102](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE CLASS fixture-inherits-ambient-machine-state EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-103](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE CLASS budget-row-not-remeasured-after-added-arms EARNED A GATE AT… |
+| [TOOL-dPlacedRequest-105](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE CLASS fixture-passes-by-finding-nothing EARNED A GATE AT ITS SECOND… |
+| [TOOL-dPlacedRequest-109](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-11-21 | THE SCRATCH-GUARD FLOOR SITS BELOW THE ROWS IT GUARDS.… |
+| [TOOL-dPlacedRequest-110](../builds/dPlacedRequest/BACKLOG.md) | OPEN | HIGH | — | 2026-11-21 | held red: suite loop termination red at a0ae4dca on the daily held job,… |
+| [TOOL-dPlacedRequest-111](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE PRE-PUSH HOOK. TOOL-dWitnessedBar-73 S6 put… |
 | [TOOL-dPolishedVitrine-3](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-recall/adopt-memory-recall.sh probes for the settings… |
 | [TOOL-dPolishedVitrine-4](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | derive_gate_runner in tools/playbook/render_playbook.py tries four… |
 | [TOOL-dPolishedVitrine-7](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/check-kit-placeholders.py EXEMPTS the review-harness kit because… |
@@ -679,6 +689,11 @@ Cite ids, never line numbers.
 | [TOOL-dTotalRecall-108](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE RECORD-KIND CHECK READS NO SERVES LINE OUTSIDE THE BUILD FOLDERS.… |
 | [TOOL-dTracedLedger-2](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aSparedSpawn's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTracedLedger-3](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aOrientedCast's owner: memory hygiene check 23 is red at origin/main… |
+| [TOOL-dTrackedAtlas-13](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite pre-push run-log line red at 9e21ac76 on the daily held… |
+| [TOOL-dTrackedAtlas-14](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite loop guard fixtures red at 9e21ac76 on the daily held… |
+| [TOOL-dTrackedAtlas-15](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite unattended brief-recorded selftest red at 9e21ac76 on… |
+| [TOOL-dTrackedAtlas-16](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite unattended pass-order selftest red at 9e21ac76 on the… |
+| [TOOL-dTrackedAtlas-17](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite unattended pass-tree selftest red at 9e21ac76 on the… |
 | [TOOL-dTrueNorth-21](../builds/dTrueNorth/BACKLOG.md) | DEFERRED | LOW | TOOL-dPinnedHandoff-2 | 2026-10-21 | TWO LIVE SPECS OF dPinnedHandoff OMIT TWO LEGS THEIR FILES TRIP. Since… |
 | [TOOL-dTrueNorth-22](../builds/dTrueNorth/BACKLOG.md) | DEFERRED | LOW | TOOL-aOrientedCast-28 | 2026-10-22 | A LIVE SPEC OF aOrientedCast OMITS A LEG ITS FILES TRIP. Since… |
 | [TOOL-dTrueNorth-100](../builds/dTrueNorth/BACKLOG.md) | OPEN | HIGH | — | 2026-10-22 | held red: suite build-index selftest red at 271aa59d on the daily held… |

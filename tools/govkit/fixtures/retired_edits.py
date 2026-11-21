@@ -133,9 +133,10 @@ def build_retired_gov(tmp: pathlib.Path) -> pathlib.Path:
         f'[[exempt]]\npath = "{{prefix}}/{govkit.GOVKIT_DIR.name}"\nwhy = "the deployer itself"\n\n'
         '[[exempt]]\npath = "{prefix}/policy"\nwhy = "the policy reader update runs"\n',
         encoding="utf-8", newline="\n")
-    shutil.copytree(govkit.resolve_kit_dir("policy", "policy.py", govkit.GOVKIT_DIR),
-                    g / resolve_kit_path("policy"),
-                    ignore=shutil.ignore_patterns("__pycache__", "*.test.sh"))
+    policy_kit = govkit.resolve_kit_dir("policy", "policy.py", govkit.GOVKIT_DIR)
+    shutil.copytree(policy_kit, g / resolve_kit_path("policy"),
+                    ignore=shutil.ignore_patterns("__pycache__", "*.test.sh",
+                                                  *govkit.derive_withheld_names(policy_kit)))
     sm = g / resolve_kit_path("sm")
     sm.mkdir(parents=True)
     shutil.copy2(govkit.GOVKIT_DIR.parent / "settings-merge.py", sm / "settings-merge.py")
@@ -423,7 +424,11 @@ def run_fixture(plant: str, stub: str | None, write_withdrawals: bool, rerender_
         print(f"retired-edits fixture: cannot observe: {exc}")
         return 2
     finally:
-        shutil.rmtree(tmp, ignore_errors=True)
+        import step_gate  # noqa: E402, PLC0415  its scratch remover: git's objects are read-only on Windows
+        try:
+            step_gate.remove_scratch_tree(tmp)
+        except OSError:
+            pass
     bad = 0
     for name, seen, want in obs:
         bad += seen != want

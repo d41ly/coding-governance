@@ -22460,6 +22460,7 @@ memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/run
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/runlog/extract.py:1204-1239	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/runlog/record.py:176	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/runlog/runlog.py:217	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dLandedOwners/prompts/2026-11-19-prompt-TOOL-dLandedOwners-4-3-spec-writer.md	tools/policy/check_policy.py:20-21	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 memory/builds/dLandedVerdict/README.md	drift_report.py:298-303	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dLandedVerdict/build/2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md	drift_report.py:298-303	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dLandedVerdict/spec/2026-08-19-spec-TOOL-dLandedVerdict-2.md	HYGIENE check 8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -25473,6 +25474,7 @@ memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-63-devia
 memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-64-deviation-641.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-crosscheck-returns.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-1-departures-build.md	BUILD-METHOD M4	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	tools/unattended/unattended.sh:852	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-3-reuse-scout.md	BUILD-METHOD M3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md	HYGIENE check 12	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -25616,7 +25618,6 @@ memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-62-sp
 memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-62-spec-audit.md	unattended.test.sh:708-714	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	tools/memory-tree/tree_lib.py:28	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	tools/playbook/render_playbook.py:347	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	tools/unattended/lib-unattended.sh:188-197	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	tools/unattended/unattended.sh:2070-2462	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	tools/unattended/unattended.sh:2087	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	unattended.sh:2411-2412	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -25666,25 +25667,9 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md	tool
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md	tools/push-main.sh:262	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md	tools/push-main.sh:978	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md	tools/unattended/unattended.sh:2419	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md	tools/memory-tree/tree_lib.py:28	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md	tools/unattended/unattended.sh:2290	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md	unattended.sh:2162	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-17.md	tools/memory-tree/tree_lib.py:28	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-17.md	tools/unattended/unattended.sh:2172-2186	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-17.md	tools/unattended/unattended.sh:2180	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md	tools/roles/roles_lib.py:65	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md	tools/unattended/unattended.sh:2087	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	manifest-check.sh:310-314	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	runlog_lib.py:522	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	skills/session-kickoff/manifest-check.sh:311-315	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/memory-tree/row_grammar.py:1475	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/memory-tree/row_grammar.py:1475-1479	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/roles/handoff.py:307	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/runlog/runlog_lib.py:522	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/unattended/unattended.sh:2285	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/unattended/unattended.sh:2396	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/unattended/unattended.sh:3548	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	unattended.sh:3548	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md	scratch-guard.js:667-671	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md	skills/session-kickoff/manifest-check.sh:310-317	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md	tools/memory-tree/tree_lib.py:27	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -25695,59 +25680,33 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md	tool
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md	tools/unattended/unattended.sh:2219	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md	tools/unattended/unattended.sh:2219-2220	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/memory-tree/gen_build_index.py:3940	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/memory-tree/gen_build_index.py:4069-4071	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/memory-tree/tree_lib.py:28	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/unattended/unattended.sh:2396	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/unattended/unattended.sh:4183-4192	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-23.md	tools/unattended/unattended.sh:2118	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-23.md	tools/unattended/unattended.sh:2145-2147	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-24.md	tools/unattended/unattended.sh:2318-2360	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-24.md	tools/unattended/unattended.sh:2325-2360	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-24.md	tools/unattended/unattended.sh:2331-2354	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-26.md	tools/unattended/unattended.sh:2118	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-27.md	tools/run-gates/post-merge.sh:301	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tools/push-main.sh:262-292	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tools/push-main.sh:953-1008	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tools/unattended/resume-tick.sh:305-310	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tools/unattended/unattended.sh:2275	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	skills/session-kickoff/manifest-check.sh:1054	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	tools/memory-tree/tree_lib.py:28	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	tools/roles/workflows.toml:13-20	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	tools/roles/workflows.toml:18-20	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-30.md	tools/memory-tree/row_grammar.py:1475	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-30.md	tools/memory-tree/row_grammar.py:1475-1479	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md	tools/unattended/unattended.sh:2260	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md	tools/unattended/unattended.sh:2260-2262	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md	tools/unattended/unattended.sh:8884	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md	skills/session-kickoff/manifest-check.sh:641-643	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md	skills/session-kickoff/manifest-check.sh:645-655	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md	tools/unattended/unattended.sh:671-677	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	memory/map/generated/symbols.json:3826	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	skills/session-kickoff/manifest-check.sh:375-400	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	skills/session-kickoff/manifest-check.sh:645-700	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	skills/session-kickoff/manifest-check.sh:662	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/hooks/scratch-guard.js:667	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/memory-tree/row_grammar.py:1475	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/playbook/render_playbook.py:347	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/roles/handoff.py:279	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/run-gates/post-merge.sh:301	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/run-gates/run-selftests.sh:293-310	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/unattended/unattended.sh:2112-2113	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/unattended/unattended.sh:2136	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/unattended/unattended.sh:3398	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-35.md	tools/unattended/unattended.sh:2118	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md	tools/lib/health-log.sh:14-61	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md	tools/lib/resolve-python.test.sh:180	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md	tools/unattended/unattended.sh:2338	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md	unattended.sh:2331-2354	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md	unattended.sh:2338	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-37.md	tools/unattended/unattended.sh:2325-2360	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-37.md	tools/unattended/unattended.sh:2347	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-37.md	unattended.sh:2347	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-38.md	resolve-python.test.sh:213	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-38.md	resolve-python.test.sh:221	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-38.md	tools/unattended/unattended.sh:2331-2354	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-39.md	tools/lib/health-log.sh:21-23	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools/memory-tree/gen_build_index.py:793	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools/memory-tree/tree_lib.py:28	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -25756,119 +25715,16 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools/unattended/unattended.sh:3579	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools/unattended/unattended.sh:3763	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-40.md	tools/unattended/unattended.sh:2260	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	manifest-check.sh:220-229	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	manifest-check.sh:560	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	skills/session-kickoff/manifest-check.sh:228	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	tools/playbook/render_playbook.py:424	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	tools/push-main.sh:304	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	tools/unattended/unattended.sh:9037	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	unattended.sh:2202	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	unattended.sh:2260-2263	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	unattended.sh:2261-2263	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	unattended.sh:546	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md	push-main.sh:880	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md	push-main.sh:896-902	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md	tools/push-main.sh:921	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	push-main.sh:921	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	tools/memory-tree/gotchas.py:65	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-46.md	tools/unattended/unattended.sh:2118	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md	tools/unattended/unattended.sh:2118	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md	tools/unattended/unattended.sh:2181	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-48.md	tools/unattended/unattended.test.sh:6098	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	check-spec-tokens.py:530	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	manifest-check.sh:220	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	manifest-check.sh:220-229	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	manifest-check.sh:655	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	resolve-python.test.sh:218	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	skills/session-kickoff/manifest-check.sh:228	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	stop-guard.js:97	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/hooks/scratch-guard.js:667	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/lib/resolve-python.test.sh:213-221	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/lib/resolve-python.test.sh:218	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/run-gates/run-selftests.sh:294	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/unattended/stop-guard.js:106-114	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/unattended/unattended.sh:13936	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/unattended/unattended.sh:2263	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	unattended.sh:13936	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	unattended.sh:2260-2263	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	unattended.sh:2347-2348	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	unattended.sh:3389	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/memory-tree/gen_build_index.py:793	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/memory-tree/tree_lib.py:28	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:11866-11869	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:12762	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:3975-4041	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-50.md	tools/unattended/unattended.sh:2181	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	skills/session-kickoff/manifest-check.sh:648	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/lib/resolve-python.test.sh:218	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/lib/resolve-remote.sh:3-7	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/push-main.sh:514-516	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/unattended/unattended.sh:2165	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/unattended/unattended.sh:2335-2350	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-53.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	tools/push-main.sh:514-526	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	tools/push-main.sh:516	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	tools/push-main.sh:880	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md	tools/unattended/unattended.test.sh:6098	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	BUILD-METHOD M6	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	skills/session-kickoff/manifest-check.sh:653-654	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	tools/memory-tree/gotchas.py:276-279	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	tools/unattended/unattended.sh:2171	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md	tools/push-main.sh:880	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md	tools/unattended/unattended.sh:1359-1375	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md	tools/unattended/unattended.sh:8110	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-58.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	tools/unattended/unattended.sh:2170	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	tools/unattended/unattended.sh:8536	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-6.md	tools/memory-tree/tree_lib.py:27	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-6.md	tools/roles/handoff.py:97	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-60.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/check-brief-recorded.sh:381	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/check-pass-order.sh:356	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/lib-unattended.sh:2057	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/unattended.sh:1350-1353	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/workflows/unattended-build.js:608-613	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	unattended.sh:1350	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-62.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	BUILD-METHOD M3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	lib-unattended.sh:2057	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/lib-unattended.sh:2057	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.sh:1359-1375	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.sh:1364	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.sh:13746-13758	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.test.sh:6399-6411	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.test.sh:708	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/workflows/unattended-build.js:608-613	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md	HYGIENE check 25	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md	tools/memory-tree/tree_lib.py:27	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md	tools/unattended/unattended.sh:852	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/memory-tree/gen_build_index.py:3185	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/memory-tree/tree_lib.py:27	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/roles/handoff.py:166	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/unattended/unattended.sh:3389	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/unattended/unattended.sh:3404	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	skills/session-kickoff/manifest-check.sh:216	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	skills/session-kickoff/manifest-check.sh:363-364	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	skills/session-kickoff/manifest-check.sh:555	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	tools/govkit/entries/kickoff-manifest.kit.toml:6-9	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	tools/memory-tree/tree_lib.py:27	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	tools/roles/roles_lib.py:36-40	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPolishedVitrine/README.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPolishedVitrine/build/2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dPolishedVitrine/build/2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md	run-gates.evidence.test.sh:643	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -34431,6 +34287,8 @@ memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-6.md	tools
 memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-7.md	tools/memory-recall/bench.py:182-190	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-7.md	tools/memory-recall/bench.py:308-330	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-7.md	tools/memory-recall/check-recall.py:203	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md	BUILD-METHOD M3	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md	BUILD-METHOD M3	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-10-deviation-9.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-11-deviation-10.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-12-deviation-11.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -37770,7 +37628,6 @@ memory/gotchas/a-new-leg-trips-a-growing-set-of-meta-gates.md	BUILD-METHOD M6	1	
 memory/gotchas/arm-literal-strands-on-message-edit.md	check-unattended.test.sh:714	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/gotchas/fold-text-is-unreviewed-surface.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/guides/BUILD-METHOD.md	HYGIENE check 5	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/guides/SESSION-KICKOFF.md	BUILD-METHOD M2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/guides/UNATTENDED-ASKS.md	BUILD-METHOD M2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/features/build-method.md	kit-dogfood-parity.test.sh:30	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/features/build-method.md	tools/memory-tree/adopt-memory-tree.sh:59	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

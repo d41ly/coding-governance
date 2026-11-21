@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.23 -->
+<!-- gov:kit roles@1.24 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
@@ -464,7 +464,7 @@ else; the check compares the two on every run.
 |---|---|---|---|---|---|---|
 | `gov-builder` | build | product | input:spec, card:route?, brief:non-goals? | yagni, reuse, core, derive, verify, gate, docs, security, portable, tools | true | whether the unit was committed, the commit, why when it was not, and which check ran for which gate |
 | `gov-diff-reviewer` | closing-review | none | input:diff, input:spec? | verify, gate, class, docs, left-shift, security, risk, portable | true | concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix |
-| `gov-orienter` | orient | none | input:question, input:prompt? | small, ids, memory, tokens, tools | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows |
+| `gov-orienter` | orient | none | input:question, input:prompt? | small, ids, memory, tokens, tools | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows; handed a request to place, its disposition · reason · evidence · observations · scenarios · facts |
 | `gov-researcher` | research | none | input:question, brief:goal?, brief:non-goals? | reuse, verify, class, memory | true | the candidates, each with its mechanism, the smallest test that would make it lose and that test's result, then the pick and its reason |
 | `gov-reuse-scout` | reuse | none | input:question, task:in?, card:reuse? | reuse | true | the seam to extend, cited by path, or "no existing seam fits" with the evidence |
 | `gov-session` | handoff | none | input:question, brief:goal?, task:todo?, card:route? | ids, memory | false | nothing to the sender; the receiving session acts on the task block and reports in its own session |

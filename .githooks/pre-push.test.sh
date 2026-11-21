@@ -364,6 +364,32 @@ case "$msg" in
   *) bad "8 expected a refusal, got: ${msg:-<push SUCCEEDED — the whole bar was skipped>}" ;;
 esac
 
+# case 8b — THE VERDICT FILES' CLEAR RUNS ONLY ON A DEFAULT-BRANCH PUSH (TOOL-dPlacedRequest-11 S4).
+#           A lander's three files are planted and a non-default ref is pushed, as a claim beat
+#           landing mid-bar pushes one: all three must be left byte-identical. Then a default-branch
+#           push with a red bar must still clear them before it writes its own: the refusal reads
+#           `gate-red` and the planted allow record is gone. Both under `env -u GOV_REMOTE -u
+#           GOV_DEFAULT_BRANCH`, so the observed origin/HEAD case 8 set decides, never an exported
+#           value. RED with the clear restored above the ref loop: the non-default push removes all
+#           three. WHAT THIS DOES NOT CHECK: a pre-loop `default-branch` refusal on a non-default
+#           push, which still overwrites the refusal file (§3 of the unit's spec).
+c8b_gd=$(git rev-parse --git-dir)
+git checkout -q feature; git commit -q --allow-empty -m c8b
+printf 'gate-red\tplanted\n' > "$c8b_gd/pre-push-refusal"; printf 'bar\tplanted\n' > "$c8b_gd/pre-push-bar"
+printf 'allow\tplanted\n' > "$c8b_gd/pre-push-allow"
+c8b_h0=$(cat "$c8b_gd/pre-push-refusal" "$c8b_gd/pre-push-bar" "$c8b_gd/pre-push-allow" | git hash-object --stdin)
+env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH GOV_GATE_CMD="bash $red" git push -q origin feature >/dev/null 2>&1; c8b_rc=$?
+c8b_h1=$(cat "$c8b_gd/pre-push-refusal" "$c8b_gd/pre-push-bar" "$c8b_gd/pre-push-allow" 2>/dev/null | git hash-object --stdin)
+[ "$c8b_rc" = 0 ] && [ "$c8b_h0" = "$c8b_h1" ] \
+  && ok "8b a non-default push leaves the three verdict files byte-identical" \
+  || bad "8b a non-default push moved the verdict files or failed: rc=$c8b_rc"
+git checkout -q main; git commit -q --allow-empty -m c8b-main
+env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH GOV_GATE_CMD="bash $red" git push -q origin main >/dev/null 2>&1; c8b_rc=$?
+c8b_tok=$(cut -f1 "$c8b_gd/pre-push-refusal" 2>/dev/null)
+[ "$c8b_rc" != 0 ] && [ "$c8b_tok" = gate-red ] && [ ! -e "$c8b_gd/pre-push-allow" ] \
+  && ok "8b a default-branch push still clears the planted files before its own verdict" \
+  || bad "8b a default-branch push did not clear the planted allow record, or wrote no gate-red: rc=$c8b_rc token=$c8b_tok allow=$([ -e "$c8b_gd/pre-push-allow" ] && echo present || echo absent)"
+
 # case 9 — THE RED IS ATTRIBUTED AGAINST THE LANDING BASE (TOOL-dDerivedDocket-23 AC7). The runner is
 #          handed GATE_ATTRIBUTE = the REMOTE sha git feeds the hook on stdin, never the local one: a
 #          red attributed against the tree that has it reads every red as inherited. The hook is
@@ -396,6 +422,41 @@ case "$msg" in
   *"ATTR="*) ok "9b an all-zero remote sha exports no GATE_ATTRIBUTE" ;;
   *) bad "9b the runner did not run, so the control grades nothing: ${msg:-<no output>}" ;;
 esac
+
+# case 9c — THE CLAIM FAST PATH ADMITS A PARENTED BEAT (TOOL-dPlacedRequest-34 AC24, AC25). A commit over
+#           the empty tree parented on another such commit, an unattended run's claim beat, is pushed
+#           alone to a non-default ref, the hook driven directly as in case 9 with a stub
+#           `straggler-guard.sh` beside it that prints a marker when sourced. The live hook prints no
+#           marker; a commit carrying a file prints it, the control that the stub is reachable at all;
+#           and a copy staged back to the base predicate, a parent `missing` and nothing else, prints it
+#           for the beat, so the two predicates are seen to differ. RED is the parented shape taking the
+#           slow path. WHAT THIS DOES NOT CHECK: the library's own setup, which the stub stands in for.
+c9c_z=0000000000000000000000000000000000000000
+c9c_t=$(git hash-object -w -t tree --stdin </dev/null)
+c9c_0=$(git commit-tree "$c9c_t" -m "gov-claim fx/build")
+c9c_1=$(git commit-tree "$c9c_t" -p "$c9c_0" -m "gov-claim fx/build")
+c9c_b=$(printf 'x\n' | git hash-object -w --stdin)
+c9c_f=$(git commit-tree "$(printf '100644 blob %s\tc9c.txt\n' "$c9c_b" | git mktree)" -m c9c-file)
+for c9c_d in live base; do
+  mkdir -p "$tmp/c9c-$c9c_d"
+  cp "$tmp/hooks/pre-push" "$tmp/c9c-$c9c_d/pre-push"
+  printf '%s\n' 'echo "STRAGGLER-GUARD-SOURCED"' > "$tmp/c9c-$c9c_d/straggler-guard.sh"
+done
+sed 's/ || \[ "\${_sg_rows\[_sg_i + 2\]}" = "tree 0" \]//' "$tmp/hooks/pre-push" > "$tmp/c9c-base/pre-push"
+run_c9c() { # hook dir · sha -> the hook's output for one push of that sha to refs/gov/leases/fx/build
+  GOV_GATE_CMD="bash $green" bash "$tmp/c9c-$1/pre-push" origin "$tmp/remote.git" \
+    <<<"refs/gov/leases/fx/build $2 refs/gov/leases/fx/build $c9c_z" 2>&1
+}
+if cmp -s "$tmp/hooks/pre-push" "$tmp/c9c-base/pre-push"; then
+  bad "9c the staged base predicate changed nothing, so the hook no longer spells the parented test this arm stages away"
+else
+  case "$(run_c9c live "$c9c_1")" in *STRAGGLER-GUARD-SOURCED*) bad "9c AC24 a parented claim beat pushed alone took the slow path, the straggler layer sourced" ;;
+    *) ok "9c AC24 a parented claim beat pushed alone sources no straggler-guard.sh" ;; esac
+  case "$(run_c9c live "$c9c_f")" in *STRAGGLER-GUARD-SOURCED*) ok "9c control — a commit carrying a file sources the stub" ;;
+    *) bad "9c control — a commit carrying a file did not source the stub, so the marker grades nothing" ;; esac
+  case "$(run_c9c base "$c9c_1")" in *STRAGGLER-GUARD-SOURCED*) ok "9c AC25 the base predicate sends the same beat down the slow path" ;;
+    *) bad "9c AC25 the base predicate also skipped the parented beat, so the two predicates read alike" ;; esac
+fi
 
 # ============================================================================================
 # THE BOUNDARY DECIDES. One arm per forcing predicate, plus the one that matters most: the arm
@@ -756,10 +817,11 @@ wtcfg="$wt/w/.git/config"
 wtgd="$wt/w/.git/worktrees/lw"
 if [ -d "$wtgd" ]; then
   git config --file "$wtcfg" core.bare false
-  ( cd "$wt" && GIT_DIR="$wtgd" sh -c 'd=$(mktemp -d); cd "$d" && git init -q .' ) >/dev/null 2>&1
+  # Each scratch repo under "$wt" (passed as $1), so the rm -rf "$wt" below removes it too.
+  ( cd "$wt" && GIT_DIR="$wtgd" sh -c 'd=$(mktemp -d "$1/s.XXXXXX"); cd "$d" && git init -q .' _ "$wt" ) >/dev/null 2>&1
   poisoned=$(git config --file "$wtcfg" --get core.bare)
   git config --file "$wtcfg" core.bare false
-  ( cd "$wt" && GIT_DIR="$wtgd" sh -c "unset $SCRUB; d=\$(mktemp -d); cd \"\$d\" && git init -q ." ) >/dev/null 2>&1
+  ( cd "$wt" && GIT_DIR="$wtgd" sh -c "unset $SCRUB; d=\$(mktemp -d \"\$1/s.XXXXXX\"); cd \"\$d\" && git init -q ." _ "$wt" ) >/dev/null 2>&1
   guarded=$(git config --file "$wtcfg" --get core.bare)
   if [ "$poisoned" != true ]; then
     bad "17 the fixture did not reproduce the injection, so this arm proves nothing (git behaviour changed?)"

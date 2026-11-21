@@ -92,6 +92,7 @@ loop adapt fixtures	kit	selftests
 loop breakpoint fixtures	kit	selftests
 loop budget fixtures	kit	selftests
 loop checklist tags	repo	declarations
+loop claim fixtures	kit	selftests
 loop claims fixtures	kit	selftests
 loop command conformance	repo	declarations
 loop composition fixtures	kit	selftests
@@ -102,7 +103,10 @@ loop factories fixtures	kit	selftests
 loop guard fixtures	kit	selftests
 loop item kind	repo	selftests
 loop parent routes	kit	selftests
+loop placement fixtures	kit	selftests
 loop position fixtures	kit	selftests
+loop probe fixtures	kit	selftests
+loop request fixtures	kit	selftests
 loop review bounds fixtures	kit	selftests
 loop scenario fixtures	repo	selftests
 loop splice check	repo	selftests
@@ -199,6 +203,7 @@ shell hygiene (a fork spent on builtin work)	repo	product
 shell hygiene (a location probe asked from a moved directory)	repo	product
 shell hygiene (a loop fed by a command substitution)	repo	product
 shell hygiene (a quoting hazard)	repo	product
+shell hygiene (a stage committed with no staged-diff test)	repo	product
 shell-hygiene selftest	kit	selftests
 spawn budget (forks per hot entrypoint)	repo	product
 spec tokens (a spec's own names resolve)	repo	declarations

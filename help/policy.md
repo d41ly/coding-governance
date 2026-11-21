@@ -152,26 +152,55 @@ reads is a setting you can change to no effect, so `python tools/policy/check_po
 reader coverage: budgets.enforce (owner dGroundRules, landed at 3708a705) has no reader
 ```
 
-- **Landed** means: on the default branch as `policy.py get` reads it, the build's folder
+- **Landed** means: on the default branch as `policy.py get` reads it, either the build's folder
   `memory/builds/<owner>/spec/` holds at least one spec and every spec there is `CLOSED` or
-  `WONTDO`. A build whose specs are still `DEFERRED` or open has not landed, and your working tree
-  never counts: only what is committed on the default branch does.
-- **A reader** is a line of tracked code that passes the key to the policy reader, in one of two
+  `WONTDO`, or a build run of it landed. A build run landed when one of the build's run records,
+  `RUN.md` or a rotated `RUN.LANDED.<8 hex>.md`, carries a `base:` that names a commit, the run at
+  that base was a build run rather than a spec run, and a merge on the default branch touched the
+  build's `RUN.md` with that same base. So a build run that landed with a unit carried forward as
+  `DEFERRED` counts as landed. A spec run, which carries every unit `DEFERRED`, does not: at its base
+  the build still had an open ask and a roster unit with no spec. Your working tree never counts:
+  only what is committed on the default branch does.
+- **A reader** is a line of tracked code that passes the key to the policy reader, in one of three
   shapes: a call whose first argument is the key in quotes, such as `resolve("budgets.enforce")` in
-  Python or `mirror.get('budgets.enforce')` in JavaScript, or `policy.py get budgets.enforce` in a
-  shell script or a git hook. A comment, a test file, a help page, the memory tree, the JSON mirror
+  Python or `mirror.get('budgets.enforce')` in JavaScript; `policy.py get budgets.enforce` in a
+  shell script or a git hook; or, in Python, a call passing the name of a module constant that holds
+  the key, such as `resolve(KEY)` in a file whose line `KEY = "budgets.enforce"` starts at column 0.
+  That call may sit inside another call's arguments, and may pass the name as `key=KEY`. A comment, a test file, a help page, the memory tree, the JSON mirror
   and the catalogue never count. For a key with a `*` or `<name>` part, such as `budgets.*`, a
   variable in that part counts too: `policy.py get "budgets.$cap"`, or a quoted part holding the
   variable, `resolve(f'budgets."{cap}"')`.
-- **To clear it,** do one of two things: add the reader, a call of that shape where the code uses the
-  value; or, if the key's build has not really landed, make the row's `owner` a build that has not
-  landed yet.
+- **To clear it,** do one of three things: add the reader, a call of that shape where the code uses
+  the value; or, if the key's build has not really landed, make the row's `owner` a build that has
+  not landed yet; or, if the only code that uses the key sits where the check does not look, under
+  the memory tree say, declare it in `tools/policy/unscanned-readers.txt`.
+- **A declared key** is one row of `unscanned-readers.txt`: `<key> <path> <reason>`, split on the
+  first two runs of whitespace, spaces or tabs, so the path holds no whitespace and the reason is the
+  rest of the line. Lines
+  opening `#` and blank lines are skipped. A declared key is never counted as read. Instead every run
+  prints its row after the summary line:
+
+  ```
+  reader coverage: <key> (owner <owner>) declared outside the scan at <path>: <reason>
+  ```
+
+  The row must stay true. Each of these reds the check: a line that is not a row
+  (`unscanned-readers.txt:<n> is not a row`), a key no catalogue row names, a key on a second row,
+  a declared key the scan now reads (`drop its row`), a path that is not a tracked file, and a path
+  the check already reads (`give the scan its shape instead`). The last three apply once the key's
+  owner has landed. The check does not confirm the file really uses the key: the printed reason is
+  your claim, there for anyone to read. The list is gov's own, and no install receives it.
 - **Every run says what it graded:** `reader coverage: graded <n> of <m> catalogue key(s); landed
   owners: <builds>`, and while no owner build has landed,
-  `reader coverage: graded 0, so this arm checked nothing at <commit>`, which passes.
+  `reader coverage: graded 0, so this arm checked nothing at <commit>`, which passes. A git read
+  the check makes that fails stops it with one finding naming the read:
+  `git <arguments> failed, so reader coverage cannot read the tree`.
 - **What it does not see:** a reader in another language, or one that builds the key's name at run
-  time from pieces, reds as unread; a call that only mentions the key, in a message say, counts as a
-  reader.
+  time from pieces, reds as unread. So does a key passed through a constant from another file, a
+  variable set inside a function, a constant in JavaScript or shell, a name inside a tuple or a loop
+  rather than a call's arguments, or a call whose arguments span lines. A call that only mentions the
+  key, in a message say, counts as a reader, and so does any call that passes the constant's name,
+  `print(KEY)` included.
 
 ## Who may change the policy file
 

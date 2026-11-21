@@ -369,6 +369,10 @@ path = ".githooks/straggler-guard.test.sh"
 why = "gov's own red/green arms for the two files above, which are themselves registry exemptions. Its fixtures build a memory tree, install this repo's kits into it and drive the real hooks; an adopter receives neither the library nor `pre-rebase`, so the suite would red there on absence rather than on behaviour. Exemptions are exact-path, so the subjects' rows do not cover their sibling — the precedent is `.githooks/pre-commit.test.sh` above. TOOL-dDerivedDocket-13."
 
 [[exempt]]
+path = "skills/session-kickoff/card-store.fixture.sh"
+why = "gov's own fixture for the build card, deliberately not shipped. Each case copies the memory-tree, loop and unattended kits out of the tree it sits in into a scratch repository and drives the engine beside it against a bare remote; the kickoff self-test's arm runs it where it sits beside the checker and says so where it does not. TOOL-dPlacedRequest-2 S12."
+
+[[exempt]]
 path = "skills/session-kickoff/card-compaction.fixture.sh"
 why = "gov's own live fixture for the orientation card file, deliberately not shipped. It drives two headless `claude` sessions and a compaction, minutes of model time and API tokens, so the main loop runs it live and no target receives it: a target has no build whose card it would prove. PLAY-dOrderedCharter-8 S1; exempted by PLAY-dOrderedCharter-77 S7."
 
@@ -806,7 +810,7 @@ argv = ["bash", "skills/session-kickoff/manifest-check.test.sh"]
 guard = ["skills/session-kickoff/", "{prefix}/lib/"]
 chunk = "selftests"
 subject = "kit"
-ceiling = 4370
+ceiling = 6480
 stage = ["step.test"]
 
 [[exempt_leg]]
@@ -1716,6 +1720,7 @@ guard = [
   "{prefix}/memory-tree/asbuilt_view.py",
   "{prefix}/memory-tree/deviation_join.py",
   "{prefix}/memory-tree/routed_commits.py",
+  "{prefix}/memory-tree/commit_trailers.py",
   "{prefix}/memory-tree/row_grammar.py",
   "{prefix}/roles/roles_lib.py",
   "{prefix}/roles/render_agents.py",
@@ -2107,6 +2112,62 @@ chunk = "selftests"
 subject = "kit"
 ceiling = 120
 enforces = ["principle.p23"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "loop request fixtures"
+why = "it runs `<prefix>/loop/request.py --selftest`, every plant of a request's content key through the module's own `key` verb, each file in a scratch directory: two texts differing only in case, whitespace and an ISO date keyed alike, a text empty once normalised refused, a text saved with and without a byte-order mark keyed alike, and a byte that is not UTF-8 refused by name. The key reads the `memory-tree` kit's normaliser under the loop kit's edge to it. Its subject is the module itself, so the leg has a job only where that source changes, and none in a tree that copy-installs the loop kit and never edits it, the owner's 2026-08-23 ruling for a kit's self-test. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop claims fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dPlacedRequest-19."
+tag = "leg.gov.loop-request-fixtures"
+tests = ["feature.loop"]
+purpose = "plants a request's content key through its key verb"
+argv = ["python", "{prefix}/loop/request.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 120
+enforces = ["principle.p40"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "loop probe fixtures"
+why = "it runs `<prefix>/loop/probe.py --selftest`, every plant of the probe program, each in a throwaway repository with a stub policy file and a pinned commit: the trigger's causes and each policy key's refused and admitted cases, the pin committed alone before any run, the entry-time records beside a request, the method's appends and refusals, the re-run through `loop_witness.py rerun` judged confirmed and refuted, the visual, claimed and experiment stand-ins, each verb's retried and out-of-order calls refused, a cross-kind verdict and five other malformed records refused, and both record kinds bound. It reads the `memory-tree` kit's record factory under the loop kit's edge to it, and the `policy` kit's reader by `read_policy_kit`, found by `resolve_kit_dir` with no edge, as `loop guard fixtures` does. Its subject is the module itself, so the leg has a job only where that source changes, and none in a tree that copy-installs the loop kit and never edits it, the owner's 2026-08-23 ruling for a kit's self-test. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop request fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dPlacedRequest-7."
+tag = "leg.gov.loop-probe-fixtures"
+tests = ["feature.loop"]
+purpose = "plants every break of the probe program"
+argv = ["python", "{prefix}/loop/probe.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p31"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "loop placement fixtures"
+why = "it runs `<prefix>/loop/placement.py --fixture`, every plant of the placement predicate, each in a throwaway repository with a stub policy file: one request per member of the disposition set, an unknown word refused and an alias resolved, the three `placement` values, a planted token redacted and a long reason capped, a closed build and a foreign build lease refused under `refuse` and recorded under `record`, an observation held unverified until its probe record carries a verdict, the claim lines, the owner hold and its release, a re-entering late answer, and the unattended driver's prompt-mode refusal. It reads the `memory-tree` kit under the loop kit's edge to it, and the `policy` and `runlog` kits and the unattended driver by `resolve_kit_dir` with no edge, as `loop probe fixtures` does. Its subject is the module itself, so the leg has a job only where that source changes, and none in a tree that copy-installs the loop kit and never edits it, the owner's 2026-08-23 ruling for a kit's self-test. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop request fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dPlacedRequest-4."
+tag = "leg.gov.loop-placement-fixtures"
+tests = ["feature.loop"]
+purpose = "plants every case of the placement predicate"
+argv = ["python", "{prefix}/loop/placement.py", "--fixture"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 200
+enforces = ["principle.p22"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "loop claim fixtures"
+why = "it runs `<prefix>/loop/claim.py --fixture`, every plant of `entry.claim`, each in a throwaway repository with a bare remote and the unattended driver's `--entry-claim`: a patch held under `patch.ratify` = `owner`, released by its owner's ratification and held for good by a rejection, a continue placement, `--pieces` on a patch, a stray staged path and an unreachable remote under `leases.offline: refuse` each refused, a tombstoned build lease refused under `leases: warn` with one ask and no second take, one claimant's claim resumed past the local pre-check, a slug local history minted refused by it, a slug claimed under another key drawing route-back and an unreachable remote writing no folder, a repeat with no count refused, a live holder waited for past `flow.wait-ceiling`, an overlap noted under `warn`, and the scaffold commit and first transition record of a repeat and of a patch. It reads the `memory-tree` kit under the loop kit's edge to it, and the `policy` kit, the `playbook` kit's fleet registry and the unattended driver by `resolve_kit_dir` with no edge, as `loop placement fixtures` does. Its subject is the module itself, so the leg has a job only where that source changes, and none in a tree that copy-installs the loop kit and never edits it, the owner's 2026-08-23 ruling for a kit's self-test. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop request fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dPlacedRequest-21."
+tag = "leg.gov.loop-claim-fixtures"
+tests = ["feature.loop"]
+purpose = "plants every case of the entry claim against a bare remote"
+argv = ["python", "{prefix}/loop/claim.py", "--fixture"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p39"]
 stage = ["step.test"]
 
 [[exempt_leg]]

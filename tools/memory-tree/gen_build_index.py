@@ -4556,6 +4556,134 @@ def cmd_new_build(root: str, conf: dict, args: dict) -> int:
     return cmd_write(root, conf)
 
 
+# ------------------------------------------------------------------- the placed build's scaffold
+# TOOL-dPlacedRequest-21 S4. A placed `patch` or `repeat` request is claimed before any plan record
+# kind exists, so its derived plan record is this README scaffold: the six required keys and
+# `status: OPEN`, then on a patch `parents: <origin>`, the key `collect` parses as the originating
+# build, and on a repeat `authorized-by: recipe`, `playbook:` and `pieces:`, the keys the unattended
+# driver's `check_authorization` reads in recipe mode. Its slots cite the request by its content key
+# and the origin or the playbook by path, and quote no request text, which never leaves its node.
+# It runs no slug probe of its own: `--entry-claim` runs `check_slug_claimed` before a fresh claim,
+# and a resumed claim is its claimant's. It stages the README and its contract row as `--new-build`
+# does and renders nothing, the claim verb committing the two alone before the build's first
+# transition record. WHAT THIS DOES NOT CHECK: that the origin is terminal or the playbook a
+# playbook, which the placement check read before the claim; the roster of a repeat, which is the
+# conf's first declared family, no playbook declaring one.
+PLACED_BUILD_USAGE = ("usage: gen_build_index.py --placed-build <slug> --request <content key> "
+                      "(--origin <slug> | --playbook <path> --pieces <n>)")
+#: A request's content key, as the loop kit's `request.py` derives it.
+PLACED_REQUEST_KEY = re.compile(r"[0-9a-f]{12}")
+#: The front-matter value a repeat's README carries on `authorized-by:`, the driver's recipe mode.
+AUTHORIZED_BY_RECIPE = "recipe"
+
+
+def read_placed_build_args(argv: list) -> dict:
+    """`--placed-build`'s own parse: one positional slug, `--request`, and `--origin` or `--playbook` with
+    `--pieces`, each value held to its shape here, the write boundary."""
+    out = {"slug": "", "request": "", "origin": "", "playbook": "", "pieces": ""}
+    rest = list(argv)
+    if rest and not rest[0].startswith("--"):
+        out["slug"] = rest.pop(0)
+    while rest:
+        token = rest.pop(0)
+        name = token[2:]
+        if name not in ("request", "origin", "playbook", "pieces") or not rest or out[name]:
+            raise Problem(f"--placed-build: {token} is unknown, repeated or has no value. {PLACED_BUILD_USAGE}")
+        out[name] = rest.pop(0)
+    if not out["slug"] or not PLACED_REQUEST_KEY.fullmatch(out["request"]):
+        raise Problem(f"--placed-build takes a slug and a content key of 12 hex digits. {PLACED_BUILD_USAGE}")
+    if bool(out["origin"]) == bool(out["playbook"]):
+        raise Problem(f"--placed-build takes --origin for a patch or --playbook for a repeat, one of the two. "
+                      f"{PLACED_BUILD_USAGE}")
+    if out["origin"] and out["pieces"]:
+        raise Problem(f"--placed-build: --pieces names a repeat's count, and a patch takes none. {PLACED_BUILD_USAGE}")
+    if out["playbook"] and not (out["pieces"].isdigit() and int(out["pieces"]) > 0):
+        raise Problem(f"--placed-build: a repeat takes --pieces <n>, a positive whole number, not "
+                      f"'{out['pieces'] or 'nothing'}'. {PLACED_BUILD_USAGE}")
+    return out
+
+
+def render_placed_build_readme(slug: str, args: dict, roster: str, streams: str, opened: str) -> str:
+    """The placed build's README: the front matter of a patch or a repeat, five filled slots and the
+    pairs `--write` renders into. `args` is `read_placed_build_args`'s; no request text is read."""
+    key = args["request"]
+    head = ["---", f"slug: {slug}", f"node: {slug[0]}", f"opened: {opened}", f"streams: {streams}",
+            f"roster: {roster}", "ids:", "status: OPEN"]
+    if args["origin"]:
+        head.append(f"parents: {args['origin']}")
+        what = f"a patch of `{args['origin']}`"
+        source = f"- Placed as a patch of the build `{args['origin']}`, whose folder is its origin."
+    else:
+        head += [f"authorized-by: {AUTHORIZED_BY_RECIPE}", f"playbook: {args['playbook']}",
+                 f"pieces: {args['pieces']}"]
+        what = f"a repeat of the playbook `{args['playbook']}`"
+        source = f"- Placed as a repeat of `{args['playbook']}`, {args['pieces']} piece(s) as its claimant stated."
+    return "\n".join(head + [
+        "---", "", f"# {slug} — {what}", "",
+        SLOT_CANON[0][0],
+        f"The request keyed `{key}` was placed as {what} and claimed as this build; its words stay on the "
+        f"node that recorded them, and this README cites them by that key alone.",
+        "",
+        SLOT_CANON[1][0],
+        "- The placed request is answered by the one build its claim names.",
+        "",
+        SLOT_CANON[2][0],
+        "- The placed request stays claimed with no build carrying it to done.",
+        "",
+        SLOT_CANON[3][0],
+        source,
+        f"- Claimed through `entry.claim` on `refs/gov/claims/{slug}`, the request's content key `{key}`.",
+        "",
+        SLOT_CANON[4][0],
+        "",
+        PLAN_OPEN,
+        PLAN_CLOSE,
+        "",
+        MARK_OPEN,
+        MARK_CLOSE,
+    ]) + "\n"
+
+
+def cmd_placed_build(root: str, conf: dict, args: dict) -> int:
+    """`--placed-build`: write a placed patch's or repeat's README and its BOUND contract row, and stage
+    both, as `cmd_new_build` stages them; the render and the commit are the caller's."""
+    m = conf["MEMORY_ROOT"]
+    slug = args["slug"]
+    check_archives_tracked(root, conf)
+    if not backlog.SLUG_RE.match(slug) or not (slug[0].isalpha() and slug[0].islower()):
+        raise Problem(f"`{slug}` is not a build slug: a slug is the node's own lower-case tag "
+                      f"followed by a CamelCase adjective-noun, letters and digits only")
+    rel = f"{m}/builds/{slug}/README.md"
+    if os.path.exists(os.path.join(root, rel)):
+        raise Problem(f"--placed-build {slug}: {rel} already exists, so nothing was written")
+    disciplines = read_discipline_map(conf)
+    if args["origin"]:
+        origin = args["origin"]
+        if not backlog.SLUG_RE.match(origin):
+            raise Problem(f"--placed-build: --origin `{origin}` is not a build slug")
+        source = os.path.join(root, m, "builds", origin, "README.md")
+        if not os.path.isfile(source):
+            raise Problem(f"--placed-build: the origin {m}/builds/{origin}/README.md is not in this tree")
+        fm = parse_front_matter(source, origin)
+        roster, streams = fm["roster"], fm["streams"]
+    else:
+        playbook = args["playbook"].replace("\\", "/")
+        if playbook.startswith("/") or ".." in playbook.split("/") or not os.path.isfile(os.path.join(root, playbook)):
+            raise Problem(f"--placed-build: --playbook {playbook} is no file under this tree")
+        args = dict(args, playbook=playbook)
+        if not disciplines:
+            raise Problem("--placed-build: the conf declares no FAMILIES pair, so a repeat has no roster")
+        family = next(iter(disciplines))
+        roster, streams = family, disciplines[family]
+    opened = datetime.date.today().isoformat()
+    write_text(os.path.join(root, rel), render_placed_build_readme(slug, args, roster, streams, opened))
+    registry = os.path.join(m, CONTRACT_REGISTRY).replace(os.sep, "/")
+    add_contract_row(root, conf, rel)
+    run("git", "add", "--", rel, registry, cwd=root)
+    print(f"build-index: wrote {rel} and its BOUND row in {registry}, and staged both")
+    return 0
+
+
 # ------------------------------------------------------------- the backlog-modes docs drift arm
 # TOOL-dDerivedDocket-36 S2. The kit README's backlog-modes section is where an author writing a row
 # by hand learns the grammar, and the adopter runbook points there rather than restating it. A
@@ -7599,7 +7727,7 @@ def cmd_selftest() -> int:
             return None
 
         def _build_header(body: str) -> str:
-            d = tempfile.mkdtemp()
+            d = tempfile.mkdtemp(dir=base)   # under the block's TemporaryDirectory, removed with it
             p = os.path.join(d, "README.md")
             with open(p, "w", encoding="utf-8", newline="") as fh:
                 fh.write(body)
@@ -7631,7 +7759,7 @@ def cmd_selftest() -> int:
             lambda: str(bool(getattr(_derive_kind_exc(_good.replace("node: t", "  node: t")), "region", ""))))
 
         def _read_waiver(body: str | None):
-            d = tempfile.mkdtemp()
+            d = tempfile.mkdtemp(dir=base)   # under the block's TemporaryDirectory, removed with it
             os.makedirs(os.path.join(d, "memory", "project"), exist_ok=True)
             if body is not None:
                 with open(os.path.join(d, "memory", STALE_HEADER_WAIVER), "w",
@@ -8816,6 +8944,36 @@ def cmd_selftest() -> int:
                     sc, "memory/builds/zGrantedDocket/README.md")).split("\n")))
             if _rc11 == 0 else f"rc={_rc11} :: {_out11}")
 
+        # TOOL-dPlacedRequest-21 AC5 — the placed build's scaffold, a patch of aFoo and a repeat of a
+        # playbook, over the same home tree. RED, observed at the close, is a patch scaffold written with
+        # no `parents:` key, which the first arm reads as its origin unrecorded.
+        _pb_files = dict(_build_sc_tree([_build_sc_ask(3, "the placed ask")]))
+        _pb_files["playbooks/zq-run.md"] = "# a playbook\n"
+        _pb_conf = _build_backlog_fixture(sc, _pb_files)
+        run("git", "commit", "-q", "-m", "placed", "--no-verify", cwd=sc)
+
+        def _read_placed_fm(slug, argv):
+            rc, out = _read_mode(cmd_placed_build, sc, _pb_conf, read_placed_build_args([slug] + argv))
+            path = os.path.join(sc, "memory", "builds", slug, "README.md")
+            text = read_text(path) if os.path.isfile(path) else ""
+            fm = [x for x in text.split("\n---")[0].split("\n")[1:] if ":" in x and not x.startswith("opened:")]
+            return f"rc={rc} {fm} quoted={'zq-placed-words' in text} :: {out if rc else ''}"
+
+        arm("a placed patch's README carries parents: <origin> and its staged registry row", "rc=0 ['slug: zFixPatch', "
+            "'node: z', 'streams: tool', 'roster: EXMP', 'ids:', 'status: OPEN', 'parents: aFoo'] quoted=False",
+            lambda: _read_placed_fm("zFixPatch", ["--request", "3f9c2a7d01be", "--origin", "aFoo"]))
+        arm("a placed repeat's README carries authorized-by: recipe, its playbook and its pieces",
+            "'status: OPEN', 'authorized-by: recipe', 'playbook: playbooks/zq-run.md', 'pieces: 3'] quoted=False",
+            lambda: _read_placed_fm("zRunAgain", ["--request", "3f9c2a7d01be", "--playbook", "playbooks/zq-run.md",
+                                                  "--pieces", "3"]))
+        arm("both placed READMEs and the registry are staged, nothing else", "memory/builds/zFixPatch/README.md "
+            "memory/builds/zRunAgain/README.md memory/project/readme-contract.txt",
+            lambda: " ".join(sorted(run("git", "diff", "--cached", "--name-only", cwd=sc).split())))
+        arm("a placed repeat with no --pieces is refused before any write", "a repeat takes --pieces <n>",
+            lambda: read_placed_build_args(["zNoCount", "--request", "3f9c2a7d01be", "--playbook", "p.md"]))
+        arm("a placed patch whose README exists is refused", "already exists, so nothing was written",
+            lambda: _read_placed_fm("zFixPatch", ["--request", "3f9c2a7d01be", "--origin", "aFoo"]))
+
 
     # ---------------------------------------------------- the example family (TOOL-dDerivedDocket-51)
     # DECLARED BY A SCRATCH CONF AND BY NOTHING TRACKED. The sibling kit's id grammar is an ALLOWLIST
@@ -9657,13 +9815,13 @@ def main(argv: list) -> int:
         return cmd_selftest()
     if mode not in ("--check", "--write", "--write-staged", "--check-format", "--print-bindings", "--survey",
                     "--check-asbuilt",
-                    "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor",
+                    "--report", "--bump", "--asks", "--new-build", "--placed-build", "--new-spec", "--doctor",
                     "--check-coverage"):
         print("usage: gen_build_index.py "
               "[--check [--staged|--with-verdicts]|--write|--write-staged|--check-coverage [--staged]|"
               "--check-asbuilt [--staged]|"
               "--check-format|--survey|--report|--bump|"
-              "--print-bindings|--asks|--new-build|--new-spec|--doctor|--selftest]")
+              "--print-bindings|--asks|--new-build|--placed-build|--new-spec|--doctor|--selftest]")
         return 2
     # TOOL-dTrueNorth-27 S4: `--with-verdicts` is `--check`'s alone, and never beside `--staged`, whose
     # skip would print no verdict while a full run's checks 29 and 30 read them from these lines.
@@ -9725,6 +9883,8 @@ def main(argv: list) -> int:
     try:
         if mode == "--new-build":
             return cmd_new_build(root, conf, read_new_build_args(argv[2:]))
+        if mode == "--placed-build":
+            return cmd_placed_build(root, conf, read_placed_build_args(argv[2:]))
         if mode == "--new-spec":
             return cmd_new_spec(root, conf, read_new_spec_args(argv[2:]))
         if mode == "--check-format":

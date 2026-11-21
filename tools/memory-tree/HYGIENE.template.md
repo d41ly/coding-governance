@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.168 -->
+<!-- gov:kit memory-tree@2.172 -->
 [{{MEMORY_ROOT}}/HYGIENE.md · Level 3 · Read before writing any record, index or id under the memory root; yields to levels 0 to 2]
 # {{MEMORY_ROOT}}/ retention & hygiene
 
@@ -679,8 +679,12 @@ carry it too:
   `ratchet.py widen` door) · `leg-tail` (a failing leg's output tail kept by its hash, written by the
   run-gates kit's `keep_tails.py`) · `flake` (one `test.flakes` run's per-leg verdicts, written by the run-gates kit's
   `verdict_flow.py flakes`) · `gate-health` (one gate-health measurement, the reliability bar derived from
-  the flake records, written by the drift kit's `drift_report.py --gate-health --write`). The thirteen
-  after `research` are the typed kinds: each record is named
+  the flake records, written by the drift kit's `drift_report.py --gate-health --write`) · `card` (a build's orientation card at one
+  step, its snapshot, fields `Build`, `Step` and `Ref` and the card's text in one `~~~~` fenced block)
+  · `probe-trigger` (a probe opened at an item boundary, fields `Cause`, `Asker`, `Subject`, `At` and
+  `Key`) · `probe` (the probe it opened: its pinned head, its `## Method` entries, its run lines and
+  its `Verdict` beside `Judged`, written by the loop kit's `probe.py`). The sixteen after `research`
+  are the typed kinds: each record is named
   `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.

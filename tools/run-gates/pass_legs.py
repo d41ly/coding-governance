@@ -77,10 +77,31 @@ class Refusal(Exception):
     """Exit 2, nothing written."""
 
 
+def read_declared_runner():
+    """The leg manifest `.governance/deploy.toml` names, or None (TOOL-dHomeGraded-1 S6).
+
+    An adopter whose own bar is not gov's runner keeps gov's legs in a manifest of their own, and
+    names it in `[gate_runner].file`: adopter ic's sibling `gate-legs.json` is its OWN object-shaped
+    manifest, and reading that refused every pass-leg run there. Read from the working directory,
+    which is the root for every caller. A kind other than `manifest`, a path that climbs out, or a
+    file that does not exist answers None, and the sibling stands as before."""
+    import tomllib
+    try:
+        deploy = tomllib.loads(pathlib.Path(".governance/deploy.toml").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    gr = deploy.get("gate_runner") if isinstance(deploy, dict) else None
+    f = gr.get("file") if isinstance(gr, dict) and gr.get("kind") == "manifest" else None
+    if not isinstance(f, str) or not f or ".." in f.replace("\\", "/").split("/"):
+        return None
+    p = pathlib.Path(f)
+    return p if p.is_file() else None
+
+
 def resolve_manifest_path() -> pathlib.Path:
     # ponytail: a relative GATE_LEGS resolves against the working directory, not the repo root as
     # derive-ceilings.py does, because --check spawns nothing; every caller runs from the root.
-    return pathlib.Path(os.environ.get("GATE_LEGS") or LEGS_BESIDE)
+    return pathlib.Path(os.environ.get("GATE_LEGS") or read_declared_runner() or LEGS_BESIDE)
 
 
 def read_manifest() -> tuple:
@@ -499,8 +520,8 @@ def main() -> int:
         # descriptor runs --check in every bar's preflight, so a refusal here stopped an adopter's bar
         # from starting. A path GATE_LEGS names is the caller's claim, and its absence still refuses.
         # WHAT THIS DOES NOT CHECK: that a manifest SHOULD exist; the bar runner refuses one it cannot read.
-        if verb in (cmd_apply, cmd_check) and not os.environ.get("GATE_LEGS") and not LEGS_BESIDE.exists():
-            print(f"pass-legs: not derived, no leg manifest at {LEGS_BESIDE.as_posix()}")
+        if verb in (cmd_apply, cmd_check) and not os.environ.get("GATE_LEGS")                 and not resolve_manifest_path().exists():
+            print(f"pass-legs: not derived, no leg manifest at {resolve_manifest_path().as_posix()}")
             return 0
         return verb()
     except Refusal as e:

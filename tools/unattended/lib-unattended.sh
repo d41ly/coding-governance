@@ -223,6 +223,27 @@ for key in rows:
   return "${PIPESTATUS[1]}"
 }
 
+# THIS NODE'S FLEET TAG (TOOL-dPlacedRequest-1 S11), asked of the playbook kit's one fleet reader
+# through `render_playbook.py --fleet-tag`, found by the same `resolve_kit_dir` call as the generator
+# above, so no second parser of `fleet.toml` exists. The user is USERNAME, else USER; the row is
+# matched by the user alone, case-folded, never the host (TOOL-dPlacedRequest-34 S30), as every reader
+# of the registry matches it; a GOV_NODE naming a tag of the registry names this node outright. -> the
+# tag on stdout, or status 1 with the cause on stdout: no python, no playbook kit, no row naming this
+# user, or a GOV_NODE the registry does not hold.
+resolve_fleet_tag() {
+  local d="" py="" u="${USERNAME:-${USER:-}}" out
+  declare -F resolve_python >/dev/null && py=$(resolve_python 2>/dev/null) || py=""
+  [ -n "$py" ] || { printf '%s\n' "no python resolves, so fleet.toml cannot be read"; return 1; }
+  local here=${BASH_SOURCE[0]}; case $here in */*) here=${here%/*} ;; *) here=. ;; esac
+  d=$(resolve_kit_dir "$py" playbook render_playbook.py "$here" 2>/dev/null) || d=""
+  [ -n "$d" ] || { printf '%s\n' "no playbook kit resolves beside this one, so fleet.toml cannot be read"; return 1; }
+  # repo-relative to the kit's own checkout, so a driver run over another tree reads it under that one
+  [ -f "$d/render_playbook.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; git -C "$here" rev-parse --show-toplevel 2>/dev/null)/$d"
+  out=$("$py" "$d/render_playbook.py" --fleet-tag --user "$u" --node "${GOV_NODE:-}" 2>&1) || { printf '%s\n' "${out##*REFUSED — }"; return 1; }
+  out=${out%$'\r'}
+  case "$out" in [a-z]) printf '%s\n' "$out" ;; *) printf '%s\n' "fleet.toml answered no tag for user ${u:-<none>}: $out"; return 1 ;; esac
+}
+
 # The REPAIR POINTER for a missing or stale units region (TOOL-aRepatriatedFork-2 S6): the
 # generator's `--write` mode. Both the driver and the gate leg print it, so it is spelled once, here.
 # -> the hint text; a miss says what was not found, never a guess.

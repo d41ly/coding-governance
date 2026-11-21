@@ -473,8 +473,23 @@ Then commit the result, `.governance/steps/govkit/` included.
 
 ## What this release's steps do to your repository
 
-Five moves reach an installed repository through `update`, each named here with what it leaves
+Six moves reach an installed repository through `update`, each named here with what it leaves
 behind.
+
+- **Your kickoff manifest's facts move into the overlay.** The step
+  `kickoff-manifest/facts-to-overlay` reads the manifest at your `manifest_path` answer and turns
+  each top-level `- ` bullet of its `## §B` section, the bullets above the first `###` sub-head, into
+  one level-2 unit of `.governance/instructions.toml`, tagged `repo.kickoff.f<NN>` by the bullet's
+  position and scoped to the orientation card, which prints them under `## pockets`
+  ([the orientation card](orientation-card.md)). §B then opens with one bullet naming where the facts
+  went and the write command, `instructions_edit.py`, at the path your install holds it. A bullet the
+  statement grammar or the overlay reader refuses, such as the template's placeholder bullets that
+  carry no value, stays in §B as guide text, and the up names each one by position and why, and still
+  exits 0. With no `manifest_path` answer, no manifest at it, no `## §B` heading or no playbook kit's
+  write command in your tree, there is nothing to move and nothing is written. Its witness holds once
+  §B carries that bullet and only bullets the up would keep; its down puts the manifest and the
+  overlay back byte-for-byte. Commit the result, `.governance/steps/kickoff-manifest/` included, and
+  regenerate the policy mirror, since the overlay changed.
 
 - **Your adopter rules move into the overlay.** The step `playbook/adopter-rules-to-overlay` turns
   each `- ` line of `[charter] adopter_rules` in `.governance/deploy.toml` into one level-0 unit of

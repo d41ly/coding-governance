@@ -1,0 +1,6 @@
+# unscanned-readers.txt - AUTHORED. One row per catalogue key whose consumer sits outside the code
+# reader coverage scans: `<key> <tracked path> <reason>`, the reason the rest of the line. Read by
+# check_policy.py's reader coverage, which prints each row of a landed owner's key and never counts
+# it as read. A row the scan now reads, a path not tracked, a path the scan reads, a key no catalogue
+# row names and a key on two rows are each a finding. Withheld from installs by this kit's kit.toml.
+deviation.approval memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py the chain applies the approval route in this instrument at the value PLAY-dClosedLoop-4 fixed, author-recorded; no tracked code passes the key to a policy reader

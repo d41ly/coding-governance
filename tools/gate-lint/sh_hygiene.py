@@ -11,6 +11,7 @@ Project-agnostic. Run over any repo:
     python <this file> --path-literals [registry-path] [root] [pathspec ...]     # a backslashed path
     python <this file> --quoting [registry-path] [root] [pathspec ...]           # two quoting hazards
     python <this file> --shell-role [ledger-path] [root] [pathspec ...]          # shell only shrinks
+    python <this file> --stage-commits [registry-path] [root] [pathspec ...]     # the fifth class
     python <this file> <mode> --measure [root] [pathspec ...]   # each key's fields, its count; grades nothing
     python <this file> --selftest                 # prove every predicate in BOTH directions
 
@@ -27,6 +28,23 @@ heredoc redirection; an IFS set on an earlier line or spelled any other way than
 ledger row per file, graded `shrink-only`: a new file, a grown file and a row whose file is gone are
 red, and so is a file that shrank (`count fell`) until its row is lowered in the same commit, so shell
 outside a shim only shrinks and a trim cannot regrow unrecorded. A file with no code line takes no row.
+
+THE FIFTH CLASS, `--stage-commits` (TOOL-dSettledStage-2). A commit placed after a `git add` with
+nothing between them testing that the stage left a diff. Staging can normalise a dirty file back to
+its committed bytes, a tree dirty by line endings alone, and then the commit fails on an empty stage:
+landing 12764ec21 aborted before its bar that way. A git event is `add`, `commit`, `commit-tree`,
+`diff` or `diff-index` after `git` or `GIT` and any run of the literal global options git reads before
+its verb: `-c <word>`, `-C <word>`, `-p`, `-P`, `--<name>` or `--<name>=<word>`, and `--git-dir`,
+`--work-tree`, `--namespace` or `--config-env` with a separate `<word>` (TOOL-dSettledStage-4). It is
+read where the line with its quoted text blanked leaves it as code, a `$( )` inside double quotes kept
+as code, and its arguments step over every `$( … )` in them. In one scope, the innermost function
+holding the line or the top level, a commit after a stage with a `--cached` or `--staged` diff
+between them is admitted, and after a stage with none is `unchecked`, the one gated class. A call to
+a same-file function whose body stages, directly or through another stager, is a stage, followed at
+once by a test when that body ends with its stage tested. A commit with no stage above it in
+its scope is unpaired, and one carrying `--allow-empty` is empty-ok; both are counted and printed,
+never gated. The registry counts sites per (path, `unchecked-stage`) and shrinks only. What the mode
+does not check is `STAGE_BOUNDARY`, named on `run_stage_scan` beside the mode it bounds.
 
 THE FOURTH CLASS, `--temp-names` (TOOL-dRedressedBar-24). A file written at a fixed temp name and
 renamed over its destination: a process that can write the directory plants a link at that name
@@ -155,6 +173,7 @@ from __future__ import annotations
 
 import contextlib
 import io
+import json
 import os
 import pathlib
 import re
@@ -254,7 +273,12 @@ PROBE_CLASSES = [
 #: boundary arm and the two one-line-per-key rows, 33 executed, every one unconditional.
 #: RAISED 125 -> 137 by TOOL-dWitnessedBar-24: the portability modes, three path rows, three quoting
 #: rows, the code-line count and five shell-role ledger rows, 12 executed, every one unconditional.
-FLOOR_ASSERTIONS = 137
+#: RAISED 137 -> 163 by TOOL-dSettledStage-2, merged over TOOL-dWitnessedBar-24: the stage-commit arms,
+#: the 15 fixture rows, the 10-row boundary arm and the registry arm, 26 executed, every one
+#: unconditional, counted off the arms.
+#: RAISED 163 -> 177 by TOOL-dSettledStage-4: the 13 new stage fixture rows and the one new boundary
+#: row, 14 executed, every one unconditional, counted off the arms.
+FLOOR_ASSERTIONS = 177
 
 
 def check_substitution(text: str) -> bool:
@@ -388,6 +412,59 @@ def scan_file(text: str) -> dict[str, list[tuple[int, str]]]:
     return found
 
 
+# >>> home_graded_py — canonical copy: home_graded.py in gov's lib dir (byte-identical; gated)
+def derive_home_graded(root):
+    """The set of tracked paths under `root` that a `.governance/install.json` `engine` row installed
+    at gov's own bytes (`oid` == `gov_oid`) and that still hash to them. Empty when there is no
+    receipt, it does not read, or the hash fails: the caller then grades every path, as before."""
+    import json
+    import pathlib
+    import subprocess
+    root = pathlib.Path(root)
+    try:
+        rows = json.loads((root / ".governance" / "install.json").read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        return set()
+    want = {}
+    for row in rows:
+        if not isinstance(row, dict) or row.get("role") != "engine":
+            continue
+        path, oid = row.get("path"), row.get("oid")
+        if isinstance(path, str) and isinstance(oid, str) and oid and oid == row.get("gov_oid") \
+                and ".." not in path.split("/") and (root / path).is_file():
+            want[path] = oid
+    if not want:
+        return set()
+    paths = sorted(want)
+    try:
+        out = subprocess.run(["git", "hash-object", "--stdin-paths"], cwd=str(root),
+                             input="".join(p + "\n" for p in paths), capture_output=True,
+                             text=True, encoding="utf-8")
+    except OSError:
+        return set()
+    got = out.stdout.split()
+    if out.returncode != 0 or len(got) != len(paths):
+        return set()
+    return {p for p, oid in zip(paths, got) if oid == want[p]}
+# <<< home_graded_py
+
+
+_HOME_TOLD: set = set()
+
+
+def remove_home_graded(root: pathlib.Path, rels: list[str]) -> list[str]:
+    """`rels` less the files gov installed here at its own bytes (TOOL-dHomeGraded-1 S2). Those are
+    gov's code, graded on gov's bar against gov's registries; grading them here against this tree's
+    declaration lists sites nobody in this tree wrote. Said once per root, with the count."""
+    home = derive_home_graded(root)
+    kept = [rel for rel in rels if rel not in home]
+    if len(kept) != len(rels) and str(root) not in _HOME_TOLD:
+        _HOME_TOLD.add(str(root))
+        print(f"sh-hygiene: {len(home)} file(s) .governance/install.json installed at gov's own bytes "
+              f"are gov's to grade and are not graded here; an edited one is")
+    return kept
+
+
 def scan_tree(root: pathlib.Path) -> tuple[dict[str, list[tuple[str, int, str]]], int]:
     """Every tracked `*.sh` under `root`, classified. Returns (findings, files scanned).
 
@@ -403,7 +480,7 @@ def scan_tree(root: pathlib.Path) -> tuple[dict[str, list[tuple[str, int, str]]]
         # zero files; only one of them means "there is nothing here to grade".
         raise OSError("git ls-files failed, so the population could not be derived at all: "
                       + (listing.stderr or "").strip())
-    paths = [p for p in listing.stdout.split("\0") if p]
+    paths = remove_home_graded(root, [p for p in listing.stdout.split("\0") if p])
     total: dict[str, list[tuple[str, int, str]]] = {key: [] for key, _l, _g in CLASSES}
     scanned = 0
     for rel in sorted(paths):
@@ -476,6 +553,34 @@ def resolve_declaration(arg: str | None, shape: tuple = DELIMITER_SHAPE) -> tupl
         else:
             declared[(rel, key)] = rows[(rel, key)][0]
     return declared, malformed
+
+
+def derive_default_registry(root: pathlib.Path, name: str) -> str | None:
+    """The registry a mode reads when no argument names one: `<MEMORY_ROOT>/project/<name>` under
+    `root`, when that file exists (TOOL-dHomeGraded-1 S7). gov's own rows pass the same path. An
+    adopter's leg row is gov's emission and carries no registry argument, and editing the row is
+    drift govkit reports, so the default path is where an adopter declares its own sites. Absent, the
+    run grades against an empty declaration as before. MEMORY_ROOT is read from `.memory-tree.conf`,
+    one `KEY=value` line, `memory` when the conf or the key is absent."""
+    memory_root = "memory"
+    try:
+        for line in (root / ".memory-tree.conf").read_text(encoding="utf-8").splitlines():
+            if line.startswith("MEMORY_ROOT="):
+                memory_root = line.split("=", 1)[1].strip().strip("\"'").strip("/") or "memory"
+    except OSError:
+        pass
+    path = root / memory_root / "project" / name
+    return str(path) if path.is_file() else None
+
+
+def print_registry_posture(args: list[str], default: str | None) -> None:
+    """One line saying which declaration this run grades against, when no argument named one."""
+    if args:
+        return
+    if default:
+        print(f"sh-hygiene: no registry argument, so this run reads the default registry {default}")
+    else:
+        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
 
 
 def check_registry(measured: dict[tuple[str, str], int],
@@ -595,7 +700,8 @@ def run_probe_scan(args: list[str]) -> int:
         print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
         return 2
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None, PROBE_KEY_SHAPE)
+        declared, malformed = resolve_declaration(
+            args[0] if args else derive_default_registry(root, "location-probe-waivers.txt"), PROBE_KEY_SHAPE)
         found, scanned = scan_probe_tree(root, args[2:])
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
@@ -604,8 +710,7 @@ def run_probe_scan(args: list[str]) -> int:
         print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
               "NOTHING — that is a refusal and not a pass", file=sys.stderr)
         return 2
-    if not args:
-        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print_registry_posture(args, derive_default_registry(root, "location-probe-waivers.txt"))
     print_probe_populations(found, scanned)
     measured = build_probe_measured(found)
     # A WAIVED SITE IS NAMED ON EVERY RUN, green included; its reason is the record its row cites.
@@ -808,6 +913,58 @@ def read_function_bodies(code_lines: list[tuple[int, str, str]]) -> dict[str, st
     return bodies
 
 
+def read_function_spans(code_lines: list[tuple[int, str, str]]) -> list[tuple[int, int]]:
+    """Each function's `(first, last)` index into `code_lines`, in definition order.
+
+    `first` is the definition line and `last` the line whose code opens with a `}` at the definition's
+    indent, as `read_function_bodies` finds a body's end, else the source's last line. A definition
+    that closes on its own line is `(i, i)`. The temp-name and stage-commit modes read a line's scope
+    as the innermost span holding it.
+    """
+    spans: list[tuple[int, int]] = []
+    for i, (_number, code, _comment) in enumerate(code_lines):
+        head = FUNCTION_DEF.match(code)
+        if head and head.group(3).rstrip().endswith("}"):
+            spans.append((i, i))
+        elif head:
+            close = re.compile(re.escape(head.group(1)) + r"\}")
+            spans.append((i, next((j for j in range(i + 1, len(code_lines)) if close.match(code_lines[j][1])),
+                                  len(code_lines) - 1)))
+    return spans
+
+
+def build_blanked(code: str, keep_substitutions: bool = False) -> str:
+    """The code half of one line with every quoted character blanked to `_` and its length kept.
+
+    So a `;`, an `mv` or a `git` inside quotes is data, and an offset into the result is an offset into
+    the line. The quote characters stay, and a backslash pair outside single quotes is blanked whole.
+    With `keep_substitutions`, a `$( … )` inside double quotes stays code, its own quoting tracked inside
+    it, so `"$(git diff --cached)"` is read and `"run git add"` is not; one that does not close on the
+    line keeps the rest of the line as code. Quoting carried across lines is not tracked.
+    """
+    flat, quote, k = [], "", 0
+    while k < len(code):
+        ch = code[k]
+        if ch == "\\" and quote != "'":
+            flat.append("_" * len(code[k:k + 2]))
+            k += 2
+            continue
+        if keep_substitutions and quote == '"' and code.startswith("$(", k):
+            inner = read_substitution(code, k)
+            closed = code.startswith(")", k + 2 + len(inner))
+            flat.append("$(" + build_blanked(inner, True) + (")" if closed else ""))
+            k += 2 + len(inner) + (1 if closed else 0)
+            continue
+        if quote:
+            flat.append(ch if ch == quote else "_")
+            quote = "" if ch == quote else quote
+        else:
+            quote = ch if ch in "'\"" else ""
+            flat.append(ch)
+        k += 1
+    return "".join(flat)
+
+
 def check_spawn_substitution(inner: str, pure: set[str], impure: set[str]) -> tuple[str, bool]:
     """Classify the text inside one `$( )`: (class key, is-site). A near miss is (class, False)."""
     text = inner.strip()
@@ -870,7 +1027,7 @@ def read_shell_sources(root: pathlib.Path, pathspecs: list[str]) -> list[tuple[s
         raise OSError("git ls-files failed, so the population could not be derived at all: "
                       + (listing.stderr or "").strip())
     sources = []
-    for rel in sorted(p for p in listing.stdout.split("\0") if p):
+    for rel in sorted(remove_home_graded(root, [p for p in listing.stdout.split("\0") if p])):
         full = root / rel
         name = rel.rsplit("/", 1)[-1]
         if not full.is_file() or not (name.endswith(".sh") or "." not in name):
@@ -947,7 +1104,8 @@ def run_spawn_scan(args: list[str]) -> int:
         print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
         return 2
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None, SPAWN_KEY_SHAPE)
+        declared, malformed = resolve_declaration(
+            args[0] if args else derive_default_registry(root, "spawn-idiom-sites.txt"), SPAWN_KEY_SHAPE)
         found, product, suites = scan_spawn_tree(root, args[2:])
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
@@ -956,8 +1114,7 @@ def run_spawn_scan(args: list[str]) -> int:
         print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
               "NOTHING — that is a refusal and not a pass", file=sys.stderr)
         return 2
-    if not args:
-        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print_registry_posture(args, derive_default_registry(root, "spawn-idiom-sites.txt"))
     print_spawn_populations(found, product, suites)
     for key in [k for k in declared if k[1] in SPAWN_BANNED]:
         malformed.append(f"{key[0]}: the registry declares `{key[1]}`, a BANNED class no row can waive "
@@ -1084,36 +1241,14 @@ def scan_temp_file(text: str) -> dict[str, list[tuple[int, str]]]:
     """
     code_lines = read_code_lines(text)
     binders = read_temp_binders(code_lines)
-    spans: list[tuple[int, int]] = []
-    for i, (_number, code, _comment) in enumerate(code_lines):
-        head = FUNCTION_DEF.match(code)
-        if head and head.group(3).rstrip().endswith("}"):
-            spans.append((i, i))
-        elif head:
-            close = re.compile(re.escape(head.group(1)) + r"\}")
-            spans.append((i, next((j for j in range(i + 1, len(code_lines)) if close.match(code_lines[j][1])),
-                                  len(code_lines) - 1)))
+    spans = read_function_spans(code_lines)
     found: dict[str, list[tuple[int, str]]] = {key: [] for key, _m, _l in TEMP_CLASSES}
     tables: dict[int, dict[str, tuple[str, str]]] = {}
     for i, (number, code, _comment) in enumerate(code_lines):
         table = tables.setdefault(max((start for start, end in spans if start <= i <= end), default=-1), {})
         # The line with every quoted character blanked and its length kept, so a `;` or an `mv` inside
         # quotes is data and an offset into it is an offset into the line.
-        flat, quote, k = [], "", 0
-        while k < len(code):
-            ch = code[k]
-            if ch == "\\" and quote != "'":
-                flat.append("_" * len(code[k:k + 2]))
-                k += 2
-                continue
-            if quote:
-                flat.append(ch if ch == quote else "_")
-                quote = "" if ch == quote else quote
-            else:
-                quote = ch if ch in "'\"" else ""
-                flat.append(ch)
-            k += 1
-        blank = "".join(flat)
+        blank = build_blanked(code)
         cuts = list(re.finditer(r";|&&|\|\|", blank))
         for start, end in zip([0] + [cut.end() for cut in cuts], [cut.start() for cut in cuts] + [len(code)]):
             segment = code[start:end]
@@ -1203,7 +1338,8 @@ def run_temp_scan(args: list[str]) -> int:
         print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
         return 2
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None, TEMP_KEY_SHAPE)
+        declared, malformed = resolve_declaration(
+            args[0] if args else derive_default_registry(root, "temp-name-sites.txt"), TEMP_KEY_SHAPE)
         found, scanned = scan_temp_tree(root, args[2:])
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
@@ -1212,8 +1348,7 @@ def run_temp_scan(args: list[str]) -> int:
         print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
               "NOTHING — that is a refusal and not a pass", file=sys.stderr)
         return 2
-    if not args:
-        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print_registry_posture(args, derive_default_registry(root, "temp-name-sites.txt"))
     print_temp_populations(found, scanned)
     # A REGISTERED SITE IS NAMED ON EVERY RUN, green included; its reason is the record its row cites.
     for key in sorted(declared):
@@ -1392,6 +1527,277 @@ def run_shell_role_scan(args: list[str], measure: bool) -> int:
     print(f"sh-hygiene: {len(problems)} shell-role finding(s).")
     for problem in problems:
         print(f"  {problem}")
+    return 1
+
+
+# ---- the UNCHECKED-STAGE class, `--stage-commits` -----------------------------------------------
+# An event: a git word — `git` or `GIT` not after a word character, `$`, `.` or `-`, through any run of
+# the literal global options git reads before its verb — `-c <word>`, `-C <word>`, the bare `-p` and
+# `-P`, a long option `--<name>` or `--<name>=<word>`, and the four that take a separate argument,
+# `--git-dir`, `--work-tree`, `--namespace` and `--config-env`, each then one `<word>` — then a verb
+# as a whole word. Group 1 is the verb. Matched on the code half, and kept only where the blanked
+# line leaves the git word and the verb as written. An option behind an expansion or in quotes is
+# not read, and neither is the event: a `STAGE_BOUNDARY` row.
+STAGE_EVENT = re.compile(r"(?<![\w$.-])(?:git|GIT)(?:[ \t]+-[cC][ \t]+" + PROBE_WORD + r"|[ \t]+-[pP]"
+                         r"|[ \t]+--(?:git-dir|work-tree|namespace|config-env)[ \t]+" + PROBE_WORD
+                         + r"|" + _PROBE_FLAG + r")*[ \t]+(add|commit-tree|commit|diff-index|diff)(?![\w-])")
+# A registry key is the one class, so a line number is refused as malformed.
+STAGE_KEY = re.compile(r"\Aunchecked-stage\Z")
+STAGE_KEY_SHAPE = (STAGE_KEY, "the class `unchecked-stage`", "CLASS")
+# The taxonomy, in report order: (key, mark, label). Only `unchecked` is gated.
+STAGE_CLASSES = [
+    ("unchecked", "GATED", "a commit after a stage in its scope with no staged-diff test between them"),
+    ("admitted", "admitted", "a commit after a stage with a `git diff --cached` or `diff-index --cached` test "
+                             "between them, or after a call to a same-file stager that tests its own stage"),
+    ("unpaired", "unpaired", "a commit with no stage above it in its scope — counted, never gated"),
+    ("empty-ok", "empty-ok", "a commit carrying `--allow-empty` — counted, never gated"),
+]
+# What the mode does not check, one row per form: (label, a shell example, the class it lands in), the
+# class one of `STAGE_CLASSES`' keys or `unread`, which counts no commit. `run_stage_scan`'s docstring
+# and the kit README's `--stage-commits` section name every label, and the selftest runs every example
+# and finds every label in both, as `TEMP_BOUNDARY` does for the temp-name mode.
+STAGE_BOUNDARY = [
+    ("a stage in another scope", "a() {\n  git add -A\n}\nb() {\n  git commit -q -m x\n}", "unpaired"),
+    ("a stager in a sourced library", ". ./lib.sh\nstage_all\ngit commit -q -m x", "unpaired"),
+    ("a commit that stages with -a", "git commit -qam x", "unpaired"),
+    ("a staged test whose answer does not gate the commit",
+     "git add -A\nn=$(git diff --cached --name-only | wc -l)\ngit commit -q -m x", "admitted"),
+    ("a stage and a test in two repositories",
+     "git -C a add -A\ngit -C b diff --cached --quiet || git -C b commit -q -m x", "admitted"),
+    ("a git verb behind a variable", "git add -A\n$GITCMD commit -q -m x", "unread"),
+    ("a git global option behind an expansion or in quotes", "git add -A\ngit $GIT_OPTS commit -q -m x",
+     "unread"),
+    ("a commit inside a quoted string or under eval", 'git add -A\neval "git commit -q -m x"', "unread"),
+    ("a git verb split across a line continuation", "git add -A\ngit -c a=b \\\n  commit -q -m x", "unread"),
+    ("a merge conclusion", "git merge --no-commit -q side\ngit add -A\ngit commit -q -m m", "unchecked"),
+    ("a first commit in a fresh repository", "git init -q .\ngit add -A\ngit commit -q -m first", "unchecked"),
+]
+# The undeclared-key text; the selftest's registry arm grades check_registry with this same text.
+STAGE_UNDECLARED = ("{rel}: {count} `unchecked-stage` site(s) and no registry row declares them — test the "
+                    "stage before each commit, or declare the row with its reason:")
+STAGE_REMEDY = ("test the stage before committing it, with `git diff --cached --quiet` after the `git add`, "
+                "and skip the commit when it exits 0")
+
+
+def read_stage_events(code: str) -> list[tuple[int, str, str]]:
+    """The git events on one code half, `[(column, kind, arguments)]`, in column order.
+
+    The kind is `add`; `commit` for `commit` and `commit-tree`; `test` for a staged test, a `diff` or
+    `diff-index` whose arguments carry `--cached` or `--staged`, whatever its output form; and `diff`
+    for any other. An event counts only where `build_blanked(code, keep_substitutions=True)` leaves its
+    git word and its verb unblanked, so text inside quotes is data and a `"$(git … )"` is code. Its
+    arguments are a walk over that blank from the verb's end: a `$(` is stepped over with the
+    substitution `read_substitution` reads and its closing `)`, and the first other `;`, `&`, `|` or
+    `)` ends them, else the line's end. So the `)` of a quoted `"$(date)"` does not end them, and the
+    `)` of a `$( … )` holding the event does.
+    """
+    blank = build_blanked(code, keep_substitutions=True)
+    events = []
+    for match in STAGE_EVENT.finditer(code):
+        start, verb_at, verb_end, verb = match.start(), match.start(1), match.end(1), match.group(1)
+        if blank[start:start + 3] != code[start:start + 3] or blank[verb_at:verb_end] != verb:
+            continue
+        k = verb_end
+        while k < len(blank) and blank[k] not in ";&|)":
+            k += 2 + len(read_substitution(blank, k)) + 1 if blank.startswith("$(", k) else 1
+        args = code[verb_end:min(k, len(code))]
+        if verb.startswith("diff"):
+            verb = "test" if re.search(r"(?<![\w-])--(?:cached|staged)(?![\w-])", args) else "diff"
+        events.append((verb_at, "commit" if verb.startswith("commit") else verb, args))
+    return events
+
+
+def read_stage_calls(code: str, helpers: dict[str, bool]) -> list[tuple[int, str, str]]:
+    """The calls on one code half to a name in `helpers`, `[(column, "call", name)]`, in column order.
+
+    A call is the name as a whole word, unblanked on the `keep_substitutions` blank, not after `$`,
+    `.`, `/` or `-`, not before `=`, `+=` or `[`, and not the name on its own `FUNCTION_DEF`
+    definition line. An empty `helpers` reads no call.
+    """
+    if not helpers:
+        return []
+    calls = re.compile(r"(?<![\w$./-])(" + "|".join(re.escape(name) for name in sorted(helpers))
+                       + r")(?![\w./-]|\+?=|\[)")
+    blank = build_blanked(code, keep_substitutions=True)
+    head = FUNCTION_DEF.match(code)
+    found = []
+    for call in calls.finditer(code):
+        if blank[call.start():call.end()] != call.group(1):
+            continue
+        if head and head.start(2) == call.start():
+            continue
+        found.append((call.start(), "call", call.group(1)))
+    return found
+
+
+def read_stage_helpers(code_lines: list[tuple[int, str, str]]) -> dict[str, bool]:
+    """The stagers one source defines, `{name: checked}`: a function whose body stages, directly
+    through an `add` event or through a call to another stager.
+
+    The set closes transitively. Every body from `read_function_bodies` is re-walked until the mapping
+    stops changing, at most one pass more than there are functions, so a call cycle cannot loop it.
+    A pass walks each body's events and its calls to the stagers known so far in line and column
+    order with `scan_stage_file`'s `[staged, tested]` state: an `add` sets `[True, False]`, a call
+    `[True, checked]` for the callee, and a staged test sets tested to staged. A body that ends staged
+    is a stager, CHECKED when it ends tested, so a call to it is a stage followed at once by a test.
+    A later definition of a name wins, and a cycle with no `add` in it stages nothing.
+    """
+    bodies = read_function_bodies(code_lines)
+    helpers: dict[str, bool] = {}
+    for _pass in range(len(bodies) + 1):
+        known: dict[str, bool] = {}
+        for name, body in bodies.items():
+            state = [False, False]
+            for line in body.split("\n"):
+                for _column, kind, args in sorted(read_stage_events(line) + read_stage_calls(line, helpers),
+                                                  key=lambda event: event[0]):
+                    if kind == "add":
+                        state[:] = [True, False]
+                    elif kind == "call":
+                        state[:] = [True, helpers[args]]
+                    elif kind == "test":
+                        state[1] = state[0]
+            if state[0]:
+                known[name] = state[1]
+        if known == helpers:
+            break
+        helpers = known
+    return helpers
+
+
+def scan_stage_file(text: str) -> dict[str, list[tuple[int, str]]]:
+    """Classify every commit in one shell source: `{class: [(line, code), ...]}`, by `STAGE_CLASSES`.
+
+    A commit is a `commit` or `commit-tree` event. A stage is an `add` event, or a call to a stager,
+    as `read_stage_calls` reads one. The events of one scope — the innermost function whose
+    `read_function_spans` span holds the line, else the top level — are read in line and column order.
+    A commit carrying `--allow-empty` is `empty-ok`; one with no stage above it in its scope is
+    `unpaired`; one after a stage with a staged test between them is `admitted`; any other is
+    `unchecked`. A call to a checked stager is a stage followed at once by a staged test.
+    """
+    code_lines = read_code_lines(text)
+    helpers = read_stage_helpers(code_lines)
+    spans = read_function_spans(code_lines)
+    found: dict[str, list[tuple[int, str]]] = {key: [] for key, _m, _l in STAGE_CLASSES}
+    states: dict[int, list[bool]] = {}
+    for i, (number, code, _comment) in enumerate(code_lines):
+        # [staged, tested]: a stage seen above in this scope, and a staged test since the last stage.
+        state = states.setdefault(max((start for start, end in spans if start <= i <= end), default=-1),
+                                  [False, False])
+        events = read_stage_events(code) + read_stage_calls(code, helpers)
+        for _column, kind, args in sorted(events, key=lambda event: event[0]):
+            if kind == "add":
+                state[:] = [True, False]
+            elif kind == "call":
+                state[:] = [True, helpers[args]]
+            elif kind == "test":
+                state[1] = state[0]
+            elif kind != "commit":
+                continue
+            elif re.search(r"(?<![\w-])--allow-empty(?![\w-])", args):
+                found["empty-ok"].append((number, code.strip()))
+            elif not state[0]:
+                found["unpaired"].append((number, code.strip()))
+            else:
+                found["admitted" if state[1] else "unchecked"].append((number, code.strip()))
+    return found
+
+
+def scan_stage_tree(root: pathlib.Path, pathspecs: list[str]
+                    ) -> tuple[dict[str, list[tuple[str, int, str]]], int]:
+    """Every tracked shell source under `root` and the pathspecs, classified. Returns (found, files)."""
+    total: dict[str, list[tuple[str, int, str]]] = {key: [] for key, _m, _l in STAGE_CLASSES}
+    sources = read_shell_sources(root, pathspecs)
+    for rel, data in sources:
+        for key, sites in scan_stage_file(data.decode("utf-8", "replace")).items():
+            total[key].extend((rel, line, code) for line, code in sites)
+    return total, len(sources)
+
+
+def build_stage_measured(found: dict[str, list[tuple[str, int, str]]]) -> dict[tuple[str, str], int]:
+    """The unchecked sites as `{(path, "unchecked-stage"): count}` — the registry's own key."""
+    measured: dict[tuple[str, str], int] = {}
+    for rel, _line, _code in found["unchecked"]:
+        measured[(rel, "unchecked-stage")] = measured.get((rel, "unchecked-stage"), 0) + 1
+    return measured
+
+
+def print_stage_populations(found: dict[str, list[tuple[str, int, str]]], scanned: int) -> None:
+    print(f"sh-hygiene: stage commits — {scanned} tracked shell source(s) scanned, "
+          f"{sum(len(sites) for sites in found.values())} commit(s) read")
+    for key, mark, label in STAGE_CLASSES:
+        sites = found[key]
+        print(f"sh-hygiene:   [{mark}] {len(sites)} site(s) in {len({s[0] for s in sites})} file(s) — {label}")
+    for key in ("unpaired", "empty-ok"):
+        for rel, line, code in found[key]:
+            print(f"sh-hygiene:   {key} — {rel}:{line}  {code}")
+
+
+def run_stage_scan(args: list[str]) -> int:
+    """`--stage-commits [registry] [root] [pathspec ...]`: 0 clean, 1 findings, 2 refusal.
+
+    WHAT THIS DOES NOT CHECK, by the class each form lands in. `STAGE_BOUNDARY` holds one example of
+    each, and the selftest runs every one. Only the `unchecked` class is gated.
+
+    UNPAIRED, counted and printed, never gated, so each is a MISS: a stage in another scope, a function
+    the commit's scope does not call; a stager in a sourced library, whose call stages nothing here;
+    and a commit that stages with -a, `git commit -a` or `-qam`, whose stage is the commit itself.
+
+    ADMITTED, so a MISS: a staged test whose answer does not gate the commit, such as a count taken
+    with `--name-only` and never read; and a stage and a test in two repositories, `-C a` and `-C b`,
+    since the event reader does not compare the repositories its git words name.
+
+    UNREAD, no commit counted, so each is a MISS: a git verb behind a variable, `$GITCMD commit`;
+    a git global option behind an expansion or in quotes, `git $GIT_OPTS commit` or
+    `git "--no-pager" commit`, since the git word reads only the literal options `-c`, `-C`, `-p`, `-P`,
+    `--<name>[=<word>]` and `--git-dir`, `--work-tree`, `--namespace` or `--config-env` with a separate
+    word; a commit inside a quoted string or under eval; a git verb split across a line continuation,
+    whose verb is on a line this reader does not join; and Python inside a shell string, or a commit in
+    any other language, which no shell predicate reads and which has no shell example.
+
+    UNCHECKED, the mode's two known false reds, each a registry row: a merge conclusion, which commits
+    a merge in progress on an empty stage; and a first commit in a fresh repository, whose stage holds
+    the files it just wrote. A stage tested some other way than `git diff --cached` or
+    `diff-index --cached`, such as a second `git status`, reads unchecked too.
+    """
+    root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
+    if not root.is_dir():
+        print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
+        return 2
+    try:
+        declared, malformed = resolve_declaration(
+            args[0] if args else derive_default_registry(root, "stage-commit-sites.txt"),
+            STAGE_KEY_SHAPE)
+        found, scanned = scan_stage_tree(root, args[2:])
+    except OSError as exc:
+        print(f"sh-hygiene: {exc}", file=sys.stderr)
+        return 2
+    if scanned == 0:
+        print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
+              "NOTHING — that is a refusal and not a pass", file=sys.stderr)
+        return 2
+    print_registry_posture(args, derive_default_registry(root, "stage-commit-sites.txt"))
+    print_stage_populations(found, scanned)
+    # A REGISTERED SITE SAYS WHY ON EVERY RUN, green included: a reason nobody reads is no reason.
+    for key in sorted(declared):
+        print(f"sh-hygiene: registered — {key[0]}: `{key[1]}` × {declared[key]}")
+    measured = build_stage_measured(found)
+    listing: dict[tuple[str, str], str] = {}
+    for rel, line, code in found["unchecked"]:
+        listing[(rel, "unchecked-stage")] = listing.get((rel, "unchecked-stage"), "") + f"\n    {rel}:{line}  {code}"
+    explained = {key: STAGE_UNDECLARED.format(rel=key[0], count=count) + listing[key]
+                 for key, count in measured.items()}
+    problems = malformed + check_registry(measured, declared, explained, listing)
+    if not problems:
+        print(f"sh-hygiene: OK — {sum(declared.values())} registered site(s) in {len(declared)} row(s) match "
+              f"the scan, and no undeclared commit follows a stage nothing tested")
+        return 0
+    print(f"sh-hygiene: {len(problems)} finding(s). A commit after a `git add` fails when staging left the "
+          f"index equal to HEAD — a tree dirty by line endings alone stages nothing — and the caller "
+          f"aborts on a commit it never needed.")
+    for problem in problems:
+        print(f"  {problem}")
+    print(f"sh-hygiene: remedy — {STAGE_REMEDY}")
     return 1
 
 
@@ -1869,6 +2275,127 @@ def run_selftest() -> int:
         subprocess.run(["git", "add", "b.sh"], cwd=role_dir, capture_output=True)
         test("role [ledger] a new shell file with no row is red", run_role(), 1, say=True)
 
+
+    # ---- the UNCHECKED-STAGE class: every row of the unit's fixture table, each with its verdict -----
+    # Each case is graded on all four class counts, so an arm cannot pass by grading nothing: the
+    # dead spellings must count no commit while the live rows beside them count exactly one.
+    stage_cases = [
+        ("regen shape", 'if [ -n "$(git status --porcelain)" ]; then\n  git add -A\n  git commit -q -m x\nfi\n',
+         (1, 0, 0, 0)),
+        ("staged test", "git add -A\nif ! git diff --cached --quiet; then git commit -q -m x; fi\n", (0, 1, 0, 0)),
+        ("test above the stage", "git diff --cached --quiet\ngit add -A\ngit commit -m x\n", (1, 0, 0, 0)),
+        ("checked stager", "stage_tree() {\n  git add -A\n  ! git diff --cached --quiet\n}\n"
+                           "if stage_tree; then git commit -q -m x; fi\n", (0, 1, 0, 0)),
+        ("unchecked stager", "stage_tree() {\n  git add -A\n}\nstage_tree\ngit commit -q -m x\n", (1, 0, 0, 0)),
+        ("commit-tree", 'fold() {\n  git add -A\n  t=$(git commit-tree "$(git write-tree)" -p "$1" -m m)\n}\n',
+         (1, 0, 0, 0)),
+        ("commit-tree tested", 'fold() {\n  git add -A\n  git diff --cached --quiet && return 0\n'
+                               '  t=$(git commit-tree "$(git write-tree)" -p "$1" -m m)\n}\n', (0, 1, 0, 0)),
+        ("allow-empty", "git add -A\ngit commit --allow-empty -m x\n", (0, 0, 0, 1)),
+        ("echo", 'echo "run git add -A && git commit"\n', (0, 0, 0, 0)),
+        ("comment", "# git add -A; git commit -m x\n", (0, 0, 0, 0)),
+        ("quoted heredoc", "cat <<'EOF'\ngit add -A\ngit commit -m x\nEOF\n", (0, 0, 0, 0)),
+        ("GIT and -c", 'GIT add -A -- "$p"\nrun_bounded git -c "$K" commit -q -m x\n', (1, 0, 0, 0)),
+        ("name-only test", 'git add -A\n[ -n "$(git diff --cached --name-only)" ] && git commit -m x\n', (0, 1, 0, 0)),
+        ("diff-index", "git add -A\ngit diff-index --quiet --cached HEAD || git commit -m x\n", (0, 1, 0, 0)),
+        ("a variable named as a stager", "stage() {\n  git add -A\n}\nstage=1\ngit commit -q -m x\n", (0, 0, 1, 0)),
+        # TOOL-dSettledStage-4: a quoted substitution's `)` ends no argument list, every literal global
+        # option before the verb is read, and the stager set closes over calls.
+        ("a quoted substitution before --allow-empty", 'git add -A\ngit commit -q -m "$(date)" --allow-empty\n',
+         (0, 0, 0, 1)),
+        ("a quoted substitution before --cached",
+         'git add -A\ngit diff "$(echo x)" --cached --quiet || git commit -m x\n', (0, 1, 0, 0)),
+        ("-p", "git add -A\ngit -p commit -q -m x\n", (1, 0, 0, 0)),
+        ("-P", "git add -A\ngit -P commit -q -m x\n", (1, 0, 0, 0)),
+        ("--no-pager", "git add -A\ngit --no-pager commit -q -m x\n", (1, 0, 0, 0)),
+        ("--git-dir=", "git --git-dir=.git add -A\ngit --git-dir=.git commit -q -m x\n", (1, 0, 0, 0)),
+        ("--git-dir apart", "git add -A\ngit --git-dir .git commit -q -m x\n", (1, 0, 0, 0)),
+        ("--work-tree apart", "git add -A\ngit --work-tree . commit -q -m x\n", (1, 0, 0, 0)),
+        ("--namespace apart", "git add -A\ngit --namespace n commit -q -m x\n", (1, 0, 0, 0)),
+        ("--config-env apart", "git add -A\ngit --config-env core.pager=HOME commit -q -m x\n", (1, 0, 0, 0)),
+        ("a two-hop unchecked stager", "s1() { git add -A; }\ns2() { s1; }\ns2\ngit commit -q -m x\n", (1, 0, 0, 0)),
+        ("a two-hop checked stager", "s1() {\n  git add -A\n  ! git diff --cached --quiet\n}\ns2() {\n  s1\n}\n"
+                                     "if s2; then git commit -q -m x; fi\n", (0, 1, 0, 0)),
+        ("a call cycle with no stage", "a() { b; }\nb() { a; }\na\ngit commit -q -m x\n", (0, 0, 1, 0)),
+    ]
+    for label, text, want in stage_cases:
+        seen_stage = scan_stage_file(text)
+        test(f"stage [{label}] unchecked, admitted, unpaired, empty-ok",
+             tuple(len(seen_stage[key]) for key, _m, _l in STAGE_CLASSES), want, say=True)
+    # THE BOUNDARY: every documented form lands in its class alone, `unread` when no commit is counted,
+    # and its label sits in run_stage_scan's docstring and in the README's `--stage-commits` section,
+    # each read with its whitespace squeezed. It grades that each label is NAMED and that its example
+    # lands in its class; it does not grade that the prose around a label states that class.
+    opens = next((i for i, line in enumerate(readme) if line.startswith("### `--stage-commits` ")), len(readme))
+    closes = next((i for i in range(opens + 1, len(readme)) if readme[i].startswith("## ")), len(readme))
+    section = " ".join(" ".join(readme[opens:closes]).split())
+    docstring = " ".join((run_stage_scan.__doc__ or "").split())
+    for label, example, want in STAGE_BOUNDARY:
+        kinds = [key for key, sites in scan_stage_file(example + "\n").items() if sites]
+        test(f"stage [boundary] {label}: its class, named in the docstring, named in the README",
+             (kinds[0] if len(kinds) == 1 else "+".join(kinds) or "unread", label in docstring, label in section),
+             (want, True, True), say=True)
+    stage_problems = check_registry({("a.sh", "unchecked-stage"): 1}, {("gone.sh", "unchecked-stage"): 1},
+                                    {("a.sh", "unchecked-stage"): STAGE_UNDECLARED.format(rel="a.sh", count=1)})
+    test("stage [registry] an undeclared key and a stale row are two findings, the first in the mode's words",
+         (len(stage_problems), stage_problems[0] == STAGE_UNDECLARED.format(rel="a.sh", count=1),
+          "no longer finds" in stage_problems[1]), (2, True, True), say=True)
+
+    # HOME-GRADED (TOOL-dHomeGraded-1 S2). Two files carrying the same fixed-name temp, one claimed by a
+    # receipt `engine` row at gov's bytes: only the other is named. Then the claimed one is edited, and
+    # both are: a receipt row excuses gov's bytes, never a file this tree changed.
+    held = {name: os.environ.pop(name) for name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")
+            if name in os.environ}
+    try:
+        with tempfile.TemporaryDirectory() as scratch:
+            tree = pathlib.Path(scratch)
+            site = b'printf x >"$dst.tmp"\nmv "$dst.tmp" "$dst"\n'
+            (tree / "kit.sh").write_bytes(site)
+            (tree / "own.sh").write_bytes(site)
+            (tree / "reg.txt").write_text("", encoding="utf-8")
+            for argv in (["git", "init", "-q", "."], ["git", "add", "-A"]):
+                subprocess.run(argv, cwd=str(tree), capture_output=True, check=True)
+            oid = subprocess.run(["git", "hash-object", "kit.sh"], cwd=str(tree), capture_output=True,
+                                 text=True, encoding="utf-8", check=True).stdout.strip()
+            (tree / ".governance").mkdir()
+            (tree / ".governance" / "install.json").write_text(json.dumps({"files": [
+                {"path": "kit.sh", "role": "engine", "oid": oid, "gov_oid": oid}]}), encoding="utf-8")
+            homed = []
+            for body in (site, site + b"# edited here\n"):
+                (tree / "kit.sh").write_bytes(body)
+                _HOME_TOLD.clear()
+                said = io.StringIO()
+                with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
+                    code = run_temp_scan([str(tree / "reg.txt"), str(tree)])
+                homed.append((code, "kit.sh:" in said.getvalue(), "own.sh:" in said.getvalue(),
+                              "gov's own bytes" in said.getvalue()))
+            test("home-graded: a receipt engine row at gov's bytes leaves its file out, the other named",
+                 homed[0], (1, False, True, True), say=True)
+            test("home-graded: the same file edited here is graded again",
+                 homed[1], (1, True, True, False), say=True)
+            # DEFAULT REGISTRY (TOOL-dHomeGraded-1 S7): with no argument, a run from the root reads
+            # `<MEMORY_ROOT>/project/temp-name-sites.txt` when it exists, and its row declares the site.
+            (tree / ".governance" / "install.json").unlink()
+            (tree / "kit.sh").unlink()
+            (tree / ".memory-tree.conf").write_text("MEMORY_ROOT=records\n", encoding="utf-8")
+            (tree / "records" / "project").mkdir(parents=True)
+            (tree / "records" / "project" / "temp-name-sites.txt").write_text(
+                "own.sh\tfixed-temp\t1\tabcdef12\tseeded\n", encoding="utf-8")
+            subprocess.run(["git", "add", "-A"], cwd=str(tree), capture_output=True, check=True)
+            here = os.getcwd()
+            os.chdir(tree)
+            try:
+                said = io.StringIO()
+                with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
+                    code = run_temp_scan([])
+            finally:
+                os.chdir(here)
+            test("default registry: no argument reads <MEMORY_ROOT>/project/temp-name-sites.txt and is green",
+                 (code, "reads the default registry" in said.getvalue()), (0, True), say=True)
+    finally:
+        os.environ.update(held)
+
+
     if n < FLOOR_ASSERTIONS:
         print(f"SELFTEST FAIL: {n} assertion(s) executed, under the floor of {FLOOR_ASSERTIONS} — an arm is stranded past an early exit, which is the one defect a printed count can see and a per-arm check cannot")
         ok = False
@@ -1893,13 +2420,16 @@ def main(argv: list[str]) -> int:
                                  shape, title)
     if "--shell-role" in argv:
         return run_shell_role_scan([a for a in argv[1:] if a not in ("--shell-role", "--measure")], measure)
+    if "--stage-commits" in argv:
+        return run_stage_scan([arg for arg in argv[1:] if arg != "--stage-commits"])
     args = argv[1:]
     root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
     if not root.is_dir():
         print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
         return 2
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None)
+        declared, malformed = resolve_declaration(args[0] if args else derive_default_registry(
+            root, "substitution-fed-loops.txt"))
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
         return 2
