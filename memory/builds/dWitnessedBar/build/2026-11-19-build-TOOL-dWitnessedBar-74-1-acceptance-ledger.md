@@ -11,7 +11,7 @@ record is the one `run_local_plant` builds, under `TMPDIR` at `%TEMP%/w74`. The 
 The shell-role seed measures the suite at 735 past 716, widened under
 `2026-11-21-build-TOOL-dWitnessedBar-74-widen-15`. No `a=$((a+1))` was added: the liveness check gates
 the `rec_sha` compare's existing count, so over the hook `a` counts 4 as it did before and the floor
-stays as it was. The §7 legs and the `New arm:` line's RED-first observation are the main loop's at the
+stays as it was. The §7 legs and the `New arm:` line's RED-first observation are the main loop's at the (DERIVED from the builder's probe)
 close.
 
 **Evidences:** TOOL-dWitnessedBar-74
