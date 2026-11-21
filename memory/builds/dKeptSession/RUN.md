@@ -100,3 +100,6 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-21T19:46:41Z dispatch · item a21b9965 KICK-dKeptSession-50 · reason tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-50-1-acceptance-ledger.md
 
 2026-11-21T19:54:14Z brief · item KICK-dKeptSession-54 · reason ce8c622ea915 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-54-build-brief.md
+2026-11-21T20:05:09Z draw · re-dispatch · KICK-dKeptSession-50 · 9/132 · 20261121T200509Z-25ac70
+
+2026-11-21T20:05:09Z dispatch · item 1c090563 KICK-dKeptSession-50 · reason tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-50-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
