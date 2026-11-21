@@ -12,20 +12,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 gates-run: unattended-179523792223167627694-3443211 e6def835
 parked-surfaced: yes, 4 surfaced
 keepalive-reaped: yes
-asks-at-landing: TOOL-dPlacedRequest-22=OPEN TOOL-dPlacedRequest-65=CLOSED TOOL-dPlacedRequest-66=CLOSED TOOL-dPlacedRequest-67=CLOSED TOOL-dPlacedRequest-68=CLOSED TOOL-dPlacedRequest-69=CLOSED TOOL-dPlacedRequest-70=CLOSED TOOL-dPlacedRequest-71=CLOSED TOOL-dPlacedRequest-73=CLOSED TOOL-dPlacedRequest-74=OPEN TOOL-dPlacedRequest-75=OPEN TOOL-dPlacedRequest-76=OPEN TOOL-dPlacedRequest-77=OPEN TOOL-dPlacedRequest-78=OPEN TOOL-dPlacedRequest-79=OPEN TOOL-dPlacedRequest-80=OPEN TOOL-dPlacedRequest-81=OPEN TOOL-dPlacedRequest-82=OPEN TOOL-dPlacedRequest-83=OPEN TOOL-dPlacedRequest-84=WONTDO TOOL-dPlacedRequest-85=WONTDO TOOL-dPlacedRequest-86=WONTDO TOOL-dPlacedRequest-87=OPEN TOOL-dPlacedRequest-88=WONTDO TOOL-dPlacedRequest-89=WONTDO TOOL-dPlacedRequest-90=OPEN TOOL-dPlacedRequest-91=WONTDO TOOL-dPlacedRequest-92=WONTDO TOOL-dPlacedRequest-93=WONTDO TOOL-dPlacedRequest-94=WONTDO TOOL-dPlacedRequest-101=WONTDO TOOL-dPlacedRequest-102=OPEN TOOL-dPlacedRequest-103=OPEN TOOL-dPlacedRequest-104=WONTDO TOOL-dPlacedRequest-105=OPEN TOOL-dPlacedRequest-106=WONTDO TOOL-dPlacedRequest-107=WONTDO TOOL-dPlacedRequest-108=WONTDO
+asks-at-landing: TOOL-dPlacedRequest-22=OPEN TOOL-dPlacedRequest-65=CLOSED TOOL-dPlacedRequest-66=CLOSED TOOL-dPlacedRequest-67=CLOSED TOOL-dPlacedRequest-68=CLOSED TOOL-dPlacedRequest-69=CLOSED TOOL-dPlacedRequest-70=CLOSED TOOL-dPlacedRequest-71=CLOSED TOOL-dPlacedRequest-73=CLOSED TOOL-dPlacedRequest-74=OPEN TOOL-dPlacedRequest-75=OPEN TOOL-dPlacedRequest-76=OPEN TOOL-dPlacedRequest-77=OPEN TOOL-dPlacedRequest-78=OPEN TOOL-dPlacedRequest-79=OPEN TOOL-dPlacedRequest-80=OPEN TOOL-dPlacedRequest-81=OPEN TOOL-dPlacedRequest-82=OPEN TOOL-dPlacedRequest-83=OPEN TOOL-dPlacedRequest-84=WONTDO TOOL-dPlacedRequest-85=WONTDO TOOL-dPlacedRequest-86=WONTDO TOOL-dPlacedRequest-87=OPEN TOOL-dPlacedRequest-88=WONTDO TOOL-dPlacedRequest-89=WONTDO TOOL-dPlacedRequest-90=OPEN TOOL-dPlacedRequest-91=WONTDO TOOL-dPlacedRequest-92=WONTDO TOOL-dPlacedRequest-93=WONTDO TOOL-dPlacedRequest-94=WONTDO TOOL-dPlacedRequest-101=WONTDO TOOL-dPlacedRequest-102=OPEN TOOL-dPlacedRequest-103=OPEN TOOL-dPlacedRequest-104=WONTDO TOOL-dPlacedRequest-105=OPEN TOOL-dPlacedRequest-106=WONTDO TOOL-dPlacedRequest-107=WONTDO TOOL-dPlacedRequest-108=WONTDO TOOL-dPlacedRequest-109=OPEN TOOL-dPlacedRequest-110=OPEN
 units-at-landing: TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-96 TOOL-dPlacedRequest-97 TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 TOOL-dPlacedRequest-100
 hold-run: 
-hold-streak: 1 · at 870ddd2b
+hold-streak: 1 · at a8bbf199
 resume-owed: none · owner
-held-at: 2026-11-21T02:25:47Z
-hold-reason: the landing merge of origin/main changes the protected .claude/skills/lexicon/SKILL.md and .claude/skills/unattended/SKILL.md, parked as landing-merge-protected-skills; every step needing no merge is done: 69 of 69 units built and CLOSED, the run at VERIFYING, every non-waived New arm observed RED on its break (memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-11-arm-breaks.md); after the owner's answer: merge origin/main and resolve 7 conflicts, push-main.sh --prepare, the flagged bar, the departures report, --authorization, --close with --override specs-audited for TOOL-dPlacedRequest-100, the land and --landed
+held-at: 2026-11-21T09:12:26Z
+hold-reason: the landing's pre-push routed-commits range refuses six earlier Red-fix commits outside the inline lane's limits (parked: routed-commits-lane-limits); every other red the run caused is fixed and 21 inherited reds remain, each held red on main's daily job with an open ask
 hold-until: owner
 hold-code: owner-decision
 held-from: VERIFYING
-refreshed-at: 4a7fff390790a4d5debec6bf77fd27661ba9a2da · park · 0 touching
+refreshed-at: 4a7fff390790a4d5debec6bf77fd27661ba9a2da · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 8e8230d305b04f95b1e0a0a3c8026c564f5dd7c2
-phase: VERIFYING
+witness: a8bbf1990fb6361e9f35a28d1fd674cd06464178
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -597,3 +597,7 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T02:37:16Z resume · item dPlacedRequest · reason held · keepalive c039c97c · manual
 
 2026-11-21T09:11:56Z decision · item routed-commits-lane-limits · reason Six Red-fix commits on the run branch sit outside the inline lane's limits: eb1c1447, cf67c746, 09a53ab5, 2c6c2afe and 1983ee62 edit spec paths (L3) and 3b92d470 touches 5 paths and 90 lines (L1). routed_commits.py's RANGE half, which the pre-push hook runs over the landing range, reads no waiver, so push-main.sh --land would be refused. Options: (a) replay the run branch from the first violator's parent, each spec hunk in its own records commit and 3b92d470 in two, then force-push the run branch, as dSkippedRecord repaired the same red on 2026-11-20; (b) a unit that lets the RANGE half honour an owner-recorded waiver for limits findings; (c) the owner lands by hand. The run recommends (a), and refuses it unattended because it rewrites about 350 built commits, two merges among them.
+
+2026-11-21T09:12:29Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dPlacedRequest && bash tools/push-main.sh --land --slug dPlacedRequest && bash tools/unattended/unattended.sh --settle dPlacedRequest
+
+2026-11-21T09:12:29Z hold · item owner-decision · reason until owner · reaped c039c97c · resume none(owner)
