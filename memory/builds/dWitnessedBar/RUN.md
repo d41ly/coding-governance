@@ -836,3 +836,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T15:46:35Z draw · re-dispatch · TOOL-dWitnessedBar-108 · 127/180 · 20261121T154635Z-5d0ca8
 
 2026-11-21T15:46:35Z dispatch · item 74ae4b50 TOOL-dWitnessedBar-108 · reason memory/project/shell-role.txt
+
+2026-11-21T16:10:11Z brief · item TOOL-dWitnessedBar-108 · reason 035e2c32aa64 memory/builds/dWitnessedBar/prompts/2026-11-21-prompt-TOOL-dWitnessedBar-108-build-brief-2.md
