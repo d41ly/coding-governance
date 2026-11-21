@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-80 — the liveness variant that failed both conditions becomes a tail variant, so a check that lost its last-byte test is seen red on every run
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 41 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 41 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-80-deviation-801.md](../build/2026-10-25-build-TOOL-dWitnessedBar-80-deviation-801.md) | deviation | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-80-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-80-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-80-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-80-reground-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-80-reground2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-80-reground2-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-80-reground2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-80-reground2-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-79-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-79-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 |
 
 <!-- /gen:spec-records -->
@@ -32,36 +34,45 @@ condition.
 
 This unit makes that variant fail the tail test alone. Its replacement text becomes `${_rg_v%?}x`, a
 value of forty-one bytes whose last byte is `x`. With `TOOL-dWitnessedBar-79`'s length variant, each
-condition of `check_cr_reached` has a variant that only it rejects. It repairs `TOOL-dWitnessedBar-74`
+condition of `check_cr_reached` has a variant that only it rejects; both run through unit 79's
+`check_key_variant`, so the change is the tail call's arguments. It repairs `TOOL-dWitnessedBar-74`
 and builds one step after it (order 41).
 
 ## 2. Scope (IN)
 
-- **S1** — The tail variant. In the per-key liveness loop over `CANARY_KEYS` in
-  `tools/run-gates/run-gates.gov.test.sh`, the variant unit 74 S2 introduced and unit 76 S3 carried
-  to every key writes each `<key>)` assignment as `<var>=${_rg_v%?}x`, in place of `<var>=${_rg_v%?}`.
-  The edit is the loop's one `sed` replacement text, `\1${_rg_v%?}x`, spelled once for every key
-  (`tools/run-gates/run-gates.gov.test.sh@648a4d5d5:917`). The canary's header comment names the
-  variant as `<var>=${_rg_v%?}` (`tools/run-gates/run-gates.gov.test.sh@648a4d5d5:845`). That
-  comment is prose, outside the variant population, and is rewritten to the new text because AC3's
-  whole-file grep reads it. After S1 the suite holds no `${_rg_v%?}` that lacks the `x`. Observed by
+- **S1** — The tail variant. The per-key liveness loop over `CANARY_KEYS` in
+  `tools/run-gates/run-gates.gov.test.sh` calls `tools/run-gates/run-gates.gov.test.sh#check_key_variant`
+  twice per pair, the tail call first (`tools/run-gates/run-gates.gov.test.sh@08f226f3d:948`). That
+  call's replacement argument `'${_rg_v%?}'` becomes `'${_rg_v%?}x'`, so the function's one `sed`
+  writes each `<key>)` assignment as `<var>=${_rg_v%?}x` for every key. No line of the function's body
+  changes, and the length call's `'${_rg_v:1}'` is untouched. The arm's header comment names the
+  variant as `<var>=${_rg_v%?}` (`tools/run-gates/run-gates.gov.test.sh@08f226f3d:845`) and says it
+  fails the count and the tail test at once (`tools/run-gates/run-gates.gov.test.sh@08f226f3d:849-850`).
+  Both are prose, outside the variant population, and both are rewritten: the first to
+  `<var>=${_rg_v%?}x`, because AC3's whole-file grep reads it, and the second to say the tail variant
+  fails the tail test alone. After S1 the suite holds no `${_rg_v%?}` that lacks the `x`. Observed by
   AC1 and AC3.
-- **S2** — The variant is held to unit 74 S2's two one-line counts, and then to the byte check. On its
-  mutant `check_canary_keys` must print exactly `<var>`. Observed by AC1 and AC2.
-- **S3** — The failure names the variant and the condition. Unit 76 S3's reason chain
-  (`tools/run-gates/run-gates.gov.test.sh@648a4d5d5:925-929`) reads, for this variant,
-  `tail variant changed <n> lines` or `tail mutant changed <n> lines` when a count is not one, and
-  `the tail variant passed a value whose last byte is not CR` when the mutant passes `<var>`'s byte
-  check. That last reason stands where unit 74 S3 wrote `it passed a value that lost its CR`, which
-  named no condition. Unit 74 AC2's quote of it is answered by `TOOL-dWitnessedBar-81`, and unit 76
-  AC2's by `TOOL-dWitnessedBar-87`. The chain's fourth reason, `it named <other> whose CR arrived`,
-  stays as unit 76 S3 landed it. Each reason prints unit 74 S3's line for `<var>`, sets `fail=1` and
-  leaves `<var>` out of `rgf_seen`, so that key's compare goes uncounted: unit 66 S2's for `rec_sha`,
-  unit 67 S2's for `rec_fp`. Observed by AC2.
+- **S2** — The variant is held to unit 74 S2's two one-line counts, and then to the byte check, as
+  `check_key_variant` holds every variant. On its mutant `check_canary_keys` must print exactly
+  `<var>`. Observed by AC1 and AC2.
+- **S3** — The failure names the variant and the condition. The tail call's label argument, empty at
+  HEAD, becomes `tail `. The function's count reasons
+  (`tools/run-gates/run-gates.gov.test.sh@08f226f3d:892-893`) then read `tail variant changed <n> lines`
+  and `tail mutant changed <n> lines`, as the length call's `length ` label already makes them read.
+  The call's passed-reason argument becomes `the tail variant passed a value whose last byte is not CR`,
+  printed when the mutant passes `<var>`'s byte check. That reason stands where unit 74 S3 wrote
+  `it passed a value that lost its CR`, which named no condition. Unit 74 AC2's quote of it is
+  answered by `TOOL-dWitnessedBar-81`, and unit 76 AC2's by `TOOL-dWitnessedBar-87`. The other-lead
+  argument `it named` stays, so the fourth reason, `it named <other> whose CR arrived`, stays as unit
+  76 S3 landed it. Each reason prints unit 74 S3's line for `<var>`, sets `fail=1` and leaves `<var>`
+  out of `rgf_seen`, as the loop does for any failed call (unit 79 S3). So that key's compare goes
+  uncounted: unit 66 S2's for `rec_sha`, unit 67 S2's for `rec_fp`. Observed by AC2 and AC3.
 
 ## 3. Non-goals (OUT)
 
-- The length variant, which is `TOOL-dWitnessedBar-79`'s for id 7.
+- The length variant and `check_key_variant` itself, which are `TOOL-dWitnessedBar-79`'s for id 7.
+  This unit passes the function new arguments and edits no line of its body. `TOOL-dWitnessedBar-79`
+  §8 F5 names that dependence in prose, with no Edges bullet.
 - The record of each staged break with the line it printed, in the ledgers of units 74 and 76, which
   is `TOOL-dWitnessedBar-81`'s for id 1.
 - A distinct return code for a variant that could not be sourced, and a sed that admits a quoted
@@ -76,7 +87,7 @@ and builds one step after it (order 41).
 ### Edges
 
 - **consumes-from** `TOOL-dWitnessedBar-74` — S2's `${_rg_v%?}` variant and S3's failure line, which S1 makes fail the tail test alone and S3 gives a reason naming that condition (id 18)
-- **consumes-from** `TOOL-dWitnessedBar-76` — the per-key liveness loop over `CANARY_KEYS`, whose one replacement text S1 changes for every key (id 18)
+- **consumes-from** `TOOL-dWitnessedBar-76` — the per-key liveness loop over `CANARY_KEYS`, whose tail call's replacement text S1 changes for every key (id 18)
 - **hands-off** `TOOL-dWitnessedBar-81` — the tail variant and its reason, whose staged red with no tail test unit 81 records in the ledgers of units 74 and 76 (ids 18 and 1)
 - **hands-off** `TOOL-dWitnessedBar-84` — the tail variant's mutant, held to an exact return of 1 by id 19's item, and its `<key>)` edit, widened to a quoted assignment by id 6's item
 - **hands-off** `TOOL-dWitnessedBar-85` — the tail variant and its seen-red test, on whose success unit 85 adds one to `a` per key (id 1 of the round-1 spec audit of units 79 to 84)
@@ -88,40 +99,48 @@ and builds one step after it (order 41).
 
 ### Evidence
 
-Probed at `648a4d5d5` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GNU sed 4.9
-(PINNED 2026-11-21). The probe cut the hook's `.githooks/pre-push#read_green_file`, ran the loop's
-`sed` with each replacement text for each `CANARY_KEYS` pair, then the canary's
-`sed 's/%[$].[\]r.}/}/'`. On each mutant it called a copy of
-`tools/run-gates/run-gates.gov.test.sh#check_cr_reached`, and a copy with its last-byte test taken
-out, once per pair as `check_canary_keys` does. The record was hand-built in the AC12 arm's layout;
-the arm's own record, from `run_local_plant`, is the main loop's at the close.
+Probed at `09179148e` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GNU sed 4.9
+(PINNED 2026-11-21). The probe cut the hook's `.githooks/pre-push#read_green_file` and evaluated the
+suite's `check_cr_reached`, `CANARY_KEYS`, `check_canary_keys` and `check_key_variant` as landed. It
+called `check_key_variant` for each pair with S1's replacement and S3's label and passed reason, then
+with the two landed replacements. It ran once with the real
+`tools/run-gates/run-gates.gov.test.sh#check_cr_reached` and once with a copy whose last-byte test is
+taken out. The record was hand-built in the AC12 arm's layout; the arm's own record, from
+`run_local_plant`, is the main loop's at the close. A return of 0 is a variant seen red, both counts
+one.
 
-| Text · key | Variant count | Mutant count | `rec_sha` · `rec_fp` bytes, last byte | Real check names | Count-only check names | Pin |
-|---|---|---|---|---|---|---|
-| `${_rg_v%?}x` · `sha` | 1 | 1 | 41 `x` · 41 `\r` | `rec_sha` | nothing | PINNED 2026-11-21 |
-| `${_rg_v%?}x` · `fingerprint` | 1 | 1 | 41 `\r` · 41 `x` | `rec_fp` | nothing | PINNED 2026-11-21 |
-| `${_rg_v%?}` · `sha` | 1 | 1 | 40 `b` · 41 `\r` | `rec_sha` | `rec_sha` | PINNED 2026-11-21 |
-| `${_rg_v%?}` · `fingerprint` | 1 | 1 | 41 `\r` · 40 `c` | `rec_fp` | `rec_fp` | PINNED 2026-11-21 |
-| the canary's mutant | — | — | — | nothing | nothing | PINNED 2026-11-21 |
+| Replacement · key | `rec_sha` · `rec_fp` bytes, last byte | Real check | Count-only check | Pin |
+|---|---|---|---|---|
+| `${_rg_v%?}x` · `sha` | 41 `x` · 41 `\r` | 0 | 1, S3's passed reason | PINNED 2026-11-21 |
+| `${_rg_v%?}x` · `fingerprint` | 41 `\r` · 41 `x` | 0 | 1, S3's passed reason | PINNED 2026-11-21 |
+| `${_rg_v%?}` · `sha` | 40 `b` · 41 `\r` | 0 | 0 | PINNED 2026-11-21 |
+| `${_rg_v%?}` · `fingerprint` | 41 `\r` · 40 `c` | 0 | 0 | PINNED 2026-11-21 |
+| `${_rg_v:1}` · `sha` | 40 `\r` · 41 `\r` | 0 | 0 | PINNED 2026-11-21 |
+| `${_rg_v:1}` · `fingerprint` | 41 `\r` · 40 `\r` | 0 | 0 | PINNED 2026-11-21 |
+| the canary's mutant, `check_canary_keys` direct | 41 `\r` · 41 `\r` | names nothing | names nothing | PINNED 2026-11-21 |
 
-So the landed variant is named under a check with no last-byte test, and no run sees that test red.
-The tail variant is named only by the real check, so its key reaches S3's last reason under that
-break.
+So at HEAD both landed variants are seen red by the count alone under a check with no last-byte
+test, and no run sees that test red. The tail variant is caught only by the real check, so its key
+reaches S3's passed reason under that break.
 
 - The pattern `%[$].[\]r.}` needs `$` after `%`; `${_rg_v%?}x` has `?` there, so the canary's `sed`
-  leaves the edited line alone, as the mutant counts above show.
-- At HEAD the loop's `sed` spells `\1${_rg_v%?}/` and the header comment `<var>=${_rg_v%?}`, and
-  `grep -cE '_rg_v%\?\}($|[^x])'` over the suite prints 2 (PINNED 2026-11-21), those two lines.
-  No file outside the suite spells the text or the three reasons S3 replaces (PINNED 2026-11-21,
-  `git grep` over `tools/`, `help/` and `.githooks/`).
-- `tools/gate-lint/sh_hygiene.py#measure_code_lines` reads the suite at 784 (PINNED 2026-11-21), the
-  count on its `memory/project/shell-role.txt` row. S1 and S3 rewrite existing lines in place, so the
-  count does not move and the row is not touched.
+  leaves the edited line alone, as the real-check returns above show.
+- A cut whose `sha)` assignment is quoted makes the tail call, with S3's label, print
+  `tail variant changed 0 lines` (PINNED 2026-11-21, same probe).
+- At HEAD `grep -nE '_rg_v%\?\}($|[^x])'` over the suite prints the header comment and the tail call
+  (`tools/run-gates/run-gates.gov.test.sh@08f226f3d:845`, `:948`), and `grep -n 'lost its CR'` prints
+  the tail call alone. No file outside the suite spells `_rg_v%?}`, `variant changed`,
+  `mutant changed` or `lost its CR` (PINNED 2026-11-21, `git grep` over `tools/`, `help/` and
+  `.githooks/`).
+- `tools/gate-lint/sh_hygiene.py#measure_code_lines` reads the suite at 797 (PINNED 2026-11-21), the
+  count on its `memory/project/shell-role.txt` row as unit 79 widened it. S1 and S3 rewrite existing
+  lines in place, and the measure counts no comment line, so the count does not move and the row is
+  not touched. `memory/map/generated/symbols.json` records no line number, so no symbol moves.
 
 ### Inventory
 
-Minted: the replacement text `${_rg_v%?}x`, and S3's three reasons. No function, constant, plant,
-flag or file. Naming cells: none apply, since no function is introduced.
+Minted: the replacement text `${_rg_v%?}x`, the label `tail ` and S3's passed reason. No function,
+constant, plant, flag or file. Naming cells: none apply, since no function is introduced.
 
 ### Migration
 
@@ -129,23 +148,28 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 41. Its units 73 and 76 are CLOSED at `71f212ad1` and `bdc10a4df`.
-Units 77, 79, 80 and 81 remain, and each edits `tools/run-gates/run-gates.gov.test.sh`, so they
-build one at a time. Dispatch is strictly sequential and sorts a tie by id string
-(`tools/workflows/unattended-build.js@648a4d5d5:78-82`, `:692-697`), so units 77 and 79 build before
-this unit and unit 81 after it. The builder reads the loop as those passes leave it. Once unit 79
-has landed, its length variant sits beside the variant S1 edits, and S1 changes only the
-`${_rg_v%?}` text.
+Live at landing, at order 41. Units 73, 76, 77 and 79 are CLOSED at `71f212ad1`, `bdc10a4df`,
+`7228b0a9a` and `08f226f3d`. Unit 81 remains at order 41 and also edits
+`tools/run-gates/run-gates.gov.test.sh`. Dispatch is strictly sequential and sorts a tie by id
+string (`tools/workflows/unattended-build.js@648a4d5d5:78-82`, `:692-697`), so unit 81 builds after
+this unit and reads the tail call as S1 and S3 leave it. Unit 79's `check_key_variant` carries both
+variants, so this unit edits the tail call's three arguments and the header comment, no line of the
+function's body. That is the dependence `TOOL-dWitnessedBar-79` §8 F5 names in prose, with no Edges
+bullet.
 
 ### Files touched (estimate)
 
-- `tools/run-gates/run-gates.gov.test.sh`: S1's replacement text and header comment, S3's three
-  reasons. No other file: the shell-role row does not move (§4 Evidence), and no symbol is minted.
+- `tools/run-gates/run-gates.gov.test.sh`: the tail call's replacement, label and passed reason, and
+  the header comment's two clauses on the tail variant. No other file: the shell-role row does not
+  move and the symbol map holds no line (§4 Evidence), and no symbol is minted.
 
 ### Alternatives rejected
 
 - **Keep `${_rg_v%?}` beside the tail variant.** It fails both conditions, so its red proves nothing
-  the other two variants do not, and it costs two `sed`, two `diff` and one sourced call per key.
+  the other two variants do not, and it costs a third `check_key_variant` call per key.
+- **A tail-only parameter or copy of `check_key_variant`.** The function already takes a
+  replacement, label and reason per call, so the call's arguments carry the change; a copy is the
+  second instance the charter's reuse rule refuses.
 - **A tail variant through the input path, `tr -d '\r'` on the record.** It strips every key's CR, so
   its red cannot show which key's check fired, and unit 74 §4 found key-selective filters in a process
   substitution resting on platform CR handling.
@@ -155,25 +179,26 @@ has landed, its length variant sits beside the variant S1 edits, and S1 changes 
 ## 5. Production-readiness checklist
 
 - security — no new write path.
-- perf / scale — none added: the loop's variant count per key is unchanged by S1.
-- error / empty / loading states — S3 names the three ways the tail variant fails.
+- perf / scale — none added: the loop's `check_key_variant` calls per key are unchanged by S1.
+- error / empty / loading states — S3's label and passed reason name the three ways the tail variant
+  fails, and the fourth reason stays unit 76's.
 - observability — S3's reason names the tail condition, so its red reads apart from the length
   variant's.
 - risks — a reader rewritten so an assignment is spelled differently fails with
-  `tail variant changed 0 lines`.
+  `tail variant changed 0 lines` (§4 Evidence).
 - testing — AC1 and AC3 by probe and grep, AC2 by scratch clone at the close.
 - migration — none.
 - user docs — none under `help/`; no user-facing surface changes.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a probe applies S1's edit for `sha` to the function cut by
-  `awk '/^read_green_file\(\)/,/^}/' .githooks/pre-push` on the built tree, then the canary's
-  `sed 's/%[$].[\]r.}/}/'` to the result, each `diff` counts one changed line. The sourced mutant,
-  called on the AC12 record, gives `printf %s "$rec_sha" | wc -c` as 41 with
+- **AC1** — When a probe applies S1's edit for `sha`, `sed 's/\(sha) rec_sha=\)\$_rg_v/\1${_rg_v%?}x/'`,
+  to the function cut by `awk '/^read_green_file\(\)/,/^}/' .githooks/pre-push` on the built tree,
+  then the canary's `sed 's/%[$].[\]r.}/}/'` to the result, each `diff` counts one changed line. The
+  sourced mutant, called on the AC12 record, gives `printf %s "$rec_sha" | wc -c` as 41 (PINNED 2026-11-21) with
   `printf %s "$rec_sha" | tail -c1 | od -c` showing `x`, and `rec_fp` forty-one bytes ending in `\r`.
   The same probe on the `fingerprint` arm gives `rec_fp` forty-one bytes ending in `x`, and `rec_sha`
-  forty-one ending in `\r`.
+  forty-one ending in `\r` (§4 Evidence).
   Red when: the variant is forty bytes, so it fails the count as well as the tail.
   fixture: the AC12 record, which `TOOL-dWitnessedBar-68` S1 and `TOOL-dWitnessedBar-67` S2 build.
 - **AC2** — When the arm runs over the built tree, it prints no `tail variant` line. In a scratch clone
@@ -184,10 +209,15 @@ has landed, its length variant sits beside the variant S1 edits, and S1 changes 
   fixture: a scratch clone under `%TEMP%/<short-name>`.
   permission: the arm's run is the main loop's, at the close.
 - **AC3** — When `grep -v '^[[:space:]]*#' tools/run-gates/run-gates.gov.test.sh | grep -c '_rg_v%?}x'`
-  runs on the built tree it prints 1, and `grep -cE '_rg_v%\?\}($|[^x])' tools/run-gates/run-gates.gov.test.sh`
-  prints 0.
+  and `grep -cF "'tail ' 'the tail variant passed a value whose last byte is not CR' 'it named'" tools/run-gates/run-gates.gov.test.sh`
+  run on the built tree, each prints 1 (PINNED by S1 and S3), and
+  `grep -cE '_rg_v%\?\}($|[^x])' tools/run-gates/run-gates.gov.test.sh` and
+  `grep -c 'lost its CR' tools/run-gates/run-gates.gov.test.sh` each print 0 (PINNED by S1 and S3).
+  The first grep drops comment lines, so the header comment's `<var>=${_rg_v%?}x` is not counted;
+  the third reads the whole file, comment included.
   Red when: the two-condition variant is kept beside the tail variant, in code or in the header
-  comment, or the tail variant is spelled once per key.
+  comment, the tail variant is spelled once per key, or the tail call keeps its empty label or unit
+  74 S3's reason.
 
 ## 7. Gates
 
@@ -228,15 +258,23 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC2 · the tail variant
   reason to unit 88. AC3 counts code lines for the new text and the whole file for the old one. §4
   Evidence re-probes at HEAD; Rollout names units 77 and 79 ahead and the shared suite. Citations
   move to `path#symbol` or blob-pinned lines.
+- rev-4 · 2026-11-21 · §1 to §10 · S1 · S3 · AC1 · AC3 · re-grounded over unit 79 as landed at
+  `08f226f3d`, per 2026-11-19-prompt-TOOL-dWitnessedBar-80-reground2-brief. S1 and S3 become the tail
+  call's three arguments to `check_key_variant` (replacement, label `tail `, passed reason), with the
+  header comment's two clauses on the tail variant; §3 names the function as unit 79's (its §8 F5).
+  AC1 spells its edit; AC3 adds the call's label and reason and the old reason's absence. §4 Evidence
+  re-probes through the landed function at HEAD, with the row at 797; Rollout names unit 81 alone
+  ahead.
 
 ## 10. Reuse audit
 
-The seam is `TOOL-dWitnessedBar-76`'s per-key liveness loop over `CANARY_KEYS` in
-`tools/run-gates/run-gates.gov.test.sh`, whose one replacement text changes, with the liveness control
-of `tools/run-gates/run-gates.evidence.test.sh@648a4d5d5:2327-2336`.
+The seam is `TOOL-dWitnessedBar-79`'s `tools/run-gates/run-gates.gov.test.sh#check_key_variant`,
+called from `TOOL-dWitnessedBar-76`'s per-key liveness loop over `CANARY_KEYS`, whose tail call's
+arguments change, with the liveness control of
+`tools/run-gates/run-gates.evidence.test.sh@648a4d5d5:2327-2336`.
 `python tools/codebase-map/reuse_lookup.py "prove each condition of a two-condition check can fail on its own variant"`,
-re-run at `648a4d5d5` on 2026-11-21, ranked `check`, `fail`, `checks` and `check_line` first, none a
-variant that isolates one condition of a comparison, so no existing seam fits beyond the loop named
-above.
+re-run at `09179148e` on 2026-11-21, ranked `check`, `fail`, `checks` and `check_line` first, none a
+variant that isolates one condition of a comparison, so no existing seam fits beyond the function
+named above.
 
 Recall terms used: `python tools/memory-recall/query.py "how is each condition of a canary byte check seen red, and who restates the assertion floor" --terms "canary liveness variant length tail CR byte check FLOOR_ASSERTIONS restated floor owner seen red"`
