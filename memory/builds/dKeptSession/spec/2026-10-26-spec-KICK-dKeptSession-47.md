@@ -1,6 +1,6 @@
 # KICK-dKeptSession-47 — a compaction counts towards a model's window only when the session's last main usage before it is on that model
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 14 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,9 @@
 |---|---|---|
 | [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-build-KICK-dKeptSession-47-deviation-471.md](../build/2026-10-26-build-KICK-dKeptSession-47-deviation-471.md) | deviation | — |
+| [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-48 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-36 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-1 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-48 |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 
 <!-- /gen:spec-records -->
@@ -22,13 +24,14 @@ The spec audit of this build's fifteen round-1 promotions
 confirmed finding **id 16 at HIGH**, report item **H2**, which no other HIGH id shares. Id 44 is the
 same defect at MEDIUM, item M25, batched into `KICK-dKeptSession-56`, whose item observes this fix.
 
-`KICK-dKeptSession-30` S1 folds "the largest `pre_tokens` of the `compact` events" into every
-model's observation, with no model filter. `extract_session` builds a compact event as `{t, kind,
-src, trigger, pre_tokens}` and carries no `model` (`tools/runlog/extract.py:818-821`), while a usage
-event carries one (`:834-836`). So one 1M compaction among the newest 20 transcripts puts every model
-on the node on the 1M rung, the 95946-maximum `claude-opus-4-8` of unit 30 §4 included, and a
-200k-window session of that model reads a fifth of its true fill. This unit ties each compaction to
-the model it compacted. It repairs `KICK-dKeptSession-30` and builds one step after it (order 14).
+`KICK-dKeptSession-30` S1 folds "the largest integer `pre_tokens` of its `compact` events" into
+every model's observation, with no model filter. `_build_events` builds a compact event as `{t,
+kind, src, trigger, pre_tokens}` and carries no `model`, while a usage event carries one
+(`tools/runlog/extract.py#_build_events`). So one 1M compaction among the newest 20 transcripts
+puts every model on the node on the 1M rung, the `claude-opus-4-8` of unit 30's 2026-10-26 probe
+included, and a 200k-window session of that model reads a fifth of its true fill. This unit ties
+each compaction to the model it compacted. It repairs `KICK-dKeptSession-30`, unbuilt at base
+`c2a407b0` and built at order 13, and builds one step after it (order 14).
 
 ## 2. Scope (IN)
 
@@ -38,18 +41,22 @@ the model it compacted. It repairs `KICK-dKeptSession-30` and builds one step af
   Observed by AC1 and AC2.
 - **S2** — id 16. The fixture. One scenario in `tools/runlog/fixtures/transcripts.json`,
   `context-window-compact-other`: one main usage of 50000 tokens on `other-model`, then a compaction
-  whose `compactMetadata.preTokens` is 900000, written the way the store's other scenarios are; and
-  `context-window-compact-own`, the same with the usage on `fixture-model`. Observed by AC1 and AC2.
+  whose `compactMetadata.preTokens` is 900000, written the way the store's other scenarios are, a
+  key of its `scenarios` table holding an `about` string and a `main` list of records, the
+  compaction a `system` record of subtype `compact_boundary`; and `context-window-compact-own`, the
+  same with the usage on `fixture-model`. Observed by AC1 and AC2.
 - **S3** — id 16. The sibling text superseded by name. `KICK-dKeptSession-30` S1 step 2's "and the
-  largest `pre_tokens` of the `compact` events" reads as S1 here, and unit 30 §4 Evidence's "so the
-  scan needs no new parser field" holds: the attribution reads only fields `extract_session` already
-  yields. Answered in unit 30's acceptance ledger. Observed by AC1.
+  largest integer `pre_tokens` of its `compact` events" reads as S1 here, and unit 30's Evidence
+  bullet "so the scan needs no new parser field" holds: the attribution reads only fields
+  `extract_session` already yields. Answered in unit 30's acceptance ledger. Observed by AC1.
 
 ## 3. Non-goals (OUT)
 
 - A `model` field on the compact event. The attribution is a fold over events the extractor already
   yields, so no parser field and no change to `extract_session`'s output.
 - Two windows on one model: id 43, `KICK-dKeptSession-48`.
+- The compaction's own `src`, a sidechain record and a non-integer `pre_tokens`:
+  `KICK-dKeptSession-62` S11, S12 and S25.
 - The report's left-shift checklist entry, that an aggregate keyed by a field names where each folded
   event kind gets it. No clause of this build names that checklist; AC1 is its arm here.
 
@@ -63,12 +70,17 @@ the model it compacted. It repairs `KICK-dKeptSession-30` and builds one step af
 
 ### Evidence
 
-- The compact event: `events.append({"t": t, "kind": "compact", "src": src, "trigger": trigger,
-  "pre_tokens": pre})` (`tools/runlog/extract.py:818-821`); the usage event carries `"model":
-  model` (`:834-836`). Events are sorted by `t` (`:837`), so "the newest main usage before it" is a
-  walk of one sorted list.
-- Unit 30 §4 records eight compactions on this node between 834709 and 949239 `preTokens`, beside a
-  95946 maximum on `claude-opus-4-8`: an unfiltered fold lifts that model to the 1M rung.
+- `_build_events` appends the compact event as `{"t": t, "kind": "compact", "src": src, "trigger":
+  trigger, "pre_tokens": pre}` and the usage event with `"model": model`, then sorts every event by
+  `t` (`tools/runlog/extract.py#_build_events`), so "the newest main usage before it" is a walk of
+  one sorted list. `_scan_record` reads `pre` from a `compact_boundary` record's
+  `compactMetadata.preTokens` (`tools/runlog/extract.py#_scan_record`).
+- Unit 30's Evidence, as rev-3 pins it, holds 76 compaction records on this node (PINNED, 2026-11-21)
+  whose `preTokens` lie between 208465 and 988875 (PINNED, 2026-11-21), and a 95946 main maximum on
+  `claude-opus-4-8` from its earlier probe (PINNED, 2026-10-26): an unfiltered fold lifts that model
+  to the 1M rung.
+- `derive_context_window` is not in the tree at `c2a407b0`: unit 30 mints it, so this unit edits
+  unit 30's landed fold.
 
 ### The fold
 
@@ -92,7 +104,7 @@ None: no stored state holds a window.
 
 - `tools/runlog/extract.py`: S1 in `derive_context_window`
 - `tools/runlog/fixtures/transcripts.json`: S2
-- `tools/runlog/selftest.py`: the cases of §6
+- `tools/runlog/selftest.py`: the cases of the Acceptance criteria
 
 ### Alternatives rejected
 
@@ -110,14 +122,16 @@ None: no stored state holds a window.
 - observability — the source line still names the observation that set the rung.
 - risks — a model switch inside one turn could attribute a compaction to the model switched to; the
   harness compacts between turns, so the newest usage is the compacted context's.
-- testing — the cases of §6 and the arm in §7.
+- testing — the cases of the Acceptance criteria and the arm on the Gates line.
 - migration — none.
 - user docs — none beyond unit 30 S5's paragraph, which names no compaction rule.
 
 ## 6. Acceptance criteria
 
 The fixture is a scratch projects root under `%TEMP%` holding unit 30's `context-window` transcript
-and S2's scenarios as each criterion says.
+and S2's scenarios as each criterion says, each written by `build_scenario`
+(`tools/runlog/selftest.py#build_scenario`). Every read runs with `CLAUDE_CODE_MAX_CONTEXT_TOKENS`
+removed, so unit 30's rung 1 decides nothing.
 
 - **AC1** — When `runlog.py context` reads `context-window`, a 150000-token turn on `fixture-model`,
   from a root that also holds `context-window-compact-other`, it prints `75%` and the source
@@ -130,7 +144,7 @@ and S2's scenarios as each criterion says.
 
 ## 7. Gates
 
-`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/runlog/selftest.py · covers AC1 AC2 · an other-model compaction and an own-model one beside the 150000 turn, staged red by a copy of `extract.py` folding every compaction · none
 
@@ -143,15 +157,24 @@ none
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 promotions' audit, H2 (id 16).
 - rev-2 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-62` mirrored, the other ends of
   the edges the round-2 promotions' audit's disposal declared
+- rev-3 · 2026-11-21 · §1 · S2 · S3 · §3 · §4 · §5 · §6 · §7 · §10 · re-grounded on the run's BASE
+  `c2a407b0` under the brief `2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief`.
+  Every line-number citation re-cited by symbol; the Gates line names `policy fixtures`, which
+  `extract.py` trips; S3 quotes unit 30 S1 as rev-3 words it; the Evidence's compaction figures
+  re-read from unit 30 rev-3 and pinned; S2 names the store's record shape; every read drops the
+  ambient window variable. Narrowed: §3 hands the compaction's source and a missing `pre_tokens` to
+  unit 62. No landed unit satisfies an item: unit 30 is unbuilt.
 
 ## 10. Reuse audit
 
-The seam extended is `extract_session`'s sorted event list (`tools/runlog/extract.py:818-837`), read
-inside unit 30's `derive_context_window`; no parser field is added. `python
-tools/codebase-map/reuse_lookup.py "attribute a compaction event to the model of the session it ran
-in"` ranked `add_health_event`, `build_run_model` (`tools/runlog/model.py`), `extract_session` and
-`resolve_session_tree`; `build_run_model` assembles a run's rows and attributes no compaction, and
-`extract_session` is the seam named here.
+The seam extended is `_build_events`'s sorted event list (`tools/runlog/extract.py#_build_events`),
+returned by `extract_session` and read inside unit 30's `derive_context_window`; no parser field is
+added. Re-run at `c2a407b0`, `python tools/codebase-map/reuse_lookup.py "attribute a compaction
+event to the model of the session it ran in"` ranked `add_health_event`, `build_run_model`
+(`tools/runlog/model.py`), `extract_session` and `resolve_session_tree`; `build_run_model`
+assembles a run's rows and attributes no compaction, and `extract_session` is the seam named here.
+The recall query below returned this build's own specs 47 and 30; no landed unit attributes a
+compaction to a model.
 
 Recall terms used: `python tools/memory-recall/query.py "which model does a compaction's
 preTokens belong to" --terms "compact pre_tokens preTokens model usage window rung observation

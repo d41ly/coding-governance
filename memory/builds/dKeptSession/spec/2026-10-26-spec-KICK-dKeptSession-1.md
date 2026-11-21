@@ -1,6 +1,6 @@
 # KICK-dKeptSession-1 — the named presets as data, their completeness check, pair rules and core-only load
 
-**Status:** INPROGRESS · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 1 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 1 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0139@065e06ab whole
 **Carries:** node:policy-key.preset
@@ -23,6 +23,7 @@
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-05-build-KICK-dKeptSession-1-deviation-13.md](../build/2026-11-05-build-KICK-dKeptSession-1-deviation-13.md) | deviation | — |
 | [2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md](../build/2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md) | research | KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 |
+| [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-36 KICK-dKeptSession-27 KICK-dKeptSession-24 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-1-reuse-scout.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-1-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-2-reuse-scout.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-2-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-3-reuse-scout.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-3-reuse-scout.md) | journal | — |
@@ -43,7 +44,9 @@
 | [2026-11-05-prompt-KICK-dKeptSession-1-1-spec-writer.md](../prompts/2026-11-05-prompt-KICK-dKeptSession-1-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md](../prompts/2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md) | research | KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-20 KICK-dKeptSession-25 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-1-2-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-2-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-1-divergence-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-divergence-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-1-orders-1-2-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-orders-1-2-reground-brief.md) | research | KICK-dKeptSession-19 KICK-dKeptSession-33 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -111,8 +114,10 @@ register holds pending for this build, so every reader in this build reads one s
   refusal whose key and value no `[[selects]]` row names. The row-named half reds a row-named pair
   the rule refuses and the load admits; where the rule admits a row-named pair the preset assigns,
   it prints `presets-core-only · not graded · TOOL-dDeclaredLoop-2 S8 admits after-release-verifies`
-  and counts no finding, so the half grades the moment the ask's judgement refuses. Its row in the
-  README's "Each arm in an adopter" table (`tools/policy/README.md`). Observed by AC2, AC7 and AC9.
+  and counts no finding, so the half grades the moment the ask's judgement refuses. Where
+  `resolve_kit_dir("loop", ...)` misses, both halves print `not graded · the loop kit does not
+  resolve` and count no finding (§8 F7). Its row in the README's "Each arm in an adopter" table
+  (`tools/policy/README.md`) says both. Observed by AC2, AC7, AC9 and AC13.
 - **S6** — The preset kind (shared interface I2): the `kind.preset` row of
   `tools/playbook/kinds.toml` gains its `population` (`{prefix}/policy/presets.toml`), `factory`
   (`python {prefix}/loop/factories.py preset`), `gate` (`policy check`), `summary` and `usage`, and its
@@ -124,7 +129,7 @@ register holds pending for this build, so every reader in this build reads one s
   guarded write, its gate `arm_presets` run in process as `run_policy_key_arms` runs its arms
   (`tools/loop/factories.py#run_policy_key_arms`), every held byte put back on a red. The `policy
   check` leg already enforces the kind's one bind, `principle.p16` (`tools/gate-legs.json`), so no
-  leg changes. The kinds reference page re-renders from the row (`help/reference/kinds.md`).
+  leg's `enforces` changes. The kinds reference page re-renders from the row (`help/reference/kinds.md`).
   Observed by AC10.
   **Readers:** by name: `tools/playbook/core.py`, whose `kinds` and `meta-check` verbs read the
   pending list through `read_pending`, and `tools/playbook/render_playbook.py`, whose kinds page
@@ -290,6 +295,10 @@ set build.closes after-release-verifies` is admitted as before.
 - `tools/loop/README.md`: the verb and the seventh factory
 - `tools/playbook/kinds.toml`: the `kind.preset` row
 - `tools/playbook/core-pending.txt`: the row out
+- `tools/gate-legs.json`: the `policy fixtures` row's `guard` gains `{prefix}/loop/` and
+  `{prefix}/playbook/layers.toml`, the two paths §6's copy reads, which its guard trace grades WRONG
+  today (`tools/policy/check_policy.py#check_guard_trace`); the path trips `run-gates canary`, `run-gates
+  gov canary`, `measure-legs selftest` and `policy fixtures`, each on §7's leg line
 - `help/reference/kinds.md`: re-rendered by `render_playbook.py --reference`
 - `help/policy.md`
 
@@ -316,7 +325,8 @@ set build.closes after-release-verifies` is admitted as before.
 - perf / scale — one TOML read per check; the arm runs two `guard.py` subprocesses per preset, never
   one per key.
 - error / empty / loading states — an absent store is a refusal naming `presets.toml`; a malformed
-  one is a finding naming its line; an unreadable verb line is a refusal naming it.
+  one is a finding naming its line; an unreadable verb line is a refusal naming it; an adopter
+  without the loop kit reads the load halves announced, never a finding (§8 F7).
 - observability — every finding names the preset and the key; the load names the key, the value and
   the point; the row-named half prints why it is not graded.
 - risks — a key another build adds after this unit lands has no preset value, `new policy-key`'s
@@ -330,8 +340,8 @@ set build.closes after-release-verifies` is admitted as before.
 
 The policy fixture is `check_policy.py --fixture`: one scratch repository per case under `%TEMP%`
 with a short prefix, the kit copied at its own path, a policy file committed with a remote-tracking
-ref. A case reaching the loop kit also copies the loop and playbook kits and the kits the loop
-kit's descriptor `requires`, each at its own path.
+ref. A case reaching the loop kit also copies the loop kit whole and the playbook kit's
+`layers.toml`, each at its own path, the two paths the `policy fixtures` guard gains (§4).
 
 - **AC1** — When `python presets.py check` runs in the policy kit, it exits 0 and prints the four
   preset names with one presettable count for each.
@@ -390,12 +400,16 @@ kit's descriptor `requires`, each at its own path.
   --expansion` runs at the repository root, it exits 0 and prints no refusal; fed the line `x` it
   exits 2 naming the line.
   Red when: the verb is absent, refuses a core-declared point, or reads an unparsed line as admitted.
+- **AC13** — When `python check_policy.py --fixture adopter-fresh-target` runs, each installed
+  `--check` prints `arm_presets` graded with no finding and both load halves' `not graded · the loop
+  kit does not resolve`, and the README's `arm_presets` row joins `ARMS`.
+  Red when: the arm reds a target without the loop kit, or prints a half graded there.
 
 ## 7. Gates
 
 `govkit acceptance matrix` · `playbook render selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy check` · `policy fixtures` · `loop guard fixtures` · `loop factories fixtures` · `core kinds` · `core meta-check` · `help reference pages` · `scratch-guard self-test` · `build-index selftest` · `gotchas selftest` · `routed-commits selftest` · `memory-recall kit selftest` · `recall floor` · `recall floor arms`
 
-New arm: tools/policy/check_policy.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC9 · the four `presets-*` cases' plants, each staged on a copy of the shipped store, the loader or the register · none
+New arm: tools/policy/check_policy.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC9 AC13 · the four `presets-*` cases' plants, each staged on a copy of the shipped store, the loader or the register, and `adopter-fresh-target`'s halves check · none
 New arm: tools/loop/factories.py · covers AC10 · the `preset-new` plant's factory run and the `preset-from-unknown` plant's `--from nope` · none
 
 ## 8. Open questions
@@ -456,6 +470,13 @@ New arm: tools/loop/factories.py · covers AC10 · the `preset-new` plant's fact
   value; (b) a value per preset chosen here, a posture no record of the owner's states; (c) the never
   list, which v2 closes. RESOLVED (agent, 2026-11-21, delegated): (a), rung 3; the only option
   every rule holds under with nothing invented. widens: none · relaxes: none
+- **F7 — What do the load halves do where the loop kit does not resolve?** `adopter-fresh-target`
+  installs policy, its `requires` closure and run-gates (`tools/policy/README.md`, "Each arm in an
+  adopter"), no loop kit, so a miss under `empty = "finding"` reds that adopter. (a) Each half
+  prints `not graded · the loop kit does not resolve`, no finding, the store still graded, as the
+  loop kit's cross-kit reads degrade (`tools/loop/kit.toml#requires`); (b) a finding; (c) a `loop`
+  edge on the policy kit, a kit no policy read needs. RESOLVED (agent, 2026-11-21, delegated): (a),
+  rung 3, the main loop's ruling on run `wf_c7d6ba36-6f3`. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -478,6 +499,9 @@ New arm: tools/loop/factories.py · covers AC10 · the `preset-new` plant's fact
   satisfied; the factory moves into `factories.py`; the row-named half prints not graded while the
   ask is open. Added: S8, the verb (F5), the seed's cell rules and the six rows v2 lacks (F6), AC12,
   the factories arm; every line-number citation re-cited by symbol or blob pin.
+- rev-6 · 2026-11-21 · S5 S6 · §4 · §5 · §6 · AC13 · §7 · §8 F7 · the divergence ruled under the
+  brief `2026-11-21-prompt-KICK-dKeptSession-1-divergence-brief`: `tools/gate-legs.json` rejoins
+  Files touched, correcting rev-5's "already satisfied"; the halves announce a missing loop kit (F7).
 
 ## 10. Reuse audit
 

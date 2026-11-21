@@ -1,6 +1,6 @@
 # KICK-dKeptSession-48 — the mixed-window limit stated, and a 200k session on a 1M-observed model read against its own window by the harness's variable
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 14 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,9 @@
 |---|---|---|
 | [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-build-KICK-dKeptSession-48-deviation-481.md](../build/2026-10-26-build-KICK-dKeptSession-48-deviation-481.md) | deviation | — |
+| [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-36 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-1 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 
 <!-- /gen:spec-records -->
@@ -22,14 +24,15 @@ The spec audit of this build's fifteen round-1 promotions
 confirmed finding **id 43 at HIGH**, report item **H8**, which no other id shares.
 
 `KICK-dKeptSession-30` S1 rung 2 takes the largest observation per model id across the node's newest
-20 transcripts, and its §4 Evidence records that the model id reads `claude-opus-5-5` for the 200k
+20 transcripts, and its Evidence records that the model id reads `claude-opus-5-5` for the 200k
 and the 1M window alike. So on a node that has logged any 1M session, every 200k session of that
 model is read against the 1M rung: its fill reads a fifth of the truth, `fresh-at-boundary` at 60%
-never fires, and the harness compacts first. Unit 30 §5 prices only the opposite direction, and its
-AC2 asserts the 15% that is wrong for a 200k session. No transcript field tells the two windows
-apart, so this unit states the limit where the derivation and its readers are documented, names
-the override that answers it, and observes the override on the mixed-window root. It repairs
-`KICK-dKeptSession-30` and builds one step after it (order 14).
+never fires, and the harness compacts first. Unit 30's risks line prices only the opposite
+direction, and its AC2 asserts the 15% that is wrong for a 200k session. No transcript field tells
+the two windows apart, so this unit states the limit where the derivation and its readers are
+documented, names the override that answers it, and observes the override on the mixed-window
+root. It repairs `KICK-dKeptSession-30`, unbuilt at base `c2a407b0` and built at order 13, and
+builds one step after it (order 14).
 
 ## 2. Scope (IN)
 
@@ -37,26 +40,27 @@ the override that answers it, and observes the override on the mixed-window root
   `tools/runlog/extract.py` states that every session of a model observed past 200000 on the node
   reads the 1M rung, a 200k session of that model included, and that the session's override is
   `CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000`, rung 1. Observed by AC2.
-- **S2** — id 43. The limit for the owner. `help/orientation-card.md`'s `context —` paragraph
-  (`KICK-dKeptSession-30` S5) gains one sentence: on a node that runs one model at both windows, a
-  200k session sets `CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000` or reads its fill against the larger
-  window. Observed by AC3.
+- **S2** — id 43. The limit for the owner. `help/orientation-card.md`'s `context —` paragraph, which
+  `KICK-dKeptSession-14` S9 writes in the section "When a session resumes" and
+  `KICK-dKeptSession-30` S5 re-words, gains one sentence: on a node that runs one model at both
+  windows, a 200k session sets `CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000` or reads its fill against the
+  larger window. Observed by AC3.
 - **S3** — id 43. The override observed on the mixed root. A selftest case reads unit 30's AC2 root,
   the 150000-token `context-window` beside the 900000-token `context-window-sibling`, with the
   variable set to 200000. Observed by AC1.
-- **S4** — id 43. The sibling text superseded by name. `KICK-dKeptSession-30` §5's risks line, which
+- **S4** — id 43. The sibling text superseded by name. `KICK-dKeptSession-30`'s risks line, which
   prices only a model never observed past 200k, reads both directions as S1 states them, and unit 30
   AC2's `15%` is the 1M session's share, never a 200k session's. Answered in unit 30's acceptance
   ledger. Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
-- A per-session window signal. No transcript record names the window (unit 30 §4 Evidence), so
-  none is derived; §8 F1 records the options.
+- A per-session window signal. No transcript record names the window (unit 30's Evidence), so
+  none is derived; F1 under Open questions records the options.
 - Whether the harness itself honours the variable for a first-party model: id 17, the batch's
   item, `KICK-dKeptSession-56`.
-- The report's left-shift checklist entry, that §5 risks prices both directions of every derived
-  threshold. No clause of this build names that checklist.
+- The report's left-shift checklist entry, that a risks line prices both directions of every
+  derived threshold. No clause of this build names that checklist.
 
 ### Edges
 
@@ -67,10 +71,14 @@ the override that answers it, and observes the override on the mixed-window root
 
 ### Evidence
 
-- Unit 30 §4: "The `model` field reads `claude-opus-5-5` whatever the window, and a grep for
-  `contextWindow` and `context_window` over the transcripts printed nothing."
+- Unit 30's Evidence, rev-3: "No transcript record names the window. The `model` field reads
+  `claude-opus-5-5` whatever the window, and a grep for `contextWindow` and `context_window` over
+  the transcripts printed nothing."
 - Unit 30 S1 rung 1 reads `CLAUDE_CODE_MAX_CONTEXT_TOKENS` first when it is a positive integer, with
-  source `env`.
+  source `env`, and its S2 prints `context: window <tokens> · <source>` on stderr.
+- `help/orientation-card.md` holds the section "When a session resumes" at `c2a407b0`, and no
+  `context —` paragraph yet: units 14 and 30 write it, so this unit edits their landed paragraph.
+- `derive_context_window` is not in the tree at `c2a407b0`: unit 30 mints it.
 
 ### The reads on the mixed root
 
@@ -96,9 +104,10 @@ None.
 ### Alternatives rejected
 
 - **The session's own maximum ranked above the node's.** A fresh 1M session would read its first
-  200k against the 200k rung, unit 30 §4's rejected alternative.
+  200k against the 200k rung, unit 30's own rejected alternative.
 - **The smaller rung whenever the node holds both.** It reverses the error for every 1M session,
-  which is the more common window on this node by unit 30 §4's measurement.
+  the more common window on this node, as unit 30 rev-3 pins it: its probe read 48963 of its
+  57351 main usages above 200000 (PINNED, 2026-11-21 for both counts and the line before).
 
 ## 5. Production-readiness checklist
 
@@ -109,7 +118,7 @@ None.
   200k session reading the 1M rung shows the rung it read.
 - risks — a 200k session with no override on a mixed node errs towards a late boundary act; S2 tells
   the owner the remedy.
-- testing — the case of §6 and the arm in §7.
+- testing — the case of the Acceptance criteria and the arm on the Gates line.
 - migration — none.
 - user docs — `help/orientation-card.md`, S2.
 
@@ -129,7 +138,7 @@ None.
 
 ## 7. Gates
 
-`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/runlog/selftest.py · covers AC1 · the mixed root read with the variable at 200000, staged red by a copy of `extract.py` ranking the observation above the variable · none
 
@@ -147,14 +156,23 @@ New arm: tools/runlog/selftest.py · covers AC1 · the mixed root read with the 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 promotions' audit, H8 (id 43).
 - rev-2 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-62` mirrored, the other ends of
   the edges the round-2 promotions' audit's disposal declared
+- rev-3 · 2026-11-21 · §1 · S2 · S4 · §3 · §4 · §5 · §7 · §10 · re-grounded on the run's BASE
+  `c2a407b0` under the brief `2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief`.
+  The Gates line names `policy fixtures`, which `extract.py` trips; the Evidence quotes unit 30
+  rev-3 and records that the help page's resume section stands and its `context —` paragraph is
+  unbuilt; S2 names the section and the two units that write the paragraph; the more-common-window
+  claim re-read from unit 30 rev-3 and pinned; every section-number reference to unit 30 named by
+  its section. Nothing narrowed: units 14 and 30 are unbuilt, so no landed unit satisfies an item.
 
 ## 10. Reuse audit
 
 The seam is unit 30's own rung 1, the harness's `CLAUDE_CODE_MAX_CONTEXT_TOKENS`, which this unit
-documents and observes rather than adding a second override. `python
+documents and observes rather than adding a second override. Re-run at `c2a407b0`, `python
 tools/codebase-map/reuse_lookup.py "derive the context window size of a model from observed session
-usage"`, unit 30's probe, ranked `extract_session` and `resolve_session_tree`; neither tells two
-windows apart, so no existing seam fits a per-session signal and none is minted.
+usage"`, unit 30's probe, ranked `usage` in `tools/unattended/unattended.sh` and `derive_*`
+functions of other kits by name stem only; none tells two windows apart, so no existing seam fits a
+per-session signal and none is minted. The recall query below returned this build's own specs 30
+and 48, scout C's row for unit 14 and the two spec audits; no landed unit reads a window.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a 200k session read its fill on a
 node that also runs 1M sessions" --terms "context window rung CLAUDE_CODE_MAX_CONTEXT_TOKENS 200000

@@ -34,7 +34,7 @@ guarded legs to the Gates lines of specs 6, 7, 21, 24 and 25 as leg-line-only re
 - 44 S35: already satisfied (unit 14 withdraws AC7, its S6 points at KICK-dKeptSession-13 AC5).
 - 44 S14: orient-calls row fields and CAP_CASES entry now built by unit 9 S6, S10; S14 reduces to observation. 44 S40: unit 9 S4 reuses _derive_quartiles; only derive_spent_tokens left.
 - 56 S21: read the main-file-only SessionTree unit 30 S1 builds; only derive_main_transcripts left. 56 S12: re-quote unit 30's non-goal ("about two seconds", 2.14 s main file only). 56 AC10: count derive_main_transcripts, not build_session_tree (as spec 62 S7 says). 56 S26: met for unit 30.
-- 44 S8: assumes BOUNDARY_BOUND_S = 10 and an 8 s hook budget; unit 13 no longer mints it (detached verb, per-step bounds). 44 S10: met by 13's S6. 44 AC20 premise holds.
+- 44 S8: assumes BOUNDARY_BOUND_S = 10 and a fixed hook budget; unit 13 no longer mints it (detached verb, per-step bounds). 44 S10: met by 13's S6. 44 AC20 premise holds.
 - 43: item — skipped form now ends ' · at <sha8>' (item — skipped: <why> · at <sha8>).
 - 10, 21: the boundary verb's output reaches the session at the next shell call after it finishes (detached, --out <file>), not the same call.
 - 56: read_claude_version prints 'unknown: <why>' with exit 1 when no version.

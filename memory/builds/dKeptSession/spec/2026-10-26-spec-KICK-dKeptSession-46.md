@@ -1,6 +1,6 @@
 # KICK-dKeptSession-46 — every fill reader passes the projects root it already resolved, so the window is derived under the tree the reader reads
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 14 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,9 @@
 |---|---|---|
 | [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-build-KICK-dKeptSession-46-deviation-461.md](../build/2026-10-26-build-KICK-dKeptSession-46-deviation-461.md) | deviation | — |
+| [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-36 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-1 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-47 KICK-dKeptSession-48 |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 
 <!-- /gen:spec-records -->
@@ -27,11 +29,12 @@ paths that have a root of their own.
 transcript's parent's parent, and `derive_context_fill(ev)` under the default root, so that
 `KICK-dKeptSession-9`'s per-stage rows "read the same window with no change to their call". Unit 9
 reads its sessions from `<dir>`, the `--orient` argument, yet its `context` column would derive the
-window under whatever root the process environment names. In the runlog selftest that is
-`build_arm_env`'s decoy (`tools/runlog/selftest.py:1514-1520`), and on a node it is the real tree,
-so one transcript reads one share from `runlog.py context` and another from unit 9's column. This
-unit makes every caller pass the root it resolved. It repairs `KICK-dKeptSession-30` and builds one
-step after it (order 14).
+window under whatever root the process environment names. In the runlog selftest that is the arm's
+own scratch root, which `build_arm_env` aims every `DECOY_VARS` member at
+(`tools/runlog/selftest.py#build_arm_env`), and on a node it is the real tree, so one transcript
+reads one share from `runlog.py context` and another from unit 9's column. This unit makes every
+caller pass the root it resolved. It repairs `KICK-dKeptSession-30`, unbuilt at base `c2a407b0` and
+built at order 13, and builds one step after it (order 14).
 
 ## 2. Scope (IN)
 
@@ -40,8 +43,9 @@ step after it (order 14).
   root=root)`; with neither, it raises `ValueError("derive_context_fill: pass window= or root=")`.
   It never falls back to a default root. Observed by AC1 and AC3.
 - **S2** — id 38. Unit 9's reader. `measure_orient_tree(root, repo, slug)`
-  (`KICK-dKeptSession-9` S1) computes each row's `context` as `derive_context_fill(ev, root=root)`,
-  `root` being its own first argument, the `--orient <dir>` it reads. Observed by AC1.
+  (`KICK-dKeptSession-9` S1) computes each row's `context` (`KICK-dKeptSession-9` S2) as
+  `derive_context_fill(ev, root=root)`, `root` being its own first argument, the `--orient <dir>` it
+  reads. Observed by AC1.
 - **S3** — id 38. The context verb. `runlog.py context <transcript>` keeps unit 30 S2's root, the
   transcript's parent's parent, passed to `derive_context_window` as `root=`; a transcript under
   `<dir>/<project>/` therefore reads the window under the same `<dir>` unit 9's row reads it under.
@@ -57,6 +61,7 @@ step after it (order 14).
 - How often the window is derived per run: the batch's items for ids 10, 20 and 45,
   `KICK-dKeptSession-56`.
 - The window's rungs and observation: `KICK-dKeptSession-30`.
+- The context verb's root for an agent transcript, four levels up: `KICK-dKeptSession-62` S10.
 
 ### Edges
 
@@ -70,19 +75,23 @@ step after it (order 14).
 ### Evidence
 
 - `build_arm_env(base)` copies `os.environ` and aims every `DECOY_VARS` root at the arm's scratch
-  (`tools/runlog/selftest.py:1516-1521`), so a reader that resolves its own root inside an arm reads
-  the decoy, never the arm's fixture.
-- `runlog.py`'s other verbs resolve `resolve_projects_root(override=args.transcripts)` once per
-  call (`tools/runlog/runlog.py:300`, `:324`): a reader takes a root it was given, never one of its
-  own.
-- `KICK-dKeptSession-9` S2 calls `derive_context_fill(ev)` for every main and agent file row.
+  (`tools/runlog/selftest.py#build_arm_env`, `tools/runlog/selftest.py#DECOY_VARS`), so a reader that
+  resolves its own root inside an arm reads that scratch, never the arm's fixture.
+- `runlog.py`'s transcript verbs each resolve `resolve_projects_root(override=args.transcripts)` once
+  per call and pass the root down (`tools/runlog/runlog.py#cmd_prose`,
+  `tools/runlog/runlog.py#cmd_narration`): a reader takes a root it was given, never one of its own.
+- `KICK-dKeptSession-9` S1 reads the main file and each agent file of a session as one row each, and
+  its S2 computes every row's `context` as `derive_context_fill(ev)`.
+- None of `derive_context_fill`, `derive_context_window`, `measure_context_fill` or
+  `measure_orient_tree` is in the tree at `c2a407b0`: units 14, 30 and 9 mint them (DERIVED, a
+  `git grep` of the four names over `tools/`, `skills/` and `help/` at `c2a407b0`, no hit).
 
 ### The calls
 
 ```
 measure_context_fill(t)                  -> window under t.parent.parent         (unit 30 S2, unchanged)
 measure_orient_tree(dir, ...)            -> derive_context_fill(ev, root=dir)    (S2)
-runlog.py context t                      -> measure_context_fill(t)                  (S3)
+runlog.py context t                      -> measure_context_fill(t)              (S3)
 derive_context_fill(ev)                  -> ValueError                           (S1)
 ```
 
@@ -92,12 +101,12 @@ No identifier is minted. `derive_context_fill` gains a keyword-only `root`.
 
 ### Migration
 
-None: unit 9 and unit 30 are unbuilt at this base, so no tracked caller spells the old call.
+None: unit 9 and unit 30 are unbuilt at `c2a407b0`, so no tracked caller spells the old call.
 
 ### Files touched (estimate)
 
 - `tools/runlog/extract.py`: S1, and S2 in `measure_orient_tree`
-- `tools/runlog/selftest.py`: the cases of §6
+- `tools/runlog/selftest.py`: the cases of the Acceptance criteria
 
 ### Alternatives rejected
 
@@ -114,21 +123,25 @@ None: unit 9 and unit 30 are unbuilt at this base, so no tracked caller spells t
   observation reads unit 30's bottom rung.
 - observability — `runlog.py context` already names the window's source.
 - risks — a future caller must pass a root; S1 refuses loudly where it does not.
-- testing — the cases of §6 and the arm in §7.
+- testing — the cases of the Acceptance criteria and the arm on the Gates line.
 - migration — none.
 - user docs — none: no page under `help/` names the reader's signature.
 
 ## 6. Acceptance criteria
 
-The fixture is unit 9's `--orient` projects dir under `%TEMP%`, holding unit 30's
-`context-window-sibling` transcript as a session whose `Edit` follows its 900000-token turn, read
-inside `build_arm_env`.
+The fixture is unit 9's `--orient` projects dir under `%TEMP%`: one main transcript, written by
+`write_transcript_lines` (`tools/runlog/selftest.py#write_transcript_lines`), that runs
+`unattended.sh --preflight fx` as unit 9's fixture does, then carries unit 30's
+`context-window-sibling` 900000-token main usage on `fixture-model`, then one `Edit`; and unit
+9's fixture repository. Every read runs inside `build_arm_env` with `CLAUDE_CODE_MAX_CONTEXT_TOKENS`
+removed.
 
-- **AC1** — When `python runlog.py extract --orient <dir> --slug fx --repo <repo>` runs inside
-  `build_arm_env`, the row's `context` reads `90%`.
-  Red when: the window is derived under the decoy root, which holds no observation and reads `450%`.
-- **AC2** — When `python runlog.py context <transcript>` runs inside `build_arm_env` on AC1's
-  transcript under `<dir>`, it prints `90%`, the same share as AC1's row.
+- **AC1** — When `python runlog.py extract --orient <dir> --slug fx --repo <repo>` runs, the main
+  file's `orient row` carries `context=90%`.
+  Red when: the window is derived under the arm's scratch root, which holds no observation, and the
+  row carries `context=450%`.
+- **AC2** — When `python runlog.py context <transcript>` runs on AC1's transcript under `<dir>`, it
+  prints `90%`, the same share as AC1's row.
   Red when: the two readers print two shares for one transcript.
 - **AC3** — When a probe calls `extract.derive_context_fill(ev)` with neither `window` nor `root`,
   it raises `ValueError` naming `root=`.
@@ -136,9 +149,9 @@ inside `build_arm_env`.
 
 ## 7. Gates
 
-`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 · the sibling transcript under an `--orient` dir inside the decoy environment, staged red by a copy of `derive_context_fill` that falls back to the default root · none
+New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 · the sibling usage in a preflight-and-edit transcript under an `--orient` dir inside the arm's environment, staged red by a copy of `derive_context_fill` that falls back to the default root · none
 
 ## 8. Open questions
 
@@ -149,15 +162,25 @@ none
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 promotions' audit, H1 (id 38).
 - rev-2 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-62` mirrored, the other ends of
   the edges the round-2 promotions' audit's disposal declared
+- rev-3 · 2026-11-21 · §1 · S2 · §3 · §4 · §5 · §6 · AC1 · §7 · §10 · re-grounded on the run's BASE
+  `c2a407b0` under the brief `2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief`.
+  Every line-number citation re-cited by symbol; the Gates line names `policy fixtures`, which
+  `extract.py` trips; S2 cites unit 9's row by its S1 and S2 as they stand at rev-6; the fixture
+  runs unit 9's preflight, so its population names the session, and AC1 reads the row's printed
+  `context=` field; the calls block re-aligned. Narrowed: §3 hands the agent-transcript root to unit
+  62. No landed unit satisfies an item: units 9, 14 and 30 are unbuilt.
 
 ## 10. Reuse audit
 
 The seams reused are unit 30's `derive_context_window`, whose `root` argument this unit fills, and
 the pattern of `runlog.py`'s verbs, each resolving one root and passing it down
-(`tools/runlog/runlog.py:300`); nothing is minted. `python tools/codebase-map/reuse_lookup.py "resolve
-the transcripts projects root honouring CLAUDE_CONFIG_DIR"` ranked `resolve`, `repo_root` and
-`resolve_kit_dir` by name stem; none resolves a transcripts root, and the source read above is the
-seam.
+(`tools/runlog/runlog.py#cmd_prose`); nothing is minted. Re-run at `c2a407b0`, `python
+tools/codebase-map/reuse_lookup.py "resolve the transcripts projects root honouring
+CLAUDE_CONFIG_DIR"` ranked `resolve`, `resolve_kit_dir`, `repo_root` and `resolve_memory_root` by
+name stem; none resolves a transcripts root or passes one to a reader, and the source read above is
+the seam. The recall query below returned this build's own specs 45, 46 and 30, the round-1
+promotions' audit and scout C's rows for units 9 and 14; no landed unit passes a root to a fill
+reader.
 
 Recall terms used: `python tools/memory-recall/query.py "which projects root does a per-row
 context fill read" --terms "derive_context_fill measure_orient_tree root window build_arm_env decoy
