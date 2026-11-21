@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-67 — the round-1 audit of units 64 and 65, its 19 minors batched: fixtures git cannot reshape, seed routes and probes that are bounded and stated, sweeps and readers that keep every case, and arms graded on the tree they build on
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 39 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-4 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 39 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-67-deviation-671.md](../build/2026-10-25-build-TOOL-dWitnessedBar-67-deviation-671.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-66-round6-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-66-round6-fix-brief.md) | research | TOOL-dWitnessedBar-66 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-67-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-67-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-67-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-67-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-67-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-67-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-66-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-66-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-66 |
