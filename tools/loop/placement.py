@@ -130,7 +130,7 @@ if str(KIT) not in sys.path:
 from loop_lib import (SEG, LoopError, read_dispositions, read_memory_tree, read_steps, resolve_disposition,  # noqa: E402
                       resolve_kit_dir, resolve_memory_root, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
-from loop_witness import read_clean_env, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
+from loop_witness import FIXTURE_REMOTE, read_clean_env, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
 from probe import ProbeRefused, read_build_records, resolve_git_paths  # noqa: E402
 from request import KEY_HEX, derive_request_content_key  # noqa: E402
 
@@ -968,9 +968,9 @@ def write_placement_fixture(top, policy="", driver=False, remote=False, scenario
     run_fixture_git(root, "commit", "-q", "-m", "the placement fixture")
     if remote:
         run_fixture_git(top, "init", "-q", "--bare", "--template=", str(top / "origin.git"))
-        run_fixture_git(root, "remote", "add", "origin", str(top / "origin.git"))
-        run_fixture_git(root, "push", "-q", "origin", "main")
-        run_fixture_git(root, "fetch", "-q", "origin")
+        run_fixture_git(root, "remote", "add", FIXTURE_REMOTE, str(top / "origin.git"))
+        run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "main")
+        run_fixture_git(root, "fetch", "-q", FIXTURE_REMOTE)
     return root
 
 
@@ -989,7 +989,7 @@ def write_fixture_gov_ref(root, ref, msg):
     tree = subprocess.run(["git", "mktree"], cwd=str(root), input="", capture_output=True, text=True, encoding="utf-8", check=True,
                           env=read_clean_env()).stdout.strip()
     sha = run_fixture_git(root, "commit-tree", tree, "-m", msg)
-    run_fixture_git(root, "push", "-q", "origin", "%s:%s" % (sha, ref))
+    run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "%s:%s" % (sha, ref))
 
 
 def read_fleet_user():
@@ -1050,9 +1050,9 @@ def write_audit_request_fixture(top, policy):
     for where in (("-C", str(repo)), ("--git-dir", str(origin))):   # the driver commits in both
         run_fixture_git(top, *where, "config", "user.email", "fx@example.invalid")
         run_fixture_git(top, *where, "config", "user.name", "fx")
-    run_fixture_git(repo, "remote", "add", "origin", str(origin))
-    run_fixture_git(repo, "push", "-q", "origin", "main")
-    run_fixture_git(repo, "fetch", "-q", "origin")
+    run_fixture_git(repo, "remote", "add", FIXTURE_REMOTE, str(origin))
+    run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+    run_fixture_git(repo, "fetch", "-q", FIXTURE_REMOTE)
     store = pathlib.Path(run_fixture_git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "requests"
     key = write_typed_request(repo, store, "audit the specs\n")
     ret = top / "return.txt"
@@ -1064,8 +1064,8 @@ def write_audit_request_fixture(top, policy):
         said.append((verb,) + run_placement_command(repo, *argv, session=FX_SESSION))
     run_fixture_git(repo, "add", "-A")
     run_fixture_git(repo, "commit", "-q", "-m", "the owner's placed spec audit")
-    run_fixture_git(repo, "push", "-q", "origin", "main")
-    run_fixture_git(repo, "fetch", "-q", "origin")
+    run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+    run_fixture_git(repo, "fetch", "-q", FIXTURE_REMOTE)
     return repo, key, said
 
 
@@ -1179,8 +1179,8 @@ def check_placement_plant(case, top, seen, bad):
         write_fixture_files(root, {".governance/policy.toml": text})
         run_fixture_git(root, "commit", "-q", "-am", "policy")
         if case == "amend-leased":
-            run_fixture_git(root, "push", "-q", "origin", "main")
-            run_fixture_git(root, "fetch", "-q", "origin")
+            run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "main")
+            run_fixture_git(root, "fetch", "-q", FIXTURE_REMOTE)
 
     if case == "each-disposition":   # AC1
         members = read_dispositions(KIT)
@@ -1248,7 +1248,7 @@ def check_placement_plant(case, top, seen, bad):
         if not read_newest_block().get("check", "").startswith("recorded "):
             bad.append("the block's check reads %s, not recorded" % read_newest_block().get("check"))
         if case == "amend-leased":   # a lease the reader cannot read is a fact, never a pass
-            run_fixture_git(root, "remote", "remove", "origin")
+            run_fixture_git(root, "remote", "remove", FIXTURE_REMOTE)
             check_case("unreadable", run_placement_command(root, "check", "--request", FX_KEY), 0,
                        "placement: recorded — amend", "could not be read")
     elif case == "observation":   # AC7
