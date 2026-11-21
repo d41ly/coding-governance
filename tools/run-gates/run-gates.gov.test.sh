@@ -826,16 +826,20 @@ done
 # `fingerprint<TAB>` and forty `c`, CR-ended. The hook's `read_green_file`, cut from the hook alone, and
 # `read_tag_lines`, the reader `local-hook` goes through, read that file's bytes: both take the second
 # `sha`, CR stripped, and `read_tag_lines` reads `GREEN`. The hook half grades `rec_sha`, the variable
-# each staged break reaches: RED against a `sha` read of `$1=="sha"{print $2}`, printing every match, and
-# against one lacking ` sub(/\r$/, "", v);`. In the same subshell it grades `rec_fp`, the CR strip on a
-# second key: RED against the hook's read loop without its one `${_rg_v%$'\r'}` strip
+# each staged break reaches, counted only behind the CR-REACH CANARY (TOOL-dWitnessedBar-70 S1, S2): a
+# mutant of the cut, its `%$'\r'}` strip deleted by `sed`, must differ from the cut in exactly one `diff`
+# line and, sourced in a subshell over this record, read `rec_sha` as forty-one bytes ending in CR, so
+# the planted CR is proved to reach `read_green_file` before the strip is graded. A failed canary prints
+# its line, reds, and leaves the `rec_sha` compare uncounted, which still runs and prints its own line.
+# The breaks staged against it (S3): the loop without its `_rg_v=${_rg_v%$'\r'}` line, and a `sha` case
+# keeping every repeated key, `rec_sha=${rec_sha:+$rec_sha$'\n'}$_rg_v`. In the cut's own subshell
+# the hook half grades `rec_fp`, the CR strip on a second key, uncanaried: RED against the hook's read loop without its one `${_rg_v%$'\r'}` strip
 # (TOOL-dWitnessedBar-67 S2); the backends read no `fingerprint`, so that line moves no local-hook state.
 # `read --backend local-hook` over the same fixture prints GREEN only where the verdict's CR is
 # stripped and the last `reused_cache` wins; a reader keeping the first reads NONE (S3).
-# WHAT THIS DOES NOT CHECK: on Git for Windows, gawk's text-mode read and bash `$(...)` lose the CR
-# before the strip sees it, so the second break reds only where both hand the CR on; nor a `verdict`
-# read by the hook, which reads none; nor a `sha` key read by the CLI half, whose line prints the
-# queried sha and never the record's.
+# WHAT THIS DOES NOT CHECK: a strip spelled other than `%$'\r'}`, or spelled twice, which fails the
+# canary at its count rather than grading the CR; nor a `verdict` read by the hook, which reads none;
+# nor a `sha` key read by the CLI half, whose line prints the queried sha and never the record's.
 rgf_t=$(mktemp -d); rgf_a=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; rgf_b=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 rgf_c=cccccccccccccccccccccccccccccccccccccccc
 rgf_out=$("$PYBIN" -c 'import io, os, sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
@@ -861,7 +865,18 @@ rgf_last=${rgf_out##*$'\n'}; rgf_head=${rgf_last%% *}; rgf_rec=${rgf_last#* }
 rgf_fn=$(awk '/^read_green_file\(\)/,/^}/' "$ROOT/.githooks/pre-push")
 rgf_rd=$( eval "$rgf_fn"; read_green_file "$rgf_rec"; printf '%s\t%s' "$rec_sha" "$rec_fp" )
 rgf_sha=${rgf_rd%%$'\t'*}; rgf_fp=${rgf_rd#*$'\t'}
-a=$((a+1))
+rgf_mut=$(printf '%s\n' "$rgf_fn" | sed 's/%[$].[\]r.}/}/')
+rgf_n=$(diff <(printf '%s\n' "$rgf_fn") <(printf '%s\n' "$rgf_mut") | grep -c '^>')
+# The CR is a variable set out here: a `$'\r'` spelled inside `$(...)` reaches this node's bash as an
+# empty string, so `*$'\r'` there matched every value.
+rgf_crb=$'\r'
+rgf_mr=$( LC_ALL=C; eval "$rgf_mut"; read_green_file "$rgf_rec"
+  case "$rec_sha" in *"$rgf_crb") printf '%s cr' "${#rec_sha}" ;; *) printf '%s' "${#rec_sha}" ;; esac )
+rgf_ok=0
+[ -n "$rgf_fn" ] && [ "$rgf_n" = 1 ] && [ "$rgf_mr" = "41 cr" ] && rgf_ok=1
+[ "$rgf_ok" = 1 ] \
+  || { echo "gov-canary: the planted CR never reached read_green_file on $(uname -s); the CR-strip assertion is not counted"; fail=1; }
+[ "$rgf_ok" = 1 ] && a=$((a+1))
 [ -n "$rgf_fn" ] && [ "$rgf_sha" = "$rgf_b" ] \
   || { rgf_v=${rgf_sha//$'\n'/|}; rgf_cr='\r'; echo "gov-canary: the hook's read_green_file set rec_sha to '${rgf_v//$'\r'/$rgf_cr}' over two sha lines, the second CR-ended, not the second sha with its CR stripped, or did not cut from the hook"; fail=1; }
 a=$((a+1))
