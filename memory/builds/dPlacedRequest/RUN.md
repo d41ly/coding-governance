@@ -12,17 +12,17 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 asks-at-landing: TOOL-dPlacedRequest-22=OPEN TOOL-dPlacedRequest-65=CLOSED TOOL-dPlacedRequest-66=CLOSED TOOL-dPlacedRequest-67=CLOSED TOOL-dPlacedRequest-68=CLOSED TOOL-dPlacedRequest-69=CLOSED TOOL-dPlacedRequest-70=CLOSED TOOL-dPlacedRequest-71=CLOSED TOOL-dPlacedRequest-73=CLOSED TOOL-dPlacedRequest-74=OPEN TOOL-dPlacedRequest-75=OPEN TOOL-dPlacedRequest-76=OPEN TOOL-dPlacedRequest-77=OPEN TOOL-dPlacedRequest-78=OPEN TOOL-dPlacedRequest-79=OPEN TOOL-dPlacedRequest-80=OPEN TOOL-dPlacedRequest-81=OPEN TOOL-dPlacedRequest-82=OPEN TOOL-dPlacedRequest-83=OPEN TOOL-dPlacedRequest-84=WONTDO TOOL-dPlacedRequest-85=WONTDO TOOL-dPlacedRequest-86=WONTDO TOOL-dPlacedRequest-87=OPEN TOOL-dPlacedRequest-88=WONTDO TOOL-dPlacedRequest-89=WONTDO TOOL-dPlacedRequest-90=OPEN TOOL-dPlacedRequest-91=WONTDO TOOL-dPlacedRequest-92=WONTDO TOOL-dPlacedRequest-93=WONTDO TOOL-dPlacedRequest-94=WONTDO TOOL-dPlacedRequest-101=WONTDO TOOL-dPlacedRequest-102=OPEN TOOL-dPlacedRequest-103=OPEN TOOL-dPlacedRequest-104=WONTDO TOOL-dPlacedRequest-105=OPEN TOOL-dPlacedRequest-106=WONTDO TOOL-dPlacedRequest-107=WONTDO TOOL-dPlacedRequest-108=WONTDO
 units-at-landing: TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-96 TOOL-dPlacedRequest-97 TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 TOOL-dPlacedRequest-100
 hold-run: 
-hold-streak: 1 · at e267d213
+hold-streak: 1 · at 870ddd2b
 resume-owed: none · owner
-held-at: 2026-11-20T18:37:38Z
-hold-reason: the spec audit chain holds at its 4-round ceiling: unit TOOL-dPlacedRequest-100 (finding 29 of the round-4 audit, a new mechanism on spec 96) is specced but unaudited; the owner decides between auditing it past the ceiling, building units 95 to 100 with specs-audited overridden for unit 100, or stopping
+held-at: 2026-11-21T02:25:47Z
+hold-reason: the landing merge of origin/main changes the protected .claude/skills/lexicon/SKILL.md and .claude/skills/unattended/SKILL.md, parked as landing-merge-protected-skills; every step needing no merge is done: 69 of 69 units built and CLOSED, the run at VERIFYING, every non-waived New arm observed RED on its break (memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-11-arm-breaks.md); after the owner's answer: merge origin/main and resolve 7 conflicts, push-main.sh --prepare, the flagged bar, the departures report, --authorization, --close with --override specs-audited for TOOL-dPlacedRequest-100, the land and --landed
 hold-until: owner
 hold-code: owner-decision
-held-from: BUILDING
-refreshed-at: 4a7fff390790a4d5debec6bf77fd27661ba9a2da · park · 84 touching
+held-from: VERIFYING
+refreshed-at: 4a7fff390790a4d5debec6bf77fd27661ba9a2da · handoff · 84 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 2db4a921f14d08e1ab752d2047deba13628a9233
-phase: VERIFYING
+witness: 870ddd2b20dcfcf09a04727b57a17ce217345e08
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -586,3 +586,7 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T23:34:36Z dispatch · item 5a63fbad TOOL-dPlacedRequest-100 · reason tools/unattended/unattended.sh tools/loop/claim.py tools/run-gates/selftest-budgets.txt help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-100.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-1-acceptance-ledger.md tools/loop/placement.py memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-red-fix-36.md
 
 2026-11-20T23:39:49Z decision · item landing-merge-protected-skills: the landing must merge origin/main (173 commits past the merge base 9e21ac760, 7 conflicted files), and the merge changes the sandbox-protected .claude/skills/lexicon/SKILL.md and .claude/skills/unattended/SKILL.md; options: (a) the owner confirms the pinned git origin in the app (Help, Troubleshooting, Review Pinned Git Origins) and the run merges, (b) the owner rules a plain git merge acceptable, (c) the owner merges main into the run branch · reason the app takes protected .claude/skills files only from an origin the owner confirmed, and a raw git merge or the lander's --prepare writes the same files, so taking either routes around that guard; no resolver the mandate delegates may confirm an origin
+
+2026-11-21T02:25:49Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dPlacedRequest && bash tools/push-main.sh --land --slug dPlacedRequest && bash tools/unattended/unattended.sh --settle dPlacedRequest
+
+2026-11-21T02:25:49Z hold · item owner-decision · reason until owner · reaped 65b12df9 · resume none(owner)
