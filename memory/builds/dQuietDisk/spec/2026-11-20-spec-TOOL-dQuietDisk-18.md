@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-18 — `govkit apply` reads both of its verdict maps through the target's reuse cache
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -30,7 +30,7 @@ while "green before, red after" stays computed per leg and a red after is still 
   one value read once per apply (S5). Observed by AC1 and AC2.
 - **S3** — A leg the BASELINE read prints as `reused` counts as green before, at the three places
   that test a before state: the dead-probe refusal, the `on_baseline_red` reds, and the
-  green-before rows of the AFTER comparison. One function, `effective_before(state)`, maps `reused`
+  green-before rows of the AFTER comparison. One function, `derive_before_state(state)`, maps `reused`
   to `green` and returns every other state unchanged, and all three read through it. Observed by AC2
   and AC3.
 - **S4** — The receipt records `reused` as `green` in both `baseline.legs` and `after`, through the
@@ -92,14 +92,14 @@ runner's, unchanged, and the guard-matching rule is never restated in govkit.
 ### The comparison
 
 ```python
-def effective_before(state):
+def derive_before_state(state):
     return "green" if state == "reused" else state
 
 # BASELINE
-if before_map and not any(effective_before(v) in ("green", "red") for v in before_map.values()):
+if before_map and not any(derive_before_state(v) in ("green", "red") for v in before_map.values()):
     raise Refusal("DEAD PROBE: ...")          # unchanged text
-reds = [n for n, v in before_map.items() if effective_before(v) == "red"]
-# AFTER: `b = effective_before(before_map.get(nm))`, then today's table
+reds = [n for n, v in before_map.items() if derive_before_state(v) == "red"]
+# AFTER: `b = derive_before_state(before_map.get(nm))`, then today's table
 ```
 
 The cache holds only `ok` entries (`tools/run-gates/run-gates.sh@609cd40b1:3904`), so a reused leg
@@ -110,7 +110,7 @@ today, whether it was reused or executed before.
 
 ### The receipt
 
-`_rcpt_doc` takes `baseline.legs` and `after` through `effective_before`. Under `reuse` a leg reused
+`_rcpt_doc` takes `baseline.legs` and `after` through `derive_before_state`. Under `reuse` a leg reused
 and a leg executed green record the same word, so the receipt is the same bytes whichever the sample
 drew, and the same bytes a `run` apply writes for the same verdicts.
 
@@ -125,7 +125,8 @@ and writes the entries the AFTER read then reuses.
 ### Inventory
 
 - The policy key `install.baseline`, values `reuse` and `run`.
-- The function `effective_before` in `tools/govkit/govkit.py`.
+- The function `derive_before_state` in `tools/govkit/govkit.py`, cell `py.function`; lexicon
+  `--suggest` OK.
 - The argument `reuse` of `read_gate_verdicts`.
 
 ### Files touched (estimate)
@@ -208,7 +209,7 @@ and writes the entries the AFTER read then reuses.
 
 `govkit selftest` · `policy fixtures` · `recall floor arms` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `routed-commits selftest`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 · a stub runner that prints `GATE reuse` before and `GATE FAIL` after; the arm reds when `effective_before` is bypassed and the red after passes · none
+New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 · a stub runner that prints `GATE reuse` before and `GATE FAIL` after; the arm reds when `derive_before_state` is bypassed and the red after passes · none
 
 ## 8. Open questions
 
@@ -217,6 +218,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-20 · initial draft.
+- rev-2 · 2026-11-22 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. The one minted
+  function the lexicon refused, `effective_before`, is `derive_before_state`, checked by `--suggest`,
+  everywhere the spec spells it. No criterion had the pass run a suite, a `--selftest`, a gate leg
+  or the bar: AC7's suite reading was already the main loop's.
 
 ## 10. Reuse audit
 

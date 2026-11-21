@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-11 — govkit's scratch targets come from the template cache, so `selftest.py` builds each distinct target once
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -67,20 +67,21 @@ target is built once per runner invocation and copied per call, with every arm's
 
 ```python
 def build_scratch_gov(g):
-    tpl = template_path(BUILDER_BLOB, key=(), build=_init_scratch_gov)   # unit 7's python face
-    copy_template(tpl, g)
+    tpl = CACHE.resolve_template(BUILDER_BLOB, (), _init_scratch_gov)   # unit 7's python face
+    shutil.copytree(tpl, g, symlinks=True)
     return g
 
 def build_target(tmp, deploy, name="target", files=None):
-    tpl = template_path(BUILDER_BLOB, key=(deploy, sorted_digest(files)),
-                        build=lambda d: _build_target_into(d, deploy, files))
+    tpl = CACHE.resolve_template(BUILDER_BLOB, (deploy, sorted_digest(files)),
+                                 lambda d: _build_target_into(d, deploy, files))
     t = tmp / name
-    copy_template(tpl, t)
+    shutil.copytree(tpl, t, symlinks=True)
     return t
 ```
 
-The names `template_path` and `copy_template` stand for unit 7's python face as its spec spells it;
-the builder uses that spelling. `_init_scratch_gov` and `_build_target_into` are today's two bodies,
+`CACHE` is a `TemplateCache`, and `resolve_template(builder_id, inputs, build)` is its method as
+TOOL-dQuietDisk-7 rev-2 spells it; the copy is `shutil.copytree`, as S1 states, so this unit mints
+no function of its own. `_init_scratch_gov` and `_build_target_into` are today's two bodies,
 moved and not edited.
 
 ### Why a copy and not a clone
@@ -134,7 +135,7 @@ order 4, measures a `selftest.py` shard, so it reads this unit's output and must
 - risks: a template built while a commit moves the tree
   (`memory/gotchas/suite-invalidated-by-a-commit-under-it.md`). The builders read no tracked file, so
   a commit under the run cannot change what a template holds.
-- testing: AC1 to AC4 are probes and the module's `--selftest`; AC5 runs the suite and is the main loop's.
+- testing: AC1 to AC4 are probes; the module's `--selftest` and AC5's suite run are the main loop's.
 - migration: N/A — templates live for one runner invocation.
 - user docs: N/A — test fixtures; no `help/` page describes them.
 
@@ -153,9 +154,14 @@ order 4, measures a `selftest.py` shard, so it reads this unit's output and must
   map, and then with a different `name` only, the first builds a new template and the second
   reuses the old one.
   Red when: `files` is missing from the key, or `name` is in it.
-- **AC4** — When `python tools/govkit/fixture_target.py --selftest` runs, it prints
-  `fixture-target: PASS` and exits 0.
+- **AC4** — When the probe points `GIT_CONFIG_GLOBAL` at a planted config that signs with a failing
+  program, sets `core.hooksPath` to a canary hook and names an `init.templateDir` holding a canary
+  hook, and then calls `build_target` twice with a `TemplateCache`, both copied targets hold `base`,
+  carry no canary path and no copied hook. When the main loop runs the module's own `--selftest` at
+  the close, `check_inherited_config` prints `fixture-target: PASS` and exits 0.
   Red when: a planted global config reaches a copied target.
+  permission: a role agent runs no `--selftest` (scratch-guard row G3), so the module's own run is
+  owed to the main loop; the pass makes the planted-config probe.
 - **AC5** — When the main loop runs `extract-arms.sh` over the `govkit selftest` leg at the build
   base and at this unit's commit, each in a scratch `git clone --shared` with `GIT_TRACE2_EVENT`,
   `TEMP`, `TMP` and `TMPDIR` pointed at scratch dirs, both inventories hold the same check labels
@@ -171,7 +177,7 @@ order 4, measures a `selftest.py` shard, so it reads this unit's output and must
 
 `govkit selftest` · `policy fixtures` · `recall floor arms` · `govkit refusal join` · `govkit acceptance matrix`
 
-New arm: tools/govkit/fixture_target.py · covers AC2 · its `--selftest` builds one target under each switch value and compares the five reads; a copy that skips `.git/config` reds it · none
+New arm: tools/govkit/fixture_target.py · covers AC2 AC4 · its `--selftest` builds one target under each switch value and compares the five reads; a copy that skips `.git/config` reds it · none
 
 ## 8. Open questions
 
@@ -182,6 +188,12 @@ none
 - rev-1 · 2026-11-20 · initial draft. Ordered 4, not the roster's 3: TOOL-dQuietDisk-18 writes
   `tools/govkit/selftest.py`, which this unit's AC5 reads, and the spec brief orders this unit after
   18 when both touch the file. TOOL-dQuietDisk-19 at order 4 reads this unit's output.
+- rev-2 · 2026-11-22 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. Section 4's sketch
+  spells unit 7's python face as TOOL-dQuietDisk-7 rev-2 renames it, `resolve_template`, and the copy
+  as `shutil.copytree`, in place of the placeholders `template_path` and `copy_template`, which the
+  lexicon would refuse. AC4 had the pass run the module's `--selftest`; it now has the pass run a
+  planted-config probe, the module's own run is owed to the main loop, and the `New arm:` line
+  covers AC4.
 
 ## 10. Reuse audit
 

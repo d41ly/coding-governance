@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-1 — one store of immutable history verdicts, keyed by the ids each one reads, with one `cat-file --batch` reader
 
-**Status:** INPROGRESS · rev-2 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 1
+**Status:** INPROGRESS · rev-3 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md) | research | TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-1-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-2-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task.md) | research | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-owner-build-on-land-branch.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-owner-build-on-land-branch.md) | research | — |
@@ -30,15 +31,15 @@ reads and by the grading code's own bytes, with a last graded tip per leg. The s
 
 - **S1** — `tools/lib/history_store.py`, the canonical module. Its body sits inside one marked
   block, `history_store_py`, as `tools/lib/legacy_ledger.py` holds its own. It defines
-  `BatchReader`, `open_store` and the store class section 4 names. Observed by AC1, AC2, AC3 and
+  `BatchReader`, `resolve_store` and the store class section 4 names. Observed by AC1, AC2, AC3 and
   AC4.
 - **S2** — `BatchReader(repo)` holds one `git -C <repo> cat-file --batch` process, started on the
-  first question. `read(name)` answers the object's bytes or None, and `info(name)` answers its
+  first question. `read(name)` answers the object's bytes or None, and `read_info(name)` answers its
   oid, type and size or None. A `missing` or `ambiguous` reply is None. An end of stream or a
   malformed header is a dead process: the reader restarts it once, and after a second death it
   answers each question by a one-shot `git cat-file` spawn. A dead process is never read as
   missing. Observed by AC1 and AC2.
-- **S3** — `open_store(repo, leg, code_paths)` returns the store for one leg run. Its root is
+- **S3** — `resolve_store(repo, leg, code_paths)` returns the store for one leg run. Its root is
   `<git common dir>/history-verdicts/v1/<leg>/`, beside the reuse cache's `gate-cache`. An item is
   one file under `items/<key[0:2]>/<key>`. A key is the SHA-256 of the schema tag, the leg, the
   code digest and the caller's id fields. The code digest hashes the working bytes of every path
@@ -52,20 +53,20 @@ reads and by the grading code's own bytes, with a last graded tip per leg. The s
 - **S5** — The tip. `read_tip()` and `write_tip(sha)` keep the leg's last graded tip in
   `tips/<scope>`, where the scope is the first 16 hex of the SHA-256 of the absolute git dir. Each
   worktree keeps its own tip and every worktree shares the items. Observed by AC5.
-- **S6** — `prune()` removes item files older than 30 days by mtime, in the calling process. It
+- **S6** — `remove_aged()` unlinks each item file older than 30 days by mtime, in the calling process. It
   runs at most once per 24 hours per leg, recorded by the mtime of a `pruned` stamp, so a warm run
   never lists the store. Observed by AC6.
-- **S7** — The switch. `open_store` reads the policy key `tests.history-verdicts` once, through the
+- **S7** — The switch. `resolve_store` reads the policy key `tests.history-verdicts` once, through the
   policy kit's `policy.py get`, found by the module's inline `resolve_kit_dir` block. `stored`, the
-  default, is the store. `regraded` is today's behaviour: every `get` misses, `put` and
+  default, is the store. `regraded` is today's behaviour: every `read` misses, `write` and
   `write_tip` write nothing, and `read_tip` answers None. An absent policy kit or an unreadable key
   reads as the default. The key lands with its catalogue row in `tools/policy/catalogue.toml`,
   `owner = "dQuietDisk"`, with a `summary` and a `usage`, and `help/reference/policy.md` is
   re-rendered from it. Observed by AC7.
 - **S8** — The bash face, `tools/lib/history-store.sh`, the canonical block `history_store_sh`. It
-  defines `hs_open`, `hs_tip_read`, `hs_lookup` and `hs_store`, which call the module's CLI once
-  each, and `bh_open`, `bh_info`, `bh_read` and `bh_close` over one `coproc` of
-  `git cat-file --batch`. `bh_read` reads under `LC_ALL=C` and returns 3 when the bytes read differ
+  defines `init_hs`, `read_hs_tip`, `read_hs_items` and `write_hs_items`, which call the module's CLI
+  once each, and `init_bh`, `read_bh_info`, `read_bh_blob` and `remove_bh` over one `coproc` of
+  `git cat-file --batch`. `read_bh_blob` reads under `LC_ALL=C` and returns 3 when the bytes read differ
   from the header's size, which a blob holding a NUL causes. Observed by AC8.
 - **S9** — The CLI, `python history_store.py --leg <leg> --code <path>... <verb>`. `tip` prints the
   tip. `lookup` reads `<item id>TAB<field>...` lines and prints `<item id>TAB<hit|miss>TAB<body>`.
@@ -79,10 +80,17 @@ reads and by the grading code's own bytes, with a last graded tip per leg. The s
 - **S11** — `python tools/lib/history_store.py --selftest` runs the module's arms in its own scratch
   repository, printing one line per arm and a count line. A held leg,
   `history-store selftest`, runs it, with subject `kit`, chunk `selftests`, a ceiling of 120 s and a
-  guard naming the module and the bash face. Because every held leg must carry a budget row, the
-  leg's row joins `tools/run-gates/selftest-budgets.txt`, calibrated as that file's header states:
-  the worst direct reading times 1.5, floored at 60 s, with the reading named in the row's note.
-  Observed by AC10 and AC12.
+  guard naming the module and the bash face. `tools/lib/` is no kit: it has no `kit.toml`, and the
+  registry exempts it (`tools/govkit/registry.toml@e4699ee75:253`). So the leg is declared as an
+  `[[exempt_leg]]` row of `tools/govkit/registry.toml`, in the shape of the
+  `python resolver (behaviour + inline parity + idiom ban)` row, and `tools/gate-legs.json` is
+  re-rendered from the declarations by `python tools/run-gates/leg_factory.py --write`, never edited
+  by hand. Because every held leg must carry a budget row, the leg's row joins
+  `tools/run-gates/selftest-budgets.txt`. A role agent runs no `--selftest`, so the row is a PINNED
+  estimate from a proxy reading: the wall time of one timed run of section 6's probes, times 1.5,
+  floored at 60 s. Its note says it is not a `--selftest` reading and names the proxy, as the
+  `leg-factory selftest` and `ratchet selftest` rows do. The main loop re-prices it from the first
+  measured run at the close. Observed by AC10 and AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -168,12 +176,12 @@ second reader.
 
 ### The bash face
 
-`hs_open <leg> <code path>...` resolves python through the caller's inline `resolve_python`, which
-both legs already carry, and keeps the leg and code list for the three CLI calls. `hs_lookup` and
-`hs_store` take one file each, so a leg pays one python process to read all its items and one to
-write them, whatever the unit count. `bh_open` starts the coprocess, and `bh_info` and `bh_read`
-set `BH_OID`, `BH_TYPE`, `BH_SIZE` and `BH_TEXT`. A dead coprocess returns 2 from both, and the
-caller grades that question as it does today.
+`init_hs <leg> <code path>...` resolves python through the caller's inline `resolve_python`, which
+both legs already carry, and keeps the leg and code list for the three CLI calls. `read_hs_items`
+and `write_hs_items` take one file each, so a leg pays one python process to read all its items and
+one to write them, whatever the unit count. `init_bh` starts the coprocess, `read_bh_info` and
+`read_bh_blob` set `BH_OID`, `BH_TYPE`, `BH_SIZE` and `BH_TEXT`, and `remove_bh` closes it. A dead
+coprocess returns 2 from both, and the caller grades that question as it does today.
 
 ### Inventory
 
@@ -181,20 +189,32 @@ caller grades that question as it does today.
 |---|---|---|---|
 | `tests.history-verdicts` | policy key, values `stored` and `regraded` | the catalogue | `policy.py check` |
 | `history_store_py`, `history_store_sh` | parity block markers | `PARITY_ROWS` | `tools/lib/resolve-python.test.sh` |
-| `BatchReader`, `open_store`, `HistoryStore` | Python names | none | the module's `--selftest` |
-| `hs_open`, `hs_tip_read`, `hs_lookup`, `hs_store` | shell functions | none | the module's `--selftest` |
-| `bh_open`, `bh_info`, `bh_read`, `bh_close` | shell functions | none | the module's `--selftest` |
-| `history-store selftest` | gate leg | `tools/gate-legs.json` | `run-gates canary` |
+| `BatchReader`, `HistoryStore` | Python classes | `py.type`, lexicon `--suggest` OK | the module's `--selftest` |
+| `resolve_store` | Python function | `py.function`, lexicon `--suggest` OK | the module's `--selftest` |
+| `read`, `read_info` | `BatchReader` methods | `py.function`, lexicon `--suggest` OK | the module's `--selftest` |
+| `read`, `write`, `read_tip`, `write_tip`, `remove_aged` | `HistoryStore` methods | `py.function`, lexicon `--suggest` OK | the module's `--selftest` |
+| `init_hs`, `read_hs_tip`, `read_hs_items`, `write_hs_items` | shell functions | `sh.function`, lexicon `--suggest` OK | the module's `--selftest` |
+| `init_bh`, `read_bh_info`, `read_bh_blob`, `remove_bh` | shell functions | `sh.function`, lexicon `--suggest` OK | the module's `--selftest` |
+| `tip`, `lookup`, `store` | CLI verbs | none: the lexicon declares no cell for a CLI verb | the module's `--selftest` |
+| `history-store selftest` | gate leg, an `[[exempt_leg]]` row | `tools/govkit/registry.toml` | `gate-leg conformance` |
 | `history-verdicts/` | directory under the git common dir | none | the module's `--selftest` |
+
+`.lexicon.conf` pins `VERB_OFFENDER_PIN` at the full offender count, so every function, method and
+shell function above leads with a declared verb, checked by
+`python tools/lexicon/lexicon.py --suggest <name> --as <cell>`. A method is graded as a function, a
+dunder included, so neither class defines `__enter__` or `__exit__`.
 
 ### Files touched (estimate)
 
 `tools/lib/history_store.py` · `tools/lib/history-store.sh` · `tools/unattended/history_store.py` ·
 `tools/memory-tree/history_store.py` · `tools/unattended/lib-unattended.sh` ·
 `tools/lib/resolve-python.test.sh` · `tools/policy/catalogue.toml` · `help/reference/policy.md` ·
-`tools/gate-legs.json` · `tools/run-gates/selftest-budgets.txt` · `memory/guides/SESSION-KICKOFF.md`
+`tools/govkit/registry.toml` · `tools/gate-legs.json` · `tools/run-gates/selftest-budgets.txt` ·
+`memory/guides/SESSION-KICKOFF.md`
 
-The kickoff manifest's `watch:` line names `tools/gate-legs.json`, so the commit that adds the leg
+The leg's declaration is the `[[exempt_leg]]` row in `tools/govkit/registry.toml`, and
+`tools/gate-legs.json` is the manifest `python tools/run-gates/leg_factory.py --write` re-renders
+from it. The kickoff manifest's `watch:` line names `tools/gate-legs.json`, so the commit that adds the leg
 re-stamps the manifest's `last-audit`. A new file under `tools/unattended/` and
 `tools/memory-tree/` is claimed by each kit's `include = "**"` row
 (`tools/unattended/kit.toml@e4699ee75:26`, `tools/memory-tree/kit.toml@e4699ee75:30`).
@@ -235,46 +255,49 @@ failure (its header, `tools/run-gates/selftest-budgets.txt@e4699ee75:16`).
 
 - **AC1** — When a probe builds a repository under `%TEMP%/<short-name>` with 50 committed files,
   sets `GIT_TRACE2_EVENT` to an empty directory, and reads every file through one
-  `BatchReader`, each answer equals `git show HEAD:<path>`, and `info` of `HEAD:absent` is None.
+  `BatchReader`, each answer equals `git show HEAD:<path>`, and `read_info` of `HEAD:absent` is None.
   The trace directory then holds exactly one file whose `cmd_name` event names `cat-file`.
   Red when: the reader spawns per question, so the directory holds 50 or more such files.
   figure: PINNED, one process for 50 questions.
 - **AC2** — When the probe kills the reader's process between two `read` calls, and then again
   after the restart, the next `read` of an existing blob still returns its bytes.
   Red when: an end of stream is read as `missing` and `read` answers None.
-- **AC3** — When the probe puts an item, `get` returns its body. It reads None after the file is cut
-  one byte short, after its header's tag is changed to `v2`, and, for a fresh store, after one byte
-  of a `code_paths` file changes. `python history_store.py --selftest`, run in `tools/lib/`, prints
-  each case.
+- **AC3** — When the probe writes an item with `write`, `read` returns its body. It reads None after
+  the file is cut one byte short, after its header's tag is changed to `v2`, and, for a fresh store,
+  after one byte of a `code_paths` file changes. The probe prints one line per case.
   Red when: a truncated or foreign entry is returned, or a code edit leaves the key unchanged.
-- **AC4** — When two processes each put the same 200 keys and 200 keys of their own into one store
+- **AC4** — When two processes each write the same 200 keys and 200 keys of their own into one store
   at once, every one of the 600 items reads back with its body, and no `*.tmp` file remains.
   Red when: a write goes to the final path directly, so a reader sees a partial item or a temp is
   left.
 - **AC5** — When the probe runs `git worktree add` on its repository, a tip written from each
-  worktree reads back only in that worktree, and an item put from one is a hit in the other.
+  worktree reads back only in that worktree, and an item written from one is a hit in the other.
   Red when: the scope is the common dir, so the second tip overwrites the first.
 - **AC6** — When the probe plants an item with an mtime 31 days old and one 29 days old and runs
   `store`, the old one is gone and the young one stays. A second old item planted after it
   survives a second `store` within the hour.
   Red when: the prune runs on every call, or removes by name rather than by age.
 - **AC7** — When the probe's repository commits `.governance/policy.toml` holding
-  `tests.history-verdicts = "regraded"`, the `lookup` CLI prints `miss` for an item it put
+  `tests.history-verdicts = "regraded"`, the `lookup` CLI prints `miss` for an item written
   under `stored`, and `store` leaves the item tree and the tip unchanged. With the file removed it
   prints `hit`. `python tools/policy/policy.py check` passes over the catalogue.
   Red when: the switch is not read, or its off value still reads or writes.
   fixture: the policy kit beside the module, as `tools/policy/` sits in gov.
 - **AC8** — When a bash probe sources `history-store.sh` from `tools/lib/` and reads a blob through
-  `bh_read`, `BH_TEXT` equals the blob. A blob holding a NUL returns 3. `hs_lookup` over a body
-  holding a tab, a newline and a backslash, stored through `hs_store`, prints it back escaped and
-  unescapes to the same bytes.
+  `read_bh_blob`, `BH_TEXT` equals the blob. A blob holding a NUL returns 3. `read_hs_items` over a
+  body holding a tab, a newline and a backslash, stored through `write_hs_items`, prints it back
+  escaped and unescapes to the same bytes.
   Red when: the bash face reads characters rather than bytes, or the escape is not reversible.
 - **AC9** — When the marked blocks are extracted with the parity table's own `blk` awk from the
   canonical files and from each copy, every pair compares equal.
   Red when: a copy drifts by one byte, which the two new `PARITY_ROWS` rows then report.
-- **AC10** — When `python history_store.py --selftest` runs in `tools/lib/`, it prints one line per arm
-  and a count line, and exits 0. With `read` patched to answer None on an end of stream, it exits 1.
+- **AC10** — When the main loop runs `python history_store.py --selftest` in `tools/lib/` at the close, it
+  prints one line per arm and a count line, and exits 0. With `read` patched to answer None on an
+  end of stream, it exits 1.
   Red when: the selftest passes over the patched reader.
+  permission: a role agent runs no `--selftest` (scratch-guard row G3). This is the first `New arm:`
+  line's RED and GREEN observation, owed to the main loop. The pass's proxy is AC1 to AC8, whose
+  probes call the module's functions and the bash face directly.
 - **AC11** — When `python tools/govkit/govkit.py shipped` runs, it lists the copy
   `history_store.py` under both `unattended` and `memory-tree`. When `python tools/govkit/govkit.py check --target C:/projects/incms/main`
   and the same with `C:/projects/nicocares/main` run read-only from gov before and after the unit,
@@ -283,24 +306,31 @@ failure (its header, `tools/run-gates/selftest-budgets.txt@e4699ee75:16`).
   permission: read-only against the adopters' main checkouts, never their `gov-upgrade` worktrees.
   fixture: the adopters reach the copies only after a minted version and their own `govkit update`.
 - **AC12** — When `grep -n "^history-store selftest" tools/run-gates/selftest-budgets.txt` runs, it
-  prints one row whose budget is at least 60 and whose note names the direct reading it was
-  calibrated from. When
-  `grep -n -A16 '"name": "history-store selftest"' tools/gate-legs.json` runs, the row it prints
-  holds `"ceiling": 120`.
-  Red when: the held leg lands with no budget row, a budget under the floor, or no ceiling.
-  figure: DERIVED, the budget from the builder's direct reading of the leg's own argv.
+  prints one row whose budget is at least 60 and whose note says it is a PINNED estimate from the
+  timed section 6 probes, not a `--selftest` reading, to be re-priced from the first measured run.
+  When `grep -n -A12 'name = "history-store selftest"' tools/govkit/registry.toml` runs, it prints
+  an `[[exempt_leg]]` row holding `ceiling = 120`, and
+  `grep -n -A16 '"name": "history-store selftest"' tools/gate-legs.json` prints the rendered row
+  holding `"ceiling": 120`.
+  Red when: the held leg lands with no budget row, a budget under the floor, a note that claims a
+  direct reading, no ceiling, or a manifest row with no declaration behind it.
+  figure: PINNED, the budget from the pass's timed run of the section 6 probes, times 1.5, floored at
+  60 s. The re-price from the first measured run of the leg at the close is owed to the main loop,
+  as the `leg-factory selftest` and `ratchet selftest` rows' are.
 
 This unit moves no verdict: it adds no reader to any existing leg, so every leg's rc and output stay
 as they were. The process saving is each consumer's, counted in units 2, 3 and 4.
 
 ## 7. Gates
 
-`kit epoch (shipped bytes move, the version moves)` · `python resolver (behaviour + inline parity + idiom ban)` · `every held leg is budgeted, every budget row resolves` · `policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `branch-guard self-test` · `tier2-review self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `playbook render selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
+`kit epoch (shipped bytes move, the version moves)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `gate-leg conformance` · `python resolver (behaviour + inline parity + idiom ban)` · `every held leg is budgeted, every budget row resolves` · `policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `branch-guard self-test` · `tier2-review self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `playbook render selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
 
 New arm: tools/lib/history_store.py · covers AC3 AC10 · the module's --selftest; its failing case is staged by reading an end of stream as missing, or by keying on the index blob of a code path · none
 New arm: tools/lib/resolve-python.test.sh · covers AC9 · the two new PARITY_ROWS rows; their failing case is staged by one changed byte in either copy · none
 
-The bar runs once at the close. The new leg's RED and GREEN observation is the main loop's.
+The bar runs once at the close. The new leg's RED and GREEN observation is the main loop's, and so
+is the budget row's re-price from that first measured run. No criterion has the pass run a suite,
+a `--selftest`, a gate leg or the bar.
 
 ## 8. Open questions
 
@@ -318,6 +348,17 @@ none
   budget row, which `tools/run-gates/selftest-budgets.txt` demands of every held leg and which
   rev-1 missed. No dWitnessedBar unit built after `609cd40b1` holds a history store or a batch
   reader (section 10), so the design is otherwise unchanged.
+- rev-3 · 2026-11-22 · the three divergences the first build pass handed back, under
+  `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. (a) Every minted name the lexicon refused
+  now leads with a declared verb, each checked by `--suggest`: `open_store` is `resolve_store`; the
+  store's `get`, `put` and `prune` are `read`, `write` and `remove_aged`; `BatchReader.info` is
+  `read_info`; and the eight shell functions are `init_hs`, `read_hs_tip`, `read_hs_items`,
+  `write_hs_items`, `init_bh`, `read_bh_info`, `read_bh_blob` and `remove_bh`. The Inventory names
+  each cell. (b) S11 and AC12 price the budget row as a PINNED estimate from a timed run of the
+  section 6 probes, floored at 60 s, with the re-price owed to the main loop; AC3 no longer has the
+  pass run the `--selftest`, and AC10 is the main loop's observation. (c) The leg is an
+  `[[exempt_leg]]` row of `tools/govkit/registry.toml`, which joins Files touched, with
+  `tools/gate-legs.json` re-rendered by `leg_factory.py --write`.
 
 ## 10. Reuse audit
 

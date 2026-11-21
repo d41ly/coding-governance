@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-4 — routed-commits reads only the commits its store does not already hold
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -28,7 +28,7 @@ every line it prints stay byte-identical, the deviation join's lines included.
   same revision arguments, then takes each commit's record from the store. It logs only the commits
   the store lacks, through the same `read_commits` reader and the same trailer keys. Observed by AC1
   and AC3.
-- **S2** — The leg opens the store once with `open_store` from the memory-tree kit's copy of the
+- **S2** — The leg opens the store once with `resolve_store` from the memory-tree kit's copy of the
   module, `tools/memory-tree/history_store.py`. Its code paths are `routed_commits.py`,
   `commit_trailers.py`, `tree_lib.py` and the trailer key table `read_key_table` resolves, so a
   change to any of them moves every key. A stored record is the reader's own dict for one commit:
@@ -158,27 +158,41 @@ No verb, flag, conf key, policy key or refusal number is minted.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the old leg, `python tools/memory-tree/routed_commits.py` at `609cd40b1`, and the new
-  leg run over one scratch `git clone --shared` of the real tree at the build's base, the store cold
-  and then warm, and again with `GATE_PUSH_BASE` set to a commit 20 behind HEAD, all outputs and exit
-  codes are byte-identical, the deviation join's lines included.
+The pass's probes run over a hermetic fixture repository the probe builds under
+`%TEMP%/<short-name>` with `tools/memory-tree/routed_commits.py#build_fixture` and
+`#set_fixture_conf`, called by import and never through the module's `--selftest`: one
+`git fast-import` of the history, a `.memory-tree.conf` naming `ROUTED_PATHS`, a spec tree,
+the trailer key table, and at least 600 commits, so the cold path crosses S5's bound. "Old" is the
+module at `609cd40b1` and "new" the unit's, each imported or run there by path. A reading over the
+real tree is the gate's own population, which a role agent may not run (scratch-guard row G1), so
+each such reading below is owed to the main loop at the close.
+
+- **AC1** — When the old leg and the new leg run over the fixture, the store cold and then warm, and
+  again with `GATE_PUSH_BASE` set to a commit 20 behind HEAD, all outputs and exit codes are
+  byte-identical, the deviation join's lines included. When the main loop runs the same comparison,
+  `python tools/memory-tree/routed_commits.py` at `609cd40b1` against the new leg, over one scratch
+  `git clone --shared` of the real tree at the build's base, they are byte-identical there too.
   Red when: a record assembled from the store differs from the logged one, or the order moves.
-  cost: about 30 minutes per cold run, measured 1,761 s by the analysis.
-  fixture: a clone under `%TEMP%` with its own `TEMP`.
-- **AC2** — When the trailer key table `tools/playbook/edges.toml` gains one row in the clone, the
-  next run logs the whole population again and prints what the old leg prints.
+  cost: about 30 minutes per cold run over the real tree, measured 1,761 s by the analysis.
+  permission: the real-tree corpus is owed to the main loop; the pass makes the fixture comparison.
+  fixture: the real-tree clone under `%TEMP%` with its own `TEMP`.
+- **AC2** — When the fixture's trailer key table, its copy of `tools/playbook/edges.toml`, gains one
+  row, the next run logs the whole population again and prints what the old leg prints.
   Red when: a record stored under the old table is reused.
-- **AC3** — When the new leg runs warm with no new commit and the four DESIGN_* keys blank, under
-  `GIT_TRACE2_EVENT=<dir>`, the directory holds at most 12 files and no `log` event names
-  `--name-only` over more than the NEW commits.
+- **AC3** — When the new leg runs warm over the fixture with no new commit and the four DESIGN_* keys
+  blank, under `GIT_TRACE2_EVENT=<dir>`, the directory holds at most 12 files and no `log` event
+  names `--name-only` over more than the NEW commits. The main loop takes the same count over the
+  real tree at the close.
   Red when: the whole-history log survives on the warm path.
-  figure: 12 is PINNED as the promise.
-- **AC4** — When a `git commit` touching a path under `ROUTED_PATHS` that names no unit is added past
-  the stored tip, both legs exit 1 and print the same violation line for it.
+  figure: 12 is PINNED as the promise, and a warm run's count does not grow with the commit count,
+  so the fixture reads the bound.
+  permission: the real-tree count is owed to the main loop.
+- **AC4** — When a `git commit` touching a path under `ROUTED_PATHS` that names no unit is added to
+  the fixture past the stored tip, both legs exit 1 and print the same violation line for it.
   Red when: the new commit is not read, or reads green.
-- **AC5** — When a stored record is truncated to half its bytes, the next run logs that commit again
-  and its output equals the old leg's. When a planted `read_commits` stub drops one logged commit, the
-  leg exits 2 with the truncation refusal.
+- **AC5** — When a stored record is truncated to half its bytes, the next run over the fixture logs
+  that commit again and its output equals the old leg's. When a planted `read_commits` stub drops
+  one logged commit, the leg exits 2 with the truncation refusal.
   Red when: a partial record is trusted, or a short stream reads clean.
 - **AC6** — When `grep -c 'history verdict store' tools/memory-tree/routed_commits.py` runs, it prints
   1 or more.
@@ -191,7 +205,8 @@ No verb, flag, conf key, policy key or refusal number is minted.
 New arm: tools/memory-tree/routed_commits.py · covers AC4 AC5 · a `--selftest` arm whose fixture stores records, then adds an unattributed routed commit and truncates one record; its failing case is staged by reading the store without logging the commits it lacks · none
 
 The arm sits in the leg's own `--selftest`, which already counts spawns per run. The main loop
-observes it at the close.
+observes it RED and then GREEN at the close; a role agent runs no `--selftest` (scratch-guard row
+G3).
 
 ## 8. Open questions
 
@@ -200,6 +215,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-20 · initial draft.
+- rev-2 · 2026-11-22 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. S2 spells the
+  store's opener `resolve_store`, as TOOL-dQuietDisk-1 rev-3 renames it. Section 6 no longer has the
+  pass run the leg over the real tree: AC1 to AC5 run old and new over a hermetic fixture built by
+  the module's own `build_fixture`, and the real-tree corpus of AC1 and the real-tree count of AC3
+  are owed to the main loop at the close. The spec's own minted constant, `LOG_BATCH_BOUND`, sits in
+  no lexicon cell, so nothing of its own needed a rename.
 
 ## 10. Reuse audit
 

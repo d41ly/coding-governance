@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-16 — `govkit update` reads every gov blob through one `cat-file --batch` handle
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -22,16 +22,18 @@ makes, with the same receipts, writes and printed lines.
 
 ## 2. Scope (IN)
 
-- **S1** — `open_blob_batch(root)` in `tools/govkit/upgrade_steps.py` returns a handle shaped as
-  `blob_at` reads one, whose `git -C <root> cat-file --batch` process starts on the first request
-  and stops on `close()`. `derive_introduced` opens its handle through it in place of its own
-  `subprocess.Popen` line. Observed by AC1 and AC5.
-- **S2** — `blob_at`'s batch branch tells a dead handle from a missing blob. A `missing` reply
+- **S1** — `build_blob_batch(root)` in `tools/govkit/upgrade_steps.py` returns a `BlobBatch`
+  handle, whose `git -C <root> cat-file --batch` process starts on the first request, through its
+  `init_process()`, and stops on its `remove_process()`. `derive_introduced` builds its handle
+  through it in place of its own `subprocess.Popen` line, and ends it with `remove_process()`.
+  Observed by AC1 and AC5.
+- **S2** — `blob_at`'s batch branch takes the process from `batch.init_process()` and reads its
+  `stdin` and `stdout` as today. It tells a dead handle from a missing blob. A `missing` reply
   stays None. An end of stream or a header that does not parse answers that request through the
   spawn branch and marks the handle dead, so every later request on it is a spawn too. A path
   holding a newline is a spawn, since the protocol is line-framed. Observed by AC3.
-- **S3** — `cmd_update` opens one handle before it calls `_cmd_update` and closes it in its
-  `finally`, beside `release_write_lock()`. `_cmd_update` takes it as a keyword, `batch`. Observed
+- **S3** — `cmd_update` builds one handle before it calls `_cmd_update` and calls its
+  `remove_process()` in its `finally`, beside `release_write_lock()`. `_cmd_update` takes it as a keyword, `batch`. Observed
   by AC1 and AC5.
 - **S4** — Every gov-blob read `_cmd_update` reaches passes the handle: the schema back-fill and the
   integrity loop of S9 in its body, its `_resolve_ver_at`, `_add_held` and `_write_rb_finish`
@@ -89,16 +91,17 @@ per written row of a kit. That repetition is why the analysis counts about three
 ### The handle
 
 ```python
-class BlobBatch:            # what open_blob_batch returns
-    stdin, stdout           # properties: the first access starts the process
+class BlobBatch:            # what build_blob_batch returns
+    init_process()          # starts the process on the first call; returns the same Popen after
     dead: bool              # set by blob_at on an end of stream or a bad header
-    close()                 # closes stdin and waits; a no-op when never started
+    remove_process()        # closes stdin and waits; a no-op when never started
 ```
 
 `blob_at`'s batch branch keeps its write and its header parse
-(`tools/govkit/upgrade_steps.py@609cd40b1:2686`). S2 adds two exits before the parse: `batch.dead`
-or a newline in the path takes the spawn branch, and an empty or malformed header sets `dead` and
-takes it too. A lazy start means a run refused before its first read starts no process.
+(`tools/govkit/upgrade_steps.py@609cd40b1:2686`). S2 adds two exits before the parse, both taken
+before `init_process()` is called: `batch.dead` or a newline in the path takes the spawn branch.
+An empty or malformed header sets `dead` and takes it too. A lazy start means a run refused before
+its first read starts no process.
 
 ### Why the bytes cannot differ
 
@@ -113,11 +116,15 @@ for a tree does not arise; AC4 confirms it over gov's own shipped population.
 
 | Minted identifier | Kind | Naming cell | Graded by |
 |---|---|---|---|
-| `open_blob_batch` | Python function | none | the probes of section 6 |
-| `BlobBatch` | Python class | none | the probes of section 6 |
+| `build_blob_batch` | Python function | `py.function`, lexicon `--suggest` OK | the probes of section 6 |
+| `BlobBatch` | Python class | `py.type`, lexicon `--suggest` OK | the probes of section 6 |
+| `init_process`, `remove_process` | `BlobBatch` methods | `py.function`, lexicon `--suggest` OK | the probes of section 6 |
 | `batch` | keyword of `_cmd_update` and five readers | none | the probes of section 6 |
 
-No verb, flag, conf key, policy key or refusal number is minted.
+No verb, flag, conf key, policy key or refusal number is minted. The lexicon grades a method,
+a property and a dunder as a function, and `VERB_OFFENDER_PIN` is full, so the handle carries no
+`stdin` or `stdout` property and no `close()`: `blob_at` reads the process `init_process()`
+returns.
 
 ### Files touched (estimate)
 
@@ -210,6 +217,12 @@ none
   (order 3), and no unit depends on this one, so it takes the first free order; order 4's other
   unit, TOOL-dQuietDisk-19, writes records only. TOOL-dQuietDisk-9 also writes
   `tools/govkit/upgrade_steps.py` and is sequenced after it.
+- rev-2 · 2026-11-22 · S1 · S2 · S3 · §4 · under
+  `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. Every minted
+  name the lexicon refused leads with a declared verb, each checked by `--suggest`: `open_blob_batch`
+  is `build_blob_batch`, and the handle's `stdin` and `stdout` properties and its `close()` become
+  `init_process()`, which `blob_at`'s batch branch calls for the process, and `remove_process()`.
+  No criterion had the pass run a suite, a `--selftest`, a gate leg or the bar.
 
 ## 10. Reuse audit
 

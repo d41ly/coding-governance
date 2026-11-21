@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-9 — every scratch path under one owned, swept root, and every tree removed by one chmod-and-retry helper
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 6 · closes TOOL-dQuietDisk-27
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 6 · closes TOOL-dQuietDisk-27
 
 <!-- gen:spec-records -->
 
@@ -28,13 +28,14 @@ that scratch instead of the real temp root.
 ## 2. Scope (IN)
 
 - **S1** — `tools/lib/owned_scratch.py`, the canonical module, holding two marked blocks.
-  `remove_tree_py` defines `remove_tree(path)` and `scratch_dir()`. `remove_tree` calls
+  `remove_tree_py` defines `remove_tree(path)` and `build_scratch_dir()`. `remove_tree` calls
   `shutil.rmtree` with an `onexc` hook that clears the read-only bit on the failing path and retries
-  it once, never raises, and returns whether the path is gone. `scratch_dir()` is a context manager
-  over `tempfile.mkdtemp()` whose exit calls `remove_tree`. `onexc` alone is used, because the
+  it once, never raises, and returns whether the path is gone. `build_scratch_dir()` is a
+  `contextlib.contextmanager` generator over `tempfile.mkdtemp()` whose exit calls `remove_tree`, so
+  no `__enter__` or `__exit__` is defined, which the lexicon would grade as functions. `onexc` alone is used, because the
   declared python floor is 3.15, the value `tools/lib/python-floor.txt` holds at `609cd40b1`.
   Observed by AC1.
-- **S2** — The block `owned_tempdir_py` defines `enter_owned_tempdir()`. When the process's temp dir
+- **S2** — The block `owned_tempdir_py` defines `init_owned_tempdir()`. When the process's temp dir
   sits inside a `gate-work.*` directory holding an `owner` file, it sets `tempfile.tempdir` to that
   temp dir and returns it. Otherwise it first sweeps each `gate-work.*` under the temp dir whose
   owner line names a `py:` pid that is not alive and this repository's git common dir. It then
@@ -44,10 +45,10 @@ that scratch instead of the real temp root.
   A pid that cannot be judged reads as alive. Observed by AC2 and AC3.
 - **S3** — Every `shutil.rmtree(..., ignore_errors=True)` and every
   `TemporaryDirectory(..., ignore_cleanup_errors=True)` under `tools/`, `skills/` and `.githooks/`
-  moves to `remove_tree` and `scratch_dir`. Every hand-written chmod-and-retry hook in those trees
+  moves to `remove_tree` and `build_scratch_dir`. Every hand-written chmod-and-retry hook in those trees
   moves to `remove_tree` too. A gov-internal file imports the canonical module; a file a kit ships
   carries the blocks inline. Each Python suite entry point in that population calls
-  `enter_owned_tempdir()` before its first scratch. Observed by AC4 and AC5.
+  `init_owned_tempdir()` before its first scratch. Observed by AC4 and AC5.
   **Readers:** by name: `remove_tree`, which `tools/loop/loop_witness.py` calls through the
   memory-tree kit's `deviation_join` and which the inline block keeps; each local hook's other
   callers sit in its own file and call `remove_tree` after the move ·
@@ -94,7 +95,7 @@ that scratch instead of the real temp root.
 - No bash `rm -rf` rewrite. MSYS `rm -rf` removes git's read-only objects, and the bash leaks
   dSweptScratch measured were bookkeeping it fixed (TOOL-dSweptScratch-1, §4).
 - No new sweeper. A bash-owned root is swept by `scan_dead_work`, a Python-owned one by the next
-  `enter_owned_tempdir()`. Each judges only its own pid kind: bash's `kill -0` cannot judge a
+  `init_owned_tempdir()`. Each judges only its own pid kind: bash's `kill -0` cannot judge a
   Windows pid, so `py:` lines are skipped by the bash scan, whose `case` already refuses a
   non-numeric pid (`tools/run-gates/run-gates.sh#scan_dead_work`).
 - No cleanup ledger seeded with today's sites. S3 moves every one, so the ledger starts with its
@@ -105,7 +106,7 @@ that scratch instead of the real temp root.
 - No policy key. Removing a tree and owning a root save no answer, so the cache rule does not reach
   them, and their off value would be a leak. `GATE_OUTER_AMBIENT_TMP` is not a switch either: it
   names a directory an outer runner holds, and unset is today's behaviour.
-- No outer-root read in the Python face. `enter_owned_tempdir()` nests inside whatever owned
+- No outer-root read in the Python face. `init_owned_tempdir()` nests inside whatever owned
   `TMPDIR` it is given and removes its own root at exit, so the root it sweeps is the one it sits in.
 - No move of where a bar makes its own `gate-work.*`. Under an adopter runner it stays inside that
   runner's scratch, which the runner removes.
@@ -207,7 +208,8 @@ or a verdict. `GATE_AMBIENT_TMP` itself stays as that census classes it, assigne
 | Minted identifier | Kind | Naming cell | Graded by |
 |---|---|---|---|
 | `remove_tree_py`, `owned_tempdir_py`, `owned_work_sh` | parity block markers | `PARITY_ROWS` | `tools/lib/resolve-python.test.sh` |
-| `remove_tree`, `scratch_dir`, `enter_owned_tempdir` | Python functions | none | the probes of section 6 |
+| `remove_tree`, `build_scratch_dir`, `init_owned_tempdir` | Python functions | `py.function`, lexicon `--suggest` OK | the probes of section 6 |
+| `write_work_owner`, `scan_dead_work` | shell functions, lifted under their names | `sh.function`, lexicon `--suggest` OK | the probes of section 6 |
 | `--cleanup`, arm `cleanup` | scanner mode and arm | the scanner's `ARMS` tuples | its `--selftest` |
 | `cleanup-sites` | ledger population | `.memory-tree.conf` `PROJECT_REGISTRY_EXTRA` | `memory hygiene` |
 | `cleanup posture (a tree removal that swallows its error)` | gate leg | `tools/gate-legs.json` | `run-gates canary` |
@@ -265,7 +267,7 @@ that stages them re-stamps the manifest's `last-audit`.
   matched by common dir as `scan_dead_work` matches today. An unreadable or foreign owner line is
   never swept. `GATE_OUTER_AMBIENT_TMP` moves which directory the sweep lists, never its predicate,
   so an exported value can only remove a dead bar's `gate-work.*` of this repository.
-- perf / scale: `enter_owned_tempdir` lists the temp dir's `gate-work.*` entries once per suite;
+- perf / scale: `init_owned_tempdir` lists the temp dir's `gate-work.*` entries once per suite;
   the glob reads names, not every entry's metadata.
 - error / empty / loading states: a removal that still fails returns False and raises nothing, as
   `ignore_errors` did; the root it sits in is swept later.
@@ -290,7 +292,7 @@ that stages them re-stamps the manifest's `last-audit`.
   without raising.
   Red when: the read-only objects survive, or a failure raises.
 - **AC2** — When a probe runs with `TMPDIR` inside a planted `gate-work.x/tmp` holding `gate-work.x/owner`,
-  `enter_owned_tempdir()` returns that `tmp` and makes no directory. Run with an ambient `TMPDIR`, it
+  `init_owned_tempdir()` returns that `tmp` and makes no directory. Run with an ambient `TMPDIR`, it
   makes one `gate-work.*` holding an owner line that starts `py:`, a child `python -c` it starts
   prints that root's `tmp` for each of `TMPDIR`, `TEMP` and `TMP`, and the directory is gone after
   the process exits.
@@ -298,20 +300,27 @@ that stages them re-stamps the manifest's `last-audit`.
   the ambient temp dir.
 - **AC3** — When a probe plants, under one ambient dir, a root owned by a dead `py:` pid of this
   repository, one by a live `py:` pid, one by a dead `py:` pid of another common dir, and one by a
-  bash pid, and calls `enter_owned_tempdir()`, only the first is removed.
+  bash pid, and calls `init_owned_tempdir()`, only the first is removed.
   Red when: a live, foreign or bash-owned root is removed.
 - **AC4** — When `python tools/gate-lint/encoding_posture.py --cleanup --measure . tools skills .githooks`
-  runs at the unit's tip, it prints no `cleanup` line, and the graded run with the registry
-  argument exits 0. One planted `shutil.rmtree(p, ignore_errors=True)`
-  split over two lines reds the graded run naming its file.
+  runs at the unit's tip, it prints no `cleanup` line. Run over a fixture tree holding one planted
+  `shutil.rmtree(p, ignore_errors=True)` split over two lines, it prints one `cleanup` line naming
+  that file. When the main loop runs the new leg, the graded run with the registry argument, at the
+  close, it exits 0 at the tip and 1 with the planted call.
   Red when: a split call is missed, or a site survives the move.
-- **AC5** — When each suite S3 touched is run directly in a scratch `git clone --shared` of gov with
-  `TEMP`, `TMP` and `TMPDIR` pointed at an empty directory, it prints the same arm lines and exit
-  code as at the build's base, and the directory holds 0 entries after it exits. The unattended
-  kit's suites are excluded, as the owner's rule of 2026-08-23 requires.
+  permission: the graded run is the new leg's own argv, owed to the main loop (scratch-guard row
+  G1); the pass makes the `--measure` runs.
+- **AC5** — When every Python file S3 touched compiles under `python -m py_compile`, and AC2's probe
+  shows a child's temp landing in the owned root, the pass's half holds. When the main loop runs
+  each suite S3 touched at the close, in a scratch `git clone --shared` of gov with `TEMP`, `TMP`
+  and `TMPDIR` pointed at an empty directory, it prints the same arm lines and exit code as at the
+  build's base, and the directory holds 0 entries after it exits. The unattended kit's suites are
+  excluded, as the owner's rule of 2026-08-23 requires.
   Red when: an arm's result moves, or an entry remains.
   cost: the touched suites run in full once each, some for minutes.
   figure: DERIVED at observation; the residual at the build's base is recorded beside it.
+  permission: a role agent runs no suite (scratch-guard row G3), so the suite runs are owed to the
+  main loop; the pass makes the compile check and the probe.
 - **AC6** — When a bash probe sources `owned-scratch.sh` from `tools/lib/`, plants a `gate-work.*`
   whose owner names a dead MSYS pid and this common dir, one naming a live pid, and one whose owner
   starts `py:`, and calls `scan_dead_work`, only the first is removed and the sweep line names its
@@ -328,30 +337,43 @@ that stages them re-stamps the manifest's `last-audit`.
   from every copy, every pair compares equal, and the runner carries `write_work_owner` as the
   inline block.
   Red when: a copy drifts by one byte, which the new `PARITY_ROWS` rows then report.
-- **AC9** — When `python tools/gate-lint/encoding_posture.py --selftest` runs, it prints its count
-  line at or above the raised `FLOOR_ASSERTIONS` and exits 0. With the `--cleanup` arm's keyword
-  test inverted, it exits 1.
+- **AC9** — When the main loop runs `python tools/gate-lint/encoding_posture.py --selftest` at the
+  close, it prints its count line at or above the raised `FLOOR_ASSERTIONS` and exits 0. With the
+  `--cleanup` arm's keyword test inverted, it exits 1.
   Red when: the new mode's rows do not execute.
+  permission: a role agent runs no `--selftest` (scratch-guard row G3); this is the first `New
+  arm:` line's RED and GREEN observation, owed to the main loop. The pass's proxy is AC4's
+  `--measure` runs.
 
-- **AC10** — When a probe builds a fixture bar under `%TEMP%/<short-name>`, in the shape the
-  runner's own suites build one, whose manifest declares one leg running
-  `node -e "process.exit(require('os').tmpdir().includes('gate-work.') ? 0 : 1)"`, and runs the
-  fixture's copy of the runner from Git Bash, the leg passes and the bar exits 0. With the `TEMP` and
-  `TMP` export deleted from the fixture's copy of the runner, the same leg is red. When
+- **AC10** — When a bash probe under `%TEMP%/<short-name>` takes the edited runner's
+  `export TMPDIR=` line, the one that also exports `TEMP` and `TMP`, sets `WORK` to a planted
+  `gate-work.x` holding `tmp`, evaluates the line and starts
+  `node -e "process.exit(require('os').tmpdir().includes('gate-work.') ? 0 : 1)"` from Git Bash,
+  the child exits 0. With `TEMP` and `TMP` taken out of the line, the same child exits 1. When
   `grep -n "TEMP=" tools/run-gates/run-selftests.sh` runs, it prints the row launch line, setting
-  `TEMP` and `TMP` beside `TMPDIR`.
+  `TEMP` and `TMP` beside `TMPDIR`. When the main loop runs a fixture bar at the close, in the
+  shape the runner's own suites build one, whose one leg is that `node -e` line, the leg passes, and
+  it is red with the export deleted from the fixture's copy of the runner.
   Red when: a native child's `os.tmpdir()` still answers the ambient `%TEMP%`.
   fixture: a host with `node` on `PATH`, as gov's hooks already require.
-- **AC11** — When the probe makes an outer root A holding a planted `gate-work.dead`, whose owner
-  names a dead MSYS pid and the fixture's git common dir, and two other entries, points `TMPDIR` at
-  an empty directory B, exports `GATE_OUTER_AMBIENT_TMP` as A, and runs the fixture bar, the sweep
-  line names the planted pid, `gate-work.dead` is gone and the bar prints `TMPDIR entries 2`. Its
-  one leg, `bash -c '[ -z "${GATE_OUTER_AMBIENT_TMP+x}" ]'`, passes, and the bar's own
-  `gate-work.*` was made under B. Run again with the variable unset, the planted dir survives and
-  the bar prints `TMPDIR entries 1`, B's count, as today. With the variable naming a missing
-  directory, the runner prints its NOTE line and behaves as the unset run.
+  permission: a role agent runs no runner, a fixture copy included (scratch-guard row G2), so the
+  fixture bar is owed to the main loop; the pass makes the probe.
+- **AC11** — When a bash probe takes the edited runner's outer-root read, extracted as AC10 takes
+  its line, and evaluates it with `GATE_OUTER_AMBIENT_TMP` naming an outer root A, `RG_SWEPT_TMP`
+  reads A and the variable is unset after it; unset, `RG_SWEPT_TMP` reads `$GATE_AMBIENT_TMP`; and
+  naming a missing directory, it prints the NOTE line and reads `$GATE_AMBIENT_TMP`. A second probe
+  sourcing `owned-scratch.sh` and calling `scan_dead_work` over A, holding a planted
+  `gate-work.dead` whose owner names a dead MSYS pid and the probe's git common dir, sweeps it. When
+  the main loop runs the fixture bar of AC10 at the close with A holding `gate-work.dead` and two
+  other entries, `TMPDIR` at an empty directory B and the variable exported as A, the sweep line
+  names the planted pid, `gate-work.dead` is gone, the bar prints `TMPDIR entries 2`, its one leg,
+  `bash -c '[ -z "${GATE_OUTER_AMBIENT_TMP+x}" ]'`, passes, and its own `gate-work.*` was made
+  under B. Run again with the variable unset, the planted dir survives and the bar prints
+  `TMPDIR entries 1`.
   Red when: a nested bar still counts and sweeps the outer runner's scratch, or a leg inherits the
   variable.
+  permission: the fixture bar is owed to the main loop (scratch-guard row G2); the pass makes the
+  two probes.
 - **AC12** — When `grep -n "GATE_OUTER_AMBIENT_TMP" .githooks/pre-push.test.sh` runs, it prints the
   variable's reason line in the knob classes comment and the `BAR_INERT_KNOBS` line naming it. When
   `grep -n "GATE_OUTER_AMBIENT_TMP" tools/run-gates/README.md` runs, it prints a line of the
@@ -372,7 +394,8 @@ New arm: tools/gate-lint/encoding_posture.py · covers AC4 AC9 · the --cleanup 
 New arm: tools/lib/resolve-python.test.sh · covers AC8 · the three new PARITY_ROWS rows; each failing case is staged by one changed byte in a copy · none
 
 The new cleanup leg itself is declared in `tools/gate-legs.json`, and its RED and GREEN observation
-at the close is the main loop's. The bar runs once at the close.
+at the close is the main loop's, as are the suite runs of AC5 and the fixture bars of AC10 and AC11.
+The bar runs once at the close.
 
 ## 8. Open questions
 
@@ -396,6 +419,13 @@ none
   owned-root block to `run-gates.sh` lines 2399 to 2465, unchanged in body; the population to 45
   `rmtree` and 11 `TemporaryDirectory` sites in 21 files, and the hooks to 23 files, so the file
   list is re-derived; the registry exemption to line 253; the base to `e4699ee7`.
+- rev-3 · 2026-11-22 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. The two names
+  the lexicon refused lead with a declared verb, each checked by `--suggest`: `scratch_dir` is
+  `build_scratch_dir`, a `contextlib.contextmanager` generator so that no dunder is graded, and
+  `enter_owned_tempdir` is `init_owned_tempdir`. Section 6 no longer has the pass run a gate: AC4's
+  graded run, AC5's suite runs, AC9's `--selftest` and the fixture bars of AC10 and AC11 are owed to
+  the main loop, and the pass makes `--measure` runs, a compile check and probes of the extracted
+  runner lines.
 
 ## 10. Reuse audit
 

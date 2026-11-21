@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-5 — one `git diff --name-only BASE` decides every plain-guarded leg of a bar
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -146,22 +146,33 @@ touch, so a guard the in-process rule cannot answer is still answered by git.
   `ga/`, the leg is skipped; fed `ga/f`, it runs; and a leg guarded by the file name `ga` is not
   matched by a path `ga/` names as a directory unless the path sits under it.
   Red when: a substring match takes `xga/f` for `ga/`, or a directory guard matches a file of its name.
-- **AC3** — When a bar's guard pass runs under `GIT_TRACE2_EVENT=<dir>` over the AC1 clone, the
-  directory holds one `diff` event for the guard pass, against today's one per guarded leg reaching
-  it, the count printed beside it.
+- **AC3** — When AC1's probe runs under `GIT_TRACE2_EVENT=<dir>`, one directory per side, the old
+  side holds one `diff` event per guarded leg it decides and the new side holds one `diff` event in
+  all, the two counts printed side by side. When the main loop runs a bar's guard pass over the AC1
+  clone under the same variable at the close, the directory holds one `diff` event for the guard
+  pass, against today's one per guarded leg reaching it.
   Red when: a per-leg `diff --quiet` survives for a plain-guarded leg.
   figure: the per-leg count is DERIVED from the manifest at observation.
-- **AC4** — When the one diff is made to exit 128 by a `BASE` naming a pruned object, and when a
-  path holding a double quote is edited, every guarded leg is decided by `changed`, and the `GATE`
-  lines equal the old runner's.
+  permission: a role agent runs no runner, a fixture copy included (scratch-guard row G2), so the
+  bar's own count is owed to the main loop; the pass makes the probe's count.
+- **AC4** — When the guard pass's fallback test, extracted from the edited runner into a probe
+  script as AC2 extracts its `awk`, is given a diff status of 128, and separately a moved list
+  holding a line that starts with `"`, it decides every guarded leg by `changed`. The main loop
+  observes the runner's own `GATE` lines equal the old runner's in both cases, through the `New
+  arm:` line of section 7.
   Red when: a failed or quoted read skips a leg.
+  permission: the runner's `GATE` lines are owed to the main loop (scratch-guard row G2).
 - **AC5** — When `grep -c 'check_plain_guard' tools/run-gates/run-gates.sh` runs, it prints 3 or more,
   the definition and its two callers, and the inline `case` at `build_input_keys` is gone.
   Red when: the guard pass and the input keys each keep their own predicate.
-- **AC6** — When the held-selection program runs in changed mode with a last-run record whose sha equals `BASE`, the
-  trace holds no second `diff --name-only` for that sha, and the `selftests changed` lines equal the
-  old runner's.
+- **AC6** — When `grep -n 'base.moved' tools/run-gates/run-gates.sh` runs, it prints the one write
+  of S1, the guard pass's read and the held-selection program's read under the sha-equals-`BASE`
+  test. When the main loop runs the held-selection program in changed mode at the close, with a
+  last-run record whose sha equals `BASE`, the trace holds no second `diff --name-only` for that
+  sha, and the `selftests changed` lines equal the old runner's.
   Red when: the program still diffs a sha equal to `BASE`.
+  permission: changed mode is a bar run, owed to the main loop (scratch-guard row G2); the pass
+  makes the `grep`.
 - **AC7** — When `bash skills/session-kickoff/manifest-check.sh --staged` runs over the commit that
   lands S1, it exits 0.
   Red when: the watched runner moves without the `last-audit` re-stamp.
@@ -170,7 +181,7 @@ touch, so a guard the in-process rule cannot answer is still answered by git.
 
 `run-gates canary` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/run-gates/run-gates.test.sh · covers AC2 AC4 · a fixture manifest with a plain directory guard, a near-miss path, a glob guard and a planted failing diff; its failing case is staged by matching the guard as a substring and by reading a failed diff as clean · none
+New arm: tools/run-gates/run-gates.test.sh · covers AC2 AC4 AC6 · a fixture manifest with a plain directory guard, a near-miss path, a glob guard, a planted failing diff and a last-run record whose sha equals the base; its failing case is staged by matching the guard as a substring, by reading a failed diff as clean, and by diffing the recorded sha again · none
 
 ## 8. Open questions
 
@@ -179,6 +190,11 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-20 · initial draft.
+- rev-2 · 2026-11-22 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. AC3, AC4 and
+  AC6 had the pass run the runner, which a role agent may not run in any form. AC3's figure now
+  comes from AC1's probe, AC4's from the extracted fallback test, and AC6's from a `grep`; the bar's
+  own count, `GATE` lines and changed-mode trace are owed to the main loop, and the `New arm:` line
+  covers AC6 too. `check_plain_guard`, the one name this spec mints, passes `--suggest`.
 
 ## 10. Reuse audit
 

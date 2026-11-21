@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-8 — the whole-tree readers clone without copying objects and check out only what they read
 
-**Status:** SPECCED · rev-2 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 2 · ratified 2026-11-20
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -31,8 +31,15 @@ its reason and left as today. Every reader's verdict and output stay what they w
 - **S2** — `tools/govkit/matrix.py`'s aged-gov clone and `tools/govkit/upgrade_walk.py`'s pinned
   clone add `--shared` to their `clone` call. Observed by AC2 and AC5.
 - **S3** — A reader moves to a sparse checkout only where its own output, run once over a full
-  checkout and once over a checkout leaving out `memory/builds/`, is byte-identical, an observation
-  the build pass makes reader by reader and records in the acceptance ledger. Such a reader sets `git sparse-checkout set --no-cone` to every tracked
+  checkout and once over a checkout leaving out `memory/builds/`, is byte-identical. The pass makes
+  that observation through each reader's scoped direct check, run over both checkouts and recorded
+  in the acceptance ledger: `python tools/policy/check_policy.py --fixture <case>` for one case whose
+  fixture builds a source snapshot, `python tools/govkit/upgrade_walk.py --case <case>` for one
+  case, and, for `matrix.py`, which has no scoped form, a probe that makes its aged-gov clone as
+  `tools/govkit/matrix.py@609cd40b1:976` does and runs that shape's `apply` and `update --write`
+  over each checkout. The reader's whole run over both checkouts is owed to the main loop at the
+  close, and a move there is a red the close repairs by returning that reader to its full
+  checkout. Such a reader sets `git sparse-checkout set --no-cone` to every tracked
   path except `memory/builds/` before its checkout, through a two-line helper inlined in its own kit,
   since `tools/lib/` ships nothing. The candidates are `build_source_snapshot` in
   `tools/policy/check_policy.py`, which `tools/loop/factories.py` also calls, `matrix.py`'s
@@ -133,30 +140,46 @@ every clone here is removed before its leg ends (S4).
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the foreign-prefix suite, filtered by its `--kit` flag to one family, and the
-  chain-packet suite each run before and after their clone becomes `git clone -q --shared
-  --no-checkout`, in one scratch clone of the real tree, each pair prints the same arm results and
-  exits the same.
-  Red when: a `--shared` clone changes an arm's result.
+- **AC1** — When a probe under `%TEMP%/<short-name>` builds a repository of at least 50 committed
+  files and makes two copies of it, one by today's `git clone -q --no-hardlinks` and one by
+  `git clone -q --shared --no-checkout`, each followed by the same `checkout -B`, the two copies'
+  `git ls-files -s`, `git status --porcelain` and work-tree file lists are byte-identical, and only
+  the shared copy holds an `objects/info/alternates` file. When the main loop runs the
+  foreign-prefix suite, filtered by its `--kit` flag to one family, and the chain-packet suite before
+  and after the change at the close, each pair prints the same arm results and exits the same.
+  Red when: a `--shared` clone changes the checked-out tree, or an arm's result.
   cost: the foreign-prefix suite's declared budget is long, and the filter bounds it to one family.
-  fixture: a clone under `%TEMP%` with its own `TEMP`.
-- **AC2** — When `python tools/govkit/upgrade_walk.py` runs before and after over the same clone, its
-  printed lines and exit are the same, and the walk's clone holds an `objects/info/alternates` file.
+  permission: a role agent runs no suite (scratch-guard row G3), so both suites' pairs are owed to
+  the main loop; the pass makes the clone probe.
+- **AC2** — When a probe imports `tools/govkit/upgrade_walk.py` and calls `build_release_tree` with
+  `with_target=False` over a scratch root, the clone it leaves at `<root>/gov` holds an
+  `objects/info/alternates` file and the pinned commit checked out. When
+  `python tools/govkit/upgrade_walk.py --case <case>` runs for one case before and after over the same
+  clone of gov, its printed lines and exit are the same. When the main loop runs the whole walk
+  before and after at the close, its printed lines and exit are the same.
   Red when: the walk's output moves, or its clone still carries its own copy of every object.
+  permission: the whole walk is the `upgrade-walk` leg, owed to the main loop (scratch-guard row
+  G1); the pass makes the probe and the one-case run.
 - **AC3** — When `build_source_snapshot` is called on the same working tree by the old and the new
-  `tools/policy/check_policy.py`, the two snapshot commits carry the same tree id, and every sparse
-  reader's run prints what its old run printed.
+  `tools/policy/check_policy.py`, the two snapshot commits carry the same tree id, and each sparse
+  reader's scoped direct check of S3 prints over the sparse checkout what it prints over the full
+  one. The main loop observes each sparse reader's whole run unchanged at the close.
   Red when: a sparse checkout drops a path the reader reads, so its output moves.
-- **AC4** — When S3's observation finds a reader's output moved with `memory/builds/` left out, that
+  permission: each reader's whole run is owed to the main loop; the pass makes the snapshot probe
+  and the scoped checks.
+- **AC4** — When S3's scoped check finds a reader's output moved with `memory/builds/` left out, that
   reader keeps its full checkout, and `grep -c 'sparse-checkout' <its file>` prints 0. The
   observation is trusted only after a planted read of one `memory/builds/` README inside the
   reader's scratch run makes the two outputs differ.
   Red when: a reader goes sparse against a moved observation, or the comparison cannot fail.
-- **AC5** — When each changed reader runs with `TEMP`, `TMP` and `TMPDIR` pointed at a scratch dir
-  watched every 0.5 s, its peak entry count is lower than the old reader's and its residue after exit
-  is 0, both printed beside the old figures.
+- **AC5** — When AC1's and AC2's probes and each scoped check of S3 run with `TEMP`, `TMP` and
+  `TMPDIR` pointed at a scratch dir watched every 0.5 s, each changed clone's peak entry count is
+  lower than the old clone's and the residue after exit is 0, both printed beside the old figures.
+  When the main loop takes the same watch over each changed reader's whole run at the close, the
+  same holds.
   Red when: a reader's peak does not fall, or a clone outlives its leg.
   figure: both counts are DERIVED at observation.
+  permission: the whole runs are owed to the main loop; the pass makes the probe readings.
 - **AC6** — When `grep -n -- '--shared' tools/run-gates/foreign-prefix.gov.test.sh tools/chain-packet.test.sh tools/govkit/matrix.py tools/govkit/upgrade_walk.py`
   runs, each file names it beside a comment saying why.
   Red when: a clone still carries `--no-hardlinks`.
@@ -166,7 +189,8 @@ every clone here is removed before its leg ends (S4).
 `foreign-prefix parity (every self-test at three prefixes)` · `chain-packet self-test` · `policy check` · `policy fixtures` · `loop factories fixtures` · `govkit acceptance matrix` · `upgrade-walk` · `govkit selftest` · `govkit refusal join` · `scratch-guard self-test` · `routed-commits selftest` · `recall floor arms` · `line length` · `spec tokens (a spec's own names resolve)`
 
 No suite arm is added or moved: each reader is itself a suite or a fixture, and its own arms
-re-observe it at the close.
+re-observe it at the close, run by the main loop. No criterion has the pass run a suite, a gate
+leg's own argv or the bar.
 
 ## 8. Open questions
 
@@ -188,6 +212,11 @@ re-observe it at the close.
 - rev-2 · 2026-11-20 · §3 · §4 · §8 · F1 resolved (b) under
   `2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task`: each reader takes its own `--shared` clone, and
   nothing is handed between legs.
+- rev-3 · 2026-11-22 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. S3, AC1, AC2, AC3
+  and AC5 had the pass run the readers, which are suites and gate legs a role agent may not run.
+  The pass now makes clone probes and each reader's scoped direct check, and every whole reader run
+  is owed to the main loop at the close. `write_sparse_set`, the one name the spec mints, passes
+  `--suggest` in both cells.
 
 ## 10. Reuse audit
 

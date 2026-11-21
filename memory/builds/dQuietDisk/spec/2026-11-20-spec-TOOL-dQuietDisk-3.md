@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-3 — the brief-recorded leg grades only units whose key moved since its last graded tip
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -27,8 +27,8 @@ byte-identical.
 - **S1** — Before the per-build loop, the leg reads its last graded tip from the store and derives
   the NEW set, the commits of `rev-list <last>..HEAD`, read once. No tip, a tip that is not an
   ancestor of HEAD, an unreadable store, or `tests.history-verdicts` at `regraded` makes the NEW set
-  "everything", and every unit is graded as today. The tip is read with `hs_tip_read` after one
-  `hs_open`. Observed by AC1 and AC3.
+  "everything", and every unit is graded as today. The tip is read with `read_hs_tip` after one
+  `init_hs`. Observed by AC1 and AC3.
 - **S2** — Each graded unit's outcome is one store item, keyed by the inputs section 4 lists. The
   item holds the outcome class and the commits and paths its lines name, never a printed line.
   Observed by AC1 and AC2.
@@ -38,11 +38,11 @@ byte-identical.
 - **S4** — The violation lines, the `announced` lines, the waiver bookkeeping, the stale rule and the
   three summary lines are derived from the outcomes in today's order and with today's counters. A
   short sha is computed at report time. Observed by AC1.
-- **S5** — The per-build reads at HEAD go through `bh_open` and `bh_read`, the store's one
+- **S5** — The per-build reads at HEAD go through `init_bh` and `read_bh_blob`, the store's one
   `cat-file --batch` coprocess: the README's `opened:` and CLOSED rows, and the run-state file's
-  `base:` and claim. Every item is read by one `hs_lookup` call. Observed by AC3.
-- **S6** — A run that exits 0 or 1 writes every regraded item and its new tip with one `hs_store`
-  call, each tmp-then-rename.
+  `base:` and claim. Every item is read by one `read_hs_items` call. Observed by AC3.
+- **S6** — A run that exits 0 or 1 writes every regraded item and its new tip with one
+  `write_hs_items` call, each tmp-then-rename.
   A run that exits 2 writes nothing. Observed by AC5.
 - **S7** — The header's account of what the leg does not check gains one sentence naming the store,
   what a stored outcome skips, and the switch that turns it off. Observed by AC6.
@@ -89,7 +89,7 @@ brief row, the `ls-tree` blob it joins to, and a `rev-parse --short` per printed
 | the run-state `base:` at HEAD | `build_commit`'s range starts there |
 | `HR_MODE` and `HR_TIP` | RANGE mode excludes the advertised tip's history |
 | the claim the run-state file makes at HEAD, and the blob ids of the folder's retired `RUN.*.md` files at HEAD | the finished-run branch compares the build commit's claim with what HEAD still bears out (`tools/unattended/check-brief-recorded.sh@609cd40b1:630`) |
-| `check-brief-recorded.sh`, `lib-unattended.sh`, the driver `unattended.sh` and `commit_trailers.py`, passed to `hs_open` as its code paths | the grading code: the terminal phase set is read from the driver |
+| `check-brief-recorded.sh`, `lib-unattended.sh`, the driver `unattended.sh` and `commit_trailers.py`, passed to `init_hs` as its code paths | the grading code: the terminal phase set is read from the driver |
 | `GENERATED_INDEXES`, `SHARED_RECORDS` and `PREANCHOR_CAP` | the build-commit exclusion set and the pre-run probe's cap |
 
 An active build's run-state file changes at every phase, so its units are regraded on every run
@@ -108,7 +108,7 @@ probe reads the ancestors of `base`, which the key pins.
 A warm run with an empty NEW set and no live build makes the toplevel and HEAD reads, the waiver
 `cat-file -e` and record read, the history range read, the `rev-list --count`, the one
 `read_attribution_tokens` log, the one `ls-tree`, the one `rev-list <last>..HEAD` and the one
-`bh_open` coprocess. `hs_lookup` and `hs_store` are python processes and start no git. The bound promised is **at most 30 git processes**, PINNED as a promise and observed
+`init_bh` coprocess. `read_hs_items` and `write_hs_items` are python processes and start no git. The bound promised is **at most 30 git processes**, PINNED as a promise and observed
 by AC3. A live build adds its own units' regrades, which AC3 counts apart.
 
 ### Inventory
@@ -148,27 +148,44 @@ No verb, flag, conf key, policy key or refusal number is minted.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the old leg, `bash tools/unattended/check-brief-recorded.sh` at `609cd40b1`, and the
-  new leg each run over one scratch `git clone --shared` of the real tree at the build's base, with
-  the store cold and then warm, the three outputs and exit codes are byte-identical.
+The pass's probes run over a hermetic fixture repository the probe builds under
+`%TEMP%/<short-name>`, in the shape `tools/unattended/check-brief-recorded.test.sh#mkfixture` builds
+one, read and never run: the leg, the libraries it sources and its conf copied in, two build
+folders with a pinned `base:`, one finished and one live, four CLOSED units with their brief rows,
+and commits whose subjects name them. "Old" is the leg's copy at `609cd40b1` and "new" the unit's,
+each run there by path. Running either over the fixture is a probe of this unit's code. A reading
+over the real tree is the gate's own population, which a role agent may not run (scratch-guard row
+G1), so each such reading below is owed to the main loop at the close.
+
+- **AC1** — When the old leg and the new leg each run over the fixture, with the store cold and then
+  warm, the three outputs and exit codes are byte-identical. When the main loop runs the same
+  comparison, `bash tools/unattended/check-brief-recorded.sh` at `609cd40b1` against the new leg,
+  over one scratch `git clone --shared` of the real tree at the build's base, cold then warm, the
+  three are byte-identical there too.
   Red when: a stored outcome prints differently or a counter moves.
-  cost: about 7 minutes per cold run, measured 404 s by the analysis.
-  fixture: a clone under `%TEMP%` with its own `TEMP`; the old leg runs from a worktree at `609cd40b1`.
-- **AC2** — When the AC1 clone gains, on a throwaway branch past the stored tip, one build with a
+  cost: about 7 minutes per cold run over the real tree, measured 404 s by the analysis.
+  permission: the real-tree corpus is owed to the main loop; the pass makes the fixture comparison.
+  fixture: the real-tree clone under `%TEMP%` with its own `TEMP`; the old leg runs from a worktree
+  at `609cd40b1`.
+- **AC2** — When the fixture gains, on a throwaway branch past the stored tip, one build with a
   pinned `base:`, one CLOSED unit and one `git commit` naming it with no brief row in its run-state
   file, both legs exit 1 with the same violation line, and the store shows only that unit written.
   Red when: the new leg stays green while the old leg reds, or it regrades units it held.
-- **AC3** — When the new leg runs warm with an empty NEW set under `GIT_TRACE2_EVENT=<dir>`, the
-  directory holds at most 30 files plus the live builds' regrades, which the run counts apart.
+- **AC3** — When the new leg runs warm over the fixture with an empty NEW set under
+  `GIT_TRACE2_EVENT=<dir>`, the directory holds at most 30 files plus the live build's regrades,
+  which the run counts apart. The main loop takes the same count over the real tree at the close.
   Red when: a per-unit git call survives for a unit of a finished build.
-  figure: 30 is PINNED as the promise; the cold count is DERIVED at observation.
+  figure: 30 is PINNED as the promise, and a warm run's count over finished builds does not grow
+  with the unit count, so the fixture reads the bound; the cold counts are DERIVED at observation.
+  permission: the real-tree count is owed to the main loop.
 - **AC4** — When a `git commit` naming one CLOSED unit's id and touching a path outside the record
-  surface is added past the stored tip, the new leg regrades that unit only, and its output equals
-  the old leg's. When a commit renames one build's `RUN.md` to a retired `RUN.<PHASE>.<sha8>.md`, the
-  new leg regrades that build's units only.
+  surface is added to the fixture past the stored tip, the new leg regrades that unit only, and its
+  output equals the old leg's. When a commit renames one build's `RUN.md` to a retired
+  `RUN.<PHASE>.<sha8>.md`, the new leg regrades that build's units only.
   Red when: either change leaves the stored outcome standing.
-- **AC5** — When the new leg exits 2 on a planted unreadable `BRIEF_RECORDED_CUTOFF`, the store's tip
-  and items read the same before and after through the store's reader.
+- **AC5** — When the new leg exits 2 over the fixture on a planted unreadable
+  `BRIEF_RECORDED_CUTOFF`, the store's tip and items read the same before and after through the
+  store's reader.
   Red when: a refused run writes an item.
 - **AC6** — When `grep -c 'history verdict store' tools/unattended/check-brief-recorded.sh` runs, it
   prints 1 or more.
@@ -180,8 +197,8 @@ No verb, flag, conf key, policy key or refusal number is minted.
 
 New arm: tools/unattended/check-brief-recorded.test.sh · covers AC2 AC4 · a fixture build whose stored item is planted with a moved key or a NEW commit naming its id; its failing case is staged by reading the stored outcome without the regrade · none
 
-The arm is the main loop's to observe. AC1 and AC3 are one-time observations at the close, and no
-standing arm compares against a literal sha.
+The arm is the main loop's to observe. The real-tree halves of AC1 and AC3 are the main loop's
+one-time observations at the close, and no standing arm compares against a literal sha.
 
 ## 8. Open questions
 
@@ -190,6 +207,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-20 · initial draft.
+- rev-2 · 2026-11-22 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. The store's bash
+  face is spelled as TOOL-dQuietDisk-1 rev-3 renames it: `init_hs`, `read_hs_tip`, `read_hs_items`,
+  `write_hs_items`, `init_bh` and `read_bh_blob`. Section 6 no longer has the pass run the leg over
+  the real tree: AC1 to AC5 run old and new over a hermetic fixture, and the real-tree corpus of
+  AC1 and the real-tree count of AC3 are owed to the main loop at the close. This spec mints no
+  function, so no name of its own needed a rename.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-2 — the pass-order leg grades only units whose key moved since its last graded tip
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -27,7 +27,7 @@ stated number of git processes. Every rc, summary line and violation line stays 
   the NEW set: the commits of `rev-list <last>..HEAD`, read once. When no tip is stored, the stored
   tip is not an ancestor of HEAD, the store is unreadable, or the policy key `tests.history-verdicts`
   reads `regraded`, the NEW set is "everything" and every unit is graded as today. The tip is read
-  with `hs_tip_read` after one `hs_open`. Observed by AC1 and AC3.
+  with `read_hs_tip` after one `init_hs`. Observed by AC1 and AC3.
 - **S2** — Each graded unit's outcome is one store item, keyed by the unit's inputs that section 4
   lists. The item holds the build commit, the pre-anchor commit, the spec path found and its
   `plan_state` answer, never a printed line. Observed by AC1 and AC2.
@@ -39,12 +39,12 @@ stated number of git processes. Every rc, summary line and violation line stays 
 - **S4** — The report lines, the waiver bookkeeping, the stale-waiver rule, the `--preview` output and
   the two summary lines are derived from the outcomes in the same order and with the same counters
   as today. A short sha is computed at report time, never stored. Observed by AC1.
-- **S5** — The per-build reads at HEAD go through `bh_open` and `bh_read`, the store's one
+- **S5** — The per-build reads at HEAD go through `init_bh` and `read_bh_blob`, the store's one
   `cat-file --batch` coprocess: the README's `opened:` and its CLOSED rows, and the run-state file's
-  `base:`. They are no longer one `git show` each. Every item is read by one `hs_lookup` call.
+  `base:`. They are no longer one `git show` each. Every item is read by one `read_hs_items` call.
   Observed by AC3.
 - **S6** — After a run that exits 0 or 1 with no refusal, the leg writes every regraded item and its
-  new tip with one `hs_store` call, which writes each tmp-then-rename. A run that exits 2, or a `--preview` run, writes nothing. Observed
+  new tip with one `write_hs_items` call, which writes each tmp-then-rename. A run that exits 2, or a `--preview` run, writes nothing. Observed
   by AC5.
 - **S7** — The file header's "WHAT THIS DOES NOT CHECK" list gains one bullet naming the store, what
   a stored outcome skips, and the switch that turns it off. Observed by AC6.
@@ -101,7 +101,7 @@ change to any of them moves the key.
 | the unit id and its build folder | the item's identity |
 | the range base, from the run-state file or the folder anchor | `build_commit`'s range starts there |
 | `HR_MODE` and `HR_TIP` | RANGE mode excludes the advertised tip's history |
-| `check-pass-order.sh`, `lib-unattended.sh`, the driver `unattended.sh` and `commit_trailers.py`, passed to `hs_open` as its code paths | the grading code: `plan_state` is sliced from the driver, and attribution is the trailer reader's |
+| `check-pass-order.sh`, `lib-unattended.sh`, the driver `unattended.sh` and `commit_trailers.py`, passed to `init_hs` as its code paths | the grading code: `plan_state` is sliced from the driver, and attribution is the trailer reader's |
 | `FORK_CUTOFF`, `GENERATED_INDEXES`, `SHARED_RECORDS` and `PREANCHOR_CAP` | the classifier's cutoff and the build-commit exclusion set |
 
 The store's key rule, a digest of the working bytes of every code path the caller names, is
@@ -126,7 +126,7 @@ stored. A unit that becomes CLOSED has no item, so it is graded.
 A warm run with an empty NEW set makes these git calls: the toplevel and HEAD reads, the waiver
 `cat-file -e` and its record read, the history range read, the `rev-list --count`, the one
 `read_attribution_tokens` log, the one `ls-tree` of the builds, the one `rev-list <last>..HEAD`, and
-the one `bh_open` coprocess. `hs_lookup` and `hs_store` are python processes and start no git. The bound this unit promises is **at most 30 git processes**
+the one `init_bh` coprocess. `read_hs_items` and `write_hs_items` are python processes and start no git. The bound this unit promises is **at most 30 git processes**
 for such a run, PINNED as a promise and observed by AC3. The cold count is DERIVED at observation.
 
 ### Inventory
@@ -167,30 +167,46 @@ No verb, flag, conf key, policy key or refusal number is minted.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the old leg, `bash tools/unattended/check-pass-order.sh` at `609cd40b1`, and the new
-  leg each run over one scratch `git clone --shared` of the real tree at the build's base, first with
-  the store cold and then warm, all three outputs and exit codes are byte-identical.
+The pass's probes run over a hermetic fixture repository the probe builds under
+`%TEMP%/<short-name>`, in the shape `tools/unattended/check-pass-order.test.sh#mkfixture` builds
+one, read and never run: the leg, the libraries it sources and its conf copied in, two build
+folders, one with a run-state `base:` and one without, five CLOSED units with their specs, and
+commits whose subjects name them. "Old" is the leg's copy at `609cd40b1` and "new" the unit's, each
+run there by path. Running either over the fixture is a probe of this unit's code. A reading over
+the real tree is the gate's own population, which a role agent may not run (scratch-guard row G1),
+so each such reading below is owed to the main loop at the close.
+
+- **AC1** — When the old leg and the new leg each run over the fixture, first with the store cold and
+  then warm, all three outputs and exit codes are byte-identical. When the main loop runs the same
+  comparison, `bash tools/unattended/check-pass-order.sh` at `609cd40b1` against the new leg, over
+  one scratch `git clone --shared` of the real tree at the build's base, cold then warm, all three
+  are byte-identical there too.
   Red when: a stored outcome is reported differently, or a counter on the summary line moves.
-  cost: about 18 minutes per cold run, measured 1,054 s by the analysis.
-  fixture: a clone under `%TEMP%`, its own `TEMP`, and the old leg run from a worktree at `609cd40b1`.
-- **AC2** — When the AC1 clone gains, on a throwaway branch past the stored tip, one build folder
-  whose README carries one CLOSED unit and one `git commit` that names that id and touches a product
-  path with no spec at its first parent, both legs exit 1 with the same violation line for that unit.
+  cost: about 18 minutes per cold run over the real tree, measured 1,054 s by the analysis.
+  permission: the real-tree corpus is owed to the main loop; the pass makes the fixture comparison.
+  fixture: the real-tree clone under `%TEMP%` with its own `TEMP`, and the old leg run from a
+  worktree at `609cd40b1`.
+- **AC2** — When the fixture gains, on a throwaway branch past the stored tip, one build folder whose
+  README carries one CLOSED unit and one `git commit` that names that id and touches a product path
+  with no spec at its first parent, both legs exit 1 with the same violation line for that unit.
   The new leg's store shows that one item written and every other item read, not regraded.
   Red when: the new leg stays green while the old leg reds, or it regrades units it held.
-  fixture: the AC1 clone; the planted branch is built there and never pushed.
-- **AC3** — When the new leg runs warm with an empty NEW set under `GIT_TRACE2_EVENT=<dir>`, the
-  directory holds at most 30 files, and the cold run's file count is printed beside it.
+- **AC3** — When the new leg runs warm over the fixture with an empty NEW set under
+  `GIT_TRACE2_EVENT=<dir>`, the directory holds at most 30 files, and the cold run's file count is
+  printed beside it. The main loop takes the same count over the real tree at the close, as subject
+  M2 of TOOL-dQuietDisk-19's record.
   Red when: a per-unit or per-build git call survives on the warm path.
-  figure: 30 is PINNED as the promise; the cold count is DERIVED at observation.
+  figure: 30 is PINNED as the promise, and a warm run's count does not grow with the unit count, so
+  the fixture reads the bound; the cold counts are DERIVED at observation.
+  permission: the real-tree count is owed to the main loop.
 - **AC4** — When a `git commit` naming one CLOSED unit's id in its subject and touching a path
-  outside the record surface is added past the stored tip, the new leg regrades that unit and no
-  other, and its output equals the old leg's. When a commit edits one build's run-state `base:`, the
-  new leg regrades that build's units and no other build's.
+  outside the record surface is added to the fixture past the stored tip, the new leg regrades that
+  unit and no other, and its output equals the old leg's. When a commit edits one build's run-state
+  `base:`, the new leg regrades that build's units and no other build's.
   Red when: a NEW commit carrying the id, or a moved base, does not regrade its units.
-- **AC5** — When the new leg exits 2 on a planted unreadable `PASS_ORDER_CUTOFF`, or runs under
-  `--preview`, the store's tip and items are unchanged, read before and after through the store's
-  reader.
+- **AC5** — When the new leg exits 2 over the fixture on a planted unreadable `PASS_ORDER_CUTOFF`, or
+  runs under `--preview`, the store's tip and items are unchanged, read before and after through the
+  store's reader.
   Red when: a refused or preview run writes an item.
 - **AC6** — When `grep -c 'history verdict store' tools/unattended/check-pass-order.sh` runs, it
   prints 1 or more.
@@ -202,8 +218,8 @@ No verb, flag, conf key, policy key or refusal number is minted.
 
 New arm: tools/unattended/check-pass-order.test.sh · covers AC2 AC4 · a fixture build whose stored item is planted with a moved key or a NEW commit naming its id; its failing case is staged by skipping the regrade and reading the stored outcome · none
 
-The arm is observed by the main loop, never by a unit pass. The equivalence corpus of AC1 and the
-count of AC3 are one-time observations at the close; no standing arm compares against a literal
+The arm is observed by the main loop, never by a unit pass. The real-tree halves of AC1 and AC3
+are the main loop's one-time observations at the close; no standing arm compares against a literal
 sha, which is `memory/gotchas/test-oracle-read-from-a-historical-sha.md`'s class.
 
 ## 8. Open questions
@@ -213,6 +229,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-20 · initial draft.
+- rev-2 · 2026-11-22 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. The store's bash
+  face is spelled as TOOL-dQuietDisk-1 rev-3 renames it: `init_hs`, `read_hs_tip`, `read_hs_items`,
+  `write_hs_items`, `init_bh` and `read_bh_blob`. Section 6 no longer has the pass run the leg over
+  the real tree: AC1 to AC5 run old and new over a hermetic fixture, and the real-tree corpus of
+  AC1 and the real-tree count of AC3 are owed to the main loop at the close. This spec mints no
+  function, so no name of its own needed a rename.
 
 ## 10. Reuse audit
 

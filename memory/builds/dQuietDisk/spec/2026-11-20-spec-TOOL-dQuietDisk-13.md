@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-13 — the run-gates suites build each repeated scratch repository once and copy it per arm
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -85,12 +85,13 @@ mk_repo() {
   local d=$1
   rm -rf "$GATE_TURNSTILE_DIR"/gate-bar-beacon "$GATE_TURNSTILE_DIR"/gate-bar-beacon.* \
          "$GATE_TURNSTILE_DIR/gate-bar-queue" 2>/dev/null
-  mkdir -p "$d" && cp -a "$(template_of mk_repo _build_mk_repo)/." "$d/"   # unit 7's face
+  mkdir -p "$d" && cp -a "$(resolve_template mk_repo _build_mk_repo)/." "$d/"   # unit 7's face
 }
 ```
 
-`template_of` stands for unit 7's bash face as its spec spells it. `_build_mk_repo` is today's body
-after the beacon removal, moved and not edited. The other four follow the same shape.
+`resolve_template` is unit 7's bash face as TOOL-dQuietDisk-7 rev-2 spells it, and its arguments
+are that spec's; this unit mints no function of its own beyond the moved bodies. `_build_mk_repo`
+is today's body after the beacon removal, moved and not edited. The other four follow the same shape.
 
 ### Why a copy and not a clone
 
@@ -170,6 +171,11 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-20 · initial draft.
+- rev-2 · 2026-11-22 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. Section 4's call
+  half spells unit 7's bash face `resolve_template`, as TOOL-dQuietDisk-7 rev-2 renames it, in place
+  of the placeholder `template_of`, which the lexicon would refuse. The moved bodies, such as
+  `_build_mk_repo`, lead with `build` and pass `--suggest`. No criterion had the pass run a suite:
+  AC4's suite runs were already the main loop's.
 
 ## 10. Reuse audit
 

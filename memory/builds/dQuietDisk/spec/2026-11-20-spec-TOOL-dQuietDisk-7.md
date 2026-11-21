@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-7 — one suite template cache: each base repository built once, keyed by its inputs, and cloned per case
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -52,20 +52,20 @@ read-only checkout. The unit proves the bash face on `tools/check-line-length.te
   no remote, as a built one does today. A caller that declares keep-remote skips the second
   process. Objects are never copied. Observed by AC1 and AC3.
 - **S6** — The bash face, the canonical block `template_cache_sh` in `tools/lib/template-cache.sh`,
-  defining `tc_root`, `tc_key`, `tc_ensure` and `tc_clone`. `tools/lib/lib-selftest.sh` carries it
-  inline, and a `PARITY_ROWS` row in `tools/lib/resolve-python.test.sh` holds the copy to the
+  defining `resolve_template_root`, `derive_template_key`, `resolve_template` and
+  `build_template_clone`. `tools/lib/lib-selftest.sh` carries it inline, and a `PARITY_ROWS` row in `tools/lib/resolve-python.test.sh` holds the copy to the
   canonical block, so a copy-installed suite can carry it in units 10, 12 and 13. Observed by AC8.
 - **S7** — `lib-selftest.sh` opts in per suite. `build_fixture --template "<inputs>" <builder>`
-  builds through `tc_ensure`, and each arm's copy is a `tc_clone` with keep-remote in place of
-  `cp -a`. A new verb `arm_reading`, with `arm`'s five arguments, declares an arm whose subject
+  builds through `resolve_template`, and each arm's copy is a `build_template_clone` with
+  keep-remote in place of `cp -a`. A new verb `arm_reading`, with `arm`'s five arguments, declares an arm whose subject
   writes nothing. Every such arm runs in one clone, `$SELFTEST_ROOT/read`, made on first use. After
   the run, `run_arms` FAILs the suite when `git -C "$SELFTEST_ROOT/read" status --porcelain
   --untracked-files=all` prints anything, naming the reading arms. Without `--template`,
   `build_fixture`, `arm` and `arm_reading` run exactly as `arm` runs today, on a `cp -a` copy.
   Observed by AC1, AC3 and AC6.
 - **S8** — The python face, `tools/lib/template_cache.py`: `TemplateCache(root=None)` with
-  `key(builder_id, inputs)`, `ensure(builder_id, inputs, build)` and
-  `clone(template, dest, keep_remote=False)`. `fixture_target.build_target` gains an optional
+  `derive_key(builder_id, inputs)`, `resolve_template(builder_id, inputs, build)` and
+  `build_clone(template, dest, keep_remote=False)`. `fixture_target.build_target` gains an optional
   `template` keyword. Given a `TemplateCache`, it ensures a base from its `README.md`, its `deploy`
   text and its `files`, and clones it to `tmp/<name>` in place of the eight processes
   `build_scratch_gov`, its `add` and its commit spend. Without the keyword it builds as today. Observed by AC7.
@@ -153,12 +153,18 @@ grade alike. AC3 observes it on every arm.
 |---|---|---|---|
 | `tests.fixture-templates` | policy key, values `shared` and `per-case` | the catalogue | `policy.py check` |
 | `template_cache_sh` | parity block marker | `PARITY_ROWS` | `tools/lib/resolve-python.test.sh` |
-| `tc_root`, `tc_key`, `tc_ensure`, `tc_clone` | shell functions | none | `tools/lib/lib-selftest.test.sh` |
-| `arm_reading` | `lib-selftest.sh` verb | none | `tools/lib/lib-selftest.test.sh` |
+| `resolve_template_root`, `derive_template_key`, `resolve_template`, `build_template_clone` | shell functions | `sh.function`, lexicon `--suggest` OK | `tools/lib/lib-selftest.test.sh` |
+| `arm_reading` | `lib-selftest.sh` verb, a shell function | `sh.function`, lexicon `--suggest` OK | `tools/lib/lib-selftest.test.sh` |
 | `--template` | `build_fixture` option | none | `tools/lib/lib-selftest.test.sh` |
 | `SELFTEST_TEMPLATE_ROOT` | environment variable | none | `tools/lib/lib-selftest.test.sh` |
-| `TemplateCache` | Python class | none | the probes of section 6 |
+| `TemplateCache` | Python class | `py.type`, lexicon `--suggest` OK | the probes of section 6 |
+| `derive_key`, `resolve_template`, `build_clone` | `TemplateCache` methods | `py.function`, lexicon `--suggest` OK | the probes of section 6 |
 | `template` | keyword of `build_target` | none | the probes of section 6 |
+
+`.lexicon.conf` pins `VERB_OFFENDER_PIN` at the full offender count, so every function, method and
+shell function above leads with a declared verb, checked by
+`python tools/lexicon/lexicon.py --suggest <name> --as <cell>`; `TemplateCache` defines no
+`__enter__` or `__exit__`, which the lexicon grades as functions.
 
 ### Files touched (estimate)
 
@@ -205,28 +211,34 @@ self-test`, so an edit to either runs the suite that holds their arms. The kicko
 
 - **AC1** — When a bash probe under `%TEMP%/<short-name>` sources `lib-selftest.sh` from
   `tools/lib/`, builds a fixture with `build_fixture --template` whose builder runs `git init` and
-  `git config user.email t@t`, and clones it twice with `tc_clone`, each clone's `git config
+  `git config user.email t@t`, and clones it twice with `build_template_clone`, each clone's `git config
   user.email` prints `t@t`, `git remote` prints nothing, and its tracked files equal the builder's.
   The template's `.git/objects` holds every object, and neither clone's does: each holds an
   `objects/info/alternates` naming it.
   Red when: the clone copies objects, keeps `origin`, or loses the builder's config.
-- **AC2** — When the probe calls `tc_key` for one builder with two input sets that differ by one
+- **AC2** — When the probe calls `derive_template_key` for one builder with two input sets that differ by one
   byte of one input file, and for two builders whose names match but whose `declare -f` bodies
   differ, the four keys are distinct. The same builder and inputs give the same key twice.
   Red when: a key omits the definition or the inputs' blob ids.
-- **AC3** — When the line-length suite runs directly with `tests.fixture-templates` at its default,
-  and again at `per-case`, both print the same 20 `ok` lines in the same order and the same
-  `PASS (20 arms, width <n>)` line. With the gate's 450 default changed to 449 in the template's
-  input, the same arms go red in both modes.
+- **AC3** — When a probe script under `%TEMP%/<short-name>` sources `lib-selftest.sh` from
+  `tools/lib/` and runs three arms copied from the line-length suite S10 names, two green and one
+  at the width edge, through `build_fixture --template` naming the gate, its policy files and its
+  prefix as inputs, once with `tests.fixture-templates` at its default and once at `per-case`, both
+  print the same `ok` lines in the same order. With the gate's 450 default changed to 449 in the
+  template's input, the same arm goes red in both modes. When the main loop runs the line-length
+  suite itself at the close in both modes, both print the same 20 `ok` lines in the same order and
+  the same `PASS (20 arms, width <n>)` line, and the same arms go red at 449.
   Red when: an arm's result differs between the modes, or the red arms differ.
-- **AC4** — When two shells run `tc_ensure` for the same key at once in one root, one builds and one
+  permission: a role agent runs no suite, whichever kit holds it (scratch-guard row G3), so the
+  suite's own reading is owed to the main loop; the pass makes the three-arm probe.
+- **AC4** — When two shells run `resolve_template` for the same key at once in one root, one builds and one
   reuses, the root holds one `<key>` directory and no `.stage-*`, and both get the same template.
   Red when: the loser's stage is renamed over the winner or left behind.
-- **AC5** — When the probe runs `tc_root` with `SELFTEST_TEMPLATE_ROOT` set, it prints that
+- **AC5** — When the probe runs `resolve_template_root` with `SELFTEST_TEMPLATE_ROOT` set, it prints that
   directory. Unset, with `TMPDIR` inside a planted `gate-work.x/tmp` holding `gate-work.x/owner`,
   it prints `gate-work.x/templates`. With neither, it prints `$SELFTEST_ROOT/templates`.
   Red when: a root outside an owned or caller-owned directory is chosen, so it outlives the run.
-- **AC6** — When a probe suite declares one `arm_reading` whose subject writes a file, `run_arms`
+- **AC6** — When a probe script declares one `arm_reading` whose subject writes a file, `run_arms`
   exits 1 naming that arm and the read checkout. With the write removed it exits 0. Under
   `tests.fixture-templates = "per-case"`, that arm runs in its own copy and the suite exits 0.
   Red when: a reading arm's write passes unnoticed under `shared`.
@@ -240,14 +252,18 @@ self-test`, so an edit to either runs the suite that holds their arms. The kicko
 - **AC8** — When the parity table's `blk` awk extracts `template_cache_sh` from `template-cache.sh`
   and from `lib-selftest.sh`, the two compare equal.
   Red when: the inline copy drifts by one byte, which the new `PARITY_ROWS` row then reports.
-- **AC9** — When the line-length suite runs directly in a scratch `git clone --shared` of gov with
-  `TEMP`, `TMP` and `TMPDIR` pointed at an empty directory sampled every 0.5 s, and once more on
-  the base suite, the unit's peak entry count is lower than the base's, the residual is 0 for both,
-  and the unit's run spawns no more processes in total, counted by `GIT_TRACE2_EVENT` for git and by
-  the arm count for `cp`.
+- **AC9** — When AC3's probe runs with `TEMP`, `TMP` and `TMPDIR` pointed at an empty directory
+  sampled every 0.5 s, once at the default and once at `per-case`, the default run's peak entry
+  count is lower than the `per-case` run's and the residual is 0 for both. When the main loop runs
+  the line-length suite the same way at the close, in a scratch `git clone --shared` of gov and once
+  more on the base suite, the unit's peak is lower than the base's, the residual is 0 for both, and
+  the unit's run spawns no more processes in total, counted by `GIT_TRACE2_EVENT` for git and by the
+  arm count for `cp`.
   Red when: the peak does not fall, or a template outlives the run.
   figure: DERIVED at observation; the analysis's PINNED base reading is 57 git processes and a peak
   of 1,189 entries, measured 2026-11-20.
+  permission: the suite's own reading is owed to the main loop (scratch-guard row G3); the pass
+  makes the probe's.
 
 ## 7. Gates
 
@@ -256,8 +272,9 @@ self-test`, so an edit to either runs the suite that holds their arms. The kicko
 New arm: tools/lib/lib-selftest.test.sh · covers AC1 AC2 AC4 AC5 AC6 · the template mode's arms: a clone that copies objects or keeps its remote, two builders colliding on one key, a racing stage left behind, and a reading arm that writes; each failing case is staged by that break in the harness · its FLOOR_ASSERTIONS rises by the arms added
 New arm: tools/lib/resolve-python.test.sh · covers AC8 · the template_cache_sh row; its failing case is staged by one changed byte in the copy lib-selftest.sh carries · none
 
-The bar runs once at the close. AC3 and AC9 run the line-length suite directly, which a pass may do
-because it is not an unattended-kit suite.
+The bar runs once at the close. The line-length suite's own readings in AC3 and AC9 are the main
+loop's at the close: a role agent runs no suite, whichever kit holds it. The pass makes their probe
+halves.
 
 ## 8. Open questions
 
@@ -269,6 +286,14 @@ none
   also writes `tools/lib/resolve-python.test.sh`, `tools/policy/catalogue.toml`,
   `help/reference/policy.md` and `tools/gate-legs.json`. Any order-2 unit adding a policy key or a
   parity row shares those files with this one and is sequenced with it by the dispatcher.
+- rev-2 · 2026-11-22 · S6 · S7 · S8 · §4 · AC1 · AC2 · AC3 · AC4 · AC5 · AC9 · §7 · under
+  `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. Every minted name the lexicon refused
+  leads with a declared verb, each checked by `--suggest`: the bash face's `tc_root`, `tc_key`,
+  `tc_ensure` and `tc_clone` are `resolve_template_root`, `derive_template_key`, `resolve_template`
+  and `build_template_clone`, and `TemplateCache`'s `key`, `ensure` and `clone` are `derive_key`,
+  `resolve_template` and `build_clone`. AC3 and AC9 had the pass run the line-length suite, which a
+  role agent may not run; each now has the pass run a three-arm probe script, and the suite's own
+  reading is owed to the main loop at the close.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-6 — the manifest check's pickaxe diffs only the commits whose stamp moved
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -125,23 +125,36 @@ tried candidate, so the saving is diff work and wall time, which AC2 counts.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the old and the new `bash skills/session-kickoff/manifest-check.sh` run in scratch
-  `git clone --shared` copies at three tips, the build's base, `609cd40b1` with its 302-commit range,
-  and a planted tip whose watched file moved after the stamp, each pair prints the same lines and
-  exits the same.
+The pass's probes run over a hermetic fixture repository the probe builds under
+`%TEMP%/<short-name>`, in the shape `skills/session-kickoff/manifest-check.test.sh#write_manifest`
+and `#restamp` build one, read and never run: a manifest with a `watch:` line and a `last-audit:`
+stamp, a watched file, and a range of at least 300 commits past the stamp. "Old" is the check at
+`609cd40b1` and "new" the unit's, each run there by path. A reading over the real tree is the gate's
+own population, which a role agent may not run (scratch-guard row G1), so each such reading below is
+owed to the main loop at the close.
+
+- **AC1** — When the old and the new check run over the fixture at three tips, one whose watched file
+  moved before the stamp, one whose range holds 300 commits with one re-stamp, and one whose watched
+  file moved after the stamp, each pair prints the same lines and exits the same. When the main loop
+  runs the same pairs of `bash skills/session-kickoff/manifest-check.sh` in scratch
+  `git clone --shared` copies of the real tree at the build's base and at `609cd40b1`, with its
+  302-commit range, each pair prints the same there too.
   Red when: `S` differs on any tip, so C5 passes where the old check fails or the reverse.
-  fixture: clones under `%TEMP%` with their own `TEMP`.
-- **AC2** — When both run under `GIT_TRACE2_EVENT=<dir>` at `609cd40b1`, the new run's one pickaxe
-  `log` event carries `--no-walk=unsorted` and at most the stamp-moving commits, and the two runs'
-  wall times are printed side by side.
+  permission: the real-tree pairs are owed to the main loop; the pass makes the fixture pairs.
+  fixture: the real-tree clones under `%TEMP%` with their own `TEMP`.
+- **AC2** — When both run under `GIT_TRACE2_EVENT=<dir>` over the fixture's 300-commit tip, the new
+  run's one pickaxe `log` event carries `--no-walk=unsorted` and at most the stamp-moving commits,
+  and the two runs' wall times are printed side by side. The main loop takes the same pair at
+  `609cd40b1` at the close.
   Red when: the pathspec-free pickaxe still walks the whole range on the success path.
   figure: the range size is DERIVED by `git rev-list --count` at observation.
-- **AC3** — When a planted range holds a commit whose only `last-audit:` line sits in another file
-  and a later commit that re-stamps the manifest, both versions name the same `S`, and with the
+  permission: the real-tree pair is owed to the main loop.
+- **AC3** — When the fixture's range holds a commit whose only `last-audit:` line sits in another
+  file and a later commit that re-stamps the manifest, both versions name the same `S`, and with the
   re-stamp removed both fail C5 with the same message.
   Red when: the decoy is taken for a stamp, or the re-stamp is missed.
-- **AC4** — When the batched read is made to fail by a `cat-file` stub on `PATH`, the new check runs
-  today's pickaxe and prints what the old check prints.
+- **AC4** — When the batched read is made to fail by a `cat-file` stub on `PATH`, the new check over
+  the fixture runs today's pickaxe and prints what the old check prints.
   Red when: a failed read reads as no candidate and C5 fails or passes on that alone.
 - **AC5** — When `grep -c 'stamp moved' skills/session-kickoff/manifest-check.sh` runs, it prints 1 or
   more.
@@ -165,6 +178,11 @@ none
 - rev-1 · 2026-11-20 · initial draft. Ordered 3, not the brief's 2: TOOL-dQuietDisk-5 edits
   `tools/run-gates/run-gates.sh`, which is also on the manifest's `watch:` line, so both units
   re-stamp `memory/guides/SESSION-KICKOFF.md` and their write sets meet.
+- rev-2 · 2026-11-22 · §6 · AC1 · AC2 · AC4 · under
+  `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. AC1, AC2 and AC4 had the pass run the
+  ratchet leg over real-tree clones. They now run old and new over a hermetic fixture, and the
+  real-tree pairs of AC1 and AC2 are owed to the main loop at the close. The spec mints no
+  function, so no name needed a rename.
 
 ## 10. Reuse audit
 
