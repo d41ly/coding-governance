@@ -806,3 +806,9 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T13:48:43Z dispatch · item bc10cba5 TOOL-dWitnessedBar-97 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dWitnessedBar/README.md memory/builds/dWitnessedBar/build memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-97-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-21T14:11:39Z review · item dWitnessedBar · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 2 · round-minors 4
+
+2026-11-21T14:20:26Z rescope · item add TOOL-dWitnessedBar-106 · reason the closing diff review round 1 promotes H1: the pre-push hook's hooks.bypass=refused fails open when the policy reader cannot answer
+
+2026-11-21T14:20:27Z rescope · item add TOOL-dWitnessedBar-107 · reason the closing diff review round 1 promotes H2: verify-peer signs and publishes a per-tree slot the current bar run did not write
+
+2026-11-21T14:20:28Z rescope · item add TOOL-dWitnessedBar-108 · reason the closing diff review round 1 promotes its minors M1, M2, L1 and L2, batched into one unit
