@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-20-build-TOOL-dPlacedRequest-95-1-acceptance-ledger.md](../build/2026-11-20-build-TOOL-dPlacedRequest-95-1-acceptance-ledger.md) | journal | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-95-deviation-730.md](../build/2026-11-21-build-TOOL-dPlacedRequest-95-deviation-730.md) | deviation | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-95-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-95-1-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-95-audit-fold-text-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-95-audit-fold-text-brief.md) | research | TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-95-closing-review-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-95-closing-review-spec-brief.md) | research | — |

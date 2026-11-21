@@ -33,6 +33,10 @@
 | [2026-11-19-build-TOOL-dPlacedRequest-1-design-notes.md](../build/2026-11-19-build-TOOL-dPlacedRequest-1-design-notes.md) | research | — |
 | [2026-11-19-build-TOOL-dPlacedRequest-1-red-fix-5.md](../build/2026-11-19-build-TOOL-dPlacedRequest-1-red-fix-5.md) | red-fix | — |
 | [2026-11-19-build-TOOL-dPlacedRequest-1-red-fix-6.md](../build/2026-11-19-build-TOOL-dPlacedRequest-1-red-fix-6.md) | red-fix | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-1-deviation-642.md](../build/2026-11-21-build-TOOL-dPlacedRequest-1-deviation-642.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-1-deviation-643.md](../build/2026-11-21-build-TOOL-dPlacedRequest-1-deviation-643.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-1-deviation-644.md](../build/2026-11-21-build-TOOL-dPlacedRequest-1-deviation-644.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-1-deviation-645.md](../build/2026-11-21-build-TOOL-dPlacedRequest-1-deviation-645.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-10-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-10-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-11-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-11-spec-writer.md) | journal | — |
