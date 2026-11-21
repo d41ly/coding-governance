@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-88 — the round-1 audit of units 79 to 84, 19 minors batched: quoted reasons answered, one return contract and pass-commit lookup, a derived owner on one line, a measure-keyed probe, arm spellings matched, hook directory guarded
 
-**Status:** INPROGRESS · rev-6 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 45 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-6 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 45 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-88-deviation-882.md](../build/2026-10-25-build-TOOL-dWitnessedBar-88-deviation-882.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-88-round10-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-88-round10-fix-return.md) | research | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-88-round10-h1-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-88-round10-h1-return.md) | research | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-88-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-88-1-acceptance-ledger.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-88-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-88-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-88-2-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-88-2-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-88-round10-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-88-round10-fix-brief.md) | research | — |
