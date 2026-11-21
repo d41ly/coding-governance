@@ -299,10 +299,10 @@ def read_tree_of(repo, sha):
 def read_tag_lines(text):
     """The `<key>TAB<value>` lines of a verdict record or a tag message -> {key: value}, the last one winning."""
     out = {}
-    for ln in text.splitlines():
-        k, sep, v = ln.rstrip("\r").partition("\t")
+    for ln in text.split("\n"):  # LF alone, so a CR stays data until the one-CR strip (TOOL-dWitnessedBar-69 S2)
+        k, sep, v = ln.partition("\t")
         if sep:
-            out[k] = v
+            out[k] = v[:-1] if v.endswith("\r") else v
     return out
 
 
@@ -334,7 +334,8 @@ def read_local_verdict(backend, sha, tree, repo="."):
     if not slot.is_file():
         return Verdict("NONE", "", f"no full per-tree verdict at gate-verdict/{tree[:8]}")
     try:
-        rec = read_tag_lines(slot.read_text(encoding="utf-8", errors="replace"))
+        with open(slot, encoding="utf-8", errors="replace", newline="") as fh:
+            rec = read_tag_lines(fh.read())
     except OSError as e:
         return Verdict("DEAD PROBE", "", f"gate-verdict/{tree[:8]} does not read: {e}")
     if rec.get("tree") != tree:
