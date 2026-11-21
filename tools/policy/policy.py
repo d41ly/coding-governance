@@ -19,6 +19,7 @@ written through, are KICK-dKeptSession-19's.
     python <this kit>/policy.py check [--rev <rev>]   # the file at a revision, HEAD by default
     python <this kit>/policy.py mirror --write | --check | --print   # .governance/policy.json, rendered at HEAD
     python <this kit>/policy.py settings [--write|--check] [<file>]  # the harness's two concurrency settings
+    python <this kit>/policy.py preset --diff [--section | --line] [--rev <rev>]   # the preset and the keys off it
 
 The catalogue, `catalogue.toml` beside this file, is the schema: one row per policy key. A file key
 is matched to a row as a tuple of SEGMENTS, never as a joined string, because a quoted TOML segment
@@ -43,6 +44,11 @@ THE MIRROR, `.governance/policy.json`, is the copy JavaScript reads, since a hoo
 catalogue there; `mirror --write` writes it at HEAD, which every landing runs through this kit's
 `[[generated]]` row; `policy-mirror.js` beside this file is its one reader, and takes a key from
 the landed revision's mirror only while both ids match the blobs there.
+
+THE PRESET DIFF, `preset --diff` (KICK-dKeptSession-3), prints the preset the file names, `standard (the
+default)` where it names none, then each key its assignment holds whose value `resolve_read` answers
+otherwise, over one `read_revision` read: the charter's preset section (`--section`, bounded by
+PRESET_DIFF_LINES and PRESET_DIFF_LINE_CHARS) and the instruction map's one line (`--line`).
 
 THE AGENT LIMIT, `runtime.agents-in-flight` (TOOL-dGroundRules-10), is lowered by `resolve_read` to a
 `FANOUT_CAP` line `.agent-cap.conf` holds at the revision read, its legacy home, and never raised by
@@ -1562,9 +1568,94 @@ def render_scaffold(rows):
     return out
 
 
+# ---- the preset diff (KICK-dKeptSession-3) ------------------------------------------------------
+
+# The `--section` form's bounds: at most PRESET_DIFF_LINES key lines, then one line counting the keys
+# cut, and each line at most PRESET_DIFF_LINE_CHARS characters, under the charter's one-line rule cap
+# (the playbook kit's ONE_LINE_MAX, which this kit cannot import). PINNED 2026-11-21, chosen, not measured.
+PRESET_DIFF_LINES = 12
+PRESET_DIFF_LINE_CHARS = 160
+PRESET_DIFF_VERB = "policy.py preset --diff"
+
+
+def render_preset_diff(read, form=None):
+    """The `preset --diff` lines over one `read_revision` read: `- preset — <name>`, the `preset` key
+    as `resolve_read` answers it, `standard (the default)` where the file names none; then, sorted by
+    key, one `` - `<key>` — <value> (<name>: <preset value>) `` line per key the preset's assignment
+    holds whose resolved value is not the assignment's by `presets.check_same_value`, each value
+    spelled as `get` prints it, a list joined by `, `; `- no key differs` where none does. The
+    assignment is `read_preset_assignment` over `presets.derive_declared_presets` of the read's table,
+    the last valid revision's for an invalid file, as unit 2's step takes it; a key is looked up by
+    exact path alone, so a `never` key or an unassigned derived row is never listed, and a key the
+    file leaves alone whose default is derived, read where the file names no preset, is left alone
+    too: it reads the default `standard` equals. `form` `--section` bounds the lines by
+    PRESET_DIFF_LINES, a last `- … (+<k>)` line naming the verb, and cuts each at
+    PRESET_DIFF_LINE_CHARS with a trailing `…`; `--line` is the map's one line, cut alike. The seam's
+    refusals, `presets.py` not importing, the store not reading and a name no preset holds, and the
+    read's own, are Refusals."""
+    rows = read["rows"]
+    named = resolve_read(("preset",), read_catalogue_row(("preset",), rows), read)
+    name = named.value
+    label = f"{name} (the default)" if named.source == "default" else str(name)
+    table = (read.get("last_valid") or (None, None))[1] if read["problems"] else read["table"]
+    read_kit_presets()  # imports presets.py beside this file, or refuses naming it
+    import presets
+    assignment = read_preset_assignment(name, presets.derive_declared_presets(table))
+
+    def render_value(v):
+        if isinstance(v, list):
+            return ", ".join(render_value(m) for m in v)
+        if isinstance(v, dict):
+            return render_json(v)
+        return v if isinstance(v, str) else render_toml_value(v)
+
+    differ = []
+    for path in sorted(assignment, key=render_dotted):
+        try:
+            hit = resolve_read(path, read_catalogue_row(path, rows), read)
+        except DerivedDefault:
+            continue  # the file leaves it alone and names no preset: it reads the default the preset equals
+        if not presets.check_same_value(hit.value, assignment[path]):
+            differ.append(f"- `{render_dotted(path)}` — {render_value(hit.value)} ({name}: {render_value(assignment[path])})")
+    if form == "--line":
+        lines = [f"preset — {label} · {len(differ)} key(s) differ: {PRESET_DIFF_VERB}"]
+    else:
+        lines = [f"- preset — {label}"] + (differ or ["- no key differs"])
+        if form == "--section" and len(differ) > PRESET_DIFF_LINES:
+            lines = lines[:1 + PRESET_DIFF_LINES] + [f"- … (+{len(differ) - PRESET_DIFF_LINES}) — `{PRESET_DIFF_VERB}`"]
+    if form in ("--section", "--line"):
+        lines = [ln if len(ln) <= PRESET_DIFF_LINE_CHARS else ln[:PRESET_DIFF_LINE_CHARS - 1] + "…" for ln in lines]
+    return lines
+
+
+def cmd_preset(argv):
+    """`preset --diff [--section | --line] [--rev <rev>]`, run in the repository to read: the
+    `render_preset_diff` lines over one `read_revision` read of `rev`, else the landed revision. Exit
+    0; a Refusal prints its `policy: refused` line on stderr and nothing on stdout, exit 2."""
+    import argparse
+    ap = argparse.ArgumentParser(prog="policy.py preset")
+    ap.add_argument("--diff", action="store_true", required=True)
+    form = ap.add_mutually_exclusive_group()
+    form.add_argument("--section", action="store_true")
+    form.add_argument("--line", action="store_true")
+    ap.add_argument("--rev")
+    args = ap.parse_args(argv)
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8", newline="\n")
+    try:
+        lines = render_preset_diff(read_revision(".", args.rev),
+                                   "--section" if args.section else "--line" if args.line else None)
+    except Refusal as exc:
+        print(exc, file=sys.stderr)
+        return 2
+    for ln in lines:
+        print(ln)
+    return 0
+
+
 USAGE = ("usage: python policy.py lists --check | lists --write | scaffold | get <key> [--rev <rev>] [--explain] [--json]"
          " | check [--rev <rev>] | mirror --write | mirror --check | mirror --print"
-         " | settings [--write|--check] [<settings-file>]")
+         " | settings [--write|--check] [<settings-file>] | preset --diff [--section | --line] [--rev <rev>]")
 
 
 def cmd_get(argv):
@@ -1754,6 +1845,8 @@ def main(argv):
         return cmd_mirror(argv[1:])
     if argv[:1] == ["settings"]:
         return cmd_settings(argv[1:])
+    if argv[:1] == ["preset"]:
+        return cmd_preset(argv[1:])
     if argv == ["scaffold"]:
         # The bytes, LF, never the text layer's newline translation: one output on every platform,
         # equal to the blob git stores for a scaffolded file (TOOL-dGroundRules-21 S1).

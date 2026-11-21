@@ -10,6 +10,12 @@ reader's own line, which each caller names in its own refusal. Every call passes
 literal first, the shape the policy kit's reader-coverage arm counts. Units 7, 25 and 26 call this
 module and never copy it.
 
+`read_preset_diff(root, form, rev=None, timeout=None)` runs the policy kit's `policy.py preset --diff <form>`
+the same way, `form` `--section` or `--line`, and returns its stdout lines: the charter's preset section and
+the instruction map's preset line both read it here (KICK-dKeptSession-3 S2). No kit, a verb that cannot
+start, a non-zero exit, or no answer within `timeout` seconds where one is given raises `PolicyRefused`
+with key `preset`, carrying the reader's last stderr line or the bound.
+
 `read_cap_value(cap, root, rev)` reads one size cap's value through the policy kit's `resolve_caps` at the
 revision `rev` names, so a row moved on a branch is read at `HEAD` (PLAY-dOrderedCharter-3 S9); a cap no
 value answers raises `PolicyRefused`.
@@ -96,6 +102,30 @@ def read_policy_value(key: str, root, rev: str | None = None) -> tuple[list[str]
     if p.returncode != 0:
         raise PolicyRefused(key, err[-1] if err else f"policy.py get exited {p.returncode}")
     return p.stdout.splitlines(), err[-1] if err else ""
+
+
+def read_preset_diff(root, form: str, rev: str | None = None, timeout: float | None = None) -> list[str]:
+    """-> the stdout lines of `policy.py preset --diff <form> [--rev <rev>]` run in `root`, `form` `--section`
+    or `--line`, as `read_policy_value` runs `get`; `timeout` the seconds the read may take, None for no bound
+    (KICK-dKeptSession-3 S2)."""
+    key = "preset"
+    try:
+        kit = resolve_kit_dir("policy", "policy.py", KIT_DIR)
+    except LookupError as exc:
+        raise PolicyRefused(key, f"no policy kit found: {exc}") from None
+    argv = [sys.executable, str(kit / "policy.py"), "preset", "--diff", form, *(["--rev", rev] if rev else [])]
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    try:
+        p = subprocess.run(argv, cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", stdin=subprocess.DEVNULL, env=env, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        raise PolicyRefused(key, f"policy.py preset --diff did not answer within {timeout}s") from None
+    except OSError as exc:
+        raise PolicyRefused(key, f"policy.py preset did not run: {exc}") from None
+    err = [ln for ln in (p.stderr or "").splitlines() if ln.strip()]
+    if p.returncode != 0:
+        raise PolicyRefused(key, err[-1] if err else f"policy.py preset exited {p.returncode}")
+    return p.stdout.splitlines()
 
 
 def load_policy_kit():

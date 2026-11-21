@@ -7733,6 +7733,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "check_preset_arms",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "check_preset_key",
       "kind": "function",
       "file": "tools/policy/presets.py"
@@ -9811,6 +9816,11 @@
       "id": "cmd_prepared",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "cmd_preset",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "cmd_print_bindings",
@@ -12656,6 +12666,16 @@
       "id": "derive_preset_assignment",
       "kind": "function",
       "file": "tools/policy/presets.py"
+    },
+    {
+      "id": "derive_preset_overrides",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_preset_section",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "derive_presettable",
@@ -23118,6 +23138,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "read_preset_diff",
+      "kind": "function",
+      "file": "tools/playbook/policy_value.py"
+    },
+    {
       "id": "read_preset_value",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -26886,6 +26911,11 @@
       "id": "render_practice_lines",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "render_preset_diff",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "render_preset_of",
@@ -32181,6 +32211,11 @@
       "id": "run_prefix_commit",
       "kind": "function",
       "file": ".githooks/pre-commit.test.sh"
+    },
+    {
+      "id": "run_preset_diff",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_preset_every_key",

@@ -134,6 +134,14 @@
 <!-- /one-line -->
 
 <!-- /kit:roles -->
+<!-- kit:policy -->
+## Policy preset — the posture and its exceptions
+
+<!-- one-line -->
+{{PRESET_SECTION}}
+<!-- /one-line -->
+
+<!-- /kit:policy -->
 ## Drive — how to start and advance the loop
 
 <!-- one-line -->

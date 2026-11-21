@@ -5871,6 +5871,65 @@ def run_presets_repo(name):
     return print_checks(name, checks)
 
 
+def derive_preset_overrides(name, n):
+    """`n` top-level dotted assignments, each moving one key of the shipped preset `name` off its value
+    to another member of the key's closed list, sorted by key, no key a prefix of another; fewer
+    where the store holds fewer such keys."""
+    rows = policy.load_catalogue(KIT)
+    assignment = presets.derive_preset_assignment(name, presets.load_presets(KIT), None, rows)
+    out, held = [], []
+    for path in sorted(assignment, key=policy.render_dotted):
+        allowed = policy.read_catalogue_row(path, rows).get("allowed")
+        members = allowed if isinstance(allowed, list) else allowed.get("of", []) if allowed.get("type") == "enum" else []
+        other = next((m for m in members if not presets.check_same_value(m, assignment[path])), None)
+        if other is None or any(p[:len(path)] == path or path[:len(p)] == p for p in held):
+            continue
+        held.append(path)
+        out.append(f"{policy.render_dotted(path)} = {policy.render_toml_value(other)}\n")
+        if len(out) == n:
+            break
+    return out
+
+
+def run_preset_diff(name):
+    """`preset-diff` (KICK-dKeptSession-3 AC1, AC2): `policy.py preset --diff --rev HEAD` over a file
+    naming `strict` and setting `hooks.bypass = "allowed"` prints the preset line and that one key
+    line, and its `--line` form one line within PRESET_DIFF_LINE_CHARS bytes naming `strict` and
+    `1 key(s) differ`; over a file declaring `[presets.ours]` over `strict` with its own
+    `leases.expiry-hours` and naming it, `- preset — ours` and `- no key differs`; and over a file
+    naming `strict` with PRESET_DIFF_LINES + 1 keys moved off it, `--section` prints
+    PRESET_DIFF_LINES key lines and a `(+1)` line naming the verb. WHAT IT DOES NOT CHECK: a file
+    naming no preset, which the map arms read, and the charter render, which the playbook kit's
+    selftest reads."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        over = build_reader_repo(t / "over", 'preset = "strict"\n\n[hooks]\nbypass = "allowed"\n')
+        ours = build_reader_repo(t / "ours", 'preset = "ours"\n\n[presets.ours]\nextends = "strict"\n'
+                                             '"leases.expiry-hours" = 12\n')
+        planted = derive_preset_overrides("strict", policy.PRESET_DIFF_LINES + 1)
+        many = build_reader_repo(t / "many", 'preset = "strict"\n' + "".join(planted))
+        diff = ["--diff", "--rev", "HEAD"]
+        key_line = "- `hooks.bypass` — allowed (strict: refused)"
+        checks += [
+            check_get("strict-override", over, diff, lambda rc, o, e: rc == 0 and o.splitlines() == [
+                "- preset — strict", key_line], verb="preset"),
+            check_get("strict-override", over, ["--diff", "--line", "--rev", "HEAD"], lambda rc, o, e: rc == 0 and len(
+                o.splitlines()) == 1 and len(o.splitlines()[0].encode("utf-8")) <= policy.PRESET_DIFF_LINE_CHARS
+                and "strict" in o and "1 key(s) differ" in o, verb="preset"),
+            check_get("declared-preset", ours, diff, lambda rc, o, e: rc == 0 and o.splitlines() == [
+                "- preset — ours", "- no key differs"], verb="preset"),
+            check_get(f"{len(planted)}-overrides", many, ["--diff", "--section", "--rev", "HEAD"],
+                      lambda rc, o, e: rc == 0 and len(planted) == policy.PRESET_DIFF_LINES + 1
+                      and sum(ln.startswith("- `") for ln in o.splitlines()) == policy.PRESET_DIFF_LINES
+                      and o.splitlines()[-1] == f"- … (+1) — `{policy.PRESET_DIFF_VERB}`"
+                      and all(len(ln) <= policy.PRESET_DIFF_LINE_CHARS for ln in o.splitlines()), verb="preset"),
+        ]
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
 CORE_FLOW_POINT = "point.flow.release"  # the release slot `build.closes = after-release-verifies` selects
 
 
@@ -6025,6 +6084,7 @@ CASES = [
     ("presets-pairs", None, run_presets_pairs),  # a pair broken in a preset and over a repository's override
     ("presets-repo", None, run_presets_repo),  # a repository preset admitted and refused
     ("presets-core-only", None, run_presets_core_only),  # the load over a core-only register, and its two planted loaders
+    ("preset-diff", None, run_preset_diff),  # the preset and its differing keys, three forms (KICK-dKeptSession-3)
 ]
 
 

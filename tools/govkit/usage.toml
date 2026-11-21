@@ -276,6 +276,13 @@ verb = "settings"
 flags = ["--write", "--check"]
 
 [[usage]]
+id = "script:{prefix}/policy/policy.py#preset"
+shape = "verb"
+entry = "{prefix}/policy/policy.py"
+verb = "preset"
+flags = ["--diff", "--section", "--line", "--rev="]
+
+[[usage]]
 id = "script:{prefix}/policy/check_policy.py"
 shape = "verb"
 entry = "{prefix}/policy/check_policy.py"
