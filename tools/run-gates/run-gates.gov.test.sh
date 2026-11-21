@@ -243,7 +243,11 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=76
+FLOOR_ASSERTIONS=80
+# RAISED 76 -> 80 by TOOL-dWitnessedBar-85 on 2026-11-21, stated ABSOLUTELY: the floor read from
+# this source, 76, plus S1's per-variant counts, one for each liveness variant seen red on each
+# `CANARY_KEYS` pair, twice the words of `${CANARY_KEYS[*]}`, four today, the only increments this
+# unit adds (TOOL-dWitnessedBar-82 S1's rule). Counted by reading; no suite ran.
 # RAISED 74 -> 76 by TOOL-dWitnessedBar-84 on 2026-11-21, stated ABSOLUTELY by unit 82 S1's rule: the
 # floor read from this source, 74, plus the two visit-count checks of S14, the canary's beside its one
 # `check_canary_keys` call and the liveness loop's after the loop, the only increments this unit adds.
@@ -854,7 +858,7 @@ done
 # `<var>=${_rg_v%?}x`, one `diff` line from the cut and one from its own mutant under the canary's `sed`,
 # must make `check_canary_keys` print exactly `<var>`, or the arm prints `the <var> byte check was not
 # seen red on its liveness variant (<reason>)`, reds, and leaves that key's compare uncounted. The
-# liveness loop gates those counts and adds none. Each variant runs through one function,
+# liveness loop gates those counts, and each variant seen red adds one (TOOL-dWitnessedBar-85 S1). Each variant runs through one function,
 # `check_key_variant`, called twice per pair (TOOL-dWitnessedBar-79 S1): the TAIL VARIANT above,
 # forty-one bytes ending in `x`, which fails the tail test alone and reds as `the tail variant passed
 # a value whose last byte is not CR` (TOOL-dWitnessedBar-80 S1, S3), then the LENGTH VARIANT, `<var>=` its value less the
@@ -970,7 +974,8 @@ done
 # pair, its own key's value losing its CR after the read; `check_canary_keys` on its mutant must print
 # exactly that key's variable. `rgf_seen` lists the variables seen red, and only those compares count.
 # The tail variant's call, then the length variant's (TOOL-dWitnessedBar-79 S1): each failed call's
-# reason prints one line, and a key with any joins no `rgf_seen`.
+# reason prints one line, and a key with any joins no `rgf_seen`. Each call seen red, its status 0
+# at the loop's top level and never inside its `$(...)`, adds one assertion (TOOL-dWitnessedBar-85 S1).
 # The loop counts the pairs it visits, checked after it against every word of `${CANARY_KEYS[*]}`,
 # at least two, one assertion (TOOL-dWitnessedBar-84 S14).
 rgf_seen=; rgf_lvn=0
@@ -978,9 +983,9 @@ for rgf_kp in "${CANARY_KEYS[@]}"; do
   rgf_lvn=$((rgf_lvn+1))
   rgf_kv=${rgf_kp#*:}; rgf_whys=()
   rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v%?}x' 'tail ' 'the tail variant passed a value whose last byte is not CR' 'it named') \
-    || rgf_whys+=("$rgf_why")
+    && a=$((a+1)) || rgf_whys+=("$rgf_why")
   rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v:1}' 'length ' 'the length variant passed a value one byte short' 'it named') \
-    || rgf_whys+=("$rgf_why")
+    && a=$((a+1)) || rgf_whys+=("$rgf_why")
   for rgf_why in "${rgf_whys[@]}"; do
     echo "gov-canary: the $rgf_kv byte check was not seen red on its liveness variant ($rgf_why)"; fail=1
   done

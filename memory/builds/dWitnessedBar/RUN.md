@@ -755,3 +755,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T09:24:45Z dispatch · item 78cf6b85 TOOL-dWitnessedBar-84 · reason memory/guides/SESSION-KICKOFF.md memory/builds/dBoundRoles/README.md memory/builds/dConvergedCharter/README.md memory/backlog/PLAY.md
 
 2026-11-21T09:43:53Z brief · item TOOL-dWitnessedBar-85 · reason d632d55c5bf9 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-85-build-brief.md
+
+2026-11-21T09:46:05Z dispatch · item e7504f02 TOOL-dWitnessedBar-85 · reason tools/run-gates/run-gates.gov.test.sh memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-85-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-85.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
