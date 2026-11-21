@@ -1,6 +1,6 @@
 # KICK-dKeptSession-8 — `actions.free` at the tool call: every write, spawn, commit or push belongs to the item in flight
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 25 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 25 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0146@a9c32df5 whole
 **Carries:** node:policy-key.actions.free
@@ -19,6 +19,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-7-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-7-precheck-brief.md) | research | KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-55 |
 | [2026-11-21-prompt-KICK-dKeptSession-8-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-8-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-8-orders-25-26-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-8-orders-25-26-reground-brief.md) | research | KICK-dKeptSession-11 KICK-dKeptSession-43 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
@@ -51,9 +52,12 @@ and strict's preset sets `item-reads-only`
 - **S2** — The act class, `deriveActClass(data)` in `tools/hooks/scratch-guard.js`: `spawn` for an
   `Agent` or `Workflow` call; `write` for a `WRITE_TOOLS` call, or a Bash or PowerShell command in
   which `scanWriteTargets` finds a target; `commit` where `COMMIT_SHAPED` matches the command's view
-  (`buildCommandView`); `push` where `PUSH_SHAPED` matches, its sibling over the same
-  `GIT_VALUE_FLAGS` and `VIEW_TOKEN` grammar with `push` for `commit`; `read` otherwise. The strongest
-  class wins, in the order `push`, `commit`, `write`, `spawn`, `read`. Observed by AC1 and AC5.
+  (`buildCommandView`); `push` where `PUSH_SHAPED` matches; `read` otherwise. The strongest class
+  wins, in the order `push`, `commit`, `write`, `spawn`, `read`. The two patterns are one factory,
+  `buildGitShaped(verb)`, extracted from `COMMIT_SHAPED`'s landed source over `GIT_VALUE_FLAGS` and
+  `VIEW_TOKEN` (`tools/hooks/scratch-guard.js#COMMIT_SHAPED`), so `COMMIT_SHAPED` is
+  `buildGitShaped('commit')` with its source unchanged and `PUSH_SHAPED` is `buildGitShaped('push')`,
+  never a hand copy. Observed by AC1, AC5 and AC9.
 - **S3** — The item in flight, `readItemPointer(data, env)`. It reads the card file `CARD_FILE_REL`
   at the checkout root `resolveRoleRoot` gives for the payload's `cwd`, else `CLAUDE_PROJECT_DIR`,
   with no spawn, as `readCardEnvelope` reads it. It is armed only when that file's `card-owner —`
@@ -86,22 +90,34 @@ and strict's preset sets `item-reads-only`
   runs as rule 9 on every `Agent` and `Workflow` call, after rule 7 and before the opt-in pack's
   presence check, required from `scratch-guard.js` as rule 6 requires `loadRoleIndex`. Rule 8 is
   TOOL-aGuardedEffort-1's effort rule. Observed by AC1 and AC5.
-- **S7** — Unarmed and failure. With no card file, a `card-owner —` line naming another session, no
-  routed build, or a card with no `## pointers`, the arm admits and prints
+- **S7** — Unarmed and failure. With no card file, or a card file carrying no `## pointers`, the arm
+  admits and prints nothing, as a hook with no pointer to read (§8 F5). With `## pointers` and a
+  `card-owner —` line naming another session or no routed build, it admits and prints
   `scratch-guard: actions.free unarmed — <why>`, and rule 9 its own `agent-cap: rule 9 unarmed —
-  <why>`, never silent. A card file that exists and cannot be read is no unarmed case. Once armed, a
-  throw anywhere in the arm refuses, as `main` refuses a throw in the write gate. Observed by AC6.
+  <why>`. A card file that exists and cannot be read is no unarmed case. Once armed, a throw anywhere
+  in the arm refuses, as `main` refuses a throw in the write gate. Observed by AC6.
 - **S8** — The fixture, `bash tools/hooks/actions-free.fixture.sh --plant <case>`. It builds a
   scratch repository under the host temp directory holding the build `tFix` with one routed
-  INPROGRESS unit; a card file at `CARD_FILE_REL` whose `card-owner —` line names the payload's
-  session, whose `## route` names `tFix` and whose `## pointers` the plant writes; copies of both
-  hooks under `tools/hooks/`; a stub `tools/policy/policy-mirror.js` beside them whose `readPolicy`
-  answers the planted value, or for the `refusal` plant throws a `PolicyRefusal` naming a line; and a
-  stub kickoff checker answering `--card --path`, which `checkRouted` reads to admit the plant's
-  `Edit`. It pipes the case's payload to the hook and prints the exit code and stderr. Observed by AC1
-  to AC7.
+  INPROGRESS unit and a `.memory-tree.conf` whose `ROUTED_PATHS` holds the `Edit`'s target; a card
+  file at `CARD_FILE_REL` whose `card-owner —` line names the payload's session, whose `## route`
+  names `tFix` and whose `## pointers` the plant writes; copies of both hooks at the scratch path matching
+  the fixture's own directory under its checkout; and two stubs where `resolveKitDir`'s sibling probe looks
+  (`tools/hooks/agent-cap.js#resolveKitDir`), their directories derived from the fixture's own as
+  `tools/hooks/format-guard.test.sh` derives its stub checker's, since the install-prefix leg bans a
+  spelled kit path in any shipped file. The policy stub's `readPolicy` answers `actions.free` with the
+  planted value, or for the `refusal` plant throws a `PolicyRefusal` naming a line, answers
+  `runtime.agents-in-flight` with `2`, and throws for any other key. The kickoff stub answers
+  `--card --path` with a session card holding a real `READY —` line, a `tree —` line naming the
+  scratch top and the same `## route`, so `checkOriented` admits the commit and `checkRouted` the
+  `Edit` before the arm runs. The scratch's `.claude/settings.json` sets both variables rule 7 reads
+  to `2`, and `GOV_SETTINGS_JSON` is unset, so rule 7 admits before rule 9. It pipes the case's
+  payload to the hook and prints the exit code and stderr. Observed by AC1 to AC7.
 - **S9** — The page `help/orientation-card.md` gains a section: the item pointer, what each value
   admits outside it, and the log. Observed by AC8.
+- **S10** — The budget rows of `scratch-guard self-test` and `agent-cap self-test` in
+  `tools/run-gates/selftest-budgets.txt`, re-priced over the two arms as §4's budget rows state.
+  NOT OBSERVED: a budget prices the whole suite, which runs once, after the build, never as a
+  criterion.
 
 ## 3. Non-goals (OUT)
 
@@ -140,9 +156,10 @@ and strict's preset sets `item-reads-only`
 | `none` | `write`, `commit`, `push`, `spawn` | refuse | refuse | admit, one log line |
 
 `BOUNDARY_HEADS = ['position.py', 'manifest-check.sh']`: the two commands that move a session to its
-next item, the position engine (TOOL-dDeclaredLoop-7), whose `--boundary` answers the next item, and
-the kickoff checker, whose `--card --boundary` (KICK-dKeptSession-13 S6) rewrites the pointer.
-Without them `item-reads-only` could never leave `item — none`.
+next item, the position engine, whose `<slug> --boundary` (KICK-dKeptSession-13 S1) answers the
+next item, and the kickoff checker, whose `--card --boundary` (KICK-dKeptSession-13 S6) rewrites
+the pointer. `scanCommandHeads` steps a launcher, so `python position.py …` has the head
+`position.py`. Without them `item-reads-only` could never leave `item — none`.
 
 ### The refusal
 
@@ -164,7 +181,7 @@ It is evidence for KICK-dKeptSession-9's reading and nothing else reads it.
 
 | Minted | Kind | Lexicon cell |
 |---|---|---|
-| `deriveActClass`, `readItemPointer`, `checkFreeAction` | JS functions, `scratch-guard.js`, exported for rule 9 | `js.function`, OK by `lexicon.py --suggest` |
+| `deriveActClass`, `readItemPointer`, `checkFreeAction`, `buildGitShaped` | JS functions, `scratch-guard.js`, exported for rule 9 and AC9 | `js.function`, OK by `lexicon.py --suggest` |
 | `PUSH_SHAPED`, `BOUNDARY_HEADS`, `FREE_ACTIONS_LOG` | JS constants | none declared |
 | rule 9 | an agent-cap rule | none |
 | `actions-free.fixture.sh` | fixture | none |
@@ -178,6 +195,28 @@ outside the loop moves.
 
 Live at landing, armed only where KICK-dKeptSession-13 writes the card file's `## pointers`.
 
+### The budget rows
+
+Each arm adds fixture runs to a suite whose row budgets it, and the runner reds a suite over its
+budget. The estimate is 2 s per plant (PINNED 2026-11-22): a scratch repository and five
+`scratch-guard.js` runs read 0.53 s alone on the run's node at b4b570ef7, rounded up for the tree,
+cards and stubs each plant writes.
+
+| Figure | `scratch-guard self-test` | `agent-cap self-test` |
+|---|---|---|
+| proxy `r`, the row's note (PINNED) | 188 s, 2026-11-20 | 389 s, its worst reading |
+| this unit's plants, estimates (PINNED 2026-11-22) | 10 times 2 s | 2 times 2 s |
+| `r` after this unit (PINNED 2026-11-22, the sum) | 208 s | 393 s |
+| budget, max of the row's value and 1.5 `r` | 312, over the row's 282 | 590 stands |
+| the leg's ceiling in `tools/gate-legs.json` | 490 | 1800 |
+
+The builder reads each arm alone by direct CLI and appends `Then re-read by KICK-dKeptSession-8 as
+PINNED proxy r <s>` to each row's note, with each budget the row's value or 1.5 `r` rounded up,
+whichever is higher. `tools/run-gates/ceiling-evidence.txt` is generated from run records and never
+hand-edited. Where a reading takes `r` to its leg's ceiling, the unit stops before it lands and names
+the raise for the owner (`memory/guides/BUILD-METHOD.md`, M3), and it never edits
+`tools/gate-legs.json`.
+
 ### Files touched (estimate)
 
 - `tools/hooks/scratch-guard.js`: the arm, its helpers, the wiring in `main`, the exports rule 9 reads
@@ -187,6 +226,10 @@ Live at landing, armed only where KICK-dKeptSession-13 writes the card file's `#
   suites that run it are
 - `tools/hooks/scratch-guard.test.sh`: the arm the §7 line declares
 - `tools/hooks/agent-cap.test.sh`: rule 9's arm
+- `tools/run-gates/selftest-budgets.txt`: S10, both rows' notes and the `scratch-guard self-test`
+  budget
+- `memory/map/generated/symbols.json`: the four functions and the fixture's, by `gen_map.py
+  --write`, as the commit hook demands
 - `help/orientation-card.md`: S9
 
 ### Alternatives rejected
@@ -247,10 +290,12 @@ Live at landing, armed only where KICK-dKeptSession-13 writes the card file's `#
   `read-only-probes` with `item — none`, it exits 2 naming `actions.free` and the class `spawn`;
   with `spawn-item`, stderr carries no `actions.free` line.
   Red when: a spawn outside an item passes rule 9.
-- **AC6** — When the plants `no-pointers`, `no-route` and `other-owner` run AC1's `echo x > f`, each
-  exits 0 printing `actions.free unarmed`; when the plant `throw` puts a directory at the card file's
-  path, the call exits 2 naming the arm.
-  Red when: an unarmed session is refused or admitted silently, or an armed throw admits.
+- **AC6** — When the plant `no-pointers` runs AC1's `echo x > f`, it exits 0 with no `actions.free`
+  on stderr; when `no-route` and `other-owner` run it with `## pointers` written, each exits 0
+  printing `actions.free unarmed`; when the plant `throw` puts a directory at the card file's path,
+  the call exits 2 naming the arm.
+  Red when: an unarmed session is refused, a card with pointers is unarmed silently, a card with
+  none prints a line, or an armed throw admits.
 - **AC7** — When the plants `no-helper` and `refusal` run AC1's `echo x > f`, each exits 2 as
   `read-only-probes` does and prints one `NOTE` naming the default.
   Red when: an unreadable value admits the write or reads another default.
@@ -259,10 +304,15 @@ Live at landing, armed only where KICK-dKeptSession-13 writes the card file's `#
   `node tools/policy/policy-mirror.js get actions.free` prints `read-only-probes`, both true at base
   since S1 stands; and `grep -c 'actions.free' orientation-card.md` in `help/` prints at least 1.
   Red when: the key has no row or mirror entry, or the page omits the values.
+- **AC9** — When
+  `node -e "const g = require(require('path').resolve(process.argv[1])); console.log(['git -C d commit -m x', 'git push origin main', 'git commit -m push'].map((c) => g.buildGitShaped('commit').test(c) + ':' + g.buildGitShaped('push').test(c)).join(' '))" scratch-guard.js`
+  runs in the hooks kit's directory, it prints `true:false false:true true:false`.
+  Red when: the push pattern is a hand copy that drifts from the commit grammar, or a commit message
+  reading `push` classes the call `push`.
 
 ## 7. Gates
 
-`scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `govkit selftest` · `policy fixtures` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `govkit selftest` · `policy fixtures` · `every held leg is budgeted, every budget row resolves` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC6 AC7 · the arm over each value and pointer, staged against the base hook, which admits a Bash write with no item in flight · none
 
@@ -295,6 +345,17 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · rule 9 on an `Agent` pay
   lane and rule 7 already read their keys. RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; the
   landed hooks kit requires the reader in process at both sites, so (a) would be a second way of
   reading one mirror inside one kit, and a node start per read. widens: none · relaxes: none
+- **F5 — Is the arm silent where no card file or no `## pointers` exists?** rev-4's S7 printed an
+  unarmed line on every such call, and `tools/hooks/scratch-guard.test.sh` holds 35 arms to a
+  byte-empty stderr and 22 to one line (PINNED 2026-11-22 at b4b570ef7: its `run_card` and
+  `run_write` lines expecting `empty` or `one;;`), none writing `## pointers`. Options: (a) silent
+  with no card file or no `## pointers`, the unarmed line kept for a card that carries pointers and
+  does not arm; (b) the line on every such call, and every
+  one of those 57 arms widened to admit it, which weakens what they hold; (c) one line per session,
+  which needs state the hook keeps nowhere. RESOLVED (agent, 2026-11-21, delegated): (a), rung 3; a
+  call with no pointer has no item to gate, every landed arm keeps its bytes, and a pointer the arm
+  cannot use still says so. widens: none · relaxes: the unarmed line on a call with no card file or
+  no `## pointers`
 
 ## 9. Revision log
 
@@ -317,13 +378,21 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · rule 9 on an `Agent` pay
   the class function spelled `deriveActClass` by the lexicon; the version-constant moves left to the
   lander; the instance key re-spelled to the engine's form; every line citation re-cited by symbol or
   blob pin, and `policy fixtures` named.
+- rev-5 · 2026-11-22 · S2 · S7 · S8 · S10 · §4 · §4 Files touched · AC6 · AC9 · §7 · §8 F5 · §10 · by
+  `2026-11-22-prompt-KICK-dKeptSession-7-1-spec-writer`: `PUSH_SHAPED` and `COMMIT_SHAPED` become one
+  factory, `buildGitShaped`, observed by AC9; S8's fixture stages what the hooks read before the arm,
+  a READY session card, rule 7's limit and settings, and derives its stubs' directories since the
+  install-prefix leg bans a spelled kit path; S7 is silent with no card file or no `## pointers`
+  (F5), so the landed suites' byte-empty arms hold; S10 re-prices both suites' rows; the position
+  engine's `--boundary` is unit 13's; `symbols.json` and the budgets file join Files touched.
 
 ## 10. Reuse audit
 
 The seam extended is the ordered arms of `main` in `tools/hooks/scratch-guard.js`
 (`tools/hooks/scratch-guard.js#main`), beside `checkRouted`, `checkOriented` and `checkRoleGate`, all
-read at `c2a407b0`. The class reuses `scanWriteTargets`, `COMMIT_SHAPED` with its `GIT_VALUE_FLAGS`
-and `VIEW_TOKEN`, `scanCommandHeads` and `buildBaseName`; the pointer reuses `CARD_FILE_REL`,
+read at `c2a407b0`. The class reuses `scanWriteTargets`, `COMMIT_SHAPED`'s grammar over
+`GIT_VALUE_FLAGS` and `VIEW_TOKEN`, extracted as `buildGitShaped` at its second instance,
+`scanCommandHeads` and `buildBaseName`; the pointer reuses `CARD_FILE_REL`,
 `readCardEnvelope`'s spawn-free read, `resolveRoleRoot`, `extractRouteUnits` and `resolveCommonDir`;
 the value reuses agent-cap's `resolvePolicyHelper` (`tools/hooks/agent-cap.js#resolvePolicyHelper`)
 and the red-fix lane's in-process `readPolicy` call inside `checkRouted`; rule 9 reuses rule 6's

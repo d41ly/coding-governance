@@ -1,6 +1,6 @@
 # KICK-dKeptSession-7 — dependency coordination: `deps.coordination` switching the dependency gate by the parent's lease, `deps.early-build` admitting Build, and the `confirmed`, `changed` and `landed` notices
 
-**Status:** DEFERRED · rev-7 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 24 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-8 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 24 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0145@b38efe3e whole
 **Carries:** node:policy-key.deps.coordination
@@ -25,6 +25,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-26 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-35 KICK-dKeptSession-11 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 |
 | [2026-11-21-prompt-KICK-dKeptSession-6-orders-23-24-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-6-orders-23-24-reground-brief.md) | research | KICK-dKeptSession-6 |
+| [2026-11-21-prompt-KICK-dKeptSession-7-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-7-precheck-brief.md) | research | KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-55 |
+| [2026-11-22-prompt-KICK-dKeptSession-7-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-7-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -58,34 +60,37 @@ another (gap-flow-06).
   §4's table. Each such parent's interrupt, built in `derive_interrupts`
   (`tools/loop/position.py#derive_interrupts`), prints
   `interrupt — dependency · <parent> · <reach> · <cause> (deps.coordination: <value>)`. `derive_answer`
-  answers `blocked`, at the rung its landed `blocked` holds, only where a cause is `not landed`,
-  `unreachable` or `awaiting confirmed` and the build's step is `step.build` or a later step by
+  answers `blocked`, at the rung its landed `blocked` holds, only where a cause holds Build in §4's
+  table and the build's step is `step.build` or a later step by
   `[[step]]` `order` (`tools/loop/loop.toml`); its reason is the interrupt's text after
   `interrupt — `. A Design item runs under every value (§8 F1). Observed by AC1, AC2 and AC3.
 - **S3** — `deps.early-build` (`confirmed-interfaces`, `design-only`, `anything-coordinated`; default
   `confirmed-interfaces`), read for a `reachable` parent under `message-then-progress`.
-  `confirmed-interfaces`: the cause is `confirmed` once `KICK-dKeptSession-27` S5's
-  `check_interface_notice <slug> "interfaces <parent>" <file>`, run through §4 "The driver launch",
-  exits 0, a `confirmed` or `changed` row from the parent whose `content-key` equals the key recomputed
-  over `<file>`, never chosen by arrival order; else `awaiting confirmed`. `<file>` is
-  `derive_interface_listing(root, parent, w)` written to a scratch file (S4), `w` the parent lease's
-  `witness`, read by `--lease show build <parent>` (S7) and fetched by one `git fetch <remote>`
-  (`tools/loop/claims.py#resolve_remote`) where this clone lacks it. A witness of `-`, a commit still
-  absent, or a listing that cannot be derived holds as `awaiting confirmed`. `design-only`: the cause
-  is `not landed`. `anything-coordinated`: the cause is `coordinated`. Every unit of the dependent
-  counts as consuming the parent's interfaces (§8 F2). Observed by AC4, AC5 and AC6.
+  `confirmed-interfaces` reads `check_parent_interfaces(root, slug, parent)` in
+  `tools/loop/loop_transition.py`, `(rc, line)`: the parent lease's `witness` `w` by `--lease show
+  build <parent>` (S7), fetched by one `git fetch <remote>` (`tools/loop/claims.py#resolve_remote`)
+  where this clone lacks it, `derive_interface_listing(root, parent, w)` (S4) in a scratch file, and
+  `KICK-dKeptSession-27` S5's `check_interface_notice <slug> "interfaces <parent>" <file>`, each
+  driver read through §4 "The driver launch". The cause is `confirmed` on its exit 0, the row whose
+  `content-key` recomputes, never chosen by arrival order; `awaiting confirmed` on its exit 1 or a
+  witness of `-`; `confirmation unread` on its exit 2, a read past the bound, a commit still absent
+  or a listing that does not derive, with one `position: NOTE · interfaces <parent> unread: <line>`
+  line (§8 F8). `design-only`: the cause is `not landed`. `anything-coordinated`: `coordinated`.
+  Every unit of the dependent counts as consuming the parent's interfaces (§8 F2). Observed by AC4,
+  AC5 and AC6.
 - **S4** — The `confirmed` notice at Design's exit. `derive_interface_listing(root, build, commit)` in
   `tools/loop/loop_transition.py` is the bytes `git ls-tree -r <commit> -- <memory
-  root>/builds/<build>/spec/` prints, the one listing S3 and this item key. `write_transition`
-  (`tools/loop/loop_transition.py#write_transition`), on a move from `designing` to `building`, calls
+  root>/builds/<build>/spec/` prints, the one listing S3 and this item key, written by
+  `Path.write_bytes`, never text mode, so a key posted on one node recomputes on another.
+  `write_transition` (`tools/loop/loop_transition.py#write_transition`), on a move from `designing` to `building`, calls
   `write_dependency_notices(root, build, commit)` after its commit, its lines joining `said` beside
   `write_card_follow`'s (`tools/loop/loop_transition.py#write_card_follow`); it never raises, and the
   move stands whatever it prints. Per dependent of `read_dependents(root, build)` (S9) it posts
   `--mail post <build> --to build:<dependent> --kind <kind> --subject "interfaces <build>"
   --interface <listing file> <body file>` (`KICK-dKeptSession-5` S5, `KICK-dKeptSession-27` S3), the
-  listing at `commit`, the body the commit's full sha, launched as `KICK-dKeptSession-5` S9's
-  `read_mail_rows` launches the driver. `<kind>` is `changed` where `read_mail_rows(root, dependent)`
-  holds a `confirmed` row from `build` with that subject, else `confirmed`. `commit` is the transition
+  listing at `commit`, the body the commit's full sha, through §4 "The driver launch". `<kind>` is
+  `changed` where `read_mail_rows(root, dependent)` holds a `confirmed` row from `build` with that
+  subject, else `confirmed`. `commit` is the transition
   commit, the one the driver next passes as the lease's `witness`
   (`tools/unattended/unattended.sh#read_transition_witness`, §8 F3); where `transitions.record`
   selects `micro-format` alone the writer makes no commit and nothing records a transition
@@ -100,19 +105,22 @@ another (gap-flow-06).
   `( main --mail post … )` in a subshell. A post that fails, or a loop kit that does not resolve,
   prints its line and never changes the verb's exit. Observed by AC8.
 - **S6** — The keys, each read by `read_policy_kit()` (`tools/loop/loop_parents.py#read_policy_kit`)
-  and its `resolve(<key>, <root>)` at the landed revision, as
-  `tools/loop/placement.py#read_placement_policy` reads its keys, each spelled whole. A `Refusal`, or
-  the `LookupError` of no policy kit, reads the catalogue default and prints one
-  `position: NOTE · <key> reads <default>: <why>` line. A policy file naming `preset = "strict"` with
-  no override reads `wait-for-landing` and `design-only`, strict's cells in I1
-  (`tools/policy/presets.toml`, `KICK-dKeptSession-1`), through `KICK-dKeptSession-2`'s preset step,
-  source `preset`. Observed by AC9.
+  and its `resolve(<key>, <root>, build=<slug>)` at the landed revision, each spelled whole, so a
+  dependent a scenario places reads its slot (`KICK-dKeptSession-20` S5). A `Refusal`, or the
+  `LookupError` of no policy kit, reads no value and no default: each unlanded parent's cause is
+  `policy unread`, holding Build, with one `position: NOTE · <key> unread: <why>` line (§8 F8). A
+  policy file naming `preset = "strict"` with no override reads `wait-for-landing` and `design-only`,
+  strict's cells in `tools/policy/presets.toml`, through `KICK-dKeptSession-2`'s preset step, source
+  `preset`. Observed by AC9.
 - **S7** — The witness read (§8 F5, F7): `--lease show build <slug>`, dispatched beside `--lease status`
   in the driver's `--lease` branch, runs `print_lease_witness <slug>`: one `read_claims quiet` and the
   slug's build row's `witness`, field 15 of `CLAIM_ROWS` (`tools/unattended/unattended.sh#read_claims`),
   printed alone, or `-` where the row holds none or no lease exists; `lease — off · <slug>/build` with
   `RUN_CLAIMS` off, exit 0; `lease not written — <why>`, exit 2, where the read does not answer. It
-  writes nothing. Its usage-header row joins the `#   unattended.sh --lease …` rows. Observed by AC11.
+  writes nothing. Its usage-header row joins the `#   unattended.sh --lease …` rows, and its sentence
+  follows `--lease status`'s in `tools/unattended/VERBS.template.md` and its render
+  `memory/guides/UNATTENDED-VERBS.md` alike, the pair the unattended kit gate's check 10 compares,
+  spelling no kit path. Observed by AC10 and AC11.
 - **S8** — The documentation. `help/loop.md` gains `## Coordinating with a parent build` after
   `## Where a build is, and what runs next`: the gate's values, the reach words, the causes and the
   three notices, and that section's sentence on a `parents:` build answering `blocked` points to it.
@@ -135,8 +143,7 @@ another (gap-flow-06).
   (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-coordination.md@4a13cbc82a99:143`).
 - No landing order and no held landing: `landing.order` and `deps.landing` are dShippedRelease's.
 - No `deps.on-parent-withdrawn`: dDeclaredLoop's.
-- No lease write and no verdict: this unit reads `--lease status` and adds the read-only
-  `--lease show` (S7).
+- No lease write and no verdict: `--lease show` (S7) is read-only.
 - No mailbox, kind or post path: `KICK-dKeptSession-5`'s; no content key or supersession rule:
   `KICK-dKeptSession-27`'s.
 - No automatic answer to a dependent's `confirm-request` (§8 F6).
@@ -148,10 +155,10 @@ another (gap-flow-06).
 - **consumes-from** `KICK-dKeptSession-1` — `presets.toml`, whose strict cells `wait-for-landing` and `design-only` each key is seen on, read through the reader's preset step
 - **consumes-from** `KICK-dKeptSession-5` — `read_mailbox` and the `--mail post` writer, through which the notices are posted and the confirmations read
 - **consumes-from** `KICK-dKeptSession-27` — `content-key`, its `--interface` option and `check_interface_notice`, the recomputed key that decides which confirmation is current, never arrival order
-- **consumes-from** external — dDeclaredLoop, landed: the position engine's dependency gate and answer precedence, and `write_transition`; dPlacedRequest, landed: the build lease, `--lease status` and `CLAIM_ROWS`' `witness`; dGroundRules' `resolve`
+- **consumes-from** external — dDeclaredLoop, landed: the position engine's dependency gate and answer precedence, and `write_transition`; dPlacedRequest, landed: the build lease, `--lease status`, `CLAIM_ROWS`' `witness` and `run_sourced`; dGroundRules' `resolve`
 - **hands-off** external — dIndexedDesign's `design.reentry` re-enters a dependent's consuming units on a `changed` message
 - **hands-off** `KICK-dKeptSession-35` — `write_dependency_notices` and `verb_landed`'s notice, which that unit gives a pass and a visible refusal line (id 4)
-- **hands-off** `KICK-dKeptSession-42` — the notices and S3's listing, which that unit's transition writer reads to acknowledge what the dependent consumed (id 55)
+- **hands-off** `KICK-dKeptSession-42` — the notices and S3's `check_parent_interfaces`, which that unit's transition writer reads to acknowledge what the dependent consumed (id 55)
 - **hands-off** `KICK-dKeptSession-44` — `derive_parent_reach`, the listing's bytes and `read_dependents`, the batch's S17 and S20 (ids 24, 35)
 
 ## 4. Design
@@ -169,25 +176,20 @@ another (gap-flow-06).
   (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-flow-interactions.md@6f6b55dd620d:127`): a dependent designs at any time and enters Build once
   the interfaces it consumes are confirmed.
 - v2 gives the values and defaults
-  (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c91952:1165`,
-  `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c91952:1166`); strict sets `wait-for-landing` and `design-only`
-  (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c91952:1490`, `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c91952:1491`). The clause
+  (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c91952:1165`
+  and the line after); strict sets `wait-for-landing` and `design-only`
+  (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c91952:1490`
+  and the line after). The clause
   (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c91952:1771`) names interfaces confirmed at Design's exit, and no
   answer to a `confirm-request`.
-- The landed gate: `derive_position_into` lists each `parents:` build neither `LANDED` in the hand-over
-  nor recorded as entering `landed`, `derive_interrupts` makes each a `dependency` interrupt, and
-  `derive_answer` answers `blocked` on any, after an owner decision and before `act`.
-- `--lease status` is the driver's one-lease read, kept for a reader that must not parse `--claims`
-  (`tools/unattended/unattended.sh#print_lease_status`); `placement.py` reads it through the sourced
-  driver (`tools/loop/placement.py#read_build_lease`). No verb prints a lease's `witness`: `--claims`
-  cuts to fields 1 to 5 (`tools/unattended/unattended.sh#print_claims`), and `--lease status` prints six
-  fields without it. `git grep -n 'lease show' -- tools memory/builds/dPlacedRequest` finds nothing at
-  base c2a407b0: the ask F5 names was never filed.
-- A lease's `witness` is a transition commit or, for a waiting question, a mail commit
-  (`tools/unattended/unattended.sh#check_lease_witness`).
-- `write_transition` commits the move, then runs the card follow, which never raises; with neither
-  `trailer` nor `log` selected it writes no commit.
-- The loop kit reads policy through `read_policy_kit`, and already imports it in `position.py`.
+- The landed gate: `derive_interrupts` makes each unlanded `parents:` build a `dependency` interrupt,
+  and `derive_answer` answers `blocked` on any, after an owner decision and before `act`.
+- `--lease status` prints six fields, the verdict fifth, and no `witness`; `--claims` cuts to fields 1
+  to 5 (`tools/unattended/unattended.sh#print_claims`). `placement.py` reads it through
+  `run_sourced` (`tools/loop/placement.py#read_build_lease`). A `witness` is a transition commit or
+  a waiting question's mail commit (`tools/unattended/unattended.sh#check_lease_witness`).
+- `resolve` takes `build=` and refuses a slot it cannot read, never reading it unscoped
+  (`tools/policy/policy.py#read_build_slot`, `KICK-dKeptSession-20` §8 F4).
 
 ### The gate, per parent not landed
 
@@ -195,27 +197,28 @@ another (gap-flow-06).
 |---|---|---|---|---|
 | `wait-for-landing` | any | not read | `not landed` | held |
 | `message-then-progress` | `unreachable` | not read | `unreachable` | held |
-| `message-then-progress` | `reachable` | `confirmed-interfaces` | `confirmed`, or `awaiting confirmed` | run, or held |
+| `message-then-progress` | `reachable` | `confirmed-interfaces` | `confirmed`; `awaiting confirmed` or `confirmation unread` | run; held |
 | `message-then-progress` | `reachable` | `design-only` | `not landed` | held |
 | `message-then-progress` | `reachable` | `anything-coordinated` | `coordinated` | run |
 | `order-only` | any | not read | `order only` | run |
+| either key unread | any | either key unread | `policy unread` | held |
 
 Design items run in every row; the engine's precedence is otherwise untouched.
 
 ### The driver launch
 
-Each read of the driver's state is one sourced driver, spelled as `KICK-dKeptSession-42` §4 "The
-check's launch" spells it, minted once as `run_driver_sourced(root, call, *args)` in
-`tools/loop/loop_transition.py`, the bash `resolve_bash(<driver>)`
-(`tools/loop/loop_witness.py#resolve_bash`), the driver `resolve_kit_dir("unattended", "unattended.sh",
-KIT) / "unattended.sh"` (`tools/loop/loop_lib.py#resolve_kit_dir`), stdin closed, `read_clean_env()`
-and the bound `MAIL_GUARD_SECONDS` (`KICK-dKeptSession-5` S9):
+Every driver call here runs through the landed `tools/loop/breakpoints.py#run_sourced`, which
+already runs this `--lease status` read for `read_build_lease` under `resolve_bash`. It gains two
+keyword-only arguments, every landed caller unchanged: `args=()`, values passed as `$2` onward and
+never interpolated into the script, and `timeout=900`, here `MAIL_GUARD_SECONDS` (`KICK-dKeptSession-5`
+S9), its `TimeoutExpired` a read past the bound. Each caller imports it inside the function, as
+`read_build_lease` does, since `breakpoints.py` imports both modules at its top.
 
 ```
-[<bash>, "-c", '. "$1" && load_driver_conf && check_interface_notice "$2" "$3" "$4"',
- "check_interface_notice", <driver>, <slug>, "interfaces <parent>", <listing file>]
-[<bash>, "-c", '. "$1" && load_driver_conf && main --lease status build "$2"', "main", <driver>, <parent>]
-[<bash>, "-c", '. "$1" && load_driver_conf && main --lease show build "$2"', "main", <driver>, <parent>]
+run_sourced(root, 'load_driver_conf && main --lease status build "$2"', args=(parent,), timeout=B)
+run_sourced(root, 'load_driver_conf && main --lease show build "$2"', args=(parent,), timeout=B)
+run_sourced(root, 'load_driver_conf && check_interface_notice "$2" "$3" "$4"', args=(slug, subject, file), timeout=B)
+run_sourced(root, 'load_driver_conf && main --mail post "$2" --to "$3" --kind "$4" --subject "$5" --interface "$6" "$7"', args=…, timeout=B)
 ```
 
 ### The notices
@@ -231,10 +234,10 @@ landed    · to build:<dependent> · subject landing <slug>    · body <landed s
 | Minted | Kind | Lexicon cell |
 |---|---|---|
 | `derive_parent_reach`, `derive_dependency_hold` | Python functions, `tools/loop/position.py` | `py.function`, OK by `lexicon.py --suggest` |
-| `derive_interface_listing`, `write_dependency_notices`, `read_dependents`, `run_driver_sourced` | Python functions, `tools/loop/loop_transition.py` | `py.function`, verb-first |
-| `dependents` | `loop_transition.py` verb | none |
+| `derive_interface_listing`, `write_dependency_notices`, `read_dependents`, `check_parent_interfaces` | Python functions, `tools/loop/loop_transition.py` | `py.function`, OK by `lexicon.py --suggest` |
+| `dependents`; `args`, `timeout` | `loop_transition.py` verb; keywords of `run_sourced` | none |
 | `--lease show`, `print_lease_witness` | driver act; shell function | `sh.function`, OK by `lexicon.py --suggest` |
-| `landed`, `reachable`, `unreachable`; the six causes | words on the engine's lines | none |
+| `landed`, `reachable`, `unreachable`; the causes of §4's table | words on the engine's lines | none |
 | `deps-wait`, `deps-unreachable`, `deps-order`, `deps-confirmed`, `deps-design-only`, `deps-anything`, `deps-strict`; `deps-notices` | `PLANTS` of `position.py`; of `loop_transition.py` | none |
 
 ### Migration
@@ -256,7 +259,8 @@ ordered before this one add six `position.py` plants, KICK-dKeptSession-13's one
 six `loop_transition.py` plants, KICK-dKeptSession-5's two, -36's three and -24's one. So S10 moves
 the `loop position fixtures` token from 37 to 44 and the `loop transition record` token from 19 to
 20 (DERIVED: `len(PLANTS)` read at 7df6a1dac, 31 and 13, plus those units' plants). The builder
-re-reads both counts at the unit's base and sets the tokens seven and one above them.
+re-reads both counts at the unit's base and sets the tokens seven and one above them, each moved in
+place: the check refuses a note carrying two `plants=` tokens.
 
 | Figure | `loop position fixtures` | `loop transition record` |
 |---|---|---|
@@ -267,12 +271,10 @@ re-reads both counts at the unit's base and sets the tokens seven and one above 
 | budget, max of the row's value and 1.5 `r` | 432 stands over 196 | 145, over the row's 60 today |
 | the leg's ceiling in `tools/gate-legs.json` | 300, above 130.3 s | 120, above 96.4 s |
 
-The `boundary` case's 2 s is KICK-dKeptSession-13's estimate (PINNED 2026-11-22). The other
-`position.py` estimates are the `plan-frontier` plant's 4.7 s, a driver run, rounded up, since each
-`deps-*` plant pushes to a bare origin and reads a lease. The `loop_transition.py` estimates are the
-`backward-rows` plant's 8.2 s, the module's slowest, rounded up, since each plant builds a scratch
-repository with a second build or a bare origin. Each analog was read alone by direct CLI on the
-run's node at 7df6a1dac. The builder reads each new plant alone by direct CLI and appends
+The analogs, each read alone by direct CLI on the run's node at 7df6a1dac and rounded up, PINNED:
+unit 13's 2 s for `boundary`, PINNED, the `plan-frontier` plant's 4.7 s, a driver run, for each other
+`position.py` plant, and the `backward-rows` plant's 8.2 s, the slowest, for each
+`loop_transition.py` plant. The builder reads each new plant alone by direct CLI and appends
 `Then re-read by KICK-dKeptSession-7 as PINNED proxy r <s>` to each row's note, with each budget the
 row's value or 1.5 `r` rounded up, whichever is higher. Neither leg has a row in
 `tools/run-gates/ceiling-evidence.txt`, so no evidenced maximum moves. A declared ceiling is the
@@ -283,13 +285,17 @@ edits `tools/gate-legs.json`.
 ### Files touched (estimate)
 
 - `tools/loop/position.py`: the reach, the switched gate, the key reads, seven plants
-- `tools/loop/loop_transition.py`: the listing, the notices, `read_dependents`, `dependents`, the launch, one plant
+- `tools/loop/loop_transition.py`: the listing, the notices, `read_dependents`, `dependents`, `check_parent_interfaces`, one plant
+- `tools/loop/breakpoints.py`: `run_sourced`'s `args` and `timeout`, its callers unchanged
 - `tools/loop/placement.py`: `write_foreign_lease` takes extra record fields, its callers unchanged
+- `memory/map/generated/symbols.json`: the seven functions minted, by `gen_map.py --write`, as the
+  commit hook demands
 - `tools/run-gates/selftest-budgets.txt`: S10, the `loop position fixtures` row's `plants=` token 37
   to 44 and the `loop transition record` row's 19 to 20, each note's re-read (DERIVED: `len(PLANTS)`
   at the unit's base)
 - `tools/unattended/unattended.sh`: `--lease show`, `print_lease_witness`, the `landed` notice in `verb_landed`
 - `tools/unattended/unattended.test.sh`: the landed-notice and witness-read arm
+- `tools/unattended/VERBS.template.md`, `memory/guides/UNATTENDED-VERBS.md`: S7's sentence in both
 - `help/loop.md`: the new section and the `--lease` paragraph
 
 ### Alternatives rejected
@@ -307,9 +313,9 @@ edits `tools/gate-legs.json`.
 - perf / scale — per parent not landed and per engine call: one `--lease status`, and under
   `confirmed-interfaces` one `--lease show` and one check; one post per dependent per Design exit and
   per landing.
-- error / empty / loading states — an unread lease reads `unreachable`, which holds Build and never
-  admits it; an absent or unfetchable `witness` holds Build as `awaiting confirmed`; a failed notice
-  prints its lines and fails no transition or landing.
+- error / empty / loading states — an unread lease reads `unreachable`, a refused key `policy
+  unread` and a refused check `confirmation unread`, each holding Build and naming why; a failed
+  notice prints its lines and fails no transition or landing.
 - observability — every unlanded parent prints its interrupt with reach, cause and value; every
   notice is a mail message the dependent's interrupt lists.
 - risks — under the default, a dependent with a live parent that never confirms waits for the
@@ -343,8 +349,9 @@ edits `tools/gate-legs.json`.
 - **AC4** — When `--plant deps-confirmed` runs under the defaults with the parent reachable, the Build
   item answers `blocked` naming `awaiting confirmed` while no confirmation is in the mailbox, `act`
   once a `confirmed` whose `content-key` recomputes is, and `blocked` again when the newest
-  confirmation's key does not recompute.
-  Red when: Build runs on no confirmation, or on one whose key is stale.
+  confirmation's key does not recompute; with `run_sourced` planted to answer the check exit 2, it
+  answers `blocked` naming `confirmation unread` and prints one `interfaces <parent> unread` NOTE.
+  Red when: Build runs on no confirmation or a stale key, or a refused check reads as unconfirmed.
 - **AC5** — When `--plant deps-design-only` runs with `deps.early-build = "design-only"` and the parent
   reachable, the Design item answers `act` and the Build item `blocked` naming `not landed`.
   Red when: `design-only` admits Build before the landing.
@@ -367,12 +374,18 @@ edits `tools/gate-legs.json`.
   Red when: a landing posts no notice, or a failed notice fails the landing.
 - **AC9** — When `--plant deps-strict` runs with a policy file naming `preset = "strict"` and no
   override of either key, it gives AC1's answers and AC5's, the keys reading `wait-for-landing` and
-  `design-only` with the source `preset`. This is each key seen on strict's value.
-  Red when: a strict-named file behaves as standard, C2-F11's consequence.
+  `design-only` with the source `preset`. This is each key seen on strict's value. In a second scratch
+  whose only policy revision holds `deps.coordination = "bogus"`, since a valid earlier revision is
+  read as `last-valid`, the Design item answers `act`, the Build item `blocked` naming `policy
+  unread`, and a `deps.coordination unread` NOTE prints.
+  Red when: a strict-named file behaves as standard, C2-F11's consequence, or a refused key reads a
+  default.
 - **AC10** — When `grep -n 'deps.coordination\|deps.early-build\|unreachable\|landed\|lease show'`
   runs over `help/loop.md`, each is found in its `## Coordinating with a parent build` section, and
-  `lease show` also in its `--lease` paragraph.
-  Red when: the gate's values or the witness read are undocumented.
+  `lease show` also in its `--lease` paragraph; `grep -c 'lease show build'` over
+  `tools/unattended/VERBS.template.md` and `memory/guides/UNATTENDED-VERBS.md` prints the same
+  non-zero count for each.
+  Red when: the gate's values or the witness read are undocumented, or the guide's copies differ.
 - **AC11** — When `bash tools/unattended/unattended.sh --lease show build <parent>` runs in AC8's
   fixture after a renew with `--witness <sha>`, it prints that sha alone, exit 0; with no lease it
   prints `-`; with `RUN_CLAIMS` off it prints `lease — off · <parent>/build`, exit 0.
@@ -426,7 +439,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 AC11 · the landed no
   `witness` is field 15?** Options: (a) a read verb printing one lease's `witness`, run as S1 runs its
   read; (b) `--claims` printing `witness` as a sixth field, which moves a row shape another reader
   parses; (c) parsing the lease ref's commit here, a second lease parser beside `read_claims`, which
-  §4's rejected alternative refuses. RESOLVED (owner, 2026-11-05): (a) the `--lease show` read verb,
+  §4 rejects. RESOLVED (owner, 2026-11-05): (a) the `--lease show` read verb,
   "`unattended.sh --lease show build <slug>` prints the lease's `witness` field from `CLAIM_ROWS`, or
   `-` where it holds none", then asked of dPlacedRequest; who builds it is F7.
 - **F6 — Does this unit answer a dependent's `confirm-request`?** Options: (a) no: the clause names
@@ -445,6 +458,13 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 AC11 · the landed no
   sourced snippet, a second positional parser of `CLAIM_ROWS`. RESOLVED (agent, 2026-11-21,
   delegated): (a), rung 3; the most capable option no veto removes, the owner's ruled verb in the
   clause's own lease read, and the driver is this unit's file. widens: none · relaxes: none
+- **F8 — What does the gate read where a key or the confirmation check is refused?** Options: (a)
+  hold Build with a cause naming the unread read and one NOTE; (b) rev-7's catalogue default for a
+  key and `awaiting confirmed` for the check, which reads standard's gate where a strict scenario
+  places the build and drops the check's line; (c) raise, refusing the whole build, Design too.
+  RESOLVED (agent, 2026-11-21, delegated): (a), rung 1; `KICK-dKeptSession-20` §8 F4 refuses an
+  unread posture and never reads it unscoped, `KICK-dKeptSession-27` S5 keeps a refused check apart
+  from `unconfirmed`, and (c) holds Design, which F1 runs. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -484,21 +504,25 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 AC11 · the landed no
   tokens `check_plant_tokens` grades, so S10 and AC12 observe them, `tools/run-gates/selftest-budgets.txt`
   joins Files touched, §4 states both rows' re-price over the earlier units' plants and the stop at a
   leg's ceiling, and §7 names the budget leg.
+- rev-8 · 2026-11-22 · S2 · S3 · S4 · S6 · S7 · §4 · §4 Files touched · §5 · AC4 · AC9 · AC10 · §8 F8 ·
+  §10 · by `2026-11-22-prompt-KICK-dKeptSession-7-1-spec-writer`: driver calls run through the
+  landed `run_sourced`, extended, not a second launcher; S3's chain is `check_parent_interfaces`, for
+  unit 42 too; S6 reads `build=`; a refused key or check holds Build (F8); the listing is bytes; the
+  verbs guide pair and `symbols.json` join Files touched; each `plants=` token moves in place.
 
 ## 10. Reuse audit
 
 The seam extended is the landed dependency gate in `tools/loop/position.py`, `derive_interrupts` and
 `derive_answer`, its landed test kept as the `landed` reach word; the reach reads dPlacedRequest's one
-lease read `--lease status` through the sourced driver `placement.py` already runs, and the notices
-post through unit 5's writer, after the commit where `write_card_follow` runs. The keys reuse
-`read_policy_kit`; the plants reuse `placement.py`'s `write_foreign_lease`, extended rather than
-copied. No verb printed a lease's `witness`, so S7 adds the one the owner ruled.
+lease read `--lease status` through `tools/loop/breakpoints.py#run_sourced`, the launcher
+`placement.py` already runs it by, extended rather than copied, and the notices
+post through unit 5's writer after the commit. The keys reuse `read_policy_kit`; the plants reuse
+`placement.py`'s `write_foreign_lease`, extended. No verb printed a `witness`, so S7 adds the owner's.
 `python tools/codebase-map/reuse_lookup.py "a dependency gate switched by policy and parent
 reachability"`, re-run at c2a407b0, ranked `read_policy_value`, `read_policy_kit`, `PolicyRefused`
 and `load_policy`, name stems on `policy`; `read_policy_kit` is the reader S6 reuses, and none is a
-dependency gate. `python tools/memory-recall/query.py "how does a dependent
-build coordinate with its parent"` with the terms below, re-run at c2a407b0, returned this spec, the
-spec brief's unit row, the C2 skeptic brief and scout C's row 1, which names TOOL-dDeclaredLoop-7 S4's
-interrupt, the seam above; none disagrees with source.
+dependency gate. `python tools/memory-recall/query.py "how does a dependent build coordinate with its
+parent"` with the terms below returned this spec, the spec brief's row and scout C's row 1, which
+names the interrupt above; none disagrees with source.
 
 Recall terms used: deps.coordination deps.early-build confirmed changed landed parent lease reachable wait-for-landing dependency gate

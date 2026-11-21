@@ -1,6 +1,6 @@
 # KICK-dKeptSession-35 — every dependency notice posted per dependent and per Design exit, so each one lands as its own message
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 25 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 25 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -17,6 +17,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-35-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md) | research | KICK-dKeptSession-42 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 |
+| [2026-11-21-prompt-KICK-dKeptSession-7-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-7-precheck-brief.md) | research | KICK-dKeptSession-7 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-55 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
@@ -61,11 +62,13 @@ it (order 25).
   answers AC7 with AC1's output and quotes its "with one dependent README naming it in" and "a
   second move out of Design posts". Unit 7 builds at order 24 and is CLOSED when this unit builds, so
   neither its spec nor its ledger is written (F1). Observed by AC1 and AC5.
-- **S5** — The user page. `help/loop.md`'s notices paragraph (`KICK-dKeptSession-7` S7) names the
+- **S5** — The user page. `help/loop.md`'s notices paragraph (`KICK-dKeptSession-7` S8) names the
   pass on each notice and the `notice — not posted` line. Observed by AC4.
 - **S6** — The budget row. `notices-two-dependents` and `notices-refused` move the `plants=<n>` token
   of the `loop transition record` row in `tools/run-gates/selftest-budgets.txt`, re-priced as §4's
-  budget row states. Observed by AC6.
+  budget row states. Both are branches of `run_transition_fixture`, as `KICK-dKeptSession-36` S4's
+  are, so no plant adds a module-level symbol and `memory/map/generated/symbols.json` does not move.
+  Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -131,7 +134,8 @@ module its argv runs, once imported (`tools/run-gates/run-selftests.sh#check_pla
 before this one add seven plants, KICK-dKeptSession-5's two, -36's three, -24's one and -7's one,
 and KICK-dKeptSession-42, of this unit's step, adds four. So S6 moves the token from 20 to 22, or
 from 24 to 26 where unit 42 lands first (DERIVED: `len(PLANTS)` read at 7df6a1dac, 13, plus those
-units' plants). The builder re-reads the count at the unit's base and sets the token two above it.
+units' plants). The builder re-reads the count at the unit's base and sets the token two above it,
+moved in place: the check refuses a note carrying two `plants=` tokens.
 
 | Figure | `loop transition record` |
 |---|---|
@@ -157,7 +161,8 @@ leg's ceiling, the unit stops before it lands and names the raise for the owner,
 - `tools/loop/loop_transition.py`: S1 and S3 in `write_dependency_notices`, and the two plants
 - `tools/run-gates/selftest-budgets.txt`: S6, the `loop transition record` row's `plants=` token two
   above its count at the unit's base and its note's re-read (DERIVED: `len(PLANTS)`)
-- `tools/unattended/unattended.sh`: S2 and S3 in `verb_landed`, and `KIT_UNATTENDED_VERSION` moved
+- `tools/unattended/unattended.sh`: S2 and S3 in `verb_landed`; its kit version is the lander's to
+  mint at the push (`tools/push-main.sh@78f40c3c2475:27`), never this branch's
 - `tools/unattended/unattended.test.sh`: the landed arm extended
 - `help/loop.md`: S5's sentence
 - `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-35-1-acceptance-ledger.md`:
@@ -226,7 +231,7 @@ parent, a bare origin under `%TEMP%` and `RUN_CLAIMS=on`, planted by `loop_trans
 
 `loop transition record` · `every held leg is budgeted, every budget row resolves` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/loop_transition.py · covers AC1 AC3 · the `notices-two-dependents` and `notices-refused` plants, each rebinding the spawn the writer imports inside its function and restoring it after the run, staged red by a scratch copy dropping `--pass` · the `loop transition record` row's `plants=<n>` token rises by two
+New arm: tools/loop/loop_transition.py · covers AC1 AC3 · the `notices-two-dependents` and `notices-refused` plants, each rebinding `run_sourced`, the launcher the writer imports inside its function (`KICK-dKeptSession-7` §4), and restoring it after the run, staged red by a scratch copy dropping `--pass` · the `loop transition record` row's `plants=<n>` token rises by two
 New arm: tools/unattended/unattended.test.sh · covers AC2 · two landings to one dependent · the effective `FLOOR_ASSERTIONS` pin and its region's `FLOOR_SHARD_<k>` rise by the arm's counted assertions
 
 ## 8. Open questions
@@ -265,6 +270,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC2 · two landings to on
   `check_plant_tokens` grades, so S6 and AC6 observe it, `tools/run-gates/selftest-budgets.txt` joins
   Files touched, §4 states the row's re-price over the earlier units' plants and the stop at the
   leg's ceiling, and §7 names the budget leg.
+- rev-6 · 2026-11-22 · S5 · S6 · §4 · §4 Files touched · §7 · by
+  `2026-11-22-prompt-KICK-dKeptSession-7-1-spec-writer`: S5 points at unit 7's docs item, S8, not
+  its witness read; the `KIT_UNATTENDED_VERSION` move leaves Files touched, since the lander mints
+  kit versions at the push; the `plants=` token moves in place, the check refusing two; the plants
+  rebind unit 7's `run_sourced` launch and, as nested branches, leave `symbols.json` unmoved.
 
 ## 10. Reuse audit
 

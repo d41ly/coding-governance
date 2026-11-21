@@ -1,6 +1,6 @@
 # KICK-dKeptSession-42 — a dependent's transition acknowledges the notices it has consumed, so a parent's notice never holds the dependent until the wait ceiling
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 25 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 25 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-11-21-build-KICK-dKeptSession-10-reground-orders-20-26-returns.md](../build/2026-11-21-build-KICK-dKeptSession-10-reground-orders-20-26-returns.md) | research | KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-1 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md) | research | KICK-dKeptSession-35 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 |
+| [2026-11-21-prompt-KICK-dKeptSession-7-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-7-precheck-brief.md) | research | KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-8 KICK-dKeptSession-55 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
@@ -42,28 +43,34 @@ dependent's transition writer acknowledge each notice it has consumed. It repair
   The guard then refuses on the read's `open` rows less every id acknowledged with exit 0, and the
   read is not repeated. Observed by AC1.
 - **S2** — id 55. Consumed interfaces. For each parent, the `from-build` of column 6, with an `open`
-  `confirmed` or `changed` row in those rows, the writer runs `KICK-dKeptSession-27` S5's
-  `check_interface_notice <slug> "interfaces <parent>" <listing>` over the listing
-  `KICK-dKeptSession-7` S3 derives, written to a scratch file. When it prints `interface — current
-  <id>` and that id is an `open` row of the read, the writer acknowledges that row and every earlier
-  `open` `confirmed` or `changed` from the same parent, earlier by `first-seen`, column 5. A row it
-  does not acknowledge, a `changed` whose key does not recompute, stays open for the re-entry that
-  consumes it. The check runs in the driver as §8 F2 rules. Observed by AC2 and AC3.
+  `confirmed` or `changed` row in those rows, the writer calls `KICK-dKeptSession-7` S3's
+  `check_parent_interfaces(root, slug, parent)`, the one chain the gate reads: the parent lease's
+  `witness`, its listing in a scratch file and `KICK-dKeptSession-27` S5's `check_interface_notice
+  <slug> "interfaces <parent>" <listing>`, run in the driver as §8 F2 rules. When it answers exit 0
+  with `interface — current <id>` and that id is an `open` row of the read, the writer acknowledges
+  that row and every earlier `open` `confirmed` or `changed` from the same parent, earlier by
+  `first-seen`, column 5. Any other answer acks nothing from that parent, and its exit 2 line is
+  written to stderr as S3's failed ack is. A row it does not acknowledge, a `changed` whose key does
+  not recompute, stays open for the re-entry that consumes it. Observed by AC2 and AC3.
 - **S3** — id 55. The post. Each acknowledgement is `--mail ack <slug> <id>`
-  (`KICK-dKeptSession-5` S8), launched as `read_mail_rows` launches its read: the driver
-  `resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"`
-  (`tools/loop/loop_lib.py#resolve_kit_dir`) run under `resolve_bash(<driver>)`
-  (`tools/loop/loop_witness.py#resolve_bash`), which returns `None` where no bash sees it, with stdin
-  closed, `read_clean_env()` (`tools/loop/loop_witness.py#read_clean_env`) and the bound
-  `MAIL_GUARD_SECONDS`. It runs once per id and only while the row reads `open`, so a retried
-  transition posts nothing twice. A failed ack prints `mail — ack not posted <id> · rc <n>`, and the
-  guard then refuses on the still-open row as unit 5 S9 states. Observed by AC4.
+  (`KICK-dKeptSession-5` S8), run through `tools/loop/breakpoints.py#run_sourced` as
+  `KICK-dKeptSession-7` §4 "The driver launch" extends it, `'load_driver_conf && main --mail ack "$2"
+  "$3"'` with `args=(slug, id)` and the bound `MAIL_GUARD_SECONDS`, under the landed
+  `resolve_bash(<driver>)` (`tools/loop/loop_witness.py#resolve_bash`), imported inside the function.
+  It runs once per id and only while the row reads `open`, so a retried transition posts nothing
+  twice. A failed ack, a non-zero exit or a launch that raises, writes `mail — ack not posted <id> ·
+  rc <n|->` to stderr as it happens, since a move the guard then refuses returns no `said`, and the
+  guard refuses on the still-open row as unit 5 S9 states. Observed by AC4.
 - **S4** — id 55. `KICK-dKeptSession-24` §8 F2's reliance on the deadline for "a `changed` nobody
   acknowledges" now covers only a `changed` the dependent has not consumed; that unit's text is
   superseded by name here, unchanged in behaviour. NOT OBSERVED: no criterion of this unit observes
   unit 24's deadline, which keeps its own AC.
 - **S5** — The user page. `help/loop.md`'s guard paragraph, which `KICK-dKeptSession-5` S14 writes
   under "Recording a build's move", gains §4's table "Who acknowledges what". Observed by AC5.
+- **S6** — The budget row. The four `acks-*` plants move the `plants=<n>` token of the `loop
+  transition record` row in `tools/run-gates/selftest-budgets.txt`, re-priced as §4's budget row
+  states. They are branches of `run_transition_fixture`, as `KICK-dKeptSession-36` S4's are, so no
+  plant adds a module-level symbol. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -77,10 +84,10 @@ dependent's transition writer acknowledge each notice it has consumed. It repair
 
 ### Edges
 
-- **consumes-from** `KICK-dKeptSession-7` — the `confirmed`, `changed` and `landed` notices and S3's interface listing, which the writer reads to decide what it has consumed (id 55)
+- **consumes-from** `KICK-dKeptSession-7` — the `confirmed`, `changed` and `landed` notices, S3's `check_parent_interfaces` and §4's extended `run_sourced`, by which the writer decides what it has consumed and posts its acks (id 55)
 - **consumes-from** `KICK-dKeptSession-5` — `write_transition`'s guard, `read_mail_rows` and the `--mail ack` verb, through which the writer acknowledges between the read and the refusal
 - **consumes-from** `KICK-dKeptSession-27` — `check_interface_notice`, whose `current <id>` line names the row the dependent has consumed
-- **consumes-from** `KICK-dKeptSession-36` — the landed `resolve_bash(<driver>)` launch the guard's read uses, through which each `--mail ack` runs
+- **consumes-from** `KICK-dKeptSession-36` — the landed `resolve_bash(<driver>)` the guard's read uses, under which `run_sourced` runs each `--mail ack`
 - **hands-off** `KICK-dKeptSession-53` — `write_consumed_acks`' S2, whose "earlier by `first-seen`" that unit replaces with the key and chain rule (id 4)
 - **hands-off** `KICK-dKeptSession-55` — `write_consumed_acks` and its S1 and S3, which that unit makes conditional on the guard's verdict and visible (id 49)
 - **hands-off** `KICK-dKeptSession-56` — `write_consumed_acks`' launcher and failed acks, and the Gates legs, the batch's S3, S32, S27, S44 and S42 (ids 5, 50, 36, 53, 41)
@@ -116,9 +123,12 @@ dependent's transition writer acknowledge each notice it has consumed. It repair
 
 ### The check's launch (§8 F2)
 
+Both driver calls are `KICK-dKeptSession-7` §4's `run_sourced` form, never a launcher of this
+unit's own: the check inside `check_parent_interfaces`, and the ack here.
+
 ```
-[<bash>, "-c", '. "$1" && load_driver_conf && check_interface_notice "$2" "$3" "$4"',
- "check_interface_notice", <driver>, <slug>, "interfaces <parent>", <listing file>]
+run_sourced(root, 'load_driver_conf && check_interface_notice "$2" "$3" "$4"', args=(slug, "interfaces <parent>", listing), timeout=MAIL_GUARD_SECONDS)
+run_sourced(root, 'load_driver_conf && main --mail ack "$2" "$3"', args=(slug, id), timeout=MAIL_GUARD_SECONDS)
 ```
 
 ### Inventory
@@ -132,10 +142,45 @@ dependent's transition writer acknowledge each notice it has consumed. It repair
 
 None: no notice exists before `KICK-dKeptSession-7`.
 
+### The budget row
+
+`check_plant_tokens` holds the `plants=<n>` token of each loop-kit row equal to `len(PLANTS)` of the
+module its argv runs, once imported, and refuses a note carrying two tokens
+(`tools/run-gates/run-selftests.sh#check_plant_tokens`). The `loop transition record` row runs
+`loop_transition.py check --selftest`. Units ordered before this one add seven plants,
+KICK-dKeptSession-5's two, -36's three, -24's one and -7's one, and KICK-dKeptSession-35, of this
+unit's step, adds two. So S6 moves the token from 20 to 24, or from 22 to 26 where unit 35 lands
+first (DERIVED: `len(PLANTS)` read at 7df6a1dac, 13, plus those units' plants). The builder re-reads
+the count at the unit's base and moves the one token in place, four above it.
+
+| Figure | `loop transition record` |
+|---|---|
+| proxy `r` at this tree, the row's note (PINNED 2026-11-21) | 33.4 s over 13 plants |
+| the earlier units' plants, estimates (PINNED 2026-11-22) | 7 times 9 s, and 2 times 9 s more after unit 35 |
+| this unit's plants, estimates (PINNED 2026-11-22) | 4 times 9 s |
+| `r` after this unit (PINNED 2026-11-22, the sum) | 132.4 s, or 150.4 s after unit 35 |
+| budget, max of the row's value and 1.5 `r` | 199, or 226 after unit 35 |
+| the leg's ceiling in `tools/gate-legs.json` | 120, under 132.4 s |
+
+The estimates are the `backward-rows` plant's 8.2 s, the module's slowest, rounded up, read alone
+by direct CLI on the run's node at 7df6a1dac, since each plant builds the two-build scratch
+repository with a bare origin. The builder reads each new plant alone by direct CLI and appends
+`Then re-read by KICK-dKeptSession-42 as PINNED proxy r <s>` to the row's note, with the budget the
+row's value or 1.5 `r` rounded up, whichever is higher. The leg has no row in
+`tools/run-gates/ceiling-evidence.txt`, so no evidenced maximum moves. By these estimates this unit
+takes `r` past the leg's 120 s ceiling (PINNED 2026-11-22). A declared ceiling is the owner's to move
+(`memory/guides/BUILD-METHOD.md`, M3): where the builder's reading takes `r` to the ceiling the leg
+carries at the unit's base, the unit stops before it lands and names the raise for the owner, and it
+never edits `tools/gate-legs.json`.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_transition.py`: `write_consumed_acks`, called between the read and the refusal,
   and the four plants
+- `tools/run-gates/selftest-budgets.txt`: S6, the `loop transition record` row's `plants=` token
+  four above its count at the unit's base and its note's re-read (DERIVED: `len(PLANTS)`)
+- `memory/map/generated/symbols.json`: `write_consumed_acks`, by `gen_map.py --write`, as the commit
+  hook demands
 - `help/loop.md`: S5's table
 
 ### Alternatives rejected
@@ -154,7 +199,7 @@ None: no notice exists before `KICK-dKeptSession-7`.
 - perf / scale — one `check_interface_notice` per parent with an open notice, and one post per
   consumed id, at a transition.
 - error / empty / loading states — a failed ack, or a check that does not answer within the bound,
-  leaves the row open and the guard refuses, so the failure is visible and never silent.
+  leaves the row open and the guard refuses, its line on stderr, so the failure is never silent.
 - observability — each ack is a mail message in the parent's view of the dependent's replies.
 - risks — a dependent that never transitions never acks; its parent is not held by that, since only
   rows addressed to a build gate that build. A move the table refuses after the guard has still
@@ -186,12 +231,20 @@ The fixture is `KICK-dKeptSession-7` AC7's two-build scratch repository with a b
 - **AC5** — When `grep -n "Acknowledged by" loop.md` runs in `help/`, it prints the table's header
   row under "Recording a build's move".
   Red when: the owner's page does not say who acknowledges a notice.
+- **AC6** — When, at the unit's commit,
+  `python -I -c "import sys; sys.path.insert(0, 'tools/loop'); import loop_transition as m; print(len(m.PLANTS))"`
+  runs, it prints the number that
+  `grep -oP '^loop transition record\t.*\Kplants=\d+' tools/run-gates/selftest-budgets.txt`
+  prints after `plants=`, and the four `acks-*` plants are among the keys of `PLANTS`.
+  Red when: the row still carries the count from before this unit's plants.
+  figure: PINNED 2026-11-22 at `7df6a1dac`, the probe prints `13` and the grep `plants=13`, before
+  the units ordered ahead of this one land.
 
 ## 7. Gates
 
-`loop transition record` · `docs` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop transition record` · `policy fixtures` · `every held leg is budgeted, every budget row resolves` · `recall floor` · `recall floor arms` · `docs` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 AC4 · the `acks-landed`, `acks-confirmed`, `acks-superseded` and `acks-failed` plants, staged red against unit 5's guard with no ack step · none
+New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 AC4 · the `acks-landed`, `acks-confirmed`, `acks-superseded` and `acks-failed` plants, staged red against unit 5's guard with no ack step · the `loop transition record` row's `plants=<n>` token rises by four
 
 ## 8. Open questions
 
@@ -227,14 +280,22 @@ New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 AC4 · the `acks-la
   absent `tools/loop/selftest.py` to `loop_transition.py`'s plants; S5 and AC5 carry §5's page into
   the files touched; the leg line gains `loop transition record` and `docs`; line citations re-cited
   by section. Narrowed: no second read before the guard, since the one read is unit 5's.
+- rev-4 · 2026-11-22 · S2 · S3 · S6 · §3 Edges · §4 · §4 Files touched · AC6 · §7 · §10 · by
+  `2026-11-22-prompt-KICK-dKeptSession-7-1-spec-writer`: S2 calls unit 7's `check_parent_interfaces`
+  and S3 posts through `run_sourced` as unit 7 extends it, no launcher of this unit's own; a refused
+  check or a failed ack writes its line to stderr, since a refused move returns no `said`; S6 and AC6
+  move the `plants=<n>` token the four plants owe, priced in §4's budget row with the stop at the
+  leg's ceiling; `selftest-budgets.txt` and `symbols.json` join Files touched; the leg line gains
+  `policy fixtures`, whose guard holds `tools/loop/`, the budget leg and the two `recall floor` legs
+  `symbols.json` trips.
 
 ## 10. Reuse audit
 
 The seams extended are `KICK-dKeptSession-5`'s `read_mail_rows` read, `--mail ack` verb and
-`write_transition` guard, `KICK-dKeptSession-27`'s `check_interface_notice` and `KICK-dKeptSession-7`'s
-listing, launched as `tools/loop/loop_transition.py#write_card_follow` launches the kickoff engine,
-through `tools/loop/loop_lib.py#resolve_kit_dir` and `tools/loop/loop_witness.py#resolve_bash`;
-nothing is re-derived. `python tools/codebase-map/reuse_lookup.py "acknowledge a mailbox message
+`write_transition` guard, `KICK-dKeptSession-27`'s `check_interface_notice`, and
+`KICK-dKeptSession-7`'s `check_parent_interfaces` and its extension of the landed
+`tools/loop/breakpoints.py#run_sourced`, under `tools/loop/loop_witness.py#resolve_bash`; nothing is
+re-derived and no second launcher is minted. `python tools/codebase-map/reuse_lookup.py "acknowledge a mailbox message
 once its consumer reads it"` ranked `read_text`, `read`, `read_bytes` and `read_git` by the name
 stem `read` only; no mail code is in the tree at c2a407b0, so no other seam fits and the sibling
 units' specs are the seams.
