@@ -37766,12 +37766,6 @@ memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-9.md	tools/g
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-92.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md	tools/lib/resolve-python.sh:39	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md	tools/unattended/check-unattended.sh:4064	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md	tools/unattended/check-unattended.sh:4158-4170	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md	tools/unattended/lib-unattended.sh:1026	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md	tools/unattended/lib-unattended.sh:1137	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md	tools/workflows/unattended-build.js:76	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/gotchas/a-new-leg-trips-a-growing-set-of-meta-gates.md	BUILD-METHOD M6	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/gotchas/arm-literal-strands-on-message-edit.md	check-unattended.test.sh:714	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/gotchas/fold-text-is-unreviewed-surface.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
