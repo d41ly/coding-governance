@@ -15,7 +15,8 @@ under `2026-11-21-build-TOOL-dWitnessedBar-77-widen-19`. No `a=$((a+1))` was add
 The floor that counts this unit's arms is `FLOOR_ASSERTIONS` in `tools/run-gates/run-gates.gov.test.sh` as `TOOL-dWitnessedBar-82` S1 restates it after unit 78, answering the New-arm line's floor clause, which cites `TOOL-dWitnessedBar-73` S15 (`TOOL-dWitnessedBar-82` S3).
 
 **Evidences:** TOOL-dWitnessedBar-77
-- AC1 — `never reached read_green_file` — over the cut as the hook has it the slice printed no line, `fail` 0,
+- AC1 — `never reached read_green_file` — TOOL-dWitnessedBar-84 S15: this spec's rev-4 re-grounded its §4 onto section labels, 70 S2, 72 S1, 72 §4 Inventory, 72 §5 observability and 72 AC1, and `grep -cE '7[02]\.md:[0-9]'` over it prints 0, so no line of unit 70's or unit 72's spec is cited; rev-4 closed the audit's id 11 here.
+  Over the cut as the hook has it the slice printed no line, `fail` 0,
   `rgf_ok` 1. Over the cut whose `sha` and `fingerprint` cases both read `${_rg_v%?}` it printed
   `gov-canary: the planted CR never reached read_green_file on MINGW64_NT-10.0-22621 for rec_sha; the CR-strip assertion is not counted`
   then the same line `for rec_fp;`, and no `for count` line; the suite as `1f34660b7` has it printed the

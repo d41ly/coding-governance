@@ -243,7 +243,10 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=74
+FLOOR_ASSERTIONS=76
+# RAISED 74 -> 76 by TOOL-dWitnessedBar-84 on 2026-11-21, stated ABSOLUTELY by unit 82 S1's rule: the
+# floor read from this source, 74, plus the two visit-count checks of S14, the canary's beside its one
+# `check_canary_keys` call and the liveness loop's after the loop, the only increments this unit adds.
 # RAISED 72 -> 74 by TOOL-dWitnessedBar-82 on 2026-11-21, stated ABSOLUTELY (S1, under unit 73 S15's
 # rule): it counts every arm built through order 43, read from this source with each loop at its
 # population. Unit 73's 72, plus TOOL-dWitnessedBar-78's every-key record over `read_bar_file` (S7) and
@@ -869,35 +872,52 @@ done
 # canary at its count rather than grading the CR; nor a `verdict` read by the hook, which reads none;
 # nor a `sha` key read by the CLI half, whose line prints the queried sha and never the record's.
 # Its CR is spelled in this top-level body, never inside a `$(...)`, which reads it as empty here.
-check_cr_reached() (   # file · record · var -> 0 only when var, read by name, is forty-one bytes ending in CR
+# A READ FAILURE IS NOT A RED (TOOL-dWitnessedBar-84 S13): `check_cr_reached` returns 2 when `<file>`
+# cannot be sourced, defines no `read_green_file`, or `<record>` is not a regular file, and 1 only on a
+# value it measured. `check_canary_keys` prints a variable only on a 1 and returns 2 on any 2, and on
+# a visit count (S14) other than every word of `${CANARY_KEYS[*]}`, at least two, which it names on
+# stderr, since each call runs inside a `$(...)`. WHAT THIS DOES NOT CHECK: which of the two a 2 was.
+check_cr_reached() (   # file · record · var -> 0 when var, read by name, is forty-one bytes ending in CR; 1 when not; 2 unread
   LC_ALL=C
-  . "$1" || exit 1
+  unset -f read_green_file
+  . "$1" || exit 2
+  declare -F read_green_file > /dev/null || exit 2
+  [ -f "$2" ] || exit 2
   read_green_file "$2"
   _cc_v=${!3}
-  [ "${#_cc_v}" -eq 41 ] && [ "${_cc_v: -1}" = $'\r' ]
+  [ "${#_cc_v}" -eq 41 ] && [ "${_cc_v: -1}" = $'\r' ] || exit 1
 )
 CANARY_KEYS=(sha:rec_sha fingerprint:rec_fp)   # <key>:<var>, each read by the cut, in the canary's order
-check_canary_keys() {   # file · record -> prints, one per line, each CANARY_KEYS variable whose CR did not arrive
-  local _ck_p
+rgf_km=0; for rgf_w in ${CANARY_KEYS[*]}; do rgf_km=$((rgf_km+1)); done   # the pairs each loop owes a visit
+check_canary_keys() {   # file · record -> prints, one per line, each CANARY_KEYS variable whose CR did not arrive; 2 unread
+  local _ck_p _ck_rc _ck_n=0 _ck_2=0
   for _ck_p in "${CANARY_KEYS[@]}"; do
-    check_cr_reached "$1" "$2" "${_ck_p#*:}" || printf '%s\n' "${_ck_p#*:}"
+    _ck_n=$((_ck_n+1))
+    check_cr_reached "$1" "$2" "${_ck_p#*:}"; _ck_rc=$?
+    case "$_ck_rc" in 0) ;; 1) printf '%s\n' "${_ck_p#*:}" ;; *) _ck_2=1 ;; esac
   done
+  if [ "$_ck_n" != "$rgf_km" ] || [ "$rgf_km" -lt 2 ]; then
+    echo "gov-canary: the canary visited $_ck_n of $rgf_km CANARY_KEYS pairs" >&2; return 2
+  fi
+  [ "$_ck_2" = 0 ] || return 2
 }
 # <key>:<var> · replacement · label · passed reason · other lead -> 0 silent when the variant, the cut
 # `rgf_fn` with its `<key>)` assignment set to the replacement, was seen red over `rgf_rec`; else
 # prints one reason and returns 1. Writes its variant and mutant under `rgf_t`.
 check_key_variant() {
-  local _kv_k=${1%%:*} _kv_v=${1#*:} _kv_n _kv_mn _kv_got _kv_g _kv_has=0 _kv_oth=
-  printf '%s\n' "$rgf_fn" | sed 's/\('"$_kv_k) $_kv_v"'=\)\$_rg_v/\1'"$2"'/' > "$rgf_t/cut-var.sh"
+  local _kv_k=${1%%:*} _kv_v=${1#*:} _kv_n _kv_mn _kv_got _kv_rc _kv_g _kv_has=0 _kv_oth=
+  # The `<key>)` arm's assignment, bare or quoted, takes the replacement unquoted (TOOL-dWitnessedBar-84 S6).
+  printf '%s\n' "$rgf_fn" | sed 's/\('"$_kv_k) $_kv_v"'=\)"\{0,1\}\$_rg_v"\{0,1\}/\1'"$2"'/' > "$rgf_t/cut-var.sh"
   _kv_n=$(diff <(printf '%s\n' "$rgf_fn") "$rgf_t/cut-var.sh" | grep -c '^>')
   sed 's/%[$].[\]r.}/}/' "$rgf_t/cut-var.sh" > "$rgf_t/cut-var-mut.sh"
   _kv_mn=$(diff "$rgf_t/cut-var.sh" "$rgf_t/cut-var-mut.sh" | grep -c '^>')
-  _kv_got=$(check_canary_keys "$rgf_t/cut-var-mut.sh" "$rgf_rec")
+  _kv_got=$(check_canary_keys "$rgf_t/cut-var-mut.sh" "$rgf_rec"); _kv_rc=$?
   for _kv_g in $_kv_got; do
     if [ "$_kv_g" = "$_kv_v" ]; then _kv_has=1; else _kv_oth=${_kv_oth:+$_kv_oth }$_kv_g; fi
   done
   if [ "$_kv_n" != 1 ]; then printf '%s\n' "${3}variant changed $_kv_n lines"
   elif [ "$_kv_mn" != 1 ]; then printf '%s\n' "${3}mutant changed $_kv_mn lines"
+  elif [ "$_kv_rc" = 2 ]; then printf '%s\n' "${3}variant could not be sourced or read (rc 2)"
   elif [ "$_kv_has" != 1 ]; then printf '%s\n' "$4"
   elif [ -n "$_kv_oth" ]; then printf '%s\n' "$5 $_kv_oth whose CR arrived"
   else return 0; fi
@@ -933,11 +953,13 @@ printf '%s\n' "$rgf_mut" > "$rgf_t/cut-mut.sh"
 rgf_n=$(diff <(printf '%s\n' "$rgf_fn") <(printf '%s\n' "$rgf_mut") | grep -c '^>')
 # The line's slot (TOOL-dWitnessedBar-75 S1, S2) takes each value of `rgf_whats`, one line apiece
 # (TOOL-dWitnessedBar-77 S1): `count <n>` alone when the count failed, so no byte check runs past it,
-# else every variable `check_canary_keys` prints, in its order, so `rec_sha` before `rec_fp`.
+# else every variable `check_canary_keys` prints, in its order, so `rec_sha` before `rec_fp`, or
+# `unread` alone when it returned 2 (TOOL-dWitnessedBar-84 S13, S14), its visit count one assertion.
 rgf_whats=()
 if [ "$rgf_n" != 1 ]; then rgf_whats=("count $rgf_n")
-else rgf_miss=$(check_canary_keys "$rgf_t/cut-mut.sh" "$rgf_rec")
-  for rgf_g in $rgf_miss; do rgf_whats+=("$rgf_g"); done; fi
+else a=$((a+1)); rgf_miss=$(check_canary_keys "$rgf_t/cut-mut.sh" "$rgf_rec"); rgf_ck=$?
+  if [ "$rgf_ck" = 2 ]; then rgf_whats=("unread")
+  else for rgf_g in $rgf_miss; do rgf_whats+=("$rgf_g"); done; fi; fi
 rgf_ok=0
 [ "${#rgf_whats[@]}" = 0 ] && rgf_ok=1
 for rgf_what in "${rgf_whats[@]}"; do
@@ -949,8 +971,11 @@ done
 # exactly that key's variable. `rgf_seen` lists the variables seen red, and only those compares count.
 # The tail variant's call, then the length variant's (TOOL-dWitnessedBar-79 S1): each failed call's
 # reason prints one line, and a key with any joins no `rgf_seen`.
-rgf_seen=
+# The loop counts the pairs it visits, checked after it against every word of `${CANARY_KEYS[*]}`,
+# at least two, one assertion (TOOL-dWitnessedBar-84 S14).
+rgf_seen=; rgf_lvn=0
 for rgf_kp in "${CANARY_KEYS[@]}"; do
+  rgf_lvn=$((rgf_lvn+1))
   rgf_kv=${rgf_kp#*:}; rgf_whys=()
   rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v%?}x' 'tail ' 'the tail variant passed a value whose last byte is not CR' 'it named') \
     || rgf_whys+=("$rgf_why")
@@ -961,6 +986,9 @@ for rgf_kp in "${CANARY_KEYS[@]}"; do
   done
   [ "${#rgf_whys[@]}" = 0 ] && rgf_seen="$rgf_seen $rgf_kv"
 done
+a=$((a+1))
+[ "$rgf_lvn" = "$rgf_km" ] && [ "$rgf_km" -ge 2 ] \
+  || { echo "gov-canary: the liveness loop visited $rgf_lvn of $rgf_km CANARY_KEYS pairs"; fail=1; }
 [ "$rgf_ok" = 1 ] && case "$rgf_seen " in *" rec_sha "*) a=$((a+1)) ;; esac
 [ -n "$rgf_fn" ] && [ "$rgf_sha" = "$rgf_b" ] \
   || { rgf_v=${rgf_sha//$'\n'/|}; rgf_cr='\r'; echo "gov-canary: the hook's read_green_file set rec_sha to '${rgf_v//$'\r'/$rgf_cr}' over two sha lines, the second CR-ended, not the second sha with its CR stripped, or did not cut from the hook"; fail=1; }
@@ -974,7 +1002,24 @@ done
 # names that do not. An empty derivation reds. RED against a `selftests` case keeping the first of a
 # repeated key (it names `rec_st`). WHAT THIS DOES NOT CHECK: a key the hook reads through a line not of
 # that form, which the listing below names as a variable outside the derivation.
-rgf_pairs=$(printf '%s\n' "$rgf_fn" | sed -n 's/^[[:space:]]*\([A-Za-z_]*\)) \(rec_[A-Za-z_]*\)=.*/\1 \2/p')
+# One derivation serves both readers (TOOL-dWitnessedBar-84 S10, S11): `_derive_case_keys` prints one
+# `<key> <var>` line per `<label>) <prefix><name>=` assignment in the cut, every one on a line, and
+# returns 1, naming the cut and both numbers on stderr, when that differs from `grep -o`'s count of
+# them. Each caller's assertion requires its 0.
+_derive_case_keys() {   # cut-file · prefix -> one `<key> <var>` line per case-arm assignment; 1 on a miscount
+  local _dk_out _dk_n _dk_m
+  _dk_out=$(awk -v p="$2" '{ s = $0
+    while (match(s, "[A-Za-z_]+\\) " p "[A-Za-z_]+=")) {
+      t = substr(s, RSTART, RLENGTH - 1); s = substr(s, RSTART + RLENGTH)
+      k = t; sub(/\).*/, "", k); v = t; sub(/^.*\) /, "", v); print k " " v } }' "$1")
+  _dk_n=$(printf '%s\n' "$_dk_out" | grep -c .)
+  _dk_m=$(grep -oE "[A-Za-z_]+\) $2[A-Za-z_]+=" "$1" | grep -c .)
+  [ -n "$_dk_out" ] && printf '%s\n' "$_dk_out"
+  [ "$_dk_n" = "$_dk_m" ] \
+    || { echo "gov-canary: the case keys derived from $1 number $_dk_n, and its $2 case-arm assignments $_dk_m" >&2; return 1; }
+}
+printf '%s\n' "$rgf_fn" > "$rgf_t/cut.sh"
+rgf_pairs=$(_derive_case_keys "$rgf_t/cut.sh" rec_); rgf_dk=$?
 rgf_vars=$(printf '%s\n' "$rgf_pairs" | awk 'NF == 2 { print $2 }' | sort -u | tr '\n' ' ')
 : > "$rgf_t/keys.rec"; printf '%s\n' "$rgf_pairs" > "$rgf_t/pairs.txt"  # a file, not a here-string from a substitution
 while read -r rgf_k rgf_kn; do
@@ -982,7 +1027,7 @@ while read -r rgf_k rgf_kn; do
 done < "$rgf_t/pairs.txt"
 rgf_kf=$( eval "$rgf_fn"; read_green_file "$rgf_t/keys.rec"; for rgf_kv in $rgf_vars; do [ "${!rgf_kv}" = new ] || printf '%s ' "$rgf_kv"; done )
 a=$((a+1))
-[ -n "${rgf_vars// /}" ] && [ -z "$rgf_kf" ] \
+[ "$rgf_dk" = 0 ] && [ -n "${rgf_vars// /}" ] && [ -z "$rgf_kf" ] \
   || { echo "gov-canary: over a record holding each key the cut's case labels name ($(printf '%s\n' "$rgf_pairs" | grep -c .) derived: ${rgf_vars:-none}), old then new CR-ended, these did not read exactly new: ${rgf_kf:-none}"; fail=1; }
 # EVERY KEY `read_bar_file` READS (TOOL-dWitnessedBar-78 S7, AC8): the same derived planting over the
 # hook's cut `read_bar_file`, its `<label>) bg_<name>=` lines, in a third record; every derived variable
@@ -991,7 +1036,8 @@ a=$((a+1))
 # variable). WHAT THIS DOES NOT CHECK: the `selection.[1-9]*` label, which fills `bg_sel_rows` and is
 # outside the derivation.
 rbf_fn=$(awk '/^read_bar_file\(\)/,/^}/' "$ROOT/.githooks/pre-push")
-rbf_pairs=$(printf '%s\n' "$rbf_fn" | sed -n 's/^[[:space:]]*\([A-Za-z_]*\)) \(bg_[A-Za-z_]*\)=.*/\1 \2/p')
+printf '%s\n' "$rbf_fn" > "$rgf_t/bar-cut.sh"
+rbf_pairs=$(_derive_case_keys "$rgf_t/bar-cut.sh" bg_); rbf_dk=$?
 rbf_vars=$(printf '%s\n' "$rbf_pairs" | awk 'NF == 2 { print $2 }' | sort -u | tr '\n' ' ')
 : > "$rgf_t/bar-keys.rec"; printf '%s\n' "$rbf_pairs" > "$rgf_t/bar-pairs.txt"  # a file, not a here-string from a substitution
 rbf_miss=
@@ -1003,7 +1049,7 @@ for rgf_k in base max_age blocks; do
 done
 rbf_kf=$( eval "$rbf_fn"; read_bar_file "$rgf_t/bar-keys.rec"; for rgf_kv in $rbf_vars; do [ "${!rgf_kv}" = new ] || printf '%s ' "$rgf_kv"; done )
 a=$((a+1))
-[ -n "${rbf_vars// /}" ] && [ -z "$rbf_kf" ] && [ -z "$rbf_miss" ] \
+[ "$rbf_dk" = 0 ] && [ -n "${rbf_vars// /}" ] && [ -z "$rbf_kf" ] && [ -z "$rbf_miss" ] \
   || { echo "gov-canary: over a record holding each key read_bar_file's case labels name ($(printf '%s\n' "$rbf_pairs" | grep -c .) derived: ${rbf_vars:-none}; missing:${rbf_miss:- none}), old then new CR-ended, these did not read exactly new: ${rbf_kf:-none}"; fail=1; }
 # THE LINE RULES, OVER BOTH READERS (TOOL-dWitnessedBar-78 S13, AC14): a fourth record holds
 # `manifest<TAB>x<TAB>`, a bare `fingerprint` and a final `selftests<TAB>on` with no LF. Each cut reads
