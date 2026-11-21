@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-70 — the CRLF record arm proves its planted CR reaches `read_green_file` before any CR-strip assertion counts, and each staged red is recorded with its failing line from a Windows node
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 39 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-3 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 39 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-68-round7-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-68-round7-fix-return.md) | research | TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 |
 | [2026-10-25-build-TOOL-dWitnessedBar-70-deviation-701.md](../build/2026-10-25-build-TOOL-dWitnessedBar-70-deviation-701.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-68-round7-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-68-round7-fix-brief.md) | research | TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-70-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-70-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-70-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-70-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-70-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-70-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-68-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-68-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 |
