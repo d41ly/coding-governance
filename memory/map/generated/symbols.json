@@ -12090,6 +12090,11 @@
     {
       "id": "derive_kit_rel",
       "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_kit_rel",
+      "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
     },
     {
@@ -12316,6 +12321,11 @@
       "id": "derive_minute",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "derive_mirror_inputs",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "derive_module_closure",

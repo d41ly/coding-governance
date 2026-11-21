@@ -2635,7 +2635,11 @@ def run_mirror_landed(name):
     setting budgets.enforce, b merged --no-ff onto main detached, `mirror --write` over the merge, and
     `commit-tree` over the written tree with parents main and b, pushed as main: at that rewrite
     `mirror --check` is fresh, `arm_mirror_parity` finds nothing, and the helper reads the key from
-    the mirror with no `mirror stale at`. A failed git step is a WRONG naming the step."""
+    the mirror with no `mirror stale at`. `mirror-presets-stale` (KICK-dKeptSession-40): the copy given
+    this kit's store and its module, a policy file naming strict under `last-valid`, its fresh mirror
+    pushed as L, then strict's `hooks.bypass` set to `allowed` in the store alone and pushed: the helper
+    reads the mirror stale and answers `allowed`, and the copy's `mirror --print` records the store
+    under `legacy_blobs`. A failed git step is a WRONG naming the step."""
     rows = policy.load_catalogue(KIT)
     repo, kit, bare = build_landed_repo(rows)
     try:
@@ -2763,6 +2767,37 @@ def run_mirror_landed(name):
             at = run_fixture_git(repo, "rev-parse", "HEAD")[:8]
             checks.append(check_run(at_l, what + " --explain", helper + ["--explain"], lambda rc, o, e: rc == 0
                                     and o == "2\n" and f" · mirror stale at {at}; " in e))
+        elif name == "mirror-presets-stale":
+            # KICK-dKeptSession-40 S2: the preset store a recorded input. The copy carries the store and
+            # its module, which the reader reads beside policy.py, its policy file names strict, and the
+            # mirror is fresh at L; then a landing that changes strict's hooks.bypass in the store alone.
+            for f in ("presets.py", presets.STORE):
+                (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
+            write_policy(repo, 'preset = "strict"\n' + LANDED_POLICY.format(on="last-valid", n=3))
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "-m", "the store, and a policy file naming strict")
+            Path(repo, *MIRROR_FILE).write_bytes(policy.render_mirror(repo, "HEAD"))
+            run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+            run_fixture_git(repo, "commit", "-q", "-m", "the mirror, fresh")
+            run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+            write_edit(kit / presets.STORE, lambda t: set_preset_block(t, "strict", lambda b: re.sub(
+                r'(?m)^"hooks\.bypass" = .*$', '"hooks.bypass" = "allowed"', b)))
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "-m", "a store-only landing")
+            run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+            at = run_fixture_git(repo, "rev-parse", "HEAD")[:8]
+            bypass = ["node", str(kit / "policy-mirror.js"), "get", "hooks.bypass", "--repo", str(repo), "--explain"]
+            checks.append(check_run(at_l, "policy-mirror.js get hooks.bypass --explain", bypass, lambda rc, o, e: rc == 0
+                                    and o == "allowed\n" and f"policy: hooks.bypass · preset · mirror stale at {at}; " in e))
+            # AC3: the render the copy's own CLI prints records the store beside the two legacy inputs;
+            # the line names the recorded inputs, never the render's whole bytes.
+            inputs, recorded = {policy.LEGACY_FANOUT, policy.OVERLAY_REL, policy.derive_kit_rel(presets.STORE)}, []
+            scenario, what, ok, seen = check_run(
+                at_l, "policy.py mirror --print", [sys.executable, str(kit / "policy.py"), "mirror", "--print"],
+                lambda rc, o, e: rc == 0 and not recorded.extend(sorted(json.loads(o).get("legacy_blobs") or {}))
+                and inputs <= set(recorded), cwd=repo)
+            checks.append((scenario, what, ok, seen.split(" · stdout ")[0] + " · legacy_blobs " + ", ".join(recorded)
+                           if recorded else seen))
         elif name == "mirror-shim-exit-one":
             # TOOL-dGroundRules-21 S16: every shim outcome but exit 0 and its own refusal is a PolicyRefusal
             # naming the status, never an undefined value or another throw.
@@ -6116,6 +6151,7 @@ CASES = [
     ("mirror-commit-rewrite", None, run_mirror_landed),
     ("mirror-landed-merge", None, run_mirror_landed),
     ("mirror-stale-legacy", None, run_mirror_landed),
+    ("mirror-presets-stale", None, run_mirror_landed),  # the preset store a recorded input (KICK-dKeptSession-40)
     ("mirror-shim-exit-one", None, run_mirror_landed),
     ("mirror-absent-adopter", None, run_mirror_absent_adopter),
     ("mirror-landed-parity", None, run_mirror_landed_parity),

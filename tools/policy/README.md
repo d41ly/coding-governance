@@ -301,7 +301,8 @@ pinned LF in `.gitattributes`. `render_mirror(repo, rev)` renders it for one rev
   "catalogue_blob": "<blob id of this kit's catalogue at the revision>",
   "keys": {"budgets.enforce": {"reason": "...", "source": "file", "value": "warn"}},
   "legacy_blobs": {".agent-cap.conf": "<its blob id at the revision, or null when absent>",
-                   ".governance/instructions.toml": "<the same>"},
+                   ".governance/instructions.toml": "<the same>",
+                   "<this kit's path>/presets.toml": "<the same>"},
   "policy_blob": "<blob id of .governance/policy.toml at the revision, or null when absent>"
 }
 ```
@@ -309,8 +310,10 @@ pinned LF in `.gitattributes`. `render_mirror(repo, rev)` renders it for one rev
 **Every input the resolution reads is pinned** (TOOL-dGroundRules-21 S17). `legacy_blobs` maps each
 legacy input `resolve_read` reads, `LEGACY_INPUTS` in `policy.py`, today `.agent-cap.conf`, whose
 `FANOUT_CAP` lowers the agent limit, and the instruction overlay `.governance/instructions.toml`, whose
-`[[policy]]` rows are the rows of the repository's own `adopter.` keys (PLAY-dOrderedCharter-32), to its
-blob id at the rendered revision or null, and the helper
+`[[policy]]` rows are the rows of the repository's own `adopter.` keys (PLAY-dOrderedCharter-32), and
+then this kit's preset store `presets.toml`, which the preset step reads (KICK-dKeptSession-40), by
+the kit's prefix in its repository as the catalogue is, `derive_mirror_inputs` in `policy.py`, each
+to its blob id at the rendered revision or null, and the helper
 reads a mirror whose recorded id differs at L, or that carries no `legacy_blobs`, as STALE, so a
 landing that changes the conf alone is never read through a mirror holding the old limit. THE RULE: a
 unit adding a resolution input adds its path to `LEGACY_INPUTS`, so its blob joins this map.

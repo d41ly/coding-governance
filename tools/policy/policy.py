@@ -956,14 +956,27 @@ def check_json_value(key, value):
     return value
 
 
-def derive_catalogue_rel():
-    """This kit's catalogue as a path from the top of the kit's repository, git's own spelling, or
-    a Refusal where the kit is in no repository. A repository the kit is copied into at its own
-    path, as the fixture does, holds the catalogue at the same path."""
+def derive_kit_rel(name):
+    """The kit's file `name` as a path from the top of the kit's repository, git's own spelling, or
+    a Refusal naming the file where the kit is in no repository. A repository the kit is copied into
+    at its own path, as the fixture does, holds the file at the same path (KICK-dKeptSession-40 S1)."""
     prefix = run_git(KIT, "rev-parse", "--show-prefix")
     if prefix is None:
-        raise Refusal((KIT / CATALOGUE).as_posix(), 0, "the policy kit is in no git repository, so its catalogue has no blob")
-    return prefix.strip() + CATALOGUE
+        raise Refusal((KIT / name).as_posix(), 0, f"the policy kit is in no git repository, so its {name} has no blob")
+    return prefix.strip() + name
+
+
+def derive_catalogue_rel():
+    """This kit's catalogue as a path from the top of the kit's repository: `derive_kit_rel`'s."""
+    return derive_kit_rel(CATALOGUE)
+
+
+def derive_mirror_inputs():
+    """The files the mirror records under `legacy_blobs`, each by its path at the revision read:
+    every LEGACY_INPUTS path, then this kit's preset store, the preset step's input
+    (KICK-dKeptSession-40 S2). The store's path is the kit's prefix, known only once the kit's
+    repository is, so it is no LEGACY_INPUTS literal."""
+    return (*LEGACY_INPUTS, derive_kit_rel("presets.toml"))
 
 
 def check_pattern_name(name):
@@ -1012,7 +1025,7 @@ def render_mirror(repo, rev="HEAD"):
     def read_blob(rel):
         return (run_git(repo, "rev-parse", "--verify", "-q", f"{read['sha']}:{rel}") or "").strip() or None
     doc = {"catalogue_blob": read_blob(derive_catalogue_rel()), "keys": keys,
-           "legacy_blobs": {rel: read_blob(rel) for rel in LEGACY_INPUTS}, "policy_blob": read_blob(POLICY_REL)}
+           "legacy_blobs": {rel: read_blob(rel) for rel in derive_mirror_inputs()}, "policy_blob": read_blob(POLICY_REL)}
     return (json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii")
 
 
@@ -1726,7 +1739,7 @@ def cmd_mirror(argv):
         if not top:
             raise Refusal(MIRROR_REL, 0, "the working directory is in no git repository")
         cat = derive_catalogue_rel()
-        for rel in (POLICY_REL, cat, *LEGACY_INPUTS):
+        for rel in (POLICY_REL, cat, *derive_mirror_inputs()):
             here = (run_git(top, "hash-object", "--", rel) or "").strip()
             if here != (run_git(top, "rev-parse", "--verify", "-q", f"HEAD:{rel}") or "").strip():
                 raise Refusal(rel, 0, "uncommitted changes; the mirror renders a revision, commit first")
