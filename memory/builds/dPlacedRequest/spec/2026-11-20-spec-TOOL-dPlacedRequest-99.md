@@ -12,6 +12,7 @@
 | [2026-11-21-build-TOOL-dPlacedRequest-99-deviation-734.md](../build/2026-11-21-build-TOOL-dPlacedRequest-99-deviation-734.md) | deviation | — |
 | [2026-11-21-build-TOOL-dPlacedRequest-99-red-fix-35.md](../build/2026-11-21-build-TOOL-dPlacedRequest-99-red-fix-35.md) | red-fix | — |
 | [2026-11-21-build-TOOL-dPlacedRequest-99-red-fix-48.md](../build/2026-11-21-build-TOOL-dPlacedRequest-99-red-fix-48.md) | red-fix | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-99-red-fix-53.md](../build/2026-11-21-build-TOOL-dPlacedRequest-99-red-fix-53.md) | red-fix | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-95-audit-fold-text-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-95-audit-fold-text-brief.md) | research | TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-98 |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-99-closing-review-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-99-closing-review-spec-brief.md) | research | — |
 | [2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-96 TOOL-dPlacedRequest-97 TOOL-dPlacedRequest-98 |
