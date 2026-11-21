@@ -100,6 +100,8 @@ and `mirror-absent-refuse` are outcome cases (TOOL-dGroundRules-5): each copies 
 policy-mirror.js and policy-shim.sh into the kit copy, pushes a landed revision L to a bare remote,
 and asserts what the helper, the hooks kit's agent-cap.js and `arm_mirror_landed` answer there.
 `mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in six ladder states.
+`mirror-input-parity` (KICK-dKeptSession-59) holds policy-mirror.js's `MIRROR_KIT_INPUTS` literal,
+each name spelled by `derive_kit_rel`, to `derive_mirror_inputs` less `LEGACY_INPUTS`.
 `mirror-commit-rewrite` (TOOL-dGroundRules-65) commits the mirror rendered at its parent, rewrites
 that commit with `git commit-tree` as the lander does, and reds a `mirror --check` that is not fresh
 at either commit, or a helper reading the rewrite that leaves the render's `{rev}` unfilled.
@@ -3049,6 +3051,39 @@ def run_mirror_upgrade(name):
         remove_repo(repo)
         remove_repo(bare)
     return print_checks(name, checks)
+
+
+MIRROR_KIT_INPUTS_RX = re.compile(r"MIRROR_KIT_INPUTS\s*=\s*(\[[^\]]*\])")  # spans newlines inside the brackets
+
+
+def run_mirror_input_parity(name):
+    """`mirror-input-parity` (KICK-dKeptSession-59 S1): the one `MIRROR_KIT_INPUTS = [...]` literal of
+    this kit's policy-mirror.js, taken by regex and parsed as JSON, each name spelled by
+    `policy.derive_kit_rel`, against `policy.derive_mirror_inputs()` less `policy.LEGACY_INPUTS`, both
+    read live from the kit's own policy.py. A literal absent, unparseable or no list of names, or a
+    name `derive_kit_rel` refuses, is a WRONG and never a pass; unequal sets are a WRONG naming each
+    input on one side only. The repository-relative inputs are KICK-dKeptSession-62's widening."""
+    what = "MIRROR_KIT_INPUTS against derive_mirror_inputs less LEGACY_INPUTS"
+    try:
+        found = MIRROR_KIT_INPUTS_RX.findall((KIT / "policy-mirror.js").read_text(encoding="utf-8"))
+        names = json.loads(found[0]) if len(found) == 1 else None
+        if names is None:
+            seen = f"policy-mirror.js holds {len(found)} MIRROR_KIT_INPUTS = [...] literal(s), not one"
+        elif not isinstance(names, list) or not all(isinstance(n, str) for n in names):
+            seen, names = f"policy-mirror.js's MIRROR_KIT_INPUTS literal is no list of names: {found[0]}", None
+        else:
+            js = {policy.derive_kit_rel(n) for n in names}
+            want = set(policy.derive_mirror_inputs()) - set(policy.LEGACY_INPUTS)
+    except (OSError, UnicodeDecodeError, ValueError) as exc:  # a JSONDecodeError is a ValueError
+        names, seen = None, f"policy-mirror.js's MIRROR_KIT_INPUTS did not read: {type(exc).__name__}: {exc}"
+    except policy.Refusal as exc:
+        names, seen = None, f"derive_kit_rel refused: {exc}"
+    if names is None:
+        return print_checks(name, [("the JS literal", what, False, seen)])
+    only = [f"{r} in derive_mirror_inputs alone" for r in sorted(want - js)]
+    only += [f"{r} in MIRROR_KIT_INPUTS alone" for r in sorted(js - want)]
+    seen = "; ".join(only) or f"{len(js)} input(s) on each side: {', '.join(sorted(js)) or '(none)'}"
+    return print_checks(name, [("the kit's two lists", what, not only, seen)])
 
 
 # ---- the minimal guard (TOOL-dGroundRules-6) ----------------------------------------------------
@@ -6361,6 +6396,7 @@ CASES = [
     ("mirror-absent-adopter", None, run_mirror_absent_adopter),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
     ("mirror-upgrade", None, run_mirror_upgrade),  # a pre-unit mirror through the adopter's check and scaffold (KICK-dKeptSession-50)
+    ("mirror-input-parity", None, run_mirror_input_parity),  # the JS reader's kit inputs against policy.py's (KICK-dKeptSession-59)
     *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR, *GUARD_INPUTS, *GUARD_RUN]),  # outcome cases: guard.py --staged
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
     ("legacy-homes-main-dropped", None, run_legacy_main_dropped),  # the base is the merge-base, not the tip
