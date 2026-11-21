@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: c2a407b0390f3d57a118b58e376c326aeb207c13 · park · ? touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: fbba9ffd932816e503e91c1baf1286027e15e013
 phase: VERIFYING
@@ -861,3 +862,7 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T17:11:18Z dispatch · item 4bfcda23 TOOL-dWitnessedBar-110 · reason .githooks/pre-push.test.sh help/tags.md help/verdict-backends.md memory/builds/dWitnessedBar/build memory/builds/dWitnessedBar/spec/2026-11-21-spec-TOOL-dWitnessedBar-110.md memory/project/shell-role.txt tools/lib/commit_trailers.py tools/memory-tree/commit_trailers.py tools/run-gates/verdict_backends.py tools/unattended/commit_trailers.py tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-110-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-11-21-spec-TOOL-dWitnessedBar-110.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-21T17:36:45Z proposal · item kickoff facts: carry 05ae97627's two fact edits into the level-2 overlay origin moved them to (TOOL-dPlacedRequest-9) · step python tools/playbook/instructions_edit.py edit --manifest overlay --tag repo.kickoff.f09 --text (drop ', and `git worktree list` is the inventory') --build dWitnessedBar --unit TOOL-dWitnessedBar-51 --mark semantic; then add a level-2 reader.card fact: 'A red leg re-runs once on the same tree (`GATE_RERUN=1`), a flaky one is held as `quarantine`, and each gate a build adds or changes owes a seen-red line (`TOOL-dWitnessedBar-8`, `-30`, `-7`).' · reason the landing merge took origin's manifest, whose facts are now instruction units; instructions.proof = tty-cli refuses an agent write and prints it as a proposal, so the owner applies it
+
+2026-11-21T18:19:19Z decision · item landing-adopter-rules-witness · reason Gov first refuses every prepare: playbook/adopter-rules-to-overlay's landed witness pins rule 06's old text (baseline.toml), and TOOL-dWitnessedBar-51 corrected it to baseline.txt. Options: (a) retire the step to a successor whose witness reads the derived repo.rule tag (a govkit design change, new step + selftest); (b) revert rule 06's text, leaving the charter naming a file the map no longer has. Refused unattended: the program is frozen, and either option changes shipped upgrade semantics. Ask TOOL-dWitnessedBar-111.
+
+2026-11-21T18:19:21Z decision · item landing-python-floor-frozen · reason step-rows-frozen reds: TOOL-dWitnessedBar-26 (§8 F8 option a) edited tools/govkit/steps/python_floor.py, the landed lib/python-floor-3.15 row's program. Options: (a) revert to the landed bytes, so a no-bash node still never spawns bare bash but prints a traceback, and [dSP-91 L2]'s no-bash branch reds there; (b) ship the one-line refusal as a new step and re-point the govkit selftest floor arms that pin the old row id. Refused unattended: it reverses a resolved spec fork or adds a step. Ask TOOL-dWitnessedBar-112.
