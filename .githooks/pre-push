@@ -1506,10 +1506,22 @@ GATE_FULL_MAX_LAG=10
 # `policy.py get verdict.blocks --rev <R>`, at the remote sha git fed this hook — R, the landing base,
 # which only a gated push can move — so a branch that loosens its own policy file enables nothing.
 # The kit is found by `resolve_kit_dir`, a copy under the pushing tree vetted by `check_reviewed_file`
-# first, as the floor reader below finds the loop kit. NO POLICY KIT reads the catalogue default
-# `own-only`, said on the policy line; a reader that exits non-zero or answers outside `own-only
-# own-mixed-contended every-red` reads `every-red`, because a typo must not land a red, and so does a
-# remote with no tip, where nothing can read INHERITED.
+# first, as the floor reader below finds the loop kit. No python launcher or no policy kit reads the
+# catalogue default `own-only` as its base, said on the policy line; a reader that exits non-zero or
+# answers outside `own-only own-mixed-contended every-red` reads `every-red`, because a typo must not
+# land a red, and so does a remote with no tip, where nothing can read INHERITED.
+#
+# THE FLOOR AT R (TOOL-dWitnessedBar-106): `verdict.blocks`, `verdict.held` and `hooks.bypass` each
+# read the STRICTER of that base and a floor parsed out of R's own committed policy file by
+# `scan_policy_bytes`, as data and never executed. So a pushed tree that deletes the kit, a node with
+# no python, a reader that fails, or a tip whose catalogue drops a value can never read a key looser
+# than R's own bytes declare. A mention the parse cannot read raises the key to its strictest value
+# only where the reader gave no member answer. Each raise is said: on the policy line for
+# `verdict.blocks`, in PP_BYPASS_WHY for `hooks.bypass`; `verdict.held`'s one consumer says when it acts.
+# WHAT THE FLOOR DOES NOT CHECK: a key in a spelling the parse does not name, a multi-line string or a
+# quoted dotted root key the left-hand rule misses, which reads as no mention, so a tampered reader
+# over such an R stays as loose as before. The three orders below are this hook's own fact, held to
+# the catalogue's `allowed` lists as sets by its suite, never their rank.
 #
 # THE AGE BOUND STAYS IN THE GATE FILE: `INHERITED_RED_MAX_AGE=<n>`, counted in first-parent landings,
 # is PARSED out of that file as committed at R and never executed: one anchored match, a trailing
@@ -1542,15 +1554,58 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
   printf '%s' "$v"
 }
 
+derive_strictest() { # order · value… -> the value latest in the order among those that are members; nothing when none is
+  local m v best=""
+  for m in $1; do
+    for v in "${@:2}"; do [ "$v" != "$m" ] || best=$m; done
+  done
+  [ -z "$best" ] || printf '%s' "$best"
+}
+
+scan_policy_bytes() { # policy text · table · key · order -> one reading per line naming <table>.<key>: the value when a member of the order, else ?; nothing when none names it
+  local line r lhs val q v tail tbl="" hdr="" first=1 bom=$'\xef\xbb\xbf'
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=${line%$'\r'}
+    [ -z "$first" ] || { line=${line#"$bom"}; first=""; }
+    r=${line#"${line%%[![:blank:]]*}"}
+    case "$r" in ''|'#'*) continue ;; '[['*) hdr=1; tbl=$'\n'; continue ;; esac
+    if [ "${r:0:1}" = "[" ] && [ "${r#*]}" != "$r" ]; then
+      tail=${r#*]}; tail=${tail#"${tail%%[![:blank:]]*}"}
+      case "$tail" in ''|'#'*) v=${r#[}; v=${v%%]*}; tbl=${v//[[:blank:]\"\']/}; hdr=1; continue ;; esac
+    fi
+    [ "${r#*=}" != "$r" ] || continue
+    lhs=${r%%=*}; lhs=${lhs//[[:blank:]\"\']/}
+    val=${r#*=}; val=${val#"${val%%[![:blank:]]*}"}; val=${val%"${val##*[![:blank:]]}"}
+    if [ -n "$hdr" ]; then
+      [ "$tbl" = "$2" ] && [ "$lhs" = "$3" ] || continue
+    else
+      case "$lhs" in "$2.$3") ;; "$2") [ "${val:0:1}" = "{" ] || continue ;; *) continue ;; esac
+    fi
+    # The value: one quoted v, then blanks and an optional comment. Any other spelling reads `?`.
+    q=${val:0:1}; v=${val:1}
+    case "$q" in \"|\') ;; *) printf '?\n'; continue ;; esac
+    case "$v" in *"$q"*) ;; *) printf '?\n'; continue ;; esac
+    tail=${v#*"$q"}; v=${v%%"$q"*}; tail=${tail#"${tail%%[![:blank:]]*}"}
+    case "$tail" in ''|'#'*) ;; *) printf '?\n'; continue ;; esac
+    if [ -n "$(derive_strictest "$4" "$v")" ]; then printf '%s\n' "$v"; else printf '?\n'; fi
+  done <<< "$1"
+}
+
 PP_READ_AT=""; PP_HELD=on-demand; PP_BYPASS=allowed; PP_BYPASS_WHY=""
+# Each key's values, loosest first, and the policy file's path, spelled once (TOOL-dWitnessedBar-106 S2).
+PP_BLOCKS_ORDER="own-only own-mixed-contended every-red"
+PP_HELD_ORDER="on-demand peer-or-cadence push-selected"
+PP_BYPASS_ORDER="allowed refused"
+PP_POLICY_REL=.governance/policy.toml
 read_policy_at() { # sha -> PP_POLICY (own-only|own-mixed-contended|every-red), PP_MAX_AGE (the positive bound declared, or empty), PP_WHY, PP_HELD (verdict.held), PP_BYPASS and PP_BYPASS_WHY (hooks.bypass)
-  local sha=$1 blob age="" bnd py dir="" rel tree val rc
+  local sha=$1 blob age="" bnd py pyok="" dir="" rel tree val rc=0 ans="" text key var ord base got strict new why
   # READ ONCE PER SHA: the doc class and the policy line ask for the same R.
   [ -n "$sha" ] && [ "$sha" = "$PP_READ_AT" ] && return 0
   PP_POLICY=every-red; PP_MAX_AGE=""; PP_WHY=""; PP_HELD=on-demand; PP_BYPASS=allowed; PP_BYPASS_WHY=""
   if [ -z "$sha" ] || [ -z "${sha//0/}" ]; then
     PP_WHY="the remote holds no tip for $def yet, so there is no R to read a policy at"; return 0
   fi
+  # ONE EXIT FROM HERE, the function's end, so every path passes the floor below.
   PP_READ_AT=$sha
   if blob=$(git show "$sha:$_gate_env_rel" 2>/dev/null); then
     age=$(read_policy_key "$blob" INHERITED_RED_MAX_AGE)
@@ -1559,6 +1614,7 @@ read_policy_at() { # sha -> PP_POLICY (own-only|own-mixed-contended|every-red), 
   if [ -n "$age" ]; then bnd="an age bound of $age first-parent landings from $_gate_env_rel there, which escalates an aged leg's ask"
   else bnd="no age bound in $_gate_env_rel there, so no leg is aged"; fi
   if py=$(resolve_python 2>/dev/null); then
+    pyok=1
     for tree in "$top" "$(cd "${0%/*}/.." && pwd)"; do
       dir=$(resolve_kit_dir "$py" policy policy.py "$tree/${GOV_KITROOT:-.}" 2>/dev/null) || { dir=""; continue; }
       rel="${dir%$'\r'}/policy.py"
@@ -1569,29 +1625,50 @@ read_policy_at() { # sha -> PP_POLICY (own-only|own-mixed-contended|every-red), 
       # none, reads as the catalogue default `on-demand`, which exports nothing.
       PP_HELD=$(cd "$top" && "$py" "$tree/$rel" get verdict.held --rev "$sha" 2>/dev/null) || PP_HELD=""
       PP_HELD=${PP_HELD%$'\r'}
-      case "$PP_HELD" in peer-or-cadence|push-selected|on-demand) ;; *) PP_HELD=on-demand ;; esac
+      if [ -n "$(derive_strictest "$PP_HELD_ORDER" "$PP_HELD")" ]; then ans="$ans verdict.held"; else PP_HELD=on-demand; fi
       # `hooks.bypass` at the same R (TOOL-dWitnessedBar-2 S1): an answer outside its two values, or
       # none, reads as the catalogue default `allowed`, and PP_BYPASS_WHY says so.
       PP_BYPASS=$(cd "$top" && "$py" "$tree/${dir%$'\r'}/policy.py" get hooks.bypass --rev "$sha" 2>/dev/null) || PP_BYPASS=""
       PP_BYPASS=${PP_BYPASS%$'\r'}
-      case "$PP_BYPASS" in
-        allowed|refused) ;;
-        *) PP_BYPASS_WHY="the reader, policy.py get, answered '${PP_BYPASS:-nothing}' at ${sha:0:8}, so hooks.bypass reads its catalogue default, allowed"
-           PP_BYPASS=allowed ;;
-      esac
+      if [ -n "$(derive_strictest "$PP_BYPASS_ORDER" "$PP_BYPASS")" ]; then ans="$ans hooks.bypass"
+      else PP_BYPASS_WHY="the reader, policy.py get, answered '${PP_BYPASS:-nothing}' at ${sha:0:8}, so hooks.bypass reads its catalogue default, allowed"
+           PP_BYPASS=allowed
+      fi
       break
     done
   fi
-  if [ -z "$dir" ]; then
-    PP_POLICY=own-only; PP_MAX_AGE=$age
-    PP_WHY="no policy kit resolves, so the catalogue default own-only applies, with $bnd"; return 0
+  PP_MAX_AGE=$age
+  if [ -z "$pyok" ]; then
+    PP_POLICY=own-only
+    PP_WHY="no python launcher resolves to run the policy reader, so the catalogue default own-only applies, with $bnd"
+  elif [ -z "$dir" ]; then
+    PP_POLICY=own-only
+    PP_WHY="no policy kit resolves, so the catalogue default own-only applies, with $bnd"
+  elif [ "$rc" = 0 ] && [ -n "$(derive_strictest "$PP_BLOCKS_ORDER" "$val")" ]; then
+    PP_POLICY=$val; ans="$ans verdict.blocks"; PP_WHY="read by policy.py get, with $bnd"
+  else
+    PP_WHY="policy.py get verdict.blocks exited $rc answering '$val', outside '$PP_BLOCKS_ORDER', which reads every-red"
   fi
-  case "$rc:$val" in
-    0:own-only|0:own-mixed-contended|0:every-red)
-      PP_POLICY=$val; PP_MAX_AGE=$age; PP_WHY="read by policy.py get, with $bnd" ;;
-    *) PP_MAX_AGE=$age
-       PP_WHY="policy.py get verdict.blocks exited $rc answering '$val', outside 'own-only own-mixed-contended every-red', which reads every-red" ;;
-  esac
+  # THE FLOOR (S3): each key reads the stricter of its base above and the readings `scan_policy_bytes`
+  # takes from R's committed policy file. A `?` reading raises to the key's strictest value only where
+  # the reader gave no member answer (§8 F3 of the unit's spec); no reading leaves the base.
+  text=$(git show "$sha:$PP_POLICY_REL" 2>/dev/null) || text=""
+  for key in verdict.blocks:PP_POLICY:PP_BLOCKS_ORDER verdict.held:PP_HELD:PP_HELD_ORDER hooks.bypass:PP_BYPASS:PP_BYPASS_ORDER; do
+    var=${key#*:}; ord=${var#*:}; ord=${!ord}; var=${var%%:*}; key=${key%%:*}; base=${!var}
+    got=$(scan_policy_bytes "$text" "${key%%.*}" "${key#*.}" "$ord")
+    strict=""
+    case " $ans " in *" $key "*) ;; *) case "$got" in *'?'*) strict=${ord##* } ;; esac ;; esac
+    # Unquoted on purpose: one word per member reading, the `?` lines deleted first, so no glob remains.
+    new=$(derive_strictest "$ord" "$base" ${got//\?/} $strict)
+    [ "$new" != "$base" ] || continue
+    printf -v "$var" '%s' "$new"
+    if [ "$(derive_strictest "$ord" ${got//\?/})" = "$new" ]; then
+      why="$PP_POLICY_REL at ${sha:0:8} declares $key $new, which the policy reader did not confirm, so $key reads $new"
+    else
+      why="$PP_POLICY_REL at ${sha:0:8} spells $key in a form this hook does not parse and the policy reader did not answer, so $key reads its strictest value, $new"
+    fi
+    case "$key" in verdict.blocks) PP_WHY="$PP_WHY; $why" ;; hooks.bypass) PP_BYPASS_WHY=$why ;; esac
+  done
 }
 
 gd=$(git rev-parse --git-dir 2>/dev/null)
@@ -2042,7 +2119,9 @@ fi
 # registry is asked, by its `off-node` verb, whether the `verdict` row is off-node, and every landing is
 # refused while it is not, because a hook on this node cannot refuse its own bypass; then any
 # unwitnessed commit refuses the push, naming each SHA. Both refusals are `bypass-refused`. A kit or a
-# launcher that does not resolve prints one line, and under `refused` refuses: deny by default. The
+# launcher that does not resolve prints one line, and under `refused` refuses: deny by default. Nor
+# does `hooks.bypass` itself read looser than R's committed policy file declares, whatever kit or
+# launcher the pushed tree has: `read_policy_at`'s floor (TOOL-dWitnessedBar-106) raises it. The
 # kits are found as the policy push arm finds its own, a copy under the pushing tree vetted first.
 # WHAT THIS DOES NOT CATCH: a `--no-verify` push, which runs no hook, and which the off-node bar's
 # pass-order arm reads from history instead; a typed `Commit-Checked:` line, which is text; a push to a

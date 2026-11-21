@@ -26,6 +26,11 @@ consumers today, each family documented on its own page:
   ([the red-fix lane](red-fix-lane.md));
 - `memory.staged-render`, which the build-index generator's `--write-staged` reads
   ([the commit render](commit-render.md));
+- `hooks.bypass`, `verdict.blocks` and `verdict.held`, which the pre-push hook reads at the
+  remote tip it pushes over, through `policy.py get`, and never from the pushed tree. Each key reads
+  no looser than that tip's committed policy file declares, even where no python or no policy kit
+  resolves or the reader fails: the hook also parses the three keys out of the file's own text, as
+  a floor, and says on its output when that raised a key;
 - `retrofit.unseeded`, which the baseline ledger factory's `legacy_ledger.py seed` reads: under
   `unarmed`, the default, a population registered with no seed command is reported unarmed, and under
   `refuse` the seed run exits 2 naming each one;

@@ -1650,7 +1650,11 @@ esac
 # subshell as KIT_REL is above for the bound, mapped through the kit contract the hook states: a bound
 # that is not a positive integer reads none. A declaration the hook and the oracle read differently
 # reds here, naming both.
-_ir_fns=$(awk '/^resolve_python\(\)/,/^}/; /^resolve_kit_dir\(\)/,/^}/; /^read_policy_key\(\)/,/^}/; /^read_policy_at\(\)/,/^}/' "$SRC/.githooks/pre-push")
+# The R-scoped read is cut once, shared with the floor harness of TOOL-dWitnessedBar-106 below: its
+# four functions by awk range, and its column-0 orders and policy path by grep.
+_pp_read_fns=$(awk '/^read_policy_key\(\)/,/^}/; /^scan_policy_bytes\(\)/,/^}/; /^derive_strictest\(\)/,/^}/; /^read_policy_at\(\)/,/^}/' "$SRC/.githooks/pre-push"
+  grep -E '^PP_[A-Z]+_ORDER=|^PP_POLICY_REL=' "$SRC/.githooks/pre-push")
+_ir_fns=$(awk '/^resolve_python\(\)/,/^}/; /^resolve_kit_dir\(\)/,/^}/' "$SRC/.githooks/pre-push")$'\n'$_pp_read_fns
 read_ir_policy() { # <repo> <sha> -> "<value> <bound>" as the sliced hook reader resolves it
   ( cd "$1" && top=$PWD && main_local="" && PP_READ_AT="" && _gate_env_rel=".githooks/gate-env.sh" && def=main \
     && GOV_KITROOT=$KIT_REL && eval "$_ir_fns" && check_reviewed_file() { :; } \
@@ -3033,6 +3037,138 @@ case "$BP_RC|$(read_token)|$BP_OUT" in
   *) bad "BP S6 expected a bypass-refused refusal naming the off-node backends, got rc $BP_RC token $(read_token): $BP_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
+
+# ---- TOOL-dWitnessedBar-106 AC1 to AC8: THE THREE POLICY READS AT R NEVER READ LOOSER THAN R'S FILE ----
+# The floor harness: the hook's R-scoped read, `_pp_read_fns` above, run in a subshell over a scratch
+# repo committing three revisions of the policy file at the path the policy kit's POLICY_REL names:
+# A names none of the three keys, R declares each at its strictest, R3 spells them as inline tables.
+# Three kit copies beside them: `kr` the real reader, `kb` a policy.py that exits 3, and `kt` the real
+# reader whose catalogue lists each key without its strictest value. `run_floor_read` stubs the
+# launcher and the kit per plant. The A column and the `real` plant are controls, green before the
+# floor and red under an over-fix reading every key at its strictest. Then the end-to-end push of a
+# tip carrying `git rm` of the policy reader, the single-exit measure and the parity of the orders.
+# WHAT THIS DOES NOT CHECK: a spelling the floor grammar does not name, which reads as no mention.
+fl_d="$tmp/fl"; mkdir -p "$fl_d/kr" "$fl_d/kb" "$fl_d/kt"
+fl_rel=$(sed -n 's/^POLICY_REL = "\(.*\)"\r*$/\1/p' "$SRC/$KIT_REL/$PK/policy.py")
+eval "$(grep -E '^PP_[A-Z]+_ORDER=|^PP_POLICY_REL=' "$SRC/.githooks/pre-push")"
+for fl_k in kr kt; do
+  cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+     "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$fl_d/$fl_k/"
+done
+printf 'import sys\nsys.exit(3)\n' > "$fl_d/kb/policy.py"
+fl_kt=$("$_rkd_py" -c 'import re, sys
+p = sys.argv[1]; text = open(p, encoding="utf-8").read()
+for pair in sys.argv[2:]:
+    name, drop = pair.split(":")
+    m = re.search(r"(name = \"%s\"\nallowed = \[)([^\]]*)\]" % re.escape(name), text)
+    kept = [v.strip() for v in m.group(2).split(",") if v.strip() != "\"%s\"" % drop] if m else []
+    if not m or len(kept) == m.group(2).count(",") + 1: sys.exit("no %s row lists %s" % (name, drop))
+    text = text[:m.start()] + m.group(1) + ", ".join(kept) + "]" + text[m.end():]
+open(p, "w", encoding="utf-8", newline="\n").write(text)
+print("tampered")' "$fl_d/kt/catalogue.toml" "verdict.blocks:${PP_BLOCKS_ORDER##* }" \
+  "verdict.held:${PP_HELD_ORDER##* }" "hooks.bypass:${PP_BYPASS_ORDER##* }" 2>&1)
+[ "$fl_kt" = tampered ] || bad "FL TOOL-dWitnessedBar-106 the kt catalogue could not be narrowed: $fl_kt"
+( cd "$fl_d" && git init -q --template= && git config core.autocrlf false && mkdir -p "${fl_rel%/*}" \
+  && printf '[runtime]\nagents-in-flight = 6\n' > "$fl_rel" && git add "$fl_rel" && git commit -q -m A \
+  && printf '[verdict]\nblocks = "every-red"\nheld = "push-selected"\n\n[hooks]\nbypass = "refused"\n' > "$fl_rel" \
+  && git add "$fl_rel" && git commit -q -m R \
+  && printf 'verdict = { blocks = "own-only", held = "on-demand" }\nhooks = { bypass = "allowed" }\n' > "$fl_rel" \
+  && git add "$fl_rel" && git commit -q -m R3 ) >/dev/null 2>&1 || bad "FL TOOL-dWitnessedBar-106 could not build the floor harness"
+fl_A=$(git -C "$fl_d" rev-parse HEAD~2 2>/dev/null); fl_R=$(git -C "$fl_d" rev-parse HEAD~1 2>/dev/null)
+fl_R3=$(git -C "$fl_d" rev-parse HEAD 2>/dev/null)
+run_floor_read() { # plant (nopy nokit broken tampered real) · sha -> `blocks=<v> held=<v> bypass=<v>`, then the PP_WHY and PP_BYPASS_WHY lines
+  ( cd "$fl_d" || exit 1
+    top=$PWD; main_local=""; PP_READ_AT=""; _gate_env_rel=.githooks/gate-env.sh; def=main
+    eval "$_pp_read_fns"
+    check_reviewed_file() { :; }
+    resolve_python() { printf '%s' "$_rkd_py"; }
+    case "$1" in
+      nopy) resolve_python() { return 1; } ;;
+      nokit) resolve_kit_dir() { return 1; } ;;
+      broken) resolve_kit_dir() { printf kb; } ;;
+      tampered) resolve_kit_dir() { printf kt; } ;;
+      real) resolve_kit_dir() { printf kr; } ;;
+    esac
+    read_policy_at "$2"
+    printf 'blocks=%s held=%s bypass=%s\n%s\n%s\n' "$PP_POLICY" "$PP_HELD" "$PP_BYPASS" "$PP_WHY" "$PP_BYPASS_WHY" )
+}
+# The table of §4 "The arms", one row per plant and revision: AC1 nopy, AC2 nokit, AC3 broken, AC4
+# tampered, AC5 real.
+for fl_row in "AC1 nopy A own-only on-demand allowed" "AC1 nopy R every-red push-selected refused" \
+    "AC1 nopy R3 every-red push-selected refused" "AC2 nokit A own-only on-demand allowed" \
+    "AC2 nokit R every-red push-selected refused" "AC3 broken A every-red on-demand allowed" \
+    "AC3 broken R every-red push-selected refused" "AC4 tampered R every-red push-selected refused" \
+    "AC5 real R3 own-only on-demand allowed"; do
+  read -r fl_ac fl_p fl_at fl_b fl_h fl_y <<< "$fl_row"
+  case "$fl_at" in A) fl_s=$fl_A ;; R) fl_s=$fl_R ;; *) fl_s=$fl_R3 ;; esac
+  _o=$(run_floor_read "$fl_p" "$fl_s")
+  if [ "${_o%%$'\n'*}" = "blocks=$fl_b held=$fl_h bypass=$fl_y" ]; then
+    ok "FL TOOL-dWitnessedBar-106 $fl_ac the $fl_p plant at $fl_at reads $fl_b $fl_h $fl_y"
+  else
+    bad "FL TOOL-dWitnessedBar-106 $fl_ac the $fl_p plant at $fl_at expected $fl_b $fl_h $fl_y, got: $_o"
+  fi
+done
+# AC1: at R and R3 with no python the policy line names the launcher, not a kit.
+for fl_s in "$fl_R" "$fl_R3"; do
+  _o=$(run_floor_read nopy "$fl_s")
+  case "$_o" in
+    *"no policy kit"*) bad "FL TOOL-dWitnessedBar-106 AC1 with no python the policy line names a kit: $_o" ;;
+    *"no python launcher resolves to run the policy reader, so the catalogue default own-only applies"*)
+      ok "FL TOOL-dWitnessedBar-106 AC1 with no python at ${fl_s:0:8} the policy line names the launcher" ;;
+    *) bad "FL TOOL-dWitnessedBar-106 AC1 with no python the policy line does not name the launcher: $_o" ;;
+  esac
+done
+# AC2: each raise is said, and at A the no-kit wording stands.
+_o=$(run_floor_read nokit "$fl_R")
+case "$_o" in
+  *"declares verdict.blocks every-red, which the policy reader did not confirm"*$'\n'*"declares hooks.bypass refused, which the policy reader did not confirm"*)
+    ok "FL TOOL-dWitnessedBar-106 AC2 with no kit at R the policy line and the bypass line each name the raise" ;;
+  *) bad "FL TOOL-dWitnessedBar-106 AC2 with no kit at R a raise went unsaid: $_o" ;;
+esac
+_o=$(run_floor_read nokit "$fl_A")
+case "$_o" in
+  *$'\n'"no policy kit resolves, so the catalogue default own-only applies"*) ok "FL TOOL-dWitnessedBar-106 AC2 with no kit at A the policy line keeps its wording" ;;
+  *) bad "FL TOOL-dWitnessedBar-106 AC2 with no kit at A the policy line moved: $_o" ;;
+esac
+# AC5: an unparsed spelling with no reader says so on the bypass line.
+_o=$(run_floor_read nopy "$fl_R3")
+case "${_o##*$'\n'}" in
+  *"spells hooks.bypass in a form this hook does not parse"*) ok "FL TOOL-dWitnessedBar-106 AC5 an unparsed spelling with no reader raises hooks.bypass and says so" ;;
+  *) bad "FL TOOL-dWitnessedBar-106 AC5 the bypass line does not name the unparsed spelling: $_o" ;;
+esac
+# AC6: a refused R whose pushed tip removes the policy reader still refuses the unwitnessed commit.
+build_bp_fixture nokitrm refused peer-node || bad "FL could not build its refused fixture"
+git rm -q "$KIT_REL/$PK/policy.py" >/dev/null 2>&1 && git commit -q -m "the tip drops the policy reader" >/dev/null 2>&1 \
+  || bad "FL TOOL-dWitnessedBar-106 AC6 could not remove the policy reader on the tip"
+run_bp_push
+_j=$(read_bp_journal)
+case "$BP_RC|$(read_token)|$_j" in
+  0*) bad "FL TOOL-dWitnessedBar-106 AC6 a tip with no policy reader landed an unwitnessed pass commit: $BP_OUT" ;;
+  *"|bypass-refused|"*"bypass=unwitnessed-commit"$'\t'"sha=$BP_UN"$'\t'"policy=refused"*)
+    ok "FL TOOL-dWitnessedBar-106 AC6 a tip with no policy reader meets R's hooks.bypass refused, and the commit is recorded" ;;
+  *) bad "FL TOOL-dWitnessedBar-106 AC6 expected a bypass-refused refusal recording ${BP_UN:0:8} under refused, got rc $BP_RC token $(read_token): $_j | $BP_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+# AC7: after `PP_READ_AT=$sha` the function has one exit, its end. The cut must hold that line, or the
+# measure reads 0 over nothing.
+fl_cut=$(awk '/^read_policy_at\(\)/,/^}/' "$SRC/.githooks/pre-push")
+fl_n=$(printf '%s\n' "$fl_cut" | awk '/PP_READ_AT=\$sha/ {f=1; next} f && /(^|[;&|[:space:]])return([[:space:]]|;|$)/ {n++} END {print n+0}')
+case "$fl_cut|$fl_n" in
+  *'PP_READ_AT=$sha'*"|0") ok "FL TOOL-dWitnessedBar-106 AC7 read_policy_at has no return after PP_READ_AT=\$sha, so every path passes the floor" ;;
+  *) bad "FL TOOL-dWitnessedBar-106 AC7 read_policy_at returns $fl_n time(s) after PP_READ_AT=\$sha, or the cut lost that line" ;;
+esac
+# AC8: the hook's three orders equal the catalogue's allowed lists as sets, and its path the kit's.
+fl_par=$("$_rkd_py" -c 'import sys, tomllib
+rows = {r["name"]: r for r in tomllib.load(open(sys.argv[1], "rb"))["key"]}
+for pair in sys.argv[2:]:
+    name, order = pair.split("=", 1)
+    if set(order.split()) != set(rows[name]["allowed"]): print("%s: the hook orders [%s], the catalogue allows %s" % (name, order, rows[name]["allowed"]))' \
+  "$SRC/$KIT_REL/$PK/catalogue.toml" "verdict.blocks=$PP_BLOCKS_ORDER" "verdict.held=$PP_HELD_ORDER" "hooks.bypass=$PP_BYPASS_ORDER" 2>&1)
+if [ -z "$fl_par" ] && [ -n "$fl_rel" ] && [ "$PP_POLICY_REL" = "$fl_rel" ]; then
+  ok "FL TOOL-dWitnessedBar-106 AC8 the hook's three orders are the catalogue's allowed lists, and its policy path is POLICY_REL"
+else
+  bad "FL TOOL-dWitnessedBar-106 AC8 the orders or the path drifted: ${fl_par:-orders agree} · hook '$PP_POLICY_REL', policy.py '$fl_rel'"
+fi
 
 # ---- TOOL-dWitnessedBar-63 AC11 (S19): A LINE WITH NO TAB IS AN ABSENT KEY TO THE HOOK'S READERS -------
 # `read_bar_file` and `read_green_file`, cut from the hook by their awk ranges and sourced alone, read one
