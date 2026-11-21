@@ -930,10 +930,10 @@ else rgf_live=1; fi
 # that form, which the listing below names as a variable outside the derivation.
 rgf_pairs=$(printf '%s\n' "$rgf_fn" | sed -n 's/^[[:space:]]*\([A-Za-z_]*\)) \(rec_[A-Za-z_]*\)=.*/\1 \2/p')
 rgf_vars=$(printf '%s\n' "$rgf_pairs" | awk 'NF == 2 { print $2 }' | sort -u | tr '\n' ' ')
-: > "$rgf_t/keys.rec"
+: > "$rgf_t/keys.rec"; printf '%s\n' "$rgf_pairs" > "$rgf_t/pairs.txt"  # a file, not a here-string from a substitution
 while read -r rgf_k rgf_kn; do
   [ -n "$rgf_k" ] && printf '%s\told\n%s\tnew\r\n' "$rgf_k" "$rgf_k" >> "$rgf_t/keys.rec"
-done <<<"$rgf_pairs"
+done < "$rgf_t/pairs.txt"
 rgf_kf=$( eval "$rgf_fn"; read_green_file "$rgf_t/keys.rec"; for rgf_kv in $rgf_vars; do [ "${!rgf_kv}" = new ] || printf '%s ' "$rgf_kv"; done )
 a=$((a+1))
 [ -n "${rgf_vars// /}" ] && [ -z "$rgf_kf" ] \
