@@ -1526,20 +1526,39 @@ out=$(LLR="$LLU" run_ll seed --population p --widen R1)
 # against a seed reading a silent rev-parse exit 1 as unborn, or stamping the SHA a bare HEAD read
 # prints. WHAT THIS DOES NOT CHECK: a reftable repository, where no branch file exists to break, and a
 # git release answering these states with other exit codes or words.
+# TOOL-dWitnessedBar-67 S6, AC5: no git config of the machine reshapes a fixture here or below. Each is
+# made by `git -c init.defaultBranch=master init -q --ref-format=files`, so it is files-backed by
+# construction and `git rev-parse --show-ref-format` must print `files`; each branch file is `.git/` plus
+# `git symbolic-ref HEAD`'s output, never a literal branch; and every git call to the block's end runs
+# with `GIT_CONFIG_NOSYSTEM=1` and `GIT_CONFIG_GLOBAL` naming an empty scratch file, unset after it.
+# A fifth fixture, `chain`, holds only the branch file `ref: refs/heads/other` with no `other`: a commit
+# would create `other`, so the seed reads it as unborn and arms p at the null SHA (S13, AC11).
 LL_DANGLING=1111111111111111111111111111111111111111
-for ll_fx in garbage missing loop detached; do
+export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL="$LL/fixture-global"; : > "$GIT_CONFIG_GLOBAL"
+for ll_fx in garbage missing loop detached chain; do
   LLC="$LL/corrupt-$ll_fx"; mkdir -p "$LLC/tools/fx" "$LLC/memory/project"
-  git init -q "$LLC" && git -C "$LLC" config core.autocrlf false
+  git -c init.defaultBranch=master init -q --ref-format=files "$LLC" && git -C "$LLC" config core.autocrlf false
   cp "$LLR/fxseed.py" "$LLC/"; build_ll_seeded p memory/project/p.txt "$LL_SEEDARGV" > "$LLC/tools/fx/kit.toml"
   printf 'a\nb\n' > "$LLC/seed-keys.txt"; : > "$LLC/memory/project/.keep"; git -C "$LLC" add -A
+  ll_fmt=$(git -C "$LLC" rev-parse --show-ref-format 2>&1 | tr -d '\r')
+  [ "$ll_fmt" = files ] || bad "67 AC5: the $ll_fx fixture read ref format '$ll_fmt', not files"; ok
   ll_ref=$(git -C "$LLC" symbolic-ref HEAD | tr -d '\r')
   case $ll_fx in
     garbage) printf 'garbage\n' > "$LLC/.git/$ll_ref" ;;
     missing) printf '%s\n' "$LL_DANGLING" > "$LLC/.git/$ll_ref" ;;
     loop) printf 'ref: refs/heads/other\n' > "$LLC/.git/$ll_ref"; printf 'ref: %s\n' "$ll_ref" > "$LLC/.git/refs/heads/other" ;;
     detached) printf '%s\n' "$LL_DANGLING" > "$LLC/.git/HEAD" ;;
+    chain) printf 'ref: refs/heads/other\n' > "$LLC/.git/$ll_ref" ;;
   esac
   out=$(LLU="$LLC" run_ll_py 'sys.exit(L.main(["legacy_ledger.py", "seed", "--population", "p"]))')
+  if [ "$ll_fx" = chain ]; then
+    { [ "$out" = rc=0 ] && grep -qxF "armed p 2" "$LL/py.out" && ! grep -q Traceback "$LL/py.err" \
+      && grep -qxF "a${T}1${T}${LL_NULL}${T}seeded" "$LLC/memory/project/p.txt" \
+      && grep -qxF "b${T}1${T}${LL_NULL}${T}seeded" "$LLC/memory/project/p.txt" \
+      && [ ! -e "$LLC/.git/refs/heads/other" ]; } \
+      || bad "67 AC11: a seed on the one-file chain, the branch file naming a ref that does not exist yet, did not arm p with two null-SHA rows: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+    continue
+  fi
   ll_reason=$(sed -n 's/^unarmed p no HEAD: //p' "$LL/py.out")
   { [ "$out" = rc=1 ] && [ "$(wc -l < "$LL/py.out")" -eq 1 ] && [ -n "$ll_reason" ] \
     && grep -qxF "legacy_ledger: p: no HEAD: $ll_reason; nothing written" "$LL/py.err" && [ ! -e "$LLC/memory/project/p.txt" ] \
@@ -1547,6 +1566,66 @@ for ll_fx in garbage missing loop detached; do
     && { [ "$ll_fx" != detached ] || [ "$ll_reason" = "git symbolic-ref exited 1" ]; }; } \
     || bad "64 AC1: a seed on the $ll_fx HEAD did not exit 1 with one no-HEAD line and its reason, or wrote a home or a null or dangling SHA: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
 done
+# TOOL-dWitnessedBar-67 AC7 (S8): `seed --all` over two registrations in the `garbage` fixture resolves its
+# root, reads HEAD once and gives each registration its own `unarmed <name> no HEAD: ` line with one
+# reason, writing no home. RED against an `--all` printing nothing where a root resolves, stopping at its
+# first population, or reading HEAD per population.
+LLC="$LL/corrupt-garbage"
+build_ll_seeded x1 memory/project/x1.txt "$LL_SEEDARGV" >> "$LLC/tools/fx/kit.toml"; git -C "$LLC" add -A
+out=$(LLU="$LLC" run_ll_py 'sys.exit(L.run_seed_cli(["--all"], "."))')
+ll_reasons=$(sed -n 's/^unarmed [^ ]* no HEAD: //p' "$LL/py.out" | sort -u)
+{ [ "$out" = rc=1 ] && [ "$(wc -l < "$LL/py.out")" -eq 2 ] && grep -q '^unarmed p no HEAD: .' "$LL/py.out" \
+  && grep -q '^unarmed x1 no HEAD: .' "$LL/py.out" && [ -n "$ll_reasons" ] && [ "$(printf '%s\n' "$ll_reasons" | wc -l)" -eq 1 ] \
+  && [ ! -e "$LLC/memory/project/p.txt" ] && [ ! -e "$LLC/memory/project/x1.txt" ] && ! grep -q Traceback "$LL/py.err"; } \
+  || bad "67 AC7: seed --all over p and x1 on the garbage HEAD did not give each one no-HEAD line with one reason and no home: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+
+# ---- 2o, the bounded git calls, the child-ref reason and the hex-named refs (TOOL-dWitnessedBar-67) ----
+# A one-commit fixture, `child`, built as the corrupt-HEAD block builds its own. AC6 (S7): a stand-in for
+# `subprocess.run` records the `timeout` of every call whose argv opens with `git`, through the seed with
+# `--sha` at its HEAD and the seed in the `missing` fixture: each call carries `timeout=60`. AC16 (S18):
+# after `git branch a/b` and `git symbolic-ref HEAD refs/heads/a`, the seed reads no HEAD with the reason
+# `git for-each-ref listed <row>`, the row naming `refs/heads/a/b`. AC8 (S9): with HEAD back on its branch,
+# a second commit, and branches `deadbeef` and `cafe1234` at HEAD~1, whose sha starts with neither, each
+# `--sha` exits 2 naming --sha and writes no home. RED against a git call with no timeout, a reason
+# reading `exited 0`, and a `--sha` stamped from a ref its hex only names. WHAT THIS DOES NOT CHECK: a
+# git that hangs past the bound, or an exact-match `for-each-ref`, which no seed call runs.
+LLK="$LL/child"; mkdir -p "$LLK/tools/fx" "$LLK/memory/project"
+{ git -c init.defaultBranch=master init -q --ref-format=files "$LLK" && git -C "$LLK" config core.autocrlf false \
+  && cp "$LLR/fxseed.py" "$LLK/" && build_ll_seeded p memory/project/p.txt "$LL_SEEDARGV" > "$LLK/tools/fx/kit.toml" \
+  && printf 'a\nb\n' > "$LLK/seed-keys.txt" && : > "$LLK/memory/project/.keep" && git -C "$LLK" add -A \
+  && git -C "$LLK" -c user.email=t@e -c user.name=t commit -q --no-verify -m one; } \
+  || bad "67: the one-commit child fixture could not be built"; ok
+ll_kref=$(git -C "$LLK" symbolic-ref HEAD | tr -d '\r'); ll_khead=$(git -C "$LLK" rev-parse HEAD | tr -d '\r')
+LL_RECORD='_run, _calls = L.subprocess.run, []
+def run(argv, **kw):
+    if argv and argv[0] == "git":
+        _calls.append(kw.get("timeout"))
+    return _run(argv, **kw)
+L.subprocess.run = run
+rc = L.run_seed_cli(sys.argv[2:], ".")
+print("git calls %d timeouts %s" % (len(_calls), sorted(set(repr(t) for t in _calls))))
+sys.exit(rc)'
+for ll_fx in child corrupt-missing; do
+  ll_args=(--population p); [ "$ll_fx" != child ] || ll_args+=(--sha "$ll_khead")
+  out=$(LLU="$LL/$ll_fx" run_ll_py "$LL_RECORD" "${ll_args[@]}")
+  { grep -qE "^git calls ([2-9]|[1-9][0-9]+) timeouts \['60'\]$" "$LL/py.out" && ! grep -q Traceback "$LL/py.err"; } \
+    || bad "67 AC6: a git call of the seed ${ll_args[*]} in the $ll_fx fixture ran without timeout=60: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+done
+rm -f "$LLK/memory/project/p.txt"
+git -C "$LLK" branch a/b && git -C "$LLK" symbolic-ref HEAD refs/heads/a || bad "67 AC16: the child ref could not be planted"; ok
+out=$(LLU="$LLK" run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p"], "."))')
+{ [ "$out" = rc=1 ] && grep -q '^unarmed p no HEAD: git for-each-ref listed .*refs/heads/a/b' "$LL/py.out" \
+  && [ ! -e "$LLK/memory/project/p.txt" ]; } \
+  || bad "67 AC16: a seed whose unborn HEAD for-each-ref matches by prefix did not name the listed refs/heads/a/b: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+git -C "$LLK" symbolic-ref HEAD "$ll_kref" && git -C "$LLK" -c user.email=t@e -c user.name=t commit -q --no-verify --allow-empty -m two \
+  && git -C "$LLK" branch deadbeef HEAD~1 && git -C "$LLK" branch cafe1234 HEAD~1 || bad "67 AC8: the hex-named refs could not be planted"; ok
+for ll_sha in deadbeef cafe1234; do
+  out=$(LLU="$LLK" run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p", "--sha", sys.argv[2]], "."))' "$ll_sha")
+  { [ "$out" = rc=2 ] && grep -q -- '--sha' "$LL/py.err" && [ ! -e "$LLK/memory/project/p.txt" ] \
+    && [ "${ll_khead#"$ll_sha"}" = "$ll_khead" ]; } \
+    || bad "67 AC8: seed --sha $ll_sha, a branch at HEAD~1 $ll_khead, did not exit 2 naming --sha with no home: $out / $(tr '\n' '|' < "$LL/py.err")"; ok
+done
+unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
 
 # ---- 2o, the no-HEAD and cross-drive routes (TOOL-dWitnessedBar-63 AC4 AC6) -------------------------
 # Over the unborn fixture, now committed, through stand-ins: `read_head_sha` answering no sha and
@@ -1605,8 +1684,9 @@ fi
 # a sha naming no commit exit 2 naming --sha with no home; HEAD's first 8 hex characters in upper case,
 # or the shortest longer prefix holding a letter, arm p at HEAD's full lowercase sha; on a commitless
 # `git init` the null SHA arms. RED against the exit-2 work-tree refusal and against a `--sha` stamped
-# without resolving. WHAT THIS DOES NOT CHECK: a git that hangs for real, since no seed call passes git a
-# timeout; an abbreviation two commits share.
+# without resolving. WHAT THIS DOES NOT CHECK: a git that hangs for real: every seed git call passes
+# `timeout=60` (TOOL-dWitnessedBar-67 S7, its recorder above), and no fixture holds git past that bound
+# to watch the TimeoutExpired route fire; an abbreviation two commits share.
 LLN="$LL/norepo"; mkdir -p "$LLN" "$LL/nopath"
 out=$(LLU="$LLN" GIT_CEILING_DIRECTORIES="$LL" run_ll_py 'sys.exit(L.main(["legacy_ledger.py", "seed", "--population", "p"]))')
 { [ "$out" = rc=1 ] && [ "$(wc -l < "$LL/py.out")" -eq 1 ] && grep -q '^unarmed p no HEAD: .' "$LL/py.out" \

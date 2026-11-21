@@ -316,7 +316,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=316
+FLOOR_ASSERTIONS=317
+# RAISED 316 -> 317 by TOOL-dWitnessedBar-67 on 2026-11-21: the runner's record reader over an unterminated
+# last line, one assertion. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 314 -> 316 by TOOL-dWitnessedBar-65 on 2026-11-21: the runner's record reader over a CRLF verdict
 # line and a repeated key, one assertion each. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 312 -> 314 by TOOL-dWitnessedBar-63 on 2026-11-21: the runner's record reader cut alone, an empty
@@ -3345,6 +3347,14 @@ rk_out=$( eval "$rk_fn"; unset rk_verdict rk_note rk_head; read_record_keys "$tm
 [ -n "$rk_fn" ] && [ "${rk_out##* head=}" = "[y]" ] \
   && ok "65-AC11 read_record_keys keeps the last of a repeated head key" \
   || nope "65-AC11 read_record_keys read head<TAB>x then head<TAB>y as ${rk_out##* head=}"
+# TOOL-dWitnessedBar-67 AC9 (S11): the same cut over a record whose last line, `head<TAB>z`, carries no
+# trailing LF reads `head` as z. RED against the loop without its `|| [ -n "$_rk_l" ]` guard, which drops
+# the unterminated line and leaves `head` unset.
+printf 'verdict\tGREEN\nhead\tz' > "$tmp/rk-record-67"
+rk_out=$( eval "$rk_fn"; unset rk_head; read_record_keys "$tmp/rk-record-67" rk_ head; printf 'head=[%s]' "${rk_head-unset}" )
+[ -n "$rk_fn" ] && [ "$rk_out" = "head=[z]" ] \
+  && ok "67-AC9 read_record_keys reads an unterminated last line head<TAB>z as z" \
+  || nope "67-AC9 read_record_keys read an unterminated last line head<TAB>z as ${rk_out#head=}, or did not cut from the runner"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

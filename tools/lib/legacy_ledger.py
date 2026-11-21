@@ -101,11 +101,13 @@ class Registration:
 def _run_git(root, *args, with_stderr=False):
     """-> (returncode, stdout) of one `git -C root` call, the inherited-directory variables dropped;
     `with_stderr` adds its stderr as a third item. A git that cannot be spawned or that times out is exit
-    127 with the text `git not runnable: <exception>` (TOOL-dWitnessedBar-65 S9)."""
+    127 with the text `git not runnable: <exception>` (TOOL-dWitnessedBar-65 S9). This is the block's one
+    git spawn, so the 60-second bound `resolve_health_log` uses bounds every git call of the seed's SHA
+    resolution (TOOL-dWitnessedBar-67 S7)."""
     env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
     try:
         p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
-                           encoding="utf-8", errors="surrogateescape", env=env)
+                           encoding="utf-8", errors="surrogateescape", env=env, timeout=60)
     except (OSError, subprocess.TimeoutExpired) as exc:
         text = "git not runnable: %s" % exc
         return (127, "", text) if with_stderr else (127, text)
@@ -461,7 +463,9 @@ def read_head_sha(root):
     dangling, looping or detached-missing HEAD among them, is no sha and the reason `no HEAD: <the first
     stderr line of the probe that ended the read>`, or `git <verb> exited <rc>` where it printed none, so
     a tree git refused to read is never stamped as seeded before any commit (TOOL-dWitnessedBar-63 S8,
-    TOOL-dWitnessedBar-64 S3). The recall kit's `read_worktree_head` and the overlay's `check_born` read
+    TOOL-dWitnessedBar-64 S3). A probe that exits 0 and still ends the read names what disqualified it:
+    `git for-each-ref listed <its first stdout line>` and `git symbolic-ref printed <the line not opening
+    refs/>` (TOOL-dWitnessedBar-67 S18). The recall kit's `read_worktree_head` and the overlay's `check_born` read
     every failure as unborn and neither is importable from this block. WHAT IT DOES NOT CHECK: a git
     release whose wording or exit codes differ from these on any of the three probes, or a branch ref
     that `for-each-ref` matches by prefix, such as `refs/heads/b/x` beside an unborn `refs/heads/b`,
@@ -480,7 +484,13 @@ def read_head_sha(root):
             rc, out, err = _run_git(root, "for-each-ref", lines[0], with_stderr=True)
             if rc == 0 and not out.strip() and not err.strip():
                 return NULL_SHA, ""
-    return None, "no HEAD: %s" % (err.strip().splitlines() or ["git %s exited %d" % (verb, rc)])[0].strip()
+    what = "git %s exited %d" % (verb, rc)
+    rows = [ln.strip() for ln in out.splitlines() if ln.strip()] if rc == 0 else []
+    if rows and verb == "for-each-ref":
+        what = "git for-each-ref listed %s" % rows[0]
+    elif rows and verb == "symbolic-ref":
+        what = "git symbolic-ref printed %s" % ([ln for ln in rows if not ln.startswith("refs/")] or rows)[0]
+    return None, "no HEAD: %s" % (err.strip().splitlines() or [what])[0].strip()
 
 
 def read_home_state(path):
@@ -714,7 +724,9 @@ def run_seed_cli(args, cwd):
     call's reason: `--population` prints its one unarmed line, `--all` prints nothing on stdout and
     `seed: no HEAD: <reason>` on stderr, each exit 1; `--home` exits 2 (TOOL-dWitnessedBar-65 S8). A
     given `--sha` is folded to lowercase and stamped as the full sha of the commit it names; one naming
-    none, and the null SHA outside an unborn HEAD, exits 2 (TOOL-dWitnessedBar-65 S10)."""
+    none, and the null SHA outside an unborn HEAD, exits 2 (TOOL-dWitnessedBar-65 S10), and so does one
+    whose commit's full sha does not start with it, a branch or tag with an all-hex name having stood in
+    for the object it abbreviates (TOOL-dWitnessedBar-67 S9)."""
     usage = ("usage: legacy_ledger.py seed (--all | --population <name>) [--widen <record>] [--sha <sha>]\n"
              "       legacy_ledger.py seed --home <path> [--sha <sha>] (--copy <template> | -- <argv>...)")
     argv = None
@@ -770,6 +782,10 @@ def run_seed_cli(args, cwd):
         else:
             rc, out = _run_git(root, "rev-parse", "--verify", "--quiet", "%s^{commit}" % sha)
             named = rc == 0 and SHA_RE.fullmatch(out.strip()) is not None
+            if named and not out.strip().startswith(sha):
+                print("legacy_ledger: --sha %r resolves through a ref to %s, a commit it does not abbreviate, "
+                      "so no home is written" % (opts["--sha"], out.strip()), file=sys.stderr)
+                return 2
             sha = out.strip()
         if not named:
             print("legacy_ledger: --sha %r names no commit in this repository%s, so no home is written"
