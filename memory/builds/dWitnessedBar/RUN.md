@@ -9,10 +9,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: c2a407b0390f3d57a118b58e376c326aeb207c13 · park · ? touching
+asks-at-landing: TOOL-dWitnessedBar-31=DEFERRED TOOL-dWitnessedBar-32=OPEN TOOL-dWitnessedBar-33=OPEN TOOL-dWitnessedBar-34=CLOSED TOOL-dWitnessedBar-35=OPEN TOOL-dWitnessedBar-36=OPEN TOOL-dWitnessedBar-37=DEFERRED TOOL-dWitnessedBar-38=OPEN TOOL-dWitnessedBar-39=OPEN TOOL-dWitnessedBar-98=OPEN TOOL-dWitnessedBar-99=OPEN TOOL-dWitnessedBar-100=OPEN TOOL-dWitnessedBar-101=DEFERRED TOOL-dWitnessedBar-102=DEFERRED TOOL-dWitnessedBar-103=DEFERRED TOOL-dWitnessedBar-104=OPEN TOOL-dWitnessedBar-105=OPEN TOOL-dWitnessedBar-111=OPEN TOOL-dWitnessedBar-112=OPEN TOOL-dWitnessedBar-113=OPEN TOOL-dWitnessedBar-114=OPEN
+units-at-landing: TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110
+hold-run: 
+hold-streak: 1 · at bdbd89e9
+resume-owed: none · owner
+held-at: 2026-11-21T18:20:01Z
+hold-reason: The work is sound and merged onto origin/main at c2a407b03 with every pass leg green. Two upgrade-step conflicts block the landing; the frozen-step rule forbids both fixes unattended: gov first refuses the adopter-rules witness (rule 06's corrected text, ask 111), and step-rows-frozen reds on the floor step's edited program (ask 112). Both are parked with their options.
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
+refreshed-at: c2a407b0390f3d57a118b58e376c326aeb207c13 · handoff · ? touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: fbba9ffd932816e503e91c1baf1286027e15e013
-phase: VERIFYING
+witness: bdbd89e9550f54eba2b74e0cc41b6410e0e5a337
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -866,3 +876,7 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T18:19:19Z decision · item landing-adopter-rules-witness · reason Gov first refuses every prepare: playbook/adopter-rules-to-overlay's landed witness pins rule 06's old text (baseline.toml), and TOOL-dWitnessedBar-51 corrected it to baseline.txt. Options: (a) retire the step to a successor whose witness reads the derived repo.rule tag (a govkit design change, new step + selftest); (b) revert rule 06's text, leaving the charter naming a file the map no longer has. Refused unattended: the program is frozen, and either option changes shipped upgrade semantics. Ask TOOL-dWitnessedBar-111.
 
 2026-11-21T18:19:21Z decision · item landing-python-floor-frozen · reason step-rows-frozen reds: TOOL-dWitnessedBar-26 (§8 F8 option a) edited tools/govkit/steps/python_floor.py, the landed lib/python-floor-3.15 row's program. Options: (a) revert to the landed bytes, so a no-bash node still never spawns bare bash but prints a traceback, and [dSP-91 L2]'s no-bash branch reds there; (b) ship the one-line refusal as a new step and re-point the govkit selftest floor arms that pin the old row id. Refused unattended: it reverses a resolved spec fork or adds a step. Ask TOOL-dWitnessedBar-112.
+
+2026-11-21T18:20:04Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dWitnessedBar && bash tools/push-main.sh --land --slug dWitnessedBar && bash tools/unattended/unattended.sh --settle dWitnessedBar
+
+2026-11-21T18:20:04Z hold · item owner-decision · reason until owner · reaped 0b5bfd26 · resume none(owner)
