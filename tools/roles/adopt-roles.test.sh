@@ -1374,7 +1374,9 @@ got = json.loads(efforts("spec-review") or "{}") if commit("roles.effort.gov-ske
 print("ac3 %d" % int(got.get("skeptic") == "max"))
 a = model() if commit("roles.model.gov-builder.codex = \"gpt-x\"") else None
 b = model() if commit("roles.model.gov-builder.codex = \"gpt-x\"", "roles.model.gov-builder.claude-code = \"opus\"") else None
-print("ac1 %d" % int(a == front("gov-builder", "model") and b == "opus"))
+rendered = run("render_agents.py", "--write")[0] == 0 and re.search(
+    r"(?m)^model: opus\r?$", (fx / ".claude" / "agents" / "gov-builder.md").read_text(encoding="utf-8")) is not None
+print("ac1 %d" % int(a == front("gov-builder", "model") and b == "opus" and rendered))
 role = kit / "agents" / "gov-builder.agent.md"
 held = role.read_bytes()
 def grant():
@@ -1401,14 +1403,14 @@ print("ac5 %d" % int(rc == 1 and len(said) == 1 and "default" in said[0] and "re
 house.unlink()
 _rc, out, _err = run("check_roles.py", "--root", str(fx))
 print("ac6 %d" % int(efforts("build") == json.dumps({"builder": front("gov-builder", "effort")}, separators=(",", ":"))
-                     and " R12 " not in out and ": R12 — " not in out))
+                     and "roles: graded " in out and " R12 " not in out and ": R12 — " not in out))
 ' "$FX" "$FX/$KREL" 2>&1)
 A29=${A29//$'\r'/}
 check_arm "arm 29 a set roles.effort.<role> key beats the house file's level, and absent the house level reads" \
    "$([ "$_rc29" = 0 ] && [[ $A29 == *'ac2 1'* ]] && echo 1 || echo 0)"
 check_arm "arm 29 a stage with only its role's key set reads that key before the house stage row" \
    "$([[ $A29 == *'ac3 1'* ]] && echo 1 || echo 0)"
-check_arm "arm 29 a codex model key leaves the claude-code model the declared one, and a claude-code key sets it" \
+check_arm "arm 29 a codex model key leaves the claude-code model the declared one, and a claude-code key sets it and the agent type's model line" \
    "$([[ $A29 == *'ac1 1'* ]] && echo 1 || echo 0)"
 check_arm "arm 29 a role's gates field beats its house [gates] row in the index and the ceiling, and absent the row reads" \
    "$([[ $A29 == *'ac4 1'* ]] && echo 1 || echo 0)"
