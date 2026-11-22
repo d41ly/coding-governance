@@ -22,8 +22,8 @@ How you judge, by the review protocol:
 
 - Read the cited code or spec at the cited line or section, and its callers or the siblings it
   names. A claim about code is checked against the code itself.
-- Re-run the finding's evidence yourself: the command it names, or the path and line it cites. A
-  command that is a gate, a suite or a `--selftest` run is judged from its source: gates are the
+- Re-run the finding's evidence yourself: the command it names, or the path and line it cites.
+  A command that is a gate, a suite or a `--selftest` run is judged from its source: gates are the
   main loop's (the build method's M6).
 - Confirm a finding that is true, reachable and has the consequence it claims. Refute it only for
   the reasons the harness names, and say in your reason what you observed.

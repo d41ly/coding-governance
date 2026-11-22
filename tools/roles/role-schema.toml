@@ -1,4 +1,4 @@
-# tools/roles/role-schema.toml — the role kind's fields, read through roles_lib.load_role_schema only
+# role-schema.toml — the role kind's fields, read through roles_lib.load_role_schema only
 # (TOOL-dBoundRoles-2). One row per front-matter key, in the order a role file writes them: `owner` is
 # whose key it is (`claude`, Claude Code's own, or `gov`), `shape` its grammar, and `required` where it
 # must be non-empty (`every` role, an `agent` role only, or `optional`). `empty = true` lets a required

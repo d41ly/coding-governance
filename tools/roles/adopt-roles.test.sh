@@ -144,10 +144,11 @@ for slot, role in lib.load_roles(kit).items():
         if path is not None:
             held.add(path.relative_to(kit.parent).as_posix())
 print("\n".join(sorted(held)))' "$HERE") || return 2
-  while IFS= read -r _e; do
+  local _ea=() _e; mapfile -t _ea <<< "$_enf"
+  for _e in "${_ea[@]}"; do
     _e=${_e%$'\r'}; [ -n "$_e" ] || continue
     mkdir -p "$(dirname "$_ftr/$_e")" && cp "$HERE/../$_e" "$_ftr/$_e" || return 2
-  done <<< "$_enf"
+  done
   printf 'MEMORY_ROOT=%s\nCHARTER=%s\n' "$MR" "$CH" > "$FX/.memory-tree.conf"
   cp "$REPO/$CH" "$FX/$CH" || return 2
   (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1)
