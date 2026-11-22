@@ -25,6 +25,11 @@
 | [2026-11-22-build-TOOL-dBoundRoles-1-2-builder-return.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-2-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dBoundRoles-1-chain-rounds.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-chain-rounds.md) | journal | — |
 | [2026-11-22-build-TOOL-dBoundRoles-1-deviation-13.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-deviation-13.md) | deviation | — |
+| [2026-11-22-build-TOOL-dBoundRoles-1-red-fix-4.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-red-fix-4.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dBoundRoles-1-red-fix-5.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-red-fix-5.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dBoundRoles-1-red-fix-6.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-red-fix-6.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dBoundRoles-1-red-fix-7.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-red-fix-7.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dBoundRoles-1-widen-5.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-widen-5.md) | widen | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-3-reuse-scout.md) | journal | — |

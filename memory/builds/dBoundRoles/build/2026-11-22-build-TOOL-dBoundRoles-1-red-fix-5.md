@@ -1,0 +1,10 @@
+# TOOL-dBoundRoles-1 red-fix 5 — method carriers (every pointer declared) fixed in 7016640b
+
+**Serves:** red-fix TOOL-dBoundRoles-1
+
+- **Leg:** method carriers (every pointer declared)
+- **Red line:** METHOD-CARRIERS check 3 FAILED — a file mentions BUILD-METHOD.md and is not declared in memory/project/method-carriers.txt
+- **Files:** help/roles.md, memory/project/docs-undocumented.txt, memory/project/method-carriers.txt, tools/roles/adopt-roles.test.sh, tools/run-gates/selftest-budgets.txt
+- **Commit:** 7016640bb4093c246877c84dfa3284383667cb84
+- **Rerun:** bash tools/run-gates/pass-legs.sh --base 85a3e2b4a1729938139ab226152ba2cb6e9fd400
+- **Caused-by:** TOOL-dBoundRoles-1
