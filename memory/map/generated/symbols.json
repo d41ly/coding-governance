@@ -32203,6 +32203,21 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "resolve_seed_arg",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "resolve_seed_arg",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "resolve_seed_arg",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
       "id": "resolve_seed_head",
       "kind": "function",
       "file": "tools/gate-lint/legacy_ledger.py"
