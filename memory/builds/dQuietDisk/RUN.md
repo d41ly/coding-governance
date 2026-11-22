@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: a0ae4dcac415bfab8de7cce5da6423311a25a39e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: c95ef6216483338ec4c2b9b18817188b74d95d8d
-phase: RUNNING
+witness: a19951cd998524932e849650675c48b18729b0b8
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/disk-churn-fixes-40450b
