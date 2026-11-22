@@ -11354,7 +11354,7 @@ memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-1-reground-r
 memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-a.md	267 rows
 memory/builds/dKeptSession/build/2026-10-26-build-KICK-dKeptSession-64-promoted-fix-return.md	3 lines
 memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	15 calls
-memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	64 specs
+memory/builds/dKeptSession/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	65 specs
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-6-spec-reviewer.md	10 specs
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-6-spec-reviewer.md	26 specs
 memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-7-spec-writer.md	49152 bytes
