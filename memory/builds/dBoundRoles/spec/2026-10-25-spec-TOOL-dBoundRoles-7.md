@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-7 — shell writes held to the work order's allowance
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 14 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 14 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0172@d88edbe8 whole
 
@@ -128,7 +128,7 @@ a shell edit of a spec by a role outside the spec class is refused; the one admi
 The prompt a role agent was spawned with is its transcript's first `user` record: rule 6 of
 `tools/hooks/agent-cap.js` admits a direct spawn only when that prompt is the marker line and the
 `## Task` section of its prompt file byte for byte, with its task-sha verified
-(`agent-cap.js:691-750`), so the transcript holds the admitted work order and the hook needs no copy
+(`tools/hooks/agent-cap.js@935a910d:691-750`), so the transcript holds the admitted work order and the hook needs no copy
 of the marker grammar. The layout was read on this node at 2026-10-25: a direct spawn's transcript is
 `subagents/agent-<id>.jsonl` beside a `.meta.json`, its first record a `user` record whose content opens
 with the `gov:handoff` marker, and a harness agent's is under `subagents/workflows/<run id>/`. A hook
@@ -305,6 +305,7 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
   `policy fixtures`, whose guard holds `tools/hooks/scratch-guard.js` that §4 Files touched names, and
   §4's `checkHandoffSpawn` citation moves from the chain baseline `59ff8f2ac` (2089-2148) to HEAD's
   `agent-cap.js` (691-750), the function unchanged in behaviour; nothing else moved.
+- rev-4 · 2026-11-22 · §4 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; nothing else moved.
 
 ## 10. Reuse audit
 

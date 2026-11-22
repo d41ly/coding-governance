@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-10 — `driver.reads`, `prompts.author` and `roles.no-spawn`, each read and enforced at its seam
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0175@0d300fb9 whole
 **Carries:** node:policy-key.driver.reads
@@ -50,7 +50,7 @@ render. Where a value has no seam at base, the spec says what stands in and who 
   Observed by AC3.
 - **S3** — `prompts.author`, values `prompt-writer` and `requesting-worker-rendered`, default
   `prompt-writer`. `resolvePromptsAuthor(root)` in `tools/hooks/agent-cap.js` reads it once per `Agent`
-  call in rule 6 (`checkHandoffSpawn`, `agent-cap.js:691`). Under `requesting-worker-rendered`, rule 6
+  call in rule 6 (`checkHandoffSpawn`, `tools/hooks/agent-cap.js@935a910d:691`). Under `requesting-worker-rendered`, rule 6
   is today's check, every task a rendered handoff the requesting session made; under `prompt-writer`,
   rule 6 also applies the framing requirement TOOL-dBoundRoles-4 defines. Every rule-6 refusal names
   the value in force. Observed by AC4.
@@ -285,13 +285,14 @@ New arm: tools/roles/render_agents.py · covers AC5 · its self-test renders `--
   1182, RL-4, RL-5 and RL-8 with their settlement, scout B's row for cl-0175, and the hooks and the
   handoff renderer at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring the edges of TOOL-dBoundRoles-43, TOOL-dBoundRoles-44, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
-- rev-3 · 2026-11-22 · S2 · §7 · §10 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/hooks/scratch-guard.js` in Files touched trips its guard; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up with its behaviour unchanged, so the cites re-point at HEAD, `checkHandoffSpawn` now at `tools/hooks/agent-cap.js:691-750`; nothing else moved.
+- rev-3 · 2026-11-22 · S2 · §7 · §10 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/hooks/scratch-guard.js` in Files touched trips its guard; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up (DERIVED: baseline line 2089 less HEAD line 691) with its behaviour unchanged, so the cites re-point at HEAD, `checkHandoffSpawn` now at `tools/hooks/agent-cap.js@935a910d:691-750`; nothing else moved.
+- rev-4 · 2026-11-22 · §2 · §9 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; each figure the re-ground wrote carries a pin on its line; nothing else moved.
 
 ## 10. Reuse audit
 
 The seams extended are the write gate's hook `tools/hooks/scratch-guard.js` (its `main` dispatch,
 `:1529-1611`, and its fragment's matcher), the spawn guard's rule 6 (`checkHandoffSpawn`,
-`tools/hooks/agent-cap.js:691-750`), and the stand-in render (`tools/roles/handoff.py:1034-1048`,
+`tools/hooks/agent-cap.js@935a910d:691-750`), and the stand-in render (`tools/roles/handoff.py:1034-1048`,
 `load_stand_in_waivers` at `roles_lib.py:488`). the probe `reuse_lookup.py` over the phrase "read a policy key value to gate a spawn or a read" ranked `read_conf_key`, `readConfKey` and `load_policy`;
 the first two read `.memory-tree.conf` and the third the roles kit's house file, and none reads a
 `.governance` key, so the reader is dGroundRules' and no existing seam in this tree fits for it. For

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-16 — the shapes: each workflow entry's kind, checklist, orientation, merge and twin rule, the five kinds as defaults over the stage rows
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0181@6ebedcff whole
 **Carries:** node:system.role-shapes
@@ -196,7 +196,7 @@ gap-roles-18 already counts as declared, so the entry names it instead of a prom
 | `render_agents.py` | renders `shapes` into the index; its harness list (`extract_workflow_harnesses`) is unchanged |
 | `adopt-roles.sh` | its Skill binder reads only `name` and `stage` lines (`:134-160`), which the `[[kind]]` placement keeps |
 | `check-wiring.sh` | reads `workflows.toml` as the kit's anchor only (`:1697`); unchanged |
-| agent-cap's `args.roles` refusal (`tools/hooks/agent-cap.js:771-777`) | admits a value only as an agent-true role; binding a call to its shape is dWellOiledMachine's, so unchanged (§8 F3) |
+| agent-cap's `args.roles` refusal (`tools/hooks/agent-cap.js@935a910d:771-777`) | admits a value only as an agent-true role; binding a call to its shape is dWellOiledMachine's, so unchanged (§8 F3) |
 | the build Skill (`tools/roles/SKILL.template.md:27`) | passes `stage-efforts`' output, whose shape is unchanged |
 
 ### Inventory
@@ -336,11 +336,12 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC3 AC4 AC6 · a fixture 
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
 - rev-3 · 2026-11-22 · §4 · §7 · §8 F3 · the leg line gains `policy fixtures`, whose guard holds the
   `tools/roles/roles_lib.py` §4 Files touched names; the `args.roles` refusal's citations re-point from the
-  chain baseline `59ff8f2ac` to HEAD, the file cut to 1227 lines by TOOL-dFairHearing-16: the §4 row's
+  chain baseline `59ff8f2ac` to HEAD, the file cut to 1227 lines at 52f769c24 by TOOL-dFairHearing-16: the §4 row's
   `:2179-2185` to `:771-777`, F3's probe `2176,2186` to `768,778`, and its harness-list `:2163-2175` to
   `:761-767` plus `resolveHarnessEntry` (`:785-799`), where TOOL-aGuardedEffort-1 moved the path compare; the
   refusal reads what F3 observed, so F3's resolution stands; by
   `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else moved.
+- rev-4 · 2026-11-22 · §4 · §9 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; each figure the re-ground wrote carries a pin on its line; nothing else moved.
 
 ## 10. Reuse audit
 

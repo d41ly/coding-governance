@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-8 — the role-gate arm's field escape explained and closed
 
-**Status:** DEFERRED · rev-2 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0173@a66af889 whole
 
@@ -36,7 +36,7 @@ G3 when no checkout root resolves (§8 F2).
   no longer returns: rows G2 and G3, which read no index, refuse a matching candidate with an empty
   allowlist, and only G1 is unarmed, with its witness line. Observed by AC1, AC2 and AC3.
 - **S2** — Agent-cap's rule 6 reads its root through the same `resolveRoleRoot`, which it already
-  imports (`tools/hooks/agent-cap.js:1040-1042`); it passes no candidates, so its verdict is unchanged.
+  imports (`tools/hooks/agent-cap.js@935a910d:1040-1042`); it passes no candidates, so its verdict is unchanged.
   Observed by AC3.
 - **S3** — The explanation, where the arm is documented: `tools/hooks/README.md`'s section
   "scratch-guard's fourth check" (`:491`) and the role-arm paragraph of scratch-guard's header
@@ -214,6 +214,7 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 · a gov-bu
   `tools/hooks/agent-cap.js` (1040-1042), the call unchanged and still passing no candidates; at HEAD
   rule 6 runs first and is no longer skipped under `--only=`, which S2 does not rely on. The §7 leg
   line gains `policy fixtures`, whose guard the Files touched path `tools/hooks/scratch-guard.js` trips.
+- rev-3 · 2026-11-22 · §2 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; nothing else moved.
 
 ## 10. Reuse audit
 

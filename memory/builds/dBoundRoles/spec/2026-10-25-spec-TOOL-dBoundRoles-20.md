@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-20 — a repository's roles and workflow entries composed beside gov's, with the role kind's fixed set, widening directions and step-gate classes
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0185@ce70dc70 whole
 **Carries:** node:tag-namespace.workflow
@@ -449,10 +449,11 @@ New arm: tools/govkit/selftest.py · covers AC9 · the `role` and `workflow` cla
   §8 F5 as resolved.
 - rev-5 · 2026-11-22 · §7 · §10 · the leg line gains `policy fixtures`, whose guard holds
   `tools/playbook/tag_index.py` that §4 Files touched names; §10's citation of `checkHarnessCall` is
-  re-pointed from the 2427-line file's `:2157` to `tools/hooks/agent-cap.js:759-780` at `062906ffd`,
+  re-pointed from the 2427-line file's `:2157` to `tools/hooks/agent-cap.js@935a910d:759-780` at `062906ffd`,
   TOOL-dFairHearing-16 having moved rules 0, 2 and 5 out, and names that its path compare now lives in
   `resolveHarnessEntry` (TOOL-aGuardedEffort-1), with no change in what it admits, by
   `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
+- rev-6 · 2026-11-22 · §9 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; nothing else moved.
 
 ## 10. Reuse audit
 
@@ -466,7 +467,7 @@ role and workflow beside the shipped catalogue"` ranked `load_workflows`, `load_
 and `extract_workflow_harnesses`, the same roles-kit seams, and no composer, matching scout A: no overlay
 reader exists at base. The recall probe returned the packet's clause, the brief's row and the flow
 adoption's item 12; none disagreed with source. Scout A cited `checkHarnessCall` at line 2157 of the
-file as it stood at base; at `062906ffd` it is `tools/hooks/agent-cap.js:759-780`, its path compare
+file as it stood at base; at `062906ffd` it is `tools/hooks/agent-cap.js@935a910d:759-780`, its path compare
 moved into `resolveHarnessEntry` (:785-800) with no change in what it admits, and this unit leaves its
 code unchanged, the index carrying the composition instead.
 

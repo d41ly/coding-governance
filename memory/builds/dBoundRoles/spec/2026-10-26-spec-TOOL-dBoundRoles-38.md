@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-38 — handed content fenced inside the work order, and every reader of a fact line or a marker line skips what a fence holds
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -55,14 +55,14 @@ marker line walk the text fence-aware, so nothing inside a fence is read as eith
   `tools/hooks/scratch-guard.js`, added to its `module.exports`, is the same walker for the hooks.
   Observed by AC2 and AC4.
 - **S4** — The readers walk it. `extract_prompt_marker` (`tools/roles/roles_lib.py:246-255`) counts the
-  marker lines it finds outside a fence. `extractHandoffMarker` (`tools/hooks/agent-cap.js:650-658`),
+  marker lines it finds outside a fence. `extractHandoffMarker` (`tools/hooks/agent-cap.js@935a910d:650-658`),
   which rule 6 calls on the prompt and on the prompt file and which `TOOL-dBoundRoles-4` S4 calls on the
   prompt writer's file, reads only unfenced lines. Every reader of `FACT_RE` `TOOL-dBoundRoles-13` builds,
   the Python reader in `roles_lib.py` and the JavaScript copy in `checkHandoffSpawn`, reads only
   unfenced lines. Observed by AC1 and AC3.
   **Readers:** by name: `tools/roles/roles_lib.py` (`extract_prompt_marker` and the `FACT_RE` reader),
   `tools/hooks/agent-cap.js` (`extractHandoffMarker` and the `FACT_RE` copy in `checkHandoffSpawn`) ·
-  by value: `checkHandoffSpawn`'s two marker counts (`agent-cap.js:704-705`, `:718-719`), its fact re-cut, and
+  by value: `checkHandoffSpawn`'s two marker counts (`tools/hooks/agent-cap.js@935a910d:704-705`, `:718-719`), its fact re-cut, and
   every `handoff.py` verb that reads a prompt's marker through `extract_prompt_marker`, each now counting
   unfenced lines only.
 - **S5** — A fence left open refuses. `render_handoff` refuses a task section whose walk ends inside a
@@ -109,7 +109,7 @@ Read at base `462d20f3` on 2026-10-26, the `agent-cap.js` line numbers re-pointe
   `ls memory/builds/tFix` fails. Handed raw into an unfenced block, the line is read as a fact; handed
   inside a three-backtick fence, spec 13's own inner fence closes it early. S1's length rule is what
   keeps the outer fence closed.
-- `tools/hooks/agent-cap.js:650-658` walks every line, so `checkHandoffSpawn` counts a quoted marker
+- `tools/hooks/agent-cap.js@935a910d:650-658` walks every line, so `checkHandoffSpawn` counts a quoted marker
   (`:704-705` on the prompt, `:718-719` on the file).
 - `tools/memory-tree/tree_lib.py:149-174` is the house's fence walker, with the final open-fence yield
   S3 copies. It toggles on any run of three, so a three-backtick line inside a four-backtick fence closes
@@ -234,7 +234,7 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC3 AC4 · a rule-6 payload who
   unit 13 carries whole; veto 1 discards it. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the
   precedent `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
 - **F2 — Where does the JavaScript walker live?** Options: (a) `scratch-guard.js`'s exports, which
-  `agent-cap.js` already requires (`agent-cap.js:788`, `:1040`) and which `TOOL-dBoundRoles-7`'s
+  `agent-cap.js` already requires (`tools/hooks/agent-cap.js@935a910d:788`, `:1040`) and which `TOOL-dBoundRoles-7`'s
   allowance reader shares; (b) a function inside `agent-cap.js`; (c) a new module. (b) leaves the
   allowance reader in `scratch-guard.js` to copy it, which the reuse rule forbids at the second
   instance; (c) adds a file every install must ship and wire. RESOLVED (agent, 2026-10-26, delegated):
@@ -257,12 +257,13 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC3 AC4 · a rule-6 payload who
   `tools/workflows/spec-audit-optin.js`, and agent-cap still requires scratch-guard's exports at the
   two sites named, so F2's answer stands. The §7 leg line gains `policy
   fixtures`, whose guard the Files touched path `tools/roles/roles_lib.py` trips.
+- rev-5 · 2026-11-22 · §2 · §4 · §8 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; nothing else moved.
 
 ## 10. Reuse audit
 
 The seams are `render_handoff`'s block list (`tools/roles/handoff.py:381-416`), the two marker readers
 (`extract_prompt_marker`, `tools/roles/roles_lib.py:246`; `extractHandoffMarker`,
-`tools/hooks/agent-cap.js:650`), and `scratch-guard.js`'s exports, which `agent-cap.js` already
+`tools/hooks/agent-cap.js@935a910d:650`), and `scratch-guard.js`'s exports, which `agent-cap.js` already
 imports. The fence machine's shape, with its final open-fence yield, is
 `tools/memory-tree/tree_lib.py:149` `unfenced_lines`, copied with a length rule rather than imported.
 `python tools/codebase-map/reuse_lookup.py "skip lines inside a fenced code block when reading a document line by line"`

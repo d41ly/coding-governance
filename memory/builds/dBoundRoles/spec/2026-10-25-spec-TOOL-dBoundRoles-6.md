@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-6 — the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 9 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 9 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0171@efd80f4f whole
 
@@ -61,7 +61,7 @@ from").
 - **S3** — A governed tree with no index is refused by both hooks. Where `loadRoleIndex` reads
   `absent` and `checkRoleGoverned(top)` of §4 holds, `checkRoleWrite`
   (`scratch-guard.js:1065`), `checkRoleGate` (`scratch-guard.js:1437`) and agent-cap's rule 6 (the
-  `index.state` branch, `tools/hooks/agent-cap.js:1044-1046`) refuse, each naming the index path and
+  `index.state` branch, `tools/hooks/agent-cap.js@935a910d:1044-1046`) refuse, each naming the index path and
   the re-render; a tree that is not governed keeps today's no-arm verdict. Observed by AC3.
 - **S4** — One role section and one hash in the library (I6): `derive_section_sha` moves from
   `tools/roles/handoff.py:307-309` into `tools/roles/roles_lib.py`, and `render_role_section(kit_dir,
@@ -71,12 +71,12 @@ from").
   (`tools/roles/render_agents.py:207-216`) writes `"role-sha": derive_section_sha(render_role_section(…))`
   per role, and `loadRoleIndex` (`scratch-guard.js:952-989`) admits the key, a string of 12 lowercase
   hex digits when present, refusing any other value as `broken`. Observed by AC4.
-- **S6** — `role-sha` compared at spawn: `checkHandoffSpawn` (`agent-cap.js:691-750`), after the
+- **S6** — `role-sha` compared at spawn: `checkHandoffSpawn` (`tools/hooks/agent-cap.js@935a910d:691-750`), after the
   task digest and before the description step, reads the marker's `role-sha` through
   `extractHandoffMarker`'s named group and compares it with `index.roles[type]['role-sha']`. An index
   holding no `role-sha` for the type refuses with the re-render of the index; a differing one refuses
   with the re-render of the handoff, naming both values. Observed by AC4 and AC5.
-- **S7** — The headers and docs say it: agent-cap's rule-6 comment (`agent-cap.js:30-37`, "it never
+- **S7** — The headers and docs say it: agent-cap's rule-6 comment (`tools/hooks/agent-cap.js@935a910d:30-37`, "it never
   compares `role-sha`"), scratch-guard's role-arm paragraph (`scratch-guard.js:99-101`, "An ABSENT
   index adds no arm"), the two arms' sections of `tools/hooks/README.md` and the index paragraph of
   `tools/roles/README.md`. Observed by AC6.
@@ -329,12 +329,13 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC4 AC5 · a handoff rendered b
   §10's sentence on scout A's citations stays as measured at `4283cb44`. The §7 leg line gains `policy
   fixtures` and `routed-commits selftest`, the legs whose guards the Files touched paths
   `tools/hooks/scratch-guard.js` and `tools/policy/guarded-paths.txt` trip.
+- rev-6 · 2026-11-22 · §2 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; nothing else moved.
 
 ## 10. Reuse audit
 
 The seams extended: the write gate's evaluation order in `checkRouted` (`tools/hooks/scratch-guard.js:1113-1185`)
 and `checkRoleWrite` (`:1064-1086`); `loadRoleIndex` (`:952-989`), the one index reader both hooks
-use; `checkRoleGate` (`:1421-1451`); rule 6's `checkHandoffSpawn` (`tools/hooks/agent-cap.js:691-750`)
+use; `checkRoleGate` (`:1421-1451`); rule 6's `checkHandoffSpawn` (`tools/hooks/agent-cap.js@935a910d:691-750`)
 and its dispatch (`:1034-1057`); `render_roles_index` (`tools/roles/render_agents.py:207-216`), the one
 index writer; `derive_section_sha` (`tools/roles/handoff.py:307-309`), moved to the library as I6
 says; TOOL-dGroundRules-6's guarded list and guard, under TOOL-dDeclaredLoop-2's verdict. `python tools/codebase-map/reuse_lookup.py "refuse

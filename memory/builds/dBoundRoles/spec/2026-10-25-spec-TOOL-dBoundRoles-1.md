@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0166@83615023 whole
 
@@ -79,7 +79,7 @@ had no spawn in 60 days and two double up (gap-roles-07), and no check keeps cor
   `tools/roles/agents/gov-diff-reviewer.agent.md`, `tools/roles/house/gov-spec-reviewer.md` and
   `tools/roles/house/gov-diff-reviewer.md` · by value: `print_harness_args`
   (`tools/roles/handoff.py:453`), whose `{key: slot}` map every review harness call passes as
-  `args.roles`, and `checkHarnessCall` (`tools/hooks/agent-cap.js:759`), which admits each value only
+  `args.roles`, and `checkHarnessCall` (`tools/hooks/agent-cap.js@935a910d:759`), which admits each value only
   as an agent-true role of the index; both read the re-keyed rows and need no edit. Observed by AC3.
 - **S4** — Two workflow entries, `plan` (roles `gov-planner`) and `design` (roles `gov-architect`), in
   `tools/roles/workflows.toml`, and `WORKFLOW_NAMES` (`tools/roles/check_roles.py:90`) holding them, so R7
@@ -379,9 +379,10 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC4 · the playbook-render s
 - rev-4 · 2026-11-22 · S3 · §7 · the leg line gains `policy fixtures`, whose guard holds
   `tools/roles/agents/gov-builder.agent.md` under the `tools/roles/agents/` §4 Files touched names; S3's
   `checkHarnessCall` citation re-points from `:2157` at the chain baseline `59ff8f2ac` to `:759` at HEAD, the
-  file cut to 1227 lines by TOOL-dFairHearing-16; the function's harness-path compare has since moved into
+  file cut to 1227 lines at 52f769c24 by TOOL-dFairHearing-16; the function's harness-path compare has since moved into
   `resolveHarnessEntry` (TOOL-aGuardedEffort-1) and its `args.roles` admission is unchanged, so S3's sentence
   stands; by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else moved.
+- rev-5 · 2026-11-22 · §2 · §9 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; each figure the re-ground wrote carries a pin on its line; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -9,7 +9,7 @@ committed nothing; `diverged: true`.
 
 §4 "### The binding join" (which S5 and AC2 build on) says the join reads from the index "the units' selector rows as
 PLAY-dOrderedCharter-10 S4 reads them, a unit's selectors sharing its `tag` row's path and line
-(`tools/playbook/instruction_units.py#extract_unit`)". At HEAD, in extract_unit (instruction_units.py:470-474), each
+(`tools/playbook/instruction_units.py#extract_unit`)". At HEAD, in extract_unit (tools/playbook/instruction_units.py@73883269:470-474), each
 row's line is `n = u.line + <offset of the first span line holding "<val>">`. A unit's `tag` row sits on its `tag =`
 line, and each selector row on the `scope =` line, or its own line when the scope array spans several lines. Probe:
 `extract_unit({'memory_root':'memory'}, 'tools/corekit/instructions.toml', '[[unit]]\ntag = "unit.alpha"\nscope =

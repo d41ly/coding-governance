@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-12 — the orientation scout's placement return through the typed channel, recorded and checked by the driver
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0177@4a09db23 whole
 
@@ -116,7 +116,7 @@ untyped placement is the gap this unit closes, so it never falls back to reading
 
 A return can say anything about who wrote it. The work order it answers is a rendered file whose
 marker carries the role and a task-sha the spawn guard compared at spawn
-(`tools/hooks/agent-cap.js:737-738`). Reading the role from there is reading a witnessed fact
+(`tools/hooks/agent-cap.js@935a910d:737-738`). Reading the role from there is reading a witnessed fact
 rather than a claimed one, the [trust] classes' distinction
 (`memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md:240-248`).
 
@@ -255,7 +255,8 @@ New arm: tools/loop/placement.py · covers AC1 AC2 · the `return-untyped` and `
   touched · §5 · AC1 · §7 · §8 F4 · re-grounded on the cross-check record
   `2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck`, row 25: `place` runs the roles kit's new
   `handoff.py check-return-file` as a subprocess and imports no roles module.
-- rev-4 · 2026-11-22 · §4 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/roles/handoff.py` in Files touched trips its guard; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up with its behaviour unchanged, so the cites re-point at HEAD, the task-sha compare now at `tools/hooks/agent-cap.js:737-738`; nothing else moved.
+- rev-4 · 2026-11-22 · §4 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/roles/handoff.py` in Files touched trips its guard; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up (DERIVED: baseline line 2089 less HEAD line 691) with its behaviour unchanged, so the cites re-point at HEAD, the task-sha compare now at `tools/hooks/agent-cap.js@935a910d:737-738`; nothing else moved.
+- rev-5 · 2026-11-22 · §4 · §9 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; each figure the re-ground wrote carries a pin on its line; nothing else moved.
 
 ## 10. Reuse audit
 

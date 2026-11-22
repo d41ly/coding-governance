@@ -12129,7 +12129,7 @@ memory/builds/dBackdatedFixture/spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md
 memory/builds/dBackdatedFixture/spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md	tools/govkit/govkit.py:3066-3157	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBackdatedFixture/spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md	tools/govkit/selftest.py:511	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBackdatedFixture/spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md	tools/govkit/selftest.py:947-952	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/RUN.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dBoundRoles/RUN.LANDED.98284ad5.md	BUILD-METHOD M4	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
 memory/builds/dBoundRoles/build/2026-10-25-build-TOOL-dBoundRoles-1-reuse-scout-a.md	agent-cap.js:2053	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/build/2026-10-25-build-TOOL-dBoundRoles-1-reuse-scout-a.md	agent-cap.js:2072	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/build/2026-10-25-build-TOOL-dBoundRoles-1-reuse-scout-a.md	agent-cap.js:2077-2086	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12315,6 +12315,7 @@ memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-66-deviation-6
 memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-67-deviation-671.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-68-deviation-681.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-69-deviation-691.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-1-acceptance-ledger.md	tools/playbook/instructions.toml:5	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
 memory/builds/dBoundRoles/prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md	BUILD-METHOD M2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-11-spec-writer.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-owner-review-stop.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12322,6 +12323,21 @@ memory/builds/dBoundRoles/prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-r
 memory/builds/dBoundRoles/prompts/2026-10-26-prompt-TOOL-dBoundRoles-21-1-spec-writer.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/prompts/2026-10-26-prompt-TOOL-dBoundRoles-37-round1-fix-brief.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/prompts/2026-10-26-prompt-TOOL-dBoundRoles-6-1-spec-writer.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-reground-a-spec-writer.md	tools/hooks/agent-cap.js:2157	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-reground-a-spec-writer.md	tools/hooks/agent-cap.js:2179	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-reground-b-spec-writer.md	tools/hooks/agent-cap.js:2044	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-reground-b-spec-writer.md	tools/hooks/agent-cap.js:2048	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-reground-b-spec-writer.md	tools/hooks/agent-cap.js:2049	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-reground-b-spec-writer.md	tools/hooks/agent-cap.js:2089	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-reground-b-spec-writer.md	tools/hooks/agent-cap.js:2278	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-reground-b-spec-writer.md	tools/hooks/agent-cap.js:2282	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer.md	tools/hooks/agent-cap.js:2051	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer.md	tools/hooks/agent-cap.js:2089	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer.md	tools/hooks/agent-cap.js:2157	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-reground-c-spec-writer.md	tools/hooks/agent-cap.js:2077	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-reground-c-spec-writer.md	tools/hooks/agent-cap.js:2089	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-reground-c-spec-writer.md	tools/hooks/agent-cap.js:2102	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-reground-c-spec-writer.md	tools/hooks/agent-cap.js:2135	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md	BUILD-METHOD M7	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md	adopt-memory-tree.sh:649-662	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md	check-dead-paths.sh:192-197	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12499,7 +12515,6 @@ memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-65-66-spec-
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-65-66-spec-audit-round1.md	handoff.py:1027	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-65-66-spec-audit-round1.md	tools/memory-tree/deviation_join.py:163	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-65-66-spec-audit-round1.md	tools/roles/handoff.py:1027	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md	tools/hooks/agent-cap.js:2157	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md	tools/roles/check_roles.py:85-91	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md	tools/roles/check_roles.py:90	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12510,10 +12525,8 @@ memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md	tools/roles
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md	tools/roles/render_agents.py:207	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md	tools/roles/roles_lib.py:330	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-10.md	BUILD-METHOD M7	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-10.md	agent-cap.js:2089	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-10.md	check_roles.py:360-372	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-10.md	roles_lib.py:488	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-10.md	tools/hooks/agent-cap.js:2089-2148	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-10.md	tools/roles/handoff.py:1034-1041	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-10.md	tools/roles/handoff.py:1034-1048	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-11.md	check-memory-hygiene.sh:1849-1853	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12523,13 +12536,11 @@ memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-11.md	tools/memo
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-11.md	tools/unattended/unattended.sh:13584	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-11.md	tools/unattended/unattended.sh:13606-13616	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-11.md	tools/workflows/unattended-build.template.js:2353	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-12.md	tools/hooks/agent-cap.js:2135-2136	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-12.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-12.md	tools/roles/roles_lib.py:96-133	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md	handoff.py:307-309	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md	handoff.py:330-335	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md	handoff.py:99	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md	tools/hooks/agent-cap.js:2089-2148	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md	tools/roles/handoff.py:312	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md	tools/roles/handoff.py:330-396	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md	tools/unattended/unattended.sh:13004	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12537,15 +12548,6 @@ memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md	tools/work
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md	tools/workflows/unattended-unit.js:257-266	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md	unattended-build.template.js:2460	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md	unattended-unit.js:257-266	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-14.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-14.md	tools/roles/check_roles.py:110	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-14.md	tools/roles/check_roles.py:197-207	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-14.md	tools/roles/handoff.py:338-379	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-14.md	tools/roles/roles_lib.py:257	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-14.md	tools/roles/roles_lib.py:36-40	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-14.md	tools/roles/workflows.toml:37	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-14.md	tools/workflows/tier2-review.template.js:236	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-14.md	tools/workflows/unattended-build.template.js:455	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-15.md	render_agents.py:270-274	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-15.md	tools/roles/check_roles.py:218-223	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-15.md	tools/roles/check_roles.py:85-89	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12555,7 +12557,6 @@ memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-15.md	tools/role
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-15.md	tools/roles/roles_lib.py:284-303	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-15.md	tools/roles/roles_lib.py:31-32	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-15.md	tools/roles/roles_lib.py:97	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-16.md	tools/hooks/agent-cap.js:2179-2185	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-16.md	tools/roles/adopt-roles.sh:134-160	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-16.md	tools/roles/check_roles.py:246-313	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-16.md	tools/roles/check_roles.py:92	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12564,8 +12565,6 @@ memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-16.md	tools/role
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-16.md	tools/roles/roles_lib.py:339	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-16.md	tools/workflows/tier2-review.template.js:1352	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-16.md	tools/workflows/unattended-build.template.js:942	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-17.md	tools/hooks/agent-cap.js:2044	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-17.md	tools/hooks/agent-cap.js:2049-2056	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-17.md	tools/memory-tree/tree_lib.py:471	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-17.md	tools/roles/handoff.py:297-305	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-17.md	tools/roles/handoff.py:420-421	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12604,7 +12603,6 @@ memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-2.md	tools/roles
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-2.md	tools/workflows/unattended-build.template.js:719	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-20.md	render_agents.py:285-287	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-20.md	roles_lib.py:595-604	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-20.md	tools/hooks/agent-cap.js:2157-2179	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-20.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-20.md	tools/roles/check_roles.py:90-91	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-20.md	tools/roles/render_agents.py:158-167	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12643,20 +12641,17 @@ memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-23.md	tools/role
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-23.md	tools/workflows/unattended-build.template.js:505-532	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-24.md	handoff.py:329-409	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-24.md	roles_lib.py:586-590	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-24.md	tools/hooks/agent-cap.js:2135-2136	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-24.md	tools/roles/handoff.py:312	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-24.md	tools/roles/handoff.py:698-709	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md	.claude/settings.json:4-12	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md	tools/govkit/entries/settings-merge.kit.toml:22	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md	tools/govkit/govkit.py:6725	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md	tools/hooks/agent-cap.js:2089-2149	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md	tools/hooks/kit.toml:102-116	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md	tools/hooks/kit.toml:18-20	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md	tools/hooks/kit.toml:3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md	tools/lib/resolve-python.test.sh:226	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md	tools/settings-merge.py:117	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-26.md	tools/hooks/agent-cap.js:2077-2086	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-26.md	tools/unattended/unattended.sh:12533	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-26.md	tools/unattended/unattended.sh:12534-12538	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-26.md	unattended.sh:12534-12538	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12664,16 +12659,12 @@ memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-3.md	handoff.py:
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-3.md	handoff.py:412-414	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-3.md	handoff.py:420-421	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-3.md	handoff.py:426-450	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-3.md	tools/hooks/agent-cap.js:2089-2148	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-3.md	tools/hooks/scratch-guard.js:667	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-3.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-3.md	tools/roles/check_roles.py:99-101	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-3.md	tools/roles/handoff.py:312	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-3.md	tools/roles/handoff.py:396-416	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-4.md	agent-cap.js:2048-2056	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-4.md	agent-cap.js:2089-2148	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-4.md	handoff.py:825-828	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-4.md	tools/hooks/agent-cap.js:2089-2148	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-4.md	tools/roles/handoff.py:312	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-4.md	tools/roles/handoff.py:312-423	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-4.md	tools/roles/roles_lib.py:36-40	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12687,9 +12678,7 @@ memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-5.md	tools/workf
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-5.md	unattended-build.template.js:505-537	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-5.md	unattended-build.template.js:533-534	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-5.md	unattended-unit.js:333-337	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	agent-cap.js:2089-2148	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	agent-cap.js:43	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	agent-cap.js:51-59	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	handoff.py:415	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	handoff.py:443	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	scratch-guard.js:1065	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12697,15 +12686,12 @@ memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	scratch-gua
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	scratch-guard.js:941	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	scratch-guard.js:952-989	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	scratch-guard.js:99-101	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	tools/hooks/agent-cap.js:2089-2148	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	tools/hooks/agent-cap.js:2282-2284	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	tools/hooks/scratch-guard.js:1113	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	tools/hooks/scratch-guard.js:1113-1185	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	tools/roles/handoff.py:307-309	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	tools/roles/kit.toml:72-73	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	tools/roles/render_agents.py:147-148	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-6.md	tools/roles/render_agents.py:207-216	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-7.md	agent-cap.js:2089-2148	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-7.md	scratch-guard.js:1075-1083	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-7.md	scratch-guard.js:339-384	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-7.md	scratch-guard.js:85	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12715,7 +12701,6 @@ memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-7.md	tools/hooks
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-7.md	tools/roles/handoff.py:825-828	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-8.md	scratch-guard.js:105-130	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-8.md	scratch-guard.js:1421-1451	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-8.md	tools/hooks/agent-cap.js:2278-2280	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-8.md	tools/hooks/scratch-guard.js:1396	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-8.md	tools/hooks/scratch-guard.js:1421-1451	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-9.md	BUILD-METHOD M8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12742,10 +12727,6 @@ memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-37.md	tools/govk
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-37.md	tools/roles/kit.toml:35-40	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-37.md	tools/roles/roles_lib.py:330	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-37.md	tools/workflows/unattended-build.js:608-613	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	agent-cap.js:1887	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	agent-cap.js:2102-2103	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	tools/hooks/agent-cap.js:2048	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	tools/hooks/agent-cap.js:2048-2056	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	tools/memory-tree/tree_lib.py:149	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	tools/memory-tree/tree_lib.py:149-174	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	tools/roles/handoff.py:312	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12753,7 +12734,6 @@ memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	tools/role
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	tools/roles/roles_lib.py:246	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	tools/roles/roles_lib.py:246-255	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	tools/workflows/unattended-build.js:608-613	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-39.md	tools/hooks/agent-cap.js:2102-2129	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-39.md	tools/hooks/format-guard.js:101-103	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-39.md	tools/roles/roles_lib.py:246	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-39.md	tools/workflows/tier2-review.js:270-272	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12794,9 +12774,6 @@ memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-45.md	tools/role
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-45.md	tools/roles/handoff.py:381-386	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-45.md	tools/roles/handoff.py:98-99	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-45.md	tools/workflows/unattended-build.js:76-80	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-46.md	agent-cap.js:1887	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-46.md	agent-cap.js:2135-2136	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-46.md	tools/hooks/agent-cap.js:2048-2056	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-46.md	tools/roles/handoff.py:98-99	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-46.md	tools/workflows/unattended-build.js:76-80	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-47.md	tools/roles/handoff.py:380-386	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -12842,7 +12819,6 @@ memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-57.md	tools/memo
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-58.md	BUILD-METHOD M2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-58.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-58.md	tools/govkit/govkit.py:5050-5051	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-58.md	tools/hooks/agent-cap.js:2051	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-58.md	tools/roles/handoff.py:340-346	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-58.md	tools/roles/roles_lib.py:252	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-59.md	BUILD-METHOD M2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -37274,6 +37250,12 @@ memory/builds/dWitnessedBar/build/2026-10-25-build-TOOL-dWitnessedBar-96-deviati
 memory/builds/dWitnessedBar/build/2026-10-25-build-TOOL-dWitnessedBar-97-deviation-971.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/build/2026-10-26-build-TOOL-dWitnessedBar-1-reground-returns.md	tools/run-gates/measure_legs.py:116-153	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/build/2026-11-05-build-TOOL-dWitnessedBar-1-parents-crosscheck.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-7.md	HYGIENE check 13	1	3dfd6aab7f0e68ef3531b33d90f6f3ce36801cc6	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-31
+memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-7.md	HYGIENE check 15	1	3dfd6aab7f0e68ef3531b33d90f6f3ce36801cc6	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-31
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md	HYGIENE check 13	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md	HYGIENE check 15	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md	HYGIENE check 13	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md	HYGIENE check 15	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
 memory/builds/dWitnessedBar/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	tools/unattended/stop-guard.js:111	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-owner-review-stop.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md	BUILD-METHOD M2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -37755,6 +37737,7 @@ tools/memory-tree/deviation_join.py	deviations.py:851-854	1	9e21ac760dc0a43d6ed0
 tools/memory-tree/gen_build_index.py	run.sh:12	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/memory-tree/row_grammar.py	drift_report.py:1103	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/memory-tree/tree_lib.py	/check-playbook-parity.sh:334	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+tools/playbook/adopt-playbook.sh	instructions.toml:5	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
 tools/playbook/adopt-playbook.sh	site.py:1	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/playbook/adopt-playbook.sh	tools/corekit/core.py:10	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/playbook/adopt-playbook.sh	tools/corekit/core.py:11	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -37805,9 +37788,3 @@ tools/workflows/tier2-review.test.sh	p.js:9	1	9e21ac760dc0a43d6ed007396922722cce
 tools/workflows/tier2-review.test.sh	security.js:1	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh32-pathless.js:3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh36-mid.js:2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-7.md	HYGIENE check 13	1	3dfd6aab7f0e68ef3531b33d90f6f3ce36801cc6	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-31
-memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-7.md	HYGIENE check 15	1	3dfd6aab7f0e68ef3531b33d90f6f3ce36801cc6	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-31
-memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md	HYGIENE check 13	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
-memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md	HYGIENE check 15	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
-memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md	HYGIENE check 13	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
-memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md	HYGIENE check 15	1	c99ffb318f0140622dd779af68bc9edde1a0a2dd	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-4 — the prompt writer composing every role's task from the driver's details
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 17 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 17 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0169@60524f05 whole
 
@@ -120,7 +120,7 @@ task-sha binds the framing exactly as it binds every other block.
 ### The framing check at spawn
 
 ```
-checkHandoffSpawn, after today's checks pass (agent-cap.js:691-750)
+checkHandoffSpawn, after today's checks pass (tools/hooks/agent-cap.js@935a910d:691-750)
   resolvePromptsAuthor(root) == requesting-worker-rendered  -> admit
   subagent_type == gov-prompt-writer                        -> admit
   the task's "### framing:job" blocks != 1                  -> deny
@@ -131,7 +131,7 @@ checkHandoffSpawn, after today's checks pass (agent-cap.js:691-750)
 ```
 
 The marker of the named file is read with the hook's existing `extractHandoffMarker`
-(`agent-cap.js:650-658`), so no second copy of the grammar enters the hook.
+(`tools/hooks/agent-cap.js@935a910d:650-658`), so no second copy of the grammar enters the hook.
 
 ### Inventory
 
@@ -253,14 +253,15 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 · its self-test renders
   shared interfaces I1, I12 and I16 and D3, scout B's row for cl-0169, TOOL-dBoundRoles-1's roster
   row, and `tools/roles/handoff.py` and `tools/hooks/agent-cap.js` at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **consumes-from** and **hands-off** bullets mirroring the edges of TOOL-dBoundRoles-38, TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
-- rev-3 · 2026-11-22 · §4 · §7 · §10 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `format-guard self-test`, `policy fixtures`, as `tools/hooks/agent-cap.js` and `tools/roles/handoff.py` in Files touched trip their guards; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up with its behaviour unchanged, so the cites re-point at HEAD, `checkHandoffSpawn` now at `tools/hooks/agent-cap.js:691-750` and `extractHandoffMarker` at `:650-658`; nothing else moved.
+- rev-3 · 2026-11-22 · §4 · §7 · §10 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `format-guard self-test`, `policy fixtures`, as `tools/hooks/agent-cap.js` and `tools/roles/handoff.py` in Files touched trip their guards; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up (DERIVED: baseline line 2089 less HEAD line 691) with its behaviour unchanged, so the cites re-point at HEAD, `checkHandoffSpawn` now at `tools/hooks/agent-cap.js@935a910d:691-750` and `extractHandoffMarker` at `:650-658`; nothing else moved.
+- rev-4 · 2026-11-22 · §4 · §9 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; each figure the re-ground wrote carries a pin on its line; nothing else moved.
 
 ## 10. Reuse audit
 
 The seams extended are `render_handoff` (`tools/roles/handoff.py:312-423`), its blocks list
 (`:381-416`) and its transcript locator (`read_transcript`, `:825-828`); the `reads` vocabulary
 `READ_KEYS` (`tools/roles/roles_lib.py:36-40`); and rule 6 (`checkHandoffSpawn`,
-`tools/hooks/agent-cap.js:691-750`) with its marker reader `extractHandoffMarker` (`:650-658`).
+`tools/hooks/agent-cap.js@935a910d:691-750`) with its marker reader `extractHandoffMarker` (`:650-658`).
 `python tools/codebase-map/reuse_lookup.py "compose a role agent task prompt from the driver details"`
 ranked `extract_prompt_marker`, `render_role`, `load_roles` and `renderPromptLine`, all handoff
 plumbing; no role authors a task at base (scout B: "no seam fits for the role itself", 10 role files and

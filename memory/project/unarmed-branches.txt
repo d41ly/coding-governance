@@ -173,3 +173,4 @@ tools/push-main.sh	exit	check_landing_verdict "$(git rev-parse --verify HEAD)" |
 tools/push-main.sh	exit	check_landing_verdict "$(git rev-parse --verify "refs/heads/$def")" || exit 1	1	0b7e0fceb2fb91cda124074148a284281a387499	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-6-1-builder-return.md
 tools/push-main.sh	exit	push-main: could not stage gov's receipt of the upgrade steps. Aborted (no push).	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 tools/push-main.sh	exit	push-main: could not stage the minted versions. Aborted (no push).	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+tools/playbook/adopt-playbook.sh	exit	role and field namespace arm(s) failed	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-3

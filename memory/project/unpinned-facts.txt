@@ -6844,7 +6844,7 @@ memory/builds/dBackdatedFixture/spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md
 memory/builds/dBackdatedFixture/spec/2026-09-16-spec-DEPL-dBackdatedFixture-2.md	12 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBackdatedFixture/spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md	12 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBackdatedFixture/spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md	4 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/RUN.md	60120 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dBoundRoles/RUN.LANDED.98284ad5.md	60120 bytes	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
 memory/builds/dBoundRoles/build/2026-10-25-build-TOOL-dBoundRoles-1-reuse-scout-c.md	63 files	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-1-crosscheck-returns.md	14 specs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/build/2026-10-26-build-TOOL-dBoundRoles-1-crosscheck-returns.md	7 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -6904,6 +6904,18 @@ memory/builds/dBoundRoles/prompts/2026-11-05-prompt-TOOL-dBoundRoles-20-1-spec-w
 memory/builds/dBoundRoles/prompts/2026-11-05-prompt-TOOL-dBoundRoles-20-owner-forks-cascade.md	49152 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/prompts/2026-11-05-prompt-TOOL-dBoundRoles-3-1-spec-writer.md	49152 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/prompts/2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks.md	49152 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-reground-a-spec-writer.md	1227 lines	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-reground-a-spec-writer.md	2427 lines	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-reground-a-spec-writer.md	59 specs	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-reground-b-spec-writer.md	1227 lines	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-reground-b-spec-writer.md	2427 lines	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-reground-b-spec-writer.md	59 specs	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer.md	1227 lines	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer.md	2427 lines	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer.md	59 specs	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-reground-c-spec-writer.md	1227 lines	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-reground-c-spec-writer.md	2427 lines	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-reground-c-spec-writer.md	59 specs	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-2
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md	10237 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md	156459 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md	20 specs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

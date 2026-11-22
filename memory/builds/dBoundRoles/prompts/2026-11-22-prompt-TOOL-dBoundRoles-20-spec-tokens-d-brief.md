@@ -6,7 +6,7 @@
 
 > /unattended dBoundRoles
 
-— owner, 2026-11-22, starting this build run. `check-spec-tokens.py --spec` over every roster spec reds 42 of 59 specs at
+— owner, 2026-11-22, starting this build run. `check-spec-tokens.py --spec` over every roster spec reds 42 of 59 specs (DERIVED by --plan --paths) at
 `062906ffd`, and `--dispatch` refuses a spec the checker reds. This batch re-grounds its share before any is dispatched.
 
 ## The brief
@@ -22,7 +22,7 @@ Revise each spec named below in place, as a rev bump with one revision-log line 
    - `[guards]`: add the named leg to the Gates leg line, spelled as `tools/gate-legs.json` names it; or, where the
      path is not one the unit writes at HEAD, correct Files touched and say why in the revision-log line.
    - `[cite]`: the citation names a line of `tools/hooks/agent-cap.js` as it stood at the chain baseline `59ff8f2ac`
-     (2427 lines); TOOL-dFairHearing-16 has since moved rules 0, 2 and 5 to the review kit and the file is 1227 lines.
+     (2427 lines at 59ff8f2ac); TOOL-dFairHearing-16 has since moved rules 0, 2 and 5 to the review kit and the file is 1227 lines at 062906ffd.
      Find the cited function or constant at HEAD (`git show 59ff8f2ac:tools/hooks/agent-cap.js | sed -n '<N>p'` names
      it; grep HEAD for that name) and re-point the line, or the range, at where it lives now, in whichever file holds
      it. Where the code the spec relies on is gone or changed in behaviour, re-ground the dependent sentence too and
@@ -32,7 +32,7 @@ Revise each spec named below in place, as a rev bump with one revision-log line 
 3. The specs and their hits:
    - `TOOL-dBoundRoles-20` (`memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-20.md`):
      - [guards] `policy fixtures <- tools/playbook/tag_index.py` — the Files touched list names tools/playbook/tag_index.py, which trips the guard of leg 'policy fixtures', absent from the Gates leg line
-     - [cite] `tools/hooks/agent-cap.js:2157` — file has 1227 lines
+     - [cite] `tools/hooks/agent-cap.js@d4c072df:2157` — file has 1227 lines at 062906ffd
    - `TOOL-dBoundRoles-19` (`memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-19.md`):
      - [guards] `policy fixtures <- tools/roles/kit.toml` — the Files touched list names tools/roles/kit.toml, which trips the guard of leg 'policy fixtures', absent from the Gates leg line
    - `TOOL-dBoundRoles-18` (`memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-18.md`):
@@ -40,7 +40,7 @@ Revise each spec named below in place, as a rev bump with one revision-log line 
    - `TOOL-dBoundRoles-25` (`memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md`):
      - [guards] `playbook render selftest <- tools/lexicon/lexicon.py` — the Files touched list names tools/lexicon/lexicon.py, which trips the guard of leg 'playbook render selftest', absent from the Gates leg line
      - [guards] `policy fixtures <- tools/roles/kit.toml` — the Files touched list names tools/roles/kit.toml, which trips the guard of leg 'policy fixtures', absent from the Gates leg line
-     - [cite] `tools/hooks/agent-cap.js:2089` — file has 1227 lines
+     - [cite] `tools/hooks/agent-cap.js@d4c072df:2089` — file has 1227 lines at 062906ffd
    - `TOOL-dBoundRoles-43` (`memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-43.md`):
      - [guards] `policy fixtures <- tools/roles/roles_lib.py` — the Files touched list names tools/roles/roles_lib.py, which trips the guard of leg 'policy fixtures', absent from the Gates leg line
    - `TOOL-dBoundRoles-44` (`memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-44.md`):
@@ -49,7 +49,7 @@ Revise each spec named below in place, as a rev bump with one revision-log line 
      - [guards] `policy fixtures <- tools/roles/roles_lib.py` — the Files touched list names tools/roles/roles_lib.py, which trips the guard of leg 'policy fixtures', absent from the Gates leg line
    - `TOOL-dBoundRoles-58` (`memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-58.md`):
      - [guards] `policy fixtures <- tools/roles/roles_lib.py` — the Files touched list names tools/roles/roles_lib.py, which trips the guard of leg 'policy fixtures', absent from the Gates leg line
-     - [cite] `tools/hooks/agent-cap.js:2051` — file has 1227 lines
+     - [cite] `tools/hooks/agent-cap.js@d4c072df:2051` — file has 1227 lines at 062906ffd
    - `TOOL-dBoundRoles-60` (`memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-60.md`):
      - [guards] `govkit selftest <- tools/govkit/registry.toml` — the Files touched list names tools/govkit/registry.toml, which trips the guard of leg 'govkit selftest', absent from the Gates leg line
      - [guards] `govkit refusal join <- tools/govkit/registry.toml` — the Files touched list names tools/govkit/registry.toml, which trips the guard of leg 'govkit refusal join', absent from the Gates leg line

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-3 — the work order rendered per item, hashed into the spawn marker and bound to its act
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0168@abfd5f4f whole
 **Carries:** node:record-kind.work-order
@@ -67,7 +67,7 @@ card (I12). Today the work order names no checklist item, allowance or witness k
   (`handoff.py:420-421`) covers them, and the marker carries the item's tag in `item=`. Observed by
   AC1.
 - **S5** — Bound to its act, the stand-in binding record: rule 6's `checkHandoffSpawn`
-  (`tools/hooks/agent-cap.js:691-750`) admits a work order whose marker carries an `item=` other
+  (`tools/hooks/agent-cap.js@935a910d:691-750`) admits a work order whose marker carries an `item=` other
   than `-` only when the session's orientation card, read through scratch-guard's exported `readCard`
   and `extractRouteUnits` (`tools/hooks/scratch-guard.js:667`, `:839`), routes the marker's `unit=`;
   otherwise it refuses, naming the unit and the card. A marker whose `item=` is `-` or absent is
@@ -302,12 +302,13 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · an item work order spawn
   `tools/hooks/agent-cap.js` (691-750), the function unchanged in behaviour; the §7 leg line gains
   `format-guard self-test` and `policy fixtures`, the legs whose guards the Files touched paths
   `tools/hooks/agent-cap.js` and `tools/roles/roles_lib.py` trip.
+- rev-6 · 2026-11-22 · §2 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; nothing else moved.
 
 ## 10. Reuse audit
 
 The seams extended: `render_handoff`'s block list (`tools/roles/handoff.py:396-416`), where every
 block of a task is added, and its marker writer (`:420-421`); `check_handoff` (`:426-450`); rule 6's
-`checkHandoffSpawn` (`tools/hooks/agent-cap.js:691-750`), which already compares the prompt and the
+`checkHandoffSpawn` (`tools/hooks/agent-cap.js@935a910d:691-750`), which already compares the prompt and the
 task-sha; `readCard` and `extractRouteUnits` (`tools/hooks/scratch-guard.js:667`, `:839`), exported and
 already used for the write gate's route; `WRITE_FOLDERS` (`tools/roles/check_roles.py:99-101`) for the
 allowance folders. `python tools/codebase-map/reuse_lookup.py "render a role's work order for one

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-26 — the typed refusal return: its rule, its remedy and the remedy's actor, routed at once and never re-offered
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0191@66acd199 whole
 
@@ -262,7 +262,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC4 · `--refused` with `
   A's row for cl-0191, the stall-and-loop record's item 7, and TOOL-dDeclaredLoop-14 and -30 at base
   `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
-- rev-3 · 2026-11-22 · §7 · §10 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `scratch-guard self-test`, `tier2-review self-test`, `policy fixtures`, as `tools/unattended/unattended.sh` and `tools/roles/roles_lib.py` in Files touched trip their guards; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up with its behaviour unchanged, so the cites re-point at HEAD, `renderHandoffDeny` now at `tools/hooks/agent-cap.js:679-688`; nothing else moved.
+- rev-3 · 2026-11-22 · §7 · §10 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `scratch-guard self-test`, `tier2-review self-test`, `policy fixtures`, as `tools/unattended/unattended.sh` and `tools/roles/roles_lib.py` in Files touched trip their guards; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up (DERIVED: baseline line 2089 less HEAD line 691) with its behaviour unchanged, so the cites re-point at HEAD, `renderHandoffDeny` now at `tools/hooks/agent-cap.js@935a910d:679-688`; nothing else moved.
+- rev-4 · 2026-11-22 · §9 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; each figure the re-ground wrote carries a pin on its line; nothing else moved.
 
 ## 10. Reuse audit
 
@@ -270,7 +271,7 @@ No existing seam fits the outcome table: `python tools/codebase-map/reuse_lookup
 remedy to the actor who can perform it"` ranked name stems (`refusal` in `tools/memory-recall/recall_conf.py`,
 `DesignRefusal` in `tools/memory-tree/design_lib.py`, `remedy` in `tools/memory-tree/check-verdict-epoch.sh`,
 the `Refusal` exception classes), each a refusal raised in its own tool, none routing one; scout A's probe
-found `remedy` only as prose in deny strings (`tools/hooks/agent-cap.js:679-688`, `renderHandoffDeny`).
+found `remedy` only as prose in deny strings (`tools/hooks/agent-cap.js@935a910d:679-688`, `renderHandoffDeny`).
 The record extends TOOL-dDeclaredLoop-14 S2's `refusal` row and `park` (`tools/unattended/unattended.sh:12533`);
 the arm's home is unit 2's kind file; the owner branch extends unit 11's reader. The recall probe returned the
 night-pass instruments' clause text, scout A's row and the as-built view's clause, none disagreeing with

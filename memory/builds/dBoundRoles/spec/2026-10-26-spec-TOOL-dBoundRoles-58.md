@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-58 — the 35 minors of auditing units 45 to 51: criteria passable on a correct build, one typed set and one block reader at spawn, one extents record at render, the H1 parity's consumers, and AMENDED answers naming a revision
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 32 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 32 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -136,7 +136,7 @@ where the report merged several into one item.
 - **S21** — id 42. `check_authored_lines` splits a typed value on `\n` only and deletes every `\r` from
   each line before matching, as `extract_prompt_marker` (`tools/roles/roles_lib.py:252`) and
   `extractHandoffMarker` do. Observed by AC21.
-  **Readers:** by name: `tools/roles/roles_lib.py:252` and `tools/hooks/agent-cap.js:653`, the two
+  **Readers:** by name: `tools/roles/roles_lib.py:252` and `extractHandoffMarker` at tools/hooks/agent-cap.js@935a910d:653, the two
   readers that already delete each carriage return and whose split S21 copies, and
   `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-45.md`, whose S2 states the rule
   whose line split S21 fixes; no name leaves the tree. by value: NO VALUE READERS — the carriage return
@@ -424,9 +424,10 @@ New arm: tools/govkit/selftest.py · covers AC31 · the shared seed predicate, s
   The H1 is shortened to fit the build index's row cap after the DEFERRED flip; nothing else moved.
 - rev-4 · 2026-11-22 · §7 · S21 · the leg line gains `policy fixtures`, whose guard holds
   `tools/roles/roles_lib.py` that §4 Files touched names; S21's reader citation is re-pointed from the
-  2427-line file's `:2051` to `tools/hooks/agent-cap.js:653` at `062906ffd`, the same carriage-return
+  2427-line file's `:2051` to `tools/hooks/agent-cap.js@935a910d:653` at `062906ffd`, the same carriage-return
   strip in `extractHandoffMarker`, TOOL-dFairHearing-16 having moved rules 0, 2 and 5 out, by
   `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
+- rev-5 · 2026-11-22 · §2 · §9 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, and S21's **Readers:** by-name half names that reader by its `extractHandoffMarker` with the pin beside it, so the hygiene readers grade still finds a reader spelling that token; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-46 — the spawn guard holds a typed block to the authored-line rule: a fact, marker or `Framed by:` line in `input:question` or `input:diff`, or a fence left open there, is denied
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -76,12 +76,12 @@ rule the render applies. It repairs `TOOL-dBoundRoles-38`'s spawn half and build
 Read at base `462d20f3` on 2026-10-26, the `agent-cap.js` line numbers re-pointed to HEAD on
 2026-11-22 over code unchanged since:
 
-- `tools/hooks/agent-cap.js:650-658` walks every line of a prompt for its marker, and
+- `tools/hooks/agent-cap.js@935a910d:650-658` walks every line of a prompt for its marker, and
   `checkHandoffSpawn` counts markers on the prompt (`:704-705`) and on the file (`:718-719`);
   `TOOL-dBoundRoles-38` S4 makes both fence-aware and adds the fact re-cut's fence-aware read.
 - `tools/roles/handoff.py:98-99` declares the four input names and the two path inputs; a kit file may
   not import another kit's code, so the hooks kit spells the two typed names once, with the source cited.
-- The guard compares the file's task-sha with its marker (`agent-cap.js:737-738`), which proves the
+- The guard compares the file's task-sha with its marker (`tools/hooks/agent-cap.js@935a910d:737-738`), which proves the
   file is unedited since its marker was written, not that the render wrote it.
 
 ### Why the same rule twice
@@ -189,12 +189,13 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC1 AC2 AC3 · a rule-6 payload
   `tools/workflows/spec-audit-optin.js`, to 788, so agent-cap still requires scratch-guard's exports.
   The §7 leg line gains `format-guard self-test` and `policy fixtures`, the legs whose guards the Files
   touched path `tools/hooks/agent-cap.js` trips.
+- rev-5 · 2026-11-22 · §4 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; nothing else moved.
 
 ## 10. Reuse audit
 
 The seams are `checkHandoffSpawn` in `tools/hooks/agent-cap.js` and `TOOL-dBoundRoles-38`'s
 `readUnfencedLines` in `scratch-guard.js`'s exports, which `agent-cap.js` already requires
-(`agent-cap.js:788`). `python tools/codebase-map/reuse_lookup.py "spawn guard denies a prompt file block carrying a forged line"`
+(`tools/hooks/agent-cap.js@935a910d:788`). `python tools/codebase-map/reuse_lookup.py "spawn guard denies a prompt file block carrying a forged line"`
 ranked `check_line`, `render_line`, `corpus_files` and `parse_conf_line`, none a block check in the hooks
 kit, so no existing seam fits beyond the guard and the walker.
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-25 — the spawn guard and harness admission moved into the roles pack, admission held to the landed blob, `tools/hooks/agent-cap.js` retired with an upgrade step
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0190@03bbbf1e whole
 
@@ -169,14 +169,14 @@ them.
 
 ### Evidence at base `4ed9e567`
 
-- Rule 6 is `checkHandoffSpawn` (at `062906ffd` `tools/hooks/agent-cap.js:691-750`, :2089-2149 at
+- Rule 6 is `checkHandoffSpawn` (at `062906ffd` `tools/hooks/agent-cap.js@935a910d:691-750`, :2089-2149 at
   base) and `checkHarnessCall` (:2157-2188) over `HANDOFF_MARK_RE` (:2044). `main()` runs it at
   :2269-2295, importing `loadRoleIndex`, `resolveRoleRoot` and `buildComparablePath` from
   `tools/hooks/scratch-guard.js` (:952, :1396, :166, exported at :1615).
 - Admission matches the path only: `checkHarnessCall` resolves `scriptPath` to a root-relative path
   and compares it with the index's `harnesses` list (:2166-2175). Nothing reads the file's bytes.
 - `main()` is called unguarded at :2427. scratch-guard runs `main()` only as the entry point (:1614).
-- Since base: at `062906ffd` `checkHarnessCall` is `tools/hooks/agent-cap.js:759-780` and hands the
+- Since base: at `062906ffd` `checkHarnessCall` is `tools/hooks/agent-cap.js@935a910d:759-780` and hands the
   path compare to `resolveHarnessEntry` (:785-800), which rule 8 shares, admitting the same calls; the
   file exports through `module.exports` (:1104) and runs `main()` only as the entry point (:1113).
 - The hooks kit's descriptor is registry entry `agent-cap` (`tools/hooks/kit.toml:3`). Its version is
@@ -527,6 +527,7 @@ New arm: tools/check-wiring.test.sh · covers AC10 · a scratch settings file wi
   (TOOL-aGuardedEffort-1), and the file now exports through `module.exports` and runs `main()` only as
   the entry point, by `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else
   moved.
+- rev-7 · 2026-11-22 · §4 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; nothing else moved.
 
 ## 10. Reuse audit
 
