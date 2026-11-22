@@ -21,6 +21,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   (`build/2026-11-22-build-TOOL-dBoundRoles-1-1-builder-return.md`): AC1's scratch and the suite fixture carry
   `tools/playbook/layers.toml` at the home `playbook` (§8 F11), and `tools/roles/adopt-roles.test.sh` joined Files
   touched. Declare `.claude/roles.json` and `help/reference/kinds.md` by `--dispatch` if you write them.
+- Rev-8 then folded the second builder's divergence
+  (`build/2026-11-22-build-TOOL-dBoundRoles-1-2-builder-return.md`): `load_role_schema`'s key grammar widens to a
+  hyphenated word so the `acts-as` row loads (§8 F12), and `tools/roles/roles_lib.py` joined Files touched.
 - Rendering the new and merged agent types changes `.claude/agents/`; the running session cannot spawn a changed
   type until a new session starts, which is expected and not yours to fix.
 

@@ -83,3 +83,8 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T07:02:18Z draw · re-dispatch · TOOL-dBoundRoles-1 · 11/122 · 20261122T070218Z-92ebad
 
 2026-11-22T07:02:18Z dispatch · item c3122581 TOOL-dBoundRoles-1 · reason tools/roles/agents tools/roles/house tools/roles/kit.toml tools/roles/role-schema.toml tools/roles/check_roles.py tools/roles/render_agents.py tools/roles/workflows.toml tools/roles/README.md tools/roles/adopt-roles.test.sh tools/playbook/layers.toml tools/playbook/check_layers.py tools/playbook/adopt-playbook.sh tools/playbook/kinds.toml tools/loop/loop_items.py tools/loop/loop.toml tools/loop/factories.py tools/workflows/kit.toml help/loop.md help/reference/drive.md AGENTS.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-1-1-acceptance-ledger.md
+
+2026-11-22T07:41:17Z brief · item TOOL-dBoundRoles-1 · reason 966cd75406f6 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-1-build-brief.md
+2026-11-22T07:43:58Z draw · re-dispatch · TOOL-dBoundRoles-1 · 12/122 · 20261122T074358Z-ebf411
+
+2026-11-22T07:43:58Z dispatch · item b1323a67 TOOL-dBoundRoles-1 · reason tools/roles/agents tools/roles/house tools/roles/kit.toml tools/roles/role-schema.toml tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/render_agents.py tools/roles/workflows.toml tools/roles/README.md tools/roles/adopt-roles.test.sh tools/playbook/layers.toml tools/playbook/check_layers.py tools/playbook/adopt-playbook.sh tools/playbook/kinds.toml tools/loop/loop_items.py tools/loop/loop.toml tools/loop/factories.py tools/workflows/kit.toml help/loop.md help/reference/drive.md AGENTS.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-1-1-acceptance-ledger.md
