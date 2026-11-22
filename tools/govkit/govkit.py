@@ -797,7 +797,7 @@ def resolve_measurer_currency(root: pathlib.Path, to_commit: str) -> tuple[str, 
                                    f"advertises {head[:8]}"))
 
 
-def resolve_entry_version_at(root: pathlib.Path, desc: dict, commit: str) -> str:
+def resolve_entry_version_at(root: pathlib.Path, desc: dict, commit: str, batch=None) -> str:
     """`entry_version`, resolved AT A COMMIT rather than in the working tree.
 
     DEPL-dGaugedVintage-9 S1. `update --to <rev>` can name a commit that is not HEAD, and stamping a
@@ -809,7 +809,7 @@ def resolve_entry_version_at(root: pathlib.Path, desc: dict, commit: str) -> str
         return "(none declared)"
     home = (desc.get("home") or "").rstrip("/")
     src = f"{home}/{vf['file']}" if home else vf["file"]
-    data = blob_at(root, commit, src)
+    data = blob_at(root, commit, src, batch=batch)
     if data is None:
         return "(unresolvable)"
     try:
@@ -1163,8 +1163,8 @@ def read_registry_at(root: pathlib.Path, commit: str) -> tuple[dict | None, str]
         return None, f"{rel} at {commit[:8]} does not parse ({e})"
 
 
-def read_requires_at(root: pathlib.Path, commit: str,
-                     ids: list[str]) -> tuple[dict[str, tuple[dict, str]], dict[str, str]]:
+def read_requires_at(root: pathlib.Path, commit: str, ids: list[str],
+                     batch=None) -> tuple[dict[str, tuple[dict, str]], dict[str, str]]:
     """TOOL-dDeclaredLoop-73 S2: each id's `requires` as gov holds it AT `commit`, `(descs_at, unknown)`.
 
     The descriptor path is the registry's at that commit, so a descriptor that moved is read where
@@ -1184,7 +1184,7 @@ def read_requires_at(root: pathlib.Path, commit: str,
             continue
         dpath = resolve_prefix_token(paths[eid] or "", tr)
         try:
-            desc = read_descriptor_at(root, commit, dpath)
+            desc = read_descriptor_at(root, commit, dpath, batch=batch)
         except Refusal as e:
             unknown[eid] = str(e)
             continue
@@ -4115,13 +4115,152 @@ ADOPTER_BAR_PATHS = ('gr["file"]', 'receipt_path', '"install.sums"')
 write_atomic = upgrade_steps.write_atomic
 
 
-def write_install_receipt(target: pathlib.Path, receipt_path: pathlib.Path, doc: dict) -> None:
+def derive_kit_attestations(root: pathlib.Path, to_commit: str) -> list[dict]:
+    """TOOL-dQuietDisk-14 S1 to S4. Which kits gov's own green held runs proved, by content.
+
+    One `{"kit", "digest", "gov_commit", "sources", "legs"}` per entry whose every `subject = "kit"`
+    `[[gate_leg]]` holds a held-tier record, `<git common dir>/gate-selftest-last/<name key>`, the
+    file `run-gates.sh` writes after a first-attempt green on a clean, unmoved tree. The record's
+    `row` must equal the runner's row hash of the leg's current manifest row, and every attested
+    `(source, gov_oid)` pair, the entry's `EPOCH_ROLES` survivors and those of every entry it
+    requires transitively, must name the same blob at the record's `sha` as at `to_commit`. The
+    digest is the SHA-256 of the sorted `<source>TAB<gov_oid>LF` lines; `sources` is that list.
+
+    The record's `sha` is read for blob identity only, never as a verdict. The survivors come from
+    the working tree's descriptors, as `cmd_shipped` resolves them, so a `to_commit` other than
+    HEAD answers `[]`. A failure at any step costs that entry its attestation, never the caller's
+    write, and every blob is asked through one `git cat-file --batch-check`.
+    """
+    root = pathlib.Path(root)
+    try:
+        if git(root, "rev-parse", "HEAD").strip() != to_commit:
+            return []
+        descs = read_shipped_descriptors(root)
+        manifest = json.loads(resolve_tool_path(root, "gate-legs.json").read_text(encoding="utf-8"))
+        common = pathlib.Path(git(root, "rev-parse", "--git-common-dir").strip())
+    except (Refusal, OSError, ValueError):
+        return []
+    rows = {str(m.get("name")): m for m in manifest if isinstance(m, dict)} \
+        if isinstance(manifest, list) else {}
+    held = (common if common.is_absolute() else root / common) / "gate-selftest-last"
+    # THE RUNNER'S ROW HASH, its declarative keys read from their one home beside the runner, loaded
+    # by path as `regen.py` is. Where that file will not load, the whole row is hashed, the runner's
+    # own fallback, so a record earned under the tuple reads stale rather than attesting.
+    keys: tuple = ()
+    rg_home = (descs.get("run-gates", ({}, ""))[0].get("home") or "").rstrip("/")
+    if rg_home and (root / rg_home / "held_halves.py").is_file():
+        saved = list(sys.path)
+        try:
+            spec = importlib.util.spec_from_file_location(
+                "gov_held_halves", str(root / rg_home / "held_halves.py"))
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            keys = tuple(mod.DECLARATIVE_LEG_KEYS)
+        except Exception:
+            keys = ()
+        finally:
+            sys.path[:] = saved
+    legs = {eid: [g for g in (d.get("gate_leg") or []) if isinstance(g, dict) and g.get("subject") == "kit"]
+            for eid, (d, _p) in descs.items()}
+    legs = {eid: gs for eid, gs in legs.items() if gs}
+    # The `requires` closure at `to_commit`, through the one vintage reader; `None` is unknown.
+    requires: dict[str, list[str] | None] = {}
+    frontier = sorted(legs)
+    while frontier:
+        try:
+            at, unknown = read_requires_at(root, to_commit, frontier)
+        except Refusal:
+            at, unknown = {}, {e: "" for e in frontier}
+        for e in frontier:
+            requires[e] = None if e in unknown or e not in at else [str(x) for x in at[e][0]["requires"]]
+        frontier = sorted({x for e in frontier for x in (requires[e] or []) if x not in requires})
+    survivors: dict[str, set[str] | None] = {}
+    candidates: dict[str, tuple[set[str], list[dict]]] = {}
+    for eid in sorted(legs):
+        members, todo = {eid}, [eid]
+        while todo:
+            nxt = requires.get(todo.pop())
+            if nxt is None:
+                members = set()
+                break
+            todo += [x for x in nxt if x not in members]
+            members |= set(nxt)
+        srcs: set[str] = set()
+        for m in sorted(members):
+            if m not in survivors:
+                try:
+                    survivors[m] = {row["src"] for row in resolve_entry(
+                        root, descs[m][0], canonical_ctx(m))["survivors"]
+                        if row.get("src") and row["role"] in EPOCH_ROLES} if m in descs else None
+                except Refusal:
+                    survivors[m] = None
+            if survivors[m] is None:
+                srcs = set()
+                break
+            srcs |= survivors[m]
+        evidence: list[dict] = []
+        for g in legs[eid] if srcs else []:
+            name = str(g.get("name"))
+            try:
+                lines = (held / hashlib.sha1(name.encode()).hexdigest()[:16]).read_text(
+                    encoding="utf-8").splitlines()
+            except OSError:
+                break
+            rec = dict(ln.rstrip("\r").split("\t", 1) for ln in lines if "\t" in ln)
+            row = rows.get(name)
+            if row is None or not rec.get("sha") or rec.get("row") != hashlib.sha1(json.dumps(
+                    {k: v for k, v in row.items() if k not in keys}, sort_keys=True).encode()).hexdigest():
+                break
+            evidence.append({"name": name, "sha": rec["sha"], "row": rec["row"]})
+        else:
+            if srcs and evidence:
+                candidates[eid] = (srcs, evidence)
+    asks = sorted({f"{c}:{s}" for srcs, ev in candidates.values()
+                   for c in {to_commit, *(e["sha"] for e in ev)} for s in srcs if "\n" not in s})
+    if not asks:
+        return []
+    out = subprocess.run(["git", "-C", str(root), "cat-file", "--batch-check"], capture_output=True,
+                         input="".join(f"{a}\n" for a in asks).encode("utf-8"), check=False)
+    answers = out.stdout.decode("utf-8", "replace").splitlines() if out.returncode == 0 else []
+    oids = {a: ans.split()[0] for a, ans in zip(asks, answers)
+            if len(ans.split()) == 3 and ans.split()[1] == "blob"}
+    attestations: list[dict] = []
+    for eid, (srcs, ev) in sorted(candidates.items()):
+        pairs = sorted((s, oids.get(f"{to_commit}:{s}")) for s in srcs)
+        if any(o is None for _s, o in pairs) or any(
+                oids.get(f"{e['sha']}:{s}") != o for e in ev for s, o in pairs):
+            continue
+        attestations.append({
+            "kit": eid,
+            "digest": hashlib.sha256("".join(f"{s}\t{o}\n" for s, o in pairs).encode("utf-8")).hexdigest(),
+            "gov_commit": to_commit, "sources": [[s, o] for s, o in pairs], "legs": ev})
+    return attestations
+
+
+def write_install_receipt(target: pathlib.Path, receipt_path: pathlib.Path, doc: dict,
+                          attest: tuple[pathlib.Path, str] | None = None) -> list[dict] | None:
     """Write `.governance/install.sums` from every `doc["files"]` row carrying `sha256`, then the
     receipt `doc` at `receipt_path`, each through `write_atomic` and in that order
-    (TOOL-dRedressedBar-19 S40). The one writer of the pair (TOOL-dSafePassage-62 S2)."""
+    (TOOL-dRedressedBar-19 S40). The one writer of the pair (TOOL-dSafePassage-62 S2).
+
+    TOOL-dQuietDisk-14 S5. With `attest=(root, to_commit)` the top-level `attestations` key is set
+    from `derive_kit_attestations` before the write, replacing any the document held, and the list
+    is returned for the caller's count line. A key new to the document goes before `steps`, which
+    stays the receipt's last key. Without it the document is written as given and None returned;
+    `install.sums` is derived from `files` alone either way."""
+    att = None
+    if attest is not None:
+        att = derive_kit_attestations(*attest)
+        if "attestations" not in doc and "steps" in doc:
+            steps = doc.pop("steps")
+            doc["attestations"] = att
+            doc["steps"] = steps
+        else:
+            doc["attestations"] = att
     write_atomic(target / ".governance" / "install.sums",
                  "".join(f"{f['sha256']}  {f['path']}\n" for f in doc["files"] if "sha256" in f))
     write_atomic(receipt_path, json.dumps(doc, indent=2) + "\n")
+    return att
 
 
 def derive_receipt_schema(prior) -> dict:
@@ -6198,12 +6337,15 @@ def remove_wired_fragments(target: pathlib.Path, rows: list[dict], frags: list[s
     return unwired
 
 
-def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
-    """Parse the target's runner output into leg name -> green|red|skipped.
+def read_gate_verdicts(target: pathlib.Path, gr: dict, reuse: bool = False) -> dict[str, str]:
+    """Parse the target's runner output into leg name -> one of the OBSERVED_STATES.
 
     Run WITHOUT the run-everything escape, deliberately. Running both reads with it doubles the
     target's whole bar AND makes the dead-probe check unreachable, because with every guard
     overridden no leg can report skipped — a liveness half the regime forbids is not one.
+
+    TOOL-dQuietDisk-18 S1: with `reuse` the runner also gets `GATE_REUSE=1`, so a leg whose input key
+    holds an `ok` in the target's reuse cache prints as `reused` rather than executing again.
     """
     cmd = gr.get("command") or []
     if not cmd:
@@ -6217,7 +6359,7 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     # leg line when a declared output is stale, and both reads then parsed an empty map, with which apply
     # could certify an install it never compared. Skipped, a stale output reads as its own leg's red.
     out = subprocess.run(resolve_shell_argv(list(cmd)), cwd=str(target), capture_output=True, text=True,
-                         env=dict(os.environ, GATE_REGEN_CHECK="0"))
+                         env=dict(os.environ, GATE_REGEN_CHECK="0", **({"GATE_REUSE": "1"} if reuse else {})))
     verdicts: dict[str, str] = {}
     for state, key in OBSERVED_STATES:
         for tmpl in (gr.get(key) or []):
@@ -6229,6 +6371,38 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
                 if line.startswith(head) and len(line) > len(head):
                     verdicts.setdefault(line[len(head):].strip().split("  ")[0].strip(), state)
     return verdicts
+
+
+def derive_leg_state(state: str | None) -> str | None:
+    """TOOL-dQuietDisk-18 S3, S4: a leg the runner REUSED is a green one, and every other state is
+    itself. The reuse cache holds only `ok` entries, so a reused leg was proven green under the same
+    input key; every test of a before state, and the receipt's two maps, read through this."""
+    return "green" if state == "reused" else state
+
+
+def read_baseline_mode(target: pathlib.Path, gr: dict) -> str:
+    """TOOL-dQuietDisk-18 S5: `reuse` when the target's `install.baseline` answers `reuse` and its
+    `[gate_runner]` declares a non-empty `observed_reused`, else `run`, with one line naming why.
+
+    A failed read costs a saving and never a verdict, so unlike `read_retired_edits_mode` nothing
+    here refuses. The template is tested first: a runner whose reused legs cannot be parsed would
+    drop them from both maps, and a leg skipped after a green one would no longer be refused."""
+    if not gr.get("observed_reused"):
+        print("govkit apply — the baseline reads in the `run` mode: this target's [gate_runner] "
+              "declares no observed_reused, so a reused leg could not be parsed")
+        return "run"
+    try:
+        value, source, reason = read_policy_value("install.baseline", target)
+    except (LookupError, Refusal) as exc:
+        why = (str(exc).strip().splitlines() or [""])[0]
+        print(f"govkit apply — the baseline reads in the `run` mode: install.baseline could not be "
+              f"read: {why}")
+        return "run"
+    if value == "reuse":
+        return "reuse"
+    print(f"govkit apply — the baseline reads in the `run` mode: install.baseline = {value!r} "
+          f"({source}: {reason})")
+    return "run"
 
 
 def resolve_stand_down(hole: dict, selection: list[str], owned: frozenset | set = frozenset(),
@@ -7718,23 +7892,31 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- came from are printed and recorded, and a CHANGE to either re-prompts.
     before_map: dict[str, str] = {}
     baseline = {"kind": gr.get("kind", "absent")}
+    # TOOL-dQuietDisk-18 S2: ONE mode, read once, for both reads, so the two maps stay comparable.
+    reuse = False
     if gr.get("kind") == "manifest":
         print(f"govkit apply — the baseline will RUN, from this target's own .governance/deploy.toml:"
               f"\n                 {' '.join(gr.get('command') or [])}")
+        reuse = read_baseline_mode(target, gr) == "reuse"
+        if reuse:
+            print("govkit apply — the baseline will RUN, reusing each leg the target's reuse cache "
+                  "holds green")
         step(STEP_BASELINE, "reading the target's own runner")
-        before_map = read_gate_verdicts(target, gr)
-        baseline["legs"] = before_map
+        before_map = read_gate_verdicts(target, gr, reuse=reuse)
+        # S4: the receipt's copy says `green` for a reused leg; `before_map` keeps the runner's word.
+        baseline["legs"] = {n: derive_leg_state(v) for n, v in before_map.items()}
         # A map with nothing green or red carries no information — every leg after the install
         # would land in the row that carries the exemptions. `held` joins `skipped` here by being
         # absent from the green/red test, which is what makes an all-held baseline refuse rather
-        # than sail through on an empty map. TOOL-dUnstalledConvoy-26.
-        if before_map and not any(v in ("green", "red") for v in before_map.values()):
+        # than sail through on an empty map. TOOL-dUnstalledConvoy-26. A REUSED leg is green
+        # (TOOL-dQuietDisk-18 S3), so an all-reused baseline is no dead probe.
+        if before_map and not any(derive_leg_state(v) in ("green", "red") for v in before_map.values()):
             raise Refusal(
                 "DEAD PROBE: the baseline read parsed legs but not one of them is green or red — a "
                 "map that is entirely skipped carries no information, and every leg after the "
                 "install would land in the row that carries the exemptions. Refusing rather than "
                 "rerouting the whole install into its most forgiving branch")
-        reds = [n for n, v in before_map.items() if v == "red"]
+        reds = [n for n, v in before_map.items() if derive_leg_state(v) == "red"]
         if reds and (deploy.get("policy") or {}).get("on_baseline_red") == "refuse":
             raise Refusal(f"on_baseline_red = refuse and these legs are already red before this "
                           f"install: {', '.join(sorted(reds))}")
@@ -8424,9 +8606,11 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     after_map: dict[str, str] = {}
     if gr.get("kind") == "manifest":
         step(STEP_AFTER, "re-reading the target's runner")
-        after_map = read_gate_verdicts(target, gr)
+        after_map = read_gate_verdicts(target, gr, reuse=reuse)
         for nm in sorted(set(before_map) | set(after_map)):
-            b, a2 = before_map.get(nm), after_map.get(nm)
+            # TOOL-dQuietDisk-18 S3: a leg reused before is green before; the after side keeps the
+            # runner's own word, so a reuse after still prints the carried note below.
+            b, a2 = derive_leg_state(before_map.get(nm)), after_map.get(nm)
             if b == "green" and a2 == "red":
                 r.fail(f"leg '{nm}' was green before this install and is red after")
             elif b == "green" and a2 == "held":
@@ -8466,11 +8650,15 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # alone, a narrower apply dropped a carried kit's hole and machine orders while keeping its claim,
     # so `check` stopped reporting its machine destination and verifying its outbox files.
     _rcpt_doc.update({
-        "files": rows + _carried_rows, "orders": orders + _carried_orders, "after": after_map,
+        # TOOL-dQuietDisk-18 S4: `after` records a reused leg as `green`, so the receipt is the same
+        # bytes whichever legs the runner's sample drew, and the same a `run` apply writes.
+        "files": rows + _carried_rows, "orders": orders + _carried_orders,
+        "after": {n: derive_leg_state(v) for n, v in after_map.items()},
         "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
                         "emitted": emitted, "legs_withheld": _legs_withheld}})
     # TOOL-dRedressedBar-19 S40: the sidecar first, the receipt last, each through `write_atomic`.
-    write_install_receipt(target, receipt_path, _rcpt_doc)
+    _att = write_install_receipt(target, receipt_path, _rcpt_doc, attest=(root, commit))
+    print(f"govkit apply — attestations: {len(_att)} kit(s) attested at {commit[:8]}")
     if _carried_kits:
         print(f"govkit apply — receipt KEEPS {len(_carried_kits)} kit(s) this selection did not "
               f"name, with their {len(_carried_rows)} row(s) verbatim: {', '.join(_carried_kits)}")
@@ -9164,7 +9352,7 @@ def derive_rename_map(root: pathlib.Path, base_commit: str | None, to_commit: st
 def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit: str,
                  index: dict[str, tuple[str, str]],
                  needles: dict[str, str] | None = None,
-                 rename=None, *, gov_absent: bool = False) -> dict:
+                 rename=None, *, gov_absent: bool = False, batch=None) -> dict:
     """One receipt row's verdict, from three identities. TWO of them are git blob OIDs.
 
     `gov_absent` reads gov's side absent whatever gov holds at the row's `source`: a `seed` row whose kit
@@ -9203,8 +9391,8 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
     three are `None` on every other verdict.
     """
     src, base_commit = row.get("source"), row.get("commit")
-    theirs = None if gov_absent else (blob_at(root, to_commit, src) if src else None)
-    base = blob_at(root, base_commit, src) if (src and base_commit) else None
+    theirs = None if gov_absent else (blob_at(root, to_commit, src, batch=batch) if src else None)
+    base = blob_at(root, base_commit, src, batch=batch) if (src and base_commit) else None
     entry = index.get(row["path"])
     ours_oid = entry[1] if entry else None
     gov_oid = row.get("gov_oid")
@@ -9264,7 +9452,7 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
     # registry and no target descriptor, and giving it one would make it a second resolver.
     moved = rename(row) if (rename is not None and src
                             and t_state == "absent" and o_state != "absent") else None
-    theirs_new = blob_at(root, to_commit, moved[0]) if moved else None
+    theirs_new = blob_at(root, to_commit, moved[0], batch=batch) if moved else None
     if moved and theirs_new is None:
         moved = None          # git named the pair and gov's tree has no blob there: not actionable
     if moved and carry != "verbatim" and read_ours() is None:
@@ -9415,7 +9603,7 @@ def write_conflict_candidate(outbox: pathlib.Path, row: dict, base: bytes, ours:
 
 
 def measure_rendered_rows(root: pathlib.Path, target: pathlib.Path, rows: list[dict],
-                          to_commit: str, resolve_version) -> list[tuple[dict, str | None]]:
+                          to_commit: str, resolve_version, batch=None) -> list[tuple[dict, str | None]]:
     """Re-measure each `rendered` receipt row from the bytes its render left on disk, in place.
 
     DEPL-dRemeasuredRender-1 S1. `update` caps a rendered row at `re-rendered` and lets the kit's
@@ -9449,7 +9637,7 @@ def measure_rendered_rows(root: pathlib.Path, target: pathlib.Path, rows: list[d
             continue
         row["sha256"] = _sha(dp.read_bytes())
         row["oid"] = oid
-        tmpl = blob_at(root, to_commit, str(row["source"])) if row.get("source") else None
+        tmpl = blob_at(root, to_commit, str(row["source"]), batch=batch) if row.get("source") else None
         if tmpl is not None:
             row["gov_oid"] = blob_oid(tmpl)
             row["commit"] = to_commit
@@ -9625,18 +9813,22 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
                write_withdrawals: bool = False,
                kits: list[str] | None = None, accept_role_moves: bool = False,
                rollback: bool = False) -> int:
-    """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
+    """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists. One gov blob
+    handle serves every receipt-row read the run makes, and the `finally` that releases the lock
+    stops its process (TOOL-dQuietDisk-16 S3)."""
+    batch = upgrade_steps.build_blob_batch(root)
     try:
         return _cmd_update(root, target, to_rev, write, write_withdrawals, kits, accept_role_moves,
-                           rollback)
+                           rollback, batch=batch)
     finally:
+        batch.remove_process()
         release_write_lock()
 
 
 def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                 write_withdrawals: bool = False,
                 kits: list[str] | None = None, accept_role_moves: bool = False,
-                rollback: bool = False) -> int:
+                rollback: bool = False, *, batch=None) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
@@ -9746,7 +9938,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # refreshed to new bytes kept the version it landed at — reproduced by aTetheredConvoy F6.
     def _resolve_ver_at(_row: dict) -> str:
         _d = descs.get(_row.get("kit") or "")
-        return resolve_entry_version_at(root, _d[0], to_commit) if _d else _row.get("version", "")
+        return resolve_entry_version_at(root, _d[0], to_commit, batch=batch) if _d else _row.get("version", "")
 
     if base_commit:
         chk = subprocess.run(["git", "-C", str(root), "cat-file", "-e", f"{base_commit}^{{commit}}"],
@@ -9817,7 +10009,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # run installs, and a claimed kit whose requires that vintage cannot answer is refused, never read as
     # none. TOOL-dDeclaredLoop-79 S19: the one read feeds the gained prune too, so it grades the vintage
     # the refusal grades; a gained kit that vintage cannot answer is left out by name, never pulled in.
-    _req_at, _unknown_at = read_requires_at(root, to_commit, list(claimed) + list(gained))
+    _req_at, _unknown_at = read_requires_at(root, to_commit, list(claimed) + list(gained), batch=batch)
     _unknown_claimed = {k: why for k, why in _unknown_at.items() if k in claimed}
     if _unknown_claimed:
         raise Refusal("; ".join(f"'{k}' requires are unknown at {to_commit[:8]}: {why}"
@@ -9921,7 +10113,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 continue
             if not (row.get("source") and row.get("commit")):
                 continue
-            was = blob_at(root, row["commit"], row["source"])
+            was = blob_at(root, row["commit"], row["source"], batch=batch)
             if was is not None:
                 row["gov_oid"] = blob_oid(was)
 
@@ -9952,7 +10144,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # classification loop, not this preamble's.
             continue
         if has_commit and has_gov:
-            was = blob_at(root, row["commit"], row["source"]) if row.get("source") else None
+            was = blob_at(root, row["commit"], row["source"], batch=batch) if row.get("source") else None
             now = blob_oid(was) if was is not None else None
             if now != row["gov_oid"]:
                 raise Refusal(
@@ -10295,7 +10487,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # fetched tip) resolves each role from the descriptor and pool AT `--to`, the vintage
                 # whose bytes this run moves to; a kit gained after it resolves as the working tree does.
                 d, dpath = descs[row["kit"]]
-                d_at = (read_descriptor_at(root, to_commit, dpath)
+                d_at = (read_descriptor_at(root, to_commit, dpath, batch=batch)
                         if to_commit != _head_commit else None)
                 at = to_commit if d_at is not None else None
                 d = d_at if d_at is not None else d
@@ -10358,7 +10550,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         _src6 = (w or {}).get("src") or row.get("source")
                         _ent6 = index0.get(row["path"])
                         _ours6 = index_blob(target, _ent6[1]) if _ent6 else None
-                        _hit6 = (derive_attribution(root, _src6, _ours6, to_commit, needles)
+                        _hit6 = (derive_attribution(root, _src6, _ours6, to_commit, needles, batch=batch)
                                  if (_src6 and _ours6 is not None) else None)
                         if _src6:
                             row["source"] = _src6
@@ -10409,8 +10601,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # The block's own hash, not the file's. `check` owns the drift verdict; `update` reports
             # whether gov's block MOVED, and never merges: a gov-owned region has an owner.
             src2 = row.get("source")
-            theirs2 = blob_at(root, to_commit, src2) if src2 else None
-            base2 = blob_at(root, row.get("commit"), src2) if (src2 and row.get("commit")) else None
+            theirs2 = blob_at(root, to_commit, src2, batch=batch) if src2 else None
+            base2 = (blob_at(root, row.get("commit"), src2, batch=batch)
+                     if (src2 and row.get("commit")) else None)
             v = "current" if _sha(theirs2) == _sha(base2) else "block-moved"
             tally[v] = tally.get(v, 0) + 1
             print(f"  {v:<18} [{role:<13}] {row['path']}")
@@ -10579,7 +10772,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # retired seed row, while gov still ships the bytes at its `source` for another kit. What it does
         # not see: a seed row whose recorded path an answer has since moved also finds no rule.
         seed_gone = role == "seed" and row.get("kit") in descs and now is None
-        c = classify_row(root, target, row, to_commit, index0, needles, resolve_renamed, gov_absent=seed_gone)
+        c = classify_row(root, target, row, to_commit, index0, needles, resolve_renamed, gov_absent=seed_gone,
+                         batch=batch)
 
         # DEPL-aRepatriatedFork-17 S4. LONE-CR LOSS IS A FINDING. Counted against gov's blob at the
         # row's own `commit`, on the target's worktree copy. Not a ROW line: this is a second line
@@ -10747,7 +10941,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"{to_commit[:8]}); EQUALITY, not ordering:")
         for _k in sorted(_by_kit):
             _d = descs.get(_k)
-            _live = resolve_entry_version_at(root, _d[0], to_commit) if _d else "(unresolvable)"
+            _live = (resolve_entry_version_at(root, _d[0], to_commit, batch=batch) if _d
+                     else "(unresolvable)")
             _stored = _by_kit[_k]
             # DEPL-aRepatriatedFork-17 S7. THE TARGET'S OWN CONSTANT DECIDES, where it can be read. A
             # pinned row carries its BASE vintage's version, so a kit merged forward read MIXED
@@ -11892,7 +12087,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             if not write:
                 _landed_new.append(_dest)
                 continue
-            _blob0 = blob_at(root, to_commit, _src0)
+            _blob0 = blob_at(root, to_commit, _src0, batch=batch)
             if _blob0 is None:
                 _refused_new.append((_dest, f"gov declares it at {_src0}, which does not resolve "
                                             f"at {to_commit[:8]}"))
@@ -12011,8 +12206,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # resolves gov's descriptor as it stands, so an `update --to` an older vintage meets sources
         # that do not exist there at all — refused as unresolvable, and nothing that could land. The
         # whole suite's [-8] arms found the first cut, which read absent-at-base alone, holding them.
-        if (base_commit and _rs and blob_at(root, base_commit, _rs) is None
-                and blob_at(root, to_commit, _rs) is not None):
+        if (base_commit and _rs and blob_at(root, base_commit, _rs, batch=batch) is None
+                and blob_at(root, to_commit, _rs, batch=batch) is not None):
             _add_held(_rk, _rd)
     # ---- HOLD REGION END
     for _eid_h, _paths_h in sorted(_held_kits.items()):
@@ -12077,7 +12272,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # S1), so a step killed here left a receipt naming the old bytes for every file the loop moved,
         # and a rollback read each one as an adopter's edit and kept it. Above schema 4 the walk's
         # first record writes the same receipt; this closes the window before it.
-        write_install_receipt(target, receipt_path, receipt)
+        write_install_receipt(target, receipt_path, receipt, attest=(root, to_commit))
         _sw_walk = upgrade_steps.run_step_walk(root, target, receipt_path, receipt, _sw_pending)
         print(f"govkit update — steps: {_sw_walk['pending']} pending · {_sw_walk['applied']} applied "
               f"· {_sw_walk['skipped']} skipped · stopped at {_sw_walk['stopped'] or 'none'}")
@@ -12891,7 +13086,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             else:
                 _rm_why = None
             _rm_out = ([(_rm_row, _rm_why) for _rm_row in _rm_rows] if _rm_why else
-                       measure_rendered_rows(root, target, _rm_rows, to_commit, _resolve_ver_at))
+                       measure_rendered_rows(root, target, _rm_rows, to_commit, _resolve_ver_at,
+                                             batch=batch))
             for _rm_row, _rm_w in _rm_out:
                 if _rm_w:
                     _rm_kept += 1
@@ -13100,7 +13296,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # skips that guard entirely and overwrites the project-owned file the first run refused to touch.
     # A partial update leaves the receipt describing what it did, at the commit it came from.
     if r.problems:
-        write_install_receipt(target, receipt_path, receipt)
+        _att = write_install_receipt(target, receipt_path, receipt, attest=(root, to_commit))
+        print(f"govkit update — attestations: {len(_att)} kit(s) attested at {to_commit[:8]}")
         print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
               f"deleted {len(deleted)}, withheld {withheld}, "
               f"{conflicts} conflict(s). The receipt is NOT re-stamped: this run had findings, and a "
@@ -13143,12 +13340,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"and this run graded none of them, so advancing gov_commit would move the base they "
               f"must be attributed from. Clear them with "
               f"`govkit adopt --re-adopt --pin <path>=<rev> --write`")
-        write_install_receipt(target, receipt_path, receipt)
+        _att = write_install_receipt(target, receipt_path, receipt, attest=(root, to_commit))
+        print(f"govkit update — attestations: {len(_att)} kit(s) attested at {to_commit[:8]}")
         _write_rb_finish(f"not moved, {ungraded} row(s) carry evidence unattributed")
         return r.emit()
 
     receipt["gov_commit"] = to_commit
-    write_install_receipt(target, receipt_path, receipt)
+    _att = write_install_receipt(target, receipt_path, receipt, attest=(root, to_commit))
+    print(f"govkit update — attestations: {len(_att)} kit(s) attested at {to_commit[:8]}")
     # DEPL-cMendedVintage-4 S3. dGaugedVintage-8 S2's "what it overrode" clause went with the
     # override: reaching here now proves `ungraded` is 0, so the clause could only ever render empty.
     print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
@@ -13198,7 +13397,7 @@ def carry_matches(rung: str, ours: bytes, base: bytes, needles: dict[str, str]) 
 
 
 def derive_attribution(root: pathlib.Path, src: str, ours: bytes, to_commit: str,
-                       needles: dict[str, str]) -> tuple[str, str, str] | None:
+                       needles: dict[str, str], batch=None) -> tuple[str, str, str] | None:
     """S3 + S4. The vintage the target's bytes came from, as `(commit, gov_oid, rung)`, or `None`.
 
     RUNG-MAJOR, NOT RECENCY-MAJOR, and it is load-bearing rather than a preference. Every commit is
@@ -13223,7 +13422,7 @@ def derive_attribution(root: pathlib.Path, src: str, ours: bytes, to_commit: str
 
     def base_at(c: str) -> bytes | None:
         if c not in cache:
-            cache[c] = blob_at(root, c, src)
+            cache[c] = blob_at(root, c, src, batch=batch)
         return cache[c]
 
     for rung in CARRY_RUNGS:
@@ -13782,7 +13981,7 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     # TOOL-dSafePassage-3 S5: `schema` in place and, where it is given, `steps` as the last key —
     # carried verbatim from the receipt `--re-adopt` replaces, for D2's reason, or a first install's.
     envelope.update(derive_receipt_schema(_prior))
-    write_install_receipt(target, receipt_path, envelope)
+    write_install_receipt(target, receipt_path, envelope, attest=(root, commit))
     print(f"govkit adopt — receipt written: {len(rows)} row(s), {len(selection)} kit(s), "
           f"schema {envelope['schema']}, gov_commit {commit[:8]}")
     if staged:
@@ -13966,10 +14165,10 @@ def read_descriptors(root: pathlib.Path, reg: dict, r: Report) -> dict[str, tupl
     return descs
 
 
-def read_descriptor_at(root: pathlib.Path, commit: str, dpath: str) -> dict | None:
+def read_descriptor_at(root: pathlib.Path, commit: str, dpath: str, batch=None) -> dict | None:
     """TOOL-dSafePassage-65 S1. The descriptor at `dpath` as gov holds it AT `commit`, joined as
     `read_descriptors` joins the working tree's. None where the blob is absent there."""
-    blob = blob_at(root, commit, dpath)
+    blob = blob_at(root, commit, dpath, batch=batch)
     if blob is None:
         return None
     try:

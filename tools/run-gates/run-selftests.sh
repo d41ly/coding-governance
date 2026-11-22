@@ -1026,14 +1026,142 @@ if [ "$MODE" = sweep ]; then
 fi
 export SELFTEST_INNER_WIDTH=$(( W / OUTER )); [ "$SELFTEST_INNER_WIDTH" -ge 1 ] || SELFTEST_INNER_WIDTH=1
 
+# ---- THE OWNED ROOT, the bar's own (TOOL-dQuietDisk-9 S4) ---------------------------------------
+# This runner's scratch is one `gate-work.*` root under the ambient TMPDIR, in every mode, carrying the
+# owner line the bar writes and swept by the bar's own sweep, so a killed run's scratch is removed by
+# the next bar or the next run of this one. The record and the sweep are the bar's `owned_work_sh`
+# block, inlined below with the three helpers it calls and defines none of: the `health_log_sh` block,
+# and the bar's `derive_temp_path` and `ts_alive` one-liners, copied as the runner spells them.
+# Two modes run rows under it, so a row's template cache finds this root's `templates` through the
+# cache's own walk and a native child's temp lands inside it too: `--pooled` sets each row's TMPDIR,
+# TEMP and TMP to `$RS_SCRATCH/s/<row>/tmp`, and `--serial` exports all three as the root itself,
+# whose own entries are names no `mktemp` makes (TOOL-dQuietDisk-37 S11). `--attribute` keeps the
+# ambient TMPDIR: its L and R runs grade two revisions, and under one root they would share one
+# template cache, whose key leaves a builder's helpers out, so R could reuse a template L built with
+# other helpers and report a wrong baseline; keeping the sides apart would cost two more owned roots.
+# >>> health_log_sh — canonical copy: health-log.sh in gov's lib dir (byte-identical; gated)
+# I3, THE HEALTH LOG (TOOL-aGraftedHelix-8): `<git-common-dir>/health.log`, one LF-terminated UTF-8
+# line per automatic self-heal, four TAB-separated fields: utc (`YYYY-MM-DDTHH:MM:SS+00:00`), source
+# and event (each `^[a-z][a-z0-9-]*$`), and a detail whose TAB, CR and LF are each folded to one space
+# and which is cut to 240 characters. At HEALTH_LOG_CAP_LINES lines the appender first keeps the
+# newest half, through a temp file and a rename, then appends. `derive_health_log <common-dir>` prints
+# the path and spawns nothing; `resolve_health_log <repo-dir>` asks git once and prints it, or fails
+# printing nothing; `add_health_event <log> <source> <event> <detail>` is the only writer. A refused
+# token, an empty path or a failed write prints ONE `health: NOTE -` line on stderr and returns 0: it
+# never fails its caller. WHAT IT DOES NOT DO: serialize concurrent writers (a trim racing an append
+# can lose that line; ponytail: one rename, a lock file if a lost line is ever observed); validate
+# what a detail means; or tell a repository with no writer installed from one where nothing healed.
+HEALTH_LOG_CAP_LINES=500
+derive_health_log() { printf '%s/health.log\n' "$1"; }
+resolve_health_log() {
+  local _hl_c
+  _hl_c=$(git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+  _hl_c=${_hl_c%$'\r'}
+  [ -n "$_hl_c" ] || return 1
+  derive_health_log "$_hl_c"
+}
+add_health_event() {
+  local _hl_log=${1:-} _hl_src=${2:-} _hl_ev=${3:-} _hl_d=${4:-} _hl_why="" _hl_n=0 _hl_t
+  local _hl_a=abcdefghijklmnopqrstuvwxyz
+  case "$_hl_src" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="source '$_hl_src' is not a lowercase token" ;; esac
+  case "$_hl_ev" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="event '$_hl_ev' is not a lowercase token" ;; esac
+  [ -n "$_hl_log" ] || _hl_why="no log path resolved"
+  if [ -z "$_hl_why" ]; then
+    _hl_d=${_hl_d//$'\t'/ }; _hl_d=${_hl_d//$'\r'/ }; _hl_d=${_hl_d//$'\n'/ }; _hl_d=${_hl_d:0:240}
+    _hl_t=$(date -u +%Y-%m-%dT%H:%M:%S+00:00 2>/dev/null) || _hl_t=""
+    [ -n "$_hl_t" ] || _hl_why="date printed no UTC stamp"
+  fi
+  if [ -z "$_hl_why" ] && [ -f "$_hl_log" ]; then
+    _hl_n=$(wc -l < "$_hl_log" 2>/dev/null) || _hl_n=0
+    _hl_n=${_hl_n//[!0-9]/}
+    if [ "${_hl_n:-0}" -ge "$HEALTH_LOG_CAP_LINES" ]; then
+      { tail -n $((HEALTH_LOG_CAP_LINES / 2)) "$_hl_log" > "$_hl_log.trim.$$" && mv -f "$_hl_log.trim.$$" "$_hl_log"; } 2>/dev/null \
+        || { rm -f "$_hl_log.trim.$$" 2>/dev/null; _hl_why="the trim to the newest $((HEALTH_LOG_CAP_LINES / 2)) lines failed"; }
+    fi
+  fi
+  if [ -z "$_hl_why" ]; then
+    { printf '%s\t%s\t%s\t%s\n' "$_hl_t" "$_hl_src" "$_hl_ev" "$_hl_d" >> "$_hl_log"; } 2>/dev/null && return 0
+    _hl_why="the append failed"
+  fi
+  printf 'health: NOTE - %s: %s; nothing written\n' "${_hl_log:-(no path)}" "$_hl_why" >&2
+  return 0
+}
+# <<< health_log_sh
+# derive_temp_path <name> <dest> — sets <name> to an unpredictable sibling of <dest>; creates nothing (TOOL-dRedressedBar-24)
+derive_temp_path() { if [ -n "${SRANDOM:-}" ]; then printf -v "$1" '%s.%s%s.tmp' "$2" "$SRANDOM" "$SRANDOM"; else printf -v "$1" '%s' "$(mktemp -u "$2.XXXXXXXX" 2>/dev/null)"; [ -n "${!1}" ]; fi; }
+ts_alive(){ kill -0 "$1" 2>/dev/null; }
+# >>> owned_work_sh — canonical copy: owned-scratch.sh in gov's lib dir (byte-identical; gated)
+write_work_owner() { # <dir> <common> -> <dir>/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
+  local _tp
+  derive_temp_path _tp "$1/owner"
+  printf '%s\t%s\t%s\n' "$$" "$2" "$EPOCHSECONDS" > "$_tp" 2>/dev/null \
+    && mv -f "$_tp" "$1/owner" 2>/dev/null
+}
+
+scan_dead_work() { # <ambient> <own dir> <common> <health log> -> removes each gate-work dir under <ambient> a dead bar owns
+  local d own pid rest common f
+  local -a doomed
+  # No common dir, no proof of ownership: sweep nothing rather than match an empty field.
+  [ -n "$3" ] || return 0
+  for d in "$1"/gate-work.*; do
+    [ -d "$d" ] || continue
+    # NEVER OUR OWN, guarded explicitly although our live pid already withholds it — the same belt
+    # `ts_sweep_queue` wears, for the same reason: a later edit to the pid test must not reach here.
+    [ "${d##*/}" = "${2##*/}" ] && continue
+    own=""
+    { IFS= read -r own < "$d/owner"; } 2>/dev/null
+    own=${own%$'\r'}
+    [ -n "$own" ] || continue
+    pid=${own%%$'\t'*}; rest=${own#*$'\t'}; common=${rest%%$'\t'*}
+    case "$pid" in ''|*[!0-9]*) continue ;; esac
+    # THIS REPOSITORY'S, or an ORPHAN's: an absolute common dir that names no directory any more, a
+    # fixture repository its suite removed (TOOL-dQuietDisk-9 S9). Another live repository's root and
+    # a relative common dir are never touched.
+    if [ "$common" != "$3" ]; then
+      case "$common" in /*|[A-Za-z]:[/\\]*) ;; *) continue ;; esac
+      [ -d "$common" ] && continue
+    fi
+    ts_alive "$pid" && continue
+    printf 'run-gates: sweeping the scratch of a dead bar (pid %s)\n' "$pid" >&2
+    doomed=()
+    for f in "$d"/* "$d"/.[!.]*; do
+      [ -e "$f" ] || [ -L "$f" ] || continue
+      [ "${f##*/}" = owner ] && continue
+      doomed+=("$f")
+    done
+    if { [ "${#doomed[@]}" = 0 ] || rm -rf "${doomed[@]}" 2>/dev/null; } && rm -rf "$d" 2>/dev/null; then
+      add_health_event "$4" run-gates scratch-swept "dead bar pid $pid"
+    else
+      printf 'run-gates: NOTE - the scratch of dead bar %s was not removed whole; its owner record stays, so the next bar retries: %s\n' "$pid" "$d" >&2
+    fi
+  done
+  return 0
+}
+# <<< owned_work_sh
+
 # FED FROM FILES, NOT FROM A HEREDOC OVER A VARIABLE. Six loops here used to read their rows
 # from a heredoc holding
 # `$POP` and `$EV_TEXT`, both assigned from command substitutions, which is the shape the
 # shell-hygiene leg gates: such a loop can read until an EOF that never arrives. Its registry is
 # set-equality with shrink-only counts, so a build that adds a site cannot declare one. The text
 # is written once and every loop reads the file; the registry row for this file goes with them.
-RS_SCRATCH=$(mktemp -d) || { echo "run-selftests: cannot create a scratch dir" >&2; exit 2; }
+RS_SCRATCH=$(mktemp -d "${TMPDIR:-/tmp}/gate-work.XXXXXXXX") || { echo "run-selftests: cannot create a scratch dir" >&2; exit 2; }
 trap 'rm -rf "$RS_SCRATCH" 2>/dev/null' EXIT
+# THE GIT DIR AND THE COMMON DIR, ASKED ONCE and parsed as the bar parses its facts; the common dir is
+# normalised by `cd` and `pwd`, the bar's RG_COMMON spelling, so each runner sweeps the other's roots.
+# The sweep mode's per-row log dir takes the git dir from here.
+RS_GIT_DIR=""; RS_COMMON=""; RS_HEALTH_LOG=""
+if _rs_facts=$(git rev-parse --git-dir --git-common-dir 2>/dev/null) && [ -n "$_rs_facts" ]; then
+  RS_GIT_DIR=${_rs_facts%%$'\n'*}
+  case "$_rs_facts" in *$'\n'*) _rs_facts=${_rs_facts#*$'\n'}; RS_COMMON=${_rs_facts%%$'\n'*} ;; esac
+fi
+unset _rs_facts
+if [ -n "$RS_COMMON" ] && cd "$RS_COMMON" 2>/dev/null; then RS_COMMON=$PWD; else RS_COMMON=""; fi
+cd "$ROOT" || exit 2
+[ -z "$RS_COMMON" ] || RS_HEALTH_LOG=$(derive_health_log "$RS_COMMON")
+write_work_owner "$RS_SCRATCH" "$RS_COMMON" \
+  || echo "run-selftests: NOTE - no owner record could be written into $RS_SCRATCH, so if this run is killed no later run can prove it dead and sweep its scratch" >&2
+scan_dead_work "${TMPDIR:-/tmp}" "$RS_SCRATCH" "$RS_COMMON" "$RS_HEALTH_LOG"
 POP_FILE="$RS_SCRATCH/population"; EV_FILE="$RS_SCRATCH/evidence"
 POP=$(read_population "$BUDGETS" "$LEGS" "$FILTER")
 printf '%s\n' "$POP" > "$POP_FILE"
@@ -1475,7 +1603,7 @@ if [ "$MODE" = sweep ]; then
     fi
   fi
 
-  SWEEP_ROOT=$(mktemp -d) || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
+  SWEEP_ROOT="$RS_SCRATCH/s"; mkdir "$SWEEP_ROOT" || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
   # THE POPULATION SCRATCH TOO: this trap REPLACES the one that removed it at startup.
   trap 'rm -rf "$SWEEP_ROOT" "$RS_SCRATCH" 2>/dev/null' EXIT
   # EACH ROW'S OUTPUT OUTLIVES THE TRAP. The render loop copies `$d/out` to
@@ -1486,7 +1614,7 @@ if [ "$MODE" = sweep ]; then
   # were unobtainable from a calibrate (aBatchedArm closing review D3). Resolved ONCE and never
   # composed from an empty git dir; capture OFF is announced, not silent.
   SWEEP_LOGDIR=""
-  _gd=$(git rev-parse --git-dir 2>/dev/null) || _gd=""
+  _gd=$RS_GIT_DIR
   if [ -n "$_gd" ] && mkdir -p "$_gd/gate-logs/selftests" 2>/dev/null; then
     SWEEP_LOGDIR="$_gd/gate-logs/selftests"; chmod 700 "$SWEEP_LOGDIR" 2>/dev/null || true
   else
@@ -1575,7 +1703,7 @@ if [ "$MODE" = sweep ]; then
     # `timeout` forwards the signal to its own child, and killing the subshell would leave both.
     # A PRIVATE TURNSTILE per row (TOOL-aFrugalTurnstile-5 S7): the runner's beacon is host-wide, so
     # every row's fixture bars would otherwise serialize against each other and against real bars.
-    TMPDIR="$d/tmp" GATE_TURNSTILE_DIR="$d/tmp/gate-turnstile" \
+    TMPDIR="$d/tmp" TEMP="$d/tmp" TMP="$d/tmp" GATE_TURNSTILE_DIR="$d/tmp/gate-turnstile" \
       "$SWEEP_TIMEOUT" -k 5 "$bound" bash -c "${SW_ARGV[$((k - 1))]}" > "$d/out" 2>&1 &
     tp=$!
     echo "$tp" > "$d/pid"
@@ -2027,7 +2155,7 @@ if [ -n "$ATTRIBUTE" ]; then
     exit 2
   fi
 
-  ATTR_TMP=$(mktemp -d) || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
+  ATTR_TMP="$RS_SCRATCH/a"; mkdir "$ATTR_TMP" || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
   # IDEMPOTENT: a removed worktree is forgotten, so a second entry has nothing left to fail on and
   # cannot print an orphan line for a worktree that is already gone.
   attr_cleanup() {
@@ -2268,6 +2396,9 @@ fi
 
 echo "run-selftests: $NROWS suite(s), declared total $(( (TOTAL + 59) / 60 )) minutes, width $W (outer $OUTER, inner $SELFTEST_INNER_WIDTH)"
 st=0; ran=0; over=0
+# THE SERIAL ROWS RUN UNDER THE OWNED ROOT (TOOL-dQuietDisk-37 S11), so the EXIT trap removes their
+# scratch and a killed run strands nothing the next one cannot sweep; the root itself, no new entry.
+export TMPDIR="$RS_SCRATCH" TEMP="$RS_SCRATCH" TMP="$RS_SCRATCH"
 while IFS=$'\t' read -r state name budget argv; do
   [ -n "${name:-}" ] || continue
   # THE STATE IS READ HERE TOO. This loop used to ignore it entirely, so an UNRESOLVED row -- whose

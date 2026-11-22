@@ -257,6 +257,139 @@ RUN_GATES="${RUN_GATES_DIR##*/}"
 
 tmp=$(mktemp -d) || exit 2
 trap 'rm -rf "$tmp"' EXIT
+# THE FIXTURE TEMPLATES (TOOL-dQuietDisk-12). A pushed-main fixture whose arguments recur is built once
+# per run through the template cache's bash face, carried inline because this suite ships to adopters,
+# who hold no gov lib dir. A call that opts in with FX_TEMPLATE=1 copies that template and borrows its
+# objects; `tests.fixture-templates` at per-case builds every call in place, as before the cache.
+# >>> template_cache_sh — canonical copy: template-cache.sh in gov's lib dir (byte-identical; gated)
+resolve_template_root() { # -> the cache root: SELFTEST_TEMPLATE_ROOT, a bar's owned $WORK, or $SELFTEST_ROOT
+  local _tc_d=${TMPDIR:-/tmp} _tc_p
+  if [ -n "${SELFTEST_TEMPLATE_ROOT:-}" ] && [ -d "$SELFTEST_TEMPLATE_ROOT" ]; then
+    printf '%s\n' "$SELFTEST_TEMPLATE_ROOT"; return 0
+  fi
+  while [ -n "$_tc_d" ]; do
+    case ${_tc_d##*/} in gate-work.*) [ -f "$_tc_d/owner" ] && { printf '%s\n' "$_tc_d/templates"; return 0; } ;; esac
+    _tc_p=${_tc_d%/*}; [ "$_tc_p" = "$_tc_d" ] && break; _tc_d=$_tc_p
+  done
+  [ -n "${SELFTEST_ROOT:-}" ] || { echo "template-cache: no root: no SELFTEST_TEMPLATE_ROOT, no owned gate-work, no SELFTEST_ROOT" >&2; return 2; }
+  printf '%s\n' "$SELFTEST_ROOT/templates"
+}
+remove_git_env_leaks() { # unsets, in the calling subshell, the names GIT_ENV_LEAKS drops
+  unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES \
+    GIT_COMMON_DIR GIT_NAMESPACE GIT_PREFIX GIT_LITERAL_PATHSPECS GIT_GLOB_PATHSPECS \
+    GIT_NOGLOB_PATHSPECS GIT_ICASE_PATHSPECS
+}
+derive_template_key() ( # <builder> [<input file>...] -> the key, 40 hex, from the builder's definition and the inputs' blob ids
+  remove_git_env_leaks
+  local -; set -o pipefail
+  local _tc_b=$1; shift
+  { printf 'template-cache v1\nbash\n%s\n' "$_tc_b"
+    declare -f "$_tc_b"
+    printf 'input %s\n' "$@"
+    [ "$#" -eq 0 ] || printf '%s\n' "$@" | git hash-object --no-filters --stdin-paths
+  } | git hash-object --stdin
+)
+resolve_template() ( # <root> <key> <builder> [<arg>...] -> <root>/<key>/repo, <key> folding the args; built once per root
+  remove_git_env_leaks
+  local _tc_r=$1 _tc_k=$2 _tc_l _tc_n; shift 2
+  if [ "$#" -gt 1 ]; then
+    _tc_k=$({ printf 'template-cache args v1\n%s\n' "$_tc_k"; printf '%q\n' "${@:2}"; } | git hash-object --stdin) \
+      || { echo "template-cache: the key of $1's arguments could not be derived" >&2; return 2; }
+  fi
+  local _tc_dir="$_tc_r/$_tc_k" _tc_s="$_tc_r/.stage-$_tc_k-$BASHPID"
+  local -a _tc_c=(-c core.autocrlf=false -c core.hooksPath= -c commit.gpgsign=false -c user.name=t -c user.email=t@e)
+  if [ -e "$_tc_dir/ready" ]; then
+    echo "template: ${_tc_k:0:8} reused" >&2; printf '%s\n' "$_tc_dir/repo"; return 0
+  fi
+  mkdir -p "$_tc_s/repo" || return 2
+  if ! ( cd "$_tc_s/repo" && "$@" ) >&2; then
+    rm -rf "$_tc_s"; echo "template-cache: the builder $1 failed, so no template was made" >&2; return 2
+  fi
+  [ -e "$_tc_s/repo/.git" ] || git -C "$_tc_s/repo" init -q --template= || { rm -rf "$_tc_s"; return 2; }
+  git -C "$_tc_s/repo" "${_tc_c[@]}" add -A || { rm -rf "$_tc_s"; return 2; }
+  if ! git -C "$_tc_s/repo" "${_tc_c[@]}" commit -q -m base >/dev/null 2>&1; then
+    # NOTHING TO COMMIT is a builder that committed its own tree, and only that is not a failure.
+    git -C "$_tc_s/repo" rev-parse -q --verify 'HEAD^{commit}' >/dev/null && git -C "$_tc_s/repo" diff --cached --quiet \
+      || { rm -rf "$_tc_s"; echo "template-cache: the commit of $1's tree failed" >&2; return 2; }
+  fi
+  git -C "$_tc_s/repo" config --local --list > "$_tc_s/config-all" || { rm -rf "$_tc_s"; return 2; }
+  : > "$_tc_s/config-pins"
+  while IFS= read -r _tc_l; do
+    _tc_l=${_tc_l%$'\r'}; _tc_n=${_tc_l%%=*}
+    case $_tc_n in
+      remote.*|branch.*|core.repositoryformatversion|core.filemode|core.bare|core.logallrefupdates) ;;
+      core.symlinks|core.ignorecase|core.precomposeunicode|'') ;;
+      *) printf '%s\n' "$_tc_l" >> "$_tc_s/config-pins" ;;
+    esac
+  done < "$_tc_s/config-all"
+  rm -f "$_tc_s/config-all"; : > "$_tc_s/ready"
+  # `mv -T` FAILS onto the key directory, which is never empty; a plain `mv` would nest the stage in it.
+  if mv -T "$_tc_s" "$_tc_dir" 2>/dev/null; then
+    echo "template: ${_tc_k:0:8} built" >&2
+  else
+    rm -rf "$_tc_s"
+    [ -e "$_tc_dir/ready" ] || { echo "template-cache: could not place $_tc_dir" >&2; return 2; }
+    echo "template: ${_tc_k:0:8} reused" >&2
+  fi
+  printf '%s\n' "$_tc_dir/repo"
+)
+build_template_clone() ( # <template repo> <dest> -> a --shared clone carrying the template's config pins and no remote
+  remove_git_env_leaks
+  local _tc_l; local -a _tc_p=()
+  while IFS= read -r _tc_l; do [ -n "$_tc_l" ] && _tc_p+=(-c "$_tc_l"); done < "${1%/*}/config-pins" || return 2
+  git -c core.autocrlf=false clone --shared --quiet --template= ${_tc_p[@]+"${_tc_p[@]}"} "$1" "$2" \
+    && git -C "$2" remote remove origin
+)
+read_template_mode() { # <python> <policy.py> -> per-case or shared: tests.fixture-templates, shared unless the reader says per-case
+  local _tc_v
+  if [ -n "${1:-}" ] && [ -f "${2:-}" ] && _tc_v=$("$1" "$2" get tests.fixture-templates 2>/dev/null) \
+     && [ "${_tc_v%$'\r'}" = per-case ]; then echo per-case; else echo shared; fi
+}
+# <<< template_cache_sh
+# The root is this run's own, under $tmp, unless a bar's owned $WORK holds it; the switch is read once.
+# FX_INPUTS are the files a tree half copies or calls, named under $SRC in git's path form, because
+# `git hash-object --stdin-paths` refuses an MSYS path; the suite file stands for the helpers it calls.
+FX_ROOT=$(SELFTEST_ROOT=$tmp resolve_template_root) || exit 2
+_fx_mode=$(read_template_mode "$_rkd_py" "$SRC/$KIT_REL/$PK/policy.py")
+FX_INPUTS=()
+for _fx_f in "$SRC/.githooks/pre-push.test.sh" "$SRC/.githooks/pre-push" "$SRC/$KIT_REL/$PK/policy.py" \
+             "$SRC/$KIT_REL/$PK/budgets.py" "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" \
+             "$SRC/$RUN_GATES_DIR/gate-fingerprint.sh"; do
+  [ ! -f "$_fx_f" ] || FX_INPUTS+=("$_fx_f")
+done
+declare -A FX_MEMO=()   # the %q text of a tree half and its arguments -> its template, then both objects dirs
+run_tree_in_stage() { # <tree fn> [<arg>...] -> the tree half in resolve_template's stage: the stage its fixture dir, repo its work dir
+  "$1" "${PWD%/*}" "$PWD" "${@:2}"
+}
+build_pushed_fixture() { # <dir> <work name> <tree fn> [<arg>...] -> a pushed fixture at <dir>: the tree half in place, or
+  # under FX_TEMPLATE=1 and `shared` a copy of its template for those arguments, borrowing the template's objects
+  local d=$1 w=$2 fn=$3 a v t o r x n; local -a e src skip dst; shift 3
+  if [ "${FX_TEMPLATE:-}" != 1 ] || [ "$_fx_mode" = per-case ]; then "$fn" "$d" "$d/$w" "$@"; return; fi
+  printf -v a '%q ' "$fn" "$@"; v=${FX_MEMO[$a]:-}
+  if [ -z "$v" ]; then
+    # The tree half's arguments key its template through resolve_template's own fold (TOOL-dQuietDisk-37
+    # S6); the `cd` keeps the key's repository discovery away from the caller's directory.
+    x=$(cd "$tmp" && derive_template_key "$fn" ${FX_INPUTS[@]+"${FX_INPUTS[@]}"}) \
+      && t=$(resolve_template "$FX_ROOT" "$x" run_tree_in_stage "$fn" "$@") \
+      && o=$(cd "$t/.git/objects" && { pwd -W 2>/dev/null || pwd; }) \
+      && r=$(cd "${t%/*}/remote.git/objects" && { pwd -W 2>/dev/null || pwd; }) || return 1
+    v=$t$'\t'$o$'\t'$r; FX_MEMO[$a]=$v
+  fi
+  t=${v%%$'\t'*}; v=${v#*$'\t'}; o=${v%%$'\t'*}; r=${v#*$'\t'}
+  mkdir -p "$d/$w/.git/objects/info" "$d/$w/.git/objects/pack" "$d/remote.git/objects/info" "$d/remote.git/objects/pack" \
+    && cp -a "${t%/*}/hooks" "$d/" || return 1
+  # Each entry list is a builtin glob, dotfiles included: the work tree but .git, .git and remote.git but objects.
+  src=("$t" "$t/.git" "${t%/*}/remote.git"); skip=(.git objects objects); dst=("$d/$w" "$d/$w/.git" "$d/remote.git")
+  for x in 0 1 2; do
+    e=()
+    for n in "${src[x]}"/* "${src[x]}"/.[!.]* "${src[x]}"/..?*; do
+      [ -e "$n" ] && [ "${n##*/}" != "${skip[x]}" ] && e+=("$n")
+    done
+    [ "${#e[@]}" -eq 0 ] || cp -a "${e[@]}" "${dst[x]}/" || return 1
+  done
+  printf '%s\n' "$o" > "$d/$w/.git/objects/info/alternates" && printf '%s\n' "$r" > "$d/remote.git/objects/info/alternates" \
+    && git -C "$d/$w" config core.hooksPath "$d/hooks" && git -C "$d/$w" config remote.origin.url "$d/remote.git"
+}
 fail=0
 ok() { echo "  ok   — $1"; }
 bad() { echo "  FAIL — $1"; fail=1; }
@@ -1485,11 +1618,15 @@ write_ir_policy() { # value | "" (a policy file with no [verdict]) -> .governanc
   else printf '[runtime]\nagents-in-flight = 6\n' > .governance/policy.toml; fi
 }
 build_ir_fixture() { # tag · kit (kit:<value>, kit: for no key, nokit, broken) · gate-env body (printf %b) -> a pushed main at R; sets IR_R
-  local tag=$1 kit=$2 body=$3
-  local d="$tmp/ir-$tag"
+  build_pushed_fixture "$tmp/ir-$1" work build_ir_tree "$2" "$3" || return 1
+  cd "$tmp/ir-$1/work" || return 1
+  IR_R=$(git rev-parse HEAD)
+}
+build_ir_tree() { # fixture dir · work dir · kit · gate-env body -> build_ir_fixture's tree, committed and pushed
+  local d=$1 kit=$3 body=$4
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
-  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
-  cd "$d/work" || return 1
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$2"
+  cd "$2" || return 1
   git config core.hooksPath "$d/hooks"
   git config core.autocrlf false
   mkdir -p .githooks "$KIT_REL"
@@ -1509,7 +1646,7 @@ build_ir_fixture() { # tag · kit (kit:<value>, kit: for no key, nokit, broken) 
   git remote add origin "$d/remote.git"
   touch "$(git rev-parse --git-dir)/push-main-active"
   GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
-  IR_R=$(git rev-parse HEAD)
+  return 0
 }
 run_ir_push() { # [env assignments…] -> the push's merged output, then `rc=<n>` on its own line
   git commit -q --allow-empty -m "ir $RANDOM" >/dev/null 2>&1
@@ -1536,7 +1673,7 @@ esac
 
 # AC2: under own-mixed-contended at R, a red whose one leg reads INHERITED and not aged lands, naming
 # the leg; the same bar with the leg MIXED is blocked. The value and the bound reach the runner too.
-build_ir_fixture ac2 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC2 could not build its fixture"
+FX_TEMPLATE=1 build_ir_fixture ac2 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC2 could not build its fixture"
 _o=$(run_ir_push)
 case "$_o" in
   *"every red passes — landing under verdict.blocks own-mixed-contended: x"*"rc=0") ok "IR AC2 an inherited-only red within its age lands under own-mixed-contended" ;;
@@ -1564,7 +1701,7 @@ case "$_o" in
 esac
 
 # AC15: the same inherited-only record on a bar whose verdict reads tree_moved yes is blocked, naming it.
-build_ir_fixture ac15 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC15 could not build its fixture"
+FX_TEMPLATE=1 build_ir_fixture ac15 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC15 could not build its fixture"
 _o=$(run_ir_push IR_MOVED=yes)
 case "$_o" in
   *"the tree moved while the bar ran, so no verdict describes the pushed commit"*"rc=1") ok "IR AC15 a moved tree blocks an inherited-only red" ;;
@@ -1648,7 +1785,7 @@ esac
 
 # AC4: an inherited green whose base IS the remote sha, written under the value at R, selects the
 # scoped gate and names itself; once the remote moves past that base, the same stamp forces FULL.
-build_ir_fixture ac4 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC4 could not build its fixture"
+FX_TEMPLATE=1 build_ir_fixture ac4 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC4 could not build its fixture"
 git commit -q --allow-empty -m c1 >/dev/null 2>&1
 write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10 own-mixed-contended
 # TOOL-dWitnessedBar-58 AC1 (S1): this push's bar is a capturing stub in place of $green, exiting 0 as it
@@ -1676,7 +1813,7 @@ esac
 
 # TOOL-dWitnessedBar-3 AC4 (§8 F8): a stamp written under own-only while the value at R is
 # own-mixed-contended forces FULL, naming both: a MIXED red that boundary blocks must not scope the gate.
-build_ir_fixture acb kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR TOOL-dWitnessedBar-3 AC4 could not build its stamp fixture"
+FX_TEMPLATE=1 build_ir_fixture acb kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR TOOL-dWitnessedBar-3 AC4 could not build its stamp fixture"
 write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10 own-only
 _o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c && git push origin main' 2>&1 )
 case "$_o" in
@@ -1686,7 +1823,7 @@ case "$_o" in
 esac
 
 # AC14: a stamp written under max_age 50 while the bound at R is 10 forces FULL, naming both.
-build_ir_fixture ac14 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC14 could not build its fixture"
+FX_TEMPLATE=1 build_ir_fixture ac14 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC14 could not build its fixture"
 write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 50 own-mixed-contended
 _o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c && git push origin main' 2>&1 )
 case "$_o" in
@@ -1695,7 +1832,7 @@ case "$_o" in
 esac
 
 # AC16: a STALE full green that predicate 2 refuses does not hide a usable inherited green.
-build_ir_fixture ac16 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC16 could not build its fixture"
+FX_TEMPLATE=1 build_ir_fixture ac16 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC16 could not build its fixture"
 git checkout -q -b elsewhere; git commit -q --allow-empty -m off >/dev/null 2>&1; _off=$(git rev-parse HEAD); git checkout -q main
 printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nrun_id\ttest\n' "$_off" > "$(git rev-parse --git-dir)/gate-full-green"
 write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10 own-mixed-contended
@@ -1949,6 +2086,9 @@ cd "$pfx_home" || exit 2
 #   GATE_ATTRIBUTE GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE — the hook clears the policy pair
 #     and sets all three from R itself (TOOL-dDerivedDocket-23, -24), and attribution is report-only.
 #   GATE_AMBIENT_TMP GATE_HOST_RATIO — assigned in the runner, from TMPDIR and as a source constant.
+#   GATE_OUTER_AMBIENT_TMP — the temp root an outer adopter runner started under, read once and unset
+#     before any leg; it moves only which directory the scratch count and the dead-owner sweep read,
+#     and that sweep needs a dead owner, so it never moves a leg or a verdict (TOOL-dQuietDisk-9 S8).
 #   GATE_DOCS_BASE — the hook clears it for every bar, a STUB included, and sets it only on a doc-only
 #     decision (TOOL-dThriftyLanding-3), as it sets GATE_BASE on the path where that matters.
 #   GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_MEMINFO — the memory pause's threshold, its hold bound and the
@@ -1988,7 +2128,7 @@ cd "$pfx_home" || exit 2
 #     once and unset before any leg; it writes `<i>.rerun.*` beside the attempts and moves no verdict and
 #     no exit code, so it can turn no leg into a PASS or a SKIP (TOOL-dWitnessedBar-8 S1, F6).
 # Classified by TOOL-aSparedSpawn-33 S8.
-BAR_INERT_KNOBS="GATE_BASE_FROM GATE_CAUSE GATE_RERUN GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_SELECTION GATE_HOST_RATIO GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+BAR_INERT_KNOBS="GATE_BASE_FROM GATE_CAUSE GATE_RERUN GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_OUTER_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_SELECTION GATE_HOST_RATIO GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n
@@ -2237,20 +2377,24 @@ docs_env="$tmp/docs-env.txt"
 docstub="$tmp/docstub.sh"
 printf '#!/usr/bin/env bash\nprintf "docs=%%s\\n" "${GATE_DOCS_BASE:-}" > "$DOCS_ENV"\nexit 0\n' > "$docstub"
 build_docs_fixture() { # tag · gate-env body (printf %b) · [verdict.blocks at R, through a policy kit copy] -> a pushed main at R carrying that body
-  local d="$tmp/docs-$1"
+  build_pushed_fixture "$tmp/docs-$1" work build_docs_tree "${@:2}" || return
+  cd "$tmp/docs-$1/work"
+}
+build_docs_tree() { # fixture dir · work dir · gate-env body · [verdict.blocks] -> build_docs_fixture's tree, pushed; the push's status
+  local d=$1
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
-  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
-  cd "$d/work" || return 1
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$2"
+  cd "$2" || return 1
   git config core.hooksPath "$d/hooks"
   mkdir -p .githooks "$KIT_REL" notes src
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
-  if [ -n "${3:-}" ]; then
+  if [ -n "${4:-}" ]; then
     git config core.autocrlf false; mkdir -p "$KIT_REL/$PK"
     cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
        "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/"
-    write_ir_policy "$3"
+    write_ir_policy "$4"
   fi
-  printf '%b' "$2" > .githooks/gate-env.sh
+  printf '%b' "$3" > .githooks/gate-env.sh
   printf 'GOV_KITROOT=%s\n' "$KIT_REL" >> .githooks/gate-env.sh
   printf 'a\n' > notes/a.md; printf 'b\n' > notes/b.md; printf 'x\n' > src/x.sh
   git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
@@ -2269,7 +2413,7 @@ run_docs_push() { # [env…] -> the push's merged output, then the docs base the
 }
 read_docs_tip() { git ls-remote origin refs/heads/main | cut -f1; }
 
-build_docs_fixture ac1 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS AC1 could not build its fixture"
+FX_TEMPLATE=1 build_docs_fixture ac1 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS AC1 could not build its fixture"
 _r=$(read_docs_tip); set_docs_stamp
 printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
 _o=$(run_docs_push)
@@ -2378,7 +2522,7 @@ case "$_o" in
   *) bad "DOCS M2 expected the every-red notice, got: $_o" ;;
 esac
 # TOOL-dThriftyLanding-12, closing review L3: the inherited-green branch exports the docs base too.
-build_docs_fixture inh 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS L3a could not build its fixture"
+FX_TEMPLATE=1 build_docs_fixture inh 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS L3a could not build its fixture"
 _r=$(read_docs_tip)
 rm -f "$(git rev-parse --git-dir)/gate-full-green"
 write_ir_stamp "$_r" "$_r" "" own-only   # no policy kit here, so the value at R is the default own-only
@@ -2389,7 +2533,7 @@ case "$_o" in
   *) bad "DOCS L3a expected an inherited-green docs-only decision and docs=$_r, got: $_o" ;;
 esac
 # ...and a LINKED worktree adopts the primary's own stamp, the common dir's gate-full-green.
-build_docs_fixture wt 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS L3b could not build its fixture"
+FX_TEMPLATE=1 build_docs_fixture wt 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS L3b could not build its fixture"
 _r=$(read_docs_tip); set_docs_stamp
 _wt="$tmp/docs-wt-linked"
 git worktree add -q "$_wt" -b wtb >/dev/null 2>&1
@@ -2509,10 +2653,16 @@ cd "$pfx_home" || exit 2
 # The hook is driven directly with git's stdin line, and the remote moves by --no-verify pushes, so
 # each arm names exactly the R and tip it grades. The declared STUB escape is lifted per push.
 build_bg_fixture() { # tag [gate-env lines] -> a work clone at main=R, pushed; cwd moves in; sets BG_D bg_gd BG_MARK
-  BG_D="$tmp/bg-$1"; mkdir -p "$BG_D/hooks"; cp "$SRC/.githooks/pre-push" "$BG_D/hooks/pre-push"
-  git init -q --bare "$BG_D/remote.git"; git init -q "$BG_D/w"; cd "$BG_D/w" || return 1
+  BG_D="$tmp/bg-$1"; build_pushed_fixture "$BG_D" w build_bg_tree "${@:2}" || return 1
+  cd "$BG_D/w" || return 1
+  bg_gd=$(git rev-parse --git-dir); BG_MARK="$BG_D/mark"; : > "$BG_MARK"
+}
+build_bg_tree() { # fixture dir · work dir · [gate-env lines] -> build_bg_fixture's tree, committed and pushed
+  local d=$1
+  mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
+  git init -q --bare "$d/remote.git"; git init -q "$2"; cd "$2" || return 1
   git config user.email t@example.com; git config user.name t; git config core.autocrlf false
-  git config core.hooksPath "$BG_D/hooks"
+  git config core.hooksPath "$d/hooks"
   mkdir -p "$KIT_REL/$RUN_GATES" .githooks notes src
   cp "$SRC/$RUN_GATES_DIR/gate-fingerprint.sh" "$KIT_REL/$RUN_GATES/"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
@@ -2533,11 +2683,11 @@ BGSTUB
     "$KIT_REL/$RUN_GATES/run-gates.sh" > wrap-bar.sh
   printf '#!/usr/bin/env bash\nexec bash %s "$@"\n' "$KIT_REL/$RUN_GATES/run-gates.sh" > other-bar.sh
   printf 'GATE_CMD="bash wrap-bar.sh"\n' > .unattended.conf
-  printf 'GOV_KITROOT=%s\nGATE_DOC_PATHS="notes/"\n%b' "$KIT_REL" "${2:-}" > .githooks/gate-env.sh
+  printf 'GOV_KITROOT=%s\nGATE_DOC_PATHS="notes/"\n%b' "$KIT_REL" "${3:-}" > .githooks/gate-env.sh
   printf 'a\n' > notes/a.md; printf 'x\n' > src/x.sh; printf '* text eol=lf\n' > .gitattributes
   git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
-  git remote add origin "$BG_D/remote.git"; git push -q --no-verify origin main >/dev/null 2>&1
-  bg_gd=$(git rev-parse --git-dir); BG_MARK="$BG_D/mark"; : > "$BG_MARK"
+  git remote add origin "$d/remote.git"; git push -q --no-verify origin main >/dev/null 2>&1
+  return 0
 }
 read_bg_marks() { wc -l < "$BG_MARK" | tr -d ' '; }
 run_bg_push() { # [env…] -> BG_OUT BG_RC for a push of HEAD to main over the remote's main
@@ -2575,7 +2725,14 @@ BG_RUNNER="bash $KIT_REL/$RUN_GATES/run-gates.sh"; BG_WRAP="bash wrap-bar.sh"
 # AC1 (TOOL-dWitnessedBar-4 AC6) — a green push leaves no record of the hook's own: the runner writes
 # the verdict per tree, and the stand-in runner here writes none, so the git dir holds no gate-bar-green
 # and no gate-verdict after it. Red against a hook that still writes its own per-tree green.
-build_bg_fixture ac1 || bad "BG could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture ac1 || bad "BG could not build its fixture"
+# TOOL-dQuietDisk-12 AC2 — a templated fixture is its own: its hooks path and its origin name this call's
+# BG_D, and that remote's main is HEAD. Silent when it holds, so the suite's ok lines stay those of the
+# base. Red against a build_pushed_fixture with no config writes, whose copy names the template's stage.
+_fx_h=$(git config core.hooksPath); _fx_u=$(git config remote.origin.url); _fx_m=$(git ls-remote origin refs/heads/main | cut -f1)
+[ "$_fx_h" = "$(cd "$BG_D/hooks" && { pwd -W 2>/dev/null || pwd; })" ] \
+  && [ "$_fx_u" = "$(cd "$BG_D/remote.git" && { pwd -W 2>/dev/null || pwd; })" ] && [ "$_fx_m" = "$(git rev-parse HEAD)" ] \
+  || bad "FX a templated bg fixture must name its own hooks and remote, whose main is HEAD: hooks=$_fx_h url=$_fx_u main=$_fx_m"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 run_bg_push
 case "$BG_RC|$(ls -d "$bg_gd"/gate-bar-green* "$bg_gd"/gate-verdict 2>/dev/null)" in
@@ -2623,7 +2780,7 @@ cd "$pfx_home" || exit 2
 # TOOL-dWitnessedBar-41 AC3 — a verdict whose `selection.1` was edited after the run no longer hashes to
 # its `selection`, and one whose `selection` key was deleted cannot say whether its bar held legs: both
 # run the bar, naming why. Red against a hook that skips `check_tree_selection`.
-build_bg_fixture ac6 || bad "BG could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture ac6 || bad "BG could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
 for _c in verdict manifest reused_cache keyless reused selftests tree seledit selkeyless control; do
@@ -2670,7 +2827,7 @@ cd "$pfx_home" || exit 2
 # derive runs the bar and names the row; one whose selection R derives exactly covers the merge with no
 # bar run. `select --check --selection` exits 1 and 0 on the same two rebuilt files. Red against a hook
 # that skips `check_tree_selection`.
-build_bg_fixture sel || bad "BG could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture sel || bad "BG could not build its fixture"
 cp "$SRC/$RUN_GATES_DIR/verdict_flow.py" "$SRC/$RUN_GATES_DIR/leg_factory.py" "$SRC/$RUN_GATES_DIR/regen.py" \
    "$KIT_REL/$RUN_GATES/"
 mkdir -p "$KIT_REL/$PK" .governance
@@ -2736,7 +2893,7 @@ printf 'held\t%s\n' "$_sel_add" > "$BG_D/sel-adds"; printf 'held\t%s\n' "$_sel_l
 cd "$pfx_home" || exit 2
 
 # AC9, AC10 — a runner stamp covers; a scoped verdict covers only from the adopted base.
-build_bg_fixture ac9 || bad "BG could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture ac9 || bad "BG could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1; write_bg_stamp "$_x"
 _m0=$(read_bg_marks); run_bg_push
@@ -2762,7 +2919,7 @@ cd "$pfx_home" || exit 2
 
 # AC14, AC15 — an inherited red lands under the value at R, here the catalogue default own-only, since
 # the fixture carries no policy kit; a doc-only push scopes doc-only.
-build_bg_fixture ac14 || bad "BG could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture ac14 || bad "BG could not build its fixture"
 echo 1 >> src/x.sh; git commit -qam c; run_bg_push BG_MODE=inh
 case "$BG_RC|$BG_OUT" in
   "0|"*"every red passes — landing under verdict.blocks own-only"*) ok "BG AC14 an inherited red lands under verdict.blocks own-only" ;;
@@ -2778,7 +2935,7 @@ cd "$pfx_home" || exit 2
 # AC17 (TOOL-dWitnessedBar-4 §4) — a wrapper bar that is not the runner finds no record for its own
 # command: even the runner's GREEN verdict of the very tree it pushes is no candidate, so it runs FULL
 # and says why. Red against a hook that offers the runner's verdict to any bar.
-build_bg_fixture ac17 || bad "BG could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture ac17 || bad "BG could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; git checkout -q main
 git merge -q --no-ff X -m "merge X" >/dev/null 2>&1; write_bg_verdict "$(git rev-parse HEAD)" full ""
 _m0=$(read_bg_marks); run_bg_push GOV_GATE_CMD="$BG_WRAP"
@@ -2791,7 +2948,7 @@ cd "$pfx_home" || exit 2
 # AC19, AC20 — a scoped verdict of the pushed tree is adopted only on a base B that is a full green
 # this push would adopt: one whose base no full verdict names is refused naming the base, and one whose
 # base is past the bound is refused on the base's lag.
-build_bg_fixture ac19 || bad "BG could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture ac19 || bad "BG could not build its fixture"
 _b=$(git rev-parse HEAD); echo c >> src/x.sh; git commit -qam C; _c=$(git rev-parse HEAD); set_bg_remote
 echo c2 >> src/x.sh; git commit -qam C2; _t=$(git rev-parse HEAD)
 write_bg_verdict "$_t" scoped "$_c"; run_bg_push
@@ -2800,7 +2957,7 @@ case "$BG_OUT" in
   *) bad "BG AC19 expected the verdict refused on its base, got: $BG_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
-build_bg_fixture ac20 || bad "BG could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture ac20 || bad "BG could not build its fixture"
 _b=$(git rev-parse HEAD)
 for _i in $(seq 1 16); do echo "p$_i" >> src/x.sh; git commit -qam "p$_i"; done
 set_bg_remote; echo c4 >> src/x.sh; git commit -qam C4; _t=$(git rev-parse HEAD)
@@ -2812,7 +2969,7 @@ esac
 cd "$pfx_home" || exit 2
 
 # TOOL-aFrugalTurnstile-11 AC4 — a scoped verdict only in the scoped slot covers a push of its tree.
-build_bg_fixture slot4 || bad "BG could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture slot4 || bad "BG could not build its fixture"
 _b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
 write_bg_verdict "$_b" full ""; write_bg_verdict "$_l" scoped "$_b"
 _m0=$(read_bg_marks); run_bg_push
@@ -2862,7 +3019,7 @@ for _pm in "local:AC1" "yes:AC5"; do
 done
 
 # AC2 — the recorded green strictly descends from the red: cleared, and the push scopes.
-build_bg_fixture pm-clear "$PM_DECL" || bad "PM could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture pm-clear "$PM_DECL" || bad "PM could not build its fixture"
 _p=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam x; _x=$(git rev-parse HEAD); write_bg_stamp "$_x"
 echo 2 >> src/x.sh; git commit -qam t; write_pm_red "$_p"; run_bg_push
 case "$BG_OUT" in
@@ -2872,7 +3029,7 @@ esac
 cd "$pfx_home" || exit 2
 
 # AC3 — undeclared at R, a present red is never read (the reuse probe's `ls-remote --heads` is no read of it) and the decision does not move.
-build_bg_fixture pm-undecl || bad "PM could not build its fixture"; build_pm_shim
+FX_TEMPLATE=1 build_bg_fixture pm-undecl || bad "PM could not build its fixture"; build_pm_shim
 _f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam p; _p=$(git rev-parse HEAD)
 echo 2 >> src/x.sh; git commit -qam t; write_pm_red "$_p"; run_bg_push PATH="$PM_PATH"
 case "$(grep -c 'ls-remote.*refs/gov/bar-red' "$BG_D/shim.log")|$BG_OUT" in
@@ -2883,7 +3040,7 @@ esac
 cd "$pfx_home" || exit 2
 
 # AC4 — declared, and the push URL reaches nothing: --decide reads unreadable as FULL, never as absent.
-build_bg_fixture pm-unread "$PM_DECL" || bad "PM could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture pm-unread "$PM_DECL" || bad "PM could not build its fixture"
 _f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam t
 git remote set-url --push origin "$BG_D/nowhere/x.git"; run_pm_decide -- "$(git rev-parse HEAD)" "$(read_pm_remote)"
 case "$PM_RC|$PM_OUT" in
@@ -2893,7 +3050,7 @@ esac
 cd "$pfx_home" || exit 2
 
 # AC6 — three states, one stdout line each, exit 0, and nothing under the git dir moves.
-build_bg_fixture pm-decide || bad "PM could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture pm-decide || bad "PM could not build its fixture"
 _f=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam t; _t=$(git rev-parse HEAD); _r=$(read_pm_remote)
 for _st in none scoped covered; do
   _e=()
@@ -2919,7 +3076,7 @@ done
 cd "$pfx_home" || exit 2
 
 # AC7, AC9 — a refusal exits 1 with an empty stdout; a bad call or an unchosen remote exits 2.
-build_bg_fixture pm-refuse || bad "PM could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture pm-refuse || bad "PM could not build its fixture"
 _f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam t; _t=$(git rev-parse HEAD); _r=$(read_pm_remote)
 echo 3 >> src/x.sh; run_pm_decide -- "$_t" "$_r"; _o1="$PM_RC|$PM_OUT"; git checkout -q src/x.sh
 run_pm_decide -- "$_f" "$_r"; _o2="$PM_RC|$PM_OUT"
@@ -2942,7 +3099,7 @@ cd "$pfx_home" || exit 2
 # AC11 — a covering record binds to the red too; and --decide's scoped base is the push's GATE_BASE.
 # TOOL-aFrugalTurnstile-15: the red that stays covered sits BEFORE the full green _b, since a scoped
 # record's own sha no longer clears a red at its base.
-build_bg_fixture pm-cover "$PM_DECL" || bad "PM could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture pm-cover "$PM_DECL" || bad "PM could not build its fixture"
 _p=$(git rev-parse HEAD); echo 0 >> src/x.sh; git commit -qam b; _b=$(git rev-parse HEAD)
 echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
 for _red in "$_l" "$_p"; do
@@ -2963,7 +3120,7 @@ cd "$pfx_home" || exit 2
 # with the ancestor records (TOOL-dWitnessedBar-4 S3): a scoped verdict is a candidate only for its own
 # tree, where the cover pass answers first.
 for _ac in AC2 AC3; do
-  build_bg_fixture "pm-full-$_ac" "$PM_DECL" || bad "PM could not build its fixture"
+  FX_TEMPLATE=1 build_bg_fixture "pm-full-$_ac" "$PM_DECL" || bad "PM could not build its fixture"
   _b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam x; _x=$(git rev-parse HEAD)
   [ "$_ac" = AC3 ] && { echo f >> src/x.sh; git commit -qam f; _b=$(git rev-parse HEAD); }
   echo 2 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
@@ -2979,7 +3136,7 @@ for _ac in AC2 AC3; do
   esac
   cd "$pfx_home" || exit 2
 done
-build_bg_fixture pm-base || bad "PM could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture pm-base || bad "PM could not build its fixture"
 _f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam t
 run_pm_decide -- "$(git rev-parse HEAD)" "$(read_pm_remote)"; run_bg_push
 _pmb=${PM_OUT#scoped }; _pmb=${_pmb%% *}
@@ -3006,7 +3163,7 @@ cd "$pfx_home" || exit 2
 # manifest blob or another fingerprint: the bar runs and no cover line prints. With a non-covering
 # per-tree verdict planted (it reads RED) the `not covered` line prints, and it names the reason.
 # Deleting any of the three refusals reds its arm; the unaltered stamp is the control.
-build_bg_fixture t16stamp || bad "T16 could not build its fixture"
+FX_TEMPLATE=1 build_bg_fixture t16stamp || bad "T16 could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
 for _alt in "control:" "manifest:leg manifest elsewhere/other-legs.json" "blob:leg manifest blob 01234567" "fingerprint:graded tree fingerprint 01234567"; do

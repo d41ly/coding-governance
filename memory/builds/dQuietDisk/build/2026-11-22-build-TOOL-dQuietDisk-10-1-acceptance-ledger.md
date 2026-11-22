@@ -1,0 +1,16 @@
+# TOOL-dQuietDisk-10 — acceptance ledger
+
+**Serves:** journal TOOL-dQuietDisk-10
+
+This pass ran no merge bar, no self-test suite and no gate leg, and it never ran `tools/check-wiring.test.sh` (gate-guard row D4). The probes ran on node d on 2026-11-22, under git 2.54.0.windows.1, from one script in the session scratch directory. The script cut the block from `export GIT_AUTHOR_NAME` to the closing brace of `newrepo` out of the edited suite with `awk`, and sourced it in a subshell with `TMPDIR` pointed at a scratch directory. The old leg is the suite at `40def53f7` (blob `8d0af8c91b34`), taken with `git show` into the scratch directory. Every line marked OWED belongs to the main loop at the close.
+
+**Evidences:** TOOL-dQuietDisk-10
+- AC1 — `GIT_TRACE2_EVENT` — at the pass, the seed build wrote 4 trace files and the capture 1 more. `newrepo wired` and then `newrepo` added none. `git -C "$D" config --local core.hooksPath` printed `.githooks` for the wired copy and nothing for the plain one. On the old leg, the seed wrote the same 4, and one `newrepo; git config core.hooksPath .githooks` added 1.
+- AC2 — `cmp` — at the pass, a `newrepo wired` copy's `.git/config` was `cmp`-identical to a plain copy's after `git config core.hooksPath .githooks`. Its `git ls-files -s`, `git for-each-ref` and `git config --local --list` read identically. The seed's config after the write-back was `cmp`-identical to its bytes before the capture. In the wired copy, `bash tools/check-wiring.sh --check` printed `ok       hooks     — core.hooksPath -> .githooks` and exited 0. In the plain copy it printed `UNWIRED  hooks` and exited 1.
+- AC3 — `newrepo wired` — at the pass, the three greps printed 0, 10 and 1. Before the change they printed 10, 0 and 11.
+- AC4 — `exits 2` — at the pass, a shell function `git` that fails `git -C <seed> config` made the sourced block exit 2 before `newrepo` was defined. A second function, whose `config` call succeeded but wrote nothing, also made the block exit 2, through the guard that the captured bytes differ from the plain ones.
+- AC5 — `template_cache_sh` — at the pass, `grep -nE '(^|[;&|] *)(\.|source) .*/lib/'` printed nothing, and `grep -c '>>> template_cache_sh'` printed 0.
+- AC6 — `extract-arms.sh` — OWED: the suite's 255 labels and verdicts, and its `PASS` total, at the build base and at this commit.
+- AC7 — `git clone --shared` — OWED: the suite's before and after runs in a scratch clone, which should show the git process count falling by at least 32, the peak temp entries not rising, and 0 residual entries. The read-only `govkit.py check --target C:/projects/incms/main` and `--target C:/projects/nicocares/main` are owed too. The probe left 0 entries in its own scratch `TMPDIR`.
+- Gates — `AC5 all wired -> exit 0` — OWED: the existing `check-wiring self-test` arm, to be seen RED with the wired write in `newrepo` removed and GREEN once restored. Section 4's probe shows the plain copy exits 1, and this pass saw the same.
+- Shell role — `shell-role.txt` — the suite now has 1660 code lines by `measure_code_lines` in `tools/gate-lint/sh_hygiene.py`, against its row of 1654: five capture lines and one `newrepo` line. The main loop widens the row. This pass did not edit the ledger.

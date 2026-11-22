@@ -1989,6 +1989,30 @@
     ]
   },
   {
+    "name": "cleanup posture (a tree removal that swallows its error)",
+    "tag": "leg.gov.cleanup-posture-a-tree-removal-that-swallows-its-error",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "catches a tree removal that swallows its error",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/encoding_posture.py",
+      "--cleanup",
+      "memory/project/cleanup-sites.txt",
+      ".",
+      "{prefix}",
+      "skills",
+      ".githooks"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
     "name": "hook destinations self-test",
     "tag": "leg.gov.hook-destinations-self-test",
     "tests": [
@@ -2527,7 +2551,8 @@
       "{prefix}/hooks/kit.toml",
       "{prefix}/settings-merge.py",
       "{prefix}/codebase-map/kit.toml",
-      "{prefix}/process-monitor/census.py"
+      "{prefix}/process-monitor/census.py",
+      "{prefix}/lib/template_cache.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -2577,6 +2602,29 @@
     "enforces": [
       "practice.portable.launch",
       "practice.portable.interpreter-floor"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "history-store selftest",
+    "tag": "leg.gov.history-store-selftest",
+    "purpose": "self-tests the history verdict store and its batch reader",
+    "argv": [
+      "python3",
+      "{prefix}/lib/history_store.py",
+      "--selftest"
+    ],
+    "guard": [
+      "{prefix}/lib/history_store.py",
+      "{prefix}/lib/history-store.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 120,
+    "enforces": [
+      "practice.gate"
     ],
     "stage": [
       "step.test"
@@ -3773,7 +3821,9 @@
     ],
     "guard": [
       "{prefix}/lib/lib-selftest.sh",
-      "{prefix}/lib/lib-selftest.test.sh"
+      "{prefix}/lib/lib-selftest.test.sh",
+      "{prefix}/lib/template-cache.sh",
+      "{prefix}/lib/template_cache.py"
     ],
     "chunk": "selftests",
     "subject": "kit",

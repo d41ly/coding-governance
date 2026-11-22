@@ -1,0 +1,3 @@
+# ledger · cleanup-sites · key site path,arm · direction shrink-only · drain hunk
+tools/govkit/steps/conf_pins_to_ledger.py	cleanup	1	0a155e5fdf69c5ecabc0e62f47dbd1ec609b5760	widened:2026-11-22-build-TOOL-dQuietDisk-9-widen-14
+tools/govkit/steps/registry_to_ledger.py	cleanup	1	0a155e5fdf69c5ecabc0e62f47dbd1ec609b5760	widened:2026-11-22-build-TOOL-dQuietDisk-9-widen-14
