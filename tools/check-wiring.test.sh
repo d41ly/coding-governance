@@ -412,7 +412,17 @@ out=$(chk --check); rc=$?
 cleanup
 
 # AC5a — all wired -> exit 0
-newrepo wired; chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 all wired -> exit 0" 1 || ck "AC5 all wired -> exit 0" 0
+# TOOL-dQuietDisk-26 AC1 — the same run, traced: the checker lists the index once, reads its
+# attributes once and the hooks' HEAD entries once, so a tree tracking one hook spends one
+# `ls-files`, one `ls-tree` and one `check-attr` per `--check`. A trace that was never written
+# counts none of the three, so it fails rather than passes.
+newrepo wired; _qd_tr=$(mktemp -d)
+GIT_TRACE2_EVENT="$_qd_tr" chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 all wired -> exit 0" 1 || ck "AC5 all wired -> exit 0" 0
+_qd_n=$(cat "$_qd_tr"/* 2>/dev/null | grep '"event":"cmd_name"' \
+        | grep -oE '"name":"(ls-files|ls-tree|check-attr)"' | sort | tr -d '\n')
+ck "QD26 AC1 a wired tree spends one ls-files, one ls-tree and one check-attr per --check [$_qd_n]" \
+   "$([ "$_qd_n" = '"name":"check-attr""name":"ls-files""name":"ls-tree"' ] && echo 1 || echo 0)"
+rm -rf "$_qd_tr"
 cleanup
 # AC5b — non-git dir -> exit 0
 D=$(mktemp -d); cd "$D" || exit 2; chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 non-git -> exit 0" 1 || ck "AC5 non-git -> exit 0" 0
@@ -663,6 +673,14 @@ JSON
   printf 'MEMORY_ROOT=memory\nROUTED_PATHS="%s"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' '.githooks/ memory/builds/' > .memory-tree.conf
   ck "RQ12 AC10 an entry under MEMORY_ROOT -> UNWIRED routed naming it as covering MEMORY_ROOT" \
      "$(HOME="$SGHOME" chk --check | grep -q '^UNWIRED  routed    — ROUTED_PATHS entry memory/builds/ covers MEMORY_ROOT' && echo 1 || echo 0)"
+  # TOOL-dQuietDisk-26 AC3 — a QUOTED listing is never read in-process. `ls-files` C-quotes the
+  # non-ASCII name, so a prefix test over the run's one listing would miss `docs/` and red an armed
+  # entry; the checker makes the per-site call instead, which matches the raw name.
+  mkdir -p docs; : > "docs/"$'\303\251'".md"; git add docs; git config core.quotePath true
+  printf 'MEMORY_ROOT=memory\nROUTED_PATHS="docs/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
+  ck "QD26 AC3 a directory entry whose one tracked file has a non-ASCII name reads ok routed" \
+     "$(HOME="$SGHOME" chk --check | grep -q '^ok       routed' && echo 1 || echo 0)"
+  git rm -rq --cached docs; rm -rf docs; git config --unset core.quotePath
   rm -f .memory-tree.conf
 
   # TOOL-aRoutedQuill-5 AC9 — the gate wired, and no /session-kickoff on this machine: the gate's own

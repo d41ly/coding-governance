@@ -7478,6 +7478,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "check_listed",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
       "id": "check_live_header",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -24058,6 +24063,16 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "read_listed_attr",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "read_listed_attrs",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
       "id": "read_listing",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -26796,6 +26811,11 @@
       "id": "read_tree_fingerprint",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "read_tree_listing",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
     },
     {
       "id": "read_tree_modes",

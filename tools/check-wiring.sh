@@ -796,17 +796,22 @@ resolve_kit_files
 GOV_WIRING_HOOKS="commit-msg pre-commit pre-push pre-rebase"
 check_hook_blobs() { # $1 = resolved hooks dir, $2 = the configured value as written
   local dir="$1" shown="$2" hook resolved tracked otherbranch
+  local -a hookpaths=()
+  for hook in $GOV_WIRING_HOOKS; do hookpaths+=(".githooks/$hook"); done
   for hook in $GOV_WIRING_HOOKS; do
     # A hook this tree does not TRACK is a SKIP, never a comparison and never a finding. Check H's
     # entry guard is tracked `.githooks/pre-commit` alone, so an adopter that owns its own pre-commit
     # and ships no pre-push must not acquire a permanent report it has no action to clear.
-    if ! git ls-files --error-unmatch ".githooks/$hook" >/dev/null 2>&1; then
+    if ! check_listed ".githooks/$hook"; then
       echo "skip     hooks     — .githooks/$hook is not tracked here, so there is nothing to compare"
       continue
     fi
     # `ls-tree`, not `rev-parse HEAD:<path>`: a POSIX-emulation shell on Windows can mangle the
-    # `<rev>:.dotpath` spelling and report ABSENT for a file that is present.
-    tracked=$(git ls-tree HEAD -- ".githooks/$hook" 2>/dev/null | awk '{print $3}')
+    # `<rev>:.dotpath` spelling and report ABSENT for a file that is present. ONE `ls-tree` over
+    # every hook, at the first tracked one (TOOL-dQuietDisk-26 S5): it prints a line per hook HEAD
+    # holds and none for the rest, so each hook reads its own line.
+    if [ -z "$_LT_READ" ]; then _LT=$(git ls-tree HEAD -- "${hookpaths[@]}" 2>/dev/null); _LT_READ=1; fi
+    tracked=$(printf '%s\n' "$_LT" | P=".githooks/$hook" awk -F'\t' '$2 == ENVIRON["P"] { split($1, f, " "); print f[3] }')
     resolved=$([ -f "$dir/$hook" ] && git hash-object "$dir/$hook" 2>/dev/null)
     # LIVENESS: an unreadable side is never printed as `ok`. "Could not compare" and "compared and
     # agreed" are different facts, and only one of them is evidence.
@@ -856,7 +861,12 @@ check_hook_modes() { # $1 = resolved hooks dir, $2 = the configured value as wri
     return
   fi
   # Paths print relative to $dir, so a nested file carries a `/` and is not a hook git would run.
-  if ! ls=$(git -C "$dir" ls-files -s 2>/dev/null); then
+  # THIS checkout's directory reads the run's one listing, its lines under the directory's prefix
+  # cut to that prefix as `git -C` prints them (TOOL-dQuietDisk-26 S4); another checkout, or a
+  # GIT_DIR or GIT_WORK_TREE that `-C` would honour, makes the call.
+  if [ "$top" -ef "$ROOT" ] && [ -z "${GIT_DIR+x}" ] && [ -z "${GIT_WORK_TREE+x}" ] && [ "$_LS_OK" = 1 ]; then
+    ls=$(printf '%s\n' "$_LS" | P="$pfx" awk -F'\t' '$0 != "" && (ENVIRON["P"] == "" || index($2, ENVIRON["P"]) == 1) { print $1 "\t" substr($2, length(ENVIRON["P"]) + 1) }')
+  elif ! ls=$(git -C "$dir" ls-files -s 2>/dev/null); then
     echo "note     hooks     — hook modes in $shown: UNKNOWN, git ls-files failed in $top"
     return
   fi
@@ -899,7 +909,7 @@ EOF
 
 # --- Check H: git hooks (core.hooksPath) ---------------------------------------------------------
 check_hooks() {
-  if ! { [ -f .githooks/pre-commit ] && git ls-files --error-unmatch .githooks/pre-commit >/dev/null 2>&1; }; then
+  if ! { [ -f .githooks/pre-commit ] && check_listed .githooks/pre-commit; }; then
     echo "skip     hooks     — no tracked .githooks/pre-commit"
     return
   fi
@@ -962,6 +972,72 @@ else
 fi
 rm -f "$_sj_err"
 matchers_of || :
+
+# --- the tracked tree, read ONCE per invocation (TOOL-dQuietDisk-26) --------------------------------
+# Every arm below asked git its own question: fourteen `ls-files`, four `ls-tree` and three
+# `check-attr` per `--check` on gov's tree. The index is listed once here, its attributes read once,
+# and the hooks' HEAD entries once at the first tracked hook, in this shell like `matchers_of` above,
+# so every arm's substitution inherits them. Nothing persists past the run, and no arm writes a path
+# into the index or `.gitattributes`: `--fix`'s one index write changes a hook's MODE, and its
+# read-back stays a live call. Reset here, so a value inherited from the environment never stands in
+# for a read this run did not make.
+#
+# A QUOTED LINE MAKES THE LISTING UNUSABLE. `ls-files` C-quotes a path with unusual bytes, while a
+# per-site pathspec matches the raw name, so a string test over the quoted line would answer
+# differently. Rather than unquote in bash, every site then makes its own call, as before.
+# PIPES, NEVER HERE-STRINGS: bash writes a large here-string to a temp file, measured, and the
+# listing is megabytes on a real tree, so each read below feeds `printf '%s\n'` into a pipe.
+# UNSET FIRST, then set: an assignment keeps an inherited export, and a listing exported into every
+# child's environment overflows a Windows environment block, so no child git starts (measured).
+unset _LS _LS_NAMES _LS_OK _LS_ATTRS _LS_ATTRS_OK _LT _LT_READ
+_LS=""; _LS_NAMES=""; _LS_OK=""; _LS_ATTRS=""; _LS_ATTRS_OK=""; _LT=""; _LT_READ=""
+read_tree_listing() { # -> _LS, the index as `ls-files -s` prints it; _LS_NAMES, its paths framed by newlines
+  local nl=$'\n' names
+  _LS=$(git ls-files -s 2>/dev/null) || return 0
+  names=$(printf '%s\n' "$_LS" | cut -f2-)
+  case "$nl$names" in *"$nl\""*) return 0 ;; esac
+  _LS_NAMES="$nl${names:+$names$nl}"
+  _LS_OK=1
+}
+read_listed_attrs() { # -> _LS_ATTRS, the `eol` and `merge` lines of every listed path, in listing order
+  [ "$_LS_OK" = 1 ] || return 0
+  if [ "$_LS_NAMES" = $'\n' ]; then _LS_ATTRS_OK=1; return 0; fi
+  _LS_ATTRS=$(printf '%s' "${_LS_NAMES#?}" | git check-attr --stdin eol merge 2>/dev/null) && _LS_ATTRS_OK=1
+}
+read_listed_attr() { # $1 = eol or merge -> that attribute's `check-attr` line for every tracked path
+  if [ "$_LS_OK" = 1 ] && [ "$_LS_ATTRS_OK" = 1 ]; then
+    # An attribute value holds no whitespace, so an `eol` line never matches the `merge` filter.
+    # Its stderr is discarded as the call's was, since a reader may close the pipe at its first match.
+    [ -z "$_LS_ATTRS" ] || printf '%s\n' "$_LS_ATTRS" 2>/dev/null | grep -E ": $1: [^ ]*\$" 2>/dev/null
+    return 0
+  fi
+  git ls-files 2>/dev/null | git check-attr --stdin "$1" 2>/dev/null
+}
+check_listed() { # $1 = a path, $2 = `exact` -> 0 when it is tracked, by git's rule for a literal pathspec
+  # Plain: an entry equal to the path or under `<path>/`, and only under it when the path ends in `/`.
+  # `exact`: an entry equal to the path. Quoting makes every byte of the path literal, and the
+  # match is case-sensitive, as pathspec matching is under core.ignorecase too (probed).
+  local p="$1" nl=$'\n' out
+  if [ "$_LS_OK" = 1 ]; then
+    case "$_LS_NAMES" in *"$nl$p$nl"*) return 0 ;; esac
+    [ "${2:-}" != exact ] || return 1
+    case "$p" in
+      */) case "$_LS_NAMES" in *"$nl$p"*) return 0 ;; esac ;;
+      *)  case "$_LS_NAMES" in *"$nl$p/"*) return 0 ;; esac ;;
+    esac
+    return 1
+  fi
+  # The listing is unusable: the site's own call. Every line it prints matches the pathspec, so
+  # plain is "printed any", and `exact` is "printed the path itself".
+  out=$(git --literal-pathspecs ls-files -- "$p" 2>/dev/null) || return 1
+  [ -n "$out" ] || return 1
+  if [ "${2:-}" = exact ]; then
+    case "$nl$out$nl" in *"$nl$p$nl"*) return 0 ;; esac
+    return 1
+  fi
+}
+read_tree_listing
+read_listed_attrs
 
 # --- Check A: agent-cap PreToolUse hook in the resolved settings file -----------------------------
 # Advisory: no mode mutates settings.json (the SessionStart hook must not rewrite its own file).
@@ -1318,10 +1394,11 @@ check_eol() {
   # glob, so the "every eol=lf path under .claude/" selector the paragraph above forbids stays unwritten.
   # A THIRD NAMED GLOB (TOOL-aOrientedCast-8 S8): the roles kit's rendered agent types and its role
   # index, which `roles render wiring` byte-compares, so a CRLF render is reported here and `--fix`
-  # rewrites it as it does a rendered Skill. One --stdin check-attr spawn, as main reads it.
-  pop=$(git ls-files .claude/skills/ .claude/workflows/ .claude/agents/ .claude/roles.json 2>/dev/null \
-        | grep -E '^\.claude/skills/.*\.md$|^\.claude/workflows/[^/]*\.js$|^\.claude/agents/[^/]*\.md$|^\.claude/roles\.json$' \
-        | git check-attr --stdin eol 2>/dev/null | sed -n 's/^\(.*\): eol: lf$/\1/p')
+  # rewrites it as it does a rendered Skill. The run's one attribute read answers it
+  # (TOOL-dQuietDisk-26 S3): every path's `eol` line, captured, then the globs. Each glob sits inside
+  # one of the four directories the per-site `ls-files` named, so the population and its order hold.
+  pop=$(read_listed_attr eol | sed -n 's/^\(.*\): eol: lf$/\1/p' \
+        | grep -E '^\.claude/skills/.*\.md$|^\.claude/workflows/[^/]*\.js$|^\.claude/agents/[^/]*\.md$|^\.claude/roles\.json$')
   if [ -z "$pop" ]; then
     echo "skip     eol       — no tracked .claude/skills/**.md or .claude/workflows/*.js carries an eol=lf pin"
     return
@@ -1430,8 +1507,8 @@ check_merge_rows() {
   # ONE call over every tracked path, and it reads what GIT judges rather than grepping
   # `.gitattributes` — attributes come from several files, the same rule check_eol follows. Looping
   # per file would be ~500 process spawns inside a SessionStart hook; `--stdin` is one process
-  # regardless of tree size.
-  declared=$(git ls-files 2>/dev/null | git check-attr --stdin merge 2>/dev/null | sed -n 's/: merge: rows$//p')
+  # regardless of tree size, and since TOOL-dQuietDisk-26 that one is the run's, shared by every arm.
+  declared=$(read_listed_attr merge | sed -n 's/: merge: rows$//p')
   if [ -z "$declared" ]; then
     echo "skip     merge     — no tracked path declares merge=rows"
     return
@@ -1625,8 +1702,8 @@ check_merge_rows() {
 # a foreign value reported and never overwritten. (aMendedFleet unit 22)
 check_merge_ours() {
   local cur
-  # One `check-attr --stdin` over the tracked paths, the same read check_merge_rows makes.
-  if ! git ls-files 2>/dev/null | git check-attr --stdin merge 2>/dev/null | grep -q ': merge: ours$'; then
+  # The run's one `check-attr --stdin` over the tracked paths, the read check_merge_rows makes.
+  if ! read_listed_attr merge | grep -q ': merge: ours$'; then
     echo "skip     merge     — merge=ours is declared on no tracked path"
     return
   fi
@@ -1843,9 +1920,9 @@ try {
       c=${e//\\//}
       while [ "${c#./}" != "$c" ]; do c=${c#./}; done
       if [ "${c%/}" != "$c" ]; then
-        [ -n "$(git --literal-pathspecs ls-files -- "$c" 2>/dev/null | head -n1)" ] && continue
+        check_listed "$c" && continue
       else
-        git --literal-pathspecs ls-files -- "$c" 2>/dev/null | grep -qxF -- "$c" && continue
+        check_listed "$c" exact && continue
       fi
       why="ROUTED_PATHS entry $e names nothing tracked (a directory entry ends in /)"; break
     done
@@ -1969,7 +2046,7 @@ check_skill_install() {
   # this state the check reports UNWIRED at every SessionStart, forever, in every adopting repo, with
   # a Fix line naming a command the operator has already run. `check_recall_opened`'s own comment
   # records where that road ends: a permanent false alarm trains every node to ignore the verifier.
-  if ! git ls-files --error-unmatch -- "$rel/SKILL.md" >/dev/null 2>&1; then
+  if ! check_listed "$rel/SKILL.md"; then
     echo "skip     skill     — the kickoff kit is not adopted in this repo; the install is machine-global"
     return
   fi
