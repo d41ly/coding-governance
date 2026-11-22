@@ -8848,6 +8848,11 @@
       "file": "tools/playbook/overlay_rows.py"
     },
     {
+      "id": "check_row_value",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "check_rows",
       "kind": "function",
       "file": "tools/playbook/check_layers.py"
@@ -8856,6 +8861,11 @@
       "id": "check_rows",
       "kind": "function",
       "file": "tools/playbook/row_checks.py"
+    },
+    {
+      "id": "check_rows_added",
+      "kind": "function",
+      "file": "tools/memory-tree/gov_record.py"
     },
     {
       "id": "check_rule_tags",
@@ -36286,6 +36296,11 @@
       "id": "run_planted",
       "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
+    },
+    {
+      "id": "run_planted_door",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "run_planted_git",

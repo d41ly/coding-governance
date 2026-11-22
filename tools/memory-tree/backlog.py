@@ -1580,6 +1580,17 @@ def render_ask_row(ask_id: str, filed: str, text: str, unit: bool = False, point
     return f"- {ask_id}{SEP}filed {filed}{marker}{SEP}{text}{render_clauses(clauses)}{tail}"
 
 
+def check_row_value(label: str, value: str) -> None:
+    """Refuse a value that would split the one-line row it is written into: a CR, an LF, `SEP` or
+    `ARROW`. ValueError naming `label` and the character class (TOOL-dTotalRecall-41 S1). Called by the
+    write door on each value it was handed, never by a renderer, whose other callers already validate.
+    WHAT IT DOES NOT CHECK: an empty value, or a value whose bytes read as a clause label."""
+    for bad, name in (("\r", "a carriage return"), ("\n", "a line feed"), (SEP, "the row separator"),
+                      (ARROW, "the pointer arrow")):
+        if bad in value:
+            raise ValueError(f"{label} holds {name}, which would split the row it is written into")
+
+
 def render_clauses(clauses) -> str:
     """The clause tail alone, for the two renderers that both end with one. `()` renders nothing."""
     return "".join(f"{SEP}{label} {value}" for label, value in clauses)

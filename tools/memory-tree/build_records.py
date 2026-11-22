@@ -1357,9 +1357,39 @@ def run_ask_door(root, *flags):
     return p.returncode, (p.stdout + p.stderr).strip()
 
 
+#: The renderer plants of TOOL-dTotalRecall-41 AC3 and AC4, each the body of `plant(ask_id, filed, text, unit,
+#: pointer, clauses)` over `real`, the renderer it rebinds.
+RENDER_PLANTS = {
+    "drop-clauses": "return real(ask_id, filed, text, unit, pointer)",
+    "second-ask": "return real(ask_id, filed, text, unit, pointer, clauses) + '\\n' + "
+                  "real(ask_id + '9', filed, 'planted', clauses=clauses)",
+}
+
+
+def run_planted_door(root, plant, *flags):
+    """`run_ask_door` in a child Python that first rebinds `backlog.render_ask_row` to the `RENDER_PLANTS`
+    body `plant` (TOOL-dTotalRecall-41 AC3, AC4), then runs `gov_record.main`: `(exit, output)`."""
+    import subprocess
+    code = ("import sys\n"
+            "for s in (sys.stdout, sys.stderr):\n"
+            "    s.reconfigure(encoding='utf-8', errors='replace')\n"
+            "sys.path.insert(0, sys.argv[1])\n"
+            "import backlog\n"
+            "real = backlog.render_ask_row\n"
+            "def plant(ask_id, filed, text, unit=False, pointer='', clauses=()):\n"
+            f"    {RENDER_PLANTS[plant]}\n"
+            "backlog.render_ask_row = plant\n"
+            "import gov_record\n"
+            "sys.exit(gov_record.main(['new', 'ask', '--build', 'tDoor', *sys.argv[2:]]))\n")
+    p = subprocess.run([sys.executable, "-c", code, str(KIT), *flags], cwd=str(root), capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL, timeout=600)
+    return p.returncode, (p.stdout + p.stderr).strip()
+
+
 def check_ask_plant():
-    """`--fixture --plant ask-door` (TOOL-dTotalRecall-7 AC4 to AC7, AC10 to AC12): the ask door's refuse,
-    undeclared-family, file, replay and grade cases in one seed, the refused read in a seed whose one commit
+    """`--fixture --plant ask-door` (TOOL-dTotalRecall-7 AC4 to AC7, AC10 to AC12; TOOL-dTotalRecall-41 AC1 to
+    AC4): the ask door's refuse, undeclared-family, value-refusal, planted-renderer, file, replay and grade
+    cases in one seed, the refused read in a seed whose one commit
     holds an invalid `asks.acceptance`, and the refused and filed cases over a bare remote, each seed under
     the host temp directory and the door run from this kit. -> `(failures, cases)`, or `(None, why)` where
     a kit the door runs beside does not resolve."""
@@ -1403,6 +1433,17 @@ def check_ask_plant():
         check_case("undeclared family", run_ask_door(a, *derive_flags(base, "--family", "NOPE"), "--clause", "accept",
                                                      "y"), 2, ["--family", "NOPE", "EXMP"], a)   # AC10
         check_case("no family", run_ask_door(a, *base[2:], "--clause", "accept", "y"), 2, ["--family"], a)
+        # TOOL-dTotalRecall-41 AC1 to AC3, each before the first filing, so the "file" case's id proves none minted
+        check_case("text-newline", run_ask_door(a, *derive_flags(base, "--text", "x\n- X-a-2 · filed 2026-02-01 · "
+                                                                "injected"), *accept), 2, ["--text", "a line feed"], a)
+        check_case("text-separator", run_ask_door(a, *derive_flags(base, "--text", "x · accept y")), 2,
+                   ["--text", "the row separator"], a)
+        check_case("pointer-cr", run_ask_door(a, *base, "--pointer", "a\rb", *accept), 2,
+                   ["--pointer", "a carriage return"], a)
+        check_case("sev-newline", run_ask_door(a, *base[:-1], "w\n- SEV · X-a-1 · HIGH · z", *accept), 2,
+                   ["--sev", "a line feed"], a)
+        check_case("graded-args-not-row", run_planted_door(a, "drop-clauses", *base, *accept), 2,
+                   ["asks.acceptance", "states no acceptance"], a)
         got = run_ask_door(a, *base, *accept)   # AC5
         check_case("file", got, 0, [f"wrote {rel} {first} key "])
         key = (re.search(rf"^wrote {re.escape(rel)} {first} key ([0-9a-f]{{12}})$", got[1], re.M) or [None, None])[1]
@@ -1422,6 +1463,11 @@ def check_ask_plant():
         check_case("replay", run_ask_door(a, *base, *accept), 0, [f"exists {rel} {first} key {key}"])   # AC12
         if (a / rel).read_bytes() != held or len(read_backlog(a)[0].asks) != 1:
             bad.append("replay: the backlog's bytes moved, or it no longer reads one ask")
+        status = run_git(a, "status", "--porcelain")
+        check_case("two-rows-added", run_planted_door(a, "second-ask", *base, *accept), 2,
+                   ["add 2 ask(s)", "nothing was minted or written"])   # TOOL-dTotalRecall-41 AC4
+        if (a / rel).read_bytes() != held or run_git(a, "status", "--porcelain") != status:
+            bad.append("two-rows-added: the backlog's bytes or the status moved on a refused filing")
         (a / ".governance").mkdir(exist_ok=True)
         with open(a / ".governance/policy.toml", "w", encoding="utf-8", newline="\n") as fh:
             fh.write('asks.acceptance = "grade"\n')

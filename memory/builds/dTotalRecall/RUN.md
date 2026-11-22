@@ -224,3 +224,10 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T21:15:54Z draw · re-dispatch · TOOL-dTotalRecall-11 · 27/186 · 20261122T211554Z-4dc620
 
 2026-11-22T21:15:54Z dispatch · item f711a956 TOOL-dTotalRecall-11 · reason tools/memory-tree/shape_run.py tools/memory-tree/gov_record.py tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/memory-tree/record-kinds.toml tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/README.md tools/memory-tree/kit.toml tools/govkit/registry.toml tools/gate-legs.json tools/govkit/subject-pins.tsv memory/map/features/memory-tree-hygiene.md tools/run-gates/ceiling-evidence.txt tools/workflows/tier2-review.test.sh tools/workflows/README.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-11.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-11-2-acceptance-ledger.md
+
+2026-11-22T21:40:09Z brief · item TOOL-dTotalRecall-41 · reason 601e33fc985e memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-41-build-brief.md
+
+2026-11-22T21:45:43Z dispatch · item 4ddb0f11 TOOL-dTotalRecall-41 · reason memory/LIVE.md tools/memory-tree/backlog.py
+2026-11-22T21:49:06Z draw · re-dispatch · TOOL-dTotalRecall-41 · 28/186 · 20261122T214906Z-7d274a
+
+2026-11-22T21:49:06Z dispatch · item 4ddb0f11 TOOL-dTotalRecall-41 · reason tools/memory-tree/backlog.py tools/memory-tree/gov_record.py tools/memory-tree/build_records.py tools/memory-tree/check-memory-hygiene.test.sh memory/map/generated tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-41.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-41-1-acceptance-ledger.md

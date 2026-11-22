@@ -3722,7 +3722,9 @@ fi
 # --- runs the refuse, undeclared-family, file, replay, grade, refused-read and refused-filing-on-a-remote
 # --- cases, each in a seed under the host temp directory. Red on a grade after the write, a family check
 # --- cut, a mint before the grade and a listing cut. It needs the policy, unattended and loop kits beside
-# --- this one and skips ALOUD without them.
+# --- this one and skips ALOUD without them. TOOL-dTotalRecall-41 (AC1 AC2 AC3 AC4) adds the cases
+# --- text-newline, text-separator, pointer-cr, sev-newline, graded-args-not-row and two-rows-added under the
+# --- same PASS hit: red on the check_row_value calls cut, the argument mapping graded and the count cut.
 out=$("$_PY" "$HERE/build_records.py" --fixture --plant ask-door 2>&1)
 if grep -qF 'build-records: SKIP ask-door' <<<"$out"; then
   echo "skip the ask door's plant: $(grep -F 'build-records: SKIP ask-door' <<<"$out"), so its 2 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+2))

@@ -22,7 +22,8 @@ through `write_record`, an empty rule's `--name`, a `<FAMILY>-<slug>-<seq>` coun
 `gov-claim.sh ask`, the family the unit's) and the file written and staged, never committed. A kind whose
 input is not a field list takes its handler in `KIND_HANDLERS`: `build-readme` and `spec` run the
 `--new-build` and `--new-spec` scaffolds of `gen_build_index.py`, imported, every flag passed through;
-`ask` grades the ask's clauses by `asks.acceptance` before any mint, then writes its ask and `SEV` rows
+`ask` refuses a line break or row separator in any value and grades the clauses parsed back from the row
+it would write by `asks.acceptance` before any mint (TOOL-dTotalRecall-41), then writes its ask and `SEV` rows
 into the build's `BACKLOG.md` under an id the `--family` counter mints (TOOL-dTotalRecall-7), printing
 `wrote <path> <id> key <key>` or `exists <path> <id> key <key>`, and `graded: not ready (R5)` under `grade`;
 `shape-run` takes `--review <path>` alone, a tracked review record whose one `review-shape` line `shape_run.py`
@@ -109,17 +110,38 @@ def render_backlog_text(prior, slug, ask_row, sev_row):
     return "\n".join(out) + "\n"
 
 
+def check_rows_added(before, after, ask_id, level):
+    """What `after` adds to `before` (two `backlog.parse_file` results, `before` None for an absent file),
+    where the ask door writes exactly one ask `ask_id` and one verb row, its `SEV` row at `level`: an empty
+    string where it adds exactly those, else what it added (TOOL-dTotalRecall-41 S3).
+    WHAT IT DOES NOT CHECK: a row of `before` that `after` rewrites in place, since it counts and names."""
+    import backlog  # noqa: E402  the SEV verb, spelled once
+    asks = len(after.asks) - (len(before.asks) if before is not None else 0)
+    rows = len(after.rows) - (len(before.rows) if before is not None else 0)
+    named = [x for x in after.asks if x.id == ask_id]
+    sevs = [r for r in after.rows if r.verb == backlog.SEV_VERB and r.target == ask_id and r.value == level]
+    if asks == 1 and rows == 1 and len(named) == 1 and len(sevs) == 1:
+        return ""
+    return (f"add {asks} ask(s) and {rows} verb row(s), {len(named)} ask(s) {ask_id} and {len(sevs)} SEV row(s) "
+            f"at {level} naming it, where exactly one of each is added")
+
+
 def write_new_ask(root, argv):
     """`new ask --build <slug> --family <FAMILY> --text <text> --sev <LEVEL> <why> [--clause <label> <value>]…
-    [--unit] [--pointer <path>]`: the ask kind's handler (TOOL-dTotalRecall-7 S2, §4 "The door verb"). In
-    order: the arguments, `--family` one the conf's `FAMILIES` declares; `asks.acceptance` read; the
-    `--clause` mapping graded by `backlog.check_ask_acceptable`, a false grade under `refuse` the refusal,
-    before any listing, mint or write; the content key; the listing of the build's `BACKLOG.md`, an ask of
-    that key `exists`; the counter mint `build_records.write_seq_mint`; both rows rendered, written, staged
-    and parsed back, the file put back as it was where the read-back fails. ValueError for every refusal.
+    [--unit] [--pointer <path>]`: the ask kind's handler (TOOL-dTotalRecall-7 S2, §4 "The door verb";
+    TOOL-dTotalRecall-41 §4 "The handler's order"). In order: the arguments, `--family` one the conf's
+    `FAMILIES` declares; `backlog.check_row_value` on every value; `asks.acceptance` read; the build's
+    `BACKLOG.md` parsed once, both rows rendered under the provisional id `<FAMILY>-<slug>-0` into the
+    would-be file and parsed, which must add exactly that ask and its `SEV` row (`check_rows_added`); that
+    parsed ask's clauses, through `derive_clauses`, graded by `backlog.check_ask_acceptable`, a false grade
+    under `refuse` the refusal, before any listing, mint or write; the listing of the before-parse, an ask of
+    the content key `exists`; the counter mint `build_records.write_seq_mint`; both rows rendered under the
+    minted id, written, staged and parsed back to the same count, the file put back as it was where the
+    read-back fails. ValueError for every refusal.
     WHAT IT DOES NOT CHECK: an ask of the same key filed on another branch, which the counter hands the
-    same id; an ask of the same text whose clauses differ, which is another key; a clause VALUE's own
-    grammar, which the read-back and V13 read (TOOL-dTotalRecall-41 moves it to the door)."""
+    same id; an ask of the same text whose clauses differ, which is another key; the rows rendered under the
+    minted id, which are counted and keyed, never graded; an ask the file already holds under the
+    provisional id, which the offline mint never hands out and whose clauses would merge into the grade."""
     import datetime
     import backlog  # noqa: E402  the predicate, the renderers and the parser, spelled once
     from tree_lib import read_policy_value  # noqa: E402  the kit's one policy read
@@ -152,9 +174,10 @@ def write_new_ask(root, argv):
         raise ValueError(f"--clause {' '.join(bad)} is no label of {' '.join(backlog.CLAUSE_LABELS)}")
     pairs = [(label, value) for label, value in a.clause]
     given = [("--text", a.text), ("--sev why", why)] + ([("--pointer", a.pointer)] if a.pointer is not None else [])
-    for name, value in given + pairs:
-        if not value.strip() or "\n" in value or "\r" in value:
-            raise ValueError(f"{name}: a value is one line and not empty")
+    for name, value in given + [(f"--clause {label}", value) for label, value in pairs]:
+        if not value.strip():
+            raise ValueError(f"{name}: a value is not empty")
+        backlog.check_row_value(name, value)
     memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
     if not pathlib.Path(root, memory_root, "builds", a.build).is_dir():
         raise ValueError(f"{memory_root}/builds/{a.build}/ is no build folder of this tree")
@@ -169,24 +192,38 @@ def write_new_ask(root, argv):
         raise ValueError(f"asks.acceptance did not read, so no ask is filed on a guessed value: {exc}") from None
     if value not in ("refuse", "grade"):
         raise ValueError(f"asks.acceptance reads {value!r}, neither refuse nor grade")
-    clauses = {label: tuple(backlog.read_clause_values(pairs, label)) for label in backlog.CLAUSE_LABELS
-               if backlog.read_clause_values(pairs, label)}
-    ready = backlog.check_ask_acceptable(clauses)
-    if not ready and value == "refuse":
-        raise ValueError(f"asks.acceptance is refuse and the ask {a.text!r} states no acceptance: it states "
-                         f"`accept <what done looks like>` or a `seen … run`, `seen <locator> run <command>`, "
-                         f"each a --clause")
     key = derive_ask_key(a.text, a.unit, a.pointer, pairs)
 
     rel = f"{memory_root}/builds/{a.build}/BACKLOG.md"
     path = pathlib.Path(root, rel)
     held = path.read_bytes() if path.is_file() else None
     prior = held.decode("utf-8") if held is not None else None
-    if prior is not None:
-        for ask in backlog.parse_file(rel, prior, grammar).asks:
-            if derive_ask_key(ask.text, ask.unit, ask.pointer, ask.clauses) == key:
-                print(f"exists {rel} {ask.id} key {key}")
-                return 0
+    before = backlog.parse_file(rel, prior, grammar) if prior is not None else None
+    today = datetime.date.today().isoformat()
+
+    def render_rows(ask_id):
+        """The would-be file with the ask and its `SEV` row rendered under `ask_id`, through the module so
+        a rebound renderer is the one read."""
+        return render_backlog_text(prior, a.build, backlog.render_ask_row(ask_id, today, a.text, a.unit,
+                                                                          a.pointer or "", pairs),
+                                   backlog.render_sev_row(ask_id, level, why))
+
+    provisional = f"{a.family}-{a.build}-0"
+    would = backlog.parse_file(rel, render_rows(provisional), grammar)
+    wrong = check_rows_added(before, would, provisional, level)
+    if wrong:
+        raise ValueError(f"the rows rendered under the provisional id {provisional} {wrong}, so nothing was "
+                         f"minted or written")
+    ready = backlog.check_ask_acceptable(
+        backlog.derive_clauses(backlog.build_corpus([would])).get(provisional, {}))
+    if not ready and value == "refuse":
+        raise ValueError(f"asks.acceptance is refuse and the ask {a.text!r} states no acceptance: it states "
+                         f"`accept <what done looks like>` or a `seen … run`, `seen <locator> run <command>`, "
+                         f"each a --clause")
+    for ask in before.asks if before is not None else ():
+        if derive_ask_key(ask.text, ask.unit, ask.pointer, ask.clauses) == key:
+            print(f"exists {rel} {ask.id} key {key}")
+            return 0
 
     word, said, lines = build_records.write_seq_mint(root, a.family, a.build, key)
     for line in lines:
@@ -194,18 +231,13 @@ def write_new_ask(root, argv):
     if word == "waiting":
         print(said)
         return 4
-    today = datetime.date.today().isoformat()
-    text = render_backlog_text(prior, a.build, backlog.render_ask_row(said, today, a.text, a.unit, a.pointer or "",
-                                                                     pairs),
-                               backlog.render_sev_row(said, level, why))
     with open(path, "w", encoding="utf-8", newline="\n") as fh:
-        fh.write(text)
+        fh.write(render_rows(said))
     subprocess.run(["git", "add", "--", rel], cwd=str(root), capture_output=True, check=False)
     back = backlog.parse_file(rel, path.read_bytes().decode("utf-8"), grammar)
+    wrong = check_rows_added(before, back, said, level)
     asks = [x for x in back.asks if x.id == said]
-    sevs = [r for r in back.rows if r.verb == backlog.SEV_VERB and r.target == said]
-    if (len(asks) != 1 or len(sevs) != 1 or sevs[0].value != level
-            or derive_ask_key(asks[0].text, asks[0].unit, asks[0].pointer, asks[0].clauses) != key):
+    if wrong or derive_ask_key(asks[0].text, asks[0].unit, asks[0].pointer, asks[0].clauses) != key:
         if prior is None:
             subprocess.run(["git", "rm", "-q", "--cached", "-f", "--", rel], cwd=str(root), capture_output=True,
                            check=False)
@@ -213,8 +245,8 @@ def write_new_ask(root, argv):
         else:
             path.write_bytes(held)
             subprocess.run(["git", "add", "--", rel], cwd=str(root), capture_output=True, check=False)
-        raise ValueError(f"{rel} did not read {said} back as one ask of key {key} and one SEV row at {level} "
-                         f"({len(asks)} ask(s), {len(sevs)} SEV row(s)), so the rows were removed and the file put "
+        raise ValueError(f"{rel} did not read {said} back as one ask of key {key} and one SEV row at {level}: "
+                         f"the written rows {wrong or 'read another key'}, so the rows were removed and the file put "
                          f"back as it was")
     print(f"wrote {rel} {said} key {key}")
     if not ready:
