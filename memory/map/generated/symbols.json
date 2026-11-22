@@ -21948,6 +21948,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_claude_version",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "read_clause_values",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -41936,6 +41941,11 @@
       "id": "write_class_row_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "write_claude_stub",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
     },
     {
       "id": "write_close_commit",

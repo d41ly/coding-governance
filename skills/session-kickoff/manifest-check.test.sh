@@ -2520,7 +2520,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # pointers-boundary, pointers-at-transitions, pointers-cap, pointers-replay), one ok row each from the
 # loop above; no suite ran in the pass, each plant was run alone by direct CLI.
 # +2: RAISED by the red-fix arming KICK-dKeptSession-13's POINTERS refusal (the K13 run_card and its count).
-FLOOR_ASSERTIONS=419
+# +1: RAISED by KICK-dKeptSession-37 — the plant it adds to `--list` (fixture-run-cli), one ok row from
+# the loop above; no suite ran in the pass, the plant was run alone by direct CLI.
+FLOOR_ASSERTIONS=420
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

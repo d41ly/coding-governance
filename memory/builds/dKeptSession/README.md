@@ -117,7 +117,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-67 — pass-tree regenerates over the merge as it will be committed, so a pass that changes a mirror input merges](spec/2026-11-22-spec-KICK-dKeptSession-67.md) | 7 | 2 | CLOSED | rev-3 | 2026-11-22 |
 | [KICK-dKeptSession-12 — a fresh session in the build's worktree recommended until the card-import fixture passes](spec/2026-10-26-spec-KICK-dKeptSession-12.md) | 8 | 2 | CLOSED | rev-5 | 2026-11-22 |
 | [KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`](spec/2026-10-26-spec-KICK-dKeptSession-13.md) | 9 | 2 | CLOSED | rev-7 | 2026-11-22 |
-| [KICK-dKeptSession-37 — the card-fixture verdict records the version of the claude binary the fixture launched, never the session's environment](spec/2026-10-26-spec-KICK-dKeptSession-37.md) | 9 | 2 | INPROGRESS | rev-5 | 2026-11-21 |
+| [KICK-dKeptSession-37 — the card-fixture verdict records the version of the claude binary the fixture launched, never the session's environment](spec/2026-10-26-spec-KICK-dKeptSession-37.md) | 9 | 2 | CLOSED | rev-5 | 2026-11-22 |
 | [KICK-dKeptSession-38 — the card-fixture verdict passes only while the tested binary is both PATH's and the session's, and an unknown version is red](spec/2026-10-26-spec-KICK-dKeptSession-38.md) | 9 | 2 | DEFERRED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-69 — the run branch reconciled with origin/main in one merge commit, one list factory kept, and the run's own reds cleared](spec/2026-11-22-spec-KICK-dKeptSession-69.md) | 9 | 2 | INPROGRESS | rev-3 | 2026-11-22 |
 | [KICK-dKeptSession-26 — the card showing the build's remaining rework budget beside its pointers](spec/2026-10-26-spec-KICK-dKeptSession-26.md) | 10 | 2 | DEFERRED | rev-4 | 2026-11-22 |
@@ -165,7 +165,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-2 | 2026-11-21 |
 <!-- /gen:build-units -->
 
-Records: 303 bound to this build, across 4 record folder(s).
+Records: 304 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

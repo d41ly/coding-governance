@@ -19,8 +19,9 @@
 # naming `tFix`, and the case runs its verbs and prints one `card-store: <case> · <what> · held|MISSED`
 # line per observation. The scratch tree is removed at exit. The card-import fixture's verdict
 # (KICK-dKeptSession-12) is planted in its file, or recorded by `--card --fixture-run` over a stub
-# fixture named by CARD_FIXTURE; those cases and every `context-` case export one `AI_AGENT`, so no
-# outcome reads the version of the session running the suite.
+# fixture named by CARD_FIXTURE; those cases and every `context-` case export one `AI_AGENT`, and the
+# cases that record one put a stub `claude` first on PATH, whose version the verdict records
+# (KICK-dKeptSession-37), so no outcome reads the version of the session or the node running the suite.
 # Exit 2 is a usage error, or a fixture that could not be built.
 # WHAT THIS DOES NOT CHECK: a remote other than a local bare one; a lost compare-and-swap, which needs
 # two writers between one read and its push; the engine's other cells, which their own arms cover; the
@@ -33,7 +34,7 @@ PLANTS="render publish publish-off publish-unwritten publish-late publish-hung s
 follow-fixed snapshot-terminal snapshot-every lookup lookup-offline lookup-upstream lookup-hung replay context-idle context-always-resume
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
 partial-ask terminal-route close-follow-twice follow-offline-publish follow-offline-publish-online
-follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-run worktree-named replay-order
+follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-run fixture-run-cli worktree-named replay-order
 pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
@@ -103,6 +104,16 @@ set_card_verdict() {
   local at; printf -v at '%(%Y-%m-%dT%H:%M:%S%z)T' -1
   mkdir -p "$R/.git/orientation" \
     && printf 'card-fixture — %s · fixture %s · cli %s · %s\n' "$1" "$2" "$3" "$at" > "$R/.git/orientation/card-fixture.verdict"
+}
+# write_claude_stub <script body> — a stub `claude` at $S/clibin, that dir first on PATH, whose version
+# the fixture's verdict records (KICK-dKeptSession-37 S2). The PATH entry is the POSIX spelling: a
+# drive-letter one's colon splits PATH, and the node's own `claude` answers instead of the stub.
+write_claude_stub() {
+  local d="$S/clibin"
+  { mkdir -p "$d" && printf '#!/usr/bin/env bash\n%s\n' "$1" > "$d/claude" && chmod +x "$d/claude"; } \
+    || { echo "card-store: no stub claude could be written under $d"; exit 2; }
+  command -v cygpath >/dev/null 2>&1 && d=$(cygpath -u "$d")
+  case ":$PATH:" in *":$d:"*) ;; *) export PATH="$d:$PATH" ;; esac
 }
 
 # The scratch repository: its build, the copied kits and the two stubs, committed and pushed.
@@ -366,8 +377,10 @@ case "$PLANT" in
   fixture-run)
     # KICK-dKeptSession-12 AC4: the verb over a stub fixture exiting 0, 1 and 2, each into its own
     # scratch dir; every file under the scratch tree but those dirs and the case's output is listed
-    # before and after, so a write outside <dir> other than the verdict is seen.
+    # before and after, so a write outside <dir> other than the verdict is seen. The verdict records PATH's
+    # `claude` (KICK-dKeptSession-37 S2), so a stub answering 9.9.2 stands first on PATH.
     export AI_AGENT=claude-code_9-9-2_agent
+    write_claude_stub 'echo "9.9.2 (Claude Code)"'
     v="$R/.git/orientation/card-fixture.verdict"; mkdir -p "$S/snap"
     printf 'exit 0\n' > "$S/stub0.sh"
     printf '%s\n' 'echo "card-compaction: FAILED limb B — the stub names its limb"' 'exit 1' > "$S/stub1.sh"
@@ -386,6 +399,24 @@ case "$PLANT" in
     rm -f "$v"
     CARD_FIXTURE="$S/stub9.sh" run_card_engine "$R" --card --fixture-run "$S/fx9"; rc=$?
     print_card_held "AC4 with CARD_FIXTURE naming no file the verb exits 2 and writes no verdict" "$([ "$rc" = 2 ] && [ ! -e "$v" ]; echo $?)" ;;
+  fixture-run-cli)
+    # KICK-dKeptSession-37 AC2, AC3: the verdict records the version of the `claude` first on PATH, the
+    # binary the fixture launches, never the one AI_AGENT names; a stub printing no version records
+    # `unknown`, and a card written beside it keeps the `cli —` cell's skipped: reason.
+    export AI_AGENT=claude-code_9-9-2_agent
+    v="$R/.git/orientation/card-fixture.verdict"
+    printf 'exit 0\n' > "$S/stub0.sh"
+    write_claude_stub 'echo "9.9.1 (Claude Code)"'
+    CARD_FIXTURE="$S/stub0.sh" run_card_engine "$R" --card --fixture-run "$S/fx0"; rc=$?
+    print_card_held "AC2 the verdict records PATH's claude 9.9.1, not AI_AGENT's 9.9.2" \
+      "$([ "$rc" = 0 ] && grep -q '^card-fixture — pass · fixture [0-9a-f]\{8\} · cli 9\.9\.1 · ' "$v"; echo $?)"
+    write_claude_stub 'exit 1'
+    CARD_FIXTURE="$S/stub0.sh" run_card_engine "$R" --card --fixture-run "$S/fx1"; rc=$?
+    print_card_held "AC3 a PATH claude printing nothing records cli unknown" \
+      "$([ "$rc" = 0 ] && grep -q '^card-fixture — pass · fixture [0-9a-f]\{8\} · cli unknown · ' "$v"; echo $?)"
+    run_card_engine "$R" --card --write --session t1
+    print_card_held "AC3 the card's cli — cell keeps its reason" \
+      "$(grep -m1 '^cli — ' "$R/.git/orientation/t1.md" | tr -d '\r' | grep -qx 'cli — skipped: claude --version printed no version'; echo $?)" ;;
   context-*|partial-*|terminal-route|fixture-stale|worktree-named|replay-order)
     case "$PLANT" in context-*|fixture-stale|worktree-named|replay-order) export AI_AGENT=claude-code_9-9-2_agent ;; esac
     if [ "$PLANT" = worktree-named ]; then
