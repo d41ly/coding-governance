@@ -1,0 +1,4 @@
+# ledger · row-duplicates · key record shard,row-key · direction shrink-only · drain key
+memory/DECISIONS.md	TOOL-aUnmannedHelm-5	2	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/DECISIONS.md	TOOL-aUnmannedHelm-6	2	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/DECISIONS.md	TOOL-aWrittenMethod-1	4	f4309607205a56fb072cfb57f05d6fe885c63365	seeded

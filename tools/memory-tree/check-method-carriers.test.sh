@@ -34,12 +34,14 @@ same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]
 
 seed() { # dir -> a git repo with the kit, a conf, a memory tree and ONE declared carrier
   rm -rf "$1"; mkdir -p "$1/$KIT_REL" "$1/memory/project" "$1/memory/guides"
-  cp "$LEG" "$1/$KIT_REL/"
+  # The leg reads its registry through the ledger factory beside it (TOOL-dWitnessedBar-16), so the
+  # factory and the two modules it imports travel with it, as an install lays them.
+  cp "$LEG" "$HERE/legacy_ledger.py" "$HERE/backlog.py" "$HERE/coverage_join.py" "$1/$KIT_REL/"
   ( cd "$1" && git init -q -b main . && git config user.email t@t.test && git config user.name t )
   printf 'MEMORY_ROOT=memory\n' > "$1/.memory-tree.conf"
   printf '# the method\n' > "$1/memory/guides/BUILD-METHOD.md"
   printf 'See memory/guides/BUILD-METHOD.md for the build method.\n' > "$1/POINTER.md"
-  printf '# method-carriers\nPOINTER.md \xc2\xb7 the one declared carrier\n' > "$1/memory/project/method-carriers.txt"
+  printf '# method-carriers\nPOINTER.md\t1\tabcdef12\tseeded\n' > "$1/memory/project/method-carriers.txt"
   ( cd "$1" && git add -A >/dev/null 2>&1 )
 }
 run() { ( cd "$1" && bash $KIT_REL/check-method-carriers.sh 2>&1 ); }
@@ -82,7 +84,7 @@ hit "$out" "SNEAKY.md"
 
 # ---- check 4, both directions: a row whose file is GONE, and a row whose file stopped pointing.
 seed "$R"
-printf '# method-carriers\nPOINTER.md \xc2\xb7 ok\nVANISHED.md \xc2\xb7 never existed\n' > "$R/memory/project/method-carriers.txt"
+printf '# method-carriers\nPOINTER.md\t1\tabcdef12\tseeded\nVANISHED.md\t1\tabcdef12\tseeded\n' > "$R/memory/project/method-carriers.txt"
 ( cd "$R" && git add -A >/dev/null 2>&1 )
 out=$(run "$R"); rc=$?
 same "a row for a missing file exits 1" "$rc" "1"
@@ -91,7 +93,7 @@ hit "$out" "a declared carrier no longer exists, so its row guards nothing"
 seed "$R"
 printf 'this file no longer mentions the method\n' > "$R/POINTER.md"
 printf 'See memory/guides/BUILD-METHOD.md.\n' > "$R/OTHER.md"
-printf '# method-carriers\nPOINTER.md \xc2\xb7 stale\nOTHER.md \xc2\xb7 real\n' > "$R/memory/project/method-carriers.txt"
+printf '# method-carriers\nPOINTER.md\t1\tabcdef12\tseeded\nOTHER.md\t1\tabcdef12\tseeded\n' > "$R/memory/project/method-carriers.txt"
 ( cd "$R" && git add -A >/dev/null 2>&1 )
 out=$(run "$R"); rc=$?
 same "a stale row exits 1" "$rc" "1"

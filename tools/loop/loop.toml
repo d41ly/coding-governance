@@ -1886,7 +1886,7 @@ routes = { held = "item.test.select", recorded = "item.test.verdict", retried = 
 [[item]]
 tag = "item.test.seen-red"
 step = "step.test"
-actor = "command:test.seen-red"
+actor = "command:memory-tree.seen-red"
 needs = ["item.test.verdict"]
 inputs = ["layer.memory:the seen-red records of the gates the build added or changed"]
 allowance = "none"

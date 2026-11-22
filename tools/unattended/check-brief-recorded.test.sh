@@ -207,6 +207,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
 # table. A shell consumer runs it with the python it already resolved, so the receipt rung is
@@ -801,7 +819,7 @@ rm -rf "$T"
 # ---- stale and REDS; a row only in the working tree waives nothing, because the leg reads HEAD.
 write_waiver() { # fixture root · commit? -> writes the one-row registry naming the fixture's unit
   ( cd "$1" && mkdir -p memory/project \
-    && printf 'ARCH-tBrief-1\tbuilt without a recorded brief\n' > memory/project/brief-recorded-waiver.txt \
+    && printf 'ARCH-tBrief-1\t1\tabcdef12\tseeded\n' > memory/project/brief-recorded-waiver.txt \
     && if [ "$2" = commit ]; then git add -A >/dev/null && git commit -q -m "records: waive" --no-verify; fi ) >/dev/null 2>&1
 }
 T=$(mkfixture norow); write_waiver "$T" commit
@@ -898,7 +916,7 @@ rm -rf "$T"
 # ...a WAIVER ROW naming the pushed unit is NOT JUDGED stale in RANGE mode, and is counted (rev-2)
 T=$(seed_brange_fixture)
 ( cd "$T/work" && git reset -q --hard origin/main && mkdir -p memory/project \
-  && printf 'ARCH-tBR-1\tbuilt without a recorded brief, landed as-is\n' > memory/project/brief-recorded-waiver.txt \
+  && printf 'ARCH-tBR-1\t1\tabcdef12\tseeded\n' > memory/project/brief-recorded-waiver.txt \
   && git add -A >/dev/null && git commit -q -m "waive ARCH-tBR-1" --no-verify && git push -q origin main \
   && write_br_build 2 row ) >/dev/null 2>&1
 o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?

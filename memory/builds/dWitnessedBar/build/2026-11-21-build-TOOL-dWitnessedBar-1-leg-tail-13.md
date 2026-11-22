@@ -1,0 +1,27 @@
+# TOOL-dWitnessedBar-1 leg-tail 13 — layer dependencies (the core never depends on an expansion) failed in run unattended-179529481580044524711-1640412
+
+**Serves:** leg-tail TOOL-dWitnessedBar-1
+
+- **Leg:** layer dependencies (the core never depends on an expansion)
+- **Hash:** d7caee92117f5174757d8c9704da2898ca2331ae
+- **Run:** unattended-179529481580044524711-1640412
+- **Sha:** f9ee3f8e0f2e994c7bad52ae0779fcf31c9c94db
+- **Cause:** run:dWitnessedBar
+
+```
+# run-gates | leg layer dependencies (the core never depends on an expansion) | exit 1
+layers: RED tools/memory-tree/legacy_ledger.py@eca5d963:230 · probe · core kit memory-tree depends on non-core kit govkit, and no optional row of its descriptor names the file as part
+layers: RED tools/playbook/instruction_units.py@73883269:2152 · probe · core kit playbook-render depends on non-core kit govkit, and no optional row of its descriptor names the file as part
+layers: RED tools/playbook/writing_practice.py@f56d57cc:491 · probe · core kit playbook-render depends on non-core kit govkit, and no optional row of its descriptor names the file as part
+layers: RED tools/run-gates/keep_tails.py@3abcdc0e:109 · probe · core kit run-gates depends on non-core kit runlog, and no optional row of its descriptor names the file as part
+layers: RED tools/run-gates/keep_tails.py@3abcdc0e:114 · import · core kit run-gates depends on non-core kit runlog, and no optional row of its descriptor names the file as part
+layers: RED tools/run-gates/leg_factory.py@16eb2782:74 · probe · core kit run-gates depends on non-core kit govkit, and no optional row of its descriptor names the file as part
+layers: RED tools/run-gates/leg_factory.py@16eb2782:136 · probe · core kit run-gates depends on non-core kit govkit, and no optional row of its descriptor names the file as part
+layers: RED tools/run-gates/leg_factory.py@16eb2782:141 · import · core kit run-gates depends on non-core kit govkit, and no optional row of its descriptor names the file as part
+layers: RED tools/run-gates/product_tests.py@badbd617:284 · probe · core kit run-gates depends on non-core kit pytest-parallel-guardrails, and no optional row of its descriptor names the file as part
+layers: RED tools/run-gates/product_tests.py@badbd617:292 · copy · core kit run-gates depends on non-core kit pytest-parallel-guardrails, and no optional row of its descriptor names the file as part
+layers: RED tools/run-gates/verdict_flow.py@b7294f80:1186 · probe · core kit run-gates depends on non-core kit drift-audit, and no optional row of its descriptor names the file as part
+layers: RED tools/run-gates/verdict_flow.py@b7294f80:1312 · probe · core kit run-gates depends on non-core kit drift-audit, and no optional row of its descriptor names the file as part
+layers: not read: a path computed at run time, JavaScript, a file no descriptor claims, a path that names no file the kit ships, and a bare kit name inside a string or a here-document
+layers: 12 layer row(s), 30 kit descriptor(s); edges by kind: import 5 · dynamic 0 · probe 48 · copy 6 · shell 0 · requires-if 0; 47 allowed, 12 red; 0 contract red(s)
+```

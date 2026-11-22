@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-90 — the round-1 audit of unit 89, 15 minors batched: a canary verdict on every code, the built match on quoted arms, selectors keyed on their unit, criteria that can red and a derivation that names each failure
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 47 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-3 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 47 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,9 +8,17 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
 | [2026-10-25-build-TOOL-dWitnessedBar-90-deviation-901.md](../build/2026-10-25-build-TOOL-dWitnessedBar-90-deviation-901.md) | deviation | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-90-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-90-1-acceptance-ledger.md) | journal | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-90-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-90-1-builder-return.md) | journal | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
+| [2026-11-21-build-TOOL-dWitnessedBar-90-widen-25.md](../build/2026-11-21-build-TOOL-dWitnessedBar-90-widen-25.md) | widen | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-90-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-90-build-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-90-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-90-reground-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-90-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-90-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-90-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-90-spec-audit-round1.md) | spec-audit | — |
+| [2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md](../reviews/2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md) | diff-review | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
 
 <!-- /gen:spec-records -->
 
@@ -48,13 +56,18 @@ defect at two binding grades and stand as items M4 and L1.
 ## 2. Scope (IN)
 
 - **S1** — id 17. The canary's verdict on every code. At the canary's single top-level call of
-  `check_canary_keys`, a return of 3 sets `fail=1`. The call site then prints nothing beyond the
-  visited line `check_canary_keys` already printed on stderr, and no `TOOL-dWitnessedBar-75` S1 line.
-  A return outside 0 to 3 sets `fail=1` and prints
+  `check_canary_keys`, a return of 3 already sets `fail=1` and leaves `rgf_ok` at 0, so the call site
+  prints nothing beyond the visited line `check_canary_keys` printed on stderr, and no
+  `TOOL-dWitnessedBar-75` S1 line: unit 89's pass `05fdf49d3` built that under its deviation 893.
+  This unit adds the remaining branch. A return outside 0 to 3 sets `fail=1`, leaves `rgf_ok` at 0,
+  as the suite's rule for a failed canary requires (§4 Evidence), and prints
   `gov-canary: check_canary_keys returned <rc>, a code it does not define`. Returns 0, 1 and 2 keep the
-  actions units 70, 75 and 84 S13 give them. The liveness loop already requires exactly 1 on each
-  variant's mutant (84 S13), so it fails on every other code. Unit 89's ledger beside AC4 records that
-  the canary's verdict on 3 is observed by this unit's AC1, and names this unit. Observed by AC1.
+  actions units 70, 75 and 84 S13 give them. The liveness loop requires a 1 with exactly `<var>` on
+  each variant's mutant (84 S13, 88 S3), so it fails on every other code. When the branch grows the
+  suite's code lines past its shell-role row, the builder widens that row with `ratchet.py widen` and
+  sets it to the built file's measure, as unit 89's `-widen-24` record did. Unit 89's ledger beside
+  AC4 records that the canary's verdict on 3 is observed by this unit's AC1, and names this unit.
+  Observed by AC1.
 - **S2** — id 4. The built match, graded on the quoted spellings. At the close the main loop runs the
   arm in two scratch clones of the built tree. One clone's `.githooks/pre-push` spells the `sha)` arm
   `rec_sha="$_rg_v"`, and the other spells it `rec_sha="${_rg_v}"`. The built liveness loop edits
@@ -105,15 +118,21 @@ defect at two binding grades and stand as items M4 and L1.
   the close, as if it carried `permission: the ledger is written at the close.` So at the close
   unit 89's ledger answers every one of its thirteen criteria. Observed by AC10.
 - **S11** — id 13. One owner line, its claim stated true. This unit declares a gov-canary arm (§7),
-  so `TOOL-dWitnessedBar-88` S6's derivation names it the floor's owner at the close (§8 F2). Its
-  builder restates `FLOOR_ASSERTIONS` absolutely, at the count the suite executes on a passing run at
-  this pass, by `TOOL-dWitnessedBar-82` S1's counting rule. The one comment line directly above
-  `FLOOR_ASSERTIONS=<n>` reads
-  `# Raised to <n> by TOOL-dWitnessedBar-90, counting every arm through order 47; stated ABSOLUTELY.`
-  That line is the only `Raised` comment the built suite keeps. The two `TOOL-aShardedFloor-2` lines
-  at `:92-93` and the `TOOL-dDerivedDocket-23` line at `:95` are not carried into the built file. The
-  other floor comments stay: the trailing comment on `:91`, the verdict block at `:377-378` and the
-  shard contract's note at `:408`. The assignment carries nothing after the number. Unit 89's ledger
+  so `TOOL-dWitnessedBar-88` S6's derivation and `TOOL-dWitnessedBar-83` S1's sort name it the
+  floor's owner (§8 F2), and units 88 and 89 left the owner line to it (88 S7, 89 S10). Its builder
+  restates `FLOOR_ASSERTIONS` absolutely, at the count the suite executes on a passing run at this
+  pass, by `TOOL-dWitnessedBar-82` S1's counting rule. S1 adds no increment of `a`, so that count is
+  the value the file holds, 80 (PINNED 2026-11-21 by `grep '^FLOOR_ASSERTIONS='`); any other count is
+  a divergence the builder returns. The one comment line directly above `FLOOR_ASSERTIONS=<n>` reads
+  `# Raised to <n> by TOOL-dWitnessedBar-90, counting every arm built through order 47; stated ABSOLUTELY.`
+  (§8 F5). That line is the only floor-history comment the built suite keeps. Not carried into the
+  built file: the `TOOL-aShardedFloor-2` comment's two lines above the constant
+  (`tools/run-gates/run-gates.gov.test.sh@9b0ad9c97:244-245`), and every comment line below it up to
+  the blank line (`@9b0ad9c97:247-287`), the ten `# RAISED` and six `# Raised` lines with their
+  continuation lines, units 82, 84 and 85's included; git history owns them. The other floor
+  comments stay: the trailing comment on `a=0` (`@9b0ad9c97:243`), the verdict block's
+  (`@9b0ad9c97:719-720`) and the shard contract's note (`@9b0ad9c97:750`). The assignment carries
+  nothing after the number. Unit 89's ledger
   beside AC10 records that this unit restates the floor after it, and that 89 AC10's owner-line
   clauses were read at 89's pass commit as `build_commit` finds it. It names this unit. Observed by
   AC11.
@@ -160,6 +179,9 @@ defect at two binding grades and stand as items M4 and L1.
   over the count the suite already executes.
 - The liveness loop's own verdict on a code outside 0 to 3. 84 S13 requires exactly 1 there, and
   89 S4 sets `fail=1` on 3.
+- Unit 28's arm, which waits with unit 28: it is deferred unbuilt at order 30, so S11's count holds
+  no assertion of it, and its own restatement, a `# RAISED` comment below the constant, is its
+  builder's. No other item here waits on it.
 
 ### Edges
 
@@ -175,51 +197,66 @@ defect at two binding grades and stand as items M4 and L1.
 ### Why one unit
 
 M4 admits a second unit only so that the two halves build concurrently. The suite half, S1 and S11,
-writes `tools/run-gates/run-gates.gov.test.sh`. The ledger half, S2 to S10 and S12 to S15, records
-arm runs and probes over that built suite in the ledgers of units 87 and 89. It reads the suite half's
+writes `tools/run-gates/run-gates.gov.test.sh` and its shell-role row. The ledger half, S2 to S10
+and S12 to S15, records arm runs and probes over that built suite in the ledgers of units 76, 87 and
+89. It reads the suite half's
 output as an acceptance input, M6 clause 2: S2's clones and S9's readings run the arm S1 changes, and
 S14 cuts the function S1's call site calls. S13 regenerates indexes beside the ledger records, M6
 clause 3. No split leaves two disjoint write sets. Dispatch is strictly sequential, a shared order
-included (`tools/workflows/unattended-build.js:76`), so a split would buy no concurrency.
+included (`tools/workflows/unattended-build.js@9b0ad9c97:78`), so a split would buy no concurrency.
 
 ### Evidence
 
-- `tools/run-gates/run-gates.gov.test.sh`, read on 2026-10-25: `:91` is
-  `a=0  # executed assertions, printed at the end against the pinned floor`, `:92-93` the two
-  `TOOL-aShardedFloor-2` lines, `:94` `FLOOR_ASSERTIONS=16`, `:95` the `TOOL-dDerivedDocket-23` line,
-  `:377-378` the verdict block's comment holding `a counter and a floor at BIRTH`, and `:408` the
-  shard contract's note holding `per-mode assertion floor`. `grep -n -i floor` prints those lines,
-  and `:459` fails only when `a` is below the floor. `grep -c Raised` prints 2.
-- `check_canary_keys`, its call sites and the liveness loop are not in the tree yet: units 74, 76,
-  79, 80, 84 and 89 specify them, and none is built. 84 S13 (spec-84 lines 115-122) gives the
-  canary's actions on 1 and 2, and requires exactly 1 from the liveness loop. 89 S4 (spec-89 lines
-  68-76) adds 3 and states the liveness loop's action on it, and no canary verdict.
-- `TOOL-dWitnessedBar-75` S1 (spec-75 line 35) spells the canary's line
-  `... on <uname -s> for <what>; the CR-strip assertion is not counted`, so `for unread` is the
+Read on 2026-11-21 at `93d34f5da`. Units 82 to 89 are CLOSED; unit 28 is deferred unbuilt.
+
+- `tools/run-gates/run-gates.gov.test.sh@9b0ad9c97:243-287`: `a=0` with its trailing comment
+  `executed assertions, printed at the end against the pinned floor`, the `TOOL-aShardedFloor-2`
+  comment's two lines, `FLOOR_ASSERTIONS=80`, then forty-one comment lines of floor history up to the
+  blank `@9b0ad9c97:288`. `grep -cE '^# (Raised|RAISED) '` prints 17 and `grep -c 'Raised'` prints 7 (PINNED
+  2026-11-21). `a counter and a floor at BIRTH` sits at `@9b0ad9c97:720` and
+  `per-mode assertion floor` at `@9b0ad9c97:750`, and `grep -c` prints 1 for each of the three
+  phrases (PINNED 2026-11-21). `@9b0ad9c97:1328` fails only when `a` is below the floor.
+- The canary's call site (`@9b0ad9c97:968-979`) takes `unread` on `rgf_ck` 2, sets `fail=1` on a 3,
+  and sets `rgf_ok` only when `rgf_whats` is empty and `rgf_ck` is not 3. Any other code reaches the
+  slot loop over an empty `rgf_miss` and leaves the canary passed. The 3 branch and the `rgf_ok`
+  guard are unit 89's deviation 893
+  (`memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-89-deviation-893.md`). The
+  comment above `#check_cr_reached` rules that a failed canary leaves the `rec_sha` and `rec_fp`
+  compares uncounted (`@9b0ad9c97:851-852`).
+- `#check_canary_keys` returns 3 on a failed visited count with the visited line on stderr, else 2
+  on any 2, else its printed flag (84 S13, 88 S3, 89 S4). `#check_key_variant` returns 3 silent on a
+  3, maps a 2 to `could not be sourced or read (rc 2)`, and maps every other code but a 1 with
+  exactly `<var>` to the passed reason. The liveness loop sets `fail=1` on a 3 (`@9b0ad9c97:989-1004`).
+- `TOOL-dWitnessedBar-75` S1's line, as built at `@9b0ad9c97:978`, reads
+  `... on $(uname -s) for $rgf_what; the CR-strip assertion is not counted`, so `for unread` is the
   read-failure slot's token.
-- Probed on this node on 2026-10-25 (GNU sed 4.9): 89 S6's match for `sha` with the replacement
-  `${_rg_v:1}` changed one line for each of S3's first five lines and none for its two modifier arms,
-  each line written to its own scratch file.
-- `region()` (`tools/unattended/unattended.sh:1310-1318`) exits 3 only from its END block. Probed on
-  2026-10-25 against a scratch copy of the five paths the derivation reads: §4's script printed 27 and
-  `spec/2026-10-25-spec-TOOL-dWitnessedBar-89.md` over the live README, `MALFORMED REGION` with exit 3
-  with a second `gen:build-units` pair appended, `REGION READER NOT FOUND` with exit 4 with `region()`
-  renamed, and `REGION READ FAILED (rc 2)` with exit 6 with the README absent. Once the index is
-  re-rendered with this unit, the length reads 28 and the path names this spec. PINNED on
-  2026-10-25; 89 S9 re-derives it at the close.
+- The suite's 852 code lines are its row in `memory/project/shell-role.txt`, a shrink-only ledger
+  (PINNED 2026-11-21 by `sh_hygiene.py --shell-role --measure . tools/run-gates/run-gates.gov.test.sh`).
+- Probed on this node on 2026-11-21 (GNU sed 4.9, bash 5.3.9 cygwin): the built `#check_key_variant`
+  match for `sha` with the replacement `${_rg_v:1}` changed one line for each of S3's first five
+  lines and none for its two modifier arms, each line written to its own scratch file, and
+  `grep -c 'sha)'` printed 1 for each. The built hook's arm is `sha) rec_sha=$_rg_v ;;`
+  (`.githooks/pre-push#read_green_file`).
+- `tools/unattended/unattended.sh#region` exits 3 only from its END block; awk exits 2 on a file it
+  cannot open. Probed on 2026-11-21 against a scratch copy of the four paths AC15 names: §4's script
+  printed 28 and `spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md` over the live README (PINNED
+  2026-11-21), `MALFORMED REGION` with exit 3 with a second `gen:build-units` pair appended,
+  `REGION READER NOT FOUND` with exit 4 with `region()` renamed, and `REGION READ FAILED (rc 2)` with
+  exit 6 with the README absent. 89 S9 re-derives the length at the close.
 - `resolve_python` (`tools/lib/resolve-python.sh`) runs each candidate and echoes the first that
   exits 0, returning non-zero and leaving the caller to halt when none does.
-- Hygiene check 9 (`tools/memory-tree/check-memory-hygiene.sh:1245-1277`) runs
+- Hygiene check 9 (`tools/memory-tree/check-memory-hygiene.sh@9b0ad9c97:1662-1675`) runs
   `gen_build_index.py --check` and fails with `generated build index differs from a fresh render`.
-  `.githooks/pre-commit:179-182` runs that hygiene with `--staged` when `memory/` is touched.
-  `tools/run-gates/run-gates.sh:1449` runs `regen.py --check`, and `:224` maps `--regen` to
-  `regen.py --write`. `tools/memory-tree/kit.toml:473-478` and `:489-495` declare the `[[generated]]`
-  rows for `{memory_root}/LIVE.md` and `{memory_root}/backlog`. `tools/unattended/README.md:34` says
-  `GENERATED_INDEXES` only adds pairs to these, and `.unattended.conf:418` names neither render.
-- `tools/memory-tree/gen_build_index.py:2709-2733` renders the `gen:spec-records` region of every unit
+  `.githooks/pre-commit@9b0ad9c97:283-291` runs that hygiene with `--staged` when `memory/` is
+  touched. `tools/run-gates/run-gates.sh@9b0ad9c97:1629` runs `regen.py --check`, and
+  `@9b0ad9c97:392` maps `--regen` to `regen.py --write`. `tools/memory-tree/kit.toml@9b0ad9c97:666-672`
+  and `@9b0ad9c97:682-689` declare the `[[generated]]` rows for `{memory_root}/LIVE.md` and
+  `{memory_root}/backlog`. `tools/unattended/README.md@9b0ad9c97:41` says `GENERATED_INDEXES` only
+  adds pairs to these, and `.unattended.conf#GENERATED_INDEXES` names neither render.
+- `tools/memory-tree/gen_build_index.py#plan` renders the `gen:spec-records` region of every unit
   spec of every build on `--write`. Commit `29ad48729` touched `spec-TOOL-dWitnessedBar-1.md`,
   `-10.md`, `-11.md` and others at that region alone.
-- `build_commit` (`tools/unattended/lib-unattended.sh:1186`) answers which commit is a unit's pass.
+- `tools/unattended/lib-unattended.sh#build_commit` answers which commit is a unit's pass.
 
 ### The owner derivation
 
@@ -243,8 +280,9 @@ printf '%s\n' "$r" | "$py" -c "import sys, importlib.util as u, re; s = u.spec_f
 
 Minted: the canary call site's line `gov-canary: check_canary_keys returned <rc>, a code it does not
 define`; the owner line naming this unit, with the restated `FLOOR_ASSERTIONS`; the derivation's
-`REGION READER NOT FOUND` and `REGION READ FAILED (rc <n>)` lines with exits 4 and 6. No function,
-plant, flag or file. Naming cells: none apply.
+`REGION READER NOT FOUND` and `REGION READ FAILED (rc <n>)` lines with exits 4 and 6; the widened
+shell-role row and its widen record, when S1 grows the suite. No function, plant, flag or file.
+Naming cells: none apply.
 
 ### Migration
 
@@ -252,19 +290,22 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 47, after every other unit of the build, the last of them
-`TOOL-dWitnessedBar-89` at order 46. S1, S3, S11, S14 and S15's probes run at the pass. S2's clones
+Live at landing, at order 47, building alone after `TOOL-dWitnessedBar-89` at order 46; units 91
+and 92 follow at order 48, and unit 28 stays deferred (§3). S1, S3, S11, S14 and S15's probes run at the pass. S2's clones
 and S1 and S9's clone readings run at the close. Every ledger line, from S1 to S15, is written at the
 close.
 
 ### Files touched (estimate)
 
-- `tools/run-gates/run-gates.gov.test.sh`
-- `memory/builds/dWitnessedBar/README.md`
-- `memory/backlog/TOOL.md`
-- `memory/LIVE.md`
-- `memory/builds/dWitnessedBar/build/`
-- `memory/builds/dWitnessedBar/spec/`
+- `tools/run-gates/run-gates.gov.test.sh`, S1's branch and S11's owner line and floor comments
+- `memory/project/shell-role.txt`, the suite's row widened when S1 grows it
+- `memory/builds/dWitnessedBar/README.md`, `memory/backlog/TOOL.md` and `memory/LIVE.md`, rendered
+  by `gen_build_index.py --write`
+- `memory/builds/dWitnessedBar/RUN.md`
+- `memory/builds/dWitnessedBar/spec/`, this spec's status header and every `gen:spec-records` region
+  the `--write` moves (S13)
+- `memory/builds/dWitnessedBar/build/`, this unit's acceptance ledger and widen record, and the
+  close's lines in the ledgers of units 76, 87 and 89
 
 ### Alternatives rejected
 
@@ -281,7 +322,7 @@ close.
 ## 5. Production-readiness checklist
 
 - security — no new write path. The scratch clones sit under `%TEMP%`.
-- perf / scale — none: S1 adds two `case` arms, and the close's clones run once.
+- perf / scale — none: S1 adds one branch at the call site, and the close's clones run once.
 - error / empty / loading states — S1 fails the canary on every code but 0; S14 refuses an empty cut;
   S15 gives a missing reader, a malformed region and an unreadable README three distinct lines.
 - observability — S1's undefined-code line names the code; S11's owner line names its unit.
@@ -304,14 +345,17 @@ close.
   holding `check_canary_keys returned 7` and exits non-zero. When
   `grep -n 'AC4' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-89*acceptance-ledger*` runs at
   the close, it prints a line naming `TOOL-dWitnessedBar-90`.
-  Red when: a canary call site whose `case` handles 0, 1 and 2 alone passes on a visited failure.
+  Red when: a canary call site handling 0, 1 and 2 alone passes on a visited failure, or reads an
+  undefined code as a pass.
   fixture: scratch clones under `%TEMP%/<short-name>`.
   figure: the `2` is the number of words in `${CANARY_KEYS[*]}`, DERIVED at observation time.
   permission: the arm's run is the main loop's, at the close.
 - **AC2** — In each of two scratch clones of the built tree, one whose `.githooks/pre-push` spells the
   `sha)` arm `rec_sha="$_rg_v"` and one spelling it `rec_sha="${_rg_v}"`, `grep -c 'rec_sha="'`
   over the clone's hook prints 1, and the arm prints no line holding `variant changed 0 lines` and
-  no line holding `visited`. When
+  no line holding `visited`. `TOOL-dWitnessedBar-91` S1 replaces that count with its anchored
+  three (§3 Edges): the built hook's two `rec_sha=""` initialisers already make it read 2 on the unedited hook (PINNED
+  2026-11-21 by `grep -c 'rec_sha="' .githooks/pre-push`). When
   `grep -n 'AC6' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-89*acceptance-ledger*` runs at
   the close, it prints a line naming `rec_sha="${_rg_v}"` and `TOOL-dWitnessedBar-90`.
   Red when: a built match that lost its optional quotes stalls the liveness loop on a quoted arm.
@@ -371,11 +415,12 @@ close.
   `grep -cE "^- AC${n} " memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-89*acceptance-ledger*`
   runs, it prints at least 1, and the line answering AC12 names `TOOL-dWitnessedBar-90`.
   Red when: a close-time act 89's Rollout omitted leaves one of its criteria unanswered.
-  figure: 13 is PINNED, the criteria 89 §6 numbers at rev-1.
+  figure: 13 is PINNED 2026-11-21, the criteria 89 §6 numbers at rev-4.
   permission: the ledger is written at the close.
-- **AC11** — On the built tree, `grep -c 'Raised' tools/run-gates/run-gates.gov.test.sh` prints 1, and
-  the line number `grep -n 'Raised'` prints is one less than the one `grep -n '^FLOOR_ASSERTIONS='`
-  prints. `grep -B1 '^FLOOR_ASSERTIONS=' tools/run-gates/run-gates.gov.test.sh | head -1` names
+- **AC11** — On the built tree, `grep -cE '^# (Raised|RAISED) ' tools/run-gates/run-gates.gov.test.sh`
+  prints 1, and the line number `grep -nE '^# (Raised|RAISED) '` prints is one less than the one
+  `grep -n '^FLOOR_ASSERTIONS='` prints.
+  `grep -B1 '^FLOOR_ASSERTIONS=' tools/run-gates/run-gates.gov.test.sh | head -1` names
   `TOOL-dWitnessedBar-90` and no other unit id, and
   `grep -cE '^FLOOR_ASSERTIONS=[0-9]+$' tools/run-gates/run-gates.gov.test.sh` prints 1. Each of
   `grep -c 'printed at the end against the pinned floor'`, `grep -c 'a counter and a floor at BIRTH'`
@@ -384,8 +429,10 @@ close.
   `grep -n 'build_commit' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-89*acceptance-ledger*`
   prints a line naming `TOOL-dWitnessedBar-90`.
   Red when: a builder reading "the only floor comment" deletes the verdict block's provenance, or a
-  stale owner line survives beside the restated value.
-  figure: the floor and `<n>` are DERIVED at observation time; `grep -c 'Raised'` prints 2 today.
+  stale owner line survives beside the restated value, or an upper-case `# RAISED` line below the
+  constant survives a case-sensitive count.
+  figure: the floor and `<n>` are DERIVED at observation time; the `(Raised|RAISED)` count reads 17
+  (PINNED 2026-11-21, §4 Evidence).
   permission: the arm's run is the main loop's, at the close.
 - **AC12** — At the close, `grep '^GENERATED_INDEXES=' .unattended.conf` holds neither
   `memory/LIVE.md` nor `memory/backlog`, and
@@ -424,12 +471,13 @@ close.
 
 ## 7. Gates
 
-`run-gates gov canary` · `testsuite counts (every bar self-test prints one)` · `recall floor` · `recall floor arms` · `memory hygiene`
+`run-gates gov canary` · `testsuite counts (every bar self-test prints one)` · `portability (shell lines only shrink)` · `ratchet (never gains)` · `recall floor` · `recall floor arms` · `memory hygiene`
 
-`run-gates gov canary` is held unless the main loop sets GATE_SELFTESTS at the close, which
-`SELFTESTS_OWED_PATHS="tools/"` does (`.unattended.conf:40`). `testsuite counts (every bar self-test
-prints one)` reads the assignment line S11 writes. `recall floor` and `recall floor arms` are owed for
-the paths under `memory/`.
+`run-gates gov canary` is held unless the main loop sets GATE_SELFTESTS at the close
+(`tools/run-gates/run-gates.sh#derive_hold_source`), as `.unattended.conf#SELFTESTS_OWED_PATHS`
+does. `testsuite counts (every bar self-test prints one)` reads the assignment line S11 writes.
+`portability (shell lines only shrink)` and `ratchet (never gains)` grade S1's shell-role row.
+`recall floor` and `recall floor arms` are owed for the paths under `memory/`.
 
 New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 AC2 · the canary call site's verdict on a visited failure and on a code it does not define, and the built match on quoted arms, staged red by a scratch suite whose canary call site handles 0, 1 and 2 alone (the isolated clone ends `PASS (`) and by a match whose quotes are not optional (a quoted hook arm reaches `variant changed 0 lines`) · FLOOR_ASSERTIONS restated absolutely by S11, its owner this unit
 
@@ -460,6 +508,14 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 AC2 · the canary c
   widened write set with no observation. (a) satisfies both fixes. RESOLVED (agent, 2026-10-25,
   delegated): (a), rung 3, the most feature-rich survivor.
   widens: none · relaxes: none
+- **F5 — What does the owner line count, with unit 28 deferred (id 13)?** Unit 28, at order 30,
+  declares a gov-canary `New arm:` line and is unbuilt, so rev-2's `counting every arm through order
+  47` would be false. Options: (a) `counting every arm built through order 47`; (b) keep rev-2's
+  wording and name unit 28 in a second comment; (c) hold this unit until unit 28 builds. (b) puts a
+  second story about one value beside the owner line, the class id 13 names; (c) defers a unit the
+  run dispatches over a deferral it does not own. RESOLVED (agent, 2026-11-21, delegated): (a), rung
+  3, the one survivor that keeps id 13's claim true on one line.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -468,15 +524,20 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 AC2 · the canary c
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-91 and TOOL-dWitnessedBar-92, promoted by the round-1 spec audit of
   unit 90; nothing else moved.
+- rev-3 · 2026-11-21 · §2 to §8 · §10 · re-grounded at `93d34f5da` per
+  2026-11-19-prompt-TOOL-dWitnessedBar-90-reground-brief. S1 keeps only the undefined-code branch,
+  unit 89's deviation 893 having built the 3; S11 drops every floor-history line and counts built arms
+  (F5); AC11 counts `RAISED` too; the shell-role row and its legs join; citations pinned.
 
 ## 10. Reuse audit
 
 Each item extends the seam its finding names. S1 extends the canary's call site and 89 S4's return
-code. S2 and S9 reuse the scratch-clone arm runs of 88 AC10 and 89 AC1, AC4 and AC6. S11 follows
+code, and its row widening reuses `ratchet.py widen`. S2 and S9 reuse the scratch-clone arm runs of 88 AC10 and 89 AC1, AC4 and AC6. S11 follows
 `TOOL-dWitnessedBar-82` S1's rule. S12 names the existing render-freshness seam: hygiene check 9
-(`tools/memory-tree/check-memory-hygiene.sh:1245`), `regen.py --check` (`tools/run-gates/run-gates.sh:1449`)
+(`tools/memory-tree/check-memory-hygiene.sh@9b0ad9c97:1662`), `regen.py --check`
+(`tools/run-gates/run-gates.sh@9b0ad9c97:1629`)
 and the `[[generated]]` rows of `tools/memory-tree/kit.toml`, so this build adds no freshness rule of
-its own. S15 keeps `region` (`tools/unattended/unattended.sh:1310`) and adopts `resolve_python`
+its own. S15 keeps `region` (`tools/unattended/unattended.sh#region`) and adopts `resolve_python`
 (`tools/lib/resolve-python.sh`), the one interpreter resolver.
 `python tools/codebase-map/reuse_lookup.py "report a failure distinctly when a sourced shell function is missing or a slice reader exits non-zero"`
 ranked `read`, `read_text`, `report` and `slice`, none of them a reader that tells a missing function

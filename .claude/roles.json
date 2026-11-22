@@ -10,7 +10,8 @@
         "gov-skeptic": "medium",
         "gov-spec-reviewer": "medium",
         "gov-spec-writer": "high",
-        "gov-synthesizer": "high"
+        "gov-synthesizer": "high",
+        "gov-tester": "medium"
       },
       "stages": {
         "build": {
@@ -62,7 +63,8 @@
           "gov-skeptic": "medium",
           "gov-spec-reviewer": "medium",
           "gov-spec-writer": "medium",
-          "gov-synthesizer": "medium"
+          "gov-synthesizer": "medium",
+          "gov-tester": "medium"
         },
         "stages": {
           "build": {
@@ -187,6 +189,12 @@
       "gates": [],
       "workflow": "closing-review",
       "writes": "review"
+    },
+    "gov-tester": {
+      "agent": true,
+      "gates": [],
+      "workflow": "gate-bar",
+      "writes": "none"
     }
   }
 }

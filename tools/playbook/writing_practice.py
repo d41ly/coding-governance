@@ -1,7 +1,7 @@
 """writing_practice — the writing practice's checks over records as well as units (PLAY-dOrderedCharter-29).
 
     python writing_practice.py check [one-subject|pinned-facts|one-door|rationale-apart|one-owner] [--explain]
-    python writing_practice.py check pinned-facts --seed | --shrink
+    python writing_practice.py check pinned-facts --seed | --shrink | --list
     python writing_practice.py --fixture --plant <case>
 
 `practice.writing` in practices.toml names eight rules; this module checks five, the rest are the resolver's and
@@ -18,8 +18,10 @@ and never red it; `pinned-facts` holds today's in the keyed list and reds a new 
 
 `one-subject`: a unit tag on two rows, or a heading slug twice in one record or one document, is red.
 `pinned-facts`: a line quoting a number before a word of FACT_UNITS carries a pin on that line. Today's unpinned
-facts are the keyed list `unpinned-facts.txt` under `<MEMORY_ROOT>/project/`, `<path>\\t<fact>`; a new fact is red,
-a listed one gone from the tree red as stale until `--shrink` takes it off; `--seed` writes the list once.
+facts are the keyed list `unpinned-facts.txt` under `<MEMORY_ROOT>/project/`, a ledger population keyed by path and
+fact, read and written through `positional.read_list` and `write_list` (TOOL-dWitnessedBar-18); a new fact is red,
+a listed one gone from the tree red as stale until `--shrink` takes it off; `--seed` writes the list once, and
+`--list` prints the population's seed, each fact of the tree as its key fields and the count.
 `one-door`: `doors.toml`, one `[[door]]` row per kind of DOOR_KINDS, each writer a tracked file and each node of a
 kind with a witness carrying it. `rationale-apart`: a unit's `help` inside a registered document, and a build
 record's path in the registry or a unit's text or source, are red. `one-owner`: every namespace, kind and kit unit
@@ -226,15 +228,32 @@ def derive_facts_path(pop) -> pathlib.Path:
     return positional.derive_list_path(pop["root"], pop["memory_root"], FACTS_NAME)
 
 
+def read_facts_list(pop):
+    """The facts list's rows, `<path>\\t<fact>`, through `positional.read_list` (TOOL-dWitnessedBar-18 S5);
+    None where absent. A list the factory refuses is a refusal."""
+    try:
+        return positional.read_list(pop["root"], derive_facts_path(pop))
+    except ti.TagError as exc:
+        raise Refused(f"pinned-facts: refused · {exc}") from None
+
+
+def write_facts_list(pop, rows) -> None:
+    """`rows` written through `positional.write_list`; a list it refuses is a refusal, nothing written."""
+    try:
+        positional.write_list(pop["root"], derive_facts_path(pop), rows)
+    except ti.TagError as exc:
+        raise Refused(f"pinned-facts: refused · {exc}") from None
+
+
 def check_pinned_facts(pop, opts) -> tuple:
     path = derive_facts_path(pop)
-    listed = positional.read_list(path)
+    listed = read_facts_list(pop)
     tree = read_fact_rows(pop)
     if opts.seed:
         if listed:
             raise Refused(f"pinned-facts: refused · --seed · {path.name} already holds {len(listed)} rows: the seed "
                           "runs once, and --shrink takes rows out")
-        positional.write_list(path, tree)
+        write_facts_list(pop, tree)
         return [], [f"pinned-facts: seeded {path.name} with {len(tree)} rows"]
     if listed is None:
         raise Refused(f"pinned-facts: refused · {pop['memory_root']}/project/{FACTS_NAME} is absent: run `writing_practice.py check "
@@ -242,7 +261,7 @@ def check_pinned_facts(pop, opts) -> tuple:
     listed = set(listed)
     if opts.shrink:
         keep = listed & tree
-        positional.write_list(path, keep)
+        write_facts_list(pop, keep)
         return [], [f"pinned-facts: shrink dropped {len(listed - keep)} stale rows, {len(keep)} remain"]
     reds, lines = [], []
     for row in sorted(tree - listed):
@@ -386,10 +405,14 @@ def run_arm(arm, pop, opts) -> int:
 
 
 def run_check(root, arm, opts) -> int:
-    if (opts.seed or opts.shrink) and arm != "pinned-facts":
-        print("writing-practice: --seed and --shrink are pinned-facts' alone", file=sys.stderr)
+    listed = getattr(opts, "list", False)
+    if (opts.seed or opts.shrink or listed) and arm != "pinned-facts" or opts.seed + opts.shrink + listed > 1:
+        print("writing-practice: --seed, --shrink and --list are pinned-facts' alone, one at a time", file=sys.stderr)
         return 2
     pop = read_populations(root)
+    if listed:  # the `unpinned-facts` population's seed (TOOL-dWitnessedBar-18 S4): the arm's own measurement
+        positional.print_rows(read_fact_rows(pop))
+        return 0
     rcs = [run_arm(a, pop, opts) for a in ((arm,) if arm else LEG_ARMS)]
     return 2 if 2 in rcs else max(rcs)
 
@@ -464,15 +487,24 @@ PLANTS = {
 }
 
 
+FX_FACTS = "memory/project/unpinned-facts.txt"
+FX_REGISTRY = "{prefix}/govkit/registry.toml"
+
+
 def derive_fixture_files(files) -> dict:
-    """`files` with each path's `{prefix}` the tool root this install lays its kits under."""
-    return {ti.resolve_prefix_token(k, iu.derive_kit_prefix()): v for k, v in files.items()}
+    """`files` with each path's `{prefix}` the tool root this install lays its kits under, and a planted facts
+    list written in the ledger grammar its registration renders (TOOL-dWitnessedBar-18 S5)."""
+    out = {ti.resolve_prefix_token(k, iu.derive_kit_prefix()): v for k, v in files.items()}
+    if out.get(FX_FACTS):
+        out[FX_FACTS] = positional.derive_fixture_list("unpinned-facts", [r for r in out[FX_FACTS].split("\n") if r])
+    return out
 
 
 def write_fixture(root, files) -> None:
     import gov_tag
     gov_tag.run_git(root, "init", "-q", "-b", "main")
-    gov_tag.write_commit(root, derive_fixture_files(FX_FILES), "the fixture")
+    gov_tag.write_commit(root, derive_fixture_files({**FX_FILES, FX_REGISTRY: positional.derive_fixture_ledger(
+        ["unpinned-facts"])}), "the fixture")
     if callable(files) or isinstance(files, str):
         return
     gov_tag.write_files(root, derive_fixture_files(files))
@@ -488,7 +520,7 @@ def run_plant(root, plant) -> int:
         oid = gov_tag.run_git(root, "rev-parse", "HEAD").strip()
         gov_tag.write_commit(root, {"memory/guides/BETA.md": f"# Beta\n\n{FACT} at {oid}\n"}, "the plant")
     if files == "seed-twice":
-        gov_tag.write_commit(root, {"memory/project/unpinned-facts.txt": None,
+        gov_tag.write_commit(root, {FX_FACTS: None,
                                     "memory/guides/BETA.md": f"# Beta\n\n{FACT}\n"}, "no list, one fact")
         print(f"writing-practice: plant {plant} · the first --seed")
         first = run_check(root, arm, argparse.Namespace(explain=False, seed=True, shrink=False))
@@ -528,6 +560,7 @@ def main(argv=None) -> int:
     ap.add_argument("--explain", action="store_true")
     ap.add_argument("--seed", action="store_true")
     ap.add_argument("--shrink", action="store_true")
+    ap.add_argument("--list", action="store_true", help="pinned-facts: print the facts list's seed")
     ap.add_argument("--fixture", action="store_true")
     ap.add_argument("--plant", default="none")
     ap.add_argument("--root", default=None)

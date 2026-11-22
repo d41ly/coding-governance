@@ -181,6 +181,10 @@ unchanged from `handoff.py agents --handoff <path>` for an agent it spawned itse
   the whole session again and prints the same lines. A record from another version of the verb, or
   for a session file that was edited, is never used.
 
+The `gov-tester` role judges a red the bar attributed to this build: the Test step hands it an OWN or
+blocking MIXED red, and it answers whether the code missed or the spec was wrong, with an outcome of
+`code-miss` or `spec-wrong`. It writes nothing. <!-- usage: agent:gov-tester -->
+
 ## When no role agent can be spawned
 
 Inline work is refused: the main session does not write a spec, review one, build a unit or run the

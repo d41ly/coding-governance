@@ -10,7 +10,7 @@ Remedies when this gate fails on your change:
 - claim the new key in the owning `<MAP_ROOT>/features/<feature>.md` (create it from any
   existing dossier — headings are pinned, prose is free), or
 - claim it in `<MAP_ROOT>/FOUNDATION.md` if it is shared substrate;
-- `baseline.toml` never gains a key: the gate refuses one the baseline at the branch's base did not
+- `baseline.txt` never gains a key: the gate refuses one the baseline at the branch's base did not
   carry (the merge-base with the remote default branch) — claim it in a dossier instead;
 - claim edits: regen artifacts with the command the failure prints (`map_lib.regen_cmd()`).
 
@@ -146,7 +146,7 @@ def test_every_inventory_key_is_claimed_or_baselined() -> None:
     assert cov.clean, (
         "codebase-map coverage violations.\n"
         f"UNCLAIMED (new key? claim it in a feature dossier, or FOUNDATION.md for shared "
-        f"substrate; baseline.toml is reserved for the initial backfill): {cov.unclaimed}\n"
+        f"substrate; baseline.txt is reserved for the initial backfill): {cov.unclaimed}\n"
         f"STALE CLAIMS (a dossier names a key that no longer exists): {cov.stale_claims}\n"
         f"STALE BASELINE (delete the line — the item is gone): {cov.stale_baseline}\n"
         f"LAZY BASELINE (now claimed — delete its baseline line): {cov.lazy_baseline}"
@@ -166,13 +166,13 @@ def test_baseline_never_gains_a_key() -> None:
     if base is None:
         print(f"     UNGRADED: {why}")
         return
-    added, note = cj.derive_baseline_additions(root, base, (m.map_root(root) / "baseline.toml").relative_to(root).as_posix())
+    added, note = cj.derive_baseline_additions(root, base, (m.map_root(root) / "baseline.txt").relative_to(root).as_posix())
     if added is None:
         print(f"     UNGRADED: {note} ({why})")
         return
     print(f"     compared against {base[:12]} ({why}): {note}")
     assert not added, (
-        "baseline.toml GAINED keys its base did not carry — claim each in a feature dossier, or "
+        "baseline.txt GAINED keys its base did not carry — claim each in a feature dossier, or "
         "FOUNDATION.md for shared substrate, and delete it from the baseline:\n"
         + "\n".join(f"  {inv}: {key}" for inv, keys in added.items() for key in keys)
     )
@@ -204,47 +204,6 @@ def test_dossier_affordance_present_or_graced() -> None:
         f"dossiers missing the '{m.AFFORDANCE_HEADING}' section — add a `seam: <id> — reuse for "
         f"<need>; extend via <point>` line per reusable seam, or `none — <why feature-specific>`: "
         f"{offenders}"
-    )
-
-
-# A NEW DOSSIER'S `decisions` LIST STARTS EMPTY AND IS NOT FINISHED THERE. It holds the unit ids
-# that govern the feature, it is graded shrink-only by the check below, and it is filled as those
-# ids are learned rather than guessed — a guessed id RESOLVES, which makes it worse than a visibly
-# empty list. This guidance sits here, beside the check that reads the population, rather than in
-# the scaffolder: the skeleton it was first written into is the one file the dossier loader
-# EXCLUDES from that population, so the check could never see it.
-def test_dossier_decisions_are_declining() -> None:
-    """How many dossiers declare NO decisions, against a shrink-only pin.
-
-    An empty list passes validation, so nothing has ever failed on the field, so nobody fills
-    it, so the reuse audit returns a seam with no rationale. That is the vacuous-selector
-    class: a rule that binds nothing reports clean forever. The pin is what converts "legal"
-    into "declining".
-
-    UNSET OR EMPTY IS UNGRADED, AND SAYS SO. A fresh adopter has no measurement of their own
-    corpus, and a number copied from another tree is either vacuous or permanently red. Reading
-    an absent pin as 0 would red their first run; reading it as "skip" silently would make this
-    check the very thing it exists to close. So it announces.
-    """
-    tree = m.load_map_tree(INVENTORY_IDS, decision_id_re=ID_RE)
-    if not tree.dossiers:
-        # UNGRADED, not failed. A freshly seeded tree has no dossiers yet, and asserting over
-        # an empty population is how this check reds an adopter on their first run. It binds
-        # the day the first dossier lands -- the same shape the unset-pin branch below uses.
-        print("     UNGRADED: no dossiers under the map root yet; this check grades a "
-              "population that does not exist, and binds when the first dossier lands")
-        return
-    empty = sorted(d.feature for d in tree.dossiers if not d.decisions)
-    raw = (m.load_conf().get("DOSSIER_DECISIONS_EMPTY_PIN", "") or "").strip()
-    if not raw:
-        print(f"     UNGRADED: {len(empty)} of {len(tree.dossiers)} dossier(s) declare no decisions; "
-              "set DOSSIER_DECISIONS_EMPTY_PIN in the kit conf to a value measured on THIS corpus")
-        return
-    pin = int(raw)
-    assert len(empty) <= pin, (
-        f"{len(empty)} of {len(tree.dossiers)} dossier(s) declare no decisions, over a "
-        f"shrink-only pin of {pin}. Fill one, or lower the pin with the reading beside it.\n"
-        f"empty: {empty}"
     )
 
 
@@ -338,18 +297,32 @@ def test_generated_artifacts_are_fresh() -> None:
         for tier, artifact in orphaned)
 
 
+def derive_unstaged_artifacts() -> list[str]:
+    """The generated artifacts the worktree holds differently from the index, repo-relative: fresh in
+    the worktree and not staged, so a commit would carry the stale copies. `--precommit` reds on them,
+    the check the pre-commit hook made before its leg was derived (TOOL-dWitnessedBar-10 S5). It
+    reads the INDEX against the worktree; it does not grade the index's own copies."""
+    import subprocess
+    gen_dir = m.map_root() / "generated"
+    out = subprocess.run(["git", "diff", "--name-only", "--", gen_dir.as_posix()],
+                         capture_output=True, text=True, encoding="utf-8", cwd=str(m.repo_root()))
+    return [p for p in out.stdout.splitlines() if p.strip()]
+
+
 # ======================================================================================
 # Standalone runner (projects without a test framework)
 # ======================================================================================
 
 if __name__ == "__main__":
+    # `--precommit`: the commit-time form. Every assertion below, then the regenerated artifacts left
+    # unstaged are a failure naming each, since the commit would carry the stale copies.
+    precommit = "--precommit" in sys.argv[1:]
     failures = 0
     for fn in (
         test_every_inventory_key_is_claimed_or_baselined,
         test_baseline_never_gains_a_key,
         test_dossier_prose_headings_pinned,
         test_dossier_affordance_present_or_graced,
-        test_dossier_decisions_are_declining,
         test_dossier_prose_carries_no_typed_count,
         test_path_derived_keys_are_posix,
         test_generated_artifacts_are_fresh,
@@ -359,5 +332,12 @@ if __name__ == "__main__":
             print(f"ok   {fn.__name__}")
         except AssertionError as exc:
             print(f"FAIL {fn.__name__}\n{exc}")
+            failures += 1
+    if precommit and not failures:
+        unstaged = derive_unstaged_artifacts()
+        if unstaged:
+            print("FAIL the codebase-map artifacts are fresh in the worktree but NOT staged, so this commit "
+                  "carries the stale copies. Stage them:")
+            print("\n".join(f"    {p}" for p in unstaged))
             failures += 1
     sys.exit(1 if failures else 0)

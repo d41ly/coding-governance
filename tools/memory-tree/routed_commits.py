@@ -7,7 +7,8 @@ behind it. This leg grades the COMMITS: every non-merge commit touching a path u
 must name a unit id whose spec existed at that commit's first parent.
 
     python routed_commits.py                          # grade the range, print the summary
-    python routed_commits.py --newest-unit <range>    # the newest unit id <range>'s commits attribute
+    python routed_commits.py --newest-unit <range> [<path>]  # the newest unit id <range>'s commits
+                                                      # attribute, those touching <path> alone if named
     python routed_commits.py --red-fix-limits <rev>   # one `Red-fix:` commit against the lane's limits
     python routed_commits.py --selftest               # the arms, over scratch repositories
 
@@ -561,10 +562,12 @@ def check_deviation_join(repo, conf, read) -> list:
         raise Refusal(f"the deviation join is armed and measures nothing: {exc}") from None
 
 
-def read_newest_unit(repo, rev_range: str) -> str:
+def read_newest_unit(repo, rev_range: str, path: str | None = None) -> str:
     """The first id, walking the non-merge commits of `rev_range` newest first, that a spec at HEAD
     defines, by the union reading; '' when none does. The attended lander's mint names this unit (S11),
-    so an unspecced id or a merge's id would name one the leg cannot grade (TOOL-aRoutedQuill-12 S2)."""
+    so an unspecced id or a merge's id would name one the leg cannot grade (TOOL-aRoutedQuill-12 S2).
+    `path` limits the walk to the commits touching it, `git log ... <range> -- <path>`, read as a
+    literal pathspec: the runner's size-warning attribution (TOOL-dWitnessedBar-29 S4, S5)."""
     repo = pathlib.Path(repo)
     conf = load_conf(repo)
     families = extract_families(conf)
@@ -575,7 +578,10 @@ def read_newest_unit(repo, rev_range: str) -> str:
     id_map, _ = load_spec_paths(repo, tracked, memory_root, families)
     id_re = build_id_re(families)
     try:
-        commits = read_commits(repo, ["--no-merges", rev_range], ("Pass",), run=lambda at, argv: run_git(at, *argv))
+        # The path rides after its own `--`; the reader's trailing `--` is then one more literal
+        # pathspec, `--`, which names no file.
+        revs = ["--no-merges", rev_range] + (["--", f":(literal){path}"] if path else [])
+        commits = read_commits(repo, revs, ("Pass",), run=lambda at, argv: run_git(at, *argv))
     except (LookupError, ValueError) as exc:
         raise Refusal(f"the commit log cannot be read: {exc}") from None
     for c in commits:
@@ -941,6 +947,19 @@ def run_selftest() -> int:
         set_fixture_conf(repo)
         newest = read_newest_unit(repo, f"{s[1]}..HEAD")
         print_arm(newest == "TOOL-tFix-1", f"AC11 --newest-unit skips a newest merge commit's id (got '{newest}')")
+        # TOOL-dWitnessedBar-29 AC5: a path walks only the commits touching it, so the newest unit, which
+        # never touched it, is passed over for the one that did; with no path the newest is named.
+        repo, s = build_fixture(root, "newestpath", [
+            {"msg": "init", "files": {"README.md": "x\n"}},
+            {"msg": "spec TOOL-tFix-1 and TOOL-tFix-2", "files": {SPEC1: "# TOOL-tFix-1 — one\n", SPEC2: "# TOOL-tFix-2 — two\n"}},
+            {"msg": "TOOL-tFix-1: grows the guide", "files": {"src/guide.md": "grown\n"}},
+            {"msg": "TOOL-tFix-2: elsewhere, newest", "files": {"src/other.txt": "o\n"}},
+        ])
+        set_fixture_conf(repo)
+        newest = read_newest_unit(repo, "HEAD", "src/guide.md")
+        print_arm(newest == "TOOL-tFix-1", f"dWB29 AC5 --newest-unit with a path names the unit that touched it (got '{newest}')")
+        newest = read_newest_unit(repo, "HEAD")
+        print_arm(newest == "TOOL-tFix-2", f"dWB29 AC5 --newest-unit with no path names the newest unit (got '{newest}')")
 
         # ---- TOOL-aNimbleMend-8 AC4 AC5 AC6: the red-fix lane. Four commits, graded WHOLE and RANGE with
         # the lane key stubbed on and then off, then a trailer-free twin for the spawn count. Against a
@@ -1424,8 +1443,8 @@ def main(argv: list) -> int:
         return run_selftest()
     try:
         repo = pathlib.Path(run_git(os.getcwd(), "rev-parse", "--show-toplevel").decode("utf-8").strip())
-        if len(args) == 2 and args[0] == "--newest-unit":
-            unit = read_newest_unit(repo, args[1])
+        if len(args) in (2, 3) and args[0] == "--newest-unit":
+            unit = read_newest_unit(repo, args[1], args[2] if len(args) == 3 else None)
             if unit:
                 print(unit)
             return 0
@@ -1452,7 +1471,7 @@ def main(argv: list) -> int:
                 print(f"  {fix['sha'][:8]} {fix['subject']} — {found}")
             return 1
         if args:
-            print(f"{SAY}: unknown arguments {' '.join(args)}; the verbs are none, --newest-unit <range>, "
+            print(f"{SAY}: unknown arguments {' '.join(args)}; the verbs are none, --newest-unit <range> [<path>], "
                   f"--red-fix-limits <rev> and --selftest")
             return 2
         rc, lines = check_routed_commits(repo, os.environ)

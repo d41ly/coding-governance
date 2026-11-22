@@ -42,7 +42,8 @@ RUNBOOK = ROOT / "WIRE-INTO-PROJECT.md"
 ANCHOR = re.compile(r"<!--\s*govkit:entry\s+([a-z0-9-]+)\s*-->")
 
 # THE SHRINK-ONLY RATCHET, and it is an EQUALITY rather than a ceiling. `readme-contract.txt` under
-# the memory tree's project registry carries the same shape as `exempt-pin:` and its header states
+# the memory tree's project registry carried the same shape as `exempt-pin:` until it became a ledger
+# population graded against its base (TOOL-dWitnessedBar-16), and its header stated
 # why: a pin left ABOVE the count after a drain is permanent slack, which is how a shrink-only list
 # stops shrinking without anyone noticing. So a DRAIN reds here too, and the remedy it prints is to
 # lower this number in the same commit as the section that drained it. Raising it is not a remedy

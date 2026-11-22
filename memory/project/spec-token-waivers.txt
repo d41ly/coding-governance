@@ -1,42 +1,35 @@
-# spec-token-waivers.txt - declared exceptions for tools/check-spec-tokens.py (TOOL-dRetiredFork-20).
-#
-# One `<token>	<reason>` per row. SHRINK-ONLY: the count may fall, never rise, so a new hit cannot
-# be waived away quietly. A row carrying no reason REDS, and so does one no spec produces any more -
-# a stale exception cannot hide a live hit.
-#
-# SEEDED EMPTY, deliberately. A registry seeded at the size of the problem is a ratchet with a worse
-# name; the pre-wiring run decides its first rows and each one is dispositioned in the record.
-codebase-map/selftest.py	a prefix-relative path in bConvergentLodestar, whose spec predates the tools/ prefix.
-tools/run-gates.sh	[path] REAL and that build's to fix: the runner moved to tools/run-gates/run-gates.sh (aBatchedLintel)
-selftest	[leg] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-in-flight/.gitkeep	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-in-flight/{a,b,c}.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-memory/project/journal/2026-07-15-aRuledParchment.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-verifier fan-out (≤5 verify agents per review)	[leg] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-memory/archive/ledger/{a,b,c}.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-memory/architecture/project/legacy-files.txt	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-memory/project/tstray.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-memory/guides/tfixture.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-memory/guides/tguide.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-memory/map/features/tdoss.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-memory/project/IN-FLIGHT.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-memory/project/MEMORY.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-memory/project/README.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-.claude/SESSION-KICKOFF.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-memory/backlog/<FAMILY>.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-testsuite counts	[leg] REAL and that build's to fix: a leg name truncated in its section 7 (aTetheredScratch)
-review-join ban	[leg] REAL and that build's to fix: a leg name truncated in its section 7 (aTetheredScratch)
-.claude/hooks/agent-cap.js	a path THIS build retired. TOOL-dRetiredFork-14/21 moved the hooks to the shipped kit dir and dropped the .claude/ copies, so a live spec of another build (aDeclaredBound-4 AC10) now cites a file gov does not track. Its AC is about PARITY between the shipped and wired copies -- a mechanism this build removed -- so rewriting the citation would change another build's acceptance criteria rather than repath it. Waived, and the disposition is an owner turn.
-.claude/hooks/scratch-guard.js	same cause and same reasoning, for aTetheredScratch-1 (its section 2 and AC7). Both rows exist because a retirement in one build invalidated a path two other builds' LIVE specs depend on; net waiver count FELL 24 -> 23 in the same pass, so the shrink-only discipline holds.
-build-index selftest <- tools/check-spec-tokens.py	[guards] another build's live spec, dPinnedHandoff, which TOOL-dTrueNorth-11's guard widening reached; its cure is that build's own section 7, asked by TOOL-dTrueNorth-21 in dTrueNorth's BACKLOG.md. Count 23 -> 25 under the standing ruling (ER:388, TOOL-dTrueNorth-20 F3) (dTrueNorth)
-memory-hygiene self-test <- tools/check-spec-tokens.py	[guards] another build's live spec, dPinnedHandoff, which TOOL-dTrueNorth-11's guard widening reached; its cure is that build's own section 7, asked by TOOL-dTrueNorth-21 in dTrueNorth's BACKLOG.md. Count 23 -> 25 under the standing ruling (ER:388, TOOL-dTrueNorth-20 F3) (dTrueNorth)
-routed-commits selftest <- tools/unattended/	[guards] another build's live spec, aOrientedCast-28, which TOOL-dTrueNorth-12's guard widening reached; its cure is that build's own section 7, asked by TOOL-dTrueNorth-22 in dTrueNorth's BACKLOG.md. Count 25 -> 26 under the standing ruling (ER:388), as TOOL-dTrueNorth-20 F3 took the two rows before it (dTrueNorth)
-tools/hooks/agent-cap.js:2092	[cite] another build's live spec, TOOL-aOrientedCast-28, cites agent-cap.js by line; TOOL-dGroundRules-10: this unit's retirements took the file from 2427 lines to 1960 and moved the lines; its cure is a re-citation by symbol in that build's own spec, asked by TOOL-dGroundRules-108 in dGroundRules' BACKLOG.md. Count 26 -> 28 rows (34 -> 36 lines) under the standing ruling (ER:388, TOOL-dGroundRules-10 F7) (dGroundRules)
-policy fixtures <- tools/workflows/unattended-build.template.js	[guards] another build's live spec, TOOL-aOrientedCast-28, which TOOL-dGroundRules-18's guard widening reached; its cure is that build's own section 7, asked by TOOL-dGroundRules-109 in dGroundRules' BACKLOG.md. Count 28 -> 29 rows (36 -> 37 lines) under the standing ruling (ER:388, TOOL-dGroundRules-18 F2) (dGroundRules)
-policy fixtures <- skills/session-kickoff/manifest-check.sh	[guards] another build's live specs, DEPL-aScoutedSeam-1 and KICK-aScoutedSeam-1, which TOOL-dGroundRules-20's guard widening reached; its cure is that build's own section 7, asked by TOOL-dGroundRules-110 in dGroundRules' BACKLOG.md. Count 29 -> 33 rows (37 -> 41 lines) under the standing ruling (ER:388, TOOL-dGroundRules-20 F1) (dGroundRules)
-policy fixtures <- tools/codebase-map/map_lib.py	[guards] another build's live specs, TOOL-aScoutedSeam-1 and TOOL-aScoutedSeam-3, which TOOL-dGroundRules-20's guard widening reached; its cure is that build's own section 7, asked by TOOL-dGroundRules-110 in dGroundRules' BACKLOG.md. Count 29 -> 33 rows (37 -> 41 lines) under the standing ruling (ER:388, TOOL-dGroundRules-20 F1) (dGroundRules)
-policy fixtures <- tools/memory-tree/check-memory-hygiene.sh	[guards] two other builds' live specs, TOOL-aScoutedSeam-2 and TOOL-dPinnedHandoff-1, which TOOL-dGroundRules-20's guard widening reached; its cure is each build's own section 7, asked by TOOL-dGroundRules-110 and TOOL-dGroundRules-111 in dGroundRules' BACKLOG.md. Count 29 -> 33 rows (37 -> 41 lines) under the standing ruling (ER:388, TOOL-dGroundRules-20 F1) (dGroundRules)
-policy fixtures <- tools/check-spec-tokens.py	[guards] another build's live specs, TOOL-dPinnedHandoff-2 and TOOL-dPinnedHandoff-3, which TOOL-dGroundRules-20's guard widening reached; its cure is that build's own section 7, asked by TOOL-dGroundRules-111 in dGroundRules' BACKLOG.md. Count 29 -> 33 rows (37 -> 41 lines) under the standing ruling (ER:388, TOOL-dGroundRules-20 F1) (dGroundRules)
-policy fixtures <- tools/workflows/kit.toml	[guards] another build's live spec, TOOL-aScoutedSeam-1, which TOOL-dGroundRules-67's guard sweep reached (the paths deviation 78 owed, tools/workflows/kit.toml among them); the join names a spec's first declared path per missing leg, and tools/workflows/kit.toml precedes roles_lib.py there, so this row re-keys the one TOOL-dGroundRules-25 keyed on roles_lib.py, which no spec produces any more; its cure is that build's own section 7, asked by TOOL-dGroundRules-110 in dGroundRules' BACKLOG.md. Count 33 -> 33 rows (41 -> 41 lines) under the standing ruling (ER:388, TOOL-dGroundRules-67 section 4) (dGroundRules)
-tools/hooks/agent-cap.js:1972	[cite] another build's live spec, TOOL-aOrientedCast-28, cites agent-cap.js by line; TOOL-dFairHearing-16: this unit's move of rules 0, 2 and 5 to the review kit took the file from 2008 lines to 947 and moved the lines; its cure is a re-citation by symbol in that build's own spec, asked by TOOL-dFairHearing-41 in dFairHearing's BACKLOG.md. Count 33 -> 34 rows (41 -> 42 lines) under the standing ruling (ER:388, TOOL-dFairHearing-16 F8) (dFairHearing)
-hook destinations self-test <- tools/workflows/kit.toml	[guards] another build's live spec, TOOL-aScoutedSeam-1, which TOOL-dFairHearing-47's guard widening reached; its cure is that build's own section 7, asked by TOOL-dFairHearing-49 in dFairHearing's BACKLOG.md, under the standing ruling the rows above name (dFairHearing)
+# ledger · spec-token-waivers · key key token · direction shrink-only · drain key
+codebase-map/selftest.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/run-gates.sh	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+selftest	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+in-flight/.gitkeep	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+in-flight/{a,b,c}.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/project/journal/2026-07-15-aRuledParchment.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+verifier fan-out (≤5 verify agents per review)	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/archive/ledger/{a,b,c}.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/architecture/project/legacy-files.txt	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/project/tstray.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/guides/tfixture.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/guides/tguide.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/map/features/tdoss.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/project/IN-FLIGHT.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/project/MEMORY.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/project/README.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+.claude/SESSION-KICKOFF.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/backlog/<FAMILY>.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+testsuite counts	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+review-join ban	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+.claude/hooks/agent-cap.js	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+.claude/hooks/scratch-guard.js	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+build-index selftest <- tools/check-spec-tokens.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory-hygiene self-test <- tools/check-spec-tokens.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+routed-commits selftest <- tools/unattended/	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/hooks/agent-cap.js:2092	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- tools/workflows/unattended-build.template.js	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- skills/session-kickoff/manifest-check.sh	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- tools/codebase-map/map_lib.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- tools/memory-tree/check-memory-hygiene.sh	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- tools/check-spec-tokens.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- tools/workflows/kit.toml	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/hooks/agent-cap.js:1972	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+hook destinations self-test <- tools/workflows/kit.toml	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

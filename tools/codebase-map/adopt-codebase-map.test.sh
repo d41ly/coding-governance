@@ -213,6 +213,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 
 PY=$(resolve_python "${MAP_PY:-}") || exit 2
 
@@ -404,6 +422,80 @@ else
   else
     good "6 happy-path adopts, and the gate it installs is live"
   fi
+fi
+
+# ---------------------------------------------------------------------------------------------
+# arm 7 (TOOL-dWitnessedBar-15 AC7) — a re-adopt never re-seeds the affordance grace list. The
+# adopter seeds it through the memory-tree kit's `legacy_ledger.py seed --home`, so the fixture
+# carries that kit beside this one, as an install does (`requires = ["memory-tree"]`). Once the list
+# exists, a dossier lacking the section is planted and committed, and the next adopt must leave the
+# list byte-identical: a re-seed would grace the planted offender. The scaffolding run writes the list,
+# since the seed admits a home whose directory exists (TOOL-dWitnessedBar-47), and arm 8 owns that
+# first write; this arm asserts the file, not which run wrote it. A list holding no row is UNARMED and
+# the factory re-seeds an unarmed home (TOOL-dWitnessedBar-16 §8 F18), so the scaffold carries one
+# section-less dossier, `early`, and the list the third adopt seeds is armed with it.
+# The list's basename is taken from the adopter's own seed call, never spelled here, so arms 7 and 8
+# follow a rename and red where no name is found (TOOL-dWitnessedBar-57 S12).
+# ---------------------------------------------------------------------------------------------
+AFF_NAME=$(sed -n 's|.*legacy_ledger\.py" seed --home "[^"]*/\([^"/]*\)".*|\1|p' "$KIT/adopt-codebase-map.sh" | head -n 1)
+note "arms 7 and 8 read the exempt list's basename from the adopter's seed call: ${AFF_NAME:-none found}"
+KD=$(mkrepo "$TMP/a7" "${FPFX%/}")
+MT=$("$PY" -c 'import sys
+sys.path.insert(0, sys.argv[1])
+import map_lib
+print(map_lib.MEMORY_TREE_DIR.as_posix())' "$KIT" 2>&1 | tr -d '\r')
+cp -r "$MT" "$(dirname "$KD")/memory-tree" 2>/dev/null
+aff="$TMP/a7/memory/map/$AFF_NAME"
+(cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold >/dev/null 2>&1) || true   # creates the conf, exits 1 by design
+(cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold >/dev/null 2>&1) || true   # scaffolds the map tree
+mkdir -p "$TMP/a7/memory/map/features"
+printf '# early\n\n```toml\nfeature = "early"\ntitle = "early"\nstatus = "shipped"\nstreams = []\ndecisions = []\npaths = { globs = ["src/*.py"] }\n\n[claims]\nmods = []\n```\n' \
+  > "$TMP/a7/memory/map/features/early.md"
+git -C "$TMP/a7" add -A && git -C "$TMP/a7" commit -qm scaffold --no-verify
+out=$(cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1)
+if [ -z "$AFF_NAME" ]; then bad "7 re-adopt: no exempt list basename was found in the adopter's seed call"
+elif [ ! -d "$(dirname "$KD")/memory-tree" ]; then bad "7 re-adopt: the memory-tree kit was not found beside the kit under test: $MT"
+elif [ ! -f "$aff" ] || ! grep -q "^early" "$aff"; then bad "7 re-adopt: no armed $AFF_NAME after the scaffold was committed"; printf '%s\n' "$out" | sed 's/^/      /'
+else
+  cp "$aff" "$TMP/a7-aff.before"
+  printf '# planted\n\n```toml\nfeature = "planted"\ntitle = "planted"\nstatus = "shipped"\nstreams = []\ndecisions = []\npaths = { globs = ["src/*.py"] }\n\n[claims]\nmods = []\n```\n' \
+    > "$TMP/a7/memory/map/features/planted.md"
+  git -C "$TMP/a7" add -A && git -C "$TMP/a7" commit -qm planted --no-verify
+  out=$(cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1)
+  if ! printf '%s' "$out" | grep -qxF "present memory/map/$AFF_NAME"; then
+    bad "7 re-adopt: the seed did not report the grace list $AFF_NAME present"; printf '%s\n' "$out" | sed 's/^/      /'
+  elif ! cmp -s "$TMP/a7-aff.before" "$aff" || grep -q planted "$aff"; then
+    bad "7 re-adopt: the second adopt re-seeded $AFF_NAME over a planted violation"
+  else
+    good "7 re-adopt leaves the affordance grace list $AFF_NAME, the adopter's seed name, byte-identical with a planted violation present"
+  fi
+fi
+
+# ---------------------------------------------------------------------------------------------
+# arm 8 (TOOL-dWitnessedBar-47 AC1) — a fresh install seeds before its first commit. One adopt, the
+# conf copied first as arm 4's documented path does, on a `git init` target with nothing committed and
+# the memory-tree kit beside this one, as arm 7 carries it: the map directory the scaffold has just
+# made holds no tracked file, and the seed must still write affordance-exempt.txt there. Red when the
+# seed's home test asks for a tracked file in the directory again. A fresh scaffold holds no section-less
+# dossier, so the list is the factory's one unarmed dead-probe line and the adopt still exits 0
+# (TOOL-dWitnessedBar-16 §8 F18): an empty list written armed is the one `ratchet (populated)` reds.
+# WHAT THIS DOES NOT CHECK: a map directory the scaffold failed to make, which the seed reports
+# `unarmed ... no directory` and the resolver suite's part 2o observes.
+# ---------------------------------------------------------------------------------------------
+KD=$(mkrepo "$TMP/a8" "${FPFX%/}")
+cp -r "$MT" "$(dirname "$KD")/memory-tree" 2>/dev/null
+cp "$KD/.codebase-map.conf.example" "$TMP/a8/.codebase-map.conf"
+aff="$TMP/a8/memory/map/$AFF_NAME"
+out=$(cd "$TMP/a8" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1); rc=$?
+if [ -z "$AFF_NAME" ]; then bad "8 fresh-install: no exempt list basename was found in the adopter's seed call"
+elif git -C "$TMP/a8" rev-parse -q --verify HEAD >/dev/null 2>&1; then bad "8 fresh-install: the target holds a commit, so the arm proves nothing"
+elif [ "$rc" != 0 ] || [ ! -f "$aff" ]; then
+  bad "8 fresh-install: one adopt on an uncommitted target did not write $AFF_NAME (rc=$rc)"; printf '%s\n' "$out" | sed 's/^/      /'
+elif ! printf '%s' "$out" | grep -qxF "unarmed memory/map/$AFF_NAME dead probe" \
+    || [ "$(grep -c . "$aff")" != 1 ] || ! grep -q "^# unarmed · dead probe · " "$aff"; then
+  bad "8 fresh-install: the list is not the one unarmed dead-probe line"; printf '%s\n' "$out" | sed 's/^/      /'
+else
+  good "8 fresh-install seeds $AFF_NAME, the adopter's seed name, unarmed, before the target's first commit"
 fi
 
 [ "$fails" = 0 ] || { printf '%s arm(s) FAILED\n' "$fails"; exit 1; }

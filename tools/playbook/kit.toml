@@ -38,13 +38,14 @@ to = "{prefix}/playbook/{relpath}"
 # install. These are `root_relative` rules pointing at the REAL files rather than copies, so there is
 # one source of truth and nothing to keep in step; gov itself has no copy beside the engine and reads
 # its own tree, which is the fall-through `declaration_paths()` documents.
-# GOV'S OWN LISTS STAY HOME (PLAY-dOrderedCharter-70 S10). The core's pending list and the legacy list name
-# gov's own files and records, so no adopter receives them. The two positional lists live in gov's
-# `<MEMORY_ROOT>/project/`, outside this kit (PLAY-dOrderedCharter-72). The write mode writes an empty
-# `core-pending.txt` here and an empty `positional-refs.txt` in the target's memory project folder where a
-# target lacks them, since an absent list is a red; the legacy list and the producer list read absent as empty.
+# GOV'S OWN LISTS STAY HOME (PLAY-dOrderedCharter-70 S10). The core's pending list names gov's own files
+# and records, so no adopter receives it. The positional lists and the legacy list live in gov's
+# `<MEMORY_ROOT>/project/`, outside this kit (PLAY-dOrderedCharter-72, TOOL-dWitnessedBar-18 §8 F7). The
+# write mode writes an empty `core-pending.txt` here, and the `positional-refs` ledger with no row, its
+# header and the factory's unarmed line, in the target's memory project folder where a target lacks them,
+# since an absent list is a red; the legacy list and the producer list read absent as empty.
 [[files]]
-include = ["core-pending.txt", "instructions-legacy.txt"]
+include = ["core-pending.txt"]
 role = "project-owned"
 
 [[files]]
@@ -163,11 +164,42 @@ stage = 1
 [check]
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
 
+# THE POSITIONAL LIST, a ledger population (TOOL-dWitnessedBar-18 S1): the one list this kit writes into
+# a target, so its registration ships here; `verbatim = ["ref"]` keeps a file:line reference as written
+# (§8 F1). Its seed is the positional arm's own measurement.
+[[ledger]]
+population = "positional-refs"
+leg = "tags (the resolver's checks)"
+seed = ["python", "{prefix}/playbook/positional.py", "list"]
+key = "site"
+fields = ["path", "ref"]
+verbatim = ["ref"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/positional-refs.txt"
+
+# An adopter's list converts at its next update (TOOL-dWitnessedBar-18 §4 Migration).
+[[upgrade]]
+id = "playbook-render/positional-refs-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/positional-refs.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/positional-refs.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/positional-refs.txt"]
+surfaces = ["file:memory/project/positional-refs.txt"]
+needs-target = false
+
 [[gate_leg]]
+tag = "leg.playbook-render.playbook-render-wiring"
+tests = ["feature.playbook"]
 name = "playbook render wiring"
 subject = "repo"
+purpose = "asserts the rendered charter region still matches"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+chunk = "wiring"
+ceiling = 300
 
 # THE ENGINE'S OWN ARMS, and an adopter receives them because they are about the ENGINE rather than
 # about gov: every fixture is written into a temp dir by the selftest itself, so there is no gov path
@@ -175,7 +207,29 @@ stage = ["step.test"]
 # without measuring — an unrecognised `kits` member silently deleting a charter section, and a value
 # substituted verbatim into a markdown table row.
 [[gate_leg]]
+tag = "leg.playbook-render.playbook-render-selftest"
+tests = ["feature.playbook"]
 name = "playbook render selftest"
 subject = "kit"
+purpose = "arms the charter render engine's own predicates"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]
+unguarded_why = "an adopter receives no guard: gov's names the render engine's gov-side reads, so in an adopter it runs whole whenever GATE_SELFTESTS asks"
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = [
+  "{prefix}/playbook/",
+  "{prefix}/memory-tree/import_walk.py",
+  "{prefix}/memory-tree/check-arms.py",
+  "{prefix}/memory-tree/tree_lib.py",
+  "{prefix}/memory-tree/id_grammar.py",
+  "{prefix}/memory-tree/coverage_join.py",
+  "{prefix}/memory-tree/design_lib.py",
+  "{prefix}/memory-tree/corpus_ids.py",
+  "{prefix}/lexicon/",
+  "{prefix}/govkit/entries/playbook.kit.toml",
+  "coding-governance-agents.template.md",
+]
+chunk = "selftests"
+ceiling = 300

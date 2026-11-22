@@ -1,17 +1,16 @@
-"""coverage_join — the join factory: the both-ways coverage join and the shrink-only baseline's additions
-(PLAY-dOrderedCharter-19 S9).
+"""coverage_join — the join factory: the both-ways coverage join (PLAY-dOrderedCharter-19 S9).
 
 The canonical copy. `<prefix>/lib/` is gov-internal and ships nothing, so the block below travels INLINE,
 byte-identical, in the memory-tree kit's `coverage_join.py`, which every consumer imports, and
 `<prefix>/lib/resolve-python.test.sh`'s parity table reds a copy that drifts. It moved here from the
 codebase-map kit's `map_lib.py` so that no core build imports an optional kit or reads its conf: the
-block calls none of that kit's root or conf readers and raises none of its errors, and a working baseline that
-does not parse propagates `tomllib.TOMLDecodeError` for its caller to name.
+block calls none of that kit's root or conf readers and raises none of its errors. The shrink-only
+baseline's additions left the block when the map baseline became a ledger population: the memory-tree
+kit's copy carries them as a thin adapter over the ledger factory, outside its block, since the
+factory imports this block (TOOL-dWitnessedBar-16 §8 F8).
 """
 from __future__ import annotations
 
-import subprocess
-import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -72,37 +71,4 @@ def compute_coverage(
         if lazy := sorted(base & claimed):
             lazy_baseline[inv_id] = lazy
     return Coverage(unclaimed, stale_claims, stale_baseline, lazy_baseline)
-
-
-def _read_git_text(root: Path, *args: str) -> str | None:
-    """stdout of one `git -C root ...` call, or None when git is absent or the call fails."""
-    try:
-        r = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
-                           encoding="utf-8", errors="replace")
-    except (FileNotFoundError, OSError):
-        return None
-    return r.stdout if r.returncode == 0 else None
-
-
-def derive_baseline_additions(root: Path, base: str, rel: str) -> tuple[dict[str, list[str]] | None, str]:
-    """Per inventory id of the WORKING baseline at `root`/`rel` (a root-relative POSIX path), the keys
-    `base`'s baseline did not carry — or None with the reason when there is no comparison to make. A
-    baseline absent at `base`, or one that does not parse there, is NO comparison, never an empty one:
-    read as empty, every key would read as added. An inventory id absent at `base` counts every key as
-    added, so a new inventory cannot open with a baselined key. The note carries both sides' key counts,
-    so a comparison over nothing is visible as such. A WORKING file that does not parse raises its
-    `tomllib.TOMLDecodeError`, which the caller names in its own error."""
-    path = Path(root) / rel
-    text = _read_git_text(root, "show", f"{base}:./{rel}")  # `./`: relative to root, not the git top
-    if text is None:
-        return None, f"no {rel} at {base[:12]}"
-    try:
-        old = tomllib.loads(text)
-    except tomllib.TOMLDecodeError as exc:
-        return None, f"{rel} does not parse at {base[:12]}: {exc}"
-    new = tomllib.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
-    added = {inv: sorted(set(keys) - set(old.get(inv, ()))) for inv, keys in sorted(new.items())}
-    note = (f"base carried {sum(len(v) for v in old.values())} key(s), "
-            f"working carries {sum(len(v) for v in new.values())}")
-    return {inv: keys for inv, keys in added.items() if keys}, note
 # <<< coverage_join

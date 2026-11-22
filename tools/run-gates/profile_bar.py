@@ -4,6 +4,7 @@
     python <prefix>/run-gates/profile_bar.py                 # profile the full bar at the default width
     python <prefix>/run-gates/profile_bar.py --width 4       # pin the pool width
     python <prefix>/run-gates/profile_bar.py --report        # re-print the last record, run nothing
+    GOV_NODE=<tag> python <prefix>/run-gates/profile_bar.py --record   # commit the last FULL run's wall
 
 WHAT THIS DOES NOT CHECK. It does not verify a leg is correct, does not attribute a leg's cost to any
 cause inside it, and does not prove the machine was quiet — it asserts what it could verify and marks
@@ -70,8 +71,10 @@ RUNNER = os.path.join(KITDIR, "run-gates.sh").replace("\\", "/")
 # It did: `retry` (TOOL-dDerivedDocket-26) and `attr` (TOOL-dDerivedDocket-23) landed in the runner
 # and not here, and this reader refused every bar until they were carried. Neither is a leg's final
 # verdict, which is why each has its own set below rather than a place in NOT_RUN.
-VERDICT = re.compile(r"^GATE (ok|skip|FAIL|reuse|held|retry|attr)\s+(.*)$")
-PINNED_VERBS = ("ok", "skip", "FAIL", "reuse", "held", "retry", "attr")
+# `warn` (TOOL-dWitnessedBar-29) is the second annotation: a size warning a leg that already printed
+# `GATE ok` carried, named after the leg lines, so it names no new leg and moves no verdict.
+VERDICT = re.compile(r"^GATE (ok|skip|FAIL|reuse|held|retry|attr|warn)\s+(.*)$")
+PINNED_VERBS = ("ok", "skip", "FAIL", "reuse", "held", "retry", "attr", "warn")
 # Verbs whose leg did NOT execute. `skip` is a guard decision and `held` is a subject decision; the
 # two have different remedies and are counted separately, but neither contributes work.
 NOT_RUN = ("skip", "held")
@@ -81,8 +84,9 @@ NOT_RUN = ("skip", "held")
 # `retry` nothing supersedes is a retry the wall cut: the leg ran and did not pass.
 INTERIM = ("retry",)
 # An ANNOTATION of a verdict already printed. `attr` classifies a red leg against a base commit
-# after the bar has reported it `FAIL`, so it names no new leg and changes no verdict.
-ANNOTATION = ("attr",)
+# after the bar has reported it `FAIL`, so it names no new leg and changes no verdict; `warn` shows a
+# size warning a passing leg printed, after that leg's `GATE ok`.
+ANNOTATION = ("attr", "warn")
 
 
 def derive_runner_verbs(runner_path):
@@ -204,13 +208,17 @@ def check_quiet(_runner=None):
     with its command line took long enough on a loaded node to dominate the profiler's own runtime,
     which matters because a probe nobody can afford to run is a probe that gets removed.
 
+    THE POSIX ARM (TOOL-dWitnessedBar-30 S7): where no PowerShell is on PATH it reads `ps -eo
+    pid=,args=` under the same liveness assertion, so a Linux node can find a quiet host. MSYS `ps`
+    reads no argv, and a Windows host has PowerShell, so every other host still reads `unverified`.
+
     `_runner` is the subprocess entry point, injected so the self-test can drive this function
     against a query that returns rows it cannot read. It is not a knob: no caller passes it.
     """
     runner = _runner or subprocess.run
     ps = shutil.which("powershell") or shutil.which("pwsh")
     if not ps:
-        return "unverified", "no powershell on PATH, cannot read process command lines on this host"
+        return check_quiet_posix(runner)
     script = (
         "Get-CimInstance Win32_Process -Filter \"Name='bash.exe' or ProcessId=%d\" | "
         "ForEach-Object { \"$($_.ProcessId)|$($_.CommandLine)\" }" % os.getpid()
@@ -236,6 +244,29 @@ def check_quiet(_runner=None):
         return "false", "%d foreign run-gates process(es) visible, read %d row(s)" % (
             len(foreign), len(rows))
     return "true", "read %d row(s) including this process, no foreign run-gates among them" % len(rows)
+
+
+def check_quiet_posix(runner):
+    """`check_quiet` where no PowerShell exists: one `ps -eo pid=,args=`, each row `<pid> <argv>`, under
+    the same liveness assertion, this process's own row present with a non-empty command line."""
+    try:
+        out = runner(["ps", "-eo", "pid=,args="], capture_output=True, text=True, timeout=120,
+                     encoding="utf-8", errors="replace")
+    except Exception as exc:   # a PROBE reports that it could not look; it never raises
+        return "unverified", "no powershell on PATH, and ps failed: %s" % exc
+    if getattr(out, "returncode", 1) != 0:
+        return "unverified", "no powershell on PATH, and ps exited %s" % getattr(out, "returncode", "?")
+    rows = [l.strip().split(None, 1) for l in (out.stdout or "").split("\n") if l.strip()]
+    mypid = str(os.getpid())
+    mine = [r for r in rows if r[0] == mypid]
+    if not mine or len(mine[0]) < 2 or not mine[0][1].strip():
+        return ("unverified",
+                "ps returned %d row(s) but not this process's own command line, so a zero from it "
+                "proves nothing" % len(rows))
+    foreign = [r for r in rows if len(r) > 1 and "run-gates.sh" in r[1] and r[0] != mypid]
+    if foreign:
+        return "false", "%d foreign run-gates process(es) visible, read %d row(s) by ps" % (len(foreign), len(rows))
+    return "true", "read %d row(s) by ps including this process, no foreign run-gates among them" % len(rows)
 
 
 def check_packing(wall, ideal):
@@ -279,29 +310,111 @@ def measure_orphans(manifest_path, timings_path):
     return len(orphans), round(sum(v for _, v in orphans), 1), len(legs)
 
 
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
+
 def resolve_bash(script):
-    r"""Find a bash that can actually SEE `script`, by RUNNING each candidate. Never by PATH alone.
+    r"""`(found, tried)`: a bash that can actually SEE `script`, by RUNNING each candidate, the one
+    block's rule; `""` on refusal, `tried` naming each candidate with its reason. Never by PATH alone.
 
     On Windows, PATH order commonly puts C:\Windows\System32\bash.exe — the WSL launcher — ahead of
     Git-Bash. WSL bash cannot open a `C:/...` path at all, so it answers `No such file or directory`
     for a script that plainly exists and the runner exits 127 having run zero legs. MEASURED here,
     not theorised. The probe is the property that matters: can this bash stat the script?
     """
-    cands = [os.environ.get("GOV_BASH", ""), shutil.which("bash") or "",
-             "C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"]
-    tried = []
-    for c in cands:
-        if not c or c in tried:
-            continue
-        tried.append(c)
-        try:
-            r = subprocess.run([c, "-c", 'test -f "$1"', "_", script],
-                               capture_output=True, text=True, encoding="utf-8", timeout=20)
-        except (OSError, subprocess.SubprocessError):
-            continue
-        if r.returncode == 0:
-            return c, tried
-    return "", tried
+    found, tried, _refusal = scan_bash(script)
+    return found, tried
 
 
 def run_git(args, cwd=None):
@@ -318,6 +431,8 @@ def main():
     ap.add_argument("--scoped", action="store_true", help="honour leg guards (default profiles the FULL bar)")
     ap.add_argument("--out", default="", help="record path (default <git-dir>/gate-profile.jsonl)")
     ap.add_argument("--report", action="store_true", help="print the last record and exit; run nothing")
+    ap.add_argument("--record", action="store_true",
+                    help="distil the last FULL record into bar-wall-evidence.txt as GOV_NODE's row; run nothing")
     args = ap.parse_args()
 
     root = run_git(["rev-parse", "--show-toplevel"])
@@ -339,6 +454,8 @@ def main():
 
     if args.report:
         return print_last(record_path)
+    if args.record:
+        return write_wall_record(record_path, WALL_EVIDENCE)
 
     if not os.path.exists(RUNNER):
         print("profile-bar: runner not found beside this verb: %s" % RUNNER, file=sys.stderr)
@@ -552,6 +669,66 @@ def print_summary(rec):
         print("  %d executed leg(s) carried NO duration: %s"
               % (len(rec["env"]["legs_without_duration"]),
                  ", ".join(rec["env"]["legs_without_duration"][:5])))
+
+
+WALL_EVIDENCE = os.path.join(KITDIR, "bar-wall-evidence.txt")
+WALL_HEADER = (
+    "# bar-wall-evidence.txt — each node's whole-bar wall time, TRACKED so the bar's cost is evidence.\n"
+    "#\n"
+    "# GENERATED by `GOV_NODE=<tag> python <prefix>/run-gates/profile_bar.py --record` from the last\n"
+    "# record of `<git-dir>/gate-profile.jsonl`. Do not hand-edit. One row per node, replaced by that\n"
+    "# node's next --record: the LATEST reading, not a maximum, because a wall time measures a bar and\n"
+    "# bounds nothing. A record taken with --scoped is refused: a guarded run is not the whole bar.\n"
+    "# TOOL-dWitnessedBar-10 S8.\n"
+    "#\n"
+    "# <node>\t<date>\t<sha8>\t<wall seconds>\t<legs run>\t<width>\n"
+)
+
+
+def write_wall_record(path, out):
+    """Replace GOV_NODE's row of <out> with the last record of the profile log <path>.
+
+    Exit 1, writing nothing, when GOV_NODE is unset or the last record was taken with --scoped; exit 2
+    when the log holds no record. Never a maximum: the row is the latest whole-bar run on that node.
+    """
+    node = os.environ.get("GOV_NODE")
+    if not node or "\t" in node or "\n" in node:
+        print("profile-bar: --record needs GOV_NODE set to this node's tag, with no tab or newline; the "
+              "row is that node's and is not defaulted. Nothing was written.", file=sys.stderr)
+        return 1
+    last = None
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if line:
+                    try:
+                        last = json.loads(line)
+                    except ValueError:
+                        continue
+    if not isinstance(last, dict):
+        print("profile-bar: no parseable record at %s, so there is no wall time to record" % path,
+              file=sys.stderr)
+        return 2
+    if not last.get("full"):
+        print("profile-bar: the last record at %s was taken with --scoped: a guarded run is not the "
+              "whole bar, so its wall time is not recorded. Nothing was written." % path, file=sys.stderr)
+        return 1
+    ran = sum(1 for l in last.get("legs") or [] if l.get("verdict") not in NOT_RUN)
+    row = "\t".join((node, str(last.get("at") or "unknown")[:10], str(last.get("sha") or "unknown")[:8],
+                     "%.1f" % float(last.get("wall") or 0.0), str(ran), str(last.get("width") or 0)))
+    rows = {}
+    if os.path.exists(out):
+        with open(out, encoding="utf-8") as fh:
+            for line in fh:
+                line = line.rstrip("\r\n")
+                if line.strip() and not line.startswith("#"):
+                    rows[line.split("\t")[0]] = line
+    rows[node] = row
+    with open(out, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(WALL_HEADER + "".join(rows[k] + "\n" for k in sorted(rows)))
+    print("profile-bar: recorded node %s's whole-bar wall %.1fs in %s" % (node, float(last.get("wall") or 0.0), out))
+    return 0
 
 
 def print_last(path):

@@ -1,0 +1,19 @@
+# TOOL-dWitnessedBar-92 — acceptance ledger
+
+**Serves:** journal TOOL-dWitnessedBar-92
+
+No merge bar, no self-test suite and no gate leg ran in this pass. This unit writes records only: it touches no code file and mints no function. Its pass-time reads ran on node d, 2026-11-21, from base `1e38f6eb1`, over the unedited built tree. Every line marked OWED is the main loop's at the close, after the last unit is terminal, or after this pass commit where §4 Rollout puts it: every note in the ledgers of units 87 to 90, S1's, S2's and S5's scratch clones, S12's stagings and every run of §4's note check.
+
+**Evidences:** TOOL-dWitnessedBar-92
+- AC1 — `sha)[[:space:]]*rec_sha="` — on the built tree at `1e38f6eb1`, `grep -c 'sha)[[:space:]]*rec_sha="' .githooks/pre-push` printed 0 (PINNED 2026-11-21), the built arm being `sha) rec_sha=$_rg_v ;;` in `.githooks/pre-push#read_green_file`. OWED: note row `92|S1` in unit 90's ledger under `- AC2`, and §4's note check over the rows opening `92|S1|`, at the close.
+- AC2 — `PASS (` — OWED: 90 AC1's two scratch clones with S2's added line, the third clone handling 0, 1 and 2 alone and its last line, note row `92|S2` and its note check, all at the close; the increment count read 2 by `grep -c '^\[ "\$rgf_ok" = 1 \] && case' tools/run-gates/run-gates.gov.test.sh` at `1e38f6eb1` (DERIVED 2026-11-21) and is re-derived at observation.
+- AC3 — `NOTES OK 17` — OWED: §4's note check over the rows opening `90|` and the relabelled `for unread` staging, at the close, once the notes are written; the figure is PINNED by the spec's AC3.
+- AC4 — `resolve_python:` — OWED: the `92|S4` notes, their note check and the scratch copy of 88's ledger, at the close.
+- AC5 — `stages paths outside the set it declared` — the dispatch row `item 1e38f6eb TOOL-dWitnessedBar-92` in `memory/builds/dWitnessedBar/RUN.md` piped to `grep -cE ' memory/builds/dWitnessedBar/spec/?( |$)'` printed 0; the commits naming `Pass: TOOL-dWitnessedBar-(89|90)` over `cdfbd1cf..1e38f6eb1`, `05fdf49d3` and `b5a33a39c`, each name their own spec alone under `spec/`, so 0 paths were read through `GEN_REGION_AWK` (DERIVED 2026-11-21); `grep '^GENERATED_INDEXES=' .unattended.conf` names none of `memory/LIVE.md`, `memory/ledger` and `memory/backlog`. OWED: the re-read after this pass commit, the scratch clone's three `--check-commit` stagings, and the `92|S5` and `90|S13` notes with their note check, at the close.
+- AC6 — `^- AC${n} ` — OWED: the exact counts over the ledgers of units 87 to 90 and the scratch stagings, at the close, once the notes are written.
+- AC7 — `rc=0` — OWED: the regeneration through `resolve_python` and the porcelain read after this pass commit, the `py=false` staging, and note row `92|S7` with its note check at the close; `rc=0` is the spec's AC7 figure, PINNED there.
+- AC8 — `1565 s floor` — on the built tree at `1e38f6eb1`, `grep -c` printed 1 for each of `THE SHARD CONTRACT, both directions (TOOL-aShardedFloor-2)`, `test_recall_floor.py from the payload` and `1565 s floor` in `tools/run-gates/run-gates.gov.test.sh` (PINNED 2026-11-21); no probe ran the suite, and this pass restores no comment and writes no suite line. OWED: note row `92|S9` in unit 90's ledger and its note check, at the close.
+- AC9 — `AC4 AC6 AC7 AC10 AC12` — OWED: the `92|S10` and `90|S10` notes and their note check, at the close.
+- AC10 — `on any commit touching` — OWED: the `90|S12` notes, their note check and the absent-phrase read, at the close.
+- AC11 — `TOKEN READER NOT FOUND` — OWED: §4's owner derivation on the built tree and its stagings in a scratch copy, and note row `92|S12` with its note check, at the close.
+- AC12 — `NOTES OK 29` — OWED: §4's note check over every row of the note table and the wrapped-token staging of 89's ledger, at the close; the figure is PINNED by the spec's AC12.

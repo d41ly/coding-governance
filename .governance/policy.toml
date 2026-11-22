@@ -13,3 +13,6 @@ agents-in-flight = 6
 
 [memory]
 staged-render = "on"
+
+[verdict]
+blocks = "own-mixed-contended"

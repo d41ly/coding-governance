@@ -13,10 +13,10 @@
 # the host turnstile like any bar, and publishes: a RED pushes `<sha>:refs/gov/bar-red` when that ref
 # is absent or an ancestor of <sha>; a GREEN deletes the ref when it names <sha> or an ancestor of it.
 # Every push is leased on the sha it observed, so a ref that moved in between is a lost race, never
-# an overwrite. It keeps the last verdict in `<common-dir>/gate-post-merge`, writes a GREEN's record
-# to `<common-dir>/gate-bar-green.shared` (design D3, `by post-merge`) only when the scratch worktree is
-# still clean after the bar (TOOL-aFrugalTurnstile-17), and copies the bar's run
-# record to `<common-dir>/gate-run/<run id>/` before the worktree goes.
+# an overwrite. It keeps the last verdict in `<common-dir>/gate-post-merge` and copies the bar's run
+# record to `<common-dir>/gate-run/<run id>/` before the worktree goes. The verdict per tree is the
+# runner's own record, `<common-dir>/gate-verdict/<tree hash>`, which the bar's runner writes from the
+# scratch worktree into the one common dir (TOOL-dWitnessedBar-4 S4); this script writes none.
 #
 # WHAT THIS DOES NOT CHECK: it grades the tree at `<sha>` alone, never the push that landed it; it
 # trusts this clone's remote-tracking ref for "landed"; it applies three keys of the gate-env file
@@ -31,15 +31,18 @@ set -u
 # reuse mode would let the caller choose a verdict; an inherited holder nonce would skip the queue.
 # `GATE_REUSE_LINEAGE` is a reuse mode too, and the one this bar's `GATE_FULL` would switch on
 # (TOOL-aSparedSpawn-33 S7). `GATE_SELFTESTS` and `GATE_TURNSTILE_DIR` stay honoured: the first is the
-# owner's switch, the second moves the queue and never a verdict.
+# owner's switch, the second moves the queue and never a verdict. Every knob the pre-push hook scrubs or
+# clears for a bar is here too (TOOL-dWitnessedBar-60 S2): an inherited `GATE_SELECTION` would hold legs
+# in a bar this records as green, and an inherited `GATE_BASE_FROM` would skip a scoped bar's verdict.
 PM_SCRUB="GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES
   GIT_COMMON_DIR GIT_NAMESPACE GIT_PREFIX GOV_GATE_CMD GOV_GATE_CMD_TEST GOV_PYTHON GATE_LEGS GATE_REUSE
   GATE_REUSE_LINEAGE GATE_BASE GATE_DOCS_BASE GATE_PUSH_BASE GATE_ATTRIBUTE GATE_SPAWN_CMD GATE_SPAWN_FLOOR
-  GATE_VERDICT_FAULT GATE_RUN_ID GATE_TURNSTILE_HOLDER"
+  GATE_VERDICT_FAULT GATE_RUN_ID GATE_TURNSTILE_HOLDER GATE_BASE_FROM GATE_SELECTION GATE_REGEN_CHECK
+  GATE_REUSE_PUSH GATE_REUSE_DIGEST_ENV GATE_REUSE_SAMPLE GATE_REUSE_DAY"
 PM_DROPPED=""
 for _k in $PM_SCRUB $(compgen -e); do
   case "$_k" in
-    *_PY|GATE_INHERITED_RED*) ;;
+    *_PY|GATE_INHERITED_RED_MAX_AGE|GATE_VERDICT_BLOCKS) ;;
     *) case " ${PM_SCRUB//$'\n'/ } " in *" $_k "*) ;; *) continue ;; esac ;;
   esac
   if [ -n "${!_k+x}" ]; then
@@ -779,7 +782,8 @@ run_bar() { # -> PM_VERDICT GREEN|RED|REFUSED, with PM_WHY on REFUSED
   local rc v head
   PM_VERDICT=""; PM_WHY=""
   read -ra words <<<"$BAR"
-  ( cd "$WT" && GATE_FULL=1 GATE_RUN_ID="$RUN_ID" bash "$KITDIR/run-gates.sh" --hold -- "${words[@]}" </dev/null ); rc=$?
+  # The bar's cause is the landed sha it grades (TOOL-dWitnessedBar-25 S2), in the runner's verdict.
+  ( cd "$WT" && GATE_FULL=1 GATE_RUN_ID="$RUN_ID" GATE_CAUSE="post-merge:$SHA" bash "$KITDIR/run-gates.sh" --hold -- "${words[@]}" </dev/null ); rc=$?
   head=$(git -C "$WT" rev-parse -q --verify HEAD 2>/dev/null) || head=""
   if [ "$head" != "$SHA" ]; then
     PM_VERDICT=REFUSED; PM_WHY="the scratch worktree's HEAD reads ${head:-nothing} after the bar, not ${SHA:0:8}, so no verdict describes the sha"; return 0
@@ -804,25 +808,6 @@ write_run_record() { # -> PM_RUN_COPY, the copy of the bar's run record under th
   else
     echo "post-merge: the run record at $PM_WT_GD/gate-run/$RUN_ID could not be copied to $CDIR/gate-run/"
   fi
-}
-
-write_bar_green() { # -> <common-dir>/gate-bar-green.shared in design D3's grammar, by post-merge
-  local tree w paths="" dirty t
-  local -a words=()
-  # The hook's and the driver's writers refuse a dirty tree, and so does this one: a bar judged on rc
-  # and HEAD alone may have rewritten tracked files, and the record would certify the pristine tree.
-  if ! dirty=$(git -C "$WT" status --porcelain --ignore-submodules=untracked 2>/dev/null) || [ -n "$dirty" ]; then
-    echo "post-merge: no gate-bar-green.shared written — the scratch worktree is not clean after the bar"
-    return 0
-  fi
-  tree=$(git rev-parse -q --verify "$SHA^{tree}" 2>/dev/null) || tree=""
-  read -ra words <<<"$BAR"
-  for w in "${words[@]}"; do case "$w" in */*|*.sh) paths="$paths${paths:+ }$w" ;; esac; done
-  t=$(mktemp -u "$CDIR/gate-bar-green.shared.XXXXXXXX" 2>/dev/null)
-  { printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t%s\nkind\tfull\nbase\t\nselftests\t%s\nrun_id\t%s\nby\tpost-merge\nstamped\t%s\n' \
-      "$SHA" "$tree" "$BAR" "$paths" "${GATE_SELFTESTS:+1}" "$RUN_ID" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-      > "$t" && mv -f "$t" "$CDIR/gate-bar-green.shared"; } 2>/dev/null \
-    || { [ -z "$t" ] || rm -f "$t" 2>/dev/null; echo "post-merge: $CDIR/gate-bar-green.shared could not be written"; }
 }
 
 # ---- 4. the scratch worktree, and its cleanup ------------------------------------------------------
@@ -870,7 +855,6 @@ else
 fi
 
 # ---- 7. the records, and the exit ------------------------------------------------------------------
-[ "$PM_VERDICT" = GREEN ] && write_bar_green
 if [ "$PM_PUB" = failed ]; then
   echo "post-merge: publish FAILED — $PM_PUB_WHY"
 elif [ "$PM_VERDICT" = GREEN ]; then

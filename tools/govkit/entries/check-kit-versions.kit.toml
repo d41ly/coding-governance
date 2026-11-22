@@ -43,9 +43,17 @@ this entry IS a gate, and it lands as a `seed` the target is expected to edit do
 """
 
 [[gate_leg]]
+tag = "leg.check-kit-versions.kit-version-markers"
+tests = ["feature.memory-tree-hygiene"]
 name = "kit version markers"
 subject = "repo"
+purpose = "checks every kit carries a well-formed version constant"
 argv = ["bash", "{prefix}/check-kit-versions.sh"]
 guard = []
 doc_reads = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 660

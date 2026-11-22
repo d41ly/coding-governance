@@ -1,0 +1,15 @@
+# ledger · dossier-decisions-empty · key key feature · direction shrink-only · drain key
+build-readme-surface	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+codebase-map	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+govkit	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+install-prefix	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+kit-placeholders	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+lexicon	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory-recall	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory-tree-merge-driver	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+playbook-mode	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+review-harnesses	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+row-grammar	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+session-kickoff	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+spec-tokens	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+testsuite-counts	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded

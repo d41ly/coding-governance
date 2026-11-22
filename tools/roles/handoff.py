@@ -308,20 +308,105 @@ def extract_brief_section(text, sub_head):
     return None if found is None else BLANK_EDGES_RE.sub("", "\n".join(found))
 
 
-def resolve_bash():
-    """GOV_BASH, else the first bash on PATH that is not a System32 or WindowsApps launcher, which on
-    Windows sees another filesystem (the different-shell gotcha class); None when none is found.
-    ponytail: existence only, no run probe — the one call made with it is the probe, and its failure
-    leaves the card absent and named."""
-    if os.environ.get("GOV_BASH"):
-        return os.environ["GOV_BASH"]
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
     for d in os.environ.get("PATH", "").split(os.pathsep):
-        for name in ("bash.exe", "bash"):
-            cand = os.path.join(d, name)
-            low = cand.replace("\\", "/").lower()
-            if os.path.isfile(cand) and "/system32/" not in low and "/windowsapps/" not in low:
-                return cand
-    return None
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
+
+def resolve_bash():
+    """The bash the one `resolve_bash_py` block above finds, GOV_BASH first and each candidate RUN, a
+    System32 or WindowsApps launcher refused (the different-shell gotcha class); None when none is
+    found, which leaves the card absent and named."""
+    return scan_bash()[0] or None
 
 
 def resolve_kickoff_checker(root):
@@ -782,7 +867,12 @@ def print_roster(memory_root):
         line = ("- `%s`: %s %s. Output: %s." % (slot, keys["description"], when, output)).replace(
             lib.MEMORY_ROOT_TOKEN, memory_root)
         if cap and len(line) > cap and mode == "warn":
-            warned.append("BUDGET WARN — roster-line · %s · %d chars over %d · %s" % (slot, len(line), cap, rule))
+            # The runner's `gate-warn` marker on the warning's next line, on its stream (TOOL-dWitnessedBar-29 S2, §8
+            # F4); `read_cap_answer` loaded its factory to answer `warn`.
+            budgets = sys.modules.get("budgets")
+            warned.append("BUDGET WARN — roster-line · %s · %d chars over %d · %s" % (slot, len(line), cap, rule)
+                          + ("\n" + budgets.render_warn_marker(slot, "roster-line · %d chars over %d" % (len(line), cap))
+                             if budgets else ""))
         elif cap and len(line) > cap:
             bad.append("roster line for %s is %d characters, past the %d a one-line charter rule may "
                        "take; shorten its description, mandatory or output (%s)" % (slot, len(line), cap, rule))

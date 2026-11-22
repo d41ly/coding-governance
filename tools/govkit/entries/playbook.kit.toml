@@ -29,11 +29,15 @@ the entry lands no file, so there is nothing here to observe: the render's own -
 # The step that carries `[charter] adopter_rules` into the overlay as level-0 `repo.` units
 # (PLAY-dOrderedCharter-31 S4). Its `surfaces` is the declared absence: the key stays a live input of
 # the render, so the step takes no member of gov's product away. Frozen once landed.
+# `-2` succeeds `playbook/adopter-rules-to-overlay`, retired to it in the govkit registry
+# (TOOL-dWitnessedBar-111, on the owner's ruling): the up and the down are the predecessor's frozen
+# program, and the witness reads a converted rule by its derived tag as well as its text, so an
+# instruction edit of the rule after the up no longer reads as the step un-applied.
 [[upgrade]]
-id = "playbook/adopter-rules-to-overlay"
+id = "playbook/adopter-rules-to-overlay-2"
 up = ["python", "{gov}/govkit/steps/adopter_rules_to_overlay.py", "up", "{target}"]
 down = ["python", "{gov}/govkit/steps/adopter_rules_to_overlay.py", "down", "{target}"]
-witness = ["python", "{gov}/govkit/steps/adopter_rules_to_overlay.py", "witness", "{target}"]
+witness = ["python", "{gov}/govkit/steps/adopter_rules_witness.py", "witness", "{target}"]
 surfaces = []
 needs-target = false
 

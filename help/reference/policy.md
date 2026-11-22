@@ -32,6 +32,14 @@ core.exceptions = "owner-only-expiring"
 ## `policy-file.on-invalid`
 Documented on [help/policy.md](../policy.md).
 
+## `hooks.bypass`
+<!-- usage: policy:hooks.bypass c687519d -->
+Whether a hook bypass is only recorded or also refused. Under both values each one is recorded as a decision=bypass line in the git common dir's runlog/pushes.log: a landing the pre-push hook never allowed, which the lander reports landed UNGATED, and a pushed pass commit with no Commit-Checked: trailer, which the unattended commit check never saw. Under allowed the push proceeds and the pass-order leg lists such commits as a note. Under refused the pre-push hook refuses them, the pass-order leg reds on them, and the lander and the hook refuse every landing until verdict names an off-node backend, since a hook on the bypassing node cannot refuse its own bypass. Read at the default branch's tip by the hook, at the landed revision by the lander, and at the graded commit by the leg.
+
+```text
+hooks.bypass = "refused"
+```
+
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
 
@@ -93,6 +101,126 @@ Documented on [help/pass-legs.md](../pass-legs.md).
 ## `memory.staged-render`
 Documented on [help/commit-render.md](../commit-render.md).
 
+## `tests.without-cadence`
+<!-- usage: policy:tests.without-cadence e2b76654 -->
+What a landing does with the product-test levels outside tests.landing-levels where no cadence runs them: runs them at landing anyway, reports them unrun, or waits for a cadence to be set up.
+
+```text
+tests.without-cadence = "report-unrun"
+```
+
+## `verdict`
+<!-- usage: policy:verdict 0427cc96 -->
+Which backend's verdict a landing stands on, a name a [[verdict_backend]] row in a kit descriptor declares: local-hook, this node's own hook's full per-tree verdict; peer-node, a second node's verify-peer tag for the commit's own tree; or remote-ci, a push run of the remote CI workflow under verdict.remote.trust. Read at the landed revision by the lander before each landing push, which under any backend but local-hook lands only on GREEN; a value no row declares refuses before any push.
+
+```text
+verdict = "peer-node"
+```
+
+## `verdict.blocks`
+<!-- usage: policy:verdict.blocks 2f0b7c25 -->
+Which red of a red bar blocks its landing, by the class the runner's attribution reads each red at: under own-only an OWN or DEAD PROBE red blocks, under own-mixed-contended a MIXED or CONTENDED red blocks too, and under every-red an INHERITED red blocks as well. Read at the default branch's tip by the pre-push hook and the unattended driver; a red bar lands only when every red passes.
+
+```text
+verdict.blocks = "own-mixed-contended"
+```
+
+## `verdict.held`
+<!-- usage: policy:verdict.held dff3fa99 -->
+When a held leg runs, read at the default branch's tip: under on-demand it is held at every bar unless GATE_SELFTESTS asks for it; under push-selected the pre-push hook exports GATE_SELFTESTS=changed for its bar when the pusher set nothing, so the held legs the push moved run; under peer-or-cadence it is held at the push and runs elsewhere, a HELD_CI_WORKFLOW in .unattended.conf or a registered peer backend, and the selection refuses where neither is declared.
+
+```text
+verdict.held = "push-selected"
+```
+
+## `verdict.flakes`
+<!-- usage: policy:verdict.flakes cbd3373b -->
+What a red bar's flakes do, read by the run-gates kit's `verdict_flow.py flakes` after a bar run under GATE_RERUN=1, which re-runs each red leg once on the same tree: under retry-only nothing is written; under record each such run writes one `flake` record, a row per executed leg with its first rc and its re-run rc; under quarantine it also holds each leg whose flakes reach verdict.flakes.entry and no OPEN held-flaky-leg ask names, and the unattended close files that ask, which holds the leg through the selection's quarantine row: the held leg still runs at least once a day, outside the verdict, so its greens accrue in the flake records, and it is released, its ask closed, after verdict.flakes.release consecutive greens.
+
+```text
+verdict.flakes = "record"
+```
+
+## `verdict.flakes.entry`
+<!-- usage: policy:verdict.flakes.entry abdb1ee4 -->
+How many flakes in a leg's last window of verdicts hold it under verdict.flakes quarantine, counted across the tracked flake records, newest first and after the leg's last release: a declared count/window such as 3/10, or measured, the Measured field of the newest gate-health record, and 2/10 until one exists.
+
+```text
+verdict.flakes.entry = "3/10"
+```
+
+## `verdict.flakes.release`
+<!-- usage: policy:verdict.flakes.release 81b1e216 -->
+How many consecutive greens release a leg held under verdict.flakes quarantine, read at the default branch's tip by the run-gates kit's `verdict_flow.py select`: the leg's executed rows in the tracked flake records since its held-flaky-leg ask was filed, newest first, must open with this many greens, a red resetting the count; a leg whose manifest row changed since that filing is released too. The unattended close then writes the ask's CLOSED row.
+
+```text
+verdict.flakes.release = 5
+```
+
+## `tests.product`
+<!-- usage: policy:tests.product a994fddb -->
+Which product-test legs, the legs carrying a level, the manifest holds: the repository's own declared ones, those plus one leg per level each detected runner adapter declares, or none at all.
+
+```text
+tests.product = "declared"
+```
+
+## `tests.landing-levels`
+<!-- usage: policy:tests.landing-levels a3cbde00 -->
+Which product-test levels a landing runs, from unit, integration, e2e and performance, or every level the manifest declares; the slower levels left out are tests.without-cadence's.
+
+```text
+tests.landing-levels = ["unit", "integration", "e2e"]
+```
+
+## `verdict.tree`
+<!-- usage: policy:verdict.tree e2b80358 -->
+Which tree Test verifies: the merge `push-main.sh --prepare` makes of the build onto the advertised tip, or the build's own tip pinned with no merge, `--land` then making the landing merge.
+
+```text
+verdict.tree = "build-tip"
+```
+
+## `verdict.red-route`
+<!-- usage: policy:verdict.red-route ad9f8979 -->
+Where the tester's judgment of a blocking OWN or MIXED red sends it: under fix-pass-or-design a code-miss goes to a fix pass and a spec-wrong to a new unit through Design, and under always-new-unit both go to a new unit. Read by run-gates' verdict_flow.py judge.
+
+```text
+verdict.red-route = "always-new-unit"
+```
+
+## `verdict.remote.trust`
+<!-- usage: policy:verdict.remote.trust 562844dc -->
+What the remote-ci backend does with the source check of its witness rule: under pinned-workflow pinned files that differ from verdict.remote.pin read HELD and an owner item asks to re-pin or to refuse; under owner-reviews-workflow-change the owner item opens at the first differing read and the slot stays HELD until the owner re-pins; under app-only the source check is skipped and a passing run reads GREEN with witness claimed, never witnessed.
+
+```text
+verdict.remote.trust = "owner-reviews-workflow-change"
+```
+
+## `verdict.remote.pin-scope`
+<!-- usage: policy:verdict.remote.pin-scope 48608634 -->
+Which files verdict.remote.pin pins for the remote-ci backend: workflow, the declared workflow .github/workflows/remote-ci.yml; or dispatch-closure, that workflow, the run-gates kit's run-gates.sh, the leg manifest and .githooks/gate-env.sh, the files that decide the bar's dispatch, never every script the bar job runs.
+
+```text
+verdict.remote.pin-scope = "dispatch-closure"
+```
+
+## `verdict.remote.pin`
+<!-- usage: policy:verdict.remote.pin fc4016ee -->
+The pin the remote-ci backend's source check compares against: one object id, git hash-object --stdin over one &lt;path&gt; &lt;blob id&gt; line per file verdict.remote.pin-scope names, sorted by path, each ending LF, which the run-gates kit's remote_verdict.py pin prints at HEAD. The owner's: set from a terminal or by policy_edit.py set on a live run's branch, and the loop guard refuses an agent's change to it anywhere else. Unset, remote-ci reads HELD, no pin.
+
+```text
+verdict.remote.pin = "1fe706824a048fd582f17ef18b4ec6b2d9898d46"
+```
+
+## `verdict.peer.signers`
+<!-- usage: policy:verdict.peer.signers 6c292dc2 -->
+Which node keys may sign a peer-node verdict: one allowed-signers line per node, its node tag, its SSH key type and its base64 public key, with no options field. The peer-node reader reads it at the landed revision, verifies the refs/gov/verdict/&lt;sha&gt; tag with git verify-tag against it, and lets the verdict stand only when the signing key's node tag is the tag's node line and not the reading node's own. The owner's: set from a terminal or by policy_edit.py set on a live run's branch, and the loop guard refuses an agent's change to it anywhere else. Unset, every peer-node read is NONE, no signer table.
+
+```text
+verdict.peer.signers = ["b ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA01XHzWJLfi5hyD6zkT39tg7Apyf1k93ZQ2h2VvlYuK"]
+```
+
 ## `help.enforce`
 Documented on [help/docs-leg.md](../docs-leg.md).
 
@@ -143,6 +271,14 @@ What the render gate does with the list of instruction files not yet rendered fr
 instructions.legacy = "refuse"
 ```
 
+## `trace.leg-output`
+<!-- usage: policy:trace.leg-output b5f47620 -->
+Where a failing leg's output tail lives: kept by its hash in the common dir and named in the verdict under either value, and under `tail-by-hash` also committed as a `leg-tail` record by the run-gates kit's `keep_tails.py`.
+
+```text
+trace.leg-output = "node-local"
+```
+
 ## `platforms.provision`
 Documented on [help/python-floor.md](../python-floor.md).
 
@@ -155,7 +291,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (242)
+## Not yet summarised (226)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -165,7 +301,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `policy-file.guard`
 - `policy-file.proof`
 - `floor`
-- `hooks.bypass`
 - `transitions.record`
 - `leases`
 - `leases.granularity`
@@ -273,20 +408,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `flow.adapt`
 - `flow.promote`
 - `policy-file.on-missing-expansion`
-- `tests.without-cadence`
-- `verdict`
-- `verdict.blocks`
-- `verdict.held`
-- `verdict.flakes`
-- `verdict.flakes.entry`
-- `verdict.flakes.release`
-- `tests.product`
-- `tests.landing-levels`
-- `verdict.tree`
-- `verdict.red-route`
-- `verdict.remote.trust`
-- `verdict.remote.pin-scope`
-- `verdict.remote.pin`
 - `plan.authority`
 - `plan.unplaced`
 - `plan.triage`
@@ -389,7 +510,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `commits.squash`
 - `trace.identity`
 - `trace.cost`
-- `trace.leg-output`
 - `trace.rows`
 - `runtime.binary`
 - `runtime.owner-harness`

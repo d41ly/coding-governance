@@ -1,35 +1,16 @@
-# temp-name-sites.txt — the sites the `shell hygiene (a fixed-name temp renamed into place)` leg carries.
-# TOOL-dRedressedBar-24.
-#
-# A row is `<path> TAB <class> TAB <count> TAB <reason>`. The key is the file and the one CLASS,
-# `fixed-temp`, and NEVER a line number, because a line-keyed registry reds on an unrelated edit above
-# the site. The count is how many `mv` commands in that file rename a temp whose name anyone can know
-# before the write creates it: a fixed name, or one suffixed with the writer's pid.
-#
-# SET EQUALITY IN BOTH DIRECTIONS, and the counts too: a measured path with no row fails, a row the
-# scan no longer finds fails, and a count that no longer matches fails, so fixing a site forces its
-# count down in the same commit. The leg grades the tracked product shell sources, less the suites and
-# the memory tree, so a suite's scratch temps are not rows here.
-#
-# Every row predates the lint. A `health_log_sh` row is the trim of the one block four kits carry
-# byte-identically under a parity table, with a Python twin; its fix is open ask TOOL-aPairedSlots-10,
-# and it writes the git common dir, which a process confined to the temp dir cannot write. The leg
-# prints every row's reason on every run, green included. No total is written here: the scanner
-# derives them.
-.githooks/pre-push	fixed-temp	2	the bar-green stamp, git dir and common dir; predates the lint; drained by deleting this row in the commit that fixes it
-skills/session-kickoff/card-store.fixture.sh	fixed-temp	8	the fixture's set-asides of real files, never a temp it writes: the conf and the driver moved aside and back, and the bare remote taken offline and restored, each inside the fixture's own `mktemp -d` scratch; drained by deleting this row in the commit that fixes it
-skills/session-kickoff/manifest-check.sh	fixed-temp	5	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; two card rewrites in its `mktemp -d` scratch; predates the lint; and the pockets block's two re-renders (TOOL-dPlacedRequest-9 S4), each a fixed name inside that same `mktemp -d` scratch, a directory whose own name nobody knows before it is made; drained by deleting this row in the commit that fixes it
-tools/branch-reconcile/adopt-branch-reconcile.sh	fixed-temp	1	the rendered skill in the target; predates the lint; drained by deleting this row in the commit that fixes it
-tools/check-template-size.sh	fixed-temp	1	the high-water file, `.tmp.$$`; predates the lint; drained by deleting this row in the commit that fixes it
-tools/check-wiring.sh	fixed-temp	2	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; an EOL rewrite in the target; predates the lint; drained by deleting this row in the commit that fixes it
-tools/codebase-map/adopt-codebase-map.sh	fixed-temp	1	a rendered file in the target; predates the lint; drained by deleting this row in the commit that fixes it
-tools/lib/health-log.sh	fixed-temp	1	the canonical `health_log_sh` trim, ask TOOL-aPairedSlots-10; predates the lint; drained by deleting this row in the commit that fixes it
-tools/memory-recall/adopt-memory-recall.sh	fixed-temp	1	the rendered skill in the target; predates the lint; drained by deleting this row in the commit that fixes it
-tools/memory-tree/adopt-memory-tree.sh	fixed-temp	2	a rendered file and the slot-limits file in the target; predates the lint; drained by deleting this row in the commit that fixes it
-tools/push-main.sh	fixed-temp	1	the `health_log_sh` trim, ask TOOL-aPairedSlots-10, the block four kits carry byte-identically, inlined here by dPlacedRequest beside the feed block; drained by deleting this row in the commit that fixes it
-tools/run-gates/post-merge.sh	fixed-temp	1	the `health_log_sh` trim, ask TOOL-aPairedSlots-10, the block four kits carry byte-identically, inlined here by dPlacedRequest beside the feed block; drained by deleting this row in the commit that fixes it
-tools/run-gates/run-gates.sh	fixed-temp	1	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; predates the lint; drained by deleting this row in the commit that fixes it
-tools/runlog/adopt-runlog.sh	fixed-temp	1	the rendered skill in the target; predates the lint; drained by deleting this row in the commit that fixes it
-tools/unattended/adopt-unattended.sh	fixed-temp	1	the conf rewrite in the target; predates the lint; drained by deleting this row in the commit that fixes it
-tools/unattended/lib-unattended.sh	fixed-temp	1	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; predates the lint; drained by deleting this row in the commit that fixes it
-tools/unattended/unattended.sh	fixed-temp	2	the bar-green stamp, git dir and common dir; predates the lint; drained by deleting this row in the commit that fixes it
+# ledger · temp-name-sites · key site path,class · direction shrink-only · drain hunk
+skills/session-kickoff/card-store.fixture.sh	fixed-temp	8	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+skills/session-kickoff/manifest-check.sh	fixed-temp	5	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/branch-reconcile/adopt-branch-reconcile.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-template-size.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-wiring.sh	fixed-temp	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/codebase-map/adopt-codebase-map.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lib/health-log.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-recall/adopt-memory-recall.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/adopt-memory-tree.sh	fixed-temp	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	fixed-temp	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+tools/run-gates/post-merge.sh	fixed-temp	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+tools/run-gates/run-gates.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/runlog/adopt-runlog.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/lib-unattended.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

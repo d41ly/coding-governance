@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-91 — unit 90 AC2 counts the quoted `sha)` arm, not every `rec_sha="`, so a correct build passes and the reader's resets stay
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 48 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-3 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 48 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,12 +8,19 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
 | [2026-10-25-build-TOOL-dWitnessedBar-91-deviation-911.md](../build/2026-10-25-build-TOOL-dWitnessedBar-91-deviation-911.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-91-round13-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-91-round13-fix-return.md) | research | TOOL-dWitnessedBar-92 |
+| [2026-11-19-build-TOOL-dWitnessedBar-91-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-91-1-acceptance-ledger.md) | journal | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-91-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-91-1-builder-return.md) | journal | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-91-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-91-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-91-round13-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-91-round13-fix-brief.md) | research | TOOL-dWitnessedBar-92 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-91-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-91-build-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-91-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-91-reground-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-91-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-91-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-91-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-91-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-92 |
+| [2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md](../reviews/2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md) | diff-review | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
 
 <!-- /gen:spec-records -->
 
@@ -76,21 +83,29 @@ repairs `TOOL-dWitnessedBar-90` and builds one step after it (order 48).
 
 ### Evidence
 
-- `.githooks/pre-push`, read on 2026-10-25: `:1350` is the top-level
-  `rec_sha=""; rec_fp=""; ...` initialiser, and `:1352` is the same reset inside `read_green_file`,
-  which opens at `:1351`. `grep -c 'rec_sha="'` prints 2 and `grep -c 'sha)[[:space:]]*rec_sha="'`
-  prints 0. PINNED on 2026-10-25; S1 reads both counts against the built hook at the close.
-- `grep -n 'sha)'` over the whole hook prints `:1427`, `sha) bg_sha=$v ;;`, which is outside
-  `read_green_file`. So the only-arm check cuts the reader first, as `TOOL-dWitnessedBar-88` AC10
-  cuts it with `awk '/^read_green_file\(\)/,/^}/'`.
-- `TOOL-dWitnessedBar-69` S1 (spec-69 lines 38-49) replaces the reader's seven `$(awk ...)` reads with
-  one loop and a `case` on the key, and says "An unreadable file leaves all seven empty, as today".
-  Spec-69 line 74 spells the built arm `sha) rec_sha=$_rg_v`, unquoted. The reader's seven keys, read
-  from its awk reads at `:1354` to `:1368`, are `sha`, `fingerprint`, `manifest_blob`, `manifest`,
-  `selftests`, `reused` and `reused_cache`, so only one of them closes as `sha)`. Over today's hook
-  the cut piped to `grep -o 'sha)' | wc -l` prints 0.
+Read on 2026-11-21 at `2e0d7c562`. Units 69 and 90 are CLOSED.
+
+- `.githooks/pre-push@380aa64c5:1600` is the top-level `rec_sha=""; rec_fp=""; ...` initialiser, and
+  `.githooks/pre-push#read_green_file` opens on the next line and repeats the same reset in its body.
+  `grep -c 'rec_sha="'` prints 2 and `grep -c 'sha)[[:space:]]*rec_sha="'` prints 0 (PINNED
+  2026-11-21). The hook's one other `rec_sha=` assignment, `rec_sha=$_sel_sha`, is unquoted. S1 reads
+  both counts against the built hook at the close.
+- `grep -n 'sha)'` over the whole hook prints two lines: the reader's `sha) rec_sha=$_rg_v ;;` and
+  `sha) bg_sha=$_rb_v ;;` in `.githooks/pre-push#read_bar_file`, outside `read_green_file`. So the
+  only-arm check cuts the reader first, as `TOOL-dWitnessedBar-88` AC10 cuts it with
+  `awk '/^read_green_file\(\)/,/^}/'`.
+- `TOOL-dWitnessedBar-69` S1 replaced the reader's seven `$(awk ...)` reads with one loop and a `case`
+  on the key, said "An unreadable file leaves all seven empty, as today", and kept the function's
+  closing `}` its only column-0 `}`. As built, the reader's `case` spells the arm
+  `sha) rec_sha=$_rg_v ;;`, unquoted, with the label and the assignment on one line, and its seven arms
+  are `sha`, `fingerprint`, `manifest_blob`, `manifest`, `selftests`, `reused` and `reused_cache`
+  (`.githooks/pre-push#read_green_file`), so only one of them closes as `sha)`. Over the built hook the
+  cut piped to `grep -o 'sha)' | wc -l` prints 1 (PINNED 2026-11-21).
 - `memory/gotchas/ledger-token-wrapped-across-a-line-joins-nothing.md` records that a ledger grep reads
   one physical line.
+- `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-90-1-acceptance-ledger.md` is
+  the one file AC2's glob matches. Its `- AC2` line records the two clones as OWED to the close, and
+  AC2's selector over it prints nothing on 2026-11-21.
 
 ### Inventory
 
@@ -103,12 +118,19 @@ None: no stored data changes.
 
 ### Rollout
 
-At the close, after every unit is terminal. The unit takes order 48, one above unit 90's 47, beside
-`TOOL-dWitnessedBar-92`. Its counts run in 90 AC2's clones, and its note is written at the close.
+The pass takes order 48, one above unit 90's 47, and builds before `TOOL-dWitnessedBar-92`, which
+consumes it. It writes this unit's acceptance ledger with AC1 and AC2 owed. At the close, after every
+unit is terminal, S1's counts run in 90 AC2's clones and S2's note is written.
 
 ### Files touched (estimate)
 
-- `memory/builds/dWitnessedBar/build/`
+- `memory/builds/dWitnessedBar/build/`, this unit's acceptance ledger at the pass, and S2's note in
+  `2026-11-19-build-TOOL-dWitnessedBar-90-1-acceptance-ledger.md` at the close
+- `memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-91.md`, its status header
+- `memory/builds/dWitnessedBar/RUN.md`
+- `memory/builds/dWitnessedBar/README.md`, `memory/backlog/TOOL.md` and `memory/LIVE.md`, rendered
+  by `gen_build_index.py --write`, with any `gen:spec-records` region the `--write` moves
+  (`TOOL-dWitnessedBar-90` S13)
 
 ### Alternatives rejected
 
@@ -126,8 +148,8 @@ At the close, after every unit is terminal. The unit takes order 48, one above u
   which reds.
 - observability — the note quotes each count with its clone, so a reader can rerun it.
 - risks — a builder who quotes the arm on a line apart from its `sha)` label passes the only-arm count
-  and fails the anchored one; unit 69's arm keeps the label and the assignment on one line
-  (spec-69 line 74).
+  and fails the anchored one; the built arm keeps the label and the assignment on one line
+  (`.githooks/pre-push#read_green_file`).
 - testing — AC1 by scratch clone and AC2 by ledger, both at the close.
 - migration — none.
 - user docs — none under `help/`; no user-facing surface changes.
@@ -141,7 +163,8 @@ At the close, after every unit is terminal. The unit takes order 48, one above u
   Red when: a correct clone reds because the count includes the resets, or a clone passes with a
   reset deleted or a second `sha)` arm in the reader.
   fixture: 90 AC2's scratch clones under `%TEMP%/<short-name>`.
-  figure: the reset count is DERIVED at observation time from the unedited built hook; it reads 2 today.
+  figure: the reset count is DERIVED at observation time from the unedited built hook; it read 2 on
+  2026-11-21 at `2e0d7c562`.
   permission: the clones are the main loop's, at the close.
 - **AC2** — When
   `awk '/^\*\*Evidences:\*\*|^#/{o=""} /^- /{o=$0} /TOOL-dWitnessedBar-91 S2([^0-9]|$)/{print o}' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-90*acceptance-ledger*`
@@ -157,7 +180,8 @@ At the close, after every unit is terminal. The unit takes order 48, one above u
 
 `recall floor` and `recall floor arms` are owed for the ledgers under `memory/`. AC1 reads 90 AC2's
 clones at the close; this unit adds no arm and moves none, so it declares no `New arm:` line, and
-`TOOL-dWitnessedBar-88` S6's derivation still names unit 90 the floor's owner.
+the owner derivation of `TOOL-dWitnessedBar-90` §4 still names unit 90 the floor's owner: run on
+2026-11-21 it printed 28 and `spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md` (DERIVED).
 
 ## 8. Open questions
 
@@ -180,6 +204,10 @@ clones at the close; this unit adds no arm and moves none, so it declares no `Ne
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edge of TOOL-dWitnessedBar-97, promoted by the round-1 spec audit of units 91 and 92; nothing else
   moved.
+- rev-3 · 2026-11-21 · §4 · §5 · §6 · §7 · §10 · re-grounded at `2e0d7c562` per
+  2026-11-19-prompt-TOOL-dWitnessedBar-91-reground-brief. Evidence cites the hook by symbol over
+  unit 69 as built, whose cut now prints 1 and beside which `read_bar_file` holds a second `sha)`;
+  counts re-pinned; Rollout and Files touched list the pass's records; criteria unchanged.
 
 ## 10. Reuse audit
 
@@ -187,7 +215,7 @@ The seam is 90 AC2's own clones and the reader cut `TOOL-dWitnessedBar-88` AC10 
 `awk '/^read_green_file\(\)/,/^}/'`; the ledger note uses the acceptance ledger of
 `memory/HYGIENE.md` "Acceptance ledger".
 `python tools/codebase-map/reuse_lookup.py "count one case arm assignment in a shell hook without counting the variable initialisers"`
-ranked `counts`, `arm`, `armed` and `run_arms`, none a counter of one case arm apart from a variable's
-resets, so no existing seam fits beyond the cut and the ledger named above.
+ranked `counts`, `arm`, `armed` and `run_selftest_cases` first on 2026-11-21, none a counter of one
+case arm apart from a variable's resets, so no existing seam fits beyond the cut and the ledger named above.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a grep count criterion pass on a correct build when the file already holds the token" --terms "grep count criterion baseline initialiser rec_sha case arm anchored selector clone pre-push quoted"`

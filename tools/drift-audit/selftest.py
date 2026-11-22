@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.34
+gov:kit drift-audit@1.35
 
     python <kit>/selftest.py
 
@@ -76,6 +76,7 @@ def resolve_kit_dir(home, anchor, here):
 # and a selftest that could not build one could not test it. Written ONCE here rather than twelve
 # times below: a literal repeated twelve times is twelve chances for eleven of them to be updated.
 ROOT_PFX = ""   # a root install's prefix is empty, and the scratch repos are built through it
+LEDGER_KIT_HOME = "memory-tree"   # the home gov gives the kit that carries the ledger factory
 REPORT_REL = f"{ROOT_PFX}{KIT_NAME}/drift_report.py"
 FAILS: list[str] = []
 
@@ -96,7 +97,9 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 486
+CHECK_FLOOR = 494
+# 486 -> 494, TOOL-dWitnessedBar-1: the eight checks of `test_gate_health`, two per `--fixture` case,
+# COUNTED off the arm rather than measured, because the unit pass runs no suite.
 # 482 + 482 -> 486, TOOL-aSparedSpawn-34, the merge of local main into aSparedSpawn: base 478, plus 4
 # from this branch (TOOL-aSparedSpawn-11) and 4 from local main (TOOL-aPairedSlots-7 and -11).
 # 478 -> 482, TOOL-aSparedSpawn-11: the four checks of `test_one_signal_matches_report`, COUNTED off
@@ -283,10 +286,46 @@ def _side_branch_commit(r: pathlib.Path) -> str:
     return sha
 
 
-def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
+# THE POPULATIONS (TOOL-dWitnessedBar-16 S8). The shrink-only lists, the pins and the baselines are
+# `[[ledger]]` registrations and their homes, read through the memory-tree kit's ledger factory, so a
+# fixture carries that factory beside its drift kit, as an install does, and a descriptor registering
+# them. `write_pins` and `write_baselines` write the two homes in the ledger grammar; a pin of 0 is no
+# row, and an empty home is the header alone. The homes sit in `memory/project/` beside every other
+# population, outside any kit (TOOL-dWitnessedBar-16 S14).
+PINS_HOME = "memory/project/drift-pins.txt"
+BASELINES_HOME = "memory/project/drift-baselines.txt"
+FIXTURE_LEDGERS = (
+    'id = "drift-audit"\n\n'
+    '[[ledger]]\npopulation = "shrinkme"\nleg = "l"\nseed = []\nkey = "key"\nfields = ["entry"]\n'
+    'drain = "key"\ndirection = "shrink-only"\nhome = "shrinkme.txt"\n\n'
+    '[[ledger]]\npopulation = "drift-pins"\nleg = "l"\nseed = []\nkey = "key"\nfields = ["signal"]\n'
+    f'drain = "key"\ndirection = "ceiling"\nhome = "{PINS_HOME}"\n\n'
+    '[[ledger]]\npopulation = "drift-baselines"\nleg = "l"\nseed = []\nkey = "record"\n'
+    f'fields = ["signal", "id"]\ndrain = "key"\ndirection = "shrink-only"\nhome = "{BASELINES_HOME}"\n')
+
+
+def write_pins(r: pathlib.Path, pins: dict) -> None:
+    """The fixture's `drift-pins` home, one row per non-zero pin."""
+    rows = "".join(f"{sig}\t{n}\tabcdef12\tseeded\n" for sig, n in sorted(pins.items()) if n)
+    (r / PINS_HOME).parent.mkdir(parents=True, exist_ok=True)
+    (r / PINS_HOME).write_text("# ledger · drift-pins · key key signal · direction ceiling · drain key\n" + rows,
+                               encoding="utf-8", newline="\n")
+
+
+def write_baselines(r: pathlib.Path, sets: dict) -> None:
+    """The fixture's `drift-baselines` home, one row per (signal, id)."""
+    rows = "".join(f"{sig}\t{i}\t1\tabcdef12\tseeded\n" for sig, ids in sorted(sets.items()) for i in ids)
+    (r / BASELINES_HOME).parent.mkdir(parents=True, exist_ok=True)
+    (r / BASELINES_HOME).write_text(
+        "# ledger · drift-baselines · key record signal,id · direction shrink-only · drain key\n" + rows,
+        encoding="utf-8", newline="\n")
+
+
+def make_repo(tmp: pathlib.Path, name: str = "repo", ledger: bool = True) -> pathlib.Path:
     # `name` exists so a second arm can build a SECOND fixture rather than thread itself through
     # `test_signals_can_move`'s eight mutations — that sequence ends by unlinking the project layer,
-    # so anything appended to it would run against a repo that refuses to report at all.
+    # so anything appended to it would run against a repo that refuses to report at all. `ledger`
+    # False builds the tree with no memory-tree kit at all, which the straggler arm's first half needs.
     r = tmp / name
     # DERIVED from the conf this fixture is about to write, never a literal layout. The previous
     # line spelled `memory/tooling/builds/<x>/spec` — the pre-flatten shape — so an arm named
@@ -358,6 +397,16 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
 
     for f in ("drift_report.py", "drift_signals.template.py"):
         (r / KIT_NAME / f).write_bytes((KIT / f).read_bytes())
+    if ledger:
+        # The ledger factory's kit, resolved in this install and laid out under its own name, as this
+        # kit is under KIT_NAME: never a kit name typed beside a path (TOOL-dWitnessedBar-16 S15).
+        ledger_kit = resolve_kit_dir(LEDGER_KIT_HOME, "legacy_ledger.py", KIT)
+        mt = r / ledger_kit.name
+        mt.mkdir()
+        for f in ("legacy_ledger.py", "backlog.py", "coverage_join.py"):
+            (mt / f).write_bytes((ledger_kit / f).read_bytes())
+        (r / KIT_NAME / "kit.toml").write_text(FIXTURE_LEDGERS, encoding="utf-8", newline="\n")
+        (r / ".gitignore").write_text("__pycache__/\n", encoding="utf-8", newline="\n")
     (r / KIT_NAME / "drift_signals.py").write_text(
         # PRODUCT_GLOBS is deliberately WIDER than TRACE_GLOBS here. The narrowing is the whole
         # point of TRACE_GLOBS -- in the shipping repo it drops `.claude/` and the kickoff
@@ -374,15 +423,14 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
         # `conf/` stays outside it, so an engine that read PRODUCT_GLOBS here would
         # be caught rather than passing by coincidence.
         "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']\n"
-        "SHRINK_ONLY = {'shrinkme.txt': 'a list that promises to shrink'}\n"
+        # The shrink-only list and the pins are populations the descriptor above registers; the pin
+        # home stays ABSENT here, so the pin-semantics arm below writes the first row, and seeding a
+        # pin here would silently turn that arm into a no-op.
         "HANDKEPT = []\n"
-        # PINS stays EMPTY and is spelled exactly `PINS = {}`: the pin-semantics arm below rewrites
-        # this literal, and seeding a pin here would silently turn that arm into a no-op.
-        "PINS = {}\n"
         # HANDKEPT is empty here, as it is in the shipped template — so the signal it feeds is empty
         # BY DECLARATION, not blind, and must be named as such or `--check` reds this fixture for
-        # modelling the adopter default faithfully. SHRINK_ONLY is populated above, so it is NOT
-        # declared: leaving it in this set after populating it is how an exemption becomes a hole.
+        # modelling the adopter default faithfully. A shrink-only list is registered above, so the
+        # engine does NOT declare that signal empty: the declaration is derived, never typed.
         "DECLARED_EMPTY = {'handkept_inventories_disagreeing_with_source'}\n",
         encoding="utf-8", newline="\n")
 
@@ -931,9 +979,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
           f"lines={olines[:5]} red={sorted(red_now)}")
     check("--offenders carries no line locator in any key",
           not any(re.search(r":\d+(:|$)", ln) or '"line"' in ln for ln in olines), f"{olines[:5]}")
-    sig.write_text(sig.read_text(encoding="utf-8").replace(
-        "PINS = {}", "PINS = {'non_terminal_specs_cited_by_product_source': 1}"),
-        encoding="utf-8", newline="\n")
+    write_pins(r, {'non_terminal_specs_cited_by_product_source': 1})
     at = run([sys.executable, REPORT_REL, "--check"], r)
     check("--check greens once the pin is seeded at the measured value", at.returncode == 0,
           f"rc={at.returncode} stderr={at.stderr.strip()[:200]}")
@@ -1341,7 +1387,7 @@ def test_backlog_stragglers(tmp: pathlib.Path) -> None:
     remote-tracking ref and the arm names it.
     """
     print("backlog stragglers (not asked without the relocation engine; falsifiable with it)")
-    r = make_repo(tmp, name="stragglers")
+    r = make_repo(tmp, name="stragglers", ledger=False)
 
     s = read_one_signal(r, "backlog_stragglers")
     check("no memory-tree kit: backlog_stragglers is NOT ASKED, not a clean zero",
@@ -2036,7 +2082,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
     # `git show <base>:<file>`, so a pin that exists only in the working tree has no prior value and
     # is correctly ignored. Seeding it in the working tree alone would make every direction below
     # pass by finding nothing.
-    conf.write_text(conf.read_text(encoding="utf-8") + 'ORPHAN_ID_PIN="5"\n',
+    conf.write_text(conf.read_text(encoding="utf-8") + 'FIXTURE_PIN="5"\n',
                     encoding="utf-8", newline="\n")
     # `make_repo` writes its own MINIMAL signals module, so there is no RATCHETS list to edit —
     # appending one is the only thing that arms this fixture. A `.replace()` against a string this
@@ -2044,7 +2090,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
     # and passes by finding nothing. That is exactly what the first cut of this arm did.
     sig.write_text(
         sig.read_text(encoding="utf-8")
-        + 'RATCHETS = [{"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"}]\n',
+        + 'RATCHETS = [{"file": ".memory-tree.conf", "key": "FIXTURE_PIN", "weakens": "up"}]\n',
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     seeded = run(["git", "commit", "-q", "-m", "seed the ratchet", "--no-verify"], r)
@@ -2053,7 +2099,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
     # The base value has to be READABLE, or every direction is a skip wearing a pass.
     at_base = run(["git", "show", "main:.memory-tree.conf"], r)
     check("the pin is readable at the fixture's base",
-          at_base.returncode == 0 and 'ORPHAN_ID_PIN="5"' in at_base.stdout,
+          at_base.returncode == 0 and 'FIXTURE_PIN="5"' in at_base.stdout,
           at_base.stdout[-200:])
     committed = conf.read_text(encoding="utf-8")
 
@@ -2065,7 +2111,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
           (base_ok.stdout + base_ok.stderr)[-400:])
 
     # --- direction one: weakened, unjustified -------------------------------------------------
-    conf.write_text(committed.replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="9"'),
+    conf.write_text(committed.replace('FIXTURE_PIN="5"', 'FIXTURE_PIN="9"'),
                     encoding="utf-8", newline="\n")
     out = _check()
     check("an unjustified RAISE is refused",
@@ -2073,8 +2119,8 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
           (out.stdout + out.stderr)[-400:])
 
     # --- direction two: the SAME raise, justified in place ------------------------------------
-    justified = "# RAISED 5 -> 9 because the fixture says so.\n" + 'ORPHAN_ID_PIN="9"'
-    conf.write_text(committed.replace('ORPHAN_ID_PIN="5"', justified),
+    justified = "# RAISED 5 -> 9 because the fixture says so.\n" + 'FIXTURE_PIN="9"'
+    conf.write_text(committed.replace('FIXTURE_PIN="5"', justified),
                     encoding="utf-8", newline="\n")
     out = _check()
     check("the same RAISE with a justification naming both values is allowed",
@@ -2084,7 +2130,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
     # --- direction three: TIGHTENED, unjustified ----------------------------------------------
     # A ratchet that also refuses improvement is a ratchet nobody turns, so this direction must be
     # free. Without it, direction one would pass equally against a guard that refused any edit.
-    conf.write_text(committed.replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="1"'),
+    conf.write_text(committed.replace('FIXTURE_PIN="5"', 'FIXTURE_PIN="1"'),
                     encoding="utf-8", newline="\n")
     out = _check()
     check("a tightening move needs no justification",
@@ -2100,7 +2146,7 @@ def test_baselines(tmp: pathlib.Path) -> None:
     state and demands red, and the clean state and the equal-seed arm demand green, so a guard that
     refused every edit fails here as surely as one that refused none.
     """
-    print("BASELINES (an equal-count swap, a drain and a growth each red)")
+    print("baselines (an equal-count swap, a drain and a growth each red)")
     r = make_repo(tmp, name="baselines")
     sig = r / KIT_NAME / "drift_signals.py"
     app = r / "src" / "app.py"
@@ -2111,12 +2157,12 @@ def test_baselines(tmp: pathlib.Path) -> None:
         "**Status:** SPECCED · rev-1 · 2026-01-01 · node a · Tier-2 · base 0000000\n",
         encoding="utf-8", newline="\n")
     app.write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
-    # The layer sits INSIDE the evidence globs, as it does in this repo, so the drain arm also proves
-    # that a list spelling an id is not a citation of it (S10).
+    # The kit dir, which holds the baselines home, sits INSIDE the evidence globs, as it does in this
+    # repo, so the drain arm also proves that a list spelling an id is not a citation of it (S10).
     layer = sig.read_text(encoding="utf-8").replace(
         "EVIDENCE_GLOBS = ['src', ", "EVIDENCE_GLOBS = ['src', '" + KIT_NAME + "', ")
-    seeded = layer + "BASELINES = {'" + name + "': ['TOOL-aThing-1']}\n"
-    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    sig.write_text(layer, encoding="utf-8", newline="\n")
+    write_baselines(r, {name: ['TOOL-aThing-1']})
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "seed the baseline", "--no-verify"], r)
 
@@ -2147,63 +2193,60 @@ def test_baselines(tmp: pathlib.Path) -> None:
 
     # --- GROWTH against a committed base that lists the signal ---------------------------------
     app.write_text("# implements TOOL-aThing-1 and TOOL-aOther-1\n", encoding="utf-8", newline="\n")
-    sig.write_text(seeded.replace("['TOOL-aThing-1']", "['TOOL-aThing-1', 'TOOL-aOther-1']"),
-                   encoding="utf-8", newline="\n")
+    write_baselines(r, {name: ['TOOL-aThing-1', 'TOOL-aOther-1']})
     grown = run_check()
     check("baselines: a set gaining an id against its base reds as a weakened ratchet",
           grown.returncode == 1 and "RATCHET WEAKENED" in grown.stderr
           and "gained TOOL-aOther-1" in grown.stderr, f"rc={grown.returncode} {grown.stderr.strip()[-300:]}")
 
     # --- the FIRST seed is bounded by the pin the base held ------------------------------------
-    pinned = layer.replace("PINS = {}", "PINS = {'" + name + "': 1}")
-    sig.write_text(pinned, encoding="utf-8", newline="\n")
+    write_baselines(r, {})
+    write_pins(r, {name: 1})
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "a pin at the base", "--no-verify"], r)
-    sig.write_text(layer + "BASELINES = {'" + name + "': ['TOOL-aThing-1', 'TOOL-aOther-1']}\n",
-                   encoding="utf-8", newline="\n")
+    write_pins(r, {})
+    write_baselines(r, {name: ['TOOL-aThing-1', 'TOOL-aOther-1']})
     over = run_check()
     check("baselines: a first seed above the base's pin reds",
           over.returncode == 1 and "seeded with 2 ids where the base pins it at 1" in over.stderr,
           f"rc={over.returncode} {over.stderr.strip()[-300:]}")
     app.write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
-    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    write_baselines(r, {name: ['TOOL-aThing-1']})
     equal = run_check()
     check("baselines: a first seed at the base's pin is green", equal.returncode == 0,
           f"rc={equal.returncode} {equal.stderr.strip()[-300:]}")
 
     # --- ONE bound per signal -------------------------------------------------------------------
-    sig.write_text(seeded.replace("PINS = {}", "PINS = {'" + name + "': 1}"),
-                   encoding="utf-8", newline="\n")
+    write_pins(r, {name: 1})
     both = run([sys.executable, REPORT_REL, "--check"], r)
-    check("baselines: a signal in both PINS and BASELINES is refused with exit 2 before any line",
-          both.returncode == 2 and not both.stdout.strip() and "PINS and BASELINES" in both.stderr,
+    check("baselines: a signal in both drift-pins and drift-baselines is refused with exit 2 before any line",
+          both.returncode == 2 and not both.stdout.strip() and "drift-pins and drift-baselines" in both.stderr,
           f"rc={both.returncode} out={both.stdout[:120]!r} {both.stderr.strip()[-200:]}")
-    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    write_pins(r, {})
 
     # --- TOOL-aMendedFleet-110: a MOVE out of BASELINES into PINS is graded against the base ----
     # The seeded set becomes the base first: the arms above end on a base that pins the signal.
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "the seeded set is the base", "--no-verify"], r)
-    sys.path.insert(0, str(KIT))
-    import drift_report as dr
-    moved = dr.build_baseline_findings(
-        dr.Git(r, "HEAD"), f"{ROOT_PFX}{KIT_NAME}/drift_signals.py",
-        {"closed_specs_with_no_product_commit": []}, {name: 2})
-    check("baselines: a set moved to PINS above the base's size is one finding naming it",
+    fx = load_fixture_report(r)
+    ledger, regs, _pins, _sets = fx.read_drift_populations(r)
+    moved = fx.build_baseline_findings(fx.Git(r, "HEAD"), ledger, regs,
+                                       {"closed_specs_with_no_product_commit": []}, {name: 2})
+    check("baselines: a set moved to drift-pins above the base's size is one finding naming it",
           len(moved) == 1 and f"{name!r} moved" in moved[0] and "WEAKENS" in moved[0], repr(moved))
-    sig.write_text(layer.replace("PINS = {}", "PINS = {'" + name + "': 2}"),
-                   encoding="utf-8", newline="\n")
+    write_baselines(r, {})
+    write_pins(r, {name: 2})
     emptied = run_check()
-    check("baselines: no BASELINES and the signal pinned above the base's size reds",
+    check("baselines: no baseline row and the signal pinned above the base's size reds",
           emptied.returncode == 1 and "RATCHET WEAKENED" in emptied.stderr
           and f"{name!r} moved" in emptied.stderr,
           f"rc={emptied.returncode} {emptied.stderr.strip()[-300:]}")
-    sig.write_text(layer.replace("PINS = {}", "PINS = {'" + name + "': 1}"),
-                   encoding="utf-8", newline="\n")
+    write_pins(r, {name: 1})
     at_size = run_check()
     check("baselines: a move pinned at the base set's size is green", at_size.returncode == 0,
           f"rc={at_size.returncode} {at_size.stderr.strip()[-300:]}")
-    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    write_pins(r, {})
+    write_baselines(r, {name: ['TOOL-aThing-1']})
 
 
 def test_shrink_low_water(tmp: pathlib.Path) -> None:
@@ -2261,11 +2304,11 @@ def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     r = make_repo(tmp, name="remotebase")
     conf = r / ".memory-tree.conf"
     sig = r / KIT_NAME / "drift_signals.py"
-    conf.write_text(conf.read_text(encoding="utf-8") + 'ORPHAN_ID_PIN="5"\n',
+    conf.write_text(conf.read_text(encoding="utf-8") + 'FIXTURE_PIN="5"\n',
                     encoding="utf-8", newline="\n")
     sig.write_text(
         sig.read_text(encoding="utf-8")
-        + 'RATCHETS = [{"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"}]\n',
+        + 'RATCHETS = [{"file": ".memory-tree.conf", "key": "FIXTURE_PIN", "weakens": "up"}]\n',
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "seed the ratchet", "--no-verify"], r)
@@ -2275,7 +2318,7 @@ def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     run(["git", "init", "-q", "--template=", "--bare", str(bare)], tmp)
     run(["git", "remote", "add", "origin", str(bare)], r)
     # THE RAISE, UNJUSTIFIED, pushed — what a raise another node already landed looks like from here.
-    conf.write_text(conf.read_text(encoding="utf-8").replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="9"'),
+    conf.write_text(conf.read_text(encoding="utf-8").replace('FIXTURE_PIN="5"', 'FIXTURE_PIN="9"'),
                     encoding="utf-8", newline="\n")
     run(["git", "commit", "-q", "-am", "raise the pin on origin", "--no-verify"], r)
     tip = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
@@ -2942,9 +2985,7 @@ def test_report_only_signal_is_judged_against_its_pin(tmp: pathlib.Path) -> None
     check("report-only: the fixture's report-only signal has a value to pin",
           value > 0, f"value {value} -- the arm below would pin at zero and prove nothing")
 
-    proj.write_text(proj.read_text(encoding="utf-8").replace(
-        "PINS = {}", "PINS = {'" + name + "': " + str(value) + "}"),
-        encoding="utf-8", newline=NL)
+    write_pins(r, {name: value})
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "chore: pin the report-only signal at its value", "--no-verify"], r)
 
@@ -3113,6 +3154,38 @@ def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
           [d["leg"] for d in got["detail"]] == ["leg a", "leg b"], f"got {got['detail']}")
 
 
+def test_gate_health(tmp: pathlib.Path) -> None:
+    """TOOL-dWitnessedBar-1: the reliability bar measured from the flake records, over drift's four
+    `--gate-health --fixture` cases. Each plants its own scratch repository holding this kit, the
+    memory-tree factory and a manifest, so the arm reads the mode as an install runs it; `short` and
+    `write` stage the unarmed set by deleting one row of one leg. Red when the percentile is taken over
+    every row rather than per leg, the one is not added, an unarmed measurement prints a value or writes a
+    record, or a `--with` naming no flake record is not refused. Every case passes `--selection`, an empty
+    selection record, as the mode requires (TOOL-dWitnessedBar-57 S18); `held` (AC16) appends its own
+    quarantine row to it and reds where a leg that row or the kit hold holds is read as a bar leg, or the
+    mode runs with no `--selection`."""
+    print("gate health, the reliability bar measured from the flake records")
+    try:
+        resolve_kit_dir(LEDGER_KIT_HOME, "build_records.py", KIT)
+    except LookupError as exc:
+        skip("gate health", f"no memory-tree record factory in this install: {exc}")
+        return
+    wants = {"differs": "gate-health measured 4/10 · legs 10/10 · verdicts fx-00 ",
+             "lower": "gate-health measured 1/10 · legs 10/10 · verdicts fx-00 ",
+             "short": "gate-health unarmed · leg 03 29/30\n",
+             "write": "drift-report: wrote memory/builds/tHealth/build/",
+             "held": "gate-health measured 1/10 · legs 1/1 · verdicts fx-00 "}
+    selection = tmp / "gate-health-selection"
+    selection.write_bytes(b"")
+    for case, want in wants.items():
+        p = run([sys.executable, str(KIT / "drift_report.py"), "--gate-health", "--fixture", case,
+                 "--selection", str(selection)], KIT)
+        check(f"gate health: --fixture {case} reads every case as planted",
+              p.returncode == 0 and f"gate-health fixture {case} ok" in p.stdout,
+              f"rc {p.returncode}: {(p.stdout + p.stderr)[-400:]}")
+        check(f"gate health: --fixture {case} prints {want.strip()!r}", want in p.stdout, p.stdout[-400:])
+
+
 def test_cutoff_keys_armed(tmp: pathlib.Path) -> None:
     """TOOL-aMendedFleet-21: armed `_CUTOFF` keys in TRACKED root confs, pinned only where declared.
 
@@ -3138,13 +3211,11 @@ def test_cutoff_keys_armed(tmp: pathlib.Path) -> None:
     got = report(r).get(name, {})
     check("cutoffs: armed and exported count, blank, commented and untracked do not",
           (got.get("value"), got.get("of"), got.get("live")) == (2, 4, True), f"row {got}")
-    check("cutoffs: with no PINS entry the row is report-only and says no budget is declared",
+    check("cutoffs: with no drift-pins row the row is report-only and says no budget is declared",
           got.get("gateable") is False and "no budget" in str((got.get("detail") or [{}])[0]),
           f"row {got}")
-    proj = r / KIT_NAME / "drift_signals.py"
-    proj.write_text(proj.read_text(encoding="utf-8").replace(
-        "PINS = {}", "PINS = {'" + name + "': 2}"), encoding="utf-8", newline=NL)
-    check("cutoffs: a PINS entry makes it gateable", report(r).get(name, {}).get("gateable") is True)
+    write_pins(r, {name: 2})
+    check("cutoffs: a drift-pins row makes it gateable", report(r).get(name, {}).get("gateable") is True)
     with (r / ".other.conf").open("a", encoding="utf-8", newline=NL) as fh:
         fh.write('G_CUTOFF="2026-04-04"' + NL)
     out = run([sys.executable, REPORT_REL, "--check"], r)
@@ -4329,25 +4400,120 @@ def test_aborted_work_landed(tmp: pathlib.Path) -> None:
           _measure_git_calls(dr, small, dr.read_aborted_verdicts) == seen[6], f"{seen}")
 
 
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
+
 def resolve_bash_shell(probe_dir: pathlib.Path) -> str | None:
-    """A shell that runs the kit library as bash runs it: `[[ ]]` and process substitution, both of
-    which the library uses. `sh` on MSYS is bash in POSIX mode, so the probe leaves that mode first."""
+    """The bash the one `resolve_bash_py` block above finds, kept only when it runs the kit library as
+    bash runs it: `[[ ]]` and process substitution, both of which the library uses. None when the
+    block refuses, so a WSL launcher or a bare `bash` never runs the library; the probe leaves POSIX
+    mode first, as a bash started under the name `sh` would be in it."""
+    cand = scan_bash()[0]
+    if not cand:
+        return None
     marker = probe_dir / ".bashprobe"
     marker.write_text("PROBE=works\n", encoding="utf-8", newline="\n")
     probe = ('set +o posix 2>/dev/null; . ./.bashprobe; y=$(cat < <(printf %s "$PROBE")); '
              '[[ "$y" == works ]] && printf %s "$y"')
     try:
-        for cand in ("bash", "sh", "/usr/bin/bash", "/bin/bash"):
-            try:
-                out = subprocess.run([cand, "-c", probe], cwd=str(probe_dir), capture_output=True,
-                                     text=True, encoding="utf-8", errors="replace")
-            except (OSError, FileNotFoundError):
-                continue
-            if out.returncode == 0 and out.stdout.strip() == "works":
-                return cand
+        out = subprocess.run([cand, "-c", probe], cwd=str(probe_dir), capture_output=True,
+                             text=True, encoding="utf-8", errors="replace")
+    except OSError:
         return None
     finally:
         marker.unlink(missing_ok=True)
+    return cand if out.returncode == 0 and out.stdout.strip() == "works" else None
 
 
 def test_work_landed_matches_the_driver(tmp: pathlib.Path) -> None:
@@ -4509,6 +4675,7 @@ def main() -> int:
         test_backlog_ask_signals(tmp)
         test_asks_disposed_overrides(tmp)
         test_legs_retried_after_timeout(tmp)
+        test_gate_health(tmp)
         test_fleet_over_budget(tmp)
         test_remote_ci_red_streak(tmp)
         test_auto_memory_pointers(tmp)

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 50 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-2 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 50 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,11 +8,18 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
 | [2026-10-25-build-TOOL-dWitnessedBar-97-deviation-971.md](../build/2026-10-25-build-TOOL-dWitnessedBar-97-deviation-971.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-97-round14-h1-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-97-round14-h1-return.md) | research | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-97-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-97-1-acceptance-ledger.md) | journal | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-97-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-97-1-builder-return.md) | journal | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-97-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-97-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-97-round14-h1-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-97-round14-h1-brief.md) | research | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-97-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-97-build-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-97-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-97-reground-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-97-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-97-reground-spec-writer.md) | journal | — |
+| [2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md](../reviews/2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md) | diff-review | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 |
 
 <!-- /gen:spec-records -->
 
@@ -26,7 +33,7 @@ BUILD-METHOD M4 batches every MEDIUM and LOW into one unit, or two only where th
 disjoint write sets by M6's clauses. §4 "Why one unit" says why these stay one. Each finding is named
 by report id and is its own scope item, including where the report merged two ids into one item.
 The minors land on units 91 and 92, so this unit repairs no one unit and builds after every unit of
-the build (order 50).
+the build but the deferred unit 28 (order 50).
 
 | Report item | Severity | Report id | Lands on | Scope item |
 |---|---|---|---|---|
@@ -48,13 +55,15 @@ unit 94 makes the shared fix; S9 adds the arms only id 16's fix names.
 
 ## 2. Scope (IN)
 
-- **S1** — id 2. A launcher word, never a path, and 92 AC4's Red-when restated. 92 S4's note quotes
-  the one word `resolve_python` printed, in `TOOL-dWitnessedBar-96` S2's spelling. 92 AC4's Red-when,
-  "a close that runs a derivation through a bare launcher records no resolved interpreter and passes",
-  is superseded: a bare launcher word is what `resolve_python` prints, and the break is a note that
-  records refusal text in its place. A note holding the first line `resolve_python` writes on
-  refusal, `resolve_python: no usable python launcher.`, then `exit 0`, reads as no note through 96
-  S3's row. Observed by AC1.
+- **S1** — id 2. The value `resolve_python` printed, and 92 AC4's Red-when restated. 92 S4's note
+  quotes the one line `resolve_python` printed on stdout, in `TOOL-dWitnessedBar-96` S2's spelling:
+  an override as given, the memo launcher as an absolute path, or the forward-slashed executable its
+  probe found, and a launcher name only where the probe named no file. 92 AC4's Red-when, "a close
+  that runs a derivation through a bare launcher records no resolved interpreter and passes", is
+  superseded: a launcher name can be what `resolve_python` prints, so a note quoting one is correct,
+  and the break is a note that records refusal text in its place. A note holding the first line
+  `resolve_python` writes on refusal, which opens `resolve_python: no usable python launcher at the
+  floor`, then `exit 0`, reads as no note through 96 S3's row. Observed by AC1.
 - **S2** — id 6. The exit graded. A derivation run that exits non-zero is recorded with that exit,
   and 96 S3's row refuses it. A note holding `resolve_python: python3 exit 5` and no `exit 0` reads as
   no note. Observed by AC2.
@@ -67,7 +76,8 @@ unit 94 makes the shared fix; S9 adds the arms only id 16's fix names.
 - **S4** — id 4. 92 S2's third clone, isolated. The third clone of 92 S2 and AC2 is 90 AC1's first
   isolated clone: `_iso=1` is set for the canary's top-level call of `check_canary_keys` alone, and
   `check_canary_keys` stops after its first pair when `_iso` is set. It also carries 92 S2's added
-  line after that call site, and a call site whose `case` handles 0, 1 and 2 alone. Its output, with
+  line directly after the line that sets `rgf_ok`, and a call site handling 0, 1 and 2 alone, with
+  no `= 3` branch and no undefined-code `elif`. Its output, with
   stderr joined, holds a line holding `the canary visited 1 of`, which shows the visited failure
   fired, and its last line holds `PASS (`. 92 S2's note in unit 90's ledger carries
   `the canary visited 1 of` beside `PASS (`. Observed by AC4.
@@ -75,8 +85,11 @@ unit 94 makes the shared fix; S9 adds the arms only id 16's fix names.
   `git log --format=%H -E --grep='^Pass: TOOL-dWitnessedBar-(89|90)$' cdfbd1cf..HEAD` clause is
   superseded by §4's pass-commit read. For each dispatch key of each unit that
   `read_pass_declarations` prints, it takes `pass_commit` over that key's window, bounded by the
-  unit's next anchor that `next_anchor` names, as check 23 does. It prints `NO PASS COMMIT <unit>`
-  and reds when either unit yields none. `build_commit` is not used here: it answers with one commit
+  unit's next anchor that `next_anchor` names, as check 23 does. It sources
+  `tools/lib/resolve-python.sh` first, because `pass_commit` attributes each commit through
+  `read_attribution_tokens`, which answers status 2 and attributes nothing when the caller's shell
+  defines no `resolve_python`. It prints `NO PASS COMMIT <unit>` and reds when either unit yields
+  none. `build_commit` is not used here: it answers with one commit
   per unit, and 92 S5 asks of every pass. 88 S5 rules the lookup of a unit's one pass commit and
   stands. 92 S5's note in unit 90's ledger carries `pass_commit` and each sha the read printed.
   Observed by AC5.
@@ -116,7 +129,10 @@ unit 94 makes the shared fix; S9 adds the arms only id 16's fix names.
   ledger awk, a glob over acceptance ledgers and a hand-piped `GEN_REGION_AWK`. No clause of this
   build names them.
 - New assertions in the suite, and a `New arm:` line. S4 only clones the suite, so
-  `TOOL-dWitnessedBar-88` S6's derivation still names unit 90 the floor's owner.
+  `TOOL-dWitnessedBar-92` §4's owner derivation, which takes the place of 88 S6's (92 S12), still
+  names unit 90 the floor's owner.
+- Unit 28, deferred unbuilt on asks TOOL-dWitnessedBar-101 to -103. No item here waits on it: every
+  note, fragment, ledger and pass commit S1 to S10 read belongs to units 87 to 96.
 
 ### Edges
 
@@ -135,65 +151,87 @@ notes in the ledgers of units 88, 89 and 90, and S8's answer count reads the ans
 under, so any split shares those records and reads the other half's notes as an acceptance input,
 which M6 clauses 2 and 3 forbid. S6's note lands in the same ledger of unit 90 that S4's and S5's
 notes do. Dispatch is strictly sequential, a shared order included
-(`tools/workflows/unattended-build.js:76`), so a split would buy no concurrency.
+(`tools/workflows/unattended-build.js@cb03a9f8c:78`), so a split would buy no concurrency.
 
 ### Evidence
 
-- `tools/lib/resolve-python.sh:39` writes `resolve_python: no usable python launcher. Each candidate
-  was RUN with -c 'import sys' and` as its first refusal line, to stderr.
-- Probed on 2026-10-25 through 92 §4's note check with the fragments of units 93, 94 and 96 and S8's,
-  and 96 S3's row for `92|S4|88|AC6`. A note holding the backticked refusal text above and `exit 0`
-  printed `NO NOTE 92 S4 resolve_python:`, and so did a note holding `resolve_python: python3 exit 5`.
-- §4 "The derivation's identity" was probed on 2026-10-25. Over spec-92 it extracted 31 lines with
-  checksum 788872005, and over spec-90 9 lines with checksum 2001065055. A note carrying the
-  backticked `script 2001065055`, fed the row whose token is the backticked `script 788872005`,
-  printed a line opening `NO NOTE 92 S4`; with `script 788872005` it printed `NOTES OK 1`. Both figures move with
-  any edit to either block, so every criterion derives them at observation time.
-- Spec-90 lines 298-300 define the first isolated clone: `_iso=1` set for the top-level call alone,
-  and `check_canary_keys` stopping after its first pair when `_iso` is set. Spec-89 S4 (lines 69-74)
-  has the canary print `gov-canary: the canary visited <n> of <m> CANARY_KEYS pairs` to stderr and
-  return 3 on a visited failure.
-- `pass_commit` (`tools/unattended/lib-unattended.sh:1026`) prints the first pass commit after an
-  anchor, up to an optional bound, and attributes a commit by its `Pass:` trailer, splitting the
-  trailer into ids (`:1069-1075`). `next_anchor` (`:1936`) names a unit's next anchor by ancestry.
-  `tools/unattended/check-unattended.sh:4158-4170` takes check 23's window the same way.
-  `build_commit` (`:1186`) returns one commit per unit.
-- §4's pass-commit read was probed on 2026-10-25. Over `memory/builds/dWitnessedBar/RUN.md`, which
-  holds no dispatch row yet, it printed `NO PASS COMMIT TOOL-dWitnessedBar-89` and
-  `NO PASS COMMIT TOOL-dWitnessedBar-90`, exit 1. Pointed at `memory/builds/aBatchedArm/RUN.md` with
-  its units, it printed two `PASS COMMIT` lines for `TOOL-aBatchedArm-3`, one per dispatch key, and
-  three for `TOOL-aBatchedArm-1`, exit 0.
-- `check_gen_region_only` (`tools/unattended/lib-unattended.sh:1137`) reads both blobs through `GIT`
-  and returns 1 when either is missing. `check_generated_render` calls it as
-  `check_gen_region_only "$1^:$2" "$1:$2"` (`tools/unattended/check-unattended.sh:4064`).
-- Probed on 2026-10-25, over a scratch copy holding `-89-1-` and `-89-2-` ledgers with the notes in
-  the `-2-` file, spec-92's script printed `NO SINGLE LEDGER 89` for each row, exit 1. With S8's
-  fragments it printed `NOTES OK 2`, with or without the fragments of units 93, 94 and 96. With a
-  `-2-` ledger carrying only `- AC4` and 90 S14's note under `- AC7` in the `-1-` file, it printed
-  `NOTES OK 2`. With no ledger it printed `NO LEDGER 89` per row.
-- Probed on 2026-10-25, a 89 ledger whose `- AC4` answer line reads
+Read on 2026-11-21 at `10b5fd993`. Units 87 to 96 are CLOSED; units 91 to 96 wrote records only, and
+spec-92 last moved at `3ffc6c67c` (rev-3). Unit 28 is deferred unbuilt.
+
+- `tools/lib/resolve-python.sh#resolve_python` prints one line on stdout: the memo launcher of
+  `GATE_RESOLVED_PY`, admitted only absolute; else an override, the caller's argument or
+  `GOV_PYTHON`, as given; else, for `python3`, `python` or `py`, the forward-slashed executable its
+  probe printed where `[ -f ]` holds, and the name otherwise. On refusal it returns 1 and writes
+  every line to stderr, each opening `resolve_python: `: the first
+  `resolve_python: no usable python launcher at the floor <floor> (python-floor.txt in gov's lib dir).`,
+  the last `resolve_python: tried:` and the candidates. Sourced on node d with no `GOV_PYTHON` and no
+  memo it printed an absolute `.../python.exe`, exit 0; with `PATH=/nonexistent` it printed that
+  refusal, exit 1 (DERIVED 2026-11-21).
+- Probed on 2026-11-21 through 92 §4's note check composed as S8 states, with 96 S3's row for
+  `92|S4|88|AC6`. A note holding the backticked first refusal line above and then `exit 0` printed
+  `NO NOTE 92 S4 resolve_python:`, exit 1, and so did a note holding `resolve_python: python3 exit 5`.
+  Notes holding `resolve_python: python3 exit 0` or the absolute path node d's resolver printed,
+  then `exit 0`, printed `NOTES OK 1`.
+- §4 "The derivation's identity" was probed on 2026-11-21. Over spec-92 it extracted 31 lines with
+  checksum 788872005 (DERIVED 2026-11-21), and over spec-90 9 lines with checksum 2001065055 (DERIVED
+  2026-11-21). Run from the root, the extracted script printed 28 (DERIVED 2026-11-21) and
+  `spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md`, exit 0. A note carrying the backticked
+  `script 2001065055`, fed the row whose token is the backticked `script 788872005`, printed a line opening `NO NOTE 92 S4`; with `script 788872005` it
+  printed `NOTES OK 2` beside 96 S3's row. Both figures move with any edit to either block, so every
+  criterion derives them at observation time.
+- 90 AC1 defines the first isolated clone: `_iso=1` set for the canary's top-level call alone, and
+  `check_canary_keys` stopping after its first pair when `_iso` is set. As 89 S4 built it,
+  `tools/run-gates/run-gates.gov.test.sh#check_canary_keys` prints
+  `gov-canary: the canary visited <n> of <m> CANARY_KEYS pairs` to stderr and returns 3 on a visited
+  failure. The built call site sets `rgf_ok` only on 0 or 1, and 92 S2's added line follows that line.
+- `tools/unattended/lib-unattended.sh#pass_commit` prints the first pass commit after an anchor, up
+  to an optional bound, attributing each commit through `#read_attribution_tokens`: a `Pass:`
+  trailer attributes by its ids alone. That reader takes its launcher from the caller's own
+  `resolve_python` and, with none defined, prints
+  `lib-unattended: read_attribution_tokens found no python launcher, so no commit is attributed` and
+  returns 2. `#next_anchor` names a unit's next anchor by ancestry, and `#read_pass_declarations`
+  prints one row per dispatch key, the rows under one key joined. Check 23 takes its window the same
+  way (`tools/unattended/check-unattended.sh@cb03a9f8c:4625-4632`). `#build_commit` returns one
+  commit per unit.
+- §4's pass-commit read was probed on 2026-11-21 at `10b5fd993`, where `RUN.md` holds one dispatch
+  key for each of units 89 and 90. Without its first line it printed the reader's refusal and
+  `NO PASS COMMIT` for both units, exit 1. As written it printed `PASS COMMIT` for
+  `TOOL-dWitnessedBar-89` at `05fdf49d3` and for `TOOL-dWitnessedBar-90` at `b5a33a39c`, each with
+  `paths 0`, exit 0. In a scratch clone with AC10's staging, it printed
+  `BODY EDIT TOOL-dWitnessedBar-89 <sha> memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md`
+  and a second `PASS COMMIT` for unit 89, `paths 1`, exit 1.
+- `tools/unattended/lib-unattended.sh#check_gen_region_only` reads both blobs through `GIT` and
+  returns 1 when either is missing. `tools/unattended/check-unattended.sh#check_generated_render`
+  calls it as `check_gen_region_only "$1^:$2" "$1:$2"`.
+- Probed on 2026-11-21, over a scratch root holding `-89-1-` and `-89-2-` ledgers with the notes in
+  the `-2-` file, spec-92's script printed `NO SINGLE LEDGER 89` for each row, exit 1, and the script
+  composed as S8 states printed `NOTES OK 2`. With a `-2-` ledger carrying only `- AC4` and 90 S14's
+  note under `- AC7` in the `-1-` file, it printed `NOTES OK 2`, and §4's answer count printed
+  `AC7 MAX 1 SUM 1` for `89 7`. With no ledger it printed `NO LEDGER 89` per row.
+- Probed on 2026-11-21, a 89 ledger whose `- AC4` answer line reads
   `- AC4 — passed; see TOOL-dWitnessedBar-90 S1 and TOOL-dWitnessedBar-90 S14` printed `NOTES OK 1`
   for row `90|S1|89|AC4|` through spec-92's script, and `NO NOTE 90 S1` through the composed check.
   A ledger with that mention under `- AC4` and 90 S14's note under `- AC7` printed
   `MISPLACED 90 S14` for row `90|S14|89|AC7|` through spec-92's script and `NOTES OK 1` through the
   composed check.
-- Probed on 2026-10-25, a 90 ledger whose 91 S2 note is a continuation under `- AC2` printed
-  `NOTES OK 1` for row `91|S2|90|AC2|sha)[[:space:]]*rec_sha="`. Spelled as its own
-  `- AC2 — TOOL-dWitnessedBar-91 S2` line, it printed a line opening `NO NOTE 91 S2` through the composed check,
-  while 91 AC2's selector printed one line opening `- AC2 `, and `grep -cE '^- AC2 '` printed 2.
+- Probed on 2026-11-21, a 90 ledger whose 91 S2 note is a continuation under `- AC2` printed
+  `NOTES OK 1` for row `91|S2|90|AC2|sha)[[:space:]]*rec_sha="`, and the answer count printed
+  `AC2 MAX 1 SUM 1`. Spelled as its own `- AC2 — TOOL-dWitnessedBar-91 S2` line, it printed a line
+  opening `NO NOTE 91 S2` through the composed check, and the answer count `AC2 MAX 2 SUM 2`, exit 1.
 
 ### The ledger fragments
 
-S8 rewrites two lines of 92 §4's note check. Spec-92 lines 279-280 become:
+S8 rewrites two lines of 92 §4's note check. Spec-92 lines 319-320 at `3ffc6c67c` become:
 
 ```bash
   set -- $b/*TOOL-dWitnessedBar-${l}-*acceptance-ledger*
   [ -e "$1" ] || { echo "NO LEDGER $l"; bad=1; continue; }
 ```
 
-On spec-92 line 281, the awk program's first rule `'/^\*\*Evidences:\*\*|^#/{o=""}` becomes
+On spec-92 line 321, the awk program's first rule `'/^\*\*Evidences:\*\*|^#/{o=""}` becomes
 `'FNR == 1 || /^\*\*Evidences:\*\*|^#/{o=""}`, so the opener resets at each ledger, and the file
-argument `' "$f")` becomes `' "$@")`. No other unit rewrites these fragments.
+argument `' "$f")` becomes `' "$@")`. No other unit rewrites these fragments: 93 S1 rewrites line
+323, 94 S1 the selector's `k=` and 96 S1 the `read` and the awk's variables and test.
 
 ### The answer count
 
@@ -224,13 +262,15 @@ cksum < "$SCRATCH/derive.sh" | cut -d' ' -f1
 
 ### The pass-commit read
 
-Run with `bash` from the repository root, `SCRATCH` set. It prints one
+Run with `bash` from the repository root, `SCRATCH` set. Its first line defines `resolve_python`
+for `read_attribution_tokens` (S5). It prints one
 `PASS COMMIT <unit> <sha> pass_commit paths <n>` line per dispatched pass that committed, a
 `BODY EDIT <unit> <sha> <path>` line per spec path edited outside its gen regions, and a
 `NO PASS COMMIT <unit>` line per unit with none. It exits 0 only when neither of the last two
 printed. The loop over dispatch keys is S5's; the `check_gen_region_only` line is S10's.
 
 ```bash
+. tools/lib/resolve-python.sh
 . tools/unattended/lib-unattended.sh
 r=memory/builds/dWitnessedBar/RUN.md; sd=memory/builds/dWitnessedBar/spec/
 read_pass_declarations "$r" > "$SCRATCH/rows"
@@ -287,13 +327,26 @@ None: no stored data changes.
 
 ### Rollout
 
-At order 50, after every other unit of the build. S5 and S10's read runs after the pass commits of
-units 89 and 90 exist, at the close. S4's clone, the scratch copies and every note run at the close,
-where every derivation run uses the bytes S3 extracts.
+At order 50, building alone after every other unit of the build but the deferred unit 28. The pass
+writes this unit's acceptance ledger with AC1 to AC10 owed to the close, as units 93 to 96 did
+(`4bb681e94`, `f6b3da04b`, `f6fb4fc49`, `73fc3773b`). The pass commits of units 89 and 90 exist
+(`05fdf49d3`, `b5a33a39c`), so S5 and S10's read runs at the close with the rest. S4's clone, the
+scratch copies and every note run at the close, where every derivation run uses the bytes S3
+extracts.
 
 ### Files touched (estimate)
 
-- `memory/builds/dWitnessedBar/build/`
+- `memory/builds/dWitnessedBar/build/`: this unit's acceptance ledger at the pass; at the close, the
+  notes S3 to S5 shape in `2026-11-19-build-TOOL-dWitnessedBar-88-1-acceptance-ledger.md`,
+  `2026-11-19-build-TOOL-dWitnessedBar-89-1-acceptance-ledger.md` and
+  `2026-11-19-build-TOOL-dWitnessedBar-90-1-acceptance-ledger.md`, and the answers to the clauses
+  S1 to S10 supersede in `2026-11-19-build-TOOL-dWitnessedBar-91-1-acceptance-ledger.md` and
+  `2026-11-19-build-TOOL-dWitnessedBar-92-1-acceptance-ledger.md` (§3)
+- `memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md`, its status header
+- `memory/builds/dWitnessedBar/RUN.md`
+- `memory/builds/dWitnessedBar/README.md`, `memory/backlog/TOOL.md` and `memory/LIVE.md`, rendered
+  by `gen_build_index.py --write`, with any `gen:spec-records` region the `--write` moves
+  (`TOOL-dWitnessedBar-92` S5)
 
 ### Alternatives rejected
 
@@ -321,11 +374,12 @@ where every derivation run uses the bytes S3 extracts.
   `NO PASS COMMIT`; an edited spec body prints `BODY EDIT` with its path; a missing blob fails closed
   through `check_gen_region_only`.
 - observability — each pass commit is printed with its sha and path count, and each derivation note
-  names its launcher, exit and script.
+  names the resolver's value, the exit and the script.
 - risks — the note check admits a note in a lower-numbered ledger that carries its answer, where S7
   says to write it in the highest; either placement sits under an answer of that criterion.
 - testing — AC1 to AC3 and AC6 to AC9 by fixture at the close; AC4 by scratch clone at the close; AC5
-  and AC10 after the pass commits of units 89 and 90, AC10's red in a scratch clone.
+  and AC10 at the close over the pass commits `05fdf49d3` and `b5a33a39c`, AC10's red in a scratch
+  clone.
 - migration — none.
 - user docs — none under `help/`; no user-facing surface changes.
 
@@ -335,9 +389,10 @@ The note check below is 92 §4's script composed as S8 states, fed rows on stdin
 
 - **AC1** — In a scratch root holding one
   `memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-88-*acceptance-ledger*` file whose `- AC6`
-  note, labelled `TOOL-dWitnessedBar-92 S4`, holds the backticked
-  `resolve_python: no usable python launcher. Each candidate was RUN` and then `exit 0`, the note
-  check fed 96 S3's row for `92|S4|88|AC6` prints `NO NOTE 92 S4 resolve_python:` and exits 1.
+  answer carries one continuation line, two spaces in, opening `TOOL-dWitnessedBar-92 S4` and
+  holding, backticked, the first line `resolve_python` writes on refusal, which opens
+  `resolve_python: no usable python launcher at the floor`, and then `exit 0`, the note check fed
+  96 S3's row for `92|S4|88|AC6` prints `NO NOTE 92 S4 resolve_python:` and exits 1.
   Red when: a note recording the resolver's refusal passes as a resolved launcher.
   fixture: a scratch root under the run's scratch directory.
 - **AC2** — In the same scratch root with the note holding `resolve_python: python3 exit 5` and no
@@ -349,7 +404,7 @@ The note check below is 92 §4's script composed as S8 states, fed rows on stdin
   `- AC6` note carries the checksum of unit 90's owner-derivation block, extracted from spec-90 by the
   same `sed` and `awk`, the row for `92|S4|88|AC6` prints a line opening `NO NOTE 92 S4` and exits 1.
   Red when: a close-time run of unit 90's script is recorded as a run of unit 92's.
-  figure: `<c>` is DERIVED at observation time; it read 788872005 on 2026-10-25.
+  figure: `<c>` is DERIVED at observation time; it read 788872005 on 2026-10-25 and on 2026-11-21.
   permission: the ledgers are written at the close.
 - **AC4** — In 92 AC2's third clone, built as S4 states, the arm's output with stderr joined holds a
   line holding `the canary visited 1 of`, and its last line holds `PASS (`. The note check fed
@@ -361,8 +416,9 @@ The note check below is 92 §4's script composed as S8 states, fed rows on stdin
   `TOOL-dWitnessedBar-89` and `TOOL-dWitnessedBar-90`, no `NO PASS COMMIT` line, and exits 0. The
   note check fed `92|S5|90|AC13|pass_commit` prints `NOTES OK 1`.
   Red when: either unit's pass commits are missed and the read passes on none.
-  figure: the number of lines is DERIVED from the dispatch rows at observation time. Before either
-  unit dispatches, the read prints both `NO PASS COMMIT` lines and exits 1, as probed on 2026-10-25.
+  figure: the number of lines is DERIVED from the dispatch rows at observation time; on 2026-11-21
+  at `10b5fd993` the read printed one line for each unit, `paths 0`, exit 0, and with its first line
+  removed both `NO PASS COMMIT` lines, exit 1 (§4 Evidence).
   permission: the ledger is written at the close.
 - **AC6** — At the close, the note check fed `91|S2|90|AC2|sha)[[:space:]]*rec_sha="` prints
   `NOTES OK 1`, and §4's answer count run as `90 2` exits 0. In a scratch copy of unit 90's ledger
@@ -387,8 +443,8 @@ The note check below is 92 §4's script composed as S8 states, fed rows on stdin
   Red when: a delta second pass reds a note placed under its answer in the first ledger, or a doubled
   answer in one ledger passes.
   fixture: scratch roots under the run's scratch directory.
-  figure: 29 is PINNED, the rows of 92 §4's note table at rev-1, which 96 S3 restates without adding
-  one.
+  figure: 29 is PINNED 2026-11-21, the rows of 92 §4's note table at rev-3 counted by `grep -c .`
+  over its text block, which 96 S3 restates without adding one.
   permission: the ledgers are written at the close.
 - **AC9** — In a scratch root whose 89 ledger reads
   `- AC4 — passed; see TOOL-dWitnessedBar-90 S1 and TOOL-dWitnessedBar-90 S14` with no continuation
@@ -407,7 +463,7 @@ The note check below is 92 §4's script composed as S8 states, fed rows on stdin
   and exits 1.
   Red when: a pass commit edits another unit's spec outside its gen regions and the read passes.
   fixture: a scratch clone under `%TEMP%/<short-name>`.
-  cost: a clone and two staged commits, at the close.
+  cost: a clone and one staged commit, which may carry the dispatch row, at the close.
 
 ## 7. Gates
 
@@ -415,7 +471,9 @@ The note check below is 92 §4's script composed as S8 states, fed rows on stdin
 
 `recall floor` and `recall floor arms` are owed for the ledgers under `memory/`. AC4 reads 92 AC2's
 clones at the close; this unit adds no arm and moves none, so it declares no `New arm:` line, and
-`TOOL-dWitnessedBar-88` S6's derivation still names unit 90 the floor's owner.
+`TOOL-dWitnessedBar-92` §4's owner derivation, which takes the place of 88 S6's (92 S12), still names
+unit 90 the floor's owner: run at `10b5fd993` it printed 28 and
+`spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md`, exit 0 (PINNED 2026-11-21).
 
 ## 8. Open questions
 
@@ -441,16 +499,24 @@ clones at the close; this unit adds no arm and moves none, so it declares no `Ne
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit of units 91 and 92: 9
   MEDIUM and 1 LOW findings, batched.
+- rev-2 · 2026-11-21 · §1 to §7 · §10 · re-grounded at `10b5fd993` per
+  2026-11-19-prompt-TOOL-dWitnessedBar-97-reground-brief. S1 and AC1 quote the value and the refusal
+  line `resolve_python` prints today; S5's read sources the resolver `read_attribution_tokens` needs;
+  S4 and §4 cite 90 AC1 and 89 S4 as built; spec-92 and code citations move to rev-3 and to symbols;
+  Evidence re-probed and re-pinned; unit 28 named waiting; Files touched listed exactly.
 
 ## 10. Reuse audit
 
 Each item extends the seam its finding names. S5 and S10 call `read_pass_declarations`,
 `pass_commit`, `next_anchor` and `check_gen_region_only` from `tools/unattended/lib-unattended.sh`, the
-same seams check 23 reads a pass's window through (`tools/unattended/check-unattended.sh:4158-4170`
-and `:4064`), and spell no second rule. S6, S8 and S9 extend 92 §4's note check rather than keeping
-91's hand-written awk beside it. S1 to S3 quote `resolve_python` (`tools/lib/resolve-python.sh`).
+same seams check 23 reads a pass's window through
+(`tools/unattended/check-unattended.sh@cb03a9f8c:4625-4632` and
+`tools/unattended/check-unattended.sh#check_generated_render`), and spell no second rule. S6, S8 and
+S9 extend 92 §4's note check rather than keeping 91's hand-written awk beside it. S1 to S3 quote
+`resolve_python` (`tools/lib/resolve-python.sh#resolve_python`), which S5's read also sources.
 `python tools/codebase-map/reuse_lookup.py "find every pass commit of a dispatched unit in a build"`
-ranked `build`, `units`, `build_commit` and `build_fixture`; `build_commit` answers one commit per
-unit, so the per-dispatch seams named above are the ones extended.
+ranked `build`, `units`, `build_records` and `write_commit` first on 2026-11-21, then
+`parse_unit_rows` and `build_commit`; `build_commit` answers one commit per unit, so the
+per-dispatch seams named above are the ones extended.
 
 Recall terms used: `python tools/memory-recall/query.py "how are a unit's several acceptance ledgers read when it has a second pass" --terms "acceptance ledger second pass pass number glob note check pass_commit dispatch row script identity cksum"`

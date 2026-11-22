@@ -1,0 +1,17 @@
+# ledger · unbound-records · key record path · direction shrink-only · drain key
+memory/builds/aBoundedVerdict/build/2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/aBranchedMandate/build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/aBranchedMandate/build/2026-08-18-build-TOOL-aBranchedMandate-5-handoff-open-rows.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/aFerriedDossier/build/2026-08-16-build-aFerriedDossier-1-incms-adopter-handoff.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/aGradedDialect/prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-owner-mandate.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/aMouldedFolio/build/2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/aSiftedPlaybook/build/2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/aTetheredRecord/build/2026-08-16-build-aTetheredRecord-1-design-pass.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/aWeighedCanon/build/2026-09-04-build-TOOL-aWeighedCanon-1-spec-format-measurements.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/aWeighedCanon/build/2026-09-04-build-TOOL-aWeighedCanon-2-what-the-spec-format-is-missing.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/aWrittenMethod/build/2026-08-11-build-aWrittenMethod-1-enforcement-pass.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/bThriftyBellows/build/2026-07-16-build-bThriftyBellows-1.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/cBriefedPilot/build/2026-08-14-build-cBriefedPilot-1-design-pass.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-owner-mandate.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/dGaugedVintage/build/2026-09-01-build-dGaugedVintage-1-incms-dossier-triage.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded
+memory/builds/dTieredTribunal/build/2026-08-25-build-dTieredTribunal-1-review-harness-research.md	1	f4309607205a56fb072cfb57f05d6fe885c63365	seeded

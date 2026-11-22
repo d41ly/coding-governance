@@ -1,16 +1,22 @@
 """positional — file:line citations held in the positional population, and the two forms that cannot drift
 (PLAY-dOrderedCharter-26).
 
-    python positional.py seed | shrink | check
+    python positional.py seed | shrink | check | list
     python positional.py pin <file> [--at <rev>]
-    python positional.py producers [--seed]
+    python positional.py producers [--seed | --list]
     python positional.py --selftest
 
 A file:line citation is `<path>.<ext>:<n>[-<m>]`, `<ext>` in CODE_EXTENSIONS. Every one the tree held at
-the seed is a `<citing path>\\t<path>:<n>[-<m>]` row of unit 19's keyed list `positional-refs.txt`
-under `<MEMORY_ROOT>/project/`, outside the kit (PLAY-dOrderedCharter-72), keyed by path and reference
-and never by the citing line; the list's `§n`, `Mn` and `check n` rows are those
-`gov_tag.py --list-positional` prints. New text cites one of the stable forms: a symbol, `path#symbol` as the whole text of a one-backtick span in tracked Markdown, its path's suffix
+the seed is a row of unit 19's keyed list `positional-refs.txt` under `<MEMORY_ROOT>/project/`, outside
+the kit (PLAY-dOrderedCharter-72), keyed by the citing path and the reference `<path>:<n>[-<m>]` and
+never by the citing line; the list's `§n`, `Mn` and `check n` rows are those
+`gov_tag.py --list-positional` prints. Both lists are ledger populations (TOOL-dWitnessedBar-18): each row
+its key fields, the count, the sha it was seeded at and its disposition, read and written through
+memory-tree's copy of the ledger factory with the arity and `verbatim` positions of the `[[ledger]]`
+registration naming its home. A list no registration names reads as no rows while it holds none, and is
+refused naming its population once it holds one; a writer of such a list refuses and writes nothing.
+`list` prints the rows the arm holds the list to, each key's fields then the count, the population's seed;
+`producers --list` prints the producer list's. New text cites one of the stable forms: a symbol, `path#symbol` as the whole text of a one-backtick span in tracked Markdown, its path's suffix
 in SYMBOL_EXTENSIONS, or a blob-pinned line, `<path>@<oid>:<n>[-<m>]`.
 
 `check` is the `positional` arm of `gov_tag.py check`, run alone: the tree against the list both ways,
@@ -27,15 +33,16 @@ once and refuses a list already holding a file:line row; `shrink` drops the stal
 one; `pin` rewrites a file's unlisted file:line citations to the blob-pinned line at `--at` (HEAD).
 `producers` prints every hit of PRODUCER_RE over PRODUCER_PATHSPECS, the directive sources, a render's
 hits carried by its `.template.` source (PLAY-dOrderedCharter-48); `--seed` writes
-`positional-producers.txt`, beside the first list, once, a `<path>\\t<line text>` row per hit naming no
-stable form. The arm's `producers` limb reds a hit neither kept nor naming a stable form, and a kept row
-no hit carries.
+`positional-producers.txt`, beside the first list, once, a row keyed by path and line text per hit naming
+no stable form. The arm's `producers` limb reds a hit neither kept nor naming a stable form, and a kept row
+no hit carries; a hit is kept through the widen route, which records its reason.
 Exit 0 green, 1 red, 2 a refusal (a refused policy read, an unreadable list, a git failure).
 """
 from __future__ import annotations
 
 import argparse
 import ast
+import json
 import os
 import pathlib
 import re
@@ -97,19 +104,119 @@ def derive_list_path(root, memory_root, name=LIST_NAME) -> pathlib.Path:
     return pathlib.Path(root) / memory_root / "project" / name
 
 
-def read_list(path) -> list[str] | None:
-    """The list's `<path>\\t<ref>` rows, or None where the file is absent."""
+def load_ledger():
+    """memory-tree's copy of the ledger factory, the kit this kit's descriptor requires, reached as the tag
+    index reaches that kit (TOOL-dWitnessedBar-18 S5)."""
+    ti.load_memory_tree()
+    import legacy_ledger
+    return legacy_ledger
+
+
+def read_list_registration(root, path):
+    """-> (the factory, the `[[ledger]]` registration whose home is `path` at `root`, or None where none
+    names it, the list's population as its file stem names it). A refused registration is a refusal."""
+    LL = load_ledger()
+    rel = pathlib.Path(os.path.relpath(os.path.abspath(path), os.path.abspath(root))).as_posix()
     try:
-        text = pathlib.Path(path).read_text(encoding="utf-8")
+        regs = LL.read_registrations(root)
+    except ValueError as exc:
+        raise ti.TagError(f"a [[ledger]] registration is refused: {exc}") from None
+    return LL, next((r for r in regs if r.home == rel), None), pathlib.PurePosixPath(rel).stem
+
+
+def read_list(root, path) -> list[str] | None:
+    """The list's rows at `root`, each key's fields TAB-joined, through the factory's `read_ledger` with its
+    registration's arity and `verbatim` positions; None where the file is absent. With no registration
+    naming it, a list holding no row reads as none and one holding a row is refused, naming its population."""
+    path = pathlib.Path(path)
+    try:
+        text = path.read_bytes().decode("utf-8")
     except FileNotFoundError:
         return None
-    except OSError as exc:
-        raise ti.TagError(f"the positional list {pathlib.Path(path).as_posix()} is unreadable: {exc}") from None
-    return [ln.rstrip("\r") for ln in text.split("\n") if ln.strip()]
+    except (OSError, UnicodeDecodeError) as exc:
+        raise ti.TagError(f"the list {path.as_posix()} is unreadable: {exc}") from None
+    LL, reg, population = read_list_registration(root, path)
+    if reg is None:
+        if any(ln.strip() and not ln.lstrip().startswith("#") for ln in text.split("\n")):
+            raise ti.TagError(f"{path.name} holds rows and no [[ledger]] registration names it, so the "
+                              f"population {population} has no arity to read them by")
+        return []
+    rows, bad = LL.read_ledger(root, reg)
+    if bad:
+        raise ti.TagError(f"{reg.home} · population {reg.population} · {LL.render_malformed(bad[0])}")
+    return ["\t".join(key) for key in rows]
 
 
-def write_list(path, rows) -> None:
-    pathlib.Path(path).write_bytes("".join(f"{r}\n" for r in sorted(set(rows))).encode("utf-8"))
+def write_list(root, path, rows) -> None:
+    """Write `rows`, each key's fields TAB-joined, through the factory's `write_rows` to the home of the
+    registration naming `path`: a row the list holds keeps its count, sha and disposition, a new one is
+    written with the count 1, HEAD's sha and `seeded`. With no registration naming it, refused, writing nothing."""
+    LL, reg, population = read_list_registration(root, path)
+    if reg is None:
+        raise ti.TagError(f"no [[ledger]] registration names {pathlib.Path(path).name}, so the population "
+                          f"{population} has no header to write; nothing written")
+    held = {}
+    if pathlib.Path(path).is_file():
+        held, bad = LL.read_ledger(root, reg)
+        if bad:
+            raise ti.TagError(f"{reg.home} · population {reg.population} · {LL.render_malformed(bad[0])}")
+    keys = sorted({tuple(r.split("\t", len(reg.fields) - 1)) for r in rows})
+    sha = None
+    if any(k not in held for k in keys):
+        sha, why = LL.read_head_sha(root)
+        if not sha:
+            raise ti.TagError(f"{reg.home}: {why}, so no sha can be stamped; nothing written")
+    LL.write_rows(root, reg, {k: held[k][:2] if k in held else (1, (sha, "seeded")) for k in keys})
+
+
+def load_converter():
+    """memory-tree's `convert_registry`, whose `derive_registration` reads a population's `[[ledger]]` table
+    from gov's own checkout and whose `derive_converted_text` writes a home's ledger bytes."""
+    load_ledger()
+    import convert_registry
+    return convert_registry
+
+
+def read_gov_registration(population):
+    """The `[[ledger]]` registration of `population` in gov's own checkout, the work tree holding the
+    converter, read as `convert_registry.derive_registration` reads it; a refusal names the population."""
+    cr = load_converter()
+    try:
+        regs = [r for r in cr.LL.read_registrations(cr.resolve_checkout()) if r.population == population]
+    except (cr.Refusal, ValueError) as exc:
+        raise ti.TagError(f"gov's [[ledger]] table for {population} does not read: {exc}") from None
+    if len(regs) != 1:
+        raise ti.TagError(f"{len(regs)} of gov's [[ledger]] tables name {population}, not one")
+    return regs[0]
+
+
+def derive_fixture_ledger(populations) -> str:
+    """The `[[ledger]]` tables of `populations` as gov's descriptors hold them, rendered as TOML: what a
+    fixture writes into its scratch tree, read from gov and never retyped, so its lists read as gov's do
+    (TOOL-dWitnessedBar-18 S5)."""
+    out = []
+    for population in populations:
+        reg = read_gov_registration(population)
+        table = {"population": reg.population, "leg": reg.leg, "seed": list(reg.seed), "key": reg.key,
+                 "fields": list(reg.fields), "verbatim": list(reg.verbatim), "drain": reg.drain,
+                 "direction": reg.direction, "home": reg.home}
+        out.append("[[ledger]]\n" + "".join(f"{k} = {json.dumps(v)}\n" for k, v in table.items()) + "\n")
+    return "".join(out)
+
+
+def derive_fixture_list(population, rows) -> str:
+    """A fixture's list in the ledger grammar: the header gov's registration of `population` renders, then
+    each of `rows`, its key fields TAB-joined, with the count 1, the null SHA and `seeded`."""
+    LL, reg = load_ledger(), read_gov_registration(population)
+    return "".join(f"{line}\n" for line in [LL.render_header(reg), *(f"{r}\t1\t{LL.NULL_SHA}\tseeded" for r in rows)])
+
+
+def print_rows(rows) -> None:
+    """A seed's output: each row's key fields then the count `1`, TAB-separated (TOOL-dWitnessedBar-15)."""
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    for r in sorted(set(rows)):
+        print(f"{r}\t1")
 
 
 def check_file_line_row(row: str) -> bool:
@@ -149,22 +256,26 @@ def read_producers(root, kit_rel, memory_root) -> list[tuple[str, int, str]]:
     return [(p, n, t.strip()) for p, n, t in hits if not check_render(p)]
 
 
-def read_producer_rows(path) -> list[str] | None:
-    """The kept producer list's `<path>\\t<line text>` rows, its `# ` reason lines left out; None if absent."""
-    rows = read_list(path)
-    return None if rows is None else [r for r in rows if not r.startswith("#")]
+def read_producer_rows(root, path) -> list[str] | None:
+    """The kept producer list's rows, each `<path>\\t<line text>`, through `read_list`; None if absent."""
+    return read_list(root, path)
+
+
+def derive_producer_rows(hits) -> set[str]:
+    """`<path>\\t<line text>` for each hit naming no stable form: the rows the kept list holds at its seed."""
+    return {f"{p}\t{t}" for p, _n, t in hits if not STABLE_FORM_RE.search(t)}
 
 
 def check_producers(root, kit_rel, mode, memory_root) -> tuple[list, list, dict]:
     """The `producers` limb: a hit neither kept nor naming a stable form is red, as is a kept row no hit
     carries; under `refuse` a kept hit is red too. -> (findings, lines, counts)."""
     say, rel = "tags: positional · producer", derive_list_path("", memory_root, PRODUCERS_NAME).as_posix()
-    rows = read_producer_rows(derive_list_path(root, memory_root, PRODUCERS_NAME))
+    rows = read_producer_rows(root, derive_list_path(root, memory_root, PRODUCERS_NAME))
     kept = set(rows or ())
     hits = read_producers(root, kit_rel, memory_root)
     carried = {f"{p}\t{t}" for p, _n, t in hits}
-    remedy = (f"re-point it to `path#symbol` or a blob-pinned line `<path>@<oid>:<n>`, or keep it with a "
-              f"`<path>\\t<line>` row under a `# ` reason in {rel}")
+    remedy = (f"re-point it to `path#symbol` or a blob-pinned line `<path>@<oid>:<n>`, or keep it in {rel} "
+              f"through `ratchet.py widen positional-producers`, whose widen record holds its reason")
     findings = [f"{say} · {p}:{n} · {t} · {remedy}" for p, n, t in hits
                 if f"{p}\t{t}" not in kept and not STABLE_FORM_RE.search(t)]
     unlisted = len(findings)
@@ -179,25 +290,27 @@ def check_producers(root, kit_rel, mode, memory_root) -> tuple[list, list, dict]
                              "producers_stale": len(kept - carried)}
 
 
-def run_producers(root, kit_rel, memory_root, seed=False) -> int:
-    """`positional.py producers`: every hit as `<path>:<n>\\t<line>`. `--seed` writes the kept list once, a
-    row per hit naming no stable form, and refuses a list already holding a row."""
+def run_producers(root, kit_rel, memory_root, seed=False, listed=False) -> int:
+    """`positional.py producers`: every hit as `<path>:<n>\\t<line>`. `--list` prints the population's seed,
+    each hit naming no stable form as its key fields and the count. `--seed` writes the kept list once,
+    a row per such hit, and refuses a list already holding a row."""
     hits = read_producers(root, kit_rel, memory_root)
+    if listed:
+        print_rows(derive_producer_rows(hits))
+        return 0
     if not seed:
         for p, n, t in hits:
             print(f"{p}:{n}\t{t}")
         return 0
     path = derive_list_path(root, memory_root, PRODUCERS_NAME)
-    held = read_producer_rows(path) or []
+    held = read_producer_rows(root, path) or []
     if held:
         rel = derive_list_path("", memory_root, PRODUCERS_NAME).as_posix()
         print(f"positional: producers seed refused · {rel} already holds {len(held)} rows; "
               "the seed runs once, and the list only ever shortens after it")
         return 1
-    rows = sorted({f"{p}\t{t}" for p, _n, t in hits if not STABLE_FORM_RE.search(t)})
-    head = ("# The producer hits kept: one `<path>\\t<the line's text, trimmed>` row each, keyed by text and never\n"
-            "# by line number, a `# ` reason line above each group (PLAY-dOrderedCharter-48).\n")
-    path.write_bytes((head + "".join(f"{r}\n" for r in rows)).encode("utf-8"))
+    rows = derive_producer_rows(hits)
+    write_list(root, path, rows)
     print(f"positional: producers seeded {len(rows)} rows" if rows else
           "positional: producers seeded a header and no row: the query found no hit naming no stable form")
     return 0
@@ -399,19 +512,28 @@ def read_grandfathered(root, kit_rel, frozen, rows) -> dict:
     return old
 
 
+def read_held_rows(root, kit_rel, memory_root, listed) -> tuple[set, dict]:
+    """(the tree's rows of both reference kinds, the unlisted file:line rows `read_grandfathered`
+    grandfathers): the measurement the arm holds the list to, which `list` prints less the second."""
+    tree = read_file_line_rows(root, memory_root) | read_section_rows(root)
+    old = read_grandfathered(root, kit_rel, f"{memory_root}/builds/",
+                             [r for r in sorted(tree - set(listed)) if check_file_line_row(r)])
+    return tree, old
+
+
 def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict]:
     """The `positional` arm: the tree against the list both ways over both reference kinds, then every pin
     and every symbol citation. -> (reds, the lines it prints, its counts)."""
     say = "tags: positional · "
     rel = derive_list_path("", memory_root).as_posix()
-    rows = read_list(derive_list_path(root, memory_root))
+    rows = read_list(root, derive_list_path(root, memory_root))
     if rows is None:
         folder = pathlib.PurePosixPath(rel).parent.as_posix()
         if not derive_list_path(root, memory_root).parent.is_dir():  # PLAY-dOrderedCharter-78 S5: no memory tree
             return [], [f"{say}unarmed: {folder} is absent, so no memory tree is adopted here"], {"absent": True}
         return [f"{say}the list {rel} is absent, so no positional population is read"], [], {"absent": True}
     listed = set(rows)
-    tree = read_file_line_rows(root, memory_root) | read_section_rows(root)
+    tree, old = read_held_rows(root, kit_rel, memory_root, listed)
     aliases = ti.read_aliases(pathlib.Path(root) / kit_rel / "aliases.toml")
     frozen = f"{memory_root}/builds/"
 
@@ -423,7 +545,6 @@ def check_positional(root, kit_rel, mode, memory_root) -> tuple[list, list, dict
         return f"cite `{tag}`, the alias row's tag" if tag else "cite the tag an aliases.toml row maps it to"
 
     unlisted, grandfathered = sorted(tree - listed), []
-    old = read_grandfathered(root, kit_rel, frozen, [r for r in unlisted if check_file_line_row(r)])
     for r, hits in old.items():
         path, _, ref = r.partition("\t")
         grandfathered += [f"positional — grandfathered: {path}:{n} {ref} (written in {sha[:8]}, before the check)"
@@ -474,7 +595,7 @@ def run_seed(root, memory_root) -> int:
     """S2's one-time seed: every file:line pair in the tree, and every row `--list-positional` prints that
     the list lacks. Refused once the list holds a file:line row."""
     path = derive_list_path(root, memory_root)
-    rows = read_list(path) or []
+    rows = read_list(root, path) or []
     held = [r for r in rows if check_file_line_row(r)]
     if held:
         print(f"positional: seed refused · {path.name} already holds {len(held)} file:line rows, "
@@ -483,21 +604,30 @@ def run_seed(root, memory_root) -> int:
         return 1
     fl = read_file_line_rows(root, memory_root)
     joined = read_section_rows(root) - set(rows)
-    write_list(path, set(rows) | fl | joined)
+    write_list(root, path, set(rows) | fl | joined)
     print(f"positional: seeded {len(fl)} file:line rows, and joined {len(joined)} section rows the list lacked")
+    return 0
+
+
+def run_list(root, kit_rel, memory_root) -> int:
+    """`positional.py list`, the population's seed: each row the arm holds the list to, the tree's rows less
+    the unlisted ones `read_grandfathered` grandfathers, as its key fields and the count; on a green tree,
+    the list's own keys."""
+    tree, old = read_held_rows(root, kit_rel, memory_root, read_list(root, derive_list_path(root, memory_root)) or [])
+    print_rows(tree - set(old))
     return 0
 
 
 def run_shrink(root, memory_root) -> int:
     """Drop every row whose reference is gone from the tree; the list only ever shortens."""
     path = derive_list_path(root, memory_root)
-    rows = read_list(path)
+    rows = read_list(root, path)
     if rows is None:
         print(f"positional: shrink refused · {path.name} is absent", file=sys.stderr)
         return 2
     tree = read_file_line_rows(root, memory_root) | read_section_rows(root)
     keep = [r for r in rows if r in tree]
-    write_list(path, keep)
+    write_list(root, path, keep)
     print(f"positional: shrink dropped {len(rows) - len(keep)} stale rows, {len(set(keep))} remain")
     return 0
 
@@ -512,7 +642,8 @@ def run_pin(root, memory_root, file, rev="HEAD") -> int:
         print(f"positional: pin refused · {pathlib.Path(file).as_posix()} is no file inside {root.as_posix()}")
         return 1
     rel = target.relative_to(root).as_posix()
-    listed = {r.partition("\t")[2] for r in read_list(derive_list_path(root, memory_root)) or [] if r.startswith(rel + "\t")}
+    listed = {r.partition("\t")[2] for r in read_list(root, derive_list_path(root, memory_root)) or []
+              if r.startswith(rel + "\t")}
     oids, refused, done = {}, [], []
 
     def read_oid(path):
@@ -628,16 +759,19 @@ def run_selftest() -> int:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="positional.py", description="the positional population and its stable forms")
-    ap.add_argument("verb", nargs="?", choices=("seed", "shrink", "pin", "check", "producers"))
+    ap.add_argument("verb", nargs="?", choices=("seed", "shrink", "pin", "check", "producers", "list"))
     ap.add_argument("file", nargs="?")
     ap.add_argument("--at", default="HEAD")
     ap.add_argument("--seed", action="store_true", help="producers: write the kept list once")
+    ap.add_argument("--list", action="store_true", dest="listed", help="producers: print the kept list's seed")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args(argv)
     if a.selftest:
         return run_selftest()
     if not a.verb:
         ap.error("a verb, or --selftest")
+    if (a.seed or a.listed) and a.verb != "producers" or a.seed and a.listed:
+        ap.error("--seed and --list are producers' flags, one at a time")
     from gov_tag import derive_kit_rel, resolve_repo_root
     from policy_value import PolicyRefused
     try:
@@ -648,9 +782,11 @@ def main(argv=None) -> int:
                 ap.error("pin takes <file>")
             return run_pin(root, memory_root, a.file, a.at)
         if a.verb == "producers":
-            return run_producers(root, kit_rel, memory_root, a.seed)
+            return run_producers(root, kit_rel, memory_root, a.seed, a.listed)
         if a.verb == "check":
             return run_check(root, kit_rel)
+        if a.verb == "list":
+            return run_list(root, kit_rel, memory_root)
         return {"seed": run_seed, "shrink": run_shrink}[a.verb](root, memory_root)
     except PolicyRefused as exc:
         print(f"tags: refused · {exc.key} · {exc.line}", file=sys.stderr)

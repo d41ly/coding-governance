@@ -109,6 +109,120 @@ class _Skip(Exception):
     """This arm could not run here, and says why. Reported separately — never counted as passed."""
 
 
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
+
+# The one scan this run makes, filled by the first `resolve_selftest_bash` call: the block keeps no
+# memo and runs every candidate, so each bash site asking again would repeat the whole PATH walk.
+_SELFTEST_BASH: list = []
+
+
+def resolve_selftest_bash() -> str:
+    """The bash every arm of this suite runs, by absolute path, never the bare name and never a PATH
+    lookup by name (TOOL-dWitnessedBar-49): `shutil.which` walks PATH with no System32 or WindowsApps
+    filter, so on a Windows node it can hand an arm WSL's launcher. The `resolve_bash_py` block above
+    runs each candidate against this file instead, once per run. Nothing accepted raises `_Skip`
+    carrying the block's refusal, which names every candidate tried, where each site skipped before.
+    """
+    if not _SELFTEST_BASH:
+        _SELFTEST_BASH.append(scan_bash(os.path.abspath(__file__).replace("\\", "/")))
+    found, _tried, refusal = _SELFTEST_BASH[0]
+    if not found:
+        raise _Skip(refusal)
+    return found
+
+
 def resolve_memory_root() -> str:
     """The corpus root from the RESOLVED conf.
 
@@ -463,9 +577,7 @@ def test_parser_vs_bash():
     another Python parser would be an assertion whose two operands share a generator; bash sourcing
     the same file is the only independent oracle.
     """
-    bash = shutil.which("bash")
-    if not bash:
-        raise _Skip("no bash on PATH — the only independent oracle for the conf grammar")
+    bash = resolve_selftest_bash()
     root = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-conf-")).resolve()
     try:
         (root / ".memory-tree.conf").write_text(
@@ -538,9 +650,7 @@ def test_no_conf_query():
 
 @check("no conf: adopt-memory-recall.sh refuses and creates nothing")
 def test_no_conf_adopt():
-    bash = shutil.which("bash")
-    if not bash:
-        raise _Skip("no bash on PATH")
+    bash = resolve_selftest_bash()
     root, kitdir = make_repo()
     try:
         shutil.copyfile(KIT / "adopt-memory-recall.sh", kitdir / "adopt-memory-recall.sh")
@@ -1351,9 +1461,7 @@ def copy_extra(kitdir: pathlib.Path, *names: str) -> None:
 
 
 def adopt(root: pathlib.Path, kitdir: pathlib.Path, *args: str):
-    bash = shutil.which("bash")
-    if not bash:
-        raise _Skip("no bash on PATH")
+    bash = resolve_selftest_bash()
     return subprocess.run(
         [bash, str(kitdir / "adopt-memory-recall.sh"), *args],
         cwd=str(root), capture_output=True, text=True,
@@ -1437,10 +1545,10 @@ def test_printed_invocations_resolve():
 @check("adopt --check runs with `python` off PATH and only `python3` available")
 def test_python3_only():
     """A node with both binaries can never see this defect, so PATH is cut down to prove it."""
-    bash = shutil.which("bash")
+    bash = resolve_selftest_bash()
     git = shutil.which("git")
-    if not (bash and git):
-        raise _Skip("needs bash and git on PATH")
+    if not git:
+        raise _Skip("needs git on PATH")
     keep = []
     for exe in (bash, git):
         d = pathlib.Path(exe).parent
@@ -1655,9 +1763,7 @@ def test_skill_description_invariants():
 
 @check("recall-opened.test.sh: the hook records a rank on ANY corpus root")
 def test_hook_test():
-    bash = shutil.which("bash")
-    if not bash:
-        raise _Skip("no bash on PATH")
+    bash = resolve_selftest_bash()
     proc = subprocess.run(
         [bash, str(KIT / "recall-opened.test.sh")], capture_output=True, text=True,
     )

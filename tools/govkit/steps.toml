@@ -38,3 +38,14 @@ reverted = "down-exit"
 surfaces = []
 needs-target = false
 resume = "atomic"
+
+# TOOL-dWitnessedBar-3 S8: the gate key INHERITED_RED retired onto the policy key verdict.blocks, its
+# `park` written as `every-red` and its `land` as `own-mixed-contended` into the target's
+# `.governance/policy.toml`, the gate file's line taken out. Its down restores both files.
+[[upgrade]]
+id = "govkit/inherited-red-to-verdict-blocks"
+up = ["python", "{gov}/govkit/steps/inherited_red.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/inherited_red.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/inherited_red.py", "witness", "{target}"]
+surfaces = ["conf-key:.githooks/gate-env.sh#INHERITED_RED"]
+needs-target = false

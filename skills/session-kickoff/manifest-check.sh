@@ -52,7 +52,7 @@
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.38"   # gov:kit kickoff-manifest@1.38 — the registry id
+KIT_MANIFEST_VERSION="1.39"   # gov:kit kickoff-manifest@1.39 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -1320,6 +1320,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
@@ -2444,6 +2462,8 @@ set +f; IFS=$_mb_ifs
 check_budget_breach() {
   if [ "$(read_budget_field "$1" 3)" = warn ]; then
     printf 'BUDGET WARN — %s · %s · %s %s over %s · %s\n' "$1" "$5" "$2" "$3" "$4" "$(read_budget_rule "$1")"
+    # The runner's marker on the next line (TOOL-dWitnessedBar-29 S2), so a passing bar shows it.
+    printf 'gate-warn\tsize\t%s\t%s · %s %s over %s\n' "${5//[$'\t\r\n']/ }" "$1" "$2" "$3" "$4"
     return 0
   fi
   [ -z "$MB_NOTE" ] || { echo "$MB_NOTE"; MB_NOTE=""; }

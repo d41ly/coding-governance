@@ -1,0 +1,13 @@
+# TOOL-dWitnessedBar-107 — acceptance ledger
+
+**Serves:** journal TOOL-dWitnessedBar-107
+
+No merge bar, no self-test suite and no gate leg ran in this pass. Its pass-time probes ran on node d, 2026-11-21, from base `55fa356b3`: the unit's own CLI, `python tools/run-gates/verdict_backends.py --fixture --plant peer-stale-slot`, over the scratch repository the plant makes, ssh-keygen running; grep and the shell-role measure over the edited files. Every line marked OWED is the main loop's at the close, after the last unit is terminal: the gov canary, the New arm's RED-first observation against the base `run_verify_peer`, and the legs §7 names.
+
+**Evidences:** TOOL-dWitnessedBar-107
+- AC1 — `at run r0, a record it did not write` — at the pass, scenario 1 printed `exit 1 · owed 1` and `held`, its line `not published: the bar exited 1 and left gate-verdict/<t8> at run r0, a record it did not write`, and scenario 4 held with `verdict refs: 0`. OWED: the canary's `peer-stale-slot:0` case, and its RED-first observation against the base `run_verify_peer`, at the close.
+- AC2 — `reused 1 leg(s) from the cache` — at the pass, scenario 2 held, exit 1, its `not published` line naming run `s-reused`, `reads NONE` and `the record says its run reused 1 leg(s) from the cache`. OWED: the canary case and its RED-first observation, at the close.
+- AC3 — `reads GREEN` — at the pass, scenario 3 held, exit 1, its `not published` line opening `the bar exited 1` and naming run `s-disagree`, `reads GREEN`. OWED: the canary case and its RED-first observation, at the close.
+- AC4 — `8 of 8 scenario(s) held · all held` — at the pass, scenarios 5 to 8 held: the RED and then the GREEN published as node b, the RED tag carrying `run_id s-red` and the GREEN `run_id s-clean` with `GATE_RUN_ID=s-red` in verify-peer's environment; the last line printed `8 of 8 scenario(s) held · all held` and the command exited 0. OWED: the canary case and its RED-first observation, at the close.
+- AC5 — `peer-stale-slot:0` — at the pass, `grep -n` printed one line, 788, which also holds `remote-green:0`; `grep -n -A1 '^FLOOR_ASSERTIONS=81$'` printed the constant and `# RAISED 80 -> 81 by TOOL-dWitnessedBar-107`; the line above still starts `# Raised to 80 by TOOL-dWitnessedBar-90`; and `sh_hygiene.py --shell-role --measure` printed `853`. OWED: the `portability (shell lines only shrink)` leg and the canary's floor, at the close.
+- AC6 — `GATE_RUN_ID` — at the pass, `grep -c 'not published' help/verdict-backends.md` printed `1`, and `grep -n 'GATE_RUN_ID'` named the help paragraph, the module docstring's sentence and S1 step 3's `env.pop`.

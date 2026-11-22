@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-19 — the leg's `purpose` field in `gate-legs.json`, every leg reviewed
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 7 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-4 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 7 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0357@4d3bcfbb whole
 
@@ -8,15 +8,24 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-b.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-28 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-28 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
+| [2026-11-19-build-TOOL-dWitnessedBar-19-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-19-1-acceptance-ledger.md) | journal | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-19-purpose-review.md](../build/2026-11-19-build-TOOL-dWitnessedBar-19-purpose-review.md) | research | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-19-red-fix-29.md](../build/2026-11-19-build-TOOL-dWitnessedBar-19-red-fix-29.md) | red-fix | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-19-red-fix-30.md](../build/2026-11-19-build-TOOL-dWitnessedBar-19-red-fix-30.md) | red-fix | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-19-1-spec-reviewer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-19-1-spec-reviewer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-19-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-19-build-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-22-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-22-reground-brief.md) | journal | TOOL-dWitnessedBar-22 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-54 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
+| [2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md](../reviews/2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md) | diff-review | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
 
 <!-- /gen:spec-records -->
 
@@ -38,15 +47,15 @@ reach to the owner instead of guessing (PM-5, v2:390).
 - **S2** — The value. A `purpose` is a JSON string of 1 to 60 characters, one line, no leading or
   trailing space, and no two legs of one manifest share one. Observed by AC2 and AC3.
 - **S3** — Every row carries it. Every row of `tools/gate-legs.json` carries `purpose`, except a leg
-  on the pending population of S6, and every descriptor `[[gate_leg]]` row in the 26 `kit.toml` files
-  §4 lists carries the same string as its manifest row. An `[[exempt_leg]]` leg carries it in the
-  manifest only, as its `subject` is. Observed by AC4 and AC6.
+  on the pending population of S6, and every descriptor `[[gate_leg]]` row in the 27 `kit.toml`
+  files §4 lists (PINNED 2026-11-19 at `a4cffc2cb`) carries the same string as its manifest row. An
+  `[[exempt_leg]]` leg carries it in the manifest only, as its `subject` is. Observed by AC4 and AC6.
 - **S4** — The derivation. Each value is derived by §4's rule from one source the leg carries, and the
   review record `memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-19-purpose-review.md`
   holds one row per leg: its name, its purpose, the rule step that produced it and the `path:line` of
   the source. Observed by AC5.
-- **S5** — The 7h arms. govkit `selfcheck` 7h (`tools/govkit/govkit.py:2785-2948`) gains three arms
-  beside its `subject` and `doc_reads` arms: presence (a manifest row with no `purpose` that is not
+- **S5** — The 7h arms. govkit `selfcheck` 7h (`tools/govkit/govkit.py#selfcheck`, its `7h`
+  block) gains three arms beside its `subject` and `doc_reads` arms: presence (a manifest row with no `purpose` that is not
   pending, and a pending leg that now carries one or has left the manifest), shape (S2, the
   uniqueness half included) and agreement (a descriptor's `purpose` equal to its manifest row's,
   presence included). 7h's note line gains `purposes: <n> declared · <m> pending`, both derived.
@@ -55,18 +64,21 @@ reach to the owner instead of guessing (PM-5, v2:390).
   `shrink-only` population on the ledger factory `tools/lib/legacy_ledger.py` (I4): a `[[ledger]]`
   table in `tools/run-gates/kit.toml` with `population` `leg-purpose-pending`, `leg` `govkit
   selfcheck`, key kind `key` with the one field `name`, drain `key`, home
-  `tools/run-gates/purpose-pending.txt`, and a `seed` argv printing every manifest leg with no
-  `purpose`. Each row's disposition is `deferred:<ask>`, naming the one owner ask of S7. The file is
-  withheld from adopters by a `project-owned` `[[files]]` row, as `ceiling-evidence.txt` is
-  (`tools/run-gates/kit.toml:67-69`), and `.gitattributes` gains its `merge=rows` line. With no
+  `tools/run-gates/purpose-pending.txt`, and a `seed` argv printing one row per manifest leg
+  with no `purpose`, its name then the count 1, TAB-separated, the seed contract
+  of TOOL-dWitnessedBar-15 §4 "The rule". Each row's disposition is `deferred:<ask>`, naming the one
+  owner ask of S7. The file is withheld from adopters by a `project-owned` `[[files]]` row, as
+  `ceiling-evidence.txt` is (`tools/run-gates/kit.toml@4d1909b97cfa:72-74`), and `.gitattributes`
+  gains its `<home> merge=rows` line, TOOL-dWitnessedBar-13 §4 "The merge class". With no
   underived leg, none of these exists and the presence arm admits no exception. Observed by AC7.
 - **S7** — The owner question. When S6 is written, one ask row in
   `memory/builds/dWitnessedBar/BACKLOG.md` puts every underived leg to the owner, pointing at the
   review record's "Put to the owner" section, which lists each such leg with what the rule found at
   each step. Observed by AC7.
-- **S8** — The emitter carries it. `write_gate_legs`' row builder (`tools/govkit/govkit.py:4422-4455`)
-  writes a descriptor's `purpose` into a target row where the target's runner is at the `purpose` row
-  of `LEG_KEY_FLOORS` or later, beside `doc_reads`, and omits it below. Observed by AC8.
+- **S8** — The emitter carries it. `write_gate_legs`' row builder
+  (`tools/govkit/govkit.py#write_gate_legs`) writes a descriptor's `purpose` into a target row where
+  the target's runner is at the `purpose` row of `LEG_KEY_FLOORS` or later, beside `doc_reads`, and
+  omits it below. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -98,20 +110,20 @@ the same gate script.
 
 | Step | Source | Reaches |
 |---|---|---|
-| 1 | the parenthetical in the leg's `name` | 22 legs at `19d6aae6` (PINNED, 2026-10-25): it names the defect the leg catches |
+| 1 | the parenthetical in the leg's `name` | 35 legs at `a4cffc2cb` (PINNED, 2026-11-19): most name the defect the leg catches, the rest what it grades |
 | 2 | the comment block directly above the leg's `[[gate_leg]]` row in its descriptor | a descriptor-claimed leg whose row carries one |
-| 3 | the gate script's header, its module docstring or leading comment, first sentence, qualified by the `argv` word that tells this leg from every other leg running that script | every leg: each of the 142 rows names a tracked script carrying a header, and every pair of legs sharing a script differs by a mode flag or a target path (PINNED, 2026-10-25, measured over `tools/gate-legs.json` at `19d6aae6`) |
-| 4 | the `title` of the dossier whose `[claims] gate-legs` names the leg, qualified as in step 3 | 122 legs at `19d6aae6` (PINNED) |
+| 3 | the gate script's header, its module docstring or leading comment, first sentence, qualified by the `argv` word that tells this leg from every other leg running that script | every leg: each of the 198 rows names one of 164 tracked scripts carrying a header, and no two of the legs sharing one of the 19 shared scripts carry the same `argv` (PINNED, 2026-11-19, measured over `tools/gate-legs.json` at `a4cffc2cb`) |
+| 4 | the `title` of the dossier under `memory/map/features/` whose `[claims] gate-legs` names the leg, qualified as in step 3 | 180 legs at `a4cffc2cb` (PINNED, 2026-11-19) |
 | — | none of the four | put to the owner (S6, S7) |
 
 The pass reads each source and writes at most 60 characters that say what the source says, citing it.
 The 60 is the project map's line grammar, `purpose := at most 60 characters, verbatim from the
 namespace's declared purpose source` (project-map.md:555): the field is that declared source, so the
-map renders it verbatim. Two worked rows, from the tree at `19d6aae6`:
+map renders it verbatim. Two worked rows, from the tree at `19d6aae6`, both re-read at `a4cffc2cb`:
 
 | Leg | Step | Source | Purpose |
 |---|---|---|---|
-| `charter size` | 3 | `tools/check-template-size.sh:2`, argv word `AGENTS.md` | `caps the charter's bytes at its declared ceiling` |
+| `charter size` | 3 | `tools/check-template-size.sh@c76defcee626:2`, argv word `AGENTS.md` | `caps the charter's bytes at its declared ceiling` |
 | `shell hygiene (a fork spent on builtin work)` | 1 | its name | `catches a fork spent on builtin work in a shell file` |
 
 What no probe sees: whether the 60 characters say what the cited line says. The closing review reads
@@ -132,9 +144,11 @@ TOOL-dWitnessedBar-19`. The record cites; it is never read by a gate.
 
 ### The 7h arms
 
-Read from the manifest, as `subject` is, so the 74 `[[exempt_leg]]` legs are graded by the same arm as
-the 68 claimed ones (`selfcheck` notes `legs: 142 in the manifest · 68 claimed · 74 exempt` at
-`19d6aae6`, PINNED). Each finding names the leg and the arm:
+Read from the manifest, as `subject` is, so the 128 `[[exempt_leg]]` legs are graded by the same arm
+as the 70 claimed ones (PINNED 2026-11-19 at `a4cffc2cb`, by counting `tools/govkit/registry.toml`'s
+`[[exempt_leg]]` rows and the descriptors' `[[gate_leg]]` rows, the two populations 7h's note
+line `legs: <n> in the manifest · <c> claimed · <x> exempt` counts). Each finding names the leg and
+the arm:
 
 | Arm | Red on |
 |---|---|
@@ -155,9 +169,9 @@ pass adds to 7h is asked of `python tools/lexicon/lexicon.py --suggest <name> --
 ### Migration
 
 Additive. Every row gains one key. The runner's held-tier row hash is the SHA-1 of the whole row as
-sorted JSON (`tools/run-gates/run-gates.sh:2852`), so every held record earned before this commit reads
-stale once and is re-earned; no reader of the hash compares it to anything older. A target's canary
-below the `purpose` floor never receives the key (S8).
+sorted JSON (`tools/run-gates/run-gates.sh@c828502568bf:3008`), so every held record earned before
+this commit reads stale once and is re-earned; no reader of the hash compares it to anything older.
+A target's canary below the `purpose` floor never receives the key (S8).
 
 ### Rollout
 
@@ -171,9 +185,9 @@ kit's version moves with its canary's key set, which is what the `purpose` floor
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
 - `tools/run-gates/run-gates.test.sh`
+- `tools/run-gates/README.md`
 - `tools/run-gates/purpose-pending.txt` (only when S6 is written)
 - `.gitattributes` (only when S6 is written)
-- `tools/agent-instructions/kit.toml`
 - `tools/branch-reconcile/kit.toml`
 - `tools/codebase-map/kit.toml`
 - `tools/drift-audit/kit.toml`
@@ -190,9 +204,11 @@ kit's version moves with its canary's key set, which is what the `purpose` floor
 - `tools/govkit/entries/push-main.kit.toml`
 - `tools/govkit/entries/settings-merge.kit.toml`
 - `tools/lexicon/kit.toml`
+- `tools/loop/kit.toml`
 - `tools/memory-recall/kit.toml`
 - `tools/memory-tree/kit.toml`
 - `tools/playbook/kit.toml`
+- `tools/policy/kit.toml`
 - `tools/process-monitor/kit.toml`
 - `tools/roles/kit.toml`
 - `tools/run-gates/kit.toml`
@@ -218,7 +234,8 @@ kit's version moves with its canary's key set, which is what the `purpose` floor
 
 - security — no write path beyond tracked declarations; the emitter writes the key only under its
   floor, so no target's canary reds.
-- perf / scale — three arms over 142 rows inside an existing selfcheck; no new leg.
+- perf / scale — three arms over the manifest's rows (198, PINNED 2026-11-19 at `a4cffc2cb`) inside
+  an existing selfcheck; no new leg.
 - error / empty / loading states — an absent pending file is no exception list, never an empty one
   read green; an unreadable one is a 7h failure naming it.
 - observability — 7h's note prints `purposes: <n> declared · <m> pending`.
@@ -277,7 +294,7 @@ kit's version moves with its canary's key set, which is what the `purpose` floor
 
 ## 7. Gates
 
-`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor arms` · `agent-instructions self-test` · `branch-reconcile selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `playbook render selftest` · `pre-push run-log line` · `review-join self-test` · `run-gates run-log line` · `runlog selftest` · `shell-hygiene selftest` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `memory hygiene` · `recall floor` · `spec tokens (a spec's own names resolve)`
+`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor arms` · `branch-reconcile selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `playbook render selftest` · `policy fixtures` · `pre-push run-log line` · `review-join self-test` · `run-gates run-log line` · `runlog selftest` · `shell-hygiene selftest` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `memory hygiene` · `recall floor` · `spec tokens (a spec's own names resolve)` · `hook destinations self-test` · `scratch-guard self-test` · `routed-commits selftest`
 
 New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC6 · plants beside D3 (TOOL-dThriftyLanding-4): a 61-character purpose, a shared purpose, an exempt leg with none, a descriptor disagreeing with its manifest row, and a stale pending row · none
 
@@ -289,7 +306,8 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC6 · plants beside D3 
   read anything but 140 and would read 140 on the clause's own tree. RESOLVED (agent, 2026-10-25,
   delegated): the review covers every leg the manifest holds at the build run's base, derived there;
   "140" is the clause's measurement of the same population (the brief's D4), so no deviation is owed
-  for the count, rung 2. widens: none · relaxes: none
+  for the count, rung 2. widens: none · relaxes: none. Re-observed 2026-11-19 at `a4cffc2cb`: 198,
+  the same population moved, so the resolution holds.
 - **F2 — Where does an underived leg wait for the owner?** Options: (a) a `shrink-only` population on
   I4, keyed by leg name, written only when non-empty; (b) a sentinel `purpose` value; (c) the leg left
   without the key and listed only in the record. (b) lets a new leg pass with the sentinel; (c) leaves
@@ -315,20 +333,37 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC6 · plants beside D3 
   emitter at base `cdfbd1cf`, measured at `19d6aae6`.
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edges of TOOL-dWitnessedBar-51, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-11-19 · §7 · the leg line drops `agent-instructions self-test`, which
+  PLAY-dOrderedCharter-31 retired from `tools/gate-legs.json` with its kit, whose registry `[[retired]]`
+  successor `playbook-render` is tested by `playbook render selftest`, already on the line; it gains
+  `policy fixtures`, whose manifest guard holds the §4 path `tools/gate-legs.json`; per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief; nothing else moved.
+- rev-4 · 2026-11-19 · §2 §4 §5 §7 §8 §10 · S3 S5 S6 S8 · F1 · re-grounded at `a4cffc2cb` per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-22-reground-brief: the rule's step counts, the 7h populations
+  and the descriptor count are re-pinned (PINNED, §4), step 4 naming the features dossiers alone; S6
+  spells unit 13's `.gitattributes` line and unit 15's seed row contract; Files touched drops the retired agent-instructions descriptor and gains the loop and
+  policy descriptors and the run-gates README, and the leg line gains `hook destinations
+  self-test`, `scratch-guard self-test` and `routed-commits selftest`, whose guards those paths
+  trip; F1's count is re-observed; citations re-pinned as `path#symbol` or blob-pinned.
 
 ## 10. Reuse audit
 
-The seam extended is govkit `selfcheck` 7h (`tools/govkit/govkit.py:2785-2948`), whose `doc_reads`
-arms (`:2858-2871`) and exempt-leg subject arm (`:2926-2942`) are the shape S5 copies, and the emitter
-row builder (`:4422-4455`) with its floor reader `check_target_reads_subject` (`:6063`), extended the way
-`DOC_READS_FLOOR_RUN_GATES` (`:6013`) was, through I1's `LEG_KEY_FLOORS` table. The pending population
-reuses the ledger factory `tools/lib/legacy_ledger.py` (I4, unit 13), not built at base.
+The seam extended is govkit `selfcheck` 7h (`tools/govkit/govkit.py#selfcheck`, its `7h` block),
+whose `doc_reads` agreement arm and exempt-leg subject arm are the shape S5 copies, and the emitter row
+builder in `tools/govkit/govkit.py#write_gate_legs` with its floor reader
+`tools/govkit/govkit.py#check_target_reads_subject`, extended the way
+`tools/govkit/govkit.py#DOC_READS_FLOOR_RUN_GATES` was, through I1's `LEG_KEY_FLOORS` table, all
+re-verified at `a4cffc2cb`. The pending population reuses the ledger factory
+`tools/lib/legacy_ledger.py` (I4, unit 13), not built at `a4cffc2cb` and queued at its rev-3, whose
+`[[ledger]]` registration S6 fills field for field.
 `python tools/codebase-map/reuse_lookup.py "a prose purpose field on every gate leg row derived from what the leg carries"`
 ranked name-stem matches only (`rows`, `legs`, `field`, `derive_*`) and named no purpose source,
 which agrees with source: no leg row and no descriptor carries a prose field at base (measured: the
-descriptors' top-level keys and the manifest's nine row keys hold none). Scout B's row named the
+descriptors' top-level keys and the manifest's nine row keys hold none), nor at `a4cffc2cb`, where
+the manifest's rows use 14 keys and the descriptors' `[[gate_leg]]` rows 10 (PINNED 2026-11-19), none
+of them prose. Scout B's row named the
 dossier front matter and the parentheticals; reading source added the descriptor comment blocks and
 the gate scripts' headers, the only source reaching every leg. Scout B's "140 legs" and its seam lines
-agree with source at `19d6aae6` except the count, 142 (§8 F1).
+agree with source at `19d6aae6` except the count, 142 (§8 F1); at `a4cffc2cb` it is 198 (PINNED).
 
 Recall terms used: `python tools/memory-recall/query.py "where does a gate leg declare its purpose and how is a purposeless node reviewed" --terms "leg purpose field gate-legs.json PM-5 map-purpose review derive owner ask dossier parenthetical"`

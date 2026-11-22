@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# gov:kit lexicon@1.29
+# gov:kit lexicon@1.30
 """lexicon.py — two naming predicates over a DECLARED vocabulary, plus one self-containment refusal.
 
 THE INVOCATIONS ARE NOT LISTED HERE. Run the file with no recognised mode and it prints them, with
@@ -87,7 +87,7 @@ from lexicon_conf import (ConfError, CONVENTIONS, PATTERN_PARTS, SURFACES, langs
 from subtokens import (check_convention, classify, leading_verb, read_stem,  # noqa: E402
                        render_convention, subtokens)
 
-KIT_LEXICON_VERSION = "1.29"
+KIT_LEXICON_VERSION = "1.30"
 
 CONF_NAME = ".lexicon.conf"
 #: the playbook kit's home under the tool root, where `read_tag_words` resolves the namespace registry
