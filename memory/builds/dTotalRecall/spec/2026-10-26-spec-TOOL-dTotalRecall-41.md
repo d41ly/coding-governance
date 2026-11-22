@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-41 — the ask door refuses a line break or row separator in any value and grades the row it would write, read back
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 14 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 14 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-11-22-build-TOOL-dTotalRecall-41-family-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-41-family-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-41-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-41-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-41-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-41-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-41-family-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-41-family-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-41-family-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-41-family-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-41-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-41-reground-brief.md) | journal | — |
