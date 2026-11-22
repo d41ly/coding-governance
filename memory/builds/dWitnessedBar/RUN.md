@@ -12,20 +12,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 parked-surfaced: yes
 keepalive-reaped: yes
 gates-run: unattended-179529481580044524711-1640412 f9ee3f8e
-asks-at-landing: TOOL-dWitnessedBar-31=DEFERRED TOOL-dWitnessedBar-32=OPEN TOOL-dWitnessedBar-33=OPEN TOOL-dWitnessedBar-34=CLOSED TOOL-dWitnessedBar-35=OPEN TOOL-dWitnessedBar-36=OPEN TOOL-dWitnessedBar-37=DEFERRED TOOL-dWitnessedBar-38=OPEN TOOL-dWitnessedBar-39=OPEN TOOL-dWitnessedBar-98=OPEN TOOL-dWitnessedBar-99=OPEN TOOL-dWitnessedBar-100=OPEN TOOL-dWitnessedBar-101=DEFERRED TOOL-dWitnessedBar-102=DEFERRED TOOL-dWitnessedBar-103=DEFERRED TOOL-dWitnessedBar-104=OPEN TOOL-dWitnessedBar-105=OPEN TOOL-dWitnessedBar-111=OPEN TOOL-dWitnessedBar-112=OPEN TOOL-dWitnessedBar-113=OPEN TOOL-dWitnessedBar-114=OPEN
+asks-at-landing: TOOL-dWitnessedBar-31=DEFERRED TOOL-dWitnessedBar-32=OPEN TOOL-dWitnessedBar-33=OPEN TOOL-dWitnessedBar-34=CLOSED TOOL-dWitnessedBar-35=OPEN TOOL-dWitnessedBar-36=OPEN TOOL-dWitnessedBar-37=DEFERRED TOOL-dWitnessedBar-38=OPEN TOOL-dWitnessedBar-39=OPEN TOOL-dWitnessedBar-98=OPEN TOOL-dWitnessedBar-99=OPEN TOOL-dWitnessedBar-100=OPEN TOOL-dWitnessedBar-101=DEFERRED TOOL-dWitnessedBar-102=DEFERRED TOOL-dWitnessedBar-103=DEFERRED TOOL-dWitnessedBar-104=OPEN TOOL-dWitnessedBar-105=OPEN TOOL-dWitnessedBar-111=CLOSED TOOL-dWitnessedBar-112=CLOSED TOOL-dWitnessedBar-113=OPEN TOOL-dWitnessedBar-114=OPEN TOOL-dWitnessedBar-1000=OPEN
 units-at-landing: TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110
 hold-run: 
-hold-streak: 1 · at f8fdf8d6
+hold-streak: 1 · at 98e8972c
 resume-owed: none · owner
-held-at: 2026-11-21T18:20:01Z
-hold-reason: The work is sound and merged onto origin/main at c2a407b03 with every pass leg green. Two upgrade-step conflicts block the landing; the frozen-step rule forbids both fixes unattended: gov first refuses the adopter-rules witness (rule 06's corrected text, ask 111), and step-rows-frozen reds on the floor step's edited program (ask 112). Both are parked with their options.
+held-at: 2026-11-22T02:06:07Z
+hold-reason: the owner asked to land as is so dependent builds can start, and authorized one push past the pre-push hook; the close's gates-green item admits no override over the build's own reds (check 83), so the owner lands through the hand-off recipe with the recorded bypass, and the reds are fixed after
 hold-until: owner
 hold-code: owner-decision
 held-from: VERIFYING
-refreshed-at: c2a407b0390f3d57a118b58e376c326aeb207c13 · park · ? touching
+refreshed-at: c2a407b0390f3d57a118b58e376c326aeb207c13 · handoff · ? touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: de0768e3ab65b8c79df5c40158730e05fe3ade83
-phase: VERIFYING
+witness: 98e8972cfe0c92167d082df9c176c4db1905b94f
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -887,3 +887,7 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T18:42:39Z resume · item dWitnessedBar · reason held · keepalive 1f189298 · manual
 
 2026-11-22T02:00:37Z decision · item landing-hook-bypass: the owner asked to land as is; the pre-push hook blocks on the build's remaining own reds (remote literals, layer dependencies, python reads) and the packet pin only the owner can re-pin. Options: (a) the owner authorizes the hook's own documented override for this one landing push, recorded as an override; (b) fix the reds first and land through the hook · reason skipping a hook is the owner's explicit call by the charter, never inferred from 'as is'; no resolver the mandate delegates may skip one
+
+2026-11-22T02:06:09Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dWitnessedBar && bash tools/push-main.sh --land --slug dWitnessedBar && bash tools/unattended/unattended.sh --settle dWitnessedBar
+
+2026-11-22T02:06:09Z hold · item owner-decision · reason until owner · reaped 1f189298 · resume none(owner)
