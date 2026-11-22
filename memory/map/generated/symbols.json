@@ -13143,6 +13143,16 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_overlay_drift",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "derive_overlay_expected",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "derive_overlay_text",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
@@ -16806,6 +16816,11 @@
       "id": "load_kit_module",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "load_kit_roster",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "load_last_queries",
