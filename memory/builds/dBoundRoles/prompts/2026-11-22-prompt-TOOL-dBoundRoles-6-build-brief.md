@@ -21,7 +21,13 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every roster spec was re-grounded on HEAD before this dispatch, so its citations hold at HEAD or name the earlier
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
-- This is the second dispatch. The first builder (run `wf_c709768a-dd5`) stopped on rev-7; the main loop decided its
+- This is the third dispatch. The second builder (run `wf_3f5ef03a-ab0`) finished the code and stopped only on two
+  record numbers already taken in this build. Its pass is `t6/TOOL-dBoundRoles-6-pass.patch` in the session scratchpad
+  and its change-record draft `t6/change-record-draft.md`: re-apply the patch with `git apply --index`, save the draft as
+  `build/2026-11-22-build-TOOL-dBoundRoles-6-change-5.md` with its H1 reading change 5, write the deviation record as
+  `build/2026-11-22-build-TOOL-dBoundRoles-6-deviation-64.md` (not the deviation-61 path the next line names), then
+  finish the ledger, the CLOSED status, the generators and the checklist.
+- Earlier: this was the second dispatch. The first builder (run `wf_c709768a-dd5`) stopped on rev-7; the main loop decided its
   items in `build/2026-11-22-build-TOOL-dBoundRoles-6-1-main-loop-decision.md`. Build them as stated there and write
   ONE deviation record, `build/2026-11-22-build-TOOL-dBoundRoles-6-deviation-61.md`, carrying its items 1, 3 and 4
   against rev-7 (values `report` and `author-recorded`). The help pages and the policy README in the write set are
