@@ -37788,3 +37788,33 @@ tools/workflows/tier2-review.test.sh	p.js:9	1	9e21ac760dc0a43d6ed007396922722cce
 tools/workflows/tier2-review.test.sh	security.js:1	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh32-pathless.js:3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh36-mid.js:2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	BUILD-METHOD M4	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	BUILD-METHOD M4	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	instructions.toml:5	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	instructions.toml:5	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2044	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2044	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2048	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2048	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2049	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2049	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2051	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2051	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2077	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2077	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2089	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2089	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2102	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2102	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2135	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2135	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2157	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2157	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2179	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2179	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2278	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2278	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/hooks/agent-cap.js:2282	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/hooks/agent-cap.js:2282	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-1.md	tools/playbook/instructions.toml:5	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
+memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-widen-4.md	tools/playbook/instructions.toml:5	1	734ec40a1b0e9e979d583d579b6aeb0bbe8b5c22	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-4
