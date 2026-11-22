@@ -1,6 +1,6 @@
 # KICK-dKeptSession-30 — the context window derived per model from the node's observed usage, never pinned at 200000
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 13 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 13 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -22,6 +22,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-30-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-build-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-32 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-30-orders-13-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-orders-13-reground-brief.md) | research | KICK-dKeptSession-9 |
+| [2026-11-22-prompt-KICK-dKeptSession-30-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-30-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-KICK-dKeptSession-30-divergence-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-30-divergence-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
@@ -38,8 +40,8 @@ reads up to about 490% and the default `context.threshold` of 60% fires at 120k 
 the real window: under `fresh-at-boundary` every owner session past 120k is told to end at its next
 item boundary. This unit replaces the constant with a window derived per model from what the node's
 own transcripts show the window holds, and lets the harness's own window variable win. It repairs
-`KICK-dKeptSession-14`, which is unbuilt at base `c2a407b0` and builds at order 12, and builds one
-step after it (order 13).
+`KICK-dKeptSession-14`, unbuilt at base `c2a407b0`, landed at order 12 by `6d3567df` and CLOSED,
+and builds one step after it (order 13).
 
 ## 2. Scope (IN)
 
@@ -66,8 +68,15 @@ step after it (order 13).
   `derive_context_window(<the event's model>, root=<the transcript's projects root>, held=<its own
   path and events>)`, the root the transcript's parent's parent, and returns `(share, tokens,
   source)`, `(None, None, None)` with no main usage, in place of the bare share
-  `KICK-dKeptSession-14` S1 returns. Its one caller is that unit's `cmd_context` in
-  `tools/runlog/runlog.py`, which unpacks it. `derive_context_fill(ev, window=None)` takes an
+  `KICK-dKeptSession-14` S1 returns. Its callers at `5c9f5999` are `cmd_context`
+  (`tools/runlog/runlog.py#cmd_context`), which unpacks it, and
+  `tools/runlog/selftest.py#test_extract_context_fill`, whose `until` check compares
+  `measure_context_fill(main, until=t_mid)` with `0.9` directly and under the triple compares its
+  first member. Observation: that case's own root observes 180000 on `fixture-model` at most, the
+  200000 rung, so its `60%` and `0.9` hold; its liveness check calls `derive_context_fill(usage[-1])`
+  with no window, under the default root the launcher aims at the decoy, whose canary
+  (`tools/runlog/selftest.py#build_decoy`, the `discover-hit` scenario) reads one main token on
+  `fixture-model`, the 200000 rung, so its `0.95` holds too. `derive_context_fill(ev, window=None)` takes an
   explicit window, or derives one from `ev["model"]` under the default root, so `KICK-dKeptSession-9`'s per-stage rows
   read the same window with no change to their call. `python tools/runlog/runlog.py context
   <transcript>`, minted by `KICK-dKeptSession-14` S1, keeps its stdout, `<n>%` or `none`, and prints
@@ -81,11 +90,13 @@ step after it (order 13).
   KICK-dKeptSession-30 derives it", and states S1 supersedes both. Unit 14 builds at order 12 and is
   CLOSED when this unit builds, so neither its spec nor its ledger is written (F3). Observed by AC5
   and AC7.
-  **Readers:** by name: READER NOT IN TREE — the constant is minted by unit 14 S1 and spelled only
-  by that unit's unbuilt fill function and help paragraph, so no tracked reader spells it at this
-  base, a grep of the tracked tree finding none · by value: NO VALUE READERS — its only value
-  readers are unit 14's fill and unit 9's per-stage column, both unbuilt at this base, which divide
-  by it and which S2 re-points.
+  **Readers:** by name: `tools/runlog/extract.py`, `tools/runlog/runlog.py` and
+  `tools/runlog/README.md` spell it at commit 5c9f5999, a `git grep` of the tracked tree finding no other;
+  S3 takes it out of the first, its definition, its one use and the comment and docstring naming
+  it, and S6 rewrites the other two ·
+  by value: `derive_context_fill` and `measure_context_fill` divide by it, re-pointed by S2;
+  `test_extract_context_fill` reads 200000 through them, which S2's observation holds; unit 9's
+  per-stage column, DEFERRED, reads it through `derive_context_fill` with no change to its call.
 - **S4** — id 16. The fixture. Two scenarios in `tools/runlog/fixtures/transcripts.json`,
   `context-window` with a last main usage of 150000 tokens on `fixture-model`, and
   `context-window-sibling` with one main usage of 900000 tokens on the same model, written the way
@@ -102,6 +113,41 @@ step after it (order 13).
   `KICK-dKeptSession-14` S9 in the section "When a session resumes", says the window is derived per
   model from the node's observed usage and names `CLAUDE_CODE_MAX_CONTEXT_TOKENS`, in place of the
   word "pinned". Observed by AC6.
+- **S6** — id 16. The shipped texts that state the pinned window, rewritten to the derived one in
+  the change that lands S3, since each is false once S3 lands. At `5c9f5999` a `git grep` for
+  `CONTEXT_WINDOW_TOKENS`, `pinned window`, `pinned constant` and `pinned 200000` over
+  `tools/runlog/`, the catalogue, `manifest-check.sh` and the card page prints 12 lines (PINNED,
+  2026-11-22): S3 answers the four in `extract.py`, S5 the card page's, and this item the other seven.
+  1. `tools/runlog/README.md`, the `context` paragraph: the share is over the window
+     `derive_context_window` derives, `CLAUDE_CODE_MAX_CONTEXT_TOKENS` first, then the smallest
+     `CONTEXT_WINDOW_RUNGS` rung at or above the node's largest observation for the model, then the
+     bottom rung; S2's stderr line; `measure_context_fill`'s `(share, tokens, source)` and
+     `derive_context_fill(ev, window=None)`. The share passes 100% only where the variable is set
+     below the context read or the transcript is outside the scan.
+  2. `tools/runlog/runlog.py`, the module docstring's `context` sentence: the share of the derived
+     window, and the stderr line.
+  3. `tools/policy/catalogue.toml`, `context.threshold`'s `summary` alone: "the runlog kit's pinned
+     window" becomes the window the runlog kit derives per model from the node's observed usage, or
+     `CLAUDE_CODE_MAX_CONTEXT_TOKENS` where set. Its `allowed` and `default` stay as they are.
+  4. The comment above `skills/session-kickoff/manifest-check.sh#render_context_line`, its WHAT THIS
+     DOES NOT CHECK part: the window is the one the runlog kit derives, `CLAUDE_CODE_MAX_CONTEXT_TOKENS`
+     or the node's observed usage rounded up to a rung, and nothing checks it is the model's real one. No code line
+     of the function changes.
+  5. `tools/runlog/selftest.py#test_extract_context_fill`'s docstring and the `context-fill`
+     scenario's `about` in `tools/runlog/fixtures/transcripts.json`: "the pinned window" and "the
+     pinned 200000" become the 200000 rung the case's root derives.
+  **The knock-on.** The policy fingerprint stays put: `context.threshold`'s row is its `shape`,
+  `values` and `default` (`tools/govkit/docs_leg.py#read_policy_usage`), hashed by
+  `tools/govkit/docs_leg.py#derive_usage_fingerprint`, and `python tools/govkit/docs_leg.py
+  --fingerprints` prints `ba7d79dc` for it, the fingerprint the key's anchor on
+  `help/orientation-card.md` carries (PINNED, 2026-11-22, at `5c9f5999`). The key's section on
+  `help/reference/policy.md` is a "Documented on" link with no summary, since the card page anchors
+  it (`tools/playbook/render_playbook.py#render_reference_page`). Neither file is written for it.
+  The mirror moves: `.governance/policy.json` carries the catalogue's blob id as `catalogue_blob`
+  (`tools/policy/policy.py#render_mirror`), so `python tools/policy/policy.py mirror --write`
+  re-writes it once the catalogue edit is committed, the mirror rendering at HEAD. `manifest-check.sh`
+  is on `memory/guides/SESSION-KICKOFF.md`'s `watch:` line, so its `last-audit` is re-stamped in the
+  commit that stages it, with a delta line in the commit message. Observed by AC8 and AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -176,11 +222,20 @@ None. No stored state holds a fill; every read derives it.
 ### Files touched (estimate)
 
 - `tools/runlog/extract.py`: S1, S2 and S3
-- `tools/runlog/runlog.py`: `cmd_context` unpacking S2's triple and printing the stderr line
+- `tools/runlog/runlog.py`: `cmd_context` unpacking S2's triple and printing the stderr line; the
+  module docstring, S6
 - `tools/runlog/selftest.py`: the window case, the launcher's dropped variable and the
-  `ASSERTION_FLOOR` raise
-- `tools/runlog/fixtures/transcripts.json`: S4's two scenarios
+  `ASSERTION_FLOOR` raise; `test_extract_context_fill`'s `until` check unpacking S2's triple, and
+  its docstring, S6
+- `tools/runlog/fixtures/transcripts.json`: S4's two scenarios; `context-fill`'s `about`, S6
 - `help/orientation-card.md`: S5
+- `tools/runlog/README.md`: S6, the `context` paragraph
+- `tools/policy/catalogue.toml`: S6, `context.threshold`'s `summary`
+- `.governance/policy.json`: S6's knock-on, its `catalogue_blob` re-written by `python
+  tools/policy/policy.py mirror --write`
+- `skills/session-kickoff/manifest-check.sh`: S6, the comment above `render_context_line`
+- `memory/guides/SESSION-KICKOFF.md`: S6's knock-on, `last-audit` re-stamped for the watched
+  `manifest-check.sh`
 - `memory/map/generated/symbols.json`: `derive_context_window`, regenerated by `gen_map.py --write`,
   which the bar's codebase-map leg grades
 - `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-30-1-acceptance-ledger.md`:
@@ -217,7 +272,7 @@ None. No stored state holds a fill; every read derives it.
   `KICK-dKeptSession-56` S11's memo is per process and does not shorten one call.
 - testing — the selftest case of §6 and the arm in §7.
 - migration — none.
-- user docs — `help/orientation-card.md`, S5.
+- user docs — `help/orientation-card.md`, S5; the runlog kit's README and the catalogue summary, S6.
 
 ## 6. Acceptance criteria
 
@@ -246,10 +301,28 @@ None. No stored state holds a fill; every read derives it.
   prints `1`; and `git diff --name-only <pass base> HEAD --` over unit 14's spec and its acceptance
   ledger prints nothing.
   Red when: S3's answer lands in a record of unit 14, or this unit's ledger quotes neither passage.
+- **AC8** — When `git grep -n -e CONTEXT_WINDOW_TOKENS -e "pinned window" -e "pinned constant" -e
+  "pinned 200000" -- tools/runlog skills/session-kickoff/manifest-check.sh
+  tools/policy/catalogue.toml help/orientation-card.md` runs, it prints nothing; and `git grep -c
+  CLAUDE_CODE_MAX_CONTEXT_TOKENS -- tools/runlog/README.md tools/policy/catalogue.toml
+  skills/session-kickoff/manifest-check.sh` prints a row for each of the three files.
+  Red when: any of the 12 lines (PINNED, 2026-11-22) that grep prints at `5c9f5999` survives, or a rewritten text does
+  not name the harness's variable.
+  figure: the 12 lines PINNED, 2026-11-22, at `5c9f5999`.
+- **AC9** — After the build's commit, `python tools/policy/policy.py mirror --check` exits 0 and the
+  mirror's `catalogue_blob` equals the blob `git ls-tree HEAD tools/policy/catalogue.toml` prints; `python
+  tools/playbook/render_playbook.py --reference --check` exits 0; and `python
+  tools/govkit/docs_leg.py --fingerprints` prints, on its `policy:context.threshold` row, the
+  fingerprint the key's anchor on `help/orientation-card.md` carries.
+  Red when: the mirror still names the catalogue blob `4be1f801`, or the summary edit moved the
+  fingerprint off the anchor or the reference page off its render.
+  figure: `4be1f801` PINNED, 2026-11-22, at `5c9f5999`; the fingerprint DERIVED by `--fingerprints`
+  at observation time.
+  cost: the reference check up to 130 s, its leg's ceiling PINNED in `tools/gate-legs.json`.
 
 ## 7. Gates
 
-`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `routed-commits selftest` · `scratch-guard self-test` · `manifest-check self-test`
 
 New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 · the window case over the two scenarios, staged red by a copy of `extract.py` dividing by 200000 · `ASSERTION_FLOOR`, raised by the case's checks and its three decoy checks
 
@@ -308,6 +381,14 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 · the window case o
   passages, under the brief `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`; the class
   KICK-dKeptSession-49 rev-6 first resolved. The ledger's path trips the two `recall floor` legs,
   already on §7's leg line.
+- rev-6 · 2026-11-22 · §1 · S2 · S3 · S6 · §4 · §5 · AC8 · AC9 · §7 · under the brief
+  `2026-11-22-prompt-KICK-dKeptSession-30-divergence-brief`: S6 rewrites the README paragraph, the
+  catalogue summary and the `manifest-check.sh` comment that unit 14 landed stating the pinned
+  window, plus the `runlog.py` and selftest docstrings and the `context-fill` fixture's `about` the
+  same grep finds; S3's readers re-taken at `5c9f5999`; S2 names the selftest caller. The brief's
+  premise that the summary is fingerprinted does not hold at `5c9f5999`, as S6 cites, so the anchor
+  and the reference page are observed current by AC9 and not written; the mirror and the manifest
+  stamp join Files touched.
 
 ## 10. Reuse audit
 
