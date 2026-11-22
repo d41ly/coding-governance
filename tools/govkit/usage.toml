@@ -684,7 +684,7 @@ id = "script:{prefix}/loop/factories.py#role"
 shape = "verb"
 entry = "{prefix}/loop/factories.py"
 verb = "role"
-flags = ["--workflow=", "--writes=", "--description=", "--reads=", "--never=", "--return=", "--output=", "--ceiling="]
+flags = ["--workflow=", "--writes=", "--description=", "--reads=", "--never=", "--return=", "--output=", "--ceiling=", "--layer=", "--acts-as="]
 
 [[usage]]
 id = "script:{prefix}/loop/factories.py#workflow"

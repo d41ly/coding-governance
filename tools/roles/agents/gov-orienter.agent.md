@@ -5,6 +5,8 @@ tools: Read, Grep, Glob, Bash
 model: inherit
 maxTurns: 60
 workflow: orient
+layer: layer.roles
+acts-as: item
 reads: field.input.question, field.input.prompt?
 writes: none
 rules: small, ids, memory, tokens, tools

@@ -6,6 +6,7 @@
     python factories.py hook <name> --kit <id> --event <event> [--matcher <m>]
     python factories.py role <slot> --workflow <name> --writes <class> --description <text> --reads <keys>
                         --never <entries> --return <template> --output <text> --ceiling <bytes>
+                        --layer <layer tag> --acts-as item|cycle
     python factories.py workflow <name> --driver <driver> --harness <path|none> --roles <slots>
                         --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>
     python factories.py scenario <name> --extends <tag|none> --admit <fact>=<value>... --entry <step tag>
@@ -34,7 +35,8 @@ conforms, then runs the kind's gate over the whole population:
   `git add` has put the three files written; the directory is removed on the way out and the caller's
   index is never written.
 - `role` writes `<slot>.agent.md` under the roles kit's `agents/`, `mandatory: no`, an empty `rules`, the
-  `never` list and the `return` template its flags give (TOOL-dBoundRoles-2), and a one-line body; lists the slot in its workflow's `roles`; writes the slot's ceiling row into the roles
+  `never` list and the `return` template its flags give (TOOL-dBoundRoles-2), the `layer` and `acts-as` its
+  `--layer` and `--acts-as` give (TOOL-dBoundRoles-1), and a one-line body; lists the slot in its workflow's `roles`; writes the slot's ceiling row into the roles
   kit's `BODY_CEILINGS`; and re-renders that kit's README catalogue region through `check_roles.py
   --write`, whose grade is the gate.
 - `workflow` appends a `[[workflow]]` row to the roles kit's `workflows.toml`, its `name`, `order` and
@@ -137,7 +139,8 @@ NEW_ARGV = {
     "hook-new": ["hook", "fixture-hook", "--kit", "agent-cap", "--event", "Stop"],
     "role-new": ["role", "gov-fixture", "--workflow", "build", "--writes", "none", "--description",
                  "A fixture role.", "--reads", "input:question", "--never", FIXTURE_ROLE_NEVER, "--return",
-                 FIXTURE_ROLE_RETURN, "--output", "the answer, to its caller", "--ceiling", "1024"],
+                 FIXTURE_ROLE_RETURN, "--output", "the answer, to its caller", "--ceiling", "1024", "--layer",
+                 "layer.roles", "--acts-as", "item"],
     "workflow-new": ["workflow", "fixture", "--driver", "program", "--harness", "none", "--roles", "",
                      "--enforced-by", "none — a fixture", "--trigger", "never, a fixture", "--order", "0",
                      "--step", "none"],
@@ -547,13 +550,15 @@ def write_workflow_roles(text, workflow, slot):
     raise Refused("--workflow %r names no workflows.toml row holding a one-line roles list" % workflow)
 
 
-def write_role(top, kit_rel, slot, workflow, writes, description, reads, never, template, output, ceiling):
+def write_role(top, kit_rel, slot, workflow, writes, description, reads, never, template, output, ceiling, layer,
+               acts_as):
     if not NAME_RE.fullmatch(slot):
         raise Refused("the slot %r is not %s" % (slot, NAME_RE.pattern))
     if ceiling <= 0:
         raise Refused("--ceiling %d is not a byte count above 0" % ceiling)
     for flag, text in (("--workflow", workflow), ("--writes", writes), ("--description", description),
-                       ("--reads", reads), ("--never", never), ("--return", template), ("--output", output)):
+                       ("--reads", reads), ("--never", never), ("--return", template), ("--output", output),
+                       ("--layer", layer), ("--acts-as", acts_as)):
         check_one_line(flag, text)
     roles = derive_roles_kit(top, kit_rel)
     import roles_lib
@@ -562,8 +567,9 @@ def write_role(top, kit_rel, slot, workflow, writes, description, reads, never, 
         raise Refused("%s exists; the factory writes a new role" % role.relative_to(top).as_posix())
     table, checker = roles / "workflows.toml", roles / "check_roles.py"
     values = dict(name=slot, description=description, tools=ROLE_TOOLS, model=ROLE_MODEL, workflow=workflow,
-                  reads=reads, writes=writes, rules="", mandatory="no", output=output, never=never)
+                  layer=layer, reads=reads, writes=writes, rules="", mandatory="no", output=output, never=never)
     values["return"] = template   # `return` is a Python keyword, so the key is set by subscript
+    values["acts-as"] = acts_as   # a hyphenated key, so it is set by subscript as `return` is
     body = "You are the %s role of the %s workflow; what it does beyond its front matter is its author's to write.\n" % (
         slot, workflow)
     text = render_front_matter(roles_lib.FRONT_MATTER_KEYS, values).replace(": \n", ":\n") + "\n" + body
@@ -631,6 +637,7 @@ def write_hand_plant(clone, kit_rel, case):
     elif case == "role-hand":
         p = resolve_kit_dir("roles", "check_roles.py", here) / "agents" / "gov-hand.agent.md"
         text = ("---\nname: gov-hand\ndescription: A hand role.\ntools: Read\nmodel: inherit\nworkflow: build\n"
+                "layer: layer.roles\nacts-as: item\n"
                 "reads: input:question\nrules:\nmandatory: no\noutput: x\nnever: edits a file — unenforced — a hand role\n"
                 "return: outcome:answered|none, answer:text?\n---\n\nA hand body.\n")
     elif case == "scenario-hand":
@@ -731,7 +738,7 @@ def run_interrupt_plant(clone, kit_rel):
     before = {path: path.read_bytes() for path in held}
     real_replace = policy_edit.os.replace
     args = (clone, kit_rel, "gov-fixture", "build", "none", "A fixture role.", "input:question", FIXTURE_ROLE_NEVER,
-            FIXTURE_ROLE_RETURN, "the answer, to its caller", 1024)
+            FIXTURE_ROLE_RETURN, "the answer, to its caller", 1024, "layer.roles", "item")
 
     def run_interrupted():
         """The role kind's writes, interrupted at the second rename onto a held or created path: its output."""
@@ -841,7 +848,7 @@ def main(argv):
                 ("policy-key", "name", ("--allowed", "--default", "--summary", "--usage", "--owner")),
                 ("hook", "name", ("--kit", "--event")),
                 ("role", "slot", ("--workflow", "--writes", "--description", "--reads", "--never", "--return",
-                                  "--output")),
+                                  "--output", "--layer", "--acts-as")),
                 ("workflow", "name", ("--driver", "--harness", "--roles", "--enforced-by", "--trigger", "--step")),
                 ("scenario", "name", ("--extends", "--entry"))):
             sp = sub.add_parser(kind)
@@ -867,7 +874,7 @@ def main(argv):
             return write_scenario(top, kit_rel, a.name, a.extends, a.admit, a.entry)
         if a.kind == "role":
             return write_role(top, kit_rel, a.slot, a.workflow, a.writes, a.description, a.reads, a.never,
-                              getattr(a, "return"), a.output, a.ceiling)
+                              getattr(a, "return"), a.output, a.ceiling, a.layer, a.acts_as)
         return write_workflow(top, kit_rel, a.name, a.driver, a.harness, a.roles, a.enforced_by, a.trigger, a.order,
                               a.step)
     except Refused as exc:

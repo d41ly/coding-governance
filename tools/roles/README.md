@@ -1,8 +1,9 @@
 <!-- gov:kit roles@1.25 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
-A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
-`handoff`, `spec-write`, `spec-review`, `build`, `closing-review`, `gate-bar` and `bookkeeping` —
+A governed session runs its LLM work through twelve declared WORKFLOWS — `orient`, `research`, `reuse`,
+`handoff`, `spec-write`, `spec-review`, `build`, `closing-review`, `gate-bar`, `bookkeeping`, `plan`
+and `design` —
 each driven by an agent ROLE, a harness, a program or the main loop. A role is an agent-definition
 file under `agents/`: a CONSTANT block its agent starts from, plus front matter saying which
 workflow it serves, which inputs it reads, which path class it may write, which sections of the
@@ -34,6 +35,15 @@ later key is one row there.
   `text`, `sha`, `path`, `list`, `int` or a closed set of values `a|b`, a bare word being a set of
   one; a `?` marks a field optional. Every template holds a required `outcome` whose type is a
   closed set. The body says what each field means.
+- `layer` is the `layer.<seg>` tag of the playbook kit's `layers.toml` row the role belongs to, and
+  `acts-as` is `item`, a role that acts in a loop item, or `cycle`, one that serves the cycle and acts
+  in none (TOOL-dBoundRoles-1). R2 joins `layer` to a row of that register where it resolves, and
+  prints a note where it does not; the summary counts the roles per layer and per `acts-as`. Every
+  role carries both, so a role file of your own that lacks them is an R2 defect on update, and the
+  role factory, `core.py new role`, writes them from its `--layer` and `--acts-as` flags. The twelve
+  core roles sit at `layer.roles`; `gov-session` sits at `layer.runtime`. The expansion roles, the
+  deployer and the maintainer, have no file here: the playbook kit's layer rows register them, and
+  the loop kit refuses a core item naming one.
 
 A rendered role closes with `## Never`, `## Ceiling` (its tools, its write class and the gate legs
 the policy's `[gates]` grants it) and `## Return`, by every route that renders a role.
@@ -322,7 +332,7 @@ hands it no handoff would otherwise give it no charter at all; the agent file is
 a handoff carries none. A pre-tag (v3.x) charter, with
 `## §<n> — ` headings and no rule tag, renders every type with no `## Charter` and prints one note
 asking for a reseed; a doc of neither shape refuses. Beside the types sits `.claude/roles.json`, the generated index the hooks read: every role
-with its `workflow`, `writes` and `agent`, `agent: false` roles included, and `harnesses`, the
+with its `workflow`, `writes`, `agent`, `layer` and `acts-as`, `agent: false` roles included, and `harnesses`, the
 repo-relative scripts of every workflow whose `driver` is `workflow`. The kit resolver finds a
 harness govkit rendered from its template through that file's `rendered` receipt row, so a kit
 landed under its id rather than its home is listed where it sits. A harness the tree does not hold
@@ -377,7 +387,7 @@ Protocols section lists.
 
 - The base role files, the workflow table, the library, the checker, the renderers, the adopter and
   this README are the kit's, overwritten on every update.
-- The ten house overlays under `house/` are SEEDED: you receive each once and own it afterwards,
+- The house overlays under `house/`, one per role, are SEEDED: you receive each once and own it afterwards,
   and an update never rewrites one. They are where your project's rules for a role go.
 - The adopter, `bash adopt-roles.sh --scaffold`, runs at install and again at every update unless
   `GOVKIT_RERENDER=0` declines it. It renders the `/build` Skill, one agent type per agent role
@@ -468,27 +478,31 @@ else; the check compares the two on every run.
 |---|---|---|---|---|---|---|
 | orient | main-loop | /session-kickoff | gov-orienter | — | manifest-check.sh --card --append | once per session, at kickoff, before the first work-unit is opened |
 | reuse | agent | none | gov-reuse-scout | — | none — the scout's trigger is the kickoff opt-in that aScoutedSeam owns | before a new behaviour is designed, when kickoff asks for a scout |
-| spec-write | workflow | {prefix}/workflows/unattended-build.js | gov-spec-writer, gov-builder, gov-spec-reviewer, gov-skeptic, gov-synthesizer | specWriter → gov-spec-writer, disposal → gov-spec-writer, builder → gov-builder, specFinder → gov-spec-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | scratch-guard.js role arm | once per build, after orientation, for every unit whose spec is missing or thin |
-| spec-review | workflow | {prefix}/workflows/tier2-review.js | gov-spec-reviewer, gov-skeptic, gov-synthesizer | specFinder → gov-spec-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys | after the spec set is written, where the build or its project declares a spec audit |
+| spec-write | workflow | {prefix}/workflows/unattended-build.js | gov-spec-writer, gov-builder, gov-reviewer, gov-skeptic, gov-synthesizer | specWriter → gov-spec-writer, disposal → gov-spec-writer, builder → gov-builder, specFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | scratch-guard.js role arm | once per build, after orientation, for every unit whose spec is missing or thin |
+| spec-review | workflow | {prefix}/workflows/tier2-review.js | gov-reviewer, gov-skeptic, gov-synthesizer | specFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys | after the spec set is written, where the build or its project declares a spec audit |
 | build | workflow | {prefix}/workflows/unattended-unit.js | gov-builder | builder → gov-builder | scratch-guard.js role arm, routed commits name a specced unit | once per unit, in stage order, after its spec is READY |
-| closing-review | workflow | {prefix}/workflows/tier2-review.js | gov-diff-reviewer, gov-skeptic, gov-synthesizer | diffFinder → gov-diff-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard | once per build, after the last unit is terminal, over the cumulative diff |
+| closing-review | workflow | {prefix}/workflows/tier2-review.js | gov-reviewer, gov-skeptic, gov-synthesizer | diffFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard | once per build, after the last unit is terminal, over the cumulative diff |
 | gate-bar | program | bash {prefix}/run-gates/run-gates.sh | gov-tester | — | the pre-push hook | once, after the closing review, at the close or the push boundary |
 | research | agent | none | gov-researcher | — | agent-cap.js spawn guard | any time a design must choose between candidates that no existing seam decides |
-| handoff | program | python {prefix}/roles/handoff.py render | gov-session | — | none — a session-to-session message is no tool call the spawn guard sees | any time work passes to another session of this repository |
+| handoff | program | python {prefix}/roles/handoff.py render | gov-prompt-writer, gov-session | — | none — a session-to-session message is no tool call the spawn guard sees | any time work passes to another session of this repository |
 | bookkeeping | main-loop | none | — | — | memory hygiene | any time a record, an index or the run state is updated |
+| plan | agent | none | gov-planner | — | agent-cap.js spawn guard | any time a build's plan is drafted, judged or recorded, before its specs are written |
+| design | agent | none | gov-architect | — | agent-cap.js spawn guard | any time a build's scope is inventoried or decomposed into units, before its specs are written |
 
 **Roles**, from `agents/*.agent.md`:
 
 | role | workflow | writes | reads | rules | agent | return |
 |---|---|---|---|---|---|---|
+| `gov-architect` | design | records | field.input.question, field.input.spec?, field.brief.goal?, field.brief.non-goals?, field.task.reuse? | yagni, reuse, core, derive, verify, small, memory | true | outcome:inventoried\|decomposed\|fact-fork\|goal-fork\|probe, record:path?, reason:text |
 | `gov-builder` | build | product | field.input.spec, field.card.route?, field.brief.non-goals? | yagni, reuse, core, derive, verify, gate, docs, security, portable, tools | true | outcome:committed\|returned, commit:sha?, why:text?, checks:list |
-| `gov-diff-reviewer` | closing-review | none | field.input.diff, field.input.spec? | verify, gate, class, docs, left-shift, security, risk, portable | true | outcome:findings\|clean, findings:list |
 | `gov-orienter` | orient | none | field.input.question, field.input.prompt? | small, ids, memory, tokens, tools | true | outcome:oriented\|placed, card:text?, disposition:text?, reason:text?, evidence:text?, observations:text?, scenarios:text?, facts:text? |
+| `gov-planner` | plan | records | field.input.question, field.brief.goal?, field.brief.non-goals?, field.card.route? | yagni, reuse, derive, verify, memory | true | outcome:select\|defer\|retire\|refuse\|drafted\|research\|owner-question\|review\|no-review\|grouped\|probe, record:path?, reason:text |
+| `gov-prompt-writer` | handoff | none | field.input.question, field.brief.goal?, field.card.route? | small, ids, tokens | true | outcome:composed\|refused, task:text?, reason:text? |
 | `gov-researcher` | research | none | field.input.question, field.brief.goal?, field.brief.non-goals? | reuse, verify, class, memory | true | outcome:picked\|none, candidates:list, pick:text?, reason:text |
 | `gov-reuse-scout` | reuse | none | field.input.question, field.task.in?, field.card.reuse? | reuse | true | outcome:seam\|none-fits, seam:path?, evidence:text |
+| `gov-reviewer` | closing-review | none | field.input.spec?, field.input.diff?, field.brief.goal?, field.brief.non-goals? | spec?, verify, gate, class, docs, left-shift, security, risk, portable | true | outcome:findings\|clean, findings:list |
 | `gov-session` | handoff | none | field.input.question, field.brief.goal?, field.task.todo?, field.card.route? | ids, memory | false | outcome:sent |
 | `gov-skeptic` | closing-review | none | field.input.diff?, field.input.spec? | verify, class, risk | true | outcome:judged, verdicts:list |
-| `gov-spec-reviewer` | spec-review | none | field.input.spec, field.brief.goal?, field.brief.non-goals? | spec?, verify, gate, class, docs, security, risk | true | outcome:findings\|clean, findings:list |
 | `gov-spec-writer` | spec-write | spec | field.brief.prompt, field.brief.goal, field.brief.items, field.brief.acceptance, field.brief.gates, field.brief.non-goals, field.input.spec?, field.task.reuse?, field.card.route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | outcome:done, authored:list, alreadyPresent:list, refused:list, summary:text |
 | `gov-synthesizer` | closing-review | review | field.input.diff?, field.input.spec? | left-shift, risk, signal | true | outcome:reported, report:path, items:list |
 | `gov-tester` | gate-bar | none | field.input.spec, field.input.diff?, field.input.question? | verify, spec, gate, class, risk | true | outcome:code-miss\|spec-wrong\|answered, evidence:text, answer:text? |

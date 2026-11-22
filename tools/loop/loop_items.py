@@ -21,7 +21,10 @@ its `[[item]]` table: `check_program`, `check_witness_classes` and `check_item_d
 and each record input of a composed item joined to an item of its needs closure that returns that kind at
 that version. The stage kind is composed after the item kind answers, through the same verb, and
 `check_program` admits the items of each composed stage; a stage composition answering unarmed admits none
-(TOOL-dDeclaredLoop-25). Last, `upstream.py`'s `check_upstream_rows` holds each composed row's `upstream`
+(TOOL-dDeclaredLoop-25). `check_item_roles`, the P28 matrix arm (TOOL-dBoundRoles-1 S7), refuses every
+composed item, gov's or the repository's, whose `role:<slot>` actor an expansion row of the playbook kit's
+`layers.toml` registers, whose role's `layer` is no core row, or whose role acts as `cycle`; it prints
+`loop: item roles · <n> role item(s) graded`, or `unarmed` with no register or no role item. Last, `upstream.py`'s `check_upstream_rows` holds each composed row's `upstream`
 field (TOOL-dDeclaredLoop-29). It prints `loop: items composed · <n> row(s) · <m> repository`, one `loop: patch <row> on
 <tag> · <field> <op> · <class>` line per classified patch operation, one `loop: record-version <kind> · <n>
 · <hash>` line per version row, `loop: record inputs · <n> joined`, `loop: upstream edges · <n> record · <m>
@@ -112,6 +115,9 @@ PLANTS = {
     "exit-unfixed": "the schema holding no [[fixed-row]] for item.build.exit",
     "schema-absent": "the schema file removed",
     "definition-uncommitted": "the definition's removal committed and the definition staged again, as a first install leaves it",
+    "role-layer": "gov items acting as role:gov-deployer and role:gov-prompt-writer, and the repository item "
+                  "item.build.adopter.ship acting as role:gov-deployer",
+    "role-core": "the same three items, each acting as role:gov-builder",
 }
 #: Each selftest case: the case, its owed exit, and the opening and needle of the line it owes.
 CASES = (("check", 0, "loop: items composed", "row(s)"),
@@ -135,7 +141,9 @@ CASES = (("check", 0, "loop: items composed", "row(s)"),
          ("amended-cycle", 1, "loop: refused", "cycle"),
          ("exit-unfixed", 1, "loop: refused", "item.build.exit"),
          ("schema-absent", 2, "loop: fixture · compose", "unarmed"),
-         ("definition-uncommitted", 2, "loop: fixture · render after the commit", "gov:item"))
+         ("definition-uncommitted", 2, "loop: fixture · render after the commit", "gov:item"),
+         ("role-layer", 1, "loop: refused", "layer.distribution"),
+         ("role-core", 0, "loop: item roles", "role item(s) graded"))
 #: The render probe a plant runs in its scratch: the item rows `read_kind_rows` composes, or the `gov:item`
 #: lines of `render_delta_report`, argv[1] the scratch's playbook kit.
 RENDER_PROBE = """import pathlib, sys
@@ -280,12 +288,60 @@ def check_record_versions(data, rows):
     return lines, refusals, versions
 
 
-def check_item_composition(data, where, rows, fixed, layers, roles, versions, stages=()):
+def check_item_roles(items, roles, layers):
+    """The refusals of the P28 matrix arm (TOOL-dBoundRoles-1 S7): every item of the composition `items`
+    whose actor is `role:<slot>`, gov's rows and the repository's alike, is refused where an expansion row
+    of `layers`, the register's `[[layer]]` rows, holds the slot in its `roles`; where the catalogue
+    `roles` holds the slot at a `layer` that is no core row; and where it holds the slot acting as
+    `cycle`. A slot neither the register nor the catalogue knows is no refusal: the declaration check
+    prints it `pending`. `roles` None, the roles kit unresolved, grades the register half alone."""
+    kinds = {r.get("tag"): r.get("kind") for r in layers}
+    registered = {}
+    for r in layers:
+        if r.get("kind") == "expansion" and isinstance(r.get("roles"), list):
+            for slot in r["roles"]:
+                registered.setdefault(slot, []).append(r.get("tag"))
+    refusals = []
+    for row in items:
+        actor = row.get("actor")
+        if not (isinstance(actor, str) and actor.startswith("role:")):
+            continue
+        slot, tag = actor[len("role:"):], row.get("tag")
+        if slot in registered:
+            refusals.append("item %s names role.%s, which %s %s as an expansion role"
+                            % (tag, slot, " and ".join(registered[slot]),
+                               "registers" if len(registered[slot]) == 1 else "register"))
+        keys = (roles or {}).get(slot, {}).get("keys", {})
+        layer = keys.get("layer")
+        if slot in (roles or {}) and kinds.get(layer) != "core":
+            refusals.append("item %s names role.%s, whose layer %s is not core" % (tag, slot, layer or "(none)"))
+        if keys.get("acts-as") == "cycle":
+            refusals.append("item %s names role.%s, a cycle role, which acts in no item" % (tag, slot))
+    return refusals
+
+
+def read_layer_rows(kit_dir):
+    """The `[[layer]]` rows of the playbook kit's `layers.toml`, with their `kind` and `roles`, from the
+    file `read_layer_tags` resolves: LookupError where it does not resolve, LoopError where it does not read."""
+    path = resolve_kit_dir("playbook", "layers.toml", kit_dir) / "layers.toml"
+    try:
+        with open(path, "rb") as fh:
+            rows = tomllib.load(fh).get("layer", [])
+    except OSError as e:
+        raise LoopError(path.as_posix(), "cannot be read: %s" % e.strerror)
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        raise LoopError(path.as_posix(), "not valid TOML: %s" % e)
+    return [r for r in rows if isinstance(r, dict)] if isinstance(rows, list) else []
+
+
+def check_item_composition(data, where, rows, fixed, layers, roles, versions, stages=(), layer_rows=None):
     """`(lines, refusals)` of the composed `rows` held as `data`'s `[[item]]` table: `check_program`, which
     admits the items of the composed repository `stages`, `check_witness_classes` and
     `check_item_declarations`; `fixed`, the schema's `[[fixed-row]]` tags, joined
     both ways with each step's exit and the floor item; then each record input joined to an item of its
-    needs closure returning that kind at that version, `versions` the pinned ones and 1 for any other."""
+    needs closure returning that kind at that version, `versions` the pinned ones and 1 for any other.
+    With `layer_rows`, the register's rows, `check_item_roles` grades every row's role actor
+    (TOOL-dBoundRoles-1 S7)."""
     held = dict(data, item=rows)
     refusals = []
     try:
@@ -294,6 +350,8 @@ def check_item_composition(data, where, rows, fixed, layers, roles, versions, st
     except LoopError as e:
         refusals.append(str(e))
     refusals += check_item_declarations(rows, roles[0], roles[1])[1]
+    if layer_rows is not None:
+        refusals += check_item_roles(rows, roles[0], layer_rows)
     schema = (pathlib.Path(derive_definition_rel()).parent / SCHEMA).as_posix()
     declared = {r.get("tag"): r for r in rows}
     for step in data.get("step", []):
@@ -372,8 +430,19 @@ def run_check():
     except (OSError, tomllib.TOMLDecodeError, LookupError, ImportError) as e:
         print("%s: items unarmed · %s" % (SAY, e))
         return 2
+    try:
+        layer_rows = read_layer_rows(KIT)
+    except LookupError:
+        layer_rows = None
+    except LoopError as e:
+        print("%s: refused · %s" % (SAY, e))
+        return 1
+    acting = sum(1 for r in rows if isinstance(r.get("actor"), str) and r["actor"].startswith("role:"))
     join_lines, more = check_item_composition(data, where, rows, fixed, layers, read_role_defaults(KIT), versions,
-                                              stages)
+                                              stages, layer_rows)
+    join_lines.append("%s: item roles · %s" % (SAY, "unarmed · no layer register resolves" if layer_rows is None
+                                               else "unarmed · no item names a role" if not acting
+                                               else "%d role item(s) graded" % acting))
     from upstream import check_upstream_rows   # it imports this module, so here and not at the top
     upstream_lines, upstream_refusals = check_upstream_rows(rows, root)
     for line in version_lines + join_lines + upstream_lines:
@@ -575,6 +644,14 @@ def derive_repo_item(name, needs=(), inputs=("layer.flow:the fixture's input",))
             "routes": {"done": "item.test.exit"}}
 
 
+def derive_role_item(tag, actor):
+    """An item of the build step acting as the role `actor`, carrying no `inputs`, `allowance` or `returns` of
+    its own, so its role's apply (TOOL-dBoundRoles-1 §4 "The item arm")."""
+    return {"tag": tag, "step": "step.build", "actor": actor, "needs": [], "outcomes": ["done"],
+            "witness": {"class": "history", "by": "the fixture's record"}, "owner": "dDeclaredLoop",
+            "routes": {"done": "item.build.exit"}}
+
+
 def write_fixture_plant(top, case, pins, bad):
     """Write `case`'s plant in the scratch `top` and commit it, `pins` gov's item pins at the base; a step
     the plant owes beside `check` and does not answer as owed appends to `bad`."""
@@ -646,6 +723,17 @@ def write_fixture_plant(top, case, pins, bad):
         (top / schema).write_text(body.replace(block, ""), encoding="utf-8", newline="")
     elif case == "schema-absent":
         (top / schema).unlink()
+    elif case in ("role-layer", "role-core"):
+        # TOOL-dBoundRoles-1 AC6: two gov items in the scratch definition and one repository item in its overlay.
+        actors = (("role:gov-deployer", "role:gov-prompt-writer", "role:gov-deployer") if case == "role-layer"
+                  else ("role:gov-builder",) * 3)
+        planted = [derive_role_item("item.build.fx-deploy", actors[0]),
+                   derive_role_item("item.build.fx-prompt", actors[1])]
+        body = (top / defn).read_text(encoding="utf-8")
+        (top / defn).write_text(body.rstrip("\n") + "\n\n" + "\n".join(render_item_row(r) for r in planted),
+                                encoding="utf-8", newline="")
+        write_fixture_files(top, {OVERLAY: render_item_row(derive_role_item("item.build.%s.ship" % ADOPTER,
+                                                                            actors[2]))})
     elif case == "factory":
         rc, line = run_factory(top)
         print("%s: fixture · new · exit %d · %s" % (SAY, rc, line))

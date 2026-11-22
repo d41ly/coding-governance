@@ -4,6 +4,8 @@ description: Tries to refute each finding it is handed.
 tools: Read, Grep, Glob, Bash
 model: inherit
 workflow: closing-review
+layer: layer.roles
+acts-as: item
 reads: field.input.diff?, field.input.spec?
 writes: none
 rules: verify, class, risk

@@ -4,6 +4,8 @@ description: Finds the seam a new behaviour should extend.
 tools: Read, Grep, Glob, Bash
 model: inherit
 workflow: reuse
+layer: layer.roles
+acts-as: item
 reads: field.input.question, field.task.in?, field.card.reuse?
 writes: none
 rules: reuse

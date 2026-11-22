@@ -109,7 +109,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # merged at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c: 61 shared, +6 this branch's, +8 main's = 75.
 # +4 for arm 26 (TOOL-dBoundRoles-14).
 # +6 for arm 27 (TOOL-dBoundRoles-2).
-FLOOR_ASSERTIONS=85
+# +3 for arm 28 (TOOL-dBoundRoles-1).
+FLOOR_ASSERTIONS=88
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -117,17 +118,23 @@ check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL 
 # home `loop`, where the library's resolver probes. The source is the loop kit beside this one.
 LOOP_SRC="$HERE/../loop"
 [ -f "$LOOP_SRC/loop_lib.py" ] && [ -f "$LOOP_SRC/loop.toml" ] || { echo "adopt-roles.test: no loop kit beside this one at $LOOP_SRC, so no fixture can place its workflows"; exit 2; }
-FX=""; FXK="$KREL"; FXL=""
+LAYERS_SRC="$HERE/../playbook/layers.toml"
+[ -f "$LAYERS_SRC" ] || { echo "adopt-roles.test: no layer register beside this kit at $LAYERS_SRC, so no fixture can join a role's layer"; exit 2; }
+FX=""; FXK="$KREL"; FXL=""; FXP=""
 build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at the kit path, $KREL
   # unless given, with $ADOPTER as its adopter, and the loop kit beside it at $FXL, scaffolded; rc of
   # the scaffold. The fixture directory is $TMP_ROOT/fx<n> unless given, and run_adopter reads the kit
   # path the last call used.
   FXK=${1:-$KREL}; FX=${2:-$TMP_ROOT/fx$n}
   FXL=loop; [[ $FXK == */* ]] && FXL=${FXK%/*}/loop
-  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$FXL" "$FX/$_chd" || return 2
+  # TOOL-dBoundRoles-1 §8 F11: the layer register R2 joins each role's `layer` to, at the home `playbook`
+  # beside the roles and loop kits, where the library's resolver probes.
+  FXP=playbook; [[ $FXK == */* ]] && FXP=${FXK%/*}/playbook
+  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$FXL" "$FX/$FXP" "$FX/$_chd" || return 2
   git init -q "$FX" || return 2
   cp -R "$HERE"/. "$FX/$FXK"/ && cp "$ADOPTER" "$FX/$FXK/adopt-roles.sh" || return 2
   cp "$LOOP_SRC/loop_lib.py" "$LOOP_SRC/loop.toml" "$FX/$FXL"/ || return 2
+  cp "$LAYERS_SRC" "$FX/$FXP"/ || return 2
   # TOOL-dBoundRoles-2 §4 Migration: each script a shipped role's `never` entry names, copied from this
   # repository's tool root to the same path under the fixture's, so the fixture holds the enforcers a
   # default install holds and R13 grades it as it grades one. The list is read from the role files
@@ -1279,6 +1286,46 @@ check_arm "arm 27 a return template with no outcome is one R2 line" \
 check_arm "arm 27 the never row cut from the schema makes every role's never an R2 unknown key" \
    "$([[ $A27 == *'schema 1'* ]] && echo 1 || echo 0)"
 [ "$A27" = $'clean 1\nbare 1\nghost 1\nbody 1\noutcome 1\nschema 1' ] || printf '    %s\n' "${A27//$'\n'/$'\n'    }"
+
+# ---- arm 28 (TOOL-dBoundRoles-1 AC1): R2 joins each role's `layer` to a row of the layer register the fixture
+# ---- holds at the home `playbook`, and grades `acts-as` against its two values. gov-builder planted at
+# ---- `layer: layer.nowhere` and gov-skeptic at `acts-as: helper` exit 1 with exactly two R2 lines, one naming
+# ---- each; restored, no R2 line. The failing case, observed at the close and not by the pass that
+# ---- wrote this: `layer` graded by its shape alone, so a tag naming no row passes and one R2 line prints.
+build_fixture; _rc28=$?
+A28=$("$PY" -B -c 'import pathlib, re, subprocess, sys
+fx, kit = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve()
+def grade():
+    p = subprocess.run([sys.executable, "-B", str(kit / "check_roles.py"), "--root", str(fx)], cwd=str(kit),
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return p.returncode, [ln for ln in p.stdout.splitlines() if ": R2 — " in ln]
+paths = {kit / "agents" / "gov-builder.agent.md": ("layer", "layer.nowhere"),
+         kit / "agents" / "gov-skeptic.agent.md": ("acts-as", "helper")}
+before = {p: p.read_bytes() for p in paths}
+rc, got = grade()
+print("clean %d" % int(not got))
+try:
+    for p, (key, value) in paths.items():
+        text = before[p].decode("utf-8")
+        p.write_bytes(re.sub(r"(?m)^%s: .*?(\r?)$" % re.escape(key), lambda m: "%s: %s%s" % (key, value, m.group(1)),
+                             text, count=1).encode("utf-8"))
+    rc, got = grade()
+finally:
+    for p, b in before.items():
+        p.write_bytes(b)
+print("planted %d" % int(rc == 1 and len(got) == 2
+                         and any("gov-builder" in g and "layer.nowhere" in g for g in got)
+                         and any("gov-skeptic" in g and "helper" in g for g in got)))
+rc, got = grade()
+print("restored %d" % int(not got))
+' "$FX" "$FX/$KREL" 2>&1)
+A28=${A28//$'\r'/}
+check_arm "arm 28 the fixture, holding the layer register at the home playbook, grades no R2 line" \
+   "$([ "$_rc28" = 0 ] && [[ $A28 == *'clean 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 28 a layer naming no row and an acts-as outside item and cycle are two R2 lines, one naming each" \
+   "$([[ $A28 == *'planted 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 28 restored, the fixture grades no R2 line again" "$([[ $A28 == *'restored 1'* ]] && echo 1 || echo 0)"
+[ "$A28" = $'clean 1\nplanted 1\nrestored 1' ] || printf '    %s\n' "${A28//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

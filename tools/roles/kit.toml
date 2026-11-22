@@ -36,10 +36,11 @@ role = "engine"
 # for a role live, and `update` never rewrites a seed. EACH IS NAMED, because
 # a LIST include claims literal paths only (the runlog descriptor records the measurement).
 [[files]]
-include = ["house/gov-builder.md", "house/gov-diff-reviewer.md", "house/gov-orienter.md",
-           "house/gov-researcher.md", "house/gov-reuse-scout.md", "house/gov-session.md",
-           "house/gov-skeptic.md", "house/gov-spec-reviewer.md", "house/gov-spec-writer.md",
-           "house/gov-synthesizer.md", "house/gov-tester.md", "house/policy.toml"]
+include = ["house/gov-architect.md", "house/gov-builder.md", "house/gov-orienter.md",
+           "house/gov-planner.md", "house/gov-prompt-writer.md", "house/gov-researcher.md",
+           "house/gov-reuse-scout.md", "house/gov-reviewer.md", "house/gov-session.md",
+           "house/gov-skeptic.md", "house/gov-spec-writer.md", "house/gov-synthesizer.md",
+           "house/gov-tester.md", "house/policy.toml"]
 role = "seed"
 
 # THE ADOPTER'S SELF-TEST IS WITHHELD, by claiming the destination (TOOL-aQuenchedHarness-3): its

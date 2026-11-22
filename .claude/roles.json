@@ -2,13 +2,15 @@
   "effort": {
     "default": {
       "roles": {
+        "gov-architect": "medium",
         "gov-builder": "high",
-        "gov-diff-reviewer": "medium",
         "gov-orienter": "high",
+        "gov-planner": "medium",
+        "gov-prompt-writer": "medium",
         "gov-researcher": "medium",
         "gov-reuse-scout": "medium",
+        "gov-reviewer": "medium",
         "gov-skeptic": "medium",
-        "gov-spec-reviewer": "medium",
         "gov-spec-writer": "high",
         "gov-synthesizer": "high",
         "gov-tester": "medium"
@@ -55,13 +57,15 @@
           "fable"
         ],
         "roles": {
+          "gov-architect": "medium",
           "gov-builder": "medium",
-          "gov-diff-reviewer": "medium",
           "gov-orienter": "medium",
+          "gov-planner": "medium",
+          "gov-prompt-writer": "medium",
           "gov-researcher": "medium",
           "gov-reuse-scout": "medium",
+          "gov-reviewer": "medium",
           "gov-skeptic": "medium",
-          "gov-spec-reviewer": "medium",
           "gov-spec-writer": "medium",
           "gov-synthesizer": "medium",
           "gov-tester": "medium"
@@ -124,75 +128,113 @@
     "tools/workflows/unattended-unit.js"
   ],
   "roles": {
+    "gov-architect": {
+      "acts-as": "item",
+      "agent": true,
+      "gates": [],
+      "layer": "layer.roles",
+      "workflow": "design",
+      "writes": "records"
+    },
     "gov-builder": {
+      "acts-as": "item",
       "agent": true,
       "gates": [
         "lexicon naming predicates"
       ],
+      "layer": "layer.roles",
       "workflow": "build",
       "writes": "product"
     },
-    "gov-diff-reviewer": {
-      "agent": true,
-      "gates": [],
-      "workflow": "closing-review",
-      "writes": "none"
-    },
     "gov-orienter": {
+      "acts-as": "item",
       "agent": true,
       "gates": [],
+      "layer": "layer.roles",
       "workflow": "orient",
       "writes": "none"
     },
-    "gov-researcher": {
+    "gov-planner": {
+      "acts-as": "item",
       "agent": true,
       "gates": [],
+      "layer": "layer.roles",
+      "workflow": "plan",
+      "writes": "records"
+    },
+    "gov-prompt-writer": {
+      "acts-as": "cycle",
+      "agent": true,
+      "gates": [],
+      "layer": "layer.roles",
+      "workflow": "handoff",
+      "writes": "none"
+    },
+    "gov-researcher": {
+      "acts-as": "item",
+      "agent": true,
+      "gates": [],
+      "layer": "layer.roles",
       "workflow": "research",
       "writes": "none"
     },
     "gov-reuse-scout": {
+      "acts-as": "item",
       "agent": true,
       "gates": [],
+      "layer": "layer.roles",
       "workflow": "reuse",
       "writes": "none"
     },
+    "gov-reviewer": {
+      "acts-as": "item",
+      "agent": true,
+      "gates": [],
+      "layer": "layer.roles",
+      "workflow": "closing-review",
+      "writes": "none"
+    },
     "gov-session": {
+      "acts-as": "cycle",
       "agent": false,
       "gates": [],
+      "layer": "layer.runtime",
       "workflow": "handoff",
       "writes": "none"
     },
     "gov-skeptic": {
+      "acts-as": "item",
       "agent": true,
       "gates": [],
+      "layer": "layer.roles",
       "workflow": "closing-review",
       "writes": "none"
     },
-    "gov-spec-reviewer": {
-      "agent": true,
-      "gates": [],
-      "workflow": "spec-review",
-      "writes": "none"
-    },
     "gov-spec-writer": {
+      "acts-as": "item",
       "agent": true,
       "gates": [
         "memory hygiene",
         "lexicon naming predicates",
         "spec tokens (a spec's own names resolve)"
       ],
+      "layer": "layer.roles",
       "workflow": "spec-write",
       "writes": "spec"
     },
     "gov-synthesizer": {
+      "acts-as": "item",
       "agent": true,
       "gates": [],
+      "layer": "layer.roles",
       "workflow": "closing-review",
       "writes": "review"
     },
     "gov-tester": {
+      "acts-as": "item",
       "agent": true,
       "gates": [],
+      "layer": "layer.roles",
       "workflow": "gate-bar",
       "writes": "none"
     }

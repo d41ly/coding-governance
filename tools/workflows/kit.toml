@@ -242,7 +242,7 @@ when = "a build whose units lack a spec or hold a thin one"
 
 [[drive]]
 stage = "spec-review"
-role = "gov-spec-reviewer"
+role = "gov-reviewer"
 command = "Workflow <prefix>/workflows/tier2-review.js"
 when = "a spec audit the build or its project declares"
 
@@ -254,7 +254,7 @@ when = "a finding handed on to refute"
 
 [[drive]]
 stage = "closing-review"
-role = "gov-diff-reviewer"
+role = "gov-reviewer"
 command = "Workflow <prefix>/workflows/tier2-review.js"
 when = "the last unit terminal, over the cumulative diff"
 

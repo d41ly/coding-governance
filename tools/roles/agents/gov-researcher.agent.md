@@ -4,6 +4,8 @@ description: Finds candidates and the test each could lose.
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 model: inherit
 workflow: research
+layer: layer.roles
+acts-as: item
 reads: field.input.question, field.brief.goal?, field.brief.non-goals?
 writes: none
 rules: reuse, verify, class, memory

@@ -4,6 +4,8 @@ description: Writes each unit's spec, never code.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: inherit
 workflow: spec-write
+layer: layer.roles
+acts-as: item
 reads: field.brief.prompt, field.brief.goal, field.brief.items, field.brief.acceptance, field.brief.gates, field.brief.non-goals, field.input.spec?, field.task.reuse?, field.card.route?
 writes: spec
 rules: yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security

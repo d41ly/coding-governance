@@ -1318,7 +1318,7 @@ flags to the factory its row names:
 python <prefix>/playbook/core.py new command <verb> --kit <id> --run <path>
 python <prefix>/playbook/core.py new policy-key <name> --allowed <toml> --default <toml> --summary <text> --usage <text> --owner <build>
 python <prefix>/playbook/core.py new hook <name> --kit <id> --event <event> [--matcher <m>]
-python <prefix>/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --never <entries> --return <template> --output <text> --ceiling <bytes>
+python <prefix>/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --never <entries> --return <template> --output <text> --ceiling <bytes> --layer <layer tag> --acts-as item|cycle
 python <prefix>/playbook/core.py new workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>
 python <prefix>/playbook/core.py new scenario <name> --extends <tag|none> --admit <fact>=<value> --entry <step tag>
 ```
@@ -1345,7 +1345,7 @@ naming it.
   gate reads tracked fragments only, so the factory runs it against a throwaway copy of your index
   holding the new files, and deletes the copy afterwards. Your own index is never written: nothing is
   staged for you.
-- **A role:** `python tools/loop/factories.py role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --never <entries> --return <template> --output <text> --ceiling <bytes>` <!-- usage: script:tools/loop/factories.py#role 8825562a -->
+- **A role:** `python tools/loop/factories.py role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --never <entries> --return <template> --output <text> --ceiling <bytes> --layer <layer tag> --acts-as item|cycle` <!-- usage: script:tools/loop/factories.py#role 50224b14 -->
   writes `<slot>.agent.md` under the roles kit's `agents/`, its `never` list of `<limit> — <enforcer>`
   entries and its `return` template as the flags give them, lists the slot in its workflow's `roles`,
   adds its body ceiling to the roles checker's `BODY_CEILINGS`, and re-renders the roles README's

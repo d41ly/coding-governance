@@ -4,6 +4,8 @@ description: Merges verified findings into one report.
 tools: Read, Grep, Glob, Bash, Write
 model: inherit
 workflow: closing-review
+layer: layer.roles
+acts-as: item
 reads: field.input.diff?, field.input.spec?
 writes: review
 rules: left-shift, risk, signal

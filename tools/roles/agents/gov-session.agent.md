@@ -2,6 +2,8 @@
 name: gov-session
 description: Opens a handoff to another session.
 workflow: handoff
+layer: layer.runtime
+acts-as: cycle
 reads: field.input.question, field.brief.goal?, field.task.todo?, field.card.route?
 writes: none
 rules: ids, memory

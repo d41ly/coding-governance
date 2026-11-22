@@ -1,11 +1,11 @@
-# workflows.toml — the ten workflows a governed session runs its LLM work through: WHO drives each.
+# workflows.toml — the twelve workflows a governed session runs its LLM work through: WHO drives each.
 # Read through roles_lib.py's `load_workflows` only, and graded by check_roles.py (rules R6 to R9).
 #
 # WHERE a workflow sits is not here. Its build order and the step its work serves are the loop
 # definition's, `loop.toml` in the loop kit, read through roles_lib.py's `read_workflow_order`; R6
 # joins the two files by `name` both ways, and refuses a `stage` or a `step` key here as unknown.
 #
-#   name         one of the ten; each exactly once, and the join key to the loop definition's row
+#   name         one of the twelve; each exactly once, and the join key to the loop definition's row
 #   driver       agent | workflow | program | main-loop
 #   harness      a {prefix}-relative script path, a command, or "none"
 #   roles        the slot keys of the role files that drive it
@@ -33,8 +33,8 @@ trigger = "before a new behaviour is designed, when kickoff asks for a scout"
 name = "spec-write"
 driver = "workflow"
 harness = "{prefix}/workflows/unattended-build.js"
-roles = ["gov-spec-writer", "gov-builder", "gov-spec-reviewer", "gov-skeptic", "gov-synthesizer"]
-stages = { specWriter = "gov-spec-writer", disposal = "gov-spec-writer", builder = "gov-builder", specFinder = "gov-spec-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
+roles = ["gov-spec-writer", "gov-builder", "gov-reviewer", "gov-skeptic", "gov-synthesizer"]
+stages = { specWriter = "gov-spec-writer", disposal = "gov-spec-writer", builder = "gov-builder", specFinder = "gov-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
 enforced-by = ["scratch-guard.js role arm"]
 trigger = "once per build, after orientation, for every unit whose spec is missing or thin"
 
@@ -42,8 +42,8 @@ trigger = "once per build, after orientation, for every unit whose spec is missi
 name = "spec-review"
 driver = "workflow"
 harness = "{prefix}/workflows/tier2-review.js"
-roles = ["gov-spec-reviewer", "gov-skeptic", "gov-synthesizer"]
-stages = { specFinder = "gov-spec-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
+roles = ["gov-reviewer", "gov-skeptic", "gov-synthesizer"]
+stages = { specFinder = "gov-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
 enforced-by = ["agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys"]
 trigger = "after the spec set is written, where the build or its project declares a spec audit"
 
@@ -60,8 +60,8 @@ trigger = "once per unit, in stage order, after its spec is READY"
 name = "closing-review"
 driver = "workflow"
 harness = "{prefix}/workflows/tier2-review.js"
-roles = ["gov-diff-reviewer", "gov-skeptic", "gov-synthesizer"]
-stages = { diffFinder = "gov-diff-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
+roles = ["gov-reviewer", "gov-skeptic", "gov-synthesizer"]
+stages = { diffFinder = "gov-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
 enforced-by = ["agent-cap.js spawn guard"]
 trigger = "once per build, after the last unit is terminal, over the cumulative diff"
 
@@ -85,7 +85,7 @@ trigger = "any time a design must choose between candidates that no existing sea
 name = "handoff"
 driver = "program"
 harness = "python {prefix}/roles/handoff.py render"
-roles = ["gov-session"]
+roles = ["gov-prompt-writer", "gov-session"]
 enforced-by = "none — a session-to-session message is no tool call the spawn guard sees"
 trigger = "any time work passes to another session of this repository"
 
@@ -96,3 +96,19 @@ harness = "none"
 roles = []
 enforced-by = ["memory hygiene"]
 trigger = "any time a record, an index or the run state is updated"
+
+[[workflow]]
+name = "plan"
+driver = "agent"
+harness = "none"
+roles = ["gov-planner"]
+enforced-by = ["agent-cap.js spawn guard"]
+trigger = "any time a build's plan is drafted, judged or recorded, before its specs are written"
+
+[[workflow]]
+name = "design"
+driver = "agent"
+harness = "none"
+roles = ["gov-architect"]
+enforced-by = ["agent-cap.js spawn guard"]
+trigger = "any time a build's scope is inventoried or decomposed into units, before its specs are written"

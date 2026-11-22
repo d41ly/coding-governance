@@ -4,6 +4,8 @@ description: Judges a red the bar attributed to this build, and answers the Test
 tools: Read, Grep, Glob, Bash
 model: inherit
 workflow: gate-bar
+layer: layer.roles
+acts-as: item
 reads: field.input.spec, field.input.diff?, field.input.question?
 writes: none
 rules: verify, spec, gate, class, risk

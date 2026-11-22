@@ -114,6 +114,9 @@ ROLE_SCHEMA = "role-schema.toml"
 SCHEMA_OWNERS = ("claude", "gov")
 SCHEMA_SHAPES = ("slot", "text", "list", "class", "bool", "entries", "template")
 SCHEMA_REQUIRED = ("every", "agent", "optional")
+#: A row's key: a hyphenated word, letters and digits opening on a letter, single hyphens between them
+#: (TOOL-dBoundRoles-1 S1), so `acts-as` loads and `-x`, `x-` and `x--y` do not.
+SCHEMA_KEY_RE = r"[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*"
 
 
 def load_role_schema():
@@ -142,7 +145,7 @@ def load_role_schema():
                 raise RolesError("%s: R2 — field %d's %s %r is not one of %s"
                                  % (where, i, name, r.get(name), " ".join(allowed)))
         key = r.get("key")
-        if not isinstance(key, str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]*", key):
+        if not isinstance(key, str) or not re.fullmatch(SCHEMA_KEY_RE, key):
             raise RolesError("%s: R2 — field %d's key %r is not one word" % (where, i, key))
         if key in seen:
             raise RolesError("%s: R2 — field key '%s' is repeated" % (where, key))

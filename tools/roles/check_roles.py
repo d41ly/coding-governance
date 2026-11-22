@@ -24,7 +24,10 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       not, on any role); `name` not the file stem; `writes` outside its set; `agent` not
       true/false; `tools` or `model` absent on an agent role; a `return` template
       `parse_return_template` refuses, a required `outcome` of a closed set among what it owes
-      (TOOL-dBoundRoles-2)
+      (TOOL-dBoundRoles-2); a `layer` that is no `layer.<seg>` tag or names no `[[layer]]` row of the
+      playbook kit's `layers.toml`, joined only where that register resolves and a `roles: note:`
+      otherwise; an `acts-as` other than `item` or `cycle`. The summary counts the roles per layer
+      and per `acts-as` value (TOOL-dBoundRoles-1)
   R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` or `upstream:rows` without `?`,
       each entry read through `parse_read_key`, so `task:title` and its tag `field.task.title` are one key
   R4  a `rules` entry that is not a lowercase tag optionally ending in `?`, a tag named twice, or a
@@ -37,7 +40,7 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       states the job (TOOL-dBoundRoles-2 S3); a slot with no ceiling row. The ceiling half obeys
       the policy kit's size switch for the family cap `role-body` (TOOL-dGroundRules-9): under `warn` it prints a `BUDGET WARN` line and
       is no defect; with no policy kit, or a refusing reader, it is a defect as before
-  R6  a workflow entry with an unknown, missing or repeated key or name, a missing name of the ten,
+  R6  a workflow entry with an unknown, missing or repeated key or name, a missing name of the twelve,
       an unknown `driver`, or a `trigger` carrying a newline; a workflow no `[[workflow]]` row of
       the loop definition places, a loop row naming no workflow here, or a loop definition that
       does not read, one line (TOOL-dDeclaredLoop-1): a workflow's order and step are the loop
@@ -118,15 +121,19 @@ except Exception as _e:  # the library derives its key set from role-schema.toml
 #: Bytes of each slot's BASE body, CR stripped. A new role is priced when it is added.
 BODY_CEILINGS = {
     "gov-orienter": 3072, "gov-researcher": 3072, "gov-reuse-scout": 1536,
-    "gov-spec-writer": 4096, "gov-spec-reviewer": 4096, "gov-builder": 4096,
-    "gov-diff-reviewer": 4096, "gov-skeptic": 3072, "gov-synthesizer": 3072, "gov-session": 2048,
-    "gov-tester": 3072,
+    "gov-spec-writer": 4096, "gov-builder": 4096,
+    "gov-reviewer": 4096, "gov-skeptic": 3072, "gov-synthesizer": 3072, "gov-session": 2048,
+    "gov-tester": 3072, "gov-prompt-writer": 3072, "gov-planner": 3072, "gov-architect": 3072,
 }
 WORKFLOW_NAMES = ("orient", "research", "reuse", "handoff", "spec-write", "spec-review", "build",
-                  "closing-review", "gate-bar", "bookkeeping")
+                  "closing-review", "gate-bar", "bookkeeping", "plan", "design")
 WORKFLOW_KEYS = ("name", "driver", "harness", "roles", "stages", "enforced-by", "trigger")
 DRIVERS = ("agent", "workflow", "program", "main-loop")
 WRITES = ("none", "spec", "product", "review", "records")
+#: The two `acts-as` values (TOOL-dBoundRoles-1 S1): a role acting in an item, or one serving the cycle.
+ACTS_AS = ("item", "cycle")
+#: A `layer` value's shape, the playbook register's tag grammar; R2 joins it to a row of that register.
+LAYER_TAG_RE = re.compile(r"^layer(\.[a-z][a-z0-9-]*)+$")
 #: The keys every role carries and those only an agent role must, and the required keys that may be
 #: empty: derived from the role schema's rows, never typed (TOOL-dBoundRoles-2 S1).
 _SCHEMA = lib.load_role_schema()
@@ -188,6 +195,21 @@ def check_catalogue_region(text, region):
     return None
 
 
+def read_layer_tags(kit_dir):
+    """`(tags, "")`, the `tag` of each `[[layer]]` row of the playbook kit's `layers.toml`, the kit found from
+    `kit_dir` through `resolve_kit_dir`; `(None, why)` where it does not resolve or does not read, so R2's
+    layer join is a note and never a pass (TOOL-dBoundRoles-1 S1)."""
+    try:
+        path = lib.resolve_kit_dir("playbook", "layers.toml", kit_dir) / "layers.toml"
+        with open(path, "rb") as fh:
+            rows = tomllib.load(fh).get("layer") or []
+    except LookupError as e:
+        return None, str(e)
+    except (OSError, tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        return None, "the layer register does not read: %s" % e
+    return {r.get("tag") for r in rows if isinstance(r, dict) and isinstance(r.get("tag"), str)}, ""
+
+
 def check_roles(root, kit_dir, write=False):
     """`(defects, notes, summary)`; raises RolesError when the check is unarmed (R0)."""
     root, kit_dir = pathlib.Path(root), pathlib.Path(kit_dir)
@@ -210,6 +232,11 @@ def check_roles(root, kit_dir, write=False):
 
     roles, n_reads, n_rules, n_outputs, n_mandatory, cited = {}, 0, 0, 0, 0, set()
     n_never, n_unenforced = 0, 0
+    layer_tags, layer_why = read_layer_tags(kit_dir)
+    if layer_tags is None:
+        notes.append("roles: note: no layer register answered, so each role's layer is not joined to a row: %s"
+                     % layer_why)
+    by_layer, by_acts = {}, {}
     body_mode = None  # the `role-body` cap's (mode, rule), asked at the first body over its ceiling
     for p in sorted((kit_dir / "agents").glob("*.agent.md")):
         slot = p.name[:-len(".agent.md")]
@@ -232,6 +259,17 @@ def check_roles(root, kit_dir, write=False):
             add_defect(p, "R2", "name '%s' is not the file stem '%s'" % (keys["name"], slot))
         if keys.get("writes") and keys["writes"] not in WRITES:
             add_defect(p, "R2", "writes '%s' is not one of %s" % (keys["writes"], " ".join(WRITES)))
+        layer, acts = keys.get("layer"), keys.get("acts-as")
+        if layer:
+            by_layer[layer] = by_layer.get(layer, 0) + 1
+            if not LAYER_TAG_RE.match(layer):
+                add_defect(p, "R2", "layer '%s' is not a layer.<seg> tag" % layer)
+            elif layer_tags is not None and layer not in layer_tags:
+                add_defect(p, "R2", "layer '%s' names no [[layer]] row of the layer register" % layer)
+        if acts:
+            by_acts[acts] = by_acts.get(acts, 0) + 1
+            if acts not in ACTS_AS:
+                add_defect(p, "R2", "acts-as '%s' is not one of %s" % (acts, " ".join(ACTS_AS)))
         if keys.get("agent", "true") not in ("true", "false"):
             add_defect(p, "R2", "agent '%s' is not true or false" % keys["agent"])
         if keys.get("agent", "true") == "true":
@@ -480,12 +518,14 @@ def check_roles(root, kit_dir, write=False):
 
     summary = ("roles: graded %d roles, %d overlays, %d workflows, %d reads keys, %d mandatory roles, "
                "%d writer outputs, %d never entries (%d unenforced), %d rule tags and %d protocol file "
-               "names against %s, a %s charter; "
+               "names against %s, a %s charter; roles by layer %s, by acts-as %s; "
                "overlay bytes %s; %d stand-in waiver(s), %d stand-in declaration(s); %d defect(s)" % (
                    len(files), len(overlays), len(workflows), n_reads, n_mandatory, n_outputs, n_never,
                    n_unenforced, n_rules,
                    len(protocol_files), doc,
                    "tagged" if charter["shape"] == "tagged" else "pre-tag",
+                   ", ".join("%s=%d" % kv for kv in sorted(by_layer.items())) or "none",
+                   ", ".join("%s=%d" % kv for kv in sorted(by_acts.items())) or "none",
                    ", ".join("%s=%d" % kv for kv in overlays.items()) or "none",
                    len(waivers), len(declared), len(defects)))
     return defects, notes, summary

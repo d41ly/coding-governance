@@ -4,6 +4,8 @@ description: Builds one unit from its spec and commits it.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: inherit
 workflow: build
+layer: layer.roles
+acts-as: item
 reads: field.input.spec, field.card.route?, field.brief.non-goals?
 writes: product
 rules: yagni, reuse, core, derive, verify, gate, docs, security, portable, tools

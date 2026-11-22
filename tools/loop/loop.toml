@@ -261,6 +261,16 @@ name = "bookkeeping"
 order = 0
 step = "none"
 
+[[workflow]]
+name = "plan"
+order = 0
+step = "step.plan"
+
+[[workflow]]
+name = "design"
+order = 0
+step = "step.design"
+
 [dispositions]
 set = ["continue", "amend", "new", "patch", "repeat", "unit", "breakpoint", "ask", "none"]
 

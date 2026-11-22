@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles
 
-**Status:** INPROGRESS · rev-8 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
+**Status:** CLOSED · rev-8 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0166@83615023 whole
 
@@ -20,9 +20,11 @@
 | [2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | — |
 | [2026-10-26-build-TOOL-dBoundRoles-1-reground-returns.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-reground-returns.md) | research | — |
 | [2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md) | research | TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
+| [2026-11-22-build-TOOL-dBoundRoles-1-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-22-build-TOOL-dBoundRoles-1-1-builder-return.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dBoundRoles-1-2-builder-return.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-2-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dBoundRoles-1-chain-rounds.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-chain-rounds.md) | journal | — |
+| [2026-11-22-build-TOOL-dBoundRoles-1-deviation-13.md](../build/2026-11-22-build-TOOL-dBoundRoles-1-deviation-13.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-3-reuse-scout.md) | journal | — |

@@ -42,6 +42,20 @@ owner = "gov"
 shape = "text"
 required = "every"
 
+# `layer` and `acts-as` (TOOL-dBoundRoles-1 S1): the `layer.<seg>` tag of the playbook kit's register row
+# the role belongs to, and `item` or `cycle`. No shape grades a value, so R2 grades each by its key.
+[[field]]
+key = "layer"
+owner = "gov"
+shape = "text"
+required = "every"
+
+[[field]]
+key = "acts-as"
+owner = "gov"
+shape = "text"
+required = "every"
+
 [[field]]
 key = "reads"
 owner = "gov"

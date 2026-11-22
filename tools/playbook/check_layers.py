@@ -25,6 +25,14 @@ name resolving to a `.py` file at a non-core home and not in the importer's own 
 name its file as `part`; every other edge is red. Exit 0 green, 1 red, 2 an unreadable register or
 descriptor.
 
+THE ROLE REGISTRATION (TOOL-dBoundRoles-1 S5). An expansion row registers the roles and lenses it owns in
+`roles` and `lenses` lists, each entry one tag segment. `check_layer_roles` adds its reds to the contract's:
+either list on a core row, an entry outside that shape, a role of the role index `.claude/roles.json` at the
+checked root whose slot an expansion registers and whose `layer` is none of the registering rows, and a role
+no expansion registers whose `layer` names a non-core row. The index is read as JSON data, so this kit imports
+no roles module; with no index the role half prints one `unarmed` line. An index older than its role files
+is the roles kit's render leg's red, not this check's.
+
 A spelled path `<home>/<rest>` is an edge only when <rest> names a file the tree tracks under that
 home, or a directory or glob matching one, that no core kit owns; an empty <rest>, or one opening on
 a variable, names the home itself and stays an edge (PLAY-dOrderedCharter-61). A bare home word in a
@@ -114,6 +122,10 @@ _arms_spec.loader.exec_module(check_arms)  # the one shell lexer: scan_shell_lin
 KINDS = ("import", "dynamic", "probe", "copy", "shell", "requires-if")
 LAYER_KINDS = ("core", "optional", "expansion")
 TAG = re.compile(r"^layer(\.[a-z][a-z0-9-]*)+$")
+#: One tag segment: a registered role's slot or a lens's name (TOOL-dBoundRoles-1 S5).
+SEG = re.compile(r"^[a-z][a-z0-9-]*$")
+#: The role index the roles kit renders at the checked root, read as JSON data: this kit imports no roles module.
+ROLE_INDEX = ".claude/roles.json"
 COPY_CALLS = ("copy", "copy2", "copyfile", "copytree")
 NOT_READ = ("layers: not read: a path computed at run time, JavaScript, a file no descriptor claims, "
             "a path that names no file the kit ships, and a bare kit name inside a string or a here-document")
@@ -399,6 +411,50 @@ def check_point(point, who, declared):
     return []
 
 
+def check_layer_roles(root, rows):
+    """-> (reds, notes) of the register's role registration (TOOL-dBoundRoles-1 S5): a `roles` or
+    `lenses` list on a core row; an entry of either outside the `seg` shape; and, read as JSON data from
+    the role index `.claude/roles.json` at root, each role whose slot an expansion row registers while
+    its `layer` is none of the registering rows, and each role no expansion registers whose `layer`
+    names a non-core row. With no index, or one that does not read, the role half is one `unarmed` note."""
+    reds, notes, registered = [], [], {}
+    kinds = {r.get("tag"): r.get("kind") for r in rows}
+    for r in rows:
+        for key in ("roles", "lenses"):
+            listed = r.get(key)
+            if listed is None:
+                continue
+            if r.get("kind") == "core":
+                reds.append("row '%s': a core row carries a `%s` list; only an expansion row registers a role "
+                            "or a lens" % (r.get("tag"), key))
+            if not isinstance(listed, list):
+                reds.append("row '%s': its `%s` is not a list" % (r.get("tag"), key))
+                continue
+            for entry in listed:
+                if not isinstance(entry, str) or not SEG.match(entry):
+                    reds.append("row '%s': its `%s` entry %r is not a %s word" % (r.get("tag"), key, entry, SEG.pattern))
+                elif key == "roles" and r.get("kind") == "expansion":
+                    registered.setdefault(entry, []).append(r.get("tag"))
+    index = pathlib.Path(root) / ROLE_INDEX
+    try:
+        roles = json.loads(index.read_text(encoding="utf-8")).get("roles")
+        if not isinstance(roles, dict):
+            raise ValueError("its `roles` is not an object")
+    except (OSError, ValueError, AttributeError) as e:
+        notes.append("layers: roles unarmed · the role index %s does not read, so no role's layer is joined "
+                     "to the registration: %s" % (ROLE_INDEX, e))
+        return reds, notes
+    for slot in sorted(roles):
+        layer = roles[slot].get("layer") if isinstance(roles[slot], dict) else None
+        if slot in registered and layer not in registered[slot]:
+            reds.append("role %s: a role file at layer %r, a slot the expansion row(s) %s register; an expansion "
+                        "role has no core role file" % (slot, layer, ", ".join("'%s'" % t for t in registered[slot])))
+        elif slot not in registered and layer in kinds and kinds[layer] != "core":
+            reds.append("role %s: its layer '%s' is a %s row, and no expansion row registers it"
+                        % (slot, layer, kinds[layer]))
+    return reds, notes
+
+
 def check_layers(root, tool_root, register, listing=False):
     """-> (lines, rc) for the contract, the edges and EX-1 over the tree at root."""
     try:
@@ -409,6 +465,8 @@ def check_layers(root, tool_root, register, listing=False):
         return ["layers: UNREADABLE %s" % e], 2
     rows = [r for r in reg["layer"] if isinstance(r, dict)]
     reds = check_rows(rows)
+    role_reds, role_notes = check_layer_roles(root, rows)
+    reds += role_reds
     by_tag = {r.get("tag"): r for r in rows}
     declared = {}
     for r in rows:
@@ -441,12 +499,14 @@ def check_layers(root, tool_root, register, listing=False):
         return ["layers: UNREADABLE %s (%s)" % (f, why) for f, why in unread], 2
     if listing:
         for r in rows:
-            lines.append("layers: row %s · %s · kits: %s" % (r.get("tag"), r.get("kind"),
-                         " ".join(k["id"] for k in kits if k["layer"] == r.get("tag")) or "none"))
+            lines.append("layers: row %s · %s · kits: %s · roles: %s" % (r.get("tag"), r.get("kind"),
+                         " ".join(k["id"] for k in kits if k["layer"] == r.get("tag")) or "none",
+                         " ".join(str(s) for s in r.get("roles") or []) or "none"))
         for k in kits:
             lines.append("layers: kit %s · %s · %s" % (k["id"], k["path"], k["layer"] or "NO LAYER"))
         for f, line, kind, src, target, ok in edges:
             lines.append("layers: edge %s:%d · %s · %s -> %s · %s" % (f, line, kind, src, target, "allowed" if ok else "red"))
+    lines.extend(role_notes)
     for red in reds:
         lines.append("layers: RED %s" % red)
     for f, line, kind, src, target, ok in edges:
@@ -489,7 +549,7 @@ def write_layer_row(register, tag, kind, of, definition):
 
 PLANTS = ("import", "dynamic", "probe", "copy", "shell", "requires-if", "unslotted", "slotted",
           "ex1-pair", "no-layer", "unknown-layer", "undeclared-point", "quoted", "unshipped",
-          "flat-slotted", "flat-literal", "unparsable")
+          "flat-slotted", "flat-literal", "unparsable", "role-on-expansion", "roles-on-core")
 
 
 def build_layers_fixture(top, plant):
@@ -503,11 +563,20 @@ def build_layers_fixture(top, plant):
     ]
     if plant == "ex1-pair":
         rows.append(("layer.exp2", "expansion", None, ["point.exp.hook"], []))
+    # TOOL-dBoundRoles-1 S5: a role registered by the expansion row while the fixture's role index holds it at
+    # the core row, and a `roles` list on the core row.
+    registers = {"role-on-expansion": "layer.exp", "roles-on-core": "layer.core"}.get(plant)
     reg = "shared = [\"govkit\"]\n"  # the flat plants' entries directory
     for tag, kind, of, dec, use in rows:
-        reg += "\n[[layer]]\ntag = %s\nkind = %s\n%sdefinition = \"fixture\"\ndeclares = %s\nuses = %s\n" % (
-            json.dumps(tag), json.dumps(kind), "of = %s\n" % json.dumps(of) if of else "", json.dumps(dec), json.dumps(use))
+        reg += "\n[[layer]]\ntag = %s\nkind = %s\n%sdefinition = \"fixture\"\ndeclares = %s\nuses = %s\n%s" % (
+            json.dumps(tag), json.dumps(kind), "of = %s\n" % json.dumps(of) if of else "", json.dumps(dec), json.dumps(use),
+            "roles = [\"gov-builder\"]\n" if tag == registers else "")
     (top / "layers.toml").write_text(reg, encoding="utf-8")
+    if plant == "role-on-expansion":
+        index = top / ROLE_INDEX
+        index.parent.mkdir(parents=True, exist_ok=True)
+        index.write_text(json.dumps({"roles": {"gov-builder": {"layer": "layer.core", "acts-as": "item"}}}),
+                         encoding="utf-8")
     core_desc = 'id = "corekit"\nhome = "corekit"\nlayer = "layer.core"\n'
     if plant == "slotted":
         core_desc += 'optional = [{ part = "core.py", point = "point.core.slot", fallback = "renders not-installed" }]\n'

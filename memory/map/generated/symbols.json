@@ -7148,6 +7148,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "check_item_roles",
+      "kind": "function",
+      "file": "tools/loop/loop_items.py"
+    },
+    {
       "id": "check_item_seeds",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
@@ -7246,6 +7251,11 @@
       "id": "check_landing_verdict",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "check_layer_roles",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
     },
     {
       "id": "check_layers",
@@ -13716,6 +13726,11 @@
       "id": "derive_role_file",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "derive_role_item",
+      "kind": "function",
+      "file": "tools/loop/loop_items.py"
     },
     {
       "id": "derive_role_roster",
@@ -23573,9 +23588,19 @@
       "file": "tools/memory-tree/convert_registry.py"
     },
     {
+      "id": "read_layer_rows",
+      "kind": "function",
+      "file": "tools/loop/loop_items.py"
+    },
+    {
       "id": "read_layer_tags",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "read_layer_tags",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
     },
     {
       "id": "read_layers",

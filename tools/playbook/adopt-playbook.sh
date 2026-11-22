@@ -267,6 +267,8 @@ quoted|1|0 allowed, 1 red;
 unshipped|1|tools/corekit/core.py:9 · probe · core kit corekit depends on non-core kit mapkit
 unshipped|1|0 allowed, 1 red;
 unparsable|2|layers: UNREADABLE tools/corekit/core.py (SyntaxError
+role-on-expansion|1|layers: RED role gov-builder: a role file at layer 'layer.core', a slot the expansion row(s) 'layer.exp' register
+roles-on-core|1|layers: RED row 'layer.core': a core row carries a `roles` list
 PLANTS
 if [ "$_lf" != 0 ]; then echo "FAIL — $_lf layer-check arm(s) failed"; exit 1; fi
 echo "PASS — the layer check's plants"

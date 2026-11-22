@@ -51,11 +51,11 @@ python <prefix>/playbook/core.py new gate-leg <name> --kit <id> --argv <json> --
 ```
 
 ## `kind.role`
-<!-- usage: kind:kind.role 6c2ed5d4 -->
+<!-- usage: kind:kind.role 31b99e5f -->
 A role an agent takes in the loop: a role file of the roles kit, listed by its workflow and priced by its body ceiling.
 
 ```text
-python <prefix>/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --never <entries> --return <template> --output <text> --ceiling <bytes>
+python <prefix>/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --never <entries> --return <template> --output <text> --ceiling <bytes> --layer <layer tag> --acts-as item|cycle
 ```
 
 ## `kind.workflow`

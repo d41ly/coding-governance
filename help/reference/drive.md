@@ -68,8 +68,8 @@ a build whose units lack a spec or hold a thin one
 Workflow <prefix>/workflows/unattended-build.js
 ```
 
-## `drive.spec-review.gov-spec-reviewer`
-<!-- usage: drive:drive.spec-review.gov-spec-reviewer 0f65719a -->
+## `drive.spec-review.gov-reviewer`
+<!-- usage: drive:drive.spec-review.gov-reviewer 0f65719a -->
 a spec audit the build or its project declares
 
 ```text
@@ -100,8 +100,8 @@ before any review, for the bug classes a diff can hit
 python <prefix>/memory-tree/gotchas.py --for-diff <base>..<head>
 ```
 
-## `drive.closing-review.gov-diff-reviewer`
-<!-- usage: drive:drive.closing-review.gov-diff-reviewer 48bb388b -->
+## `drive.closing-review.gov-reviewer`
+<!-- usage: drive:drive.closing-review.gov-reviewer 48bb388b -->
 the last unit terminal, over the cumulative diff
 
 ```text

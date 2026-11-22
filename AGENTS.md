@@ -183,14 +183,16 @@
 - `gov-orienter`: Orients one session for one task, read-only. Optional, the main loop may orient itself. Output: the card, to the main loop.
 - `gov-reuse-scout`: Finds the seam a new behaviour should extend. Optional, when kickoff asks for one. Output: the seam, to its caller.
 - `gov-spec-writer`: Writes each unit's spec, never code. Mandatory for every spec written. Output: specs in `memory/builds/<slug>/spec/`.
-- `gov-spec-reviewer`: Hunts defects in a spec set, read-only. Mandatory for every spec audit owed. Output: findings, to its harness.
 - `gov-builder`: Builds one unit from its spec and commits it. Mandatory for every unit built. Output: commits under `ROUTED_PATHS`.
-- `gov-diff-reviewer`: Reviews a diff through one lens. Mandatory for every closing review. Output: findings, to its harness.
+- `gov-reviewer`: Reviews a spec set or a diff through one lens, read-only. Mandatory for every spec audit owed and every closing review. Output: findings, to its harness.
 - `gov-skeptic`: Tries to refute each finding it is handed. Mandatory for every review's findings. Output: verdicts, to its harness.
 - `gov-synthesizer`: Merges verified findings into one report. Mandatory for every review's report. Output: a report in `memory/builds/<slug>/reviews/`.
 - `gov-tester`: Judges a red the bar attributed to this build, and answers the Test step's question. Optional, when Test hands it an OWN or blocking MIXED red, a fix pass asks whether the spec is wrong, or the reason stage asks its question. Output: judgments, to its harness.
 - `gov-researcher`: Finds candidates and the test each could lose. Optional, when no seam decides a design. Output: candidates, to its caller.
+- `gov-prompt-writer`: Composes the task a role agent is handed. Optional, when the driver hands a role its task. Output: a task, to the driver.
 - `gov-session`: Opens a handoff to another session. Optional, when work leaves this session. Output: a prompt file in the build's `prompts/`.
+- `gov-planner`: Drafts and judges a build's plan. Optional, when a build's plan is drafted or judged. Output: a plan record under `memory/`.
+- `gov-architect`: Inventories a build's scope and decomposes it into units. Optional, when a build's scope is inventoried or decomposed. Output: an inventory or a roster under `memory/`.
 <!-- /one-line -->
 
 ## Drive — how to start and advance the loop
@@ -208,11 +210,11 @@
 - orient · gov-orienter — once per session, before the first unit opens: `/session-kickoff`
 - reuse · gov-reuse-scout — a new behaviour about to be designed: `python <prefix>/codebase-map/reuse_lookup.py "<behaviour>"`
 - spec-write · gov-spec-writer — a build whose units lack a spec or hold a thin one: `Workflow <prefix>/workflows/unattended-build.js`
-- spec-review · gov-spec-reviewer — a spec audit the build or its project declares: `Workflow <prefix>/workflows/tier2-review.js`
+- spec-review · gov-reviewer — a spec audit the build or its project declares: `Workflow <prefix>/workflows/tier2-review.js`
 - spec-review · gov-skeptic — a finding handed on to refute: `Workflow <prefix>/workflows/tier2-review.js`
 - build · gov-builder — a unit whose spec is READY: `python <prefix>/roles/handoff.py render --role gov-builder --build <slug> --unit <id>`
 - closing-review · main — before any review, for the bug classes a diff can hit: `python <prefix>/memory-tree/gotchas.py --for-diff <base>..<head>`
-- closing-review · gov-diff-reviewer — the last unit terminal, over the cumulative diff: `Workflow <prefix>/workflows/tier2-review.js`
+- closing-review · gov-reviewer — the last unit terminal, over the cumulative diff: `Workflow <prefix>/workflows/tier2-review.js`
 - closing-review · gov-synthesizer — the verified findings, merged into one report: `Workflow <prefix>/workflows/tier2-review.js`
 - gate-bar · main — the close or the push boundary: the pre-push hook runs the full bar: `bash <prefix>/push-main.sh`
 <!-- /one-line -->

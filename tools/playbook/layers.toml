@@ -5,6 +5,8 @@
 # and `uses` (those it attaches at); `homes` names a tool directory that has no descriptor. A kit joins
 # a layer by its own descriptor's `layer = "<tag>"` key, so a layer's kits are derived, never typed here.
 # `shared` lists the tool directories that hold inline-copied primitives and no layer.
+# An expansion row registers the roles and the review lenses it owns, by slot and by name, in `roles` and
+# `lenses` (TOOL-dBoundRoles-1): no role file defines them, and no core row carries either list.
 #
 # The rows' definitions are the dClosedLoop architecture's `[layers]` table cells, and the points are the
 # eight `[core-points]` of its layer-expansions record, each spelled point.<layer>.<seg>, and the three
@@ -86,6 +88,8 @@ uses = ["point.flow.version"]
 [[layer]]
 tag = "layer.observability"
 kind = "expansion"
+roles = ["gov-maintainer"]
+lenses = ["maintenance-run", "loop"]
 definition = "signals about the loop and the runtime, read and filed but never deciding a position, and the cadence programs that act on them: Maintain and the Loop Review"
 declares = []
 uses = ["point.runtime.cadence", "point.runtime.reading", "point.memory.record-home", "point.memory.live-column", "point.flow.version"]
@@ -93,6 +97,7 @@ uses = ["point.runtime.cadence", "point.runtime.reading", "point.memory.record-h
 [[layer]]
 tag = "layer.integrations"
 kind = "expansion"
+roles = ["gov-deployer"]
 definition = "adapters to outside services, each registered at the core point it serves under one header: remote CI as a verdict backend, notifications, cloud hosts, and deploy engines that promote a landed tree through environments"
 declares = []
 uses = ["point.flow.verdict-backend", "point.flow.release", "point.runtime.grant", "point.memory.record-home"]
@@ -100,6 +105,7 @@ uses = ["point.flow.verdict-backend", "point.flow.release", "point.runtime.grant
 [[layer]]
 tag = "layer.distribution"
 kind = "expansion"
+roles = ["gov-deployer"]
 definition = "the product's delivery across a repository boundary"
 homes = ["govkit"]
 declares = []
