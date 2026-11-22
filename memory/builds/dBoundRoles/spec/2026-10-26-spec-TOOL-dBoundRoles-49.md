@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-49 — govkit's default plan derives the seed rows it expects to preview from the plan model and the roles roster, so the third typed roles count cannot red late
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 5 · advances TOOL-dBoundRoles-27
+**Status:** CLOSED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 5 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-26-build-TOOL-dBoundRoles-45-round2-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-45-round2-fix-return.md) | research | TOOL-dBoundRoles-43 TOOL-dBoundRoles-45 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 |
 | [2026-10-26-build-TOOL-dBoundRoles-49-deviation-491.md](../build/2026-10-26-build-TOOL-dBoundRoles-49-deviation-491.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-49-deviation-492.md](../build/2026-10-26-build-TOOL-dBoundRoles-49-deviation-492.md) | deviation | — |
+| [2026-11-22-build-TOOL-dBoundRoles-49-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dBoundRoles-49-1-acceptance-ledger.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-45-round2-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-45-round2-fix-brief.md) | research | TOOL-dBoundRoles-45 TOOL-dBoundRoles-43 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief.md) | journal | TOOL-dBoundRoles-14 TOOL-dBoundRoles-2 TOOL-dBoundRoles-1 TOOL-dBoundRoles-21 TOOL-dBoundRoles-37 TOOL-dBoundRoles-22 TOOL-dBoundRoles-16 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-15 |

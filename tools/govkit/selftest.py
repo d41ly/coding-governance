@@ -3174,6 +3174,18 @@ def derive_roles_expected(kit: pathlib.Path, descriptor: dict) -> tuple[set, set
     return agents, overlays
 
 
+def derive_seed_expected(target: pathlib.Path, descs: dict, selection: list[str]) -> list[dict]:
+    """TOOL-dBoundRoles-49 S1: the seed rows a `plan` of `target` over `selection` previews, DERIVED
+    from the plan model and never typed. The rows `planned_writes` returns from gov's root, `target`'s
+    own deploy answers and a fresh `Report`, kept where `kind` is `write`, `role` is `seed` and no
+    token is `missing`: the one predicate `cmd_plan` prints both `write|seed` and `KEEP|seed` from, so
+    the preview and its expectation cannot classify a row two ways (TOOL-dClosedLexicon-13). Runs no
+    case and writes nothing."""
+    gk = govkit_module()
+    rows = gk.planned_writes(GOV_ROOT, target, gk.load_deploy(target), descs, selection, gk.Report())
+    return [x for x in rows if x["kind"] == "write" and x["role"] == "seed" and not x["missing"]]
+
+
 def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = False) -> None:
     """TOOL-aOrientedCast-8 S10, AC4 and AC6: a DEFAULT apply into a scratch target renders the roles
     kit — the role index, one agent type per agent role, the seeded house overlays and the `/build`
@@ -10458,10 +10470,36 @@ user_skills = "/tmp/gk-fake-skills"
             # `project-owned` mechanism; both landed after this pin and moved no row out.
             # Measured by a default `plan` into a scratch target on 2026-10-13 (TOOL-aSweptBar-1 S10).
             # seed 14 -> 15, TOOL-dWitnessedBar-23 S6: `roles` seeds `house/gov-tester.md`; the close observes it.
+            # TOOL-dBoundRoles-49 S2: the seed half is no longer a measurement. It is the count of the
+            # rows `derive_seed_expected` reads from the plan model, over the same target and the
+            # selection `cmd_plan` resolves for it, so a roster that seeds one more file moves both
+            # sides. The `ORDER|project-owned` half stays the measurement recorded above.
+            import tomllib  # noqa: PLC0415
+            _gk49 = govkit_module()
+            _reg49 = _gk49.load_registry(GOV_ROOT)
+            _descs49 = _gk49.read_descriptors(GOV_ROOT, _reg49, _gk49.Report())
+            _sel49 = _gk49.resolve_selection(_reg49, _descs49, "default", [], _gk49.load_deploy(t2))
+            _seed_rows = derive_seed_expected(t2, _descs49, _sel49)
+            _seed_got = marks.get("write|seed", 0) + marks.get("KEEP|seed", 0)
+            _seed_by_kit: dict[str, list[str]] = {}
+            for _sr in _seed_rows:
+                _seed_by_kit.setdefault(_sr["kit"], []).append(_sr["dest"])
             check("...and the playbook file previews as a seed WRITE, not as an order",
-                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 15
-                  and marks.get("ORDER|project-owned") == 34,
-                  str(marks))
+                  _seed_got == len(_seed_rows) and marks.get("ORDER|project-owned") == 34,
+                  "previewed %d seed row(s), the plan model derives %d, by kit %s; marks %s"
+                  % (_seed_got, len(_seed_rows), _seed_by_kit, marks))
+            # TOOL-dBoundRoles-49 S3: the roles share is the roster's. Every overlay
+            # `derive_roles_expected` reads from the roles kit is the source of exactly one derived
+            # seed row of the `roles` kit, so an overlay the roster seeds and the plan drops reds by name.
+            _ov49 = derive_roles_expected(KIT_DIRS["roles"], tomllib.loads(
+                (KIT_DIRS["roles"] / "kit.toml").read_text(encoding="utf-8")))[1]
+            _home49 = (_descs49.get("roles", ({}, ""))[0].get("home") or "").rstrip("/")
+            _roles_src49 = [_sr["src"] for _sr in _seed_rows if _sr["kit"] == "roles"]
+            _ov_unrowed = sorted(o for o in _ov49 if _roles_src49.count(_home49 + "/" + o) != 1)
+            check("...and every roles house overlay is the source of one previewed roles seed row",
+                  bool(_ov49) and not _ov_unrowed,
+                  "overlays without exactly one roles seed row %s; roster overlays %d, roles seed sources %s"
+                  % (_ov_unrowed, len(_ov49), sorted(_roles_src49)))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
             check("...and NO project-owned row is previewed as a write",
