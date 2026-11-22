@@ -579,7 +579,10 @@ def read_peer_verdict(backend, sha, tree, repo="."):
     node = read_node_tag()
     if not node:
         return Verdict("DEAD PROBE", "", "GOV_NODE names no node tag here, so no peer verdict can be told off-node")
-    remote = os.environ.get("GOV_REMOTE") or "origin"
+    from remote_verdict import resolve_remote  # noqa: PLC0415 - the kit's one inline remote ladder
+    remote, _branch, _observed, refusal = resolve_remote(repo)
+    if not remote:
+        return Verdict("DEAD PROBE", "", refusal or "no remote resolves, so no peer verdict can be fetched")
     ref = VERDICT_REF + sha
     rc, out = run_git(repo, "ls-remote", remote, ref)
     if rc != 0:
@@ -788,6 +791,7 @@ FIX_ROWS = (("local-hook", "verdict_backends:read_local_verdict", "false"),
             ("remote-ci", "remote_verdict:read_remote_verdict", "true"))
 FIX_KIT_FILES = ("verdict_backends.py", "remote_verdict.py", "leg_factory.py", "regen.py")
 FIX_WORKFLOW = ".github/workflows/remote-ci.yml"
+FX_REMOTE = "fx"  # the fixtures' scratch remote: a name no real remote of gov is likely to carry
 FIX_TOOLS = TOOL_ROOT.name  # the fixture tree mirrors this tool root's name
 FIX_KIT = f"{FIX_TOOLS}/{HERE.name}"  # this kit, as the fixture tree spells it
 
@@ -809,7 +813,7 @@ def render_rows(names):
 
 def write_fixture_tree(top, files, remote=True, kits=True):
     """A repository at `top/work` committed on `main`: `files`, and with `kits` the lander, the policy kit and
-    this kit's readers under `tools/`; with `remote` pushed to the bare `top/remote.git`, origin/HEAD set."""
+    this kit's readers under `tools/`; with `remote` pushed to the bare `top/remote.git`, its remote HEAD set."""
     work = pathlib.Path(top, "work")
     work.mkdir(parents=True)
     run_fixture_git(work, "init", "-q", "--template=", "-b", "main")
@@ -830,9 +834,9 @@ def write_fixture_tree(top, files, remote=True, kits=True):
     run_fixture_git(work, "commit", "-q", "--no-verify", "-m", "fixture")
     if remote:
         run_fixture_git(top, "init", "-q", "--bare", "--template=", "remote.git")
-        run_fixture_git(work, "remote", "add", "origin", str(pathlib.Path(top, "remote.git")))
-        run_fixture_git(work, "push", "-q", "--no-verify", "origin", "main")
-        run_fixture_git(work, "remote", "set-head", "origin", "main")
+        run_fixture_git(work, "remote", "add", FX_REMOTE, str(pathlib.Path(top, "remote.git")))
+        run_fixture_git(work, "push", "-q", "--no-verify", FX_REMOTE, "main")
+        run_fixture_git(work, "remote", "set-head", FX_REMOTE, "main")
     return work
 
 
@@ -1096,19 +1100,19 @@ def run_peer_plant(case, top, run_scenario):
             f'[verdict.peer]\nsigners = [{signers}]\n', encoding="utf-8")
         run_fixture_git(work, "add", "-A")
         run_fixture_git(work, "commit", "-q", "--no-verify", "-m", f"the policy, {scope} {trust.strip()}")
-        run_fixture_git(work, "push", "-q", "--no-verify", "origin", "main")
+        run_fixture_git(work, "push", "-q", "--no-verify", FX_REMOTE, "main")
 
     def write_tag(sha, node_line, signer, tree, signed=True):
         rec = {"verdict": "GREEN", "tree": tree, "run_id": "r1"}
         if signed:
             run_fixture_git(work, "config", "user.signingkey", pathlib.Path(top, f"key-{signer}").as_posix())
-        why = (write_peer_tag if signed else write_unsigned_tag)(work, sha, rec, node_line, "origin")
+        why = (write_peer_tag if signed else write_unsigned_tag)(work, sha, rec, node_line, FX_REMOTE)
         if why:
             raise OSError(why)
 
     def run_node_read(name, sha, owed, needles):
         run_scenario(name, work, [*me, "read", "--backend", "peer-node", "--sha", sha], owed, needles,
-                     GOV_NODE="a", GOV_REMOTE="origin")
+                     GOV_NODE="a", GOV_REMOTE=FX_REMOTE)
 
     write_policy()
     sha = run_fixture_git(work, "rev-parse", "HEAD")
@@ -1131,7 +1135,7 @@ def run_peer_plant(case, top, run_scenario):
         run_node_read("an unsigned tag from node b", sha, 1, [said % "NONE", "unsigned"])
         run_fixture_git(work, "config", "user.signingkey", "")
         run_scenario("verify-peer with user.signingkey empty", work, [*me, "verify-peer"], 2,
-                     ["verify-peer refused · user.signingkey"], GOV_NODE="b", GOV_REMOTE="origin")
+                     ["verify-peer refused · user.signingkey"], GOV_NODE="b", GOV_REMOTE=FX_REMOTE)
     elif case == "peer-tip-missing":
         # A tag object naming a commit nobody has, written loose into the remote, so the ref is advertised
         # and the fetch, which must bring the commit in too, fails (TOOL-dWitnessedBar-56 S15).
@@ -1143,7 +1147,7 @@ def run_peer_plant(case, top, run_scenario):
             raise OSError(f"git hash-object --literally exited {rc}, so no broken tag is planted")
         run_fixture_git(remote, "update-ref", VERDICT_REF + sha, tag)
         run_node_read("an advertised tip the fetch cannot bring in", sha, 1,
-                      [said % "DEAD PROBE", f"git fetch origin {VERDICT_REF}{sha}"])
+                      [said % "DEAD PROBE", f"git fetch {FX_REMOTE} {VERDICT_REF}{sha}"])
     elif case == "peer-no-ssh-keygen":
         write_tag(sha, "b", "b", tree)
         run_fixture_git(work, "config", "gpg.ssh.program", pathlib.Path(top, "absent", "ssh-keygen").as_posix())
@@ -1168,14 +1172,14 @@ def run_peer_plant(case, top, run_scenario):
     elif case == "peer-bad-signature":
         write_tag(sha, "b", "b", tree)
         ref = VERDICT_REF + sha
-        signed = run_fixture_git(work, "ls-remote", "origin", ref).split("\t")[0]
+        signed = run_fixture_git(work, "ls-remote", FX_REMOTE, ref).split("\t")[0]
         body = run_fixture_git(work, "cat-file", "tag", signed) + "\n"
         if "run_id\tr1\n" not in body:
             raise OSError("the signed tag carries no run_id line to edit")
         rc, edited = run_git(work, "hash-object", "-t", "tag", "-w", "--stdin", data=body.replace("run_id\tr1\n", "run_id\tr2\n"))
         if rc != 0 or not edited:
             raise OSError(f"git hash-object exited {rc}, so no edited tag is written")
-        run_fixture_git(work, "push", "-q", "--force", "--no-verify", "origin", f"{edited}:{ref}")
+        run_fixture_git(work, "push", "-q", "--force", "--no-verify", FX_REMOTE, f"{edited}:{ref}")
         run_node_read("a tag edited after node b signed it", sha, 1, [said % "NONE", "bad signature"])
     elif case == "peer-stale-slot":
         run_stale_slot_plant(top, work, run_scenario)
@@ -1235,16 +1239,16 @@ exit "$rc"
     run_fixture_git(work, "commit", "-q", "--no-verify", "-m", "a candidate whose bar is a stub")
     cand = run_fixture_git(work, "rev-parse", "HEAD")
     run_fixture_git(work, "checkout", "-q", "main")
-    run_fixture_git(work, "push", "-q", "--no-verify", "origin", f"{cand}:{CANDIDATE_REF}{cand}")
+    run_fixture_git(work, "push", "-q", "--no-verify", FX_REMOTE, f"{cand}:{CANDIDATE_REF}{cand}")
     run_fixture_git(work, "config", "user.signingkey", pathlib.Path(top, "key-b").as_posix())
     tree = read_tree_of(work, cand)
     slots = read_common_dir(work) / "gate-verdict"
     slots.mkdir(exist_ok=True)
     (slots / tree).write_bytes(f"tree\t{tree}\nsha\t{cand}\nverdict\tGREEN\nkind\tfull\nrun_id\tr0\nreused\t1\n"
                                f"reused_cache\t1\nselection\tnone\n".encode("utf-8"))
-    peer = {"GOV_NODE": "b", "GOV_REMOTE": "origin"}
+    peer = {"GOV_NODE": "b", "GOV_REMOTE": FX_REMOTE}
     published = f"published {VERDICT_REF}{cand[:8]} as node b"
-    count = ("import subprocess, sys; p = subprocess.run(['git', 'ls-remote', 'origin', 'refs/gov/verdict/*'], "
+    count = ("import subprocess, sys; p = subprocess.run(['git', 'ls-remote', '" + FX_REMOTE + "', 'refs/gov/verdict/*'], "
              "capture_output=True, text=True); n = len(p.stdout.splitlines()); print('verdict refs:', n); "
              "sys.exit(0 if p.returncode == 0 and n == 0 else 1)")
     tag = ["git", "cat-file", "tag", VERDICT_REF + cand]
@@ -1298,9 +1302,9 @@ def run_remote_plant(case, top, rv):
         pathlib.Path(work, FIX_WORKFLOW).write_text("name: remote-ci\non: push\n", encoding="utf-8")
         run_fixture_git(work, "commit", "-q", "--no-verify", "-am", "the workflow swapped")
         sha = run_fixture_git(work, "rev-parse", "HEAD")
-    run_fixture_git(work, "remote", "add", "origin", "https://github.com/o/r.git")
-    run_fixture_git(work, "update-ref", "refs/remotes/origin/main", landed)
-    run_fixture_git(work, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+    run_fixture_git(work, "remote", "add", FX_REMOTE, "https://github.com/o/r.git")
+    run_fixture_git(work, "update-ref", f"refs/remotes/{FX_REMOTE}/main", landed)
+    run_fixture_git(work, "symbolic-ref", f"refs/remotes/{FX_REMOTE}/HEAD", f"refs/remotes/{FX_REMOTE}/main")
     resp = pathlib.Path(top, "responses")
     resp.mkdir()
     path = FIX_WORKFLOW if case != "other-path" else ".github/workflows/other.yml"
@@ -1326,7 +1330,7 @@ def run_remote_plant(case, top, rv):
         pathlib.Path(work, ".governance/policy.toml").write_text(
             f'[verdict.remote]\ntrust = "app-only"\npin = "{pin}"\n', encoding="utf-8")
         run_fixture_git(work, "commit", "-q", "--no-verify", "-am", "trust app-only")
-        run_fixture_git(work, "update-ref", "refs/remotes/origin/main", run_fixture_git(work, "rev-parse", "HEAD"))
+        run_fixture_git(work, "update-ref", f"refs/remotes/{FX_REMOTE}/main", run_fixture_git(work, "rev-parse", "HEAD"))
         rc, said = run_fixture_command(work, argv)
         out.append(("under app-only", rc, 0, [f"verdict: remote-ci · GREEN · {sha[:8]} · witness claimed"], said))
     return out
@@ -1401,7 +1405,7 @@ def main(argv):
     ap.add_argument("verb", nargs="?", choices=["read", "off-node", "verify-peer"])
     ap.add_argument("--backend", help="read this backend rather than the value `verdict` holds")
     ap.add_argument("--sha", help="the commit read")
-    ap.add_argument("--remote", default=None, help="verify-peer's remote, origin by default")
+    ap.add_argument("--remote", default=None, help="verify-peer's remote; the ladder resolves it by default")
     ap.add_argument("--fixture", action="store_true", help="run one plant's scenarios in a scratch directory")
     ap.add_argument("--plant", choices=list(PLANTS))
     args = ap.parse_args(argv)
@@ -1415,7 +1419,14 @@ def main(argv):
         if not args.sha:
             ap.error("read takes --sha <sha>")
         return run_read(args.backend, args.sha)
-    return run_verify_peer(args.remote or os.environ.get("GOV_REMOTE") or "origin")
+    remote = args.remote
+    if not remote:
+        from remote_verdict import resolve_remote  # noqa: PLC0415 - the kit's one inline remote ladder
+        remote, _branch, _observed, refusal = resolve_remote(".")
+        if not remote:
+            print(f"verify-peer: {refusal or 'no remote resolves, so nothing is verified'}", file=sys.stderr)
+            return 2
+    return run_verify_peer(remote)
 
 
 if __name__ == "__main__":

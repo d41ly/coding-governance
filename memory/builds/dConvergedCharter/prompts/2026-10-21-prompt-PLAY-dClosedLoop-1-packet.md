@@ -65,7 +65,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `e239d8161fb3a02a24f65039f3045947b0b382aa`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `62ccec623069583d765b86d723e0533c739169e5`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -74,7 +74,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `b1b9c9b613365fa43ad0e9eb94db3b96a03eba6e`
+- rendered at: `26f5ff5ad4d34164eece6a3bb43f8c3fec301d5f`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -129,30 +129,30 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dConverge
 
 The opened README's roster, every unit with its row:
 
-- unit id `PLAY-dConvergedCharter-1` · README:63 | 1 | `PLAY-dConvergedCharter-1` | `cl-dClosedLoop-0475@2b542935` | protocol text derived to facts only |
-- unit id `PLAY-dConvergedCharter-2` · README:64 | 2 | `PLAY-dConvergedCharter-2` | `cl-dClosedLoop-0476@46c25c62` | every remaining positional reference migrated to tags |
-- unit id `PLAY-dConvergedCharter-3` · README:65 | 3 | `PLAY-dConvergedCharter-3` | `cl-dClosedLoop-0477@47475290` | records merged by evidence |
-- unit id `PLAY-dConvergedCharter-4` · README:66 | 4 | `PLAY-dConvergedCharter-4` | `cl-dClosedLoop-0478@5ccb9b38` | superseded parts retired through ratified proposals |
-- unit id `PLAY-dConvergedCharter-5` · README:67 | 5 | `PLAY-dConvergedCharter-5` | `cl-dClosedLoop-0479@8dc7a199` | adopters migrated onto the ranked charter and the loop |
-- unit id `PLAY-dConvergedCharter-6` · README:68 | 6 | `PLAY-dConvergedCharter-6` | `cl-dClosedLoop-0480@7f73d023` | every record kind on dTotalRecall's registry |
-- unit id `PLAY-dConvergedCharter-7` · README:69 | 7 | `PLAY-dConvergedCharter-7` | `cl-dClosedLoop-0481@a6574329` | protocols and templates rendered as tag-sliced views from the loop's checklists |
-- unit id `PLAY-dConvergedCharter-8` · README:70 | 8 | `PLAY-dConvergedCharter-8` | `cl-dClosedLoop-0482@c8b56d3a` | the remaining renderers absorbed |
-- unit id `PLAY-dConvergedCharter-9` · README:71 | 9 | `PLAY-dConvergedCharter-9` | `cl-dClosedLoop-0483@5b53c82b` | Skills converged to level-4 thin entries |
-- unit id `PLAY-dConvergedCharter-10` · README:72 | 10 | `PLAY-dConvergedCharter-10` | `cl-dClosedLoop-0484@7e1eaeeb` | the protocol slices and Skill entries rendered from units |
-- unit id `PLAY-dConvergedCharter-11` · README:73 | 11 | `PLAY-dConvergedCharter-11` | `cl-dClosedLoop-0485@dde21704` | every kit conf key the retrofit does not convert folded into the policy file |
-- unit id `PLAY-dConvergedCharter-12` · README:74 | 12 | `PLAY-dConvergedCharter-12` | `cl-dClosedLoop-0486@36def3b5` | the unattended kit |
-- unit id `PLAY-dConvergedCharter-13` · README:75 | 13 | `PLAY-dConvergedCharter-13` | `cl-dClosedLoop-0487@ff29708d` | feature-specific guide prose migrated into feature-scoped units (night pass |
-- unit id `PLAY-dConvergedCharter-14` · README:76 | 14 | `PLAY-dConvergedCharter-14` | `cl-dClosedLoop-0488@7cf98c51` | every part in the fates table at its fate |
-- unit id `PLAY-dConvergedCharter-15` · README:77 | 15 | `PLAY-dConvergedCharter-15` | `cl-dClosedLoop-0489@74c9a546` | the hand-written `help/` pages |
-- unit id `PLAY-dConvergedCharter-16` · README:78 | 16 | `PLAY-dConvergedCharter-16` | `cl-dClosedLoop-0490@166e1002` | the `/session-kickoff` Skill retired once the orientation scout and `kickoff.runs` have landed: a `[[retired]]` row with an inventory of its readers by path and by value over the tree |
-- unit id `PLAY-dConvergedCharter-17` · README:79 | 17 | `PLAY-dConvergedCharter-17` | `cl-dClosedLoop-0491@3aafd2a1` | the `/build` Skill retired once dWellOiledMachine's supervisor drives attended builds: a `[[retired]]` row with its readers inventoried by value |
-- unit id `PLAY-dConvergedCharter-18` · README:80 | 18 | `PLAY-dConvergedCharter-18` | `cl-dClosedLoop-0492@a532274c` | the owner's cycle walked by key: from a planted build's intake |
-- unit id `PLAY-dConvergedCharter-19` · README:81 | 19 | `PLAY-dConvergedCharter-19` | `cl-dClosedLoop-0493@0d92d2e3` | the guides' positional citations migrated to tags |
-- unit id `PLAY-dConvergedCharter-20` · README:82 | 20 | `PLAY-dConvergedCharter-20` | `cl-dClosedLoop-0494@eb095d63` | the conf fold and the unattended kit's retirement shipped as upgrade steps |
-- unit id `PLAY-dConvergedCharter-21` · README:83 | 21 | `PLAY-dConvergedCharter-21` | `cl-dClosedLoop-0495@53f4c9b2` | `tools/roles/house/policy.toml` retired as a seed: a repository's efforts folded into the `roles.effort.*` policy keys |
-- unit id `PLAY-dConvergedCharter-22` · README:84 | 22 | `PLAY-dConvergedCharter-22` | `cl-dClosedLoop-0496@a94b54b6` | the census of gov's own flow and role settings: the legs no descriptor declares |
-- unit id `PLAY-dConvergedCharter-23` · README:85 | 23 | `PLAY-dConvergedCharter-23` | `cl-dClosedLoop-0502@fbfa8f4f` | the release asks' join: Maintain's `release-verify-failed` ask and `release.route`'s keyed alike by (reading |
-- unit id `PLAY-dConvergedCharter-41` · README:86 | 24 | `PLAY-dConvergedCharter-41` | `cl-dClosedLoop-0485@dde21704` part 2/2 | the named readers of the folded conf keys re-pointed, and the house-file fallback's arm (the owner's 2026-11-04 split of unit 11) |
+- unit id `PLAY-dConvergedCharter-1` · README:62 | 1 | `PLAY-dConvergedCharter-1` | `cl-dClosedLoop-0475@2b542935` | protocol text derived to facts only |
+- unit id `PLAY-dConvergedCharter-2` · README:63 | 2 | `PLAY-dConvergedCharter-2` | `cl-dClosedLoop-0476@46c25c62` | every remaining positional reference migrated to tags |
+- unit id `PLAY-dConvergedCharter-3` · README:64 | 3 | `PLAY-dConvergedCharter-3` | `cl-dClosedLoop-0477@47475290` | records merged by evidence |
+- unit id `PLAY-dConvergedCharter-4` · README:65 | 4 | `PLAY-dConvergedCharter-4` | `cl-dClosedLoop-0478@5ccb9b38` | superseded parts retired through ratified proposals |
+- unit id `PLAY-dConvergedCharter-5` · README:66 | 5 | `PLAY-dConvergedCharter-5` | `cl-dClosedLoop-0479@8dc7a199` | adopters migrated onto the ranked charter and the loop |
+- unit id `PLAY-dConvergedCharter-6` · README:67 | 6 | `PLAY-dConvergedCharter-6` | `cl-dClosedLoop-0480@7f73d023` | every record kind on dTotalRecall's registry |
+- unit id `PLAY-dConvergedCharter-7` · README:68 | 7 | `PLAY-dConvergedCharter-7` | `cl-dClosedLoop-0481@a6574329` | protocols and templates rendered as tag-sliced views from the loop's checklists |
+- unit id `PLAY-dConvergedCharter-8` · README:69 | 8 | `PLAY-dConvergedCharter-8` | `cl-dClosedLoop-0482@c8b56d3a` | the remaining renderers absorbed |
+- unit id `PLAY-dConvergedCharter-9` · README:70 | 9 | `PLAY-dConvergedCharter-9` | `cl-dClosedLoop-0483@5b53c82b` | Skills converged to level-4 thin entries |
+- unit id `PLAY-dConvergedCharter-10` · README:71 | 10 | `PLAY-dConvergedCharter-10` | `cl-dClosedLoop-0484@7e1eaeeb` | the protocol slices and Skill entries rendered from units |
+- unit id `PLAY-dConvergedCharter-11` · README:72 | 11 | `PLAY-dConvergedCharter-11` | `cl-dClosedLoop-0485@dde21704` | every kit conf key the retrofit does not convert folded into the policy file |
+- unit id `PLAY-dConvergedCharter-12` · README:73 | 12 | `PLAY-dConvergedCharter-12` | `cl-dClosedLoop-0486@36def3b5` | the unattended kit |
+- unit id `PLAY-dConvergedCharter-13` · README:74 | 13 | `PLAY-dConvergedCharter-13` | `cl-dClosedLoop-0487@ff29708d` | feature-specific guide prose migrated into feature-scoped units (night pass |
+- unit id `PLAY-dConvergedCharter-14` · README:75 | 14 | `PLAY-dConvergedCharter-14` | `cl-dClosedLoop-0488@7cf98c51` | every part in the fates table at its fate |
+- unit id `PLAY-dConvergedCharter-15` · README:76 | 15 | `PLAY-dConvergedCharter-15` | `cl-dClosedLoop-0489@74c9a546` | the hand-written `help/` pages |
+- unit id `PLAY-dConvergedCharter-16` · README:77 | 16 | `PLAY-dConvergedCharter-16` | `cl-dClosedLoop-0490@166e1002` | the `/session-kickoff` Skill retired once the orientation scout and `kickoff.runs` have landed: a `[[retired]]` row with an inventory of its readers by path and by value over the tree |
+- unit id `PLAY-dConvergedCharter-17` · README:78 | 17 | `PLAY-dConvergedCharter-17` | `cl-dClosedLoop-0491@3aafd2a1` | the `/build` Skill retired once dWellOiledMachine's supervisor drives attended builds: a `[[retired]]` row with its readers inventoried by value |
+- unit id `PLAY-dConvergedCharter-18` · README:79 | 18 | `PLAY-dConvergedCharter-18` | `cl-dClosedLoop-0492@a532274c` | the owner's cycle walked by key: from a planted build's intake |
+- unit id `PLAY-dConvergedCharter-19` · README:80 | 19 | `PLAY-dConvergedCharter-19` | `cl-dClosedLoop-0493@0d92d2e3` | the guides' positional citations migrated to tags |
+- unit id `PLAY-dConvergedCharter-20` · README:81 | 20 | `PLAY-dConvergedCharter-20` | `cl-dClosedLoop-0494@eb095d63` | the conf fold and the unattended kit's retirement shipped as upgrade steps |
+- unit id `PLAY-dConvergedCharter-21` · README:82 | 21 | `PLAY-dConvergedCharter-21` | `cl-dClosedLoop-0495@53f4c9b2` | `tools/roles/house/policy.toml` retired as a seed: a repository's efforts folded into the `roles.effort.*` policy keys |
+- unit id `PLAY-dConvergedCharter-22` · README:83 | 22 | `PLAY-dConvergedCharter-22` | `cl-dClosedLoop-0496@a94b54b6` | the census of gov's own flow and role settings: the legs no descriptor declares |
+- unit id `PLAY-dConvergedCharter-23` · README:84 | 23 | `PLAY-dConvergedCharter-23` | `cl-dClosedLoop-0502@fbfa8f4f` | the release asks' join: Maintain's `release-verify-failed` ask and `release.route`'s keyed alike by (reading |
+- unit id `PLAY-dConvergedCharter-41` · README:85 | 24 | `PLAY-dConvergedCharter-41` | `cl-dClosedLoop-0485@dde21704` part 2/2 | the named readers of the folded conf keys re-pointed, and the house-file fallback's arm (the owner's 2026-11-04 split of unit 11) |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 

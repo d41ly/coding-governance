@@ -67,7 +67,11 @@
     "guard": [
       "{prefix}/codebase-map/",
       ".codebase-map.conf",
-      "{prefix}/memory-tree/coverage_join.py"
+      "{prefix}/memory-tree/coverage_join.py",
+      "{prefix}/memory-tree/backlog.py",
+      "{prefix}/memory-tree/id_grammar.py",
+      "{prefix}/memory-tree/legacy_ledger.py",
+      "{prefix}/memory-tree/tree_lib.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -2206,7 +2210,9 @@
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/policy/budgets.py",
       "{prefix}/policy/policy.py",
-      "{prefix}/memory-tree/backlog.py"
+      "{prefix}/memory-tree/backlog.py",
+      "{prefix}/memory-tree/coverage_join.py",
+      "{prefix}/memory-tree/legacy_ledger.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -2234,7 +2240,9 @@
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/policy/budgets.py",
       "{prefix}/policy/policy.py",
-      "{prefix}/memory-tree/backlog.py"
+      "{prefix}/memory-tree/backlog.py",
+      "{prefix}/memory-tree/coverage_join.py",
+      "{prefix}/memory-tree/legacy_ledger.py"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -2917,7 +2925,11 @@
       "{prefix}/codebase-map/",
       "{prefix}/lib/",
       "{prefix}/lexicon/",
-      "{prefix}/memory-tree/coverage_join.py"
+      "{prefix}/memory-tree/coverage_join.py",
+      "{prefix}/memory-tree/backlog.py",
+      "{prefix}/memory-tree/id_grammar.py",
+      "{prefix}/memory-tree/legacy_ledger.py",
+      "{prefix}/memory-tree/tree_lib.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -3247,7 +3259,9 @@
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/policy/budgets.py",
       "{prefix}/policy/policy.py",
-      "{prefix}/memory-tree/backlog.py"
+      "{prefix}/memory-tree/backlog.py",
+      "{prefix}/memory-tree/coverage_join.py",
+      "{prefix}/memory-tree/legacy_ledger.py"
     ],
     "chunk": "selftests",
     "subject": "kit",

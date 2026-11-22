@@ -1086,6 +1086,20 @@ def run_selftest() -> int:
         newest = read_newest_unit(repo, "HEAD")
         print_arm(newest == "TOOL-tFix-2", f"dWB29 AC5 --newest-unit with no path names the newest unit (got '{newest}')")
 
+        # ---- TOOL-aWrappedRoster-1 AC1: the manifest parser reads both shapes an adopter commits, a
+        # bare list of rows and an object holding them under `legs`, and still refuses an object without.
+        def read_shape(text):
+            try:
+                return parse_leg_names(text)
+            except ValueError:
+                return None
+
+        print_arm(read_shape('[{"name": "leg one"}]') == {"leg one"}
+            and read_shape('{"_doc": "x", "legs": [{"name": "leg one"}]}') == {"leg one"}
+            and read_shape('{"_doc": "x"}') is None and read_shape('"legs"') is None,
+            "TOOL-aWrappedRoster-1 AC1 parse_leg_names reads a bare row list and an object's `legs` list, "
+            "and refuses an object with no `legs` list and a scalar")
+
         # ---- TOOL-aNimbleMend-8 AC4 AC5 AC6: the red-fix lane. Four commits, graded WHOLE and RANGE with
         # the lane key stubbed on and then off, then a trailer-free twin for the spawn count. Against a
         # grader that reads no `Red-fix:` trailer every arm but the last two reads RED.

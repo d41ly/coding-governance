@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-by: attended
+landed-derived: ab15defb271cb1646bcbc040610e97e08c12231f 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 parked-surfaced: yes
 keepalive-reaped: yes
 gates-run: unattended-179529481580044524711-1640412 f9ee3f8e
@@ -24,8 +26,8 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: c2a407b0390f3d57a118b58e376c326aeb207c13 · handoff · ? touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 98e8972cfe0c92167d082df9c176c4db1905b94f
-phase: HELD
+witness: ab15defb271cb1646bcbc040610e97e08c12231f
+phase: LANDED
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug

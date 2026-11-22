@@ -529,7 +529,8 @@ def read_red_route(here):
         resolve_kit_dir("policy", "policy.py", here)
     except LookupError:
         return RED_ROUTE_DEFAULT, "the catalogue default: no policy kit resolves"
-    p = run_kit(here, "policy", "policy.py", ["get", RED_ROUTE_KEY], f"{RED_ROUTE_KEY} unread")
+    # str(): a key inside a list is invisible to the policy check's reader scan; a call's bare argument is not
+    p = run_kit(here, "policy", "policy.py", ["get", str(RED_ROUTE_KEY)], f"{RED_ROUTE_KEY} unread")
     value = p.stdout.strip()
     if p.returncode != 0 or value not in RED_ROUTES:
         raise Refusal(f"policy.py get {RED_ROUTE_KEY} exited {p.returncode} answering '{value}', outside "
