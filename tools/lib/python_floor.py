@@ -200,7 +200,7 @@ for p in json.load(sys.stdin):
 
 
 # The census's declared table: a module, or a `(module, attribute)` pair, and the version that bounds
-# it, from the feature census of PLAY-dClosedLoop-1's night-pass instruments. An `added` feature is red
+# it, from the feature census of the dClosedLoop chain's night-pass instruments. An `added` feature is red
 # above the floor; a `removed` one, or one whose `removal` is announced, is red at or below it.
 _PEP594 = ("aifc audioop cgi cgitb chunk crypt imghdr mailcap msilib nis nntplib ossaudiodev pipes sndhdr "
            "spwd sunau telnetlib uu xdrlib").split()
