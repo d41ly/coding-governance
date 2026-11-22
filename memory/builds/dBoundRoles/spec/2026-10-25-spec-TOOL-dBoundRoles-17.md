@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-17 — every work order's marker carrying `item=`, every return naming the work order it `answers`, today's population seeded
 
-**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 8 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-8 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 8 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0182@0cc5ed88 whole
 
@@ -85,8 +85,23 @@ it arms (the memory plan's `[sites]` work-order row and its `[gates]` "work orde
   the third inside the planted gov-session script.
   **Readers:** by name: `tools/roles/handoff.py` (`main`, the one caller passing it);
   `tools/roles/render_agents.py` (the selftest's handoff arm) and `tools/roles/adopt-roles.test.sh`
-  (its three embedded calls), which pass none, so their markers carry the dash · by value: NO VALUE READERS — the marker's
-  readers are S2's list.
+  (its three embedded calls), which pass none, so their markers carry the dash · by value:
+  `tools/playbook/instruction_units.py#arm_work_order`, the `work-order` case of the `instruction units
+  selftest` leg, which runs `handoff.py render` with no `--item` and compares its output byte for byte
+  with the pinned `ORDER_HEAD` (`tools/playbook/instruction_units.py@73883269:2087`), whose marker
+  carries no `item=`. The pass re-pins that line with `item=-` between `unit=PLAY-fixture-1` and
+  `path=`, and neither sha moves: the marker sits outside the role and task sections both hashes are
+  taken over (`tools/roles/handoff.py@694e9bf2:748-749`). The marker's parsing readers are S2's list.
+  `git grep -n 'gov:handoff'` at `50a732230` (PINNED) finds four other comparisons of the whole line, each
+  between two lines one render wrote, so each holds unchanged: `tools/hooks/agent-cap.js@935a910d:719`
+  (the file's marker against the prompt's), `tools/hooks/agent-cap.js@935a910d:730` (prompt line 1
+  against it), `tools/roles/handoff.py@694e9bf2:1324` (a spawn's prompt marker against the file's) and
+  `tools/roles/adopt-roles.test.sh@937bfafe:667` (arm 11's variants against the render's first line).
+  Four fixtures plant their own marker in the legacy shape and compare it with nothing the renderer
+  writes, so they parse as legacy: `tools/roles/adopt-roles.test.sh@937bfafe:419`,
+  `tools/hooks/agent-cap.test.sh@97439f99:628`, `tools/hooks/format-guard.test.sh@f19b3e7f:505` and
+  `tools/policy/check_policy.py@6cbdf64b:3631`. Every other hit reads only the marker's opening
+  `<!-- gov:handoff ` or the bare token.
 - **S4** — The `answers` line (I14): a record return carries `**Answers:** <work order path>
   task-sha=<12hex>` among its header lines beside `**Serves:**`; a harness return carries a required
   schema field `answers` holding the same value. `ANSWERS_RE` and `derive_answers_value(path,
@@ -225,7 +240,11 @@ record path, which this home does.
 
 ### Rollout
 
-Live at landing on the `roles catalogue` leg, which runs `check_roles.py`.
+Live at landing on the `roles catalogue` leg, which runs `check_roles.py`. The hook
+`tools/hooks/agent-cap.js` and the renderer `tools/roles/handoff.py` change in the one pass commit: a
+session's rule 6 runs the project directory's hook, and today's `HANDOFF_MARK_RE`
+(`tools/hooks/agent-cap.js@935a910d:646`) matches no line carrying `item=`, so no tree may hold a
+renderer that writes `item=` beside a hook that refuses it.
 
 ### Files touched (estimate)
 
@@ -240,6 +259,7 @@ Live at landing on the `roles catalogue` leg, which runs `check_roles.py`.
 - `tools/hooks/agent-cap.test.sh`
 - `tools/hooks/README.md`
 - `tools/playbook/edge_grammar.py` (`read_handoff_edges`, by name)
+- `tools/playbook/instruction_units.py` (`ORDER_HEAD`'s marker re-pinned with `item=-`, S3)
 - `memory/project/work-order-legacy.txt` (written by the seed)
 - `tools/memory-tree/check-memory-hygiene.sh` (check 3's named case, §8 F5)
 - `tools/memory-tree/HYGIENE.template.md` (the registry row; its render is the main loop's follow-up, S6)
@@ -328,7 +348,7 @@ Live at landing on the `roles catalogue` leg, which runs `check_roles.py`.
 
 ## 7. Gates
 
-`roles catalogue` · `roles adopter self-test` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `playbook render selftest` · `govkit acceptance matrix` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `recall floor` · `recall floor arms` · `branch-guard self-test` · `kit/dogfood doc parity` · `docs` · `govkit selftest` · `govkit refusal join` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles adopter self-test` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `playbook render selftest` · `instruction units selftest` · `govkit acceptance matrix` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `recall floor` · `recall floor arms` · `branch-guard self-test` · `kit/dogfood doc parity` · `docs` · `govkit selftest` · `govkit refusal join` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC3 AC4 AC6 · a planted unmarked handoff and a planted return with a wrong `task-sha` after the fixture's seed · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC2 · a rule-6 case whose prompt carries the marker with `item=`, beside the existing six-field cases kept as the legacy shape · none
@@ -438,6 +458,14 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC2 · a rule-6 case whose prom
   page, the anchor and the follow-up render; the leg line gains `docs`, and `govkit selftest` and
   `govkit refusal join`, whose guards `tools/govkit/usage.toml` trips; new F6 fixes the return
   predicate's reading, probed at `4283cb44` and HEAD `2675b020e`.
+- rev-8 · 2026-11-22 · S3 · §4 · §7 · folded `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-fix-3-brief`,
+  handed as `2026-11-22-prompt-TOOL-dBoundRoles-17-fix-3-spec-writer`, on the divergence
+  `2026-11-22-build-TOOL-dBoundRoles-17-3-builder-return`: S3's Readers line names
+  `instruction_units.py#arm_work_order` as the marker's value reader by its pinned `ORDER_HEAD`, re-pinned
+  with `item=-` and neither sha moving, and names the four other whole-line comparisons a `git grep` for
+  the marker's opening found at `50a732230`, each unchanged; §4's Rollout lands the hook and the renderer
+  in the one pass commit; Files touched gains `tools/playbook/instruction_units.py` and the leg line
+  `instruction units selftest`.
 
 ## 10. Reuse audit
 

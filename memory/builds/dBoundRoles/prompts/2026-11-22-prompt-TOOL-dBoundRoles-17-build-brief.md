@@ -20,7 +20,12 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every roster spec was re-grounded on HEAD before this dispatch, so its citations hold at HEAD or name the earlier
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
-- This is the third dispatch. The second builder (run `wf_25370bd3-656`) found the help page and usage row the docs
+- This is the fourth dispatch. The third builder (run `wf_913518d6-7fc`) built most of the unit, then found
+  `tools/playbook/instruction_units.py#arm_work_order` pinning the marker's bytes; rev-8 adds that reader, the file and
+  its leg. Its partial build is `p17/TOOL-dBoundRoles-17-wip.patch` in the session scratchpad, with the seeded home
+  `p17/work-order-legacy.txt.wip`: re-apply the patch with `git apply --index`, check it against rev-8, then finish the
+  docs, hygiene check 3, the template row, the help page, the usage row, the manifest re-stamp and the ledger.
+- Earlier: this was the third dispatch. The second builder (run `wf_25370bd3-656`) found the help page and usage row the docs
   rule owes, the kickoff manifest re-stamp, a render route a builder may not run, the return predicate's two readings
   and readers with no field record; rev-7 folds all five (§8 F6 for the predicate). The pass edits only
   `tools/memory-tree/HYGIENE.template.md`: the main loop renders `memory/HYGIENE.md` in a follow-up commit, so do not
