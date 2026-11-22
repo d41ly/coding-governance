@@ -6,6 +6,7 @@ model: inherit
 workflow: design
 layer: layer.roles
 acts-as: item
+shapes: single
 reads: field.input.question, field.input.spec?, field.brief.goal?, field.brief.non-goals?, field.task.reuse?
 writes: records
 rules: yagni, reuse, core, derive, verify, small, memory

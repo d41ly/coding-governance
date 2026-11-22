@@ -1,0 +1,42 @@
+# instructions.toml: the roles kit's instruction units, one [[unit]] row each, in the grammar
+# <prefix>/playbook/instruction_units.py reads (PLAY-dOrderedCharter-40). They are the orientations and
+# checklists the entries of workflows.toml name (TOOL-dBoundRoles-16 S6), each scoped to the roles that
+# run in an entry naming it; check_roles.py's R9 joins every such tag to a row here.
+
+[[unit]]
+tag = "unit.orient.producer"
+level = 5
+type = "directive"
+scope = ["role.gov-planner", "role.gov-architect", "role.gov-spec-writer", "role.gov-builder", "role.gov-reviewer", "role.gov-skeptic", "role.gov-synthesizer"]
+trigger = "Before a producing role makes its first change"
+budget = "line"
+text = "MUST read the spec and every file it names before the first change, and build from them."
+owner = "dBoundRoles"
+
+[[unit]]
+tag = "unit.orient.verifier-cold"
+level = 5
+type = "directive"
+scope = ["role.gov-reviewer", "role.gov-skeptic", "role.gov-synthesizer", "role.gov-tester"]
+trigger = "When a role verifies work it did not write"
+budget = "line"
+text = "MUST judge only what is handed, each item against its evidence, never the author's intent."
+owner = "dBoundRoles"
+
+[[unit]]
+tag = "unit.checklist.for-paths"
+level = 5
+type = "pointer"
+scope = ["role.gov-planner", "role.gov-architect", "role.gov-spec-writer", "role.gov-builder", "role.gov-reviewer", "role.gov-skeptic", "role.gov-synthesizer"]
+budget = "line"
+text = "Before the first change, run `python {prefix}/memory-tree/gotchas.py --for-paths <paths>` over the paths the work names."
+owner = "dBoundRoles"
+
+[[unit]]
+tag = "unit.checklist.for-diff"
+level = 5
+type = "pointer"
+scope = ["role.gov-reviewer", "role.gov-skeptic", "role.gov-synthesizer", "role.gov-tester"]
+budget = "line"
+text = "When a diff is judged, run `python {prefix}/memory-tree/gotchas.py --for-diff <range>` over its range."
+owner = "dBoundRoles"

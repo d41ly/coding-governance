@@ -6478,6 +6478,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "check_experiment_table",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
+    },
+    {
       "id": "check_extract_covers",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -9346,6 +9351,11 @@
       "id": "check_tracked",
       "kind": "function",
       "file": "tools/workflows/check-protocol-parity.test.sh"
+    },
+    {
+      "id": "check_tracked_path",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
     },
     {
       "id": "check_tracked_population",
@@ -14348,6 +14358,11 @@
       "file": "tools/loop/termination.py"
     },
     {
+      "id": "derive_stage_rows",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "derive_stage_state",
       "kind": "function",
       "file": "tools/loop/splice.py"
@@ -17118,6 +17133,16 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "load_workflow_kinds",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "load_workflow_table",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "load_workflows",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -19639,6 +19664,11 @@
     },
     {
       "id": "parse_return_template",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "parse_role_shapes",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
     },
@@ -25643,6 +25673,11 @@
       "file": "tools/run-gates/pass_legs.py"
     },
     {
+      "id": "read_scorer_instances",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
+    },
+    {
       "id": "read_scout_return",
       "kind": "function",
       "file": "tools/loop/placement.py"
@@ -26756,6 +26791,11 @@
       "id": "read_unit_rows",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "read_unit_tags",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
     },
     {
       "id": "read_unit_usage_members",

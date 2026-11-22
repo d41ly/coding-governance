@@ -56,6 +56,14 @@ owner = "gov"
 shape = "text"
 required = "every"
 
+# `shapes` (TOOL-dBoundRoles-16 S5): the workflow kinds the role runs in, comma-separated, each one of
+# roles_lib.py's WORKFLOW_KINDS, graded by R2 by its key; R9 refuses a stage row whose kind it lacks.
+[[field]]
+key = "shapes"
+owner = "gov"
+shape = "list"
+required = "agent"
+
 [[field]]
 key = "reads"
 owner = "gov"

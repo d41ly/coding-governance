@@ -133,6 +133,9 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "shapes": [
+        "single"
+      ],
       "workflow": "design",
       "writes": "records"
     },
@@ -143,6 +146,9 @@
         "lexicon naming predicates"
       ],
       "layer": "layer.roles",
+      "shapes": [
+        "per-unit"
+      ],
       "workflow": "build",
       "writes": "product"
     },
@@ -151,6 +157,9 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "shapes": [
+        "single"
+      ],
       "workflow": "orient",
       "writes": "none"
     },
@@ -159,6 +168,9 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "shapes": [
+        "single"
+      ],
       "workflow": "plan",
       "writes": "records"
     },
@@ -167,6 +179,9 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "shapes": [
+        "single"
+      ],
       "workflow": "handoff",
       "writes": "none"
     },
@@ -175,6 +190,10 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "shapes": [
+        "single",
+        "twin"
+      ],
       "workflow": "research",
       "writes": "none"
     },
@@ -183,6 +202,10 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "shapes": [
+        "single",
+        "experiment"
+      ],
       "workflow": "reuse",
       "writes": "none"
     },
@@ -191,6 +214,10 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "shapes": [
+        "panel",
+        "twin"
+      ],
       "workflow": "closing-review",
       "writes": "none"
     },
@@ -199,6 +226,7 @@
       "agent": false,
       "gates": [],
       "layer": "layer.runtime",
+      "shapes": [],
       "workflow": "handoff",
       "writes": "none"
     },
@@ -207,6 +235,10 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "shapes": [
+        "panel",
+        "twin"
+      ],
       "workflow": "closing-review",
       "writes": "none"
     },
@@ -219,6 +251,9 @@
         "spec tokens (a spec's own names resolve)"
       ],
       "layer": "layer.roles",
+      "shapes": [
+        "per-unit"
+      ],
       "workflow": "spec-write",
       "writes": "spec"
     },
@@ -227,6 +262,10 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "shapes": [
+        "panel",
+        "twin"
+      ],
       "workflow": "closing-review",
       "writes": "review"
     },
@@ -235,6 +274,9 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "shapes": [
+        "single"
+      ],
       "workflow": "gate-bar",
       "writes": "none"
     }

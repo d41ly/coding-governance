@@ -24,7 +24,8 @@ that does not read refuses, naming it. A pre-tag charter renders no
 `## Charter` and prints one note. Beside them it writes the generated
 index `.claude/roles.json`: every role with its `workflow`, `writes`, `agent` and `gates`, the gate legs
 the merged grant lets it run (empty where neither home names any), its `layer` and `acts-as`, which
-the playbook kit's layer check reads as data (TOOL-dBoundRoles-1 S6), `harnesses`, the repo-relative
+the playbook kit's layer check reads as data (TOOL-dBoundRoles-1 S6), its `shapes`, the list of workflow
+kinds it runs in (TOOL-dBoundRoles-16 S5), `harnesses`, the repo-relative
 scripts of every workflow whose `driver` is `workflow`, and `gates.manifest`, the repo-relative path of
 the tool root's gate manifest or null when no file is there (TOOL-aOrientedCast-11; scratch-guard.js reads
 both to refuse a role agent a gate), and `effort`, the resolved role and stage levels of the default
@@ -278,14 +279,15 @@ def derive_effort_index(policy, roles, workflows, tool_root, target_root):
 
 def render_roles_index(roles, harnesses, policy, manifest, effort):
     """The index bytes: every role's `workflow`, `writes`, `agent`, `gates`, `layer` and `acts-as`
-    (TOOL-dBoundRoles-1 S6), the harness list, the gate manifest's path and `derive_effort_index`'s
-    `effort`."""
+    (TOOL-dBoundRoles-1 S6) and `shapes`, the kinds it runs in, a list (TOOL-dBoundRoles-16 S5), the
+    harness list, the gate manifest's path and `derive_effort_index`'s `effort`."""
     allow = policy.get("gates", {})
     obj = {"effort": effort, "gates": {"manifest": manifest}, "harnesses": harnesses,
            "roles": {slot: {"acts-as": r["keys"].get("acts-as", ""),
                             "agent": r["keys"].get("agent", "true") == "true",
                             "gates": list(allow.get(slot, [])),
                             "layer": r["keys"].get("layer", ""),
+                            "shapes": lib.parse_role_shapes(r["keys"].get("shapes")),
                             "workflow": r["keys"].get("workflow", ""),
                             "writes": r["keys"].get("writes", "")} for slot, r in roles.items()}}
     return json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=True) + "\n"

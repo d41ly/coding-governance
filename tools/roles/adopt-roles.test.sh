@@ -49,7 +49,10 @@
 # absent house file falling to the declared effort (arm 29); and the stage rows of `workflows.toml` graded as
 # R9, a two-stage mixed-role entry clean, a zero fan, an unknown effort and an unknown row kind refused with
 # and without the loop kit's `kinds` verb, a cap above a committed `runtime.agents-in-flight` refused, and
-# the rows' declared levels read with no house file and no key (arm 30). Every arm is a self-contained block below the prologue, so a
+# the rows' declared levels read with no house file and no key (arm 30); and the workflow shapes graded as R9, a
+# kind's cap above a committed limit, an experiment table naming both, neither or a stray reruns key, a role
+# outside its stage's kind, the role index's `shapes`, and an orientation tag naming no unit, resolved and
+# unarmed (arm 31). Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 25
 # arm 9's writer and lines.
 #
@@ -118,7 +121,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +3 for arm 28 (TOOL-dBoundRoles-1).
 # +6 for arm 29 (TOOL-dBoundRoles-21).
 # +8 for arm 30 (TOOL-dBoundRoles-22).
-FLOOR_ASSERTIONS=102
+# +10 for arm 31 (TOOL-dBoundRoles-16).
+FLOOR_ASSERTIONS=112
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1439,6 +1443,8 @@ check_arm "arm 29 an absent house file falls to the declared effort and is no R1
 # ---- the role's declaration (ac3), the house file deleted last, so every plant above reads it.
 # ---- WHAT IT DOES NOT CHECK: a refusing policy reader, a repeated key, a row on a non-workflow driver,
 # ---- or `receives` against the kinds; nor the real loop kit's `kinds` verb, which has not landed.
+# ---- `scratch` carries the shape TOOL-dBoundRoles-16 requires of an entry listing a role, `single` as the
+# ---- workflow factory writes it, and its `judge` row `kind = "panel"`, the kind gov-skeptic declares.
 build_fixture; _rc30=$?
 _pk=policy; [[ $FXK == */* ]] && _pk=${FXK%/*}/policy
 A30=$("$PY" -B -c 'import json, os, pathlib, re, shutil, subprocess, sys, tomllib
@@ -1460,6 +1466,9 @@ name = "scratch"
 driver = "workflow"
 harness = "{prefix}/workflows/scratch.js"
 roles = ["gov-reuse-scout", "gov-skeptic"]
+kind = "single"
+checklist = "none"
+orientation = "none"
 enforced-by = ["agent-cap.js spawn guard"]
 trigger = "any time this arm plants it"
 """
@@ -1467,7 +1476,7 @@ ROW = """
 [[workflow.stages]]
 key = "%s"
 role = "%s"
-fan = %s
+%sfan = %s
 cap = %s
 effort = "%s"
 receives = %s
@@ -1482,8 +1491,9 @@ for kind in ("seam", "criterion", "interface", "fork", "finding", "repair"):
 table, checker = kit / "workflows.toml", kit / "check_roles.py"
 held = table.read_text(encoding="utf-8")
 def plant(fan=1, cap=1, effort="medium", returns=("finding",)):
-    table.write_text(held + ENTRY + ROW % ("scout", "gov-reuse-scout", 1, 1, "medium", "[]", json.dumps(["seam"]))
-                     + ROW % ("judge", "gov-skeptic", fan, cap, effort, json.dumps(["seam"]), json.dumps(list(returns))),
+    table.write_text(held + ENTRY + ROW % ("scout", "gov-reuse-scout", "", 1, 1, "medium", "[]", json.dumps(["seam"]))
+                     + ROW % ("judge", "gov-skeptic", "kind = \"panel\"\n", fan, cap, effort, json.dumps(["seam"]),
+                              json.dumps(list(returns))),
                      encoding="utf-8")
 def commit(n):
     (fx / ".governance").mkdir(exist_ok=True)
@@ -1552,6 +1562,113 @@ check_arm "arm 30 ...and the limit lowered to 5 reds the cap of 6" \
 check_arm "arm 30 with the house file deleted and no key set, stage-efforts prints the rows' declared levels, one differing from its role's" \
    "$([[ $A30 == *'ac3 1'* ]] && echo 1 || echo 0)"
 [ "$A30" = $'ac2 1\nac4a 1\nac4b 1\nac5a 1\nac5b 1\nac5c 1\nac5d 1\nac3 1' ] || printf '    %s\n' "${A30//$'\n'/$'\n'    }"
+
+# ---- arm 31 (TOOL-dBoundRoles-16 AC2 AC3 AC4 AC6): the workflow shapes graded as R9. The fixture gains the
+# ---- playbook kit whole over its layer register, so the unit join reads this kit's instructions.toml through
+# ---- `read_units`; the workflows kit's replay_scorer.py at the home `workflows`; and the policy kit, the limit
+# ---- 6 committed on `main` as arm 30 commits it, beside a tracked case file and a tracked label-key file. Each
+# ---- plant is one R9 line, the file restored after it: the `panel` [[kind]] row's cap raised to 9 (ac2); the
+# ---- `reuse` entry made an experiment naming both scorer and judge, neither, and a reruns key `ghost.medium`
+# ---- (ac3a to ac3c), and with the scorer `scouted-seam` and every variant keyed exiting 0 (ac3d); gov-builder's
+# ---- shapes cut to `single` while its stages run per-unit, one line naming both stages and the kind (ac4a),
+# ---- and the role index listing each role's shapes as its file declares them after a render (ac4b);
+# ---- closing-review's orientation `unit.orient.nothing` (ac6a), the four tags resolved over the fixture
+# ---- (ac6b), and the join printed unarmed with the playbook kit's unit reader moved away (ac6c). The failing
+# ---- cases, owed at the close and not observed by the pass that wrote this: only explicit row caps bounded
+# ---- (ac2), the table read without its exactly-one rule (ac3a, ac3b), `shapes` read by no check (ac4a), and
+# ---- the tag graded by its shape alone (ac6a). WHAT IT DOES NOT CHECK: a twin entry's `of`, a `merge` value,
+# ---- a stage row's own `kind`, a judge file's content, or a scorer join with no workflows kit.
+build_fixture; _rc31=$?
+_tr31=$FX; [[ $FXK == */* ]] && _tr31=$FX/${FXK%/*}
+A31=$("$PY" -B -c 'import json, os, pathlib, re, shutil, subprocess, sys
+fx, kit, tool_root, src = (pathlib.Path(a).resolve() for a in sys.argv[1:5])
+env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_") and k != "GOV_DEFAULT_BRANCH"}
+def git(*a):
+    return subprocess.run(["git", "-c", "user.name=fx", "-c", "user.email=fx@fx", "-C", str(fx), *a], env=env,
+                          capture_output=True, text=True).returncode
+def run(cwd, *a):
+    p = subprocess.run([sys.executable, "-B", *a], cwd=str(cwd), env=env, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    return p.returncode, p.stdout
+def check(*extra):
+    rc, out = run(kit, "check_roles.py", "--root", str(fx), *extra)
+    return rc, out, [ln for ln in out.splitlines() if ": R9 — " in ln]
+for home in ("policy", "playbook"):
+    shutil.copytree(src / home, tool_root / home, dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__"))
+(tool_root / "workflows").mkdir(exist_ok=True)
+shutil.copy(src / "workflows" / "replay_scorer.py", tool_root / "workflows" / "replay_scorer.py")
+(fx / "fx-cases.json").write_text("[]\n", encoding="utf-8")
+(fx / "fx-labels.json").write_text("{}\n", encoding="utf-8")
+(fx / ".governance").mkdir(exist_ok=True)
+(fx / ".governance" / "policy.toml").write_text("runtime.agents-in-flight = 6\n", encoding="utf-8")
+ok = git("symbolic-ref", "HEAD", "refs/heads/main") == 0 and git("add", "-A") == 0 \
+    and git("commit", "-q", "--allow-empty", "-m", "limit 6") == 0
+table, role = kit / "workflows.toml", kit / "agents" / "gov-builder.agent.md"
+held, role_held = table.read_text(encoding="utf-8"), role.read_text(encoding="utf-8")
+rc, out, r9 = check("--write")
+print("ac6b %d" % int(ok and rc == 0 and not r9 and "4 unit tag(s) resolved" in out))
+table.write_text(held.replace("kind = \"panel\"\nfan = 5\ncap = 5", "kind = \"panel\"\nfan = 5\ncap = 9", 1), encoding="utf-8")
+rc, out, r9 = check()
+print("ac2 %d" % int(rc == 1 and len(r9) == 1 and all(s in r9[0] for s in ("panel", "9", "runtime.agents-in-flight"))))
+EXP = ("[workflow.experiment]\ncases = \"fx-cases.json\"\nvariants = [\"base\", \"house-index\"]\nfan = 4\n%s"
+       "reruns = { \"base.medium\" = 3, \"house-index.medium\" = 3%s }\n\n")
+def plant(names, extra=""):
+    text = held.replace("roles = [\"gov-reuse-scout\"]\nkind = \"single\"",
+                        "roles = [\"gov-reuse-scout\"]\nkind = \"experiment\"", 1)
+    at = text.index("[[workflow]]", text.index("name = \"reuse\""))
+    table.write_text(text[:at] + EXP % (names, extra) + text[at:], encoding="utf-8")
+    return check("--write")
+SCORER, JUDGE = "scorer = \"scouted-seam\"\n", "judge = \"fx-labels.json\"\n"
+for case, names, extra, needle in (("ac3a", SCORER + JUDGE, "", "both scorer and judge"),
+                                   ("ac3b", "", "", "neither scorer nor judge"),
+                                   ("ac3c", SCORER, ", \"ghost.medium\" = 1", "ghost.medium")):
+    rc, out, r9 = plant(names, extra)
+    print("%s %d" % (case, int(rc == 1 and len(r9) == 1 and needle in r9[0])))
+rc, out, r9 = plant(SCORER)
+print("ac3d %d" % int(rc == 0 and not r9 and "no scorer factory answers" not in out))
+table.write_text(held, encoding="utf-8")
+check("--write")
+role.write_text(role_held.replace("shapes: per-unit", "shapes: single", 1), encoding="utf-8")
+rc, out, r9 = check()
+print("ac4a %d" % int(rc == 1 and len(r9) == 1 and all(s in r9[0] for s in ("per-unit", "build.builder", "spec-write.builder"))))
+role.write_text(role_held, encoding="utf-8")
+rc, _out = run(fx, str(kit / "render_agents.py"), "--write")
+index = json.loads((fx / ".claude" / "roles.json").read_text(encoding="utf-8")).get("roles", {})
+declared = {}
+for path in (kit / "agents").glob("*.agent.md"):
+    head = path.read_text(encoding="utf-8").split("\n---", 1)[0]
+    m = re.search(r"(?m)^shapes: *(.*?)\r?$", head)
+    declared[path.name[:-len(".agent.md")]] = [s.strip() for s in m.group(1).split(",")] if m else []
+print("ac4b %d" % int(rc == 0 and len(declared) > 1 and any(declared.values())
+                      and {s: r.get("shapes") for s, r in index.items()} == declared))
+table.write_text(held.replace("orientation = \"unit.orient.verifier-cold\"\nenforced-by = [\"agent-cap.js spawn guard\"]",
+                              "orientation = \"unit.orient.nothing\"\nenforced-by = [\"agent-cap.js spawn guard\"]", 1),
+                 encoding="utf-8")
+rc, out, r9 = check()
+print("ac6a %d" % int(rc == 1 and len(r9) == 1 and "unit.orient.nothing" in r9[0] and "no declared unit" in r9[0]))
+table.write_text(held, encoding="utf-8")
+reader = tool_root / "playbook" / "instruction_units.py"
+reader.rename(reader.with_suffix(".away"))
+rc, out, r9 = check()
+reader.with_suffix(".away").rename(reader)
+print("ac6c %d" % int(rc == 0 and not r9 and "the unit join is unarmed" in out and "units unarmed" in out))
+' "$FX" "$FX/$FXK" "$_tr31" "$HERE/.." 2>&1)
+A31=${A31//$'\r'/}
+check_arm "arm 31 over the fixture the four orientation and checklist tags resolve and no R9 line prints" \
+   "$([ "$_rc31" = 0 ] && [[ $A31 == *'ac6b 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 31 the panel kind row capping 9 over a committed limit of 6 is one R9 line naming panel and the limit" \
+   "$([[ $A31 == *'ac2 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 31 an experiment naming both scorer and judge is one R9 line" "$([[ $A31 == *'ac3a 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 31 ...naming neither is one R9 line" "$([[ $A31 == *'ac3b 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 31 ...a reruns key ghost.medium is one R9 line" "$([[ $A31 == *'ac3c 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 31 ...the scouted-seam scorer with every variant keyed exits 0" "$([[ $A31 == *'ac3d 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 31 gov-builder at shapes single under per-unit stages is one R9 line naming both stages" \
+   "$([[ $A31 == *'ac4a 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 31 the rendered role index lists each role's shapes as its file declares them" \
+   "$([[ $A31 == *'ac4b 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 31 an orientation naming no unit is one R9 line naming the tag" "$([[ $A31 == *'ac6a 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 31 with no unit reader the join prints unarmed and grades no tag" "$([[ $A31 == *'ac6c 1'* ]] && echo 1 || echo 0)"
+[ "$A31" = $'ac6b 1\nac2 1\nac3a 1\nac3b 1\nac3c 1\nac3d 1\nac4a 1\nac4b 1\nac6a 1\nac6c 1' ] || printf '    %s\n' "${A31//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

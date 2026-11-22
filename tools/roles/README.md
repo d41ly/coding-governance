@@ -44,6 +44,12 @@ later key is one row there.
   core roles sit at `layer.roles`; `gov-session` sits at `layer.runtime`. The expansion roles, the
   deployer and the maintainer, have no file here: the playbook kit's layer rows register them, and
   the loop kit refuses a core item naming one.
+- `shapes` is the workflow kinds the role runs in, comma-separated, each one of the five under "The
+  workflow shapes" (TOOL-dBoundRoles-16), required on every agent role and graded by R2. R9 refuses a
+  stage row whose kind the role does not declare, one line per role and kind naming every such
+  stage. A role file of your own that lacks it is an R2 defect on update; `core.py new role` writes
+  the kind of its `--workflow` entry, and refuses, writing nothing, where that entry carries none.
+  The role index, `.claude/roles.json`, lists each role's `shapes`.
 - `effort` is the role's declared reasoning effort, one of the five levels under "The effort
   policy", required on every agent role and graded by R2 (TOOL-dBoundRoles-21). It is the last step
   of the effort order, read only where no policy key is set and no house file is present, so a role
@@ -509,6 +515,7 @@ outside the five levels, a row kind outside the loop kit's set, and a `cap` abov
 `runtime.agents-in-flight`, the policy key read once per run. Where the loop kit prints no row kinds
 the lists are graded by the `seg` shape with one note, and with no policy kit the cap arm prints one
 note calling it unarmed; the summary counts the rows and names the limit they were graded against.
+Each entry's shape is graded as R9 too, as "The workflow shapes" says.
 A stand-in declaration and the owner's waiver rows are joined as R15, under "Standing in for
 a role". It prints one line per defect naming the file and the rule (the rules are listed in its
 header, with what it does not check), then a summary of every count it graded, the charter's shape among
@@ -516,23 +523,61 @@ them. Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the
 `CHARTER` or its `MEMORY_ROOT` is missing, or the doc is no charter this kit reads. `--write` re-renders the region below from the table and the front matter, and nothing
 else; the check compares the two on every run.
 
+## The workflow shapes
+
+Each entry that lists a role declares its whole execution shape (TOOL-dBoundRoles-16): its `kind`, its
+`checklist` and its `orientation`, and optionally its `merge`, its `twin` rule and, on a `twin` entry,
+`of`, the entry it runs twice. The five kinds are `[[kind]]` rows above the first entry of
+`workflows.toml`, each holding the `fan`, `cap`, `merge` and `twin` its entries and their stage rows
+default to:
+
+- `single`, one agent; `per-unit`, one agent per unit, up to the bound; `panel`, finders, verifier
+  batches and one synthesizer, merged `synth` and twinned by the policy key `review.twin`; `twin`,
+  two runs of the entry `of` names, merged `defect-map`; and `experiment`, variants over frozen
+  cases, scored, whose fan and cap are its entry's `[workflow.experiment]` table's `fan`.
+- A stage row may omit `fan` and `cap`, and carry its own `kind` where it differs from its entry's,
+  as `spec-write`'s three audit rows are `panel` inside a `per-unit` entry.
+  `roles_lib.derive_stage_rows(entry, kinds)` is the one place a default is applied, over the map
+  `roles_lib.load_workflow_kinds` reads, and `derive_stage_map` reads its output.
+- Every kind's `cap` is at or under `runtime.agents-in-flight`, graded once at its `[[kind]]` row, and
+  a cap a row sets is graded at the row. No harness reads the rows yet: `panel`'s 5 is
+  `tier2-review`'s `MAX_VERIFIERS`, and `per-unit`'s 5 sits at or under `SPEC_WRITERS`, the agent
+  limit's render.
+- `checklist` and `orientation` are `none` or the tag of an instruction unit; R9 joins each tag to a
+  unit the playbook kit's `read_units` reads, and prints one note calling the join unarmed where that
+  kit does not resolve. This kit's `instructions.toml` holds the four gov's entries name:
+  `unit.orient.producer`, `unit.orient.verifier-cold`, `unit.checklist.for-paths` and
+  `unit.checklist.for-diff`.
+- An `experiment` entry carries a `[workflow.experiment]` table, refused on any other: `cases`, a
+  tracked file; `variants`, distinct words; `fan`, from 1 to the agent limit; exactly one of
+  `scorer`, an `INSTANCES` key of the workflows kit's `replay_scorer.py` (a note where that kit does
+  not resolve), and `judge`, a tracked label-key file; and `reruns`, keyed `<variant>.<level>`, each
+  variant at least once. Gov ships no experiment entry.
+
+`core.py new workflow` writes `kind = "single"`, with `checklist` and `orientation` at `none`, where
+its `--roles` lists a slot, and none of the three where it lists none, as `bookkeeping` carries
+none. The summary counts the entries per kind and the unit tags resolved. What R9 does not check
+here: what a merge or a twin does, which the harnesses own; that a listed role of a stage-less entry
+declares the entry's kind, since R9 grades a role's kind per stage row; and the policy value a `twin`
+key holds.
+
 <!-- gen:roles-catalogue -->
 **Workflows**, from `workflows.toml`:
 
-| name | driver | harness | roles | stages | enforced-by | trigger |
-|---|---|---|---|---|---|---|
-| orient | main-loop | /session-kickoff | gov-orienter | — | manifest-check.sh --card --append | once per session, at kickoff, before the first work-unit is opened |
-| reuse | agent | none | gov-reuse-scout | — | none — the scout's trigger is the kickoff opt-in that aScoutedSeam owns | before a new behaviour is designed, when kickoff asks for a scout |
-| spec-write | workflow | {prefix}/workflows/unattended-build.js | gov-spec-writer, gov-builder, gov-reviewer, gov-skeptic, gov-synthesizer | specWriter → gov-spec-writer, disposal → gov-spec-writer, builder → gov-builder, specFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | scratch-guard.js role arm | once per build, after orientation, for every unit whose spec is missing or thin |
-| spec-review | workflow | {prefix}/workflows/tier2-review.js | gov-reviewer, gov-skeptic, gov-synthesizer | specFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys | after the spec set is written, where the build or its project declares a spec audit |
-| build | workflow | {prefix}/workflows/unattended-unit.js | gov-builder | builder → gov-builder | scratch-guard.js role arm, routed commits name a specced unit | once per unit, in stage order, after its spec is READY |
-| closing-review | workflow | {prefix}/workflows/tier2-review.js | gov-reviewer, gov-skeptic, gov-synthesizer | diffFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard | once per build, after the last unit is terminal, over the cumulative diff |
-| gate-bar | program | bash {prefix}/run-gates/run-gates.sh | gov-tester | — | the pre-push hook | once, after the closing review, at the close or the push boundary |
-| research | agent | none | gov-researcher | — | agent-cap.js spawn guard | any time a design must choose between candidates that no existing seam decides |
-| handoff | program | python {prefix}/roles/handoff.py render | gov-prompt-writer, gov-session | — | none — a session-to-session message is no tool call the spawn guard sees | any time work passes to another session of this repository |
-| bookkeeping | main-loop | none | — | — | memory hygiene | any time a record, an index or the run state is updated |
-| plan | agent | none | gov-planner | — | agent-cap.js spawn guard | any time a build's plan is drafted, judged or recorded, before its specs are written |
-| design | agent | none | gov-architect | — | agent-cap.js spawn guard | any time a build's scope is inventoried or decomposed into units, before its specs are written |
+| name | driver | harness | roles | stages | enforced-by | trigger | kind | checklist | orientation | merge | twin | of | experiment |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| orient | main-loop | /session-kickoff | gov-orienter | — | manifest-check.sh --card --append | once per session, at kickoff, before the first work-unit is opened | single | none | none | — | — | — | — |
+| reuse | agent | none | gov-reuse-scout | — | none — the scout's trigger is the kickoff opt-in that aScoutedSeam owns | before a new behaviour is designed, when kickoff asks for a scout | single | none | none | — | — | — | — |
+| spec-write | workflow | {prefix}/workflows/unattended-build.js | gov-spec-writer, gov-builder, gov-reviewer, gov-skeptic, gov-synthesizer | specWriter → gov-spec-writer, disposal → gov-spec-writer, builder → gov-builder, specFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | scratch-guard.js role arm | once per build, after orientation, for every unit whose spec is missing or thin | per-unit | unit.checklist.for-paths | unit.orient.producer | — | — | — | — |
+| spec-review | workflow | {prefix}/workflows/tier2-review.js | gov-reviewer, gov-skeptic, gov-synthesizer | specFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys | after the spec set is written, where the build or its project declares a spec audit | panel | none | unit.orient.verifier-cold | — | — | — | — |
+| build | workflow | {prefix}/workflows/unattended-unit.js | gov-builder | builder → gov-builder | scratch-guard.js role arm, routed commits name a specced unit | once per unit, in stage order, after its spec is READY | per-unit | unit.checklist.for-paths | unit.orient.producer | — | — | — | — |
+| closing-review | workflow | {prefix}/workflows/tier2-review.js | gov-reviewer, gov-skeptic, gov-synthesizer | diffFinder → gov-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard | once per build, after the last unit is terminal, over the cumulative diff | panel | unit.checklist.for-diff | unit.orient.verifier-cold | — | — | — | — |
+| gate-bar | program | bash {prefix}/run-gates/run-gates.sh | gov-tester | — | the pre-push hook | once, after the closing review, at the close or the push boundary | single | unit.checklist.for-diff | unit.orient.verifier-cold | — | — | — | — |
+| research | agent | none | gov-researcher | — | agent-cap.js spawn guard | any time a design must choose between candidates that no existing seam decides | single | none | none | — | — | — | — |
+| handoff | program | python {prefix}/roles/handoff.py render | gov-prompt-writer, gov-session | — | none — a session-to-session message is no tool call the spawn guard sees | any time work passes to another session of this repository | single | none | none | — | — | — | — |
+| bookkeeping | main-loop | none | — | — | memory hygiene | any time a record, an index or the run state is updated | — | — | — | — | — | — | — |
+| plan | agent | none | gov-planner | — | agent-cap.js spawn guard | any time a build's plan is drafted, judged or recorded, before its specs are written | single | unit.checklist.for-paths | unit.orient.producer | — | — | — | — |
+| design | agent | none | gov-architect | — | agent-cap.js spawn guard | any time a build's scope is inventoried or decomposed into units, before its specs are written | single | unit.checklist.for-paths | unit.orient.producer | — | — | — | — |
 
 **Roles**, from `agents/*.agent.md`:
 

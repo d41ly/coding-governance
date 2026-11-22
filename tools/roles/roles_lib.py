@@ -777,35 +777,103 @@ def load_roles(kit_dir):
     return roles
 
 
-def load_workflows(kit_dir):
-    """`workflows.toml`'s `[[workflow]]` entries, as a list in file order, each entry's `stages` its
-    `[[workflow.stages]]` rows as a list of row dicts in file order (TOOL-dBoundRoles-22 S2). The rows
-    are not validated here: R9 grades them, and `derive_stage_map` is the one map read from them."""
+def load_workflow_table(kit_dir):
+    """`workflows.toml` beside the kit, parsed: the one read `load_workflows` and `load_workflow_kinds`
+    take. An unreadable file, or one that is not TOML, raises RolesError naming it, R6."""
     path = pathlib.Path(kit_dir) / "workflows.toml"
     try:
         with open(path, "rb") as fh:
-            data = tomllib.load(fh)
+            return tomllib.load(fh)
     except OSError as e:
         raise RolesError("%s: R6 — cannot be read — %s" % (path.as_posix(), e.strerror))
     except tomllib.TOMLDecodeError as e:
         raise RolesError("%s: R6 — not valid TOML — %s" % (path.as_posix(), e))
-    entries = data.get("workflow", [])
+
+
+def load_workflows(kit_dir):
+    """`workflows.toml`'s `[[workflow]]` entries, as a list in file order, each entry's `stages` its
+    `[[workflow.stages]]` rows as a list of row dicts in file order (TOOL-dBoundRoles-22 S2). The rows
+    are not validated here: R9 grades them, and `derive_stage_rows` is the one read of them."""
+    entries = load_workflow_table(kit_dir).get("workflow", [])
     if not isinstance(entries, list) or not all(isinstance(e, dict) for e in entries):
-        raise RolesError("%s: R6 — 'workflow' is not an array of tables" % path.as_posix())
+        raise RolesError("%s: R6 — 'workflow' is not an array of tables"
+                         % (pathlib.Path(kit_dir) / "workflows.toml").as_posix())
     return entries
+
+
+#: The five workflow kinds (TOOL-dBoundRoles-16 S1), each named by one `[[kind]]` row of `workflows.toml`
+#: holding its defaults. The set is closed here because `twin` and `experiment` carry fields of their own,
+#: `of` and the `[workflow.experiment]` table, which R9 grades by the kind's name.
+WORKFLOW_KINDS = ("single", "per-unit", "panel", "twin", "experiment")
+
+
+def load_workflow_kinds(kit_dir):
+    """`{kind: row}` of `workflows.toml`'s `[[kind]]` rows, in file order (TOOL-dBoundRoles-16 S1): the
+    named defaults `derive_stage_rows` applies. A `kind` that is no array of tables, a row whose `kind`
+    is not a string, or a kind two rows name raises RolesError naming the file, R9, since each makes the
+    map ambiguous. The values are not graded here: R9 grades them."""
+    where = (pathlib.Path(kit_dir) / "workflows.toml").as_posix()
+    rows = load_workflow_table(kit_dir).get("kind", [])
+    if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
+        raise RolesError("%s: R9 — 'kind' is not an array of [[kind]] tables" % where)
+    out = {}
+    for i, row in enumerate(rows, 1):
+        name = row.get("kind")
+        if not isinstance(name, str):
+            raise RolesError("%s: R9 — [[kind]] row %d's kind %r is not a string" % (where, i, name))
+        if name in out:
+            raise RolesError("%s: R9 — [[kind]] row %d repeats the kind '%s'" % (where, i, name))
+        out[name] = row
+    return out
+
+
+def derive_stage_rows(entry, kinds):
+    """One workflow entry's stage rows with its kind's defaults applied (TOOL-dBoundRoles-16 S1), the
+    one place a default is applied: each a copy of its row carrying `kind`, the row's own else its
+    entry's; `fan` and `cap`, the row's own else its kind row's, and for an `experiment` kind the
+    entry's `[workflow.experiment]` table's `fan` for both; and `merge` and `twin`, the entry's own else
+    its kind row's. `kinds` is `load_workflow_kinds`' map; `{}` applies no default. A value none of them
+    gives stays absent, for R9 to name, and a row that is not a table is skipped, as R9 names it."""
+    rows = entry.get("stages") if isinstance(entry, dict) else None
+    out = []
+    for row in rows if isinstance(rows, list) else ():
+        if not isinstance(row, dict):
+            continue
+        got, kind = dict(row), row.get("kind", entry.get("kind"))
+        held = kinds.get(kind, {}) if isinstance(kind, str) else {}
+        if kind == "experiment":
+            table = entry.get("experiment")
+            fan = table.get("fan") if isinstance(table, dict) else None
+            held = dict(held, **({"fan": fan, "cap": fan} if fan is not None else {}))
+        if kind is not None:
+            got["kind"] = kind
+        for field in ("fan", "cap"):
+            if field not in got and field in held:
+                got[field] = held[field]
+        for field in ("merge", "twin"):
+            value = entry.get(field, held.get(field))
+            if field not in got and value is not None:
+                got[field] = value
+        out.append(got)
+    return out
 
 
 def derive_stage_map(entry):
     """The ordered `{stage key: role}` map of one workflow entry's stage rows (TOOL-dBoundRoles-22 S2),
-    the one map every reader of an entry's stages takes: `{}` where the entry holds no rows, and a row
-    that is not a table, or whose `key` or `role` is not a string, is skipped, since R9 names it. A key
-    repeated in its entry keeps its first row's role."""
-    rows = entry.get("stages") if isinstance(entry, dict) else None
+    read from `derive_stage_rows`, which no key or role defaults: the one map every reader of an
+    entry's stages takes. `{}` where the entry holds no rows, and a row that is not a table, or whose
+    `key` or `role` is not a string, is skipped, since R9 names it. A key repeated in its entry keeps
+    its first row's role."""
     out = {}
-    for row in rows if isinstance(rows, list) else ():
-        if isinstance(row, dict) and isinstance(row.get("key"), str) and isinstance(row.get("role"), str):
+    for row in derive_stage_rows(entry, {}):
+        if isinstance(row.get("key"), str) and isinstance(row.get("role"), str):
             out.setdefault(row["key"], row["role"])
     return out
+
+
+def parse_role_shapes(value):
+    """The kinds a role's `shapes` value declares (TOOL-dBoundRoles-16 S5), comma-separated, in order."""
+    return [s.strip() for s in (value or "").split(",") if s.strip()]
 
 
 def read_agent_limit(root):
@@ -1169,12 +1237,13 @@ def resolve_stage_efforts(policy, workflow, model, root):
     `roles.effort.<workflow>.<stage>`, `roles.effort.<role>` and `roles.effort.default`, read in the
     repository at `root`; then the house file's level table `model` takes, where present, its
     `stages.<workflow>` entry, else its `roles` entry, else its `default`; then the row's own `effort`;
-    then the role's declared `effort`, through `resolve_effort`."""
+    then the role's declared `effort`, through `resolve_effort`. The rows are `derive_stage_rows`',
+    the one read of them (TOOL-dBoundRoles-16 S8), so a row a kind defaults is resolved."""
     name, out = workflow.get("name"), {}
     table = held = None   # the house table, resolved at the first stage no key gives a level
     rows = {}
-    for row in workflow.get("stages") if isinstance(workflow.get("stages"), list) else ():
-        if isinstance(row, dict) and isinstance(row.get("key"), str):
+    for row in derive_stage_rows(workflow, {}):
+        if isinstance(row.get("key"), str):
             rows.setdefault(row["key"], row)
     for key, slot in derive_stage_map(workflow).items():
         level = read_policy_setting(f"roles.effort.{name}.{key}", root)

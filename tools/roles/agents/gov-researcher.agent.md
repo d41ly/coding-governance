@@ -6,6 +6,7 @@ model: inherit
 workflow: research
 layer: layer.roles
 acts-as: item
+shapes: single, twin
 reads: field.input.question, field.brief.goal?, field.brief.non-goals?
 writes: none
 rules: reuse, verify, class, memory

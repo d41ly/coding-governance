@@ -6,6 +6,7 @@ model: inherit
 workflow: plan
 layer: layer.roles
 acts-as: item
+shapes: single
 reads: field.input.question, field.brief.goal?, field.brief.non-goals?, field.card.route?
 writes: records
 rules: yagni, reuse, derive, verify, memory

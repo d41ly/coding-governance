@@ -6,6 +6,7 @@ model: inherit
 workflow: gate-bar
 layer: layer.roles
 acts-as: item
+shapes: single
 reads: field.input.spec, field.input.diff?, field.input.question?
 writes: none
 rules: verify, spec, gate, class, risk

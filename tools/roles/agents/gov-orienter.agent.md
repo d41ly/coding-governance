@@ -7,6 +7,7 @@ maxTurns: 60
 workflow: orient
 layer: layer.roles
 acts-as: item
+shapes: single
 reads: field.input.question, field.input.prompt?
 writes: none
 rules: small, ids, memory, tokens, tools
