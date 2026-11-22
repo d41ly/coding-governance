@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-37 — only the four rendered workflow scripts are `linguist-generated`, held equal to the kits' render rows both ways
 
-**Status:** WONTDO · rev-4 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 4 · advances TOOL-dTotalRecall-27 · retired with the code record it repairs: TOOL-dTotalRecall-8 is WONTDO by its §8 F1 loss route, deviation 2026-11-22-build-TOOL-dTotalRecall-8-deviation-83, and no scope here stands without it (§8 F4)
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 4 · advances TOOL-dTotalRecall-27 TOOL-dTotalRecall-109
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -218,6 +218,7 @@ AC4's.
   builds an arm whose one row has no reader, scaffolding for a later unit's row (`[yagni]`), and unit
   53 can build its own arm for that row at its re-ground. RESOLVED (agent, 2026-11-22, delegated):
   (a), M3, the one option that builds nothing without a reader. widens: none · relaxes: none
+  Superseded 2026-11-22: the retirement became a deferral to ask TOOL-dTotalRecall-109, beside TOOL-dTotalRecall-8's, so this unit stays parked with the code record it repairs.
 
 ## 9. Revision log
 
@@ -225,6 +226,7 @@ AC4's.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off mirror of TOOL-dTotalRecall-53, each a consumes-from edge of a unit the round-1 spec audit of units 36 to 43 promoted.
 - rev-3 · 2026-11-22 · §1, §2 S2 to S4, §3, §4, §5, AC1, AC3 to AC5, §7, §8 F3, §10 · re-grounded at base `8b8b1374` per `2026-11-22-prompt-TOOL-dTotalRecall-37-reground-brief`: the workflows kit now tracks fourteen `.js` files, six hand-written; the record is `tools/playbook/code_record.py` beside the tag index; the render set resolves through `resolve_dests` and excludes `.md` (F3); `derive_home_ctx` and `read_attr_population` extracted at their second instance (S3, AC5); `policy fixtures` named on the leg line; citations by symbol.
 - rev-4 · 2026-11-22 · Status · §3 Edges · §8 F4 · retired `WONTDO` per `2026-11-22-prompt-TOOL-dTotalRecall-8-retire-brief`: TOOL-dTotalRecall-8 lost its re-timing (deviation 83) and is not built, and by F4 no scope of this unit stands without its record; both edges say so. No other text moved.
+- rev-5 · 2026-11-22 · Status · §8 F4 · deferred per `2026-11-22-prompt-TOOL-dTotalRecall-8-defer-brief`: the status goes `DEFERRED`, the header advances TOOL-dTotalRecall-109 beside TOOL-dTotalRecall-27 and drops the retirement reason, and F4 gains the line saying the retirement became a deferral beside TOOL-dTotalRecall-8's. Every other rev-4 change stays.
 
 ## 10. Reuse audit
 

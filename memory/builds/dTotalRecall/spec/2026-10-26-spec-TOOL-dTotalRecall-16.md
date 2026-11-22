@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-16 — the registry's `purpose` field, and every existing node's purpose reviewed as `memory.map-purpose` says
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base a3d6d07e · streams tooling · order 5 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base a3d6d07e · streams tooling · order 5 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0227@b1bcbcb9 whole
 **Carries:** node:policy-key.memory.map-purpose
@@ -125,6 +125,7 @@ The level-0 map reads these purposes.
 - **consumes-from** `TOOL-dTotalRecall-8` — nothing minted: its rev-5 §8 F4 mints no `policy_value.py`, so this unit reads `memory.map-purpose` through the landed `tools/memory-tree/tree_lib.py#read_policy_value`
 - **consumes-from** `TOOL-dTotalRecall-18` — S10's `--layer`, `--lifecycle` and `--readers-none` flags of `record_kinds.py new`, which this unit's `new` call passes beside `--purpose`, and the view's S2 columns and S11 cell escape, after which its `Purpose` column renders
 - **hands-off** `TOOL-dTotalRecall-14` — `purpose`, each node's declared purpose or `—`, which the map renders
+- **hands-off** `TOOL-dTotalRecall-25` — S1's `purpose` cell and S2's `--purpose` of `record_kinds.py new`, which that unit's `new` call passes in writing the `stream-plan` row
 - **consumes-from** external — landed and re-grounded at `a3d6d07e`: PLAY-dOrderedCharter-22 S3 and S4 (`memory/project/chain.toml`, `CHAIN_REGISTRY`, `check_chain_registry`'s string `purpose`), TOOL-dGroundRules-1 S3 and -2 (the catalogue row and `policy.py get`), TOOL-dWitnessedBar-13 S2 (the `[[ledger]]` registration and `legacy_ledger.py seed`)
 - **hands-off** `TOOL-dTotalRecall-43` — the purpose review and its write surface, which that unit changes for the round-1 audit's ids 30 and 65; at rev-3 the review writes no namespace member's file
 
@@ -351,6 +352,9 @@ PLAY-dOrderedCharter-22's arm grades; and `--selftest` on the bar, since no leg 
 - rev-4 · 2026-11-22 · §3 · by 2026-11-22-prompt-TOOL-dTotalRecall-16-edge-brief: the Edges block gains
   the consumes-from bullet matching spec 18 rev-6's hands-off to this unit, and the non-goal's sentence
   saying no such edge exists is deleted; nothing else moved.
+- rev-5 · 2026-11-22 · §3 · by 2026-11-22-prompt-TOOL-dTotalRecall-25-edges-brief: the Edges block
+  gains the hands-off bullet to TOOL-dTotalRecall-25 mirroring that unit's rev-6 consumes-from edge;
+  nothing else moved.
 
 ## 10. Reuse audit
 

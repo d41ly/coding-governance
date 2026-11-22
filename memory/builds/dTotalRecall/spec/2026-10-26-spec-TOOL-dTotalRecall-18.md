@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-18 — the kind registry completed: every column declared, readers and writers rendered, the pockets witnessed, and `journal` renamed `log`
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 46c806b6 · streams tooling · order 4 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 46c806b6 · streams tooling · order 4 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0229@03c635cf whole
 **Carries:** node:record-kind.view
@@ -27,6 +27,7 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-18-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-18-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dTotalRecall-18-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-18-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks.md) | research | TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-18-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-18-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-18-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-18-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-18-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-18-reground-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -161,6 +162,7 @@ fixtures, each re-pointed or found to hold no reader (§4 "The rename's sites", 
 
 - **consumes-from** `TOOL-dTotalRecall-1` — `record-kinds.toml`, `record_kinds.py` and its legacy ledger, whose optional columns this unit makes required and whose view and factory it extends
 - **hands-off** `TOOL-dTotalRecall-16` — S10's `--layer`, `--lifecycle` and `--readers-none` flags of `record_kinds.py new`, which that unit's `new` call passes beside `--purpose`, and the view's S2 columns and S11 cell escape, after which its `Purpose` column renders
+- **hands-off** `TOOL-dTotalRecall-25` — S1's required columns and S10's `--layer`, `--lifecycle` and `--readers-none` flags of `record_kinds.py new`, which that unit's `new` call passes in writing the `stream-plan` row
 - **hands-off** `TOOL-dTotalRecall-19` — `log`, the Serves kind the door writes in each record's header, and `resolve_kind`
 - **hands-off** `TOOL-dTotalRecall-20` — `log`, the retired alias `journal` and S12's `[[retired]]` row, whose upgrade step unit 20 ships and may name in that row's place
 - **consumes-from** external — PLAY-dOrderedCharter-29 S5 (`doors.toml` and `check_one_door`), TOOL-dDeclaredLoop-12 (`tools/loop/loop.toml` item rows), TOOL-dDeclaredLoop-24 (`derive_record_ref` and the typed record reference) and TOOL-dSafePassage-10 (the step gate and its `[[retired]]` witness), each landed and re-grounded here at base
@@ -499,6 +501,9 @@ New arm: tools/playbook/writing_practice.py · covers AC3 · the plant `door-in-
   read through the alias; three pocket families added; counts re-derived.
 - rev-6 · 2026-11-22 · §3 · an edges pass per `2026-11-22-prompt-TOOL-dTotalRecall-8-edges-brief`: the
   Edges block gains the hands-off bullet to TOOL-dTotalRecall-16 mirroring that unit's rev-3
+  consumes-from edge; nothing else moved.
+- rev-7 · 2026-11-22 · §3 · an edges pass per `2026-11-22-prompt-TOOL-dTotalRecall-25-edges-brief`:
+  the Edges block gains the hands-off bullet to TOOL-dTotalRecall-25 mirroring that unit's rev-6
   consumes-from edge; nothing else moved.
 
 ## 10. Reuse audit

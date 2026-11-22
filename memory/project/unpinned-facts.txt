@@ -8294,7 +8294,6 @@ memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.
 memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md	34 units	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md	40 units	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md	20 units	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md	1 MB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md	140 legs	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md	213 rows	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md	24 rows	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

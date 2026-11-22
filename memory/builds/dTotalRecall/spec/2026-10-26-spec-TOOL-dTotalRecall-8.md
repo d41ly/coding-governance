@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built
 
-**Status:** WONTDO · rev-7 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · advances TOOL-dTotalRecall-27 · retired by §8 F1's loss route: the cold record measured 10,884,519 bytes against AC1's 1 MB line, deviation 2026-11-22-build-TOOL-dTotalRecall-8-deviation-83
+**Status:** DEFERRED · rev-8 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · advances TOOL-dTotalRecall-27 TOOL-dTotalRecall-109
 
 **Carries:** cl-dClosedLoop-0219@62a3f369 whole
 **Carries:** node:record-kind.code
@@ -31,6 +31,8 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-8-defer-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-defer-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-8-defer-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-defer-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-edges-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-edges-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-edges-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-edges-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-facts-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-facts-brief.md) | journal | — |
@@ -442,6 +444,7 @@ any adopter tree but the planted one; whether a `test` row's definition really t
   unit is retired `WONTDO` by M2's AMEND with its measurement in the deviation it owes, and its
   readers keep `git grep`. widens: none · relaxes: none
   Taken 2026-11-22: the cold run at the pass base printed `seconds 10.80` and `bytes 10884519`, over the 1 MB line, recorded in `2026-11-22-build-TOOL-dTotalRecall-8-deviation-83`.
+  Superseded 2026-11-22: the loss route's `WONTDO` became a deferral to ask TOOL-dTotalRecall-109, since a retired carrier leaves cl-dClosedLoop-0219 and its owned nodes with no live carrier and hygiene check 29 then refuses every INPROGRESS spec of the build.
 - **F2 — Where are vendored and generated paths registered, when no registry exists today?** Options:
   (a) `.gitattributes`' `linguist-vendored` and `linguist-generated`; (b) each `kit.toml`'s
   `[[generated]]` rows; (c) a new conf or policy key. (b) needs the run-gates kit's token resolution
@@ -518,6 +521,11 @@ any adopter tree but the planted one; whether a `test` row's definition really t
   F1's loss route is taken; the `closes` list leaves the header, since the record that would answer
   TOOL-dTotalRecall-102 and TOOL-dTotalRecall-103 is not built; the hands-off bullets to units 37 and
   43 and the external one say so; F1 gains the line recording the measurement. No other text moved.
+- rev-8 · 2026-11-22 · Status · §8 F1 · deferred per `2026-11-22-prompt-TOOL-dTotalRecall-8-defer-brief`:
+  the status goes `DEFERRED`, the header advances TOOL-dTotalRecall-109 beside TOOL-dTotalRecall-27 and
+  drops the retirement reason, and F1 gains the line saying the loss route's `WONTDO` was superseded,
+  because a retired carrier leaves cl-dClosedLoop-0219 and its owned nodes uncarried and hygiene check
+  29 refuses the build's INPROGRESS specs. The Carries lines and every other rev-7 change stay.
 
 ## 10. Reuse audit
 

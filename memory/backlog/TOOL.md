@@ -673,7 +673,7 @@ Cite ids, never line numbers.
 | [TOOL-dTieredTribunal-22](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the uncounted filter(Boolean) predicate, the follow-up… |
 | [TOOL-dTieredTribunal-23](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the protocol gate arm TOOL-dTieredTribunal-13's F1 resolved to record… |
 | [TOOL-dTieredTribunal-24](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | two mechanical arms for the amendment-leaves-its-other-half-standing… |
-| [TOOL-dTotalRecall-27](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | MED | TOOL-dTotalRecall-10 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dTotalRecall-27](../builds/dTotalRecall/BACKLOG.md) | INPROGRESS | MED | TOOL-dTotalRecall-18 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dTotalRecall-28](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE RECORD-KIND FACTORY HAS TWO OWNERS ON PAPER. TOOL-dPlacedRequest-1… |
 | [TOOL-dTotalRecall-29](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | MED | TOOL-dTotalRecall-3 | 2026-10-26 | THE SHARED REF WRITER MAY DELETE A CLAIM REF. TOOL-dTotalRecall-3 never… |
 | [TOOL-dTotalRecall-30](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-24 | 2026-10-26 | THE FEED CENSUS CANNOT SEE A RECORD COMMIT. TOOL-dPlacedRequest-13's… |
@@ -690,6 +690,7 @@ Cite ids, never line numbers.
 | [TOOL-dTotalRecall-106](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE CAUSES CHECK READS NO BINDING. TOOL-dTotalRecall-19 S8's… |
 | [TOOL-dTotalRecall-107](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE ITEM BUDGET HAS NO PER-ROLE FORM. v2:1370 gives memory.item-budget… |
 | [TOOL-dTotalRecall-108](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE RECORD-KIND CHECK READS NO SERVES LINE OUTSIDE THE BUILD FOLDERS.… |
+| [TOOL-dTotalRecall-109](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | HIGH | TOOL-dTotalRecall-37 | 2026-11-22 | THE CODE RECORD LOST ITS OWN RE-TIMING. TOOL-dTotalRecall-8's cold… |
 | [TOOL-dTracedLedger-2](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aSparedSpawn's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTracedLedger-3](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aOrientedCast's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTrackedAtlas-13](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite pre-push run-log line red at 9e21ac76 on the daily held… |
