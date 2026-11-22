@@ -298,7 +298,10 @@ fi
 # next six rows are PLAY-dOrderedCharter-70's: a TOML row placed on its own `tag =` line, a staged rename
 # serving the new name alone, and a charter moved by a committed and by an uncommitted conf edit; between
 # them, PLAY-dOrderedCharter-49's two: a dirty row leaves with its reverted edit, and a worktree re-created at
-# a gone one's path inherits none of its rows.
+# a gone one's path inherits none of its rows. The last two rows are TOOL-dTotalRecall-10's `repeat-heading`: a
+# repeated `##` heading derives `-2`, a later heading folding to that suffix searches past it to `-2-2`, the
+# second section serves its own text, and `check` grades no derived anchor for uniqueness. What they do not
+# check: a repeat across `##` and `###`, which the `doc` namespace does not derive.
 # run_plant_rows <label> <script>: one `<plant and flags>|<exit>|<must print>|<must not print>` row per stdin
 # line, each run as `<script> --fixture --plant <plant and flags>`; every failed row adds one to `_tf`.
 run_plant_rows() {
@@ -415,6 +418,8 @@ reference-row $_tk|0|h1 = "The fixture's reference page"|lacks h1
 reference-row $_tk|0|show: rc=0, check: rc=0
 reference-no-h1 $_tk|1|member doc.reference.fixture (|resolves to no row
 reference-no-h1 $_tk|1|/references.toml) lacks h1
+repeat-heading $_tk|0|tags: plant repeat-heading · sections findings findings-2 findings-2-2
+repeat-heading $_tk|0|tags: green · 0 red|doc.repeat#findings
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
 echo "PASS — the tag resolver's plants"

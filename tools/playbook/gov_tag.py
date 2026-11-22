@@ -397,7 +397,10 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
           "positional-spec-revbump", "positional-bulk-move", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
-          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows")
+          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "repeat-heading")
+#: TOOL-dTotalRecall-10 S4's `repeat-heading`: one H2 repeated, then a heading whose own fold is the repeat's suffix
+REPEAT_GUIDE = ("# Repeat\n\n## Findings\n\nthe first findings\n\n## Findings\n\nthe second findings\n\n"
+                "## Findings 2\n\nthe third findings\n")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -634,6 +637,8 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
             files["memory/guides/ALPHA.md"] += "\nand [doc.nope]\n"
     if plant == "two-paths":
         files["memory/guides/BETA.md"] = GUIDE
+    if plant == "repeat-heading":
+        files["memory/guides/REPEAT.md"] = REPEAT_GUIDE
     if plant == "unclosed-fence":
         files["memory/guides/ALPHA.md"] = GUIDE + UNCLOSED
     if plant == "unclosed-record":
@@ -1108,6 +1113,22 @@ def run_plant(root, top, plant, sets) -> int:
         same = print_equal(read_dump(root), read_cold_dump())
         rc = run_verb(root, "where", "doc.alpha#intro", sets=sets)
         return 0 if same and rc == 0 else 1
+    if plant == "repeat-heading":  # TOOL-dTotalRecall-10 S4: each repeat its own address, none graded unique
+        run_verb(root, "rebuild", None, sets=sets)
+        con = ti.load_index(root)
+        try:
+            ti.load_view(con, root, ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml"))
+            rows = sorted(ti.read_rows(con, ("section",), like="doc.repeat#%"), key=lambda r: r[2])
+        finally:
+            con.close()
+        segs = [r[0].split("#", 1)[1] for r in rows]
+        served = read_served(root, "doc.repeat#findings-2")
+        body = [line for line in served.splitlines() if line.strip() and not line.startswith("#")]
+        say("sections", *segs)
+        say("findings-2 serves", *body)
+        rc = run_verb(root, "check", None, sets=sets)
+        ok = segs == ["findings", "findings-2", "findings-2-2"]
+        return 0 if ok and "the second findings" in served and "the first findings" not in served and rc == 0 else 1
     if plant == "dirty":
         other = top / "wt2"
         run_git(root, "worktree", "add", "-q", str(other), "-b", "two")

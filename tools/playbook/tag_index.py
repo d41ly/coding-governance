@@ -2,7 +2,8 @@
 
 THE GRAMMAR. A tag is `<ns>.<seg>(.<seg>)*`, each `seg` `[a-z0-9][a-z0-9-]*`, at most TAG_MAX_BYTES bytes;
 `<ns>` is a word the registry, `namespaces.toml` beside this file, declares, never one typed here. A
-document section is `doc.<name>#<seg>`, its `<seg>` the `##` heading folded by `derive_heading_seg`.
+document section is `doc.<name>#<seg>`, its `<seg>` the `##` heading folded by `derive_heading_seg`,
+a repeat suffixed by `derive_anchor`.
 
 THE INDEX is `<git-common-dir>/gov/index-s<INDEX_SCHEMA>.db`, `derive_index_path`'s, one file per node
 that every worktree of the repository shares, written by the extractors alone through `build_index`, never committed: deleting it costs one
@@ -248,6 +249,20 @@ def derive_heading_seg(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
 
 
+def derive_anchor(heading: str, seen: set) -> str:
+    """One heading's derived anchor in one document. `seen` holds the anchors derived before it, and this
+    extends it: a repeat of a fold takes `-2`, `-3`, the search running past a natural suffix another heading
+    already took; an empty fold is returned empty and never recorded (TOOL-dTotalRecall-10 S1)."""
+    base = derive_heading_seg(heading)
+    if not base:
+        return ""
+    anchor, n = base, 2
+    while anchor in seen:
+        anchor, n = f"{base}-{n}", n + 1
+    seen.add(anchor)
+    return anchor
+
+
 def scan_unfenced(text: str, unclosed: list | None = None):
     """(line number, line) for every line of Markdown `text` outside a fence, through memory-tree's one fence
     reader; the line an unclosed fence opens at goes to `unclosed`, a caller that does not ask reading on.
@@ -292,9 +307,10 @@ def extract_doc(ctx, path, text=None):
     lines = text.splitlines()
     heads = [(n, line[3:].strip()) for n, line in scan_unfenced(text) if line.startswith("## ")]
     rows = [("", "doc", 1, len(lines), lines[0] if lines else "")]
+    seen = set()
     for i, (n, head) in enumerate(heads):
         end = heads[i + 1][0] - 1 if i + 1 < len(heads) else len(lines)
-        seg = derive_heading_seg(head)
+        seg = derive_anchor(head, seen)
         if seg:
             rows.append((f"#{seg}", "section", n, end, "\n".join(lines[n - 1:end])))
     return rows

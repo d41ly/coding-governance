@@ -11513,6 +11513,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "derive_anchor",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "derive_anchor_tier",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
