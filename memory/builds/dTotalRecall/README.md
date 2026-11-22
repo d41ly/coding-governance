@@ -107,9 +107,9 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-16 — the registry's `purpose` field, and every existing node's purpose reviewed as `memory.map-purpose` says](spec/2026-10-26-spec-TOOL-dTotalRecall-16.md) | 5 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [TOOL-dTotalRecall-25 — the stream-plan kind, registered so the planner that writes it and the pick that reads it descend from one row](spec/2026-10-26-spec-TOOL-dTotalRecall-25.md) | 6 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader](spec/2026-10-26-spec-TOOL-dTotalRecall-5.md) | 7 | 2 | CLOSED | rev-12 | 2026-11-22 |
-| [TOOL-dTotalRecall-38 — every id reader that splits on a hyphen parses through the grammar, found by the reader census and proved by the flip probe](spec/2026-10-26-spec-TOOL-dTotalRecall-38.md) | 8 | 2 | DEFERRED | rev-5 | 2026-11-22 |
-| [TOOL-dTotalRecall-4 — the build README's declared front-matter schema, its routing region, the work order as each agent's root, and a design-only build's ids as units](spec/2026-10-26-spec-TOOL-dTotalRecall-4.md) | 8 | 2 | DEFERRED | rev-5 | 2026-11-22 |
-| [TOOL-dTotalRecall-54 — `parse_id_parts` lands on the named-group regex in step 8, ahead of the readers unit 38 re-points onto it](spec/2026-10-26-spec-TOOL-dTotalRecall-54.md) | 8 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dTotalRecall-38 — every id reader that splits on a hyphen parses through the grammar, found by the reader census and proved by the flip probe](spec/2026-10-26-spec-TOOL-dTotalRecall-38.md) | 8 | 2 | DEFERRED | rev-6 | 2026-11-22 |
+| [TOOL-dTotalRecall-4 — the build README's declared front-matter schema, its routing region, the work order as each agent's root, and a design-only build's ids as units](spec/2026-10-26-spec-TOOL-dTotalRecall-4.md) | 8 | 2 | DEFERRED | rev-6 | 2026-11-22 |
+| [TOOL-dTotalRecall-54 — `parse_id_parts` lands on the named-group regex in step 8, ahead of the readers unit 38 re-points onto it](spec/2026-10-26-spec-TOOL-dTotalRecall-54.md) | 8 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dTotalRecall-40 — the routing region reads every record kind through `resolve_kind`, so log records written after the rename route under logs](spec/2026-10-26-spec-TOOL-dTotalRecall-40.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-44 — the split census keys on the split's shape, so it lists every id reader whatever its value is named](spec/2026-10-26-spec-TOOL-dTotalRecall-44.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-45 — the four id readers outside unit 38's table parse through the grammar, each site held gone by file and line](spec/2026-10-26-spec-TOOL-dTotalRecall-45.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-22 |
@@ -192,7 +192,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 334 bound to this build, across 4 record folder(s).
+Records: 344 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

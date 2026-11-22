@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-4 — the build README's declared front-matter schema, its routing region, the work order as each agent's root, and a design-only build's ids as units
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base c344bdc4 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base e514feb7 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0215@10676c23 whole
 **Carries:** node:record-kind.build-readme
@@ -15,11 +15,14 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-4-deviation-41.md](../build/2026-10-26-build-TOOL-dTotalRecall-4-deviation-41.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-4-reground-2-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-4-reground-2-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-4-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-4-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-4-reground-2-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-4-reground-2-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-4-reground-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-4-reground-2-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-4-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-4-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-4-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-4-reground-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -48,7 +51,9 @@ nobody, and the README routes a reader to no record by purpose.
   grammar)`, which returns the refusal text or `""`. The parser keeps its signature `(path, slug)` and
   passes `conf` and `grammar` as `None`, grading the types §4 marks tree-free; `collect`
   (`tools/memory-tree/gen_build_index.py#collect`) grades the tree-bound types through the same
-  function with the conf and unit 5's `derive_slug_grammar(root)`, replacing its two enum checks. So
+  function with the conf and `read_slug_grammar(root)` (`#read_slug_grammar`), unit 5's wrapper over
+  `tools/memory-tree/id_grammar.py#derive_slug_grammar` whose refusal is a `Problem`, replacing its
+  two enum checks. So
   the loop kit's four callers, `tools/loop/budget.py#derive_patch_origin`,
   `tools/loop/loop_parents.py#read_withdrawn_parents`, `tools/loop/placement.py#derive_build_status`
   and `tools/loop/position.py#derive_position_into`, gain the unknown-key and tree-free refusals and
@@ -58,8 +63,9 @@ nobody, and the README routes a reader to no record by purpose.
   its loop, so every in-generator reader reads it unchanged: the build-index status line
   (`#render_region`), the LIVE rows (`#render_live`) and the ledger shards (`#render_shards`).
   `cmd_placed_build` stops reading its origin's typed `roster` and `streams`, and both scaffolds,
-  `render_new_build_readme` and `render_placed_build_readme`, stop writing the three keys, the second
-  losing its `roster` and `streams` parameters. `--print-front-matter <slug>` prints the derived three
+  `render_new_build_readme` and `render_placed_build_readme`, stop writing the three keys, the first
+  losing its `conf` parameter, read today for the streams alone, and the second its `roster` and
+  `streams` parameters; each keeps the `slug-grammar:` line unit 5 added. `--print-front-matter <slug>` prints the derived three
   through `read_derived_front_matter(root, conf, slug)`, and the two readers outside the generator
   read it: the unattended kit's `tools/unattended/unattended.sh#read_roster_family` runs the flag on
   the generator `resolve_index_generator` names, and `tools/loop/claim.py#read_anchor_unit` calls the
@@ -96,7 +102,7 @@ nobody, and the README routes a reader to no record by purpose.
   `depends-on`, `patches`, `amends`, `supersedes` and `implements` as authored keys so the refusal does
   not reject them, and types their values; unit 6 parses them.
 - Grading an adopter's README front matter before unknown keys are refused: TOOL-dTotalRecall-20's
-  upgrade step. gov's own 223 READMEs carry no unknown key (PINNED 2026-11-22 at `c344bdc40`).
+  upgrade step. gov's own 223 READMEs carry no unknown key (PINNED 2026-11-22 at `e514feb71`).
 - Removing `status:` from the chain READMEs, ask PLAY-dClosedLoop-31's acceptance: an owner records
   commit. The schema keeps today's rule, a typed `status` refused once a spec carries a status header
   (`tools/memory-tree/gen_build_index.py#derive_status`).
@@ -106,14 +112,16 @@ nobody, and the README routes a reader to no record by purpose.
 - The record door's `new build-readme`: TOOL-dTotalRecall-2's, which writes against this schema.
 - Cutting work orders from the build's records (P29's executor): dWellOiledMachine's. This unit only
   states the root in the handoff it already renders.
-- The registry's four columns S8's row fills: TOOL-dTotalRecall-18's (order 4, before this unit), whose
-  `layer`, `home`, `lifecycle` and `readers` rules the row meets; that unit names no edge to this one.
+- The registry's columns S8's row fills: TOOL-dTotalRecall-18's four (order 4, before this unit), whose
+  `layer`, `home`, `lifecycle` and `readers` rules the row meets, and TOOL-dTotalRecall-16's `purpose`,
+  both CLOSED; neither names an edge to this one.
 
 ### Edges
 
-- **consumes-from** `TOOL-dTotalRecall-5` — `derive_slug_grammar`, whose `BUILD_SLUG_RE` types the
-  `slugs` keys and whose `parse_slug_grammar` types the `slug-grammar:` key `FRONT_MATTER_KEYS`
-  admits, written by both scaffolds since unit 5
+- **consumes-from** `TOOL-dTotalRecall-5` — `derive_slug_grammar`, read through
+  `gen_build_index.py#read_slug_grammar`, whose `BUILD_SLUG_RE` types the `slugs` keys, and
+  `parse_slug_grammar`, which types the `slug-grammar:` key `FRONT_MATTER_KEYS` admits, written by
+  both scaffolds since unit 5 (CLOSED, `202a354a4`)
 - **consumes-from** `TOOL-dTotalRecall-1` — `record-kinds.toml`, the registry the
   `record-kind.build-readme` row lands in
 - **hands-off** `TOOL-dTotalRecall-6` — `FRONT_MATTER_KEYS`, whose relation keys unit 6 parses,
@@ -122,7 +130,7 @@ nobody, and the README routes a reader to no record by purpose.
   validates against before it writes
 - **hands-off** `TOOL-dTotalRecall-20` — `FRONT_MATTER_KEYS`, which the upgrade step grades an
   adopter's README against before unknown keys are refused
-- **consumes-from** external — landed and re-grounded at `c344bdc40`: TOOL-dWitnessedBar-13's
+- **consumes-from** external — landed and re-grounded at `c344bdc40`, re-read at `e514feb71`: TOOL-dWitnessedBar-13's
   `[[ledger]]` registration and its memory-tree copy `tools/memory-tree/legacy_ledger.py`, and
   TOOL-dWitnessedBar-15's `seed_population`, which seed the legacy population (I22);
   `read_policy_value` (I8) over TOOL-dGroundRules-1 S3's `builds.agent-root` catalogue row;
@@ -164,22 +172,23 @@ FRONT_MATTER_KEYS = {
 | Type | Grade | Admits |
 |---|---|---|
 | `slug` | tree-free | the folder name, compared as today in `parse_front_matter` |
-| `date` | tree-free | an ISO calendar date, four-digit year first, compared as today for `opened` |
+| `date` | tree-free | an ISO calendar date, four-digit year first, that `datetime.date.fromisoformat` reads, so `2026-13-45`, which today's shape match for `opened` admits, is refused |
 | `tags` | tree-free | whitespace-separated tokens holding no space, comma or bracket (PLAY-dOrderedCharter-24 S2's target rule) |
 | `word` | tree-free | one token of `[A-Za-z0-9._-]+` |
-| `grammar` | tree-free | a value unit 5's `parse_slug_grammar` reads |
+| `grammar` | tree-free | a value `tools/memory-tree/id_grammar.py#parse_slug_grammar` reads, its `ConfError` the refusal, the module imported at call as `read_slug_grammar` imports it; `derive_slug_grammar` reads the same key through that one parser (`#read_recorded_grammars`) |
 | `path` | tree-free | a relative path holding no `..` segment, the shape `cmd_placed_build` checks of `--playbook` |
 | `count` | tree-free | a positive whole number, as `read_placed_build_args` checks `--pieces` |
 | `status` | tree-free | `STATUS_TOKENS`, as today |
-| `ids`, `id-ranges` | tree-bound | whitespace-separated ids, a range `<id>..<n>` for `id-ranges`, each through `tools/memory-tree/tree_lib.py#_id_alternation` |
-| `slugs` | tree-bound | whitespace-separated tokens, each matching `derive_slug_grammar(root).BUILD_SLUG_RE` |
+| `ids`, `id-ranges` | tree-bound | whitespace-separated ids, each matching `tools/memory-tree/tree_lib.py#build_id_token_re` over `#_id_alternation(conf)` for `root`; for `id-ranges` a range `<id>..<n>` too, every token one `#_expand_ids` reads with none in its `bad` |
+| `slugs` | tree-bound | whitespace-separated tokens, each matching `read_slug_grammar(root).BUILD_SLUG_RE` |
 | `families`, `streams` | tree-bound | each `+`-separated member in `FAMILIES` or `DISCIPLINES`, the two enum checks `collect` makes today |
 
 `playbook` and `pieces` are the keys `render_placed_build_readme` writes on a repeat; no tracked README
-carries them. The census at `c344bdc40`: every one of 223 READMEs carries `slug`, `node`, `opened`,
-`streams`, `roster` and `ids`; `authorized-by` 79, `parents` 33, `may` 22, `spec-audit` 11, `status`
-8, `asks` 3, and no other key (PINNED 2026-11-22, `collect`'s parse of every tracked README; AC1
-re-derives it).
+carries them, nor `slug-grammar`, which unit 5's scaffolds write on the next README. The census at
+`e514feb71`: every one of 223 READMEs carries `slug`, `node`, `opened`, `streams`, `roster` and `ids`;
+`authorized-by` 79, `parents` 33, `may` 22, `spec-audit` 11, `status` 8, `asks` 3, and no other key
+(PINNED 2026-11-22, `collect`'s parse of every tracked README; AC1 re-derives it). Every typed value
+grades clean under its type, its ids, asks, parents, words and dates (PINNED 2026-11-22, the same parse).
 
 ### The derivation
 
@@ -190,11 +199,11 @@ citations or its `ids:`), the ids its `asks:` expands to, the union of `rosters[
 `read_discipline_map(conf)` maps those families to. The chain reproduces each scaffold's typed value:
 `render_new_build_readme` types the families of its asks, and `cmd_placed_build` its origin's roster
 for a patch and the first `FAMILIES` pair for a repeat (§8 F8). `rosters` is each build's roster,
-read before the derivation, so a parent's is in hand whatever the slug order. At `c344bdc40` the
+read before the derivation, so a parent's is in hand whatever the slug order. At `e514feb71` the
 derivation differs from the typed values of 39 builds in its rendered text and of 20 as a set, so S4
-prints 26 lines, 18 for `streams`, 7 for `roster` and 1 for `node` (PINNED 2026-11-22; §8 F7).
-`read_derived_front_matter(root, conf, slug)` runs `collect` once, about 5 s at `c344bdc40` (PINNED
-2026-11-22), and raises `Problem` for a slug with no README.
+prints 26 lines, 18 for `streams`, 7 for `roster` and 1 for `node` (PINNED 2026-11-22, the chain run
+over `collect`'s builds; §8 F7). `read_derived_front_matter(root, conf, slug)` runs `collect` once,
+about 8 s at `e514feb71` (PINNED 2026-11-22), and raises `Problem` for a slug with no README.
 
 ### The legacy population
 
@@ -205,7 +214,7 @@ A `[[ledger]]` registration `build-readme-typed-derived` in `tools/govkit/regist
 `<path> TAB 1` for each tracked README whose front matter types `node`, `roster` or `streams`, read
 with `parse_front_matter`. The pass seeds it once through `legacy_ledger.py seed --population
 build-readme-typed-derived` and commits the home, which `.memory-tree.conf`'s `PROJECT_REGISTRY_EXTRA`
-admits under `memory/project/`; at `c344bdc40` it would hold 223 rows (PINNED 2026-11-22).
+admits under `memory/project/`; at `e514feb71` it would hold 223 rows (PINNED 2026-11-22).
 
 `read_typed_derived_paths(root)` reads it through the memory-tree copy of the ledger factory, as
 `tools/memory-tree/record_kinds.py#read_legacy_keys` reads unit 1's, and returns `(paths, note)`.
@@ -232,12 +241,13 @@ An adopter's tree, which holds no govkit registry, and every fixture tree are un
 | card ref | `refs/gov/builds/<slug>/card`, the ref's name (TOOL-dPlacedRequest-2) |
 
 The typed rows are read from `TYPED_RECORD_KINDS` (`tools/memory-tree/tree_lib.py#TYPED_RECORD_KINDS`,
-PLAY-dOrderedCharter-42 S1), never a list here: its 16 members at `c344bdc40` (DERIVED, the tuple)
-include `deviation` and the parents' kinds, `card` among them, so the ref's row is `card ref` and the
+PLAY-dOrderedCharter-42 S1), never a list here: its 17 members at `e514feb71` (DERIVED, the tuple)
+include `deviation`, the parents' kinds, `card` among them, and TOOL-dTotalRecall-25's `stream-plan`,
+so the ref's row is `card ref` and the
 snapshot records' row is `card`. A row renders only when its purpose has a member, except `card ref`.
 A purpose with more than two records names its two newest by filename date, each its filename in
 backticks, and then `and <n> more under <folder>/`: two names of the longest record filename, 94
-characters (PINNED 2026-11-22 at `c344bdc40`), and the row's frame stay within
+characters (PINNED 2026-11-22 at `e514feb71`), and the row's frame stay within
 `BUILD_README_ENTRY_CAP_CHARS`, 350 (`tools/memory-tree/HYGIENE.template.md` check 7). Kinds are read
 from the bindings `plan()` already attaches to each build (`build["records"]`, each carrying its
 `kind`), never re-parsed; `plan()` attaches the open count beside them, `reading["fold"].statuses`
@@ -279,14 +289,19 @@ readers = []
 readers-none = "an agent reads it as its root under builds.agent-root, through no work-order read key"
 lifecycle = "current-state"
 check = "memory hygiene"
+purpose = { text = "the build README's declared front-matter schema, with unknown keys refused; writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:467" }
 ```
 
 The row takes unit 1's landed data model: `schema.form` `header`, its owner grading it (check 9 runs
 the generator); `schema.source` names the pure-literal dict, which
 `tools/memory-tree/record_kinds.py#read_schema_source` reads by `ast.literal_eval` and lists by its
 keys, and those keys must equal `fields` both ways; `check` names the `memory hygiene` leg. `layer`,
-`home`, `lifecycle`, `readers` and `readers-none` are filled as TOOL-dTotalRecall-18 S1 requires.
-TOOL-dTotalRecall-2 moves `writer` to its door (§8 F4).
+`home`, `lifecycle`, `readers` and `readers-none` are filled as TOOL-dTotalRecall-18 S1 requires, and
+`purpose`, last, as TOOL-dTotalRecall-16 requires: the layer table's own row for the kind,
+97 bytes (DERIVED, `wc -c`) under `PURPOSE_BYTES` (`tools/memory-tree/record_kinds.py#PURPOSE_BYTES`). The
+pass writes the row into the file by hand, since `record_kinds.py new` admits a `fields` or `fence`
+form only (`tools/memory-tree/record_kinds.py#NEW_FORMS`), and re-renders the region with
+`record_kinds.py --write`. TOOL-dTotalRecall-2 moves `writer` to its door (§8 F4).
 
 ### Inventory
 
@@ -333,7 +348,7 @@ three keys or the scaffolds' old lines move with them.
 - security — the parser is the write boundary for README front matter: an unknown key and a
   malformed value refuse before any render, and no value reaches a regex unvalidated.
 - perf / scale — one dict lookup per key; the routing region reads the bindings `plan()` already
-  holds; `--print-front-matter` costs one `collect`, about 5 s (PINNED 2026-11-22, §4 "The derivation").
+  holds; `--print-front-matter` costs one `collect`, about 8 s (PINNED 2026-11-22, §4 "The derivation").
 - error / empty / loading states — an unknown key names the key, the line and the declared set; an
   empty purpose renders no row; the card row never reads a ref, so it cannot fail; an unarmed legacy
   population and an unreadable policy each say so on one line and refuse nothing.
@@ -377,7 +392,7 @@ three keys or the scaffolds' old lines move with them.
   holds one row per member, each naming its record.
   Red when: the region lists every record unbounded, or omits a purpose that has members, or a typed
   kind's records route nowhere.
-  figure: the 5 review records of `dTrueNorth` are PINNED 2026-11-22 at `c344bdc40`; the members are
+  figure: the 5 review records of `dTrueNorth` are PINNED 2026-11-22 at `e514feb71`; the members are
   DERIVED, read from the tuple at run time.
 - **AC6** — When a probe calls `render_handoff` for build `dTotalRecall` at the pass tip, where
   `builds.agent-root` is unset, the task section's opening holds `Your root is this work order`; in a
@@ -399,7 +414,7 @@ three keys or the scaffolds' old lines move with them.
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `build README slot contract` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `record-kinds` · `roles render selftest` · `roles adopter self-test` · `roles catalogue` · `unattended kit gate` · `loop budget fixtures` · `loop parent routes` · `loop placement fixtures` · `loop position fixtures` · `loop claim fixtures` · `ratchet (never gains)` · `ratchet (both ways)` · `policy check` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `straggler-guard arms` · `transition-audit arms` · `scratch-guard self-test` · `routed-commits selftest` · `tier2-review self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `build README slot contract` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `record-kinds` · `roles render selftest` · `roles adopter self-test` · `roles catalogue` · `unattended kit gate` · `loop budget fixtures` · `loop parent routes` · `loop placement fixtures` · `loop position fixtures` · `loop claim fixtures` · `ratchet (never gains)` · `ratchet (both ways)` · `policy check` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `straggler-guard arms` · `transition-audit arms` · `scratch-guard self-test` · `routed-commits selftest` · `tier2-review self-test` · `lexicon naming predicates` · `python reads (a name never bound, an import outside its guard)` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC2 AC3 AC4 AC5 AC7 · its `--selftest` gains the unknown-key refusal, the typed-value refusals, the derived keys and their fallback chain, the legacy-population read armed and unarmed, the routes region's bound and the design-only `B` row pair, staged by restoring the open-world parse · none
 New arm: tools/roles/render_agents.py · covers AC6 · its `--selftest` asserts the root line under both values and under a refusing reader, staged by dropping the policy read · none
@@ -437,7 +452,8 @@ build's citations, so a cited typo is defined.
   delegated): this spec called them as their specs named them and the build run re-grounds on the
   landed code, rung 1 (the brief's chain rule). Re-grounded at `c344bdc40`: TOOL-dWitnessedBar-13 and
   -15, TOOL-dGroundRules-1 and -2, PLAY-dOrderedCharter-19, -24 and -42, TOOL-dPlacedRequest-2 and -21
-  are CLOSED, and §3 to §4 name what each landed. widens: none · relaxes: none
+  are CLOSED, and §3 to §4 name what each landed; re-read at `e514feb71` over TOOL-dTotalRecall-5,
+  -16, -18 and -25, CLOSED since. widens: none · relaxes: none
 - **F6 — Where does the legacy population register?** Options: (a) `tools/govkit/registry.toml`, gov's
   own, beside unit 1's `record-kinds-legacy`, so an adopter's tree is unarmed until
   TOOL-dTotalRecall-20 grades it; (b) the memory-tree kit's `kit.toml`, shipped, whose home every
@@ -480,6 +496,12 @@ build's citations, so a cited typo is defined.
 - rev-5 · 2026-11-22 · §3 Edges · per `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`: the
   `consumes-from TOOL-dTotalRecall-8` bullet, which took nothing, is deleted; §4 "The agent's root"
   already states the read through `tree_lib.py#read_policy_value`. No criterion moved.
+- rev-6 · 2026-11-22 · S2 · S3 · §3 · §4 · §5 · AC5's figure · §7 · §8 F5 · §10 · re-grounded at `e514feb71`
+  over unit 5's landed code per `2026-11-22-prompt-TOOL-dTotalRecall-4-reground-2-brief`: the tree-bound
+  types read `gen_build_index.py#read_slug_grammar`, the ids `tree_lib.py#build_id_token_re`; `date` is
+  a calendar date, as AC2 demands; `render_new_build_readme` loses `conf`, and the `python reads` leg
+  joins §7; the registry row gains unit 16's `purpose`, written by hand; `TYPED_RECORD_KINDS` holds 17;
+  the census, counts and timing re-pinned. No criterion moved.
 
 ## 10. Reuse audit
 
@@ -488,7 +510,9 @@ The seams extended are `parse_front_matter`, `REQUIRED_KEYS` and `collect`'s enu
 derivation `render_new_build_readme` and `cmd_placed_build` already apply, the region registry
 `GEN_REGIONS` and `REGION_RENDERERS`, the defined set `spec_ids` that `cmd_print_bindings` reads, the
 ledger factory through `tools/memory-tree/record_kinds.py#read_legacy_keys`'s read and
-`tools/lib/legacy_ledger.py#seed_population`, the policy read
+`tools/lib/legacy_ledger.py#seed_population`, the slug grammar unit 5 landed, read through
+`tools/memory-tree/gen_build_index.py#read_slug_grammar` and `tools/memory-tree/id_grammar.py#parse_slug_grammar`
+rather than a second slug or grammar pattern, the policy read
 `tools/memory-tree/tree_lib.py#read_policy_value` reached as `tools/roles/roles_lib.py#read_workflow_order`
 reaches a sibling kit, and `render_handoff` (`tools/roles/handoff.py#render_handoff`). The
 unknown-key refusal copies no code but follows a shape the tree already has: the roles kit's agent
@@ -500,6 +524,7 @@ ranked generic names (`key`, `render`, `readme`, `region`, `build_grammar`) and 
 `parse_front_matter` or `GEN_REGIONS`, which scout A's row and a read of the generator found. The
 recall probe returned scout A's row for cl-0215, the brief's I6 and the layer's `[build]`. The
 re-ground's reader search, `git grep -nE '\^(roster|streams|node):|fm\["(node|roster|streams)"\]' --
-tools skills`, found `read_anchor_unit`, `cmd_placed_build` and the second scaffold, none in rev-3.
+tools skills`, found `read_anchor_unit`, `cmd_placed_build` and the second scaffold, none in rev-3;
+re-run at `e514feb71` it finds those and suite fixtures alone.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a build README declare its front matter keys and route readers" --terms "front matter parse_front_matter REQUIRED_KEYS unknown key refused node roster streams derived routing region design-only bindings"`
