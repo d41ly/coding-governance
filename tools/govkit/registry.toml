@@ -1743,6 +1743,7 @@ guard = [
   "{prefix}/check-line-length.sh",
   "{prefix}/memory-tree/check-memory-hygiene.sh",
   "{prefix}/memory-tree/gen_build_index.py",
+  "{prefix}/memory-tree/history_store.py",
   "{prefix}/roles/check_roles.py",
   "{prefix}/playbook/render_playbook.py",
   "{prefix}/playbook/instruction_units.py",
