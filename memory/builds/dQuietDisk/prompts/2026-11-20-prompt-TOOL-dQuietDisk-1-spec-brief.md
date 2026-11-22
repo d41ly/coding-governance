@@ -9,7 +9,7 @@ You author specs and write no product code. Read these in order before your firs
 2. The build README, `memory/builds/dQuietDisk/README.md`. Its build-level rules bind every spec.
 3. The analysis, `memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`. Your unit's
    rework id (K1 to K12) is named below. §3 holds the evidence rows, and §4 says why each design churns.
-4. `memory/TEMPLATE-SPEC.md` and `memory/guides/BUILD-METHOD.md` M2, M3, M5 and M12. Units 1 to 18 are Tier 2,
+4. `memory/TEMPLATE-SPEC.md` and the build method's sections `doc.build-method#m2-the-spec-set-decompose-detect-classify-act`, `doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority`, `doc.build-method#m5-recall-and-reuse` and `doc.build-method#m12-research-test-choose-when-the-solution-is-not-given`. Units 1 to 18 are Tier 2,
    because each changes a shipped kit's contract. Unit 19 is Tier 1, because it writes only records.
 
 ## What every spec here must hold
