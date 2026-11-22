@@ -222,3 +222,4 @@ memory/builds/dSettledStage/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb
 memory/builds/dSkippedRecord/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 memory/builds/dSweptScratch/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 memory/builds/dTrackedAtlas/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+memory/builds/aWrappedRoster/README.md	bound	1	e33de0de688484ec474d932a3c0aa1354bcb4ebe	seeded

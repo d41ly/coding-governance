@@ -46,7 +46,7 @@ ids TOOL-aWrappedRoster-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aWrappedRoster-1 — the leg-manifest parser reads an object-wrapped manifest](spec/2026-11-22-spec-TOOL-aWrappedRoster-1.md) | — | 1 | CLOSED | rev-1 | 2026-11-22 |
+| [TOOL-aWrappedRoster-1 — the leg-manifest parser reads an object-wrapped manifest](spec/2026-11-22-spec-TOOL-aWrappedRoster-1.md) | — | 1 | CLOSED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).

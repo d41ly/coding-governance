@@ -1,6 +1,6 @@
 # TOOL-aWrappedRoster-1 — the leg-manifest parser reads an object-wrapped manifest
 
-**Status:** CLOSED · rev-1 · 2026-11-22 · node a · Tier-1 · base 8b8b1374 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-11-22 · node a · Tier-1 · base 8b8b1374 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -44,16 +44,20 @@ an object with no list under `legs`, so a non-manifest blob still reads as absen
 
 ## 5. Acceptance criteria
 
-- **AC1** — When `python3 tools/memory-tree/routed_commits.py --selftest` runs, the
-  TOOL-aWrappedRoster-1 arm passes and every other arm still does.
-  Red when: the parser refuses `{"legs": [...]}`, or reads `{"_doc": "x"}` or a scalar as a manifest.
-  Observed red against base `tree_lib.py` on 2026-11-22: the object shape raised ValueError.
-- **AC2** — When the fixed parser reads inCMS's `scripts/gate-legs.json`, it returns that file's leg
-  names. Red when: it raises.
+- **AC1** — When `parse_leg_names` reads a bare row list, an object whose `legs` holds that list, an
+  object with no `legs` and a JSON scalar, it returns the leg names for the first two and raises
+  ValueError for the last two.
+  Red when: the parser refuses the object shape, or reads either refusal as a manifest.
+  Observed red against the base `tree_lib.py` on 2026-11-22: the object shape raised ValueError.
+- **AC2** — When the fixed parser reads inCMS's committed leg manifest (an object holding `_doc` and
+  `legs`), it returns that manifest's leg names. Red when: it raises.
+  Observed 2026-11-22 against inCMS branch/admin-mobile-620da1.
 
 ## 6. Gates
 
-`routed-commits selftest` · `routed commits name a specced unit` · `memory hygiene` · `line length`
+`routed-commits selftest` · `routed commits name a specced unit` · `policy fixtures` · `memory hygiene` · `line length` · `spec tokens (a spec's own names resolve)`
+
+New arm: tools/memory-tree/routed_commits.py · covers AC1 · `--selftest` parses the four shapes through `parse_leg_names`; staged red by reading them through the base parser · none
 
 ## 7. Open questions
 
@@ -62,3 +66,4 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-22 · initial draft.
+- rev-2 · 2026-11-22 · AC1 · AC2 · the bar's spec-tokens leg: AC1 observes the arm, not the suite, and AC2 names the adopter's manifest without a path gov does not track.
