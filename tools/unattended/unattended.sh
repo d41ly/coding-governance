@@ -8998,12 +8998,14 @@ ASKROWS
   fi
   # EACH PARENT'S DERIVED PHASE, so the engine reads a parent landed by its recorded move OR by the
   # derivation this driver owns (TOOL-dDeclaredLoop-7 section 8 F6). The front matter is read in this
-  # shell, from line 1's `---` to the next, as the index generator's parser reads it.
+  # shell, from line 1's `---` to the next, as the index generator's parser reads it. Both spellings of
+  # the `after` relation are read, `parents:` and `depends-on:`, the two `[[front-matter]]` rows of the
+  # playbook kit's edges.toml that type it (TOOL-dTotalRecall-6 S11); no gate compares this list to them.
   while IFS= read -r _pl || [ -n "$_pl" ]; do
     _pl=${_pl%$'\r'}
     if [ "$_pl" = "---" ]; then _pin=$((_pin + 1)); [ "$_pin" -lt 2 ] && continue; break; fi
     [ "$_pin" = 1 ] || break
-    case "$_pl" in parents:*) _pl=${_pl#parents:} ;; *) continue ;; esac
+    case "$_pl" in parents:*) _pl=${_pl#parents:} ;; depends-on:*) _pl=${_pl#depends-on:} ;; *) continue ;; esac
     for _pp in $_pl; do
       if [ -f "$M/builds/$_pp/RUN.md" ]; then read_derived_phase "$M/builds/$_pp/RUN.md"; else DP_PHASE="-"; fi
       _ho+="parent	$_pp	${DP_PHASE:--}"$'\n'

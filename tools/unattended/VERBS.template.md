@@ -110,8 +110,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   what makes one `--paths` invocation the resume path's single source for both "which unit is next" and
   "where is its spec". A `spec-disposal:` line sits between those two, carries no TAB and holds the value
   a caller copies as `disposal`. The `next:` line is the loop kit's position engine's, `position.py
-  <slug> --next-line`, handed this verb's rows, the first undecided ask, each `parents:` build's derived
-  phase, `RESUME_STALE_BOUND` and the owed park sets in `GOV_POSITION_STATES`. It names the
+  <slug> --next-line`, handed this verb's rows, the first undecided ask, each `parents:` or `depends-on:`
+  build's derived phase, `RESUME_STALE_BOUND` and the owed park sets in `GOV_POSITION_STATES`. It names the
   LEAST-ADVANCED unit, a unit's step read from witnesses — its pass commit and acceptance record, the
   bar's `gates-run` tip, the remote-tracking tip — and never from a typed status word, so a MISSING,
   THIN or FORKED unit beside a READY one takes the line and the loop holds on it. A build whose

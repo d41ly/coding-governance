@@ -53,7 +53,7 @@ THE DRAW. `record_draw(build, cause, item)` writes one draw row, the freeze row 
 and answers `drawn`; once spent equals total it writes nothing and answers `exhausted`, and the build
 ends as `flow.on-exhausted` names. The cause is one of `CAUSES`, and `patch:<slug>` is
 derived, never given: a build whose newest recorded move carries `scenario.patch` draws on the first
-build its README's `parents:` names, as `patch:<its slug>`. `draw` appends the rows to the build's
+build its README's `parents:` or `depends-on:` names, as `patch:<its slug>`. `draw` appends the rows to the build's
 newest log record and commits that record alone, its subject `loop budget(<slug>): <cause> <spent>/<total>`,
 or, with no log record, appends them to the run-state file (`write_budget_rows`), under any
 `transitions.record` set; a build with neither refuses the draw. Where the originating build of a patch
@@ -395,21 +395,23 @@ def read_trailer_rows(build, root):
 
 def derive_patch_origin(build, root, moves=None):
     """The build whose budget `build`'s draws land on where `build` is a patch build, its newest recorded
-    move carrying `scenario.patch`: the first slug its README's `parents:` names. None for any other
-    build; ValueError where a patch build's README names no parent."""
+    move carrying `scenario.patch`: the first slug its README's `parents:` or `depends-on:` names, the
+    `after` targets of the memory-tree kit's `parse_relations` (TOOL-dTotalRecall-6 S9). None for any
+    other build; ValueError where a patch build's README names no parent."""
     moves = read_transitions(build, root) if moves is None else moves
     if not moves or PATCH_SCENARIO not in moves[0].get("scenario", "").split("+"):
         return None
     read_memory_tree("gen_build_index.py")
-    from gen_build_index import Problem, parse_front_matter
+    from gen_build_index import ORDER_TYPE, Problem, parse_front_matter, parse_relations, read_relation_rows
     readme = pathlib.Path(root, resolve_memory_root(root), "builds", build, "README.md")
     try:
-        parents = parse_front_matter(str(readme), build).get("parents", "").split()
+        fm = parse_front_matter(str(readme), build)
+        parents = [e["target"] for e in parse_relations(fm, read_relation_rows(), root) if e["type"] == ORDER_TYPE]
     except (Problem, OSError) as e:
         raise ValueError("the patch build %s's README does not read: %s" % (build, e)) from None
     if not parents:
-        raise ValueError("%s is a patch build and its README names no parents:, so its draw has no originating "
-                         "budget" % build)
+        raise ValueError("%s is a patch build and its README names no parents: or depends-on:, so its draw has no "
+                         "originating budget" % build)
     return parents[0]
 
 

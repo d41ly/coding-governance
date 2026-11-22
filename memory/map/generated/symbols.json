@@ -8533,6 +8533,11 @@
       "file": "tools/memory-tree/ratchet.py"
     },
     {
+      "id": "check_relation_cycles",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_relations",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -10429,6 +10434,11 @@
     },
     {
       "id": "cmd_print_bindings",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_print_relations",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },
@@ -13808,6 +13818,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "derive_relation_inverses",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "derive_relation_successors",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -16933,6 +16948,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "load_edge_grammar",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "load_engine",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -19883,6 +19903,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "parse_relations",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "parse_request",
       "kind": "function",
       "file": "tools/policy/budgets.py"
@@ -21766,6 +21791,11 @@
       "id": "read_build_records",
       "kind": "function",
       "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "read_build_refs",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "read_build_slug",
@@ -25566,6 +25596,11 @@
       "id": "read_relation_gate",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "read_relation_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "read_release_count",
@@ -32701,6 +32736,11 @@
       "id": "resolve_registry",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "resolve_relation_target",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "resolve_relocate_sides",
@@ -40956,6 +40996,11 @@
       "id": "test_refusals_named",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_relations",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "test_relative_and_spaced_roots_are_refused",

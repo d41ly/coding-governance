@@ -161,3 +161,10 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T15:31:39Z draw · re-dispatch · TOOL-dTotalRecall-45 · 16/186 · 20261122T153139Z-5c58f6
 
 2026-11-22T15:31:39Z dispatch · item f1ddf241 TOOL-dTotalRecall-45 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md
+
+2026-11-22T15:45:34Z brief · item TOOL-dTotalRecall-6 · reason f9b4cf8a9e16 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-6-build-brief.md
+
+2026-11-22T15:46:59Z dispatch · item 803a3b80 TOOL-dTotalRecall-6 · reason tools/memory-tree/gen_build_index.py tools/playbook/edges.toml tools/loop/budget.py tools/loop/loop_parents.py tools/loop/position.py tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-6.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-6-1-acceptance-ledger.md
+2026-11-22T15:53:11Z draw · re-dispatch · TOOL-dTotalRecall-6 · 17/186 · 20261122T155311Z-9d2b14
+
+2026-11-22T15:53:11Z dispatch · item 803a3b80 TOOL-dTotalRecall-6 · reason memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-6-deviation-62.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-6-deviation-63.md

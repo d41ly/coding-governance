@@ -463,7 +463,8 @@ step of the phase it was held from, which the driver writes as the run's `held-f
 
 ## When a parent build is withdrawn
 
-A build whose README front matter names `parents:` depends on them. When a parent is withdrawn, the
+A build whose README front matter names `depends-on:`, or its older spelling `parents:`, depends on
+them. When a parent is withdrawn, the
 policy key `deps.on-parent-withdrawn` says what the dependent build does, and the loop kit answers it
 as a route. Until a parent's withdrawal is posted, a parent reads withdrawn when its run-state file,
 `RUN.md` in its build folder, holds a `phase` that the definition's phase rows map to the state
@@ -506,14 +507,15 @@ waits for its next row.
   route none
   ```
 
-  It prints `route none` when no parent reads withdrawn or the README has no `parents:` key. It exits
-  2 on a `parents:` slug naming no build folder, a state outside the build's open states, a policy
-  value outside the key's set, or no kept branch, and 2 `unarmed` where the policy kit is not
+  It prints `route none` when no parent reads withdrawn or the README has no `parents:` or
+  `depends-on:` key. It exits 2 on a `parents:` or `depends-on:` slug naming no build folder, a state
+  outside the build's open states, a policy value outside the key's set, or no kept branch, and 2 `unarmed` where the policy kit is not
   installed beside the loop kit, never falling back to a default.
 
 - **See it on a scratch repository:** `--fixture --plant <case>` builds a scratch repository holding a <!-- usage: script:tools/loop/loop_parents.py 5ff32d7b -->
   child build and its parent, runs the route there, prints whether the tree changed, and removes it.
-  The cases are `withdrawn-parent` (the parent aborted, its kept branch present), `no-kept-branch`
+  The cases are `withdrawn-parent` (the parent aborted, its kept branch present), `depends-on-parent`
+  (the same, the child naming its parent under `depends-on:`), `no-kept-branch`
   (aborted, its kept branch deleted), `live-parent`, `no-parents`, `incomplete-parent` (aborted,
   halted `budget-exhausted`), `aborted-on-run-branch` (building in the tree, aborted at its run
   branch's tracking tip), `no-run-record` (no `RUN.md` at all) and `parent-in-extra-phase` (the parent
@@ -928,7 +930,7 @@ and a token, compares without it on both sides; a URL git rewrote through `url.<
 still reads skipped. With no remote at all, or no tracking ref of the default branch, the remote reads absent: the
 engine answers on your local witnesses, so no unit reads `deployed`, and prints
 `interrupt — remote · none` with no remote-tip claim. A tracking ref you deleted reads the same. An owed parked decision or an unpassed hold answers
-`awaiting`; a `parents:` build that has not landed answers `blocked`; an undecided ask answers
+`awaiting`; a `parents:` or `depends-on:` build that has not landed answers `blocked`; an undecided ask answers
 `awaiting` only when no item can run.
 
 The frontier is every item of the build's step whose witness does not hold and whose needs are

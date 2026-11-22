@@ -17,6 +17,12 @@
 # once and the commit adapter reads this table. A row with no `type` registers a key that carries a
 # value and no edge (`Gov-Transition`, `Gov-Policy`, `Red-fix`): the adapter passes over it, and the
 # one trailer reader, commit_trailers.read_commits, reads every row's key and refuses any other.
+#
+# One [[front-matter]] row per build README relation key (TOOL-dTotalRecall-6 S1): `key`, the `type` of
+# the closed set it declares, and `target`, the address form each of its targets is typed by (`slug`, a
+# build slug; `unit-id`, a family id whose slug names its build; `tag`, a tag of the tag index). A key
+# is a spelling, never a type: `depends-on` and its alias `parents` both declare `after`. Read by the
+# memory-tree kit's gen_build_index.read_relation_rows, which inverts each edge into its target's README.
 
 [[edge]]
 type = "part-of"
@@ -30,7 +36,7 @@ declared-at = "annotations, dossier claims"
 [[edge]]
 type = "implements"
 inverse = "implemented-by"
-from = ["any"]
+from = ["any", "build"]
 to = ["feature", "spec"]
 pin = "none"
 status = "declared"
@@ -84,7 +90,7 @@ declared-at = "the chain row; the session binding, through resume and fork"
 [[edge]]
 type = "supersedes"
 inverse = "superseded-by"
-from = ["any"]
+from = ["any", "build"]
 to = ["any"]
 pin = "tag"
 status = "declared"
@@ -93,7 +99,7 @@ declared-at = "the new node"
 [[edge]]
 type = "amends"
 inverse = "amended-by"
-from = ["any"]
+from = ["any", "build"]
 to = ["any"]
 pin = "tag"
 status = "declared"
@@ -103,7 +109,7 @@ declared-at = "the amending node"
 type = "patches"
 inverse = "patched-by"
 from = ["build"]
-to = ["build", "item"]
+to = ["build", "item", "family-id"]
 pin = "none"
 status = "declared"
 declared-at = "the patch build's intake"
@@ -307,3 +313,36 @@ key = "Red-fix"            # value: one gate leg's name, read by the routed-comm
 
 [[trailer]]
 key = "Commit-Checked"     # value: unattended@<kit version>, written by the commit check, TOOL-dWitnessedBar-2
+
+# The build README's relation keys, each with the type it declares and its targets' address form
+# (TOOL-dTotalRecall-6 S1, gap-mem-07). The rows' order is the order a README's relation lines render in.
+
+[[front-matter]]
+key = "depends-on"
+type = "after"
+target = "slug"
+
+[[front-matter]]
+key = "parents"            # the alias, read exactly as depends-on
+type = "after"
+target = "slug"
+
+[[front-matter]]
+key = "patches"
+type = "patches"
+target = "unit-id"
+
+[[front-matter]]
+key = "amends"
+type = "amends"
+target = "unit-id"
+
+[[front-matter]]
+key = "supersedes"
+type = "supersedes"
+target = "slug"
+
+[[front-matter]]
+key = "implements"
+type = "implements"
+target = "tag"

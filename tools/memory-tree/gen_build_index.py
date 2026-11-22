@@ -10,6 +10,7 @@
     python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
     python <prefix>/memory-tree/gen_build_index.py --doctor <slug> # every failing rule for one build folder
     python <prefix>/memory-tree/gen_build_index.py --new-spec <ID> --tier <1|2>  # a spec skeleton
+    python <prefix>/memory-tree/gen_build_index.py --print-relations  # every README relation edge and its state
     python <prefix>/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
 
 WHAT --check-format DOES NOT CHECK. It grades POSITION for every tracked build README and SHAPE — the
@@ -23,7 +24,7 @@ It replaces the retired directory-listing generator. A listing carried paths, wh
 prints better; this carries STATUS, which git does not — and a build's status is a PURE FUNCTION of
 its units' statuses, so nothing here is authored and nothing rots.
 
-SEVEN SOURCES, NOTHING ELSE
+EIGHT SOURCES, NOTHING ELSE
   * each build's README front matter (slug node opened streams roster [status])
   * every `**Status:**` header under that build's spec/, at any depth
   * for the ROSTER, and for the date of a build's last record, every tracked file under the memory
@@ -52,6 +53,9 @@ SEVEN SOURCES, NOTHING ELSE
     and every deviation record. `--write` writes DESIGN_VIEW, `--check` compares its bytes, and
     `--check-asbuilt` prints its verdicts (TOOL-dTrueNorth-6, S17). All four blank, one `as-built
     view: off` line is printed and nothing is read; a partial set is a refusal naming each blank key.
+  * for a README relation's target outside this tree ONLY, this clone's copies of the target build's
+    card and lease refs, read to tell a pending target from a withdrawn one and never rendered
+    (TOOL-dTotalRecall-6); today's tree names no such target, so none is read.
 No git history and no mtimes. A source the renderer does not read cannot make the render drift; a
 source the renderer WRITES must not also be read, or a wrong value defends itself forever.
 
@@ -1432,6 +1436,11 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
     # TOOL-dTotalRecall-4 — the slug grammar the tree-bound types read, and the legacy population
     # whose READMEs may still type the derived keys, each read once for the walk.
     grammar = read_slug_grammar(root)
+    # TOOL-dTotalRecall-6 — the relation rows, read once for the walk, and the (type, inverse) pairs in
+    # their order, which `render_edges` writes a build's relation lines in.
+    relation_rows = read_relation_rows()
+    relation_types = list(dict.fromkeys(
+        (r["type"], r["inverse"]) for r in (relation_rows["keys"] if relation_rows else {"parents": PARENTS_ROW}).values()))
     legacy, unarmed = read_typed_derived_paths(root)
     if legacy is None:
         print(f"front-matter: legacy population unarmed: {unarmed}", file=sys.stderr)
@@ -1523,6 +1532,12 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
         # source names the id, the derivation takes over and a wrong authored value loses. Global
         # emptiness is the dangerous case, and the precondition above owns it.
         roster = roster_by_slug.get(slug) or [i for i in fm["ids"].split() if i]
+        # TOOL-dTotalRecall-6 S3 — the relation keys, typed by the registry's rows; `parents` below is
+        # the `after` targets, so a `depends-on:` target reads everywhere a `parents:` one does.
+        try:
+            relations = parse_relations(fm, relation_rows, root)
+        except Problem as exc:
+            raise Problem(f"{readme}: {exc}") from None
         # Which record folders this build actually HAS. Authored as prose in 17 READMEs and wrong
         # in 15 of them: the sentence is written when a build opens, predicting the folders it will
         # grow, and nothing revisits it. Seven claim a build/ that was never created.
@@ -1540,7 +1555,9 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
                 # renderer that parsed names would have to waive them or render them degraded.
                 "docs": sorted(t for t in by_slug.get(slug, [])
                                if any(t.startswith(f"{m}/builds/{slug}/{k}/") for k in RECORD_KINDS)),
-                "parents": [s.strip() for s in fm.get("parents", "").split() if s.strip()],
+                "parents": [e["target"] for e in relations if e["type"] == ORDER_TYPE],
+                "relations": relations,
+                "relation_types": relation_types,
                 "units": [u for u in units if u],
                 "status": derive_status(units, fm, readme),
             }
@@ -1579,7 +1596,8 @@ def derive_front_matter(build: dict, rosters: dict, conf: dict) -> dict:
 
     `node` is the slug's first letter. `roster` is the sorted families of the first non-empty of: the
     build's roster ids (`collect`'s, its citations or its `ids:`), the ids its `asks:` names, the
-    union of `rosters[p]` for each slug its `parents:` names, and the conf's first `FAMILIES` pair.
+    union of `rosters[p]` for each slug its `parents:` or `depends-on:` names (`collect`'s `parents`,
+    the `after` targets, TOOL-dTotalRecall-6 S3), and the conf's first `FAMILIES` pair.
     `streams` is the sorted disciplines `read_discipline_map(conf)` maps those families to. The chain
     reproduces both scaffolds: `--new-build` types its asks' families, `--placed-build` its origin's
     roster for a patch and the first pair for a repeat. A family is read as the declared alternation
@@ -1589,7 +1607,7 @@ def derive_front_matter(build: dict, rosters: dict, conf: dict) -> dict:
     head = re.compile(r"^(" + _id_alternation(conf) + r")-")
     fm = build["fm"]
     chain = (list(build["roster"]), fm.get("asks", "").split(),
-             [i for p in fm.get("parents", "").split() for i in rosters.get(p, [])])
+             [i for p in build["parents"] for i in rosters.get(p, [])])
     roster: list = []
     for tokens in chain:
         roster = sorted({m.group(1) for m in map(head.match, tokens) if m})
@@ -1674,6 +1692,208 @@ def derive_defined_ids(root: str, tracked: list, conf: dict) -> set:
             continue
         out.update(_expand_ids(fm.get("ids", ""), alt, root)[0])
     return out
+
+
+# ----------------------------------------------------------------------- the typed relations
+# TOOL-dTotalRecall-6 (gap-mem-07). A build README declares typed relations to other builds, unit ids
+# and tags through the keys the playbook kit's `edges.toml` registers as `[[front-matter]]` rows, each
+# naming the type of the one closed set it declares and its targets' address form. Every edge is
+# inverted into the README of the build owning its target, `depends-on` may form no cycle, and a target
+# outside this tree is pending, never red, until its build lands without it or is withdrawn: read from
+# this clone's copies of the build's card and lease refs, never the network.
+
+#: The `after` type, the build-to-build order `depends-on:` and its alias `parents:` declare.
+ORDER_TYPE = "after"
+#: The `parents` row, read where no playbook kit resolves: the one relation before the registry, read as
+#: before it, and its type's inverse, which names no rendered line (`render_edges` writes `Child builds`).
+PARENTS_ROW = {"key": "parents", "type": ORDER_TYPE, "target": "slug", "inverse": "before"}
+#: The README relation keys `FRONT_MATTER_KEYS` admits; where no playbook kit resolves, each but
+#: `parents` is refused rather than read untyped.
+RELATION_KEYS = ("depends-on", "parents", "patches", "amends", "supersedes", "implements")
+#: The address forms a `[[front-matter]]` row's `target` names.
+RELATION_FORMS = ("slug", "unit-id", "tag")
+#: The four refs a build's card and lease sit at in a clone, in the order a pending target names the
+#: first present: the card (TOOL-dPlacedRequest-2), its fetched cache, the build lease
+#: (TOOL-dPlacedRequest-1) and its fetched cache.
+BUILD_REF_FORMS = ("refs/gov/builds/{slug}/card", "refs/gov/remote/builds/{slug}/card",
+                   "refs/gov/leases/{slug}/build", "refs/gov/remote/leases/{slug}/build")
+#: A lease tip message's terminal `withdrawn` status line, the key TOOL-dPlacedRequest-1 S5 writes.
+WITHDRAWN_STATUS_RE = re.compile(r"(?m)^status:[ \t]*withdrawn[ \t]*\r?$")
+
+
+def read_relation_rows():
+    """`{"keys": {key: row}, "dir": the kit directory}` of the playbook kit's `edges.toml`, found by
+    `backlog.resolve_kit_dir` from this file's directory, the route `commit_trailers.read_key_table`
+    takes to the same file (TOOL-dTotalRecall-6 S3). `keys` holds the `[[front-matter]]` rows in their
+    order, each carrying its type's `inverse` from the `[[edge]]` row. None where no playbook kit
+    resolves, or its table holds no `[[front-matter]]` row. A table that does not parse, or a row naming
+    no front-matter key, a key twice, a type outside the closed set or a target outside
+    `RELATION_FORMS`, is a Problem naming the file."""
+    import tomllib  # noqa: PLC0415 — read only where a relation is parsed
+    try:
+        kit = backlog.resolve_kit_dir("playbook", "edges.toml", pathlib.Path(os.path.abspath(__file__)).parent)
+    except LookupError:
+        return None
+    path = kit / "edges.toml"
+    try:
+        data = tomllib.loads(path.read_text(encoding="utf-8"))
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        raise Problem(f"the relation table {path.as_posix()} does not read: {exc}") from None
+    types = {r.get("type"): r for r in data.get("edge") or [] if isinstance(r, dict)}
+    keys: dict = {}
+    for n, row in enumerate(data.get("front-matter") or [], 1):
+        if not (isinstance(row, dict) and row.get("key") in RELATION_KEYS and row["key"] not in keys
+                and row.get("type") in types and row.get("target") in RELATION_FORMS):
+            raise Problem(f"{path.as_posix()}: [[front-matter]] row {n} needs a relation key named once "
+                          f"({' '.join(RELATION_KEYS)}), a type of the [[edge]] rows and a target among "
+                          f"{' '.join(RELATION_FORMS)}")
+        keys[row["key"]] = dict(row, inverse=types[row["type"]]["inverse"])
+    return {"keys": keys, "dir": kit} if keys else None
+
+
+def load_edge_grammar(kit):
+    """The playbook kit's `edge_grammar` module, imported from `kit`, the directory `read_relation_rows`
+    found: the one tag parser and tag resolver, never a second reader of the tag index (section 8 F8)."""
+    if str(kit) not in sys.path:
+        sys.path.append(str(kit))
+    import edge_grammar  # noqa: PLC0415 — the playbook kit's, reached by the path append above
+    return edge_grammar
+
+
+def parse_relations(fm: dict, rows, root) -> list:
+    """The relation edges one build README's front matter `fm` declares, in key order and each key's
+    targets in written order (TOOL-dTotalRecall-6 S3): `{"source", "key", "type", "inverse", "target",
+    "form", "owner"}`, `owner` the slug of the build the target belongs to (a slug's own, a unit id's
+    slug), None for a tag. `rows` is `read_relation_rows()`. Each target is typed by its row's address
+    form: a slug by `read_slug_grammar(root).BUILD_SLUG_RE`, a unit id by the id grammar's
+    `parse_id_parts`, a tag by `edge_grammar.parse_edge_target` answering `tag`. A Problem names the key
+    and target a form refuses, two keys of one type (`parents` beside `depends-on`), and a relation key
+    no row types, which with `rows` None is every relation key but `parents`."""
+    keys = rows["keys"] if rows is not None else {PARENTS_ROW["key"]: PARENTS_ROW}
+    stray = [k for k in fm if k in RELATION_KEYS and k not in keys]
+    if stray:
+        raise Problem(f"'{stray[0]}' is a relation key no [[front-matter]] row of a playbook kit's edges.toml "
+                      f"resolving here types; install the playbook kit beside this one, or spell the order parents:")
+    spelled: dict = {}
+    for k in fm:
+        if k in keys:
+            other = spelled.setdefault(keys[k]["type"], k)
+            if other != k:
+                raise Problem(f"carries both {other}: and {k}:, two spellings of the one `{keys[k]['type']}` "
+                              f"relation; keep one")
+    grammar, edge_grammar, out = None, None, []
+    for k in fm:
+        row = keys.get(k)
+        for target in (fm[k].split() if row else ()):
+            form, owner = row["target"], None
+            if form == "slug":
+                grammar = grammar or read_slug_grammar(root)
+                ok, owner = bool(grammar.BUILD_SLUG_RE.match(target)), target
+            elif form == "unit-id":
+                try:
+                    owner, ok = backlog.load_id_grammar().parse_id_parts(target, root)[1], True
+                except ValueError:
+                    ok = False
+            else:
+                edge_grammar = edge_grammar or load_edge_grammar(rows["dir"])
+                ok = (edge_grammar.parse_edge_target(target) or (None,))[0] == "tag"
+            if not ok:
+                raise Problem(f"{k}: names '{target}', which is no {form} target, the address form "
+                              f"edges.toml's [[front-matter]] row types {k} by")
+            out.append({"source": fm.get("slug"), "key": k, "type": row["type"], "inverse": row["inverse"],
+                        "target": target, "form": form, "owner": owner})
+    return out
+
+
+def derive_relation_inverses(builds: list, edges: list) -> dict:
+    """`{slug: {inverse: sorted source slugs}}`: every edge's inverse, named by its type's `inverse`, on
+    the build in `builds` that owns its target (TOOL-dTotalRecall-6 S4). A target owned by no build in
+    this tree, and a tag, which has no README, yield none."""
+    known = {b["slug"] for b in builds}
+    out: dict = {}
+    for e in edges:
+        if e["owner"] in known:
+            out.setdefault(e["owner"], {}).setdefault(e["inverse"], set()).add(e["source"])
+    return {slug: {inv: sorted(src) for inv, src in got.items()} for slug, got in out.items()}
+
+
+def check_relation_cycles(builds: list, edges: list) -> None:
+    """A Problem naming every `depends-on` cycle among the builds in this tree, each `a -> b -> a` in
+    `backlog.scan_cycles`'s rotation to its smallest member (TOOL-dTotalRecall-6 S6); `parents` is the
+    same `after` edge. A target outside this tree closes no cycle."""
+    known = {b["slug"] for b in builds}
+    graph: dict = {}
+    for e in edges:
+        if e["type"] == ORDER_TYPE and e["source"] in known and e["owner"] in known:
+            graph.setdefault(e["source"], set()).add(e["owner"])
+    cycles = backlog.scan_cycles(graph)
+    if cycles:
+        raise Problem("depends-on forms a cycle, so no build of it can land first: "
+                      + "; ".join(" -> ".join(c + c[:1]) for c in cycles))
+
+
+def read_build_refs(root: str, slug: str) -> tuple:
+    """`(present, withdrawn)` for build `slug` in the clone at `root` (TOOL-dTotalRecall-6 section 4
+    "Target states"): the refs of `BUILD_REF_FORMS` the clone holds, in that order, read with one
+    `git for-each-ref`, and the lease copies among them whose tip message carries `status: withdrawn`.
+    A ref name is built only from a slug `BUILD_SLUG_RE` admits; any other is a Problem."""
+    if not read_slug_grammar(root).BUILD_SLUG_RE.match(slug):
+        raise Problem(f"'{slug}' is no build slug, so no card or lease ref is named from it")
+    names = [form.format(slug=slug) for form in BUILD_REF_FORMS]
+    held = set(run("git", "for-each-ref", "--format=%(refname)", *names, cwd=root).split())
+    present = [n for n in names if n in held]
+    withdrawn = [n for n in present if "/leases/" in n
+                 and WITHDRAWN_STATUS_RE.search(run("git", "log", "-1", "--format=%B", n, "--", cwd=root))]
+    return present, withdrawn
+
+
+def resolve_relation_target(edge: dict, ctx: dict) -> tuple:
+    """`(state, detail)` of one edge's target (TOOL-dTotalRecall-6 S5): `resolved` with no detail;
+    `pending` naming the first card or lease ref this clone holds, else `found nowhere`; `red` naming
+    its cause. `ctx` holds `root`, `conf`, `rows` and `builds`, `{slug: collect's build}`, and caches
+    what a later target reads again. A slug resolves where its build's README is tracked, a unit id
+    where `derive_defined_ids` holds it; either is red where a lease copy of its build reads withdrawn,
+    and a unit id where its build is in this tree at a `TERMINAL` status. A tag resolves where
+    `edge_grammar.resolve_edge` answers `resolved`, and is otherwise pending, never red."""
+    root, target, owner = ctx["root"], edge["target"], edge["owner"]
+    if edge["form"] == "tag":
+        if "tags" not in ctx:
+            kit = ctx["rows"]["dir"]
+            eg = load_edge_grammar(kit)
+            ctx["tags"] = (eg, eg.build_resolve_context(root, kit / "namespaces.toml"))
+        eg, rc = ctx["tags"]
+        return ("resolved", "") if eg.resolve_edge(target, rc)[0] == "resolved" else ("pending", "found nowhere")
+    build = ctx["builds"].get(owner)
+    if edge["form"] == "slug" and build is not None:
+        return "resolved", ""
+    if edge["form"] == "unit-id":
+        if "defined" not in ctx:
+            m = ctx["conf"]["MEMORY_ROOT"]
+            tracked = [p for p in run("git", "ls-files", "--", m + "/", cwd=root).split("\n") if p]
+            ctx["defined"] = derive_defined_ids(root, tracked, ctx["conf"])
+        if target in ctx["defined"]:
+            return "resolved", ""
+        if build is not None and build["status"] in TERMINAL:
+            return "red", f"its build {owner} is {build['status']} and defines no {target}"
+    present, withdrawn = read_build_refs(root, owner)
+    if withdrawn:
+        return "red", f"the build {owner} is withdrawn, its lease {withdrawn[0]} reading status: withdrawn"
+    return "pending", present[0] if present else "found nowhere"
+
+
+def cmd_print_relations(root: str, conf: dict) -> int:
+    """`--print-relations` (TOOL-dTotalRecall-6 S8): one line per declared edge of every build, in slug
+    order, `<source slug> TAB <type> TAB <target> TAB <state>[ TAB <detail>]`, the detail the ref a
+    pending target was found on, `found nowhere`, or a red target's cause. `collect`'s own report lines
+    go to stderr, so stdout carries only the edges. Exit 0; a refusal is the caller's Problem."""
+    with contextlib.redirect_stdout(sys.stderr):
+        builds = collect(root, conf)
+    ctx = {"root": root, "conf": conf, "rows": read_relation_rows(), "builds": {b["slug"]: b for b in builds}}
+    for b in builds:
+        for e in b["relations"]:
+            state, detail = resolve_relation_target(e, ctx)
+            print("\t".join([e["source"], e["type"], e["target"], state] + ([detail] if detail else [])))
+    return 0
 
 
 # ------------------------------------------------------------------------------- the backlog
@@ -2242,17 +2462,39 @@ def render_edges(build: dict) -> str:
     Slugs, never ids (fork 4). `rosters()` keys on an id's own slug component, so a slug joins no
     roster and this region leaves LIVE.md and both ledger shards byte-neutral. A bare id in a leading
     table cell would additionally ANCHOR via the extractor and rewrite the other build's `ids:` line.
+
+    TOOL-dTotalRecall-6 S7 — the relation graph. The two lines stay `after`'s, then one line per other
+    type the build declares and per inverse it receives, in the `[[front-matter]]` rows' order
+    (`build["relation_types"]`), each list sorted. A slug in this tree is linked, any other is written
+    `<slug> (not in this tree)`; a unit id or a tag is backticked, and only in the README whose front
+    matter cites it. A pending target's ref is never rendered: the bytes would differ between clones.
     """
     mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-edges")
     out = [mo, ""]
-    parents, children = build["parents"], build.get("children", [])
-    if not parents and not children:
-        out.append("*This build declares no parent and no build declares it as one.*")
-    else:
-        for label, vals in (("Parent", parents), ("Child", children)):
-            if vals:
-                links = ", ".join(f"[{s}](../{s}/README.md)" for s in sorted(vals))
-                out.append(f"- **{label} builds:** {links}")
+    known, inverses = build.get("known", ()), build.get("inverses", {})
+
+    def render_target(e):
+        if e["form"] != "slug":
+            return f"`{e['target']}`"
+        s = e["target"]
+        return f"[{s}](../{s}/README.md)" if s in known else f"{s} (not in this tree)"
+
+    declared: dict = {}
+    for e in build["relations"]:
+        declared.setdefault(e["type"], {})[e["target"]] = render_target(e)
+    parents = declared.get(ORDER_TYPE, {})
+    children = build.get("children", [])
+    lines = [f"- **{label} builds:** " + ", ".join(vals[k] for k in sorted(vals))
+             for label, vals in (("Parent", parents), ("Child", {s: f"[{s}](../{s}/README.md)" for s in children}))
+             if vals]
+    for kind, inverse in build["relation_types"]:
+        if kind == ORDER_TYPE:
+            continue
+        if declared.get(kind):
+            lines.append(f"- **{kind}:** " + ", ".join(declared[kind][k] for k in sorted(declared[kind])))
+        if inverses.get(inverse):
+            lines.append(f"- **{inverse}:** " + ", ".join(f"[{s}](../{s}/README.md)" for s in inverses[inverse]))
+    out += lines or ["*This build declares no parent and no build declares it as one.*"]
     out.append(mc)
     return "\n".join(out)
 
@@ -3257,19 +3499,27 @@ def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> t
     m = conf["MEMORY_ROOT"]
     reading: dict = {}
     builds = collect(root, conf, backlog_out=reading)
-    # DERIVE the child set by inverting `parents:`. Authoring both directions would put two answers
-    # to one question in two files with no gate on this bar able to reconcile them — the defect
-    # TOOL-aMouldedFolio-1 recorded one relation over, when it refused a front-matter schema.
+    # DERIVE every inverse by inverting the declared relations, `parents:`'s child set among them.
+    # Authoring both directions would put two answers to one question in two files with no gate on this
+    # bar able to reconcile them — the defect TOOL-aMouldedFolio-1 recorded one relation over, when it
+    # refused a front-matter schema. TOOL-dTotalRecall-6 S5 to S7: a `depends-on` cycle is refused, a red
+    # target is refused, and a target outside this tree is pending, which passes, in place of the
+    # folder-only refusal a `parents:` slug met here before.
     known = {b["slug"] for b in builds}
-    children = {}
+    edges = [e for b in builds for e in b["relations"]]
+    check_relation_cycles(builds, edges)
+    ctx = {"root": root, "conf": conf, "rows": None, "builds": {b["slug"]: b for b in builds}}
     for b in builds:
-        for p in b["parents"]:
-            if p not in known:
-                raise Problem(f"{b['readme']}: parents: names '{p}', which is not a build folder "
-                              f"under {m}/builds/ — an edge to nothing is a typo, not a relation")
-            children.setdefault(p, []).append(b["slug"])
+        for e in b["relations"]:
+            if e["form"] == "tag":
+                continue  # never red, so the render reads no tag state (section 4 "Target states")
+            state, detail = resolve_relation_target(e, ctx)
+            if state == "red":
+                raise Problem(f"{b['readme']}: {e['key']}: names '{e['target']}', which is red: {detail}")
+    inverses = derive_relation_inverses(builds, edges)
     for b in builds:
-        b["children"] = sorted(children.get(b["slug"], []))
+        b["known"], b["inverses"] = known, inverses.get(b["slug"], {})
+        b["children"] = b["inverses"].get(next(inv for kind, inv in b["relation_types"] if kind == ORDER_TYPE), [])
     # The bindings, read ONCE for the whole render and attached per build. Each record is filed under
     # the build folder that HOUSES it, which is not always the build its ids belong to — a
     # cross-build record renders where a reader will look for it.
@@ -5275,6 +5525,76 @@ def _fixture(tmp: str, *, marker=True, readme=True, status_key=None, spec_status
     return load_conf(tmp)
 
 
+def test_relations(arm) -> None:
+    """TOOL-dTotalRecall-6's arms (section 7): the two-build cycle, the pending ref, the withdrawn lease,
+    the landed build missing a unit, the inverse render and its hand edit, and the alias pair, each over
+    a fresh `_fixture` tree gaining builds under its ARCH family. The found-nowhere target is the
+    `tGhost` arm beside the call. Staged red by restoring the folder-only `parents:` check in `plan()`,
+    which refuses every tree here naming a slug outside it and never reaches the cycle or the pair."""
+    with tempfile.TemporaryDirectory() as base:
+        def write_relation_tree(name, builds):
+            t = os.path.join(base, name)
+            os.makedirs(t)
+            conf = _fixture(t, spec_status="OPEN")
+            for slug, extra, status in builds:
+                folder = os.path.join(t, "memory", "builds", slug)
+                write_text(os.path.join(folder, "README.md"), "\n".join(
+                    ["---", f"slug: {slug}", "opened: 2026-08-01", f"ids: ARCH-{slug}-1", *extra, "---", "",
+                     f"# {slug}", "", MARK_OPEN, MARK_CLOSE]) + "\n")
+                write_text(os.path.join(folder, "spec", f"2026-08-01-spec-{slug}-1.md"),
+                           f"# ARCH-{slug}-1 — a unit\n\n**Status:** {status} · rev-1 · 2026-08-01 · node x · "
+                           "Tier-2 · base 0123abcd\n")
+            run("git", "add", "-A", cwd=t)
+            run("git", "commit", "-q", "-m", "relations", "--no-verify", cwd=t)
+            return t, conf
+
+        def write_lease(t, slug, status):
+            sha = run("git", "commit-tree", run("git", "write-tree", cwd=t).strip(), "-m",
+                      f"lease {slug}\n\nstatus: {status}", cwd=t).strip()
+            run("git", "update-ref", f"refs/gov/leases/{slug}/build", sha, cwd=t)
+
+        alpha = "memory/builds/xAlpha/README.md"
+        t, conf = write_relation_tree("cycle", [("xAlpha", ["depends-on: xBeta"], "OPEN"),
+                                                ("xBeta", ["depends-on: xAlpha"], "OPEN")])
+        arm("TOOL-dTotalRecall-6 AC2 — a two-build depends-on cycle is refused, named", "xAlpha -> xBeta -> xAlpha",
+            lambda: plan(t, conf))
+        t, conf = write_relation_tree("pending", [("xAlpha", ["depends-on: xRemote"], "OPEN")])
+        write_lease(t, "xRemote", "held")
+        arm("TOOL-dTotalRecall-6 AC3 — a target on a held lease prints pending, naming the ref",
+            "xAlpha\tafter\txRemote\tpending\trefs/gov/leases/xRemote/build",
+            lambda t=t, conf=conf: _read_mode(cmd_print_relations, t, conf)[1])
+        arm("TOOL-dTotalRecall-6 AC3 — a pending target renders and never names its ref", "True",
+            lambda t=t, conf=conf: str("xRemote (not in this tree)" in plan(t, conf)[0][alpha]
+                                       and "refs/gov" not in plan(t, conf)[0][alpha]))
+        write_lease(t, "xRemote", "withdrawn")
+        arm("TOOL-dTotalRecall-6 AC5 — a target whose lease reads withdrawn is red, named",
+            "names 'xRemote', which is red: the build xRemote is withdrawn", lambda t=t, conf=conf: plan(t, conf))
+        t, conf = write_relation_tree("landed", [("xAlpha", ["patches: ARCH-xDone-9"], "OPEN"),
+                                                 ("xDone", [], "CLOSED")])
+        arm("TOOL-dTotalRecall-6 AC6 — a landed build's missing unit is red, named",
+            "its build xDone is CLOSED and defines no ARCH-xDone-9", lambda t=t, conf=conf: plan(t, conf))
+        t, conf = write_relation_tree("live", [("xAlpha", ["patches: ARCH-xDone-9"], "OPEN"), ("xDone", [], "OPEN")])
+        arm("TOOL-dTotalRecall-6 AC6 — a live build's missing unit prints pending",
+            "xAlpha\tpatches\tARCH-xDone-9\tpending\tfound nowhere",
+            lambda t=t, conf=conf: _read_mode(cmd_print_relations, t, conf)[1])
+        t, conf = write_relation_tree("inverse", [("xAlpha", ["amends: ARCH-xBeta-1"], "OPEN"), ("xBeta", [], "OPEN")])
+        arm("TOOL-dTotalRecall-6 AC7 — the inverse renders in the target's README",
+            "- **amended-by:** [xAlpha](../xAlpha/README.md)",
+            lambda t=t, conf=conf: plan(t, conf)[0]["memory/builds/xBeta/README.md"])
+        arm("TOOL-dTotalRecall-6 AC7 — the edge renders in the source's README", "- **amends:** `ARCH-xBeta-1`",
+            lambda t=t, conf=conf: plan(t, conf)[0][alpha])
+        _read_mode(cmd_write, t, conf)
+        run("git", "add", "-A", cwd=t)
+        beta = os.path.join(t, "memory", "builds", "xBeta", "README.md")
+        write_text(beta, "\n".join(ln for ln in read_text(beta).split("\n") if "amended-by" not in ln))
+        arm("TOOL-dTotalRecall-6 AC7 — a hand-deleted inverse line reads stale",
+            "memory/builds/xBeta/README.md (stale", lambda t=t, conf=conf: _read_mode(cmd_check, t, conf)[1])
+        t, conf = write_relation_tree("alias", [("xAlpha", ["parents: xBeta", "depends-on: xBeta"], "OPEN"),
+                                                ("xBeta", [], "OPEN")])
+        arm("TOOL-dTotalRecall-6 AC8 — parents: beside depends-on: is refused, naming both",
+            "carries both parents: and depends-on:", lambda t=t, conf=conf: plan(t, conf))
+
+
 def test_staged_render(arm) -> None:
     """TOOL-aTrimmedHook-1's arms: `--check --staged` renders exactly when the staged set can move it.
 
@@ -5696,24 +6016,27 @@ def test_staged_write(arm) -> None:
               and read_porcelain(d) == before)
         arm("TOOL-aTrimmedWait-8 AC1 — the view refusal declines and writes nothing", "ARM-PASS",
             lambda: build_arm_result(ok, rc, out))
-        # AC3 — `plan()` raises over a staged `parents: nope`, after the moved view was written.
+        # AC3 — `plan()` raises over a staged alias pair, `parents: nope` beside `depends-on: nope`, after
+        # the moved view was written. A slug naming no folder is pending since TOOL-dTotalRecall-6, so
+        # the pair is the refusal `plan()` still raises from a README alone.
+        alias_pair = "streams: arch\nparents: nope\ndepends-on: nope"
         write_staged_change(on_d, d)
         write_text(view_path, read_text(view_path).replace("first. | baseline", "first, quietly. | baseline"))
-        write_text(readme_d, read_text(readme_d).replace("streams: arch", "streams: arch\nparents: nope"))
+        write_text(readme_d, read_text(readme_d).replace("streams: arch", alias_pair))
         run("git", "add", "--", view_rel, readme, cwd=d)
         before, view_before = read_porcelain(d), pathlib.Path(view_path).read_bytes()
         rc, out = run_write_staged(d)
-        ok = (rc == 1 and "parents: names 'nope'" in out and read_porcelain(d) == before
+        ok = (rc == 1 and "carries both parents: and depends-on:" in out and read_porcelain(d) == before
               and pathlib.Path(view_path).read_bytes() == view_before)
         arm("TOOL-aTrimmedWait-8 AC3 — a plan() refusal puts the hand-edited view back", "ARM-PASS",
             lambda: build_arm_result(ok, rc, out))
         write_staged_change(on_d, d)
-        write_text(readme_d, read_text(readme_d).replace("streams: arch", "streams: arch\nparents: nope"))
+        write_text(readme_d, read_text(readme_d).replace("streams: arch", alias_pair))
         run("git", "add", "--", readme, cwd=d)
         run("git", "rm", "-q", "--", view_rel, cwd=d)
         before = read_porcelain(d)
         rc, out = run_write_staged(d)
-        ok = (rc == 1 and "parents: names 'nope'" in out and read_porcelain(d) == before
+        ok = (rc == 1 and "carries both parents: and depends-on:" in out and read_porcelain(d) == before
               and not os.path.exists(view_path))
         arm("TOOL-aTrimmedWait-8 AC3 — a plan() refusal removes the view the run created", "ARM-PASS",
             lambda: build_arm_result(ok, rc, out))
@@ -6184,14 +6507,17 @@ def test_front_matter_schema(arm) -> None:
         arm("TOOL-dTotalRecall-4 S2 — collect refuses a tree-bound value outside its type",
             "depends-on 'd!bad' is not a slugs value",
             lambda: _read_mode(lambda r, c: collect(r, c) and 0, tmp, conf)[1])
-        # S3 — the chain: ids, then asks, then the parents' rosters, then the conf's first pair.
+        # S3 — the chain: ids, then asks, then the parents' rosters, then the conf's first pair. A build's
+        # parents are `collect`'s `after` targets (TOOL-dTotalRecall-6 S3), handed here as `collect` hands them.
         cf = {"FAMILIES": "tool:TOOL arch:ARCH", "DISCIPLINES": "tool arch"}
         for label, build, rosters_in, want in (
-                ("the ids win", {"slug": "tX", "roster": ["TOOL-tX-1"], "fm": {"asks": "ARCH-tY-1"}}, {}, "TOOL"),
-                ("the asks next", {"slug": "tX", "roster": [], "fm": {"asks": "ARCH-tY-1..2"}}, {}, "ARCH"),
-                ("the parents next", {"slug": "tX", "roster": [], "fm": {"parents": "tY"}}, {"tY": ["ARCH-tY-3"]},
+                ("the ids win", {"slug": "tX", "roster": ["TOOL-tX-1"], "parents": [], "fm": {"asks": "ARCH-tY-1"}},
+                 {}, "TOOL"),
+                ("the asks next", {"slug": "tX", "roster": [], "parents": [], "fm": {"asks": "ARCH-tY-1..2"}}, {},
                  "ARCH"),
-                ("the conf's first pair last", {"slug": "tX", "roster": [], "fm": {}}, {}, "TOOL")):
+                ("the parents next", {"slug": "tX", "roster": [], "parents": ["tY"], "fm": {"depends-on": "tY"}},
+                 {"tY": ["ARCH-tY-3"]}, "ARCH"),
+                ("the conf's first pair last", {"slug": "tX", "roster": [], "parents": [], "fm": {}}, {}, "TOOL")):
             arm(f"TOOL-dTotalRecall-4 S3 — derive_front_matter: {label}", f"'node': 't', 'roster': '{want}', "
                 f"'streams': '{'tool' if want == 'TOOL' else 'arch'}'",
                 lambda b=build, r=rosters_in: str(derive_front_matter(b, r, cf)))
@@ -7267,14 +7593,18 @@ def cmd_selftest() -> int:
             lambda: str("gen:build-docs" in render_region(
                 [b for b in collect(t12, conf12) if b["slug"] == "tOne"][0])))
 
-        # S10 — an edge to a build that does not exist is a typo, not a relation.
+        # S10, as TOOL-dTotalRecall-6 S5 reads it — an edge to a build this tree does not hold is pending
+        # and found nowhere, never red, until its build lands or is withdrawn: it renders, and prints.
         t15 = os.path.join(base, "badedge"); os.makedirs(t15)
         conf15 = _fixture(t15, spec_status="OPEN")
         rd15 = os.path.join(t15, "memory", "builds", "tOne", "README.md")
         write_text(rd15, read_text(rd15).replace("ids: ARCH-tOne-1", "ids: ARCH-tOne-1\nparents: tGhost"))
         run("git", "add", "-A", cwd=t15)
-        arm("an edge to a nonexistent build is named", "which is not a build folder",
-            lambda: plan(t15, conf15))
+        arm("an edge to a build found nowhere renders as not in this tree", "tGhost (not in this tree)",
+            lambda: plan(t15, conf15)[0]["memory/builds/tOne/README.md"])
+        arm("an edge to a build found nowhere prints pending, found nowhere", "tOne\tafter\ttGhost\tpending\tfound nowhere",
+            lambda: _read_mode(cmd_print_relations, t15, conf15)[1])
+        test_relations(arm)
         # ---- the record->spec binding parser.
         # Every arm is a POSITIVE assertion on a classification, because the failure mode of a
         # head-scan is silence: a boundary set one line short reports "absent" for a conformant
@@ -10300,12 +10630,12 @@ def main(argv: list) -> int:
     if mode not in ("--check", "--write", "--write-staged", "--check-format", "--print-bindings", "--survey",
                     "--check-asbuilt",
                     "--report", "--bump", "--asks", "--new-build", "--placed-build", "--new-spec", "--doctor",
-                    "--check-coverage", "--print-front-matter", "--print-typed-derived"):
+                    "--check-coverage", "--print-front-matter", "--print-typed-derived", "--print-relations"):
         print("usage: gen_build_index.py "
               "[--check [--staged|--with-verdicts]|--write|--write-staged|--check-coverage [--staged]|"
               "--check-asbuilt [--staged]|"
               "--check-format|--survey|--report|--bump|"
-              "--print-bindings|--print-front-matter <slug>|--print-typed-derived|"
+              "--print-bindings|--print-front-matter <slug>|--print-typed-derived|--print-relations|"
               "--asks|--new-build|--placed-build|--new-spec|--doctor|--selftest]")
         return 2
     # TOOL-dTrueNorth-27 S4: `--with-verdicts` is `--check`'s alone, and never beside `--staged`, whose
@@ -10332,10 +10662,13 @@ def main(argv: list) -> int:
             return 2
     # TOOL-dTotalRecall-4 S3, S4 — two read-only printers whose stdout is a value a program parses, so
     # a refusal goes to stderr and exits 2.
-    if mode in ("--print-front-matter", "--print-typed-derived"):
+    # TOOL-dTotalRecall-6 S8 — `--print-relations` is a third, the edge list TOOL-dTotalRecall-22 reads.
+    if mode in ("--print-front-matter", "--print-typed-derived", "--print-relations"):
         try:
             if mode == "--print-typed-derived":
                 return cmd_print_typed_derived(root, conf)
+            if mode == "--print-relations":
+                return cmd_print_relations(root, conf)
             if len(argv) != 3 or argv[2].startswith("--"):
                 raise Problem("usage: gen_build_index.py --print-front-matter <slug>")
             derived = read_derived_front_matter(root, conf, argv[2])
