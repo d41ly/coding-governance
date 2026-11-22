@@ -218,6 +218,9 @@ The `context —` line shows how full the session's context window is, as a whol
 its last request read, as its transcript records them, over the window derived per model from this
 node's observed usage: `CLAUDE_CODE_MAX_CONTEXT_TOKENS` where the harness sets it, else the largest
 context this node's recent transcripts show on that model, rounded up to the 200k or the 1M window.
+No transcript names the window a session runs, so on a node that runs one model at both windows a
+200k session reads its fill against the 1M window unless the owner starts it with
+`CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000` set.
 A subagent's requests never count. The `context.on-full` policy key decides what a filling window leads to, and
 `context.threshold` where it starts: <!-- usage: policy:context.on-full 50e931f0 --> <!-- usage: policy:context.threshold ba7d79dc -->
 
