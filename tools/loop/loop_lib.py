@@ -2,6 +2,7 @@
 """loop_lib — the one reader of the loop's definition, `loop.toml` beside this file (TOOL-dDeclaredLoop-1).
 
     python loop_lib.py --check                    # read the definition, print what was read
+    python loop_lib.py --steps                    # one `<step tag> TAB <state>` line per step
     python loop_lib.py --scopes                   # each item's instruction scope, derived
     python loop_lib.py --fixture --plant <case>   # read it with one break planted in memory
     python loop_lib.py --selftest                 # every plant, each held to the exit and line it owes
@@ -126,6 +127,10 @@ that is not an integer at or above 0, a `step` that is absent or is neither a st
 of the `SEG` shape, or holds a word twice; a `[[disposition-alias]]` row whose `word` is a member or
 repeats an earlier row's, or whose `means` is no member. The table is graded where the definition holds
 it; `read_dispositions` and `--check` refuse a definition that declares no set.
+
+`--steps` prints one `<step tag>` TAB `<state>` line per `[[step]]` row, from `read_steps`, in the loop's order,
+and exits 0; a refused definition prints `loop: <why>` and exits 1, as `--check` does. It is the contract a
+sibling kit reads a step's state through, by subprocess (KICK-dKeptSession-9 S9).
 
 `--check` prints one line per step and per workflow, the set and one line per alias, then a count, and exits 0; a refused definition is one
 line and exit 1. It prints each step's program, `loop: program <step> · <n> item(s) · <tags>` in needs
@@ -2089,8 +2094,17 @@ def main(argv):
         return 1 if refusals else 0
     if argv[:1] == ["seed"]:   # TOOL-dPlacedRequest-8 S4: an item's declared seed, resolved to paths
         return run_seed_command(kit_dir, argv[1:])
+    if argv == ["--steps"]:   # KICK-dKeptSession-9 S9: each step's tag and state, the contract a sibling reads
+        try:
+            steps = read_steps(kit_dir)
+        except LoopError as e:
+            print("loop: %s" % e)
+            return 1
+        for s in steps:
+            print("%s\t%s" % (s["tag"], s["state"]))
+        return 0
     if argv not in (["--check"], ["--scopes"]) and plant not in PLANTS:
-        print("usage: python loop_lib.py --check | --scopes | --selftest | --fixture --plant <%s> | --grade-site <%s> "
+        print("usage: python loop_lib.py --check | --steps | --scopes | --selftest | --fixture --plant <%s> | --grade-site <%s> "
               "<entry>... | seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]" % (
             "|".join(PLANTS), "|".join(DECLARATION_SITES)), file=sys.stderr)
         return 2

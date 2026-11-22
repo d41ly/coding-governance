@@ -3768,6 +3768,16 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_orient_repo",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_orient_transcript",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_overlap_ref",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -13278,6 +13288,21 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_orient_calls_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_orient_ceiling",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "derive_orient_stage",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "derive_origin_sha",
       "kind": "function",
       "file": "tools/loop/claim.py"
@@ -18598,6 +18623,11 @@
       "file": "tools/unattended/resume-tick.test.sh"
     },
     {
+      "id": "measure_orient_tree",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "measure_orphans",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -20351,6 +20381,11 @@
       "id": "print_ok",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
+      "id": "print_orient",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
     },
     {
       "id": "print_outlog",
@@ -31450,6 +31485,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
     {
@@ -34891,6 +34931,11 @@
       "id": "run_kit_verb",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "run_kit_verb",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
     },
     {
       "id": "run_ladder_terms",
@@ -39771,6 +39816,11 @@
       "id": "test_extract_failure_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_extract_orient",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_extract_ready",

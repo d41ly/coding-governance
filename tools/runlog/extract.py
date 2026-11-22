@@ -30,6 +30,7 @@ import json
 import os
 import pathlib
 import re
+import subprocess
 import sys
 import time
 from dataclasses import dataclass
@@ -39,6 +40,49 @@ if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
 import runlog_lib as rl  # noqa: E402
+
+
+# A sibling kit's verb is run as a subprocess from the directory this block finds, never imported:
+# the orientation report reads the policy kit's reader and budgets and the loop kit's steps through it
+# (KICK-dKeptSession-9 S3).
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
 
 SCHEMA = 1
 # The CLOSED lists the self-test holds its fixtures against, in both directions: a member with no
@@ -1329,3 +1373,191 @@ def measure_context_fill(transcript, until=None) -> tuple:
     window, source = derive_context_window(last.get("model"), root=path.parent.parent,
                                            held=(path, events))
     return derive_context_fill(last, window), window, source
+
+
+# ---------------------------------------------------------------------------------- orientation
+
+# The smallest population a stage's evidence ceiling is derived over (KICK-dKeptSession-9 S5): the
+# smallest the orientation research graded a percentile over, its `new -> READY` row. Under it a stage
+# has no ceiling and warns nothing.
+ORIENT_CEILING_FLOOR = 20
+# The tool classes whose first event ends a file's orientation: its first item action (S2).
+ORIENT_ACTIONS = ("edit", "write", "git-commit")
+
+
+def run_kit_verb(home, anchor, args, repo) -> tuple:
+    """`(rc, stdout, why)` of `python <anchor> <args>` run in `repo`, the file found in the sibling kit
+    `resolve_kit_dir` finds beside this one; `why` is the last stderr line. `(None, "", why)` where the
+    kit does not resolve or the process does not start. Nothing is imported from the sibling."""
+    try:
+        kit = resolve_kit_dir(home, anchor, HERE)
+    except LookupError as exc:
+        return None, "", str(exc)
+    try:
+        proc = subprocess.run([sys.executable, str(kit / anchor), *args], cwd=str(repo), capture_output=True,
+                              text=True, encoding="utf-8", errors="replace")
+    except OSError as exc:
+        return None, "", f"{anchor} did not run: {exc}"
+    return proc.returncode, proc.stdout, (proc.stderr.strip().splitlines() or [""])[-1]
+
+
+def _read_orient_git(repo, args) -> str | None:
+    """One git call's stdout in `repo`, or None where git refuses it."""
+    try:
+        proc = subprocess.run(["git", "-C", str(repo), "-c", "core.quotepath=off", *args], capture_output=True,
+                              text=True, encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    return proc.stdout if proc.returncode == 0 else None
+
+
+def _read_orient_moves(repo, slug) -> tuple:
+    """`(moves, notes)`: `slug`'s stage transitions in `repo` as `[(committer epoch, step tag)]`, oldest
+    first, read with git on the loop kit's channels (KICK-dKeptSession-9 S3). The channel set is
+    `transitions.record`, read once through the policy kit's reader. With `trailer` selected, one
+    `git log` over HEAD reads each commit's committer date and its `Gov-Transition` trailer, kept where
+    it names `build=<slug>`; with `log` and no `trailer`, each of the build's transition records gives
+    its `**To:**` field and the committer date of the commit that added it; with neither, nothing is
+    stored. Each `to` state maps to its step through the loop kit's `--steps` verb, `none` where no step
+    holds it. A channel or a step read that does not answer is one note, and no move."""
+    rc, out, why = run_kit_verb("policy", "policy.py", ["get", "transitions.record"], repo)
+    if rc != 0:
+        return [], [f"transitions.record did not read ({why or 'exit %s' % rc}), so every stage reads none"]
+    channels = out.split()
+    if "trailer" not in channels and "log" not in channels:
+        return [], [f"transitions.record is {' '.join(channels) or 'empty'}, which stores no move, so every "
+                    "stage reads none"]
+    rc, out, why = run_kit_verb("loop", "loop_lib.py", ["--steps"], repo)
+    if rc != 0:
+        return [], [f"the loop kit's steps did not read ({why or out.strip() or 'exit %s' % rc}), so every "
+                    "stage reads none"]
+    steps = {state: tag for tag, _tab, state in (ln.partition("\t") for ln in out.splitlines()) if _tab}
+    found = []
+    if "trailer" in channels:
+        text = _read_orient_git(repo, ["log", "--format=%ct%x1f%(trailers:key=Gov-Transition,valueonly,"
+                                       "separator=%x1f)%x1e", "HEAD"])
+        for chunk in (text or "").split("\x1e"):
+            stamp, *values = chunk.strip().split("\x1f")
+            for value in values:
+                parts = value.strip().split(" · ")
+                head = parts[0].split(" -> ")
+                if stamp.isdigit() and len(head) == 2 and f"build={slug}" in parts[1:]:
+                    found.append((int(stamp), head[1].strip()))
+    else:
+        try:
+            folder = f"{rl.resolve_memory_root(repo)}/builds/{slug}/build"
+        except ValueError as exc:
+            return [], [f"{exc}, so every stage reads none"]
+        text = _read_orient_git(repo, ["log", "--diff-filter=A", "--format=%x1e%ct", "--name-only", "HEAD",
+                                       "--", folder])
+        for chunk in (text or "").split("\x1e"):
+            stamp, *names = chunk.strip().splitlines() or [""]
+            for name in names:
+                if not re.search(r"-transition-[0-9]+\.md$", name) or not stamp.isdigit():
+                    continue
+                try:
+                    record = (pathlib.Path(repo) / name).read_text(encoding="utf-8", errors="replace")
+                except OSError:
+                    continue
+                to = re.search(r"^- \*\*To:\*\* (\S+)", record, re.M)
+                if to:
+                    found.append((int(stamp), to.group(1)))
+    return sorted((t, steps.get(state, "none")) for t, state in found), []
+
+
+def derive_orient_stage(t, moves) -> str:
+    """The step tag of the newest move in `moves`, `[(epoch, step tag)]` oldest first, at or before `t`,
+    the session's first timed record; `none` where no move precedes it (KICK-dKeptSession-9 S3)."""
+    stage = "none"
+    for at, tag in moves:
+        if t is None or at > t:
+            break
+        stage = tag
+    return stage
+
+
+def derive_orient_ceiling(values) -> int | None:
+    """The nearest-rank 90th percentile of a stage's `calls`, DERIVED from the population handed in, or
+    None where it holds fewer than ORIENT_CEILING_FLOOR values (KICK-dKeptSession-9 S5)."""
+    if len(values) < ORIENT_CEILING_FLOOR:
+        return None
+    ranked = sorted(values)
+    return ranked[-(-9 * len(ranked) // 10) - 1]
+
+
+def _read_first_time(path) -> float | None:
+    """The epoch of a main file's first timed record that is not a sidechain's, or None."""
+    try:
+        fh = open(path, "rb")
+    except OSError:
+        return None
+    with fh:
+        for raw in fh:
+            try:
+                rec = parse_record(raw)
+            except ValueError:
+                continue
+            t = parse_time(rec.get("timestamp"))
+            if t is not None and rec.get("isSidechain") is not True:
+                return t
+    return None
+
+
+def measure_orient_tree(root, repo, slug) -> dict:
+    """What each session the two attributions name for `slug` spent before its first item action, one
+    row per file (KICK-dKeptSession-9 S1, S2): `{"sessions", "rows", "notes"}`. The population is the
+    sessions `scan_preflights` finds under `root` (`heuristic`) and those `read_session_ids` reads from
+    the driver journal of `repo` (`driver`, which wins for a session both name); a session with no main
+    file under `root` is not reported. Each row is the main file or one agent file of
+    `build_session_tree`, its `source` `main` or the agent file's stem: `action` the class of its first
+    tool event in ORIENT_ACTIONS, or `none`; `calls` the tool events before it; `tokens` the four
+    counts of its usage events before it; `context` `derive_context_fill` of the main file's last main
+    usage before it, or None; `stage` the session's, `derive_orient_stage` at its main file's first
+    timed record. One scan per file; writes nothing."""
+    root = pathlib.Path(root)
+    attributed = {sid: "heuristic" for sid, _slug in scan_preflights(root, slug)}
+    moves, notes = _read_orient_moves(repo, slug)
+    try:
+        sids, _refused = read_session_ids(slug, rl.resolve_journal_root(repo) / rl.PRODUCER_FILES["driver"])
+        attributed.update((sid, "driver") for sid in sids)
+    except ValueError as exc:
+        notes.append(f"the driver journal did not resolve ({exc}), so only the heuristic attribution reads")
+    out = {"sessions": 0, "rows": [], "notes": notes}
+    windows: dict = {}
+    for sid, attribution in sorted(attributed.items()):
+        try:
+            tree = resolve_session_tree(sid, root)
+        except ValueError:
+            continue
+        if tree.main is None:
+            continue
+        out["sessions"] += 1
+        stage = derive_orient_stage(_read_first_time(tree.main), moves)
+        main_events = extract_session(SessionTree(sid=sid, main=tree.main))["events"]
+        mains = [ev for ev in main_events if ev["kind"] == "usage" and ev["src"] == "main"]
+        for source, path in [("main", tree.main)] + [(p.stem, p) for p in tree.agents + tree.workflow_agents]:
+            events = main_events if source == "main" else extract_session(SessionTree(sid=sid, main=path))["events"]
+            row = {"sid": sid, "attribution": attribution, "source": source, "stage": stage, "action": "none",
+                   "calls": 0, "tokens": 0, "context": None}
+            t_action = None
+            for ev in events:
+                if ev["kind"] == "tool" and ev["cls"] in ORIENT_ACTIONS:
+                    row["action"], t_action = ev["cls"], ev["t"]
+                    break
+                if ev["kind"] == "tool":
+                    row["calls"] += 1
+                elif ev["kind"] == "usage":
+                    row["tokens"] += ev["in"] + ev["out"] + ev["cache_read"] + ev["cache_write"]
+            last = None
+            for ev in mains:
+                if t_action is not None and ev["t"] >= t_action:
+                    break
+                last = ev
+            if last is not None:
+                # ponytail: one window per model per run, the share derive_context_fill(ev) takes.
+                model = last.get("model")
+                if model not in windows:
+                    windows[model] = derive_context_window(model)[0]
+                row["context"] = derive_context_fill(last, windows[model])
+            out["rows"].append(row)
+    return out
