@@ -263,3 +263,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T23:28:03Z draw · re-dispatch · KICK-dKeptSession-39 · 16/132 · 20261122T232803Z-e8aec9
 
 2026-11-22T23:28:03Z dispatch · item 211d3809 KICK-dKeptSession-39 · reason tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-39-1-acceptance-ledger.md
+
+2026-11-22T23:51:15Z brief · item KICK-dKeptSession-51 · reason 686d20cf6133 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-51-build-brief.md
+
+2026-11-22T23:53:49Z dispatch · item 614fda11 KICK-dKeptSession-51 · reason tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dWellOiledMachine/BACKLOG.md memory/builds/dWellOiledMachine/README.md memory/backlog/TOOL.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-51-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
