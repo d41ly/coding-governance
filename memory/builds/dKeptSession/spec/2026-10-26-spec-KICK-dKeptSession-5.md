@@ -1,6 +1,6 @@
 # KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition
 
-**Status:** DEFERRED · rev-12 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 16 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-12 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 16 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0143@cafeb575 whole
 **Carries:** node:record-kind.mailbox-message
@@ -29,6 +29,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-22-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-22-precheck-brief.md) | research | KICK-dKeptSession-22 KICK-dKeptSession-31 |
 | [2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md) | research | KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 |
 | [2026-11-21-prompt-KICK-dKeptSession-5-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-5-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-5-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-5-build-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md) | research | KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 |
 | [2026-11-22-prompt-KICK-dKeptSession-5-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-5-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-KICK-dKeptSession-5-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-5-reground-brief.md) | research | — |
