@@ -319,7 +319,9 @@ fail=0
 # gated. Counted by reading; this pass runs no suite.
 # 468 -> 480, TOOL-dWitnessedBar-29: arm 9e3's twelve, a passing leg's size warning shown, seven through
 # the bar and five through the sliced `scan_leg_warnings`. Not gated. Counted by reading; no suite ran.
-FLOOR_ASSERTIONS=480
+# 480 -> 490, TOOL-dQuietDisk-5: arm 3h1's ten, nine `check_gm_line` calls and the trace's re-diff
+# check. Not gated. Counted by reading; this pass runs no suite.
+FLOOR_ASSERTIONS=490
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -1483,6 +1485,53 @@ n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
   || { echo "canary: with the ladder refusing, a guarded leg did not fail safe to RUN"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 ( cd "$G" && git remote remove origin ) >/dev/null 2>&1
+
+# 3h1. ONE MOVED LIST DECIDES EVERY PLAIN GUARD. TOOL-dQuietDisk-5 AC2 AC4 AC7. The guarded fixture
+#     again, beside 3h's own because 3i reads that one's three legs: a plain directory guard against a
+#     near-miss path, a glob guard, a planted failing diff, and a held record whose sha is the base.
+#     Each case reds a different break: a guard matched as a substring skips nothing it should, a
+#     failed diff read as clean skips every guarded leg, a recorded sha diffed again shows in the trace.
+GM="$SCRATCH/guarded-moved"
+mkdir -p "$GM/${PFX}${KIT}" "$GM/fx" "$GM/ga" "$GM/xga" "$GM/hk"
+cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$GM/${PFX}${KIT}/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$GM/${PFX}${KIT}/" 2>/dev/null || true
+cp "$SCRATCH/fx/instant.sh" "$GM/fx/a.sh"; cp "$SCRATCH/fx/instant.sh" "$GM/hk/h.test.sh"
+printf 'f\n' > "$GM/ga/f"; printf 'f\n' > "$GM/xga/f"
+cat > "$GM/${PFX}gate-legs.json" <<'JSON'
+[
+  {"name": "plain one",  "argv": ["bash", "fx/a.sh"]},
+  {"name": "dir guard",  "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},
+  {"name": "glob guard", "argv": ["bash", "fx/a.sh"], "guard": ["fx/*.sh"]},
+  {"name": "held kit",   "argv": ["bash", "hk/h.test.sh"], "subject": "kit", "guard": ["hk/"]}
+]
+JSON
+( cd "$GM" && git init -q --template= -b main . && git add -A && git commit -qm fx ) >/dev/null 2>&1
+check_gm_line() { # label · ERE one whole line of o must match
+  n=$((n+1))
+  printf '%s\n' "$o" | grep -qE -- "$2" || { echo "canary: one moved list — $1: no line matched /$2/ in:"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+}
+printf 'x\n' >> "$GM/xga/f"
+o=$( cd "$GM" && GATE_FULL= GATE_BASE=HEAD GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
+check_gm_line "a near-miss path xga/f does not move guard ga/" '^GATE skip  dir guard  \(unchanged vs [^)]*\)$'
+check_gm_line "control: an unmoved glob guard skips" '^GATE skip  glob guard  \(unchanged vs [^)]*\)$'
+printf 'x\n' >> "$GM/ga/f"; printf '# moved\n' >> "$GM/fx/a.sh"
+o=$( cd "$GM" && GATE_FULL= GATE_BASE=HEAD GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
+check_gm_line "ga/f moves guard ga/" '^GATE ok    dir guard$'
+check_gm_line "a moved fx/a.sh moves glob guard fx/*.sh, decided by its own diff" '^GATE ok    glob guard$'
+( cd "$GM" && git checkout -q -- . ) >/dev/null 2>&1
+o=$( cd "$GM" && GATE_FULL= GATE_BASE="$(cd "$GM" && git rev-parse HEAD:ga/f)" GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
+check_gm_line "a failed diff (the base a blob) runs the plain-guarded leg" '^GATE ok    dir guard$'
+check_gm_line "...and the glob-guarded one" '^GATE ok    glob guard$'
+o=$( cd "$GM" && GATE_FULL=1 GATE_BASE= GATE_SELFTESTS=1 GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
+check_gm_line "setup: the seed run executes the held leg" '^GATE ok    held kit$'
+: > "$SCRATCH/gm.trace"
+o=$( cd "$GM" && GATE_FULL= GATE_BASE=HEAD GATE_SELFTESTS=changed GIT_TRACE="$SCRATCH/gm.trace" GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
+check_gm_line "a record at the base holds its leg" '^GATE held  held kit  \(kit, unchanged since [0-9a-f]{8}\)$'
+o=$(<"$SCRATCH/gm.trace")
+check_gm_line "control: the bar read its moved list once" ' diff --name-only --no-renames [0-9a-f]{40} --$'
+n=$((n+1))
+printf '%s\n' "$o" | grep -qE ' diff --name-only --no-renames [0-9a-f]{40}$' \
+  && { echo "canary: one moved list — the held selection diffed a recorded sha equal to the base again"; fail=1; }
 
 # 3h2. SUBJECT: a kit-subject leg is HELD unless asked, and GATE_FULL does not ask.
 #     TOOL-dUnstalledConvoy-26. A kit self-test stages a break into a copy of a checker and asserts

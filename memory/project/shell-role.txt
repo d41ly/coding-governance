@@ -111,8 +111,8 @@ tools/run-gates/profile_bar.test.sh	315	99c65d5e352d061e856a81d01d00f3454294071c
 tools/run-gates/run-gates.evidence.test.sh	2459	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
 tools/run-gates/run-gates.gov.test.sh	853	d7c4a67399ed2dbeaad06ad17bf622a158816295	widened:2026-11-21-build-TOOL-dWitnessedBar-90-widen-25
 tools/run-gates/run-gates.runlog.test.sh	994	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/run-gates/run-gates.sh	3737	a07a2203d9fbe56ae79174f39d9321646265958a	widened:2026-11-21-build-TOOL-dWitnessedBar-63-widen-6
-tools/run-gates/run-gates.test.sh	3179	99c65d5e352d061e856a81d01d00f3454294071c	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
+tools/run-gates/run-gates.sh	3770	393d9289d1a830a650404d4aa93624ac61fb3912	widened:2026-11-22-build-TOOL-dQuietDisk-5-widen-6
+tools/run-gates/run-gates.test.sh	3220	393d9289d1a830a650404d4aa93624ac61fb3912	widened:2026-11-22-build-TOOL-dQuietDisk-5-widen-6
 tools/run-gates/run-gates.turnstile.test.sh	1185	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/run-held-wsl.sh	307	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/run-selftests.sh	1542	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36

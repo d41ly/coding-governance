@@ -77,7 +77,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 21 unit(s) · node d · opened 2026-11-20 · streams tooling
+**Build status:** SPECCED · 21 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16
 ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30
 
@@ -89,7 +89,7 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 | [TOOL-dQuietDisk-2 — the pass-order leg grades only units whose key moved since its last graded tip](spec/2026-11-20-spec-TOOL-dQuietDisk-2.md) | 2 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [TOOL-dQuietDisk-3 — the brief-recorded leg grades only units whose key moved since its last graded tip](spec/2026-11-20-spec-TOOL-dQuietDisk-3.md) | 2 | 2 | CLOSED | rev-5 | 2026-11-22 |
 | [TOOL-dQuietDisk-4 — routed-commits reads only the commits its store does not already hold](spec/2026-11-20-spec-TOOL-dQuietDisk-4.md) | 2 | 2 | CLOSED | rev-4 | 2026-11-22 |
-| [TOOL-dQuietDisk-5 — one `git diff --name-only BASE` decides every plain-guarded leg of a bar](spec/2026-11-20-spec-TOOL-dQuietDisk-5.md) | 2 | 2 | INPROGRESS | rev-3 | 2026-11-22 |
+| [TOOL-dQuietDisk-5 — one `git diff --name-only BASE` decides every plain-guarded leg of a bar](spec/2026-11-20-spec-TOOL-dQuietDisk-5.md) | 2 | 2 | CLOSED | rev-3 | 2026-11-22 |
 | [TOOL-dQuietDisk-7 — one suite template cache: each base repository built once, keyed by its inputs, and cloned per case](spec/2026-11-20-spec-TOOL-dQuietDisk-7.md) | 2 | 2 | SPECCED | rev-5 | 2026-11-22 |
 | [TOOL-dQuietDisk-8 — the whole-tree readers clone without copying objects and check out only what they read](spec/2026-11-20-spec-TOOL-dQuietDisk-8.md) | 2 | 2 | SPECCED | rev-5 | 2026-11-22 |
 | [TOOL-dQuietDisk-10 — `check-wiring.test.sh` takes its scratch repositories from the template cache](spec/2026-11-20-spec-TOOL-dQuietDisk-10.md) | 3 | 2 | SPECCED | rev-3 | 2026-11-22 |
@@ -107,7 +107,7 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 | [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 7 | 1 | SPECCED | rev-4 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 53 bound to this build, across 3 record folder(s).
+Records: 56 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
