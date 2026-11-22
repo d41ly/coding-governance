@@ -472,11 +472,14 @@ write_card_fixture_verdict() { # scratch dir -> the line it wrote; 2 with nothin
 }
 
 # The verdict's reader, which `derive_resume_lines`' `always-resume` arm asks: `pass` only while the
-# recorded verdict is `pass`, its blob is the installed fixture's now and its version
-# `read_session_cli_version`'s now; otherwise one `red: <why>` line. A line off the writer's grammar
-# reads as no run, so the override can only fail towards recommending a fresh session.
+# recorded verdict is `pass`, its blob is the installed fixture's now, and its version is both PATH's
+# `claude`'s now, `read_claude_version`'s, and the session's now, `read_session_cli_version`'s
+# (KICK-dKeptSession-38 S1); otherwise one `red: <why>` line. The tests run in that order and the first
+# that fails answers, so a recorded red keeps its own reason and a verdict that is no pass spawns no
+# `claude --version`. An unknown version on any side is red, never an equality (S2). A line off the
+# writer's grammar reads as no run, so the override can only fail towards recommending a fresh session.
 read_card_fixture_verdict() { # -> pass, or red: <why>; one line on stdout, 0 always
-  local l="" v old8 oldv blob ver
+  local l="" v old8 oldv blob p="" s=""
   local re='^card-fixture — (pass|absent|red [A-Za-z0-9 ]+) · fixture ([0-9a-f]{8}) · cli ([0-9]+(\.[0-9]+){1,3}|unknown) · [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[+-][0-9]{4}$'
   [ -f "$CARD_FIXTURE" ] || { echo "red: no fixture installed"; return 0; }
   [ -f "$CARD_DIR/$CARD_FIXTURE_VERDICT" ] && IFS= read -r l < "$CARD_DIR/$CARD_FIXTURE_VERDICT"
@@ -486,8 +489,11 @@ read_card_fixture_verdict() { # -> pass, or red: <why>; one line on stdout, 0 al
   [ "$v" = pass ] || { echo "red: $v"; return 0; }
   blob=$(git hash-object -- "$CARD_FIXTURE" 2>/dev/null); blob=${blob:-unhashed}
   [ "${blob:0:8}" = "$old8" ] || { echo "red: recorded for fixture $old8, now ${blob:0:8}"; return 0; }
-  read_session_cli_version ver || ver=unknown
-  [ "$ver" = "$oldv" ] || { echo "red: recorded under cli $oldv, now $ver"; return 0; }
+  [ "$oldv" != unknown ] || { echo "red: cli version unknown · recorded"; return 0; }
+  p=$(read_claude_version) || { echo "red: cli version unknown · PATH"; return 0; }
+  read_session_cli_version s || { echo "red: cli version unknown · session"; return 0; }
+  [ "$p" = "$oldv" ] || { echo "red: recorded under cli $oldv, PATH now $p"; return 0; }
+  [ "$s" = "$oldv" ] || { echo "red: fixture ran cli $oldv, this session runs $s"; return 0; }
   echo pass
 }
 

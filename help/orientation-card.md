@@ -198,9 +198,15 @@ The card-import fixture's verdict lives in one file per clone, `card-fixture.ver
 a machine by running `manifest-check.sh --card --fixture-run <empty-dir>`: it runs
 `card-compaction.fixture.sh` in that directory, which starts two headless sessions and takes
 minutes, then writes and prints one line such as `card-fixture — pass · fixture 3f9c2a71 · cli
-2.1.308 · 2026-10-27T09:14:02+0000`. A pass counts only while the fixture file and the Claude Code
-version are both still the ones it names, so editing the fixture or upgrading the CLI makes it stale,
-and the override returns until you run the fixture again. With no file, the reason printed is `no
-recorded run`. Every fresh recommendation names the tree to start in after `· in`: the worktree the
+2.1.308 · 2026-10-27T09:14:02+0000`. The version is that of the `claude` first on PATH, the
+binary the fixture launches. A pass counts only while the fixture file is still the one it names and
+the tested version is both PATH's `claude` now and the version of the session reading it, so editing
+the fixture, upgrading the CLI on PATH, or starting a session whose harness runs another version
+makes it stale, and the override returns until you run the fixture again. The reason names the two
+versions that differ: `recorded under cli <old>, PATH now <new>` or `fixture ran cli <x>, this
+session runs <y>`. A version that cannot be read on any side, the recorded one, PATH's or the
+session's, is red too, as `cli version unknown` with the side named. A machine whose IDE harness and
+PATH binary run different versions never passes until the two run one version and the fixture is
+run again. With no file, the reason printed is `no recorded run`. Every fresh recommendation names the tree to start in after `· in`: the worktree the
 build's card was published from, when `git worktree list` still lists it, else `a new worktree of
 <slug>`.
