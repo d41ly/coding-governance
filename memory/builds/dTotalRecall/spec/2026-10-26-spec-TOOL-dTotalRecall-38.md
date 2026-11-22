@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dTotalRecall-38-deviation-381.md](../build/2026-10-26-build-TOOL-dTotalRecall-38-deviation-381.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-38-deviation-382.md](../build/2026-10-26-build-TOOL-dTotalRecall-38-deviation-382.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-38-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-38-1-acceptance-ledger.md) | log | — |
+| [2026-11-22-build-TOOL-dTotalRecall-38-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-38-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-38-reground-2-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-38-reground-2-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-38-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-38-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
