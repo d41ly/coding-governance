@@ -203,3 +203,6 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T16:39:01Z brief · item KICK-dKeptSession-30 · reason 911d05c03786 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-30-build-brief.md
 
 2026-11-22T16:41:50Z dispatch · item ddf04ac1 KICK-dKeptSession-30 · reason tools/runlog/extract.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/fixtures/transcripts.json help/orientation-card.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-30-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+2026-11-22T16:55:51Z draw · re-dispatch · KICK-dKeptSession-30 · 13/132 · 20261122T165551Z-552023
+
+2026-11-22T16:55:51Z dispatch · item 84869f49 KICK-dKeptSession-30 · reason tools/runlog/extract.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/fixtures/transcripts.json help/orientation-card.md tools/runlog/README.md tools/policy/catalogue.toml .governance/policy.json skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-30-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
