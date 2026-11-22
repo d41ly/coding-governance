@@ -1,5 +1,5 @@
 {
-  "catalogue_blob": "6322dc80420b60372bc06e5ec57d60197b1704a4",
+  "catalogue_blob": "ce50ecdfe2a9ac6813a07ac52d06d9d4cd49c82b",
   "keys": {
     "actions.free": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
