@@ -31,7 +31,11 @@
  * outside every fence (TOOL-dBoundRoles-38 S5: a marker or fact line inside a fence is handed content,
  * counted and re-cut by no step, every line read through the sibling's `readUnfencedLines`), no typed
  * input's `### input:<name>` block holding a fact, marker or `Framed by:` line, fenced or not, or leaving a
- * fence open (TOOL-dBoundRoles-46 S2: a typed value is authored text, `TYPED_INPUTS`), the marker's
+ * fence open (TOOL-dBoundRoles-46 S2: a typed value is authored text, `TYPED_INPUTS`), every block opening
+ * outside a fence and each handed block's content inside its own (TOOL-dBoundRoles-48 S3, `checkBlockFences`: an
+ * unfenced fact line is the line two below an unfenced `### ` heading, the pair's next non-blank line opens its
+ * fence, and only blank lines, or after the last one the envelope closer naming the marker's path, follow the
+ * fence's closer up to the next unfenced heading), the marker's
  * `role-sha` the one the index holds for that role, the hash of the role text its agent type was
  * rendered from (TOOL-dBoundRoles-6 S6: an index holding none refuses naming the index's re-render, a
  * differing one naming both values and the handoff's re-render), every `gov:fact` line of the section
@@ -745,6 +749,59 @@ function checkTypedBlocks(section, lead) {
   return null
 }
 
+// TOOL-dBoundRoles-48 S3 - every block opens outside a fence, and a handed block's content lies inside its own.
+// The section is walked once by the sibling's `readUnfencedLines`. An unfenced `FACT_RE` line that is not the line
+// two below an unfenced `### ` heading refuses; such a heading-then-fact pair heads a handed block unless its
+// heading names a typed input (`TYPED_INPUTS`), and a handed block refuses when its next non-blank line is not a
+// fence opener, when a line up to that fence's closer is read outside it, or when anything but blank lines sits
+// between that closer and the next unfenced heading. After the last handed block the one other line admitted is
+// the task envelope's closer `[/<path>]`, `path` the marker's own, as the section's last non-blank line (§8 F4).
+// `lead` is the count of the file's lines before the section, so each refusal names the line of the file. null to
+// admit, else the refusal naming the block and the line.
+function checkBlockFences(section, lead, docPath) {
+  const sg = require(require('path').join(__dirname, 'scratch-guard.js'))
+  const lines = String(section).split('\n').map((l) => l.replace(/\r/g, ''))
+  const read = new Map()
+  for (const [n, line] of sg.readUnfencedLines(lines.join('\n'))) if (line !== null) read.set(n, line)
+  const remedy = 'every block of the task section opens outside a fence and a handed block\'s content lies inside its own; correct the value that moved the fence and re-render with handoff.py render.'
+  const pairs = []
+  let block = 'opening'
+  for (const [n, line] of read) {
+    if (/^(### |## (?!Task$))/.test(line)) block = line.replace(/^#+ /, '').trim()
+    if (!FACT_RE.test(line)) continue
+    if (!/^### /.test(read.get(n - 2) || '')) return `${block}: line ${lead + n} of the file reads a fact line no unfenced \`### \` heading stands two lines above, so it would stand as an executor fact; ${remedy}`
+    pairs.push(n - 2)
+  }
+  const last = pairs.length ? pairs[pairs.length - 1] : 0
+  for (const h of pairs) {
+    const name = read.get(h).slice(4).trim()
+    const typed = /^input:(\S+)$/.exec(name)
+    if (typed && TYPED_INPUTS.includes(typed[1])) continue
+    let k = h + 3
+    while (k <= lines.length && lines[k - 1].trim() === '') k++
+    const open = k <= lines.length ? /^ {0,3}(`{3,}|~{3,})/.exec(lines[k - 1]) : null
+    if (!open) return `${name}: line ${lead + k} of the file is not the opening line of the handed block's fence; ${remedy}`
+    let c = k + 1
+    for (; c <= lines.length; c++) {
+      const m = /^ {0,3}(`{3,}|~{3,})([\s\S]*)$/.exec(lines[c - 1])
+      if (m && m[1][0] === open[1][0] && m[1].length >= open[1].length && /^[ \t]*$/.test(m[2])) break
+    }
+    if (c > lines.length) return `${name}: the handed block's fence opened at line ${lead + k} of the file never closes; ${remedy}`
+    for (let j = k + 1; j < c; j++) {
+      if (read.has(j)) return `${name}: line ${lead + j} of the file, inside the handed block's fence, is read outside a fence, so the handed content would stand as executor lines; ${remedy}`
+    }
+    let j = c + 1
+    const extra = []
+    while (j <= lines.length && !/^#{1,3} /.test(read.get(j) || '')) {
+      if (lines[j - 1].trim() !== '') extra.push(j)
+      j++
+    }
+    const closer = h === last && j > lines.length && extra.length === 1 && lines[extra[0] - 1].trimEnd() === `[/${docPath}]`
+    if (extra.length && !closer) return `${name}: line ${lead + extra[0]} of the file sits between the handed block's fence and the next block, where only blank lines may; ${remedy}`
+  }
+  return null
+}
+
 // The first twelve hex digits of the git blob id of `buf` with CRLF folded to LF: the roles kit's
 // `derive_fact_key` over the same bytes, so a fact keys one way on every checkout.
 function deriveBlobId(buf) {
@@ -880,6 +937,10 @@ function checkHandoffSpawn(data, index, root) {
   const lead = text.replace(/\r\n/g, '\n').slice(0, text.replace(/\r\n/g, '\n').length - section.length).split('\n').length - 1
   const typed = checkTypedBlocks(section, lead)
   if (typed) return renderHandoffDeny('Agent', `${m.path}'s ${typed}`, index)
+  // TOOL-dBoundRoles-48 S3 - the fence state at every block: after the typed blocks, before the role text and the
+  // fact re-cut, so a fact line a flipped fence surfaced from handed content is denied before it is read as one.
+  const flipped = checkBlockFences(section, lead, m.path)
+  if (flipped) return renderHandoffDeny('Agent', `${m.path}'s ${flipped}`, index)
   // TOOL-dBoundRoles-6 S6 - the role text: the marker's role-sha against the one the index carries for
   // the type, the hash of the `## Role` section the renderer composes, so a handoff rendered from role
   // text the agent type was not rendered from is refused. After the digest, before the description.

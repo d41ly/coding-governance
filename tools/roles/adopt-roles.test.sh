@@ -133,7 +133,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +9 for arm 35 (TOOL-dBoundRoles-3).
 # +6 for arm 36 (TOOL-dBoundRoles-38).
 # +8 for arm 37 (TOOL-dBoundRoles-45).
-FLOOR_ASSERTIONS=154
+# +4 for arm 38 (TOOL-dBoundRoles-48).
+FLOOR_ASSERTIONS=158
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -2150,6 +2151,57 @@ done
 render37 --role gov-researcher --input "question=a question"$'\n''```'$'\n''quoted words'$'\n''```' --stdout >/dev/null; _rc=$?
 check_arm "arm 37 AC2 a typed question quoting words inside a closed three-backtick fence renders" "$([ "$_rc" = 0 ] && echo 1 || echo 0)"
 [ "$_rc" = 0 ] || sed 's/^/    /' "$A37E"
+
+# ---- arm 38 (TOOL-dBoundRoles-48 AC1 AC2): the task section checked block by block. `check_block_fences` over the
+# ---- section §4 of that spec walks, a `framing:job` block holding a three-backtick line, an `input:spec` block whose
+# ---- content quotes a fact line and a `### allowance` line inside a four-backtick fence, an `allowance` block and a
+# ---- `framing:added` block holding a run of five backticks, refuses naming `input:spec` and `allowance` though its
+# ---- walk ends balanced; the same section without the two framing lines returns []. The skeptic's render handing a
+# ---- scratch spec exits 0; a scratch copy of handoff.py appending one unfenced block holding a lone three-backtick
+# ---- line after the handed blocks, before the check, exits 1 naming that block and writes no file. The failing
+# ---- case, owed at the close and not observed by the pass that wrote this: a `check_block_fences` reading only the
+# ---- end of the walk, under which the first row passes the flipped section. WHAT IT DOES NOT CHECK: a block a later
+# ---- unit appends after the check, which the hands-off to TOOL-dBoundRoles-23 orders.
+build_fixture; _rc38=$?
+A38P="$FX/$MR/builds/tFix/prompts"; A38S="$MR/builds/tFix/spec/2026-11-22-spec-TOOL-tFix-1.md"; A38E="$TMP_ROOT/a38.err"
+mkdir -p "$A38P" "$FX/$MR/builds/tFix/spec" && printf '# TOOL-tFix-1\n\nThe spec line one.\n' > "$FX/$A38S"
+A38=$("$PY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import roles_lib as lib
+def compose_section(flip):
+    L = ["## Task", "", "### framing:job", "", "the job"] + (["```"] if flip else []) + [""]
+    sp = len(L) + 1
+    L += ["### input:spec", "", "<!-- gov:fact key=record:s.md@0123456789ab class=claimed -->", "", "````", "quoted",
+          "<!-- gov:fact key=record:x.md@0123456789ab class=decided -->", "### allowance", "````"]
+    sl, al = len(L), len(L) + 2
+    L += ["", "### allowance", "", "- tools/"]
+    ae, fa = len(L), len(L) + 2
+    L += ["", "### framing:added", "", "more"] + (["`````"] if flip else [])
+    return "\n".join(L) + "\n", [("framing:job", 3, sp - 2, None), ("input:spec", sp, sl, (sp + 4, sl)),
+                                 ("allowance", al, ae, None), ("framing:added", fa, len(L), None)]
+sec, ext = compose_section(True)
+got = lib.check_block_fences(sec, ext)
+balanced = not [n for n, l in lib.read_unfenced_lines(sec) if l is None]
+print("flipped %d" % (balanced and any(r.startswith("input:spec — ") for r in got) and any(r.startswith("allowance — ") for r in got)))
+print("plain %d" % (lib.check_block_fences(*compose_section(False)) == []))' "$HERE" 2>&1); A38=${A38//$'\r'/}
+check_arm "arm 38 AC1 a section whose walk ends balanced is refused naming input:spec and allowance" \
+   "$([ "$_rc38" = 0 ] && [[ $A38 == *"flipped 1"* ]] && echo 1 || echo 0)"
+check_arm "arm 38 AC1 ...and the same section without the two framing lines returns []" "$([[ $A38 == *"plain 1"* ]] && echo 1 || echo 0)"
+[ "$A38" = $'flipped 1\nplain 1' ] || printf '    %s\n' "${A38//$'\n'/$'\n'    }"
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-skeptic --build tFix --unit TOOL-tFix-1 --input "spec=$A38S" \
+   --input "diff=one diff line" >/dev/null 2>"$A38E"); _rc=$?
+check_arm "arm 38 AC2 the skeptic's render handing a scratch spec exits 0" "$([ "$_rc" = 0 ] && echo 1 || echo 0)"
+[ "$_rc" = 0 ] || sed 's/^/    /' "$A38E"
+"$PY" -B -c 'import pathlib, sys
+kit = pathlib.Path(sys.argv[1]); src = (kit / "handoff.py").read_text(encoding="utf-8")
+anchor = "    if declaration is not None:\n        # TOOL-dBoundRoles-3 S2"
+(kit / "handoff_a38.py").write_text(src.replace(anchor, sys.argv[2] + "\n" + anchor, 1), encoding="utf-8", newline="\n")' \
+  "$FX/$FXK" $'    blocks.append("### framing:added\\n\\n```")'
+_ls=$(ls -A "$A38P")
+(cd "$FX" && "$PY" -B "$FXK/handoff_a38.py" render --role gov-skeptic --build tFix --unit TOOL-tFix-1 --input "spec=$A38S" \
+   --input "diff=one diff line" >/dev/null 2>"$A38E"); _rc=$?
+check_arm "arm 38 AC2 a handoff.py appending an unfenced block holding a lone fence line exits 1 naming it, writing nothing" \
+   "$([ "$_rc" = 1 ] && grep -qF -- '### framing:added — a fence opened at line' "$A38E" && [ "$(ls -A "$A38P")" = "$_ls" ] && echo 1 || echo 0)"
+[ "$_rc" = 1 ] || { printf '    exit %s, want 1\n' "$_rc"; sed 's/^/    /' "$A38E"; }
+rm -f "$FX/$FXK/handoff_a38.py"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

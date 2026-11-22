@@ -4888,6 +4888,11 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "checkBlockFences",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkBuildable",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -5676,6 +5681,11 @@
       "id": "check_blob_reader",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "check_block_fences",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "check_born",
@@ -11436,6 +11446,11 @@
       "id": "derive_blob_pin",
       "kind": "function",
       "file": "tools/loop/policy_edit.py"
+    },
+    {
+      "id": "derive_block_extents",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "derive_bm_r3",

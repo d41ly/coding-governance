@@ -782,6 +782,46 @@ def render_handed_fence(content):
     return "%s\n%s%s%s" % (bar, content, "" if not content or content.endswith("\n") else "\n", bar)
 
 
+def check_block_fences(section, extents):
+    """One refusal line per fence defect of `section`, walked by `read_unfenced_lines`, at each block's extents
+    (TOOL-dBoundRoles-48 S1); `[]` when every block holds. `extents` lists `(key, first, last, fence)` per
+    block, its first and last line in `section`, and `fence` the `(opening, closing)` lines of a handed block's
+    fence or None for an authored one. A line names the key and the line for each block whose first line the
+    walk reads inside a fence, each handed block whose heading or fact line it reads inside one, each handed
+    content line it reads outside its fence, and a walk that ends inside one, named by the block holding the
+    line the fence opened at. So a walk that ends balanced after an authored block flipped the fence state
+    across a handed one still refuses."""
+    read, opened = set(), None
+    for n, line in read_unfenced_lines(section):
+        if line is None:
+            opened = n
+        else:
+            read.add(n)
+    lines, out = str(section).split("\n"), []
+    for key, first, _last, fence in extents:
+        if first not in read:
+            out.append("%s — its first line, line %d of the ## Task section, is read inside a fence a block before "
+                       "it left open, so the block would stand as content; close that fence in the value that "
+                       "opened it and render again" % (key, first))
+        if fence is None:
+            continue
+        hidden = next((n for n in range(first, fence[0]) if lines[n - 1].strip() and n not in read), None)
+        if hidden is not None:
+            out.append("%s — line %d of the ## Task section, its heading or fact line, is read inside a fence, so "
+                       "the handed block would not stand as one; close the fence a block before it opened and "
+                       "render again" % (key, hidden))
+        out += ["%s — line %d of the ## Task section, inside the handed fence of lines %d-%d, is read outside "
+                "a fence, so the handed content would stand as executor lines; close the fence a block before "
+                "it opened and render again" % (key, n, fence[0], fence[1])
+                for n in range(fence[0] + 1, fence[1]) if n in read]
+    if opened is not None:
+        holder = [key for key, first, last, _f in extents if first <= opened <= last]
+        out.append("%s — a fence opened at line %d of the ## Task section is never closed, so every fact line "
+                   "after it would be read as content; close it in the value that opened it and render again"
+                   % (holder[-1] if holder else "the ## Task section", opened))
+    return out
+
+
 #: The line shapes a typed input may not carry (TOOL-dBoundRoles-45 S2), each one a handoff's reader acts on:
 #: a heading of level one to three, a fact line, a `gov:handoff` marker line and a framing line.
 AUTHORED_LINE_SHAPES = (("a heading", re.compile(r"#{1,3} ")), ("a fact line", FACT_RE),
