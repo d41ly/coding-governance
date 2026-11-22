@@ -278,7 +278,7 @@ PROBE_CLASSES = [
 #: unconditional, counted off the arms.
 #: RAISED 163 -> 177 by TOOL-dSettledStage-4: the 13 new stage fixture rows and the one new boundary
 #: row, 14 executed, every one unconditional, counted off the arms.
-FLOOR_ASSERTIONS = 177
+FLOOR_ASSERTIONS = 178
 
 
 def check_substitution(text: str) -> bool:
@@ -455,13 +455,14 @@ _HOME_TOLD: set = set()
 def remove_home_graded(root: pathlib.Path, rels: list[str]) -> list[str]:
     """`rels` less the files gov installed here at its own bytes (TOOL-dHomeGraded-1 S2). Those are
     gov's code, graded on gov's bar against gov's registries; grading them here against this tree's
-    declaration lists sites nobody in this tree wrote. Said once per root, with the count."""
+    declaration lists sites nobody in this tree wrote. Said once per root, with the count, on stderr:
+    a `--measure` run's stdout is a ledger seed's rows (TOOL-aFlattenedSeed-2)."""
     home = derive_home_graded(root)
     kept = [rel for rel in rels if rel not in home]
     if len(kept) != len(rels) and str(root) not in _HOME_TOLD:
         _HOME_TOLD.add(str(root))
         print(f"sh-hygiene: {len(home)} file(s) .governance/install.json installed at gov's own bytes "
-              f"are gov's to grade and are not graded here; an edited one is")
+              f"are gov's to grade and are not graded here; an edited one is graded", file=sys.stderr)
     return kept
 
 
@@ -2373,6 +2374,14 @@ def run_selftest() -> int:
                  homed[0], (1, False, True, True), say=True)
             test("home-graded: the same file edited here is graded again",
                  homed[1], (1, True, True, False), say=True)
+            # TOOL-aFlattenedSeed-2: under `--measure`, stdout is a seed's rows, so the note rides stderr.
+            (tree / "kit.sh").write_bytes(site)
+            _HOME_TOLD.clear()
+            out, err = io.StringIO(), io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                run_shell_role_scan([str(tree)], True)
+            test("home-graded: a --measure run's stdout holds rows only, the note on stderr",
+                 (out.getvalue().splitlines(), "gov's own bytes" in err.getvalue()), (["own.sh\t2"], True), say=True)
             # DEFAULT REGISTRY (TOOL-dHomeGraded-1 S7): with no argument, a run from the root reads
             # `<MEMORY_ROOT>/project/temp-name-sites.txt` when it exists, and its row declares the site.
             (tree / ".governance" / "install.json").unlink()
