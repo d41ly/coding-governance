@@ -322,6 +322,16 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
     const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
     const trace = []
     const returns = JSON.parse(process.argv[3])
+    // TOOL-dBoundRoles-5 - a returns value `{"__seq": [v1, v2, ...]}` answers the spawns of its key in turn, the
+    // last value repeating, so one stage can return null twice and then an object; any other value
+    // answers every spawn, as before.
+    const seqAt = {}
+    const readSeq = (k) => {
+      const v = returns[k]
+      if (!v || typeof v !== "object" || !Array.isArray(v.__seq)) return v
+      seqAt[k] = (seqAt[k] || 0) + 1
+      return v.__seq[Math.min(seqAt[k], v.__seq.length) - 1]
+    }
     const agent = async (prompt, opts) => {
       // TOOL-aOrientedCast-27 - a label is `<slug> · <scope> · <stage>`. The whole one is traced on a
       // `label:` line before its `agent:` line; every other line and the returns lookup key on the
@@ -351,8 +361,8 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
       // reads what it read before; a scan over the WHOLE trace drops these lines, or it reads every
       // prompt twice and JSON escapes besides.
       trace.push("promptjson:" + label + ":" + JSON.stringify(String(prompt)))
-      if (Object.prototype.hasOwnProperty.call(returns, full)) return schemaShaped(returns[full], opts && opts.schema)
-      for (const k of Object.keys(returns)) if (label.indexOf(k) === 0) return schemaShaped(returns[k], opts && opts.schema)
+      if (Object.prototype.hasOwnProperty.call(returns, full)) return schemaShaped(readSeq(full), opts && opts.schema)
+      for (const k of Object.keys(returns)) if (label.indexOf(k) === 0) return schemaShaped(readSeq(k), opts && opts.schema)
       return null
     }
     // TOOL-dMergedTally-1 - `RUN_WF_SCHEMA=strict` makes the double answer AS ITS SCHEMA ALLOWS: a
@@ -3456,6 +3466,39 @@ for v in '[]' '{"finder":"high"}' '{"builder":"High"}'; do
   has    "OC10 AC6 the unit harness REFUSES efforts $v" "$o" "THROW unattended-unit: \`efforts\`"
   hasnt_ "OC10 AC6 ...before any spawn for $v" "$o" "agent:"
 done
+
+# ==== TOOL-dBoundRoles-5 — A SINGLE-CALL STAGE RETURNING NOTHING IS RE-RUN UP TO `retries` (AC6, AC7) ====
+# The plant `harness-null-twice`: the builder returns null twice, then a committed object. With `retries`
+# 2 the child's result is that object and its log names two re-runs; with 1 it takes the dead-agent path;
+# absent, it spawns once and logs `retries: 0`. Against a re-run loop staged to return the first result,
+# the retries-2 rows red. `-1`, `"3"`, 5 (one above ATTEMPTS.length - 1), 1.5 and null are refused before
+# any spawn by the child and by the parent, and the parent forwards a passed count to the child and to
+# the audit's review call. WHAT IT DOES NOT CHECK: a stage inside a fan, which keeps its direct call and
+# is never re-run; the review harness's own refusal, which its own suite reads.
+DBR5_NULL2='{"build":{"__seq":[null,null,{"committed":true,"sha":"abc1234","why":"","summary":"s"}]}}'
+o=$(run_wf "${OC_CHILD/'"slug":"tB",'/'"slug":"tB","retries":2,'}" "$DBR5_NULL2" "$C")
+same   "DBR5 AC6 retries 2: the builder spawns three times" "$(printf '%s\n' "$o" | grep -c '^agent:build$')" "3"
+has    "DBR5 AC6 ...and the result is the third return" "$(printf '%s\n' "$o" | grep '^RESULT')" '"committed":true,"sha":"abc1234"'
+same   "DBR5 AC6 ...and the log names two re-runs" "$(printf '%s\n' "$o" | grep -c '^log:unit A-tB-1: the builder returned nothing, re-run [12] of 2$')" "2"
+o=$(run_wf "${OC_CHILD/'"slug":"tB",'/'"slug":"tB","retries":1,'}" "$DBR5_NULL2" "$C")
+same   "DBR5 AC6 retries 1: the builder spawns twice" "$(printf '%s\n' "$o" | grep -c '^agent:build$')" "2"
+has    "DBR5 AC6 ...and takes the dead-agent path" "$(printf '%s\n' "$o" | grep '^RESULT')" '"committed":false,"sha":""'
+o=$(run_wf "$OC_CHILD" "$DBR5_NULL2" "$C")
+same   "DBR5 AC6 absent: the builder spawns once" "$(printf '%s\n' "$o" | grep -c '^agent:build$')" "1"
+has    "DBR5 AC6 ...and the log says retries is 0" "$o" "log:retries: 0 — no retries was passed"
+for v in '-1' '"3"' '5' '1.5' 'null'; do
+  o=$(run_wf "${OC_CHILD/'"slug":"tB",'/'"slug":"tB","retries":'"$v"','}" '{}' "$C")
+  has    "DBR5 AC7 the unit harness REFUSES retries $v" "$o" "THROW unattended-unit: \`retries\`"
+  hasnt_ "DBR5 AC7 ...before any spawn for $v" "$o" "agent:"
+  o=$(run_wf "${UNITS/'"slug":"tB",'/'"slug":"tB","retries":'"$v"','}" '{}')
+  has    "DBR5 AC7 the build harness REFUSES retries $v" "$o" "THROW unattended-build: \`retries\`"
+  hasnt_ "DBR5 AC7 ...before any spawn for $v" "$o" "agent:"
+done
+o=$(run_wf "${UNITS/'"slug":"tB",'/'"slug":"tB","retries":2,'}" "$(returns CONVERGED 0)")
+has    "DBR5 S6 the audit's review call carries retries" "$(printf '%s\n' "$o" | grep '^wargs:')" '"retries":2'
+has    "DBR5 S6 dispatch.args carries retries" "$(printf '%s\n' "$o" | grep '^RESULT')" '"retries":2'
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
+hasnt_ "DBR5 S6 absent: nothing forwards retries" "$(printf '%s\n' "$o" | grep -E '^(wargs|RESULT)')" '"retries"'
 
 # ================================================== TOOL-aOrientedCast-27 — LABELS AND THE RUN'S IDENTITY
 # Every agent's whole label is `<slug> · <scope> · <stage>`, read off the runner's `label:` line, each

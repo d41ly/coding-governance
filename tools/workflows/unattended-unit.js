@@ -17,13 +17,17 @@
 // either — hooks DO reach a sidechain (measured 2026-09-12); they simply have nothing here to match.
 // Asserted once, when the file lands. Held after that by review alone.
 //
-// IT IS NEARLY ONE STRAIGHT LINE — A STYLE RULE WITH NO ENFORCER, AND ONE DELIBERATE EXCEPTION. No
-// loop, no array method, no Promise combinator and no arrow, so the one spawn below is visible in a
-// single screen. What it DOES carry is exactly one top-level definition, and that is not a lapse:
-// the codebase-map JS liveness floor raises on any `.js` under the tool root yielding no definition
-// at all, and `codebase-map coverage + freshness` runs unguarded on every bar. The child yields to
-// the floor rather than the floor to the child — widening a fail-closed check so a style preference
-// can survive is the trade this build exists to stop making.
+// IT IS NEARLY ONE STRAIGHT LINE — A STYLE RULE WITH NO ENFORCER, AND TWO DELIBERATE EXCEPTIONS. No
+// loop but the one below, no array method, no Promise combinator and no arrow, so the one spawn below
+// is visible in a single screen. What it DOES carry is exactly one top-level definition, and that is
+// not a lapse: the codebase-map JS liveness floor raises on any `.js` under the tool root yielding no
+// definition at all, and `codebase-map coverage + freshness` runs unguarded on every bar. The child
+// yields to the floor rather than the floor to the child — widening a fail-closed check so a style
+// preference can survive is the trade this build exists to stop making. The SECOND exception is the
+// re-run loop around the one spawn (TOOL-dBoundRoles-5 S6): `for (const n of ATTEMPTS)` under
+// `gov:sequential-agents(5)`, `ATTEMPTS` a five-element array literal and one awaited `agent()` in its
+// body, the one loop shape the fan-out rule admits, so the spawn stays one call site, run once and
+// re-run at most `retries` times while it returns nothing.
 //
 // ITS NAME IS `check` AND THAT IS THE MERGE BAR, NOT TASTE. `.lexicon.conf` declares this suffix as
 // a probe layer, so its functions pattern grades the definition below, and the declared verb table
@@ -32,7 +36,7 @@
 // table would have redded the bar; raising the pin instead would have made the table a synonym list.
 //
 // Measured against the shipped hook: `function`, `=>` and a non-receiver `.map` all ADMIT at exit 0.
-// What the hook DOES deny, per dispatch, is a loop around a spawn, a fan-out receiver it cannot
+// What the hook DOES deny, per dispatch, is an unmarked loop around a spawn, a fan-out receiver it cannot
 // size, a raw fan-out primitive, an unresolvable bound and a ref-keyed verdict join. Keep this file
 // that shape anyway, and do not mistake the shape for a guarantee.
 //
@@ -68,6 +72,13 @@
 //
 // `efforts` IS OPTIONAL (TOOL-aOrientedCast-10), with the same one key: `builder`, the reasoning
 // effort the builder spawns at, which the parent forwards in `dispatch.args` beside `roles`.
+//
+// `retries` IS OPTIONAL (TOOL-dBoundRoles-5 S6): a non-negative integer, the policy key `roles.retries`
+// the caller reads with `policy.py get roles.retries` and the parent forwards in `dispatch.args` beside
+// `efforts`. A builder whose `agent()` returns null or undefined is spawned again, up to `retries`
+// times, each re-run logged; a return of any other value is final. Refused before the spawn when it is
+// not an integer or lies outside 0 to `ATTEMPTS.length - 1`, so a string `"3"` is never coerced. Absent,
+// it is 0, one log line says so, and the spawn, prompt and return are unchanged.
 //
 // `passLegs` IS OPTIONAL (TOOL-aNimbleMend-7): a one-line command the parent hands out in
 // `dispatch.args`. Given, and the builder committed, the return carries a `nextAction` ordering the
@@ -316,6 +327,18 @@ if (effortKeys === 'builder' && (typeof efforts.builder !== 'string' || !/^[a-z]
 }
 const effort = effortKeys === 'builder' ? efforts.builder : ''
 
+// TOOL-dBoundRoles-5 S6 - `retries`, the re-runs a builder returning nothing is given. ATTEMPTS is the
+// bounded literal the marked loop below iterates, so its length less one is the most this file admits.
+const ATTEMPTS = [0, 1, 2, 3, 4]
+const retries = cfg.retries === undefined ? 0 : cfg.retries
+if (typeof retries !== 'number' || !Number.isInteger(retries) || retries < 0 || retries > ATTEMPTS.length - 1) {
+  throw new Error(
+    'unattended-unit: `retries` must be an integer from 0 to ' + (ATTEMPTS.length - 1) + ', the re-runs a ' +
+      'builder returning nothing is given, as `policy.py get roles.retries` prints it. Got ' +
+      JSON.stringify(cfg.retries) + '. Omit the key and a builder returning nothing is not re-run.',
+  )
+}
+
 // `why` is REQUIRED and is never an absence: an empty result with no reason is indistinguishable
 // from a clean pass over nothing.
 const UNIT_SCHEMA = {
@@ -493,13 +516,23 @@ log('unit ' + cfg.unitId + ': builder ' + (builder
   : 'is untyped: no roles.builder was passed, so it spawns untyped with its role prose inline'))
 log(effort ? 'effort builder: ' + effort + ' — efforts.builder'
   : 'effort builder: the agent type\'s own, else the session\'s — no efforts.builder')
+log(cfg.retries === undefined
+  ? 'retries: 0 — no retries was passed, so a builder returning nothing is not spawned again'
+  : 'retries: ' + retries + ' — a builder returning nothing is spawned again up to ' + retries + ' time(s)')
 
-const r = await agent(
-  PROMPT,
-  Object.assign({ label: identity, schema: UNIT_SCHEMA },
-    builder ? { agentType: builder } : {}, effort ? { effort: effort } : {},
-    cfg.passBase === undefined ? {} : { isolation: 'worktree' }),
-)
+// TOOL-dBoundRoles-5 S6 - THE SECOND EXCEPTION: the one spawn, re-run while it returns nothing.
+let r = null
+for (const n of ATTEMPTS) { // gov:sequential-agents(5)
+  if (n > retries) break
+  r = await agent(
+    PROMPT,
+    Object.assign({ label: identity, schema: UNIT_SCHEMA },
+      builder ? { agentType: builder } : {}, effort ? { effort: effort } : {},
+      cfg.passBase === undefined ? {} : { isolation: 'worktree' }),
+  )
+  if (r !== null && r !== undefined) break
+  if (n < retries) log('unit ' + cfg.unitId + ': the builder returned nothing, re-run ' + (n + 1) + ' of ' + retries)
+}
 
 log('unit ' + cfg.unitId + ': committed=' + String(!!(r && r.committed)) + ' sha=' + ((r && r.sha) || '-'))
 if (cfg.passBase !== undefined) log('unit ' + cfg.unitId + ': branch=' + ((r && r.branch) || '-') + ' worktree=' + ((r && r.worktree) || '-'))

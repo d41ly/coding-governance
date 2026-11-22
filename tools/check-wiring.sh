@@ -1932,6 +1932,12 @@ $harn
 EOF
   fi
   echo "ok       roles     — $n agent types, the role index and the /build Skill are rendered"
+  # TOOL-dBoundRoles-5 S5 - the return check's SubagentStop fragment, graded by the one per-fragment
+  # grader the scratch and spec-audit arms call, over every fragment in the kit's directory. A kit that
+  # ships none, one older than the return check, adds no line.
+  if [ -f "$kit/return-check.fragment.json" ]; then
+    check_fragments "roles    " "$kit/return-check.fragment.json"
+  fi
 }
 
 # --- Check S: the machine-global /session-kickoff install matches the tracked engine ---------------

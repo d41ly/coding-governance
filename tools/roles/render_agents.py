@@ -591,6 +591,101 @@ def check_fields_arm(state):
                   "the three sections do not carry the two entries, the ceiling and the template: %r" % text)
 
 
+def check_return_arm(state):
+    """Arm 22 (TOOL-dBoundRoles-5 AC1-AC4): `check_return` over the kit's own `gov-builder` and
+    `gov-orienter` templates, and `handoff.py check-return` over `SubagentStop` payloads, both in a git
+    fixture whose HEAD is the one commit a `sha` field may name. The plants: `return-valid` passes, and its
+    orientation twin of `key: value` lines; `return-no-object`, `return-unknown-field` and a closed-set
+    value outside its set each name their field; `return-bad-sha` names `commit`; `return-answers-mismatch`
+    names `answers`, called directly and read off a transcript's first `user` marker by the verb;
+    `stop-retry` blocks three stops under the catalogue default of `roles.retries`, the record counting
+    them; `stop-exhausted` then passes with a stderr witness. The verb runs as a subprocess, so its policy
+    reader is the real one. WHAT IT DOES NOT CHECK: a policy file's value (the adopter's git fixtures read
+    one), nor that the platform continues a blocked subagent."""
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    env["GOV_DEFAULT_BRANCH"] = "main"
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+        root = pathlib.Path(tmp)
+
+        def run_git(*args):
+            return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, env=env,
+                                  stdin=subprocess.DEVNULL).stdout.strip()
+
+        run_git("init", "-q", "-b", "main")
+        run_git("-c", "user.email=f@f", "-c", "user.name=f", "commit", "-q", "--allow-empty", "-m", "fixture")
+        head = run_git("rev-parse", "HEAD")
+        order = ("memory/builds/x/prompts/p.md", "aaaaaaaaaaaa")
+        fence = "```json\n%s\n```"
+        plants = {
+            "return-valid": fence % json.dumps({"outcome": "committed", "commit": head, "checks": []}),
+            "return-no-object": "Committed it; the checks ran.",
+            "return-unknown-field": fence % json.dumps({"outcome": "returned", "checks": [], "extra": 1}),
+            "return-outside-set": fence % json.dumps({"outcome": "maybe", "checks": []}),
+            "return-bad-sha": fence % json.dumps({"outcome": "committed", "commit": "deadbeef", "checks": []}),
+            "return-answers-mismatch": fence % json.dumps({"outcome": "returned", "checks": [],
+                                                           "answers": order[0] + " task-sha=" + "b" * 12}),
+        }
+        want = {"return-valid": None, "return-no-object": "return object", "return-unknown-field": "extra",
+                "return-outside-set": "outcome", "return-bad-sha": "commit", "return-answers-mismatch": "answers"}
+        for plant, text in plants.items():
+            try:
+                got = lib.check_return("gov-builder", text, root, order if "answers" in plant else None)
+            except lib.RolesError as e:
+                got = ["raised %s" % e]
+            ok = got == [] if want[plant] is None else len(got) == 1 and got[0].startswith(want[plant] + " — ")
+            check_arm(state, 22, ok, "%s read %r, not %s" % (plant, got, "no defect" if want[plant] is None
+                                                              else "one defect naming %s" % want[plant]))
+        got = lib.check_return("gov-orienter", "outcome: oriented\ncard: the card\nreason: a reason", root)
+        check_arm(state, 22, got == [], "an orientation return of key: value lines read %r, not no defect" % got)
+
+        def run_verb(payload):
+            p = subprocess.run([sys.executable, str(KIT_DIR / "handoff.py"), "check-return"], cwd=str(root),
+                               input=json.dumps(payload), capture_output=True, text=True, encoding="utf-8",
+                               env=env)
+            return p.returncode, p.stdout.strip(), p.stderr.strip()
+
+        record = root / ".git" / read_return_dir() / "a1.json"
+        stop = {"agent_type": "gov-builder", "agent_id": "a1", "last_assistant_message": fence % '{"checks": []}'}
+        for n in (1, 2, 3):  # stop-retry: blocked while the attempts are fewer than the default of 3
+            rc, out, _err = run_verb(stop)
+            try:
+                said, rec = json.loads(out), json.loads(record.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                said, rec = {}, {}
+            check_arm(state, 22, rc == 0 and said.get("decision") == "block" and "outcome" in said.get("reason", "")
+                      and rec.get("attempts") == n and rec.get("valid") is False,
+                      "stop-retry %d printed %r with the record %r, not a block naming outcome at %d attempt(s)"
+                      % (n, out, rec, n))
+        rc, out, err = run_verb(stop)  # stop-exhausted
+        check_arm(state, 22, rc == 0 and out == "" and "check-return:" in err
+                  and json.loads(record.read_text(encoding="utf-8")).get("attempts") == 3,
+                  "stop-exhausted exited %d printing %r with %r, not 0, nothing and a witness" % (rc, out, err))
+        for payload, what in (({"agent_id": "a2", "last_assistant_message": "x"}, "no agent_type"),
+                              (dict(stop, agent_id="a3", last_assistant_message=plants["return-valid"]),
+                               "a valid return")):
+            rc, out, _err = run_verb(payload)
+            check_arm(state, 22, rc == 0 and out == "", "%s exited %d printing %r, not 0 and nothing" % (what, rc, out))
+        transcript = root / "agent.jsonl"
+        marker = ("<!-- gov:handoff role=gov-builder build=x unit=U-1 item=- path=%s role-sha=%s task-sha=%s -->"
+                  % (order[0], "c" * 12, order[1]))
+        transcript.write_text("\n".join(json.dumps(r) for r in (
+            {"type": "user", "message": {"role": "user", "content": marker + "\n\nBuild it."}},
+            {"type": "assistant", "message": {"content": [{"type": "text", "text":
+                                                            plants["return-answers-mismatch"]}]}})) + "\n",
+            encoding="utf-8")
+        rc, out, _err = run_verb({"agent_type": "gov-builder", "agent_id": "a4",
+                                  "agent_transcript_path": str(transcript)})
+        check_arm(state, 22, rc == 0 and '"block"' in out and "answers" in out,
+                  "return-answers-mismatch read off the transcript printed %r, not a block naming answers" % out)
+
+
+def read_return_dir():
+    """The record folder `handoff.py check-return` writes under the git common dir, read from that file so
+    the arm names no second literal of it."""
+    m = re.search(r'^RETURN_CHECK_DIR = "([^"]+)"$', (KIT_DIR / "handoff.py").read_text(encoding="utf-8"), re.M)
+    return m.group(1) if m else "return-check"
+
+
 def run_selftest():
     """The arms over fixture catalogues; prints PASS or FAIL with the assertion count. Each fixture is a
     non-git temporary directory, where the policy kit's reader names no commit, so the run binds
@@ -1005,6 +1100,7 @@ def run_selftest():
                 p: p.read_bytes() for p in (root / ".claude").rglob("*") if p.is_file()},
                 "19e: a refused profile holding %r moved a file under .claude" % (lines,))
     check_fields_arm(state)
+    check_return_arm(state)
     lib.read_policy_setting = own_reader
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)

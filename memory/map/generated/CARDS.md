@@ -270,6 +270,7 @@ The role catalogue: one owner-editable agent definition per role with an empty h
 - decisions 13: `TOOL-aOrientedCast-1`, `TOOL-aOrientedCast-2`, `TOOL-aOrientedCast-3`, `KICK-aOrientedCast-2`, `TOOL-aOrientedCast-8`, `TOOL-aOrientedCast-10`, `TOOL-aOrientedCast-11`, `TOOL-aOrientedCast-16`, `TOOL-aOrientedCast-17`, `TOOL-aOrientedCast-20`, `TOOL-aOrientedCast-27`, `TOOL-dRenderedAnchor-1`, `TOOL-dRenderedAnchor-2`
 - gate-legs 4: `roles adopter self-test`, `roles catalogue`, `roles render selftest`, `roles render wiring`
 - kits 1: `roles`
+- harness-hooks 1: `SubagentStop tools/roles/return-check.sh`
 - rendered-skills 1: `build`
 - globs 1: `tools/roles/**`
 

@@ -2286,6 +2286,7 @@ async function runLedgerArms() {
   await runLensYieldArms()
   await runRolesArms()
   await runEffortsArms()
+  await runRetriesArms()
   await runAddressArms()
   await runGradesArms()
   await runTwinArms()
@@ -2844,13 +2845,28 @@ function blankStrings(s) {
   return out.join('')
 }
 // Every agent( call outside a string or comment: its line, and its second top-level argument as code and as written.
+// TOOL-dBoundRoles-5 S6 - `runWithRetries(prompt, opts)` is a spawn carrying the options it is handed, so each
+// call of it is read as an agent( call with its own options, and the helper's definition, whose one agent( call
+// carries only the `opts` handed in, is skipped: each stage the helper wraps is still counted once.
 function scanAgentCalls(text) {
   const code = blankStrings(text)
   const calls = []
-  const re = /(^|[^.\w$])agent\s*\(/g
+  const helper = /(^|[^.\w$])function\s+runWithRetries\s*\(/.exec(code)
+  let skipEnd = -1
+  if (helper) {
+    let d = 0
+    let k = code.indexOf('{', code.indexOf(')', helper.index))
+    for (; k < code.length; k++) {
+      if (code[k] === '{') d++
+      else if (code[k] === '}' && --d === 0) break
+    }
+    skipEnd = k
+  }
+  const re = /(^|[^.\w$])(?:agent|runWithRetries)\s*\(/g
   let m
   while ((m = re.exec(code))) {
     const open = m.index + m[0].length - 1
+    if (helper && open > helper.index && open <= skipEnd) continue
     let d = 0
     let k = open
     const commas = []
@@ -3236,6 +3252,32 @@ async function runEffortsArms() {
   r = await runReview(DIFF, ALL_OK)
   if (checkNoThrow(r, 'efforts absent'))
     ck(r.trace.length > 0 && r.trace.every((t) => !t.hasEffort), 'efforts: absent, no spawn carries an effort key')
+}
+
+// ==== TOOL-dBoundRoles-5 S6 AC7 — `retries` re-runs a single-call stage returning nothing, never a fan's ====
+// Red against the parent render, which reads no `retries`: a malformed count proceeds, and a resume probe
+// returning null is spawned once whatever the count. WHAT IT DOES NOT CHECK: the build and unit
+// harnesses' own reads, which the unattended-build suite holds.
+async function runRetriesArms() {
+  for (const v of [-1, '3', 5, 1.5, null]) {
+    const x = await runReview(Object.assign({}, DIFF, { retries: v }), ALL_OK)
+    ck(!!x.threw && x.threw.indexOf('tier2-review: `retries`') === 0 && x.trace.length === 0,
+      'retries: ' + JSON.stringify(v) + ' is refused before any spawn' + (x.threw ? '' : ' (it proceeded)'))
+  }
+  let spawned = 0
+  const real = ALL_OK['resume:probe']
+  const buildProbeDeadTwice = (label, prompt) => (++spawned <= 2 ? null : typeof real === 'function' ? real(label, prompt) : real)
+  const r = await runReview(Object.assign({}, DIFF, { retries: 2 }), buildStubs({ 'resume:probe': buildProbeDeadTwice }))
+  if (checkNoThrow(r, 'retries 2')) {
+    ck(r.scanSpawned('resume:probe').length === 3 &&
+      r.logs.filter((l) => /^re-run [12] of 2: .*resume:probe returned nothing$/.test(l)).length === 2,
+      'retries: 2 spawns a probe returning null twice three times, logging two re-runs')
+    ck(r.scanSpawned('find:').length === 5, 'retries: the finders inside their fan are spawned once each')
+  }
+  spawned = 0
+  const r0 = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbeDeadTwice }))
+  ck(r0.scanSpawned('resume:probe').length === 1 && r0.logs.indexOf('retries: 0 — no retries was passed, so a stage returning nothing is not spawned again') !== -1,
+    'retries: absent, a probe returning null is spawned once and the log says retries is 0')
 }
 
 // ==== TOOL-aEvidencedLens-6 — `lensYield`, one row per running lens, unique defects counted by ITEM ====

@@ -13,6 +13,7 @@
     python handoff.py check <file>
     python handoff.py roster
     python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]
+    python handoff.py check-return < <SubagentStop hook payload>
 
 `render` fills the work-order template, `templates/work-order.template.md` in this kit, whose slots are
 `role`, `roles_lib.render_role`'s output, closing with the role's `## Never`, `## Ceiling` and `## Return`
@@ -114,6 +115,21 @@ pass is running. The session's parsed calls are kept in one record per session f
 `<git-common-dir>/handoff-calls/`, keyed by this file's sha256, the file's resolved path and the
 sha256 of the bytes it consumed, so a later call parses only the lines appended since; any other
 record is a miss and a read from byte 0, and deleting the folder clears it (TOOL-aTrimmedWait-7).
+
+`check-return` is the direct route's return check (TOOL-dBoundRoles-5 S2, S3), run by the `SubagentStop`
+hook `return-check.sh` with the hook payload on stdin. Its role is the payload's `agent_type`, an
+`agent`-true slot of `roles_lib.load_roles`; a payload naming none prints nothing. Its return is the
+payload's `last_assistant_message`, else the last assistant text of `agent_transcript_path`, and its work
+order the marker of that transcript's first `user` record, read by `roles_lib.extract_prompt_marker`.
+`roles_lib.check_return` grades the return; on defects, while the attempts recorded for the agent are
+fewer than the policy key `roles.retries`, read by `roles_lib.read_policy_setting` with its catalogue
+default, it prints `{"decision": "block", "reason": …}`, the reason naming every defect, the role's
+template and the order to return one corrected `json` block; once they reach it, it prints nothing and
+one stderr witness line. The record `<git common dir>/return-check/<agent_id>.json`, the id admitted
+only in `PATH_ID_RE`'s shape, is rewritten on every checked stop with `attempts`, `valid` and
+`defects`: the witness the driver reads, since a stop hook's exit code is none. It exits 0 on every
+path, a role file that does not parse, an unreadable transcript and an id off the shape included, so a
+broken check never blocks a stop.
 
 Sources, by key family: `task:` the card's `## task` field, read by the kickoff checker's grammar
 (stated above its `check_card_task`, and ported here because that one is shell) under the labels
@@ -249,6 +265,10 @@ SESSION_LINE_TOKENS = (b'"Agent"', b'"Workflow"', b"toolUseResult", b"task-notif
 #: session file, and the record's keys, every one checked by read_session_record before use.
 SESSION_CACHE_DIR = "handoff-calls"
 SESSION_RECORD_KEYS = frozenset(("parser", "session", "offset", "prefix", "calls", "notified", "bad"))
+#: TOOL-dBoundRoles-5 S3: the folder under the git common dir holding one return-check record per agent,
+#: and the policy key bounding how often a failed return is sent back.
+RETURN_CHECK_DIR = "return-check"
+RETRIES_KEY = "roles.retries"
 
 
 def read_git_stdout(repo: pathlib.Path, *args: str) -> str:
@@ -1350,6 +1370,145 @@ def load_agent_transcript(path):
     return out
 
 
+def read_agent_turns(path):
+    """`(first user text, last assistant text)` of one agent transcript (TOOL-dBoundRoles-5 S2): the text
+    of its first `user` record, the prompt the agent was handed, and of its last `assistant` record
+    carrying any, each None where no record does or the file does not read. A record's text is its
+    `message.content` string, or the `text` of its content blocks of type `text`, joined by newlines."""
+    first, last = None, None
+    try:
+        with open(path, "rb") as fh:
+            raw_lines = fh.read().split(b"\n")
+    except (OSError, TypeError, ValueError):
+        return None, None
+    for raw in raw_lines:
+        try:
+            rec = json.loads(raw) if raw.strip() else None
+        except (ValueError, RecursionError):
+            rec = None
+        if not isinstance(rec, dict) or rec.get("type") not in ("user", "assistant"):
+            continue
+        content = rec.get("message").get("content") if isinstance(rec.get("message"), dict) else None
+        if isinstance(content, list):
+            content = "\n".join(b["text"] for b in content if isinstance(b, dict) and b.get("type") == "text"
+                                and isinstance(b.get("text"), str))
+        if not isinstance(content, str):
+            continue
+        if rec["type"] == "user":
+            if first is None:
+                first = content
+        elif content.strip():
+            last = content
+    return first, last
+
+
+def read_return_record(path):
+    """The attempts one agent's return-check record holds, 0 where it is absent, unreadable or holds no
+    non-negative integer `attempts` (TOOL-dBoundRoles-5 S3)."""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            rec = json.load(fh)
+    except (OSError, ValueError):
+        return 0
+    n = rec.get("attempts") if isinstance(rec, dict) else None
+    return n if isinstance(n, int) and not isinstance(n, bool) and n >= 0 else 0
+
+
+def write_return_record(path, attempts, defects):
+    """Rewrite one agent's return-check record, `{"attempts", "valid", "defects"}`, through a temporary
+    file beside it, so a reader never meets half a record (TOOL-dBoundRoles-5 S3)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.name + ".tmp")
+    with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump({"attempts": attempts, "valid": not defects, "defects": defects}, fh, ensure_ascii=False)
+        fh.write("\n")
+    os.replace(tmp, path)
+
+
+def write_return_witness(line):
+    """One `check-return:` line on stderr, the witness of a stop the check let through (TOOL-dBoundRoles-5 S3)."""
+    print("check-return: %s" % line, file=sys.stderr)
+
+
+def run_return_check(stdin_text):
+    """`check-return` over one `SubagentStop` payload (TOOL-dBoundRoles-5 S2, S3), as the module doc
+    states; the exit status, always 0. Every refusal to check is one `check-return:` line on stderr."""
+    try:
+        payload = json.loads(stdin_text)
+    except (ValueError, RecursionError):
+        write_return_witness("the hook payload is no JSON, so no return was checked")
+        return 0
+    slot = payload.get("agent_type") if isinstance(payload, dict) else None
+    if not isinstance(slot, str) or not slot.strip():
+        return 0
+    try:
+        roles = lib.load_roles(KIT_DIR)
+    except lib.RolesError as e:
+        write_return_witness("the role catalogue does not load, so no return was checked: %s" % e)
+        return 0
+    if slot not in roles or roles[slot]["keys"].get("agent", "true") == "false":
+        return 0
+    agent_id = payload.get("agent_id")
+    if not isinstance(agent_id, str) or not PATH_ID_RE.match(agent_id):
+        write_return_witness("%s stopped with an agent_id off the shape %s, so its attempts have no record "
+                             "and its return was not checked" % (slot, PATH_ID_RE.pattern))
+        return 0
+    g = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, encoding="utf-8",
+                       errors="replace", stdin=subprocess.DEVNULL)
+    if g.returncode != 0 or not g.stdout.strip():
+        write_return_witness("the working directory is in no git repository, so %s's return was not checked"
+                             % agent_id)
+        return 0
+    root = pathlib.Path(g.stdout.strip())
+    transcript = payload.get("agent_transcript_path")
+    first, last = read_agent_turns(transcript) if isinstance(transcript, str) and transcript else (None, None)
+    text = payload.get("last_assistant_message")
+    text = text if isinstance(text, str) and text.strip() else last
+    if text is None:
+        write_return_witness("%s %s left no last_assistant_message and no readable transcript text, so its "
+                             "return was not checked" % (slot, agent_id))
+        return 0
+    marker = lib.extract_prompt_marker(first) if first else None
+    work_order = (marker.group("path"), marker.group("task_sha")) if marker else None
+    try:
+        defects = lib.check_return(slot, text, root, work_order)
+    except lib.RolesError as e:
+        write_return_witness("%s %s: the check did not run: %s" % (slot, agent_id, e))
+        return 0
+    # The count is read only for a return that fails, so a valid return's record is written even where the
+    # policy reader refuses; a refused read sends nothing back and the record still holds the defects.
+    try:
+        retries = lib.read_policy_setting(RETRIES_KEY, root, with_default=True) if defects else 0
+    except lib.RolesError as e:
+        write_return_witness("%s %s: %s is unread, so a failed return is not sent back: %s"
+                             % (slot, agent_id, RETRIES_KEY, e))
+        retries = 0
+    if not isinstance(retries, int) or isinstance(retries, bool) or retries < 0:
+        write_return_witness("%s reads %r, no retry count, so a failed return is not sent back"
+                             % (RETRIES_KEY, retries))
+        retries = 0
+    path = common_git_dir(root) / RETURN_CHECK_DIR / ("%s.json" % agent_id)
+    attempts = read_return_record(path)
+    block = bool(defects) and attempts < retries
+    attempts += 1 if block else 0
+    write_return_record(path, attempts, defects)
+    template = roles[slot]["keys"].get("return", "")
+    if block:
+        reason = ("The return check refused this reply: it does not match the `return` template of %s, `%s`. "
+                  "%d defect(s): %s. Return ONE corrected ```json block holding every required field of that "
+                  "template, each value of its type, a closed set's value as the template spells it, and no "
+                  "field it does not name. This is send-back %d of %d (%s)."
+                  % (slot, template, len(defects), "; ".join(defects), attempts, retries, RETRIES_KEY))
+        sys.stdout.buffer.write((json.dumps({"decision": "block", "reason": reason}, ensure_ascii=False)
+                                 + "\n").encode("utf-8"))
+    elif defects:
+        write_return_witness("%s %s still fails its template after %d of %d send-backs (%s), left for the "
+                             "driver to route: %s — the record is %s"
+                             % (slot, agent_id, attempts, retries, RETRIES_KEY, "; ".join(defects),
+                                path.as_posix()))
+    return 0
+
+
 def load_run_journal(path):
     """One harness run's agents from its `journal.jsonl`, one per `started` entry in journal order, as
     `{"id", "label", "returned", "failed", "result"}`: `returned` once a `result` or `failed` entry
@@ -1637,7 +1796,16 @@ def main(argv):
     sel.add_argument("--run")
     ag.add_argument("--session")
     ag.add_argument("--write", action="store_true")
+    sub.add_parser("check-return")
     a = ap.parse_args(argv)
+    if a.verb == "check-return":
+        # TOOL-dBoundRoles-5 S5 - a broken return check never blocks a stop: every failure exits 0.
+        try:
+            return run_return_check(sys.stdin.buffer.read().decode("utf-8", errors="replace"))
+        except Exception as e:  # noqa: BLE001 - the fail-open boundary of a stop hook
+            print("check-return: the check failed and the stop goes ahead: %s: %s" % (type(e).__name__, e),
+                  file=sys.stderr)
+            return 0
     if a.verb == "agents" and a.run is not None and not PATH_ID_RE.match(a.run):
         ap.error("--run '%s' is not a run id of letters, digits, '_' and '-'" % a.run)
     if getattr(a, "model", None) is not None and not a.model.strip():

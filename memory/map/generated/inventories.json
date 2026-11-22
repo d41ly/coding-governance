@@ -270,7 +270,8 @@
       "Stop tools/hooks/format-guard.js",
       "Stop tools/unattended/stop-guard.js",
       "StopFailure tools/unattended/stall-recorder.js",
-      "SubagentStart tools/hooks/scratch-guard.js"
+      "SubagentStart tools/hooks/scratch-guard.js",
+      "SubagentStop tools/roles/return-check.sh"
     ],
     "workflow-scripts": [
       "check-review-join.js",

@@ -1195,7 +1195,9 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   or, for the closing review M8 composes, `tier2-review`. **It also carries `efforts`**: the JSON
   `handoff.py stage-efforts <workflow> --model <id>` prints for the workflow that call runs —
   `spec-write` for the build harness, `build` for the unit harness, `closing-review` for the closing
-  review. `<id>` is the model in use: the session's own model id, exactly as the session's
+  review. **It also carries `retries`** beside `efforts`: the integer `policy.py get roles.retries`
+  prints, how often a single-call stage that returns nothing is spawned again; the build harness
+  forwards it to the unit harness and the audit. `<id>` is the model in use: the session's own model id, exactly as the session's
   environment states it, read again at each call. A direct role spawn's `Agent` call carries `effort`
   too, its role's value in the JSON `handoff.py role-efforts --model <id>` prints; the roles kit's
   README states the limits. **A unit harness call whose `roles` names a `builder` also carries
