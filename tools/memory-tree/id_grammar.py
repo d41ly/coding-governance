@@ -856,7 +856,12 @@ def scan_readers(root) -> list[str]:
     `skills/`, and of every tracked file under `.githooks/`, that spells a slug or id shape, outside
     the grammar's own entry points: this module and every `slug_legacy_*` block."""
     root = pathlib.Path(root)
-    out = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", "tools", "skills", ".githooks"],
+    tool_root = pathlib.Path(__file__).resolve().parent.parent
+    try:  # the tool root as this tree places it, so an adopter's install prefix is the one scanned
+        tool_rel = tool_root.relative_to(repo_root().resolve()).as_posix()
+    except (ValueError, ConfError):
+        tool_rel = tool_root.name
+    out = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", tool_rel, "skills", ".githooks"],
                          capture_output=True, check=True).stdout.decode("utf-8", "replace")
     own = pathlib.Path(__file__).resolve()
     try:  # this module's own path in ITS tree, so a scanned clone's copy of it is excluded too

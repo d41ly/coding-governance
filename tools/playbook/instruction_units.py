@@ -1254,7 +1254,7 @@ DOCUMENT_REQUIRED = ("tag", "path", "level", "direction", "source")
 #: PLAY-dOrderedCharter-8 S9: `untracked`, a boolean, absent read as false, marks a per-worktree file no clone tracks
 DOCUMENT_FLAGS = ("untracked",)
 DOCUMENT_KEYS = frozenset((*DOCUMENT_REQUIRED, "h1", "hold", *DOCUMENT_FLAGS))
-HOLD_RE = None   # bound below, once `load_memory_tree_path` is defined (TOOL-dTotalRecall-5 S7)
+# HOLD_RE is bound above, with CHANGE_RECORD_RE, by load_slug_patterns (TOOL-dTotalRecall-5 S7)
 PROTOCOLS_HEAD = "## Protocols"
 
 
