@@ -62,7 +62,7 @@ tools/lib/python-floor.sh	24	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/lib/refuse-wrong-shell.sh	119	b82c0f53dd1223fab306f59bef735b3f1ceecb29	widened:2026-11-20-build-TOOL-dWitnessedBar-62-widen-5
 tools/lib/render-doc.sh	205	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/lib/resolve-python.sh	133	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
-tools/lib/resolve-python.test.sh	1420	0688706490e6ded275a3c3a67c0979e36cdbd608	widened:2026-11-21-build-TOOL-dWitnessedBar-73-widen-17
+tools/lib/resolve-python.test.sh	1559	e0f5e1915d25412a743265bd8269457b2912e36b	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-2
 tools/lib/resolve-remote.sh	33	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/loop/adopt-loop.sh	147	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/memory-recall/adopt-memory-recall.sh	239	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
@@ -127,7 +127,7 @@ tools/unattended/check-unattended.sh	3708	7a787b95c6b545ee206c4efe75f5c268c7bb72
 tools/unattended/check-unattended.test.sh	4442	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/unattended/cross-component.test.sh	149	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/unattended/gate-guard.test.sh	635	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
-tools/unattended/lib-unattended.sh	1319	eb9443a71caf08eda9eabfdef0f3a0dfb318a35b	widened:2026-11-21-build-TOOL-dWitnessedBar-65-widen-8
+tools/unattended/lib-unattended.sh	1390	e0f5e1915d25412a743265bd8269457b2912e36b	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-2
 tools/unattended/pass-tree.sh	244	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/unattended/pass-tree.test.sh	321	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/unattended/resume-tick.sh	213	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
@@ -147,3 +147,4 @@ tools/workflows/spec-audit-optin.test.sh	474	7a787b95c6b545ee206c4efe75f5c268c7b
 tools/workflows/tier2-review.test.sh	3682	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/workflows/unattended-build.test.sh	2878	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/run-gates/lib-verdict.sh	10	fc999262ba59a3fa7e84f41ca90c185fe765ef9e	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
+tools/lib/history-store.sh	59	e0f5e1915d25412a743265bd8269457b2912e36b	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-2
