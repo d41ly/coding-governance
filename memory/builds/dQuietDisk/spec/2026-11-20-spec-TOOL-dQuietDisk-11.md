@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-11 — govkit's scratch targets come from the template cache, so `selftest.py` builds each distinct target once
 
-**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base c3c0811b · streams tooling · order 4
+**Status:** INPROGRESS · rev-4 · 2026-11-22 · node d · Tier-2 · base c3c0811b · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-11-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-11-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-11-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-11-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-11-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-11-reground-task.md) | research | TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-26 |
 
 <!-- /gen:spec-records -->

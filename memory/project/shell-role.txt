@@ -40,8 +40,8 @@ tools/check-template-size.sh	336	99c65d5e352d061e856a81d01d00f3454294071c	widene
 tools/check-template-size.test.sh	255	99c65d5e352d061e856a81d01d00f3454294071c	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
 tools/check-testsuite-counts.sh	85	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/check-testsuite-counts.test.sh	306	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/check-wiring.sh	1306	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/check-wiring.test.sh	1660	fadd401b0dc06cd54b91aa0b77f0d63fa11e6b6c	widened:2026-11-22-build-TOOL-dQuietDisk-10-widen-9
+tools/check-wiring.sh	1352	b31f3bd112652dd6c6310c7b16c800664a90ae03	widened:2026-11-22-build-TOOL-dQuietDisk-26-widen-13
+tools/check-wiring.test.sh	1671	b31f3bd112652dd6c6310c7b16c800664a90ae03	widened:2026-11-22-build-TOOL-dQuietDisk-26-widen-13
 tools/codebase-map/adopt-codebase-map.sh	277	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/codebase-map/adopt-codebase-map.test.sh	353	2e4634f8cf060cbf11c9d8046da58737629773e5	widened:2026-11-20-build-TOOL-dWitnessedBar-57-widen-2
 tools/drift-audit/adopt-drift-audit.sh	262	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
