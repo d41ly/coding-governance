@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-7 — the ask kind's acceptance at filing, under `asks.acceptance`
 
-**Status:** CLOSED · rev-6 · 2026-11-22 · node d · Tier-2 · base ed5a7d52 · streams tooling · order 13 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-7 · 2026-11-22 · node d · Tier-2 · base ed5a7d52 · streams tooling · order 13 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0218@939beda1 whole
 
@@ -19,6 +19,7 @@
 | [2026-10-26-build-TOOL-dTotalRecall-7-deviation-71.md](../build/2026-10-26-build-TOOL-dTotalRecall-7-deviation-71.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-7-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-7-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-7-2-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-7-2-acceptance-ledger.md) | log | — |
+| [2026-11-22-build-TOOL-dTotalRecall-7-2-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-7-2-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-7-divergence-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-7-divergence-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-7-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-7-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
@@ -28,6 +29,8 @@
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
 | [2026-11-22-prompt-TOOL-dTotalRecall-7-build-brief-2.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-build-brief-2.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-7-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-7-cite-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-cite-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-7-cite-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-cite-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-7-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-reground-brief.md) | journal | — |
@@ -337,7 +340,7 @@ None. Every landed ask keeps its bytes. V14 and R5 keep their verdicts, so no tr
 - **AC7** — When the AC4 command runs in a seed whose one commit's `.governance/policy.toml` reads
   `asks.acceptance = "bogus"`, it exits 2 naming `asks.acceptance` and the reader's `policy: refused`
   line, and `git status --porcelain` is empty. At rev-6, `policy.py get asks.acceptance` in such a
-  seed exits 2 printing `policy: refused · .governance/policy.toml:1 · asks.acceptance: "bogus" is
+  seed exits 2 printing `policy: refused · <the seed's policy file and line> · asks.acceptance: "bogus" is
   not one of ["refuse", "grade"]; no valid revision of the file precedes <sha8>`. It does not observe
   the `LookupError` branch, a policy kit absent beside the door, since the seed runs the pass tip's kits.
   Red when: a refused read falls back to filing, so the row is written on a guessed value.
@@ -490,6 +493,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC4 AC5 AC6 AC
   caller's factory. Forced: the fixture is a seed running the pass tip's kits, as unit 2's plants
   are, so AC7's refused read is an invalid committed policy file, not a removed kit; AC5 and AC6 name
   their verdict conf. Every other rev-5 decision stands.
+- rev-7 · 2026-11-22 · §6 AC7 · per `2026-11-22-prompt-TOOL-dTotalRecall-7-cite-brief`: a record-only
+  rewording to a CLOSED spec, no criterion moved; AC7's quoted refusal names the seed's policy file and
+  line in words, so the quote spells no path:line the citation check reads into this repository.
 
 ## 10. Reuse audit
 

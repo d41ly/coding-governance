@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-36 — every code writer of a record writes its `Caused-by` line, so the causes check stays green on the records written after its seed
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,9 +12,12 @@
 | [2026-10-26-build-TOOL-dTotalRecall-36-deviation-361.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-deviation-361.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-36-deviation-362.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-deviation-362.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
+| [2026-11-22-build-TOOL-dTotalRecall-36-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-36-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-1-spec-writer.md) | journal | TOOL-dTotalRecall-1 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-36-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-36-reground-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-36-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-36-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-39 TOOL-dTotalRecall-43 |
 
 <!-- /gen:spec-records -->
@@ -23,15 +26,24 @@
 
 The round-1 spec audit (`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md`)
 confirmed finding **id 1 at HIGH**, its item **H1**, alone in that item. `TOOL-dTotalRecall-19` S8 reds
-every tracked record that has no legacy row, is not a root kind and carries no `Caused-by`, and its S7
-seeds that legacy population once, shrink-only, at its landing. Only the door and the typed factory
-write a cause. Every other writer keeps writing records with no cause line after the seed:
+every tracked Markdown record that has no legacy row, is not a root kind and carries no resolving
+`Caused-by` (a typed kind whose fields declare none is read from its Serves unit), and its S7 seeds that
+legacy population once, shrink-only, at its landing. Only the door (`gov_record.py new <kind>
+--caused-by`, unit 19 S2) and the typed factory's fields (`build_records.py#FIELD`) write a cause. Every
+other writer keeps writing records with no cause line after the seed, each read at HEAD `ed5a7d523`:
 
-- the review harness's binding line (`tools/workflows/tier2-review.template.js:318-328` and `:1874-1878`);
-- the build harness's clean-round record line (`tools/workflows/unattended-build.template.js:2557`);
-- the roles kit's prompt record head and agent ledger (`tools/roles/handoff.py:422` and `:775`);
-- the runlog run record (`tools/runlog/record.py:1137`);
-- the as-built view head (`tools/memory-tree/asbuilt_view.py:150`).
+- the review harness's binding line (`tools/workflows/tier2-review.template.js#renderAuditBinding`, and
+  the synthesis instruction's diff-kind binding sentence beside it);
+- the build harness's clean-round record line (the `pinnedLine` of
+  `tools/workflows/unattended-build.template.js`'s clean-round block);
+- the roles kit's prompt record head and agent ledger (`tools/roles/handoff.py#render_handoff` and
+  `#write_agent_ledger`);
+- the runlog run record (`tools/runlog/record.py#render_markdown`);
+- the as-built view head (`tools/memory-tree/asbuilt_view.py#VIEW_HEAD`);
+- the loop kit's upstream record (`tools/loop/upstream.py#write_upstream_record`), the driver's
+  spec-audit chain record (`tools/unattended/unattended.sh#write_chain_round`) and the backlog
+  migration's census (`tools/memory-tree/migrate_backlog.py#render_census`), the writers the census
+  finds at HEAD beyond the five read at base (§8 F3).
 
 The next record any of them writes reds `record causes (causes and orphans over the legacy population)`.
 This unit makes each of those writers write `**Caused-by:**`, says so in the binding grammar a
@@ -44,38 +56,71 @@ repairs `TOOL-dTotalRecall-19`.
 - **S1** — The review harness renders the cause line. `renderCauseLine(ids)` in
   `tools/workflows/tier2-review.template.js` returns `**Caused-by:** <the first id, bare>`, with any
   `@rev-<n>` pin stripped. The synthesis instruction names it as the record's second line, directly
-  under the binding line, on both kinds: for the spec kind it sits inside the `<<<SERVES` block the
-  agent copies verbatim, and for the diff kind the instruction spells it from the first unit id of the
-  diff. `tools/workflows/tier2-review.js` is re-rendered from the template. Observed by AC1.
+  under the binding line, on both kinds, and its ordered-opening sentence ("THE RECORD'S OPENING IS
+  ORDERED") counts it: for the spec kind it sits inside the `<<<SERVES` block the agent copies verbatim,
+  and for the diff kind the instruction spells it from the first unit id of the diff.
+  `tools/workflows/tier2-review.js` is re-rendered from the template by the kit's `[[regenerate]]` render
+  (`tools/workflows/kit.toml`). Observed by AC1.
 - **S2** — The build harness's clean-round record. The `nextAction` text of
-  `tools/workflows/unattended-build.template.js` that hands the caller `pinnedLine` names line 2 as
-  `**Caused-by:** <owed[0]>`, and `tools/workflows/unattended-build.js` is re-rendered. Observed by AC2.
-- **S3** — The roles kit. `tools/roles/handoff.py` writes `**Caused-by:** <unit id>` on the line after the
-  prompt record's `**Serves:**` line (`:422`), and the agent ledger it creates (`:775`) writes
-  `**Caused-by:** <its first id>` under its Serves line. Rewriting an existing ledger's Serves line keeps
-  a cause line already present and inserts one where none is. Observed by AC3.
+  `tools/workflows/unattended-build.template.js`'s clean-round block, which hands the caller `pinnedLine`
+  as line 1, names line 2 as `**Caused-by:** <owed[0]>`, and `tools/workflows/unattended-build.js` is
+  re-rendered the same way. Observed by AC2.
+- **S3** — The roles kit. `render_handoff` in `tools/roles/handoff.py` writes `**Caused-by:** <unit id>`
+  on the line after the prompt record's `**Serves:**` line, ahead of any `**Load gaps:**` line, and the
+  agent ledger `write_agent_ledger` creates writes `**Caused-by:** <its first id>` under its Serves line.
+  Rewriting an existing ledger's Serves line keeps a cause line already present and inserts one where
+  none is. Observed by AC3.
 - **S4** — The runlog run record and the as-built view. `render_markdown` in `tools/runlog/record.py`
-  writes `**Caused-by:** <the first served id>` on the line after the Serves line, and the run record's
-  head check (`check_serves_line`, `:1461`) gains its sibling `check_cause_line`, which reds a head with no
-  cause line or a cause naming no served id. `VIEW_HEAD` in `tools/memory-tree/asbuilt_view.py` writes
-  `**Caused-by:** {serves}` under its Serves line. Observed by AC4.
-- **S5** — The grammar a hand-writer reads. The "Record bindings" section of
-  `tools/memory-tree/HYGIENE.template.md` (`:616`) states that a record written after the causes seed
-  carries `**Caused-by:** <target>` within the first `BIND_HEAD_LINES` lines (`tree_lib.py:401`), and
+  writes `**Caused-by:** <the first served id>` on the line after the Serves line: the first of the
+  sorted served ids, bare, never an `N..M` run `render_serves` writes, since `TOOL-dTotalRecall-19` S5
+  resolves a `family-id` and a run is not one. `check_cause_line`, the sibling of `check_serves_line`,
+  reds a head with no cause line or a cause naming no served id. `VIEW_HEAD` in
+  `tools/memory-tree/asbuilt_view.py` writes `**Caused-by:** {serves}` under its Serves line. The fixed
+  head `check_record_lines` grades admitting the line, and the head check's reading of it, are
+  `TOOL-dTotalRecall-48`'s (its S1, S2); `VIEW_HEAD`'s parity with its pinned instrument is
+  `TOOL-dTotalRecall-49`'s; both build at order 18. Observed by AC4.
+- **S5** — The grammar a hand-writer reads. The "Record bindings — how a record names its spec" section
+  of `tools/memory-tree/HYGIENE.template.md` states that a record written after the causes seed carries
+  `**Caused-by:** <target>` within the first `BIND_HEAD_LINES` lines (`tree_lib.py#BIND_HEAD_LINES`), and
   names `gov_record.py new <kind> --caused-by <target>` as the door that writes it. The render reaches
   `memory/HYGIENE.md` through `adopt-memory-tree.sh --render`. NOT OBSERVED by a criterion: a prose
   rule, held equal to its render by the `kit/dogfood doc parity` leg at the close.
-- **S6** — The backfill. Every tracked record that the legacy population of `TOOL-dTotalRecall-19` S7
-  lacks and that carries no `Caused-by` at this unit's pass base gains `**Caused-by:** <its first
-  Serves id>` on the line after its Serves line, in this unit's pass commit. These are the records the
-  run wrote between unit 19's seed and this pass, its prompt records first among them. Observed by AC5.
+- **S6** — The backfill. Every tracked `.md` record that `check_causes` reds as causeless at this unit's
+  pass base (no `<path> -` row in `legacy-records`, a kind that is not a root, no `Caused-by`) gains
+  `**Caused-by:** <its first Serves id>`, the id bare with any `@rev-<n>` pin cut, on the line after its
+  Serves line, in this unit's pass commit. These are the records the run wrote between unit 19's seed
+  and this pass, its prompt records first among them. A non-Markdown record is never graded
+  (`TOOL-dTotalRecall-19` S7) and is `TOOL-dTotalRecall-51`'s. S6 inserts into no record whose own
+  reader holds its head's bytes: a run record (`record.py#check_record_lines`' fixed head, until
+  `TOOL-dTotalRecall-48`) and a `-chain-rounds.md` record (append-only by `check-unattended.sh`'s prefix
+  rule). Each such record at the pass base is named in the pass's deviation record and left to
+  `TOOL-dTotalRecall-47`'s verb; this build's folder tracks none at HEAD (DERIVED 2026-11-22,
+  `git ls-files 'memory/builds/dTotalRecall/build/*-chain-rounds.md' 'memory/builds/dTotalRecall/build/*-runlog-*.md'`
+  prints nothing). Observed by AC5.
 - **S7** — The writer census, `check_cause_writers(root)` in `tools/memory-tree/record_causes.py`, run by
-  `--check` beside `check_causes`. It lists every tracked `*.py`, `*.js` or `*.sh` file under the tool
-  root, test-named files excepted (`*.test.sh`, `selftest.py`, `test_*.py`), that spells a
-  `**Serves:** ` literal and spells no `Caused-by`. A file on the census is red unless the constant
-  `CAUSE_WRITER_KEPT` in the same module lists it with a reason, for a file whose Serves literals are
-  fixture or instruction text only. The candidate predicate is run over the real tree before the
-  constant is written, and the pass commit's `Decided:` trailer names each kept file. Observed by AC6.
+  `--check` beside `check_causes`. Its population is the alias census's: every tracked `*.py`, `*.sh` or
+  `*.js` file under the tool root `record_kinds.py#derive_tool_rel` gives, read through
+  `read_code_paths(root, tool_rel)`, the walk this unit extracts from `record_kinds.py#check_alias_compares`,
+  which then calls it; test-named files excepted (`*.test.sh`, `selftest.py`, `test_*.py`). A census
+  file spells a `**Serves:** ` literal and no `Caused-by`. It is red unless `CAUSE_WRITER_KEPT` in the
+  same module keys it with a reason, for a file whose Serves literals are fixture, instruction or
+  reader-prefix text only (§8 F3); each key is the file's path under the tool root, spelled in parts as
+  `record_kinds.py#ALIAS_COMPARE_KEPT` spells its keys, so the install-prefix ban reads no kit path. Its
+  output takes `check_alias_compares`' shape: one `cause-writer · <path>:<line> · kept <reason>` or
+  `· red` line per census file at its first Serves literal, then a count line. The candidate predicate
+  is run over the real tree before the constant is written, and the pass commit's `Decided:` trailer
+  names each kept file. Observed by AC6.
+- **S8** — The writers the census holds at HEAD beyond S1 to S4 (§8 F3). `write_upstream_record` in
+  `tools/loop/upstream.py` writes `**Caused-by:** <unit>` on the line after its Serves line; where it
+  still calls `re.fullmatch(ID, unit)`, which raises `TypeError` since `TOOL-dTotalRecall-5` made
+  `build_records.ID` an `id_grammar.py#SlugPattern`, the pass spells it `ID.fullmatch(unit)`.
+  `write_chain_round` in `tools/unattended/unattended.sh` writes `**Caused-by:** <named>` on the line
+  after a new chain record's Serves line, and `derive_chain_verdict`'s head rule in the same file, which
+  skips the head's `# `, Serves and `Appended by` lines before the first round row, skips a
+  `**Caused-by:** ` line too, since it otherwise reads it as a malformed round row and refuses at check
+  118. `render_census` in `tools/memory-tree/migrate_backlog.py` writes `**Caused-by:** <unit_id>` on
+  the line after its Serves line; `render_worksheet`'s comment form stays `TOOL-dTotalRecall-53` S10's.
+  Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -86,7 +131,7 @@ repairs `TOOL-dTotalRecall-19`.
   with a better-known cause, such as dWellOiledMachine's intake, writes that one when it lands.
 - Rewriting a legacy record. S6 touches only records the population lacks.
 - Proving that a census file writes the line at run time. The census grades spelling; each writer's
-  own arm in §7 grades behaviour.
+  own criterion grades behaviour.
 
 ### Edges
 
@@ -111,32 +156,40 @@ repairs `TOOL-dTotalRecall-19`.
 # Tier-2 review: ...
 ```
 
-The cause line sits directly under the binding line, so it falls inside the first `BIND_HEAD_LINES`
-(12) lines that `read_header_edges` reads (`TOOL-dTotalRecall-19` S1), and the binding line stays the
-record's first line, which hygiene check 21's binding-head window and check 22's opening order read.
-The target is a bare unit id: `TOOL-dTotalRecall-19` S5 resolves a `family-id` in the defined-id set,
-and a pinned `@rev-<n>` token is not one.
+The cause line sits directly under the binding line wherever the writer puts that line (first on a
+review, a prompt record and a census; third under a title on a run record, an upstream record and a
+chain record), so it falls inside the first `BIND_HEAD_LINES` unfenced lines that `TOOL-dTotalRecall-19`
+S1's `read_header_edges` reads as a column-0 `**Caused-by:**`. Check 21's binding-head window
+(`tree_lib.py#read_bindings`) still finds the Serves line where it was. The target is a bare unit id:
+`TOOL-dTotalRecall-19` S5 resolves a `family-id` in the defined-id set, and a pinned `@rev-<n>` token or
+an `N..M` run is not one.
 
 ### The census
 
-| Census file at base | Disposition |
+| Census file at HEAD | Disposition |
 |---|---|
 | `tools/workflows/tier2-review.template.js`, `unattended-build.template.js` and their renders | S1 and S2 write the line |
 | `tools/roles/handoff.py` | S3 writes the line |
-| `tools/runlog/record.py` | S4 writes the line |
-| `tools/memory-tree/asbuilt_view.py` | S4 writes the line |
-| `tools/memory-tree/deviation_join.py` | already spells `Caused-by` (`:147`), so it is off the census |
-| `tools/memory-tree/gen_build_index.py`, `migrate_backlog.py`, `adopt-memory-tree.sh` | probed at the pass; kept only where every Serves literal is fixture or instruction text |
+| `tools/runlog/record.py`, `tools/memory-tree/asbuilt_view.py` | S4 writes the line |
+| `tools/loop/upstream.py`, `tools/unattended/unattended.sh`, `tools/memory-tree/migrate_backlog.py` | S8 writes the line |
+| `tools/loop/placement.py`, `tools/memory-tree/seen_red.py`, `tools/playbook/instruction_units.py`, `tools/policy/check_policy.py` | kept: fixture text |
+| `tools/memory-tree/adopt-memory-tree.sh` | kept: instruction text |
+| `tools/workflows/replay_scorer.py`, `tools/workflows/review_replay.py` | kept: reader-prefix, fixture and docstring text |
 
-The table is the reading at base `462d20f3`, from `git grep -n "Serves:\*\* " -- tools`. The census
-itself is derived at every run and never typed.
+The table is the reading at HEAD `ed5a7d523` (DERIVED 2026-11-22: the census holds 17 files, ten written
+and seven kept), from `git grep -l -F '**Serves:** ' -- 'tools/*.py' 'tools/*.js' 'tools/*.sh'
+':!tools/*.test.sh' ':!tools/*selftest.py' ':!tools/*test_*.py'` less each file `git grep -q -F
+Caused-by` matches. `deviation_join.py`, `build_records.py`, `gen_build_index.py`, `ratchet.py`,
+`record_kinds.py`, `loop_witness.py` and `playbook/core.py` already spell `Caused-by`, so they are off the
+census. The census itself is derived at every run and never typed.
 
 ### Inventory
 
 Minted: `renderCauseLine` in the review harness, `check_cause_line` in `tools/runlog/record.py`,
-`check_cause_writers` and `CAUSE_WRITER_KEPT` in `tools/memory-tree/record_causes.py`. Naming cells:
-each Python name is asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the
-pass, and `renderCauseLine` under the JavaScript cell.
+`check_cause_writers` and `CAUSE_WRITER_KEPT` in `tools/memory-tree/record_causes.py`, and
+`read_code_paths` in `tools/memory-tree/record_kinds.py`. Naming cells: each Python name is asked of
+`python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass, and `renderCauseLine`
+under the JavaScript cell; each leads with a `.lexicon.conf` VERBS verb (`render`, `check`, `read`).
 
 ### Files touched (estimate)
 
@@ -148,9 +201,16 @@ pass, and `renderCauseLine` under the JavaScript cell.
 - `tools/roles/handoff.py`
 - `tools/roles/selftest.py`
 - `tools/runlog/record.py`
+- `tools/runlog/selftest.py`
 - `tools/memory-tree/asbuilt_view.py`
 - `tools/memory-tree/record_causes.py`
+- `tools/memory-tree/record_kinds.py` (`read_code_paths`, extracted from `check_alias_compares`)
+- `tools/memory-tree/migrate_backlog.py`
+- `tools/memory-tree/check-memory-hygiene.test.sh` (the census arm)
 - `tools/memory-tree/HYGIENE.template.md`
+- `tools/loop/upstream.py`
+- `tools/unattended/unattended.sh`
+- `tools/unattended/unattended.test.sh` (the chain-record arm)
 - `memory/HYGIENE.md` (the render)
 - `memory/builds/dTotalRecall/prompts/` (S6's backfill)
 - `memory/map/generated/` (regenerated by `python tools/codebase-map/gen_map.py --write`)
@@ -162,60 +222,83 @@ pass, and `renderCauseLine` under the JavaScript cell.
   build would sit outside the rule this build lands.
 - **Re-seed the legacy population at this pass.** The ledger is shrink-only (`TOOL-dTotalRecall-19`
   S7), so a re-seed is refused, and it would launder exactly the records the rule is about.
+- **A second walk over the tool root's code files beside the alias census's.** It is the kind's second
+  instance copied, which the charter's reuse rule refuses; the walk is extracted once (S7).
 
 ## 5. Production-readiness checklist
 
 - security — no new write surface: each writer gains one line in a file it already writes.
-- perf / scale — the census is one `git grep` over the tool root per check run.
+- perf / scale — the census is one walk over the tool root's tracked code files per check run, the
+  alias census's walk.
 - error / empty / loading states — a census file with no reason in `CAUSE_WRITER_KEPT` is red and
-  named; an empty census prints `0 writer(s) without a cause` and is a pass, because every writer was
-  found and each writes the line.
+  named; a count line with no red is a pass, because every writer was found and each writes the line.
 - observability — `--check` names each census file and its first Serves literal's line.
 - risks — the census grades spelling, so a writer that spells `Caused-by` in a comment and never
-  writes it passes the census; the causes check itself still reds the record it writes.
-- testing — AC1 to AC6 by the pass; the arms of §7 at the close.
+  writes it passes the census; the causes check itself still reds the record it writes. Between this
+  pass and `TOOL-dTotalRecall-48`, a run record `render_markdown` writes fails the fixed head, and
+  between this pass and `TOOL-dTotalRecall-49` the view's cause line departs from its instrument.
+- testing — AC1 to AC7 by the pass; the arms of §7 at the close.
 - migration — S6's backfill of this run's own records, nothing landed.
 - user docs — none under `help/`: no page covers record heads; `memory/HYGIENE.md` carries S5.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When a `node -e` probe loads `tools/workflows/tier2-review.js`'s body with
-  `new Function(...)` and returns `renderCauseLine`, as `tier2-review.test.sh:237` loads
-  `renderAuditBinding`, the call over the ids `TOOL-x-1@rev-2` and `TOOL-x-2` returns
-  `**Caused-by:** TOOL-x-1`; and `grep -c "Caused-by" tools/workflows/tier2-review.js` counts the
-  instruction text on both kinds' branches.
+  `new Function(...)` and returns `renderCauseLine`, as the TOOL-dTrueNorth-5 AC2 arm of the review
+  harness's self-test loads `renderAuditBinding`, the call over the ids
+  `TOOL-x-1@rev-2` and `TOOL-x-2` returns `**Caused-by:** TOOL-x-1`; and
+  `grep -c "Caused-by" tools/workflows/tier2-review.js` counts the instruction text on both kinds'
+  branches.
   Red when: the pin is kept on the target, or the diff kind's instruction names no cause line.
 - **AC2** — When `grep -n "Caused-by" tools/workflows/unattended-build.js` runs at the pass tip, the
   clean-round `nextAction` text names line 2 as the cause line beside `pinnedLine`.
   Red when: the clean-round record the caller writes is instructed with the binding line alone.
 - **AC3** — When `python tools/roles/handoff.py` writes a prompt record for a fixture unit in a
-  scratch clone under `%TEMP%`, the line after its Serves line is `**Caused-by:** <the unit id>`; when the agent
-  ledger is created and then rewritten with a second id, `grep -c "Caused-by"` over it prints `1`.
+  scratch clone under the system temp directory, the line after its Serves line is
+  `**Caused-by:** <the unit id>`; when the agent ledger is created and then rewritten with a second id,
+  `grep -c "Caused-by"` over it prints `1`.
   Red when: the rewrite path drops or doubles the cause line.
   fixture: a scratch clone with one build folder and one spec; the pass makes it.
 - **AC4** — When `render_markdown` from `tools/runlog/record.py` renders a fixture record serving
-  `TOOL-x-1`, the line after its Serves line is `**Caused-by:** TOOL-x-1`, and `check_cause_line`
-  over the same head with that line cut returns one finding; and `VIEW_HEAD.format(serves="FIX-y-6")`
-  from `tools/memory-tree/asbuilt_view.py` holds `**Caused-by:** FIX-y-6`.
-  Red when: the run record or the view is written with no cause, or the head check passes a head
-  without one.
-- **AC5** — When `python record_causes.py --check` runs at the pass tip, it prints
-  `0 causeless`, and `git diff --stat <pass base>..HEAD` lists each record S6 backfilled.
-  Red when: a record this run wrote after unit 19's seed still carries no cause.
+  `TOOL-x-1` and `TOOL-x-2`, whose Serves line reads `TOOL-x-1..2`, the line after it is
+  `**Caused-by:** TOOL-x-1`, and `check_cause_line` over the same head with that line cut returns one
+  finding; and `VIEW_HEAD.format(serves="FIX-y-6", instrument="x", sha="0", count=0)` from
+  `tools/memory-tree/asbuilt_view.py` holds `**Caused-by:** FIX-y-6`.
+  Red when: the run record or the view is written with no cause, the cause is a run, or the head check
+  passes a head without one.
+- **AC5** — When `python record_causes.py --check` runs from `tools/memory-tree/` at the pass tip, it
+  prints `0 causeless`, and `git diff --stat <pass base>..HEAD` lists each record S6 backfilled.
+  Red when: a Markdown record this run wrote after unit 19's seed still carries no cause.
 - **AC6** — When `python record_causes.py --check` runs in a scratch copy of the
   tree where `tools/roles/handoff.py`'s two cause lines are cut, it exits 1 naming `handoff.py` under
-  the writer census; at the pass tip the census names no file outside `CAUSE_WRITER_KEPT`.
+  the writer census; at the pass tip the census names no file outside `CAUSE_WRITER_KEPT`; and
+  `python record_kinds.py --check`'s `alias-compare` count line reads as it did at the pass base.
   Red when: the census reads only the registry's writer cells, so a writer the registry does not
-  name escapes it.
-  fixture: a scratch copy under `%TEMP%`; the pass makes it.
+  name escapes it, or the extracted walk changes the alias census's population.
+  fixture: a scratch copy under the system temp directory; the pass makes it.
+- **AC7** — When a `python -c` probe from `tools/memory-tree/` prints line 2 of
+  `migrate_backlog.render_census("TOOL-x-1", "abc", {"corpus": [], "findings": [], "conservation": []})`,
+  it prints `**Caused-by:** TOOL-x-1`; when a `python -c` probe from `tools/loop/` calls
+  `upstream.write_upstream_record` over `upstream.build_fixture_repo()` with `FX_BUILD`, `FX_UNIT` and
+  `FX_ITEM`, the record's line after its Serves line is `**Caused-by:**` and `FX_UNIT`; and when
+  `bash tools/unattended/unattended.sh --record-round` writes a new chain record in a scratch clone, the
+  line after its Serves line is `**Caused-by:** <the named id>`, and `--chain-verdict` over it exits as
+  over the same record without that line.
+  Red when: a writer is kept to clear the census instead of writing the line, or the chain reader
+  refuses the cause line as a round row.
+  fixture: the chain half needs a scratch clone with a build folder and a spec; the pass makes it.
 
 ## 7. Gates
 
-`tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `runlog selftest` · `runlog record schema` · `pre-push run-log line` · `run-gates run-log line` · `kit/dogfood doc parity` · `memory hygiene` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e`
+`tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `runlog selftest` · `runlog record schema` · `pre-push run-log line` · `run-gates run-log line` · `kit/dogfood doc parity` · `memory hygiene` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `policy fixtures` · `scratch-guard self-test` · `unattended kit gate` · `memory-hygiene self-test` · `record-kinds` · `backlog migration selftest` · `loop upstream fixtures` · `install-prefix (shipped surface)`
 
-New arm: tools/memory-tree/record_causes.py · covers AC6 · the writer census plant `writer-without-cause`, a fixture file spelling a Serves literal and no cause, staged by cutting `check_cause_writers` from `--check` · none
+The leg `record causes (causes and orphans over the legacy population)` runs `--check`, which the
+census joins; it is `TOOL-dTotalRecall-19`'s and lands with it, so it is named here in prose.
+
+New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC6 · the writer census plant `record_causes.py --fixture --plant writer-without-cause`, a fixture code file spelling a Serves literal and no cause, staged by cutting `check_cause_writers` from `--check` · none
 New arm: tools/workflows/tier2-review.test.sh · covers AC1 · a pin on `renderCauseLine`'s output beside the `renderAuditBinding` pin, staged by returning the pinned id · none
 New arm: tools/runlog/selftest.py · covers AC4 · a run record head with its cause line cut, staged by `check_cause_line` returning no finding · none
+New arm: tools/unattended/unattended.test.sh · covers AC7 · a chain record carrying its cause line read by `--chain-verdict`, staged by cutting the head rule's `**Caused-by:**` skip · none
 
 ## 8. Open questions
 
@@ -232,22 +315,47 @@ New arm: tools/runlog/selftest.py · covers AC4 · a run record head with its ca
   RESOLVED (agent, 2026-10-26, delegated): (a), rung 5, the grant the README's `may:` line names.
   grants: PLAY-dClosedLoop-3 HYGIENE.template.md's Record bindings section states the cause line ·
   widens: none · relaxes: none
+- **F3 — The census at HEAD holds writers and a reader-prefix file §2 did not name; what disposes them?**
+  Read at `ed5a7d523`: `write_upstream_record`, `write_chain_round` and `render_census` write records
+  with no cause, and `replay_scorer.py`'s Serves literals are reader prefixes (`SERVES_PREFIX`,
+  `SPEC_SERVES_PREFIX`) and fixtures. Options: (a) S8 makes the three writers write the line, and
+  `CAUSE_WRITER_KEPT`'s reasons admit reader-prefix text beside fixture and instruction text, the reason
+  `TOOL-dTotalRecall-53` S8 names for `review_replay.py`; (b) keep the writers with a fixture reason;
+  (c) leave them red until a later unit. (b) keeps a file on a reason that is false, which S7 forbids;
+  (c) fails AC6 at this unit's own tip. RESOLVED (agent, 2026-11-22, delegated): (a), the sole survivor,
+  per `2026-11-22-prompt-TOOL-dTotalRecall-36-reground-brief`; `TOOL-dTotalRecall-53` S7 and S8 then find
+  `render_census`'s line and the reason present. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's id 1 (HIGH, item H1).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off mirror of TOOL-dTotalRecall-47, TOOL-dTotalRecall-48, TOOL-dTotalRecall-49, TOOL-dTotalRecall-50, TOOL-dTotalRecall-51, TOOL-dTotalRecall-53, each a consumes-from edge of a unit the round-1 spec audit of units 36 to 43 promoted.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-60, each the other end of an edge a unit the round-1 spec audit of units 44 to 53 promoted wrote; nothing else moved.
+- rev-4 · 2026-11-22 · §1 · S1 to S8 · §3 · §4 · §5 · §6 AC1, AC4 to AC7 · §7 · §8 F3 added · §10 · per
+  `2026-11-22-prompt-TOOL-dTotalRecall-36-reground-brief`, re-grounded at `ed5a7d523`: every line cite is
+  a symbol; the census is re-derived and S8 adds its three new writers (F3); the walk is extracted from
+  unit 40's alias census; S6 backfills Markdown only and leaves the run and chain records whose heads
+  their readers hold; the run record's cause is never a run; AC4's view half supplies every placeholder;
+  the census arm moves to `check-memory-hygiene.test.sh`; the leg line gains the legs its paths trip.
 
 ## 10. Reuse audit
 
 The seams extended are the writers themselves, each at the line that already writes the binding
-(`tools/workflows/tier2-review.template.js:318`, `tools/workflows/unattended-build.template.js:2557`,
-`tools/roles/handoff.py:422` and `:775`, `tools/runlog/record.py:1137`,
-`tools/memory-tree/asbuilt_view.py:150`), and `TOOL-dTotalRecall-19`'s `record_causes.py`, whose
-`--check` the census joins. No existing seam fits the census: `python tools/codebase-map/reuse_lookup.py
-"record writer emits a cause header line"` ranked name-stem neighbours (`write`, `write_text`,
-`records`, `emit`) and no writer inventory. The recall probe returned the promotion precedent
-`TOOL-cMendedVintage-19` and the dSafePassage promoted specs, which place a repair after its unit.
+(`tools/workflows/tier2-review.template.js#renderAuditBinding`, the clean-round `pinnedLine` of
+`tools/workflows/unattended-build.template.js`, `tools/roles/handoff.py#render_handoff` and
+`#write_agent_ledger`, `tools/runlog/record.py#render_markdown`, `tools/memory-tree/asbuilt_view.py#VIEW_HEAD`,
+`tools/loop/upstream.py#write_upstream_record`, `tools/unattended/unattended.sh#write_chain_round` and
+`tools/memory-tree/migrate_backlog.py#render_census`); `TOOL-dTotalRecall-19`'s `record_causes.py`, whose
+`--check` the census joins and whose `--fixture --plant` the census plant extends; and
+`TOOL-dTotalRecall-40`'s alias census, `record_kinds.py#check_alias_compares` with
+`#ALIAS_COMPARE_KEPT`, `#derive_tool_rel` and `#read_tracked`, whose population walk S7 extracts as
+`read_code_paths` and whose file-keyed keep map and line shape the census takes. The lookup
+`python tools/codebase-map/reuse_lookup.py "census of code files spelling a literal with a kept map of reasons"`
+ranked name-stem neighbours (`census` in `merge-rows.py`, `write_fixture_files`, `write_file`) and not
+the alias census, found by reading unit 40's landed code; the base lookup
+`python tools/codebase-map/reuse_lookup.py "record writer emits a cause header line"` ranked `write`,
+`write_text`, `records` and `emit` and no writer inventory. The recall probe returned the promotion
+precedent `TOOL-cMendedVintage-19` and the dSafePassage promoted specs, which place a repair after its
+unit.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a confirmed spec audit finding promoted to a repair unit ordered after the unit it repairs" --terms "promoted HIGH repairs order spec-audit disposal batched minors rescope add Derived PLAY-dClosedLoop-2 hands-off"`

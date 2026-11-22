@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-42 — the shape-run home is its id-rule's glob, a typed kind's unarmed reason sits on its row, and a record is graded only by the row its Serves kind names
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base e1ae60af · streams tooling · order 15 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base e1ae60af · streams tooling · order 15 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -101,6 +101,7 @@ names a directory, and grades an untyped record only by the row its Serves kind 
 - **hands-off** `TOOL-dTotalRecall-43` — `derive_record_kind`, which that unit's item for the audit's id 12
   makes the `record` extractor call
 - **hands-off** `TOOL-dTotalRecall-53` — `unarmed` and `derive_record_kind`, which that unit makes legal on a fence row and feeds a classified kind (the round-1 audit of units 36 to 43, ids 7, 8, 17, 27 and 39)
+- **hands-off** `TOOL-dTotalRecall-9` — `derive_record_kind`, which that unit's `record` extractor calls for each record's kind (its §8 F8)
 
 ## 4. Design
 
@@ -280,6 +281,9 @@ observes the arm RED and GREEN at the close.
   legal there; `canonical_kind` is `resolve_kind`; S4's probe is `/**` under `:(glob)`; the fixture
   build is `bFix` and the plants ride its deviation, stream-plan, log and research rows; the leg line
   gains `memory-hygiene self-test` and `record-kinds`; Files touched gains the kit README.
+- rev-4 · 2026-11-22 · §3 · the Edges block gains the hands-off mirror of TOOL-dTotalRecall-9's
+  consumes-from edge on `derive_record_kind`, written by that unit's re-ground per
+  `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-brief`; nothing else moved.
 
 ## 10. Reuse audit
 
