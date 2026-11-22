@@ -86,7 +86,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
@@ -116,7 +116,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-45 — a typed `--input` value is authored text: written unfenced, refused when a line would stand as an executor line, so the anchor check grades it](spec/2026-10-26-spec-TOOL-dBoundRoles-45.md) | 12 | 2 | CLOSED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-46 — the spawn guard holds a typed block to the authored-line rule: a fact, marker or `Framed by:` line in `input:question` or `input:diff`, or a fence left open there, is denied](spec/2026-10-26-spec-TOOL-dBoundRoles-46.md) | 12 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [TOOL-dBoundRoles-48 — the composed task section checked block by block: every block opens outside a fence, and each handed block's content lies inside its own, at render and at spawn](spec/2026-10-26-spec-TOOL-dBoundRoles-48.md) | 12 | 2 | DEFERRED | rev-4 | 2026-11-22 |
-| [TOOL-dBoundRoles-8 — the role-gate arm's field escape explained and closed](spec/2026-10-25-spec-TOOL-dBoundRoles-8.md) | 12 | 2 | INPROGRESS | rev-4 | 2026-11-22 |
+| [TOOL-dBoundRoles-8 — the role-gate arm's field escape explained and closed](spec/2026-10-25-spec-TOOL-dBoundRoles-8.md) | 12 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-9 — the `none` and `review` write classes enforced in the role arm](spec/2026-10-25-spec-TOOL-dBoundRoles-9.md) | 13 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-7 — shell writes held to the work order's allowance](spec/2026-10-25-spec-TOOL-dBoundRoles-7.md) | 14 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-5 — returns through a schema-forced channel on both routes, residual failures retried by `roles.retries`](spec/2026-10-25-spec-TOOL-dBoundRoles-5.md) | 15 | 2 | DEFERRED | rev-6 | 2026-11-22 |
