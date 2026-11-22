@@ -110,7 +110,7 @@ ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 
 | [TOOL-dQuietDisk-36 — the bash template cache runs git without the inherited git environment, and the turnstile suite grades the spared live repository and the swept orphan](spec/2026-11-22-spec-TOOL-dQuietDisk-36.md) | 8 | 2 | CLOSED | rev-1 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 129 bound to this build, across 4 record folder(s).
+Records: 131 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

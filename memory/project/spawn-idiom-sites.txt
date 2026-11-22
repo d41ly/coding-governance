@@ -101,7 +101,7 @@ tools/lexicon/adopt-lexicon.sh	var-pipe	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d
 tools/lib/extract-arms.sh	var-pipe	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/lib/extract-arms.test.sh	path-subst	4	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/lib/kit-rel.sh	path-subst	3	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-tools/lib/lib-selftest.test.sh	cat-file	26	3470633ba7207796277d51f89fca8329073ba9d3	widened:2026-11-22-build-TOOL-dQuietDisk-7-widen-18
+tools/lib/lib-selftest.test.sh	cat-file	30	4840e65ede833dec6a1d30a689f99a81603dc182	widened:2026-11-22-build-TOOL-dQuietDisk-36-widen-21
 tools/lib/lib-selftest.test.sh	path-subst	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/lib/pyrun.sh	path-subst	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/lib/refuse-wrong-shell.sh	path-subst	1	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-37
