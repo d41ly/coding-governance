@@ -206,8 +206,6 @@ _SCHEMA = lib.load_role_schema()
 REQUIRED_ROLE_KEYS = tuple(r["key"] for r in _SCHEMA if r["required"] == "every")
 AGENT_ROLE_KEYS = tuple(r["key"] for r in _SCHEMA if r["required"] == "agent")
 EMPTY_ROLE_KEYS = frozenset(r["key"] for r in _SCHEMA if r["empty"])
-#: Where each writer class's output lives (R14): the library's one table, which the rendered ceiling reads.
-WRITE_FOLDERS = lib.WRITE_FOLDERS
 #: A `mandatory` value calling its role optional: exactly `no`, or `no — <when it is used>` (R13).
 NOT_MANDATORY_RE = re.compile(r"^no(?: — .+)?$")
 #: A mandatory value's own statement that no hook enforces it (R13).
@@ -511,7 +509,9 @@ def check_roles(root, kit_dir, write=False):
         output = keys.get("output", "")
         for token in sorted(set(lib.TOKEN_RE.findall(output)) - {lib.MEMORY_ROOT_TOKEN}):
             add_defect(p, "R14", "output carries the token %s; only %s renders" % (token, lib.MEMORY_ROOT_TOKEN))
-        folder = WRITE_FOLDERS.get(keys.get("writes"))
+        # Where each writer class's output lives: the library's one table, which the rendered ceiling and
+        # the role index's `classes` map read too (TOOL-dBoundRoles-9 S1).
+        folder = lib.WRITE_FOLDERS.get(keys.get("writes"))
         if folder:
             n_outputs += 1
             if folder not in output:

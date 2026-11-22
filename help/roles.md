@@ -286,6 +286,12 @@ until an owner writes its first row.
 - A `Workflow` call that runs anything other than a listed harness with its `roles` argument.
 - A spec write from anything but the spec writer, and a product write from anything but the builder
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
+- Any file write from a role declaring `writes = none`: such a role writes nothing in the repository.
+- A write from a role declaring `writes = review` outside a build's reviews folder,
+  `<MEMORY_ROOT>/builds/<slug>/reviews/`. A review harness run with its default `reviewDir` is
+  refused there; pass `reviewDir` under that folder. Where `roles.json` was rendered before it held
+  the `classes` map that spells the folder, every such write is refused until
+  `render_agents.py --write` re-renders it.
 - A role agent running the bar, the self-test runner or any suite, beyond what its grant allows.
   A gate run by its full path from a directory outside every checkout is judged by the index of the
   checkout that holds the script. Where neither sits in a checkout, no grant can be read, so the bar
@@ -300,7 +306,7 @@ until an owner writes its first row.
 
 All of these switch on where `.claude/roles.json` exists. Where it is missing but `.claude/agents/`
 still holds an agent file the kit rendered, the hooks refuse every spec and product write, every
-role agent's gate run and every `Agent` and `Workflow` call, naming the index, until
+other file write from a role agent, every role agent's gate run and every `Agent` and `Workflow` call, naming the index, until
 `render_agents.py --write` restores it. In a repository that never adopted the kit, a missing index
 switches nothing on. They do not see writes made through Bash or PowerShell, `--bare` runs, agents a
 harness spawns internally, session-to-session messages, or a `roles.json` edited by shell and never

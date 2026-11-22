@@ -32,7 +32,9 @@ the playbook kit's layer check reads as data (TOOL-dBoundRoles-1 S6), its `shape
 kinds it runs in (TOOL-dBoundRoles-16 S5), its `role-sha`, `roles_lib.derive_section_sha` of the `## Role`
 section `roles_lib.render_role_section` composes, the hash a handoff's marker carries and the hooks kit's
 spawn guard compares (TOOL-dBoundRoles-6 S5), `harnesses`, the repo-relative
-scripts of every workflow whose `driver` is `workflow`, and `gates.manifest`, the repo-relative path of
+scripts of every workflow whose `driver` is `workflow`, `classes`, each write class's folder as
+`roles_lib.WRITE_FOLDERS` spells it, which scratch-guard.js reads to place a `review` role's write
+(TOOL-dBoundRoles-9 S2), and `gates.manifest`, the repo-relative path of
 the tool root's gate manifest or null when no file is there (TOOL-aOrientedCast-11; scratch-guard.js reads
 both to refuse a role agent a gate), and `effort`, the resolved role and stage levels of the default
 tables and of every profile (TOOL-aGuardedEffort-1; agent-cap.js grades a spawn's level against
@@ -271,9 +273,11 @@ def render_roles_index(roles, harnesses, policy, manifest, effort, role_shas):
     """The index bytes: every role's `workflow`, `writes`, `agent`, `gates`, `layer` and `acts-as`
     (TOOL-dBoundRoles-1 S6), `shapes`, the kinds it runs in, a list (TOOL-dBoundRoles-16 S5), and
     `role-sha`, its value in `role_shas` (TOOL-dBoundRoles-6 S5), the harness list, the gate manifest's
-    path and `derive_effort_index`'s `effort`."""
+    path, `derive_effort_index`'s `effort`, and `classes`, each write class's folder as the library's
+    `WRITE_FOLDERS` spells it, token and placeholder kept (TOOL-dBoundRoles-9 S2)."""
     allow = policy.get("gates", {})
-    obj = {"effort": effort, "gates": {"manifest": manifest}, "harnesses": harnesses,
+    obj = {"classes": dict(lib.WRITE_FOLDERS),
+           "effort": effort, "gates": {"manifest": manifest}, "harnesses": harnesses,
            "roles": {slot: {"acts-as": r["keys"].get("acts-as", ""),
                             "agent": r["keys"].get("agent", "true") == "true",
                             "gates": list(allow.get(slot, [])),

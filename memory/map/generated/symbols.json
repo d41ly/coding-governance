@@ -5113,6 +5113,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "checkRoleClass",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkRoleGate",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -18238,6 +18243,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "matchWriteClass",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "match_expr",
       "kind": "function",
       "file": "tools/memory-tree/id_grammar.py"
@@ -28341,6 +28351,11 @@
       "id": "renderChecklistUnion",
       "kind": "function",
       "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
+      "id": "renderClassDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "renderCloses",
@@ -41806,6 +41821,11 @@
       "id": "write_claim_scaffold",
       "kind": "function",
       "file": "tools/loop/claim.py"
+    },
+    {
+      "id": "write_class_roles",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_class_row_plant",
