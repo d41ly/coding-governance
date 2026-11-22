@@ -168,6 +168,7 @@ ratchet selftest	kit	selftests
 recall floor	repo	declarations
 recall floor arms	repo	selftests
 receipt sync (installed files match the receipt)	repo	declarations
+record-kinds	repo	records
 remote literals (kit code names no remote)	repo	declarations
 remote literals self-test	kit	selftests
 review-join ban (no ref-keyed join)	repo	declarations

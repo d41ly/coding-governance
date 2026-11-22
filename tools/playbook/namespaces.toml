@@ -214,3 +214,9 @@ class = "commit"
 owner = "dDeclaredLoop"
 pattern = "commit_trailers:SHA_RE"
 resolver = "commit_trailers:--print-commits"
+
+[[native]]
+class = "gap-key"
+owner = "dTotalRecall"
+pattern = "record_kinds:GAP_KEY_RE"
+resolver = "record_kinds:--print-gap-keys"

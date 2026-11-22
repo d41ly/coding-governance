@@ -2748,3 +2748,29 @@ fields = ["conf", "key"]
 drain = "key"
 direction = "shrink-only"
 home = "memory/project/legacy-homes.txt"
+
+# The record-kind registry's legacy population (TOOL-dTotalRecall-1 S8, §8 F6): gov's own, beside the
+# `record-kinds` leg's row below, so it owes no step. One `<path> <row name> 1` row per record a
+# `fields` row of `<prefix>/memory-tree/record-kinds.toml` graded at landing; only later records are graded.
+[[ledger]]
+population = "record-kinds-legacy"
+leg = "record-kinds"
+seed = ["python", "{prefix}/memory-tree/record_kinds.py", "--seed-legacy"]
+key = "record"
+fields = ["path", "section"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/record-kinds-legacy.txt"
+
+[[exempt_leg]]
+name = "record-kinds"
+tag = "leg.gov.record-kinds"
+why = "it grades gov's own record population against gov's registry and its legacy ledger, which lives in govkit's registry and no adopter install holds. TOOL-dTotalRecall-1 S3, S11."
+tests = ["feature.memory-tree-hygiene"]
+purpose = "grades every record kind's row and its records"
+argv = ["python", "{prefix}/memory-tree/record_kinds.py", "--check"]
+chunk = "records"
+ceiling = 120
+subject = "repo"
+enforces = ["principle.p16"]
+stage = ["step.test"]

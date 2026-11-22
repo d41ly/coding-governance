@@ -800,6 +800,44 @@ those shapes and an Answers naming no recommendation record of the build. The un
 `--recommend` calls it; the newest score record of a stage and the reason answering it are the pair
 that decides.
 
+## Record kinds — the registry's view
+
+Every record kind is declared once, as a `[[record-kind]]` row of `tools/memory-tree/record-kinds.toml`; the
+table below is GENERATED from it by `python tools/memory-tree/record_kinds.py --write`, and the `record-kinds`
+leg reds it when it differs by one byte. A kind joins through `record_kinds.py new`, never by an edit here.
+
+<!-- gen:record-kinds -->
+
+| Kind | Tag | Home | Writer | Check |
+|---|---|---|---|---|
+| `spec` | `record.spec` | — | `gen_build_index.py --new-spec` | `memory hygiene` |
+| `spec-audit` | `record.spec-audit` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | `memory hygiene` |
+| `diff-review` | `record.diff-review` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | `memory hygiene` |
+| `journal` | `record.journal` | `memory/builds/*/prompts/*.md` | `hand` | `memory hygiene` |
+| `research` | `record.research` | `memory/builds/*/build/*.md` | `hand` | `memory hygiene` |
+| `run-record` | `record.run-record` | — | `runlog.py record --write` | `runlog record schema` |
+| `backlog-row` | `record.backlog-row` | — | `hand` | `memory hygiene` |
+| `design-record` | `record.design-record` | `memory/builds/*/build/*-architecture-v*.md` | `hand` | `memory hygiene` |
+| `dossier` | `record.dossier` | — | `hand` | `codebase-map gate coverage` |
+| `deviation` | `record.deviation` | `memory/builds/*/build/*-build-*-deviation-*.md` | `hand` | `memory hygiene` |
+| `exception` | `record.exception` | `memory/builds/*/build/*-build-*-exception-*.md` | `build_records.py new exception` | `memory hygiene` |
+| `override` | `record.override` | `memory/builds/*/build/*-build-*-override-*.md` | `build_records.py new override` | `memory hygiene` |
+| `change` | `record.change` | `memory/builds/*/build/*-build-*-change-*.md` | `build_records.py new change` | `memory hygiene` |
+| `red-fix` | `record.red-fix` | `memory/builds/*/build/*-build-*-red-fix-*.md` | `build_records.py new red-fix` | `memory hygiene` |
+| `disposition` | `record.disposition` | `memory/builds/*/build/*-build-*-disposition-*.md` | `build_records.py new disposition` | `memory hygiene` |
+| `acceptance` | `record.acceptance` | `memory/builds/*/build/*-build-*-acceptance-*.md` | `loop_witness.py acceptance` | `memory hygiene` |
+| `transition` | `record.transition` | `memory/builds/*/build/*-build-*-transition-*.md` | `loop_transition.py record` | `memory hygiene` |
+| `recommendation` | `record.recommendation` | `memory/builds/*/build/*-build-*-recommendation-*.md` | `build_records.py new recommendation` | `memory hygiene` |
+| `widen` | `record.widen` | `memory/builds/*/build/*-build-*-widen-*.md` | `ratchet.py widen` | `memory hygiene` |
+| `leg-tail` | `record.leg-tail` | `memory/builds/*/build/*-build-*-leg-tail-*.md` | `keep_tails.py` | `memory hygiene` |
+| `flake` | `record.flake` | `memory/builds/*/build/*-build-*-flake-*.md` | `verdict_flow.py flakes` | `memory hygiene` |
+| `gate-health` | `record.gate-health` | `memory/builds/*/build/*-build-*-gate-health-*.md` | `drift_report.py --gate-health --write` | `memory hygiene` |
+| `card` | `record.card` | `memory/builds/*/build/*-build-*-card-*.md` | `manifest-check.sh --card --follow` | `memory hygiene` |
+| `probe-trigger` | `record.probe-trigger` | `memory/builds/*/build/*-build-*-probe-trigger-*.md` | `probe.py trigger` | `memory hygiene` |
+| `probe` | `record.probe` | `memory/builds/*/build/*-build-*-probe-*.md` | `probe.py pin` | `memory hygiene` |
+
+<!-- /gen:record-kinds -->
+
 ## Acceptance ledger — how a built unit evidences its criteria
 
 Inside a record whose `**Serves:**` kind is `journal`, which is already defined as evidence of what

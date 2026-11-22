@@ -5349,5 +5349,27 @@
     "stage": [
       "step.test"
     ]
+  },
+  {
+    "name": "record-kinds",
+    "tag": "leg.gov.record-kinds",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "grades every record kind's row and its records",
+    "argv": [
+      "python",
+      "{prefix}/memory-tree/record_kinds.py",
+      "--check"
+    ],
+    "chunk": "records",
+    "subject": "repo",
+    "ceiling": 120,
+    "enforces": [
+      "principle.p16"
+    ],
+    "stage": [
+      "step.test"
+    ]
   }
 ]

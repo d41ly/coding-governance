@@ -279,6 +279,36 @@ row: `never gains` admits a widened row only where that record is tracked, names
 the key, and gives a reason. Under `retrofit.widen = "refuse"` the door writes nothing and the leg
 admits only a record the compare base already tracks. A widened row's count is not checked.
 
+## The record-kind registry — one declaration per kind (TOOL-dTotalRecall-1)
+
+`<prefix>/memory-tree/record-kinds.toml` declares every kind of record the memory tree holds, one
+`[[record-kind]]` row each, and `<prefix>/memory-tree/record_kinds.py` is its reader, gate, view and
+factory. Its columns, in order: `name`; `tag`, `record.<name>`; `layer`; `home`, the `git ls-files`
+glob of the kind's records, required on a `fields` row; `id-rule`, the name grammar or `""`;
+`schema`, `{ form, source, fields }`, `form` one of `fields`, `header`, `rows`, `generated`, `source`
+an optional `<path>:<NAME>[.<key>]...` literal another module declares the same fields in, read by
+`ast` and never imported; `writer`, the door writing the kind, `generator:<path>` or `hand`;
+`readers`; `lifecycle`; `check`, the leg grading it. `layer`, `readers` and `lifecycle` are admitted
+and stay empty until TOOL-dTotalRecall-18 requires them; `root` and `sections` are admitted for
+their owners.
+
+| Verb | What it does |
+|---|---|
+| `--check` | the `record-kinds` leg: every row's columns, its `check` leg and its `source` both ways, the factory's `TYPED_RECORD_KINDS` joined to the rows both ways, every `fields` record outside the legacy ledger carrying its fields in order, each deviation's `Follow-through: gap <key>` resolved, and the view byte for byte |
+| `--write` | renders the `gen:record-kinds` region of `HYGIENE.template.md`, which `adopt-memory-tree.sh --render` carries into `<memory root>/HYGIENE.md` |
+| `--template <kind>` | prints the skeleton one `fields` row defines, the layout `build_records.py` writes |
+| `new <name> --tag record.<name> --writer <door> --check <leg> --field <Key>... --home <glob>` | the factory: appends one conforming row and re-renders the view, exit 2 writing nothing on a missing column |
+| `--seed-legacy` | prints the `record-kinds-legacy` population, `<path> TAB <row name> TAB 1` per record a `fields` row grades, for `legacy_ledger.py seed` |
+| `--print-gap-keys` | the `gap-key` native class's members, the first cells of every tracked gap register; exit 3 where none is tracked |
+| `--fixture [--plant <case>]` | builds a throwaway repository and runs `--check` there; `--selftest` asserts every plant red |
+
+A typed kind's row grades only the records its `build_records.py` name grammar matches, so a
+`…-probe-design.md` its glob also matches falls to the `research` row. A typed kind with no record
+yet prints `<kind>: unarmed — no record yet` and passes; any other empty population reds. The step
+gate's `record-kind-schema` class holds `<kind>.<field>` per field of every row, so a removed field is
+a vanished member. What it does not check: whether a `writer` writes its kind, a field's value, and
+a `header`, `rows` or `generated` row's records, which its `check` leg's owner grades.
+
 ## Backlog modes — authored shards and per-build asks
 
 Where an ask lives, and who decides its status, is one conf key. This section is the author-facing

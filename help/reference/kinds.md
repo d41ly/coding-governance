@@ -91,11 +91,11 @@ python <prefix>/playbook/core.py new charter-practice <name> --line <text>
 ```
 
 ## `kind.record-kind`
-<!-- usage: kind:kind.record-kind f55fbc8e -->
+<!-- usage: kind:kind.record-kind 76204c35 -->
 A kind of record the memory tree holds.
 
 ```text
-no factory has landed; dConvergedCharter lands it, and until then the kind has no member
+python <prefix>/memory-tree/record_kinds.py new <name> --tag record.<name> --writer <door> --check <leg> --field <Key>... --home <glob>
 ```
 
 ## `kind.stage`

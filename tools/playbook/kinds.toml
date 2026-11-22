@@ -123,13 +123,13 @@ usage = "python {prefix}/playbook/core.py new charter-practice <name> --line <te
 
 [[kind]]
 tag = "kind.record-kind"
-owner = "dConvergedCharter"
+owner = "dTotalRecall"
 binds = ["principle.p16"]
-population = ""
-factory = ""
-gate = ""
+population = "{prefix}/memory-tree/record-kinds.toml"
+factory = "python {prefix}/memory-tree/record_kinds.py new"
+gate = "record-kinds"
 summary = "A kind of record the memory tree holds."
-usage = "no factory has landed; dConvergedCharter lands it, and until then the kind has no member"
+usage = "python {prefix}/memory-tree/record_kinds.py new <name> --tag record.<name> --writer <door> --check <leg> --field <Key>... --home <glob>"
 
 [[kind]]
 tag = "kind.stage"

@@ -161,6 +161,7 @@
       "recall floor",
       "recall floor arms",
       "receipt sync (installed files match the receipt)",
+      "record-kinds",
       "remote literals (kit code names no remote)",
       "remote literals self-test",
       "review-join ban (no ref-keyed join)",

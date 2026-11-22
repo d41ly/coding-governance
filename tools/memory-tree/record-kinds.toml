@@ -1,0 +1,309 @@
+# record-kinds.toml — the record-kind registry (TOOL-dTotalRecall-1): one [[record-kind]] row per kind of
+# record the memory tree holds, the memory contract's one declaration of each. Columns, in this order:
+# `name`; `tag`, record.<name>; `layer`; `home`, the `git ls-files` glob of its records, required on a
+# `fields` row; `id-rule`, its name grammar or ""; `schema`, { form, source, fields }, `form` one of
+# fields, header, rows, generated, `source` the literal another module declares the fields in, read by
+# `ast`; `writer`, the command that writes it, `generator:<path>` or `hand`; `readers`; `lifecycle`;
+# `check`, the leg of <prefix>/gate-legs.json grading it. `layer`, `readers` and `lifecycle` stay empty
+# until TOOL-dTotalRecall-18 requires them. A kind joins through
+# `python <prefix>/memory-tree/record_kinds.py new`, and `record_kinds.py --check` grades the file.
+
+[[record-kind]]
+name = "spec"
+tag = "record.spec"
+layer = ""
+home = ""
+id-rule = "<date>-spec-<unit id>.md"
+schema = { form = "header", fields = [] }
+writer = "gen_build_index.py --new-spec"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "spec-audit"
+tag = "record.spec-audit"
+layer = ""
+home = "memory/builds/*/reviews/*.md"
+id-rule = ""
+schema = { form = "fields", fields = ["Serves"] }
+writer = "tier2-review.js"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "diff-review"
+tag = "record.diff-review"
+layer = ""
+home = "memory/builds/*/reviews/*.md"
+id-rule = ""
+schema = { form = "fields", fields = ["Serves"] }
+writer = "tier2-review.js"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "journal"
+tag = "record.journal"
+layer = ""
+home = "memory/builds/*/prompts/*.md"
+id-rule = ""
+schema = { form = "fields", fields = ["Serves"] }
+writer = "hand"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "research"
+tag = "record.research"
+layer = ""
+home = "memory/builds/*/build/*.md"
+id-rule = ""
+schema = { form = "fields", fields = ["Serves"] }
+writer = "hand"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "run-record"
+tag = "record.run-record"
+layer = ""
+home = ""
+id-rule = ""
+schema = { form = "header", fields = [] }
+writer = "runlog.py record --write"
+readers = []
+lifecycle = ""
+check = "runlog record schema"
+
+[[record-kind]]
+name = "backlog-row"
+tag = "record.backlog-row"
+layer = ""
+home = ""
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "hand"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "design-record"
+tag = "record.design-record"
+layer = ""
+home = "memory/builds/*/build/*-architecture-v*.md"
+id-rule = ""
+schema = { form = "fields", fields = ["Serves"] }
+writer = "hand"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "dossier"
+tag = "record.dossier"
+layer = ""
+home = ""
+id-rule = ""
+schema = { form = "header", fields = [] }
+writer = "hand"
+readers = []
+lifecycle = ""
+check = "codebase-map gate coverage"
+
+[[record-kind]]
+name = "deviation"
+tag = "record.deviation"
+layer = ""
+home = "memory/builds/*/build/*-build-*-deviation-*.md"
+id-rule = "<date>-build-<unit id>-deviation-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.deviation.required", fields = ["Departs from", "Hand-off", "Before", "After", "Cause", "Reason", "Evidence", "Risk", "Approver", "Follow-through", "Caused-by"] }
+writer = "hand"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "exception"
+tag = "record.exception"
+layer = ""
+home = "memory/builds/*/build/*-build-*-exception-*.md"
+id-rule = "<date>-build-<unit id>-exception-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.exception.required", fields = ["Principle", "Excuses", "Reason", "Caused-by"] }
+writer = "build_records.py new exception"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "override"
+tag = "record.override"
+layer = ""
+home = "memory/builds/*/build/*-build-*-override-*.md"
+id-rule = "<date>-build-<unit id>-override-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.override.required", fields = ["Rule", "Words", "Session", "Value", "Caused-by"] }
+writer = "build_records.py new override"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "change"
+tag = "record.change"
+layer = ""
+home = "memory/builds/*/build/*-build-*-change-*.md"
+id-rule = "<date>-build-<unit id>-change-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.change.required", fields = ["Unit", "Action", "Before", "After", "Mark", "Proof", "Caused-by"] }
+writer = "build_records.py new change"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "red-fix"
+tag = "record.red-fix"
+layer = ""
+home = "memory/builds/*/build/*-build-*-red-fix-*.md"
+id-rule = "<date>-build-<unit id>-red-fix-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.red-fix.required", fields = ["Leg", "Red line", "Files", "Commit", "Rerun", "Caused-by"] }
+writer = "build_records.py new red-fix"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "disposition"
+tag = "record.disposition"
+layer = ""
+home = "memory/builds/*/build/*-build-*-disposition-*.md"
+id-rule = "<date>-build-<unit id>-disposition-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.disposition.required", fields = ["Item", "Disposition", "Channel", "Caused-by"] }
+writer = "build_records.py new disposition"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "acceptance"
+tag = "record.acceptance"
+layer = ""
+home = "memory/builds/*/build/*-build-*-acceptance-*.md"
+id-rule = "<date>-build-<unit id>-acceptance-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.acceptance.required", fields = ["Sha", "Writer", "Caused-by"] }
+writer = "loop_witness.py acceptance"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "transition"
+tag = "record.transition"
+layer = ""
+home = "memory/builds/*/build/*-build-*-transition-*.md"
+id-rule = "<date>-build-<unit id>-transition-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.transition.required", fields = ["Build", "From", "To", "Item", "Sha"] }
+writer = "loop_transition.py record"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "recommendation"
+tag = "record.recommendation"
+layer = ""
+home = "memory/builds/*/build/*-build-*-recommendation-*.md"
+id-rule = "<date>-build-<unit id>-recommendation-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.recommendation.required", fields = ["Stage", "Score", "Source", "Binds", "Reason", "Role", "Caused-by"] }
+writer = "build_records.py new recommendation"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "widen"
+tag = "record.widen"
+layer = ""
+home = "memory/builds/*/build/*-build-*-widen-*.md"
+id-rule = "<date>-build-<unit id>-widen-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.widen.required", fields = ["Population", "Keys", "Reason", "Caused-by"] }
+writer = "ratchet.py widen"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "leg-tail"
+tag = "record.leg-tail"
+layer = ""
+home = "memory/builds/*/build/*-build-*-leg-tail-*.md"
+id-rule = "<date>-build-<unit id>-leg-tail-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.leg-tail.required", fields = ["Leg", "Hash", "Run", "Sha", "Cause"] }
+writer = "keep_tails.py"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "flake"
+tag = "record.flake"
+layer = ""
+home = "memory/builds/*/build/*-build-*-flake-*.md"
+id-rule = "<date>-build-<unit id>-flake-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.flake.required", fields = ["Run", "Ended", "Sha", "Tree", "Legs"] }
+writer = "verdict_flow.py flakes"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "gate-health"
+tag = "record.gate-health"
+layer = ""
+home = "memory/builds/*/build/*-build-*-gate-health-*.md"
+id-rule = "<date>-build-<unit id>-gate-health-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.gate-health.required", fields = ["Measured", "Verdicts", "Legs"] }
+writer = "drift_report.py --gate-health --write"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "card"
+tag = "record.card"
+layer = ""
+home = "memory/builds/*/build/*-build-*-card-*.md"
+id-rule = "<date>-build-<unit id>-card-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.card.required", fields = ["Build", "Step", "Ref"] }
+writer = "manifest-check.sh --card --follow"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "probe-trigger"
+tag = "record.probe-trigger"
+layer = ""
+home = "memory/builds/*/build/*-build-*-probe-trigger-*.md"
+id-rule = "<date>-build-<unit id>-probe-trigger-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.probe-trigger.required", fields = ["Cause", "Asker", "Subject", "At", "Key"] }
+writer = "probe.py trigger"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
+
+[[record-kind]]
+name = "probe"
+tag = "record.probe"
+layer = ""
+home = "memory/builds/*/build/*-build-*-probe-*.md"
+id-rule = "<date>-build-<unit id>-probe-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.probe.required", fields = ["Sha", "Kind", "Question", "Losing", "Asker", "Trigger"] }
+writer = "probe.py pin"
+readers = []
+lifecycle = ""
+check = "memory hygiene"
