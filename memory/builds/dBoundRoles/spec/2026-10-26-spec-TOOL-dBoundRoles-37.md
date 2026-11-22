@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-37 — govkit's roles install case derives the agent types and house overlays it expects from the roster and the seed rows, so no roster change leaves a typed count to red
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -16,6 +16,7 @@
 | [2026-10-26-prompt-TOOL-dBoundRoles-37-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-37-round1-fix-brief.md) | research | TOOL-dBoundRoles-40 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-1-reground-e-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-1-reground-e-brief.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief.md) | journal | TOOL-dBoundRoles-14 TOOL-dBoundRoles-2 TOOL-dBoundRoles-1 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-49 TOOL-dBoundRoles-16 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-15 |
+| [2026-11-22-prompt-TOOL-dBoundRoles-37-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-37-build-brief.md) | journal | — |
 | [2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 |
 
 <!-- /gen:spec-records -->
