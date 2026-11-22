@@ -36,7 +36,11 @@ reference; this page is the short version.
    `<!-- gov:fact key=<key> class=<class> -->`. The key names what the value was cut from:
    `record:<path>@<12 hex>` for a record or the card, `blob:<path>@<12 hex>:1-<n>` for `input:code`,
    `cmd:` for a typed argument. The class, `witnessed`, `decided` or `claimed`, is derived from the key
-   and its source, never typed. `handoff.py facts --build <slug> --unit <id> --input prompt=<brief>
+   and its source, never typed. The content follows its fact line inside a fence of backticks one
+   longer than any backtick run it holds, so a fact line or `gov:handoff` marker line the content
+   quotes, as a spec often does, is read as text, never as a fact or a marker. A render whose task
+   would end inside an unclosed fence is refused, naming the block and the line, and nothing is
+   written. `handoff.py facts --build <slug> --unit <id> --input prompt=<brief>
    --input spec=<spec>` prints the same cut as one JSON list for a caller that hands it on: the unit
    harness takes it as `facts` wherever `roles.builder` travels, and refuses a call without it.
    Its `gov:handoff` marker line names the item the work order was cut for as `item=`: pass
@@ -259,6 +263,9 @@ until an owner writes its first row.
 - A handoff whose handed fact moved: a `blob:` or `record:` key whose source now holds other bytes
   than the ones it was cut from, or none. The refusal names the key and both blob ids. Re-render the
   handoff, which cuts it fresh. A handoff rendered before fact lines existed carries none and passes.
+  A fact line or marker line inside a fence is content and is neither re-cut nor counted.
+- A handoff whose `## Task` section ends inside a fence that never closes. The refusal names the line
+  of the file the fence opened at. Re-render the handoff.
 - A tool write to `.claude/roles.json`, or to the agent file `.claude/agents/<role>.md` of a role the
   index names, from any writer, the main session included. `render_agents.py --write` is their one
   writer. Your own files under `.claude/agents/` are not affected. The policy kit's commit guard also

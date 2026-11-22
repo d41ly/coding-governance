@@ -300,8 +300,16 @@ digits of the git blob id with CRLF folded, `card/<session id>` read through scr
 outside the checkout refuses, as `fact: <key> was cut at <old>, and its source now reads <new>:
 re-render the handoff, which cuts it fresh`. A `cmd:` key rides the `task-sha` and is not re-run, and a
 handoff rendered before the fact line carries none and re-derives nothing. The spawn is the act launch,
-so a role is never handed a fact its source no longer holds. It reads every line matching the grammar,
-so content that quotes a fact line is read as one until the handed blocks are fenced.
+so a role is never handed a fact its source no longer holds.
+Handed content is fenced (TOOL-dBoundRoles-38): the renderer writes each handed value inside a backtick
+fence one longer than the content's longest backtick run, the fact line outside and before it. Every
+marker count and the fact re-cut read only the lines scratch-guard's exported `readUnfencedLines` yields,
+the roles kit's `read_unfenced_lines` spelled again,
+so a fact line or marker line inside a fence is content: a spec that quotes either is never counted or
+re-cut. `extractHandoffMarker`, which the format guard's `readHandoffVia` also calls, walks it the same
+way. A file whose `## Task` section ends inside a fence would hide every later fact line, so it is
+refused, naming the line of the file the fence opened at. A handoff rendered before the fence carries
+unfenced content, read as before.
 Then the card check (TOOL-dBoundRoles-3 S5): a marker whose `item=` is a tag, a work order cut for one
 item, is admitted only when the payload session's orientation card routes the marker's `unit=`. The card
 is read through scratch-guard's `readCard`, its path the kickoff checker's `--card --path --session <sid>`

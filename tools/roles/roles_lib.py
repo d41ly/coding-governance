@@ -16,7 +16,9 @@ two into the agent file's body, the block R5 measures against the role's `budget
 `render_role_section` is the one composition of a handoff's `## Role` section and `derive_section_sha` the
 one hash of it, so the role index's `role-sha` and a handoff marker's are one value (TOOL-dBoundRoles-6).
 `derive_fact_key` is the one key of a handed fact and `derive_fact_class` its one class, written on the
-`FACT_RE` line `render_fact_line` composes (TOOL-dBoundRoles-13). Stdlib only; every text read
+`FACT_RE` line `render_fact_line` composes (TOOL-dBoundRoles-13). `render_handed_fence` fences each handed
+value and `read_unfenced_lines` is the one fence walker every reader of a fact or marker line walks, so a
+line quoted inside handed content is content (TOOL-dBoundRoles-38). Stdlib only; every text read
 folds CRLF to LF and names its encoding.
 
 The front-matter grammar: a `---` block at line 1, one `key: value` per line at COLUMN 0, values kept
@@ -102,7 +104,8 @@ MARKER_RE = re.compile(r"^<!-- gov:handoff role=(?P<role>\S+) build=(?P<build>\S
                        r"role-sha=(?P<role_sha>[0-9a-f]{12}) task-sha=(?P<task_sha>[0-9a-f]{12}) -->$", re.M)
 #: A handed fact's line (TOOL-dBoundRoles-13 S3): the one grammar of the line `render_handoff` writes atop each
 #: `reads` block, its key `derive_fact_key`'s and its class `derive_fact_class`'s; the hooks kit's spawn guard
-#: spells it again, as a kit imports no sibling kit.
+#: spells it again, as a kit imports no sibling kit. A text's fact lines are read only on the lines
+#: `read_unfenced_lines` yields, so a fact line quoted inside handed content is content (TOOL-dBoundRoles-38 S4).
 FACT_RE = re.compile(r"^<!-- gov:fact key=(?P<key>\S+) class=(?P<class>witnessed|decided|claimed) -->$", re.M)
 #: The `--input` names whose value is typed on the command line rather than read from a file: each is keyed
 #: `cmd:` over the fixed argv `--input`, NUL, `<name>`, which is how `derive_fact_class` tells it `claimed`.
@@ -747,13 +750,47 @@ def extract_microformat_shapes(text):
     return shapes
 
 
+def read_unfenced_lines(text):
+    """`(line number, line)` for every line of `text` outside a fence, then `(opened at, None)` when the
+    text ends inside one (TOOL-dBoundRoles-38 S3). A fence opens on a line of at most three spaces of
+    indent and then three or more backticks or three or more tildes, and closes only on a line of the
+    same character whose run is at least as long, with nothing after it but whitespace; a fence line is
+    yielded by neither end. The hooks kit's `readUnfencedLines` is the same walker. `tree_lib.unfenced_lines`'
+    shape, copied with the length rule: a shorter run inside a longer fence is content."""
+    fence, opened_at = "", 0
+    for n, line in enumerate(str(text).split("\n"), 1):
+        m = re.match(r" {0,3}(`{3,}|~{3,})(.*)", line, re.S)
+        if not fence:
+            if m:
+                fence, opened_at = m.group(1), n
+                continue
+            yield n, line
+        elif m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) \
+                and re.fullmatch(r"[ \t\r]*", m.group(2)):
+            fence = ""
+    if fence:
+        yield opened_at, None
+
+
+def render_handed_fence(content):
+    """`content` between an opening and a closing line of backticks and nothing else, the run one more
+    than the longest run of backticks anywhere in `content` and at least three, so no line of it can
+    close the fence (TOOL-dBoundRoles-38 S1). The content's bytes sit unchanged between the opening
+    line's newline and the closing line; an empty value is an empty fence."""
+    content = str(content)
+    bar = "`" * max([3] + [len(run) + 1 for run in re.findall(r"`+", content)])
+    return "%s\n%s%s%s" % (bar, content, "" if not content or content.endswith("\n") else "\n", bar)
+
+
 def extract_prompt_marker(prompt):
     """The `MARKER_RE` match of the marker line an `Agent` prompt opens with, read as the hooks
-    kit's spawn guard reads it (its rule 6): exactly one line, carriage returns removed, is a whole
-    marker line, and it is the prompt's first line once CRLF is folded, the two ends trimmed and
-    that line's trailing whitespace dropped. None otherwise (TOOL-aOrientedCast-25)."""
+    kit's spawn guard reads it (its rule 6): exactly one line outside every fence, carriage returns
+    removed, is a whole marker line, and it is the prompt's first line once CRLF is folded, the two ends
+    trimmed and that line's trailing whitespace dropped. None otherwise (TOOL-aOrientedCast-25); a marker
+    line inside a fence is handed content and is not counted (TOOL-dBoundRoles-38 S4)."""
     text = str(prompt)
-    marks = [ln for ln in (raw.replace("\r", "") for raw in text.split("\n")) if MARKER_RE.fullmatch(ln)]
+    marks = [ln for ln in (raw.replace("\r", "") for _n, raw in read_unfenced_lines(text) if raw is not None)
+             if MARKER_RE.fullmatch(ln)]
     first = text.replace("\r\n", "\n").strip().split("\n")[0].rstrip()
     return MARKER_RE.fullmatch(first) if len(marks) == 1 and first == marks[0] else None
 

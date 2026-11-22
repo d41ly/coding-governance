@@ -422,15 +422,18 @@ def read_note_refs(text, path) -> list[dict]:
 
 def read_handoff_edges(text, path) -> list[dict]:
     """A work order's `gov:handoff` marker, read by the roles kit's `MARKER_RE`: its `unit=`, where it
-    names one, and its `build=` as `serves` targets."""
+    names one, and its `build=` as `serves` targets. Only the lines the roles kit's `read_unfenced_lines`
+    yields are read, so a marker quoted inside a fence, handed content included, is no edge (TOOL-dBoundRoles-38 S4)."""
     from policy_value import resolve_kit_dir
     roles = resolve_kit_dir("roles", "roles_lib.py", KIT_DIR)
     if str(roles) not in sys.path:
         sys.path.append(str(roles))
-    from roles_lib import MARKER_RE
+    from roles_lib import MARKER_RE, read_unfenced_lines
     edges = []
-    for m in MARKER_RE.finditer(text):
-        n = text.count("\n", 0, m.start()) + 1
+    for n, line in read_unfenced_lines(text):
+        m = MARKER_RE.fullmatch(line) if line is not None else None
+        if not m:
+            continue
         targets = [t for t in (m.group("unit"), m.group("build")) if t != "-"]
         edges.append({"path": path, "line": n, "type": "serves", "targets": targets, "site": "work-order"})
     return check_site_targets(edges, path)

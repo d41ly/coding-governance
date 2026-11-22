@@ -131,7 +131,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +9 for arm 33 (TOOL-dBoundRoles-17).
 # +2 for arm 34 (TOOL-dBoundRoles-13).
 # +9 for arm 35 (TOOL-dBoundRoles-3).
-FLOOR_ASSERTIONS=140
+# +6 for arm 36 (TOOL-dBoundRoles-38).
+FLOOR_ASSERTIONS=146
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1066,7 +1067,7 @@ check_arm "arm 21 a profile level edited with no re-render is a drifted index, n
 # ---- reverted so `brief:prompt` reads a `### prompt` sub-head, which renders no block and passes
 # ---- the empty one.
 build_fixture; _rc22=$?
-A22=$("$PY" -B -c 'import pathlib, sys
+A22=$("$PY" -B -c 'import pathlib, re, sys
 fx, kit = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve()
 sys.path.insert(0, str(kit))
 import handoff, roles_lib as lib
@@ -1083,7 +1084,9 @@ for prompt in (lines, ""):
     try:
         task = handoff.render_handoff(fx, sys.argv[3], lib.resolve_charter_path(fx),
                                       "gov-spec-writer", keys, "bx", "TOOL-bx-1", None, {}, None)[2]
-        print("rendered %d" % ("### brief:prompt\n\n" + lines + "\n### brief:goal\n" in task))
+        # the block's fact line (TOOL-dBoundRoles-13) and the fence its content sits in (TOOL-dBoundRoles-38)
+        print("rendered %d" % bool(re.search(r"### brief:prompt\n\n<!-- gov:fact key=record:\S+ class=\w+ -->\n\n```\n"
+                                             + re.escape(lines) + r"```\n\n### brief:goal\n", task)))
     except lib.RolesError as e:
         print("refused %d" % str(e).split("\n")[0].startswith("brief:prompt — "))
 ' "$FX" "$FX/$KREL" "$MR" 2>&1)
@@ -1124,6 +1127,8 @@ for up in ("rows.txt", None):
     task = handoff.render_handoff(fx, mr, lib.resolve_charter_path(fx), "gov-builder", keys, "bx", "TOOL-bx-1",
                                   None, {}, None, upstream=up)[2]
     block = task.split("### upstream:rows\n\n", 1)[1] if "### upstream:rows\n\n" in task else ""
+    # past the block's fact line (TOOL-dBoundRoles-13) and its fence's opening line (TOOL-dBoundRoles-38)
+    block = re.sub(r"\A<!-- gov:fact key=record:\S+ class=\w+ -->\n\n```\n", "", block)
     if up:
         print("rendered %d" % (block.startswith(rows) and all(w in block for w in ("## Upstream", "used", "bypassed", "not-applicable"))))
     else:
@@ -2008,6 +2013,89 @@ mv "$FX/$FXL" "$TMP_ROOT/a35-loop"
 check_refused35 "arm 35 AC6 with the loop kit taken away the render exits 1 naming no loop kit" \
   'no loop kit' --role gov-builder --item item.build.unit --allowance "$FXK/handoff.py" --input "spec=$A35S"
 mv "$TMP_ROOT/a35-loop" "$FX/$FXL"
+
+# ---- arm 36 (TOOL-dBoundRoles-38 AC1 AC2 AC4): handed content fenced, and every reader of a fact or marker line
+# ---- skipping what a fence holds. The fixture's gov-spec-writer reads its brief fields and `field.input.spec?`, as
+# ---- `task:` needs the kickoff checker and `card:` the session's card, which a roles-kit fixture lacks; the build
+# ---- holds a brief record. The scratch spec quotes, inside a three-backtick fence, a `### input:spec` heading and a
+# ---- fact line keyed to a record that does not exist, then a heading-then-fact pair and a whole marker line of
+# ---- its own. `handoff.py render --stdout` exits 0; the fact lines `read_unfenced_lines` yields are one per handed
+# ---- block, none the spec's; `extract_prompt_marker` reads the render's own marker; and the playbook kit's
+# ---- `read_handoff_edges` reads one edge, that marker's. `render_handed_fence` sizes its fence one past the
+# ---- longest run, and the walker yields nothing from inside a four-backtick fence holding a three-backtick line.
+# ---- A card whose route opens a fence nothing closes makes the researcher's render exit 1 naming `## Card` and
+# ---- the line, writing nothing. The failing cases, owed at the close and not observed by the pass that wrote
+# ---- this: `render_handoff` writing the content unfenced, so the spec's planted fact and marker are read, and
+# ---- the render with its open-fence step cut out, which writes the file. WHAT IT DOES NOT CHECK: a typed
+# ---- value left unfenced, which TOOL-dBoundRoles-45 narrows S2 to, or a fence opened in a work-order block.
+build_fixture; _rc36=$?
+sed 's/^reads: .*/reads: field.brief.prompt, field.brief.goal, field.brief.items, field.brief.acceptance, field.brief.gates, field.brief.non-goals, field.input.spec?/' \
+  "$FX/$FXK/agents/gov-spec-writer.agent.md" > "$TMP_ROOT/a36.role" && cp "$TMP_ROOT/a36.role" "$FX/$FXK/agents/gov-spec-writer.agent.md"
+A36P="$FX/$MR/builds/tFix/prompts"; A36S="$MR/builds/tFix/spec/2026-11-22-spec-TOOL-tFix-1.md"; A36E="$TMP_ROOT/a36.err"
+mkdir -p "$A36P" "$FX/$MR/builds/tFix/spec"
+"$PY" -B -c 'import pathlib, sys
+fx, spec = pathlib.Path(sys.argv[1]), sys.argv[2]
+heads = ("Goal", "Items", "Acceptance", "Gates", "Non-goals")
+(fx / pathlib.Path(spec).parent.parent / "prompts" / "2026-11-22-prompt-TOOL-tFix-1-brief.md").write_text(
+    "# Brief\n\n## The prompt\n\n> owner words\n\n## The brief\n\n" + "".join("### %s\n\n%s text\n\n" % (h, h) for h in heads),
+    encoding="utf-8", newline="\n")
+fact = "<!-- gov:fact key=record:%s/builds/tFix/nothing.md@0123456789ab class=decided -->" % sys.argv[3]
+mark = ("<!-- gov:handoff role=gov-spec-writer build=tFix unit=TOOL-tFix-1 item=- path=%s/builds/tFix/prompts/x.md "
+        "role-sha=0123456789ab task-sha=0123456789ab -->" % sys.argv[3])
+(fx / spec).write_text("# TOOL-tFix-1\n\n```\n### input:spec\n\n%s\n```\n\n### input:spec\n\n%s\n\n%s\n" % (fact, fact, mark),
+                       encoding="utf-8", newline="\n")' "$FX" "$A36S" "$MR"
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-spec-writer --build tFix --unit TOOL-tFix-1 \
+   --input "spec=$A36S" --stdout > "$TMP_ROOT/a36.out" 2>"$A36E"); _rc=$?
+A36=$("$PY" -B -c 'import pathlib, sys
+kit = pathlib.Path(sys.argv[2]); sys.path.insert(0, str(kit))
+import roles_lib as lib
+text = pathlib.Path(sys.argv[1]).read_bytes().decode("utf-8")
+task = text[text.index("\n## Task\n") + 1:]
+lines = [l for _n, l in lib.read_unfenced_lines(task) if l is not None]
+facts = [l for l in lines if lib.FACT_RE.fullmatch(l)]
+heads = [l for l in lines if l.startswith("### ") and l[4:].split(":")[0] in ("brief", "input")]
+print("facts %d" % (len(facts) == len(heads) == 7 and not any("nothing.md" in f for f in facts)))
+own = lib.MARKER_RE.search(text)
+hit = lib.extract_prompt_marker(own.group(0) + "\n\n" + task)
+print("marker %d" % bool(hit and hit.group(0) == own.group(0) and "/prompts/2026-" in hit.group("path")))
+try:
+    play = lib.resolve_kit_dir("playbook", "edge_grammar.py", kit)
+except LookupError:
+    play = None
+if play is None:
+    print("edges skip")
+else:
+    sys.path.insert(0, str(play))
+    import edge_grammar
+    edges = edge_grammar.read_handoff_edges(text, "x.md")
+    print("edges %d" % (len(edges) == 1 and edges[0]["line"] == text[:own.start()].count("\n") + 1))
+f6, f3 = lib.render_handed_fence("a ````` b"), lib.render_handed_fence("plain")
+inner = "\n".join(["before", "````", "inside", "```", "still inside", "````", "after"])
+print("fence %d" % (f6 == "``````\na ````` b\n``````" and f3 == "```\nplain\n```"
+                    and [l for _n, l in lib.read_unfenced_lines(inner)] == ["before", "after"]))
+' "$TMP_ROOT/a36.out" "$HERE" 2>&1); A36=${A36//$'\r'/}
+check_arm "arm 36 AC1 the spec writer's render handing a spec that quotes facts and a marker exits 0" \
+   "$([ "$_rc36" = 0 ] && [ "$_rc" = 0 ] && echo 1 || { sed 's/^/    /' "$A36E" >&2; echo 0; })"
+check_arm "arm 36 AC1 ...the unfenced fact lines are one per handed block, none of them the spec's" \
+   "$([[ $A36 == *"facts 1"* ]] && echo 1 || echo 0)"
+check_arm "arm 36 AC1 ...extract_prompt_marker reads the render's own marker" "$([[ $A36 == *"marker 1"* ]] && echo 1 || echo 0)"
+if [[ $A36 == *"edges skip"* ]]; then
+  echo "SKIP arm 36 edges — no playbook kit holding edge_grammar.py was found from $KREL"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-1))
+else
+  check_arm "arm 36 AC1 ...read_handoff_edges reads one edge, the render's own marker's" "$([[ $A36 == *"edges 1"* ]] && echo 1 || echo 0)"
+fi
+check_arm "arm 36 AC2 render_handed_fence runs one past the longest backtick run, and a shorter run closes no fence" \
+   "$([[ $A36 == *"fence 1"* ]] && echo 1 || echo 0)"
+[[ $A36 == *"facts 1"*"marker 1"* && $A36 == *"fence 1"* ]] || printf '    %s\n' "${A36//$'\n'/$'\n'    }"
+mkdir -p "$FX/.claude" && printf '%s\n' '[.claude/orientation-card.md · Level 1 · the card]' '## route' '- build: tFix' '````' \
+  '- unit: TOOL-tFix-1' '[/.claude/orientation-card.md]' > "$FX/.claude/orientation-card.md"
+_ls=$(ls -A "$A36P")
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-researcher --build tFix --unit TOOL-tFix-1 \
+   --input "question=which mechanism fits" >/dev/null 2>"$A36E"); _rc=$?
+check_arm "arm 36 AC4 a card route opening a fence nothing closes exits 1 naming ## Card and the line, writing nothing" \
+   "$([ "$_rc" = 1 ] && grep -qF -- '## Card — a fence opened at line' "$A36E" && [ "$(ls -A "$A36P")" = "$_ls" ] && echo 1 || echo 0)"
+[ "$_rc" = 1 ] || { printf '    exit %s, want 1\n' "$_rc"; sed 's/^/    /' "$A36E"; }
+rm -f "$FX/.claude/orientation-card.md"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

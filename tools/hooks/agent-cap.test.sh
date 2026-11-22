@@ -681,6 +681,26 @@ ftask = task + "\n### input:spec\n\n<!-- gov:fact key=record:%s@%s class=claimed
 faced = pre + "2026-10-11-prompt-T-1-4-researcher.md"
 MF = render_marker(faced, ftask)
 write_prompt_file(faced, MF, ftask)
+# TOOL-dBoundRoles-38 - handed content fenced: a spec quoting a three-backtick fence that holds a heading and a
+# fact line keyed to no file, then a whole marker line, handed under its own record: key inside a four-backtick
+# fence; `moved` is that handoff with the quoted marker hand-moved below the fence, `open` one whose task section
+# ends inside the fence, each re-hashed so its digest holds.
+qspec = "memory/builds/bx/spec/quoted.md"
+qmark = render_marker(pre + "2026-10-11-prompt-T-1-9-researcher.md", task)
+qraw = ("```\n### input:spec\n\n<!-- gov:fact key=record:memory/builds/tFix/nothing.md@0123456789ab class=claimed -->\n"
+        "```\n" + qmark + "\n").encode("utf-8")
+with open(os.path.join(root, qspec), "wb") as f:
+    f.write(qraw)
+qfact = "<!-- gov:fact key=record:%s@%s class=claimed -->" % (qspec, hashlib.sha1(b"blob %d\0" % len(qraw) + qraw).hexdigest()[:12])
+qhead = task + "\n### input:spec\n\n" + qfact + "\n\n````\n"
+qtask = qhead + qraw.decode("utf-8") + "````\n"
+mtask = qhead + qraw.decode("utf-8").replace(qmark + "\n", "") + "````\n" + qmark + "\n"
+otask = qhead + qraw.decode("utf-8")
+fenced, moved, opened = (pre + "2026-10-11-prompt-T-1-%d-researcher.md" % k for k in (6, 7, 8))
+MQ, MM, MO = render_marker(fenced, qtask), render_marker(moved, mtask), render_marker(opened, otask)
+write_prompt_file(fenced, MQ, qtask)
+write_prompt_file(moved, MM, mtask)
+write_prompt_file(opened, MO, otask)
 prompts = {
     "ok": M + "\n\n" + task,
     "crlf": ("\n\n" + M + "\n\n" + task + "\n\n").replace("\n", "\r\n"),
@@ -699,6 +719,9 @@ prompts = {
     "dash": MD + "\n\n" + task,
     "rerendered": MR + "\n\n" + task,
     "fact": MF + "\n\n" + ftask,
+    "fenced": MQ + "\n\n" + qtask,
+    "moved": MM + "\n\n" + mtask,
+    "open": MO + "\n\n" + otask,
 }
 for k, v in prompts.items():
     with open(out + "." + k, "w", newline="") as f:
@@ -823,6 +846,15 @@ run_spawn "rule6 BR13 AC3: the spec moved after rendering refused, naming its re
 run_spawn "rule6 BR13 AC3: ...and naming the re-render that cuts it fresh" 2 gov-researcher fact "re-render the handoff, which cuts it fresh"
 write_handoff
 run_spawn "rule6 BR13 AC3: ...and the handoff re-rendered after the move admitted" 0 gov-researcher fact ""
+# TOOL-dBoundRoles-38 AC3 AC4 - handed content fenced. The `fenced` handoff's spec quotes a fact line keyed to no
+# file and a whole marker line, both inside the four-backtick fence, and is admitted: neither is counted nor
+# re-cut. The `moved` copy carries the quoted marker below the fence and is refused naming 2 marker lines; the
+# `open` one's task section ends inside the fence and is refused naming the line it opened at. Against an
+# extractHandoffMarker that walks every line, the first row is refused naming 2 marker lines; against a
+# checkHandoffSpawn with its open-fence step cut out, the last row is admitted or refused for another reason.
+run_spawn "rule6 BR38 AC3: a handoff whose fenced content quotes a marker and a fact line is admitted" 0 gov-researcher fenced ""
+run_spawn "rule6 BR38 AC3: the quoted marker hand-moved outside the fence refused, naming 2 marker lines" 2 gov-researcher moved "carries 2 gov:handoff marker lines"
+run_spawn "rule6 BR38 AC4: a task section ending inside a fence refused, naming the line it opened at" 2 gov-researcher open "ends inside a fence opened at line 23 of the file"
 # TOOL-dBoundRoles-6 AC4 — role-sha compared at spawn. The index is re-rendered after the researcher's
 # body gained one line, so it carries HO_RSHA2; the `ok` handoff was rendered before it and carries
 # HO_RSHA. Against checkHandoffSpawn with its role-sha step cut out, the first row is admitted.
