@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-8 — the whole-tree readers clone without copying objects and check out only what they read
 
-**Status:** SPECCED · rev-5 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2 · ratified 2026-11-20
+**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
