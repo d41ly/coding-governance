@@ -1,6 +1,6 @@
 # KICK-dKeptSession-39 — `mailbox-message` a typed record kind, served as itself and joined to its file name both ways
 
-**Status:** INPROGRESS · rev-5 · 2026-11-23 · node a · Tier-2 · base f81e565e · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-6 · 2026-11-23 · node a · Tier-2 · base f81e565e · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -131,10 +131,12 @@ The counting sentence's opening, `The sixteen after` then the backticked `resear
 typed kinds:`, becomes:
 
 ```
-The kinds after `research` are the typed kinds, `TYPED_RECORD_KINDS` in `{{KIT_DIR}}/tree_lib.py`:
+The typed kinds, `TYPED_RECORD_KINDS` in `{{KIT_DIR}}/tree_lib.py`, are those after `research`:
 ```
 
-The rest of that sentence, the file-name grammar and the two-way join, stays as it is. The builder
+The new sentence must not open with `The` and one word before the backticked `research`, because
+AC4's count pattern matches that shape for any count word, the word `kinds` included. The rest of
+that sentence, the file-name grammar and the two-way join, stays as it is. The builder
 re-wraps the bullet's lines to the guide's width. It then writes the dogfood copy with the parity
 suite's `--render` mode (`tools/memory-tree/kit-dogfood-parity.test.sh`), which renders
 `{{KIT_DIR}}` as `tools/memory-tree`. That render rewrites all four live copies, and the other three
@@ -231,10 +233,12 @@ heading, a blank line and its Serves line.
   '<id>', 1)[0]]])"` runs, it prints both paths, each beside two empty lists. And
   `grep -n 'TYPED_RECORD_KINDS' tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md` finds the
   bullet's pointer in each file.
-  Red when: the closed list omits a member of the tuple, still counts the typed kinds, or the
-  dogfood copy was not re-rendered.
-  figure: DERIVED, the tuple read at observation time; today it prints `['mailbox-message']` and
-  the sixteen sentence for each file.
+  Red when: the closed list omits a member of the tuple, still counts the typed kinds, opens its
+  pointer sentence as `The <word> after` the backticked `research`, or the dogfood copy was not
+  re-rendered.
+  figure: DERIVED, the tuple read at observation time. PINNED at b2303b53b: the probe prints
+  `['mailbox-message']` and the sixteen sentence for each file, and over §4's text applied to the
+  template, raw and rendered, it prints two empty lists.
 
 ## 7. Gates
 
@@ -282,6 +286,12 @@ No `New arm:` line: the unit adds and moves no arm.
   tuple in both files. §4 cites the `typed-kinds` plant by `run_fixture`, re-pins
   `tools/push-main.sh` at its current blob, and says why each other shipped text naming the kind
   stays true. Nothing narrowed.
+- rev-6 · 2026-11-23 · §4 · AC4 · the builder's divergence on run wf_26b710f4-4e9, under the
+  main loop's ruling (b): §4's pointer sentence opened `The kinds after` the backticked `research`,
+  which AC4's count pattern matches, so AC4 could never print two empty lists. The sentence now
+  reads `The typed kinds, ... are those after` the backticked `research`, and §4 says why. AC4's
+  pattern is unchanged, and its Red when and figure lines now name that shape and pin the probe at
+  b2303b53b. Nothing narrowed.
 
 ## 10. Reuse audit
 
