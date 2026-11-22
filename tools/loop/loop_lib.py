@@ -59,7 +59,8 @@ Each item declares one actor of one kind (TOOL-dDeclaredLoop-9): `<kind>:<name>`
 and `returns`. A `role:<slot>` item, the slot a role file's stem, takes each absent one from its role:
 `read_role_defaults` reads the roles kit's catalogue through its `roles_lib.load_roles`, the kit found
 by `resolve_kit_dir` and imported inside the function, and `resolve_item_declaration` gives the item
-its role's `reads`, `writes` and `returns`, naming each field's source. `check_item_declarations`
+its role's `reads`, `writes` and `return`, the role's typed return template (TOOL-dBoundRoles-2), naming
+each field's source. `check_item_declarations`
 refuses an actor that is not one string of a declared kind, a non-role item missing a field, a role
 item's explicit field equal to its role's (a copy), and a role item's explicit `allowance` other than
 `none`. A slot the catalogue lacks prints `pending`, and every role item `unarmed` where the roles
@@ -1503,13 +1504,13 @@ def read_role_defaults(kit_dir):
 def resolve_item_declaration(item, roles):
     """`{"inputs", "allowance", "returns", "source"}` of one `[[item]]` row, `source` naming each
     field's: `item` where the row declares it, which a non-role item always does; for a `role:<slot>`
-    item's absent field, its role's `reads` split on commas, `writes` or `returns`, sourced
+    item's absent field, its role's `reads` split on commas, `writes` or `return` template, sourced
     `role:<slot>`, or None sourced `pending` where `roles` holds no such slot and `unarmed` where
     `roles` is None."""
     actor = item.get("actor")
     slot = actor[len("role:"):] if isinstance(actor, str) and actor.startswith("role:") else None
     out, source = {}, {}
-    for field, key in (("inputs", "reads"), ("allowance", "writes"), ("returns", "returns")):
+    for field, key in (("inputs", "reads"), ("allowance", "writes"), ("returns", "return")):
         if field in item or slot is None:
             out[field], source[field] = item.get(field), "item"
         elif roles is None or slot not in roles:
@@ -1555,7 +1556,7 @@ def check_item_declarations(items, roles, why):
         elif kind == "role":
             slot = form.group(2)
             role = roles.get(slot) if roles is not None else None
-            for field, key in (("inputs", "reads"), ("allowance", "writes"), ("returns", "returns")):
+            for field, key in (("inputs", "reads"), ("allowance", "writes"), ("returns", "return")):
                 if field not in row or role is None:
                     continue
                 theirs = role["keys"].get(key)

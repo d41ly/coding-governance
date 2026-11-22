@@ -13,7 +13,8 @@
     python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]
 
 `render` fills the work-order template, `templates/work-order.template.md` in this kit, whose slots are
-`role`, `roles_lib.render_role`'s output, then a `### Drive` block holding the charter's drive lines for the
+`role`, `roles_lib.render_role`'s output, closing with the role's `## Never`, `## Ceiling` and `## Return`
+sections, the ceiling's gate legs the policy's `[gates]` grant (TOOL-dBoundRoles-2 S6), then a `### Drive` block holding the charter's drive lines for the
 role where it has any (PLAY-dOrderedCharter-6); `opening`; `reads`, a block per input the role's `reads`
 declares, in that order, then the optional `input:code` every role carries (PLAY-dOrderedCharter-27): the
 text of the file `--input code=` names, measured against `memory.code-budget` by the load-set check; and
@@ -561,7 +562,11 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         values["input:" + name] = v.replace("\r\n", "\n")
     # PLAY-dOrderedCharter-11 S4: the role's load set and its block's budget, before any card or brief is read;
     # a supplied code block is measured beside it, CR stripped (PLAY-dOrderedCharter-27 S4)
-    role_text = lib.render_role(KIT_DIR, role, memory_root)
+    # TOOL-dBoundRoles-2 S6: the role closes with its never list, its ceiling and its return, the ceiling's
+    # gate legs the policy's grant, loaded as `print_role_efforts` loads it, so both routes render one block
+    roles = lib.load_roles(KIT_DIR)
+    granted = lib.load_policy(KIT_DIR, roles, lib.load_workflows(KIT_DIR)).get("gates", {})
+    role_text = lib.render_role(KIT_DIR, role, memory_root, granted.get(role, ()))
     code = values.get("input:" + CODE_INPUT)
     refused, gate = lib.check_load_set(root, KIT_DIR, [(role, len(role_text.encode("utf-8")))],
                                        [(CODE_INPUT, len(code.replace("\r", "").encode("utf-8")))] if code else [],

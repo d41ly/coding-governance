@@ -91,7 +91,8 @@ there and not empty.
 A role actor names its role by the role file's stem, such as `role:gov-builder` for
 `gov-builder.agent.md`. Its row leaves out `inputs`, `allowance` and `returns`, and takes them from
 the role file in the roles kit: `inputs` from its `reads`, `allowance` from its `writes`, and `returns`
-from its `returns`. If a role row writes one of them anyway with the role's own value, it is refused
+from its `return`, the role's typed return template, such as `outcome:committed|returned, commit:sha?`.
+If a role row writes one of them anyway with the role's own value, it is refused
 as a copy. A role row may write `allowance = "none"` to narrow its role, and no other allowance.
 A role the roles kit does not hold yet prints `pending`, and if the roles kit is not installed every
 role item prints `unarmed`. Neither is refused, and neither counts as checked.
@@ -1317,7 +1318,7 @@ flags to the factory its row names:
 python <prefix>/playbook/core.py new command <verb> --kit <id> --run <path>
 python <prefix>/playbook/core.py new policy-key <name> --allowed <toml> --default <toml> --summary <text> --usage <text> --owner <build>
 python <prefix>/playbook/core.py new hook <name> --kit <id> --event <event> [--matcher <m>]
-python <prefix>/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --returns <text> --output <text> --ceiling <bytes>
+python <prefix>/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --never <entries> --return <template> --output <text> --ceiling <bytes>
 python <prefix>/playbook/core.py new workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>
 python <prefix>/playbook/core.py new scenario <name> --extends <tag|none> --admit <fact>=<value> --entry <step tag>
 ```
@@ -1344,8 +1345,9 @@ naming it.
   gate reads tracked fragments only, so the factory runs it against a throwaway copy of your index
   holding the new files, and deletes the copy afterwards. Your own index is never written: nothing is
   staged for you.
-- **A role:** `python tools/loop/factories.py role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --returns <text> --output <text> --ceiling <bytes>` <!-- usage: script:tools/loop/factories.py#role 33094e4a -->
-  writes `<slot>.agent.md` under the roles kit's `agents/`, lists the slot in its workflow's `roles`,
+- **A role:** `python tools/loop/factories.py role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --never <entries> --return <template> --output <text> --ceiling <bytes>` <!-- usage: script:tools/loop/factories.py#role 8825562a -->
+  writes `<slot>.agent.md` under the roles kit's `agents/`, its `never` list of `<limit> — <enforcer>`
+  entries and its `return` template as the flags give them, lists the slot in its workflow's `roles`,
   adds its body ceiling to the roles checker's `BODY_CEILINGS`, and re-renders the roles README's
   catalogue. Its gate is `roles catalogue`.
 - **A workflow:** `python tools/loop/factories.py workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step>` <!-- usage: script:tools/loop/factories.py#workflow d7b86fbb -->
@@ -1666,8 +1668,8 @@ Who places is the key `placement` in `.governance/policy.toml`:
 
 - `agent-places`, the default: the orientation scout's return is the placement, given as
   `placement.py place --request <key> --return <file>`, a file of `disposition`, `build`, `playbook`,
-  `reason`, `evidence`, `observations`, `scenarios` and `facts` lines, the scout's `returns:` shape, and
-  `breakpoint` for a `breakpoint` disposition.
+  `reason`, `evidence`, `observations`, `scenarios` and `facts` lines, the fields of the scout's
+  `return:` template under its `placed` outcome, and `breakpoint` for a `breakpoint` disposition.
 - `declared-checked`: the request's own declaration is, `placement.py place --request <key> --declared
   <word> [<build>]`, and the scout's return is evidence only.
 - `owner-places`: `place` writes no disposition and prints the scout's return as evidence and

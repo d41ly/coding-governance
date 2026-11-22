@@ -18,10 +18,13 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       `## Facts`), or a practice tag repeated (exit 2)
   R1  zero role files or zero workflow entries, or a tagged charter no role's `rules` cites a tag
       of: a check that graded nothing is DEAD PROBE
-  R2  a front-matter defect: unknown, indented, repeated or missing key (`rules` may be empty;
-      `mandatory` and `output` may not, on any role);
-      `name` not the file stem; `writes` outside its set; `agent` not true/false; `tools` or
-      `model` absent on an agent role
+  R2  a front-matter defect: unknown, indented, repeated or missing key, the keys and which are
+      required read from `role-schema.toml` through `roles_lib.load_role_schema`, an absent or
+      invalid schema exit 2 (`rules` may be empty; `mandatory`, `output`, `never` and `return` may
+      not, on any role); `name` not the file stem; `writes` outside its set; `agent` not
+      true/false; `tools` or `model` absent on an agent role; a `return` template
+      `parse_return_template` refuses, a required `outcome` of a closed set among what it owes
+      (TOOL-dBoundRoles-2)
   R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` or `upstream:rows` without `?`,
       each entry read through `parse_read_key`, so `task:title` and its tag `field.task.title` are one key
   R4  a `rules` entry that is not a lowercase tag optionally ending in `?`, a tag named twice, or a
@@ -29,8 +32,10 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       prints one `roles: note:`. A pre-tag (v3.x) charter resolves no tag and prints one note
   R5  a body empty, over its slot's ceiling, carrying a `# `/`## ` line or a token other than
       {{MEMORY_ROOT}}, or spelling the file name of a protocol the charter's Protocols section
-      names; a slot with no ceiling row. The ceiling half obeys the policy kit's size switch for the
-      family cap `role-body` (TOOL-dGroundRules-9): under `warn` it prints a `BUDGET WARN` line and
+      names; a body line carrying `never`, `do not`, `don't` or `must not`, matched ignoring case as
+      whole words, one line each naming its line, since a limit lives in `never` and the body
+      states the job (TOOL-dBoundRoles-2 S3); a slot with no ceiling row. The ceiling half obeys
+      the policy kit's size switch for the family cap `role-body` (TOOL-dGroundRules-9): under `warn` it prints a `BUDGET WARN` line and
       is no defect; with no policy kit, or a refusing reader, it is a defect as before
   R6  a workflow entry with an unknown, missing or repeated key or name, a missing name of the ten,
       an unknown `driver`, or a `trigger` carrying a newline; a workflow no `[[workflow]]` row of
@@ -62,7 +67,12 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
   R13 a `mandatory` value carrying a token other than {{MEMORY_ROOT}}; or one calling its role
       mandatory (anything but `no` or `no — <when>`) whose `workflow` entry's `enforced-by` holds no
       hook entry, one whose first word is a `.js` file name, and that carries no
-      `unenforced — <why>` clause (TOOL-aOrientedCast-17)
+      `unenforced — <why>` clause (TOOL-aOrientedCast-17); and each `never` entry
+      `roles_lib.check_never_entries` refuses: no ` — `, an enforcer that is neither a script a kit
+      holds (its first word a `.js`, `.py` or `.sh` file in the tool root or one directory under
+      it), a `leg: <name>` of the tool root's gate manifest (a note where it does not read), nor
+      `unenforced — <why>` with a reason (TOOL-dBoundRoles-2 S2). The summary counts the entries
+      graded and the `unenforced` ones
   R14 an `output` value carrying a token other than {{MEMORY_ROOT}}; or a `spec`, `review`,
       `product` or `records` writer's `output` lacking its class's folder spelling from
       WRITE_FOLDERS (TOOL-aOrientedCast-17)
@@ -79,7 +89,10 @@ the tree does not hold should be installed, which is a `note` here and the wirin
 whether a cited rule suits its role; and whether a bare tag exists in every v4.x seed an adopter may
 hold. An overlay's size is printed and never graded: it is the adopter's own text. R13 reads a
 first word ending in `.js` as a hook by spelling convention alone, never asking whether that script
-exists, is wired or refuses an inline stand-in; R14 does not compare an `output` with where the role
+exists, is wired or refuses an inline stand-in. A `never` entry's script is graded for presence
+alone and its leg for a name in the manifest: whether that enforcer refuses what the entry names is a
+review question. R5's body arm sees only its four words, so a limit phrased otherwise ("you are not
+designing in this pass") passes; R14 does not compare an `output` with where the role
 actually writes; and a `mandatory` value's when-clause is never tested for truth. R15 does not check
 whether the tool truly could not spawn, whether the `owner` who signed a row is the owner, whether a
 reason says anything, whether a marker's build matches its folder, an inline stand-in nobody
@@ -94,7 +107,13 @@ import tomllib
 
 KIT_DIR = pathlib.Path(__file__).absolute().parent
 sys.path.insert(0, str(KIT_DIR))
-import roles_lib as lib  # noqa: E402  (the kit's own library, beside this file)
+try:
+    import roles_lib as lib  # noqa: E402  (the kit's own library, beside this file)
+except Exception as _e:  # the library derives its key set from role-schema.toml at import: exit 2 naming it
+    if type(_e).__name__ != "RolesError":
+        raise
+    print("roles: %s" % _e)
+    sys.exit(2)
 
 #: Bytes of each slot's BASE body, CR stripped. A new role is priced when it is added.
 BODY_CEILINGS = {
@@ -108,13 +127,14 @@ WORKFLOW_NAMES = ("orient", "research", "reuse", "handoff", "spec-write", "spec-
 WORKFLOW_KEYS = ("name", "driver", "harness", "roles", "stages", "enforced-by", "trigger")
 DRIVERS = ("agent", "workflow", "program", "main-loop")
 WRITES = ("none", "spec", "product", "review", "records")
-REQUIRED_ROLE_KEYS = ("name", "description", "workflow", "reads", "writes", "rules", "returns",
-                      "mandatory", "output")
-#: Where each writer class's output lives, spelled as `output` must carry it (R14). The product
-#: class has no single folder, so its spelling is the conf key that declares its paths.
-WRITE_FOLDERS = {"spec": "{{MEMORY_ROOT}}/builds/<slug>/spec/",
-                 "review": "{{MEMORY_ROOT}}/builds/<slug>/reviews/",
-                 "product": "ROUTED_PATHS", "records": "{{MEMORY_ROOT}}/"}
+#: The keys every role carries and those only an agent role must, and the required keys that may be
+#: empty: derived from the role schema's rows, never typed (TOOL-dBoundRoles-2 S1).
+_SCHEMA = lib.load_role_schema()
+REQUIRED_ROLE_KEYS = tuple(r["key"] for r in _SCHEMA if r["required"] == "every")
+AGENT_ROLE_KEYS = tuple(r["key"] for r in _SCHEMA if r["required"] == "agent")
+EMPTY_ROLE_KEYS = frozenset(r["key"] for r in _SCHEMA if r["empty"])
+#: Where each writer class's output lives (R14): the library's one table, which the rendered ceiling reads.
+WRITE_FOLDERS = lib.WRITE_FOLDERS
 #: A `mandatory` value calling its role optional: exactly `no`, or `no — <when it is used>` (R13).
 NOT_MANDATORY_RE = re.compile(r"^no(?: — .+)?$")
 #: A mandatory value's own statement that no hook enforces it (R13).
@@ -148,7 +168,7 @@ def render_catalogue_region(roles, workflows):
     out =["", "**Workflows**, from `workflows.toml`:", "",
            "| " + " | ".join(WORKFLOW_KEYS) + " |", "|" + "---|" * len(WORKFLOW_KEYS)]
     out += ["| " + " | ".join(render_cell(w.get(k)) for k in WORKFLOW_KEYS) + " |" for w in workflows]
-    cols = ("workflow", "writes", "reads", "rules", "agent", "returns")
+    cols = ("workflow", "writes", "reads", "rules", "agent", "return")
     out += ["", "**Roles**, from `agents/*.agent.md`:", "",
             "| role | " + " | ".join(cols) + " |", "|" + "---|" * (len(cols) + 1)]
     for slot, r in roles.items():
@@ -189,18 +209,25 @@ def check_roles(root, kit_dir, write=False):
         defects.append("roles: %s: %s — %s" % (resolve_display_path(root, path), rule, what))
 
     roles, n_reads, n_rules, n_outputs, n_mandatory, cited = {}, 0, 0, 0, 0, set()
+    n_never, n_unenforced = 0, 0
     body_mode = None  # the `role-body` cap's (mode, rule), asked at the first body over its ceiling
     for p in sorted((kit_dir / "agents").glob("*.agent.md")):
         slot = p.name[:-len(".agent.md")]
         try:
-            keys, body = lib.parse_front_matter(resolve_display_path(root, p), lib.load_text(p))
+            text = lib.load_text(p)
+            keys, body = lib.parse_front_matter(resolve_display_path(root, p), text)
         except lib.RolesError as e:
             defects.append("roles: %s" % e)
             continue
         roles[slot] = {"path": p, "keys": keys, "body": body}
         for k in REQUIRED_ROLE_KEYS:
-            if k not in keys or (k != "rules" and not keys[k]):
+            if k not in keys or (k not in EMPTY_ROLE_KEYS and not keys[k]):
                 add_defect(p, "R2", "front-matter key '%s' is missing" % k)
+        if keys.get("return"):
+            try:
+                lib.parse_return_template(keys["return"])
+            except lib.RolesError as e:
+                add_defect(p, "R2", "return '%s': %s" % (keys["return"], str(e).split(" — ", 1)[-1]))
         if keys.get("name") and keys["name"] != slot:
             add_defect(p, "R2", "name '%s' is not the file stem '%s'" % (keys["name"], slot))
         if keys.get("writes") and keys["writes"] not in WRITES:
@@ -208,7 +235,7 @@ def check_roles(root, kit_dir, write=False):
         if keys.get("agent", "true") not in ("true", "false"):
             add_defect(p, "R2", "agent '%s' is not true or false" % keys["agent"])
         if keys.get("agent", "true") == "true":
-            for k in "tools model".split():
+            for k in AGENT_ROLE_KEYS:
                 if not keys.get(k):
                     add_defect(p, "R2", "'%s' is absent on an agent role" % k)
         seen = set()
@@ -259,6 +286,23 @@ def check_roles(root, kit_dir, write=False):
             add_defect(p, "R5", "body is empty")
         if any(ln.startswith(("# ", "## ")) for ln in body.split("\n")):
             add_defect(p, "R5", "body carries a '# ' or '## ' heading line")
+        # THE BODY ARM (TOOL-dBoundRoles-2 S3): a limit lives in `never` with its enforcer, so a body line
+        # carrying a prohibition word is one defect naming its line in the file.
+        folded = text.replace("\r\n", "\n")
+        first = folded.count("\n", 0, folded.find(body, lib.FRONT_MATTER_RE.match(folded).end())) + 1
+        for i, ln in enumerate(body.split("\n")):
+            hit = lib.PROHIBITION_RE.search(ln)
+            if hit:
+                add_defect(p, "R5", "body line %d carries '%s', a limit: %r; move it to `never` as "
+                           "'<limit> — <enforcer>' and keep the job in the body" % (first + i, hit.group(0), ln.strip()))
+        entries = lib.parse_never_entries(keys.get("never", ""))
+        n_never += len(entries)
+        n_unenforced += sum(1 for _l, e in entries if e.startswith(lib.UNENFORCED_PREFIX))
+        if keys.get("never"):
+            never_notes = []
+            for what in lib.check_never_entries(keys["never"], tool_root, never_notes):
+                add_defect(p, "R13", what)
+            notes.extend("roles: note: %s: %s" % (resolve_display_path(root, p), n) for n in never_notes)
         for token in sorted(set(lib.TOKEN_RE.findall(body)) - {lib.MEMORY_ROOT_TOKEN}):
             add_defect(p, "R5", "body carries the token %s; only %s renders" % (token, lib.MEMORY_ROOT_TOKEN))
         output = keys.get("output", "")
@@ -435,9 +479,11 @@ def check_roles(root, kit_dir, write=False):
         add_defect(readme, "R11", problem)
 
     summary = ("roles: graded %d roles, %d overlays, %d workflows, %d reads keys, %d mandatory roles, "
-               "%d writer outputs, %d rule tags and %d protocol file names against %s, a %s charter; "
+               "%d writer outputs, %d never entries (%d unenforced), %d rule tags and %d protocol file "
+               "names against %s, a %s charter; "
                "overlay bytes %s; %d stand-in waiver(s), %d stand-in declaration(s); %d defect(s)" % (
-                   len(files), len(overlays), len(workflows), n_reads, n_mandatory, n_outputs, n_rules,
+                   len(files), len(overlays), len(workflows), n_reads, n_mandatory, n_outputs, n_never,
+                   n_unenforced, n_rules,
                    len(protocol_files), doc,
                    "tagged" if charter["shape"] == "tagged" else "pre-tag",
                    ", ".join("%s=%d" % kv for kv in overlays.items()) or "none",

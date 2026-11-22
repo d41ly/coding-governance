@@ -16,7 +16,11 @@ folds CRLF to LF and names its encoding.
 The front-matter grammar: a `---` block at line 1, one `key: value` per line at COLUMN 0, values kept
 RAW (a list is comma-separated on one line, the form Claude Code's own `tools:` takes). An indented,
 a repeated or an unknown key is refused, because a simple parser drops an indented key without a
-word and a repeated one silently keeps the last.
+word and a repeated one silently keeps the last. The keys are the rows of `role-schema.toml` beside
+this file, read by `load_role_schema` at import (TOOL-dBoundRoles-2): `never` is parsed by
+`parse_never_entries` and graded by `check_never_entries`, `return` by `parse_return_template`, and
+`render_role` closes a role with the `## Never`, `## Ceiling` and `## Return` sections
+`render_role_fields` composes.
 """
 import datetime
 import json
@@ -25,12 +29,6 @@ import re
 import tomllib
 
 KIT_ROLES_VERSION = "1.25"
-
-#: Every front-matter key a role file may carry: Claude Code's own, then gov's.
-#: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
-#: install-prefix ban as a kit path (TOOL-aOrientedCast-8 S14).
-FRONT_MATTER_KEYS = tuple("name description tools model maxTurns "
-                          "workflow reads writes rules returns agent mandatory output".split())
 
 #: The closed `reads` vocabulary, one literal: each family and its field names. A key is
 #: `<family>:<field>`, its tag `field.<family>.<field>` (TOOL-dBoundRoles-14), either spelling legal in a
@@ -108,6 +106,213 @@ UNRANKED_NOTE = "envelope — unarmed · no playbook kit, so the blocks render u
 
 class RolesError(Exception):
     """The one exception of this kit; its message names the file and the rule."""
+
+
+#: The role kind's field declaration beside this file (TOOL-dBoundRoles-2 S1), and the closed values of
+#: each row's three graded keys.
+ROLE_SCHEMA = "role-schema.toml"
+SCHEMA_OWNERS = ("claude", "gov")
+SCHEMA_SHAPES = ("slot", "text", "list", "class", "bool", "entries", "template")
+SCHEMA_REQUIRED = ("every", "agent", "optional")
+
+
+def load_role_schema():
+    """The `[[field]]` rows of `role-schema.toml` beside this file, in file order, each a dict holding
+    `key`, `owner`, `shape`, `required` and `empty` (False unless the row says true). An absent file, one
+    that is not TOML, a `[kind]` whose name is not `role`, or a row with a missing, repeated or
+    out-of-set value raises RolesError naming the file, R2."""
+    path = pathlib.Path(__file__).absolute().parent / ROLE_SCHEMA
+    where = path.as_posix()
+    try:
+        with open(path, "rb") as fh:
+            data = tomllib.load(fh)
+    except OSError as e:
+        raise RolesError("%s: R2 — the role schema cannot be read — %s" % (where, e.strerror))
+    except tomllib.TOMLDecodeError as e:
+        raise RolesError("%s: R2 — the role schema is not valid TOML — %s" % (where, e))
+    if not isinstance(data.get("kind"), dict) or data["kind"].get("name") != "role":
+        raise RolesError("%s: R2 — [kind] name is not \"role\"" % where)
+    rows, seen = data.get("field"), set()
+    if not isinstance(rows, list) or not rows or not all(isinstance(r, dict) for r in rows):
+        raise RolesError("%s: R2 — 'field' is not a non-empty array of tables" % where)
+    out = []
+    for i, r in enumerate(rows, 1):
+        for name, allowed in (("owner", SCHEMA_OWNERS), ("shape", SCHEMA_SHAPES), ("required", SCHEMA_REQUIRED)):
+            if r.get(name) not in allowed:
+                raise RolesError("%s: R2 — field %d's %s %r is not one of %s"
+                                 % (where, i, name, r.get(name), " ".join(allowed)))
+        key = r.get("key")
+        if not isinstance(key, str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]*", key):
+            raise RolesError("%s: R2 — field %d's key %r is not one word" % (where, i, key))
+        if key in seen:
+            raise RolesError("%s: R2 — field key '%s' is repeated" % (where, key))
+        if not isinstance(r.get("empty", False), bool):
+            raise RolesError("%s: R2 — field '%s' empty is not true or false" % (where, key))
+        seen.add(key)
+        out.append({"key": key, "owner": r["owner"], "shape": r["shape"], "required": r["required"],
+                    "empty": r.get("empty", False)})
+    return out
+
+
+#: Every front-matter key a role file may carry, in the schema's order: derived from it, never typed.
+FRONT_MATTER_KEYS = tuple(r["key"] for r in load_role_schema())
+#: Where each writer class's output lives, spelled as `output` must carry it (R14) and as a rendered
+#: role's ceiling names it. The product class has no single folder, so its spelling is the conf key
+#: that declares its paths.
+WRITE_FOLDERS = {"spec": "{{MEMORY_ROOT}}/builds/<slug>/spec/",
+                 "review": "{{MEMORY_ROOT}}/builds/<slug>/reviews/",
+                 "product": "ROUTED_PATHS", "records": "{{MEMORY_ROOT}}/"}
+#: A `never` entry's limit and enforcer are split at the first of these (TOOL-dBoundRoles-2 S2).
+NEVER_SEP = " — "
+#: The stated absence of an enforcer, its reason non-empty: R13's `unenforced — <why>` spelling.
+UNENFORCED_PREFIX = "unenforced — "
+#: A gate-leg enforcer, the leg's manifest name after it.
+LEG_PREFIX = "leg: "
+#: A script enforcer's first word: a file name ending in one of these.
+ENFORCER_SCRIPT_RE = re.compile(r"^[^\s/\\]+\.(?:js|py|sh)$")
+#: The return template's grammar (TOOL-dBoundRoles-2 S4): a field name, a closed set's value, the named types.
+RETURN_NAME_RE = re.compile(r"^[a-z][A-Za-z0-9-]*$")
+RETURN_VALUE_RE = re.compile(r"^[a-z][a-z0-9-]*$")
+RETURN_TYPES = ("text", "sha", "path", "list", "int")
+#: How a rendered `## Return` names each named type.
+RETURN_TYPE_WORDS = {"text": "text", "sha": "a sha", "path": "a path", "list": "a list", "int": "an integer"}
+#: A body line carrying a limit, which belongs in `never` (R5's body arm).
+PROHIBITION_RE = re.compile(r"(?i)\b(never|do not|don't|must not)\b")
+
+
+def parse_never_entries(value):
+    """`[(limit, enforcer)]` of a `never` value, in order: the `;`-separated entries, each split at its
+    first ` — `, both halves stripped; an entry with no ` — ` has the enforcer ''."""
+    out = []
+    for entry in (value or "").split(";"):
+        entry = entry.strip()
+        if entry:
+            limit, _sep, enforcer = entry.partition(NEVER_SEP)
+            out.append((limit.strip(), enforcer.strip()))
+    return out
+
+
+def resolve_enforcer_path(tool_root, name):
+    """The path of the script `name` in the tool root or one directory under it, the root first and then
+    the directories in name order; None where neither holds it."""
+    root = pathlib.Path(tool_root)
+    if (root / name).is_file():
+        return root / name
+    try:
+        dirs = sorted(d for d in root.iterdir() if d.is_dir())
+    except OSError:
+        return None
+    return next((d / name for d in dirs if (d / name).is_file()), None)
+
+
+def check_never_entries(value, tool_root, notes=None):
+    """The defects of a `never` value against the install at `tool_root`, one string per entry that fails
+    (TOOL-dBoundRoles-2 S2). Each entry's enforcer is, in this order: a script, its first word a `.js`,
+    `.py` or `.sh` file `resolve_enforcer_path` finds; a gate leg, `leg: <name>`, a leg of the tool root's
+    gate manifest, checked only when that manifest reads and a note appended to `notes` otherwise; or a
+    stated absence, `unenforced — <why>`, its reason non-empty. An empty value, an entry with no ` — `, an
+    enforcer of none of the three forms, a script no kit holds and a leg the manifest lacks each fail."""
+    entries, defects, legs = parse_never_entries(value), [], False
+    if not entries:
+        return ["never names no limit; each entry is '<limit> — <enforcer>'"]
+    for limit, enforcer in entries:
+        shown = "'%s'" % (limit + (NEVER_SEP + enforcer if enforcer else ""))
+        first = enforcer.split()[0] if enforcer.split() else ""
+        if not limit or not enforcer:
+            defects.append("never entry %s names no enforcer; write '<limit> — <enforcer>', the enforcer a "
+                           "script, 'leg: <name>' or 'unenforced — <why>'" % shown)
+        elif ENFORCER_SCRIPT_RE.match(first):
+            if resolve_enforcer_path(tool_root, first) is None:
+                defects.append("never entry %s names %s, which no kit holds: no file of that name sits in the "
+                               "tool root or one directory under it" % (shown, first))
+        elif enforcer.startswith(LEG_PREFIX):
+            leg = enforcer[len(LEG_PREFIX):].strip()
+            if legs is False:
+                legs = load_gate_leg_names(tool_root)
+            if not leg:
+                defects.append("never entry %s names no leg after 'leg: '" % shown)
+            elif legs is None:
+                if notes is not None:
+                    notes.append("%s cannot be read, so the never entry %s's leg is not checked"
+                                 % ((pathlib.Path(tool_root) / GATE_MANIFEST).as_posix(), shown))
+            elif leg not in legs:
+                defects.append("never entry %s names the leg '%s', which %s does not hold"
+                               % (shown, leg, (pathlib.Path(tool_root) / GATE_MANIFEST).as_posix()))
+        elif enforcer.startswith(UNENFORCED_PREFIX.rstrip()) and first == "unenforced":
+            if not enforcer.startswith(UNENFORCED_PREFIX) or not enforcer[len(UNENFORCED_PREFIX):].strip():
+                defects.append("never entry %s states no enforcer without a reason; write 'unenforced — <why>'"
+                               % shown)
+        else:
+            defects.append("never entry %s names an enforcer of no known form; write a script, "
+                           "'leg: <name>' or 'unenforced — <why>'" % shown)
+    return defects
+
+
+def parse_return_template(value):
+    """`[(name, type, optional)]` of a `return` template, in order (TOOL-dBoundRoles-2 S4): `type` one of
+    RETURN_TYPES, or a closed set as a tuple of values, a bare word none of the named types being a set
+    of one. RolesError, R2, on an empty template or entry, an entry that is not `<name>:<type>[?]`, a
+    repeated name, an empty set, a value named twice in one set, or no required `outcome` whose type is
+    a closed set."""
+    out, names = [], set()
+    entries = [e.strip() for e in (value or "").split(",")]
+    if not (value or "").strip():
+        raise RolesError("R2 — the return template is empty; it holds an 'outcome:<value>|<value>' entry")
+    for entry in entries:
+        name, sep, kind = entry.partition(":")
+        name, kind = name.strip(), kind.strip()
+        optional = kind.endswith("?")
+        kind = kind[:-1].strip() if optional else kind
+        if not sep or not RETURN_NAME_RE.match(name):
+            raise RolesError("R2 — return entry %r is not '<name>:<type>[?]', the name %s"
+                             % (entry, RETURN_NAME_RE.pattern))
+        if name in names:
+            raise RolesError("R2 — return field '%s' is named twice" % name)
+        names.add(name)
+        if kind in RETURN_TYPES:
+            out.append((name, kind, optional))
+            continue
+        values = [v.strip() for v in kind.split("|")]
+        if not kind or not all(values):
+            raise RolesError("R2 — return field '%s' has an empty type or an empty value in its set" % name)
+        for v in values:
+            if not RETURN_VALUE_RE.match(v):
+                raise RolesError("R2 — return field '%s' value %r is not %s" % (name, v, RETURN_VALUE_RE.pattern))
+        if len(set(values)) != len(values):
+            raise RolesError("R2 — return field '%s' names a value twice in its set" % name)
+        out.append((name, tuple(values), optional))
+    if not any(n == "outcome" and isinstance(t, tuple) and not o for n, t, o in out):
+        raise RolesError("R2 — the return template holds no required 'outcome' field whose type is a closed "
+                         "set of values")
+    return out
+
+
+def render_role_fields(keys, gates=()):
+    """The `## Never`, `## Ceiling` and `## Return` sections of a role's front matter `keys`
+    (TOOL-dBoundRoles-2 S6), the gate legs `gates` granted it. `## Never` and `## Return` render only
+    where their key is non-empty; the ceiling always renders, an absent value as `none`."""
+    out = []
+    entries = parse_never_entries(keys.get("never", ""))
+    if entries:
+        lines = []
+        for limit, enforcer in entries:
+            if enforcer.startswith(UNENFORCED_PREFIX):
+                lines.append("- %s — unenforced: %s" % (limit, enforcer[len(UNENFORCED_PREFIX):].strip()))
+            else:
+                lines.append("- %s — enforced by %s" % (limit, enforcer) if enforcer else "- %s" % limit)
+        out.append("## Never\n\n" + "\n".join(lines))
+    writes = keys.get("writes") or "none"
+    folder = WRITE_FOLDERS.get(writes)
+    out.append("## Ceiling\n\n- tools: %s\n- writes: %s\n- gate legs: %s" % (
+        keys.get("tools") or "none", writes + (", in " + folder if folder else ""),
+        ", ".join(gates) if gates else "none"))
+    if keys.get("return"):
+        fields = []
+        for name, kind, optional in parse_return_template(keys["return"]):
+            what = "one of " + ", ".join(kind) if isinstance(kind, tuple) else RETURN_TYPE_WORDS[kind]
+            fields.append("%s (%s%s)" % (name, what, ", optional" if optional else ""))
+        out.append("## Return\n\nReturn one object holding these fields, in this order: %s." % "; ".join(fields))
+    return "\n\n".join(out)
 
 
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
@@ -825,11 +1030,13 @@ def resolve_stage_efforts(policy, workflow, model=None):
             for key, slot in (workflow.get("stages") or {}).items()}
 
 
-def render_role(kit_dir, name, memory_root):
-    """The role's base body with `{{MEMORY_ROOT}}` substituted, then its house overlay when non-empty."""
+def render_role(kit_dir, name, memory_root, gates=()):
+    """The role's base body with `{{MEMORY_ROOT}}` substituted, then its house overlay when non-empty, then
+    its `## Never`, `## Ceiling` and `## Return` sections, `render_role_fields`' of its front matter and
+    the gate legs `gates` granted it (TOOL-dBoundRoles-2 S6), so every route closes the role alike."""
     kit = pathlib.Path(kit_dir)
     path = kit / "agents" / (name + ".agent.md")
-    _, body = parse_front_matter(path.as_posix(), load_text(path))
+    keys, body = parse_front_matter(path.as_posix(), load_text(path))
     overlay_path = kit / "house" / (name + ".md")
     overlay = load_text(overlay_path).strip("\n") if overlay_path.is_file() else ""
     for src, rule, text in ((path, "R5", body), (overlay_path, "R10", overlay)):
@@ -838,6 +1045,7 @@ def render_role(kit_dir, name, memory_root):
                 raise RolesError("%s: %s — carries the render token %s; only %s renders"
                                  % (src.as_posix(), rule, token, MEMORY_ROOT_TOKEN))
     out = body + ("\n\n## House rules\n\n" + overlay if overlay.strip() else "")
+    out += "\n\n" + render_role_fields(keys, gates)
     return out.replace(MEMORY_ROOT_TOKEN, memory_root) + "\n"
 
 

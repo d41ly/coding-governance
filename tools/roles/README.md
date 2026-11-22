@@ -20,7 +20,23 @@ overlay is appended to the base block under a `## House rules` heading when the 
 an empty or absent one adds nothing. An overlay carries no `#` or `##` heading of its own and no
 render token but `{{MEMORY_ROOT}}`. Its size is printed on every check run and never graded.
 The `mandatory` and `output` keys ride the base file, as `writes` does, so an overlay cannot change
-them.
+them, and so do `never` and `return` (TOOL-dBoundRoles-2). The keys a role file may carry, and which
+each role must, are the rows of `role-schema.toml`, which `roles_lib.load_role_schema` reads; a
+later key is one row there.
+
+- `never` holds the role's limits, `;`-separated, each `<limit> — <enforcer>`. The enforcer is a
+  script whose first word names a `.js`, `.py` or `.sh` file in the tool root or one directory
+  under it (`scratch-guard.js role arm`), a gate leg (`leg: memory hygiene`), or a stated absence
+  (`unenforced — <why>`). R13 grades every entry and the summary counts the `unenforced` ones. A
+  body line carrying `never`, `do not`, `don't` or `must not` is an R5 defect: the limit moves to
+  `never`, and the body keeps the job.
+- `return` is the typed return template, `<field>:<type>[?]` entries comma-separated, a type one of
+  `text`, `sha`, `path`, `list`, `int` or a closed set of values `a|b`, a bare word being a set of
+  one; a `?` marks a field optional. Every template holds a required `outcome` whose type is a
+  closed set. The body says what each field means.
+
+A rendered role closes with `## Never`, `## Ceiling` (its tools, its write class and the gate legs
+the policy's `[gates]` grants it) and `## Return`, by every route that renders a role.
 
 A base block POINTS at the document that owns a rule — the spec format, the build method, the
 review protocol, all under `{{MEMORY_ROOT}}` — and never restates it. Stage protocol (return
@@ -434,7 +450,8 @@ the role files, the overlays and the workflow table against each other in both d
 `rules` tag against the practice tags of the governing doc, which it locates through the
 memory-tree conf's `CHARTER` key; a body or an overlay spelling a protocol's file name reds as R5 or
 R10. A role called mandatory under a workflow whose `enforced-by` names no hook script, without an
-`unenforced — <why>` clause, reds as R13, and a writer role whose `output` lacks its class's folder
+`unenforced — <why>` clause, reds as R13, as does a `never` entry naming no enforcer, a script no
+kit holds or a leg the manifest lacks; a writer role whose `output` lacks its class's folder reds
 as R14. The workflow table is joined with the loop definition by workflow name, both ways, as R6: a
 workflow's build order and step are that definition's, so a `stage` or `step` key in the table reds
 as unknown (TOOL-dDeclaredLoop-1). A stand-in declaration and the owner's waiver rows are joined as R15, under "Standing in for
@@ -462,18 +479,18 @@ else; the check compares the two on every run.
 
 **Roles**, from `agents/*.agent.md`:
 
-| role | workflow | writes | reads | rules | agent | returns |
+| role | workflow | writes | reads | rules | agent | return |
 |---|---|---|---|---|---|---|
-| `gov-builder` | build | product | field.input.spec, field.card.route?, field.brief.non-goals? | yagni, reuse, core, derive, verify, gate, docs, security, portable, tools | true | whether the unit was committed, the commit, why when it was not, and which check ran for which gate |
-| `gov-diff-reviewer` | closing-review | none | field.input.diff, field.input.spec? | verify, gate, class, docs, left-shift, security, risk, portable | true | concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix |
-| `gov-orienter` | orient | none | field.input.question, field.input.prompt? | small, ids, memory, tokens, tools | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows; handed a request to place, its disposition · reason · evidence · observations · scenarios · facts |
-| `gov-researcher` | research | none | field.input.question, field.brief.goal?, field.brief.non-goals? | reuse, verify, class, memory | true | the candidates, each with its mechanism, the smallest test that would make it lose and that test's result, then the pick and its reason |
-| `gov-reuse-scout` | reuse | none | field.input.question, field.task.in?, field.card.reuse? | reuse | true | the seam to extend, cited by path, or "no existing seam fits" with the evidence |
-| `gov-session` | handoff | none | field.input.question, field.brief.goal?, field.task.todo?, field.card.route? | ids, memory | false | nothing to the sender; the receiving session acts on the task block and reports in its own session |
-| `gov-skeptic` | closing-review | none | field.input.diff?, field.input.spec? | verify, class, risk | true | a verdict per finding, confirmed or refuted, with the reason observed and, for a confirmed one, its severity |
-| `gov-spec-reviewer` | spec-review | none | field.input.spec, field.brief.goal?, field.brief.non-goals? | spec?, verify, gate, class, docs, security, risk | true | concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix |
-| `gov-spec-writer` | spec-write | spec | field.brief.prompt, field.brief.goal, field.brief.items, field.brief.acceptance, field.brief.gates, field.brief.non-goals, field.input.spec?, field.task.reuse?, field.card.route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
-| `gov-synthesizer` | closing-review | review | field.input.diff?, field.input.spec? | left-shift, risk, signal | true | the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers |
-| `gov-tester` | gate-bar | none | field.input.spec, field.input.diff?, field.input.question? | verify, spec, gate, class, risk | true | for each red handed, one judgment, code-miss or spec-wrong (the closed outcomes of the item.test.attribute row), with the evidence observed; for the Test step's question, its answer and the evidence |
+| `gov-builder` | build | product | field.input.spec, field.card.route?, field.brief.non-goals? | yagni, reuse, core, derive, verify, gate, docs, security, portable, tools | true | outcome:committed\|returned, commit:sha?, why:text?, checks:list |
+| `gov-diff-reviewer` | closing-review | none | field.input.diff, field.input.spec? | verify, gate, class, docs, left-shift, security, risk, portable | true | outcome:findings\|clean, findings:list |
+| `gov-orienter` | orient | none | field.input.question, field.input.prompt? | small, ids, memory, tokens, tools | true | outcome:oriented\|placed, card:text?, disposition:text?, reason:text?, evidence:text?, observations:text?, scenarios:text?, facts:text? |
+| `gov-researcher` | research | none | field.input.question, field.brief.goal?, field.brief.non-goals? | reuse, verify, class, memory | true | outcome:picked\|none, candidates:list, pick:text?, reason:text |
+| `gov-reuse-scout` | reuse | none | field.input.question, field.task.in?, field.card.reuse? | reuse | true | outcome:seam\|none-fits, seam:path?, evidence:text |
+| `gov-session` | handoff | none | field.input.question, field.brief.goal?, field.task.todo?, field.card.route? | ids, memory | false | outcome:sent |
+| `gov-skeptic` | closing-review | none | field.input.diff?, field.input.spec? | verify, class, risk | true | outcome:judged, verdicts:list |
+| `gov-spec-reviewer` | spec-review | none | field.input.spec, field.brief.goal?, field.brief.non-goals? | spec?, verify, gate, class, docs, security, risk | true | outcome:findings\|clean, findings:list |
+| `gov-spec-writer` | spec-write | spec | field.brief.prompt, field.brief.goal, field.brief.items, field.brief.acceptance, field.brief.gates, field.brief.non-goals, field.input.spec?, field.task.reuse?, field.card.route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | outcome:done, authored:list, alreadyPresent:list, refused:list, summary:text |
+| `gov-synthesizer` | closing-review | review | field.input.diff?, field.input.spec? | left-shift, risk, signal | true | outcome:reported, report:path, items:list |
+| `gov-tester` | gate-bar | none | field.input.spec, field.input.diff?, field.input.question? | verify, spec, gate, class, risk | true | outcome:code-miss\|spec-wrong\|answered, evidence:text, answer:text? |
 
 <!-- /gen:roles-catalogue -->

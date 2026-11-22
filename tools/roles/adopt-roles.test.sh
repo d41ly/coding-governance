@@ -108,7 +108,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +8 for arm 25 (TOOL-aTrimmedWait-7).
 # merged at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c: 61 shared, +6 this branch's, +8 main's = 75.
 # +4 for arm 26 (TOOL-dBoundRoles-14).
-FLOOR_ASSERTIONS=79
+# +6 for arm 27 (TOOL-dBoundRoles-2).
+FLOOR_ASSERTIONS=85
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -127,6 +128,26 @@ build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at 
   git init -q "$FX" || return 2
   cp -R "$HERE"/. "$FX/$FXK"/ && cp "$ADOPTER" "$FX/$FXK/adopt-roles.sh" || return 2
   cp "$LOOP_SRC/loop_lib.py" "$LOOP_SRC/loop.toml" "$FX/$FXL"/ || return 2
+  # TOOL-dBoundRoles-2 §4 Migration: each script a shipped role's `never` entry names, copied from this
+  # repository's tool root to the same path under the fixture's, so the fixture holds the enforcers a
+  # default install holds and R13 grades it as it grades one. The list is read from the role files
+  # through the kit's own library, never typed here.
+  _ftr=$FX; [[ $FXK == */* ]] && _ftr=$FX/${FXK%/*}
+  _enf=$("$PY" -B -c 'import pathlib, sys
+kit = pathlib.Path(sys.argv[1]); sys.path.insert(0, str(kit))
+import roles_lib as lib
+held = set()
+for slot, role in lib.load_roles(kit).items():
+    for _limit, enforcer in lib.parse_never_entries(role["keys"].get("never", "")):
+        first = (enforcer.split() or [""])[0]
+        path = lib.resolve_enforcer_path(kit.parent, first) if lib.ENFORCER_SCRIPT_RE.match(first) else None
+        if path is not None:
+            held.add(path.relative_to(kit.parent).as_posix())
+print("\n".join(sorted(held)))' "$HERE") || return 2
+  while IFS= read -r _e; do
+    _e=${_e%$'\r'}; [ -n "$_e" ] || continue
+    mkdir -p "$(dirname "$_ftr/$_e")" && cp "$HERE/../$_e" "$_ftr/$_e" || return 2
+  done <<< "$_enf"
   printf 'MEMORY_ROOT=%s\nCHARTER=%s\n' "$MR" "$CH" > "$FX/.memory-tree.conf"
   cp "$REPO/$CH" "$FX/$CH" || return 2
   (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1)
@@ -1208,6 +1229,55 @@ check_arm "arm 26 ...while field.task.title yields no R3 line" \
 check_arm "arm 26 R3 refuses field.card.reuse without its ?, saying card:reuse must be optional" \
    "$([[ $A26 == *'reuse 1'* ]] && echo 1 || echo 0)"
 [ "$A26" = $'clean 1\ntitel 1\ntitle 1\nreuse 1' ] || printf '    %s\n' "${A26//$'\n'/$'\n'    }"
+
+# ---- arm 27 (TOOL-dBoundRoles-2 AC1 AC2 AC3 AC4 AC6): the fixture, holding the enforcers its roles' `never`
+# ---- entries name, grades clean; then each plant on gov-builder is ONE line of its rule, the file restored after
+# ---- it: a bare limit and a limit whose script no kit holds are R13, a body prohibition is R5 naming the line,
+# ---- a template with no `outcome` is R2; and the `never` row cut from the fixture's role-schema.toml makes
+# ---- every role file's `never:` an R2 unknown key, since the key set is derived from the schema. The failing
+# ---- case, observed at the close and not by the pass that wrote this: any one of the plants passing.
+build_fixture; _rc27=$?
+A27=$("$PY" -B -c 'import pathlib, re, subprocess, sys
+fx, kit = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve()
+role, schema = kit / "agents" / "gov-builder.agent.md", kit / "role-schema.toml"
+def grade():
+    out = subprocess.run([sys.executable, "-B", str(kit / "check_roles.py"), "--root", str(fx)], cwd=str(fx),
+                         capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.splitlines()
+    return [ln for ln in out if re.search(r": R(2|5|13) — ", ln)]
+def plant(path, edit):
+    before = path.read_bytes()
+    path.write_bytes(edit(before.decode("utf-8")).encode("utf-8"))
+    try:
+        return grade()
+    finally:
+        path.write_bytes(before)
+def one(got, rule, *needles):
+    return int(len(got) == 1 and (": %s — " % rule) in got[0] and all(n in got[0] for n in needles))
+print("clean %d" % (not grade()))
+never = lambda tail: lambda t: re.sub(r"(?m)^(never: .*?)(\r?)$", lambda m: m.group(1) + tail + m.group(2), t, count=1)
+print("bare %d" % one(plant(role, never("; edits the spec")), "R13", "gov-builder", "edits the spec", "no enforcer"))
+print("ghost %d" % one(plant(role, never("; writes outside ROUTED_PATHS — ghost-guard.js arm")), "R13", "ghost-guard.js"))
+print("body %d" % one(plant(role, lambda t: t.rstrip() + "\n\nNever edit the spec.\n"), "R5", "Never edit the spec."))
+print("outcome %d" % one(plant(role, lambda t: re.sub(r"(?m)^return: .*?(\r?)$", lambda m: "return: commit:sha?" + m.group(1), t, count=1)),
+                         "R2", "outcome"))
+got = plant(schema, lambda t: re.sub(r"\[\[field\]\]\r?\nkey = \"never\"\r?\n(?:[a-z]+ = .*\r?\n)*\r?\n", "", t, count=1))
+roles = len(list((kit / "agents").glob("*.agent.md")))
+print("schema %d" % int(roles > 0 and len(got) == roles and all("unknown front-matter key " + chr(39) + "never" + chr(39) in g for g in got)))
+' "$FX" "$FX/$KREL" 2>&1)
+A27=${A27//$'\r'/}
+check_arm "arm 27 the fixture, holding its roles' enforcers, grades no R2, R5 or R13 line" \
+   "$([ "$_rc27" = 0 ] && [[ $A27 == *'clean 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 27 a bare never entry is one R13 line saying it names no enforcer" \
+   "$([[ $A27 == *'bare 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 27 a never entry naming a script no kit holds is one R13 line naming it" \
+   "$([[ $A27 == *'ghost 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 27 a body line carrying a prohibition is one R5 line naming it" \
+   "$([[ $A27 == *'body 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 27 a return template with no outcome is one R2 line" \
+   "$([[ $A27 == *'outcome 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 27 the never row cut from the schema makes every role's never an R2 unknown key" \
+   "$([[ $A27 == *'schema 1'* ]] && echo 1 || echo 0)"
+[ "$A27" = $'clean 1\nbare 1\nghost 1\nbody 1\noutcome 1\nschema 1' ] || printf '    %s\n' "${A27//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

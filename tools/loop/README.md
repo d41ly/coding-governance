@@ -90,7 +90,8 @@ list, a comma, whitespace or a second colon is refused, naming the item and the 
 item carries a non-empty `inputs`, `allowance` and `returns`. A `role:<slot>` item's slot is a role
 file's stem under the roles kit's `agents/`, such as `gov-builder`, and `resolve_item_declaration`
 gives its absent `inputs` the role's `reads` split on commas, its absent `allowance` the role's
-`writes` and its absent `returns` the role's `returns`, naming each field's source. The catalogue is
+`writes` and its absent `returns` the role's `return`, its typed return template (TOOL-dBoundRoles-2),
+naming each field's source. The catalogue is
 `read_role_defaults(kit_dir)`: the roles kit found by `resolve_kit_dir` from this directory, its
 `roles_lib` imported inside the function and `load_roles` of that directory returned, or None and
 why. A role item's explicit field equal to its role's is refused as a copy, and its explicit

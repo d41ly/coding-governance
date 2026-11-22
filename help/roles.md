@@ -17,8 +17,11 @@ reference; this page is the short version.
 2. **A role supplies the constant part.** Each role is one file under `<prefix>/roles/agents/`: its
    instructions, the inputs it reads, the file class it may write and the tags of the charter's
    practices it needs, under `rules`. It also says when the role is mandatory, under `mandatory`, and
-   where its output goes, under `output`. Its agent carries those rule lines and the charter's
-   Protocols and Facts sections whole.
+   where its output goes, under `output`. Its limits are under `never`, each paired with the hook,
+   gate leg or stated absence that enforces it, and what it hands back is the typed template under
+   `return`, which always holds a closed `outcome`. Its agent carries those rule lines and the
+   charter's Protocols and Facts sections whole, and its role text closes with `## Never`,
+   `## Ceiling` (its tools, its write class and the gate legs it may run) and `## Return`.
 3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
    `prompts/` folder, with `## Role` and then `## Task`, filled from the card, the build's brief and
    any `--input` values. A spec writer's task also carries the brief's `## The prompt`, the owner's

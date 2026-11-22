@@ -1,0 +1,92 @@
+# tools/roles/role-schema.toml — the role kind's fields, read through roles_lib.load_role_schema only
+# (TOOL-dBoundRoles-2). One row per front-matter key, in the order a role file writes them: `owner` is
+# whose key it is (`claude`, Claude Code's own, or `gov`), `shape` its grammar, and `required` where it
+# must be non-empty (`every` role, an `agent` role only, or `optional`). `empty = true` lets a required
+# key be present and empty. A later unit's key is one row here.
+[kind]
+name = "role"
+
+[[field]]
+key = "name"
+owner = "claude"
+shape = "slot"
+required = "every"
+
+[[field]]
+key = "description"
+owner = "claude"
+shape = "text"
+required = "every"
+
+[[field]]
+key = "tools"
+owner = "claude"
+shape = "list"
+required = "agent"
+
+[[field]]
+key = "model"
+owner = "claude"
+shape = "text"
+required = "agent"
+
+[[field]]
+key = "maxTurns"
+owner = "claude"
+shape = "text"
+required = "optional"
+
+[[field]]
+key = "workflow"
+owner = "gov"
+shape = "text"
+required = "every"
+
+[[field]]
+key = "reads"
+owner = "gov"
+shape = "list"
+required = "every"
+
+[[field]]
+key = "writes"
+owner = "gov"
+shape = "class"
+required = "every"
+
+[[field]]
+key = "rules"
+owner = "gov"
+shape = "list"
+required = "every"
+empty = true
+
+[[field]]
+key = "mandatory"
+owner = "gov"
+shape = "text"
+required = "every"
+
+[[field]]
+key = "output"
+owner = "gov"
+shape = "text"
+required = "every"
+
+[[field]]
+key = "never"
+owner = "gov"
+shape = "entries"
+required = "every"
+
+[[field]]
+key = "return"
+owner = "gov"
+shape = "template"
+required = "every"
+
+[[field]]
+key = "agent"
+owner = "gov"
+shape = "bool"
+required = "optional"

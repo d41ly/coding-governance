@@ -79,7 +79,7 @@ population = "{prefix}/roles/agents/*.agent.md"
 factory = "python {prefix}/loop/factories.py role"
 gate = "roles catalogue"
 summary = "A role an agent takes in the loop: a role file of the roles kit, listed by its workflow and priced by its body ceiling."
-usage = "python {prefix}/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --returns <text> --output <text> --ceiling <bytes>"
+usage = "python {prefix}/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --never <entries> --return <template> --output <text> --ceiling <bytes>"
 
 [[kind]]
 tag = "kind.workflow"

@@ -62,3 +62,15 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T05:04:04Z draw · re-dispatch · TOOL-dBoundRoles-2 · 6/122 · 20261122T050404Z-70358f
 
 2026-11-22T05:04:04Z dispatch · item a01362eb TOOL-dBoundRoles-2 · reason tools/roles/role-schema.toml tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/render_agents.py tools/roles/handoff.py tools/roles/agents tools/roles/README.md tools/roles/adopt-roles.test.sh tools/loop/factories.py tools/loop/loop_lib.py tools/loop/README.md tools/playbook/kinds.toml tools/govkit/usage.toml help/loop.md help/reference/kinds.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-2-1-acceptance-ledger.md
+2026-11-22T05:44:39Z draw · re-dispatch · TOOL-dBoundRoles-2 · 7/122 · 20261122T054439Z-60c335
+
+2026-11-22T05:44:39Z dispatch · item 85a3f6e4 TOOL-dBoundRoles-2 · reason .claude/agents memory/map/generated/symbols.json memory/LIVE.md memory/backlog/TOOL.md memory/builds/dBoundRoles/README.md memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-2.md
+2026-11-22T05:48:47Z draw · re-dispatch · TOOL-dBoundRoles-2 · 8/122 · 20261122T054847Z-9c42ce
+
+2026-11-22T05:48:48Z dispatch · item 85a3f6e4 TOOL-dBoundRoles-2 · reason tools/roles/role-schema.toml tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/render_agents.py tools/roles/handoff.py tools/roles/agents tools/roles/README.md tools/roles/adopt-roles.test.sh tools/loop/factories.py tools/loop/loop_lib.py tools/loop/README.md tools/playbook/kinds.toml tools/govkit/usage.toml help/loop.md help/reference/kinds.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-2-1-acceptance-ledger.md
+2026-11-22T05:52:45Z draw · re-dispatch · TOOL-dBoundRoles-2 · 9/122 · 20261122T055245Z-08bab4
+
+2026-11-22T05:52:45Z dispatch · item 85a3f6e4 TOOL-dBoundRoles-2 · reason help/roles.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-2-deviation-23.md
+2026-11-22T05:56:45Z draw · re-dispatch · TOOL-dBoundRoles-2 · 10/122 · 20261122T055645Z-2d4969
+
+2026-11-22T05:56:45Z dispatch · item 85a3f6e4 TOOL-dBoundRoles-2 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

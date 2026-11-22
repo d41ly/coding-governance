@@ -8,7 +8,9 @@ the repository root: the role's Claude keys, then `effort: <level>` as `roles_li
 reads it from the kit's `house/policy.toml` (TOOL-aOrientedCast-10) with no model named, so a type
 carries the default tables' level and never a profile's (TOOL-aProfiledEffort-1), then
 `omitClaudeMd: true`, then gov's `workflow` and
-`writes`, then a body that is `roles_lib.render_role`'s output and, under `## Charter`,
+`writes`, then a body that is `roles_lib.render_role`'s output, which closes the role with its
+`## Never`, `## Ceiling` and `## Return` sections, the gate legs the policy's `[gates]` grants it
+handed in (TOOL-dBoundRoles-2 S6), and, under `## Charter`,
 `roles_lib.render_charter_blocks` for the role: the practice lines its `rules` key cites, then
 the charter's carried sections whole (TOOL-aOrientedCast-16). Where the playbook kit's document registry
 reads, the body is ranked (PLAY-dOrderedCharter-5 S1): `## Charter` first, in the envelope of the charter's
@@ -155,18 +157,19 @@ def load_catalogue(kit_dir, target_root):
 
 
 def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort, missing=(), rows=None,
-                      charter_doc=""):
+                      charter_doc="", gates=()):
     """One agent type's text: Claude keys, its effort, the trim, gov's two keys, then the body. With
     `rows`, the document registry, the body is ranked (PLAY-dOrderedCharter-5 S1): `## Charter` and the
     role's charter blocks first, in the envelope of the charter's row at `charter_doc`, then the rendered
     role and each `Missing required unit:` line the load-set check printed for it under `warn`, all in the
     agent file's own envelope. With `rows` None, no playbook kit, the role comes first and the charter
-    after it, unenveloped. A charter that yields no block renders no `## Charter`."""
+    after it, unenveloped. A charter that yields no block renders no `## Charter`. `gates` is the role's
+    granted gate legs, which its `## Ceiling` names."""
     keys = role["keys"]
     head = ["---"] + ["%s: %s" % (k, keys[k]) for k in CLAUDE_KEYS if k in keys]
     head += ["effort: %s" % effort, "omitClaudeMd: true", "workflow: %s" % keys.get("workflow", ""),
              "writes: %s" % keys.get("writes", ""), "---"]
-    body = lib.render_role(kit_dir, slot, memory_root)
+    body = lib.render_role(kit_dir, slot, memory_root, gates)
     if missing:
         body += "\n" + "\n".join(missing) + "\n"
     blocks = lib.render_charter_blocks(charter, role["path"].as_posix(), keys.get("rules", ""), notes)
@@ -331,9 +334,11 @@ def run_mode(mode, kit_dir, tool_root, target_root):
     try:
         cat = load_catalogue(kit_dir, target_root)
         agents = [slot for slot, role in cat["roles"].items() if role["keys"].get("agent", "true") == "true"]
+        granted = cat["policy"].get("gates", {})   # each role's legs, which its rendered ceiling names
         # PLAY-dOrderedCharter-11 S4: every agent type's load set and role block, ONE check before writing
         refused, gate = lib.check_load_set(target_root, kit_dir, [
-            (slot, len(lib.render_role(kit_dir, slot, cat["memory_root"]).encode("utf-8"))) for slot in agents])
+            (slot, len(lib.render_role(kit_dir, slot, cat["memory_root"], granted.get(slot, ())).encode("utf-8")))
+            for slot in agents])
         if refused:
             raise lib.RolesError("\n".join(gate))
         missing = {slot: [ln for ln in gate if ln.startswith("Missing required unit:")
@@ -348,7 +353,8 @@ def run_mode(mode, kit_dir, tool_root, target_root):
         for slot in agents:
             rendered["%s/%s.md" % (AGENTS_REL, slot)] = render_agent_file(
                 kit_dir, slot, cat["roles"][slot], cat["memory_root"], cat["charter"], cat["notes"],
-                lib.resolve_effort(cat["policy"], slot), missing[slot], rows, cat["charter_doc"])
+                lib.resolve_effort(cat["policy"], slot), missing[slot], rows, cat["charter_doc"],
+                granted.get(slot, ()))
         harnesses, absent = derive_harness_paths(cat["workflows"], tool_root, target_root)
         manifest = resolve_gate_manifest(tool_root, target_root)
         rendered[INDEX_REL] = render_roles_index(
@@ -529,6 +535,37 @@ def check_ranked_arms(state, roles):
             want = "opens at level 0 after" if name == "reordered" else "has no closer"
             check_arm(state, 20, not ok and any("DOC.md#practices-at-build" in ln and want in ln for ln in said),
                       "the %s envelope passed check: %r" % (name, said))
+
+
+#: Arm 21's role (TOOL-dBoundRoles-2 AC5): two `never` entries, a typed `return` and one granted gate leg.
+FIELDS_ROLE = ("workflow: w1\nreads: input:spec\nwrites: product\nrules: one\n"
+               "never: edits the spec — unenforced — a fixture limit; writes elsewhere — a.js stub arm\n"
+               "return: outcome:done|failed, note:text?\n")
+
+
+def check_fields_arm(state):
+    """Arm 21 (TOOL-dBoundRoles-2 AC5): the rendered role closes with exactly one `## Never` holding its
+    two entries, one `## Ceiling` naming its write class's folder and its one granted leg, and one
+    `## Return`, in that order after the body and before the unranked `## Charter`."""
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        kit, tool_root = build_fixture(root, {"r-one": (FIELDS_ROLE, "")},
+                                       FIXTURE_POLICY + '\n[gates]\nr-one = ["leg a"]\n')
+        (tool_root / lib.GATE_MANIFEST).write_text('[{"name": "leg a", "argv": ["bash", "{prefix}/a.sh"]}]\n',
+                                                   encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            rc = run_mode("write", kit, tool_root, root)
+        agent = root / AGENTS_REL / "r-one.md"
+        text = agent.read_text(encoding="utf-8") if agent.is_file() else ""
+        heads = [ln for ln in text.split("\n") if ln in ("## Never", "## Ceiling", "## Return", "## Charter")]
+        check_arm(state, 21, rc == 0 and heads == ["## Never", "## Ceiling", "## Return", "## Charter"]
+                  and text.index("Body of r-one") < text.index("## Never"),
+                  "the role's sections are %r, not one Never, Ceiling and Return after the body, before "
+                  "the Charter" % heads)
+        check_arm(state, 21, "\n- edits the spec — unenforced: a fixture limit\n- writes elsewhere — enforced by "
+                  "a.js stub arm\n" in text and "\n- writes: product, in ROUTED_PATHS\n- gate legs: leg a\n" in text
+                  and "outcome (one of done, failed); note (text, optional)." in text,
+                  "the three sections do not carry the two entries, the ceiling and the template: %r" % text)
 
 
 def run_selftest():
@@ -933,6 +970,7 @@ def run_selftest():
             check_arm(state, 19, bool(before) and before == {
                 p: p.read_bytes() for p in (root / ".claude").rglob("*") if p.is_file()},
                 "19e: a refused profile holding %r moved a file under .claude" % (lines,))
+    check_fields_arm(state)
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)
     print("%s (%d assertions)" % ("FAIL" if state["fail"] else "PASS", state["n"]))

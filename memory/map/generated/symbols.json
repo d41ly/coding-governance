@@ -6563,6 +6563,11 @@
       "file": "tools/loop/position.py"
     },
     {
+      "id": "check_fields_arm",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "check_file_line_row",
       "kind": "function",
       "file": "tools/playbook/positional.py"
@@ -7601,6 +7606,11 @@
       "id": "check_needs_target",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "check_never_entries",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "check_new_at_base",
@@ -16928,6 +16938,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "load_role_schema",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "load_roles",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -19468,6 +19483,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "parse_never_entries",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "parse_observed",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -19566,6 +19586,11 @@
       "id": "parse_retirement",
       "kind": "function",
       "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
+      "id": "parse_return_template",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "parse_row",
@@ -29468,6 +29493,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "render_role_fields",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "render_roles_index",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
@@ -30509,6 +30539,11 @@
     },
     {
       "id": "resolve_effort",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "resolve_enforcer_path",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
     },
