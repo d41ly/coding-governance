@@ -9,7 +9,7 @@ Write the rulings into the specs.
 ## TOOL-dQuietDisk-1, rev-3 → rev-4
 
 1. **§7 Gates.** The leg line names `history-store selftest`, the leg S11 adds. The spec-token checker reds without it:
-   `[guards] history-store selftest <- tools/lib/history_store.py — §4 files-touched names tools/lib/history_store.py,
+   PINNED from the checker's output: `[guards] history-store selftest <- tools/lib/history_store.py — §4 files-touched names tools/lib/history_store.py,
    which trips the guard of leg 'history-store selftest', absent from the §7 leg line`.
 
 2. **The shell-line ledger.** The bash face stays, because units 2 and 3 are bash consumers of it. The unguarded leg

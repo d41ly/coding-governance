@@ -33,7 +33,7 @@ analysis and the owner's prompt are recorded under `prompts/` and `build/`.
 
 ## Build-level rules
 
-- Classification (M2): 19 units, MISSING at open, specced by the spec-writer role.
+- Classification (M2): every roster unit MISSING at open, specced by the spec-writer role.
 - Chain map (v2 `[chain]`): units 1 to 15 and 19 sit in dWitnessedBar's area (Test: gate health, held
   legs, budgets); 16 to 18 in dSafePassage's (Supersession: govkit update and apply); 2 to 6 also in
   dScopedBuild's (Build: the history-derived exit base). This build runs on its own track; a shared

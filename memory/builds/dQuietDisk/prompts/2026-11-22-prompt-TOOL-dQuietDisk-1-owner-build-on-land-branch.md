@@ -26,4 +26,4 @@ reconcile at your merge."
   so a red fix that collides with a unit is reconciled at that merge and recorded. The bar runs there.
 - **The closing review reads this build's own diff.** Its round-1 base is the merge commit that brought
   dWitnessedBar in, not the run's pinned BASE `c95ef6216`. A range from BASE would hand the reviewers dWitnessedBar's
-  300 commits, which its own closing review already read.
+  commits, which its own closing review already read.

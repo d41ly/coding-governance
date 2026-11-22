@@ -137,7 +137,7 @@ Units 2 and 3 both read `lib-unattended.sh`. If both must write it, sequence the
 ### 4 — `routed_commits.py` incremental · order 2 · dWitnessedBar, dScopedBuild
 
 - `tools/memory-tree/routed_commits.py` runs `git log --raw --numstat` over every commit (around 353 and 410-413 at
-  main), measured at 1,761 s.
+  main), measured at 1,761 s, PINNED in the analysis.
 - Grade only commits past its last graded tip, with each commit's verdict keyed by its id and the grading code's
   blob.
 - Read `TOOL-aMeasuredDrag-1`'s findings record (`memory/builds/aMeasuredDrag/build/2026-11-15-build-TOOL-aMeasuredDrag-1-findings-gate.md`), which proposed exactly this.
@@ -206,7 +206,7 @@ copying it. Run a candidate predicate over the real tree first (`[class]`), and 
 ### 10 to 13 — suites on the template cache (K1) · order 3 · dWitnessedBar
 
 One suite per unit, each on unit 7's factory:
-- 10 `tools/check-wiring.test.sh` (measured: 255 arms, 42 `newrepo`, 3,786 git processes, 307 s);
+- 10 `tools/check-wiring.test.sh` (measured: 255 arms, 42 `newrepo`, 3,786 git processes, 307 s, PINNED in the analysis);
 - 11 `tools/govkit/selftest.py` (102 `build_target`/`build_scratch_gov` calls, 144 `apply`);
 - 12 `.githooks/pre-push.test.sh` (49 fixture builders, 75 real pushes);
 - 13 `tools/run-gates/run-gates*.test.sh`, the suites `.test`, `.turnstile`, `.evidence` and `.gov`.
