@@ -714,6 +714,18 @@ def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
 sys.path.insert(0, str(HERE))
 from fixture_target import build_scratch_gov, build_target  # noqa: E402 — TOOL-dSafePassage-5 S12, -26 S19: the factories
 
+# TOOL-dQuietDisk-11 S1/S2: one suite template cache per run, loaded by path from gov's lib dir.
+# `main` binds it once its scratch root exists; a `build_target` call whose `(deploy, files)` text
+# recurs at another call, with a `deploy` built from module constants alone, passes
+# `template=TEMPLATES`, so each recurring target is built once and cloned per call. Left at `None`
+# (a helper driven outside `main`), and under the switch's `per-case`, every call builds as before.
+_template_cache_spec = importlib.util.spec_from_file_location(
+    "template_cache", resolve_kit_dir("lib", "template_cache.py", HERE) / "template_cache.py")
+template_cache = importlib.util.module_from_spec(_template_cache_spec)
+_template_cache_spec.loader.exec_module(template_cache)
+TemplateCache = template_cache.TemplateCache
+TEMPLATES = None
+
 
 DEPLOY_FULL = f"""gov_source = "local"
 prefix = "{PFX[:-1]}"
@@ -1475,7 +1487,8 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
 
     # AC1 — adopt records the owned row, then `apply --resume` must leave its bytes and role alone.
     lacking = "alpha = 1\n\nif __name__ == '__main__':\n    print('hello')\n"
-    t = build_target(tmp / "own", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"))
+    t = build_target(tmp / "own", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"),
+                     template=TEMPLATES)
     (t / PFX / "demo").mkdir(parents=True)
     (t / "docs").mkdir()
     for f in ("use.py", "seed.txt", "tpl.md"):
@@ -1528,7 +1541,8 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
 
     # DEPL-aRepatriatedFork-21 S2, closing review round 1 residual (e). A FIRST apply over an owning
     # target has no receipt row to carry, so it builds one; the row carries every key adopt's does.
-    f1 = build_target(tmp / "first", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"))
+    f1 = build_target(tmp / "first", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"),
+                      template=TEMPLATES)
     (f1 / PFX / "demo").mkdir(parents=True)
     (f1 / PFX / "demo" / "run.py").write_text(lacking, encoding="utf-8", newline="\n")
     settle(f1, "the target's own program")
@@ -1540,7 +1554,7 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
           and frow.get("oid") == (adopted or {}).get("oid"), json.dumps(frow) + p.stdout[-600:])
 
     # AC4 — no [[own]] rows: gov's run.py lands as `engine` and no owned skip is printed.
-    n = build_target(tmp / "non", SAFE_DEPLOY)
+    n = build_target(tmp / "non", SAFE_DEPLOY, template=TEMPLATES)
     run_govkit("apply", "--target", str(n))
     (n / "docs").mkdir()
     (n / "docs" / "tpl.md").write_text("tpl\n", encoding="utf-8", newline="\n")
@@ -1949,7 +1963,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
                               capture_output=True, text=True, encoding="utf-8", env=env)
 
     def build_target17(g: pathlib.Path, tag: str) -> pathlib.Path:
-        t = build_target(tmp / f"{tag}-t", SAFE_DEPLOY)
+        t = build_target(tmp / f"{tag}-t", SAFE_DEPLOY, template=TEMPLATES)
         p = run_gov17(g, "apply", "--target", str(t))
         check(f"[aRF-17] the {tag} fixture installs, or every arm over it grades nothing",
               p.returncode == 0, p.stdout[-900:] + p.stderr[-600:])
@@ -2589,7 +2603,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     old = "".join(f"line {i}\n" for i in range(20))
     g, a1 = build_gov17("sp", kit_cf, {"prog.py": old, "other.py": old})
     write_gov17(g, kit_cf, {"prog.py": "".join(f"mid {i}\n" for i in range(20))}, "A2")
-    t = build_target(tmp / "sp-t", SAFE_DEPLOY)
+    t = build_target(tmp / "sp-t", SAFE_DEPLOY, template=TEMPLATES)
     (t / PFX / "demo").mkdir(parents=True)
     (t / PFX / "demo" / "prog.py").write_bytes(old.replace("line 7\n", "line seven\n").encode())
     (t / PFX / "demo" / "other.py").write_bytes(
@@ -2687,7 +2701,7 @@ def measure_mode_carry(tmp: pathlib.Path, source: str, arms: set) -> dict:
                               capture_output=True, text=True, encoding="utf-8", env=e)
 
     def build_levelled_target(g: pathlib.Path, tag: str) -> pathlib.Path:
-        t = build_target(tmp / f"{tag}-t", SAFE_DEPLOY)
+        t = build_target(tmp / f"{tag}-t", SAFE_DEPLOY, template=TEMPLATES)
         p = run_gov(g, "apply", "--target", str(t))
         add_result("LIVE", f"[aLC-1] the {tag} fixture installs", p.returncode == 0,
                    p.stdout[-900:] + p.stderr[-600:])
@@ -3858,7 +3872,8 @@ def check_requires_vintage(tmp: pathlib.Path) -> None:
     g = tmp / "rv-gov"
     a = build_steps_gov(g, {f"{gkn}/registry.toml": reg, "demo/kit.toml": 'id = "demo"\n' + body,
                             "demo/a.txt": "a\n"})
-    t = build_target(tmp / "rv-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+    t = build_target(tmp / "rv-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                     template=TEMPLATES)
 
     def run_gk(*args: str) -> subprocess.CompletedProcess:
         return subprocess.run([sys.executable, str(g / PFX / gkn / "govkit.py"), *args],
@@ -3931,7 +3946,8 @@ def check_gained_prune_vintage(tmp: pathlib.Path) -> None:
     descs = {f"{k}/kit.toml": f'id = "{k}"\n' + VINTAGE_KIT_BODY.replace('"demo"', f'"{k}"') for k in kits}
     g = tmp / "gp-gov"
     a = build_steps_gov(g, {f"{gkn}/registry.toml": reg % '"demo"', **descs, **{f"{k}/a.txt": "a\n" for k in kits}})
-    t = build_target(tmp / "gp-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+    t = build_target(tmp / "gp-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                     template=TEMPLATES)
     govkit = [sys.executable, str(g / PFX / gkn / "govkit.py")]
     p = subprocess.run(govkit + ["apply", "--target", str(t), "--kits", "demo"], capture_output=True, text=True,
                        encoding="utf-8", env=STEPS_ENV)
@@ -3984,7 +4000,7 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
                               cwd=str(t), capture_output=True, text=True, encoding="utf-8").stdout.strip()
 
     def build_capped(tag: str, conf: bytes) -> pathlib.Path:
-        t = build_target(tmp / tag, None)
+        t = build_target(tmp / tag, None, template=TEMPLATES)
         (t / ".governance").mkdir(exist_ok=True)
         (t / ".governance" / "policy.toml").write_bytes(scaffold.replace(b"\r\n", b"\n"))
         (t / ".agent-cap.conf").write_bytes(conf)
@@ -4020,7 +4036,7 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
     check("[dSP-1 AC11] a down after the up leaves a BOM-led CRLF conf and the policy file byte-identical",
           down.returncode == 0 and read_tree(t) == pre
           and not (t / ".governance" / "steps" / "agent-cap").exists(), down.stdout + down.stderr)
-    t = build_target(tmp / "fs-ac17", None)
+    t = build_target(tmp / "fs-ac17", None, template=TEMPLATES)
     down = run_step("down", t)
     status = run_gov_git(t, "status", "--porcelain")
     check("[dSP-17 AC5] a down on a target that never held the conf, with no image, exits 0 and writes nothing",
@@ -4096,7 +4112,7 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
     check("[dSP-1 S6] a conf that is not UTF-8: the up exits 1 naming it and writes no byte",
           up.returncode == 1 and ".agent-cap.conf: not UTF-8" in up.stderr and read_tree(t) == pre,
           up.stdout + up.stderr)
-    t = build_target(tmp / "fs-badpol", None)
+    t = build_target(tmp / "fs-badpol", None, template=TEMPLATES)
     (t / ".governance").mkdir(exist_ok=True)
     (t / ".governance" / "policy.toml").write_bytes(b"[runtime\n")
     (t / ".agent-cap.conf").write_bytes(b"FANOUT_CAP=2\n")
@@ -4153,7 +4169,7 @@ def check_review_rounds_step(tmp: pathlib.Path) -> None:
                               cwd=str(t), capture_output=True, text=True, encoding="utf-8").stdout.strip()
 
     def build_bounded(tag: str, conf: bytes) -> pathlib.Path:
-        t = build_target(tmp / tag, None)
+        t = build_target(tmp / tag, None, template=TEMPLATES)
         (t / ".unattended.conf").write_bytes(conf)
         settle(t, "a target with a round bound")
         return t
@@ -5946,7 +5962,7 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
         return json.loads(derive_receipt_path(t).read_text(encoding="utf-8"))
 
     def build_installed(tag: str) -> tuple[pathlib.Path, subprocess.CompletedProcess]:
-        t = build_target(tmp / tag, DEPLOY_FULL)
+        t = build_target(tmp / tag, DEPLOY_FULL, template=TEMPLATES)
         p = run("apply", "--target", str(t), "--kits", kit)
         settle(t, "the install")
         return t, p
@@ -6424,6 +6440,9 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
+        # TOOL-dQuietDisk-11 S1: the run's one cache, its root the face's own order and this root last.
+        global TEMPLATES
+        TEMPLATES = TemplateCache(root=tmp / "templates")
 
         # TOOL-aRepatriatedFork-11 S3/S4. Needs no git and no verb, so it runs first and cheaply.
         check_fragment_wiring(tmp)
@@ -6454,7 +6473,13 @@ def main() -> int:
         check("that refusal names the path", str(notrepo.name) in p.stderr, p.stderr)
 
         # --- plan refuses a target carrying no descriptor, and says who writes one.
-        bare = build_target(tmp / "a", None)
+        bare = build_target(tmp / "a", None, template=TEMPLATES)
+        # TOOL-dQuietDisk-11 S4: the liveness arm. A suite that passes no cache, or a cache whose
+        # `shared` clone never reached this call, leaves the target without the clone's alternates.
+        check("[dQuietDisk-11] a recurring target is a clone of its template",
+              TEMPLATES is not None
+              and (bare / ".git" / "objects" / "info" / "alternates").is_file() == (TEMPLATES.mode == "shared"),
+              f"TEMPLATES={TEMPLATES!r} mode={getattr(TEMPLATES, 'mode', None)!r}")
         p = run("plan", "--target", str(bare))
         check("plan refuses a target with no deploy.toml", p.returncode == 2)
         check("that refusal refuses to GUESS an answer",
@@ -6462,7 +6487,7 @@ def main() -> int:
 
         # --- plan over a real descriptor lists writes and WRITES NOTHING. The on-disk effect is the
         # --- assertion: a read-only verb that leaves a byte behind is the whole risk of this verb.
-        full = build_target(tmp / "b", DEPLOY_FULL)
+        full = build_target(tmp / "b", DEPLOY_FULL, template=TEMPLATES)
         before = sorted(q.relative_to(full).as_posix() for q in full.rglob("*") if q.is_file())
         p = run("plan", "--target", str(full), "--kits", "memory-tree")
         after = sorted(q.relative_to(full).as_posix() for q in full.rglob("*") if q.is_file())
@@ -6579,7 +6604,7 @@ def main() -> int:
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
         # adopter, so these arms measure the LAND path rather than somebody else's adopter.
-        ap = build_target(tmp / "d", DEPLOY_FULL)
+        ap = build_target(tmp / "d", DEPLOY_FULL, template=TEMPLATES)
         p = run("apply", "--target", str(ap), "--kits", "check-wiring")
         check("apply exits 0 over a clean target", p.returncode == 0, p.stdout + p.stderr)
         check("apply landed the flat destination its descriptor DECLARES, not a kit-relative default",
@@ -6641,7 +6666,7 @@ def main() -> int:
         # Before precedence existed, gov's filled module landed byte-identical in the target and the
         # receipt called it `engine`. The arm asserts the BYTES, not just the role: a role that is
         # right about the wrong file is the failure this replaces.
-        cm = build_target(tmp / "u1a", DEPLOY_FULL)
+        cm = build_target(tmp / "u1a", DEPLOY_FULL, template=TEMPLATES)
         p = run("apply", "--target", str(cm), "--kits", "codebase-map,memory-tree")
         rec = json.loads((cm / ".governance" / "install.json").read_text(encoding="utf-8"))
         govroot = GOV_ROOT
@@ -6763,7 +6788,7 @@ def main() -> int:
 
         # AC10 — the playbook lands BYTES. It sits first in the default selection and, tagged
         # project-owned, landed nothing at all while its placeholder hole probed two absent paths.
-        pb = build_target(tmp / "u1b", DEPLOY_FULL)
+        pb = build_target(tmp / "u1b", DEPLOY_FULL, template=TEMPLATES)
         # THE APPLY'S OWN VERDICT IS PART OF THE ARM. This call DISCARDED the CompletedProcess, so
         # when `apply` refused, the refusal that named the cause was thrown away and the arm reported
         # the empty directory listing instead. Measured on the post-merge bar of the aFusedCharter
@@ -6940,7 +6965,7 @@ def main() -> int:
         # --- output: four fragment lines in B carry it too). A-absent is the stop still accepted.
         _rb11gk = govkit_module()
         _rb11src = f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js"
-        _rb11a = build_target(tmp / "rq11a", DEPLOY_FULL)
+        _rb11a = build_target(tmp / "rq11a", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
         settle(_rb11a, "the first apply")
         _rb11hk = idx_of(_rb11src)
@@ -6972,7 +6997,7 @@ def main() -> int:
         check("[dRB-12] AC2 a third identical apply over fixture A exits 1",
               _rb11pa3.returncode == 1, f"rc {_rb11pa3.returncode} · {_rb11pa3.stdout[-900:]}")
 
-        _rb11n = build_target(tmp / "rq11n", DEPLOY_FULL)
+        _rb11n = build_target(tmp / "rq11n", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(_rb11n), "--kits", "settings-merge")
         settle(_rb11n, "the first apply")
         (_rb11n / ".claude").mkdir(exist_ok=True)
@@ -7056,7 +7081,7 @@ def main() -> int:
         # --- rows, and the next apply of either was refused as foreign. Every figure is read from the
         # --- receipt the narrower apply read, so nothing here pins a row count. The carry is keyed
         # --- on the claim: keyed on the selection, it also kept the prior `(govkit)` attributes row.
-        _rb12 = build_target(tmp / "rq12", DEPLOY_FULL)
+        _rb12 = build_target(tmp / "rq12", DEPLOY_FULL, template=TEMPLATES)
         _rb12rp = _rb12 / ".governance" / "install.json"
         _rb12three = "agent-cap,settings-merge,kickoff-manifest"
         _rb12keeps = "govkit apply — receipt KEEPS "
@@ -7568,7 +7593,7 @@ def main() -> int:
         # zeros and whose every hash was rewritten to nonsense, exited 0. `check` contained exactly
         # one filesystem test — on the receipt's own path — and never opened the file list, never
         # read the sidecar it writes, and called no hash function.
-        ev = build_target(tmp / "u5a", DEPLOY_FULL)
+        ev = build_target(tmp / "u5a", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(ev), "--kits", "check-wiring")
         pc = run("check", "--target", str(ev))
         # DEPL-dBackdatedFixture-3. THE EXPECTATION COMES FROM THE DESCRIPTOR (DEPL-aTetheredConvoy-5
@@ -7594,7 +7619,7 @@ def main() -> int:
               pc.stdout + pc.stderr)
 
         # AC2 — one modified engine file is a finding naming the path and BOTH hashes.
-        ev2 = build_target(tmp / "u5b", DEPLOY_FULL)
+        ev2 = build_target(tmp / "u5b", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(ev2), "--kits", "check-wiring")
         tgt = ev2 / PFX / "check-wiring.sh"
         tgt.write_bytes(tgt.read_bytes() + b"\n# drift\n")
@@ -7607,7 +7632,7 @@ def main() -> int:
         # AC5 — provenance at check time, plus the DEAD PROBE half. A loop that resolved zero of a
         # non-zero population measured nothing, and reporting that as clean is the failure direction
         # this repo names.
-        ev3 = build_target(tmp / "u5c", DEPLOY_FULL)
+        ev3 = build_target(tmp / "u5c", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(ev3), "--kits", "check-wiring")
         rp = ev3 / ".governance" / "install.json"
         rec = json.loads(rp.read_text(encoding="utf-8"))
@@ -7622,7 +7647,7 @@ def main() -> int:
 
         # AC4 — the sidecar and the receipt are asserted against EACH OTHER. The sidecar is the
         # artifact a target verifies with bash alone and nothing in this repo read it before.
-        ev4 = build_target(tmp / "u5d", DEPLOY_FULL)
+        ev4 = build_target(tmp / "u5d", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(ev4), "--kits", "check-wiring")
         sp = ev4 / ".governance" / "install.sums"
         lines = sp.read_text(encoding="utf-8").splitlines()
@@ -7635,7 +7660,7 @@ def main() -> int:
               and "the receipt carries" in pc.stdout, pc.stdout)
 
         # THE WHOLE HOLE, end to end. This is the fixture that exited 0 before this unit.
-        ev5 = build_target(tmp / "u5e", DEPLOY_FULL)
+        ev5 = build_target(tmp / "u5e", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(ev5), "--kits", "check-wiring")
         rp = ev5 / ".governance" / "install.json"
         rec = json.loads(rp.read_text(encoding="utf-8"))
@@ -7707,7 +7732,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The [[outcome]] evaluator: six descriptors declared these blocks and ZERO code read them,
         # so an exit code shared by six unrelated branches was the whole report. A fixture asserts a
         # MEANING now, which is what the acceptance layer needs and could not have.
-        cmt = build_target(tmp / "u5g", DEPLOY_FULL)
+        cmt = build_target(tmp / "u5g", DEPLOY_FULL, template=TEMPLATES)
         pa = run("apply", "--target", str(cmt), "--kits", "memory-tree")
         check("a declared outcome is reported by its MEANING, not as a bare integer",
               "seed-and-stop" in pa.stdout or "refused-foreign-tree" in pa.stdout
@@ -7738,7 +7763,7 @@ user_skills = "/tmp/gk-fake-skills"
               _pi12.stdout)
         check("[-12] and that report does not claim an accepted stop that never happened",
               "stopped at an accepted outcome" not in _pi12.stdout, _pi12.stdout)
-        _no12 = build_target(tmp / "u12b", DEPLOY_FULL)
+        _no12 = build_target(tmp / "u12b", DEPLOY_FULL, template=TEMPLATES)
         _pn12 = run("apply", "--target", str(_no12), "--write")
         check("[-12] the same fixture WITHOUT the key still runs that kit's adopter",
               (_no12 / ".memory-tree.conf").is_file() and "DECLINED" not in _pn12.stdout,
@@ -8259,7 +8284,7 @@ user_skills = "/tmp/gk-fake-skills"
                               'dedupe_key = "name"\ncommand = ["true"]\nrun_all_env = {}\n'
                               'observed_ran = ["a{name}"]\nobserved_failed = ["b{name}"]'),
                              "only 'json-array' is implemented")):
-            bt = build_target(tmp / ("u4r%d" % (abs(hash(bad)) % 9999)), None)
+            bt = build_target(tmp / ("u4r%d" % (abs(hash(bad)) % 9999)), None, template=TEMPLATES)
             (bt / ".governance").mkdir(exist_ok=True)
             (bt / ".governance" / "deploy.toml").write_text(
                 f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["check-wiring"]\n'
@@ -8460,7 +8485,7 @@ user_skills = "/tmp/gk-fake-skills"
         # --- CLI it never wrote (DEPL-dGaugedVintage-3). The kit declares no forked rule now, so a
         # --- fresh target receives all three. The INCOMPLETE report that existed for that state is
         # --- graded over the synthetic `demo` fork in the DEPL-dCarriedReceipt-10 block below.
-        inc = build_target(tmp / "incomplete", DEPLOY_FULL)
+        inc = build_target(tmp / "incomplete", DEPLOY_FULL, template=TEMPLATES)
         p = run("apply", "--target", str(inc), "--kits", "memory-recall,memory-tree")
         out = p.stdout + p.stderr
         _mr = inc / PFX / KIT_NAMES["memory-recall"]
@@ -9066,7 +9091,7 @@ user_skills = "/tmp/gk-fake-skills"
               "a graded join on a function's closing line is reported as an escape")
 
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
-        for_ = build_target(tmp / "e", DEPLOY_FULL)
+        for_ = build_target(tmp / "e", DEPLOY_FULL, template=TEMPLATES)
         (for_ / PFX).mkdir(parents=True, exist_ok=True)
         (for_ / PFX / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n",
                                                         encoding="utf-8")
@@ -9080,7 +9105,8 @@ user_skills = "/tmp/gk-fake-skills"
         # --- TOOL-aRepatriatedFork-24 AC8: a foreign kit at the INTAKE'S OWN prefix. The probe asked
         # --- only at gov's prefix and the root, so a `scripts/` intake over a `scripts/` install read
         # --- as a clean target and the apply went ahead. Red against `2143b6d6`'s probe.
-        for_s = build_target(tmp / "e24", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1))
+        for_s = build_target(tmp / "e24", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1),
+                             template=TEMPLATES)
         (for_s / "scripts").mkdir(parents=True, exist_ok=True)
         (for_s / "scripts" / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n",
                                                           encoding="utf-8")
@@ -9097,7 +9123,8 @@ user_skills = "/tmp/gk-fake-skills"
         # --- over a foreign kit at GOV'S canonical prefix. The per-entry probe dropped the old pair's
         # --- canonical rung, so this target read as clean and apply installed a second copy.
         # --- Red against `7de665e5`'s probe.
-        for_c = build_target(tmp / "e24c", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1))
+        for_c = build_target(tmp / "e24c", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1),
+                             template=TEMPLATES)
         (for_c / PFX).mkdir(parents=True, exist_ok=True)
         (for_c / PFX / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n", encoding="utf-8")
         p = run("apply", "--target", str(for_c), "--kits", _sel24)
@@ -9112,7 +9139,7 @@ user_skills = "/tmp/gk-fake-skills"
         # --- POSITIVE on-disk assertion rather than deleted — an arm that asserts a refusal string
         # --- is the classic one that keeps passing after the string merely moves, so its
         # --- replacement has to observe an effect. The full behaviour is in the unit 6 block above.
-        p = run("apply", "--target", str(build_target(tmp / "f", DEPLOY_FULL)),
+        p = run("apply", "--target", str(build_target(tmp / "f", DEPLOY_FULL, template=TEMPLATES)),
                 "--kits", "pytest-parallel-guardrails")
         check("a merged rule now LANDS rather than refusing", p.returncode == 0, p.stdout)
         check("and it reports the mode it used, on disk",
@@ -9124,7 +9151,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("that refusal calls it a stated non-goal", "stated non-goal" in p.stderr, p.stderr)
 
         # --- --resume needs an install to resume.
-        p = run("apply", "--target", str(build_target(tmp / "g", DEPLOY_FULL)),
+        p = run("apply", "--target", str(build_target(tmp / "g", DEPLOY_FULL, template=TEMPLATES)),
                 "--kits", "check-wiring", "--resume")
         check("--resume refuses with no receipt", p.returncode == 2)
         check("that refusal says there is no install to resume",
@@ -9133,7 +9160,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ================= intake =================
         # AC12: given a prepared answer stream, intake writes a descriptor `apply` accepts with no
         # further prompting. The arm is the CHAIN, not the file: intake then apply, no hand editing.
-        ik = build_target(tmp / "h", None)
+        ik = build_target(tmp / "h", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik), "--kits", "check-wiring")
         check("intake exits 0 when the selection needs no answers", p.returncode == 0,
               p.stdout + p.stderr)
@@ -9143,7 +9170,7 @@ user_skills = "/tmp/gk-fake-skills"
               p.stdout + p.stderr)
 
         # --- intake refuses to invent an answer, and NAMES the ones it wants.
-        ik2 = build_target(tmp / "i", None)
+        ik2 = build_target(tmp / "i", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik2), "--kits", "kickoff-manifest")
         check("intake refuses when an answer is missing", p.returncode == 2)
         check("intake names the missing answers", "manifest_path" in p.stderr, p.stderr)
@@ -9169,7 +9196,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The pre-unit behaviour emitted the literal `tools` whatever was supplied, so the one
         # committed non-default descriptor in the fleet was a file the tool that owns it could not
         # have written. Each arm below fails against that draft.
-        ik3 = build_target(tmp / "i3", None)
+        ik3 = build_target(tmp / "i3", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik3), "--kits", "gate-lint",
                 "--answer", "prefix=scripts")
         check("intake with --answer prefix= exits 0", p.returncode == 0, p.stdout + p.stderr)
@@ -9179,7 +9206,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("the run reports the prefix and names its source",
               'prefix "scripts" (from --answer)' in p.stdout, p.stdout)
 
-        ik4 = build_target(tmp / "i4", None)
+        ik4 = build_target(tmp / "i4", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik4), "--kits", "gate-lint")
         check("an OMITTED prefix still defaults to tools",
               'prefix = "tools"' in (ik4 / ".governance" / "deploy.toml").read_text(
@@ -9189,7 +9216,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # An EMPTY value is the default, never an empty prefix: `prefix = ""` would resolve every
         # destination to a bare relative path, which is a silent mis-install rather than a refusal.
-        ik5 = build_target(tmp / "i5", None)
+        ik5 = build_target(tmp / "i5", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik5), "--kits", "gate-lint", "--answer", "prefix=")
         check("an EMPTY --answer prefix= falls back to tools",
               'prefix = "tools"' in (ik5 / ".governance" / "deploy.toml").read_text(
@@ -9202,7 +9229,7 @@ user_skills = "/tmp/gk-fake-skills"
         # [gate_runner] block is emitted from a seed whose {prefix} and {kit} tokens resolve here,
         # so a draft that fixes only the `prefix = ` line writes a descriptor declaring one prefix
         # whose runner paths spell another. Observed as a staged break before this arm was written.
-        ik6 = build_target(tmp / "i6", None)
+        ik6 = build_target(tmp / "i6", None, template=TEMPLATES)
         p = run("intake", "--target", str(ik6), "--kits", "run-gates",
                 "--answer", "prefix=scripts")
         check("intake emits a [gate_runner] under a non-default prefix", p.returncode == 0,
@@ -9222,7 +9249,7 @@ user_skills = "/tmp/gk-fake-skills"
         # re-stamp. So ONE `.gitattributes` row froze a target's `gov_commit` forever, and every
         # kit selection carrying an lf_pin produces exactly such a row. Reproduced on a real target
         # before the fix: `update --write` exited 1 and `gov_commit` never moved.
-        ap = build_target(tmp / "u2pins", None)
+        ap = build_target(tmp / "u2pins", None, template=TEMPLATES)
         p = run("intake", "--target", str(ap), "--kits", "push-main")
         check("[-2] intake accepts push-main", p.returncode == 0, p.stdout + p.stderr)
         p = run("apply", "--target", str(ap), "--kits", "push-main")
@@ -9422,7 +9449,7 @@ user_skills = "/tmp/gk-fake-skills"
         EDIT = "committed\nAN OPERATOR EDIT\n"
 
         # ---- AC1: `update --write` over a pinned path named with a SPACE.
-        _sp = build_target(tmp / "gs25a", DEPLOY_FULL)
+        _sp = build_target(tmp / "gs25a", DEPLOY_FULL, template=TEMPLATES)
         check("[-25] AC1 fixture: apply installs cleanly before anything is dirtied",
               run("apply", "--target", str(_sp)).returncode == 0, "")
         settle(_sp, "applied")
@@ -9447,7 +9474,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # ---- AC2: `apply` over a pinned path carrying a NON-ASCII byte. A DIFFERENT VERB and a
         # ---- different route into the same guard, which is why it is not the same fixture.
-        _na = build_target(tmp / "gs25b", DEPLOY_FULL)
+        _na = build_target(tmp / "gs25b", DEPLOY_FULL, template=TEMPLATES)
         _bad = _na / "memory" / "caf\u00e9.md"
         _bad.parent.mkdir(parents=True, exist_ok=True)
         _bad.write_text("committed\n", encoding="utf-8", newline="\n")
@@ -10359,7 +10386,7 @@ user_skills = "/tmp/gk-fake-skills"
         # destroyed by every re-apply, silently, with the descriptor reading exactly as intended.
         with tempfile.TemporaryDirectory() as td3:
             tmp3 = pathlib.Path(td3)
-            t = build_target(tmp3, None)
+            t = build_target(tmp3, None, template=TEMPLATES)
             run("intake", "--target", str(t), "--kits", "drift-audit")
             first = run("apply", "--target", str(t), "--kits", "drift-audit,memory-tree")
             owned = t / PFX / KIT_NAMES["drift-audit"] / "drift_signals.py"
@@ -10463,7 +10490,7 @@ user_skills = "/tmp/gk-fake-skills"
             # preview agreed with it. Asserted as a SUBSET relation on the preview's write set: the
             # declared single kit's rows are a strict subset of what the registry default writes,
             # which is a property no re-baselining of a row count can accidentally satisfy.
-            t3 = build_target(tmp3 / "declared", DEPLOY_FULL)
+            t3 = build_target(tmp3 / "declared", DEPLOY_FULL, template=TEMPLATES)
             pl3 = run("plan", "--target", str(t3))
             check("a target's own `kits` list is honoured by a no---kits plan", pl3.returncode == 0,
                   pl3.stdout + pl3.stderr)
@@ -10715,7 +10742,7 @@ user_skills = "/tmp/gk-fake-skills"
                 # second apply there can refuse for the pre-existing-kits reason instead of the
                 # merged-region one — and the arm would then pass or fail on fixture order rather
                 # than on the behaviour it names. `plan` above is read-only, so it can share `t2`.
-                tm = build_target(tmp3 / f"merged-{kit}", DEPLOY_FULL)
+                tm = build_target(tmp3 / f"merged-{kit}", DEPLOY_FULL, template=TEMPLATES)
                 ap = run("apply", "--target", str(tm), "--kits", kit)
                 check(f"{kit}: ...and apply refuses over it",
                       "no verb here can write a gov-owned region" in ap.stdout + ap.stderr,
@@ -10725,7 +10752,7 @@ user_skills = "/tmp/gk-fake-skills"
             # KEYED ON codebase-map, NOT ON playbook. The playbook's two rules are `seed` and LAND,
             # so it skips nothing to name — this arm was reading the role the landed-zero-bytes
             # defect wore. codebase-map's `map_extractors.py` is a real project-owned skip.
-            t3 = build_target(tmp3 / "skips", DEPLOY_FULL)
+            t3 = build_target(tmp3 / "skips", DEPLOY_FULL, template=TEMPLATES)
             sk = run("apply", "--target", str(t3), "--kits", "codebase-map,memory-tree")
             check("apply names each skipped rule, its role and its destination",
                   f"SKIPPED [project-owned] {PFX}{KIT_NAMES['codebase-map']}/map_extractors.py" in sk.stdout,
@@ -10958,7 +10985,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- AC2: a NORMAL repo whose selection declares NO lf_pin. check-wiring is the kit for
         # ---- the mirror-image reason: the path form works fine here, so the only thing this arm
         # ---- can be measuring is that the probe left `if pins:`.
-        n2 = build_target(tmp / "ac2", None)
+        n2 = build_target(tmp / "ac2", None, template=TEMPLATES)
         run("intake", "--target", str(n2), "--kits", "check-wiring")
         run("apply", "--target", str(n2), "--kits", "check-wiring")
         settle(n2, "the install")
@@ -11044,7 +11071,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The loop does not sleep-and-hope: it WATCHES for the lock to appear and only then starts
         # the second run, and if three attempts never catch the first run holding it, the arm FAILS
         # rather than reporting a green it did not earn.
-        cc = build_target(tmp / "ac5", None)
+        cc = build_target(tmp / "ac5", None, template=TEMPLATES)
         run("intake", "--target", str(cc), "--kits", "memory-tree")
         run("apply", "--target", str(cc), "--kits", "memory-tree")
         settle(cc, "the install")
@@ -11128,7 +11155,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # The target installs at whatever gov's HEAD is, so it is built HERE — between B and D —
         # which is how its receipt comes to record the MIDDLE vintage with history on both sides.
-        t7 = build_target(tmp / "ac7", None)
+        t7 = build_target(tmp / "ac7", None, template=TEMPLATES)
         gov_run(gv, "intake", "--target", str(t7), "--kits", "demo")
         gov_run(gv, "apply", "--target", str(t7), "--kits", "demo")
         settle(t7, "the demo install")
@@ -11244,7 +11271,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- compares the INDEX BLOB against the oid the receipt recorded, so it excuses gov's own
         # ---- staging and nothing else. The negative half below is what makes that a carve-out and
         # ---- not a hole, and it is the reason this is asserted as a PAIR.
-        _oa = build_target(tmp / "owner-a", None)
+        _oa = build_target(tmp / "owner-a", None, template=TEMPLATES)
         run("intake", "--target", str(_oa), "--kits", "memory-tree")
         _poa = run("apply", "--target", str(_oa), "--kits", "memory-tree")
         _oarec = json.loads((_oa / ".governance" / "install.json").read_text(encoding="utf-8"))
@@ -11349,7 +11376,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ----
         # ---- BOTH VERBS ARE ARMED, because a `plan` that cheerfully previews escaping writes is its
         # ---- own defect: the preview is what an operator approves.
-        _tv = build_target(tmp / "traversal", None)
+        _tv = build_target(tmp / "traversal", None, template=TEMPLATES)
         (_tv / ".governance").mkdir(parents=True, exist_ok=True)
         (_tv / ".governance" / "deploy.toml").write_text(
             'prefix = "../../PWNED"\n', encoding="utf-8", newline="\n")
@@ -11403,7 +11430,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ----
         # ---- THE PAIR IS THE POINT: the character grader admits the drive letter, and the ESCAPE
         # ---- grader still reds a drive-lettered destination. Two guards, two jobs, asserted apart.
-        _dvt = build_target(tmp / "drive-win", None)
+        _dvt = build_target(tmp / "drive-win", None, template=TEMPLATES)
         (_dvt / ".governance").mkdir(parents=True, exist_ok=True)
         (_dvt / ".governance" / "deploy.toml").write_text(
             f'prefix = "{PFX[:-1]}"\n\n[answers]\nmanifest_path = "docs/MANIFEST.md"\n'
@@ -11449,7 +11476,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- and stopping there would have left the CLASS open at a site that fails SILENTLY,
         # ---- which is exactly the rule this build had already broken once in the same round.
         def build_gr_target(tag: str, runner_file: str) -> pathlib.Path:
-            _t = build_target(tmp / f"gr-{tag}", None)
+            _t = build_target(tmp / f"gr-{tag}", None, template=TEMPLATES)
             (_t / ".governance").mkdir(parents=True, exist_ok=True)
             (_t / ".governance" / "deploy.toml").write_text(
                 f'prefix = "{PFX[:-1]}"\n\n[gate_runner]\nkind = "manifest"\n'
@@ -11647,7 +11674,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- `attributes` row whose file is on disk, the literal form could elect it, and that row
         # ---- is now one the shadow refusal DOES cover -- so the arm would have graded the ruling
         # ---- against the one row the ruling no longer applies to.
-        _ob = build_target(tmp / "owner-b", None)
+        _ob = build_target(tmp / "owner-b", None, template=TEMPLATES)
         run("intake", "--target", str(_ob), "--kits", "memory-tree")
         run("apply", "--target", str(_ob), "--kits", "memory-tree")
         settle(_ob, "the install")
@@ -11734,7 +11761,7 @@ user_skills = "/tmp/gk-fake-skills"
             return "(no row)"
 
         MTR = f"{PFX}{KIT_NAMES['memory-tree']}/README.md"
-        i7 = build_target(tmp / "id7", DEPLOY_FULL)
+        i7 = build_target(tmp / "id7", DEPLOY_FULL, template=TEMPLATES)
         run("apply", "--target", str(i7), "--kits", "memory-tree")
         settle(i7, "the install")
         c7 = clone_crlf(i7, "id7-clone")
@@ -11917,7 +11944,7 @@ user_skills = "/tmp/gk-fake-skills"
             Run through the SCRATCH gov's own copy of the engine, which is the seam that acts —
             a break staged into this repo's `govkit.py` does not reach a copy taken before it.
             """
-            t = build_target(tmp / name, None)
+            t = build_target(tmp / name, None, template=TEMPLATES)
             for verb in ("intake", "apply"):
                 subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), verb,
                                 "--target", str(t), "--kits", "demo"], capture_output=True)
@@ -12060,7 +12087,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- `merged` arm patched out of S9, that row's `commit`-without-`gov_oid` tripped the
         # ---- exactly-one branch and the WHOLE run refused before any row was classified — on the
         # ---- first update against any target that ever applied such a rule.
-        t11 = build_target(tmp / "id11", None)
+        t11 = build_target(tmp / "id11", None, template=TEMPLATES)
         run("intake", "--target", str(t11), "--kits", "push-main")
         run("apply", "--target", str(t11), "--kits", "push-main")
         settle(t11, "the push-main install")
@@ -12122,7 +12149,7 @@ user_skills = "/tmp/gk-fake-skills"
             guarantee under test is the one that survives a commit, and an uncommitted edit never
             reaches the classifier at all.
             """
-            t = build_target(tmp / name, DEPLOY_FULL)
+            t = build_target(tmp / name, DEPLOY_FULL, template=TEMPLATES)
             run("apply", "--target", str(t), "--kits", "check-wiring")
             # BOTH identities from the SAME vintage, or the fixture is `-7` S9's corruption rather
             # than an older install, and every run below refuses before it classifies. The SAME
@@ -13080,7 +13107,8 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- printed. The summary clause is derived from the same table now.
         _gp = fork_gov("plan", fork_kit())
         _tp = build_target(tmp / "fork-plan-t",
-                          f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+                          f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                           template=TEMPLATES)
         _pp = run_in_gov(_gp, "plan", "--target", str(_tp), "--kits", "demo")
         _prows = _extract_plan_rows(_pp.stdout)
         check("[-10] AC5 plan exits 0 over a descriptor carrying a forked rule",
@@ -13110,7 +13138,8 @@ user_skills = "/tmp/gk-fake-skills"
 
         def fork_target(g: pathlib.Path, name: str) -> pathlib.Path:
             t = build_target(tmp / name,
-                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                             template=TEMPLATES)
             p = t / PFX / "demo" / "forked-one.py"
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text(FORK_TARGET_BYTES, encoding="utf-8", newline="\n")
@@ -13154,7 +13183,8 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- never on the kit id, so this fixture grades the same branch.
         _gi = fork_gov("incomplete", fork_kit())
         _ti = build_target(tmp / "fork-incomplete-t",
-                          f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+                          f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                           template=TEMPLATES)
         _ip = run_in_gov(_gi, "apply", "--target", str(_ti), "--kits", "demo")
         _io = _ip.stdout + _ip.stderr
         check("[dGV-3] apply reports an entry INCOMPLETE when its forked files are absent",
@@ -13377,7 +13407,8 @@ user_skills = "/tmp/gk-fake-skills"
             later arms are grading a broken install. The local delta is an EDIT AFTER the install, which is
             the state the three-way exists for.
             """
-            t = build_target(tmp / name, f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+            t = build_target(tmp / name, f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                             template=TEMPLATES)
             (t / PFX / "demo").mkdir(parents=True, exist_ok=True)
             (t / PFX / "demo" / "rendered.txt").write_text(
                 "the adopter rendered this\n", encoding="utf-8", newline="\n")
@@ -14194,7 +14225,8 @@ user_skills = "/tmp/gk-fake-skills"
                   '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n')
         _g88 = build_rename_gov("inplace", _kit88, "pinned", {"keep.txt": "one\ntwo\nthree\nfour\n"})
         _gk88 = _g88 / "pinned" / KIT_NAMES["govkit"]
-        _t88 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-t")
+        _t88 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-t",
+                            template=TEMPLATES)
         _ap88 = subprocess.run([sys.executable, str(_gk88 / "govkit.py"), "apply", "--target", str(_t88),
                                 "--kits", "demo"], capture_output=True, text=True, encoding="utf-8", errors="replace")
         settle(_t88, "the install")
@@ -14237,7 +14269,8 @@ user_skills = "/tmp/gk-fake-skills"
         # place, and other.txt is renamed onto the adopter's own file, so the kit is rolled back. The
         # in-place row is snapshotted at its one path, so the order restores it once.
         _g91 = build_rename_gov("inplace-held", _kit88, "pinned", {"keep.txt": "one\ntwo\n", "other.txt": "other\n"})
-        _t91 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-held-t")
+        _t91 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-held-t",
+                            template=TEMPLATES)
         _ap91 = subprocess.run([sys.executable, str(_g91 / "pinned" / KIT_NAMES["govkit"] / "govkit.py"), "apply",
                                 "--target", str(_t91), "--kits", "demo"],
                                capture_output=True, text=True, encoding="utf-8", errors="replace")
@@ -14263,7 +14296,8 @@ user_skills = "/tmp/gk-fake-skills"
         # the two names must still be one file. A hard link stands in for a symlink: NTFS makes one
         # without a privilege, and `samefile` answers both alike.
         _g93 = build_rename_gov("link", _kit88, "pinned", {"keep.txt": "one\ntwo\nthree\nfour\n"})
-        _t93 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-link-t")
+        _t93 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-link-t",
+                            template=TEMPLATES)
         _ap93 = run_in_gov(_g93, "apply", "--target", str(_t93), "--kits", "demo", root="pinned")
         _keep93, _link93 = (_t93 / "pinned" / "demo" / n for n in ("keep.txt", "linked.txt"))
         try:
@@ -15611,7 +15645,8 @@ user_skills = "/tmp/gk-fake-skills"
         # this unit's widening and no arm would have noticed. `build_target` + the real `apply`, with
         # no `settle` behind it, is that state exactly: gov's block staged, nothing committed.
         _t24p = build_target(tmp / "v24-postapply",
-                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n',
+                             template=TEMPLATES)
         _a24p = run_in_gov(_gp, "apply", "--target", str(_t24p), "--kits", "demo")
         check("[-24] AC2 LIVENESS the post-apply fixture installed green and left gov's block "
               "STAGED rather than committed",
@@ -16873,7 +16908,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- Graded on the POPULATION rather than through a second `update` run, because the
         # ---- population IS the fix and a run would also have to clear `-7` S4 and the lock to say
         # ---- anything -- a fixture that cannot reach the case is how this build lost two rounds.
-        _mgt = build_target(tmp / 'merged-dirty', None)
+        _mgt = build_target(tmp / 'merged-dirty', None, template=TEMPLATES)
         (_mgt / 'pyproject.toml').write_text('[tool.x]\nk = 1\n', encoding='utf-8', newline='\n')
         settle(_mgt, 'a target owning a pyproject')
         run('intake', '--target', str(_mgt), '--kits', 'pytest-parallel-guardrails')
@@ -16908,7 +16943,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- TWO KITS, THE ESCAPE IN THE LAST ONE, and the assertion is the PROPERTY rather than
         # ---- the message: after the refusal the target holds no gov-written file at all. Measured
         # ---- with the hoist reverted, the same fixture left 33 dirty paths behind.
-        _h3t = build_target(tmp / 'h3-order', None)
+        _h3t = build_target(tmp / 'h3-order', None, template=TEMPLATES)
         (_h3t / '.governance').mkdir(parents=True, exist_ok=True)
         (_h3t / '.governance' / 'deploy.toml').write_text(
             f'gov_source = "local"\nprefix = "{PFX[:-1]}"\n'

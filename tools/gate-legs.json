@@ -2519,7 +2519,8 @@
       "{prefix}/hooks/kit.toml",
       "{prefix}/settings-merge.py",
       "{prefix}/codebase-map/kit.toml",
-      "{prefix}/process-monitor/census.py"
+      "{prefix}/process-monitor/census.py",
+      "{prefix}/lib/template_cache.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
