@@ -5769,6 +5769,12 @@ def test_slug_claims(arm, files: dict) -> None:
             "(0, 'local refs/gov/claims/dSame · no remote') refs=''",
             lambda: f"{run_claims((seed, 'slug', 'dSame', '--claimant', 'ffffffffffff'))[0]} "
                     f"refs='{read_git(seed, 'for-each-ref', 'refs/gov')}'")
+        bad = run_claims((a, "slug", "asks", "--claimant", "ffffffffffff"),
+                         (a, "ask", "XYZ", "dSame", "--claimant", "ffffffffffff"),
+                         (a, "slug", "dSame", "--claimant", "FFFF"))
+        arm("TOOL-dTotalRecall-3 S1 — the slug asks, a family FAMILIES lacks and a malformed key each refuse before the remote",
+            "[2, 2, 2] ['refused the slug asks', 'refused the family XYZ', 'refused the claimant key']",
+            lambda: f"{[r for r, _ in bad]} {[' '.join(x.split()[:4]) for _, x in bad]}")
 
 
 def test_staged_render(arm) -> None:
