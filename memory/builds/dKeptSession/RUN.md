@@ -174,3 +174,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T13:03:51Z draw · re-dispatch · KICK-dKeptSession-37 · 11/132 · 20261122T130351Z-321a17
 
 2026-11-22T13:03:51Z dispatch · item bfc2a0b0 KICK-dKeptSession-37 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-37-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-22T13:31:59Z brief · item KICK-dKeptSession-38 · reason ea9b5ee789e9 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-38-build-brief.md
+
+2026-11-22T13:34:46Z dispatch · item 55584c3f KICK-dKeptSession-38 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh help/orientation-card.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-38-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
