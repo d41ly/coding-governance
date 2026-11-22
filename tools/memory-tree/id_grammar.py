@@ -870,24 +870,23 @@ _READER_ID_SHAPE = re.compile(r"\[[^\]\n]*a-z[^\]\n]*\](?:[*+]|\{\{?[0-9]*,?[0-9
 _READER_SLUG_SHAPE = re.compile(r"\w*(?:SLUG|[Ss]lug)\w*\s*=\s*(?:re\.compile\(\s*)?\(?\s*"
                                 r"(?:[rRbBfF]{0,2}(['\"])[^'\"\n]*\[|/[^/\n]*\[)")
 _READER_BLOCK = re.compile(r"^(?:# |// )(>>>|<<<) slug_legacy_")
-# The split shapes (TOOL-dTotalRecall-38 S2): a value whose name holds `id`, `slug` or `unit`, case
-# ignored, split on a hyphen by Python's `.split("-")` or `.rsplit("-"`, by a shell `${name%-*}`,
-# `${name%%-*}`, `${name#*-}` or `${name##*-}`, or on a line that names one beside a `cut -d-`,
-# `cut -d '-'` or `IFS=-`. The value's NAME is read, so a split of a value named otherwise is outside
-# it, and so is `.partition`.
-_SPLIT_NAME = r"[A-Za-z_]*(?:id|slug|unit)[A-Za-z_]*"
+# The split shapes (TOOL-dTotalRecall-38 S2, keyed on the shape by TOOL-dTotalRecall-44): Python's
+# `.split("-")` with no maxsplit, blanks inside its parentheses allowed, unless it is indexed `[0]` at
+# once, since the family before the first hyphen is the one segment a hyphen in a slug cannot move; a
+# shell `${name%-*}`, `${name%%-*}`, `${name#*-}` or `${name##*-}`, `cut -d-`, `cut -d '-'`,
+# `cut -d "-"` or `IFS=-`. No value's NAME is read, so a reader of an id named `i` or `a` is listed;
+# `.rsplit("-", 1)`, which reads the sequence after the last hyphen, and `.partition` are outside it.
 _READER_SPLIT_SHAPE = re.compile(
-    _SPLIT_NAME + r"\.r?split\(\s*(['\"])-\1"
-    r"|\$\{" + _SPLIT_NAME + r"(?:%%?-\*|##?\*-)\}"
-    r"|^(?=.*\$\{?" + _SPLIT_NAME + r").*(?:\bcut\s+-d\s*(?:-|'-'|\"-\")(?=\s|$)|\bIFS=-(?=\s|;|$))",
-    re.I)
+    r"\.split\(\s*([\"'])-\1\s*\)(?!\[0\])"
+    r"|\bcut\s+-d\s*(?:-|'-'|\"-\")(?=\s|$)|\bIFS=-(?=\s|;|$)"
+    r"|\$\{[A-Za-z_]+(?:%%?-\*|##?\*-)\}")
 
 
 def scan_readers(root) -> list[str]:
     """`path:line:text` for every line of a tracked `*.py`, `*.sh` or `*.js` file under `tools/` and
     `skills/`, and of every tracked file under `.githooks/`, that spells a slug or id shape or splits
-    an id-named value on a hyphen (`_READER_SPLIT_SHAPE`), outside the grammar's own entry points:
-    this module and every `slug_legacy_*` block."""
+    a value on a hyphen in a shape that reads past the family (`_READER_SPLIT_SHAPE`), outside the
+    grammar's own entry points: this module and every `slug_legacy_*` block."""
     root = pathlib.Path(root)
     tool_root = pathlib.Path(__file__).resolve().parent.parent
     try:  # the tool root as this tree places it, so an adopter's install prefix is the one scanned

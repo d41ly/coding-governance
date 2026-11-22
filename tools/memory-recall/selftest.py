@@ -3660,13 +3660,21 @@ def test_id_parts_parse_under_each_tree_grammar():
 
 
 # --- TOOL-dTotalRecall-38: the split census and the flip probe's census check ---------------------
-# One plant per split shape the census reads, and a control whose split value is named for no id.
+# One plant per split shape the census reads, and a control that takes index 0. TOOL-dTotalRecall-44
+# S3 keys the census on the shape: three plants whose value is named for no id, or whose index or
+# unpacking reads past the family, are listed; an index-0 split and an `rsplit` sequence read are not.
 _SPLIT_PLANTS = {
     "py-split": ("plant/py_split.py", 'slug = unit_id.split("-")[1]\n'),
     "sh-cut": ("plant/sh_cut.sh", "slug=$(printf '%s' \"$unit_id\" | cut -d- -f2)\n"),
     "sh-expansion": ("plant/sh_expansion.sh", "fam=${unit_id%%-*}\n"),
     "control": ("plant/control.py", 'stem = path.split("-")[0]\n'),
+    "py-unnamed": ("plant/py_unnamed.py", 'slug = i.split("-")[1]\n'),
+    "py-node": ("plant/py_node.py", "node = spec_id.split('-')[1][0]\n"),
+    "py-unpack": ("plant/py_unpack.py", 'fam, slug, seq = x.split("-")\n'),
+    "py-head": ("plant/py_head.py", 'fam = x.split("-")[0]\n'),
+    "py-rsplit": ("plant/py_rsplit.py", 'seq = x.rsplit("-", 1)[1]\n'),
 }
+_SPLIT_LISTED = {"py-split", "sh-cut", "sh-expansion", "py-unnamed", "py-node", "py-unpack"}
 # The re-pointed reader the clone reverts to its split, and the split it reverts to.
 _REPOINTED = ("        return backlog.load_id_grammar().parse_id_parts(ident, None, alt=backlog.ANY_FAMILY)[1]\n",
               '        return ident.split("-")[1]\n')
@@ -3674,9 +3682,9 @@ _REPOINTED = ("        return backlog.load_id_grammar().parse_id_parts(ident, No
 
 @check("the reader census lists each split shape, and the flip probe fails a clone that reverts a re-pointed reader")
 def test_split_census_and_the_flip_probe_census_check():
-    """TOOL-dTotalRecall-38 AC2, AC4. In `make_repo`'s throwaway tree, which carries every memory-tree
-    `*.py`, that tree's own `id_grammar.py --readers` lists the `py-split`, `sh-cut` and
-    `sh-expansion` plants and not the control. Its `--flip-probe` over a clone of that tree names no
+    """TOOL-dTotalRecall-38 AC2, AC4 and TOOL-dTotalRecall-44 AC1. In `make_repo`'s throwaway tree,
+    which carries every memory-tree `*.py`, that tree's own `id_grammar.py --readers` lists the
+    `_SPLIT_LISTED` plants and neither the control, `py-head` nor `py-rsplit`. Its `--flip-probe` over a clone of that tree names no
     census failure, and over the clone with `migrate_backlog.read_slug` reverted to its split and
     committed, every flip names the reverted line and the probe exits 1. The throwaway carries no
     policy kit, so its flips' other checks are not read here."""
@@ -3697,7 +3705,7 @@ def test_split_census_and_the_flip_probe_census_check():
                            capture_output=True, text=True, encoding="utf-8")
         assert p.returncode == 0, f"--readers crashed:\n{p.stderr[-600:]}"
         listed = {name for name, (rel, _text) in _SPLIT_PLANTS.items() if f"{rel}:1:" in p.stdout}
-        assert listed == {"py-split", "sh-cut", "sh-expansion"}, f"the census listed the plants {sorted(listed)}"
+        assert listed == _SPLIT_LISTED, f"the census listed the plants {sorted(listed)}"
         subprocess.run(["git", "clone", "-q", str(root), str(clone)], check=True, capture_output=True)
         subprocess.run(["git", "-C", str(clone), "remote", "remove", "origin"], check=True, capture_output=True)
         probe = [sys.executable, str(grammar), "--flip-probe", str(clone)]
@@ -3719,7 +3727,8 @@ def test_split_census_and_the_flip_probe_census_check():
     finally:
         cleanup(root)
         cleanup(clone)
-    return "3 split plants listed, the control not; 6 flips name the reverted reader and the probe exits 1"
+    return (f"{len(_SPLIT_LISTED)} split plants listed, the other {len(_SPLIT_PLANTS) - len(_SPLIT_LISTED)} not; "
+            "6 flips name the reverted reader and the probe exits 1")
 
 
 def main() -> int:
