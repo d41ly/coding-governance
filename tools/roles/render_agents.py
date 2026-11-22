@@ -536,6 +536,8 @@ def check_ranked_arms(state, roles):
 FIXTURE_TREE_LIB = ('import os\n\n\ndef read_policy_value(key, root):\n    value = os.environ.get("FX_AGENT_ROOT", "")\n'
                     '    if key != "builds.agent-root" or not value:\n'
                     '        raise ValueError("%s did not read: fixture refusal" % key)\n    return value\n')
+#: The sibling kit's directory name `handoff.read_agent_root` resolves beside the fixture's tool root.
+FIXTURE_TREE_KIT = "memory-tree"
 
 
 def check_agent_root_arms(state, roles):
@@ -547,8 +549,9 @@ def check_agent_root_arms(state, roles):
     with tempfile.TemporaryDirectory() as tmp:
         root = pathlib.Path(tmp)
         kit, tool_root = build_fixture(root, {"r-one": roles["r-one"]})
-        (tool_root / "memory-tree").mkdir()
-        (tool_root / "memory-tree" / "tree_lib.py").write_text(FIXTURE_TREE_LIB, encoding="utf-8")
+        fixture_kit = tool_root / FIXTURE_TREE_KIT
+        fixture_kit.mkdir()
+        (fixture_kit / "tree_lib.py").write_text(FIXTURE_TREE_LIB, encoding="utf-8")
         (root / "mem" / "builds" / "fxFix" / "prompts").mkdir(parents=True)
         (root / "spec.md").write_text("spec\n", encoding="utf-8")
         saved = (handoff.KIT_DIR, handoff.WORK_ORDER, lib.check_load_set, sys.modules.pop("tree_lib", None),
