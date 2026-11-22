@@ -624,11 +624,12 @@ function deriveRoundFields(count) {
 }
 const reviewDir = a.reviewDir || 'reviews/'
 // TOOL-aOrientedCast-27 S3/S9 - every agent's label and the run's identity, `<slug> · <scope> · <stage>`.
-// The slug is the segment after a `builds/` segment of `reviewDir` when it is letters only, else none,
+// The slug is the segment after a `builds/` segment of `reviewDir` when the slug grammar admits it
+// (`[a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3}`, rendered from the memory-tree kit, TOOL-dTotalRecall-5 S5), else none,
 // so a review outside a build folder carries no slug part. The stage is the label a spawn carried
 // before, so `pending`, the log lines and every reader of a stage keep their spelling. The build
 // harness holds its own copy of the function, because a workflow script imports nothing.
-const reviewSlug = (/(?:^|\/)builds\/([A-Za-z]+)(?:\/|$)/.exec(String(reviewDir).replace(/\\/g, '/')) || [])[1] || ''
+const reviewSlug = (/(?:^|\/)builds\/([a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3})(?:\/|$)/.exec(String(reviewDir).replace(/\\/g, '/')) || [])[1] || ''
 const reviewScope = kind + ' round ' + round
 function renderAgentLabel(scope, stage) {
   return [reviewSlug, scope, stage].filter(Boolean).join(' · ')
@@ -770,7 +771,8 @@ const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulat
 // `base` sha are "an immutable 7-40 hex object id", which is one question with one answer.
 const PINNED_SHA = /^[0-9a-f]{7,40}$/
 // `expand_id_runs`' id grammar, anchored: a subject's pin below and a finding's address in the tally.
-const PIN_ID = /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/
+// A pinned unit id; its slug is the slug grammar's class, rendered as `[a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3}` (TOOL-dTotalRecall-5 S5).
+const PIN_ID = /^[A-Z]+-([a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3})-[0-9]+$/
 const subjects = Array.isArray(a.subjects) ? a.subjects : []
 if (isSpec) {
   // D6 - `find(pred) || null` collapsed a FALSY offender back onto the pass sentinel, so the `!x`

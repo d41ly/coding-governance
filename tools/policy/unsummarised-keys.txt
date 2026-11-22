@@ -22,9 +22,6 @@ build.spend-cap
 build.unit-holders
 build.worktree
 builds.agent-root
-builds.slug-date
-builds.slug-style
-builds.slug-words
 card.follows
 card.pointers
 card.snapshot

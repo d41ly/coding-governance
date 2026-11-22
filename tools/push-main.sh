@@ -122,8 +122,9 @@ done
 # THE ATTENDED LANDING TAKES `--slug` TOO (TOOL-dPlacedRequest-15 S6): with it the landing fences on
 # that build's lease, and without it the landing names no build and covers no lease.
 if [ -n "$MODE" ] || [ -n "$SLUG_SET" ]; then
-  # The SAME grammar the memory tree enforces on a build-folder name, because that is what a slug
-  # is; it reaches a commit message and a lease ref, so it is validated before it gets there.
+  # A slug reaches a commit message and a lease ref, so a traversal or a blank is refused here, before
+  # anything runs; the slug grammar itself is asked below, once the kit resolver is defined, and still
+  # before anything is written (TOOL-dTotalRecall-5 S7).
   case "$SLUG" in
     *[!A-Za-z0-9-]* | "" | [!A-Za-z]*)
       echo "push-main: ${MODE:+--$MODE needs }--slug <slug>, a build-folder name: a letter, then letters, digits or dashes: '$SLUG'" >&2
@@ -1149,11 +1150,12 @@ derive_carry_set() {  # R · output-file
 # comparison.
 resolve_commit_build() {  # sha · memory-root -> a build slug, or `unknown`
   local subj claim folders one
+  load_slug_class || return 2
   subj=$(git log -1 --format=%s "$1" 2>/dev/null || true)
   claim=$(printf '%s\n' "$subj" | sed -nE \
     -e 's/^[a-z][a-z-]*\(([A-Za-z0-9_.-]+)\):.*/\1/p' -e 't' \
-    -e 's/^[A-Z][A-Z]+-([A-Za-z]+)-[0-9]+:.*/\1/p' -e 't' \
-    -e 's/^merge: [A-Z][A-Z]+-([A-Za-z]+)-[0-9]+( .*)?$/\1/p' | head -n 1)
+    -e "s/^[A-Z][A-Z]+-($SLUG_CLASS)-[0-9]+:.*/\\1/p" -e 't' \
+    -e "s/^merge: [A-Z][A-Z]+-($SLUG_CLASS)-[0-9]+( .*)?\$/\\1/p" | head -n 1)
   folders=$(git show --pretty=format: --name-only "$1" 2>/dev/null \
     | awk -v p="$2/builds/" 'index($0,p)==1 { r=substr($0,length(p)+1); i=index(r,"/"); if (i>1) print substr(r,1,i-1) }' \
     | sort -u)
@@ -1460,6 +1462,29 @@ resolve_lander_kit() {  # kit home · file -> "<python>\t<kit dir>" · 0; else t
     return 2
   fi
   printf '%s\t%s\n' "$py" "$dir"
+}
+# THE SLUG GRAMMAR (TOOL-dTotalRecall-5 S7): the memory-tree kit's hygiene script beside this lander
+# prints it as `--print-slug-re`, asked once and kept in SLUG_CLASS for every slug and id reader below.
+# This kit requires no memory-tree, so where that kit or a python is not installed the inline legacy
+# shape applies, said once on stderr; a kit that answers nothing usable refuses, never guessed.
+# >>> slug_legacy_sh — canonical copy: check-memory-hygiene.sh in the memory-tree kit (byte-identical; gated)
+SLUG_LEGACY_ERE='[a-z][A-Za-z]{2,}'
+# <<< slug_legacy_sh
+SLUG_CLASS=""
+load_slug_class() {  # -> 0 with SLUG_CLASS set; 2 with a named refusal on stderr
+  [ -n "$SLUG_CLASS" ] && return 0
+  local _sg _re=""
+  if _sg=$(resolve_lander_kit memory-tree check-memory-hygiene.sh); then
+    _re=$("${BASH:-bash}" "$top/${_sg#*$'\t'}/check-memory-hygiene.sh" --print-slug-re 2>/dev/null | tr -d '\r')
+    case "$_re" in
+      '^('*')$') SLUG_CLASS=${_re#'^('}; SLUG_CLASS=${SLUG_CLASS%')$'}; return 0 ;;
+    esac
+    echo "push-main: the memory-tree kit's slug grammar did not answer --print-slug-re, so no slug is read: ${_re:-no answer}" >&2
+    return 2
+  fi
+  echo "slug grammar: memory-tree not installed, the legacy shape applies" >&2
+  SLUG_CLASS=$SLUG_LEGACY_ERE
+  return 0
 }
 # `check_merge_losses R T` runs the lexicon kit's `--merge-losses` over `R..T`, the merges a prepared
 # landing would publish, so a merge that LOST a definition a parent carried is refused here, before
@@ -2050,6 +2075,13 @@ cmd_prepared() {
   exit 0
 }
 
+# THE SLUG IS ONE THE SLUG GRAMMAR ADMITS, its BUILD_SLUG_RE, asked before any verb writes a thing.
+if [ -n "$SLUG" ]; then
+  load_slug_class || exit 2
+  [[ $SLUG =~ ^($SLUG_CLASS)$ ]] || {
+    echo "push-main: ${MODE:+--$MODE needs }--slug <slug>, a build-folder name the slug grammar admits, ^($SLUG_CLASS)\$: '$SLUG'" >&2
+    exit 2; }
+fi
 case "$MODE" in
   prepare)  cmd_prepare; exit $? ;;
   land)     cmd_land ;;

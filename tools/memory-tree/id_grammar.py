@@ -197,12 +197,15 @@ class Conf:
         in this module's code, so a widening of an era reaches none of the project values. Measured
         when the session era widened: `records` went 53 documents to 91 and every already-built
         cache stayed warm and blind to the 38 new ones. `derive_grammar_epoch()` is this file's own bytes.
+        The slug class is folded beside it (TOOL-dTotalRecall-5 S4): a README recording a new slug
+        grammar widens the session era with no byte of this file moving.
         """
-        # `extra_sources` and `exclude` change WHICH documents exist; `cited_families` and
-        # `node_tag_class` change which strings are ids.
+        # `extra_sources` and `exclude` change WHICH documents exist; `cited_families`,
+        # `node_tag_class` and the slug class change which strings are ids.
         blob = "\0".join((self.memory_root, ",".join(sorted(self.families)), self.node_tag_class,
                           " ".join(self.extra_sources), derive_grammar_epoch(),
-                          ",".join(sorted(self.cited_families)), " ".join(self.exclude)))
+                          ",".join(sorted(self.cited_families)), " ".join(self.exclude),
+                          derive_slug_grammar(self.root).slug_class))
         return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
 
 
@@ -274,21 +277,211 @@ def resolve(root: pathlib.Path | None = None) -> Conf:
     return out
 
 
+# ---------------------------------------------------------------------------- the slug grammar
+#
+# TOOL-dTotalRecall-5. One slug grammar, declared by the policy keys `builds.slug-words`,
+# `builds.slug-style` and `builds.slug-date` and derived here once, is what every slug and id reader
+# reads. A grammar's shape is `<node-letter><date><word>{lo,hi}`: a word is a capital and at least one
+# lower-case letter, the date is empty unless `in-slug`, then eight digits or a hyphenated date after
+# the node letter. `style` is the minting source and never a shape. A changed grammar binds new mints
+# only: `mint_re` is the grammar in force, and `slug_class` the alternation of the frozen legacy shape,
+# the grammar in force and every grammar a tracked build README records in `slug-grammar:`, so no
+# reader refuses a slug minted under any of them. `slug_class` is spliced by Python readers and
+# `slug_ere`, the same construction with capturing group openers, by shell, awk and JavaScript ones:
+# ERE has no `(?:` (gawk and bash `=~` refuse it, §8 F7).
+
+# The catalogue's three defaults, for a tree with no policy kit or a refused read. The build-index
+# self-test holds them to the catalogue rows wherever the policy kit resolves.
+SLUG_DEFAULTS = {"builds.slug-words": "1-3", "builds.slug-style": "humorous", "builds.slug-date": "none"}
+_SLUG_STYLES = ("humorous", "descriptive")
+_SLUG_DATES = ("none", "shown", "in-slug")
+_SLUG_RECORD_RE = re.compile(r"^words=([0-9]+)-([0-9]+) style=(\S+) date=(\S+)$")
+_SLUG_DATE_SHAPE = "[0-9]{8}|[0-9]{4}-[0-9]{2}-[0-9]{2}"
+
+# The legacy shape, `[<node>][A-Za-z]{2,}`, a `%` template over the node class: frozen, and the
+# answer of a kit that cannot reach this module, which carries this block inline.
+# >>> slug_legacy_py — canonical copy: id_grammar.py in the memory-tree kit (byte-identical; gated)
+SLUG_LEGACY = "[%s][A-Za-z]{2,}"
+# <<< slug_legacy_py
+
+
+class SlugGrammar(types.SimpleNamespace):
+    """The slug grammar of one tree: `words` (lo, hi), `style`, `date`, `node`, `slug_class`,
+    `slug_ere`, `BUILD_SLUG_RE`, `mint_re`, `record` and `fallback`, the reason the defaults apply or
+    empty when the three keys read."""
+
+    def render_label(self, slug: str, opened: str | None) -> str:
+        """`<slug> (<opened>)` under `shown`, the bare slug otherwise: a date beside a slug, never in an id."""
+        return f"{slug} ({opened})" if self.date == "shown" and opened else slug
+
+
+def parse_slug_grammar(value: str, where: str | None = None) -> tuple[tuple[int, int], str, str]:
+    """`words=<lo>-<hi> style=<style> date=<date>` -> ((lo, hi), style, date), the record's one reader.
+
+    A value outside the grammar, `lo` below 1 or above `hi` among it, is a ConfError naming the README
+    `where` that carried it, or with none the policy key, never a default."""
+    m = _SLUG_RECORD_RE.match(str(value).strip())
+    if not m:
+        raise ConfError(f"refused: {where or 'the builds.slug-* keys'} {value!r} is not "
+                        "`words=<lo>-<hi> style=<style> date=<date>`")
+    lo, hi, style, date = int(m.group(1)), int(m.group(2)), m.group(3), m.group(4)
+    if not 1 <= lo <= hi:
+        raise ConfError(f"refused: {where or 'builds.slug-words'} words={lo}-{hi} is not a range "
+                        "with 1 <= lo <= hi")
+    if style not in _SLUG_STYLES:
+        raise ConfError(f"refused: {where or 'builds.slug-style'} style={style} is not one of "
+                        f"{', '.join(_SLUG_STYLES)}")
+    if date not in _SLUG_DATES:
+        raise ConfError(f"refused: {where or 'builds.slug-date'} date={date} is not one of "
+                        f"{', '.join(_SLUG_DATES)}")
+    return (lo, hi), style, date
+
+
+def render_slug_shape(g, opener: str) -> str:
+    """One grammar's shape. `opener` is the group opener: `(?:` renders the Python spelling, `(` the
+    POSIX ERE one; the two differ in nothing else. `g` carries `node`, `words` and `date`."""
+    date = opener + _SLUG_DATE_SHAPE + ")" if g.date == "in-slug" else ""
+    return "[" + g.node + "]" + date + opener + "[A-Z][a-z]+){%d,%d}" % g.words
+
+
+def render_slug_record(words: tuple[int, int], style: str, date: str) -> str:
+    return "words=%d-%d style=%s date=%s" % (words[0], words[1], style, date)
+
+
+def read_slug_policy(root: pathlib.Path) -> tuple[str, str]:
+    """-> (the record of the three keys, the fallback line). The first refused read ends the reads and
+    `SLUG_DEFAULTS` applies to all three, as checks 6 and 7 treat their read: a LookupError is no
+    policy kit, a ValueError the reader refusing, no landed revision among its causes."""
+    here = str(pathlib.Path(__file__).resolve().parent)
+    if here not in sys.path:
+        sys.path.append(here)
+    import tree_lib  # noqa: PLC0415 — the sibling, deliberately not at import
+
+    vals = dict(SLUG_DEFAULTS)
+    key = "builds.slug-words"
+    try:
+        vals[key] = tree_lib.read_policy_value("builds.slug-words", root)
+        key = "builds.slug-style"
+        vals[key] = tree_lib.read_policy_value("builds.slug-style", root)
+        key = "builds.slug-date"
+        vals[key] = tree_lib.read_policy_value("builds.slug-date", root)
+    except LookupError:
+        vals = dict(SLUG_DEFAULTS)
+        why = "slug grammar: no policy kit, the defaults apply"
+    except ValueError as exc:
+        vals = dict(SLUG_DEFAULTS)
+        said = str(exc).partition(" did not read: ")[2] or str(exc)
+        why = f"slug grammar: the policy reader refused {key}, the defaults apply: {said}"
+    else:
+        why = ""
+    record = "words=%s style=%s date=%s" % (vals["builds.slug-words"], vals["builds.slug-style"],
+                                            vals["builds.slug-date"])
+    return record, why
+
+
+def read_recorded_grammars(root: pathlib.Path, memory_root: str) -> list[tuple[str, str]]:
+    """[(record, README path)], each tracked `<memory_root>/builds/<slug>/README.md` recording one in
+    its front matter's `slug-grammar:`, in path order. A README recording none is legacy."""
+    try:
+        out = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", f"{memory_root}/builds"],
+                             capture_output=True, check=True).stdout.decode("utf-8", "replace")
+    except (OSError, subprocess.CalledProcessError):
+        return []
+    here = str(pathlib.Path(__file__).resolve().parent)
+    if here not in sys.path:
+        sys.path.append(here)
+    from tree_lib import FM_RE, read_text  # noqa: PLC0415 — the sibling, deliberately not at import
+
+    found = []
+    for rel in sorted(p for p in out.split("\0") if p):
+        parts = rel.split("/")
+        if parts[-1] != "README.md" or len(parts) != len(memory_root.split("/")) + 3:
+            continue
+        try:
+            fm = FM_RE.match(read_text(str(root / rel)))
+        except (OSError, UnicodeDecodeError):
+            continue
+        for line in (fm.group(1).splitlines() if fm else ()):
+            if line.startswith("slug-grammar:"):
+                found.append((line.partition(":")[2].strip(), rel))
+    return found
+
+
+def read_slug_node(root: pathlib.Path) -> tuple[str, str]:
+    """-> (the node-tag class, the memory root) of `root`'s conf, as `resolve` validates the class."""
+    conf = load_conf(root)
+    node = conf.get("RECALL_NODE_TAG_CLASS", "").strip() or NODE_TAG_CLASS
+    if not _TAG_CLASS_RE.match(node):
+        raise ConfError(f"refused: {CONF_NAME} RECALL_NODE_TAG_CLASS={node!r} is not a character-class "
+                        "body over [a-z0-9-], e.g. a-f")
+    return node, conf.get("MEMORY_ROOT", "").strip().strip("/") or "memory"
+
+
+_slug_cache: dict[str, SlugGrammar] = {}
+
+
+def derive_slug_grammar(root=None) -> SlugGrammar:
+    """The slug grammar of `root`, or with none the repo this file lives in, cached per process and root."""
+    base = pathlib.Path(root) if root is not None else repo_root()
+    key = str(base.resolve())
+    if key in _slug_cache:
+        return _slug_cache[key]
+    node, memory_root = read_slug_node(base)
+    record, fallback = read_slug_policy(base)
+    words, style, date = parse_slug_grammar(record)
+    g = SlugGrammar(words=words, style=style, date=date, node=node, fallback=fallback,
+                    record=render_slug_record(words, style, date))
+    recorded = []
+    for value, rel in read_recorded_grammars(base, memory_root):
+        rw, rs, rd = parse_slug_grammar(value, rel)
+        recorded.append(types.SimpleNamespace(words=rw, style=rs, date=rd, node=node,
+                                              record=render_slug_record(rw, rs, rd)))
+    g.recorded = list(dict.fromkeys(r.record for r in recorded))
+    legacy = SLUG_LEGACY % node
+    g.slug_class = "|".join(dict.fromkeys([legacy, render_slug_shape(g, "(?:"),
+                                           *(render_slug_shape(r, "(?:") for r in recorded)]))
+    g.slug_ere = "|".join(dict.fromkeys([legacy, render_slug_shape(g, "("),
+                                         *(render_slug_shape(r, "(") for r in recorded)]))
+    g.BUILD_SLUG_RE = re.compile(r"^(?:" + g.slug_class + r")$")
+    g.mint_re = re.compile(r"^" + render_slug_shape(g, "(?:") + r"$")
+    _slug_cache[key] = g
+    return g
+
+
+class SlugPattern:
+    """A compiled pattern bound from the slug grammar at FIRST USE, never at import: importing a reader
+    resolves no conf and runs no policy read. `build` takes the grammar and returns the pattern text;
+    every attribute of the compiled pattern (`match`, `fullmatch`, `pattern`, ...) reads through."""
+
+    def __init__(self, build, flags: int = 0, root=None):
+        self._build, self._flags, self._root, self._re = build, flags, root, None
+
+    def __getattr__(self, name):
+        if self._re is None:
+            self._re = re.compile(self._build(derive_slug_grammar(self._root)), self._flags)
+        return getattr(self._re, name)
+
+
 # ---------------------------------------------------------------------------- the id grammar
 
 
-def _eras(node: str) -> tuple[str, ...]:
+def _eras(node: str, slug_class: str | None = None) -> tuple[str, ...]:
     """The three id eras, from ONE construction. A second copy is the catalogue-drift class.
 
     flat `ARCH-001` · node-scoped `ABL-d119` · session `ABL-bSiftedArchive-3`, and its `-3b`
     correction. Spelled out rather than approximated: a loose `[A-Za-z0-9]+` tail also swallows
     `ARCH-codebase` and bare session slugs, measured upstream at +348 phantom ids. The session era's
     `[a-z]*` tail is the narrowest widening that admits the ratified correction id.
+
+    The session era's slug is `slug_class`, the slug grammar's (TOOL-dTotalRecall-5 S4), so an id
+    whose slug carries an `in-slug` date parses; None is the legacy shape alone.
     """
+    session = (r"(?:" + slug_class + r")" if slug_class is not None
+               else rf"[{node}][A-Za-z]{{2,}}")
     return (
         r"\d{3}",  # flat            ARCH-001
         rf"[{node}]\d{{2,3}}",  # node-scoped     ABL-d119
-        rf"[{node}][A-Za-z]{{2,}}-\d+[a-z]*",  # session  ABL-bSiftedArchive-3, and its -3b
+        session + r"-\d+[a-z]*",  # session  ABL-bSiftedArchive-3, and its -3b
     )
 
 
@@ -299,7 +492,7 @@ class Grammar(types.SimpleNamespace):
 def build_grammar(conf: Conf) -> Grammar:
     """The grammar of one resolved conf. Built by concatenation: `.format()` reads `{2,6}` as a field."""
     families = conf.families + conf.cited_families
-    eras = _eras(conf.node_tag_class)
+    eras = _eras(conf.node_tag_class, derive_slug_grammar(conf.root).slug_class)
     ident = r"(?:" + "|".join(families) + r")-(?:" + "|".join(eras) + r")"
     # An anchor is a line that DEFINES a record, as opposed to one that merely cites it: a heading,
     # a bold list item, a pipe-table row's first cell and a charter-form dash row. H1 is NOT one of
@@ -645,3 +838,188 @@ def match_expr(query: str) -> str:
     # OR the terms. FTS5's query language treats most punctuation as syntax, so every term is
     # double-quoted -- an unquoted `use client` or `c++` is a syntax error, not a miss.
     return " OR ".join('"' + t.replace('"', "") + '"' for t in dict.fromkeys(ts))
+
+
+# ---------------------------------------------------------------------------- the slug grammar's CLI
+
+# The reader search (TOOL-dTotalRecall-5 §4 "The readers"): a slug class followed by a hyphen and a
+# digit class, at most a group's closing and opening parenthesis between them, its repeat a `*`, a `+`
+# or a brace interval, single or an f-string's doubled; or a name holding `slug` bound to a regex literal.
+_READER_ID_SHAPE = re.compile(r"\[[^\]\n]*a-z[^\]\n]*\](?:[*+]|\{\{?[0-9]*,?[0-9]*\}\}?)?\)?-\(?(?:\?:|\?P<\w+>)?"
+                              r"(?:\\d|\[0-9\]|\[1-9\])")
+_READER_SLUG_SHAPE = re.compile(r"\w*(?:SLUG|[Ss]lug)\w*\s*=\s*(?:re\.compile\(\s*)?\(?\s*"
+                                r"(?:[rRbBfF]{0,2}(['\"])[^'\"\n]*\[|/[^/\n]*\[)")
+_READER_BLOCK = re.compile(r"^(?:# |// )(>>>|<<<) slug_legacy_")
+
+
+def scan_readers(root) -> list[str]:
+    """`path:line:text` for every line of a tracked `*.py`, `*.sh` or `*.js` file under `tools/` and
+    `skills/`, and of every tracked file under `.githooks/`, that spells a slug or id shape, outside
+    the grammar's own entry points: this module and every `slug_legacy_*` block."""
+    root = pathlib.Path(root)
+    out = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", "tools", "skills", ".githooks"],
+                         capture_output=True, check=True).stdout.decode("utf-8", "replace")
+    own = pathlib.Path(__file__).resolve()
+    try:  # this module's own path in ITS tree, so a scanned clone's copy of it is excluded too
+        own_rel = own.relative_to(repo_root().resolve()).as_posix()
+    except (ValueError, ConfError):
+        own_rel = None
+    hits = []
+    for rel in sorted(p for p in out.split("\0") if p):
+        if not (rel.startswith(".githooks/") or rel.endswith((".py", ".sh", ".js"))):
+            continue
+        path = root / rel
+        if not path.is_file() or path.resolve() == own or rel == own_rel:
+            continue
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except (OSError, UnicodeDecodeError):
+            continue
+        inside = False
+        for n, line in enumerate(lines, 1):
+            mark = _READER_BLOCK.match(line)
+            if mark:
+                inside = mark.group(1) == ">>>"
+                continue
+            if not inside and (_READER_ID_SHAPE.search(line) or _READER_SLUG_SHAPE.search(line)):
+                hits.append(f"{rel}:{n}:{line}")
+    return hits
+
+
+# The six flips of §4 "The flips": (name, key, value, the new slug planted).
+_FLIPS = (
+    ("slug-words 1", "builds.slug-words", "1-1", "dLoop"),
+    ("slug-words 3", "builds.slug-words", "3-3", "dClosedLoopTwo"),
+    ("slug-style descriptive", "builds.slug-style", "descriptive", "dClosedLoop"),
+    ("slug-date shown", "builds.slug-date", "shown", "dClosedLoop"),
+    ("slug-date in-slug digit", "builds.slug-date", "in-slug", "d20261026ClosedLoop"),
+    ("slug-date in-slug hyphenated", "builds.slug-date", "in-slug", "d2026-10-26ClosedLoop"),
+)
+
+
+def run_flip_probe(clone) -> int:
+    """Each flip of `_FLIPS`, committed to `main` of the scratch clone `clone`, whose remote is removed
+    so the policy reader's landed revision is that `main`: the new slug passes `mint_re`; a legacy
+    two-word slug the flip does not admit fails it and passes `BUILD_SLUG_RE`, or the shape is stated
+    unchanged; every tracked folder passes `BUILD_SLUG_RE`; `ID_RE` matches `TOOL-<slug>-3` whole.
+    One `flip <name>: ok` line or the failed checks each; 1 on any failure, 2 on an unusable clone."""
+    global _default, _cached
+    clone = pathlib.Path(clone).resolve()
+
+    def run(*args: str) -> str:
+        return subprocess.run(["git", "-C", str(clone), "-c", "user.name=flip-probe",
+                               "-c", "user.email=flip-probe@invalid", "-c", "core.autocrlf=false", *args],
+                              capture_output=True, text=True, encoding="utf-8", check=True).stdout
+
+    try:
+        if run("remote").strip():
+            print(f"flip-probe: refused: {clone.as_posix()} has a remote, so its landed revision is not "
+                  "its main; remove it in the scratch clone", file=sys.stderr)
+            return 2
+        if clone == repo_root().resolve():
+            print("flip-probe: refused: the clone is this tree; make a scratch clone", file=sys.stderr)
+            return 2
+        run("checkout", "-q", "main")
+        start = run("rev-parse", "HEAD").strip()
+    except (OSError, subprocess.CalledProcessError) as exc:
+        print(f"flip-probe: refused: {clone.as_posix()} is no git clone with a main: {exc}", file=sys.stderr)
+        return 2
+    policy = clone / ".governance" / "policy.toml"
+    node, memory_root = read_slug_node(clone)
+    depth = len(memory_root.split("/"))
+    _slug_cache.clear()
+    base_mint = derive_slug_grammar(clone).mint_re.pattern
+    failed = 0
+    try:
+        for name, key, value, slug in _FLIPS:
+            run("reset", "-q", "--hard", start)
+            vals = dict(SLUG_DEFAULTS, **{key: value})
+            record = "words=%s style=%s date=%s" % (vals["builds.slug-words"], vals["builds.slug-style"],
+                                                    vals["builds.slug-date"])
+            text = policy.read_text(encoding="utf-8") if policy.is_file() else ""
+            policy.parent.mkdir(parents=True, exist_ok=True)
+            policy.write_text(text.rstrip("\n") + f'\n\n[builds]\n{key.partition(".")[2]} = "{value}"\n',
+                              encoding="utf-8", newline="\n")
+            readme = clone / memory_root / "builds" / slug / "README.md"
+            readme.parent.mkdir(parents=True, exist_ok=True)
+            readme.write_text(f"---\nslug: {slug}\nslug-grammar: {record}\nopened: 2026-10-26\n---\n\n"
+                              f"# {slug}\n", encoding="utf-8", newline="\n")
+            run("add", "--", policy.relative_to(clone).as_posix(), readme.relative_to(clone).as_posix())
+            run("commit", "-q", "--no-verify", "-m", f"flip-probe: {name}")
+            _slug_cache.clear()
+            _default = _cached = None
+            g = derive_slug_grammar(clone)
+            why = []
+            same = g.mint_re.pattern == base_mint
+            if g.record != record:
+                why.append(f"the grammar in force reads {g.record}, not {record} ({g.fallback or 'no fallback'})")
+            if not g.mint_re.match(slug):
+                why.append(f"mint_re refuses the new slug {slug}")
+            if same and key == "builds.slug-words" or same and value == "in-slug":
+                why.append("the shape did not change")
+            elif not same and (g.mint_re.match("dTotalRecall") or not g.BUILD_SLUG_RE.match("dTotalRecall")):
+                why.append("the legacy two-word slug dTotalRecall does not fail mint_re and pass BUILD_SLUG_RE")
+            folders = sorted({p.split("/")[depth + 1] for p in run("ls-files", "--", f"{memory_root}/builds").splitlines()
+                              if len(p.split("/")) > depth + 2})
+            bad = [f for f in folders if not g.BUILD_SLUG_RE.match(f)]
+            if bad or not folders:
+                why.append(f"BUILD_SLUG_RE refuses the tracked folder(s) {' '.join(bad[:5]) or '(none tracked)'}")
+            ident = f"TOOL-{slug}-3"
+            m = grammar_for(clone).ID_RE.search(f"see {ident} here")
+            if not m or m.group(0) != ident or not m.group(0).endswith("-3"):
+                why.append(f"ID_RE does not match {ident} whole: {m.group(0) if m else 'no match'}")
+            if value == "shown" and g.render_label("dClosedLoop", "2026-10-26") != "dClosedLoop (2026-10-26)":
+                why.append("render_label does not render dClosedLoop (2026-10-26)")
+            if why:
+                print(f"flip {name}: " + "; ".join(why))
+            else:
+                print(f"flip {name}: ok" + (f" (the shape does not change under {value})" if same else ""))
+            failed += bool(why)
+    finally:
+        run("reset", "-q", "--hard", start)
+        _slug_cache.clear()
+        _default = _cached = None
+    return 1 if failed else 0
+
+
+_USAGE = ("usage: id_grammar.py --print slug-re|slug-class|slug-grammar [<root>]\n"
+          "       id_grammar.py --readers [<root>]\n"
+          "       id_grammar.py --flip-probe <scratch clone>")
+
+
+def main(argv=None) -> int:
+    args = list(sys.argv[1:] if argv is None else argv)
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8", newline="\n")
+    if args[:1] == ["--print"] and len(args) in (2, 3) and args[1] in ("slug-re", "slug-class", "slug-grammar"):
+        try:
+            g = derive_slug_grammar(args[2] if len(args) == 3 else None)
+        except ConfError as exc:
+            print(f"id_grammar: {exc}", file=sys.stderr)
+            return 2
+        if g.fallback:
+            print(g.fallback, file=sys.stderr)
+        if args[1] == "slug-re":
+            print("^(" + g.slug_ere + ")$")
+        elif args[1] == "slug-class":
+            print(g.slug_ere)
+        else:
+            print(g.record)
+            for record in g.recorded:
+                print(f"recorded {record}")
+        return 0
+    if args[:1] == ["--readers"] and len(args) <= 2:
+        hits = scan_readers(args[1] if len(args) == 2 else repo_root())
+        for hit in hits:
+            print(hit)
+        print(f"readers: {len(hits)} line(s) in {len({h.split(':', 1)[0] for h in hits})} file(s)",
+              file=sys.stderr)
+        return 0
+    if args[:1] == ["--flip-probe"] and len(args) == 2:
+        return run_flip_probe(args[1])
+    print(_USAGE, file=sys.stderr)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

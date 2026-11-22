@@ -1711,7 +1711,8 @@ if (badSubject !== -1) {
 }
 // TOOL-dTrueNorth-5 S2 - the pin fields, under the grammar `tier2-review.js` refuses them by, so a
 // caller-supplied set is refused here, naming the field and the stage, before the callee is spawned.
-const UNIT_ID = /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/
+// A unit id; its slug is the slug grammar's class, rendered as `[a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3}` (TOOL-dTotalRecall-5 S5).
+const UNIT_ID = /^[A-Z]+-([a-z][A-Za-z]{2,}|[a-z]([A-Z][a-z]+){1,3})-[0-9]+$/
 const unpinned = !specAudit ? null : subjects.reduce(function (hit, s, i) {
   if (hit) return hit
   if (typeof s.id !== 'string' || !UNIT_ID.test(s.id)) return { i: i, field: 'id', got: s.id }

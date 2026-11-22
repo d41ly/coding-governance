@@ -149,7 +149,9 @@ NEXT_SHAPES = {"live-unit": "<id> (READY - build it)",
                "nothing-graded": "none - no tracked spec grades as a unit (see the NOT A UNIT rows above)",
                "everything-terminal": "none - every tracked spec is terminal",
                "other": "none - <answer>: <reason>"}
-UNIT_ID = re.compile(r"[A-Za-z]+-[A-Za-z0-9]+-\d+")
+read_memory_tree("id_grammar.py")
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
+UNIT_ID = SlugPattern(lambda g: r"[A-Za-z]+-(?:" + g.slug_class + r")-\d+")
 PARKED_ROW = re.compile(r"^[0-9][0-9-]*T[0-9:]*Z (\S+) · item (\S+)")
 #: `--plant`'s cases and what each owes.
 PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 3's step",

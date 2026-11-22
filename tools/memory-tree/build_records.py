@@ -157,11 +157,12 @@ if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 from design_lib import read_design_conf, read_tracked_builds  # noqa: E402  the tracked population
 from tree_lib import RED_FIX_TRAILER, TYPED_RECORD_KINDS  # noqa: E402  the reader's kind list, this table's keys
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
 
 FIELD = re.compile(r"^- \*\*([A-Z][a-z-]+(?: [a-z]+)?):\*\* (.+)$")     # the instrument deviations.py's
-ID = r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
+ID = SlugPattern(lambda g: r"[A-Za-z]+-(?:" + g.slug_class + r")-\d+")   # a unit id, its slug the grammar's
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]*$")
+SLUG = SlugPattern(lambda g: g.BUILD_SLUG_RE.pattern)       # a build slug, every grammar one was minted under
 PRINCIPLE = re.compile(r"^principle\.p[1-9]\d*$")
 SEG = r"[a-z0-9][a-z0-9-]*"                                    # one segment of a tag, and one disposition word
 TAG = SEG + r"(?:\." + SEG + r")+"
@@ -284,7 +285,7 @@ PENDING_ENTRY = ('    "exception": {\n        "required": ("Principle", "Excuses
 
 def derive_stem(kind):
     """A `kind` record's stem as a regex, its `<n>` following."""
-    return r"\d{4}-\d{2}-\d{2}-build-" + ID + "-" + re.escape(kind) + "-"
+    return r"\d{4}-\d{2}-\d{2}-build-" + ID.pattern + "-" + re.escape(kind) + "-"
 
 
 def derive_record_name(kind):
@@ -875,7 +876,7 @@ def write_record(root, build, unit, kind, title, fields, today=None, lines=()):
                          f"record of it is written")
     if not SLUG.match(build):
         raise ValueError(f"--build {build!r} is not a build slug")
-    if not re.fullmatch(ID, unit):
+    if not ID.fullmatch(unit):
         raise ValueError(f"--unit {unit!r} is not a unit id")
     forged = [key for key, value in fields if "\n" in value or "\r" in value or FORGED_FIELD.match(value)]
     if forged:

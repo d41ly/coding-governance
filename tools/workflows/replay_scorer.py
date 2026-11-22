@@ -1719,7 +1719,7 @@ def run_selftest():
             refs = ["d.md:[plan] input", "d.md:[act] lifetime"] + (["d.md:[spawn] relaunch"] if r == 2 and run2_hits_c else [])
             rows = "".join(f"| {i} | walk-{i} | {ref} | high | confirmed |\n" for i, ref in enumerate(refs, 1))
             path = pathlib.Path(tmp, f"run{r}.md")
-            path.write_text(f"**Serves:** spec-audit PLAY-dX-1\n\n## Verdict: CLEAN WITH FIXES\n\nReview shape: confirmed {len(refs)}.\n\n"
+            path.write_text(f"**Serves:** spec-audit PLAY-dXFix-1\n\n## Verdict: CLEAN WITH FIXES\n\nReview shape: confirmed {len(refs)}.\n\n"
                             f"## Walk table — run {r} of 2, sliced by {('scenario', 'step')[r - 1]}\n"
                             f"walk-seed mode=reverted-escapes key-sha256={sha}\n\n| Item | Scenario | Actor | Needs | Witness | Route | Verdict |\n"
                             f"|---|---|---|---|---|---|---|\n| `plan` | S1 | = | = | = | = | holds |\n\n{APPENDIX_HEADING}\n\n"

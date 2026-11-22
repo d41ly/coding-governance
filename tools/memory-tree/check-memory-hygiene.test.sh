@@ -3892,9 +3892,10 @@ rm -rf "$_ixt" "$_ixw"
 
 # ---- TOOL-dRetiredFork-15: the five project keys -------------------------------------------------
 # Three arms per validated key -- default, valid override, INVALID override -- because the invalid
-# case is the only one that matters here. BUILD_SLUG_RE and RECORD_SERVES_CUTOFF NARROW what is
-# graded, so a bad value does not red: it silently grades nothing and reports green. These arms are
-# what stop that reaching an adopter.
+# case is the only one that matters here. RECORD_SERVES_CUTOFF NARROWS what is graded, so a bad
+# value does not red: it silently grades nothing and reports green. These arms are what stop that
+# reaching an adopter. BUILD_SLUG_RE is RETIRED as an input (TOOL-dTotalRecall-5 S6): any set value
+# refuses naming the three policy keys, and check 4 reads the slug grammar's derived pattern.
 #
 # ONE FIXTURE, REUSED, AND IT IS THE CHECK-16 NOTE TREE ABOVE (TOOL-aRatifiedRulings-3). The second
 # cut ran every arm over a `git archive` of this whole repository: 1902 tracked files at 28 s a
@@ -3918,26 +3919,44 @@ case "$_b1rc:$_b1out" in
   *) echo "FAIL project keys: the fixture is not clean unset (rc=$_b1rc), or its clean run never reached check 16 — every arm below is meaningless"; st=1 ;;
 esac
 
-write_pk_conf 'BUILD_SLUG_RE="^[A-Za-z]+$"'; o=$(run_pk_gate); r=$?
-n=$((n+1)); [ "$r" = 0 ] && echo "ok   BUILD_SLUG_RE: a pattern gov's own slugs satisfy still passes" \
-  || { echo "FAIL BUILD_SLUG_RE: a satisfiable pattern redded (rc=$r)"; st=1; }
-
-write_pk_conf 'BUILD_SLUG_RE="^zzz[A-Za-z]+$"'; o=$(run_pk_gate); r=$?
+# A PASSING RUN PRINTS NO SLUG GRAMMAR LINE. This fixture is master-pinned, so it has no landed
+# revision, the policy reader refuses and the defaults apply, and that reason explains nothing here.
 n=$((n+1))
-case "$o" in
-  *"HYGIENE check 4 FAILED"*"memory/builds/tOne (bad folder name"*) echo "ok   BUILD_SLUG_RE: a pattern the folders violate REDS (rc=$r)" ;;
-  *) echo "FAIL BUILD_SLUG_RE: a violated pattern did not red check 4 naming memory/builds/tOne (rc=$r) — the key is not reaching check 4"; st=1 ;;
+case "$_b1out" in
+  *"slug grammar:"*) echo "FAIL a passing run printed the slug grammar's fallback line, which explains no finding"; st=1 ;;
+  *) echo "ok   a passing run prints no slug grammar line" ;;
 esac
 
-# THE INVALID CASES. Each of these would otherwise grade nothing and report clean.
-for bad_re in '.*' '^[A-Za-z]*$' '[A-Za-z]+'; do
-  write_pk_conf "BUILD_SLUG_RE=\"$bad_re\""; o=$(run_pk_gate); r=$?
+# EVERY SET VALUE REFUSES, a satisfiable, a violated and a match-everything one alike: the conf is no
+# second carrier of the slug grammar, so no value of it is read (TOOL-dTotalRecall-5 AC6).
+for set_re in '^[A-Za-z]+$' '^zzz[A-Za-z]+$' '.*'; do
+  write_pk_conf "BUILD_SLUG_RE=\"$set_re\""; o=$(run_pk_gate); r=$?
   n=$((n+1))
   case "$r:$o" in
-    2:*BUILD_SLUG_RE*) echo "ok   BUILD_SLUG_RE='$bad_re' ABORTS naming the key" ;;
-    *) echo "FAIL BUILD_SLUG_RE='$bad_re' did not abort (rc=$r)"; st=1 ;;
+    2:*"BUILD_SLUG_RE='$set_re' (retired"*builds.slug-words*builds.slug-style*builds.slug-date*) echo "ok   BUILD_SLUG_RE='$set_re' refuses naming the three policy keys" ;;
+    *) echo "FAIL BUILD_SLUG_RE='$set_re' did not refuse naming builds.slug-words, builds.slug-style and builds.slug-date (rc=$r) — the conf value is still read"; st=1 ;;
   esac
 done
+write_pk_conf ""
+
+# CHECK 4 READS THE DERIVED PATTERN, and the reason the defaults apply prints ONCE, after its first
+# finding: a planted folder `d_bad` no grammar admits reds check 4 by name (TOOL-dTotalRecall-5 AC13).
+mkdir -p "$_b1/memory/builds/d_bad" && printf '# d_bad\n' > "$_b1/memory/builds/d_bad/README.md"
+( cd "$_b1" && git add -- memory/builds/d_bad/README.md )
+o=$(run_pk_gate); r=$?
+( cd "$_b1" && git rm -rfq -- memory/builds/d_bad ) >/dev/null 2>&1; rm -rf "$_b1/memory/builds/d_bad"
+n=$((n+1))
+_sg_after=${o#*memory/builds/d_bad (bad folder name}
+case "$o" in
+  *"HYGIENE check 4 FAILED"*"memory/builds/d_bad (bad folder name"*) echo "ok   check 4 reds a planted folder the derived slug pattern refuses (rc=$r)" ;;
+  *) echo "FAIL check 4 did not red memory/builds/d_bad (rc=$r) — the derived pattern is not reaching check 4"; st=1 ;;
+esac
+n=$((n+1))
+_sg_n=$(printf '%s\n' "$o" | grep -c '^slug grammar: the policy reader refused builds.slug-words, the defaults apply: ' || true)
+case "$_sg_n:$_sg_after" in
+  1:*"slug grammar: the policy reader refused builds.slug-words"*) echo "ok   the slug grammar's fallback line prints once, after check 4's finding" ;;
+  *) echo "FAIL the fallback line printed $_sg_n time(s), or before check 4's finding, not once after it"; st=1 ;;
+esac
 
 # RECORD_SERVES_CUTOFF
 write_pk_conf 'RECORD_SERVES_CUTOFF="2020-01-01"'; o=$(run_pk_gate); r=$?

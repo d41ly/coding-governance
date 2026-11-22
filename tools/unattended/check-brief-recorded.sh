@@ -519,7 +519,8 @@ if GIT cat-file -e "HEAD:$WAIVER_FILE" 2>/dev/null; then
   # Read through the ledger factory (TOOL-dWitnessedBar-16): one `<unit> TAB <count> TAB <sha> TAB <disposition>`
   # row per waived unit, its reason in the conversion record and never on the row.
   waived_ids=$(read_record_keys HEAD "$WAIVER_FILE") || exit 2
-  waived_ids=$(grep -E '^[A-Z]+-[A-Za-z]+-[0-9]+$' <<<"$waived_ids" || true)
+  load_slug_class || exit 2   # the id, the slug grammar's (TOOL-dTotalRecall-5 S7)
+  waived_ids=$(grep -E "^$UNIT_ID_ERE\$" <<<"$waived_ids" || true)
   waived_ids=$(echo $waived_ids)   # one space-separated line: the membership test needs a space on both sides
 fi
 # Every violation routes through here, so a waived unit is counted rather than silently dropped.

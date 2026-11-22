@@ -613,6 +613,16 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "SlugGrammar",
+      "kind": "class",
+      "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
+      "id": "SlugPattern",
+      "kind": "class",
+      "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
       "id": "StaleHeader",
       "kind": "class",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -9053,6 +9063,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_slug_minted",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_slug_shape",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -14423,6 +14438,21 @@
       "file": "tools/playbook/overlay.py"
     },
     {
+      "id": "derive_slug_grammar",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
+      "id": "derive_slug_pattern",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "derive_slug_pattern",
+      "kind": "function",
+      "file": "tools/runlog/runlog_lib.py"
+    },
+    {
       "id": "derive_source_paths",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -16948,6 +16978,11 @@
       "file": "tools/run-gates/held_halves.py"
     },
     {
+      "id": "load_id_grammar",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "load_index",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -17173,6 +17208,41 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "load_slug_class",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "load_slug_class",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "load_slug_class",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "load_slug_grammar",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "load_slug_grammar",
+      "kind": "function",
+      "file": "tools/runlog/runlog_lib.py"
+    },
+    {
+      "id": "load_slug_pattern",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "load_slug_patterns",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "load_spec_facts",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -17236,6 +17306,11 @@
       "id": "load_tree_lib_or_refuse",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "load_unit_id",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "load_units_module",
@@ -17821,6 +17896,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "main",
@@ -19811,6 +19891,11 @@
       "id": "parse_shell_defs",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "parse_slug_grammar",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "parse_spaced_reason",
@@ -23503,6 +23588,11 @@
       "file": "tools/memory-tree/tree_lib.py"
     },
     {
+      "id": "read_id_re",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "read_id_tokens",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -25293,6 +25383,11 @@
       "file": "tools/workflows/review_dispose.py"
     },
     {
+      "id": "read_recorded_grammars",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
       "id": "read_recorded_phase",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -26158,9 +26253,34 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_slug_class",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
+      "id": "read_slug_ere",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.sh"
+    },
+    {
+      "id": "read_slug_grammar",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_slug_home",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_slug_node",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
+      "id": "read_slug_policy",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "read_source_git_dirs",
@@ -30133,6 +30253,16 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "render_slug_record",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
+      "id": "render_slug_shape",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
       "id": "render_spawn",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -31300,6 +31430,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/chain-packet.py"
     },
     {
@@ -31596,6 +31731,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/runlog/runlog_lib.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -34436,6 +34576,11 @@
       "id": "run_fixtures_guard_census",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_flip_probe",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "run_floor_read",
@@ -37871,6 +38016,11 @@
       "id": "scan_reader_keys",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "scan_readers",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "scan_record_rows",

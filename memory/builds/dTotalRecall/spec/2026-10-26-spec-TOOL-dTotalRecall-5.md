@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader
 
-**Status:** INPROGRESS · rev-11 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-11 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0216@f8936b35 whole
 **Carries:** node:policy-key.builds.slug-words
@@ -19,6 +19,8 @@
 | [2026-11-22-build-TOOL-dTotalRecall-5-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-1-builder-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-2-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-2-builder-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-3-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-3-builder-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-4-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-4-acceptance-ledger.md) | log | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-deviation-52.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-deviation-52.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-divergence-2-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-2-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-divergence-3-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-3-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-divergence-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-return.md) | research | — |

@@ -824,13 +824,13 @@ def test_chunk_arm_rolls_up():
     # (a) ANCHORED — several hits sharing one record id collapse to the first, and a second record
     #     survives. The id, not the path, is doing the work: all three sit in one file.
     anchored = [
-        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 1},
-        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 40},
-        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 90},
-        {"id": "TOOL-x-2", "path": "memory/a.md", "line": 120},
+        {"id": "TOOL-xFix-1", "path": "memory/a.md", "line": 1},
+        {"id": "TOOL-xFix-1", "path": "memory/a.md", "line": 40},
+        {"id": "TOOL-xFix-1", "path": "memory/a.md", "line": 90},
+        {"id": "TOOL-xFix-2", "path": "memory/a.md", "line": 120},
     ]
     got = rr(anchored, 20)
-    assert [h["id"] for h in got] == ["TOOL-x-1", "TOOL-x-2"], got
+    assert [h["id"] for h in got] == ["TOOL-xFix-1", "TOOL-xFix-2"], got
     assert got[0]["line"] == 1, "the rollup must keep the BEST-RANKED hit, not the last"
 
     # (b) UNANCHORED — the branch the corpus actually takes. No `id` at all, so the key degrades to

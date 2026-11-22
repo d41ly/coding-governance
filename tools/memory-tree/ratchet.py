@@ -72,6 +72,7 @@ if str(KIT) not in sys.path:
 import legacy_ledger as LL  # noqa: E402  the ledger factory, this kit's copy
 from build_records import derive_record_name, read_record, write_record  # noqa: E402  the record factory
 from tree_lib import parse_conf_line, read_policy_value  # noqa: E402  the kit's one conf line and policy read
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use
 from seen_red import read_seen_red_records  # noqa: E402  the one seen-red record reader (unit 7)
 
 SAY = "ratchet"
@@ -104,7 +105,7 @@ SCALAR_POPULATION = "conf-scalar-pins"
 PIN_RE = re.compile(r"([A-Z_]+_PIN)=")
 CUTOFF_RE = re.compile(r"([A-Z0-9_]+_CUTOFF)=")
 BLANK_CUTOFF = 99991231  # a blank cutoff reads as the latest date, so disarming its rule is a raise
-UNIT_RE = re.compile(r"[A-Za-z]+-([A-Za-z0-9]+)-\d+")
+UNIT_RE = SlugPattern(lambda g: r"[A-Za-z]+-((?:" + g.slug_class + r"))-\d+")   # the slug grammar's (TOOL-dTotalRecall-5 S7)
 EMPTY_TEXT = "reads unarmed, no seen-red line names its leg"
 # THE REMEDY a base leg with no compare base prints on its `unresolved` line (TOOL-dWitnessedBar-51 S33).
 # No `GATE_` knob turns that line into a pass: the remedy is a base, never a waiver.

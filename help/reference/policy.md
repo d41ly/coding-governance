@@ -40,6 +40,30 @@ Whether a hook bypass is only recorded or also refused. Under both values each o
 hooks.bypass = "refused"
 ```
 
+## `builds.slug-words`
+<!-- usage: policy:builds.slug-words 849f618e -->
+How many capitalised words a new build slug carries after its node letter, as lo-hi; a changed range binds new mints only, and every slug minted before it still reads.
+
+```text
+builds.slug-words = "2-2"
+```
+
+## `builds.slug-style`
+<!-- usage: policy:builds.slug-style b3a295eb -->
+Where a new build slug's words come from, a humorous pick or a description of the build; the style is recorded with the slug and never changes its shape.
+
+```text
+builds.slug-style = "descriptive"
+```
+
+## `builds.slug-date`
+<!-- usage: policy:builds.slug-date 643d0750 -->
+Whether a build's opened date is left out, shown beside its slug in the generated views, or written into a new slug after the node letter, as eight digits or a hyphenated date.
+
+```text
+builds.slug-date = "shown"
+```
+
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
 
@@ -299,7 +323,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (225)
+## Not yet summarised (222)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -352,9 +376,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `builds.agent-root`
 - `asks.acceptance`
 - `decisions.major`
-- `builds.slug-words`
-- `builds.slug-style`
-- `builds.slug-date`
 - `lexicon.pin`
 - `lexicon.forced`
 - `lexicon.at-commit`

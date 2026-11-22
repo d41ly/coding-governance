@@ -144,7 +144,7 @@ PLACEHOLDERS =("…", "...", "tbd", "todo", "n/a", "none", "-", "?")
 KICKOFF_HOME, KICKOFF_CHECKER = "session-kickoff", "manifest-check.sh"
 CHECKER_BOUND_S = 30
 SLUG_RE = lib.SLUG_RE
-UNIT_RE = re.compile(r"^[A-Z]+-([A-Za-z]+)-[0-9]+$")
+UNIT_RE = lib.load_slug_pattern(lambda g: r"^[A-Z]+-((?:" + g.slug_class + r"))-[0-9]+$")
 READY_RE = re.compile(r"^(- )?READY — ")
 BLANK_EDGES_RE = re.compile(r"\A\s*\n|\n\s*\Z")
 WORK_ORDER = KIT_DIR / "templates" / "work-order.template.md"
@@ -178,7 +178,7 @@ WRITE_TOOLS = ("Write", "Edit", "MultiEdit", "NotebookEdit")
 SESSION_ID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 #: A run id or an agent id reaches a path only in this shape.
 PATH_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
-LABEL_UNIT_RE = re.compile(r"[A-Z]+-[A-Za-z]+-[0-9]+")
+LABEL_UNIT_RE = lib.load_slug_pattern(lambda g: r"[A-Z]+-(?:" + g.slug_class + r")-[0-9]+")
 SHAPE_FIELD_RE = re.compile(r"<([^<>]+)>")
 NOTIFICATION_RE = re.compile(r"<task-notification>(.*?)</task-notification>", re.S)
 #: The session file's lines worth parsing: every other line is skipped unparsed, by its bytes.

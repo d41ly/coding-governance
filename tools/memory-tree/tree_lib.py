@@ -409,7 +409,7 @@ def parse_spec_h1(rel: str, text: str, memory_root: str, families) -> tuple[int,
     if not build_spec_path_re(memory_root).match(rel):
         return None
     alt = "|".join(sorted(set(families))) or "(?!)"
-    pat = re.compile(r"^#\s+[`*]*(?P<id>(?:" + alt + r")-[A-Za-z0-9]+-\d+)\b")
+    pat = re.compile(r"^#\s+[`*]*(?P<id>(?:" + alt + r")-(?:" + read_slug_class() + r")-\d+)\b")
     for n, line in unfenced_lines(text):
         if line is None:
             continue
@@ -667,22 +667,30 @@ def record_paths(tracked: list, m: str) -> list:
     return [p for p in tracked if sel.match(p)]
 
 
-def build_id_token_re(alt: str):
+def read_slug_class(root=None) -> str:
+    """The slug grammar's `slug_class` for `root`, None the default tree (TOOL-dTotalRecall-5 S13):
+    the sibling `id_grammar`, imported at first call as `read_policy_value` imports `backlog`."""
+    from id_grammar import derive_slug_grammar   # noqa: E402  the sibling, deliberately not at import
+    return derive_slug_grammar(root).slug_class
+
+
+def build_id_token_re(alt: str, root=None):
     """One id token with its optional `@rev-N` pin (TOOL-dTrueNorth-9 S3). The one spelling
     `_expand_ids` and `read_id_pins` both match through, so the reader of the ids and the reader of
-    their pins cannot disagree on what an id is."""
-    return re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<seq>\d+)(?:@rev-(?P<rev>\d+))?$")
+    their pins cannot disagree on what an id is. Its slug is the slug grammar's class for `root`, None
+    the default tree (TOOL-dTotalRecall-5 S13), never a looser literal."""
+    return re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>" + read_slug_class(root) + r")-(?P<seq>\d+)(?:@rev-(?P<rev>\d+))?$")
 
 
-def _expand_ids(rest: str, alt: str) -> tuple:
+def _expand_ids(rest: str, alt: str, root=None) -> tuple:
     """Return (ids, bad_tokens). A contiguous run may be written N..M and EXPANDS here, at authoring
     time, to a fixed set — unlike a wildcard it cannot rot when the build later gains a unit.
 
     TWO VALUES, for all four callers (TOOL-dTrueNorth-9 S1): `backlog.read_header_verbs` and
     `read_idlist` unpack a pair, and a third value stranded both. A pin is `read_id_pins`' to read."""
     ids, bad = [], []
-    one = build_id_token_re(alt)
-    rng = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<lo>\d+)\.\.(?P<hi>\d+)$")
+    one = build_id_token_re(alt, root)
+    rng = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>" + read_slug_class(root) + r")-(?P<lo>\d+)\.\.(?P<hi>\d+)$")
     for tok in rest.split():
         mo = one.match(tok)
         if mo:
@@ -697,11 +705,11 @@ def _expand_ids(rest: str, alt: str) -> tuple:
     return ids, bad
 
 
-def read_id_pins(rest: str, alt: str) -> dict:
+def read_id_pins(rest: str, alt: str, root=None) -> dict:
     """`{id: N}`, the highest N each id carries as `@rev-N` on the line (TOOL-dTrueNorth-9 S2), the
     revision a spec-audit record read. A range token carries no pin, so its ids get none."""
     pins: dict = {}
-    one = build_id_token_re(alt)
+    one = build_id_token_re(alt, root)
     for tok in rest.split():
         mo = one.match(tok)
         if mo and mo.group("rev") is not None:
@@ -733,7 +741,7 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
     m = conf["MEMORY_ROOT"]
     alt = _id_alternation(conf)
     typed_name = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-(?:" + alt
-                            + r")-[A-Za-z0-9]+-\d+-(?P<kind>" + "|".join(map(re.escape, TYPED_RECORD_KINDS))
+                            + r")-(?:" + read_slug_class(root) + r")-\d+-(?P<kind>" + "|".join(map(re.escape, TYPED_RECORD_KINDS))
                             + r")-\d+\.md$")
     out = {}
     for rel in record_paths(tracked, m):
@@ -768,7 +776,7 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
             if not rest:
                 continue
             if mo.group("key") == "Commissions":
-                cids, bad = _expand_ids(rest, alt)
+                cids, bad = _expand_ids(rest, alt, root)
                 rec["commissions"] = cids
                 rec["bad"] += bad
                 continue
@@ -787,14 +795,14 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
             toks = rest.split()
             if toks and (toks[0] in RECORD_KIND_TOKENS or toks[0] in KIND_ALIASES):
                 served = " ".join(toks[1:])
-                ids, bad = _expand_ids(served, alt)
+                ids, bad = _expand_ids(served, alt, root)
                 rec["kind"] = toks[0]
                 # TOOL-dTrueNorth-20 S9, S36 — A REPEATED ID FOLDS HERE, in first-seen order, and never in
                 # `_expand_ids`, whose base return its four callers keep: a record serving one id twice,
                 # pinned at two revisions say, then renders it once in a records table and counts once in
                 # the ids joins. Its pins are `read_id_pins`' below, the highest kept.
                 rec["ids"] = list(dict.fromkeys(ids))
-                rec["pins"] = read_id_pins(served, alt)
+                rec["pins"] = read_id_pins(served, alt, root)
                 rec["bad"] += bad
                 if not ids:
                     rec["state"] = "malformed"

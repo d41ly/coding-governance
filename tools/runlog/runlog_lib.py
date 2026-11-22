@@ -22,7 +22,79 @@ from __future__ import annotations
 import pathlib
 import re
 import subprocess
+import sys
 from dataclasses import dataclass, field
+
+
+# THE SLUG GRAMMAR (TOOL-dTotalRecall-5 S8). Every slug and id reader in this kit reads the memory-tree
+# kit's `id_grammar`, found through the resolver above; this kit does not require that kit, so where it
+# does not resolve the inline legacy shape below applies, said once on stderr, at import.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+# >>> slug_legacy_py — canonical copy: id_grammar.py in the memory-tree kit (byte-identical; gated)
+SLUG_LEGACY = "[%s][A-Za-z]{2,}"
+# <<< slug_legacy_py
+
+
+def load_slug_grammar():
+    """The memory-tree kit's `id_grammar` module, or None where that kit does not resolve, with one
+    stderr line saying the legacy shape applies. Asked once, at import, and never a guessed path."""
+    try:
+        kit = resolve_kit_dir("memory-tree", "id_grammar.py", pathlib.Path(__file__).resolve().parent)
+    except LookupError:
+        print("slug grammar: memory-tree not installed, the legacy shape applies", file=sys.stderr)
+        return None
+    if str(kit) not in sys.path:
+        sys.path.append(str(kit))
+    import id_grammar  # noqa: PLC0415 — the sibling kit, reached through the resolver above
+    return id_grammar
+
+
+_SLUG_GRAMMAR = load_slug_grammar()
+
+
+def derive_slug_pattern(build, flags=0):
+    """A pattern whose slug is the slug grammar's class, `build` taking that class and returning the
+    pattern text: bound at first use where memory-tree resolves, the legacy shape where it does not."""
+    if _SLUG_GRAMMAR is None:
+        return re.compile(build(SLUG_LEGACY % "a-z"), flags)
+    return _SLUG_GRAMMAR.SlugPattern(lambda g: build(g.slug_class), flags)
 
 KIT_RUNLOG_VERSION = "1.18"  # gov:kit runlog@1.18
 
@@ -44,12 +116,12 @@ MEMORY_ROOT_DEFAULT = "memory"
 # The invocation states `build_invocations` assigns. A start with no end is NOT called "killed": a
 # verb still running when the journal is read looks exactly the same, and the name says so.
 INVOCATION_STATES = ("ended", "killed-or-running", "orphan-end")
-# THE SLUG GRAMMAR, the unattended driver's own: its `check_slug_shape`, and hygiene check 4's default
-# beside it, admit a letter, then letters, digits or dashes. One constant, so no reader in this kit
-# refuses a build folder the driver accepts; the extractor kept a copy that refused dashed and
-# single-letter slugs (L4 of the closing review, round 1). Read it with `fullmatch`. The withheld
-# self-test holds it to that function, run by bash from the driver's source.
-SLUG_RE = re.compile(r"[A-Za-z][A-Za-z0-9-]*")
+# A BUILD SLUG, the slug grammar's class (TOOL-dTotalRecall-5 S7), which the unattended driver's
+# `check_slug_shape` and hygiene check 4 read too. One constant, so no reader in this kit refuses a
+# build folder the driver accepts; the extractor kept a copy that refused dashed and single-letter
+# slugs (L4 of the closing review, round 1). Read it with `fullmatch`. The withheld self-test holds it
+# to that function, run by bash from the driver's source.
+SLUG_RE = derive_slug_pattern(lambda c: r"(?:" + c + r")")
 
 # Compiled ONCE, at import. The parser calls only these objects' methods, so reading a journal of any
 # length compiles nothing per line — the self-test counts that by patching `re.compile`.

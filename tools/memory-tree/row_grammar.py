@@ -90,6 +90,7 @@ from tree_lib import (  # noqa: E402  the kit's shared helpers
 # TOOL-dWitnessedBar-48: the one bash rule; `cmd_selftest`'s `resolve_shell_ere` is its adapter. The
 # `resolve_bash_py` block is carried once in `tree_lib.py` (TOOL-dWitnessedBar-57 S7).
 from tree_lib import scan_bash  # noqa: E402  the kit's one resolve_bash_py block
+from tree_lib import read_slug_class  # noqa: E402  the slug grammar's class (TOOL-dTotalRecall-5 S7)
 
 
 CHECK = 20
@@ -202,7 +203,8 @@ def id_pattern(conf):
     # line", where it is. Two questions, two predicates, stated here so the difference is not read as
     # drift. Without the suffix the numeric prefix matches inside a revision id and 42 real archive
     # rows report as unkeyable.
-    return re.compile(r"(?:" + "|".join(sorted(re.escape(f) for f in fams)) + r")-[A-Za-z0-9]+-\d+[a-z]*")
+    slug = read_slug_class()   # the slug grammar's class (TOOL-dTotalRecall-5 S7)
+    return re.compile(r"(?:" + "|".join(sorted(re.escape(f) for f in fams)) + r")-(?:" + slug + r")-\d+[a-z]*")
 
 
 def derive_row_re(conf):
@@ -223,7 +225,8 @@ def derive_row_re(conf):
 # Written with a real string builder, never a shell heredoc: the first cut of this line carried a
 # word-boundary escape that reached the file as a literal BACKSPACE byte, so the pattern compiled,
 # printed correctly, and matched nothing. Only repr() showed it.
-GENERIC_ID = re.compile(r"[A-Z][A-Z0-9]{1,9}-[A-Za-z0-9]+-[0-9]+[a-z]*")
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
+GENERIC_ID = SlugPattern(lambda g: r"[A-Z][A-Z0-9]{1,9}-(?:" + g.slug_class + r")-[0-9]+[a-z]*")
 
 
 # A rotated archive, by the name of the document it ROTATED: `<STEM>.<iso-date><suffix?>.md`, flat.
@@ -2688,12 +2691,12 @@ def cmd_selftest():
         arm("check 28: ...in exactly one finding line", "findings=1",
             lambda: f"findings={run_content(t28, c28, b28).count('check 28:')}")
         # AC2 — a row re-minted in the decision index's other shape.
-        t28, c28, b28 = build_content("contentshape", "- ARCH-tA-1 · a row the other shape re-mints\n", {
-            "memory/DECISIONS.md": "- ARCH-tA-1 · a row the other shape re-mints\n"
-                                   "- **ARCH-tB-1** — **a row the other shape re-mints**\n"})
+        t28, c28, b28 = build_content("contentshape", "- ARCH-tAFix-1 · a row the other shape re-mints\n", {
+            "memory/DECISIONS.md": "- ARCH-tAFix-1 · a row the other shape re-mints\n"
+                                   "- **ARCH-tBFix-1** — **a row the other shape re-mints**\n"})
         arm("check 28: a row re-minted in the bold-and-dash shape reds naming both locations",
-            "rc=1 check 28: 2 records hold one content key — memory/DECISIONS.md:1 (ARCH-tA-1), "
-            "memory/DECISIONS.md:2 (ARCH-tB-1)", lambda: run_content(t28, c28, b28))
+            "rc=1 check 28: 2 records hold one content key — memory/DECISIONS.md:1 (ARCH-tAFix-1), "
+            "memory/DECISIONS.md:2 (ARCH-tBFix-1)", lambda: run_content(t28, c28, b28))
         # AC3 — one identity across a snapshot rotation, and two distinct bodies: neither is graded.
         snap = "- ARCH-tSnap-1 · a row a snapshot rotation carries forward\n"
         t28, c28, b28 = build_content("contentsnap", "", {
@@ -2710,7 +2713,7 @@ def cmd_selftest():
             f"rc=0 row-grammar: check 28 graded 0 record(s) in {b28[:8]}..HEAD — 0 row(s), 0 gotcha(s)",
             lambda: run_content(t28, c28, b28))
         # AC10 — a pair landed at the base is counted, never reported; an added restatement reds.
-        landed = "- ARCH-tL-{} · a text two ids already hold at the base\n"
+        landed = "- ARCH-tLFix-{} · a text two ids already hold at the base\n"
         t28, c28, b28 = build_content("contentlanded", landed.format(1) + landed.format(2), {})
         arm("check 28: a duplicate landed at the base is counted and not reported",
             "rc=0 row-grammar: check 28 graded 2 record(s) in " + b28[:8] + "..HEAD — 2 row(s), "
@@ -2718,22 +2721,22 @@ def cmd_selftest():
             "not reported", lambda: run_content(t28, c28, b28))
         _write_commit(t28, "2026-02-01", {"memory/DECISIONS.md": "".join(landed.format(n) for n in (1, 2, 3))})
         arm("check 28: an added restatement of a landed pair reds naming all three holders",
-            "rc=1 check 28: 3 records hold one content key — memory/DECISIONS.md:1 (ARCH-tL-1), "
-            "memory/DECISIONS.md:2 (ARCH-tL-2), memory/DECISIONS.md:3 (ARCH-tL-3)",
+            "rc=1 check 28: 3 records hold one content key — memory/DECISIONS.md:1 (ARCH-tLFix-1), "
+            "memory/DECISIONS.md:2 (ARCH-tLFix-2), memory/DECISIONS.md:3 (ARCH-tLFix-3)",
             lambda: run_content(t28, c28, b28))
         # AC11 — two empty keys are counted and never compared; three holders across two kinds.
         t28, c28, b28 = build_content("contentblank", "", {
-            "memory/DECISIONS.md": "- ARCH-tE-1 · 2026-01-01\n- ARCH-tE-2 · **2026-02-02**\n"})
+            "memory/DECISIONS.md": "- ARCH-tEFix-1 · 2026-01-01\n- ARCH-tEFix-2 · **2026-02-02**\n"})
         arm("check 28: two records whose keys are empty do not red each other, and are counted",
             "rc=0 row-grammar: check 28 graded 2 record(s) in " + b28[:8] + "..HEAD — 2 row(s), "
             "0 gotcha(s), 2 with an empty key, 0 key(s) held twice", lambda: run_content(t28, c28, b28))
         t28, c28, b28 = build_content("contentthree", "", {
-            "memory/DECISIONS.md": "- ARCH-tT-1 · three records hold this text\n"
-                                   "- ARCH-tT-2 · **three  records hold this text**\n",
+            "memory/DECISIONS.md": "- ARCH-tTFix-1 · three records hold this text\n"
+                                   "- ARCH-tTFix-2 · **three  records hold this text**\n",
             "memory/gotchas/three.md": build_body("three", "Three records hold this text\n")})
         arm("check 28: three holders across a row and a gotcha are all named",
-            "rc=1 check 28: 3 records hold one content key — memory/DECISIONS.md:1 (ARCH-tT-1), "
-            "memory/DECISIONS.md:2 (ARCH-tT-2), memory/gotchas/three.md (three)",
+            "rc=1 check 28: 3 records hold one content key — memory/DECISIONS.md:1 (ARCH-tTFix-1), "
+            "memory/DECISIONS.md:2 (ARCH-tTFix-2), memory/gotchas/three.md (three)",
             lambda: run_content(t28, c28, b28))
         # No mainline base: every key is graded as added, and the summary says so.
         run("git", "branch", "-m", "no-mainline", cwd=t28)

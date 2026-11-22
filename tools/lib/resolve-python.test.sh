@@ -196,6 +196,7 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 UNATTENDED_DIR=$(resolve_kit_dir "$REALPY" unattended check-unattended.sh "$HERE") || exit 2
 RUNGATES_DIR=$(resolve_kit_dir "$REALPY" run-gates run-gates.sh "$HERE") || exit 2
+MEMTREE_DIR=$(resolve_kit_dir "$REALPY" memory-tree id_grammar.py "$HERE") || exit 2
 
 # ---- 1b. THE FLOOR, BEHAVIOUR (TOOL-dSafePassage-11) ---------------------------------------------
 # The floor is READ from its one declaration here, never typed, so a later raise moves no line of
@@ -443,6 +444,8 @@ gov_ref_sh|$ROOT/$KIT_REL/gov-ref.sh|$KIT_REL/gov-ref
 gov_feed_sh|$ROOT/$KIT_REL/gov-feed.sh|$KIT_REL/gov-feed
 home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
 extract_code|$ROOT/$KIT_REL/extract_code.py|$KIT_REL/extract_code
+slug_legacy_py|$ROOT/$MEMTREE_DIR/id_grammar.py|$MEMTREE_DIR/id_grammar
+slug_legacy_sh|$ROOT/$MEMTREE_DIR/check-memory-hygiene.sh|$MEMTREE_DIR/check-memory-hygiene
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -531,6 +534,12 @@ extract_code|$ROOT/$KIT_REL/extract_code.py|$KIT_REL/extract_code
 # extract_code (TOOL-dTotalRecall-13 S3) is the shared extraction primitive: the definition extractors,
 # their tokenizers, the state reader and the map's identifier lexer. The lexicon kit's and the
 # codebase-map kit's extract_code.py are each that block whole, beside a comment header of their own.
+# slug_legacy_py and slug_legacy_sh (TOOL-dTotalRecall-5 S8) are the slug grammar's legacy shape, one
+# constant per language, canonical in the memory-tree kit's id_grammar.py and hygiene script: a reader
+# in a kit that does not require memory-tree carries it inline for the tree where that kit is absent,
+# runlog_lib.py and branch_reconcile.py the Python one, run-gates.sh, push-main.sh and the workflows
+# kit's renderer the shell one. The two Python copies sit beside a resolve_kit_dir block, which the
+# row of that name finds by its marker.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -1196,7 +1205,7 @@ FG="$TMP/fg"
 # TOOL-dFairHearing-50 S15 - each kit segment is the suite's own derived directory name, so the arm spells no
 # kit path: these segments are the kit homes `resolveKitDir` probes, and no fixture name can stand in.
 FG_HK=${HOOKS_DIR##*/}; FG_POL=${POLICY_DIR##*/}; FG_WF=${WORKFLOWS_DIR##*/}
-mkdir -p "$FG/.git" "$FG/.governance" "$FG/k/$FG_HK" "$FG/k/$FG_POL" "$FG/k/$FG_WF" "$FG/f/$FG_POL" "$FG/f/$FG_HK" "$FG/r/memory/builds/b/reviews"
+mkdir -p "$FG/.git" "$FG/.governance" "$FG/k/$FG_HK" "$FG/k/$FG_POL" "$FG/k/$FG_WF" "$FG/f/$FG_POL" "$FG/f/$FG_HK" "$FG/r/memory/builds/bFix/reviews"
 cp "$ROOT/$HOOKS_DIR/agent-cap.js" "$ROOT/$HOOKS_DIR/scratch-guard.js" "$FG/k/$FG_HK/"
 cp "$ROOT/$WORKFLOWS_DIR/spec-audit-optin.js" "$FG/k/$FG_WF/"
 printf 'module.exports = { readPolicy: () => ({ value: 7 }) }\n' > "$FG/k/$FG_POL/policy-mirror.js"
@@ -1208,7 +1217,7 @@ printf '{"files": [{"source": "t/%s/policy-mirror.js", "path": "f/%s/policy-mirr
 fg_bound=$("$NODE" -e 'console.log("bound " + JSON.stringify(require(process.argv[1]).readWriterBound(process.argv[2])))' "$FG/k/$FG_HK/agent-cap.js" "$FG" 2>&1 | tr -d '\r')
 [ "$fg_bound" = 'bound {"n":99,"key":"runtime.agents-in-flight"}' ] \
   || bad "FH48 AC1 a forged row did not choose the policy helper rule 7 loads: $fg_bound"; ok
-fg_pack=$(printf '{"tool_name":"Workflow","tool_input":{"args":{"kind":"spec-audit","repo":"%s","reviewDir":"memory/builds/b/reviews"}},"cwd":"%s"}' "$FG/r" "$FG/r" | "$NODE" "$FG/k/$FG_WF/spec-audit-optin.js" 2>&1); fg_rc=$?
+fg_pack=$(printf '{"tool_name":"Workflow","tool_input":{"args":{"kind":"spec-audit","repo":"%s","reviewDir":"memory/builds/bFix/reviews"}},"cwd":"%s"}' "$FG/r" "$FG/r" | "$NODE" "$FG/k/$FG_WF/spec-audit-optin.js" 2>&1); fg_rc=$?
 [ "$fg_rc" = 0 ] && [[ $fg_pack == *"FORGED agent-cap loaded"* ]] \
   || bad "FH48 AC1 a forged row did not choose the readers the pack loads: exit $fg_rc, $fg_pack"; ok
 FG_PHRASE='rests on the working-tree receipt'

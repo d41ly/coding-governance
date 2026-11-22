@@ -720,14 +720,18 @@ _NODE_TAG_CLASS = "a-z"
 _FAMILY_SHAPE = re.compile(r"^[A-Z][A-Z0-9]*$")
 
 
-def _build_local_ident(families) -> str:
+def _build_local_ident(families, slug_class=None) -> str:
     """The LOCAL COPY of the shipped id alternation, for a tree with no id grammar module.
 
     Byte-compared against the extractor's own output by this kit's self-test whenever that kit is
-    present, which is what keeps "fallback" from meaning "second grammar".
+    present, which is what keeps "fallback" from meaning "second grammar". `slug_class` is the slug
+    grammar's, spliced into the session era as the module's `_eras` splices it (TOOL-dTotalRecall-5
+    S4); None is the inline legacy shape, the fallback's answer where the module does not import.
     """
     node = _NODE_TAG_CLASS
-    eras = (r"\d{3}", rf"[{node}]\d{{2,3}}", rf"[{node}][A-Za-z]{{2,}}-\d+[a-z]*")
+    session = (r"(?:" + slug_class + r")" if slug_class is not None
+               else rf"[{node}][A-Za-z]{{2,}}")
+    eras = (r"\d{3}", rf"[{node}]\d{{2,3}}", session + r"-\d+[a-z]*")
     # A conf declaring NO families must not narrow the grammar to nothing: that is the blind
     # oracle this unit exists to remove, reintroduced through the fallback. The permissive form
     # below is what the hand-typed pattern did, so an undeclared tree keeps exactly the coverage

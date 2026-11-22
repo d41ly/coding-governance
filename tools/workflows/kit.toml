@@ -9,6 +9,7 @@ scope = "repo"
 version_from = { file = "tier2-review.template.js", pattern = "version: " }
 # `policy` since TOOL-dGroundRules-10: the renderer reads the `{{FANOUT_CAP}}` width from its reader.
 requires = ["agent-cap", "policy"]
+requires_if = [{ kit = "memory-tree", why = "TOOL-dTotalRecall-5 S5: the renderer, check-protocol-parity.test.sh --render, answers the two harness templates' {{SLUG_CLASS}} from the memory-tree kit's hygiene script's --print-slug-class, beside the gotchas.py its MEMORY_TREE_DIR probe found. Where that probe found no memory-tree kit it substitutes its inline slug_legacy_sh block, the legacy shape, and says so, as it skips the MEMORY_TREE_DIR pairs out loud. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it SELECTS no kit, since a plain `requires` would add an install dependency to a kit an adopter may run alone (§8 F2 of that spec)" }]
 why_two_ids = "this directory versions its files under TWO kit ids — the review harness and the drift-audit workflows — so a single version_from cannot describe it. The drift-audit workflow scripts travel with the drift-audit entry."
 
 [[files]]
@@ -64,7 +65,7 @@ placeholders = ["TOOL_ROOT"]
 include = ["unattended-build.template.js"]
 role = "rendered"
 to = "{kit}/unattended-build.js"
-placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "FANOUT_CAP"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "FANOUT_CAP", "SLUG_CLASS"]
 
 # THE REVIEW AND DRIFT-AUDIT HARNESSES ARE RENDERED TOO, since TOOL-aRepatriatedFork-7, each for
 # `FANOUT_CAP`, the concurrency width. An adopter whose fan-out bound differed kept a hand fork
@@ -82,7 +83,7 @@ placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "FANOUT_CAP"]
 include = ["tier2-review.template.js"]
 role = "rendered"
 to = "{kit}/tier2-review.js"
-placeholders = ["FANOUT_CAP", "LENS_SLOTS", "TOOL_ROOT"]
+placeholders = ["FANOUT_CAP", "LENS_SLOTS", "TOOL_ROOT", "SLUG_CLASS"]
 
 [[files]]
 include = ["drift-audit-code.template.js"]

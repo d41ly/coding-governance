@@ -603,7 +603,7 @@ HOOK="$HO6/agent-cap.js"
 HOREPO="$TMP/horepo"
 HO_WF=workflows
 mkdir -p "$HOREPO/.git" "$HOREPO/.claude" "$HOREPO/sub" "$HOREPO/tools/$HO_WF" \
-  "$HOREPO/memory/builds/bx/prompts" "$HOREPO/memory/builds/bx/spec"
+  "$HOREPO/memory/builds/bxFix/prompts" "$HOREPO/memory/builds/bxFix/spec"
 HOJ="$NODEDIR/horepo"
 printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/h.js"
 printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/other.js"
@@ -622,18 +622,18 @@ import hashlib, os, sys
 root, out = sys.argv[1], sys.argv[2]
 h = lambda s: hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]
 role = "## Role\n\nYou research.\n\n"
-task = "## Task\n\nThis handoff is for build `bx`, unit `T-1`.\n\n### input:question\n\nWhat calls rule 4?\n"
-pre = "memory/builds/bx/prompts/"
+task = "## Task\n\nThis handoff is for build `bxFix`, unit `T-1`.\n\n### input:question\n\nWhat calls rule 4?\n"
+pre = "memory/builds/bxFix/prompts/"
 def render_marker(p, sec, r="gov-researcher", unit="T-1"):
-    return "<!-- gov:handoff role=%s build=bx unit=%s path=%s role-sha=%s task-sha=%s -->" % (r, unit, p, h(role), h(sec))
+    return "<!-- gov:handoff role=%s build=bxFix unit=%s path=%s role-sha=%s task-sha=%s -->" % (r, unit, p, h(role), h(sec))
 def write_prompt_file(rel, m, sec):
     with open(os.path.join(root, rel), "w", newline="\n") as f:
         f.write("**Serves:** journal T-1\n\n# gov-researcher handoff - T-1\n\n" + m + "\n\n" + role + sec)
-ok, stale, spec = pre + "2026-10-11-prompt-T-1-researcher.md", pre + "2026-10-11-prompt-T-2-researcher.md", "memory/builds/bx/spec/x.md"
+ok, stale, spec = pre + "2026-10-11-prompt-T-1-researcher.md", pre + "2026-10-11-prompt-T-2-researcher.md", "memory/builds/bxFix/spec/x.md"
 M = render_marker(ok, task)
 write_prompt_file(ok, M, task)
 # TOOL-aOrientedCast-27 - a handoff rendered with no --unit: its marker unit is `-`, its name has no unit part.
-nounit = pre + "2026-10-11-prompt-bx-researcher.md"
+nounit = pre + "2026-10-11-prompt-bxFix-researcher.md"
 MN = render_marker(nounit, task, unit="-")
 write_prompt_file(nounit, MN, task)
 write_prompt_file(stale, render_marker(stale, task), task.replace("rule 4", "rule 5"))
@@ -660,10 +660,10 @@ for k, v in prompts.items():
 }
 run_spawn() { # name expected_exit subagent_type(- for none) prompt-variant needle(empty for an allow) [session prompt tool_use_id]
   # HO_CWD moves the payload cwd off $HOJ/sub; HO_PROJECT, when set, is the hook's CLAUDE_PROJECT_DIR.
-  # TOOL-aOrientedCast-27 - `description` is the name of the handoff the variant carries, `bx · T-1 ·
-  # research`, or `bx · research` for `nounit`; HO_DESC overrides it, and HO_DESC=- leaves the key out.
+  # TOOL-aOrientedCast-27 - `description` is the name of the handoff the variant carries, `bxFix · T-1 ·
+  # research`, or `bxFix · research` for `nounit`; HO_DESC overrides it, and HO_DESC=- leaves the key out.
   local payload got desc=${HO_DESC:-}
-  if [ -z "$desc" ]; then if [ "$4" = nounit ]; then desc='bx · research'; else desc='bx · T-1 · research'; fi; fi
+  if [ -z "$desc" ]; then if [ "$4" = nounit ]; then desc='bxFix · research'; else desc='bxFix · T-1 · research'; fi; fi
   payload=$("$TESTPY" -c 'import json,sys
 cwd,t,pf,s,p,u,d=sys.argv[1:8]
 ti={"prompt":open(pf,newline="").read()}
@@ -705,8 +705,8 @@ run_spawn "rule6 AC2: a type refusal names the render route" 2 Explore ok 'hando
 run_spawn "rule6 AC2: no marker refused" 2 gov-researcher none 'carries 0 gov:handoff marker lines'
 run_spawn "rule6 AC2: two markers refused" 2 gov-researcher two 'carries 2 gov:handoff marker lines'
 run_spawn "rule6 AC2: a marker role unlike the type refused" 2 gov-researcher role 'is not the subagent_type'
-run_spawn "rule6 AC2: a path holding .. refused" 2 gov-researcher dotdot 'is not a repo-relative file under builds/bx/prompts/'
-run_spawn "rule6 AC2: a path outside prompts/ refused" 2 gov-researcher spec 'is not a repo-relative file under builds/bx/prompts/'
+run_spawn "rule6 AC2: a path holding .. refused" 2 gov-researcher dotdot 'is not a repo-relative file under builds/bxFix/prompts/'
+run_spawn "rule6 AC2: a path outside prompts/ refused" 2 gov-researcher spec 'is not a repo-relative file under builds/bxFix/prompts/'
 run_spawn "rule6 AC2: a path naming no file refused" 2 gov-researcher nofile 'names no file'
 run_spawn "rule6 AC2: a section one character off refused" 2 gov-researcher off "differs from"
 run_spawn "rule6 AC2: a freeform line before the marker refused" 2 gov-researcher pre 'prompt line 1 is not the marker line'
@@ -745,12 +745,12 @@ run_harness "rule6 AC5: no harness refuses the harness call as UNARMED" 2 "{\"sc
 # checkHandoffSpawn with its description step cut out, every refusal below is admitted.
 write_roles "$HO_ROLES"
 run_spawn "rule6 OC27: the unit-less handoff with its unit-less name is admitted" 0 gov-researcher nounit ""
-HO_DESC=- run_spawn "rule6 OC27: no description refused, naming the expected name" 2 gov-researcher ok '"bx · T-1 · research"'
+HO_DESC=- run_spawn "rule6 OC27: no description refused, naming the expected name" 2 gov-researcher ok '"bxFix · T-1 · research"'
 HO_DESC=- run_spawn "rule6 OC27: ...and naming the missing one as null" 2 gov-researcher ok 'description null is not'
-HO_DESC='Fold two specs, spec three units' run_spawn "rule6 OC27: a freeform description refused" 2 gov-researcher ok '"bx · T-1 · research"'
-HO_DESC='bx · T-1 · build' run_spawn "rule6 OC27: a wrong-action description refused" 2 gov-researcher ok '"bx · T-1 · research"'
-HO_DESC='bx · T-2 · research' run_spawn "rule6 OC27: a wrong-unit description refused" 2 gov-researcher ok '"bx · T-1 · research"'
-HO_DESC='bx · - · research' run_spawn "rule6 OC27: a dash unit part on the unit-less handoff refused" 2 gov-researcher nounit '"bx · research"'
+HO_DESC='Fold two specs, spec three units' run_spawn "rule6 OC27: a freeform description refused" 2 gov-researcher ok '"bxFix · T-1 · research"'
+HO_DESC='bxFix · T-1 · build' run_spawn "rule6 OC27: a wrong-action description refused" 2 gov-researcher ok '"bxFix · T-1 · research"'
+HO_DESC='bxFix · T-2 · research' run_spawn "rule6 OC27: a wrong-unit description refused" 2 gov-researcher ok '"bxFix · T-1 · research"'
+HO_DESC='bxFix · - · research' run_spawn "rule6 OC27: a dash unit part on the unit-less handoff refused" 2 gov-researcher nounit '"bxFix · research"'
 write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); del d["roles"]["gov-researcher"]["workflow"]; print(json.dumps(d))' "$HO_ROLES")"
 run_spawn "rule6 OC27: an index role with no workflow refused, naming the key" 2 gov-researcher ok 'declares no workflow for gov-researcher'
 # TOOL-aOrientedCast-14 AC4 — the anchor: a cwd under no checkout falls back to CLAUDE_PROJECT_DIR, a
@@ -821,7 +821,7 @@ run_effort() { # name expected_exit tool transcript(- for none) extra-json needl
 cwd,tool,tp,extra,pf,h,roles,kind=sys.argv[1:9]
 extra=json.loads(extra)
 if tool=="Agent":
-    ti={"subagent_type":kind,"description":"bx · T-1 · research","prompt":open(pf,newline="").read()}
+    ti={"subagent_type":kind,"description":"bxFix · T-1 · research","prompt":open(pf,newline="").read()}
     ti.update(extra)
 else:
     ti={"scriptPath":h,"args":{"roles":json.loads(roles)}}

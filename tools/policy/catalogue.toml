@@ -383,18 +383,24 @@ owner = "dLinkedLibrary"
 name = "builds.slug-words"
 allowed = { type = "pattern", regex = "[0-9]+-[0-9]+" }
 default = "1-3"
+summary = "How many capitalised words a new build slug carries after its node letter, as lo-hi; a changed range binds new mints only, and every slug minted before it still reads."
+usage = 'builds.slug-words = "2-2"'
 owner = "dTotalRecall"
 
 [[key]]
 name = "builds.slug-style"
 allowed = ["humorous", "descriptive"]
 default = "humorous"
+summary = "Where a new build slug's words come from, a humorous pick or a description of the build; the style is recorded with the slug and never changes its shape."
+usage = 'builds.slug-style = "descriptive"'
 owner = "dTotalRecall"
 
 [[key]]
 name = "builds.slug-date"
 allowed = ["none", "shown", "in-slug"]
 default = "none"
+summary = "Whether a build's opened date is left out, shown beside its slug in the generated views, or written into a new slug after the node letter, as eight digits or a hyphenated date."
+usage = 'builds.slug-date = "shown"'
 owner = "dTotalRecall"
 
 [[key]]

@@ -489,7 +489,7 @@ def check_ranked_arms(state, roles):
             ("open", ".claude/agents/r-one.md", 5), ("open", "DOC.md", 0)] and found[-1][1:3] == (
             "close", ".claude/agents/r-one.md") and agent.index("- [one] Rule one.") < agent.index("[/DOC.md]")
             < agent.index("Body of r-one"), "the agent file is not ranked, charter first: %r" % agent)
-        (root / "mem" / "builds" / "fx" / "prompts").mkdir(parents=True)
+        (root / "mem" / "builds" / "fxFix" / "prompts").mkdir(parents=True)
         (root / "spec.md").write_text("spec\n", encoding="utf-8")
         saved = (handoff.KIT_DIR, handoff.WORK_ORDER, lib.check_load_set)
         handoff.KIT_DIR, handoff.WORK_ORDER = kit, KIT_DIR / "templates" / "work-order.template.md"
@@ -497,8 +497,8 @@ def check_ranked_arms(state, roles):
                                                       "Reach of one."])
         try:
             keys = lib.load_roles(kit)["r-one"]["keys"]
-            path, text, task = handoff.render_handoff(root, "mem", root / "DOC.md", "r-one", keys, "fx",
-                                                      "PLAY-fx-1", None, {"spec": "spec.md"}, None, [])
+            path, text, task = handoff.render_handoff(root, "mem", root / "DOC.md", "r-one", keys, "fxFix",
+                                                      "PLAY-fxFix-1", None, {"spec": "spec.md"}, None, [])
         finally:
             handoff.KIT_DIR, handoff.WORK_ORDER, lib.check_load_set = saved
         path.write_text(text, encoding="utf-8", newline="\n")

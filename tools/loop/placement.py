@@ -169,7 +169,9 @@ STAND_INS = ({"route": "step.plan", "dispositions": ("new",), "item": "item.plan
               "owner": "dIndexedDesign"})
 #: The lease verdicts the claims reader prints for a lease nobody holds now.
 FREE_VERDICTS = ("released", "terminal", "stale")
-SLUG = re.compile(r"[A-Za-z][A-Za-z0-9-]*")
+read_memory_tree("id_grammar.py")
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
+SLUG = SlugPattern(lambda g: g.BUILD_SLUG_RE.pattern)
 #: The fixture's builds: one live, one closed; its request key and its late answer's item.
 FX_LIVE, FX_DONE, FX_NEW, FX_UNIT = "dLive", "dDone", "dFresh", "TOOL-dLive-1"
 FX_KEY, FX_ITEM = "3f9c2a71d0e4", "TOOL-tFix-1#F2"

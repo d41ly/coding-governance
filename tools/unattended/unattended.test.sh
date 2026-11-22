@@ -336,14 +336,14 @@ check_status_one_line() { # slug -> asserts --status wrote exactly one stdout li
 # BOTH ENUMERATION SITES, because both carried it: `spec_ids` and the `--plan` sibling now filter
 # through one predicate, and an arm that exercised only one would leave the other free to drift.
 t_uw=$(mktemp -d); ( cd "$t_uw" && git init -q . && git config user.email t@t && git config user.name t
-  mkdir -p memory/builds/tW/spec/_working
-  printf 'x\n' > memory/builds/tW/spec/_working/notes.md
+  mkdir -p memory/builds/tWFix/spec/_working
+  printf 'x\n' > memory/builds/tWFix/spec/_working/notes.md
   printf '# t\n\n**Status:** OPEN . rev-1 . 2026-09-03 . node t . Tier-1 . base 0123abcd . streams tooling . order 0\n' \
-    > memory/builds/tW/spec/2026-09-03-spec-TOOL-tW-1.md
+    > memory/builds/tWFix/spec/2026-09-03-spec-TOOL-tWFix-1.md
   git add -A && git commit -q -m f --no-verify ) >/dev/null 2>&1
-out=$(cd "$t_uw" && git ls-files "memory/builds/tW/spec/*.md" | grep -vE '/spec/_[^/]*/' || true)
+out=$(cd "$t_uw" && git ls-files "memory/builds/tWFix/spec/*.md" | grep -vE '/spec/_[^/]*/' || true)
 miss "$out" "_working/notes.md"
-hit  "$out" "2026-09-03-spec-TOOL-tW-1.md"
+hit  "$out" "2026-09-03-spec-TOOL-tWFix-1.md"
 rm -rf "$t_uw"
 
 
@@ -6330,11 +6330,11 @@ git reset -q --hard; git clean -qfd; bcrestore
 # ---- close. No preflight can write that record now, so it is borrowed: a sibling README with no key
 # ---- in the same BASE commit is preflighted, and its record is re-keyed to the README that has one.
 reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
-readme tBr2; mutate memory/builds/tBr2/README.md '/^slug: tBr2$/a authorized-by: prompt'
+readme tBrTwo; mutate memory/builds/tBrTwo/README.md '/^slug: tBrTwo$/a authorized-by: prompt'
 scope published; git add -A >/dev/null && git commit -q -m br --no-verify
 git push -q -f origin unit 2>/dev/null
-run --preflight tBr2 --keepalive-id k1 >/dev/null
-sed 's/tBr2/tBr/g' memory/builds/tBr2/RUN.md > memory/builds/tBr/RUN.md
+run --preflight tBrTwo --keepalive-id k1 >/dev/null
+sed 's/tBrTwo/tBr/g' memory/builds/tBrTwo/RUN.md > memory/builds/tBr/RUN.md
 git add -A >/dev/null && git commit -q -m "a record borrowed from a pre-89 preflight" --no-verify
 # ---- TOOL-aGraftedHelix-30: `--authorization` grades `authorization-reachable` ALONE, by the arm
 # ---- --close grades it with, so a reconciling merge learns at the merge what the close would say.
@@ -6344,11 +6344,11 @@ read_authorization_witness() { # slug -> the three reads the verb may not move
   git status --porcelain; git hash-object "memory/builds/$1/RUN.md"; git ls-remote origin
 }
 _az_tip=$(git rev-parse HEAD~1)
-_az_w0=$(read_authorization_witness tBr2)
-out=$(run --authorization tBr2); _az_rc=$?
+_az_w0=$(read_authorization_witness tBrTwo)
+out=$(run --authorization tBrTwo); _az_rc=$?
 hit  "$out" "unattended: authorization-reachable — met · base $_az_tip · anchor refs/heads/main at "
 same "GH30 AC1 a met record exits 0" "$_az_rc" "0"
-same "GH30 AC1 a met record moved nothing" "$(read_authorization_witness tBr2)" "$_az_w0"
+same "GH30 AC1 a met record moved nothing" "$(read_authorization_witness tBrTwo)" "$_az_w0"
 # ---- AC2: the borrowed record is check 89's, and ONE line then names both exits and not owner-landing.
 _az_w0=$(read_authorization_witness tBr)
 _az_ref=$(run --authorization tBr); _az_rc=$?
@@ -6360,20 +6360,20 @@ same "GH30 AC2 a refused record moved nothing" "$(read_authorization_witness tBr
 # ---- AC4: a predicate that never reached the README is NOT EVALUATED - exit 2 and no exits - when the
 # ---- remote does not answer and when the run branch is unpublished; pushed again, the answer returns.
 git remote set-url origin "$ORIGIN_DIR/nope.git"
-out=$(run --authorization tBr2); _az_rc=$?
+out=$(run --authorization tBrTwo); _az_rc=$?
 hit  "$out" "the remote did not answer, and the anchor is an observation of it"
 hit  "$out" "unattended: authorization-reachable — not evaluated"
 miss "$out" "--handoff"
 same "GH30 AC4 an unanswered remote exits 2" "$_az_rc" "2"
 git remote set-url origin "$ORIGIN"
 git push -q origin --delete unit 2>/dev/null
-out=$(run --authorization tBr2); _az_rc=$?
+out=$(run --authorization tBrTwo); _az_rc=$?
 hit  "$out" "the remote advertises no tip for the branch this run is on"
 hit  "$out" "unattended: authorization-reachable — not evaluated"
 miss "$out" "--handoff"
 same "GH30 AC4 an unpublished run branch exits 2" "$_az_rc" "2"
 git push -q -f origin "$_az_tip:refs/heads/unit" 2>/dev/null
-out=$(run --authorization tBr2); _az_rc=$?
+out=$(run --authorization tBrTwo); _az_rc=$?
 hit  "$out" "unattended: authorization-reachable — met · base $_az_tip"
 same "GH30 AC4 the branch pushed again reads met" "$_az_rc" "0"
 out=$(run --close tBr)
@@ -7197,14 +7197,14 @@ hit "$(run --preflight tOwnPb --keepalive-id k1)" "a recipe-mode build README na
 # the `published` anchor's declared cost, reaching one step further than the protocol spells out:
 # a run that can author its own authorization can author the instructions it is judged against too.
 reset_tree; scope published
-readme tOwn2
-mutate memory/builds/tOwn2/README.md '/^slug: tOwn2$/a authorized-by: recipe\nplaybook: content/pb-own.md\npieces: 2'
+readme tOwnTwo
+mutate memory/builds/tOwnTwo/README.md '/^slug: tOwnTwo$/a authorized-by: recipe\nplaybook: content/pb-own.md\npieces: 2'
 own_pb
 git push -q -f origin unit 2>/dev/null
-out=$(run --preflight tOwn2 --keepalive-id k1)
+out=$(run --preflight tOwnTwo --keepalive-id k1)
 miss "$out" "a recipe-mode build README names a playbook that does not resolve at the pinned BASE"
 hit "$out" "preflight OK"
-hit "$(cat memory/builds/tOwn2/RUN.md)" "anchor-kind: run-branch"
+hit "$(cat memory/builds/tOwnTwo/RUN.md)" "anchor-kind: run-branch"
 reset_tree; git push -q -f origin unit 2>/dev/null
 
 # ---- AC6: the piece-scoped items' TERM ZERO, OBSERVED. Both are MET for a run that is not in recipe
@@ -7430,11 +7430,11 @@ echo "MARK ac4-transport" >&2
 # ---- told the operator to push a branch that is already pushed - advice that is not merely useless
 # ---- but wrong, and acting on it changes nothing. The arm asserts BOTH halves: the new message
 # ---- appears, and the misleading one does not.
-reset_tree; readme tBr2; scope published; git add -A >/dev/null && git commit -q -m br2 --no-verify
+reset_tree; readme tBrTwo; scope published; git add -A >/dev/null && git commit -q -m br2 --no-verify
 git push -q -f origin unit 2>/dev/null
 git remote set-url origin "http://127.0.0.1:1/nope.git" 2>/dev/null
 git remote set-url --push origin "http://127.0.0.1:1/nope.git" 2>/dev/null
-out=$(run --preflight tBr2 --keepalive-id k1)
+out=$(run --preflight tBrTwo --keepalive-id k1)
 miss "$out" "push the branch first"
 git remote set-url origin "$ORIGIN" 2>/dev/null
 git remote set-url --push origin "$ORIGIN" 2>/dev/null
@@ -8781,7 +8781,7 @@ git config --unset remote.origin.pushurl 2>/dev/null || true; git remote set-url
 # SHADOWS the insteadOf rewrite entirely, so the first attempt at this arm configured the rewrite,
 # had it silently ignored, and measured fetch == push again. The mechanism only exists when nothing
 # more specific is set.
-reset_tree; readme tSplit2; scope published; git add -A >/dev/null && git commit -q -m split2 --no-verify
+reset_tree; readme tSplitTwo; scope published; git add -A >/dev/null && git commit -q -m split2 --no-verify
 git push -q -f origin unit 2>/dev/null
 git remote set-url origin "example.invalid:some/repo.git" 2>/dev/null
 git config --unset remote.origin.pushurl 2>/dev/null || true
@@ -8790,7 +8790,7 @@ git config "url.git@example.invalid:some/repo.git.pushInsteadOf" "example.invali
 # also makes these two differ, so a not-equal guard passes while the mechanism under test is inert -
 # which is what happened, and it is the same pass-by-finding-anything shape one level up.
 same "the rewrite produces the user@ spelling" "$(git remote get-url --push origin)" "git@example.invalid:some/repo.git"
-out=$(run --preflight tSplit2 --keepalive-id k1)
+out=$(run --preflight tSplitTwo --keepalive-id k1)
 hit  "$out" "fetch and push URLs differ in spelling and normalise to the same endpoint"
 miss "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to"
 git config --unset "url.git@example.invalid:some/repo.git.pushInsteadOf" 2>/dev/null || true
@@ -8798,10 +8798,10 @@ git remote set-url origin "$ORIGIN" 2>/dev/null
 
 
 # ...and the REFUSAL survives for the case the check was written for: two genuinely different places.
-reset_tree; readme tSplit3; scope published; git add -A >/dev/null && git commit -q -m split3 --no-verify
+reset_tree; readme tSplitThree; scope published; git add -A >/dev/null && git commit -q -m split3 --no-verify
 git push -q -f origin unit 2>/dev/null
 git remote set-url --push origin "https://example.invalid/not/the/same.git" 2>/dev/null
-out=$(run --preflight tSplit3 --keepalive-id k1)
+out=$(run --preflight tSplitThree --keepalive-id k1)
 hit "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to, so the anchor and the landing name two different endpoints"
 git remote set-url --push origin "$ORIGIN" 2>/dev/null
 reset_tree

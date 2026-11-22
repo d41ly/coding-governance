@@ -91,9 +91,6 @@ policy:build.spend-cap	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:build.unit-holders	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:build.worktree	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:builds.agent-root	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:builds.slug-date	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:builds.slug-style	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:builds.slug-words	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:card.follows	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:card.pointers	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:card.snapshot	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

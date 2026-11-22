@@ -1254,7 +1254,8 @@ TRIGGER_CAUSES="owed opt-in recommendation placement"
 # THE CHAIN RECORD'S GRAMMAR, ONE SPELLING EACH (TOOL-dFoldedAudit-15 S22): `_ids_of`, `write_chain_round`
 # and `derive_chain_verdict` read these, the awk through `-v` and dynamic regexes. Which two severities
 # are major stays in that awk, because it asks a different question from which four exist.
-UNIT_ID_ERE='[A-Z]+-[A-Za-z0-9]+-[0-9]+'
+# UNIT_ID_ERE, the unit id, is lib-unattended.sh's: `load_slug_class` sets it from the slug grammar
+# (TOOL-dTotalRecall-5 S7), and every reader below loads it first.
 CHAIN_SEVERITIES='BLOCKER|HIGH|MEDIUM|LOW'
 CHAIN_NATURES='local|new-mechanism'
 # The class of a cited path, whole (TOOL-aCarriedStop-2): the bracket expression and no quantifier, so
@@ -5426,9 +5427,9 @@ trusted_base() { # run-state file [· allow-degenerate [· preflight]]  ->  sets
 # The SHAPE is its own predicate because a second caller needs it with no refusal attached: the run
 # log's START records a slug only when it passes, and it runs before any verb could refuse. One
 # grammar, two callers, rather than a copy of the pattern that drifts. TOOL-dLoggedFlight-2.
-check_slug_shape() { # slug -> 0 when it is a build-folder name
-  case "$1" in *[!A-Za-z0-9-]* | "" | [!A-Za-z]*) return 1 ;; esac
-  return 0
+check_slug_shape() { # slug -> 0 when it is a build-folder name: the slug grammar's BUILD_SLUG_RE (TOOL-dTotalRecall-5 S7)
+  load_slug_class || return 1
+  [[ $1 =~ $SLUG_RE_ERE ]]
 }
 check_slug() {
   # Bound to a NAME, not used as `$1`: check-arms reads `${?[A-Za-z_]…` as an interpolation and a
@@ -6925,6 +6926,7 @@ check_authorization() { # slug · base
       fail 20 "the working copy's build README does not carry exactly one well-formed units pair while the pinned BASE does, so the scope this run is executing against cannot be compared: $rel"
       return 1
     fi
+    load_slug_class || return 1
     miss=$(comm -23 <(printf '%s\n' "$ub" | _ids_of) <(printf '%s\n' "$uh" | _ids_of) | tr '\n' ' ' | sed 's/[[:space:]]*$//')
     if [ -n "$miss" ]; then
       fail 20 "a unit in the scope at the pinned BASE is absent from it now, so this run narrowed or renamed the scope it was authorized for; additions are admitted and removals are not: $miss"
@@ -7528,16 +7530,17 @@ unit_rows() { # build README -> unit rows; rc 3 = no single well-formed pair
 nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
 # TOOL-aBoundedVerdict-11 S6 - ids out of whatever row text it is handed, sorted and deduplicated so
 # two callers cannot disagree about order. Reads stdin, so it composes with either side of the compare.
-_ids_of() { grep -oE "$UNIT_ID_ERE" | sort -u; }
+_ids_of() { load_slug_class || return 2; grep -oE "$UNIT_ID_ERE" | sort -u; }
 # The FIRST id on each row, which is the row's OWN id: a generated unit row leads with its link label
 # and may mention another id in the title text. `_ids_of` over a row SET cannot tell the two apart,
 # and a foreign id there would put a unit into a population it is not in. Measured over this corpus:
 # 80 generated regions, zero foreign ids — so this closes a shape rather than a live instance, which
 # is stated rather than implied.
 row_ids_of() { # stdin: unit rows -> each row's own id, one per line, sorted
+  load_slug_class || return 2
   while IFS= read -r _ri_row; do
     [ -n "$_ri_row" ] || continue
-    printf '%s\n' "$_ri_row" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | head -1
+    printf '%s\n' "$_ri_row" | grep -oE "$UNIT_ID_ERE" | head -1
   done | sort -u
 }
 # `expand_id_runs` USED TO BE DEFINED HERE. TOOL-dDerivedDocket-18 moved it, unchanged, into
@@ -8457,6 +8460,7 @@ build_ask_plan() { # slug · spec paths… -> sets ASK_PLAN_ROWS, ASK_PLAN_NEXT,
   local _m _mids _bl _fids _pop="" _mset="" _id _i=0 _rev _rel _sp _spid _live _cover _disp
   local _n=0 _sum _rdy _dup
   ASK_PLAN_ROWS=""; ASK_PLAN_NEXT=""; ASK_PLAN_WHY=""; ASK_POSITIONS=""; AW_ROWS=""
+  load_slug_class || return 2
   _m=$(mandate_of "$slug")
   # A MANDATE THAT DOES NOT READ WHOLE IS NAMED, not planned from (closing review F2). This verb
   # reports and refuses nothing, so it plans the folder's own asks and says, on a line of its own
@@ -8525,7 +8529,7 @@ build_ask_plan() { # slug · spec paths… -> sets ASK_PLAN_ROWS, ASK_PLAN_NEXT,
     # names, so two DIFFERENT builds closing it once each is a contest, which is a different thing
     # and is what the R2 grade already reports.
     _dup=$(ask_field "$_id" closers | tr ',' '\n' | sed 's/^stale://' \
-      | grep -E '^[A-Z]+-[A-Za-z0-9]+-[0-9]+$' \
+      | grep -E "^$UNIT_ID_ERE\$" \
       | awk '{ b = $0; sub(/^[A-Z]+-/, "", b); sub(/-[0-9]+$/, "", b)
                c[b]++; s[b] = s[b] (s[b] == "" ? "" : ",") $0 }
              END { for (b in c) if (c[b] > 1) { print s[b]; exit } }')
@@ -10811,10 +10815,11 @@ derive_review_signals() { # slug · stage -> sets _rs_why _rs_tier2 _rs_anchor; 
   local _rs_row _rs_id _rs_t _rs_sp _rs_n=0 _rs_seen=" "
   local -a _rs_rows=()
   _rs_why=""; _rs_tier2=""; _rs_anchor=""
+  load_slug_class || return 2
   readme_of "$1" >/dev/null
   mapfile -t _rs_rows < <(unit_rows "$_readme" 2>/dev/null)
   for _rs_row in ${_rs_rows[@]+"${_rs_rows[@]}"}; do
-    [[ $_rs_row =~ [A-Z]+-[A-Za-z0-9]+-[0-9]+ ]] || continue
+    [[ $_rs_row =~ $UNIT_ID_ERE ]] || continue
     _rs_id=${BASH_REMATCH[0]}
     case "$_rs_seen" in *" $_rs_id "*) ;; *)
       _rs_seen="$_rs_seen$_rs_id "; _rs_n=$((_rs_n + 1))
@@ -13120,6 +13125,7 @@ write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 or emp
 write_inherited_asks() { # slug · R · run dir
   local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid blk cand reused fam seq id argv file tok a s k cls
   local r8=${2:0:8} today sev filed=0
+  load_slug_class || return 1
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   [ -f "$d/attribution" ] || return 0
@@ -13139,7 +13145,7 @@ write_inherited_asks() { # slug · R · run dir
           echo "gates-green: ask $cand already OPEN for leg $leg at $r8 · reused"; reused=1; break
         fi
       done < <(grep -F -- "$cls red: leg $leg red at $r8," "$bl" 2>/dev/null \
-                 | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
+                 | awk -v idre="^- $UNIT_ID_ERE · filed " '$0 ~ idre { v = $2; print v }')
     fi
     [ -z "$reused" ] || continue
     # THE ID, minted under this run's slug: the owner id's family when the age probe named one, else
@@ -13224,6 +13230,7 @@ write_inherited_asks() { # slug · R · run dir
 # WHAT IT DOES NOT CHECK: that the leg is a leg of the bar, or that the text is true: the caller's.
 write_leg_ask() { # slug · leg · form · ask text · SEV · SEV reason · KEEP reason -> 0 filed or reused, 1 not; one line each
   local slug=$1 leg=$2 form=$3 text=$4 sev=$5 bl f home cand fam id a s k at8=""
+  load_slug_class || return 1
   bl="$M/builds/$slug/BACKLOG.md"
   if [ -n "${ASKS_CMD:-}" ]; then
     for f in $(GIT ls-files -- ":(glob)$M/builds/*/BACKLOG.md" 2>/dev/null); do
@@ -13234,8 +13241,8 @@ write_leg_ask() { # slug · leg · form · ask text · SEV · SEV reason · KEEP
         if read_ask_back "$cand" "$home" "$sev"; then
           echo "gates-green: ask $cand already OPEN $sev for ${form#*: } $leg in $f · reused"; return 0
         fi
-      done < <(WLA_KEY="$form $leg ${text%% *} " awk '
-                 /^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed [^ ]+ · / {
+      done < <(WLA_KEY="$form $leg ${text%% *} " awk -v idre="^- $UNIT_ID_ERE · filed [^ ]+ · " '
+                 $0 ~ idre {
                    r = $0; sub(/^- [^ ]+ · filed [^ ]+ · /, "", r)
                    if (substr(r, 1, length(ENVIRON["WLA_KEY"])) == ENVIRON["WLA_KEY"]) print $2
                  }' "$f" 2>/dev/null)
@@ -13299,6 +13306,7 @@ write_ask_closing() { # ask id · home build slug · by (sha or id) · why -> 0 
 write_flake_releases() { # R -> one line per release: closed or refused
   local r=$1 py k out rc=0 tmp line rest leg id why home head
   [ -n "$r" ] || { echo "gates-green: releases — no advertised tip was observed, so there is no R to select at"; return 0; }
+  load_slug_class || return 1
   if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
      || ! k=$(resolve_kit_dir "$py" run-gates verdict_flow.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
     echo "gates-green: releases — no run-gates kit holding verdict_flow.py resolves beside this kit, so no quarantined leg is released"
@@ -13318,7 +13326,7 @@ write_flake_releases() { # R -> one line per release: closed or refused
     case "$line" in "release  "*) ;; *) continue ;; esac
     rest=${line#release  }; leg=${rest%%  *}; rest=${rest#*  }; id=${rest%%  *}; why=${rest#*  }
     home=${id#*-}; home=${home%-*}
-    if [[ ! $id =~ ^[A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+$ ]] || [ -z "$head" ] || [ "$why" = "$rest" ]; then
+    if [[ ! $id =~ ^${UNIT_ID_ERE}$ ]] || [ -z "$head" ] || [ "$why" = "$rest" ]; then
       echo "gates-green: releases — no ask closed: the line is not release  <leg>  <ask id>  <reason>, or HEAD does not resolve: $line"
       continue
     fi
@@ -17262,6 +17270,7 @@ check_chain_fold() { # unit · the row's rev, with `load_spec_facts` already rea
 # on every verdict and dispatch line, and no guard against a run that lies.
 write_chain_round() { # slug · subject · audited ids · blockers · highs, rows in RR_FINDINGS and RR_SIBLINGS, or the cited record in RR_OWNER_STOP
   local slug="$1" subj="$2" audited="$3" blockers="$4" highs="$5" path="$RR_OWNER_STOP"
+  load_slug_class || return 1
   local id="$UNIT_ID_ERE" rec now tok rows="" last=0 seen=0 round folds=() mixed="" named
   local f_id f_sev f_nat f_specs f_unit f_rev
   local re_ids="^$id( $id)*\$" re_sibling="^$id@rev-[0-9]+\$"
@@ -17383,6 +17392,7 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
 # header's prefix reaches that fault instead of leaving the sets (TOOL-dFoldedAudit-15 S4).
 derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -> 0 with _cv_* set, else check 118 and 1
   local out
+  load_slug_class || return 1
   out=$(awk -v live="$2" -v stop="$3" -v ceiling="$4" -v idre="^$UNIT_ID_ERE\$" -v sevre="^($CHAIN_SEVERITIES)\$" -v natre="^($CHAIN_NATURES)\$" -v pathre="^record $CHAIN_PATH_CLASS+\$" '
     function isid(s) { return s ~ idre }
     function isids(s,   a, k, i) {
@@ -19078,7 +19088,7 @@ write_runlog_start() { # the caller's first argument · its second -> the START 
 # no call writes two END lines. EVERY read is defaulted: `set -u` holds inside a trap, and
 # a trap that aborts on an unset name writes nothing for exactly the call it exists to record.
 write_runlog_end() { # the status the EXIT trap saw -> the END line, then the out-of-band stamp
-  local rc="${1:-}" ex=unclean t d dur="" chk="" c u="" ub="" pt="" p1 p2 p3
+  local rc="${1:-}" ex=unclean t d dur="" chk="" c u="" ub="" pt=""
   local -a f=()
   [ "${RUNLOG_CLEAN:-}" = 1 ] && ex=clean
   if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; d=${t//[!0-9]/}
@@ -19093,14 +19103,11 @@ write_runlog_end() { # the status the EXIT trap saw -> the END line, then the ou
     --dispatch|--rescope) u=${PK_ITEM:-} ;;
     --review)             u=${RV_SUBJECT:-} ;;
   esac
-  # `_ids_of`'s grammar, `[A-Z]+-[A-Za-z0-9]+-[0-9]+`, anchored, and asked of the three parts in
-  # turn rather than of a regex: `=~` ranges follow the locale, and these patterns are ASCII here.
+  # `_ids_of`'s grammar, UNIT_ID_ERE, anchored: its slug is the slug grammar's (TOOL-dTotalRecall-5
+  # S7), so a dated slug's hyphens are read as the slug's and never as the id's separators. A grammar
+  # that does not load marks the unit bad, never guessed.
   if [ -n "$u" ]; then
-    p1=${u%%-*}; p3=${u##*-}; p2=${u#"$p1"-}; p2=${p2%-"$p3"}
-    case "$u" in *-*-*) ;; *) ub=1 ;; esac
-    case "$p1" in ""|*[!A-Z]*) ub=1 ;; esac
-    case "$p2" in ""|*[!A-Za-z0-9]*) ub=1 ;; esac
-    case "$p3" in ""|*[!0-9]*) ub=1 ;; esac
+    if load_slug_class 2>/dev/null; then [[ $u =~ ^${UNIT_ID_ERE}$ ]] || ub=1; else ub=1; fi
     [ -n "$ub" ] && u=""
   fi
   [ -n "${RUNLOG_SLUG:-}" ] && read_phase_into pt "${ROOT:-.}/${M:-memory}/builds/$RUNLOG_SLUG/RUN.md"

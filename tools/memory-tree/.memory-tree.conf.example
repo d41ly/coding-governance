@@ -379,10 +379,9 @@ ACCEPTANCE_LEDGER_GRANDFATHER=""
 # than quietly grading nothing. Blank and invalid are different answers and the checker keeps them
 # apart.
 
-# BUILD_SLUG_RE — the pattern a build folder name must match. Blank = ^[A-Za-z][A-Za-z0-9-]*$
-# MUST be anchored at both ends, and MUST NOT match the empty string: a pattern matching "" admits
-# every folder name and check 4 then passes everything. The checker refuses all three cases.
-BUILD_SLUG_RE=""
+# The pattern a build folder name must match is no conf key: it is derived from the slug grammar's
+# policy keys, builds.slug-words, builds.slug-style and builds.slug-date in .governance/policy.toml,
+# by id_grammar.py's derive_slug_grammar. The retired BUILD_SLUG_RE, set here, refuses by name.
 
 # PROJECT_REGISTRY_EXTRA — whitespace-separated extra filenames legal directly under
 # <MEMORY_ROOT>/project/. This only WIDENS the whitelist and is bounded by what your tree actually

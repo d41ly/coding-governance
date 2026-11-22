@@ -893,7 +893,8 @@ def build_roster_id_re(families: set):
     if not fam:
         raise Problem("build-index: FAMILIES is empty, so no id can be recognised and every roster "
                       "would render empty — which is also what a clean corpus looks like")
-    return re.compile(r"\b(?:" + fam + r")-([A-Za-z0-9]+)-\d+\b")
+    slug = read_slug_grammar(None).slug_class   # the slug grammar's class (TOOL-dTotalRecall-5 S7)
+    return re.compile(r"\b(?:" + fam + r")-((?:" + slug + r"))-\d+\b")
 
 
 def extract_roster_ids(text: str, id_re) -> list:
@@ -1581,7 +1582,8 @@ def _build_authored_row_re(families) -> "re.Pattern":
     predicate would red a view over its own prose.
     """
     alt = "|".join(sorted(re.escape(f) for f in families)) or "(?!)"
-    return re.compile(r"^\s*[-*]\s+[\[`*]*(?:" + alt + r")-[A-Za-z0-9]+-\d+\b")
+    slug = read_slug_grammar(None).slug_class   # the slug grammar's class (TOOL-dTotalRecall-5 S7)
+    return re.compile(r"^\s*[-*]\s+[\[`*]*(?:" + alt + r")-(?:" + slug + r")-\d+\b")
 
 
 def scan_view_guard(root: str, rel: str, family: str, conf: dict, kit: str,
@@ -2339,7 +2341,9 @@ def render_live_blockers(reading: dict) -> list:
 
 
 def render_live(builds: list, m: str, conf: dict | None = None, reading: dict | None = None,
-                landed: dict | None = None) -> str:
+                landed: dict | None = None, grammar=None) -> str:
+    # `grammar`, the slug grammar, labels each build link through `render_label`, so a `shown` date
+    # renders beside the slug and never inside an id; None, and under `none`, the bare slug.
     # LIVE_DORMANT_DAYS (TOOL-aMendedFleet-12): blank or absent renders the file this function always
     # rendered, byte for byte; anything else must be a positive whole number of days or it refuses.
     raw = ((conf or {}).get("LIVE_DORMANT_DAYS") or "").strip()
@@ -2389,8 +2393,9 @@ def render_live(builds: list, m: str, conf: dict | None = None, reading: dict | 
             fm = b["fm"]
             tail = " {} | {} |".format(*extra[b["slug"]]) if extra else ""
             tail += f" {landed.get(b['slug'], 0)} |" if landed is not None else ""
+            label = grammar.render_label(b["slug"], fm.get("opened")) if grammar else b["slug"]
             out.append(
-                f"| [{b['slug']}](builds/{b['slug']}/README.md) | {b['status']} | {fm['node']} | "
+                f"| [{label}](builds/{b['slug']}/README.md) | {b['status']} | {fm['node']} | "
                 f"{fm['opened']} | {fm['streams']} | {len(b['roster'])} |{tail}"
             )
     else:
@@ -2399,7 +2404,7 @@ def render_live(builds: list, m: str, conf: dict | None = None, reading: dict | 
     return "\n".join(out) + "\n"
 
 
-def render_shards(builds: list, m: str) -> dict:
+def render_shards(builds: list, m: str, grammar=None) -> dict:
     months: dict = {}
     for b in builds:
         months.setdefault(b["fm"]["opened"][:7], []).append(b)
@@ -2418,8 +2423,9 @@ def render_shards(builds: list, m: str) -> dict:
         ]
         for b in sorted(rows, key=lambda x: x["slug"]):
             fm = b["fm"]
+            label = grammar.render_label(b["slug"], fm.get("opened")) if grammar else b["slug"]
             body.append(
-                f"| [{b['slug']}](../builds/{b['slug']}/README.md) | {fm['node']} | {fm['opened']} |"
+                f"| [{label}](../builds/{b['slug']}/README.md) | {fm['node']} | {fm['opened']} |"
             )
         out[f"{m}/ledger/{month}.md"] = "\n".join(body) + "\n"
     return out
@@ -3089,9 +3095,11 @@ def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> t
                 stext, render_spec_records(u["id"], inverted.get(u["id"], []), rel), rel,
                 SPEC_RECORDS_OPEN, SPEC_RECORDS_CLOSE)
     record = read_landed_unclosed(root, conf, resolve)
+    grammar = read_slug_grammar(root)
     artifacts[f"{m}/LIVE.md"] = render_live(
-        builds, m, conf, reading, None if record is None else derive_landed_counts(record, builds, m))
-    artifacts.update(render_shards(builds, m))
+        builds, m, conf, reading, None if record is None else derive_landed_counts(record, builds, m),
+        grammar)
+    artifacts.update(render_shards(builds, m, grammar))
     # Orphans: a tracked file under ledger/ that this render does not produce. The DELETABLE set is
     # bounded to the month-shard NAME; anything else is reported and left alone.
     tracked = [p for p in run("git", "ls-files", "--", f"{m}/ledger/", cwd=root).split("\n") if p]
@@ -3606,7 +3614,8 @@ def cmd_write(root: str, conf: dict, staged: bool = False) -> int:
 #: same question as one asking what is BLOCKED, and leaving it out would make that question
 #: unanswerable by the one mode built to answer it.
 ASK_STATUS_TOKENS = STATUS_TOKENS + (backlog.UNRESOLVED,)
-ASK_ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+$")
+ASK_ID_RE = backlog.load_id_grammar().SlugPattern(
+    lambda g: r"^[A-Za-z][A-Za-z0-9]*-(?:" + g.slug_class + r")-\d+$")   # the slug grammar's (TOOL-dTotalRecall-5 S7)
 ASK_USAGE = ("usage: gen_build_index.py --asks [FAMILY|ID] [--all] [--status <token>] "
              "[--build <slug>] [--json|--tsv] [--ready [IDLIST]] [--target <slug>] "
              "[--live-builds <slug>…] [--at <rev>] [--probe <id>] "
@@ -4413,7 +4422,7 @@ def check_slug_claimed(root: str, conf: dict, slug: str) -> str:
     return ""
 
 
-def render_new_build_readme(slug: str, conf: dict, ids: list, opened: str, at: str) -> str:
+def render_new_build_readme(slug: str, conf: dict, ids: list, opened: str, at: str, grammar: str) -> str:
     """The scaffolded README: front matter, a title, five GENERATED slot bodies, and the pairs.
 
     NO AUTHORED PROSE ANYWHERE. Every line below is derived from the mandate, the conf and the
@@ -4437,6 +4446,7 @@ def render_new_build_readme(slug: str, conf: dict, ids: list, opened: str, at: s
     head = [
         "---",
         f"slug: {slug}",
+        f"slug-grammar: {grammar}",
         f"node: {slug[0]}",
         f"opened: {opened}",
         f"streams: {'+'.join(streams)}",
@@ -4497,6 +4507,27 @@ def add_contract_row(root: str, conf: dict, rel: str) -> None:
     write_text(path, text.rstrip("\n") + "\n" + "\t".join([rel, "bound", "1", sha, "seeded"]) + "\n")
 
 
+def read_slug_grammar(root: str):
+    """The slug grammar of `root` (TOOL-dTotalRecall-5), the sibling `id_grammar`'s, its refusal a Problem."""
+    import id_grammar  # noqa: PLC0415 — deferred exactly as backlog.py's is
+    try:
+        return id_grammar.derive_slug_grammar(root)
+    except id_grammar.ConfError as exc:
+        raise Problem(str(exc)) from None
+
+
+def check_slug_minted(root: str, slug: str):
+    """The grammar in force, when `slug` is a slug it mints; else a Problem naming the grammar and its
+    shape, and the reason the defaults apply where they do, before any write (TOOL-dTotalRecall-5 S3)."""
+    grammar = read_slug_grammar(root)
+    if not grammar.mint_re.match(slug):
+        why = f"; {grammar.fallback}" if grammar.fallback else ""
+        raise Problem(f"`{slug}` is not a build slug the grammar in force mints: {grammar.record}, the "
+                      f"shape `{grammar.mint_re.pattern}`, the node's own lower-case tag followed by its "
+                      f"capitalised words{why}")
+    return grammar
+
+
 def cmd_new_build(root: str, conf: dict, args: dict) -> int:
     """Owner ruling D12-a: an owner's id list becomes a build README the OWNER lands.
 
@@ -4516,9 +4547,7 @@ def cmd_new_build(root: str, conf: dict, args: dict) -> int:
     # half-staged rotation only after the README and its contract row were written and staged, and
     # the staged README then blocks the re-run the refusal asks for (TOOL-dHomedResolver-5, M1).
     check_archives_tracked(root, conf)
-    if not backlog.SLUG_RE.match(slug) or not (slug[0].isalpha() and slug[0].islower()):
-        raise Problem(f"`{slug}` is not a build slug: a slug is the node's own lower-case tag "
-                      f"followed by a CamelCase adjective-noun, letters and digits only")
+    grammar = check_slug_minted(root, slug)
     ids = read_idlist(args["asks"], _id_alternation(conf))
     ids.sort(key=lambda i: (i.split("-")[1], i.split("-")[0], int(i.rsplit("-", 1)[1])))
     claimed = check_slug_claimed(root, conf, slug)
@@ -4547,7 +4576,7 @@ def cmd_new_build(root: str, conf: dict, args: dict) -> int:
                       f"unasked; nothing was written")
     rel = f"{m}/builds/{slug}/README.md"
     opened = datetime.date.today().isoformat()
-    write_text(os.path.join(root, rel), render_new_build_readme(slug, conf, ids, opened, ""))
+    write_text(os.path.join(root, rel), render_new_build_readme(slug, conf, ids, opened, "", grammar.record))
     registry = os.path.join(m, CONTRACT_REGISTRY).replace(os.sep, "/")
     add_contract_row(root, conf, rel)
     run("git", "add", "--", rel, registry, cwd=root)
@@ -4603,11 +4632,13 @@ def read_placed_build_args(argv: list) -> dict:
     return out
 
 
-def render_placed_build_readme(slug: str, args: dict, roster: str, streams: str, opened: str) -> str:
+def render_placed_build_readme(slug: str, args: dict, roster: str, streams: str, opened: str,
+                               grammar: str) -> str:
     """The placed build's README: the front matter of a patch or a repeat, five filled slots and the
     pairs `--write` renders into. `args` is `read_placed_build_args`'s; no request text is read."""
     key = args["request"]
-    head = ["---", f"slug: {slug}", f"node: {slug[0]}", f"opened: {opened}", f"streams: {streams}",
+    head = ["---", f"slug: {slug}", f"slug-grammar: {grammar}", f"node: {slug[0]}", f"opened: {opened}",
+            f"streams: {streams}",
             f"roster: {roster}", "ids:", "status: OPEN"]
     if args["origin"]:
         head.append(f"parents: {args['origin']}")
@@ -4650,17 +4681,16 @@ def cmd_placed_build(root: str, conf: dict, args: dict) -> int:
     m = conf["MEMORY_ROOT"]
     slug = args["slug"]
     check_archives_tracked(root, conf)
-    if not backlog.SLUG_RE.match(slug) or not (slug[0].isalpha() and slug[0].islower()):
-        raise Problem(f"`{slug}` is not a build slug: a slug is the node's own lower-case tag "
-                      f"followed by a CamelCase adjective-noun, letters and digits only")
+    grammar = check_slug_minted(root, slug)
     rel = f"{m}/builds/{slug}/README.md"
     if os.path.exists(os.path.join(root, rel)):
         raise Problem(f"--placed-build {slug}: {rel} already exists, so nothing was written")
     disciplines = read_discipline_map(conf)
     if args["origin"]:
         origin = args["origin"]
-        if not backlog.SLUG_RE.match(origin):
-            raise Problem(f"--placed-build: --origin `{origin}` is not a build slug")
+        if not grammar.BUILD_SLUG_RE.match(origin):
+            raise Problem(f"--placed-build: --origin `{origin}` is not a build slug: it matches no "
+                          f"grammar a build was minted under, `{grammar.BUILD_SLUG_RE.pattern}`")
         source = os.path.join(root, m, "builds", origin, "README.md")
         if not os.path.isfile(source):
             raise Problem(f"--placed-build: the origin {m}/builds/{origin}/README.md is not in this tree")
@@ -4676,7 +4706,8 @@ def cmd_placed_build(root: str, conf: dict, args: dict) -> int:
         family = next(iter(disciplines))
         roster, streams = family, disciplines[family]
     opened = datetime.date.today().isoformat()
-    write_text(os.path.join(root, rel), render_placed_build_readme(slug, args, roster, streams, opened))
+    write_text(os.path.join(root, rel), render_placed_build_readme(slug, args, roster, streams, opened,
+                                                                   grammar.record))
     registry = os.path.join(m, CONTRACT_REGISTRY).replace(os.sep, "/")
     add_contract_row(root, conf, rel)
     run("git", "add", "--", rel, registry, cwd=root)
@@ -5832,8 +5863,8 @@ def check_expand_contract() -> str:
     """TOOL-dTrueNorth-16 AC15 — `backlog.read_header_verbs` over a `closes` header with an `expand` stub
     returning three values: the refusal's text, or what came back instead."""
     try:
-        backlog.read_header_verbs("**Status:** OPEN · rev-1 · closes TOOL-dX-1", "memory/builds/dX/spec/s.md",
-                                  lambda value: (["TOOL-dX-1"], [], "a third value"))
+        backlog.read_header_verbs("**Status:** OPEN · rev-1 · closes TOOL-dXFix-1", "memory/builds/dXFix/spec/s.md",
+                                  lambda value: (["TOOL-dXFix-1"], [], "a third value"))
     except backlog.Problem as exc:
         return f"backlog.Problem: {exc}"
     except ValueError as exc:
@@ -6238,14 +6269,14 @@ def cmd_selftest() -> int:
     # alone is the fixture-passes-by-finding-nothing shape: a stub returning its input joined would
     # fail it, but so would a greedy version that swallows a gap, and only the second arm can tell
     # those apart. The third holds the boundary at two, where a range is not shorter than the pair.
-    arm("a contiguous run collapses to a range", "TOOL-dX-2..4",
-        lambda: _render_id_ranges(["TOOL-dX-2", "TOOL-dX-3", "TOOL-dX-4"]))
-    arm("a GAP is never swallowed by the range", "TOOL-dX-2..3 TOOL-dX-7",
-        lambda: _render_id_ranges(["TOOL-dX-2", "TOOL-dX-3", "TOOL-dX-7"]))
-    arm("a differing slug does not join a run", "TOOL-dX-2 TOOL-dY-3",
-        lambda: _render_id_ranges(["TOOL-dX-2", "TOOL-dY-3"]))
-    arm("a non-numeric tail is emitted verbatim", "TOOL-dX-head",
-        lambda: _render_id_ranges(["TOOL-dX-head"]))
+    arm("a contiguous run collapses to a range", "TOOL-dXFix-2..4",
+        lambda: _render_id_ranges(["TOOL-dXFix-2", "TOOL-dXFix-3", "TOOL-dXFix-4"]))
+    arm("a GAP is never swallowed by the range", "TOOL-dXFix-2..3 TOOL-dXFix-7",
+        lambda: _render_id_ranges(["TOOL-dXFix-2", "TOOL-dXFix-3", "TOOL-dXFix-7"]))
+    arm("a differing slug does not join a run", "TOOL-dXFix-2 TOOL-dYFix-3",
+        lambda: _render_id_ranges(["TOOL-dXFix-2", "TOOL-dYFix-3"]))
+    arm("a non-numeric tail is emitted verbatim", "TOOL-dXFix-head",
+        lambda: _render_id_ranges(["TOOL-dXFix-head"]))
 
     # `_render_wrapped_ids` — the gap lines' cap remedy. The arm asserts the WRAP, not the content: a
     # version that never wraps returns one line and fails on the count, which is the property the
@@ -7068,26 +7099,26 @@ def cmd_selftest() -> int:
             "['ARCH-tOne-1@rev-1']", lambda: _read_cited_past_pin("build"))
         arm("TOOL-dFoldedAudit-15 AC28 — the same record under reviews/ clears the unit", "[]",
             lambda: _read_cited_past_pin("reviews"))
-        # TOOL-dFoldedAudit-6 AC5 — THE PREDICATE'S CASES, each over one record, its text naming FIX-x-1. The
+        # TOOL-dFoldedAudit-6 AC5 — THE PREDICATE'S CASES, each over one record, its text naming FIX-xFix-1. The
         # two prefix arms red against either match dropping its boundary, the heading arm against a reader
         # finding the section by ordinal, and the continuation arm against a line-oriented entry.
         import design_lib as _dl6f
 
-        def _check_fold(rev2, unit="FIX-x-1", revs=(2,), heading="## 9. Revision log",
-                        stem="2026-10-21-review-FIX-x-2", text="names FIX-x-1"):
+        def _check_fold(rev2, unit="FIX-xFix-1", revs=(2,), heading="## 9. Revision log",
+                        stem="2026-10-21-review-FIX-xFix-2", text="names FIX-xFix-1"):
             return _dl6f.check_audit_fold(f"# s\n\n{heading}\n\n- rev-1 · initial\n- rev-2 · 2026-10-21 · §6 ·{rev2}\n",
-                                          unit, revs, [f"memory/builds/b/reviews/{stem}.md"], lambda _p: text)
+                                          unit, revs, [f"memory/builds/bFix/reviews/{stem}.md"], lambda _p: text)
 
         arm("TOOL-dFoldedAudit-6 AC5 — a citation wrapped onto a continuation line is the entry's", "True",
-            lambda: _check_fold(" a fold,\n  2026-10-21-review-FIX-x-2"))
+            lambda: _check_fold(" a fold,\n  2026-10-21-review-FIX-xFix-2"))
         arm("TOOL-dFoldedAudit-6 AC5 — the section is found by its text, at any ordinal", "True",
-            lambda: _check_fold(" 2026-10-21-review-FIX-x-2", heading="## 8. Revision log"))
+            lambda: _check_fold(" 2026-10-21-review-FIX-xFix-2", heading="## 8. Revision log"))
         arm("TOOL-dFoldedAudit-6 AC5 — an empty revs is False", "False",
-            lambda: _check_fold(" 2026-10-21-review-FIX-x-2", revs=range(3, 3)))
+            lambda: _check_fold(" 2026-10-21-review-FIX-xFix-2", revs=range(3, 3)))
         arm("TOOL-dFoldedAudit-6 AC5 — a stem that is a prefix of the cited stem is no citation", "False",
-            lambda: _check_fold(" 2026-10-21-review-FIX-x-26"))
+            lambda: _check_fold(" 2026-10-21-review-FIX-xFix-26"))
         arm("TOOL-dFoldedAudit-6 AC5 — an id that is a prefix of the named id is no naming", "False",
-            lambda: _check_fold(" 2026-10-21-review-FIX-x-2", text="names FIX-x-10"))
+            lambda: _check_fold(" 2026-10-21-review-FIX-xFix-2", text="names FIX-xFix-10"))
         # TOOL-dFoldedAudit-6 AC6 — ONE PREDICATE: the join holds design_lib's own object, and the past-pin
         # reader CALLS it, read from the function's tree because this arm's own text spells the name too.
         import deviation_join as _dj6f
@@ -7766,7 +7797,7 @@ def cmd_selftest() -> int:
                           encoding="utf-8", newline="") as fh:
                     fh.write(body)
             try:
-                return str(read_stale_header_waiver(d, "memory", ["memory/builds/x/README.md"]))
+                return str(read_stale_header_waiver(d, "memory", ["memory/builds/xFix/README.md"]))
             except Problem as exc:
                 return str(exc)
 
@@ -7776,7 +7807,7 @@ def cmd_selftest() -> int:
         arm("a waiver row naming an untracked path REFUSES", "outlived",
             lambda: _read_waiver("memory/builds/ghost/README.md\t1\tabcdef12\tseeded\n"))
         arm("a waiver row the ledger factory refuses REFUSES", "not the key's fields",
-            lambda: _read_waiver("memory/builds/x/README.md   a reason in the old grammar\n"))
+            lambda: _read_waiver("memory/builds/xFix/README.md   a reason in the old grammar\n"))
 
         # TOOL-dDerivedDocket-6 — the two BACKLOG verbs, read through `backlog.py` and expanded by
         # this module's own `_expand_ids`. THE DARK ARM IS FIRST and is the one that matters here: a
@@ -8809,7 +8840,8 @@ def cmd_selftest() -> int:
             "[asks: EXMP-aFoo-3..4]",
             lambda: "[" + [x for x in _sc_fm if x.startswith("asks:")][0] + "]")
         arm("the front matter carries the keys a run and the bar both read",
-            "['slug: zFreshDocket', 'node: z', 'streams: tool', 'roster: EXMP', 'ids:', "
+            "['slug: zFreshDocket', 'slug-grammar: words=1-3 style=humorous date=none', 'node: z', "
+            "'streams: tool', 'roster: EXMP', 'ids:', "
             "'status: OPEN', 'authorized-by: slug']",
             lambda: str([x for x in _sc_fm if not x.startswith(("opened:", "asks:"))]))
         arm("the `ids:` line is the RENDER's, which owns it — empty on a build no id names yet",
@@ -8960,6 +8992,7 @@ def cmd_selftest() -> int:
             return f"rc={rc} {fm} quoted={'zq-placed-words' in text} :: {out if rc else ''}"
 
         arm("a placed patch's README carries parents: <origin> and its staged registry row", "rc=0 ['slug: zFixPatch', "
+            "'slug-grammar: words=1-3 style=humorous date=none', "
             "'node: z', 'streams: tool', 'roster: EXMP', 'ids:', 'status: OPEN', 'parents: aFoo'] quoted=False",
             lambda: _read_placed_fm("zFixPatch", ["--request", "3f9c2a7d01be", "--origin", "aFoo"]))
         arm("a placed repeat's README carries authorized-by: recipe, its playbook and its pieces",
@@ -8973,6 +9006,23 @@ def cmd_selftest() -> int:
             lambda: read_placed_build_args(["zNoCount", "--request", "3f9c2a7d01be", "--playbook", "p.md"]))
         arm("a placed patch whose README exists is refused", "already exists, so nothing was written",
             lambda: _read_placed_fm("zFixPatch", ["--request", "3f9c2a7d01be", "--origin", "aFoo"]))
+
+        # TOOL-dTotalRecall-5 AC3 — both doors check a new slug against the grammar in force's
+        # `mint_re`, which refuses a dated slug under the default `date=none`, before any write; and
+        # a placed patch's `--origin` is read against BUILD_SLUG_RE, every grammar a build was minted
+        # under. RED, observed at the close, is `slug-grammar:` dropped from `render_new_build_readme`,
+        # which the front-matter arm above reads.
+        _sg_dated = "d2026-10-26Loop"
+        arm("--new-build refuses a slug the grammar in force does not mint, and writes nothing",
+            "rc=1 folder=False", lambda: _read_refusal(_sg_dated, ["EXMP-aFoo-3"]))
+        arm("that refusal names the grammar in force and its shape",
+            "is not a build slug the grammar in force mints: words=1-3 style=humorous date=none, the shape",
+            lambda: _read_refusal(_sg_dated, ["EXMP-aFoo-3"]))
+        arm("--placed-build refuses it too, naming the grammar, and writes nothing",
+            "rc=1 [] quoted=False :: build-index: `d2026-10-26Loop` is not a build slug the grammar in force mints",
+            lambda: _read_placed_fm(_sg_dated, ["--request", "3f9c2a7d01be", "--origin", "aFoo"]))
+        arm("a placed patch's --origin `A_b`, which no grammar admits, is refused", "is not a build slug: it matches no grammar",
+            lambda: _read_placed_fm("zOtherPatch", ["--request", "3f9c2a7d01be", "--origin", "A_b"]))
 
 
     # ---------------------------------------------------- the example family (TOOL-dDerivedDocket-51)
@@ -9353,6 +9403,31 @@ def cmd_selftest() -> int:
             "| [aFile](builds/aFile/README.md) | SPECCED | a | 2026-09-01 | tool | 1 | 2026-09-09 | active | 0 |\n"
             "| [aSpec](builds/aSpec/README.md) | SPECCED | a | 2026-09-01 | tool | 1 | 2026-09-30 | active | 2 |\n",
             lambda: _k_live)
+        # TOOL-dTotalRecall-5 AC9 — the `shown` date renders beside the slug in the link text, never
+        # in its target, and `none` renders the bare slug; both views read one `render_label`.
+        import id_grammar as _sg_kit  # noqa: PLC0415 — deferred exactly as the anchor arms above
+        _sg_shown = _sg_kit.SlugGrammar(date="shown")
+        arm("TOOL-dTotalRecall-5 AC9 — under `shown` a LIVE link's text carries the opened date, its target the slug",
+            "| [aSpec (2026-09-01)](builds/aSpec/README.md) | SPECCED |",
+            lambda: render_live(collect(_l_t, _l_blank), "memory", _l_blank, None, None, _sg_shown))
+        arm("TOOL-dTotalRecall-5 AC9 — and a ledger shard's link text too",
+            "| [aSpec (2026-09-01)](../builds/aSpec/README.md) | a | 2026-09-01 |",
+            lambda: "".join(render_shards(collect(_l_t, _l_blank), "memory", _sg_shown).values()))
+        arm("TOOL-dTotalRecall-5 AC9 — under `none` the label is the bare slug", "dClosedLoop|",
+            lambda: _sg_kit.SlugGrammar(date="none").render_label("dClosedLoop", "2026-10-26") + "|")
+        # SLUG_DEFAULTS restates the catalogue's three defaults for a tree with no policy kit; held to
+        # the rows here wherever the policy kit resolves, one SKIP line where it does not.
+        try:
+            _sg_pol = backlog.resolve_kit_dir("policy", "catalogue.toml", pathlib.Path(__file__).resolve().parent)
+        except LookupError as _sg_why:
+            _sg_pol = None
+            print(f"arm SKIP  SLUG_DEFAULTS against the catalogue rows — no policy kit resolves: {_sg_why}")
+        if _sg_pol is not None:
+            import tomllib  # noqa: PLC0415 — only this arm reads the catalogue
+            _sg_rows = {k["name"]: k.get("default") for k in tomllib.loads(
+                (_sg_pol / "catalogue.toml").read_text(encoding="utf-8")).get("key", [])}
+            arm("TOOL-dTotalRecall-5 — SLUG_DEFAULTS is the catalogue rows' defaults, key for key", "True",
+                lambda: str({k: _sg_rows.get(k) for k in _sg_kit.SLUG_DEFAULTS} == _sg_kit.SLUG_DEFAULTS))
         # AC2 — the pure mapping over a live build and a terminal one. The third row carries the live
         # unit's OWN id at a path the fixture never tracked, so only the (file, id) pair rejects it.
         _k_t = os.path.join(_l_base, "landed"); os.makedirs(_k_t)
@@ -9383,14 +9458,14 @@ def cmd_selftest() -> int:
         arm("AC2 — two trees a year apart in commit dates render one LIVE.md", "apart=True same=True",
             lambda: f"apart={_l_dates[0] != _l_dates[1]} same={_l_renders[0] == _l_renders[1]}")
 
-    # TOOL-aMendedFleet-19 AC6 — the attribution delimits the slug on both sides, so `zA` never claims
-    # `zAB`'s README or ids. A substring match would attribute all four and count none elsewhere.
-    _d_keys = ["check 9\tmemory/builds/zA/README.md", "check 21\tTOOL-zA-3 cited by nothing",
-               "check 9\tmemory/builds/zAB/README.md", "check 21\tTOOL-zAB-2 cited by nothing", ""]
-    arm("TOOL-aMendedFleet-19 AC6 — zA takes its README and id, zAB's two count elsewhere",
-        "['memory/builds/zA/README.md', 'TOOL-zA-3 cited by nothing'] 2",
-        lambda: "%s %d" % ([k for _r, k in scan_doctor_offenders(_d_keys, "zA", "memory")[0]],
-                           scan_doctor_offenders(_d_keys, "zA", "memory")[1]))
+    # TOOL-aMendedFleet-19 AC6 — the attribution delimits the slug on both sides, so `zAFix` never claims
+    # `zAFixB`'s README or ids. A substring match would attribute all four and count none elsewhere.
+    _d_keys = ["check 9\tmemory/builds/zAFix/README.md", "check 21\tTOOL-zAFix-3 cited by nothing",
+               "check 9\tmemory/builds/zAFixB/README.md", "check 21\tTOOL-zAFixB-2 cited by nothing", ""]
+    arm("TOOL-aMendedFleet-19 AC6 — zAFix takes its README and id, zAFixB's two count elsewhere",
+        "['memory/builds/zAFix/README.md', 'TOOL-zAFix-3 cited by nothing'] 2",
+        lambda: "%s %d" % ([k for _r, k in scan_doctor_offenders(_d_keys, "zAFix", "memory")[0]],
+                           scan_doctor_offenders(_d_keys, "zAFix", "memory")[1]))
     # AC5 — a hygiene child exiting 2, or exiting 1 naming no key, is unanswered: exit 2, naming the
     # grader, and the slot-contract finding beside it still prints. The third arm holds the answered
     # case at 1, so a verdict returning 2 unconditionally cannot pass the pair.
@@ -9401,11 +9476,11 @@ def cmd_selftest() -> int:
                   "elsewhere": 0}
         arm(f"TOOL-aMendedFleet-19 AC5 — hygiene exit {_d_code} with no key reads exit 2, slot finding kept",
             "2 True True", lambda h=_d_hyg: "%d %s %s" % (
-                derive_doctor_verdict("zA", [h, _d_slot])[0],
-                "doctor zA: hygiene did not answer" in "\n".join(derive_doctor_verdict("zA", [h, _d_slot])[1]),
-                "doctor zA: slot-contract registry — no row" in "\n".join(derive_doctor_verdict("zA", [h, _d_slot])[1])))
+                derive_doctor_verdict("zAFix", [h, _d_slot])[0],
+                "doctor zAFix: hygiene did not answer" in "\n".join(derive_doctor_verdict("zAFix", [h, _d_slot])[1]),
+                "doctor zAFix: slot-contract registry — no row" in "\n".join(derive_doctor_verdict("zAFix", [h, _d_slot])[1])))
     arm("TOOL-aMendedFleet-19 S4 — an answered hygiene run with a key elsewhere and a slot finding reads 1",
-        "1", lambda: str(derive_doctor_verdict("zA", [
+        "1", lambda: str(derive_doctor_verdict("zAFix", [
             {"grader": "hygiene", "answered": True, "why": "", "code": 1, "mine": [], "elsewhere": 3},
             _d_slot])[0]))
 
@@ -9475,7 +9550,7 @@ def cmd_selftest() -> int:
     test_coverage_stub(arm)
     arm("TOOL-dTrueNorth-16 AC15 — read_header_verbs refuses an expand returning three values with backlog.Problem "
         "naming the (ids, bad) contract and the spec path", "True",
-        lambda: str((lambda o: o.startswith("backlog.Problem: memory/builds/dX/spec/s.md:") and "(ids, bad)" in o)(
+        lambda: str((lambda o: o.startswith("backlog.Problem: memory/builds/dXFix/spec/s.md:") and "(ids, bad)" in o)(
             check_expand_contract())))
     test_asbuilt_view(arm)
 
@@ -9520,7 +9595,7 @@ def scan_doctor_offenders(keys: list, slug: str, memory_root: str) -> tuple:
     """`(mine, elsewhere)` from `check <n><TAB><key>` lines. S2's attribution, delimited both sides.
 
     A key is this folder's when it carries the folder's path or an id `<FAMILY>-<slug>-<seq>`. The
-    slug is delimited on BOTH sides, so slug `zA` never claims `zAB`'s README or its ids.
+    slug is delimited on BOTH sides, so slug `zAFix` never claims `zAFixB`'s README or its ids.
     """
     path_re = re.compile(re.escape(f"{memory_root.rstrip('/')}/builds/{slug}") + r"(?![A-Za-z0-9])")
     id_re = re.compile(r"(?<![A-Za-z0-9])[A-Z]+-" + re.escape(slug) + r"-[0-9]+")
@@ -9761,7 +9836,8 @@ def cmd_new_spec(root: str, conf: dict, args: dict) -> int:
     """Write one spec skeleton under its build's `spec/` folder; refuse before writing on any conflict."""
     m = conf["MEMORY_ROOT"]
     spec_id = args["id"]
-    parts = re.fullmatch(r"([A-Z]+)-([a-z][A-Za-z0-9]*)-([1-9][0-9]*)", spec_id)
+    slug_class = read_slug_grammar(root).slug_class   # the slug grammar's (TOOL-dTotalRecall-5 S7)
+    parts = re.fullmatch(r"([A-Z]+)-((?:" + slug_class + r"))-([1-9][0-9]*)", spec_id)
     if not parts or not backlog.SLUG_RE.match(parts.group(2)):
         raise Problem(f"--new-spec: `{spec_id}` is not a unit id, FAMILY-<slug>-<seq> with a node-led "
                       f"CamelCase slug. {NEW_SPEC_USAGE}")

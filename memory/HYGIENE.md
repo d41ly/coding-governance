@@ -188,8 +188,10 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
 
 - Every new tracked id is `FAMILY-<slug>-<seq>`, owned by the session that mints it, so nothing it
   numbers can be contested.
-- The slug is the node's tag from the charter's node registry plus a fresh CamelCase adjective-noun,
-  `[A-Za-z]` only, minted ONCE per session; the tag's letter makes two nodes' slugs disjoint.
+- The slug is the node's tag from the charter's node registry plus fresh words, minted ONCE per
+  session; the tag's letter makes two nodes' slugs disjoint. Its shape is the slug grammar's, the policy
+  keys `builds.slug-words`, `builds.slug-style` and `builds.slug-date` as `derive_slug_grammar` in the
+  memory-tree kit's `id_grammar.py` derives them, and a new build's README records it as `slug-grammar:`.
 - `<seq>` is a plain 1-up per session and family, unpadded: a label, never a rank. The next one is the
   numeric maximum of YOUR ids in that family plus one, carried in session state, because an
   uncommitted id is invisible to grep.

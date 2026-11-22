@@ -124,9 +124,22 @@ LEGACY_TOKENS = ("OPEN", "SPECCED", "INPROGRESS", "BLOCKED", "DEFERRED", "CLOSED
 # then sort before a September cutoff and silently disarm V9 and V12.
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
-# A build folder slug. Disjoint from a SHA by construction: every slug in this corpus carries an
-# upper-case letter (the node tag plus a CamelCase adjective-noun) and a SHA carries none.
-SLUG_RE = re.compile(r"^(?=.*[A-Z])[A-Za-z0-9]+$")
+
+
+def load_id_grammar():
+    """The sibling `id_grammar`, whose slug grammar every slug and id pattern of this module reads at
+    first use (TOOL-dTotalRecall-5 S7). Importing it resolves no conf and reads no policy."""
+    here = str(pathlib.Path(__file__).resolve().parent)
+    if here not in sys.path:
+        sys.path.append(here)
+    import id_grammar  # noqa: PLC0415 — the sibling, reached by the path append above
+    return id_grammar
+
+
+# A build folder slug: the slug grammar's BUILD_SLUG_RE, every grammar a build was minted under
+# (TOOL-dTotalRecall-5 S7), bound at first use. It admits an all-lower-case legacy slug, so the
+# REOPEN slot below asks SHA_RE first: an all-letter hex sha is also a legacy-shaped slug.
+SLUG_RE = load_id_grammar().SlugPattern(lambda g: g.BUILD_SLUG_RE.pattern)
 
 # THE THREE LOCATOR FORMS OF §4, and the one shape fix F6 forbids, each anchored at BOTH ends. A
 # locator is the whole value or it is not a locator: an unanchored form would read the first legal
@@ -198,7 +211,7 @@ def build_grammar(families) -> Grammar:
                       f"id grammar instead of failing")
     alt = "|".join(sorted(set(fams))) or "(?!)"
     return Grammar(tuple(sorted(set(fams))),
-                   re.compile(r"^(?:" + alt + r")-[A-Za-z0-9]+-\d+$"))
+                   load_id_grammar().SlugPattern(lambda g: r"^(?:" + alt + r")-(?:" + g.slug_class + r")-\d+$"))
 
 
 def check_id(token: str, grammar: Grammar) -> bool:
@@ -450,7 +463,7 @@ def extract_grants(value: str) -> tuple:
 #: build's asks are filed under — grading it against the backlog allowlist would refuse a
 #: legitimate grant on any tree whose two sets differ. Whether the id RESOLVES is the question the
 #: unit that HONOURS a grant asks, at the moment it honours one.
-GRANT_ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+$")
+GRANT_ID_RE = load_id_grammar().SlugPattern(lambda g: r"^[A-Za-z][A-Za-z0-9]*-(?:" + g.slug_class + r")-\d+$")
 
 
 def check_grant(grant: str) -> bool:
@@ -1620,8 +1633,9 @@ VIEW_H1_RE = re.compile(
 # A rendered DATA row, recognised by its LINK-WRAPPED first cell. That wrapper is what keeps the
 # table-anchor shape off the row, so the row that the anchor grammar refuses to claim is exactly the
 # row this pattern accepts — one property, asserted from both sides.
-VIEW_ROW_RE = re.compile(
-    r"^\| \[[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+\]\(\.\./builds/[A-Za-z0-9]+/BACKLOG\.md\) \|.*\|$")
+VIEW_ROW_RE = load_id_grammar().SlugPattern(
+    lambda g: r"^\| \[[A-Za-z][A-Za-z0-9]*-(?:" + g.slug_class + r")-\d+\]\(\.\./builds/(?:" + g.slug_class
+    + r")/BACKLOG\.md\) \|.*\|$")
 _LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")
 
 

@@ -396,6 +396,34 @@ case "${1:-}" in
   # `precommit` argv its `guard` trips, under the interpreter just resolved; the pre-commit hook's call.
   --precommit)   shift; exec "$PYBIN" "$KITDIR/precommit.py" "$@" ;;
 esac
+# THE SLUG GRAMMAR (TOOL-dTotalRecall-5 S7, S8): the memory-tree kit's hygiene script prints it as
+# `--print-slug-re`, found through the resolver read above, asked once, only by a reader that needs
+# it, and kept in SLUG_CLASS. This kit requires no memory-tree, so where that kit is not installed the
+# inline legacy shape applies, said once on stderr; a kit that answers nothing usable refuses.
+# >>> slug_legacy_sh — canonical copy: check-memory-hygiene.sh in the memory-tree kit (byte-identical; gated)
+SLUG_LEGACY_ERE='[a-z][A-Za-z]{2,}'
+# <<< slug_legacy_sh
+SLUG_CLASS=""
+load_slug_class() {  # -> 0 with SLUG_CLASS set; 2 with a named refusal on stderr
+  [ -n "$SLUG_CLASS" ] && return 0
+  local _mt _re=""
+  if _mt=$("$PYBIN" -I -c "${RKD_PROGRAM%$'\n'}"'
+import sys
+try:
+    print(resolve_kit_dir("memory-tree", "check-memory-hygiene.sh", sys.argv[1]).as_posix())
+except LookupError as e:
+    sys.exit(str(e))' "$KITDIR" 2>/dev/null); then
+    _re=$("${BASH:-bash}" "${_mt%$'\r'}/check-memory-hygiene.sh" --print-slug-re 2>/dev/null | tr -d '\r')
+    case "$_re" in
+      '^('*')$') SLUG_CLASS=${_re#'^('}; SLUG_CLASS=${SLUG_CLASS%')$'}; return 0 ;;
+    esac
+    echo "run-gates: the memory-tree kit's slug grammar did not answer --print-slug-re, so no unit id is read: ${_re:-no answer}" >&2
+    return 2
+  fi
+  echo "slug grammar: memory-tree not installed, the legacy shape applies" >&2
+  SLUG_CLASS=$SLUG_LEGACY_ERE
+  return 0
+}
 fails=0; n=0; skips=0; ondemands=0; HELD_KIT=0; HELD_QUARANTINE=0; HELD_LEVEL=0; HELD_KEYS=""
 HELD_N=0; HELD_RAN=0; HELD_RAN_FAIL=0
 
@@ -5288,7 +5316,8 @@ derive_age() {
   done
   owner=${ATTR_FPL[$lo]}
   A_AGE=$lo; A_OWN8=${owner:0:8}
-  A_OWNID=$(git log -1 --format=%s "$owner" 2>/dev/null | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | head -1)
+  A_OWNID=""
+  load_slug_class && A_OWNID=$(git log -1 --format=%s "$owner" 2>/dev/null | grep -oE "[A-Z]+-($SLUG_CLASS)-[0-9]+" | head -1)
   [ -n "$A_OWNID" ] || A_OWNID=-
   A_AGE_NOTE="introduced by $A_OWN8, $lo first-parent landing(s) before R"
 }

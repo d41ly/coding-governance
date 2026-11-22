@@ -50,6 +50,8 @@ import extract as ex  # noqa: E402
 import runlog_lib as rl  # noqa: E402
 
 MODEL_SCHEMA = 1
+# A decision row's head unit id, its slug the slug grammar's class (TOOL-dTotalRecall-5 S7).
+UNIT_HEAD_RE = rl.derive_slug_pattern(lambda c: r"[A-Z]+-(?:" + c + r")-[0-9]+")
 # The CLOSED lists. The self-test drives a fixture for every member and holds every fixture's answer
 # to membership, in both directions, so a member with no fixture and an answer outside the list both
 # red.
@@ -1927,7 +1929,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
             for _ in range(n):
                 head = ln[2:].split(" ", 1)[0]
                 decision_rows.append({"sha": c["sha"], "owner": check_owner_row(ln),
-                                      "id": head if re.fullmatch(r"[A-Z]+-[A-Za-z0-9]+-[0-9]+", head) else None})
+                                      "id": head if UNIT_HEAD_RE.fullmatch(head) else None})
     ledger_paths = {p for c in own for s, p in c["files"]
                     if s in "AM" and p.startswith(f"{build}/build/") and "acceptance-ledger" in p}
     review_paths = {p for c in era_commits for s, p in c["files"]

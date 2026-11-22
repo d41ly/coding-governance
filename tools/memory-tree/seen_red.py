@@ -55,7 +55,8 @@ SAY = "seen-red"
 SEEN_RED_LEAD = "- seen-red"
 SEEN_RED_RE = re.compile(r"^- seen-red — `([^`]+)` — red `([0-9a-f]{8,40})` — green `([0-9a-f]{8,40})` — (\S.*)$")
 NEW_ARM_LEAD = "New arm:"
-SLUG_RE = re.compile(r"[A-Za-z0-9]+")
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use
+SLUG_RE = SlugPattern(lambda g: r"(?:" + g.slug_class + r")")   # the slug grammar's (TOOL-dTotalRecall-5 S7)
 BASE_RE = re.compile(r"[0-9a-f]{7,40}")
 RUN_FACTS = "## Run facts"
 

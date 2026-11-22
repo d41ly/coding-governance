@@ -154,12 +154,15 @@ ROLES = ("spec writer", "author", "owner")      # the record grammar's approver 
 RANK = {"author": 0, "spec writer": 1, "owner": 2}
 LEAST = {"editorial": "author", "additive": "spec writer", "stricter": "spec writer", "loosening": "owner",
          "breaking": "owner"}                   # final-questions `[deviation]`, the by-risk table
-_ID =r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
-DEPARTS = re.compile(r"^(`?)(?:" + _CL + r"@[0-9a-f]{8}|" + _ID + r"@rev-\d+|d[A-Z]\w+)\1(?: \[[^\]]+\])?$")
-FOLLOW = re.compile(r"^(?:amends " + _CL + r"@[0-9a-f]{8}|supersedes " + _CL + r"@[0-9a-f]{8} by " + _CL
-                    + r"|new unit " + _ID + r"|(?:gap|ask|usage) \S+)$")
-_STEM = derive_stem("deviation")                                 # a record's stem, its <n> following
-SUPERSEDES = re.compile(r"(`?)(" + _STEM + r"\d+)\1")           # one record id, quoted or bare
+from id_grammar import SlugPattern  # noqa: E402  the slug grammar, bound at first use (TOOL-dTotalRecall-5 S7)
+_ID = SlugPattern(lambda g: r"[A-Za-z]+-(?:" + g.slug_class + r")-\d+")
+DEPARTS = SlugPattern(lambda g: r"^(`?)(?:" + _CL + r"@[0-9a-f]{8}|" + _ID.pattern
+                      + r"@rev-\d+|d[A-Z]\w+)\1(?: \[[^\]]+\])?$")
+FOLLOW = SlugPattern(lambda g: r"^(?:amends " + _CL + r"@[0-9a-f]{8}|supersedes " + _CL + r"@[0-9a-f]{8} by "
+                     + _CL + r"|new unit " + _ID.pattern + r"|(?:gap|ask|usage) \S+)$")
+# A record's stem, its <n> following; one record id, quoted or bare. Bound at first use, as the
+# stem's unit id is the slug grammar's.
+SUPERSEDES = SlugPattern(lambda g: r"(`?)(" + derive_stem("deviation") + r"\d+)\1")
 RESCOPE = re.compile(r"^\S+ rescope · item (add|retire|supersede|defer) (\S+)(?: -> (\S+))? · reason (.*)$", re.M)
 LEDGER = re.compile(r"^- (\S+) — amended rev-(\d+)\b")
 RUN_FILE = re.compile(r"^RUN(?:\.[^/]+)?\.md$")

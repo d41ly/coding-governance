@@ -146,9 +146,11 @@ COUNTED_STATES = ("present", "partial")
 TIME_SOURCES = ("git", "run-state")
 _GIT, _RUN_STATE = frozenset(("git",)), frozenset(("run-state",))
 DATE_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
-RECORD_NAME_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-build-([A-Z]+-[A-Za-z0-9]+-[0-9]+)-"
-                            + RECORD_TAG + r"-([0-9a-f]{8})\.md")
-UNIT_ID_RE = re.compile(r"([A-Z]+)-([A-Za-z0-9]+)-([0-9]+)")
+# A record's name and a unit id, each slug the slug grammar's class (TOOL-dTotalRecall-5 S7).
+RECORD_NAME_RE = rl.derive_slug_pattern(lambda c: r"[0-9]{4}-[0-9]{2}-[0-9]{2}-build-([A-Z]+-(?:" + c + r")-[0-9]+)-"
+                                        + RECORD_TAG + r"-([0-9a-f]{8})\.md")
+UNIT_ID_RE = rl.derive_slug_pattern(lambda c: r"([A-Z]+)-((?:" + c + r"))-([0-9]+)")
+UNIT_RANGE_RE = rl.derive_slug_pattern(lambda c: r"([A-Z]+)-((?:" + c + r"))-([0-9]+)(?:\.\.([0-9]+))?")
 PLACEHOLDER_RE = re.compile(r"\{([a-z-]+)\}")
 COMMITMENT_RE = re.compile(r"sha256 ([0-9a-f]{64}) · lines ([0-9]+)")
 # EVERY SUMMARY FACT WHOSE RENDERED VALUE A PARSER IN THIS KIT READS BACK, mapped to that parser
@@ -1484,7 +1486,7 @@ def check_serves_line(ln, line, slug, own_ids) -> list:
     if m.group(1) != SERVES_KIND and m.group(1) not in SERVES_ALIASES:
         out.append((ln, "serves", f"the binding kind is not `{SERVES_KIND}`"))
     for tok in m.group(2).split(" "):
-        r = re.fullmatch(r"([A-Z]+)-([A-Za-z0-9]+)-([0-9]+)(?:\.\.([0-9]+))?", tok)
+        r = UNIT_RANGE_RE.fullmatch(tok)
         if r is None:
             out.append((ln, "serves", "a token that is neither a unit id nor an id range"))
             continue

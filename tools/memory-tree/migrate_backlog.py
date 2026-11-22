@@ -534,9 +534,9 @@ def check_names_id(text: str, ident: str) -> bool:
 #: corpus does — citing its neighbours — and proposing a hold from a bare mention put 97 of 334
 #: triage rows under a BLOCKED proposal on the first real-tree run, every one of them a citation.
 #: The target still has to resolve live; this pattern is what makes the resolution mean something.
-ROW_HOLD_RE = re.compile(
+ROW_HOLD_RE = backlog.load_id_grammar().SlugPattern(lambda g: (
     r"\b(?:blocked|block|held|holds|hold|waiting|waits|depends|depend|pending|deferred|defer)\s+"
-    r"(?:on|upon|until|for)\s+[`\[*]*([A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+)", re.I)
+    r"(?:on|upon|until|for)\s+[`\[*]*([A-Za-z][A-Za-z0-9]*-(?:" + g.slug_class + r")-\d+)"), re.I)
 
 
 def read_row_hold(body: str, grammar, known) -> str:
@@ -561,7 +561,8 @@ def read_named_hold(body: str, grammar, known) -> str:
     nothing files derives UNRESOLVED in the fold, which would land in the switch-over as a V6
     verdict instead of as the triage ask the design routes it to.
     """
-    for token in re.findall(r"[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+", body):
+    slug = backlog.load_id_grammar().derive_slug_grammar().slug_class
+    for token in re.findall(r"[A-Za-z][A-Za-z0-9]*-(?:" + slug + r")-\d+", body):
         if backlog.check_id(token, grammar) and token in known:
             return token
     return ""

@@ -4486,17 +4486,24 @@ def test_model_driver_sets():
         print("  SKIP extract slug grammar: no bash that shares this filesystem is on PATH, or no function "
               "to run, so the driver cannot grade the kit's grammar here")
         return
-    names = ("dLoggedFlight", "my-build", "a", "Z9", "trailing-", "a--b", "9lives", "-lead", "", "a_b", "a.b",
+    names = ("dLoggedFlight", "myBuild", "aFix", "Z9", "trailing-", "a--b", "9lives", "-lead", "", "a_b", "a.b",
              "ab/c")
-    script = shape + '\nfor s; do if check_slug_shape "$s"; then printf 1; else printf 0; fi; printf "\\0"; done'
-    got = subprocess.run([bash, "-c", script, "_", *names], capture_output=True)
+    # The driver's function reads the slug grammar's BUILD_SLUG_RE through `load_slug_class`, the kit
+    # library's, which this script stands in for with the ERE the memory-tree module prints, so the
+    # driver's bash `=~` is graded against this kit's Python `fullmatch` over one class (TOOL-dTotalRecall-5 S7).
+    ere = ("^(" + rl._SLUG_GRAMMAR.derive_slug_grammar().slug_ere + ")$" if rl._SLUG_GRAMMAR is not None
+           else "^(" + rl.SLUG_LEGACY % "a-z" + ")$")
+    script = ('load_slug_class() { SLUG_RE_ERE=$GOV_SLUG_RE_ERE; return 0; }\n' + shape
+              + '\nfor s; do if check_slug_shape "$s"; then printf 1; else printf 0; fi; printf "\\0"; done')
+    got = subprocess.run([bash, "-c", script, "_", *names], capture_output=True,
+                         env=dict(os.environ, GOV_SLUG_RE_ERE=ere))
     fields = got.stdout.split(b"\0")
     check("extract slug grammar: bash answered once per name, NUL-framed, and exited 0",
           (got.returncode, len(fields), fields[-1:]), (0, len(names) + 1, [b""]))
     driver_ok = [f == b"1" for f in fields[:len(names)]]
-    check_true("extract slug grammar liveness: the driver accepts a dashed and a single-letter name, and "
-               "refuses a digit-first one, so the table has both sides", driver_ok[1:3] == [True, True]
-               and driver_ok[6] is False, str(driver_ok))
+    check_true("extract slug grammar liveness: the driver accepts myBuild and aFix, two names the slug "
+               "class admits, and refuses a digit-first one, so the table has both sides",
+               driver_ok[1:3] == [True, True] and driver_ok[6] is False, str(driver_ok))
     check("extract slug grammar: SLUG_RE accepts exactly the names check_slug_shape accepts",
           [bool(rl.SLUG_RE.fullmatch(s)) for s in names], driver_ok)
     read = [rx.derive_tool_class("Bash", {"command": f"bash unattended.sh --preflight {s} --mode prompt",
