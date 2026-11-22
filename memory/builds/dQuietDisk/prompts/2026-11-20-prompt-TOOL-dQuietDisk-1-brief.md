@@ -133,7 +133,7 @@ measured before and after.
 14. The `run-gates*.test.sh` suites on the template cache [planned TOOL-dQuietDisk-13]
 15. `check-unattended.test.sh` on the template cache [parked the same owner rule as item 9 forbids running it]
 16. A content-addressed attestation that a kit tree passed its self-tests, recorded by gov and carried to adopters with the minted kit [planned TOOL-dQuietDisk-14]
-17. An adopter's kit self-test leg is held when its vendored kit tree hash is attested, and runs as today when the hash is unknown [planned TOOL-dQuietDisk-15]
+17. An adopter's kit self-test leg is held when its vendored kit tree hash is attested, and runs as today when the hash is unknown [parked TOOL-dQuietDisk-15 is DEFERRED by its fork F1: both adopters' default bars already hold every gov kit self-test, so the hold saves nothing until a bar is handed a selection, ask TOOL-dQuietDisk-33]
 18. `govkit update` passes one `blob_at(..., batch=)` handle to every receipt-row read [planned TOOL-dQuietDisk-16]
 19. `govkit update` runs each `adopt-*.sh --check` once [planned TOOL-dQuietDisk-17]
 20. `govkit apply` takes its before map from the target's reuse cache and re-runs only legs whose guards meet the files it wrote [planned TOOL-dQuietDisk-18]
