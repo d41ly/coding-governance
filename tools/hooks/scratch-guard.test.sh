@@ -1629,6 +1629,85 @@ write_roles absent
 rm -rf "$SGWT/kit"
 
 # ==================================================================================================
+# ---- the SHELL-WRITE ARM (TOOL-dBoundRoles-7): a role agent's Bash or PowerShell write meets the --
+# ---- verdict an Edit or Write of its target meets, and its work order's allowance ----------------
+# The plants sed-in-place, py-write, node-write, ps-write, git-apply-file, git-apply-heredoc and
+# home-sed read the exported scanner and checkCommand; none-role-shell, allowance-in, allowance-out
+# and allowance-absent run the hook over the write gate's fixture, whose conf sets MEMORY_ROOT=mem,
+# with a fixture agent transcript. Against a copy of the hook whose checkShellWrites call is cut from
+# main, the none-role-shell, allowance-out and throw exit-2 rows exit 0; against the scanner at base,
+# every BR7-AC1 to AC3 row naming a target and the home-sed row read none. The exit-0 rows are the
+# near-misses and the main loop's controls.
+# scan_targets <name> <want> <command> [<cwd>] — scanWriteTargets' answer as `value:why` pairs joined by `;`.
+scan_targets() {
+  local got
+  got=$(node -e 'const t=require(process.argv[1]).scanWriteTargets(process.argv[2],process.argv[3]||"");console.log("["+t.map((x)=>x.value+":"+x.why).join(";")+"]")' "$HOOK" "$3" "${4:-}" 2>&1)
+  if [ "$got" = "[$2]" ]; then echo "ok   $1"; pass=$((pass+1)); else echo "FAIL $1 (read '$got', want '[$2]')"; fail=$((fail+1)); fi
+}
+scan_targets "BR7-AC1 sed-in-place: sed -i names its file operand" 'a.py:sed -i' "sed -i 's/a/b/' a.py"
+scan_targets "BR7-AC1 sed without -i writes nothing" '' "sed 's/a/b/' a.py"
+scan_targets "BR7-AC2 py-write: a python -c open in w mode" 'a.py:interpreter write' "python -c \"open('a.py','w').write('x')\""
+scan_targets "BR7-AC2 py-write: a python3 - heredoc's Path.write_text" 'b.txt:interpreter write' "python3 - <<'EOF'
+from pathlib import Path
+Path('b.txt').write_text('x')
+EOF"
+scan_targets "BR7-AC2 node-write: a node -e writeFileSync" 'c.js:interpreter write' "node -e \"require('fs').writeFileSync('c.js','')\""
+scan_targets "BR7-AC2 a read-mode open writes nothing" '' "python -c \"print(open('a.py').read())\""
+scan_targets "BR7-AC2 ps-write: PowerShell's [IO.File]::WriteAllText" 'ps.txt:interpreter write' "[IO.File]::WriteAllText('ps.txt', 'x')"
+printf 'diff --git a/d.py b/d.py\n--- a/d.py\n+++ b/d.py\n@@ -1 +1 @@\n-a\n+b\n' > "$TMP/sw7.patch"
+scan_targets "BR7-AC3 git-apply-file: a patch file's +++ b/ path, the file placed against the cwd" 'd.py:git apply' 'git apply sw7.patch' "$SG_TMP_N"
+scan_targets "BR7-AC3 git-apply-heredoc: the same patch in a heredoc" 'd.py:git apply' "git apply <<'EOF'
+$(cat "$TMP/sw7.patch")
+EOF"
+scan_targets "BR7-AC3 git apply --check writes nothing" '' 'git apply --check sw7.patch' "$SG_TMP_N"
+sg7_k=$(HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
+  node -e 'console.log(require(process.argv[1]).checkCommand(process.argv[2],process.env).bad.map((b)=>b.kind+":"+b.why).join(";"))' "$HOOK" "sed -i 's/a/b/' ~/x" 2>&1)
+[ "$sg7_k" = 'home:sed -i' ] && { echo "ok   BR7-AC8 home-sed: checkCommand reads sed -i on ~/x as a home finding"; pass=$((pass+1)); } \
+  || { echo "FAIL BR7-AC8 home-sed: checkCommand read '$sg7_k', want 'home:sed -i'"; fail=$((fail+1)); }
+# write_sw7_transcript <allowance body> — the fixture agent transcript: sw7sess.jsonl names the
+# session, and the agent a7's record, its prompt a work order's marker and ## Task, lies under it.
+SG7_TP="$SG_TMP_N/sw7sess.jsonl"
+write_sw7_transcript() {
+  "$TESTPY" -c 'import json,os,sys
+d=os.path.join(sys.argv[1],"subagents"); os.makedirs(d,exist_ok=True)
+p="<!-- gov:handoff role=gov-spec-writer build=bx unit=TOOL-x-20 path=mem/builds/bx/prompts/p.md -->\n\n## Task\n\n### allowance\n\n"+sys.argv[2]+"\n\n### return\n\nnone\n"
+open(os.path.join(d,"agent-a7.jsonl"),"w",encoding="utf-8",newline="\n").write(json.dumps({"type":"user","message":{"role":"user","content":p}})+"\n")' "$SG_TMP_N/sw7sess" "$1"
+}
+# run_shell_write <name> <want_exit> <stderr-expect> <agent_type|-> <command> [<field>=<value> ...] —
+# a Bash payload from the linked worktree, fields joining its top level; graded as run_card grades.
+# SG7_PRELOAD, when set, is a script node preloads into the hook.
+run_shell_write() {
+  local name=$1 want=$2 expect=$3 type=$4 cmd=$5; shift 5
+  local payload got
+  payload=$("$TESTPY" -c 'import json,sys; d={"tool_name":"Bash","tool_input":{"command":sys.argv[2]},"cwd":sys.argv[3]}
+if sys.argv[1] != "-": d["agent_type"]=sys.argv[1]
+d.update(kv.split("=",1) for kv in sys.argv[4:]); print(json.dumps(d))' "$type" "$cmd" "$SG_CWD_WT" "$@")
+  case "$payload" in *'"command"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
+  printf '%s' "$payload" | env -u CLAUDE_PROJECT_DIR HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
+    node ${SG7_PRELOAD:+-r "$SG7_PRELOAD"} "$HOOK" >/dev/null 2>"$TMP/err"
+  got=$?
+  check_stderr "$name" "$want" "$got" "$expect"
+}
+write_class_roles with
+run_shell_write "BR7-AC4 none-role-shell: gov-researcher's sed -i at the fixture root -> deny naming the target, sed -i and the driver" 2 "any;;/a.py;;sed -i;;whose writes is none;;The remedy is the driver's" gov-researcher "sed -i 's/a/b/' a.py" session_id=sgtest-o1 agent_id=a7
+run_shell_write "BR7-AC4 gov-researcher's sed with no -i -> allow, stderr EMPTY" 0 empty gov-researcher "sed 's/a/b/' a.py" session_id=sgtest-o1 agent_id=a7
+run_shell_write "BR7-AC7 the main loop's sed -i at the fixture root -> allow, stderr EMPTY" 0 empty - "sed -i 's/a/b/' a.py" session_id=sgtest-o1
+write_sw7_transcript '- mem/builds/bx/spec/'
+run_shell_write "BR7-AC5 allowance-in: gov-spec-writer redirects under its allowance -> allow, stderr EMPTY" 0 empty gov-spec-writer 'echo x > mem/builds/bx/spec/sw7.md' session_id=sgtest-o1 agent_id=a7 "transcript_path=$SG7_TP"
+run_shell_write "BR7-AC5 allowance-out: gov-spec-writer redirects under another build's spec/ -> deny naming the allowance and the work order" 2 "any;;outside the allowance;;mem/builds/bx/spec/;;agent-a7.jsonl;;gov:handoff;;The remedy is the driver's" gov-spec-writer 'echo x > mem/builds/other/spec/sw7.md' session_id=sgtest-o1 agent_id=a7 "transcript_path=$SG7_TP"
+write_sw7_transcript 'none'
+run_shell_write "BR7-AC5 a none allowance: the same write under mem/builds/bx/spec/ -> deny naming none" 2 "any;;outside the allowance;;none, which admits no repository write" gov-spec-writer 'echo x > mem/builds/bx/spec/sw7.md' session_id=sgtest-o1 agent_id=a7 "transcript_path=$SG7_TP"
+run_shell_write "BR7-AC6 allowance-absent: no transcript_path -> allow, one witness naming allowance not located" 0 "one;;allowance not located" gov-spec-writer 'echo x > mem/builds/other/spec/sw7.md' session_id=sgtest-o1 agent_id=a7
+# AC7: a throw inside the arm refuses a role agent through main's catch and never the main loop. The
+# preloaded stub makes fs.existsSync throw, which the arm's placing walk reaches first on this command.
+printf '%s\n' 'const fs = require("fs"); fs.existsSync = function () { throw new Error("stub: existsSync throws") }' > "$TMP/sw7throw.js"
+SG7_PRELOAD="$SG_TMP_N/sw7throw.js"
+run_shell_write "BR7-AC7 a throw in the arm, gov-builder -> deny naming the shell-write arm" 2 "any;;the shell-write arm threw" gov-builder "sed -i 's/a/b/' a.py" session_id=sgtest-o1 agent_id=a7
+run_shell_write "BR7-AC7 a throw in the arm, the main loop -> allow, stderr EMPTY" 0 empty - "sed -i 's/a/b/' a.py" session_id=sgtest-o1
+unset SG7_PRELOAD
+write_roles absent
+
+# ==================================================================================================
 # ---- the SUBAGENT CONTEXT (TOOL-aRoutedQuill-4): a SubagentStart payload is answered with the -----
 # ---- card's route, each unit's verdict and what the write gate refuses, as facts -----------------
 # Over the write gate's fixture, conf and cards above. The base hook exits 0 with EMPTY stdout for
@@ -1984,8 +2063,11 @@ n=$((pass+fail))
 # 410 = 401 + the 9 rows TOOL-dBoundRoles-8 added (2 for AC1 and AC2's refusals, 1 for AC2's --help,
 # 2 for AC3's leg row and the resolveRoleRoot check, 1 for AC3's broken index and 3 for AC4), counted
 # by hand under the same rule; its two re-expected O-AC3 rows add none.
+# 430 = 410 + the 20 rows TOOL-dBoundRoles-7 added (10 scan_targets rows for AC1 to AC3, 1 for AC8's
+# home-sed, and 9 run_shell_write rows: 2 for AC4, 3 for AC5, 1 for AC6, and 3 for AC7, the main
+# loop's sed -i and the throw for a role agent and for the main loop), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=410
+FLOOR_ASSERTIONS=430
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

@@ -33,15 +33,16 @@
  * `stripStrings`), for the same reason.
  *
  * ponytail: the predicate is TEXTUAL. It resolves no variable beyond `~`, `$HOME` and the three temp
- * spellings, follows no `cd`, and reads nothing inside a heredoc'd python script — `cd ~ && echo x > y`
- * walks straight past it. It catches the literal shapes that produced every one of the observed
- * files, which is the job. The upgrade path, if that stops being enough, is a real tokenizer rather
- * than more regexes.
+ * spellings, follows no `cd`, and reads a heredoc body only where a `python -`, `python3 -` or `node`
+ * with no script, or a `git apply`, reads it (TOOL-dBoundRoles-7) — `cd ~ && echo x > y` walks
+ * straight past it. It catches the literal shapes that produced every one of the observed files,
+ * which is the job. The upgrade path, if that stops being enough, is a real tokenizer rather than
+ * more regexes.
  *
  * FAILS OPEN. Unparseable stdin, an unknown tool, or a missing command all exit 0. This is a hygiene
  * rule, not a containment boundary; a security control would have to fail the other way. The THIRD
- * check below, the write gate, is one exception: it fails closed. The role-gate arm is the other,
- * for a payload carrying an `agent_type` only.
+ * check below, the write gate, is one exception: it fails closed. The role-gate arm and the
+ * shell-write arm are the others, for a payload carrying an `agent_type` only.
  *
  * Protocol: deny = stderr text + exit 2. Allow = print nothing, exit 0. Matches agent-cap.js, which
  * records the choice as version-robust and free of any JSON-schema dependency — with ONE departure,
@@ -83,8 +84,12 @@
  * refuses except one to the conf. A target in no repository, or in one that is not the session's,
  * is not gated; neither is a repository with no conf (one witness line).
  *
- * WHAT ESCAPES THE WRITE GATE — it stops forgetting, not evasion: a Bash or PowerShell write (`sed
- * -i`, an interpreter, a redirect) is never seen, and the push-time leg owns that guarantee; a
+ * WHAT ESCAPES THE WRITE GATE — it stops forgetting, not evasion: the main loop's Bash or PowerShell
+ * write (`sed -i`, an interpreter, a redirect) is never seen, and the push-time leg owns that
+ * guarantee; a role agent's is held by the shell-write arm below to the same verdict, for the shapes
+ * scanWriteTargets reads (a redirect, `tee`, `touch`, `mkdir`, the PowerShell write cmdlets, the
+ * last argument of `cp`, `mv`, `install` and `rsync`, `sed -i`, `perl -i`, an interpreter's
+ * literal write call and `git apply`), and a role agent's other shell writes still escape; a
  * hook-less or `--bare` run fires no hook; a narrowed ROUTED_PATHS is a conf diff, not a refusal; a
  * hand-written card with a `## route` is read like the writer's; and a spec status flipped to
  * INPROGRESS without the owner's approval admits, because the gate reads a status the agent writes.
@@ -103,8 +108,8 @@
  * naming no writer for a class refuses that class as UNARMED. The renders themselves, the index and
  * the agent file of every role it names, are refused to every writer at step 5a, naming
  * `render_agents.py --write` (TOOL-dBoundRoles-6 S1); an adopter's own agent file is not. What
- * escapes it, besides everything that escapes the gate: a shell write to the renders, which the
- * policy kit's commit guard holds, a tree whose index and every rendered agent file were both
+ * escapes it, besides everything that escapes the gate: the main loop's shell write to the renders,
+ * which the policy kit's commit guard holds, a tree whose index and every rendered agent file were both
  * deleted, and a session launched AS a role, whose payload carries that role's type. It grades four
  * write classes (TOOL-dBoundRoles-9): `spec` and `product` above, and, on a target in neither, step
  * 6b's two: a role declaring `writes = none` writes nothing in the repository, and one declaring
@@ -174,6 +179,31 @@
  * `sleep` under a shorter `timeout`, a file named like a follow option without `--`, or PowerShell's
  * own wait cmdlets, and they refuse a backgrounded poll too. It stops forgetting, not evasion, and
  * the push-boundary bar is still the guarantee.
+ *
+ * THE FIFTH CHECK: THE SHELL-WRITE ARM (TOOL-dBoundRoles-7). On a Bash or PowerShell payload
+ * carrying an `agent_type`, AFTER the role-gate arm, `checkShellWrites` takes each target the one
+ * scanner, scanWriteTargets, finds — `sed -i` and `sed --in-place`, `perl -i`, an interpreter's
+ * write call on a string literal (`open(<lit>, "w")`, `Path(<lit>).write_text(`, `writeFileSync(`,
+ * `appendFileSync(`, PowerShell's `[IO.File]::WriteAllText(`) in a `python -c`, `node -e` or
+ * `python -` / `node` heredoc, each `+++ b/` and `rename to` path of a `git apply` patch, and the
+ * shapes checkCommand already read — places it against the payload `cwd`, and judges one in the
+ * session's repository with checkRouted on a synthetic `Write` of it, so the route arm, the role arm
+ * and step 6b class it exactly as they class an `Edit`. Where the agent's work order, the first
+ * `user` record of its transcript, hands an `### allowance` block in its `## Task` section
+ * (readWorkOrderAllowance), a target the class admits must also lie under one of its entries
+ * (checkRoutedEntry, the matcher the product class reads); a `none` allowance admits no repository
+ * write. No transcript, no readable first record or no block holds the write to its class alone,
+ * with one witness line. `checkShellWrites` is the predicate and its comment is the ONE evaluation
+ * order; a throw refuses a role agent, and the main loop is never judged by it. WHAT STILL ESCAPES:
+ * a write from inside a script file the command runs; a target computed at run time (a variable,
+ * `os.path.join`, a template literal); a heredoc fed to an interpreter the list does not name; a
+ * `sed`, `perl`, `git` or interpreter that does not head its simple command (`xargs sed -i`,
+ * `sudo python -c`); `rm`, `mv` of a
+ * file out of a folder, `git checkout`, `git restore`, `git stash`, `git merge` and `git am`; a patch
+ * read from a pipe, or one whose paths `-p` or `--directory` move, its paths placed against the
+ * payload `cwd`; and a transcript an agent rewrites, since it lives outside the repository. A word
+ * like `install` or `touch` heading no command but unquoted in one (`grep -n install x`) still reads
+ * as a write, as checkCommand reads it; quoting it is the agent's remedy.
  *
  * THE THIRD EVENT: SUBAGENTSTART (TOOL-aRoutedQuill-4). A subagent inherits the hooks but not the
  * parent's card, so it would meet the write gate blind. Wired by `scratch-guard-subagent.fragment.json`
@@ -303,30 +333,41 @@ function checkUnderRoot(pathC, rootC) {
 }
 
 /**
+ * Every heredoc of <cmd>, left to right: `[{ open, from, to }]`, `open` the offset of its `<<`
+ * opener, and `cmd.slice(from, to)` its body, the lines between the opener's line and the line
+ * holding its tag alone. `to <= from` is reachable: an EMPTY body puts the terminator on the line
+ * immediately after the opener, so the computed span is -1. Found by the corpus probe, not by
+ * reasoning — the smoke fixtures all had non-empty bodies. A body is skipped whole, so an opener
+ * spelled inside one is not read as another. buildCommandView blanks these bodies, and the
+ * shell-write scan reads the one a simple command opens (TOOL-dBoundRoles-7 S1).
+ */
+function readHeredocBodies(cmd) {
+  const out = []
+  const here = /<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/g
+  let hm
+  while ((hm = here.exec(cmd)) !== null) {
+    const bodyStart = cmd.indexOf('\n', hm.index)
+    if (bodyStart === -1) break
+    const end = cmd.slice(bodyStart).search(new RegExp('\\n[ \\t]*' + hm[2] + '[ \\t]*(?:\\n|$)'))
+    const bodyEnd = end === -1 ? cmd.length : bodyStart + end
+    out.push({ open: hm.index, from: bodyStart + 1, to: bodyEnd })
+    here.lastIndex = Math.max(bodyEnd, hm.index + hm[0].length)
+  }
+  return out
+}
+
+/**
  * Blank the CONTENTS of quoted strings and heredoc bodies, preserving length so offsets still line
  * up with the original. Operators are then located in this view and targets read from the original.
  */
 function buildCommandView(cmd) {
-  // `to <= from` is reachable: an EMPTY heredoc body puts the terminator on the line immediately
-  // after the opener, so the computed span is -1. Found by the corpus probe, not by reasoning —
-  // the smoke fixtures all had non-empty bodies.
   const buildBlankedRun = (s, from, to) =>
     to <= from ? s : s.slice(0, from) + ' '.repeat(to - from) + s.slice(to)
   let view = cmd
 
   // Heredoc bodies first: their contents can hold anything, including quotes that would desync a
   // naive quote scanner.
-  const here = /<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/g
-  let hm
-  while ((hm = here.exec(view)) !== null) {
-    const tag = hm[2]
-    const bodyStart = view.indexOf('\n', hm.index)
-    if (bodyStart === -1) break
-    const end = view.slice(bodyStart).search(new RegExp('\\n[ \\t]*' + tag + '[ \\t]*(?:\\n|$)'))
-    const bodyEnd = end === -1 ? view.length : bodyStart + end
-    view = buildBlankedRun(view, bodyStart + 1, bodyEnd)
-    here.lastIndex = bodyEnd
-  }
+  for (const h of readHeredocBodies(cmd)) view = buildBlankedRun(view, h.from, h.to)
 
   // Then quoted runs, single and double, left to right.
   let out = ''
@@ -379,17 +420,151 @@ const REDIRECT = /(?:^|[\s;&|(])(?:\d?>>?|&>)/g
 const TMP_ASSIGN = /(?:^|[\s;&|(])(TMPDIR|TMP|TEMP)=/g
 
 /**
+ * TOOL-dBoundRoles-7 S1: an interpreter's write call whose first argument is a string literal, the
+ * literal being group 2. Python's `open(<lit>, <mode>)` is a write only where the mode literal holds
+ * `w`, `a`, `x` or `+`, which the caller tests on group 4; a computed path or mode matches nothing.
+ */
+const INTERPRETER_WRITES = [
+  /\bopen\(\s*[rR]?(['"])([^'"\n]+)\1\s*,\s*(?:mode\s*=\s*)?[rRbB]?(['"])([^'"\n]*)\3/g,
+  /\bPath\(\s*[rR]?(['"])([^'"\n]+)\1\s*\)\s*\.\s*write_(?:text|bytes)\(/g,
+  /\b(?:writeFileSync|appendFileSync)\(\s*(['"`])([^'"`\n]+)\1/g,
+  /\[(?:System\.)?IO\.File\]::(?:WriteAllText|WriteAllBytes|AppendAllText)\(\s*(['"])([^'"\n]+)\1/gi,
+]
+/** The bound on a patch file the `git apply` shape reads, in bytes. */
+const PATCH_READ_BOUND = 256 * 1024
+
+/** The string-literal path of every INTERPRETER_WRITES call in <body>; a template literal holding `${` is computed. */
+function scanInterpreterWrites(body) {
+  const out = []
+  for (const rx of INTERPRETER_WRITES) {
+    rx.lastIndex = 0
+    let m
+    while ((m = rx.exec(String(body))) !== null) {
+      if (m[4] !== undefined && !/[wax+]/.test(m[4])) continue
+      if (!m[2].includes('${')) out.push(m[2])
+    }
+  }
+  return out
+}
+
+/**
+ * The file operands of a `sed` or `perl` simple command's <argv> that edits in place, or [] when it
+ * carries no in-place option. In a short cluster `i` takes the rest as its backup suffix, so `-Ei`
+ * is in place and `-ie` is in place with suffix `e`, as GNU sed reads them; `--in-place[=<suffix>]`
+ * is sed's long form. The script is the first operand unless an `-e` or `-f` (perl `-e` or `-E`)
+ * named it; an empty word, BSD sed's `-i ''` suffix, is no operand.
+ */
+function scanInPlaceOperands(argv) {
+  const perl = buildBaseName(argv[0]) === 'perl'
+  let inPlace = false
+  let script = false
+  const files = []
+  for (let k = 1; k < argv.length; k++) {
+    const w = argv[k]
+    if (w === '') continue
+    if (w === '--') { files.push(...argv.slice(k + 1).filter((x) => x !== '')); break }
+    if (!perl && /^--in-place(?:=|$)/.test(w)) { inPlace = true; continue }
+    if (!perl && /^--(?:expression|file)$/.test(w)) { script = true; k++; continue }
+    if (/^--/.test(w)) { if (/^--(?:expression|file)=/.test(w)) script = true; else if (w === '--line-length') k++; continue }
+    if (/^-[A-Za-z0-9]/.test(w)) {
+      for (let i = 1; i < w.length; i++) {
+        const ch = w[i]
+        if (ch === 'i') { inPlace = true; break }
+        if ((perl ? 'eE' : 'ef').includes(ch) || (!perl && ch === 'l')) {
+          if (ch !== 'l') script = true
+          if (i === w.length - 1) k++
+          break
+        }
+      }
+      continue
+    }
+    if (!script) { script = true; continue }
+    files.push(w)
+  }
+  return inPlace ? files : []
+}
+
+/**
+ * The paths a `git` simple command's patch writes, or [] when it is no `git apply`, or one of
+ * `--check`, `--stat`, `--numstat` and `--summary` makes it write nothing. Each patch operand is
+ * read, resolved against <cwd> when relative (a relative one with no <cwd> is not read), up to
+ * PATCH_READ_BOUND bytes; with no operand, or `-`, the heredoc the command opens, <here>, is the
+ * patch. A path is each `+++ b/<path>` line's, tab and its tail dropped, and each `rename to <path>`
+ * line's. A patch read from a pipe is not seen.
+ */
+function scanPatchTargets(argv, here, cwd) {
+  const fs = require('fs')
+  const path = require('path')
+  let k = 1
+  for (; k < argv.length && argv[k].startsWith('-'); k++) if (GIT_VALUE_FLAGS.includes(argv[k])) k++
+  if (argv[k] !== 'apply') return []
+  const ops = argv.slice(k + 1)
+  if (ops.some((w) => /^--(?:check|stat|numstat|summary)$/.test(w)) && !ops.includes('--apply')) return []
+  const files = []
+  for (let i = 0; i < ops.length; i++) {
+    if (['--directory', '--exclude', '--include', '--whitespace'].includes(ops[i])) i++
+    else if (ops[i] === '-' || !ops[i].startsWith('-')) files.push(ops[i])
+  }
+  const texts = []
+  if (files.length === 0 || files.includes('-')) texts.push(here || '')
+  for (const f of files.filter((x) => x !== '-')) {
+    const native = buildNativePath(f)
+    if (!path.isAbsolute(native) && !cwd) continue
+    let fd = null
+    try {
+      fd = fs.openSync(cwd ? path.resolve(buildNativePath(cwd), native) : native, 'r')
+      const buf = Buffer.alloc(PATCH_READ_BOUND)
+      texts.push(buf.toString('utf8', 0, fs.readSync(fd, buf, 0, PATCH_READ_BOUND, 0)))
+    } catch { /* an unreadable patch writes nothing this scan can name */ } finally { if (fd !== null) fs.closeSync(fd) }
+  }
+  const out = []
+  for (const t of texts) {
+    for (const l of t.split('\n')) {
+      const m = /^\+\+\+ "?b\/(.+?)"?(?:\t.*)?\r?$/.exec(l) || /^rename to (.+?)\r?$/.exec(l)
+      if (m) out.push(m[1])
+    }
+  }
+  return out
+}
+
+/**
  * Locate write targets. Operators come from the blanked VIEW; the token itself is read from the
  * ORIGINAL, so a quoted target still resolves while a quoted operator stays invisible.
  *
  * `cp`/`mv`/`install`/`rsync` take their LAST argument only — those read a source first, and a
  * home-rooted SOURCE is a read. Getting this wrong would have denied this build's own inventory step.
+ *
+ * TOOL-dBoundRoles-7 S1 adds four shapes, read per simple command through scanCommandHeads' inline
+ * mode: the file operands of `sed -i` (and `perl -i`, its own `why`); the string-literal first
+ * argument of an INTERPRETER_WRITES call inside a `python`, `python3` or `py` `-c` body, a `node -e`
+ * body, or the heredoc a `python -`, `python3 -` or `node` with no script reads; PowerShell's
+ * `[IO.File]::` write calls in the command itself; and each path a `git apply` patch names. <cwd>,
+ * the payload's, places a relative patch file; without it only an absolute one is read.
  */
-function scanWriteTargets(cmd) {
+function scanWriteTargets(cmd, cwd) {
   const view = buildCommandView(cmd)
   const found = []
   const addTarget = (value, why) => {
     if (value && !value.startsWith('-')) found.push({ value, why })
+  }
+  for (const c of scanCommandHeads(cmd, 0, { inline: true })) {
+    if (c.inline !== undefined) {
+      for (const v of scanInterpreterWrites(c.inline)) addTarget(v, 'interpreter write')
+      continue
+    }
+    const base = buildBaseName(c.head)
+    if (base === 'sed' || base === 'perl') for (const v of scanInPlaceOperands(c.argv)) addTarget(v, `${base} -i`)
+    else if (base === 'git') for (const v of scanPatchTargets(c.argv, c.here, cwd)) addTarget(v, 'git apply')
+  }
+  // PowerShell's write calls, located in the VIEW so a quoted mention is invisible, the literal read
+  // from the ORIGINAL at the same offset.
+  const call = new RegExp(INTERPRETER_WRITES[3].source, 'gi')
+  const opener = /\[(?:System\.)?IO\.File\]::(?:WriteAllText|WriteAllBytes|AppendAllText)\(/gi
+  let pm
+  while ((pm = opener.exec(view)) !== null) {
+    call.lastIndex = pm.index
+    const lit = call.exec(cmd)
+    if (lit && lit.index === pm.index) addTarget(lit[2], 'interpreter write')
   }
 
   for (const [rx, why] of [[REDIRECT, 'redirect'], [TMP_ASSIGN, 'temp-root assignment']]) {
@@ -1578,6 +1753,39 @@ function checkPolicyFile(tool, target, top) {
 }
 
 /**
+ * The target's REAL place (TOOL-aRoutedQuill-12 S4): <native> resolved against <cwd> where it is
+ * relative, then the realpath of its deepest existing ancestor with the not-yet-existing tail
+ * appended, so a product file reached through a junction or a symlink is placed, and gated, like its
+ * repository spelling. checkRouted and checkShellWrites place a target through it alike.
+ */
+function resolveTargetPlace(native, cwd) {
+  const fs = require('fs')
+  const path = require('path')
+  let target = cwd ? path.resolve(buildNativePath(cwd), native) : path.resolve(native)
+  for (let head = target, tail = ''; ;) {
+    if (fs.existsSync(head)) { target = path.join(resolveRealPath(head) || head, tail); break }
+    const up = path.dirname(head)
+    if (up === head) break
+    tail = tail ? path.join(path.basename(head), tail) : path.basename(head)
+    head = up
+  }
+  return target
+}
+
+/**
+ * TOOL-dBoundRoles-7 S5: the first of <entries>, a list in the `ROUTED_PATHS` grammar, that covers
+ * <rel>, a comparable repo-relative path, or undefined. An entry ending in a slash covers the folder
+ * and everything under it, by whole segment; any other entry covers that exact path; a leading `./`
+ * is dropped. checkRouted's product class and the work order's allowance read this one matcher.
+ */
+function checkRoutedEntry(rel, entries) {
+  return entries.find((e) => {
+    const c = buildComparablePath(e).replace(/^\.\//, '')
+    return /[\\/]$/.test(e) ? checkUnderRoot(rel, c) : rel === c
+  })
+}
+
+/**
  * THE ONE EVALUATION ORDER of the write gate. Returns null to print nothing, `{ witness }` to allow
  * with one stderr line, `{ deny }` to refuse.
  *  1. `tool_name` outside WRITE_TOOLS → null
@@ -1648,17 +1856,7 @@ function checkRouted(data, env) {
   if (!path.isAbsolute(native) && !cwd) {
     return { deny: `BLOCKED by scratch-guard: this ${tool} names a relative target (${raw}) in tool_input.file_path or tool_input.notebook_path, and the payload carries no cwd to resolve it against, so the write gate refuses.\n` }
   }
-  // The target's REAL place (TOOL-aRoutedQuill-12 S4): the realpath of its deepest existing ancestor
-  // with the not-yet-existing tail appended, so a product file reached through a junction or a symlink
-  // is placed, and gated, like its repository spelling.
-  let target = cwd ? path.resolve(buildNativePath(cwd), native) : path.resolve(native)
-  for (let head = target, tail = ''; ;) {
-    if (fs.existsSync(head)) { target = path.join(resolveRealPath(head) || head, tail); break }
-    const up = path.dirname(head)
-    if (up === head) break
-    tail = tail ? path.join(path.basename(head), tail) : path.basename(head)
-    head = up
-  }
+  const target = resolveTargetPlace(native, cwd)
   const sessionStart = env.CLAUDE_PROJECT_DIR || cwd
   if (!sessionStart) return null
   const session = resolveComparableCommon(path.resolve(buildNativePath(sessionStart)))
@@ -1687,10 +1885,7 @@ function checkRouted(data, env) {
   const rel = targetC.slice(buildComparablePath(top).length + 1)
   const rendered = checkRenderedRole(tool, targetC, rel, top)
   if (rendered) return rendered
-  const entry = routed.trim().split(/\s+/).find((e) => {
-    const c = buildComparablePath(e).replace(/^\.\//, '')
-    return /[\\/]$/.test(e) ? checkUnderRoot(rel, c) : rel === c
-  })
+  const entry = checkRoutedEntry(rel, routed.trim().split(/\s+/))
   const sid = data.session_id ? String(data.session_id) : ''
   const agentType = typeof data.agent_type === 'string' ? data.agent_type : ''
   if (entry === undefined) {
@@ -1778,6 +1973,152 @@ function checkRouted(data, env) {
   return checkLane({ deny: renderRouteDeny(tool, targetC, entry, confShown, `no unit its card ${card.shown} routes is buildable:\n${reasons.join('\n')}`, 'Make one routed unit buildable — its spec at the status that admits writes — or route the unit that owns this write through /session-kickoff and manifest-check.sh --card --append.') })
 }
 
+// ---- the shell-write arm (TOOL-dBoundRoles-7) ---------------------------------------------------
+
+/** The shape an agent id and a Workflow run id must hold to reach a path: format-guard.js's RUN_ID_RE. */
+const TRANSCRIPT_ID_RE = /^[A-Za-z0-9_-]{1,64}$/
+/** The bound on the agent transcript's head the allowance read takes, in bytes. */
+const TRANSCRIPT_READ_BOUND = 256 * 1024
+
+/**
+ * S4: the allowance of the work order a role agent was spawned with, read from its transcript, where
+ * agent-cap.js's rule 6 verified the prompt against its prompt file byte for byte. The transcript is
+ * `<session dir>/subagents/agent-<agent_id>.jsonl`, else `<session dir>/subagents/workflows/<run id>/
+ * agent-<agent_id>.jsonl` for the first run id in name order holding one, the session dir being the
+ * payload's `transcript_path` without `.jsonl`; `agent_id` and each run id reach a path only in
+ * TRANSCRIPT_ID_RE's shape. Its first TRANSCRIPT_READ_BOUND bytes are read, and its first record must
+ * parse; the first `user` record's content is the prompt. The allowance is the `### allowance` block
+ * inside the prompt's `## Task` section, read up to the next heading: each `- <prefix>` bullet one
+ * entry, a backtick pair around it stripped, and a body reading `none` the empty list.
+ * `{ entries, from, marker }` when found, `from` the transcript and `marker` the prompt's first line
+ * where it is the `gov:handoff` marker; `{ why }` when no transcript, no readable first record, no
+ * `## Task` section or no block is found. Reads no other file and never throws on a missing one.
+ */
+function readWorkOrderAllowance(data) {
+  const fs = require('fs')
+  const path = require('path')
+  const tp = typeof data.transcript_path === 'string' ? data.transcript_path : ''
+  if (!tp.endsWith('.jsonl')) return { why: 'the payload carries no transcript_path naming a .jsonl file' }
+  const aid = typeof data.agent_id === 'string' ? data.agent_id : ''
+  if (!TRANSCRIPT_ID_RE.test(aid)) return { why: `the payload's agent_id ${JSON.stringify(aid.slice(0, 80))} is not in the shape ${TRANSCRIPT_ID_RE}` }
+  const sub = path.join(buildNativePath(tp.slice(0, -'.jsonl'.length)), 'subagents')
+  const name = `agent-${aid}.jsonl`
+  let runs = []
+  try { runs = fs.readdirSync(path.join(sub, 'workflows')).filter((r) => TRANSCRIPT_ID_RE.test(r)).sort() } catch { runs = [] }
+  const file = [path.join(sub, name), ...runs.map((r) => path.join(sub, 'workflows', r, name))].find((f) => fs.existsSync(f))
+  if (!file) return { why: `no agent transcript ${name} under ${buildComparablePath(sub)}` }
+  const from = buildComparablePath(file)
+  let head = ''
+  let fd = null
+  try {
+    fd = fs.openSync(file, 'r')
+    const buf = Buffer.alloc(TRANSCRIPT_READ_BOUND)
+    head = buf.toString('utf8', 0, fs.readSync(fd, buf, 0, TRANSCRIPT_READ_BOUND, 0))
+  } catch (e) {
+    return { why: `the agent transcript ${from} cannot be read (${(e && e.code) || e})` }
+  } finally {
+    if (fd !== null) fs.closeSync(fd)
+  }
+  let prompt = null
+  for (const line of head.split('\n')) {
+    if (line.trim() === '') continue
+    let d
+    try { d = JSON.parse(line) } catch { return { why: `the agent transcript ${from} holds no readable first record within its first ${TRANSCRIPT_READ_BOUND} bytes` } }
+    if (!d || d.type !== 'user') continue
+    const c = d.message && d.message.content
+    prompt = typeof c === 'string' ? c
+      : Array.isArray(c) ? c.filter((b) => b && b.type === 'text' && typeof b.text === 'string').map((b) => b.text).join('\n') : ''
+    break
+  }
+  if (prompt === null) return { why: `the agent transcript ${from} holds no user record` }
+  const lines = prompt.split(/\r?\n/)
+  const task = lines.indexOf('## Task')
+  if (task === -1) return { why: `the prompt in ${from} holds no ## Task section` }
+  const end = lines.findIndex((l, i) => i > task && /^## /.test(l))
+  const at = lines.findIndex((l, i) => i > task && (end === -1 || i < end) && l.trim() === '### allowance')
+  if (at === -1) return { why: `the ## Task section of the prompt in ${from} carries no ### allowance block` }
+  const entries = []
+  for (const raw of lines.slice(at + 1)) {
+    const l = raw.trim()
+    if (/^#{1,6}\s/.test(l)) break
+    const b = /^- (.+)$/.exec(l)
+    if (b) entries.push(b[1].trim().replace(/^`(.*)`$/, '$1'))
+  }
+  return { entries, from, marker: lines[0].startsWith('<!-- gov:handoff') ? lines[0].trim() : '' }
+}
+
+/** S7: a shell-write refusal — the command's target, the shape that wrote it, why, and the remedy's actor. */
+function renderShellDeny(tool, t, shown, reason) {
+  return (
+    `BLOCKED by scratch-guard: this ${tool} command writes ${shown} through ${t.why} (\`${t.value}\`), and a role ` +
+    `agent's shell write is held to what an Edit or Write of the same target meets. ${reason}\n\n` +
+    'The remedy is the driver\'s: re-scope the work order, or route the write to a role whose class and ' +
+    'allowance cover it (TOOL-dBoundRoles-7).\n'
+  )
+}
+
+/**
+ * THE ONE EVALUATION ORDER of the shell-write arm (TOOL-dBoundRoles-7). Returns null to admit,
+ * `{ witness }` to admit with one stderr line, `{ deny }` to refuse.
+ *  1. `agent_type` absent or empty → null (the main loop meets checkCommand and checkOriented alone)
+ *  2. scanWriteTargets(cmd, cwd) finds no target but a temp-root assignment → null, with no file read
+ *  3. each target, with `~` and `$HOME` expanded; one still holding `$` or a backtick (a computed
+ *     path, §8 F4), a relative one with no payload `cwd`, and a device name (`nul`, `con`, `/dev/…`)
+ *     are not placed; the rest placed by resolveTargetPlace against the payload `cwd`:
+ *     a. in no repository, or one whose common dir is not the session's (`CLAUDE_PROJECT_DIR`, else
+ *        `cwd`) → skipped: checkCommand's rules own it
+ *     b. checkRouted on a synthetic `Write` payload carrying the target as `tool_input.file_path` and
+ *        the payload's `cwd`, `session_id` and `agent_type`: a deny → deny, renderShellDeny around
+ *        it; a witness is kept
+ *     c. readWorkOrderAllowance(data), read once per call: found, and checkRoutedEntry places the
+ *        target's repo-relative path under none of its entries → deny naming the allowance and the
+ *        work order; an empty list admits no target
+ *  4. the witnesses step 3b kept, and, where step 3c read no allowance, one naming why, joined on one
+ *     line → witness; else null
+ * The synthetic payload carries no `content`, so no status-only flip is proven and a shell edit of a
+ * spec by a role outside the spec class refuses; the admitted flip stays the `Edit` route.
+ */
+function checkShellWrites(cmd, data, env) {
+  const path = require('path')
+  const type = typeof data.agent_type === 'string' ? data.agent_type : ''
+  if (!type) return null
+  const cwd = typeof data.cwd === 'string' ? data.cwd : ''
+  const targets = scanWriteTargets(cmd, cwd).filter((t) => t.why !== 'temp-root assignment')
+  if (targets.length === 0) return null
+  const sessionStart = env.CLAUDE_PROJECT_DIR || cwd
+  if (!sessionStart) return null
+  const session = resolveComparableCommon(path.resolve(buildNativePath(sessionStart)))
+  if (!session.key) return null
+  const tool = typeof data.tool_name === 'string' ? data.tool_name : 'Bash'
+  const home = env.HOME || env.USERPROFILE || ''
+  const witnesses = []
+  let allowance = null
+  for (const t of targets) {
+    let v = String(t.value)
+    if (home) v = v.replace(/^(?:~|\$\{HOME\}|\$HOME)(?=\/|\\|$)/, () => home)
+    if (/[$`]/.test(v) || v.startsWith('~') || /^(?:nul|con|\/dev\/.+)$/i.test(v)) continue
+    const native = buildNativePath(v)
+    if (!path.isAbsolute(native) && !cwd) continue
+    const target = resolveTargetPlace(native, cwd)
+    const mine = resolveComparableCommon(target)
+    if (!mine.key || mine.key !== session.key) continue
+    const shown = buildComparablePath(target)
+    const verdict = checkRouted({ tool_name: 'Write', tool_input: { file_path: target }, cwd, session_id: data.session_id, agent_type: type }, env)
+    if (verdict && verdict.deny) return { deny: renderShellDeny(tool, t, shown, `The write gate refuses that Write:\n\n${verdict.deny.trimEnd()}`) }
+    if (verdict && verdict.witness && !witnesses.includes(verdict.witness)) witnesses.push(verdict.witness)
+    if (allowance === null) allowance = readWorkOrderAllowance(data)
+    if (!allowance.entries) continue
+    const rel = shown.slice(buildComparablePath(mine.hit.toplevel).length + 1)
+    if (checkRoutedEntry(rel, allowance.entries) === undefined) {
+      const listed = allowance.entries.length ? allowance.entries.join(', ') : 'none, which admits no repository write'
+      const order = `the work order role ${type} was spawned with, the first record of ${allowance.from}${allowance.marker ? `, which opens ${allowance.marker}` : ''}`
+      return { deny: renderShellDeny(tool, t, shown, `Its path ${rel} lies outside the allowance of ${order}: ${listed}.`) }
+    }
+  }
+  if (allowance && !allowance.entries) witnesses.push(`allowance not located — ${allowance.why}, so a role agent's shell write is held to its class verdict alone`)
+  return witnesses.length ? { witness: witnesses.join(' · ') } : null
+}
+
 // ---- the role-gate arm (TOOL-aOrientedCast-11) --------------------------------------------------
 
 /** The launchers whose script is the head; `python3.<n>` is matched by shape. */
@@ -1834,7 +2175,8 @@ function buildGateWord(w, base, topC) {
 
 /**
  * From word <k> of <a>, past every option of <rule>: a word opening `-`, or `+` for a shell. Returns
- * the index of the next non-option word, or -1 when the simple command ends. A cluster takes one
+ * the index of the next non-option word, or a negative number when the simple command ends: -2 - <j>
+ * where the `ends` option at index <j> ended it (TOOL-dBoundRoles-7 S1), else -1. A cluster takes one
  * word per `clusterTakes` letter it carries. A body option scans the word after those ONCE through
  * scanCommandHeads into <out>, with <opts>, at depth 0 only, then ends it. A `--` is stepped past and
  * ends the options.
@@ -1846,7 +2188,7 @@ function scanLauncherOptions(a, k, rule, depth, out, opts) {
     if (w === '--') return k + 1
     if (!w.startsWith('-') && !(r.plus && w.startsWith('+'))) return k
     if (r.takes && r.takes.includes(w)) { k++; continue }
-    if (r.ends && r.ends.test(w)) return -1
+    if (r.ends && r.ends.test(w)) return -2 - k
     const j = r.clusterTakes && /^[-+][A-Za-z]+$/.test(w) ? (w.match(r.clusterTakes) || []).length : 0
     if (r.body && r.body.test(w)) {
       if (depth === 0 && a[k + 1 + j] !== undefined) out.push(...scanCommandHeads(a[k + 1 + j], depth + 1, opts))
@@ -1869,13 +2211,21 @@ function scanLauncherOptions(a, k, rule, depth, out, opts) {
  * Returns `[{ text, head, argv, launched, reserved }]`, argv being the head and every word after it,
  * reserved the reserved words stepped. A `#` beginning a word, outside quotes and heredoc bodies,
  * blanks the rest of its line first, as the shell drops a comment (TOOL-aTrimmedWait-9).
+ * With `opts.inline` (TOOL-dBoundRoles-7 S1, the shell-write scan alone) every entry also carries
+ * `here`, the body of the heredoc its segment opens, or undefined; and a Python launcher ended by a
+ * `-c` cluster, or a Node one by `-e`, `--eval`, `-p` or `--print`, yields an entry whose `inline` is
+ * the word after it, as does a Python or Node launcher left with no script word, or a Python one
+ * whose script is `-`, its `inline` being `here`, the program it reads from standard input.
  */
 function scanCommandHeads(cmd, depth = 0, opts = {}) {
   const view = buildCommandView(cmd).replace(/(^|[\s;&|()<>])#[^\n]*/g, (w, p) => p + ' '.repeat(w.length - p.length))
   const out = []
   const seg = /[^;|&()\n]+/g
+  const bodies = opts.inline ? readHeredocBodies(cmd) : []
   let m
   while ((m = seg.exec(view)) !== null) {
+    const opened = bodies.find((h) => h.open >= m.index && h.open < m.index + m[0].length)
+    const here = opened ? cmd.slice(opened.from, Math.max(opened.from, opened.to)) : undefined
     const tok = new RegExp(VIEW_TOKEN, 'g')
     const words = []
     let t
@@ -1912,14 +2262,22 @@ function scanCommandHeads(cmd, depth = 0, opts = {}) {
     }
     if (k < 0 || k >= a.length) continue
     const lb = buildBaseName(a[k])
+    const text = cmd.slice(m.index, m.index + m[0].length).trim()
     let launched = false
     if (GATE_LAUNCHERS.includes(lb) || /^python3\.\d+$/.test(lb)) {
       const family = lb === 'bash' || lb === 'sh' ? 'shell' : lb === 'node' ? 'node' : 'python'
+      const at = k
       k = scanLauncherOptions(a, k + 1, GATE_OPTION_RULES[family], depth, out, opts)
+      if (opts.inline && family !== 'shell') {
+        const e = k <= -2 ? a[-2 - k] : ''
+        const inline = (family === 'python' ? /c$/.test(e) : /^(?:-e|--eval|-p|--print)$/.test(e)) ? a[-1 - k]
+          : k >= a.length || (family === 'python' && a[k] === '-') ? here : undefined
+        if (inline !== undefined) out.push({ text, head: a[at], argv: a.slice(at), launched: false, reserved, here, inline })
+      }
       if (k < 0 || k >= a.length) continue
       launched = true
     }
-    out.push({ text: cmd.slice(m.index, m.index + m[0].length).trim(), head: a[k], argv: a.slice(k), launched, reserved })
+    out.push(Object.assign({ text, head: a[k], argv: a.slice(k), launched, reserved }, opts.inline ? { here } : {}))
   }
   return out
 }
@@ -2327,8 +2685,21 @@ function main() {
     process.exit(2)
   }
   if (gate && gate.witness) process.stderr.write(`scratch-guard: ${gate.witness}\n`)
+  // The shell-write arm (TOOL-dBoundRoles-7), after the role-gate arm, and it FAILS CLOSED for a role
+  // agent as that arm does (S6). The main loop is never judged by it, and never refused by its throw.
+  let shell = null
+  try {
+    shell = checkShellWrites(cmd, data, process.env)
+  } catch (e) {
+    shell = data.agent_type ? { deny: `BLOCKED by scratch-guard: the shell-write arm threw (${(e && e.message) || e}) and refuses a role agent's ${data.tool_name} call (TOOL-dBoundRoles-7).\n` } : null
+  }
+  if (shell && shell.deny) {
+    process.stderr.write(shell.deny)
+    process.exit(2)
+  }
+  if (shell && shell.witness) process.stderr.write(`scratch-guard: ${shell.witness}\n`)
   process.exit(0)
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines, scanWriteTargets, checkShellWrites, readWorkOrderAllowance, checkRoutedEntry }

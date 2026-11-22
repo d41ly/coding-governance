@@ -86,7 +86,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
@@ -118,7 +118,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-48 — the composed task section checked block by block: every block opens outside a fence, and each handed block's content lies inside its own, at render and at spawn](spec/2026-10-26-spec-TOOL-dBoundRoles-48.md) | 12 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-8 — the role-gate arm's field escape explained and closed](spec/2026-10-25-spec-TOOL-dBoundRoles-8.md) | 12 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-9 — the `none` and `review` write classes enforced in the role arm](spec/2026-10-25-spec-TOOL-dBoundRoles-9.md) | 13 | 2 | CLOSED | rev-4 | 2026-11-22 |
-| [TOOL-dBoundRoles-7 — shell writes held to the work order's allowance](spec/2026-10-25-spec-TOOL-dBoundRoles-7.md) | 14 | 2 | INPROGRESS | rev-5 | 2026-11-22 |
+| [TOOL-dBoundRoles-7 — shell writes held to the work order's allowance](spec/2026-10-25-spec-TOOL-dBoundRoles-7.md) | 14 | 2 | CLOSED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-5 — returns through a schema-forced channel on both routes, residual failures retried by `roles.retries`](spec/2026-10-25-spec-TOOL-dBoundRoles-5.md) | 15 | 2 | DEFERRED | rev-6 | 2026-11-22 |
 | [TOOL-dBoundRoles-10 — `driver.reads`, `prompts.author` and `roles.no-spawn`, each read and enforced at its seam](spec/2026-10-25-spec-TOOL-dBoundRoles-10.md) | 16 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-39 — the return check grades a direct spawn only: a stop whose transcript is a harness stage's, or whose first record carries no handoff marker, passes untouched](spec/2026-10-26-spec-TOOL-dBoundRoles-39.md) | 16 | 2 | DEFERRED | rev-6 | 2026-11-22 |
@@ -158,7 +158,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 343 bound to this build, across 4 record folder(s).
+Records: 345 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
