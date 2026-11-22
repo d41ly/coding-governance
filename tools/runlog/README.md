@@ -150,6 +150,7 @@ python <this kit>/runlog.py extract --discover [--slug <s>]  # runs with no jour
 python <this kit>/runlog.py extract --measure <projects dir>  # rate and peak memory, writes nothing
 python <this kit>/runlog.py extract --ready <projects dir>    # spend before READY, writes nothing
 python <this kit>/runlog.py narration --session <sid> --from <t> --to <t>
+python <this kit>/runlog.py context <transcript>               # how full the main context window is
 ```
 
 **Where it reads.** A session id is any UUID-shaped `sess.*` value on the slug's `start` lines,
@@ -208,6 +209,17 @@ keeps times and counts only, matching both witnesses in memory, and writes nothi
 session is a `DEAD PROBE`, exit 2. What `--ready` cannot see: a session that reached READY with
 neither witness, which it counts as not ready, and a READY line quoted inside a longer message, which
 it counts as the witness.
+
+**`context`** prints how full one session's main context window is (KICK-dKeptSession-14): `<n>%`, the
+`in`, `cache_read` and `cache_write` of the transcript's last `usage` event with `src` `main`, summed by
+`derive_context_tokens` (the one such sum, which `--ready` calls too), over `CONTEXT_WINDOW_TOKENS`,
+times 100 rounded down; or `none` when the transcript holds no main usage. It parses the main file
+alone, so no subagent's request can decide the share, keeps no text, writes nothing and exits 0, or 2
+when the path names no file. The window is one pinned constant, unverified against the platform's
+documentation, and a session can read past it, so the share can pass 100%. `measure_context_fill(transcript,
+until=None)` is the same read for a caller, the share at or before an epoch second, and
+`derive_context_fill(ev)` the share of one event a caller already holds. The kickoff engine's
+`context —` line reads it, as the `context.on-full` and `context.threshold` policy keys decide.
 
 **The self-test never reads or writes a real store.** Its `main` aims `HOME`, `USERPROFILE`,
 `LOCALAPPDATA`, `XDG_STATE_HOME` and `CLAUDE_CONFIG_DIR` at a decoy tree holding a canary transcript

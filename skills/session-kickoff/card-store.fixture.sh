@@ -17,7 +17,11 @@
 # --boundary <pointer>` the planted `key`, `answer` and `forked` units, and `<slug> --json` the planted
 # `json` and `rc`, each after the planted `delay`; and its `budget.py` replaced by a stub answering `state
 # --build <slug>` with the planted `budget` from that same file, `open 0/4` where none is planted, so no case
-# runs the real module either (KICK-dKeptSession-26 S4). The engine writes the session card `t1`, appends a READY body with a `## route`
+# runs the real module either (KICK-dKeptSession-26 S4); and the runlog kit's `runlog.py`, at the path the
+# engine's resolver finds it, as a stub answering `context <path>` with the planted `fill` from that same file
+# after the planted `fill-delay`, `none` where no fill is planted, so no case parses a transcript
+# (KICK-dKeptSession-14 S7). The stub policy kit appends each key it is asked to `$CARD_STUB_POLICY.log`, so
+# a case can see a key never read. The engine writes the session card `t1`, appends a READY body with a `## route`
 # naming `tFix`, and the case runs its verbs and prints one `card-store: <case> · <what> · held|MISSED`
 # line per observation. The scratch tree is removed at exit. The card-import fixture's verdict
 # (KICK-dKeptSession-12) is planted in its file, or recorded by `--card --fixture-run` over a stub
@@ -40,7 +44,8 @@ partial-ask terminal-route close-follow-twice follow-offline-publish follow-offl
 follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-run fixture-run-cli worktree-named replay-order
 fixture-cli-path-differs fixture-cli-unknown pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay
 budget-open budget-spent budget-unfrozen budget-omitted budget-no-kit
-position-act position-awaiting position-disagrees position-skips lead-compact lead-resume"
+position-act position-awaiting position-disagrees position-skips lead-compact lead-resume
+fill-fresh-past fill-under fill-compact fill-replay fill-slow"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
 BRIEF=memory/builds/tFix/prompts/2026-01-01-prompt-TOOL-tFix-1-brief.md
@@ -165,10 +170,23 @@ write_card_fixture() {
     '    sys.exit(0)' \
     'sys.exit("stub budget: state --build <slug>, and was asked %s" % sys.argv[1:])' > "$f"
   : > "$CARD_STUB_POSITION"
+  # The stub runlog kit (KICK-dKeptSession-14 S7): the fixture copies no runlog kit, so the stub stands at the
+  # path the resolver answers over this kit's own tree.
+  f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file runlog runlog.py); [ -n "$f" ] || return 1
+  rel=${f#"$GOVROOT"/}; mkdir -p "$R/${rel%/*}"
+  printf '%s\n' 'import os, sys, time' \
+    'sys.stdout.reconfigure(encoding="utf-8")' \
+    'vals = dict(l.rstrip("\n").partition("=")[::2] for l in open(os.environ["CARD_STUB_POSITION"], encoding="utf-8") if "=" in l)' \
+    'if len(sys.argv) != 3 or sys.argv[1] != "context":' \
+    '    sys.exit("stub runlog: context <transcript>, and was asked %s" % sys.argv[1:])' \
+    'time.sleep(float(vals.get("fill-delay") or 0))' \
+    'print(vals.get("fill") or "none")' > "$R/$rel"
   f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file policy policy.py); [ -n "$f" ] || return 1
   rel=${f#"$GOVROOT"/}; mkdir -p "$R/${rel%/*}"
   printf '%s\n' 'import os, sys' \
     'vals = dict(l.rstrip("\n").partition("=")[::2] for l in open(os.environ["CARD_STUB_POLICY"], encoding="utf-8") if "=" in l)' \
+    'if len(sys.argv) == 3 and sys.argv[1] == "get":' \
+    '    open(os.environ["CARD_STUB_POLICY"] + ".log", "a", encoding="utf-8").write(sys.argv[2] + "\n")' \
     'if len(sys.argv) != 3 or sys.argv[1] != "get" or sys.argv[2] not in vals:' \
     '    sys.exit("stub policy: get <a planted key>, and was asked %s" % sys.argv[1:])' \
     'if vals[sys.argv[2]] == "":' \
@@ -190,6 +208,8 @@ write_card_fixture() {
   set_card_policy card.pointers every-item
   set_card_policy resume.context fresh-when-idle
   set_card_policy resume.partial continue-item
+  set_card_policy context.on-full fresh-at-boundary
+  set_card_policy context.threshold 60%
   git -C "$R" add -A && ! git -C "$R" diff --cached --quiet && git -C "$R" commit -q -m "fixture: the build tFix" \
     && git -C "$R" branch -M main && git -C "$R" remote add "$FX_REMOTE" "$O" \
     && git -C "$R" push -q "$FX_REMOTE" main 2>/dev/null || return 1
@@ -229,12 +249,14 @@ run_card_append() {
   write_card_body "$S/body" 1
   (cd "$R" && bash "$CHECK" --card --append --session t1 < "$S/body") > "$OUT" 2>&1
 }
-# run_card_replay [source] — the replay as the hook runs it, its payload piped on stdin with no --session,
-# naming the given `source`, never through run_card_engine, which closes stdin (KICK-dKeptSession-15 S6).
+# run_card_replay [source] [transcript] — the replay as the hook runs it, its payload piped on stdin with no
+# --session, naming the given `source` and `transcript_path`, never through run_card_engine, which closes
+# stdin (KICK-dKeptSession-15 S6, KICK-dKeptSession-14 S7).
 run_card_replay() {
-  local payload
-  if [ -n "${1:-}" ]; then printf -v payload '{"session_id":"t1","cwd":"%s","source":"%s"}' "$R" "$1"
-  else printf -v payload '{"session_id":"t1","cwd":"%s"}' "$R"; fi
+  local payload tx=""
+  [ -z "${2:-}" ] || printf -v tx ',"transcript_path":"%s"' "$2"
+  if [ -n "${1:-}" ]; then printf -v payload '{"session_id":"t1","cwd":"%s","source":"%s"%s}' "$R" "$1" "$tx"
+  else printf -v payload '{"session_id":"t1","cwd":"%s"%s}' "$R" "$tx"; fi
   (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
 }
 # set_card_answer <answer> <next item, empty for null> [rc] — the stub engine's `--json` answer, in the
@@ -794,5 +816,68 @@ case "$PLANT" in
       print_card_held "AC4 source resume: the position line prints and no lead — line does" \
         "$(tr -d '\r' < "$OUT" | grep -qx 'position — act · next item.build.unit-pass' && ! grep -q '^lead — ' "$OUT"; echo $?)"
     fi ;;
+  fill-fresh-past|fill-under|fill-compact)
+    # KICK-dKeptSession-14 AC3, AC4, AC5: the session card's first boundary, crossing none → K1, with a
+    # transcript named by --transcript and the stub runlog kit answering the planted share. Staged against
+    # a crossing past the threshold that prints nothing, fill-fresh-past reds; against a line printed under
+    # the threshold or away from a crossing, fill-under; against compact-with-card measuring or reading
+    # the threshold, fill-compact.
+    run_card_append; set_card_position key "$K1"
+    tx="$S/transcript.jsonl"; : > "$tx"
+    case "$PLANT" in
+      fill-fresh-past) set_card_position fill 72% ;;
+      fill-under) set_card_position fill 41% ;;
+      fill-compact) set_card_position fill 72%; set_card_policy context.on-full compact-with-card ;;
+    esac
+    : > "$CARD_STUB_POLICY.log"
+    run_card_engine "$R" --card --boundary --build tFix --session t1 --transcript "$tx"
+    crossed=$(grep -qxF "boundary — none → $K1" "$OUT"; echo $?)
+    case "$PLANT" in
+      fill-fresh-past)
+        print_card_held "AC3 a crossing at 72% under fresh-at-boundary and 60% prints the fresh-now line" \
+          "$([ "$crossed" = 0 ] && tr -d '\r' < "$OUT" | grep -qxF 'context — 72% of window · past 60% · fresh now, at this item boundary (context.on-full: fresh-at-boundary)'; echo $?)" ;;
+      fill-under)
+        print_card_held "AC4 a crossing at 41% prints no context — line" "$([ "$crossed" = 0 ] && ! grep -q '^context — ' "$OUT"; echo $?)"
+        set_card_position fill 72%
+        run_card_engine "$R" --card --boundary --build tFix --session t1 --transcript "$tx"
+        print_card_held "AC4 no crossing at 72% prints no context — line" \
+          "$(grep -qxF "boundary — none crossed · item $K1" "$OUT" && ! grep -q '^context — ' "$OUT"; echo $?)" ;;
+      fill-compact)
+        print_card_held "AC5 compact-with-card: the crossing at 72% prints no context — line" "$([ "$crossed" = 0 ] && ! grep -q '^context — ' "$OUT"; echo $?)"
+        print_card_held "AC5 the stub policy kit's log shows context.on-full read and context.threshold never" \
+          "$(tr -d '\r' < "$CARD_STUB_POLICY.log" | grep -qx 'context.on-full' && ! tr -d '\r' < "$CARD_STUB_POLICY.log" | grep -qx 'context.threshold'; echo $?)" ;;
+    esac ;;
+  fill-replay)
+    # KICK-dKeptSession-14 AC6: a compaction replayed with the payload's transcript_path, the stub engine
+    # answering act and the stub runlog kit 72%; the line stands after position — and before now —, then
+    # reads compact-with-card's own line, and under the threshold S4's `under` line. Staged against the
+    # line printed after now —, or not at all, the first row reds.
+    run_card_append; set_card_answer act item.build.unit-pass; set_card_position fill 72%
+    tx="$S/transcript.jsonl"; : > "$tx"
+    run_card_replay compact "$tx"
+    want='context — 72% of window · past 60% · fresh at next item boundary (context.on-full: fresh-at-boundary)'
+    at=$(tr -d '\r' < "$OUT" | awk -v w="$want" '/^position — / && !o { o = NR } $0 == w && !c { c = NR } /^now — / && !n { n = NR }
+      END { print o + 0, c + 0, n + 0 }')
+    read -r l1 l2 l3 <<<"$at"
+    print_card_held "AC6 fresh-at-boundary at 72%: position, context and now at lines $at, increasing" \
+      "$([ "$l1" -gt 0 ] && [ "$l1" -lt "$l2" ] && [ "$l2" -lt "$l3" ]; echo $?)"
+    set_card_policy context.on-full compact-with-card; run_card_replay compact "$tx"
+    print_card_held "AC6 compact-with-card at 72% reads context — 72% of window (context.on-full: compact-with-card)" \
+      "$(tr -d '\r' < "$OUT" | grep -qxF 'context — 72% of window (context.on-full: compact-with-card)'; echo $?)"
+    set_card_policy context.on-full fresh-at-boundary; set_card_position fill 41%; run_card_replay compact "$tx"
+    print_card_held "S4 fresh-at-boundary at 41% reads context — 41% of window · under 60%" \
+      "$(tr -d '\r' < "$OUT" | grep -qxF 'context — 41% of window · under 60%'; echo $?)" ;;
+  fill-slow)
+    # KICK-dKeptSession-14 AC10: the stub runlog kit sleeping past a lowered CARD_CONTEXT_BOUND, timed
+    # against a control replay whose stub answers at once, as position-skips times its bound.
+    run_card_append; set_card_answer act item.build.unit-pass; set_card_position fill 72%
+    tx="$S/transcript.jsonl"; : > "$tx"
+    t0=$EPOCHSECONDS; run_card_replay "" "$tx"; t1=$EPOCHSECONDS
+    set_card_position fill-delay 30
+    t2=$EPOCHSECONDS; CARD_CONTEXT_BOUND=2 run_card_replay "" "$tx"; t3=$EPOCHSECONDS
+    set_card_position fill-delay 0
+    print_card_held "AC10 a stub past CARD_CONTEXT_BOUND=2 prints did not answer within 2s, and the replay still ends with its now — line" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'context — skipped: runlog.py did not answer within 2s' && tr -d '\r' < "$OUT" | tail -n 1 | grep -q '^now — '; echo $?)"
+    print_card_held "AC10 the slow replay took $((t3 - t2 - t1 + t0))s over the control, within the bound plus 5s" "$([ $((t3 - t2 - t1 + t0)) -le 7 ]; echo $?)" ;;
 esac
 exit "$MISSED"

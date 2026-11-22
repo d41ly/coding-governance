@@ -9,6 +9,7 @@
     python <this kit>/runlog.py extract --ready <projects dir>
     python <this kit>/runlog.py narration --session <sid> --from <t> --to <t> [--transcripts <dir>]
     python <this kit>/runlog.py prose --session <sid> | --transcript <file> [--transcripts <dir>] [--charter <file>]
+    python <this kit>/runlog.py context <transcript>
     python <this kit>/runlog.py model <slug> [--run <n>] [--json] [--journals <dir>] [--transcripts <dir>]
     python <this kit>/runlog.py record <slug> [--run <n>] [--write] [--journals <dir>] [--transcripts <dir>]
     python <this kit>/runlog.py verify <record> [--journals <dir>]
@@ -29,6 +30,10 @@ recomputes a record's journal commitment on this machine: exit 0 when it matches
 `extract` writes one structural extract per session to the user-profile store and prints one JSON
 object per session on stdout; `--measure` and `--ready` write nothing and print a report. `narration` prints a
 window of redacted text framed as data and writes nothing. The extractor's rules are the kit README's.
+`context` prints how full one transcript's main context window is (KICK-dKeptSession-14): `<n>%`, the
+share of `extract.CONTEXT_WINDOW_TOKENS` its last main `usage` event read, times 100 rounded down, or
+`none` with no main usage in it; it parses the main file alone, writes nothing and exits 0, or 2 when
+the path names no file.
 `model` joins one run's sources into the run model and prints it, the whole JSON with `--json`, and
 writes a local copy beside the extracts; it exits 2 when the build has no committed run-state file or
 the run number names no run, and a store that does not resolve costs the copy, never the print.
@@ -315,6 +320,17 @@ def cmd_prose(args) -> int:
     return 0
 
 
+def cmd_context(args) -> int:
+    path = pathlib.Path(args.transcript)
+    if not path.is_file():
+        print(f"runlog: context {path.as_posix()} names no file", file=sys.stderr)
+        return 2
+    fill = ex.measure_context_fill(path)
+    # Rounded to nine places before the floor, so a share of exactly 0.6 reads 60, never 59.
+    print("none" if fill is None else f"{int(round(fill * 100, 9))}%")
+    return 0
+
+
 def cmd_narration(args) -> int:
     t_from, t_to = ex.parse_time(args.t_from), ex.parse_time(args.t_to)
     if t_from is None or t_to is None:
@@ -525,6 +541,9 @@ def main(argv=None) -> int:
     pp.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
     pp.add_argument("--charter", help="the charter whose microformats fence defines the pair; default "
                     "AGENTS.md at the toplevel of the current directory")
+    pc = sub.add_parser("context", help="print how full one transcript's main context window is, "
+                        "<n>%% or none; writes nothing")
+    pc.add_argument("transcript", help="one session's main transcript .jsonl")
     pm = sub.add_parser("model", help="join one run's sources into the run model and print it")
     pm.add_argument("slug")
     pm.add_argument("--run", type=int, help="the 1-up run of the build, oldest first; default the last")
@@ -563,6 +582,8 @@ def main(argv=None) -> int:
         return cmd_narration(args)
     if args.cmd == "prose":
         return cmd_prose(args)
+    if args.cmd == "context":
+        return cmd_context(args)
     if args.legs and not args.by_leg:
         ap.error("journal --legs is read only by --by-leg")
     if args.by_leg and args.producer != "gates":

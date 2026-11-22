@@ -1228,9 +1228,42 @@ def measure_ready_tree(root) -> dict:
             for f in ("in", "out", "cache_read", "cache_write"):
                 row[f] += ev[f]
             if ev["src"] == "main":
-                context = ev["in"] + ev["cache_read"] + ev["cache_write"]
+                context = derive_context_tokens(ev)
                 if row["context_first"] is None:
                     row["context_first"] = context
                 row["context_ready"] = context
         out["rows"].append(row)
     return out
+
+
+# The window a context share is taken of, in tokens: ONE pinned constant beside the sum, unverified
+# against the platform's documentation in this tree (KICK-dKeptSession-14 F2). A main session can read
+# past it, so the share can pass 1.0; KICK-dKeptSession-30 derives the window per model and retires it.
+CONTEXT_WINDOW_TOKENS = 200000
+
+
+def derive_context_tokens(ev) -> int:
+    """The context one `usage` event read: its `in`, `cache_read` and `cache_write` summed, the one
+    such sum in the kit, which `measure_ready_tree` and `measure_context_fill` both call."""
+    return ev["in"] + ev["cache_read"] + ev["cache_write"]
+
+
+def derive_context_fill(ev) -> float:
+    """The share of CONTEXT_WINDOW_TOKENS one `usage` event's context used, for a reader that holds
+    events already and takes the share of any of them without re-reading a transcript."""
+    return derive_context_tokens(ev) / CONTEXT_WINDOW_TOKENS
+
+
+def measure_context_fill(transcript, until=None) -> float | None:
+    """The share of the window the transcript's last `usage` event with `src` `main` used, at or before
+    `until` (an epoch second; the end when None), or None with no such event (KICK-dKeptSession-14 S1).
+    The MAIN file alone is parsed: no agent file is listed, so a subagent's usage cannot decide the
+    share, and a sidechain record inside the main file is read as `agent`, as `extract_session` reads it.
+    Only usage counts leave the transcript; no text is kept."""
+    path = pathlib.Path(transcript)
+    tree = SessionTree(sid=path.stem, main=path)
+    last = None
+    for ev in extract_session(tree)["events"]:
+        if ev["kind"] == "usage" and ev["src"] == "main" and (until is None or ev["t"] <= until):
+            last = ev
+    return None if last is None else derive_context_fill(last)

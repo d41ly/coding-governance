@@ -10123,6 +10123,11 @@
       "file": "tools/lib/legacy_ledger.py"
     },
     {
+      "id": "cmd_context",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
+    },
+    {
       "id": "cmd_contribute",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -11796,6 +11801,16 @@
       "id": "derive_context",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "derive_context_fill",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "derive_context_tokens",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
     },
     {
       "id": "derive_converted_text",
@@ -18346,6 +18361,11 @@
       "id": "measure_commitment",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "measure_context_fill",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
     },
     {
       "id": "measure_contract_parity",
@@ -28953,6 +28973,11 @@
       "file": "tools/govkit/steps/fanout_cap.py"
     },
     {
+      "id": "render_context_line",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "render_convention",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
@@ -33731,6 +33756,11 @@
       "id": "run_cont28_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "run_context_boundary",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "run_core_new",
@@ -39709,6 +39739,11 @@
     },
     {
       "id": "test_extract_ac9_usage",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_context_fill",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

@@ -43,6 +43,15 @@ hooks.bypass = "refused"
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
 
+## `context.on-full`
+Documented on [help/orientation-card.md](../orientation-card.md).
+
+## `context.threshold`
+Documented on [help/orientation-card.md](../orientation-card.md).
+
+## `card.pointers`
+Documented on [help/orientation-card.md](../orientation-card.md).
+
 ## `instructions.checks`
 <!-- usage: policy:instructions.checks 24ae9920 -->
 What a render does when a reader's load set lacks a unit its required-by names: refuse the render, render with a missing-unit line the reader sees, or render and record the gap in the prompt record.
@@ -291,7 +300,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (226)
+## Not yet summarised (223)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -382,9 +391,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `mailbox.fetch-seconds`
 - `review.follow-up`
 - `prompts.batch`
-- `context.on-full`
-- `context.threshold`
-- `card.pointers`
 - `notices.record`
 - `review.breakpoints`
 - `probe.points`

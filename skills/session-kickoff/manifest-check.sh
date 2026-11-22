@@ -309,6 +309,11 @@ CARD_RECORDS_BOUND=${CARD_RECORDS_BOUND:-5}
 # same read and more, took 1.1 s over dKeptSession. The env override exists for the self-test's stub
 # fixture, as CARD_CLI_BOUND's does, and is not an adopter knob.
 CARD_BUDGET_BOUND=${CARD_BUDGET_BOUND:-10}
+# The `context —` line's bound on the runlog kit's `runlog.py context <transcript>`, in seconds
+# (KICK-dKeptSession-14 S5), the map's own figure, above the 1.5 s a main-file parse of a 232 MB
+# transcript took, PINNED 2026-11-21 by that unit. The env override exists for the self-test's slow-stub
+# plant, as CARD_MAP_BOUND's does, and is not an adopter knob.
+CARD_CONTEXT_BOUND=${CARD_CONTEXT_BOUND:-5}
 # The lines a stored `## pointers` section holds, the one list `check_card_pointers` reads: each later
 # session unit appends its own word (KICK-dKeptSession-26 `budget`, KICK-dKeptSession-5 `mail`).
 POINTER_LINES="records forks item budget"
@@ -1114,6 +1119,7 @@ print_replay() {
   fi
   render_position_line "$build"
   render_lead_notice
+  render_context_line
   derive_head_state
   printf 'now — HEAD %s · %s · %s · %s · %s\n' "$HEAD_SHA" "$HEAD_BRANCH" "$HEAD_DIRTY" "$TOPLEVEL" "$REPLAY_KEYS"
 }
@@ -1974,8 +1980,10 @@ check_card_pointers() { # card file -> each missing word on stdout; 0 always
 # fetches from the remote it resolves into the cache ref, writing no `FETCH_HEAD`, and sights the feed,
 # so this engine carries no feed block and no writer. A lost compare-and-swap re-reads the tip, re-renders once on it and writes
 # again. Every store's failure is its own `card —` line and never changes the caller's exit.
-# THE SIX POLICY KEYS are read by `read_card_policy`, one literal `get` line per key, the shape the
-# policy kit's reader coverage counts (as `read_spec_audit_switch` in the unattended driver does).
+# THE POLICY KEYS this engine reads, `card.follows`, `card.store`, `card.snapshot`, `card.pointers`,
+# `resume.context`, `resume.partial`, `context.on-full` and `context.threshold`, are read by
+# `read_card_policy`, one literal `get` line per key, the shape the policy kit's reader coverage counts
+# (as `read_spec_audit_switch` in the unattended driver does).
 # WHAT THIS DOES NOT CHECK: that the card's text is true, which its cells derive; who may publish a build's
 # card, which the lease and the claim decide.
 # THE LOOKUP BOUND (TOOL-dPlacedRequest-49 S2): a reader's bound sits inside the claims cell's, so
@@ -1991,7 +1999,7 @@ CARD_PUBLISH_BOUND=${CARD_PUBLISH_BOUND:-140}   # seconds the driver's write of 
 RESUME_IDLE_S=300
 CARD_REF_TIP=""; CARD_REF_WHY=""; CARD_DRV=""; CARD_STORED_STEP=""; CARD_STORED_FROM=""; CARD_REC=""; CARD_REC_STEP=""
 
-read_card_policy() { # card.follows|card.store|card.snapshot|card.pointers|resume.context|resume.partial -> its value on stdout, a set's members one per line; 1 and the refusal on stdout
+read_card_policy() { # card.follows|card.store|card.snapshot|card.pointers|resume.context|resume.partial|context.on-full|context.threshold -> its value on stdout, a set's members one per line; 1 and the refusal on stdout
   local def pk d py out v n=0
   case "${1:-}" in
     card.follows) def=re-render-at-transition ;;
@@ -2000,7 +2008,9 @@ read_card_policy() { # card.follows|card.store|card.snapshot|card.pointers|resum
     card.pointers) def=every-item ;;
     resume.context) def=fresh-when-idle ;;
     resume.partial) def=continue-item ;;
-    *) printf "read_card_policy reads card.follows, card.store, card.snapshot, card.pointers, resume.context or resume.partial, and was asked for '%s'\n" "${1:-}"
+    context.on-full) def=fresh-at-boundary ;;
+    context.threshold) def=60% ;;
+    *) printf "read_card_policy reads card.follows, card.store, card.snapshot, card.pointers, resume.context, resume.partial, context.on-full or context.threshold, and was asked for '%s'\n" "${1:-}"
        return 1 ;;
   esac
   pk=$(resolve_kit_file policy policy.py)
@@ -2017,6 +2027,8 @@ read_card_policy() { # card.follows|card.store|card.snapshot|card.pointers|resum
     card.pointers) out=$("$py" "$d/policy.py" get card.pointers 2>&1) ;;
     resume.context) out=$("$py" "$d/policy.py" get resume.context 2>&1) ;;
     resume.partial) out=$("$py" "$d/policy.py" get resume.partial 2>&1) ;;
+    context.on-full) out=$("$py" "$d/policy.py" get context.on-full 2>&1) ;;
+    context.threshold) out=$("$py" "$d/policy.py" get context.threshold 2>&1) ;;
   esac || { printf '%s\n' "${out:-policy.py get $1 exited non-zero}"; return 1; }
   out=${out//$'\r'/}
   for v in $out; do
@@ -2028,6 +2040,10 @@ read_card_policy() { # card.follows|card.store|card.snapshot|card.pointers|resum
       card.pointers:every-item|card.pointers:at-transitions) ;;
       resume.context:fresh-when-idle|resume.context:always-resume|resume.context:always-fresh) ;;
       resume.partial:continue-item|resume.partial:restart-item|resume.partial:ask-owner) ;;
+      context.on-full:compact-with-card|context.on-full:fresh-at-boundary) ;;
+      context.threshold:*)
+        [[ $v =~ ^(100|[1-9]?[0-9])%$ ]] \
+          || { printf "%s answered '%s', which is outside the row's pattern (100|[1-9]?[0-9])%%\n" "$1" "$v"; return 1; } ;;
       *) printf "%s answered '%s', which is outside the closed set this engine branches on\n" "$1" "$v"; return 1 ;;
     esac
   done
@@ -2550,7 +2566,8 @@ run_card_boundary() { # slug -> the verb's lines on stdout; 0, or 2 with no sess
         [ "$mode" != every-item ] || write_build_card "$slug" "" stored boundary 0 0
       else
         printf 'card — skipped: card.pointers refused: %s\n' "${mode%%$'\n'*}"
-      fi ;;
+      fi
+      run_context_boundary ;;
     *)
       printf 'boundary — skipped: %s\n' "$b"
       write_card_pointers "$slug" ;;
@@ -2738,6 +2755,80 @@ render_position_line() { # slug -> one position — line on stdout; 0 always
 render_lead_notice() { # -> the lead — line on stdout after a compaction, else nothing; 0 always
   [ "$CARD_SOURCE" = compact ] || return 0
   printf '%s\n' "lead — the compaction summary is a lead, never a source: check it against the position above and the card's pointers"
+}
+
+# The `context —` line (KICK-dKeptSession-14 S3, S4): how full the owner session's window is, the runlog
+# kit's `runlog.py context <transcript>` over CARD_TRANSCRIPT, the payload's `transcript_path` at a replay
+# and the boundary verb's `--transcript`, found by `resolve_kit_file` and run as `derive_map_block` runs the
+# map: under CARD_CONTEXT_BOUND, stdin closed, into a scratch file under the card dir. Its answer is held
+# to `<digits>%` or `none` before any comparison. `context.on-full` decides the line and, under
+# `fresh-at-boundary` alone, `context.threshold`, each read once per verb by `read_card_policy`. At a
+# replay every outcome is one line, a failure `context — skipped: <why>`. At a boundary, `boundary`, the
+# one line is the fresh-now line at or past the threshold; anything else, a skip or a refusal included,
+# prints nothing, since a line at every boundary that changes no act teaches the session to skip it, and
+# under `compact-with-card` nothing is measured. WHAT THIS DOES NOT CHECK: that the window is the model's,
+# a pinned constant in the runlog kit; or that the session acts on the line.
+render_context_line() { # [boundary] -> one context — line on stdout at a replay; at a boundary the fresh-now line or nothing; 0 always
+  local at=${1:-replay} mode thr="" t rl py sf rc out="" n="" why=""
+  if ! mode=$(read_card_policy context.on-full); then
+    [ "$at" = boundary ] || printf 'context — skipped: context.on-full refused: %s\n' "${mode%%$'\n'*}"
+    return 0
+  fi
+  [ "$at" != boundary ] || [ "$mode" = fresh-at-boundary ] || return 0
+  if [ "$mode" = fresh-at-boundary ] && ! thr=$(read_card_policy context.threshold); then
+    [ "$at" = boundary ] || printf 'context — skipped: context.threshold refused: %s\n' "${thr%%$'\n'*}"
+    return 0
+  fi
+  if [ -z "$CARD_TRANSCRIPT" ]; then why='no transcript path names the session'
+  elif [ ! -f "$CARD_TRANSCRIPT" ]; then why='the transcript path names no file'
+  elif rl=$(resolve_kit_file runlog runlog.py); [ -z "$rl" ]; then why='no runlog kit'
+  elif ! py=$(resolve_python 2>/dev/null); then why='no Python resolves on this node'
+  elif ! timeout -k 1 5 true </dev/null >/dev/null 2>&1; then
+    why='this node has no working timeout -k, so the read would be unbounded and none ran'
+  elif ! sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.context.XXXXXX"); then
+    why="no scratch file under $CARD_DIR to capture the share in"
+  else
+    timeout -k 2 "$CARD_CONTEXT_BOUND" "$py" "$rl" context "$CARD_TRANSCRIPT" </dev/null >"$sf" 2>&1; rc=$?
+    case "$rc" in
+      0) out=$(LC_ALL=C awk '{ sub(/\r$/, "") } /^([0-9]+%|none)$/ { a = $0 } END { print a }' "$sf")
+         case "$out" in
+           none) why='no main usage in the transcript' ;;
+           "") why='runlog.py printed no share this replay reads' ;;
+           *) n=${out%\%} ;;
+         esac ;;
+      124|137) why="runlog.py did not answer within ${CARD_CONTEXT_BOUND}s" ;;
+      *) why=$(LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+           NF && f == "" { f = $0 }
+           END { if (f == "") f = "runlog.py context exited " rc " and printed nothing"
+                 if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+                 print f }' "$sf") ;;
+    esac
+    rm -f "$sf" 2>/dev/null
+  fi
+  if [ -n "$why" ]; then
+    [ "$at" = boundary ] || printf 'context — skipped: %s\n' "$why"
+    return 0
+  fi
+  t=${thr%\%}
+  case "$at:$mode" in
+    boundary:*)
+      [ "$n" -lt "$t" ] \
+        || printf 'context — %s%% of window · past %s · fresh now, at this item boundary (context.on-full: fresh-at-boundary)\n' "$n" "$thr" ;;
+    *:compact-with-card) printf 'context — %s%% of window (context.on-full: compact-with-card)\n' "$n" ;;
+    *)
+      if [ "$n" -ge "$t" ]; then
+        printf 'context — %s%% of window · past %s · fresh at next item boundary (context.on-full: fresh-at-boundary)\n' "$n" "$thr"
+      else
+        printf 'context — %s%% of window · under %s\n' "$n" "$thr"
+      fi ;;
+  esac
+  return 0
+}
+
+# S3's act, the boundary verb's step after a crossing: the fresh-now line, written with the verb's other
+# lines to its `--out` file, which the hook hands the session at its next shell call.
+run_context_boundary() { # -> the fresh-now line or nothing on stdout; 0 always
+  render_context_line boundary
 }
 
 if [ -n "$CARD" ]; then
