@@ -13,6 +13,7 @@
 | [2026-11-22-prompt-TOOL-dQuietDisk-36-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-36-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-36-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-36-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-36-spec-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-36-spec-task.md) | research | — |
+| [2026-11-22-review-TOOL-dQuietDisk-36-closing-diff-review-round2.md](../reviews/2026-11-22-review-TOOL-dQuietDisk-36-closing-diff-review-round2.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 

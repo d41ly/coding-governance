@@ -163,3 +163,8 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-22T19:14:56Z brief · item TOOL-dQuietDisk-36 · reason d295d087b141 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-36-build-brief.md
 
 2026-11-22T19:16:31Z dispatch · item 42d04087 TOOL-dQuietDisk-36 · reason tools/lib/template-cache.sh tools/lib/lib-selftest.sh .githooks/pre-push.test.sh tools/lib/lib-selftest.test.sh tools/lib/resolve-python.test.sh tools/run-gates/run-gates.turnstile.test.sh memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/CARDS.md memory/builds/dQuietDisk/spec/2026-11-22-spec-TOOL-dQuietDisk-36.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-36-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-36-deviation-1.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+2026-11-22T19:34:36Z draw · review-round · dQuietDisk · 9/44 · 20261122T193436Z-d596b3
+
+2026-11-22T19:34:37Z review · item dQuietDisk · reason verdict CLEAN · blockers 0 · round-highs 0 · round-minors 0 · CONVERGED · highs 0 · minors 9 · to units · disposition promote
+
+2026-11-22T19:34:58Z rescope · item add TOOL-dQuietDisk-37 · reason the closing diff review CONVERGED at round 2 with round 1's 5 MEDIUM and 4 LOW findings standing; review.findings blocker-high-own and budget target unit promote them to one batched unit (`doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it`, its diff-exit rule)

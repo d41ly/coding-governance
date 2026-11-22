@@ -5,7 +5,7 @@ opened: 2026-11-20
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30 TOOL-dQuietDisk-31 TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36
+ids: TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30 TOOL-dQuietDisk-31 TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37 TOOL-dQuietDisk-38 TOOL-dQuietDisk-39
 ---
 
 # dQuietDisk — gov's bars and suites stop churning the disk
@@ -34,7 +34,7 @@ analysis and the owner's prompt are recorded under `prompts/` and `build/`.
 ## Build-level rules
 
 - Classification (M2): every roster unit MISSING at open, specced by the spec-writer role.
-- Chain map (v2 `[chain]`): units 1 to 15, 19, 26, 28 and 36 sit in dWitnessedBar's area (Test: gate health, held
+- Chain map (v2 `[chain]`): units 1 to 15, 19, 26, 28, 36 and 37 sit in dWitnessedBar's area (Test: gate health, held
   legs, budgets); 16 to 18 in dSafePassage's (Supersession: govkit update and apply); 2 to 6 also in
   dScopedBuild's (Build: the history-derived exit base). This build runs on its own track; a shared
   subject is reconciled at the merge, and no spec here contradicts theirs.
@@ -75,13 +75,14 @@ none
 | 20 | `TOOL-dQuietDisk-26` | `check-wiring.sh` lists the tree once per invocation, every check reading that one listing |
 | 21 | `TOOL-dQuietDisk-28` | the history store resolves its policy switch once per process, not once per verb |
 | 22 | `TOOL-dQuietDisk-36` | the closing review's round-1 fold: the bash template cache runs git with the inherited git environment scrubbed, and the turnstile suite grades both the spared live other repository and the swept orphan |
+| 23 | `TOOL-dQuietDisk-37` | the closing review's MEDIUM and LOW findings, batched: the missing arms for the attestations, the owned scratch root, the history store's hits, the one-diff rule, the template race and BlobBatch's fallbacks, the template key's builder arguments, the CR guard on batch names, and the run-selftests comment |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** DEFERRED · 22 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16
 ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30 TOOL-dQuietDisk-31
-ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36
+ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37 TOOL-dQuietDisk-38 TOOL-dQuietDisk-39
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -110,7 +111,7 @@ ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 
 | [TOOL-dQuietDisk-36 — the bash template cache runs git without the inherited git environment, and the turnstile suite grades the spared live repository and the swept orphan](spec/2026-11-22-spec-TOOL-dQuietDisk-36.md) | 8 | 2 | CLOSED | rev-1 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 131 bound to this build, across 4 record folder(s).
+Records: 133 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
