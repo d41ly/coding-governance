@@ -13,6 +13,7 @@
 | [2026-11-22-build-TOOL-dQuietDisk-37-red-fix-9.md](../build/2026-11-22-build-TOOL-dQuietDisk-37-red-fix-9.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dQuietDisk-37-widen-22.md](../build/2026-11-22-build-TOOL-dQuietDisk-37-widen-22.md) | widen | — |
 | [2026-11-22-build-TOOL-dQuietDisk-37-widen-23.md](../build/2026-11-22-build-TOOL-dQuietDisk-37-widen-23.md) | widen | — |
+| [2026-11-22-build-TOOL-dQuietDisk-37-widen-28.md](../build/2026-11-22-build-TOOL-dQuietDisk-37-widen-28.md) | widen | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-37-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-37-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-37-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-37-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-37-spec-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-37-spec-task.md) | research | — |

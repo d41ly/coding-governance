@@ -195,9 +195,8 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
-- The bar owns its scratch (TOOL-dDerivedDocket-25): every leg's `TMPDIR`, `TEMP` and `TMP` is the
-  runner's own `gate-work.*/tmp`, gone on exit; a SIGKILLed bar's is swept by the next once its pid
-  is dead, as is one whose owner names a repository gone since (TOOL-dQuietDisk-9).
+- The bar owns its scratch (TOOL-dDerivedDocket-25): every leg's temp dirs are the runner's own
+  `gate-work.*/tmp`, gone on exit; a dead bar's is swept by the next, even if its repo is gone.
   `TMPDIR entries <n>` prints the ambient count, which now grows only from older bars or another
   repository's. The measured cost is in the run-gates kit README.
 - A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
