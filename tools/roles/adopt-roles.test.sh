@@ -1816,7 +1816,8 @@ build_fixture
 _mt=memory-tree; [[ $FXK == */* ]] && _mt=${FXK%/*}/memory-tree
 A33P="$FX/$MR/builds/tFix/prompts"; A33B="$FX/$MR/builds/tFix/build"; A33R="$TMP_ROOT/a33.out"
 A33H="$FX/$MR/project/work-order-legacy.txt"
-mkdir -p "$FX/$_mt" "$A33P" "$A33B" && cp "$HERE/../memory-tree/legacy_ledger.py" "$FX/$_mt"/
+_mtsrc="$HERE/../memory-tree"
+mkdir -p "$FX/$_mt" "$A33P" "$A33B" && cp "$_mtsrc/legacy_ledger.py" "$FX/$_mt"/
 (cd "$FX" && unset GIT_DIR GIT_WORK_TREE && git add -A && git -c user.name=fx -c user.email=fx@fx commit -qm fx) >/dev/null 2>&1
 run_adopter --scaffold > "$A33R"
 A33W=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build tFix --unit TOOL-tFix-1 \
