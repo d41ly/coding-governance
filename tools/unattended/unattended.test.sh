@@ -20510,7 +20510,7 @@ if in_shard 8; then
 
 # ==================================================================================================
 # KICK-dKeptSession-28 — WHO A MAILBOX MESSAGE IS FOR. One subshell sources the tracked driver, so
-# `check_fleet_tag` reads the tracked `tools/playbook/fleet.toml`, and prints one line per criterion:
+# `check_fleet_tag` reads the playbook kit's tracked `fleet.toml`, and prints one line per criterion:
 # `check_mail_recipient` returns 0 on build:fx, unit:KICK-fx-3, node:a and project (AC1); 2 with one
 # `mail — refused · recipient` line on stderr on build:, unit:fx, unit:KICK-fx-x, the leading-digit
 # slug of unit:KICK-3x-3, everyone, Project and the empty text (AC1); 2 on node:z with one line naming
