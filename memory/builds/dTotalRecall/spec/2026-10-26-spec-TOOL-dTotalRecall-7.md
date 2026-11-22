@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-7 — the ask kind's acceptance at filing, under `asks.acceptance`
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 803a3b80 · streams tooling · order 13 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base ed5a7d52 · streams tooling · order 13 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0218@939beda1 whole
 
@@ -17,13 +17,18 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-7-deviation-71.md](../build/2026-10-26-build-TOOL-dTotalRecall-7-deviation-71.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-7-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-7-1-builder-return.md) | journal | — |
+| [2026-11-22-build-TOOL-dTotalRecall-7-divergence-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-7-divergence-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-7-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-7-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-7-1-spec-reviewer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-7-1-spec-reviewer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-7-build-brief-2.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-build-brief-2.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-7-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-7-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-7-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-7-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -42,8 +47,10 @@ record-kind registry.
 ## 2. Scope (IN)
 
 Preconditions this unit calls and does not build: the record door `tools/memory-tree/gov_record.py`,
-its `KIND_HANDLERS` table and its mint (TOOL-dTotalRecall-2 S1, §4 "The command" and "Minting",
-unbuilt at HEAD), the ask-family counter it mints under (TOOL-dTotalRecall-3 S1, unbuilt), the landed
+its `KIND_HANDLERS` table and the counter mint inside `build_records.py#write_new_record`
+(TOOL-dTotalRecall-2, built at `d91388c2f`), the ask-family counter `gov-claim.sh ask <FAMILY> <slug>
+--claimant <key>` it mints under, replaying by claimant key (TOOL-dTotalRecall-3, built at
+`f8b950c13`), the landed
 registry `tools/memory-tree/record-kinds.toml` and its check `record_kinds.py#check_record_kinds`
 (TOOL-dTotalRecall-1, CLOSED), the landed catalogue row `asks.acceptance` in
 `tools/policy/catalogue.toml`, which carries no `summary` or `usage` (TOOL-dGroundRules-1 S3, S6), and
@@ -57,13 +64,17 @@ resolves and `ValueError` carrying the reader's last line where the read refuses
   `backlog.py#derive_verdicts`) and READY's R5 (inside `backlog.py#derive_ready`) call it in place of
   the two copies of that expression they spell today. Their verdicts are unchanged. Observed by AC1,
   AC2 and AC3.
-- **S2** — The ask kind's door verb. `gov_record.py new ask --build <slug> --text <text> --sev <LEVEL>
-  <why> [--clause <label> <value>]… [--unit] [--pointer <path>]` is the `ask` entry of
-  TOOL-dTotalRecall-2's `KIND_HANDLERS`. It renders the ask row with `backlog.py#render_ask_row` and
-  its `SEV` row with `backlog.py#render_sev_row`, the id minted by the door (I2, under I4's claim or
-  counter), and before any write grades the row's own clauses with `check_ask_acceptable`. A
-  `--clause` label outside `CLAUSE_LABELS` and a `--sev` level outside `SEVERITIES` are refused by
-  name (§8 F5). Observed by AC4, AC5 and AC6.
+- **S2** — The ask kind's door verb. `gov_record.py new ask --build <slug> --family <FAMILY> --text
+  <text> --sev <LEVEL> <why> [--clause <label> <value>]… [--unit] [--pointer <path>]` is the `ask`
+  entry of TOOL-dTotalRecall-2's `KIND_HANDLERS`. It grades the ask's own clauses with
+  `check_ask_acceptable` before any mint or write (§8 F7), files nothing where the build's
+  `BACKLOG.md` already holds an ask of the same content key (§8 F8), then mints the id in the
+  `--family` the caller names (§8 F6) through `write_seq_mint`, the counter mint extracted out of
+  `build_records.py#write_new_record` for its second caller, and renders the ask row with
+  `backlog.py#render_ask_row` and its `SEV` row with `backlog.py#render_sev_row`. A `--family` the
+  conf's `FAMILIES` does not declare, a `--clause` label outside `CLAUSE_LABELS` and a `--sev` level
+  outside `SEVERITIES` are refused by name (§8 F5). Observed by AC4, AC5, AC6, AC10, AC11, AC12 and
+  AC13.
 - **S3** — `asks.acceptance`, read once per filing with `read_policy_value("asks.acceptance", root)`.
   `refuse`: an ask failing S1 is not written; the door exits 2 naming the key, the ask's text and the
   two forms it may state, `accept <what done looks like>` and `seen <locator> run <command>`, and the
@@ -100,9 +111,10 @@ resolves and `ValueError` carrying the reader's last line where the read refuses
   `SEV` row, `#read_ask_back` reads each row back, and V14 grades them.
 - Changing V14's forward-only rule or `ASK_CUTOFF` (`.memory-tree.conf#ASK_CUTOFF`): the cutoff still
   decides which hand-written rows V14 grades.
-- Id minting, the claim and counter refs, and the door's generic validation and idempotence:
-  TOOL-dTotalRecall-2 and TOOL-dTotalRecall-3. The value refusal at the door and the grade of the
-  parsed row: TOOL-dTotalRecall-41.
+- The claim and counter refs, and the `fields` door's validation and idempotence: TOOL-dTotalRecall-2
+  and TOOL-dTotalRecall-3. This unit moves their counter mint into `write_seq_mint` unchanged, and
+  owns `new ask`'s own replay rule (§4 "The door verb"), since `write_new_record` writes no `rows`
+  kind. The value refusal at the door and the grade of the parsed row: TOOL-dTotalRecall-41.
 - The `backlog-row` kind (the ask register's row store): TOOL-dTotalRecall-1's row.
 
 ### Edges
@@ -133,25 +145,53 @@ the shape `derive_clauses` returns for an ask no `SCOPE` row names yet.
 
 ### The door verb
 
-`new ask` is the ask kind's handler, `write_new_ask`, keyed `ask` in TOOL-dTotalRecall-2's
-`KIND_HANDLERS` inside `gov_record.py`. Its order: parse the arguments (refuse an unknown label or
-level), read `asks.acceptance`, mint the id, render the ask row and its `SEV` row, grade the ask row
-with S1, then write or refuse. The ask row goes under `## Asks` and the `SEV` row under
-`## Dispositions` of `memory/builds/<slug>/BACKLOG.md`, the file made with its H1 and both headings
-where absent, as `tools/unattended/unattended.sh#write_backlog_rows` makes it; the file is staged
-with `git add` (TOOL-dTotalRecall-2 S8). The id is minted before the grade only because the rendered
-row carries it; a refused filing commits no mint, as the door's idempotence rule (I2) treats any
-refused write. After the write the door parses the file back with `backlog.parse_file`, under the
-grammar `backlog.build_grammar` compiles from the conf's `FAMILIES` as
-`record_kinds.py#read_open_asks` compiles it, and confirms one ask with that id and one `SEV` row
-naming it; a failed read-back puts the file back as it was and exits 2, as
-`unattended.sh#write_ask_rows` does through `#read_ask_back`.
+`new ask` is the ask kind's handler, `write_new_ask(root, argv)`, keyed `ask` in TOOL-dTotalRecall-2's
+`KIND_HANDLERS` inside `gov_record.py`, after `main` has read the kind's registry row through
+`build_records.py#read_kind_row`. Its order, every refusal a `ValueError` `main` prints as
+`refused ask: <why>`, exit 2:
+
+1. Parse the arguments; refuse an unknown label or level, and a `--family` outside the families the
+   conf's `FAMILIES` pairs declare, read as `record_kinds.py#read_open_asks` reads them, naming it and
+   those families; `--family` is required (§8 F6). The same families compile the read-back grammar of step 7.
+2. Read `asks.acceptance` (S3).
+3. Grade the `--clause` mapping with S1; under `refuse` a false grade is the refusal, before any
+   listing, mint or write (§8 F7).
+4. Derive the content key, `derive_ask_key(text, unit, pointer, clauses)`:
+   `build_records.py#derive_content_key("ask", …)` over `text`, the `unit` marker (`unit` or empty),
+   `pointer` and each clause pair in written order; the id, the filed date and the `SEV` row are not
+   keyed.
+5. The listing: parse the build's `BACKLOG.md`, where it exists, with `backlog.parse_file`; an ask
+   whose `derive_ask_key` over its parsed `text`, `unit`, `pointer` and `clauses` equals the key is
+   the same filing, printed `exists <path> <id> key <key>`, exit 0, nothing minted or written,
+   whatever its status (§8 F8).
+6. The mint, `write_seq_mint(root, family, build, key)`, the counter half of `write_new_record`
+   moved out whole, which it then calls: `gov-claim.sh ask <FAMILY> <slug> --claimant <key>` through
+   `gen_build_index.py#run_claim_cli`, and on its `local … · no remote` answer `derive_ask_seq` through
+   `tools/loop/breakpoints.py#run_sourced`. Its exit 4 `waiting offline <ref>` is printed and the
+   door exits 4; any other refusal is exit 2. As in `write_new_record`, the counter ref is the
+   authority and no lease or claim is read.
+7. Render both rows under the minted id and write them: the ask row under `## Asks` and the `SEV` row
+   under `## Dispositions` of `memory/builds/<slug>/BACKLOG.md`, the file made with its H1 and both
+   headings where absent, as `tools/unattended/unattended.sh#write_backlog_rows` makes it, and staged
+   with `git add` (TOOL-dTotalRecall-2 S8). The door parses the file back with `backlog.parse_file`
+   and confirms one ask with that id and one `SEV` row naming it; a failed read-back puts the file
+   back as it was and exits 2, as `unattended.sh#write_ask_rows` does through `#read_ask_back`.
+8. Print `wrote <path> <id> key <key>`, and under `grade` with a false grade `graded: not ready (R5)`.
+
+A refusal at steps 1 to 3 reaches no counter, so it spends no number on the remote. A read-back
+failure at step 7 has spent one; a replay of the same filing passes the same key as claimant, and the
+counter's claimant-key replay hands it the same id back. Without a remote, no counter exists and
+`derive_ask_seq` reads the trees, so nothing is spent. What the replay rule does not check: an ask
+of the same key filed on another branch, which the counter hands the same id, and whose two rows meet
+at that branch's merge; and an ask of the same text whose clauses differ, which is another key and so
+another filing.
 
 | `asks.acceptance` | S1 true | S1 false |
 |---|---|---|
-| `refuse` (default) | rows written, exit 0 | exit 2, nothing written, the two forms named |
+| `refuse` (default) | rows written, exit 0 | exit 2, nothing minted or written, the two forms named |
 | `grade` | rows written, exit 0 | rows written, `graded: not ready (R5)`, exit 0 |
-| read refused | exit 2 naming the key, nothing written | the same |
+| read refused | exit 2 naming the key, nothing minted or written | the same |
+| an ask of the same key already filed | `exists`, exit 0, nothing minted or written | the same, under `grade`; `refuse` refuses at step 3 |
 
 ### The policy read
 
@@ -193,15 +233,19 @@ TOOL-dTotalRecall-43 S3 names for `ask`, since an ask's status is folded from ro
 grades: the row grammar is `backlog.py`'s `ask` production, parsed by `extract_row`, and V14 grades it
 through `check_ask_acceptable`, reported by `gen_build_index.py --check` as hygiene check 9 inside the
 `memory hygiene` leg the `check` cell names; `check_record_kinds` counts the row as `ask rows`, grading
-no record of it by field. The id is minted by the door under the build's claim, or an ask family's
-counter ref for a filer outside a build (I4).
+no record of it by field. The id is minted by the door in the caller's `--family`, through the ask
+family's counter ref or, with no remote, the driver's floor (§4 "The door verb", step 6).
 
 ### Inventory
 
-Minted: `check_ask_acceptable`; the handler `write_new_ask` and its `ask` entry in `KIND_HANDLERS`;
-the registry row `ask`; the fixture plant `ask-door` of `build_records.py --fixture`. Naming cells:
-`check_ask_acceptable` and `write_new_ask` are asked of the lexicon's `--suggest` under
-`--as py.function` at the pass.
+Minted: `check_ask_acceptable`; the handler `write_new_ask`, its `--family` flag and its `ask` entry
+in `KIND_HANDLERS`; `derive_ask_key` beside it in `gov_record.py`; `write_seq_mint(root, family,
+build, key)` in `build_records.py`, returning `(word, said, lines)`, `word` `minted` or `waiting`,
+`said` the id or the waiting line, `lines` the `local` line where the floor minted, a `ValueError` for
+every refusal; the registry row `ask`; the fixture plant `ask-door` of `build_records.py --fixture`.
+Naming cells: `check_ask_acceptable`, `write_new_ask`, `derive_ask_key` and `write_seq_mint` each
+answer `OK` to the lexicon's `--suggest` under `--as py.function` at rev-6, and are asked again at the
+pass.
 
 ### Migration
 
@@ -214,7 +258,8 @@ None. Every landed ask keeps its bytes. V14 and R5 keep their verdicts, so no tr
 - `tools/memory-tree/record-kinds.toml`
 - `tools/memory-tree/HYGIENE.template.md` (the `gen:record-kinds` region, by `record_kinds.py --write`)
 - `memory/HYGIENE.md` (the same region, by `adopt-memory-tree.sh --render`)
-- `tools/memory-tree/build_records.py` (the `ask-door` fixture plant)
+- `tools/memory-tree/build_records.py` (`write_seq_mint` out of `write_new_record`; the `ask-door`
+  fixture plant)
 - `tools/memory-tree/check-memory-hygiene.test.sh` (the plant's run, the second arm of §7)
 - `tools/memory-tree/gen_build_index.py` (the V14 selftest arm of §7)
 - `tools/memory-tree/README.md`
@@ -237,14 +282,17 @@ None. Every landed ask keeps its bytes. V14 and R5 keep their verdicts, so no tr
 ## 5. Production-readiness checklist
 
 - security — a new write path into `BACKLOG.md`, reached only through the door, which validates once at
-  the write boundary; deny by default: a refused policy read files nothing.
-- perf / scale — one policy read and one file parse per filing.
+  the write boundary; deny by default: a refused policy read files nothing, and a `--family` no conf
+  pair declares reaches no counter and no floor.
+- perf / scale — one policy read, one counter mint or floor, and two parses of the build's
+  `BACKLOG.md` (the listing and the read-back) per filing; a replay costs the policy read and one parse.
 - error / empty / loading states — the refusal names the key, the ask text and both forms; an unknown
-  `--clause` label or `--sev` level is refused by name.
-- observability — the door prints the filed id, or the refusal, or the `graded` line.
+  `--clause` label, `--sev` level or `--family` is refused by name; a replay prints `exists`.
+- observability — the door prints the filed or found id with its key, or the refusal, or the `graded`
+  line.
 - risks — under `refuse`, a filer used to filing first and curing later is refused; `grade` restores
   today's behaviour for that repository.
-- testing — AC1 to AC9 by a pass; the arms of §7 at the close.
+- testing — AC1 to AC13 by a pass; the arms of §7 at the close.
 - migration — none, as §4 says.
 - user docs — the catalogue row's `summary` and `usage` render the key's section of
   `help/reference/policy.md` (S5); `tools/memory-tree/README.md` names the verb (S6); the door's own
@@ -262,24 +310,35 @@ None. Every landed ask keeps its bytes. V14 and R5 keep their verdicts, so no tr
   and prints `sorted({v.code for v in b.derive_verdicts(corpus, b._CLEAN_CONF)})`, the list holds
   `14`; with `clauses=(('accept', 'y'),)` on the row it does not.
   Red when: V14 stops calling the predicate, or calls it with the row's text instead of its clauses.
-- **AC4** — When `python gov_record.py new ask --build <slug> --text "x" --sev LOW "a fixture ask"` runs
-  in a scratch clone under `%TEMP%` whose committed policy leaves `asks.acceptance` unset, it exits 2,
-  its output names `asks.acceptance`, `accept` and `seen … run`, and `git status --porcelain` is empty.
-  Red when: the door writes the row before grading it, so the clone's `BACKLOG.md` shows modified.
-  fixture: a scratch clone carrying the door, the registry, the policy kit and one build folder; none
-  exists at HEAD, so the build run makes it.
-- **AC5** — When the same command runs with `--clause accept "the leg is green"`, it exits 0;
-  `backlog.parse_file` over the written `BACKLOG.md` reads one ask with the minted id, whose clauses
-  `check_ask_acceptable` accepts, and one `SEV` row naming it at `LOW`; and a `derive_verdicts` probe
-  over the clone's backlog names that id under neither `12` nor `14`.
+- **AC4** — When `python <pass tip>/tools/memory-tree/gov_record.py new ask --build tDoor --family EXMP
+  --text "x" --sev LOW "a fixture ask"` runs with the seed as its working directory, it exits 2, its
+  output names `asks.acceptance`, `accept` and `seen … run`, and `git status --porcelain` is empty.
+  Red when: the door writes the row before grading it, so the seed's `BACKLOG.md` shows added.
+  fixture: the `ask-door` plant, a seed git repository under the host temp directory: a
+  `.memory-tree.conf` reading `MEMORY_ROOT=memory` and `FAMILIES="example:EXMP"`, a copy of the pass
+  tip's `tools/memory-tree/record-kinds.toml` at that path, a build folder `tDoor` under `memory/builds/`
+  whose `README.md` reads `# tDoor`, with no `BACKLOG.md`, no `.governance/policy.toml`, one commit on `main`, no remote. The
+  door, the policy kit and the unattended and loop kits run from the pass tip; none exists at HEAD,
+  so the build run makes it.
+- **AC5** — When the AC4 command runs with `--clause accept "the leg is green"`, it exits 0 and prints
+  `wrote <path> EXMP-tDoor-1 key <12 hex digits>`, `<path>` the build folder's `BACKLOG.md` relative
+  to the seed; `backlog.parse_file` over that file under `backlog.build_grammar(("EXMP",))` reads one ask `EXMP-tDoor-1`, whose clause pairs,
+  mapped by label, `check_ask_acceptable` accepts, and one `SEV` row naming it at `LOW`; and
+  `derive_verdicts` over a corpus of that parse under `_CLEAN_CONF` names the id under neither `12`
+  nor `14`.
   Red when: the read-back is skipped, so a row the parser cannot read is left written, or the `SEV`
   row is not written, so V12 names the id.
-- **AC6** — When the clone's committed policy sets `asks.acceptance = "grade"` and the AC4 command
-  runs, it exits 0, prints `graded: not ready (R5)`, and a `derive_verdicts` probe over the clone's
-  backlog names the new id under `14`.
+- **AC6** — When the seed's `main` gains a commit whose `.governance/policy.toml` reads
+  `asks.acceptance = "grade"` and the AC4 command runs, it exits 0, prints `graded: not ready (R5)`
+  and a `wrote` line, and `derive_verdicts` over the seed's backlog under `_CLEAN_CONF` names the id
+  that line prints under `14`.
   Red when: `grade` is read as `refuse`, or the door writes the row and prints nothing.
-- **AC7** — When the AC4 command runs in a clone with the policy kit removed, it exits 2 naming
-  `asks.acceptance` and the reader's line, and `git status --porcelain` is empty.
+- **AC7** — When the AC4 command runs in a seed whose one commit's `.governance/policy.toml` reads
+  `asks.acceptance = "bogus"`, it exits 2 naming `asks.acceptance` and the reader's `policy: refused`
+  line, and `git status --porcelain` is empty. At rev-6, `policy.py get asks.acceptance` in such a
+  seed exits 2 printing `policy: refused · .governance/policy.toml:1 · asks.acceptance: "bogus" is
+  not one of ["refuse", "grade"]; no valid revision of the file precedes <sha8>`. It does not observe
+  the `LookupError` branch, a policy kit absent beside the door, since the seed runs the pass tip's kits.
   Red when: a refused read falls back to filing, so the row is written on a guessed value.
 - **AC8** — When `python record_kinds.py --check` runs from `tools/memory-tree/` at the pass tip, its
   first line names `ask rows` and no line opens `record-kinds: RED row ask`; in a scratch clone whose
@@ -292,13 +351,32 @@ None. Every landed ask keeps its bytes. V14 and R5 keep their verdicts, so no tr
   `grep -c "policy:asks.acceptance" memory/project/docs-undocumented.txt` prints `0`.
   Red when: the `summary` lands and the name stays on the shrink-only list, or the reverse, or the
   key's page section is not rendered.
+- **AC10** — When the AC4 command runs with `--clause accept y` and `--family NOPE` in place of
+  `--family EXMP`, it exits 2 naming `--family`, `NOPE` and `EXMP`, and `git status --porcelain` is
+  empty; with no `--family` it exits 2 naming `--family`.
+  Red when: an undeclared family reaches the mint, so the output names `NOPE-tDoor-1` or a failed
+  read-back instead of the declared families.
+- **AC11** — When the AC4 command runs in the AC4 seed with a bare repository under the same temp
+  directory added as its one remote `origin` and `main` pushed to it, it exits 2 and
+  `git ls-remote origin "refs/gov/claims/asks/*"` prints nothing; when AC5's command then runs there,
+  it exits 0 naming `EXMP-tDoor-1`, and the same `ls-remote` prints one line ending
+  `refs/gov/claims/asks/EXMP-tDoor`.
+  Red when: the mint runs before the grade, so the refused filing leaves the counter ref on `origin`.
+- **AC12** — When AC5's command runs a second time in AC5's seed, it exits 0 and prints
+  `exists <path> EXMP-tDoor-1 key <the key AC5 printed>`, `<path>` the one AC5 printed, the file's bytes
+  equal those AC5 left, and `backlog.parse_file` over it reads one ask.
+  Red when: the listing is skipped, so `derive_ask_seq` mints `EXMP-tDoor-2` and a second ask lands.
+- **AC13** — When `grep -c "run_claim_cli(" build_records.py` runs in `tools/memory-tree/`, it prints
+  `1`; `grep -c "def write_seq_mint" build_records.py` prints `1`; `grep -c "write_seq_mint(" gov_record.py`
+  prints `1`; and `grep -c "run_claim_cli(\|run_sourced(" gov_record.py` prints `0`.
+  Red when: the ask handler carries its own copy of the counter mint, so the last count reads `1` or more.
 
 ## 7. Gates
 
 `build-index selftest` · `memory hygiene` · `memory-hygiene self-test` · `backlog migration selftest` · `row-keyed merge driver replay` · `corpus-ids selftest` · `tier2-review self-test` · `routed-commits selftest` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `scratch-guard self-test` · `memory-recall kit selftest` · `policy fixtures` · `policy check` · `record-kinds` · `kit/dogfood doc parity` · `docs`
 
 New arm: tools/memory-tree/gen_build_index.py · covers AC3 · the V14 arms of the build-index selftest kept green through `check_ask_acceptable`, staged by the predicate's `run` test cut so a bare `seen` passes · none
-New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC4 AC5 AC6 AC7 · a `build_records.py --fixture --plant ask-door` case beside the `typed-kinds` one: the `new ask` refuse, file, grade and refused-read cases in a scratch clone, staged by the predicate call moved after the write · none
+New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC4 AC5 AC6 AC7 AC10 AC11 AC12 · a `build_records.py --fixture --plant ask-door` case beside the `typed-kinds` one: the `new ask` refuse, file, grade, refused-read, undeclared-family, refused-filing-on-a-remote and replay cases in the plant's seed, staged in turn by the predicate call moved after the write, the family check cut, the mint moved before the grade and the listing cut · none
 
 ## 8. Open questions
 
@@ -338,6 +416,45 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC4 AC5 AC6 AC
   value S3 refuses for the policy read. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the
   only survivor of veto 1, on the write surface the unit already priced (`BACKLOG.md` through the
   door). widens: the door's `--sev` argument · relaxes: none
+- **F6 — Which `<FAMILY>` is an ask id minted in?** Both mint routes take one (`gov-claim.sh ask
+  <FAMILY> <slug>`, `derive_ask_seq <FAMILY> <slug>`), and `write_new_record`'s rule, the serving
+  unit's prefix (`build_records.py#write_new_record`), has no input here: the ask's `--unit` is the
+  row's boolean marker. Options: (a) the first family of the build's derived roster, the shell
+  filers' `unattended.sh#read_roster_family`, here `gen_build_index.py#read_derived_front_matter`
+  imported: one whole-tree `collect` per filing, refused on any unparseable README anywhere, at
+  9 s on this tree at ed5a7d52 as this unit's builder return measured it, and a fixture needing a full
+  README, a parseable spec and a stale-header waiver (that return's probe); (b) a cheaper rule, the conf's first `FAMILIES` pair, the roster chain's
+  last fallback (`gen_build_index.py#derive_front_matter`), which in this tree's four-family conf
+  files every tooling build's asks under `PLAY`; (c) a required `--family <FAMILY>`, refused before
+  any mint unless a conf pair declares it, as `gov-claim.sh`'s argument check refuses it on the
+  remote route. (b) is right only in a tree of one family. (a) meets every criterion but adds a
+  tree-wide refusal and that whole-tree read to each filing; (c) meets every criterion for one conf read and
+  leaves the family to the filer, as unit 2's door leaves it to `--unit`.
+  RESOLVED (agent, 2026-11-22, delegated): (c), M3's most feature-rich survivor, fewest follow-ups
+  left open, per `2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-brief` item 1a.
+  widens: the door's `--family` argument · relaxes: none
+- **F7 — Does the grade run before the mint?** With a remote the mint pushes a counter commit to
+  `refs/gov/claims/asks/<FAMILY>-<slug>` (TOOL-dTotalRecall-3), and no writer ever deletes a claim
+  ref. Options: (a) grade first: arguments, policy read, S1, listing, mint, render, write, so a
+  refused filing reaches no counter; (b) mint first, as rev-5 ordered it, and drop rev-5's claim that a
+  refused filing commits no mint, each refusal under `refuse` spending a number on the remote. The
+  grade needs no id, since it reads the `--clause` mapping (§4 "The predicate"), so (a) costs nothing
+  and is `write_new_record`'s own order, its `check_text` before `run_claim_cli`.
+  RESOLVED (agent, 2026-11-22, delegated): (a), M3's most feature-rich survivor, tie-broken by reuse
+  of that order, per `2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-brief` item 1b.
+  widens: none · relaxes: none
+- **F8 — What does a replayed `new ask` do?** `write_new_record` refuses every schema form but
+  `fields` and writes one file per record, so its listing never reaches an ask, two rows in a shared
+  `BACKLOG.md`. Options: (a) the door's own listing before the mint, an ask of the same content key in
+  the build's `BACKLOG.md` printed `exists`, nothing minted or written, the key also the counter's
+  claimant so a rolled-back filing gets its id back; (b) the counter's claimant-key replay alone, under
+  which a remote hands the first id back and a second row of that id fails the read-back, exit 2, and
+  no remote mints a fresh id and files a duplicate; (c) widen `write_new_record` to the `rows` form,
+  rewriting TOOL-dTotalRecall-2's CLOSED one-file write for a two-row append. (b) files duplicates
+  without a remote; (c) reopens a closed unit's write for one kind.
+  RESOLVED (agent, 2026-11-22, delegated): (a), M3's most feature-rich survivor, the one option whose
+  replay is a no-op on both routes, per `2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-brief`
+  item 1c. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -362,6 +479,16 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC4 AC5 AC6 AC
   requires (F5); S5 renders the key's help section and drains its docs-undocumented row; the door's
   arm moves to `check-memory-hygiene.test.sh`; the leg line gains `policy check`, `record-kinds`,
   `kit/dogfood doc parity` and `docs`.
+- rev-6 · 2026-11-22 · header base · §2 S2 · §3 · §4 "The door verb", "The ask row", Inventory, Files
+  touched · §5 · §6 AC4, AC5, AC6, AC7, AC10, AC11, AC12, AC13 · §7 · §8 F6, F7, F8 added · §10 · per
+  `2026-11-22-prompt-TOOL-dTotalRecall-7-divergence-brief` over the builder return
+  `2026-11-22-build-TOOL-dTotalRecall-7-1-builder-return`, re-grounded at `ed5a7d52` on units 2 and 3
+  as built: the ask id's family is a required `--family` (F6); the grade runs before the mint (F7);
+  a replay of one content key is `exists` (F8), so §3 no longer hands `new ask`'s idempotence to
+  units 2 and 3; the counter mint moves out of `write_new_record` as `write_seq_mint`, its second
+  caller's factory. Forced: the fixture is a seed running the pass tip's kits, as unit 2's plants
+  are, so AC7's refused read is an invalid committed policy file, not a removed kit; AC5 and AC6 name
+  their verdict conf. Every other rev-5 decision stands.
 
 ## 10. Reuse audit
 
@@ -371,7 +498,13 @@ READY's R5 inside `backlog.py#derive_ready` spells a second time; lifting it int
 `backlog.py#render_ask_row` and `#render_sev_row`, the read-back pattern is
 `tools/unattended/unattended.sh#write_ask_rows` with `#read_ask_back`, the policy read is
 `tools/memory-tree/tree_lib.py#read_policy_value`, and the registry row joins
-`tools/memory-tree/record-kinds.toml` beside its `backlog-row` row of the same form. At `462d20f3` the
+`tools/memory-tree/record-kinds.toml` beside its `backlog-row` row of the same form. The mint is
+`build_records.py#write_new_record`'s counter half, extracted as `write_seq_mint` at its second
+caller rather than copied, and the replay key is `build_records.py#derive_content_key`, the formula
+the `fields` door keys by. Disagreement with source: TOOL-dTotalRecall-2 §4 (CLOSED) says a later
+`ask` handler "ends in `write_new_record`'s mint, idempotence and refusal path"; the built function
+refuses every form but `fields`, so the ask handler shares its mint and key and owns its listing
+(§8 F8). At `462d20f3` the
 lookup, `python tools/codebase-map/reuse_lookup.py "refuse an ask filed without an acceptance clause"`,
 ranked `render_ask_row`, `derive_clauses`, `read_clause_values` and `derive_ask_locators` in
 `backlog.py`, and the shell filers `write_ask_rows`, `write_held_asks` and `write_inherited_asks`; at
