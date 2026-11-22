@@ -465,7 +465,7 @@ class SlugPattern:
 # ---------------------------------------------------------------------------- the id grammar
 
 
-def _eras(node: str, slug_class: str | None = None) -> tuple[str, ...]:
+def _eras(node: str, slug_class: str) -> tuple[str, ...]:
     """The three id eras, from ONE construction. A second copy is the catalogue-drift class.
 
     flat `ARCH-001` · node-scoped `ABL-d119` · session `ABL-bSiftedArchive-3`, and its `-3b`
@@ -474,10 +474,9 @@ def _eras(node: str, slug_class: str | None = None) -> tuple[str, ...]:
     `[a-z]*` tail is the narrowest widening that admits the ratified correction id.
 
     The session era's slug is `slug_class`, the slug grammar's (TOOL-dTotalRecall-5 S4), so an id
-    whose slug carries an `in-slug` date parses; None is the legacy shape alone.
+    whose slug carries an `in-slug` date parses; the legacy shape is the first arm of that class.
     """
-    session = (r"(?:" + slug_class + r")" if slug_class is not None
-               else rf"[{node}][A-Za-z]{{2,}}")
+    session = r"(?:" + slug_class + r")"
     return (
         r"\d{3}",  # flat            ARCH-001
         rf"[{node}]\d{{2,3}}",  # node-scoped     ABL-d119

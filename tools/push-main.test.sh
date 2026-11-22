@@ -1837,7 +1837,8 @@ write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fxFix, FX/b; rc 1 
   git init -q --template= "$FX/kit" && cp -R "$HERE/$_fn_k" "$FX/kit/$_fn_k" && cp -R "$HERE/$_fn_pb" "$FX/kit/$_fn_pb" \
     && printf '[[node]]\ntag = "%s"\nuser = "%s"\nhost = ""\nprojects_root = "%s"\nvariances = ""\n\n' a daily-agent "$FX" b agent5 "$FX" \
       > "$FX/kit/$_fn_pb/fleet.toml" || return 1
-  for _fn_s in policy loop; do # the driver's optional siblings its lease verbs resolve, where this install has them
+  # memory-tree since TOOL-dTotalRecall-5: the driver reads every slug through that kit's slug grammar.
+  for _fn_s in policy loop memory-tree; do # the driver's siblings its lease verbs resolve, where this install has them
     [ ! -d "$HERE/$_fn_s" ] || cp -R "$HERE/$_fn_s" "$FX/kit/$_fn_s" || return 1
   done
   fx_line="the fixture's remote and clones could not be made under $FX"

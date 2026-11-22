@@ -114,6 +114,11 @@ check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL 
 # home `loop`, where the library's resolver probes. The source is the loop kit beside this one.
 LOOP_SRC="$HERE/../loop"
 [ -f "$LOOP_SRC/loop_lib.py" ] && [ -f "$LOOP_SRC/loop.toml" ] || { echo "adopt-roles.test: no loop kit beside this one at $LOOP_SRC, so no fixture can place its workflows"; exit 2; }
+# THE MEMORY-TREE KIT's slug grammar (TOOL-dTotalRecall-5 S7): the library reads every build slug and
+# unit id through that kit's `id_grammar.py`, which reads the policy through its `tree_lib.py` and
+# `backlog.py`, so every fixture holds those three beside its roles kit too, at the home `memory-tree`.
+MT_SRC="$HERE/../memory-tree"
+[ -f "$MT_SRC/id_grammar.py" ] && [ -f "$MT_SRC/tree_lib.py" ] && [ -f "$MT_SRC/backlog.py" ] || { echo "adopt-roles.test: no memory-tree kit beside this one at $MT_SRC, so no fixture can read a slug"; exit 2; }
 FX=""; FXK="$KREL"; FXL=""
 build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at the kit path, $KREL
   # unless given, with $ADOPTER as its adopter, and the loop kit beside it at $FXL, scaffolded; rc of
@@ -121,10 +126,12 @@ build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at 
   # path the last call used.
   FXK=${1:-$KREL}; FX=${2:-$TMP_ROOT/fx$n}
   FXL=loop; [[ $FXK == */* ]] && FXL=${FXK%/*}/loop
-  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$FXL" "$FX/$_chd" || return 2
+  local fxm=memory-tree; [[ $FXK == */* ]] && fxm=${FXK%/*}/memory-tree
+  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$FXL" "$FX/$fxm" "$FX/$_chd" || return 2
   git init -q "$FX" || return 2
   cp -R "$HERE"/. "$FX/$FXK"/ && cp "$ADOPTER" "$FX/$FXK/adopt-roles.sh" || return 2
   cp "$LOOP_SRC/loop_lib.py" "$LOOP_SRC/loop.toml" "$FX/$FXL"/ || return 2
+  cp "$MT_SRC/id_grammar.py" "$MT_SRC/tree_lib.py" "$MT_SRC/backlog.py" "$FX/$fxm"/ || return 2
   printf 'MEMORY_ROOT=%s\nCHARTER=%s\n' "$MR" "$CH" > "$FX/.memory-tree.conf"
   cp "$REPO/$CH" "$FX/$CH" || return 2
   (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1)
