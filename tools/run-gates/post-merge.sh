@@ -285,7 +285,9 @@ read_remote_red() { # -> rc 0 with PM_RED_STATE present|absent and PM_RED_SHA; r
 # GOVREF_WHY. An EMPTY source returns 2 `no source` and pushes nothing, so a failed build captured as
 # `c=$(build_gov_commit …)` is never a deletion; `remove_gov_ref` is the one deletion form, its
 # expected sha non-empty, and it reaches the same push and porcelain read through `write_gov_ref`,
-# which admits an empty source only when `remove_gov_ref` is its caller.
+# which admits an empty source only when `remove_gov_ref` is its caller. NO CLAIM REF IS PRUNED
+# (TOOL-dTotalRecall-3 S5): `remove_gov_ref` returns 2 for any ref under `refs/gov/claims/`, a slug's
+# claim and an ask family's counter, naming the rule in GOVREF_WHY, before it reaches the push.
 # THE CALLER SETS THREE NAMES: GOVREF_RUNNER, a function taking `<outfile> <git args…>` that runs git
 # bounded and writes its stdout to the file; GOVREF_REMOTE, the remote NAME the push names, so the
 # pre-push hook observes `<name>/HEAD`; GOVREF_GITDIR, the git dir whose `pre-push-refusal` a hook
@@ -348,6 +350,7 @@ write_gov_ref() {    # ref · expected sha or empty · src -> 0 written, 1 lost,
 }
 remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref's deletion
   GOVREF_WHY=""
+  case "$1" in refs/gov/claims/*) GOVREF_WHY="a ref under refs/gov/claims/ is never deleted: a claim and a counter are append-only"; return 2 ;; esac
   [ -n "$2" ] || { GOVREF_WHY="no expected sha"; return 2; }
   write_gov_ref "$1" "$2" ""
 }

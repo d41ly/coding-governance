@@ -5078,6 +5078,59 @@ def check_slug_minted(root: str, slug: str):
     return grammar
 
 
+# ------------------------------------------------------------------- the scaffold's remote claim
+# TOOL-dTotalRecall-3 S7. `--new-build` claims its slug on the remote through this kit's claim CLI before
+# it writes, so two clones that have not fetched each other cannot both scaffold one slug: the local
+# `check_slug_claimed` stays the pre-check, and `refs/gov/claims/<slug>` is the guarantee. The claimant is
+# the mandate's content key, so one mandate re-run in any session resumes its own claim, read from this
+# node's cache ref with no fetch before the pre-check, whose `git log --all` probe would find the claim
+# commit naming the slug. WHAT THIS DOES NOT CHECK: a claim cached by another key, which the CLI's fetch
+# answers `taken`; and a remote-less clone, where the CLI prints `local` and the pre-check is the whole check.
+#: The claim CLI, beside this file, and the cache namespace its fetch and its writes fill.
+CLAIM_CLI = "gov-claim.sh"
+CLAIM_CACHE_NS = "refs/gov/remote/claims"
+
+
+def derive_mandate_key(ids: list) -> str:
+    """The first twelve hex digits of the SHA-256 of the sorted ids joined by newlines: the claimant key one
+    mandate carries in any session."""
+    return hashlib.sha256("\n".join(sorted(ids)).encode("utf-8")).hexdigest()[:12]
+
+
+def read_own_claim(root: str, slug: str, key: str) -> bool:
+    """True where this node's cache ref of `slug`'s claim carries `claimant-key: <key>` in its first-parent
+    history, read with no fetch; False where the ref is absent or another key's."""
+    done = subprocess.run(["git", "log", "--first-parent", "-n", "64", "--format=%B",
+                           f"{CLAIM_CACHE_NS}/{slug}", "--"], cwd=root, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace", env=_build_git_env())
+    return done.returncode == 0 and f"claimant-key: {key}" in (x.rstrip("\r") for x in done.stdout.split("\n"))
+
+
+def write_slug_claim(root: str, slug: str, key: str) -> str:
+    """Claim `refs/gov/claims/<slug>` for `key` through the claim CLI, its `--offline` the policy value
+    `leases.offline`, or none where that does not read, so the CLI's `refuse` applies. Returns the CLI's line
+    on exit 0; a Problem naming the ref and the CLI's line on any other exit."""
+    import corpus_ids  # noqa: PLC0415 — deferred: only the scaffold needs a bash
+    ref = f"refs/gov/claims/{slug}"
+    try:
+        sh = corpus_ids.resolve_bash()
+    except corpus_ids.Problem as exc:
+        raise Problem(f"--new-build {slug}: {ref} cannot be claimed, no usable bash: {exc}") from None
+    argv = [sh, os.path.join(os.path.dirname(os.path.abspath(__file__)), CLAIM_CLI).replace(os.sep, "/"),
+            "slug", slug, "--claimant", key]
+    try:
+        argv += ["--offline", read_policy_value("leases.offline", root)]
+    except (LookupError, ValueError) as exc:
+        print(f"build-index: leases.offline did not read, so the claim takes the CLI's refuse: {exc}")
+    done = subprocess.run(argv, cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                          env=_build_git_env(), stdin=subprocess.DEVNULL)
+    line = (done.stdout.strip().splitlines() or [f"no line, exit {done.returncode}"])[-1]
+    if done.returncode != 0:
+        raise Problem(f"--new-build {slug}: {ref} was not claimed, exit {done.returncode}: {line}; "
+                      f"nothing was written")
+    return line
+
+
 def cmd_new_build(root: str, conf: dict, args: dict) -> int:
     """Owner ruling D12-a: an owner's id list becomes a build README the OWNER lands.
 
@@ -5104,7 +5157,8 @@ def cmd_new_build(root: str, conf: dict, args: dict) -> int:
     # (TOOL-dTotalRecall-38 S3), so no ValueError arises.
     parse_id_parts = backlog.load_id_grammar().parse_id_parts
     ids.sort(key=lambda i: tuple(parse_id_parts(i, None, alt=alt)[k] for k in (1, 0, 2)))
-    claimed = check_slug_claimed(root, conf, slug)
+    key = derive_mandate_key(ids)
+    claimed = "" if read_own_claim(root, slug, key) else check_slug_claimed(root, conf, slug)
     if claimed:
         raise Problem(f"--new-build {slug}: {claimed}")
     reading: dict = {}
@@ -5128,6 +5182,7 @@ def cmd_new_build(root: str, conf: dict, args: dict) -> int:
         raise Problem(f"--new-build {slug}: every id in the mandate grades `no` — the table above "
                       f"names each one's failing rules — so there is nothing a run could execute "
                       f"unasked; nothing was written")
+    print(f"build-index: {write_slug_claim(root, slug, key)}")
     rel = f"{m}/builds/{slug}/README.md"
     opened = datetime.date.today().isoformat()
     write_text(os.path.join(root, rel), render_new_build_readme(slug, ids, opened, "", grammar.record))
@@ -5593,6 +5648,127 @@ def test_relations(arm) -> None:
                                                 ("xBeta", [], "OPEN")])
         arm("TOOL-dTotalRecall-6 AC8 — parents: beside depends-on: is refused, naming both",
             "carries both parents: and depends-on:", lambda t=t, conf=conf: plan(t, conf))
+
+
+def test_slug_claims(arm, files: dict) -> None:
+    """TOOL-dTotalRecall-3's arms (section 7) over a bare remote whose default branch is `files`, the
+    scaffold's home tree, and its clones: the concurrent slug claim, the parallel counter mints, the replays,
+    the floor, the scaffold's refusal and resume, the three offline values and the remote-less clone. Staged
+    red by a copy of the claim CLI whose push carries no lease, which lets both clones claim one slug."""
+    cli = os.path.join(os.path.dirname(os.path.abspath(__file__)), CLAIM_CLI).replace(os.sep, "/")
+    import corpus_ids  # noqa: PLC0415 — deferred exactly as the scaffold's own claim
+    try:
+        sh = corpus_ids.resolve_bash()
+    except corpus_ids.Problem as exc:
+        arm("TOOL-dTotalRecall-3 — the claim arms have a bash to run the claim CLI", "a usable bash", lambda: str(exc))
+        return
+    env = dict(_build_git_env(), GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@x", GIT_COMMITTER_NAME="t",
+               GIT_COMMITTER_EMAIL="t@x")
+
+    def build_claim_proc(cwd, *argv):
+        return subprocess.Popen([sh, cli, *argv], cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                                stdin=subprocess.DEVNULL, text=True, encoding="utf-8", errors="replace", env=env)
+
+    def run_claims(*calls):
+        """`[(rc, last stdout line)]` of each `(cwd, argv…)` call, all started before any is awaited."""
+        procs = [build_claim_proc(c[0], *c[1:]) for c in calls]
+        return [(p.returncode, (out.strip().splitlines() or [""])[-1])
+                for p, out in ((p, p.communicate()[0]) for p in procs)]
+
+    def read_git(cwd, *argv):
+        return subprocess.run(["git", *argv], cwd=cwd, capture_output=True, text=True, encoding="utf-8",
+                              errors="replace", env=env).stdout.strip()
+
+    with tempfile.TemporaryDirectory() as base:
+        seed, remote = os.path.join(base, "seed"), os.path.join(base, "r.git")
+        os.makedirs(seed)
+        _build_backlog_fixture(seed, files)
+        conf_path = os.path.join(seed, ".memory-tree.conf")
+        write_text(conf_path, read_text(conf_path).replace('fourth:FRTH"', 'fourth:FRTH tooling:TOOL"'))
+        run("git", "add", "-A", cwd=seed)
+        run("git", "commit", "-q", "-m", "home", "--no-verify", cwd=seed)
+        run("git", "init", "-q", "--bare", remote, cwd=base)
+        run("git", "push", "-q", remote, "HEAD:refs/heads/main", cwd=seed)
+        run("git", "symbolic-ref", "HEAD", "refs/heads/main", cwd=remote)
+
+        def build_clone(name):
+            run("git", "clone", "-q", remote, name, cwd=base)
+            return os.path.join(base, name)
+
+        a, b = build_clone("a"), build_clone("b")
+        before = check_slug_claimed(b, load_conf(b), "dSame")
+        ka, kb = "aaaaaaaaaaaa", "bbbbbbbbbbbb"
+        got = run_claims((a, "slug", "dSame", "--claimant", ka), (b, "slug", "dSame", "--claimant", kb))
+        won = ka if got[0][0] == 0 else kb
+        arm("TOOL-dTotalRecall-3 AC1 — the local pre-check alone finds nothing in either clone", "[]", lambda: f"[{before}]")
+        arm("TOOL-dTotalRecall-3 AC1 — two clones claiming one slug at once: one claimed, one taken naming the winner",
+            f"[0, 1] claimed refs/gov/claims/dSame taken refs/gov/claims/dSame by {won}",
+            lambda: f"{sorted(r for r, _ in got)} {' '.join(sorted(line.rsplit(' ', 1)[0] if r == 0 else line for r, line in got))}")
+        body = read_git(remote, "log", "-1", "--format=%B", "refs/gov/claims/dSame")
+        arm("TOOL-dTotalRecall-3 AC1 — the remote's claim carries the I23 header and the winner's key",
+            f"gov-claim claims/dSame\n\nclaimant-key: {won}", lambda: body.replace("\r", ""))
+
+        minted = []
+        for n in range(1, 6):
+            minted += [line for _, line in run_claims((a, "ask", "TOOL", "dSame", "--claimant", f"a{n:011d}"),
+                                                       (b, "ask", "TOOL", "dSame", "--claimant", f"b{n:011d}"))]
+        arm("TOOL-dTotalRecall-3 AC2 — ten mints raced two at a time print TOOL-dSame-1 to -10, no repeat",
+            " ".join(f"minted TOOL-dSame-{n}" for n in range(1, 11)),
+            lambda: " ".join(sorted(minted, key=lambda x: int(x.rsplit("-", 1)[-1]) if x[-1:].isdigit() else 0)))
+
+        tip = read_git(remote, "rev-parse", "refs/gov/claims/asks/TOOL-dSame")
+        again = run_claims((a, "ask", "TOOL", "dSame", "--claimant", "a00000000001"))[0]
+        arm("TOOL-dTotalRecall-3 AC3 — a replayed mint prints its id again and the counter's tip does not move",
+            "True True", lambda: f"{again == (0, minted[0]) and minted[0].startswith('minted ')} "
+                                 f"{tip == read_git(remote, 'rev-parse', 'refs/gov/claims/asks/TOOL-dSame')}")
+        arm("TOOL-dTotalRecall-3 AC3 — the counter's tip carries a claimant-key line", "claimant-key: ",
+            lambda: read_git(remote, "log", "-1", "--format=%B", "refs/gov/claims/asks/TOOL-dSame"))
+        stip = read_git(remote, "rev-parse", "refs/gov/claims/dSame")
+        home = a if won == ka else b
+        twice = run_claims((home, "slug", "dSame", "--claimant", won)) + run_claims((home, "slug", "dSame", "--claimant", won))
+        arm("TOOL-dTotalRecall-3 AC3 — a replayed slug claim exits 0 twice and the claim's tip does not move",
+            "[0, 0] True", lambda: f"{[r for r, _ in twice]} {stip == read_git(remote, 'rev-parse', 'refs/gov/claims/dSame')}")
+
+        c = build_clone("c")
+        rc4, out4 = _read_mode(cmd_new_build, c, load_conf(c), {"slug": "dSame", "asks": ["EXMP-aFoo-3"]})
+        arm("TOOL-dTotalRecall-3 AC4 — a third clone's --new-build of a slug claimed elsewhere refuses, naming the ref",
+            "rc=1 readme=False named=True",
+            lambda: f"rc={rc4} readme={os.path.exists(os.path.join(c, 'memory/builds/dSame/README.md'))} "
+                    f"named={'refs/gov/claims/dSame was not claimed' in out4} :: {out4[-300:]}")
+        d = build_clone("d")
+        rc5, out5 = _read_mode(cmd_new_build, d, load_conf(d), {"slug": "dOther", "asks": ["EXMP-aFoo-3"]})
+        otip = read_git(remote, "rev-parse", "refs/gov/claims/dOther")
+        run("git", "reset", "-q", "--hard", cwd=d)
+        gone = os.path.exists(os.path.join(d, "memory/builds/dOther/README.md"))
+        rc6, out6 = _read_mode(cmd_new_build, d, load_conf(d), {"slug": "dOther", "asks": ["EXMP-aFoo-3"]})
+        arm("TOOL-dTotalRecall-3 AC4 — the scaffold claims, and its re-run after a hard reset resumes its own claim",
+            "first=0 claimed=True reset-gone=True again=0 unmoved=True readme=True",
+            lambda: f"first={rc5} claimed={bool(otip) and 'fatal' not in otip} reset-gone={not gone} again={rc6} "
+                    f"unmoved={otip == read_git(remote, 'rev-parse', 'refs/gov/claims/dOther')} "
+                    f"readme={os.path.exists(os.path.join(d, 'memory/builds/dOther/README.md'))}"
+            + ("" if rc5 == 0 and rc6 == 0 else f" :: {out5[-300:]} :: {out6[-300:]}"))
+
+        write_text(os.path.join(seed, "floor.md"), "names TOOL-dFloor-14\n")
+        run("git", "add", "-A", cwd=seed)
+        run("git", "commit", "-q", "-m", "floor", "--no-verify", cwd=seed)
+        run("git", "push", "-q", remote, "HEAD:refs/heads/main", cwd=seed)
+        arm("TOOL-dTotalRecall-3 AC2 — a default branch already naming TOOL-dFloor-14 mints TOOL-dFloor-15 next",
+            "(0, 'minted TOOL-dFloor-15')", lambda: str(run_claims((b, "ask", "TOOL", "dFloor", "--claimant", kb))[0]))
+
+        o = build_clone("o")
+        run("git", "remote", "set-url", "origin", os.path.join(base, "missing.git").replace(os.sep, "/"), cwd=o)
+        queue = os.path.join(o, ".git", "gov-queue.log")
+        offline = [run_claims((o, "ask", "TOOL", "dSame", "--claimant", "eeeeeeeeeeee", "--offline", v))[0]
+                   for v in ("refuse", "warn", "follow-leases")]
+        arm("TOOL-dTotalRecall-3 AC6 — offline: refuse exits 2, warn and follow-leases exit 4, nothing queued or cached",
+            "[2, 4, 4] refused offline waiting offline waiting offline queue=False cache=''",
+            lambda: f"{[r for r, _ in offline]} {' '.join(' '.join(x.split()[:2]) for _, x in offline)} "
+                    f"queue={os.path.exists(queue)} "
+                    f"cache='{read_git(o, 'for-each-ref', 'refs/gov/remote/claims/asks/TOOL-dSame')}'")
+        arm("TOOL-dTotalRecall-3 AC8 — a remote-less clone prints local and writes no ref",
+            "(0, 'local refs/gov/claims/dSame · no remote') refs=''",
+            lambda: f"{run_claims((seed, 'slug', 'dSame', '--claimant', 'ffffffffffff'))[0]} "
+                    f"refs='{read_git(seed, 'for-each-ref', 'refs/gov')}'")
 
 
 def test_staged_render(arm) -> None:
@@ -9757,6 +9933,7 @@ def cmd_selftest() -> int:
             lambda: _read_placed_fm(_sg_dated, ["--request", "3f9c2a7d01be", "--origin", "aFoo"]))
         arm("a placed patch's --origin `A_b`, which no grammar admits, is refused", "is not a build slug: it matches no grammar",
             lambda: _read_placed_fm("zOtherPatch", ["--request", "3f9c2a7d01be", "--origin", "A_b"]))
+        test_slug_claims(arm, _build_sc_tree([_build_sc_ask(3, "the claimed ask")]))
 
 
     # ---------------------------------------------------- the example family (TOOL-dDerivedDocket-51)

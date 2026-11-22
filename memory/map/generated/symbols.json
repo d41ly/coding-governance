@@ -840,6 +840,11 @@
     {
       "id": "add_feed_event",
       "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "add_feed_event",
+      "kind": "function",
       "file": "tools/push-main.sh"
     },
     {
@@ -856,6 +861,11 @@
       "id": "add_feed_sightings",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "add_feed_sightings",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "add_feed_sightings",
@@ -916,6 +926,11 @@
       "id": "add_health_event",
       "kind": "function",
       "file": "tools/lib/health_log.py"
+    },
+    {
+      "id": "add_health_event",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "add_health_event",
@@ -3356,6 +3371,11 @@
       "id": "build_gov_commit",
       "kind": "function",
       "file": "tools/lib/gov-ref.sh"
+    },
+    {
+      "id": "build_gov_commit",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "build_gov_commit",
@@ -5978,6 +5998,11 @@
       "file": "tools/govkit/upgrade_walk.py"
     },
     {
+      "id": "check_claim_args",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
       "id": "check_claim_canary",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -6266,6 +6291,11 @@
       "id": "check_dir_lock_stale",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "check_dir_lock_stale",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "check_dir_lock_stale",
@@ -6576,6 +6606,11 @@
       "id": "check_feed",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "check_feed",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "check_feed",
@@ -8206,6 +8241,11 @@
       "id": "check_proc_gone",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "check_proc_gone",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "check_proc_gone",
@@ -11458,6 +11498,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "derive_ask_floor",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
       "id": "derive_ask_freeze",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -12250,6 +12295,11 @@
     {
       "id": "derive_feed_events",
       "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "derive_feed_events",
+      "kind": "function",
       "file": "tools/push-main.sh"
     },
     {
@@ -12581,6 +12631,11 @@
       "id": "derive_health_log",
       "kind": "function",
       "file": "tools/lib/health_log.py"
+    },
+    {
+      "id": "derive_health_log",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "derive_health_log",
@@ -13166,6 +13221,11 @@
       "id": "derive_lowered_limit",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_mandate_key",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "derive_manifest_kind",
@@ -14746,6 +14806,11 @@
       "id": "derive_temp_path",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "derive_temp_path",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "derive_temp_path",
@@ -20400,6 +20465,11 @@
     {
       "id": "print_feed",
       "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "print_feed",
+      "kind": "function",
       "file": "tools/push-main.sh"
     },
     {
@@ -22153,6 +22223,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_claim_replay",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
       "id": "read_claims",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -23051,6 +23126,11 @@
       "id": "read_first_seen",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "read_first_seen",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "read_first_seen",
@@ -24798,6 +24878,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "read_own_claim",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_owned_entries",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -25301,6 +25386,11 @@
       "id": "read_proc_token",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "read_proc_token",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "read_proc_token",
@@ -27955,6 +28045,11 @@
     {
       "id": "refuse_wrong_shell",
       "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
       "file": "tools/memory-tree/kit-dogfood-parity.test.sh"
     },
     {
@@ -28295,6 +28390,11 @@
     {
       "id": "remove_dir_lock",
       "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "remove_dir_lock",
+      "kind": "function",
       "file": "tools/push-main.sh"
     },
     {
@@ -28336,6 +28436,11 @@
       "id": "remove_gov_ref",
       "kind": "function",
       "file": "tools/lib/gov-ref.sh"
+    },
+    {
+      "id": "remove_gov_ref",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "remove_gov_ref",
@@ -31405,6 +31510,11 @@
     {
       "id": "resolve_health_log",
       "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "resolve_health_log",
+      "kind": "function",
       "file": "tools/process-monitor/reap.py"
     },
     {
@@ -32515,6 +32625,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/memory-tree/kit-dogfood-parity.test.sh"
     },
     {
@@ -32866,6 +32981,11 @@
       "id": "resolve_remote_sh",
       "kind": "function",
       "file": "tools/memory-tree/check-verdict-epoch.sh"
+    },
+    {
+      "id": "resolve_remote_sh",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "resolve_remote_sh",
@@ -33688,6 +33808,11 @@
       "file": "tools/unattended/gate-guard.test.sh"
     },
     {
+      "id": "run_ask_mint",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
       "id": "run_ask_query",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -34076,6 +34201,11 @@
       "id": "run_claim_plant",
       "kind": "function",
       "file": "tools/loop/claim.py"
+    },
+    {
+      "id": "run_claim_remote",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "run_claim_verb",
@@ -36886,6 +37016,11 @@
       "id": "run_slot_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "run_slug_claim",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "run_sourced",
@@ -41333,6 +41468,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_slug_claims",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "test_snippet_share_bounds_the_head_and_pointers_keep_the_rest",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -42490,6 +42630,11 @@
     {
       "id": "write_dir_lock",
       "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "write_dir_lock",
+      "kind": "function",
       "file": "tools/push-main.sh"
     },
     {
@@ -42515,6 +42660,11 @@
     {
       "id": "write_dir_lock_pid",
       "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "write_dir_lock_pid",
+      "kind": "function",
       "file": "tools/push-main.sh"
     },
     {
@@ -42531,6 +42681,11 @@
       "id": "write_dir_lock_wait",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "write_dir_lock_wait",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "write_dir_lock_wait",
@@ -42670,6 +42825,11 @@
     {
       "id": "write_feed",
       "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
+    },
+    {
+      "id": "write_feed",
+      "kind": "function",
       "file": "tools/push-main.sh"
     },
     {
@@ -42691,6 +42851,11 @@
       "id": "write_feed_success",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "write_feed_success",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "write_feed_success",
@@ -43036,6 +43201,11 @@
       "id": "write_gov_ref",
       "kind": "function",
       "file": "tools/lib/gov-ref.sh"
+    },
+    {
+      "id": "write_gov_ref",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "write_gov_ref",
@@ -44288,6 +44458,11 @@
       "file": "tools/playbook/overlay.py"
     },
     {
+      "id": "write_slug_claim",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "write_sparse_checkout",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -44811,6 +44986,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/memory-tree/check-verdict-epoch.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/gov-claim.sh"
     },
     {
       "id": "wrong_shell_at",

@@ -197,7 +197,10 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
   uncommitted id is invisible to grep.
 - Before using a slug, grep the whole memory tree for `[A-Z]+-<slug>-[0-9]` at all times, archives
   included, and scan the live rows of the work-state index; re-roll on any hit.
-- No reserve-above-a-marker, no shared counter and no renumber-on-merge: the slug is the guarantee.
+- Within a build, no reserve-above-a-marker, no shared counter and no renumber-on-merge: the slug,
+  claimed once at `refs/gov/claims/<slug>`, is the guarantee. A filer outside a build, one filing an
+  ask in another build's family, mints the id through `gov-claim.sh ask`, under that family's counter
+  ref `refs/gov/claims/asks/<FAMILY>-<slug>`.
 - A session is one continuous effort under one slug, across work-units and families; a resumed or
   summarized session keeps its slug.
 - A fan-out child never mints: its orchestrator does, or the child takes a slug of its own.
@@ -821,7 +824,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 
 <!-- gen:record-kinds -->
 
-48 kinds · 24 purposes pending
+49 kinds · 24 purposes pending
 
 | Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |
 |---|---|---|---|---|---|---|---|
@@ -856,6 +859,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 | `archive` | `record.archive` | `memory/archive/**` | `hand` | — | — | `memory hygiene` | a rotated record under `memory/archive/`, written by rotation (the away pass); writer item not named |
 | `instrument` | `record.instrument` | `memory/builds/*/build/*.py`, `memory/builds/*/build/*.sh`, `memory/builds/*/build/*.js`, `memory/builds/*/build/*.json`, `memory/builds/*/build/*.tsv`, `memory/builds/*/build/*.txt`, `memory/builds/*/build/*.svg`, `memory/builds/*/build/*.html`, `memory/builds/*/build/*.log`, `memory/builds/*/build/*.out` | `hand` | — | — | `memory hygiene` | a script, table or drawing kept beside the record it serves (the away pass); writer item not named: the session that |
 | `witness` | `record.witness` | `refs/gov/**` | `gov-ref.sh` | — | — | `record-kinds` | a declared pocket outside the tree, such as a transcript, a Codex rollout, the auto-memory, the live inbox or a |
+| `claim` | `record.claim` | `refs/gov/claims/**` | `gov-claim.sh` | — | — | `build-index selftest` | the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim |
 | `orientation-cards` | `record.orientation-cards` | `<git-common-dir>/orientation/*` | `manifest-check.sh --card` | `gov-builder`, `gov-reuse-scout`, `gov-session`, `gov-spec-writer` | — | `record-kinds` | — |
 | `unattended-sidecars` | `record.unattended-sidecars` | `<git-common-dir>/unattended/*`, `<git-common-dir>/unattended-landed` | `unattended.sh` | — | — | `record-kinds` | — |
 | `runlog-journal` | `record.runlog-journal` | `<git-common-dir>/runlog/*`, `<git-common-dir>/runlog-stamp-*` | `runlog.py` | — | — | `record-kinds` | — |

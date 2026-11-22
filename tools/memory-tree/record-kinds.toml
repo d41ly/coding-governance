@@ -465,6 +465,20 @@ check = "record-kinds"
 purpose = { text = "a declared pocket outside the tree, such as a transcript, a Codex rollout, the auto-memory, the live inbox or a", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:481" }
 
 [[record-kind]]
+name = "claim"
+tag = "record.claim"
+layer = "layer.memory"
+home = ["refs/gov/claims/**"]
+id-rule = "refs/gov/claims/<slug> | refs/gov/claims/asks/<FAMILY>-<slug>"
+schema = { form = "header", fields = ["claimant-key", "session", "family", "seq"] }
+writer = "gov-claim.sh"
+readers = []
+readers-none = "a claim is read by its writers' replay and the orphan check, never filled into a work order"
+lifecycle = "append-only"
+check = "build-index selftest"
+purpose = { text = "the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:468" }
+
+[[record-kind]]
 name = "orientation-cards"
 tag = "record.orientation-cards"
 layer = "layer.instruction"

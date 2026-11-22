@@ -2015,6 +2015,31 @@ gr_got=$(cd "$gr" && GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@x GIT_COMMITTER_NAME=t
 write=2 why=[no source]
 tip=second
 parent=first" ] || bad "the canonical gov_ref_sh pushed a failed build, or built no parented tip: ${gr_got//$'\n'/ | }"; ok
+# NO CLAIM REF IS PRUNED (TOOL-dTotalRecall-3 S5, AC5): the canonical `remove_gov_ref` returns 2 for a
+# ref under `refs/gov/claims/`, GOVREF_WHY naming the namespace, and the origin still names the claim,
+# while a run ref is still deleted. Staged red by deleting the refusal line from the canonical copy.
+# WHAT THIS DOES NOT CHECK: the inline copies, which the parity rows above hold to this canonical.
+gc="$TMP/gov-ref-claims"; mkdir -p "$gc"
+gc_got=$(cd "$gc" && GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@x GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@x \
+  GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0="$gc/no-hooks" \
+  GIT_CONFIG_KEY_1=advice.graftFileDeprecated GIT_CONFIG_VALUE_1=false bash -c '
+  . "$1"; . "$2"
+  git init -q --bare origin.git && git init -q work && cd work || exit 2
+  git remote add origin ../origin.git
+  run_plain() { local o=$1; shift; git "$@" >"$o" 2>/dev/null; }
+  GOVREF_RUNNER=run_plain; GOVREF_REMOTE=origin; GOVREF_GITDIR=""
+  c=$(build_gov_commit "" claim) && write_gov_ref refs/gov/claims/dSame "" "$c" || echo "claim failed"
+  r=$(build_gov_commit "" run) && write_gov_ref refs/gov/runs/tFix "" "$r" || echo "run failed"
+  remove_gov_ref refs/gov/claims/dSame "$c"; echo "claim=$?"
+  case "$GOVREF_WHY" in *refs/gov/claims/*) echo why=named ;; *) echo "why=[$GOVREF_WHY]" ;; esac
+  [ "$(git -C ../origin.git rev-parse -q --verify refs/gov/claims/dSame)" = "$c" ] && echo claim=kept
+  remove_gov_ref refs/gov/runs/tFix "$r"; echo "run=$?"
+  git -C ../origin.git rev-parse -q --verify refs/gov/runs/tFix >/dev/null || echo run=gone' _ "$HERE/gov-ref.sh" "$HERE/gov-feed.sh" 2>&1 | tr -d '\r')
+[ "$gc_got" = "claim=2
+why=named
+claim=kept
+run=0
+run=gone" ] || bad "the canonical remove_gov_ref deleted a claim ref, or no longer deletes a run ref: ${gc_got//$'\n'/ | }"; ok
 
 # ---- 2q. THE FEED WRITER CENSUS (TOOL-dPlacedRequest-13 S9, AC7, AC9, AC11) ------------------------
 # Parity holds the carriers' `gov_feed_sh` copies to the canonical; this holds every governance ref

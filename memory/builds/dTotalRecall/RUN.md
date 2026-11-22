@@ -178,3 +178,10 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T17:18:42Z draw · re-dispatch · TOOL-dTotalRecall-22 · 19/186 · 20261122T171842Z-a437f2
 
 2026-11-22T17:18:42Z dispatch · item 1ca91e84 TOOL-dTotalRecall-22 · reason memory/map/features/playbook.md
+
+2026-11-22T17:44:40Z brief · item TOOL-dTotalRecall-3 · reason ee08617f81d0 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-3-build-brief.md
+
+2026-11-22T17:45:58Z dispatch · item e1ae60af TOOL-dTotalRecall-3 · reason tools/memory-tree/gov-claim.sh tools/memory-tree/gen_build_index.py tools/memory-tree/record-kinds.toml tools/memory-tree/HYGIENE.template.md tools/lib/gov-ref.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/lib/resolve-python.test.sh tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-3.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-3-1-acceptance-ledger.md
+2026-11-22T18:05:03Z draw · re-dispatch · TOOL-dTotalRecall-3 · 20/186 · 20261122T180503Z-607022
+
+2026-11-22T18:05:03Z dispatch · item e1ae60af TOOL-dTotalRecall-3 · reason memory/HYGIENE.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-3-deviation-33.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-3-deviation-34.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-3-deviation-35.md memory/builds/dTotalRecall/README.md
