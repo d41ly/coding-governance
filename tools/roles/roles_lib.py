@@ -412,7 +412,7 @@ def read_cap_answer(request, root, kit_dir):
 
 
 #: The policy kit's refusal of a key whose catalogue row carries a derived default, its `DERIVED_WHY`
-#: (`tools/policy/policy.py#DERIVED_WHY`) spelled again, since a kit imports no sibling kit, under the
+#: (the policy kit's `policy.py#DERIVED_WHY`) spelled again, since a kit imports no sibling kit, under the
 #: name the playbook kit spells it: a key refused with it is unset (TOOL-dBoundRoles-21 §8 F8).
 POLICY_DERIVED_LINE = "a derived default no reader computes yet"
 #: Each `(key, root)` read this process, mapped to `(value, source)`, `(None, None)` for an unset key, so

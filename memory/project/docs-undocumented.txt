@@ -256,11 +256,7 @@ policy:review.unclassed	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:review.unverified	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:roles.answered-calls	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:roles.auth.<role>	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:roles.effort.<role>	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:roles.effort.<workflow>.<stage>	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:roles.effort.default	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:roles.harness.<role>	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:roles.model.<role>.<harness>	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:roles.no-spawn	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:roles.on-contradiction	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:roles.orientation.house-index	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
