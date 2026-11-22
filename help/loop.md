@@ -601,7 +601,9 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   `loop: mail · unarmed · <why>` line: `RUN_CLAIMS` off, no unattended driver beside the loop kit, or
   a repository with no `.unattended.conf`. A read that cannot answer, no bash that can run the driver,
   no answer within its 30 s (PINNED) or a failed read with no row, is `loop: unanswered · mail unknown:
-  ...`, exit 2, never an empty mailbox. Past the guard, each answered or acknowledged message no
+  ...`, exit 2, never an empty mailbox. The driver runs under the bash that can see it, never the bare
+  name `bash`, which on Windows can reach WSL and its other filesystem: `GOV_BASH`, when set, is the
+  only one tried, and a node where none can see the driver refuses the move as `mail unknown`. Past the guard, each answered or acknowledged message no
   earlier move named is disposed: the move's trailer and record carry `disposed=<id>+<id>`, and where
   `log` is selected one `<date>-build-<id>-mailbox-message-<n>.md` record per message, its fields and
   its body, is written beside the move's own record in the same commit. A message is disposed once.
@@ -630,8 +632,12 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   `subset-trailer-line`, `subset-log`, `empty-set`, `log-drift`, `orphan-log`, `no-row`, `line-drift`,
   `pre-spec`, `field`, `backward-rows` (three moves forward and three back, each trailer and read
   printed with its direction), `skip-backward` (the same six moves, the last one's record deleted,
-  so the check names the move back that owes it), `mail-open` (an open question on a scratch remote
-  refusing the move) and `mail-disposed` (the question acknowledged, disposed once). `check --selftest` runs every case, and gov's own
+  so the check names the move back that owes it), `descope-spent` (a rework budget of 0: the move
+  back refused as spent, then a descope recorded), `mail-open` (an open question on a scratch remote
+  refusing the move), `mail-disposed` (the question acknowledged, disposed once), `mail-argv` (the
+  mailbox read's command line recorded and held to the located driver and the bash that sees it),
+  `mail-no-driver` (no driver found, the move recorded with the mailbox unarmed) and `mail-no-bash`
+  (no bash that sees the driver, the move refused as `mail unknown`). `check --selftest` runs every case, and gov's own
   `loop transition record` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->

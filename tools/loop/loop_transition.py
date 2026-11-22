@@ -179,7 +179,12 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
           "mail-open": "the driver's conf with RUN_CLAIMS on and a bare remote holding fy's question to build:tFix: "
                        "B4 refused naming it, no commit",
           "mail-disposed": "the same question and tFix's ack of it: B4 disposes it in one commit, its record read, "
-                           "then B5 disposes nothing"}
+                           "then B5 disposes nothing",
+          "mail-argv": "the driver's conf with RUN_CLAIMS on and subprocess.run wrapped: B4's --mail read argv "
+                       "recorded, answered zero rows, and held to the located driver and the bash that sees it",
+          "mail-no-driver": "the driver's conf, the driver's locator run over an empty scratch directory: B4 "
+                            "records with the mailbox unarmed",
+          "mail-no-bash": "the driver's conf and resolve_bash answering None: B4 refused as mail unknown, no commit"}
 #: The mail plants' messages, each `(ref, build, id, to, kind, subject, answers)`, put straight on the fixture's
 #: remote; `mail-disposed` adds the ack.
 FX_QUESTION = ("refs/gov/mail/fy/z/s-other", "fy", "a1b2c3d4e5f6", "build:tFix", "question", "the fixture's question", "none")
@@ -844,7 +849,7 @@ def write_transition_plant(top, case):
     write_fixture_files(top, files)
     run_fixture_git(top, "add", "-A")
     run_fixture_git(top, "commit", "-q", "-m", "fixture")
-    if case.startswith("mail-"):   # a bare remote inside the git dir, so the scratch's removal takes it too
+    if case in ("mail-open", "mail-disposed"):   # a bare remote inside the git dir, so the scratch's removal takes it too
         from placement import write_fixture_gov_ref
         origin = top / ".git" / "fx-origin.git"
         run_fixture_git(top, "init", "-q", "--bare", "--template=", str(origin))
@@ -930,6 +935,52 @@ def run_transition_fixture(case):
             value = run_fixture_git(top, "log", "-1", "--format=%%(trailers:key=%s,valueonly)" % TRAILER_KEY)
             print("%s: fixture · next move · %s" % (SAY, "disposes again: " + value if "disposed=" in value else "disposes nothing"))
             return run_verb(["check", *at])
+        if case in ("mail-argv", "mail-no-driver", "mail-no-bash"):   # KICK-dKeptSession-36 S4: the guard's launch
+            import subprocess   # each plant rebinds the name the guard imports inside its function, then restores it
+            import loop_lib
+            import loop_witness
+            spawned, real_run, real_locate = [], subprocess.run, loop_lib.resolve_kit_dir
+            empty = top / ".git" / "fx-empty"   # inside the git dir, so the scratch's removal takes it too
+            empty.mkdir()
+
+            def run_mail_spawn(argv, *rest, **kw):   # the one --mail call recorded and answered zero rows
+                if "--mail" in [str(a) for a in argv]:
+                    spawned.append([str(a) for a in argv])
+                    return subprocess.CompletedProcess(argv, 0, "", "")
+                return real_run(argv, *rest, **kw)
+
+            def resolve_empty_kit(home, anchor, here):   # the driver's locator over an empty scratch directory
+                return real_locate(home, anchor, empty if (home, anchor) == ("unattended", "unattended.sh") else here)
+
+            def resolve_no_bash(script):
+                return None
+            owner, name, stand_in = {"mail-argv": (subprocess, "run", run_mail_spawn),
+                                     "mail-no-driver": (loop_lib, "resolve_kit_dir", resolve_empty_kit),
+                                     "mail-no-bash": (loop_witness, "resolve_bash", resolve_no_bash)}[case]
+            real, before = getattr(owner, name), read_count()
+            setattr(owner, name, stand_in)
+            try:
+                rc = run_verb(b4)
+            finally:
+                setattr(owner, name, real)
+            if case == "mail-no-bash":
+                print("%s: fixture · commits %s" % (SAY, "unchanged" if read_count() == before else "changed"))
+            if case != "mail-argv":
+                return rc
+            try:
+                driver = (real_locate("unattended", "unattended.sh", KIT) / "unattended.sh").as_posix()
+            except LookupError as e:
+                driver = "unlocated: %s" % e
+            got = spawned[0] if len(spawned) == 1 else ["none"] * 3
+            misses = [why for ok, why in (
+                (len(spawned) == 1, "%d --mail call(s) recorded, not one" % len(spawned)),
+                (got[1] == driver, "argv[1] is not the located driver %s" % driver),
+                (len(spawned) == 1 and got[0] == loop_witness.resolve_bash(got[1]), "argv[0] is not resolve_bash(argv[1])"),
+                (got[2:] == ["--mail", "read", FX_BUILD], "the rest is not --mail read %s" % FX_BUILD),
+                (rc == 0, "the move did not record")) if not ok]
+            print("%s: fixture · mail-argv · %s" % (SAY, "held" if not misses else "MISSED %s · argv %s" % (
+                "; ".join(misses), spawned or "none")))
+            return 0 if not misses else 1
         if case in ("no-row", "empty-set"):
             before = read_count()
             argv = b4 if case == "empty-set" else b4[:7] + ["--item", "item.design.exit"] + b4[9:]
@@ -1070,7 +1121,14 @@ def run_selftest():
              ("mail-disposed record", fx("mail-disposed"), 0, "%s: fixture · memory/builds/%s/build/" % (SAY, FX_BUILD),
               "%s-1.md · read exit 0 · Serves %s %s · State acked" % (MAIL_KIND, MAIL_KIND, FX_UNIT)),
              ("mail-disposed next", fx("mail-disposed"), 0, "%s: fixture · next move · disposes nothing" % SAY, ""),
-             ("mail-disposed check", fx("mail-disposed"), 0, check, "· 0 finding(s)")]
+             ("mail-disposed check", fx("mail-disposed"), 0, check, "· 0 finding(s)"),
+             ("mail-argv", fx("mail-argv"), 0, "%s: fixture · mail-argv · held" % SAY, ""),
+             ("mail-no-driver", fx("mail-no-driver"), 0,
+              "%s: mail · unarmed · no unattended kit holding unattended.sh in this install" % SAY, ""),
+             ("mail-no-driver recorded", fx("mail-no-driver"), 0, "%s: recorded · planning -> designing" % SAY, ""),
+             ("mail-no-bash", fx("mail-no-bash"), 2, "%s: unanswered · mail unknown: no bash that can see " % SAY,
+              "unattended.sh"),
+             ("mail-no-bash commits", fx("mail-no-bash"), 2, "%s: fixture · commits unchanged" % SAY, "")]
     return run_selftest_cases(run_cached_case, cases, "%s: transition selftest" % SAY)
 
 
