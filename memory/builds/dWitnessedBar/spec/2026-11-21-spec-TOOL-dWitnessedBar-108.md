@@ -17,6 +17,7 @@
 | [2026-11-21-build-TOOL-dWitnessedBar-108-red-fix-150.md](../build/2026-11-21-build-TOOL-dWitnessedBar-108-red-fix-150.md) | red-fix | — |
 | [2026-11-21-build-TOOL-dWitnessedBar-108-widen-27.md](../build/2026-11-21-build-TOOL-dWitnessedBar-108-widen-27.md) | widen | — |
 | [2026-11-21-build-TOOL-dWitnessedBar-108-widen-28.md](../build/2026-11-21-build-TOOL-dWitnessedBar-108-widen-28.md) | widen | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-108-red-fix-164.md](../build/2026-11-22-build-TOOL-dWitnessedBar-108-red-fix-164.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dWitnessedBar-108-widen-38.md](../build/2026-11-22-build-TOOL-dWitnessedBar-108-widen-38.md) | widen | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-108-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-108-build-brief.md) | journal | — |
 | [2026-11-21-prompt-TOOL-dWitnessedBar-108-build-brief-2.md](../prompts/2026-11-21-prompt-TOOL-dWitnessedBar-108-build-brief-2.md) | journal | — |
