@@ -1,6 +1,6 @@
 # KICK-dKeptSession-51 — the act's place in the message id is the ninth field, after the recipient and the content key, in every text that states it
 
-**Status:** DEFERRED · rev-5 · 2026-11-23 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-5 · 2026-11-23 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md) | research | KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-27 |
 | [2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md) | research | KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 |
 | [2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md) | research | KICK-dKeptSession-50 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-61 |
+| [2026-11-21-prompt-KICK-dKeptSession-51-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-51-build-brief.md) | research | — |
 | [2026-11-22-prompt-KICK-dKeptSession-51-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-51-reground-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-51-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-51-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
