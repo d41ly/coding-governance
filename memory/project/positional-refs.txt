@@ -33649,7 +33649,6 @@ memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-43.md	tools/me
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-43.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-43.md	tools/runlog/model.py:1571	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-44.md	BUILD-METHOD M6	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-46.md	BUILD-METHOD M6	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-47.md	BUILD-METHOD M6	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-48.md	tools/gate-legs.json:1006	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-48.md	tools/runlog/record.py:1564	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
