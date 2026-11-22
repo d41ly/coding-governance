@@ -47,12 +47,13 @@ of the file. `check` re-derives both and compares the marker's `path` with the f
 envelope opened must close, and the levels must never decrease down each part, `## Role` and `## Task`,
 each failure naming the envelope; it prints each part's levels in order, or `unranked` for a file holding
 no envelope, which passes (PLAY-dOrderedCharter-5 S4).
-`harness-args` prints, as one line of sorted JSON, the union of the `stages` tables of every
-workflow whose harness names that script. `stage-efforts` prints, the same way, the reasoning effort
-resolved for every stage key of ONE workflow's `stages` table: a harness call passes it as its
-`efforts` argument (TOOL-aOrientedCast-10). The order is TOOL-dBoundRoles-21's: the policy keys
-`roles.effort.<workflow>.<stage>`, `roles.effort.<role>` and `roles.effort.default` of the working
-directory's repository, then `house/policy.toml` where present, then the role's declared `effort`.
+`harness-args` prints, as one line of sorted JSON, the union of the stage maps, `key → role` of each
+`[[workflow.stages]]` row, of every workflow whose harness names that script. `stage-efforts`
+prints, the same way, the reasoning effort resolved for every stage row of ONE workflow: a harness
+call passes it as its `efforts` argument (TOOL-aOrientedCast-10). The order is TOOL-dBoundRoles-21's
+with TOOL-dBoundRoles-22's step: the policy keys `roles.effort.<workflow>.<stage>`,
+`roles.effort.<role>` and `roles.effort.default` of the working directory's repository, then
+`house/policy.toml` where present, then the stage row's `effort`, then the role's declared `effort`.
 `role-efforts` prints, the same way,
 the level of every role whose `agent` is true, and a direct spawn passes its role's value. With
 `--model <id>` the two verbs resolve the levels the policy's profiles give that model id; without
@@ -790,16 +791,17 @@ def write_json_line(obj):
 
 
 def print_harness_args(harness):
-    """Print the union of the `stages` tables of every workflow whose harness path ends in the script
-    `harness` (its file name without extension) as one line of sorted JSON; RolesError when no
-    workflow's harness carries it or one stage key maps to two roles."""
+    """Print the union of the stage maps, `derive_stage_map` of each entry's stage rows
+    (TOOL-dBoundRoles-22 S2), of every workflow whose harness path ends in the script `harness` (its
+    file name without extension) as one line of sorted JSON; RolesError when no workflow's harness
+    carries it or one stage key maps to two roles."""
     union, hit = {}, False
     for w in lib.load_workflows(KIT_DIR):
         tokens = [t for t in str(w.get("harness", "")).split() if "/" in t]
         if not any(t.rsplit("/", 1)[-1].rsplit(".", 1)[0] == harness for t in tokens):
             continue
         hit = True
-        for key, slot in (w.get("stages") or {}).items():
+        for key, slot in lib.derive_stage_map(w).items():
             if union.get(key, slot) != slot:
                 raise lib.RolesError("stage key %s maps to both %s and %s across the workflows of %s"
                                      % (key, union[key], slot, harness))
@@ -810,9 +812,9 @@ def print_harness_args(harness):
 
 
 def print_stage_efforts(workflow, model, root):
-    """Print the resolved level of every stage key of one workflow's `stages` table as one line of
-    sorted JSON (TOOL-aOrientedCast-10); RolesError on an unknown name, a workflow with no `stages`
-    table, or a policy defect. Keyed by workflow, not harness: a harness serving two workflows runs
+    """Print the resolved level of every stage row's key of one workflow as one line of sorted JSON
+    (TOOL-aOrientedCast-10; TOOL-dBoundRoles-22 S2); RolesError on an unknown name, a workflow with no
+    stage rows, or a policy defect. Keyed by workflow, not harness: a harness serving two workflows runs
     one role at two levels, which a union cannot carry. `model` goes to the resolver unchanged
     (TOOL-aProfiledEffort-2), and `root`, the repository whose policy keys it reads first
     (TOOL-dBoundRoles-21 S7)."""
@@ -821,8 +823,8 @@ def print_stage_efforts(workflow, model, root):
     entry = next((w for w in workflows if w.get("name") == workflow), None)
     if entry is None:
         raise lib.RolesError("no workflow named %s in workflows.toml" % workflow)
-    if not isinstance(entry.get("stages"), dict):
-        raise lib.RolesError("the workflow %s has no stages table, so no harness stage takes a level"
+    if not lib.derive_stage_map(entry):
+        raise lib.RolesError("the workflow %s has no stage rows, so no harness stage takes a level"
                              % workflow)
     write_json_line(lib.resolve_stage_efforts(policy, entry, model, root))
 

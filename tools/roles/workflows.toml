@@ -9,9 +9,20 @@
 #   driver       agent | workflow | program | main-loop
 #   harness      a {prefix}-relative script path, a command, or "none"
 #   roles        the slot keys of the role files that drive it
-#   stages       optional, a workflow driver only: harness stage key -> the slot it spawns as
 #   enforced-by  what refuses a bypass, by description, or the one string "none — <why>"
 #   trigger      one line saying when it runs
+#
+# A `workflow` driver, and no other, carries its STAGES as ordered `[[workflow.stages]]` rows after
+# its keys (TOOL-dBoundRoles-22), every row holding all seven fields; R9 grades each:
+#
+#   key          the harness's stage key, unique in its entry
+#   role         the slot the stage spawns as, one the entry's `roles` lists
+#   fan          the most agents the stage spawns in one call, an integer of at least 1
+#   cap          the most of them in flight at once, at most `runtime.agents-in-flight`
+#   effort       the stage's declared level, read after the policy keys and the house file and
+#                before the role's own `effort`
+#   receives     the row kinds the stage takes, from the loop kit's closed set (its upstream.py)
+#   returns      the row kinds the stage hands on, the same set; either list empty where none
 
 [[workflow]]
 name = "orient"
@@ -34,36 +45,149 @@ name = "spec-write"
 driver = "workflow"
 harness = "{prefix}/workflows/unattended-build.js"
 roles = ["gov-spec-writer", "gov-builder", "gov-reviewer", "gov-skeptic", "gov-synthesizer"]
-stages = { specWriter = "gov-spec-writer", disposal = "gov-spec-writer", builder = "gov-builder", specFinder = "gov-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
 enforced-by = ["scratch-guard.js role arm"]
 trigger = "once per build, after orientation, for every unit whose spec is missing or thin"
+
+[[workflow.stages]]
+key = "specWriter"
+role = "gov-spec-writer"
+fan = 6
+cap = 6
+effort = "high"
+receives = ["seam"]
+returns = ["criterion", "interface", "fork"]
+
+[[workflow.stages]]
+key = "disposal"
+role = "gov-spec-writer"
+fan = 1
+cap = 1
+effort = "high"
+receives = ["finding"]
+returns = ["repair"]
+
+[[workflow.stages]]
+key = "builder"
+role = "gov-builder"
+fan = 1
+cap = 1
+effort = "high"
+receives = ["criterion", "interface"]
+returns = ["repair"]
+
+[[workflow.stages]]
+key = "specFinder"
+role = "gov-reviewer"
+fan = 5
+cap = 5
+effort = "medium"
+receives = []
+returns = ["finding"]
+
+[[workflow.stages]]
+key = "skeptic"
+role = "gov-skeptic"
+fan = 5
+cap = 5
+effort = "medium"
+receives = ["finding"]
+returns = ["finding"]
+
+[[workflow.stages]]
+key = "synthesis"
+role = "gov-synthesizer"
+fan = 1
+cap = 1
+effort = "medium"
+receives = ["finding"]
+returns = ["finding"]
 
 [[workflow]]
 name = "spec-review"
 driver = "workflow"
 harness = "{prefix}/workflows/tier2-review.js"
 roles = ["gov-reviewer", "gov-skeptic", "gov-synthesizer"]
-stages = { specFinder = "gov-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
 enforced-by = ["agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys"]
 trigger = "after the spec set is written, where the build or its project declares a spec audit"
+
+[[workflow.stages]]
+key = "specFinder"
+role = "gov-reviewer"
+fan = 5
+cap = 5
+effort = "medium"
+receives = []
+returns = ["finding"]
+
+[[workflow.stages]]
+key = "skeptic"
+role = "gov-skeptic"
+fan = 5
+cap = 5
+effort = "medium"
+receives = ["finding"]
+returns = ["finding"]
+
+[[workflow.stages]]
+key = "synthesis"
+role = "gov-synthesizer"
+fan = 1
+cap = 1
+effort = "medium"
+receives = ["finding"]
+returns = ["finding"]
 
 [[workflow]]
 name = "build"
 driver = "workflow"
 harness = "{prefix}/workflows/unattended-unit.js"
 roles = ["gov-builder"]
-stages = { builder = "gov-builder" }
 enforced-by = ["scratch-guard.js role arm", "routed commits name a specced unit"]
 trigger = "once per unit, in stage order, after its spec is READY"
+
+[[workflow.stages]]
+key = "builder"
+role = "gov-builder"
+fan = 1
+cap = 1
+effort = "high"
+receives = ["criterion", "interface"]
+returns = ["repair"]
 
 [[workflow]]
 name = "closing-review"
 driver = "workflow"
 harness = "{prefix}/workflows/tier2-review.js"
 roles = ["gov-reviewer", "gov-skeptic", "gov-synthesizer"]
-stages = { diffFinder = "gov-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
 enforced-by = ["agent-cap.js spawn guard"]
 trigger = "once per build, after the last unit is terminal, over the cumulative diff"
+
+[[workflow.stages]]
+key = "diffFinder"
+role = "gov-reviewer"
+fan = 5
+cap = 5
+effort = "medium"
+receives = []
+returns = ["finding"]
+
+[[workflow.stages]]
+key = "skeptic"
+role = "gov-skeptic"
+fan = 5
+cap = 5
+effort = "medium"
+receives = ["finding"]
+returns = ["finding"]
+
+[[workflow.stages]]
+key = "synthesis"
+role = "gov-synthesizer"
+fan = 1
+cap = 1
+effort = "high"
+receives = ["finding"]
+returns = ["finding"]
 
 [[workflow]]
 name = "gate-bar"

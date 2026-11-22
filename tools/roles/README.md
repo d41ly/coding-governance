@@ -141,7 +141,8 @@ serving two runs, a model no transcript names or two profiles match, an `Agent` 
 `CLAUDE_CODE_EFFORT_LEVEL` is set, a configured default subagent model, an effort ceiling in
 settings, or a hand-edited index.
 `python handoff.py harness-args <harness>` prints the `roles` object a harness takes: the
-union of the `stages` tables of every workflow whose harness is that script, as one line of JSON.
+union of the stage maps of every workflow whose harness is that script, as one line of JSON, each
+map `key → role` of the workflow's stage rows, read through `roles_lib.derive_stage_map`.
 `python handoff.py stage-efforts <workflow> --model <id>` prints the `efforts` object a harness call
 takes for one workflow. What `<id>` is, and what each verb prints without the flag, is the next
 section's.
@@ -266,7 +267,11 @@ A role's level and model are read in this order (TOOL-dBoundRoles-21), the first
 2. `roles.effort.<role>`;
 3. `roles.effort.default`;
 4. `house/policy.toml`, where present, as the rest of this section reads it;
-5. the role file's declared `effort`.
+5. for a harness stage, its stage row's `effort` in `workflows.toml` (TOOL-dBoundRoles-22);
+6. the role file's declared `effort`.
+
+Step 5 is read only where no key is set and no house file is present, since the house file's
+`default` gives every stage a level; step 6 remains for a role's own agent type, which has no stage.
 
 The keys are read through the policy kit's one reader, `policy.py get <key> --json`, run by
 `roles_lib.read_policy_setting` in the repository at its landed revision, so an uncommitted edit of
@@ -286,16 +291,16 @@ empty fallback, no defect: each level then falls to the keys and the declared `e
 - `[effort]` holds `default`, the level of every role and stage the file does not name.
 - `[effort.roles]` holds one entry per role slot whose `agent` is true. `render_agents.py` writes the
   resolved level into that agent type as `effort: <level>`, the line before `omitClaudeMd: true`.
-- `[effort.stages.<workflow>]` overrides a stage of one workflow, keyed by that workflow's `stages`
-  keys. `handoff.py stage-efforts <workflow> --model <id>` prints each stage's level, its entry here
+- `[effort.stages.<workflow>]` overrides a stage of one workflow, keyed by that workflow's stage
+  rows' `key`s. `handoff.py stage-efforts <workflow> --model <id>` prints each stage's level, its entry here
   else its slot's, and a harness call passes that JSON as `efforts`, which wins over the agent
   type's level. That is how `gov-synthesizer` runs at `medium` in spec review and `high` in closing
   review on a model no profile matches.
 - `[effort.profiles.<name>]` is a profile for one model family (TOOL-aProfiledEffort-1). It holds
   `match` and `default`, and optionally `[effort.profiles.<name>.roles]` and
   `[effort.profiles.<name>.stages.<workflow>]` in the grammar of the tables above. The seeded
-  `[effort.profiles.fable]` names no role and no stage, so every role and every stage key of a
-  workflow's `stages` table runs at `medium` on any Claude Fable version. Adding a profile is adding one such table: no code changes, and
+  `[effort.profiles.fable]` names no role and no stage, so every role and every stage row of a
+  workflow runs at `medium` on any Claude Fable version. Adding a profile is adding one such table: no code changes, and
   `check_roles.py` grades it as R12. A matched profile is read ALONE: the role and stage entries of
   the tables above do not reach a model a profile matches.
 
@@ -496,7 +501,15 @@ R10. A role called mandatory under a workflow whose `enforced-by` names no hook 
 kit holds or a leg the manifest lacks; a writer role whose `output` lacks its class's folder reds
 as R14. The workflow table is joined with the loop definition by workflow name, both ways, as R6: a
 workflow's build order and step are that definition's, so a `stage` or `step` key in the table reds
-as unknown (TOOL-dDeclaredLoop-1). A stand-in declaration and the owner's waiver rows are joined as R15, under "Standing in for
+as unknown (TOOL-dDeclaredLoop-1).
+A `workflow` driver declares its stages as ordered `[[workflow.stages]]` rows, each naming its `key`,
+`role`, `fan`, `cap`, `effort`, `receives` and `returns` (TOOL-dBoundRoles-22), graded as R9: a key
+outside its pattern or repeated, a role the entry does not list, a fan or cap below 1, an effort
+outside the five levels, a row kind outside the loop kit's set, and a `cap` above
+`runtime.agents-in-flight`, the policy key read once per run. Where the loop kit prints no row kinds
+the lists are graded by the `seg` shape with one note, and with no policy kit the cap arm prints one
+note calling it unarmed; the summary counts the rows and names the limit they were graded against.
+A stand-in declaration and the owner's waiver rows are joined as R15, under "Standing in for
 a role". It prints one line per defect naming the file and the rule (the rules are listed in its
 header, with what it does not check), then a summary of every count it graded, the charter's shape among
 them. Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the conf, its

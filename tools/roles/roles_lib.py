@@ -778,7 +778,9 @@ def load_roles(kit_dir):
 
 
 def load_workflows(kit_dir):
-    """`workflows.toml`'s `[[workflow]]` entries, as a list in file order."""
+    """`workflows.toml`'s `[[workflow]]` entries, as a list in file order, each entry's `stages` its
+    `[[workflow.stages]]` rows as a list of row dicts in file order (TOOL-dBoundRoles-22 S2). The rows
+    are not validated here: R9 grades them, and `derive_stage_map` is the one map read from them."""
     path = pathlib.Path(kit_dir) / "workflows.toml"
     try:
         with open(path, "rb") as fh:
@@ -791,6 +793,28 @@ def load_workflows(kit_dir):
     if not isinstance(entries, list) or not all(isinstance(e, dict) for e in entries):
         raise RolesError("%s: R6 — 'workflow' is not an array of tables" % path.as_posix())
     return entries
+
+
+def derive_stage_map(entry):
+    """The ordered `{stage key: role}` map of one workflow entry's stage rows (TOOL-dBoundRoles-22 S2),
+    the one map every reader of an entry's stages takes: `{}` where the entry holds no rows, and a row
+    that is not a table, or whose `key` or `role` is not a string, is skipped, since R9 names it. A key
+    repeated in its entry keeps its first row's role."""
+    rows = entry.get("stages") if isinstance(entry, dict) else None
+    out = {}
+    for row in rows if isinstance(rows, list) else ():
+        if isinstance(row, dict) and isinstance(row.get("key"), str) and isinstance(row.get("role"), str):
+            out.setdefault(row["key"], row["role"])
+    return out
+
+
+def read_agent_limit(root):
+    """The repository's agent limit (TOOL-dBoundRoles-22 S5): the resolved value of
+    `runtime.agents-in-flight` in the repository at `root`, whatever its source, through
+    `read_policy_setting` with its catalogue default, or None where no policy kit answers. A refusal of
+    the reader raises its RolesError."""
+    value = read_policy_setting("runtime.agents-in-flight", root, with_default=True)
+    return None if value is None else int(value)
 
 
 def read_workflow_order(kit_dir):
@@ -929,9 +953,9 @@ def load_policy(kit_dir, roles, workflows, notes=None):
             if name not in by_name:
                 bad.append("%s: R12 — %s — names no workflow" % (where, key))
                 continue
-            held = by_name[name].get("stages")
-            if not isinstance(held, dict):
-                bad.append("%s: R12 — %s — the workflow %s has no stages table" % (where, key, name))
+            held = derive_stage_map(by_name[name])
+            if not held:
+                bad.append("%s: R12 — %s — the workflow %s has no stage rows" % (where, key, name))
                 continue
             for stage, level in levels.items():
                 check_level("%s.%s" % (key, stage), level)
@@ -1140,19 +1164,31 @@ def resolve_effort(policy, slot, model, root):
 
 
 def resolve_stage_efforts(policy, workflow, model, root):
-    """`{stage key: level}` for every key of a workflow entry's `stages` table, each the first of
-    (TOOL-dBoundRoles-21 S2, §4 "The order"): the policy key `roles.effort.<workflow>.<stage>`, read in
-    the repository at `root`; then the house file's `stages.<workflow>` entry in the level table
-    `model` takes, where no role key or blanket key is set; else the level `resolve_effort` gives the
-    slot the stage maps to."""
+    """`{stage key: level}` for every stage row of a workflow entry, in row order, each the first of
+    (TOOL-dBoundRoles-21 S2; TOOL-dBoundRoles-22 S3, §4 "The effort"): the policy keys
+    `roles.effort.<workflow>.<stage>`, `roles.effort.<role>` and `roles.effort.default`, read in the
+    repository at `root`; then the house file's level table `model` takes, where present, its
+    `stages.<workflow>` entry, else its `roles` entry, else its `default`; then the row's own `effort`;
+    then the role's declared `effort`, through `resolve_effort`."""
     name, out = workflow.get("name"), {}
-    table = None
-    for key, slot in (workflow.get("stages") or {}).items():
+    table = held = None   # the house table, resolved at the first stage no key gives a level
+    rows = {}
+    for row in workflow.get("stages") if isinstance(workflow.get("stages"), list) else ():
+        if isinstance(row, dict) and isinstance(row.get("key"), str):
+            rows.setdefault(row["key"], row)
+    for key, slot in derive_stage_map(workflow).items():
         level = read_policy_setting(f"roles.effort.{name}.{key}", root)
-        if level is None and read_policy_setting(f"roles.effort.{slot}", root) is None \
-                and read_policy_setting("roles.effort.default", root) is None:
-            table = table if table is not None else resolve_house_table(policy, model) or {}
-            level = table.get("stages", {}).get(name, {}).get(key)
+        if level is None:
+            level = read_policy_setting(f"roles.effort.{slot}", root)
+        if level is None:
+            level = read_policy_setting("roles.effort.default", root)
+        if level is None:
+            if not held:
+                table, held = resolve_house_table(policy, model), True
+            if table is not None:
+                level = table.get("stages", {}).get(name, {}).get(key) or table.get("roles", {}).get(slot, table["default"])
+        if level is None:
+            level = rows[key].get("effort")
         out[key] = level if level is not None else resolve_effort(policy, slot, model, root)
     return out
 
