@@ -22245,33 +22245,7 @@ memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-a
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	tools/workflows/unattended-build.template.js:2078
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	BUILD-METHOD M3
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	BUILD-METHOD M4
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/codebase-map/map_lib.py:149
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/hooks/format-guard.js:248
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/hooks/scratch-guard.js:1615
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/memory-tree/gen_build_index.py:2615-2626
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/runlog/runlog.py:210
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/unattended/gate-guard.js:173-177
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/unattended/kit.toml:12
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/unattended/stop-guard.js:113
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	unattended.sh:162
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	unattended.sh:318
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	unattended.sh:323
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	BUILD-METHOD M4
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	gate-guard.js:173-177
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	gen_build_index.py:1716
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	govkit.py:1170-1183
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	govkit.py:1177-1183
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	manifest-check.sh:414
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	policy.py:132
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	resolve-python.test.sh:168-184
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	skills/session-kickoff/manifest-check.sh:414
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	tools/check-spec-tokens.py:530
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	tools/lib/resolve_kit_dir.py:23
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	tools/runlog/selftest.py:355-356
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	tools/unattended/gate-guard.js:173-177
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	tools/unattended/unattended.sh:262
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	unattended.sh:13690-13760
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md	unattended.sh:228-265
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-57.md	BUILD-METHOD M6
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	BUILD-METHOD M3
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md	BUILD-METHOD M4
