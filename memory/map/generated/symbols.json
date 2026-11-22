@@ -13933,6 +13933,11 @@
       "file": "tools/playbook/writing_practice.py"
     },
     {
+      "id": "derive_seed_expected",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "derive_seed_prefix",
       "kind": "function",
       "file": "tools/gate-lint/legacy_ledger.py"
