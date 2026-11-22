@@ -26,7 +26,10 @@ over `--list` now runs the five new plants and whose floor rises by five, the `l
 leg, whose `plants=` token now reads 42, and both `New arm:` lines' RED-first observations: the
 `budget-omitted` plant's second row staged red by a copy of the engine whose `POINTER_LINES` lacks
 `budget`, and the `state-answers` case staged red by a `state` verb printing a line `budget_state`
-did not answer.
+did not answer. The `manifest-check self-test` row of the budgets file is not re-priced here: the
+spec prices only the `loop budget fixtures` row, and that row's own note asks for a re-price from
+the main loop's first reading of the leg alone, which now runs five more plants, the slowest read
+here, `budget-open`, at 58 s (DERIVED, that run).
 
 ## Decisions taken in the build
 
@@ -42,36 +45,28 @@ did not answer.
   never frozen.
 
 **Evidences:** KICK-dKeptSession-26
-- AC1 — `--plant budget-open` planted `budget=open 3/10` and the key K1 in the stub's file, appended
-  the READY body and read the ref's card: the line directly after `item —` in its `## pointers`
-  section read `budget — open 3/10`; `--plant budget-spent` read `budget — spent` and `--plant
-  budget-unfrozen` read `budget — unfrozen 1/4` there. Each row held and each plant exited 0
-  (DERIVED, those runs).
-- AC2 — `--plant budget-omitted` wrote the section with `--card --pointers`: `--card --check
-  --session t1` exited 0 on the card as written, its line after `item —` reading `budget — open
-  0/4`, the stub's default; with the `budget —` line cut it exited 1 and its output named `no 'budget
-  —' line`. Both rows held, exit 0 (DERIVED, that run).
-- AC3 — `--plant budget-no-kit` took the copied `budget.py` out of the scratch repository with `git
-  rm`, after which `resolve_kit_file loop budget.py` answered nothing; the published card's line after
-  `item —` read `budget — skipped: no loop kit`, and `--card --check` exited 0 on the session card
-  carrying it. Three rows held, exit 0 (DERIVED, that run).
-- AC4 — the same `budget-open` plant then ran `--card --boundary` once, planted K2 and `open 4/10`,
-  and ran it again: the second printed `boundary — K1 → K2` and the ref's card read `item — K2 · at
-  …` followed directly by `budget — open 4/10`. The row held; the plant took 58 s (DERIVED, that run).
-- AC5 — `grep -n "budget —" help/orientation-card.md` printed the example line `budget — open 3/10`,
-  and the bullet's line naming `budget — open <n>/<total>`, `budget — spent` and `budget — unfrozen
-  <n>/<total>` (DERIVED, that probe).
-- AC6 — `python tools/loop/budget.py --fixture --plant state-answers` printed `open 1/6`, `spent`
-  and `unfrozen 0/6`, each beside the same `budget_state` answer, then `loop: fixture · state-answers
-  · held`, exit 0, in 3.5 s (DERIVED, that run). Over this repository `state --build dKeptSession`
-  printed `open 11/132`, exit 0, in 0.7 s (DERIVED, that run), and `state` with no `--build` exited 2.
-- AC7 — `python tools/govkit/docs_leg.py --fingerprints` printed the row
-  `script:tools/loop/budget.py#state` with fingerprint `7be78ec8` and page `help/loop.md` (DERIVED,
-  that run, after the bullet carried its anchor).
-- AC8 — the probe `len(m.PLANTS)` printed `42` and `state-answers` is a key of it, and the grep of the
-  `loop budget fixtures` row printed `plants=42` (DERIVED, those probes). Its note gains the re-read
-  as PINNED proxy r 181.2 s, the 177.7 s already there plus the case's 3.5 s, and 1.5 r rounds up to
-  272 s, under the row's 498 s, which stands (DERIVED, from the case's reading).
-- `--list` prints 51 plants, five more than at the base (DERIVED, `--list` piped into `grep -c .`),
-  and `FLOOR_ASSERTIONS` rises from 422 to 427 (PINNED, one ok row per new plant from the suite's
-  loop).
+- AC1 — `bash card-store.fixture.sh --plant budget-open`, the stub answering `open 3/10`: the published card's `## pointers` section read `budget — open 3/10` on the line directly after `item —`; `budget-spent` read `budget — spent` and `budget-unfrozen` read `budget — unfrozen 1/4` there.
+  The plant planted the answer and the key K1 in the stub's file and appended the READY body before
+  reading the ref's card. Each row held and each plant exited 0 (DERIVED, those runs).
+- AC2 — the plant `budget-omitted`: `bash skills/session-kickoff/manifest-check.sh --card --check --session t1` exited 0 on the card as written and exited 1 naming `budget —` once that line was cut.
+  The plant wrote the section with the pointers verb first, its line after the item line reading
+  the stub's default answer, open 0/4. Both rows held, exit 0 (DERIVED, that run).
+- AC3 — the plant `budget-no-kit`: the line read `budget — skipped: no loop kit` and `--card --check` exited 0.
+  The plant took the copied module out of the scratch repository with a git rm first, after which
+  the fixture's resolver answered nothing for it, and that was a row too. Three rows held, exit 0
+  (DERIVED, that run).
+- AC4 — the plant `budget-open` then ran `--card --boundary` once, planted K2 and `open 4/10`, ran it again, and the ref's card read `budget — open 4/10` directly after its item line.
+  The second run printed the crossing from K1 to K2 and published under every-item. The row held;
+  the plant took 58 s (DERIVED, that run).
+- AC5 — `grep -n "budget —" help/orientation-card.md` printed the example line and the bullet's line naming `budget — open <n>/<total>`, `budget — spent` and `budget — unfrozen <n>/<total>`.
+  (DERIVED, that probe.)
+- AC6 — `python tools/loop/budget.py --fixture --plant state-answers` printed `open 1/6`, `spent` and `unfrozen 0/6`, each equal to `budget_state`'s, then `loop: fixture · state-answers · held`, exit 0.
+  It took 3.5 s (DERIVED, that run). Over this repository the verb printed open 11/132 for
+  dKeptSession, exit 0, in 0.7 s, and with no build flag it exited 2 (DERIVED, those runs).
+- AC7 — `python tools/govkit/docs_leg.py --fingerprints` printed the row `script:tools/loop/budget.py#state` with fingerprint `7be78ec8` and page `help/loop.md`.
+  (DERIVED, that run, after the bullet carried its anchor.)
+- AC8 — the probe of `PLANTS` printed `42` and `state-answers` is a key of it, and the grep of `tools/run-gates/selftest-budgets.txt` printed `plants=42`.
+  (DERIVED, those probes.) The row's note gains the re-read as PINNED proxy r 181.2 s, the 177.7 s
+  already there plus the case's 3.5 s (DERIVED, from the case's reading).
+  1.5 r rounds up to 272 s, under the row's 498 s, which stands (DERIVED, from the case's reading).
+- `--list` prints 51 plants, five more than at the base (DERIVED, `--list` piped into `grep -c .`), and `FLOOR_ASSERTIONS` rises from 422 to 427 (PINNED, one ok row per new plant from the suite's loop).
