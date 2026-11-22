@@ -232,3 +232,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T19:36:20Z draw · re-dispatch · KICK-dKeptSession-47 · 15/132 · 20261122T193620Z-032bca
 
 2026-11-22T19:36:20Z dispatch · item 0eaad14e KICK-dKeptSession-47 · reason tools/runlog/extract.py tools/runlog/README.md tools/runlog/fixtures/transcripts.json tools/runlog/selftest.py memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-47-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-22T19:54:27Z brief · item KICK-dKeptSession-48 · reason 4c9c677f0f81 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-48-build-brief.md
+
+2026-11-22T19:57:06Z dispatch · item 23e49663 KICK-dKeptSession-48 · reason tools/runlog/extract.py tools/runlog/README.md help/orientation-card.md tools/runlog/selftest.py memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-48-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
