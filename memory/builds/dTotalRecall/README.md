@@ -142,9 +142,9 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-20 — this build's own upgrade steps: the journal alias, the scaffold verbs forwarded to record, the front matter graded, and the retag](spec/2026-10-26-spec-TOOL-dTotalRecall-20.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-23 |
 | [TOOL-dTotalRecall-71 — unit 57's edge to unit 56 is certified at step 21 by a probe proven live on a copy without it, and unit 67's false reading is recorded](spec/2026-10-26-spec-TOOL-dTotalRecall-71.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-23 |
 | [TOOL-dTotalRecall-72 — unit 57's edge to unit 56 is read at step 21 by a probe no shell quotes, and written with its mirror before unit 57 builds if absent](spec/2026-10-26-spec-TOOL-dTotalRecall-72.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-23 |
-| [TOOL-dTotalRecall-17 — the map's losing test: the coherence and reuse lenses replayed with the map and without, before any map code is built](spec/2026-10-26-spec-TOOL-dTotalRecall-17.md) | 22 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [TOOL-dTotalRecall-81 — the guarded revision read: a pass commit resolved by the driver's rule, verified as a commit and read by `read_blobs_at`, refused when any step answers empty, first applied to unit 71's PASS67](spec/2026-10-26-spec-TOOL-dTotalRecall-81.md) | 22 | 2 | DEFERRED | rev-3 | 2026-10-26 |
-| [TOOL-dTotalRecall-82 — unit 71's `pass67` count is re-read at unit 67's verified pass commit, and the deviation record of unit 67 it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-82.md) | 22 | 2 | DEFERRED | rev-2 | 2026-10-26 |
+| [TOOL-dTotalRecall-17 — the map's losing test: the coherence and reuse lenses replayed with the map and without, before any map code is built](spec/2026-10-26-spec-TOOL-dTotalRecall-17.md) | 22 | 2 | DEFERRED | rev-3 | 2026-11-23 |
+| [TOOL-dTotalRecall-81 — the guarded revision read: a pass commit resolved by the driver's rule, verified as a commit and read by `read_blobs_at`, refused when any step answers empty, first applied to unit 71's PASS67](spec/2026-10-26-spec-TOOL-dTotalRecall-81.md) | 22 | 2 | DEFERRED | rev-4 | 2026-11-23 |
+| [TOOL-dTotalRecall-82 — unit 71's `pass67` count is re-read at unit 67's verified pass commit, and the deviation record of unit 67 it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-82.md) | 22 | 2 | DEFERRED | rev-3 | 2026-11-23 |
 | [TOOL-dTotalRecall-14 — the level-0 project map: its renderer and gov map, derived from the one index, held to its budget without losing a node](spec/2026-10-26-spec-TOOL-dTotalRecall-14.md) | 23 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-15 — the map's three-way completeness check and the map leg pack](spec/2026-10-26-spec-TOOL-dTotalRecall-15.md) | 24 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-26 — the atlas under `help/atlas/`: generated Markdown and Mermaid pages from the one index's node table, refused when stale](spec/2026-10-26-spec-TOOL-dTotalRecall-26.md) | 25 | 2 | DEFERRED | rev-3 | 2026-10-26 |
@@ -192,7 +192,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 532 bound to this build, across 4 record folder(s).
+Records: 542 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -298,13 +298,13 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-brief.md` and 222 more under prompts/ |
+| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-brief.md` and 228 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-22-build-TOOL-dTotalRecall-8-deviation-83.md`, `2026-11-22-build-TOOL-dTotalRecall-6-deviation-63.md` and 136 more under build/ |
 | red-fix | `2026-11-22-build-TOOL-dTotalRecall-6-red-fix-13.md`, `2026-11-22-build-TOOL-dTotalRecall-5-red-fix-9.md` and 12 more under build/ |
 | widen | `2026-11-22-build-TOOL-dTotalRecall-8-widen-1.md`, `2026-11-22-build-TOOL-dTotalRecall-7-widen-4.md` and 2 more under build/ |
-| research | `2026-11-22-build-TOOL-dTotalRecall-9-reground-return.md`, `2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md` and 94 more under build/ |
-| logs | `2026-11-22-build-TOOL-dTotalRecall-7-2-builder-return.md`, `2026-11-22-build-TOOL-dTotalRecall-7-2-acceptance-ledger.md` and 45 more under build/ |
+| research | `2026-11-22-build-TOOL-dTotalRecall-9-reground-return.md`, `2026-11-22-build-TOOL-dTotalRecall-82-reground-return.md` and 97 more under build/ |
+| logs | `2026-11-22-build-TOOL-dTotalRecall-7-2-builder-return.md`, `2026-11-22-build-TOOL-dTotalRecall-7-2-acceptance-ledger.md` and 46 more under build/ |
 | open asks | `BACKLOG.md`, 10 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->
