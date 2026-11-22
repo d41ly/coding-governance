@@ -709,9 +709,13 @@ and `command -v` end the command, which runs no script; a shell's `-c` and `env 
 scanned once, past any arguments its cluster takes. The same arm refuses a role agent's polling
 wait, read by `checkPollWait` over the same simple commands with the shell's reserved words (`do`,
 `then`, `if`, `while`, `until` and the rest) stepped for these rows alone: the background command's
-exit notification is the wait. A gate row refusing the same command wins. The role index is read at the checkout root of the payload `cwd`, else of
-`CLAUDE_PROJECT_DIR`; neither resolving adds no arm, with one witness line when
-`CLAUDE_PROJECT_DIR` is set. The rows:
+exit notification is the wait. A gate row refusing the same command wins.
+`checkRoleGate` reads the role index at the checkout root of three starts in turn: the payload `cwd`,
+`CLAUDE_PROJECT_DIR`, then the directory of each candidate's launched script resolved against the
+payload `cwd` (`TOOL-dBoundRoles-8`), so a gate run by absolute path from outside every checkout reads the
+index of the checkout holding the script. When none of the three resolves, `checkRoleGate` still
+refuses rows G2 and G3 with an empty allowlist, saying no checkout root was found; G1 and the
+polling rows are unarmed, and one witness line names the three starts. The rows:
 
 | Row | Matches | Admitted when |
 |---|---|---|
@@ -739,6 +743,15 @@ alias, a `sleep` under 5 s in a `for` loop, a `sleep` under a shorter `timeout` 
 duration), a file named like a follow option without `--`, or PowerShell's own wait cmdlets; they do
 not read `run_in_background`, so a backgrounded poll is refused too. It stops forgetting, not evasion, and the push-boundary bar
 is still the guarantee. The main loop, which carries no `agent_type`, is never refused.
+
+**What the field measurement found** (`TOOL-dBoundRoles-8`, gap-orient-09). A field count of typed
+gate runs the arm let through was a count of commands that only NAME a gate script: a suite path
+assigned to a variable and read with `sed`, a `grep -E` whose quoted alternation names the bar
+runner, a `sed` read of a suite file. The arm reads the quote-aware view (`buildCommandView`) and
+admits each, correctly; the counting predicate split segments inside quotes and read an assignment or
+an argument as a launched script. Replayed at their commits, the recorded commands of the surviving
+transcripts held no true gate run the arm admitted. The census instrument is the replay of the
+recorded commands through the exported `checkRoleGate` and `scanCommandHeads`, never a regex of its own.
 
 ## The authoring rule for kit files
 

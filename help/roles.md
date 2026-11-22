@@ -278,6 +278,9 @@ until an owner writes its first row.
 - A spec write from anything but the spec writer, and a product write from anything but the builder
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
 - A role agent running the bar, the self-test runner or any suite, beyond what its grant allows.
+  A gate run by its full path from a directory outside every checkout is judged by the index of the
+  checkout that holds the script. Where neither sits in a checkout, no grant can be read, so the bar
+  runners and the suites are refused there with or without `roles.json`.
 - A role agent's polling wait: a `tail` that follows a file, a `sleep` inside a `while`
   or `until` loop, or a `sleep` of 5 s or more.
 - In a session routed to a live build, a final message that leaves out the `agent` or `returned`

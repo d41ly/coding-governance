@@ -1,0 +1,15 @@
+# TOOL-dBoundRoles-8 deviation 81 — the builder's additions the spec did not state
+
+**Serves:** deviation TOOL-dBoundRoles-8
+
+- **Departs from:** `TOOL-dBoundRoles-8@rev-4` [S1, §4 The new step 3, §4 Files touched, §5]
+- **Hand-off:** spec-to-code
+- **Before:** S1 has `resolveRoleRoot` resolve each candidate's launched script against the payload `cwd`, without saying what a relative script with no payload `cwd` resolves against; §4's new step 3 mints a refusal line without saying which renderer composes it; §4 Files touched names no page under `help/` and §5 says no user docs are owed; the spec cites `tools/hooks/scratch-guard.js@0251d34d` as the blob at HEAD.
+- **After:** `tools/hooks/scratch-guard.js#resolveRoleRoot` takes a candidate's script as a start only where it can be resolved against the payload `cwd`, or is absolute: a relative script with no payload `cwd` is no start, never resolved against the hook's own working directory. The no-root refusal is `tools/hooks/scratch-guard.js#renderGateDeny` with no index (`shown` null), which says no checkout root was found from the payload cwd, `CLAUDE_PROJECT_DIR` or the script's directory and that the allowlist is empty, rather than a second renderer. `help/roles.md`'s refused-gate bullet says a gate run by full path from outside every checkout is judged by the index of the script's checkout, and that where neither sits in one the bar runners and the suites are refused with or without `roles.json`, which its "All of these switch on where `.claude/roles.json` exists" no longer covers alone. In `tools/hooks/scratch-guard.test.sh` the `O-AC3` rows S1 changes are re-expected: the relative runner run from a directory in no checkout is now refused naming G2, and the witness row runs a script no row names, expecting the new witness text. At base `6151b39f5` the hook is blob `392c63d5`, moved off `0251d34d` by earlier units of this build; `checkRoleGate`, its step 3, `resolveRoleRoot` and `scanCommandHeads` hold by symbol, and the convicted exit was re-observed at base (the AC1 and AC2 payloads returned null).
+- **Cause:** builder discovery
+- **Reason:** the payload `cwd` is where the command runs, so a relative script means nothing without it, and resolving it against the hook process would read a directory the agent never named; one renderer keeps the refusal's wording single-sourced with the rows it shares; the charter's `[docs]` rule owes the user page a sentence once a typed role's gate run outside a checkout is refused where no index exists; the re-expected rows are the fixture bytes S1 changes. No new function was named, so no lexicon ask was owed.
+- **Evidence:** the build brief `memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-8-build-brief.md` and `memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-8-1-acceptance-ledger.md`.
+- **Risk:** stricter
+- **Approver:** author, the gov-builder pass of the unattended run, under the build README's `author-recorded` value; reported by the `report` value
+- **Follow-through:** none
+- **Caused-by:** TOOL-dBoundRoles-8
