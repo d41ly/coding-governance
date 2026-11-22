@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-16 — `govkit update` reads every gov blob through one `cat-file --batch` handle
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -67,7 +67,7 @@ none
 
 ### Where the code was read
 
-Every citation is at `609cd40b1`, the tip of `branch/unattended-dwitnessedbar-2ed3b3`, by symbol or
+Every citation is at `59e882afd`, the tip of `branch/unattended-dwitnessedbar-2ed3b3`, by symbol or
 as `<path>@609cd40b1:<line>`. The brief's line numbers are main's; the tip moved them by about 85.
 
 ### The reads `update` makes today

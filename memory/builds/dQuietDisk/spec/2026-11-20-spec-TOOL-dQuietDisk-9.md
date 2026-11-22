@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-9 — every scratch path under one owned, swept root, and every tree removed by one chmod-and-retry helper
 
-**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 6 · closes TOOL-dQuietDisk-27
+**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base b3f5a2bc · streams tooling · order 6 · closes TOOL-dQuietDisk-27
 
 <!-- gen:spec-records -->
 
@@ -34,7 +34,7 @@ that scratch instead of the real temp root.
   it once, never raises, and returns whether the path is gone. `build_scratch_dir()` is a
   `contextlib.contextmanager` generator over `tempfile.mkdtemp()` whose exit calls `remove_tree`, so
   no `__enter__` or `__exit__` is defined, which the lexicon would grade as functions. `onexc` alone is used, because the
-  declared python floor is 3.15, the value `tools/lib/python-floor.txt` holds at `609cd40b1`.
+  declared python floor is 3.15, the value `tools/lib/python-floor.txt` holds at `59e882afd`.
   Observed by AC1.
 - **S2** — The block `owned_tempdir_py` defines `init_owned_tempdir()`. When the process's temp dir
   sits inside a `gate-work.*` directory holding an `owner` file, it sets `tempfile.tempdir` to that
@@ -123,7 +123,7 @@ that scratch instead of the real temp root.
 
 ### Where the code was read
 
-Code at `e4699ee75`, the build base: the merge that brought dWitnessedBar's land tip `ed833f684`
+Code at `b3f5a2bc3`, the build base: the merge that brought dWitnessedBar's land tip `fb6f1a74c`
 into this run, as the owner ruled on 2026-11-22. It holds both lines rev-1 read separately,
 dWitnessedBar's and main's with TOOL-dSweptScratch-1. A citation is by symbol or
 `<path>@e4699ee75:<line>`.
@@ -136,19 +136,19 @@ and `skills/`. The first two rows were run on 2026-11-20:
 
 | Tree | `rmtree` sites | `TemporaryDirectory` sites | Files | Of them, shipped by a kit |
 |---|---|---|---|---|
-| `609cd40b1` | 59 | 11 | 33 | 22 files, 40 sites [PINNED] |
-| HEAD `a5537b925` | 35 | 11 | 15 | 12 files, 26 sites [PINNED] |
-| base `e4699ee75` | 45 | 11 | 21 | 16 files, 34 sites [PINNED] |
+| `59e882afd` | 59 | 11 | 33 | 22 files, 40 sites [PINNED] |
+| HEAD `a2619a3f6` | 35 | 11 | 15 | 12 files, 26 sites [PINNED] |
+| base `b3f5a2bc3` | 45 | 11 | 21 | 16 files, 34 sites [PINNED] |
 
 The 11 `TemporaryDirectory` sites are all in `tools/govkit/upgrade_steps.py` (10) and
-`tools/govkit/selftest.py` (1). A line grep finds 57 and 12 at `609cd40b1`; the AST reads a call
+`tools/govkit/selftest.py` (1). A line grep finds 57 and 12 at `59e882afd`; the AST reads a call
 split across lines, which the grep misses. "Shipped" is `python tools/govkit/govkit.py shipped`, run at
-`a5537b925` for the first two rows and at `e4699ee75` for the third. The `e4699ee75` row was read on
+`a2619a3f6` for the first two rows and at `b3f5a2bc3` for the third. The `b3f5a2bc3` row was read on
 2026-11-22 over `tools/`, `skills/` and `.githooks/`, which holds none. The merge of dWitnessedBar's
-land tip added ten `rmtree` sites over `a5537b925`, among them
+land tip added ten `rmtree` sites over `a2619a3f6`, among them
 `tools/run-gates/verdict_flow.py`, `tools/run-gates/leg_factory.py` and
 `tools/run-gates/verdict_backends.py`. The hand-written hooks, `git grep -nE "onexc|onerror"` at
-`e4699ee75`, sit in 23 files [PINNED], among them `tools/memory-tree/deviation_join.py#remove_tree`,
+`b3f5a2bc3`, sit in 23 files [PINNED], among them `tools/memory-tree/deviation_join.py#remove_tree`,
 `tools/govkit/upgrade_walk.py#remove_tree`, `tools/govkit/step_gate.py` and
 `tools/lib/commit_trailers.py`. The builder re-runs the predicate at the pass's own base with
 `--cleanup --measure` and moves what it prints. figure: DERIVED at the pass's base; the table is
@@ -175,7 +175,7 @@ The Python liveness check is `os.kill(pid, 0)` on POSIX and `OpenProcess` with
 ### The two gaps of ask TOOL-dQuietDisk-27
 
 The owned-root block sits at `tools/run-gates/run-gates.sh@e4699ee75:2399-2465`, byte-identical to
-its body at `609cd40b1` and only moved. It sets `GATE_AMBIENT_TMP=${TMPDIR:-/tmp}`, makes `$WORK`
+its body at `59e882afd` and only moved. It sets `GATE_AMBIENT_TMP=${TMPDIR:-/tmp}`, makes `$WORK`
 there, sweeps `"$GATE_AMBIENT_TMP"/gate-work.*`, counts `"$GATE_AMBIENT_TMP"/*` into
 `TMPDIR_ENTRIES` and exports only `TMPDIR` (`:2465`). The incms session measured both gaps
 (`memory/builds/dQuietDisk/BACKLOG.md`, ask TOOL-dQuietDisk-27): `os.tmpdir()` in a native node
@@ -225,7 +225,7 @@ or a verdict. `GATE_AMBIENT_TMP` itself stays as that census classes it, assigne
 `tools/gate-legs.json` · `memory/guides/SESSION-KICKOFF.md` · `.githooks/pre-push.test.sh` ·
 `tools/run-gates/README.md`
 
-Plus every file the predicate and the hook grep name at the pass's base. At `e4699ee75` those are
+Plus every file the predicate and the hook grep name at the pass's base. At `b3f5a2bc3` those are
 42 files [PINNED]:
 
 `.githooks/pre_push_bar_selftest.py` · `tools/branch-reconcile/selftest.py` ·
@@ -411,7 +411,7 @@ none
   (`tools/govkit/upgrade_steps.py`) and TOOL-dQuietDisk-17 and -18 (`tools/govkit/selftest.py`)
   write, at orders 1 to 5. No unit depends on this one, so it runs after all of them and moves the
   sites they leave.
-- rev-2 · 2026-11-22 · closes TOOL-dQuietDisk-27 and re-grounded at e4699ee75 (dWitnessedBar's
+- rev-2 · 2026-11-22 · closes TOOL-dQuietDisk-27 and re-grounded at b3f5a2bc3 (dWitnessedBar's
   land tip merged), under `2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task`. Ask 27's two gaps
   join as S7 and S8, with AC10 to AC12: `TEMP` and `TMP` exported beside `TMPDIR` by both runners,
   and `GATE_OUTER_AMBIENT_TMP`, the outer runner's ambient root, read for the count and the sweep
@@ -419,7 +419,7 @@ none
   too, the same class. S4 states the three helpers the lifted block calls. What moved: the
   owned-root block to `run-gates.sh` lines 2399 to 2465, unchanged in body; the population to 45
   `rmtree` and 11 `TemporaryDirectory` sites in 21 files, and the hooks to 23 files [PINNED], so the file
-  list is re-derived; the registry exemption to line 253; the base to `e4699ee7`.
+  list is re-derived; the registry exemption to line 253; the base to `b3f5a2bc`.
 - rev-3 · 2026-11-22 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. The two names
   the lexicon refused lead with a declared verb, each checked by `--suggest`: `scratch_dir` is
   `build_scratch_dir`, a `contextlib.contextmanager` generator so that no dunder is graded, and
@@ -451,14 +451,14 @@ local hooks and stated in its §3 that a killed run's leak was out of its reach;
 reach. It also returned TOOL-aBranchedMandate-6, which measured the read-only-object mechanism, and
 TOOL-dQuietDisk-23, the other G-C clauses. The owning chain build is dWitnessedBar (Test: gate
 health); its branch changes `run-gates.sh` and `run-selftests.sh`, and no spec of it changes the
-owner record or the sweep, at `609cd40b1` or at `e4699ee75`: the block's body is byte-identical at
-both. The re-ground read `git log 609cd40b1..ed833f684` over both runners and
+owner record or the sweep, at `59e882afd` or at `b3f5a2bc3`: the block's body is byte-identical at
+both. The re-ground read `git log 59e882afd..fb6f1a74c` over both runners and
 `.githooks/pre-push.test.sh`, and the specs added since, units 106 to 110. Two overlaps are named
 for the merge. Three files the population moves are dWitnessedBar's own,
 `tools/run-gates/verdict_flow.py`, `tools/run-gates/leg_factory.py` and
 `tools/run-gates/verdict_backends.py`. The knob census S8 joins classes names from its units 5,
 8, 25, 40 and 56, and its units 63, 106 and 110 changed `.githooks/pre-push.test.sh` after
-`609cd40b1`; S8 adds one name and one reason line there. The incms side is TOOL-dQuietDisk-27's source: the incms
+`59e882afd`; S8 adds one name and one reason line there. The incms side is TOOL-dQuietDisk-27's source: the incms
 fix-4 session's notes in the shared notes folder, `fix4-incms-notes-for-gov.md`, ask for exactly
 these two changes, and its `scripts/gate.sh` records that it owes the export once gov names the
 variable.

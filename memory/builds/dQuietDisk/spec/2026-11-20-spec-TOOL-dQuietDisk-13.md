@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-13 — the run-gates suites build each repeated scratch repository once and copy it per arm
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -46,7 +46,7 @@ the same arms with the same RED and GREEN results.
 ## 3. Non-goals (OUT)
 
 - `tools/run-gates/run-gates.gov.test.sh`. It builds no fixture: it holds no `git init`, `mktemp -d`,
-  clone or worktree at `609cd40b1`, and grades gov's own corpus in place.
+  clone or worktree at `59e882afd`, and grades gov's own corpus in place.
 - `tools/run-gates/run-gates.runlog.test.sh`, which matches the `run-gates*.test.sh` glob and which
   the spec brief does not name. It has one `git init`.
 - The builders whose calls never repeat a content: `build_attr_fixture` (1 call),
@@ -65,7 +65,7 @@ the same arms with the same RED and GREEN results.
 
 ## 4. Design
 
-### Inventory at `609cd40b1`
+### Inventory at `59e882afd`
 
 | Builder | Calls | git today, per call | git after, per repeated call | Saved per run |
 |---|---|---|---|---|
@@ -157,7 +157,7 @@ one copied from a template, and compares, with the destination path replaced by 
   permission: a role pass may not run a `.test.sh` suite (`tools/unattended/gate-guard.js` row D4);
   the main loop observes this at VERIFYING.
   cost: three suites whose ceilings run to tens of minutes each.
-  figure: 509 is DERIVED from §4's call-site count at `609cd40b1`.
+  figure: 509 is DERIVED from §4's call-site count at `59e882afd`.
 
 ## 7. Gates
 
@@ -189,7 +189,7 @@ template's builder unchanged and its callers do not move.
 `python tools/codebase-map/reuse_lookup.py "build a scratch fixture repository once and clone it per test case"`
 ranked `build_fixture`, `build_target` and `build_scratch_gov` as seams, and none of these five.
 Chain owner: dWitnessedBar (Test). Its branch changes 256, 18 and 320 lines [PINNED] of the three suites
-between `9e21ac760` and `609cd40b1`, the verdict, held-leg and flake arms among them, so this unit
+between `9e21ac760` and `59e882afd`, the verdict, held-leg and flake arms among them, so this unit
 builds on its landed tip and re-counts §4's table there.
 
 Recall terms used: `python tools/memory-recall/query.py "how do the run-gates canary, turnstile and evidence suites build their scratch repositories" --terms "mk_repo rec_repo ru_repo build_hv_repo fresh_gitdir scratch repository template copy run-gates turnstile evidence canary"`

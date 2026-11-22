@@ -222,4 +222,4 @@ memory/builds/dSettledStage/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb
 memory/builds/dSkippedRecord/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 memory/builds/dSweptScratch/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 memory/builds/dTrackedAtlas/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
-memory/builds/dQuietDisk/README.md	bound	1	fd1269e00ecb4337c41a1701aaebaa8cc951a538	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-1
+memory/builds/dQuietDisk/README.md	bound	1	1ae661ab4f9565e39c66d7c658e3e11c981eb56e	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-1

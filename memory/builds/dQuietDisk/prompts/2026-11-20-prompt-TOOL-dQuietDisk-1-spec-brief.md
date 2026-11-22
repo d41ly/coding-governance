@@ -16,7 +16,7 @@ You author specs and write no product code. Read these in order before your firs
 
 ### Read the code at dWitnessedBar's tip, not at this branch
 
-Read every file named below at `609cd40b1` (`git show 609cd40b1:<path>`). That commit is the tip of
+Read every file named below at `59e882afd` (`git show 59e882afd:<path>`). That commit is the tip of
 `branch/unattended-dwitnessedbar-2ed3b3`.
 - dWitnessedBar is the dClosedLoop chain's Test build, still running, and it changes most of these files. The units
   are built on its landed tip, never on this branch's copy.
@@ -123,7 +123,7 @@ Concurrency: two bars finishing together lose no entry, by tmp-then-rename. Prun
 
 - Grades only units whose key moved since its last graded tip, through unit 1's store and reader.
 - Includes the reads it makes through `tools/unattended/lib-unattended.sh` (around line 1323 at main) and its own
-  loops (`check-pass-order.sh` around 475-531 and 599-630 at main; re-find them at `609cd40b1`).
+  loops (`check-pass-order.sh` around 475-531 and 599-630 at main; re-find them at `59e882afd`).
 - The analysis counts about 11.5k git processes per run; state the bound after the change.
 - `TOOL-aMeasuredDrag-1` already narrowed `--check-commit`, so read it first.
 

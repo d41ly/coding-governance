@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-15 — a kit self-test leg is held where gov's attestation matches the vendored bytes
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
+**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 59e882af · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

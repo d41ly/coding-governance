@@ -7,7 +7,7 @@ You build ONE unit from its spec. The spec is the contract. This brief adds only
 ## Where the build stands
 
 - **The build.** This is dQuietDisk's build run.
-  - Its base is the merge `e4699ee75`, which brought in dWitnessedBar's land tip `ed833f684`. The owner ruled on
+  - Its base is the merge `b3f5a2bc3`, which brought in dWitnessedBar's land tip `fb6f1a74c`. The owner ruled on
     2026-11-22 to build on it and to land only after dWitnessedBar lands:
     `memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-owner-build-on-land-branch.md`.
   - This unit is build order 1, beside TOOL-dQuietDisk-1, which is CLOSED. Nothing else is built. Commit directly in
@@ -16,7 +16,7 @@ You build ONE unit from its spec. The spec is the contract. This brief adds only
 - **Your commit.** Your pass commit ends with the charter's trailer,
   `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
 - **AC6's before reading is taken.** The main loop ran `govkit.py check` read-only against `C:/projects/incms/main`
-  and `C:/projects/nicocares/main` at `1abd1c969`. Both exited 0. Their outputs are in the session scratchpad as
+  and `C:/projects/nicocares/main` at `fc9da0196`. Both exited 0. Their outputs are in the session scratchpad as
   `u14-check-before-incms.txt` and `u14-check-before-nicocares.txt`. The main loop takes the after reading and
   compares the two.
 

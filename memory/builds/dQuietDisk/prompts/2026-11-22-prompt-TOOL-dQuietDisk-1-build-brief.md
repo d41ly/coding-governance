@@ -7,12 +7,12 @@ You build ONE unit from its spec. The spec is the contract. This brief adds only
 ## Where the build stands
 
 - **The build.** This is dQuietDisk's build run.
-  - Its base is the merge `e4699ee75`, which brought in dWitnessedBar's land tip `ed833f684`. The owner ruled on
+  - Its base is the merge `b3f5a2bc3`, which brought in dWitnessedBar's land tip `fb6f1a74c`. The owner ruled on
     2026-11-22 to build on it and to land only after dWitnessedBar lands:
     `memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-owner-build-on-land-branch.md`.
   - This unit is build order 1. Nothing is built yet. Unit 14 builds after you, in this same tree, so commit directly
     here.
-  - Your spec was re-grounded at `e4699ee75` (rev-2).
+  - Your spec was re-grounded at `b3f5a2bc3` (rev-2).
 - **Your commit.** Your pass commit ends with the charter's trailer,
   `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
 - **The other tasks.** A measurement task is running in a detached scratch clone. It touches nothing in this worktree.
@@ -77,10 +77,10 @@ You build ONE unit from its spec. The spec is the contract. This brief adds only
   Apply it with `git apply`, then bring it to rev-4: `read_info`'s oid from `git rev-parse --verify --quiet`, and
   `git_env_leaks_py` inline with `derive_git_env`. Re-run your probes.
 - **Do not run `--dispatch`.** Check 49 refuses every dQuietDisk dispatch until the `history-store selftest` leg exists
-  in `tools/gate-legs.json`, which only your commit creates. Stay inside the declared set (row `244f9949`). It
+  in `tools/gate-legs.json`, which only your commit creates. Stay inside the declared set (row `62c5c471`). It
   already holds the spec, `tools/govkit/registry.toml`, `tools/gate-legs.json` and the map's generated files.
 - **S12 and AC13 (the shell-role widen) are owed to the main loop.** Do not write `memory/project/shell-role.txt` or
   a widen record. Right after your commit, the main loop runs the pass legs. The portability leg reds on the three
   rows, and the main loop widens them as an inline red fix. Mark AC13 owed in the ledger.
-- **What your commit carries.** Spec rev-4 and TOOL-dQuietDisk-7 rev-3 are committed (`3be1a5528`). Your pass
+- **What your commit carries.** Spec rev-4 and TOOL-dQuietDisk-7 rev-3 are committed (`aaf1c4285`). Your pass
   commit carries the rev-4 spec's status flip to `CLOSED`, and nothing of TOOL-dQuietDisk-7.

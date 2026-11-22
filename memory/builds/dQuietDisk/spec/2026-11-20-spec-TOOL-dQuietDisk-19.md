@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-19 — the before and after measurements, with their instruments
 
-**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-1 · base e4699ee7 · streams tooling · order 7 · ratified 2026-11-20
+**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-1 · base b3f5a2bc · streams tooling · order 7 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -29,8 +29,8 @@ comparison derived from those readings.
 - **S1** — The instrument `qd-measure.sh`, the fenced block under §4 "The instrument", is carried
   byte for byte into the record. Every reading in the record is a row it printed. Observed by AC1.
 - **S2** — The B0 readings. Before the first unit pass, the main loop runs the instrument over
-  subjects M1, M2 (cold and warm) and M3 at the build base `e4699ee75`, the merge that brought
-  dWitnessedBar's land tip `ed833f684` in, where the owner's ruling of 2026-11-22 puts every before
+  subjects M1, M2 (cold and warm) and M3 at the build base `b3f5a2bc3`, the merge that brought
+  dWitnessedBar's land tip `fb6f1a74c` in, where the owner's ruling of 2026-11-22 puts every before
   reading. It commits the rows as the record's first version in a records commit carrying
   `Pass: none`. Observed by AC2 and AC3.
 - **S3** — The A readings. After every unit at orders 1 to 6 is terminal, TOOL-dQuietDisk-26,
@@ -63,7 +63,7 @@ comparison derived from those readings.
   Every reading runs in a detached scratch `git clone --shared` with its own `TEMP`.
 - Running nicocares' suite from gov. Its numbers are the nicocares session's (brief item 22).
 - A `--shard` reading of `tools/govkit/selftest.py`. The suite takes no shard flag at BASE, at
-  `609cd40b1` or at `e4699ee75` (`grep -c shard` prints 0 over each), so M3 is the whole leg.
+  `59e882afd` or at `b3f5a2bc3` (`grep -c shard` prints 0 over each), so M3 is the whole leg.
 - Commits the closing review folds in after A. They are not re-measured.
 
 ### Edges
@@ -83,11 +83,11 @@ comparison derived from those readings.
 
 ### Evidence
 
-Read at `e4699ee75`, the build base, unless a line names another sha. It is the merge that brought
-dWitnessedBar's land tip `ed833f684` into this run (owner ruling, 2026-11-22).
+Read at `b3f5a2bc3`, the build base, unless a line names another sha. It is the merge that brought
+dWitnessedBar's land tip `fb6f1a74c` into this run (owner ruling, 2026-11-22).
 
 - The builder role may run one gate, `lexicon naming predicates` (`.claude/roles.json@c6505c35c853`,
-  `roles.gov-builder.gates`), unchanged at `e4699ee75`. `tools/hooks/scratch-guard.js#checkGateSuite`
+  `roles.gov-builder.gates`), unchanged at `b3f5a2bc3`. `tools/hooks/scratch-guard.js#checkGateSuite`
   refuses a role agent any `*.test.sh` or `*selftest.py` script
   (`tools/hooks/scratch-guard.js@e4699ee75:1740`). So
   the unit pass cannot run M1 or M3. M6 refuses it M2, a leg outside its allowlist. The brief's
@@ -100,9 +100,9 @@ dWitnessedBar's land tip `ed833f684` into this run (owner ruling, 2026-11-22).
 - The pass-order leg reads the remote's advertised tip, and a clone with no remote reads "this
   clone declares no remote to observe" (`tools/unattended/lib-unattended.sh@e4699ee75:1513`).
   `read_history_range` then grades the whole history (`:1563-1572`), and the leg's summary line
-  ends `range whole (…)`. The same branch held at `609cd40b1` and at BASE, so removing `origin`
+  ends `range whole (…)`. The same branch held at `59e882afd` and at BASE, so removing `origin`
   from the clone fixes M2's mode at every sha.
-- The leg argvs at `e4699ee75` are `bash {prefix}/check-wiring.test.sh`
+- The leg argvs at `b3f5a2bc3` are `bash {prefix}/check-wiring.test.sh`
   (`tools/gate-legs.json@e4699ee75:752`), `bash {prefix}/unattended/check-pass-order.sh`
   (`:1770`) and `python {prefix}/govkit/selftest.py` (`:2515`). The pass-order script takes only
   `--preview` (`tools/unattended/check-pass-order.sh@e4699ee75:241`).
@@ -220,7 +220,7 @@ Its sections, in this order:
 | Section | Written by | Holds |
 |---|---|---|
 | `## Instrument` | B0 commit | `### The instrument` and the fence above, byte for byte, then the python version and the git version |
-| `## Shas` | B0, then A commit | one row per label: the sha, what it is, the date and time taken; the B0 row names `e4699ee75` |
+| `## Shas` | B0, then A commit | one row per label: the sha, what it is, the date and time taken; the B0 row names `b3f5a2bc3` |
 | `## Readings` | B0, then A commit | the header row, then the instrument's rows as printed, AC8's re-take included |
 | `## Switches set for A-off` | A commit | one row per key: the unit, the key, the value set, the subjects it governs |
 | `## Comparison` | unit pass | the table below |
@@ -380,7 +380,7 @@ print("probe done")
   figure: DERIVED from the record at observation time.
 - **AC3** — When the block below runs, it prints `B0 is the build base` and
   `A is one ancestor of HEAD`, and no `late` line.
-  Red when: B0 was taken at another sha than the build base `e4699ee75`, the A rows name two shas,
+  Red when: B0 was taken at another sha than the build base `b3f5a2bc3`, the A rows name two shas,
   or a commit of a unit at orders 1 to 6 lands after A, so A does not hold the work it is said to
   measure.
 
@@ -388,7 +388,7 @@ print("probe done")
   BASE=$(sed -n 's/^base:[[:space:]]*//p' memory/builds/dQuietDisk/RUN.md | head -1)
   B0=$(awk -F' [|] ' '/^[|] B0 [|]/ { print $2; exit }' "$REC")
   A=$(awk -F' [|] ' '/^[|] A-o(n|ff) [|]/ { print $2 }' "$REC" | sort -u)
-  if [ "$B0" = e4699ee75 ] && [ "$(git rev-parse "$B0^2")" = "$(git rev-parse ed833f684)" ]; then
+  if [ "$B0" = b3f5a2bc3 ] && [ "$(git rev-parse "$B0^2")" = "$(git rev-parse fb6f1a74c)" ]; then
     echo "B0 is the build base"; else echo "B0 is not the build base"; fi
   [ "$(printf '%s\n' "$A" | wc -l)" = 1 ] && git merge-base --is-ancestor "$A" HEAD \
     && echo "A is one ancestor of HEAD"
@@ -493,7 +493,7 @@ history legs grade this unit's pass and brief. No arm is added or moved.
 ## 8. Revision log
 
 - rev-1 · 2026-11-20 · initial draft from the build's spec brief
-  `2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief`, unit 19, with code read at `609cd40b1` and
+  `2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief`, unit 19, with code read at `59e882afd` and
   BASE. It diverges from the brief in one place: the after readings are the main loop's, because
   the builder role may not run a suite or a leg (§4 Evidence). It also adds A-off, so that the
   saving is read at one tree.
@@ -502,14 +502,14 @@ history legs grade this unit's pass and brief. No arm is added or moved.
   TOOL-dQuietDisk-26, so A waits for every unit at orders 1 to 4, and AC3's late set is those units.
   The nicocares section writes the `awaiting:` line. The Limits name unit 26's missing switch and
   units 17 and 9, which land after A.
-- rev-3 · 2026-11-22 · re-grounded at e4699ee75 (dWitnessedBar's land tip merged), under
+- rev-3 · 2026-11-22 · re-grounded at b3f5a2bc3 (dWitnessedBar's land tip merged), under
   `2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task`. The unit moves from order 5 to order 7,
   after TOOL-dQuietDisk-9 at order 6, so A waits for every unit at orders 1 to 6: S3 says so, the
   §3 bullet and the Limits line that left units 17 and 9 unmeasured are dropped, and AC3's late set
-  is every unit at those orders again, 1 to 18 and 26. B0 is taken at `e4699ee75`, the owner's
+  is every unit at those orders again, 1 to 18 and 26. B0 is taken at `b3f5a2bc3`, the owner's
   build base, and AC3 checks that sha rather than RUN.md's pinned BASE; the Shas row names it. A
   Limits line names unit 9's missing switch, as unit 26's is named. What moved: every §4 Evidence
-  citation is re-cited at `e4699ee75` (scratch-guard's suite test to 1740, the no-remote branch to
+  citation is re-cited at `b3f5a2bc3` (scratch-guard's suite test to 1740, the no-remote branch to
   1513 and the whole-history range to 1563-1572, the three leg argvs to 752, 1770 and 2515, the
   record-surface line to 767); the builder's gate, the budget row and the shard count did not.
 - rev-4 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
@@ -522,7 +522,7 @@ No existing seam fits. `python tools/codebase-map/reuse_lookup.py "count git pro
 returned name-token neighbours only: `run`, `git`, `run_git` and `scan_processes`. None counts
 trace2 files or temp entries. `tools/run-gates/profile_bar.py` is the nearest instrument in the
 tree, and it times a whole bar (§4 Alternatives rejected). No file under `tools/`, `skills/` or
-`.githooks/` sets `GIT_TRACE2_EVENT` (`git grep -l` at `e4699ee75`). The analysis's §2 readings used
+`.githooks/` sets `GIT_TRACE2_EVENT` (`git grep -l` at `b3f5a2bc3`). The analysis's §2 readings used
 the same three instruments, but its script lived only in that session's scratch. So this record
 carries its instrument itself, and the area is dWitnessedBar's (Test: gate health and budgets).
 

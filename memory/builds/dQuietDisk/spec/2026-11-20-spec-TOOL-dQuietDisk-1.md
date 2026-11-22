@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-1 — one store of immutable history verdicts, keyed by the ids each one reads, with one `cat-file --batch` reader
 
-**Status:** CLOSED · rev-4 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-11-22 · node d · Tier-2 · base b3f5a2bc · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -116,7 +116,7 @@ reads and by the grading code's own bytes, with a last graded tip per leg. The s
   writes the next widen record of this build under `memory/builds/dQuietDisk/build/`, then each
   row `widened:<record stem>` (`tools/memory-tree/ratchet.py@e4699ee75:33`); no row is
   hand-edited. The record's one-line Reason states two figures apart for each key. The first is
-  the lines this unit adds. The second is the base excess the merge `e4699ee75` already carried,
+  the lines this unit adds. The second is the base excess the merge `b3f5a2bc3` already carried,
   none for the new file: the pass's reading gave 1557 lines against the row's 1420 for
   `tools/lib/resolve-python.test.sh`, and 1331 against 1319 for `tools/unattended/lib-unattended.sh`
   (`2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-2-task`). The base excess comes from
@@ -154,8 +154,8 @@ reads and by the grading code's own bytes, with a last graded tip per leg. The s
 
 ### Where the code was read
 
-Every citation is at `e4699ee75`, the build base: the merge that brought dWitnessedBar's land tip
-`ed833f684` into this run, as the owner ruled on 2026-11-22. A citation is written
+Every citation is at `b3f5a2bc3`, the build base: the merge that brought dWitnessedBar's land tip
+`fb6f1a74c` into this run, as the owner ruled on 2026-11-22. A citation is written
 `<path>@e4699ee75:<line>` or by symbol.
 
 ### The seams this extends
@@ -413,13 +413,13 @@ none
 
 - rev-1 · 2026-11-20 · initial draft. Order 1, as briefed: the write set is disjoint from
   TOOL-dQuietDisk-14's, the other order-1 unit, and units 2 to 4 consume it at order 2.
-- rev-2 · 2026-11-22 · re-grounded at e4699ee75 (dWitnessedBar's land tip merged), under
+- rev-2 · 2026-11-22 · re-grounded at b3f5a2bc3 (dWitnessedBar's land tip merged), under
   `2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task`. What moved: every `run-gates.sh` citation
   (the `head $RG_HEAD` line to 3553, the cache home to 3651, its writer to 5988 and 6029), the
-  registry's `{prefix}/lib` exemption to line 253, and the base to `e4699ee7`. S4 names the
+  registry's `{prefix}/lib` exemption to line 253, and the base to `b3f5a2bc`. S4 names the
   `mkstemp` staging the reuse cache's writer uses. S11 and AC12 add the leg's ceiling and its
   budget row, which `tools/run-gates/selftest-budgets.txt` demands of every held leg and which
-  rev-1 missed. No dWitnessedBar unit built after `609cd40b1` holds a history store or a batch
+  rev-1 missed. No dWitnessedBar unit built after `59e882afd` holds a history store or a batch
   reader (section 10), so the design is otherwise unchanged.
 - rev-3 · 2026-11-22 · the three divergences the first build pass handed back, under
   `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. (a) Every minted name the lexicon refused
@@ -438,7 +438,7 @@ none
   `portability (shell lines only shrink)` and `ratchet (never gains)`, which grade the ledger S12
   widens. (2) S12 keeps the bash face and widens its three shell-role rows through
   `ratchet.py widen shell-role`. The record states this unit's added lines and the base excess
-  `e4699ee75` carried as separate figures, and Files touched gains the ledger and the record. (3) The
+  `b3f5a2bc3` carried as separate figures, and Files touched gains the ledger and the record. (3) The
   reader's protocol spells the one-shot oid as `git rev-parse --verify --quiet <name>`, never
   `cat-file -t`, and says why neither `^{object}` nor `--batch-check` is used. (4) A new §4
   subsection states that the module carries `git_env_leaks_py` inline and starts every git child,
@@ -450,8 +450,8 @@ none
 The seams extended: the reuse cache's home and write rule (`tools/run-gates/run-gates.sh`, the
 `REUSE_CACHE` block, TOOL-aSparedSpawn-13), the batch protocol of `upgrade_steps.py#blob_at`, and
 the copy rule of `PARITY_ROWS` with `tools/lib/legacy_ledger.py` as its whole-module precedent.
-`tools/lib/` holds no `cat-file` reader at the base: `git grep -n "cat-file" e4699ee75 -- tools/lib/`
-prints nothing. The three files `tools/lib/` gained since `609cd40b1` are `gov-feed.sh`,
+`tools/lib/` holds no `cat-file` reader at the base: `git grep -n "cat-file" b3f5a2bc3 -- tools/lib/`
+prints nothing. The three files `tools/lib/` gained since `59e882afd` are `gov-feed.sh`,
 `gov-ref.sh` and `home_graded.py`; none is a store or a reader. The existing readers are `upgrade_steps.py#derive_introduced`'s held process,
 `tools/drift-audit/drift_report.py`'s, and the one-shot batches of `routed_commits.py` and
 `tools/lexicon/lexicon.py`. The brief's "already hold coprocesses" is stale for the last two: each
@@ -467,8 +467,8 @@ Recall returned TOOL-dUnstuckLanding-7 and -17, the RANGE-mode history legs, TOO
 the routed-commits leg outgrowing its ceiling with no push base, and TOOL-dScopedBuild-14's reuse
 scout naming the deviation join's policy read. Owning chain builds: dWitnessedBar (Test: gate
 health, the reuse cache) and dScopedBuild (Build: the history-derived exit base), whose legs this
-store serves. No dWitnessedBar spec defines a history store, at `609cd40b1` or at `e4699ee75`.
-The re-ground read `git log 609cd40b1..ed833f684` over `tools/lib/`, `run-gates.sh`,
+store serves. No dWitnessedBar spec defines a history store, at `59e882afd` or at `b3f5a2bc3`.
+The re-ground read `git log 59e882afd..fb6f1a74c` over `tools/lib/`, `run-gates.sh`,
 `verdict_flow.py`, `lib-unattended.sh` and `routed_commits.py`, and the five dWitnessedBar specs
 added since, units 106 to 110. `verdict_flow.py` holds the flake ledger, the quarantine and the
 red routing, and none of it keys a verdict by the ids a history item reads. The only file that

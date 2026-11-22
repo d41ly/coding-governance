@@ -4,7 +4,7 @@
 
 You write specs only, in `memory/builds/dQuietDisk/spec/`. You do not commit. Read the build's spec brief,
 `memory/builds/dQuietDisk/prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md`, whole first. Its rules bind
-this task: read code at `609cd40b1`, cite as `<path>@609cd40b1:<line>`, verdicts unchanged, the saving counted, the
+this task: read code at `59e882afd`, cite as `<path>@609cd40b1:<line>`, verdicts unchanged, the saving counted, the
 cache a switch, safe fallback, and no unattended-kit suite.
 
 ## 1. Mark the resolved forks in place
@@ -34,7 +34,7 @@ Tier 2, order 4, chain area dWitnessedBar (Test).
 `check-attr`, 400 `config` and 186 `ls-tree` among the suite's 3,786 git processes: see
 `memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md` §2.
 
-Read `check-wiring.sh` at `609cd40b1`. dWitnessedBar changed it, and units 26 and 27 there touched it.
+Read `check-wiring.sh` at `59e882afd`. dWitnessedBar changed it, and units 26 and 27 there touched it.
 
 The change:
 - One `git ls-files -s`, and one batched `git check-attr --stdin` where attributes are read, per invocation.

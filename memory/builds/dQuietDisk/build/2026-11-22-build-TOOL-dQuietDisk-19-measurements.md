@@ -59,16 +59,16 @@ Python 3.15.2 · git 2.54.0.windows.1, on node d.
 
 | label | sha | what it is | taken (UTC) |
 |---|---|---|---|
-| B0 | e4699ee75 | the build base: the merge whose second parent is dWitnessedBar's land tip ed833f684 | M1, M2 2026-11-21 22:57 to 23:41; M3 2026-11-21 23:54 to 2026-11-22 01:12 |
+| B0 | b3f5a2bc3 | the build base: the merge whose second parent is dWitnessedBar's land tip fb6f1a74c | M1, M2 2026-11-21 22:57 to 23:41; M3 2026-11-21 23:54 to 2026-11-22 01:12 |
 
 ## Readings
 
 | label | sha | subject | run | rc | wall ms | git processes | peak temp | residual temp | top git subcommands | last line |
 |---|---|---|---|---|---|---|---|---|---|---|
-| B0 | e4699ee75 | M1 | 1 | 1 | 350276 | 3772 | 378 | 0 | ls-files 1679, rev-parse 507, check-attr 421, config 398, ls-tree 186 | ---- 247 passed, 8 failed ---- |
-| B0 | e4699ee75 | M2 | 1 | 0 | 1057875 | 9319 | 2 | 0 | show 4252, rev-parse 1599, ls-tree 1535, grep 1533, rev-list 165 | pass-order: graded 1709 closed unit(s) · 84 build(s) skipped by the 2026-09-01 cutoff · 50 build(s) graded with no run-state file · 176 unit(s) unbuilt-in-range · 0 pre-anchor violation(s) · 6 wa |
-| B0 | e4699ee75 | M2 | 2 | 0 | 1045021 | 9319 | 2 | 0 | show 4252, rev-parse 1599, ls-tree 1535, grep 1533, rev-list 165 | pass-order: graded 1709 closed unit(s) · 84 build(s) skipped by the 2026-09-01 cutoff · 50 build(s) graded with no run-state file · 176 unit(s) unbuilt-in-range · 0 pre-anchor violation(s) · 6 wa |
-| B0 | e4699ee75 | M3 | 1 | 1 | 4479811 | 63711 | 73788 | 3526 | ls-files 24462, show 11558, rev-parse 5853, config 5408, cat-file 3282 | govkit-selftest: 96 FAILED — [aRF-1 AC9] the same trailer under [answers] is still refused, [aRF-42 rev-3 AC9] --answers kit.<entry>.<key> agrees with target_context on every overlay and fallback, [ |
+| B0 | b3f5a2bc3 | M1 | 1 | 1 | 350276 | 3772 | 378 | 0 | ls-files 1679, rev-parse 507, check-attr 421, config 398, ls-tree 186 | ---- 247 passed, 8 failed ---- |
+| B0 | b3f5a2bc3 | M2 | 1 | 0 | 1057875 | 9319 | 2 | 0 | show 4252, rev-parse 1599, ls-tree 1535, grep 1533, rev-list 165 | pass-order: graded 1709 closed unit(s) · 84 build(s) skipped by the 2026-09-01 cutoff · 50 build(s) graded with no run-state file · 176 unit(s) unbuilt-in-range · 0 pre-anchor violation(s) · 6 wa |
+| B0 | b3f5a2bc3 | M2 | 2 | 0 | 1045021 | 9319 | 2 | 0 | show 4252, rev-parse 1599, ls-tree 1535, grep 1533, rev-list 165 | pass-order: graded 1709 closed unit(s) · 84 build(s) skipped by the 2026-09-01 cutoff · 50 build(s) graded with no run-state file · 176 unit(s) unbuilt-in-range · 0 pre-anchor violation(s) · 6 wa |
+| B0 | b3f5a2bc3 | M3 | 1 | 1 | 4479811 | 63711 | 73788 | 3526 | ls-files 24462, show 11558, rev-parse 5853, config 5408, cat-file 3282 | govkit-selftest: 96 FAILED — [aRF-1 AC9] the same trailer under [answers] is still refused, [aRF-42 rev-3 AC9] --answers kit.<entry>.<key> agrees with target_context on every overlay and fallback, [ |
 
 ## Limits
 

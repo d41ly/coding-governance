@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-17 — `govkit update` skips a kit's verify check when nothing moved since its baseline
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 5 · ratified 2026-11-20
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 5 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -64,7 +64,7 @@ none
 
 ### The two runs today
 
-All citations are read at `609cd40b1`.
+All citations are read at `59e882afd`.
 
 `run_kit_check` is the one runner of a kit's `[check]` (`tools/govkit/govkit.py#run_kit_check`). Its
 docstring says `update` calls it twice per touched kit. The baseline loop runs it over

@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-6 — the manifest check's pickaxe diffs only the commits whose stamp moved
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -63,7 +63,7 @@ only over the commits whose stamp moved. C5's answer, its exit and its message a
 
 ### C5 today
 
-All citations are read at `609cd40b1`.
+All citations are read at `59e882afd`.
 
 When `W`, the newest watch-touching commit since the stamp, exists, C5 runs
 `git log --format=%H -G'^last-audit:' "$LA_SHA..HEAD"` with no pathspec
@@ -90,7 +90,7 @@ because the pickaxe runs without a pathspec over the very commits it ran over be
 
 Today's pickaxe diffs every non-merge commit of the range. After, it diffs only the commits whose
 stamp moved, which on a branch with one re-stamp is one or two. On dWitnessedBar's tip the stamp's
-range holds 302 commits, DERIVED by `git rev-list --count <LA>..609cd40b1` on 2026-11-20 and
+range holds 302 commits, DERIVED by `git rev-list --count <LA>..59e882afd` on 2026-11-20 and
 re-derived by AC2. The git process count stays about the same, four calls against one plus two per
 tried candidate, so the saving is diff work and wall time, which AC2 counts.
 
@@ -130,7 +130,7 @@ The pass's probes run over a hermetic fixture repository the probe builds under
 `%TEMP%/<short-name>`, in the shape `skills/session-kickoff/manifest-check.test.sh#write_manifest`
 and `#restamp` build one, read and never run: a manifest with a `watch:` line and a `last-audit:`
 stamp, a watched file, and a range of at least 300 commits [PINNED] past the stamp. "Old" is the check at
-`609cd40b1` and "new" the unit's, each run there by path. A reading over the real tree is the gate's
+`59e882afd` and "new" the unit's, each run there by path. A reading over the real tree is the gate's
 own population, which a role agent may not run (scratch-guard row G1), so each such reading below is
 owed to the main loop at the close.
 
@@ -138,7 +138,7 @@ owed to the main loop at the close.
   moved before the stamp, one whose range holds 300 commits [PINNED] with one re-stamp, and one whose watched
   file moved after the stamp, each pair prints the same lines and exits the same. When the main loop
   runs the same pairs of `bash skills/session-kickoff/manifest-check.sh` in scratch
-  `git clone --shared` copies of the real tree at the build's base and at `609cd40b1`, with its
+  `git clone --shared` copies of the real tree at the build's base and at `59e882afd`, with its
   302-commit range, each pair prints the same there too.
   Red when: `S` differs on any tip, so C5 passes where the old check fails or the reverse.
   permission: the real-tree pairs are owed to the main loop; the pass makes the fixture pairs.
@@ -146,7 +146,7 @@ owed to the main loop at the close.
 - **AC2** — When both run under `GIT_TRACE2_EVENT=<dir>` over the fixture's 300-commit tip, the new
   run's one pickaxe `log` event carries `--no-walk=unsorted` and at most the stamp-moving commits,
   and the two runs' wall times are printed side by side. The main loop takes the same pair at
-  `609cd40b1` at the close.
+  `59e882afd` at the close.
   Red when: the pathspec-free pickaxe still walks the whole range on the success path.
   figure: the range size is DERIVED by `git rev-list --count` at observation.
   permission: the real-tree pair is owed to the main loop.

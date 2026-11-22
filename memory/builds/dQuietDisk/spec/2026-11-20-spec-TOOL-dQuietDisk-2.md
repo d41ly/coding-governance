@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-2 — the pass-order leg grades only units whose key moved since its last graded tip
 
-**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base 6749bfa8 · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base 69c9c5cb · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -19,7 +19,7 @@
 
 `tools/unattended/check-pass-order.sh` regrades every CLOSED unit of every build on every bar, with
 one or more git processes per question. TOOL-dQuietDisk-19's before-reading of the leg counts
-9,319 git processes and 1,058 s for one run at `e4699ee75` [PINNED, that record's M2 row,
+9,319 git processes and 1,058 s for one run at `b3f5a2bc3` [PINNED, that record's M2 row,
 2026-11-21]. This unit grades a unit only when its stored verdict is absent or its key moved,
 through the history verdict store TOOL-dQuietDisk-1 built. A warm run then costs a bounded, stated
 number of git processes that does not grow with the unit count. Every rc, summary line and
@@ -85,15 +85,15 @@ violation line stays byte-identical.
   read misses, and the leg grades every unit as today.
 - **hands-off** `TOOL-dQuietDisk-19` — the warm-run bound this spec promises, which that unit's M2
   after-reading of the pass-order leg is held to
-- **consumes-from** external — dWitnessedBar's land tip `ed833f684`, merged into this run at
-  `e4699ee75`. It carries TOOL-dWitnessedBar-2's unwitnessed-pass arm, whose two per-build reads
+- **consumes-from** external — dWitnessedBar's land tip `fb6f1a74c`, merged into this run at
+  `b3f5a2bc3`. It carries TOOL-dWitnessedBar-2's unwitnessed-pass arm, whose two per-build reads
   S5 stores.
 
 ## 4. Design
 
 ### The leg at the base
 
-All citations are read at `6749bfa8d`, where the leg's blob is `199f4ae905c8` and the library's is
+All citations are read at `69c9c5cb8`, where the leg's blob is `199f4ae905c8` and the library's is
 `a1a50756567e`. The four inputs below had already landed when this re-ground was taken.
 
 The leg builds the `_SUBJ` subject cache from one `read_attribution_tokens HEAD` call and checks
@@ -119,7 +119,7 @@ A unit with a build commit then costs a `rev-parse` of the parent, a `git grep`,
 `rev-parse --short` per sha it names (`:656`, `:712`, `:717`).
 
 At the real tree the walk reaches 140 builds past the cutoff: 90 with a run-state file and 50
-without. They hold 1,711 CLOSED rows [PINNED, counted at `cda37e7e6` on 2026-11-22].
+without. They hold 1,711 CLOSED rows [PINNED, counted at `fa1295ff4` on 2026-11-22].
 
 ### The store as built
 
@@ -148,7 +148,7 @@ The leg passes four code paths: `check-pass-order.sh`, `lib-unattended.sh`, the 
 `unattended.sh`, which `plan_state` is sliced from, and `commit_trailers.py`, the token and
 `unchecked` reader. The leg runs from its repository root, so a path inside it is named relative and
 every worktree shares the items. About 9% of commits change one of the four: 29 of the 308
-first-parent commits of the 30 days to 2026-11-22 [PINNED, counted at `cda37e7e6`]. Each such
+first-parent commits of the 30 days to 2026-11-22 [PINNED, counted at `fa1295ff4`]. Each such
 commit starts every unit cold.
 
 ### The items
@@ -184,8 +184,8 @@ to candidates is filled from the same token stream `_SUBJ` reads, with no second
 - **The walk order.** git pops the newest commit in its queue. Where dates never run backwards along
   ancestry, the walk lists commits in committer-date order, ties broken by queue entry. Two
   candidates with different timestamps are therefore listed in the same order in every history that
-  holds both. At `cda37e7e6`, no parent edge runs backwards and 15 share a second.
-  Of the 10,930 commits read, 0 edges run backwards [PINNED, measured 2026-11-22 at `cda37e7e6`].
+  holds both. At `fa1295ff4`, no parent edge runs backwards and 15 share a second.
+  Of the 10,930 commits read, 0 edges run backwards [PINNED, measured 2026-11-22 at `fa1295ff4`].
   S4 keeps the tie case out of the store. A history whose dates run backwards is the residual S8
   names.
 - **The spec at the build commit.** The spec found and its state are read at the build commit's first
@@ -241,7 +241,7 @@ remote observation's 6 and the RANGE list's 1.
 
 A tip moved by one commit adds three things. The `rev-list --parents` adds 1, the write adds 8, and
 the `unchecked` read adds 1 for each build range the unwitnessed arm grades, B on the summary line.
-The promise there is **at most 50 plus B**, PINNED and observed by AC4. B is 0 at `cda37e7e6`
+The promise there is **at most 50 plus B**, PINNED and observed by AC4. B is 0 at `fa1295ff4`
 [PINNED, 2026-11-22]. The cold counts are DERIVED at observation.
 
 ### Inventory
@@ -316,7 +316,7 @@ CLOSED units: one built conformingly, one built before its folder existed, and o
 truncates. One pass commit names a `tA` unit with no `Commit-Checked:` trailer. The large F also
 holds ten more builds of two or three units each.
 
-"Old" is the leg at `6749bfa8d`, run by path from a `git clone --shared` of this repository checked
+"Old" is the leg at `69c9c5cb8`, run by path from a `git clone --shared` of this repository checked
 out there under `%TEMP%`. "New" is the unit's leg, run by path from the build worktree. Both run
 with F as the working directory, and their stdout and stderr are compared together. A reading over
 the real tree is the gate's own population, which a role agent may not run (scratch-guard row G1).
@@ -454,8 +454,8 @@ sha, which is `memory/gotchas/test-oracle-read-from-a-historical-sha.md`'s class
   warm bound PINNED as the promise its `figure:` line already makes. Design, scope and acceptance
   unchanged.
 - rev-4 · 2026-11-22 · §1 §2 §3 §4 §5 §6 §7 §8 §10 · S1 to S8 · AC1 to AC11 · re-grounded at
-  6749bfa8d (order 1 built), under `2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task`. Every code
-  fact is re-cited by blob or symbol at `6749bfa8d`. These moved:
+  69c9c5cb8 (order 1 built), under `2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task`. Every code
+  fact is re-cited by blob or symbol at `69c9c5cb8`. These moved:
   - TOOL-dWitnessedBar-2's unwitnessed-pass arm landed in the build walk, with a `merge-base` and an
     `unchecked` read per build, so S5 stores both.
   - The store as built spawns 8 git processes per verb where the policy kit resolves, where rev-3
@@ -469,7 +469,7 @@ sha, which is `memory/gotchas/test-oracle-read-from-a-historical-sha.md`'s class
     are F2 to F4.
   - The goal is unchanged, and acceptance grew for two reasons. The spec brief's adopter clause,
     which rev-3 lacked, is AC10. The design's new fallbacks and pins are observed by AC5 to AC9.
-  - The fixture's base leg is now the copy at `6749bfa8d`.
+  - The fixture's base leg is now the copy at `69c9c5cb8`.
 
 ## 10. Reuse audit
 
@@ -484,7 +484,7 @@ The chain build owning the area is dWitnessedBar (Test: gate health), whose land
 this file. dScopedBuild (Build: the history-derived exit base) shares the range rule, and
 TOOL-dUnstuckLanding-17's RANGE mode becomes key input. No dWitnessedBar unit made this leg
 incremental. Of its specs, only units 2, 16, 27 and 54 name this file. Its non-merge commits in
-`git log 609cd40b1..ed833f684` touch the file only for unit 2 and two kit-version mints.
+`git log 59e882afd..fb6f1a74c` touch the file only for unit 2 and two kit-version mints.
 
 `python tools/codebase-map/reuse_lookup.py "reuse a stored per-unit verdict keyed by the commits it reads in a history leg"`
 returned name-token neighbours only (`read_text`, `key`, `read`, `leg`, `legs`). No existing seam fits

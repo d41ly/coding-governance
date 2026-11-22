@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-7 — one suite template cache: each base repository built once, keyed by its inputs, and cloned per case
 
-**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -113,7 +113,7 @@ read-only checkout. The unit proves the bash face on `tools/check-line-length.te
 
 ### Where the code was read
 
-Every citation is at `609cd40b1`, the tip of `branch/unattended-dwitnessedbar-2ed3b3`, by symbol or
+Every citation is at `59e882afd`, the tip of `branch/unattended-dwitnessedbar-2ed3b3`, by symbol or
 as `<path>@609cd40b1:<line>`.
 
 ### The seams today
@@ -326,6 +326,6 @@ seam clones a template.
 Recall returned TOOL-aSparedSpawn-9, which built `NEWREPO_SEED` once and copied it per call, and
 TOOL-aQuenchedHarness-5, the harness's own spec, whose per-arm copy this unit replaces with a clone.
 The owning chain build is dWitnessedBar (Test: gate health and budgets); no spec of it at
-`609cd40b1` changes `lib-selftest.sh` or `fixture_target.py`.
+`59e882afd` changes `lib-selftest.sh` or `fixture_target.py`.
 
 Recall terms used: fixture template snapshot build_fixture lib-selftest build_target fixture_target newrepo seed clone shared

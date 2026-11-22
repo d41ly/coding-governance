@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-11 — govkit's scratch targets come from the template cache, so `selftest.py` builds each distinct target once
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -15,7 +15,7 @@
 
 ## 1. Goal
 
-`tools/govkit/selftest.py` calls `build_target` 97 times at `609cd40b1`, and each call spends 8 git
+`tools/govkit/selftest.py` calls `build_target` 97 times at `59e882afd`, and each call spends 8 git
 processes on a repository 66 of those calls already built once with the same content. This unit
 points `build_target` and `build_scratch_gov` at TOOL-dQuietDisk-7's python face, so each distinct
 target is built once per runner invocation and copied per call, with every arm's verdict unchanged.
@@ -47,7 +47,7 @@ target is built once per runner invocation and copied per call, with every arm's
 
 ## 3. Non-goals (OUT)
 
-- The 60 inline `"init"` sites of `selftest.py` at `609cd40b1`, spread over about forty local helpers
+- The 60 inline `"init"` sites of `selftest.py` at `59e882afd`, spread over about forty local helpers
   that each build a distinct base (`build_rename_target`, `hook_target`, `runner_target` and the
   rest). A template used once costs what the inline build costs.
 - The clone of gov at `tools/govkit/selftest.py@609cd40b1:5867` and the upgrade walk's gov clone:
@@ -99,7 +99,7 @@ Every copy of one template holds the same commit, so two targets built from one 
 sha where today two builds in different seconds do not. No arm can rely on the difference today:
 two builds in the same second already share a sha. AC5's full run is the observation.
 
-### The saving, derived from the code at `609cd40b1`
+### The saving, derived from the code at `59e882afd`
 
 An AST walk of `selftest.py` finds 97 `build_target` calls over 31 distinct `(deploy, files)`
 argument expressions, so 66 calls [DERIVED] repeat a key. Three of those name the loop variable `deploy`,
@@ -173,7 +173,7 @@ order 4, measures a `selftest.py` shard, so it reads this unit's output and must
   permission: a role pass may not run the deployer's suite (`tools/unattended/gate-guard.js` row D4);
   the main loop observes this at VERIFYING.
   cost: two full runs of the deployer's suite.
-  figure: 504 is DERIVED from §4's static walk at `609cd40b1`.
+  figure: 504 is DERIVED from §4's static walk at `59e882afd`.
 
 ## 7. Gates
 
@@ -213,6 +213,6 @@ ranked `build_target` and `build_scratch_gov` in `tools/govkit/fixture_target.py
 factory per kind (S12), and this unit keeps that contract: each call still returns a repository
 holding the same files, refs and config at the destination it names. dWitnessedBar's
 branch changes 512 lines [PINNED] of `selftest.py` and none of `fixture_target.py` between `9e21ac760` and
-`609cd40b1`, so this unit builds on its tip.
+`59e882afd`, so this unit builds on its tip.
 
 Recall terms used: `python tools/memory-recall/query.py "how does govkit selftest build its scratch target repositories" --terms "build_target build_scratch_gov fixture_target scratch target template copy clone selftest govkit run_git"`

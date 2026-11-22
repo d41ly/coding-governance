@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-14 — the kit attestation: gov's green held run of a kit's self-tests, recorded by content and carried in the adopter's receipt
 
-**Status:** CLOSED · rev-3 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-11-22 · node d · Tier-2 · base b3f5a2bc · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -88,8 +88,8 @@ an adopter's leg whose vendored bytes match it. Nothing in an adopter's bar chan
 
 ### Where the code was read
 
-Every citation is at `e4699ee75`, the build base: the merge that brought dWitnessedBar's land tip
-`ed833f684` into this run, as the owner ruled on 2026-11-22. A citation is by symbol or
+Every citation is at `b3f5a2bc3`, the build base: the merge that brought dWitnessedBar's land tip
+`fb6f1a74c` into this run, as the owner ruled on 2026-11-22. A citation is by symbol or
 `<path>@e4699ee75:<line>`.
 
 ### Which hash both ends can compute
@@ -253,13 +253,13 @@ none
   `tools/govkit/govkit.py` and was briefed at order 1, so it moved to order 4 rather than this unit,
   because TOOL-dQuietDisk-15 consumes this one at order 2. TOOL-dQuietDisk-17 (order 2) and
   TOOL-dQuietDisk-18 (order 3) write the same file after it.
-- rev-2 · 2026-11-22 · re-grounded at e4699ee75 (dWitnessedBar's land tip merged), under
+- rev-2 · 2026-11-22 · re-grounded at b3f5a2bc3 (dWitnessedBar's land tip merged), under
   `2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task`. What moved: the runner's row hash now leaves
   out `DECLARATIVE_LEG_KEYS` (TOOL-dWitnessedBar-51 S48), so S2 and derivation step 3 read that
   tuple from `tools/run-gates/held_halves.py` rather than hashing the whole row, and AC8 observes
   it. Citations moved: the held-tier writer to 5955, the `changed` selection's leg loop to 3345,
   the row hash to 3086, `EPOCH_ROLES` to 14048, and `check-receipt.py`'s read to
-  `derive_source_rows`; the base is `e4699ee7`. The record's shape, `sha` and `row`, did not move.
+  `derive_source_rows`; the base is `b3f5a2bc`. The record's shape, `sha` and `row`, did not move.
 - rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. The
   four symbol citations naming the bare basename `govkit.py`, one in section 4 and three in
   section 10, now name `tools/govkit/govkit.py`. No figure was unpinned and no build-method
@@ -276,7 +276,7 @@ declarative keys (`tools/run-gates/held_halves.py@e4699ee75:68`), the epoch surv
 `tools/govkit/govkit.py#read_requires_at`, and the receipt's one writer
 `tools/govkit/govkit.py#write_install_receipt`, which `apply`, `update` and `adopt` already share.
 No existing seam records an attestation: the receipt has no such key, and
-`git grep -n -i "attest" e4699ee75 -- tools/govkit/ tools/run-gates/` prints nothing.
+`git grep -n -i "attest" b3f5a2bc3 -- tools/govkit/ tools/run-gates/` prints nothing.
 
 `python tools/codebase-map/reuse_lookup.py "record that a kit tree passed its self-tests and carry it to adopters"`
 ranked `tree`, `resolve_kit_dir`, `records` and `remove_tree`, name-token neighbours of which none
@@ -287,7 +287,7 @@ build is dWitnessedBar (Test: held legs), and dSafePassage (Supersession) for th
 dSafePassage's CLOSED units 5, 10 and 25 to 27 define the walk, the steps and the one blob reader;
 none defines a receipt key this contradicts.
 
-The re-ground at `e4699ee75` read `git log 609cd40b1..ed833f684` over `tools/govkit/govkit.py`,
+The re-ground at `b3f5a2bc3` read `git log 59e882afd..fb6f1a74c` over `tools/govkit/govkit.py`,
 `tools/run-gates/run-gates.sh`, `tools/run-gates/held_halves.py` and `tools/run-gates/check-receipt.py`,
 and the dWitnessedBar specs added since, units 106 to 110. No unit there writes a self-test
 attestation, a held-leg record beyond `sha` and `row`, or a kit tree hash. Two overlaps are named

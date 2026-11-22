@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-10 — `check-wiring.test.sh` takes its scratch repositories from the template cache
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3 · ratified 2026-11-20
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 3 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -31,7 +31,7 @@ processes for the same 255 arms with the same RED and GREEN results.
 - **S2** — A second template, `newrepo-wired`: the same builder followed by
   `git config core.hooksPath .githooks`. `newrepo wired` copies it. The ten sites that spell
   `newrepo; git config core.hooksPath .githooks` call `newrepo wired` instead (lines 404, 1343,
-  1348, 1841, 1935, 1958, 2013, 2220, 2306 and 2366 at `609cd40b1`). The site at line 398, which
+  1348, 1841, 1935, 1958, 2013, 2220, 2306 and 2366 at `59e882afd`). The site at line 398, which
   writes `./.githooks`, and the site at line 2290, which writes an out-of-tree path, keep their own
   `git config`. Observed by AC1 and AC2.
 - **S3** — Each template's key is unit 7's kit tree hash plus a discriminator naming this suite, the
@@ -52,12 +52,12 @@ processes for the same 255 arms with the same RED and GREEN results.
 - `tools/check-wiring.sh` itself. Of the 3,786 git processes the analysis measured in one run, 1,679
   are `ls-files` (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`,
   §2). Those come from the checker re-listing the tree on each of its 133 invocations
-  (`chk`/`chke`, counted at `609cd40b1`), not from fixtures. TOOL-dQuietDisk-26 carries that one
+  (`chk`/`chke`, counted at `59e882afd`), not from fixtures. TOOL-dQuietDisk-26 carries that one
   listing per invocation, at order 4, after this unit has moved the suite (F1).
 - A read-only checkout shared by reading arms. The suite's header names an auto-fix mode
   (`tools/check-wiring.test.sh@609cd40b1:2`), so which arms write is a per-arm question. Every
   `newrepo` arm keeps its own copy.
-- The single-use fixtures (lines 410, 1448-1478, 1718 and 2267 at `609cd40b1`). A template built
+- The single-use fixtures (lines 410, 1448-1478, 1718 and 2267 at `59e882afd`). A template built
   once and used once costs what the inline build costs.
 - The owned, swept scratch root for `newrepo`'s `mktemp -d`: TOOL-dQuietDisk-9.
 - The factory itself, its switch and how its bash face ships: TOOL-dQuietDisk-7.
@@ -103,7 +103,7 @@ on node d):
 A clone spends one more process for one fewer entry and adds remote state the remote and
 `core.sshCommand` arms read. A worktree detaches `HEAD`. The copy face is kept.
 
-### The saving, derived from the code at `609cd40b1`
+### The saving, derived from the code at `59e882afd`
 
 | Source | Before | After |
 |---|---|---|
@@ -176,7 +176,7 @@ checker's own per-check listing, is TOOL-dQuietDisk-26's, so this bound counts f
   process count falls by at least 7 and the residual temp entries are 0 both times.
   Red when: the count does not fall, or an entry remains after the run.
   permission: as AC6.
-  figure: the bound 7 is DERIVED from §4's static count at `609cd40b1`; the measured counts are
+  figure: the bound 7 is DERIVED from §4's static count at `59e882afd`; the measured counts are
   TOOL-dQuietDisk-19's record.
   fixture: the adopter half is a scratch target that `python tools/govkit/govkit.py apply` installs
   the check-wiring kit into, where the main loop runs the shipped suite; `tools/govkit/fixtures/`
@@ -227,7 +227,7 @@ The seam is TOOL-dQuietDisk-7's template factory, which generalises `tools/lib/l
 ranked `build_fixture` (`tools/lib/lib-selftest.sh`), `build_target` and `build_scratch_gov`
 (`tools/govkit/fixture_target.py`) as seams; no candidate is a per-arm copy face, so this unit uses
 the factory's template path and keeps the suite's copy. Chain owner: dWitnessedBar (Test, gate health
-and budgets). Its branch changes 20 lines [PINNED] of this suite between `9e21ac760` and `609cd40b1`, an
+and budgets). Its branch changes 20 lines [PINNED] of this suite between `9e21ac760` and `59e882afd`, an
 inline `refuse_wrong_shell` block and one dependency list, and no fixture line, so this unit builds on
 its tip copy and nothing overlaps.
 

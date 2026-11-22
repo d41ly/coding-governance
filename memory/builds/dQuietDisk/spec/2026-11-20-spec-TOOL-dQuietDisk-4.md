@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-4 — routed-commits reads only the commits its store does not already hold
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -72,7 +72,7 @@ every line it prints stay byte-identical, the deviation join's lines included.
 
 ### The read today
 
-All citations are read at `609cd40b1`.
+All citations are read at `59e882afd`.
 
 `check_routed_commits` (`tools/memory-tree/routed_commits.py#check_routed_commits`) loops over one or
 two populations and calls `read_routed_commits` for each
@@ -165,14 +165,14 @@ The pass's probes run over a hermetic fixture repository the probe builds under
 `#set_fixture_conf`, called by import and never through the module's `--selftest`: one
 `git fast-import` of the history, a `.memory-tree.conf` naming `ROUTED_PATHS`, a spec tree,
 the trailer key table, and at least 600 commits [PINNED], so the cold path crosses S5's bound. "Old" is the
-module at `609cd40b1` and "new" the unit's, each imported or run there by path. A reading over the
+module at `59e882afd` and "new" the unit's, each imported or run there by path. A reading over the
 real tree is the gate's own population, which a role agent may not run (scratch-guard row G1), so
 each such reading below is owed to the main loop at the close.
 
 - **AC1** — When the old leg and the new leg run over the fixture, the store cold and then warm, and
   again with `GATE_PUSH_BASE` set to a commit 20 behind HEAD, all outputs and exit codes are
   byte-identical, the deviation join's lines included. When the main loop runs the same comparison,
-  `python tools/memory-tree/routed_commits.py` at `609cd40b1` against the new leg, over one scratch
+  `python tools/memory-tree/routed_commits.py` at `59e882afd` against the new leg, over one scratch
   `git clone --shared` of the real tree at the build's base, they are byte-identical there too.
   Red when: a record assembled from the store differs from the logged one, or the order moves.
   cost: about 30 minutes per cold run over the real tree, measured 1,761 s [PINNED] by the analysis.
@@ -237,7 +237,7 @@ history legs (`memory/builds/aMeasuredDrag/build/2026-11-15-build-TOOL-aMeasured
 row legs-1 and the routing note under it). Where the brief says to key each commit's verdict, this
 spec keys its record, for the reason section 3 gives. The chain build owning the area is dWitnessedBar
 (Test: gate health), with dScopedBuild (Build: the history-derived exit base); dWitnessedBar changes
-this file by 3 lines [PINNED] at `609cd40b1`.
+this file by 3 lines [PINNED] at `59e882afd`.
 
 `python tools/codebase-map/reuse_lookup.py "cache parsed commit log records by commit id across runs"`
 returned name-token neighbours only (`run`, `parse`, `parse_args`, `records`). No existing seam fits

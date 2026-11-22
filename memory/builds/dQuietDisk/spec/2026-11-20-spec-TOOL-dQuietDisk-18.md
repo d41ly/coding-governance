@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-18 — `govkit apply` reads both of its verdict maps through the target's reuse cache
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -237,12 +237,12 @@ these inputs" per leg, and `read_policy_value` in `tools/govkit/govkit.py` for t
 `python tools/codebase-map/reuse_lookup.py "read recorded leg verdicts from the reuse cache instead of running the target bar"`
 ranked name-token neighbours, `read_policy_value` among them and no cache reader, so govkit reads no
 cache file itself and asks the target's runner through the knob it already honours. No existing
-policy key covers apply's baseline: the catalogue's six `install.` rows at `609cd40b1` are
+policy key covers apply's baseline: the catalogue's six `install.` rows at `59e882afd` are
 `install.from`, `install.guards`, `install.deprecation-window`, `install.on-shim-call`,
 `install.retired-edits` and `install.steps`, and none is about the baseline. Chain
 owners: dSafePassage (Supersession, govkit apply), whose CLOSED specs 5, 10 and 25 to 27 do not touch
 `read_gate_verdicts`, and dWitnessedBar (Test), whose branch changes 277 lines [PINNED] of `govkit.py` between
-`9e21ac760` and `609cd40b1` and no line of the BASELINE or AFTER blocks; its unit 16 names "baseline"
+`9e21ac760` and `59e882afd` and no line of the BASELINE or AFTER blocks; its unit 16 names "baseline"
 only for the map's own registries. The recall probe surfaced DEPL-dSettledRoster-2, named in §3.
 
 Recall terms used: `python tools/memory-recall/query.py "how does govkit apply compare the target bar before and after the install, and can it reuse cached verdicts" --terms "govkit apply baseline read_gate_verdicts before_map after_map GATE_REUSE reuse cache gate-cache observed_reused input key"`

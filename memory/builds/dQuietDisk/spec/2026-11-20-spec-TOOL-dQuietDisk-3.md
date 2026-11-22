@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-3 — the brief-recorded leg grades only units whose key moved since its last graded tip
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -72,7 +72,7 @@ byte-identical.
 
 ### The leg today
 
-All citations are read at `609cd40b1`.
+All citations are read at `59e882afd`.
 
 The leg builds `_SUBJ` once (`tools/unattended/check-brief-recorded.sh@609cd40b1:477`) and reads the
 history range once (`tools/unattended/check-brief-recorded.sh@609cd40b1:503`). It walks every build
@@ -154,21 +154,21 @@ The pass's probes run over a hermetic fixture repository the probe builds under
 `%TEMP%/<short-name>`, in the shape `tools/unattended/check-brief-recorded.test.sh#mkfixture` builds
 one, read and never run: the leg, the libraries it sources and its conf copied in, two build
 folders with a pinned `base:`, one finished and one live, four CLOSED units with their brief rows,
-and commits whose subjects name them. "Old" is the leg's copy at `609cd40b1` and "new" the unit's,
+and commits whose subjects name them. "Old" is the leg's copy at `59e882afd` and "new" the unit's,
 each run there by path. Running either over the fixture is a probe of this unit's code. A reading
 over the real tree is the gate's own population, which a role agent may not run (scratch-guard row
 G1), so each such reading below is owed to the main loop at the close.
 
 - **AC1** — When the old leg and the new leg each run over the fixture, with the store cold and then
   warm, the three outputs and exit codes are byte-identical. When the main loop runs the same
-  comparison, `bash tools/unattended/check-brief-recorded.sh` at `609cd40b1` against the new leg,
+  comparison, `bash tools/unattended/check-brief-recorded.sh` at `59e882afd` against the new leg,
   over one scratch `git clone --shared` of the real tree at the build's base, cold then warm, the
   three are byte-identical there too.
   Red when: a stored outcome prints differently or a counter moves.
   cost: about 7 minutes per cold run over the real tree, measured 404 s [PINNED] by the analysis.
   permission: the real-tree corpus is owed to the main loop; the pass makes the fixture comparison.
   fixture: the real-tree clone under `%TEMP%` with its own `TEMP`; the old leg runs from a worktree
-  at `609cd40b1`.
+  at `59e882afd`.
 - **AC2** — When the fixture gains, on a throwaway branch past the stored tip, one build with a
   pinned `base:`, one CLOSED unit and one `git commit` naming it with no brief row in its run-state
   file, both legs exit 1 with the same violation line, and the store shows only that unit written.

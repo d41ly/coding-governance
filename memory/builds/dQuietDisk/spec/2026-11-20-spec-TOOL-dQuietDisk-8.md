@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-8 — the whole-tree readers clone without copying objects and check out only what they read
 
-**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2 · ratified 2026-11-20
+**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 2 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -19,7 +19,7 @@
 
 Six readers each make their own full copy of the repository during a bar: a clone, often with every
 object copied, and a checkout of all 14,156 tracked files, of which 13,206 sit under
-`memory/builds/` (both DERIVED by `git ls-tree -r --name-only 609cd40b1` on 2026-11-20). This unit
+`memory/builds/` (both DERIVED by `git ls-tree -r --name-only 59e882afd` on 2026-11-20). This unit
 makes each reader clone with `--shared`, so no object is copied or hardlinked, and check out only the
 paths it reads where that is proven not to move its output. A reader that cannot share is named with
 its reason and left as today. Every reader's verdict and output stay what they were.
@@ -79,7 +79,7 @@ its reason and left as today. Every reader's verdict and output stay what they w
 
 ### The readers today
 
-All citations are read at `609cd40b1`. The object store measured 167 MB in 92 files, PINNED, on
+All citations are read at `59e882afd`. The object store measured 167 MB in 92 files, PINNED, on
 2026-11-20 by `du` and `find` over this clone's common `objects/`.
 
 | Reader | Clone today | Checkout | Mutates its copy | After |

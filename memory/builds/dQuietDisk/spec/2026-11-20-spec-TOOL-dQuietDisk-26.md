@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-26 — `check-wiring.sh` lists the tree once per invocation
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -86,7 +86,7 @@ byte-identical, and the saving is counted on one run over the real tree and on t
 
 ### The reads today
 
-All citations are read at `609cd40b1`. The predicate below, an awk that names the enclosing function
+All citations are read at `59e882afd`. The predicate below, an awk that names the enclosing function
 of every `git … ls-files`, `ls-tree` and `check-attr` spawn outside comments and `echo` strings,
 was run over the file and found fourteen spawn sites in nine functions.
 
@@ -104,7 +104,7 @@ was run over the file and found fourteen spawn sites in nine functions.
 | `check_skill_install` | `ls-files --error-unmatch -- skills/session-kickoff/SKILL.md` | `tools/check-wiring.sh@609cd40b1:1972` | 1 |
 
 Measured on 2026-11-20, PINNED: `bash tools/check-wiring.sh --check` in a scratch
-`git clone --shared` at `609cd40b1` with `core.hooksPath=.githooks`, under `GIT_TRACE2_EVENT`,
+`git clone --shared` at `59e882afd` with `core.hooksPath=.githooks`, under `GIT_TRACE2_EVENT`,
 spent 44 git processes, of them 14 `ls-files`, 4 `ls-tree` and 3 `check-attr`, rc 1, 6.4 s. The four
 `check_routed` calls are this repository's four `ROUTED_PATHS` entries.
 
@@ -145,7 +145,7 @@ in C quotes. A per-site pathspec matches the raw name and prints the quoted line
 `check_routed`'s directory test passes for a directory whose only tracked file is `docs/é.md`. A
 string prefix test over the quoted line would not. Rather than unquote in bash, a listing holding
 any quoted line is unusable and every site makes today's call. Gov's tree holds no quoted path:
-`git ls-tree -r --name-only 609cd40b1 | grep -c '^"'` printed 0 on 2026-11-20, DERIVED. An
+`git ls-tree -r --name-only 59e882afd | grep -c '^"'` printed 0 on 2026-11-20, DERIVED. An
 adopter tree that holds one keeps today's cost and today's answers.
 
 ### Case
@@ -217,7 +217,7 @@ path is the same in both runs.
   `ls-files`, one `ls-tree` and one `check-attr` `cmd_name` event, and its file count is at least 18
   below the old one.
   Red when: any per-site listing call survives, or the batched attribute read runs twice.
-  figure: the old counts were PINNED on 2026-11-20 at `609cd40b1` as 44, 14, 4 and 3; both runs are
+  figure: the old counts were PINNED on 2026-11-20 at `59e882afd` as 44, 14, 4 and 3; both runs are
   DERIVED at observation.
 - **AC2** — When old and new each run `--check` and `--session` in the clone, with `core.hooksPath`
   unset and then set, and `--fix` in a clone re-made at the same path before each run, every pair's
@@ -285,7 +285,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-20 · initial draft, from the spec task
-  `2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task`, with code read at `609cd40b1`.
+  `2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task`, with code read at `59e882afd`.
 - rev-2 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
   5 and section 6 the listing's shell-string size is marked DERIVED from the path count, and the suite
   cost from the analysis PINNED. Design, scope and acceptance unchanged.

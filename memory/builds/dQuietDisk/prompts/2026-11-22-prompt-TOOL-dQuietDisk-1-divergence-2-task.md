@@ -23,7 +23,7 @@ Write the rulings into the specs.
      dWitnessedBar's units 58 and 60 did with `ratchet.py widen shell-role`.
    - Add both paths to Files touched.
    - The widen record states two figures separately: the lines this unit adds, and the base excess the merge
-     `e4699ee75` already carried. Today that is 1420 against 1557 for `resolve-python.test.sh` and 1319 against 1331
+     `b3f5a2bc3` already carried. Today that is 1420 against 1557 for `resolve-python.test.sh` and 1319 against 1331
      for `lib-unattended.sh`.
    - The base excess is inherited from dWitnessedBar's land tip. It is reconciled when the run re-merges main after
      dWitnessedBar's landing: the row is re-measured there and the record amended.

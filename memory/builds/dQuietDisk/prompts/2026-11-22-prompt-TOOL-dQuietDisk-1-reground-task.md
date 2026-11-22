@@ -10,11 +10,11 @@ You write specs only, in `memory/builds/dQuietDisk/spec/`. Do not commit. Read t
 
 ## The new base
 
-The run branch now holds the merge `e4699ee75`. It brings in dWitnessedBar's land tip `ed833f684`: its units built at
+The run branch now holds the merge `b3f5a2bc3`. It brings in dWitnessedBar's land tip `fb6f1a74c`: its units built at
 orders 23 to the end, its closing-review promotions up to TOOL-dWitnessedBar-110, its red fixes, and its prepared
-merge `f1af151e9` onto origin/main `c2a407b03`.
+merge `685a7a522` onto origin/main `c2a407b03`.
 
-Every spec was written against `609cd40b1`. Read the code each spec cites as it stands at `e4699ee75`, which is
+Every spec was written against `59e882afd`. Read the code each spec cites as it stands at `b3f5a2bc3`, which is
 `HEAD`. The worktree is checked out there, so read files directly.
 
 ## 1. Re-ground TOOL-dQuietDisk-1 and TOOL-dQuietDisk-14 (order 1)
@@ -23,12 +23,12 @@ For each of the two specs:
 
 - **Re-check every code fact.** Re-check each cited path, line, symbol, argv and behaviour at `HEAD`. Where a fact
   moved, re-cite it as `<path>@e4699ee75:<line>` or by symbol, and change the design to match.
-- **Look for work dWitnessedBar already did.** Check whether a dWitnessedBar unit after `609cd40b1` already did part
-  of this unit's work. Grep its specs and `git log 609cd40b1..ed833f684 -- <files>`.
+- **Look for work dWitnessedBar already did.** Check whether a dWitnessedBar unit after `59e882afd` already did part
+  of this unit's work. Grep its specs and `git log 59e882afd..fb6f1a74c -- <files>`.
   - Unit 1: a store or cache of history verdicts, a `cat-file --batch` helper in `tools/lib/`, or `verdict_flow.py`.
   - Unit 14: a self-test attestation, a held-leg record or a kit tree hash.
   - Where one did, extend it and say so in §10. Never write a parallel store.
-- **Record the re-ground.** Bump the rev and add a revision-log line: `re-grounded at e4699ee75 (dWitnessedBar's land
+- **Record the re-ground.** Bump the rev and add a revision-log line: `re-grounded at b3f5a2bc3 (dWitnessedBar's land
   tip merged), <what moved>`. Write `nothing moved` where nothing did.
 
 ## 2. TOOL-dQuietDisk-9 absorbs ask TOOL-dQuietDisk-27
@@ -57,7 +57,7 @@ Add `closes TOOL-dQuietDisk-27` to unit 9's status header, and put both gaps in 
 Change its `order 5` to `order 7`, after unit 9 at order 6. Then:
 - drop the limit that says units 17 and 9 are not measured;
 - restore AC3's late-commit check over every order below 7;
-- re-ground it at `HEAD` as section 1 describes. Its B0 readings are being taken at `e4699ee75` right now, so its
+- re-ground it at `HEAD` as section 1 describes. Its B0 readings are being taken at `b3f5a2bc3` right now, so its
   Shas section's B0 row is that commit.
 
 Bump the rev and add a revision-log line.

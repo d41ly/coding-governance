@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-5 — one `git diff --name-only BASE` decides every plain-guarded leg of a bar
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -65,14 +65,14 @@ the same as today.
 
 ### The guard pass today
 
-All citations are read at `609cd40b1`.
+All citations are read at `59e882afd`.
 
 `changed` returns true under `GATE_FULL` or an empty `BASE`, and otherwise runs
 `! git diff --quiet "$BASE" -- "$@"` (`tools/run-gates/run-gates.sh@609cd40b1:598`). A git error
 reads as changed, so the leg runs. The guard pass calls it once per guarded leg that no hold, docs
 skip or earlier decision took (`tools/run-gates/run-gates.sh@609cd40b1:3431`), in a serial loop.
 Under the default bar of this repository, 8 of the 73 guarded legs reach it; under
-`GATE_SELFTESTS=1`, all 73 do. Both counts are DERIVED from `tools/gate-legs.json` at `609cd40b1` and
+`GATE_SELFTESTS=1`, all 73 do. Both counts are DERIVED from `tools/gate-legs.json` at `59e882afd` and
 re-derived by AC3.
 
 The held-selection program runs `diff --name-only --no-renames <sha>` once per distinct recorded sha
@@ -137,7 +137,7 @@ touch, so a guard the in-process rule cannot answer is still answered by git.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a probe runs, in a scratch `git clone --shared` at `609cd40b1`, both today's
+- **AC1** — When a probe runs, in a scratch `git clone --shared` at `59e882afd`, both today's
   `git diff --quiet "$BASE" -- <guards>` and the new in-process rule for every guarded leg of
   `tools/gate-legs.json`, against five bases (HEAD, HEAD~1, HEAD~20, the merge-base with `main`, and
   the build's base), with one tracked file edited uncommitted and one renamed, the two answers agree

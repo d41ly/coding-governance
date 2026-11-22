@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-12 — `pre-push.test.sh` builds each repeated pushed-main fixture once and copies it per arm
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -51,7 +51,7 @@ and fewer real pushes for the same arms with the same RED and GREEN results.
   sets, one of them a hook file the arm rewrites), `build_vr_fixture` (1) and `build_sg_fixture` (2).
   A template used once costs what the build costs.
 - The single-use inline fixtures at lines 285, 923, 974, 1035, 1120, 1261, 1348, 1652, 1935, 2060
-  and 2105 at `609cd40b1`.
+  and 2105 at `59e882afd`.
 - The 75 real pushes the arms themselves make: each is the subject under test.
 - `.githooks/pre-push` itself, and the push boundary's verdict and reuse rules (dWitnessedBar).
 - The factory, its switch and how its bash face ships: TOOL-dQuietDisk-7.
@@ -63,7 +63,7 @@ and fewer real pushes for the same arms with the same RED and GREEN results.
 
 ## 4. Design
 
-### Inventory of the repeated calls at `609cd40b1`
+### Inventory of the repeated calls at `59e882afd`
 
 | Builder | Calls | Distinct argument sets | Repeats a built key |
 |---|---|---|---|
@@ -149,7 +149,7 @@ switch at today's value and one copied from a template, each at its own `$d`, an
   Red when: a line changes, the count does not fall by the bound, or an entry remains.
   permission: a role pass may not run a `.test.sh` suite (`tools/unattended/gate-guard.js` row D4);
   the main loop observes this at VERIFYING.
-  figure: 168 is DERIVED from §4's call-site count at `609cd40b1`.
+  figure: 168 is DERIVED from §4's call-site count at `59e882afd`.
   fixture: the adopter half is a scratch target that `python tools/govkit/govkit.py apply` installs
   the push-main kit into, where the main loop runs the shipped suite; `tools/govkit/fixtures/` holds
   no adopter tree with this kit today. `python tools/govkit/govkit.py check --target
@@ -182,7 +182,7 @@ shape, bare remote plus work plus push, so the factory serves them unchanged.
 `python tools/codebase-map/reuse_lookup.py "build a scratch fixture repository once and clone it per test case"`
 ranked `build_fixture`, `build_target` and `build_scratch_gov` as seams, and no pre-push builder.
 Chain owner: dWitnessedBar (Test). Its branch changes 811 lines [PINNED] of this suite between `9e21ac760` and
-`609cd40b1`: it re-signed `build_ir_fixture` and `build_docs_fixture`, added `build_sel_fixture`,
+`59e882afd`: it re-signed `build_ir_fixture` and `build_docs_fixture`, added `build_sel_fixture`,
 and added `build_bg_fixture` calls. This unit builds on its landed tip and re-counts §4's table
 there.
 
