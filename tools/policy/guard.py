@@ -9,7 +9,12 @@ The verdict over the staged change of an agent's commit. It refuses a change to 
 same commit. A merge concluded with a parent's blob writes nothing new and is admitted. The mirror
 `.governance/policy.json` leaves the judged set when its staged bytes are its render at HEAD and the
 render's inputs are staged as HEAD holds them (TOOL-dGroundRules-19), so a catalogue or policy change
-is one commit and its regenerated mirror the next. A change the verdict refuses is still admitted on
+is one commit and its regenerated mirror the next. A touched set lying wholly among the roles kit's
+render lines, `.claude/roles.json` and one `.claude/agents/<slot>.md` per agent-true role, is admitted
+when every such path is staged equal to its working-tree bytes and the roles kit's
+`render_agents.py --check`, found by the inlined `resolve_kit_dir` and run as a subprocess, exits 0;
+a hand edit, a deletion, a rename or no roles kit refuses (TOOL-dBoundRoles-6 S2). An agent file
+the list does not name, an adopter's own or a role added after its line, is not guarded. A change the verdict refuses is still admitted on
 a live run's branch (PLAY-dOrderedCharter-84): HEAD's branch is the `run-branch` of a run-state file
 at HEAD whose `phase` there is outside the `PHASES_TERMINAL` set an unattended driver at HEAD
 declares, with no decision row asked. Exit 0 admitted, 1 refused naming every failed condition and
@@ -24,7 +29,8 @@ agent's commit a terminal, the threat the owner accepted; a list line removed in
 file changed in the next; a commit made on another clone; a cherry-pick or a rebase, which fire no
 pre-commit; this file deleted from the working tree, since the hook resolves the kit there; and a
 run-state file committed naming the agent's own branch with a live phase, which admits the commit
-after it, though never its own, since the guard reads HEAD. The
+after it, though never its own, since the guard reads HEAD; and renders staged over a role
+catalogue edited in the working tree and left unstaged, since `--check` reads the working tree. The
 push-time bar does not re-judge authorship.
 """
 import difflib
@@ -40,6 +46,11 @@ sys.dont_write_bytecode = True
 LIST = "guarded-paths.txt"
 POLICY = ".governance/policy.toml"
 MIRROR = ".governance/policy.json"
+#: The roles kit's renders the list names (TOOL-dBoundRoles-6 S2): the role index, and the agent files
+#: under the agents folder, one list line per agent-true role; the renderer is found by its anchor.
+RENDER_INDEX = ".claude/roles.json"
+RENDER_AGENTS = ".claude/agents/"
+RENDERER = ("roles", "render_agents.py")
 DECISIONS = "memory/DECISIONS.md"
 NOT_CAPS = (("budgets", "enforce"), ("budgets", "pinned"))
 REMEDY = ("policy-guard: an agent may raise one measured-file cap in this shape, or commit on the run "
@@ -47,6 +58,8 @@ REMEDY = ("policy-guard: an agent may raise one measured-file cap in this shape,
           "from a terminal.")
 MIRROR_REMEDY = (f" The landing renders {MIRROR} and commits it with no hook firing; drop it from this "
                  f"commit: git restore --staged --worktree {MIRROR}")
+RENDER_REMEDY = (f" {RENDER_INDEX} and the agent files under {RENDER_AGENTS} are admitted as render_agents.py "
+                 "--write leaves them: re-render, stage every render it wrote, and commit nothing else among these paths.")
 
 
 def run_git(*args, missing=False):
@@ -131,6 +144,93 @@ def check_mirror_render():
     if blob is None or blob != p.stdout:
         return "differs from its render at HEAD"
     return None
+
+
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+def check_render_paths(paths):
+    """Whether `paths` lie wholly among the roles kit's render lines: the role index, or a `.md` file
+    directly under the agents folder. A path under the agents folder the list does not name is never
+    touched, so the list's own lines decide which agent files are guarded."""
+    return bool(paths) and all(p == RENDER_INDEX or (p.startswith(RENDER_AGENTS) and p.endswith(".md")
+                                                      and "/" not in p[len(RENDER_AGENTS):]) for p in paths)
+
+
+def check_render_shape(touched):
+    """The rendered-paths shape (TOOL-dBoundRoles-6 S2) over a touched set lying wholly among the render
+    lines -> each failed condition as (path, why), [] where it holds. Every staged path is present and
+    equal, carriage returns stripped, to its working-tree bytes, so a rename or a deletion refuses; and
+    `render_agents.py --check`, the roles kit's renderer found by `resolve_kit_dir` from this file, run
+    under this interpreter as a subprocess, so no reader is imported, exits 0 over the working tree. Then
+    the staged renders are exactly what the working tree's catalogue renders. No roles kit found refuses
+    every path, naming where it looked."""
+    why = []
+    for p, status in sorted(touched.items()):
+        oid = read_blob_id("", p)
+        if status not in ("M", "A") or oid is None:
+            why.append((p, "deleted or retyped, and a render is only ever rewritten by render_agents.py --write"))
+            continue
+        staged = run_git("cat-file", "blob", oid).replace(b"\r", b"")
+        try:
+            work = Path(p).read_bytes().replace(b"\r", b"")
+        except OSError as exc:
+            why.append((p, f"its working-tree file does not read ({exc.strerror}), so the staged bytes are no render"))
+            continue
+        if staged != work:
+            why.append((p, "the staged bytes are not its working-tree bytes, so render_agents.py --check grades another text"))
+    if why:
+        return why
+    try:
+        kit = resolve_kit_dir(*RENDERER, Path(__file__).absolute().parent)
+    except LookupError as exc:
+        return [(p, f"no roles kit to re-render it: {exc}") for p in sorted(touched)]
+    r = subprocess.run([sys.executable, "-B", str(kit / RENDERER[1]), "--check"], capture_output=True)
+    if r.returncode != 0:
+        said = [ln for ln in r.stdout.decode("utf-8", errors="replace").replace("\r", "").split("\n")
+                if ln.startswith(("render_agents: missing", "render_agents: drift", "render_agents: stale",
+                                  "render_agents: misplaced"))]
+        err = r.stderr.decode("utf-8", errors="replace").strip().replace("\r", "").split("\n")[0]
+        detail = "; ".join(said) or err or "no drift line"
+        return [(p, f"render_agents.py --check exited {r.returncode}: {detail}") for p in sorted(touched)]
+    return []
 
 
 def derive_leaf_changes(old, new):
@@ -264,9 +364,14 @@ def main(argv):
         print(f"policy-guard: admitted · {MIRROR} · equals its render at HEAD")
     if not touched:
         return 0
-    refused = [(p, mirror_why if p == MIRROR else f"an agent's commit may change {POLICY} alone among the guarded paths")
-               for p in sorted(touched) if p != POLICY]
-    cap = None
+    render = check_render_paths(list(touched))
+    refused = check_render_shape(touched) if render else [
+        (p, mirror_why if p == MIRROR else f"an agent's commit may change {POLICY} alone among the guarded paths")
+        for p in sorted(touched) if p != POLICY]
+    if render and not refused:
+        print(f"policy-guard: admitted · {' '.join(sorted(touched))} · each equals its render: render_agents.py --check exits 0")
+        return 0
+    cap = None   # a render set holds no policy file, so neither branch below reads it
     if touched.get(POLICY, "M") != "M":
         refused.append((POLICY, f"{'added' if touched[POLICY] == 'A' else 'deleted or retyped'}, not a cap raised"))
     elif POLICY in touched:
@@ -286,7 +391,7 @@ def main(argv):
         print(f"policy-guard: refused · {path} · {why}")
     for why in whys:
         print(f"policy-guard: not a live run's branch · {why}")
-    print(REMEDY + (MIRROR_REMEDY if MIRROR in touched else ""))
+    print(REMEDY + (MIRROR_REMEDY if MIRROR in touched else "") + (RENDER_REMEDY if render else ""))
     return 1
 
 

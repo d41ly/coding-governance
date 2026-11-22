@@ -13,6 +13,8 @@ the one composition of the charter text a role carries: every consumer that hand
 calls both, so a role reaches an agent the same way by every route. `render_static_block` composes the
 two into the agent file's body, the block R5 measures against the role's `budget`, and
 `check_single_carry` keeps `instructions.task-charter` from carrying the charter twice (TOOL-dBoundRoles-15).
+`render_role_section` is the one composition of a handoff's `## Role` section and `derive_section_sha` the
+one hash of it, so the role index's `role-sha` and a handoff marker's are one value (TOOL-dBoundRoles-6).
 Stdlib only; every text read
 folds CRLF to LF and names its encoding.
 
@@ -26,6 +28,7 @@ this file, read by `load_role_schema` at import (TOOL-dBoundRoles-2): `never` is
 `render_role_fields` composes.
 """
 import datetime
+import hashlib
 import json
 import pathlib
 import re
@@ -122,6 +125,15 @@ MICROFORMAT_LINE_RE = re.compile(r"^- `(.*)`$")
 UNRANKED_NOTE = "envelope — unarmed · no playbook kit, so the blocks render unranked: %s"
 #: Where an agent role's type renders, repo-relative: the file whose body `render_static_block` composes.
 AGENTS_REL = ".claude/agents"
+#: The work-order template under a kit directory, and its slot line; a ranked section's `LEAD_SLOTS` open
+#: its envelope (PLAY-dOrderedCharter-5 S2). `render_role_section` reads the template of the kit it is handed.
+WORK_ORDER_REL = "templates/work-order.template.md"
+WORK_ORDER_SLOT_RE = re.compile(r"<!-- slot: ([a-z-]+) -->")
+WORK_ORDER_LEAD_SLOTS = ("practices",)
+WORK_ORDER_TASK_RE = re.compile(r"^## Task$", re.M)
+#: The charter's drive section heading and one drive line, `- <stage> · <role> — ` (PLAY-dOrderedCharter-6).
+DRIVE_HEAD = "## Drive — "
+DRIVE_LINE_RE = re.compile(r"^- \S+ · (\S+) — ")
 
 
 class RolesError(Exception):
@@ -1454,6 +1466,77 @@ def render_static_block(kit_dir, slot, role, memory_root, charter, notes, gates=
     if row is not None:
         body = render_envelope(rel, row[0], row[1], body)
     return body
+
+
+def derive_section_sha(section):
+    """The first 12 lowercase hex digits of the SHA-256 of a section's bytes, CRLF folded to LF: a handoff
+    marker's `role-sha` and `task-sha`, and the role index's `role-sha` (TOOL-dBoundRoles-6 S4)."""
+    return hashlib.sha256(section.replace("\r\n", "\n").encode("utf-8")).hexdigest()[:12]
+
+
+def extract_drive_lines(text, role):
+    """The charter's drive lines whose role is `role`: each `- <stage> · <role> — ` line of the section the
+    drive heading opens, as the playbook render composed it from the selected kits' `[[drive]]` rows
+    (PLAY-dOrderedCharter-6), so a subagent holds its role's lines as the main session does."""
+    out, inside = [], False
+    for line in text.replace("\r\n", "\n").split("\n"):
+        if line.startswith("## "):
+            inside = line.startswith(DRIVE_HEAD)
+        elif inside and DRIVE_LINE_RE.match(line) and DRIVE_LINE_RE.match(line).group(1) == role:
+            out.append(line.rstrip())
+    return out
+
+
+def extract_work_order_parts(template):
+    """`(role part, task part)` of the work-order template at `template`, split at its own `## Task` line,
+    its blank edges trimmed; RolesError where it holds none."""
+    text = load_text(template).strip("\n")
+    task = WORK_ORDER_TASK_RE.search(text)
+    if not task:
+        raise RolesError("%s carries no '## Task' line" % pathlib.Path(template).as_posix())
+    return text[:task.start()], text[task.start():]
+
+
+def render_work_order_section(template, section, fills, wraps=None):
+    """One part of the work-order template: each paragraph kept, a slot line its fill, a slot filled with
+    nothing dropped. A part whose heading line `wraps` keys is ranked (PLAY-dOrderedCharter-5 S2): the fills
+    of `WORK_ORDER_LEAD_SLOTS`, each already in its own lower-level envelope, open it, and the rest of its
+    body follows inside the envelope `(doc, level, direction)` the key names, every envelope under the
+    heading. A slot `fills` lacks raises RolesError naming `template`."""
+    paras, lead = [], []
+    wrap = (wraps or {}).get(section.strip("\n").split("\n", 1)[0])
+    for para in section.strip("\n").split("\n\n"):
+        slot = WORK_ORDER_SLOT_RE.fullmatch(para)
+        if slot and slot.group(1) not in fills:
+            raise RolesError("%s names the slot '%s', which no handoff fills"
+                             % (pathlib.Path(template).as_posix(), slot.group(1)))
+        (lead if slot and wrap and slot.group(1) in WORK_ORDER_LEAD_SLOTS else paras).append(
+            fills[slot.group(1)] if slot else para)
+    paras = [p for p in paras if p]
+    if wrap:
+        rest = [render_envelope(*wrap, "\n\n".join(paras[1:]))] if paras[1:] else []
+        paras = paras[:1] + ["\n".join(p.rstrip("\n") for p in lead + rest if p)]
+    return "\n\n".join(p for p in paras if p)
+
+
+def render_role_section(kit_dir, slot, memory_root, charter_text, gates=(), rows=None):
+    """The `## Role` section a handoff carries and the role index's `role-sha` hashes (TOOL-dBoundRoles-6 S4):
+    the work-order template's role part under `kit_dir`, its slot filled with `render_role`'s output for
+    `slot` and `gates`, its blank edges trimmed, then, where `charter_text` holds drive lines for the role,
+    its `### Drive` block; with `rows`, the document registry, the body in the envelope of the agent file's
+    row; then two newlines. One composition, so a handoff and its agent type agree exactly when both were
+    rendered from one role text and one charter's drive lines."""
+    template = pathlib.Path(kit_dir) / WORK_ORDER_REL
+    role_part, _task = extract_work_order_parts(template)
+    drive = extract_drive_lines(charter_text, slot)
+    fill = render_role(kit_dir, slot, memory_root, gates).strip("\n") + (
+        "\n\n### Drive\n\n" + "\n".join(drive) if drive else "")
+    wraps = None
+    agent = "%s/%s.md" % (AGENTS_REL, slot)
+    row = read_envelope_row(rows, agent, memory_root)
+    if row is not None:
+        wraps = {"## Role": (agent, row[0], row[1])}
+    return render_work_order_section(template, role_part, {"role": fill}, wraps) + "\n\n"
 
 
 def read_role_budget(role):

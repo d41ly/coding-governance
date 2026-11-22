@@ -6,3 +6,19 @@
 .governance/policy.json
 .governance/instructions.toml
 .governance/deploy.toml
+# The roles kit's renders (TOOL-dBoundRoles-6 S2): its role index and one line per agent-true role's
+# agent file, since every reader matches a staged path to a whole line. guard.py admits them only as
+# render_agents.py --write leaves them. A role added later is unguarded at commit until its line lands.
+.claude/roles.json
+.claude/agents/gov-architect.md
+.claude/agents/gov-builder.md
+.claude/agents/gov-orienter.md
+.claude/agents/gov-planner.md
+.claude/agents/gov-prompt-writer.md
+.claude/agents/gov-researcher.md
+.claude/agents/gov-reuse-scout.md
+.claude/agents/gov-reviewer.md
+.claude/agents/gov-skeptic.md
+.claude/agents/gov-spec-writer.md
+.claude/agents/gov-synthesizer.md
+.claude/agents/gov-tester.md

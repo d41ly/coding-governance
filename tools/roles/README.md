@@ -161,7 +161,7 @@ the `effort` key `render_agents.py` writes into the role index. It does not chec
 harness spawns itself, the `committer` and `probe` stages, which workflow a call to a harness
 serving two runs, a model no transcript names or two profiles match, an `Agent` call where
 `CLAUDE_CODE_EFFORT_LEVEL` is set, a configured default subagent model, an effort ceiling in
-settings, or a hand-edited index.
+settings, or an index edited by shell.
 `python handoff.py harness-args <harness>` prints the `roles` object a harness takes: the
 union of the stage maps of every workflow whose harness is that script, as one line of JSON, each
 map `key → role` of the workflow's stage rows, read through `roles_lib.derive_stage_map`.
@@ -394,8 +394,22 @@ hands it no handoff would otherwise give it no charter at all; the agent file is
 a handoff carries none. A pre-tag (v3.x) charter, with
 `## §<n> — ` headings and no rule tag, renders every type with no `## Charter` and prints one note
 asking for a reseed; a doc of neither shape refuses. Beside the types sits `.claude/roles.json`, the generated index the hooks read: every role
-with its `workflow`, `writes`, `agent`, `layer` and `acts-as`, `agent: false` roles included, and `harnesses`, the
-repo-relative scripts of every workflow whose `driver` is `workflow`. The kit resolver finds a
+with its `workflow`, `writes`, `agent`, `layer` and `acts-as`, `agent: false` roles included, its
+`role-sha`, and `harnesses`, the
+repo-relative scripts of every workflow whose `driver` is `workflow`. `role-sha` is
+`roles_lib.derive_section_sha` of the `## Role` section `roles_lib.render_role_section` composes, the
+one composition `handoff.py render` writes into a handoff and hashes into its marker: the work-order
+template's role part under the kit, filled with the rendered role, its `### Drive` lines from the
+charter, and the agent file's envelope where the playbook kit's registry ranks it. So a handoff and
+its agent type agree exactly when both were rendered from one role text, and the hooks kit's spawn
+guard refuses a handoff whose marker's `role-sha` is not the index's, naming both values, and an index
+holding none for the type, naming its re-render (TOOL-dBoundRoles-6). The index and every agent file
+it names are written by `render_agents.py --write` alone: the hooks kit's write gate refuses a tool
+write to them for every writer, the policy kit's `guarded-paths.txt` names them so its commit guard
+admits them only as `--write` leaves them with `--check` exiting 0, and a tree whose `.claude/agents/`
+keeps a render while its index is gone is refused by both hooks until the index is re-rendered. A role
+added to the catalogue renders an agent file no list line names, so its commit is unguarded until the
+role's line lands in `guarded-paths.txt`. The kit resolver finds a
 harness govkit rendered from its template through that file's `rendered` receipt row, so a kit
 landed under its id rather than its home is listed where it sits. A harness the tree does not hold
 is listed where the resolver places it. Where a file of its name sits directly inside a directory

@@ -133,6 +133,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "role-sha": "f712bc3d11ad",
       "shapes": [
         "single"
       ],
@@ -146,6 +147,7 @@
         "lexicon naming predicates"
       ],
       "layer": "layer.roles",
+      "role-sha": "32bee7788860",
       "shapes": [
         "per-unit"
       ],
@@ -157,6 +159,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "role-sha": "7e1bafa3b5c2",
       "shapes": [
         "single"
       ],
@@ -168,6 +171,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "role-sha": "785729cbae0a",
       "shapes": [
         "single"
       ],
@@ -179,6 +183,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "role-sha": "8434acdd51f4",
       "shapes": [
         "single"
       ],
@@ -190,6 +195,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "role-sha": "e8788e02c318",
       "shapes": [
         "single",
         "twin"
@@ -202,6 +208,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "role-sha": "054e380a188e",
       "shapes": [
         "single",
         "experiment"
@@ -214,6 +221,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "role-sha": "e6a1258582fc",
       "shapes": [
         "panel",
         "twin"
@@ -226,6 +234,7 @@
       "agent": false,
       "gates": [],
       "layer": "layer.runtime",
+      "role-sha": "b463c4537a21",
       "shapes": [],
       "workflow": "handoff",
       "writes": "none"
@@ -235,6 +244,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "role-sha": "2c8056e0bad1",
       "shapes": [
         "panel",
         "twin"
@@ -251,6 +261,7 @@
         "spec tokens (a spec's own names resolve)"
       ],
       "layer": "layer.roles",
+      "role-sha": "a1ec32699e57",
       "shapes": [
         "per-unit"
       ],
@@ -262,6 +273,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "role-sha": "9d630acebb0d",
       "shapes": [
         "panel",
         "twin"
@@ -274,6 +286,7 @@
       "agent": true,
       "gates": [],
       "layer": "layer.roles",
+      "role-sha": "5bb27d79c42a",
       "shapes": [
         "single"
       ],

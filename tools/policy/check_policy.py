@@ -110,7 +110,13 @@ and reads `mirror --check` fresh at the new HEAD. The live run's three (PLAY-dOr
 the deploy and instructions edits on a branch `run/t` whose committed run-state record and driver
 decide: `guard-run-live` exits 0 in either `run-branch` spelling, `guard-run-terminal` exits 1 on
 `LANDED`, `ABORTED` and a removed driver, and `guard-run-other-branch` exits 1 on a branch no record
-at HEAD names, a record only staged, and a detached HEAD.
+at HEAD names, a record only staged, and a detached HEAD. The rendered-paths shape's six
+(TOOL-dBoundRoles-6 S2) commit a `.claude/roles.json` the list names and stage one change of it, the
+renderer a stub beside the kit copy exiting as its `rc` file says: `guard-render-admitted` exits 0 on a
+stub exiting 0; `guard-render-drift` exits 1 naming the stub's drift line; `guard-render-unstaged` exits
+1 on a working tree moved after staging; `guard-render-deleted` on the index removed;
+`guard-render-no-kit` on no renderer to find; and `guard-render-beside` on the index staged beside
+`.governance/deploy.toml`, which leaves the shape.
 
 `legacy-homes` is an outcome case (TOOL-dGroundRules-7): per case, a repository holding a copy of
 policy.py, gov's govkit registry, the memory-tree kit's ledger factory, a `.unattended.conf`, a gate
@@ -2698,6 +2704,13 @@ GUARD_FILES = ("guard.py", "guarded-paths.txt", *READER_FILES)  # the reader: th
 GUARD_MIRROR = ("guard-mirror-render", "guard-mirror-beside-catalogue", "guard-mirror-branch-green")
 GUARD_INPUTS = ("guard-mirror-beside-conf", "guard-mirror-inputs-join")  # TOOL-dGroundRules-25 S19, S21
 GUARD_RUN = ("guard-run-live", "guard-run-terminal", "guard-run-other-branch")  # PLAY-dOrderedCharter-84
+# TOOL-dBoundRoles-6 S2: the rendered-paths shape over the role index the list names, judged against a
+# stub renderer the guard finds where `resolve_kit_dir` probes, beside the kit copy; its exit is a file.
+GUARD_RENDER = ("guard-render-admitted", "guard-render-drift", "guard-render-unstaged", "guard-render-deleted",
+                "guard-render-no-kit", "guard-render-beside")
+RENDER_STUB = ('import pathlib, sys\nrc = int((pathlib.Path(__file__).parent / "rc").read_text())\n'
+               'print("render_agents: 0 agent type(s) and 1 index graded")\n'
+               'if rc:\n    print("render_agents: drift .claude/roles.json")\nsys.exit(rc)\n')
 DEPLOY_REL = ".governance/deploy.toml"
 DECISIONS_REL = "memory/DECISIONS.md"
 # A measured-file cap whose key carries slashes and a leading dot, and the spec folder's class row, so
@@ -2898,6 +2911,42 @@ def run_guard_case(name):
                 run_fixture_git(repo, "reset", "-q", "--hard")
                 run_fixture_git(repo, "checkout", "-q", "run/t")
                 run_fixture_git(repo, "reset", "-q", "--hard", base)
+        if name in GUARD_RENDER:
+            # TOOL-dBoundRoles-6 S2: a role index committed under the list's render line, then one staged
+            # change of it per case. The renderer is a stub beside the kit copy, where the guard's
+            # `resolve_kit_dir` probes, exiting as its `rc` file says; `-no-kit` writes none.
+            import guard as mguard
+            index = mguard.RENDER_INDEX
+            write_fixture = lambda rel, text: Path(repo, rel).write_text(text, encoding="utf-8", newline="\n")  # noqa: E731
+            Path(repo, index).parent.mkdir(parents=True, exist_ok=True)
+            write_fixture(index, '{"roles": {}}\n')
+            run_fixture_git(repo, "add", "--", index)
+            run_fixture_git(repo, "commit", "-q", "-m", "a role index")
+            if name != "guard-render-no-kit":
+                stub = kit.parent / mguard.RENDERER[0]
+                stub.mkdir(parents=True, exist_ok=True)
+                (stub / mguard.RENDERER[1]).write_text(RENDER_STUB, encoding="utf-8", newline="\n")
+                (stub / "rc").write_text("1" if name == "guard-render-drift" else "0", encoding="utf-8")
+            if name == "guard-render-deleted":
+                run_fixture_git(repo, "rm", "-q", "--", index)
+            else:
+                write_fixture(index, '{"roles": {"r": {}}}\n')
+                run_fixture_git(repo, "add", "--", index)
+            if name == "guard-render-unstaged":
+                write_fixture(index, '{"roles": {"r": {"agent": true}}}\n')
+            if name == "guard-render-beside":
+                write_fixture(DEPLOY_REL, 'deployer = "planted"\n')
+                run_fixture_git(repo, "add", "--", DEPLOY_REL)
+            want, needle = {
+                "guard-render-admitted": (0, f"policy-guard: admitted · {index} · each equals its render"),
+                "guard-render-drift": (1, f"refused · {index} · render_agents.py --check exited 1: render_agents: drift {index}"),
+                "guard-render-unstaged": (1, f"refused · {index} · the staged bytes are not its working-tree bytes"),
+                "guard-render-deleted": (1, f"refused · {index} · deleted or retyped"),
+                "guard-render-no-kit": (1, f"refused · {index} · no roles kit to re-render it"),
+                "guard-render-beside": (1, f"refused · {index} · an agent's commit may change {POLICY_REL} alone"),
+            }[name]
+            checks.append(check_run(name[len("guard-render-"):], "guard.py --staged", guard,
+                                    lambda rc, o, e: rc == want and needle in o, cwd=repo))
         for scenario, edits, want, present, absent in GUARD_PLANTS.get(name, []):
             for rel, edit in edits:
                 path = Path(repo, rel)
@@ -3551,7 +3600,10 @@ HANDOFF_TASK = "## Task\n\nThis handoff is for build `bx`, unit `T-1`.\n"
 HANDOFF_FILE = "memory/builds/bx/prompts/2026-10-24-prompt-T-1-researcher.md"
 HARNESS_FILE = "harness/h.js"
 HARNESS_TEXT = "export const meta = { name: 'h', description: 'one agent' }\nconst s = await agent('one')\n"
-LIMIT_ROLES = {"roles": {"gov-researcher": {"agent": True, "workflow": "research", "writes": "none"}},
+# The role carries the `role-sha` of HANDOFF_ROLE, which the spawn guard compares with the marker's
+# (TOOL-dBoundRoles-6 S6), so the admitted spawn is one rule 6 admits on the role text too.
+LIMIT_ROLES = {"roles": {"gov-researcher": {"agent": True, "workflow": "research", "writes": "none",
+                                            "role-sha": hashlib.sha256(HANDOFF_ROLE.encode("utf-8")).hexdigest()[:12]}},
                "harnesses": [HARNESS_FILE]}
 # A verifier split at 6 (TOOL-dGroundRules-18 AC3), which rule 2 judges against MAX_VERIFIERS whatever the limit.
 VERIFIER_SPLIT = ("const K = 6\nconst g = chunk(all, Math.ceil(all.length / K)) // gov:fixed-verifiers\n"
@@ -5669,7 +5721,8 @@ CASES = [
     ("mirror-shim-exit-one", None, run_mirror_landed),
     ("mirror-absent-adopter", None, run_mirror_absent_adopter),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
-    *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR, *GUARD_INPUTS, *GUARD_RUN]),  # outcome cases: guard.py --staged
+    *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR, *GUARD_INPUTS, *GUARD_RUN,
+                                          *GUARD_RENDER]),  # outcome cases: guard.py --staged
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
     ("legacy-homes-main-dropped", None, run_legacy_main_dropped),  # the base is the merge-base, not the tip
     ("legacy-homes-present", None, run_legacy_present),  # gov's registry registers the list at its home, and no kit holds it

@@ -130,7 +130,7 @@ refuses the render, naming the key.
   or `CLAUDE_CODE_EFFORT_LEVEL` is set, the call goes through with one line saying the level was not
   checked. It does not check the agents a harness spawns itself, the `committer` and `probe`
   stages, which workflow a call to a harness serving two runs, a default subagent model or an
-  effort ceiling in your settings, or a hand-edited role index.
+  effort ceiling in your settings, or a role index edited by shell.
 - **Change how a role behaves:** edit `<prefix>/roles/house/<role>.md`, never the file under
   `agents/`. Your overlay is appended under `## House rules`, and updates never overwrite it.
 - **Change a role's effort or model:** set a key in `.governance/policy.toml` and commit it:
@@ -228,6 +228,15 @@ until an owner writes its first row.
 
 - An `Agent` call whose type is not a `gov-*` role, or whose prompt is not a rendered handoff.
 - A misnamed spawn: an `Agent` call whose `description` is not the name `handoff.py render` printed.
+- A stale handoff: an `Agent` call whose handoff was rendered from role text other than the text its
+  agent type was rendered from. The marker's `role-sha` must equal the `role-sha` the role index
+  holds for that role; the refusal names both values. Re-render the handoff, or the index with
+  `render_agents.py --write` where the role changed after it. An index holding no `role-sha` for the
+  role, as one rendered before the key existed does, refuses every spawn of it until it is re-rendered.
+- A tool write to `.claude/roles.json`, or to the agent file `.claude/agents/<role>.md` of a role the
+  index names, from any writer, the main session included. `render_agents.py --write` is their one
+  writer. Your own files under `.claude/agents/` are not affected. The policy kit's commit guard also
+  admits a commit of these files only as `render_agents.py --write` leaves them.
 - A `Workflow` call that runs anything other than a listed harness with its `roles` argument.
 - A spec write from anything but the spec writer, and a product write from anything but the builder
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
@@ -240,9 +249,13 @@ until an owner writes its first row.
   one, it names that verb instead. This one switches on with the route, not with
   `roles.json`, and only where the governing doc's micro-formats define both lines.
 
-All of these switch on only where `.claude/roles.json` exists. They do not see writes made through
-Bash or PowerShell, `--bare` runs, agents a harness spawns internally, session-to-session messages,
-or a hand-edited `roles.json`.
+All of these switch on where `.claude/roles.json` exists. Where it is missing but `.claude/agents/`
+still holds an agent file the kit rendered, the hooks refuse every spec and product write, every
+role agent's gate run and every `Agent` and `Workflow` call, naming the index, until
+`render_agents.py --write` restores it. In a repository that never adopted the kit, a missing index
+switches nothing on. They do not see writes made through Bash or PowerShell, `--bare` runs, agents a
+harness spawns internally, session-to-session messages, or a `roles.json` edited by shell and never
+committed.
 
 ## In a repository that adopts the kit
 

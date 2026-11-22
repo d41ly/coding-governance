@@ -97,11 +97,16 @@
  * `writes = product`. The main loop, which carries no `agent_type`, and an untyped harness agent
  * (`workflow-subagent`) are refused both — except a spec edit that moves only the status and date
  * cells of its `**Status:**` line, admitted from the main loop and from a `product` role on a spec
- * its card routes. An ABSENT index adds no arm; a broken one refuses both classes; an index naming
- * no writer for a class refuses that class as UNARMED. What escapes it, besides everything that
- * escapes the gate: a hand-edited index, and a session launched AS a role, whose payload carries
- * that role's type. It grades two write classes; `none`, `review` and `records` are declared in the
- * index and read by nothing here.
+ * its card routes. An ABSENT index adds no arm in a tree that never adopted the roles kit, and
+ * refuses both classes in a GOVERNED one, a tree whose `.claude/agents/` holds a rendered gov agent
+ * file (`checkRoleGoverned`, TOOL-dBoundRoles-6 S3); a broken one refuses both classes; an index
+ * naming no writer for a class refuses that class as UNARMED. The renders themselves, the index and
+ * the agent file of every role it names, are refused to every writer at step 5a, naming
+ * `render_agents.py --write` (TOOL-dBoundRoles-6 S1); an adopter's own agent file is not. What
+ * escapes it, besides everything that escapes the gate: a shell write to the renders, which the
+ * policy kit's commit guard holds, a tree whose index and every rendered agent file were both
+ * deleted, and a session launched AS a role, whose payload carries that role's type. It grades two
+ * write classes; `none`, `review` and `records` are declared in the index and read by nothing here.
  *
  * THE RED-FIX LANE (TOOL-aNimbleMend-8, bounded by TOOL-aNimbleMend-14). A product write the route
  * arm or the role arm is about to refuse is admitted, with one witness line, while the gate ledger
@@ -112,7 +117,8 @@
  * ancestor of `HEAD` the landed revision does not reach: the runner carries old rows forward, so a
  * row is bounded by its own head. A blank `LEG_MANIFEST` reads as `gate-legs.json` beside the
  * run-gates kit this install holds, and closes the lane where none resolves. The writer is the main
- * loop or a role declaring `writes = product`; any other writer, a broken role index, the key
+ * loop or a role declaring `writes = product`; any other writer, a broken role index, an absent one
+ * in a governed tree (TOOL-dBoundRoles-6 S3), the key
  * `off`, a refused key read and any other value each leave the refusal standing. `readOpenReds`
  * reads the ledger, `checkRedLane` is the decision, and the commit owes a `Red-fix: <leg>` trailer
  * beside `Pass: none`, which the commit grader reads. A spec write never reaches it. WHAT THE LANE
@@ -145,7 +151,8 @@
  * command's exit notification is the wait. The index is read at the checkout root of the payload `cwd`, else of
  * `CLAUDE_PROJECT_DIR`; neither resolving adds no arm, with one witness line when
  * `CLAUDE_PROJECT_DIR` is set. An absent
- * index adds no arm; a broken one refuses a candidate; a manifest that does not read leaves G1
+ * index adds no arm, except in a governed tree, where it refuses a candidate naming the re-render
+ * (TOOL-dBoundRoles-6 S3); a broken one refuses a candidate; a manifest that does not read leaves G1
  * unarmed with one witness line while G2 and G3 bind; a throw refuses a role agent. THE CEILING:
  * the match is textual, so a gate reached through an interpreter, an alias, a function, an
  * assembled path, a `$(…)` inside quotes, a scoped variant of a leg with an extra argument, or an
@@ -1133,6 +1140,8 @@ const ROLE_INDEX = '.claude/roles.json'
  * strings, and the top-level `gates`, `{ manifest: <string|null> }`; `gates` is null when absent.
  * TOOL-aGuardedEffort-1 adds a third: the top-level `effort`, a plain object whose `default`,
  * `profiles`, `harnesses` and `unset` are plain objects; `effort` is null when absent.
+ * TOOL-dBoundRoles-6 S5 adds a fourth: a role's `role-sha`, 12 lowercase hex digits, the hash of the
+ * `## Role` section a handoff of it carries, which agent-cap.js's rule 6 compares at spawn.
  */
 function loadRoleIndex(top) {
   const fs = require('fs')
@@ -1163,6 +1172,10 @@ function loadRoleIndex(top) {
     if (r.gates !== undefined && (!Array.isArray(r.gates) || !r.gates.every((g) => typeof g === 'string'))) {
       return { state: 'broken', shown, why: `${shape}: role ${n}'s gates is not a list of strings` }
     }
+    // TOOL-dBoundRoles-6 S5: a role's `role-sha`, when present, is 12 lowercase hex digits.
+    if (r['role-sha'] !== undefined && !(typeof r['role-sha'] === 'string' && /^[0-9a-f]{12}$/.test(r['role-sha']))) {
+      return { state: 'broken', shown, why: `${shape}: role ${n}'s role-sha is not 12 lowercase hex digits` }
+    }
   }
   // ...and the top-level `gates`, when present, is `{ manifest: <string|null> }`. Absent reads as no manifest.
   const gates = d.gates
@@ -1178,6 +1191,51 @@ function loadRoleIndex(top) {
     return { state: 'broken', shown, why: `${shape}: effort is not { default: {…}, profiles: {…}, harnesses: {…}, unset: {…} }` }
   }
   return { state: 'ok', shown, roles: d.roles, harnesses: d.harnesses, gates: gates || null, effort: effort || null }
+}
+
+/** The folder the roles kit renders agent types into, beside the index: `.claude/agents/`. */
+const ROLE_AGENTS_DIR = ROLE_INDEX.replace(/[^/]+$/, 'agents/')
+
+/**
+ * TOOL-dBoundRoles-6 §4 "A governed tree": true when `.claude/agents/` at `top` holds a `.md` file whose
+ * front matter, read by readFrontMatterKey, carries both `workflow` and `writes`, the two gov keys the
+ * roles kit's renderer writes and Claude Code's own agent files never carry. Exported beside
+ * loadRoleIndex, so agent-cap.js reads it through this one reader. Asked only where the index is absent,
+ * so a tree whose index was deleted while its renders remain is governed and refused, and a tree that
+ * never adopted the roles kit keeps its no-arm verdict. A folder or file that does not read is not
+ * governed. WHAT IT DOES NOT SEE: a tree whose index and every rendered agent file were both deleted.
+ */
+function checkRoleGoverned(top) {
+  const fs = require('fs')
+  const path = require('path')
+  let names
+  try { names = fs.readdirSync(path.join(top, ROLE_AGENTS_DIR)) } catch { return false }
+  for (const n of names.filter((x) => x.toLowerCase().endsWith('.md')).sort()) {
+    let text = null
+    try { text = fs.readFileSync(path.join(top, ROLE_AGENTS_DIR, n), 'utf8') } catch { text = null }
+    if (text !== null && readFrontMatterKey(text, 'workflow') !== null && readFrontMatterKey(text, 'writes') !== null) return true
+  }
+  return false
+}
+
+/**
+ * Step 5a of the write gate (TOOL-dBoundRoles-6 S1): `{ deny }` when `rel`, the target's comparable
+ * repo-relative path at `top`, is the role index, or the agent file `.claude/agents/<name>.md` of a
+ * role the index at `top` names; null otherwise. Every writer is refused, a role agent and the main
+ * loop alike: the renderer writes both, and its `--write` is the one door. An adopter's own file under
+ * `.claude/agents/`, named by no index row, and any agent file while the index does not read as ok,
+ * fall through to the steps after it.
+ */
+function checkRenderedRole(tool, targetC, rel, top) {
+  const dir = ROLE_AGENTS_DIR.toLowerCase()
+  let owned = rel === ROLE_INDEX.toLowerCase()
+  if (!owned && rel.startsWith(dir) && rel.endsWith('.md') && !rel.slice(dir.length).includes('/')) {
+    const index = loadRoleIndex(top)
+    const name = rel.slice(dir.length, -'.md'.length)
+    owned = index.state === 'ok' && Object.keys(index.roles).some((n) => n.toLowerCase() === name)
+  }
+  if (!owned) return null
+  return { deny: `BLOCKED by scratch-guard: ${targetC} is rendered by render_agents.py --write, and no writer edits it by hand. This ${tool} is refused for a role agent and the main loop alike: change the role's definition in the roles kit, then run render_agents.py --write, which renders the role index and every agent file it names (TOOL-dBoundRoles-6).\n` }
 }
 
 /**
@@ -1248,14 +1306,19 @@ function renderRoleDeny(cls, index, writers, w) {
 /**
  * Steps 6a and 9a: the role verdict on a write of class `cls` ('spec' or 'product'). null admits,
  * `{ deny }` refuses. `w` carries `tool`, `ti` (the tool_input), `native` (the target on disk),
- * `target` (its comparable form), `agentType`, `slug` and `routed` (the comparable spec paths the
- * session card's `## route` names). An absent index admits; a broken one refuses; no `agent`-true
- * role with `writes = cls` refuses as UNARMED; a role in the class admits. Last, and for a spec only,
- * S4's status flip admits from the main loop on any spec and from a `product` role on a routed one.
+ * `target` (its comparable form), `agentType`, `slug`, `routed` (the comparable spec paths the
+ * session card's `## route` names) and `top` (the target's toplevel). An absent index admits, unless
+ * the tree is governed (checkRoleGoverned, TOOL-dBoundRoles-6 S3), which refuses; a broken one
+ * refuses; no `agent`-true role with `writes = cls` refuses as UNARMED; a role in the class admits.
+ * Last, and for a spec only, S4's status flip admits from the main loop on any spec and from a
+ * `product` role on a routed one.
  */
 function checkRoleWrite(cls, index, w) {
-  if (index.state === 'absent') return null
   const head = `BLOCKED by scratch-guard: this ${w.tool} targets ${w.target}, a ${cls} path,`
+  if (index.state === 'absent') {
+    if (!checkRoleGoverned(w.top)) return null
+    return { deny: `${head} and the role index ${index.shown} is absent while this tree carries rendered role agents. Every spec and product write in this repository refuses until the index is back; it is generated, so re-render it with render_agents.py --write (TOOL-dBoundRoles-6).\n` }
+  }
   if (index.state === 'broken') {
     return { deny: `${head} and the role index ${index.shown} ${index.why}. Every spec and product write in this repository refuses until the index is sound; it is generated, so re-render it rather than hand-edit it.\n` }
   }
@@ -1359,13 +1422,13 @@ function readOpenReds(gitDir, top) {
 
 /**
  * S2: the lane's one decision, first match wins. `w` carries `agentType`, `index` as loadRoleIndex
- * returns it, `lane` as `{ on, why }` and `reds` as readOpenReds returns them. `{ witness }` admits,
- * null leaves the refusal standing.
+ * returns it, `governed` as checkRoleGoverned answers for an absent index, `lane` as `{ on, why }`
+ * and `reds` as readOpenReds returns them. `{ witness }` admits, null leaves the refusal standing.
  *  1. `lane.on` is not true → null
  *  2. `reds` is empty → null
- *  3. the index is broken → null
+ *  3. the index is broken, or absent in a governed tree (TOOL-dBoundRoles-6 S3) → null
  *  4. `agentType` is empty, the main loop → witness
- *  5. the index is absent → witness
+ *  5. the index is absent, in a tree that is not governed → witness
  *  6. `agentType` names an `agent`-true role declaring `writes = product` → witness
  *  7. anything else, the untyped harness agent included → null
  * It does not ask whether the write fixes the red: any product path is admitted while a leg is open.
@@ -1376,7 +1439,7 @@ function readOpenReds(gitDir, top) {
 function checkRedLane(w) {
   if (!w.lane || w.lane.on !== true) return null
   if (!Array.isArray(w.reds) || w.reds.length === 0) return null
-  if (!w.index || w.index.state === 'broken') return null
+  if (!w.index || w.index.state === 'broken' || (w.index.state === 'absent' && w.governed === true)) return null
   const r = w.index.state === 'ok' && w.agentType && Object.prototype.hasOwnProperty.call(w.index.roles, w.agentType) ? w.index.roles[w.agentType] : null
   if (w.agentType && w.index.state !== 'absent' && !(r && r.agent === true && r.writes === 'product')) return null
   return { witness: `red-fix lane admits this write — open red leg(s): ${w.reds.join(', ')}; its commit owes a \`Red-fix: <leg>\` trailer beside \`Pass: none\`${w.lane.why ? ` · ${w.lane.why}` : ''}` }
@@ -1412,10 +1475,14 @@ function checkPolicyFile(tool, target, top) {
  *     naming policy_edit.py, before the conf is read, so an unarmed or absent conf does not open it
  *  4. `<target toplevel>/.memory-tree.conf` absent → witness; present and unreadable → deny
  *  5. UNARMED (checkUnarmed) → null when the target is the conf, else deny
+ * 5a. the role index `.claude/roles.json`, or the agent file `.claude/agents/<name>.md` of a role that
+ *     index names (checkRenderedRole, TOOL-dBoundRoles-6 S1) → deny naming render_agents.py --write,
+ *     for every writer; an adopter's own agent file, named by no index row, goes on to step 6
  *  6. the target's CLASS: product when it falls under a ROUTED_PATHS entry; spec when its path
  *     opens `<MEMORY_ROOT>/builds/<one segment>/spec/`; else neither → null. Only a spec or a
  *     product path reads further, and only those read the role index.
- * 6a. spec → checkRoleWrite('spec') over loadRoleIndex(top): absent → null; broken → deny; no
+ * 6a. spec → checkRoleWrite('spec') over loadRoleIndex(top): absent → null, or deny where the tree
+ *     is governed (checkRoleGoverned, TOOL-dBoundRoles-6 S3); broken → deny; no
  *     `agent`-true role with `writes = spec` → deny, UNARMED; the payload's `agent_type` names such a
  *     role → null; a status-and-date-only flip (checkStatusOnlyEdit) from the main loop, or from a
  *     `product` role on a spec its card's `## route` names → null; else deny
@@ -1430,7 +1497,7 @@ function checkPolicyFile(tool, target, top) {
  *     when it records any. It does not ask whether the pass committed: a pass's spec goes terminal in
  *     its own pass commit, so a pass committed with its spec left INPROGRESS keeps admitting; and a
  *     hand-appended row is read like the driver's.
- * 9a. checkRoleWrite('product'): absent → null; broken → deny; no `agent`-true role with
+ * 9a. checkRoleWrite('product'): absent → null, or deny in a governed tree; broken → deny; no `agent`-true role with
  *     `writes = product` → deny, UNARMED; the payload's `agent_type` names such a role → null; else
  *     deny. The route arm runs first and never instead: a builder with no buildable route meets
  *     step 7, 8 or 9b's refusal word for word.
@@ -1438,7 +1505,8 @@ function checkPolicyFile(tool, target, top) {
  *     and on nothing else: read the gate ledger's open reds (readOpenReds over the worktree's git
  *     dir and toplevel: a row counts only at `HEAD` or at an unlanded ancestor of it, for a leg of
  *     `LEG_MANIFEST`, TOOL-aNimbleMend-14) and the role index FIRST. With no red open, a broken
- *     index, or a writer checkRedLane's steps 4 to 6 would not admit, the refusal stands as
+ *     index or an absent one in a governed tree (TOOL-dBoundRoles-6 S3), or a writer checkRedLane's
+ *     steps 4 to 6 would not admit, the refusal stands as
  *     composed and the lane key is not read (TOOL-aNimbleMend-15). Only then read the lane key
  *     `bar.inline-red-fixes`, and return checkRedLane's witness, or the refusal as composed. A key
  *     read that refused or answered another value appends its one line to the refusal, and only
@@ -1498,6 +1566,8 @@ function checkRouted(data, env) {
     return { deny: `BLOCKED by scratch-guard: the write gate is UNARMED in this repository — ${confShown}: ${unarmed}. The gate reads MEMORY_ROOT and ROUTED_PATHS from that conf, and every write here refuses until both are sound; the one write admitted is to ${confShown} itself.\n` }
   }
   const rel = targetC.slice(buildComparablePath(top).length + 1)
+  const rendered = checkRenderedRole(tool, targetC, rel, top)
+  if (rendered) return rendered
   const entry = routed.trim().split(/\s+/).find((e) => {
     const c = buildComparablePath(e).replace(/^\.\//, '')
     return /[\\/]$/.test(e) ? checkUnderRoot(rel, c) : rel === c
@@ -1513,7 +1583,7 @@ function checkRouted(data, env) {
     const slug = path.relative(top, target).replace(/\\/g, '/').split('/')[pre.split('/').length - 1] || ''
     const cardText = sid ? readCard(mine.common, sid).text : null
     const routed = extractRouteUnits(cardText).units.filter((u) => u.spec).map((u) => buildComparablePath(path.join(top, buildNativePath(u.spec))))
-    return checkRoleWrite('spec', loadRoleIndex(top), { tool, ti, native: target, target: targetC, agentType, slug, routed })
+    return checkRoleWrite('spec', loadRoleIndex(top), { tool, ti, native: target, target: targetC, agentType, slug, routed, top })
   }
   // Step 10: the red-fix lane, asked with a product-class verdict already composed. An admit passes
   // through untouched, so the key and the ledger are read on a refusal only.
@@ -1533,7 +1603,8 @@ function checkRouted(data, env) {
     }
     const reds = readOpenReds(gitDir, top)
     const index = loadRoleIndex(top)
-    if (!checkRedLane({ agentType, index, lane: { on: true, why: '' }, reds })) return verdict
+    const governed = index.state === 'absent' && checkRoleGoverned(top)
+    if (!checkRedLane({ agentType, index, governed, lane: { on: true, why: '' }, reds })) return verdict
     let lane
     try {
       const helper = require('./agent-cap.js').resolvePolicyHelper()
@@ -1547,7 +1618,7 @@ function checkRouted(data, env) {
     } catch (e) {
       lane = { on: false, why: String((e && e.message) || e).split(/\r?\n/)[0] }
     }
-    const admit = checkRedLane({ agentType, index, lane, reds })
+    const admit = checkRedLane({ agentType, index, governed, lane, reds })
     if (admit) return admit
     return !lane.on && lane.why ? { deny: `${verdict.deny}${lane.why}\n` } : verdict
   }
@@ -1564,7 +1635,7 @@ function checkRouted(data, env) {
   // Step 9a: the route admits; the writer's role decides. The slug is the unit id's middle.
   const checkUnitWrite = (u) => {
     const slug = (/^[A-Za-z]+-(.+)-\d+$/.exec(u.unit) || [])[1] || route.build
-    return checkRoleWrite('product', loadRoleIndex(top), { tool, ti, native: target, target: targetC, agentType, slug, routed: [] })
+    return checkRoleWrite('product', loadRoleIndex(top), { tool, ti, native: target, target: targetC, agentType, slug, routed: [], top })
   }
   const reasons = []
   for (const u of route.units) {
@@ -1859,7 +1930,8 @@ function resolveRoleRoot(cwd, env) {
  *     and no polling hit by checkPollWait → null, with no file read
  *  3. no root by resolveRoleRoot (the payload `cwd`, then `CLAUDE_PROJECT_DIR`) → null, or one
  *     witness naming both starts when `CLAUDE_PROJECT_DIR` is set
- *  4. loadRoleIndex: absent → null; broken → deny naming the index
+ *  4. loadRoleIndex: absent → null, or deny naming the index and its re-render where the tree is
+ *     governed (checkRoleGoverned, TOOL-dBoundRoles-6 S3); broken → deny naming the index
  *  5. the allowlist: the index's `gates` list for the type, else empty — `workflow-subagent` and
  *     every type the index does not name may run nothing
  *  6. readGateLegs: no manifest, an absent one or one that does not parse leaves G1 unarmed and
@@ -1885,7 +1957,10 @@ function checkRoleGate(cmd, data, env) {
   // G1 resolves the command's paths against the payload cwd, and against the root when it has none.
   const cwd = raw ? path.resolve(raw) : top
   const index = loadRoleIndex(top)
-  if (index.state === 'absent') return null
+  if (index.state === 'absent') {
+    if (!checkRoleGoverned(top)) return null
+    return { deny: `BLOCKED by scratch-guard: a role agent runs no gate, and the role index ${index.shown} is absent while this tree carries rendered role agents, so the allowlist of ${type} cannot be read. Re-render the index with render_agents.py --write; gates run in the main session at the merge or push threshold (TOOL-dBoundRoles-6).\n` }
+  }
   if (index.state === 'broken') {
     return { deny: `BLOCKED by scratch-guard: a role agent runs no gate, and the role index ${index.shown} ${index.why}, so the allowlist of ${type} cannot be read. Repair or re-render the index; gates run in the main session at the merge or push threshold.\n` }
   }
@@ -2115,4 +2190,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane }
