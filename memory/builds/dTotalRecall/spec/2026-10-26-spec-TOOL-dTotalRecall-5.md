@@ -29,6 +29,7 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-5-1-spec-reviewer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-5-1-spec-reviewer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief-2.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief-2.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief-3.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief-3.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief-4.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief-4.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-spec-writer.md) | log | — |
