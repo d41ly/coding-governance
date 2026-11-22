@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-45 — a typed `--input` value is authored text: written unfenced, refused when a line would stand as an executor line, so the anchor check grades it
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-26-prompt-TOOL-dBoundRoles-45-round2-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-45-round2-fix-brief.md) | research | TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief.md) | journal | TOOL-dBoundRoles-17 TOOL-dBoundRoles-6 TOOL-dBoundRoles-13 TOOL-dBoundRoles-3 TOOL-dBoundRoles-38 TOOL-dBoundRoles-46 TOOL-dBoundRoles-48 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-7 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-3-reground-h-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-3-reground-h-brief.md) | journal | TOOL-dBoundRoles-3 TOOL-dBoundRoles-38 TOOL-dBoundRoles-46 |
+| [2026-11-22-prompt-TOOL-dBoundRoles-45-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-45-build-brief.md) | journal | — |
 | [2026-10-26-review-TOOL-dBoundRoles-45-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-45-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-49 TOOL-dBoundRoles-46 TOOL-dBoundRoles-48 TOOL-dBoundRoles-47 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 |
 
 <!-- /gen:spec-records -->
