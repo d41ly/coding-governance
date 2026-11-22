@@ -703,6 +703,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "Violation",
+      "kind": "class",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
       "id": "Walk",
       "kind": "class",
       "file": "tools/memory-tree/transition_audit.py"
@@ -5843,6 +5848,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "check_cardinality_mirror",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
       "id": "check_carries_restored",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
@@ -6356,6 +6366,16 @@
       "id": "check_drive_red",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_edge_bounds",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "check_edge_cardinality",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
     },
     {
       "id": "check_edge_shape",
@@ -11633,6 +11653,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_cardinality_cell",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
       "id": "derive_carried",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -12041,6 +12066,11 @@
       "id": "derive_drift_line",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "derive_edge_bounds",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
     },
     {
       "id": "derive_edge_pins",
@@ -19553,6 +19583,11 @@
       "file": "tools/memory-tree/design_lib.py"
     },
     {
+      "id": "parse_bound",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
       "id": "parse_candidates",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
@@ -25591,6 +25626,11 @@
       "id": "read_registry_tags",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "read_relation_edges",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
     },
     {
       "id": "read_relation_gate",
@@ -33871,6 +33911,11 @@
       "id": "run_card_file",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "run_cardinality_plant",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
     },
     {
       "id": "run_case",

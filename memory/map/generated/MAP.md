@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 225 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 177 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 226 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 177 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -42,6 +42,7 @@ Inventories: gate-legs: 225 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · 
 | `drift-audit records` | baseline |
 | `drift-audit selftest` | baseline |
 | `drift-audit wiring` | baseline |
+| `edge cardinality (per source and per target, over the merged tree)` | playbook |
 | `edges (every declared edge parses, is registered and resolves)` | playbook |
 | `encoding posture (JavaScript text IO names its encoding)` | gate-lint |
 | `encoding posture (an entry point writes stdout as UTF-8)` | gate-lint |

@@ -35,6 +35,7 @@
       "drift-audit records",
       "drift-audit selftest",
       "drift-audit wiring",
+      "edge cardinality (per source and per target, over the merged tree)",
       "edges (every declared edge parses, is registered and resolves)",
       "encoding posture (JavaScript text IO names its encoding)",
       "encoding posture (an entry point writes stdout as UTF-8)",

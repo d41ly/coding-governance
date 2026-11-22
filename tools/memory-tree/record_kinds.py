@@ -160,7 +160,7 @@ LEGACY = "record-kinds-legacy"
 REGION_OPEN, REGION_CLOSE = "<!-- gen:record-kinds -->", "<!-- /gen:record-kinds -->"
 COLUMNS = ("name", "tag", "layer", "home", "id-rule", "schema", "writer", "readers", "readers-none", "lifecycle",
            "check", "purpose")
-LATER_COLUMNS = ("root", "sections")   # TOOL-dTotalRecall-19's and -9's, admitted and graded by their owners
+LATER_COLUMNS = ("root", "sections", "cardinality")   # TOOL-dTotalRecall-19's, -9's and -22's, admitted and graded by their owners
 REQUIRED = ("name", "tag", "layer", "home", "schema", "writer", "readers", "lifecycle", "check", "purpose")
 #: TOOL-dTotalRecall-16 S1: a purpose's one line, in UTF-8 bytes (PINNED, the cap that spec sets).
 PURPOSE_BYTES = 120

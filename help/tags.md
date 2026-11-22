@@ -293,8 +293,18 @@ id's section (`PLAY-dOrderedCharter-24#goal`) stays `unarmed`.
 - **Check the tree:** `python tools/playbook/edge_grammar.py --check` reads every site and the commit
   trailers since the compare base (`--base <rev>` names another), resolves every target, and prints one
   line per red, then the edges by type and by site. The `edges` leg of the `tags` pack runs it.
+- **Count each edge per source and per target:**
+  `python tools/playbook/edge_grammar.py --cardinality --registry` counts every edge the tree check
+  reads, plus the build README relations, against the
+  `cardinality` each declared row of `edges.toml` carries: one `supersedes` per target, since a node has
+  one successor, and one `caused-by` per source, since a record has one cause; every other type is `many`.
+  `--registry` also checks that each record kind whose fields name a bounded type carries the same
+  bounds in its `cardinality` cell. It prints one line per violation and exits 1, or the edges and types
+  it read and exits 0. Two records superseding one decision on two branches merge clean in git, and this
+  reds the merged tree; `--fixture --plant cardinality-merge` shows it. The `edge cardinality` leg of the
+  `tags` pack runs it.
 - **See it red:** `python tools/playbook/edge_grammar.py --fixture --plant outside-to` checks a planted
-  `layer=kit.x` and exits 1. <!-- usage: script:tools/playbook/edge_grammar.py 71d8d8a6 -->
+  `layer=kit.x` and exits 1. <!-- usage: script:tools/playbook/edge_grammar.py bbbb4ab6 -->
 
 ## The three keys
 

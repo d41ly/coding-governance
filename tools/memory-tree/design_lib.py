@@ -104,8 +104,9 @@ import pathlib
 import re
 import subprocess
 import sys
+from typing import NamedTuple
 
-KIT = os.path.dirname(os.path.abspath(__file__))
+KIT =os.path.dirname(os.path.abspath(__file__))
 if KIT not in sys.path:
     sys.path.insert(0, KIT)
 from tree_lib import (  # noqa: E402
@@ -181,6 +182,32 @@ def derive_clause_hash(text):
     """A clause's pin: `derive_pin_hash` of its text with its trailing `cl-` id cut off
     (`carries.py:85-87`)."""
     return derive_pin_hash(CLAUSE_ID.sub("", text))
+
+
+class Violation(NamedTuple):
+    """One group of edges past its bound (TOOL-dTotalRecall-22 S3): the type, the end (`source` or
+    `target`), the node at that end, the bound, and every member edge `(type, source, target, where)`."""
+    type: str
+    end: str
+    node: str
+    bound: int
+    members: tuple
+
+
+def check_edge_bounds(edges, bounds) -> list:
+    """THE ONE EDGE COUNTER (TOOL-dTotalRecall-22 S3), generalised from the as-built view's one head per
+    clause: `edges` an iterable of `(type, source, target, where)`, `bounds` `{type: (per_source,
+    per_target)}`, each `"many"` or a positive int. Groups the edges by `(type, source)` and by `(type,
+    target)` and returns one `Violation` per group holding more members than its end's bound, in first-seen
+    order. A type `bounds` does not name is not counted. Pure: no I/O."""
+    groups: dict = {}
+    for edge in edges:
+        kind, source, target, _where = edge
+        for end, node, bound in zip(("source", "target"), (source, target), bounds.get(kind, ("many", "many"))):
+            if bound != "many":
+                groups.setdefault((kind, end, node, int(bound)), []).append(tuple(edge))
+    return [Violation(kind, end, node, bound, tuple(members))
+            for (kind, end, node, bound), members in groups.items() if len(members) > bound]
 
 
 def extract_clause_tokens(text):

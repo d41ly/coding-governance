@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-22 — each edge type's cardinality declared per source and per target, mirrored in the kind registry, and checked over the merged tree after every merge
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 803a3b80 · streams tooling · order 10 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-5 · 2026-11-22 · node d · Tier-2 · base 803a3b80 · streams tooling · order 10 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0233@50683b2a whole
 
@@ -14,6 +14,8 @@
 | [2026-10-26-build-TOOL-dTotalRecall-22-deviation-221.md](../build/2026-10-26-build-TOOL-dTotalRecall-22-deviation-221.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-22-deviation-222.md](../build/2026-10-26-build-TOOL-dTotalRecall-22-deviation-222.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-22-deviation-223.md](../build/2026-10-26-build-TOOL-dTotalRecall-22-deviation-223.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-22-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-22-1-acceptance-ledger.md) | log | — |
+| [2026-11-22-build-TOOL-dTotalRecall-22-deviation-224.md](../build/2026-11-22-build-TOOL-dTotalRecall-22-deviation-224.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-22-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-22-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |

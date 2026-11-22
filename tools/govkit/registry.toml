@@ -2798,3 +2798,17 @@ ceiling = 122
 subject = "repo"
 enforces = ["principle.p16"]
 stage = ["step.test"]
+
+[[exempt_leg]]
+name = "edge cardinality (per source and per target, over the merged tree)"
+tag = "leg.gov.edge-cardinality-per-source-and-per-target-over-the"
+why = "it runs `<prefix>/playbook/edge_grammar.py --cardinality --registry`, the per-source and per-target count of every edge gov's own tree declares, the build README relations included, against the `cardinality` each row of `<prefix>/playbook/edges.toml` carries, and the kind registry's mirror of those bounds. The checker ships with the playbook-render kit's `**` include, so an adopter receives it, but the LEG is gov's: the records and READMEs it counts are authored here, beside the `edges` leg it joins in the `tags` pack. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. A red is one node given two successors or one record two causes, one fact held twice. TOOL-dTotalRecall-22."
+tests = ["feature.playbook"]
+purpose = "counts each edge type per source and per target"
+argv = ["python", "{prefix}/playbook/edge_grammar.py", "--cardinality", "--registry"]
+chunk = "declarations"
+ceiling = 180
+subject = "repo"
+pack = "tags"
+enforces = ["practice.one-fact"]
+stage = ["step.test"]

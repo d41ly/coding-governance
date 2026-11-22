@@ -445,6 +445,9 @@ fi
 # section, block and note refs segment. The `leg-` rows are TOOL-dWitnessedBar-22's leg-row site, each its
 # site named `gate-legs.json`: a `tests` target in a namespace the shipped registry lacks marked `unarmed`
 # and counted, a row's two edges resolved, and a rule-member `enforces` target marked and never resolved.
+# The `cardinality-` rows are TOOL-dTotalRecall-22's: a declared row with its bound cut refused, the kind
+# registry's mirror differing from the bounds in memory, and two branches each superseding one node, clean
+# alone and red once merged clean. What they do not check: a bound above 1, which no row declares.
 _uk=; check_sibling_kit roles roles_lib.py || _uk=roles
 if [ -n "$_uk" ]; then echo "UNARMED — the edge grammar's plants: no $_uk kit in this install"; else
 _tf=0
@@ -496,6 +499,11 @@ leg-resolved|0|edges: green · 2 edge(s)|leg rows
 leg-rule-member|0|edges: leg rows · 1 enforces target(s) unarmed, practice rules core meta-check grades|=practice.land.paths ·
 leg-rule-member|0|edges: resolved · gate-legs.json:
 leg-rule-member|0|· enforces=practice.land · practice.land
+cardinality-missing|2|edge 'part-of' (row 1) lacks cardinality|NOT refused
+cardinality-mirror|1|cardinality: registry · deviation · caused-by per-source is "many" here, "1" in edges.toml
+cardinality-branch|0|cardinality: read 1 edges of 1 types, 0 line(s) refused and not counted; 0 violations|exceeded at
+cardinality-merge|1|edges: plant cardinality-merge · git merge was clean
+cardinality-merge|1|cardinality: supersedes per-target 1 exceeded at PLAY-xDec-1 by memory/builds/xAlpha/build/2026-11-22-build-PLAY-xAlpha-1-note.md:5, memory/builds/xBeta/build/2026-11-22-build-PLAY-xBeta-1-note.md:5
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf edge-grammar arm(s) failed"; exit 1; fi
 echo "PASS — the edge grammar's plants"

@@ -170,3 +170,11 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T15:53:11Z dispatch · item 803a3b80 TOOL-dTotalRecall-6 · reason memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-6-deviation-62.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-6-deviation-63.md
 
 2026-11-22T16:44:19Z brief · item TOOL-dTotalRecall-22 · reason 82f81cb8b6ee memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-22-build-brief.md
+
+2026-11-22T16:59:36Z dispatch · item 1ca91e84 TOOL-dTotalRecall-22 · reason tools/playbook/edges.toml tools/playbook/edge_grammar.py tools/playbook/adopt-playbook.sh tools/memory-tree/design_lib.py tools/memory-tree/asbuilt_view.py tools/memory-tree/record-kinds.toml tools/memory-tree/record_kinds.py tools/govkit/registry.toml tools/gate-legs.json tools/govkit/subject-pins.tsv tools/run-gates/ceiling-evidence.txt tools/govkit/usage.toml help/tags.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-22.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-22-1-acceptance-ledger.md
+2026-11-22T17:14:32Z draw · re-dispatch · TOOL-dTotalRecall-22 · 18/186 · 20261122T171432Z-9f7d48
+
+2026-11-22T17:14:32Z dispatch · item 1ca91e84 TOOL-dTotalRecall-22 · reason memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-22-deviation-224.md
+2026-11-22T17:18:42Z draw · re-dispatch · TOOL-dTotalRecall-22 · 19/186 · 20261122T171842Z-a437f2
+
+2026-11-22T17:18:42Z dispatch · item 1ca91e84 TOOL-dTotalRecall-22 · reason memory/map/features/playbook.md

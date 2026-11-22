@@ -128,8 +128,8 @@ if KIT not in sys.path:
 from deviation_join import (  # noqa: E402  the record grammar's one reader, and the fixture repository
     Fixture, read_baseline_line, read_record, read_records, remove_tree, set_env_aside)
 from design_lib import (  # noqa: E402  the one parser of the design, and its clause-id grammar
-    _CL, DESIGN_KEYS, VIEW_ROW, DesignRefusal, derive_clause_hash, read_chain_clauses, read_design_conf,
-    read_design_keys, read_design_view, read_repo_root, run_git, write_design_fixture)
+    _CL, DESIGN_KEYS, VIEW_ROW, DesignRefusal, check_edge_bounds, derive_clause_hash, read_chain_clauses,
+    read_design_conf, read_design_keys, read_design_view, read_repo_root, run_git, write_design_fixture)
 
 SAY = "as-built view"
 # The argv and the env every attribute read of the merge check runs with, one pair so no read carries a
@@ -359,11 +359,15 @@ def resolve_clause_rows(records):
         if len({(r.get("after") or "").strip() for r, _row in members}) > 1:
             superseded = {r["supersedes"] for r, _row in members if r.get("supersedes") not in (None, r["id"])}
             head = [(r, row) for r, row in members if r["id"] not in superseded]
-            if len(head) != 1:
-                findings.append(f"unordered amends of {cid}: {', '.join(ids)} give it differing **After:** texts, and "
-                                + (f"no **Supersedes:** orders {', '.join(r['id'] for r, _row in head)}" if head else
-                                   "each is named in another's **Supersedes:**, a cycle with no head")
-                                + f"; {cid} renders its baseline row")
+            unordered = f"unordered amends of {cid}: {', '.join(ids)} give it differing **After:** texts, and "
+            if not head:
+                findings.append(unordered + f"each is named in another's **Supersedes:**, a cycle with no head; "
+                                            f"{cid} renders its baseline row")
+            # TOOL-dTotalRecall-22 S4: two or more heads is the shared counter's per-target bound 1 over the
+            # derived head relation, one edge (head, member, clause) per member no other supersedes
+            for v in check_edge_bounds([("head", r["id"], cid, r["id"]) for r, _row in head], {"head": ("many", 1)}):
+                findings.append(unordered + f"no **Supersedes:** orders {', '.join(m[1] for m in v.members)}; "
+                                            f"{cid} renders its baseline row")
         if stray or len(head) != 1:
             continue
         r, row = head[0]
