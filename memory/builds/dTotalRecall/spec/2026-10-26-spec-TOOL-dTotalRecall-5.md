@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader
 
-**Status:** INPROGRESS · rev-9 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-10 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0216@f8936b35 whole
 **Carries:** node:policy-key.builds.slug-words
@@ -17,6 +17,8 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-5-deviation-51.md](../build/2026-10-26-build-TOOL-dTotalRecall-5-deviation-51.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-1-builder-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-2-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-2-builder-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-divergence-2-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-2-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-divergence-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
@@ -25,6 +27,8 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-5-1-spec-reviewer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-5-1-spec-reviewer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief-2.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief-2.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-reground-brief.md) | journal | — |
@@ -39,8 +43,8 @@ One slug grammar, declared by the three policy keys `builds.slug-words`, `builds
 `builds.slug-date` and derived once by `derive_slug_grammar(root)` in `tools/memory-tree/id_grammar.py`,
 is what every slug and id reader in the tree reads, so an owner can change the grammar in one place
 and no reader rejects a slug or id minted under it or before it (gap-mem-06). Today each reader
-spells its own pattern: the id-shape census of §4 "The readers" finds 71 lines in 35 files (PINNED
-2026-11-22 at `b4137f489` and at `44c6800aa`). A digit date breaks six of the readers the slug research probed and a
+spells its own pattern: the id-shape census of §4 "The readers" finds 73 lines in 37 files (PINNED
+2026-11-22 at `b4137f489`, at `44c6800aa` and at `a8748ffaa`). A digit date breaks six of the readers the slug research probed and a
 hyphenated date ten (`research-memory-builds.md:92`), and the one setting that exists,
 `BUILD_SLUG_RE`, reaches check 4 alone (`layer-memory.md:531-560`).
 
@@ -49,9 +53,11 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
 - **S1** — `derive_slug_grammar(root)` in `tools/memory-tree/id_grammar.py`, the module
   PLAY-dOrderedCharter-18 S1 landed with `tools/memory-tree/id_grammar.py#grammar_for`, returns the
   `SlugGrammar` of §4 "The grammar": `words`, `style`, `date`, `node`, `slug_class`, `slug_ere`, the
-  derived `BUILD_SLUG_RE`, the strict `mint_re` and the `record` string. It reads the three keys
-  through `tools/memory-tree/tree_lib.py#read_policy_value` (§4 "The policy reads"), the key literal
-  first, and is cached per root. Observed by AC1 and AC2.
+  derived `BUILD_SLUG_RE`, the strict `mint_re`, the `record` string and the `fallback` reason. It
+  reads the three keys through `tools/memory-tree/tree_lib.py#read_policy_value` (§4 "The policy
+  reads"), the key literal first, and is cached per root. Where the policy reader refuses or no policy
+  kit resolves, the defaults apply and `fallback` names why, as checks 6 and 7 treat their read
+  (§8 F12). Observed by AC1, AC2 and AC13.
 - **S2** — A changed grammar binds new mints only: `mint_re` is the grammar in force, and
   `BUILD_SLUG_RE` is the union of the legacy shape, the grammar in force and every grammar a build
   README records, so every reader accepts both an existing form and the new one. Observed by AC2.
@@ -70,7 +76,14 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
   That is the era's one widening: under `none` and `shown` every slug the strict shape admits the
   legacy shape admits too (§4 "The grammar", §8 F11), so `ID_RE` finds the 4420 distinct ids it finds
   today in tracked `memory/**/*.md`, and no more (PINNED 2026-11-22 at `44c6800aa`). `Conf.digest` folds that class beside `derive_grammar_epoch()`, so a README recording a new grammar
-  invalidates a warm recall cache, the class its docstring measured. Observed by AC4.
+  invalidates a warm recall cache, the class its docstring measured. The era's local copy in
+  `tools/drift-audit/drift_report.py#_build_local_ident`
+  (`tools/drift-audit/drift_report.py@a8748ffaa:730`), which its self-test byte-compares with
+  `grammar_for(root).ID` (`tools/drift-audit/selftest.py@a8748ffaa:2849`), takes a trailing
+  `slug_class=None` and splices it as `_eras` does, `None` its inline legacy shape, the fallback it
+  already answers where `id_grammar` does not import; that arm passes
+  `derive_slug_grammar(root).slug_class`, so it still compares the two constructions byte for byte.
+  Observed by AC4 and AC14.
 - **S5** — The export to shell and to JavaScript: `id_grammar.py --print slug-re|slug-class|slug-grammar`,
   and `check-memory-hygiene.sh --print-slug-re` and `--print-slug-class`, each running the module once
   through the script's resolved Python; both print the ERE spelling of §4 "The two spellings". Two
@@ -88,8 +101,12 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
   (`tools/memory-tree/check-memory-hygiene.sh@b4137f489:1191`) takes `--print-slug-re`'s value, and
   the blank default `^[A-Za-z][A-Za-z0-9-]*$` it falls back to retires. The derived pattern is
   narrower than that default; every tracked folder matches it (§4 "The grammar"), and a folder
-  check 4's `LEGACY` registry names stays exempt. A module run that exits non-zero refuses the run,
-  exit 2, with the module's last line, never a fallback pattern. The conf key `BUILD_SLUG_RE` is
+  check 4's `LEGACY` registry names stays exempt. The policy reader refusing is not a module failure:
+  the module applies the defaults, exits 0 and writes its `fallback` line on stderr, which check 4
+  keeps and prints once beside its first finding, as `CAP_NOTE` is printed beside the first size
+  breach (`tools/memory-tree/check-memory-hygiene.sh@a8748ffaa:823`), so a passing run prints no new
+  line. A module run that exits non-zero, a crash or a `ConfError` of §4 "The policy reads", refuses
+  the run, exit 2, with the module's last line, never a fallback pattern. The conf key `BUILD_SLUG_RE` is
   retired as an input: a non-blank value refuses with exit 2 naming the three policy keys. Its
   default, its anchoring and empty-match refusals and its declared-key loop sit at
   `tools/memory-tree/check-memory-hygiene.sh@b4137f489:187`, `:233` and `:305`. Observed by AC6.
@@ -147,8 +164,11 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
   call, as `tools/memory-tree/tree_lib.py#read_policy_value` imports `backlog`.
   `tools/memory-tree/tree_lib.py#_expand_ids` and `tools/memory-tree/tree_lib.py#read_id_pins` take the
   same `root=None` and pass it on, and `tools/memory-tree/tree_lib.py#read_bindings` passes its own
-  root. A fixture id a suite reads through these functions with a slug the class refuses is
-  re-spelled to the legacy shape. Observed by AC12.
+  root. `_expand_ids`'s range form `rng` splices the same class as its `slug` group in place of its
+  own `[A-Za-z0-9]+` (`tools/memory-tree/tree_lib.py@a8748ffaa:685`), so a range admits exactly the
+  slugs the single token admits and `TOOL-dX-1..3` is a bad token, as `TOOL-dX-2` is (§8 F10). A
+  fixture id a suite reads through these functions with a slug the class refuses is re-spelled to the
+  legacy shape. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -195,7 +215,7 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
 ### The grammar
 
 ```python
-SlugGrammar(words=(lo, hi), style, date, node, slug_class, slug_ere, BUILD_SLUG_RE, mint_re, record)
+SlugGrammar(words=(lo, hi), style, date, node, slug_class, slug_ere, BUILD_SLUG_RE, mint_re, record, fallback)
 ```
 
 | Field | Source |
@@ -232,7 +252,7 @@ shape (`layer-memory.md:556`). A word carries no digit, as the slug rule's "`[A-
 A README recording no `slug-grammar:` is a legacy README and is read under the legacy shape alone.
 The recorded grammars are read from the front matter of the READMEs `git ls-files` lists in `root`,
 once per process and root, with `tools/memory-tree/tree_lib.py#read_text`; a value that does not
-parse as §4 "The record" refuses by path.
+parse as §4 "The record" refuses by path, as the `ConfError` of §4 "The policy reads".
 
 ### The two spellings
 
@@ -257,12 +277,54 @@ The three keys are read with `read_policy_value("builds.slug-words", root)` and 
 the key literal first, the call shape `tools/policy/check_policy.py`'s reader coverage reads.
 `tools/memory-tree/tree_lib.py#read_policy_value` runs `policy.py get <key>` in `root`, and `get` reads
 `.governance/policy.toml` as committed at the landed revision, the remote ladder's tip or with no remote
-the local default branch, never the working tree (`tools/policy/policy.py#derive_landed_revision`). A
-`LookupError`, no policy kit resolving, applies `SLUG_DEFAULTS`, the three catalogue defaults above,
-and prints one line once per process, `slug grammar: no policy kit, the defaults apply`. A
-`ValueError`, the reader refusing, refuses the caller with its message, which names the key.
-`parse_slug_grammar` refuses a `words` value with `lo` below 1 or above `hi`, which the catalogue's
-pattern `[0-9]+-[0-9]+` admits.
+the local default branch, never the working tree (`tools/policy/policy.py#derive_landed_revision`).
+`get` refuses, exit 2, wherever no landed revision resolves: a repository with no remote whose
+`main` names no commit, which is every fixture of `tools/memory-tree/check-memory-hygiene.test.sh`
+by its master pin (`tools/memory-tree/check-memory-hygiene.test.sh@a8748ffaa:299`) and any adopter
+with no remote whose branch is not `main` (`2026-11-22-build-TOOL-dTotalRecall-5-2-builder-return`).
+Its other refusals for these three keys are of the revision too, an invalid file with no last valid
+revision or `policy-file.on-invalid` not `last-valid` (`tools/policy/policy.py#read_last_valid_value`),
+never of one key, since each row carries a literal default (`tools/policy/policy.py#resolve`).
+
+One rule covers both ways the read can fail, the rule checks 6 and 7 hold for their size switch: "No
+kit, or any refusal, leaves every value as declared ... and the reason prints once, at the first
+breach" (`tools/memory-tree/check-memory-hygiene.sh@a8748ffaa:753`).
+
+- A `LookupError`, no policy kit resolving, or a `ValueError`, the reader refusing, applies
+  `SLUG_DEFAULTS`, the three catalogue defaults above, to all three keys together. The first refused
+  read ends the reads, so the grammar is never a mix of read and default values, and a tree with no
+  landed revision pays one `policy.py get` run, not three.
+- `fallback` then holds one line, `slug grammar: no policy kit, the defaults apply` or
+  `slug grammar: the policy reader refused <key>, the defaults apply: <the reader's last line>`; it
+  is empty when the three keys read.
+- `fallback` is printed where it explains something, never on every read: by each `--print` mode of
+  `id_grammar.py`, on stderr; beside check 4's first finding (S6); and in the refusal of
+  `cmd_new_build` and `cmd_placed_build` (S3). A reader that only parses slugs or ids prints nothing,
+  so no suite's output moves in a fixture with no landed revision. The scoped-versus-unscoped line
+  compare at `tools/memory-tree/check-memory-hygiene.test.sh@a8748ffaa:1453` is one output such a line
+  would have to survive.
+- `parse_slug_grammar` refuses a value the reader returned that is outside its grammar, a `words`
+  value with `lo` below 1 or above `hi`, which the catalogue's pattern `[0-9]+-[0-9]+` admits. That
+  refusal, and a malformed recorded grammar, raise `ConfError`, the class
+  `tools/memory-tree/id_grammar.py#resolve` raises for an unusable conf, carrying the key or the path.
+  So each caller below meets the grammar's one refusal on the path it already takes for a broken conf.
+
+What this does not check: an owner's key that the reader refused goes unapplied, said only by
+`fallback`. The policy kit's own leg, `policy check`, is what reds an invalid policy file.
+
+The callers of what S4 and S13 change were each read at `a8748ffaa`, for the path each takes when
+`grammar_for` or the id-token readers raise. None of them meets the policy refusal, which no longer
+raises:
+
+| Caller | On a raise |
+|---|---|
+| `tools/memory-tree/merge-rows.py#anchors` | becomes a conflict, by its "no degraded mode" |
+| `tools/memory-tree/transition_audit.py#resolve_anchor` | `cannot run`, exit 2, check 26's leg line |
+| `tools/drift-audit/drift_report.py#_resolve_ident`, `#_resolve_anchors` | `except Exception`, the local legacy copy |
+| `tools/memory-tree/corpus_ids.py#resolve_anchor` | `ConfError` mapped by name to its `Problem` |
+| `tools/unattended/check-unattended.sh` `ASK_ANCHOR_PY` | exit 3 naming the bind |
+| `tools/memory-recall/extract.py`, its import-time `grammar_for()` | the import raises in its importer |
+| `tree_lib.read_bindings` and its readers in `gen_build_index.py`, `deviation_join.py`, `seen_red.py`, `build_records.py` and `tools/playbook/edge_grammar.py` | propagates to each tool's own handler |
 
 ### The readers
 
@@ -270,20 +332,25 @@ The inventory is derived, never typed. `id_grammar.py --readers [<root>]` lists 
 tracked `*.py`, `*.sh` or `*.js` file under `tools/` and `skills/`, and of every tracked file under
 `.githooks/`, whose hooks carry no extension, that spells a slug class followed by a hyphen and a
 digit class, `\d`, `[0-9]` or `[1-9]`, with at most a group's closing and opening parenthesis between
-them (the id shape; `tools/memory-tree/gen_build_index.py#cmd_new_spec` is one such), or binds a name
+them, the class's repeat a `*`, a `+` or a brace interval in its single or its f-string's doubled
+braces (the id shape; `tools/memory-tree/gen_build_index.py#cmd_new_spec` is one such), or binds a name
 containing `SLUG` or `slug` to a regex literal (the slug shape), outside the grammar's own entry
 points. Its id-shape half, in the narrower form with no parenthesis between, is this command:
 
 ```bash
-git grep -nE '\[[^]]*a-z[^]]*\]([*+]|\{[0-9]*,?[0-9]*\})?-([\\]d|\[0-9\]|\[1-9\])' <rev> -- 'tools/*.py' 'tools/*.sh' 'tools/*.js' 'skills/*.py' 'skills/*.sh' 'skills/*.js' '.githooks/*' | wc -l
+git grep -nE '\[[^]]*a-z[^]]*\]([*+]|\{\{?[0-9]*,?[0-9]*\}\}?)?-([\\]d|\[0-9\]|\[1-9\])' <rev> -- 'tools/*.py' 'tools/*.sh' 'tools/*.js' 'skills/*.py' 'skills/*.sh' 'skills/*.js' '.githooks/*' | wc -l
 ```
 
 Its file count is the same command with `cut -d: -f2 | sort -u | wc -l` in place of `wc -l`. The
 backslash of its first digit arm is bracketed, `[\\]d`: rev-8 spelled it `\\d`, which on git
 2.54.0.windows.1 matched no backslash-d spelling, so that command printed 49 lines in 21 files at
-`b4137f489` and at `44c6800aa` (measured 2026-11-22). As spelled here it finds 71 lines in 35 files at
-`b4137f489` and at `44c6800aa`, 70 lines in 34 files at the base `8b8b1374`, and 62 lines in 29 files
-at `fb872a37e` (each PINNED 2026-11-22, same git), so rev-5's figure, which stated no command, does not reproduce. Among them is every site scout C listed
+`b4137f489` and at `44c6800aa` (measured 2026-11-22). Its brace interval admits an f-string's doubled
+braces, `\{\{?...\}\}?`: rev-9's single-brace arm missed the session era's two f-string spellings,
+`tools/memory-tree/id_grammar.py#_eras`, the grammar's own, and
+`tools/drift-audit/drift_report.py@a8748ffaa:730`, a reader (S4), and found 71 lines in 35 files at
+`b4137f489`, at `44c6800aa` and at `a8748ffaa`. As spelled here it finds 73 lines in 37 files at
+`b4137f489`, at `44c6800aa` and at `a8748ffaa`, 72 lines in 36 files at the base `8b8b1374`, and 64
+lines in 31 files at `fb872a37e` (each PINNED 2026-11-22, same git), so rev-5's figure, which stated no command, does not reproduce. Among them is every site scout C listed
 (`2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-c.md`), each found at HEAD on 2026-11-22 under
 the same name, the JavaScript `reviewSlug` among them
 (`tools/workflows/tier2-review.template.js@b4137f489:631`). Readers landed since the base join
@@ -300,7 +367,7 @@ Each hit takes one disposition; the pass commit's `Decided:` trailer names any h
 | The reader sits in | It reads the grammar through |
 |---|---|
 | memory-tree | a sibling import of `id_grammar` |
-| a kit that requires memory-tree (roles, unattended's Python, memory-recall, loop, playbook-render) | that kit's existing `resolve_kit_dir` copy, the loop kit's in `tools/loop/loop_lib.py` |
+| a kit that requires memory-tree (roles, unattended's Python, memory-recall, loop, playbook-render, drift-audit) | that kit's existing `resolve_kit_dir` copy, the loop kit's in `tools/loop/loop_lib.py`; drift-audit's local copy takes the class as S4 states |
 | a repo-root tool (`tools/check-spec-tokens.py`) | its `resolve_kit_dir` copy |
 | a kit that does not require memory-tree (runlog, branch-reconcile, run-gates) | a `resolve_kit_dir` copy: run-gates' existing one, and in `tools/runlog/runlog_lib.py` and `tools/branch-reconcile/branch_reconcile.py` the one this pass adds (S8), neither file holding one at `44c6800aa`; where memory-tree does not resolve, its inline `slug_legacy_*` block and one stderr line, `slug grammar: memory-tree not installed, the legacy shape applies` |
 | shell (unattended, push-main, run-gates, the hygiene script) | `check-memory-hygiene.sh --print-slug-class` or `--print-slug-re`, resolved once per run |
@@ -389,6 +456,8 @@ which TOOL-dTotalRecall-20's upgrade steps may grade.
 - `tools/loop/position.py`
 - `tools/playbook/instruction_units.py`
 - `tools/check-spec-tokens.py`
+- `tools/drift-audit/drift_report.py` (`_build_local_ident`'s `slug_class`, S4)
+- `tools/drift-audit/selftest.py` (its local-grammar parity arm, S4)
 - `tools/unattended/unattended.sh`
 - `tools/unattended/lib-unattended.sh`
 - `tools/unattended/check-unattended.sh`
@@ -427,15 +496,17 @@ The search of §4 "The readers" re-derives this list at the pass; a hit outside 
 - perf / scale — the three policy reads took 0.73 s together (PINNED, measured 2026-11-22) and the
   README scan reads each build's front matter, each once per process and root; a print mode adds one
   Python start per shell run.
-- error / empty / loading states — no policy kit applies the defaults and says so; memory-tree absent
-  applies the legacy shape and says so; a malformed recorded grammar refuses by path; a module failure
-  refuses check 4 rather than falling back.
+- error / empty / loading states — no policy kit, or the policy reader refusing (no landed revision
+  among its causes), applies the defaults and says so in `fallback` where it explains a finding;
+  memory-tree absent applies the legacy shape and says so; a malformed recorded grammar or a value
+  `parse_slug_grammar` refuses raises `ConfError` by path or key; a module failure refuses check 4
+  rather than falling back.
 - observability — `--print slug-grammar` prints the grammar in force and every recorded grammar.
 - risks — a reader the search cannot see (a pattern built at runtime) keeps its own spelling; the
   search's population is printed so the pass can read it, and the flip probe is the backstop.
   `SLUG_DEFAULTS` restates the catalogue's defaults for a tree with no policy kit; the build-index
   self-test arm of §7 compares the two where the policy kit resolves.
-- testing — AC1 to AC11 by a pass; the arms of §7 at the close.
+- testing — AC1 to AC14 by a pass; the arms of §7 at the close.
 - migration — none for records; a set conf `BUILD_SLUG_RE` is refused by name.
 - user docs — `help/reference/policy.md` gains the three keys' sections by its render (S12); S11
   updates the hygiene prose. No new surface class: the new flags and print modes join no `[[class]]`
@@ -444,10 +515,11 @@ The search of §4 "The readers" re-derives this list at the pass; a hit outside 
 ## 6. Acceptance criteria
 
 - **AC1** — When `python id_grammar.py --print slug-grammar` runs from `tools/memory-tree/` at the pass
-  tip with no `builds.slug-*` key set, it prints `words=1-3 style=humorous date=none`, and every
-  tracked build folder name matches `--print slug-re`'s pattern under `grep -E`.
-  Red when: the defaults are read wrongly, or the derived pattern rejects an existing folder or is
-  not ERE.
+  tip with no `builds.slug-*` key set, it prints `words=1-3 style=humorous date=none` and writes
+  nothing on stderr, and every tracked build folder name matches `--print slug-re`'s pattern under
+  `grep -E`.
+  Red when: the defaults are read wrongly, the keys did not read in this tree (a `fallback` line on
+  stderr), or the derived pattern rejects an existing folder or is not ERE.
 - **AC2** — When a probe commits `builds.slug-words = "1-1"` to `main` of a scratch clone whose
   remote is removed and calls `derive_slug_grammar(<clone>)`, `mint_re` refuses `dTotalRecall` and
   admits `dLoop`, and `BUILD_SLUG_RE` admits both.
@@ -478,11 +550,12 @@ The search of §4 "The readers" re-derives this list at the pass; a hit outside 
   Red when: the conf value is still read, so the slug grammar has two carriers.
 - **AC7** — When `python id_grammar.py --readers` runs at the pass tip, it lists no line outside the
   grammar's entry points but the hits the pass's `Decided:` trailer keeps; when a scratch clone gains
-  a planted `x.py` in its tools directory holding `re.compile(r"[A-Z]+-[A-Za-z]+-[0-9]+")` and a
-  planted `.githooks/x` holding `grep -E '[A-Z]+-[A-Za-z]+-[0-9]+'`, it lists both lines.
-  Red when: the predicate misses either planted id-shape spelling, or the tip still holds an
-  un-re-pointed reader.
-  figure: the narrower form's 71 lines in 35 files at `b4137f489` and at `44c6800aa` are PINNED 2026-11-22 by the command of §4 "The readers", its first digit arm bracketed; the pass re-derives the before-count with it at its base.
+  a planted `x.py` in its tools directory holding `re.compile(r"[A-Z]+-[A-Za-z]+-[0-9]+")` and
+  `y = rf"[{n}][A-Za-z]{{2,}}-\d+"`, and a planted `.githooks/x` holding
+  `grep -E '[A-Z]+-[A-Za-z]+-[0-9]+'`, it lists all three lines.
+  Red when: the predicate misses any planted id-shape spelling, the f-string's doubled braces among
+  them, or the tip still holds an un-re-pointed reader.
+  figure: the narrower form's 73 lines in 37 files at `b4137f489`, at `44c6800aa` and at `a8748ffaa` are PINNED 2026-11-22 by the command of §4 "The readers", its first digit arm bracketed and its brace interval admitting doubled braces; the pass re-derives the before-count with it at its base.
 - **AC8** — When `tools/memory-tree` is renamed away in a scratch clone and a probe calls runlog's
   slug reader in `tools/runlog/runlog_lib.py` on `dTotalRecall`, it accepts the slug and prints
   `slug grammar: memory-tree not installed, the legacy shape applies` once; and when the
@@ -508,19 +581,45 @@ The search of §4 "The readers" re-derives this list at the pass; a hit outside 
   Red when: a key stays unsummarised, unanchored, or on the docs ledger once anchored.
 - **AC12** — When a probe in AC4's planted clone calls `build_id_token_re("TOOL", <clone>)` from
   `tools/memory-tree/tree_lib.py`, it matches `TOOL-d2026-10-26Loop-3` whole with `slug`
-  `d2026-10-26Loop` and `seq` `3`, and matches neither `TOOL-dX-2` nor `TOOL-x-1`; and a probe
-  printing each tracked path's `ids` from `read_bindings` prints the same lines at the pass base and
-  at the tip.
-  Red when: the slug group keeps `[A-Za-z0-9]+`, so the hyphenated id fails and `TOOL-dX-2` matches,
-  or the bound class drops an id the base read.
+  `d2026-10-26Loop` and `seq` `3`, and matches neither `TOOL-dX-2` nor `TOOL-x-1`; when the same
+  probe calls `_expand_ids("TOOL-dX-1..3 TOOL-d2026-10-26Loop-1..2", "TOOL", <clone>)`, it returns the
+  ids `TOOL-d2026-10-26Loop-1` and `TOOL-d2026-10-26Loop-2` and the one bad token `TOOL-dX-1..3`;
+  and a probe printing each tracked path's `ids` from `read_bindings` prints the same lines at the
+  pass base and at the tip.
+  Red when: the slug group of the single or the range form keeps `[A-Za-z0-9]+`, so the hyphenated id
+  fails or `TOOL-dX-2` matches or `TOOL-dX-1..3` expands, or the bound class drops an id the base
+  read.
   fixture: AC4's clone; the pass makes it.
+- **AC13** — When a probe in a scratch repository made by `git init -q --template=` with
+  `init.defaultBranch=master`, one commit and no remote, wraps
+  `read_policy_value` from `tools/memory-tree/tree_lib.py` with a call counter and calls
+  `derive_slug_grammar(<repo>)`, it returns `words=(1, 3)`, `style` `humorous` and `date` `none` with
+  `fallback` naming `builds.slug-words` and `refs/heads/main`, the counter reads 1, and nothing is
+  written on stderr; when `check-memory-hygiene.sh` runs in the hygiene suite's base fixture, which
+  its master pin (§4 "The policy reads") leaves with no landed revision, a passing run's output holds
+  no `slug grammar:` line, and with a folder `d_bad` planted
+  there check 4's finding is followed by the `fallback` line once; and when the repository's branch is renamed `main` and a
+  commit sets `builds.slug-words = "0-2"` in `.governance/policy.toml`, `derive_slug_grammar` raises
+  `ConfError` naming `builds.slug-words`.
+  Red when: the policy reader's refusal raises out of the grammar, the three keys are read after the
+  first refusal, a passing run prints the reason or a failing one omits it, or a value the grammar
+  refuses falls back.
+  fixture: the scratch repository under `%TEMP%/<short>`; the pass makes it, the probe of the second
+  builder return its model; the hygiene suite's base fixture exists today.
+- **AC14** — When a probe at the pass tip imports `tools/drift-audit/drift_report.py` and
+  `tools/memory-tree/id_grammar.py` and compares
+  `_build_local_ident(families, derive_slug_grammar(root).slug_class)` with `grammar_for(root).ID`
+  for this tree, the two are byte-equal; and `_build_local_ident(families)` still matches `TOOL-dTotalRecall-5` whole.
+  Red when: the local copy keeps its own session spelling, so drift-audit's parity arm reds once S4
+  splices the class, or the fallback loses the legacy shape.
 
 ## 7. Gates
 
 `memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `memory-recall kit selftest` · `branch-reconcile selftest` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `routed-commits selftest` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `pass-order history` · `brief-recorded` · `push-main self-test` · `roles render selftest` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `review-protocol parity (kit vs dogfood)` · `kit placeholders (a declared token its adopter substitutes)` · `playbook render selftest` · `branch-guard self-test` · `drift-audit selftest` · `scratch-guard self-test` · `corpus-ids selftest` · `transition-audit arms` · `verdict-epoch self-test` · `loop adapt fixtures` · `loop breakpoint fixtures` · `loop guard fixtures` · `loop placement fixtures` · `loop position fixtures` · `loop claim fixtures` · `ratchet selftest` · `instruction units selftest` · `policy check` · `policy fixtures` · `docs` · `help reference pages` · `govkit selfcheck` · `govkit acceptance matrix` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC8 · the `slug_legacy_py` and `slug_legacy_sh` parity rows, staged by one byte changed in the run-gates copy · that suite's assertion count, raised by the two rows and by the two `resolve_kit_dir` copies S8 adds to the existing row's population
-New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 AC6 · the `BUILD_SLUG_RE` arms from `tools/memory-tree/check-memory-hygiene.test.sh@b4137f489:3896` rewritten: a set conf value refuses naming the three keys, and check 4 reds a planted folder `d_bad` the derived pattern refuses, staged by restoring the conf read · none
+New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 AC6 AC13 · the `BUILD_SLUG_RE` arms from `tools/memory-tree/check-memory-hygiene.test.sh@b4137f489:3896` rewritten: a set conf value refuses naming the three keys, and check 4 reds a planted folder `d_bad` the derived pattern refuses with the `fallback` line once after it, the master-pinned fixture having no landed revision, staged by restoring the conf read and by printing the line on every run · none
+New arm: tools/drift-audit/selftest.py · covers AC14 · its local-grammar parity arm passing the shipped slug class to `_build_local_ident`, staged by dropping the splice from the local copy · none
 New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--selftest` gains the `slug-grammar:` line in both scaffolded READMEs, the `shown` label, and `SLUG_DEFAULTS` against the catalogue rows' defaults where the policy kit resolves, one SKIP line where it does not, staged by dropping the key from `render_new_build_readme` · none
 
 ## 8. Open questions
@@ -606,6 +705,34 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--se
   feature-rich survivor of veto 1, satisfying the criteria (a) does with no follow-up left open; it is
   the return's (a) with its digits dropped, per
   `2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-brief`. widens: none · relaxes: none
+- **F12 — What does the grammar do when the policy reader refuses?** Rev-9 refused the caller, but
+  `policy.py get` refuses wherever no landed revision resolves, which is every fixture of the hygiene
+  suite by its master pin and `tools/memory-tree/corpus_ids.py#_scratch` on a node whose
+  `init.defaultBranch` is not `main`, so `memory-hygiene self-test` and `corpus-ids selftest` would red, and check 26 with them
+  (`tools/memory-tree/transition_audit.py#main` turns any raise into exit 2)
+  (`2026-11-22-build-TOOL-dTotalRecall-5-2-builder-return`). Options: (a) the return's (a): a
+  `ValueError` whose cause is no landed revision applies `SLUG_DEFAULTS` as `LookupError` does, one
+  stderr line per process, any other `ValueError` still refusing; (b) keep the refusal and give every
+  suite fixture a landed `main`; (c) read the keys only where `.governance/policy.toml` is tracked in
+  `root`, the defaults otherwise; (d) the rule checks 6 and 7 hold
+  (`tools/memory-tree/check-memory-hygiene.sh@a8748ffaa:753`): any refusal of the policy reader
+  applies the defaults, the reason printed where it explains a finding. A value the reader returns and
+  `parse_slug_grammar` refuses still refuses, under every option.
+  (b) reverses the hygiene suite's deliberate master pin, which keeps checks 6 and 7 at their default,
+  and leaves every adopter with no remote off `main` refused on every id parse and conflicted on
+  every merge, veto 1. (a) can tell its cause apart only by matching the policy kit's message text,
+  which no contract carries. Its remaining refusal, an invalid policy file under `on-invalid` refuse,
+  would refuse every id parse in the tree, where checks 6 and 7 read the same refusal as their
+  default. Its stderr line per process also prints in every fixture process, which the line compare
+  at `tools/memory-tree/check-memory-hygiene.test.sh@a8748ffaa:1453` must then survive. (c) decides
+  from the working tree what the reader reads at the landed revision, one fact in two places, and an
+  adopter whose tracked file has no landed revision still refuses everywhere. (d) keeps one rule with
+  checks 6 and 7. Every suite stays at its output, since a passing run prints nothing, and the
+  policy kit's own `policy check` leg stays the one owner of an invalid file's refusal.
+  Recommendation (d). RESOLVED (agent, 2026-11-22, delegated): (d), the most feature-rich survivor of
+  veto 1: it covers (a)'s no-landed-revision case and the invalid-file case with one rule, and ties
+  to the precedent the brief named, the size switch's read, per
+  `2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-brief`. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -643,6 +770,16 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--se
   join that row's marker-derived population with the row unchanged, beside two new rows; the census
   command's first digit arm is bracketed and every figure on it re-pinned at `44c6800aa`. No
   criterion's observation moved.
+- rev-10 · 2026-11-22 · S1 · S4 · S6 · S13 · §1 · §4 "The grammar", "The policy reads", "The
+  readers", Files touched · §5 · AC1 · AC7 · AC12 · AC13 · AC14 · §7 `New arm:` · §8 F12 · per
+  `2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-brief` and
+  `2026-11-22-build-TOOL-dTotalRecall-5-2-builder-return`: the policy reader's refusal applies the
+  defaults as checks 6 and 7 do, `fallback` naming it where it explains a finding (F12), and the
+  grammar's own refusals raise `ConfError`, with every caller of S4's and S13's functions traced for
+  its path on a raise; S13's range form splices the class too; the census's brace interval admits an
+  f-string's doubled braces, which finds drift-audit's local era copy, re-pointed in S4 with its
+  parity arm, and every figure on it is re-pinned at `a8748ffaa`. AC1's and AC12's observations
+  widen, AC7's planted lines gain one, and AC13 and AC14 are new.
 
 ## 10. Reuse audit
 
