@@ -1016,8 +1016,7 @@ def derive_introduced(root, landed_ref: str, files: list[str], table: str,
     if not (landed_ref and want and files):
         return found
     declared, walked = set(files), list(files)
-    cat = subprocess.Popen(["git", "-C", str(root), "cat-file", "--batch"],
-                           stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    cat = build_blob_batch(root)
     try:
         if registry:
             reg_rel, tr = registry
@@ -1065,8 +1064,7 @@ def derive_introduced(root, landed_ref: str, files: list[str], table: str,
             if not want:
                 break
     finally:
-        cat.stdin.close()
-        cat.wait()
+        cat.remove_process()
     return found
 
 
@@ -2691,20 +2689,72 @@ def blob_at(root, commit: str, path: str, batch=None) -> bytes | None:
     say "these bytes came from <commit>" about bytes that came from whatever the operator had
     checked out and half-edited at the time.
 
-    THE ONE revision-blob reader (TOOL-dSafePassage-26 S14). `batch` is an open
-    `git cat-file --batch` process a caller reading many blobs passes, `derive_introduced` among
-    them, so a history walk asks one process rather than spawning one `git show` per blob.
+    THE ONE revision-blob reader (TOOL-dSafePassage-26 S14). `batch` is a `BlobBatch` from
+    `build_blob_batch` that a caller reading many blobs passes, `derive_introduced` and `update`
+    among them, so a run asks one `git cat-file --batch` process rather than spawning one
+    `git show` per blob. TOOL-dQuietDisk-16 S2: a `missing` or `ambiguous` reply is None, as the
+    spawn is; an end of stream or a header that does not parse answers through the spawn and
+    marks the handle dead, so a dead process never reads as a missing blob, and a name holding a
+    newline, which the line-framed protocol cannot carry, is a spawn too.
     """
-    if batch is None:
-        out = subprocess.run(["git", "-C", str(root), "show", f"{commit}:{path}"],
-                             capture_output=True, check=False)
-        return out.stdout if out.returncode == 0 else None
-    batch.stdin.write(f"{commit}:{path}\n".encode("utf-8"))
-    batch.stdin.flush()
-    head = batch.stdout.readline().split()
-    if len(head) < 3:
-        return None  # `<name> missing`: no such blob at that commit
-    return batch.stdout.read(int(head[2]) + 1)[:-1]
+    name = f"{commit}:{path}"
+    if batch is not None and not batch.dead and "\n" not in name:
+        proc = batch.init_process()
+        try:
+            proc.stdin.write(f"{name}\n".encode("utf-8"))
+            proc.stdin.flush()
+            line = proc.stdout.readline()
+        except (OSError, ValueError):
+            line = b""
+        if line.rstrip(b"\n").endswith((b" missing", b" ambiguous")):
+            return None  # no such blob at that commit, or a commit naming more than one object
+        head = line.split()
+        if len(head) == 3 and head[2].isdigit():
+            size = int(head[2])
+            try:
+                data = proc.stdout.read(size + 1)
+            except (OSError, ValueError):
+                data = b""
+            if len(data) == size + 1:
+                return data[:-1]
+        batch.dead = True
+    out = subprocess.run(["git", "-C", str(root), "show", name], capture_output=True, check=False)
+    return out.stdout if out.returncode == 0 else None
+
+
+class BlobBatch:
+    """TOOL-dQuietDisk-16 S1. One `git -C <root> cat-file --batch` process `blob_at` reads through,
+    started on the first request and stopped by `remove_process()`. `dead` is set by `blob_at` on
+    an end of stream or a bad header, and every later request on the handle is a spawn."""
+
+    def __init__(self, root):
+        self.root = root
+        self.dead = False
+        self._proc = None
+
+    def init_process(self) -> subprocess.Popen:
+        """The process, started on the first call, so a run refused before its first read starts
+        none; it inherits the caller's environment, as the spawn branch's `git show` does."""
+        if self._proc is None:
+            self._proc = subprocess.Popen(["git", "-C", str(self.root), "cat-file", "--batch"],
+                                          stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        return self._proc
+
+    def remove_process(self) -> None:
+        """Close the process's stdin and wait for it; a no-op on a handle never started."""
+        if self._proc is None:
+            return
+        try:
+            self._proc.stdin.close()
+        except OSError:
+            pass  # a process already gone leaves a pipe that refuses the close
+        self._proc.wait()
+        self._proc.stdout.close()
+
+
+def build_blob_batch(root) -> BlobBatch:
+    """TOOL-dQuietDisk-16 S1. A `BlobBatch` over gov's object store at `root`, no process yet."""
+    return BlobBatch(root)
 
 
 def write_atomic(dest, text: str) -> None:

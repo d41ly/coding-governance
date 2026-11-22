@@ -43,6 +43,11 @@
       "file": "tools/unattended/history_store.py"
     },
     {
+      "id": "BlobBatch",
+      "kind": "class",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "BoundsRefused",
       "kind": "class",
       "file": "tools/loop/review_bounds.py"
@@ -2876,6 +2881,11 @@
       "id": "build_blanked",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "build_blob_batch",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "build_blob_request",
