@@ -1834,6 +1834,68 @@ HOOK=$sg_hook
   && { echo "ok   TOOL-dPlacedRequest-95 AC1 fixture 3: the commit's PreToolUse ran no checker the target tracks"; pass=$((pass+1)); } \
   || { echo "FAIL TOOL-dPlacedRequest-95 AC1 fixture 3: tracked '$sg95_tracked', or the target's checker ran and wrote its marker"; fail=$((fail+1)); }
 
+# ---- KICK-dKeptSession-13 AC5 (S7): the item-boundary step starts the verb detached, at a moved HEAD alone ----
+# A scratch repository whose card file is owned by session sgtest-ib, routes the build tIb and holds an
+# `item —` line. checkItemBoundary is called with a stub checker per case, each stub appending its argv to
+# its own calls file, sleeping 5 s, then writing its done file. Holds when: `at` equal to HEAD, a role
+# agent's payload, and a card another session owns start no stub; a stale `at` starts one, with the
+# boundary verb's flags and `--out` naming `<common dir>/orientation/sgtest-ib.boundary`, the step
+# returning before the stub is done; and a waiting `.boundary` file is returned and unlinked. Staged
+# against a step that compares nothing, the at-equal-to-HEAD row reds; against a synchronous spawn, the
+# return row. WHAT THIS DOES NOT CHECK: the verb the real checker runs, which the card-store plants cover.
+sgib="$TMP/sgib"; sgib_r="$sgib/repo"; mkdir -p "$sgib/stubs" "$sgib_r/.claude"
+git init -q "$sgib_r" && printf 'x\n' > "$sgib_r/x.txt" && $SGGIT -C "$sgib_r" add x.txt && $SGGIT -C "$sgib_r" commit -q -m one
+sgib_h=$(git -C "$sgib_r" rev-parse --short=8 HEAD)
+sgib_c=$(cd "$sgib_r" && node -p 'process.cwd()')
+mkdir -p "$sgib_r/.git/orientation"
+# write_sgib_card <owner> <at, or none for no section>
+write_sgib_card() {
+  { printf '[.claude/orientation-card.md · Level 1 · a fixture direction]\ncard-owner — %s · absent\n## route\n- build: tIb\n' "$1"
+    [ "$2" = none ] || printf '## pointers\nrecords — none\nforks — none\nitem — item.build.base@TOOL-tIb-1#aaaa0001 · at %s\n' "$2"
+    printf 'READY — tIb\n[/.claude/orientation-card.md]\n'; } > "$sgib_r/.claude/orientation-card.md"
+}
+for sgib_s in equal role other stale ctx bare; do
+  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "%s"\nsleep 5\n: > "%s"\n' "$sgib/calls-$sgib_s" "$sgib/done-$sgib_s" > "$sgib/stubs/$sgib_s.sh"
+done
+# run_sgib <stub> <agent_type or -> — the step's elapsed ms, its return and whether the stub is done, one line
+run_sgib() {
+  node -e 'const m = require(process.argv[1]); const d = { hook_event_name: "PreToolUse", tool_name: "Bash", tool_input: { command: "true" }, session_id: "sgtest-ib", cwd: process.argv[2] }
+    if (process.argv[4] !== "-") d.agent_type = process.argv[4]
+    const t = Date.now(); const out = m.checkItemBoundary(d, {}, process.argv[3]); const ms = Date.now() - t
+    console.log(ms + " " + JSON.stringify(out) + " " + require("fs").existsSync(process.argv[5]))' "$HOOK" "$sgib_c" "$sgib/stubs/$1.sh" "$2" "$sgib/done-$1" 2>&1
+}
+write_sgib_card sgtest-ib "$sgib_h"; run_sgib equal - > "$sgib/out-equal"
+write_sgib_card sgtest-ib 00000000; run_sgib role gov-builder > "$sgib/out-role"
+write_sgib_card sgtest-other 00000000; run_sgib other - > "$sgib/out-other"
+write_sgib_card sgtest-ib 00000000; run_sgib stale - > "$sgib/out-stale"
+write_sgib_card sgtest-ib none; run_sgib bare - > "$sgib/out-bare"
+printf 'boundary — K1 → K2\n' > "$sgib_r/.git/orientation/sgtest-ib.boundary"
+write_sgib_card sgtest-ib "$sgib_h"; run_sgib ctx - > "$sgib/out-ctx"
+for sgib_i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do [ -f "$sgib/calls-stale" ] && [ -f "$sgib/calls-bare" ] && break; sleep 1; done
+sleep 1
+for sgib_s in equal role other ctx; do
+  [ ! -e "$sgib/calls-$sgib_s" ] && { echo "ok   KICK-dKeptSession-13 AC5 case $sgib_s starts no boundary verb"; pass=$((pass+1)); } \
+    || { echo "FAIL KICK-dKeptSession-13 AC5 case $sgib_s started the boundary verb: $(cat "$sgib/calls-$sgib_s") · $(cat "$sgib/out-$sgib_s")"; fail=$((fail+1)); }
+done
+sgib_want="--card --boundary --build tIb --session sgtest-ib --out "
+case "$(grep -c . "$sgib/calls-stale" 2>/dev/null);$(cat "$sgib/calls-stale" 2>/dev/null)" in
+  "1;$sgib_want"*/orientation/sgtest-ib.boundary) echo "ok   KICK-dKeptSession-13 AC5 a stale at starts one detached --card --boundary, --out naming the .boundary file"; pass=$((pass+1)) ;;
+  *) echo "FAIL KICK-dKeptSession-13 AC5 a stale at starts one detached --card --boundary: $(cat "$sgib/calls-stale" 2>&1) · $(cat "$sgib/out-stale")"; fail=$((fail+1)) ;;
+esac
+case "$(cat "$sgib/out-stale")" in
+  *' "" false') echo "ok   KICK-dKeptSession-13 AC5 the step returned before the stub was done"; pass=$((pass+1)) ;;
+  *) echo "FAIL KICK-dKeptSession-13 AC5 the step returned before the stub was done: $(cat "$sgib/out-stale")"; fail=$((fail+1)) ;;
+esac
+[ "$(grep -c . "$sgib/calls-bare" 2>/dev/null)" = 1 ] && { echo "ok   KICK-dKeptSession-13 AC5 a card with no ## pointers starts the verb"; pass=$((pass+1)); } \
+  || { echo "FAIL KICK-dKeptSession-13 AC5 a card with no ## pointers starts the verb: $(cat "$sgib/out-bare")"; fail=$((fail+1)); }
+case "$(cat "$sgib/out-ctx")" in
+  *' "boundary — K1 → K2" '*) [ ! -e "$sgib_r/.git/orientation/sgtest-ib.boundary" ] \
+    && { echo "ok   KICK-dKeptSession-13 AC5 a waiting .boundary file is returned and unlinked"; pass=$((pass+1)); } \
+    || { echo "FAIL KICK-dKeptSession-13 AC5 the .boundary file was returned and left in place"; fail=$((fail+1)); } ;;
+  *) echo "FAIL KICK-dKeptSession-13 AC5 a waiting .boundary file is returned: $(cat "$sgib/out-ctx")"; fail=$((fail+1)) ;;
+esac
+for sgib_i in 1 2 3 4 5 6 7 8; do [ -f "$sgib/done-stale" ] && [ -f "$sgib/done-bare" ] && break; sleep 1; done
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a

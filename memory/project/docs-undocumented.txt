@@ -99,7 +99,6 @@ policy:builds.slug-date	undocumented when the docs leg landed
 policy:builds.slug-style	undocumented when the docs leg landed
 policy:builds.slug-words	undocumented when the docs leg landed
 policy:card.follows	undocumented when the docs leg landed
-policy:card.pointers	undocumented when the docs leg landed
 policy:card.snapshot	undocumented when the docs leg landed
 policy:card.store	undocumented when the docs leg landed
 policy:commits.edge-check	undocumented when the docs leg landed

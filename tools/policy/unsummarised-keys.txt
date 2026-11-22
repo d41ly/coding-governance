@@ -26,7 +26,6 @@ builds.slug-date
 builds.slug-style
 builds.slug-words
 card.follows
-card.pointers
 card.snapshot
 card.store
 commits.edge-check

@@ -11,8 +11,11 @@
 # the build `tFix` (one spec, one brief), the memory-tree, loop and unattended kits copied from the tree
 # this file sits in at the paths the engine's own resolver finds them, a `.unattended.conf` with
 # RUN_CLAIMS on, so the driver writes the card's ref (TOOL-dPlacedRequest-33), a stub policy kit answering the case's
-# planted values from a file outside the repository, and a stub playbook kit whose `pockets` verb
-# prints one fact. The engine writes the session card `t1`, appends a READY body with a `## route`
+# planted values from a file outside the repository, a stub playbook kit whose `pockets` verb
+# prints one fact, and the copied loop kit's `position.py` replaced by a stub answering from a second
+# planted file, CARD_STUB_POSITION, so no case runs the real engine (KICK-dKeptSession-13 S9): `<slug>
+# --boundary <pointer>` the planted `key`, `answer` and `forked` units, and `<slug> --json` the planted
+# `json` and `rc`, each after the planted `delay`. The engine writes the session card `t1`, appends a READY body with a `## route`
 # naming `tFix`, and the case runs its verbs and prints one `card-store: <case> · <what> · held|MISSED`
 # line per observation. The scratch tree is removed at exit. The card-import fixture's verdict
 # (KICK-dKeptSession-12) is planted in its file, or recorded by `--card --fixture-run` over a stub
@@ -30,7 +33,8 @@ PLANTS="render publish publish-off publish-unwritten publish-late publish-hung s
 follow-fixed snapshot-terminal snapshot-every lookup lookup-offline lookup-upstream lookup-hung replay context-idle context-always-resume
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
 partial-ask terminal-route close-follow-twice follow-offline-publish follow-offline-publish-online
-follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-run worktree-named replay-order"
+follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-run worktree-named replay-order
+pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
 BRIEF=memory/builds/tFix/prompts/2026-01-01-prompt-TOOL-tFix-1-brief.md
@@ -58,8 +62,10 @@ R="$S/repo"; O="$S/origin.git"; OUT="$S/out"
 # The fixture repository's one remote, named apart from any real one: kit code names no remote by literal
 # (check-remote-literals.sh), and the driver reads a repository of one remote through the ladder's only-remote rung.
 FX_REMOTE=upstream
-export CARD_STUB_POLICY="$S/policy.txt"
+export CARD_STUB_POLICY="$S/policy.txt" CARD_STUB_POSITION="$S/position.txt"
 MISSED=0
+# Two item keys in the engine's instance shape, `<item tag>@<pass>#<inputs>`.
+K1=item.build.base@TOOL-tFix-1#aaaa0001; K2=item.build.base@TOOL-tFix-1#aaaa0002
 
 # print_card_held <what> <0 held | else missed>
 print_card_held() {
@@ -71,6 +77,12 @@ set_card_policy() {
   local t; t=$(mktemp "$CARD_STUB_POLICY.XXXXXXXX") || exit 2
   grep -v "^$1=" "$CARD_STUB_POLICY" > "$t" 2>/dev/null; mv -f "$t" "$CARD_STUB_POLICY"
   printf '%s=%s\n' "$1" "$2" >> "$CARD_STUB_POLICY"
+}
+# set_card_position <key|answer|forked|json|rc|delay> <value> — the stub position engine's planted answer.
+set_card_position() {
+  local t; t=$(mktemp "$CARD_STUB_POSITION.XXXXXXXX") || exit 2
+  grep -v "^$1=" "$CARD_STUB_POSITION" > "$t" 2>/dev/null; mv -f "$t" "$CARD_STUB_POSITION"
+  printf '%s=%s\n' "$1" "$2" >> "$CARD_STUB_POSITION"
 }
 # run_card_engine <tree> <engine args…> — stdin closed, stdout and stderr to $OUT; the engine's exit.
 run_card_engine() {
@@ -105,6 +117,28 @@ write_card_fixture() {
     rel=${f#"$GOVROOT"/}; rel=${rel%/*}
     mkdir -p "$R/$rel" && cp -R "$GOVROOT/$rel/." "$R/$rel/" || return 1
   done
+  # The stub position engine over the copied one: nothing a plant runs imports a name from it.
+  f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file loop position.py); [ -n "$f" ] || return 1
+  f="$R/${f#"$GOVROOT"/}"; [ -f "$f" ] || return 1
+  printf '%s\n' 'import os, sys, time' \
+    'sys.stdout.reconfigure(encoding="utf-8")' \
+    'vals = dict(l.rstrip("\n").partition("=")[::2] for l in open(os.environ["CARD_STUB_POSITION"], encoding="utf-8") if "=" in l)' \
+    'time.sleep(float(vals.get("delay") or 0))' \
+    'if len(sys.argv) == 4 and sys.argv[2] == "--boundary":' \
+    '    p, key, answer = sys.argv[3], vals.get("key") or "none", vals.get("answer") or "act"' \
+    '    if answer in ("stale-remote", "invalid-input"):' \
+    '        print("boundary — none crossed · item %s · %s" % (p, answer))' \
+    '    elif key == p:' \
+    '        print("boundary — none crossed · item %s" % p)' \
+    '    else:' \
+    '        print("boundary — %s → %s" % (p, key))' \
+    '    print("forked — %s" % (" · ".join(u for u in (vals.get("forked") or "").split(",") if u) or "none"))' \
+    '    sys.exit(2 if answer == "invalid-input" else 0)' \
+    'if len(sys.argv) == 3 and sys.argv[2] == "--json":' \
+    '    print(vals.get("json") or "{}")' \
+    '    sys.exit(int(vals.get("rc") or 0))' \
+    'sys.exit("stub position: <slug> --boundary <pointer> or <slug> --json, and was asked %s" % sys.argv[1:])' > "$f"
+  : > "$CARD_STUB_POSITION"
   f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file policy policy.py); [ -n "$f" ] || return 1
   rel=${f#"$GOVROOT"/}; mkdir -p "$R/${rel%/*}"
   printf '%s\n' 'import os, sys' \
@@ -127,6 +161,7 @@ write_card_fixture() {
   set_card_policy card.store remote-ref,build-folder,local-clone
   set_card_policy card.follows re-render-at-transition
   set_card_policy card.snapshot terminal-only
+  set_card_policy card.pointers every-item
   set_card_policy resume.context fresh-when-idle
   set_card_policy resume.partial continue-item
   git -C "$R" add -A && ! git -C "$R" diff --cached --quiet && git -C "$R" commit -q -m "fixture: the build tFix" \
@@ -142,6 +177,22 @@ write_card_body() {
     printf '## route\n- build: tFix\n- unit: TOOL-tFix-1 · spec %s\n- brief: %s\n' "$SPEC" "$BRIEF"
     [ "$2" = 0 ] || printf 'READY — tFix · node a · main · base %s · Tier-1 · gates none\n' "$(git -C "$R" rev-parse --short=12 HEAD)"
   } > "$1"
+}
+# write_card_records — AC1's build: two journal records a day apart, one spec-audit record and a second
+# spec, TOOL-tFix-2, the unit the stub engine grades FORKED, committed; and the memory root's LIVE.md, which
+# the session card's `live —` cell names absent, so `--card --check` finds that path tracked.
+write_card_records() {
+  printf '# LIVE\n' > "$R/memory/LIVE.md"
+  printf '**Serves:** journal TOOL-tFix-1\n\n# the older journal\n' > "$R/memory/builds/tFix/build/2026-01-01-build-TOOL-tFix-1-agent-ledger.md"
+  printf '**Serves:** journal TOOL-tFix-1\n\n# the newer journal\n' > "$R/memory/builds/tFix/build/2026-01-02-build-TOOL-tFix-1-agent-ledger.md"
+  mkdir -p "$R/memory/builds/tFix/reviews"
+  printf '## Verdict: CLEAN\n\n**Serves:** spec-audit TOOL-tFix-1@rev-1\n' > "$R/memory/builds/tFix/reviews/2026-01-01-review-TOOL-tFix-1-spec-audit.md"
+  printf '# TOOL-tFix-2 — the forked unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-1\n' > "$R/memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-2.md"
+  git -C "$R" add -A memory && git -C "$R" commit -q -m "fixture: tFix's records and its forked unit"
+}
+# read_card_section <card file> — its `## pointers` section, the heading to the line before the next `## ` or READY line.
+read_card_section() {
+  tr -d '\r' < "$1" | awk '/^## pointers$/ { p = 1; print; next } p && (/^## / || /^(- )?READY — /) { p = 0 } p'
 }
 # The append at READY, which publishes the build card.
 run_card_append() {
@@ -466,5 +517,79 @@ case "$PLANT" in
         print_card_held "S4 resolve_build_card, run after the follow, re-keys that same card" \
           "$(grep -q '^card — tFix · ' "$OUT" && [ -s "$S/card.tail" ] && cmp -s "$S/card.tail" "$S/t1.tail"; echo $?)" ;;
     esac ;;
+  pointers-render)
+    # KICK-dKeptSession-13 AC1, AC11: `--card --pointers` over two journal records, one spec-audit record
+    # and a FORKED unit, the stub answering K1. Staged against an older record of a kind winning, the
+    # resolved spec listed, or the section after the READY line, a row reds; AC11's second row is the
+    # failing case, a section missing a POINTER_LINES line passing the check.
+    write_card_records; set_card_position key "$K1"; set_card_position forked TOOL-tFix-2
+    run_card_append
+    run_card_engine "$R" --card --pointers --build tFix --session t1
+    read_ref_card "$O" > "$S/card"; read_card_section "$S/card" > "$S/sec"; h8=$(git -C "$R" rev-parse --short=8 HEAD)
+    print_card_held "AC1 records — names the newer journal and the review, never the older journal" \
+      "$(grep -q '^records — .*journal memory/builds/tFix/build/2026-01-02-build-TOOL-tFix-1-agent-ledger\.md' "$S/sec" \
+        && grep -q '^records — .*spec-audit memory/builds/tFix/reviews/2026-01-01-review-TOOL-tFix-1-spec-audit\.md' "$S/sec" \
+        && ! grep -q '2026-01-01-build-TOOL-tFix-1-agent-ledger' "$S/sec"; echo $?)"
+    print_card_held "AC1 forks — names the FORKED spec's §8 alone" "$(grep -qx 'forks — memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-2\.md §8' "$S/sec"; echo $?)"
+    print_card_held "AC1 item — names the stub's key at HEAD $h8" "$(grep -qxF "item — $K1 · at $h8" "$S/sec"; echo $?)"
+    print_card_held "AC1 the section sits above the READY line, which is still last" \
+      "$(tr -d '\r' < "$S/card" | awk '/^## pointers$/ { p = NR } /^READY — / { r = NR } END { exit !(p && r > p && r == NR) }'; echo $?)"
+    run_card_engine "$R" --card --check --session t1; rc=$?
+    print_card_held "AC11 --card --check passes the session card as written" "$([ "$rc" = 0 ] && read_card_section "$R/.git/orientation/t1.md" | grep -q '^forks — '; echo $?)"
+    grep -v '^forks — ' "$R/.git/orientation/t1.md" > "$S/t1.cut" && cp "$S/t1.cut" "$R/.git/orientation/t1.md"
+    run_card_engine "$R" --card --check --session t1; rc=$?
+    print_card_held "AC11 with its forks — line cut the check exits 1 naming forks —" "$([ "$rc" = 1 ] && grep -q "no 'forks —' line" "$OUT"; echo $?)" ;;
+  pointers-boundary)
+    # KICK-dKeptSession-13 AC2: the session card brought to K1, then the stub at K2. Staged against a
+    # crossing that leaves the ref's `item —` unchanged, the first row reds; against a run with no
+    # crossing that publishes, the second.
+    run_card_append; set_card_position key "$K1"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC2 a card with no section crosses none → K1" "$(grep -qxF "boundary — none → $K1" "$OUT"; echo $?)"
+    set_card_position key "$K2"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC2 K1 → K2 prints the crossing and the ref's card reads item — K2" \
+      "$(grep -qxF "boundary — $K1 → $K2" "$OUT" && read_ref_card "$O" | grep -q "^item — $K2 · at "; echo $?)"
+    c1=$(git -C "$O" rev-parse --verify -q "$REF"); git -C "$R" commit -q --allow-empty -m "fixture: another commit"; h8=$(git -C "$R" rev-parse --short=8 HEAD)
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC2 the stub still at K2 after a commit: nothing published, the session card's at reads $h8" \
+      "$(grep -qxF "boundary — none crossed · item $K2" "$OUT" && [ "$(git -C "$O" rev-parse --verify -q "$REF")" = "$c1" ] \
+        && read_card_section "$R/.git/orientation/t1.md" | grep -qxF "item — $K2 · at $h8"; echo $?)"
+    run_card_engine "$R" --card --boundary --build tFix --session t1 --out "$S/boundary.out"
+    print_card_held "AC2 with --out the stdout is empty and the file holds the lines" "$([ ! -s "$OUT" ] && grep -qxF "boundary — none crossed · item $K2" "$S/boundary.out"; echo $?)"
+    run_card_engine "$R" --card --boundary --build tFix --session t1 --out "$S/nowhere/boundary.out"; rc=$?
+    print_card_held "AC2 an --out whose directory does not exist is refused, exit 2" "$([ "$rc" = 2 ] && [ ! -e "$S/nowhere" ]; echo $?)" ;;
+  pointers-at-transitions)
+    # KICK-dKeptSession-13 AC3: under at-transitions a crossing publishes nothing and the follow re-renders.
+    set_card_policy card.pointers at-transitions
+    run_card_append; c1=$(git -C "$O" rev-parse --verify -q "$REF"); set_card_position key "$K1"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC3 the crossing leaves the ref unchanged and rewrites the session card's item — line" \
+      "$(grep -qxF "boundary — none → $K1" "$OUT" && [ "$(git -C "$O" rev-parse --verify -q "$REF")" = "$c1" ] \
+        && read_card_section "$R/.git/orientation/t1.md" | grep -q "^item — $K1 · at "; echo $?)"
+    run_card_engine "$R" --card --follow --build tFix --to designing
+    print_card_held "AC3 the follow re-renders the section with the stub's key" \
+      "$(read_ref_card "$O" | head -n 1 | grep -q '^card — tFix · step designing ·' && read_ref_card "$O" | grep -q "^item — $K1 · at "; echo $?)" ;;
+  pointers-cap)
+    # KICK-dKeptSession-13 AC6: a cap the card fits under without its section and not with it, the
+    # `## pockets` section's room taken out, since the render drops it before it refuses the card.
+    set_card_position key "$K1"; run_card_append; c1=$(git -C "$O" rev-parse --verify -q "$REF")
+    read_ref_card "$O" > "$S/card"
+    b=$(wc -c < "$S/card"); sb=$(read_card_section "$S/card" | wc -c)
+    pb=$(tr -d '\r' < "$S/card" | awk '/^## pockets$/ { p = 1 } /^recent —/ { p = 0 } p' | wc -c)
+    CARD_CAP_BYTES=$((b - pb - sb / 2)) run_card_engine "$R" --card --pointers --build tFix --session t1
+    print_card_held "AC6 under CARD_CAP_BYTES=$((b - pb - sb / 2)) the publish names the pointers not written" "$(grep -q '^card — pointers not written: [0-9]* bytes over the cap$' "$OUT"; echo $?)"
+    print_card_held "AC6 the ref is unchanged" "$([ "$(git -C "$O" rev-parse --verify -q "$REF")" = "$c1" ]; echo $?)" ;;
+  pointers-replay)
+    # KICK-dKeptSession-13 AC7: a compacted session's replay in a second clone, after a publish carrying
+    # K1, prints the section the lookup re-keyed from the build card.
+    set_card_position key "$K1"; run_card_append
+    git clone -q -b main "$O" "$S/clone2" 2>/dev/null && git -C "$S/clone2" config core.hooksPath "$S/hooks"
+    run_card_engine "$S/clone2" --card --lookup --build tFix --session t2
+    C2=$(git -C "$S/clone2" rev-parse --show-toplevel)
+    printf -v payload '{"session_id":"t2","cwd":"%s"}' "$C2"
+    (cd "$S/clone2" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+    print_card_held "AC7 the replay prints the ## pointers section the lookup re-keyed" \
+      "$(read_card_section "$OUT" | grep -q "^item — $K1 · at " && read_card_section "$OUT" | grep -q '^records — '; echo $?)" ;;
 esac
 exit "$MISSED"

@@ -35,6 +35,14 @@ Documented on [help/policy.md](../policy.md).
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
 
+## `card.pointers`
+<!-- usage: policy:card.pointers 6940ded3 -->
+When the build card's pointers section, its latest records, open forks and item in flight, is published: at every item boundary the session crosses, or only at a stage move, the session's own card still rewritten at each boundary.
+
+```text
+card.pointers = "at-transitions"
+```
+
 ## `instructions.checks`
 <!-- usage: policy:instructions.checks 24ae9920 -->
 What a render does when a reader's load set lacks a unit its required-by names: refuse the render, render with a missing-unit line the reader sees, or render and record the gap in the prompt record.
@@ -155,7 +163,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (242)
+## Not yet summarised (241)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -249,7 +257,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `prompts.batch`
 - `context.on-full`
 - `context.threshold`
-- `card.pointers`
 - `notices.record`
 - `review.breakpoints`
 - `probe.points`

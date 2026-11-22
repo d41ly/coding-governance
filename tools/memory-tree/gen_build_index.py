@@ -9,6 +9,7 @@
     python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
     python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
     python <prefix>/memory-tree/gen_build_index.py --doctor <slug> # every failing rule for one build folder
+    python <prefix>/memory-tree/gen_build_index.py --latest-records <slug>  # the newest bound record per kind
     python <prefix>/memory-tree/gen_build_index.py --new-spec <ID> --tier <1|2>  # a spec skeleton
     python <prefix>/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
 
@@ -695,6 +696,28 @@ def derive_audit_writers(root: str, memory_root: str, rels, resolve=None) -> set
     older = {sha for sha in shas if blobs.get((sha, harness)) is not None
              and AUDIT_WRITER_MARK not in blobs[(sha, harness)]}
     return {rel for rel, sha in added.items() if sha in older}
+
+
+def cmd_latest_records(root: str, conf: dict, slug: str) -> int:
+    """READ-ONLY (KICK-dKeptSession-13 S3): one `<kind> <path>` line per `RECORD_KIND_TOKENS` kind the
+    build's bound records carry, the newest of that kind by filename, sorted by kind. `read_bindings`
+    runs over the build folder's tracked paths alone, so a kind `TYPED_RECORD_KINDS` gains is read with
+    no change here. Exit 0, a build with no bound record printing nothing; 2 on a slug that is not one.
+    WHAT THIS DOES NOT CHECK: that a record's content is current; the newest name is the newest date."""
+    if not re.fullmatch(r"[A-Za-z0-9]+", slug or ""):
+        print(f"build-index: --latest-records takes a build slug, [A-Za-z0-9]+, and was given {slug!r}",
+              file=sys.stderr)
+        return 2
+    folder = f"{conf['MEMORY_ROOT']}/builds/{slug}/"
+    tracked = [p for p in run("git", "ls-files", "--", folder, cwd=root).split("\n") if p]
+    newest: dict = {}
+    for rel, rec in read_bindings(root, tracked, conf).items():
+        kind = rec["kind"] if rec["state"] == "bound" else None
+        if kind and (kind not in newest or os.path.basename(rel) > os.path.basename(newest[kind])):
+            newest[kind] = rel
+    for kind in sorted(newest):
+        print(f"{kind} {newest[kind]}")
+    return 0
 
 
 def cmd_print_bindings(root: str, conf: dict, resolve=None) -> int:
@@ -9779,12 +9802,13 @@ def main(argv: list) -> int:
     if mode not in ("--check", "--write", "--write-staged", "--check-format", "--print-bindings", "--survey",
                     "--check-asbuilt",
                     "--report", "--bump", "--asks", "--new-build", "--placed-build", "--new-spec", "--doctor",
-                    "--check-coverage"):
+                    "--check-coverage", "--latest-records"):
         print("usage: gen_build_index.py "
               "[--check [--staged|--with-verdicts]|--write|--write-staged|--check-coverage [--staged]|"
               "--check-asbuilt [--staged]|"
               "--check-format|--survey|--report|--bump|"
-              "--print-bindings|--asks|--new-build|--placed-build|--new-spec|--doctor|--selftest]")
+              "--print-bindings|--asks|--new-build|--placed-build|--new-spec|--doctor|--latest-records <slug>|"
+              "--selftest]")
         return 2
     # TOOL-dTrueNorth-27 S4: `--with-verdicts` is `--check`'s alone, and never beside `--staged`, whose
     # skip would print no verdict while a full run's checks 29 and 30 read them from these lines.
@@ -9807,6 +9831,17 @@ def main(argv: list) -> int:
             return cmd_print_bindings(root, conf)
         except Problem as exc:
             print(f"build-index: {exc}")
+            return 2
+    # `--latest-records` (KICK-dKeptSession-13 S3): its stdout is the card's `records —` line's source,
+    # so a refusal goes to stderr, as `--asks` puts its own.
+    if mode == "--latest-records":
+        if len(argv) != 3:
+            print("usage: gen_build_index.py --latest-records <slug>", file=sys.stderr)
+            return 2
+        try:
+            return cmd_latest_records(root, conf, argv[2])
+        except Problem as exc:
+            print(f"build-index: {exc}", file=sys.stderr)
             return 2
     # `--asks` IS DISPATCHED OUTSIDE THE HANDLER BELOW, which prints its message to stdout. That is
     # right for every other mode and wrong for this one, whose stdout is a value a program parses:
