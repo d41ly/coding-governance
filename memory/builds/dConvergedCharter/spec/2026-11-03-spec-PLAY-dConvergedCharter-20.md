@@ -105,7 +105,7 @@ and the owner-item mailbox (TOOL-dWellOiledMachine-48 S1, S4). `read_releases`
   either exit. An up that staged the policy file prints the route and then that rollback as its last two
   lines. Observed by AC1, AC2, AC10, AC11 and AC12.
   **Readers:** by name: `tools/policy/policy.py:1211` (`derive_legacy_homes`, which lists each home's
-  keys), `memory/project/legacy-homes.txt`, and the kit descriptors' `[config]` tables, `tools/memory-tree/kit.toml:80`,
+  keys), `memory/project/legacy-homes.txt`, and the kit descriptors' `[config]` tables, `tools/memory-tree/kit.toml`,
   `tools/codebase-map/kit.toml:70`, `tools/lexicon/kit.toml:78`, `tools/process-monitor/kit.toml:60` ·
   by value: unit 11's `render_folded_lines`, behind `policy.py legacy <home>`, which prints the home's
   line before the step and the policy file's value after it, so a value read before the step and after
@@ -479,7 +479,7 @@ New arm: tools/govkit/selftest.py · covers AC6 · a planted register and mailbo
   `2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2` finding 35 (M18: the UNARMED
   window's bounds stated, its two exits the route or the step's own DOWN with the index restored, the
   up printing that rollback beside the route, AC12 with no commit N and the arm's abandoned-route case).
-- rev-8 · 2026-11-22 · S1 S2 · the **Readers:** by name: halves re-pointed from `tools/policy/legacy-homes.txt` to `memory/project/legacy-homes.txt`, where TOOL-dWitnessedBar-20 moved it; nothing else moves. From the brief `2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief`.
+- rev-8 · 2026-11-22 · S1 S2 · the **Readers:** by name: halves re-pointed from `tools/policy/legacy-homes.txt` to `memory/project/legacy-homes.txt`, where TOOL-dWitnessedBar-20 moved it; nothing else moves. From the brief `2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief`. On the re-pointed line, S1 cites `tools/memory-tree/kit.toml` by path alone, the `[config]` table named beside it, since a file:line there would be a new positional citation and neither stable form resolves in a by-name half.
 
 ## 10. Reuse audit
 

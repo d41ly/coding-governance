@@ -1,6 +1,6 @@
 # TOOL-aMendedLedger-5 — U5: the row-keyed merge driver, its launcher shim and its wiring
 
-**Status:** SPECCED · rev-3 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-11-22 · node a · Tier-2 · base 663ca427 · streams tooling
 
 > **rev-3** — the decision table below is amended in lockstep with the master's rev-5: `%B`-only
 > rows SPLICE (they did already; the table said `append`), the two delete cases compare the ROW
@@ -489,7 +489,7 @@ guard keyed on the driver's own paths would skip the leg on exactly the diffs th
   to return nothing.
 - **AC12** When `python tools/codebase-map/test_codebase_map.py` is run after this unit it exits 0
   with the new leg name claimed by `memory/map/features/memory-tree-merge-driver.md` and no new key in
-  `memory/map/baseline.toml` — including `test_dossier_prose_headings_pinned` and
+  `memory/map/baseline.txt` — including `test_dossier_prose_headings_pinned` and
   `test_dossier_affordance_present_or_graced` passing over the new dossier, and
   `test_generated_artifacts_are_fresh` byte-comparing a `memory/map/generated/` regenerated in THIS
   commit.
@@ -610,6 +610,7 @@ matching `check_hooks` rather than the byte-rewriting `eol` arm.
   filed an unkeyable correction row immediately above the deleted row and then discarded it at rc 0;
   and two postconditions are added, on duplication (row line AND leading id) and on placement. Every
   one of those is a reproduction from review round 2 or 3, each with `git merge-file` as the control.
+- rev-4 · 2026-11-22 · AC12 · `memory/map/baseline.toml` re-pointed to `memory/map/baseline.txt`, where the `codebase-map/baseline-to-ledger` step converted it; nothing else moves. From the brief `2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief`.
 
 ## 10. Reuse audit
 
