@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-8 — the whole-tree readers clone without copying objects and check out only what they read
 
-**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base 59e882af · streams tooling · order 2 · ratified 2026-11-20
+**Status:** SPECCED · rev-5 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -12,14 +12,15 @@
 | [2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md) | research | TOOL-dQuietDisk-10 TOOL-dQuietDisk-17 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md) | research | TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-7 |
+| [2026-11-22-prompt-TOOL-dQuietDisk-8-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-8-1-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 Six readers each make their own full copy of the repository during a bar: a clone, often with every
-object copied, and a checkout of all 14,156 tracked files, of which 13,206 sit under
-`memory/builds/` (both DERIVED by `git ls-tree -r --name-only 59e882afd` on 2026-11-20). This unit
+object copied, and a checkout of all 15,122 tracked files, of which 14,141 sit under
+`memory/builds/` (both DERIVED by `git ls-tree -r --name-only 40def53f7` on 2026-11-22). This unit
 makes each reader clone with `--shared`, so no object is copied or hardlinked, and check out only the
 paths it reads where that is proven not to move its output. A reader that cannot share is named with
 its reason and left as today. Every reader's verdict and output stay what they were.
@@ -30,20 +31,24 @@ its reason and left as today. Every reader's verdict and output stay what they w
   `git clone -q --no-hardlinks` with `git clone -q --shared --no-checkout` followed by their existing
   `checkout -B`, which checks out the full tree as today. The clone's own commits land in its own
   object store. Observed by AC1 and AC5.
-- **S2** — `tools/govkit/matrix.py`'s aged-gov clone and `tools/govkit/upgrade_walk.py`'s pinned
-  clone add `--shared` to their `clone` call. Observed by AC2 and AC5.
+- **S2** — `tools/govkit/matrix.py`'s aged-gov clone adds `--shared` to its `clone` call.
+  `tools/govkit/upgrade_walk.py`'s pinned clone adds `--shared --no-checkout`. Today that clone checks
+  out the source's HEAD and then, on the next line, the pin
+  (`tools/govkit/upgrade_walk.py@aea8e1c7386b:231`), so its existing `checkout --detach <pin>` is left
+  as the one checkout. Observed by AC2 and AC5.
 - **S3** — A reader moves to a sparse checkout only where its own output, run once over a full
   checkout and once over a checkout leaving out `memory/builds/`, is byte-identical. The pass makes
   that observation through each reader's scoped direct check, run over both checkouts and recorded
   in the acceptance ledger: `python tools/policy/check_policy.py --fixture <case>` for one case whose
   fixture builds a source snapshot, `python tools/govkit/upgrade_walk.py --case <case>` for one
   case, and, for `matrix.py`, which has no scoped form, a probe that makes its aged-gov clone as
-  `tools/govkit/matrix.py@609cd40b1:976` does and runs that shape's `apply` and `update --write`
+  `tools/govkit/matrix.py@8bb81dbe52f9:976` does and runs that shape's `apply` and `update --write`
   over each checkout. The reader's whole run over both checkouts is owed to the main loop at the
   close, and a move there is a red the close repairs by returning that reader to its full
-  checkout. Such a reader sets `git sparse-checkout set --no-cone` to every tracked
-  path except `memory/builds/` before its checkout, through a two-line helper inlined in its own kit,
-  since `tools/lib/` ships nothing. The candidates are `build_source_snapshot` in
+  checkout. Such a reader runs one `git sparse-checkout set --no-cone '/*' '!/memory/builds/'`,
+  written at its clone site, between its `--no-checkout` clone and its checkout. `matrix.py`'s clone
+  checks out today, so if it goes sparse it also takes `--no-checkout` and checks out its HEAD
+  itself after the sparse set. The candidates are `build_source_snapshot` in
   `tools/policy/check_policy.py`, which `tools/loop/factories.py` also calls, `matrix.py`'s
   aged-gov clone and `upgrade_walk.py`'s pinned clone. Observed by AC3 and AC4.
 - **S4** — Each changed clone keeps today's teardown, the suite's exit trap, the policy kit's own
@@ -54,11 +59,11 @@ its reason and left as today. Every reader's verdict and output stay what they w
 
 ## 3. Non-goals (OUT)
 
-- `tools/govkit/selftest.py`'s source-mode clone (`tools/govkit/selftest.py@609cd40b1:6143`) stays as
-  it is. It is a plain local clone, so git already hardlinks its objects rather than copying them,
-  and its arm runs `update --write` in source mode, whose plan lists the files on disk; a sparse
-  checkout would change that plan and so the arm's verdict. It also sits in the file
-  TOOL-dQuietDisk-11 and TOOL-dQuietDisk-18 rewrite at order 3.
+- `tools/govkit/selftest.py`'s source-mode clone (`tools/govkit/selftest.py@c2b02d780af9:6322`)
+  stays as it is. It is a plain local clone, so git already hardlinks its objects rather than
+  copying them, and its arm runs `update --write` in source mode, whose plan lists the files on
+  disk; a sparse checkout would change that plan and so the arm's verdict. It also sits in the file
+  TOOL-dQuietDisk-18 rewrites at order 3.
 - No sparse checkout for foreign-prefix or chain-packet. Foreign-prefix runs every self-test's
   prologue at each moved prefix, and chain-packet runs the real instruments over the chain builds'
   records, so either may read any tracked path.
@@ -72,28 +77,32 @@ its reason and left as today. Every reader's verdict and output stay what they w
 
 ### Edges
 
-- **consumes-from** external — dWitnessedBar's landed tip, which this unit is built on, because that
-  branch changes five of these files.
+- **consumes-from** external — dWitnessedBar's landing, `8b8b1374c` on main, merged into this branch
+  at `40def53f7`. This unit is built on it, because that build changed five of these files
+  (`git diff --stat 9e21ac760 fb6f1a74c`).
 
 ## 4. Design
 
 ### The readers today
 
-All citations are read at `59e882afd`. The object store measured 167 MB in 92 files, PINNED, on
-2026-11-20 by `du` and `find` over this clone's common `objects/`.
+All citations are read at `40def53f7`, each pinned to its blob there. Only
+`tools/policy/check_policy.py` and `tools/govkit/selftest.py` moved since `59e882afd`, both before
+dWitnessedBar's land tip `fb6f1a74c`; `build_source_snapshot`'s body is unchanged and only its lines
+moved. The object store measured 167 MB in 92 files, PINNED, on 2026-11-20 by `du` and `find` over
+this clone's common `objects/`.
 
 | Reader | Clone today | Checkout | Mutates its copy | After |
 |---|---|---|---|---|
-| `foreign-prefix.gov.test.sh` | `--no-hardlinks` (`tools/run-gates/foreign-prefix.gov.test.sh@609cd40b1:471`) | full | `git mv` of the tool root three times | `--shared --no-checkout`, full checkout |
-| `chain-packet.test.sh` | `--no-hardlinks` (`tools/chain-packet.test.sh@609cd40b1:313`) | full | one commit of planted specs | `--shared --no-checkout`, full checkout |
-| `check_policy.py` `build_source_snapshot` | `--shared --no-checkout` (`tools/policy/check_policy.py@609cd40b1:1101`) | full, of the committed working tree (`tools/policy/check_policy.py@609cd40b1:1117`) | installs and plants | sparse where S3 holds |
-| `factories.py` | through `build_source_snapshot` (`tools/loop/factories.py@609cd40b1:598`) | as above | plants | inherits |
-| `matrix.py` aged gov | `--local`, hardlinked (`tools/govkit/matrix.py@609cd40b1:976`) | full | edits the registry | `--shared`, sparse where S3 holds |
-| `upgrade_walk.py` | plain local, hardlinked (`tools/govkit/upgrade_walk.py@609cd40b1:230`) | full, at the pin | walks to the tip | `--shared`, sparse where S3 holds |
-| `selftest.py` source mode | plain local (`tools/govkit/selftest.py@609cd40b1:6143`) | full | `update --write` | unchanged, section 3 |
+| `foreign-prefix.gov.test.sh` | `--no-hardlinks` (`tools/run-gates/foreign-prefix.gov.test.sh@fe5ce9d67e73:471`) | full, then `checkout -B` | `git mv` of the tool root three times | `--shared --no-checkout`, full checkout |
+| `chain-packet.test.sh` | `--no-hardlinks` (`tools/chain-packet.test.sh@396018d9b00e:313`) | full, then `checkout -B` | one commit of planted specs | `--shared --no-checkout`, full checkout |
+| `check_policy.py` `build_source_snapshot` | `--shared --no-checkout` (`tools/policy/check_policy.py@6cbdf64bc9c3:1363`) | full, of the committed working tree (`tools/policy/check_policy.py@6cbdf64bc9c3:1379`) | installs and plants | sparse where S3 holds |
+| `factories.py` | through `build_source_snapshot` (`tools/loop/factories.py@835d45ef996f:598`) | as above | plants | inherits |
+| `matrix.py` aged gov | `--local`, hardlinked (`tools/govkit/matrix.py@8bb81dbe52f9:976`) | full | edits the registry | `--shared`, sparse where S3 holds |
+| `upgrade_walk.py` | plain local, hardlinked (`tools/govkit/upgrade_walk.py@aea8e1c7386b:230`) | full at the source's HEAD, then the pin (`:231`) | walks to the tip | `--shared --no-checkout`, sparse where S3 holds |
+| `selftest.py` source mode | plain local (`tools/govkit/selftest.py@c2b02d780af9:6322`) | full | `update --write` | unchanged, section 3 |
 
-So the bytes saved by S1 are two copies of the object store per bar, and the files saved by S3 are
-up to 13,206 checked-out files per sparse reader per run.
+So the bytes saved by S1 are two copies of the object store per bar. S2 saves the upgrade walk's
+first full checkout, and S3 saves up to 14,141 checked-out files per sparse reader per run.
 
 ### Why one runner-built snapshot buys nothing here
 
@@ -113,25 +122,38 @@ every clone here is removed before its leg ends (S4).
 
 `tools/run-gates/foreign-prefix.gov.test.sh` · `tools/chain-packet.test.sh` · `tools/policy/check_policy.py` · `tools/govkit/matrix.py` · `tools/govkit/upgrade_walk.py`
 
+No file gains a column-0 function, so the codebase map's generated symbol index is not
+regenerated. None of these paths is on the kickoff manifest's `watch:` line, and the pass writes no
+other path.
+
+### Paths shared with order-2 units
+
+None. TOOL-dQuietDisk-2 writes the pass-order leg and its suite, TOOL-dQuietDisk-3 the
+brief-recorded leg and its suite, TOOL-dQuietDisk-4 the routed-commits reader, TOOL-dQuietDisk-5 the
+bar runner, its suite and the kickoff manifest, and TOOL-dQuietDisk-7 the template-cache files and
+their registrations. None of them names a path above, so this unit builds in parallel with each.
+Later orders do share paths: TOOL-dQuietDisk-9, at order 6, also writes `tools/policy/check_policy.py`
+and `tools/govkit/upgrade_walk.py`, and it is built on this unit's text.
+
 ### Inventory
 
-| Minted identifier | Kind | Naming cell | Graded by |
-|---|---|---|---|
-| `write_sparse_set` | a two-line inline helper per sparse reader's kit | none | AC3 |
+The unit mints no identifier. The sparse step is one git argv at each sparse reader's clone site,
+so no helper is named.
 
 ### Alternatives rejected
 
 | Alternative | Why it loses |
 |---|---|
 | A runner-built snapshot handed to every reader | Section 4: every reader mutates, so the handed path is cloned again at the same cost. |
+| A module-level helper per sparse reader (rev-4's `write_sparse_set`) | It wraps one git argv. Each copy would add a row to the codebase map's symbol index, and two copies would sit in the govkit kit, whose second instance owes a factory. |
 | `git worktree add` from one shared clone | Parallel legs would race on one repository's refs, `worktrees/` and config. |
 | `git archive` of named paths | It loses the history the policy snapshot and the upgrade walk read. |
 
 ## 5. Production-readiness checklist
 
 - security: N/A — scratch copies of the repository's own tree, removed before the leg ends.
-- perf / scale: two object-store copies per bar removed (S1); up to 13,206 checked-out files per sparse
-  reader (S3), counted by AC5.
+- perf / scale: two object-store copies per bar removed (S1); the upgrade walk's first full checkout
+  removed (S2); up to 14,141 checked-out files per sparse reader (S3), counted by AC5.
 - error / empty / loading states: a clone that fails exits as today, with the reader's own message.
 - observability: each reader's output is unchanged.
 - risks: a sparse reader that reads a left-out path would change its verdict; S3's observation
@@ -155,17 +177,21 @@ every clone here is removed before its leg ends (S4).
   the main loop; the pass makes the clone probe.
 - **AC2** — When a probe imports `tools/govkit/upgrade_walk.py` and calls `build_release_tree` with
   `with_target=False` over a scratch root, the clone it leaves at `<root>/gov` holds an
-  `objects/info/alternates` file and the pinned commit checked out. When
+  `objects/info/alternates` file and the pinned commit checked out: its `git ls-files` equals
+  `git ls-tree -r --name-only <pin>` and its `git status --porcelain` prints nothing. When
   `python tools/govkit/upgrade_walk.py --case <case>` runs for one case before and after over the same
   clone of gov, its printed lines and exit are the same. When the main loop runs the whole walk
   before and after at the close, its printed lines and exit are the same.
-  Red when: the walk's output moves, or its clone still carries its own copy of every object.
+  Red when: the walk's output moves, its clone still carries its own copy of every object, or its
+  work tree differs from the pin's.
   permission: the whole walk is the `upgrade-walk` leg, owed to the main loop (scratch-guard row
   G1); the pass makes the probe and the one-case run.
 - **AC3** — When `build_source_snapshot` is called on the same working tree by the old and the new
   `tools/policy/check_policy.py`, the two snapshot commits carry the same tree id, and each sparse
   reader's scoped direct check of S3 prints over the sparse checkout what it prints over the full
-  one. The main loop observes each sparse reader's whole run unchanged at the close.
+  one. A sparse reader's work tree holds no file under `memory/builds/` and every other tracked
+  file of its checked-out commit. The main loop observes each sparse reader's whole run unchanged
+  at the close.
   Red when: a sparse checkout drops a path the reader reads, so its output moves.
   permission: each reader's whole run is owed to the main loop; the pass makes the snapshot probe
   and the scoped checks.
@@ -222,14 +248,29 @@ leg's own argv or the bar.
 - rev-4 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
   4 the object-store figures' PINNED moves onto the line that quotes them. Design, scope and
   acceptance unchanged.
+- rev-5 · 2026-11-22 · §1 §2 §3 §4 §5 §6 §10 · S2 · S3 · AC2 · AC3 · re-grounded at 40def53f7
+  (order 1 built, dWitnessedBar landed), under `2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task`.
+  What moved: `build_source_snapshot`'s clone and checkout lines and the source-mode clone in
+  `tools/govkit/selftest.py`, both re-cited by blob. Every other cited file is byte-identical to
+  `59e882afd`. The tree counts are re-derived at 40def53f7. TOOL-dQuietDisk-11 no longer writes
+  `selftest.py`, so §3 names only TOOL-dQuietDisk-18. Scope widens by one flag: re-reading the
+  walk's clone showed it checks out HEAD before its own checkout of the pin, so S2 adds
+  `--no-checkout` there, as S1 does for the two suites. This stays inside §1's goal of checking out only what a reader reads, and AC2 now
+  observes the pin's work tree. `write_sparse_set` is retired. As a column-0 function it would
+  move `memory/map/generated/symbols.json`, and two copies would sit in govkit. The sparse step
+  is now one inline git argv, and the helper is a row of Alternatives rejected. Design names no
+  order-2 unit sharing a path.
 
 ## 10. Reuse audit
 
 The seam extended is `build_source_snapshot` (`tools/policy/check_policy.py#build_source_snapshot`),
 the one reader already cloning `--shared --no-checkout`; S1 and S2 bring the other clones to its
-form. The chain builds owning the area are dWitnessedBar (Test: suites and budgets), which changes
-five of these files on its branch, and dSafePassage (Supersession), whose CLOSED unit 5 owns the
-upgrade walk's design; only the walk's clone flags move here.
+form. The chain builds owning the area are dWitnessedBar (Test: suites and budgets), which changed
+five of these files and has landed, and dSafePassage (Supersession), whose CLOSED unit 5 owns the
+upgrade walk's design; only the walk's clone flags move here. No dWitnessedBar unit touched any of
+these clones' flags: `git log -S'no-hardlinks'` and `git log -S'sparse-checkout'` over
+`59e882afd..40def53f7 -- tools/` list no commit, and its specs name neither. So there is no
+dWitnessedBar work to extend here.
 
 `python tools/codebase-map/reuse_lookup.py "clone a repository snapshot shared without copying objects"`
 named `build_source_snapshot`, the seam above, beside name-token neighbours. Recall returned

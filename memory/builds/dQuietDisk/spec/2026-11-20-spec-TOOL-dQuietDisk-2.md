@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-2 — the pass-order leg grades only units whose key moved since its last graded tip
 
-**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base 69c9c5cb · streams tooling · order 2
+**Status:** SPECCED · rev-5 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-2-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-2-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-2-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md) | research | TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 |
 
 <!-- /gen:spec-records -->
@@ -70,7 +71,7 @@ violation line stays byte-identical.
 - No change to `tools/unattended/commit_trailers.py` or to TOOL-dQuietDisk-1's store. A gap in the
   store is that unit's deviation, named in section 8.
 - No change to the reuse cache's `head $RG_HEAD` key for history legs
-  (`tools/run-gates/run-gates.sh@db46050c01dc:3553`). The leg still runs on every bar; it does less.
+  (`tools/run-gates/run-gates.sh@2e851a92d9ce:3553`). The leg still runs on every bar; it does less.
 - No change to what the leg grades, its exit codes, its waiver registry, its cutoff or its summary
   fields.
 - A cold run's per-unit spawns stay as today. The only cold saving is the coprocess's per-build
@@ -86,22 +87,22 @@ violation line stays byte-identical.
 - **hands-off** `TOOL-dQuietDisk-19` — the warm-run bound this spec promises, which that unit's M2
   after-reading of the pass-order leg is held to
 - **consumes-from** external — dWitnessedBar's land tip `fb6f1a74c`, merged into this run at
-  `b3f5a2bc3`. It carries TOOL-dWitnessedBar-2's unwitnessed-pass arm, whose two per-build reads
-  S5 stores.
+  `b3f5a2bc3`, and its landing on main at `8b8b1374c`, merged at `40def53f7`. The land tip carries
+  TOOL-dWitnessedBar-2's unwitnessed-pass arm, whose two per-build reads S5 stores.
 
 ## 4. Design
 
 ### The leg at the base
 
-All citations are read at `69c9c5cb8`, where the leg's blob is `199f4ae905c8` and the library's is
-`a1a50756567e`. The four inputs below had already landed when this re-ground was taken.
+All citations are read at `40def53f7`, where the leg's blob is `638bb1d0c2a6` and the library's is
+`7592fd768bc2`. The four inputs below had already landed when this re-ground was taken.
 
 The leg builds the `_SUBJ` subject cache from one `read_attribution_tokens HEAD` call and checks
-its size against `rev-list --count HEAD` (`tools/unattended/check-pass-order.sh@199f4ae905c8:452`).
-It reads the history range once (`tools/unattended/check-pass-order.sh@199f4ae905c8:481`). The
+its size against `rev-list --count HEAD` (`tools/unattended/check-pass-order.sh@638bb1d0c2a6:452`).
+It reads the history range once (`tools/unattended/check-pass-order.sh@638bb1d0c2a6:481`). The
 unwitnessed-pass block finds its anchor with one `git log -S Commit-Checked` and reads
-`hooks.bypass` at HEAD (`tools/unattended/check-pass-order.sh@199f4ae905c8:502`). The build walk then
-runs once per build README at HEAD (`tools/unattended/check-pass-order.sh@199f4ae905c8:527`). Per
+`hooks.bypass` at HEAD (`tools/unattended/check-pass-order.sh@638bb1d0c2a6:502`). The build walk then
+runs once per build README at HEAD (`tools/unattended/check-pass-order.sh@638bb1d0c2a6:527`). Per
 build it runs these:
 
 - `git show` of the README for `opened:` (`:534`), and again for the CLOSED ids (`:600`);
@@ -113,7 +114,7 @@ build it runs these:
 
 Per CLOSED unit it calls `tools/unattended/lib-unattended.sh#build_commit`, which runs one
 `rev-list` per range, memoised in `_BC_MEMO` (`:466`). It also runs one `git show --name-only` per
-candidate commit whose tokens carry the id (`tools/unattended/lib-unattended.sh@a1a50756567e:1410`).
+candidate commit whose tokens carry the id (`tools/unattended/lib-unattended.sh@7592fd768bc2:1410`).
 A unit with a build commit then costs a `rev-parse` of the parent, a `git grep`, an `ls-tree` and a
 `git show` of the spec (`:668`, `:696`, `:697`, `:699`). Each report line adds one
 `rev-parse --short` per sha it names (`:656`, `:712`, `:717`).
@@ -316,7 +317,7 @@ CLOSED units: one built conformingly, one built before its folder existed, and o
 truncates. One pass commit names a `tA` unit with no `Commit-Checked:` trailer. The large F also
 holds ten more builds of two or three units each.
 
-"Old" is the leg at `69c9c5cb8`, run by path from a `git clone --shared` of this repository checked
+"Old" is the leg at `40def53f7`, run by path from a `git clone --shared` of this repository checked
 out there under `%TEMP%`. "New" is the unit's leg, run by path from the build worktree. Both run
 with F as the working directory, and their stdout and stderr are compared together. A reading over
 the real tree is the gate's own population, which a role agent may not run (scratch-guard row G1).
@@ -417,8 +418,8 @@ sha, which is `memory/gotchas/test-oracle-read-from-a-historical-sha.md`'s class
   unit follows the store as built.
 - **F2 — `init_bh` starts `git cat-file --batch` without the library's replace-ref pin.** The leg's
   header requires every dereference to go through `GIT`
-  (`tools/unattended/check-pass-order.sh@199f4ae905c8:47`), the pinned wrapper
-  (`tools/unattended/lib-unattended.sh@a1a50756567e:62`).
+  (`tools/unattended/check-pass-order.sh@638bb1d0c2a6:47`), the pinned wrapper
+  (`tools/unattended/lib-unattended.sh@7592fd768bc2:62`).
   - (a) The leg calls `GIT_NO_REPLACE_OBJECTS=1 init_bh`, so the coprocess ignores replace refs.
     The exported `GIT_GRAFT_FILE=/dev/null` already reaches it.
   - (b) Read the per-build blobs through `GIT show` as today, and give up S2's saving.
@@ -470,11 +471,25 @@ sha, which is `memory/gotchas/test-oracle-read-from-a-historical-sha.md`'s class
   - The goal is unchanged, and acceptance grew for two reasons. The spec brief's adopter clause,
     which rev-3 lacked, is AC10. The design's new fallbacks and pins are observed by AC5 to AC9.
   - The fixture's base leg is now the copy at `69c9c5cb8`.
+- rev-5 · 2026-11-22 · §3 §4 §6 §10 · AC1 · re-grounded at 40def53f7 (order 1 built, dWitnessedBar
+  landed), under `2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task`. Only `fb6f1a74c..8b8b1374c` was
+  re-checked in the files this spec cites, and no line, symbol, argv or behaviour it relies on moved:
+  - The leg, the driver and the bar runner moved only by one-line replacements: the kit-version
+    line, and the bar runner's tail-keeper cut through `derive_temp_path`. The cited lines are re-cited
+    at their new blobs, the leg's `638bb1d0c2a6`, the library's `7592fd768bc2` and the runner's
+    `2e851a92d9ce`.
+  - The library changed one line, `read_record_keys`, which now scrubs `GIT_DIR` and `GIT_WORK_TREE`
+    for its `rev-parse --show-toplevel`. The waiver read it serves still costs 2 git processes, so
+    the warm bound stays 45, and 50 plus B.
+  - The store, its copies, `commit_trailers.py`, the leg's suite and the policy page are unchanged
+    since `69c9c5cb8`.
+  - AC1's old leg is now the copy at `40def53f7`. It differs from the copy at `69c9c5cb8` only in its
+    kit-version line, which the leg never prints. Scope and acceptance are unchanged.
 
 ## 10. Reuse audit
 
 The seam extended is the leg's own build walk and its two in-run caches, `_SUBJ` and `_BC_MEMO`
-(`tools/unattended/check-pass-order.sh@199f4ae905c8:452` and `:466`). This unit persists their
+(`tools/unattended/check-pass-order.sh@638bb1d0c2a6:452` and `:466`). This unit persists their
 answers across runs through TOOL-dQuietDisk-1's store and coprocess, and adds no store of its own.
 `_SUBJ` now also feeds the candidate map, with no second read. TOOL-dWitnessedBar-2's
 unwitnessed-pass arm (`:579` to `:593`) is extended in place: its two per-build reads become S5's
@@ -484,7 +499,9 @@ The chain build owning the area is dWitnessedBar (Test: gate health), whose land
 this file. dScopedBuild (Build: the history-derived exit base) shares the range rule, and
 TOOL-dUnstuckLanding-17's RANGE mode becomes key input. No dWitnessedBar unit made this leg
 incremental. Of its specs, only units 2, 16, 27 and 54 name this file. Its non-merge commits in
-`git log 59e882afd..fb6f1a74c` touch the file only for unit 2 and two kit-version mints.
+`git log 59e882afd..fb6f1a74c` touch the file only for unit 2 and two kit-version mints. In
+`fb6f1a74c..8b8b1374c` only the landing merge `fcd824fed` touches it, and only for its kit-version
+line. The same 4 dWitnessedBar specs name it at `40def53f7`.
 
 `python tools/codebase-map/reuse_lookup.py "reuse a stored per-unit verdict keyed by the commits it reads in a history leg"`
 returned name-token neighbours only (`read_text`, `key`, `read`, `leg`, `legs`). No existing seam fits

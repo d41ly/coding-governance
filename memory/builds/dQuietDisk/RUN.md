@@ -57,3 +57,5 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-22T03:07:52Z brief · item TOOL-dQuietDisk-1 · reason 3df211fad528 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-build-brief.md
 
 2026-11-22T03:07:54Z brief · item TOOL-dQuietDisk-14 · reason 555b5e672671 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-14-build-brief.md
+
+2026-11-22T03:35:30Z rescope · item add TOOL-dQuietDisk-28 · reason discovery adopted (BUILD-METHOD discoveries-adopted): the order-2 re-grounds of units 2, 3 and 4 each measured that every verb of the history store TOOL-dQuietDisk-1 built spends about 8 git processes resolving its policy switch, so unit 4 adds 8 or 9 git processes per run against about 1.8 s saved. One resolve per process removes that cost for every consumer without moving any of their bounds, which are upper limits. Order 3, after the order-2 consumers, touching only the store and its copies.

@@ -16,7 +16,7 @@ Order 1 is built and CLOSED, and dWitnessedBar has landed. `HEAD` carries:
   byte-identical copies in `tools/unattended/` and `tools/memory-tree/`, `tools/lib/history-store.sh` and the block it
   adds to `tools/unattended/lib-unattended.sh`;
 - TOOL-dQuietDisk-14, the kit attestation, at `69c9c5cb8`;
-- the merge `40def53f7` of main at `8b8b1374c`, dWitnessedBar's landing. It brings in 27 commits past `fb6f1a74c`.
+- the merge `40def53f7` of main at `8b8b1374c`, dWitnessedBar's landing. It brings in the 27 commits [DERIVED: `git rev-list --count fb6f1a74c..8b8b1374c`] past `fb6f1a74c`.
   Among others they change `tools/unattended/check-pass-order.sh`, `tools/unattended/check-brief-recorded.sh`,
   `tools/unattended/lib-unattended.sh` and `tools/run-gates/run-gates.sh`: `git diff fb6f1a74c 8b8b1374c -- <file>`.
 
