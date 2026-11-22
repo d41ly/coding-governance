@@ -609,6 +609,8 @@ Cite ids, never line numbers.
 | [TOOL-dQuietDisk-35](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | A HELD KIT'S VERIFY CHECK RUNS THOUGH IT DECIDES NOTHING.… |
 | [TOOL-dQuietDisk-38](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-22 | A FIXTURE BUILDER OUTSIDE THE TEMPLATE CACHE STILL RUNS UNDER AN… |
 | [TOOL-dQuietDisk-39](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-22 | THE HISTORY-STORE ARMS CANNOT TELL A STORE THAT SERVES HITS FROM ONE… |
+| [TOOL-dQuietDisk-40](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE CLOSING REVIEW'S TWO LEFT-SHIFT GATES ARE UNBUILT. Round 1 of the… |
+| [TOOL-dQuietDisk-41](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | derive_kit_attestations SENDS A NAME HOLDING A CR TO ITS BATCH READ.… |
 | [TOOL-dRankedPlan-17](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dRankedPlan-18](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-6 | 2026-10-26 | A PLAN REVIEW'S FINDINGS HAVE NO DISPOSAL ROUTE. review.dispose… |
 | [TOOL-dRemeasuredRender-2](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the location-probe scanner does not see a probe whose cd <dir> carries… |

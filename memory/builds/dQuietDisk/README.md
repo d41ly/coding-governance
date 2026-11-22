@@ -5,7 +5,7 @@ opened: 2026-11-20
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30 TOOL-dQuietDisk-31 TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37 TOOL-dQuietDisk-38 TOOL-dQuietDisk-39
+ids: TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30 TOOL-dQuietDisk-31 TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37 TOOL-dQuietDisk-38 TOOL-dQuietDisk-39 TOOL-dQuietDisk-40 TOOL-dQuietDisk-41
 ---
 
 # dQuietDisk — gov's bars and suites stop churning the disk
@@ -75,14 +75,14 @@ none
 | 20 | `TOOL-dQuietDisk-26` | `check-wiring.sh` lists the tree once per invocation, every check reading that one listing |
 | 21 | `TOOL-dQuietDisk-28` | the history store resolves its policy switch once per process, not once per verb |
 | 22 | `TOOL-dQuietDisk-36` | the closing review's round-1 fold: the bash template cache runs git with the inherited git environment scrubbed, and the turnstile suite grades both the spared live other repository and the swept orphan |
-| 23 | `TOOL-dQuietDisk-37` | the closing review's MEDIUM and LOW findings, batched: the missing arms for the attestations, the owned scratch root, the history store's hits, the one-diff rule, the template race and BlobBatch's fallbacks, the template key's builder arguments, the CR guard on batch names, and the run-selftests comment |
+| 23 | `TOOL-dQuietDisk-37` | the closing review's MEDIUM and LOW findings, batched: the missing arms for the attestations, the owned scratch root, the one-diff rule, the template race and BlobBatch's fallbacks, the template key's builder arguments, the CR guard on batch names, and the run-selftests comment |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 22 unit(s) · node d · opened 2026-11-20 · streams tooling
+**Build status:** INPROGRESS · 23 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16
 ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30 TOOL-dQuietDisk-31
-ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37 TOOL-dQuietDisk-38 TOOL-dQuietDisk-39
+ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37 TOOL-dQuietDisk-38 TOOL-dQuietDisk-39 TOOL-dQuietDisk-40 TOOL-dQuietDisk-41
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -109,16 +109,17 @@ ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 
 | [TOOL-dQuietDisk-9 — every scratch path under one owned, swept root, and every tree removed by one chmod-and-retry helper](spec/2026-11-20-spec-TOOL-dQuietDisk-9.md) | 6 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 7 | 1 | CLOSED | rev-5 | 2026-11-22 |
 | [TOOL-dQuietDisk-36 — the bash template cache runs git without the inherited git environment, and the turnstile suite grades the spared live repository and the swept orphan](spec/2026-11-22-spec-TOOL-dQuietDisk-36.md) | 8 | 2 | CLOSED | rev-1 | 2026-11-22 |
+| [TOOL-dQuietDisk-37 — the closing review's MEDIUM and LOW findings: the missing arms, the template key's builder arguments, the CR guard on batch names, and the serial runner's owned temp root](spec/2026-11-22-spec-TOOL-dQuietDisk-37.md) | 9 | 2 | INPROGRESS | rev-1 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 133 bound to this build, across 4 record folder(s).
+Records: 135 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dQuietDisk-1 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-2 TOOL-dQuietDisk-26
-TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-28 TOOL-dQuietDisk-36.
+TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-28 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37.
 
-Ids whose spec moved past its audited revision: none — 0 of 22 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 23 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -133,6 +134,7 @@ Ids whose spec moved past its audited revision: none — 0 of 22 unit id(s) carr
 | 6 | `TOOL-dQuietDisk-9` | no |
 | 7 | `TOOL-dQuietDisk-19` | no |
 | 8 | `TOOL-dQuietDisk-36` | no |
+| 9 | `TOOL-dQuietDisk-37` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
