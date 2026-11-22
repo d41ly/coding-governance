@@ -192,3 +192,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T15:08:58Z brief · item KICK-dKeptSession-15 · reason f0041b6a0f12 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-15-build-brief.md
 
 2026-11-22T15:11:44Z dispatch · item 040cc07e KICK-dKeptSession-15 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh help/orientation-card.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-15-1-acceptance-ledger.md
+
+2026-11-22T15:49:22Z brief · item KICK-dKeptSession-14 · reason e09209ac4a1a memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-14-build-brief.md
+
+2026-11-22T15:52:26Z dispatch · item 3519a6e0 KICK-dKeptSession-14 · reason tools/runlog/extract.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/fixtures/transcripts.json tools/runlog/README.md skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/map/generated/symbols.json tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt help/orientation-card.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-14-1-acceptance-ledger.md
