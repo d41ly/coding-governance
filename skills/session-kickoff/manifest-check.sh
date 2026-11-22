@@ -304,9 +304,14 @@ CARD_MEMORY_BOUND=${CARD_MEMORY_BOUND:-5}
 # overrides exist for the self-test's slow-stub arms, as CARD_CLI_BOUND's does; neither is an adopter knob.
 CARD_POSITION_BOUND=${CARD_POSITION_BOUND:-10}
 CARD_RECORDS_BOUND=${CARD_RECORDS_BOUND:-5}
+# The `budget —` line's bound on the loop kit's `budget.py state`, in seconds (KICK-dKeptSession-26),
+# PINNED 2026-11-21: the module reads the build's homes with no remote call, and its `ending` verb, the
+# same read and more, took 1.1 s over dKeptSession. The env override exists for the self-test's stub
+# fixture, as CARD_CLI_BOUND's does, and is not an adopter knob.
+CARD_BUDGET_BOUND=${CARD_BUDGET_BOUND:-10}
 # The lines a stored `## pointers` section holds, the one list `check_card_pointers` reads: each later
 # session unit appends its own word (KICK-dKeptSession-26 `budget`, KICK-dKeptSession-5 `mail`).
-POINTER_LINES="records forks item"
+POINTER_LINES="records forks item budget"
 # The `claims —` cell's three constants (TOOL-aGraftedHelix-2): the read's bound in seconds, the
 # second clock's hide age, and the row cap. The bound's env override exists for the self-test's
 # slow-driver arm, as CARD_CAP_BYTES's does; none of the three is an adopter knob.
@@ -1926,7 +1931,7 @@ check_card() {
   lacks=$(check_card_pointers "$CARD_FILE")
   if [ -s "$CARD_TMP/misses" ] || [ -n "$lacks" ]; then
     awk -F '\t' '{print $2 " · line " $1}' "$CARD_TMP/misses"
-    for real in $lacks; do printf "POINTERS — the '## pointers' section has no '%s —' line, which POINTER_LINES lists\n" "$real"; done
+    for real in $lacks; do printf "POINTERS — the '## pointers' section has no '%s —' line, which POINTER_LINES lists; --card --pointers --build <slug> --session %s renders it\n" "$real" "$CARD_SID"; done
     exit 1
   fi
   exit 0
@@ -2356,6 +2361,8 @@ write_card_follow() { # slug · state · terminal 0|1 -> its card — lines; 0 a
 #                                     spec under the build's `spec/`; the `§8` a word apart, so the path is
 #                                     one token `extract_card_tokens` finds tracked
 #   item — <instance key|none> · at <sha8>   the boundary's answer and the HEAD it was derived at
+#   budget — <answer>                the build's rework budget, the loop kit's `budget.py state --build
+#                                     <slug>` line as it prints it, under CARD_BUDGET_BOUND (KICK-dKeptSession-26)
 # A source that does not resolve is its line's `<word> — skipped: <why>`, the `item —` line still ending
 # ` · at <sha8>`. THE ITEM BOUNDARY, I12, is the loop kit's `position.py <slug> --boundary <pointer>`, run by
 # `run_item_boundary` under CARD_POSITION_BOUND, once per process: its file is kept for every later write.
@@ -2413,7 +2420,7 @@ render_pointers() { # slug · boundary file -> the section on stdout; 0 always
     "boundary — none crossed · item "*) item=${b#boundary — none crossed · item }; item=${item%% · *} ;;
     "boundary — "*" → "*) item=${b##* → } ;;
     *) printf 'forks — skipped: %s\n' "${b:-no boundary was read}"
-       printf 'item — skipped: %s · at %s\n' "${b:-no boundary was read}" "$at"; return 0 ;;
+       printf 'item — skipped: %s · at %s\n' "${b:-no boundary was read}" "$at"; render_budget_line "$1"; return 0 ;;
   esac
   ids=$(sed -n 's/^forked — //p' "$2" | head -n 1)
   memroot=$(read_memory_root) || memroot=""
@@ -2428,6 +2435,33 @@ render_pointers() { # slug · boundary file -> the section on stdout; 0 always
     printf 'forks — %s\n' "${forks:-none}"
   fi
   printf 'item — %s · at %s\n' "$item" "$at"
+  render_budget_line "$1"
+}
+
+# The section's `budget —` line (KICK-dKeptSession-26 S1): the one line the loop kit's `budget.py state
+# --build <slug>` prints, `open <spent>/<total>`, `spent` or `unfrozen <spent>/<total>`, never re-derived
+# here. Run in `$ROOT`, whose build the module reads under the working directory, stdin closed, into a
+# scratch file under CARD_BUDGET_BOUND, as `derive_map_block` bounds the map; the answer held to one line
+# of printable text. Every failure is one `budget — skipped:` line, and the section is still written.
+# WHAT THIS DOES NOT CHECK: that the answer is current past this render; a draw shows at the next one.
+render_budget_line() { # slug -> one budget — line on stdout; 0 always
+  local bk py rc sf="$CARD_TMP/pointers.budget" line
+  bk=$(resolve_kit_file loop budget.py)
+  [ -n "$bk" ] || { printf 'budget — skipped: no loop kit\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'budget — skipped: no Python resolves on this node\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'budget — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  (cd "$ROOT" && timeout -k 2 "$CARD_BUDGET_BOUND" "$py" "$bk" state --build "$1" </dev/null > "$sf" 2>/dev/null); rc=$?
+  case "$rc" in
+    0) line=$(LC_ALL=C awk '{ sub(/\r$/, ""); gsub(/[[:cntrl:]]/, "") }
+         NF { f = $0; if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }; print f; exit }' "$sf")
+       if [ -n "$line" ]; then printf 'budget — %s\n' "$line"
+       else printf 'budget — skipped: budget.py state exited 0 and printed nothing\n'; fi ;;
+    124|137) printf 'budget — skipped: budget.py state did not answer within %ss\n' "$CARD_BUDGET_BOUND" ;;
+    *) printf 'budget — skipped: budget.py state exited %s\n' "$rc" ;;
+  esac
+  rm -f "$sf" 2>/dev/null
+  return 0
 }
 
 # The `item —` line's key in a card or a tail, `none` where the section, the line or a key is absent.

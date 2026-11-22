@@ -127,6 +127,7 @@ section directly above the `READY` line, saying where the build is now rather th
 records — journal memory/builds/dExample/build/2026-10-27-build-KICK-dExample-1-agent-ledger.md · spec-audit memory/builds/dExample/reviews/2026-10-27-review-KICK-dExample-1-spec-audit.md
 forks — memory/builds/dExample/spec/2026-10-27-spec-KICK-dExample-3.md §8
 item — item.build.base@KICK-dExample-2#3f9c2a71 · at 8c1e0b42
+budget — open 3/10
 ```
 
 - `records —` names the build's newest record of each kind, one per kind, read by the memory-tree
@@ -136,9 +137,16 @@ item — item.build.base@KICK-dExample-2#3f9c2a71 · at 8c1e0b42
 - `item —` names the item in flight, the loop kit's instance key, or `none` while the build waits on
   something other than an item, and the commit it was read at. While the remote is stale or the
   build's inputs do not read, the item already named is kept.
+- `budget —` shows the build's remaining rework budget, the line the loop kit's `budget.py state`
+  prints, one of three: `budget — open <n>/<total>`, `budget — spent` or `budget — unfrozen <n>/<total>`.
+  `open` is a frozen budget with `<n>` of its `<total>` draws made, `spent` one with none left, and
+  `unfrozen` one not yet frozen at the end of design. Only you, the owner, raise the budget;
+  nothing on the card does. With no loop kit in the repository it reads `budget — skipped:
+  no loop kit`, which hides the budget rather than showing it as zero.
 
 A line whose source does not answer reads `<word> — skipped: <why>`. `manifest-check.sh --card
---check` refuses a stored section missing one of its lines.
+--check` refuses a stored section missing one of its lines and names `--card --pointers`, which
+renders the section afresh; a card written before a line was added reads that way until then.
 
 **When the section is rewritten.** Every publish and every follow writes a fresh section into the
 build's card. Between those, the item boundary does: after a commit, the session's next shell call

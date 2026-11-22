@@ -1989,6 +1989,12 @@ No ending raises `flow.rework-budget`: raising it stays yours.
   then one `loop: budget · no draw id · <row>` line per draw row written before draw ids, each counted as
   its own draw, so a count of zero read under the wrong root shows where it looked.
 
+- **See the state:** `python tools/loop/budget.py state --build <slug>` runs at your repository's top <!-- usage: script:tools/loop/budget.py#state 7be78ec8 -->
+  level and prints one line, the budget's state and nothing else: `open <spent>/<total>` once it is
+  frozen, `spent` once every draw it allows is made, or `unfrozen <spent>/<total>` before its freeze;
+  exit 0. It refuses as `origin` does, exit 2. Your build's card shows the same line as its `budget —`
+  pointer.
+
 - **End a spent build:** `bash tools/unattended/unattended.sh --exhausted <slug>` records the ending <!-- usage: verb:unattended.sh:--exhausted 40c08fe9 -->
   once, as a `decision` row the wrap-up shows you, and prints what comes next: `close-incomplete`
   files each open unit with `--rescope <slug> --act defer` and then runs `--abort <slug> --code
