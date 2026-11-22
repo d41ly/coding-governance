@@ -26,7 +26,7 @@ layer = "layer.memory"
 home = "memory/builds/*/spec/*.md"
 id-rule = "<date>-spec-<unit id>.md"
 schema = { form = "header", fields = [] }
-writer = "gen_build_index.py --new-spec"
+writer = "gov_record.py new spec"
 readers = ["input:spec"]
 lifecycle = "current-state"
 check = "memory hygiene"
@@ -42,7 +42,7 @@ schema = { form = "header", source = "{prefix}/memory-tree/gen_build_index.py:FR
   "slug", "opened", "ids", "parents", "depends-on", "patches", "amends", "supersedes", "implements",
   "may", "spec-audit", "authorized-by", "asks", "slug-grammar", "playbook", "pieces", "status", "node",
   "roster", "streams"] }
-writer = "gen_build_index.py --new-build"
+writer = "gov_record.py new build-readme"
 readers = []
 readers-none = "an agent reads it as its root under builds.agent-root, through no work-order read key"
 lifecycle = "current-state"
@@ -85,7 +85,7 @@ layer = "layer.memory"
 home = "memory/builds/*/prompts/*.md"
 id-rule = ""
 schema = { form = "fields", fields = ["Serves"] }
-writer = "hand"
+writer = "gov_record.py new log"
 readers = ["brief:prompt", "brief:goal", "brief:items", "brief:acceptance", "brief:gates", "brief:non-goals", "input:prompt"]
 lifecycle = "append-only"
 check = "memory hygiene"
@@ -98,7 +98,7 @@ layer = "layer.memory"
 home = "memory/builds/*/build/*.md"
 id-rule = ""
 schema = { form = "fields", fields = ["Serves"] }
-writer = "hand"
+writer = "gov_record.py new research"
 readers = []
 readers-none = "a report is cited by a spec's reuse audit, never filled into a work order"
 lifecycle = "frozen"
@@ -140,7 +140,7 @@ layer = "layer.memory"
 home = "memory/builds/*/build/*-architecture-v*.md"
 id-rule = ""
 schema = { form = "fields", fields = ["Serves"] }
-writer = "hand"
+writer = "gov_record.py new design-record"
 readers = []
 readers-none = "a design record is read by the deviation join, never filled into a work order"
 lifecycle = "frozen"
@@ -168,7 +168,7 @@ layer = "layer.memory"
 home = "memory/builds/*/build/*-build-*-deviation-*.md"
 id-rule = "<date>-build-<unit id>-deviation-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.deviation.required", fields = ["Departs from", "Hand-off", "Before", "After", "Cause", "Reason", "Evidence", "Risk", "Approver", "Follow-through", "Caused-by"] }
-writer = "hand"
+writer = "gov_record.py new deviation"
 readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"

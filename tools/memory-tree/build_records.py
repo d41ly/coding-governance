@@ -128,6 +128,14 @@ read) and `Legs` (`<armed>/<bar legs>`). It has no `new` door: the drift kit's `
 --write` loads this factory in-process and calls `write_record`, and the run-gates kit's `verdict_flow.py` reads
 the newest one's `Measured` as `verdict.flakes.entry`'s `measured` threshold.
 
+THE RECORD DOOR (TOOL-dTotalRecall-2): `write_new_record` is the one write of `gov_record.py new <kind>`, the
+door of each kind whose registry row names it its writer (`read_kind_row`, `DOOR_WRITER`). It renders the row's
+template, refuses the bytes by the kind's own check (`check_typed_record`, the reader the `read` verb
+dispatches to), lists the kind's home for a record of the same content key (`derive_content_key`), reads the
+build's authority (`check_mint_authority`) and mints: a typed kind through `write_record`, whose `check` hook
+reads the exact bytes before the file opens, an empty id rule by the caller's `--name`, a `SEQ_RULE` by the
+claim CLI's counter. The factory's own `new` doors stay their kinds' doors.
+
 `build_records.py read <path>` prints one record's fields and every refusal: exit 0 well-formed, 1 malformed,
 2 an unreadable path or a pending kind. A kind with a reader of its own is read by it; `exception` by
 `read_exception`; every other kind, `widen`, `leg-tail`, `flake` and `gate-health` among them, by
@@ -146,8 +154,11 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import hashlib
+import os
 import pathlib
 import re
+import subprocess
 import sys
 
 sys.dont_write_bytecode = True
@@ -864,11 +875,13 @@ def write_recommendation(root, build, unit, stage, score, source, binds, reason,
     return write_record(root, build, unit, "recommendation", f"{stage} review", fields, today)
 
 
-def write_record(root, build, unit, kind, title, fields, today=None, lines=()):
+def write_record(root, build, unit, kind, title, fields, today=None, lines=(), check=None):
     """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
     headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>`, each `(key, value)` of
     `fields` as a bold-key bullet and, after one blank line, each of `lines` as written (TOOL-dDeclaredLoop-17
-    S1), each refused as a value is. -> its repo-relative path. A refusal is ValueError."""
+    S1), each refused as a value is. `check(rel, text)`, where given, reads the bytes about to be written and
+    raises ValueError to refuse them, before the file is opened (TOOL-dTotalRecall-2 S4). -> its
+    repo-relative path. A refusal is ValueError."""
     if kind not in KINDS:
         raise ValueError(f"{kind!r} is not a typed kind: " + ", ".join(KINDS))
     if "pending" in KINDS[kind]:   # PLAY-dOrderedCharter-55 S8: refused before any write, as `read` refuses it
@@ -900,10 +913,265 @@ def write_record(root, build, unit, kind, title, fields, today=None, lines=()):
     body = [f"# {unit} {kind} {n} — {title}", "", f"**Serves:** {kind} {unit}", ""]
     body += [f"- **{key}:** {value}" for key, value in fields]
     body += [""] + list(lines) if lines else []
+    if check:
+        check(path.relative_to(root).as_posix(), "\n".join(body) + "\n")
     out.mkdir(exist_ok=True)
     with open(path, "x", encoding="utf-8", newline="\n") as fh:   # never over a record already there
         fh.write("\n".join(body) + "\n")
     return path.relative_to(root).as_posix()
+
+
+# -------------------------------------------------------------------------------- the record door
+# TOOL-dTotalRecall-2: `gov_record.py new <kind>` is the thin adapter over `write_new_record`, the door of each
+# kind whose registry row names it its writer.
+#: The writer cell of a kind this door writes; `{}` the kind.
+DOOR_WRITER = "gov_record.py new {}"
+#: An id rule's counter mint, the one shape a `<seq>` is minted in.
+SEQ_RULE = "<FAMILY>-<slug>-<seq>"
+
+
+def check_typed_record(rel, text, kind):
+    """`[(field, why)]`, the refusals of one typed `kind` record at `rel`: the kind's own reader where it has
+    one, `deviation_join.read_record` for a deviation, else `read_record` by its `KINDS` entry alone. The
+    `read` verb and the record door both call it, so the write boundary and the gate are one predicate."""
+    if kind == "deviation":
+        import deviation_join  # noqa: E402  the deviation kind's own rules live with its join
+        return deviation_join.read_record(rel, text)["malformed"]
+    readers = {"change": read_change, "override": read_override, "red-fix": read_red_fix,
+               "disposition": read_disposition, "acceptance": read_acceptance, "transition": read_transition,
+               "recommendation": read_recommendation, "card": read_card, "probe-trigger": read_probe_trigger,
+               "probe": read_probe, "exception": read_exception}
+    if kind in readers:
+        return readers[kind](rel, text)["malformed"]
+    return read_record(rel, text, kind)[1]   # TOOL-dWitnessedBar-8 §8 F12: no rules of its own
+
+
+def derive_content_key(kind, fields, given=None):
+    """The content key of one record: the first 12 hex digits of the SHA-256 of the LF-folded text of the kind
+    name, the given name where the row mints none, and each `(key, value)` of `fields` in schema order, the
+    formula of the roles kit's `derive_section_sha`. Derived from the fields, never stored beside them."""
+    text = "\n".join([kind, given or ""] + [f"{key}: {value}" for key, value in fields])
+    return hashlib.sha256(text.replace("\r\n", "\n").encode("utf-8")).hexdigest()[:12]
+
+
+def read_kind_row(root, kind):
+    """The `[[record-kind]]` row of `kind`, read through `tree_lib.resolve_kind`, whose writer is this door;
+    ValueError naming `record-kinds.toml` where the registry or the row is absent, and naming the row's
+    writer where another door writes the kind (S2)."""
+    import record_kinds  # noqa: E402  the registry's reader, a sibling of this file
+    from tree_lib import resolve_kind
+    try:
+        rows = record_kinds.read_record_kinds(root)
+    except record_kinds.RecordKindsError as exc:
+        raise ValueError(str(exc)) from None
+    if rows is None:
+        raise ValueError(f"no {record_kinds.REGISTRY} in this tree, so no kind has a door")
+    name = resolve_kind(kind)
+    row = next((r for r in rows if r.get("name") == name), None)
+    if row is None:
+        raise ValueError(f"no [[record-kind]] row of {record_kinds.REGISTRY} names {kind}")
+    if row.get("writer") != DOOR_WRITER.format(name):
+        raise ValueError(f"its door is {row.get('writer')}, the writer {record_kinds.REGISTRY} names, and each "
+                         f"kind has one door")
+    return row
+
+
+def check_mint_authority(root, build):
+    """The lines a mint under `build` prints, after its authority reads: the build lease, classed by the loop
+    kit's `read_lease_class` where the unattended driver resolves, `mine` admitting and any fact refusing;
+    then, the lease free or unread for want of a kit, the claim's `session` in this node's cache ref
+    (`gen_build_index.read_claim_lines`), this session's admitting and another's refusing; with neither, the
+    charter's per-session rule, named. ValueError naming the holder or the fact (S6, §4 "Minting")."""
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    lines, loop = [], None
+    for home, anchor in (("unattended", "unattended.sh"), ("loop", "placement.py")):
+        try:
+            loop = resolve_kit_dir(home, anchor, KIT)
+        except LookupError:
+            lines, loop = [f"unarmed — no {home} kit"], None
+            break
+    if loop is not None:
+        if str(loop) not in sys.path:
+            sys.path.insert(0, str(loop))
+        import placement  # noqa: E402  the loop kit's lease comparison, kept one (§8 F6)
+        cls = placement.read_lease_class(root, build)
+        if cls == "mine":
+            return lines
+        if cls != "free":
+            raise ValueError(cls)
+    import gen_build_index  # noqa: E402  the claim's cache ref and its reader
+    claim = gen_build_index.read_claim_lines(str(root), build)
+    if claim is not None:
+        sessions = [ln[len("session: "):].strip() for ln in claim if ln.startswith("session: ")]
+        me = os.environ.get("CLAUDE_CODE_SESSION_ID") or "absent"
+        holder = sessions[-1] if sessions else "absent"   # the oldest commit, the claim itself
+        if holder != me:
+            raise ValueError(f"the claim of {build} ({gen_build_index.CLAIM_CACHE_NS}/{build}) is held by session "
+                             f"{holder}, not this session {me}")
+        return lines
+    return lines + [f"minted under the session rule: no claim or lease for {build}"]
+
+
+def write_new_record(root, kind, build, unit, title, fields, name=None):
+    """The record door's one write (TOOL-dTotalRecall-2 S1-S8): the `kind` record of `build` serving `unit`,
+    headed `title`, `fields` its `(key, value)` pairs in the caller's order, `name` the stem a row with an
+    empty `id-rule` takes. In order: the row (S2), the render and its refusal by the kind's own check (S3,
+    S4), the listing of the kind's home for a record of the same content key (S5), the authority (S6), then
+    the mint and the write, staged (S8). -> `(word, path or line, key, lines)`, `word` one of `wrote`,
+    `exists` and `waiting`, `lines` the authority's. ValueError for every refusal, nothing written."""
+    import fnmatch
+    import record_kinds  # noqa: E402  the registry's template and field check
+    from tree_lib import TYPED_RECORD_KINDS
+    root = pathlib.Path(root)
+    row = read_kind_row(root, kind)
+    kind = row["name"]
+    schema = row.get("schema") if isinstance(row.get("schema"), dict) else {}
+    if schema.get("form") != "fields":
+        raise ValueError(f"its schema form is {schema.get('form')}, written only by a kind handler")
+    rule, home, typed = row.get("id-rule") or "", row.get("home"), kind in TYPED_RECORD_KINDS
+    for flag, value in (("--build", build), ("--unit", unit), ("--title", title)):
+        if not value:
+            raise ValueError(f"{flag} is required")
+    if not SLUG.match(build):
+        raise ValueError(f"--build {build!r} is not a build slug")
+    if not ID.fullmatch(unit):
+        raise ValueError(f"--unit {unit!r} is not a unit id")
+    forged = [key for key, value in [("title", title)] + list(fields)
+              if "\n" in value or "\r" in value or FORGED_FIELD.match(value)]
+    if forged:
+        raise ValueError(f"{', '.join(forged)}: a value is one line and never opens **<Word>:**, so it cannot "
+                         f"forge a field")
+    order = [f for f in schema.get("fields", []) if f != "Serves"]
+    given = dict(fields)
+    ordered = [(f, given[f]) for f in order if f in given] + [(k, v) for k, v in fields if k not in order]
+    template = record_kinds.render_template([row], kind).split("\n")
+
+    def render_text(rel, n):
+        """The template filled for the record at `rel`, `n` its minted `<n>`."""
+        head = template[0].replace("<unit id>", unit).replace("<n>", str(n)).replace("<title>", title)
+        body = [head, "", f"**Serves:** {kind} {unit}", ""]
+        body += [f"- **{f}:** {given[f]}" if f in given else f"- **{f}:** " for f in order]
+        body += [f"- **{k}:** {v}" for k, v in ordered if k not in order]
+        return "\n".join(body) + "\n"
+
+    def read_ordered_fields(text):
+        """A record's `(key, value)` field lines, the row's fields first in schema order, then the rest."""
+        pairs = [(m.group(1), m.group(2).strip()) for ln in text.replace("\r\n", "\n").split("\n")
+                 if (m := FIELD.match(ln))]
+        seen = dict(pairs)
+        return [(f, seen[f]) for f in order if f in seen] + [(k, v) for k, v in pairs if k not in order]
+
+    def check_text(rel, text):
+        """The kind's own check over the bytes at `rel`: S4's refusal, naming each field and its reason."""
+        if typed:
+            bad = check_typed_record(rel, text, kind)
+        else:
+            missing, misplaced = record_kinds.derive_field_lines(text, schema.get("fields", []))
+            bad = [(f, "is missing") for f in missing] + [(f, "is out of the row's order") for f in misplaced]
+        if bad:
+            raise ValueError("; ".join(f"{key} {why}" for key, why in bad))
+
+    # the placement: the row's home with the build for its `builds/*/` segment, and the name its rule gives
+    memory_root = (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/")
+    if not pathlib.Path(root, memory_root, "builds", build).is_dir():
+        raise ValueError(f"{memory_root}/builds/{build}/ is no build folder of this tree")
+    glob = str(home).replace("builds/*/", f"builds/{build}/", 1)
+    folder = glob.rsplit("/", 1)[0]
+    if "*" in folder or "builds/*/" not in str(home):
+        raise ValueError(f"its home {home} places no record under one build")
+    today = datetime.date.today().isoformat()
+    seq = None
+    if typed:
+        if name:
+            raise ValueError(f"--name names a record of a row that mints none, and {kind} mints its own")
+        rel = f"{memory_root}/builds/{build}/build/{today}-build-{unit}-{kind}-1.md"   # provisional, for the check
+        given_id = None
+    elif not rule:
+        if not name:
+            raise ValueError(f"--name <stem> is required: the {kind} row's id-rule is empty, so no grammar "
+                             f"mints its name")
+        if name in (".", "..") or any(c in name for c in "/\\") or not name.strip():
+            raise ValueError(f"--name {name!r} is not one path segment")
+        rel = f"{folder}/{name}.md"
+        if not fnmatch.fnmatchcase(rel, glob):
+            raise ValueError(f"--name {name}: {rel} misses the {kind} row's home {home}")
+        hit = next((k for k in TYPED_RECORD_KINDS if derive_record_name(k).search(rel)), None)
+        if hit:
+            raise ValueError(f"--name {name}: {rel} is a {hit} record's name, graded by that kind alone")
+        given_id = name
+    elif rule == SEQ_RULE + ".md":
+        if name:
+            raise ValueError(f"--name names a record of a row that mints none, and {kind} mints its own")
+        seq = (unit.split("-", 1)[0], build)   # the counter's family is the serving unit's
+        rel, given_id = f"{folder}/{seq[0]}-{build}-0.md", None   # provisional, for the check
+    else:
+        raise ValueError(f"its id-rule {rule} holds a placeholder this door mints only in a typed kind")
+    text = render_text(rel, 1)
+    check_text(rel, text)
+    key = derive_content_key(kind, read_ordered_fields(text), given_id)
+
+    # the listing: a record of the kind whose re-derived key matches is the same write
+    grammars = {k: derive_record_name(k) for k in TYPED_RECORD_KINDS}
+    for path in record_kinds.read_tracked(root, str(home)):
+        hits = [k for k, g in grammars.items() if g.search(path)]
+        if (kind not in hits) if typed else hits:
+            continue
+        p = pathlib.Path(root, path)
+        if not p.is_file():
+            continue
+        stem = p.stem if not rule else None
+        other = derive_content_key(kind, read_ordered_fields(p.read_bytes().decode("utf-8", "replace")), stem)
+        if other == key:
+            return "exists", path, key, []
+        if given_id is not None and path == rel:
+            raise ValueError(f"{path} already holds the record {given_id}, its content key {other}, not {key}")
+    if given_id is not None and pathlib.Path(root, rel).exists():
+        raise ValueError(f"{rel} already exists, untracked: a different value under an existing id")
+
+    # the authority and the mint
+    lines = [] if seq else check_mint_authority(root, build)
+    if typed:
+        def check_written(at, written):
+            """The bytes `write_record` is about to write: the template's render, refused by the kind's check."""
+            n = re.search(r"-(\d+)\.md$", at).group(1)
+            if written != render_text(at, n):
+                raise ValueError(f"the factory's layout and the {kind} template disagree at {at}")
+            check_text(at, written)
+        rel = write_record(root, build, unit, kind, title, ordered, today, check=check_written)
+    else:
+        if seq:
+            import gen_build_index  # noqa: E402  the claim CLI's one caller seam
+            try:
+                rc, said = gen_build_index.run_claim_cli(str(root), "ask", seq[0], build, "--claimant", key)
+            except gen_build_index.Problem as exc:
+                raise ValueError(str(exc)) from None
+            if rc == 4:
+                return "waiting", said, key, lines
+            if rc != 0:
+                raise ValueError(said)
+            if said.startswith("local "):
+                from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+                try:
+                    resolve_kit_dir("unattended", "unattended.sh", KIT)
+                    loop = resolve_kit_dir("loop", "breakpoints.py", KIT)
+                except LookupError:
+                    raise ValueError("unarmed — no unattended kit") from None
+                if str(loop) not in sys.path:
+                    sys.path.insert(0, str(loop))
+                from breakpoints import run_sourced   # noqa: E402  the driver's one floor, never a third copy
+                rc, out = run_sourced(root, "derive_ask_seq %s %s" % (seq[0], build))
+                if rc != 0 or not out.strip().isdigit():
+                    raise ValueError(f"derive_ask_seq {seq[0]} {build} answered exit {rc}: {out.strip()[-200:]}")
+                lines, minted = lines + [said], f"{seq[0]}-{build}-{out.strip()}"
+            else:
+                minted = said.split(" ", 1)[1].strip()
+            rel = f"{folder}/{minted}.md"
+            text = render_text(rel, 1)
+        pathlib.Path(root, rel).parent.mkdir(parents=True, exist_ok=True)
+        with open(pathlib.Path(root, rel), "x", encoding="utf-8", newline="\n") as fh:
+            fh.write(text)
+    subprocess.run(["git", "add", "--", rel], cwd=str(root), capture_output=True, check=False)
+    return "wrote", rel, key, lines
 
 
 # -------------------------------------------------------------------------------- the fixture
@@ -1351,33 +1619,7 @@ def main(argv):
     if "pending" in KINDS[kind]:
         print(f"build-records: {rel} · the {kind} kind is pending on {KINDS[kind]['pending']}, which gives it fields")
         return 2
-    if kind == "deviation":
-        import deviation_join  # noqa: E402  the deviation kind's own rules live with its join
-        bad = deviation_join.read_record(rel, text)["malformed"]
-    elif kind == "change":
-        bad = read_change(rel, text)["malformed"]
-    elif kind == "override":
-        bad = read_override(rel, text)["malformed"]
-    elif kind == "red-fix":
-        bad = read_red_fix(rel, text)["malformed"]
-    elif kind == "disposition":
-        bad = read_disposition(rel, text)["malformed"]
-    elif kind == "acceptance":
-        bad = read_acceptance(rel, text)["malformed"]
-    elif kind == "transition":
-        bad = read_transition(rel, text)["malformed"]
-    elif kind == "recommendation":
-        bad = read_recommendation(rel, text)["malformed"]
-    elif kind == "card":
-        bad = read_card(rel, text)["malformed"]
-    elif kind == "probe-trigger":
-        bad = read_probe_trigger(rel, text)["malformed"]
-    elif kind == "probe":
-        bad = read_probe(rel, text)["malformed"]
-    elif kind == "exception":
-        bad = read_exception(rel, text)["malformed"]
-    else:   # TOOL-dWitnessedBar-8 §8 F12: a kind with no rules of its own reads by its `KINDS` entry alone
-        bad = read_record(rel, text, kind)[1]
+    bad = check_typed_record(rel, text, kind)
     for ln in text.replace("\r\n", "\n").split("\n"):
         if m := FIELD.match(ln):
             print(f"build-records: {rel} · {m.group(1)}: {m.group(2).strip()}")

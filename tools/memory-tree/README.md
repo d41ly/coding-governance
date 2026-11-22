@@ -342,6 +342,37 @@ the govkit registry. What it does not check: whether a `writer` writes its kind,
 contents, whether a `layer` tag is a row of the layer register, whether a derived purpose describes
 its node, and an ask closed only by a spec header's `closes`, which reads as open.
 
+### The record door — `gov_record.py new <kind>` (TOOL-dTotalRecall-2)
+
+```
+python <prefix>/memory-tree/gov_record.py new <kind> --build <slug> --unit <id> --title <text> [--name <stem>] [--field <Name>=<value>]...
+python <prefix>/memory-tree/gov_record.py new build-readme <slug> --asks <IDLIST>
+python <prefix>/memory-tree/gov_record.py new spec <id> --tier 1|2 [--order <n>] [--base <sha>]
+```
+
+The one write door of every kind whose registry row names `gov_record.py new <kind>` its `writer`:
+`deviation`, `research`, `log` and `design-record`, and the two scaffolds as kinds, `build-readme` and
+`spec`, which run `gen_build_index.py`'s `--new-build` and `--new-spec` with every flag passed through. A
+kind with no row, or whose row names another door, exits 2 naming it, so a factory door's kind
+(`build_records.py new exception`) stays that door's. A `fields` kind is `build_records.write_new_record`:
+the row's `--template` skeleton filled with each `--field`, a key the row does not name following; the
+bytes parsed back by the kind's own check before anything is written (`check_typed_record` for a typed
+kind, the row's field lines for any other); then the kind's home is listed, and a record whose content
+key (`derive_content_key`, over the kind, a given `--name` and the field values in schema order) matches
+is the same write, `exists`, while a different value under a given name is refused. The build's
+authority is read next, `check_mint_authority`: the build lease, classed by the loop kit's
+`read_lease_class` where the unattended driver resolves, `mine` admitting and a holder or an unread lease
+refusing; then the claim's `session` in this node's cache ref `refs/gov/remote/claims/<slug>`, this
+session's admitting; with neither, `minted under the session rule: no claim or lease for <slug>`. A typed
+kind's `<n>` is `write_record`'s, a row with an empty `id-rule` takes `--name`, one path segment placed in
+the row's home and refused where a typed kind's name grammar matches it, and a `<FAMILY>-<slug>-<seq>`
+rule is minted by `gov-claim.sh ask` with the content key as its claimant, the family the unit's; a clone
+with no remote takes the unattended driver's `derive_ask_seq`. The file is staged, never committed.
+Exit: 0 `wrote <path> key <key>` or `exists <path> key <key>`; 2 `refused <kind>: <why>`, nothing
+written; 4 `waiting offline <ref>`, a counter mint offline under `warn` or `follow-leases`.
+WHAT IT DOES NOT CHECK: a record's edges and causes (TOOL-dTotalRecall-19), and two builds holding a
+`--name` record of one stem and one key, which the listing reads as one write.
+
 ## Backlog modes — authored shards and per-build asks
 
 Where an ask lives, and who decides its status, is one conf key. This section is the author-facing

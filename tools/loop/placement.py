@@ -589,8 +589,16 @@ def read_terminal_statuses():
 def read_build_lease(root, build):
     """None where the build lease of `build` is free, or held under this node's fleet tag by this session, as
     the unattended driver's `--lease status build <build>` prints it (TOOL-dPlacedRequest-34 S22), else the
-    fact that fails. An unreadable lease is a fact, never a pass; a session the harness exposes none of holds
-    no lease."""
+    fact that fails: `read_lease_class` with its two admitting classes read as one."""
+    cls = read_lease_class(root, build)
+    return None if cls in ("free", "mine") else cls
+
+
+def read_lease_class(root, build):
+    """`free` where the build lease of `build` is free, `mine` where it is held under this node's fleet tag by
+    this session, as the unattended driver's `--lease status build <build>` prints it (TOOL-dPlacedRequest-34
+    S22), else the fact that fails (TOOL-dTotalRecall-2 S6). An unreadable lease is a fact, never a pass; a
+    session the harness exposes none of holds no lease."""
     import shlex
     from breakpoints import run_sourced   # it runs the driver, so here and only for the facts that read a lease
     try:
@@ -605,16 +613,16 @@ def read_build_lease(root, build):
         return "the build lease of %s could not be read: %s" % (build, next(
             (ln for ln in reversed(lines) if ln and not ln.startswith("fleet-tag\t")), "exit %d" % rc))
     if any(ln.startswith(("lease — off · ", "lease — none · ")) for ln in lines):
-        return None
+        return "free"
     row = next((ln.split("\t") for ln in lines if ln.startswith("%s/build\t" % build) and ln.count("\t") == 5), None)
     if row is None:
         return "the build lease of %s could not be read: --lease status printed no row" % build
     _tail, tag, sess, _status, verdict, _epoch = row
     if verdict in FREE_VERDICTS:
-        return None
+        return "free"
     me = os.environ.get("CLAUDE_CODE_SESSION_ID") or "absent"
     if verdict in ("live", "held") and tag == mine and mine != "-" and sess == me and me != "absent":
-        return None
+        return "mine"
     return "the build lease of %s reads %s, held by %s session %s" % (build, verdict, tag, sess)
 
 

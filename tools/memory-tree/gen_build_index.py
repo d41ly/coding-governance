@@ -5097,36 +5097,51 @@ def derive_mandate_key(ids: list) -> str:
     return hashlib.sha256("\n".join(sorted(ids)).encode("utf-8")).hexdigest()[:12]
 
 
-def read_own_claim(root: str, slug: str, key: str) -> bool:
-    """True where this node's cache ref of `slug`'s claim carries `claimant-key: <key>` in its first-parent
-    history, read with no fetch; False where the ref is absent or another key's."""
+def read_claim_lines(root: str, slug: str) -> list | None:
+    """The message lines of this node's cache ref of `slug`'s claim, its first-parent history newest first
+    and at most 64 commits, read with no fetch; None where the ref is absent (TOOL-dTotalRecall-2 S6). The
+    scaffold's resume and the record door's claim rung both read it."""
     done = subprocess.run(["git", "log", "--first-parent", "-n", "64", "--format=%B",
                            f"{CLAIM_CACHE_NS}/{slug}", "--"], cwd=root, capture_output=True, text=True,
                           encoding="utf-8", errors="replace", env=_build_git_env())
-    return done.returncode == 0 and f"claimant-key: {key}" in (x.rstrip("\r") for x in done.stdout.split("\n"))
+    return [x.rstrip("\r") for x in done.stdout.split("\n")] if done.returncode == 0 else None
 
 
-def write_slug_claim(root: str, slug: str, key: str) -> str:
-    """Claim `refs/gov/claims/<slug>` for `key` through the claim CLI, its `--offline` the policy value
-    `leases.offline`, or none where that does not read, so the CLI's `refuse` applies. Returns the CLI's line
-    on exit 0; a Problem naming the ref and the CLI's line on any other exit."""
-    import corpus_ids  # noqa: PLC0415 — deferred: only the scaffold needs a bash
-    ref = f"refs/gov/claims/{slug}"
+def read_own_claim(root: str, slug: str, key: str) -> bool:
+    """True where this node's cache ref of `slug`'s claim carries `claimant-key: <key>` in its first-parent
+    history, read with no fetch; False where the ref is absent or another key's."""
+    return f"claimant-key: {key}" in (read_claim_lines(root, slug) or ())
+
+
+def run_claim_cli(root: str, *argv: str) -> tuple:
+    """`(exit, last stdout line)` of the claim CLI run in `root` for `argv`, its `--offline` the policy value
+    `leases.offline`, or none where that does not read, so the CLI's `refuse` applies. A Problem where no
+    usable bash runs it. The scaffold's slug claim and the record door's counter mint both call it."""
+    import corpus_ids  # noqa: PLC0415 — deferred: only a claim needs a bash
     try:
         sh = corpus_ids.resolve_bash()
     except corpus_ids.Problem as exc:
-        raise Problem(f"--new-build {slug}: {ref} cannot be claimed, no usable bash: {exc}") from None
-    argv = [sh, os.path.join(os.path.dirname(os.path.abspath(__file__)), CLAIM_CLI).replace(os.sep, "/"),
-            "slug", slug, "--claimant", key]
+        raise Problem(f"no usable bash runs {CLAIM_CLI}: {exc}") from None
+    cmd = [sh, os.path.join(os.path.dirname(os.path.abspath(__file__)), CLAIM_CLI).replace(os.sep, "/"), *argv]
     try:
-        argv += ["--offline", read_policy_value("leases.offline", root)]
+        cmd += ["--offline", read_policy_value("leases.offline", root)]
     except (LookupError, ValueError) as exc:
         print(f"build-index: leases.offline did not read, so the claim takes the CLI's refuse: {exc}")
-    done = subprocess.run(argv, cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace",
+    done = subprocess.run(cmd, cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace",
                           env=_build_git_env(), stdin=subprocess.DEVNULL)
-    line = (done.stdout.strip().splitlines() or [f"no line, exit {done.returncode}"])[-1]
-    if done.returncode != 0:
-        raise Problem(f"--new-build {slug}: {ref} was not claimed, exit {done.returncode}: {line}; "
+    return done.returncode, (done.stdout.strip().splitlines() or [f"no line, exit {done.returncode}"])[-1]
+
+
+def write_slug_claim(root: str, slug: str, key: str) -> str:
+    """Claim `refs/gov/claims/<slug>` for `key` through the claim CLI. Returns the CLI's line on exit 0; a
+    Problem naming the ref and the CLI's line on any other exit."""
+    ref = f"refs/gov/claims/{slug}"
+    try:
+        rc, line = run_claim_cli(root, "slug", slug, "--claimant", key)
+    except Problem as exc:
+        raise Problem(f"--new-build {slug}: {ref} cannot be claimed, {exc}") from None
+    if rc != 0:
+        raise Problem(f"--new-build {slug}: {ref} was not claimed, exit {rc}: {line}; "
                       f"nothing was written")
     return line
 

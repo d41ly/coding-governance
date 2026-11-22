@@ -828,17 +828,17 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 
 | Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |
 |---|---|---|---|---|---|---|---|
-| `spec` | `record.spec` | `memory/builds/*/spec/*.md` | `gen_build_index.py --new-spec` | `gov-builder`, `gov-diff-reviewer`, `gov-skeptic`, `gov-spec-reviewer`, `gov-spec-writer`, `gov-synthesizer`, `gov-tester` | `gov-spec-writer` | `memory hygiene` | its writer is `design.unit-spec`; the spec redesigned as a structured, tagged contract |
-| `build-readme` | `record.build-readme` | `memory/builds/*/README.md` | `gen_build_index.py --new-build` | — | — | `memory hygiene` | the build README's declared front-matter schema, with unknown keys refused; writer item not named |
+| `spec` | `record.spec` | `memory/builds/*/spec/*.md` | `gov_record.py new spec` | `gov-builder`, `gov-diff-reviewer`, `gov-skeptic`, `gov-spec-reviewer`, `gov-spec-writer`, `gov-synthesizer`, `gov-tester` | `gov-spec-writer` | `memory hygiene` | its writer is `design.unit-spec`; the spec redesigned as a structured, tagged contract |
+| `build-readme` | `record.build-readme` | `memory/builds/*/README.md` | `gov_record.py new build-readme` | — | — | `memory hygiene` | the build README's declared front-matter schema, with unknown keys refused; writer item not named |
 | `spec-audit` | `record.spec-audit` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | — | `gov-synthesizer` | `memory hygiene` | — |
 | `diff-review` | `record.diff-review` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | — | `gov-synthesizer` | `memory hygiene` | — |
-| `log` | `record.log` | `memory/builds/*/prompts/*.md` | `hand` | `gov-builder`, `gov-orienter`, `gov-researcher`, `gov-session`, `gov-spec-reviewer`, `gov-spec-writer` | — | `memory hygiene` | the journal grammar moved into the core; writer item not named |
-| `research` | `record.research` | `memory/builds/*/build/*.md` | `hand` | — | — | `memory hygiene` | — |
+| `log` | `record.log` | `memory/builds/*/prompts/*.md` | `gov_record.py new log` | `gov-builder`, `gov-orienter`, `gov-researcher`, `gov-session`, `gov-spec-reviewer`, `gov-spec-writer` | — | `memory hygiene` | the journal grammar moved into the core; writer item not named |
+| `research` | `record.research` | `memory/builds/*/build/*.md` | `gov_record.py new research` | — | — | `memory hygiene` | — |
 | `run-record` | `record.run-record` | `memory/builds/*/build/*-runlog-*.md` | `runlog.py record --write` | — | — | `runlog record schema` | observability's journal reader writes it when the journal shows a run closed, as `observability.run-record` says |
 | `backlog-row` | `record.backlog-row` | `memory/backlog/*.md` | `hand` | — | — | `memory hygiene` | the ask register's row store; the memory contract declares it; writer item not named |
-| `design-record` | `record.design-record` | `memory/builds/*/build/*-architecture-v*.md` | `hand` | — | — | `memory hygiene` | a core memory kind with no writer item; the memory contract declares it |
+| `design-record` | `record.design-record` | `memory/builds/*/build/*-architecture-v*.md` | `gov_record.py new design-record` | — | — | `memory hygiene` | a core memory kind with no writer item; the memory contract declares it |
 | `dossier` | `record.dossier` | `memory/map/features/*.md` | `hand` | — | — | `codebase-map gate coverage` | dossiers anchored to symbol keys; its writer, where the map is installed, is `build.unit-pass`, the claiming dossier's |
-| `deviation` | `record.deviation` | `memory/builds/*/build/*-build-*-deviation-*.md` | `hand` | — | — | `memory hygiene` | the record kept in its departing build's `build/` folder, read by the deviation join, the as-built view |
+| `deviation` | `record.deviation` | `memory/builds/*/build/*-build-*-deviation-*.md` | `gov_record.py new deviation` | — | — | `memory hygiene` | the record kept in its departing build's `build/` folder, read by the deviation join, the as-built view |
 | `exception` | `record.exception` | `memory/builds/*/build/*-build-*-exception-*.md` | `build_records.py new exception` | — | — | `memory hygiene` | the exception register, kept in the building build's `build/` folder as a deviation record is; writer item not named |
 | `override` | `record.override` | `memory/builds/*/build/*-build-*-override-*.md` | `build_records.py new override` | — | — | `memory hygiene` | `charter.override` and its record, under the precedence and override rule, the record kept in the building build's |
 | `change` | `record.change` | `memory/builds/*/build/*-build-*-change-*.md` | `build_records.py new change` | — | — | `memory hygiene` | — |

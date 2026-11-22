@@ -192,3 +192,11 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T18:55:45Z draw · re-dispatch · TOOL-dTotalRecall-2 · 21/186 · 20261122T185545Z-8b6541
 
 2026-11-22T18:55:45Z dispatch · item a3d6f917 TOOL-dTotalRecall-2 · reason memory/HYGIENE.md
+
+2026-11-22T19:07:37Z brief · item TOOL-dTotalRecall-2 · reason a828796f0f4c memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-build-brief-2.md
+2026-11-22T19:08:55Z draw · re-dispatch · TOOL-dTotalRecall-2 · 22/186 · 20261122T190855Z-4ba0a3
+
+2026-11-22T19:08:55Z dispatch · item 9e0dfdb0 TOOL-dTotalRecall-2 · reason tools/memory-tree/gov_record.py tools/memory-tree/build_records.py tools/memory-tree/gen_build_index.py tools/loop/placement.py tools/memory-tree/record-kinds.toml tools/memory-tree/HYGIENE.template.md tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/README.md memory/HYGIENE.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-2.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-2-2-acceptance-ledger.md
+2026-11-22T19:14:57Z draw · re-dispatch · TOOL-dTotalRecall-2 · 23/186 · 20261122T191457Z-fac732
+
+2026-11-22T19:14:57Z dispatch · item 9e0dfdb0 TOOL-dTotalRecall-2 · reason memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-2-deviation-26.md

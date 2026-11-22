@@ -3601,6 +3601,123 @@ hit 'build-records: PASS recommendation'
 out=$("$_PY" "$HERE/build_records.py" --fixture --plant pending-kind 2>&1)
 hit 'build-records: PASS pending-kind'
 
+# --- TOOL-dTotalRecall-2 (AC1 to AC10) — the record door, `gov_record.py new <kind>`, each call in a clone of a
+# --- seed repository holding this kit's registry, over a bare remote, AC7's twin clones among them. Red on
+# --- a door writing a kind with no row or another door (AC1, AC9), a value reaching disk past the kind's check
+# --- (AC2), a replay writing twice or a changed value overwriting (AC3, AC4), a mint that misses the build's
+# --- lease or claim (AC5), a counter mint not keyed by the content key (AC6), a scaffold copied or its claim
+# --- skipped (AC7), a template its own check refuses (AC8) and a name the door invented or a typed kind's
+# --- (AC10). The lease and the counter arms need the unattended kit beside this one and skip ALOUD without it.
+GRD="$TMP/grd"; GRS="$GRD/seed"
+run_record_door() { (cd "$GRD/$1" && CLAUDE_CODE_SESSION_ID="${GR_SESSION:-s-mine}" "$_PY" "$HERE/gov_record.py" new "${@:2}" 2>&1); }
+run_record_deviation() { run_record_door "$1" deviation --build "$2" --unit "TOOL-$2-2" --title t --field "Departs from=TOOL-$2-2@rev-1" \
+  --field 'Hand-off=spec-to-code' --field 'Before=b' --field 'After=a' --field 'Cause=builder discovery' \
+  --field "Reason=$3" --field 'Evidence=e' --field "Risk=${4:-additive}" --field 'Approver=p' --field 'Follow-through=gap x' \
+  --field "Caused-by=TOOL-$2-2"; }
+mkdir -p "$GRS/$KIT_REL" "$GRS/memory/builds/dTotalRecall/spec" "$GRS/memory/builds/xLeased" "$GRS/memory/builds/xNew"
+{ cat "$HERE/record-kinds.toml"
+  printf '\n[[record-kind]]\nname = "planted"\nwriter = "runlog"\n'
+  printf '\n[[record-kind]]\nname = "planted-ask"\nhome = "memory/builds/*/asks/*.md"\nid-rule = "<FAMILY>-<slug>-<seq>.md"\n'
+  printf 'schema = { form = "fields", fields = ["Serves", "Text"] }\nwriter = "gov_record.py new planted-ask"\n'; } > "$GRS/$KIT_REL/record-kinds.toml"
+printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n' > "$GRS/.memory-tree.conf"
+printf 'RUN_CLAIMS="on"\n' > "$GRS/.unattended.conf"
+cp "$HERE/SPEC-TEMPLATE.template.md" "$GRS/memory/TEMPLATE-SPEC.md"
+for _gb in dTotalRecall xLeased xNew; do printf -- '---\nslug: %s\n---\n\n# %s\n' "$_gb" "$_gb" > "$GRS/memory/builds/$_gb/README.md"; done
+printf '# TOOL-dTotalRecall-2 — the record door\n\n**Status:** INPROGRESS · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd\n' \
+  > "$GRS/memory/builds/dTotalRecall/spec/2026-09-01-spec-TOOL-dTotalRecall-2.md"
+git -C "$GRS" init -q --template= . && git -C "$GRS" add -A && git -C "$GRS" commit -qm seed
+git init -q --bare --template= "$GRD/r.git" && git -C "$GRS" push -q "$GRD/r.git" HEAD:refs/heads/main
+git -C "$GRD/r.git" symbolic-ref HEAD refs/heads/main
+git clone -q "$GRD/r.git" "$GRD/a" && git clone -q "$GRD/r.git" "$GRD/b"
+git clone -q "$GRD/r.git" "$GRD/nr" && git -C "$GRD/nr" remote remove origin
+
+out=$(run_record_door a nosuch); hit 'refused nosuch: no [[record-kind]] row of record-kinds.toml names nosuch'   # AC1
+out=$(run_record_door a planted --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t); hit 'refused planted: its door is runlog'
+out=$(run_record_deviation a dTotalRecall r1 bogus; git -C "$GRD/a" status --porcelain)   # AC2: the kind's check names Risk, nothing on disk
+hit 'refused deviation: Risk bogus is outside'; miss 'deviation-1.md'
+out=$(run_record_deviation a dTotalRecall r1); hit 'minted under the session rule: no claim or lease for dTotalRecall'   # AC3, AC5's neither
+hit 'wrote memory/builds/dTotalRecall/build/'; _grk=$(printf '%s\n' "$out" | sed -n 's/^wrote .* key //p')
+out=$(run_record_deviation a dTotalRecall r1; echo "files $(git -C "$GRD/a" status --porcelain | wc -l | tr -d ' ')")
+hit "exists memory/builds/dTotalRecall/build/$(date +%Y-%m-%d)-build-TOOL-dTotalRecall-2-deviation-1.md key ${_grk:-NONE}"
+hit 'files 1'
+out=$(run_record_deviation a dTotalRecall r2); hit "TOOL-dTotalRecall-2-deviation-2.md key"   # AC4: a changed field writes the next <n>
+out=$(run_record_door a spec TOOL-dTotalRecall-2 --tier 2); hit 'refused spec: --new-spec: memory/builds/dTotalRecall/spec/2026-09-01-spec-TOOL-dTotalRecall-2.md already carries'
+out=$("$_PY" "$HERE/build_records.py" read "$GRD/a/memory/builds/dTotalRecall/build/$(date +%Y-%m-%d)-build-TOOL-dTotalRecall-2-deviation-1.md" >/dev/null 2>&1; echo "rc=$?"
+      grep -m1 '^\*\*Serves:\*\*' "$GRD/a/memory/builds/dTotalRecall/build/"*-deviation-1.md)   # AC8
+hit 'rc=0'; hit '**Serves:** deviation TOOL-dTotalRecall-2'
+out=$("$_PY" -c 'import sys, tomllib
+rows = tomllib.load(open(sys.argv[1], "rb"))["record-kind"]
+print("hand fields:", [r["name"] for r in rows if r["schema"]["form"] == "fields" and r["writer"] == "hand"])
+print("doors:", " ".join(r["name"] + "=" + r["writer"] for r in rows if r["name"] in ("research", "log", "deviation")))' "$HERE/record-kinds.toml")
+hit 'hand fields: []'; hit 'log=gov_record.py new log'; hit 'research=gov_record.py new research'; hit 'deviation=gov_record.py new deviation'   # AC9
+out=$(run_record_door a exception --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t); hit 'refused exception: its door is build_records.py new exception'
+out=$(run_record_door a research --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --name 2026-11-22-build-TOOL-dTotalRecall-2-probe)   # AC10
+hit 'wrote memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-2-probe.md key'
+out=$(grep -m1 '^\*\*Serves:\*\*' "$GRD/a/memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-2-probe.md"); hit '**Serves:** research TOOL-dTotalRecall-2'
+out=$(run_record_door a research --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t); hit 'refused research: --name <stem> is required'
+out=$(run_record_door a research --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --name 2026-11-22-build-TOOL-dTotalRecall-2-deviation-9)
+hit 'is a deviation record'"'"'s name, graded by that kind alone'
+run_record_door a spec TOOL-xNew-1 --tier 2 >/dev/null; (cd "$GRD/b" && "$_PY" "$HERE/gen_build_index.py" --new-spec TOOL-xNew-1 --tier 2 >/dev/null 2>&1)   # AC7, the twins
+out=$(cmp "$GRD/a/memory/builds/xNew/spec/"*-spec-TOOL-xNew-1.md "$GRD/b/memory/builds/xNew/spec/"*-spec-TOOL-xNew-1.md 2>&1 && echo twins-equal); hit 'twins-equal'
+out=$("$_PY" - "$HERE" "$GRD/rd" 2>&1 <<'PY'
+import os, subprocess, sys
+kit, base = sys.argv[1], sys.argv[2]
+sys.path.insert(0, kit)
+import backlog, gen_build_index as g
+seed, remote, home = os.path.join(base, "seed"), os.path.join(base, "r.git"), "memory/builds/aFoo/README.md"
+os.makedirs(seed)
+asks = [backlog.render_ask_row(f"EXMP-aFoo-{n}", "2026-09-01", f"the mandated ask {n}", clauses=(
+    ("seen", "`memory/builds/aFoo/README.md`@abc1234"), ("accept", "the row says what done looks like"))) for n in (3, 4)]
+g._build_backlog_fixture(seed, {
+    home: ("---\nslug: aFoo\nnode: a\nopened: 2026-09-01\nstreams: tool\nroster: EXMP\nids: EXMP-aFoo-1\n---\n\n# aFoo\n\n"
+           + g.PLAN_OPEN + "\n" + g.PLAN_CLOSE + "\n\n" + g.MARK_OPEN + "\n" + g.MARK_CLOSE + "\n"),
+    "memory/builds/aFoo/spec/2026-09-01-spec-aFoo-90.md": g._render_backlog_spec("EXMP-aFoo-90"),
+    "memory/builds/aFoo/BACKLOG.md": g._render_backlog_file("aFoo", asks),
+    "memory/" + g.CONTRACT_REGISTRY: g._render_contract_fixture([(home, "exempt")], "# the fixture registry\n"),
+    g.kit_rel() + "/record-kinds.toml": '[[record-kind]]\nname = "build-readme"\nwriter = "gov_record.py new build-readme"\n',
+    ".unattended.conf": 'RUN_CLAIMS="off"\n'})
+run = lambda cwd, *a: subprocess.run(["git", *a], cwd=cwd, check=True, capture_output=True)
+run(seed, "commit", "-q", "-m", "home", "--no-verify"); run(base, "init", "-q", "--bare", remote)
+run(seed, "push", "-q", remote, "HEAD:refs/heads/main"); run(remote, "symbolic-ref", "HEAD", "refs/heads/main")
+run(seed, "remote", "add", "origin", remote)
+p = subprocess.run([sys.executable, os.path.join(kit, "gov_record.py"), "new", "build-readme", "dLoop", "--asks", "EXMP-aFoo-3",
+                    "-4"], cwd=seed, capture_output=True, text=True, encoding="utf-8")
+readme = os.path.join(seed, "memory/builds/dLoop/README.md")
+print("rc", p.returncode, "slug-grammar", os.path.isfile(readme) and any(ln.startswith("slug-grammar:") for ln in open(readme, encoding="utf-8")),
+      "claim", bool(subprocess.run(["git", "rev-parse", "-q", "--verify", "refs/gov/claims/dLoop"], cwd=remote,
+                                   capture_output=True).stdout.strip()))
+PY
+)
+hit 'rc 0 slug-grammar True claim True'   # AC7: the scaffold's README, its claim on the remote
+_gru=$(resolve_kit_dir "$_PY" unattended unattended.sh "$HERE" 2>/dev/null) || _gru=""
+if [ -n "$_gru" ]; then
+  _grt=$(cd "$GRD/a" && bash -c '. "$1" >/dev/null 2>&1 || exit 2; load_driver_conf >/dev/null 2>&1; resolve_fleet_tag 2>/dev/null' _ \
+         "$(git -C "$HERE" rev-parse --show-toplevel)/$_gru/unattended.sh")
+  write_record_lease() { # fleet tag · session -> the lease of xLeased on the remote, held live by them
+    local now m; now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    m=$(printf 'gov-claim xLeased/build\n\nslug: xLeased\nnode: %s\nhost: h\nsession: %s\nkeepalive: k\nstatus: live\nlease-utc: %s\nbeat-utc: %s\nepoch: 1\nkind: build\nfleet-tag: %s\nrenews: yes' "$1" "$2" "$now" "$now" "$1")
+    git -C "$GRD/a" push -q -f origin "$(git -C "$GRD/a" commit-tree "$(git -C "$GRD/a" mktree </dev/null)" -m "$m"):refs/gov/leases/xLeased/build"; }
+  write_record_lease z s-other; out=$(run_record_deviation a xLeased r1); hit 'refused deviation: the build lease of xLeased reads live, held by z session s-other'   # AC5
+  (cd "$GRD/a" && CLAUDE_CODE_SESSION_ID=s-other bash "$HERE/gov-claim.sh" slug xLeased --claimant aaaaaaaaaaaa >/dev/null 2>&1)
+  write_record_lease "${_grt:-NONE}" s-mine; out=$(run_record_deviation a xLeased r2); hit 'wrote memory/builds/xLeased/build/'
+  git -C "$GRD/a" push -q origin :refs/gov/leases/xLeased/build
+  out=$(run_record_deviation a xLeased r3); hit 'refused deviation: the claim of xLeased (refs/gov/remote/claims/xLeased) is held by session s-other'
+  out=$(GR_SESSION=s-other run_record_deviation a xLeased r4); hit 'wrote memory/builds/xLeased/build/'
+  out=$(run_record_door a planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello)   # AC6, over the remote
+  _grc=$(git -C "$GRD/r.git" rev-parse -q --verify refs/gov/claims/asks/TOOL-dTotalRecall)
+  _gri=$(printf '%s\n' "$out" | sed -n 's|^wrote memory/builds/dTotalRecall/asks/\(TOOL-dTotalRecall-[0-9]*\)\.md key .*|\1|p')
+  out=$(run_record_door a planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello
+        echo "tip $(git -C "$GRD/r.git" rev-parse -q --verify refs/gov/claims/asks/TOOL-dTotalRecall)")
+  hit "exists memory/builds/dTotalRecall/asks/${_gri:-NONE}.md"; hit "tip ${_grc:-NONE}"
+  _grn=$(git -C "$GRD/nr" grep -h -o -w -I -E 'TOOL-dTotalRecall-[0-9]+' HEAD | sed 's/.*-//' | sort -n | tail -1)
+  out=$(run_record_door nr planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello
+        run_record_door nr planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello)
+  hit "wrote memory/builds/dTotalRecall/asks/TOOL-dTotalRecall-$((${_grn:-0} + 1)).md"
+  hit "exists memory/builds/dTotalRecall/asks/TOOL-dTotalRecall-$((${_grn:-0} + 1)).md"
+else
+  echo "skip the record door's lease and counter arms: no unattended kit beside this one, so its 8 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+8))
+fi
+
 # --- TOOL-aNimbleMend-9 S7 (AC2 to AC6) — the red-fix door and its join: the plant stages, in a scratch
 # --- repository of its own, the door deriving Commit and Files from an abbreviated rev, its three
 # --- refusals, an owed fix at HEAD, the --staged form red and then green, the clean join and each of J1
@@ -5350,7 +5467,10 @@ done
 # seed-across arm become one scaffold, so the after-commit FOO_PIN assertion is made once (-1), and the
 # arm gains the listing run's armed set and the null-then-HEAD SHA and fixture-compared assertion (+2),
 # each one top-level `n=$((n+1))`, never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=797
+# RAISED 797 -> 828 by TOOL-dTotalRecall-2 on 2026-11-22: the record door's thirty-one assertions, twenty-three
+# top-level and never skipped, and eight behind the unattended kit, skipped aloud with n_skip carrying them.
+# Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=828
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
