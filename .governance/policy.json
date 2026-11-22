@@ -1,5 +1,5 @@
 {
-  "catalogue_blob": "a656c18b739a404294ba5c4a0c39133fc853023e",
+  "catalogue_blob": "3c136d9f8dbe0a179056ed235d568cc7e5886673",
   "keys": {
     "actions.free": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -358,6 +358,11 @@
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
       "value": "allowed"
+    },
+    "install.baseline": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "reuse"
     },
     "install.deprecation-window": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
