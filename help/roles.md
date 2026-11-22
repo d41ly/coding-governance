@@ -251,16 +251,31 @@ build's scope and decomposes it into units. Both write records only, under the b
 ## When no role agent can be spawned
 
 Inline work is refused: the main session does not write a spec, review one, build a unit or run the
-closing review itself. The one exception is a tool or run that cannot spawn a role agent at all, and
-only where an owner has waived it in `role-stand-in-waiver.txt` under `<memory root>/project/`,
-which holds an owner's row per build and role. A stand-in declares itself by rendering the role's
-handoff with `handoff.py render ... --stand-in`. A waiver never admits a write the hooks refuse. For
-the row grammar, read the roles README's "Standing in for a role" section; no tree holds the registry
+closing review itself. A stand-in declares itself by rendering the role's handoff with
+`handoff.py render ... --stand-in`, and the policy key `roles.no-spawn` decides whether that render
+is admitted at all:
+
+- `executor-role-session`, the default: every `--stand-in` is refused. The refusal names the route
+  that is always open, spawning the role through an `Agent` call or a listed harness. An item no
+  agent can take goes to a role session that an executor starts, and that executor is
+  dWellOiledMachine's, not yet built.
+- `refuse`: every `--stand-in` is refused, naming the key.
+- `recorded-stand-in`: a stand-in is admitted only where an owner has waived it in
+  `role-stand-in-waiver.txt` under `<memory root>/project/`, which holds an owner's row per build
+  and role.
+
+So under the default a waiver row alone admits nothing: set `roles.no-spawn = "recorded-stand-in"`
+through the policy file's one door, `policy_edit.py`, first. Where the policy kit is not installed,
+the waiver row decides, as before the key. A waiver never admits a write the hooks refuse. For the
+row grammar, read the roles README's "Standing in for a role" section; no tree holds the registry
 until an owner writes its first row.
 
 ## What the hooks refuse
 
-- An `Agent` call whose type is not a `gov-*` role, or whose prompt is not a rendered handoff.
+- An `Agent` call whose type is not a `gov-*` role, or whose prompt is not a rendered handoff. Each
+  such refusal ends by naming the policy key `prompts.author` and its value: `prompt-writer`, the
+  default, or `requesting-worker-rendered`. Under both, the prompt must be a handoff that
+  `handoff.py render` produced.
 - A misnamed spawn: an `Agent` call whose `description` is not the name `handoff.py render` printed.
 - A stale handoff: an `Agent` call whose handoff was rendered from role text other than the text its
   agent type was rendered from. The marker's `role-sha` must equal the `role-sha` the role index
@@ -319,6 +334,15 @@ other file write from a role agent, every role agent's gate run and every `Agent
 `render_agents.py --write` restores it. In a repository that never adopted the kit, a missing index
 switches nothing on.
 
+The main session's reads are held too, by the policy key `driver.reads`, wherever the policy kit is
+installed, with or without `roles.json`. Under its default, `state-reads-only`, the main session's
+`Grep` and `Glob` are refused: a search is a scout's task. The refusal names the key, its value and
+the remedy, dispatching the `gov-researcher` role through a rendered handoff. Its `Read` of a named
+file is still admitted. Under `none-scout-only` its `Read` is refused too. Under `read-only-probes`
+all three are admitted. A role agent's reads are never refused by this key. Without the policy kit,
+every read is admitted with one stderr line saying `driver.reads unarmed`. To change the value, set
+it through the policy file's one door, `policy_edit.py`.
+
 A role agent's writes made through Bash or PowerShell are held too. A redirect, `tee`, `touch`,
 `mkdir`, `cp`, `mv`, `sed -i`, `perl -i`, `git apply`, or a literal write call inside `python -c`,
 `node -e` or a `python -` heredoc meets the same refusal an `Edit` of that file would. Where the
@@ -328,12 +352,12 @@ role's write class alone. The refusal names the file, the shell shape and the al
 the remedy to whoever dispatched the agent: re-scope the work order, or route the write to a role
 whose class covers it.
 
-The hooks do not see the main session's shell writes, a write made from inside a script file a
-command runs, a path built at run time (a variable or a joined path), `rm`, `git checkout`,
-`git restore`, `git stash`, a patch piped into `git apply`, `--bare` runs, agents a harness spawns
-internally, session-to-session messages, or a `roles.json` the main session edited by shell and
-never committed. A word such as `install` or `touch` left unquoted as an argument, as in
-`grep -n install notes.md`, reads as a write; quote it.
+The hooks do not see the main session's shell writes, its `grep`, `find` or `cat` run through
+Bash, a write made from inside a script file a command runs, a path built at run time (a variable
+or a joined path), `rm`, `git checkout`, `git restore`, `git stash`, a patch piped into
+`git apply`, `--bare` runs, agents a harness spawns internally, session-to-session messages, or a
+`roles.json` the main session edited by shell and never committed. A word such as `install` or
+`touch` left unquoted as an argument, as in `grep -n install notes.md`, reads as a write; quote it.
 
 ## In a repository that adopts the kit
 

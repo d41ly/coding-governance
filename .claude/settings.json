@@ -11,15 +11,6 @@
         ]
       },
       {
-        "matcher": "Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/scratch-guard.js\""
-          }
-        ]
-      },
-      {
         "matcher": "Bash|PowerShell|AskUserQuestion",
         "hooks": [
           {
@@ -34,6 +25,15 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/tools/workflows/spec-audit-optin.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit|Read|Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/scratch-guard.js\""
           }
         ]
       }

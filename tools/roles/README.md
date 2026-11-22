@@ -374,7 +374,14 @@ for the same build and role is a defect naming the line it repeats.
 
 **The declaration.** A stand-in renders its role's handoff with
 `python handoff.py render --role <role> --build <slug> ... --stand-in` and follows it, so the role's
-text reaches it exactly as it would reach an agent. With no valid row for that build and role the
+text reaches it exactly as it would reach an agent. Before the registry is read, the render reads the
+policy key `roles.no-spawn` through `roles_lib.read_policy_setting`, with its catalogue default
+(TOOL-dBoundRoles-10, `handoff.py#check_no_spawn`). `refuse` exits 1, naming the key, and writes
+nothing. `executor-role-session`, the default, exits 1 too, naming the route that is always open, the
+role spawned through an `Agent` call or a listed harness, and the executor role session that is
+dWellOiledMachine's. `recorded-stand-in`, or no policy kit, goes on to the registry, so a waiver row
+admits a stand-in only once the owner sets that value through `policy_edit.py`. R15's join of rows
+and declarations reads no key. With no valid row for that build and role the
 render exits 1, naming the registry and the row the owner writes, and writes nothing; otherwise the
 file takes the derived name with a `-stand-in` tail before `.md`. `--stand-in` excludes `--out` and
 `--stdout`: a handoff printed to stdout declares nothing.

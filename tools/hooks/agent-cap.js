@@ -51,7 +51,11 @@
  * from the marker and the index's `workflow` for that role, the unit part left out for a `-` unit
  * (TOOL-aOrientedCast-27). That step stops a stale or freeform name, never a forged one. A `Workflow`
  * call is admitted only by a `scriptPath` listed in `harnesses`, with `args.roles` a non-empty object
- * whose every value is an `agent`-true role. A throw inside it refuses.
+ * whose every value is an `agent`-true role. A throw inside it refuses. An `Agent` call reads the policy
+ * key `prompts.author` once (TOOL-dBoundRoles-10 S3, `resolvePromptsAuthor`), and every rule-6 refusal of
+ * one ends with a line naming the key, the value in force and the remedy; no policy kit beside this hook
+ * reads it as unarmed, and the check is the rendered-handoff check under both values until
+ * TOOL-dBoundRoles-4 adds the prompt writer's framing under `prompt-writer`.
  * CEILING, said rather than implied: it stops forgetting, not evasion. A hook-less or `--bare` run,
  * the agents a running harness spawns through its own `agent()`, a session-to-session message, a
  * self-consistent hand-written prompt file whose marker copies the index's `role-sha`, and an index
@@ -874,10 +878,48 @@ function renderHandoffDeny(tool, why, index) {
   return `BLOCKED by agent-cap: rule 6 (TOOL-aOrientedCast-7) refused this ${tool} call — ${why}\n${route}\n`
 }
 
+// TOOL-dBoundRoles-10 S3 - the policy key `prompts.author`, who writes a worker's task: `prompt-writer`, its
+// default, or `requesting-worker-rendered`. The landed value through the policy kit's `readPolicy`, found
+// through `resolvePolicyHelper`, the way rule 7 reads its key; null where no policy kit resolves beside this
+// hook, so rule 6 runs as before the key; a refused read throws the reader's PolicyRefusal. Under
+// `requesting-worker-rendered` rule 6 is the rendered-handoff check below; under `prompt-writer` it is that
+// check too, and the framing requirement the value adds is TOOL-dBoundRoles-4's, which reads this function.
+const PROMPTS_AUTHOR_KEY = 'prompts.author'
+function resolvePromptsAuthor(root) {
+  const helper = resolvePolicyHelper()
+  if (!helper || !require('fs').existsSync(helper)) return null
+  return require(helper).readPolicy(PROMPTS_AUTHOR_KEY, { repo: root }).value
+}
+
+// The line every rule-6 refusal of an `Agent` call ends with (S6): the key, the value in force, and the remedy
+// with its actor. The key is read once per call and root, kept in `renderAuthorNote.at`, and the line never
+// throws: a refused read is named, and rule 6 judges the call as the rendered-handoff check alone, since no
+// value of the key changes that check until TOOL-dBoundRoles-4 lands; rule 7 refuses a refused policy read.
+function renderAuthorNote(root) {
+  if (renderAuthorNote.at && renderAuthorNote.at.root === root) return renderAuthorNote.at.line
+  const remedy = 'The driver renders the handoff the value requires; the owner may set another value of prompts.author through the policy file\'s one door, the loop kit\'s policy_edit.py.'
+  let line
+  try {
+    const v = resolvePromptsAuthor(root)
+    line = v === null
+      ? `${PROMPTS_AUTHOR_KEY} unarmed — no policy kit resolves beside this hook, so rule 6 is the rendered-handoff check alone (TOOL-dBoundRoles-10).`
+      : v === 'requesting-worker-rendered'
+        ? `${PROMPTS_AUTHOR_KEY} is requesting-worker-rendered (TOOL-dBoundRoles-10): every task is a handoff the requesting session rendered with handoff.py render, which rule 6 checks. ${remedy}`
+        : `${PROMPTS_AUTHOR_KEY} is ${v} (TOOL-dBoundRoles-10): every worker's task is the prompt writer's, rendered as a handoff with handoff.py render, which rule 6 checks; the framing the value adds is TOOL-dBoundRoles-4's. ${remedy}`
+  } catch (e) {
+    line = `${PROMPTS_AUTHOR_KEY} could not be read (${String((e && e.message) || e).split(/\r?\n/)[0]}), so rule 6 judged this call as the rendered-handoff check alone (TOOL-dBoundRoles-10).`
+  }
+  renderAuthorNote.at = { root, line }
+  return line
+}
+
 // Rule 6 on an `Agent` call (§4 "The evaluation order", step 2): null to admit, else a deny string.
 function checkHandoffSpawn(data, index, root) {
   const fs = require('fs')
   const path = require('path')
+  // TOOL-dBoundRoles-10 S3 - prompts.author, read once per Agent call here, at the rule's start; main ends
+  // every rule-6 refusal of the call with the line this read composed.
+  renderAuthorNote(root)
   const ti = data.tool_input || {}
   const roles = Object.keys(index.roles).filter((n) => index.roles[n].agent === true)
   if (!roles.length) return renderHandoffDeny('Agent', `UNARMED: ${index.shown} declares no agent-true role, so no spawn can be admitted.`, index)
@@ -1276,6 +1318,8 @@ function main() {
     } catch (e) {
       deny = renderHandoffDeny(data.tool_name, `the rule threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.`, index)
     }
+    // TOOL-dBoundRoles-10 S3 - every rule-6 refusal of an Agent call names prompts.author and the value in force.
+    if (deny && data.tool_name === 'Agent' && root) deny += renderAuthorNote(root) + '\n'
     if (deny) {
       process.stderr.write(deny)
       process.exit(2)
@@ -1337,6 +1381,8 @@ module.exports = {
   resolvePolicyHelper,
   // TOOL-dBoundRoles-46 S1: the typed inputs, read by the agent-cap suite against handoff.py's split.
   TYPED_INPUTS,
+  // TOOL-dBoundRoles-10 S3: the prompts.author reader, which TOOL-dBoundRoles-4's framing branch reads.
+  resolvePromptsAuthor,
 }
 if (require.main === module) main()
 

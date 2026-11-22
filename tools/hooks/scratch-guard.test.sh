@@ -323,7 +323,7 @@ raw "empty stdin -> allow"            0 ''
 raw "non-JSON stdin -> allow"         0 'not json at all'
 raw "JSON null -> allow"              0 'null'
 raw "no tool_name -> allow"           0 '{"tool_input":{"command":"echo x > ~/.litter"}}'
-raw "unrelated tool -> allow"         0 '{"tool_name":"Read","tool_input":{"command":"echo x > ~/.litter"}}'
+raw "unrelated tool -> allow"         0 '{"tool_name":"WebFetch","tool_input":{"command":"echo x > ~/.litter"}}'
 raw "no command key -> allow"         0 '{"tool_name":"Bash","tool_input":{}}'
 
 # ---- every home-root spelling DENIES, each with an ALLOW near-miss --------------------------------
@@ -2011,6 +2011,48 @@ HOOK=$sg_hook
   && { echo "ok   TOOL-dPlacedRequest-95 AC1 fixture 3: the commit's PreToolUse ran no checker the target tracks"; pass=$((pass+1)); } \
   || { echo "FAIL TOOL-dPlacedRequest-95 AC1 fixture 3: tracked '$sg95_tracked', or the target's checker ran and wrote its marker"; fail=$((fail+1)); }
 
+# ---- TOOL-dBoundRoles-10 AC1 AC2 (S1, S2): the main-loop read arm, driver.reads over Read, Grep, Glob ----
+# A fresh repository whose primary branch holds no policy file, so driver.reads reads its default
+# state-reads-only; `sgdr-none` and `sgdr-probes` each commit a .governance/policy.toml setting
+# none-scout-only and read-only-probes. The key is read at the landed revision, which in a clone with no
+# remote is the local branch GOV_DEFAULT_BRANCH names, given per row; a branch that does not exist is a
+# refused read. Every row pipes its payload through the hook's main, so against a copy of the hook whose
+# read dispatch is cut from main the main-grep-default, main-read-none and policy-absent rows red: each
+# read then exits 0 with nothing said. policy-absent runs the L15 copy, every script of this kit and no
+# policy kit beside it. WHAT THIS DOES NOT CHECK: a value outside the key's three, which the policy
+# reader refuses before the hook sees one; and the main loop's grep, find or cat run through Bash.
+SGDR="$TMP/sgdr"
+git init -q "$SGDR" && $SGGIT -C "$SGDR" commit -q --allow-empty -m init
+SGDR_MAIN=$(git -C "$SGDR" symbolic-ref --short HEAD)
+SGDR_CWD=$(cd "$SGDR" && node -p 'process.cwd()')
+for sgdr_v in none:none-scout-only probes:read-only-probes; do
+  sgdr_blob=$(printf '[driver]\nreads = "%s"\n' "${sgdr_v#*:}" | git -C "$SGDR" hash-object -w --stdin)
+  sgdr_tree=$(printf '100644 blob %s\tpolicy.toml\n' "$sgdr_blob" | git -C "$SGDR" mktree)
+  sgdr_top=$(printf '040000 tree %s\t.governance\n' "$sgdr_tree" | git -C "$SGDR" mktree)
+  git -C "$SGDR" update-ref "refs/heads/sgdr-${sgdr_v%%:*}" "$($SGGIT -C "$SGDR" commit-tree "$sgdr_top" -m "driver.reads ${sgdr_v#*:}")"
+done
+# run_read <name> <expected exit> <branch> <tool> <needle, empty for an empty stderr> [agent_type] [hook]
+run_read() {
+  local payload got
+  payload=$(node -e 'const d = { tool_name: process.argv[1], cwd: process.argv[2], session_id: "sgtest-dr", tool_input: { pattern: "x" } }; if (process.argv[3]) d.agent_type = process.argv[3]; console.log(JSON.stringify(d))' "$4" "$SGDR_CWD" "${6:-}")
+  printf '%s' "$payload" | GOV_DEFAULT_BRANCH="$3" node "${7:-$HOOK}" >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$2" ] && { if [ -z "$5" ]; then [ ! -s "$TMP/err" ]; else grep -qF -- "$5" "$TMP/err"; fi; }; then
+    echo "ok   $1 (exit $got)"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got, want $2${5:+, stderr carrying '$5'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+run_read "DR-AC1 main-grep-default: the main loop's Grep, driver.reads unset -> deny naming the key and its value" 2 "$SGDR_MAIN" Grep 'driver.reads is state-reads-only'
+run_read "DR-AC1 main-grep-default: ...and the scout as the driver's remedy" 2 "$SGDR_MAIN" Grep 'dispatch a scout, the gov-researcher role'
+run_read "DR-AC1 the main loop's Glob, driver.reads unset -> deny" 2 "$SGDR_MAIN" Glob 'driver.reads is state-reads-only'
+run_read "DR-AC1 main-read-default: the main loop's Read, driver.reads unset -> allow, nothing said" 0 "$SGDR_MAIN" Read ''
+run_read "DR-AC1 the main loop's Grep under read-only-probes -> allow, nothing said" 0 sgdr-probes Grep ''
+run_read "DR-AC1 main-read-none: the main loop's Read under none-scout-only -> deny naming the value" 2 sgdr-none Read 'driver.reads is none-scout-only'
+run_read "DR-AC2 worker-grep: gov-researcher's Grep, driver.reads unset -> allow, nothing said" 0 "$SGDR_MAIN" Grep '' gov-researcher
+run_read "DR-AC2 worker-grep: gov-researcher's Grep under none-scout-only -> allow, nothing said" 0 sgdr-none Grep '' gov-researcher
+run_read "DR-AC2 policy-absent: no policy kit beside the hook, the main loop's Grep -> allow with the unarmed witness" 0 "$SGDR_MAIN" Grep 'driver.reads unarmed' '' "$TMP/nopol/hk/scratch-guard.js"
+run_read "DR a refused key read, the main loop's Read -> deny naming the reader's refusal" 2 sgdr-no-such-branch Read 'driver.reads could not be read'
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
@@ -2066,8 +2108,10 @@ n=$((pass+fail))
 # 430 = 410 + the 20 rows TOOL-dBoundRoles-7 added (10 scan_targets rows for AC1 to AC3, 1 for AC8's
 # home-sed, and 9 run_shell_write rows: 2 for AC4, 3 for AC5, 1 for AC6, and 3 for AC7, the main
 # loop's sed -i and the throw for a role agent and for the main loop), counted by hand under the same rule.
+# 440 = 430 + the 10 run_read rows TOOL-dBoundRoles-10 added (6 for AC1, 3 for AC2 and 1 for the refused
+# key read), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=430
+FLOOR_ASSERTIONS=440
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

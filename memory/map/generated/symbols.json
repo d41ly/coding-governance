@@ -4958,6 +4958,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkDriverRead",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkEffortLevel",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -7701,6 +7706,16 @@
       "id": "check_no_runstate",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "check_no_spawn",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "check_no_spawn_arm",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "check_node_merge_arm",
@@ -28303,6 +28318,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderAuthorNote",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderBlankedLiterals",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -30479,6 +30499,11 @@
     },
     {
       "id": "resolvePolicyHelper",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "resolvePromptsAuthor",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },
@@ -35881,6 +35906,11 @@
       "id": "run_raw",
       "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
+    },
+    {
+      "id": "run_read",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "run_read",

@@ -344,6 +344,16 @@ A `Workflow` call passes only by a `scriptPath` listed in `harnesses` (never an 
 `name:` run), with `args.roles` a non-empty object whose every value is an `agent`-true role: pass
 what `handoff.py harness-args <harness>` prints.
 
+**`prompts.author`** (TOOL-dBoundRoles-10). An `Agent` call reads the policy key once, through
+`resolvePromptsAuthor`, which `module.exports` carries: the landed value through the policy kit's
+`readPolicy`, found through `resolvePolicyHelper`, or null where no policy kit resolves beside the hook.
+Under `requesting-worker-rendered` the rule is the check above, every task a handoff the requesting
+session rendered; under `prompt-writer`, the default, it is that check too, and the framing the value
+adds is TOOL-dBoundRoles-4's. Every rule-6 refusal of an `Agent` call ends with one line naming the key,
+the value in force and the remedy: the driver renders the handoff the value requires, or the owner sets
+another value through `policy_edit.py`. No policy kit reads as `prompts.author unarmed`, and a refused
+read is named in that line without refusing the call by itself; rule 7 refuses a refused policy read.
+
 ORDER: first, before rule 7. A throw inside the rule refuses.
 
 **What it does not stop**, said rather than implied: a hook-less or `--bare` run; the agents a running
@@ -421,7 +431,7 @@ gone) or `down`. What a step is: gov's help page `help/upgrade-steps.md`.
 ## scratch-guard's second check: a `git commit` on an un-oriented card
 
 `scratch-guard.js` is the other hook in this home, on the
-`Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit` matcher, and for a shell call, after its
+`Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit|Read|Grep|Glob` matcher, and for a shell call, after its
 scratch verdict it runs ONE more check, `checkOriented` (`TOOL-aReplayedCard-1`). A `git commit`
 issued by the main loop is refused, exit 2, while the session's orientation card — the file the
 kickoff kit's `manifest-check.sh --card --write` writes at session start under
@@ -468,8 +478,9 @@ asserted, never its correctness, and there is no waiver.
 ## scratch-guard's third check: a product write no routed unit owns
 
 `TOOL-aRoutedQuill-2`. One fragment, widened: `scratch-guard.fragment.json` declares the matcher
-`Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit`, and `main` sends a shell call to the two checks
-above and a write tool to `checkRouted`. A second PreToolUse fragment of the same script is not an
+`Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit|Read|Grep|Glob`, and `main` sends a shell call to
+the two checks above, a write tool to `checkRouted`, and a read tool to the main-loop read arm below
+(TOOL-dBoundRoles-10). A second PreToolUse fragment of the same script is not an
 option: `settings-merge.py` joins on the script's basename within an event and moves one of the two
 out.
 
@@ -840,6 +851,31 @@ its paths placed against the payload `cwd`; and a transcript an agent rewrites, 
 outside the repository. A word such as `install` or `touch` left unquoted as an argument
 (`grep -n install x`) still reads as a write, as the write-target guard reads it; quoting it is the
 agent's remedy. It stops forgetting, not evasion.
+
+## scratch-guard's sixth check: the main loop's read tools
+
+`TOOL-dBoundRoles-10`. On a `Read`, `Grep` or `Glob` payload, `main` calls `checkDriverRead` after its
+`SubagentStart` branch and before its write-gate branch, then exits, so a read never reaches
+`checkRouted` or the Bash checks. It reads the policy key `driver.reads` through the policy kit's
+`readPolicy`, found through agent-cap's `resolvePolicyHelper` as the red-fix lane reads its key, at the
+toplevel of the payload `cwd` (else `CLAUDE_PROJECT_DIR`), at the landed revision. First match wins:
+
+- a payload carrying an `agent_type` is admitted: a worker keeps its read-only probes;
+- a start in no repository is not this check's, and is admitted;
+- no policy kit beside the hook admits with one witness line, `driver.reads unarmed`;
+- `read-only-probes` admits all three; `state-reads-only`, the default, admits `Read` and refuses
+  `Grep` and `Glob`, the two whose every use is a search; `none-scout-only` refuses all three;
+- a refused key read refuses, naming the reader's line, since an arm that cannot read its key does not
+  admit, and so does a throw inside the check, for the main loop.
+
+**The refusal** names the key, its value, the driver's remedy, a scout (the `gov-researcher` role)
+dispatched through a rendered handoff, and the owner's, another value set through the policy file's
+one door, the loop kit's `policy_edit.py`.
+
+**What it does not check.** Which file a `Read` names: no record says what the driver was handed, so
+`state-reads-only` cannot hold a `Read` to it; and the main loop's `grep`, `find` or `cat` run through
+Bash, which this check never sees. Each `Read`, `Grep` and `Glob` launches the hook, and a main-loop
+one spawns the policy reader.
 
 ## The authoring rule for kit files
 
