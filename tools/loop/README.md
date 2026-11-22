@@ -424,8 +424,13 @@ kit takes no edge to it. `--fixture --plant <case>` runs both over a scratch rep
 `subset-trailer-line`, `subset-log`, `empty-set`, `log-drift`, `orphan-log`, `no-row`, `line-drift`,
 `pre-spec`, `field`, and the two over `BACKWARD_MOVES`, three moves forward and three back:
 `backward-rows`, printing each trailer and read with its direction, and `skip-backward`, the newest
-record deleted so the check names the move back owing it; and `mail-open` and `mail-disposed`, the
-driver's conf and a bare remote holding an open question, then its `ack`. `check --selftest` holds the tree's own definition, then runs every plant, and
+record deleted so the check names the move back owing it; `descope-spent`, the move back refused on
+a spent rework budget, then a descope; `mail-open` and `mail-disposed`, the
+driver's conf and a bare remote holding an open question, then its `ack`; and the three over the
+guard's launch, each rebinding the name the guard imports inside its function and restoring it:
+`mail-argv`, the mailbox read's argv recorded and held to the located driver and `resolve_bash`'s
+bash, `mail-no-driver`, the driver's locator over an empty directory, the move recorded unarmed, and
+`mail-no-bash`, `resolve_bash` answering `None`, the move refused as `mail unknown`. `check --selftest` holds the tree's own definition, then runs every plant, and
 is gov's `loop transition record` leg.
 
 ```bash
