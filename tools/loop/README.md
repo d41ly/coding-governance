@@ -975,6 +975,13 @@ drive rows by `order` and pick each role's practices by its reach word.
   Exit 0, 1 on a refusal, 2 on usage or a site outside `DECLARATION_SITES`. It reads the list in this
   directory and runs no git. The unattended kit's check 53 calls it, which is why that kit requires
   this one.
+- `python loop_lib.py declaration --item <item tag> --json` prints one item's declaration as one line of
+  sorted JSON (TOOL-dBoundRoles-3 §8 F5, F6): `resolve_item_declaration`'s `inputs`, `allowance`,
+  `returns` and `source` for the row, a role item's absent fields its role's through `read_role_defaults`,
+  beside the row's `tag`, `actor`, `step`, `outcomes` as `read_outcome_set` resolves them, and `witness`.
+  The rows are read through `read_items`, so the definition is checked first. Exit 0; 1 on stderr naming
+  the tag for an item no row declares, or on a definition that does not hold; 2 on usage. The roles kit's
+  `handoff.py render --item` runs it as a subprocess to cut one item's work order.
 - `bash adopt-loop.sh --check` runs the first through the resolved python. The kit renders
   nothing, so its adopter has no `--scaffold`.
 

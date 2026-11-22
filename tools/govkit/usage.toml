@@ -114,7 +114,7 @@ id = "script:{prefix}/roles/handoff.py#render"
 shape = "verb"
 entry = "{prefix}/roles/handoff.py"
 verb = "render"
-flags = ["--role=", "--build=", "--unit=", "--item=", "--card=", "--input=", "--upstream=", "--out=", "--stdout", "--stand-in", "--part="]
+flags = ["--role=", "--build=", "--unit=", "--item=", "--allowance=", "--card=", "--input=", "--upstream=", "--out=", "--stdout", "--stand-in", "--part="]
 
 [[usage]]
 id = "script:{prefix}/roles/handoff.py#roster"
@@ -292,6 +292,13 @@ id = "script:{prefix}/loop/loop_lib.py"
 shape = "verb"
 entry = "{prefix}/loop/loop_lib.py"
 flags = ["--check", "--scopes", "--selftest", "--fixture", "--plant=", "--grade-site="]
+
+[[usage]]
+id = "script:{prefix}/loop/loop_lib.py#declaration"
+shape = "verb"
+entry = "{prefix}/loop/loop_lib.py"
+verb = "declaration"
+flags = ["--item=", "--json"]
 
 [[usage]]
 id = "script:{prefix}/loop/loop_witness.py"

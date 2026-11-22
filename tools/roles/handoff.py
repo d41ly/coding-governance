@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """handoff.py — a role and one task's inputs, rendered into one hashed prompt file (TOOL-aOrientedCast-2).
 
-    python handoff.py render --role <name> --build <slug> [--unit <id>] [--item <tag>] [--card <path>]
+    python handoff.py render --role <name> --build <slug> [--unit <id>] [--item <tag> [--allowance <path>]...]
+                             [--card <path>]
                              [--input <key>=<value>]... [--upstream <rows file>]
                              [--out <path> | --stdout | --stand-in]
                              [--part full|task]
@@ -54,13 +55,27 @@ any hook or gate.
 The marker is `<!-- gov:handoff role=<slot> build=<slug> unit=<id|-> item=<tag|-> path=<rel> role-sha=<12hex>
 task-sha=<12hex> -->` (TOOL-dBoundRoles-17 S1): `item=` names the item the work order was cut for, `--item`'s
 tag in the `item.<step>.<name>` shape or `-` without it, a malformed tag refused with exit 1 writing nothing;
-the shape alone is checked, never that the loop defines the item. A marker written before `item=` still
-parses, every reader taking its fields by group name. A research return names the work order it answers on
-a `**Answers:** <path> task-sha=<12hex>` line, `roles_lib.derive_answers_value`'s value, which the
-catalogue checker's R16 grades.
+the shape is checked first. A marker written before `item=` still parses, every reader taking its fields
+by group name.
+THE WORK ORDER PER ITEM (TOOL-dBoundRoles-3): with `--item`, the render reads the item's declaration from the
+loop kit, its `loop_lib.py declaration --item <tag> --json` run in a subprocess under a bound, the kit found
+by `resolve_kit_dir`, and refuses with exit 1, writing nothing, an item the loop does not declare, one whose
+actor is not `role:<the --role slot>`, and no loop kit. The task then closes, after the `reads` blocks, with
+five blocks, `roles_lib.WORK_ORDER_BLOCKS`: `### item`, the tag, its step and its outcome set; `### inputs`,
+each of the item's inputs handed as content under its own `### <field tag>` heading, its fact line two below,
+an optional one the render cannot resolve named on the `Not supplied` line; `### allowance`, the path
+prefixes `roles_lib.derive_allowance` gives the item's write class: none, the build's `spec/` or `reviews/`
+folder, the memory root, or for a `product` item each path `--allowance` grants, which must sit under a
+`ROUTED_PATHS` entry, a `product` item granted none refused, so pass the unit's `--dispatch --writes` set and
+never the whole of `ROUTED_PATHS`; `### return`, the item's resolved return; and `### witness`, its witness
+class and `by`. All five sit inside `## Task`, so `task-sha` covers them. `--allowance` without `--item`
+refuses. The hooks kit's spawn guard admits such a work order only in a session whose card routes its unit.
+A research return names the work order it answers on a `**Answers:** <path> task-sha=<12hex>` line,
+`roles_lib.derive_answers_value`'s value, which the catalogue checker's R16 grades.
 The marker carries two hashes, each the first 12 hex digits of the SHA-256 of one section's bytes
 with CRLF folded to LF: `## Role` up to the byte before the `## Task` line, and `## Task` to the end
-of the file. `check` re-derives both and compares the marker's `path` with the file's own; then every
+of the file. `check` re-derives both and compares the marker's `path` with the file's own, and for a
+marker whose `item=` is a tag refuses a task missing any of the five blocks, naming it; then every
 envelope opened must close, and the levels must never decrease down each part, `## Role` and `## Task`,
 each failure naming the envelope; it prints each part's levels in order, or `unranked` for a file holding
 no envelope, which passes (PLAY-dOrderedCharter-5 S4).
@@ -142,7 +157,9 @@ a ledger line edited by hand passes, since nothing re-derives the ledger; a `han
 forged with a matching prefix and parser hash is trusted as the transcript's own lines are, and a
 transcript rewritten so its consumed bytes keep their sha256 resumes from the stale record.
 For `--model`: the id is not checked to be the model the session or the spawned agent runs, since
-the caller types it, and an id no profile matches answers the default levels with no note.
+the caller types it, and an id no profile matches answers the default levels with no note. For
+`--allowance`: that a granted path exists or is the unit's dispatched write set, since the caller passes it,
+so a caller granting a whole `ROUTED_PATHS` entry is admitted.
 """
 import argparse
 import datetime
@@ -178,6 +195,8 @@ UPSTREAM_CONTRACT = ("Answer every row id above exactly once, in a `## Upstream`
 PLACEHOLDERS =("…", "...", "tbd", "todo", "n/a", "none", "-", "?")
 KICKOFF_HOME, KICKOFF_CHECKER = "session-kickoff", "manifest-check.sh"
 CHECKER_BOUND_S = 30
+#: The bound on the loop kit's `declaration` verb, which reads the loop definition and the role catalogue.
+DECLARATION_BOUND_S = 60
 SLUG_RE = lib.SLUG_RE
 UNIT_RE = re.compile(r"^[A-Z]+-([A-Za-z]+)-[0-9]+$")
 READY_RE = re.compile(r"^(- )?READY — ")
@@ -565,19 +584,75 @@ def print_input_facts(root, memory_root, slug, inputs):
     write_json_line(facts)
 
 
+def read_item_declaration(item, role):
+    """The declaration of the item `item` as the loop kit's `loop_lib.py declaration --item <tag> --json` prints it,
+    run in a subprocess with stdin closed under `DECLARATION_BOUND_S`, the kit found by
+    `resolve_kit_dir("loop", "loop_lib.py", KIT_DIR)` (TOOL-dBoundRoles-3 S1, §8 F5, F6). RolesError naming the
+    loop kit where none resolves or its verb does not answer, the tag with the verb's first line where it exits
+    non-zero, and the item's actor where it is not `role:<role>`."""
+    try:
+        script = lib.resolve_kit_dir("loop", "loop_lib.py", KIT_DIR) / "loop_lib.py"
+    except LookupError as e:
+        raise lib.RolesError("--item %s: no loop kit declares the item — %s" % (item, e))
+    try:
+        r = subprocess.run([sys.executable, str(script), "declaration", "--item", item, "--json"],
+                           stdin=subprocess.DEVNULL, capture_output=True, encoding="utf-8", errors="replace",
+                           timeout=DECLARATION_BOUND_S, env=dict(os.environ, PYTHONIOENCODING="utf-8"))
+    except (OSError, subprocess.TimeoutExpired) as e:
+        raise lib.RolesError("--item %s: the loop kit's %s declaration did not answer: %s" % (item, script.as_posix(), e))
+    said = (r.stderr.strip() or r.stdout.strip() or "nothing printed").split("\n")[0]
+    try:
+        declaration = json.loads(r.stdout) if r.returncode == 0 else None
+    except ValueError:
+        declaration, said = None, "its output is no JSON"
+    if not isinstance(declaration, dict):
+        raise lib.RolesError("--item %s: the loop kit's declaration verb exited %d: %s" % (item, r.returncode, said))
+    if declaration.get("actor") != "role:" + role:
+        raise lib.RolesError("--item %s is the item of %s, not role:%s: a work order is cut only for the role its "
+                             "item names" % (item, declaration.get("actor"), role))
+    return declaration
+
+
+def render_work_order_blocks(item, declaration, prefixes, inputs):
+    """The five blocks an item's work order closes its task with, `lib.WORK_ORDER_BLOCKS` in order
+    (TOOL-dBoundRoles-3 S2, §4 "The blocks"): the tag, its step and its outcome set; `inputs`, the rendered
+    sub-blocks, or `none`; the allowance's `prefixes` as one `- <path>` line each, or `none`; the declaration's
+    `returns`; and its witness's class and `by`. A field the declaration leaves empty reads `none`."""
+    witness = declaration.get("witness") if isinstance(declaration.get("witness"), dict) else {}
+    bodies = ("%s · %s · outcomes: %s" % (item, declaration.get("step") or "none",
+                                          ", ".join(declaration.get("outcomes") or ()) or "none"),
+              "\n\n".join(inputs) or "none",
+              "\n".join("- " + p for p in prefixes) or "none",
+              declaration.get("returns") or "none",
+              "%s · %s" % (witness.get("class") or "none", witness.get("by") or "none"))
+    return ["%s\n\n%s" % (head, body) for head, body in zip(lib.WORK_ORDER_BLOCKS, bodies)]
+
+
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
-                   notes=None, tail="", upstream=None, item=None):
+                   notes=None, tail="", upstream=None, item=None, allowance=()):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
     The charter library's notes are appended to `notes` when a list is given; `tail` goes before
     the derived name's `.md`; `upstream` is the rows file `--upstream` names, the `upstream:rows` source;
     `item` the item tag the marker's `item=` carries, `-` when None (TOOL-dBoundRoles-17 S3), a tag
-    outside `ITEM_VALUE_RE` refused before anything is read."""
+    outside `ITEM_VALUE_RE` refused before anything is read. With `item`, its declaration is read from the loop
+    kit and the task closes with `lib.WORK_ORDER_BLOCKS` (TOOL-dBoundRoles-3 S2), its allowance
+    `lib.derive_allowance`'s over `allowance`, the paths `--allowance` grants."""
     if item is not None and not lib.ITEM_VALUE_RE.match(item):
         raise lib.RolesError("--item '%s' is not an item tag item.<step>.<name>, each segment lowercase "
                              "letters, digits and '-'" % item)
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
+    # TOOL-dBoundRoles-3 S1 S3: the item's declaration and its allowance, refused before any value is read
+    declaration = prefixes = None
+    if item is not None:
+        declaration = read_item_declaration(item, role)
+        conf = root / ".memory-tree.conf"
+        prefixes = lib.derive_allowance(declaration, slug, allowance, memory_root,
+                                        lib.read_conf_key(conf, "ROUTED_PATHS") if conf.is_file() else None)
+    elif allowance:
+        raise lib.RolesError("--allowance %s: only an item's work order takes an allowance; pass --item <tag>"
+                             % allowance[0])
     # TOOL-dBoundRoles-13 S3: every `reads` value is handed as content under the key it was cut by, the
     # rows file's `record:` key (§8 F4) on its rows, the renderer's contract after them unkeyed
     values, fact_keys = {}, {}
@@ -656,9 +731,13 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     reads = [k + "?" * o for k, o in (lib.parse_read_key(x) for x in keys.get("reads", "").split(",") if x.strip())]
     if not any(k.rstrip("?") == "input:" + CODE_INPUT for k in reads):
         reads.append("input:%s?" % CODE_INPUT)  # the derived optional key every role carries
+    # TOOL-dBoundRoles-3 S2: the item's inputs, each read as its native key, so every source either list names is read
+    item_keys = [k + "?" * o for k, o in (lib.parse_read_key(x) for x in (declaration or {}).get("inputs") or ()
+                                         if isinstance(x, str) and x.strip())]
+    wanted = reads + item_keys
     card = brief = None
     why, labels = {}, {}
-    if any(k.startswith("task:") for k in reads):
+    if any(k.startswith("task:") for k in wanted):
         # The card labels, read off the checker that grades a card rather than typed beside it
         # (TOOL-aOrientedCast-15 S3): the same bounded, stdin-closed run `resolve_card_path` makes.
         checker, bash = resolve_kickoff_checker(root), resolve_bash()
@@ -677,7 +756,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
                                  "labels, and the task fields are %d" % (checker.as_posix(), r.returncode,
                                                                           len(derived), len(TASK_FIELDS)))
         labels = dict(zip(derived, TASK_FIELDS))
-    if any(k.startswith(("task:", "card:")) for k in reads):
+    if any(k.startswith(("task:", "card:")) for k in wanted):
         card, why["card"] = resolve_card_path(root, card_arg)
         card_text = lib.load_text(card) if card else ""
         if card:
@@ -687,12 +766,12 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
                    "card/%s" % (card.stem if card_arg is not None else os.environ.get("CLAUDE_CODE_SESSION_ID", "")))
             fact_keys["task"] = fact_keys["card"] = lib.derive_fact_key("record", ref, card.read_bytes())
         values.update(("task:" + f, v) for f, v in extract_task_fields(card_text, labels).items())
-        for k in reads:
+        for k in wanted:
             if k.startswith("card:") and card:
                 section = extract_card_section(card_text, k.rstrip("?")[5:])
                 if section is not None:
                     values[k.rstrip("?")] = section
-    if any(k.startswith("brief:") for k in reads):
+    if any(k.startswith("brief:") for k in wanted):
         prompts = build_dir / "prompts"
         brief = resolve_brief_record(prompts, inputs.get("prompt") and pathlib.Path(
             os.path.normpath(root / inputs["prompt"])))
@@ -701,7 +780,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         brief_text = lib.load_text(brief) if brief else ""
         if brief:
             fact_keys["brief"] = lib.derive_fact_key("record", brief.relative_to(root).as_posix(), brief.read_bytes())
-        for k in reads:
+        for k in wanted:
             if k.startswith("brief:") and brief:
                 # TOOL-dPavedRoad-3: the owner's words are the record's own `## The prompt` section,
                 # read as a card section is; every other brief key is a sub-head of `## The brief`.
@@ -731,6 +810,23 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         else:
             absent.append(key)
             reasons += [what] if why.get(src) and what not in reasons else []
+    if declaration is not None:
+        # TOOL-dBoundRoles-3 S2: each input of the item handed as content under its own level-3 heading, a `reads`
+        # key spelled as its `field.` tag, its fact line two below; one it cannot resolve refuses or is not supplied
+        subs = []
+        for k in item_keys:
+            key = k.rstrip("?")
+            head = lib.derive_field_tag(key) if key in lib.READ_KEYS else key
+            v = BLANK_EDGES_RE.sub("", values.get(key, ""))
+            fact = fact_keys.get(key) or fact_keys.get(key.split(":")[0])
+            if fact and not check_placeholder(v):
+                subs.append("### %s\n\n%s\n\n%s" % (head, lib.render_fact_line(fact, root), v))
+            elif not k.endswith("?"):
+                if not any(r.startswith(key + " — ") for r in refusals):
+                    refusals.append("%s — the item %s's input carries no value this render resolves" % (head, item))
+            elif key not in absent:
+                absent.append(key)
+        blocks += render_work_order_blocks(item, declaration, prefixes, subs)
     if charter_error is not None:
         raise charter_error
     refusals += tag_refusals
@@ -773,8 +869,9 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
 
 def check_handoff(root, path):
     """`(ok, lines)`: the marker's two hashes re-derived from the file's own bytes, CRLF folded, and
-    its `path` compared with the file's repo-relative path; one line per mismatch, else one line
-    naming the path and both hashes."""
+    its `path` compared with the file's repo-relative path, and for a marker whose `item=` is a tag each of
+    `lib.WORK_ORDER_BLOCKS` looked for as a whole line inside `## Task` (TOOL-dBoundRoles-3 S6); one line per
+    mismatch or missing block, else one line naming the path and both hashes."""
     p = pathlib.Path(os.path.normpath(root / path))
     rel = p.relative_to(root).as_posix() if root in p.parents else p.as_posix()
     try:
@@ -795,6 +892,13 @@ def check_handoff(root, path):
                                       ("task-sha", marker.group("task_sha"), task_sha),
                                       ("path", marker.group("path"), rel))
            if said != actual]
+    # TOOL-dBoundRoles-3 S6: a work order cut for an item carries the kind's five blocks inside `## Task`
+    item = marker.group("item")
+    if item not in (None, "-"):
+        task_text = text[task_m.start():]
+        bad += ["handoff: %s: item=%s — the work order lacks its '%s' block inside '## Task', a part of the %s kind"
+                % (rel, item, head, lib.WORK_ORDER_KIND["kind"]) for head in lib.WORK_ORDER_BLOCKS
+                if not re.search(r"^%s[ \t]*$" % re.escape(head), task_text, re.M)]
     ranked, levels = check_envelope_order(rel, text, role_m.start(), task_m.start())
     bad += ranked
     return not bad, bad or ["%s role-sha=%s task-sha=%s" % (rel, role_sha, task_sha), levels]
@@ -1434,6 +1538,7 @@ def main(argv):
     r.add_argument("--build", required=True)
     r.add_argument("--unit")
     r.add_argument("--item")
+    r.add_argument("--allowance", action="append", default=[])
     r.add_argument("--card")
     r.add_argument("--input", action="append", default=[])
     r.add_argument("--upstream")
@@ -1567,7 +1672,8 @@ def main(argv):
         notes = []
         path, text, task_part = render_handoff(root, memory_root, charter_path, a.role, keys, a.build,
                                                a.unit, a.card, inputs, out, notes,
-                                               lib.STAND_IN_TAIL if a.stand_in else "", a.upstream, item=a.item)
+                                               lib.STAND_IN_TAIL if a.stand_in else "", a.upstream, item=a.item,
+                                               allowance=a.allowance)
         for line in notes:
             print("handoff: note — %s" % line, file=sys.stderr)
         if not a.stand_in:

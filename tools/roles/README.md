@@ -165,6 +165,28 @@ and writes nothing, and only the shape is checked (TOOL-dBoundRoles-17). A marke
 `item=` still parses, every reader taking its fields by group name. A research return names the work
 order it answers on a `**Answers:** <work order path> task-sha=<12hex>` line beside its `**Serves:**`
 line, the value `roles_lib.derive_answers_value` writes, and the catalogue checker grades both as R16.
+THE WORK ORDER PER ITEM (TOOL-dBoundRoles-3): with `--item <tag>` the render reads the item's declaration
+from the loop kit, running its `loop_lib.py declaration --item <tag> --json` in a subprocess under a bound,
+the kit found by `resolve_kit_dir("loop", "loop_lib.py", ...)`, and refuses with exit 1, writing nothing, a
+tag the loop does not declare, an item whose actor is not `role:<the --role slot>`, and no loop kit. The
+task then closes, after the `reads` blocks, with the five blocks of `roles_lib.WORK_ORDER_BLOCKS`: `### item`
+(the tag, its step and its outcome set), `### inputs` (each of the item's inputs handed as content, one
+sub-block each on a level-3 `### <field tag>` heading with its fact line two lines below, an optional one
+the render cannot resolve named on the `Not supplied` line), `### allowance`, `### return` (the item's
+resolved `returns`) and `### witness` (its witness class and `by`). They sit inside `## Task`, so the
+marker's `task-sha` covers them. THE ALLOWANCE RULE: `roles_lib.derive_allowance` turns the item's write
+class into repo-relative path prefixes, read from `WRITE_FOLDERS` with `{{MEMORY_ROOT}}` and `<slug>`
+filled: `none` renders `none`, `spec` and `review` the build's `spec/` and `reviews/` folders, `records`
+the memory root, and `product` each path a repeated `--allowance <path>` grants, each under a
+`ROUTED_PATHS` entry of the conf (an entry ending `/` covers the paths under it, any other names one
+file). A `product` item granted none, a granted path under no entry, absolute or climbing through `..`,
+a path granted to any other class and `--allowance` without `--item` each refuse. Pass the unit's
+`--dispatch --writes` set: a caller granting a whole `ROUTED_PATHS` entry is admitted, and nothing here
+can tell. THE BINDING: the hooks kit's spawn guard admits a work order whose marker's `item=` is a tag only
+in a session whose orientation card routes the marker's `unit=`, the stand-in binding record until
+dWellOiledMachine's. `python handoff.py check <file>` refuses a work order with `item=` set that lacks
+any of the five blocks, naming it. The record kind is `roles_lib.WORK_ORDER_KIND`: its folder, its name
+grammar, its door, its parts and its readers, `check_handoff`, rule 6 and R16.
 `python handoff.py check <file>` re-derives both hashes and the marker's path, then
 grades the envelopes: every one opened closes, and their levels never decrease down the `## Role` part
 or the `## Task` part, each failure naming the envelope; it prints each part's levels in order, and a

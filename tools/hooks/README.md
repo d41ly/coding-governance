@@ -302,6 +302,14 @@ re-render the handoff, which cuts it fresh`. A `cmd:` key rides the `task-sha` a
 handoff rendered before the fact line carries none and re-derives nothing. The spawn is the act launch,
 so a role is never handed a fact its source no longer holds. It reads every line matching the grammar,
 so content that quotes a fact line is read as one until the handed blocks are fenced.
+Then the card check (TOOL-dBoundRoles-3 S5): a marker whose `item=` is a tag, a work order cut for one
+item, is admitted only when the payload session's orientation card routes the marker's `unit=`. The card
+is read through scratch-guard's `readCard`, its path the kickoff checker's `--card --path --session <sid>`
+answer run under `CARD_PATH_BOUND_MS`, and its `## route` units through `extractRouteUnits`; otherwise the
+call is refused naming the item, the unit and the card, or `readCard`'s `shown` where no card reads. A
+marker whose `item=` is `-` or absent is judged as before. It is the stand-in binding record until
+dWellOiledMachine's session binding; it does not see two sessions routing one unit, or a card edited by
+hand, which the write gate's card rules govern.
 Last, its `description`, ends trimmed, must be the spawn's name `handoff.py render` prints on stderr
 as `handoff: description — <name>`: `<build> · <unit> · <workflow>`, from the marker's build and unit
 and the index's `workflow` for that role, or `<build> · <workflow>` for a marker whose unit is `-`

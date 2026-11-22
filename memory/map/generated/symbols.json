@@ -5018,6 +5018,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkItemBinding",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkLane",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -11281,6 +11286,11 @@
       "id": "derive_all_on",
       "kind": "function",
       "file": "tools/loop/floor.py"
+    },
+    {
+      "id": "derive_allowance",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "derive_ancestors",
@@ -23488,6 +23498,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "read_item_declaration",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "read_item_members",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
@@ -27703,6 +27718,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "refused35",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
       "id": "regen_cmd",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -28116,6 +28136,11 @@
       "id": "render",
       "kind": "function",
       "file": "tools/workflows/check-protocol-parity.test.sh"
+    },
+    {
+      "id": "render35",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
     },
     {
       "id": "renderAgentLabel",
@@ -30141,6 +30166,11 @@
       "id": "render_widen_record",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "render_work_order_blocks",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "render_work_order_section",
@@ -33666,6 +33696,11 @@
       "id": "run_deadline_patch",
       "kind": "function",
       "file": "tools/loop/termination.py"
+    },
+    {
+      "id": "run_declaration_command",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "run_declared_python",

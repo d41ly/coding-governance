@@ -55,7 +55,9 @@
 # unarmed (arm 31); and the work order's `item=` written by `--item`, a malformed tag refused, and R16 over
 # a return's `**Answers:**` line, a work order planted after the seed with no `item=` or no marker, and no
 # legacy home (arm 33); and the spec writer's handoff handing its spec as content under a `record:` fact line,
-# and `handoff.py facts` cutting it to the same key (arm 34). Every arm is a self-contained block below the prologue, so a
+# and `handoff.py facts` cutting it to the same key (arm 34); and the work order rendered per item, its five blocks,
+# its allowance by class, a wrong role, no allowance, an unrouted one, an undeclared item, no loop kit and a missing
+# block refused (arm 35). Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 25
 # arm 9's writer and lines.
 #
@@ -128,7 +130,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +8 for arm 32 (TOOL-dBoundRoles-15).
 # +9 for arm 33 (TOOL-dBoundRoles-17).
 # +2 for arm 34 (TOOL-dBoundRoles-13).
-FLOOR_ASSERTIONS=131
+# +9 for arm 35 (TOOL-dBoundRoles-3).
+FLOOR_ASSERTIONS=140
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1815,6 +1818,9 @@ check_arm "arm 32 ...and with the rule taken out the catalogue checks clean" "$(
 # ---- unmarked work order passes. WHAT IT DOES NOT CHECK: a return naming two work orders, or a seed over
 # ---- an unborn HEAD, which leaves the home unarmed.
 build_fixture
+# TOOL-dBoundRoles-3 S1: an item's work order reads the item's declaration from the loop kit, so the fixture's
+# definition declares `item.build.unit` for the role this arm renders, gov-researcher.
+printf '\n[[item]]\ntag = "item.build.unit"\nstep = "step.build"\nactor = "role:gov-researcher"\nneeds = []\noutcomes = ["picked"]\nwitness = { class = "history", by = "the return" }\nowner = "tFix"\nroutes = { picked = "transition" }\n' >> "$FX/$FXL/loop.toml"
 _mt=memory-tree; [[ $FXK == */* ]] && _mt=${FXK%/*}/memory-tree
 A33P="$FX/$MR/builds/tFix/prompts"; A33B="$FX/$MR/builds/tFix/build"; A33R="$TMP_ROOT/a33.out"
 A33H="$FX/$MR/project/work-order-legacy.txt"
@@ -1917,6 +1923,91 @@ check_arm "arm 34 the spec writer's handoff hands its spec as content under a cl
 check_arm "arm 34 handoff.py facts cuts the same spec to the same key, beside its brief" \
    "$([ "${A34#*$'\n'}" = 'facts 1' ] && echo 1 || echo 0)"
 [ "$A34" = $'render 1\nfacts 1' ] || printf '    %s\n' "${A34//$'\n'/$'\n'    }"
+
+# ---- arm 35 (TOOL-dBoundRoles-3 AC1 AC2 AC3 AC4 AC6 AC7): the work order rendered per item. The fixture's loop
+# ---- definition gains three rows: `item.build.unit` for gov-builder, whose `product` class takes the granted
+# ---- paths, and `item.design.tspec` and `item.design.tnone` for gov-spec-writer, the second narrowed to `none`;
+# ---- the fixture's gov-spec-writer reads `field.input.spec?` alone, since `task:` needs the kickoff checker and
+# ---- `brief:` a brief record, which a roles-kit fixture lacks. Its conf routes the kit's own folder. The builder's
+# ---- render through the CLI writes the five blocks inside `## Task`, its allowance the one granted path, its marker
+# ---- `item=item.build.unit`, and `handoff.py check` passes it; the same render naming gov-spec-writer, granting no
+# ---- path, granting one beside the memory root's README, naming an undeclared item, or with the loop kit taken
+# ---- away each exits 1 naming the actor, the class and the flag, the path, the tag or the loop kit, and writes
+# ---- nothing; the spec item's allowance is the build's `spec/` folder and the narrowed one reads `none`; the
+# ---- work order without its `### witness` block, its marker re-hashed, fails `check` naming the block. The failing
+# ---- cases, owed at the close and not observed by the pass that wrote this: `render_handoff` with its item
+# ---- step cut out, which renders the work order with no block and passes every refusal, and `derive_allowance`
+# ---- admitting every granted path. WHAT IT DOES NOT CHECK: a work order spawned, which the hooks kit's
+# ---- agent-cap.test.sh binds to the session's card.
+build_fixture; _rc35=$?
+printf '\n[[item]]\ntag = "item.build.unit"\nstep = "step.build"\nactor = "role:gov-builder"\nneeds = []\noutcomes = ["committed", "diverged"]\nwitness = { class = "history", by = "the unit'"'"'s commit, its Pass: trailer naming the unit" }\nowner = "tFix"\nroutes = { committed = "transition", diverged = "transition" }\n' >> "$FX/$FXL/loop.toml"
+for _t in tspec tnone; do
+  _al=""; [ "$_t" = tnone ] && _al='allowance = "none"'$'\n'
+  printf '\n[[item]]\ntag = "item.design.%s"\nstep = "step.design"\nactor = "role:gov-spec-writer"\nneeds = []\n%soutcomes = ["done"]\nwitness = { class = "history", by = "the spec" }\nowner = "tFix"\nroutes = { done = "transition" }\n' \
+    "$_t" "$_al" >> "$FX/$FXL/loop.toml"
+done
+sed 's/^reads: .*/reads: field.input.spec?/' "$FX/$FXK/agents/gov-spec-writer.agent.md" > "$TMP_ROOT/a35.role" \
+  && cp "$TMP_ROOT/a35.role" "$FX/$FXK/agents/gov-spec-writer.agent.md"
+printf 'ROUTED_PATHS="%s/"\n' "$FXK" >> "$FX/.memory-tree.conf"
+A35P="$FX/$MR/builds/tFix/prompts"; A35S="$MR/builds/tFix/spec/2026-11-22-spec-TOOL-tFix-1.md"; A35E="$TMP_ROOT/a35.err"
+mkdir -p "$A35P" "$FX/$MR/builds/tFix/spec" && printf '# TOOL-tFix-1\n\nThe spec line one.\n' > "$FX/$A35S"
+render35() { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --build tFix --unit TOOL-tFix-1 "$@" 2>"$A35E"); }
+A35W=$(render35 --role gov-builder --item item.build.unit --allowance "$FXK/handoff.py" --input "spec=$A35S"); _rc=$?
+A35W=${A35W%$'\r'}
+A35=$("$PY" -B -c 'import pathlib, re, sys
+text = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+task = text[text.index("\n## Task\n"):]
+heads = ["### item", "### inputs", "### allowance", "### return", "### witness"]
+at = [task.find("\n%s\n" % h) for h in heads]
+print("blocks %d" % (all(a > 0 for a in at) and at == sorted(at)))
+print("allow %s" % task.split("\n### allowance\n\n", 1)[-1].split("\n\n", 1)[0].replace("\n", "|"))
+print("item %d" % bool(re.search(r"^<!-- gov:handoff .* item=item\.build\.unit path=", text, re.M)))
+' "$FX/$A35W" 2>&1); A35=${A35//$'\r'/}
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" check "$A35W") >/dev/null 2>&1; _ck=$?
+check_arm "arm 35 AC1 the builder's item work order holds the five blocks in ## Task, its allowance the granted path, and check passes" \
+   "$([ "$_rc35" = 0 ] && [ "$_rc" = 0 ] && [ "$_ck" = 0 ] && [ "$A35" = "blocks 1"$'\n'"allow - $FXK/handoff.py"$'\n'"item 1" ] && echo 1 || echo 0)"
+[ "$_rc" = 0 ] && [ "$_ck" = 0 ] || { printf '    exit %s check %s\n' "$_rc" "$_ck"; sed 's/^/    /' "$A35E"; }
+[ "$A35" = "blocks 1"$'\n'"allow - $FXK/handoff.py"$'\n'"item 1" ] || printf '    %s\n' "${A35//$'\n'/$'\n'    }"
+_ls=$(ls -A "$A35P")
+refused35() { # name needle render-args...: exit 1, the needle on stderr, nothing written
+  local name=$1 needle=$2; shift 2
+  render35 "$@" >/dev/null; local rc=$?
+  check_arm "$name" "$([ "$rc" = 1 ] && grep -qF -- "$needle" "$A35E" && [ "$(ls -A "$A35P")" = "$_ls" ] && echo 1 || echo 0)"
+  [ "$rc" = 1 ] && grep -qF -- "$needle" "$A35E" || { printf '    exit %s, want 1 naming %s\n' "$rc" "$needle"; sed 's/^/    /' "$A35E"; }
+}
+refused35 "arm 35 AC2 a render naming gov-spec-writer exits 1 naming the item's actor role:gov-builder and writes nothing" \
+  'role:gov-builder' --role gov-spec-writer --item item.build.unit --allowance "$FXK/handoff.py" --input "spec=$A35S"
+refused35 "arm 35 AC3 with no --allowance the product item exits 1 naming the class and the flag" \
+  'product class, which takes only the paths the dispatch grants: pass --allowance' --role gov-builder --item item.build.unit --input "spec=$A35S"
+refused35 "arm 35 AC4 a granted path under no ROUTED_PATHS entry exits 1 naming it" \
+  "--allowance $MR/notes.md sits under no ROUTED_PATHS entry" --role gov-builder --item item.build.unit --allowance "$MR/notes.md" --input "spec=$A35S"
+refused35 "arm 35 AC6 an item the loop does not declare exits 1 naming the tag" \
+  'no [[item]] row declares item.build.nothing' --role gov-builder --item item.build.nothing --allowance "$FXK/handoff.py" --input "spec=$A35S"
+for _t in tspec tnone; do
+  _w=$(render35 --role gov-spec-writer --item "item.design.$_t" --input "spec=$A35S"); _w=${_w%$'\r'}
+  _a=$([ -n "$_w" ] && "$PY" -B -c 'import pathlib, sys
+t = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+print(t.split("\n### allowance\n\n", 1)[-1].split("\n\n", 1)[0].replace("\n", "|"))' "$FX/$_w"); _a=${_a%$'\r'}
+  [ "$_t" = tspec ] && _want="- $MR/builds/tFix/spec/" || _want=none
+  check_arm "arm 35 AC3 the $_t item's allowance block reads $_want" "$([ "$_a" = "$_want" ] && echo 1 || { printf '    %s\n' "$_a" >&2; echo 0; })"
+  rm -f "$FX/$_w"
+done
+A35K="$A35P/2026-11-22-prompt-TOOL-tFix-1-9-builder.md"
+"$PY" -B -c 'import pathlib, re, sys, hashlib
+src, dst, rel = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2]), sys.argv[3]
+text = src.read_text(encoding="utf-8").split("\n### witness\n", 1)[0] + "\n"
+m = re.search(r"^<!-- gov:handoff .* path=(\S+) role-sha=\S+ task-sha=([0-9a-f]{12}) -->$", text, re.M)
+sha = hashlib.sha256(text[text.index("\n## Task\n") + 1:].encode("utf-8")).hexdigest()[:12]
+line = m.group(0).replace("path=" + m.group(1), "path=" + rel).replace("task-sha=" + m.group(2), "task-sha=" + sha)
+dst.write_text(text.replace(m.group(0), line), encoding="utf-8", newline="\n")' "$FX/$A35W" "$A35K" "$MR/builds/tFix/prompts/${A35K##*/}"
+_ck=$(cd "$FX" && "$PY" -B "$FXK/handoff.py" check "$MR/builds/tFix/prompts/${A35K##*/}" 2>&1); _rc=$?
+check_arm "arm 35 AC7 the work order without its ### witness block, re-hashed, fails check naming the block" \
+   "$([ "$_rc" = 1 ] && [[ $_ck == *"lacks its '### witness' block"* ]] && echo 1 || echo 0)"
+rm -f "$A35K"; _ls=$(ls -A "$A35P")
+mv "$FX/$FXL" "$TMP_ROOT/a35-loop"
+refused35 "arm 35 AC6 with the loop kit taken away the render exits 1 naming no loop kit" \
+  'no loop kit' --role gov-builder --item item.build.unit --allowance "$FXK/handoff.py" --input "spec=$A35S"
+mv "$TMP_ROOT/a35-loop" "$FX/$FXL"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
