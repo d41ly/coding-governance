@@ -39823,6 +39823,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_extract_context_window_compact",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_extract_context_window_root",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
