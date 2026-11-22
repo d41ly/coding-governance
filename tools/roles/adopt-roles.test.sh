@@ -1593,10 +1593,13 @@ def run(cwd, *a):
 def check(*extra):
     rc, out = run(kit, "check_roles.py", "--root", str(fx), *extra)
     return rc, out, [ln for ln in out.splitlines() if ": R9 — " in ln]
+homes = {}
 for home in ("policy", "playbook"):
-    shutil.copytree(src / home, tool_root / home, dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__"))
-(tool_root / "workflows").mkdir(exist_ok=True)
-shutil.copy(src / "workflows" / "replay_scorer.py", tool_root / "workflows" / "replay_scorer.py")
+    homes[home] = tool_root / home
+    shutil.copytree(src / home, homes[home], dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__"))
+for home, name in (("workflows", "replay_scorer.py"),):
+    (tool_root / home).mkdir(exist_ok=True)
+    shutil.copy(src / home / name, tool_root / home / name)
 (fx / "fx-cases.json").write_text("[]\n", encoding="utf-8")
 (fx / "fx-labels.json").write_text("{}\n", encoding="utf-8")
 (fx / ".governance").mkdir(exist_ok=True)
@@ -1647,7 +1650,7 @@ table.write_text(held.replace("orientation = \"unit.orient.verifier-cold\"\nenfo
 rc, out, r9 = check()
 print("ac6a %d" % int(rc == 1 and len(r9) == 1 and "unit.orient.nothing" in r9[0] and "no declared unit" in r9[0]))
 table.write_text(held, encoding="utf-8")
-reader = tool_root / "playbook" / "instruction_units.py"
+reader = homes["playbook"].joinpath("instruction_units.py")
 reader.rename(reader.with_suffix(".away"))
 rc, out, r9 = check()
 reader.with_suffix(".away").rename(reader)
