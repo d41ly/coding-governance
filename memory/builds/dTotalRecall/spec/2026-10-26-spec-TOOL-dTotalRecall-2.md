@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing
 
-**Status:** DEFERRED · rev-12 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-12 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0213@bfd195a1 whole
 
@@ -30,6 +30,7 @@
 | [2026-11-02-prompt-TOOL-dTotalRecall-2-owner-fork.md](../prompts/2026-11-02-prompt-TOOL-dTotalRecall-2-owner-fork.md) | research | — |
 | [2026-11-03-prompt-TOOL-dTotalRecall-2-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-2-1-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md) | research | TOOL-dTotalRecall-1 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-2-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-carries-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-carries-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-fold-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-fold-brief.md) | journal | — |
