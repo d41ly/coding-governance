@@ -28,6 +28,40 @@ sys.path.insert(0, str(HERE))
 import instruction_units as iu  # noqa: E402
 import overlay as ov  # noqa: E402
 import render_playbook as rp  # noqa: E402
+import contextlib
+import os
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
 
 SAY = "composition"
 KIT = iu.derive_tool_rel("alpha")
@@ -196,7 +230,7 @@ def arm_installed_template(c, _a):
         c.check("with the copy removed the render refuses, exit 1, naming both paths",
                 iu.derive_template_rel() in said and f"{empty.as_posix()}/{rp.TEMPLATE_NAME}" in said, said)
     finally:
-        shutil.rmtree(empty, ignore_errors=True)
+        remove_tree(empty)
 
 
 def arm_delta(c, _a):

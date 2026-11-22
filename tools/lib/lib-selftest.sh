@@ -1,6 +1,7 @@
 # lib-selftest.sh — a self-test harness whose unit of cost is not a process. TOOL-aQuenchedHarness-5.
 #
-# SOURCED, never executed. Three verbs and nothing else: `build_fixture`, `arm`, `run_arms`. It is not
+# SOURCED, never executed. Four verbs and nothing else: `build_fixture`, `arm`, `arm_reading`, `run_arms`
+# (the fourth, and `build_fixture --template`, are TOOL-dQuietDisk-7's template mode, below). It is not
 # a test framework — no discovery, no fixtures-by-convention, no assertion library. Those exist and
 # this repo does not need one; what it needs is for a declared self-test budget measured in HOURS
 # to stop being measured in hours. The figure is not written here: `run-selftests.sh --list`
@@ -44,6 +45,15 @@ _st_n=0                   # arms DECLARED, which is also the reporting order
 # arm runs in a subshell of this one, so it INHERITS these arrays; nothing has to be marshalled.
 _st_labels=(); _st_wantrc=(); _st_wantout=(); _st_setup=(); _st_subject=()
 
+# THE TEMPLATE MODE (TOOL-dQuietDisk-7 S7). `_st_template` is the template repo a `--template` batch
+# clones per arm, `_st_reading` the indices `arm_reading` declared, and `_st_tmode` the switch
+# `tests.fixture-templates`, read once per suite run on the first `--template` call. The library's
+# own directory is taken by builtins as it is sourced, so the resolver and the policy kit are found
+# beside it rather than by a literal path.
+_st_template=""; _st_reading=(); _st_tmode=""
+case ${BASH_SOURCE[0]} in */*) _st_lib=${BASH_SOURCE[0]%/*} ;; *) _st_lib=. ;; esac
+case $_st_lib in /*|[A-Za-z]:*) ;; *) _st_lib=$PWD/$_st_lib ;; esac
+
 # Resolved ONCE. `command -v` per arm is a process per arm to answer a question whose answer cannot
 # change during a run.
 _st_timeout=""; command -v timeout >/dev/null 2>&1 && _st_timeout=timeout
@@ -63,6 +73,94 @@ _st_waitn=0; ( : & wait -n ) >/dev/null 2>&1 && _st_waitn=1
 _st_width() { local w=${SELFTEST_INNER_WIDTH:-1}; case "$w" in ''|*[!0-9]*) w=1 ;; esac
               [ "$w" -ge 1 ] || w=1; printf '%s' "$w"; }
 
+# THE TEMPLATE CACHE'S BASH FACE, carried inline from `template-cache.sh` beside this file, whose
+# header gives its usage, and held to it by `resolve-python.test.sh`'s parity table.
+# >>> template_cache_sh — canonical copy: template-cache.sh in gov's lib dir (byte-identical; gated)
+resolve_template_root() { # -> the cache root: SELFTEST_TEMPLATE_ROOT, a bar's owned $WORK, or $SELFTEST_ROOT
+  local _tc_d=${TMPDIR:-/tmp} _tc_p
+  if [ -n "${SELFTEST_TEMPLATE_ROOT:-}" ] && [ -d "$SELFTEST_TEMPLATE_ROOT" ]; then
+    printf '%s\n' "$SELFTEST_TEMPLATE_ROOT"; return 0
+  fi
+  while [ -n "$_tc_d" ]; do
+    case ${_tc_d##*/} in gate-work.*) [ -f "$_tc_d/owner" ] && { printf '%s\n' "$_tc_d/templates"; return 0; } ;; esac
+    _tc_p=${_tc_d%/*}; [ "$_tc_p" = "$_tc_d" ] && break; _tc_d=$_tc_p
+  done
+  [ -n "${SELFTEST_ROOT:-}" ] || { echo "template-cache: no root: no SELFTEST_TEMPLATE_ROOT, no owned gate-work, no SELFTEST_ROOT" >&2; return 2; }
+  printf '%s\n' "$SELFTEST_ROOT/templates"
+}
+remove_git_env_leaks() { # unsets, in the calling subshell, the names GIT_ENV_LEAKS drops
+  unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES \
+    GIT_COMMON_DIR GIT_NAMESPACE GIT_PREFIX GIT_LITERAL_PATHSPECS GIT_GLOB_PATHSPECS \
+    GIT_NOGLOB_PATHSPECS GIT_ICASE_PATHSPECS
+}
+derive_template_key() ( # <builder> [<input file>...] -> the key, 40 hex, from the builder's definition and the inputs' blob ids
+  remove_git_env_leaks
+  local -; set -o pipefail
+  local _tc_b=$1; shift
+  { printf 'template-cache v1\nbash\n%s\n' "$_tc_b"
+    declare -f "$_tc_b"
+    printf 'input %s\n' "$@"
+    [ "$#" -eq 0 ] || printf '%s\n' "$@" | git hash-object --no-filters --stdin-paths
+  } | git hash-object --stdin
+)
+resolve_template() ( # <root> <key> <builder> [<arg>...] -> <root>/<key>/repo, <key> folding the args; built once per root
+  remove_git_env_leaks
+  local _tc_r=$1 _tc_k=$2 _tc_l _tc_n; shift 2
+  if [ "$#" -gt 1 ]; then
+    _tc_k=$({ printf 'template-cache args v1\n%s\n' "$_tc_k"; printf '%q\n' "${@:2}"; } | git hash-object --stdin) \
+      || { echo "template-cache: the key of $1's arguments could not be derived" >&2; return 2; }
+  fi
+  local _tc_dir="$_tc_r/$_tc_k" _tc_s="$_tc_r/.stage-$_tc_k-$BASHPID"
+  local -a _tc_c=(-c core.autocrlf=false -c core.hooksPath= -c commit.gpgsign=false -c user.name=t -c user.email=t@e)
+  if [ -e "$_tc_dir/ready" ]; then
+    echo "template: ${_tc_k:0:8} reused" >&2; printf '%s\n' "$_tc_dir/repo"; return 0
+  fi
+  mkdir -p "$_tc_s/repo" || return 2
+  if ! ( cd "$_tc_s/repo" && "$@" ) >&2; then
+    rm -rf "$_tc_s"; echo "template-cache: the builder $1 failed, so no template was made" >&2; return 2
+  fi
+  [ -e "$_tc_s/repo/.git" ] || git -C "$_tc_s/repo" init -q --template= || { rm -rf "$_tc_s"; return 2; }
+  git -C "$_tc_s/repo" "${_tc_c[@]}" add -A || { rm -rf "$_tc_s"; return 2; }
+  if ! git -C "$_tc_s/repo" "${_tc_c[@]}" commit -q -m base >/dev/null 2>&1; then
+    # NOTHING TO COMMIT is a builder that committed its own tree, and only that is not a failure.
+    git -C "$_tc_s/repo" rev-parse -q --verify 'HEAD^{commit}' >/dev/null && git -C "$_tc_s/repo" diff --cached --quiet \
+      || { rm -rf "$_tc_s"; echo "template-cache: the commit of $1's tree failed" >&2; return 2; }
+  fi
+  git -C "$_tc_s/repo" config --local --list > "$_tc_s/config-all" || { rm -rf "$_tc_s"; return 2; }
+  : > "$_tc_s/config-pins"
+  while IFS= read -r _tc_l; do
+    _tc_l=${_tc_l%$'\r'}; _tc_n=${_tc_l%%=*}
+    case $_tc_n in
+      remote.*|branch.*|core.repositoryformatversion|core.filemode|core.bare|core.logallrefupdates) ;;
+      core.symlinks|core.ignorecase|core.precomposeunicode|'') ;;
+      *) printf '%s\n' "$_tc_l" >> "$_tc_s/config-pins" ;;
+    esac
+  done < "$_tc_s/config-all"
+  rm -f "$_tc_s/config-all"; : > "$_tc_s/ready"
+  # `mv -T` FAILS onto the key directory, which is never empty; a plain `mv` would nest the stage in it.
+  if mv -T "$_tc_s" "$_tc_dir" 2>/dev/null; then
+    echo "template: ${_tc_k:0:8} built" >&2
+  else
+    rm -rf "$_tc_s"
+    [ -e "$_tc_dir/ready" ] || { echo "template-cache: could not place $_tc_dir" >&2; return 2; }
+    echo "template: ${_tc_k:0:8} reused" >&2
+  fi
+  printf '%s\n' "$_tc_dir/repo"
+)
+build_template_clone() ( # <template repo> <dest> -> a --shared clone carrying the template's config pins and no remote
+  remove_git_env_leaks
+  local _tc_l; local -a _tc_p=()
+  while IFS= read -r _tc_l; do [ -n "$_tc_l" ] && _tc_p+=(-c "$_tc_l"); done < "${1%/*}/config-pins" || return 2
+  git -c core.autocrlf=false clone --shared --quiet --template= -o template-source ${_tc_p[@]+"${_tc_p[@]}"} "$1" "$2" \
+    && git -C "$2" remote remove template-source
+)
+read_template_mode() { # <python> <policy.py> -> per-case or shared: tests.fixture-templates, shared unless the reader says per-case
+  local _tc_v
+  if [ -n "${1:-}" ] && [ -f "${2:-}" ] && _tc_v=$("$1" "$2" get tests.fixture-templates 2>/dev/null) \
+     && [ "${_tc_v%$'\r'}" = per-case ]; then echo per-case; else echo shared; fi
+}
+# <<< template_cache_sh
+
 # ---------------------------------------------------------------------------------------------
 # build_fixture <builder>  — run the builder ONCE, snapshot what it made.
 #
@@ -74,12 +172,40 @@ _st_width() { local w=${SELFTEST_INNER_WIDTH:-1}; case "$w" in ''|*[!0-9]*) w=1 
 # batch one's and graded the OLD arms against the NEW snapshot. Every one of them would have passed or
 # failed for reasons unrelated to what it was written to ask. Found by reading, not by running, which
 # is why it is fixed here rather than after a port had already been built on it.
+#
+# build_fixture --template "<input file>..." <builder> — the same batch on the template cache, when
+# `tests.fixture-templates` reads `shared`: the builder runs once per cache root, keyed by its
+# `declare -f`, the named files' blob ids and the arguments after the builder, which resolve_template
+# folds into the key, so `mka x` and `mka y` are two templates; every arm gets a `--shared` clone of it with no
+# remote. Under `per-case` it is the line above. An absent policy kit, an unreadable key or no
+# python reads as `shared`, the key's default.
 build_fixture() {
+  local _st_ins="" _st_on=0 _st_x _st_r _st_k
+  if [ "${1:-}" = --template ]; then _st_ins=${2:-}; _st_on=1; shift 2 || shift; fi
   [ $# -ge 1 ] || { echo "lib-selftest: build_fixture needs a builder" >&2; return 2; }
   _st_n=0
-  _st_labels=(); _st_wantrc=(); _st_wantout=(); _st_setup=(); _st_subject=()
+  _st_labels=(); _st_wantrc=(); _st_wantout=(); _st_setup=(); _st_subject=(); _st_reading=()
+  _st_template=""
   SELFTEST_ROOT=$(mktemp -d) || { echo "lib-selftest: cannot create a scratch root" >&2; return 2; }
   SELFTEST_SNAPSHOT="$SELFTEST_ROOT/snapshot"
+  if [ "$_st_on" = 1 ] && [ -z "$_st_tmode" ]; then
+    . "$_st_lib/resolve-python.sh"
+    . "$_st_lib/refuse-wrong-shell.sh"
+    refuse_wrong_shell || exit 2
+    _st_pk=policy; _st_x=$_st_lib/../$_st_pk/$_st_pk.py
+    _st_r=""; [ ! -f "$_st_x" ] || _st_r=$(resolve_python 2>/dev/null) || _st_r=""
+    _st_tmode=$(read_template_mode "$_st_r" "$_st_x")
+  fi
+  if [ "$_st_on" = 1 ] && [ "$_st_tmode" = shared ]; then
+    local -a _st_in=(); local _st_f=$-
+    set -f; for _st_x in $_st_ins; do _st_in+=("$_st_x"); done; case $_st_f in *f*) ;; *) set +f ;; esac
+    _st_r=$(resolve_template_root) && _st_k=$(derive_template_key "$1" ${_st_in[@]+"${_st_in[@]}"}) \
+      && _st_template=$(resolve_template "$_st_r" "$_st_k" "$@") || {
+      _st_template=""
+      echo "lib-selftest: the template for $1 was not built, so every arm below would grade a fixture that was never built" >&2
+      return 2; }
+    return 0
+  fi
   mkdir -p "$SELFTEST_SNAPSHOT" || return 2
   ( cd "$SELFTEST_SNAPSHOT" && "$@" ) || {
     echo "lib-selftest: the fixture builder failed, so every arm below would grade a fixture that was never built" >&2
@@ -117,6 +243,15 @@ arm() {
   _st_setup+=("$4");  _st_subject+=("$5")
 }
 
+# arm_reading <label> <want-rc> <want-substring> <setup> <subject> — `arm`, for a subject that writes
+# nothing. In a `--template` batch under `shared`, every such arm runs in ONE clone,
+# `$SELFTEST_ROOT/read`, made before the pool starts, and `run_arms` FAILs the suite when that clone's
+# `git status` shows a write afterwards, naming the reading arms. Anywhere else it is `arm`.
+arm_reading() {
+  arm "$@" || return
+  _st_reading[$((_st_n - 1))]=1
+}
+
 # ONE PROCESS RUNS BOTH HALVES, and the subject's status still arrives ALONE. An earlier harness in
 # this repo ran `sh -c 'setup; gate; cleanup'` and compared the rc of the CLEANUP, so every red arm
 # reported 0 and the suite would have certified a gate that never fired. Here the setup's failure
@@ -141,8 +276,17 @@ _ST_BODY='
 # harness, so every one of those became an array lookup or a builtin.
 _st_run_one() {
   local i=$1 k=$(( $1 - 1 )) d="$SELFTEST_ROOT/arm.$i" w="$SELFTEST_ROOT/work.$i"
-  # THE COPY. Filesystem work, not process creation, and it is what makes the pool safe.
-  cp -a "$SELFTEST_SNAPSHOT" "$w" 2>/dev/null || { printf 'ERR\tcould not copy the snapshot\n' > "$d/verdict"; return; }
+  # THE COPY. Filesystem work, not process creation, and it is what makes the pool safe. In a
+  # `--template` batch it is a clone of the template, and a reading arm takes the one read clone.
+  if [ -z "$_st_template" ]; then
+    cp -a "$SELFTEST_SNAPSHOT" "$w" 2>/dev/null || { printf 'ERR\tcould not copy the snapshot\n' > "$d/verdict"; return; }
+  elif [ -n "${_st_reading[$k]:-}" ]; then
+    w="$SELFTEST_ROOT/read"
+    [ -d "$w" ] || { printf 'ERR\tcould not copy the snapshot\n' > "$d/verdict"; return; }
+  else
+    build_template_clone "$_st_template" "$w" >/dev/null 2>&1 \
+      || { printf 'ERR\tcould not copy the snapshot\n' > "$d/verdict"; return; }
+  fi
 
   # BOUNDED WITH `timeout`, not with a sleep-and-kill pair: that pair cost two more processes per arm
   # and left its `sleep` orphaned whenever the arm finished early. Capturing to a FILE is what makes
@@ -232,6 +376,12 @@ run_arms() {
   local i=1; local -a dirs=()
   while [ "$i" -le "$_st_n" ]; do dirs+=("$SELFTEST_ROOT/arm.$i"); i=$((i + 1)); done
   mkdir -p "${dirs[@]}" || return 2
+  # THE READ CLONE, made once before the pool, so no two reading arms race to make it.
+  local rd=""
+  if [ -n "$_st_template" ] && [ "${#_st_reading[@]}" -gt 0 ]; then
+    rd="$SELFTEST_ROOT/read"
+    build_template_clone "$_st_template" "$rd" >/dev/null 2>&1 || rd=""
+  fi
 
   i=1; local live=0
   while [ "$i" -le "$_st_n" ]; do
@@ -258,6 +408,16 @@ run_arms() {
     esac
     j=$((j + 1))
   done
+  # A READING ARM THAT WROTE fails the suite here, rather than leaking into its neighbours unseen.
+  if [ -n "$rd" ]; then
+    local wrote names=""
+    wrote=$(git -C "$rd" status --porcelain --untracked-files=all 2>&1) || wrote=${wrote:-git status failed}
+    if [ -n "$wrote" ]; then
+      for j in "${!_st_reading[@]}"; do [ "$j" -lt "$_st_n" ] && names+="${names:+; }${_st_labels[$j]}"; done
+      fails=$((fails + 1))
+      printf 'FAIL  a reading arm wrote into the read checkout %s — %s: %s\n' "$rd" "$names" "${wrote//$'\n'/ }"
+    fi
+  fi
   echo "----"
   [ "$probe" = 1 ] && echo "foreign-prefix-probe: stopped after 1 arm"
   if [ "$fails" -eq 0 ]; then

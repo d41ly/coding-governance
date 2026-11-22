@@ -41,7 +41,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.57   # gov:kit run-gates@1.57
+KIT_RUN_GATES_VERSION=1.58   # gov:kit run-gates@1.58
 # 1.53 -> 1.54: the canary's one key set, `LEG_KEYS`, admits `level`, govkit's `LEG_KEY_FLOORS["level"]`, and `product_tests.py` grades it (TOOL-dWitnessedBar-9).
 # 1.52 -> 1.53: the canary's one key set, `LEG_KEYS`, admits `precommit`, govkit's `LEG_KEY_FLOORS["precommit"]`, and `--precommit` runs it (TOOL-dWitnessedBar-10).
 # 1.51 -> 1.52: the canary's one key set, `LEG_KEYS`, admits `purpose`, govkit's `LEG_KEY_FLOORS["purpose"]` (TOOL-dWitnessedBar-19).
@@ -2384,19 +2384,36 @@ fi
 #             fails `ts_alive`, with the predicate of `ts_sweep_queue`: a live pid only WITHHOLDS the
 #             sweep, so a pid table that errs can only keep a dir, never remove a live bar's. A dir
 #             with no readable owner is never touched, which is also why a bar that predates this
-#             unit, or another repository's, is left alone (the spec's F1 kept the delete surface to
-#             this repository). The owner record is removed LAST, so a sweep that fails part-way
-#             leaves a dir the next bar can still prove dead and retry.
-#   REDIRECTED  `TMPDIR` is exported as `$WORK/tmp` before the first leg dispatches, so every leg's
-#             `mktemp -d` and every Python `tempfile` lands inside the scratch the `cleanup` trap
-#             already removes. The spelling is the one `mktemp -d` returned and never a drive-letter
-#             rewrite, which is what broke four arms of the template-size self-test when an external
-#             root was tried (measured by the aTetheredScratch build).
+#             unit, or another live repository's, is left alone (the spec's F1 kept the delete surface
+#             to this repository). An ORPHAN's is swept too: a dead owner whose absolute common dir
+#             names no directory any more, a fixture repository its suite removed (TOOL-dQuietDisk-9
+#             S9). The owner record is removed LAST, so a sweep that fails part-way leaves a dir the
+#             next bar can still prove dead and retry. The record and the sweep are the `owned_work_sh`
+#             block, which the self-test runner carries too.
+#   REDIRECTED  `TMPDIR`, `TEMP` and `TMP` are exported as `$WORK/tmp` before the first leg
+#             dispatches, so every leg's `mktemp -d`, every Python `tempfile` and a native child's
+#             temp dir, which reads `TEMP` and `TMP` and never `TMPDIR`, land inside the scratch the
+#             `cleanup` trap already removes (TOOL-dQuietDisk-9 S7). The spelling is the one `mktemp -d`
+#             returned and never a drive-letter rewrite, which is what broke four arms of the
+#             template-size self-test when an external root was tried (measured by the aTetheredScratch
+#             build); MSYS converts all three for a native child.
+#   OUTER     an adopter runner that already redirects `TMPDIR` to its own owned scratch exports
+#             `GATE_OUTER_AMBIENT_TMP`, the temp root it was itself started under. Naming a directory,
+#             it is `RG_SWEPT_TMP`, what the count and the sweep read; `WORK` is still made under
+#             `${TMPDIR:-/tmp}`, inside that runner's scratch. Unset or empty, nothing changes; naming
+#             no directory, one NOTE line says so. It is read once and unset before any leg, so a bar
+#             nested inside a leg never inherits it (TOOL-dQuietDisk-9 S8).
 #
 # It runs HERE, after the turnstile, so a bar still queued never sweeps. Every refusal in this block
 # sits ABOVE the `cleanup` trap, the same class as the `mktemp -d` beside it, so each removes what it
 # made before it exits.
 GATE_AMBIENT_TMP=${TMPDIR:-/tmp}
+RG_SWEPT_TMP=$GATE_AMBIENT_TMP
+if [ -n "${GATE_OUTER_AMBIENT_TMP:-}" ]; then
+  if [ -d "$GATE_OUTER_AMBIENT_TMP" ]; then RG_SWEPT_TMP=$GATE_OUTER_AMBIENT_TMP
+  else echo "run-gates: NOTE - GATE_OUTER_AMBIENT_TMP names no directory, so the bar counts and sweeps $GATE_AMBIENT_TMP" >&2; fi
+fi
+unset GATE_OUTER_AMBIENT_TMP
 WORK=$(mktemp -d "$GATE_AMBIENT_TMP/gate-work.XXXXXXXX") || { echo "run-gates: cannot create a scratch dir"; exit 2; }
 # THE COMMON DIR THE OWNER NAMES, the one resolution the turnstile's key also takes, made above the
 # width whether or not the turnstile runs, because the sweep must still know which repository a
@@ -2404,30 +2421,37 @@ WORK=$(mktemp -d "$GATE_AMBIENT_TMP/gate-work.XXXXXXXX") || { echo "run-gates: c
 WORK_COMMON=$RG_COMMON
 [ -n "$RG_HEALTH_LOG" ] || [ -z "$WORK_COMMON" ] || RG_HEALTH_LOG=$(derive_health_log "$WORK_COMMON")
 
-write_work_owner() { # -> $WORK/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
+# >>> owned_work_sh — canonical copy: owned-scratch.sh in gov's lib dir (byte-identical; gated)
+write_work_owner() { # <dir> <common> -> <dir>/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
   local _tp
-  derive_temp_path _tp "$WORK/owner"
-  printf '%s\t%s\t%s\n' "$$" "$WORK_COMMON" "$EPOCHSECONDS" > "$_tp" 2>/dev/null \
-    && mv -f "$_tp" "$WORK/owner" 2>/dev/null
+  derive_temp_path _tp "$1/owner"
+  printf '%s\t%s\t%s\n' "$$" "$2" "$EPOCHSECONDS" > "$_tp" 2>/dev/null \
+    && mv -f "$_tp" "$1/owner" 2>/dev/null
 }
 
-scan_dead_work() { # -> removes each gate-work dir under the ambient TMPDIR that this repo's dead bar owns
+scan_dead_work() { # <ambient> <own dir> <common> <health log> -> removes each gate-work dir under <ambient> a dead bar owns
   local d own pid rest common f
   local -a doomed
   # No common dir, no proof of ownership: sweep nothing rather than match an empty field.
-  [ -n "$WORK_COMMON" ] || return 0
-  for d in "$GATE_AMBIENT_TMP"/gate-work.*; do
+  [ -n "$3" ] || return 0
+  for d in "$1"/gate-work.*; do
     [ -d "$d" ] || continue
     # NEVER OUR OWN, guarded explicitly although our live pid already withholds it — the same belt
     # `ts_sweep_queue` wears, for the same reason: a later edit to the pid test must not reach here.
-    [ "${d##*/}" = "${WORK##*/}" ] && continue
+    [ "${d##*/}" = "${2##*/}" ] && continue
     own=""
     { IFS= read -r own < "$d/owner"; } 2>/dev/null
     own=${own%$'\r'}
     [ -n "$own" ] || continue
     pid=${own%%$'\t'*}; rest=${own#*$'\t'}; common=${rest%%$'\t'*}
     case "$pid" in ''|*[!0-9]*) continue ;; esac
-    [ "$common" = "$WORK_COMMON" ] || continue
+    # THIS REPOSITORY'S, or an ORPHAN's: an absolute common dir that names no directory any more, a
+    # fixture repository its suite removed (TOOL-dQuietDisk-9 S9). Another live repository's root and
+    # a relative common dir are never touched.
+    if [ "$common" != "$3" ]; then
+      case "$common" in /*|[A-Za-z]:[/\\]*) ;; *) continue ;; esac
+      [ -d "$common" ] && continue
+    fi
     ts_alive "$pid" && continue
     printf 'run-gates: sweeping the scratch of a dead bar (pid %s)\n' "$pid" >&2
     doomed=()
@@ -2437,32 +2461,34 @@ scan_dead_work() { # -> removes each gate-work dir under the ambient TMPDIR that
       doomed+=("$f")
     done
     if { [ "${#doomed[@]}" = 0 ] || rm -rf "${doomed[@]}" 2>/dev/null; } && rm -rf "$d" 2>/dev/null; then
-      add_health_event "$RG_HEALTH_LOG" run-gates scratch-swept "dead bar pid $pid"
+      add_health_event "$4" run-gates scratch-swept "dead bar pid $pid"
     else
       printf 'run-gates: NOTE - the scratch of dead bar %s was not removed whole; its owner record stays, so the next bar retries: %s\n' "$pid" "$d" >&2
     fi
   done
   return 0
 }
+# <<< owned_work_sh
 
-write_work_owner \
+write_work_owner "$WORK" "$WORK_COMMON" \
   || echo "run-gates: NOTE - no owner record could be written into $WORK, so if this bar is killed no later bar can prove it dead and sweep its scratch" >&2
 mkdir "$WORK/tmp" 2>/dev/null \
   || { rm -rf "$WORK" 2>/dev/null; echo "run-gates: cannot create the legs' scratch dir under $WORK"; exit 2; }
-scan_dead_work
+scan_dead_work "$RG_SWEPT_TMP" "$WORK" "$WORK_COMMON" "$RG_HEALTH_LOG"
 # THE AMBIENT COUNT, ONCE PER BAR, measured after the sweep and counting this bar's own dir, so two
-# bars over an unchanged ambient print the same figure and a leak reads as growth. A glob rather than
+# bars over an unchanged ambient print the same figure and a leak reads as growth. Under an outer root
+# it counts that root, which this bar's own dir does not sit in, and the same holds. A glob rather than
 # `ls | wc -l`: no process, and no per-entry stat on a directory that may hold tens of thousands.
 _te_ng=0; shopt -q nullglob && _te_ng=1
 _te_dg=0; shopt -q dotglob && _te_dg=1
 shopt -s nullglob dotglob
-_te_all=("$GATE_AMBIENT_TMP"/*)
+_te_all=("$RG_SWEPT_TMP"/*)
 [ "$_te_ng" = 1 ] || shopt -u nullglob
 [ "$_te_dg" = 1 ] || shopt -u dotglob
 TMPDIR_ENTRIES=${#_te_all[@]}
 unset _te_all _te_ng _te_dg
 echo "TMPDIR entries $TMPDIR_ENTRIES"
-export TMPDIR="$WORK/tmp"
+export TMPDIR="$WORK/tmp" TEMP="$WORK/tmp" TMP="$WORK/tmp"
 # THE TRAP COVERS THE SCRATCH DIR AND THE BEACON, AND NOTHING ELSE. That exclusion is load-bearing:
 # the run record below lives under the git dir and is DURABLE, so a trap that swept it would erase
 # the record on every ordinary exit and on every caught signal — which is every path except the
@@ -3261,6 +3287,48 @@ CENSUS_TOKENS="$WORK/census.tokens"
 } > "$CENSUS_TOKENS" 2>/dev/null || CENSUS_TOKENS=""
 unset _ct_av _ct_w
 
+# THE DIRT RULE, ONCE (TOOL-dQuietDisk-5 S4 S5), shared by the guard pass and `build_input_keys`.
+# check_plain_guard <guard>... -> 0 when every guard is PLAIN: only `[A-Za-z0-9._/@+=-]`, and not empty,
+# `.`, `./`, absolute, magic, or carrying `..` or `//`. Only for such a guard does the slice below
+# match exactly what git's pathspec matches; any other guard is answered by git itself.
+check_plain_guard() {
+  local g
+  for g in "$@"; do
+    case "$g" in ''|.|./|/*|:*|*[!A-Za-z0-9._/@+=-]*|*..*|*//*) return 1 ;; esac
+  done
+}
+# write_guard_slices <guards file> <path list> <slice prefix>: one file `<prefix><i>` per row of the
+# guards file (`<i><TAB><g1,g2,...>`), holding the path list's lines that the leg's guards match, in
+# list order. A list line's path is what follows its first TAB, or the whole line where it has none
+# (an `ls-files -s` listing or a `--name-only` list), its C quotes stripped. A guard ending in `/`
+# names a directory, so, as in git's pathspec, it never matches a file of that exact name; without
+# the slash it matches the file or everything under the directory. A substring is never a match.
+write_guard_slices() {
+  awk -F'\t' -v pre="$3" '
+      FNR == NR { leg[++nl] = $1; ng[nl] = split($2, gl, ",")
+                  for (j = 1; j <= ng[nl]; j++) { g = gl[j]; dn[nl, j] = sub(/\/$/, "", g); gd[nl, j] = g }
+                  printf "" > (pre $1); next }
+      { line = $0; p = substr(line, index(line, "\t") + 1)
+        if (substr(p, 1, 1) == "\"" && substr(p, length(p), 1) == "\"") p = substr(p, 2, length(p) - 2)
+        for (l = 1; l <= nl; l++) for (j = 1; j <= ng[l]; j++) {
+          g = gd[l, j]
+          if ((p == g && !dn[l, j]) || substr(p, 1, length(g) + 1) == g "/") { print line > (pre leg[l]); break }
+        } }
+      END { for (l = 1; l <= nl; l++) close(pre leg[l]) }
+  ' "$1" "$2" 2>/dev/null
+}
+# THE BAR'S MOVED PATHS, READ ONCE (TOOL-dQuietDisk-5 S1): one whole-tree diff against BASE, which the
+# guard pass slices for every plain-guarded leg and the held selection reads for a record at BASE.
+# `--no-renames` because a per-leg diff, limited to its guard before rename detection, reads a file
+# renamed out of the guard as deleted inside it, and both names must print; `--` so no path reads as a
+# revision. Written under a temporary name and moved into place on exit 0 alone, so a failed diff
+# leaves no list and every guarded leg keeps its own `changed` call.
+if [ -n "$BASE" ] && [ -z "${GATE_FULL:-}" ] && [ -n "${guards[*]:-}" ] && derive_temp_path _bm "$WORK/base.moved"; then
+  git -c core.quotePath=false diff --name-only --no-renames "$BASE" -- > "$_bm" 2>/dev/null \
+    && mv -f "$_bm" "$WORK/base.moved"
+  unset _bm
+fi
+
 # ---- THE HELD TIER, SELECTED BY THE KIT WHOSE SHIPPED BYTES MOVED (TOOL-aSparedSpawn-12) -----------
 # `GATE_SELFTESTS=changed` runs a held leg only when one of these holds, and holds it otherwise with a
 # line naming the sha it is unchanged since: it has no last-run record, an unreadable one, one whose
@@ -3290,7 +3358,7 @@ if [ "${GATE_SELFTESTS:-}" = changed ]; then
     if num_ok "$GATE_SELFTESTS_MAX_LAG"; then SELFTESTS_MAX_LAG=$((10#$GATE_SELFTESTS_MAX_LAG))
     else echo "run-gates: NOTE - GATE_SELFTESTS_MAX_LAG='$GATE_SELFTESTS_MAX_LAG' is not a positive integer, so the held-tier lag bound is $SELFTESTS_MAX_LAG" >&2; fi
   fi
-  _sel_in=""
+  _sel_in=""; _sel_moved=""; [ -f "$WORK/base.moved" ] && _sel_moved=$WORK/base.moved
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
     derive_hold_source "$i"; [ "$HOLD_SRC" = kit ] || continue
@@ -3303,6 +3371,7 @@ if [ "${GATE_SELFTESTS:-}" = changed ]; then
   printf '%s' "$_sel_in" | "$PYBIN" -c "$RKD_PROGRAM"'
 import subprocess, sys
 here, rdir, head, bound = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4])
+base, base_moved = sys.argv[5], sys.argv[6]
 legs = [r.split("\x1e") for r in sys.stdin.buffer.read().decode("utf-8").split("\n") if r]
 out = []
 
@@ -3384,7 +3453,17 @@ for sha, members in todo.items():
             why_run = "recorded %s is %d first-parent commits behind HEAD, beyond the bound %d" % (s8, int(n), bound)
     if why_run:
         out += ["R\x1e%s\x1e%s" % (i, why_run) for i, _s in members]; continue
-    rc, moved = run_git("-c", "core.quotePath=false", "diff", "--name-only", "--no-renames", sha)
+    # A record at BASE reads the moved list of the bar (TOOL-dQuietDisk-5 S6): the same argv plus a
+    # `--` naming no path, so the same lines. Any other sha, or no list, keeps its own read.
+    rc = 1
+    if sha == base and base_moved:
+        try:
+            with open(base_moved, encoding="utf-8", errors="replace") as fh:
+                rc, moved = 0, fh.read()
+        except OSError:
+            rc = 1
+    if rc != 0:
+        rc, moved = run_git("-c", "core.quotePath=false", "diff", "--name-only", "--no-renames", sha)
     if rc != 0:
         out += ["R\x1e%s\x1ethe diff since recorded %s could not be read" % (i, s8) for i, _s in members]
         continue
@@ -3403,7 +3482,7 @@ elif fallback:
     out.insert(0, "F\x1eno kit ships the suite of %d held leg(s), so each selects by its guard plus its suite file: %s"
                % (len(fallback), ", ".join(fallback)))
 sys.stdout.buffer.write("".join(r + "\n" for r in out).encode("utf-8"))
-' "$KITDIR" "$HELD_DIR" "$RG_HEAD" "$SELFTESTS_MAX_LAG" > "$WORK/held-select" \
+' "$KITDIR" "$HELD_DIR" "$RG_HEAD" "$SELFTESTS_MAX_LAG" "$BASE" "$_sel_moved" > "$WORK/held-select" \
     || echo "run-gates: selftests changed: the selection program failed, so every held leg it did not decide executes" >&2
   while IFS=$'\x1e' read -r _sel_k _sel_i _sel_v; do
     case "$_sel_k" in
@@ -3412,7 +3491,7 @@ sys.stdout.buffer.write("".join(r + "\n" for r in out).encode("utf-8"))
       H) printf '%s' "$_sel_v" > "$WORK/$_sel_i.unchanged" ;;
     esac
   done < "$WORK/held-select"
-  unset _sel_in _sel_k _sel_i _sel_v
+  unset _sel_in _sel_k _sel_i _sel_v _sel_moved
 fi
 
 # UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED. TOOL-aBoundedCeiling-1 S6. The runner cannot know
@@ -3422,8 +3501,11 @@ fi
 # profile line, which is where an operator already reads this run's knobs. The DECLARATION
 # requirement over gov's own corpus is S9, in run-gates.gov.test.sh, which is the suite allowed to
 # hold a claim about this repository.
-# Guard evaluation runs SERIALLY and up front: it is a read-only `git diff` per guarded leg, and
-# deciding before dispatch keeps the skip verdict independent of scheduling.
+# Guard evaluation runs SERIALLY and up front, and deciding before dispatch keeps the skip verdict
+# independent of scheduling. A leg whose every guard is plain is sliced out of the bar's one moved list
+# after the loop, by the dirt rule above, and an empty slice skips it (TOOL-dQuietDisk-5 S2). A leg with
+# any other guard, every leg when the list is absent, and every sliced leg when the slicing fails, keeps
+# its own read-only `git diff` through `changed` (S3).
 for ((i=0; i<total; i++)); do
   [ -z "${names[$i]}" ] && continue
   # SUBJECT FIRST, and in this pass rather than in the dispatch loop. A kit-subject leg tests the
@@ -3474,8 +3556,21 @@ for ((i=0; i<total; i++)); do
   fi
   [ -z "${guards[$i]}" ] && continue
   IFS=, read -ra gp <<<"${guards[$i]}"
+  if [ -f "$WORK/base.moved" ] && check_plain_guard "${gp[@]}"; then
+    printf '%s\t%s\n' "$i" "${guards[$i]}" >> "$WORK/moved.guards"; continue
+  fi
   changed "${gp[@]}" || printf 'skip' > "$WORK/$i.rc"
 done
+if [ -s "$WORK/moved.guards" ]; then
+  if write_guard_slices "$WORK/moved.guards" "$WORK/base.moved" "$WORK/moved.slice."; then
+    while IFS=$'\t' read -r i _; do [ -s "$WORK/moved.slice.$i" ] || printf 'skip' > "$WORK/$i.rc"; done < "$WORK/moved.guards"
+  else
+    while IFS=$'\t' read -r i _mg; do
+      IFS=, read -ra gp <<<"$_mg"; changed "${gp[@]}" || printf 'skip' > "$WORK/$i.rc"
+    done < "$WORK/moved.guards"
+  fi
+  unset _mg
+fi
 
 # UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED, and counted over the legs that will actually RUN.
 # The runner cannot tell a leg somebody forgot from an adopter leg the deployer has no business
@@ -3588,11 +3683,7 @@ build_input_keys() {
     plain=1
     if [ -n "${guards[$i]}" ]; then
       IFS=, read -ra gp <<<"${guards[$i]}"
-      for g in "${gp[@]}"; do
-        case "$g" in
-          ''|.|./|/*|:*|*[!A-Za-z0-9._/@+=-]*|*..*|*//*) plain=0 ;;
-        esac
-      done
+      check_plain_guard "${gp[@]}" || plain=0
       if [ "$plain" = 1 ]; then union+=("${gp[@]}"); fi
     fi
     if [ "$plain" = 1 ]; then bulk+=" $i"; n_bulk=$((n_bulk + 1))
@@ -3605,21 +3696,9 @@ build_input_keys() {
     for i in $bulk; do
       [ -n "${guards[$i]}" ] && printf '%s\t%s\n' "$i" "${guards[$i]}"
     done > "$WORK/keys.guards"
-    # One file per guarded leg, `keys.slice.<i>`, holding its lines of the listing in listing order. A
-    # guard ending in `/` names a directory, so, as in git's pathspec, it never matches a file of that
-    # exact name; without the slash it matches the file or everything under the directory.
-    awk -F'\t' -v dir="$WORK" '
-      FNR == NR { leg[++nl] = $1; ng[nl] = split($2, gl, ",")
-                  for (j = 1; j <= ng[nl]; j++) { g = gl[j]; dn[nl, j] = sub(/\/$/, "", g); gd[nl, j] = g }
-                  printf "" > (dir "/keys.slice." $1); next }
-      { line = $0; p = substr(line, index(line, "\t") + 1)
-        if (substr(p, 1, 1) == "\"" && substr(p, length(p), 1) == "\"") p = substr(p, 2, length(p) - 2)
-        for (l = 1; l <= nl; l++) for (j = 1; j <= ng[l]; j++) {
-          g = gd[l, j]
-          if ((p == g && !dn[l, j]) || substr(p, 1, length(g) + 1) == g "/") { print line > (dir "/keys.slice." leg[l]); break }
-        } }
-      END { for (l = 1; l <= nl; l++) close(dir "/keys.slice." leg[l]) }
-    ' "$WORK/keys.guards" "$WORK/keys.listing" 2>/dev/null || { KEYS_FAIL="the guard slices"; return 0; }
+    # One file per guarded leg, `keys.slice.<i>`, holding its lines of the listing in listing order.
+    write_guard_slices "$WORK/keys.guards" "$WORK/keys.listing" "$WORK/keys.slice." \
+      || { KEYS_FAIL="the guard slices"; return 0; }
   fi
   for i in $bulk; do
     lines=(); comp=""
