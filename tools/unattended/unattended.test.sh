@@ -20754,6 +20754,79 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# KICK-dKeptSession-23 — EVERY MAIL WRITE IS IN THE CHANGE FEED ONCE ITS REF UPDATE LANDS, AND IN NO
+# OTHER CASE. KICK-dKeptSession-5's two-clone fixture, built again here over a fresh bare remote
+# holding no mail ref, its `run_mail_arm` and `read_mail_refs` reused, each clone's feed its git
+# common dir's `gov-feed.log`. AC1: A's session s1 posts one `question` and A's feed gains exactly one
+# line, its ref the remote mail ref, kind `mail`, blob the empty tree and commit the remote ref's tip.
+# AC2: the same post retried is refused as a duplicate, exit 1, and the feed gains no line; then a
+# post on s3 loses its compare-and-swap to a racer that a `git` shim on PATH writes into the bare
+# remote by `update-ref` on the push naming `refs/gov/mail/`, as the run-claim block's AC6 stages one,
+# so the post's fetch never reads it: exit 1, the lost post's own commit, which the shim records,
+# neither on the remote nor in the feed, and every line the feed gained naming a commit the remote
+# holds. AC5: B's `fy` question to build:fx is one line in A's feed after A's `--mail read fx`, its
+# ref under `refs/gov/mail/fy/` and kind `mail`. Every post is kind `question`, which
+# KICK-dKeptSession-27's `--interface` refusal never reaches. RED, observed at the close, is a copy of
+# the driver whose `write_mail_ref` pushes around `write_gov_ref`, which leaves AC1's feed unchanged,
+# or appends whatever its push did, which puts AC2's lost commit in the feed. WHAT THIS BLOCK DOES NOT
+# DRIVE: the census over the driver, `scan_feed_writers`'s, probed directly in the unit's acceptance
+# ledger (AC3, AC4); `--mail ack`, which writes through the same `write_mail_ref`.
+# ==================================================================================================
+mb_d=$(mktemp -d)
+git init -q --bare -b main "$mb_d/o.git"
+for mb_c in A B; do
+  git init -q -b main "$mb_d/$mb_c" && git -C "$mb_d/$mb_c" config user.email t@t.test && git -C "$mb_d/$mb_c" config user.name t \
+    && git -C "$mb_d/$mb_c" config core.autocrlf false
+  ( cd "$mb_d/$mb_c" && mkconf && sed -i 's/^RUN_CLAIMS="off"$/RUN_CLAIMS="on"/' .unattended.conf )
+done
+( cd "$mb_d/A" && git add -A && git commit -q -m base --no-verify && git remote add origin "$mb_d/o.git" && git push -q origin main 2>/dev/null )
+( cd "$mb_d/B" && git remote add origin "$mb_d/o.git" && git fetch -q origin && git reset -q --hard origin/main )
+printf 'a message body\n' > "$mb_d/body.txt"
+mf_log="$mb_d/A/.git/gov-feed.log"
+# ---- AC1
+mf_r=$(read_mail_refs); mf_n=$(cat "$mf_log" 2>/dev/null | grep -c .)
+run_mail_arm A s1 post fx --to build:fy --kind question --subject one "$mb_d/body.txt" >/dev/null
+mf_tip=$(git --git-dir="$mb_d/o.git" rev-parse --verify -q refs/gov/mail/fx/a/s1)
+same "KDS23 AC1 a post to a remote holding no mail ref is one feed line: the remote mail ref, kind mail, the empty tree, the remote tip" \
+  "$mf_r $(tail -n +$((mf_n + 1)) "$mf_log" 2>/dev/null | cut -f2-5 | tr '\t' ' ' | tr '\n' ';')" \
+  "0 refs/gov/mail/fx/a/s1 mail 4b825dc642cb6eb9a060e54bf8d69288fbee4904 $mf_tip;"
+# ---- AC2
+mf_n=$(cat "$mf_log" 2>/dev/null | grep -c .)
+mf_out=$(run_mail_arm A s1 post fx --to build:fy --kind question --subject one "$mb_d/body.txt"); mf_rc=$?
+same "KDS23 AC2 the retried post is refused as a duplicate, exit 1, and the feed gains no line" \
+  "$mf_rc $(grep -c '^mail — duplicate [0-9a-f]* · refs/gov/remote/mail/fx/a/s1$' <<<"$mf_out") $(cat "$mf_log" 2>/dev/null | grep -c .)" "1 1 $mf_n"
+mf_git=$(command -v git); mkdir -p "$mb_d/bin"
+mf_racer=$(git --git-dir="$mb_d/o.git" -c user.name=t -c user.email=t@t.test commit-tree "$(git --git-dir="$mb_d/o.git" mktree </dev/null)" -m "gov-mail fx/eeeeeeeeeeee")
+cat > "$mb_d/bin/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/mail/"*) printf '%s\n' "\${@: -1}" > "$mb_d/pushed"; "$mf_git" --git-dir="$mb_d/o.git" update-ref refs/gov/mail/fx/a/s3 $mf_racer ;; esac
+exec "$mf_git" "\$@"
+EOF
+chmod +x "$mb_d/bin/git"
+mf_n=$(cat "$mf_log" 2>/dev/null | grep -c .)
+mf_out=$(PATH="$mb_d/bin:$PATH" run_mail_arm A s3 post fx --to build:fy --kind question --subject lost "$mb_d/body.txt"); mf_rc=$?
+same "KDS23 AC2 the post that lost its compare-and-swap exits 1 printing mail — lost, the racer on the remote ref" \
+  "$mf_rc $(grep -c '^mail — lost [0-9a-f]* · refs/gov/mail/fx/a/s3 · lost the race on the lease: ' <<<"$mf_out") $(git --git-dir="$mb_d/o.git" rev-parse --verify -q refs/gov/mail/fx/a/s3)" \
+  "1 1 $mf_racer"
+mf_l=$(sed -n 's/:.*//p' "$mb_d/pushed" 2>/dev/null)
+mapfile -t mf_g < <(tail -n +$((mf_n + 1)) "$mf_log" 2>/dev/null | cut -f5)
+mf_x=0; for mf_c in "${mf_g[@]}"; do git --git-dir="$mb_d/o.git" cat-file -e "$mf_c" 2>/dev/null || mf_x=$((mf_x + 1)); done
+same "KDS23 AC2 the lost commit is neither on the remote nor in A's feed, and no line the feed gained names a commit the remote lacks" \
+  "$([[ $mf_l =~ ^[0-9a-f]{40}$ ]] && ! git --git-dir="$mb_d/o.git" cat-file -e "$mf_l" 2>/dev/null && echo absent) $(cut -f5 "$mf_log" 2>/dev/null | grep -cx "${mf_l:-none}") $mf_x" \
+  "absent 0 0"
+# ---- AC5
+run_mail_arm B t1 post fy --to build:fx --kind question --subject 'q to fx' "$mb_d/body.txt" >/dev/null
+mf_c=$(git --git-dir="$mb_d/o.git" rev-parse --verify -q refs/gov/mail/fy/b/t1)
+mf_n=$(cat "$mf_log" 2>/dev/null | grep -c .)
+run_mail_arm A s1 read fx >/dev/null
+same "KDS23 AC5 B's question to build:fx is one line in A's feed after A's read, its ref under refs/gov/mail/fy/ and kind mail" \
+  "$(tail -n +$((mf_n + 1)) "$mf_log" 2>/dev/null | awk -F'\t' -v c="$mf_c" 'c != "" && $5 == c { n++; r = $2 " " $3 } END { print n + 0, r }')" \
+  "1 refs/gov/mail/fy/b/t1 mail"
+rm -rf "$mb_d"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-18 — THE CADENCE SEGMENT IS THE TAG GRAMMAR'S. The sourced driver's
 # `check_cadence_segment` over the spec's probe set, each refusal naming its rule (AC1); the playbook
 # kit's `parse_tag` over each `unit.<name>`, a name admitted there when the tag reads as namespace
@@ -24233,7 +24306,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # `same` (AC1 to AC4, one each), each unconditional and outside any loop, off the diff's own lines;
 # unit 22's calls widened to eight fields add none. No skip branch. No suite ran, and its RED-first
 # observation is the close's.
-FLOOR_ASSERTIONS=4095
+# RAISED 4095 -> 4100 by KICK-dKeptSession-23 on 2026-11-23: the mail-feed block's 5 region-eight
+# `same` (AC1 1, AC2 3, AC5 1), each unconditional and outside any loop, off the diff's own lines; no
+# skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4100
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24521,7 +24597,8 @@ FLOOR_SHARD_7=311
 # RAISED 1289 -> 1294 by KICK-dKeptSession-22: the same 5 region-eight message-id assertions, see FLOOR_ASSERTIONS.
 # RAISED 1294 -> 1308 by KICK-dKeptSession-5: the same 14 region-eight mailbox assertions, see FLOOR_ASSERTIONS.
 # RAISED 1308 -> 1312 by KICK-dKeptSession-31: the same 4 region-eight eight-field id assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1312
+# RAISED 1312 -> 1317 by KICK-dKeptSession-23: the same 5 region-eight mail-feed assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1317
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
