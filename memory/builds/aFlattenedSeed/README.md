@@ -44,13 +44,13 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-11-22 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-22 · streams tooling
 ids TOOL-aFlattenedSeed-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aFlattenedSeed-1 — three kit readers read an adopter's own layout](spec/2026-11-22-spec-TOOL-aFlattenedSeed-1.md) | — | 1 | INPROGRESS | rev-1 | 2026-11-22 |
+| [TOOL-aFlattenedSeed-1 — three kit readers read an adopter's own layout](spec/2026-11-22-spec-TOOL-aFlattenedSeed-1.md) | — | 1 | CLOSED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).

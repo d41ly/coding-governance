@@ -1,6 +1,6 @@
 # TOOL-aFlattenedSeed-1 — three kit readers read an adopter's own layout
 
-**Status:** INPROGRESS · rev-1 · 2026-11-22 · node a · Tier-1 · base b2eec4b6 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-11-22 · node a · Tier-1 · base b2eec4b6 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -66,6 +66,7 @@ ledger seed whose kit is installed flat. After it, inCMS can seed its population
 - **AC3** — When a seed argv names `{prefix}/fx2/fxflat.py` and only a receipt row places that file, at
   `flat/fxflat.py`, `seed` arms the population. Red when: the token resolves only against the tool
   root and the seed exits non-zero.
+  Observed red against the base block on 2026-11-22: `unarmed fx-flat exit 2`.
 
 ## 6. Gates
 
@@ -82,3 +83,4 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-22 · initial draft.
+- rev-2 · 2026-11-22 · AC3 · closed: the arm's red against the base block recorded.
