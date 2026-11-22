@@ -439,6 +439,22 @@ policy change is one commit and its regenerated mirror the next. What remains mu
   carrying `RAISED <old> -> <new>`;
 - `memory/DECISIONS.md` is staged with at least one `- ` row added and no line removed.
 
+**The rendered-paths shape** (TOOL-dBoundRoles-6 S2). `guarded-paths.txt` also names the roles kit's
+renders: the role index `.claude/roles.json` and one `.claude/agents/<slot>.md` line per agent-true
+role, since every reader of the list matches a staged path to a whole line. A touched set lying wholly
+among those lines, with no other guarded path beside it, is admitted, printing
+`policy-guard: admitted · <paths> · each equals its render: render_agents.py --check exits 0`, when
+every such path is staged present and equal, carriage returns stripped, to its working-tree bytes, and
+the roles kit's `render_agents.py --check`, found by `guard.py`'s inlined `resolve_kit_dir` and run
+under the guard's own interpreter as a subprocess, exits 0 over the working tree. So the committed
+renders are what the working tree's catalogue renders. A hand edit refuses with the check's drift
+line, a deletion or a rename with `deleted or retyped`, a working tree moved after staging with
+`the staged bytes are not its working-tree bytes`, and no roles kit with `no roles kit to re-render
+it`; a render staged beside another guarded path leaves the shape and takes that path's refusal. An
+agent file the list does not name, an adopter's own or a role's added after the list's last edit, is
+not guarded: the list gains its line in the role's own commit. The loop kit's verdict reaches the
+shape under every value of `policy-file.guard`, through its step that runs this file.
+
 A change those conditions refuse is still admitted on a live run's branch (PLAY-dOrderedCharter-84),
 reading no policy key and asking for no decision row. `check_run_mandate` reads `HEAD` alone, each
 step stopping at its first miss: the branch, `git symbolic-ref -q HEAD` (none: `HEAD is detached`);
@@ -635,7 +651,7 @@ no file, and an invalid file over a valid ancestor, `last-valid`. `mirror --chec
 `policy: mirror fresh` at both, each line naming its kind, and the helper, reading the
 rewrite pushed as L, must name L's sha8 as the landed revision with no `{rev}` left.
 
-The twenty-one `guard-*` cases copy `guard.py`, `guarded-paths.txt` and `policy.py` into the kit copy and commit a
+The thirty `guard-*` cases copy `guard.py`, `guarded-paths.txt` and `policy.py` into the kit copy and commit a
 policy file whose `[budgets]` table caps a tracked `.claude/skills/x/SKILL.md`, a key with slashes and
 a leading dot, at 100, a tracked `small.md` at 50 and the spec folder's class row
 `memory/builds/*/spec/` at 10 (TOOL-dGroundRules-21 S22), behind a
@@ -658,7 +674,17 @@ and run `mirror --write`: `guard-mirror-render` stages the mirror alone, exit 0 
 `mirror --check` at the new HEAD must print `policy: mirror fresh`. `guard-mirror-beside-conf` stages
 `.agent-cap.conf` beside a mirror rendered at HEAD, and `guard-mirror-inputs-join` first commits a
 render recording one input more than today's and stages that input beside its mirror: each must exit
-1 naming the input (TOOL-dGroundRules-25 S19, S21). The hook block's arms are in gov's pre-commit suite.
+1 naming the input (TOOL-dGroundRules-25 S19, S21). The live run's three (PLAY-dOrderedCharter-84),
+`guard-run-live`, `guard-run-terminal` and `guard-run-other-branch`, stage the deploy and instructions
+edits on a branch whose committed run-state record and driver decide, as `check_policy.py`'s header
+states. The rendered-paths shape's six (TOOL-dBoundRoles-6
+S2) commit a `.claude/roles.json`, which the copied list names, and stage one change of it, the
+renderer a stub beside the kit copy where the guard's `resolve_kit_dir` probes, exiting as its `rc`
+file says: `guard-render-admitted` exits 0 on a stub exiting 0, printing `each equals its render`;
+`guard-render-drift` exits 1 naming the stub's drift line; `guard-render-unstaged` exits 1 on a working
+tree moved after staging; `guard-render-deleted` on the index removed; `guard-render-no-kit` on no
+renderer to find; and `guard-render-beside` on the index staged beside `.governance/deploy.toml`, which
+leaves the shape. The hook block's arms are in gov's pre-commit suite.
 
 `legacy-homes` is one outcome case over one repository per name in `LEGACY_CASES`, each a copy of `policy.py` with
 gov's govkit registry under the copy's tool root, the memory-tree kit's `legacy_ledger.py`,

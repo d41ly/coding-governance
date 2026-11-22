@@ -607,7 +607,11 @@ mkdir -p "$HOREPO/.git" "$HOREPO/.claude" "$HOREPO/sub" "$HOREPO/tools/$HO_WF" \
 HOJ="$NODEDIR/horepo"
 printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/h.js"
 printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/other.js"
-HO_ROLES='{"roles":{"gov-researcher":{"agent":true,"workflow":"research","writes":"none"},"gov-builder":{"agent":true,"workflow":"build","writes":"product"},"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/'"$HO_WF"'/h.js"]}'
+# TOOL-dBoundRoles-6 S6: the researcher's `role-sha` is the hash of the role section write_handoff gives
+# every handoff below; HO_RSHA2 is that section with one more line, the role text after a body change.
+HO_RSHA=$("$TESTPY" -c 'import hashlib; print(hashlib.sha256(b"## Role\n\nYou research.\n\n").hexdigest()[:12])' | tr -d '\r')
+HO_RSHA2=$("$TESTPY" -c 'import hashlib; print(hashlib.sha256(b"## Role\n\nYou research.\n\nOne more line.\n\n").hexdigest()[:12])' | tr -d '\r')
+HO_ROLES='{"roles":{"gov-researcher":{"agent":true,"role-sha":"'"$HO_RSHA"'","workflow":"research","writes":"none"},"gov-builder":{"agent":true,"workflow":"build","writes":"product"},"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/'"$HO_WF"'/h.js"]}'
 HO_CWD=""
 HO_PROJECT=""
 write_roles() { # the index body, or `none` to remove it
@@ -624,14 +628,14 @@ h = lambda s: hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]
 role = "## Role\n\nYou research.\n\n"
 task = "## Task\n\nThis handoff is for build `bx`, unit `T-1`.\n\n### input:question\n\nWhat calls rule 4?\n"
 pre = "memory/builds/bx/prompts/"
-def render_marker(p, sec, r="gov-researcher", unit="T-1", item=None):
+def render_marker(p, sec, r="gov-researcher", unit="T-1", item=None, r_sec=None):
     # TOOL-dBoundRoles-17: `item=` sits between `unit=` and `path=` where given; every other variant
     # keeps the six-field marker, the legacy shape the guard still admits.
     tag = " item=%s" % item if item else ""
-    return "<!-- gov:handoff role=%s build=bx unit=%s%s path=%s role-sha=%s task-sha=%s -->" % (r, unit, tag, p, h(role), h(sec))
-def write_prompt_file(rel, m, sec):
+    return "<!-- gov:handoff role=%s build=bx unit=%s%s path=%s role-sha=%s task-sha=%s -->" % (r, unit, tag, p, h(r_sec or role), h(sec))
+def write_prompt_file(rel, m, sec, r_sec=None):
     with open(os.path.join(root, rel), "w", newline="\n") as f:
-        f.write("**Serves:** journal T-1\n\n# gov-researcher handoff - T-1\n\n" + m + "\n\n" + role + sec)
+        f.write("**Serves:** journal T-1\n\n# gov-researcher handoff - T-1\n\n" + m + "\n\n" + (r_sec or role) + sec)
 ok, stale, spec = pre + "2026-10-11-prompt-T-1-researcher.md", pre + "2026-10-11-prompt-T-2-researcher.md", "memory/builds/bx/spec/x.md"
 M = render_marker(ok, task)
 write_prompt_file(ok, M, task)
@@ -645,6 +649,11 @@ itemed = pre + "2026-10-11-prompt-T-1-2-researcher.md"
 MI = render_marker(itemed, task, item="item.build.unit")
 write_prompt_file(itemed, MI, task)
 write_prompt_file(spec, render_marker(spec, task), task)
+# TOOL-dBoundRoles-6 - the handoff re-rendered after the role body gained one line: its role section and
+# its marker's role-sha are the new text's; the `ok` handoff above is the one rendered before.
+rerendered = pre + "2026-10-11-prompt-T-1-3-researcher.md"
+MR = render_marker(rerendered, task, r_sec=role + "One more line.\n\n")
+write_prompt_file(rerendered, MR, task, role + "One more line.\n\n")
 prompts = {
     "ok": M + "\n\n" + task,
     "crlf": ("\n\n" + M + "\n\n" + task + "\n\n").replace("\n", "\r\n"),
@@ -660,6 +669,7 @@ prompts = {
     "stale": render_marker(stale, task) + "\n\n" + task.replace("rule 4", "rule 5"),
     "nounit": MN + "\n\n" + task,
     "item": MI + "\n\n" + task,
+    "rerendered": MR + "\n\n" + task,
 }
 for k, v in prompts.items():
     with open(out + "." + k, "w", newline="") as f:
@@ -764,6 +774,31 @@ HO_DESC='bx · T-2 · research' run_spawn "rule6 OC27: a wrong-unit description 
 HO_DESC='bx · - · research' run_spawn "rule6 OC27: a dash unit part on the unit-less handoff refused" 2 gov-researcher nounit '"bx · research"'
 write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); del d["roles"]["gov-researcher"]["workflow"]; print(json.dumps(d))' "$HO_ROLES")"
 run_spawn "rule6 OC27: an index role with no workflow refused, naming the key" 2 gov-researcher ok 'declares no workflow for gov-researcher'
+# TOOL-dBoundRoles-6 AC4 — role-sha compared at spawn. The index is re-rendered after the researcher's
+# body gained one line, so it carries HO_RSHA2; the `ok` handoff was rendered before it and carries
+# HO_RSHA. Against checkHandoffSpawn with its role-sha step cut out, the first row is admitted.
+write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); d["roles"]["gov-researcher"]["role-sha"]=sys.argv[2]; print(json.dumps(d))' "$HO_ROLES" "$HO_RSHA2")"
+run_spawn "rule6 BR6 AC4: a handoff rendered before the role body changed refused, naming role-sha" 2 gov-researcher ok "role-sha: the handoff was rendered from role text $HO_RSHA, and gov-researcher was rendered from $HO_RSHA2; re-render the handoff"
+run_spawn "rule6 BR6 AC4: ...and the handoff re-rendered from the new text admitted" 0 gov-researcher rerendered ""
+# AC5 — an index row without `role-sha` refuses naming the index's re-render; a malformed one is a
+# broken index. Against a guard admitting on a missing key, the first row is admitted; against a
+# loadRoleIndex passing the key unread, the second is refused by the comparison, not as broken.
+write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); del d["roles"]["gov-researcher"]["role-sha"]; print(json.dumps(d))' "$HO_ROLES")"
+run_spawn "rule6 BR6 AC5: an index holding no role-sha for the type refused, naming the index's re-render" 2 gov-researcher ok 'holds no role-sha for gov-researcher; re-render the index'
+write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); d["roles"]["gov-researcher"]["role-sha"]="XYZ"; print(json.dumps(d))' "$HO_ROLES")"
+run_spawn "rule6 BR6 AC5: a role-sha of XYZ is a broken index, refusing the spawn" 2 gov-researcher ok "role gov-researcher's role-sha is not 12 lowercase hex digits"
+# AC3 — an absent index in a governed tree, one whose .claude/agents/ keeps a rendered role agent,
+# refuses both tools naming the re-render; the arms of AC5 above, with no agents folder, still admit.
+# Against a rule 6 reading an absent index as no rule, both rows are admitted.
+write_roles none
+mkdir -p "$HOREPO/.claude/agents"
+printf -- '---\nname: gov-researcher\ndescription: d\nworkflow: research\nwrites: none\n---\nbody\n' > "$HOREPO/.claude/agents/gov-researcher.md"
+run_spawn "rule6 BR6 AC3: no index beside a rendered agent file refuses the spawn, naming the re-render" 2 general-purpose none 'is absent while this tree carries rendered role agents; re-render it with render_agents.py --write'
+run_harness "rule6 BR6 AC3: ...and the harness call" 2 "$HO_INLINE" 'is absent while this tree carries rendered role agents'
+printf -- '---\nname: adopter-own\ndescription: d\n---\nbody\n' > "$HOREPO/.claude/agents/gov-researcher.md"
+run_spawn "rule6 BR6 AC3: an agents folder holding only an adopter's own file is no governed tree, admitted" 0 general-purpose none ""
+rm -rf "$HOREPO/.claude/agents"
+write_roles "$HO_ROLES"
 # TOOL-aOrientedCast-14 AC4 — the anchor: a cwd under no checkout falls back to CLAUDE_PROJECT_DIR, a
 # cwd in a checkout keeps it, and neither resolving says so. $TMP itself lies in no checkout. Against
 # a rule 6 reading the payload cwd alone, the first row exits 0 and the third says nothing.

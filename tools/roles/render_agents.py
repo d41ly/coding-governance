@@ -29,7 +29,9 @@ that does not read refuses, naming it. A pre-tag charter renders no
 index `.claude/roles.json`: every role with its `workflow`, `writes`, `agent` and `gates`, the gate legs
 the merged grant lets it run (empty where neither home names any), its `layer` and `acts-as`, which
 the playbook kit's layer check reads as data (TOOL-dBoundRoles-1 S6), its `shapes`, the list of workflow
-kinds it runs in (TOOL-dBoundRoles-16 S5), `harnesses`, the repo-relative
+kinds it runs in (TOOL-dBoundRoles-16 S5), its `role-sha`, `roles_lib.derive_section_sha` of the `## Role`
+section `roles_lib.render_role_section` composes, the hash a handoff's marker carries and the hooks kit's
+spawn guard compares (TOOL-dBoundRoles-6 S5), `harnesses`, the repo-relative
 scripts of every workflow whose `driver` is `workflow`, and `gates.manifest`, the repo-relative path of
 the tool root's gate manifest or null when no file is there (TOOL-aOrientedCast-11; scratch-guard.js reads
 both to refuse a role agent a gate), and `effort`, the resolved role and stage levels of the default
@@ -158,12 +160,13 @@ def load_catalogue(kit_dir, target_root):
         raise lib.RolesError("%s declares no MEMORY_ROOT, or is absent" % conf.as_posix())
     charter_path = lib.resolve_charter_path(target_root)
     doc = pathlib.Path(os.path.relpath(str(charter_path), str(target_root))).as_posix()
-    charter = lib.parse_charter(lib.load_text(charter_path), doc)
+    charter_text = lib.load_text(charter_path)
+    charter = lib.parse_charter(charter_text, doc)
     workflows = lib.load_workflows(kit_dir)
     notes = [lib.LEGACY_NOTE % doc] if charter["shape"] == "legacy" else []
     return {"roles": roles, "workflows": workflows, "memory_root": memory_root,
             "policy": lib.load_policy(kit_dir, roles, workflows, notes),
-            "notes": notes, "charter": charter, "charter_doc": doc}
+            "notes": notes, "charter": charter, "charter_doc": doc, "charter_text": charter_text}
 
 
 def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort, missing=(), rows=None,
@@ -264,16 +267,18 @@ def derive_effort_index(policy, roles, workflows, tool_root, target_root):
                                   for key, slot in lib.derive_stage_map(w).items()} for w in driven}}
 
 
-def render_roles_index(roles, harnesses, policy, manifest, effort):
+def render_roles_index(roles, harnesses, policy, manifest, effort, role_shas):
     """The index bytes: every role's `workflow`, `writes`, `agent`, `gates`, `layer` and `acts-as`
-    (TOOL-dBoundRoles-1 S6) and `shapes`, the kinds it runs in, a list (TOOL-dBoundRoles-16 S5), the
-    harness list, the gate manifest's path and `derive_effort_index`'s `effort`."""
+    (TOOL-dBoundRoles-1 S6), `shapes`, the kinds it runs in, a list (TOOL-dBoundRoles-16 S5), and
+    `role-sha`, its value in `role_shas` (TOOL-dBoundRoles-6 S5), the harness list, the gate manifest's
+    path and `derive_effort_index`'s `effort`."""
     allow = policy.get("gates", {})
     obj = {"effort": effort, "gates": {"manifest": manifest}, "harnesses": harnesses,
            "roles": {slot: {"acts-as": r["keys"].get("acts-as", ""),
                             "agent": r["keys"].get("agent", "true") == "true",
                             "gates": list(allow.get(slot, [])),
                             "layer": r["keys"].get("layer", ""),
+                            "role-sha": role_shas[slot],
                             "shapes": lib.parse_role_shapes(r["keys"].get("shapes")),
                             "workflow": r["keys"].get("workflow", ""),
                             "writes": r["keys"].get("writes", "")} for slot, r in roles.items()}}
@@ -363,9 +368,14 @@ def run_mode(mode, kit_dir, tool_root, target_root):
                 lib.resolve_role_model(slot, "claude-code", target_root, kit_dir))
         harnesses, absent = derive_harness_paths(cat["workflows"], tool_root, target_root)
         manifest = resolve_gate_manifest(tool_root, target_root)
+        # TOOL-dBoundRoles-6 S5: each role's `role-sha`, the hash of the `## Role` section a handoff of it
+        # carries, so the spawn guard compares a handoff with the role text its agent type was rendered from
+        role_shas = {slot: lib.derive_section_sha(lib.render_role_section(
+            kit_dir, slot, cat["memory_root"], cat["charter_text"], granted.get(slot, ()), rows))
+            for slot in cat["roles"]}
         rendered[INDEX_REL] = render_roles_index(
             cat["roles"], harnesses, cat["policy"], manifest,
-            derive_effort_index(cat["policy"], cat["roles"], cat["workflows"], tool_root, target_root))
+            derive_effort_index(cat["policy"], cat["roles"], cat["workflows"], tool_root, target_root), role_shas)
     except lib.RolesError as e:
         print("\n".join("render_agents: " + ln for ln in str(e).split("\n")), file=sys.stderr)
         return 2
@@ -403,12 +413,15 @@ def run_mode(mode, kit_dir, tool_root, target_root):
 
 
 def build_fixture(root, roles, policy=FIXTURE_POLICY):
-    """A catalogue in <root>: kit, overlays, policy, workflow table, conf, governing doc, stub harnesses."""
+    """A catalogue in <root>: kit, overlays, policy, work-order template, workflow table, conf, governing doc,
+    stub harnesses."""
     root = pathlib.Path(root)
     kit = root / FIXTURE_ROOT / KIT_DIR.name
     stubs = (root / FIXTURE_HARNESS.format(prefix=FIXTURE_ROOT)).parent
-    for d in (kit / "agents", kit / "house", stubs):
+    for d in (kit / "agents", kit / "house", kit / "templates", stubs):
         d.mkdir(parents=True, exist_ok=True)
+    # the work-order template, whose role part each role's `role-sha` hashes (TOOL-dBoundRoles-6 S5)
+    (kit / lib.WORK_ORDER_REL).write_text(lib.load_text(KIT_DIR / lib.WORK_ORDER_REL), encoding="utf-8")
     for slot, (extra, overlay) in roles.items():
         (kit / "agents" / (slot + ".agent.md")).write_text(
             "---\nname: %s\ndescription: d %s\ntools: Read, Write\nmodel: inherit\n%s---\n\n"
@@ -534,8 +547,8 @@ def check_ranked_arms(state, roles):
             plant = "\n".join(planted)
             m = handoff.MARKER_RE.search(plant)
             r, t = plant.index("\n## Role\n") + 1, plant.index("\n## Task\n") + 1
-            plant = plant.replace(m.group(0), m.group(0).replace(m.group("role_sha"), handoff.derive_section_sha(
-                plant[r:t])).replace(m.group("task_sha"), handoff.derive_section_sha(plant[t:])))
+            plant = plant.replace(m.group(0), m.group(0).replace(m.group("role_sha"), lib.derive_section_sha(
+                plant[r:t])).replace(m.group("task_sha"), lib.derive_section_sha(plant[t:])))
             path.write_text(plant, encoding="utf-8", newline="\n")
             ok, said = handoff.check_handoff(root, rel)
             want = "opens at level 0 after" if name == "reordered" else "has no closer"

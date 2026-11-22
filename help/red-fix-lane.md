@@ -41,8 +41,10 @@ these hold:
 
 So the lane stays open across the fix commit, and closes when a run records the leg green or the
 branch lands. A leg a pass-leg run holds stays eligible: a full bar's red at `HEAD` opens the
-lane. The gate itself writes nothing to the ledger. A spec write never reaches the lane, and a
-broken role index closes it.
+lane. The gate itself writes nothing to the ledger. A spec write never reaches the lane. A broken
+role index closes it, and so does a missing one where `.claude/agents/` still holds an agent file
+the roles kit rendered; a missing index in a repository that never adopted the roles kit leaves the
+lane open.
 
 ## What the commit owes
 

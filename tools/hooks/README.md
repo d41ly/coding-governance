@@ -265,8 +265,13 @@ scratch-guard's `resolveRoleRoot` and `loadRoleIndex`, so the two hooks read one
 When neither start lies in a checkout the rule adds nothing, and says so in one stderr line naming
 both when `CLAUDE_PROJECT_DIR` is set. Once read, the index is:
 
-- **absent** — no rule; every verdict is as before;
-- **broken** — every `Agent` and `Workflow` call is refused, naming the file;
+- **absent** — no rule, every verdict as before, in a tree that never adopted the roles kit; in a
+  GOVERNED tree, one whose `.claude/agents/` keeps a file whose front matter carries both
+  `workflow:` and `writes:` (scratch-guard's `checkRoleGoverned`), every `Agent` and `Workflow`
+  call is refused, naming the index and its re-render, `render_agents.py --write`
+  (TOOL-dBoundRoles-6 S3);
+- **broken** — every `Agent` and `Workflow` call is refused, naming the file; a role whose
+  `role-sha` is present and not 12 lowercase hex digits makes the index broken;
 - **no `agent`-true role** — every `Agent` call is refused as UNARMED; **an empty `harnesses`
   list** — every `Workflow` call is refused as UNARMED.
 
@@ -280,6 +285,13 @@ item=<item.step.name|-> path=<rel> role-sha=<12hex> task-sha=<12hex> -->`, its f
 (TOOL-dBoundRoles-17). That path is repo-relative under `builds/<build>/prompts/`; the file must hold
 the same single marker, and its section must hash to the marker's `task-sha`, so a file edited after
 rendering is refused too. A refusal names the first prompt line that differs; resend the file's bytes.
+Then the role text (TOOL-dBoundRoles-6 S6): the marker's `role-sha` is compared with the `role-sha`
+the index holds for that role, the hash `render_agents.py` writes of the `## Role` section the roles
+kit's `render_role_section` composes, the same section a handoff carries. An index holding no
+`role-sha` for the type refuses, naming the re-render of the index; a differing one refuses, naming
+both values, as `role-sha: the handoff was rendered from role text <marker's>, and <type> was rendered
+from <index's>; re-render the handoff`. So a handoff rendered before its role's text changed no longer
+spawns.
 Last, its `description`, ends trimmed, must be the spawn's name `handoff.py render` prints on stderr
 as `handoff: description — <name>`: `<build> · <unit> · <workflow>`, from the marker's build and unit
 and the index's `workflow` for that role, or `<build> · <workflow>` for a marker whose unit is `-`
@@ -294,10 +306,11 @@ ORDER: first, before rule 7. A throw inside the rule refuses.
 
 **What it does not stop**, said rather than implied: a hook-less or `--bare` run; the agents a running
 harness spawns through its own `agent()`, which is a runtime call and not a tool call; a
-session-to-session message; a hand-written prompt file that agrees with itself; a hand-edited
-index; a forged name, since any caller can copy the right one; and a harness agent's label, which
-its script sets inside a runtime call no hook sees. It never compares `role-sha` with the role an
-agent type was rendered from.
+session-to-session message; a hand-written prompt file that agrees with itself and copies the
+index's `role-sha`; an index edited by shell, since the write gate's step 5a refuses a tool write to
+it and the policy kit's commit guard a commit of it, never the shell write itself; a forged name,
+since any caller can copy the right one; and a harness agent's label, which its script sets inside a
+runtime call no hook sees.
 
 ## Rule 8 — the level a call runs at is its model's
 
@@ -444,7 +457,8 @@ read like the driver's. No other build's run-state file and no rotated `RUN.LAND
 **The order** is `checkRouted`'s comment, and it is the only statement of it. In short: a target in
 no repository, or in one whose common dir is not the session's (`CLAUDE_PROJECT_DIR`, else the
 payload `cwd`), is not gated, so a scratch clone's writes never meet its own conf; a repository with
-no conf admits with one witness line; a non-product write reads nothing past the conf. An absent
+no conf admits with one witness line; a non-product write reads nothing past the conf but step 5a's
+test of the role index's renders, below. An absent
 card, a card with no `## route`, and a route with no buildable unit each refuse with their own
 remedy — `manifest-check.sh --card --write --session <sid>`, `/session-kickoff`, or the status that
 admits. A card the replay wrote is read like any other.
@@ -485,8 +499,20 @@ in the status and date cells. That flip is admitted from the main loop on any sp
 `product` role on a spec its card's `## route` names; rev, tier, base, the tail and every section
 stay the spec-writer's.
 
-**Arming.** No index adds no arm, so a repository without the roles kit sees the route gate exactly
-as before. An index that cannot be read, is not JSON, or is not the shape
+**The renders are out of every writer's reach** (TOOL-dBoundRoles-6 S1). Step 5a of `checkRouted`,
+after the conf's arming and before the class step, refuses a tool write to the role index
+`.claude/roles.json`, and to `.claude/agents/<name>.md` where the index names the role `<name>`, for
+every writer, a role agent and the main loop alike, with `BLOCKED by scratch-guard: <target> is
+rendered by render_agents.py --write, and no writer edits it by hand`. An adopter's own file under
+`.claude/agents/`, named by no index row, keeps the verdict it had. The policy kit's
+`guarded-paths.txt` names the same renders, so its commit guard holds a shell write's commit.
+
+**Arming.** No index adds no arm in a repository that never adopted the roles kit, which sees the
+route gate exactly as before. In a GOVERNED tree, one whose `.claude/agents/` keeps a rendered gov
+agent file (`checkRoleGoverned(top)`: a `.md` file whose front matter carries both `workflow:` and
+`writes:`, the keys the roles kit's renderer writes and Claude Code's own agent files never carry),
+an absent index refuses every spec and product write, naming the index and its re-render
+(TOOL-dBoundRoles-6 S3). An index that cannot be read, is not JSON, or is not the shape
 `{ roles: { <name>: { writes, agent } }, harnesses: [...] }` refuses every spec and product write,
 naming the file. An index naming no `agent`-true role for a class refuses that class as UNARMED.
 Each refusal names the target, its class, the writer, the roles the index admits, the index, and the
@@ -494,8 +520,9 @@ route to such a role: render its handoff with `handoff.py render --role <name> -
 task` and pass the output as the prompt of an `Agent` call whose `subagent_type` is that role, or
 name the role in its harness's `roles` argument. A spec refusal also names the status flip.
 
-**Its ceiling**, beside the gate's: a Bash or PowerShell write is never seen; a hand-edited index is
-read like a generated one; a session launched AS a role carries that role's type. The `none`,
+**Its ceiling**, beside the gate's: a Bash or PowerShell write is never seen, the renders' included;
+a tree whose index and every rendered agent file were both deleted reads as never adopted; a session
+launched AS a role carries that role's type. The `none`,
 `review` and `records` write classes are declared in the index and graded by nothing here. A hook
 script is read afresh on every call, so the arm binds a session from its next write once the tree
 its hooks run from holds it.
@@ -525,7 +552,8 @@ refused, or answered any other value, leaves the refusal standing and appends it
 only where a red is open and the writer is one the lane admits: the ledger and the role index are
 read first, and with no red open, a broken index or any other writer the key is not read and no
 line is appended. A
-broken role index closes the lane. The key and the ledger are read on a would-be refusal only, and
+broken role index closes the lane, and so does an absent one in a governed tree (TOOL-dBoundRoles-6
+S3); an absent one in a tree that never adopted the roles kit admits as before. The key and the ledger are read on a would-be refusal only, and
 a spec write never reaches the lane. What it does not check: whether the write fixes the red, since
 any product path is admitted while any row is open and the commit grader bounds nothing here;
 whether a later commit of the branch already fixed the red, since a row at an unlanded ancestor
@@ -666,7 +694,8 @@ exit notification is the wait. A gate row refusing the same command wins. The ro
 The allowlist is the role index's `gates` list for that type, which the roles kit renders from the
 role's `gates` field, else the `[gates]` table of its policy file; a type the index does not name, `workflow-subagent` and every
 built-in among them, may run nothing. `checkRoleGate`'s comment is the ONE evaluation order. An absent
-index adds no arm; a broken one refuses a candidate; a manifest that does not read leaves G1 unarmed
+index adds no arm, except in a governed tree, where it refuses a candidate naming the index and its
+re-render (TOOL-dBoundRoles-6 S3); a broken one refuses a candidate; a manifest that does not read leaves G1 unarmed
 with one witness line, and G2 and G3 still bind; a throw inside the arm refuses a role agent. The
 refusal names the type, the simple command, the row, the leg, the allowlist and the index, and says
 to return the need and verify with a fixture or a probe of your own code.

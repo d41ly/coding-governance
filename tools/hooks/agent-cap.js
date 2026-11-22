@@ -20,12 +20,17 @@
  * `.claude/roles.json` at the checkout root of the payload `cwd`, else of `CLAUDE_PROJECT_DIR`
  * (TOOL-aOrientedCast-14; neither resolving adds no rule, with one stderr line when
  * `CLAUDE_PROJECT_DIR` is set), read through the sibling hook's `resolveRoleRoot` and `loadRoleIndex`:
- * absent adds no rule; broken refuses both tools; no `agent`-true role refuses every `Agent` call, and
+ * absent adds no rule, except in a governed tree, one whose `.claude/agents/` keeps a rendered role
+ * agent (the sibling's `checkRoleGoverned`), where it refuses both tools naming the re-render
+ * (TOOL-dBoundRoles-6 S3); broken refuses both tools; no `agent`-true role refuses every `Agent` call, and
  * an empty `harnesses` list every `Workflow` call, as UNARMED. An `Agent` call is admitted only when
  * its `subagent_type` is an `agent`-true role and its `prompt` is, line endings folded and its ends
  * trimmed, exactly one `gov:handoff` marker line naming that role, blank lines, and the `## Task`
  * section of the file the marker's `path` names under `builds/<build>/prompts/`, that file holding the
- * same single marker and a section whose SHA-256 prefix is the marker's `task-sha`, and its
+ * same single marker and a section whose SHA-256 prefix is the marker's `task-sha`, the marker's
+ * `role-sha` the one the index holds for that role, the hash of the role text its agent type was
+ * rendered from (TOOL-dBoundRoles-6 S6: an index holding none refuses naming the index's re-render, a
+ * differing one naming both values and the handoff's re-render), and its
  * `description`, ends trimmed, the name the renderer prints on stderr: `<build> · <unit> · <workflow>`
  * from the marker and the index's `workflow` for that role, the unit part left out for a `-` unit
  * (TOOL-aOrientedCast-27). That step stops a stale or freeform name, never a forged one. A `Workflow`
@@ -33,8 +38,8 @@
  * whose every value is an `agent`-true role. A throw inside it refuses.
  * CEILING, said rather than implied: it stops forgetting, not evasion. A hook-less or `--bare` run,
  * the agents a running harness spawns through its own `agent()`, a session-to-session message, a
- * self-consistent hand-written prompt file and a hand-edited index all pass it, and it never compares
- * `role-sha` with the role an agent type was rendered from.
+ * self-consistent hand-written prompt file whose marker copies the index's `role-sha`, and an index
+ * edited by shell, which the write gate's step 5a refuses only to a tool write, all pass it.
  *
  * RULE 8 (TOOL-aGuardedEffort-1) — the level a call runs at is the one the effort policy gives its
  * model. Armed by the index's `effort` key, which the roles kit's renderer writes with every level
@@ -648,8 +653,8 @@ const HANDOFF_MARK = 'gov:handoff'
 const HANDOFF_MARK_RE = /^<!-- gov:handoff role=(?<role>\S+) build=(?<build>\S+) unit=(?<unit>\S+)(?: item=(?<item>\S+))? path=(?<path>\S+) role-sha=(?<roleSha>[0-9a-f]{12}) task-sha=(?<taskSha>[0-9a-f]{12}) -->$/
 
 // Every line of `text`, carriage returns stripped, that is a whole marker line with its fields in
-// order: `{ line, role, build, unit, item, path, taskSha }` each, read by group name; `item` is the
-// field's string, `-` included, or null for a marker carrying none.
+// order: `{ line, role, build, unit, item, path, roleSha, taskSha }` each, read by group name; `item` is
+// the field's string, `-` included, or null for a marker carrying none.
 function extractHandoffMarker(text) {
   const out = []
   for (const raw of String(text).split('\n')) {
@@ -657,7 +662,7 @@ function extractHandoffMarker(text) {
     const m = HANDOFF_MARK_RE.exec(line)
     if (!m) continue
     const g = m.groups
-    out.push({ line, role: g.role, build: g.build, unit: g.unit, item: g.item === undefined ? null : g.item, path: g.path, taskSha: g.taskSha })
+    out.push({ line, role: g.role, build: g.build, unit: g.unit, item: g.item === undefined ? null : g.item, path: g.path, roleSha: g.roleSha, taskSha: g.taskSha })
   }
   return out
 }
@@ -741,7 +746,17 @@ function checkHandoffSpawn(data, index, root) {
   }
   const digest = buildTaskDigest(section)
   if (digest !== m.taskSha) return renderHandoffDeny('Agent', `${m.path}'s \`## Task\` section hashes to ${digest}, and its marker says task-sha=${m.taskSha}: the file was edited after rendering.`, index)
-  // TOOL-aOrientedCast-27 step 2.10 - after the digest, so the one remedy left is the description.
+  // TOOL-dBoundRoles-6 S6 - the role text: the marker's role-sha against the one the index carries for
+  // the type, the hash of the `## Role` section the renderer composes, so a handoff rendered from role
+  // text the agent type was not rendered from is refused. After the digest, before the description.
+  const indexed = index.roles[type]['role-sha']
+  if (indexed === undefined) {
+    return renderHandoffDeny('Agent', `role-sha: ${index.shown} holds no role-sha for ${type}; re-render the index with render_agents.py --write.`, index)
+  }
+  if (indexed !== m.roleSha) {
+    return renderHandoffDeny('Agent', `role-sha: the handoff was rendered from role text ${m.roleSha}, and ${type} was rendered from ${indexed}; re-render the handoff with handoff.py render, or the index with render_agents.py --write where the role's text moved after it.`, index)
+  }
+  // TOOL-aOrientedCast-27 step 2.10 - after the digest and the role text, so the one remedy left is the description.
   const workflow = index.roles[type].workflow
   if (typeof workflow !== 'string' || workflow === '') {
     return renderHandoffDeny('Agent', `${index.shown} declares no workflow for ${type}, so this spawn's name cannot be derived; re-render the role index.`, index)
@@ -1034,20 +1049,23 @@ function main() {
   if (!data || (data.tool_name !== 'Workflow' && data.tool_name !== 'Agent')) process.exit(0)
 
   // RULE 6 (TOOL-aOrientedCast-7) — first, so a call outside a declared harness is refused whatever its
-  // args. An absent `.claude/roles.json` at the role root adds no rule; a broken one, or a throw
-  // anywhere in the rule, refuses: a rule that cannot finish does not admit.
+  // args. An absent `.claude/roles.json` at the role root adds no rule, except in a governed tree, whose
+  // `.claude/agents/` keeps a rendered role agent, where it refuses (TOOL-dBoundRoles-6 S3); a broken
+  // one, or a throw anywhere in the rule, refuses: a rule that cannot finish does not admit.
   let index = null
   let root = null
   {
     let deny = null
     try {
       // TOOL-aOrientedCast-14: the root of the payload cwd, else of CLAUDE_PROJECT_DIR.
-      const { loadRoleIndex, resolveRoleRoot } = require(require('path').join(__dirname, 'scratch-guard.js'))
+      const { loadRoleIndex, resolveRoleRoot, checkRoleGoverned } = require(require('path').join(__dirname, 'scratch-guard.js'))
       const cwd = data.cwd || process.cwd()
       root = resolveRoleRoot(cwd, process.env)
       if (root) {
         index = loadRoleIndex(root)
-        if (index.state === 'broken') deny = renderHandoffDeny(data.tool_name, `the role index ${index.shown} ${index.why}; fix or regenerate it.`, null)
+        if (index.state === 'absent' && checkRoleGoverned(root)) {
+          deny = renderHandoffDeny(data.tool_name, `the role index ${index.shown} is absent while this tree carries rendered role agents; re-render it with render_agents.py --write.`, null)
+        } else if (index.state === 'broken') deny = renderHandoffDeny(data.tool_name, `the role index ${index.shown} ${index.why}; fix or regenerate it.`, null)
         else if (index.state === 'ok') deny = data.tool_name === 'Agent' ? checkHandoffSpawn(data, index, root) : checkHarnessCall(data, index, root)
       } else if (process.env.CLAUDE_PROJECT_DIR) {
         process.stderr.write(`agent-cap: rule 6 unarmed — neither the payload cwd ${cwd} nor CLAUDE_PROJECT_DIR ${process.env.CLAUDE_PROJECT_DIR} lies in a checkout, so no role index was read\n`)

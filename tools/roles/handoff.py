@@ -169,8 +169,7 @@ SLUG_RE = lib.SLUG_RE
 UNIT_RE = re.compile(r"^[A-Z]+-([A-Za-z]+)-[0-9]+$")
 READY_RE = re.compile(r"^(- )?READY — ")
 BLANK_EDGES_RE = re.compile(r"\A\s*\n|\n\s*\Z")
-WORK_ORDER = KIT_DIR / "templates" / "work-order.template.md"
-SLOT_RE = re.compile(r"<!-- slot: ([a-z-]+) -->")
+WORK_ORDER = KIT_DIR / lib.WORK_ORDER_REL
 MARKER_RE = lib.MARKER_RE
 ROLE_HEAD_RE, TASK_HEAD_RE = re.compile(r"^## Role$", re.M), re.compile(r"^## Task$", re.M)
 PROMPT_HEAD_RE = re.compile(r"^## The prompt[ \t]*$", re.M)
@@ -182,18 +181,13 @@ ROSTER_LINE_MAX = 200
 REACH_LINE = "load-set — reach · "
 #: The note a render prints where no policy kit answers `instructions.task-charter` (TOOL-dBoundRoles-15 §8 F2).
 TASK_CHARTER_NOTE = "instructions.task-charter unread: no policy kit; the single carry takes when-not-static"
-#: The ranked handoff (PLAY-dOrderedCharter-5 S2): the slot whose block leads the task part at level 0,
-#: its envelope's doc, and the task's own level and direction.
-LEAD_SLOTS = ("practices",)
+#: The ranked handoff (PLAY-dOrderedCharter-5 S2): the practices block's envelope doc, which leads the task
+#: part at level 0 as `lib.WORK_ORDER_LEAD_SLOTS` names it, and the task's own level and direction.
 PRACTICES_DOC = "%s#practices-at-%s"
 TASK_LEVEL = 6
 TASK_DIRECTION = "The task: this unit's goal, scope and acceptance; yields to levels 0 to 5"
 #: PLAY-dOrderedCharter-8 S7: the card file the kickoff checker renders into each session tree, at level 1
 CARD_FILE_REL = ".claude/orientation-card.md"
-#: The charter's drive section and its line, `- <stage> · <role> — <when>: `<command>``, as the playbook kit
-#: renders them; a kit imports no sibling, so the heading's opening is spelled again here.
-DRIVE_HEAD = "## Drive — "
-DRIVE_LINE_RE = re.compile(r"^- \S+ · (\S+) — ")
 #: `agents` (TOOL-aOrientedCast-20): the ledger's file-name tail, the value of a field nothing
 #: answers, and the tool uses whose paths a `returned` line counts as written.
 LEDGER_TAIL = "-agent-ledger.md"
@@ -499,54 +493,6 @@ def derive_prompt_name(prompts_dir, date, unit_id, role, tail=""):
                              role[4:] if role.startswith("gov-") else role, tail)
 
 
-def derive_section_sha(section):
-    """The first 12 lowercase hex digits of the SHA-256 of a section's bytes, CRLF folded to LF."""
-    return hashlib.sha256(section.replace("\r\n", "\n").encode("utf-8")).hexdigest()[:12]
-
-
-def render_work_order(fills, wraps=None):
-    """`(role_sec, task_sec)` of the work-order template: each paragraph kept, a slot line its fill, a slot
-    filled with nothing dropped, the two sections split at the template's own `## Task` line. A section
-    whose heading line `wraps` keys is ranked (PLAY-dOrderedCharter-5 S2): the fills of `LEAD_SLOTS`, each
-    already in its own lower-level envelope, open it, and the rest of its body follows inside the envelope
-    `(doc, level, direction)` the key names, every envelope under the heading."""
-    text = lib.load_text(WORK_ORDER).strip("\n")
-    task = TASK_HEAD_RE.search(text)
-    if not task:
-        raise lib.RolesError("%s carries no '## Task' line" % WORK_ORDER.as_posix())
-
-    def render_section(section):
-        paras, lead = [], []
-        wrap = (wraps or {}).get(section.strip("\n").split("\n", 1)[0])
-        for para in section.strip("\n").split("\n\n"):
-            slot = SLOT_RE.fullmatch(para)
-            if slot and slot.group(1) not in fills:
-                raise lib.RolesError("%s names the slot '%s', which no handoff fills"
-                                     % (WORK_ORDER.as_posix(), slot.group(1)))
-            (lead if slot and wrap and slot.group(1) in LEAD_SLOTS else paras).append(
-                fills[slot.group(1)] if slot else para)
-        paras = [p for p in paras if p]
-        if wrap:
-            rest = [lib.render_envelope(*wrap, "\n\n".join(paras[1:]))] if paras[1:] else []
-            paras = paras[:1] + ["\n".join(p.rstrip("\n") for p in lead + rest if p)]
-        return "\n\n".join(p for p in paras if p)
-
-    return render_section(text[:task.start()]) + "\n\n", render_section(text[task.start():]) + "\n"
-
-
-def extract_drive_lines(text, role):
-    """The charter's drive lines whose role is `role`: each `- <stage> · <role> — ` line of the section the
-    drive heading opens, as the playbook render composed it from the selected kits' `[[drive]]` rows
-    (PLAY-dOrderedCharter-6), so a subagent holds its role's lines as the main session does."""
-    out, inside = [], False
-    for line in text.replace("\r\n", "\n").split("\n"):
-        if line.startswith("## "):
-            inside = line.startswith(DRIVE_HEAD)
-        elif inside and DRIVE_LINE_RE.match(line) and DRIVE_LINE_RE.match(line).group(1) == role:
-            out.append(line.rstrip())
-    return out
-
-
 def render_card_block(root):
     """PLAY-dOrderedCharter-8 S7: `## Card`, holding the card file's first line, the `## route` section of
     what that line opens and its last line, the file's own envelope copied and never typed here; "" when
@@ -731,7 +677,6 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     if absent:
         opening += "\nNot supplied, optional: %s%s." % (
             ", ".join("`%s`" % k for k in absent), " — " + "; ".join(reasons) if reasons else "")
-    drive = extract_drive_lines(charter_text, role)
     step = reach[0][1].rsplit(".", 1)[1] if reach else None
     practices = ("### Practices at %s\n\n" % step + "\n".join(
         "- [%s] %s" % (tag.split(".")[1], text) for _reader, tag, text in reach)) if reach else ""
@@ -740,12 +685,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     rel = path.relative_to(root).as_posix()
     wraps = None
     if rows is not None:   # PLAY-dOrderedCharter-5 S2: each block in the envelope of its level
-        from render_agents import AGENTS_REL
         wraps = {"## Task": (rel, TASK_LEVEL, TASK_DIRECTION)}
-        agent = "%s/%s.md" % (AGENTS_REL, role)
-        row = lib.read_envelope_row(rows, agent, memory_root)
-        if row is not None:
-            wraps["## Role"] = (agent, row[0], row[1])
         row = lib.read_envelope_row(rows, doc, memory_root)
         if practices and row is not None:
             practices = lib.render_envelope(PRACTICES_DOC % (doc, step), row[0], row[1], practices)
@@ -753,12 +693,13 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     card_block = render_card_block(root)
     if card_block:
         practices = practices.rstrip("\n") + "\n\n" + card_block if practices else card_block
-    role_sec, task_sec = render_work_order({
-        "role": role_text.strip("\n")
-        + ("\n\n### Drive\n\n" + "\n".join(drive) if drive else ""), "opening": opening,
-        "reads": "\n\n".join(blocks), "practices": practices}, wraps)
+    # TOOL-dBoundRoles-6 S4: the role section is the library's one composition, the one the role index's
+    # `role-sha` hashes, with its drive lines and its agent file's envelope; the task part is the template's
+    role_sec = lib.render_role_section(KIT_DIR, role, memory_root, charter_text, granted.get(role, ()), rows)
+    task_sec = lib.render_work_order_section(WORK_ORDER, lib.extract_work_order_parts(WORK_ORDER)[1], {
+        "opening": opening, "reads": "\n\n".join(blocks), "practices": practices}, wraps) + "\n"
     marker = "<!-- gov:handoff role=%s build=%s unit=%s item=%s path=%s role-sha=%s task-sha=%s -->" % (
-        role, slug, unit or "-", item or "-", rel, derive_section_sha(role_sec), derive_section_sha(task_sec))
+        role, slug, unit or "-", item or "-", rel, lib.derive_section_sha(role_sec), lib.derive_section_sha(task_sec))
     head = "**Serves:** journal %s\n%s\n# %s handoff — %s\n\n%s\n\n" % (
         unit_id, "".join(g + "\n" for g in gaps), role, unit_id, marker)
     return path, head + role_sec + task_sec, marker + "\n\n" + task_sec
@@ -781,8 +722,8 @@ def check_handoff(root, path):
     if not task_m:
         return False, ["handoff: %s: no gov:handoff marker line followed by a '## Role' and a "
                        "'## Task' line" % rel]
-    role_sha = derive_section_sha(text[role_m.start():task_m.start()])
-    task_sha = derive_section_sha(text[task_m.start():])
+    role_sha = lib.derive_section_sha(text[role_m.start():task_m.start()])
+    task_sha = lib.derive_section_sha(text[task_m.start():])
     bad = ["handoff: %s: %s — the marker says %s, the file gives %s" % (rel, what, said, actual)
            for what, said, actual in (("role-sha", marker.group("role_sha"), role_sha),
                                       ("task-sha", marker.group("task_sha"), task_sha),

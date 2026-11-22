@@ -1435,6 +1435,31 @@ print(json.dumps(d))' "$type" "$tool" "$cmd" "$cwd")
 SG_K_HOOKS=hooks SG_K_GOVKIT=govkit SG_K_MEMORY_TREE=memory-tree SG_K_ROLES=roles
 SG_K_LEXICON=lexicon SG_K_WORKFLOWS=workflows SG_K_UNATTENDED=unattended
 write_gate_manifest kit/gate-legs.json
+# ---- TOOL-dBoundRoles-6: the renders out of every writer's reach (S1), and an index removed beside --
+# ---- its renders refused (S3) ---------------------------------------------------------------------
+# AC1 over the role-gate index, which names gov-builder: a tool write to the index, or to the agent file
+# of a role it names, refuses every writer at the write gate's step 5a, naming the renderer; an
+# adopter's own agent file keeps today's verdict. Neither path is routed nor a spec, so against
+# checkRouted with step 5a cut out the three exit-2 rows exit 0.
+SG_AGENTS="$SGWT/.claude/agents"
+mkdir -p "$SG_AGENTS"
+printf -- '---\nname: gov-builder\ndescription: d\nworkflow: build\nwrites: product\n---\nbody\n' > "$SG_AGENTS/gov-builder.md"
+run_edit "BR6-AC1 gov-builder's Edit of the role index -> deny naming render_agents.py --write" 2 "any;;.claude/roles.json;;render_agents.py --write" Edit "$SG_CWD_WT/.claude/roles.json" 'a>>b' session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+run_edit "BR6-AC1 the main loop's Edit of the role index -> deny naming render_agents.py --write" 2 "any;;.claude/roles.json;;render_agents.py --write" Edit "$SG_CWD_WT/.claude/roles.json" 'a>>b' session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "BR6-AC1 a Write to the agent file of a role the index names -> deny naming render_agents.py --write" 2 "any;;.claude/agents/gov-builder.md;;render_agents.py --write" Write "$SG_CWD_WT/.claude/agents/gov-builder.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "BR6-AC1 a Write to an adopter's own agent file, named by no index row -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/.claude/agents/adopter-own.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+# AC3 — the index removed while a rendered agent file remains: a spec write and a role agent's suite run
+# each refuse naming the absent index; with no rendered agent file, only an adopter's own, the same
+# payloads keep today's exits. Against an absent index read as no arm, the two exit-2 rows exit 0.
+write_roles absent
+run_edit "BR6-AC3 governed, no index: the main loop writes a spec -> deny naming the absent index" 2 "any;;$SG_ROLES_SHOWN;;is absent while this tree carries rendered role agents;;render_agents.py --write" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_role_bash "BR6-AC3 governed, no index: gov-builder runs a .test.sh suite -> deny naming the absent index" 2 "any;;is absent while this tree carries rendered role agents;;render_agents.py --write" gov-builder Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh"
+rm -f "$SG_AGENTS/gov-builder.md"
+printf -- '---\nname: adopter-own\ndescription: d\n---\nbody\n' > "$SG_AGENTS/adopter-own.md"
+run_edit "BR6-AC3 not governed, no index: the main loop writes a spec -> allow, stderr EMPTY" 0 empty Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_role_bash "BR6-AC3 not governed, no index: gov-builder runs a .test.sh suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh"
+rm -rf "$SG_AGENTS"
+write_gate_manifest kit/gate-legs.json
 # ---- AC1: the REFUSED payloads for gov-builder, each naming its row; the main loop's controls -----
 run_role_bash "G-AC1 the bar runner -> deny naming G2" 2 "any;;G2 runner;;gov-builder;;$SG_ROLES_SHOWN;;merge or push threshold" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh"
 run_role_bash "G-AC1 the bar under a GATE_ prefix -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "GATE_SELFTESTS=1 bash kit/$RUN_GATES/run-gates.sh"

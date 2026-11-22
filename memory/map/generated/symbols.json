@@ -5083,6 +5083,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkRenderedRole",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkRepoPath",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -5094,6 +5099,11 @@
     },
     {
       "id": "checkRoleGate",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkRoleGoverned",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -8513,9 +8523,19 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_render_paths",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
+    },
+    {
       "id": "check_render_settled",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "check_render_shape",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
     },
     {
       "id": "check_rendered",
@@ -13970,7 +13990,7 @@
     {
       "id": "derive_section_sha",
       "kind": "function",
-      "file": "tools/roles/handoff.py"
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "derive_sections",
@@ -15420,7 +15440,7 @@
     {
       "id": "extract_drive_lines",
       "kind": "function",
-      "file": "tools/roles/handoff.py"
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "extract_drive_region",
@@ -15736,6 +15756,11 @@
       "id": "extract_unlocated",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "extract_work_order_parts",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "extract_workflow_harnesses",
@@ -29643,6 +29668,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "render_role_section",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "render_roles_index",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
@@ -30073,9 +30103,9 @@
       "file": "tools/memory-tree/ratchet.py"
     },
     {
-      "id": "render_work_order",
+      "id": "render_work_order_section",
       "kind": "function",
-      "file": "tools/roles/handoff.py"
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "render_workflow",
@@ -31206,6 +31236,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
     },
     {
       "id": "resolve_kit_dir",

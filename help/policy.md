@@ -232,13 +232,16 @@ did not set. Its change record, under the build's `build/` folder, names the key
 component is not installed, `policy-file.proof = "signed"` say, is refused, or read as its default
 with one line saying so, as `policy-file.on-missing-expansion` says.
 
-**The guard.** This repository's pre-commit hook guards four paths, listed in
+**The guard.** This repository's pre-commit hook guards the paths listed in
 `tools/policy/guarded-paths.txt`:
 
 - `.governance/policy.toml`, the policy file;
 - `.governance/policy.json`, its JSON mirror;
 - `.governance/instructions.toml`, the instruction manifest;
-- `.governance/deploy.toml`, the deployer's answers.
+- `.governance/deploy.toml`, the deployer's answers;
+- `.claude/roles.json`, the roles kit's role index, and `.claude/agents/<role>.md`, one line per
+  agent role, the agent files the roles kit renders. A role added later is guarded once its line is
+  added to the list in the same commit as the role.
 
 - **The owner commits from a terminal.** A commit made at a terminal is the owner's proof, and the
   hook admits it, printing `policy guard — <paths> staged, admitted on the owner's terminal proof.`
@@ -261,7 +264,7 @@ with one line saying so, as `policy-file.on-missing-expansion` says.
   reason with the remedy; the minimal guard's own `policy-guard:` lines pass through.
 - **An agent may change the policy file one way: raise one measured-file cap.** One key under
   `[budgets]` whose name is the path of a tracked file, set to a larger whole number, and nothing
-  else in the four files changed. The commit must carry its argument and its record:
+  else among the guarded files changed. The commit must carry its argument and its record:
   - comment lines added directly above the cap, one of them `RAISED <old> -> <new>`;
   - at least one row added to `memory/DECISIONS.md`, with no row removed;
   - the change record naming `policy.budgets.<cap>`, and the `Gov-Policy:` trailer.
@@ -290,7 +293,17 @@ with one line saying so, as `policy-file.on-missing-expansion` says.
   commit of `.governance/policy.json` with neither of those two files staged beside it. The hook
   renders the mirror at `HEAD` itself and admits the staged one only when its bytes are that render,
   printing `policy-guard: admitted · .governance/policy.json · equals its render at HEAD`.
-- **An agent's commit on a live run's branch is admitted.** Any change to the four files that the
+- **An agent may commit the role renders as `render_agents.py --write` leaves them.** A commit whose
+  guarded paths are only `.claude/roles.json` and the listed agent files is admitted when each is
+  staged exactly as it stands in the working tree and `python tools/roles/render_agents.py --check`
+  exits 0, printing
+  `policy-guard: admitted · <paths> · each equals its render: render_agents.py --check exits 0`.
+  Stage the role file you changed beside them; it is not a guarded path. A hand edit is refused with
+  the check's `drift` line, a deleted or renamed render with `deleted or retyped`, a file changed
+  after staging with `the staged bytes are not its working-tree bytes`, and a tree with no roles kit
+  with `no roles kit to re-render it`. A render staged beside one of the four `.governance/` files
+  leaves this shape and is refused with them.
+- **An agent's commit on a live run's branch is admitted.** Any change to the guarded files that the
   shapes above would refuse is admitted when the branch being committed on is the `run-branch:` of
   an unattended run's run-state file, `builds/<slug>/RUN.md`, committed at `HEAD`, and that file's
   `phase:` at `HEAD` is not one of the `PHASES_TERMINAL` phases the unattended driver at `HEAD`
