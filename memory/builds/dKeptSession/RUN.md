@@ -140,3 +140,6 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T00:20:03Z brief · item KICK-dKeptSession-67 · reason 1f477ee42e08 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-67-build-brief.md
 
 2026-11-22T00:25:45Z dispatch · item 7d4c4653 KICK-dKeptSession-67 · reason tools/unattended/pass-tree.sh tools/unattended/pass-tree.test.sh tools/unattended/README.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-67-1-acceptance-ledger.md
+2026-11-22T00:41:20Z draw · re-dispatch · KICK-dKeptSession-16 · 10/132 · 20261122T004120Z-2e40a1
+
+2026-11-22T00:41:20Z dispatch · item 53d80cea KICK-dKeptSession-16 · reason tools/policy/catalogue.toml tools/policy/policy.py tools/policy/check_policy.py tools/policy/unpurposed-namespaces.txt tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-16-1-acceptance-ledger.md
