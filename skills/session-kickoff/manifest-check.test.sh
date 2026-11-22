@@ -1596,6 +1596,13 @@ check_eq "K2 AC2 the stdout names every miss" "4" "$(grep -c '^UNVERIFIED — ' 
 # AC6, the miss half: the stored annotations are skipped, the four misses are found again.
 run_card "K2 AC6 --card --check over an annotated card prints the misses and exits 1" "$CWT" 1 "UNVERIFIED — TOOL-zCardFixture-1 · line" --card --check --session "$K2A"
 check_eq "K2 AC6 --card --check reports each miss once, never its own annotation lines" "4" "$(grep -c '^UNVERIFIED — ' "$CARD_OUT")"
+# KICK-dKeptSession-13 S2: a `## pointers` section lacking a POINTER_LINES word is refused by that
+# word, one POINTERS line per word; the card is restored byte for byte after the arm.
+cp "$K2CARD" "$TMP/k2card.pointers.bak"
+printf '## pointers\nrecords — r\nitem — i\n' >> "$K2CARD"
+run_card "K13 --card --check names the pointers word the section lacks and exits 1" "$CWT" 1 "POINTERS — the '## pointers' section has no 'forks —' line, which POINTER_LINES lists" --card --check --session "$K2A"
+check_eq "K13 --card --check prints one POINTERS line per missing word" "1" "$(grep -c '^POINTERS — ' "$CARD_OUT")"
+cp "$TMP/k2card.pointers.bak" "$K2CARD"
 
 # The refusals: each leaves the card byte-identical. `run_card` feeds /dev/null, so every body
 # goes through the pipe form.
@@ -2494,7 +2501,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +5: RAISED by KICK-dKeptSession-13 S9 — the five plants it adds to `--list` (pointers-render,
 # pointers-boundary, pointers-at-transitions, pointers-cap, pointers-replay), one ok row each from the
 # loop above; no suite ran in the pass, each plant was run alone by direct CLI.
-FLOOR_ASSERTIONS=417
+# +2: RAISED by the red-fix arming KICK-dKeptSession-13's POINTERS refusal (the K13 run_card and its count).
+FLOOR_ASSERTIONS=419
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced
