@@ -24,6 +24,18 @@ You build ONE unit from its spec. The spec is the contract. This brief adds only
 - **Your commit.** Your pass commit ends with the charter's trailer,
   `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
 
+## This is the second pass
+
+- **The first pass diverged and committed nothing** (unit harness run `wf_13bf29df-96d`). Its rulings are in rev-6 of
+  your spec, from `2026-11-22-prompt-TOOL-dQuietDisk-9-divergence-task`. Read the rev-6 revision-log line first.
+- **Start from its patch.** Apply
+  `C:/Users/d41ly/AppData/Local/Temp/claude/b3f6db677b077b04/0840beea-0651-4dc3-9fe7-f227915b6b42/scratchpad/u9/TOOL-dQuietDisk-9-build.patch`
+  with `git apply`, then check every hunk against rev-6 rather than trusting it. Never apply
+  `TOOL-dQuietDisk-9-frozen-steps.patch`: the three step programs a landed row names stay byte-identical, and their two
+  cleanup sites become waived rows in `memory/project/cleanup-sites.txt`.
+- **The declared write set still names the three frozen programs.** Leave them untouched; a declared path you do not
+  write is no finding.
+
 ## Traps on this node
 
 - **Run no suite and no runner.** `run-gates.sh` and `run-selftests.sh` in any form, a fixture bar included, every

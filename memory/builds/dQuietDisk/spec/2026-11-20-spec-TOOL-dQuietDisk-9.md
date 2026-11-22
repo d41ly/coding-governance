@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-9 — every scratch path under one owned, swept root, and every tree removed by one chmod-and-retry helper
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base ebab8b90 · streams tooling · order 6 · closes TOOL-dQuietDisk-27 · ratified 2026-11-22
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base ebab8b90 · streams tooling · order 6 · closes TOOL-dQuietDisk-27 · ratified 2026-11-22
 
 <!-- gen:spec-records -->
 
@@ -14,6 +14,7 @@
 | [2026-11-22-prompt-TOOL-dQuietDisk-17-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-17-reground-task.md) | research | TOOL-dQuietDisk-17 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-9-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-9-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-9-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-9-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-9-divergence-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-9-divergence-task.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -66,7 +67,12 @@ that scratch instead of the real temp root.
 - **S3** — Every `shutil.rmtree(..., ignore_errors=True)` and every
   `TemporaryDirectory(..., ignore_cleanup_errors=True)` under `tools/`, `skills/` and `.githooks/`
   moves to `remove_tree` and `build_scratch_dir`. Every hand-written chmod-and-retry hook in those
-  trees moves to `remove_tree` too. Every file but `tools/lib/owned_scratch.py` carries the blocks
+  trees moves to `remove_tree` too. A program a landed `[[upgrade]]` row names in its argv is
+  excluded, because `tools/govkit/upgrade_steps.py#check_frozen` reds the `step-rows-frozen` leg on
+  any byte of it changing. At `ebab8b90b` that excludes three files under `tools/govkit/steps/`:
+  `conf_pins_to_ledger.py` and `registry_to_ledger.py` keep their one cleanup site each, which
+  enter `memory/project/cleanup-sites.txt` as waived rows with that reason, and
+  `kickoff_facts_to_overlay.py` keeps its hook. Every file but `tools/lib/owned_scratch.py` carries the blocks
   it calls inline, a gov-internal file included, as the copy rule in the design section states. Each
   Python suite entry point in that population, a file a gate leg's argv runs to execute arms, calls
   `init_owned_tempdir()` before its first scratch and before it builds a `TemplateCache`. Observed
@@ -92,12 +98,16 @@ that scratch instead of the real temp root.
   `git rev-parse --git-dir --git-common-dir` there gives both dirs, parsed by parameter expansion
   as the runner parses its facts
   (`tools/run-gates/run-gates.sh@7848b83f22c0:127-131`), and never by a loop. The common dir is
-  normalised by `cd` and `pwd` as `RG_COMMON` is (`:1113-1114`), and the health log comes from
-  `derive_health_log`. It writes the owner line and calls `scan_dead_work` there, before any mode
+  normalised to `RG_COMMON`'s form (`:1113-1114`) by `cd` and `$PWD` in the running shell, with no
+  subshell, and the health log comes from `derive_health_log`. It writes the owner line and calls `scan_dead_work` there, before any mode
   runs a row. The sweep root (`tools/run-gates/run-selftests.sh@c9d39e4a1284:1478`) becomes
   `$RS_SCRATCH/s` and the attribution scratch (`:2030`) becomes `$RS_SCRATCH/a`, each made by
   `mkdir`. The sweep mode's own `git rev-parse --git-dir` (`:1489`) takes the startup answer. S4
-  adds one command-substitution assignment and no loop fed by one. Observed by AC6 and AC7.
+  adds two command substitutions to `run-selftests.sh`, `$(git rev-parse --git-dir --git-common-dir)`
+  and `$(derive_health_log ...)`, and no loop fed by either. The second grows the
+  `spawn-idiom-sites` row `tools/run-gates/run-selftests.sh` `pure-fn-subst` (3 [PINNED at
+  `ebab8b90b`]) by one, which the main loop widens through `ratchet.py widen` after the pass.
+  Observed by AC6 and AC7.
 - **S5** — Four `PARITY_ROWS` rows join `tools/lib/resolve-python.test.sh`: one for each Python
   block and one for `owned_work_sh`. Observed by AC8.
 - **S6** — The lint. `tools/gate-lint/encoding_posture.py` gains a mode `--cleanup`, with its scan
@@ -150,8 +160,10 @@ that scratch instead of the real temp root.
   `mktemp -d` of each suite that carries the cache inline are removed by a trap and left by a kill.
   Under a bar or the self-test runner they already sit in an owned root. A direct run is G-C's
   unrooted-`mktemp` clause, ask TOOL-dQuietDisk-23, as are the leftovers the design section counts.
-- No cleanup ledger seeded with today's sites. S3 moves every one, so the ledger starts with its
-  header and no row.
+- No movable site seeded into the cleanup ledger. S3 moves every one, so the ledger holds only the
+  two frozen step programs' waived rows.
+- No successor step programs. Retiring the landed rows to new programs is a separate mechanism this
+  unit does not need, and two waived rows cost nothing.
 - The other G-C lint clauses: `git init` outside the template helper, a spawn inside a loop body,
   `copytree` of a kit, `clone --no-hardlinks` and an unrooted `mktemp`. They are TOOL-dQuietDisk-23.
 - No kit version bump by hand: `govkit.py mint` writes every owed bump at the lander.
@@ -222,7 +234,7 @@ to 4 added `tools/lib/template_cache.py` and `tools/lib/history_store.py` with i
 at `b3f5a2bc3` [PINNED], among them `tools/memory-tree/deviation_join.py#remove_tree`,
 `tools/govkit/upgrade_walk.py#remove_tree`, `tools/govkit/step_gate.py` and
 `tools/lib/commit_trailers.py`. The builder re-runs the predicate at the pass's own base with
-`--cleanup --measure` and moves what it prints. figure: DERIVED at the pass's base; the table is
+`--cleanup --measure` and moves what it prints outside the frozen step programs. figure: DERIVED at the pass's base; the table is
 PINNED at the four shas named.
 
 ### The copy rule
@@ -330,13 +342,12 @@ never a leg or a verdict. `GATE_AMBIENT_TMP` stays as that census classes it, as
 new row for `tools/lib/owned-scratch.sh` grow only through
 `python tools/memory-tree/ratchet.py widen shell-role`, which the main loop runs after the pass
 
-Plus every file the predicate and the hook grep name at the pass's base. At `ebab8b90b` those are
-46 files [PINNED]:
+Plus every file the predicate and the hook grep name at the pass's base, less the frozen step
+programs. At `ebab8b90b` those are 43 files [DERIVED: the 46 both greps name, less three]:
 
 `.githooks/pre_push_bar_selftest.py` · `tools/branch-reconcile/selftest.py` ·
 `tools/govkit/fixture_target.py` · `tools/govkit/selftest.py` · `tools/govkit/step_gate.py` ·
-`tools/govkit/steps/conf_pins_to_ledger.py` · `tools/govkit/steps/kickoff_facts_to_overlay.py` ·
-`tools/govkit/steps/registry_to_ledger.py` · `tools/govkit/upgrade_steps.py` ·
+`tools/govkit/upgrade_steps.py` ·
 `tools/govkit/upgrade_walk.py` · `tools/lexicon/selftest.py` · `tools/lib/commit_trailers.py` ·
 `tools/lib/history_store.py` · `tools/lib/template_cache.py` ·
 `tools/loop/claims.py` · `tools/loop/factories.py` · `tools/memory-recall/check-recall.py` ·
@@ -374,6 +385,7 @@ that stages them re-stamps the manifest's `last-audit`.
 | One sweeper for both pid kinds in bash | MSYS `kill -0` reads a native pid as dead. |
 | An owned root per self-test runner mode | One startup root covers every mode. |
 | `onerror` below 3.12 | The floor is 3.15: dead code. |
+| Successor programs for the frozen steps | A second mechanism, `[[retired]]` rows and new programs, for two sites (YAGNI). |
 
 ## 5. Production-readiness checklist
 
@@ -426,14 +438,17 @@ that stages them re-stamps the manifest's `last-audit`.
   so the common dir reads empty, it removes none of the four.
   Red when: a live, foreign or bash-owned root is removed, or an empty common dir sweeps.
 - **AC4** — When `python tools/gate-lint/encoding_posture.py --cleanup --measure . tools skills .githooks`
-  runs at the unit's tip, it prints no `cleanup` line. Run over a fixture tree holding one planted
+  runs at the unit's tip, it prints two `cleanup` lines, naming `conf_pins_to_ledger.py` and
+  `registry_to_ledger.py`, and the `cleanup-sites` ledger holds those two waived rows, each with its
+  reason. Run over a fixture tree holding one planted
   `shutil.rmtree(p, ignore_errors=True)` split over two lines, it prints one `cleanup` line naming
   that file. `grep -n "cleanup posture" tools/gate-legs.json tools/govkit/registry.toml` prints the
   leg's rendered and `[[exempt_leg]]` rows, and
   `grep -n "cleanup-sites" tools/gate-lint/kit.toml .memory-tree.conf tools/memory-tree/convert_registry.py`
   prints a line from each file. When the main loop runs the new leg, the graded run with the
   registry argument, at the close, it exits 0 at the tip and 1 with the planted call.
-  Red when: a split call is missed, a site survives the move, or the leg is not rendered.
+  Red when: a split call is missed, a site outside the two frozen programs survives the move, a
+  frozen program changes a byte, or the leg is not rendered.
   permission: the graded run is the new leg's argv, the main loop's (scratch-guard row G1); the
   pass makes the `--measure` runs and the greps.
 - **AC5** — When every Python file S3 touched compiles under `python -m py_compile`, and AC2's probe
@@ -526,12 +541,13 @@ their lines and their sweep of this repository's roots (AC6, AC7), widened only 
 
 ## 7. Gates
 
-`encoding posture (text IO names its encoding)` · `pre-push self-test` · `pre-push bar self-test` · `shell-hygiene selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates turnstile` · `run-gates evidence` · `run-gates canary` · `run-gates gov canary` · `run-gates run-log line` · `pre-push run-log line` · `measure-legs selftest` · `run-selftests self-test` · `scratch-guard self-test` · `selftest harness self-test` · `history-store selftest` · `routed-commits selftest` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `tier2-review self-test` · `codebase-map kit selftest` · `recall floor` · `recall floor arms` · `memory-recall kit selftest` · `process-monitor census selftest` · `runlog selftest` · `branch-reconcile selftest` · `lexicon selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
+`ratchet (populated)` · `step-rows-frozen` · `encoding posture (text IO names its encoding)` · `pre-push self-test` · `pre-push bar self-test` · `shell-hygiene selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates turnstile` · `run-gates evidence` · `run-gates canary` · `run-gates gov canary` · `run-gates run-log line` · `pre-push run-log line` · `measure-legs selftest` · `run-selftests self-test` · `scratch-guard self-test` · `selftest harness self-test` · `history-store selftest` · `routed-commits selftest` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `tier2-review self-test` · `codebase-map kit selftest` · `recall floor` · `recall floor arms` · `memory-recall kit selftest` · `process-monitor census selftest` · `runlog selftest` · `branch-reconcile selftest` · `lexicon selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
 
 New arm: tools/gate-lint/encoding_posture.py · covers AC4 AC9 · the --cleanup mode's selftest rows; a planted swallowing removal split over two lines, and a TemporaryDirectory with ignore_cleanup_errors, each staged in a fixture tree · FLOOR_ASSERTIONS rises by the rows added
 New arm: tools/lib/resolve-python.test.sh · covers AC8 · the four new PARITY_ROWS rows; each failing case is staged by one changed byte in a copy · none
 
-The new cleanup leg itself is declared in `tools/govkit/registry.toml` and rendered into
+The new cleanup leg, `cleanup posture (a tree removal that swallows its error)`, unrendered until
+this unit builds, is declared in `tools/govkit/registry.toml` and rendered into
 `tools/gate-legs.json`, and its RED and GREEN observation at the close is the main loop's, as are
 the suite runs of AC5 and the fixture bars of AC10 and AC11. The bar runs once at the close.
 
@@ -591,6 +607,15 @@ the suite runs of AC5 and the fixture bars of AC10 and AC11. The bar runs once a
   row (AC4). The design section states the saving measured and the git processes added. F1 was
   resolved (b) by the main loop under the run's mandate, adding S9 and AC13, and
   TOOL-dQuietDisk-17's retirement leaves `selftest.py` as units 18 and 11 left it.
+- rev-6 · 2026-11-22 · the first build pass's divergences, ruled under
+  `2026-11-22-prompt-TOOL-dQuietDisk-9-divergence-task`. S3 excludes every program a landed
+  `[[upgrade]]` row names, which `check_frozen` freezes: three step programs leave the file list,
+  their two cleanup sites become the ledger's two waived rows, and the kickoff step's hook stays,
+  so section 3, AC4 and the alternatives follow. S4 states its two command substitutions and the
+  `pure-fn-subst` row the second grows. Section 7 names the cleanup leg, `ratchet (populated)`,
+  which the ledger now populates, and `step-rows-frozen`. Kit versions still move only at the
+  close's mint. The next pass builds on `TOOL-dQuietDisk-9-build.patch`, 56 files [PINNED, the
+  divergence task's count]; the record keeps `TOOL-dQuietDisk-9-frozen-steps.patch`, not applied.
 
 ## 10. Reuse audit
 
