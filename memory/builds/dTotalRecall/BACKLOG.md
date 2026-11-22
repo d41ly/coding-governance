@@ -33,7 +33,7 @@
 - SEV · TOOL-dTotalRecall-30 · LOW · a record write that skips the feed passes the census
 - DEFERRED · TOOL-dTotalRecall-30 · until TOOL-dTotalRecall-24 · TOOL-dTotalRecall-24's build run extends `scan_feed_writers` and `check_feed` to record commits, so the two specs agree there at the latest (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dTotalRecall-31 · LOW · the README's relation keys sit outside the edge registry that types them
-- DEFERRED · TOOL-dTotalRecall-31 · until TOOL-dTotalRecall-6 · TOOL-dTotalRecall-6's build run adds the table and widens the rows per its deviation 61, so the two specs agree there at the latest (the spec run carries it forward with the unit it waits on)
+- CLOSED · TOOL-dTotalRecall-31 · by TOOL-dTotalRecall-6 · the README's relation keys are typed by the `[[front-matter]]` table in `tools/playbook/edges.toml`, with `implements`, `amends` and `supersedes` taking a build and `patches` a family id — closed by TOOL-dTotalRecall-6 (`ce198f660`); its deviation 62 states the rows
 - SEV · TOOL-dTotalRecall-32 · LOW · an edge type with no declared cardinality is never checked after a merge
 - DEFERRED · TOOL-dTotalRecall-32 · until TOOL-dTotalRecall-22 · TOOL-dTotalRecall-22's build run requires the key per its deviation 221, so the two specs agree there at the latest (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dTotalRecall-33 · LOW · one name answers two questions in one kit
