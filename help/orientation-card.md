@@ -128,6 +128,7 @@ records — journal memory/builds/dExample/build/2026-10-27-build-KICK-dExample-
 forks — memory/builds/dExample/spec/2026-10-27-spec-KICK-dExample-3.md §8
 item — item.build.base@KICK-dExample-2#3f9c2a71 · at 8c1e0b42
 budget — open 3/10
+mail — 6299617af701
 ```
 
 - `records —` names the build's newest record of each kind, one per kind, read by the memory-tree
@@ -143,6 +144,10 @@ budget — open 3/10
   `unfrozen` one not yet frozen at the end of design. Only you, the owner, raise the budget;
   nothing on the card does. With no loop kit in the repository it reads `budget — skipped:
   no loop kit`, which hides the budget rather than showing it as zero.
+- `mail —` names each open message addressed to the build or one of its units, by id, the unattended
+  driver's `--mail read <slug> --open --ids`, or `none`. An open message holds the build's moves until
+  it is answered or acknowledged ([the loop's moves](loop.md)). With `RUN_CLAIMS` off it reads
+  `mail — skipped: RUN_CLAIMS is off`, never `none`.
 
 A line whose source does not answer reads `<word> — skipped: <why>`. `manifest-check.sh --card
 --check` refuses a stored section missing one of its lines and names `--card --pointers`, which

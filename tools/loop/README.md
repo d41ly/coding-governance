@@ -64,6 +64,18 @@ row declaring `outcomes = "dispositions"` takes the set above, and any other row
 as `ratified` and `rejected`. `check_disposition_record` is that join. It answers `None` for an item
 the definition does not declare, which a caller prints as `unarmed`.
 
+## The mail kinds
+
+`[mail]` holds the mailbox's one closed kind set (KICK-dKeptSession-5 S3), the words a message's `kind`
+may be: `confirm-request`, `confirmed`, `changed`, `overlap`, `takeover`, `landed`, `question`,
+`answer`, `ack`, `intake`, `withdrawn` and `superseded`. `check_loop` grades its `kinds` where the table
+is present as it grades the disposition set: an empty list, a word given twice or one outside a tag
+segment's shape refuses the definition. `read_mail_kinds` returns the members, LoopError where the
+table is absent, and `loop_lib.py --mail-kinds` prints one per line, exit 0, or `loop: <why>`, exit 1.
+The unattended kit's `--mail post` runs that verb and refuses any other kind before it writes; the
+`mail-kinds-repeated` plant holds the grade. An `answer` or an `ack` is a reply: it decides another
+message's state and never waits itself.
+
 ## The item programs
 
 Each gov step is a program of items (TOOL-dDeclaredLoop-12): one `[[item]]` row per item, after every
@@ -383,7 +395,19 @@ and `scenario` and `scenario-settled`, the build's scenarios and any conflict se
 the writer derives through `scenario.py`'s `derive_move_scenarios` and refuses from a `--field` too, and
 `budget` and `draw`, `BUDGET_FIELDS`, a move's rework budget rows, which the writer derives through
 `budget.py`'s `render_budget_fields` where a set without `log` leaves the build no record, and refuses
-from a `--field` as well.
+from a `--field` as well, and `disposed`, the mail the move disposed, derived and refused as they are.
+
+**The mail guard** (KICK-dKeptSession-5 S9, S10). After the set is read and before `derive_move`, the
+writer runs the unattended kit's `--mail read <slug>` once, `read_mail_rows`, under
+`MAIL_GUARD_SECONDS`, its bash the inline resolver's. A row reading `open`, a message addressed to the
+build or one of its units neither answered nor acknowledged, raises `MailHeld`, a `TransitionRefused`
+printed `refused — <slug> · mail open <id> …`, exit 1, writing nothing; `claim.py` catches it before a
+row miss and prints `claim held`. `mail — off`, no unattended kit, or a repository with no
+`.unattended.conf` pass with one `loop: mail · unarmed · <why>` line; a driver no bash sees, a read
+silent within the bound, or a non-zero read with no row is `mail unknown`, exit 2. Past the guard each
+`answered`, `acked` or `expired` row no earlier move names is written into `disposed=<id>+<id>`, and
+where the set holds `log`, `write_mail_records` writes one `mailbox-message` record per id, its fields
+and its body in one `~~~~` block, after the move's own record and in its commit.
 
 `record` (`write_transition`) answers the move by `derive_move` first, so a move no row holds prints
 `refused` and writes nothing; it resolves the witness to HEAD or its ancestor, refuses a staged index,
@@ -400,7 +424,8 @@ kit takes no edge to it. `--fixture --plant <case>` runs both over a scratch rep
 `subset-trailer-line`, `subset-log`, `empty-set`, `log-drift`, `orphan-log`, `no-row`, `line-drift`,
 `pre-spec`, `field`, and the two over `BACKWARD_MOVES`, three moves forward and three back:
 `backward-rows`, printing each trailer and read with its direction, and `skip-backward`, the newest
-record deleted so the check names the move back owing it. `check --selftest` holds the tree's own definition, then runs every plant, and
+record deleted so the check names the move back owing it; and `mail-open` and `mail-disposed`, the
+driver's conf and a bare remote holding an open question, then its `ack`. `check --selftest` holds the tree's own definition, then runs every plant, and
 is gov's `loop transition record` leg.
 
 ```bash

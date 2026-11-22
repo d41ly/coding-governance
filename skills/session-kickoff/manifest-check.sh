@@ -316,7 +316,7 @@ CARD_BUDGET_BOUND=${CARD_BUDGET_BOUND:-10}
 CARD_CONTEXT_BOUND=${CARD_CONTEXT_BOUND:-5}
 # The lines a stored `## pointers` section holds, the one list `check_card_pointers` reads: each later
 # session unit appends its own word (KICK-dKeptSession-26 `budget`, KICK-dKeptSession-5 `mail`).
-POINTER_LINES="records forks item budget"
+POINTER_LINES="records forks item budget mail"
 # The `claims —` cell's three constants (TOOL-aGraftedHelix-2): the read's bound in seconds, the
 # second clock's hide age, and the row cap. The bound's env override exists for the self-test's
 # slow-driver arm, as CARD_CAP_BYTES's does; none of the three is an adopter knob.
@@ -2381,6 +2381,8 @@ write_card_follow() { # slug · state · terminal 0|1 -> its card — lines; 0 a
 #   item — <instance key|none> · at <sha8>   the boundary's answer and the HEAD it was derived at
 #   budget — <answer>                the build's rework budget, the loop kit's `budget.py state --build
 #                                     <slug>` line as it prints it, under CARD_BUDGET_BOUND (KICK-dKeptSession-26)
+#   mail — <id> <id> …|none          the build's open mail, the unattended driver's `--mail read <slug> --open
+#                                     --ids`, under CARD_CLAIMS_BOUND (KICK-dKeptSession-5 S13)
 # A source that does not resolve is its line's `<word> — skipped: <why>`, the `item —` line still ending
 # ` · at <sha8>`. THE ITEM BOUNDARY, I12, is the loop kit's `position.py <slug> --boundary <pointer>`, run by
 # `run_item_boundary` under CARD_POSITION_BOUND, once per process: its file is kept for every later write.
@@ -2438,7 +2440,7 @@ render_pointers() { # slug · boundary file -> the section on stdout; 0 always
     "boundary — none crossed · item "*) item=${b#boundary — none crossed · item }; item=${item%% · *} ;;
     "boundary — "*" → "*) item=${b##* → } ;;
     *) printf 'forks — skipped: %s\n' "${b:-no boundary was read}"
-       printf 'item — skipped: %s · at %s\n' "${b:-no boundary was read}" "$at"; render_budget_line "$1"; return 0 ;;
+       printf 'item — skipped: %s · at %s\n' "${b:-no boundary was read}" "$at"; render_budget_line "$1"; render_mail_line "$1"; return 0 ;;
   esac
   ids=$(sed -n 's/^forked — //p' "$2" | head -n 1)
   memroot=$(read_memory_root) || memroot=""
@@ -2454,6 +2456,29 @@ render_pointers() { # slug · boundary file -> the section on stdout; 0 always
   fi
   printf 'item — %s · at %s\n' "$item" "$at"
   render_budget_line "$1"
+  render_mail_line "$1"
+}
+
+# The section's `mail —` line (KICK-dKeptSession-5 S13): the build's open messages, the unattended driver's
+# `--mail read <slug> --open --ids` run through `run_driver_bounded` under CARD_CLAIMS_BOUND, its one line
+# read: `mail — <id> <id> …` or `mail — none`; `mail — skipped: RUN_CLAIMS is off` where the driver
+# answers `mail — off`; `mail — skipped: <why>` for no driver, the bound passed or a non-zero exit. No
+# replay line is added: the line prints inside the stored card. WHAT THIS DOES NOT CHECK: a message
+# posted after the render; the line is as fresh as the section's last write.
+render_mail_line() { # slug -> one mail — line on stdout; 0 always
+  local o="$CARD_TMP/pointers.mail" rc a
+  run_driver_bounded "$CARD_CLAIMS_BOUND" "$o" /dev/null --mail read "$1" --open --ids; rc=$?
+  if [ "$rc" = 125 ] && [ -n "$CARD_REF_WHY" ]; then printf 'mail — skipped: %s\n' "$CARD_REF_WHY"; return 0; fi
+  a=$(tr -d '\r' < "$o" 2>/dev/null | LC_ALL=C awk 'NF { print; exit }')
+  rm -f "$o" 2>/dev/null
+  case "$rc:$a" in
+    124:*|137:*) printf 'mail — skipped: --mail read did not answer within %ss\n' "$CARD_CLAIMS_BOUND" ;;
+    "0:mail — off") printf 'mail — skipped: RUN_CLAIMS is off\n' ;;
+    0:mail\ —\ *|0:) printf 'mail — skipped: --mail read printed no ids: %s\n' "${a:0:160}" ;;
+    0:*) printf 'mail — %s\n' "${a:0:160}" ;;
+    *) printf 'mail — skipped: --mail read exited %s: %s\n' "$rc" "${a:0:160}" ;;
+  esac
+  return 0
 }
 
 # The section's `budget —` line (KICK-dKeptSession-26 S1): the one line the loop kit's `budget.py state

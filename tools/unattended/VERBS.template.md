@@ -590,6 +590,39 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `register — not written · <why>`, `register — refused <subject|decision key> over <n> bytes
   encoded` or `register — off` (exit 2). Dark behind `RUN_CLAIMS` like every claim; no entry is
   ever deleted or rewritten. It takes no slug.
+- `--mail` — the mailbox per build, three verbs. `--mail post <slug> --to <recipient> --kind <kind>
+  --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] <body file>` appends ONE
+  message to this session's own ref, `refs/gov/mail/<slug>/<fleet tag>/<session>`, the slug the
+  sender's build, so writers never contend: one commit per post on the ref's previous tip under the
+  `gov-claim` identity, a session's first post parentless, written by compare-and-swap. The kind is
+  one of the loop kit's closed `[mail]` set, `confirm-request`, `confirmed`, `changed`, `overlap`,
+  `takeover`, `landed`, `question`, `answer`, `ack`, `intake`, `withdrawn` and `superseded`, as its
+  `loop_lib.py --mail-kinds` prints them; the recipient is one of four forms, `build:<slug>`,
+  `unit:<id>`, `node:<fleet tag>` or the bare word `project`. The id is `derive_message_id` called
+  over eight fields in order: the build, the item's instance key, the pass, the kind, the subject,
+  the id it answers, the recipient and the content key (`none`), each absent one `none`; no session
+  and no time is a field, so a retried post carries the id of the post it retries and is refused as
+  a duplicate across the build's session refs. The record is `gov-mail <slug>/<id>`, a blank line,
+  the keys `id`, `build`, `from-tag`, `from-session`, `to`, `kind`, `item`, `pass`, `subject` and
+  `answers`, a blank line and the body, refused over 4096 bytes (PINNED) or carrying a NUL or a
+  control byte other than tab and newline, or holding a line the record factory would read as a
+  field or its `~~~~` fence. It prints ONE line: `mail — posted <id> · <ref>` (exit 0); `mail —
+  duplicate <id> · <ref>` or `mail — lost <id> · <ref> · <why>` (exit 1); or `mail — not written ·
+  <why>`, `mail — not written: no session id` or `mail — off` (exit 2). `--mail read <who> [--open]
+  [--ids]` reads a build's mailbox, `<who>` a slug, read as `build:<slug>`, or one of the recipient
+  forms: one bounded, pruned fetch of every build's mail refs into this node's cache, then one TAB
+  row per message addressed to `<who>`, a build reading its units' messages too: `id`, `kind`, `to`,
+  `state`, `first-seen`, `from-build`, `subject`, `answers`, `ref`, `commit` and `reply`, one id held
+  on two refs shown once at its earliest sighting. The four states: `reply` for an `answer` or an
+  `ack`, which never waits; `answered` where an `answer` names the id; `acked` where an `ack` does
+  and no `answer`; `open` otherwise; `reply` names the message that decided the state. `--open`
+  prints only the open rows and `--ids` their ids on one line, or `none`. A failed fetch prints
+  `mail — local copy: <why>` and reads the cache (exit 0); a refused read exits 2. `--mail ack <slug>
+  <id>` posts an `ack` from `<slug>` answering `<id>` to its sender's build, with its subject and an
+  empty body, exit 2 where `<id>` is no row addressed to `<slug>`, else the post's exits. A build's
+  transition is refused while a message addressed to it reads `open`, and the move disposes each
+  answered or acknowledged message once (the loop kit's `loop_transition.py`). Dark behind
+  `RUN_CLAIMS`: a post or an ack prints `mail — off` and exits 2, a read prints it and exits 0.
 - `--card-ref` — `--card-ref write <slug> --message <file>`, the build card's ref on the remote,
   written for the kickoff engine's `remote-ref` card store, which calls it bounded with the commit
   message it rendered in the file (TOOL-dPlacedRequest-33). Dark behind `RUN_CLAIMS`: while the

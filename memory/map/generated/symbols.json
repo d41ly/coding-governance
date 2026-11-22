@@ -258,6 +258,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "MailHeld",
+      "kind": "class",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "MapError",
       "kind": "class",
       "file": "tools/codebase-map/map_lib.py"
@@ -3361,6 +3366,11 @@
       "id": "build_gov_index",
       "kind": "function",
       "file": "tools/govkit/census.py"
+    },
+    {
+      "id": "build_gov_message",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "build_grade_row",
@@ -13118,6 +13128,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "derive_mail_ref",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_manifest_kind",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -20378,6 +20393,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_mailbox",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_measure",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
@@ -24231,6 +24251,31 @@
       "id": "read_loop_guard",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "read_mail_kinds",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "read_mail_refs",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_mail_rows",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "read_mailbox",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_mailbox_message",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "read_manifest",
@@ -29233,6 +29278,11 @@
       "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
+      "id": "render_fixture_mail",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "render_fixture_row",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -29496,6 +29546,11 @@
       "id": "render_loop_order",
       "kind": "function",
       "file": "tools/loop/composition.py"
+    },
+    {
+      "id": "render_mail_line",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "render_malformed",
@@ -35193,6 +35248,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_mail_arm",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_main",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -38476,6 +38536,11 @@
       "id": "seed_loop_kit",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "seed_mail_at",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "seed_mirror_absent",
@@ -41973,6 +42038,11 @@
       "file": "tools/loop/loop_transition.py"
     },
     {
+      "id": "write_card_mail",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
       "id": "write_card_parts",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -43176,6 +43246,26 @@
       "id": "write_loop_plant",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "write_mail_ack",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_mail_post",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_mail_records",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "write_mail_ref",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_manifest",

@@ -276,6 +276,12 @@ means = "ask"
 word = "refuse-as-duplicate"
 means = "continue"
 
+# The mailbox's one closed kind set (KICK-dKeptSession-5 S3): the words a message's `kind` may be,
+# checked by the unattended driver's `--mail post` before any commit, read through `read_mail_kinds`.
+[mail]
+kinds = ["confirm-request", "confirmed", "changed", "overlap", "takeover", "landed", "question", "answer", "ack",
+         "intake", "withdrawn", "superseded"]
+
 [[checklist]]
 registry = "DOD_CORE"
 handle = "gates-green"
