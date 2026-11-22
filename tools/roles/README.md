@@ -71,7 +71,9 @@ rows` output, followed by `UPSTREAM_CONTRACT`, the line each row id is answered 
 `upstream:rows?`, since only an item naming upstream items is handed rows; `--upstream` for a role not
 reading it is refused, and an empty rows file supplies nothing. A required key
 that resolves to nothing, an empty value or a placeholder refuses by name and writes nothing; an
-optional one is named on the task block's `Not supplied` line.
+optional one is named on the task block's `Not supplied` line. A key may be spelled as its tag,
+`field.task.title` for `task:title`, which `roles_lib.parse_read_key` folds to the native key before R3,
+the render or its `--input` check reads it, so the block keeps its native heading (TOOL-dBoundRoles-14).
 
 The card is `--card`, else the file the kickoff checker's `--card --path` prints for
 `CLAUDE_CODE_SESSION_ID`, so the card's location stays that checker's rule. The brief record is
@@ -462,16 +464,16 @@ else; the check compares the two on every run.
 
 | role | workflow | writes | reads | rules | agent | returns |
 |---|---|---|---|---|---|---|
-| `gov-builder` | build | product | input:spec, card:route?, brief:non-goals? | yagni, reuse, core, derive, verify, gate, docs, security, portable, tools | true | whether the unit was committed, the commit, why when it was not, and which check ran for which gate |
-| `gov-diff-reviewer` | closing-review | none | input:diff, input:spec? | verify, gate, class, docs, left-shift, security, risk, portable | true | concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix |
-| `gov-orienter` | orient | none | input:question, input:prompt? | small, ids, memory, tokens, tools | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows; handed a request to place, its disposition · reason · evidence · observations · scenarios · facts |
-| `gov-researcher` | research | none | input:question, brief:goal?, brief:non-goals? | reuse, verify, class, memory | true | the candidates, each with its mechanism, the smallest test that would make it lose and that test's result, then the pick and its reason |
-| `gov-reuse-scout` | reuse | none | input:question, task:in?, card:reuse? | reuse | true | the seam to extend, cited by path, or "no existing seam fits" with the evidence |
-| `gov-session` | handoff | none | input:question, brief:goal?, task:todo?, card:route? | ids, memory | false | nothing to the sender; the receiving session acts on the task block and reports in its own session |
-| `gov-skeptic` | closing-review | none | input:diff?, input:spec? | verify, class, risk | true | a verdict per finding, confirmed or refuted, with the reason observed and, for a confirmed one, its severity |
-| `gov-spec-reviewer` | spec-review | none | input:spec, brief:goal?, brief:non-goals? | spec?, verify, gate, class, docs, security, risk | true | concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix |
-| `gov-spec-writer` | spec-write | spec | brief:prompt, brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
-| `gov-synthesizer` | closing-review | review | input:diff?, input:spec? | left-shift, risk, signal | true | the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers |
-| `gov-tester` | gate-bar | none | input:spec, input:diff?, input:question? | verify, spec, gate, class, risk | true | for each red handed, one judgment, code-miss or spec-wrong (the closed outcomes of the item.test.attribute row), with the evidence observed; for the Test step's question, its answer and the evidence |
+| `gov-builder` | build | product | field.input.spec, field.card.route?, field.brief.non-goals? | yagni, reuse, core, derive, verify, gate, docs, security, portable, tools | true | whether the unit was committed, the commit, why when it was not, and which check ran for which gate |
+| `gov-diff-reviewer` | closing-review | none | field.input.diff, field.input.spec? | verify, gate, class, docs, left-shift, security, risk, portable | true | concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix |
+| `gov-orienter` | orient | none | field.input.question, field.input.prompt? | small, ids, memory, tokens, tools | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows; handed a request to place, its disposition · reason · evidence · observations · scenarios · facts |
+| `gov-researcher` | research | none | field.input.question, field.brief.goal?, field.brief.non-goals? | reuse, verify, class, memory | true | the candidates, each with its mechanism, the smallest test that would make it lose and that test's result, then the pick and its reason |
+| `gov-reuse-scout` | reuse | none | field.input.question, field.task.in?, field.card.reuse? | reuse | true | the seam to extend, cited by path, or "no existing seam fits" with the evidence |
+| `gov-session` | handoff | none | field.input.question, field.brief.goal?, field.task.todo?, field.card.route? | ids, memory | false | nothing to the sender; the receiving session acts on the task block and reports in its own session |
+| `gov-skeptic` | closing-review | none | field.input.diff?, field.input.spec? | verify, class, risk | true | a verdict per finding, confirmed or refuted, with the reason observed and, for a confirmed one, its severity |
+| `gov-spec-reviewer` | spec-review | none | field.input.spec, field.brief.goal?, field.brief.non-goals? | spec?, verify, gate, class, docs, security, risk | true | concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix |
+| `gov-spec-writer` | spec-write | spec | field.brief.prompt, field.brief.goal, field.brief.items, field.brief.acceptance, field.brief.gates, field.brief.non-goals, field.input.spec?, field.task.reuse?, field.card.route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
+| `gov-synthesizer` | closing-review | review | field.input.diff?, field.input.spec? | left-shift, risk, signal | true | the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers |
+| `gov-tester` | gate-bar | none | field.input.spec, field.input.diff?, field.input.question? | verify, spec, gate, class, risk | true | for each red handed, one judgment, code-miss or spec-wrong (the closed outcomes of the item.test.attribute row), with the evidence observed; for the Test step's question, its answer and the evidence |
 
 <!-- /gen:roles-catalogue -->

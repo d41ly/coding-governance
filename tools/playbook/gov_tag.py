@@ -218,6 +218,51 @@ def run_purpose_check(con, root, ctx, chain, chain_rel) -> tuple[list, list, dic
     return reds + c_reds, lines, counts
 
 
+def check_role_bindings(con, ctx) -> tuple[list, list]:
+    """The role binding join (TOOL-dBoundRoles-14 S5): layer-roles widens the `rules:` binding both ways,
+    so a unit's `role.` scope and each role's `rules` agree. The index holds no grouping of a unit's
+    selectors, so each unit manifest the view's `tag` and `selector` rows name, by an extractor of
+    UNIT_EXTRACTORS, is re-parsed through `parse_unit_rows` from `read_served_text`, one `Unit` one group.
+    Red: a unit naming `role.<slot>` and `practice.<tag>` whose role's `rules` does not cite `<tag>`; and a
+    role citing `<tag>` that no unit among those naming `practice.<tag>` and any `role.` selector selects.
+    A unit naming a practice and no role binds every reader, so it is never a disagreement. While no unit
+    read names a `role.` selector, one `unarmed` line and nothing graded. -> (reds, lines)."""
+    paths = sorted({path for _t, path, _n, _k, _b, ex in ti.read_rows(con, ("tag", "selector"))
+                    if ex in ti.UNIT_EXTRACTORS})
+    bound = []  # (unit's name, its path:line, its role slots, its practice tags)
+    for path in paths:
+        for u in instruction_units.parse_unit_rows(ti.read_served_text(ctx, path), path)[0]:
+            slots = {s[len("role."):] for s in u.scope if s.startswith("role.")}
+            tags = {s[len("practice."):] for s in u.scope if s.startswith("practice.")}
+            bound.append((u.tag or f"unit row {u.index}", f"{u.path}:{u.line}", slots, tags))
+    if not any(slots for _u, _at, slots, _p in bound):
+        return [], ["tags: join role bindings · unarmed: no unit read names a role. selector, so no binding "
+                    "is graded"]
+    extractor = next((r["extractor"] for r in ctx["namespaces"] if r["ns"] == "role"), None)
+    roles = {}  # slot -> (path, line, its rules tags, ? stripped)
+    for tag, path, line, kind, blob, ex in ti.read_rows(con, ("tag",), like="role.%"):
+        if ex == extractor and tag not in roles:
+            rules = ti.read_text_of(con, blob, ex, kind, line)[1]
+            roles[tag[len("role."):]] = (path, line, {e.strip().rstrip("?") for e in rules.split(",") if e.strip()})
+    reds, unit_pairs, role_pairs = [], 0, 0
+    for name, at, slots, tags in bound:
+        for slot in sorted(slots):
+            for tag in sorted(tags):
+                unit_pairs += 1
+                if tag not in roles.get(slot, (None, None, set()))[2]:
+                    reds.append(f"tags: {at} · role binding · unit {name} binds {tag} to role.{slot}, whose rules "
+                                "does not cite it")
+    for slot, (path, line, cites) in sorted(roles.items()):
+        for tag in sorted(cites):
+            role_pairs += 1
+            held = [slots for _u, _at, slots, tags in bound if tag in tags and slots]
+            if held and not any(slot in slots for slots in held):
+                reds.append(f"tags: {path}:{line} · role binding · role.{slot} cites {tag}, and no role-bound unit "
+                            f"of it selects role.{slot}")
+    return reds, [f"tags: join role bindings · {unit_pairs} unit pairs and {role_pairs} role pairs graded over "
+                  f"{len(bound)} units and {len(roles)} roles, {len(reds)} red"]
+
+
 def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
     counts = ti.derive_namespace_state(con, ctx)
     armed = counts  # ns -> defined-tag count; 0 is unarmed
@@ -228,7 +273,9 @@ def run_check(con, root, ctx, kit_rel, *, sets, base, as_json, state) -> int:
     reds, shaped = ti.check_tag_shape(con, ctx)
     family, f_lines = ti.derive_family_tags(con, ctx)  # TOOL-dDeclaredLoop-18 S5: one derivation, two readers
     j_reds, j_lines = ti.check_namespace_joins(con, ctx, file_names, every=instruction_units.EVERY, family=family)
-    j_lines += f_lines
+    b_reds, b_lines = check_role_bindings(con, ctx)  # TOOL-dBoundRoles-14 S5: beside the joins, its reds the run's
+    j_reds += b_reds
+    j_lines += b_lines + f_lines
     s_reds, c = ti.check_resolves(con, ctx, bare_mode, armed, file_names, family=family)
     reds += j_reds + s_reds
     base_spans, base_sections, base_why = None, None, ""
@@ -397,7 +444,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
           "positional-spec-revbump", "positional-bulk-move", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
-          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows")
+          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "role-rows", "role-binding", "field-rows")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -433,6 +480,19 @@ FIXTURE_LOOP = instruction_units.derive_tool_rel("loop", "loop.toml")
 FIXTURE_LEGS = instruction_units.derive_tool_rel("gate-legs.json")
 FIXTURE_CHECK_KITS = {k: instruction_units.derive_tool_rel(k, "kit.toml") for k in ("memory-tree", "unattended")}
 NUMBERED_CHECK = '\n[[numbered_check]]\nid = "23"\nleg = "{leg}"\n'
+#: TOOL-dBoundRoles-14 S8: the roles kit's role files, read-key literal and workflow table as a fixture tree holds them
+FIXTURE_AGENTS = instruction_units.derive_tool_rel("roles", "agents")
+FIXTURE_ROLES_KIT = {k: instruction_units.derive_tool_rel("roles", k) for k in ("roles_lib.py", "workflows.toml")}
+
+
+def derive_role_file(name, rules) -> str:
+    """A fixture role file: its front matter's `name` and `rules`, the keys the extractor and the join read."""
+    return f"---\nname: {name}\nrules: {rules}\n---\n\nthe {name} body\n"
+
+
+#: the role binding plant's one manifest: `unit.beta` its `tag` line first, `unit.alpha` its `scope` first
+BINDING_UNITS = ('[[unit]]\ntag = "unit.beta"\nscope = ["practice.verify", "role.gov-skeptic"]\n\n'
+                 '[[unit]]\nscope = ["role.gov-builder", "practice.yagni"]\ntag = "unit.alpha"\n')
 #: PLAY-dOrderedCharter-10 S8: each plant's registry rows and the files it adds to the base fixture
 SHAPE_PLANTS = {
     "bad-ns": (FIXTURE_UNIT_ROW, {"tools/corekit/instructions.toml": '[[unit]]\ntag = "step.build"\n'}),
@@ -497,6 +557,19 @@ SHAPE_PLANTS = {
     "check-rows": (derive_fixture_row("check", "tag_index:extract_check"), {
         rel: f'id = "{kid}"\n\n[check]\nargv = ["bash", "check.sh"]\n' + NUMBERED_CHECK.format(leg=f"{kid} leg")
         for kid, rel in FIXTURE_CHECK_KITS.items()}),
+    # TOOL-dBoundRoles-14 S8: two role files and a guide citing one and a misspelling; the binding join's two
+    # directions over one manifest; the installed read-key literal and workflow table, a guide citing a misspelling
+    "role-rows": (derive_fixture_row("role", "tag_index:extract_role", "selects"), {
+        f"{FIXTURE_AGENTS}/gov-builder.agent.md": derive_role_file("gov-builder", "verify"),
+        f"{FIXTURE_AGENTS}/gov-skeptic.agent.md": derive_role_file("gov-skeptic", "verify"),
+        "memory/guides/ALPHA.md": "+\nsee `role.gov-builder` and `role.gov-buildr`\n"}),
+    "role-binding": (FIXTURE_UNIT_ROW + derive_fixture_row("role", "tag_index:extract_role", "selects"), {
+        f"{FIXTURE_AGENTS}/gov-builder.agent.md": derive_role_file("gov-builder", "verify"),
+        f"{FIXTURE_AGENTS}/gov-skeptic.agent.md": derive_role_file("gov-skeptic", "verify"),
+        f"{FIXTURE_KIT}/instructions.toml": BINDING_UNITS,
+        "tools/corekit/core.tags": "+practice.verify\npractice.yagni\n"}),
+    "field-rows": (derive_fixture_row("field", "tag_index:extract_field"),
+                   {"memory/guides/ALPHA.md": "+\nsee `field.task.title` and `field.task.titel`\n"}),
 }
 #: PLAY-dOrderedCharter-22's registry plants: each edits the base registry's first row, `doc`'s
 PURPOSE_PLANTS = {
@@ -653,6 +726,15 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         files[f"{kit}/namespaces.toml"] += rows
         for rel, text in extra.items():  # a leading `+` appends to the base file
             files[rel] = files[rel] + text[1:] if text.startswith("+") else text
+    if plant == "field-rows":  # TOOL-dBoundRoles-14: the installed workflow table byte for byte, and the read-key
+        import ast            # literal cut whole out of the installed library, so no other line of it is graded
+        from policy_value import resolve_kit_dir
+        for name, rel in FIXTURE_ROLES_KIT.items():
+            files[rel] = (resolve_kit_dir("roles", name, KIT_DIR) / name).read_bytes().decode("utf-8")
+        lib = files[FIXTURE_ROLES_KIT["roles_lib.py"]].splitlines()
+        node = next(n for n in ast.parse("\n".join(lib)).body if isinstance(n, ast.Assign)
+                    and any(getattr(t, "id", None) == "READ_FAMILIES" for t in n.targets))
+        files[FIXTURE_ROLES_KIT["roles_lib.py"]] = "\n".join(lib[node.lineno - 1:node.end_lineno]) + "\n"
     if plant == "policy-catalogue":  # TOOL-dDeclaredLoop-18: the installed policy kit's catalogue, byte for byte
         from policy_value import resolve_kit_dir
         files[FIXTURE_CATALOGUE] = (resolve_kit_dir("policy", "catalogue.toml", KIT_DIR)
@@ -1178,19 +1260,32 @@ def run_plant(root, top, plant, sets) -> int:
         checked = run_verb(root, "check", None, sets=sets)
         say(f"where: rc={rc}, check: rc={checked}")
         return 1 if rc or checked else 0
-    if plant in ("pack-rows", "check-rows"):  # TOOL-dWitnessedBar-12 AC4: the members, then an empty `check`
+    if plant == "role-binding":  # TOOL-dBoundRoles-14 AC2: both directions red, then gov-builder citing yagni alone
+        rc = run_verb(root, "check", None, sets=sets)
+        write_commit(root, {f"{FIXTURE_AGENTS}/gov-builder.agent.md": derive_role_file("gov-builder", "yagni")},
+                     "gov-builder cites yagni alone")
+        say(f"with gov-builder citing yagni alone: rc={run_verb(root, 'check', None, sets=sets)}")
+        return rc
+    if plant in ("pack-rows", "check-rows", "role-rows", "field-rows"):  # the members, then the check
         ns = plant.split("-")[0]
 
-        def read_members():  # the namespace's distinct defined tags in the fixture's view
+        def read_members(rows=False):  # the namespace's defined tags in the fixture's view, distinct or every row
             con = ti.load_index(root)
             try:
                 ti.load_view(con, root, ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml"))
-                return sorted({r[0] for r in ti.read_rows(con, ("tag",), like=f"{ns}.%")})
+                tags = [r[0] for r in ti.read_rows(con, ("tag",), like=f"{ns}.%")]
+                return tags if rows else sorted(set(tags))
             finally:
                 con.close()
         checked = run_verb(root, "check", None, sets=sets)
         members = read_members()
         say(f"members {' '.join(members)}, check: rc={checked}")
+        if plant == "field-rows":  # TOOL-dBoundRoles-14 AC3: each member once, a key several workflows share too
+            every = read_members(rows=True)
+            say(" · ".join(f"{t} {every.count(t)}" for t in ("field.task.title", "field.input.spec",
+                                                            "field.stage.spec-writer", "field.stage.skeptic")))
+        if plant in ("role-rows", "field-rows"):  # TOOL-dBoundRoles-14 AC1 AC3: the check's own exit
+            return checked
         if plant == "pack-rows":
             return 1 if checked or members != ["pack.ratchet", "pack.tags"] else 0
         write_commit(root, {rel: (root / rel).read_text(encoding="utf-8").split("\n[[numbered_check]]")[0]

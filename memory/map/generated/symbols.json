@@ -8603,6 +8603,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "check_role_bindings",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "check_role_move",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
@@ -12023,6 +12028,11 @@
       "file": "tools/loop/position.py"
     },
     {
+      "id": "derive_field_tag",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "derive_first_bound",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -13693,6 +13703,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "derive_role_file",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
       "id": "derive_role_roster",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -14266,6 +14281,11 @@
       "id": "derive_spliced_table",
       "kind": "function",
       "file": "tools/loop/splice.py"
+    },
+    {
+      "id": "derive_stage_field_tag",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "derive_stage_rows",
@@ -15318,6 +15338,11 @@
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
+      "id": "extract_field",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "extract_files_touched",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -15516,6 +15541,11 @@
       "id": "extract_repo",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "extract_role",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "extract_roster_ids",
@@ -19498,6 +19528,11 @@
       "file": "tools/process-monitor/census.py"
     },
     {
+      "id": "parse_read_key",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "parse_record",
       "kind": "function",
       "file": "tools/runlog/extract.py"
@@ -20301,6 +20336,11 @@
       "id": "print_summary",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "print_tag_rows",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
     },
     {
       "id": "print_tail",
@@ -25263,6 +25303,11 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "read_roles_tag_rows",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
+    },
+    {
       "id": "read_root_conf_lines",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
@@ -25576,6 +25621,11 @@
       "id": "read_selection_holds",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_served_text",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "read_serves_ids",
@@ -32111,6 +32161,11 @@
       "id": "resolve_rev",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "resolve_roles_verb",
+      "kind": "function",
+      "file": "tools/playbook/tag_index.py"
     },
     {
       "id": "resolve_root",

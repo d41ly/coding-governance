@@ -475,6 +475,94 @@ def extract_policy(ctx, path, text=None):
     return rows
 
 
+@functools.cache
+def resolve_roles_verb():
+    """The roles kit's `check_roles.py`, the role grammar's one verb, through the inline `resolve_kit_dir`,
+    never an import, since a kit imports no sibling kit (TOOL-dBoundRoles-14 §8 F5); or None, its refusal
+    printed once, and both extractors that reach it then yield nothing."""
+    from policy_value import resolve_kit_dir
+    try:
+        return resolve_kit_dir("roles", "check_roles.py", KIT_DIR) / "check_roles.py"
+    except LookupError as exc:
+        print(f"tags: the role and field extractors read the roles kit's check_roles.py, and cannot: {exc}",
+              file=sys.stderr)
+        return None
+
+
+def read_roles_tag_rows(mode, path, text) -> list:
+    """`check_roles.py --print-tag-rows <mode>` over `text`, the blob's, on stdin: one `tag` row per
+    JSON line it prints, `(tag, "tag", line, line, text)`. A blob it cannot parse exits 2 naming the
+    defect, which is printed, and yields nothing; so does a roles kit not found."""
+    verb = resolve_roles_verb()
+    if verb is None:
+        return []
+    try:
+        done = subprocess.run([sys.executable, "-B", str(verb), "--print-tag-rows", mode],
+                              input=text.encode("utf-8"), capture_output=True, timeout=120)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        print(f"tags: {path} · check_roles.py --print-tag-rows {mode} did not answer: {exc}", file=sys.stderr)
+        return []
+    if done.returncode:
+        why = done.stderr.decode("utf-8", "replace").strip() or f"exit {done.returncode}"
+        print(f"tags: {path} · check_roles.py --print-tag-rows {mode} refused: {why}", file=sys.stderr)
+        return []
+    rows = []
+    for line in done.stdout.decode("utf-8", "replace").splitlines():
+        try:
+            row = json.loads(line)
+            rows.append((row["tag"], "tag", int(row["line"]), int(row["line"]), str(row["text"])))
+        except (ValueError, TypeError, KeyError):
+            print(f"tags: {path} · check_roles.py --print-tag-rows {mode} printed a line that is no row: {line}",
+                  file=sys.stderr)
+    return rows
+
+
+def extract_role(ctx, path, text=None):
+    """The `role` namespace: `role.<name>` for each role file, `{prefix}/roles/agents/*.agent.md` under
+    the tool root, `<name>` its front matter's `name`, at the `name:` line, its text the raw `rules`
+    value, which the role binding join reads (TOOL-dBoundRoles-14 S2). The grammar is the roles kit's
+    `parse_front_matter`, reached by `read_roles_tag_rows`."""
+    if text is None:
+        troot = pathlib.PurePosixPath(ctx["kit"]).parent.as_posix()
+        agents = resolve_prefix_token("{prefix}/roles/agents", troot)
+        name = path[len(agents) + 1:] if path.startswith(agents + "/") else ""
+        return "" if fnmatch.fnmatchcase(name, "*.agent.md") and "/" not in name else None
+    return read_roles_tag_rows("role", path, text)
+
+
+def extract_field(ctx, path, text=None):
+    """The `field` namespace (TOOL-dBoundRoles-14 S3): `field.<family>.<name>` for each read key of
+    `READ_FAMILIES` in the roles kit's `roles_lib.py`, at its name's line, its text the native key
+    `<family>:<name>`, read by `ast.literal_eval` of that one assignment as `extract_level` reads
+    `LEVELS`; and `field.stage.<seg>` for each distinct stage key of the roles kit's `workflows.toml`,
+    folded by the roles kit's own verb, `read_roles_tag_rows`. A module that does not parse, or holds
+    no such literal, names nothing."""
+    if text is None:
+        return "" if (_read_tool_file(ctx, path, "roles", "roles_lib.py")
+                      or _read_tool_file(ctx, path, "roles", "workflows.toml")) else None
+    if path.endswith(".toml"):
+        return read_roles_tag_rows("stage", path, text)
+    import ast
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return []
+    for node in tree.body:
+        if (isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "READ_FAMILIES" for t in node.targets)
+                and isinstance(node.value, ast.Dict)):
+            try:
+                ast.literal_eval(node.value)
+            except ValueError:
+                return []
+            rows = []
+            for fam, names in zip(node.value.keys, node.value.values):
+                for e in getattr(names, "elts", ()):
+                    if isinstance(fam, ast.Constant) and isinstance(e, ast.Constant) and isinstance(e.value, str):
+                        rows.append((f"field.{fam.value}.{e.value}", "tag", e.lineno, e.lineno, f"{fam.value}:{e.value}"))
+            return rows
+    return []
+
+
 def derive_kit_rows(text, ns, table):
     """`<ns>.<id>.<key>` for each `[[table]]` row of a kit descriptor's `text`, `<id>` the descriptor's
     top-level `id` and `<key>` the row's ROW_TAG_KEYS key; a descriptor with no string `id` yields
@@ -1378,6 +1466,17 @@ def read_py_assigns(text) -> set:
     return {t.id for t in targets if isinstance(t, ast.Name)}
 
 
+def read_served_text(ctx, path) -> str:
+    """The text the view serves at `path`, CRLF folded, `""` for a file that cannot be read; any cache is
+    the caller's. The working tree stands in for the served blob, as the view is HEAD plus this worktree's
+    edits, and an edited file's blob is a `hash-object` written to no object store (`build_overlay`), so no
+    read by blob id reaches it (TOOL-dBoundRoles-14 §8 F7)."""
+    try:
+        return (ctx["root"] / path).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
+    except OSError:
+        return ""
+
+
 def check_namespace_purpose(con, ctx, chain_rows) -> tuple[list, dict]:
     """S1 and S2 of PLAY-dOrderedCharter-22: every row's `owner` is a build of the chain registry, and its
     `purpose-source` grades its members, the `#`-free defining rows its own extractor serves for it. A
@@ -1396,12 +1495,8 @@ def check_namespace_purpose(con, ctx, chain_rows) -> tuple[list, dict]:
     texts: dict = {}
 
     def read_served(path):
-        # ponytail: the working tree stands in for the served blob, as the view is HEAD plus this worktree's edits
         if path not in texts:
-            try:
-                texts[path] = (ctx["root"] / path).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
-            except OSError:
-                texts[path] = ""
+            texts[path] = read_served_text(ctx, path)
         return texts[path]
 
     reds: list = []

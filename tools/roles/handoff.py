@@ -585,7 +585,9 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
                                  % build_dir.as_posix())
         unit_id = ids.group(1)
     refusals = []
-    reads = [x.strip() for x in keys.get("reads", "").split(",") if x.strip()]
+    # TOOL-dBoundRoles-14 S4: each entry in either spelling, read as its native key, so a `field.` tag
+    # dispatches to its family and its block keeps the native `### <key>` heading
+    reads = [k + "?" * o for k, o in (lib.parse_read_key(x) for x in keys.get("reads", "").split(",") if x.strip())]
     if not any(k.rstrip("?") == "input:" + CODE_INPUT for k in reads):
         reads.append("input:%s?" % CODE_INPUT)  # the derived optional key every role carries
     card = brief = None
@@ -1467,7 +1469,7 @@ def main(argv):
         if a.role not in roles:
             raise lib.RolesError("no role '%s' in the catalogue; its slots are %s" % (a.role, ", ".join(roles)))
         keys = roles[a.role]["keys"]
-        read = {x.strip().rstrip("?") for x in keys.get("reads", "").split(",")}
+        read = {lib.parse_read_key(x)[0] for x in keys.get("reads", "").split(",") if x.strip()}
         for name in inputs:
             if name not in ("prompt", CODE_INPUT) and "input:" + name not in read:
                 ap.error("input:%s is a key %s does not read" % (name, a.role))

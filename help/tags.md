@@ -2,7 +2,7 @@
 
 **What it is.** A tag names one thing in the repository: `doc.build-method` is the build method
 guide, `doc.build-method#m5-recall-and-reuse` its `## M5` section. A tag is `<ns>.<seg>(.<seg>)*`,
-lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Eighteen
+lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Twenty
 namespaces are registered today, each read from the file that declares its members:
 
 | Namespace | Its members come from |
@@ -24,12 +24,14 @@ namespaces are registered today, each read from the file that declares its membe
 | `leg` | each row's `tag` in `tools/gate-legs.json`, as `leg.<owner>.<name>`, beside the leg's free-text `name`, which stays the key every file keyed by leg joins on |
 | `pack` | each distinct `pack` value of the rows of `tools/gate-legs.json`, as `pack.<word>` |
 | `check` | each `[[numbered_check]]` row of a kit descriptor, `id` and `leg`, beside its `[check]` table, as `check.<kit id>.<check id>` |
+| `role` | each role file under `tools/roles/agents/`, as `role.<name>`, its front matter's `name`; a unit naming a `role.` tag in its `scope` must agree with that role's `rules`, both ways |
+| `field` | each read key of `READ_FAMILIES` in `tools/roles/roles_lib.py`, as `field.<family>.<name>`, and each harness stage key of `tools/roles/workflows.toml`, as `field.stage.<key>` with each capital lower-cased behind a hyphen, `specWriter` as `field.stage.spec-writer` |
 
 A namespace whose file declares nothing yet prints as `unarmed`, and nothing in it is graded: `step`
 and `item` until the loop definition lands, `command` until a descriptor holds a `[[command]]` row,
 `check` until one holds a `[[numbered_check]]` row.
-`policy` is graded today. A tag in a namespace no row registers is red: `role` joins when dBoundRoles
-registers it and `record` with dTotalRecall.
+`policy` is graded today. A tag in a namespace no row registers is red: `record` joins with
+dTotalRecall.
 
 A catalogue key whose name carries a placeholder segment, such as `review.<stage>` or `budgets.*`, is
 not a tag. Its literal prefix is a family: a citation under it, such as `policy.review.<a stage>`, is

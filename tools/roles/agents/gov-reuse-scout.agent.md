@@ -4,7 +4,7 @@ description: Finds the seam a new behaviour should extend.
 tools: Read, Grep, Glob, Bash
 model: inherit
 workflow: reuse
-reads: input:question, task:in?, card:reuse?
+reads: field.input.question, field.task.in?, field.card.reuse?
 writes: none
 rules: reuse
 returns: the seam to extend, cited by path, or "no existing seam fits" with the evidence

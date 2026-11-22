@@ -301,11 +301,17 @@ the key, read in process through `policy_value.read_declared_keys`; `check` prin
 `join policy · families` line, and a refused policy read declares nothing. What the family join does not
 check: what a placeholder stands for, so `policy.review.<anything>` is declared by `review.<stage>`.
 
+dBoundRoles registers `role` and `field` (TOOL-dBoundRoles-14): `role.<slot>` for each role file of the
+roles kit, read through that kit's `check_roles.py --print-tag-rows role` by subprocess, and
+`field.<family>.<name>` for each read key of its `READ_FAMILIES`, with `field.stage.<seg>` for each harness
+stage key of its `workflows.toml`, folded by the same verb's `stage` mode. `check` adds the role binding
+join, each unit's `role.` scope against each role's `rules` both ways, `unarmed` while no unit names a
+`role.` selector.
+
 The later namespaces are not registered, so their tags red until the build that arms each adds its row:
 
 | Namespace | Armed by |
 |---|---|
-| `role` | dBoundRoles |
 | `record` | dTotalRecall |
 
 The index is `<git-common-dir>/gov/index-s<INDEX_SCHEMA>.db`, `tag_index.derive_index_path`'s, one SQLite

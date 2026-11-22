@@ -4,7 +4,7 @@ description: Reviews a diff through one lens.
 tools: Read, Grep, Glob, Bash
 model: inherit
 workflow: closing-review
-reads: input:diff, input:spec?
+reads: field.input.diff, field.input.spec?
 writes: none
 rules: verify, gate, class, docs, left-shift, security, risk, portable
 returns: concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix

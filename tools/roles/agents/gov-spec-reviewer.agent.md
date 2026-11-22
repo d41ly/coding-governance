@@ -4,7 +4,7 @@ description: Hunts defects in a spec set, read-only.
 tools: Read, Grep, Glob, Bash
 model: inherit
 workflow: spec-review
-reads: input:spec, brief:goal?, brief:non-goals?
+reads: field.input.spec, field.brief.goal?, field.brief.non-goals?
 writes: none
 rules: spec?, verify, gate, class, docs, security, risk
 returns: concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix

@@ -436,6 +436,29 @@ if [ "$_tf" != 0 ]; then echo "FAIL — $_tf policy-namespace arm(s) failed"; ex
 echo "PASS — the policy namespace's plants"
 fi
 
+# THE ROLE AND FIELD NAMESPACES' ARMS (TOOL-dBoundRoles-14 S8). Three tag-resolver plants that reach the roles
+# kit's `check_roles.py --print-tag-rows` by subprocess: two role files as `role` members beside a guide whose
+# misspelt citation alone reds; the role binding join red both ways over one manifest whose second unit
+# puts `scope` before `tag`, then green with gov-builder citing yagni alone; and the installed read-key
+# literal and workflow table as `field` members, each once, beside a misspelt citation. What this does not
+# check: whether a role's `rules` suits the units it binds, only that the two name each other.
+_uk=; check_sibling_kit memory-tree tree_lib.py || _uk=memory-tree
+check_sibling_kit roles check_roles.py || _uk=${_uk:-roles}
+if [ -n "$_uk" ]; then echo "UNARMED — the role and field namespaces' plants: no $_uk kit in this install"; else
+_tf=0
+run_plant_rows tags "$HERE/gov_tag.py" <<PLANTS
+role-rows $_tk|1|members role.gov-builder role.gov-skeptic, check: rc=1
+role-rows $_tk|1|\`role.gov-buildr\` is cited and undeclared in role|\`role.gov-builder\` is cited
+role-binding $_tk|1|instructions.toml:5 · role binding · unit unit.alpha binds yagni to role.gov-builder|unit unit.beta
+role-binding $_tk|1|gov-builder.agent.md:2 · role binding · role.gov-builder cites verify, and no role-bound unit
+role-binding $_tk|1|with gov-builder citing yagni alone: rc=0
+field-rows $_tk|1|\`field.task.titel\` is cited and undeclared in field|\`field.task.title\` is cited
+field-rows $_tk|1|field.task.title 1 · field.input.spec 1 · field.stage.spec-writer 1 · field.stage.skeptic 1
+PLANTS
+if [ "$_tf" != 0 ]; then echo "FAIL — $_tf role and field namespace arm(s) failed"; exit 1; fi
+echo "PASS — the role and field namespaces' plants"
+fi
+
 # THE EDGE GRAMMAR'S ARMS (PLAY-dOrderedCharter-24 §4). Each row runs `edge_grammar.py --fixture` over one
 # plant, the same row shape as the tag resolver's: the two-line block and a fenced line green, each
 # malformed plant naming both its bad lines in one refusal, the closed set's reds, and a selector a fixture

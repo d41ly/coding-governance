@@ -4,7 +4,7 @@ description: Tries to refute each finding it is handed.
 tools: Read, Grep, Glob, Bash
 model: inherit
 workflow: closing-review
-reads: input:diff?, input:spec?
+reads: field.input.diff?, field.input.spec?
 writes: none
 rules: verify, class, risk
 returns: a verdict per finding, confirmed or refuted, with the reason observed and, for a confirmed one, its severity

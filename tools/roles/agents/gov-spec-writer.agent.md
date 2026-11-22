@@ -4,7 +4,7 @@ description: Writes each unit's spec, never code.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: inherit
 workflow: spec-write
-reads: brief:prompt, brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route?
+reads: field.brief.prompt, field.brief.goal, field.brief.items, field.brief.acceptance, field.brief.gates, field.brief.non-goals, field.input.spec?, field.task.reuse?, field.card.route?
 writes: spec
 rules: yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security
 returns: the units authored, already present and refused, each by its unit id, with the reason for every refusal

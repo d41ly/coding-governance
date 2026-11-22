@@ -42,7 +42,8 @@
 # without one, and R3 refusing a bare `upstream:rows` and an `upstream:` key outside the vocabulary
 # (arm 23); and the agents verb's
 # session record, cold, warm, read, resumed after an append and a torn line, and keyed off by a
-# transcript edit, a foreign key or an unwritable folder (arm 25). Every arm is a self-contained block below the prologue, so a
+# transcript edit, a foreign key or an unwritable folder (arm 25); and R3 reading each `reads` entry
+# in either spelling, a misspelt `field.` tag named and a bare `field.card.reuse` refused (arm 26). Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 25
 # arm 9's writer and lines.
 #
@@ -106,7 +107,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +1 for arm 24 (TOOL-dDeclaredLoop-56).
 # +8 for arm 25 (TOOL-aTrimmedWait-7).
 # merged at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c: 61 shared, +6 this branch's, +8 main's = 75.
-FLOOR_ASSERTIONS=75
+# +4 for arm 26 (TOOL-dBoundRoles-14).
+FLOOR_ASSERTIONS=79
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1006,7 +1008,8 @@ check_arm "arm 21 a profile level edited with no re-render is a drifted index, n
 
 # ---- arm 22 (TOOL-dPavedRoad-3 AC2): the spec writer's handoff carries the brief's `## The prompt`
 # ---- as its `brief:prompt` block, and an empty prompt refuses that key by name. The keys are the
-# ---- fixture kit's gov-spec-writer reads filtered to the `brief:` family, so the shipped role is
+# ---- fixture kit's gov-spec-writer reads filtered to the `brief:` family, on the native key
+# ---- `parse_read_key` returns since the role spells each as its `field.` tag (TOOL-dBoundRoles-14 S7), so the shipped role is
 # ---- what is proved; `task:` needs the kickoff checker, which a roles-kit fixture does not hold.
 # ---- The failing case, observed at the close and not by the pass that wrote this: the dispatch
 # ---- reverted so `brief:prompt` reads a `### prompt` sub-head, which renders no block and passes
@@ -1017,7 +1020,7 @@ fx, kit = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve
 sys.path.insert(0, str(kit))
 import handoff, roles_lib as lib
 reads = lib.load_roles(handoff.KIT_DIR)["gov-spec-writer"]["keys"]["reads"].split(", ")
-keys = {"reads": ", ".join(k for k in reads if k.startswith("brief:"))}
+keys = {"reads": ", ".join(k for k in reads if lib.parse_read_key(k)[0].startswith("brief:"))}
 brief = fx / sys.argv[3] / "builds" / "bx" / "prompts" / "2026-11-10-prompt-TOOL-bx-1-brief.md"
 brief.parent.mkdir(parents=True, exist_ok=True)
 heads = ("Goal", "Items", "Acceptance", "Gates", "Non-goals")
@@ -1165,6 +1168,46 @@ check_arm "arm 25 a record with a foreign parser, session or offset, or truncate
 rm -rf "$A23D"; printf x > "$A23D"; run_agents23
 _w23=0; check_cold23 && [ -z "$(find "$FX/.git" -name '*.tmp')" ] && _w23=1
 check_arm "arm 25 an unwritable record folder prints the cold lines and leaves no temporary file" "$_w23"
+
+# ---- arm 26 (TOOL-dBoundRoles-14 AC6): R3 reads each `reads` entry through `parse_read_key`, so the shipped
+# ---- role files' tag spelling grades clean; a fixture role whose `reads` carries the misspelt tag
+# ---- `field.task.titel` is one R3 line naming it, while `field.task.title` yields none; and gov-reuse-scout's
+# ---- `field.card.reuse?` without its `?` is one R3 line saying `card:reuse` must be optional. The failing
+# ---- case, observed at the close and not by the pass that wrote this: R3 grading the raw entry, so every
+# ---- migrated tag reads as outside the vocabulary and the tag spelling of a bare `card:reuse` passes.
+build_fixture; _rc26=$?
+A26=$("$PY" -B -c 'import pathlib, re, subprocess, sys
+fx, kit = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve()
+def set_reads(role, old, new):
+    path = kit / "agents" / (role + ".agent.md")
+    text = path.read_bytes().decode("utf-8")
+    path.write_bytes(re.sub(r"(?m)^(reads:.*?)%s(\r?)$" % re.escape(old), lambda m: m.group(1) + new + m.group(2),
+                            text, count=1).encode("utf-8"))
+def read_r3():
+    out = subprocess.run([sys.executable, "-B", str(kit / "check_roles.py"), "--root", str(fx)], cwd=str(fx),
+                         capture_output=True, text=True, encoding="utf-8", errors="replace").stdout.splitlines()
+    return [ln for ln in out if ": R3 — " in ln]
+print("clean %d" % (not read_r3()))
+set_reads("gov-builder", "", ", field.task.titel")
+got = read_r3()
+print("titel %d" % (len(got) == 1 and "gov-builder" in got[0] and "field.task.titel" in got[0]
+                    and "outside the vocabulary" in got[0]))
+set_reads("gov-builder", ", field.task.titel", ", field.task.title")
+print("title %d" % (not read_r3()))
+set_reads("gov-reuse-scout", "field.card.reuse?", "field.card.reuse")
+got = read_r3()
+print("reuse %d" % (len(got) == 1 and "gov-reuse-scout" in got[0] and "card:reuse must be optional" in got[0]))
+' "$FX" "$FX/$KREL" 2>&1)
+A26=${A26//$'\r'/}
+check_arm "arm 26 the shipped role files' tag-spelt reads grade clean under R3" \
+   "$([ "$_rc26" = 0 ] && [[ $A26 == *'clean 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 26 R3 names a planted field.task.titel as outside the vocabulary, one line" \
+   "$([[ $A26 == *'titel 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 26 ...while field.task.title yields no R3 line" \
+   "$([[ $A26 == *'title 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 26 R3 refuses field.card.reuse without its ?, saying card:reuse must be optional" \
+   "$([[ $A26 == *'reuse 1'* ]] && echo 1 || echo 0)"
+[ "$A26" = $'clean 1\ntitel 1\ntitle 1\nreuse 1' ] || printf '    %s\n' "${A26//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

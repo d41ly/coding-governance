@@ -4,7 +4,7 @@ description: Merges verified findings into one report.
 tools: Read, Grep, Glob, Bash, Write
 model: inherit
 workflow: closing-review
-reads: input:diff?, input:spec?
+reads: field.input.diff?, field.input.spec?
 writes: review
 rules: left-shift, risk, signal
 returns: the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers

@@ -4,7 +4,7 @@ description: Judges a red the bar attributed to this build, and answers the Test
 tools: Read, Grep, Glob, Bash
 model: inherit
 workflow: gate-bar
-reads: input:spec, input:diff?, input:question?
+reads: field.input.spec, field.input.diff?, field.input.question?
 writes: none
 rules: verify, spec, gate, class, risk
 returns: for each red handed, one judgment, code-miss or spec-wrong (the closed outcomes of the item.test.attribute row), with the evidence observed; for the Test step's question, its answer and the evidence

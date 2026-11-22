@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-14 — the `role` and `field` tag namespaces, their extractors and the role binding join
 
-**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
+**Status:** CLOSED · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0179@f74e2fff whole
 **Carries:** node:tag-namespace.role
@@ -17,6 +17,7 @@
 | [2026-10-26-build-TOOL-dBoundRoles-14-deviation-141.md](../build/2026-10-26-build-TOOL-dBoundRoles-14-deviation-141.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-14-deviation-142.md](../build/2026-10-26-build-TOOL-dBoundRoles-14-deviation-142.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-14-deviation-143.md](../build/2026-10-26-build-TOOL-dBoundRoles-14-deviation-143.md) | deviation | — |
+| [2026-11-22-build-TOOL-dBoundRoles-14-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dBoundRoles-14-1-acceptance-ledger.md) | journal | — |
 | [2026-11-22-build-TOOL-dBoundRoles-14-1-builder-return.md](../build/2026-11-22-build-TOOL-dBoundRoles-14-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dBoundRoles-14-2-builder-return.md](../build/2026-11-22-build-TOOL-dBoundRoles-14-2-builder-return.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |

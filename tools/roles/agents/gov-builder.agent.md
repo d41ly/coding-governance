@@ -4,7 +4,7 @@ description: Builds one unit from its spec and commits it.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: inherit
 workflow: build
-reads: input:spec, card:route?, brief:non-goals?
+reads: field.input.spec, field.card.route?, field.brief.non-goals?
 writes: product
 rules: yagni, reuse, core, derive, verify, gate, docs, security, portable, tools
 returns: whether the unit was committed, the commit, why when it was not, and which check ran for which gate

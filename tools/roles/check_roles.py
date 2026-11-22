@@ -2,12 +2,14 @@
 """check_roles.py — the role files, the workflow table and the governing doc agree (TOOL-aOrientedCast-1).
 
     python check_roles.py [--root <dir>] [--write]
+    python check_roles.py --print-tag-rows role|stage < <a role file or workflows.toml>
 
 The kit directory is this script's own directory and the tool root its parent; `--root` defaults to
 the git toplevel of the working directory. One line per defect, `roles: <path>: <rule> — <what>`,
 then one summary line naming every count it graded and each overlay's bytes. Exit 0 clean, 1 on any
 defect, 2 when the check is unarmed. `--write` renders the README's catalogue region and writes it,
-touching nothing else, then grades as usual.
+touching nothing else, then grades as usual. `--print-tag-rows` prints the tag index's rows of the
+text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says.
 
   R0  no `.memory-tree.conf`, no CHARTER key in it, or no file at that path; a blank or absent
       MEMORY_ROOT in it (TOOL-aOrientedCast-19); a governing doc that
@@ -20,7 +22,8 @@ touching nothing else, then grades as usual.
       `mandatory` and `output` may not, on any role);
       `name` not the file stem; `writes` outside its set; `agent` not true/false; `tools` or
       `model` absent on an agent role
-  R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` or `upstream:rows` without `?`
+  R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` or `upstream:rows` without `?`,
+      each entry read through `parse_read_key`, so `task:title` and its tag `field.task.title` are one key
   R4  a `rules` entry that is not a lowercase tag optionally ending in `?`, a tag named twice, or a
       bare tag naming no practice of a tagged charter; an optional (`?`) tag its practices lack
       prints one `roles: note:`. A pre-tag (v3.x) charter resolves no tag and prints one note
@@ -82,10 +85,12 @@ whether the tool truly could not spawn, whether the `owner` who signed a row is 
 reason says anything, whether a marker's build matches its folder, an inline stand-in nobody
 declared, or a declared stand-in that was in fact spawned, which is harmless overstatement.
 """
+import json
 import pathlib
 import re
 import subprocess
 import sys
+import tomllib
 
 KIT_DIR = pathlib.Path(__file__).absolute().parent
 sys.path.insert(0, str(KIT_DIR))
@@ -209,14 +214,14 @@ def check_roles(root, kit_dir, write=False):
         seen = set()
         for item in [x.strip() for x in keys.get("reads", "").split(",") if x.strip()]:
             n_reads += 1
-            base = item[:-1] if item.endswith("?") else item
+            base, optional = lib.parse_read_key(item)  # either spelling, `task:title` or `field.task.title`
             if base not in lib.READ_KEYS:
                 add_defect(p, "R3", "reads key '%s' is outside the vocabulary" % item)
             if base in seen:
                 add_defect(p, "R3", "reads key '%s' is named twice" % base)
-            if item == "card:reuse":
+            if base == "card:reuse" and not optional:
                 add_defect(p, "R3", "card:reuse must be optional, 'card:reuse?': that section is not on every card")
-            if item == "upstream:rows":
+            if base == "upstream:rows" and not optional:
                 add_defect(p, "R3", "upstream:rows must be optional, 'upstream:rows?': only an item naming "
                                     "upstream items is handed rows")
             seen.add(base)
@@ -440,9 +445,53 @@ def check_roles(root, kit_dir, write=False):
     return defects, notes, summary
 
 
+def print_tag_rows(mode, text):
+    """`--print-tag-rows role|stage` (TOOL-dBoundRoles-14 S2, S3): one JSON object per member,
+    `{"tag", "line", "text"}`, of the text handed on stdin and of nothing else, so the tag index's rows
+    stay keyed by committed blob. `role`: a role file's `role.<name>` at its `name:` line, its text the
+    raw `rules` value, through `parse_front_matter`. `stage`: each distinct stage key of every
+    `[[workflow]]` entry's `stages`, `derive_stage_field_tag`'s fold at the first `stages` line carrying
+    it, its text the key. The rows are not validated: a malformed name is the shape check's to red.
+    A text that does not parse prints the defect on stderr, exit 2."""
+    text = text.replace("\r\n", "\n")
+    rows = []
+    if mode == "role":
+        try:
+            keys, _body = lib.parse_front_matter("<stdin>", text)
+        except lib.RolesError as e:
+            print("roles: %s" % e, file=sys.stderr)
+            return 2
+        if keys.get("name"):
+            n = next((i for i, ln in enumerate(text.split("\n"), 1) if ln.startswith("name:")), 1)
+            rows.append({"tag": "role." + keys["name"], "line": n, "text": keys.get("rules", "")})
+    else:
+        try:
+            entries = tomllib.loads(text).get("workflow") or []
+        except tomllib.TOMLDecodeError as e:
+            print("roles: <stdin>: R6 — not valid TOML — %s" % e, file=sys.stderr)
+            return 2
+        lines, seen = text.split("\n"), set()
+        for entry in entries if isinstance(entries, list) else ():
+            stages = entry.get("stages") if isinstance(entry, dict) else None
+            for key in stages if isinstance(stages, dict) else ():
+                tag = lib.derive_stage_field_tag(key)
+                if tag in seen:
+                    continue
+                seen.add(tag)
+                held = re.compile(r"(?<![\w-])%s\s*=" % re.escape(key))
+                n = next((i for i, ln in enumerate(lines, 1)
+                          if re.match(r"\s*stages\s*=", ln) and held.search(ln)), 1)
+                rows.append({"tag": tag, "line": n, "text": key})
+    for row in rows:
+        print(json.dumps(row, ensure_ascii=False))
+    return 0
+
+
 def main(argv):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     args, root, write = list(argv), None, False
+    if args[:1] == ["--print-tag-rows"] and args[1:] in (["role"], ["stage"]):
+        return print_tag_rows(args[1], sys.stdin.buffer.read().decode("utf-8", "replace"))
     while args:
         a = args.pop(0)
         if a == "--write":
@@ -450,7 +499,8 @@ def main(argv):
         elif a == "--root" and args:
             root = args.pop(0)
         else:
-            print("usage: python check_roles.py [--root <dir>] [--write]", file=sys.stderr)
+            print("usage: python check_roles.py [--root <dir>] [--write] | --print-tag-rows role|stage",
+                  file=sys.stderr)
             return 2
     if root is None:
         r = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, encoding="utf-8")

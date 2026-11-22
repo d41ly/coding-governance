@@ -4,7 +4,7 @@ description: Finds candidates and the test each could lose.
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 model: inherit
 workflow: research
-reads: input:question, brief:goal?, brief:non-goals?
+reads: field.input.question, field.brief.goal?, field.brief.non-goals?
 writes: none
 rules: reuse, verify, class, memory
 returns: the candidates, each with its mechanism, the smallest test that would make it lose and that test's result, then the pick and its reason

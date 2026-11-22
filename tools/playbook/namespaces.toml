@@ -191,6 +191,26 @@ role = "describes"
 purpose-source = "{prefix}/govkit/registry.toml"
 join-armed-by = "dWitnessedBar"
 
+[[namespace]]
+ns = "role"
+owner = "dBoundRoles"
+layer = "layer.roles"
+source = "{prefix}/roles/agents/*.agent.md"
+extractor = "tag_index:extract_role"
+role = "selects"
+purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md"
+join-armed-by = "dBoundRoles"
+
+[[namespace]]
+ns = "field"
+owner = "dBoundRoles"
+layer = "layer.roles"
+source = "{prefix}/roles/roles_lib.py, {prefix}/roles/workflows.toml"
+extractor = "tag_index:extract_field"
+role = "describes"
+purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md"
+join-armed-by = "dBoundRoles"
+
 # The native-id classes (PLAY-dOrderedCharter-28 S2), read by edge_grammar.read_native_classes: one [[native]]
 # row per class, `class`, the word an edge row's `from` or `to` names it by; `owner`, the build that registered
 # it; `pattern`, the `<module>:<name>` that compiles its ids, never a second regex; `resolver`, what prints its

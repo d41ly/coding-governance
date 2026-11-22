@@ -32,15 +32,18 @@ KIT_ROLES_VERSION = "1.25"
 FRONT_MATTER_KEYS = tuple("name description tools model maxTurns "
                           "workflow reads writes rules returns agent mandatory output".split())
 
-#: The closed `reads` vocabulary: `<family>:<field>`, a trailing `?` marking one optional.
-READ_KEYS = frozenset(
-    ["task:" + f for f in ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates")]
-    + ["card:" + f for f in ("route", "records", "classes", "read", "open", "reuse")]
-    + ["brief:" + f for f in ("prompt", "goal", "items", "acceptance", "gates", "non-goals")]
-    + ["input:" + f for f in ("spec", "diff", "question", "prompt")]
-    # the rows an item's upstream items established, handed on by `handoff.py render --upstream`, legal
-    # only optional since only an item naming upstream items has them (TOOL-dDeclaredLoop-29)
-    + ["upstream:rows"])
+#: The closed `reads` vocabulary, one literal: each family and its field names. A key is
+#: `<family>:<field>`, its tag `field.<family>.<field>` (TOOL-dBoundRoles-14), either spelling legal in a
+#: `reads` value and a trailing `?` marking one optional. The tag index reads this assignment from the
+#: committed blob, so it stays one literal.
+READ_FAMILIES = {"task": ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates"),
+                 "card": ("route", "records", "classes", "read", "open", "reuse"),
+                 "brief": ("prompt", "goal", "items", "acceptance", "gates", "non-goals"),
+                 "input": ("spec", "diff", "question", "prompt"),
+                 # the rows an item's upstream items established, handed on by `handoff.py render --upstream`,
+                 # legal only optional since only an item naming upstream items has them (TOOL-dDeclaredLoop-29)
+                 "upstream": ("rows",)}
+READ_KEYS = frozenset("%s:%s" % (f, n) for f, names in READ_FAMILIES.items() for n in names)
 
 #: The reasoning-effort levels a role or a stage may take (TOOL-aOrientedCast-10). Read from Claude
 #: Code 2.1.292, whose agent loader and `Workflow` `agent()` options both take these five names; the
@@ -445,6 +448,31 @@ def render_charter_blocks(charter, where, value, notes=None):
     blocks = ["### Charter rules\n\n" + "\n".join(lines)] if lines else []
     blocks += ["### %s\n\n%s" % (head, body) for head, body in charter["carried"]]
     return "\n\n".join(blocks) + "\n"
+
+
+def derive_field_tag(key):
+    """A native read key's tag: `task:title` is `field.task.title`."""
+    return "field." + key.replace(":", ".", 1)
+
+
+def parse_read_key(entry):
+    """`(native key, optional)` of one `reads` entry in either spelling: one trailing `?` is the
+    optional flag, `field.<family>.<name>` folds to `<family>:<name>`, and any other entry is returned
+    unchanged, so a key outside the vocabulary stays outside it (TOOL-dBoundRoles-14 S4)."""
+    entry = entry.strip()
+    optional = entry.endswith("?")
+    key = entry[:-1] if optional else entry
+    parts = key.split(".")
+    if len(parts) == 3 and parts[0] == "field" and all(parts):
+        key = "%s:%s" % (parts[1], parts[2])
+    return key, optional
+
+
+def derive_stage_field_tag(key):
+    """A harness stage key's tag: each capital lower-cased with a hyphen before it, `specWriter` to
+    `field.stage.spec-writer`. R9's STAGE_KEY_RE admits no digit and no hyphen, so the fold is
+    injective (TOOL-dBoundRoles-14 §8 F2)."""
+    return "field.stage." + re.sub(r"[A-Z]", lambda m: "-" + m.group(0).lower(), key)
 
 
 def parse_front_matter(path, text):

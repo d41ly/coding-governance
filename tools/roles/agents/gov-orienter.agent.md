@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Bash
 model: inherit
 maxTurns: 60
 workflow: orient
-reads: input:question, input:prompt?
+reads: field.input.question, field.input.prompt?
 writes: none
 rules: small, ids, memory, tokens, tools
 returns: the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows; handed a request to place, its disposition · reason · evidence · observations · scenarios · facts

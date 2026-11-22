@@ -44,3 +44,12 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T03:15:02Z dispatch · item 760bfa18 TOOL-dBoundRoles-14 · reason tools/playbook/namespaces.toml tools/playbook/tag_index.py tools/playbook/gov_tag.py tools/playbook/adopt-playbook.sh tools/playbook/README.md tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/handoff.py tools/roles/adopt-roles.test.sh tools/roles/agents tools/roles/README.md help/tags.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-1-acceptance-ledger.md
 
 2026-11-22T03:27:07Z brief · item TOOL-dBoundRoles-14 · reason c710a5e929a3 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-build-brief.md
+2026-11-22T03:43:25Z draw · re-dispatch · TOOL-dBoundRoles-14 · 3/122 · 20261122T034325Z-6295d1
+
+2026-11-22T03:43:25Z dispatch · item 1d58e026 TOOL-dBoundRoles-14 · reason memory/map/generated/symbols.json
+2026-11-22T03:47:17Z draw · re-dispatch · TOOL-dBoundRoles-14 · 4/122 · 20261122T034717Z-3add06
+
+2026-11-22T03:47:17Z dispatch · item 1d58e026 TOOL-dBoundRoles-14 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dBoundRoles/README.md
+2026-11-22T03:52:07Z draw · re-dispatch · TOOL-dBoundRoles-14 · 5/122 · 20261122T035207Z-c831c7
+
+2026-11-22T03:52:07Z dispatch · item 1d58e026 TOOL-dBoundRoles-14 · reason memory/map/generated/symbols.json memory/LIVE.md memory/backlog/TOOL.md memory/builds/dBoundRoles/README.md help/tags.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-1-acceptance-ledger.md memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-14.md tools/playbook/README.md tools/playbook/adopt-playbook.sh tools/playbook/gov_tag.py tools/playbook/namespaces.toml tools/playbook/tag_index.py tools/roles/README.md tools/roles/adopt-roles.test.sh tools/roles/agents/gov-builder.agent.md tools/roles/agents/gov-diff-reviewer.agent.md tools/roles/agents/gov-orienter.agent.md tools/roles/agents/gov-researcher.agent.md tools/roles/agents/gov-reuse-scout.agent.md tools/roles/agents/gov-session.agent.md tools/roles/agents/gov-skeptic.agent.md tools/roles/agents/gov-spec-reviewer.agent.md tools/roles/agents/gov-spec-writer.agent.md tools/roles/agents/gov-synthesizer.agent.md tools/roles/agents/gov-tester.agent.md tools/roles/check_roles.py tools/roles/handoff.py tools/roles/roles_lib.py
