@@ -260,3 +260,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T19:41:09Z dispatch · item 473b4d1f TOOL-dBoundRoles-8 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/agent-cap.js tools/hooks/README.md help/roles.md help/red-fix-lane.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-8-deviation-81.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-8-1-acceptance-ledger.md memory/map/generated/symbols.json
 
 2026-11-22T19:41:10Z brief · item TOOL-dBoundRoles-8 · reason c832d790d873 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-8-build-brief.md
+
+2026-11-22T20:12:18Z dispatch · item 10151b2e TOOL-dBoundRoles-48 · reason tools/roles/roles_lib.py tools/roles/handoff.py tools/roles/adopt-roles.test.sh tools/roles/README.md tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh tools/hooks/README.md help/roles.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-48-deviation-482.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-48-1-acceptance-ledger.md memory/map/generated/symbols.json
+
+2026-11-22T20:12:29Z brief · item TOOL-dBoundRoles-48 · reason c3e2de7e6c19 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-48-build-brief.md
