@@ -223,3 +223,4 @@ memory/builds/dSkippedRecord/README.md	bound	1	c2a407b0390f3d57a118b58e376c326ae
 memory/builds/dSweptScratch/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 memory/builds/dTrackedAtlas/README.md	bound	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 memory/builds/aWrappedRoster/README.md	bound	1	e33de0de688484ec474d932a3c0aa1354bcb4ebe	seeded
+memory/builds/aFlattenedSeed/README.md	bound	1	b2eec4b653aea1b6581df3d3b6a1c4114d775003	seeded

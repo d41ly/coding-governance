@@ -203,11 +203,15 @@ def derive_manifest_path():
 
 
 def read_manifest_rows(path):
-    """The manifest's rows, refused where the file is absent or is no list of objects."""
+    """The manifest's rows: its top-level list, or the list under a top-level object's `legs` key, the
+    shape an adopter's documented manifest takes (TOOL-aWrappedRoster-1, here TOOL-aFlattenedSeed-1 S1).
+    Refused where the file is absent or holds no list of objects in either shape."""
     try:
         rows = json.loads(pathlib.Path(path).read_bytes().decode("utf-8"))
     except (OSError, ValueError) as e:
         raise Refusal(f"{pathlib.Path(path).as_posix()} does not read as JSON: {e}") from None
+    if isinstance(rows, dict):
+        rows = rows.get("legs")
     if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
         raise Refusal(f"{pathlib.Path(path).as_posix()} is no list of leg rows")
     return rows
@@ -343,6 +347,15 @@ def run_fixture(only):
             if why:
                 failed += 1
                 lines.append(f"  FAIL case {label}: {'; '.join(why)}")
+        if only is None:  # TOOL-aFlattenedSeed-1 S1: an adopter's object-wrapped manifest reads its rows
+            wrapped = scratch / "wrapped.json"
+            wrapped.write_bytes(json.dumps({"_doc": "wrapped", "legs": [{"name": "a", "level": "unit"}]}).encode())
+            got = read_manifest_rows(wrapped)
+            lines.append(f"case wrapped manifest: {len(got)} row(s)")
+            picked = [*picked, None]
+            if got != [{"name": "a", "level": "unit"}]:
+                failed += 1
+                lines.append(f"  FAIL case wrapped manifest: read {got!r}")
     finally:
         remove_tree(scratch)
     lines.append(f"{SAY}: fixture · {len(picked) - failed} of {len(picked)} cases read as planted")
