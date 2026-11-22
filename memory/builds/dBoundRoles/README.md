@@ -86,7 +86,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
@@ -109,7 +109,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-55 — unit 49's overlay check refuses an empty expected set, and ends where unit 19 moves the house files out of the kit](spec/2026-10-26-spec-TOOL-dBoundRoles-55.md) | 6 | 2 | CLOSED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-15 — the role static block carried once per spawn, and its budget over the whole rendered block](spec/2026-10-25-spec-TOOL-dBoundRoles-15.md) | 7 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-17 — every work order's marker carrying `item=`, every return naming the work order it `answers`, today's population seeded](spec/2026-10-25-spec-TOOL-dBoundRoles-17.md) | 8 | 2 | CLOSED | rev-8 | 2026-11-22 |
-| [TOOL-dBoundRoles-6 — the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn](spec/2026-10-25-spec-TOOL-dBoundRoles-6.md) | 9 | 2 | DEFERRED | rev-7 | 2026-11-22 |
+| [TOOL-dBoundRoles-6 — the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn](spec/2026-10-25-spec-TOOL-dBoundRoles-6.md) | 9 | 2 | INPROGRESS | rev-7 | 2026-11-22 |
 | [TOOL-dBoundRoles-13 — inputs handed as content, each fact keyed and classed by the executor and re-cut fresh at act launch](spec/2026-10-25-spec-TOOL-dBoundRoles-13.md) | 10 | 2 | DEFERRED | rev-6 | 2026-11-22 |
 | [TOOL-dBoundRoles-3 — the work order rendered per item, hashed into the spawn marker and bound to its act](spec/2026-10-25-spec-TOOL-dBoundRoles-3.md) | 11 | 2 | DEFERRED | rev-8 | 2026-11-22 |
 | [TOOL-dBoundRoles-38 — handed content fenced inside the work order, and every reader of a fact line or a marker line skips what a fence holds](spec/2026-10-26-spec-TOOL-dBoundRoles-38.md) | 11 | 2 | DEFERRED | rev-6 | 2026-11-22 |
@@ -158,7 +158,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 304 bound to this build, across 4 record folder(s).
+Records: 305 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
