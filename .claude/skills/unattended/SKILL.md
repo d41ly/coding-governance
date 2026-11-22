@@ -142,7 +142,7 @@ python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
 ```
 
 A pass commit's `Pass: <unit-id>` trailer is graded by `unattended.sh --check-commit "$1"`. Drive by
-`scriptPath`: `tools/workflows/unattended-build.js`, then `tools/workflows/unattended-unit.js`.
+`scriptPath`: `tools/workflows/unattended-build.js`, then `tools/workflows/unattended-unit.js` with `facts` from `handoff.py facts`.
 
 ## Resume
 
@@ -155,7 +155,7 @@ reaps with `CronDelete` before scheduling, and runs `delete_scheduled_task` only
 under `in-place` after `bash tools/push-main.sh --prepare --slug <slug>` and
 `unattended.sh --authorization <slug>`. Attest with `unattended.sh --attest <slug> --item keepalive-reaped|parked-decisions-surfaced`.
 
-**TWO items have NO override, and this is where you will meet them: `authorization-reachable` and
+**TWO items have NO override: `authorization-reachable` and
 `pieces-complete`.** An override on the
 authorization check IS the authorization check, so the verb refuses the pair rather than recording
 it; and one on `pieces-complete`, a recipe-mode run's claim it produced what was asked, is the

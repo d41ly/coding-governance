@@ -4963,6 +4963,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkFactKeys",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkFile",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -10983,6 +10988,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveBlobId",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "deriveCellSample",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -12023,6 +12033,16 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_fact_class",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "derive_fact_key",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "derive_fact_plan",
       "kind": "function",
       "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
@@ -12541,6 +12561,11 @@
       "id": "derive_input_digest",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "derive_input_facts",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "derive_install_order",
@@ -20158,6 +20183,11 @@
       "file": "tools/run-gates/held_halves.py"
     },
     {
+      "id": "print_input_facts",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "print_interrupted_acts",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -25338,6 +25368,11 @@
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
+      "id": "read_repo_file",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "read_repo_root",
       "kind": "function",
       "file": "tools/loop/scenario.py"
@@ -29001,6 +29036,11 @@
       "id": "render_fact_expectation",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_fact_line",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "render_family_view",

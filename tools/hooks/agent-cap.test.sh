@@ -654,6 +654,20 @@ write_prompt_file(spec, render_marker(spec, task), task)
 rerendered = pre + "2026-10-11-prompt-T-1-3-researcher.md"
 MR = render_marker(rerendered, task, r_sec=role + "One more line.\n\n")
 write_prompt_file(rerendered, MR, task, role + "One more line.\n\n")
+# TOOL-dBoundRoles-13 - a handoff handing a spec as content under its record: key, the git blob id of the
+# spec bytes as they stand when this runs, CRLF folded, so a call after the spec moved cuts it fresh.
+fspec = "memory/builds/bx/spec/fact.md"
+fpath = os.path.join(root, fspec)
+if not os.path.exists(fpath):
+    with open(fpath, "w", newline="\n") as f:
+        f.write("The spec line.\n")
+with open(fpath, "rb") as f:
+    raw = f.read().replace(b"\r\n", b"\n")
+fblob = hashlib.sha1(b"blob %d\0" % len(raw) + raw).hexdigest()[:12]
+ftask = task + "\n### input:spec\n\n<!-- gov:fact key=record:%s@%s class=claimed -->\n\n%s" % (fspec, fblob, raw.decode("utf-8"))
+faced = pre + "2026-10-11-prompt-T-1-4-researcher.md"
+MF = render_marker(faced, ftask)
+write_prompt_file(faced, MF, ftask)
 prompts = {
     "ok": M + "\n\n" + task,
     "crlf": ("\n\n" + M + "\n\n" + task + "\n\n").replace("\n", "\r\n"),
@@ -670,6 +684,7 @@ prompts = {
     "nounit": MN + "\n\n" + task,
     "item": MI + "\n\n" + task,
     "rerendered": MR + "\n\n" + task,
+    "fact": MF + "\n\n" + ftask,
 }
 for k, v in prompts.items():
     with open(out + "." + k, "w", newline="") as f:
@@ -774,6 +789,16 @@ HO_DESC='bx · T-2 · research' run_spawn "rule6 OC27: a wrong-unit description 
 HO_DESC='bx · - · research' run_spawn "rule6 OC27: a dash unit part on the unit-less handoff refused" 2 gov-researcher nounit '"bx · research"'
 write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); del d["roles"]["gov-researcher"]["workflow"]; print(json.dumps(d))' "$HO_ROLES")"
 run_spawn "rule6 OC27: an index role with no workflow refused, naming the key" 2 gov-researcher ok 'declares no workflow for gov-researcher'
+# TOOL-dBoundRoles-13 AC3 — a handed fact re-cut at the spawn. The `fact` handoff hands the spec fact.md
+# under its record: key; the spec then gains one line, so the key the handoff carries moved, and
+# write_handoff cuts it fresh. Against checkHandoffSpawn with its fact step cut out, both refusals admit.
+write_roles "$HO_ROLES"
+run_spawn "rule6 BR13 AC3: a handoff whose handed spec is unchanged is admitted" 0 gov-researcher fact ""
+printf 'One more line.\n' >> "$HOREPO/memory/builds/bx/spec/fact.md"
+run_spawn "rule6 BR13 AC3: the spec moved after rendering refused, naming its record: key" 2 gov-researcher fact "fact: record:memory/builds/bx/spec/fact.md@"
+run_spawn "rule6 BR13 AC3: ...and naming the re-render that cuts it fresh" 2 gov-researcher fact "re-render the handoff, which cuts it fresh"
+write_handoff
+run_spawn "rule6 BR13 AC3: ...and the handoff re-rendered after the move admitted" 0 gov-researcher fact ""
 # TOOL-dBoundRoles-6 AC4 — role-sha compared at spawn. The index is re-rendered after the researcher's
 # body gained one line, so it carries HO_RSHA2; the `ok` handoff was rendered before it and carries
 # HO_RSHA. Against checkHandoffSpawn with its role-sha step cut out, the first row is admitted.
