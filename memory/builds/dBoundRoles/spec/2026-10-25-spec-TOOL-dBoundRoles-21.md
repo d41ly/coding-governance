@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-21 — the effort and model keys, `default` reserved, and the gate grant a role field, every reader re-pointed
 
-**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0186@e356242a whole
 **Carries:** node:policy-key.roles.effort.<role>
@@ -74,7 +74,10 @@ fallback dConvergedCharter retires. `resolve_stage_efforts`, R12, `handoff.py`'s
 - **S3** — The role's declared effort, `effort`, a row of `tools/roles/role-schema.toml`
   (TOOL-dBoundRoles-2 S1), one of `EFFORT_LEVELS` (`tools/roles/roles_lib.py#EFFORT_LEVELS`), required
   on every agent role and graded by R2; gov's agent roles declare the level each resolves to at the build run's
-  base, so no rendered effort moves in this unit. Observed by AC6.
+  base, so no rendered effort moves in this unit. Gov's role factory writes it too:
+  `ROLE_EFFORT = "medium"` joins `ROLE_TOOLS, ROLE_MODEL` (`tools/loop/factories.py@100722a6:111`), and
+  `tools/loop/factories.py#write_role` puts `effort=ROLE_EFFORT` in the `values` its front matter is
+  rendered from, so `core.py new role` keeps its gate green (§8 F11). Observed by AC6 and AC8.
 - **S4** — `default` reserved: R2 reds a role file whose slot is `default`, since
   `roles.effort.default` is the blanket and `roles.effort.<role>` would read it as a role.
   Observed by AC5.
@@ -124,15 +127,26 @@ fallback dConvergedCharter retires. `resolve_stage_efforts`, R12, `handoff.py`'s
   `help/reference/policy.md`, which lists the four under "Not yet summarised"
   (`help/reference/policy.md@66ea6f02:335-338`), with `render_playbook.py --reference`. The mirror
   `.governance/policy.json` records the catalogue's blob (`tools/policy/policy.py#render_mirror`), so
-  the catalogue edit leaves it stale. It is rewritten as its render, never by hand, and lands in the
-  pass commit, the route TOOL-dBoundRoles-44 §8 F5 and TOOL-dBoundRoles-51 §8 F3 record. `policy.py
+  the catalogue edit leaves it stale. It is rewritten as its render, never by hand, in a commit of its
+  own after the pass commit, never an amend: the route TOOL-dBoundRoles-44 S8 and §8 F5 and
+  TOOL-dBoundRoles-51 §8 F3 record, and the policy guard's docstring describes, a catalogue change in
+  one commit and its regenerated mirror the next (`tools/policy/guard.py@a5d4f958:9-12`). `policy.py
   mirror --write` refuses while the catalogue differs from HEAD and renders at HEAD
   (`tools/policy/policy.py#cmd_mirror`), so the pass commit is made first, then `python
-  tools/policy/policy.py mirror --write` runs at the repository's top, then the mirror is staged and
-  folded in with `git commit --amend --no-edit`. The amended commit renders the same bytes, by
-  `render_mirror`'s invariant: it holds the same policy, catalogue and legacy blobs over the same
-  parent. The policy guard admits the staged mirror there, as its render at HEAD with its inputs staged
-  as HEAD holds them (`tools/policy/guard.py@a5d4f958:9-12`). The render moves `catalogue_blob` alone,
+  tools/policy/policy.py mirror --write` runs at the repository's top, then `.governance/policy.json`
+  alone is staged and committed as the mirror commit. Its subject is `build(dBoundRoles):
+  TOOL-dBoundRoles-21's policy mirror rewritten as its render`, and its final trailer block is
+  `Pass: none`, then the charter's commit trailer (`AGENTS.md`, Facts, **Commit trailer:**) as its last
+  line, nothing after it. `--check-commit` (`tools/unattended/unattended.sh#check_commit_message`)
+  checks that attribution, then admits at `Pass: none` before it reads a declaration; `pass_commit`
+  (`tools/unattended/lib-unattended.sh#pass_commit`) attributes a `Pass: none` commit to no unit, so the
+  pass commit stays this unit's one pass commit. The mirror is the policy kit's `[[generated]]` output,
+  which each landing re-renders (`tools/policy/kit.toml@a87393a2:51-56`). The policy guard admits the
+  staged mirror there, as its render at HEAD with its inputs staged as HEAD holds them
+  (`tools/policy/guard.py@a5d4f958:9-12`). Between the two commits the mirror is stale, so the
+  acceptance ledger, which lands in the pass commit, records AC7's mirror half as owed at the mirror
+  commit, and the builder's return names that commit's sha and the line `mirror --check` printed
+  there. The render moves `catalogue_blob` alone,
   since a derived-default key is left out of the mirror and a pattern row is listed only where the
   file sets a key of it. Observed by AC7.
 
@@ -157,7 +171,7 @@ fallback dConvergedCharter retires. `resolve_stage_efforts`, R12, `handoff.py`'s
 - **hands-off** `TOOL-dBoundRoles-16` — `resolve_stage_efforts`, the resolver the shapes' efforts read, keys first and the house file by workflow and stage
 - **hands-off** `TOOL-dBoundRoles-23` — `roles.effort.default`, the blanket whose floor and provenance it checks
 - **hands-off** `TOOL-dBoundRoles-43` — `read_policy_setting` and the `gates` field, which unit 43 makes the one reader and renders into the ceiling (ids 7 and 31 of the round-1 spec audit)
-- **hands-off** `TOOL-dBoundRoles-44` — S8's mirror step, the mirror its render in the pass commit, which unit 44 §8 F5 admits (id 51 of the round-1 spec audit)
+- **hands-off** `TOOL-dBoundRoles-44` — S8's mirror step, the mirror its render in a commit of its own after the pass commit, which unit 44 S8 and §8 F5 admit (id 51 of the round-1 spec audit)
 
 ## 4. Design
 
@@ -230,7 +244,7 @@ step 2 from reading the blanket as a role.
 ### Inventory
 
 Minted: `read_policy_setting`, `resolve_role_model`, `HARNESS_MODEL_EQUIVALENT`, `check_gate_names`
-and `POLICY_DERIVED_LINE` in `roles_lib.py`; the role keys `effort` and `gates`; the reserved slot
+and `POLICY_DERIVED_LINE` in `roles_lib.py`; `ROLE_EFFORT` in `tools/loop/factories.py`; the role keys `effort` and `gates`; the reserved slot
 `default`. `POLICY_DERIVED_LINE` is the policy kit's `DERIVED_WHY` (`tools/policy/policy.py#DERIVED_WHY`)
 spelled again, since a kit imports no sibling, under the name the playbook kit spells it
 (`tools/playbook/render_playbook.py#POLICY_DERIVED_LINE`). Naming cells: each
@@ -258,11 +272,12 @@ session, as the house file's header says of its own values today.
 - `tools/roles/house/policy.toml` (the seed's two `[gates]` rows moved, its comment)
 - `tools/roles/README.md`
 - `tools/roles/adopt-roles.test.sh` (the arms of §7)
+- `tools/loop/factories.py` (`ROLE_EFFORT` beside `ROLE_TOOLS` and `ROLE_MODEL`, written by `write_role`, S3)
 - `tools/policy/catalogue.toml` (four rows' `summary` and `usage`)
 - `tools/policy/unsummarised-keys.txt` (drained by `policy.py lists --write`)
 - `help/reference/policy.md` (rendered by `render_playbook.py --reference`)
-- `.governance/policy.json` (rewritten as its render by `policy.py mirror --write`, folded into the
-  pass commit, S8)
+- `.governance/policy.json` (rewritten as its render by `policy.py mirror --write` after the pass
+  commit, alone in the mirror commit, S8)
 - `.claude/agents/` and `.claude/roles.json` (rendered by `render_agents.py --write`; every rendered
   level and grant is today's, so a byte that moves is the render's and is committed with it)
 
@@ -341,15 +356,23 @@ session, as the house file's header says of its own values today.
 - **AC7** — When `grep -cE '^roles\.(effort|model)' unsummarised-keys.txt` runs in `tools/policy/`, it
   prints 0, `git grep -nE 'tomllib.*policy\.toml|\.governance/policy' -- tools/roles` prints only
   comment lines, and `git grep -nwE '(from|import) policy' -- tools/roles` prints nothing. At the
-  pass commit, `python tools/policy/policy.py mirror --check` run at the repository's top prints
-  `policy: mirror fresh`.
+  mirror commit S8 makes after the pass commit, `python tools/policy/policy.py mirror --check` run at
+  the repository's top prints `policy: mirror fresh`, and `git show --name-only --format= HEAD` prints
+  `.governance/policy.json` alone.
   Red when: a key is read by a second parser in the roles kit, the policy kit is imported, a row
   stays unsummarised, or the mirror keeps its base bytes, whose `catalogue_blob` the catalogue edit
-  moved.
+  moved, or is written beside another change.
+- **AC8** — When `python -c "import sys; sys.path.insert(0, 'tools/loop'); import factories as f; top, rel = f.derive_layout(); clone, _sha = f.build_fixture_base(top, rel); rc = f.write_role(clone, rel, 'gov-probe', 'build', 'none', 'A probe role.', 'input:question', f.FIXTURE_ROLE_NEVER, f.FIXTURE_ROLE_RETURN, 'the answer, to its caller', 1024, 'layer.roles', 'item'); print(rc, (f.derive_roles_kit(clone, rel) / 'agents' / 'gov-probe.agent.md').read_text(encoding='utf-8').count(chr(10) + 'effort: medium' + chr(10)))"`
+  runs at the repository's top, it prints `0 1`: the factory writes the role into a scratch clone of
+  the working tree, its `roles catalogue` gate green, and the role declares `effort: medium` once.
+  fixture: the clone `build_fixture_base` in `tools/loop/factories.py` builds, the one the `role-new` plant
+  writes into; at `f5673cdca` the call prints `0 0`, no `effort` row existing yet.
+  Red when: `write_role` writes no `effort`, so R2 reds the new role, the factory puts every path back
+  and exits 1, and the file the call reads is absent.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `routed-commits selftest` · `scratch-guard self-test` · `policy fixtures` · `policy check` · `help reference pages` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `loop factories fixtures` · `check-wiring self-test` · `lexicon naming predicates` · `routed-commits selftest` · `scratch-guard self-test` · `policy fixtures` · `policy check` · `help reference pages` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · a fixture repository committing a policy file per plant, staged by a house-file effort beside a set key, a stage with only a role key, a house `[gates]` row beside a grant, a `codex` model key and a `default` role file · none
 
@@ -468,6 +491,35 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · a 
   most feature-rich option: every criterion and every current reader with no follow-up, the merge
   living in one core beside the grading that `load_policy` already holds.
   widens: none · relaxes: none
+- **F11 — What effort does gov's role factory write on a new agent role, once S3 makes `effort`
+  required?** `tools/loop/factories.py#write_role` renders the front matter from
+  `roles_lib.FRONT_MATTER_KEYS` and a `values` dict holding `tools=ROLE_TOOLS` and `model=ROLE_MODEL`
+  (`tools/loop/factories.py@100722a6:111`) and no effort, and `render_front_matter` drops a key `values`
+  lacks; the kind's gate runs innermost and puts every path back when R2 reds
+  (`tools/loop/factories.py#write_kind_instance`), so every `core.py new role` and the `role-new` plant
+  would red. Options: (a) a constant `ROLE_EFFORT = "medium"` on `ROLE_TOOLS, ROLE_MODEL`'s line, which
+  `write_role` writes as `effort`; (b) the house file's `[effort] default`, read at write time; (c) the
+  key `roles.effort.default`, read at write time; (d) a new `--effort` flag. (d) is a new public
+  surface, the factory's argv with its `tools/govkit/usage.toml` row, `help/loop.md` and the
+  `NEW_ARGV["role-new"]` plant (veto 2). (b), probed at `f5673cdca`: `load_policy(kit_dir, roles,
+  workflows)` takes the loaded roles and the workflow table and refuses on any defect of the file
+  (`tools/roles/roles_lib.py#load_policy`), so a red house file would refuse a role write; after S7 an
+  absent file is an empty fallback, so (b) still owes (a)'s constant; and while the file is present,
+  step 4 of §4's order already yields its default at render, so (b)'s copy is read only at step 5,
+  where the file is absent and (b) has nothing to read. (c) reaches the policy kit from the loop kit by
+  a subprocess, and an unset row reads `None` (F8), so it too owes (a)'s constant. (a), probed at
+  `f5673cdca` by AC8's call: it prints `0 0`, the factory green with no `effort` line, and the count
+  moves to 1 once `write_role` writes the key. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3,
+  every criterion with no follow-up, tie-broken by fewer open questions, since (b) and (c) each still
+  owe (a)'s constant, then by reuse of the `ROLE_TOOLS, ROLE_MODEL` seam. `medium` is gov's house
+  `[effort] default` (`tools/roles/house/policy.toml@025dbf0f:8`) and TOOL-dBoundRoles-23 S5's floor,
+  so a factory-made role renders the level it renders today and meets that floor. What (a) does not
+  check: that the constant stays equal to a house default; an adopter's own default still applies at
+  step 4, the declared `medium` read only once its house file is gone. The `role-hand` plant's file
+  declares no `effort` either, and R2 names each absent key on its own line, the `writes` line at
+  `tools/roles/check_roles.py@f00f5d8a:250-252` and an agent role's `effort` at `:275-278`, so that case
+  still meets the `writes` line it owes.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -503,6 +555,13 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · a 
   `load_policy` returns the merged grant every reader takes, `run_mode` and `render_handoff` named (F10,
   AC4's ceiling); `.governance/policy.json` joins Files touched as its render folded into the pass
   commit (S8, AC7). Each criterion keeps its number.
+- rev-7 · 2026-11-22 · S3 S8 · §3 · §4 · AC7 AC8 · §7 · §8 F11 · folds the two items of
+  `2026-11-22-build-TOOL-dBoundRoles-21-2-builder-return` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-21-spec-fix-2-brief`, grounded at `f5673cdca`. Gov's role factory
+  writes `effort: medium` from `ROLE_EFFORT` beside `ROLE_TOOLS` and `ROLE_MODEL` (F11), so
+  `tools/loop/factories.py` joins Files touched, AC8 observes the write and `loop factories fixtures`
+  joins §7; the mirror is rewritten after the pass commit in a `Pass: none` mirror commit of its own,
+  no amend, where AC7 observes it fresh. Each criterion keeps its number; AC8 is new.
 
 ## 10. Reuse audit
 
@@ -533,6 +592,12 @@ readers S6 names. This roles-kit spelling is the third copy of the refusal text,
 reader into `tools/lib/` is outside the four items this rev folds. The recall probe returned the
 backlog ask TOOL-dIndexedDesign-22, which F8's pick answers, and TOOL-dGroundRules-62, whose caps module
 reads the same refusal as no file value in process.
+
+At rev-7, verified at `f5673cdca`: the factory's effort extends the seam its tools and model already
+take, the `ROLE_TOOLS, ROLE_MODEL` constants `tools/loop/factories.py#write_role` writes
+(`tools/loop/factories.py@100722a6:111`), and the mirror commit takes the two-commit route
+`tools/policy/guard.py@a5d4f958:9-12` describes and `tools/unattended/unattended.sh#check_commit_message`
+admits at `Pass: none`.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a stage's effort resolved from keys and the house policy file" --terms "resolve_stage_efforts effort keys roles.effort default house policy gates grant R12 stage-efforts"`
 

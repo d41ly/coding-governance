@@ -20,6 +20,13 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   grant (§8 F10), and `.governance/policy.json` is rewritten as its render after the pass commit, as §2 S8 states.
   This pass runs in the run's own tree; TOOL-dBoundRoles-37 is already built and CLOSED at `5f7f208fd`.
 
+- Rev-7 then folded the second builder's divergence
+  (`build/2026-11-22-build-TOOL-dBoundRoles-21-2-builder-return.md`): the role factory writes `ROLE_EFFORT = "medium"`
+  (§8 F11, observed by AC8), and the mirror is committed alone after the pass commit, AC7 observed there, never an
+  amend. That builder's unverified partial implementation is the patch
+  `C:/Users/d41ly/AppData/Local/Temp/claude/bf1faa02b154e3ee/b48c5b81-0c25-4457-90e8-da811a25e0e9/scratchpad/TOOL-dBoundRoles-21-partial.patch`;
+  reuse what still fits rev-7 and verify every hunk against the spec.
+
 ## What the main loop needs from your commit
 
 - One pass commit, its subject naming `TOOL-dBoundRoles-21`, its final trailer block carrying `Pass: TOOL-dBoundRoles-21` beside
