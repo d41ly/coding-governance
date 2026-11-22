@@ -146,7 +146,7 @@ notices that HEAD has moved past the `at` of its card's `item —` line and star
 --card --boundary --build <slug> --session <sid>` in the background, so the call is not held up. The
 verb moves `at` to HEAD and reads the build's current item. When the item has changed it prints
 `boundary — <old> → <new>` and rewrites your session card's section. The `card.pointers` policy key
-decides whether the build's card is published too:
+decides whether the build's card is published too: <!-- usage: policy:card.pointers 6940ded3 -->
 
 - `every-item` (the default): the build's card is published at every item boundary.
 - `at-transitions`: only your session card is rewritten; the build's card gets a fresh section at the
