@@ -12,6 +12,7 @@
 | [2026-11-22-build-KICK-dKeptSession-69-red-fix-10.md](../build/2026-11-22-build-KICK-dKeptSession-69-red-fix-10.md) | red-fix | — |
 | [2026-11-22-build-KICK-dKeptSession-69-red-fix-9.md](../build/2026-11-22-build-KICK-dKeptSession-69-red-fix-9.md) | red-fix | — |
 | [2026-11-22-build-KICK-dKeptSession-69-widen-1.md](../build/2026-11-22-build-KICK-dKeptSession-69-widen-1.md) | widen | — |
+| [2026-11-22-build-KICK-dKeptSession-69-widen-2.md](../build/2026-11-22-build-KICK-dKeptSession-69-widen-2.md) | widen | — |
 | [2026-11-22-prompt-KICK-dKeptSession-69-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-69-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-KICK-dKeptSession-69-2-builder.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-69-2-builder.md) | journal | — |
 | [2026-11-22-prompt-KICK-dKeptSession-69-3-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-69-3-spec-writer.md) | journal | — |
