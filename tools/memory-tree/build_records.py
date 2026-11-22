@@ -286,7 +286,7 @@ if set(KINDS) != set(TYPED_RECORD_KINDS):
     raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "
                       + ", ".join(sorted(set(KINDS) ^ set(TYPED_RECORD_KINDS))))
 DOORS = ("exception", "change", "override", "red-fix", "disposition", "recommendation")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
-PLANTS = ("typed-kinds", "pending-kind", "red-fix-join", "recommendation")
+PLANTS = ("typed-kinds", "pending-kind", "red-fix-join", "recommendation", "ask-door")
 SHA40 = re.compile(r"[0-9a-f]{40}")
 SAY_JOIN = "build-records: red-fix join"
 #: PLAY-dOrderedCharter-55 S8's `pending-kind`: the exception kind's entry staged pending, in a copy of this module
@@ -1012,6 +1012,40 @@ def check_mint_authority(root, build):
     return lines + [f"minted under the session rule: no claim or lease for {build}"]
 
 
+def write_seq_mint(root, family, build, key):
+    """The counter mint of one `<FAMILY>-<slug>-<seq>` id, `key` its claimant: `gov-claim.sh ask <family>
+    <build> --claimant <key>` through the claim CLI's one caller seam, and on its `local … · no remote`
+    answer the driver's floor `derive_ask_seq`, run sourced. The counter ref is the authority, so no lease
+    or claim is read. Its callers are the `fields` door's `<seq>` rule and the ask handler of
+    `gov_record.py` (TOOL-dTotalRecall-7 §4). -> `(word, said, lines)`, `word` `minted` or `waiting`,
+    `said` the id or the waiting line, `lines` the `local` line where the floor minted; ValueError for
+    every refusal."""
+    import gen_build_index  # noqa: E402  the claim CLI's one caller seam
+    try:
+        rc, said = gen_build_index.run_claim_cli(str(root), "ask", family, build, "--claimant", key)
+    except gen_build_index.Problem as exc:
+        raise ValueError(str(exc)) from None
+    if rc == 4:
+        return "waiting", said, []
+    if rc != 0:
+        raise ValueError(said)
+    if not said.startswith("local "):
+        return "minted", said.split(" ", 1)[1].strip(), []
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    try:
+        resolve_kit_dir("unattended", "unattended.sh", KIT)
+        loop = resolve_kit_dir("loop", "breakpoints.py", KIT)
+    except LookupError:
+        raise ValueError("unarmed — no unattended kit") from None
+    if str(loop) not in sys.path:
+        sys.path.insert(0, str(loop))
+    from breakpoints import run_sourced   # noqa: E402  the driver's one floor, never a third copy
+    rc, out = run_sourced(root, "derive_ask_seq %s %s" % (family, build))
+    if rc != 0 or not out.strip().isdigit():
+        raise ValueError(f"derive_ask_seq {family} {build} answered exit {rc}: {out.strip()[-200:]}")
+    return "minted", f"{family}-{build}-{out.strip()}", [said]
+
+
 def write_new_record(root, kind, build, unit, title, fields, name=None):
     """The record door's one write (TOOL-dTotalRecall-2 S1-S8): the `kind` record of `build` serving `unit`,
     headed `title`, `fields` its `(key, value)` pairs in the caller's order, `name` the stem a row with an
@@ -1140,31 +1174,10 @@ def write_new_record(root, kind, build, unit, title, fields, name=None):
         rel = write_record(root, build, unit, kind, title, ordered, today, check=check_written)
     else:
         if seq:
-            import gen_build_index  # noqa: E402  the claim CLI's one caller seam
-            try:
-                rc, said = gen_build_index.run_claim_cli(str(root), "ask", seq[0], build, "--claimant", key)
-            except gen_build_index.Problem as exc:
-                raise ValueError(str(exc)) from None
-            if rc == 4:
-                return "waiting", said, key, lines
-            if rc != 0:
-                raise ValueError(said)
-            if said.startswith("local "):
-                from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
-                try:
-                    resolve_kit_dir("unattended", "unattended.sh", KIT)
-                    loop = resolve_kit_dir("loop", "breakpoints.py", KIT)
-                except LookupError:
-                    raise ValueError("unarmed — no unattended kit") from None
-                if str(loop) not in sys.path:
-                    sys.path.insert(0, str(loop))
-                from breakpoints import run_sourced   # noqa: E402  the driver's one floor, never a third copy
-                rc, out = run_sourced(root, "derive_ask_seq %s %s" % (seq[0], build))
-                if rc != 0 or not out.strip().isdigit():
-                    raise ValueError(f"derive_ask_seq {seq[0]} {build} answered exit {rc}: {out.strip()[-200:]}")
-                lines, minted = lines + [said], f"{seq[0]}-{build}-{out.strip()}"
-            else:
-                minted = said.split(" ", 1)[1].strip()
+            word, minted, floor = write_seq_mint(root, seq[0], build, key)
+            if word == "waiting":
+                return "waiting", minted, key, lines
+            lines = lines + floor
             rel = f"{folder}/{minted}.md"
             text = render_text(rel, 1)
         pathlib.Path(root, rel).parent.mkdir(parents=True, exist_ok=True)
@@ -1290,6 +1303,137 @@ def check_recommendation_plant(root, unit, run_git):
     return bad + check_bindings(root, "recommendation", written, run_git)
 
 
+def seed_ask_repo(top, name, policy=None):
+    """The `ask-door` plant's seed (TOOL-dTotalRecall-7 AC4): a git repository `top/name` whose one commit on
+    `main` holds a `.memory-tree.conf` declaring `example:EXMP`, this kit's `record-kinds.toml` at its kit
+    path, and the build folder `tDoor` with its README and no `BACKLOG.md`, plus `policy` as its
+    `.governance/policy.toml` where given; no remote. -> its path."""
+    import record_kinds  # noqa: E402  the registry's kit path
+    import subprocess
+    root = pathlib.Path(top, name)
+    files = {".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="example:EXMP"\n',
+             "memory/builds/tDoor/README.md": "# tDoor\n",
+             f"{record_kinds.derive_kit_rel()}/{record_kinds.REGISTRY}": (KIT / record_kinds.REGISTRY).read_bytes().decode("utf-8")}
+    if policy is not None:
+        files[".governance/policy.toml"] = policy
+    for rel, text in files.items():
+        pathlib.Path(root, rel).parent.mkdir(parents=True, exist_ok=True)
+        with open(pathlib.Path(root, rel), "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(text)
+    for argv in (("init", "-q", "--template="), ("symbolic-ref", "HEAD", "refs/heads/main"),
+                 ("config", "user.name", "fx"), ("config", "user.email", "fx@example.invalid"),
+                 ("config", "commit.gpgsign", "false"), ("config", "core.autocrlf", "false"),
+                 ("add", "-A"), ("commit", "-qm", "the ask-door seed")):
+        subprocess.run(["git", *argv], cwd=str(root), capture_output=True, check=True)
+    return root
+
+
+def run_ask_door(root, *flags):
+    """`gov_record.py new ask --build tDoor <flags>` run from this kit in the seed `root`: `(exit, output)`."""
+    import subprocess
+    p = subprocess.run([sys.executable, str(KIT / "gov_record.py"), "new", "ask", "--build", "tDoor", *flags],
+                       cwd=str(root), capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       stdin=subprocess.DEVNULL, timeout=600)
+    return p.returncode, (p.stdout + p.stderr).strip()
+
+
+def check_ask_plant():
+    """`--fixture --plant ask-door` (TOOL-dTotalRecall-7 AC4 to AC7, AC10 to AC12): the ask door's refuse,
+    undeclared-family, file, replay and grade cases in one seed, the refused read in a seed whose one commit
+    holds an invalid `asks.acceptance`, and the refused and filed cases over a bare remote, each seed under
+    the host temp directory and the door run from this kit. -> `(failures, cases)`, or `(None, why)` where
+    a kit the door runs beside does not resolve."""
+    import subprocess
+    import tempfile
+    import backlog  # noqa: E402  the parser, the predicate and the verdicts the cases read
+    from deviation_join import remove_tree   # noqa: E402  the kit's fixture helper
+    for home, anchor in (("policy", "policy.py"), ("unattended", "unattended.sh"), ("loop", "breakpoints.py")):
+        try:
+            backlog.resolve_kit_dir(home, anchor, KIT)
+        except LookupError:
+            return None, f"no {home} kit beside this one"
+    bad, cases = [], [0]
+    rel, first = "memory/builds/tDoor/BACKLOG.md", "EXMP-tDoor-1"
+    base = ["--family", "EXMP", "--text", "x", "--sev", "LOW", "a fixture ask"]
+    accept = ["--clause", "accept", "the leg is green"]
+    grammar = backlog.build_grammar(("EXMP",))
+    top = pathlib.Path(tempfile.mkdtemp(prefix="ask-"))
+
+    def run_git(root, *args):
+        return subprocess.run(["git", *args], cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+                              check=True).stdout
+
+    def check_case(case, got, rc, needles, root=None):
+        """One case: its exit, each needle in its output, and where `root` is given a clean status."""
+        status = run_git(root, "status", "--porcelain").strip() if root is not None else ""
+        lack = [n for n in needles if n not in got[1]]
+        cases[0] += 1
+        if got[0] != rc or lack or status:
+            bad.append(f"{case}: exited {got[0]}, not {rc}; missing {lack}; status {status!r}: {got[1][:300]}")
+        print(f"build-records: ask-door · {case} · exit {got[0]}")
+
+    def read_backlog(root):
+        """The seed's backlog parsed under `EXMP`, and the verdicts of a corpus of it under the clean conf."""
+        parsed = backlog.parse_file(rel, (root / rel).read_bytes().decode("utf-8"), grammar)
+        return parsed, backlog.derive_verdicts(backlog.build_corpus([parsed]), backlog._CLEAN_CONF)
+
+    try:
+        a = seed_ask_repo(top, "a")
+        check_case("refuse", run_ask_door(a, *base), 2, ["asks.acceptance", "accept", "seen … run"], a)   # AC4
+        check_case("undeclared family", run_ask_door(a, *derive_flags(base, "--family", "NOPE"), "--clause", "accept",
+                                                     "y"), 2, ["--family", "NOPE", "EXMP"], a)   # AC10
+        check_case("no family", run_ask_door(a, *base[2:], "--clause", "accept", "y"), 2, ["--family"], a)
+        got = run_ask_door(a, *base, *accept)   # AC5
+        check_case("file", got, 0, [f"wrote {rel} {first} key "])
+        key = (re.search(rf"^wrote {re.escape(rel)} {first} key ([0-9a-f]{{12}})$", got[1], re.M) or [None, None])[1]
+        if key is None:
+            bad.append(f"file: no `wrote {rel} {first} key <12 hex digits>` line: {got[1][:300]}")
+            return bad, cases[0]
+        parsed, verdicts = read_backlog(a)
+        asks = [x for x in parsed.asks if x.id == first]
+        sevs = [r for r in parsed.rows if r.verb == backlog.SEV_VERB and r.target == first and r.value == "LOW"]
+        graded = asks and backlog.check_ask_acceptable({label: tuple(backlog.read_clause_values(asks[0].clauses, label))
+                                                        for label in backlog.CLAUSE_LABELS})
+        named = sorted({v.code for v in verdicts if first in v.text} & {12, 14})
+        if len(parsed.asks) != 1 or len(asks) != 1 or not graded or len(sevs) != 1 or named:
+            bad.append(f"file: the backlog reads {len(parsed.asks)} ask(s), {len(sevs)} LOW SEV row(s) naming {first}, "
+                       f"graded {bool(graded)}, named under {named}")
+        held = (a / rel).read_bytes()
+        check_case("replay", run_ask_door(a, *base, *accept), 0, [f"exists {rel} {first} key {key}"])   # AC12
+        if (a / rel).read_bytes() != held or len(read_backlog(a)[0].asks) != 1:
+            bad.append("replay: the backlog's bytes moved, or it no longer reads one ask")
+        (a / ".governance").mkdir(exist_ok=True)
+        with open(a / ".governance/policy.toml", "w", encoding="utf-8", newline="\n") as fh:
+            fh.write('asks.acceptance = "grade"\n')
+        run_git(a, "add", "-A")
+        run_git(a, "commit", "-qm", "asks.acceptance graded")
+        got = run_ask_door(a, *base)   # AC6
+        check_case("grade", got, 0, ["graded: not ready (R5)", f"wrote {rel} "])
+        gid = (re.search(rf"^wrote {re.escape(rel)} (\S+) key", got[1], re.M) or [None, "NONE"])[1]
+        if not any(v.code == 14 and gid in v.text for v in read_backlog(a)[1]):
+            bad.append(f"grade: V14 does not name {gid}, the id the grade case filed")
+        b = seed_ask_repo(top, "b", 'asks.acceptance = "bogus"\n')   # AC7
+        check_case("refused read", run_ask_door(b, *base), 2, ["asks.acceptance", "policy: refused"], b)
+        c = seed_ask_repo(top, "c")   # AC11
+        run_git(top, "init", "-q", "--bare", "--template=", "c.git")
+        run_git(top / "c.git", "symbolic-ref", "HEAD", "refs/heads/main")
+        run_git(c, "remote", "add", "origin", (top / "c.git").as_posix())
+        run_git(c, "push", "-q", "origin", "main")
+        check_case("refused on a remote", run_ask_door(c, *base), 2, ["asks.acceptance"], c)
+        refs = run_git(c, "ls-remote", "origin", "refs/gov/claims/asks/*").strip()
+        if refs:
+            bad.append(f"refused on a remote: the refused filing left a counter ref on origin: {refs}")
+        check_case("filed on a remote", run_ask_door(c, *base, *accept), 0, [f"wrote {rel} {first} key "])
+        refs = run_git(c, "ls-remote", "origin", "refs/gov/claims/asks/*").strip().splitlines()
+        if len(refs) != 1 or not refs[0].endswith("refs/gov/claims/asks/EXMP-tDoor"):
+            bad.append(f"filed on a remote: origin holds {refs}, not the one counter ref of EXMP-tDoor")
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError, ValueError) as exc:
+        bad.append(f"the fixture could not be built: {exc}")
+    finally:
+        remove_tree(top)
+    return bad, cases[0]
+
+
 def run_fixture(plant):
     """`--fixture --plant typed-kinds` (PLAY-dOrderedCharter-42 S4): one record of every kind of
     `TYPED_RECORD_KINDS`, read at run time, in a build folder of a scratch git repository under the host
@@ -1300,6 +1444,18 @@ def run_fixture(plant):
     from deviation_join import remove_tree, set_env_aside   # noqa: E402  the kit's fixture helpers
     from tree_lib import GIT_ENV_LEAKS, read_bindings        # noqa: E402
     unit, bad, written = "ARCH-tKinds-1", [], {}
+    if plant == "ask-door":   # TOOL-dTotalRecall-7: the ask door's cases, each in a seed of its own
+        with set_env_aside(GIT_ENV_LEAKS):
+            bad, cases = check_ask_plant()
+        if bad is None:
+            print(f"build-records: SKIP {plant} — {cases}, so its cases are UNEXERCISED here")
+            return 0
+        for why in bad:
+            print(f"build-records: FAIL {plant} · {why}")
+        if bad:
+            return 1
+        print(f"build-records: PASS {plant} — {cases} cases: refuse, family, file, replay, grade, refused read, remote")
+        return 0
     root = pathlib.Path(tempfile.mkdtemp(prefix="br-"))
     if plant == "pending-kind":   # PLAY-dOrderedCharter-55 S8: a copy of this module with one kind pending
         import contextlib

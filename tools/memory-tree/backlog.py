@@ -426,6 +426,16 @@ def parse_seen(value: str) -> Seen:
                 f"`` `path` matching `pattern` ``, or `<repo>:<path>@<sha>`")
 
 
+def check_ask_acceptable(clauses) -> bool:
+    """Does a merged-clauses mapping state what done means? `accept`, or a `seen … run`.
+
+    THE ONE PREDICATE (TOOL-dTotalRecall-7 S1): V14, READY's R5 and the record door's `new ask`
+    each ask it of a `{label: (value, …)}` mapping, `derive_clauses`'s shape, so a filing graded at
+    the door reads exactly as V14 grades it after."""
+    return bool(clauses.get("accept")) or any(parse_seen(v).command
+                                               for v in clauses.get("seen", ()))
+
+
 def extract_grants(value: str) -> tuple:
     """`(grants, why)` for one `may` value. `('none',)` is the absorbed token, never a grant.
 
@@ -1179,10 +1189,7 @@ def derive_verdicts(corpus: Corpus, conf: Conf) -> list:
             for ask in parsed.asks:
                 if ask.filed < conf.cutoff:
                     continue
-                clauses = merged.get(ask.id, {})
-                if clauses.get("accept"):
-                    continue
-                if any(parse_seen(v).command for v in clauses.get("seen", ())):
+                if check_ask_acceptable(merged.get(ask.id, {})):
                     continue
                 out.append(Verdict(14, f"{ask.path}:{ask.line}: {ask.id} is filed on or after "
                                        f"{conf.cutoff} and its merged clauses carry neither "
@@ -1495,8 +1502,7 @@ def derive_ready(grader: Grader, ask_id: str) -> Ready:
         missing.append("R4")
 
     # R5 — ACCEPTABLE. `accept` says what done looks like; a `seen … run` says a machine can ask.
-    if not (clauses.get("accept")
-            or any(parse_seen(v).command for v in clauses.get("seen", ()))):
+    if not check_ask_acceptable(clauses):
         missing.append("R5")
 
     if external and not clauses.get("data"):

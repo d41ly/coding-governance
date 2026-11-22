@@ -7,7 +7,6 @@ annotations.delivery
 annotations.grammar
 annotations.lookup
 annotations.resolve-scope
-asks.acceptance
 attendance
 attendance.scope
 autonomy

@@ -471,7 +471,11 @@ Forward-only means graded only for an ask filed on or after `ASK_CUTOFF`.
 - `V13` — the clause tail's grammar: an empty clause, one label twice on a row, a malformed `seen` or
   `may`, a `may` on a `SCOPE` row, a `SCOPE` row naming an unfiled ask, or two `SCOPE` rows for one
   target in one file.
-- `V14` — forward-only: an ask whose merged clauses carry neither `accept` nor a `seen … run`.
+- `V14` — forward-only: an ask whose merged clauses carry neither `accept` nor a `seen … run`. The one
+  predicate is `backlog.py`'s `check_ask_acceptable`, which READY's R5 and the filing path call too: an ask
+  is filed through `gov_record.py new ask --build <slug> --family <FAMILY> --text <text> --sev <LEVEL> <why>
+  [--clause <label> <value>]...`, which grades its clauses under `asks.acceptance` before any id is minted,
+  refusing (`refuse`, the default) or filing it graded not ready (`grade`).
 - `V15` — `ASK_CUTOFF` blank under `builds`, which disarms the forward-only verdicts.
 - `V16` — `ASK_CUTOFF` not a zero-padded date, which disarms them the same way.
 

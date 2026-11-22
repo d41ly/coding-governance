@@ -9390,6 +9390,12 @@ def cmd_selftest() -> int:
             et, _ac4, cutoff="2026-06-02"))
         arm("moving the cutoff PAST every ask disarms V14 entirely — the forward-only control",
             "0", lambda: str(len([x for x in _out4b.split("\n") if "    V14 " in x])))
+        # TOOL-dTotalRecall-7 S1 — the one predicate V14, R5 and the ask door call: `accept`, or a `seen`
+        # carrying its `run` tail, and a bare `seen` is no acceptance. Red on a cut of the `run` test.
+        arm("check_ask_acceptable takes accept and a seen … run, and refuses a bare seen and nothing",
+            "[True, True, False, False]", lambda: str([backlog.check_ask_acceptable(c) for c in (
+                dict([(_ACCEPT[0], (_ACCEPT[1],))]),
+                {"seen": (_SEEN_HERE[1] + " run `git --version`",)}, {"seen": (_SEEN_HERE[1],)}, {})]))
 
         # AC5 — the six rules, one failing fixture each, graded over ONE mandate. The expected
         # table is spelled row by row rather than summarised: a count would pass over two rows that

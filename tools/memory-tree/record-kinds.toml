@@ -714,3 +714,17 @@ readers-none = "no role's reads: names a stream plan until dWellOiledMachine's p
 lifecycle = "current-state"
 check = "record-kinds"
 purpose = { text = "a build's units grouped into ordered streams, written by dIndexedDesign's planner, read by dWellOiledMachine's pick", source = "owner" }
+
+[[record-kind]]
+name = "ask"
+tag = "record.ask"
+layer = "layer.memory"
+home = "memory/builds/*/BACKLOG.md"
+id-rule = "<FAMILY>-<slug>-<seq>"
+schema = { form = "rows", fields = [] }
+writer = "gov_record.py new ask"
+readers = []
+readers-none = "an ask row is read by backlog.py's fold and the index generator's views, never filled into a work order"
+lifecycle = "current-state"
+check = "memory hygiene"
+purpose = { text = "the ask kind's acceptance at filing; its writers are the items that file asks, each filing stating its acceptance", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:455" }

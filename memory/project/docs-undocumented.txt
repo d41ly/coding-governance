@@ -77,7 +77,6 @@ policy:annotations.delivery	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:annotations.grammar	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:annotations.lookup	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:annotations.resolve-scope	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:asks.acceptance	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:attendance	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:attendance.scope	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:autonomy	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

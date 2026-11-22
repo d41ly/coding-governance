@@ -824,7 +824,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 
 <!-- gen:record-kinds -->
 
-49 kinds · 24 purposes pending
+50 kinds · 24 purposes pending
 
 | Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |
 |---|---|---|---|---|---|---|---|
@@ -877,6 +877,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 | `index-render-stamp` | `record.index-render-stamp` | `<git-common-dir>/gen-build-index-render-stamp` | `gen_build_index.py` | — | — | `record-kinds` | — |
 | `git-client-state` | `record.git-client-state` | `<git-common-dir>/sourcetreeconfig.json` | `hand` | — | — | `record-kinds` | — |
 | `stream-plan` | `record.stream-plan` | `memory/builds/*/build/*-stream-plan-*.md` | `hand` | — | — | `record-kinds` | a build's units grouped into ordered streams, written by dIndexedDesign's planner, read by dWellOiledMachine's pick |
+| `ask` | `record.ask` | `memory/builds/*/BACKLOG.md` | `gov_record.py new ask` | — | — | `memory hygiene` | the ask kind's acceptance at filing; its writers are the items that file asks, each filing stating its acceptance |
 
 <!-- /gen:record-kinds -->
 

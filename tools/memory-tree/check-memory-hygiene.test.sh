@@ -3718,6 +3718,19 @@ else
   echo "skip the record door's lease and counter arms: no unattended kit beside this one, so its 8 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+8))
 fi
 
+# --- TOOL-dTotalRecall-7 (AC4 AC5 AC6 AC7 AC10 AC11 AC12) — the ask door, `gov_record.py new ask`: the plant
+# --- runs the refuse, undeclared-family, file, replay, grade, refused-read and refused-filing-on-a-remote
+# --- cases, each in a seed under the host temp directory. Red on a grade after the write, a family check
+# --- cut, a mint before the grade and a listing cut. It needs the policy, unattended and loop kits beside
+# --- this one and skips ALOUD without them.
+out=$("$_PY" "$HERE/build_records.py" --fixture --plant ask-door 2>&1)
+if grep -qF 'build-records: SKIP ask-door' <<<"$out"; then
+  echo "skip the ask door's plant: $(grep -F 'build-records: SKIP ask-door' <<<"$out"), so its 2 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+2))
+else
+  hit 'build-records: PASS ask-door'
+  miss 'build-records: FAIL'
+fi
+
 # --- TOOL-aNimbleMend-9 S7 (AC2 to AC6) — the red-fix door and its join: the plant stages, in a scratch
 # --- repository of its own, the door deriving Commit and Files from an abbreviated rev, its three
 # --- refusals, an owed fix at HEAD, the --staged form red and then green, the clean join and each of J1
@@ -5470,7 +5483,10 @@ done
 # RAISED 797 -> 828 by TOOL-dTotalRecall-2 on 2026-11-22: the record door's thirty-one assertions, twenty-three
 # top-level and never skipped, and eight behind the unattended kit, skipped aloud with n_skip carrying them.
 # Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=828
+# RAISED 828 -> 830 by TOOL-dTotalRecall-7 on 2026-11-22: the ask-door plant's two assertions, its PASS line
+# and no FAIL line, top-level and skipped aloud with n_skip carrying them where a kit the door runs beside is
+# absent. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=830
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

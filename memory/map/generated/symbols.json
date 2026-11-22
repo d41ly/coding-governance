@@ -5568,6 +5568,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "check_ask_acceptable",
+      "kind": "function",
+      "file": "tools/memory-tree/backlog.py"
+    },
+    {
       "id": "check_ask_filed",
       "kind": "function",
       "file": "tools/loop/placement.py"
@@ -5581,6 +5586,11 @@
       "id": "check_ask_path",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "check_ask_plant",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "check_asks_moved",
@@ -11516,6 +11526,11 @@
       "id": "derive_ask_freeze",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_ask_key",
+      "kind": "function",
+      "file": "tools/memory-tree/gov_record.py"
     },
     {
       "id": "derive_ask_locators",
@@ -29368,6 +29383,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_backlog_text",
+      "kind": "function",
+      "file": "tools/memory-tree/gov_record.py"
+    },
+    {
       "id": "render_baseline",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -33841,6 +33861,11 @@
       "id": "run_ask",
       "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
+    },
+    {
+      "id": "run_ask_door",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "run_ask_mint",
@@ -38766,6 +38791,11 @@
       "id": "seed_ambiguous_registry",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "seed_ask_repo",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "seed_bound_kits",
@@ -43728,6 +43758,11 @@
       "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
+      "id": "write_new_ask",
+      "kind": "function",
+      "file": "tools/memory-tree/gov_record.py"
+    },
+    {
       "id": "write_new_record",
       "kind": "function",
       "file": "tools/memory-tree/build_records.py"
@@ -44476,6 +44511,11 @@
       "id": "write_seed_plant",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "write_seq_mint",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "write_session",

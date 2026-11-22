@@ -40,6 +40,14 @@ Whether a hook bypass is only recorded or also refused. Under both values each o
 hooks.bypass = "refused"
 ```
 
+## `asks.acceptance`
+<!-- usage: policy:asks.acceptance 4225e190 -->
+Whether the record door files an ask whose clauses state no acceptance, neither an accept clause nor a seen clause with a run command: refuse it unwritten, or file it and report it not ready, the memory hygiene check grading it after.
+
+```text
+asks.acceptance = "grade"
+```
+
 ## `builds.slug-words`
 <!-- usage: policy:builds.slug-words 849f618e -->
 How many capitalised words a new build slug carries after its node letter, as lo-hi; a changed range binds new mints only, and every slug minted before it still reads.
@@ -323,7 +331,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (222)
+## Not yet summarised (221)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -374,7 +382,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `reuse.propose`
 - `annotations.grammar`
 - `builds.agent-root`
-- `asks.acceptance`
 - `decisions.major`
 - `lexicon.pin`
 - `lexicon.forced`
