@@ -1566,7 +1566,9 @@ run_role_bash "O-AC3 cwd, CLAUDE_PROJECT_DIR and the script under no checkout ->
 # ---- TOOL-dBoundRoles-8: a gate run by absolute path from outside every checkout. The index is read --
 # ---- at the checkout holding the script; with none, G2 and G3 bind with an empty allowlist. Against --
 # ---- step 3 returning null with no root, as at base, both BR8-AC1/AC2 exit-2 rows exit 0, the -------
-# ---- --help row and the leg row print nothing, and BR8-AC3's broken-index row below exits 0 ---------
+# ---- --help row prints nothing, and BR8-AC3's broken-index row below exits 0. The leg row passes ----
+# ---- at base too: it is the control against G2 and G3 binding with no third start, which ---------
+# ---- prints the witness for it, and the broken-index row's refusal would name no index ------------
 SG_NOREPO_FWD=${SG_NOREPO//\\//}
 SG_CWD_WT_FWD=${SG_CWD_WT//\\//}
 run_role_bash "BR8-AC1 the bar runner by absolute path in no checkout, cwd in none, no CLAUDE_PROJECT_DIR -> deny naming G2" 2 "any;;G2 runner;;No checkout root was found" gov-builder Bash "bash $SG_NOREPO_FWD/$SGP/run-gates.sh" "$SG_NOREPO"
@@ -1946,8 +1948,11 @@ n=$((pass+fail))
 # its run_card row and its marker row), counted by hand under the same rule.
 # 401 = 400 + the every-host TOOL-dPlacedRequest-34 AC28 row, left out of the count until TOOL-dPlacedRequest-99 S7;
 # AC28's MSYS-fold row runs on a MINGW, MSYS or CYGWIN host alone, and its skip elsewhere keeps it out.
+# 410 = 401 + the 9 rows TOOL-dBoundRoles-8 added (2 for AC1 and AC2's refusals, 1 for AC2's --help,
+# 2 for AC3's leg row and the resolveRoleRoot check, 1 for AC3's broken index and 3 for AC4), counted
+# by hand under the same rule; its two re-expected O-AC3 rows add none.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=401
+FLOOR_ASSERTIONS=410
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
