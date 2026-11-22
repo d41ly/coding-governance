@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-60 — the round-1 audit of units 52 to 58, its 37 minors: criteria that can fail and can pass, arms observed where their code lives, one read-key parse, floors moved with their arms, and write sets that name every file a pass writes
 
-**Status:** DEFERRED · rev-6 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -368,7 +368,7 @@ Live at landing, at order 33, after every unit it repairs and after unit 59.
 
 ## 7. Gates
 
-`roles adopter self-test` · `roles catalogue` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `memory-recall kit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles adopter self-test` · `roles catalogue` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `memory-recall kit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 `agent-cap self-test` stands for the spawn guard's suite; unit 25's pass renames it on every live §7
 line when it renames the leg.
@@ -413,6 +413,9 @@ S20's guard is not an arm: AC12 observes it directly, red before the edit and gr
   TOOL-dWitnessedBar-11 by `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md` row 53: the
   guard is widened in the leg's `[[exempt_leg]]` declaration, its `enforces` kept, and the manifest
   re-rendered by `leg_factory.py --write`; F5 re-resolved.
+- rev-7 · 2026-11-22 · §7 · the leg line gains `govkit selftest`, `govkit refusal join`, `govkit
+  acceptance matrix` and `policy fixtures`, whose guards hold `tools/govkit/registry.toml` that §4 Files
+  touched names, by `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
 
 ## 10. Reuse audit
 

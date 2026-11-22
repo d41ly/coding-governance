@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-17 — every work order's marker carrying `item=`, every return naming the work order it `answers`, today's population seeded
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 8 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 8 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0182@0cc5ed88 whole
 
@@ -35,14 +35,14 @@ it arms (the memory plan's `[sites]` work-order row and its `[gates]` "work orde
 - **S1** — The marker grammar with `item=` (I5): `<!-- gov:handoff role=<slot> build=<slug>
   unit=<id|-> item=<item.step.name|-> path=<rel> role-sha=<12hex> task-sha=<12hex> -->`. `MARKER_RE`
   (`tools/roles/roles_lib.py:79-80`) and its JavaScript copy `HANDOFF_MARK_RE`
-  (`tools/hooks/agent-cap.js:2044`) both take `item=` as an optional field between `unit=` and
+  (`tools/hooks/agent-cap.js:646`) both take `item=` as an optional field between `unit=` and
   `path=`, so a marker written before this unit still parses, and both move to named groups. Observed
   by AC1 and AC2.
 - **S2** — Every reader reads by name, never by position: `check_handoff`
   (`tools/roles/handoff.py:437-450`, today groups 4, 5 and 6), `print_agent_lines`
   (`tools/roles/handoff.py:834-850`, groups 1 to 4), `scan_stand_in_declarations`
   (`tools/roles/roles_lib.py:553-561`, groups 1 to 3) and `extractHandoffMarker`
-  (`tools/hooks/agent-cap.js:2049-2056`, `m[1]` to `m[6]`), each returning an `item` beside the fields
+  (`tools/hooks/agent-cap.js:651-658`, `m[1]` to `m[6]`), each returning an `item` beside the fields
   it returned before. Observed by AC2.
 - **S3** — The writer: `render_handoff` takes an `item` argument and `handoff.py render` an
   `--item <tag>` flag; the marker it writes always carries `item=`, the tag or `-` when none is given.
@@ -233,7 +233,7 @@ Live at landing on the `roles catalogue` leg, which runs `check_roles.py`.
 
 ## 7. Gates
 
-`roles catalogue` · `roles adopter self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles adopter self-test` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC3 AC4 AC6 · a planted unmarked handoff and a planted return with a wrong `task-sha` after the fixture's seed · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC2 · a rule-6 case whose prompt carries the marker with `item=`, beside the existing six-field cases kept as the legacy shape · none
@@ -272,11 +272,16 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC2 · a rule-6 case whose prom
   B's row for cl-0182, the memory plan's `[sites]` and `[gates]`, and both populations measured over
   the tree at `4283cb44`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-44, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-11-22 · S1 · S2 · §7 · §10 · re-grounded by `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`:
+  the `HANDOFF_MARK_RE` and `extractHandoffMarker` citations re-pointed from the chain baseline
+  `59ff8f2ac` (lines 2044 and 2049-2056) to HEAD's `tools/hooks/agent-cap.js` (646 and 651-658), the
+  code unchanged in behaviour; the §7 leg line gains `format-guard self-test` and `policy fixtures`,
+  the legs whose guards the Files touched paths `tools/hooks/agent-cap.js` and `tools/roles/roles_lib.py` trip.
 
 ## 10. Reuse audit
 
 The seams extended: `MARKER_RE` (`tools/roles/roles_lib.py:79-80`), the one Python marker grammar,
-and its JavaScript copy `HANDOFF_MARK_RE` (`tools/hooks/agent-cap.js:2044`); the marker writer in
+and its JavaScript copy `HANDOFF_MARK_RE` (`tools/hooks/agent-cap.js:646`); the marker writer in
 `render_handoff` (`tools/roles/handoff.py:420-421`); `derive_prompt_name`
 (`tools/roles/handoff.py:297-305`), whose name grammar is the handoff predicate; R15's scan of
 `prompts/` (`scan_stand_in_declarations`, `tools/roles/roles_lib.py:543-562`), the precedent for a

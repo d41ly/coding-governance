@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-39 — the return check grades a direct spawn only: a stop whose transcript is a harness stage's, or whose first record carries no handoff marker, passes untouched
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -85,7 +85,7 @@ it (order 16).
   (`scratch-guard.js`) fired for it, so a typed harness agent raises subagent events.
 - A direct spawn's transcript is `subagents/agent-<id>.jsonl`, its first record opening with the
   `gov:handoff` marker, which rule 6 admits only as the prompt's first line (`TOOL-dBoundRoles-7` §4,
-  read on this node on 2026-10-25; `tools/hooks/agent-cap.js:2102-2129`).
+  read on this node on 2026-10-25; `tools/hooks/agent-cap.js:704-731`).
 - A sub-agent's end fires `SubagentStop` with `agent_id`, `agent_transcript_path` and `agent_type`
   (`memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md:148-150`).
 
@@ -158,7 +158,7 @@ so `TOOL-dBoundRoles-10` builds first and `TOOL-dBoundRoles-40` after this unit.
 
 ## 7. Gates
 
-`roles render selftest` · `roles catalogue` · `roles adopter self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
+`roles render selftest` · `roles catalogue` · `roles adopter self-test` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
 New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 · the `harness-typed-stop` and `unmarked-stop` plants beside `stop-retry`, staged by a `check-return` with the route test removed, which blocks the harness plant · none
 
@@ -174,6 +174,7 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 · the `harness-type
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of the 26 unit specs, id 21
   (HIGH, item H1, shared with id 56).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dBoundRoles-50, the minors batch of the round-1 audit of units 37 to 44; nothing else moved.
+- rev-3 · 2026-11-22 · §4 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/roles/handoff.py` in Files touched trips its guard; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up with its behaviour unchanged, so the cites re-point at HEAD, rule 6's marker-line checks now at `tools/hooks/agent-cap.js:704-731`; nothing else moved.
 
 ## 10. Reuse audit
 

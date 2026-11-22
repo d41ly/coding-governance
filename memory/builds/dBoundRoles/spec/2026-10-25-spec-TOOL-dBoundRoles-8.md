@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-8 — the role-gate arm's field escape explained and closed
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0173@a66af889 whole
 
@@ -35,7 +35,7 @@ G3 when no checkout root resolves (§8 F2).
   no longer returns: rows G2 and G3, which read no index, refuse a matching candidate with an empty
   allowlist, and only G1 is unarmed, with its witness line. Observed by AC1, AC2 and AC3.
 - **S2** — Agent-cap's rule 6 reads its root through the same `resolveRoleRoot`, which it already
-  imports (`tools/hooks/agent-cap.js:2278-2280`); it passes no candidates, so its verdict is unchanged.
+  imports (`tools/hooks/agent-cap.js:1040-1042`); it passes no candidates, so its verdict is unchanged.
   Observed by AC3.
 - **S3** — The explanation, where the arm is documented: `tools/hooks/README.md`'s section
   "scratch-guard's fourth check" (`:491`) and the role-arm paragraph of scratch-guard's header
@@ -171,7 +171,7 @@ Live at landing on the `scratch-guard self-test` leg's hook.
 
 ## 7. Gates
 
-`scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 · a gov-builder payload running the bar runner and a suite by absolute path from a directory in no checkout · none
 
@@ -208,6 +208,11 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 · a gov-bu
 
 - rev-1 · 2026-10-25 · initial draft, from the packet's Items 8, the brief's D5, scout C's row for
   cl-0173, and the replay probe run over the transcript corpus and the source at `4283cb44`.
+- rev-2 · 2026-11-22 · S2 · §7 · re-grounded by `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`: rule 6's
+  `resolveRoleRoot` import re-pointed from the chain baseline `59ff8f2ac` (2278-2280) to HEAD's
+  `tools/hooks/agent-cap.js` (1040-1042), the call unchanged and still passing no candidates; at HEAD
+  rule 6 runs first and is no longer skipped under `--only=`, which S2 does not rely on. The §7 leg
+  line gains `policy fixtures`, whose guard the Files touched path `tools/hooks/scratch-guard.js` trips.
 
 ## 10. Reuse audit
 

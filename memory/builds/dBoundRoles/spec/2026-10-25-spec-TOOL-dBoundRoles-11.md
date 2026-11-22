@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-11 — every fork resolved by the role that meets it with its full record, or held as `run.on-owner-question` says
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 21 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 21 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0176@6a45e0b7 whole
 **Carries:** node:policy-key.run.on-owner-question
@@ -271,7 +271,7 @@ every fork, so the hold changes nothing until an owner sets another value.
 
 ## 7. Gates
 
-`check-wiring self-test` · `recall floor arms` · `memory hygiene` · `memory-hygiene self-test` · `marker contracts` · `kit/dogfood doc parity` · `unattended kit gate` · `pass-order history` · `roles adopter self-test` · `roles catalogue` · `roles render wiring` · `transition-audit arms` · `straggler-guard arms` · `recall floor` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`check-wiring self-test` · `recall floor arms` · `routed-commits selftest` · `branch-guard self-test` · `scratch-guard self-test` · `tier2-review self-test` · `memory hygiene` · `memory-hygiene self-test` · `marker contracts` · `kit/dogfood doc parity` · `unattended kit gate` · `pass-order history` · `roles adopter self-test` · `roles catalogue` · `roles render wiring` · `transition-audit arms` · `straggler-guard arms` · `recall floor` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC3 · the planted out-of-set pick, not-first pick and record-less agent mark, staged by removing the record predicate from check 12 · none
 New arm: tools/memory-tree/marker-contract.test.sh · covers AC4 · the record's contract row, staged by dropping the predicate from `plan_state` · none
@@ -314,6 +314,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC5 · the reader under each 
   `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md` row 18: `run.on-owner-question` is
   read by the `policy.py get` subprocess, the one seam PLAY-dOrderedCharter-7 §4 lets a sibling kit
   reach, never by an in-process `resolve()`.
+- rev-4 · 2026-11-22 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `routed-commits selftest`, `branch-guard self-test`, `scratch-guard self-test`, `tier2-review self-test`, as `tools/policy/catalogue.toml`, `tools/memory-tree/check-memory-hygiene.sh` and `tools/unattended/unattended.sh` in Files touched trip their guards; nothing else moved.
 
 ## 10. Reuse audit
 

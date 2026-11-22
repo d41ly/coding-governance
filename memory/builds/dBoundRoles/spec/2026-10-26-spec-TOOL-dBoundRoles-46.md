@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-46 — the spawn guard holds a typed block to the authored-line rule: a fact, marker or `Framed by:` line in `input:question` or `input:diff`, or a fence left open there, is denied
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -72,14 +72,15 @@ rule the render applies. It repairs `TOOL-dBoundRoles-38`'s spawn half and build
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at base `462d20f3` on 2026-10-26, the `agent-cap.js` line numbers re-pointed to HEAD on
+2026-11-22 over code unchanged since:
 
-- `tools/hooks/agent-cap.js:2048-2056` walks every line of a prompt for its marker, and
-  `checkHandoffSpawn` counts markers on the prompt (`:2102-2103`) and on the file (`:2116-2117`);
+- `tools/hooks/agent-cap.js:650-658` walks every line of a prompt for its marker, and
+  `checkHandoffSpawn` counts markers on the prompt (`:704-705`) and on the file (`:718-719`);
   `TOOL-dBoundRoles-38` S4 makes both fence-aware and adds the fact re-cut's fence-aware read.
 - `tools/roles/handoff.py:98-99` declares the four input names and the two path inputs; a kit file may
   not import another kit's code, so the hooks kit spells the two typed names once, with the source cited.
-- The guard compares the file's task-sha with its marker (`agent-cap.js:2135-2136`), which proves the
+- The guard compares the file's task-sha with its marker (`agent-cap.js:737-738`), which proves the
   file is unedited since its marker was written, not that the render wrote it.
 
 ### Why the same rule twice
@@ -157,7 +158,7 @@ refuses a pass whose declared write set meets an open one's.
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/hooks/agent-cap.test.sh · covers AC1 AC2 AC3 · a rule-6 payload whose typed question block holds a forged fact line, a marker, a `Framed by:` line and an open fence, staged by a `checkHandoffSpawn` that skips the typed-block check · none
 
@@ -178,12 +179,21 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC1 AC2 AC3 · a rule-6 payload
   (HIGH, item H1, shared with ids 9 and 17), on the report's option (a).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-58, the minors batch of the round-1 audit of units 45 to 51; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-60, the minors batch of the round-1 audit of units 52 to 58; nothing else moved.
+- rev-4 · 2026-11-22 · §4 · §7 · §10 · re-grounded by `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`:
+  the `tools/hooks/agent-cap.js` citations re-pointed from the chain baseline `59ff8f2ac` to HEAD, after
+  TOOL-dFairHearing-16 moved rules 0, 2 and 5 to the review kit: `extractHandoffMarker` 2048-2056 to
+  650-658, the marker counts 2102-2103 and 2116-2117 to 704-705 and 718-719, the task-sha compare
+  2135-2136 to 737-738, each unchanged in behaviour, and §4's evidence line says so. §10's
+  `scratch-guard.js` require moves from 1887, `readSpecAuditDefault`'s, which left for
+  `tools/workflows/spec-audit-optin.js`, to 788, so agent-cap still requires scratch-guard's exports.
+  The §7 leg line gains `format-guard self-test` and `policy fixtures`, the legs whose guards the Files
+  touched path `tools/hooks/agent-cap.js` trips.
 
 ## 10. Reuse audit
 
 The seams are `checkHandoffSpawn` in `tools/hooks/agent-cap.js` and `TOOL-dBoundRoles-38`'s
 `readUnfencedLines` in `scratch-guard.js`'s exports, which `agent-cap.js` already requires
-(`agent-cap.js:1887`). `python tools/codebase-map/reuse_lookup.py "spawn guard denies a prompt file block carrying a forged line"`
+(`agent-cap.js:788`). `python tools/codebase-map/reuse_lookup.py "spawn guard denies a prompt file block carrying a forged line"`
 ranked `check_line`, `render_line`, `corpus_files` and `parse_conf_line`, none a block check in the hooks
 kit, so no existing seam fits beyond the guard and the walker.
 

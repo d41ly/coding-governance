@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-23 — the prompt writer's default frame, bounded lists, upstream rows, and the medium effort floor
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 18 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 18 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0188@23b122f8 whole
 
@@ -260,7 +260,7 @@ own key.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 AC6 · its self-test renders the plants of §4's inventory, the failing case staged by an `assemble_frame` that keeps arrival order and a `check_effort_floor` that passes every level · none
 
@@ -307,6 +307,7 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 AC6 · its self-
   row 43: the verdict is `tools/loop/guard.py --staged`, which admits an agent's recorded policy change
   under the two non-default `policy-file.guard` values, so the floor admits a policy-file level below
   medium only under `owner-only`; AC5 plants each value; F3 re-resolved to (c).
+- rev-5 · 2026-11-22 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/roles/roles_lib.py` in Files touched trips its guard; nothing else moved.
 
 ## 10. Reuse audit
 

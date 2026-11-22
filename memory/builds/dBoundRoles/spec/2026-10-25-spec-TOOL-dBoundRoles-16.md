@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-16 — the shapes: each workflow entry's kind, checklist, orientation, merge and twin rule, the five kinds as defaults over the stage rows
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0181@6ebedcff whole
 **Carries:** node:system.role-shapes
@@ -195,7 +195,7 @@ gap-roles-18 already counts as declared, so the entry names it instead of a prom
 | `render_agents.py` | renders `shapes` into the index; its harness list (`extract_workflow_harnesses`) is unchanged |
 | `adopt-roles.sh` | its Skill binder reads only `name` and `stage` lines (`:134-160`), which the `[[kind]]` placement keeps |
 | `check-wiring.sh` | reads `workflows.toml` as the kit's anchor only (`:1697`); unchanged |
-| agent-cap's `args.roles` refusal (`tools/hooks/agent-cap.js:2179-2185`) | admits a value only as an agent-true role; binding a call to its shape is dWellOiledMachine's, so unchanged (§8 F3) |
+| agent-cap's `args.roles` refusal (`tools/hooks/agent-cap.js:771-777`) | admits a value only as an agent-true role; binding a call to its shape is dWellOiledMachine's, so unchanged (§8 F3) |
 | the build Skill (`tools/roles/SKILL.template.md:27`) | passes `stage-efforts`' output, whose shape is unchanged |
 
 ### Inventory
@@ -292,7 +292,7 @@ Live at landing on the `roles catalogue` leg; the moved efforts reach an agent t
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC3 AC4 AC6 · a fixture kit planting a kind cap above a committed limit, an experiment table with both and with neither scorer and judge, a role outside its stage's kind and an orientation tag naming no unit · none
 
@@ -312,11 +312,12 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC3 AC4 AC6 · a fixture 
   PLAY-dOrderedCharter-19 S3 registers.
   widens: none · relaxes: none
 - **FACT-QUESTION · F3 — Does agent-cap's `args.roles` refusal read anything a shape field changes?**
-  Probe: `sed -n 2176,2186p tools/hooks/agent-cap.js`. Observation, 2026-10-25: it admits each
+  Probe: `sed -n 768,778p tools/hooks/agent-cap.js`. Observation, 2026-10-25: it admits each
   `args.roles` value only as an agent-true role of the index, and reads no stage, kind, fan or cap.
   Liveness: the same probe would show a read of `index.harnesses` or a stage map if one were made, as
-  `:2163-2175` shows for the harness list. RESOLVED (agent, 2026-10-25, delegated): the refusal is
-  unchanged in this unit, its binding to the shape dWellOiledMachine's per systems.md Owners, and the
+  `:761-767` and `resolveHarnessEntry` (`:785-799`) show for the harness list. RESOLVED (agent,
+  2026-10-25, delegated): the refusal is unchanged in this unit, its binding to the shape
+  dWellOiledMachine's per systems.md Owners, and the
   index's per-role `shapes` is what TOOL-dBoundRoles-25's moved guard reads.
   widens: none · relaxes: none
 - **F4 — The parents this unit calls are specced and not built at `4ed9e567`.** PLAY-dOrderedCharter-9,
@@ -332,6 +333,13 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC3 AC4 AC6 · a fixture 
   scout C's row for cl-0181, systems.md `[design-role-shapes]`, research-role-shapes-a §5, and the roles
   kit at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-11-22 · §4 · §7 · §8 F3 · the leg line gains `policy fixtures`, whose guard holds the
+  `tools/roles/roles_lib.py` §4 Files touched names; the `args.roles` refusal's citations re-point from the
+  chain baseline `59ff8f2ac` to HEAD, the file cut to 1227 lines by TOOL-dFairHearing-16: the §4 row's
+  `:2179-2185` to `:771-777`, F3's probe `2176,2186` to `768,778`, and its harness-list `:2163-2175` to
+  `:761-767` plus `resolveHarnessEntry` (`:785-799`), where TOOL-aGuardedEffort-1 moved the path compare; the
+  refusal reads what F3 observed, so F3's resolution stands; by
+  `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else moved.
 
 ## 10. Reuse audit
 

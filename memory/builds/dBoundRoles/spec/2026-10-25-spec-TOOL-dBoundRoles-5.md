@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-5 — returns through a schema-forced channel on both routes, residual failures retried by `roles.retries`
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 15 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 15 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0170@d33b224b whole
 **Carries:** node:policy-key.roles.retries
@@ -259,7 +259,7 @@ argument is inert until a caller passes it, which S7's two paragraphs make the d
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `transition-audit arms` · `straggler-guard arms` · `lexicon naming predicates` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `workflow script syntax` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `transition-audit arms` · `straggler-guard arms` · `lexicon naming predicates` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `workflow script syntax` · `recall floor` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 · its self-test runs `validate_return` and `check-return` over the plants of §4's inventory, staged by a `validate_return` that skips the `sha` rule · none
 New arm: tools/workflows/unattended-build.test.sh · covers AC6 AC7 · a stub runtime returns null twice, staged by a `spawnWithRetries` that returns the first result · none
@@ -295,6 +295,7 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC6 AC7 · a stub ru
   `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md` row 14: `roles.retries` is read by
   the `policy.py get` subprocess, the one seam PLAY-dOrderedCharter-7 §4 lets a sibling kit reach,
   never by an in-process `resolve`.
+- rev-4 · 2026-11-22 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/roles/roles_lib.py` in Files touched trips its guard; nothing else moved.
 
 ## 10. Reuse audit
 

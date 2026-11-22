@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-40 — a recorded harness-stage stop replayed against every `SubagentStop` hook a default install registers, red on any output, any block or any record
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -154,7 +154,7 @@ the module, imported in its place.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the recorded harness-stage stop replayed against every `SubagentStop` command of the default install, staged by a return-check launcher whose verb skips the route test, and by a settings file with the event removed · none
 
@@ -175,6 +175,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the recorded harness-
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of the 26 unit specs, id 56
   (HIGH, item H1, shared with id 21).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dBoundRoles-50, the minors batch of the round-1 audit of units 37 to 44; nothing else moved.
+- rev-3 · 2026-11-22 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/govkit/selftest.py` in Files touched trips its guard; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-45 — a typed `--input` value is authored text: written unfenced, refused when a line would stand as an executor line, so the anchor check grades it
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -177,7 +177,7 @@ a pass whose declared write set meets an open one's.
 
 ## 7. Gates
 
-`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · a researcher render whose typed question holds plain words, then each forged line and an open fence, staged by a `render_handoff` that fences the typed value and skips `check_authored_lines` · none
 
@@ -200,6 +200,9 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · a researcher rende
   (HIGH, item H1, shared with ids 1 and 9), on the report's option (a).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-58, the minors batch of the round-1 audit of units 45 to 51; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
+- rev-4 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
+  `tools/roles/roles_lib.py` that §4 Files touched names, by
+  `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`; nothing else moved.
 
 ## 10. Reuse audit
 

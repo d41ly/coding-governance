@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-21 — the effort and model keys, `default` reserved, and the gate grant a role field, every reader re-pointed
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0186@e356242a whole
 **Carries:** node:policy-key.roles.effort.<role>
@@ -265,10 +265,10 @@ session, as the house file's header says of its own values today.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `routed-commits selftest` · `scratch-guard self-test` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-The policy kit's legs, `policy check` and `policy fixtures` (TOOL-dGroundRules-1 S2), grade S8's rows
-once that build lands; they are not in the manifest at base, so they are named here in prose.
+The policy kit's leg `policy check` (TOOL-dGroundRules-1 S2) also grades S8's rows; it was not in the
+manifest at base, so it is named here in prose.
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · a fixture repository committing a policy file per plant, staged by a house-file effort beside a set key, a stage with only a role key, a house `[gates]` row beside a grant, a `codex` model key and a `default` role file · none
 
@@ -323,6 +323,11 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · a 
   `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md` row 36: TOOL-dDeclaredLoop-18 rev-2
   makes no `resolve` import, so `read_policy_setting` runs `policy.py get --json` by subprocess, F2
   re-resolved; it gains `with_default` for TOOL-dBoundRoles-22 S5's limit.
+- rev-4 · 2026-11-22 · §7 · the leg line gains `routed-commits selftest` and `scratch-guard self-test`, whose
+  guards hold `tools/policy/` and so the `tools/policy/catalogue.toml` §4 Files touched names, and
+  `policy fixtures`, whose guard holds the `tools/roles/roles_lib.py` it names; `policy fixtures` stands in the
+  manifest at HEAD, so the prose line under the leg line now names `policy check` alone; by
+  `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else moved.
 
 ## 10. Reuse audit
 

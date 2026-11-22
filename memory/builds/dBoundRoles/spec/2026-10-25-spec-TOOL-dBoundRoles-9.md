@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-9 — the `none` and `review` write classes enforced in the role arm
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 13 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 13 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0174@b2c09e04 whole
 
@@ -252,7 +252,7 @@ Each criterion runs `checkRouted` through `node -e` over a fixture repository ma
 
 ## 7. Gates
 
-`scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `check-wiring self-test` · `lexicon naming predicates` · `roles catalogue` · `roles render wiring` · `roles render selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `check-wiring self-test` · `lexicon naming predicates` · `roles catalogue` · `roles render wiring` · `roles render selftest` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC7 · the `none-other`, `review-out`, `review-default-dir` and `review-no-classes` plants stage the failing case against a hook whose step 6b is reverted · none
 
@@ -289,6 +289,9 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC7 · the 
 - rev-1 · 2026-10-25 · initial draft, from the packet's Items 9, the brief's shared interface I23,
   scout C's row for cl-0174, and `tools/hooks/scratch-guard.js` and `tools/roles/` at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
+  `tools/hooks/scratch-guard.js` that §4 Files touched names, by
+  `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`; nothing else moved.
 
 ## 10. Reuse audit
 

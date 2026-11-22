@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-50 — the round-1 audit of units 37 to 44, its 24 roles-code minors: one fence walker per language, fence-aware marker readers, live leg names, waiver and registry rows kept true, and criteria that can fail
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -318,7 +318,7 @@ Live at landing, at order 30, after every unit it repairs and beside `TOOL-dBoun
 
 ## 7. Gates
 
-`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `dead-path carriers (deleted files still named)` · `shell hygiene (a fork spent on builtin work)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `dead-path carriers (deleted files still named)` · `shell hygiene (a fork spent on builtin work)` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 `agent-cap self-test` is named because `tools/hooks/` trips its guard at base; S1 renames it on this line
 when unit 25 renames the leg.
@@ -353,6 +353,9 @@ New arm: tools/roles/spawn-guard.test.sh · covers AC16 · spec 13's handoff pip
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-56 and -58, promotions of the round-1 audit of units 45 to 51; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
 - rev-4 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-66, the minors batch of the round-1 audit of unit 64; nothing else moved.
+- rev-5 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
+  `tools/roles/roles_lib.py` that §4 Files touched names, by
+  `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
 
 ## 10. Reuse audit
 

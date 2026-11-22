@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-20 — a repository's roles and workflow entries composed beside gov's, with the role kind's fixed set, widening directions and step-gate classes
 
-**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0185@ce70dc70 whole
 **Carries:** node:tag-namespace.workflow
@@ -360,7 +360,7 @@ refusals, now armed for two more kinds.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC11 · the planted repository role and workflow, the out-of-shape role, the patches of a core role's write class and return, the cycle-row supersedes, the actor patch without the template, the three exclusions, the unheld harness and the scenario's activated role and workflow rows, each staged by removing its check · none
 New arm: tools/playbook/adopt-playbook.sh · covers AC1 · the `workflow-rows` plant, staged by dropping the overlay read from `extract_workflow` · none
@@ -446,6 +446,12 @@ New arm: tools/govkit/selftest.py · covers AC9 · the `role` and `workflow` cla
   `2026-11-05-prompt-TOOL-dBoundRoles-20-1-spec-writer`: S11 carries TOOL-dBoundRoles-22 §8 F2 (a),
   the two `activatable` members and a scenario's rows composed, and F6 reads TOOL-dDeclaredLoop-26
   §8 F5 as resolved.
+- rev-5 · 2026-11-22 · §7 · §10 · the leg line gains `policy fixtures`, whose guard holds
+  `tools/playbook/tag_index.py` that §4 Files touched names; §10's citation of `checkHarnessCall` is
+  re-pointed from the 2427-line file's `:2157` to `tools/hooks/agent-cap.js:759-780` at `062906ffd`,
+  TOOL-dFairHearing-16 having moved rules 0, 2 and 5 out, and names that its path compare now lives in
+  `resolveHarnessEntry` (TOOL-aGuardedEffort-1), with no change in what it admits, by
+  `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
 
 ## 10. Reuse audit
 
@@ -458,8 +464,9 @@ TOOL-dSafePassage-10's class registry. `python tools/codebase-map/reuse_lookup.p
 role and workflow beside the shipped catalogue"` ranked `load_workflows`, `load_roles`, `render_role`
 and `extract_workflow_harnesses`, the same roles-kit seams, and no composer, matching scout A: no overlay
 reader exists at base. The recall probe returned the packet's clause, the brief's row and the flow
-adoption's item 12; none disagreed with source. Scout A cited `checkHarnessCall` at
-`tools/hooks/agent-cap.js:2157-2179`; at `4283cb44` it opens at `:2157` and this unit leaves its code
-unchanged, the index carrying the composition instead.
+adoption's item 12; none disagreed with source. Scout A cited `checkHarnessCall` at line 2157 of the
+file as it stood at base; at `062906ffd` it is `tools/hooks/agent-cap.js:759-780`, its path compare
+moved into `resolveHarnessEntry` (:785-800) with no change in what it admits, and this unit leaves its
+code unchanged, the index carrying the composition instead.
 
 Recall terms used: `python tools/memory-recall/query.py "how can a repository add its own role and workflow beside gov's catalogue" --terms "adopter role workflow overlay composition BODY_CEILINGS WORKFLOW_NAMES amends supersedes exclude widening fixed set"`

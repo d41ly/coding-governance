@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-7 — shell writes held to the work order's allowance
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 14 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 14 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0172@d88edbe8 whole
 
@@ -127,7 +127,7 @@ a shell edit of a spec by a role outside the spec class is refused; the one admi
 The prompt a role agent was spawned with is its transcript's first `user` record: rule 6 of
 `tools/hooks/agent-cap.js` admits a direct spawn only when that prompt is the marker line and the
 `## Task` section of its prompt file byte for byte, with its task-sha verified
-(`agent-cap.js:2089-2148`), so the transcript holds the admitted work order and the hook needs no copy
+(`agent-cap.js:691-750`), so the transcript holds the admitted work order and the hook needs no copy
 of the marker grammar. The layout was read on this node at 2026-10-25: a direct spawn's transcript is
 `subagents/agent-<id>.jsonl` beside a `.meta.json`, its first record a `user` record whose content opens
 with the `gov:handoff` marker, and a harness agent's is under `subagents/workflows/<run id>/`. A hook
@@ -251,7 +251,7 @@ fixture repository made under `%TEMP%` with `git init`, a `.memory-tree.conf`, a
 
 ## 7. Gates
 
-`scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 · the `sed-in-place`, `none-role-shell` and `allowance-out` plants stage the failing case against a copy of the hook whose `checkShellWrites` call is cut from `main` · none
 
@@ -300,6 +300,10 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
 - rev-1 · 2026-10-25 · initial draft, from the packet's Items 7, the brief's shared interfaces I12 and
   I23, scout C's row for cl-0172, and `tools/hooks/scratch-guard.js` at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-11-22 · §4 · §7 · by `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`: the leg line gains
+  `policy fixtures`, whose guard holds `tools/hooks/scratch-guard.js` that §4 Files touched names, and
+  §4's `checkHandoffSpawn` citation moves from the chain baseline `59ff8f2ac` (2089-2148) to HEAD's
+  `agent-cap.js` (691-750), the function unchanged in behaviour; nothing else moved.
 
 ## 10. Reuse audit
 

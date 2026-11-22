@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-22 — workflow entries as data: ordered stages, each naming its role, fan, cap, effort and rows, every cap under the agent limit
 
-**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 5 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 5 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0187@5afc67cc whole
 
@@ -243,7 +243,7 @@ no Workflow call changes.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit acceptance matrix` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC4 AC5 · a fixture kit whose table plants a two-stage mixed-role entry, a zero fan, an unknown row kind and a cap above a committed limit · none
 
@@ -306,6 +306,9 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC4 AC5 · a fixture kit 
 - rev-4 · 2026-11-05 · §3 · §8 F2 F5 · the owner resolved F2 and F5 to (a), by
   `2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks`: a scenario's rows are TOOL-dBoundRoles-20's to
   compose, and the row kinds' verb is the ask the build run files in dDeclaredLoop's `BACKLOG.md`.
+- rev-5 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds `tools/roles/roles_lib.py`
+  that §4 Files touched names, by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else
+  moved.
 
 ## 10. Reuse audit
 

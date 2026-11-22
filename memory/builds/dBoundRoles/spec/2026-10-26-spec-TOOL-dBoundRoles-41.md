@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-41 — the anchor check grades the text a work order authors, never the content it hands, by the block extents the render assembled
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -169,7 +169,7 @@ so `TOOL-dBoundRoles-12` builds before this unit.
 
 ## 7. Gates
 
-`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
+`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · a builder render handing a spec that quotes `cmd:<command>` and a well-formed example key in prose, staged by a `render_handoff` that passes the whole section to `check_anchors` · none
 
@@ -190,6 +190,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · a builder render h
   (HIGH, item H2; id 53 shares the defect at MEDIUM, item M30), on the skeptic's corrected fix.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-45, -47 and -50, promotions of the round-1 audit of units 37 to 44; the -50 bullet names AC3's AMENDED answer. Nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-58, the minors batch of the round-1 audit of units 45 to 51; nothing else moved.
+- rev-4 · 2026-11-22 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/roles/handoff.py` in Files touched trips its guard; nothing else moved.
 
 ## 10. Reuse audit
 

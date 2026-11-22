@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-13 — inputs handed as content, each fact keyed and classed by the executor and re-cut fresh at act launch
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 10 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 10 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0178@f3b0d6ea whole
 
@@ -48,7 +48,7 @@ their parent had read before the dispatch (gap-roles-11), agents read their own 
   card's and the brief's values keep their content and gain their record key. `FACT_RE` in
   `roles_lib.py` is the fact line's one grammar. Observed by AC1.
 - **S4** — Re-cut at the direct route's act launch: `checkHandoffSpawn`
-  (`tools/hooks/agent-cap.js:2089-2148`), after the task digest, reads every fact line of the task
+  (`tools/hooks/agent-cap.js:691-750`), after the task digest, reads every fact line of the task
   section through a JavaScript copy of `FACT_RE` and re-derives each `blob:` and `record:` key from
   the bytes at the spawn, the card through scratch-guard's exported `readCard`. A key that moved
   refuses, naming the key, the blob now at its source and the re-render that cuts it fresh. A `cmd:`
@@ -223,7 +223,7 @@ Live at landing on both routes.
 
 ## 7. Gates
 
-`roles adopter self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `workflow script syntax` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles adopter self-test` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `workflow script syntax` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/hooks/agent-cap.test.sh · covers AC3 · a rule-6 case whose handed spec changes between render and spawn · none
 New arm: tools/workflows/unattended-build.test.sh · covers AC5 · the unit harness evaluated with no `facts`, and with a `facts` naming another spec path · none
@@ -255,12 +255,17 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC4 · a render and a `fa
 - rev-1 · 2026-10-25 · initial draft, from the packet's Items 13, the brief's I13, scout B's row for
   cl-0178, v2's P29 and `layer-roles.md` `[trust]` 1-3, and the source at `4283cb44`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring the edges of TOOL-dBoundRoles-38, TOOL-dBoundRoles-43, TOOL-dBoundRoles-44, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-11-22 · S4 · §7 · §10 · re-grounded by `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`:
+  the `checkHandoffSpawn` citation re-pointed from the chain baseline `59ff8f2ac` (2089-2148) to HEAD's
+  `tools/hooks/agent-cap.js` (691-750), the function unchanged in behaviour, its task digest still
+  before the step S4 adds; the §7 leg line gains `format-guard self-test` and `policy fixtures`, the
+  legs whose guards the Files touched paths `tools/hooks/agent-cap.js` and `tools/roles/roles_lib.py` trip.
 
 ## 10. Reuse audit
 
 The seams extended: `render_handoff`'s reads walk (`tools/roles/handoff.py:330-396`), which already
 hands card, brief and argument values as content; `derive_section_sha` (`handoff.py:307-309`), the
-12-hex precedent; rule 6's `checkHandoffSpawn` (`tools/hooks/agent-cap.js:2089-2148`), which already
+12-hex precedent; rule 6's `checkHandoffSpawn` (`tools/hooks/agent-cap.js:691-750`), which already
 re-derives the task-sha at the spawn; scratch-guard's exported `readCard`; the unit harness's prompt
 (`tools/workflows/unattended-unit.js:257-266`) and the build harness's dispatch row. The blob-key
 primitive is `git hash-object` cut to 12 hex, as `verb_brief` hashes a brief (`tools/unattended/unattended.sh:13004`;

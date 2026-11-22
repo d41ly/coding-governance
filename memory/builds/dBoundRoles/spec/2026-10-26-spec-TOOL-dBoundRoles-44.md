@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-44 — the round-1 audit's 11 docs-and-records minors: memory readers re-derived, frozen receipt waived, gotcha pages re-pointed, two Skills fitted, legacy registry named, workflow suites re-keyed and the close's harness swap checked
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -226,7 +226,7 @@ Live at landing, at order 29, after every unit it repairs and beside `TOOL-dBoun
 
 ## 7. Gates
 
-`tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `scratch-guard self-test` · `dead-path carriers (deleted files still named)` · `kickoff engine size <=18KiB` · `manifest-check self-test` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `unattended skill size` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `memory hygiene` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `scratch-guard self-test` · `dead-path carriers (deleted files still named)` · `kickoff engine size <=18KiB` · `manifest-check self-test` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `unattended skill size` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `branch-guard self-test` · `memory hygiene` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC6 · the roles kit's legacy work-order registry under a fixture project folder, staged by a check 3 without its named case, which refuses the file · none
 
@@ -251,6 +251,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC6 · the rol
   there, S3 stating the base its re-derivation reads.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dBoundRoles-51, the minors batch of the round-1 audit of units 37 to 44; it names AC8's and AC9's AMENDED answers. Nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-58, the minors batch of the round-1 audit of units 45 to 51; nothing else moved.
+- rev-4 · 2026-11-22 · §7 · the leg line gains `branch-guard self-test`, whose guard holds
+  `tools/memory-tree/check-memory-hygiene.sh` that §4 Files touched names, by
+  `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
 
 ## 10. Reuse audit
 

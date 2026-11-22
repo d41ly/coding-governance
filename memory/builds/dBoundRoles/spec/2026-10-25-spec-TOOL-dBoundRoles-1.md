@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0166@83615023 whole
 
@@ -77,7 +77,7 @@ had no spawn in 60 days and two double up (gap-roles-07), and no check keeps cor
   `tools/roles/agents/gov-diff-reviewer.agent.md`, `tools/roles/house/gov-spec-reviewer.md` and
   `tools/roles/house/gov-diff-reviewer.md` · by value: `print_harness_args`
   (`tools/roles/handoff.py:453`), whose `{key: slot}` map every review harness call passes as
-  `args.roles`, and `checkHarnessCall` (`tools/hooks/agent-cap.js:2157`), which admits each value only
+  `args.roles`, and `checkHarnessCall` (`tools/hooks/agent-cap.js:759`), which admits each value only
   as an agent-true role of the index; both read the re-keyed rows and need no edit. Observed by AC3.
 - **S4** — Two workflow entries, `plan` (roles `gov-planner`) and `design` (roles `gov-architect`), in
   `tools/roles/workflows.toml`, and `WORKFLOW_NAMES` (`tools/roles/check_roles.py:90`) holding them, so R7
@@ -314,7 +314,7 @@ Live at landing on the `roles catalogue` leg; the new agent types reach a sessio
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit acceptance matrix` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit acceptance matrix` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 The loop kit's leg `loop item kind` (TOOL-dDeclaredLoop-24 S8) runs S7's arm once that build lands;
 it is not in the manifest at base, so it is named here in prose.
@@ -374,6 +374,12 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC4 · the playbook-render s
   the cross-check record `2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck`, rows 3 and 8: the
   item arm grades every composed item, repository rows included (TOOL-dDeclaredLoop-24 S3), with a
   planted repository item; `check_layer_roles` reads `.claude/roles.json` and imports no roles module.
+- rev-4 · 2026-11-22 · S3 · §7 · the leg line gains `policy fixtures`, whose guard holds
+  `tools/roles/agents/gov-builder.agent.md` under the `tools/roles/agents/` §4 Files touched names; S3's
+  `checkHarnessCall` citation re-points from `:2157` at the chain baseline `59ff8f2ac` to `:759` at HEAD, the
+  file cut to 1227 lines by TOOL-dFairHearing-16; the function's harness-path compare has since moved into
+  `resolveHarnessEntry` (TOOL-aGuardedEffort-1) and its `args.roles` admission is unchanged, so S3's sentence
+  stands; by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else moved.
 
 ## 10. Reuse audit
 

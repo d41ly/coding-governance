@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-19 — the roles kit's house text files moved into the overlay as level-5 units selecting their role, by their own upgrade step
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 24 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 24 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0184@923d7266 whole
 
@@ -240,7 +240,7 @@ remaining `house/*.md` naming the step that moves it, never a silent drop.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `lexicon naming predicates` · `check-wiring self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `lexicon naming predicates` · `check-wiring self-test` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC3 AC4 · the moved line rendered in the marked part and the two R10 plants, staged by restoring the house-file read in `render_role` · none
 New arm: tools/govkit/selftest.py · covers AC1 AC2 · the step's up, down and witness on a fixture target, staged by an up that skips the before-image · none
@@ -272,6 +272,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · the step's up, down and w
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-55, a promotion of the round-1 audit of units 45 to 51; nothing else moved.
 - rev-4 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-60, the minors batch of the round-1 audit of units 52 to 58; nothing else moved.
 - rev-5 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
+- rev-6 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
+  `tools/roles/kit.toml` that §4 Files touched names, by
+  `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
 
 ## 10. Reuse audit
 

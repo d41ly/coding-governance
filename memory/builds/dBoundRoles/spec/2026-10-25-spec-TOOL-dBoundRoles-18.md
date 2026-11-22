@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-18 — the reviewers' merge as an upgrade step: an adopter's reviewer agents renamed to `gov-reviewer`, the role index re-rendered, every key the merge touches re-keyed
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 25 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 25 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0183@46564bcb whole
 
@@ -314,7 +314,7 @@ loaded until it restarts. The harness reads `.claude/agents` at session start
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 The pass adds no leg. Once their builds land, the two legs TOOL-dSafePassage-1 and -10 add grade
 this unit's row: `step-rows-frozen` and `step-gate`.
@@ -373,6 +373,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC9 · each 
   A's row for cl-0183, TOOL-dBoundRoles-1's S3 and §4 "The merge" as written in this run, and
   TOOL-dSafePassage-1 and -10 at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
+  `tools/govkit/upgrade_steps.py` that §4 Files touched names, by
+  `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
 
 ## 10. Reuse audit
 

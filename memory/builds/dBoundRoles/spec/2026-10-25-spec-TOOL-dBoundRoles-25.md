@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-25 — the spawn guard and harness admission moved into the roles pack, admission held to the landed blob, `tools/hooks/agent-cap.js` retired with an upgrade step
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0190@03bbbf1e whole
 
@@ -168,13 +168,16 @@ them.
 
 ### Evidence at base `4ed9e567`
 
-- Rule 6 is `checkHandoffSpawn` (`tools/hooks/agent-cap.js:2089-2149`) and `checkHarnessCall`
-  (:2157-2188) over `HANDOFF_MARK_RE` (:2044). `main()` runs it at :2269-2295, importing
-  `loadRoleIndex`, `resolveRoleRoot` and `buildComparablePath` from `tools/hooks/scratch-guard.js`
-  (:952, :1396, :166, exported at :1615).
+- Rule 6 is `checkHandoffSpawn` (at `062906ffd` `tools/hooks/agent-cap.js:691-750`, :2089-2149 at
+  base) and `checkHarnessCall` (:2157-2188) over `HANDOFF_MARK_RE` (:2044). `main()` runs it at
+  :2269-2295, importing `loadRoleIndex`, `resolveRoleRoot` and `buildComparablePath` from
+  `tools/hooks/scratch-guard.js` (:952, :1396, :166, exported at :1615).
 - Admission matches the path only: `checkHarnessCall` resolves `scriptPath` to a root-relative path
   and compares it with the index's `harnesses` list (:2166-2175). Nothing reads the file's bytes.
 - `main()` is called unguarded at :2427. scratch-guard runs `main()` only as the entry point (:1614).
+- Since base: at `062906ffd` `checkHarnessCall` is `tools/hooks/agent-cap.js:759-780` and hands the
+  path compare to `resolveHarnessEntry` (:785-800), which rule 8 shares, admitting the same calls; the
+  file exports through `module.exports` (:1104) and runs `main()` only as the entry point (:1113).
 - The hooks kit's descriptor is registry entry `agent-cap` (`tools/hooks/kit.toml:3`). Its version is
   `agent-cap.js`'s constant (:6), and the file ships as engine (:21-24).
 - settings-merge wires agent-cap as its built-in default: `HOOK_MARKER` (`tools/settings-merge.py:117`),
@@ -441,7 +444,7 @@ build's own close. The pass records in its acceptance ledger which harnesses thi
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `hook destinations self-test` · `check-wiring self-test` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `verifier fan-out self-test` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `playbook parity selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon naming predicates` · `lexicon selftest` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `run-selftests self-test` · `straggler-guard arms` · `transition-audit arms` · `recall floor` · `recall floor arms` · `roles catalogue` · `roles render wiring` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `hook destinations self-test` · `check-wiring self-test` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `verifier fan-out self-test` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `playbook parity selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon naming predicates` · `lexicon selftest` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `run-selftests self-test` · `straggler-guard arms` · `transition-audit arms` · `recall floor` · `recall floor arms` · `roles catalogue` · `roles render wiring` · `playbook render selftest` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 This pass's files trip the guard of `agent-cap self-test` at the base, so the leg is named, and the
 pass retires it into `spawn-guard self-test`.
@@ -515,6 +518,14 @@ New arm: tools/check-wiring.test.sh · covers AC10 · a scratch settings file wi
   and 45: the renamed leg is declared once through TOOL-dWitnessedBar-11's factory with `enforces`,
   the manifest rendered; the pack's require of `scratch-guard.js` is a declared `requires_if` edge, F3
   re-resolved.
+- rev-6 · 2026-11-22 · §7 · §4 Evidence · the leg line gains `playbook render selftest`, whose guard
+  holds `tools/lexicon/lexicon.py`, and `policy fixtures`, whose guard holds `tools/roles/kit.toml`,
+  both of which §4 Files touched names; the Evidence block's rule-6 citation is re-pointed at
+  `062906ffd`, TOOL-dFairHearing-16 having moved rules 0, 2 and 5 out of the 2427-line file, and a
+  bullet names what changed since base: the path compare moved into `resolveHarnessEntry`
+  (TOOL-aGuardedEffort-1), and the file now exports through `module.exports` and runs `main()` only as
+  the entry point, by `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else
+  moved.
 
 ## 10. Reuse audit
 

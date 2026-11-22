@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-2 — each role's static instructions as structured fields: the never list with its enforcers, the ceiling and the typed return
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 2 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 2 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0167@0ec2ea97 whole
 
@@ -297,7 +297,7 @@ Live at landing on the `roles catalogue` leg; the re-render reaches a session at
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 AC6 · a fixture kit planting a bare limit, a limit whose script no kit holds, a body prohibition and a template with no outcome, each one R13, R5 or R2 line · none
 New arm: tools/roles/render_agents.py · covers AC5 · its self-test catalogue renders a role with two never entries and asserts the three sections and their order, staged by a catalogue whose role lacks `return` · none
@@ -347,6 +347,9 @@ New arm: tools/roles/render_agents.py · covers AC5 · its self-test catalogue r
   `2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck`, row 11: the tester's template carries the
   outcome `answered`, its `answer` and its `evidence`, so a `test.reason` return validates
   (TOOL-dWitnessedBar-23 §1).
+- rev-4 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds `tools/roles/roles_lib.py`
+  that §4 Files touched names, by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else
+  moved.
 
 ## 10. Reuse audit
 

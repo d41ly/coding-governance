@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-37 — govkit's roles install case derives the agent types and house overlays it expects from the roster and the seed rows, so no roster change leaves a typed count to red
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -162,7 +162,7 @@ so `TOOL-dBoundRoles-21` builds before this unit at the same order.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
 New arm: tools/govkit/selftest.py · covers AC1 AC2 · the OC8 AC4 roles install case with S2's set checks, staged by removing one rendered `gov-*.md` from the scratch target after its apply, which reds "renders one agent type per agent-true role" naming the missing slot · none
 
@@ -187,6 +187,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · the OC8 AC4 roles install
   (HIGH, item H5; id 47 shares the defect at MEDIUM, item M25).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dBoundRoles-49 and -50, promotions of the round-1 audit of units 37 to 44; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-54, a promotion of the round-1 audit of units 45 to 51; nothing else moved.
+- rev-4 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds `tools/govkit/selftest.py`
+  that §4 Files touched names, by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else
+  moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-43 — the round-1 audit's 46 roles-code minors: one grammar each for returns, shapes and slots, one reader and writer each, bounded readers, resumable steps, and the registries they feed
 
-**Status:** DEFERRED · rev-6 · 2026-11-05 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -530,7 +530,7 @@ from the repo root: one govkit case function, no suite.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `template size <=48KiB` · `memory hygiene` · `method carriers (every pointer declared)` · `testsuite counts (every bar self-test prints one)` · `playbook render selftest` · `check-wiring self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `template size <=48KiB` · `policy fixtures` · `memory hygiene` · `method carriers (every pointer declared)` · `testsuite counts (every bar self-test prints one)` · `playbook render selftest` · `check-wiring self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC12 AC34 AC36 AC45 · the stand-in per `roles.no-spawn` value, a render handing spec 24, a forged framing heading and a CLI `work-order`, staged by a `render_handoff` admitting a forged field · none
 New arm: tools/hooks/scratch-guard.test.sh · covers AC35 AC39 AC40 · `allowance-shadowed`, a 300 KB first record and `policy-refusal`, staged by a first-match allowance reader · none
@@ -602,6 +602,9 @@ F9 and F14 moved to `TOOL-dBoundRoles-44` with S31 and S42.
   imported; F17 open; §2's item titles, §3, §4 and §8's rung-3 `widens`/`relaxes` cut for size, no design
   moved.
 - rev-6 · 2026-11-05 · §8 F17 · resolved by the owner to (a), `2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks`; no design moved.
+- rev-7 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
+  `tools/roles/roles_lib.py` that §4 Files touched names, by
+  `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-24 — the framing checked at render: every anchor a work order points at resolves to a fact it hands
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 19 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 19 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0189@8d7be499 whole
 
@@ -66,7 +66,7 @@ nothing refuses the render instead of reaching an agent that would then go and r
 - Retyped facts. A framing that copies a handed excerpt's text instead of anchoring it is gap-roles-05's
   measure, not this clause's check; no anchor is involved, so nothing here can see it.
 - A re-check at spawn. The spawn guard already compares the task-sha of the file it is handed
-  (`tools/hooks/agent-cap.js:2135-2136`), so a file edited after render is refused there; this unit
+  (`tools/hooks/agent-cap.js:737-738`), so a file edited after render is refused there; this unit
   adds no hook arm.
 - A vanished anchor re-found by its blob in history: the [trust] rule's executor route
   (layer-roles.md:235-237), TOOL-dBoundRoles-13's and dFurnishedOrders'.
@@ -212,7 +212,7 @@ Live at landing: the check runs inside every `render_handoff` call.
 The pass adds no leg: the roles adopter suite already renders handoffs in its fixture repository, and
 this unit's cases join it.
 
-`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC4 · the planted anchor-to-nothing render and the malformed span, staged by removing the `check_anchors` call from `render_handoff` · none
 
@@ -244,6 +244,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC4 · the planted an
   for cl-0189, and layer-roles R3-E and [trust] at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring the edges of TOOL-dBoundRoles-41, TOOL-dBoundRoles-43, TOOL-dBoundRoles-44, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the **consumes-from** bullet mirroring TOOL-dBoundRoles-45's hands-off, a promotion of the round-1 audit of units 37 to 44; nothing else moved.
+- rev-4 · 2026-11-22 · §3 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/roles/roles_lib.py` in Files touched trips its guard; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up with its behaviour unchanged, so the cites re-point at HEAD, the task-sha compare now at `tools/hooks/agent-cap.js:737-738`; nothing else moved.
 
 ## 10. Reuse audit
 

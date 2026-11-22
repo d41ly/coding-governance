@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-3 — the work order rendered per item, hashed into the spawn marker and bound to its act
 
-**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0168@abfd5f4f whole
 **Carries:** node:record-kind.work-order
@@ -66,7 +66,7 @@ card (I12). Today the work order names no checklist item, allowance or witness k
   (`handoff.py:420-421`) covers them, and the marker carries the item's tag in `item=`. Observed by
   AC1.
 - **S5** — Bound to its act, the stand-in binding record: rule 6's `checkHandoffSpawn`
-  (`tools/hooks/agent-cap.js:2089-2148`) admits a work order whose marker carries an `item=` other
+  (`tools/hooks/agent-cap.js:691-750`) admits a work order whose marker carries an `item=` other
   than `-` only when the session's orientation card, read through scratch-guard's exported `readCard`
   and `extractRouteUnits` (`tools/hooks/scratch-guard.js:667`, `:839`), routes the marker's `unit=`;
   otherwise it refuses, naming the unit and the card. A marker whose `item=` is `-` or absent is
@@ -237,7 +237,7 @@ then each is rendered through this door.
 
 ## 7. Gates
 
-`roles catalogue` · `roles adopter self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles adopter self-test` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 AC6 · an item render with a wrong role, no allowance, an unrouted allowance and an undeclared item · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC5 · an item work order spawned in a session whose card routes another unit · none
@@ -296,12 +296,17 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · an item work order spawn
   is the ask for it.
 - rev-4 · 2026-11-05 · S1 · §8 F5 · the owner resolved F5 to (a), by `2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks`: S1's
   verb is the ask the build run files in dDeclaredLoop's `BACKLOG.md`; no design moved.
+- rev-5 · 2026-11-22 · S5 · §7 · §10 · re-grounded by `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`:
+  the `checkHandoffSpawn` citation re-pointed from the chain baseline `59ff8f2ac` (2089-2148) to HEAD's
+  `tools/hooks/agent-cap.js` (691-750), the function unchanged in behaviour; the §7 leg line gains
+  `format-guard self-test` and `policy fixtures`, the legs whose guards the Files touched paths
+  `tools/hooks/agent-cap.js` and `tools/roles/roles_lib.py` trip.
 
 ## 10. Reuse audit
 
 The seams extended: `render_handoff`'s block list (`tools/roles/handoff.py:396-416`), where every
 block of a task is added, and its marker writer (`:420-421`); `check_handoff` (`:426-450`); rule 6's
-`checkHandoffSpawn` (`tools/hooks/agent-cap.js:2089-2148`), which already compares the prompt and the
+`checkHandoffSpawn` (`tools/hooks/agent-cap.js:691-750`), which already compares the prompt and the
 task-sha; `readCard` and `extractRouteUnits` (`tools/hooks/scratch-guard.js:667`, `:839`), exported and
 already used for the write gate's route; `WRITE_FOLDERS` (`tools/roles/check_roles.py:99-101`) for the
 allowance folders. `python tools/codebase-map/reuse_lookup.py "render a role's work order for one

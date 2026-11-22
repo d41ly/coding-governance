@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-14 — the `role` and `field` tag namespaces, their extractors and the role binding join
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0179@f74e2fff whole
 **Carries:** node:tag-namespace.role
@@ -312,7 +312,7 @@ namespace's extractor, and on the `roles catalogue` leg for R3.
 The pass adds no leg: PLAY-dOrderedCharter-19's `tags` leg runs the extractors and the joins once its
 build lands, and this unit's rows join it as data.
 
-`roles catalogue` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit acceptance matrix` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the playbook-render selftest runs `gov_tag.py --fixture` under each plant of S8, its failing case staged by `role-rows` and `role-binding` · none
 New arm: tools/roles/adopt-roles.test.sh · covers AC6 · a fixture role whose `reads` carries `field.task.titel` stages the failing case, one R3 line, while `field.task.title` yields none · none
@@ -371,6 +371,9 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC6 · a fixture role whose `
   `2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck`, row 27: the extractors reach the role
   grammar through the roles kit's new `check_roles.py --print-tag-rows` by subprocess and import no
   roles module; the rejected `READ_KEYS` import now also cites the sibling-kit rule.
+- rev-5 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
+  `tools/playbook/tag_index.py` that §4 Files touched names, by
+  `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else moved.
 
 ## 10. Reuse audit
 

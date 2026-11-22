@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-55 — unit 49's overlay check refuses an empty expected set, and ends where unit 19 moves the house files out of the kit
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -147,7 +147,7 @@ order 24.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC1 · the empty-roster refusal, staged by removing S1's length test, which lets an empty kit pass · none
 
@@ -168,6 +168,9 @@ New arm: tools/govkit/selftest.py · covers AC1 · the empty-roster refusal, sta
   (HIGH, item H2, shared with id 14), on the report's empty-set refusal and its retire-at-19 option.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-60, the minors batch of the round-1 audit of units 52 to 58; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
+- rev-4 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds `tools/govkit/selftest.py`
+  that §4 Files touched names, by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else
+  moved.
 
 ## 10. Reuse audit
 

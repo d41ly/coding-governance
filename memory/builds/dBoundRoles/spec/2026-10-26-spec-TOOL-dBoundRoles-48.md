@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-48 — the composed task section checked block by block: every block opens outside a fence, and each handed block's content lies inside its own, at render and at spawn
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -183,7 +183,7 @@ a pass whose declared write set meets an open one's.
 
 ## 7. Gates
 
-`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · §4's flipped section by direct call and a render with an extra unfenced block, staged by a `check_block_fences` that reads only the end of the walk · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC3 · a rule-6 payload whose prompt file is flipped by two authored lines around a handed block, staged by a `checkHandoffSpawn` without S3's check · none
@@ -206,6 +206,9 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC3 · a rule-6 payload whose p
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 37 to 44, id 34
   (HIGH, item H3), on the skeptic's corrected fix.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-58, the minors batch of the round-1 audit of units 45 to 51; nothing else moved.
+- rev-3 · 2026-11-22 · §7 · the leg line gains `format-guard self-test` and `policy fixtures`, whose
+  guards hold `tools/hooks/agent-cap.js` and `tools/roles/roles_lib.py` that §4 Files touched names, by
+  `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`; nothing else moved.
 
 ## 10. Reuse audit
 

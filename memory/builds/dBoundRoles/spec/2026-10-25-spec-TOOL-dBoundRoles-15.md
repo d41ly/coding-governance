@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-15 — the role static block carried once per spawn, and its budget over the whole rendered block
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 7 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 7 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0180@145f826e whole
 **Carries:** node:policy-key.instructions.task-charter
@@ -275,7 +275,7 @@ kit is installed, and the note of §4 "The single carry" names its absence on ev
 
 The pass adds no leg: the `roles catalogue` leg runs R5, and the roles adopter suite runs the renders.
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `routed-commits selftest` · `scratch-guard self-test` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC7 · a fixture policy file setting `always` under an agent-true render, and a planted 1100-byte cited rule under `gov-reuse-scout` · none
 
@@ -313,6 +313,10 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC7 · a fixture 
 - rev-1 · 2026-10-25 · initial draft, from the packet's Items 15, the brief's I1, I7 and I8, scout
   A's row for cl-0180, and the source at `4283cb44`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-11-22 · §7 · the leg line gains `routed-commits selftest` and `scratch-guard self-test`, whose
+  guards hold `tools/policy/` and so the `tools/policy/caps.toml` §4 Files touched names, and
+  `policy fixtures`, whose guard holds the `tools/roles/roles_lib.py` it names, by
+  `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else moved.
 
 ## 10. Reuse audit
 

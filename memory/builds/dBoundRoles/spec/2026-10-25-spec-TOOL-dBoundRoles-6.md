@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-6 — the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn
 
-**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 9 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 9 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0171@efd80f4f whole
 
@@ -60,7 +60,7 @@ from").
 - **S3** — A governed tree with no index is refused by both hooks. Where `loadRoleIndex` reads
   `absent` and `checkRoleGoverned(top)` of §4 holds, `checkRoleWrite`
   (`scratch-guard.js:1065`), `checkRoleGate` (`scratch-guard.js:1437`) and agent-cap's rule 6 (the
-  `index.state` branch, `tools/hooks/agent-cap.js:2282-2284`) refuse, each naming the index path and
+  `index.state` branch, `tools/hooks/agent-cap.js:1044-1046`) refuse, each naming the index path and
   the re-render; a tree that is not governed keeps today's no-arm verdict. Observed by AC3.
 - **S4** — One role section and one hash in the library (I6): `derive_section_sha` moves from
   `tools/roles/handoff.py:307-309` into `tools/roles/roles_lib.py`, and `render_role_section(kit_dir,
@@ -70,12 +70,12 @@ from").
   (`tools/roles/render_agents.py:207-216`) writes `"role-sha": derive_section_sha(render_role_section(…))`
   per role, and `loadRoleIndex` (`scratch-guard.js:952-989`) admits the key, a string of 12 lowercase
   hex digits when present, refusing any other value as `broken`. Observed by AC4.
-- **S6** — `role-sha` compared at spawn: `checkHandoffSpawn` (`agent-cap.js:2089-2148`), after the
+- **S6** — `role-sha` compared at spawn: `checkHandoffSpawn` (`agent-cap.js:691-750`), after the
   task digest and before the description step, reads the marker's `role-sha` through
   `extractHandoffMarker`'s named group and compares it with `index.roles[type]['role-sha']`. An index
   holding no `role-sha` for the type refuses with the re-render of the index; a differing one refuses
   with the re-render of the handoff, naming both values. Observed by AC4 and AC5.
-- **S7** — The headers and docs say it: agent-cap's rule-6 comment (`agent-cap.js:51-59`, "it never
+- **S7** — The headers and docs say it: agent-cap's rule-6 comment (`agent-cap.js:30-37`, "it never
   compares `role-sha`"), scratch-guard's role-arm paragraph (`scratch-guard.js:99-101`, "An ABSENT
   index adds no arm"), the two arms' sections of `tools/hooks/README.md` and the index paragraph of
   `tools/roles/README.md`. Observed by AC6.
@@ -249,7 +249,7 @@ the list's two lines, since the list is read at HEAD.
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `routed-commits selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC3 · a write to the index and to an owned agent file, and an index removed beside its renders · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC4 AC5 · a handoff rendered before a role body change, and an index row without `role-sha` · none
@@ -319,13 +319,22 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC4 AC5 · a handoff rendered b
   (a), by `2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks`: step 5a answers the two render entries before the
   policy-path arm, and the two looser values admit a true re-render, each the ask the build run files in
   dDeclaredLoop's `BACKLOG.md`.
+- rev-5 · 2026-11-22 · S3 · S6 · S7 · §7 · §10 · re-grounded by `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`:
+  the `tools/hooks/agent-cap.js` citations re-pointed from the 2427-line file at the chain baseline `59ff8f2ac` to HEAD's,
+  after TOOL-dFairHearing-16 moved rules 0, 2 and 5 to the review kit: the rule-6 `index.state` branch
+  2282-2284 to 1044-1046, `checkHandoffSpawn` 2089-2148 to 691-750 (unchanged in behaviour), its
+  dispatch 2273-2294 to 1034-1057, and the rule-6 header comment 51-59 to 30-37. At HEAD rule 6 runs
+  first and unconditionally, no longer skipped under `--only=`, which no sentence here relied on.
+  §10's sentence on scout A's citations stays as measured at `4283cb44`. The §7 leg line gains `policy
+  fixtures` and `routed-commits selftest`, the legs whose guards the Files touched paths
+  `tools/hooks/scratch-guard.js` and `tools/policy/guarded-paths.txt` trip.
 
 ## 10. Reuse audit
 
 The seams extended: the write gate's evaluation order in `checkRouted` (`tools/hooks/scratch-guard.js:1113-1185`)
 and `checkRoleWrite` (`:1064-1086`); `loadRoleIndex` (`:952-989`), the one index reader both hooks
-use; `checkRoleGate` (`:1421-1451`); rule 6's `checkHandoffSpawn` (`tools/hooks/agent-cap.js:2089-2148`)
-and its dispatch (`:2273-2294`); `render_roles_index` (`tools/roles/render_agents.py:207-216`), the one
+use; `checkRoleGate` (`:1421-1451`); rule 6's `checkHandoffSpawn` (`tools/hooks/agent-cap.js:691-750`)
+and its dispatch (`:1034-1057`); `render_roles_index` (`tools/roles/render_agents.py:207-216`), the one
 index writer; `derive_section_sha` (`tools/roles/handoff.py:307-309`), moved to the library as I6
 says; TOOL-dGroundRules-6's guarded list and guard, under TOOL-dDeclaredLoop-2's verdict. `python tools/codebase-map/reuse_lookup.py "refuse
 a write to the generated role index and compare the role hash at spawn"` ranked generic write and
