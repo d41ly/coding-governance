@@ -31,6 +31,7 @@
 | [2026-11-02-prompt-TOOL-dTotalRecall-2-owner-fork.md](../prompts/2026-11-02-prompt-TOOL-dTotalRecall-2-owner-fork.md) | research | — |
 | [2026-11-03-prompt-TOOL-dTotalRecall-2-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-2-1-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md) | research | TOOL-dTotalRecall-1 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-2-build-brief-2.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-build-brief-2.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-carries-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-carries-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer.md) | log | — |

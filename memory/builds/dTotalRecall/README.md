@@ -192,7 +192,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 448 bound to this build, across 4 record folder(s).
+Records: 449 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -298,7 +298,7 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-8-retire-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-8-retire-brief.md` and 174 more under prompts/ |
+| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-8-retire-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-8-retire-brief.md` and 175 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-22-build-TOOL-dTotalRecall-8-deviation-83.md`, `2026-11-22-build-TOOL-dTotalRecall-6-deviation-63.md` and 135 more under build/ |
 | red-fix | `2026-11-22-build-TOOL-dTotalRecall-6-red-fix-13.md`, `2026-11-22-build-TOOL-dTotalRecall-5-red-fix-9.md` and 11 more under build/ |
