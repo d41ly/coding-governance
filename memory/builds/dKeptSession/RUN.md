@@ -19,19 +19,19 @@ hold-code: host-owner-action
 held-from: BUILDING
 refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: a6e86e37066313a7561f4541a9fbcddecf4d3ca2
-phase: HELD
+witness: 91d470117d7da8bdc193ece198526a43b34c7712
+phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dkeptsession-a0567a
 anchor-kind: default-branch
 cli-version: 2.1.326
-lease-utc: 2026-11-21T12:17:07Z
+lease-utc: 2026-11-22T12:58:51Z
 pid-image: claude.exe
 host: compeeto
 pid: 29104
 session: d5b6d4ab-72df-4e61-9a7c-05dde93b7f5b
-keepalive: f586eb4e
+keepalive: 64fde974
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: c2a407b0390f3d57a118b58e376c326aeb207c13
 anchor-ref: refs/heads/main
@@ -169,3 +169,5 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T05:25:24Z decision · item dWitnessedBar's packet pin: run, at a console, python memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --repin memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py · reason origin/main 8b8b1374 moved the schedule instrument (pinned 5aa5421e265b, HEAD holds 6184e5717b59), so dWitnessedBar's packet reds its pin arm on main itself. check-spec-tokens reds the live tree over it, and --dispatch (check 49) refuses every dispatch while it does. --repin admits only an owner at a console, and the spec-token waiver ledger is shrink-only, so the run cannot clear it. Options: (a) the owner re-pins and the run resumes; (b) the owner rules dWitnessedBar terminal so its packet leaves the live tree.
 
 2026-11-22T05:27:36Z hold · item host-owner-action · reason until owner · reaped f586eb4e · resume none(owner)
+
+2026-11-22T12:58:57Z resume · item dKeptSession · reason held · keepalive 64fde974 · manual
