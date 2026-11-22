@@ -78,7 +78,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 22 unit(s) · node d · opened 2026-11-20 · streams tooling
+**Build status:** DEFERRED · 22 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16
 ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30 TOOL-dQuietDisk-31
 ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36
@@ -107,10 +107,10 @@ ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 
 | [TOOL-dQuietDisk-17 — `govkit update` skips a kit's verify check when nothing moved since its baseline](spec/2026-11-20-spec-TOOL-dQuietDisk-17.md) | 5 | 2 | WONTDO | rev-5 | 2026-11-22 |
 | [TOOL-dQuietDisk-9 — every scratch path under one owned, swept root, and every tree removed by one chmod-and-retry helper](spec/2026-11-20-spec-TOOL-dQuietDisk-9.md) | 6 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 7 | 1 | CLOSED | rev-5 | 2026-11-22 |
-| [TOOL-dQuietDisk-36 — the bash template cache runs git without the inherited git environment, and the turnstile suite grades the spared live repository and the swept orphan](spec/2026-11-22-spec-TOOL-dQuietDisk-36.md) | 8 | 2 | INPROGRESS | rev-1 | 2026-11-22 |
+| [TOOL-dQuietDisk-36 — the bash template cache runs git without the inherited git environment, and the turnstile suite grades the spared live repository and the swept orphan](spec/2026-11-22-spec-TOOL-dQuietDisk-36.md) | 8 | 2 | CLOSED | rev-1 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 128 bound to this build, across 4 record folder(s).
+Records: 129 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

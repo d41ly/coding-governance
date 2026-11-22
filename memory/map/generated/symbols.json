@@ -28363,6 +28363,21 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "remove_git_env_leaks",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "remove_git_env_leaks",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "remove_git_env_leaks",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
+    },
+    {
       "id": "remove_gov_queue_hold",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"

@@ -274,7 +274,13 @@ resolve_template_root() { # -> the cache root: SELFTEST_TEMPLATE_ROOT, a bar's o
   [ -n "${SELFTEST_ROOT:-}" ] || { echo "template-cache: no root: no SELFTEST_TEMPLATE_ROOT, no owned gate-work, no SELFTEST_ROOT" >&2; return 2; }
   printf '%s\n' "$SELFTEST_ROOT/templates"
 }
-derive_template_key() { # <builder> [<input file>...] -> the key, 40 hex, from the builder's definition and the inputs' blob ids
+remove_git_env_leaks() { # unsets, in the calling subshell, the names GIT_ENV_LEAKS drops
+  unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES \
+    GIT_COMMON_DIR GIT_NAMESPACE GIT_PREFIX GIT_LITERAL_PATHSPECS GIT_GLOB_PATHSPECS \
+    GIT_NOGLOB_PATHSPECS GIT_ICASE_PATHSPECS
+}
+derive_template_key() ( # <builder> [<input file>...] -> the key, 40 hex, from the builder's definition and the inputs' blob ids
+  remove_git_env_leaks
   local -; set -o pipefail
   local _tc_b=$1; shift
   { printf 'template-cache v1\nbash\n%s\n' "$_tc_b"
@@ -282,8 +288,9 @@ derive_template_key() { # <builder> [<input file>...] -> the key, 40 hex, from t
     printf 'input %s\n' "$@"
     [ "$#" -eq 0 ] || printf '%s\n' "$@" | git hash-object --no-filters --stdin-paths
   } | git hash-object --stdin
-}
-resolve_template() { # <root> <key> <builder> [<arg>...] -> <root>/<key>/repo on stdout, built once per root
+)
+resolve_template() ( # <root> <key> <builder> [<arg>...] -> <root>/<key>/repo on stdout, built once per root
+  remove_git_env_leaks
   local _tc_r=$1 _tc_k=$2 _tc_l _tc_n; shift 2
   local _tc_dir="$_tc_r/$_tc_k" _tc_s="$_tc_r/.stage-$_tc_k-$BASHPID"
   local -a _tc_c=(-c core.autocrlf=false -c core.hooksPath= -c commit.gpgsign=false -c user.name=t -c user.email=t@e)
@@ -321,13 +328,14 @@ resolve_template() { # <root> <key> <builder> [<arg>...] -> <root>/<key>/repo on
     echo "template: ${_tc_k:0:8} reused" >&2
   fi
   printf '%s\n' "$_tc_dir/repo"
-}
-build_template_clone() { # <template repo> <dest> -> a --shared clone carrying the template's config pins and no remote
+)
+build_template_clone() ( # <template repo> <dest> -> a --shared clone carrying the template's config pins and no remote
+  remove_git_env_leaks
   local _tc_l; local -a _tc_p=()
   while IFS= read -r _tc_l; do [ -n "$_tc_l" ] && _tc_p+=(-c "$_tc_l"); done < "${1%/*}/config-pins" || return 2
   git -c core.autocrlf=false clone --shared --quiet --template= ${_tc_p[@]+"${_tc_p[@]}"} "$1" "$2" \
     && git -C "$2" remote remove origin
-}
+)
 read_template_mode() { # <python> <policy.py> -> per-case or shared: tests.fixture-templates, shared unless the reader says per-case
   local _tc_v
   if [ -n "${1:-}" ] && [ -f "${2:-}" ] && _tc_v=$("$1" "$2" get tests.fixture-templates 2>/dev/null) \

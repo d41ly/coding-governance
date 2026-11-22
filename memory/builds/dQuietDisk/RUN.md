@@ -159,3 +159,7 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-22T18:51:15Z review · item dQuietDisk · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 2 · round-minors 9
 
 2026-11-22T18:51:34Z rescope · item add TOOL-dQuietDisk-36 · reason closing diff review round 1 (closing-target highs) confirmed two HIGHs, H1 (the bash template cache runs git under an inherited GIT_DIR) and H2 (the orphan sweep removes the turnstile suite's foreign-repository fixture); the round's fold is this unit, re-reviewed as round 2
+
+2026-11-22T19:14:56Z brief · item TOOL-dQuietDisk-36 · reason d295d087b141 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-36-build-brief.md
+
+2026-11-22T19:16:31Z dispatch · item 42d04087 TOOL-dQuietDisk-36 · reason tools/lib/template-cache.sh tools/lib/lib-selftest.sh .githooks/pre-push.test.sh tools/lib/lib-selftest.test.sh tools/lib/resolve-python.test.sh tools/run-gates/run-gates.turnstile.test.sh memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/CARDS.md memory/builds/dQuietDisk/spec/2026-11-22-spec-TOOL-dQuietDisk-36.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-36-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-36-deviation-1.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

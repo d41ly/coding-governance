@@ -20,7 +20,7 @@ nope() { n=$((n+1)); bad=1; printf 'nope %s — %s\n' "$1" "${2:-}"; }
 
 # FLOOR_ASSERTIONS grades whether this SUITE still carries its arms, not whether this box could run
 # them. A suite that silently shrinks reports green over a population it stopped grading.
-FLOOR_ASSERTIONS=31
+FLOOR_ASSERTIONS=34
 
 # run_harness <name> <body> [<dir>] -> writes $TMP/<name>.out, returns the harness's exit status; the
 # body runs in <dir>, the repository root by default, whose policy a `--template` batch reads
@@ -211,6 +211,36 @@ read -r _ k1 k1b k2 k3 < <(grep '^keys ' "$TMP/tkey.out")
   || nope "a redefined builder kept its key" "$(cat "$TMP/tkey.out")"
 [ -n "${k3:-}" ] && [ "$k2" != "$k3" ] && ok "one byte of one input file moves the key" \
   || nope "a changed input kept its key" "$(cat "$TMP/tkey.out")"
+
+# An exported GIT_DIR reaches none of the three git-running verbs (TOOL-dQuietDisk-36 S4). It names a
+# scratch SHA-256 repository with one commit and an origin remote, so a leak moves its HEAD, drops its
+# remote, or derives a 64-hex key; the body exports it only after the harness is sourced, and unsets it
+# for its own reads of the clone. WHAT THIS DOES NOT CHECK: read_template_mode, which runs no git here.
+LEAK=$TMP/leak/scratch; mkdir -p "$LEAK"; printf 's\n' > "$LEAK/s.txt"
+git -C "$LEAK" init -q --object-format=sha256 && git -C "$LEAK" -c core.autocrlf=false add -A \
+  && git -C "$LEAK" -c core.hooksPath= -c commit.gpgsign=false -c user.name=t -c user.email=t@t commit -qm scratch \
+  && git -C "$LEAK" remote add origin "$TMP/leak/origin.git" \
+  || { echo "lib-selftest-test: cannot build the scratch SHA-256 repository"; exit 2; }
+h0=$(git -C "$LEAK" rev-parse HEAD)
+export TMP_LEAK=$TMP/leak
+run_harness tleak 'mkg() { git init -q && printf g > g.txt && git -c core.autocrlf=false add -A \
+  && git -c core.hooksPath= -c commit.gpgsign=false -c user.name=t -c user.email=t@t commit -qm self; }
+k0=$(derive_template_key mkg)
+export GIT_DIR=$TMP_LEAK/scratch/.git
+k1=$(derive_template_key mkg)
+t=$(resolve_template "$TMP_LEAK/root" "$k1" mkg 2>/dev/null)
+build_template_clone "$t" "$TMP_LEAK/clone" 2>/dev/null
+unset GIT_DIR
+echo "clone $(git -C "$TMP_LEAK/clone" remote 2>/dev/null | grep -c .) $(cat "$TMP_LEAK/clone/g.txt" 2>/dev/null)"
+echo "keys $k0 $k1"' "$DEF"
+[ -n "$h0" ] && [ "$(git -C "$LEAK" rev-parse HEAD 2>/dev/null)" = "$h0" ] && [ "$(git -C "$LEAK" remote 2>/dev/null)" = origin ] \
+  && ok "an exported GIT_DIR keeps the scratch repository's HEAD and its origin remote unmoved" \
+  || nope "the template cache moved the HEAD or a remote of the repository GIT_DIR names" "$(cat "$TMP/tleak.out")"
+grep -qx 'clone 0 g' "$TMP/tleak.out" && ok "and the clone holds the builder's tree and no remote" \
+  || nope "the clone under an exported GIT_DIR is not the builder's tree without a remote" "$(cat "$TMP/tleak.out")"
+read -r _ lk0 lk1 < <(grep '^keys ' "$TMP/tleak.out")
+[[ ${lk0:-} =~ ^[0-9a-f]{40}$ ]] && [ "${lk1:-}" = "$lk0" ] && ok "and the key equals the key derived with GIT_DIR unset" \
+  || nope "the key moved under an exported GIT_DIR" "$(cat "$TMP/tleak.out")"
 
 # A racing stage left behind: two shells resolve one key at once in one root.
 run_harness trace 'mkr() { sleep 1; git init -q && printf r > f; }

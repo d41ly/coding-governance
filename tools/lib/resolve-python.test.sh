@@ -571,6 +571,18 @@ while IFS='|' read -r stem canon excl; do
   done <<<"$copies"
 done <<<"$PARITY_ROWS"
 
+# THE BASH SCRUB'S NAMES ARE GIT_ENV_LEAKS (TOOL-dQuietDisk-36 S5). template_cache_sh's
+# remove_git_env_leaks unsets a list the Python canonical also spells, in a second language, and the
+# parity row above carries the bash list to its copies but compares it with nothing. This holds the
+# quoted GIT_ names of the canonical git_env_leaks_py block, member for member and in order, to the
+# GIT_ names in the body of remove_git_env_leaks in the canonical template-cache.sh; an empty list on
+# either side is a break, never a match. WHAT THIS DOES NOT CHECK: a copy's list, which the row reads.
+gel_py=$(blk git_env_leaks_py "$ROOT/$KIT_REL/git_env_leaks.py" | grep -oE '"GIT_[A-Z_]+"' | tr -d '"')
+gel_sh=$(awk '/^remove_git_env_leaks\(\) \{/{f=1; next} f && /^}/{exit} f' "$ROOT/$KIT_REL/template-cache.sh" \
+  | tr -d '\r' | grep -oE 'GIT_[A-Z_]+')
+{ [ -n "$gel_py" ] && [ -n "$gel_sh" ] && [ "$gel_py" = "$gel_sh" ]; } \
+  || bad "remove_git_env_leaks in $KIT_REL/template-cache.sh unsets '${gel_sh//$'\n'/ }', not GIT_ENV_LEAKS of $KIT_REL/git_env_leaks.py '${gel_py//$'\n'/ }'"; ok
+
 # THE WRONG-SHELL REFUSAL'S COVERAGE, BOTH WAYS (TOOL-dWitnessedBar-27 S5). The parity row above holds
 # every inline `refuse_wrong_shell` block to its canonical; this holds the population to the refusal,
 # over sets re-derived at every run from the tracked shell files outside the memory tree, each break

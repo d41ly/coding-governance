@@ -330,7 +330,9 @@ bad=0
 # Raised from 101 to 144 by TOOL-aPairedSlots-15: the 33 of arms 29-43 (TOOL-aPairedSlots-2 to -5),
 # which left this floor where it was, and the 10 of arms 44-48, counted off the blocks.
 # Raised from 144 to 145 by TOOL-dRedressedBar-24 S8: arm R6's heartbeat check, unconditional.
-FLOOR_ASSERTIONS=145
+# Raised from 145 to 147 by TOOL-dQuietDisk-36 S7: arm 22's orphan and relative lines, counted on
+# its never-established branch too, as two SKIPs.
+FLOOR_ASSERTIONS=147
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -1181,8 +1183,10 @@ R22=$tmp/sweep; mk_repo "$R22"
 printf '#!/usr/bin/env bash\ni=0; while [ ! -e "${TS_GO:?}" ] && [ "$i" -lt 1800 ]; do sleep 0.1; i=$((i + 1)); done\nexit 0\n' > "$R22/fx/wait.sh"
 ( cd "$R22" && git add -A && git commit -qm wait ) >/dev/null 2>&1
 A22=$tmp/ambient22; mkdir -p "$A22"
-mkdir -p "$A22/gate-work.foreign"
-printf '999999\t%s\t0\n' "/nowhere/else/.git" > "$A22/gate-work.foreign/owner"
+# The foreign owner's common dir EXISTS: an absolute one that names no directory is an orphan's, which
+# the sweep removes by design (TOOL-dQuietDisk-9 S9), so a missing path here would grade that rule.
+mkdir -p "$A22/gate-work.foreign" "$tmp/other22/.git"
+printf '999998\t%s\t0\n' "$tmp/other22/.git" > "$A22/gate-work.foreign/owner"
 printf '%s\n' '[ {"name": "waiter", "argv": ["bash", "fx/wait.sh"]} ]' > "$tmp/wait22.json"
 printf '%s\n' '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]' > "$tmp/quick22.json"
 ( cd "$R22" && env TMPDIR="$A22" TS_GO="$tmp/go22" GATE_FULL=1 GATE_TURNSTILE=0 GATE_WALL=0 \
@@ -1216,17 +1220,30 @@ if [ -n "$w22" ]; then
     || nope "the first bar's owner record names '$c22', which is not this repository's git dir"
   mkdir -p "$A22/gate-work.deadmine"
   printf '999999\t%s\t0\n' "$c22" > "$A22/gate-work.deadmine/owner"
+  # THE ORPHAN RULE'S TWO SIDES (TOOL-dQuietDisk-36 S7), planted beside the control so the second bar
+  # grades all four owners: an absolute common dir that was never created is an orphan's and is swept,
+  # and a relative one is never read as either repository's and survives.
+  mkdir -p "$A22/gate-work.orphan" "$A22/gate-work.relative"
+  printf '999997\t%s\t0\n' "$tmp/gone22/.git" > "$A22/gate-work.orphan/owner"
+  printf '999996\t%s\t0\n' "relative/.git" > "$A22/gate-work.relative/owner"
   ( cd "$R22" && env TMPDIR="$A22" GATE_FULL=1 GATE_TURNSTILE=0 GATE_WALL=0 GATE_LEGS="$tmp/quick22.json" \
       bash $KIT_REL/run-gates.sh ) >"$tmp/out22b" 2>&1
   { [ ! -e "$A22/gate-work.deadmine" ] && grep -q 'sweeping the scratch of a dead bar (pid 999999)' "$tmp/out22b"; } \
     && ok "control: the second bar swept, and announced, a dead bar of THIS repository's scratch" \
     || { nope "the second bar did not sweep a dead bar's scratch, so the two survivals below prove nothing"; tail -4 "$tmp/out22b" | sed 's/^/      /'; }
-  # TOOL-aGraftedHelix-8: ONE scratch-swept line for the one dead bar of this repository, and none
-  # for the foreign owner the sweep spared.
+  { [ ! -e "$A22/gate-work.orphan" ] && grep -q 'sweeping the scratch of a dead bar (pid 999997)' "$tmp/out22b"; } \
+    && ok "the second bar swept, and announced, a dead bar's scratch whose absolute common dir names no directory" \
+    || { nope "the second bar left an orphan's scratch, whose common dir was never created"; tail -4 "$tmp/out22b" | sed 's/^/      /'; }
+  { [ -f "$A22/gate-work.relative/owner" ] && ! grep -qs 'pid 999996' "$tmp/out22a" "$tmp/out22b"; } \
+    && ok "a dead bar's scratch whose owner names a RELATIVE common dir survived, unannounced" \
+    || nope "the sweep removed or announced scratch whose owner names a relative common dir"
+  # TOOL-aGraftedHelix-8: ONE scratch-swept line per dead bar swept, this repository's and the orphan's,
+  # and none for the foreign or the relative owner the sweep spared.
   hl22=$(awk -F'\t' '$2 == "run-gates" && $3 == "scratch-swept"' "$R22/.git/health.log" 2>/dev/null)
-  [ "$(printf '%s' "$hl22" | grep -c .)" = 1 ] && [ "$(printf '%s' "$hl22" | cut -f4)" = "dead bar pid 999999" ] \
-    && ok "the dead bar's scratch sweep appended one scratch-swept line naming its pid" \
-    || nope "the dead bar's scratch sweep left '$(printf '%s' "$hl22" | tr '\t\n' ' ;')' in the health log, not one scratch-swept line"
+  [ "$(printf '%s' "$hl22" | grep -c .)" = 2 ] \
+    && [ "$(printf '%s\n' "$hl22" | cut -f4 | sort | tr '\n' ';')" = "dead bar pid 999997;dead bar pid 999999;" ] \
+    && ok "the two dead bars' scratch sweeps appended one scratch-swept line each, naming their pids" \
+    || nope "the dead bars' scratch sweeps left '$(printf '%s' "$hl22" | tr '\t\n' ' ;')' in the health log, not two scratch-swept lines"
   [ -d "$w22" ] && [ -f "$w22/owner" ] \
     && ok "a LIVE bar's scratch survived a second bar's sweep" \
     || nope "a second bar removed the scratch of a bar that was still running"
@@ -1241,6 +1258,8 @@ else
   : > "$tmp/go22"; wait "$h22" 2>/dev/null
   nope "the first bar never showed an owned, swept gate-work dir under its ambient TMPDIR, so the live-bar arm has no subject"
   skipped "the dead-owner control: the first bar never established"
+  skipped "the orphan's sweep: the first bar never established"
+  skipped "the relative owner's survival: the first bar never established"
   skipped "the live bar's survival: the first bar never established"
   skipped "the foreign owner's survival: the first bar never established"
   skipped "the first bar's verdict: the first bar never established"

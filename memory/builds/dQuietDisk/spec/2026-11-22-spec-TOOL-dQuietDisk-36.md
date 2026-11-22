@@ -1,12 +1,13 @@
 # TOOL-dQuietDisk-36 — the bash template cache runs git without the inherited git environment, and the turnstile suite grades the spared live repository and the swept orphan
 
-**Status:** INPROGRESS · rev-1 · 2026-11-22 · node d · Tier-2 · base 1af73288 · streams tooling · order 8
+**Status:** CLOSED · rev-1 · 2026-11-22 · node d · Tier-2 · base 1af73288 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-20-build-TOOL-dQuietDisk-1-agent-ledger.md](../build/2026-11-20-build-TOOL-dQuietDisk-1-agent-ledger.md) | journal | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 TOOL-dQuietDisk-28 |
+| [2026-11-22-build-TOOL-dQuietDisk-36-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dQuietDisk-36-1-acceptance-ledger.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-36-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-36-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-36-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-36-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-36-spec-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-36-spec-task.md) | research | — |
