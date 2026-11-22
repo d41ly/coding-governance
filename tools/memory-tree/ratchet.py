@@ -784,9 +784,12 @@ def write_files(top, files):
         p.write_bytes(text.encode("utf-8"))
 
 
+FX_REMOTE = "fx"  # the fixtures' scratch remote: a name no real remote of gov is likely to carry
+
+
 def write_fixture_repo(top, tables, files):
     """A scratch repository at `top`: `kit/kit.toml` holding `tables`, a build folder, and `files`,
-    committed as the base on `main`, which `refs/remotes/origin/main` names."""
+    committed as the base on `main`, which the scratch remote's `main` tracking ref names."""
     pathlib.Path(top).mkdir(parents=True)
     write_files(top, {"kit/kit.toml": 'id = "fix"\n\n' + "".join(tables),
                       "memory/builds/dFix/README.md": "# dFix\n", **files})
@@ -796,8 +799,8 @@ def write_fixture_repo(top, tables, files):
         run_git_in(top, "config", k, v)
     run_git_in(top, "add", "-A")
     run_git_in(top, "commit", "-q", "-m", "base")
-    run_git_in(top, "remote", "add", "origin", "../no-remote")
-    run_git_in(top, "update-ref", "refs/remotes/origin/main", "HEAD")
+    run_git_in(top, "remote", "add", FX_REMOTE, "../no-remote")
+    run_git_in(top, "update-ref", f"refs/remotes/{FX_REMOTE}/main", "HEAD")
     return top
 
 
@@ -993,7 +996,7 @@ def run_plant_no_base_remedy(top, results):
     `unresolved`, its reason and the remedy."""
     rows = [(("a",), 1, SHA_A, "seeded")]
     write_fixture_repo(top, [render_table()], {"pop/rows.txt": render_rows(rows)})
-    run_git_in(top, "update-ref", "-d", "refs/remotes/origin/main")
+    run_git_in(top, "update-ref", "-d", f"refs/remotes/{FX_REMOTE}/main")
     check_plant_case(results, "no-base-remedy", "never gains with no compare base", top, ["never-gains"], 1,
                      ["fix-pop · unresolved", NO_BASE_REMEDY], ["pass"])
 
@@ -1144,7 +1147,7 @@ def run_plant_regrammared(top, results):
                      ["regrammared at"], ["unresolved"])
     run_git_in(top, "add", "-A")
     run_git_in(top, "commit", "-q", "-m", "the base home regrammared")
-    run_git_in(top, "update-ref", "refs/remotes/origin/main", "HEAD")
+    run_git_in(top, "update-ref", f"refs/remotes/{FX_REMOTE}/main", "HEAD")
     write_files(top, {"pop/rows.txt": render_rows([(("a",), 1, SHA_A, "seeded"), (("b",), 1, SHA_A, "seeded"),
                                                    (("c",), 1, SHA_A, "seeded")])})
     check_plant_case(results, "regrammared", "a ledger-headed base home is graded, not regrammared", top,
