@@ -608,8 +608,8 @@ def check_return_arm(state):
         root = pathlib.Path(tmp)
 
         def run_git(*args):
-            return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, env=env,
-                                  stdin=subprocess.DEVNULL).stdout.strip()
+            return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                                  encoding="utf-8", env=env, stdin=subprocess.DEVNULL).stdout.strip()
 
         run_git("init", "-q", "-b", "main")
         run_git("-c", "user.email=f@f", "-c", "user.name=f", "commit", "-q", "--allow-empty", "-m", "fixture")
