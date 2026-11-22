@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-13 — inputs handed as content, each fact keyed and classed by the executor and re-cut fresh at act launch
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 10 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 10 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0178@f3b0d6ea whole
 
@@ -16,6 +16,7 @@
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-10 TOOL-dBoundRoles-12 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-46 TOOL-dBoundRoles-58 |
+| [2026-11-22-prompt-TOOL-dBoundRoles-13-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-13-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-15-reground-g-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-15-reground-g-brief.md) | journal | TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-6 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief.md) | journal | TOOL-dBoundRoles-17 TOOL-dBoundRoles-6 TOOL-dBoundRoles-3 TOOL-dBoundRoles-38 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-48 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-7 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief.md) | journal | TOOL-dBoundRoles-5 TOOL-dBoundRoles-4 TOOL-dBoundRoles-12 TOOL-dBoundRoles-23 TOOL-dBoundRoles-39 TOOL-dBoundRoles-41 TOOL-dBoundRoles-3 TOOL-dBoundRoles-24 |
