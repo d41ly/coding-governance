@@ -1,5 +1,5 @@
 {
-  "catalogue_blob": "25076c3d890d3b979769ff6ca302c478ecf5f6dc",
+  "catalogue_blob": "01ba1b146854765726c739537e5b909e707a030b",
   "keys": {
     "actions.free": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -1230,6 +1230,11 @@
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
       "value": "leaf"
+    },
+    "tests.history-verdicts": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "stored"
     },
     "tests.landing-levels": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
