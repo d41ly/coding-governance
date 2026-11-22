@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · closes TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · closes TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0219@62a3f369 whole
 **Carries:** node:record-kind.code
@@ -17,6 +17,7 @@
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-36 TOOL-dTotalRecall-2 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-10-26-build-TOOL-dTotalRecall-8-deviation-81.md](../build/2026-10-26-build-TOOL-dTotalRecall-8-deviation-81.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-8-deviation-82.md](../build/2026-10-26-build-TOOL-dTotalRecall-8-deviation-82.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-8-edges-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-edges-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-8-facts-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-facts-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-8-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
@@ -26,6 +27,8 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-8-edges-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-edges-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-8-edges-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-edges-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-facts-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-facts-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-facts-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-facts-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-reground-brief.md) | journal | — |
@@ -106,7 +109,15 @@ is never built.
   does a `PolicyRefused`; `code_meta` names the extractors and the ctags version. The catalogue row's
   `summary` and `usage` are filled, its name drained from `tools/policy/unsummarised-keys.txt` by
   `python tools/policy/policy.py lists --write`, and `help/reference/policy.md` re-rendered by `python
-  tools/playbook/render_playbook.py --reference`. Observed by AC8.
+  tools/playbook/render_playbook.py --reference`, so the key gains its anchored section. Its
+  `policy:memory.code-languages` row then leaves `memory/project/docs-undocumented.txt`
+  (`memory/project/docs-undocumented.txt@a3d6d07e:180`), deleted by hand from that shrink-only
+  ledger, which `tools/govkit/docs_leg.py#read_docs_state` reds as `DRAINED` once a page anchors it.
+  Observed by AC8 and AC13.
+  **Readers:** by name: `tools/govkit/docs_leg.py`, whose `read_legacy_rows` reads each ledger
+  row's id · by value: `tools/govkit/docs_leg.py#read_docs_state`, which joins each id to the page anchors
+  and reds a drained one, and `tools/govkit/docs_leg.py#check_legacy_low_water`, which counts the
+  rows against their low-water, so a drained row only lowers it.
 - **S11** — The kind: the `code` row of `tools/memory-tree/record-kinds.toml` (TOOL-dTotalRecall-1),
   form `generated`, its writer `generator:` and `tools/playbook/code_record.py` spelled through
   `{prefix}`, check `code record`, written
@@ -284,6 +295,7 @@ on 2026-11-22; a nested helper leads with a `.lexicon.conf` VERBS verb.
 - `tools/policy/catalogue.toml`
 - `tools/policy/unsummarised-keys.txt`
 - `help/reference/policy.md` (the render of `render_playbook.py --reference`)
+- `memory/project/docs-undocumented.txt` (the `policy:memory.code-languages` row drained)
 - `tools/codebase-map/map_lib.py`
 - `tools/codebase-map/map_diff.py`
 - `tools/codebase-map/selftest.py`
@@ -324,7 +336,7 @@ on 2026-11-22; a nested helper leads with a `.lexicon.conf` VERBS verb.
   mentions per language and skipped rows by reason.
 - risks — the record losing its re-timing (§8 F1); an ambiguity over 10% shipping a language's edges
   as mentions, which the meta line reports.
-- testing — AC1 to AC12 by the pass; the new arms of §7 at the close.
+- testing — AC1 to AC13 by the pass; the new arms of §7 at the close.
 - migration — none for a record or a conf: the index is a cache, and `.gitattributes` gains lines
   that change no checkout.
 - user docs — `help/reference/policy.md` gains the key's section by its render (S10);
@@ -396,10 +408,14 @@ on 2026-11-22; a nested helper leads with a `.lexicon.conf` VERBS verb.
   record_kinds.py new widget --tag record.widget --form generated --writer hand --check "memory
   hygiene"` appends a row of that form and no home, and `--form bogus` exits 2, writing nothing.
   Red when: `new` writes a `generated` kind as `fields`, or accepts an unknown form.
+- **AC13** — When `grep -cx memory.code-languages tools/policy/unsummarised-keys.txt` and `grep -c
+  policy:memory.code-languages memory/project/docs-undocumented.txt` run at the pass tip, each prints
+  0, and `grep -c 'usage: policy:memory.code-languages' help/reference/policy.md` prints 1.
+  Red when: the key stays unsummarised, unanchored, or on the docs ledger once anchored.
 
 ## 7. Gates
 
-`memory hygiene` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `lexicon selftest` · `lexicon naming predicates` · `runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `recall floor` · `recall floor arms` · `kit epoch (shipped bytes move, the version moves)` · `policy fixtures` · `routed-commits selftest` · `scratch-guard self-test`
+`memory hygiene` · `docs` · `drift-audit selftest` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `lexicon selftest` · `lexicon naming predicates` · `runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `recall floor` · `recall floor arms` · `kit epoch (shipped bytes move, the version moves)` · `policy fixtures` · `routed-commits selftest` · `scratch-guard self-test`
 
 New arm: tools/playbook/code_record.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC11 · the leg `code record` and `code_record.py --selftest` over every fixture of §6, staged by deleting the vendored exclusion · none
 New arm: tools/lib/resolve-python.test.sh · covers AC4 · the `invocation_segments` `PARITY_ROWS` row, staged by one byte changed in runlog's copy · that suite's assertion count, raised by the row
@@ -484,6 +500,12 @@ any adopter tree but the planted one; whether a `test` row's definition really t
   `leg ceilings clear their evidenced maximum` floor could never pass, restated as that leg's rule over
   the measured time with its evidence row named; the night pass's prototype size pinned to the line
   that records it. No criterion moved.
+- rev-6 · 2026-11-22 · S10 · §4 Files touched · §5 testing · AC13 · §7 · an edges pass per
+  `2026-11-22-prompt-TOOL-dTotalRecall-8-edges-brief`: S10's render anchors the key, so its
+  `policy:memory.code-languages` row drains from `memory/project/docs-undocumented.txt`, which the
+  `docs` leg otherwise reds as `DRAINED`; AC13 observes the row gone, the shape of unit 16 rev-3's
+  AC7, and §7 names the `docs` leg and the `drift-audit selftest` leg, whose guard now reaches
+  `tools/lexicon/extract_code.py`; S10 carries its drain's **Readers:** clause. No other criterion moved.
 
 ## 10. Reuse audit
 

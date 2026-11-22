@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-18 — the kind registry completed: every column declared, readers and writers rendered, the pockets witnessed, and `journal` renamed `log`
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 46c806b6 · streams tooling · order 4 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 46c806b6 · streams tooling · order 4 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0229@03c635cf whole
 **Carries:** node:record-kind.view
@@ -160,6 +160,7 @@ fixtures, each re-pointed or found to hold no reader (§4 "The rename's sites", 
 ### Edges
 
 - **consumes-from** `TOOL-dTotalRecall-1` — `record-kinds.toml`, `record_kinds.py` and its legacy ledger, whose optional columns this unit makes required and whose view and factory it extends
+- **hands-off** `TOOL-dTotalRecall-16` — S10's `--layer`, `--lifecycle` and `--readers-none` flags of `record_kinds.py new`, which that unit's `new` call passes beside `--purpose`, and the view's S2 columns and S11 cell escape, after which its `Purpose` column renders
 - **hands-off** `TOOL-dTotalRecall-19` — `log`, the Serves kind the door writes in each record's header, and `resolve_kind`
 - **hands-off** `TOOL-dTotalRecall-20` — `log`, the retired alias `journal` and S12's `[[retired]]` row, whose upgrade step unit 20 ships and may name in that row's place
 - **consumes-from** external — PLAY-dOrderedCharter-29 S5 (`doors.toml` and `check_one_door`), TOOL-dDeclaredLoop-12 (`tools/loop/loop.toml` item rows), TOOL-dDeclaredLoop-24 (`derive_record_ref` and the typed record reference) and TOOL-dSafePassage-10 (the step gate and its `[[retired]]` witness), each landed and re-grounded here at base
@@ -496,6 +497,9 @@ New arm: tools/playbook/writing_practice.py · covers AC3 · the plant `door-in-
   re-derived into one classed table; `canonical_kind` renamed `resolve_kind` for the lexicon; the door
   change re-pointed on `DOOR_KINDS`; `new` takes the columns; F7 to F10 decided; the legacy ledger
   read through the alias; three pocket families added; counts re-derived.
+- rev-6 · 2026-11-22 · §3 · an edges pass per `2026-11-22-prompt-TOOL-dTotalRecall-8-edges-brief`: the
+  Edges block gains the hands-off bullet to TOOL-dTotalRecall-16 mirroring that unit's rev-3
+  consumes-from edge; nothing else moved.
 
 ## 10. Reuse audit
 
