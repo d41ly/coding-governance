@@ -29,3 +29,11 @@ anchor-ref: refs/heads/main
 base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 
 ## Parked
+
+2026-11-22T02:56:01Z brief · item TOOL-dTotalRecall-1 · reason 08ac6895f18e memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-1-build-brief.md
+
+2026-11-22T02:58:10Z dispatch · item bd39b0a7 TOOL-dTotalRecall-1 · reason tools/memory-tree/record-kinds.toml tools/memory-tree/record_kinds.py tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/README.md tools/gate-legs.json tools/playbook/kinds.toml tools/playbook/core-pending.txt tools/playbook/namespaces.toml tools/govkit/surface-classes.toml tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/run-gates/ceiling-evidence.txt memory/map/features/memory-tree-hygiene.md memory/map/generated/symbols.json memory/project/record-kinds-legacy.txt .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-1.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-1-1-acceptance-ledger.md
+2026-11-22T03:04:52Z budget · frozen · 91 unit(s) · 186
+2026-11-22T03:04:52Z draw · re-dispatch · TOOL-dTotalRecall-1 · 1/186 · 20261122T030452Z-a0db3f
+
+2026-11-22T03:04:52Z dispatch · item bd39b0a7 TOOL-dTotalRecall-1 · reason help/reference/kinds.md
