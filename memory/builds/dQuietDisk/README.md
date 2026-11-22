@@ -85,7 +85,7 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 |---|---|---|---|---|---|
 | [TOOL-dQuietDisk-1 — one store of immutable history verdicts, keyed by the ids each one reads, with one `cat-file --batch` reader](spec/2026-11-20-spec-TOOL-dQuietDisk-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-dQuietDisk-14 — the kit attestation: gov's green held run of a kit's self-tests, recorded by content and carried in the adopter's receipt](spec/2026-11-20-spec-TOOL-dQuietDisk-14.md) | 1 | 2 | CLOSED | rev-3 | 2026-11-22 |
-| [TOOL-dQuietDisk-2 — the pass-order leg grades only units whose key moved since its last graded tip](spec/2026-11-20-spec-TOOL-dQuietDisk-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-11-22 |
+| [TOOL-dQuietDisk-2 — the pass-order leg grades only units whose key moved since its last graded tip](spec/2026-11-20-spec-TOOL-dQuietDisk-2.md) | 2 | 2 | SPECCED | rev-4 | 2026-11-22 |
 | [TOOL-dQuietDisk-3 — the brief-recorded leg grades only units whose key moved since its last graded tip](spec/2026-11-20-spec-TOOL-dQuietDisk-3.md) | 2 | 2 | SPECCED | rev-3 | 2026-11-22 |
 | [TOOL-dQuietDisk-4 — routed-commits reads only the commits its store does not already hold](spec/2026-11-20-spec-TOOL-dQuietDisk-4.md) | 2 | 2 | SPECCED | rev-3 | 2026-11-22 |
 | [TOOL-dQuietDisk-5 — one `git diff --name-only BASE` decides every plain-guarded leg of a bar](spec/2026-11-20-spec-TOOL-dQuietDisk-5.md) | 2 | 2 | SPECCED | rev-2 | 2026-11-22 |
@@ -105,7 +105,7 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 | [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 7 | 1 | SPECCED | rev-4 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 30 bound to this build, across 3 record folder(s).
+Records: 31 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
