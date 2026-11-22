@@ -292,6 +292,7 @@ until an owner writes its first row.
   `answers` naming another work order. The stop is sent back to the agent with every defect named, up
   to `roles.retries` times (3 unless your policy file sets it); after that the stop goes ahead and the
   record under `.git/return-check/` says the return stayed invalid. A failed check never blocks a stop.
+  <!-- usage: hook:return-check 2329c48d -->
 - A spec write from anything but the spec writer, and a product write from anything but the builder
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
 - Any file write from a role declaring `writes = none`: such a role writes nothing in the repository.
