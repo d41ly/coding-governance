@@ -52,3 +52,16 @@ You build ONE unit from its spec. The spec is the contract. This brief adds only
   before you stage it.
 - **Record every deviation.** A change the spec did not state is a deviation record in `build/`, named
   `…-TOOL-dQuietDisk-2-deviation-1.md`. Its values are `report` and `author-recorded`.
+
+## Second dispatch (after rev-6) — what changed
+
+- **The first pass built the unit and stopped on a divergence** (run `wf_977d5bd9-59b`). The run ruled on each point
+  in `memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-divergence-task.md`, and the spec is now
+  rev-6.
+- **Apply the saved patch first:**
+  `C:/Users/d41ly/AppData/Local/Temp/claude/b3f6db677b077b04/0840beea-0651-4dc3-9fe7-f227915b6b42/scratchpad/TOOL-dQuietDisk-2-built.patch`.
+  It applies cleanly at this tip. Its probes and fixture builder sit beside it in the scratch root.
+- **Then close the gap between the patch and rev-6.** The batched short-sha read is a `git log --no-walk=unsorted`,
+  which prints a repeated sha once, so each distinct sha is passed once and every report row is filled from the
+  sha-to-short map. Re-run the AC1 and AC4 probes after any change.
+- **The shell-line widen is the main loop's.** Report the measured code lines of `check-pass-order.sh` in your return.

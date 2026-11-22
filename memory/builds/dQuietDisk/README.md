@@ -34,7 +34,7 @@ analysis and the owner's prompt are recorded under `prompts/` and `build/`.
 ## Build-level rules
 
 - Classification (M2): every roster unit MISSING at open, specced by the spec-writer role.
-- Chain map (v2 `[chain]`): units 1 to 15 and 19 sit in dWitnessedBar's area (Test: gate health, held
+- Chain map (v2 `[chain]`): units 1 to 15, 19, 26 and 28 sit in dWitnessedBar's area (Test: gate health, held
   legs, budgets); 16 to 18 in dSafePassage's (Supersession: govkit update and apply); 2 to 6 also in
   dScopedBuild's (Build: the history-derived exit base). This build runs on its own track; a shared
   subject is reconciled at the merge, and no spec here contradicts theirs.
@@ -77,7 +77,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 20 unit(s) · node d · opened 2026-11-20 · streams tooling
+**Build status:** INPROGRESS · 21 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16
 ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30
 
@@ -86,7 +86,7 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 |---|---|---|---|---|---|
 | [TOOL-dQuietDisk-1 — one store of immutable history verdicts, keyed by the ids each one reads, with one `cat-file --batch` reader](spec/2026-11-20-spec-TOOL-dQuietDisk-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-dQuietDisk-14 — the kit attestation: gov's green held run of a kit's self-tests, recorded by content and carried in the adopter's receipt](spec/2026-11-20-spec-TOOL-dQuietDisk-14.md) | 1 | 2 | CLOSED | rev-3 | 2026-11-22 |
-| [TOOL-dQuietDisk-2 — the pass-order leg grades only units whose key moved since its last graded tip](spec/2026-11-20-spec-TOOL-dQuietDisk-2.md) | 2 | 2 | INPROGRESS | rev-5 | 2026-11-22 |
+| [TOOL-dQuietDisk-2 — the pass-order leg grades only units whose key moved since its last graded tip](spec/2026-11-20-spec-TOOL-dQuietDisk-2.md) | 2 | 2 | INPROGRESS | rev-6 | 2026-11-22 |
 | [TOOL-dQuietDisk-3 — the brief-recorded leg grades only units whose key moved since its last graded tip](spec/2026-11-20-spec-TOOL-dQuietDisk-3.md) | 2 | 2 | SPECCED | rev-4 | 2026-11-22 |
 | [TOOL-dQuietDisk-4 — routed-commits reads only the commits its store does not already hold](spec/2026-11-20-spec-TOOL-dQuietDisk-4.md) | 2 | 2 | SPECCED | rev-4 | 2026-11-22 |
 | [TOOL-dQuietDisk-5 — one `git diff --name-only BASE` decides every plain-guarded leg of a bar](spec/2026-11-20-spec-TOOL-dQuietDisk-5.md) | 2 | 2 | SPECCED | rev-3 | 2026-11-22 |
@@ -96,6 +96,7 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 | [TOOL-dQuietDisk-12 — `pre-push.test.sh` builds each repeated pushed-main fixture once and copies it per arm](spec/2026-11-20-spec-TOOL-dQuietDisk-12.md) | 3 | 2 | SPECCED | rev-2 | 2026-11-22 |
 | [TOOL-dQuietDisk-13 — the run-gates suites build each repeated scratch repository once and copy it per arm](spec/2026-11-20-spec-TOOL-dQuietDisk-13.md) | 3 | 2 | SPECCED | rev-3 | 2026-11-22 |
 | [TOOL-dQuietDisk-18 — `govkit apply` reads both of its verdict maps through the target's reuse cache](spec/2026-11-20-spec-TOOL-dQuietDisk-18.md) | 3 | 2 | SPECCED | rev-3 | 2026-11-22 |
+| [TOOL-dQuietDisk-28 — the history store's bash face resolves the switch and the git dirs once per calling shell](spec/2026-11-22-spec-TOOL-dQuietDisk-28.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-22 |
 | [TOOL-dQuietDisk-6 — the manifest check's pickaxe diffs only the commits whose stamp moved](spec/2026-11-20-spec-TOOL-dQuietDisk-6.md) | 3 | 2 | SPECCED | rev-3 | 2026-11-22 |
 | [TOOL-dQuietDisk-11 — govkit's scratch targets come from the template cache, so `selftest.py` builds each distinct target once](spec/2026-11-20-spec-TOOL-dQuietDisk-11.md) | 4 | 2 | SPECCED | rev-3 | 2026-11-22 |
 | [TOOL-dQuietDisk-15 — a kit self-test leg is held where gov's attestation matches the vendored bytes](spec/2026-11-20-spec-TOOL-dQuietDisk-15.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-20 |
@@ -106,14 +107,14 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 | [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 7 | 1 | SPECCED | rev-4 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 40 bound to this build, across 3 record folder(s).
+Records: 41 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dQuietDisk-1 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-2 TOOL-dQuietDisk-26
-TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9.
+TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-28.
 
-Ids whose spec moved past its audited revision: none — 0 of 20 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 21 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -122,7 +123,7 @@ Ids whose spec moved past its audited revision: none — 0 of 20 unit id(s) carr
 |---|---|---|
 | 1 | `TOOL-dQuietDisk-1`, `TOOL-dQuietDisk-14` | yes |
 | 2 | `TOOL-dQuietDisk-2`, `TOOL-dQuietDisk-3`, `TOOL-dQuietDisk-4`, `TOOL-dQuietDisk-5`, `TOOL-dQuietDisk-7`, `TOOL-dQuietDisk-8` | no |
-| 3 | `TOOL-dQuietDisk-10`, `TOOL-dQuietDisk-12`, `TOOL-dQuietDisk-13`, `TOOL-dQuietDisk-18`, `TOOL-dQuietDisk-6` | yes |
+| 3 | `TOOL-dQuietDisk-10`, `TOOL-dQuietDisk-12`, `TOOL-dQuietDisk-13`, `TOOL-dQuietDisk-18`, `TOOL-dQuietDisk-28`, `TOOL-dQuietDisk-6` | yes |
 | 4 | `TOOL-dQuietDisk-11`, `TOOL-dQuietDisk-15`, `TOOL-dQuietDisk-16`, `TOOL-dQuietDisk-26` | yes |
 | 5 | `TOOL-dQuietDisk-17` | no |
 | 6 | `TOOL-dQuietDisk-9` | no |

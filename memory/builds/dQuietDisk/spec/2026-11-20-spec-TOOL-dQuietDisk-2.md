@@ -1,18 +1,19 @@
 # TOOL-dQuietDisk-2 — the pass-order leg grades only units whose key moved since its last graded tip
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-20-build-TOOL-dQuietDisk-1-agent-ledger.md](../build/2026-11-20-build-TOOL-dQuietDisk-1-agent-ledger.md) | journal | TOOL-dQuietDisk-1 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
+| [2026-11-20-build-TOOL-dQuietDisk-1-agent-ledger.md](../build/2026-11-20-build-TOOL-dQuietDisk-1-agent-ledger.md) | journal | TOOL-dQuietDisk-1 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 TOOL-dQuietDisk-28 |
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-2-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-2-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-2-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-2-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-2-divergence-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-divergence-task.md) | research | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md) | research | TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 |
 
 <!-- /gen:spec-records -->
@@ -45,15 +46,16 @@ violation line stays byte-identical.
   today. Observed by AC1 and AC4.
 - **S4** — Each CLOSED unit's outcome is one `unit` item under the key section 4 lists, which
   includes the unit's candidate commits read from `_SUBJ`. A hit is used as the outcome. A miss
-  runs today's grading of that unit. A built outcome whose in-range candidates share a committer
-  timestamp is not stored. Observed by AC1, AC2, AC3, AC5 and AC7.
+  runs today's grading of that unit. The store never holds two cases, and each is graded afresh on
+  every run as today. One is a built outcome whose in-range candidates share a committer second.
+  The other is a unit whose candidate is a root commit. Observed by AC1, AC2, AC3, AC5 and AC7.
 - **S5** — The unwitnessed-pass arm stores its two per-build answers. The `merge-base
   --is-ancestor` answer goes in a `bypass-range` item, and the `unchecked` verb's lines go in an
   `unchecked` item keyed by the base and G. Observed by AC1 and AC4.
 - **S6** — The report lines, the waiver bookkeeping, the stale-waiver rule, the `--preview` output
   and the summary lines come from the outcomes in loop order, with today's counters. Every short
-  sha a report line names is computed after the loop by one `GIT rev-parse --short` over all of
-  them, and is never stored. The leg prints no line of its own about the store, and it discards
+  sha a report line names is computed after the loop by one
+  `GIT log --no-walk=unsorted --format=%h <sha>... --` over all of them, and is never stored. The leg prints no line of its own about the store, and it discards
   the store's stderr. Observed by AC1.
 - **S7** — The leg writes with one `write_hs_items <file> G` call, after a run that exits 0 or 1 and
   is not `--preview`, and only when HEAD still reads G. The file holds every item this run
@@ -163,7 +165,7 @@ graded as today. So every stored body escapes to itself under the store's rule
 | Kind | Key fields after the kind | Body |
 |---|---|---|
 | `unit` | the id, the build folder, the base or `-`, `norun` 0 or 1, `HR_MODE`, the window tip, `FORK_CUTOFF` or `-`, `GENERATED_INDEXES`, `SHARED_RECORDS`, `PREANCHOR_CAP`, the candidate list | `unbuilt`, `truncated`, `preanchor <commit>`, `nospec <build commit> <parent>`, or `spec <build commit> <parent> <state or -> <spec path>` |
-| `anchors` | `MEMORY_ROOT`, the graded commit G | one `<slug>=<base or none>` cell per build with no run-state file |
+| `anchors` | `MEMORY_ROOT`, the graded commit G | one `<folder>=<base or none>` cell per build with no run-state file |
 | `bypass-range` | the bypass anchor, the base | `graded` or `skipped`; any other exit is not stored |
 | `unchecked` | the base, G | one `<sha>:<id>,<id>` cell per line the `unchecked` verb prints, in its order |
 
@@ -175,6 +177,16 @@ mode, a build with no run-state file, and a base that is not in the tip's histor
 last fact in-process, as a base present in `_SUBJ` and absent from that list; a base absent from
 `_SUBJ` counts as outside. Where all three hold, the window tip is `HR_TIP`. The inverted map from id
 to candidates is filled from the same token stream `_SUBJ` reads, with no second git read.
+
+An `anchors` cell's `<folder>` is the build folder's path under `<MEMORY_ROOT>/builds/`, never its
+basename `slug` (`tools/unattended/check-pass-order.sh@638bb1d0c2a6:529`). The README walk lists
+every `README.md` under that root, so a nested README would give two folders one slug. For every
+top-level build the path and the slug read the same, and no build folder is nested at this tree.
+
+A unit whose candidate is a root commit has no `unit` body. Today its `rev-parse "$build_c^"` fails,
+and the unit counts as unbuilt after it has joined `inrange_ids`
+(`tools/unattended/check-pass-order.sh@638bb1d0c2a6:663` and `:668`). The leg never stores such a
+unit and never looks it up, so it is graded afresh on every run, exactly as today.
 
 ### Why a stored outcome stays true
 
@@ -214,8 +226,14 @@ adds commits to `base..HEAD`.
 3. A first `read_hs_items` with the `anchors` item at L, when S3's chain holds.
 4. The walk reads each README and run-state file through the coprocess and derives every key. A
    second `read_hs_items` then carries every `unit`, `bypass-range` and `unchecked` item.
-5. The loop takes each hit and grades each miss as today, in today's order. It holds the report
-   rows and their shas, then renders them after one batched `rev-parse --short`.
+5. The loop takes each hit and grades each miss as today, in today's order. The first built miss
+   with two or more candidates runs one lazy `GIT log --format='%H %ct' HEAD`. Its committer
+   seconds serve S4's tie rule for every later miss, so a warm run at an unmoved tip never runs it.
+   The loop holds the report rows and their shas. It renders them after one
+   `GIT log --no-walk=unsorted --format=%h <sha>... --`, which prints each sha in argument order with
+   git's own abbreviation. `rev-parse --short` takes a single revision and exits 128 on more. That
+   log prints a repeated sha once, so each distinct sha is passed once and every row is filled from
+   the sha-to-short map it yields.
 6. The summary, the waiver rule and the exits run as today, with S7's write placed before the
    first exit that S7 allows. `remove_bh` joins the existing `EXIT` trap beside the `PS_DIR`
    removal. The request and answer files sit in `PS_DIR`, so the run leaves no temp entry.
@@ -234,17 +252,20 @@ The counts below are for a run whose tip L is G, with the store warm.
 | the builds' `ls-tree` | 1 |
 | the coprocess | 1 |
 | `read_hs_tip` and two `read_hs_items`, 8 each | 24 |
-| the batched `rev-parse --short`, where a report line exists | 1 |
+| the batched `log --no-walk=unsorted --format=%h`, where a report line exists | 1 |
 
-That makes 39 on the fixture, which has no waiver file, and 41 in TOOL-dQuietDisk-19's M2 clone,
-which has no remote. This unit promises **at most 45 git processes** for such a run, whatever the
+On the fixture, which has no waiver file and whose `hooks.bypass` read spawns no git, a warm run
+measured 35 git processes [PINNED, unit harness run `wf_977d5bd9-59b`, 2026-11-22].
+TOOL-dQuietDisk-19's M2 clone has no remote, and there the rows sum to 41 [DERIVED from the table]. This unit promises **at most 45 git processes** for such a run, whatever the
 unit count. The figure is PINNED as a promise and observed by AC4. A clone with a remote adds the
 remote observation's 6 and the RANGE list's 1.
 
 A tip moved by one commit adds three things. The `rev-list --parents` adds 1, the write adds 8, and
 the `unchecked` read adds 1 for each build range the unwitnessed arm grades, B on the summary line.
 The promise there is **at most 50 plus B**, PINNED and observed by AC4. B is 0 at `fa1295ff4`
-[PINNED, 2026-11-22]. The cold counts are DERIVED at observation.
+[PINNED, 2026-11-22]. A run in which a built unit with two or more candidates misses adds one
+lazy `log --format='%H %ct'` [DERIVED from step 5 of the run], beside that unit's grading spawns.
+The cold counts are DERIVED at observation.
 
 ### Inventory
 
@@ -405,6 +426,10 @@ The arm is observed by the main loop, never by a unit pass. The real-tree halves
 are the main loop's one-time observations at the close. No standing arm compares against a literal
 sha, which is `memory/gotchas/test-oracle-read-from-a-historical-sha.md`'s class.
 
+The pass grows `tools/unattended/check-pass-order.sh` past its row in
+`memory/project/shell-role.txt`. The pass does not edit that ledger. The main loop widens the row
+after the pass, as it did for TOOL-dQuietDisk-1, so Files touched does not name it.
+
 ## 8. Open questions
 
 - **F1 — Each store verb costs 8 git processes in a tree where the policy kit resolves.**
@@ -486,6 +511,19 @@ sha, which is `memory/gotchas/test-oracle-read-from-a-historical-sha.md`'s class
     since `69c9c5cb8`.
   - AC1's old leg is now the copy at `40def53f7`. It differs from the copy at `69c9c5cb8` only in its
     kit-version line, which the leg never prints. Scope and acceptance are unchanged.
+- rev-6 · 2026-11-22 · §2 §4 §7 · S4 S6 · under `2026-11-22-prompt-TOOL-dQuietDisk-2-divergence-task`,
+  the run's rulings on unit 2's first-pass divergences:
+  - The batched short-sha read is one `GIT log --no-walk=unsorted --format=%h <sha>... --` in S6,
+    the run's step 5 and the tally, because `rev-parse --short` takes a single revision. Each
+    distinct sha is passed once, because that log prints a repeated sha once.
+  - A unit whose candidate is a root commit is never stored, in S4 and in section 4's items.
+  - The tie rule's committer seconds come from one lazy `GIT log --format='%H %ct' HEAD`, run at the
+    first built miss with two or more candidates. It is counted for a run that misses.
+  - An `anchors` cell is keyed by the folder's path under `<MEMORY_ROOT>/builds/`, not its basename.
+  - The fixture's warm tally is 35, as measured, where rev-5 said 39. The bound of 45 is unchanged.
+  - Section 7 says the main loop widens the leg's `memory/project/shell-role.txt` row after the pass.
+    Files touched is unchanged.
+  - The goal, the acceptance criteria and the bounds are unchanged.
 
 ## 10. Reuse audit
 
