@@ -46,6 +46,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - `.claude/settings.json`: S5 merges the return-check fragment through `settings-merge.py --fragment`. If the
   write gate refuses that path to you, do not route around it: build everything else, and name the merge command in
   your return for the main loop to run.
+- The first builder, run `wf_8d0b1045-394`, built this unit at `51870e685` and committed nothing: the pre-commit hook
+  refused four paths outside the write set. Its whole staged change is saved as a patch at
+  `C:/Users/d41ly/AppData/Local/Temp/claude/bf1faa02b154e3ee/b48c5b81-0c25-4457-90e8-da811a25e0e9/scratchpad/TOOL-dBoundRoles-5-pass.patch`,
+  which applies cleanly at your pass base. Apply it with `git apply --index`, then build the four items of
+  `build/2026-11-23-build-TOOL-dBoundRoles-5-1-main-loop-decision.md` on it. The write set now holds
+  `memory/map/features/roles.md`, `tools/roles/render_agents.py`, `tools/workflows/unattended-build.test.sh` and
+  `tools/workflows/tier2-review.test.sh`. Re-check every hunk you keep against the spec and the code at HEAD, re-run
+  the probes the first builder ran, and record the decision items in the deviation record.
 - Record every change the spec does not state in ONE deviation record,
   `build/2026-11-22-build-TOOL-dBoundRoles-5-deviation-53.md` (values `report` and `author-recorded`).
 - Generated outputs are admitted undeclared and belong in the pass commit: `.claude/roles.json`, `.claude/agents/` and
