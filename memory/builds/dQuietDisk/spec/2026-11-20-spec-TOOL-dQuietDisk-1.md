@@ -12,6 +12,7 @@
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-2-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-2-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-2-task.md) | research | TOOL-dQuietDisk-7 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task.md) | research | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-owner-build-on-land-branch.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-owner-build-on-land-branch.md) | research | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task.md) | research | TOOL-dQuietDisk-14 TOOL-dQuietDisk-9 TOOL-dQuietDisk-19 |
