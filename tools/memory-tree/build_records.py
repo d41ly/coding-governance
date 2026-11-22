@@ -306,7 +306,7 @@ if set(KINDS) != set(TYPED_RECORD_KINDS):
     raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "
                       + ", ".join(sorted(set(KINDS) ^ set(TYPED_RECORD_KINDS))))
 DOORS = ("exception", "change", "override", "red-fix", "disposition", "recommendation")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
-PLANTS = ("typed-kinds", "pending-kind", "red-fix-join", "recommendation", "ask-door")
+PLANTS = ("typed-kinds", "pending-kind", "red-fix-join", "recommendation", "ask-door", "door-header")
 SHA40 = re.compile(r"[0-9a-f]{40}")
 SAY_JOIN = "build-records: red-fix join"
 #: PLAY-dOrderedCharter-55 S8's `pending-kind`: the exception kind's entry staged pending, in a copy of this module
@@ -895,13 +895,14 @@ def write_recommendation(root, build, unit, stage, score, source, binds, reason,
     return write_record(root, build, unit, "recommendation", f"{stage} review", fields, today)
 
 
-def write_record(root, build, unit, kind, title, fields, today=None, lines=(), check=None):
+def write_record(root, build, unit, kind, title, fields, today=None, lines=(), check=None, place=None):
     """The record writer every door shares: the next `kind` record of `build` under `root`'s own memory tree,
     headed `# <unit> <kind> <n> — <title>`, then `**Serves:** <kind> <unit>`, each `(key, value)` of
     `fields` as a bold-key bullet and, after one blank line, each of `lines` as written (TOOL-dDeclaredLoop-17
-    S1), each refused as a value is. `check(rel, text)`, where given, reads the bytes about to be written and
-    raises ValueError to refuse them, before the file is opened (TOOL-dTotalRecall-2 S4). -> its
-    repo-relative path. A refusal is ValueError."""
+    S1), each refused as a value is. `place(text)`, where given, returns the text with the record door's
+    edge lines placed under their headings (TOOL-dTotalRecall-19 S6). `check(rel, text)`, where given, reads
+    the bytes about to be written and raises ValueError to refuse them, before the file is opened
+    (TOOL-dTotalRecall-2 S4). -> its repo-relative path. A refusal is ValueError."""
     if kind not in KINDS:
         raise ValueError(f"{kind!r} is not a typed kind: " + ", ".join(KINDS))
     if "pending" in KINDS[kind]:   # PLAY-dOrderedCharter-55 S8: refused before any write, as `read` refuses it
@@ -933,11 +934,14 @@ def write_record(root, build, unit, kind, title, fields, today=None, lines=(), c
     body = [f"# {unit} {kind} {n} — {title}", "", f"**Serves:** {kind} {unit}", ""]
     body += [f"- **{key}:** {value}" for key, value in fields]
     body += [""] + list(lines) if lines else []
+    text = "\n".join(body) + "\n"
+    if place:
+        text = place(text)
     if check:
-        check(path.relative_to(root).as_posix(), "\n".join(body) + "\n")
+        check(path.relative_to(root).as_posix(), text)
     out.mkdir(exist_ok=True)
     with open(path, "x", encoding="utf-8", newline="\n") as fh:   # never over a record already there
-        fh.write("\n".join(body) + "\n")
+        fh.write(text)
     return path.relative_to(root).as_posix()
 
 
@@ -997,7 +1001,14 @@ def read_kind_row(root, kind):
 
 
 def check_mint_authority(root, build):
-    """The lines a mint under `build` prints, after its authority reads: the build lease, classed by the loop
+    """The lines a mint under `build` prints, after its authority reads: `read_mint_authority`'s lines."""
+    return read_mint_authority(root, build)[0]
+
+
+def read_mint_authority(root, build):
+    """`(lines, made-by)` of a mint under `build`: the lines it prints, after its authority reads, and the
+    `Made-by` stand-in the record names, `lease-<build>` where it mints under the build lease this session
+    holds and `owner` otherwise (TOOL-dTotalRecall-19 S4). The authority: the build lease, classed by the loop
     kit's `read_lease_class` where the unattended driver resolves, `mine` admitting and any fact refusing;
     then, the lease free or unread for want of a kit, the claim's `session` in this node's cache ref
     (`gen_build_index.read_claim_lines`), this session's admitting and another's refusing; with neither, the
@@ -1016,7 +1027,7 @@ def check_mint_authority(root, build):
         import placement  # noqa: E402  the loop kit's lease comparison, kept one (§8 F6)
         cls = placement.read_lease_class(root, build)
         if cls == "mine":
-            return lines
+            return lines, f"lease-{build}"
         if cls != "free":
             raise ValueError(cls)
     import gen_build_index  # noqa: E402  the claim's cache ref and its reader
@@ -1028,8 +1039,8 @@ def check_mint_authority(root, build):
         if holder != me:
             raise ValueError(f"the claim of {build} ({gen_build_index.CLAIM_CACHE_NS}/{build}) is held by session "
                              f"{holder}, not this session {me}")
-        return lines
-    return lines + [f"minted under the session rule: no claim or lease for {build}"]
+        return lines, "owner"
+    return lines + [f"minted under the session rule: no claim or lease for {build}"], "owner"
 
 
 def write_seq_mint(root, family, build, key):
@@ -1066,16 +1077,75 @@ def write_seq_mint(root, family, build, key):
     return "minted", f"{family}-{build}-{out.strip()}", [said]
 
 
-def write_new_record(root, kind, build, unit, title, fields, name=None):
+def parse_edge_flags(edges, eg):
+    """`[(anchor, type, targets)]` of the door's `--edge "<anchor> <type>=<target>[,<target>]"` values, in the
+    order given (TOOL-dTotalRecall-19 S6), `eg` the playbook kit's `edge_grammar`. ValueError for a type
+    `edges.toml` lacks, a target `parse_edge_target` cannot classify and a second line of one type under
+    one heading; the anchor is the render's to find."""
+    types, out, seen = eg.read_edge_types(), [], set()
+    for spelled in edges:
+        anchor, _sp, pair = spelled.strip().partition(" ")
+        kind, eq, rest = pair.strip().partition("=")
+        if not anchor or not eq or not kind or not rest:
+            raise ValueError(f"--edge {spelled!r} is not \"<anchor> <type>=<target>[,<target>]\"")
+        if kind not in types:
+            raise ValueError(f"--edge {spelled!r}: {kind} is no type of edges.toml's closed set")
+        targets = rest.split(",")
+        bad = [t for t in targets if eg.parse_edge_target(t) is None]
+        if bad:
+            raise ValueError(f"--edge {spelled!r}: the target {bad[0]!r} matches no address form of the edge grammar")
+        if (anchor, kind) in seen:
+            raise ValueError(f"--edge {spelled!r}: a second {kind} line under #{anchor}, and a heading holds one "
+                             f"line per type")
+        seen.add((anchor, kind))
+        out.append((anchor, kind, targets))
+    return out
+
+
+def render_edge_lines(text, rows):
+    """`text` with each of `rows`' `**Edges:** <type>=<targets>` lines on the lines after the heading whose
+    derived anchor is its anchor, in the order given (S6); ValueError for an anchor no heading of `text`
+    carries. The anchors are the playbook kit's `derive_anchor` over every unfenced ATX heading."""
+    if not rows:
+        return text
+    from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+    kit = resolve_kit_dir("playbook", "tag_index.py", KIT)
+    if str(kit) not in sys.path:
+        sys.path.append(str(kit))
+    from tag_index import derive_anchor   # noqa: E402  the one anchor rule (TOOL-dTotalRecall-10)
+    from tree_lib import unfenced_lines
+    lines, at, seen = text.split("\n"), {}, set()
+    for n, line in unfenced_lines(text):
+        m = re.match(r"#{1,6} (.*\S)", line or "")
+        if m:
+            at.setdefault(derive_anchor(m.group(1), seen), n)
+    lack = [a for a, _k, _t in rows if a not in at]
+    if lack:
+        raise ValueError(f"--edge {lack[0]}: the rendered record carries no heading of that anchor; its anchors are "
+                         + (", ".join(sorted(a for a in at if a)) or "none"))
+    for n in sorted(set(at[a] for a, _k, _t in rows), reverse=True):
+        lines[n:n] = [f"**Edges:** {k}={','.join(t)}" for a, k, t in rows if at[a] == n]
+    return "\n".join(lines)
+
+
+def write_new_record(root, kind, build, unit, title, fields, name=None, caused_by=None, edges=()):
     """The record door's one write (TOOL-dTotalRecall-2 S1-S8): the `kind` record of `build` serving `unit`,
     headed `title`, `fields` its `(key, value)` pairs in the caller's order, `name` the stem a row with an
     empty `id-rule` takes. In order: the row (S2), the render and its refusal by the kind's own check (S3,
     S4), the listing of the kind's home for a record of the same content key (S5), the authority (S6), then
     the mint and the write, staged (S8). -> `(word, path or line, key, lines)`, `word` one of `wrote`,
-    `exists` and `waiting`, `lines` the authority's. ValueError for every refusal, nothing written."""
+    `exists` and `waiting`, `lines` the authority's. ValueError for every refusal, nothing written.
+
+    The header (TOOL-dTotalRecall-19 S2 to S6): `caused_by`, or a `Caused-by` field, is the record's cause,
+    refused where absent on a kind whose row is no `root` or where it does not resolve
+    (`record_causes.check_cause_target`); `**Made-by:**` and `**Caused-by:**` follow the Serves line, a typed
+    kind's `- **Made-by:**` and `- **Caused-by:**` fields following its row's, `Made-by` `lease-<build>` under
+    the build lease and `owner` otherwise; `edges`, the `--edge` values, are each a `**Edges:**` line under
+    its heading. The render is read back through `tree_lib.read_header_edges` and the edge parser before
+    any write. `Made-by` is never part of the content key."""
     import fnmatch
     import record_kinds  # noqa: E402  the registry's template and field check
-    from tree_lib import TYPED_RECORD_KINDS
+    from tree_lib import TYPED_RECORD_KINDS, read_header_edges
     root = pathlib.Path(root)
     row = read_kind_row(root, kind)
     kind = row["name"]
@@ -1083,6 +1153,21 @@ def write_new_record(root, kind, build, unit, title, fields, name=None):
     if schema.get("form") != "fields":
         raise ValueError(f"its schema form is {schema.get('form')}, written only by a kind handler")
     rule, home, typed = row.get("id-rule") or "", row.get("home"), kind in TYPED_RECORD_KINDS
+    fields = list(fields)
+    if any(k == "Made-by" for k, _v in fields):
+        raise ValueError("--field Made-by: the door writes Made-by from the authority it mints under")
+    named = [v for k, v in fields if k == "Caused-by"]
+    if named and caused_by and named[0] != caused_by:
+        raise ValueError(f"--caused-by {caused_by} and --field Caused-by={named[0]} name two causes, and a record "
+                         f"names one")
+    cause = caused_by or (named[0] if named else None)
+    if not cause and row.get("root") is not True:
+        raise ValueError(f"Caused-by is required: the {kind} row of {record_kinds.REGISTRY} is no root, so its "
+                         f"record names its cause (--caused-by <unit id or record key>)")
+    if cause and not typed:
+        fields = [(k, v) for k, v in fields if k != "Caused-by"]   # an untyped record's cause is a header line
+    elif cause and not named:
+        fields.append(("Caused-by", cause))
     for flag, value in (("--build", build), ("--unit", unit), ("--title", title)):
         if not value:
             raise ValueError(f"{flag} is required")
@@ -1090,33 +1175,69 @@ def write_new_record(root, kind, build, unit, title, fields, name=None):
         raise ValueError(f"--build {build!r} is not a build slug")
     if not ID.fullmatch(unit):
         raise ValueError(f"--unit {unit!r} is not a unit id")
-    forged = [key for key, value in [("title", title)] + list(fields)
+    forged = [key for key, value in [("title", title)] + list(fields) + [("Caused-by", cause or "")]
               if "\n" in value or "\r" in value or FORGED_FIELD.match(value)]
     if forged:
         raise ValueError(f"{', '.join(forged)}: a value is one line and never opens **<Word>:**, so it cannot "
                          f"forge a field")
+    edge_rows = []
+    if edges:
+        import gen_build_index   # noqa: E402  the route to the playbook kit's edge grammar
+        from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
+        try:
+            eg = gen_build_index.load_edge_grammar(resolve_kit_dir("playbook", "edge_grammar.py", KIT))
+        except LookupError as exc:
+            raise ValueError(f"--edge: the edge grammar does not resolve: {exc}") from None
+        edge_rows = parse_edge_flags(edges, eg)
+    if cause:
+        import record_causes   # noqa: E402  the cause's one resolution (TOOL-dTotalRecall-19 S5)
+        cause = cause.strip("`")
+        why = record_causes.check_cause_target(root, cause)
+        if why:
+            raise ValueError(f"Caused-by {cause} does not resolve: {why}")
     order = [f for f in schema.get("fields", []) if f != "Serves"]
     given = dict(fields)
     ordered = [(f, given[f]) for f in order if f in given] + [(k, v) for k, v in fields if k not in order]
     template = record_kinds.render_template([row], kind).split("\n")
 
-    def render_text(rel, n):
-        """The template filled for the record at `rel`, `n` its minted `<n>`."""
+    def render_text(rel, n, made_by="owner"):
+        """The template filled for the record at `rel`, `n` its minted `<n>`, its header naming `made_by`."""
         head = template[0].replace("<unit id>", unit).replace("<n>", str(n)).replace("<title>", title)
-        body = [head, "", f"**Serves:** {kind} {unit}", ""]
+        body = [head, "", f"**Serves:** {kind} {unit}"]
+        if not typed:
+            body += [f"**Made-by:** {made_by}"] + ([f"**Caused-by:** {cause}"] if cause else [])
+        body += [""]
         body += [f"- **{f}:** {given[f]}" if f in given else f"- **{f}:** " for f in order]
         body += [f"- **{k}:** {v}" for k, v in ordered if k not in order]
-        return "\n".join(body) + "\n"
+        body += [f"- **Made-by:** {made_by}"] if typed else []
+        return render_edge_lines("\n".join(body) + "\n", edge_rows)
 
     def read_ordered_fields(text):
-        """A record's `(key, value)` field lines, the row's fields first in schema order, then the rest."""
+        """A record's `(key, value)` field lines, the row's fields first in schema order, then the rest,
+        `Made-by` left out: who minted a record is no part of what it says."""
         pairs = [(m.group(1), m.group(2).strip()) for ln in text.replace("\r\n", "\n").split("\n")
-                 if (m := FIELD.match(ln))]
+                 if (m := FIELD.match(ln)) and m.group(1) != "Made-by"]
         seen = dict(pairs)
         return [(f, seen[f]) for f in order if f in seen] + [(k, v) for k, v in pairs if k not in order]
 
-    def check_text(rel, text):
+    def check_header(rel, text, made_by):
+        """The render's header read back through the one header reader and its edge lines through the one
+        edge parser (TOOL-dTotalRecall-19 S2, S6): each reads what the door meant to write."""
+        try:
+            got = {e["type"]: e["targets"] for e in read_header_edges(text, rel)}
+        except ValueError as exc:
+            raise ValueError(f"the header reads back refused: {exc}") from None
+        want = {"made-by": [made_by], **({"caused-by": [cause]} if cause else {})}
+        if got != want:
+            raise ValueError(f"the header reads back {got}, not {want}")
+        if edge_rows:
+            parsed = eg.parse_edge_lines(text, rel)
+            if [(e["type"], e["targets"]) for e in parsed] != [(k, t) for _a, k, t in edge_rows]:
+                raise ValueError(f"the edge lines read back {parsed}, not the --edge values given")
+
+    def check_text(rel, text, made_by="owner"):
         """The kind's own check over the bytes at `rel`: S4's refusal, naming each field and its reason."""
+        check_header(rel, text, made_by)
         if typed:
             bad = check_typed_record(rel, text, kind)
         else:
@@ -1183,15 +1304,16 @@ def write_new_record(root, kind, build, unit, title, fields, name=None):
         raise ValueError(f"{rel} already exists, untracked: a different value under an existing id")
 
     # the authority and the mint
-    lines = [] if seq else check_mint_authority(root, build)
+    lines, made_by = ([], "owner") if seq else read_mint_authority(root, build)
     if typed:
         def check_written(at, written):
             """The bytes `write_record` is about to write: the template's render, refused by the kind's check."""
             n = re.search(r"-(\d+)\.md$", at).group(1)
-            if written != render_text(at, n):
+            if written != render_text(at, n, made_by):
                 raise ValueError(f"the factory's layout and the {kind} template disagree at {at}")
-            check_text(at, written)
-        rel = write_record(root, build, unit, kind, title, ordered, today, check=check_written)
+            check_text(at, written, made_by)
+        rel = write_record(root, build, unit, kind, title, ordered + [("Made-by", made_by)], today,
+                           check=check_written, place=lambda text: render_edge_lines(text, edge_rows))
     else:
         if seq:
             word, minted, floor = write_seq_mint(root, seq[0], build, key)
@@ -1199,7 +1321,8 @@ def write_new_record(root, kind, build, unit, title, fields, name=None):
                 return "waiting", minted, key, lines
             lines = lines + floor
             rel = f"{folder}/{minted}.md"
-            text = render_text(rel, 1)
+        text = render_text(rel, 1, made_by)
+        check_text(rel, text, made_by)
         pathlib.Path(root, rel).parent.mkdir(parents=True, exist_ok=True)
         with open(pathlib.Path(root, rel), "x", encoding="utf-8", newline="\n") as fh:
             fh.write(text)
@@ -1366,6 +1489,126 @@ RENDER_PLANTS = {
 }
 
 
+def check_door_header_plant():
+    """`--fixture --plant door-header` (TOOL-dTotalRecall-19 AC1 to AC3, AC5): the record door's header in a
+    clone of a seed holding this kit's registry, over a bare remote: a `log` with no `--caused-by` refused
+    naming `Caused-by` with a clean status; a cause the corpus does not define refused; `Made-by` `owner`
+    with the lease free and `lease-<slug>` with this session's lease taken first, each read back through
+    `tree_lib.read_header_edges`; one `--edge` line under its heading; and an unregistered type, an anchor
+    the record lacks and two lines of one type under one heading each refused with nothing written; then
+    `root = true` on the `log` row, which admits no cause. -> `(failures, cases)`, or `(None, why)` where a
+    kit the door runs beside does not resolve."""
+    import subprocess
+    import tempfile
+    import backlog  # noqa: E402  the sibling resolver
+    import record_kinds  # noqa: E402  the registry's kit path
+    from deviation_join import remove_tree   # noqa: E402  the kit's fixture helper
+    from tree_lib import read_bindings, read_header_edges, read_text
+    for home, anchor in (("unattended", "unattended.sh"), ("loop", "breakpoints.py"), ("playbook", "edge_grammar.py")):
+        try:
+            backlog.resolve_kit_dir(home, anchor, KIT)
+        except LookupError:
+            return None, f"no {home} kit beside this one"
+    bad, cases, top = [], [0], pathlib.Path(tempfile.mkdtemp(prefix="hdr-"))
+    unit, folder = "TOOL-dTotalRecall-2", "memory/builds/dTotalRecall/prompts"
+    conf = {"MEMORY_ROOT": "memory", "FAMILIES": "tooling:TOOL"}
+
+    def run_git(root, *args):
+        return subprocess.run(["git", *args], cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+                              check=True).stdout
+
+    def run_door(root, *flags):
+        p = subprocess.run([sys.executable, str(KIT / "gov_record.py"), "new", *flags], cwd=str(root),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL,
+                           timeout=600, env={**os.environ, "CLAUDE_CODE_SESSION_ID": "s-mine"})
+        return p.returncode, (p.stdout + p.stderr).strip()
+
+    def check_case(case, got, rc, needles, root):
+        status = run_git(root, "status", "--porcelain").strip() if rc else ""
+        lack = [n for n in needles if n not in got[1]]
+        cases[0] += 1
+        if got[0] != rc or lack or status:
+            bad.append(f"{case}: exited {got[0]}, not {rc}; missing {lack}; status {status!r}: {got[1][:300]}")
+        print(f"build-records: door-header · {case} · exit {got[0]}")
+
+    def read_header(root, name):
+        rel = f"{folder}/{name}.md"
+        try:
+            text = read_text(str(root / rel))
+        except OSError:
+            return {}
+        edges = read_header_edges(text, rel, read_bindings(str(root), [rel], conf).get(rel))
+        return {e["type"]: (e.get("kind"), e["targets"]) if e["type"] == "serves" else e["targets"] for e in edges}
+
+    try:
+        seed = top / "seed"
+        files = {".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n', ".unattended.conf": 'RUN_CLAIMS="on"\n',
+                 "memory/builds/dTotalRecall/README.md": "---\nslug: dTotalRecall\n---\n\n# dTotalRecall\n",
+                 f"memory/builds/dTotalRecall/spec/2026-09-01-spec-{unit}.md":
+                     f"# {unit} — the door\n\n**Status:** INPROGRESS · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd\n",
+                 f"{record_kinds.derive_kit_rel()}/{record_kinds.REGISTRY}": (KIT / record_kinds.REGISTRY).read_bytes().decode("utf-8")}
+        for rel, text in files.items():
+            pathlib.Path(seed, rel).parent.mkdir(parents=True, exist_ok=True)
+            pathlib.Path(seed, rel).write_bytes(text.encode("utf-8"))
+        for argv in (("init", "-q", "--template="), ("symbolic-ref", "HEAD", "refs/heads/main"),
+                     ("config", "user.name", "fx"), ("config", "user.email", "fx@example.invalid"),
+                     ("config", "commit.gpgsign", "false"), ("config", "core.autocrlf", "false"),
+                     ("add", "-A"), ("commit", "-qm", "the door-header seed")):
+            run_git(seed, *argv)
+        run_git(top, "init", "-q", "--bare", "--template=", "r.git")
+        run_git(seed, "push", "-q", (top / "r.git").as_posix(), "HEAD:refs/heads/main")
+        run_git(top / "r.git", "symbolic-ref", "HEAD", "refs/heads/main")
+        run_git(top, "clone", "-q", "-c", "core.autocrlf=false", (top / "r.git").as_posix(), "a")
+        a = top / "a"
+        for argv in (("config", "user.name", "fx"), ("config", "user.email", "fx@example.invalid"),
+                     ("config", "core.autocrlf", "false")):
+            run_git(a, *argv)
+        base = ["log", "--build", "dTotalRecall", "--unit", unit, "--title", "A note"]
+        check_case("causeless", run_door(a, *base, "--name", "n0"), 2, ["refused log", "Caused-by"], a)   # AC1
+        check_case("unresolved cause", run_door(a, *base, "--name", "n0", "--caused-by", "TOOL-dTotalRecall-99"), 2,
+                   ["Caused-by TOOL-dTotalRecall-99 does not resolve"], a)
+        for case, edge, needle in (("edge type", "a-note implemnts=feature.x", "implemnts is no type"),   # AC3
+                                   ("edge anchor", "nope implements=feature.x", "no heading of that anchor"),
+                                   ("edge twice", "a-note implements=feature.y", "a second implements line")):
+            twice = ["--edge", "a-note implements=feature.x"] if case == "edge twice" else []
+            check_case(case, run_door(a, *base, "--name", "n0", "--caused-by", unit, *twice, "--edge", edge), 2, [needle], a)
+        name = "2026-11-23-prompt-TOOL-dTotalRecall-2-owner"
+        check_case("made-by owner", run_door(a, *base, "--name", name, "--caused-by", unit, "--edge",
+                                             "a-note implements=feature.x"), 0, [f"wrote {folder}/{name}.md"], a)   # AC2
+        got = read_header(a, name)
+        if got != {"serves": ("log", [unit]), "made-by": ["owner"], "caused-by": [unit]}:
+            bad.append(f"made-by owner: the header reads back {got}")
+        lines = (a / folder / f"{name}.md").read_bytes().decode("utf-8").split("\n")
+        if lines[:2] != ["# A note", "**Edges:** implements=feature.x"]:
+            bad.append(f"made-by owner: the edge line is not under its heading: {lines[:3]}")
+        loop = str(backlog.resolve_kit_dir("loop", "breakpoints.py", KIT))
+        if loop not in sys.path:
+            sys.path.insert(0, loop)
+        from breakpoints import run_sourced   # noqa: E402  the driver's fleet tag, as the lease reader reads it
+        _rc, tag = run_sourced(a, "load_driver_conf >/dev/null 2>&1; resolve_fleet_tag 2>/dev/null")
+        tag, now = tag.strip() or "-", datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        msg = (f"gov-claim dTotalRecall/build\n\nslug: dTotalRecall\nnode: {tag}\nhost: h\nsession: s-mine\nkeepalive: k\n"
+               f"status: live\nlease-utc: {now}\nbeat-utc: {now}\nepoch: 1\nkind: build\nfleet-tag: {tag}\nrenews: yes")
+        tree = subprocess.run(["git", "mktree"], cwd=str(a), input="", capture_output=True, text=True, check=True).stdout.strip()
+        lease = run_git(a, "commit-tree", tree, "-m", msg).strip()
+        run_git(a, "push", "-q", "-f", "origin", f"{lease}:refs/gov/leases/dTotalRecall/build")
+        name = "2026-11-23-prompt-TOOL-dTotalRecall-2-lease"
+        check_case("made-by lease", run_door(a, *base, "--name", name, "--caused-by", name.replace("lease", "owner")),
+                   0, [f"wrote {folder}/{name}.md"], a)   # AC2 under the lease, its cause a record key
+        got = read_header(a, name).get("made-by")
+        if got != ["lease-dTotalRecall"]:
+            bad.append(f"made-by lease: Made-by reads {got}, not lease-dTotalRecall")
+        reg = a / record_kinds.derive_kit_rel() / record_kinds.REGISTRY
+        reg.write_bytes(reg.read_bytes().replace(b'writer = "gov_record.py new log"\n',
+                                                 b'writer = "gov_record.py new log"\nroot = true\n', 1))
+        check_case("root log", run_door(a, *base, "--name", "n5"), 0, [f"wrote {folder}/n5.md"], a)   # AC5
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError, ValueError, LookupError) as exc:
+        bad.append(f"the fixture could not be built: {exc}")
+    finally:
+        remove_tree(top)
+    return bad, cases[0]
+
+
 def run_planted_door(root, plant, *flags):
     """`run_ask_door` in a child Python that first rebinds `backlog.render_ask_row` to the `RENDER_PLANTS`
     body `plant` (TOOL-dTotalRecall-41 AC3, AC4), then runs `gov_record.main`: `(exit, output)`."""
@@ -1510,9 +1753,9 @@ def run_fixture(plant):
     from deviation_join import remove_tree, set_env_aside   # noqa: E402  the kit's fixture helpers
     from tree_lib import GIT_ENV_LEAKS, read_bindings        # noqa: E402
     unit, bad, written = "ARCH-tKinds-1", [], {}
-    if plant == "ask-door":   # TOOL-dTotalRecall-7: the ask door's cases, each in a seed of its own
+    if plant in ("ask-door", "door-header"):   # TOOL-dTotalRecall-7, -19: a door's cases, each in a seed of its own
         with set_env_aside(GIT_ENV_LEAKS):
-            bad, cases = check_ask_plant()
+            bad, cases = check_ask_plant() if plant == "ask-door" else check_door_header_plant()
         if bad is None:
             print(f"build-records: SKIP {plant} — {cases}, so its cases are UNEXERCISED here")
             return 0
@@ -1520,7 +1763,9 @@ def run_fixture(plant):
             print(f"build-records: FAIL {plant} · {why}")
         if bad:
             return 1
-        print(f"build-records: PASS {plant} — {cases} cases: refuse, family, file, replay, grade, refused read, remote")
+        print(f"build-records: PASS {plant} — {cases} cases: " + (
+            "refuse, family, file, replay, grade, refused read, remote" if plant == "ask-door"
+            else "causeless, unresolved cause, three edge refusals, made-by owner, made-by lease, root log"))
         return 0
     root = pathlib.Path(tempfile.mkdtemp(prefix="br-"))
     if plant == "pending-kind":   # PLAY-dOrderedCharter-55 S8: a copy of this module with one kind pending

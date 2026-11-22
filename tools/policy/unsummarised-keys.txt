@@ -108,7 +108,6 @@ memory.code-languages
 memory.code-roles
 memory.default-load
 memory.item-budget
-memory.legacy-anchors
 memory.load-budget
 memory.map-budget
 memory.map-overflow

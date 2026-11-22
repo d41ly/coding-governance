@@ -140,6 +140,7 @@ python resolver (behaviour + inline parity + idiom ban)	48.8	2	a	2026-09-24	runn
 recall floor	5.4	2	a	2026-09-24	runner
 recall floor arms	36.8	3	a	2026-09-21	runner
 receipt sync (installed files match the receipt)	1.0	2	a	2026-09-24	runner
+record causes (causes and orphans over the legacy population)	11.7	1	d	2026-11-23	record_causes.py --check on the worktree at 9d7afdc6a with the pass applied and the legacy-records population seeded, timed by bash time, one run before the leg was declared, build pass of TOOL-dTotalRecall-19
 record-kinds	1.6	1	d	2026-11-22	record_kinds.py --check on the worktree at d6de992c6 with the pass applied and the legacy ledger seeded, timed by bash time, 1.6s wall at most of two runs, build pass of TOOL-dTotalRecall-1
 review-join ban (no ref-keyed join)	10.8	2	a	2026-09-24	runner
 review-join self-test	110.3	2	a	2026-09-24	runner

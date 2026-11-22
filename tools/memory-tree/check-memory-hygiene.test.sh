@@ -3625,6 +3625,9 @@ cp "$HERE/SPEC-TEMPLATE.template.md" "$GRS/memory/TEMPLATE-SPEC.md"
 for _gb in dTotalRecall xLeased xNew; do printf -- '---\nslug: %s\n---\n\n# %s\n' "$_gb" "$_gb" > "$GRS/memory/builds/$_gb/README.md"; done
 printf '# TOOL-dTotalRecall-2 — the record door\n\n**Status:** INPROGRESS · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd\n' \
   > "$GRS/memory/builds/dTotalRecall/spec/2026-09-01-spec-TOOL-dTotalRecall-2.md"
+mkdir -p "$GRS/memory/builds/xLeased/spec"   # TOOL-dTotalRecall-19: a deviation's Caused-by names a unit the corpus defines
+printf '# TOOL-xLeased-2 — the leased unit\n\n**Status:** INPROGRESS · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd\n' \
+  > "$GRS/memory/builds/xLeased/spec/2026-09-01-spec-TOOL-xLeased-2.md"
 git -C "$GRS" init -q --template= . && git -C "$GRS" add -A && git -C "$GRS" commit -qm seed
 git init -q --bare --template= "$GRD/r.git" && git -C "$GRS" push -q "$GRD/r.git" HEAD:refs/heads/main
 git -C "$GRD/r.git" symbolic-ref HEAD refs/heads/main
@@ -3651,11 +3654,11 @@ print("hand fields:", [r["name"] for r in rows if r["schema"]["form"] == "fields
 print("doors:", " ".join(r["name"] + "=" + r["writer"] for r in rows if r["name"] in ("research", "log", "deviation")))' "$HERE/record-kinds.toml")
 hit 'hand fields: []'; hit 'log=gov_record.py new log'; hit 'research=gov_record.py new research'; hit 'deviation=gov_record.py new deviation'   # AC9
 out=$(run_record_door a exception --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t); hit 'refused exception: its door is build_records.py new exception'
-out=$(run_record_door a research --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --name 2026-11-22-build-TOOL-dTotalRecall-2-probe)   # AC10
+out=$(run_record_door a research --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --name 2026-11-22-build-TOOL-dTotalRecall-2-probe --caused-by TOOL-dTotalRecall-2)   # AC10
 hit 'wrote memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-2-probe.md key'
 out=$(grep -m1 '^\*\*Serves:\*\*' "$GRD/a/memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-2-probe.md"); hit '**Serves:** research TOOL-dTotalRecall-2'
-out=$(run_record_door a research --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t); hit 'refused research: --name <stem> is required'
-out=$(run_record_door a research --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --name 2026-11-22-build-TOOL-dTotalRecall-2-deviation-9)
+out=$(run_record_door a research --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --caused-by TOOL-dTotalRecall-2); hit 'refused research: --name <stem> is required'
+out=$(run_record_door a research --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --caused-by TOOL-dTotalRecall-2 --name 2026-11-22-build-TOOL-dTotalRecall-2-deviation-9)
 hit 'is a deviation record'"'"'s name, graded by that kind alone'
 run_record_door a spec TOOL-xNew-1 --tier 2 >/dev/null; (cd "$GRD/b" && "$_PY" "$HERE/gen_build_index.py" --new-spec TOOL-xNew-1 --tier 2 >/dev/null 2>&1)   # AC7, the twins
 out=$(cmp "$GRD/a/memory/builds/xNew/spec/"*-spec-TOOL-xNew-1.md "$GRD/b/memory/builds/xNew/spec/"*-spec-TOOL-xNew-1.md 2>&1 && echo twins-equal); hit 'twins-equal'
@@ -3700,23 +3703,60 @@ if [ -n "$_gru" ]; then
   write_record_lease z s-other; out=$(run_record_deviation a xLeased r1); hit 'refused deviation: the build lease of xLeased reads live, held by z session s-other'   # AC5
   (cd "$GRD/a" && CLAUDE_CODE_SESSION_ID=s-other bash "$HERE/gov-claim.sh" slug xLeased --claimant aaaaaaaaaaaa >/dev/null 2>&1)
   write_record_lease "${_grt:-NONE}" s-mine; out=$(run_record_deviation a xLeased r2); hit 'wrote memory/builds/xLeased/build/'
+  out=$(grep -h '^- \*\*Made-by:\*\*' "$GRD/a/memory/builds/xLeased/build/"*-deviation-1.md); hit '- **Made-by:** lease-xLeased'   # TOOL-dTotalRecall-19 AC2
   git -C "$GRD/a" push -q origin :refs/gov/leases/xLeased/build
   out=$(run_record_deviation a xLeased r3); hit 'refused deviation: the claim of xLeased (refs/gov/remote/claims/xLeased) is held by session s-other'
   out=$(GR_SESSION=s-other run_record_deviation a xLeased r4); hit 'wrote memory/builds/xLeased/build/'
-  out=$(run_record_door a planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello)   # AC6, over the remote
+  out=$(run_record_door a planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello --caused-by TOOL-dTotalRecall-2)   # AC6, over the remote
   _grc=$(git -C "$GRD/r.git" rev-parse -q --verify refs/gov/claims/asks/TOOL-dTotalRecall)
   _gri=$(printf '%s\n' "$out" | sed -n 's|^wrote memory/builds/dTotalRecall/asks/\(TOOL-dTotalRecall-[0-9]*\)\.md key .*|\1|p')
-  out=$(run_record_door a planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello
+  out=$(run_record_door a planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello --caused-by TOOL-dTotalRecall-2
         echo "tip $(git -C "$GRD/r.git" rev-parse -q --verify refs/gov/claims/asks/TOOL-dTotalRecall)")
   hit "exists memory/builds/dTotalRecall/asks/${_gri:-NONE}.md"; hit "tip ${_grc:-NONE}"
   _grn=$(git -C "$GRD/nr" grep -h -o -w -I -E 'TOOL-dTotalRecall-[0-9]+' HEAD | sed 's/.*-//' | sort -n | tail -1)
-  out=$(run_record_door nr planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello
-        run_record_door nr planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello)
+  out=$(run_record_door nr planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello --caused-by TOOL-dTotalRecall-2
+        run_record_door nr planted-ask --build dTotalRecall --unit TOOL-dTotalRecall-2 --title t --field Text=hello --caused-by TOOL-dTotalRecall-2)
   hit "wrote memory/builds/dTotalRecall/asks/TOOL-dTotalRecall-$((${_grn:-0} + 1)).md"
   hit "exists memory/builds/dTotalRecall/asks/TOOL-dTotalRecall-$((${_grn:-0} + 1)).md"
 else
-  echo "skip the record door's lease and counter arms: no unattended kit beside this one, so its 8 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+8))
+  echo "skip the record door's lease and counter arms: no unattended kit beside this one, so its 9 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+9))
 fi
+
+# --- TOOL-dTotalRecall-19 (AC1 to AC8) — every record names its cause. The door's header plant: a `log` with
+# --- no `--caused-by` refused naming `Caused-by`, nothing written; an undefined cause refused; `Made-by`
+# --- `owner` and, under this session's build lease, `lease-<slug>`, each read back by `read_header_edges`;
+# --- one `--edge` line under its heading and the unregistered-type, missing-anchor and second-line refusals;
+# --- `root = true` on the `log` row admitting no cause. Then the causes and orphan checks over a seeded
+# --- legacy population: a legacy record read green, a causeless new record named, a typed kind declaring
+# --- no `Caused-by` graded on its Serves unit, a two-record cause cycle both orphans, a claim-rooted build's
+# --- record reached, and `none` seeding no section row; and `root = "yes"` red in the registry check. Red
+# --- on the cause refusal cut and on the walk seeded from the records instead of the roots.
+out=$("$_PY" "$HERE/build_records.py" --fixture --plant door-header 2>&1)
+if grep -q 'build-records: SKIP door-header' <<<"$out"; then
+  echo "skip the door-header plant: $out"; n_skip=$((${n_skip:-0}+1))
+else
+  hit 'build-records: PASS door-header — 8 cases'
+fi
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant legacy 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'   # AC4
+hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings 1'; hit '2026-01-01-build-TOOL-fRoot-1-notes.md findings-2 1'   # AC8
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant causeless 2>&1)   # AC6
+hit 'record causes: causes · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-new.md · names no Caused-by'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant typed-causeless 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant orphan 2>&1)   # AC7
+hit 'record causes: orphans · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-cycle-a.md'
+hit 'record causes: orphans · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-cycle-b.md'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant claim-root 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant none 2>&1)   # AC8's none
+hit 'record causes: legacy-records · 2 record row(s) (-), 0 section row(s) · memory.legacy-anchors none'; miss 'findings 1'
+out=$("$_PY" - "$HERE" 2>&1 <<'PY'
+import sys
+sys.path.insert(0, sys.argv[1])
+import record_kinds
+row = {"name": "log", "tag": "record.log", "root": "yes"}
+print(*[r for r in record_kinds.check_row(row, 1, set(), ".", "") if "root" in r])
+PY
+)
+hit "row log: the column \`root\` 'yes' is not a boolean"   # AC5
 
 # --- TOOL-dTotalRecall-7 (AC4 AC5 AC6 AC7 AC10 AC11 AC12) — the ask door, `gov_record.py new ask`: the plant
 # --- runs the refuse, undeclared-family, file, replay, grade, refused-read and refused-filing-on-a-remote

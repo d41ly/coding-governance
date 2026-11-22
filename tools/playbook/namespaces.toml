@@ -220,3 +220,18 @@ class = "gap-key"
 owner = "dTotalRecall"
 pattern = "record_kinds:GAP_KEY_RE"
 resolver = "record_kinds:--print-gap-keys"
+
+# TOOL-dTotalRecall-19 S4: a record header's `Made-by` stand-in, `owner` or `lease-<slug>`, until the
+# intake and binding kinds name who made a record.
+[[native]]
+class = "made-by-stand-in"
+owner = "dTotalRecall"
+pattern = "record_causes:STAND_IN_RE"
+resolver = "record_causes:--print-stand-ins"
+
+# TOOL-dTotalRecall-19 S5: a record's key, its file stem, so a `Caused-by` names the record it follows.
+[[native]]
+class = "record-key"
+owner = "dTotalRecall"
+pattern = "tree_lib:RECORD_KEY_RE"
+resolver = "record_causes:--print-record-keys"

@@ -27,6 +27,7 @@ ARCH-bOrderlyAtlas-1.)
 | `deviation_join.py` | the deviation join (TOOL-dTrueNorth-4), the product successor of the bootstrap instrument `deviations.py`'s population and join: every departure from the frozen design, or from a spec once its code has started, computed from history and joined to a `deviation` record (`<date>-build-<unit id>-deviation-<n>.md` in the departing build's `build/` folder, its grammar `HYGIENE.md`, "Record bindings"). Six arms over the chain builds' specs, the chain builds being `DESIGN_VIEW`'s Build column: a revision past the unit's first pass, a revision past its `@rev-N` audit pin, an `amended rev-N` ledger line, a divergence hand-back, a rescope row, and a `[chain]` clause-hash or `Baseline:` move since `DESIGN_BASELINE`; a revision changing only its status line and generated regions is no member, by the unattended kit's `GEN_REGION_AWK`, and neither is an audit's own fold, by `design_lib.check_audit_fold`: a commit moving the spec's header, every revision it moved holding a revision-log entry that cites by file stem a bound `spec-audit` record of the unit's build whose text names the unit, pinned or not, joins neither revision arm and owes no record. A move with no such citation is still reported, and so is a material edit moving no header. A unit's first pass is read by THE UNATTENDED DRIVER'S PASS RULE, the instrument's `read_first_pass` and the driver's `read_attribution_tokens` and `pass_commit`: a `Pass:` trailer replaces the subject, so a commit whose subject names X and whose trailer names Y is Y's pass and no pass of X, deliberately not the union `routed_commits.py` attributes by (TOOL-dTrueNorth-16). Its revisions come from `design_lib.read_spec_revisions`, the one reader the carries join reads too. `routed_commits.py` hosts it at the commit and at the close. Its own CLI takes `--policy`, `report` by default or `refuse`, and `--approval`, `author-recorded` by default or `by-risk`, which also refuses an approver below the record's risk class, then `--range`, `--fixture [--plant <case>]`, `--host routed-commits` and `--selftest`. Exit 0 green or `report`, 1 a finding under `refuse`, 2 nothing measured, each cause on its own: a partial `DESIGN_*` key set, a pin naming no commit, or a readable pin with no chain-build spec. Its states are the key rule's: the `DESIGN_*` keys are gov's, declared blank in the kit's example conf, which is off, so in an adopter they are blank and the join is off, one line. |
 | `asbuilt_view.py` | the as-built view (TOOL-dTrueNorth-6), the product successor of the bootstrap instrument `asbuilt.py`: `DESIGN_VIEW` rendered from `DESIGN_RECORD`'s `[chain]` at `DESIGN_BASELINE`, read through `design_lib.py`, with each `deviation_join.py` record's `amends` or `supersedes` row from its `**Follow-through:**` applied and each changed clause citing the record; it renders byte for byte what the instrument renders, head included, until the report-switch step. Its host is `gen_build_index.py`: `--write` writes the view BEFORE every other artifact, so the coverage regions read the view just written and one `--write` is a fixed point, and `--check` lists its drift, a hand edit named at its first differing line, under `build-index DRIFT`, exiting 1, and nothing `--write` cannot cure; `--check-asbuilt`, hygiene check 30's delegate, prints a deviation with no row, the head rule's findings, a pipe in an `**After:**`, a pinned hash the clause does not carry, a moved `Baseline:` line and a view `git check-attr merge` does not answer `merge: ours` for (TOOL-dTrueNorth-26 S16) under an `as-built VERDICT` block, exiting 1 (TOOL-dTrueNorth-16). The head's two names, its `**Serves:**` id and its instrument's file, are read from `DESIGN_VIEW`'s dated record name, `<date>-build-<unit id>-as-built.md`, by `derive_head_names`, never from the design record, and a view not so named is refused at render (TOOL-dTrueNorth-27 S7). Its own CLI takes `--write` or `--check` with `--out`, `--fixture [--plant <case>]` and `--selftest`; the fixture writes its own design through `design_lib.write_design_fixture`, so it reads nothing of the tree's. Exit 0 green, 1 a finding, 2 when the key rule refuses, the pin's design record cannot be read or `DESIGN_VIEW` is not named as a dated record. Its states are the key rule's, `design_lib.read_design_keys`: the `DESIGN_*` keys are gov's, declared blank in the kit's example conf, which is off, so in an adopter they are blank and the view is off, the generator and its host each printing one `as-built view: off` line and reading nothing; a partial set is a refusal naming each blank key. The rule that keeps it true (TOOL-dTrueNorth-8, widened by TOOL-dTrueNorth-17): the view's inputs are `DESIGN_RECORD` at `DESIGN_BASELINE`, every TRACKED record the glob `*/build/*-deviation-*.md` matches (TOOL-dTrueNorth-26 S7), and the render's code, which renders and compares it — `asbuilt_view.py`, `design_lib.py`, `deviation_join.py` and the host calls in `gen_build_index.py` — so a commit that changes any view input, a record matching the glob added, edited, moved or taken out, a `DESIGN_*` key changed, or the render's code changed (TOOL-dTrueNorth-20 S38), re-renders `DESIGN_VIEW` in that same commit through `gen_build_index.py --write`, its one writer, and no byte of the view is edited by hand; check 9 holds it at the commit, a staged record and a staged path under this kit's directory each being a build-index input, so `--check --staged` renders rather than skips and lists a stale view under `build-index DRIFT`. The transition's owner (TOOL-dTrueNorth-17): when the records and the render's code land in two passes at one order, as TOOL-dTrueNorth-4's records and TOOL-dTrueNorth-6's render did at order 3, the second order-3 pass to land runs `gen_build_index.py --write`, stages `DESIGN_VIEW` in its own commit, and was dispatched with `DESIGN_VIEW` among its `--dispatch --writes` paths; since TOOL-dTrueNorth-16 the view is a declared generated output of `asbuilt_view.py` and the generator, so a pass re-rendering it stages it without declaring it, and declaring it beside either generator is the pairing `--dispatch` refuses. The head rule beside it (TOOL-dTrueNorth-18), `resolve_clause_rows`: a clause's set is the records whose `**Follow-through:**` row names it; when every `**After:**` in the set agrees, the later file by path cites it, as the instrument's ordering does, so the view keeps its bytes, and when they differ the head supplies the row's text and citation whatever its path, the one member no other member names in `**Supersedes:**`, the optional record field `deviation_join.py`'s `read_record` reads as one record's stem and names malformed otherwise; a set left with two or more unsuperseded members, or none, is an `unordered amends of <clause>` finding naming every member, and a `**Supersedes:**` naming a record outside its clause's set is a finding naming both, each under the `as-built VERDICT` block and each rendering the clause's row from the baseline, so neither path order nor a commit date decides. |
 | `shape_run.py` | the `review-shape` line's one grammar, `SHAPE_RE`, and the shape-run kind's conformance (TOOL-dTotalRecall-11): `--parse-line <line>` prints its fields as `key=value` lines, exit 2 naming the first field that does not match; `--parse-file <path>` parses every non-empty line, `<n> parsed · <m> refused`; `--check`, the `shape-run records (each record equals its review line)` leg, compares every tracked shape-run record with the line of the review record its `Caused-by` names, exit 1 naming the record, the field and both values, and prints `unarmed` with no record. `gov_record.py new shape-run --review <path>` is the kind's door. |
+| `record_causes.py` | every record names its cause (TOOL-dTotalRecall-19): `--check`, gov's `record causes (causes and orphans over the legacy population)` leg, reds a record outside the `legacy-records` population with no resolving `Caused-by` or that no root reaches, and prints `unarmed` where no population is registered; `--measure` prints that population's seed rows; `--print-stand-ins` and `--print-record-keys` print the `made-by-stand-in` and `record-key` native classes' members; `--fixture --plant <case>` builds its plants under the system temp directory. |
 | `check-verdict-epoch.sh` | the kit version DATES the engine's verdicts: across a range, the newest bump of `KIT_MEMORY_TREE_VERSION` must come at or after the newest commit moving a behaviour-bearing line of the engine or a delegate it names. It refuses, exit 2 on and off the push boundary, a delegate list its delegates' imports outgrow (TOOL-dTrueNorth-25): one python run walks every `import` and `from … import` in the scanned `.py` files with `ast`, nested ones included, follows each that names a sibling `<name>.py` of this kit, and names each sibling outside `DELEGATES` with its importer, or a scanned module that does not parse; otherwise it prints the import closure's module count before the verdict. A module loaded by computed path, through `importlib` or by a shell invocation, is no edge, and with no python one note line says the closure was not checked. |
 | `check-verdict-epoch.test.sh` | its arms, over synthetic engines in throwaway repositories. |
 | `check-method-carriers.sh` | every file that points at the build method is declared, and points rather than copies. Structural: a fluent paraphrase under new headings passes. |
@@ -355,7 +356,7 @@ its node, and an ask closed only by a spec header's `closes`, which reads as ope
 ### The record door — `gov_record.py new <kind>` (TOOL-dTotalRecall-2)
 
 ```
-python <prefix>/memory-tree/gov_record.py new <kind> --build <slug> --unit <id> --title <text> [--name <stem>] [--field <Name>=<value>]...
+python <prefix>/memory-tree/gov_record.py new <kind> --build <slug> --unit <id> --title <text> [--caused-by <target>] [--name <stem>] [--field <Name>=<value>]... [--edge "<anchor> <type>=<target>[,<target>]"]...
 python <prefix>/memory-tree/gov_record.py new build-readme <slug> --asks <IDLIST>
 python <prefix>/memory-tree/gov_record.py new spec <id> --tier 1|2 [--order <n>] [--base <sha>]
 ```
@@ -383,8 +384,52 @@ written; 4 `waiting offline <ref>`, a counter mint offline under `warn` or `foll
 `new shape-run --review <path>` (TOOL-dTotalRecall-11) takes no other flag: a tracked review record of a
 build's `reviews/` folder, its one `review-shape` line parsed by `shape_run.py`, written as a typed
 `shape-run` record of that build serving the first id of its `**Serves:**` line, `Caused-by` its stem.
-WHAT IT DOES NOT CHECK: a record's edges and causes (TOOL-dTotalRecall-19), and two builds holding a
-`--name` record of one stem and one key, which the listing reads as one write.
+WHAT IT DOES NOT CHECK: whether a record's cause is reached from a root, which the causes check below
+grades, and two builds holding a `--name` record of one stem and one key, which the listing reads as one
+write.
+
+### Every record names its cause — the header, edge lines and `record_causes.py` (TOOL-dTotalRecall-19)
+
+```markdown
+# <title>
+
+**Serves:** log TOOL-dTotalRecall-19
+**Made-by:** owner
+**Caused-by:** TOOL-dTotalRecall-19
+```
+
+The door writes each record's header: `**Made-by:**` and `**Caused-by:**` after the Serves line, each a
+line of its own, and for a typed kind `- **Made-by:**` and `- **Caused-by:**` among its fields after the
+row's own. `Caused-by` is `--caused-by <target>` or a `Caused-by` field, one target: a family id the corpus
+defines, or a record key, the stem of a tracked Markdown record (the `record-key` native class). It is
+required on every kind whose registry row is not `root = true`, so `new log` with none exits 2 naming
+`log` and `Caused-by`, nothing written; `build-readme` and `claim` are the roots, standing in until the
+intake and binding kinds land. `Made-by` is `lease-<slug>` where the mint runs under the build lease this
+session holds and `owner` otherwise (the `made-by-stand-in` class, which the `made-by` edge row admits).
+Each `--edge "<anchor> <type>=<target>[,<target>]"` is a column-0 `**Edges:** <type>=<targets>` line under
+the heading of that derived anchor, one line per type; an unregistered type, an anchor the record lacks,
+a second line of one type under one heading and a target the edge grammar cannot classify each exit 2.
+The render is read back through `tree_lib.read_header_edges`, the one header reader (both forms, a key
+given twice refused naming both lines), and the edge parser before any write; `Made-by` is never part of
+the content key.
+
+```
+python <prefix>/memory-tree/record_causes.py --check               # the record causes leg (gov's own)
+python <prefix>/memory-tree/record_causes.py --measure             # the legacy-records seed's rows
+python <prefix>/memory-tree/record_causes.py --fixture --plant legacy|causeless|typed-causeless|orphan|claim-root|none
+```
+
+The causes check reds a tracked Markdown record with no `<path> -` row of the `legacy-records`
+population whose kind is no root and which carries no resolving `Caused-by`; a typed kind whose row
+declares no `Caused-by` (a card, a probe, a flake record) is graded on its Serves units instead. The
+orphan check walks from the roots, each build whose `README.md` is tracked and each whose claim ref
+`refs/gov/claims/<slug>` is held, through the README's `ids:` and each record's cause, and reds a new
+record no root reaches, so two records caused by each other are both orphans. The population is gov's
+own, a `[[ledger]]` table of govkit's registry seeded with today's records (`legacy_ledger.py seed
+--population legacy-records`): one row per record and, under `memory.legacy-anchors = "derived"` (the
+default), one per untagged `##` or `###` heading, its anchor `derive_anchor`'s; `none` seeds no section
+row and reads a legacy record as reached, `retag` reads authored `[section.<anchor>]` tags alone. No
+record is rewritten. An adopter's tree registers no population, so the check prints `unarmed` there.
 
 ## Backlog modes — authored shards and per-build asks
 

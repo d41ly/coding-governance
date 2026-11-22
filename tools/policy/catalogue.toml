@@ -1617,6 +1617,8 @@ owner = "dTotalRecall"
 name = "memory.legacy-anchors"
 allowed = ["derived", "none", "retag"]
 default = "derived"
+summary = "How a record written before every record named its cause is read: derived, its Serves lines as its cause and an anchor derived for each untagged heading, no file rewritten; none, no anchor and the record read as reached; or retag, its authored tags alone, once the retag step has rewritten it."
+usage = 'memory.legacy-anchors = "none"'
 owner = "dTotalRecall"
 
 [[key]]

@@ -2,7 +2,8 @@
 """gov_record.py — the one `record` write door (TOOL-dTotalRecall-2).
 
     python <prefix>/memory-tree/gov_record.py new <kind> --build <slug> --unit <id> --title <text>
-                                              [--name <stem>] [--field <Name>=<value>]...
+                                              [--caused-by <target>] [--name <stem>] [--field <Name>=<value>]...
+                                              [--edge "<anchor> <type>=<target>[,<target>]"]...
     python <prefix>/memory-tree/gov_record.py new build-readme <slug> --asks <IDLIST>
     python <prefix>/memory-tree/gov_record.py new spec <id> --tier 1|2 [--order <n>] [--base <sha>]
     python <prefix>/memory-tree/gov_record.py new ask --build <slug> --family <FAMILY> --text <text> --sev <LEVEL> <why>
@@ -19,7 +20,14 @@ the row does not name following in the caller's order; the bytes parsed back by 
 before anything is written; a record of the kind whose content key matches is the same write, `exists`;
 then the build's lease or claim is read, the id minted by the row's `id-rule` (a typed kind's `<n>`
 through `write_record`, an empty rule's `--name`, a `<FAMILY>-<slug>-<seq>` counter through
-`gov-claim.sh ask`, the family the unit's) and the file written and staged, never committed. A kind whose
+`gov-claim.sh ask`, the family the unit's) and the file written and staged, never committed. Its header
+(TOOL-dTotalRecall-19): `**Made-by:**` and `**Caused-by:**` after the Serves line, a typed kind's as its
+last fields; `--caused-by` (or a `Caused-by` field) is refused absent on a kind whose row is no `root`, and
+refused where it is neither a family id the corpus defines nor a tracked record's stem; `Made-by` is
+`lease-<slug>` under the build lease this session holds, else `owner`. Each `--edge` is a column-0
+`**Edges:** <type>=<targets>` line under the heading of that anchor, refused for a type `edges.toml` lacks,
+an anchor the record does not carry, a second line of one type under one heading or a target the edge
+grammar cannot classify, nothing written. A kind whose
 input is not a field list takes its handler in `KIND_HANDLERS`: `build-readme` and `spec` run the
 `--new-build` and `--new-spec` scaffolds of `gen_build_index.py`, imported, every flag passed through;
 `ask` refuses a line break or row separator in any value and grades the clauses parsed back from the row
@@ -31,8 +39,8 @@ parses, and writes its fields through `write_new_record` (TOOL-dTotalRecall-11).
 
 Exit and stdout: 0 `wrote <path> key <content key>` · 0 `exists <path> key <content key>` · 2 `refused
 <kind>: <why>` · 4 `waiting offline <ref>`, nothing written. A handler prints its scaffold's lines.
-WHAT IT DOES NOT CHECK: the verbs `find` and `show` (TOOL-dTotalRecall-9); a record's edges and causes
-(TOOL-dTotalRecall-19); whether two builds hold a `--name` record of one stem and one content key, which
+WHAT IT DOES NOT CHECK: the verbs `find` and `show` (TOOL-dTotalRecall-9); whether a cause is reached
+from a root, which `record_causes.py --check` grades; whether two builds hold a `--name` record of one stem and one content key, which
 the listing reads as one write.
 """
 from __future__ import annotations
@@ -342,9 +350,10 @@ def main(argv):
             except gbi.Problem as exc:
                 raise ValueError(str(exc)) from None
         ap = argparse.ArgumentParser(prog=f"gov_record.py new {kind}", allow_abbrev=False)
-        for flag in ("--build", "--unit", "--title", "--name"):
+        for flag in ("--build", "--unit", "--title", "--name", "--caused-by"):
             ap.add_argument(flag)
         ap.add_argument("--field", action="append", default=[])
+        ap.add_argument("--edge", action="append", default=[])
         a = ap.parse_args(rest)
         fields = []
         for spelled in a.field:
@@ -352,7 +361,8 @@ def main(argv):
             if not eq or not key:
                 raise ValueError(f"--field {spelled!r} is not <Name>=<value>")
             fields.append((key, value))
-        written = build_records.write_new_record(root, kind, a.build, a.unit, a.title, fields, a.name)
+        written = build_records.write_new_record(root, kind, a.build, a.unit, a.title, fields, a.name, a.caused_by,
+                                                 a.edge)
     except ValueError as exc:
         print(f"refused {kind}: {exc}")
         return 2

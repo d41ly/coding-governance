@@ -423,6 +423,8 @@ def check_row(row: dict, n: int, legs: set, root, tool_rel: str) -> list[str]:
     for col in ("layer", "lifecycle", "id-rule"):
         if col in row and not isinstance(row[col], str):
             reds.append(f"{at}: `{col}` is not a string")
+    if "root" in row and not isinstance(row["root"], bool):   # TOOL-dTotalRecall-19 S3: the door's cause refusal reads it
+        reds.append(f"{at}: the column `root` {row['root']!r} is not a boolean: `true` on a root kind, absent elsewhere")
     if isinstance(row.get("layer"), str) and not LAYER_RE.fullmatch(row["layer"]):
         reds.append(f"{at}: the column `layer` {row['layer']!r} is no `layer.<name>` tag: name the layer of the "
                     f"kit whose writer writes the kind")

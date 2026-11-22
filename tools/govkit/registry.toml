@@ -2787,6 +2787,22 @@ drain = "key"
 direction = "shrink-only"
 home = "memory/project/build-readme-typed-derived.txt"
 
+# The records that predate every record naming its cause (TOOL-dTotalRecall-19 S7, section 8 F8): gov's own,
+# beside `record-kinds-legacy`, so an adopter's tree holds none and the leg prints unarmed there. One
+# `<path> - 1` row per tracked Markdown record at the seed, and under `memory.legacy-anchors` `derived` one
+# `<path> <anchor> 1` row per untagged heading; `verbatim` keeps a numeric heading's anchor a key, never a
+# line number. A new record carries a resolving `Caused-by` and a root reaches it.
+[[ledger]]
+population = "legacy-records"
+leg = "record causes (causes and orphans over the legacy population)"
+seed = ["python", "{prefix}/memory-tree/record_causes.py", "--measure"]
+key = "record"
+fields = ["path", "section"]
+verbatim = ["section"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/legacy-records.txt"
+
 [[exempt_leg]]
 name = "record-kinds"
 tag = "leg.gov.record-kinds"
@@ -2812,4 +2828,17 @@ ceiling = 180
 subject = "repo"
 pack = "tags"
 enforces = ["practice.one-fact"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "record causes (causes and orphans over the legacy population)"
+tag = "leg.gov.record-causes-causes-and-orphans-over-the-legacy"
+why = "it grades gov's own records against the legacy-records population, which lives in govkit's registry and no adopter install holds. TOOL-dTotalRecall-19 S12, section 8 F8."
+tests = ["feature.memory-tree-hygiene"]
+purpose = "grades every record's cause and its reach from a root"
+argv = ["python", "{prefix}/memory-tree/record_causes.py", "--check"]
+chunk = "records"
+ceiling = 180
+subject = "repo"
+enforces = ["principle.p35"]
 stage = ["step.test"]

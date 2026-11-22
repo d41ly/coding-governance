@@ -162,6 +162,7 @@
       "recall floor",
       "recall floor arms",
       "receipt sync (installed files match the receipt)",
+      "record causes (causes and orphans over the legacy population)",
       "record-kinds",
       "remote literals (kit code names no remote)",
       "remote literals self-test",

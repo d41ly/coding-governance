@@ -5918,6 +5918,16 @@
       "file": "tools/roles/check_roles.py"
     },
     {
+      "id": "check_cause_target",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
+      "id": "check_causes",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "check_ceiling_emission",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -6381,6 +6391,11 @@
       "id": "check_document",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_door_header_plant",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "check_down_floor",
@@ -7821,6 +7836,11 @@
       "id": "check_order_fa12",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "check_orphans",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "check_ours",
@@ -13683,6 +13703,11 @@
       "file": "tools/playbook/overlay.py"
     },
     {
+      "id": "derive_population_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "derive_position",
       "kind": "function",
       "file": "tools/loop/position.py"
@@ -13793,6 +13818,11 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "derive_reached",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "derive_read_by",
       "kind": "function",
       "file": "tools/memory-tree/record_kinds.py"
@@ -13846,6 +13876,11 @@
       "id": "derive_receipt_schema",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_record_cause",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "derive_record_commits",
@@ -14856,6 +14891,11 @@
       "id": "derive_tag_rows",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "derive_target_class",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "derive_target_fault",
@@ -18150,6 +18190,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-tree/record_kinds.py"
     },
     {
@@ -19836,6 +19881,11 @@
       "id": "parse_dossier",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "parse_edge_flags",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "parse_edge_lines",
@@ -21543,6 +21593,11 @@
       "file": "tools/loop/claim.py"
     },
     {
+      "id": "read_anchor_value",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "read_api",
       "kind": "function",
       "file": "tools/run-gates/remote_verdict.py"
@@ -22323,6 +22378,11 @@
       "file": "tools/memory-tree/gov-claim.sh"
     },
     {
+      "id": "read_claim_slugs",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "read_claims",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -22476,6 +22536,11 @@
       "id": "read_conf",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "read_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "read_conf",
@@ -22676,6 +22741,11 @@
       "id": "read_defined",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "read_defined_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "read_definition",
@@ -23618,6 +23688,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "read_grading",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "read_grammar",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -23701,6 +23776,11 @@
       "id": "read_head_sha",
       "kind": "function",
       "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
+      "id": "read_header_edges",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "read_header_edges",
@@ -24368,6 +24448,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "read_legacy_anchors",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "read_legacy_entry",
       "kind": "function",
       "file": "tools/memory-tree/convert_registry.py"
@@ -24381,6 +24466,11 @@
       "id": "read_legacy_keys",
       "kind": "function",
       "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
+      "id": "read_legacy_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "read_legacy_registration",
@@ -24741,6 +24831,11 @@
       "id": "read_message_ids",
       "kind": "function",
       "file": "tools/unattended/commit_trailers.py"
+    },
+    {
+      "id": "read_mint_authority",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "read_mint_unit",
@@ -25593,6 +25688,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_readme_slugs",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "read_receipt",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
@@ -25670,6 +25770,11 @@
     {
       "id": "read_record_keys",
       "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
+      "id": "read_record_keys",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
     },
     {
@@ -25686,6 +25791,11 @@
       "id": "read_record_kinds",
       "kind": "function",
       "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
+      "id": "read_record_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "read_record_slugs",
@@ -26091,6 +26201,11 @@
       "id": "read_root_exit",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_rooted_units",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "read_roots",
@@ -26823,6 +26938,11 @@
       "file": "tools/loop/loop_table.py"
     },
     {
+      "id": "read_stand_ins",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "read_stash",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -27216,6 +27336,11 @@
       "id": "read_tracked",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_tracked",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "read_tracked",
@@ -29701,6 +29826,11 @@
       "id": "render_driver_lines",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_edge_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "render_edges",
@@ -34270,6 +34400,11 @@
     {
       "id": "run_check",
       "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
+      "id": "run_check",
+      "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
     },
     {
@@ -34780,6 +34915,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/memory-tree/record_kinds.py"
     },
     {
@@ -35196,6 +35336,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "run_git",
@@ -43101,6 +43246,11 @@
       "id": "write_first_transition",
       "kind": "function",
       "file": "tools/loop/claim.py"
+    },
+    {
+      "id": "write_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "write_fixture",

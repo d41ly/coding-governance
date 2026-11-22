@@ -5419,5 +5419,27 @@
     "stage": [
       "step.test"
     ]
+  },
+  {
+    "name": "record causes (causes and orphans over the legacy population)",
+    "tag": "leg.gov.record-causes-causes-and-orphans-over-the-legacy",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "grades every record's cause and its reach from a root",
+    "argv": [
+      "python",
+      "{prefix}/memory-tree/record_causes.py",
+      "--check"
+    ],
+    "chunk": "records",
+    "subject": "repo",
+    "ceiling": 180,
+    "enforces": [
+      "principle.p35"
+    ],
+    "stage": [
+      "step.test"
+    ]
   }
 ]

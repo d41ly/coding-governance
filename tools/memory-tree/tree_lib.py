@@ -638,6 +638,55 @@ BIND_RE = re.compile(
 )
 UNBOUND_RE = re.compile(r"^none\b[\s—–:-]*(?P<reason>\S.*)$")
 EVIDENCES_RE = re.compile(r"^\*\*Evidences:\*\* `?([^`\s]+)`?")
+# TOOL-dTotalRecall-19 S5: a record's key is its file stem, a dated stem whose kind word is `build`, `review` or
+# `prompt`; the `record-key` native class of the playbook kit's namespace registry matches its targets with it.
+RECORD_KEY_RE = re.compile(r"\d{4}-\d{2}-\d{2}-(?:build|review|prompt)-[A-Za-z0-9_-]+")
+# TOOL-dTotalRecall-19 S1: an untyped record's header edge lines, column 0 in its head
+HEADER_EDGE_RE = re.compile(r"^\*\*(?P<key>Caused-by|Made-by):\*\*[ \t]+(?P<target>\S.*?)[ \t]*$")
+
+
+def read_header_edges(text: str, path: str, binding=None) -> list:
+    """A record header's edges, `{path, line, type, targets, site}` each, `site` `header`: the `**Serves:**`
+    line as `serves`, its ids `binding`'s (the record's `read_bindings` row, None for a text it did not read,
+    its kind carried as `kind`), and one `made-by` and one `caused-by` edge where the record names them,
+    backticks cut (TOOL-dTotalRecall-19 S1). An untyped record names them as the column-0 lines
+    `**Made-by:** <target>` and `**Caused-by:** <target>` in its first `BIND_HEAD_LINES` unfenced lines; a
+    record whose name a typed kind's grammar matches (`build_records.derive_record_name`) as its
+    `- **Made-by:**` and `- **Caused-by:**` fields wherever they sit, read with `build_records.FIELD`.
+    ValueError naming both lines where one key is given twice. The edge grammar's own adapter of the same
+    name stays until TOOL-dTotalRecall-39 binds this one."""
+    import build_records   # noqa: E402  the factory's name grammar and field grammar; at call time, no cycle
+    lines = text.replace("\r\n", "\n").split("\n")
+    typed = any(build_records.derive_record_name(k).search(path) for k in TYPED_RECORD_KINDS)
+    edges, seen = [], {}
+    head = [(n, ln) for n, ln in unfenced_lines("\n".join(lines))][:BIND_HEAD_LINES]
+    for n, line in head:
+        if line is None:
+            break
+        mb = BIND_RE.match(line)
+        if binding and binding.get("ids") and mb and mb.group("key") == "Serves":
+            edges.append({"path": path, "line": n, "type": "serves", "targets": list(binding["ids"]),
+                          "site": "header", "kind": binding.get("kind")})
+            binding = None
+    found = []
+    if typed:
+        for n, line in enumerate(lines, 1):
+            m = build_records.FIELD.match(line)
+            if m and m.group(1) in ("Made-by", "Caused-by"):
+                found.append((n, m.group(1), m.group(2).strip()))
+    else:
+        for n, line in head:
+            if line is None:
+                break
+            m = HEADER_EDGE_RE.match(line)
+            if m:
+                found.append((n, m.group("key"), m.group("target")))
+    for n, key, target in found:
+        if key in seen:
+            raise ValueError(f"{path}: {key} is given twice, at lines {seen[key]} and {n}")
+        seen[key] = n
+        edges.append({"path": path, "line": n, "type": key.lower(), "targets": [target.strip("`")], "site": "header"})
+    return edges
 
 
 def read_evidence_lines(text: str) -> list:

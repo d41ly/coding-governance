@@ -173,7 +173,7 @@ cardinality = { per-source = "many", per-target = "many" }
 type = "made-by"
 inverse = "made"
 from = ["commit", "record"]
-to = ["act", "owner"]
+to = ["act", "owner", "made-by-stand-in"]
 pin = "none"
 status = "declared"
 declared-at = "the Gov-Act: trailer; the record header's **Made-by:**"

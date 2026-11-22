@@ -13,11 +13,14 @@
 # PURPOSE_BYTES cited <path>:<line> or `owner`, or { pending = "<id>" }, which `memory.map-purpose`
 # grades; `cardinality`, after `purpose` on a row whose `schema.fields` name a bounded edge type, each such
 # type's { per-source, per-target } as the playbook kit's edge registry declares it, compared both ways by
-# `edge_grammar.py --cardinality --registry` (TOOL-dTotalRecall-22); `unarmed`, after them on a typed
+# `edge_grammar.py --cardinality --registry` (TOOL-dTotalRecall-22); `root`, after `purpose` and before
+# `cardinality`, `true` on a kind whose record is a root of the orphan walk and needs no `Caused-by`, absent
+# read as `false`, a boolean or red, read by the record door's cause refusal (TOOL-dTotalRecall-19);
+# `unarmed`, after them on a typed
 # kind's `fields` or `fence` row whose home holds no record yet, the reason its unarmed line gives, naming
 # the writer that will arm it, red once the row grades a record (TOOL-dTotalRecall-42), set by hand as
 # `cardinality` is. A tracked-path home names its records' glob, never a directory. Every column but
-# `id-rule`, `cardinality` and `unarmed` is required and non-empty. A kind
+# `id-rule`, `root`, `cardinality` and `unarmed` is required and non-empty. A kind
 # joins through `python <prefix>/memory-tree/record_kinds.py new`, a `fence` row through its
 # `--form fence --validator <module>:<function>`, and `record_kinds.py --check` grades
 # the file; `record_kinds.py --purpose-review` derives a missing purpose and writes it as one line of its row.
@@ -51,6 +54,7 @@ readers-none = "an agent reads it as its root under builds.agent-root, through n
 lifecycle = "current-state"
 check = "memory hygiene"
 purpose = { text = "the build README's declared front-matter schema, with unknown keys refused; writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:467" }
+root = true
 cardinality = { supersedes = { per-source = "many", per-target = "1" } }
 
 [[record-kind]]
@@ -480,6 +484,7 @@ readers-none = "a claim is read by its writers' replay and the orphan check, nev
 lifecycle = "append-only"
 check = "build-index selftest"
 purpose = { text = "the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:468" }
+root = true
 
 [[record-kind]]
 name = "orientation-cards"

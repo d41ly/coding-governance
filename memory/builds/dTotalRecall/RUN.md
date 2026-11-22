@@ -242,3 +242,13 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T22:43:13Z draw · re-dispatch · TOOL-dTotalRecall-42 · 29/186 · 20261122T224313Z-5c54e1
 
 2026-11-22T22:43:13Z dispatch · item 942294ab TOOL-dTotalRecall-42 · reason tools/memory-tree/record-kinds.toml tools/memory-tree/record_kinds.py tools/memory-tree/README.md tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md memory/map/generated tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-42.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-42-1-acceptance-ledger.md
+
+2026-11-22T23:07:31Z brief · item TOOL-dTotalRecall-19 · reason 40970a56cdd9 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-19-build-brief.md
+
+2026-11-22T23:10:54Z dispatch · item 9d7afdc6 TOOL-dTotalRecall-19 · reason tools/memory-tree/gov_record.py tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/memory-tree/record_causes.py tools/memory-tree/record-kinds.toml tools/memory-tree/record_kinds.py tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/README.md tools/playbook/namespaces.toml tools/playbook/edges.toml tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/ceiling-evidence.txt tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json .memory-tree.conf memory/project/legacy-records.txt tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-19.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-19-1-acceptance-ledger.md
+2026-11-22T23:35:02Z draw · re-dispatch · TOOL-dTotalRecall-19 · 30/186 · 20261122T233502Z-ead918
+
+2026-11-22T23:35:03Z dispatch · item 9d7afdc6 TOOL-dTotalRecall-19 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-19-deviation-1002.md
+2026-11-22T23:44:47Z draw · re-dispatch · TOOL-dTotalRecall-19 · 31/186 · 20261122T234447Z-929549
+
+2026-11-22T23:44:47Z dispatch · item 9d7afdc6 TOOL-dTotalRecall-19 · reason memory/map/features/memory-tree-hygiene.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/map/generated/MAP.md memory/map/generated/inventories.json
