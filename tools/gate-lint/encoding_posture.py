@@ -82,6 +82,7 @@ import tempfile
 # rows are read by `read_rows` and graded by `compare_counts`, and the two adapters below keep this
 # scanner's signatures, messages and four-field grammar.
 from legacy_ledger import compare_counts, read_rows, render_malformed
+from sh_hygiene import derive_default_registry  # the kit's one default-registry reader
 
 ARMS = ("file-io", "subprocess")
 STDOUT_ARMS = ("stdout",)
@@ -99,7 +100,7 @@ TEXT_MODE_FLAGS = ("text", "universal_newlines")
 #: with the arms; it may never be lowered to fit a regression.
 #: RAISED 26 -> 41 by TOOL-dWitnessedBar-24: seven stdout rows, six JavaScript rows and the two
 #: per-mode arm-set rows, 15 executed, every one unconditional.
-FLOOR_ASSERTIONS = 41
+FLOOR_ASSERTIONS = 42
 
 
 def read_kwarg(call: ast.Call, name: str) -> ast.expr | None:
@@ -263,6 +264,9 @@ def scan_python_stdout(text: str) -> list[tuple[int, int, str, str]]:
 
 
 # Each mode: (the population's suffix, the per-file scan over its text, the registry's closed arm set).
+#: Each mode's ledger home under `<MEMORY_ROOT>/project/`, read when no registry argument is given.
+DEFAULT_HOMES = {"": "encoding-posture-sites.txt", "--stdout": "encoding-stdout-sites.txt",
+                 "--js": "encoding-js-sites.txt"}
 MODES = {
     "": (".py", scan_python_text_io, ARMS),
     "--stdout": (".py", scan_python_stdout, STDOUT_ARMS),
@@ -466,6 +470,24 @@ def run_selftest() -> int:
         check("a mode's own arm set grades its registry", resolve_declaration(str(reg), STDOUT_ARMS),
               ({("a.py", "stdout"): 1}, []))
         check("another mode's arm is malformed there", len(resolve_declaration(str(reg))[1]), 1)
+        # TOOL-aFlattenedSeed-3: an adopter's row names no registry, so the run reads the mode's home under
+        # <MEMORY_ROOT>/project/ and a seeded site is declared there, not undeclared.
+        import os  # noqa: PLC0415  the one arm that runs from a planted root
+        tree = pathlib.Path(scratch) / "tree"
+        (tree / "records" / "project").mkdir(parents=True)
+        (tree / "a.py").write_text('open("x")\n', encoding="utf-8")
+        (tree / ".memory-tree.conf").write_text("MEMORY_ROOT=records\n", encoding="utf-8")
+        (tree / "records" / "project" / "encoding-posture-sites.txt").write_text(
+            "a.py\tfile-io\t1\tabcdef12\tseeded\n", encoding="utf-8")
+        for argv in (["git", "init", "-q", "."], ["git", "add", "-A"]):
+            subprocess.run(argv, cwd=str(tree), capture_output=True, check=True)
+        here = os.getcwd()
+        os.chdir(tree)
+        try:
+            check("no registry argument reads <MEMORY_ROOT>/project/encoding-posture-sites.txt",
+                  main(["encoding_posture.py"]), 0)
+        finally:
+            os.chdir(here)
 
     if n < FLOOR_ASSERTIONS:
         print(f"SELFTEST FAIL: {n} assertion(s) executed, under the floor of {FLOOR_ASSERTIONS}")
@@ -488,7 +510,9 @@ def main(argv: list[str]) -> int:
         print(f"encoding-posture: not a directory: {root}", file=sys.stderr)
         return 2
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None, arms)
+        # TOOL-aFlattenedSeed-3: no registry argument reads the population's home, as an adopter's row names none.
+        default = None if measure or args else derive_default_registry(root, DEFAULT_HOMES[mode])
+        declared, malformed = resolve_declaration(args[0] if args else default, arms)
         hits, scanned = scan_tree(root, args[2:], mode)
     except OSError as exc:
         print(f"encoding-posture: {exc}", file=sys.stderr)
