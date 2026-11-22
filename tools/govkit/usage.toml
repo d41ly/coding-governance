@@ -579,6 +579,13 @@ verb = "ending"
 flags = ["--build=", "--explain"]
 
 [[usage]]
+id = "script:{prefix}/loop/budget.py#state"
+shape = "verb"
+entry = "{prefix}/loop/budget.py"
+verb = "state"
+flags = ["--build="]
+
+[[usage]]
 id = "script:{prefix}/loop/breakpoints.py"
 shape = "verb"
 entry = "{prefix}/loop/breakpoints.py"

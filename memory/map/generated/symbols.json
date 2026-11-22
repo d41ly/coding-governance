@@ -21698,6 +21698,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "read_card_budget",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
       "id": "read_card_build",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -28821,6 +28826,11 @@
       "id": "render_budget_fields",
       "kind": "function",
       "file": "tools/loop/budget.py"
+    },
+    {
+      "id": "render_budget_line",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "render_build_backlog",

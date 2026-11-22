@@ -15,7 +15,9 @@
 # prints one fact, and the copied loop kit's `position.py` replaced by a stub answering from a second
 # planted file, CARD_STUB_POSITION, so no case runs the real engine (KICK-dKeptSession-13 S9): `<slug>
 # --boundary <pointer>` the planted `key`, `answer` and `forked` units, and `<slug> --json` the planted
-# `json` and `rc`, each after the planted `delay`. The engine writes the session card `t1`, appends a READY body with a `## route`
+# `json` and `rc`, each after the planted `delay`; and its `budget.py` replaced by a stub answering `state
+# --build <slug>` with the planted `budget` from that same file, `open 0/4` where none is planted, so no case
+# runs the real module either (KICK-dKeptSession-26 S4). The engine writes the session card `t1`, appends a READY body with a `## route`
 # naming `tFix`, and the case runs its verbs and prints one `card-store: <case> · <what> · held|MISSED`
 # line per observation. The scratch tree is removed at exit. The card-import fixture's verdict
 # (KICK-dKeptSession-12) is planted in its file, or recorded by `--card --fixture-run` over a stub
@@ -36,7 +38,8 @@ follow-fixed snapshot-terminal snapshot-every lookup lookup-offline lookup-upstr
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
 partial-ask terminal-route close-follow-twice follow-offline-publish follow-offline-publish-online
 follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-run fixture-run-cli worktree-named replay-order
-fixture-cli-path-differs fixture-cli-unknown pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay"
+fixture-cli-path-differs fixture-cli-unknown pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay
+budget-open budget-spent budget-unfrozen budget-omitted budget-no-kit"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
 BRIEF=memory/builds/tFix/prompts/2026-01-01-prompt-TOOL-tFix-1-brief.md
@@ -150,6 +153,16 @@ write_card_fixture() {
     '    print(vals.get("json") or "{}")' \
     '    sys.exit(int(vals.get("rc") or 0))' \
     'sys.exit("stub position: <slug> --boundary <pointer> or <slug> --json, and was asked %s" % sys.argv[1:])' > "$f"
+  # The stub rework budget over the copied one (KICK-dKeptSession-26 S4): no card path imports a name from it.
+  f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file loop budget.py); [ -n "$f" ] || return 1
+  f="$R/${f#"$GOVROOT"/}"; [ -f "$f" ] || return 1
+  printf '%s\n' 'import os, sys' \
+    'sys.stdout.reconfigure(encoding="utf-8")' \
+    'vals = dict(l.rstrip("\n").partition("=")[::2] for l in open(os.environ["CARD_STUB_POSITION"], encoding="utf-8") if "=" in l)' \
+    'if sys.argv[1:3] == ["state", "--build"] and len(sys.argv) == 4:' \
+    '    print(vals.get("budget") or "open 0/4")' \
+    '    sys.exit(0)' \
+    'sys.exit("stub budget: state --build <slug>, and was asked %s" % sys.argv[1:])' > "$f"
   : > "$CARD_STUB_POSITION"
   f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file policy policy.py); [ -n "$f" ] || return 1
   rel=${f#"$GOVROOT"/}; mkdir -p "$R/${rel%/*}"
@@ -205,6 +218,10 @@ write_card_records() {
 # read_card_section <card file> — its `## pointers` section, the heading to the line before the next `## ` or READY line.
 read_card_section() {
   tr -d '\r' < "$1" | awk '/^## pointers$/ { p = 1; print; next } p && (/^## / || /^(- )?READY — /) { p = 0 } p'
+}
+# read_card_budget <card file> — the line of its `## pointers` section directly after the `item —` line.
+read_card_budget() {
+  read_card_section "$1" | awk 'i { print; exit } /^item — / { i = 1 }'
 }
 # The append at READY, which publishes the build card.
 run_card_append() {
@@ -647,5 +664,53 @@ case "$PLANT" in
     (cd "$S/clone2" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
     print_card_held "AC7 the replay prints the ## pointers section the lookup re-keyed" \
       "$(read_card_section "$OUT" | grep -q "^item — $K1 · at " && read_card_section "$OUT" | grep -q '^records — '; echo $?)" ;;
+  budget-open)
+    # KICK-dKeptSession-26 AC1, AC4: the stub loop kit answering open 3/10 at the append, then two
+    # `--card --boundary` runs, the stub moved to K2 and open 4/10 between them, so the second crosses and
+    # publishes under every-item. Staged against a line placed outside the section or after another line,
+    # the first row reds; against a boundary re-rendering the section with the earlier figure, the second.
+    set_card_position key "$K1"; set_card_position budget "open 3/10"; run_card_append
+    read_ref_card "$O" > "$S/card"
+    print_card_held "AC1 the published card's line directly after item — reads budget — open 3/10" \
+      "$([ "$(read_card_budget "$S/card")" = 'budget — open 3/10' ]; echo $?)"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    set_card_position key "$K2"; set_card_position budget "open 4/10"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    read_ref_card "$O" > "$S/card"
+    print_card_held "AC4 the second boundary crosses to K2 and the ref's card reads budget — open 4/10 after item — K2" \
+      "$(grep -qxF "boundary — $K1 → $K2" "$OUT" && read_card_section "$S/card" | grep -q "^item — $K2 · at " \
+        && [ "$(read_card_budget "$S/card")" = 'budget — open 4/10' ]; echo $?)" ;;
+  budget-spent|budget-unfrozen)
+    # KICK-dKeptSession-26 AC1: the other two answers, printed as the stub prints them.
+    case "$PLANT" in budget-spent) want='budget — spent' ;; *) want='budget — unfrozen 1/4' ;; esac
+    set_card_position key "$K1"; set_card_position budget "${want#budget — }"; run_card_append
+    read_ref_card "$O" > "$S/card"
+    print_card_held "AC1 the published card's line directly after item — reads $want" \
+      "$([ "$(read_card_budget "$S/card")" = "$want" ]; echo $?)" ;;
+  budget-omitted)
+    # KICK-dKeptSession-26 AC2: the session card as written passes `--card --check`; with its `budget —`
+    # line cut, the failing case, the check exits 1 naming `budget —`.
+    write_card_records; set_card_position key "$K1"; run_card_append
+    run_card_engine "$R" --card --pointers --build tFix --session t1
+    run_card_engine "$R" --card --check --session t1; rc=$?
+    print_card_held "AC2 --card --check passes the session card as written, its line after item — reading budget — open 0/4" \
+      "$([ "$rc" = 0 ] && [ "$(read_card_budget "$R/.git/orientation/t1.md")" = 'budget — open 0/4' ]; echo $?)"
+    grep -v '^budget — ' "$R/.git/orientation/t1.md" > "$S/t1.cut" && cp "$S/t1.cut" "$R/.git/orientation/t1.md"
+    run_card_engine "$R" --card --check --session t1; rc=$?
+    print_card_held "AC2 with its budget — line cut the check exits 1 naming budget —" "$([ "$rc" = 1 ] && grep -q "no 'budget —' line" "$OUT"; echo $?)" ;;
+  budget-no-kit)
+    # KICK-dKeptSession-26 AC3: the copied loop kit's budget.py taken out of the repository, so
+    # `resolve_kit_file` answers nothing; the line is a skip, and a skip is a line the check passes.
+    f=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file loop budget.py); [ -n "$f" ] || { echo "card-store: no budget.py resolves in $R"; exit 2; }
+    git -C "$R" rm -q -- "${f#"$R"/}" && git -C "$R" commit -q -m "fixture: no budget.py" || { echo "card-store: $f could not be taken out"; exit 2; }
+    print_card_held "AC3 no budget.py resolves in the repository" "$([ -z "$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file loop budget.py)" ]; echo $?)"
+    write_card_records; set_card_position key "$K1"; run_card_append
+    run_card_engine "$R" --card --pointers --build tFix --session t1
+    read_ref_card "$O" > "$S/card"
+    print_card_held "AC3 the published card's line directly after item — reads budget — skipped: no loop kit" \
+      "$([ "$(read_card_budget "$S/card")" = 'budget — skipped: no loop kit' ]; echo $?)"
+    run_card_engine "$R" --card --check --session t1; rc=$?
+    print_card_held "AC3 --card --check passes the session card carrying the skip" \
+      "$([ "$rc" = 0 ] && read_card_section "$R/.git/orientation/t1.md" | grep -qx 'budget — skipped: no loop kit'; echo $?)" ;;
 esac
 exit "$MISSED"
