@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing
 
-**Status:** DEFERRED · rev-11 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-12 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0213@bfd195a1 whole
 
@@ -19,6 +19,7 @@
 | [2026-11-02-build-TOOL-dTotalRecall-2-deviation-24.md](../build/2026-11-02-build-TOOL-dTotalRecall-2-deviation-24.md) | deviation | — |
 | [2026-11-03-build-TOOL-dTotalRecall-2-deviation-25.md](../build/2026-11-03-build-TOOL-dTotalRecall-2-deviation-25.md) | deviation | — |
 | [2026-11-03-build-TOOL-dTotalRecall-2-owner-fork-returns.md](../build/2026-11-03-build-TOOL-dTotalRecall-2-owner-fork-returns.md) | research | TOOL-dTotalRecall-1 |
+| [2026-11-22-build-TOOL-dTotalRecall-2-fold-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-2-fold-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-2-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-2-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
@@ -31,6 +32,8 @@
 | [2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md) | research | TOOL-dTotalRecall-1 |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-carries-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-carries-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer.md) | log | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-2-fold-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-fold-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-2-fold-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-fold-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -83,10 +86,10 @@ takes its kind from the registry, nothing mints a `<seq>`, and nothing makes a r
   values in schema order. A record of the kind whose re-derived key matches is the same write: the
   door prints `exists <path>` and exits 0. A different value under an existing id is refused, naming
   the record. Observed by AC3, AC4 and AC10.
-- **S6** — Minting under the build's claim or lease, by the row's `id-rule`, per §4 "Minting". The
-  lease rung reads the class field §8 F6's ask adds to `--lease status`; that ask is unfiled at HEAD
-  (DERIVED: `grep -c seventh memory/builds/dPlacedRequest/BACKLOG.md` prints 0), and this build's run
-  files it before the pass. Observed by AC5 and AC6.
+- **S6** — Minting under the build's claim or lease, by the row's `id-rule`, per §4 "Minting": the
+  lease classed by `read_lease_class`, split out of `tools/loop/placement.py#read_build_lease` (§8
+  F6), the claim read by `read_claim_lines`, split out of `gen_build_index.py#read_own_claim`.
+  Observed by AC5 and AC6.
 - **S7** — The two scaffolds become kinds of the door: `new build-readme <slug> --asks <IDLIST>` runs
   `gen_build_index.py#cmd_new_build` and `new spec <id> --tier 1|2 [--order <n>] [--base <sha>]` runs
   `gen_build_index.py#cmd_new_spec`, each imported, never copied, after `check_mint_authority`. Each
@@ -137,7 +140,7 @@ takes its kind from the registry, nothing mints a `<seq>`, and nothing makes a r
   matter is validated against
 - **consumes-from** `TOOL-dTotalRecall-3` — `refs/gov/claims/`, the slug claim and the ask-family
   counter the door mints under through `gov-claim.sh`, its exit table and `claimant-key` line, and
-  the claim's `session` key the claim rung reads
+  the cache ref `refs/gov/remote/claims/<slug>` whose `session` the claim rung reads
 - **hands-off** `TOOL-dTotalRecall-9` — `gov_record.py`, the door CLI that gains the `find` and `show`
   verbs
 - **hands-off** `TOOL-dTotalRecall-7` — `gov_record.py`, whose `new ask` refuses an ask without its
@@ -153,8 +156,9 @@ takes its kind from the registry, nothing mints a `<seq>`, and nothing makes a r
   shims forward, every flag passed through unchanged
 - **consumes-from** external — PLAY-dOrderedCharter-7 S7/S8's `tools/memory-tree/build_records.py`,
   its `write_record`, its `read` verb's per-kind readers and its `DOORS`; TOOL-dPlacedRequest-1's build
-  lease `refs/gov/leases/<slug>/build`, read from the remote by `read_claims`, and its holder read
-  through TOOL-dPlacedRequest-34 S22's read-only `--lease status build <slug>`, §8 F6's pick
+  lease `refs/gov/leases/<slug>/build`, read from the remote by `read_claims` through
+  TOOL-dPlacedRequest-34 S22's `--lease status build <slug>`, and classed by
+  `tools/loop/placement.py#read_build_lease`'s comparison (§8 F6)
 - **hands-off** `TOOL-dTotalRecall-43` — `gov_record.py`, its writer refusal, its hand-row rewrite, its value refusal and its mint, which that unit changes for the round-1 audit's ids 5, 8, 9, 50 and 60
 - **hands-off** `TOOL-dTotalRecall-79` — `gov_record.py new deviation`, the door that unit writes its deviation records through (the round-1 audit of units 71 to 76, id 1)
 - **hands-off** `TOOL-dTotalRecall-80` — `gov_record.py new deviation`, the door that unit writes its deviation records through (the round-1 audit of units 71 to 76, id 16)
@@ -223,35 +227,35 @@ placed path misses the row's `home` glob, and where a typed kind's name grammar
 (`build_records.py#derive_record_name`) matches it, naming that kind, since such a path is graded by
 that kind alone (`record_kinds.py`'s module docstring).
 
-The build's authority, in order: the lease `refs/gov/leases/<slug>/build` (TOOL-dPlacedRequest-1)
-held by this session, read through TOOL-dPlacedRequest-34 S22's read-only `--lease status build
-<slug>` (`tools/unattended/unattended.sh#print_lease_status`), §8 F6's pick, the driver found by
-`backlog.py#resolve_kit_dir`. It prints `<tail> <fleet tag> <session> <status> <verdict> <epoch>` and
-the class field F6 asks for: `mine` admits, any other class refuses naming the fleet tag and session;
-`lease — none` and `lease — off` read as no lease; `lease not written`, exit 2, refuses naming the
-line, an unread authority never being a pass. `--claims` cannot serve: it cuts its rows to five fields
-with no session (`unattended.sh#print_claims`), while a lease is `mine` only where its fleet tag and
-session match (the `lease`-mode block above `unattended.sh#check_claim_writable`).
-`tools/loop/placement.py#read_build_lease` makes that comparison itself over the six fields today;
-F6's class field keeps this door from being its second copy. `read_claims` fetches
-`refs/gov/leases/*` from the remote in one bounded fetch (`unattended.sh#read_claims`), so the lease
-read is the remote's, never a local-only ref. Else the slug claim `refs/gov/claims/<slug>` whose
-`session` key is this session's (TOOL-dTotalRecall-3's claim keys; TOOL-dPlacedRequest-21's claim body,
-`tools/loop/claim.py#render_claim_body`, carries `session` too); a lease or claim held by another
-refuses, naming the holder. A build with neither, every build opened before TOOL-dTotalRecall-3, mints
-under the charter's per-session rule and prints `minted under the session rule: no claim or lease for <slug>`;
-a tree where the unattended kit does not resolve prints `unarmed — no unattended kit` first.
-The offline value passed to `gov-claim.sh` is `read_policy_value("leases.offline", root)` (I8), the
-memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`, since TOOL-dTotalRecall-8
-mints no `policy_value.py`.
+The build's authority, in order. Where the unattended driver resolves (`backlog.py#resolve_kit_dir`),
+`read_lease_class(root, slug)`, the body of `tools/loop/placement.py#read_build_lease` split out (the
+loop kit found as `record_kinds.py` finds it), runs TOOL-dPlacedRequest-34 S22's `--lease status build <slug>`, which reads
+`refs/gov/leases/*` from the remote in one bounded fetch (`unattended.sh#read_claims`), and compares
+the lease's fleet tag and session with this node's and this session's. `mine` admits; `free`
+(`lease — none`, `lease — off`, or a `released`, `terminal` or `stale` verdict) reads the claim; any
+other answer is the fact, a holder or an unread lease, refused exit 2 naming it. `read_build_lease`
+returns None for `free` and `mine`, so the comparison stays one. The claim: the claim commit's
+`session` in this node's cache ref `refs/gov/remote/claims/<slug>` (`gen_build_index.py#CLAIM_CACHE_NS`),
+read with no fetch by `read_claim_lines(root, slug)`, split out of `read_own_claim` for both; this
+session's admits, another's refuses naming it. TOOL-dTotalRecall-3 landed no read-only claim fetch,
+and `gov-claim.sh slug` fills that cache before it writes. A build with neither, every build opened
+before TOOL-dTotalRecall-3, mints under the charter's per-session rule and prints
+`minted under the session rule: no claim or lease for <slug>`,
+after `unarmed — no unattended kit` where that kit does not resolve. `gov-claim.sh`'s `--offline` is
+`read_policy_value("leases.offline", root)` (I8, `tools/memory-tree/tree_lib.py#read_policy_value`).
 
 The content key is the `--claimant` a counter mint passes, written as its `claimant-key:` line, so a
 replayed `new` returns the id the first call minted (TOOL-dTotalRecall-3 S4); a slug claim's key is
 `cmd_new_build`'s (its S7), which also keeps the mint grammar, `gov-claim.sh` checking the admit
 grammar alone. Offline, nothing is queued and no provisional id returned (its §8 F7): under `refuse`
 the counter's exit 2 is the door's `refused`, and under `warn` and `follow-leases` its exit 4
-`waiting offline <ref>` is printed and the door exits 4, writing nothing. A remote-less clone's
-`local <ref> · no remote` (its §8 F9) mints no id, so the door refuses it, exit 2, naming the line.
+`waiting offline <ref>` is printed and the door exits 4, writing nothing. A clone with no remote gets
+`local <ref> · no remote`, exit 0 and no id, from either verb (its §8 F9): no other clone shares the
+namespace, so the local check is the whole check. A slug passes, as `cmd_new_build` passes it; an
+ask's `<seq>` is the unattended driver's `derive_ask_seq <FAMILY> <slug>`, one past the highest such
+id its tracked and working trees name, run by `tools/loop/breakpoints.py#run_sourced`, never a third
+copy of that floor. TOOL-dTotalRecall-7's remote-less ask-door fixture so gets `<FAMILY>-<slug>-1` in
+a build naming none, or `unarmed — no unattended kit`, exit 2, where its clone lacks that kit.
 
 ### Idempotence
 
@@ -266,7 +270,8 @@ so it is one fact in one place.
 
 Minted: `tools/memory-tree/gov_record.py` with the verb `new`, its flags `--title` and `--name` and the
 table `KIND_HANDLERS`; `write_new_record`, `derive_content_key`, `check_mint_authority` and
-`check_typed_record` in `build_records.py`. Naming cells: each function was asked of the lexicon's
+`check_typed_record` in `build_records.py`; `read_lease_class` in `tools/loop/placement.py`;
+`read_claim_lines` in `gen_build_index.py`. Naming cells: each function was asked of the lexicon's
 `--suggest` under `--as py.function` on 2026-11-22 and printed `OK`. The module is never named
 `record.py`, which would collide with `tools/runlog/record.py`.
 
@@ -280,6 +285,8 @@ door writes at this pass are read from the registry and named in the pass commit
 - `tools/memory-tree/gov_record.py` (new; shipped by the kit's `include = "**"` engine rule in
   `tools/memory-tree/kit.toml`, so no `[[files]]` row)
 - `tools/memory-tree/build_records.py`
+- `tools/memory-tree/gen_build_index.py` (`read_claim_lines`)
+- `tools/loop/placement.py` (`read_lease_class`)
 - `tools/memory-tree/record-kinds.toml` (the `writer` cells of `build-readme`, `spec` and S9's rows)
 - `tools/memory-tree/HYGIENE.template.md` and `memory/HYGIENE.md` (the `gen:record-kinds` region, whose
   `Writer` column `record_kinds.py --write` re-renders)
@@ -309,6 +316,7 @@ door writes at this pass are read from the registry and named in the pass commit
   missing registry refuses naming `record-kinds.toml`.
 - observability — every call prints the path and the content key.
 - risks — a legacy build mints under the session rule, which is today's rule; the named line says so.
+  A claim this node never fetched reads as none, so the door mints under that rule.
 - testing — AC1 to AC10 by a pass; the arms of §7 at the close.
 - migration — none, as §4 says.
 - user docs — the kit README names the door. The pages under `help/` showing a record command show
@@ -335,14 +343,18 @@ door writes at this pass are read from the registry and named in the pass commit
   Red when: a different value overwrites a record, or an existing id is re-written.
 - **AC5** — When the fixture's bare remote holds the lease `refs/gov/leases/xLeased/build` held by
   another session, `gov_record.py new deviation --build xLeased …` run in a clone of it exits 2 naming
-  the holder; with no lease and the claim ref `refs/gov/claims/xLeased` carrying this session's
-  `session` it writes; with neither it writes and prints `minted under the session rule`.
-  Red when: the door mints without reading the build's authority, or a lease the remote holds is
-  missed because only the clone's refs are read.
+  the holder; held by this node's fleet tag and this session, with the clone's claim of `xLeased`
+  another session's, it writes; with no lease and the claim `gov-claim.sh slug xLeased` made in the
+  clone under this session it writes, and under another session exits 2 naming it; with neither it
+  writes and prints `minted under the session rule`.
+  Red when: the door mints without reading the build's authority, misses a lease the remote holds,
+  or refuses a lease holder over another session's claim.
 - **AC6** — When a fixture registry row `planted-ask` whose `id-rule` is `<FAMILY>-<slug>-<seq>.md` is
   written twice with equal fields through `gov_record.py new` against a bare fixture remote under
   `%TEMP%/<short>`, both calls print the same id and the counter ref's tip moves once.
-  Red when: the content key is not passed as the claimant, so a replay mints twice.
+  In a clone with no remote, the pair prints one id, one past the highest its tree names.
+  Red when: the content key is not passed as the claimant, so a replay mints twice, or a remote-less
+  ask mint is refused.
 - **AC7** — When `gov_record.py new spec TOOL-xNew-1` runs in a fixture clone holding build `xNew`, the
   written file is byte-equal to what `gen_build_index.py --new-spec TOOL-xNew-1` writes in a twin
   clone; and `gov_record.py new build-readme dLoop --asks <IDLIST>` against a fixture remote writes the
@@ -367,7 +379,7 @@ door writes at this pass are read from the registry and named in the pass commit
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `record-kinds` · `build-index selftest` · `verdict epoch (kit version dates the engine)` · `verdict-epoch self-test` · `routed-commits selftest` · `policy fixtures` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms`
+`memory hygiene` · `memory-hygiene self-test` · `record-kinds` · `build-index selftest` · `tier2-review self-test` · `verdict epoch (kit version dates the engine)` · `verdict-epoch self-test` · `routed-commits selftest` · `policy fixtures` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms`
 
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 · the door's arms, each a `gov_record.py new` call in a scratch clone over a bare remote, AC7's twin clones among them, staged by dropping the key comparison, the authority read and the `--name` grammar test in turn · none
 
@@ -398,30 +410,16 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC3 AC
   their specs name them, and the build run re-grounds on the landed code, rung 1 (the brief's chain
   rule). widens: none · relaxes: none
 - **F6 — Through which surface does the door read whether this session holds the build lease?**
-  `--claims` prints five fields and no session (`unattended.sh#print_claims`), and no
-  read-only verb of that unit prints a lease's `session`. Options: (a) an ask to dPlacedRequest for a
-  holder verb over `read_claims`, printing a lease's `fleet-tag`, `session` and its `lease`-mode class
-  (`mine` or foreign), the five-field `--claims` shape kept; (b) an ask for a `session` column on
-  `--claims`, which breaks that unit's AC10 and the shape TOOL-dDeclaredLoop-8 S7 extends; (c) the
-  door parses the lease commit's `session:` key itself, a second parser of the record its S2 keeps in
-  `read_claims`; (d) `--claims`' node column alone, so two sessions of one node both mint under one
-  lease. Recommendation: (a). RESOLVED (owner, 2026-11-03): (a), served by TOOL-dPlacedRequest-34
-  S22's `--lease status`, narrowing the owner's 2026-11-02 pick of (a) as one new read-only holder
-  verb over `read_claims` widened by `epoch`, whose `epoch` served TOOL-dWellOiledMachine-6 §8 F4,
-  resolved by the owner on 2026-10-29 to a read-only `epoch` verb over `read_claims` naming this
-  verb as its best home. The holder verb is S22's `--lease status build <slug>`, read-only, printing
-  one TAB line `<tail> <fleet tag> <session> <status> <verdict> <epoch>`, or `lease — none · <tail>`
-  (`unattended.sh#print_lease_status`, landed): it carries `fleet-tag`, `session` and `epoch`,
-  and lacks the class. The ask narrows to one column, a seventh TAB field holding the `lease`-mode
-  class (`mine` or foreign, the block above `unattended.sh#check_claim_writable`), appended after `<epoch>`; the six-field
-  prefix stays, since `read_lease_epoch` (DEPL-dShippedRelease-138 S48) reads the sixth field. One
-  ask, filed once by this build's run, which builds before dWellOiledMachine, serves this unit's S6
-  and §4 "Minting", TOOL-dWellOiledMachine-58 S4 (c) and S5, TOOL-dWellOiledMachine-41 S2's driver
-  check and TOOL-dWellOiledMachine-6 S6 and S7. The row the build run files in dPlacedRequest's
-  `BACKLOG.md`: "a seventh TAB field on TOOL-dPlacedRequest-34 S22's `--lease status`, the lease's
-  `lease`-mode class (`mine` or foreign), the six-field prefix kept". The pass builds the lease rung
-  of §4 "Minting" against `--lease status` and parses no lease commit itself.
-  widens: the `--lease status` class column · relaxes: none
+  `--claims` prints five fields and no session (`unattended.sh#print_claims`); S22's `--lease status
+  build <slug>` prints `<tail> <fleet tag> <session> <status> <verdict> <epoch>`
+  (`#print_lease_status`), and `tools/loop/placement.py#read_build_lease` compares them with this
+  node's fleet tag and session, answering None for a free lease and this session's alike. Options:
+  (a) the owner's 2026-11-03 pick, a seventh `mine`/foreign field, which nothing prints or asks for;
+  (b) split `read_build_lease`'s body into `read_lease_class`, answering `free`, `mine` or the fact;
+  (c) `read_build_lease` as is, refusing a lease holder over another's claim; (d) a second copy.
+  RESOLVED (agent, 2026-11-22, delegated by `2026-11-22-prompt-TOOL-dTotalRecall-2-fold-brief`): (b),
+  the landed comparison kept one with no new field and no ask, meeting the need (a) served.
+  widens: none · relaxes: none
 - **F7 — Does the door write a kind whose writer is a factory door?** At HEAD six rows name
   `build_records.py new <kind>` (`build_records.py#DOORS`), and their writers compute fields from git and
   policy (`#write_red_fix`'s `Files` and `Commit`, `#write_override`'s `Value`); the `deviation` row the
@@ -480,6 +478,10 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC3 AC
 - rev-11 · 2026-11-22 · §4 "Minting" · per `2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer`:
   the paragraph is rewrapped so cl-dClosedLoop-0213's token `minted under the session rule: no claim or lease for <slug>`
   stands whole on one line, as the clause carries it; no word changed.
+- rev-12 · 2026-11-22 · §2 S6 · §3 Edges · §4 "Minting", "Inventory", "Files touched" · §5 · §6 AC5,
+  AC6 · §7 · §8 F6 · per `2026-11-22-prompt-TOOL-dTotalRecall-2-fold-brief`: F6 re-decided to (b), so no
+  seventh field and no ask; the claim's `session` read from its cache ref; a remote-less `local`
+  answer, per TOOL-dTotalRecall-3 as built, mints an ask by `derive_ask_seq` instead of refusing.
 
 ## 10. Reuse audit
 
