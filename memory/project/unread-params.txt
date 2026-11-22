@@ -107,3 +107,5 @@ tools/run-gates/verdict_flow.py	run_rerun_stub	run	1	7ccc1b50be28cb8b726022dc5a8
 tools/run-gates/verdict_flow.py	run_rerun_stub	top	1	7ccc1b50be28cb8b726022dc5a8409d861c948af	seeded
 tools/runlog/selftest.py	arm_spawn	a	1	7ccc1b50be28cb8b726022dc5a8409d861c948af	seeded
 tools/runlog/selftest.py	arm_spawn	k	1	7ccc1b50be28cb8b726022dc5a8409d861c948af	seeded
+tools/loop/claim.py	read_claim_lines	root	1	c7dfbd5d378d41206a43efeda20a79523e97b87a	widened:2026-11-22-build-TOOL-dWitnessedBar-108-widen-38
+tools/loop/loop_lib.py	read_builds_dir	kit_dir	1	c7dfbd5d378d41206a43efeda20a79523e97b87a	widened:2026-11-22-build-TOOL-dWitnessedBar-108-widen-38
