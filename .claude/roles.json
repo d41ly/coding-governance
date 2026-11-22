@@ -1,4 +1,10 @@
 {
+  "classes": {
+    "product": "ROUTED_PATHS",
+    "records": "{{MEMORY_ROOT}}/",
+    "review": "{{MEMORY_ROOT}}/builds/<slug>/reviews/",
+    "spec": "{{MEMORY_ROOT}}/builds/<slug>/spec/"
+  },
   "effort": {
     "default": {
       "roles": {

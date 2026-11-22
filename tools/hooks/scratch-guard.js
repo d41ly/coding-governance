@@ -105,8 +105,14 @@
  * `render_agents.py --write` (TOOL-dBoundRoles-6 S1); an adopter's own agent file is not. What
  * escapes it, besides everything that escapes the gate: a shell write to the renders, which the
  * policy kit's commit guard holds, a tree whose index and every rendered agent file were both
- * deleted, and a session launched AS a role, whose payload carries that role's type. It grades two
- * write classes; `none`, `review` and `records` are declared in the index and read by nothing here.
+ * deleted, and a session launched AS a role, whose payload carries that role's type. It grades four
+ * write classes (TOOL-dBoundRoles-9): `spec` and `product` above, and, on a target in neither, step
+ * 6b's two: a role declaring `writes = none` writes nothing in the repository, and one declaring
+ * `writes = review` writes only under the review class's folder, which the index's `classes` map
+ * spells from the roles kit's one table (`matchWriteClass`, `checkRoleClass`); with no map, that
+ * role's write refuses naming the re-render. The main loop and an agent type the index does not
+ * name are not read there; a role agent's write there meets the absent and broken verdicts above.
+ * `records` alone is declared in the index and read by nothing here.
  *
  * THE RED-FIX LANE (TOOL-aNimbleMend-8, bounded by TOOL-aNimbleMend-14). A product write the route
  * arm or the role arm is about to refuse is admitted, with one witness line, while the gate ledger
@@ -1174,6 +1180,8 @@ const ROLE_INDEX = '.claude/roles.json'
  * `profiles`, `harnesses` and `unset` are plain objects; `effort` is null when absent.
  * TOOL-dBoundRoles-6 S5 adds a fourth: a role's `role-sha`, 12 lowercase hex digits, the hash of the
  * `## Role` section a handoff of it carries, which agent-cap.js's rule 6 compares at spawn.
+ * TOOL-dBoundRoles-9 S3 adds a fifth: the top-level `classes`, a plain object whose every value is a
+ * string, each write class's folder as the roles kit's `WRITE_FOLDERS` spells it; null when absent.
  */
 function loadRoleIndex(top) {
   const fs = require('fs')
@@ -1222,7 +1230,12 @@ function loadRoleIndex(top) {
   if (effort !== undefined && !(checkPlain(effort) && ['default', 'profiles', 'harnesses', 'unset'].every((k) => checkPlain(effort[k])))) {
     return { state: 'broken', shown, why: `${shape}: effort is not { default: {…}, profiles: {…}, harnesses: {…}, unset: {…} }` }
   }
-  return { state: 'ok', shown, roles: d.roles, harnesses: d.harnesses, gates: gates || null, effort: effort || null }
+  // TOOL-dBoundRoles-9 S3: the top-level `classes`, when present, maps each write class to its folder.
+  const classes = d.classes
+  if (classes !== undefined && !(checkPlain(classes) && Object.values(classes).every((v) => typeof v === 'string'))) {
+    return { state: 'broken', shown, why: `${shape}: classes is not { <class>: <string> }` }
+  }
+  return { state: 'ok', shown, roles: d.roles, harnesses: d.harnesses, gates: gates || null, effort: effort || null, classes: classes || null }
 }
 
 /** The folder the roles kit renders agent types into, beside the index: `.claude/agents/`. */
@@ -1317,6 +1330,44 @@ function checkStatusOnlyEdit(before, after) {
   return /^\*\*Status:\*\*\s*\S+$/.test(cb[0])
 }
 
+/** The memory-root token a class folder of the index's `classes` map carries, as the roles kit spells it. */
+const MEMORY_ROOT_TOKEN = '{{MEMORY_ROOT}}'
+/** The placeholder a class folder carries for one build's segment. */
+const SLUG_PLACEHOLDER = '<slug>'
+
+/**
+ * TOOL-dBoundRoles-9 S4: whether `rel`, a target's comparable repo-relative path, lies in class `cls`'s
+ * folder as the index's `classes` map spells it. `{{MEMORY_ROOT}}` reads as the conf's `memRoot`,
+ * normalised as checkUnarmed normalises it; `<slug>` matches exactly one non-empty segment; a trailing
+ * `/` means the folder and everything under it, and a folder without one matches that path alone. A
+ * class the map does not spell, or no map, matches nothing. Never asked about `product`, whose value
+ * names the conf key holding its paths: step 6 places a product target through `ROUTED_PATHS`.
+ */
+function matchWriteClass(rel, cls, index, memRoot) {
+  const folder = index && index.classes && typeof index.classes[cls] === 'string' ? index.classes[cls] : ''
+  if (!folder) return false
+  const mem = buildComparablePath(String(memRoot || '').trim()).replace(/^\.\//, '')
+  const under = folder.endsWith('/')
+  const spelled = buildComparablePath(folder.split(MEMORY_ROOT_TOKEN + '/').join(mem === '.' ? '' : mem + '/').split(MEMORY_ROOT_TOKEN).join(mem))
+  const want = spelled.split('/')
+  const got = String(rel).split('/')
+  if (under ? got.length < want.length : got.length !== want.length) return false
+  return want.every((s, i) => (s === SLUG_PLACEHOLDER ? got[i] !== '' : s === got[i]))
+}
+
+/**
+ * TOOL-dBoundRoles-9 S6: whether a role declaring `writes` may write a target of class `cls` — `spec`,
+ * `product`, `review` or `other`, a path in none of the three. Pure: it reads no file. A spec or
+ * product target admits only its own class; a review target admits every class but `none`; any other
+ * target admits every class but `none` and `review`. Steps 6a, 6b and 9a ask it, and the shell arm
+ * asks the same question through it.
+ */
+function checkRoleClass(writes, cls) {
+  if (cls === 'spec' || cls === 'product') return writes === cls
+  if (cls === 'review') return writes !== 'none'
+  return writes !== 'none' && writes !== 'review'
+}
+
 /** S6: the role refusal — target, class, writer, the roles the index admits, the index, the route to a role. */
 function renderRoleDeny(cls, index, writers, w) {
   const r = w.agentType && Object.prototype.hasOwnProperty.call(index.roles, w.agentType) ? index.roles[w.agentType] : null
@@ -1335,26 +1386,56 @@ function renderRoleDeny(cls, index, writers, w) {
   )
 }
 
+/** Step 6b's refusal (TOOL-dBoundRoles-9 S7): target, class, role and its `writes`, and each remedy's actor. */
+function renderClassDeny(cls, index, r, w, memRoot) {
+  const mem = buildComparablePath(String(memRoot || '').trim()).replace(/^\.\//, '')
+  const folder = String(index.classes && index.classes.review || '').split(MEMORY_ROOT_TOKEN + '/').join(mem === '.' ? '' : mem + '/')
+  const where = cls === 'review' ? `a path in the review class's folder ${folder}` : 'a path in none of the spec, product and review classes'
+  const rule = r.writes === 'none' ? 'A role declaring writes = none writes nothing in this repository.'
+    : `A role declaring writes = review writes only under ${folder}, the review class's folder as ${index.shown} spells it.`
+  const covers = Object.keys(index.roles).filter((n) => index.roles[n].agent === true && checkRoleClass(index.roles[n].writes, cls)).sort()
+  const caller = r.writes === 'review'
+    ? `\n\nA review report the review harness writes under its default reviewDir lands outside that folder. The caller's remedy: pass reviewDir under ${folder} in the harness's args.`
+    : ''
+  return (
+    `BLOCKED by scratch-guard: this ${w.tool} targets ${w.target}, ${where}, and its writer is role ${w.agentType}, whose writes is ${r.writes}. ${rule}\n\n` +
+    `The driver's remedy: route this write to a role whose class covers it${covers.length ? ` (${covers.join(', ')})` : ''}, or leave it to the main loop.${caller}\n`
+  )
+}
+
 /**
- * Steps 6a and 9a: the role verdict on a write of class `cls` ('spec' or 'product'). null admits,
- * `{ deny }` refuses. `w` carries `tool`, `ti` (the tool_input), `native` (the target on disk),
- * `target` (its comparable form), `agentType`, `slug`, `routed` (the comparable spec paths the
- * session card's `## route` names) and `top` (the target's toplevel). An absent index admits, unless
- * the tree is governed (checkRoleGoverned, TOOL-dBoundRoles-6 S3), which refuses; a broken one
- * refuses; no `agent`-true role with `writes = cls` refuses as UNARMED; a role in the class admits.
- * Last, and for a spec only, S4's status flip admits from the main loop on any spec and from a
- * `product` role on a routed one.
+ * Steps 6a, 6b and 9a: the role verdict on a write of class `cls` ('spec', 'product', or step 6b's
+ * 'review' or 'other'). null admits, `{ deny }` refuses. `w` carries `tool`, `ti` (the tool_input),
+ * `native` (the target on disk), `target` (its comparable form), `agentType`, `slug`, `routed` (the
+ * comparable spec paths the session card's `## route` names), `top` (the target's toplevel) and, for
+ * step 6b, `memRoot`. An absent index admits, unless the tree is governed (checkRoleGoverned,
+ * TOOL-dBoundRoles-6 S3), which refuses; a broken one refuses. Step 6b then reads the payload's role:
+ * one the index does not name, or names `agent: false`, admits; a `review` role refuses, naming the
+ * re-render, where the index's `classes` spells no review folder; else checkRoleClass decides. For a
+ * spec or product write, no `agent`-true role with `writes = cls` refuses as UNARMED; a role in the
+ * class admits. Last, and for a spec only, S4's status flip admits from the main loop on any spec and
+ * from a `product` role on a routed one.
  */
 function checkRoleWrite(cls, index, w) {
-  const head = `BLOCKED by scratch-guard: this ${w.tool} targets ${w.target}, a ${cls} path,`
+  const where = cls === 'other' ? 'a path in none of the spec, product and review classes' : `a ${cls} path`
+  const head = `BLOCKED by scratch-guard: this ${w.tool} targets ${w.target}, ${where},`
   if (index.state === 'absent') {
     if (!checkRoleGoverned(w.top)) return null
-    return { deny: `${head} and the role index ${index.shown} is absent while this tree carries rendered role agents. Every spec and product write in this repository refuses until the index is back; it is generated, so re-render it with render_agents.py --write (TOOL-dBoundRoles-6).\n` }
+    return { deny: `${head} and the role index ${index.shown} is absent while this tree carries rendered role agents. Every spec and product write, and every role agent's write outside them, refuses in this repository until the index is back; it is generated, so re-render it with render_agents.py --write (TOOL-dBoundRoles-6).\n` }
   }
   if (index.state === 'broken') {
-    return { deny: `${head} and the role index ${index.shown} ${index.why}. Every spec and product write in this repository refuses until the index is sound; it is generated, so re-render it rather than hand-edit it.\n` }
+    return { deny: `${head} and the role index ${index.shown} ${index.why}. Every spec and product write, and every role agent's write outside them, refuses in this repository until the index is sound; it is generated, so re-render it rather than hand-edit it.\n` }
   }
-  const writers = Object.keys(index.roles).filter((n) => index.roles[n].agent === true && index.roles[n].writes === cls).sort()
+  if (cls === 'review' || cls === 'other') {
+    // Step 6b (TOOL-dBoundRoles-9 S5): the `none` and `review` classes; every other role reads as at base.
+    const r = Object.prototype.hasOwnProperty.call(index.roles, w.agentType) ? index.roles[w.agentType] : null
+    if (!r || r.agent !== true) return null
+    if (r.writes === 'review' && !(index.classes && typeof index.classes.review === 'string')) {
+      return { deny: `${head} and its writer is role ${w.agentType}, whose writes is review. The role index ${index.shown} carries no classes map spelling the review class's folder, so the write cannot be placed and refuses. The index is generated: re-render it with render_agents.py --write, which adopt-roles.sh --scaffold runs in an adopting tree (TOOL-dBoundRoles-9).\n` }
+    }
+    return checkRoleClass(r.writes, cls) ? null : { deny: renderClassDeny(cls, index, r, w, w.memRoot) }
+  }
+  const writers = Object.keys(index.roles).filter((n) => index.roles[n].agent === true && checkRoleClass(index.roles[n].writes, cls)).sort()
   if (writers.length === 0) {
     return { deny: `${head} and the role arm is UNARMED for the ${cls} class: ${index.shown} names no role with agent: true and writes = ${cls}, so every ${cls} write refuses until one is declared.\n` }
   }
@@ -1511,8 +1592,14 @@ function checkPolicyFile(tool, target, top) {
  *     index names (checkRenderedRole, TOOL-dBoundRoles-6 S1) → deny naming render_agents.py --write,
  *     for every writer; an adopter's own agent file, named by no index row, goes on to step 6
  *  6. the target's CLASS: product when it falls under a ROUTED_PATHS entry; spec when its path
- *     opens `<MEMORY_ROOT>/builds/<one segment>/spec/`; else neither → null. Only a spec or a
- *     product path reads further, and only those read the role index.
+ *     opens `<MEMORY_ROOT>/builds/<one segment>/spec/`; else neither → step 6b.
+ * 6b. neither (TOOL-dBoundRoles-9 S5): no `agent_type` → null, the main loop reading no index; else
+ *     checkRoleWrite over loadRoleIndex(top), the class `review` where matchWriteClass places the
+ *     target in the index's `classes.review` folder, else `other`: absent → null, or deny where the
+ *     tree is governed; broken → deny; a type the index does not name, or names `agent: false` →
+ *     null; a `review` role and no `classes.review` → deny naming the re-render; else
+ *     checkRoleClass(role.writes, class): `none` refuses everywhere, `review` admits its folder
+ *     alone, `spec`, `product` and `records` admit as at base
  * 6a. spec → checkRoleWrite('spec') over loadRoleIndex(top): absent → null, or deny where the tree
  *     is governed (checkRoleGoverned, TOOL-dBoundRoles-6 S3); broken → deny; no
  *     `agent`-true role with `writes = spec` → deny, UNARMED; the payload's `agent_type` names such a
@@ -1610,7 +1697,13 @@ function checkRouted(data, env) {
     // Step 6: the spec class, on the comparable form, MEMORY_ROOT normalized as checkUnarmed does it.
     const mem = buildComparablePath(memRoot.trim()).replace(/^\.\//, '')
     const pre = (mem === '.' ? '' : mem + '/') + 'builds/'
-    if (!rel.startsWith(pre) || !/^[^/]+\/spec\/./.test(rel.slice(pre.length))) return null
+    if (!rel.startsWith(pre) || !/^[^/]+\/spec\/./.test(rel.slice(pre.length))) {
+      // Step 6b (TOOL-dBoundRoles-9 S5): neither product nor spec. The main loop reads no index.
+      if (!agentType) return null
+      const index = loadRoleIndex(top)
+      const cls = index.state === 'ok' && matchWriteClass(rel, 'review', index, memRoot) ? 'review' : 'other'
+      return checkRoleWrite(cls, index, { tool, ti, native: target, target: targetC, agentType, slug: '', routed: [], top, memRoot })
+    }
     // The slug keeps its case: the same segment of the target's own spelling.
     const slug = path.relative(top, target).replace(/\\/g, '/').split('/')[pre.split('/').length - 1] || ''
     const cardText = sid ? readCard(mine.common, sid).text : null
@@ -2238,4 +2331,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, matchWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines }

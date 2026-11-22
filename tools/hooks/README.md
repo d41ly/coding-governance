@@ -523,16 +523,34 @@ the agent writes: approval is recorded, not proven. The gate stops forgetting, n
 `readConfKey(bytes, key)` is this home's one shell-grammar conf reader; the review kit's
 `spec-audit-optin.js` reads it, through `readSpecAuditDefault`.
 
-**The role arm: WHO writes a spec or a product file** (`TOOL-aOrientedCast-6`). The same gate reads
+**The role arm: WHO writes a spec or a product file** (`TOOL-aOrientedCast-6`), and what a
+`none` or `review` role writes anywhere else (`TOOL-dBoundRoles-9`). The same gate reads
 the payload's `agent_type` against the role index `.claude/roles.json` at the target's toplevel,
 which the roles kit generates; `loadRoleIndex(top)` is the one reader, exported for `agent-cap.js`.
-Two write classes are graded, and nothing else reads the index:
+Four write classes are graded:
 
 - **spec** — a target under `<MEMORY_ROOT>/builds/<build>/spec/`, at any depth. Admitted only from
   a role with `agent: true` and `writes = spec`.
 - **product** — a target under `ROUTED_PATHS`. The route arm above runs first and unchanged; once it
   finds a buildable unit, the write is admitted only from a role with `agent: true` and
   `writes = product`. A builder with no buildable route meets the route refusal word for word.
+- **none** — a role with `agent: true` and `writes = none` writes nothing in the repository: on a
+  target in neither class above, step 6b of `checkRouted` refuses it too.
+- **review** — a role with `agent: true` and `writes = review` writes only under the review class's
+  folder, `<MEMORY_ROOT>/builds/<slug>/reviews/`, `<slug>` one path segment. The folder is read from
+  the index's `classes` map, which the roles kit renders from its one table `WRITE_FOLDERS`, so the
+  hook spells no class folder of its own (`matchWriteClass(rel, cls, index, memRoot)`). Any other
+  target outside the spec and product classes refuses, the review harness's default `reviewDir`
+  included: the refusal names the caller's remedy, a `reviewDir` under that folder. An index with no
+  `classes` map, rendered before the key existed, refuses every such write of a `review` role,
+  naming the re-render (`render_agents.py --write`, or `adopt-roles.sh --scaffold` in an adopter).
+
+Step 6b reads the index only for a payload carrying an `agent_type`. The main loop, an agent type
+the index does not name and a `spec`, `product` or `records` role write outside the spec and product
+classes exactly as before. `checkRoleClass(writes, cls)` is the one predicate the spec, product and
+6b steps share, exported beside `matchWriteClass` for the shell arm. A 6b refusal names the target,
+its class, the role and its `writes`, and the driver's remedy: route the write to a role whose class
+covers it.
 
 The main loop (its payload carries no `agent_type`) and an untyped harness agent
 (`workflow-subagent`) are refused both, with ONE exception: an `Edit`, `MultiEdit` or `Write` on a
@@ -555,8 +573,9 @@ agent file (`checkRoleGoverned(top)`: a `.md` file whose front matter carries bo
 `writes:`, the keys the roles kit's renderer writes and Claude Code's own agent files never carry),
 an absent index refuses every spec and product write, naming the index and its re-render
 (TOOL-dBoundRoles-6 S3). An index that cannot be read, is not JSON, or is not the shape
-`{ roles: { <name>: { writes, agent } }, harnesses: [...] }` refuses every spec and product write,
-naming the file. An index naming no `agent`-true role for a class refuses that class as UNARMED.
+`{ roles: { <name>: { writes, agent } }, harnesses: [...] }`, its optional `classes` a map of
+strings, refuses every spec and product write, naming the file. Both verdicts also bind a role
+agent's write outside the spec and product classes, at step 6b. An index naming no `agent`-true role for a class refuses that class as UNARMED.
 Each refusal names the target, its class, the writer, the roles the index admits, the index, and the
 route to such a role: render its handoff with `handoff.py render --role <name> --build <slug> --part
 task` and pass the output as the prompt of an `Agent` call whose `subagent_type` is that role, or
@@ -564,8 +583,9 @@ name the role in its harness's `roles` argument. A spec refusal also names the s
 
 **Its ceiling**, beside the gate's: a Bash or PowerShell write is never seen, the renders' included;
 a tree whose index and every rendered agent file were both deleted reads as never adopted; a session
-launched AS a role carries that role's type. The `none`,
-`review` and `records` write classes are declared in the index and graded by nothing here. A hook
+launched AS a role carries that role's type. The `records` write class alone is declared in the
+index and graded by nothing here: a `records` role writes anywhere outside the spec and product
+classes, as before. A hook
 script is read afresh on every call, so the arm binds a session from its next write once the tree
 its hooks run from holds it.
 

@@ -1196,6 +1196,39 @@ run_edit "R-AC4 an index naming no spec role: gov-spec-writer writes a spec -> d
 run_edit "R-AC4 an index naming no spec role: gov-builder's product write -> allow, stderr EMPTY" 0 empty Write "$SG_T" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
 write_roles absent
 
+# ---- TOOL-dBoundRoles-9: the `none` and `review` write classes, at step 6b on a target in neither ---
+# ---- the spec nor the product class ---------------------------------------------------------------
+# The plants none-other, review-in, review-out, review-default-dir, review-mem-root, review-no-classes
+# and spec-role-other, over the write gate's fixture, whose conf sets MEMORY_ROOT=mem. Against a hook
+# whose step 6b is reverted to step 6's null, the none-other, review-out, review-default-dir,
+# review-mem-root and review-no-classes exit-2 rows exit 0; the exit-0 rows are their near-misses.
+# write_class_roles <with|without> — an index naming a role of each class, with or without `classes`.
+write_class_roles() {
+  local classes=''
+  [ "$1" = with ] && classes='"classes":{"product":"ROUTED_PATHS","records":"{{MEMORY_ROOT}}/","review":"{{MEMORY_ROOT}}/builds/<slug>/reviews/","spec":"{{MEMORY_ROOT}}/builds/<slug>/spec/"},'
+  mkdir -p "$SGWT/.claude"
+  printf '{%s"harnesses":[],"roles":{"gov-builder":{"agent":true,"workflow":"build","writes":"product"},"gov-researcher":{"agent":true,"workflow":"research","writes":"none"},"gov-spec-writer":{"agent":true,"workflow":"spec","writes":"spec"},"gov-synthesizer":{"agent":true,"workflow":"review","writes":"review"}}}\n' "$classes" > "$SG_ROLES"
+}
+write_class_roles with
+run_edit "BR9-AC1 none-other: gov-researcher writes under a build's build/ -> deny naming the none class" 2 "any;;gov-researcher;;whose writes is none;;writes nothing in this repository" Write "$SG_CWD_WT/mem/builds/bx/build/a.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-researcher
+run_edit "BR9-AC1 the main loop writes the same file -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/mem/builds/bx/build/a.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "BR9-AC2 review-in: gov-synthesizer writes under a build's reviews/ -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/mem/builds/bx/reviews/r.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-synthesizer
+run_edit "BR9-AC2 review-out: gov-synthesizer writes under a build's build/ -> deny naming the review folder" 2 "any;;gov-synthesizer;;whose writes is review;;mem/builds/<slug>/reviews/;;The driver's remedy" Write "$SG_CWD_WT/mem/builds/bx/build/r.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-synthesizer
+run_edit "BR9-AC2 review-default-dir: gov-synthesizer writes under the root's reviews/ -> deny naming reviewDir" 2 "any;;whose writes is review;;reviewDir;;The caller's remedy" Write "$SG_CWD_WT/reviews/r.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-synthesizer
+run_edit "BR9-AC3 review-mem-root: gov-synthesizer writes under memory/builds/x/reviews/ with MEMORY_ROOT=mem -> deny" 2 "any;;whose writes is review;;mem/builds/<slug>/reviews/" Write "$SG_CWD_WT/memory/builds/x/reviews/r.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-synthesizer
+run_edit "BR9-AC4 spec-role-other: gov-spec-writer writes under a build's build/ -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/mem/builds/bx/build/a.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-spec-writer
+run_edit "BR9-AC4 gov-researcher writes a spec -> the spec arm's deny naming gov-spec-writer" 2 "any;;a spec path;;gov-spec-writer;;handoff.py render" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-researcher
+run_edit "BR9-AC4 workflow-subagent, named by no index row, writes under build/ -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/mem/builds/bx/build/a.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=workflow-subagent
+write_class_roles without
+run_edit "BR9-AC7 review-no-classes: gov-synthesizer writes under reviews/ -> deny naming the re-render" 2 "any;;carries no classes map;;render_agents.py --write" Write "$SG_CWD_WT/mem/builds/bx/reviews/r.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-synthesizer
+run_edit "BR9-AC7 no classes: gov-researcher writes under build/ -> deny naming the none class" 2 "any;;whose writes is none" Write "$SG_CWD_WT/mem/builds/bx/build/a.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-researcher
+write_roles absent
+run_edit "BR9-AC7 no index, not governed: gov-synthesizer writes under reviews/ -> allow, as the spec arm's absent verdict" 0 empty Write "$SG_CWD_WT/mem/builds/bx/reviews/r.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-synthesizer
+run_edit "BR9-AC7 no index, not governed: the main loop writes a spec -> allow, stderr EMPTY" 0 empty Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+printf '{"classes":3,"harnesses":[],"roles":{}}\n' > "$SG_ROLES"
+run_edit "BR9-AC5 an index whose classes is 3: gov-synthesizer writes under reviews/ -> deny naming the index" 2 "any;;$SG_ROLES_SHOWN;;classes is not" Write "$SG_CWD_WT/mem/builds/bx/reviews/r.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-synthesizer
+write_roles absent
+
 # ==================================================================================================
 # ---- the DISPATCH FALLBACK (TOOL-aSmoothedDispatch-6): a unit the build's run-state file records -
 # ---- as dispatched counts as routed when its spec is buildable -----------------------------------
