@@ -2522,7 +2522,10 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +2: RAISED by the red-fix arming KICK-dKeptSession-13's POINTERS refusal (the K13 run_card and its count).
 # +1: RAISED by KICK-dKeptSession-37 — the plant it adds to `--list` (fixture-run-cli), one ok row from
 # the loop above; no suite ran in the pass, the plant was run alone by direct CLI.
-FLOOR_ASSERTIONS=420
+# +2: RAISED by KICK-dKeptSession-38 — the two plants it adds to `--list` (fixture-cli-path-differs,
+# fixture-cli-unknown), one ok row each from the loop above; no suite ran in the pass, each plant was
+# run alone by direct CLI.
+FLOOR_ASSERTIONS=422
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

@@ -19,9 +19,10 @@
 # naming `tFix`, and the case runs its verbs and prints one `card-store: <case> · <what> · held|MISSED`
 # line per observation. The scratch tree is removed at exit. The card-import fixture's verdict
 # (KICK-dKeptSession-12) is planted in its file, or recorded by `--card --fixture-run` over a stub
-# fixture named by CARD_FIXTURE; those cases and every `context-` case export one `AI_AGENT`, and the
-# cases that record one put a stub `claude` first on PATH, whose version the verdict records
-# (KICK-dKeptSession-37), so no outcome reads the version of the session or the node running the suite.
+# fixture named by CARD_FIXTURE; those cases and every `context-` case export one `AI_AGENT`, or unset
+# it where the case says so, and the cases that record one or replay a recorded pass put a stub `claude`
+# first on PATH, whose version the verdict records (KICK-dKeptSession-37) and its reader compares
+# (KICK-dKeptSession-38), so no outcome reads the version of the session or the node running the suite.
 # Exit 2 is a usage error, or a fixture that could not be built.
 # WHAT THIS DOES NOT CHECK: a remote other than a local bare one; a lost compare-and-swap, which needs
 # two writers between one read and its push; the engine's other cells, which their own arms cover; the
@@ -35,7 +36,7 @@ follow-fixed snapshot-terminal snapshot-every lookup lookup-offline lookup-upstr
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
 partial-ask terminal-route close-follow-twice follow-offline-publish follow-offline-publish-online
 follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-run fixture-run-cli worktree-named replay-order
-pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay"
+fixture-cli-path-differs fixture-cli-unknown pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
 BRIEF=memory/builds/tFix/prompts/2026-01-01-prompt-TOOL-tFix-1-brief.md
@@ -417,8 +418,11 @@ case "$PLANT" in
     run_card_engine "$R" --card --write --session t1
     print_card_held "AC3 the card's cli — cell keeps its reason" \
       "$(grep -m1 '^cli — ' "$R/.git/orientation/t1.md" | tr -d '\r' | grep -qx 'cli — skipped: claude --version printed no version'; echo $?)" ;;
-  context-*|partial-*|terminal-route|fixture-stale|worktree-named|replay-order)
-    case "$PLANT" in context-*|fixture-stale|worktree-named|replay-order) export AI_AGENT=claude-code_9-9-2_agent ;; esac
+  context-*|partial-*|terminal-route|fixture-stale|fixture-cli-*|worktree-named|replay-order)
+    case "$PLANT" in context-*|fixture-stale|fixture-cli-path-differs|worktree-named|replay-order) export AI_AGENT=claude-code_9-9-2_agent ;; fixture-cli-unknown) unset AI_AGENT ;; esac
+    # The verdict's reader compares a recorded pass with PATH's `claude` too (KICK-dKeptSession-38 S1),
+    # so every case replaying one past its blob test answers from a stub, never the node's own binary.
+    case "$PLANT" in context-always-resume|fixture-stale|fixture-cli-*) write_claude_stub 'echo "9.9.2 (Claude Code)"' ;; esac
     if [ "$PLANT" = worktree-named ]; then
       # The build card published from a linked worktree, so its `tree —` cell names that tree, and the
       # replay below runs in the primary.
@@ -430,7 +434,7 @@ case "$PLANT" in
       run_card_append
     fi
     case "$PLANT" in
-      context-always-resume|context-fixture-red|fixture-stale) set_card_policy resume.context always-resume ;;
+      context-always-resume|context-fixture-red|fixture-stale|fixture-cli-*) set_card_policy resume.context always-resume ;;
       context-always-fresh) set_card_policy resume.context always-fresh ;;
       partial-restart) set_card_policy resume.partial restart-item ;; partial-ask) set_card_policy resume.partial ask-owner ;;
     esac
@@ -442,6 +446,8 @@ case "$PLANT" in
         printf '@.claude/orientation-card.md\n' > "$R/CLAUDE.md"
         set_card_verdict 'red A' "${FX_BLOB:0:8}" 9.9.2 ;;
       fixture-stale) set_card_verdict pass 00000000 9.9.2 ;;
+      fixture-cli-path-differs) set_card_verdict pass "${FX_BLOB:0:8}" 9.9.2; write_claude_stub 'echo "9.9.1 (Claude Code)"' ;;
+      fixture-cli-unknown) set_card_verdict pass "${FX_BLOB:0:8}" unknown ;;
       context-transcript-absent) printf -v payload '{"session_id":"t1","cwd":"%s"}' "$R" ;;
       partial-*) : > "$R/one.txt"; : > "$R/two.txt" ;;
     esac
@@ -465,7 +471,26 @@ case "$PLANT" in
         print_card_held "AC3 a pass recorded for another fixture blob overrides" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: recorded for fixture 00000000, now ${FX_BLOB:0:8})"; echo $?)"
         set_card_verdict pass "${FX_BLOB:0:8}" 1.0.0
         (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
-        print_card_held "AC3 a pass recorded under another cli overrides" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: recorded under cli 1.0.0, now 9.9.2)"; echo $?)" ;;
+        print_card_held "AC3 a pass recorded under another cli overrides, named against PATH's" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: recorded under cli 1.0.0, PATH now 9.9.2)"; echo $?)" ;;
+      fixture-cli-path-differs)
+        # KICK-dKeptSession-38 AC1, AC2: a pass recorded at 9.9.2 replayed under each side differing in
+        # turn, then under all three equal.
+        print_card_held "AC1 the session's 9.9.2 equal, PATH's 9.9.1 not: fresh, the PATH reason named" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: recorded under cli 9.9.2, PATH now 9.9.1)"; echo $?)"
+        write_claude_stub 'echo "9.9.2 (Claude Code)"'; export AI_AGENT=claude-code_9-9-3_agent
+        (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+        print_card_held "AC2 PATH's 9.9.2 equal, the session's 9.9.3 not: fresh, the session reason named" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: fixture ran cli 9.9.2, this session runs 9.9.3)"; echo $?)"
+        export AI_AGENT=claude-code_9-9-2_agent
+        (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+        print_card_held "AC2 all three 9.9.2: resume, no override" "$(grep -qx 'resume — resume recommended (resume.context: always-resume)' "$OUT"; echo $?)" ;;
+      fixture-cli-unknown)
+        # KICK-dKeptSession-38 AC3 and S2's other two sides: an unknown version is red, never an equality.
+        print_card_held "AC3 a recorded cli unknown, AI_AGENT unset: fresh, unknown named for the record" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: cli version unknown · recorded)"; echo $?)"
+        set_card_verdict pass "${FX_BLOB:0:8}" 9.9.2; write_claude_stub 'exit 1'; export AI_AGENT=claude-code_9-9-2_agent
+        (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+        print_card_held "S2 a PATH claude printing no version: fresh, unknown named for PATH" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: cli version unknown · PATH)"; echo $?)"
+        write_claude_stub 'echo "9.9.2 (Claude Code)"'; unset AI_AGENT
+        (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+        print_card_held "S2 AI_AGENT naming no version: fresh, unknown named for the session" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: cli version unknown · session)"; echo $?)" ;;
       worktree-named)
         print_card_held "AC5 a fresh recommendation names the worktree the stored tree cell names" "$([[ $(grep '^resume — ' "$OUT" | tr -d '\r') == "resume — fresh recommended: idle 1"*"s past 300s · in $WT (resume.context: fresh-when-idle)" ]] && [ "$WT" != "$RT" ]; echo $?)"
         git -C "$R" worktree remove --force "$S/wt" 2>/dev/null
