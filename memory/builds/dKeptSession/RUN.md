@@ -210,3 +210,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T17:18:42Z brief · item KICK-dKeptSession-9 · reason 336894884c01 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-9-build-brief.md
 
 2026-11-22T17:21:29Z dispatch · item 068f3bb1 KICK-dKeptSession-9 · reason tools/runlog/extract.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/README.md tools/policy/caps.toml tools/policy/check_policy.py tools/gate-legs.json memory/guides/SESSION-KICKOFF.md tools/loop/loop_lib.py tools/govkit/usage.toml help/loop.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-9-1-acceptance-ledger.md
+
+2026-11-22T17:53:36Z brief · item KICK-dKeptSession-28 · reason e56b075db03a memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-28-build-brief.md
+
+2026-11-22T17:56:31Z dispatch · item eba383dc KICK-dKeptSession-28 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-28-1-acceptance-ledger.md
