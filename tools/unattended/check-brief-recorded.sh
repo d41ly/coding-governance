@@ -102,6 +102,15 @@
 #     still a violation (a stale row REDS), never why the waiver was granted.
 #   - ANYTHING ABOUT A UNIT BUILT AFTER ITS RUN FINISHED. It is announced by id and reason and graded by
 #     nothing here. Whether its spec came first is still `pass-order`'s, which grades it unchanged.
+#   - a unit the history verdict store answers (TOOL-dQuietDisk-3). Its build commit, the run-state
+#     records at it and after it, its brief row and its pre-run probe are not re-read: the stored
+#     outcome is keyed by every input they read (the id, the folder, the full base, the unit's
+#     candidate commits and those the advertised tip excludes, HEAD's claim, the retired records' blobs,
+#     the conf values) and by the bytes of this leg, its library, the driver and the trailer reader.
+#     `tests.history-verdicts = "regraded"` turns it off and every unit is regraded. RESIDUAL: the walks
+#     list commits in committer-date order, so a history whose dates run backwards along ancestry can
+#     order two candidates unlike the run that stored them; only candidates sharing a second are kept
+#     out of the store.
 #
 # THE COUNT THAT PROVES TERM 1 RAN IS `graded` MINUS `unbuilt-in-range` MINUS `built after their run
 # finished`, not `graded`. `graded` increments before the build-commit selection, exactly as the
@@ -461,6 +470,27 @@ case "$BRIEF_RECORDED_CUTOFF" in
   *) echo "brief-recorded: BRIEF_RECORDED_CUTOFF is not an ISO date, and a cutoff nothing can compare grades every build or none: $BRIEF_RECORDED_CUTOFF"; exit 2 ;;
 esac
 
+# ------------------------------------------------------------------- THE HISTORY VERDICT STORE
+# TOOL-dQuietDisk-3 S1. Each CLOSED unit's outcome is a `unit` item in TOOL-dQuietDisk-1's store,
+# through the library's bash face, keyed by the working bytes of the four files below; they are named
+# relative to the repository root where this kit sits in the graded repository, so every worktree
+# shares the items, and absolutely otherwise. The per-build reads go through one `cat-file --batch`
+# coprocess, pinned against replace refs as `GIT` is. Any failure here leaves BR_ON at 0, so every
+# read misses and the leg grades as it did before the store; nothing about the store is printed, and
+# its stderr is dropped. G is HEAD as this run read it, the commit the one write is guarded by.
+BR_ON=0; G=""; BR_T=$'\t'; BR_N=$'\n'; BR_M=$'\001'
+trap 'remove_bh' EXIT
+_br_p=$HERE/
+if _br_rel=$(derive_self_rel "$HERE") && [ "$(cd "$ROOT/$_br_rel" 2>/dev/null && pwd)" = "$HERE" ]; then
+  _br_p=${_br_rel:+$_br_rel/}
+fi
+init_hs brief-recorded "$_br_p${0##*/}" "${_br_p}lib-unattended.sh" "${_br_p}unattended.sh" "${_br_p}commit_trailers.py" 2>/dev/null && BR_ON=1
+GIT_NO_REPLACE_OBJECTS=1 init_bh 2>/dev/null || :
+if [ "$BR_ON" = 1 ] && read_bh_info HEAD && [ "$BH_TYPE" = commit ]; then G=$BH_OID; else BR_ON=0; fi
+# THE KEYS' FIELDS ARE TAB-FRAMED, so a value holding a tab, a newline or a backslash is never looked
+# up or stored (section 8 F4); these two are the same for every unit.
+case "$GENERATED_INDEXES$SHARED_RECORDS" in *[$'\t\n\\']*) BR_ON=0 ;; esac
+
 # ---- THE SUBJECT CACHE, which this leg was built WITHOUT. TOOL-aQuenchedHarness-13.
 #
 # `build_commit` walks the whole in-range history ONCE PER UNIT, and for every commit it needs that
@@ -475,8 +505,17 @@ esac
 # commit" for every id, every unit grades unbuilt-in-range, and the leg exits 0 - a silent green of
 # exactly the shape this kit refuses. Equality is exact because shas are unique.
 declare -A _SUBJ=()
+# THE CANDIDATE MAP (TOOL-dQuietDisk-3 S2), filled from the same stream: id-shaped token -> the
+# commits carrying it, in stream order, which is what a stored outcome is keyed by. `[A-Z]*-*[0-9]`
+# admits every id the CLOSED-row match below can print, and a token a line repeats is kept once.
+declare -A BR_CANDS=()
 while IFS= read -r _cl; do
   _SUBJ[${_cl%% *}]=" ${_cl#* } "
+  for _t in ${_cl#* }; do
+    case $_t in
+      [A-Z]*-*[0-9]) case "${BR_CANDS[$_t]-}" in *" ${_cl%% *}") ;; *) BR_CANDS[$_t]+=" ${_cl%% *}" ;; esac ;;
+    esac
+  done
 done < <(read_attribution_tokens HEAD)
 _n_hist=$(GIT rev-list --count HEAD 2>/dev/null)
 case "$_n_hist" in ''|*[!0-9]*) _n_hist=-1 ;; esac
@@ -501,6 +540,15 @@ violations=""; announced=""; inrange_ids=""; not_judged=0
 # ranged search already selected. Otherwise the leg grades the whole history as it always did, and
 # the summary line names the mode and why. A tip that does not resolve widens, never narrows.
 read_history_range "$DRIVER"
+# A RANGE run keys a unit by which of its candidates sit in the advertised tip's history, read once.
+declare -A BR_OUT=()
+if [ "$BR_ON" = 1 ] && [ "$HR_MODE" = range ]; then
+  if _br_l=$(GIT rev-list HEAD "^$HR_TIP" 2>/dev/null); then
+    for _c in $_br_l; do BR_OUT[$_c]=1; done
+  else
+    BR_ON=0
+  fi
+fi
 
 # ------------------------------------------------------------------------- THE WAIVER REGISTRY
 # TOOL-aRepatriatedFork-51. The sibling `pass-order` leg's registry, ported with its two properties
@@ -535,10 +583,42 @@ add_violation() { # unit-id · message line
 # so one `git rm --cached` of a build README - staged, nothing committed - would drop that whole build
 # from grading, and doing it across the tree would silence the leg while it reported a clean bill.
 # The sibling met that as a closing-review blocker; this leg is written past it rather than into it.
-for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/null | grep -E "/README\.md$"); do
+# ONE `ls-tree -r` LISTS EVERY PATH UNDER THE BUILDS WITH ITS BLOB ID (TOOL-dQuietDisk-3 S3), so each
+# build's retired `RUN.<phase>.<8hex>.md` records, shape-checked against the one grammar the driver
+# writes, are known in-process with their blobs: the names the finished-run branch below walks, and
+# the blobs a unit's key holds. The README paths come from the same listing, split as before.
+_br_names=""; declare -A BR_RETN=() BR_RETK=()
+while IFS= read -r _l; do
+  _p=${_l#*"$BR_T"}
+  case "$_p" in
+    */README.md) _br_names+="$_p$BR_N"; continue ;;
+    */RUN.*.md) ;;
+    *) continue ;;
+  esac
+  _am=${_p##*/}; _am=${_am#RUN.}; _am=${_am%.md}
+  case "${_am%.*}" in ''|*[!A-Z]*) continue ;; esac
+  case "${_am##*.}" in [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;; *) continue ;; esac
+  _o=${_l%%"$BR_T"*}
+  BR_RETN[${_p%/*}]+=" $_p"; BR_RETK[${_p%/*}]+=" ${_p##*/}:${_o##* }"
+done < <(GIT ls-tree -r HEAD -- "$MEMORY_ROOT/builds" 2>/dev/null)
+
+# THE WALK RUNS TWICE (TOOL-dQuietDisk-3 S4). The first pass reads each build's records, counts the
+# cutoff and no-base builds, and derives every CLOSED unit's key, so ONE store lookup answers them all;
+# the second grades, in the same order, each unit the lookup did not answer. The loop printed nothing
+# before the summary, so the split moves no line. `nb` counts the builds the first pass keeps and
+# `nu` their units.
+nb=0; nu=0; BR_Q=""
+declare -a B_DIR=() B_BASE=() B_HC=() B_IDS=() U_KEY=()
+for readme in $_br_names; do
   bdir=${readme%/README.md}
   slug=${bdir##*/}
-  opened=$(GIT show "HEAD:$readme" 2>/dev/null | sed -n 's/^opened:[[:space:]]*//p' | head -1)
+  # THROUGH THE COPROCESS, once for both `opened:` and the CLOSED ids below; status 2 or 3 (no
+  # coprocess, or a blob bash cannot hold) falls back to the one read this was before. The text drops
+  # its trailing newlines, as the command substitution it replaces dropped them.
+  read_bh_blob "HEAD:$readme"
+  case $? in 0) _rd=$BH_TEXT ;; 1) _rd="" ;; *) _rd=$(GIT show "HEAD:$readme" 2>/dev/null) ;; esac
+  while [ "${_rd%"$BR_N"}" != "$_rd" ]; do _rd=${_rd%"$BR_N"}; done
+  opened=$(printf '%s\n' "$_rd" | sed -n 's/^opened:[[:space:]]*//p' | head -1)
   case "$opened" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) skipped_cutoff=$((skipped_cutoff+1)); continue ;; esac
   # Both values passed an ISO-date shape check, so a bash string compare is their date order and
   # spawns nothing per README (TOOL-aMeasuredDrag-8); a build opened BEFORE the cutoff is skipped.
@@ -551,13 +631,23 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
   # because the brief row lives in the run-state file and a build with no readable run-state file has
   # no run-state file to carry one. Announcing that population is the whole of the answer: a build
   # that cannot be graded and a build that graded clean must not print the same thing.
+  # The run-state file and the base check go through the coprocess too; `_bk` is the base as the
+  # item keys spell it, the full commit, and stays empty where the check fell back.
   run="$bdir/RUN.md"
-  base=""
-  _runblob=$(GIT show "HEAD:$run" 2>/dev/null || true)
+  base=""; _bk=""
+  read_bh_blob "HEAD:$run"
+  case $? in 0) _runblob=$BH_TEXT ;; 1) _runblob="" ;; *) _runblob=$(GIT show "HEAD:$run" 2>/dev/null || true) ;; esac
+  while [ "${_runblob%"$BR_N"}" != "$_runblob" ]; do _runblob=${_runblob%"$BR_N"}; done
   if [ -n "$_runblob" ]; then
     base=$(printf '%s\n' "$_runblob" | extract_run_facts | sed -n 's/^base:[[:space:]]*//p' | head -1)
     case "$base" in
-      [0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) GIT cat-file -e "$base^{commit}" 2>/dev/null || base="" ;;
+      [0-9a-f][0-9a-f][0-9a-f][0-9a-f]*)
+        read_bh_info "$base^{commit}"
+        case $? in
+          0) _bk=$BH_OID ;;
+          1) base="" ;;
+          *) GIT cat-file -e "$base^{commit}" 2>/dev/null || base="" ;;
+        esac ;;
       *) base="" ;;
     esac
   fi
@@ -567,21 +657,110 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
 
   # The CLOSED units, from the generated region at the graded commit. A row's id is spelled twice, so
   # `match` takes the first occurrence per row rather than a `grep -o` that would emit each unit twice.
-  ids=$(GIT show "HEAD:$readme" 2>/dev/null | awk -v s="$slug" '
+  ids=$(printf '%s\n' "$_rd" | awk -v s="$slug" '
       /<!-- gen:build-units -->/ { inr=1; next }
       /<!-- \/gen:build-units -->/ { inr=0 }
       inr && / CLOSED / { if (match($0, "[A-Z]+-" s "-[0-9]+")) print substr($0, RSTART, RLENGTH) }' | sort -u)
 
+  # THE ITEM KEYS (TOOL-dQuietDisk-3 S4, section 4's key table), each its own line of the one lookup
+  # below: the id and folder, the full base, the unit's candidates in stream order, those a RANGE run's
+  # advertised tip excludes, HEAD's claim as its three values, the retired records with their blobs,
+  # and the conf values every pick reads. A field holding a tab, a newline or a backslash keys nothing.
+  _kok=$BR_ON; _hc=""; _ret=""
+  [ -n "$_bk" ] || _kok=0
+  case "$bdir$_head_claim" in *[$'\t\\']*) _kok=0 ;; esac
+  case "$bdir" in *"$BR_N"*) _kok=0 ;; esac
+  if [ "$_kok" = 1 ]; then
+    _hcr=${_head_claim%.}; _hc=${_hcr%%"$BR_N"*}; _hcr=${_hcr#*"$BR_N"}
+    _hc+="$BR_T${_hcr%%"$BR_N"*}"; _hcr=${_hcr#*"$BR_N"}; _hc+="$BR_T${_hcr%%"$BR_N"*}"
+    _ret=${BR_RETK[$bdir]-}; _ret=${_ret# }
+  fi
   for id in $ids; do
+    U_KEY[nu]=""
+    if [ "$_kok" = 1 ]; then
+      _cs=${BR_CANDS[$id]-}; _cs=${_cs# }; _ex=""
+      if [ "$HR_MODE" = range ]; then
+        for _c in $_cs; do [ -n "${BR_OUT[$_c]+set}" ] || _ex+=" $_c"; done
+        _ex=${_ex# }
+      fi
+      U_KEY[nu]="unit$BR_T$id$BR_T$bdir$BR_T$_bk$BR_T${_cs:--}$BR_T${_ex:--}$BR_T$_hc$BR_T${_ret:--}"
+      U_KEY[nu]+="$BR_T$GENERATED_INDEXES$BR_T$SHARED_RECORDS$BR_T$PREANCHOR_CAP"
+      BR_Q+="u$nu$BR_T${U_KEY[nu]}$BR_N"
+    fi
+    nu=$((nu+1))
+  done
+  B_DIR[nb]=$bdir; B_BASE[nb]=$base; B_HC[nb]=$_head_claim; B_IDS[nb]=$ids
+  nb=$((nb+1))
+done
+
+# ONE LOOKUP for every keyed unit, its request through a process substitution so no temp entry is
+# made; a store verb that fails reads as all miss.
+declare -A BR_HIT=()
+if [ "$BR_ON" = 1 ] && [ -n "$BR_Q" ]; then
+  if _br_l=$(read_hs_items <(printf '%s' "$BR_Q") 2>/dev/null); then
+    while IFS= read -r _l; do
+      _lid=${_l%%"$BR_T"*}; _l=${_l#*"$BR_T"}
+      [ "${_l%%"$BR_T"*}" != hit ] || BR_HIT[$_lid]=${_l#*"$BR_T"}
+    done < <(printf '%s\n' "$_br_l")
+  else
+    BR_ON=0
+  fi
+fi
+
+# THE BODY GRAMMAR (section 4), one pattern per form a body may take; a hit matching none regrades.
+BR_SHA='^[0-9a-f]{40}([0-9a-f]{24})?$'
+BR_RE_LATER='^later ([^ ]+) ([^ ]+) ([A-Z]+) ([A-Z]+|-) (.*)$'
+BR_RE_UNBORNE='^unborne ([^ ]+) ([A-Z]+) (.*)$'
+BR_RE_POSTRUN='^postrun ([^ ]+) ([A-Z]+) (.*)$'
+BR_RE_ONE='^(ok|norow) ([^ ]+)$'
+BR_RE_PREBUILT='^prebuilt ([^ ]+) ([^ ]+)$'
+BR_RE_LAST='^(badhash|nopath) ([^ ]+) (.*)$'
+BR_RE_MOVED='^moved ([^ ]+) ([0-9a-f]{12}) ([^ ]+) (.*)$'
+BR_W=""; BR_SHAS=""
+nu=0
+for ((_b = 0; _b < nb; _b++)); do
+  bdir=${B_DIR[_b]}; base=${B_BASE[_b]}; _head_claim=${B_HC[_b]}; run="$bdir/RUN.md"
+  for id in ${B_IDS[_b]}; do
     graded=$((graded+1))
+    _k=$nu; nu=$((nu+1))
+    # S5 - A STORED OUTCOME: the word `_w`, an optional `later` or `unborne` prefix `_pf`, and their
+    # cells, read back only in the grammar this leg writes and only where every commit cell is a full
+    # sha and a prefix names the build commit its result names. Any other body regrades.
+    _pf=""; _w=""; _c0=""; _c=""; _ph=""; _lph=""; _pre=""; _hash=""; _blob=""; _last=""
+    if [ -n "${U_KEY[_k]}" ] && [ -n "${BR_HIT[u$_k]+set}" ]; then
+      _r=${BR_HIT[u$_k]}; _rc=""
+      if [[ $_r =~ $BR_RE_LATER ]]; then
+        _pf=later; _c0=${BASH_REMATCH[1]}; _rc=${BASH_REMATCH[2]}; _ph=${BASH_REMATCH[3]}; _lph=${BASH_REMATCH[4]}; _r=${BASH_REMATCH[5]}
+      elif [[ $_r =~ $BR_RE_UNBORNE ]]; then
+        _pf=unborne; _rc=${BASH_REMATCH[1]}; _ph=${BASH_REMATCH[2]}; _r=${BASH_REMATCH[3]}
+      fi
+      if [ "$_r" = unbuilt ]; then _w=unbuilt
+      elif [[ $_r =~ $BR_RE_POSTRUN ]]; then _w=postrun; _c=${BASH_REMATCH[1]}; _ph=${BASH_REMATCH[2]}; _last=${BASH_REMATCH[3]}
+      elif [[ $_r =~ $BR_RE_ONE ]]; then _w=${BASH_REMATCH[1]}; _c=${BASH_REMATCH[2]}
+      elif [[ $_r =~ $BR_RE_PREBUILT ]]; then _w=prebuilt; _pre=${BASH_REMATCH[1]}; _c=${BASH_REMATCH[2]}
+      elif [[ $_r =~ $BR_RE_LAST ]]; then _w=${BASH_REMATCH[1]}; _c=${BASH_REMATCH[2]}; _last=${BASH_REMATCH[3]}
+      elif [[ $_r =~ $BR_RE_MOVED ]]; then _w=moved; _c=${BASH_REMATCH[1]}; _hash=${BASH_REMATCH[2]}; _blob=${BASH_REMATCH[3]}; _last=${BASH_REMATCH[4]}
+      fi
+      case $_w in
+        unbuilt|postrun) [ -z "$_pf" ] || _w="" ;;
+        ?*) [ "$_rc" = "${_pf:+$_c}" ] || _w="" ;;
+      esac
+      for _x in $_c0 $_c $_pre $_blob; do [[ $_x =~ $BR_SHA ]] || _w=""; done
+      case "${BR_HIT[u$_k]}" in *[$'\t\\']*) _w="" ;; esac
+      [ "$_lph" != - ] || _lph=""
+      [ -n "$_w" ] || { _pf=""; _c0=""; _c=""; _ph=""; _lph=""; _pre=""; _hash=""; _blob=""; _last=""; }
+    fi
+    if [ -z "$_w" ]; then
+    # A MISS GRADES AS BEFORE, to an outcome in `_w`, `_pf` and their cells, applied below with a hit's.
     # STEP 1 - the BUILD commit, through the kit library's `build_commit`, which is the sibling leg's
     # own selection rather than a second copy of it. A copy would be two answers to one question, and
     # this half is the one that has already been wrong twice: its exclusion set made a CONFORMING run
     # unlandable, twice over. The default window is the in-range `--reverse` walk.
     build_commit "$base..HEAD $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" >/dev/null
     build_c=$_BC_OUT
-    if [ -z "$build_c" ]; then unbuilt=$((unbuilt+1)); continue; fi
-    inrange_ids="$inrange_ids $id"
+    if [ -z "$build_c" ]; then
+      _w=unbuilt
+    else
 
     # TERM 1 - the run-state blob AT THAT COMMIT carries a row for this unit. Matched on the whole
     # field including both separators, which makes the id a whole token by construction: without the
@@ -612,10 +791,9 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
         case "$_lph" in ''|*[!A-Z]*) ;; *) case " $TERMINAL_PHASES " in *" $_lph "*) continue ;; esac ;; esac
         _live_c=$_lc; _live_ph=$_lph; break
       done
+      _lph=""
       if [ -n "$_live_c" ]; then
-        regraded=$((regraded+1))
-        announced="$announced
-brief-recorded: GRADED AT A LATER COMMIT — $id: the earliest commit naming it, $(GIT rev-parse --short "$build_c"), was made while $run read $_ph, but $(GIT rev-parse --short "$_live_c") also names it and touches a path outside the record surface while $run read ${_live_ph:-no phase}, so the unit was worked on during a live run and is graded there"
+        _pf=later; _c0=$build_c; _lph=$_live_ph
         build_c=$_live_c
         _sb=$(GIT show "$build_c:$run" 2>/dev/null || true)
         _fin=0
@@ -623,35 +801,29 @@ brief-recorded: GRADED AT A LATER COMMIT — $id: the earliest commit naming it,
     fi
     if [ "$_fin" = 1 ]; then
       # WHO STILL MAKES THIS CLAIM AT HEAD: the run-state file itself, or a retired record that was
-      # not yet retired at the build commit. The name is shape-checked against the one grammar the
-      # driver writes, `RUN.<phase>.<8hex>.md`, and never against its own blob: a migrated retired
-      # record keeps its name and changes its bytes, so that equality is already false in this tree.
+      # not yet retired at the build commit. The name was shape-checked against the one grammar the
+      # driver writes, `RUN.<phase>.<8hex>.md`, when the builds were listed, and never against its own
+      # blob: a migrated retired record keeps its name and changes its bytes, so that equality is
+      # already false in this tree.
       _stands=""
       if [ "$_claim" = "$_head_claim" ]; then
         _stands="$run"
       else
-        for _ar in $(GIT ls-tree --name-only HEAD -- "$bdir/" 2>/dev/null); do
-          _an=${_ar#"$bdir/"}
-          case "$_an" in RUN.*.md) ;; *) continue ;; esac
-          _am=${_an#RUN.}; _am=${_am%.md}
-          case "${_am%.*}" in ''|*[!A-Z]*) continue ;; esac
-          case "${_am##*.}" in [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;; *) continue ;; esac
+        for _ar in ${BR_RETN[$bdir]-}; do
           [ -z "$(GIT ls-tree "$build_c" -- "$_ar" 2>/dev/null)" ] || continue
           [ "$(GIT show "HEAD:$_ar" 2>/dev/null | awk "$CLAIM_AWK")" = "$_claim" ] || continue
           _stands="$_ar"; break
         done
       fi
       if [ -n "$_stands" ]; then
-        postrun=$((postrun+1))
-        announced="$announced
-brief-recorded: NOT GRADED — $id was BUILT at $(GIT rev-parse --short "$build_c") while $run read $_ph, so its run had already finished and the unit was built outside any run; $_stands still makes that claim at HEAD"
-        continue
+        _w=postrun; _c=$build_c; _last=$_stands
+      else
+        _pf=unborne
       fi
-      unborne=$((unborne+1))
-      announced="$announced
-brief-recorded: GRADED ANYWAY — $id was BUILT at $(GIT rev-parse --short "$build_c") while $run read $_ph, but no record at HEAD still makes that claim, neither $run nor one retired after that commit, so the finished run is not taken on its word"
     fi
 
+    if [ -z "$_w" ]; then
+    _c=$build_c
     _rows=$(printf '%s\n' "$_sb" | grep -F " brief · item $id · reason " || true)
     if [ -z "$_rows" ]; then
       # BUILT BEFORE ITS RUN (TOOL-aRepatriatedFork-56). A unit an earlier run built has its build
@@ -665,15 +837,8 @@ brief-recorded: GRADED ANYWAY — $id was BUILT at $(GIT rev-parse --short "$bui
       # keeps the token; pass-order's pre-anchor probe keeps it too, because that one detects.
       build_commit "$base" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "" >/dev/null
       _pre=$_BC_OUT
-      if [ -n "$_pre" ] && [ "$_pre" != TRUNCATED ]; then
-        prebuilt=$((prebuilt+1))
-        announced="$announced
-brief-recorded: NOT GRADED — $id was built before its run, at $(GIT rev-parse --short "$_pre") behind the run's base; $(GIT rev-parse --short "$build_c") is a later commit naming it"
-        continue
-      fi
-      add_violation "$id" "$id — BUILT at $(GIT rev-parse --short "$build_c") with NO brief row in $run at that commit; nothing on disk records what the agent that built it was handed"
-      continue
-    fi
+      if [ -n "$_pre" ] && [ "$_pre" != TRUNCATED ]; then _w=prebuilt; else _w=norow; _pre=""; fi
+    else
     # TERM 2 - the LAST row wins, and the writer is why it can. A unit can be re-briefed and the
     # corpus does it: three units carry two or three rows each, naming ONE path with different hashes.
     # A universal reading over rows reds all three, because the earlier hashes no longer describe the
@@ -695,23 +860,127 @@ brief-recorded: NOT GRADED — $id was built before its run, at $(GIT rev-parse 
     # message. The arm for it in `check-brief-recorded.test.sh` says the same thing.
     case "$_hash" in
       [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;;
-      *) add_violation "$id" "$id — its brief row at $(GIT rev-parse --short "$build_c") carries no twelve-hex hash in its reason field, so the join it claims to record cannot be made and a prefix comparison against it would match every blob in the repository: [$_rest]"
-         continue ;;
+      *) _w=badhash; _hash=""; _last=$_rest ;;
     esac
+    if [ -z "$_w" ]; then
     # `ls-tree` AND NOT `rev-parse <commit>:<path>`: the latter is mangled by POSIX-emulation shells
     # on Windows for a path with a leading dot segment and reports ABSENT rather than failing, which
     # is a wrong verdict wearing a clean one's clothes (memory/gotchas/msys-mangles-rev-colon-dotpath).
     _blob=$(GIT ls-tree "$build_c" -- "$_path" 2>/dev/null | awk '$2 == "blob" { print $3 }' | head -1)
     if [ -z "$_blob" ]; then
-      add_violation "$id" "$id — its brief row at $(GIT rev-parse --short "$build_c") names $_path, which is not a tracked file at that commit, so the row records that a brief existed and joins to nothing"
-      continue
+      _w=nopath; _hash=""; _last=$_path
+    else
+      case "$_blob" in
+        "$_hash"*) _w=ok; _hash=""; _blob="" ;;
+        *) _w=moved; _last=$_path ;;
+      esac
     fi
-    case "$_blob" in
-      "$_hash"*) ;;
-      *) add_violation "$id" "$id — its brief row at $(GIT rev-parse --short "$build_c") carries hash $_hash for $_path, but that path's blob at the same commit is $_blob; the file moved under the row and no re-brief recorded it" ;;
+    fi
+    fi
+    fi
+    fi
+    # S5 - WHAT A MISS STORES: its outcome as a body in section 4's grammar, where the key was derived
+    # and every cell is one that grammar admits, so the body escapes to itself and reads back as
+    # printed; and only where no two of the unit's candidates share a committer second, read from
+    # their commit objects through the coprocess, because the walks' order between two such commits
+    # is git's queue order rather than their dates (the header's date-order residual).
+    if [ "$BR_ON" = 1 ] && [ -n "${U_KEY[_k]}" ]; then
+      _bd=""
+      case $_pf in
+        later) _bd="later $_c0 $_c $_ph ${_lph:--} " ;;
+        unborne) _bd="unborne $_c $_ph " ;;
+      esac
+      case $_w in
+        unbuilt) _bd=unbuilt ;;
+        postrun) _bd="postrun $_c $_ph $_last" ;;
+        ok|norow) _bd+="$_w $_c" ;;
+        prebuilt) _bd+="prebuilt $_pre $_c" ;;
+        badhash|nopath) _bd+="$_w $_c $_last" ;;
+        moved) _bd+="moved $_c $_hash $_blob $_last" ;;
+      esac
+      case "$_bd" in *[$'\t\n\\']*) _bd="" ;; esac
+      [ -z "$_lph" ] || [[ $_lph =~ ^[A-Z]+$ ]] || _bd=""
+      [ -z "$_pf$_ph" ] || [[ $_ph =~ ^[A-Z]+$ ]] || _bd=""
+      for _x in $_c0 $_c $_pre $_blob; do [[ $_x =~ $BR_SHA ]] || _bd=""; done
+      _cs=${BR_CANDS[$id]-}
+      if [ -n "$_bd" ] && [ "${_cs#* * }" != "$_cs" ]; then
+        declare -A _br_ts=()
+        for _x in $_cs; do
+          read_bh_blob "$_x" && [ "$BH_TYPE" = commit ] || { _bd=""; break; }
+          _e=${BH_TEXT#*"$BR_N"committer }
+          [ "$_e" != "$BH_TEXT" ] || { _bd=""; break; }
+          _e=${_e%%"$BR_N"*}; _e=${_e% *}; _e=${_e##* }
+          [[ $_e =~ ^[0-9]+$ ]] && [ -z "${_br_ts[$_e]+set}" ] || { _bd=""; break; }
+          _br_ts[$_e]=1
+        done
+      fi
+      [ -z "$_bd" ] || BR_W+="u$_k$BR_T${U_KEY[_k]}$BR_T$_bd$BR_N"
+    fi
+    fi
+    # THE OUTCOME, a hit's or a miss's, applied with the counters, the announced lines and the
+    # waiver bookkeeping in today's order. A line names each commit as `BR_M<sha>BR_M`, and one
+    # batched read after the walk spells them all (S6).
+    [ "$_w" = unbuilt ] || inrange_ids="$inrange_ids $id"
+    case $_pf in
+      later)
+        regraded=$((regraded+1)); BR_SHAS+=" $_c0 $_c"
+        announced="$announced
+brief-recorded: GRADED AT A LATER COMMIT — $id: the earliest commit naming it, $BR_M$_c0$BR_M, was made while $run read $_ph, but $BR_M$_c$BR_M also names it and touches a path outside the record surface while $run read ${_lph:-no phase}, so the unit was worked on during a live run and is graded there" ;;
+      unborne)
+        unborne=$((unborne+1)); BR_SHAS+=" $_c"
+        announced="$announced
+brief-recorded: GRADED ANYWAY — $id was BUILT at $BR_M$_c$BR_M while $run read $_ph, but no record at HEAD still makes that claim, neither $run nor one retired after that commit, so the finished run is not taken on its word" ;;
+    esac
+    case $_w in
+      unbuilt) unbuilt=$((unbuilt+1)) ;;
+      postrun)
+        postrun=$((postrun+1)); BR_SHAS+=" $_c"
+        announced="$announced
+brief-recorded: NOT GRADED — $id was BUILT at $BR_M$_c$BR_M while $run read $_ph, so its run had already finished and the unit was built outside any run; $_last still makes that claim at HEAD" ;;
+      prebuilt)
+        prebuilt=$((prebuilt+1)); BR_SHAS+=" $_pre $_c"
+        announced="$announced
+brief-recorded: NOT GRADED — $id was built before its run, at $BR_M$_pre$BR_M behind the run's base; $BR_M$_c$BR_M is a later commit naming it" ;;
+      norow)
+        BR_SHAS+=" $_c"
+        add_violation "$id" "$id — BUILT at $BR_M$_c$BR_M with NO brief row in $run at that commit; nothing on disk records what the agent that built it was handed" ;;
+      badhash)
+        BR_SHAS+=" $_c"
+        add_violation "$id" "$id — its brief row at $BR_M$_c$BR_M carries no twelve-hex hash in its reason field, so the join it claims to record cannot be made and a prefix comparison against it would match every blob in the repository: [$_last]" ;;
+      nopath)
+        BR_SHAS+=" $_c"
+        add_violation "$id" "$id — its brief row at $BR_M$_c$BR_M names $_last, which is not a tracked file at that commit, so the row records that a brief existed and joins to nothing" ;;
+      moved)
+        BR_SHAS+=" $_c"
+        add_violation "$id" "$id — its brief row at $BR_M$_c$BR_M carries hash $_hash for $_last, but that path's blob at the same commit is $_blob; the file moved under the row and no re-brief recorded it" ;;
     esac
   done
 done
+
+# S6 - THE SHORT SHAS, all of them by one `log --no-walk=unsorted --format=%h`, its revisions on
+# stdin and so in input order and past any argument-length limit, each distinct sha once; never
+# stored, because a short sha's length grows with the object count. A batch that does not answer one
+# line per sha falls back to one `rev-parse --short` per sha, the read each line made before.
+if [ -n "${BR_SHAS// /}" ]; then
+  declare -A _br_seen=(); _br_u=(); _br_sh=()
+  for _c in $BR_SHAS; do [ -n "${_br_seen[$_c]-}" ] || { _br_seen[$_c]=1; _br_u+=("$_c"); }; done
+  mapfile -t _br_sh < <(printf '%s\n' "${_br_u[@]}" | GIT log --no-walk=unsorted --format=%h --stdin 2>/dev/null)
+  if [ "${#_br_sh[@]}" -ne "${#_br_u[@]}" ]; then
+    _br_sh=(); for _c in "${_br_u[@]}"; do _br_sh+=("$(GIT rev-parse --short "$_c")"); done
+  fi
+  for _i in "${!_br_u[@]}"; do
+    announced=${announced//"$BR_M${_br_u[_i]}$BR_M"/"${_br_sh[_i]%$'\r'}"}
+    violations=${violations//"$BR_M${_br_u[_i]}$BR_M"/"${_br_sh[_i]%$'\r'}"}
+  done
+fi
+
+# S7 - THE ONE WRITE, after the walk and only while HEAD still reads G, so a run whose HEAD moved
+# stores nothing: every outcome this run graded that S5 lets it store, and no tip. Its request goes
+# through a process substitution, as the lookup's did.
+if [ "$BR_ON" = 1 ] && [ -n "$BR_W" ]; then
+  _br_l=$(GIT rev-parse HEAD 2>/dev/null)
+  [ "${_br_l%$'\r'}" != "$G" ] || write_hs_items <(printf '%s' "$BR_W") >/dev/null 2>&1 || :
+fi
 
 # ------------------------------------------------------------------------------- THE LIVENESS LINE
 # ONE COUNT PER POPULATION THIS LEG WALKS. Do not write the number of them here: the line is two

@@ -72,3 +72,8 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-22T04:49:04Z brief · item TOOL-dQuietDisk-3 · reason 217b728e73d1 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-3-build-brief.md
 
 2026-11-22T04:50:40Z dispatch · item 53af6058 TOOL-dQuietDisk-3 · reason tools/unattended/check-brief-recorded.sh tools/unattended/check-brief-recorded.test.sh memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-3.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-3-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-3-deviation-1.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-22T05:31:21Z brief · item TOOL-dQuietDisk-3 · reason b37215eaa216 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-3-build-brief.md
+2026-11-22T05:32:52Z draw · re-dispatch · TOOL-dQuietDisk-3 · 4/44 · 20261122T053252Z-173ebb
+
+2026-11-22T05:32:52Z dispatch · item 959a1c43 TOOL-dQuietDisk-3 · reason tools/unattended/check-brief-recorded.sh tools/unattended/check-brief-recorded.test.sh memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-3.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-3-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-3-deviation-1.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
