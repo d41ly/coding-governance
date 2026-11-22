@@ -227,7 +227,13 @@ def build_release_tree(gov_root, root, pin: str, plants: list[dict], gov_plants:
     clone = root / "gov"
     # PINNED, not inherited: a Windows git install sets core.autocrlf=true system-wide, and the clone
     # would check out its engine bytes by the machine running the leg (fixture-inherits-ambient-machine-state)
-    run_git(root, "clone", "-q", "--no-tags", "--origin", CLONE_REMOTE, "-c", "core.autocrlf=false", gov_root.as_posix(), clone.as_posix())
+    # --shared (TOOL-dQuietDisk-8 S2): the clone reads gov's objects through objects/info/alternates
+    # rather than hardlinking the store, its own commits land in its own, and the caller's scratch root
+    # goes with it. --no-checkout because the checkout of the pin below is the clone's one checkout.
+    # S3: sparse, leaving out memory/builds/, which a --case run printed the same lines without.
+    run_git(root, "clone", "-q", "--shared", "--no-checkout", "--no-tags", "--origin", CLONE_REMOTE, "-c", "core.autocrlf=false",
+            gov_root.as_posix(), clone.as_posix())
+    run_git(clone, "sparse-checkout", "set", "--no-cone", "/*", "!/memory/builds/")
     run_git(clone, "-c", "advice.detachedHead=false", "checkout", "-q", "--detach", pin)
     full = run_git(gov_root, "rev-parse", "--symbolic-full-name", landed) or landed
     run_git(clone, "fetch", "-q", "--no-tags", gov_root.as_posix(), f"+{full}:refs/heads/main")

@@ -1376,6 +1376,9 @@ def build_source_snapshot(source_root):
         run("add", *(("-c", f"core.excludesFile={xf}") if xf else ()), "add", "-A", cwd=source, **env)
         tree = run("write-tree", "write-tree", **env)
         commit = run("commit-tree", "commit-tree", tree, "-p", "HEAD", "-m", "the working tree under test", **env)
+        # TOOL-dQuietDisk-8 S3: sparse, leaving out memory/builds/, which a --fixture case printed the same
+        # lines without; set after commit-tree, so the snapshot's tree is the working tree's, every path in it
+        run("sparse", "-C", s.as_posix(), "sparse-checkout", "set", "--no-cone", "/*", "!/memory/builds/")
         run("checkout", "-C", s.as_posix(), "checkout", "--quiet", "--detach", commit)
         links = [{ln.split("\t", 1)[1] for ln in run(step, "-C", repo.as_posix(), *argv).splitlines()
                   if ln.startswith("160000 ")} for step, repo, argv in
