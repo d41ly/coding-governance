@@ -5,7 +5,7 @@
 Each criterion of section 6, read by the pass that built the unit with a probe of the code it changed, on the
 worktree before the pass commit: `tools/govkit/selftest.py#derive_roles_expected`, imported as a library by
 `python -c`, which runs no case. No gate, suite or bar ran in the pass: the one `New arm:` arm of section 7 and
-its RED-first observation, and the section 7 legs, are owed to the main loop at the close.
+its RED-first observation, and the section 7 legs (DERIVED from the spec's Gates leg line), are owed to the main loop at the close.
 
 **Evidences:** TOOL-dBoundRoles-37
 - AC1 — `derive_roles_expected` — the AC1 `python -c` over gov's tree printed `agents 12 True overlays 13 True` (DERIVED, the probe): the first set equals the slots `.claude/roles.json` marks `agent` true, `gov-session` absent, and the second the `house/*.md` entries of `tools/roles/kit.toml`'s seed row, `house/policy.toml` excluded.
