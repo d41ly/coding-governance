@@ -146,3 +146,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T14:07:34Z brief · item TOOL-dTotalRecall-44 · reason a3c949fba7d7 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-44-build-brief.md
 
 2026-11-22T14:10:41Z dispatch · item b71b6dd0 TOOL-dTotalRecall-44 · reason tools/memory-tree/id_grammar.py tools/memory-recall/selftest.py tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-44.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-44-1-acceptance-ledger.md
+
+2026-11-22T14:29:25Z brief · item TOOL-dTotalRecall-46 · reason 3030fc142f8f memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-46-build-brief.md
+
+2026-11-22T14:32:34Z dispatch · item 254057fa TOOL-dTotalRecall-46 · reason tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-46.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-46-1-acceptance-ledger.md
