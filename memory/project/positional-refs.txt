@@ -33659,8 +33659,6 @@ memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-36.md	tools/wo
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-36.md	tools/workflows/tier2-review.template.js:318-328	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-36.md	tools/workflows/unattended-build.template.js:2557	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-36.md	tree_lib.py:401	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-37.md	tools/check-wiring.sh:1141	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-37.md	tools/govkit/govkit.py:13238	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-38.md	backlog.py:1042	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-38.md	backlog.py:1664	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-38.md	check-recall.py:511	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
