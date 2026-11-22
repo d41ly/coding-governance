@@ -13,6 +13,7 @@
 | [2026-11-22-build-TOOL-dQuietDisk-1-red-fix-2.md](../build/2026-11-22-build-TOOL-dQuietDisk-1-red-fix-2.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dQuietDisk-1-red-fix-3.md](../build/2026-11-22-build-TOOL-dQuietDisk-1-red-fix-3.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dQuietDisk-1-red-fix-4.md](../build/2026-11-22-build-TOOL-dQuietDisk-1-red-fix-4.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dQuietDisk-1-replay.md](../build/2026-11-22-build-TOOL-dQuietDisk-1-replay.md) | journal | — |
 | [2026-11-22-build-TOOL-dQuietDisk-1-widen-1.md](../build/2026-11-22-build-TOOL-dQuietDisk-1-widen-1.md) | widen | — |
 | [2026-11-22-build-TOOL-dQuietDisk-1-widen-2.md](../build/2026-11-22-build-TOOL-dQuietDisk-1-widen-2.md) | widen | — |
 | [2026-11-22-build-TOOL-dQuietDisk-1-widen-3.md](../build/2026-11-22-build-TOOL-dQuietDisk-1-widen-3.md) | widen | — |

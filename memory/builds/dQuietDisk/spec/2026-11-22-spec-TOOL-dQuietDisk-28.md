@@ -180,8 +180,8 @@ start, never at an ancestor's.
 
 The rows are DERIVED from each spec's run section and the 8 per verb above. Unit 3's warm run moves
 its one resolve from the lookup into `init_hs`, so it saves nothing warm and saves 8 on a run that
-writes. Unit 4 calls `resolve_store` once per process from python and never runs the bash face, so
-it gains nothing; its own spec's F1 cost stands. The saving falls to the shell legs.
+writes. TOOL-dQuietDisk-4 calls `resolve_store` once per process from python and never runs the
+bash face, so it gains nothing; its own spec's F1 cost stands. The saving falls to the shell legs.
 
 ### Inventory
 
@@ -244,11 +244,11 @@ symbol index, re-rendered by the codebase map's generator, `gen_map.py --write`,
 - **AC1** — When a probe builds a repository under `%TEMP%/<short-name>` on `main` with one commit
   and no remote, sources `tools/lib/history-store.sh` with `resolve_python` defined, sets
   `GIT_TRACE2_EVENT` to an empty directory, and runs `init_hs probe a` and one `read_hs_tip`, the
-  directory holds 8 files before the change and at most 8 after. With ten `read_hs_tip` calls after
-  one `init_hs`, it holds 80 before and at most 8 after. So the after count for ten verbs is at most
-  the before count for one verb, plus one process per item read through git, which these verbs do
-  not do.
-  Red when: a verb still resolves, so ten verbs hold more than 8 files.
+  directory holds 8 files [PINNED] before the change and at most 8 [PINNED] after. With ten
+  `read_hs_tip` calls after one `init_hs`, it holds 80 [PINNED] before and at most 8 [PINNED] after.
+  So the after count for ten verbs is at most the before count for one verb, plus one process per
+  item read through git, which these verbs do not do.
+  Red when: a verb still resolves, so ten verbs hold more than 8 files [PINNED, AC1's bound].
   figure: 8 and 80 PINNED as measured on 2026-11-22; the after counts DERIVED at observation.
 - **AC2** — When the probe of AC1 runs `init_hs` and then `env | grep -c '^HS_RESOLVED='` in a child,
   it prints 1, and the value's fourth field is the repository's absolute git dir. When `init_hs` runs
@@ -273,7 +273,8 @@ symbol index, re-rendered by the codebase map's generator, `gen_map.py --write`,
   and then green.
 - **AC5** — When a verb runs with `HS_RESOLVED` set to a value with a foreign tag, five fields, a mode
   of `kept`, or a git dir that is not a directory, its stdout and stderr are byte-identical to the
-  same verb run with `HS_RESOLVED` unset, and its trace directory holds 8 files.
+  same verb run with `HS_RESOLVED` unset, and its trace directory holds 8 files [PINNED, measured
+  2026-11-22 as AC1's one-verb count].
   Red when: a malformed value is read, or turns the store on or off.
 - **AC6** — When the probe's repository commits `tests.history-verdicts = "regraded"` on `main`, the
   verbs after `init_hs` print `miss` for an item written while it read `stored`, and write no item and
