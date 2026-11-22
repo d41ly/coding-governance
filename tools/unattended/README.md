@@ -45,8 +45,9 @@ skips it, `Pass: none` is taken at its word, and check 23 grades both at the clo
 in the run's own tree, paired with the unit harness's `passBase` key. `--merge <slug> --pass <unit>
 --branch <branch> --from <sha>` takes the branch the harness returned and the commit that key carried,
 merges it `--no-ff` with a `Pass: none` merge commit whose second parent is the pass commit, resolves
-only a conflict on an effective generated output or a gen-region-only change, re-renders the outputs,
-and takes the pass's worktree and branch away; `--remove <slug> --branch <branch>` takes away those of
+only a conflict on an effective generated output or a gen-region-only change, re-renders the outputs
+over the merge as it will be committed, so a renderer that reads the committed revision, as the policy
+mirror does, reads the pass's inputs, and takes the pass's worktree and branch away; `--remove <slug> --branch <branch>` takes away those of
 a pass that committed nothing. It finds `regen.py` beside the run-gates kit, and without it announces
 the skip and merges what the resolution left. Its header states the order the main loop runs it in.
 

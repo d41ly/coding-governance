@@ -1,6 +1,6 @@
 # KICK-dKeptSession-67 — pass-tree regenerates over the merge as it will be committed, so a pass that changes a mirror input merges
 
-**Status:** INPROGRESS · rev-2 · 2026-11-22 · node d · Tier-2 · base ce776cccc · streams tooling · order 7 · advances KICK-dKeptSession-29
+**Status:** CLOSED · rev-2 · 2026-11-22 · node d · Tier-2 · base ce776cccc · streams tooling · order 7 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-21-build-KICK-dKeptSession-67-1-acceptance-ledger.md](../build/2026-11-21-build-KICK-dKeptSession-67-1-acceptance-ledger.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-67-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-67-build-brief.md) | research | — |
 | [2026-11-22-prompt-KICK-dKeptSession-67-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-67-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-KICK-dKeptSession-67-2-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-67-2-spec-writer.md) | journal | — |
