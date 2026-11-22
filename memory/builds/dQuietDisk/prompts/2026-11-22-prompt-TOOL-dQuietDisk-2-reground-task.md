@@ -10,15 +10,20 @@ You write specs only, in `memory/builds/dQuietDisk/spec/`. Do not commit. Read t
 
 ## The base
 
-Order 1 is built and CLOSED. `HEAD` carries:
+Order 1 is built and CLOSED, and dWitnessedBar has landed. `HEAD` carries:
 - the merge `b3f5a2bc3`, which brought in dWitnessedBar's land tip `fb6f1a74c`;
 - TOOL-dQuietDisk-1, the history verdict store, at `10c54981f` and its red fixes: `tools/lib/history_store.py`, its
   byte-identical copies in `tools/unattended/` and `tools/memory-tree/`, `tools/lib/history-store.sh` and the block it
   adds to `tools/unattended/lib-unattended.sh`;
-- TOOL-dQuietDisk-14, the kit attestation, at `69c9c5cb8`.
+- TOOL-dQuietDisk-14, the kit attestation, at `69c9c5cb8`;
+- the merge `40def53f7` of main at `8b8b1374c`, dWitnessedBar's landing. It brings in 27 commits past `fb6f1a74c`.
+  Among others they change `tools/unattended/check-pass-order.sh`, `tools/unattended/check-brief-recorded.sh`,
+  `tools/unattended/lib-unattended.sh` and `tools/run-gates/run-gates.sh`: `git diff fb6f1a74c 8b8b1374c -- <file>`.
 
-The six order-2 specs still say `base 59e882af`. Read the code each one cites as it stands at `HEAD`. The worktree is
-checked out there, so read files directly.
+Read the code each spec cites as it stands at `HEAD`. The worktree is checked out there, so read files directly.
+
+TOOL-dQuietDisk-2 was re-grounded at `69c9c5cb8` (its rev-4). For it, re-check only what `fb6f1a74c..8b8b1374c`
+moved in the files it cites, and record the result as below.
 
 ## Re-ground each of units 2, 3, 4, 5, 7 and 8
 
@@ -34,8 +39,9 @@ checked out there, so read files directly.
   the pass regenerates them. The main loop declares the union in `--dispatch`.
 - **Say which order-2 units share a file.** In each spec's §4, name any other order-2 unit whose Files touched shares
   a path with this one. Same-order units with disjoint files build in parallel; a shared path makes them sequential.
-- **Record the re-ground.** Change the header's base to `69c9c5cb`, bump the rev and add a revision-log line:
-  `re-grounded at 69c9c5cb8 (order 1 built), <what moved>`. Write `nothing moved` where nothing did.
+- **Record the re-ground.** Change the header's base to `40def53f`, bump the rev and add a revision-log line:
+  `re-grounded at 40def53f7 (order 1 built, dWitnessedBar landed), <what moved>`. Write `nothing moved` where
+  nothing did.
 
 Nothing in a unit's goal moves. Where the re-ground changes scope or acceptance, say why in the revision-log line.
 
