@@ -3336,7 +3336,7 @@ has    "OC4 AC2 typed: the log names each typed stage" "$OC_T0" "log:roles: spec
 # TOOL-dBoundRoles-13 AC5 - where the builder travels, `facts` varies per unit and `cutFacts` names its cut;
 # with no builder role neither appears. Against the template with both conditionals cut, the typed rows red.
 has    "BR13 AC5 typed: dispatch names facts among the per-unit fields" "$(printf '%s\n' "$OC_T0" | grep '^RESULT')" '"perUnit":["unitId","specPath","briefPath","facts"]'
-has    "BR13 AC5 typed: ...and cutFacts names the cut" "$(printf '%s\n' "$OC_T0" | grep '^RESULT')" "roles/handoff.py facts --build tB --unit <unitId> --input prompt=<briefPath> --input spec=<specPath>"
+has    "BR13 AC5 typed: ...and cutFacts names the cut" "$(printf '%s\n' "$OC_T0" | grep '^RESULT')" "/handoff.py facts --build tB --unit <unitId> --input prompt=<briefPath> --input spec=<specPath>"
 o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","roles":'"$OC_NOB"',#')" "$(returns CONVERGED 0)")
 hasnt_ "OC4 AC2 no builder role: dispatch.args carries no roles key" "$(printf '%s\n' "$o" | grep '^RESULT')" '"roles"'
 hasnt_ "BR13 AC5 no builder role: ...and dispatch names no facts cut" "$(printf '%s\n' "$o" | grep '^RESULT')" '"cutFacts"'
