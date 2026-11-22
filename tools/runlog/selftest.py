@@ -359,7 +359,13 @@ from collections import Counter  # noqa: E402
 # (AC1), the home's own projects read with that variable unset (liveness), and the bottom rung with a
 # `no root:` source when no root variable is set (AC3). Its decoy checks move it by 3.
 # 3 + 3 = 6
-ASSERTION_FLOOR = 1618
+# RAISED 1618 -> 1624 by KICK-dKeptSession-46, the caller's root: ONE new arm with 3 checks —
+# `test_extract_context_fill_root`'s orient row reading the window under its `--orient` dir (AC1),
+# `runlog.py context` reading the same transcript at the same share (AC2), and the fill raising with
+# neither window nor root (AC3). The context-fill liveness check now passes its case's root and adds
+# none. Its decoy checks move it by 3.
+# 3 + 3 = 6
+ASSERTION_FLOOR = 1624
 
 PASS = []
 FAIL = []
@@ -2063,8 +2069,9 @@ def test_extract_context_fill():
     usage = [e for e in rx.extract_session(rx.resolve_session_tree(sid, projects))["events"]
              if e["kind"] == "usage"]
     check("extract context-fill liveness: the whole tree's last usage is the agent's 190000, 0.95, the "
-          "decoy the share must not read", (usage[-1]["src"], rx.derive_context_fill(usage[-1])) if usage
-          else None, ("agent", 0.95))
+          "decoy the share must not read",
+          (usage[-1]["src"], rx.derive_context_fill(usage[-1], root=projects)) if usage else None,
+          ("agent", 0.95))
 
 
 def test_extract_context_window():
@@ -2293,6 +2300,50 @@ def test_extract_orient():
                    build_arm_env(base))
     check("orient AC6: a projects dir holding no session of the slug is a DEAD PROBE, exit 2",
           (r.returncode, r.stdout.startswith("runlog: orient DEAD PROBE")), (2, True))
+
+
+def test_extract_context_fill_root():
+    """KICK-dKeptSession-46 AC1 to AC3: one main transcript under an `--orient` dir runs the preflight,
+    then the `context-window-sibling` 900000-token main request, then an Edit in a record carrying no
+    usage. Its orient row and `runlog.py context` both derive the window under that dir, the 1000000
+    rung, so both read 90%; the arm's environment aims every root at an empty scratch, whose bottom
+    rung would read 450%. With neither window nor root the fill raises."""
+    base, projects = build_projects("runlog-fill-root-")
+    sid = str(uuid.uuid4())
+    sibling = TRANSCRIPTS["scenarios"]["context-window-sibling"]["main"]
+    records = [sibling[0],
+               {"type": "assistant", "uuid": "fr-a0", "timestamp": "2026-09-13T11:00:01.000Z",
+                "message": {"role": "assistant", "content": [
+                    {"type": "tool_use", "id": "toolu_fr_0", "name": "Bash",
+                     "input": {"command": f"bash unattended.sh --preflight {ORIENT_SLUG}"}}]}},
+               sibling[1],
+               {"type": "assistant", "uuid": "fr-a2", "timestamp": "2026-09-13T11:00:10.000Z",
+                "message": {"role": "assistant", "content": [
+                    {"type": "tool_use", "id": "toolu_fr_2", "name": "Edit",
+                     "input": {"file_path": "notes.txt", "old_string": "a", "new_string": "b"}}]}}]
+    main = projects / FIXTURE_PROJECT / f"{sid}.jsonl"
+    write_transcript_lines(main, records)
+    repo, _write_policy = build_orient_repo(base)
+    r = run_runlog(["extract", "--orient", str(projects), "--slug", ORIENT_SLUG, "--repo", str(repo)], base,
+                   build_arm_env(base))
+    rows = [dict(kv.split("=", 1) for kv in ln.split()[3:] if "=" in kv)
+            for ln in r.stdout.splitlines() if ln.startswith("runlog: orient row ")]
+    check("context-fill root AC1: the orient row's window is derived under the --orient dir, so the "
+          "sibling's 900000 reads 90% of the 1000000 rung",
+          (r.returncode, [(row.get("sid"), row.get("action"), row.get("context")) for row in rows]),
+          (0, [(sid, "edit", "90%")]))
+    r = run_runlog(["context", str(main)], base, build_arm_env(base))
+    check("context-fill root AC2: runlog.py context reads the same transcript at the same 90%",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()),
+          (0, "90%", "context: window 1000000 · observed 900000 on fixture-model"))
+    usage = [e for e in rx.extract_session(rx.resolve_session_tree(sid, projects))["events"]
+             if e["kind"] == "usage"]
+    try:
+        got = ("returned", rx.derive_context_fill(usage[-1])) if usage else None
+    except ValueError as exc:
+        got = ("raised", "root=" in str(exc))
+    check("context-fill root AC3: with neither window nor root the fill raises ValueError naming root=",
+          got, ("raised", True))
 
 
 def test_extract_ac10_members():

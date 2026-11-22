@@ -259,9 +259,12 @@ parse standing in for its file; else the bottom rung, source `no observation`. A
 the top rung is its own window. The share passes 100% only where the variable is set below the
 context read or the transcript is outside the scan. `measure_context_fill(transcript, until=None)` is
 the same read for a caller, `(share, tokens, source)` at or before an epoch second, `(None, None,
-None)` with no main usage, and `derive_context_fill(ev, window=None)` the share of one event a caller
-already holds, over `window` or, when it is None, the window derived for the event's model under the
-harness's default projects root. The kickoff engine's
+None)` with no main usage, and `derive_context_fill(ev, *, window=None, root=None)` the share of one
+event a caller already holds, over `window` or, when it is None, the window derived for the event's
+model under `root`, the projects root the caller resolved (KICK-dKeptSession-46); with neither it
+raises `ValueError`, and it never derives a window under a root no caller passed. `--orient` derives
+each model's window once under the dir it reads, so a transcript under `<dir>/<project>/` reads the
+same share from its row as from `context`. The kickoff engine's
 `context —` line reads it, as the `context.on-full` and `context.threshold` policy keys decide.
 
 **The self-test never reads or writes a real store.** Its `main` aims `HOME`, `USERPROFILE`,
