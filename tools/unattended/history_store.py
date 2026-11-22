@@ -39,6 +39,7 @@ is line-framed.
     python history_store.py --leg <leg> --code <path>... tip
     python history_store.py --leg <leg> --code <path>... lookup  < <item id>TAB<field>... lines
     python history_store.py --leg <leg> --code <path>... store [--tip <sha>]  < <item id>TAB<field>...TAB<body> lines
+    python history_store.py --leg <leg> --code <path>... resolve
     python history_store.py --selftest
 
 The CLI runs in the repository its working directory sits in, and `--code` may repeat. `lookup` prints
@@ -47,6 +48,15 @@ The CLI runs in the repository its working directory sits in, and `--code` may r
 `\\`, `\t` and `\n`. Exit 0, or 2 on a refusal. WHAT THIS DOES NOT CHECK: that the verdict an item holds
 is right for the ids its key names, which is the writer's claim; and a forged item, which needs write
 access to the git dir already.
+
+THE EXPORT. Each verb reads the switch and the git dirs, 8 git processes, so the bash face's `init_hs`
+runs `resolve` once and exports the line it prints as `HS_RESOLVED`: `history-store-resolved v1`, the
+key, the mode, the git dir, the common dir and the switch's escaped note, tab-separated. The key is
+`os.path.normcase` of the absolute directory it was resolved in, and every other verb reads the export
+only where its own working directory has that key, its tag and six fields read, and under `stored`
+both dirs are directories; any other value is resolved afresh, so a wrong one costs a saving, never a
+verdict. `resolve` never reads the export and prints nothing on stderr; each verb prints the note.
+WHAT THIS DOES NOT CHECK: a repository re-created at the same path while one shell holds the export.
 """
 from __future__ import annotations
 
@@ -137,7 +147,9 @@ POLICY_KEY = "tests.history-verdicts"
 MODES = ("stored", "regraded")
 AGE_LIMIT = 30 * 86400
 PRUNE_EVERY = 86400
-VERBS = ("tip", "lookup", "store")
+VERBS = ("tip", "lookup", "store", "resolve")
+#: The first field of an `HS_RESOLVED` line; its `v1` moves with the line's shape.
+RESOLVED_TAG = "history-store-resolved v1"
 _UNESCAPES = {"\\": "\\", "t": "\t", "n": "\n"}
 _ESCAPE_RE = re.compile(r"\\(.?)", re.S)
 
@@ -226,29 +238,81 @@ def derive_code_digest(repo: pathlib.Path, paths) -> str:
     return hashlib.sha256("".join(sorted(rows)).encode("utf-8")).hexdigest()
 
 
-def read_policy_mode(repo: pathlib.Path) -> str:
-    """`tests.history-verdicts` at `repo`, through the policy kit's `policy.py get`, the kit found by
-    `resolve_kit_dir` beside this file. Its default where no policy kit resolves or the key does not
-    read, the second saying so on one stderr line."""
+def read_policy_mode(repo: pathlib.Path) -> tuple[str, str]:
+    """`(mode, note)`: `tests.history-verdicts` at `repo`, through the policy kit's `policy.py get`, the
+    kit found by `resolve_kit_dir` beside this file. Its default where no policy kit resolves or the key
+    does not read, the second with the one stderr line that says so as its note, returned, not printed;
+    the note is "" otherwise."""
     try:
         kit = resolve_kit_dir("policy", "policy.py", pathlib.Path(__file__).absolute().parent)
     except LookupError:
-        return MODES[0]
+        return MODES[0], ""
     try:
         got = subprocess.run([sys.executable, str(kit / "policy.py"), "get", POLICY_KEY], cwd=str(repo),
                              capture_output=True, text=True, encoding="utf-8", errors="replace",
                              stdin=subprocess.DEVNULL, env=derive_git_env())
     except OSError as exc:
-        print("%s: %s did not read, so %s holds: %s" % (SAY, POLICY_KEY, MODES[0], exc), file=sys.stderr)
-        return MODES[0]
+        return MODES[0], "%s: %s did not read, so %s holds: %s" % (SAY, POLICY_KEY, MODES[0], exc)
     said = got.stdout.split()
     if got.returncode == 0 and len(said) == 1 and said[0] in MODES:
-        return said[0]
+        return said[0], ""
     why = (got.stderr or got.stdout).strip().splitlines()
-    print("%s: %s did not read, so %s holds: %s" % (SAY, POLICY_KEY, MODES[0],
-                                                   why[-1] if why else "exit %d" % got.returncode),
-          file=sys.stderr)
-    return MODES[0]
+    return MODES[0], "%s: %s did not read, so %s holds: %s" % (
+        SAY, POLICY_KEY, MODES[0], why[-1] if why else "exit %d" % got.returncode)
+
+
+def read_resolved(repo) -> tuple[str, str, str, str]:
+    """`(mode, note, git dir, common dir)` at `repo`, the two reads `resolve_store` makes, made once:
+    the switch as `read_policy_mode` reads it, its note held, then, under `stored` only, one `rev-parse`
+    for the absolute git dir and the common dir, made absolute. A rev-parse that fails leaves both
+    dirs "", as does `regraded`, under which no git runs."""
+    repo = pathlib.Path(repo).absolute()
+    mode, note = read_policy_mode(repo)
+    if mode != MODES[0]:
+        return mode, note, "", ""
+    try:
+        got = subprocess.run(["git", "-C", str(repo), "rev-parse", "--absolute-git-dir", "--git-common-dir"],
+                             capture_output=True, text=True, encoding="utf-8", errors="replace",
+                             stdin=subprocess.DEVNULL, env=derive_git_env())
+        lines = got.stdout.splitlines() if got.returncode == 0 else []
+    except OSError:
+        lines = []
+    if len(lines) != 2:
+        return mode, note, "", ""
+    common = pathlib.Path(lines[1])
+    if not common.is_absolute():
+        common = repo / common
+    return mode, note, lines[0], str(common)
+
+
+def render_resolved(repo, resolved) -> str:
+    """`resolved`, as `read_resolved` answers it for `repo`, as the one `HS_RESOLVED` line: the tag, the
+    key, the mode, the git dir, the common dir and the escaped note, tab-separated. The key is
+    `os.path.normcase` of `repo`'s absolute path. "" where the key or a dir holds a tab or a newline."""
+    key = os.path.normcase(str(pathlib.Path(repo).absolute()))
+    mode, note, git_dir, common = resolved
+    if any(c in text for text in (key, git_dir, common) for c in "\t\n"):
+        return ""
+    return "\t".join((RESOLVED_TAG, key, mode, git_dir, common, render_escaped(note)))
+
+
+def parse_resolved(text, repo):
+    """The `(mode, note, git dir, common dir)` a `render_resolved` line holds, where it was rendered for
+    `repo`: its tag this one, six fields, its key `repo`'s, its mode one of MODES and, under `stored`,
+    both dirs absolute and directories. None for any other text, which means resolve afresh."""
+    cells = (text or "").split("\t")
+    if len(cells) != 6 or cells[0] != RESOLVED_TAG or cells[2] not in MODES:
+        return None
+    if cells[1] != os.path.normcase(str(pathlib.Path(repo).absolute())):
+        return None
+    try:
+        if cells[2] == MODES[0] and not all(
+                pathlib.Path(d).is_absolute() and pathlib.Path(d).is_dir() for d in cells[3:5]):
+            return None
+        note = parse_escaped(cells[5])
+    except (OSError, ValueError):
+        return None
+    return cells[2], note, cells[3], cells[4]
 
 
 class BatchReader:
@@ -445,11 +509,12 @@ class HistoryStore:
         return removed
 
 
-def resolve_store(repo, leg: str, code_paths) -> HistoryStore:
+def resolve_store(repo, leg: str, code_paths, resolved=None) -> HistoryStore:
     """The store for one run of `leg` in the repository at `repo`, keyed by the working bytes of
-    `code_paths`. ValueError on a leg that is not `[a-z0-9-]+` or no code path. The switch is read once;
-    a repository git cannot name or a code path that does not read gives a store that is off, the
-    reason on one stderr line."""
+    `code_paths`. ValueError on a leg that is not `[a-z0-9-]+` or no code path. The switch and the git
+    dirs are `resolved`, as `read_resolved` answers them, which starts no git process, or else read
+    once now; a repository git cannot name or a code path that does not read gives a store that is
+    off, the reason on one stderr line, after the switch's note where it did not read."""
     if not isinstance(leg, str) or not LEG_RE.fullmatch(leg):
         raise ValueError("a leg is [a-z0-9-]+, not %r" % (leg,))
     paths = [str(p) for p in code_paths]
@@ -457,28 +522,22 @@ def resolve_store(repo, leg: str, code_paths) -> HistoryStore:
         raise ValueError("a store needs the grading code's paths, so an edit to them moves every key")
     repo = pathlib.Path(repo).absolute()
     off = HistoryStore(None, leg, "", "", False)
-    if read_policy_mode(repo) != MODES[0]:
+    mode, note, git_dir, common = read_resolved(repo) if resolved is None else resolved
+    if note:
+        print(note, file=sys.stderr)
+    if mode != MODES[0]:
         return off
-    try:
-        got = subprocess.run(["git", "-C", str(repo), "rev-parse", "--absolute-git-dir", "--git-common-dir"],
-                             capture_output=True, text=True, encoding="utf-8", errors="replace",
-                             stdin=subprocess.DEVNULL, env=derive_git_env())
-        lines = got.stdout.splitlines() if got.returncode == 0 else []
-    except OSError:
-        lines = []
-    if len(lines) != 2:
+    if not git_dir or not common:
         print("%s: %s: git names no git dir at %s, so this run regrades" % (SAY, leg, repo.as_posix()),
               file=sys.stderr)
         return off
-    common = pathlib.Path(lines[1])
-    if not common.is_absolute():
-        common = repo / common
+    common = pathlib.Path(common)
     try:
         code = derive_code_digest(repo, paths)
     except OSError as exc:
         print("%s: %s: a code path does not read, so this run regrades: %s" % (SAY, leg, exc), file=sys.stderr)
         return off
-    scope = hashlib.sha256(lines[0].encode("utf-8")).hexdigest()[:16]
+    scope = hashlib.sha256(git_dir.encode("utf-8")).hexdigest()[:16]
     return HistoryStore(common.joinpath(*HOME, leg), leg, code, scope, True)
 
 
@@ -635,6 +694,41 @@ def test_cli(repo, check_arm) -> None:
     check_arm("cli: a body escaped another way is refused", refused.returncode == 2, "rc %d" % refused.returncode)
 
 
+def test_resolved(repo, scratch, check_arm) -> None:
+    code = ["src/check.sh"]
+    held = read_resolved(repo)
+    line = render_resolved(repo, held)
+    cells = line.split("\t")
+    bad = [render_resolved(scratch, held), line.replace(RESOLVED_TAG, "history-store-resolved v2", 1),
+           "\t".join(cells[:5]), "\t".join(cells[:2] + ["kept"] + cells[3:]),
+           "\t".join(cells[:3] + [str(repo / "absent")] + cells[4:])]
+    check_arm("resolved: a held line keyed to another directory, or malformed, is not read",
+              len(cells) == 6 and parse_resolved(line, repo) == held
+              and all(parse_resolved(text, repo) is None for text in bad),
+              "read %r" % ([parse_resolved(text, repo) for text in bad],))
+    argv = [sys.executable, str(pathlib.Path(__file__).absolute()), "--leg", "selftest-held", "--code", *code]
+    env = {k: v for k, v in derive_git_env().items() if k != "HS_RESOLVED"}
+    fresh = subprocess.run([*argv, "resolve"], cwd=str(repo), capture_output=True, env=env)
+    lied = subprocess.run([*argv, "resolve"], cwd=str(repo), capture_output=True,
+                          env=dict(env, HS_RESOLVED="\t".join(cells[:2] + ["regraded", "", ""] + cells[5:])))
+    text = fresh.stdout.decode("utf-8").rstrip("\n")
+    real_run, spawned = subprocess.run, []
+
+    def count_run(*args, **kwargs):
+        spawned.append(args)
+        return real_run(*args, **kwargs)
+    subprocess.run = count_run
+    try:
+        again = resolve_store(repo, "selftest-held", code, parse_resolved(text, repo))
+    finally:
+        subprocess.run = real_run
+    want = resolve_store(repo, "selftest-held", code)
+    same = (again.stored, again.root, again.scope, again.code) == (want.stored, want.root, want.scope, want.code)
+    check_arm("resolved: a resolve line read back in its own directory resolves the same store, no git run",
+              fresh.returncode == 0 and not fresh.stderr and lied.stdout == fresh.stdout and not spawned and same,
+              "rc %d, stderr %r, spawned %d, read %r" % (fresh.returncode, fresh.stderr, len(spawned), text))
+
+
 def test_switch(scratch, check_arm) -> None:
     try:
         resolve_kit_dir("policy", "policy.py", pathlib.Path(__file__).absolute().parent)
@@ -677,6 +771,7 @@ def run_selftest() -> int:
         test_worktree_tips(repo, scratch, check_arm)
         test_prune(repo, check_arm)
         test_cli(repo, check_arm)
+        test_resolved(repo, scratch, check_arm)
         test_switch(scratch, check_arm)
     finally:
         shutil.rmtree(str(scratch), ignore_errors=True)
@@ -706,14 +801,19 @@ def main(argv=None) -> int:
             bad = arg
             break
     if bad or not leg or not code or not verb or (tip is not None and verb != "store"):
-        print("%s: usage: --leg <leg> --code <path>... (tip | lookup | store [--tip <sha>]) | --selftest%s"
-              % (SAY, "; %r is no argument here" % bad if bad else ""), file=sys.stderr)
+        print("%s: usage: --leg <leg> --code <path>... (tip | lookup | store [--tip <sha>] | resolve)"
+              " | --selftest%s" % (SAY, "; %r is no argument here" % bad if bad else ""), file=sys.stderr)
         return 2
     if tip is not None and not TIP_RE.fullmatch(tip):
         print("%s: --tip takes a full sha, not %r" % (SAY, tip), file=sys.stderr)
         return 2
+    if verb == "resolve":
+        line = render_resolved(os.getcwd(), read_resolved(os.getcwd()))
+        sys.stdout.buffer.write(("%s\n" % line).encode("utf-8") if line else b"")
+        return 0
     try:
-        store = resolve_store(os.getcwd(), leg, code)
+        held = parse_resolved(os.environ.get("HS_RESOLVED", ""), os.getcwd())
+        store = resolve_store(os.getcwd(), leg, code, held)
     except ValueError as exc:
         print("%s: %s" % (SAY, exc), file=sys.stderr)
         return 2

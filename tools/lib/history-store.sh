@@ -8,7 +8,7 @@
 #
 # USAGE — source it where resolve_python is defined, then:
 #
-#   init_hs <leg> <code path>... || exit 2   # the leg and its grading code; python resolved once
+#   init_hs <leg> <code path>... || exit 2   # the leg and its grading code; python and the store resolved once
 #   tip=$(read_hs_tip)                       # this worktree's last graded tip, or nothing
 #   read_hs_items <file>                     # <item id>TAB<field>... -> <item id>TAB<hit|miss>TAB<body>
 #   write_hs_items <file> [<tip>]            # <item id>TAB<field>...TAB<body>; then the tip, then the prune
@@ -24,7 +24,7 @@
 # stream stays framed. WHAT THIS DOES NOT CHECK: a coprocess that hangs rather than dies.
 
 # >>> history_store_sh — canonical copy: history-store.sh in gov's lib dir (byte-identical; gated)
-init_hs() { # <leg> <code path>... -> 0 with HS_PY, HS_MODULE and HS_ARGS set; 2 with no python or no code path
+init_hs() { # <leg> <code path>... -> 0 with HS_PY, HS_MODULE, HS_ARGS and HS_RESOLVED set; 2 with no python or no code path
   local _hs_p _hs_d
   [ "$#" -ge 2 ] || { echo "init_hs: a leg and at least one code path" >&2; return 2; }
   HS_ARGS=(--leg "$1"); shift
@@ -33,6 +33,8 @@ init_hs() { # <leg> <code path>... -> 0 with HS_PY, HS_MODULE and HS_ARGS set; 2
   case $_hs_d in /*|[A-Za-z]:*) ;; *) _hs_d=$PWD/$_hs_d ;; esac
   HS_MODULE=$_hs_d/history_store.py
   HS_PY=$(resolve_python) || return 2
+  if HS_RESOLVED=$("$HS_PY" "$HS_MODULE" "${HS_ARGS[@]}" resolve 2>/dev/null) && [ -n "$HS_RESOLVED" ]
+  then export HS_RESOLVED; else unset HS_RESOLVED; fi
 }
 read_hs_tip() { # -> the leg's last graded tip in this worktree, or nothing
   "$HS_PY" "$HS_MODULE" "${HS_ARGS[@]}" tip

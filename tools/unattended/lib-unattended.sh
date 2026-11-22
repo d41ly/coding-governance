@@ -2609,7 +2609,7 @@ ask_home_of() { # ask id -> the slug segment, printed and left in `_ask_home` (T
 # and return codes are the canonical's header; the history legs that source this library carry
 # resolve_python, which init_hs calls.
 # >>> history_store_sh — canonical copy: history-store.sh in gov's lib dir (byte-identical; gated)
-init_hs() { # <leg> <code path>... -> 0 with HS_PY, HS_MODULE and HS_ARGS set; 2 with no python or no code path
+init_hs() { # <leg> <code path>... -> 0 with HS_PY, HS_MODULE, HS_ARGS and HS_RESOLVED set; 2 with no python or no code path
   local _hs_p _hs_d
   [ "$#" -ge 2 ] || { echo "init_hs: a leg and at least one code path" >&2; return 2; }
   HS_ARGS=(--leg "$1"); shift
@@ -2618,6 +2618,8 @@ init_hs() { # <leg> <code path>... -> 0 with HS_PY, HS_MODULE and HS_ARGS set; 2
   case $_hs_d in /*|[A-Za-z]:*) ;; *) _hs_d=$PWD/$_hs_d ;; esac
   HS_MODULE=$_hs_d/history_store.py
   HS_PY=$(resolve_python) || return 2
+  if HS_RESOLVED=$("$HS_PY" "$HS_MODULE" "${HS_ARGS[@]}" resolve 2>/dev/null) && [ -n "$HS_RESOLVED" ]
+  then export HS_RESOLVED; else unset HS_RESOLVED; fi
 }
 read_hs_tip() { # -> the leg's last graded tip in this worktree, or nothing
   "$HS_PY" "$HS_MODULE" "${HS_ARGS[@]}" tip

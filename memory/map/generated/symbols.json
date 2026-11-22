@@ -19713,6 +19713,21 @@
       "file": "tools/policy/budgets.py"
     },
     {
+      "id": "parse_resolved",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "parse_resolved",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "parse_resolved",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
       "id": "parse_retirement",
       "kind": "function",
       "file": "tools/memory-tree/convert_registry.py"
@@ -25398,6 +25413,21 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "read_resolved",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "read_resolved",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "read_resolved",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
       "id": "read_result_fa5",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -29671,6 +29701,21 @@
       "id": "render_report",
       "kind": "function",
       "file": "tools/process-monitor/classify.py"
+    },
+    {
+      "id": "render_resolved",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "render_resolved",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "render_resolved",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "render_retired_edited_line",
@@ -40541,6 +40586,21 @@
       "id": "test_resolution_disabled",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "test_resolved",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "test_resolved",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "test_resolved",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "test_result_cap_keeps_the_true_hit_count",
