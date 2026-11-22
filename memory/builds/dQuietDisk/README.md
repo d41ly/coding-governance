@@ -105,10 +105,10 @@ ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35
 | [TOOL-dQuietDisk-26 — `check-wiring.sh` lists the tree once per invocation](spec/2026-11-20-spec-TOOL-dQuietDisk-26.md) | 4 | 2 | CLOSED | rev-3 | 2026-11-22 |
 | [TOOL-dQuietDisk-17 — `govkit update` skips a kit's verify check when nothing moved since its baseline](spec/2026-11-20-spec-TOOL-dQuietDisk-17.md) | 5 | 2 | WONTDO | rev-5 | 2026-11-22 |
 | [TOOL-dQuietDisk-9 — every scratch path under one owned, swept root, and every tree removed by one chmod-and-retry helper](spec/2026-11-20-spec-TOOL-dQuietDisk-9.md) | 6 | 2 | CLOSED | rev-6 | 2026-11-22 |
-| [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 7 | 1 | SPECCED | rev-4 | 2026-11-22 |
+| [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 7 | 1 | SPECCED | rev-5 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 119 bound to this build, across 3 record folder(s).
+Records: 120 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

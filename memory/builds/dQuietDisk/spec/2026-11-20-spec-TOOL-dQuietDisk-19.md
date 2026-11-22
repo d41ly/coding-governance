@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-19 — the before and after measurements, with their instruments
 
-**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-1 · base b3f5a2bc · streams tooling · order 7 · ratified 2026-11-20
+**Status:** SPECCED · rev-5 · 2026-11-22 · node d · Tier-1 · base 18948bf2 · streams tooling · order 7 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -14,6 +14,7 @@
 | [2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md) | research | TOOL-dQuietDisk-8 TOOL-dQuietDisk-10 TOOL-dQuietDisk-17 TOOL-dQuietDisk-26 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-26 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-14 TOOL-dQuietDisk-9 |
+| [2026-11-22-prompt-TOOL-dQuietDisk-19-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-19-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-19-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-19-reground-task.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -28,27 +29,38 @@ comparison derived from those readings.
 ## 2. Scope (IN)
 
 - **S1** — The instrument `qd-measure.sh`, the fenced block under §4 "The instrument", is carried
-  byte for byte into the record. Every reading in the record is a row it printed. Observed by AC1.
-- **S2** — The B0 readings. Before the first unit pass, the main loop runs the instrument over
-  subjects M1, M2 (cold and warm) and M3 at the build base `b3f5a2bc3`, the merge that brought
-  dWitnessedBar's land tip `fb6f1a74c` in, where the owner's ruling of 2026-11-22 puts every before
-  reading. It commits the rows as the record's first version in a records commit carrying
-  `Pass: none`. Observed by AC2 and AC3.
-- **S3** — The A readings. After every unit at orders 1 to 6 is terminal, TOOL-dQuietDisk-26,
-  TOOL-dQuietDisk-17 and TOOL-dQuietDisk-9 among them, and before this unit is dispatched, the main loop takes two row sets at one sha A: A-off, with every switch this build
-  added held at its today value, and A-on, with every switch at its default. It re-takes the A-on
-  M2 rows once to show the instrument repeats, and commits all rows into the record in a records
-  commit carrying `Pass: none`. Observed by AC2, AC3 and AC8.
+  byte for byte into the record. Every row of the record's Readings section is a row it printed, or
+  an A-off row §4 "The calls" writes by hand. The B0 commit wrote the fence under no
+  `### The instrument` heading, the line AC1 finds it by, so the unit pass adds that one heading
+  line above the fence and changes no byte of the fence. Observed by AC1.
+- **S2** — The B0 readings, already taken. The main loop ran the instrument over subjects M1, M2
+  (cold and warm) and M3 at the build base `b3f5a2bc3`, the merge that brought dWitnessedBar's land
+  tip `fb6f1a74c` in, where the owner's ruling of 2026-11-22 puts every before reading. It committed
+  the rows as the record's first version in `291aa99e4`, a records commit carrying `Pass: none`.
+  Observed by AC2 and AC3.
+- **S3** — The A readings. Every unit at orders 1 to 6 is terminal, so the main loop takes two row
+  sets at one sha A before this unit is dispatched. A-on holds every switch this build added at its
+  default. A-off holds the two switches M2 and M3 read at their today values through the A-off
+  source, F3's (b): a bare `--shared` clone whose `main` carries one extra commit setting them, which
+  the main loop builds under the session scratch root, passes as the A-off calls' `<repo>` and
+  clears with `rm -rf` after them. M1, which no switch governs, gets the hand-written `not taken` row. The main
+  loop re-takes the A-on M2 rows once to show the instrument repeats, and commits every row and the
+  Switches section into the record in a records commit carrying `Pass: none`. Observed by AC2, AC3
+  and AC8.
 - **S4** — The unit pass writes the record's Comparison section. Every cell is derived from the
   Readings table, and every row names the unit that owns the saving and quotes the bound that
   unit's spec promises. Observed by AC4, AC5 and AC6.
 - **S5** — The unit pass writes the nicocares seed-suite section from the nicocares session's own
-  record, cited by repository, commit and path. While that record does not exist, the section holds
-  the line `awaiting: fix4-nicocares-landed.md`, naming the nicocares session and the readings it
-  owes, and the unit closes; a records commit adds the readings when they land (F1). Observed by
-  AC7.
-- **S6** — The record carries the binding line, the dated filename and the seven sections §4 names
+  record, cited by repository, commit and path. That record exists at this re-ground (§4 Evidence),
+  so the section opens with its `source:` line and copies its rows. The `awaiting:
+  fix4-nicocares-landed.md` line of F1 is written only if that source no longer resolves. Observed
+  by AC7.
+- **S6** — The record carries the binding line, the dated filename and the eight sections §4 names
   in order, its Limits section included. Observed by AC9.
+- **S7** — The record's `Owed by other units` section holds the one reading a built unit owes this
+  record that the instrument does not take: TOOL-dQuietDisk-18's AC8 pair of trace-file counts. The
+  unit pass writes its `awaiting:` line, and the main loop's VERIFYING records commit puts the
+  counts in its place. Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -63,59 +75,141 @@ comparison derived from those readings.
 - Any reading inside the live worktree, dWitnessedBar's worktree or either `gov-upgrade` worktree.
   Every reading runs in a detached scratch `git clone --shared` with its own `TEMP`.
 - Running nicocares' suite from gov. Its numbers are the nicocares session's (brief item 22).
-- A `--shard` reading of `tools/govkit/selftest.py`. The suite takes no shard flag at BASE, at
-  `59e882afd` or at `b3f5a2bc3` (`grep -c shard` prints 0 over each), so M3 is the whole leg.
+- A `--shard` reading of `tools/govkit/selftest.py`. The suite takes no shard flag at
+  `b3f5a2bc3` or at `18948bf27` (`grep -c shard` prints 0 over each), so M3 is the whole leg.
+- Readings of legs and suites no subject covers; their units' ledgers hold those counts.
 - Commits the closing review folds in after A. They are not re-measured.
 
 ### Edges
 
-- **consumes-from** `TOOL-dQuietDisk-1` — the switch of the history verdict store, which A-off holds
-  at its today value for M2
-- **consumes-from** `TOOL-dQuietDisk-2` — the bound M2's saving is held to
-- **consumes-from** `TOOL-dQuietDisk-7` — the switch of the template cache, which A-off holds at
-  its today value for M1 and M3
-- **consumes-from** `TOOL-dQuietDisk-10` — the bound M1's saving is held to
-- **consumes-from** `TOOL-dQuietDisk-11` — the bound M3's saving is held to
-- **consumes-from** `TOOL-dQuietDisk-26` — the checker's one listing per invocation, which A's M1
-  rows hold because A is taken after it lands
+- **consumes-from** `TOOL-dQuietDisk-1` — the switch `tests.history-verdicts`, for M2 (F3)
+- **consumes-from** `TOOL-dQuietDisk-2` — M2's warm bound, at most 45 git processes, its AC4 owed here
+- **consumes-from** `TOOL-dQuietDisk-7` — the switch `tests.fixture-templates`, for M3 (F3)
+- **consumes-from** `TOOL-dQuietDisk-9` — M3's owned scratch root and its residual-temp bound
+- **consumes-from** `TOOL-dQuietDisk-10` — M1's bound, shown between B0 and A (its F3 (a))
+- **consumes-from** `TOOL-dQuietDisk-11` — M3's git-process and peak-temp bound
+- **consumes-from** `TOOL-dQuietDisk-18` — its AC8 trace-file counts, which its ledger homes here
+- **consumes-from** `TOOL-dQuietDisk-26` — the one listing per invocation, a saving inside M1
 - **consumes-from** external — the nicocares session's record of its seed-suite readings
 
 ## 4. Design
 
 ### Evidence
 
-Read at `b3f5a2bc3`, the build base, unless a line names another sha. It is the merge that brought
-dWitnessedBar's land tip `fb6f1a74c` into this run (owner ruling, 2026-11-22).
+Read at `18948bf27`, the run branch's tip after TOOL-dQuietDisk-9 closed, unless a line names
+another sha.
 
 - The builder role may run one gate, `lexicon naming predicates` (`.claude/roles.json@c6505c35c853`,
-  `roles.gov-builder.gates`), unchanged at `b3f5a2bc3`. `tools/hooks/scratch-guard.js#checkGateSuite`
+  `roles.gov-builder.gates`), the same blob as at `b3f5a2bc3`. `tools/hooks/scratch-guard.js#checkGateSuite`
   refuses a role agent any `*.test.sh` or `*selftest.py` script
-  (`tools/hooks/scratch-guard.js@e4699ee75:1740`). So
-  the unit pass cannot run M1 or M3. M6 refuses it M2, a leg outside its allowlist. The brief's
-  line "the unit pass takes the after readings" cannot be built, and S3 gives them to the main loop.
+  (`tools/hooks/scratch-guard.js@0251d34d5941:1740`), also unchanged. So the unit pass cannot run M1
+  or M3. M6 refuses it M2, a leg outside its allowlist. S3 gives the after readings to the main loop.
 - `tools/unattended/gate-guard.js#readHeadRef` returns null for a detached HEAD, "because a
-  detached HEAD keys nothing" (`tools/unattended/gate-guard.js@e4699ee75:708`). Its rows deny
-  a suite only where a run record's `run-branch:` equals the ref HEAD names. F2 resolved (a) on
-  that reading: the main loop takes the M1 and M3 readings during RUNNING, in a detached scratch
-  clone.
-- The pass-order leg reads the remote's advertised tip, and a clone with no remote reads "this
-  clone declares no remote to observe" (`tools/unattended/lib-unattended.sh@e4699ee75:1513`).
-  `read_history_range` then grades the whole history (`:1563-1572`), and the leg's summary line
-  ends `range whole (…)`. The same branch held at `59e882afd` and at BASE, so removing `origin`
+  detached HEAD keys nothing" (`tools/unattended/gate-guard.js@7d5e9dc7e4ee:708`), and its caller
+  keys nothing on a null (`:739`). So F2's (a) holds: M1 and M3 are read during RUNNING, in a
+  detached scratch clone.
+- The pass-order leg reads the remote's advertised tip (`tools/gate-legs.json@db79c2db62ea:1773`,
+  the row's `reads.remote`). A clone with no remote reads "this clone declares no remote to observe"
+  (`tools/unattended/lib-unattended.sh@ce94b6dd06aa:1513`), and `read_history_range` then grades the
+  whole history (`:1563-1572`), its summary field reading `range whole (…)`. So removing `origin`
   from the clone fixes M2's mode at every sha.
-- The leg argvs at `b3f5a2bc3` are `bash {prefix}/check-wiring.test.sh`
-  (`tools/gate-legs.json@e4699ee75:752`), `bash {prefix}/unattended/check-pass-order.sh`
-  (`:1770`) and `python {prefix}/govkit/selftest.py` (`:2515`). The pass-order script takes only
-  `--preview` (`tools/unattended/check-pass-order.sh@e4699ee75:241`).
+- The verdict store engages in that whole mode too. `init_hs` opens it whatever the range
+  (`tools/unattended/check-pass-order.sh@bc36c481c969:548`), and only the read of commits past the
+  tip is range-only (`:581`). So M2 run 2 at A-on reads a warm store.
+- The leg argvs are `bash {prefix}/check-wiring.test.sh` (`tools/gate-legs.json@db79c2db62ea:752`),
+  `bash {prefix}/unattended/check-pass-order.sh` (`:1770`) and `python {prefix}/govkit/selftest.py`
+  (`:2539`), each the same text as at `b3f5a2bc3`. The pass-order script takes only `--preview`
+  (`tools/unattended/check-pass-order.sh@bc36c481c969:249`), and its summary line opens
+  `pass-order: graded` (`:1034`).
 - Pass-order excludes the build folder from build-commit selection (its `the record surface excluded`
-  line, `tools/unattended/check-pass-order.sh@e4699ee75:767`). This unit writes only under the
+  line, `tools/unattended/check-pass-order.sh@bc36c481c969:1035`). This unit writes only under the
   build folder, so the leg reads it as `unbuilt-in-range` and never as a violation.
 - The analysis took M1 at gov `608aa364c` with the same three instruments: 307.7 s, 3,786 git
   processes, peak 524, residue 0, PINNED 2026-11-20
-  (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`, §2). It
-  estimated M2 at about 11.5k git processes and 1,054 s [PINNED] (§3 row G3), an estimate and not a reading.
+  (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`, §2). B0
+  measured M2 cold at 1,057,875 ms and 9,319 git processes (the record's Readings, PINNED
+  2026-11-21).
 - `govkit selftest` is budgeted 1,600 s, from a worst of 7 readings of 1,065 s, PINNED
-  (`tools/run-gates/selftest-budgets.txt@e4699ee75:67`).
+  (`tools/run-gates/selftest-budgets.txt@0c01c70b8f71:67`).
+- The nicocares record exists: the shared notes' `fix4-nicocares-landed.md` names the
+  dSeededKiln build's measurements file in d41ly/nc, and a `git cat-file -e` of it at `7b9396cae`
+  in `C:/projects/nicocares/main` exits 0 (PINNED 2026-11-22).
+
+### The switches as built
+
+Three policy keys carry `owner = "dQuietDisk"` in `tools/policy/catalogue.toml@3c136d9f8dbe` (lines
+1799, 1807 and 1815). "Today" is the value that gives the behaviour before this build.
+
+| Unit | Key | Today's value | Default | Subjects here |
+|---|---|---|---|---|
+| TOOL-dQuietDisk-1 | `tests.history-verdicts` | `regraded` | `stored` | M2, through units 2 and 28 |
+| TOOL-dQuietDisk-7 | `tests.fixture-templates` | `per-case` | `shared` | M3, through unit 11's cache |
+| TOOL-dQuietDisk-18 | `install.baseline` | `run` | `reuse` | none read from the clone |
+
+No other unit added a switch. Units 2, 3, 4 and 28 read unit 1's key, and units 11, 12 and 13 read
+unit 7's. Units 5, 8, 9, 10, 14, 16 and 26 each state that they carry none, and units 6, 15 and 17
+built nothing. `GATE_OUTER_AMBIENT_TMP`, `FX_TEMPLATE` and `HS_RESOLVED` are not switches, as their
+units say.
+
+No environment variable holds any of the three keys:
+- Each reader calls `policy.py get <key>` with no `--rev` where it grades:
+  `tools/lib/history_store.py#read_policy_mode`, `tools/lib/template_cache.py#TemplateCache` and
+  `tools/lib/template-cache.sh#read_template_mode`. Unit 18's key is read in the target.
+- With no `--rev`, `policy.py` reads the committed policy file at the landed revision
+  (`tools/policy/policy.py@b1894836c6de:779`): in a clone with no remote, the local branch
+  `GOV_DEFAULT_BRANCH` names, else `main` (`tools/policy/policy.py#derive_landed_revision`).
+- It reads no other environment value than `GOV_REMOTE`, `GOV_DEFAULT_BRANCH` and
+  `GOV_SETTINGS_JSON` (`tools/policy/policy.py@b1894836c6de:404`, `:425`, `:991`), and the
+  instrument's clone holds one local branch.
+- `init_hs` re-exports `HS_RESOLVED` on every leg start
+  (`tools/unattended/lib-unattended.sh@ce94b6dd06aa:2621-2622`), overwriting a value set before `--`.
+
+So A-off reads them from a source whose `main` sets them (§4 "The calls", F3 (b)). A-on reads them
+at their defaults: a clone made from W read `stored` and `shared` from the policy file at
+`35d0dc3ff`, W's `main`, which sets neither (PINNED 2026-11-22). `install.baseline` needs no
+holding: every M3 target that reads it is a fixture the suite writes, alike at both A labels.
+
+### Where each unit's saving shows here
+
+| Unit | Status | Where its saving shows in this record |
+|---|---|---|
+| TOOL-dQuietDisk-1 | CLOSED | M2, through unit 2's grading, between A-off at `regraded` and A-on |
+| TOOL-dQuietDisk-2 | CLOSED | M2 warm, the owner of every M2 row |
+| TOOL-dQuietDisk-3, TOOL-dQuietDisk-4, TOOL-dQuietDisk-12, TOOL-dQuietDisk-13 | CLOSED | none: their leg or suite is no subject |
+| TOOL-dQuietDisk-5 | CLOSED | none: a direct run reads no guard diff |
+| TOOL-dQuietDisk-6 | WONTDO | owns no saving, by its F1 (b) |
+| TOOL-dQuietDisk-7 | CLOSED | M3, through unit 11 |
+| TOOL-dQuietDisk-8 | CLOSED | only where M3 reaches a clone site it changed, in B0 against A; not split out |
+| TOOL-dQuietDisk-9 | CLOSED | M3 residual temp, in B0 against A; it owns that row |
+| TOOL-dQuietDisk-10 | CLOSED | M1, in B0 against A; it owns every M1 row |
+| TOOL-dQuietDisk-11 | CLOSED | M3 git processes and peak temp; it owns those rows |
+| TOOL-dQuietDisk-14 | CLOSED | none: an attestation record saves no process here |
+| TOOL-dQuietDisk-15 | DEFERRED | owns no saving, by its F1 (c) |
+| TOOL-dQuietDisk-16 | CLOSED | inside M3's update arms, in B0 against A; not split out |
+| TOOL-dQuietDisk-17 | WONTDO | owns no saving, by its F2 (c) |
+| TOOL-dQuietDisk-18 | CLOSED | its own AC8 pair, in `Owed by other units` |
+| TOOL-dQuietDisk-26 | CLOSED | inside M1, in B0 against A, read in the top-subcommands column |
+| TOOL-dQuietDisk-28 | CLOSED | inside M2, within unit 2's bound |
+
+TOOL-dQuietDisk-26's share of M1 is the fall in the `ls-files` and `check-attr` counts that the top
+git subcommands column prints, which read 1,679 and 421 at B0 (PINNED, the record's B0 M1 row).
+
+### Where M1, M2 and M3 put their scratch after TOOL-dQuietDisk-9
+
+The instrument's temp counters still see every entry each subject makes:
+- **M3.** `tools/govkit/selftest.py#main` calls `init_owned_tempdir` first
+  (`tools/govkit/selftest.py@b69edc6594ea:6569`). Under the instrument, `TEMP`, `TMP` and `TMPDIR`
+  name the run's `t` directory, which is no owned root. So the suite makes one `gate-work.*` root
+  under `t`, with its `owner` line and a `tmp` directory, and points `tempfile` and its children's
+  three variables at that `tmp`. It removes the root at exit (`tools/lib/owned_scratch.py#init_owned_tempdir`).
+  Its template cache finds the same root and keeps `templates` there (`tools/lib/template_cache.py#TemplateCache`).
+  All of it sits under `t`, so peak and residual count it, with the Limits line's 3 entries and 1
+  git process more. A killed run's root stays in its own `t`, which no later run reads.
+- **M1.** TOOL-dQuietDisk-9 wrote no line of `tools/check-wiring.test.sh` (`git show --stat
+  525d33285`). Its scratch is still `mktemp -d` under `TMPDIR`, the run's `t`.
+- **M2.** `tools/unattended/check-pass-order.sh` still makes its scratch with `mktemp -d`
+  (`tools/unattended/check-pass-order.sh@bc36c481c969:502`). `history_store.py` makes an owned root
+  only in its `--selftest` (`tools/lib/history_store.py#run_selftest`), so M2 makes none.
 
 ### The subjects
 
@@ -123,13 +217,17 @@ dWitnessedBar's land tip `fb6f1a74c` into this run (owner ruling, 2026-11-22).
 |---|---|---|---|---|
 | M1 | check-wiring suite | `bash tools/check-wiring.test.sh` | 1 | `.` |
 | M2 | pass-order leg | `bash tools/unattended/check-pass-order.sh` | 2, cold then warm | `^pass-order: graded` |
-| M3 | govkit suite | `python tools/govkit/selftest.py` | 1 | `.` |
+| M3 | govkit suite | `python tools/govkit/selftest.py`, behind the branch wrapper below | 1 | `.` |
 | M4 | nicocares seed suite | read from the nicocares record, never run here | — | — |
 
 A run's argv is the leg row's own at the sha it measures, with `{prefix}` read as `tools`. If a unit
-of this build changes a row's argv, A follows the change. A clone made fresh holds no verdict
-store, because the store lives under the clone's own git dir, so run 1 of M2 is cold. Run 2 runs in
-the same clone with nothing committed between, so it is warm.
+of this build changes a row's argv, A follows the change; none has at `18948bf27`. M3 runs behind
+`bash -c 'git branch -q qd-measured HEAD && exec python tools/govkit/selftest.py'` at every label,
+as B0 did. The suite refuses a working tree no ref reaches, and the instrument's `remote remove
+origin` deletes the clone's remote-tracking refs. The wrapper adds 1 git process (the record's
+Limits, PINNED 2026-11-21). A clone made fresh holds no verdict store, because the store lives
+under the clone's own git dir, so run 1 of M2 is cold. Run 2 runs in the same clone with nothing
+committed between, so it is warm.
 
 ### The instrument
 
@@ -202,31 +300,68 @@ I=<scratch>/qd-measure.sh; R=<temp>/qd; S=<the sha this row set is taken at>
 W=$(git rev-parse --path-format=absolute --git-common-dir)
 bash "$I" "$R" "$W" "$S" B0 M1 1 . -- bash tools/check-wiring.test.sh
 bash "$I" "$R" "$W" "$S" B0 M2 2 '^pass-order: graded' -- bash tools/unattended/check-pass-order.sh
-bash "$I" "$R" "$W" "$S" B0 M3 1 . -- python tools/govkit/selftest.py
+bash "$I" "$R" "$W" "$S" B0 M3 1 . -- bash -c 'git branch -q qd-measured HEAD && exec python tools/govkit/selftest.py'
 ```
 
-For A-off, the label is `A-off`, M2 takes one run, and each switch goes before `--` as `KEY=value`.
-The key is the one its unit's spec names and the value is today's behaviour. A switch that a single
-run cannot set gets a hand-written row instead: label, sha and subject, `not taken` in the rc cell,
-`-` in each number cell, and the key with its reason in the last cell. For A-on, the label is
-`A-on` and the calls are as for B0. M2's call is then made a second time, labelled `A-on-again`,
-for AC8.
+For A-on, the label is `A-on` and the calls are as for B0. M2's call is then made a second time,
+labelled `A-on-again`, for AC8.
+
+For A-off, the main loop first builds the A-off source with the block below, in the calls' shell.
+`<scratch>` is the session scratch root spelled `C:/...`, since an alternates line refuses an MSYS
+`/c/...` path. The source writes one blob, one tree and one commit and reads the rest from W, which
+is never written. The guard line prints `STOP` when W's `main` policy file already has a `[tests]`
+table, and then no A-off reading is taken. The last line prints the lines the extra commit adds,
+which the Switches section records with that commit's sha.
+
+```bash
+OFF=<scratch>/qd-off.git; OFFIDX=<scratch>/qd-off.idx
+M=$(git -C "$W" rev-parse refs/heads/main)
+git -C "$W" cat-file blob "$M:.governance/policy.toml" | grep -q '^\[tests\]' && echo "qd-off: STOP, the policy file at main already holds [tests]"
+git clone -q --bare --shared "$W" "$OFF"
+git -C "$OFF" symbolic-ref HEAD refs/heads/main
+b=$( { git -C "$OFF" cat-file blob "$M:.governance/policy.toml"
+       printf '\n[tests]\nhistory-verdicts = "regraded"\nfixture-templates = "per-case"\n'; } \
+     | git -C "$OFF" hash-object -w --stdin )
+GIT_INDEX_FILE=$OFFIDX git -C "$OFF" read-tree "$M"
+GIT_INDEX_FILE=$OFFIDX git -C "$OFF" update-index --add --cacheinfo "100644,$b,.governance/policy.toml"
+t=$(GIT_INDEX_FILE=$OFFIDX git -C "$OFF" write-tree)
+git -C "$OFF" update-ref refs/heads/main "$(git -C "$OFF" commit-tree "$t" -p "$M" -m 'A-off: the switches at today')"
+git -C "$OFF" cat-file blob "$(git -C "$OFF" rev-parse refs/heads/main):.governance/policy.toml" | tail -3
+```
+
+Then the two A-off calls, at A, each with one run and no `KEY=value`, and the source's removal once
+both rows are printed. By then the instrument has removed its own clone, the source's only reader.
+
+```bash
+bash "$I" "$R" "$OFF" "$S" A-off M2 1 '^pass-order: graded' -- bash tools/unattended/check-pass-order.sh
+bash "$I" "$R" "$OFF" "$S" A-off M3 1 . -- bash -c 'git branch -q qd-measured HEAD && exec python tools/govkit/selftest.py'
+rm -rf "$OFF" "$OFFIDX"
+```
+
+The instrument's clone of the source holds the extra commit as its one local branch, `main`, and
+checks out A detached, so it measures A and reads the two keys at their today values (F3's probe).
+M1 gets a hand-written row: label `A-off`,
+A's sha in nine characters, subject `M1`, run `1`, `not taken` in the rc cell, `-` in each number
+cell, and in the last cell
+`no switch governs M1: TOOL-dQuietDisk-10 (its F3 (a)), TOOL-dQuietDisk-26 and TOOL-dQuietDisk-9 carry none`.
+`install.baseline` is not set, and need not be (§4 "The switches as built").
 
 ### The record
 
-`memory/builds/dQuietDisk/build/<date>-build-TOOL-dQuietDisk-19-measurements.md`, dated the day the
-B0 commit creates it. Its first line after the title is `**Serves:** journal TOOL-dQuietDisk-19`.
+`memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-19-measurements.md`, created by the
+B0 commit `291aa99e4`. Its first line after the title is `**Serves:** journal TOOL-dQuietDisk-19`.
 Its sections, in this order:
 
 | Section | Written by | Holds |
 |---|---|---|
-| `## Instrument` | B0 commit | `### The instrument` and the fence above, byte for byte, then the python version and the git version |
+| `## Instrument` | B0 commit, its heading line by the unit pass | `### The instrument` and the fence above, byte for byte, then the python version and the git version |
 | `## Shas` | B0, then A commit | one row per label: the sha, what it is, the date and time taken; the B0 row names `b3f5a2bc3` |
-| `## Readings` | B0, then A commit | the header row, then the instrument's rows as printed, AC8's re-take included |
-| `## Switches set for A-off` | A commit | one row per key: the unit, the key, the value set, the subjects it governs |
+| `## Readings` | B0, then A commit | the header row, then the instrument's rows as printed and A-off's hand-written rows, AC8's re-take included |
+| `## Switches at A-off` | A commit | one row per key of §4 "The switches as built": the unit, the key, today's value, the default, the subjects, and how A-off held it (the source commit's sha and its printed lines) or why it needs no holding |
 | `## Comparison` | unit pass | the table below |
-| `## nicocares seed suite` | unit pass | the `awaiting:` line, until a records commit puts a `source:` line and its readings in its place |
-| `## Limits` | unit pass | one line per limit below, and one `rc differs: <subject>` line per pair AC5 finds |
+| `## nicocares seed suite` | unit pass | the `source:` line and the nicocares record's rows |
+| `## Owed by other units` | unit pass, then the main loop's VERIFYING commit | S7's line |
+| `## Limits` | B0 commit, then unit pass | one line per limit below, and one `rc differs: <subject>` line per pair AC5 finds |
 
 The Readings header is `| label | sha | subject | run | rc | wall ms | git processes | peak temp | residual temp | top git subcommands | last line |`.
 The A re-take for AC8 is labelled `A-on-again`, so AC2 does not read it as a second A-on row.
@@ -241,18 +376,25 @@ It has one row per subject and metric: subjects `M1`, `M2 cold`, `M2 warm` and `
 - `saved` is the before value less the A-on value.
 - `percent` is `saved` over the before value, times 100, rounded as Python 3's `round` rounds, or
   `n/a` when the before value is 0. The two counts it divides stay beside it in the same row.
-- `owning unit` is `TOOL-dQuietDisk-10` for M1, `TOOL-dQuietDisk-2` for M2 and `TOOL-dQuietDisk-11`
-  for M3.
+- `owning unit` is `TOOL-dQuietDisk-10` for M1 and `TOOL-dQuietDisk-2` for M2. For M3 it is
+  `TOOL-dQuietDisk-9` on the `residual temp` row and `TOOL-dQuietDisk-11` on the other three.
 - `promised bound` quotes, in double quotes, the bound sentence from that unit's spec, as built.
 - `met` is `yes` or `no`, by the unit pass's reading of the bound against the A-on value.
 
+The `Owed by other units` line is `awaiting: TOOL-dQuietDisk-18 AC8, the main loop's at VERIFYING`
+until the main loop writes
+`TOOL-dQuietDisk-18 AC8: run <n>, reuse <n> trace files, at <sha>` in its place, `run` and
+`reuse` naming the two `install.baseline` copies that unit's AC8 builds.
+
 ### What the comparison means
 
-A-off and A-on read one tree with one history, so the saving between them belongs to this build's
-switches alone. B0 is the reading the brief asks for before the first pass, taken where
-dWitnessedBar's work is already merged. B0 against A-off moves as well with the history the run
-adds, with any default-branch merge the run takes after B0, and with the units that have no
-switch. That is why `before is` prefers A-off. Two runs
+A-off and A-on read one tree with one history, so a saving between them would belong to this
+build's switches alone. B0 is the reading the brief asks for before the first pass, taken where
+dWitnessedBar's work is already merged. B0 against A also moves with the history the run adds, with
+any default-branch merge the run takes after B0, and with the units that have no switch. That is why
+`before is` prefers A-off. M2 and M3 read A-off through the A-off source (F3 (b)), so their savings
+belong to the switches alone. M1 has no switch, so its `before is` reads `B0` and its saving carries
+those three movements with it. Two runs
 of the code at one tree is the fix `memory/gotchas/test-oracle-read-from-a-historical-sha.md` names
 for a frozen oracle.
 
@@ -261,13 +403,21 @@ for a frozen oracle.
 - Peak temp is a sample every 0.5 s, so it is a lower bound on the true peak.
 - Trace2 counts only git processes that inherit `GIT_TRACE2_EVENT`. A fixture that scrubs the
   environment is undercounted, and it is undercounted the same way at every label.
+- At A, M1 holds one arm, TOOL-dQuietDisk-26's AC1, that points `GIT_TRACE2_EVENT` at its own
+  directory for one `check-wiring.sh --check` (`tools/check-wiring.test.sh@968ec8fd8f5c:420`). That
+  call's git processes are missing from M1's A count, at least 3 (DERIVED from the arm's predicate,
+  which passes only on one `ls-files`, one `ls-tree` and one `check-attr`). B0 has no such arm, so
+  M1's `saved` git processes is high by that call.
 - Wall time is indicative. Other sessions share the host, and this record does not read the load.
-- A direct suite run builds no per-bar snapshot, so `TOOL-dQuietDisk-8`'s saving does not show here.
-- `TOOL-dQuietDisk-26` carries no switch, so A-off holds its saving as A-on does. M1's saving between
-  A-off and A-on is `TOOL-dQuietDisk-10`'s alone; unit 26's shows in B0 against A, beside the history
-  the run adds, and in that unit's own acceptance ledger.
-- `TOOL-dQuietDisk-9` carries no switch either, so its residual-temp saving shows only in B0
-  against A, beside the history the run adds, and in that unit's own AC5.
+- A-off's clone holds as local `main` the A-off source's extra commit, and A-on's holds W's `main`
+  tip. The two differ only in the policy file's `[tests]` table, so every other key reads alike.
+- M1's A-off row is `not taken`, so M1's saving is B0 against A-on, with the three movements
+  "What the comparison means" names.
+- TOOL-dQuietDisk-8 builds no runner snapshot (its F1 (b)). Its per-reader clones show only where
+  M3 reaches one, and the record does not split that out.
+- M3 at A makes one owned `gate-work.*` root under the run's `TEMP` (TOOL-dQuietDisk-9). Its peak
+  counts 3 more entries, the root, its owner line and `tmp`, and its git processes 1 more, the
+  root's common-dir read, both DERIVED from `tools/lib/owned_scratch.py#init_owned_tempdir`.
 - Commits folded in after A are not measured.
 
 ### Files touched (estimate)
@@ -277,7 +427,7 @@ for a frozen oracle.
 ### Alternatives rejected
 
 - B0 at BASE as the only "before". The history and the merged default branch move between BASE and
-  A, so B0 against A-on attributes their cost to this build.
+  A, so B0 against A-on attributes their cost to this build. It stays the `before` of M1 alone.
 - `tools/run-gates/profile_bar.py`. It times a whole bar's legs and runs the bar, which no unit
   may run. It counts no git processes and no temp entries.
 
@@ -376,14 +526,15 @@ print("probe done")
 
 - **AC2** — When `python "$P" "$REC"` runs, no line it prints begins `missing ` or `bad `. So the
   record holds the eleven B0, A-off and A-on rows, each with integer rc, wall, git, peak and
-  residual cells, or an A-off row that reads `not taken` and names its key.
-  Red when: a row is absent, a cell holds no integer, or a `not taken` row names no key.
+  residual cells, the A-off M2 and M3 rows among them, or M1's A-off row reading `not taken` with
+  its reason.
+  Red when: a row is absent, a cell holds no integer, or a `not taken` row gives no reason.
   figure: DERIVED from the record at observation time.
 - **AC3** — When the block below runs, it prints `B0 is the build base` and
   `A is one ancestor of HEAD`, and no `late` line.
   Red when: B0 was taken at another sha than the build base `b3f5a2bc3`, the A rows name two shas,
-  or a commit of a unit at orders 1 to 6 lands after A, so A does not hold the work it is said to
-  measure.
+  or a product commit of a unit at orders 1 to 6 lands after A, so A does not hold the work it is
+  said to measure.
 
   ```bash
   BASE=$(sed -n 's/^base:[[:space:]]*//p' memory/builds/dQuietDisk/RUN.md | head -1)
@@ -393,7 +544,8 @@ print("probe done")
     echo "B0 is the build base"; else echo "B0 is not the build base"; fi
   [ "$(printf '%s\n' "$A" | wc -l)" = 1 ] && git merge-base --is-ancestor "$A" HEAD \
     && echo "A is one ancestor of HEAD"
-  git log --format='%H %s' "$BASE..HEAD" | grep -E ' .*TOOL-dQuietDisk-([1-9]|1[0-8]|26)([^0-9]|$)' \
+  git log --full-history --format='%H %s' "$BASE..HEAD" -- . ':(exclude)memory' \
+    | grep -E ' .*TOOL-dQuietDisk-([1-9]|1[0-8]|2[68])([^0-9]|$)' \
     | while read -r c _; do git merge-base --is-ancestor "$c" "$A" || echo "late $c"; done
   ```
 
@@ -411,8 +563,8 @@ print("probe done")
   option (b) writes.
   Red when: the section cites a commit or path the nicocares repository does not hold, or carries
   neither line.
-  fixture: `C:/projects/nicocares/main`, read with `git cat-file` only. The tree holds no nicocares
-  measurement record today.
+  fixture: `C:/projects/nicocares/main`, read with `git cat-file` only. It holds the dSeededKiln
+  measurements file at `7b9396cae`.
 
   ```bash
   sec=$(awk '/^## nicocares seed suite/ { f = 1; next } /^## / { f = 0 } f' "$REC")
@@ -431,7 +583,8 @@ print("probe done")
   Red when: the counts differ, so the instrument does not repeat and no saving it reports can be
   told from noise.
   permission: the main loop's only. A role agent runs no leg outside its allowlist (M6).
-  cost: two runs of the leg, PINNED by the analysis at about 1,054 s each before the build.
+  cost: two runs of the leg; its cold run read 1,057,875 ms at B0 (PINNED, the record's B0 M2 run
+  1), and its warm run is held to unit 2's bound.
 - **AC9** — When the block below runs, it prints `name True serves True sections True`.
   Red when: the file is misnamed, its binding line is absent or names another kind, or a §4 section
   is missing, repeated or out of order.
@@ -443,10 +596,20 @@ print("probe done")
   t = open(p, encoding="utf-8").read()
   name = re.fullmatch(r"\d{4}-\d{2}-\d{2}-build-TOOL-dQuietDisk-19-measurements\.md", os.path.basename(p))
   serves = "**Serves:** journal TOOL-dQuietDisk-19" in t.splitlines()[:12]
-  want = ["Instrument", "Shas", "Readings", "Switches set for A-off", "Comparison",
-          "nicocares seed suite", "Limits"]
+  want = ["Instrument", "Shas", "Readings", "Switches at A-off", "Comparison",
+          "nicocares seed suite", "Owed by other units", "Limits"]
   print("name", bool(name), "serves", serves, "sections", re.findall(r"^## (.+)$", t, re.M) == want)
   EOF
+  ```
+
+- **AC10** — When the block below runs, it prints one line, either the `awaiting:` line or the
+  counts line §4 "The record" spells for TOOL-dQuietDisk-18's AC8.
+  Red when: the section is absent, or holds neither line, or a counts line whose two cells are not
+  integers.
+
+  ```bash
+  awk '/^## Owed by other units/ { f = 1; next } /^## / { f = 0 } f' "$REC" \
+    | grep -m1 -E '^(awaiting: TOOL-dQuietDisk-18 AC8, |TOOL-dQuietDisk-18 AC8: run [0-9]+, reuse [0-9]+ trace files, at [0-9a-f]{9,40}$)'
   ```
 
 ## 6. Gates
@@ -454,9 +617,9 @@ print("probe done")
 `memory hygiene` · `recall floor` · `recall floor arms` · `pass-order history` · `brief-recorded`
 
 `python tools/check-spec-tokens.py --legs-for` over a record under `memory/builds/dQuietDisk/build/`
-names `recall floor` and `recall floor arms`, both through the `memory/` guard. The other three are
-unguarded. The memory hygiene leg grades the record's filename and binding line, and the two
-history legs grade this unit's pass and brief. No arm is added or moved.
+names `recall floor` and `recall floor arms`, both through the `memory/` guard (re-run at
+`18948bf27`). The other three are unguarded. The memory hygiene leg grades the record's filename and
+binding line, and the two history legs grade this unit's pass and brief. No arm is added or moved.
 
 ## 7. Open questions
 
@@ -490,6 +653,24 @@ history legs grade this unit's pass and brief. No arm is added or moved.
   RESOLVED (agent, 2026-11-20, delegated): (a). The main loop takes the M1 and M3 readings during
   RUNNING, in a detached scratch clone, and this unit moves from order 4 to order 5, after
   TOOL-dQuietDisk-26.
+- **F3 — No switch this build added can be held at its today value by a `KEY=value` before `--`, so
+  every A-off row is `not taken`. Should A-off be taken another way?**
+  §4 "The switches as built" gives the reading: each key is read from the committed policy file at
+  the clone's landed revision, which no environment value moves. The re-ground task ruled the
+  `not taken` cell for such a switch, under which every Comparison row reads `before is` `B0`.
+  - (a) Keep it so: three hand-written A-off rows, and every saving B0 against A-on.
+  - (b) Take A-off for M2 and M3 from a policy-carrying source, the block §4 "The calls" holds,
+    passed as the A-off calls' `<repo>`; the instrument and B0 are unchanged. A probe of that block
+    on 2026-11-22 at `18948bf27` read `regraded` and `per-case` through `policy.py get` and
+    `per-case` through `read_template_mode`, where a clone of W read `stored` and `shared` (PINNED).
+    It costs one scratch repository and one commit object outside every worktree.
+  - (c) Teach the instrument to commit a policy file in its own clone, breaking S1 and AC1.
+  Recommendation: (b). It restores the one-tree comparison for the two subjects a switch governs.
+  Its precondition, no `[tests]` table in the policy file at W's `main`, holds at `35d0dc3ff`.
+  RESOLVED (agent, 2026-11-22, delegated): (b), take A-off through a bare --shared clone whose main
+  carries one extra commit setting tests.history-verdicts and tests.fixture-templates to their today
+  values. The instrument stays byte for byte and A-off becomes a reading, so the saving between
+  A-off and A-on belongs to the switches alone.
 
 ## 8. Revision log
 
@@ -516,15 +697,30 @@ history legs grade this unit's pass and brief. No arm is added or moved.
 - rev-4 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
   4 the analysis's estimated wall time is marked PINNED, as read from that record. Design, scope and
   acceptance unchanged.
+- rev-5 · 2026-11-22 · S1 · S2 · S3 · S5 · S6 · S7 · §3 · §4 · AC2 · AC3 · AC7 · AC8 · AC9 · AC10 ·
+  §7 · F3 · re-grounded at 18948bf27 (orders 1 to 6 built), under
+  `2026-11-22-prompt-TOOL-dQuietDisk-19-reground-task`. What moved: Evidence re-cited by blob
+  (gate-guard's null HEAD, the govkit argv to 2539, the pass-order surface line to 1035). The
+  switches as built are units 1, 7 and 18's keys, which no environment value holds. A table says
+  where each unit's saving shows, units 6 and 17 owning none; M1 reads no switch, so units 10, 26
+  and 9 save between B0 and A. M3's residual-temp row moves to unit 9, whose scratch the counters
+  still see. The calls carry M3's branch wrapper. S2 records B0 in `291aa99e4`, whose fence lacks
+  its `### The instrument` heading, which S1 has the pass add for AC1. S5 writes the nicocares
+  `source:` line. Scope widens by S7 and AC10, as unit 18's ledger homes its AC8 counts here, so
+  AC9 reads eight sections, one renamed. AC3's late set adds unit 28 and reads product commits only.
+  A Limits line names unit 26's traced arm. F3 resolved (b) by the main loop under the run's
+  mandate: S3, §4 "The calls" with the A-off source's block under the session scratch root and its
+  removal, the comparison and Limits lines and AC2 read A-off for M2 and M3 from that source, M1
+  alone `not taken`. The goal does not move.
 
 ## 9. Reuse audit
 
 No existing seam fits. `python tools/codebase-map/reuse_lookup.py "count git processes and temp entries while a suite runs"`
-returned name-token neighbours only: `run`, `git`, `run_git` and `scan_processes`. None counts
-trace2 files or temp entries. `tools/run-gates/profile_bar.py` is the nearest instrument in the
-tree, and it times a whole bar (§4 Alternatives rejected). No file under `tools/`, `skills/` or
-`.githooks/` sets `GIT_TRACE2_EVENT` (`git grep -l` at `b3f5a2bc3`). The analysis's §2 readings used
-the same three instruments, but its script lived only in that session's scratch. So this record
-carries its instrument itself, and the area is dWitnessedBar's (Test: gate health and budgets).
+returned name-token neighbours only (`run`, `git`, `run_git`, `scan_processes`); none counts trace2
+files or temp entries. `tools/run-gates/profile_bar.py` times a whole bar (§4 Alternatives
+rejected). At `18948bf27`, `git grep -l GIT_TRACE2_EVENT` lists only `tools/check-wiring.test.sh` and
+`tools/lib/lib-selftest.test.sh`, each tracing one arm (`tools/lib/lib-selftest.test.sh@f019992ea020:245`).
+The analysis's script lived only in its session's scratch, so this record carries its instrument,
+in dWitnessedBar's area (Test: gate health and budgets).
 
 Recall terms used: `python tools/memory-recall/query.py "how did a build record before and after measurements of git processes and suite wall time" --terms "GIT_TRACE2_EVENT git processes wall time before after measurement scratch clone temp entries evidence record"`
