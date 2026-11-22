@@ -33,7 +33,7 @@ Nothing was committed. TOOL-dTotalRecall-1 stops on a spec divergence: as §4 wr
 - Each fixture plant ran once through `python record_kinds.py --fixture [--plant <case>]`. This stands in for the `record-kinds` leg's `--selftest` arm.
   - Exit 1, each red line naming its subject: `writer-missing`, `check-unknown`, `source-drift`, `factory-kind-unrowed`, `field-missing`, `region-edited`, `gap-unresolved`.
   - Exit 0: the green fixture and `field-missing-legacy`.
-- `--check` over the real tree finished in under 2 seconds.
+- `--check` over the real tree finished in under 2 seconds (DERIVED, the builder's timed run).
 - A population probe of the draft found the overlaps: the `acceptance` home matches 1167 acceptance-ledger records and the `probe` home matches one probe-design record. That is the divergence in `why`.
 - Away from those two overlaps, no existing record misses a field or carries one out of order.
 
@@ -46,6 +46,6 @@ Nothing was committed. TOOL-dTotalRecall-1 stops on a spec divergence: as §4 wr
 - Both `New arm:` RED-first observations: `record_kinds.py --check`/`--selftest`, staged by deleting one row's `writer`; and `step_gate.py --fixture --plant record-kind-schema`.
 - AC3 and AC4, which need a commit for the step gate's clone.
 - AC5's `adopt-memory-tree.sh --render` parity.
-- The §7 legs.
+- The legs the gates section names.
 
 `gotchas.py --for-diff` did not run, because there is no commit. No command timed out or was skipped.

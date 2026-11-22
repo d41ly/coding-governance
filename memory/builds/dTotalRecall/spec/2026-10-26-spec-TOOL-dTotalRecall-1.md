@@ -31,6 +31,7 @@
 | [2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md) | research | TOOL-dTotalRecall-11 TOOL-dTotalRecall-25 |
 | [2026-11-22-build-TOOL-dTotalRecall-1-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-1-builder-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-2-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-2-acceptance-ledger.md) | journal | — |
+| [2026-11-22-build-TOOL-dTotalRecall-1-2-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-2-builder-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-divergence-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-divergence-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-reground-return.md) | research | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md) | journal | — |
