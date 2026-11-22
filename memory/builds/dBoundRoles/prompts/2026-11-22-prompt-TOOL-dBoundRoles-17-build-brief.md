@@ -20,6 +20,10 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every roster spec was re-grounded on HEAD before this dispatch, so its citations hold at HEAD or name the earlier
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
+- This is the second dispatch. The first builder (run `wf_1aee65de-95e`) found a positional `MARKER_RE` reader in
+  `tools/roles/render_agents.py`, a seeded file only a later unit admitted, and one stale count; rev-6 folds all three,
+  and this unit now admits `F:work-order-legacy.txt` in hygiene check 3 itself (§8 F5), its guide row rendered into
+  `memory/HYGIENE.md` by `kit-dogfood-parity.test.sh --render`.
 - Generated outputs are admitted undeclared and belong in the pass commit: `.claude/roles.json` and `.claude/agents/` as
   `render_agents.py --write` renders them, every file `gen_build_index.py --write` rewrites, the dClosedLoop as-built
   view and the map generator's output. Any other path outside the declared set: name it in your return and do not

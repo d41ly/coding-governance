@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-44 — the round-1 audit's 11 docs-and-records minors: memory readers re-derived, frozen receipt waived, gotcha pages re-pointed, two Skills fitted, legacy registry named, workflow suites re-keyed and the close's harness swap checked
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -28,7 +28,7 @@ The round-1 spec audit of the 26 unit specs
 (`memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md`) confirmed
 43 MEDIUM and 14 LOW findings. BUILD-METHOD M4 batches them into two units because they split into
 disjoint write sets by M6; `TOOL-dBoundRoles-43` §4 "Why two units" holds the cut and its evidence. This
-unit takes the 11 whose items write only docs, Skills, the hygiene check, gotcha pages, dead-path rows,
+unit takes the 11 whose items write only docs, Skills, the hygiene guide, gotcha pages, dead-path rows,
 the workflows suites' role maps and the build README, and read no file unit 43 writes: report ids 3, 5,
 16, 17, 26, 28, 43, 48, 49, 51 and 62, nine MEDIUM and two LOW. Each is its own scope item; before the
 split they were unit 43's S3, S4, S18, S20, S26, S30, S31, S33, S42, S47 and S48. Id 3 is the MEDIUM half
@@ -83,11 +83,13 @@ of the defect `TOOL-dBoundRoles-42` closes at HIGH.
   `tools/check-dead-paths.sh --list` reports for `agent-cap.js` or `agent-cap.test.sh` names
   `tools/roles/spawn-guard.js`, `tools/hooks/scratch-guard.js` or the moved rule's home instead. A gotcha
   page is served as live, so it is re-pointed, never waived. Observed by AC5.
-- **S6** — id 48. The legacy registry is a named kit-shipped case. `tools/memory-tree/check-memory-hygiene.sh`
-  check 3 admits `F:work-order-legacy.txt` by name beside `F:role-stand-in-waiver.txt`, with a comment
-  naming the roles kit as its shipper; `tools/memory-tree/HYGIENE.template.md` gains its registry row,
-  `memory/HYGIENE.md` its render; and `.memory-tree.conf`'s `PROJECT_REGISTRY_EXTRA` does not carry it.
-  Observed by AC6.
+- **S6** — id 48. The legacy registry is a named kit-shipped case, consumed as built.
+  `TOOL-dBoundRoles-17` makes the admission: its pass that seeds `memory/project/work-order-legacy.txt`
+  also admits `F:work-order-legacy.txt` by name in `tools/memory-tree/check-memory-hygiene.sh` check 3,
+  beside `F:role-stand-in-waiver.txt` (`tools/memory-tree/check-memory-hygiene.sh@c2fc4073:1102-1104`),
+  with its comment naming the roles kit as its shipper. This unit writes neither the case nor the
+  comment. `tools/memory-tree/HYGIENE.template.md` carries its registry row, `memory/HYGIENE.md` its
+  render; and `.memory-tree.conf`'s `PROJECT_REGISTRY_EXTRA` does not carry it. Observed by AC6.
 - **S7** — id 49. The unattended Skill fits its ceiling. With the `handoff.py facts` line unit 13 S7 adds
   to `tools/unattended/SKILL.template.md`, the render `.claude/skills/unattended/SKILL.md` stays within
   the row `tools/template-size-limits.txt` declares for it, measured CR-stripped. At HEAD `c93f676e` the
@@ -134,7 +136,7 @@ of the defect `TOOL-dBoundRoles-42` closes at HIGH.
 - **consumes-from** `TOOL-dBoundRoles-10` — `checkDriverRead`'s refusal of the search tool, which S4's kickoff line stops naming (id 28)
 - **consumes-from** `TOOL-dBoundRoles-11` — `FORK_RECORD_CUTOFF`, which S10 places after this build's spec dates (id 16)
 - **consumes-from** `TOOL-dBoundRoles-13` — the `facts` verb's Skill line, which S7 fits under the Skill's ceiling (id 49)
-- **consumes-from** `TOOL-dBoundRoles-17` — the seeded `work-order-legacy.txt`, which S6 admits by name in hygiene check 3 (id 48)
+- **consumes-from** `TOOL-dBoundRoles-17` — the seeded `work-order-legacy.txt` and its admission by name in hygiene check 3, both built by unit 17 in one pass, which S6 consumes as built; without it the seeded file reds memory hygiene (id 48)
 - **consumes-from** `TOOL-dBoundRoles-21` — S8's mirror step, whose second commit S8 leaves unmade (id 51)
 - **consumes-from** `TOOL-dBoundRoles-24` — the anchor check's docs promise, which S11 writes into `help/roles.md` (id 17)
 - **consumes-from** `TOOL-dBoundRoles-25` — the retirement, S8's readers and the close, whose memory half, frozen receipt, gotcha pages and harness swap S1, S3, S5 and S9 complete (ids 3, 26, 43 and 62)
@@ -159,13 +161,13 @@ what is missing or records that a landed unit already left it.
 
 ### Inventory
 
-Minted: the `dead-path-waivers` rows of S3 and the widen record the door writes for them, check 3's
-named case and its `HYGIENE.template.md` registry row (S6), and the README rule of S9. No function,
-constant or plant.
+Minted: the `dead-path-waivers` rows of S3 and the widen record the door writes for them, the
+`HYGIENE.template.md` registry row of S6 where none stands, and the README rule of S9. Check 3's named
+case is unit 17's. No function, constant or plant.
 
 ### Migration
 
-None: no stored data changes. S6's named case is additive for an adopter's hygiene run.
+None: no stored data changes. S6's named case is unit 17's, additive for an adopter's hygiene run.
 
 ### Rollout
 
@@ -180,8 +182,6 @@ Live at landing, at order 29, after every unit it repairs and beside `TOOL-dBoun
 - `memory/builds/dBoundRoles/build/`, the widen record of S3
 - `skills/session-kickoff/SKILL.md`
 - `memory/gotchas/`
-- `tools/memory-tree/check-memory-hygiene.sh`
-- `tools/memory-tree/check-memory-hygiene.test.sh`
 - `tools/memory-tree/HYGIENE.template.md`, rendered to `memory/HYGIENE.md`
 - `tools/unattended/SKILL.template.md`, rendered to `.claude/skills/unattended/SKILL.md`
 - `memory/guides/UNATTENDED-VERBS.md`
@@ -198,14 +198,15 @@ Live at landing, at order 29, after every unit it repairs and beside `TOOL-dBoun
 
 ## 5. Production-readiness checklist
 
-- security — no new write path; S6 admits one registry file by name in check 3, never a pattern.
+- security — no new write path; S6 consumes unit 17's admission of one registry file by name in check 3,
+  never a pattern.
 - perf / scale — greps, byte counts, one dead-path listing and one hygiene run over a fixture.
 - error / empty / loading states — S1 records a `memory/` reader no class takes rather than passing it.
 - observability — the ledger records S1's classes and S3's differences.
 - risks — S9 depends on the main loop following a written rule, whose check unit 25's ledger records;
   S7's trim must keep every line the Skill's readers act on.
 - testing — AC1 to AC11 by grep, diff, byte count, the dead-path checker's `--list` and the hygiene check
-  on a fixture; the arm of §7 at the close.
+  on a fixture.
 - migration — none.
 - user docs — `help/roles.md` by S11.
 
@@ -228,10 +229,12 @@ Live at landing, at order 29, after every unit it repairs and beside `TOOL-dBoun
 - **AC5** — When `bash tools/check-dead-paths.sh --list` runs on the built tree, it prints no hit under
   `memory/gotchas/` for the retired hook or its suite.
   Red when: a live gotcha page names the deleted hook.
-- **AC6** — When `bash tools/memory-tree/check-memory-hygiene.sh --only 3` runs over a scratch fixture tree
-  holding the seeded legacy work-order registry under its project folder, it names no finding for that
-  file, and `grep -n 'work-order-legacy' .memory-tree.conf` prints nothing.
-  Red when: the file is refused, or admitted through the project escape that hides the adopter defect.
+- **AC6** — When `grep -n 'F:work-order-legacy.txt' tools/memory-tree/check-memory-hygiene.sh` runs it names
+  the named case unit 17 builds, `bash tools/memory-tree/check-memory-hygiene.sh --only 3` run over a
+  scratch fixture tree holding the seeded legacy work-order registry under its project folder names no
+  finding for that file, and `grep -n 'work-order-legacy' .memory-tree.conf` prints nothing.
+  Red when: unit 17's admission is missing or a pattern, so the file is refused or admitted unnamed, or
+  the file is admitted through the project escape that hides the adopter defect.
   fixture: a scratch tree under the run's scratch path.
 - **AC7** — When `wc -c < .claude/skills/unattended/SKILL.md` runs it prints at most the figure the
   `.claude/skills/unattended/SKILL.md` row of `tools/template-size-limits.txt` holds,
@@ -256,8 +259,6 @@ Live at landing, at order 29, after every unit it repairs and beside `TOOL-dBoun
 ## 7. Gates
 
 `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `scratch-guard self-test` · `dead-path carriers (deleted files still named)` · `kickoff engine size <=18KiB` · `manifest-check self-test` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `unattended skill size` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `branch-guard self-test` · `memory hygiene` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
-
-New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC6 · the roles kit's legacy work-order registry under a fixture project folder, staged by a check 3 without its named case, which refuses the file · none
 
 ## 8. Open questions
 
@@ -315,13 +316,20 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC6 · the rol
   route (F5). S2's readers and S10's count are pinned, and §10's citations re-pointed. Unit 13's line,
   unit 21 S8's second commit, unit 25's AC14 and S8 and unit 42's class table were checked against
   their specs, not HEAD.
+- rev-6 · 2026-11-22 · S6 · §1 · §3 · §4 · §5 · AC6 · §7 · §10 · by
+  `2026-11-22-prompt-TOOL-dBoundRoles-44-spec-fix-1-brief` over
+  `2026-11-22-build-TOOL-dBoundRoles-17-1-builder-return`: S6 drops check 3's admission of
+  `F:work-order-legacy.txt` and its comment, which unit 17 now builds in the pass that seeds the file, and
+  consumes it as built. The consumes-from edge names it, AC6 observes the named case unit 17 builds and
+  keeps the `.memory-tree.conf` check, and §4 Files touched drops the hygiene check and its suite, with
+  the §7 arm only that admission needed. S6's guide row and the leg line stand.
 
 ## 10. Reuse audit
 
 The seams are the dead-path gate's waiver ledger (`memory/project/dead-path-waivers.txt`, whose rows
 `@a66f19bd:10-13` already waive the frozen receipt's dead lexicon path) and its widen door
-(`tools/memory-tree/ratchet.py#run_widen`), hygiene check 3's named kit-shipped cases
-(`tools/memory-tree/check-memory-hygiene.sh@c2fc4073:1073-1120`, the stand-in waiver's at
+(`tools/memory-tree/ratchet.py#run_widen`), hygiene check 3's named kit-shipped cases, which unit 17
+extends and S6 consumes (`tools/memory-tree/check-memory-hygiene.sh@c2fc4073:1073-1120`, the stand-in waiver's at
 `@c2fc4073:1102-1104`, the precedent `TOOL-bQuiltedLantern-3` sets in `memory/DECISIONS.md`), and
 `TOOL-dBoundRoles-42`'s class table.
 `python tools/codebase-map/reuse_lookup.py "admit a kit-shipped registry file by name and waive a frozen fixture's dead path"`
