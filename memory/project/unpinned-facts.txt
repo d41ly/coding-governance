@@ -15155,3 +15155,7 @@ memory/map/features/row-grammar.md	137 rows	1	9e21ac760dc0a43d6ed007396922722cce
 memory/map/features/runlog.md	100,000 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/features/unattended-mandate.md	2 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/generated/CARDS.md	1024 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	11,442 files	1	a5ae9159be35eedf054739ae548860f02d11186d	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	120 s	1	a5ae9159be35eedf054739ae548860f02d11186d	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	1557 lines	1	a5ae9159be35eedf054739ae548860f02d11186d	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
+memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md	60 s	1	a5ae9159be35eedf054739ae548860f02d11186d	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-3
