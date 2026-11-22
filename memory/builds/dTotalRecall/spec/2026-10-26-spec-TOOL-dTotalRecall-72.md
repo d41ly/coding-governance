@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-72 — unit 57's edge to unit 56 is read at step 21 by a probe no shell quotes, and written with its mirror before unit 57 builds if absent
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,9 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-72-deviation-721.md](../build/2026-10-26-build-TOOL-dTotalRecall-72-deviation-721.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-72-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-72-reground-return.md) | research | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-72-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-72-reground-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-72-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-72-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-71 TOOL-dTotalRecall-73 TOOL-dTotalRecall-75 TOOL-dTotalRecall-74 TOOL-dTotalRecall-76 |
 
 <!-- /gen:spec-records -->
@@ -24,8 +27,8 @@ binding grade differs.
 
 `TOOL-dTotalRecall-67` (order 20) passes each string of its §4 table to its probe as `"<string>"`.
 Unit 57's edge string, ``**consumes-from** `TOOL-dTotalRecall-56` ``, holds backticks, so bash runs
-`TOOL-dTotalRecall-56` as a command and the probe counts `**consumes-from** ` alone. That prints 4
-over spec 57 where the edge is absent. Unit 67's S1 therefore reads the edge as present, and its S2
+`TOOL-dTotalRecall-56` as a command and the probe counts `**consumes-from** ` alone. That counts
+every consumes-from head in spec 57, never 0, where the edge is absent (§4 pins the count). Unit 67's S1 therefore reads the edge as present, and its S2
 never writes it. Unit 57 then builds at order 30 with no sequencing edge to unit 56.
 
 This unit does unit 67's reading and writing again for that edge, by a probe whose strings never
@@ -41,7 +44,8 @@ that unit's order and nine steps ahead of units 56 and 57.
 - **S2** — The write. Where the edge string prints 0, this pass writes §4's edge bullet into unit
   57's `### Edges`. Where the mirror string prints 0 in the same case, it writes §4's mirror bullet
   into unit 56's `### Edges`. Each write is a rev bump on that spec, with a §9 line
-  `amended by TOOL-dTotalRecall-72 for TOOL-dTotalRecall-67 (id 10, item H2)`. Observed by AC1.
+  `amended by TOOL-dTotalRecall-72 for TOOL-dTotalRecall-67 (id 10, item H2)`, that phrase unwrapped
+  on one physical line, since AC1's grep reads lines. Observed by AC1.
 - **S3** — The order. This pass precedes the passes of units 56 and 57. Observed by AC2.
 
 ## 3. Non-goals (OUT)
@@ -90,10 +94,14 @@ for n, s in (('57', EDGE), ('56', MIRROR)):
 PROBE
 ```
 
-PINNED, measured 2026-10-26 at `653bed738` and again at `addc4073e` with this probe's `text(rev, …)`
-form: the edge string prints 0 over spec 57 and 0 over spec 61. The mirror string prints 0 over
-spec 56 and 1 over spec 61, whose §3 carries that bullet. The double-quoted form of unit 67 §4
-printed 4 over spec 57 at `addc4073e`, with `TOOL-dTotalRecall-56: command not found` on stderr.
+PINNED, measured 2026-10-26 at `653bed738` and `addc4073e`, and re-measured 2026-11-23 at
+`32d4c2e81` (specs 56 and 57 at rev-4, 61 at rev-3), with this probe's working-tree and `text(rev, …)`
+forms: the edge string prints 0 over spec 57 and 0 over spec 61. The mirror string prints 0 over
+spec 56 and 1 over spec 61, whose §3 carries that bullet; that 1 is the probe's liveness. A path the
+read cannot open raises and exits 1 (DERIVED 2026-11-23, `no-such.md` at both forms). The
+double-quoted form of unit 67 §4 printed 4 over spec 57 at `addc4073e` and 5 at `32d4c2e81`, each with
+`TOOL-dTotalRecall-56: command not found` on stderr: it counts every consumes-from head the spec
+holds, and spec 57 gained a head between the two.
 
 ### The bullets
 
@@ -154,7 +162,9 @@ Minted: nothing in code. Amended, only where S1 reads 0: the specs of units 56 a
 - **AC1** — When the probe of §4 runs at this pass's tip, the edge string prints 1 over unit 57's
   spec and the mirror string prints at least 1 over unit 56's spec.
   `git grep -c "amended by TOOL-dTotalRecall-72" -- 2026-10-26-spec-TOOL-dTotalRecall-57.md`, run
-  from the spec folder, prints 1 exactly when S1's base count of the edge was 0.
+  from the spec folder, prints `2026-10-26-spec-TOOL-dTotalRecall-57.md:1` and exits 0 exactly when
+  S1's base count of the edge was 0; otherwise it prints nothing and exits 1 (DERIVED 2026-11-23 at
+  `32d4c2e81`: nothing, exit 1).
   Red when: the edge is absent from unit 57's spec, or is written twice.
   figure: the base counts are PINNED in §4, measured 2026-10-26; the tip counts are DERIVED by the
   probe at the pass.
@@ -190,6 +200,11 @@ hygiene check 12's mirror rule.
   (HIGH, item H2, the defect of item B1 at its own grade).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-88, each the other end of an edge a
   unit the round-1 spec audit of units 71 to 76 promoted wrote; nothing else moved.
+- rev-3 · 2026-11-23 · §1 · §2 S2 · §4 · §6 AC1 · §10 · per `2026-11-22-prompt-TOOL-dTotalRecall-72-reground-brief`,
+  re-grounded at `32d4c2e81`: §4's base counts re-measured over specs 56, 57 and 61, unchanged, the
+  double-quoted count now 5 and §1 no longer stating one; AC1 states `git grep -c`'s real output and
+  exit, and S2 keeps its §9 phrase on one line for it; §10's recall re-run. Goal, the probe, the
+  bullets, the order and the edges are unchanged; the two base states unit 88's S29 reads stay its.
 
 ## 10. Reuse audit
 
@@ -200,6 +215,8 @@ reaches it: a literal in a quoted heredoc instead of a shell argument. The revis
 ranked name-stem neighbours only (`counts`, `read_spec_revisions`, `parse_spec_h1`), none of which
 counts a phrase in a spec body. The recall query below found the audit's own item and unit 67's
 probe, and `TOOL-aLexedStripper-1` §4, which records that a shell backtick opens command
-substitution. No existing seam fits beyond unit 67's probe.
+substitution. Re-run 2026-11-23, both commands rank the same; the recall query also returns
+`TOOL-dRankedPlan-75` and `TOOL-dCalibratedLens-29`, both DEFERRED, a shell-lint span and a
+paths-on-stdin read, neither of which counts a phrase. No existing seam fits beyond unit 67's probe.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a probe pass a string holding backticks to python without the shell running it" --terms "probe backtick double-quote command-substitution argv joined-text count spec amendment liveness stdin heredoc"`
