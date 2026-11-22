@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-14 — the kit attestation: gov's green held run of a kit's self-tests, recorded by content and carried in the adopter's receipt
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 1
+**Status:** INPROGRESS · rev-3 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,8 @@
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md) | research | TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-9 TOOL-dQuietDisk-19 |
+| [2026-11-22-prompt-TOOL-dQuietDisk-14-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-14-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-14-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-14-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -94,7 +96,7 @@ govkit renders kit literals at the install prefix, so gov's tree id is not the a
 the adopter's bytes are not gov's. The receipt already records both sides of each row
 (`tools/govkit/fixtures/adopter-ic-2cff5855.receipt.json`, every row carrying `source`,
 `gov_oid`, `oid` and `sha256`). `gov_oid` is gov's blob at the row's `commit`; `oid` is the blob the
-target's clean filter made of the bytes that landed (`govkit.py#classify_row`'s docstring).
+target's clean filter made of the bytes that landed (`tools/govkit/govkit.py#classify_row`'s docstring).
 
 So the digest is over `(source, gov_oid)`, which gov computes from its own history and the adopter
 reads from its own receipt, and neither side needs the other's bytes. Whether the adopter's file
@@ -256,6 +258,10 @@ none
   it. Citations moved: the held-tier writer to 5955, the `changed` selection's leg loop to 3345,
   the row hash to 3086, `EPOCH_ROLES` to 14048, and `check-receipt.py`'s read to
   `derive_source_rows`; the base is `e4699ee7`. The record's shape, `sha` and `row`, did not move.
+- rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. The
+  four symbol citations naming the bare basename `govkit.py`, one in section 4 and three in
+  section 10, now name `tools/govkit/govkit.py`. No figure was unpinned and no build-method
+  section was cited by number. Design, scope and acceptance unchanged.
 
 ## 10. Reuse audit
 
@@ -263,12 +269,12 @@ The seams extended: the held-tier last-run records (`<git common dir>/gate-selft
 at `tools/run-gates/run-gates.sh@e4699ee75:5955` and read by the `changed` selection at
 `tools/run-gates/run-gates.sh@e4699ee75:3345`), the runner's row hash and its one tuple of
 declarative keys (`tools/run-gates/held_halves.py@e4699ee75:68`), the epoch survivor set of
-`govkit.py#cmd_shipped`, the descriptor's `[[gate_leg]]` rows
+`tools/govkit/govkit.py#cmd_shipped`, the descriptor's `[[gate_leg]]` rows
 (`tools/govkit/entries/check-wiring.kit.toml@e4699ee75:36`),
-`govkit.py#read_requires_at`, and the receipt's one writer `govkit.py#write_install_receipt`, which
-`apply`, `update` and `adopt` already share. No existing seam records an attestation: the receipt
-has no such key, and `git grep -n -i "attest" e4699ee75 -- tools/govkit/ tools/run-gates/` prints
-nothing.
+`tools/govkit/govkit.py#read_requires_at`, and the receipt's one writer
+`tools/govkit/govkit.py#write_install_receipt`, which `apply`, `update` and `adopt` already share.
+No existing seam records an attestation: the receipt has no such key, and
+`git grep -n -i "attest" e4699ee75 -- tools/govkit/ tools/run-gates/` prints nothing.
 
 `python tools/codebase-map/reuse_lookup.py "record that a kit tree passed its self-tests and carry it to adopters"`
 ranked `tree`, `resolve_kit_dir`, `records` and `remove_tree`, name-token neighbours of which none

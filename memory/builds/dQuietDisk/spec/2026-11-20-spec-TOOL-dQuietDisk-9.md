@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-9 — every scratch path under one owned, swept root, and every tree removed by one chmod-and-retry helper
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 6 · closes TOOL-dQuietDisk-27
+**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 6 · closes TOOL-dQuietDisk-27
 
 <!-- gen:spec-records -->
 
@@ -136,9 +136,9 @@ and `skills/`. The first two rows were run on 2026-11-20:
 
 | Tree | `rmtree` sites | `TemporaryDirectory` sites | Files | Of them, shipped by a kit |
 |---|---|---|---|---|
-| `609cd40b1` | 59 | 11 | 33 | 22 files, 40 sites |
-| HEAD `a5537b925` | 35 | 11 | 15 | 12 files, 26 sites |
-| base `e4699ee75` | 45 | 11 | 21 | 16 files, 34 sites |
+| `609cd40b1` | 59 | 11 | 33 | 22 files, 40 sites [PINNED] |
+| HEAD `a5537b925` | 35 | 11 | 15 | 12 files, 26 sites [PINNED] |
+| base `e4699ee75` | 45 | 11 | 21 | 16 files, 34 sites [PINNED] |
 
 The 11 `TemporaryDirectory` sites are all in `tools/govkit/upgrade_steps.py` (10) and
 `tools/govkit/selftest.py` (1). A line grep finds 57 and 12 at `609cd40b1`; the AST reads a call
@@ -148,7 +148,7 @@ split across lines, which the grep misses. "Shipped" is `python tools/govkit/gov
 land tip added ten `rmtree` sites over `a5537b925`, among them
 `tools/run-gates/verdict_flow.py`, `tools/run-gates/leg_factory.py` and
 `tools/run-gates/verdict_backends.py`. The hand-written hooks, `git grep -nE "onexc|onerror"` at
-`e4699ee75`, sit in 23 files, among them `tools/memory-tree/deviation_join.py#remove_tree`,
+`e4699ee75`, sit in 23 files [PINNED], among them `tools/memory-tree/deviation_join.py#remove_tree`,
 `tools/govkit/upgrade_walk.py#remove_tree`, `tools/govkit/step_gate.py` and
 `tools/lib/commit_trailers.py`. The builder re-runs the predicate at the pass's own base with
 `--cleanup --measure` and moves what it prints. figure: DERIVED at the pass's base; the table is
@@ -226,7 +226,7 @@ or a verdict. `GATE_AMBIENT_TMP` itself stays as that census classes it, assigne
 `tools/run-gates/README.md`
 
 Plus every file the predicate and the hook grep name at the pass's base. At `e4699ee75` those are
-42 files:
+42 files [PINNED]:
 
 `.githooks/pre_push_bar_selftest.py` · `tools/branch-reconcile/selftest.py` ·
 `tools/govkit/fixture_target.py` · `tools/govkit/selftest.py` · `tools/govkit/step_gate.py` ·
@@ -418,7 +418,7 @@ none
   and classed inert in the pre-push knob census. S2 exports the three names from the Python face
   too, the same class. S4 states the three helpers the lifted block calls. What moved: the
   owned-root block to `run-gates.sh` lines 2399 to 2465, unchanged in body; the population to 45
-  `rmtree` and 11 `TemporaryDirectory` sites in 21 files, and the hooks to 23 files, so the file
+  `rmtree` and 11 `TemporaryDirectory` sites in 21 files, and the hooks to 23 files [PINNED], so the file
   list is re-derived; the registry exemption to line 253; the base to `e4699ee7`.
 - rev-3 · 2026-11-22 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task`. The two names
   the lexicon refused lead with a declared verb, each checked by `--suggest`: `scratch_dir` is
@@ -427,6 +427,10 @@ none
   graded run, AC5's suite runs, AC9's `--selftest` and the fixture bars of AC10 and AC11 are owed to
   the main loop, and the pass makes `--measure` runs, a compile check and probes of the extracted
   runner lines.
+- rev-4 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  4 and section 9 the measured file and site counts of the population table, the hook grep's file
+  count, the pass-base file list's count and rev-3's re-ground line are marked PINNED. Design, scope
+  and acceptance unchanged.
 
 ## 10. Reuse audit
 

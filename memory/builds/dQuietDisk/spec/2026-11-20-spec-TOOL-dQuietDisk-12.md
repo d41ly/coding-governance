@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-12 — `pre-push.test.sh` builds each repeated pushed-main fixture once and copies it per arm
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -47,7 +47,7 @@ and fewer real pushes for the same arms with the same RED and GREEN results.
 
 ## 3. Non-goals (OUT)
 
-- Builders whose every call carries distinct arguments: `build_pfx_fixture` (4 calls, 4 argument
+- Builders whose every call carries distinct arguments: `build_pfx_fixture` (4 calls [PINNED], 4 argument
   sets, one of them a hook file the arm rewrites), `build_vr_fixture` (1) and `build_sg_fixture` (2).
   A template used once costs what the build costs.
 - The single-use inline fixtures at lines 285, 923, 974, 1035, 1120, 1261, 1348, 1652, 1935, 2060
@@ -72,7 +72,7 @@ and fewer real pushes for the same arms with the same RED and GREEN results.
 | `build_docs_fixture` | 7 | 5 (`GATE_DOC_PATHS="notes/"` three times) | 2 |
 | `build_bg_fixture` | 20 | 4 (no second argument fourteen times, `$PM_DECL` four times) | 16 |
 
-Counted from the call sites, with a call inside a loop counted once. 24 calls repeat a key.
+Counted from the call sites, with a call inside a loop counted once. 24 calls [DERIVED] repeat a key.
 
 ### What a call costs
 
@@ -169,6 +169,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-20 · initial draft.
+- rev-2 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  3, section 4 and section 10 the call count of `build_pfx_fixture` is marked PINNED, the repeated-key
+  count DERIVED from the call-site table, and dWitnessedBar's changed-line count PINNED. Design, scope
+  and acceptance unchanged.
 
 ## 10. Reuse audit
 
@@ -177,7 +181,7 @@ The seam is TOOL-dQuietDisk-7's template factory, generalising `tools/lib/lib-se
 shape, bare remote plus work plus push, so the factory serves them unchanged.
 `python tools/codebase-map/reuse_lookup.py "build a scratch fixture repository once and clone it per test case"`
 ranked `build_fixture`, `build_target` and `build_scratch_gov` as seams, and no pre-push builder.
-Chain owner: dWitnessedBar (Test). Its branch changes 811 lines of this suite between `9e21ac760` and
+Chain owner: dWitnessedBar (Test). Its branch changes 811 lines [PINNED] of this suite between `9e21ac760` and
 `609cd40b1`: it re-signed `build_ir_fixture` and `build_docs_fixture`, added `build_sel_fixture`,
 and added `build_bg_fixture` calls. This unit builds on its landed tip and re-counts §4's table
 there.

@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-7 — one suite template cache: each base repository built once, keyed by its inputs, and cloned per case
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -120,7 +120,7 @@ as `<path>@609cd40b1:<line>`.
 - `build_fixture` runs a builder once into `$SELFTEST_ROOT/snapshot`, and `_st_run_one` copies it
   per arm with `cp -a` (`tools/lib/lib-selftest.sh#_st_run_one`). The copy is what makes the pool
   safe, by the file's own account, and it copies every object and every hook sample per arm.
-- `fixture_target.py#build_target` builds a target per call through `build_scratch_gov`: an
+- `tools/govkit/fixture_target.py#build_target` builds a target per call through `build_scratch_gov`: an
   `init`, five `config` calls, an `add` and a `commit`, each a process.
 - Two local templates already build once and copy per case: `NEWREPO_SEED` in
   `tools/check-wiring.test.sh@609cd40b1:45` and `TEMPLATE` in
@@ -303,6 +303,9 @@ none
 - rev-3 · 2026-11-22 · §7 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-2-task`. Section
   4 names `tools/lib/`, which trips the guard of `history-store selftest`, the leg TOOL-dQuietDisk-1
   adds, so §7's leg line names that leg.
+- rev-4 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  4 the one symbol citation naming the fixture-target module by its bare basename now names
+  `tools/govkit/fixture_target.py`. Design, scope and acceptance unchanged.
 
 ## 10. Reuse audit
 

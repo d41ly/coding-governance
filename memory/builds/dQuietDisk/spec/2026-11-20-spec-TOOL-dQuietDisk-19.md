@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-19 — the before and after measurements, with their instruments
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-1 · base e4699ee7 · streams tooling · order 7 · ratified 2026-11-20
+**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-1 · base e4699ee7 · streams tooling · order 7 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -112,7 +112,7 @@ dWitnessedBar's land tip `ed833f684` into this run (owner ruling, 2026-11-22).
 - The analysis took M1 at gov `608aa364c` with the same three instruments: 307.7 s, 3,786 git
   processes, peak 524, residue 0, PINNED 2026-11-20
   (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`, §2). It
-  estimated M2 at about 11.5k git processes and 1,054 s (§3 row G3), an estimate and not a reading.
+  estimated M2 at about 11.5k git processes and 1,054 s [PINNED] (§3 row G3), an estimate and not a reading.
 - `govkit selftest` is budgeted 1,600 s, from a worst of 7 readings of 1,065 s, PINNED
   (`tools/run-gates/selftest-budgets.txt@e4699ee75:67`).
 
@@ -512,6 +512,9 @@ history legs grade this unit's pass and brief. No arm is added or moved.
   citation is re-cited at `e4699ee75` (scratch-guard's suite test to 1740, the no-remote branch to
   1513 and the whole-history range to 1563-1572, the three leg argvs to 752, 1770 and 2515, the
   record-surface line to 767); the builder's gate, the budget row and the shard count did not.
+- rev-4 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  4 the analysis's estimated wall time is marked PINNED, as read from that record. Design, scope and
+  acceptance unchanged.
 
 ## 9. Reuse audit
 

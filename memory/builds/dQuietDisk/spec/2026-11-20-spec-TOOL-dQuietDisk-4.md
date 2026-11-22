@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-4 — routed-commits reads only the commits its store does not already hold
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -16,7 +16,7 @@
 ## 1. Goal
 
 `tools/memory-tree/routed_commits.py` reads every commit of HEAD's history with one
-`git log --name-only` per run, about 9,900 commits, measured at 1,761 s by the analysis
+`git log --name-only` per run, about 9,900 commits, measured at 1,761 s [PINNED] by the analysis
 (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`, row G3), and on a
 push it reads them twice, RANGE and WHOLE. A commit's log record never changes once its id exists.
 This unit keeps each commit's parsed record in TOOL-dQuietDisk-1's history verdict store, keyed by
@@ -57,7 +57,7 @@ every line it prints stay byte-identical, the deviation join's lines included.
 - No stored verdict. A commit's verdict reads HEAD's id map, `no spec defines it at HEAD`, which
   moves on every spec commit, so this unit stores the commit's record and grades it each run.
 - No change to `deviation_join.py`. Its per-row pickaxes, which TOOL-aMeasuredDrag-1's findings
-  record measured at about 219 s per bar, are dTrueNorth's join and a separate mechanism.
+  record measured at about 219 s [PINNED] per bar, are dTrueNorth's join and a separate mechanism.
 - No change to `commit_trailers.py`, which three kits carry as one reader.
 - No change to the red-fix limits pass, whose one `git log` runs only over `Red-fix:` commits.
 - No change to the reuse cache's history key, and no change to what is graded.
@@ -77,7 +77,7 @@ All citations are read at `609cd40b1`.
 two populations and calls `read_routed_commits` for each
 (`tools/memory-tree/routed_commits.py@609cd40b1:421`). That calls `read_commits`
 (`tools/memory-tree/commit_trailers.py#read_commits`), whose one `git log -z --root --no-renames
---name-only` over the revision arguments is the 1,761 s. Its count is then checked against
+--name-only` over the revision arguments is the 1,761 s [PINNED]. Its count is then checked against
 `rev-list --count` (`tools/memory-tree/routed_commits.py@609cd40b1:423`). The records feed both the
 grading loop and `check_deviation_join`, which reads `sha`, `parents`, `date`, `trailer` and `paths`
 (`tools/memory-tree/deviation_join.py#read_first_passes`).
@@ -163,7 +163,7 @@ The pass's probes run over a hermetic fixture repository the probe builds under
 `%TEMP%/<short-name>` with `tools/memory-tree/routed_commits.py#build_fixture` and
 `#set_fixture_conf`, called by import and never through the module's `--selftest`: one
 `git fast-import` of the history, a `.memory-tree.conf` naming `ROUTED_PATHS`, a spec tree,
-the trailer key table, and at least 600 commits, so the cold path crosses S5's bound. "Old" is the
+the trailer key table, and at least 600 commits [PINNED], so the cold path crosses S5's bound. "Old" is the
 module at `609cd40b1` and "new" the unit's, each imported or run there by path. A reading over the
 real tree is the gate's own population, which a role agent may not run (scratch-guard row G1), so
 each such reading below is owed to the main loop at the close.
@@ -174,14 +174,14 @@ each such reading below is owed to the main loop at the close.
   `python tools/memory-tree/routed_commits.py` at `609cd40b1` against the new leg, over one scratch
   `git clone --shared` of the real tree at the build's base, they are byte-identical there too.
   Red when: a record assembled from the store differs from the logged one, or the order moves.
-  cost: about 30 minutes per cold run over the real tree, measured 1,761 s by the analysis.
+  cost: about 30 minutes per cold run over the real tree, measured 1,761 s [PINNED] by the analysis.
   permission: the real-tree corpus is owed to the main loop; the pass makes the fixture comparison.
   fixture: the real-tree clone under `%TEMP%` with its own `TEMP`.
 - **AC2** — When the fixture's trailer key table, its copy of `tools/playbook/edges.toml`, gains one
   row, the next run logs the whole population again and prints what the old leg prints.
   Red when: a record stored under the old table is reused.
 - **AC3** — When the new leg runs warm over the fixture with no new commit and the four DESIGN_* keys
-  blank, under `GIT_TRACE2_EVENT=<dir>`, the directory holds at most 12 files and no `log` event
+  blank, under `GIT_TRACE2_EVENT=<dir>`, the directory holds at most 12 files [PINNED] and no `log` event
   names `--name-only` over more than the NEW commits. The main loop takes the same count over the
   real tree at the close.
   Red when: the whole-history log survives on the warm path.
@@ -222,6 +222,10 @@ none
   the module's own `build_fixture`, and the real-tree corpus of AC1 and the real-tree count of AC3
   are owed to the main loop at the close. The spec's own minted constant, `LOG_BATCH_BOUND`, sits in
   no lexicon cell, so nothing of its own needed a rename.
+- rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  1, section 3, section 4, section 6 and section 10 the analysis's commit count and wall time,
+  TOOL-aMeasuredDrag-1's measured pickaxe cost, the fixture's commit floor, AC3's warm bound and
+  dWitnessedBar's changed-line count are marked PINNED. Design, scope and acceptance unchanged.
 
 ## 10. Reuse audit
 
@@ -232,7 +236,7 @@ history legs (`memory/builds/aMeasuredDrag/build/2026-11-15-build-TOOL-aMeasured
 row legs-1 and the routing note under it). Where the brief says to key each commit's verdict, this
 spec keys its record, for the reason section 3 gives. The chain build owning the area is dWitnessedBar
 (Test: gate health), with dScopedBuild (Build: the history-derived exit base); dWitnessedBar changes
-this file by 3 lines at `609cd40b1`.
+this file by 3 lines [PINNED] at `609cd40b1`.
 
 `python tools/codebase-map/reuse_lookup.py "cache parsed commit log records by commit id across runs"`
 returned name-token neighbours only (`run`, `parse`, `parse_args`, `records`). No existing seam fits

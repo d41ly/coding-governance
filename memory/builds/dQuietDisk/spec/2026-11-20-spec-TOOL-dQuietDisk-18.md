@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-18 — `govkit apply` reads both of its verdict maps through the target's reuse cache
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -141,7 +141,9 @@ and writes the entries the AFTER read then reuses.
   apply's for identical verdicts, and differ between two applies of one tree by the sample's draw,
   which fails the build brief's acceptance that apply writes identical receipts on the fixtures.
 - A new receipt field listing the carried legs. It changes the receipt schema every adopter's govkit
-  reads, a shared contract (BUILD-METHOD M3, veto 2), for a fact the run record already holds.
+  reads, a shared contract
+  (`doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority`, veto 2), for a
+  fact the run record already holds.
 - `GATE_BASE=HEAD` for the AFTER read, so legs untouched by the writes skip. A skipped leg after a
   green one is today's "the install broke its guard" refusal (`tools/govkit/govkit.py@609cd40b1:8394-8396`),
   and under that base a skip could no longer tell an untouched leg from a broken guard.
@@ -223,6 +225,9 @@ none
   function the lexicon refused, `effective_before`, is `derive_before_state`, checked by `--suggest`,
   everywhere the spec spells it. No criterion had the pass run a suite, a `--selftest`, a gate leg
   or the bar: AC7's suite reading was already the main loop's.
+- rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  4 and section 10 the rejected alternative's build-method citation names its tag, and dWitnessedBar's
+  changed-line count is marked PINNED. Design, scope and acceptance unchanged.
 
 ## 10. Reuse audit
 
@@ -236,7 +241,7 @@ policy key covers apply's baseline: the catalogue's six `install.` rows at `609c
 `install.from`, `install.guards`, `install.deprecation-window`, `install.on-shim-call`,
 `install.retired-edits` and `install.steps`, and none is about the baseline. Chain
 owners: dSafePassage (Supersession, govkit apply), whose CLOSED specs 5, 10 and 25 to 27 do not touch
-`read_gate_verdicts`, and dWitnessedBar (Test), whose branch changes 277 lines of `govkit.py` between
+`read_gate_verdicts`, and dWitnessedBar (Test), whose branch changes 277 lines [PINNED] of `govkit.py` between
 `9e21ac760` and `609cd40b1` and no line of the BASELINE or AFTER blocks; its unit 16 names "baseline"
 only for the map's own registries. The recall probe surfaced DEPL-dSettledRoster-2, named in §3.
 

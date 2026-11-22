@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-26 — `check-wiring.sh` lists the tree once per invocation
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -192,7 +192,7 @@ at most half of the before reading. Both bounds are DERIVED from the table above
 
 - security: N/A — reads of the repository's own index and attributes; no input, write path or surface added.
 - perf / scale: per `--check` on gov's tree, 21 listing processes become 3; on a tree with a quoted
-  path, today's cost, unchanged. `_LS` on gov's 14,156 paths is about 1 MB of shell string.
+  path, today's cost, unchanged. `_LS` on gov's 14,156 paths is about 1 MB [DERIVED] of shell string.
 - error / empty / loading states: a failed listing or a quoted line falls back to every per-site call
   (S1); a failed batched attribute read falls back per attribute (S3); an empty index gives empty
   reads, exactly as the per-site calls did.
@@ -260,7 +260,7 @@ path is the same in both runs.
   number at most half of the before run's.
   Red when: an arm is lost or changes verdict, or the three do not fall to half.
   permission: a role pass may not run a self-test suite; the main loop observes this at VERIFYING.
-  cost: two suite runs, about 300 s each (the analysis, §2).
+  cost: two suite runs, about 300 s each [PINNED] (the analysis, §2).
   figure: the bound is DERIVED from §4; the counts are DERIVED at observation and recorded in this
   unit's acceptance ledger.
 - **AC7** — When `python tools/govkit/govkit.py check --target C:/projects/incms/main` and the same
@@ -286,6 +286,9 @@ none
 
 - rev-1 · 2026-11-20 · initial draft, from the spec task
   `2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task`, with code read at `609cd40b1`.
+- rev-2 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  5 and section 6 the listing's shell-string size is marked DERIVED from the path count, and the suite
+  cost from the analysis PINNED. Design, scope and acceptance unchanged.
 
 ## 10. Reuse audit
 

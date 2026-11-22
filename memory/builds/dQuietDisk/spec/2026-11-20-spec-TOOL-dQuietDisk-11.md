@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-11 — govkit's scratch targets come from the template cache, so `selftest.py` builds each distinct target once
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -102,7 +102,7 @@ two builds in the same second already share a sha. AC5's full run is the observa
 ### The saving, derived from the code at `609cd40b1`
 
 An AST walk of `selftest.py` finds 97 `build_target` calls over 31 distinct `(deploy, files)`
-argument expressions, so 66 calls repeat a key. Three of those name the loop variable `deploy`,
+argument expressions, so 66 calls [DERIVED] repeat a key. Three of those name the loop variable `deploy`,
 whose values may differ, so at least 63 repeat a built key. Each repeat spends 0 git processes where
 today's spends 8: at least 504 fewer per full run, and more for calls inside loops. Temp entries
 per call stay about equal, since the copy writes what the build wrote. The figure is DERIVED from
@@ -111,8 +111,9 @@ the static walk; unit 19 measures one shard.
 ### Order
 
 This unit writes no line of `tools/govkit/selftest.py`, but its AC5 observes that file, and
-TOOL-dQuietDisk-18 writes arms into it, so the two are not disjoint (BUILD-METHOD M6, clause 2). The spec brief says to order this
-unit after unit 18 when both touch the file, so this unit takes order 4. TOOL-dQuietDisk-19, also at
+TOOL-dQuietDisk-18 writes arms into it, so the two are not disjoint
+(`doc.build-method#m6-passes-commits-parallelism`, clause 2). The spec brief says to order this unit
+after unit 18 when both touch the file, so this unit takes order 4. TOOL-dQuietDisk-19, also at
 order 4, measures a `selftest.py` shard, so it reads this unit's output and must sit after it.
 
 ### Files touched (estimate)
@@ -195,6 +196,10 @@ none
   lexicon would refuse. AC4 had the pass run the module's `--selftest`; it now has the pass run a
   planted-config probe, the module's own run is owed to the main loop, and the `New arm:` line
   covers AC4.
+- rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  4 and section 10 the repeated-call count is marked DERIVED from the AST walk's two counts,
+  dWitnessedBar's changed-line count PINNED, and the ordering note's build-method citation names its
+  tag. Design, scope and acceptance unchanged.
 
 ## 10. Reuse audit
 
@@ -207,7 +212,7 @@ ranked `build_target` and `build_scratch_gov` in `tools/govkit/fixture_target.py
 (Test); the deployer is dSafePassage's area. Its CLOSED unit 5 made `fixture_target.py` the one
 factory per kind (S12), and this unit keeps that contract: each call still returns a repository
 holding the same files, refs and config at the destination it names. dWitnessedBar's
-branch changes 512 lines of `selftest.py` and none of `fixture_target.py` between `9e21ac760` and
+branch changes 512 lines [PINNED] of `selftest.py` and none of `fixture_target.py` between `9e21ac760` and
 `609cd40b1`, so this unit builds on its tip.
 
 Recall terms used: `python tools/memory-recall/query.py "how does govkit selftest build its scratch target repositories" --terms "build_target build_scratch_gov fixture_target scratch target template copy clone selftest govkit run_git"`

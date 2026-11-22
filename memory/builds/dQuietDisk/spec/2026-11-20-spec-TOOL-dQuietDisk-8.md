@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-8 — the whole-tree readers clone without copying objects and check out only what they read
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2 · ratified 2026-11-20
+**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -78,8 +78,8 @@ its reason and left as today. Every reader's verdict and output stay what they w
 
 ### The readers today
 
-All citations are read at `609cd40b1`. The object store measured 167 MB in 92 files on 2026-11-20,
-PINNED, by `du` and `find` over this clone's common `objects/`.
+All citations are read at `609cd40b1`. The object store measured 167 MB in 92 files, PINNED, on
+2026-11-20 by `du` and `find` over this clone's common `objects/`.
 
 | Reader | Clone today | Checkout | Mutates its copy | After |
 |---|---|---|---|---|
@@ -218,6 +218,9 @@ leg's own argv or the bar.
   The pass now makes clone probes and each reader's scoped direct check, and every whole reader run
   is owed to the main loop at the close. `write_sparse_set`, the one name the spec mints, passes
   `--suggest` in both cells.
+- rev-4 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  4 the object-store figures' PINNED moves onto the line that quotes them. Design, scope and
+  acceptance unchanged.
 
 ## 10. Reuse audit
 

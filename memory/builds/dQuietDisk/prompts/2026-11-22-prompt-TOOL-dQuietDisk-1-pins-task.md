@@ -22,8 +22,8 @@ The check skips text inside fences and inline code. Do not move a figure into in
 
 ## 2. positional
 
-`python tools/playbook/positional.py check` lists citations of sections by number, such as `BUILD-METHOD M2`, `M3`
-or `M6`. Cite each section by its tag instead:
+`python tools/playbook/positional.py check` lists citations of a section by its number after the build method's
+name. Cite each section by its tag instead:
 - M2: `doc.build-method#m2-the-spec-set-decompose-detect-classify-act`
 - M3: `doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority`
 - M5: `doc.build-method#m5-recall-and-reuse`

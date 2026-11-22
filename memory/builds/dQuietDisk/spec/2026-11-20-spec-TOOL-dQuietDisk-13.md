@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-13 — the run-gates suites build each repeated scratch repository once and copy it per arm
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -50,7 +50,7 @@ the same arms with the same RED and GREEN results.
 - `tools/run-gates/run-gates.runlog.test.sh`, which matches the `run-gates*.test.sh` glob and which
   the spec brief does not name. It has one `git init`.
 - The builders whose calls never repeat a content: `build_attr_fixture` (1 call),
-  `build_replay_fixture` and `build_age_fixture` (3 calls each, 3 argument sets each),
+  `build_replay_fixture` and `build_age_fixture` (3 calls each [PINNED], 3 argument sets each),
   `build_moved_age_fixture` and `build_owned_fixture` (1 each), and the single-use inline repositories.
 - The nested bars the arms run, 134, 70 and 39 of them by the analysis's count (§3, row G1d). Each is
   the subject under test, and the runner's own fixed cost is K9, which the prompt does not ask for.
@@ -177,6 +177,9 @@ none
   of the placeholder `template_of`, which the lexicon would refuse. The moved bodies, such as
   `_build_mk_repo`, lead with `build` and pass `--suggest`. No criterion had the pass run a suite:
   AC4's suite runs were already the main loop's.
+- rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  3 and section 10 the replay and age builders' call count and dWitnessedBar's changed-line counts are
+  marked PINNED. Design, scope and acceptance unchanged.
 
 ## 10. Reuse audit
 
@@ -185,7 +188,7 @@ The seam is TOOL-dQuietDisk-7's template factory, generalising `tools/lib/lib-se
 template's builder unchanged and its callers do not move.
 `python tools/codebase-map/reuse_lookup.py "build a scratch fixture repository once and clone it per test case"`
 ranked `build_fixture`, `build_target` and `build_scratch_gov` as seams, and none of these five.
-Chain owner: dWitnessedBar (Test). Its branch changes 256, 18 and 320 lines of the three suites
+Chain owner: dWitnessedBar (Test). Its branch changes 256, 18 and 320 lines [PINNED] of the three suites
 between `9e21ac760` and `609cd40b1`, the verdict, held-leg and flake arms among them, so this unit
 builds on its landed tip and re-counts §4's table there.
 

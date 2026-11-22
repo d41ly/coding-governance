@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-17 — `govkit update` skips a kit's verify check when nothing moved since its baseline
 
-**Status:** SPECCED · rev-2 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 5 · ratified 2026-11-20
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 5 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -18,7 +18,7 @@
 
 `govkit update --write` runs each touched kit's own `[check]` argv twice: once as a baseline before
 the first byte moves, and once in the verify pass after the writes. The analysis counts about 22 kits
-at 10 to 16 s each, twice (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`,
+at 10 to 16 s each [PINNED], twice (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`,
 row G4). This unit keeps the baseline's result keyed by the kit's installed bytes and a fingerprint
 of the target, and reuses it in the verify pass when neither moved and no target-side program ran in
 between. Every receipt, write, rollback decision and tally is unchanged. Section 4 says why this
@@ -107,7 +107,7 @@ a key that would skip verifying real writes, which would move a rollback verdict
 
 - security: N/A — reads of the target the verb already writes; nothing new is written.
 - perf / scale: one `hash-object` and one `status` per touched kit, saved against a check of 10 to
-  16 s only where the reuse fires.
+  16 s [PINNED] only where the reuse fires.
 - error / empty / loading states: an unreadable key reads as moved and the check runs (S3).
 - observability: the announced tail and the tally field (S4).
 - risks: a fingerprint that misses a change the check reads. The rule that any target-side program
@@ -119,7 +119,7 @@ a key that would skip verifying real writes, which would move a rollback verdict
 ## 6. Acceptance criteria
 
 The saving the reuse buys, stated as a count. Each reused verify saves exactly one `run_kit_check`
-call, the kit's own `[check]` argv and every process it starts, which the analysis puts at 10 to 16 s
+call, the kit's own `[check]` argv and every process it starts, which the analysis puts at 10 to 16 s [PINNED]
 (row G4, PINNED 2026-11-20). The run's saving is the `reused <n>` field of the tally, so `n` calls.
 It costs §5's one `hash-object` and one `status` per touched kit, at the baseline and again in
 verify, whether or not the reuse fires. On an ordinary version-bump update every touched kit's
@@ -181,6 +181,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · an update over a fixt
 - rev-2 · 2026-11-20 · §1 · §6 · AC1 · §8 · F1 resolved (a) under
   `2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task`: S1 to S5 are built as written, and §6 now states
   the saving the narrow reuse buys, with a `figure:` line on AC1.
+- rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  1, section 5 and section 6 the analysis's per-kit check time is marked PINNED on each line that
+  quotes it. Design, scope and acceptance unchanged.
 
 ## 10. Reuse audit
 

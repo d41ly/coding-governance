@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-6 — the manifest check's pickaxe diffs only the commits whose stamp moved
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -129,13 +129,13 @@ tried candidate, so the saving is diff work and wall time, which AC2 counts.
 The pass's probes run over a hermetic fixture repository the probe builds under
 `%TEMP%/<short-name>`, in the shape `skills/session-kickoff/manifest-check.test.sh#write_manifest`
 and `#restamp` build one, read and never run: a manifest with a `watch:` line and a `last-audit:`
-stamp, a watched file, and a range of at least 300 commits past the stamp. "Old" is the check at
+stamp, a watched file, and a range of at least 300 commits [PINNED] past the stamp. "Old" is the check at
 `609cd40b1` and "new" the unit's, each run there by path. A reading over the real tree is the gate's
 own population, which a role agent may not run (scratch-guard row G1), so each such reading below is
 owed to the main loop at the close.
 
 - **AC1** — When the old and the new check run over the fixture at three tips, one whose watched file
-  moved before the stamp, one whose range holds 300 commits with one re-stamp, and one whose watched
+  moved before the stamp, one whose range holds 300 commits [PINNED] with one re-stamp, and one whose watched
   file moved after the stamp, each pair prints the same lines and exits the same. When the main loop
   runs the same pairs of `bash skills/session-kickoff/manifest-check.sh` in scratch
   `git clone --shared` copies of the real tree at the build's base and at `609cd40b1`, with its
@@ -184,6 +184,9 @@ none
   ratchet leg over real-tree clones. They now run old and new over a hermetic fixture, and the
   real-tree pairs of AC1 and AC2 are owed to the main loop at the close. The spec mints no
   function, so no name needed a rename.
+- rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  6 the fixture's commit range, in the fixture's description and in AC1, is marked PINNED as the size
+  the spec fixes. Design, scope and acceptance unchanged.
 
 ## 10. Reuse audit
 

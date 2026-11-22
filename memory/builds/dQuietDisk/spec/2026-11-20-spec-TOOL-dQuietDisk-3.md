@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-3 — the brief-recorded leg grades only units whose key moved since its last graded tip
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -16,7 +16,7 @@
 ## 1. Goal
 
 `tools/unattended/check-brief-recorded.sh` regrades every CLOSED unit built during a run on every
-bar. The analysis counts about 6k to 8k git processes and 404 s per run
+bar. The analysis counts about 6k to 8k git processes and 404 s [PINNED] per run
 (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`, row G3). Its
 `_SUBJ` subject cache already removed the per-commit subject reads inside one run. This unit
 persists each unit's outcome through TOOL-dQuietDisk-1's history verdict store, so a warm run with no
@@ -129,7 +129,7 @@ No verb, flag, conf key, policy key or refusal number is minted.
 
 | Alternative | Why it loses |
 |---|---|
-| Persist `_SUBJ` alone | It removes one log pass per run and leaves every per-unit spawn, which is where the 404 s goes. |
+| Persist `_SUBJ` alone | It removes one log pass per run and leaves every per-unit spawn, which is where the 404 s [PINNED] goes. |
 | Key the item on HEAD | That is the reuse cache's key today, and it is why nothing is reused across commits. |
 | Store the printed lines | A short sha's length can grow between runs, so a stored line could differ from the old leg's. |
 
@@ -164,7 +164,7 @@ G1), so each such reading below is owed to the main loop at the close.
   over one scratch `git clone --shared` of the real tree at the build's base, cold then warm, the
   three are byte-identical there too.
   Red when: a stored outcome prints differently or a counter moves.
-  cost: about 7 minutes per cold run over the real tree, measured 404 s by the analysis.
+  cost: about 7 minutes per cold run over the real tree, measured 404 s [PINNED] by the analysis.
   permission: the real-tree corpus is owed to the main loop; the pass makes the fixture comparison.
   fixture: the real-tree clone under `%TEMP%` with its own `TEMP`; the old leg runs from a worktree
   at `609cd40b1`.
@@ -173,7 +173,7 @@ G1), so each such reading below is owed to the main loop at the close.
   file, both legs exit 1 with the same violation line, and the store shows only that unit written.
   Red when: the new leg stays green while the old leg reds, or it regrades units it held.
 - **AC3** — When the new leg runs warm over the fixture with an empty NEW set under
-  `GIT_TRACE2_EVENT=<dir>`, the directory holds at most 30 files plus the live build's regrades,
+  `GIT_TRACE2_EVENT=<dir>`, the directory holds at most 30 files [PINNED] plus the live build's regrades,
   which the run counts apart. The main loop takes the same count over the real tree at the close.
   Red when: a per-unit git call survives for a unit of a finished build.
   figure: 30 is PINNED as the promise, and a warm run's count over finished builds does not grow
@@ -214,6 +214,10 @@ none
   the real tree: AC1 to AC5 run old and new over a hermetic fixture, and the real-tree corpus of
   AC1 and the real-tree count of AC3 are owed to the main loop at the close. This spec mints no
   function, so no name of its own needed a rename.
+- rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  1, section 4 and section 6 the analysis's wall-time figure, in the goal, the alternatives table and
+  AC1's cost line, is marked PINNED, and AC3's warm bound PINNED as the promise its `figure:` line
+  already makes. Design, scope and acceptance unchanged.
 
 ## 10. Reuse audit
 

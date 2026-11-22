@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-16 — `govkit update` reads every gov blob through one `cat-file --batch` handle
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -17,7 +17,7 @@
 
 `govkit update` pays two to three `git show` processes per receipt row, about 810 for a 242 to 293
 row receipt (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`, row
-G4, rework K7). `upgrade_steps.py#blob_at` already takes a `batch` handle that no `update` caller
+G4, rework K7). `tools/govkit/upgrade_steps.py#blob_at` already takes a `batch` handle that no `update` caller
 passes. This unit opens one handle per `update` run and threads it to every gov-blob read the run
 makes, with the same receipts, writes and printed lines.
 
@@ -79,7 +79,7 @@ call time. Inside `_cmd_update` (`tools/govkit/govkit.py@609cd40b1:9589`) the go
 |---|---|---|
 | schema below 3 back-fill | `_cmd_update` body | one per row lacking `gov_oid` |
 | S9 integrity | `_cmd_update` body | one per row with `commit` and `gov_oid` |
-| `classify_row` | `govkit.py#classify_row` | `theirs`, `base`, and `theirs_new` on a rename |
+| `classify_row` | `tools/govkit/govkit.py#classify_row` | `theirs`, `base`, and `theirs_new` on a rename |
 | `_resolve_ver_at` | closure, via `resolve_entry_version_at` | one per written row |
 | `read_descriptor_at` | `tools/govkit/govkit.py@609cd40b1:10251`, and via `read_requires_at` | one per kit |
 | `measure_rendered_rows` | its template read | one per re-measured rendered row |
@@ -161,7 +161,7 @@ The kickoff manifest's `watch:` line names neither.
 ## 6. Acceptance criteria
 
 - **AC1** — When a probe under `%TEMP%/<short-name>` builds a scratch gov in the govkit self-test's
-  shape, holding an entry `demo` of at least 30 files with one rendered row and a version file,
+  shape, holding an entry `demo` of at least 30 files [PINNED] with one rendered row and a version file,
   applies commit A to a target, then commits B, which edits ten files, renames one and deletes one,
   two copies of that target are moved to B with `update --target <t> --write`. One run uses the
   base `govkit.py` and `upgrade_steps.py`, and one the unit's, over the same gov commits. Then
@@ -224,10 +224,14 @@ none
   is `build_blob_batch`, and the handle's `stdin` and `stdout` properties and its `close()` become
   `init_process()`, which `blob_at`'s batch branch calls for the process, and `remove_process()`.
   No criterion had the pass run a suite, a `--selftest`, a gate leg or the bar.
+- rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  1, section 4 and section 10 the three symbol citations naming a bare basename now name
+  `tools/govkit/upgrade_steps.py` and `tools/govkit/govkit.py`, and in section 6 AC1's fixture floor
+  is marked PINNED as the size the spec fixes. Design, scope and acceptance unchanged.
 
 ## 10. Reuse audit
 
-The seam extended is `upgrade_steps.py#blob_at`'s `batch` parameter, "THE ONE revision-blob reader"
+The seam extended is `tools/govkit/upgrade_steps.py#blob_at`'s `batch` parameter, "THE ONE revision-blob reader"
 by its own docstring (TOOL-dSafePassage-26 S14), and `derive_introduced`'s held process
 (`tools/govkit/upgrade_steps.py@609cd40b1:1019`), whose inline `Popen` becomes the shared opener.
 TOOL-dQuietDisk-1's `BatchReader` is not used: it lives in `tools/lib/`, which a govkit module does

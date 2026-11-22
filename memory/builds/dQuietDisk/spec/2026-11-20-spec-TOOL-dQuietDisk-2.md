@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-2 — the pass-order leg grades only units whose key moved since its last graded tip
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -16,7 +16,7 @@
 ## 1. Goal
 
 `tools/unattended/check-pass-order.sh` regrades every CLOSED unit of every build on every bar, with
-one or more git processes per question. The analysis counts about 11.5k git processes and 1,054 s
+one or more git processes per question. The analysis counts about 11.5k git processes and 1,054 s [PINNED]
 for one run (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`, row
 G3). This unit grades a unit only when its stored verdict is absent or its key moved, through the
 history verdict store TOOL-dQuietDisk-1 builds, so a warm run with no new unit costs a bounded,
@@ -183,7 +183,7 @@ so each such reading below is owed to the main loop at the close.
   one scratch `git clone --shared` of the real tree at the build's base, cold then warm, all three
   are byte-identical there too.
   Red when: a stored outcome is reported differently, or a counter on the summary line moves.
-  cost: about 18 minutes per cold run over the real tree, measured 1,054 s by the analysis.
+  cost: about 18 minutes per cold run over the real tree, measured 1,054 s [PINNED] by the analysis.
   permission: the real-tree corpus is owed to the main loop; the pass makes the fixture comparison.
   fixture: the real-tree clone under `%TEMP%` with its own `TEMP`, and the old leg run from a
   worktree at `609cd40b1`.
@@ -193,7 +193,7 @@ so each such reading below is owed to the main loop at the close.
   The new leg's store shows that one item written and every other item read, not regraded.
   Red when: the new leg stays green while the old leg reds, or it regrades units it held.
 - **AC3** — When the new leg runs warm over the fixture with an empty NEW set under
-  `GIT_TRACE2_EVENT=<dir>`, the directory holds at most 30 files, and the cold run's file count is
+  `GIT_TRACE2_EVENT=<dir>`, the directory holds at most 30 files [PINNED], and the cold run's file count is
   printed beside it. The main loop takes the same count over the real tree at the close, as subject
   M2 of TOOL-dQuietDisk-19's record.
   Red when: a per-unit or per-build git call survives on the warm path.
@@ -236,6 +236,10 @@ none
   the real tree: AC1 to AC5 run old and new over a hermetic fixture, and the real-tree corpus of
   AC1 and the real-tree count of AC3 are owed to the main loop at the close. This spec mints no
   function, so no name of its own needed a rename.
+- rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  1 and section 6 the analysis's wall-time figure is marked PINNED, as read from a record, and AC3's
+  warm bound PINNED as the promise its `figure:` line already makes. Design, scope and acceptance
+  unchanged.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-10 — `check-wiring.test.sh` takes its scratch repositories from the template cache
 
-**Status:** SPECCED · rev-2 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 3 · ratified 2026-11-20
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 3 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -170,7 +170,7 @@ checker's own per-check listing, is TOOL-dQuietDisk-26's, so this bound counts f
   Red when: an arm is lost, added or changes verdict.
   permission: a role pass may not run a self-test suite (`tools/unattended/gate-guard.js` row D4);
   the main loop observes this at VERIFYING.
-  cost: two suite runs, about 300 s each (the analysis, §2).
+  cost: two suite runs, about 300 s each [PINNED] (the analysis, §2).
 - **AC7** — When the main loop runs the suite in a scratch `git clone --shared` with
   `GIT_TRACE2_EVENT`, `TEMP`, `TMP` and `TMPDIR` pointed at scratch dirs, before and after, the git
   process count falls by at least 7 and the residual temp entries are 0 both times.
@@ -199,7 +199,8 @@ New arm: tools/check-wiring.test.sh · covers AC2 · a `newrepo wired` arm stage
   - (a) No unit; the main loop files an ask naming the listing. One follow-up stays open.
   - (b) ADD a unit: one `git ls-files -s` per invocation, read in-process by every check that
     re-lists today, with the checker's findings byte-identical on the suite's 255 arms. It closes the
-    follow-up and is a separate mechanism, so it is its own unit (BUILD-METHOD M2).
+    follow-up and is a separate mechanism, so it is its own unit
+    (`doc.build-method#m2-the-spec-set-decompose-detect-classify-act`).
   - Recommendation: (b). It is the most feature-rich option, and no veto applies: it adds no
     dependency, surface or carrier change, and widens no write surface.
   - RESOLVED (agent, 2026-11-20, delegated): (b). TOOL-dQuietDisk-26 now carries
@@ -212,6 +213,10 @@ New arm: tools/check-wiring.test.sh · covers AC2 · a `newrepo wired` arm stage
 - rev-2 · 2026-11-20 · §3 · §4 · §8 · F1 resolved (b) under
   `2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task`: the listing non-goal and the bound point at
   TOOL-dQuietDisk-26, and the external hand-off becomes an edge to it.
+- rev-3 · 2026-11-22 · wording only, under `2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task`. In section
+  6, section 8 and section 10 AC6's suite cost from the analysis and dWitnessedBar's changed-line
+  count are marked PINNED, and the fork's build-method citation names its tag. Design, scope and
+  acceptance unchanged.
 
 ## 10. Reuse audit
 
@@ -222,7 +227,7 @@ The seam is TOOL-dQuietDisk-7's template factory, which generalises `tools/lib/l
 ranked `build_fixture` (`tools/lib/lib-selftest.sh`), `build_target` and `build_scratch_gov`
 (`tools/govkit/fixture_target.py`) as seams; no candidate is a per-arm copy face, so this unit uses
 the factory's template path and keeps the suite's copy. Chain owner: dWitnessedBar (Test, gate health
-and budgets). Its branch changes 20 lines of this suite between `9e21ac760` and `609cd40b1`, an
+and budgets). Its branch changes 20 lines [PINNED] of this suite between `9e21ac760` and `609cd40b1`, an
 inline `refuse_wrong_shell` block and one dependency list, and no fixture line, so this unit builds on
 its tip copy and nothing overlaps.
 
