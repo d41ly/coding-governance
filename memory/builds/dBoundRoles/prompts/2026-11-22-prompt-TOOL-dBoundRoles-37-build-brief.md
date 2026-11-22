@@ -14,10 +14,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every roster spec was re-grounded on HEAD before this dispatch, so its citations hold at HEAD or name the earlier
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
-- It builds beside TOOL-dBoundRoles-21 at the same order, each on its own pass branch cut from the same records
-  commit; the two write sets were declared disjoint. Touch nothing outside your own. TOOL-dBoundRoles-1's build left
-  govkit's selftest seed-count pin at 15 where the tree now seeds 17: this unit's derivation is what retires that
-  typed count.
+- The first builder of this unit (run `wf_d29278d1-cce`, a parallel pass) built it to its spec and every claim held,
+  but its commit was refused: adding `derive_roles_expected` makes `memory/map/generated/symbols.json` stale, a path
+  outside the write set then declared. The main loop has since declared it. That builder's ready staged diff is the
+  patch `C:/Users/d41ly/AppData/Local/Temp/claude/bf1faa02b154e3ee/b48c5b81-0c25-4457-90e8-da811a25e0e9/scratchpad/dbr37-pass.patch`;
+  apply it with `git apply`, verify it against the spec, run `python tools/codebase-map/gen_map.py --write`, and commit.
+  This pass runs in the run's own tree, not beside another pass.
+- TOOL-dBoundRoles-1 left govkit's selftest seed-count pin at 15 where the tree now seeds 17; that plan-preview pin is
+  TOOL-dBoundRoles-49's to derive, not this unit's, and stays red until it lands.
 
 ## What the main loop needs from your commit
 
