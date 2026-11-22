@@ -1018,5 +1018,64 @@ has   "no anchor: the summary says no range is graded" "$o" "no Commit-Checked a
 same  "no anchor: nothing is refused, exit code" "$rc" "0"
 rm -rf "$T"
 
+# ---- TOOL-dQuietDisk-2 AC2 AC3 AC7: THE HISTORY VERDICT STORE serves an outcome only while its key
+# ---- holds. A warm store then gains, past its tip, a commit moving one unit's candidates, a moved
+# ---- run-state `base:`, and a new build; each reds as a cold leg would. Items cut one byte short
+# ---- regrade, so the output equals the run with no store at all. Staged red by serving the stored
+# ---- outcome without the key: drop the candidate list and the base from the unit item's fields.
+T=$(mktemp -d) || exit 2
+( cd "$T" || exit 2
+  git init -q . && git checkout -q -b main
+  git config user.email t@t; git config user.name t; git config commit.gpgsign false
+  mkdir -p ${PFX}${KIT_NAME} memory/builds/tQ/spec
+  cp "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$KIT/check-pass-order.sh" "$KIT/commit_trailers.py" \
+     "$KIT/history_store.py" ${PFX}${KIT_NAME}/
+  printf 'MEMORY_ROOT=memory\nPASS_ORDER_CUTOFF="2026-01-01"\nSHARED_RECORDS="memory/DECISIONS.md memory/backlog"\n' > .unattended.conf
+  git add -A >/dev/null; git commit -q -m "fixture base" --no-verify
+  printf 'early\n' > ${PFX}q0.sh; git add -A >/dev/null; git commit -q -m "ARCH-tQ-1: early product" --no-verify
+  { printf -- '---\nslug: tQ\nnode: t\nopened: 2026-06-01\nstreams: tooling\nroster: ARCH\nids: ARCH-tQ-1\n---\n# tQ\n'
+    printf '<!-- gen:build-index -->\n<!-- gen:build-units -->\n| Unit | Order | Tier | Status | Rev | Last change |\n|---|---|---|---|---|---|\n'
+    for u in 1 2; do printf '| [ARCH-tQ-%s — unit](spec/q%s.md) | %s | 2 | CLOSED | rev-1 | 2026-06-01 |\n' "$u" "$u" "$u"; done
+    printf '<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n'; } > memory/builds/tQ/README.md
+  printf '# ARCH-tQ-1 — the unit\n\n**Status:** CLOSED · rev-1 · 2026-06-02 · node t · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- S1 a real scope item.\n\n## 6. Acceptance criteria\n\n- AC1 something observable.\n\n## 7. Gates\n\n- a gate.\n\n## 8. Open questions\n\nnone\n' > memory/builds/tQ/spec/q1.md
+  git add -A >/dev/null; git commit -q -m "records(tQ): open the build" --no-verify
+  printf '# tQ\n<!-- run:generated -->\n<!-- /run:generated -->\n## Run facts\nbase: %s\n## Parked\n' "$(git rev-parse HEAD)" > memory/builds/tQ/RUN.md
+  git add -A >/dev/null; git commit -q -m "run state" --no-verify
+  printf 'one\n' > ${PFX}q1.sh; git add -A >/dev/null; git commit -q -m "ARCH-tQ-1: build the thing" --no-verify
+) >/dev/null 2>&1
+HS_DIR="$T/.git/history-verdicts/v1/pass-order"
+( cd "$T" && bash "$LEG" ) >/dev/null 2>&1; o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "store warm: a conforming history stays green, exit code" "$rc" "0"
+q_n=$(find "$HS_DIR/items" -type f 2>/dev/null | grep -c .)
+same  "store warm: the cold run wrote unit items" "$([ "$q_n" -gt 0 ] && echo some)" "some"
+Q_EARLY=$(git -C "$T" log --format=%h --grep='early product' -1)
+# AC3 - one unit's candidates move: an unbuilt unit gains a product commit past the stored tip
+( cd "$T" && printf 'two\n' > ${PFX}q2.sh && git add -A >/dev/null && git commit -q -m "ARCH-tQ-2: build the thing" --no-verify ) >/dev/null 2>&1
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "store moved candidates: the unit is regraded and reds, exit code" "$rc" "1"
+has   "store moved candidates: the unit built with no spec is named" "$o" "ARCH-tQ-2 — BUILT at"
+hasnt "store moved candidates: the unit whose key held is not named" "$o" "ARCH-tQ-1 — BUILT at"
+# AC3 - the build's base moves earlier, past a commit that named a unit before its spec existed
+( cd "$T" && sed -i "s/^base: .*/base: $(git rev-parse HEAD~5)/" memory/builds/tQ/RUN.md && git add -A >/dev/null \
+  && git commit -q -m "run state: an earlier base" --no-verify ) >/dev/null 2>&1
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "store moved base: exit code" "$rc" "1"
+has   "store moved base: the early build commit is named" "$o" "ARCH-tQ-1 — BUILT at $Q_EARLY with NO tracked spec"
+# AC2 - a new build folder past the stored tip, its one CLOSED unit built with no spec
+( cd "$T" && mkdir -p memory/builds/tR && sed 's/tQ/tR/g; /tR-2/d' memory/builds/tQ/README.md > memory/builds/tR/README.md \
+  && git add -A >/dev/null && git commit -q -m "records(tR): open the build" --no-verify \
+  && printf 'r\n' > ${PFX}r1.sh && git add -A >/dev/null && git commit -q -m "ARCH-tR-1: build the thing" --no-verify ) >/dev/null 2>&1
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "store new build: exit code" "$rc" "1"
+has   "store new build: its unit is named" "$o" "ARCH-tR-1 — BUILT at"
+# AC7 - every item cut one byte short regrades: the output equals a run with no store at all
+o=$(cd "$T" && bash "$LEG" 2>&1)
+for f in $(find "$HS_DIR/items" -type f 2>/dev/null); do truncate -s -1 "$f"; done
+o2=$(cd "$T" && bash "$LEG" 2>&1)
+rm -rf "$HS_DIR"; o3=$(cd "$T" && bash "$LEG" 2>&1)
+same  "store torn: items cut short read as a regrade" "$o2" "$o3"
+same  "store torn: the warm output equals the storeless one" "$o" "$o3"
+rm -rf "$T"
+
 echo "--- $n arms, exit $st"
 exit $st
