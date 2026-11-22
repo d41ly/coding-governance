@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-1 — one store of immutable history verdicts, keyed by the ids each one reads, with one `cat-file --batch` reader
 
-**Status:** INPROGRESS · rev-3 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 1
+**Status:** INPROGRESS · rev-4 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-2-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-1-3-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-3-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-2-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-2-task.md) | research | TOOL-dQuietDisk-7 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-task.md) | research | — |
@@ -77,7 +78,9 @@ reads and by the grading code's own bytes, with a last graded tip per leg. The s
 - **S10** — The copies. `tools/unattended/history_store.py` and `tools/memory-tree/history_store.py`
   carry the module whole, and `tools/unattended/lib-unattended.sh` carries the `history_store_sh`
   block, so the two copy-installed kits units 2 to 4 grade inside hold their own copies. Two rows
-  join `PARITY_ROWS` in `tools/lib/resolve-python.test.sh`, one per block. Observed by AC9.
+  join `PARITY_ROWS` in `tools/lib/resolve-python.test.sh`, one per block. The module also carries
+  the `git_env_leaks_py` block inline (section 4, the environment of every git child), whose
+  existing row already grades every file carrying its marker. Observed by AC9.
 - **S11** — `python tools/lib/history_store.py --selftest` runs the module's arms in its own scratch
   repository, printing one line per arm and a count line. A held leg,
   `history-store selftest`, runs it, with subject `kit`, chunk `selftests`, a ceiling of 120 s and a
@@ -92,6 +95,24 @@ reads and by the grading code's own bytes, with a last graded tip per leg. The s
   floored at 60 s. Its note says it is not a `--selftest` reading and names the proxy, as the
   `leg-factory selftest` and `ratchet selftest` rows do. The main loop re-prices it from the first
   measured run at the close. Observed by AC10 and AC12.
+- **S12** — The shell-line ledger. The bash face stays, because units 2 and 3 are its bash
+  consumers. `memory/project/shell-role.txt` is shrink-only, read by the unguarded leg
+  `portability (shell lines only shrink)`. Three of its keys grow here: the new
+  `tools/lib/history-store.sh`, which has no row, and `tools/unattended/lib-unattended.sh` and
+  `tools/lib/resolve-python.test.sh`. They are widened through the ledger factory's widen door,
+  `python tools/memory-tree/ratchet.py widen shell-role --key <path> --key <path> --key <path>
+  --reason <one line> --unit TOOL-dQuietDisk-1`, as dWitnessedBar's units 58 and 60 widened theirs
+  (`memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-60-widen-4.md`). The door
+  writes the next widen record of this build under `memory/builds/dQuietDisk/build/`, then each
+  row `widened:<record stem>` (`tools/memory-tree/ratchet.py@e4699ee75:33`); no row is
+  hand-edited. The record's one-line Reason states two figures apart for each key. The first is
+  the lines this unit adds. The second is the base excess the merge `e4699ee75` already carried,
+  none for the new file: the pass's reading gave 1557 lines against the row's 1420 for
+  `tools/lib/resolve-python.test.sh`, and 1331 against 1319 for `tools/unattended/lib-unattended.sh`
+  (`2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-2-task`). The base excess comes from
+  dWitnessedBar's land tip. When the run re-merges main after dWitnessedBar's landing, it
+  re-measures each row and amends the record. A row for a file this unit does not touch is not
+  this unit's, and no widen names one. Observed by AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -172,8 +193,26 @@ refused, so two field lists never join to one key text.
 | end of stream, or a header that does not parse | restart once, then a one-shot spawn | the same |
 | a name holding a newline | a one-shot spawn, since the protocol is line-framed | the same |
 
-The one-shot spawn is `git cat-file -t` then `git cat-file <type>`. It is the safe fallback, not a
-second reader.
+The one-shot spawn is the safe fallback, not a second reader. It runs `git cat-file -t <name>` for
+the type and `git cat-file <type> <name>` for the bytes, whose length is the size. For `read_info`
+alone it then takes the oid from `git rev-parse --verify --quiet <name>`, never from
+`cat-file -t`, which prints no oid. Neither the batch header nor `rev-parse` peels, so both name the
+same object. The `<name>^{object}` form is not used: in a `<rev>:<path>` name the suffix is read as
+part of the path, so `HEAD:a.txt^{object}` asks for a file of that name. `--batch-check` is not
+used either, since it would be a second process beside the held one.
+
+### The environment of every git child
+
+The module carries the `git_env_leaks_py` block inline, byte-identical to
+`tools/lib/git_env_leaks.py`. Every git child it starts runs under this process's environment less
+`GIT_ENV_LEAKS`: the held `--batch` process, the one-shot spawn, the store's `rev-parse`, and the
+selftest's calls in its scratch repository. So a `GIT_DIR` that a hook exports never points a
+`-C <repo>` call at gov's own repository, and never points the selftest's scratch-repo calls there.
+The commit-trailer readers drop the same names (`tools/lib/commit_trailers.py@e4699ee75:143`). The
+block's existing `PARITY_ROWS` row, `git_env_leaks_py`
+(`tools/lib/resolve-python.test.sh@e4699ee75:422`), finds its copies by marker over the tracked tree
+(`tools/lib/resolve-python.test.sh@e4699ee75:540`). So all three `history_store.py` files are graded
+against the canonical copy, and no row is added for them.
 
 ### The bash face
 
@@ -192,6 +231,7 @@ coprocess returns 2 from both, and the caller grades that question as it does to
 | `history_store_py`, `history_store_sh` | parity block markers | `PARITY_ROWS` | `tools/lib/resolve-python.test.sh` |
 | `BatchReader`, `HistoryStore` | Python classes | `py.type`, lexicon `--suggest` OK | the module's `--selftest` |
 | `resolve_store` | Python function | `py.function`, lexicon `--suggest` OK | the module's `--selftest` |
+| `derive_git_env` | Python function, the environment less `GIT_ENV_LEAKS` | `py.function`, lexicon `--suggest` OK | the module's `--selftest` |
 | `read`, `read_info` | `BatchReader` methods | `py.function`, lexicon `--suggest` OK | the module's `--selftest` |
 | `read`, `write`, `read_tip`, `write_tip`, `remove_aged` | `HistoryStore` methods | `py.function`, lexicon `--suggest` OK | the module's `--selftest` |
 | `init_hs`, `read_hs_tip`, `read_hs_items`, `write_hs_items` | shell functions | `sh.function`, lexicon `--suggest` OK | the module's `--selftest` |
@@ -211,7 +251,12 @@ dunder included, so neither class defines `__enter__` or `__exit__`.
 `tools/memory-tree/history_store.py` · `tools/unattended/lib-unattended.sh` ·
 `tools/lib/resolve-python.test.sh` · `tools/policy/catalogue.toml` · `help/reference/policy.md` ·
 `tools/govkit/registry.toml` · `tools/gate-legs.json` · `tools/run-gates/selftest-budgets.txt` ·
-`memory/guides/SESSION-KICKOFF.md`
+`memory/guides/SESSION-KICKOFF.md` · `memory/project/shell-role.txt` ·
+`memory/builds/dQuietDisk/build/<date>-build-TOOL-dQuietDisk-1-widen-1.md`
+
+The widen record's name is the door's: its date is the day the pass runs it, and its number is one
+past the highest widen record in the build folder (`tools/memory-tree/build_records.py@e4699ee75:892`),
+which holds none at this revision, so `1`.
 
 The leg's declaration is the `[[exempt_leg]]` row in `tools/govkit/registry.toml`, and
 `tools/gate-legs.json` is the manifest `python tools/run-gates/leg_factory.py --write` re-renders
@@ -290,8 +335,11 @@ failure (its header, `tools/run-gates/selftest-budgets.txt@e4699ee75:16`).
   escaped and unescapes to the same bytes.
   Red when: the bash face reads characters rather than bytes, or the escape is not reversible.
 - **AC9** — When the marked blocks are extracted with the parity table's own `blk` awk from the
-  canonical files and from each copy, every pair compares equal.
-  Red when: a copy drifts by one byte, which the two new `PARITY_ROWS` rows then report.
+  canonical files and from each copy, every pair compares equal. The `git_env_leaks_py` block
+  extracted from each of the three `history_store.py` files equals the one in
+  `tools/lib/git_env_leaks.py`.
+  Red when: a copy drifts by one byte, which the two new `PARITY_ROWS` rows, or the existing
+  `git_env_leaks_py` row, then report.
 - **AC10** — When the main loop runs `python history_store.py --selftest` in `tools/lib/` at the close, it
   prints one line per arm and a count line, and exits 0. With `read` patched to answer None on an
   end of stream, it exits 1.
@@ -318,13 +366,27 @@ failure (its header, `tools/run-gates/selftest-budgets.txt@e4699ee75:16`).
   figure: PINNED, the budget from the pass's timed run of the section 6 probes, times 1.5, floored at
   60 s. The re-price from the first measured run of the leg at the close is owed to the main loop,
   as the `leg-factory selftest` and `ratchet selftest` rows' are.
+- **AC13** — When
+  `grep -n -E "^tools/(lib/history-store\.sh|unattended/lib-unattended\.sh|lib/resolve-python\.test\.sh)\s" memory/project/shell-role.txt`
+  runs after the widen, it prints three rows, each ending `widened:<stem>` for one record stem. That
+  stem names a file under `memory/builds/dQuietDisk/build/` whose Keys field lists exactly those
+  three paths, whose Caused-by is `TOOL-dQuietDisk-1`, and whose Reason gives, for each key, the lines
+  this unit adds and the base excess as two numbers. `git diff --stat -- memory/project/shell-role.txt`
+  shows those three rows and no other.
+  Red when: a row is edited by hand with no record, a row for a file this unit does not touch moves,
+  or the Reason folds the base excess into this unit's own figure.
 
 This unit moves no verdict: it adds no reader to any existing leg, so every leg's rc and output stay
 as they were. The process saving is each consumer's, counted in units 2, 3 and 4.
 
 ## 7. Gates
 
-`kit epoch (shipped bytes move, the version moves)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `gate-leg conformance` · `python resolver (behaviour + inline parity + idiom ban)` · `every held leg is budgeted, every budget row resolves` · `policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `branch-guard self-test` · `tier2-review self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `playbook render selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
+`kit epoch (shipped bytes move, the version moves)` · `history-store selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `gate-leg conformance` · `python resolver (behaviour + inline parity + idiom ban)` · `every held leg is budgeted, every budget row resolves` · `policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `branch-guard self-test` · `tier2-review self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `playbook render selftest` · `portability (shell lines only shrink)` · `ratchet (never gains)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
+
+The leg line names `history-store selftest`, the leg S11 adds, because the module and the bash face
+trip its guard. On a tree without this unit's code, `tools/gate-legs.json` holds no such leg, so the
+spec-token checker reads that name as unresolved until the pass's code is in the tree. Any
+`--dispatch` that widens this pass's write set runs after the code is applied, never before.
 
 New arm: tools/lib/history_store.py · covers AC3 AC10 · the module's --selftest; its failing case is staged by reading an end of stream as missing, or by keying on the index blob of a code path · none
 New arm: tools/lib/resolve-python.test.sh · covers AC9 · the two new PARITY_ROWS rows; their failing case is staged by one changed byte in either copy · none
@@ -360,6 +422,18 @@ none
   pass run the `--selftest`, and AC10 is the main loop's observation. (c) The leg is an
   `[[exempt_leg]]` row of `tools/govkit/registry.toml`, which joins Files touched, with
   `tools/gate-legs.json` re-rendered by `leg_factory.py --write`.
+- rev-4 · 2026-11-22 · S10 · S12 · §4 · AC9 · AC13 · §7 · the second pass's refusal at `--dispatch`
+  check 49, as ruled, under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-2-task`. (1) §7's leg
+  line names `history-store selftest`, whose guard the module and the bash face trip, beside
+  `portability (shell lines only shrink)` and `ratchet (never gains)`, which grade the ledger S12
+  widens. (2) S12 keeps the bash face and widens its three shell-role rows through
+  `ratchet.py widen shell-role`. The record states this unit's added lines and the base excess
+  `e4699ee75` carried as separate figures, and Files touched gains the ledger and the record. (3) The
+  reader's protocol spells the one-shot oid as `git rev-parse --verify --quiet <name>`, never
+  `cat-file -t`, and says why neither `^{object}` nor `--batch-check` is used. (4) A new §4
+  subsection states that the module carries `git_env_leaks_py` inline and starts every git child,
+  including the selftest's, without those names. The block's existing parity row grades the three
+  copies, which AC9 now observes, and the Inventory names `derive_git_env`.
 
 ## 10. Reuse audit
 

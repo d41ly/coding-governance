@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-7 — one suite template cache: each base repository built once, keyed by its inputs, and cloned per case
 
-**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -268,7 +268,7 @@ self-test`, so an edit to either runs the suite that holds their arms. The kicko
 
 ## 7. Gates
 
-`selftest harness self-test` · `line-length gate selftest` · `extract-arms self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `testsuite counts (every bar self-test prints one)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
+`selftest harness self-test` · `history-store selftest` · `line-length gate selftest` · `extract-arms self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `testsuite counts (every bar self-test prints one)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
 
 New arm: tools/lib/lib-selftest.test.sh · covers AC1 AC2 AC4 AC5 AC6 · the template mode's arms: a clone that copies objects or keeps its remote, two builders colliding on one key, a racing stage left behind, and a reading arm that writes; each failing case is staged by that break in the harness · its FLOOR_ASSERTIONS rises by the arms added
 New arm: tools/lib/resolve-python.test.sh · covers AC8 · the template_cache_sh row; its failing case is staged by one changed byte in the copy lib-selftest.sh carries · none
@@ -276,6 +276,10 @@ New arm: tools/lib/resolve-python.test.sh · covers AC8 · the template_cache_sh
 The bar runs once at the close. The line-length suite's own readings in AC3 and AC9 are the main
 loop's at the close: a role agent runs no suite, whichever kit holds it. The pass makes their probe
 halves.
+
+The leg line names `history-store selftest`, the leg TOOL-dQuietDisk-1 adds, whose guard section 4's
+`tools/lib/` trips. The name resolves once unit 1's code is in the tree, which this order-2 unit's
+dispatch follows.
 
 ## 8. Open questions
 
@@ -295,6 +299,9 @@ none
   `resolve_template` and `build_clone`. AC3 and AC9 had the pass run the line-length suite, which a
   role agent may not run; each now has the pass run a three-arm probe script, and the suite's own
   reading is owed to the main loop at the close.
+- rev-3 · 2026-11-22 · §7 · under `2026-11-22-prompt-TOOL-dQuietDisk-1-divergence-2-task`. Section
+  4 names `tools/lib/`, which trips the guard of `history-store selftest`, the leg TOOL-dQuietDisk-1
+  adds, so §7's leg line names that leg.
 
 ## 10. Reuse audit
 

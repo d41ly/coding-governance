@@ -69,3 +69,19 @@ You build ONE unit from its spec. The spec is the contract. This brief adds only
 - **Run no gate leg, no suite and no bar.** Verify with a fixture or a probe of the code you changed.
 - **Record every deviation.** A change the spec did not state is a deviation record in `build/`.
   Its values are `report` and `author-recorded`.
+
+## Third dispatch (after rev-4) — what changed
+
+- **Start from the saved code.** Pass 2 (`wf_e88edf82-25c`) completed the code for the twelve declared files and saved it as
+  `C:/Users/d41ly/AppData/Local/Temp/claude/b3f6db677b077b04/0840beea-0651-4dc3-9fe7-f227915b6b42/scratchpad/unit1-work/TOOL-dQuietDisk-1.patch`.
+  Apply it with `git apply`, then bring it to rev-4: `read_info`'s oid from `git rev-parse --verify --quiet`, and
+  `git_env_leaks_py` inline with `derive_git_env`. Re-run your probes.
+- **Do not run `--dispatch`.** Check 49 refuses every dQuietDisk dispatch until the `history-store selftest` leg exists
+  in `tools/gate-legs.json`, which only your commit creates. Stay inside the declared set (row `244f9949`). It
+  already holds the spec, `tools/govkit/registry.toml`, `tools/gate-legs.json` and the map's generated files.
+- **S12 and AC13 (the shell-role widen) are owed to the main loop.** Do not write `memory/project/shell-role.txt` or
+  a widen record. Right after your commit, the main loop runs the pass legs. The portability leg reds on the three
+  rows, and the main loop widens them as an inline red fix. Mark AC13 owed in the ledger.
+- **What your commit carries.** Spec rev-4 is in the working tree, uncommitted, and your pass commit carries it with
+  the status flip. `memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-7.md` is also modified in the
+  working tree. Do NOT stage it: the main loop commits it after yours.

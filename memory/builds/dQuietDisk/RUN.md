@@ -38,3 +38,5 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-21T23:23:17Z brief · item TOOL-dQuietDisk-1 · reason 5d65d04f1d53 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-build-brief.md
 
 2026-11-21T23:24:29Z dispatch · item 244f9949 TOOL-dQuietDisk-1 · reason tools/lib/history_store.py tools/lib/history-store.sh tools/unattended/history_store.py tools/memory-tree/history_store.py tools/unattended/lib-unattended.sh tools/lib/resolve-python.test.sh tools/policy/catalogue.toml help/reference/policy.md tools/gate-legs.json tools/run-gates/selftest-budgets.txt memory/guides/SESSION-KICKOFF.md tools/unattended/kit.toml tools/memory-tree/kit.toml tools/lib/kit.toml tools/govkit/registry.toml memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md memory/builds/dQuietDisk/README.md memory/LIVE.md memory/INDEX.md
+
+2026-11-22T00:33:18Z brief · item TOOL-dQuietDisk-1 · reason 25f9b2e427df memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-build-brief.md
