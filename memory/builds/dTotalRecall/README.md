@@ -110,13 +110,13 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-38 — every id reader that splits on a hyphen parses through the grammar, found by the reader census and proved by the flip probe](spec/2026-10-26-spec-TOOL-dTotalRecall-38.md) | 8 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [TOOL-dTotalRecall-4 — the build README's declared front-matter schema, its routing region, the work order as each agent's root, and a design-only build's ids as units](spec/2026-10-26-spec-TOOL-dTotalRecall-4.md) | 8 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [TOOL-dTotalRecall-54 — `parse_id_parts` lands on the named-group regex in step 8, ahead of the readers unit 38 re-points onto it](spec/2026-10-26-spec-TOOL-dTotalRecall-54.md) | 8 | 2 | CLOSED | rev-5 | 2026-11-22 |
-| [TOOL-dTotalRecall-40 — the routing region reads every record kind through `resolve_kind`, so log records written after the rename route under logs](spec/2026-10-26-spec-TOOL-dTotalRecall-40.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-22 |
-| [TOOL-dTotalRecall-44 — the split census keys on the split's shape, so it lists every id reader whatever its value is named](spec/2026-10-26-spec-TOOL-dTotalRecall-44.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-22 |
-| [TOOL-dTotalRecall-45 — the four id readers outside unit 38's table parse through the grammar, each site held gone by file and line](spec/2026-10-26-spec-TOOL-dTotalRecall-45.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-22 |
+| [TOOL-dTotalRecall-40 — the routing region reads every record kind through `resolve_kind`, so log records written after the rename route under logs](spec/2026-10-26-spec-TOOL-dTotalRecall-40.md) | 9 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dTotalRecall-44 — the split census keys on the split's shape, so it lists every id reader whatever its value is named](spec/2026-10-26-spec-TOOL-dTotalRecall-44.md) | 9 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dTotalRecall-45 — the four id readers outside unit 38's table parse through the grammar, each site held gone by file and line](spec/2026-10-26-spec-TOOL-dTotalRecall-45.md) | 9 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dTotalRecall-46 — `parse_id_parts` reads the named groups of `tree_lib.build_id_token_re`, and a correction suffix parses](spec/2026-10-26-spec-TOOL-dTotalRecall-46.md) | 9 | 2 | DEFERRED | rev-4 | 2026-11-22 |
-| [TOOL-dTotalRecall-6 — typed relations between builds, inverted, checked both ways, free of `depends-on` cycles, and pending across nodes](spec/2026-10-26-spec-TOOL-dTotalRecall-6.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-22 |
-| [TOOL-dTotalRecall-63 — unit 46's own pass reds a parser that refuses a cited family, so unit 54's body is held at step 9](spec/2026-10-26-spec-TOOL-dTotalRecall-63.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-22 |
-| [TOOL-dTotalRecall-64 — unit 46's spec observes unit 54's parser body and designs none of its own](spec/2026-10-26-spec-TOOL-dTotalRecall-64.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-22 |
+| [TOOL-dTotalRecall-6 — typed relations between builds, inverted, checked both ways, free of `depends-on` cycles, and pending across nodes](spec/2026-10-26-spec-TOOL-dTotalRecall-6.md) | 9 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dTotalRecall-63 — unit 46's own pass reds a parser that refuses a cited family, so unit 54's body is held at step 9](spec/2026-10-26-spec-TOOL-dTotalRecall-63.md) | 9 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dTotalRecall-64 — unit 46's spec observes unit 54's parser body and designs none of its own](spec/2026-10-26-spec-TOOL-dTotalRecall-64.md) | 9 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dTotalRecall-22 — each edge type's cardinality declared per source and per target, mirrored in the kind registry, and checked over the merged tree after every merge](spec/2026-10-26-spec-TOOL-dTotalRecall-22.md) | 10 | 2 | DEFERRED | rev-4 | 2026-10-26 |
 | [TOOL-dTotalRecall-3 — slug claim refs and ask-family counter refs, each commit carrying its claimant, minted by leased compare-and-swap and never pruned](spec/2026-10-26-spec-TOOL-dTotalRecall-3.md) | 11 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing](spec/2026-10-26-spec-TOOL-dTotalRecall-2.md) | 12 | 2 | DEFERRED | rev-9 | 2026-11-22 |
@@ -192,7 +192,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 353 bound to this build, across 4 record folder(s).
+Records: 373 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -298,13 +298,13 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-8-retire-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-8-retire-brief.md` and 124 more under prompts/ |
+| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-8-retire-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-8-retire-brief.md` and 136 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-22-build-TOOL-dTotalRecall-8-deviation-83.md`, `2026-11-22-build-TOOL-dTotalRecall-5-deviation-52.md` and 129 more under build/ |
-| red-fix | `2026-11-22-build-TOOL-dTotalRecall-5-red-fix-9.md`, `2026-11-22-build-TOOL-dTotalRecall-5-red-fix-8.md` and 8 more under build/ |
+| red-fix | `2026-11-22-build-TOOL-dTotalRecall-5-red-fix-9.md`, `2026-11-22-build-TOOL-dTotalRecall-5-red-fix-8.md` and 9 more under build/ |
 | widen | `2026-11-22-build-TOOL-dTotalRecall-8-widen-1.md` |
-| research | `2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md`, `2026-11-22-build-TOOL-dTotalRecall-8-reground-return.md` and 59 more under build/ |
-| logs | `2026-11-22-build-TOOL-dTotalRecall-54-1-builder-return.md`, `2026-11-22-build-TOOL-dTotalRecall-54-1-acceptance-ledger.md` and 13 more under build/ |
+| research | `2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md`, `2026-11-22-build-TOOL-dTotalRecall-8-reground-return.md` and 65 more under build/ |
+| logs | `2026-11-22-build-TOOL-dTotalRecall-54-1-builder-return.md`, `2026-11-22-build-TOOL-dTotalRecall-54-1-acceptance-ledger.md` and 14 more under build/ |
 | open asks | `BACKLOG.md`, 10 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->

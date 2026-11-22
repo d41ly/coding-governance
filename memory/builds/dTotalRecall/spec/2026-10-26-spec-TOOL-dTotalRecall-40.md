@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-40 — the routing region reads every record kind through `resolve_kind`, so log records written after the rename route under logs
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 8fbc5a33 · streams tooling · order 9 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 94e17798 · streams tooling · order 9 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,9 +11,12 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-36 TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-10-26-build-TOOL-dTotalRecall-40-deviation-401.md](../build/2026-10-26-build-TOOL-dTotalRecall-40-deviation-401.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-40-reground-2-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-40-reground-2-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-40-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-40-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-40-reground-2-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-40-reground-2-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-40-reground-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-40-reground-2-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-40-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-40-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-40-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-40-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-36 TOOL-dTotalRecall-39 TOOL-dTotalRecall-43 |
@@ -29,7 +32,7 @@ same defect at MEDIUM in item M8 and is disposed in `TOOL-dTotalRecall-43`. The 
 read raw from the bindings `plan()` reads once. `TOOL-dTotalRecall-18`, CLOSED at `305b6e9d1`, renamed
 the kind `log`: every writer writes `log`, `read_bindings` keeps the written token, and a comparison by
 value reads it through `resolve_kind` (`tools/memory-tree/tree_lib.py#resolve_kind` over
-`#KIND_ALIASES`; unit 18 S7, S8). Unit 4's rev-4 re-ground names `resolve_kind` for its `logs` row, but
+`#KIND_ALIASES`; unit 18 S7, S8). Unit 4's rev-6 spec names `resolve_kind` for its `logs` row, but
 its AC5 plants one record per typed kind and none under the alias, so no criterion sees a `journal`
 and a `log` binding route together, and nothing reds a raw comparison of the retired token elsewhere.
 This unit holds every kind comparison of `render_routes` to `resolve_kind`, re-pointing any its pass
@@ -46,8 +49,8 @@ kind token anywhere in the tool root. It repairs `TOOL-dTotalRecall-4`.
   `build-routes` region re-rendered by `gen_build_index.py --write`; where unit 4 landed each comparison
   through `resolve_kind`, no region changes (§8 F3). Observed by AC1 and AC2.
 - **S2** — The alias census, `check_alias_compares(root, tool_rel)` in `tools/memory-tree/record_kinds.py`,
-  an arm of `check_record_kinds` (`#check_record_kinds`) returning `(lines, reds)` as the pocket and alias
-  arms do, so `--check` runs it. It reads every tracked `*.py`, `*.sh` and `*.js` file under the tool
+  an arm of `check_record_kinds` (`#check_record_kinds`) returning `(lines, reds)` as the pocket arm
+  `#check_pockets` does, so `--check` runs it. It reads every tracked `*.py`, `*.sh` and `*.js` file under the tool
   root through `read_tracked` (`#read_tracked`, `#derive_tool_rel`) and lists each line spelling a key of
   `tree_lib.KIND_ALIASES` as a quoted literal that is an operand of `==`, `!=`, `===` or `!==`, a member
   of the bracket after ` in (` or ` in [`, or, in a `*.sh` file, a `case` pattern. A listed line is red
@@ -97,18 +100,18 @@ kind token anywhere in the tool root. It repairs `TOOL-dTotalRecall-4`.
 The other rows of `TOOL-dTotalRecall-4` §4 are unchanged. The kinds still come from `binds_all`, read
 once in `plan()` (`tools/memory-tree/gen_build_index.py#plan`) and attached as `build["records"]`; only
 the comparison is held. Unit 4 registers the region in `#GEN_REGIONS` and its renderer in
-`#REGION_RENDERERS`, neither of which holds it at `8fbc5a337`.
+`#REGION_RENDERERS`, neither of which holds it at `94e17798f`.
 
 ### The census at base
 
-Re-derived at `8fbc5a337`: S2's predicate, run as a probe over the 381 tracked code files under
+Re-derived at `94e17798f`, after units 5, 16, 25, 38 and 54 landed: S2's predicate, run as a probe over the 381 tracked code files under
 `tools/` (DERIVED, `git ls-files tools | grep -cE "\.(py|sh|js)$"`), lists 7 lines in 2 files (DERIVED,
 the probe), none a kind comparison: unit 18 re-pointed every reader its sites table names. Each is the
 govkit shim's `install.on-shim-call` mode `journal`, a homonym: `tools/govkit/shims.py#JS_TEMPLATE`
-(two lines), `#PY_PRELUDE` (two), `#run_forward_plant` (two), and `tools/govkit/selftest.py@8fbc5a337:20615`,
+(two lines), `#PY_PRELUDE` (two), `#run_forward_plant` (two), and `tools/govkit/selftest.py@94e17798f:20615`,
 a mode list in `main`. `ALIAS_COMPARE_KEPT` therefore opens keying those two files by their paths
 under the tool root, each reason `homonym: the shim's install.on-shim-call mode`. The pass re-runs the
-probe at its base, after units 4, 5, 16, 25, 38 and 54, and a hit outside these is a comparison to
+probe at its base, after unit 4, and a hit outside these is a comparison to
 re-point in this pass, by the same rule as S1, or a fixture to key with its reason.
 
 ### Inventory
@@ -116,7 +119,7 @@ re-point in this pass, by the same rule as S1, or a fixture to key with its reas
 Minted: `check_alias_compares` and `ALIAS_COMPARE_KEPT` in `tools/memory-tree/record_kinds.py`; the
 plants `raw-alias-compare` and `alias-compare-kept` in its `#PLANTS`. Naming cell:
 `python tools/lexicon/lexicon.py --suggest check_alias_compares --as py.function` answered OK at
-`8fbc5a337`, `check` a VERBS entry of `.lexicon.conf`.
+`94e17798f`, `check` a VERBS entry of `.lexicon.conf`.
 
 ### Files touched (estimate)
 
@@ -156,7 +159,8 @@ plants `raw-alias-compare` and `alias-compare-kept` in its `#PLANTS`. Naming cel
   `build-routes` region names both under `logs`.
   Red when: the region compares the written token, so one of the two is absent.
   fixture: the scratch clone; the pass makes it, its ids in the `TOOL` family the clone's `FAMILIES`
-  holds, since an id of no family binds `malformed` and routes nowhere, as `read_bindings` reads it.
+  holds, since an id of no family binds `malformed` and routes nowhere, as `read_bindings` reads it; its
+  README types no front-matter key unit 4 derives, which unit 4's AC4 refuses on a new README.
 - **AC2** — When a probe prints `render_routes`' source through `ast.get_source_segment` at the pass tip,
   no line of it spells `journal` and it calls `resolve_kind`.
   Red when: the renderer keeps a raw comparison beside the `resolve_kind` call.
@@ -218,6 +222,11 @@ file, which the file-keyed keep hides; and a kept file that no longer hits (unit
   tool-root path, its base population 7 homonym lines in govkit (F4) and AC4 its keep; AC1's ids move
   to a real family; the legs `record-kinds`, `memory-hygiene self-test`, `chain-packet self-test`,
   `policy fixtures` and `spec tokens` join §7.
+- rev-4 · 2026-11-22 · header · §1 · S2 · §4 · AC1 · re-grounded at `94e17798f` per
+  `2026-11-22-prompt-TOOL-dTotalRecall-40-reground-2-brief`: the census probe re-run over the landed units 5,
+  16, 25, 38 and 54 still lists 7 homonym lines in 2 govkit files over 381 files (DERIVED, §4); S2's return
+  shape is `#check_pockets`', `#check_serves_aliases` returning one line; unit 4 is cited at its rev-6;
+  AC1's fixture README types no key unit 4 derives; every other claim held.
 
 ## 10. Reuse audit
 
