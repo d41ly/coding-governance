@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-19 — the before and after measurements, with their instruments
 
-**Status:** SPECCED · rev-5 · 2026-11-22 · node d · Tier-1 · base 18948bf2 · streams tooling · order 7 · ratified 2026-11-20
+**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-1 · base 18948bf2 · streams tooling · order 7 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -15,6 +15,7 @@
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-26 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-14 TOOL-dQuietDisk-9 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-19-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-19-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-19-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-19-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-19-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-19-reground-task.md) | research | — |
 
 <!-- /gen:spec-records -->
