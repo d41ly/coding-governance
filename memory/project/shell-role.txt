@@ -122,8 +122,8 @@ tools/unattended/adopt-unattended.sh	775	85a1c45076fd9093f1b9a08a2d720c8146aa1ac
 tools/unattended/adopt-unattended.test.sh	565	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/check-arms-groups.sh	137	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/check-arms-groups.test.sh	108	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/unattended/check-brief-recorded.sh	386	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/unattended/check-brief-recorded.test.sh	662	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/unattended/check-brief-recorded.sh	585	efe7745ba163c739b951ad7ea939e79fc8e14101	widened:2026-11-22-build-TOOL-dQuietDisk-3-widen-5
+tools/unattended/check-brief-recorded.test.sh	720	efe7745ba163c739b951ad7ea939e79fc8e14101	widened:2026-11-22-build-TOOL-dQuietDisk-3-widen-5
 tools/unattended/check-pass-order.sh	627	b24fe84dce8a78a30caa792a976687595193df0a	widened:2026-11-22-build-TOOL-dQuietDisk-2-widen-4
 tools/unattended/check-pass-order.test.sh	796	b24fe84dce8a78a30caa792a976687595193df0a	widened:2026-11-22-build-TOOL-dQuietDisk-2-widen-4
 tools/unattended/check-playbook.sh	332	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
