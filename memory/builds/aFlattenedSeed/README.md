@@ -4,7 +4,7 @@ node: a
 opened: 2026-11-22
 streams: tooling
 roster: TOOL
-ids: TOOL-aFlattenedSeed-1
+ids: TOOL-aFlattenedSeed-1 TOOL-aFlattenedSeed-2
 ---
 
 # aFlattenedSeed — three kit readers that red an adopter's bar on its own layout
@@ -41,25 +41,27 @@ None.
 | # | Unit | Mechanism |
 |---|---|---|
 | 1 | `TOOL-aFlattenedSeed-1` | wrapped-manifest unwrap · gitlinks skipped · seed `{prefix}` through `resolve_kit_dir` |
+| 2 | `TOOL-aFlattenedSeed-2` | sh_hygiene's home-graded note on stderr, so a `--measure` seed reads rows only |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-11-22 · streams tooling
-ids TOOL-aFlattenedSeed-1
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-11-22 · streams tooling
+ids TOOL-aFlattenedSeed-1 TOOL-aFlattenedSeed-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aFlattenedSeed-1 — three kit readers read an adopter's own layout](spec/2026-11-22-spec-TOOL-aFlattenedSeed-1.md) | — | 1 | CLOSED | rev-4 | 2026-11-22 |
+| [TOOL-aFlattenedSeed-2 — sh_hygiene's home-graded note rides stderr](spec/2026-11-23-spec-TOOL-aFlattenedSeed-2.md) | — | 1 | INPROGRESS | rev-1 | 2026-11-23 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
 
-Ids no record names: TOOL-aFlattenedSeed-1.
+Ids no record names: TOOL-aFlattenedSeed-1 TOOL-aFlattenedSeed-2.
 
-Ids no `spec-audit` record has ever named: TOOL-aFlattenedSeed-1.
+Ids no `spec-audit` record has ever named: TOOL-aFlattenedSeed-1 TOOL-aFlattenedSeed-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
