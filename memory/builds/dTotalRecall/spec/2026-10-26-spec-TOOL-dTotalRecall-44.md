@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-44 — the split census keys on the split's shape, so it lists every id reader whatever its value is named
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 94e17798 · streams tooling · order 9 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-4 · 2026-11-22 · node d · Tier-2 · base 94e17798 · streams tooling · order 9 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-11-22-build-TOOL-dTotalRecall-44-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-44-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-44-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-44-1-spec-writer.md) | journal | TOOL-dTotalRecall-1 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-44-round2-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-44-round2-fix-brief.md) | research | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-44-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-44-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-44-reground-2-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-44-reground-2-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-44-reground-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-44-reground-2-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-44-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-44-reground-brief.md) | journal | — |
