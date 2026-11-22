@@ -16,6 +16,7 @@ never: edits a spec beyond its status header — scratch-guard.js role arm; writ
 return: outcome:committed|returned, commit:sha?, why:text?, checks:list
 effort: high
 gates: lexicon naming predicates?
+budget: 8212
 ---
 
 You are a software engineer building ONE unit of a larger build: the one your task names, from its

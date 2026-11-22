@@ -128,3 +128,12 @@ key = "gates"
 owner = "gov"
 shape = "list"
 required = "optional"
+
+# `budget` (TOOL-dBoundRoles-15 S2): the byte ceiling of the role's whole static block, its `## Charter`
+# included, as `roles_lib.render_static_block` composes it; a decimal integer, which R5 reads through
+# `roles_lib.read_role_budget` and grades, since no shape here is an integer.
+[[field]]
+key = "budget"
+owner = "gov"
+shape = "text"
+required = "every"

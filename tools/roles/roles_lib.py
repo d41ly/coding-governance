@@ -10,7 +10,10 @@ of a head winning, as the hooks kit's format guard reads the fence (TOOL-aOrient
 `extract_prompt_marker` reads an `Agent` prompt's marker line as the hooks kit's spawn guard does.
 `render_role` is the one composition of a role with its house overlay, and `render_charter_blocks`
 the one composition of the charter text a role carries: every consumer that hands a role to an agent
-calls both, so a role reaches an agent the same way by every route. Stdlib only; every text read
+calls both, so a role reaches an agent the same way by every route. `render_static_block` composes the
+two into the agent file's body, the block R5 measures against the role's `budget`, and
+`check_single_carry` keeps `instructions.task-charter` from carrying the charter twice (TOOL-dBoundRoles-15).
+Stdlib only; every text read
 folds CRLF to LF and names its encoding.
 
 The front-matter grammar: a `---` block at line 1, one `key: value` per line at COLUMN 0, values kept
@@ -102,6 +105,8 @@ MICROFORMAT_LINE_RE = re.compile(r"^- `(.*)`$")
 #: The one line an agent-type or handoff render prints with no playbook kit, so no registry ranks its
 #: blocks (PLAY-dOrderedCharter-5 F4); `%s` is the resolver's refusal, which names where it looked.
 UNRANKED_NOTE = "envelope — unarmed · no playbook kit, so the blocks render unranked: %s"
+#: Where an agent role's type renders, repo-relative: the file whose body `render_static_block` composes.
+AGENTS_REL = ".claude/agents"
 
 
 class RolesError(Exception):
@@ -1304,6 +1309,85 @@ def render_role(kit_dir, name, memory_root, gates=()):
     out = body + ("\n\n## House rules\n\n" + overlay if overlay.strip() else "")
     out += "\n\n" + render_role_fields(keys, gates)
     return out.replace(MEMORY_ROOT_TOKEN, memory_root) + "\n"
+
+
+def render_static_block(kit_dir, slot, role, memory_root, charter, notes, gates=(), missing=(), rows=None,
+                        charter_doc=""):
+    """The role's static block, the one composition of the bytes an agent file carries after its front
+    matter (TOOL-dBoundRoles-15 S1): `render_role`'s output with `gates`, the legs its `## Ceiling`
+    names, then each of `missing`, the `Missing required unit:` lines the load-set check printed for it;
+    and `## Charter` with `render_charter_blocks`' blocks for `role`'s `rules`. With `rows`, the document
+    registry, the charter comes first, in the envelope of the charter's row at `charter_doc`, then the
+    role, all in the agent file's own envelope (PLAY-dOrderedCharter-5 S1); with `rows` None the role
+    comes first and the charter after it, unenveloped. A charter that yields no block renders no
+    `## Charter`. R5 measures these bytes against the role's `budget`, so the charter is inside its
+    ceiling."""
+    body = render_role(kit_dir, slot, memory_root, gates)
+    if missing:
+        body += "\n" + "\n".join(missing) + "\n"
+    blocks = render_charter_blocks(charter, role["path"].as_posix(), role["keys"].get("rules", ""), notes)
+    if blocks and rows is None:
+        body += "\n## Charter\n\n" + blocks
+    elif blocks:
+        blocks = "## Charter\n\n" + blocks
+        row = read_envelope_row(rows, charter_doc, memory_root)
+        if row is not None:
+            blocks = render_envelope(charter_doc, row[0], row[1], blocks)
+        body = blocks + "\n" + body
+    # PLAY-dOrderedCharter-3 S4: the body after the front matter in its envelope, where a registry row names it
+    rel = "%s/%s.md" % (AGENTS_REL, slot)
+    row = read_envelope_row(rows, rel, memory_root)
+    if row is not None:
+        body = render_envelope(rel, row[0], row[1], body)
+    return body
+
+
+def read_role_budget(role):
+    """The role's `budget`, the byte ceiling of its whole static block (TOOL-dBoundRoles-15 S2), as an
+    integer; None where its front matter carries no `budget`. A value that is no decimal integer raises
+    RolesError naming the role file and the value, R5."""
+    value = role["keys"].get("budget")
+    if not value:
+        return None
+    if not re.fullmatch(r"[0-9]+", value):
+        raise RolesError("%s: R5 — budget '%s' is not a decimal byte count" % (role["path"].as_posix(), value))
+    return int(value)
+
+
+#: The two harness kinds (TOOL-dBoundRoles-15 §4): `static`, a backend that loads the role's charter from
+#: a file at spawn, and `inline`, one that loads neither file, so only its task can carry the charter.
+HARNESS_KINDS = ("static", "inline")
+#: The `instructions.task-charter` values, the first the default a read of None takes.
+TASK_CHARTER_VALUES = ("when-not-static", "always")
+SINGLE_CARRY_LINE = ("instructions.task-charter is always, and %s loads the charter from %s: the charter "
+                     "would reach the agent twice; set when-not-static")
+
+
+def derive_harness_kind(keys, stand_in, charter_doc):
+    """`(kind, carrier)` for a render of the role whose front-matter keys are `keys`: the harness kind and
+    the file that loads its charter at spawn (TOOL-dBoundRoles-15 §4 "The harness kind"). An `agent`-true
+    role spawned by its type is `static`, carried by `.claude/agents/<slot>.md`; a `--stand-in` render and
+    any render of an `agent: false` role are the main loop's, `static` too, carried by the charter file,
+    `charter_doc`, which Claude Code loads at level 0. Today's one adapter derives no `inline` route: the
+    adapter that loads neither file says so in its own row, which this function reads once it exists."""
+    if stand_in or keys.get("agent", "true") == "false":
+        return "static", charter_doc
+    return "static", "%s/%s.md" % (AGENTS_REL, keys.get("name", ""))
+
+
+def check_single_carry(value, kind, role, carrier):
+    """Whether the task carries the role's charter blocks (TOOL-dBoundRoles-15 S5), for the
+    `instructions.task-charter` `value` (None reads as `when-not-static`) and the harness `kind`: only an
+    `inline` kind does. `always` with a `static` kind raises RolesError naming the key, its value, the role
+    and `carrier`, since the charter would then reach the agent twice."""
+    value = value or TASK_CHARTER_VALUES[0]
+    if value not in TASK_CHARTER_VALUES:
+        raise RolesError("instructions.task-charter is %r, not one of %s" % (value, " ".join(TASK_CHARTER_VALUES)))
+    if kind not in HARNESS_KINDS:
+        raise RolesError("the harness kind %r is not one of %s" % (kind, " ".join(HARNESS_KINDS)))
+    if kind == "static" and value == "always":
+        raise RolesError(SINGLE_CARRY_LINE % (role, carrier))
+    return kind == "inline"
 
 
 def resolve_harness_path(tool_root, harness):

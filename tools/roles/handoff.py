@@ -24,6 +24,15 @@ of one `- [<name>] <reach>` line per active practice reaching the step its workf
 load-set check's run prints under `--reach` (PLAY-dOrderedCharter-21). A slot with nothing to fill leaves no line.
 The charter's blocks ride once, in the role's agent file, never in the prompt; the render still grades the
 role's `rules` tags, each library note printed on stderr as `handoff: note — ` (PLAY-dOrderedCharter-5 S3).
+THE SINGLE CARRY (TOOL-dBoundRoles-15): the policy key `instructions.task-charter` selects whether a task
+carries the charter blocks, read once per render through `roles_lib.read_policy_setting` and checked by
+`roles_lib.check_single_carry` before any file is written. The harness kind is `static` where a file the
+backend loads carries the charter at spawn, the agent file for a spawned type and the charter file for a
+`--stand-in` or an `agent: false` render, which the main loop does; `inline` is a backend loading neither,
+and only an `inline` task carries the blocks. Every route of today's one adapter is `static`, so
+`when-not-static`, the default, puts no charter in any task, and `always` refuses with exit 1, naming the
+key, the role and the file that carries its charter, since the charter would reach it twice. With no
+policy kit the render prints one `instructions.task-charter unread` note and takes `when-not-static`.
 Where the playbook kit's document registry reads, each block sits in the envelope of its level
 (PLAY-dOrderedCharter-5 S2), opened under its section's heading: the `## Role` body in the agent file's row,
 level 5; first under `## Task` the practices block at level 0, doc `<charter>#practices-at-<step>` and the
@@ -164,6 +173,8 @@ BRIEF_HEAD_RE = re.compile(r"^## The brief[ \t]*$", re.M)
 ROSTER_LINE_MAX = 200
 #: `load_sets.py check --reach`'s line opening, one per reach unit, then `role.<name> · <tag> · <reach>`.
 REACH_LINE = "load-set — reach · "
+#: The note a render prints where no policy kit answers `instructions.task-charter` (TOOL-dBoundRoles-15 §8 F2).
+TASK_CHARTER_NOTE = "instructions.task-charter unread: no policy kit; the single carry takes when-not-static"
 #: The ranked handoff (PLAY-dOrderedCharter-5 S2): the slot whose block leads the task part at level 0,
 #: its envelope's doc, and the task's own level and direction.
 LEAD_SLOTS = ("practices",)
@@ -571,10 +582,41 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     # gate legs the policy's merged grant (TOOL-dBoundRoles-21 S6), loaded as `print_role_efforts` loads
     # it, so both routes render one block
     roles = lib.load_roles(KIT_DIR)
+    doc = charter_path.relative_to(root).as_posix() if root in charter_path.parents else charter_path.as_posix()
+    # TOOL-dBoundRoles-15 S6: the single carry, read once per render and checked before any file is written;
+    # every route of today's one adapter is `static`, so no task carries the charter and `always` refuses
+    stand_in = tail == lib.STAND_IN_TAIL
+    carry = lib.read_policy_setting("instructions.task-charter", root)
+    if carry is None and None in lib._POLICY_ANSWERS and notes is not None:   # no policy kit answered
+        notes.append(TASK_CHARTER_NOTE)
+    kind, carrier = lib.derive_harness_kind(keys, stand_in, doc)
+    lib.check_single_carry(carry, kind, role, carrier)
     granted = lib.load_policy(KIT_DIR, roles, lib.load_workflows(KIT_DIR)).get("gates", {})
     role_text = lib.render_role(KIT_DIR, role, memory_root, granted.get(role, ()))
+    charter_text = lib.load_text(charter_path)
+    try:   # a doc that is no charter refuses where it always has, after the load set and the reads
+        charter, charter_error = lib.parse_charter(charter_text, doc), None
+    except lib.RolesError as e:
+        charter, charter_error = None, e
+    if charter is not None and charter["shape"] == "legacy" and notes is not None:
+        notes.append(lib.LEGACY_NOTE % doc)
+    try:
+        rows = lib.load_document_registry(KIT_DIR)
+    except LookupError as exc:   # no playbook kit: the roles kit does not require it (F4)
+        rows = None
+        if notes is not None:
+            notes.append(lib.UNRANKED_NOTE % exc)
+    # PLAY-dOrderedCharter-5 S3: the charter rides once, in the agent file; the render still grades the tags,
+    # here, where the load-set check measures the whole static block (TOOL-dBoundRoles-15 §8 F7)
+    block, tag_refusals = role_text, []
+    if charter is not None:
+        try:
+            block = lib.render_static_block(KIT_DIR, role, roles[role], memory_root, charter, notes,
+                                            granted.get(role, ()), (), rows, doc)
+        except lib.RolesError as e:
+            tag_refusals = str(e).split("\n")
     code = values.get("input:" + CODE_INPUT)
-    refused, gate = lib.check_load_set(root, KIT_DIR, [(role, len(role_text.encode("utf-8")))],
+    refused, gate = lib.check_load_set(root, KIT_DIR, [(role, len(block.encode("utf-8")))],
                                        [(CODE_INPUT, len(code.replace("\r", "").encode("utf-8")))] if code else [],
                                        reach=True)
     if refused:
@@ -665,25 +707,11 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         else:
             absent.append(key)
             reasons += [what] if why.get(src) and what not in reasons else []
-    doc = charter_path.relative_to(root).as_posix() if root in charter_path.parents else charter_path.as_posix()
-    charter_text = lib.load_text(charter_path)
-    charter = lib.parse_charter(charter_text, doc)
-    if charter["shape"] == "legacy" and notes is not None:
-        notes.append(lib.LEGACY_NOTE % doc)
-    try:
-        # PLAY-dOrderedCharter-5 S3: the charter rides once, in the agent file; the render still grades the tags
-        lib.render_charter_blocks(
-            charter, (KIT_DIR / "agents" / (role + ".agent.md")).as_posix(), keys.get("rules", ""), notes)
-    except lib.RolesError as e:
-        refusals += str(e).split("\n")
+    if charter_error is not None:
+        raise charter_error
+    refusals += tag_refusals
     if refusals:
         raise lib.RolesError("\n".join(refusals))
-    try:
-        rows = lib.load_document_registry(KIT_DIR)
-    except LookupError as exc:   # no playbook kit: the roles kit does not require it (F4)
-        rows = None
-        if notes is not None:
-            notes.append(lib.UNRANKED_NOTE % exc)
     opening = ("This handoff is for build `%s`, unit `%s`." % (slug, unit_id) if unit
                else "This handoff is for build `%s`, and names no single unit." % slug)
     if missing:

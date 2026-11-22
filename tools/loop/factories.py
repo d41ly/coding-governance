@@ -36,9 +36,10 @@ conforms, then runs the kind's gate over the whole population:
   index is never written.
 - `role` writes `<slot>.agent.md` under the roles kit's `agents/`, `mandatory: no`, an empty `rules`, the
   `never` list and the `return` template its flags give (TOOL-dBoundRoles-2), the `layer` and `acts-as` its
-  `--layer` and `--acts-as` give (TOOL-dBoundRoles-1), and a one-line body; lists the slot in its workflow's `roles`; writes the slot's ceiling row into the roles
-  kit's `BODY_CEILINGS`; and re-renders that kit's README catalogue region through `check_roles.py
-  --write`, whose grade is the gate.
+  `--layer` and `--acts-as` give (TOOL-dBoundRoles-1), its `budget` the `--ceiling` value, the byte ceiling
+  of the role's whole static block, `## Charter` included (TOOL-dBoundRoles-15), and a one-line body; lists
+  the slot in its workflow's `roles`; and re-renders that kit's README catalogue region through
+  `check_roles.py --write`, whose grade is the gate.
 - `workflow` appends a `[[workflow]]` row to the roles kit's `workflows.toml`, its `name`, `order` and
   `step` row to the loop definition beside this file, and its name to the roles kit's `WORKFLOW_NAMES`,
   then re-renders the README region; its gate is `check_roles.py --write`, then `loop_lib.py --check`.
@@ -133,7 +134,9 @@ PLANTS = {
 #: and `factory-interrupt`.
 FIXTURE_ROLE_NEVER = "writes outside its caller's path — unenforced — a fixture role"
 FIXTURE_ROLE_RETURN = "outcome:answered|none, answer:text?"
-#: The register's factory verb each `-new` case and `factory-restores` runs, after `core.py new`.
+#: The register's factory verb each `-new` case and `factory-restores` runs, after `core.py new`. The role's
+#: `--ceiling` is its `budget` over the whole static block: its former 1024-byte body ceiling plus the charter
+#: block it renders with in gov's clone, as TOOL-dBoundRoles-15 §4 "Pricing" prices every role.
 NEW_ARGV = {
     "command-new": ["command", "check", "--kit", "loop", "--run", "loop_lib.py"],
     "policy-key-new": ["policy-key", "fixture.knob", "--allowed", '["a", "b"]', "--default", '"a"', "--summary",
@@ -141,7 +144,7 @@ NEW_ARGV = {
     "hook-new": ["hook", "fixture-hook", "--kit", "agent-cap", "--event", "Stop"],
     "role-new": ["role", "gov-fixture", "--workflow", "build", "--writes", "none", "--description",
                  "A fixture role.", "--reads", "input:question", "--never", FIXTURE_ROLE_NEVER, "--return",
-                 FIXTURE_ROLE_RETURN, "--output", "the answer, to its caller", "--ceiling", "1024", "--layer",
+                 FIXTURE_ROLE_RETURN, "--output", "the answer, to its caller", "--ceiling", "3658", "--layer",
                  "layer.roles", "--acts-as", "item"],
     "workflow-new": ["workflow", "fixture", "--driver", "program", "--harness", "none", "--roles", "",
                      "--enforced-by", "none — a fixture", "--trigger", "never, a fixture", "--order", "0",
@@ -578,20 +581,19 @@ def write_role(top, kit_rel, slot, workflow, writes, description, reads, never, 
     if not isinstance(kind, str) or not kind:
         raise Refused("--workflow %r names no workflows.toml entry carrying a kind, so the role's shapes has no "
                       "value" % workflow)
-    table, checker = roles / "workflows.toml", roles / "check_roles.py"
+    table = roles / "workflows.toml"
     values = dict(name=slot, description=description, tools=ROLE_TOOLS, model=ROLE_MODEL, workflow=workflow,
                   layer=layer, reads=reads, writes=writes, rules="", mandatory="no", output=output, never=never,
-                  effort=ROLE_EFFORT, shapes=kind)
+                  effort=ROLE_EFFORT, shapes=kind, budget=ceiling)
     values["return"] = template   # `return` is a Python keyword, so the key is set by subscript
     values["acts-as"] = acts_as   # a hyphenated key, so it is set by subscript as `return` is
     body = "You are the %s role of the %s workflow; what it does beyond its front matter is its author's to write.\n" % (
         slot, workflow)
+    # TOOL-dBoundRoles-15 §8 F8: `--ceiling` is the role's `budget`, the byte ceiling of its whole static block
     text = render_front_matter(roles_lib.FRONT_MATTER_KEYS, values).replace(": \n", ":\n") + "\n" + body
-    ceilings = render_closed_set(read_text_exact(checker), "BODY_CEILINGS = {", "\n}",
-                                 "\n    %s: %d," % (json.dumps(slot), ceiling))
     return write_kind_instance("role", slot, top, kit_rel, [
-        (role, text), (table, write_workflow_roles(read_text_exact(table), workflow, slot)),
-        (checker, ceilings)], render=roles / "README.md")
+        (role, text), (table, write_workflow_roles(read_text_exact(table), workflow, slot))],
+        render=roles / "README.md")
 
 
 def write_workflow(top, kit_rel, name, driver, harness, roles_csv, enforced_by, trigger, order, step):
@@ -751,7 +753,7 @@ def run_interrupt_plant(clone, kit_rel):
     import policy_edit
     roles = derive_roles_kit(clone, kit_rel)
     role = roles / "agents" / "gov-fixture.agent.md"
-    held = [roles / "workflows.toml", roles / "check_roles.py", roles / "README.md"]
+    held = [roles / "workflows.toml", roles / "README.md"]
     before = {path: path.read_bytes() for path in held}
     real_replace = policy_edit.os.replace
     args = (clone, kit_rel, "gov-fixture", "build", "none", "A fixture role.", "input:question", FIXTURE_ROLE_NEVER,

@@ -37,11 +37,16 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
   R4  a `rules` entry that is not a lowercase tag optionally ending in `?`, a tag named twice, or a
       bare tag naming no practice of a tagged charter; an optional (`?`) tag its practices lack
       prints one `roles: note:`. A pre-tag (v3.x) charter resolves no tag and prints one note
-  R5  a body empty, over its slot's ceiling, carrying a `# `/`## ` line or a token other than
+  R5  a body empty, carrying a `# `/`## ` line or a token other than
       {{MEMORY_ROOT}}, or spelling the file name of a protocol the charter's Protocols section
       names; a body line carrying `never`, `do not`, `don't` or `must not`, matched ignoring case as
       whole words, one line each naming its line, since a limit lives in `never` and the body
-      states the job (TOOL-dBoundRoles-2 S3); a slot with no ceiling row. The ceiling half obeys
+      states the job (TOOL-dBoundRoles-2 S3); and THE BUDGET (TOOL-dBoundRoles-15 S3): every role's
+      whole static block, `roles_lib.render_static_block`'s bytes, CR stripped, `## Charter`
+      included, rendered with the gate legs the house policy grants it, the document registry where
+      the playbook kit's reads and no `Missing required unit:` line, over the role's `budget`
+      front-matter key, read by `roles_lib.read_role_budget`, whether `agent` is true or false; a role
+      with no `budget`, or one that is no decimal integer, names the slot. The budget half obeys
       the policy kit's size switch for the family cap `role-body` (TOOL-dGroundRules-9): under `warn` it prints a `BUDGET WARN` line and
       is no defect; with no policy kit, or a refusing reader, it is a defect as before
   R6  a workflow entry with an unknown, missing or repeated key or name, a missing name of the twelve,
@@ -155,13 +160,6 @@ except Exception as _e:  # the library derives its key set from role-schema.toml
     print("roles: %s" % _e)
     sys.exit(2)
 
-#: Bytes of each slot's BASE body, CR stripped. A new role is priced when it is added.
-BODY_CEILINGS = {
-    "gov-orienter": 3072, "gov-researcher": 3072, "gov-reuse-scout": 1536,
-    "gov-spec-writer": 4096, "gov-builder": 4096,
-    "gov-reviewer": 4096, "gov-skeptic": 3072, "gov-synthesizer": 3072, "gov-session": 2048,
-    "gov-tester": 3072, "gov-prompt-writer": 3072, "gov-planner": 3072, "gov-architect": 3072,
-}
 WORKFLOW_NAMES = ("orient", "research", "reuse", "handoff", "spec-write", "spec-review", "build",
                   "closing-review", "gate-bar", "bookkeeping", "plan", "design")
 WORKFLOW_KEYS = ("name", "driver", "harness", "roles", "stages", "enforced-by", "trigger",
@@ -395,7 +393,6 @@ def check_roles(root, kit_dir, write=False):
         notes.append("roles: note: no layer register answered, so each role's layer is not joined to a row: %s"
                      % layer_why)
     by_layer, by_acts = {}, {}
-    body_mode = None  # the `role-body` cap's (mode, rule), asked at the first body over its ceiling
     for p in sorted((kit_dir / "agents").glob("*.agent.md")):
         slot = p.name[:-len(".agent.md")]
         try:
@@ -471,26 +468,6 @@ def check_roles(root, kit_dir, write=False):
         for name in protocol_files:
             if name in body:
                 add_defect(p, "R5", "body spells the protocol file %s; name the protocol, never its file" % name)
-        ceiling = BODY_CEILINGS.get(slot)
-        size = len(body.encode("utf-8"))
-        if ceiling is None:
-            add_defect(p, "R5", "slot '%s' has no ceiling row in BODY_CEILINGS" % slot)
-        elif size > ceiling:
-            # THE SWITCH (TOOL-dGroundRules-9): `role-body` is a family cap, so the policy kit is
-            # asked only its mode, once, at the first body over its slot's ceiling. Under `warn` the
-            # breach is a BUDGET WARN line and no defect; R5's other defects never move.
-            if body_mode is None:
-                body_mode = lib.read_cap_answer("role-body", root, kit_dir)[1:]
-            if body_mode[0] == "warn":
-                # The runner's `gate-warn` marker on the warning's next line, inside its own note, so it prints
-                # where the notes print (TOOL-dWitnessedBar-29 S2); `read_cap_answer` loaded its factory.
-                budgets = sys.modules.get("budgets")
-                shown = resolve_display_path(root, p)
-                notes.append("BUDGET WARN — role-body · %s · %d bytes over %d · %s" % (shown, size, ceiling, body_mode[1])
-                             + ("\n" + budgets.render_warn_marker(shown, "role-body · %d bytes over %d" % (size, ceiling))
-                                if budgets else ""))
-            else:
-                add_defect(p, "R5", "body is %d bytes, over its %d-byte ceiling (%s)" % (size, ceiling, body_mode[1]))
         if not body.strip():
             add_defect(p, "R5", "body is empty")
         if any(ln.startswith(("# ", "## ")) for ln in body.split("\n")):
@@ -804,12 +781,56 @@ def check_roles(root, kit_dir, write=False):
             if name in text:
                 add_defect(p, "R10", "overlay spells the protocol file %s; name the protocol, never its file" % name)
 
+    granted = {}
     try:
         policy_notes = []
-        lib.load_policy(kit_dir, roles, workflows, policy_notes)
+        granted = lib.load_policy(kit_dir, roles, workflows, policy_notes).get("gates", {})
         notes.extend("roles: note: %s" % n for n in policy_notes)
     except lib.RolesError as e:
         defects.extend("roles: %s" % ln for ln in str(e).split("\n"))
+
+    # R5's BUDGET (TOOL-dBoundRoles-15 S3): every role's whole static block, as `render_agent_file` composes
+    # it, against its `budget`. THE SWITCH (TOOL-dGroundRules-9): `role-body` is a family cap, so the policy
+    # kit is asked only its mode, once, at the first block over its budget. Under `warn` the breach is a
+    # BUDGET WARN line and no defect; R5's other defects never move.
+    try:
+        rows = lib.load_document_registry(kit_dir)
+    except LookupError:   # no playbook kit: the block renders unranked, as the agent file does
+        rows = None
+    except lib.RolesError as e:
+        rows = False
+        defects.append("roles: %s; R5 measures no static block" % e)
+    body_mode = None  # the `role-body` cap's (mode, rule), asked at the first block over its budget
+    for slot, r in roles.items() if rows is not False else ():
+        p = r["path"]
+        try:
+            budget = lib.read_role_budget(r)
+        except lib.RolesError as e:
+            add_defect(p, "R5", str(e).split(" — ", 1)[-1])
+            continue
+        if budget is None:
+            add_defect(p, "R5", "slot '%s' declares no budget, so its static block has no ceiling" % slot)
+            continue
+        try:
+            block = lib.render_static_block(kit_dir, slot, r, memory_root, charter, None, granted.get(slot, ()),
+                                            (), rows, doc)
+        except lib.RolesError:
+            continue   # a rules tag or a body token that does not render: R4's or R5's defect, named above
+        size = len(block.replace("\r", "").encode("utf-8"))
+        if size <= budget:
+            continue
+        if body_mode is None:
+            body_mode = lib.read_cap_answer("role-body", root, kit_dir)[1:]
+        if body_mode[0] == "warn":
+            # The runner's `gate-warn` marker on the warning's next line, inside its own note, so it prints
+            # where the notes print (TOOL-dWitnessedBar-29 S2); `read_cap_answer` loaded its factory.
+            budgets = sys.modules.get("budgets")
+            shown = resolve_display_path(root, p)
+            notes.append("BUDGET WARN — role-body · %s · %d bytes over %d · %s" % (shown, size, budget, body_mode[1])
+                         + ("\n" + budgets.render_warn_marker(shown, "role-body · %d bytes over %d" % (size, budget))
+                            if budgets else ""))
+        else:
+            add_defect(p, "R5", "static block is %d bytes, over its %d-byte ceiling (%s)" % (size, budget, body_mode[1]))
 
     # R15 — the owner's stand-in waiver rows joined with the declarations, both ways (TOOL-aOrientedCast-19).
     waivers, bad = lib.load_stand_in_waivers(root, memory_root, roles)

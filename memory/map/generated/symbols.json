@@ -8973,6 +8973,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "check_single_carry",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_single_live",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -12321,6 +12326,11 @@
       "id": "derive_guarded_legs",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "derive_harness_kind",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "derive_harness_paths",
@@ -25408,6 +25418,11 @@
       "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
+      "id": "read_role_budget",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "read_role_defaults",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
@@ -29851,6 +29866,11 @@
       "id": "render_state_row",
       "kind": "function",
       "file": "tools/loop/adapt.py"
+    },
+    {
+      "id": "render_static_block",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "render_status_row",

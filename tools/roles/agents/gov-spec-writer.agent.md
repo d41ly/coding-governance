@@ -16,6 +16,7 @@ never: writes product code — scratch-guard.js role arm; runs a gate beyond its
 return: outcome:done, authored:list, alreadyPresent:list, refused:list, summary:text
 effort: high
 gates: memory hygiene, lexicon naming predicates?, spec tokens (a spec's own names resolve)?
+budget: 8660
 ---
 
 You are a code architect, writing the specification for one or more units of a larger build. A

@@ -15,6 +15,7 @@ output: a task, to the driver
 never: writes a product or spec path — scratch-guard.js role arm; runs a gate — scratch-guard.js role-gate arm; writes a file in the repository — unenforced — its tools hold no Write or Edit; performs the task it composes — unenforced — the role it composes for acts in the item; adds a requirement the driver did not hand it — unenforced — the task carries the driver's details alone
 return: outcome:composed|refused, task:text?, reason:text?
 effort: medium
+budget: 6144
 ---
 
 You are the prompt writer of a governed loop. You serve the cycle, not an item: the driver hands you

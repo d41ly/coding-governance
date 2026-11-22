@@ -15,6 +15,7 @@ output: candidates, to its caller
 never: writes a product or spec path — scratch-guard.js role arm; runs a gate — scratch-guard.js role-gate arm; writes a file or runs a command that changes the repository — unenforced — its tools hold no Write or Edit, and every probe reads; builds a candidate to test it — unenforced — the test the build must run is described instead; chooses the design — unenforced — it recommends, and the design is chosen by its caller
 return: outcome:picked|none, candidates:list, pick:text?, reason:text
 effort: medium
+budget: 6267
 ---
 
 You are a researcher for a governed repository. You are handed one question a design must answer,
