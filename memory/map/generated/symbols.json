@@ -17208,6 +17208,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "load_sibling",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
       "id": "load_slug_class",
       "kind": "function",
       "file": "tools/push-main.sh"
@@ -19696,6 +19701,11 @@
       "id": "parse_header",
       "kind": "function",
       "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
+      "id": "parse_id_parts",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "parse_iso",
@@ -40146,6 +40156,11 @@
       "id": "test_hung_backend_is_bounded",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_id_parts_parse_under_each_tree_grammar",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_identifier_tokens_corpus_recall",

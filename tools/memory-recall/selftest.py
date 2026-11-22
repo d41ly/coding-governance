@@ -244,7 +244,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 86
+SELFTEST_ARMS = 87
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -296,6 +296,10 @@ SELFTEST_ARMS = 86
 #   with its rule disabled in the working tree before the unit landed. Written as `75 -> 78` on a
 #   branch that did not know about the five lines above; the reconcile merge renumbered it, and the
 #   tag arm now also asserts the pointer tier carries the tag.
+# 86 -> 87 on 2026-11-22 (TOOL-dTotalRecall-54): ONE arm, `parse_id_parts` - plain, cited, suffixed
+#   and caller-bound `alt` ids parse, flat, node-scoped, undeclared, malformed and pinned ids are
+#   refused naming the id, `alt` is keyword-only, `tree_lib` loads on first call, and over a foreign
+#   root the parser binds that root's families and slug class.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -3574,6 +3578,77 @@ def test_supersession_tag_in_both_renderers():
     return "full, snippet and pointer headers tagged; two successors in one tag; partial says partly"
 
 
+# --- TOOL-dTotalRecall-54: the id parser over a tree's own grammar -------------------------------
+# argv: the memory-tree directory to import from, the root to parse under (`-` for None, the tree
+# that directory sits in), then the ids. A refusal reads `ValueError` only when its text names the id.
+_PARSER_PROBE = (
+    "import sys, json, inspect, pathlib; sys.dont_write_bytecode = True\n"
+    "sys.path.insert(0, sys.argv[1])\n"
+    "import id_grammar as G\n"
+    "out = {'lazy': 'tree_lib' in sys.modules}\n"
+    "root = None if sys.argv[2] == '-' else sys.argv[2]\n"
+    "def read_parts(ident, **kw):\n"
+    "    try:\n"
+    "        return list(G.parse_id_parts(ident, root, **kw))\n"
+    "    except ValueError as exc:\n"
+    "        return 'ValueError' if ident in str(exc) else 'unnamed: ' + str(exc)\n"
+    "out['parts'] = {i: read_parts(i) for i in sys.argv[3:]}\n"
+    "out['loaded'] = 'tree_lib' in sys.modules\n"
+    "out['alt'] = read_parts('EXMP-aFoo-2', alt='EXMP|OTHR')\n"
+    "try:\n"
+    "    G.parse_id_parts('EXMP-aFoo-2', root, 'EXMP|OTHR')\n"
+    "    out['positional'] = 'accepted'\n"
+    "except TypeError:\n"
+    "    out['positional'] = 'TypeError'\n"
+    "out['id_re'] = inspect.getsource(G.parse_id_parts).count('ID_RE')\n"
+    "out['guards'] = pathlib.Path(G.__file__).read_text(encoding='utf-8').count('sys.path.append')\n"
+    "print(json.dumps(out))\n"
+)
+
+
+@check("parse_id_parts splits an id by its tree's grammar, refuses every other shape, and loads tree_lib lazily")
+def test_id_parts_parse_under_each_tree_grammar():
+    """TOOL-dTotalRecall-54 AC1, AC2, AC3, AC5, AC6. A throwaway tree declaring a cited family `ZED`
+    and the node class `a-f` parses with its own copy of the memory-tree kit's `id_grammar.py`; the
+    copy `make_repo` copies FROM parses over that tree's root, where `TOOL-xFoo-3` is refused, and
+    over its own tree, where the same id parses, so the refusal is the root's slug class."""
+    import extract as E
+    tree_src = E.resolve_kit_dir("memory-tree", "tree_lib.py", KIT)
+    good = {"TOOL-aFoo-2": ["TOOL", "aFoo", 2], "ZED-aFoo-2": ["ZED", "aFoo", 2],
+            "TOOL-aDrainedSluice-9b": ["TOOL", "aDrainedSluice", 9]}
+    bad = ("TOOL-001", "TOOL-d119", "ARCH-aFix-3", "TOOL-x", "TOOL-aFoo-2@rev-2", "TOOL-xFoo-3",
+           "EXMP-aFoo-2")
+    root, _kitdir = make_repo(conf=CONF + 'RECALL_CITED_FAMILIES="ZED"\nRECALL_NODE_TAG_CLASS="a-f"\n')
+    seen = {}
+    try:
+        for label, kit, at, ids in (("own", root / tree_src.name, "-", (*good, *bad)),
+                                    ("foreign", tree_src, str(root), ("ZED-aFoo-2", "TOOL-xFoo-3")),
+                                    ("home", tree_src, "-", ("TOOL-xFoo-3",))):
+            p = subprocess.run([sys.executable, "-c", _PARSER_PROBE, str(kit), at, *ids],
+                               cwd=str(root), capture_output=True, text=True, encoding="utf-8")
+            assert p.returncode == 0, f"the {label} parser probe crashed:\n{p.stderr[-600:]}"
+            seen[label] = json.loads(p.stdout)
+    finally:
+        cleanup(root)
+    own = seen["own"]
+    for ident, parts in good.items():
+        assert own["parts"][ident] == parts, f"{ident} parsed as {own['parts'][ident]}, wanted {parts}"
+    for ident in bad:
+        assert own["parts"][ident] == "ValueError", f"{ident} was not refused naming it: {own['parts'][ident]}"
+    assert own["alt"] == ["EXMP", "aFoo", 2], f"a caller-bound alt did not replace the families: {own['alt']}"
+    assert own["positional"] == "TypeError", f"alt is not keyword-only: {own['positional']}"
+    assert (own["lazy"], own["loaded"]) == (False, True), (
+        f"tree_lib at import / after a call: {own['lazy']} / {own['loaded']}, wanted False / True")
+    assert (own["id_re"], own["guards"]) == (0, 1), (
+        f"ID_RE in the parser {own['id_re']}x, path guards in the module {own['guards']}x, wanted 0 and 1")
+    foreign, home = seen["foreign"]["parts"], seen["home"]["parts"]
+    assert foreign["ZED-aFoo-2"] == ["ZED", "aFoo", 2], f"the foreign root lost its cited family: {foreign}"
+    assert foreign["TOOL-xFoo-3"] == "ValueError", f"the foreign root's a-f slug class was not bound: {foreign}"
+    assert home["TOOL-xFoo-3"] == ["TOOL", "xFoo", 3], f"the home tree refuses x too, so nothing discriminated: {home}"
+    return (f"{len(good)} parsed, {len(bad)} refused naming the id, alt keyword-only, tree_lib lazy; "
+            "the foreign root binds its own families and slug class")
+
+
 def main() -> int:
     # The live-log baseline is NOT taken here. It is taken at module scope, above the first `@check`,
     # because every arm runs at decoration time and a baseline taken in this function brackets
@@ -3632,6 +3707,8 @@ def main() -> int:
         # TOOL-aGraftedHelix-4: supersession
         test_supersession_edges_and_map, test_supersession_order_moves_only_past_a_successor,
         test_supersession_tag_in_both_renderers,
+        # TOOL-dTotalRecall-54: the id parser
+        test_id_parts_parse_under_each_tree_grammar,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
     # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the

@@ -10,8 +10,8 @@ reads exactly what it read before, and there is one grammar.
 IMPORTING THIS MODULE RESOLVES NO CONF. The default grammar binds on first use, to the repo this
 file lives in (`repo_root()` anchors on THIS FILE), and is cached per process; a tree with no
 `.memory-tree.conf` imports every memory-tree module and refuses only when something asks for an id.
-Nothing outside the standard library is imported at module level: `extract_records` reaches its
-sibling `tree_lib.parse_spec_h1` on first call.
+Nothing outside the standard library is imported at module level: every reach for the sibling
+`tree_lib` goes through `load_sibling` on first call.
 
 The conf parser is a copy of the twenty lines in codebase-map's map_lib.load_conf, not an import of
 it: kits are copied into adopters independently. The refusal text still names memory-recall, the
@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import fnmatch
 import hashlib
+import importlib
 import pathlib
 import re
 import sqlite3
@@ -348,14 +349,20 @@ def render_slug_record(words: tuple[int, int], style: str, date: str) -> str:
     return "words=%d-%d style=%s date=%s" % (words[0], words[1], style, date)
 
 
+def load_sibling(name: str):
+    """The memory-tree module `name` beside this file, imported on first call, never at this module's
+    import (TOOL-dTotalRecall-54 S5). The one path guard every sibling reach in this module goes through."""
+    here = str(pathlib.Path(__file__).resolve().parent)
+    if here not in sys.path:
+        sys.path.append(here)  # APPEND, never insert(0, ...): a kit dir ahead of the stdlib could shadow a stdlib module.
+    return importlib.import_module(name)
+
+
 def read_slug_policy(root: pathlib.Path) -> tuple[str, str]:
     """-> (the record of the three keys, the fallback line). The first refused read ends the reads and
     `SLUG_DEFAULTS` applies to all three, as checks 6 and 7 treat their read: a LookupError is no
     policy kit, a ValueError the reader refusing, no landed revision among its causes."""
-    here = str(pathlib.Path(__file__).resolve().parent)
-    if here not in sys.path:
-        sys.path.append(here)
-    import tree_lib  # noqa: PLC0415 — the sibling, deliberately not at import
+    tree_lib = load_sibling("tree_lib")
 
     vals = dict(SLUG_DEFAULTS)
     key = "builds.slug-words"
@@ -387,10 +394,7 @@ def read_recorded_grammars(root: pathlib.Path, memory_root: str) -> list[tuple[s
                              capture_output=True, check=True).stdout.decode("utf-8", "replace")
     except (OSError, subprocess.CalledProcessError):
         return []
-    here = str(pathlib.Path(__file__).resolve().parent)
-    if here not in sys.path:
-        sys.path.append(here)
-    from tree_lib import FM_RE, read_text  # noqa: PLC0415 — the sibling, deliberately not at import
+    tree_lib = load_sibling("tree_lib")
 
     found = []
     for rel in sorted(p for p in out.split("\0") if p):
@@ -398,7 +402,7 @@ def read_recorded_grammars(root: pathlib.Path, memory_root: str) -> list[tuple[s
         if parts[-1] != "README.md" or len(parts) != len(memory_root.split("/")) + 3:
             continue
         try:
-            fm = FM_RE.match(read_text(str(root / rel)))
+            fm = tree_lib.FM_RE.match(tree_lib.read_text(str(root / rel)))
         except (OSError, UnicodeDecodeError):
             continue
         for line in (fm.group(1).splitlines() if fm else ()):
@@ -532,6 +536,27 @@ def grammar_for(root=None) -> Grammar:
     return _default
 
 
+# The session era's correction tail, `[a-z]*` after the final digits (`_eras`): `-9b` parses as `-9`.
+SUFFIX_RE = re.compile(r"(?<=\d)[a-z]+$")
+
+
+def parse_id_parts(ident: str, root, *, alt: str | None = None) -> tuple:
+    """-> (family, slug, seq) of one session-era id, `seq` an int (TOOL-dTotalRecall-54 S1 to S3).
+
+    Matched whole by `tree_lib.build_id_token_re(alt, root)`, the one named-group id token, never
+    by the grammar's own id regex, whose groups are unnamed. `alt` is the family alternation, by default `grammar_for(root).families`, the declared
+    and cited families together; the slug class always comes from `root`, None the tree this file
+    lives in. One trailing correction suffix is stripped first. A flat or node-scoped id, an
+    undeclared family, a malformed id and a pinned `@rev-N` id raise ValueError naming it."""
+    if alt is None:
+        alt = "|".join(grammar_for(root).families)
+    token_re = load_sibling("tree_lib").build_id_token_re(alt, root)
+    m = token_re.fullmatch(SUFFIX_RE.sub("", ident))
+    if m is None or m.group("rev") is not None:
+        raise ValueError(f"not an id under this tree's grammar: {ident}")
+    return m.group("fam"), m.group("slug"), int(m.group("seq"))
+
+
 def anchor_at(line: str, g=None) -> str | None:
     """Return the record id this line DEFINES, or None if it merely cites one.
 
@@ -631,14 +656,10 @@ def heading_level(line: str) -> int | None:
 
 def _parse_spec_h1(path: str, text: str):
     """`tree_lib.parse_spec_h1` over the default conf: the sibling, imported on first call."""
-    here = str(pathlib.Path(__file__).resolve().parent)
-    if here not in sys.path:
-        # APPEND, never insert(0, ...): a kit dir ahead of the stdlib could shadow a stdlib module.
-        sys.path.append(here)
-    from tree_lib import parse_spec_h1  # noqa: PLC0415 — the sibling, deliberately not at import
+    tree_lib = load_sibling("tree_lib")
 
     conf = resolve()
-    return parse_spec_h1(path, text, conf.memory_root, conf.families)
+    return tree_lib.parse_spec_h1(path, text, conf.memory_root, conf.families)
 
 
 def extract_records(path: str, text: str) -> list[dict]:
