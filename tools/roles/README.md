@@ -156,6 +156,22 @@ order the inputs were given, refusing as `render` refuses: the unit harness's ca
 holding whitespace refuses, since `FACT_RE` could not read its key back. What it does not check: that
 a fact is true, only where it was cut from; a `cmd:` key is never re-run.
 
+**Handed content is fenced** (TOOL-dBoundRoles-38). Each handed block is its `### <key>` heading, a
+blank line, its fact line, a blank line, and the content inside a backtick fence that
+`roles_lib.render_handed_fence` writes: an opening and a closing line of backticks and nothing else, one
+backtick longer than the longest backtick run anywhere in the content and at least three, so no line of
+the content can close it, the content's bytes unchanged inside. The fact line sits outside its fence. A
+fact line or a `gov:handoff` marker line inside a fence is content, never a fact or a marker: every reader
+of either walks `roles_lib.read_unfenced_lines`, the one fence walker (a fence opens on at most three
+spaces of indent and three or more backticks or tildes, and closes only on a run of the same character at
+least as long with nothing after it but whitespace), as `extract_prompt_marker` and the playbook kit's
+`read_handoff_edges` do, and the hooks kit's spawn guard walks its copy, `readUnfencedLines`. So a spec
+that quotes a fact line, a heading-then-fact pair or a marker is handed whole and read as text. The
+practices block, the `## Card` block and the work-order blocks other than `### inputs`' sub-blocks are no
+handed value and are not fenced. A task section whose walk ends inside a fence refuses at render, naming
+the block and the line the fence opened at, and writes no file. A handoff rendered before this unit
+carries unfenced content, whose lines are read as before; a re-render fences it.
+
 The file is written under the build's `prompts/` folder as
 `<date>-prompt-<id>-<n>-<role without gov->.md`, and its `gov:handoff` marker line carries a hash of
 each section: `<!-- gov:handoff role=<slot> build=<slug> unit=<id|-> item=<item.step.name|-> path=<rel>

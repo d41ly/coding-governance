@@ -62,8 +62,8 @@ loop kit, its `loop_lib.py declaration --item <tag> --json` run in a subprocess 
 by `resolve_kit_dir`, and refuses with exit 1, writing nothing, an item the loop does not declare, one whose
 actor is not `role:<the --role slot>`, and no loop kit. The task then closes, after the `reads` blocks, with
 five blocks, `roles_lib.WORK_ORDER_BLOCKS`: `### item`, the tag, its step and its outcome set; `### inputs`,
-each of the item's inputs handed as content under its own `### <field tag>` heading, its fact line two below,
-an optional one the render cannot resolve named on the `Not supplied` line; `### allowance`, the path
+each of the item's inputs handed as content under its own `### <field tag>` heading, its fact line two below
+and its content fenced after it, an optional one the render cannot resolve named on the `Not supplied` line; `### allowance`, the path
 prefixes `roles_lib.derive_allowance` gives the item's write class: none, the build's `spec/` or `reviews/`
 folder, the memory root, or for a `product` item each path `--allowance` grants, which must sit under a
 `ROUTED_PATHS` entry, a `product` item granted none refused, so pass the unit's `--dispatch --writes` set and
@@ -129,7 +129,11 @@ and writes nothing; an optional one is named on the `Not supplied` line. A relat
 given to `--card`, `--out`, an `--input`, `--upstream` or `check` is read from the repository root.
 
 Every value is handed as content (TOOL-dBoundRoles-13): its block opens with a fact line,
-`<!-- gov:fact key=<key> class=<class> -->`, `roles_lib.FACT_RE`'s grammar, then the content. The key is
+`<!-- gov:fact key=<key> class=<class> -->`, `roles_lib.FACT_RE`'s grammar, then the content inside a fence of
+backticks one longer than its longest backtick run and at least three, `roles_lib.render_handed_fence`'s, so a
+fact or marker line the content quotes is content to every reader, each of which walks
+`roles_lib.read_unfenced_lines` (TOOL-dBoundRoles-38); a task section that ends inside a fence refuses,
+naming the block and the line, and writes nothing. The key is
 `roles_lib.derive_fact_key`'s: `record:<path>@<sha12>` for `input:spec`, `input:prompt`, a brief value and the
 `upstream:rows` file, `record:card/<session id>` for a card value (a `--card` inside the repository keys by
 its own path, else `card/<stem>`), `blob:<path>@<blob12>:1-<n>` for `input:code`, and `cmd:<argv12>:<out12>`
@@ -796,9 +800,10 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         key = k.rstrip("?")
         v = BLANK_EDGES_RE.sub("", values.get(key, ""))
         if not check_placeholder(v):
-            # TOOL-dBoundRoles-13 S3: the fact line, then the content, under the `reads` key's heading
+            # TOOL-dBoundRoles-13 S3: the fact line, then the content, under the `reads` key's heading; the content
+            # inside a fence no line of it can close, the fact line outside it (TOOL-dBoundRoles-38 S2)
             fact = fact_keys.get(key) or fact_keys[key.split(":")[0]]
-            blocks.append("### %s\n\n%s\n\n%s" % (key, lib.render_fact_line(fact, root), v))
+            blocks.append("### %s\n\n%s\n\n%s" % (key, lib.render_fact_line(fact, root), lib.render_handed_fence(v)))
             continue
         src, path = sources[key.split(":")[0]]
         what = ("no %s: %s" % (src, why[src])) if why.get(src) else (
@@ -820,7 +825,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             v = BLANK_EDGES_RE.sub("", values.get(key, ""))
             fact = fact_keys.get(key) or fact_keys.get(key.split(":")[0])
             if fact and not check_placeholder(v):
-                subs.append("### %s\n\n%s\n\n%s" % (head, lib.render_fact_line(fact, root), v))
+                subs.append("### %s\n\n%s\n\n%s" % (head, lib.render_fact_line(fact, root), lib.render_handed_fence(v)))
             elif not k.endswith("?"):
                 if not any(r.startswith(key + " — ") for r in refusals):
                     refusals.append("%s — the item %s's input carries no value this render resolves" % (head, item))
@@ -860,7 +865,17 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     role_sec = lib.render_role_section(KIT_DIR, role, memory_root, charter_text, granted.get(role, ()), rows)
     task_sec = lib.render_work_order_section(WORK_ORDER, lib.extract_work_order_parts(WORK_ORDER)[1], {
         "opening": opening, "reads": "\n\n".join(blocks), "practices": practices}, wraps) + "\n"
-    marker = "<!-- gov:handoff role=%s build=%s unit=%s item=%s path=%s role-sha=%s task-sha=%s -->" % (
+    # TOOL-dBoundRoles-38 S5: a section whose walk ends inside a fence would hide every later fact line from
+    # the spawn's re-cut, so it refuses, naming the block the fence opened in and its line, and nothing is written
+    block_at = "the task's opening"
+    for n, line in lib.read_unfenced_lines(task_sec):
+        if line is None:
+            raise lib.RolesError("%s — a fence opened at line %d of the ## Task section is never closed, so every "
+                                 "fact line after it would be read as content; close it in the value that opened "
+                                 "it and render again" % (block_at, n))
+        if line.startswith(("## ", "### ")):
+            block_at = line
+    marker ="<!-- gov:handoff role=%s build=%s unit=%s item=%s path=%s role-sha=%s task-sha=%s -->" % (
         role, slug, unit or "-", item or "-", rel, lib.derive_section_sha(role_sec), lib.derive_section_sha(task_sec))
     head = "**Serves:** journal %s\n%s\n# %s handoff — %s\n\n%s\n\n" % (
         unit_id, "".join(g + "\n" for g in gaps), role, unit_id, marker)

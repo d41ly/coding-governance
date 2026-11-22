@@ -27,7 +27,9 @@
  * its `subagent_type` is an `agent`-true role and its `prompt` is, line endings folded and its ends
  * trimmed, exactly one `gov:handoff` marker line naming that role, blank lines, and the `## Task`
  * section of the file the marker's `path` names under `builds/<build>/prompts/`, that file holding the
- * same single marker and a section whose SHA-256 prefix is the marker's `task-sha`, the marker's
+ * same single marker and a section whose SHA-256 prefix is the marker's `task-sha` and whose walk ends
+ * outside every fence (TOOL-dBoundRoles-38 S5: a marker or fact line inside a fence is handed content,
+ * counted and re-cut by no step, every line read through the sibling's `readUnfencedLines`), the marker's
  * `role-sha` the one the index holds for that role, the hash of the role text its agent type was
  * rendered from (TOOL-dBoundRoles-6 S6: an index holding none refuses naming the index's re-render, a
  * differing one naming both values and the handoff's re-render), every `gov:fact` line of the section
@@ -660,12 +662,16 @@ const HANDOFF_MARK = 'gov:handoff'
 // kit: `item=` is optional, so a marker written before it still matches (TOOL-dBoundRoles-17 S1).
 const HANDOFF_MARK_RE = /^<!-- gov:handoff role=(?<role>\S+) build=(?<build>\S+) unit=(?<unit>\S+)(?: item=(?<item>\S+))? path=(?<path>\S+) role-sha=(?<roleSha>[0-9a-f]{12}) task-sha=(?<taskSha>[0-9a-f]{12}) -->$/
 
-// Every line of `text`, carriage returns stripped, that is a whole marker line with its fields in
-// order: `{ line, role, build, unit, item, path, roleSha, taskSha }` each, read by group name; `item` is
-// the field's string, `-` included, or null for a marker carrying none.
+// Every line of `text` outside a fence, carriage returns stripped, that is a whole marker line with its
+// fields in order: `{ line, role, build, unit, item, path, roleSha, taskSha }` each, read by group name;
+// `item` is the field's string, `-` included, or null for a marker carrying none. The lines are the ones
+// scratch-guard's `readUnfencedLines` yields, so a marker quoted inside handed content, which the renderer
+// fences, is content and is not counted (TOOL-dBoundRoles-38 S4).
 function extractHandoffMarker(text) {
   const out = []
-  for (const raw of String(text).split('\n')) {
+  const sg = require(require('path').join(__dirname, 'scratch-guard.js'))
+  for (const [, raw] of sg.readUnfencedLines(text)) {
+    if (raw === null) continue
     const line = raw.replace(/\r/g, '')
     const m = HANDOFF_MARK_RE.exec(line)
     if (!m) continue
@@ -709,12 +715,13 @@ function deriveBlobId(buf) {
 // S4 - THE RE-CUT AT THE ACT LAUNCH: every fact line of the task section, each `blob:` and `record:` key
 // re-derived from the bytes now at its source, `card/<sid>` through the sibling hook's `readCard`, a
 // repo-relative path from the checkout root; a `cmd:` key is covered by the task-sha and not re-run.
-// null when every key holds, else the refusal naming the key, both blobs and the re-render.
+// null when every key holds, else the refusal naming the key, both blobs and the re-render. Only the lines
+// `readUnfencedLines` yields are read, so a fact line quoted inside handed content is content (TOOL-dBoundRoles-38 S4).
 function checkFactKeys(section, root) {
   const fs = require('fs')
   const path = require('path')
-  for (const line of String(section).split('\n')) {
-    const f = FACT_RE.exec(line)
+  for (const [, line] of require(path.join(__dirname, 'scratch-guard.js')).readUnfencedLines(section)) {
+    const f = line === null ? null : FACT_RE.exec(line)
     const m = f ? FACT_SOURCE_RE.exec(f.groups.key) : null
     if (!m) continue
     const g = m.groups
@@ -819,6 +826,15 @@ function checkHandoffSpawn(data, index, root) {
   }
   const digest = buildTaskDigest(section)
   if (digest !== m.taskSha) return renderHandoffDeny('Agent', `${m.path}'s \`## Task\` section hashes to ${digest}, and its marker says task-sha=${m.taskSha}: the file was edited after rendering.`, index)
+  // TOOL-dBoundRoles-38 S5 - a section whose walk ends inside a fence would hide every later fact line from
+  // the re-cut below, so it is denied, naming the line of the file the fence opened at.
+  let open = null
+  for (const [n, line] of require(path.join(__dirname, 'scratch-guard.js')).readUnfencedLines(section)) if (line === null) open = n
+  if (open !== null) {
+    const at = text.replace(/\r\n/g, '\n').length - section.length
+    const fileLine = text.replace(/\r\n/g, '\n').slice(0, at).split('\n').length + open - 1
+    return renderHandoffDeny('Agent', `${m.path}'s \`## Task\` section ends inside a fence opened at line ${fileLine} of the file, so every fact line after it would be read as content; close it in the value that opened it and re-render with handoff.py render.`, index)
+  }
   // TOOL-dBoundRoles-6 S6 - the role text: the marker's role-sha against the one the index carries for
   // the type, the hash of the `## Role` section the renderer composes, so a handoff rendered from role
   // text the agent type was not rendered from is refused. After the digest, before the description.

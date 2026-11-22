@@ -1005,6 +1005,31 @@ function readStatusCells(text) {
 }
 
 /**
+ * TOOL-dBoundRoles-38 S3 - the hooks' one fence walker, the roles kit's `read_unfenced_lines` spelled again,
+ * as a kit imports no sibling kit: `[line number, line]` for every line of `text` outside a fence, split on
+ * LF with any CR kept, then `[opened at, null]` when the text ends inside one. A fence opens on a line of at
+ * most three spaces of indent and then three or more backticks or three or more tildes, and closes only on a
+ * line of the same character whose run is at least as long, with nothing after it but whitespace; a fence
+ * line is yielded by neither end. So a shorter run inside a longer fence is content, and a fact or marker
+ * line quoted inside handed content is read as neither.
+ */
+function * readUnfencedLines(text) {
+  let fence = ''
+  let openedAt = 0
+  const lines = String(text).split('\n')
+  for (let i = 0; i < lines.length; i++) {
+    const m = /^ {0,3}(`{3,}|~{3,})([\s\S]*)$/.exec(lines[i])
+    if (!fence) {
+      if (m) { fence = m[1]; openedAt = i + 1; continue }
+      yield [i + 1, lines[i]]
+    } else if (m && m[1][0] === fence[0] && m[1].length >= fence.length && /^[ \t\r]*$/.test(m[2])) {
+      fence = ''
+    }
+  }
+  if (fence) yield [openedAt, null]
+}
+
+/**
  * A spec's H1 id, '' when it has none — the H1 read R4 and tree_lib.parse_spec_h1 make (S8): the
  * first UNFENCED `#` line, its first token with backticks and asterisks stripped and trailing `:.,;`
  * dropped. checkBuildable and readDispatchedUnits both read it here (TOOL-aSmoothedDispatch-6 S4).
@@ -2190,4 +2215,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines }
