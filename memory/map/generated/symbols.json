@@ -9963,6 +9963,11 @@
       "file": "tools/memory-tree/ratchet.py"
     },
     {
+      "id": "check_widen_rewrite",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "check_window_invariant",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -21696,6 +21701,11 @@
       "id": "read_bare_const",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "read_base_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "read_base_population",

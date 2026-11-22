@@ -562,16 +562,38 @@ def run_populated(root):
     return print_verdict(leg, red, len(regs))
 
 
+def read_base_paths(root, sha, seen):
+    """Fill `seen` once per run: the base's tracked paths (None when the base does not list), the widen
+    policy and the working tree's tracked paths, which `check_marker_repaired` and `check_widen_rewrite`
+    share."""
+    if "base" not in seen:
+        rc, out = LL._run_git(root, "ls-tree", "-r", "-z", "--name-only", sha)
+        seen.update(base=[p for p in out.split("\0") if p] if rc == 0 else None,
+                    policy=read_widen_policy(root), tracked=read_tracked_paths(root))
+
+
+def check_widen_rewrite(root, reg, key, was, now, sha, seen):
+    """-> True when a base row's rewrite is a raise through the door: its disposition moved to a
+    `widened:` marker naming a widen record the base's tree does not hold and that `check_widen_admitted`
+    admits, so its sha moved with it. `widen` writes exactly this rewrite (the module docstring), and
+    `never gains` admits it by the same record; a row re-dated under its base marker, or a marker turned
+    back to `seeded`, stays laundering."""
+    if reg.direction not in WIDEN_DIRECTIONS or now[1] == was[1] or not now[1].startswith(WIDENED_LEAD):
+        return False
+    read_base_paths(root, sha, seen)
+    named, stem = derive_record_name(WIDEN_KIND), now[1][len(WIDENED_LEAD):]
+    if seen["base"] is None or any(p.rsplit("/", 1)[-1] == stem + ".md" and named.search(p) for p in seen["base"]):
+        return False
+    return check_widen_admitted(root, reg, key, stem, seen["policy"], sha, seen["tracked"])[0]
+
+
 def check_marker_repaired(root, reg, key, was, now, sha, seen):
     """-> True when a rewritten disposition only repairs a base `widened:` marker that names no widen
     record in the base's tree into one that admits the key now: the rewrite never gains demands, and
     no laundering, since the base row admitted nothing. `seen` caches the policy and both path sets."""
     if reg.direction not in WIDEN_DIRECTIONS or not (was.startswith(WIDENED_LEAD) and now.startswith(WIDENED_LEAD)):
         return False
-    if "base" not in seen:
-        rc, out = LL._run_git(root, "ls-tree", "-r", "-z", "--name-only", sha)
-        seen.update(base=[p for p in out.split("\0") if p] if rc == 0 else None,
-                    policy=read_widen_policy(root), tracked=read_tracked_paths(root))
+    read_base_paths(root, sha, seen)
     named, stem = derive_record_name(WIDEN_KIND), was[len(WIDENED_LEAD):]
     if seen["base"] is None or any(p.rsplit("/", 1)[-1] == stem + ".md" and named.search(p) for p in seen["base"]):
         return False
@@ -611,6 +633,9 @@ def run_seed_laundering(root):
                 removed.append(key)
                 continue
             now = work[key][1]
+            if check_widen_rewrite(root, reg, key, values, now, sha, seen):
+                print_line(leg, reg.population, "widened", render_key(key), "%s -> %s" % (values[1], now[1]))
+                continue
             if now[0] != values[0]:
                 print_line(leg, reg.population, "re-dated", render_key(key), "%s -> %s" % (values[0], now[0]))
                 red = 1
@@ -1217,6 +1242,16 @@ def run_plant_laundering(top, results):
     write_files(top, {"pop/rows.txt": render_rows(base[1:])})
     check_plant_case(results, "laundering", "a row removed while its seed still measures it", top,
                      ["seed-laundering"], 1, ["removed while its seed still measures it · alpha"])
+    stem = pathlib.PurePosixPath(FIX_RECORD).stem
+    widened = render_rows([build_row("alpha", sha=SHA_B, disposition=WIDENED_LEAD + stem)] + base[1:])
+    write_files(top, {FIX_RECORD: render_widen_record(key="alpha"), "pop/rows.txt": widened})
+    run_git_in(top, "add", "--", FIX_RECORD)
+    check_plant_case(results, "laundering", "a row raised through a tracked widen record", top,
+                     ["seed-laundering"], 0, ["widened · alpha"], ["re-dated · alpha"])
+    write_files(top, {FIX_RECORD: None})
+    run_git_in(top, "rm", "-q", "--cached", "--", FIX_RECORD)
+    check_plant_case(results, "laundering", "the same rewrite with its widen record gone", top,
+                     ["seed-laundering"], 1, ["re-dated · alpha", "disposition rewritten · alpha"])
 
 
 def run_plant_rename(top, results):
