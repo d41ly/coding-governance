@@ -612,6 +612,15 @@ printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/other.js"
 HO_RSHA=$("$TESTPY" -c 'import hashlib; print(hashlib.sha256(b"## Role\n\nYou research.\n\n").hexdigest()[:12])' | tr -d '\r')
 HO_RSHA2=$("$TESTPY" -c 'import hashlib; print(hashlib.sha256(b"## Role\n\nYou research.\n\nOne more line.\n\n").hexdigest()[:12])' | tr -d '\r')
 HO_ROLES='{"roles":{"gov-researcher":{"agent":true,"role-sha":"'"$HO_RSHA"'","workflow":"research","writes":"none"},"gov-builder":{"agent":true,"workflow":"build","writes":"product"},"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/'"$HO_WF"'/h.js"]}'
+# TOOL-dBoundRoles-3 S5: the session's card, read through scratch-guard's `readCard`, whose path is the kickoff
+# checker's `--card --path --session <sid>` answer. A stub checker sits where the hook copy's kit resolver probes,
+# `<hooks dir>/../session-kickoff/`, and names `cards/<sid>.md` under the checkout it runs in; `ho-c1`'s card
+# routes T-1, `ho-c2`'s routes T-2 only, and no other session has one.
+mkdir -p "$TMP/rule6-hooks/session-kickoff" "$HOREPO/cards"
+printf '%s\n' '#!/bin/bash' '[ "$1" = --card ] && [ "$2" = --path ] && [ "$3" = --session ] || exit 2' \
+  'printf "%s\n" "$PWD/cards/$4.md"' > "$TMP/rule6-hooks/session-kickoff/manifest-check.sh"
+printf '## route\n- build: bx\n- unit: T-1 · spec memory/builds/bx/spec/x.md\n' > "$HOREPO/cards/ho-c1.md"
+printf '## route\n- build: bx\n- unit: T-2 · spec memory/builds/bx/spec/x.md\n' > "$HOREPO/cards/ho-c2.md"
 HO_CWD=""
 HO_PROJECT=""
 write_roles() { # the index body, or `none` to remove it
@@ -648,6 +657,10 @@ write_prompt_file(stale, render_marker(stale, task), task.replace("rule 4", "rul
 itemed = pre + "2026-10-11-prompt-T-1-2-researcher.md"
 MI = render_marker(itemed, task, item="item.build.unit")
 write_prompt_file(itemed, MI, task)
+# TOOL-dBoundRoles-3 - a handoff whose marker carries `item=-`, cut for no item, which no card binds.
+dashed = pre + "2026-10-11-prompt-T-1-5-researcher.md"
+MD = render_marker(dashed, task, item="-")
+write_prompt_file(dashed, MD, task)
 write_prompt_file(spec, render_marker(spec, task), task)
 # TOOL-dBoundRoles-6 - the handoff re-rendered after the role body gained one line: its role section and
 # its marker's role-sha are the new text's; the `ok` handoff above is the one rendered before.
@@ -683,6 +696,7 @@ prompts = {
     "stale": render_marker(stale, task) + "\n\n" + task.replace("rule 4", "rule 5"),
     "nounit": MN + "\n\n" + task,
     "item": MI + "\n\n" + task,
+    "dash": MD + "\n\n" + task,
     "rerendered": MR + "\n\n" + task,
     "fact": MF + "\n\n" + ftask,
 }
@@ -730,7 +744,17 @@ run_spawn "rule6 AC1: a rendered handoff is admitted" 0 gov-researcher ok "" ho-
 run_spawn "rule6 AC1: CRLF endings and blank ends are admitted" 0 gov-researcher crlf ""
 # TOOL-dBoundRoles-17 AC2 — a marker carrying `item=` between `unit=` and `path=` is admitted, its path read
 # by name; the six-field cases above are the legacy shape. Against the six-group regex it carries 0 markers.
-run_spawn "rule6 TOOL-dBoundRoles-17 AC2: a marker carrying item= is admitted" 0 gov-researcher item ""
+# Its session's card routes the marker's unit, which TOOL-dBoundRoles-3 S5 requires of an item's work order.
+run_spawn "rule6 TOOL-dBoundRoles-17 AC2: a marker carrying item= is admitted" 0 gov-researcher item "" ho-c1
+# TOOL-dBoundRoles-3 AC5 — an item's work order bound to its act: it spawns only in a session whose card, named
+# by the stub kickoff checker, routes the marker's unit; a handoff whose `item=` is `-` keeps today's exit
+# either way. Against checkHandoffSpawn with its binding step cut out, the three refusals are admitted.
+run_spawn "rule6 BR3 AC5: an item work order in a session whose card routes T-2 only refused, naming T-1" 2 gov-researcher item "cut for unit T-1" ho-c2
+run_spawn "rule6 BR3 AC5: ...and naming the card and the unit it routes" 2 gov-researcher item "cards/ho-c2.md routes T-2" ho-c2
+run_spawn "rule6 BR3 AC5: ...and a session with no card refused, naming where readCard looked" 2 gov-researcher item "card does not read" ho-c9
+run_spawn "rule6 BR3 AC5: the same work order in a session whose card routes T-1 admitted" 0 gov-researcher item "" ho-c1
+run_spawn "rule6 BR3 AC5: an item=- handoff keeps today's exit in the session routing T-2 only" 0 gov-researcher dash "" ho-c2
+run_spawn "rule6 BR3 AC5: ...and in the session routing T-1" 0 gov-researcher dash "" ho-c1
 # AC2 — every type that is not an agent-true role, and every malformed prompt, is refused by name.
 run_spawn "rule6 AC2: general-purpose refused" 2 general-purpose ok '"general-purpose" is not an agent-true role'
 run_spawn "rule6 AC2: Explore refused, naming the researcher" 2 Explore ok 'as the gov-researcher role'

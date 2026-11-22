@@ -7,6 +7,7 @@
     python loop_lib.py --selftest                 # every plant, each held to the exit and line it owes
     python loop_lib.py --grade-site <site> <entry>...   # grade one declaration site's witness entries
     python loop_lib.py seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]   # its seed's paths
+    python loop_lib.py declaration --item <item tag> --json   # one item's declaration, as one line of JSON
 
 The definition holds the gov steps as `[[step]]` rows and one `[[workflow]]` row per workflow of the roles
 kit: its build order, the step its work sits in and, where it differs from that step's own word, the reach
@@ -66,6 +67,11 @@ item's explicit field equal to its role's (a copy), and a role item's explicit `
 `none`. A slot the catalogue lacks prints `pending`, and every role item `unarmed` where the roles
 kit does not resolve; neither is a refusal, and the loop kit declares no edge to that kit. Every
 item's `witness` is graded by `check_witness_classes` beside the steps', and joins the actor list.
+`declaration --item <tag> --json` prints one item's declaration as one line of sorted JSON, for the roles kit's
+work-order renderer, which runs it as a subprocess (TOOL-dBoundRoles-3 §8 F5, F6): `resolve_item_declaration`'s
+`inputs`, `allowance`, `returns` and `source` for the row, beside its `tag`, `actor`, `step`, `outcomes` as
+`read_outcome_set` resolves them, and `witness`. It reads the rows through `read_items`, so a definition that does
+not hold exits 1 as one line, and so does an item no row declares, naming the tag; both on stderr.
 
 A role item also declares its code seed (TOOL-dPlacedRequest-8): `seed`, what its work order's `code`
 slot is computed from, one of the `widens` order of the item kind's schema row `seed` in
@@ -1869,6 +1875,42 @@ def run_seed_command(kit_dir, args):
     return 0
 
 
+def run_declaration_command(kit_dir, args):
+    """`declaration --item <item tag> --json`: one line of sorted JSON, `resolve_item_declaration`'s result for the
+    row, its role's defaults read through `read_role_defaults`, beside the row's `tag`, `actor`, `step`, `outcomes`
+    as `read_outcome_set` resolves them, and `witness` (TOOL-dBoundRoles-3 §8 F5, F6), exit 0. The roles kit's
+    work-order renderer runs it as a subprocess. Exit 1 on stderr naming the tag for an item no row declares, or
+    on a definition that does not hold; 2 on a usage error."""
+    import json
+    tag, as_json, rest = None, False, list(args)
+    while rest:
+        if rest[0] == "--json" and not as_json:
+            as_json, rest = True, rest[1:]
+        elif rest[0] == "--item" and len(rest) >= 2 and tag is None and rest[1]:
+            tag, rest = rest[1], rest[2:]
+        else:
+            tag = None
+            break
+    if tag is None or not as_json:
+        print("usage: python loop_lib.py declaration --item <item tag> --json", file=sys.stderr)
+        return 2
+    try:
+        rows = {r.get("tag"): r for r in read_items(kit_dir)}
+        if tag not in rows:
+            print("loop: declaration · no [[item]] row declares %s" % tag, file=sys.stderr)
+            return 1
+        outcomes = read_outcome_set(kit_dir, tag)
+    except LoopError as e:
+        print("loop: %s" % e, file=sys.stderr)
+        return 1
+    row = rows[tag]
+    roles, _why = read_role_defaults(kit_dir)
+    got = dict(resolve_item_declaration(row, roles), tag=tag, actor=row.get("actor"), step=row.get("step"),
+               outcomes=outcomes, witness=row.get("witness"))
+    print(json.dumps(got, sort_keys=True, ensure_ascii=False))
+    return 0
+
+
 def read_layer_tags(kit_dir):
     """The layer tags of the playbook kit's `layers.toml`, each `[[layer]]` row's `tag`, the kit found
     from `kit_dir` through `resolve_kit_dir`; LookupError where it does not resolve. LoopError where the
@@ -2090,9 +2132,12 @@ def main(argv):
         return 1 if refusals else 0
     if argv[:1] == ["seed"]:   # TOOL-dPlacedRequest-8 S4: an item's declared seed, resolved to paths
         return run_seed_command(kit_dir, argv[1:])
+    if argv[:1] == ["declaration"]:   # TOOL-dBoundRoles-3 §8 F5: one item's declaration, as JSON
+        return run_declaration_command(kit_dir, argv[1:])
     if argv not in (["--check"], ["--scopes"]) and plant not in PLANTS:
         print("usage: python loop_lib.py --check | --scopes | --selftest | --fixture --plant <%s> | --grade-site <%s> "
-              "<entry>... | seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]" % (
+              "<entry>... | seed <item tag> [--build <slug>] [--unit <id>] [--question <text>] | "
+              "declaration --item <item tag> --json" % (
             "|".join(PLANTS), "|".join(DECLARATION_SITES)), file=sys.stderr)
         return 2
     if plant in SEED_PLANTS:   # TOOL-dPlacedRequest-8 AC4 to AC6: the resolver in a scratch repository

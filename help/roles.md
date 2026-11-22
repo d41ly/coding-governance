@@ -43,6 +43,21 @@ reference; this page is the short version.
    `--item <tag>`, a tag in the `item.<step>.<name>` shape, or the marker reads `item=-`. A tag in
    any other shape is refused and nothing is written.
 
+   With `--item`, the render reads that item's row from the loop definition and cuts the work order
+   for it. The item must be declared there and its actor must be the role you render, else it is
+   refused and nothing is written; so is a render with no loop kit installed. The task then ends
+   with five blocks: `### item` (the tag, its step and its outcomes), `### inputs` (each input the
+   item reads, handed as content under its own heading), `### allowance` (the paths the role may
+   write), `### return` (what to hand back) and `### witness` (what proves the work was done). The
+   allowance follows the role's write class: a role writing specs gets the build's `spec/` folder,
+   one writing reviews its `reviews/` folder, one writing records the memory root, and an item
+   narrowed to `none` writes nothing. A builder's item writes product files, and you grant each
+   path with `--allowance <path>`, repeated: pass the files the unit's dispatch declared, never a
+   whole product folder. With no `--allowance`, or a path outside the conf's `ROUTED_PATHS`, the
+   render is refused. `handoff.py check <file>` refuses an item's work order missing any of the five
+   blocks. The spawn guard admits that work order only in a session whose orientation card routes
+   its unit; from any other session the `Agent` call is refused, naming the unit and the card.
+
    A research return records the work order it answers as `**Answers:** <work order path>
    task-sha=<12hex>`, beside its `**Serves:**` line, the `task-sha` copied from the work order's
    marker. `check_roles.py`'s R16 refuses a work order whose marker carries no `item=`, and a return
@@ -128,7 +143,7 @@ refuses the render, naming the key.
   python tools/roles/handoff.py render --role gov-builder --build <slug> --unit <unit-id> --part task
   ```
 
-  Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is <!-- usage: script:tools/roles/handoff.py#render caf8a37a -->
+  Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is <!-- usage: script:tools/roles/handoff.py#render 6d672651 -->
   `gov-builder`. An edited prompt is refused. Pass the name it prints on stderr after
   `handoff: description — ` as the call's `description`; any other name is refused.
   That `Agent` call also carries `effort`: the role's value in the JSON

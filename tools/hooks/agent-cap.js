@@ -34,7 +34,11 @@
  * holding a `blob:` or `record:` key whose source, read now, still has the blob it was cut at
  * (TOOL-dBoundRoles-13 S4: `card/<sid>` read through the sibling's `readCard`, any other key from the
  * checkout root; a moved or vanished source refuses naming the key, both blobs and the re-render; a
- * `cmd:` key rides the task-sha and is not re-run; a handoff carrying no fact line re-derives nothing), and its
+ * `cmd:` key rides the task-sha and is not re-run; a handoff carrying no fact line re-derives nothing), a
+ * marker whose `item=` is a tag binding its work order to this session (TOOL-dBoundRoles-3 S5, the stand-in
+ * binding record until dWellOiledMachine's: the payload session's card, read through the sibling's `readCard`,
+ * must route the marker's `unit=` among its `## route` units, read through `extractRouteUnits`; a refusal
+ * names the unit and the card, `readCard`'s `shown` where no card reads; `item=-` or none is not judged), and its
  * `description`, ends trimmed, the name the renderer prints on stderr: `<build> · <unit> · <workflow>`
  * from the marker and the index's `workflow` for that role, the unit part left out for a `-` unit
  * (TOOL-aOrientedCast-27). That step stops a stale or freeform name, never a forged one. A `Workflow`
@@ -731,6 +735,29 @@ function checkFactKeys(section, root) {
   return null
 }
 
+// TOOL-dBoundRoles-3 S5 - THE STAND-IN BINDING RECORD, until dWellOiledMachine's session binding: a work order
+// whose marker's `item=` is a tag spawns only in the session oriented for its unit. The session's card is read
+// through the sibling hook's `readCard`, whose path is the kickoff checker's `--card --path --session <sid>`
+// answer under `CARD_PATH_BOUND_MS`, and its `## route` units through `extractRouteUnits`; the marker's `unit=`
+// must be one of them. null to admit, else the refusal naming the unit and the card, `readCard`'s `shown` where
+// no card reads. A marker whose `item=` is `-` or absent is judged as before this rule. It does not see two
+// sessions routing one unit, or a card edited by hand, which the write gate's card rules govern.
+function checkItemBinding(m, sessionId, root) {
+  if (m.item === null || m.item === '-') return null
+  const path = require('path')
+  const sg = require(path.join(__dirname, 'scratch-guard.js'))
+  const top = sg.resolveToplevel(root)
+  const common = top ? sg.resolveCommonDir(top) : null
+  const card = typeof sessionId !== 'string' || sessionId === ''
+    ? { text: null, shown: '(no card: the call carries no session_id)' }
+    : common ? sg.readCard(common, sessionId) : { text: null, shown: '(no card: no git directory above the checkout)' }
+  const remedy = `an item's work order spawns only in a session whose card routes its unit; spawn it from the session oriented for ${m.unit}, or re-render it with handoff.py render for a unit this session's card routes.`
+  if (card.text === null) return `item ${m.item}: the work order is cut for unit ${m.unit}, and this session's card does not read, ${card.shown}: ${remedy}`
+  const units = sg.extractRouteUnits(card.text).units.map((u) => u.unit)
+  if (units.includes(m.unit)) return null
+  return `item ${m.item}: the work order is cut for unit ${m.unit}, and the card ${card.shown} routes ${units.length ? units.join(', ') : 'no unit'}: ${remedy}`
+}
+
 // The refusal: the rule, the tool, the reason, and the route that passes.
 function renderHandoffDeny(tool, why, index) {
   const roles = index && index.roles ? Object.keys(index.roles).filter((n) => index.roles[n].agent === true).sort() : []
@@ -806,6 +833,9 @@ function checkHandoffSpawn(data, index, root) {
   // role text and before the description. A handoff rendered before the fact line carries none: admitted.
   const moved = checkFactKeys(section, root)
   if (moved) return renderHandoffDeny('Agent', moved, index)
+  // TOOL-dBoundRoles-3 S5 - an item's work order bound to its act: after the facts, before the description.
+  const unbound = checkItemBinding(m, data.session_id, root)
+  if (unbound) return renderHandoffDeny('Agent', unbound, index)
   // TOOL-aOrientedCast-27 step 2.10 - after the digest and the role text, so the one remedy left is the description.
   const workflow = index.roles[type].workflow
   if (typeof workflow !== 'string' || workflow === '') {

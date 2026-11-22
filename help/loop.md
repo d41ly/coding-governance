@@ -1114,6 +1114,13 @@ listing none prints `unarmed — write-set: <spec> lists no path`; a path spelle
 are what was declared, not what was written. `--fixture --plant seed-bad`, `seed-write`, `seed-question`
 and `seed-scope` show a refusal and each source.
 
+**Read one item's declaration:** `python tools/loop/loop_lib.py declaration --item item.build.unit-pass --json` <!-- usage: script:tools/loop/loop_lib.py#declaration f5755a0f -->
+prints that item as one line of JSON: its `tag`, `actor`, `step`, `outcomes` (the disposition set
+where the row names it), `witness`, and its `inputs`, `allowance` and `returns`, a role item's
+absent ones taken from its role, with `source` saying where each came from. The roles kit's handoff
+renderer runs it to cut a work order for one item. An item no row declares exits 1 naming the tag,
+and so does a definition that does not read; both print on stderr.
+
 **The one path-token rule.** Both sources read paths through the unattended driver, so one rule decides <!-- usage: verb:unattended.sh:--path-tokens ee31c658 -->
 what a path is: `bash tools/unattended/unattended.sh --path-tokens` prints each backticked span of the
 text on its standard input that is one word of letters, digits, dots, underscores, slashes and dashes

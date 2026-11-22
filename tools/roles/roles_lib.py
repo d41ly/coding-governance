@@ -141,6 +141,14 @@ WORK_ORDER_REL = "templates/work-order.template.md"
 WORK_ORDER_SLOT_RE = re.compile(r"<!-- slot: ([a-z-]+) -->")
 WORK_ORDER_LEAD_SLOTS = ("practices",)
 WORK_ORDER_TASK_RE = re.compile(r"^## Task$", re.M)
+#: The record kind `work-order`, `record-kind.work-order` (TOOL-dBoundRoles-3 S6, §8 F1): its folder, its name
+#: grammar, `handoff.py#derive_prompt_name`'s, its door, its required parts in order (the marker with `item=`, the
+#: two sections and the five blocks of an item's task) and its readers, on the one line a grep of its name prints.
+#: dTotalRecall's registry reads it when it lands.
+WORK_ORDER_KIND = {"kind": "work-order", "tag": "record-kind.work-order", "folder": "<MEMORY_ROOT>/builds/<slug>/prompts/", "name": "<date>-prompt-<unit id>-<n>-<role without gov-><tail>.md", "door": "handoff.py render --item", "parts": ("<!-- gov:handoff ... item=<tag> ... -->", "## Role", "## Task", "### item", "### inputs", "### allowance", "### return", "### witness"), "readers": ("handoff.py#check_handoff", "agent-cap.js rule 6", "check_roles.py R16")}
+#: The five blocks an item's work order carries at the end of `## Task`, in order: the kind's parts after the
+#: marker and the two sections, so `render_handoff` writes and `check_handoff` reads one list.
+WORK_ORDER_BLOCKS = WORK_ORDER_KIND["parts"][3:]
 #: The charter's drive section heading and one drive line, `- <stage> · <role> — ` (PLAY-dOrderedCharter-6).
 DRIVE_HEAD = "## Drive — "
 DRIVE_LINE_RE = re.compile(r"^- \S+ · (\S+) — ")
@@ -358,6 +366,44 @@ def render_role_fields(keys, gates=()):
             fields.append("%s (%s%s)" % (name, what, ", optional" if optional else ""))
         out.append("## Return\n\nReturn one object holding these fields, in this order: %s." % "; ".join(fields))
     return "\n\n".join(out)
+
+
+def derive_allowance(declaration, slug, granted, memory_root, routed):
+    """The allowance of an item's work order as repo-relative path prefixes, in order (TOOL-dBoundRoles-3 S3, §4
+    "The allowance"), from `declaration`, the loop kit's `declaration` verb's answer: `[]` for `none`; for `spec`,
+    `review` and `records` the class's `WRITE_FOLDERS` folder, its `{{MEMORY_ROOT}}` the conf's `memory_root` and
+    `<slug>` the render's build; for `product` each path of `granted`, the caller's `--allowance` values, once,
+    each under an entry of `routed`, the conf's `ROUTED_PATHS` value, by that key's grammar: an entry ending `/`
+    covers itself and every path under it, any other entry names one file. RolesError naming the item and the
+    class or the path for an allowance outside `WRITE_FOLDERS` and `none`, a `product` item granted no path, a
+    path granted to any other class, and a granted path that is empty, absolute, climbs through `..` or sits
+    under no entry."""
+    tag, allowance, granted = declaration.get("tag"), declaration.get("allowance"), list(granted or ())
+    if allowance != "none" and allowance not in WRITE_FOLDERS:
+        raise RolesError("the item %s declares the allowance %r, which is none of none, %s"
+                         % (tag, allowance, ", ".join(WRITE_FOLDERS)))
+    if allowance != "product":
+        if granted:
+            raise RolesError("--allowance %s: the item %s's allowance is the %s class, which takes no granted "
+                             "path; only a product item does" % (granted[0], tag, allowance))
+        return [] if allowance == "none" else [
+            WRITE_FOLDERS[allowance].replace(MEMORY_ROOT_TOKEN, memory_root).replace("<slug>", slug)]
+    if not granted:
+        raise RolesError("the item %s's allowance is the product class, which takes only the paths the dispatch "
+                         "grants: pass --allowance <path> once per path of the unit's --dispatch --writes set" % tag)
+    entries = [e[2:] if e.startswith("./") else e for e in (routed or "").split()]
+    out = []
+    for path in granted:
+        p = path.replace("\\", "/")
+        p = p[2:] if p.startswith("./") else p
+        if not p or p.startswith(("/", "~")) or re.match(r"^[A-Za-z]:", p) or ".." in p.split("/"):
+            raise RolesError("--allowance %s is not a repo-relative path inside the repository" % path)
+        if not any(p == e or (e.endswith("/") and (p == e.rstrip("/") or p.startswith(e))) for e in entries):
+            raise RolesError("--allowance %s sits under no ROUTED_PATHS entry (%s): an allowance reaches no path "
+                             "outside the routed paths" % (path, " ".join(entries) or "none declared"))
+        if p not in out:
+            out.append(p)
+    return out
 
 
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
