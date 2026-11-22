@@ -3723,12 +3723,13 @@ check_mail_addressed() { # to · who -> 0 when <to> addresses <who>, 1 otherwise
   [ "build:$s" = "$who" ]
 }
 
-# A MESSAGE'S ID (KICK-dKeptSession-22 S2): `derive_gov_id` over its build, its item's instance key,
-# its pass, its kind, its subject and the id it answers, in that order, each absent one written
-# `none`. No session and no time is a field, so a post retried from the same session or a new one
-# carries the id of the post it retries, and two answers to two messages carry two ids.
-derive_message_id() { # build · item · pass · kind · subject · answers -> the first 12 hex digits; rc 1 when git cannot hash
-  derive_gov_id "${1:-none}" "${2:-none}" "${3:-none}" "${4:-none}" "${5:-none}" "${6:-none}"
+# A MESSAGE'S ID (KICK-dKeptSession-22 S2, KICK-dKeptSession-31 S1): `derive_gov_id` over its build,
+# its item's instance key, its pass, its kind, its subject, the id it answers, its recipient and its
+# content key, in that order, each absent one written `none`. No session and no time is a field, so a
+# post retried from the same session or a new one carries the id of the post it retries; two answers
+# to two messages carry two ids, and so do one notice to two recipients and one recipient's two keys.
+derive_message_id() { # build · item · pass · kind · subject · answers · to · content-key -> the first 12 hex digits; rc 1 when git cannot hash
+  derive_gov_id "${1:-none}" "${2:-none}" "${3:-none}" "${4:-none}" "${5:-none}" "${6:-none}" "${7:-none}" "${8:-none}"
 }
 
 # A RETRIED POST (KICK-dKeptSession-22 S3): every ref this node's cache holds under
