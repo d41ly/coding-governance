@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-11 — the shape-run kind, the parsed view of the review-shape line
 
-**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 14 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 14 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0222@bc317ce6 whole
 
@@ -19,6 +19,8 @@
 | [2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-25 |
 | [2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md](../build/2026-11-05-build-TOOL-dTotalRecall-1-reground-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-25 |
 | [2026-11-05-build-TOOL-dTotalRecall-11-deviation-113.md](../build/2026-11-05-build-TOOL-dTotalRecall-11-deviation-113.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-11-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-11-1-builder-return.md) | journal | — |
+| [2026-11-22-build-TOOL-dTotalRecall-11-divergence-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-11-divergence-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-11-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-11-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
@@ -27,7 +29,10 @@
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-25 |
 | [2026-11-05-prompt-TOOL-dTotalRecall-11-1-spec-reviewer.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-11-1-spec-reviewer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dTotalRecall-11-2-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-11-2-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-11-build-brief-2.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-build-brief-2.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-11-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-11-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-11-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -58,9 +63,11 @@ column, compared with `tools/playbook/edges.toml` by `edge_grammar.py#check_card
 (PLAY-dOrderedCharter-42 S1, S2); the leg factory `tools/run-gates/leg_factory.py`, whose `new` writes a
 `[[gate_leg]]` row and runs `--write` (TOOL-dWitnessedBar-11 S1 to S3); and the line's `merged=` field
 (TOOL-dFairHearing-5 S4) and four `review.cost` fields `trigger=`, `shape=`, `efforts=`, `role-sha=`
-(TOOL-dDeclaredLoop-20 S3), both printed by `renderShapeLine`. Unbuilt, built first at order 12: the door
-`tools/memory-tree/gov_record.py`, its `KIND_HANDLERS` table, and the factory's `write_new_record`,
-`check_typed_record` and `derive_content_key` (TOOL-dTotalRecall-2 rev-11, S1 to S5, S8).
+(TOOL-dDeclaredLoop-20 S3), both printed by `renderShapeLine`; and the door
+`tools/memory-tree/gov_record.py`, its `gov_record.py#KIND_HANDLERS` table, and the factory's
+`build_records.py#write_new_record`, `#check_typed_record` and `#derive_content_key`, with the mint's
+authority read `build_records.py#check_mint_authority` (TOOL-dTotalRecall-2, CLOSED at rev-13, S1 to S6,
+S8).
 
 - **S1** — The parser, `tools/memory-tree/shape_run.py`: `SHAPE_RE`, the line's grammar of §4 "The
   grammar"; `parse_shape_line(line)`, returning the fields as a dict or raising `ValueError` naming the
@@ -86,7 +93,10 @@ column, compared with `tools/playbook/edges.toml` by `edge_grammar.py#check_card
   review record's stem as the title, and the fields of §4 "The record". A record with no line, two
   lines or a line `SHAPE_RE` refuses is refused, exit 2 `refused shape-run: <why>`, nothing written. A
   second call for the same review prints `exists <path> key <content key>` and exits 0, the door's
-  content-addressed idempotence (TOOL-dTotalRecall-2 S5). Observed by AC4 and AC5.
+  content-addressed idempotence (TOOL-dTotalRecall-2 S5). The handler adds no authority read of its
+  own: `write_new_record`'s `check_mint_authority` refuses a `<slug>` whose build lease
+  `placement.py#read_lease_class` reads held by another session (TOOL-dTotalRecall-2 S6), so AC4's
+  fixture is a review record whose build lease reads free (§8 F6). Observed by AC4 and AC5.
 - **S5** — The conformance arm, `check_shape_runs(root)` in `shape_run.py`, returning `(lines, exit)`
   and run by `shape_run.py --check`: over every tracked file `build_records.derive_record_name` reads as
   a `shape-run` record, its fields read by `build_records.read_record` under the kind's entry, its
@@ -274,13 +284,15 @@ shape-run record; a later writer may file them through the verb.
 - `tools/memory-tree/build_records.py`
 - `tools/memory-tree/tree_lib.py`
 - `tools/memory-tree/record-kinds.toml`
-- `tools/memory-tree/HYGIENE.template.md`, `memory/HYGIENE.md` (the render, never the edit)
+- `tools/memory-tree/HYGIENE.template.md` (the closed `<kind>` bullet)
+- `memory/HYGIENE.md` (written by `adopt-memory-tree.sh --render`, never edited by hand)
 - `tools/memory-tree/README.md` (one files-table row for `shape_run.py`)
 - `tools/memory-tree/kit.toml` (the leg's `[[gate_leg]]` row)
 - `tools/govkit/registry.toml` (the `tier2-review self-test` guard)
 - `tools/gate-legs.json` (rendered by `leg_factory.py --write`)
-- `tools/govkit/subject-pins.tsv`, `memory/map/features/memory-tree-hygiene.md`,
-  `tools/run-gates/ceiling-evidence.txt` (the new leg's owed rows)
+- `tools/govkit/subject-pins.tsv` (the new leg's owed row: `repo` and `records`)
+- `memory/map/features/memory-tree-hygiene.md` (the new leg's owed row: the `gate-legs` claim)
+- `tools/run-gates/ceiling-evidence.txt` (the new leg's owed row: its timed evidence)
 - `tools/workflows/tier2-review.test.sh`
 - `tools/workflows/README.md`
 
@@ -332,16 +344,25 @@ shape-run record; a later writer may file them through the verb.
   Red when: the kind joins the factory's table and not the reader's list, so the import raises naming
   `shape-run`.
 - **AC4** — When the `gov_record.py` of a `git clone --depth 1` of the pass tip under `%TEMP%` runs
-  `new shape-run --review memory/builds/aBriskPreflight/reviews/2026-10-12-review-TOOL-aBriskPreflight-1-2-3-4-5-6-7-10-diff-review-round1.md`
+  `new shape-run --review memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md`
   from the clone's root, it exits 0 printing `wrote` and one
-  `-build-TOOL-aBriskPreflight-1-shape-run-1.md` path whose `Blocker` is `0`, `Out-tokens` `253733` and
-  `Caused-by` the review record's stem; a second run exits 0 printing `exists`, that path and the same
-  key, and leaves `git status --porcelain` unchanged.
+  `-build-TOOL-aBatchedPacket-1-shape-run-1.md` path whose `Blocker` is `0`, `Out-tokens` `90630`,
+  `Merged` `0` and `Caused-by` the review record's stem; a second run exits 0 printing `exists`, that
+  path and the same key, and leaves `git status --porcelain` unchanged.
   Red when: the second run writes `-shape-run-2.md`.
-  fixture: the clone, carrying the door and that landed review record; the build run makes it.
+  fixture: the clone, carrying the door and that landed review record, the one §8 F6 names; it plants
+  nothing, the build `aBatchedPacket` holding no `RUN.md` and
+  `unattended.sh --lease status build aBatchedPacket` printing `lease — none · aBatchedPacket/build`
+  (PINNED 2026-11-22 at `4993aec72`). A lease that reads held at the pass is the door's S4 refusal, and
+  the pass returns it as a divergence rather than choosing another record.
+  figure: `0`, `90630` and `0` are the record's line, `blocker=0`, `out-tokens=90630` and `merged=0` at
+  `memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md@83ea0ec633:170`
+  (PINNED 2026-11-22); `-shape-run-1` because the build's `build/` folder holds no shape-run record (PINNED 2026-11-22).
 - **AC5** — When the same command runs against that review record with its line removed, then
-  duplicated, then with `agents=10 ` deleted, and once with `--review README.md`, each exits 2 printing
+  duplicated, then with `agents=8 ` deleted, and once with `--review README.md`, each exits 2 printing
   `refused shape-run:` and the reason, and `git status --porcelain` shows no new file.
+  figure: `agents=8` is the record's line at
+  `memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md@83ea0ec633:170` (PINNED 2026-11-22).
   Red when: the door writes a record from a partial parse or from a file outside a `reviews/` folder.
 - **AC6** — When `python -c "import shape_run; lines, rc = shape_run.check_shape_runs('<clone>'); print(rc, *lines)"`
   runs from `tools/memory-tree/` over the AC4 clone, it prints `0` with the record graded; with the
@@ -381,6 +402,11 @@ shape-run record; a later writer may file them through the verb.
 
 `tier2-review self-test` · `review-join self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `build-index selftest` · `memory hygiene` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `record-kinds` · `edge cardinality (per source and per target, over the merged tree)` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
 
+The three owed-row paths' guards are on the line: `memory/HYGIENE.md` trips `kit/dogfood doc parity`,
+and it and the dossier trip `recall floor` and `recall floor arms` through `memory/`;
+`tools/run-gates/ceiling-evidence.txt` trips only guards the spec-token checker's guards join prints as
+broad, `tools/run-gates/` and `tools/` (PINNED 2026-11-22, its run over this spec).
+
 New arm: tools/workflows/tier2-review.test.sh · covers AC8 · the shape arm re-pointed at `shape_run.py --parse-line`, staged by `renderShapeLine` printing a non-numeric `agents` · none
 New arm: tools/memory-tree/shape_run.py --check · covers AC6 · the new leg, staged by a planted shape-run record whose `Blocker` differs from its review line · none
 
@@ -406,16 +432,34 @@ New arm: tools/memory-tree/shape_run.py --check · covers AC6 · the new leg, st
   Options: (a) the parent specs' spellings as cited in §2, the build run re-grounding on the landed
   code and bumping this spec's rev before any code where they differ; (b) wait for the parents.
   RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, BUILD-METHOD M2 ("to diverge, change the spec
-  first") and the brief's rule that a spec calls each parent surface as its spec names it. At rev-6
-  every surface but TOOL-dTotalRecall-2's door is cited as landed. widens: none · relaxes: none
+  first") and the brief's rule that a spec calls each parent surface as its spec names it. At rev-7
+  every surface is cited as landed, TOOL-dTotalRecall-2's door included. widens: none · relaxes: none
 - **F5 — Which unit does a shape-run record serve?** Options: (a) the first id of the review record's
   `**Serves:**` line, its `@rev-<N>` pin cut; (b) the id read from the review file name; (c) a `--unit`
-  flag the caller passes. Measured at `e1ae60af8`, file names compress ids
+  flag the caller passes. Measured 2026-11-22 at `e1ae60af8`, file names compress ids
   (`2026-10-12-review-TOOL-aBriskPreflight-1-2-3-4-5-6-7-10-diff-review-round1.md`) and a spec-audit
   name may carry an id beside its Serves list; (c) lets a caller bind a record to a unit its review never
   served, a wider write surface (veto 3). RESOLVED (agent, 2026-11-22, delegated): (a), tie-broken over
   (b) by the one-fact rule, the Serves line being the record's own binding the bindings reader reads.
   widens: none · relaxes: none
+- **F6 — Which landed review record is AC4's fixture, given the door's lease read?** Options: (a) a
+  landed review record in a build whose lease reads free,
+  `memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md`,
+  its Serves line `diff-review TOOL-aBatchedPacket-1` at
+  `memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md@83ea0ec633:1` and its review-shape line at
+  `memory/builds/aBatchedPacket/reviews/2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md@83ea0ec633:170`, the build holding no `RUN.md`; (b) the rev-6 record of `aBriskPreflight`, its
+  lease freed in the clone by setting `RUN_CLAIMS` (`.unattended.conf@d3634fd40f:156`) off, so the
+  driver prints `lease — off` and `placement.py#read_lease_class` reads free; (c) a review record
+  planted in a scratch build of the clone. The rev-6 record's build lease reads `held` by another
+  session (`phase: HELD` at `memory/builds/aBriskPreflight/RUN.md@40fa4e7dec:28`, and
+  `unattended.sh --lease status build aBriskPreflight` printing `held held`, PINNED 2026-11-22 at
+  `4993aec72`), so S4's `write_new_record` refuses it through `check_mint_authority` on every node
+  (TOOL-dTotalRecall-2 S6; the return `2026-11-22-build-TOOL-dTotalRecall-11-1-builder-return`). (b)
+  plants a conf change that switches off the authority read the door runs under, so AC4 would
+  observe a door no real caller runs; (c) observes a line no harness wrote, losing the landed line AC4
+  reads. RESOLVED (agent, 2026-11-22, delegated): (a), by the build method's fork rule, the option that satisfies
+  AC4 to AC6 with nothing planted, tie-broken by reuse of the door's landed authority read unchanged;
+  per `2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-spec-writer`. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -446,6 +490,16 @@ New arm: tools/memory-tree/shape_run.py --check · covers AC6 · the new leg, st
   Serves line's (F5); the suite reuses the python and kit `run.js` already receives, and its leg's
   guard gains the parser; the `--selftest` arm gives way to the leg's own; citations re-pointed to
   `#symbol` or blob-pinned lines.
+- rev-7 · 2026-11-22 · §2 preconditions, S4 · §4 Files touched · §6 AC4, AC5 · §7 · §8 F4, F5, and F6 added
+  · per `2026-11-22-prompt-TOOL-dTotalRecall-11-divergence-spec-writer` over the return
+  `2026-11-22-build-TOOL-dTotalRecall-11-1-builder-return`, at HEAD `4993aec72`: AC4's fixture moves to
+  the aBatchedPacket review record (F6), since the aBriskPreflight lease reads held and the door's
+  `check_mint_authority` refuses it, so AC4 reads `Out-tokens` `90630` and `Merged` `0` and AC5 deletes
+  `agents=8 `; S4 names that authority read. Files touched puts `memory/HYGIENE.md`,
+  `memory/map/features/memory-tree-hygiene.md` and `tools/run-gates/ceiling-evidence.txt` each on its
+  own bullet, the dispatch row having missed all three, and §7 names their guards' legs. Forced:
+  §2 and F4 cite TOOL-dTotalRecall-2's door as landed, CLOSED at rev-13; F5's measurement names its
+  date. Every other rev-6 decision stands.
 
 ## 10. Reuse audit
 
