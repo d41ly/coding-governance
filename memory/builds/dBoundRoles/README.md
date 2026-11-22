@@ -106,7 +106,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-49 — govkit's default plan derives the seed rows it expects to preview from the plan model and the roles roster, so the third typed roles count cannot red late](spec/2026-10-26-spec-TOOL-dBoundRoles-49.md) | 5 | 2 | CLOSED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-16 — the shapes: each workflow entry's kind, checklist, orientation, merge and twin rule, the five kinds as defaults over the stage rows](spec/2026-10-25-spec-TOOL-dBoundRoles-16.md) | 6 | 2 | INPROGRESS | rev-7 | 2026-11-22 |
 | [TOOL-dBoundRoles-54 — unit 49's overlay check reads its expected side from the roster, one `house/<slot>.md` per role slot, never from the seed rule it is compared with](spec/2026-10-26-spec-TOOL-dBoundRoles-54.md) | 6 | 2 | CLOSED | rev-7 | 2026-11-22 |
-| [TOOL-dBoundRoles-55 — unit 49's overlay check refuses an empty expected set, and ends where unit 19 moves the house files out of the kit](spec/2026-10-26-spec-TOOL-dBoundRoles-55.md) | 6 | 2 | INPROGRESS | rev-5 | 2026-11-22 |
+| [TOOL-dBoundRoles-55 — unit 49's overlay check refuses an empty expected set, and ends where unit 19 moves the house files out of the kit](spec/2026-10-26-spec-TOOL-dBoundRoles-55.md) | 6 | 2 | CLOSED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-15 — the role static block carried once per spawn, and its budget over the whole rendered block](spec/2026-10-25-spec-TOOL-dBoundRoles-15.md) | 7 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-17 — every work order's marker carrying `item=`, every return naming the work order it `answers`, today's population seeded](spec/2026-10-25-spec-TOOL-dBoundRoles-17.md) | 8 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-6 — the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn](spec/2026-10-25-spec-TOOL-dBoundRoles-6.md) | 9 | 2 | DEFERRED | rev-7 | 2026-11-22 |
@@ -158,7 +158,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 280 bound to this build, across 4 record folder(s).
+Records: 281 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

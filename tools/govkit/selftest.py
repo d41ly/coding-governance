@@ -10513,23 +10513,33 @@ user_skills = "/tmp/gk-fake-skills"
                   _seed_got == len(_seed_rows) and marks.get("ORDER|project-owned") == 34,
                   "previewed %d seed row(s), the plan model derives %d, by kit %s; marks %s"
                   % (_seed_got, len(_seed_rows), _seed_by_kit, marks))
-            # TOOL-dBoundRoles-49 S3, its expected side re-derived by TOOL-dBoundRoles-54 S1 and S2:
-            # the roles share is the roster's. The expected set is `house/<slot>.md` for every slot of
-            # the roles kit's roster, read independently of the seed rule, and it is compared both
-            # ways with the `house/*.md` sources of the derived roles seed rows. So an include removed
-            # while its file stays, and a role added with no overlay seeded, red naming the slot; an
-            # overlay seeded for no role reds naming the file. It does not check tracked house files
-            # that no role owns and no include seeds: such a file seeds and previews nothing.
-            _ov54 = derive_overlay_expected(KIT_DIRS["roles"])
-            _slots54, _files54 = derive_overlay_drift(_ov54, _seed_rows)
-            _roles_src54 = sorted(str(_sr["src"]) for _sr in _seed_rows if _sr["kit"] == "roles")
-            check("...and every roster slot's house overlay is the source of a previewed roles seed row",
-                  bool(_ov54) and not _slots54,
-                  "slots whose overlay is not seeded %s; roster overlays %s, roles seed sources %s"
-                  % (_slots54, sorted(_ov54), _roles_src54))
-            check("...and every seeded roles house overlay belongs to a roster slot", not _files54,
-                  "seeded overlays no slot owns %s; roster overlays %s, roles seed sources %s"
-                  % (_files54, sorted(_ov54), _roles_src54))
+            # TOOL-dBoundRoles-49 S3, its expected side re-derived by TOOL-dBoundRoles-54 S1 and S2,
+            # its empty refusal and its end set by TOOL-dBoundRoles-55. The population it reads: the
+            # roster of the roles kit at `KIT_DIRS["roles"]`, as `house/<slot>.md` for every slot,
+            # read independently of the seed rule, compared both ways with the `house/*.md` sources
+            # of the derived roles seed rows. It reds the three breaks of unit 54's table: an include
+            # removed while its file stays, and a role added with no overlay seeded, naming the slot;
+            # an overlay seeded for no role, naming the file. It refuses an empty expected set by the
+            # kit path it loaded, before it compares anything: a roster with no slot is a broken
+            # loader or a wrong path, never a passing check. It does not check tracked house files
+            # that no role owns and no include seeds: such a file seeds and previews nothing. When
+            # the roles kit stops seeding `house/*.md`, unit 19 deletes this check and
+            # `derive_overlay_expected` in the pass that moves the house files out of the kit.
+            _kit55 = KIT_DIRS["roles"]
+            _ov54 = derive_overlay_expected(_kit55)
+            check("...and the roles roster the overlay compare reads holds a slot", bool(_ov54),
+                  "no roster slot loaded from %s: a broken loader or a wrong path, so nothing is compared"
+                  % _kit55)
+            if _ov54:
+                _slots54, _files54 = derive_overlay_drift(_ov54, _seed_rows)
+                _roles_src54 = sorted(str(_sr["src"]) for _sr in _seed_rows if _sr["kit"] == "roles")
+                check("...and every roster slot's house overlay is the source of a previewed roles seed row",
+                      not _slots54,
+                      "slots whose overlay is not seeded %s; roster overlays %s, roles seed sources %s"
+                      % (_slots54, sorted(_ov54), _roles_src54))
+                check("...and every seeded roles house overlay belongs to a roster slot", not _files54,
+                      "seeded overlays no slot owns %s; roster overlays %s, roles seed sources %s"
+                      % (_files54, sorted(_ov54), _roles_src54))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
             check("...and NO project-owned row is previewed as a write",
