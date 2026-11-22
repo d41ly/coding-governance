@@ -1,10 +1,12 @@
 # TOOL-aFlattenedSeed-1 — three kit readers read an adopter's own layout
 
-**Status:** CLOSED · rev-2 · 2026-11-22 · node a · Tier-1 · base b2eec4b6 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-11-22 · node a · Tier-1 · base b2eec4b6 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-11-22-build-TOOL-aFlattenedSeed-1-widen-1.md](../build/2026-11-22-build-TOOL-aFlattenedSeed-1-widen-1.md) | widen | — |
 
 <!-- /gen:spec-records -->
 
@@ -63,14 +65,14 @@ ledger seed whose kit is installed flat. After it, inCMS can seed its population
 - **AC2** — When `eol_class.py --selftest` plants a gitlink whose commit the store lacks, the scan grades
   the same member count and does not raise. Red when: it raises IndexError.
   Observed red against the base reader on 2026-11-22: IndexError from `read_shebang_members`.
-- **AC3** — When a seed argv names `{prefix}/fx2/fxflat.py` and only a receipt row places that file, at
-  `flat/fxflat.py`, `seed` arms the population. Red when: the token resolves only against the tool
+- **AC3** — When a seed argv names a kit file under a home directory the fixture lacks, and only a
+  receipt row places that file, in a flat directory, `seed` arms the population. Red when: the token resolves only against the tool
   root and the seed exits non-zero.
   Observed red against the base block on 2026-11-22: `unarmed fx-flat exit 2`.
 
 ## 6. Gates
 
-`product-test contract (tests.product)` · `portability (execution-sensitive files are LF by class)` · `python resolver (behaviour + inline parity + idiom ban)` · `memory hygiene` · `line length` · `spec tokens (a spec's own names resolve)`
+`product-test contract (tests.product)` · `portability (execution-sensitive files are LF by class)` · `python resolver (behaviour + inline parity + idiom ban)` · `shell-hygiene selftest` · `memory hygiene` · `line length` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/run-gates/product_tests.py · covers AC1 · `--fixture` reads a planted wrapped manifest through `read_manifest_rows`; staged red against the base reader · none
 New arm: tools/gate-lint/eol_class.py · covers AC2 · `--selftest` plants a gitlink with an absent commit; staged red against the base reader · none
@@ -84,3 +86,4 @@ none
 
 - rev-1 · 2026-11-22 · initial draft.
 - rev-2 · 2026-11-22 · AC3 · closed: the arm's red against the base block recorded.
+- rev-3 · 2026-11-22 · AC3 · §6 · the bar's spec-tokens leg: AC3 names the fixture without paths gov does not track, and §6 names the leg `eol_class.py` guards.

@@ -65,7 +65,7 @@ tools/lib/python-floor.sh	24	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/refuse-wrong-shell.sh	119	60ca5ed4d6d66b8c8f0715ee8b1d6d4ee6cab066	widened:2026-11-20-build-TOOL-dWitnessedBar-62-widen-5
 tools/lib/render-doc.sh	205	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/resolve-python.sh	133	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/lib/resolve-python.test.sh	1557	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
+tools/lib/resolve-python.test.sh	1564	163e52c0403a4e3d9d7679b38ba5f30c5cebea70	widened:2026-11-22-build-TOOL-aFlattenedSeed-1-widen-1
 tools/lib/resolve-remote.sh	33	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/loop/adopt-loop.sh	147	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-recall/adopt-memory-recall.sh	239	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
