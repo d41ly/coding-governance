@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-54 — `parse_id_parts` lands on the named-group regex in step 8, ahead of the readers unit 38 re-points onto it
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -16,6 +16,7 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-54-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-54-1-spec-writer.md) | journal | TOOL-dTotalRecall-1 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-54-round3-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-54-round3-fix-brief.md) | research | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-54-alt-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-54-alt-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-54-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-54-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-54-reground-2-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-54-reground-2-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-54-reground-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-54-reground-2-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-54-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-54-reground-brief.md) | journal | — |
