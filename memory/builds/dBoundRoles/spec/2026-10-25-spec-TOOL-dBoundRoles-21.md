@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-21 — the effort and model keys, `default` reserved, and the gate grant a role field, every reader re-pointed
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0186@e356242a whole
 **Carries:** node:policy-key.roles.effort.<role>
@@ -47,15 +47,21 @@ fallback dConvergedCharter retires. `resolve_stage_efforts`, R12, `handoff.py`'s
 - **S1** — One policy read for the roles kit, `read_policy_setting(key, root, with_default=False)` in
   `tools/roles/roles_lib.py`: it runs TOOL-dGroundRules-2 S7's `policy.py get <key> --json`
   (`tools/policy/policy.py#cmd_get`) as a subprocess in `root`, the policy kit found through
-  `resolve_kit_dir("policy", "policy.py", here)`, since a kit imports no sibling kit (§8 F2); `get`
+  `resolve_kit_dir("policy", "policy.py", here)`, since a kit imports no sibling kit (§8 F2). The search
+  starts at `here`, `roles_lib.py`'s own directory, `pathlib.Path(__file__).absolute().parent`, the
+  anchor `load_role_schema` takes (`tools/roles/roles_lib.py#load_role_schema`), so a copy of the kit
+  finds the policy kit of its own install (§8 F9). `get`
   reads the landed revision (TOOL-dGroundRules-2 S1). It returns the printed `value` when its `source`
   is `file` or `last-valid` (§8 F6) and `None` when it is `default` (TOOL-dGroundRules-3 S2), or the
   value whatever its source under `with_default`, the form a read with a catalogue default takes
-  (TOOL-dBoundRoles-22 S5). A key is read once per process and its answer kept for the run (§8 F7).
-  An exit 2 is a `RolesError` naming the key and the reader's stderr line; no policy kit found yields
-  `None` for every key and one note. Every call
+  (TOOL-dBoundRoles-22 S5). An exit 2 whose stderr line carries `POLICY_DERIVED_LINE`, the policy
+  kit's derived-default refusal (`tools/policy/policy.py#read_default_value`), is an unset key: it
+  returns `None` in both forms, since such a row has no value to return (§8 F8). Every other exit 2 is
+  a `RolesError` naming the key and the reader's stderr line; no policy kit found yields `None` for
+  every key and one note. A key is read once per process and root, its answer kept for the run under
+  the pair (§8 F7). Every call
   spells its key first, as a literal or an f-string of the key pattern, the shape TOOL-dGroundRules-8's
-  reader-coverage arm counts. Observed by AC2 and AC7.
+  reader-coverage arm counts. Observed by AC2, AC6 and AC7.
 - **S2** — The effort order, `resolve_stage_efforts(policy, workflow, model, root)` and
   `resolve_effort(policy, slot, model, root)` re-pointed, each keeping the `model` argument
   TOOL-aProfiledEffort-1 gave it (`tools/roles/roles_lib.py@a3e28716:810-825`) and gaining `root`, per §4
@@ -77,11 +83,18 @@ fallback dConvergedCharter retires. `resolve_stage_efforts`, R12, `handoff.py`'s
   Observed by AC1.
 - **S6** — The gate grant a role field, `gates`, a row of `role-schema.toml`: the leg names a role may
   run, comma-separated, a trailing `?` marking one optional, as `[gates]` spells them today
-  (`tools/roles/house/policy.toml@339f54fa:34-37`). `render_roles_index`
-  (`tools/roles/render_agents.py#render_roles_index`) reads each role's `gates` field and the house
-  file's `[gates]` row only where the role sets none; the leg names are graded by one
-  `check_gate_names` lifted from `load_policy` (`tools/roles/roles_lib.py@a3e28716:680-712`) for both
-  homes. Gov's two grants move from the house seed into `gov-spec-writer` and `gov-builder`.
+  (`tools/roles/house/policy.toml@339f54fa:34-37`). `load_policy` returns the merged grant: its
+  `gates` maps each role to its `gates` field's legs, else to the house file's `[gates]` row only where
+  the role sets none (§8 F10). The leg names are graded by one
+  `check_gate_names` lifted from `load_policy` (`tools/roles/roles_lib.py@dd1a6c7c:888-917`) for both
+  homes. Every reader of the grant takes `load_policy(...)["gates"]` unchanged, and at HEAD they are
+  three: `render_roles_index` (`tools/roles/render_agents.py#render_roles_index`), the `granted` of
+  `run_mode` (`tools/roles/render_agents.py#run_mode`), which writes each agent file's `## Ceiling`
+  gate legs, and the `granted` of `render_handoff` (`tools/roles/handoff.py#render_handoff`), which
+  closes the handoff's role block. The three are PINNED at `8e0ea5e68` by
+  `git grep -n '.get("gates", {})' -- tools/roles`, whose two other hits are `load_policy` itself and
+  a selftest arm breaking an index.
+  Gov's two grants move from the house seed into `gov-spec-writer` and `gov-builder`.
   `checkRoleGate` in `tools/hooks/scratch-guard.js` reads the index's per-role `gates` unchanged
   (`tools/hooks/scratch-guard.js@0251d34d:1887-1893`).
   Observed by AC4.
@@ -92,15 +105,33 @@ fallback dConvergedCharter retires. `resolve_stage_efforts`, R12, `handoff.py`'s
   in `render_agents.py`'s `run_mode` (`tools/roles/render_agents.py@0d96af1a:351`);
   `derive_effort_index` (`tools/roles/render_agents.py#derive_effort_index`), which resolves every level
   of the index's `effort` table, `[effort]`'s and each profile's, for the spawn guard to look up, and
-  the render selftest's calls (`@0d96af1a:899-900`); the gate check through the index (S6); and
-  `harness-args`, which reads neither an effort nor a grant (§8 F3). Observed by AC2, AC3, AC4 and AC6.
+  the render selftest's calls (`@0d96af1a:899-900`); the three grant readers S6 names, through
+  `load_policy`'s merged grant; the gate check through the index (S6); and
+  `harness-args`, which reads neither an effort nor a grant (§8 F3). The render selftest
+  (`tools/roles/render_agents.py#run_selftest`) binds `lib.read_policy_setting` to a reader answering
+  `None` for every key for its whole run and restores it after, as its arm 20 binds
+  `lib.check_load_set` (`tools/roles/render_agents.py@132779e5:504-513`). So its 12 fixtures, each a
+  non-git temporary directory (PINNED by `grep -c 'tempfile.TemporaryDirectory()'` at `132779e5`), read
+  no key and see the house-file levels every arm asserts today (§8 F9). Observed by AC2, AC3, AC4 and AC6.
 - **S8** — The four keys' catalogue rows, landed by TOOL-dGroundRules-1 S3 from v2's `[policies]` rows
   1187-1190 with no `summary` or `usage` (`tools/policy/catalogue.toml@25076c3d:308-330`) and named on the
   shrink-only `tools/policy/unsummarised-keys.txt` (`@3e34b7fd:192-196`): this unit adds no row, fills
-  each row's `summary` and a `usage` line the row admits, and drains the four names with `python tools/policy/policy.py lists --write` in the same commit, the mirror regenerated by
-  `policy.py mirror --write` in a second, and re-renders `help/reference/policy.md`, which lists the four
-  under "Not yet summarised" (`help/reference/policy.md@66ea6f02:335-338`), with
-  `render_playbook.py --reference`. Observed by AC7.
+  each row's `summary` and a `usage` line the row admits, keeps each row's derived `default`, and drains
+  the four names with `python tools/policy/policy.py lists --write` in the same commit. It re-renders
+  `help/reference/policy.md`, which lists the four under "Not yet summarised"
+  (`help/reference/policy.md@66ea6f02:335-338`), with `render_playbook.py --reference`. The mirror
+  `.governance/policy.json` records the catalogue's blob (`tools/policy/policy.py#render_mirror`), so
+  the catalogue edit leaves it stale. It is rewritten as its render, never by hand, and lands in the
+  pass commit, the route TOOL-dBoundRoles-44 §8 F5 and TOOL-dBoundRoles-51 §8 F3 record. `policy.py
+  mirror --write` refuses while the catalogue differs from HEAD and renders at HEAD
+  (`tools/policy/policy.py#cmd_mirror`), so the pass commit is made first, then `python
+  tools/policy/policy.py mirror --write` runs at the repository's top, then the mirror is staged and
+  folded in with `git commit --amend --no-edit`. The amended commit renders the same bytes, by
+  `render_mirror`'s invariant: it holds the same policy, catalogue and legacy blobs over the same
+  parent. The policy guard admits the staged mirror there, as its render at HEAD with its inputs staged
+  as HEAD holds them (`tools/policy/guard.py@a5d4f958:9-12`). The render moves `catalogue_blob` alone,
+  since a derived-default key is left out of the mirror and a pattern row is listed only where the
+  file sets a key of it. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -123,7 +154,7 @@ fallback dConvergedCharter retires. `resolve_stage_efforts`, R12, `handoff.py`'s
 - **hands-off** `TOOL-dBoundRoles-16` — `resolve_stage_efforts`, the resolver the shapes' efforts read, keys first and the house file by workflow and stage
 - **hands-off** `TOOL-dBoundRoles-23` — `roles.effort.default`, the blanket whose floor and provenance it checks
 - **hands-off** `TOOL-dBoundRoles-43` — `read_policy_setting` and the `gates` field, which unit 43 makes the one reader and renders into the ceiling (ids 7 and 31 of the round-1 spec audit)
-- **hands-off** `TOOL-dBoundRoles-44` — S8's mirror step, whose second commit unit 44 leaves unmade (id 51 of the round-1 spec audit)
+- **hands-off** `TOOL-dBoundRoles-44` — S8's mirror step, the mirror its render in the pass commit, which unit 44 §8 F5 admits (id 51 of the round-1 spec audit)
 
 ## 4. Design
 
@@ -140,7 +171,9 @@ order without its stage rows.
 | 4 | the house file, where present, in the level table the model takes, `[effort.profiles.<name>]` where `resolve_profile` names one and `[effort]` otherwise: its `stages.<w>` `<s>`, then `roles` `<r>`, then `default` | `load_policy`, as `resolve_stage_efforts` reads it today (`tools/roles/roles_lib.py@a3e28716:793-825`) |
 | 5 | the role's declared `effort` | its front matter, through `load_roles` |
 
-The first step that yields a value wins. Steps 1 to 3 are the clause's "stage key, then its role's key,
+The first step that yields a value wins. A key step yields where `read_policy_setting` returns a
+value; an unset key, whose catalogue row's derived default the reader refuses, yields nothing (S1,
+§8 F8). Steps 1 to 3 are the clause's "stage key, then its role's key,
 then `roles.effort.default`". Step 4 is "the house file's `[effort]` ... read only where no key ... is
 set", read whole in today's chain so an adopter's own house levels keep applying until a key is set.
 Step 5 is "the role's declared value"; while a house file holds `[effort] default` (R12 requires it of a
@@ -168,9 +201,10 @@ An unknown harness name passed to the resolver is a `RolesError`, never a guess.
 gates: memory hygiene, lexicon naming predicates?
 ```
 
-`render_roles_index` writes the per-role `gates` list from the field, the `?` taken off as `load_policy`
-takes it off today (`tools/roles/roles_lib.py@a3e28716:711-712`); a role with no field takes its house row, and
-a role with neither runs no gate. `check_gate_names(names, legs, where)` returns the defects and notes
+`load_policy` builds the per-role `gates` list from the field, the `?` taken off as it takes it off
+today (`tools/roles/roles_lib.py@dd1a6c7c:920-921`); a role with no field takes its house row, and
+a role with neither runs no gate. `render_roles_index`, `run_mode` and `render_handoff` read that one
+map, so the index, the agent file's `## Ceiling` and the handoff's role block name the same legs. `check_gate_names(names, legs, where)` returns the defects and notes
 `load_policy` builds for `[gates]` today, so both homes are graded by one function against the tool
 root's `gate-legs.json`. The house seed's `[gates]` table keeps its header and comment, stating that a
 row there applies only to a role whose definition carries no `gates`, and its two rows move into the
@@ -192,8 +226,11 @@ step 2 from reading the blanket as a role.
 
 ### Inventory
 
-Minted: `read_policy_setting`, `resolve_role_model`, `HARNESS_MODEL_EQUIVALENT` and `check_gate_names`
-in `roles_lib.py`; the role keys `effort` and `gates`; the reserved slot `default`. Naming cells: each
+Minted: `read_policy_setting`, `resolve_role_model`, `HARNESS_MODEL_EQUIVALENT`, `check_gate_names`
+and `POLICY_DERIVED_LINE` in `roles_lib.py`; the role keys `effort` and `gates`; the reserved slot
+`default`. `POLICY_DERIVED_LINE` is the policy kit's `DERIVED_WHY` (`tools/policy/policy.py#DERIVED_WHY`)
+spelled again, since a kit imports no sibling, under the name the playbook kit spells it
+(`tools/playbook/render_playbook.py#POLICY_DERIVED_LINE`). Naming cells: each
 function is asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass.
 
 ### Migration
@@ -221,7 +258,10 @@ session, as the house file's header says of its own values today.
 - `tools/policy/catalogue.toml` (four rows' `summary` and `usage`)
 - `tools/policy/unsummarised-keys.txt` (drained by `policy.py lists --write`)
 - `help/reference/policy.md` (rendered by `render_playbook.py --reference`)
-- `.claude/agents/` and `.claude/roles.json` (rendered by `render_agents.py --write`)
+- `.governance/policy.json` (rewritten as its render by `policy.py mirror --write`, folded into the
+  pass commit, S8)
+- `.claude/agents/` and `.claude/roles.json` (rendered by `render_agents.py --write`; every rendered
+  level and grant is today's, so a byte that moves is the render's and is committed with it)
 
 ### Alternatives rejected
 
@@ -229,6 +269,9 @@ session, as the house file's header says of its own values today.
   rev-2 precedent, now reaches the policy kit by subprocess only (§8 F2).
 - **The declared effort before the house file.** It silently drops every level an adopter set in its
   house file the moment gov's role declares one (§8 F1).
+- **A literal sentinel default on the four rows.** It puts a value every other reader of `get` and of
+  the mirror reads as a level, and it leaves every other derived row a `RolesError` (§8 F8).
+- **Each grant reader merging the two homes itself.** It writes the merge three times (§8 F10).
 
 ## 5. Production-readiness checklist
 
@@ -239,8 +282,9 @@ session, as the house file's header says of its own values today.
   (PINNED from `.claude/roles.json` at `a01362eb0`), though `derive_effort_index` resolves each level in
   two level tables and an `unset` map, 59 resolutions (DERIVED by the pass from the index it renders).
   The pass measures the render's wall before and after and states both in its commit.
-- error / empty / loading states — no policy kit is one note and the keys read as unset; a reader
-  refusal is exit 2 naming the key; an absent house file is an empty fallback.
+- error / empty / loading states — no policy kit is one note and the keys read as unset; the
+  derived-default refusal is an unset key; every other reader refusal is exit 2 naming the key; an
+  absent house file is an empty fallback.
 - observability — `stage-efforts` prints the levels; `policy.py get <key> --explain` names each key's source.
 - risks — a stale render after a key change; the restart line `render_agents.py --write` prints covers
   it, as for the house file today. A fetch landing mid-render can give two keys two landed revisions;
@@ -260,11 +304,14 @@ session, as the house file's header says of its own values today.
   Red when: the resolver matches the key by role alone, so the `codex` key is read on `claude-code`.
   fixture: a git repository under `%TEMP%`, short-named, holding copies of the roles, loop and policy
   kits under one tool root and a committed policy file; the pass builds it, none being in the tree at
-  `a01362eb0`, where the policy kit is `tools/policy/`.
+  `a01362eb0`, where the policy kit is `tools/policy/`. It has no remote and commits on a branch named
+  `main`, the branch `get` reads as the landed revision of a clone with no remote
+  (`tools/policy/policy.py@b1894836:481`, `derive_landed_revision`).
 - **AC2** — When `python handoff.py stage-efforts build` runs in that fixture's `tools/roles/` with the
   house file's `gov-builder = "xhigh"` and the key `roles.effort.gov-builder = "high"` committed, it
   prints `{"builder":"high"}`; with the key absent it prints `{"builder":"xhigh"}`.
-  Red when: the house file is read first, so the set key loses.
+  Red when: the house file is read first, so the set key loses; or the copied policy kit's
+  derived-default refusal is a `RolesError`, so the absent key refuses instead of printing.
 - **AC3** — When `python handoff.py stage-efforts spec-review` runs there with
   `roles.effort.gov-skeptic = "max"` committed and no `roles.effort.spec-review.skeptic`, it prints
   `skeptic` at `max`, though the house file sets `[effort.stages.spec-review] skeptic = "medium"`.
@@ -272,8 +319,12 @@ session, as the house file's header says of its own values today.
 - **AC4** — When `python render_agents.py --write` runs in a fixture whose house file sets
   `gov-builder = ["memory hygiene"]` and whose `gov-builder.agent.md` carries
   `gates: lexicon naming predicates?`, the fixture's `.claude/roles.json` lists `gov-builder`'s gates as
-  `["lexicon naming predicates"]` alone; with the field absent it lists `["memory hygiene"]`.
-  Red when: the index reads the house row first or unions the two homes.
+  `["lexicon naming predicates"]` alone; with the field absent it lists `["memory hygiene"]`. In both
+  cases the `## Ceiling` of the fixture's `.claude/agents/gov-builder.md` carries `- gate legs: ` and
+  the same legs.
+  Red when: the index reads the house row first or unions the two homes; or `run_mode` reads the
+  house file's `[gates]` alone, so the ceiling names `memory hygiene` beside a field that grants
+  another leg.
 - **AC5** — When `python check_roles.py --root <repo>` runs in the `roles/` of a scratch tool root
   holding copies of `tools/roles/` and `tools/loop/` side by side, whose role-file directory holds a
   planted role file named `default`, it exits 1 with one R2 line naming the reserved slot.
@@ -286,9 +337,12 @@ session, as the house file's header says of its own values today.
   Red when: an absent house file still refuses, so the declared value is never reached.
 - **AC7** — When `grep -cE '^roles\.(effort|model)' unsummarised-keys.txt` runs in `tools/policy/`, it
   prints 0, `git grep -nE 'tomllib.*policy\.toml|\.governance/policy' -- tools/roles` prints only
-  comment lines, and `git grep -nwE '(from|import) policy' -- tools/roles` prints nothing.
-  Red when: a key is read by a second parser in the roles kit, the policy kit is imported, or a row
-  stays unsummarised.
+  comment lines, and `git grep -nwE '(from|import) policy' -- tools/roles` prints nothing. At the
+  pass commit, `python tools/policy/policy.py mirror --check` run at the repository's top prints
+  `policy: mirror fresh`.
+  Red when: a key is read by a second parser in the roles kit, the policy kit is imported, a row
+  stays unsummarised, or the mirror keeps its base bytes, whose `catalogue_blob` the catalogue edit
+  moved.
 
 ## 7. Gates
 
@@ -355,6 +409,62 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · a 
   RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, tie-broken by the smaller change to F2's
   cost; the keys a render reads stay about forty.
   widens: none · relaxes: none
+- **F8 — An unset key of the four rows never answers source `default`: what does `read_policy_setting`
+  read it as?** Each row carries a derived default (`tools/policy/catalogue.toml@25076c3d:308-330`), and
+  `read_default_value` raises `DerivedDefault` for one (`tools/policy/policy.py#read_default_value`).
+  Probed at `8e0ea5e68`: `python tools/policy/policy.py get roles.effort.gov-builder --json` exits 2
+  printing `the row roles.effort.<role> carries a derived default no reader computes yet`, and the
+  same holds for `roles.effort.spec-review.skeptic`, `roles.effort.default` and
+  `roles.model.gov-builder.claude-code`; `roles.retries`, a literal default, exits 0 with source
+  `default`. Options: (a) an exit 2 whose line carries the kit's `DERIVED_WHY` text is unset, every other
+  exit 2 a `RolesError`; (b) `get` gains a distinct answer for a derived default; (c) S8's own catalogue
+  edit gives the four rows a literal default, such as `"unset"`, which the reader maps to `None`.
+  (b) changes another build's reader and its public surface (veto 2). (c) was probed at `8e0ea5e68`:
+  the row's own check admits `"unset"` (`tools/policy/policy.py#check_shape`, through `check_value`), so
+  it would land. But `roles.effort.default` is no pattern row, so the mirror, which leaves a derived key
+  out and holds no `roles.effort` key today, would list `"unset"` as a value. Every reader of `get` would
+  then read that word as an effort level. (c) also answers these four rows only, while the backlog ask
+  TOOL-dIndexedDesign-22 (`memory/builds/dIndexedDesign/BACKLOG.md`) asks the reader to answer `None` for every
+  unset derived-default key, `review.<stage>.effort` among them, a row this unit does not own. So (c)
+  changes the mirror's public key set (veto 2) and leaves an accepted ask open. (a) is the shape three
+  readers already take: `tools/playbook/instruction_units.py#read_active_practices` through
+  `tools/playbook/render_playbook.py#POLICY_DERIVED_LINE`, `tools/run-gates/remote_verdict.py#read_remote_keys`
+  and `tools/run-gates/verdict_backends.py#read_peer_verdict` through
+  `tools/run-gates/remote_verdict.py#DERIVED_REFUSAL`. RESOLVED (agent, 2026-11-22, delegated): (a),
+  rung 3, the one survivor of veto 2, tie-broken by reuse of the seam those three readers share; it
+  answers TOOL-dIndexedDesign-22 as worded. What (a) does not check: that `POLICY_DERIVED_LINE` still
+  equals the policy kit's `DERIVED_WHY`. A reword there turns every unset key into a `RolesError`, so
+  each render refuses, loudly; AC2's absent case runs the copied policy kit and goes red on it. It does
+  not check which row a derived refusal names, so any key a caller reads unset through a derived row
+  reads `None`. It does not check the catalogue's derived prose against §4's order; S8's `summary` states
+  the step.
+  widens: none · relaxes: none
+- **F9 — Where does the policy-kit search start, and what reader do the render selftest's fixtures
+  see?** At HEAD each of the selftest's 12 fixtures is a non-git temporary directory, where the real
+  `policy.py get` exits 2, the revision naming no commit. Options: (a) the search starts at
+  `roles_lib.py`'s own directory, as `tools/playbook/policy_value.py#read_policy_value` starts at its
+  own; `run_selftest` binds `lib.read_policy_setting` to a reader answering `None` for its run, as its
+  arm 20 binds `lib.check_load_set` (`tools/roles/render_agents.py@132779e5:504-513`). The real reader
+  is observed by the adopter arm's git fixture, which copies the policy kit (AC1 to AC6). (b) the
+  search starts at the kit directory `load_policy` read, carried to the reader; a fixture's kit has no
+  policy kit beside it, so every key reads unset. That changes `read_policy_setting(key, root,
+  with_default)`, the interface TOOL-dBoundRoles-43 takes over and units 5, 10, 11 and 22 call by those
+  three arguments. (c) every fixture becomes a git repository on `main` holding a policy kit, each
+  render then running about forty `get` processes. (a) and (c) satisfy every criterion; (c) adds a
+  wall cost to the selftest that F7's measure does not price, which is one more follow-up.
+  RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the most feature-rich survivor, tie-broken by
+  fewer follow-ups and the arm-20 seam.
+  widens: none · relaxes: none
+- **F10 — Which readers of the gate grant move: the ones S7 names, or every one, through
+  `load_policy`?** At HEAD `run_mode`'s `granted` and `render_handoff`'s `granted` read
+  `load_policy(...)["gates"]` beside `render_roles_index`. Once the rows move into the role files,
+  each would render `gate legs: none` unless it reads the field too. Options: (a) S7 lists both, and
+  each reader merges the field over the house row itself; (b) `load_policy` returns the merged grant,
+  the field else the house row, so every reader takes it unchanged. (a) writes the merge three times
+  and leaves a fourth reader to repeat it. RESOLVED (agent, 2026-11-22, delegated): (b), rung 3, the
+  most feature-rich option: every criterion and every current reader with no follow-up, the merge
+  living in one core beside the grading that `load_policy` already holds.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -382,6 +492,14 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · a 
   kit, since R6 joins the loop definition. Every citation is re-pointed to a symbol or a blob. The
   `effort` and `gates` rows were checked against TOOL-dBoundRoles-2's spec, not HEAD, and
   TOOL-dBoundRoles-22 S5's `with_default` against that unit's spec.
+- rev-6 · 2026-11-22 · S1 S6 S7 S8 · §3 · §4 · §5 · AC1 AC2 AC4 AC7 · §8 F8 F9 F10 · §10 · folds the four
+  items of `2026-11-22-build-TOOL-dBoundRoles-21-1-builder-return` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-21-spec-fix-1-brief`, grounded at `8e0ea5e68`. An unset key's
+  derived-default refusal reads as `None` (F8, AC2); the policy-kit search starts at `roles_lib.py`'s
+  own directory, and the render selftest binds a reader answering `None` (F9, AC1's fixture on `main`);
+  `load_policy` returns the merged grant every reader takes, `run_mode` and `render_handoff` named (F10,
+  AC4's ceiling); `.governance/policy.json` joins Files touched as its render folded into the pass
+  commit (S8, AC7). Each criterion keeps its number.
 
 ## 10. Reuse audit
 
@@ -402,4 +520,17 @@ the night-pass instruments' copy of the clause and the flow-adoption review's fi
 `:453-471` held at `4ed9e567` and sit at `tools/roles/handoff.py@ba4a9fad:802-816` and `:782-800` at
 `a01362eb0`, and `FRONT_MATTER_KEYS` sits at `tools/roles/roles_lib.py#FRONT_MATTER_KEYS`.
 
+At rev-6, verified at `8e0ea5e68`: the derived-default reading reuses the seam three readers share,
+the kit's `DERIVED_WHY` spelled again and matched in the refusal line
+(`tools/playbook/render_playbook.py#POLICY_DERIVED_LINE`, `tools/run-gates/remote_verdict.py#DERIVED_REFUSAL`);
+the search start is the one `tools/playbook/policy_value.py#read_policy_value` takes, from its own
+kit directory; the selftest's reader is bound as `tools/roles/render_agents.py#run_selftest` binds
+`lib.check_load_set`; the merged grant extends `tools/roles/roles_lib.py#load_policy`, whose three
+readers S6 names. This roles-kit spelling is the third copy of the refusal text, beside those two. Extracting one shared
+reader into `tools/lib/` is outside the four items this rev folds. The recall probe returned the
+backlog ask TOOL-dIndexedDesign-22, which F8's pick answers, and TOOL-dGroundRules-62, whose caps module
+reads the same refusal as no file value in process.
+
 Recall terms used: `python tools/memory-recall/query.py "how is a stage's effort resolved from keys and the house policy file" --terms "resolve_stage_efforts effort keys roles.effort default house policy gates grant R12 stage-efforts"`
+
+Recall terms used at rev-6: `python tools/memory-recall/query.py "how does a kit read a policy key whose catalogue default is derived as unset" --terms "DERIVED_WHY DerivedDefault derived default unset read_policy_value policy.py get refusal"`

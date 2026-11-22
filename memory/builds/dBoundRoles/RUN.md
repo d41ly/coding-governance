@@ -113,3 +113,8 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T09:34:09Z draw · re-dispatch · TOOL-dBoundRoles-37 · 16/122 · 20261122T093409Z-584954
 
 2026-11-22T09:34:09Z dispatch · item b9ee28cf TOOL-dBoundRoles-37 · reason tools/govkit/selftest.py memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-37-1-acceptance-ledger.md memory/map/generated/symbols.json memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-37.md
+
+2026-11-22T09:54:54Z brief · item TOOL-dBoundRoles-21 · reason db98f54cf574 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-21-build-brief.md
+2026-11-22T09:58:24Z draw · re-dispatch · TOOL-dBoundRoles-21 · 17/122 · 20261122T095824Z-1f68a3
+
+2026-11-22T09:58:24Z dispatch · item 8e0ea5e6 TOOL-dBoundRoles-21 · reason tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/handoff.py tools/roles/render_agents.py tools/roles/role-schema.toml tools/roles/agents tools/roles/house/policy.toml tools/roles/README.md tools/roles/adopt-roles.test.sh tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt help/reference/policy.md .governance/policy.json memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-21-1-acceptance-ledger.md

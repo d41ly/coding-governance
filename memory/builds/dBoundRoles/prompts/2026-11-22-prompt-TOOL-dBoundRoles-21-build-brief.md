@@ -14,8 +14,11 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every roster spec was re-grounded on HEAD before this dispatch, so its citations hold at HEAD or name the earlier
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
-- It builds beside TOOL-dBoundRoles-37 at the same order, each on its own pass branch cut from the same records
-  commit; the two write sets were declared disjoint. Touch nothing outside your own.
+- The spec is rev-6, revised over the first builder's divergence
+  (`build/2026-11-22-build-TOOL-dBoundRoles-21-1-builder-return.md`): an unset key's derived-default refusal reads as
+  unset (§8 F8), the render selftest swaps in a reader answering `None` (§8 F9), `load_policy` returns the merged gate
+  grant (§8 F10), and `.governance/policy.json` is rewritten as its render after the pass commit, as §2 S8 states.
+  This pass runs in the run's own tree; TOOL-dBoundRoles-37 is already built and CLOSED at `5f7f208fd`.
 
 ## What the main loop needs from your commit
 
