@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-46 — `parse_id_parts` reads the named groups of `tree_lib.build_id_token_re`, and a correction suffix parses
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base c2143acf · streams tooling · order 9 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base c2143acf · streams tooling · order 9 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -128,8 +128,10 @@ also mints at step 8 (§8 F2). Naming cell: none; the lexicon declares `js.funct
 
 - **AC1** — When a `python -c` probe calls `parse_id_parts("TOOL-dTotalRecall-38", ".")` from
   `id_grammar.py`, it returns `("TOOL", "dTotalRecall", 38)`, and `grep -c 'ID_RE' ` over the function's
-  source prints `0`.
-  Red when: the parser reads a group `ID_RE` lacks, and the call raises `IndexError`.
+  source prints `0`. In a scratch tree whose `.memory-tree.conf` declares `RECALL_CITED_FAMILIES` with
+  `ZED`, the call on `ZED-aFoo-2` returns `("ZED", "aFoo", 2)`.
+  Red when: the parser reads a group `ID_RE` lacks, or refuses a cited family.
+  fixture: the scratch tree under the run's scratch directory; the pass makes it.
 - **AC2** — When the same probe calls it with `TOOL-aDrainedSluice-9b`, it returns
   `("TOOL", "aDrainedSluice", 9)`.
   Red when: the suffix raises `ValueError` or reaches `int()`.
@@ -172,6 +174,7 @@ New arm: tools/memory-tree/id_grammar.py · covers AC1 AC2 AC3 · the parser cas
   read is `id_grammar.py#load_conf`, not `tree_lib.parse_conf`, and its Inventory names unit 54's
   `SUFFIX_RE` and the five declared lexicon cells; §7 names the four further legs guarding
   `id_grammar.py`; F2 leaves units 63's and 64's amendments to their passes.
+- rev-5 · 2026-11-22 · AC1 · the cited-family case, added by TOOL-dTotalRecall-63 (id 3, item H3 shared with id 22)
 
 ## 10. Reuse audit
 
