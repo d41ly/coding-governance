@@ -202,6 +202,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
 # table. A shell consumer runs it with the python it already resolved, so the receipt rung is
@@ -1875,24 +1893,24 @@ for sgib_i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do [ -f "$sgib/calls-stale" ]
 sleep 1
 for sgib_s in equal role other ctx; do
   [ ! -e "$sgib/calls-$sgib_s" ] && { echo "ok   KICK-dKeptSession-13 AC5 case $sgib_s starts no boundary verb"; pass=$((pass+1)); } \
-    || { echo "FAIL KICK-dKeptSession-13 AC5 case $sgib_s started the boundary verb: $(cat "$sgib/calls-$sgib_s") · $(cat "$sgib/out-$sgib_s")"; fail=$((fail+1)); }
+    || { echo "FAIL KICK-dKeptSession-13 AC5 case $sgib_s started the boundary verb: $(<"$sgib/calls-$sgib_s") · $(<"$sgib/out-$sgib_s")"; fail=$((fail+1)); }
 done
 sgib_want="--card --boundary --build tIb --session sgtest-ib --out "
-case "$(grep -c . "$sgib/calls-stale" 2>/dev/null);$(cat "$sgib/calls-stale" 2>/dev/null)" in
+case "$(grep -c . "$sgib/calls-stale" 2>/dev/null);$(<"$sgib/calls-stale")" in
   "1;$sgib_want"*/orientation/sgtest-ib.boundary) echo "ok   KICK-dKeptSession-13 AC5 a stale at starts one detached --card --boundary, --out naming the .boundary file"; pass=$((pass+1)) ;;
-  *) echo "FAIL KICK-dKeptSession-13 AC5 a stale at starts one detached --card --boundary: $(cat "$sgib/calls-stale" 2>&1) · $(cat "$sgib/out-stale")"; fail=$((fail+1)) ;;
+  *) echo "FAIL KICK-dKeptSession-13 AC5 a stale at starts one detached --card --boundary: $(cat "$sgib/calls-stale" 2>&1) · $(<"$sgib/out-stale")"; fail=$((fail+1)) ;;
 esac
-case "$(cat "$sgib/out-stale")" in
+case "$(<"$sgib/out-stale")" in
   *' "" false') echo "ok   KICK-dKeptSession-13 AC5 the step returned before the stub was done"; pass=$((pass+1)) ;;
-  *) echo "FAIL KICK-dKeptSession-13 AC5 the step returned before the stub was done: $(cat "$sgib/out-stale")"; fail=$((fail+1)) ;;
+  *) echo "FAIL KICK-dKeptSession-13 AC5 the step returned before the stub was done: $(<"$sgib/out-stale")"; fail=$((fail+1)) ;;
 esac
 [ "$(grep -c . "$sgib/calls-bare" 2>/dev/null)" = 1 ] && { echo "ok   KICK-dKeptSession-13 AC5 a card with no ## pointers starts the verb"; pass=$((pass+1)); } \
-  || { echo "FAIL KICK-dKeptSession-13 AC5 a card with no ## pointers starts the verb: $(cat "$sgib/out-bare")"; fail=$((fail+1)); }
-case "$(cat "$sgib/out-ctx")" in
+  || { echo "FAIL KICK-dKeptSession-13 AC5 a card with no ## pointers starts the verb: $(<"$sgib/out-bare")"; fail=$((fail+1)); }
+case "$(<"$sgib/out-ctx")" in
   *' "boundary — K1 → K2" '*) [ ! -e "$sgib_r/.git/orientation/sgtest-ib.boundary" ] \
     && { echo "ok   KICK-dKeptSession-13 AC5 a waiting .boundary file is returned and unlinked"; pass=$((pass+1)); } \
     || { echo "FAIL KICK-dKeptSession-13 AC5 the .boundary file was returned and left in place"; fail=$((fail+1)); } ;;
-  *) echo "FAIL KICK-dKeptSession-13 AC5 a waiting .boundary file is returned: $(cat "$sgib/out-ctx")"; fail=$((fail+1)) ;;
+  *) echo "FAIL KICK-dKeptSession-13 AC5 a waiting .boundary file is returned: $(<"$sgib/out-ctx")"; fail=$((fail+1)) ;;
 esac
 for sgib_i in 1 2 3 4 5 6 7 8; do [ -f "$sgib/done-stale" ] && [ -f "$sgib/done-bare" ] && break; sleep 1; done
 

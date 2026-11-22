@@ -201,20 +201,36 @@ means = "adopted"
 # THE DEFINITION LEG SHIPS. Its subject is the definition every reader in the target reads, so a
 # failure means the target's loop does not read, whoever changed it.
 [[gate_leg]]
+tag = "leg.loop.loop-definition"
+tests = ["feature.loop"]
+enforces = ["principle.p1"]
 name = "loop definition"
 subject = "repo"
+purpose = "checks the loop definition every reader in the target reads"
 argv = ["python", "{kit}/loop_lib.py", "--check"]
 reads = { base = "it compares the actor-witness list with itself at the compare base, the merge-base with the default branch, so a verdict cached against one base says nothing about another (TOOL-dDeclaredLoop-5)." }
 guard = []
 ceiling = 120
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+
 # THE TRANSITION TABLES' LEG SHIPS, for the reason the definition's does: its subject is the tables every
 # mover in the target reads, so a failure means the target's moves do not hold (TOOL-dDeclaredLoop-13).
 [[gate_leg]]
+tag = "leg.loop.loop-transition-tables"
+tests = ["feature.loop"]
+enforces = ["principle.p20"]
 name = "loop transition tables"
 subject = "repo"
+purpose = "checks the transition tables every mover in the target reads"
 argv = ["python", "{kit}/loop_table.py", "check", "--selftest"]
 guard = []
 ceiling = 120
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "declarations"

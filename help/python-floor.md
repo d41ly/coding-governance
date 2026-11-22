@@ -56,6 +56,23 @@ prints the interpreter and its version and exits 0.
   `export GOV_PYTHON=/path/to/python3.15`. `GOV_PYTHON` names the command every consumer spawns,
   and it must still run at the floor; nothing lowers the floor.
 
+## When WSL's bash runs a script from a Windows checkout
+
+WSL mounts each Windows drive at `/mnt/<drive>/`. A gov script that WSL's bash starts from a Windows
+checkout would run with a Linux Python and see the tree through another filesystem. So every script
+that resolves Python refuses first, before it resolves anything, and exits 2:
+
+```text
+refuse_wrong_shell: WSL's bash is running /mnt/c/<repo>/tools/<script> from a Windows checkout under /mnt/;
+refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe).
+```
+
+The remedy is the second line: run the script from Git's bash on Windows. A Python or Node tool that
+starts a bash refuses with the same remedy, before it tries any bash. The refusal
+fires only when both hold: the script sits under a single-letter `/mnt/<drive>/`, and WSL is the
+host. A checkout on WSL's own disk, such as the held WSL mirror, and a Linux machine's own bash stay
+green.
+
 ## `platforms.provision` — what the refusal does about installing
 
 Set it in `.governance/policy.toml` (see [the policy file](policy.md)). The resolver reads it with <!-- usage: policy:platforms.provision 0eef7dd7 -->

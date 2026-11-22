@@ -249,6 +249,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 _kit=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "verdict-epoch: cannot derive this gate's own directory from '$_self_dir'"; exit 2; }
 ENGINE="${_kit}check-memory-hygiene.sh"
 _ve_py=$(resolve_python 2>/dev/null) || _ve_py=""
@@ -264,7 +282,7 @@ _ve_py=$(resolve_python 2>/dev/null) || _ve_py=""
 # `merge-rows.py` import lazily. The import-closure check below is what keeps this list whole.
 # PLAY-dOrderedCharter-7 S7: and `build_records.py`, the typed record factory `deviation_join.py` imports at
 # module level, which now holds the deviation record's field grammar and its population.
-DELEGATES="${_kit}tree_lib.py ${_kit}commit_trailers.py ${_kit}row_grammar.py ${_kit}gen_build_index.py ${_kit}corpus_ids.py ${_kit}gotchas.py ${_kit}id_grammar.py ${_kit}merge-rows.py ${_kit}design_lib.py ${_kit}asbuilt_view.py ${_kit}deviation_join.py ${_kit}build_records.py ${_kit}routed_commits.py ${_kit}backlog.py ${_kit}../check-spec-tokens.py"
+DELEGATES="${_kit}tree_lib.py ${_kit}commit_trailers.py ${_kit}row_grammar.py ${_kit}gen_build_index.py ${_kit}corpus_ids.py ${_kit}gotchas.py ${_kit}id_grammar.py ${_kit}merge-rows.py ${_kit}legacy_ledger.py ${_kit}coverage_join.py ${_kit}design_lib.py ${_kit}asbuilt_view.py ${_kit}deviation_join.py ${_kit}build_records.py ${_kit}routed_commits.py ${_kit}backlog.py ${_kit}../check-spec-tokens.py"
 [ -f "$ENGINE" ] || { echo "verdict-epoch: $ENGINE is missing — this gate reads the engine's own source"; exit 2; }
 SCAN="$ENGINE"
 for _d in $DELEGATES; do

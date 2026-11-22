@@ -7,6 +7,7 @@ SRC=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "pre-push.test: not a
 # The kit root is the one the hook itself reads: GOV_KITROOT as `.githooks/gate-env.sh` declares it
 # (TOOL-aRepatriatedFork-28), never a literal prefix typed here.
 KIT_REL=$( . "$SRC/.githooks/gate-env.sh" >/dev/null 2>&1; printf '%s' "${GOV_KITROOT:-}" )
+PK=policy  # the policy kit, named once
 [ -n "$KIT_REL" ] || { echo "pre-push.test: .githooks/gate-env.sh declares no GOV_KITROOT"; exit 2; }
 [ -f "$SRC/.githooks/pre-push" ] || { echo "pre-push.test: .githooks/pre-push missing"; exit 1; }
 # TOOL-aRepatriatedFork-46: the run-gates kit is named by the NAME its directory has under that kit
@@ -176,6 +177,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
 # table. A shell consumer runs it with the python it already resolved, so the receipt rung is
@@ -669,27 +688,11 @@ else
   bad "25 a tracked bar was refused, so 26-27 prove only that the hook refuses everything"
 fi
 
-# 25b — a tracked bar that is NOT this kit's runner adopts no runner stamp (TOOL-aFrugalTurnstile-1
-#       AC4): a green the runner earned proves the runner's legs, never this bar's. Its own green is a
-#       candidate in the stamp's place (TOOL-aFrugalTurnstile-2 S3b), so the push scopes from arm 25's
-#       gate-bar-green, 2 landings back. The stamp is 1 back and otherwise valid, so nearest-wins would
-#       pick it were it a candidate. The pushed tree is one no earlier push carried, or arm 25's record
-#       covers it and no bar, so no decision, runs. GATE_SELFTESTS is cleared as `decide` clears it.
-git commit -q --allow-empty -m c25b >/dev/null 2>&1
-stamp "$(git rev-parse HEAD)"
-printf 'c25b2\n' > c25b2.txt; git add c25b2.txt >/dev/null 2>&1; git commit -q -m c25b2 >/dev/null 2>&1
-line=$( ( unset GOV_GATE_CMD_TEST; GATE_SELFTESTS= GOV_GATE_CMD="bash tracked-bar.sh" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true )
-case "$line" in
-  *"scoped gate"*"bar green"*"from this git dir's gate-bar-green "*) ok "25b a non-runner bar scopes from its own gate-bar-green, never from the nearer runner stamp" ;;
-  *) bad "25b a runner stamp was a candidate for a bar that is not the runner: ${line:-<no decision line>}" ;;
-esac
-
-# 25c — and with NO bar record to adopt, the same bar pushes FULL and says why (TOOL-aFrugalTurnstile-1
-#       AC4's reason, which 25b no longer reaches). Every bar-record slot of this git dir goes — it is
-#       the common dir here, so that is `gate-bar-green`, `.scoped` and their `.shared` copies. The
-#       runner stamp is valid and 1 landing back, so a hook without the non-runner force scopes from it
-#       and this arm reds; the pushed file is one no earlier push carried, so no cover pass answers.
-rm -f "$(git rev-parse --git-dir)"/gate-bar-green*
+# 25c — a tracked bar that is NOT this kit's runner adopts no runner stamp (TOOL-aFrugalTurnstile-1
+#       AC4): a green the runner earned proves the runner's legs, never this bar's, and no record of its
+#       own exists (TOOL-dWitnessedBar-4 S4), so it pushes FULL and says why. The runner stamp is valid
+#       and 1 landing back, so a hook without the non-runner force scopes from it and this arm reds; the
+#       pushed file is one no earlier push carried, so no cover pass answers.
 git commit -q --allow-empty -m c25c >/dev/null 2>&1
 stamp "$(git rev-parse HEAD)"
 printf 'c25c2\n' > c25c2.txt; git add c25c2.txt >/dev/null 2>&1; git commit -q -m c25c2 >/dev/null 2>&1
@@ -1241,6 +1244,21 @@ case "$_out|$rp_knob" in
   *"FULL gate on main push"*"|") ok "RP AC15 a FULL decision hands the bar no knob, inherited or not" ;;
   *) bad "RP AC15 expected a FULL decision with no knob, got knob '$rp_knob': $_out" ;;
 esac
+# TOOL-dWitnessedBar-56 AC7 (S9): GATE_BASE_FROM and GATE_SELECTION are the hook's alone, for a STUB bar
+# too. A caller exporting both on a FULL decision has each named as not honoured, the bar sees neither,
+# and the stub, which writes its record unless GATE_BASE_FROM reads `inherited` as the runner declines,
+# writes it. Red against a hook that passes either knob through.
+printf '#!/usr/bin/env bash\nprintf "%%s|%%s" "${GATE_BASE_FROM-unset}" "${GATE_SELECTION-unset}" > "%s/bf"\n[ "${GATE_BASE_FROM:-}" = inherited ] || : > "%s/bf-record"\nexit 0\n' \
+  "$rp" "$rp" > "$rp/stub-bf.sh"
+rm -f "$rp/bf-record"; printf 'none' > "$rp/bf"
+_out=$( git commit -q --allow-empty -m "rp base-from" >/dev/null 2>&1
+        env GOV_GATE_CMD="bash $rp/stub-bf.sh" GATE_BASE_FROM=inherited GATE_SELECTION="$rp/planted-selection" \
+          git push origin main 2>&1 )
+case "$(printf '%s\n' "$_out" | grep -m1 'not honoured from the environment by this bar:')|$(<"$rp/bf")|$([ -e "$rp/bf-record" ] && echo record)" in
+  *" GATE_BASE_FROM GATE_SELECTION"*"|unset|unset|record")
+    ok "RP TOOL-dWitnessedBar-56 AC7 an exported GATE_BASE_FROM and GATE_SELECTION are named as not honoured, never reach a full decision's bar, and its record is written" ;;
+  *) bad "RP TOOL-dWitnessedBar-56 AC7 expected both knobs named and cleared and the record written, got '$(<"$rp/bf")' $([ -e "$rp/bf-record" ] && echo record || echo 'no record'): $_out" ;;
+esac
 
 # AC14: predicate 9 — a planted full green whose `reused_cache` field is not 0 forces the full bar, and
 # the same record reading 0 scopes, so the arm sees the field and not the record. RE-STAGED BY
@@ -1440,30 +1458,50 @@ case "$(cat "$dg/gep" 2>/dev/null)" in
   *) ok "TOOL-aSparedSpawn-33 AC3 the legs keep the hook's environment: pa saw GIT_EXEC_PATH during the push" ;;
 esac
 cd "$pfx_home" || exit 2
-# ---- TOOL-dDerivedDocket-24: THE INHERITED-RED POLICY, READ AT R ---------------------------------
-# A scratch repo whose `.githooks/gate-env.sh` at the pushed remote tip R declares the policy under
-# test, and a stub gate that writes the run record a real runner would: a RED verdict and one
-# attribution row in the nine-column order, reading `GATE_RUN_ID` and `GATE_ATTRIBUTE` from the hook.
-# The stub also records the policy the hook exported, so an arm can grade what reached the runner.
+# ---- TOOL-dWitnessedBar-3, TOOL-dDerivedDocket-24: WHICH RED BLOCKS, READ AT R --------------------
+# A scratch repo whose `.governance/policy.toml` at the pushed remote tip R declares `verdict.blocks`,
+# read through a copy of the policy kit committed beside it, and whose `.githooks/gate-env.sh` there
+# declares the age bound. A stub gate writes the run record a real runner would: a RED verdict and one
+# attribution row in the ten-column order, its ninth field `blocks` derived by the run-gates kit's own
+# `lib-verdict.sh` under the GATE_VERDICT_BLOCKS the hook handed it, reading `GATE_RUN_ID` and
+# `GATE_ATTRIBUTE` from the hook. The stub also records what the hook exported, so an arm can grade
+# what reached the runner.
 ir_env="$tmp/ir-env.txt"
 irstub="$tmp/irstub.sh"
+ir_lib="$SRC/$RUN_GATES_DIR/lib-verdict.sh"
 cat > "$irstub" <<'IRSTUB'
 #!/usr/bin/env bash
 d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"
+. "$IR_LIB"
+b=$(derive_red_blocks "${GATE_VERDICT_BLOCKS:-}" "${IR_VERDICT:-INHERITED}")
 printf 'verdict\tRED\nfailed\t1\ntree_moved\t%s\n' "${IR_MOVED:-no}" > "$d/verdict"
-printf 'x\t%s\t1\t0\t%s\t%s\t-\t-\tstub\n' "${IR_VERDICT:-INHERITED}" "${GATE_ATTRIBUTE:-none}" "${IR_AGE:-3}" > "$d/attribution"
-printf 'policy=%s age=%s attr=%s\n' "${GATE_INHERITED_RED:-}" "${GATE_INHERITED_RED_MAX_AGE:-}" "${GATE_ATTRIBUTE:-}" > "$IR_ENV"
+printf 'x\t%s\t1\t0\t%s\t%s\t-\t-\t%s\tstub\n' "${IR_VERDICT:-INHERITED}" "${GATE_ATTRIBUTE:-none}" "${IR_AGE:-3}" "$b" > "$d/attribution"
+printf 'policy=%s age=%s attr=%s\n' "${GATE_VERDICT_BLOCKS:-}" "${GATE_INHERITED_RED_MAX_AGE:-}" "${GATE_ATTRIBUTE:-}" > "$IR_ENV"
 echo "FAKE LEG failed"; exit 1
 IRSTUB
-build_ir_fixture() { # tag · gate-env body (printf %b) -> a pushed main whose R carries that body; sets IR_R
-  local tag=$1 body=$2
+write_ir_policy() { # value | "" (a policy file with no [verdict]) -> .governance/policy.toml in the cwd
+  mkdir -p .governance
+  if [ -n "$1" ]; then printf '[verdict]\nblocks = "%s"\n' "$1" > .governance/policy.toml
+  else printf '[runtime]\nagents-in-flight = 6\n' > .governance/policy.toml; fi
+}
+build_ir_fixture() { # tag · kit (kit:<value>, kit: for no key, nokit, broken) · gate-env body (printf %b) -> a pushed main at R; sets IR_R
+  local tag=$1 kit=$2 body=$3
   local d="$tmp/ir-$tag"
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
   git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
   cd "$d/work" || return 1
   git config core.hooksPath "$d/hooks"
+  git config core.autocrlf false
   mkdir -p .githooks "$KIT_REL"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  case "$kit" in
+    kit:*) mkdir -p "$KIT_REL/$PK"
+           cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+              "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/"
+           write_ir_policy "${kit#kit:}" ;;
+    broken) mkdir -p "$KIT_REL/$PK"
+            printf 'import sys\nsys.exit(3)\n' > "$KIT_REL/$PK/policy.py" ;;
+  esac
   printf '%b' "$body" > .githooks/gate-env.sh
   # The kit root, on the rung this hook reads it from when no receipt or root install names it.
   printf 'GOV_KITROOT=%s\n' "$KIT_REL" >> .githooks/gate-env.sh
@@ -1476,44 +1514,57 @@ build_ir_fixture() { # tag · gate-env body (printf %b) -> a pushed main whose R
 run_ir_push() { # [env assignments…] -> the push's merged output, then `rc=<n>` on its own line
   git commit -q --allow-empty -m "ir $RANDOM" >/dev/null 2>&1
   local o r
-  o=$( env GATE_SELFTESTS= IR_ENV="$ir_env" GOV_GATE_CMD="bash $irstub" "$@" git push origin main 2>&1 ); r=$?
+  o=$( env GATE_SELFTESTS= IR_ENV="$ir_env" IR_LIB="$ir_lib" GOV_GATE_CMD="bash $irstub" "$@" git push origin main 2>&1 ); r=$?
   printf '%s\nrc=%s\n' "$o" "$r"
 }
-write_ir_stamp() { # sha · base · max_age -> a planted gate-inherited-green
-  printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nselftests\t\nbase\t%s\nmax_age\t%s\nlegs\tx\nrun_id\ttest\n' \
-    "$1" "$2" "$3" > "$(git rev-parse --git-dir)/gate-inherited-green"
+write_ir_stamp() { # sha · base · max_age · blocks -> a planted gate-inherited-green
+  printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nselftests\t\nbase\t%s\nmax_age\t%s\nblocks\t%s\nlegs\tx\nrun_id\ttest\n' \
+    "$1" "$2" "$3" "$4" > "$(git rev-parse --git-dir)/gate-inherited-green"
 }
 
-# AC1, the hook's half: R says park and the pushed branch commits `land` into its OWN copy. The policy
-# line reads park, and an inherited-only red is blocked. A reader of the working tree would land it.
-build_ir_fixture ac1 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC1 could not build its fixture"
-printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
-git add -A >/dev/null 2>&1; git commit -q -m "the branch grants itself land" >/dev/null 2>&1
+# AC1, the hook's half: R reads every-red and the pushed branch loosens its OWN copy to own-only. The
+# policy line reads every-red, and an inherited-only red is blocked. A reader of the pushed tree would land it.
+build_ir_fixture ac1 kit:every-red 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC1 could not build its fixture"
+write_ir_policy own-only
+git add -A >/dev/null 2>&1; git commit -q -m "the branch grants itself own-only" >/dev/null 2>&1
 _o=$(run_ir_push)
 case "$_o" in
-  *"inherited-red policy at ${IR_R:0:8} reads park"*"rc=1") ok "IR AC1 a branch-committed land is not read: R's park binds and the red is blocked" ;;
-  *) bad "IR AC1 expected R's park and a blocked push, got: $_o" ;;
+  *"verdict.blocks at ${IR_R:0:8} reads every-red"*"this red does not land under verdict.blocks every-red — x reads INHERITED and blocks"*"rc=1")
+    ok "IR AC1 a branch-committed own-only is not read: R's every-red binds and the red is blocked" ;;
+  *) bad "IR AC1 expected R's every-red and a blocked push, got: $_o" ;;
 esac
 
-# AC2: under land at R, a red whose one leg reads INHERITED and not aged lands, naming the leg; the
-# same bar with the leg MIXED is blocked. The export reaches the runner too.
-build_ir_fixture ac2 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC2 could not build its fixture"
+# AC2: under own-mixed-contended at R, a red whose one leg reads INHERITED and not aged lands, naming
+# the leg; the same bar with the leg MIXED is blocked. The value and the bound reach the runner too.
+build_ir_fixture ac2 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC2 could not build its fixture"
 _o=$(run_ir_push)
 case "$_o" in
-  *"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0") ok "IR AC2 an inherited-only red within its age lands under land" ;;
+  *"every red passes — landing under verdict.blocks own-mixed-contended: x"*"rc=0") ok "IR AC2 an inherited-only red within its age lands under own-mixed-contended" ;;
   *) bad "IR AC2 expected the landing line and exit 0, got: $_o" ;;
 esac
 case "$(cat "$ir_env" 2>/dev/null)" in
-  "policy=land age=10 attr=${IR_R}") ok "IR AC2 the runner is handed land, the bound 10 and R" ;;
+  "policy=own-mixed-contended age=10 attr=${IR_R}") ok "IR AC2 the runner is handed own-mixed-contended, the bound 10 and R" ;;
   *) bad "IR AC2 the runner was handed: $(cat "$ir_env" 2>/dev/null)" ;;
 esac
+# TOOL-dWitnessedBar-3 AC4, the hook's arm: one MIXED leg is refused under own-mixed-contended at R …
 _o=$(run_ir_push IR_VERDICT=MIXED)
 case "$_o" in
-  *"this red does not land under INHERITED_RED=land — x reads MIXED"*"rc=1") ok "IR AC2 a MIXED leg is blocked under land" ;;
-  *) bad "IR AC2 a MIXED leg must block, got: $_o" ;;
+  *"this red does not land under verdict.blocks own-mixed-contended — x reads MIXED and blocks"*"rc=1") ok "IR TOOL-dWitnessedBar-3 AC4 a MIXED leg is blocked under own-mixed-contended" ;;
+  *) bad "IR TOOL-dWitnessedBar-3 AC4 a MIXED leg must block under own-mixed-contended, got: $_o" ;;
+esac
+# … and admitted under own-only at R, the value read there and not from the pushed tree.
+build_ir_fixture ac2o kit:own-only 'INHERITED_RED_MAX_AGE=10\n' || bad "IR TOOL-dWitnessedBar-3 AC4 could not build its fixture"
+write_ir_policy every-red
+git add -A >/dev/null 2>&1; git commit -q -m "the branch tightens its own copy" >/dev/null 2>&1
+_o=$(run_ir_push IR_VERDICT=MIXED)
+case "$_o" in
+  *"verdict.blocks at ${IR_R:0:8} reads own-only"*"every red passes — landing under verdict.blocks own-only: x"*"rc=0")
+    ok "IR TOOL-dWitnessedBar-3 AC4 a MIXED leg lands under the own-only read at R" ;;
+  *) bad "IR TOOL-dWitnessedBar-3 AC4 a MIXED leg must land under the own-only read at R, got: $_o" ;;
 esac
 
 # AC15: the same inherited-only record on a bar whose verdict reads tree_moved yes is blocked, naming it.
+build_ir_fixture ac15 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC15 could not build its fixture"
 _o=$(run_ir_push IR_MOVED=yes)
 case "$_o" in
   *"the tree moved while the bar ran, so no verdict describes the pushed commit"*"rc=1") ok "IR AC15 a moved tree blocks an inherited-only red" ;;
@@ -1521,84 +1572,101 @@ case "$_o" in
 esac
 
 # AC17, FLIPPED by TOOL-dUnstuckLanding-16 (ruling TOOL-dUnstuckLanding-22): an aged row, and an
-# age-unproven one, LAND under land — the age escalates the driver's ask and decides no landing. Land
-# beside a blank, zero or non-numeric bound reads land with NO bound, announced, and lands too; the
-# runner is handed no bound.
+# age-unproven one, LAND — the age escalates the driver's ask and decides no landing. A blank, zero
+# or non-numeric bound reads NO bound, announced, and lands too; the runner is handed no bound.
 for _a in aged -; do
   _o=$(run_ir_push IR_AGE="$_a")
   case "$_o" in
-    *"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0") ok "IR AC17 an inherited leg with age '$_a' lands under land" ;;
-    *) bad "IR AC17 an inherited leg with age '$_a' must land under land, got: $_o" ;;
+    *"every red passes — landing under verdict.blocks own-mixed-contended: x"*"rc=0") ok "IR AC17 an inherited leg with age '$_a' lands" ;;
+    *) bad "IR AC17 an inherited leg with age '$_a' must land, got: $_o" ;;
   esac
 done
 for _b in "" 0 ten; do
-  build_ir_fixture "ac17$_b" "INHERITED_RED=land\nINHERITED_RED_MAX_AGE=$_b\n" || bad "IR AC17 could not build its fixture"
+  build_ir_fixture "ac17$_b" kit:own-mixed-contended "INHERITED_RED_MAX_AGE=$_b\n" || bad "IR AC17 could not build its fixture"
   _o=$(run_ir_push)
   case "$_o" in
-    *"reads land — declared, with no age bound, so no leg is aged"*"landing under INHERITED_RED=land: x"*"rc=0")
-      ok "IR AC17 land with the bound '$_b' reads land with no bound, announced, and lands" ;;
-    *) bad "IR AC17 land with the bound '$_b' must read land with no bound, got: $_o" ;;
+    *"reads own-mixed-contended — read by policy.py get, with no age bound in .githooks/gate-env.sh there, so no leg is aged"*"landing under verdict.blocks own-mixed-contended: x"*"rc=0")
+      ok "IR AC17 the bound '$_b' reads no bound, announced, and lands" ;;
+    *) bad "IR AC17 the bound '$_b' must read no bound and land, got: $_o" ;;
   esac
   case "$(cat "$ir_env" 2>/dev/null)" in
-    "policy=land age= attr=${IR_R}") ok "IR AC17 land with the bound '$_b' hands the runner no bound" ;;
-    *) bad "IR AC17 land with the bound '$_b' handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
+    "policy=own-mixed-contended age= attr=${IR_R}") ok "IR AC17 the bound '$_b' hands the runner no bound" ;;
+    *) bad "IR AC17 the bound '$_b' handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
   esac
 done
 
-# TOOL-dUnstuckLanding-16 AC3: R's policy file declares ONLY a bound. The kit default is land, so the
-# policy line names it, and an aged inherited-only red lands. `park` declared beside the same bound
-# blocks it, and a malformed value reads park and blocks it — a typo must never land a red. The
-# branch's own copy says something else each time, so a reader of the pushed tree is graded too.
-build_ir_fixture ac3d 'INHERITED_RED_MAX_AGE=2\n' || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
-printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
-git add -A >/dev/null 2>&1; git commit -q -m "the branch declares park in its own copy" >/dev/null 2>&1
+# TOOL-dUnstuckLanding-16 AC3, re-pointed by TOOL-dWitnessedBar-3: R's policy file sets no
+# `verdict.blocks`, so the policy kit's reader answers the catalogue default own-only and an aged
+# inherited-only red lands. every-red at R blocks it, and so does a policy reader that fails, which
+# reads every-red — a broken reader must never land a red. The branch's own copy says something else
+# each time, so a reader of the pushed tree is graded too.
+build_ir_fixture ac3d kit: 'INHERITED_RED_MAX_AGE=2\n' || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
+write_ir_policy every-red
+git add -A >/dev/null 2>&1; git commit -q -m "the branch declares every-red in its own copy" >/dev/null 2>&1
 _o=$(run_ir_push IR_AGE=aged)
 case "$_o" in
-  *"inherited-red policy at ${IR_R:0:8} reads land — no INHERITED_RED is declared in .githooks/gate-env.sh there, so the kit default land applies"*"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0")
-    ok "IR TOOL-dUnstuckLanding-16 AC3 an undeclared policy reads the kit default land and an aged inherited red lands" ;;
-  *) bad "IR TOOL-dUnstuckLanding-16 AC3 an undeclared policy must read the kit default land and land, got: $_o" ;;
+  *"verdict.blocks at ${IR_R:0:8} reads own-only — read by policy.py get"*"every red passes — landing under verdict.blocks own-only: x"*"rc=0")
+    ok "IR TOOL-dUnstuckLanding-16 AC3 an undeclared key reads the catalogue default own-only and an aged inherited red lands" ;;
+  *) bad "IR TOOL-dUnstuckLanding-16 AC3 an undeclared key must read own-only and land, got: $_o" ;;
 esac
 case "$(cat "$ir_env" 2>/dev/null)" in
-  "policy=land age=2 attr=${IR_R}") ok "IR TOOL-dUnstuckLanding-16 AC3 the kit default hands the runner land and the declared bound 2" ;;
-  *) bad "IR TOOL-dUnstuckLanding-16 AC3 the kit default handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
+  "policy=own-only age=2 attr=${IR_R}") ok "IR TOOL-dUnstuckLanding-16 AC3 the default hands the runner own-only and the declared bound 2" ;;
+  *) bad "IR TOOL-dUnstuckLanding-16 AC3 the default handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
 esac
-for _p in park lnad; do
-  build_ir_fixture "ac3$_p" "INHERITED_RED=$_p\nINHERITED_RED_MAX_AGE=2\n" || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
-  printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
-  git add -A >/dev/null 2>&1; git commit -q -m "the branch grants itself land" >/dev/null 2>&1
+for _p in kit:every-red broken; do
+  build_ir_fixture "ac3${_p#kit:}" "$_p" 'INHERITED_RED_MAX_AGE=2\n' || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
   _o=$(run_ir_push IR_AGE=aged)
   case "$_o" in
-    *"red on inherited legs only"*) bad "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R landed an inherited red: $_o" ;;
-    *"inherited-red policy at ${IR_R:0:8} reads park"*"rc=1") ok "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R reads park and blocks the red" ;;
-    *) bad "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R must read park and block, got: $_o" ;;
+    *"every red passes"*) bad "IR TOOL-dUnstuckLanding-16 AC3 '$_p' at R landed an inherited red: $_o" ;;
+    *"verdict.blocks at ${IR_R:0:8} reads every-red"*"rc=1") ok "IR TOOL-dUnstuckLanding-16 AC3 '$_p' at R reads every-red and blocks the red" ;;
+    *) bad "IR TOOL-dUnstuckLanding-16 AC3 '$_p' at R must read every-red and block, got: $_o" ;;
   esac
 done
+# No policy kit at all: the catalogue default own-only, said as such.
+build_ir_fixture ac3n nokit 'INHERITED_RED_MAX_AGE=2\n' || bad "IR TOOL-dWitnessedBar-3 could not build its no-kit fixture"
+_o=$(run_ir_push)
+case "$_o" in
+  *"verdict.blocks at ${IR_R:0:8} reads own-only — no policy kit resolves, so the catalogue default own-only applies"*"rc=0")
+    ok "IR TOOL-dWitnessedBar-3 no policy kit reads the catalogue default own-only, announced" ;;
+  *) bad "IR TOOL-dWitnessedBar-3 no policy kit must read own-only, announced, got: $_o" ;;
+esac
 
-# Closing review round 1 M12 (id 18), the hook's flipped branch: R carries NO .githooks/gate-env.sh,
-# so the policy reads the kit default land, naming the absence, and an inherited-only red lands. The
-# branch restores its own copy, which the hook sources and never reads a policy from. RED against a
-# hook whose absent branch read park, staged in a scratch copy and restored.
-build_ir_fixture m12 'INHERITED_RED_MAX_AGE=2\n' || bad "IR M12 could not build its fixture"
+# Closing review round 1 M12 (id 18), re-pointed: R carries NO .githooks/gate-env.sh, so no age bound
+# is read, naming the file, and an inherited-only red still lands under the value at R. The branch
+# restores its own copy, which the hook sources and never reads a bound from.
+build_ir_fixture m12 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=2\n' || bad "IR M12 could not build its fixture"
 git rm -q .githooks/gate-env.sh >/dev/null 2>&1; git commit -q -m "R carries no gate-env" >/dev/null 2>&1
 git push -q --no-verify origin main >/dev/null 2>&1; IR_R=$(git rev-parse HEAD)
 mkdir -p .githooks; printf 'INHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
 git add -A >/dev/null 2>&1; git commit -q -m "the branch restores its own copy" >/dev/null 2>&1
 _o=$(run_ir_push)
 case "$_o" in
-  *"inherited-red policy at ${IR_R:0:8} reads land — .githooks/gate-env.sh is absent at ${IR_R:0:8}, so the kit default land applies"*"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0")
-    ok "IR M12 a gate-env absent at R reads the kit default land and an inherited red lands" ;;
-  *) bad "IR M12 a gate-env absent at R must read the kit default land and land, got: $_o" ;;
+  *"verdict.blocks at ${IR_R:0:8} reads own-mixed-contended — read by policy.py get, with no age bound in .githooks/gate-env.sh there"*"every red passes — landing under verdict.blocks own-mixed-contended: x"*"rc=0")
+    ok "IR M12 a gate-env absent at R reads no bound and an inherited red lands" ;;
+  *) bad "IR M12 a gate-env absent at R must read no bound and land, got: $_o" ;;
 esac
 
-# AC4: an inherited green whose base IS the remote sha selects the scoped gate and names itself; once
-# the remote moves past that base, the same stamp forces FULL.
-build_ir_fixture ac4 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC4 could not build its fixture"
+# AC4: an inherited green whose base IS the remote sha, written under the value at R, selects the
+# scoped gate and names itself; once the remote moves past that base, the same stamp forces FULL.
+build_ir_fixture ac4 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC4 could not build its fixture"
 git commit -q --allow-empty -m c1 >/dev/null 2>&1
-write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10
-_o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c2 && git push origin main' 2>&1 )
+write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10 own-mixed-contended
+# TOOL-dWitnessedBar-58 AC1 (S1): this push's bar is a capturing stub in place of $green, exiting 0 as it
+# does, and writing the GATE_BASE_FROM its own environment holds to the suite scratch file `IR_BF_ENV`
+# names, rooted at `$tmp` as `docstub`'s `$DOCS_ENV` is (TOOL-dWitnessedBar-63 S28), never under the
+# fixture's git dir: the bar command is where the hook's export is still visible, since the runner unsets
+# it before any leg. An absent file fails the arm. Red against a hook that drops the export on the
+# inherited-green branch.
+ir_bf="$tmp/ir-ac4/ir-base-from"; rm -f "$ir_bf"
+printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_BASE_FROM-unset}" > "$IR_BF_ENV"\nexit 0\n' > "$tmp/ir-ac4/stub-bf.sh"
+_o=$( GATE_SELFTESTS= IR_BF_ENV="$ir_bf" GOV_GATE_CMD="bash $tmp/ir-ac4/stub-bf.sh" bash -c 'git commit -q --allow-empty -m c2 && git push origin main' 2>&1 )
 case "$_o" in
   *"scoped gate on main push"*"inherited green"*"at base ${IR_R:0:8}"*) ok "IR AC4 an inherited green at the remote sha scopes the gate" ;;
   *) bad "IR AC4 expected a scoped gate naming the inherited green, got: $_o" ;;
+esac
+case "$(cat "$ir_bf" 2>/dev/null || echo 'no file')" in
+  inherited) ok "IR TOOL-dWitnessedBar-58 AC1 the inherited-green push hands its bar GATE_BASE_FROM=inherited" ;;
+  *) bad "IR TOOL-dWitnessedBar-58 AC1 the inherited-green push's bar read GATE_BASE_FROM '$(cat "$ir_bf" 2>/dev/null || echo 'no file')': $_o" ;;
 esac
 _o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c3 && git push origin main' 2>&1 )
 case "$_o" in
@@ -1606,9 +1674,20 @@ case "$_o" in
   *) bad "IR AC4 expected FULL naming the stale base, got: $_o" ;;
 esac
 
+# TOOL-dWitnessedBar-3 AC4 (§8 F8): a stamp written under own-only while the value at R is
+# own-mixed-contended forces FULL, naming both: a MIXED red that boundary blocks must not scope the gate.
+build_ir_fixture acb kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR TOOL-dWitnessedBar-3 AC4 could not build its stamp fixture"
+write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10 own-only
+_o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c && git push origin main' 2>&1 )
+case "$_o" in
+  *"FULL gate on main push"*"written under verdict.blocks own-only and the value at ${IR_R:0:8} is own-mixed-contended"*)
+    ok "IR TOOL-dWitnessedBar-3 AC4 a stamp written under another value is refused" ;;
+  *) bad "IR TOOL-dWitnessedBar-3 AC4 expected FULL naming both values, got: $_o" ;;
+esac
+
 # AC14: a stamp written under max_age 50 while the bound at R is 10 forces FULL, naming both.
-build_ir_fixture ac14 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC14 could not build its fixture"
-write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 50
+build_ir_fixture ac14 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC14 could not build its fixture"
+write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 50 own-mixed-contended
 _o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c && git push origin main' 2>&1 )
 case "$_o" in
   *"FULL gate on main push"*"written under max_age 50 and the bound at ${IR_R:0:8} is 10"*) ok "IR AC14 a stamp's wider window is not trusted" ;;
@@ -1616,10 +1695,10 @@ case "$_o" in
 esac
 
 # AC16: a STALE full green that predicate 2 refuses does not hide a usable inherited green.
-build_ir_fixture ac16 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC16 could not build its fixture"
+build_ir_fixture ac16 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC16 could not build its fixture"
 git checkout -q -b elsewhere; git commit -q --allow-empty -m off >/dev/null 2>&1; _off=$(git rev-parse HEAD); git checkout -q main
 printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nrun_id\ttest\n' "$_off" > "$(git rev-parse --git-dir)/gate-full-green"
-write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10
+write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10 own-mixed-contended
 _o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c && git push origin main' 2>&1 )
 case "$_o" in
   *"scoped gate on main push"*"inherited green"*"is not an ancestor of the pushed tip"*) ok "IR AC16 a stale full green still reaches the inherited green" ;;
@@ -1627,47 +1706,132 @@ case "$_o" in
 esac
 
 # AC11, the hook's half: its own reader, sliced out of the SHIPPED hook, run over this repository at
-# HEAD, resolves the policy THIS repository declares. ADOPTER-CORRECT (TOOL-aClassedKnob-1): the
-# expectation is derived, never gov's own `land 10`, because an adopter may declare park. The oracle is
-# the shell's own reading, the committed gate-env.sh SOURCED in a subshell as KIT_REL is above, mapped
-# through the kit contract the hook states: an absent file or a blank key reads land, a value outside
-# `park land` reads park, and a bound that is not a positive integer reads none. A declaration the
-# hook's line reader and the shell read differently reds here, naming both.
-_ir_fns=$(awk '/^read_policy_key\(\)/,/^}/; /^read_policy_at\(\)/,/^}/' "$SRC/.githooks/pre-push")
-read_ir_policy() { # <repo> <sha> -> "<policy> <bound>" as the sliced hook reader resolves it
-  ( cd "$1" && _gate_env_rel=".githooks/gate-env.sh" && def=main && eval "$_ir_fns" \
+# HEAD, resolves the value THIS repository declares. ADOPTER-CORRECT (TOOL-aClassedKnob-1): the
+# expectation is derived, never gov's own value, because an adopter may declare another. The oracle is
+# the policy kit's own reader at HEAD for the value, and the committed gate-env.sh SOURCED in a
+# subshell as KIT_REL is above for the bound, mapped through the kit contract the hook states: a bound
+# that is not a positive integer reads none. A declaration the hook and the oracle read differently
+# reds here, naming both.
+# The R-scoped read is cut once, shared with the floor harness of TOOL-dWitnessedBar-106 below: its
+# four functions by awk range, and its column-0 orders and policy path by grep.
+_pp_read_fns=$(awk '/^read_policy_key\(\)/,/^}/; /^scan_policy_bytes\(\)/,/^}/; /^derive_strictest\(\)/,/^}/; /^read_policy_at\(\)/,/^}/' "$SRC/.githooks/pre-push"
+  grep -E '^PP_[A-Z]+_ORDER=|^PP_POLICY_REL=' "$SRC/.githooks/pre-push")
+_ir_fns=$(awk '/^resolve_python\(\)/,/^}/; /^resolve_kit_dir\(\)/,/^}/' "$SRC/.githooks/pre-push")$'\n'$_pp_read_fns
+read_ir_policy() { # <repo> <sha> -> "<value> <bound>" as the sliced hook reader resolves it
+  ( cd "$1" && top=$PWD && main_local="" && PP_READ_AT="" && _gate_env_rel=".githooks/gate-env.sh" && def=main \
+    && GOV_KITROOT=$KIT_REL && eval "$_ir_fns" && check_reviewed_file() { :; } \
     && read_policy_at "$2" && printf '%s %s' "$PP_POLICY" "$PP_MAX_AGE" )
 }
 _ir_want=$( cd "$SRC" || exit 1
+  _p=$(python "$KIT_REL/$PK/policy.py" get verdict.blocks --rev HEAD 2>/dev/null) || _p=every-red
+  _p=${_p%$'\r'}
+  case "$_p" in own-only|own-mixed-contended|every-red) ;; *) _p=every-red ;; esac
   if _b=$(git show HEAD:.githooks/gate-env.sh 2>/dev/null); then
-    unset INHERITED_RED INHERITED_RED_MAX_AGE
+    unset INHERITED_RED_MAX_AGE
     eval "$_b" >/dev/null 2>&1
-    _p=${INHERITED_RED:-}; _a=${INHERITED_RED_MAX_AGE:-}
-  else _p=""; _a=""; fi
-  case "$_p" in ''|land) _p=land ;; park) ;; *) _p=park ;; esac
+    _a=${INHERITED_RED_MAX_AGE:-}
+  else _a=""; fi
   case "$_a" in ''|0*|*[!0-9]*) _a="" ;; esac
   printf '%s %s' "$_p" "$_a" )
 _o=$(read_ir_policy "$SRC" "$(cd "$SRC" && git rev-parse HEAD)")
 if [ -n "${_ir_want% }" ] && [ "$_o" = "$_ir_want" ]; then
-  ok "IR AC11 this repository at HEAD reads the policy its own gate-env.sh declares: '$_o'"
+  ok "IR AC11 this repository at HEAD reads the value and bound it declares: '$_o'"
 else
-  bad "IR AC11 this repository at HEAD read '${_o:-<nothing>}', its committed gate-env.sh declares '$_ir_want'"
+  bad "IR AC11 this repository at HEAD read '${_o:-<nothing>}', its policy kit and gate-env.sh declare '$_ir_want'"
 fi
 # AC11, the reader's failing case: two fixture commits gov's own values cannot satisfy, one declaring
-# park with a bound of 7 and one with no gate-env.sh at all, which reads the kit default land, unbounded.
-_d="$tmp/ir-ac11-reader"; mkdir -p "$_d/.githooks"
-( cd "$_d" && git init -q --template= \
-  && printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=7\n' > .githooks/gate-env.sh \
-  && git add .githooks/gate-env.sh && git commit -q -m park7 \
-  && git rm -q .githooks/gate-env.sh && git commit -q -m absent ) >/dev/null 2>&1
+# every-red with a bound of 7 and one with no gate-env.sh and no key, which reads own-only, unbounded.
+_d="$tmp/ir-ac11-reader"; mkdir -p "$_d/.githooks" "$_d/$KIT_REL/$PK"
+( cd "$_d" && git init -q --template= && git config core.autocrlf false \
+  && cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+        "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/" \
+  && write_ir_policy every-red && printf 'INHERITED_RED_MAX_AGE=7\n' > .githooks/gate-env.sh \
+  && git add -A && git commit -q -m every-red7 \
+  && write_ir_policy "" && git rm -q .githooks/gate-env.sh && git add -A && git commit -q -m absent ) >/dev/null 2>&1
 _o1=$(read_ir_policy "$_d" "$(git -C "$_d" rev-parse HEAD~1 2>/dev/null)")
 _o2=$(read_ir_policy "$_d" "$(git -C "$_d" rev-parse HEAD 2>/dev/null)")
-if [ "$_o1" = "park 7" ] && [ "$_o2" = "land " ]; then
-  ok "IR AC11 the hook's reader reads park 7 where it is declared, and land unbounded where gate-env.sh is absent"
+if [ "$_o1" = "every-red 7" ] && [ "$_o2" = "own-only " ]; then
+  ok "IR AC11 the hook's reader reads every-red 7 where it is declared, and own-only unbounded where nothing is"
 else
-  bad "IR AC11 the hook's reader read '${_o1:-<nothing>}' for park 7 and '${_o2:-<nothing>}' for an absent gate-env.sh"
+  bad "IR AC11 the hook's reader read '${_o1:-<nothing>}' for every-red 7 and '${_o2:-<nothing>}' for nothing declared"
 fi
 
+cd "$pfx_home" || exit 2
+
+# ---- TOOL-dWitnessedBar-5: A BAR'S SELECTION AND verdict.held, READ AT R -----------------------------
+# A scratch repo whose R holds the run-gates kit's selection reader, `verdict_flow.py` and the two
+# modules it loads, and the policy kit with `verdict.held` declared. A stub bar writes a GREEN verdict
+# and a `selection` into the run record the hook pinned, and records the GATE_SELFTESTS it was handed.
+# AC5: a selection holding a row R does not derive is refused, its control a header-only selection
+# that R derives exactly. AC6: `push-selected` at R exports the `changed` selection for an unset
+# pusher value, and `on-demand` exports none.
+sel_env="$tmp/sel-env.txt"
+selstub="$tmp/selstub.sh"
+cat > "$selstub" <<'SELSTUB'
+#!/usr/bin/env bash
+d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"
+printf 'verdict\tGREEN\n' > "$d/verdict"
+printf '# planted\n%b' "${SEL_ROWS:-}" > "$d/selection"
+printf 'selftests=%s\n' "${GATE_SELFTESTS-<unset>}" > "$SEL_ENV"
+exit 0
+SELSTUB
+build_sel_fixture() { # tag · verdict.held value -> a pushed main at R; sets SEL_R
+  local tag=$1 held=$2
+  local d="$tmp/sel-$tag"
+  mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
+  cd "$d/work" || return 1
+  git config core.hooksPath "$d/hooks"
+  git config core.autocrlf false
+  mkdir -p .githooks .governance "$RUN_GATES_DIR" "$KIT_REL/$PK"
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  cp "$SRC/$RUN_GATES_DIR/run-gates.sh" "$SRC/$RUN_GATES_DIR/verdict_flow.py" "$SRC/$RUN_GATES_DIR/leg_factory.py" \
+     "$SRC/$RUN_GATES_DIR/regen.py" "$RUN_GATES_DIR/"
+  cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+     "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/"
+  printf '[verdict]\nheld = "%s"\n' "$held" > .governance/policy.toml
+  printf 'GOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+  git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+  git remote add origin "$d/remote.git"
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+  SEL_R=$(git rev-parse HEAD)
+}
+run_sel_push() { # [env options and assignments…] -> the push's merged output, then `rc=<n>` on its own line
+  git commit -q --allow-empty -m "sel $RANDOM" >/dev/null 2>&1
+  local o r
+  o=$( env "$@" SEL_ENV="$sel_env" GOV_GATE_CMD="bash $selstub" git push origin main 2>&1 ); r=$?
+  printf '%s\nrc=%s\n' "$o" "$r"
+}
+build_sel_fixture ac5 on-demand || bad "SEL AC5 could not build its fixture"
+_o=$(run_sel_push GATE_SELFTESTS= SEL_ROWS='held\tx\tquarantine\tplanted by the branch\n')
+case "$_o" in
+  *"the bar's selection is not what ${SEL_R:0:8} derives"*"adds x · quarantine · planted by the branch"*"treating it as RED"*"rc=1")
+    ok "SEL TOOL-dWitnessedBar-5 AC5 a run record whose selection holds a row R does not derive is refused" ;;
+  *) bad "SEL TOOL-dWitnessedBar-5 AC5 expected the selection refused naming its row, got: $_o" ;;
+esac
+_o=$(run_sel_push GATE_SELFTESTS= SEL_ROWS='')
+case "$_o" in
+  *"selection is not what"*) bad "SEL TOOL-dWitnessedBar-5 AC5 control: a selection R derives exactly was refused: $_o" ;;
+  *"rc=0") ok "SEL TOOL-dWitnessedBar-5 AC5 control: a selection R derives exactly is admitted" ;;
+  *) bad "SEL TOOL-dWitnessedBar-5 AC5 control: expected exit 0, got: $_o" ;;
+esac
+cd "$pfx_home" || exit 2
+build_sel_fixture ac6 push-selected || bad "SEL AC6 could not build its fixture"
+_o=$(run_sel_push -u GATE_SELFTESTS SEL_ROWS='')
+case "$_o|$(cat "$sel_env" 2>/dev/null)" in
+  *"verdict.held at ${SEL_R:0:8} reads push-selected"*"rc=0|selftests=changed")
+    ok "SEL TOOL-dWitnessedBar-5 AC6 push-selected at R exports the changed selection for an unset pusher value" ;;
+  *) bad "SEL TOOL-dWitnessedBar-5 AC6 expected the export of GATE_SELFTESTS=changed, got: $_o | $(cat "$sel_env" 2>/dev/null)" ;;
+esac
+cd "$pfx_home" || exit 2
+build_sel_fixture ac6c on-demand || bad "SEL AC6 control could not build its fixture"
+_o=$(run_sel_push -u GATE_SELFTESTS SEL_ROWS='')
+case "$_o|$(cat "$sel_env" 2>/dev/null)" in
+  *"reads push-selected"*) bad "SEL TOOL-dWitnessedBar-5 AC6 control: on-demand at R exported a selection: $_o" ;;
+  *"rc=0|selftests=<unset>") ok "SEL TOOL-dWitnessedBar-5 AC6 control: on-demand at R exports nothing" ;;
+  *) bad "SEL TOOL-dWitnessedBar-5 AC6 control: expected no export, got: $_o | $(cat "$sel_env" 2>/dev/null)" ;;
+esac
 cd "$pfx_home" || exit 2
 
 # ---- TOOL-dDerivedDocket-26: AN EXIT 0 IS NOT A VERDICT UNTIL THE RUN RECORD SAYS SO ------------------
@@ -1701,8 +1865,8 @@ VRSTUB
   touch "$(git rev-parse --git-dir)/push-main-active"
   GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
 }
-# Each push carries a tree no earlier push carried, through a counter no reset rewinds: a tree a green
-# push recorded in gate-bar-green is covered, and the cover pass runs no bar.
+# Each push carries a tree no earlier push carried, through a counter no reset rewinds, so no per-tree
+# verdict can cover one and every push runs its bar.
 run_vr_push() { # [env assignments…] -> VR_OUT and VR_RC, the push's merged output and its status
   VR_N=$((${VR_N:-0} + 1)); printf '%s\n' "$VR_N" > vr-count
   git add vr-count >/dev/null 2>&1; git commit -q -m "vr $VR_N" >/dev/null 2>&1
@@ -1782,7 +1946,7 @@ cd "$pfx_home" || exit 2
 #     GATE_FULL only widens the run, and GATE_FULL=1 makes GATE_BASE irrelevant.
 #   GATE_SELFTESTS — adds legs, and predicate 8 forces a full bar for it.
 #   the rest — width, timeouts, the wall, the turnstile, reaping and the run log: a breach is RED.
-#   GATE_ATTRIBUTE GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE — the hook clears the policy pair
+#   GATE_ATTRIBUTE GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE — the hook clears the policy pair
 #     and sets all three from R itself (TOOL-dDerivedDocket-23, -24), and attribution is report-only.
 #   GATE_AMBIENT_TMP GATE_HOST_RATIO — assigned in the runner, from TMPDIR and as a source constant.
 #   GATE_DOCS_BASE — the hook clears it for every bar, a STUB included, and sets it only on a doc-only
@@ -1809,8 +1973,22 @@ cd "$pfx_home" || exit 2
 #     it can hold only a held-tier leg that GATE_SELFTESTS added, never a leg of the default bar.
 #   GATE_SPAWN_NOW — the spawn pause's reading, GATE_MEMINFO's sibling: a pause narrows the pool and
 #     always ends (TOOL-aSparedSpawn-2). Width class.
+#   GATE_CAUSE — the act that started the bar, written into its verdict and unset before any leg; the
+#     hook exports `push:<sha>` over any inherited value on every gated push, and it selects no leg
+#     and decides no verdict (TOOL-dWitnessedBar-25 S2).
+#   GATE_BASE_FROM — where a scoped bar's base came from, read once and unset before any leg; the hook
+#     clears it for every bar, a STUB included, and exports `inherited` on the inherited-green path
+#     alone (TOOL-dWitnessedBar-56 S9), and its only effect is that a scoped run writes no per-tree
+#     verdict, which costs a saving and never a leg or a verdict (TOOL-dWitnessedBar-40 S2).
+#   GATE_SELECTION — the selection record a bar holds legs by, read once and unset before any leg; a
+#     bar whose run record holds one is admitted only once `verdict_flow.py select --check` derives it
+#     again at R, so a pusher's file holds no leg R does not (TOOL-dWitnessedBar-5 S2, S7). The hook
+#     clears it for every bar, a STUB included, and sets it on no path (TOOL-dWitnessedBar-56 S9, §8 F2).
+#   GATE_RERUN — re-runs each red leg once more on the same tree after every leg is reported, read
+#     once and unset before any leg; it writes `<i>.rerun.*` beside the attempts and moves no verdict and
+#     no exit code, so it can turn no leg into a PASS or a SKIP (TOOL-dWitnessedBar-8 S1, F6).
 # Classified by TOOL-aSparedSpawn-33 S8.
-BAR_INERT_KNOBS="GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+BAR_INERT_KNOBS="GATE_BASE_FROM GATE_CAUSE GATE_RERUN GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_SELECTION GATE_HOST_RATIO GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n
@@ -2016,7 +2194,7 @@ fi
 # `guard.py` names its call and exits as PG_EXIT says, `floor.py` prints FL_VAL. The push arm grades
 # only a range the remote already holds a base of, so the base is pushed first with --no-verify. A
 # guard exiting 1 refuses as policy-unrecorded; over the declared STUB bar exiting 1, a floor printing
-# `off` lets the push through with its floor line and no gate-bar-green, and `on` refuses as gate-red.
+# `off` lets the push through with its floor line, and `on` refuses as gate-red.
 # Red with the push arm's call, or the floor read, taken out of the hook.
 git init -q --template= --bare "$tmp/pg.git"
 git init -q --template= "$tmp/pg"
@@ -2037,12 +2215,10 @@ case "$msg|$(read_token)" in
   *"LOOP PUSH ARM RAN --push-range"*"|policy-unrecorded") ok "TDL2 AC19 a loop guard exiting 1 refuses the push as policy-unrecorded" ;;
   *) bad "TDL2 AC19 expected the policy-unrecorded refusal, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
 esac
-rm -f "$pg_gd"/gate-bar-green*
 msg=$(FL_VAL=off GOV_GATE_CMD="bash $red" git push origin main 2>&1); r=$?
 case "$r|$msg" in
   0"|"*"floor: verdict-before-move off"*)
-    if ls "$pg_gd"/gate-bar-green* >/dev/null 2>&1; then bad "TDL2 AC19 a red bar read as advisory wrote a gate-bar-green"
-    else ok "TDL2 AC19 floor.py printing off lets a STUB red push through, naming the floor, with no gate-bar-green"; fi ;;
+    ok "TDL2 AC19 floor.py printing off lets a STUB red push through, naming the floor" ;;
   *) bad "TDL2 AC19 expected the red bar read as advisory under the floor off, got rc=$r: $msg" ;;
 esac
 git commit -q --allow-empty -m "another change to push"
@@ -2060,7 +2236,7 @@ cd "$pfx_home" || exit 2
 docs_env="$tmp/docs-env.txt"
 docstub="$tmp/docstub.sh"
 printf '#!/usr/bin/env bash\nprintf "docs=%%s\\n" "${GATE_DOCS_BASE:-}" > "$DOCS_ENV"\nexit 0\n' > "$docstub"
-build_docs_fixture() { # tag · gate-env body (printf %b) -> a pushed main at R carrying that body
+build_docs_fixture() { # tag · gate-env body (printf %b) · [verdict.blocks at R, through a policy kit copy] -> a pushed main at R carrying that body
   local d="$tmp/docs-$1"
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
   git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
@@ -2068,6 +2244,12 @@ build_docs_fixture() { # tag · gate-env body (printf %b) -> a pushed main at R 
   git config core.hooksPath "$d/hooks"
   mkdir -p .githooks "$KIT_REL" notes src
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  if [ -n "${3:-}" ]; then
+    git config core.autocrlf false; mkdir -p "$KIT_REL/$PK"
+    cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+       "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/"
+    write_ir_policy "$3"
+  fi
   printf '%b' "$2" > .githooks/gate-env.sh
   printf 'GOV_KITROOT=%s\n' "$KIT_REL" >> .githooks/gate-env.sh
   printf 'a\n' > notes/a.md; printf 'b\n' > notes/b.md; printf 'x\n' > src/x.sh
@@ -2183,22 +2365,23 @@ case "$_o" in
   *"not a plain repo path"*"gate on main push"*) ok "DOCS M5 a '.' element voids the doc class and the hook says so" ;;
   *) bad "DOCS M5 expected the invalid-element notice, got: $_o" ;;
 esac
-# TOOL-dThriftyLanding-12, closing review M2: under INHERITED_RED=park at R a doc push is not scoped as
-# doc-only, because the docs base may sit above an unproven record; the hook names the policy.
-build_docs_fixture park 'GATE_DOC_PATHS="notes/"\nINHERITED_RED=park\n' || bad "DOCS M2 could not build its fixture"
+# TOOL-dThriftyLanding-12, closing review M2, re-pointed by TOOL-dWitnessedBar-3 §8 F8: under
+# verdict.blocks every-red at R a doc push is not scoped as doc-only, because the docs base may sit
+# above an unproven record; the hook names the value.
+build_docs_fixture park 'GATE_DOC_PATHS="notes/"\n' every-red || bad "DOCS M2 could not build its fixture"
 set_docs_stamp
 printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
 _o=$(run_docs_push)
 case "$_o" in
-  *"docs-only"*) bad "DOCS M2 a doc push under park was scoped as doc-only: $_o" ;;
-  *"reads park, so it is not scoped as doc-only"*"gate on main push"*) ok "DOCS M2 under park a doc push keeps today's decision, and the hook names the policy" ;;
-  *) bad "DOCS M2 expected the park notice, got: $_o" ;;
+  *"docs-only"*) bad "DOCS M2 a doc push under every-red was scoped as doc-only: $_o" ;;
+  *"verdict.blocks at "*" reads every-red, so it is not scoped as doc-only"*"gate on main push"*) ok "DOCS M2 under every-red a doc push keeps today's decision, and the hook names the value" ;;
+  *) bad "DOCS M2 expected the every-red notice, got: $_o" ;;
 esac
 # TOOL-dThriftyLanding-12, closing review L3: the inherited-green branch exports the docs base too.
 build_docs_fixture inh 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS L3a could not build its fixture"
 _r=$(read_docs_tip)
 rm -f "$(git rev-parse --git-dir)/gate-full-green"
-write_ir_stamp "$_r" "$_r" ""
+write_ir_stamp "$_r" "$_r" "" own-only   # no policy kit here, so the value at R is the default own-only
 printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
 _o=$(run_docs_push)
 case "$_o" in
@@ -2319,11 +2502,12 @@ esac
 cd "$pfx_home" || exit 2
 
 # ============================================================================================
-# THE BAR'S OWN GREEN, BY TREE — TOOL-aFrugalTurnstile-2. A tracked stand-in runner at the kit path
-# writes its run record and appends one line to a marker OUTSIDE the repo, so "the bar ran" is a line
-# count and never an inference from output. The hook is driven directly with git's stdin line, and the
-# remote moves by --no-verify pushes, so each arm names exactly the R and tip it grades. The declared
-# STUB escape is lifted per push: a STUB never writes or reads a record, which AC4 grades.
+# THE RUNNER'S VERDICT PER TREE, READ BY THE HOOK — TOOL-aFrugalTurnstile-2, TOOL-dWitnessedBar-4 S3.
+# A tracked stand-in runner at the kit path writes its run record and appends one line to a marker
+# OUTSIDE the repo, so "the bar ran" is a line count and never an inference from output. It writes no
+# per-tree verdict: each arm plants the one it grades, in the runner's grammar, with `write_bg_verdict`.
+# The hook is driven directly with git's stdin line, and the remote moves by --no-verify pushes, so
+# each arm names exactly the R and tip it grades. The declared STUB escape is lifted per push.
 build_bg_fixture() { # tag [gate-env lines] -> a work clone at main=R, pushed; cwd moves in; sets BG_D bg_gd BG_MARK
   BG_D="$tmp/bg-$1"; mkdir -p "$BG_D/hooks"; cp "$SRC/.githooks/pre-push" "$BG_D/hooks/pre-push"
   git init -q --bare "$BG_D/remote.git"; git init -q "$BG_D/w"; cd "$BG_D/w" || return 1
@@ -2341,7 +2525,7 @@ case "${BG_MODE:-green}" in
   green) printf 'verdict\tGREEN\n' > "$d/verdict"; exit 0 ;;
   red) printf 'verdict\tRED\ntree_moved\tno\nfailed\t1\n' > "$d/verdict"; exit 1 ;;
   inh) printf 'verdict\tRED\ntree_moved\tno\nfailed\t1\n' > "$d/verdict"
-       printf 'leg x\tINHERITED\t-\t-\t%s\t-\n' "$GATE_ATTRIBUTE" > "$d/attribution"; exit 1 ;;
+       printf 'leg x\tINHERITED\t-\t-\t%s\t-\t-\t-\tpass\tstub\n' "$GATE_ATTRIBUTE" > "$d/attribution"; exit 1 ;;
 esac
 BGSTUB
   # A WRAPPER BAR, adopter ic's gov-bar shape (TOOL-aFrugalTurnstile-2 AC17): a tracked script that hands the runner a derived manifest.
@@ -2349,7 +2533,7 @@ BGSTUB
     "$KIT_REL/$RUN_GATES/run-gates.sh" > wrap-bar.sh
   printf '#!/usr/bin/env bash\nexec bash %s "$@"\n' "$KIT_REL/$RUN_GATES/run-gates.sh" > other-bar.sh
   printf 'GATE_CMD="bash wrap-bar.sh"\n' > .unattended.conf
-  printf 'GOV_KITROOT=%s\nINHERITED_RED=land\nGATE_DOC_PATHS="notes/"\n%b' "$KIT_REL" "${2:-}" > .githooks/gate-env.sh
+  printf 'GOV_KITROOT=%s\nGATE_DOC_PATHS="notes/"\n%b' "$KIT_REL" "${2:-}" > .githooks/gate-env.sh
   printf 'a\n' > notes/a.md; printf 'x\n' > src/x.sh; printf '* text eol=lf\n' > .gitattributes
   git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
   git remote add origin "$BG_D/remote.git"; git push -q --no-verify origin main >/dev/null 2>&1
@@ -2364,11 +2548,22 @@ run_bg_push() { # [env…] -> BG_OUT BG_RC for a push of HEAD to main over the r
   BG_RC=$?
 }
 set_bg_remote() { git push -q --no-verify origin HEAD:main >/dev/null 2>&1; }
-write_bg_record() { # file · sha · kind · base · bar -> a planted gate-bar-green record
-  printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t\nkind\t%s\nbase\t%s\nselftests\t\nrun_id\tplanted\nby\tpre-push\nstamped\tx\n' \
-    "$2" "$(git rev-parse "$2^{tree}")" "$5" "$3" "$4" > "$1"
+write_bg_verdict() { # sha · kind · base -> the runner's per-tree verdict of sha's tree, planted GREEN in the
+  # common dir with a reproducible fingerprint and the manifest blob; BG_VF its path, BG_VN its name
+  local t d; t=$(git rev-parse "$1^{tree}"); d="$(git rev-parse --git-common-dir)/gate-verdict"; mkdir -p "$d"
+  BG_VN="gate-verdict/$t"; [ "$2" = scoped ] && BG_VN="$BG_VN.scoped"; BG_VF="${d%/gate-verdict}/$BG_VN"
+  printf 'tree\t%s\nsha\t%s\nverdict\tGREEN\nkind\t%s\nbase\t%s\nmanifest\t%s\nmanifest_blob\t%s\nfingerprint\t%s\nselftests\t\nreused\t0\nreused_cache\t0\nrun_id\tplanted\nselection\tnone\nstamped\tx\nby\trunner\n' \
+    "$t" "$1" "$2" "$3" "$KIT_REL/gate-legs.json" "$(git rev-parse "$1:$KIT_REL/gate-legs.json")" \
+    "$(bash "$KIT_REL/$RUN_GATES/gate-fingerprint.sh" "$1")" > "$BG_VF"
+}
+write_bg_selection() { # row, its `held` cut and TAB-separated -> BG_VF's selection keys hold that one row,
+  # hashed as the runner hashes its canonical text (TOOL-dWitnessedBar-41 S1), its TABs kept as the runner
+  # keeps them (TOOL-dWitnessedBar-56 S1)
+  set_bg_key "$BG_VF" selection "$(printf 'held\t%s\n' "$1" | git hash-object --stdin)"
+  printf 'selection.1\t%s\n' "$1" >> "$BG_VF"
 }
 read_bg_key() { awk -F'\t' -v k="$2" '$1==k{print $2}' "$1" 2>/dev/null; }
+remove_bg_key() { awk -F'\t' -v k="$2" '$1!=k' "$1" > "$1.x" && mv "$1.x" "$1"; }
 set_bg_key() { awk -F'\t' -v k="$2" -v v="$3" 'BEGIN{OFS="\t"} $1==k{$2=v} {print}' "$1" > "$1.x" && mv "$1.x" "$1"; }
 write_bg_stamp() { # sha -> a runner gate-full-green with a reproducible fingerprint and the manifest blob
   printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nmanifest\t%s\nselftests\t\nrun_id\ttest\n' "$1" \
@@ -2377,22 +2572,23 @@ write_bg_stamp() { # sha -> a runner gate-full-green with a reproducible fingerp
 }
 BG_RUNNER="bash $KIT_REL/$RUN_GATES/run-gates.sh"; BG_WRAP="bash wrap-bar.sh"
 
-# AC1, AC2, AC11, AC3 — branch tip X pushed green writes the record; the --no-ff merge of X is covered.
+# AC1 (TOOL-dWitnessedBar-4 AC6) — a green push leaves no record of the hook's own: the runner writes
+# the verdict per tree, and the stand-in runner here writes none, so the git dir holds no gate-bar-green
+# and no gate-verdict after it. Red against a hook that still writes its own per-tree green.
 build_bg_fixture ac1 || bad "BG could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 run_bg_push
-case "$BG_RC|$(cut -f1 "$bg_gd/gate-bar-green" 2>/dev/null | tr '\n' ' ')" in
-  "0|sha tree bar bar_paths kind base selftests run_id by stamped ") ok "BG AC1 a green push writes gate-bar-green with the ten keys in order" ;;
-  *) bad "BG AC1 expected the ten keys in order after a green push, got rc $BG_RC: $(cat "$bg_gd/gate-bar-green" 2>/dev/null || echo '<absent>')" ;;
+case "$BG_RC|$(ls -d "$bg_gd"/gate-bar-green* "$bg_gd"/gate-verdict 2>/dev/null)" in
+  "0|") ok "BG AC1 a green push writes no record of the hook's own" ;;
+  *) bad "BG AC1 a green push left a hook-written record, rc $BG_RC: $(ls "$bg_gd" | grep -e gate-bar-green -e gate-verdict)" ;;
 esac
-[ "$(read_bg_key "$bg_gd/gate-bar-green" sha)|$(read_bg_key "$bg_gd/gate-bar-green" tree)|$(read_bg_key "$bg_gd/gate-bar-green" kind)|$(read_bg_key "$bg_gd/gate-bar-green" by)|$(read_bg_key "$bg_gd/gate-bar-green" bar)" \
-  = "$_x|$(git rev-parse "X^{tree}")|full|pre-push|$BG_RUNNER" ] \
-  && ok "BG AC1 the record names X, its tree, kind full, by pre-push and the vetted bar" \
-  || bad "BG AC1 the record's values are wrong: $(cat "$bg_gd/gate-bar-green" 2>/dev/null)"
+# AC2, AC11 — the --no-ff merge of X carries X's tree, so the runner's full GREEN verdict of that tree,
+# planted, covers it and no bar runs, the line naming the record's path.
+write_bg_verdict "$_x" full ""
 set_bg_remote; git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
 _m0=$(read_bg_marks); run_bg_push
 case "$BG_RC|$(read_bg_marks)|$BG_OUT" in
-  "0|$_m0|"*"pre-push: covered on main push"*"this git dir's gate-bar-green sha ${_x:0:8}"*"no bar runs"*) ok "BG AC2 the merge of X is covered by X's record and no bar runs" ;;
+  "0|$_m0|"*"pre-push: covered on main push"*"gate-verdict/$(git rev-parse 'X^{tree}') sha ${_x:0:8}"*"by runner"*"no bar runs"*) ok "BG AC2 the merge of X is covered by the runner's verdict of X's tree, naming its path, and no bar runs" ;;
   *) bad "BG AC2 expected a covered push with the marker at $_m0, got rc $BG_RC marker $(read_bg_marks): $BG_OUT" ;;
 esac
 case "$(awk -F'\t' '{print NF"|"$1"|"$2}' "$bg_gd/pre-push-bar" 2>/dev/null)|$(tail -1 "$bg_gd/runlog/pushes.log" 2>/dev/null)" in
@@ -2405,50 +2601,141 @@ esac
 [ "$(cut -f1 "$bg_gd/pre-push-allow" 2>/dev/null)" = "$(git rev-parse HEAD)" ] \
   && ok "SG covered — a covered push writes pre-push-allow naming the pushed commit" \
   || bad "SG covered — expected pre-push-allow naming $(git rev-parse --short HEAD), got: $(cat "$bg_gd/pre-push-allow" 2>/dev/null || echo '<absent>')"
-set_bg_remote; git checkout -q -b Y; echo 2 >> src/x.sh; git commit -qam Y; run_bg_push; set_bg_remote
-git checkout -q main; git merge -q --no-ff Y -m "merge Y" >/dev/null 2>&1; echo 3 >> src/x.sh; git commit -qam byte
+# AC3 — one more byte is a tree no verdict names, so nothing covers it and the bar runs.
+set_bg_remote; echo 3 >> src/x.sh; git commit -qam byte
 _m0=$(read_bg_marks); run_bg_push
 case "$(read_bg_marks)|$BG_OUT" in
-  "$((_m0 + 1))|"*"not covered"*"it graded tree"*) ok "BG AC3 one more byte is not covered, says why, and the bar runs" ;;
-  *) bad "BG AC3 expected not covered with the bar run, got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+  *"covered on main push"*) bad "BG AC3 one more byte was covered: $BG_OUT" ;;
+  "$((_m0 + 1))|"*) ok "BG AC3 one more byte is a tree no verdict names, and the bar runs" ;;
+  *) bad "BG AC3 expected the bar to run, got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
 
-# AC4, AC5 — no record for the STUB, none for a red bar.
-build_bg_fixture ac4 || bad "BG could not build its fixture"
-printf '#!/usr/bin/env bash\nexit 0\n' > "$BG_D/stub.sh"
-echo 1 >> src/x.sh; git commit -qam c; run_bg_push GOV_GATE_CMD_TEST=1 GOV_GATE_CMD="bash $BG_D/stub.sh"
-case "$([ -f "$bg_gd/gate-bar-green" ] && echo present)|$BG_OUT" in
-  "|"*"no gate-bar-green written — the bar is the declared STUB"*) ok "BG AC4 the STUB writes no record and says so" ;;
-  *) bad "BG AC4 a STUB push wrote a record or did not say so: $BG_OUT" ;;
-esac
-echo 2 >> src/x.sh; git commit -qam c2; run_bg_push BG_MODE=red
-[ "$BG_RC" = 1 ] && [ ! -f "$bg_gd/gate-bar-green" ] && ok "BG AC5 a red bar writes no record" \
-  || bad "BG AC5 a red bar must write no record, got rc $BG_RC, record $([ -f "$bg_gd/gate-bar-green" ] && echo present)"
-cd "$pfx_home" || exit 2
-
-# AC6, AC7, AC8 — an altered record covers nothing; the unaltered one is the control.
+# AC6, AC7, AC8 and TOOL-dWitnessedBar-4 AC4, AC5 — the pushed tree's per-tree verdict, planted RED,
+# from another manifest, with a non-zero reused_cache, with the self-tests held, or naming no tree,
+# covers nothing: the bar runs and the `not covered` line names why. The unaltered GREEN is the
+# control, adopted with no bar run and its path printed. Red against a hook that ignores the record
+# (the control) or adopts any of the five.
+# TOOL-dWitnessedBar-40 AC4 — a GREEN per-tree verdict carrying neither `reused` nor `reused_cache`
+# cannot say whether its run reused a leg, and one with `reused 1` and no `reused_cache` cannot say
+# which kind: both run the bar, the first naming the missing pair. The control plants both at 0 and is
+# adopted. Red against a hook whose per-tree readers lack the keyless check.
+# TOOL-dWitnessedBar-41 AC3 — a verdict whose `selection.1` was edited after the run no longer hashes to
+# its `selection`, and one whose `selection` key was deleted cannot say whether its bar held legs: both
+# run the bar, naming why. Red against a hook that skips `check_tree_selection`.
 build_bg_fixture ac6 || bad "BG could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
-for _c in bar selftests tree control; do
-  write_bg_record "$bg_gd/gate-bar-green" "$_x" full "" "$BG_RUNNER"; _e=()
+for _c in verdict manifest reused_cache keyless reused selftests tree seledit selkeyless control; do
+  write_bg_verdict "$_x" full ""; _e=()
   case $_c in
-    bar) set_bg_key "$bg_gd/gate-bar-green" bar "bash other-bar.sh"; _want="it was earned by bar" ;;
+    verdict) set_bg_key "$BG_VF" verdict RED; _want="it reads verdict 'RED', not GREEN" ;;
+    manifest) set_bg_key "$BG_VF" manifest elsewhere/other-legs.json; _want="earned on the leg manifest elsewhere/other-legs.json" ;;
+    reused_cache) printf 'reused\t1\nreused_cache\t1\n' >> "$BG_VF"; _want="reused 1 leg(s) from the cache" ;;
+    keyless) remove_bg_key "$BG_VF" reused; remove_bg_key "$BG_VF" reused_cache; _want="carries neither reused nor reused_cache" ;;
+    reused) remove_bg_key "$BG_VF" reused_cache; set_bg_key "$BG_VF" reused 1; _want="says its run reused 1 leg(s), and" ;;
     selftests) _e=(GATE_SELFTESTS=1); _want="self-tests HELD" ;;
-    tree) set_bg_key "$bg_gd/gate-bar-green" tree ""; _want="could not be read" ;;
+    tree) set_bg_key "$BG_VF" tree ""; _want="could not be read" ;;
+    seledit) write_bg_selection $'x\tquarantine\tTOOL-x-7'; awk -F'\t' '$1=="selection.1"{$0="selection.1\tx\tquarantine\tTOOL-x-8"} {print}' "$BG_VF" > "$BG_VF.x" && mv "$BG_VF.x" "$BG_VF"
+             _want="selection rows do not hash to" ;;
+    selkeyless) remove_bg_key "$BG_VF" selection; _want="carries no selection, so it cannot say whether its bar held legs" ;;
     control) _want="pre-push: covered on main push" ;;
   esac
   _m0=$(read_bg_marks); run_bg_push "${_e[@]}"
   case "$_c|$(read_bg_marks)|$BG_OUT" in
-    "control|$_m0|"*"$_want"*) ok "BG AC6-8 control: the unaltered record covers the merge" ;;
-    "$_c|$((_m0 + 1))|"*"not covered"*"$_want"*) ok "BG AC6-8 an altered $_c is not covered, says '$_want', and the bar runs" ;;
+    "control|$_m0|"*"$_want"*"$BG_VN sha ${_x:0:8}"*"no bar runs"*) ok "BG AC6-8 control: the unaltered GREEN verdict covers the merge and names its path" ;;
+    "$_c|$((_m0 + 1))|"*"not covered"*"$_want"*) ok "BG AC6-8 a verdict altered by $_c is not covered, says '$_want', and the bar runs" ;;
     *) bad "BG AC6-8 the $_c case expected '$_want', got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+  esac
+  # TOOL-dWitnessedBar-56 AC6 — PARITY: over each plant of the two record predicates the local-hook reader
+  # copies, `read --backend local-hook` stands GREEN exactly where the hook covered the push with no bar.
+  # Red against a reader that stands on `verdict GREEN` alone.
+  case $_c in
+    reused_cache|keyless|reused|seledit|selkeyless|control)
+      _hk=NONE; [ "$(read_bg_marks)" = "$_m0" ] && _hk=GREEN
+      _lv=$("$_rkd_py" "$SRC/$RUN_GATES_DIR/verdict_backends.py" read --backend local-hook --sha "$_x" 2>&1)
+      case "$_lv" in
+        *"verdict: local-hook · $_hk · "*) ok "BG TOOL-dWitnessedBar-56 AC6 parity: over $_c the hook and read --backend local-hook both read $_hk" ;;
+        *) bad "BG TOOL-dWitnessedBar-56 AC6 parity: over $_c the hook read $_hk and local-hook said: $_lv" ;;
+      esac ;;
   esac
 done
 cd "$pfx_home" || exit 2
 
-# AC9, AC10 — a runner stamp covers; a scoped record covers only from the adopted base.
+# TOOL-dWitnessedBar-41 AC2 — a per-tree verdict carries the selection its bar held legs by, and the
+# hook re-derives it at R before adopting the record, pushed from a SECOND worktree that holds no run
+# dir of the first. R holds the selection reader beside the stand-in runner, the files
+# `build_sel_fixture` copies, a manifest giving leg x level e2e and a policy landing `unit integration`
+# under `report-unrun`, so R derives one `level` row. A record whose selection holds a row R does not
+# derive runs the bar and names the row; one whose selection R derives exactly covers the merge with no
+# bar run. `select --check --selection` exits 1 and 0 on the same two rebuilt files. Red against a hook
+# that skips `check_tree_selection`.
+build_bg_fixture sel || bad "BG could not build its fixture"
+cp "$SRC/$RUN_GATES_DIR/verdict_flow.py" "$SRC/$RUN_GATES_DIR/leg_factory.py" "$SRC/$RUN_GATES_DIR/regen.py" \
+   "$KIT_REL/$RUN_GATES/"
+mkdir -p "$KIT_REL/$PK" .governance
+cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+   "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/"
+printf '%s\n' '[{"name":"x","argv":["bash","a.sh"],"level":"e2e"}]' > "$KIT_REL/gate-legs.json"
+printf '[tests]\nlanding-levels = ["unit", "integration"]\nwithout-cadence = "report-unrun"\n' > .governance/policy.toml
+git add -A >/dev/null 2>&1; git commit -qm "the selection reader at R"; set_bg_remote; _r=$(git rev-parse HEAD)
+git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
+git checkout -q -b M main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1; _mg=$(git rev-parse HEAD)
+git checkout -q main; git worktree add -q --detach "$BG_D/w2" "$_mg" >/dev/null 2>&1
+cd "$BG_D/w2" || exit 2
+bg_gd=$(git rev-parse --git-dir)
+_sel_add=$'x\tquarantine\tTOOL-x-7'; _sel_lvl=$'x\tlevel\te2e, outside tests.landing-levels unit integration'
+# TOOL-dWitnessedBar-56 S1: a note holding ` · ` round-trips, so its row reaches R's check and is named
+# there, where a rebuild turning ` · ` back into a TAB refuses it as rows that do not hash.
+_sel_dot=$'x\tquarantine\tTOOL-x-7 · 3/10'
+# TOOL-dWitnessedBar-62 S13: a `quarantine` row whose note is EMPTY, its last field, rebuilds to its hash
+# and is judged at R by its whole row, as the ` · ` row is, never refused as rows that do not hash. R
+# derives no empty-note row, so it is judged and never adopted. Red against a rebuild that reads
+# `selection.<n>` with a TAB IFS, which drops the trailing TAB.
+_sel_empty=$'x\tquarantine\t'
+declare -A _sel_hk=()
+for _c in adds dot empty derived; do
+  write_bg_verdict "$_x" full ""
+  case $_c in adds) write_bg_selection "$_sel_add" ;; dot) write_bg_selection "$_sel_dot" ;; empty) write_bg_selection "$_sel_empty" ;; *) write_bg_selection "$_sel_lvl" ;; esac
+  _m0=$(read_bg_marks); run_bg_push
+  _sel_hk[$_c]=NONE; [ "$(read_bg_marks)" = "$_m0" ] && _sel_hk[$_c]=GREEN
+  case "$_c|$(read_bg_marks)|$BG_OUT" in
+    "adds|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · TOOL-x-7"*)
+      ok "BG TOOL-dWitnessedBar-41 AC2 from a second worktree, a verdict whose selection R does not derive is not adopted, names the row, and the bar runs" ;;
+    "dot|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · TOOL-x-7 · 3/10"*)
+      ok "BG TOOL-dWitnessedBar-56 AC1 a selection row whose note holds ' · ' rebuilds to its hash and is judged at R by its whole note" ;;
+    "empty|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · , which"*)
+      ok "BG TOOL-dWitnessedBar-62 AC8 a selection row whose note is empty rebuilds to its hash and is judged at R by its whole row" ;;
+    "derived|$_m0|"*"covered on main push"*"$BG_VN sha ${_x:0:8}"*"no bar runs"*)
+      ok "BG TOOL-dWitnessedBar-41 AC2 from a second worktree, a verdict whose selection R derives exactly covers the merge with no bar run" ;;
+    *) bad "BG TOOL-dWitnessedBar-41/56/62 the $_c case got rc $BG_RC marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+  esac
+done
+# TOOL-dWitnessedBar-56 AC6 — PARITY AT R: the local-hook reader, copied beside the fixture's stand-in runner
+# with a descriptor declaring it, so it reads the kit's own selection checker and manifest as the hook
+# does, re-reads each plant once every push above is done and agrees with the hook's decision.
+cp "$SRC/$RUN_GATES_DIR/verdict_backends.py" "$KIT_REL/$RUN_GATES/"
+printf '[[verdict_backend]]\nname = "local-hook"\nreader = "verdict_backends:read_local_verdict"\noff_node = false\nowner = "tFix"\n' \
+  > "$KIT_REL/$RUN_GATES/kit.toml"
+for _c in adds dot empty derived; do
+  write_bg_verdict "$_x" full ""
+  case $_c in adds) write_bg_selection "$_sel_add" ;; dot) write_bg_selection "$_sel_dot" ;; empty) write_bg_selection "$_sel_empty" ;; *) write_bg_selection "$_sel_lvl" ;; esac
+  _lv=$("$_rkd_py" "$KIT_REL/$RUN_GATES/verdict_backends.py" read --backend local-hook --sha "$_x" 2>&1)
+  case "$_lv" in
+    *"verdict: local-hook · ${_sel_hk[$_c]} · "*) ok "BG TOOL-dWitnessedBar-56 AC6 parity at R: over $_c the hook and read --backend local-hook both read ${_sel_hk[$_c]}" ;;
+    *) bad "BG TOOL-dWitnessedBar-56 AC6 parity at R: over $_c the hook read ${_sel_hk[$_c]} and local-hook said: $_lv" ;;
+  esac
+done
+rm -f "$KIT_REL/$RUN_GATES/verdict_backends.py" "$KIT_REL/$RUN_GATES/kit.toml"
+printf 'held\t%s\n' "$_sel_add" > "$BG_D/sel-adds"; printf 'held\t%s\n' "$_sel_lvl" > "$BG_D/sel-derived"
+"$_rkd_py" "$KIT_REL/$RUN_GATES/verdict_flow.py" select --check --selection "$BG_D/sel-adds" --rev "$_r" >/dev/null 2>&1; _a=$?
+"$_rkd_py" "$KIT_REL/$RUN_GATES/verdict_flow.py" select --check --selection "$BG_D/sel-derived" --rev "$_r" >/dev/null 2>&1; _b=$?
+[ "$_a|$_b" = "1|0" ] \
+  && ok "BG TOOL-dWitnessedBar-41 AC2 select --check --selection exits 1 on the added row and 0 on the derived one" \
+  || bad "BG TOOL-dWitnessedBar-41 AC2 select --check --selection exited $_a and $_b, planted to exit 1 and 0"
+cd "$pfx_home" || exit 2
+
+# AC9, AC10 — a runner stamp covers; a scoped verdict covers only from the adopted base.
 build_bg_fixture ac9 || bad "BG could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1; write_bg_stamp "$_x"
@@ -2459,153 +2746,79 @@ case "$(read_bg_marks)|$BG_OUT" in
 esac
 rm -f "$bg_gd/gate-full-green"; git reset -q --hard origin/main; _r=$(git rev-parse HEAD); write_bg_stamp "$_r"
 echo 2 >> src/x.sh; git commit -qam lin; _l=$(git rev-parse HEAD)
-write_bg_record "$bg_gd/gate-bar-green" "$_l" scoped "$_r" "$BG_RUNNER"
+write_bg_verdict "$_l" scoped "$_r"
 _m0=$(read_bg_marks); run_bg_push
 case "$(read_bg_marks)|$BG_OUT" in
-  "$_m0|"*"covered on main push"*"a scoped green"*) ok "BG AC10 a scoped record on the adopted base covers" ;;
-  *) bad "BG AC10 a scoped record on the adopted base must cover, got: $BG_OUT" ;;
+  "$_m0|"*"covered on main push"*"a scoped green"*) ok "BG AC10 a scoped verdict on the adopted base covers" ;;
+  *) bad "BG AC10 a scoped verdict on the adopted base must cover, got: $BG_OUT" ;;
 esac
-write_bg_record "$bg_gd/gate-bar-green" "$_l" scoped "$_x" "$BG_RUNNER"
+write_bg_verdict "$_l" scoped "$_x"
 _m0=$(read_bg_marks); run_bg_push
 case "$(read_bg_marks)|$BG_OUT" in
-  "$((_m0 + 1))|"*"a scoped green against base ${_x:0:8}"*) ok "BG AC10 a scoped record on another base is not covered, naming it" ;;
-  *) bad "BG AC10 a scoped record on another base must not cover, got: $BG_OUT" ;;
+  "$((_m0 + 1))|"*"a scoped green against base ${_x:0:8}"*) ok "BG AC10 a scoped verdict on another base is not covered, naming it" ;;
+  *) bad "BG AC10 a scoped verdict on another base must not cover, got: $BG_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
 
-# AC12 from a linked worktree; AC13 by slice.
-build_bg_fixture ac12 || bad "BG could not build its fixture"
-git worktree add -q "$BG_D/wt" -b wtb >/dev/null 2>&1
-( cd "$BG_D/wt" || exit 1; bg_gd=$(git rev-parse --git-dir)
-  echo 1 >> src/x.sh; git commit -qam wt; run_bg_push
-  cmp -s "$bg_gd/gate-bar-green" "$(git rev-parse --git-common-dir)/gate-bar-green.shared" ) \
-  && ok "BG AC12 a linked worktree's record is shared byte-identical to the common dir" \
-  || bad "BG AC12 the common dir holds no byte-identical gate-bar-green.shared"
-sed -n '/^write_bar_green() {/,/^}/p' "$SRC/.githooks/pre-push" > "$BG_D/slice.sh"
-( . "$BG_D/slice.sh" || exit 1; rm -f "$bg_gd/gate-bar-green"
-  _h=$(git rev-parse HEAD); git commit -q --allow-empty -m moved
-  write_bar_green "$bg_gd" "$_h" 0 full "" "$BG_RUNNER" r1 >/dev/null
-  _a=$([ -f "$bg_gd/gate-bar-green" ] && echo present)
-  _h=$(git rev-parse HEAD); : > untracked.txt
-  write_bar_green "$bg_gd" "$_h" 0 full "" "$BG_RUNNER" r2 >/dev/null
-  _b=$([ -f "$bg_gd/gate-bar-green" ] && echo present)
-  rm -f untracked.txt; write_bar_green "$bg_gd" "$_h" 0 full "" "$BG_RUNNER" r3 >/dev/null
-  _c=$([ -f "$bg_gd/gate-bar-green" ] && echo present)
-  [ "$_a|$_b|$_c" = "||present" ] ) \
-  && ok "BG AC13 the sliced writer writes nothing with HEAD moved or an untracked file, and writes on the control" \
-  || bad "BG AC13 the sliced writer wrote a record it must not have, or none on the control"
-cd "$pfx_home" || exit 2
-
-# AC14, AC15 — no record for an inherited red landed under land, none for a doc-only push.
+# AC14, AC15 — an inherited red lands under the value at R, here the catalogue default own-only, since
+# the fixture carries no policy kit; a doc-only push scopes doc-only.
 build_bg_fixture ac14 || bad "BG could not build its fixture"
 echo 1 >> src/x.sh; git commit -qam c; run_bg_push BG_MODE=inh
-case "$BG_RC|$([ -f "$bg_gd/gate-bar-green" ] && echo present)|$BG_OUT" in
-  "0||"*"red on inherited legs only"*"no gate-bar-green written"*) ok "BG AC14 an inherited red that lands writes no record" ;;
-  *) bad "BG AC14 expected the inherited landing with no record, got rc $BG_RC: $BG_OUT" ;;
+case "$BG_RC|$BG_OUT" in
+  "0|"*"every red passes — landing under verdict.blocks own-only"*) ok "BG AC14 an inherited red lands under verdict.blocks own-only" ;;
+  *) bad "BG AC14 expected the inherited landing, got rc $BG_RC: $BG_OUT" ;;
 esac
 git reset -q --hard origin/main; write_bg_stamp "$(git rev-parse HEAD)"; echo b >> notes/a.md; git commit -qam doc; run_bg_push
-case "$([ -f "$bg_gd/gate-bar-green" ] && echo present)|$BG_OUT" in
-  "|"*"docs-only"*"no gate-bar-green written — this push was scoped doc-only"*) ok "BG AC15 a doc-only scoped green writes no record and says so" ;;
-  *) bad "BG AC15 expected no record on a doc-only push, got: $BG_OUT" ;;
+case "$BG_RC|$BG_OUT" in
+  "0|"*"docs-only"*) ok "BG AC15 a doc-only push scopes doc-only" ;;
+  *) bad "BG AC15 expected a doc-only scoped push, got rc $BG_RC: $BG_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
 
-# AC17 — a wrapper bar's full record at M scopes the push of M plus one record-only commit.
+# AC17 (TOOL-dWitnessedBar-4 §4) — a wrapper bar that is not the runner finds no record for its own
+# command: even the runner's GREEN verdict of the very tree it pushes is no candidate, so it runs FULL
+# and says why. Red against a hook that offers the runner's verdict to any bar.
 build_bg_fixture ac17 || bad "BG could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; git checkout -q main
-git merge -q --no-ff X -m "merge X" >/dev/null 2>&1; _m=$(git rev-parse HEAD)
-run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
-echo r >> src/x.sh; git commit -qam "records: close"; run_bg_push GOV_GATE_CMD="$BG_WRAP"
-case "$BG_OUT" in
-  *"scoped gate on main push"*"full bar green ${_m:0:8} from this git dir's gate-bar-green"*"BAR base=$_m full="*) ok "BG AC17 a wrapper bar's full record at M scopes M plus a record commit, with GATE_BASE M" ;;
-  *) bad "BG AC17 expected a scoped decision from the record at ${_m:0:8}, got: $BG_OUT" ;;
-esac
-cd "$pfx_home" || exit 2
-
-# AC18, AC19, AC20 — a scoped record at M is adopted on its full-green base B, lag counted from B.
-build_bg_fixture ac18 || bad "BG could not build its fixture"
-_b=$(git rev-parse HEAD); for _i in 1 2; do echo "l$_i" >> src/x.sh; git commit -qam "l$_i"; done
-_m=$(git rev-parse HEAD); echo c >> src/x.sh; git commit -qam C; set_bg_remote; echo c2 >> src/x.sh; git commit -qam C2
-write_bg_record "$bg_gd/gate-bar-green.shared" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green" "$_m" scoped "$_b" "$BG_WRAP"
-run_bg_push GOV_GATE_CMD="$BG_WRAP"
-case "$BG_OUT" in
-  *"scoped gate on main push"*"scoped bar green ${_m:0:8}"*"counted from its base ${_b:0:8}, is 4 first-parent"*"BAR base=$_m full="*) ok "BG AC18 a scoped record at M is adopted, scoping from M with the lag counted from B" ;;
-  *) bad "BG AC18 expected a scoped decision from M counted from B, got: $BG_OUT" ;;
-esac
-_c=$(git rev-parse HEAD~1)
-write_bg_record "$bg_gd/gate-bar-green" "$_m" scoped "$_c" "$BG_WRAP"; mv "$bg_gd/gate-bar-green.shared" "$BG_D/shared.keep"
-run_bg_push GOV_GATE_CMD="$BG_WRAP"
-case "$BG_OUT" in
-  *"FULL gate on main push"*"its base ${_c:0:8} is no full green this push can adopt"*) ok "BG AC19 a scoped record whose base no full green names is refused, naming its base" ;;
-  *) bad "BG AC19 expected the record refused on its base, got: $BG_OUT" ;;
-esac
-mv "$BG_D/shared.keep" "$bg_gd/gate-bar-green.shared"
-for _i in $(seq 1 10); do echo "p$_i" >> src/x.sh; git commit -qam "p$_i"; done; _m=$(git rev-parse HEAD)
-echo c3 >> src/x.sh; git commit -qam C3; set_bg_remote; echo c4 >> src/x.sh; git commit -qam C4
-write_bg_record "$bg_gd/gate-bar-green" "$_m" scoped "$_b" "$BG_WRAP"; run_bg_push GOV_GATE_CMD="$BG_WRAP"
-case "$BG_OUT" in
-  *"FULL gate on main push"*"its base ${_b:0:8} is no full green this push can adopt: the recorded full bar green is 16 first-parent landings behind"*) ok "BG AC20 a scoped record whose base is past the bound is refused on the base's lag" ;;
-  *) bad "BG AC20 expected the record refused on its base's lag, got: $BG_OUT" ;;
-esac
-cd "$pfx_home" || exit 2
-
-# TOOL-aFrugalTurnstile-11 AC1, AC3 — a wrapper bar from one git dir: FULL, scoped, then scoped again.
-build_bg_fixture slot1 || bad "BG could not build its fixture"
-echo 1 >> src/x.sh; git commit -qam c1; _c1=$(git rev-parse HEAD); run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
-echo 2 >> src/x.sh; git commit -qam c2; _c2=$(git rev-parse HEAD); run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
-[ "$(read_bg_key "$bg_gd/gate-bar-green" kind)|$(read_bg_key "$bg_gd/gate-bar-green" sha)|$(read_bg_key "$bg_gd/gate-bar-green.scoped" kind)|$(read_bg_key "$bg_gd/gate-bar-green.scoped" sha)" \
-  = "full|$_c1|scoped|$_c2" ] \
-  && ok "BG slot AC1 a scoped push leaves gate-bar-green kind full and writes gate-bar-green.scoped kind scoped" \
-  || bad "BG slot AC1 expected the full record kept and the scoped one in its own slot: $(cat "$bg_gd/gate-bar-green" "$bg_gd/gate-bar-green.scoped" 2>&1)"
-echo 3 >> src/x.sh; git commit -qam c3; run_bg_push GOV_GATE_CMD="$BG_WRAP"
-case "$BG_OUT" in
-  *"FULL gate on main push"*) bad "BG slot AC3 the third push went FULL, the alternation: $BG_OUT" ;;
-  *"scoped gate on main push"*) ok "BG slot AC3 the third push from the same git dir reads scoped gate" ;;
-  *) bad "BG slot AC3 expected a scoped gate line, got: $BG_OUT" ;;
-esac
-cd "$pfx_home" || exit 2
-
-# TOOL-aFrugalTurnstile-11 AC2 — the scoped record from a linked worktree is shared to the common dir.
-build_bg_fixture slot2 || bad "BG could not build its fixture"
-git worktree add -q "$BG_D/wt" -b wtb >/dev/null 2>&1
-( cd "$BG_D/wt" || exit 1; bg_gd=$(git rev-parse --git-dir)
-  echo 1 >> src/x.sh; git commit -qam w1; run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
-  echo 2 >> src/x.sh; git commit -qam w2; run_bg_push GOV_GATE_CMD="$BG_WRAP"
-  [ "$(read_bg_key "$bg_gd/gate-bar-green.scoped" kind)" = scoped ] \
-    && cmp -s "$bg_gd/gate-bar-green.scoped" "$(git rev-parse --git-common-dir)/gate-bar-green.scoped.shared" ) \
-  && ok "BG slot AC2 a linked worktree's scoped record is shared byte-identical as gate-bar-green.scoped.shared" \
-  || bad "BG slot AC2 the common dir holds no byte-identical gate-bar-green.scoped.shared"
-cd "$pfx_home" || exit 2
-
-# TOOL-aFrugalTurnstile-11 AC4 — a scoped record only in the scoped slot covers a push of its tree.
-build_bg_fixture slot4 || bad "BG could not build its fixture"
-_b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
-write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
+git merge -q --no-ff X -m "merge X" >/dev/null 2>&1; write_bg_verdict "$(git rev-parse HEAD)" full ""
 _m0=$(read_bg_marks); run_bg_push GOV_GATE_CMD="$BG_WRAP"
 case "$(read_bg_marks)|$BG_OUT" in
-  "$_m0|"*"covered on main push"*"this git dir's gate-bar-green.scoped sha ${_l:0:8}"*"no bar runs"*) ok "BG slot AC4 the cover pass reads the scoped slot" ;;
-  *) bad "BG slot AC4 expected the scoped-slot record to cover with no bar run, got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+  "$((_m0 + 1))|"*"FULL gate on main push"*"is not this kit's runner"*) ok "BG AC17 a wrapper bar adopts no per-tree verdict and runs FULL, naming why" ;;
+  *) bad "BG AC17 expected a FULL wrapper bar with the bar run, got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
 
-# TOOL-aFrugalTurnstile-11 AC5 — a runner stamp at F and a scoped record at M (base F): M is nearer, M wins.
-build_bg_fixture slot5 || bad "BG could not build its fixture"
-_f=$(git rev-parse HEAD); write_bg_stamp "$_f"
-echo 1 >> src/x.sh; git commit -qam m; _m=$(git rev-parse HEAD); write_bg_record "$bg_gd/gate-bar-green" "$_m" scoped "$_f" "$BG_RUNNER"
-echo 2 >> src/x.sh; git commit -qam t; run_bg_push
+# AC19, AC20 — a scoped verdict of the pushed tree is adopted only on a base B that is a full green
+# this push would adopt: one whose base no full verdict names is refused naming the base, and one whose
+# base is past the bound is refused on the base's lag.
+build_bg_fixture ac19 || bad "BG could not build its fixture"
+_b=$(git rev-parse HEAD); echo c >> src/x.sh; git commit -qam C; _c=$(git rev-parse HEAD); set_bg_remote
+echo c2 >> src/x.sh; git commit -qam C2; _t=$(git rev-parse HEAD)
+write_bg_verdict "$_t" scoped "$_c"; run_bg_push
 case "$BG_OUT" in
-  *"scoped gate on main push"*"scoped bar green ${_m:0:8}"*"counted from its base ${_f:0:8}"*"BAR base=$_m full="*) ok "BG slot AC5 the nearer scoped record at M beats the runner stamp at F" ;;
-  *) bad "BG slot AC5 expected the decision to scope from M, got: $BG_OUT" ;;
+  *"FULL gate on main push"*"its base ${_c:0:8} is no full green this push can adopt"*) ok "BG AC19 a scoped verdict whose base no full green names is refused, naming its base" ;;
+  *) bad "BG AC19 expected the verdict refused on its base, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+build_bg_fixture ac20 || bad "BG could not build its fixture"
+_b=$(git rev-parse HEAD)
+for _i in $(seq 1 16); do echo "p$_i" >> src/x.sh; git commit -qam "p$_i"; done
+set_bg_remote; echo c4 >> src/x.sh; git commit -qam C4; _t=$(git rev-parse HEAD)
+write_bg_verdict "$_b" full ""; write_bg_verdict "$_t" scoped "$_b"; run_bg_push
+case "$BG_OUT" in
+  *"FULL gate on main push"*"its base ${_b:0:8} is no full green this push can adopt: the recorded full tree verdict is 17 first-parent landings behind"*) ok "BG AC20 a scoped verdict whose base is past the bound is refused on the base's lag" ;;
+  *) bad "BG AC20 expected the verdict refused on its base's lag, got: $BG_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
 
-# TOOL-aFrugalTurnstile-11 AC6 — a runner stamp and a bar record at one sha: the tie keeps the runner stamp.
-build_bg_fixture slot6 || bad "BG could not build its fixture"
-echo 1 >> src/x.sh; git commit -qam s; _s=$(git rev-parse HEAD); write_bg_stamp "$_s"
-write_bg_record "$bg_gd/gate-bar-green" "$_s" full "" "$BG_RUNNER"; echo 2 >> src/x.sh; git commit -qam t; run_bg_push
-case "$BG_OUT" in
-  *"scoped gate on main push"*"full green ${_s:0:8} from this git dir's gate-full-green"*) ok "BG slot AC6 a tie names gate-full-green as the adopted record" ;;
-  *) bad "BG slot AC6 expected the runner stamp named on a tie, got: $BG_OUT" ;;
+# TOOL-aFrugalTurnstile-11 AC4 — a scoped verdict only in the scoped slot covers a push of its tree.
+build_bg_fixture slot4 || bad "BG could not build its fixture"
+_b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
+write_bg_verdict "$_b" full ""; write_bg_verdict "$_l" scoped "$_b"
+_m0=$(read_bg_marks); run_bg_push
+case "$(read_bg_marks)|$BG_OUT" in
+  "$_m0|"*"covered on main push"*"gate-verdict/$(git rev-parse "$_l^{tree}").scoped sha ${_l:0:8}"*"no bar runs"*) ok "BG slot AC4 the cover pass reads the scoped slot" ;;
+  *) bad "BG slot AC4 expected the scoped-slot verdict to cover with no bar run, got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
 
@@ -2686,19 +2899,18 @@ for _st in none scoped covered; do
   _e=()
   case $_st in
     scoped) write_bg_stamp "$_f" ;;
-    covered) rm -f "$bg_gd/gate-full-green"; write_bg_record "$bg_gd/gate-bar-green" "$_f" full "" "$BG_WRAP"
-             write_bg_record "$bg_gd/gate-bar-green.scoped" "$_t" scoped "$_f" "$BG_WRAP"; _e=(GOV_GATE_CMD="$BG_WRAP") ;;
+    covered) rm -f "$bg_gd/gate-full-green"; write_bg_verdict "$_f" full ""; write_bg_verdict "$_t" scoped "$_f" ;;
   esac
   read_pm_sums > "$BG_D/s0"; _j0=$(cat "$bg_gd"/runlog/*.log 2>/dev/null | wc -l); _m0=$(read_bg_marks)
   run_pm_decide "${_e[@]}" -- "$_t" "$_r"; read_pm_sums > "$BG_D/s1"
   case "$_st|$PM_RC|$(printf '%s\n' "$PM_OUT" | grep -c .)|$PM_OUT" in
-    "none|0|1|full "*|"scoped|0|1|scoped $_f $_f"|"covered|0|1|covered "*"gate-bar-green.scoped") ok "PM AC6 $_st: one decision line, exit 0" ;;
+    "none|0|1|full "*|"scoped|0|1|scoped $_f $_f"|"covered|0|1|covered "*"gate-verdict/"*".scoped") ok "PM AC6 $_st: one decision line, exit 0" ;;
     *) bad "PM AC6 $_st expected one $_st line and exit 0, got rc $PM_RC: $PM_OUT" ;;
   esac
   # TOOL-aFrugalTurnstile-13 AC1: the line names the vetted bar after its last TAB. RED against the hook
   # at 69426afd, whose line carries no bar field.
-  [ "$_st" != covered ] || { [ "$PM_BAR" = "$BG_WRAP" ] && ok "PM TOOL-aFrugalTurnstile-13 AC1 the decision line ends in a TAB and the vetted bar" \
-    || bad "PM TOOL-aFrugalTurnstile-13 AC1 expected the bar field '$BG_WRAP', got '$PM_BAR'"; }
+  [ "$_st" != covered ] || { [ "$PM_BAR" = "$BG_RUNNER" ] && ok "PM TOOL-aFrugalTurnstile-13 AC1 the decision line ends in a TAB and the vetted bar" \
+    || bad "PM TOOL-aFrugalTurnstile-13 AC1 expected the bar field '$BG_RUNNER', got '$PM_BAR'"; }
   { cmp -s "$BG_D/s0" "$BG_D/s1" && [ ! -e "$bg_gd/pre-push-refusal" ] && [ ! -e "$bg_gd/pre-push-bar" ] &&
     [ "$(cat "$bg_gd"/runlog/*.log 2>/dev/null | wc -l)" = "$_j0" ] && [ "$(read_bg_marks)" = "$_m0" ]; } \
     && ok "PM AC6 $_st: no file under the git dir changed, no journal line, no bar" \
@@ -2734,8 +2946,8 @@ build_bg_fixture pm-cover "$PM_DECL" || bad "PM could not build its fixture"
 _p=$(git rev-parse HEAD); echo 0 >> src/x.sh; git commit -qam b; _b=$(git rev-parse HEAD)
 echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
 for _red in "$_l" "$_p"; do
-  write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
-  write_pm_red "$_red"; _m0=$(read_bg_marks); run_bg_push GOV_GATE_CMD="$BG_WRAP"
+  write_bg_verdict "$_b" full ""; write_bg_verdict "$_l" scoped "$_b"
+  write_pm_red "$_red"; _m0=$(read_bg_marks); run_bg_push
   case "$_red|$(read_bg_marks)|$BG_OUT" in
     "$_l|$((_m0 + 1))|"*"FULL gate on main push"*"RED at ${_l:0:8}"*) ok "PM AC11 a red the covering record does not strictly descend from forces FULL" ;;
     "$_p|$_m0|"*"covered on main push"*"no bar runs"*) ok "PM AC11 a covering record that descends from the red stays covered" ;;
@@ -2744,24 +2956,25 @@ for _red in "$_l" "$_p"; do
 done
 cd "$pfx_home" || exit 2
 
-# TOOL-aFrugalTurnstile-15 AC1-AC3 — a red clears only on the FULL green the decision rests on. A scoped
-# record at a descendant of the red X, whose base _b is older than X, neither scopes (AC1) nor covers
-# (AC2); a full base strictly descending from X clears it (AC3). AC1 and AC2 are RED against the hook at
-# ebbc83b7, which cleared on the scoped record's own sha.
-for _ac in AC1 AC2 AC3; do
+# TOOL-aFrugalTurnstile-15 AC2, AC3 — a red clears only on the FULL green the decision rests on. A scoped
+# verdict of the pushed tree at a descendant of the red X, whose base _b is older than X, does not cover
+# (AC2); a full base strictly descending from X clears it, and the push is covered (AC3). AC2 is RED
+# against the hook at ebbc83b7, which cleared on the scoped record's own sha. AC1, the scope case, left
+# with the ancestor records (TOOL-dWitnessedBar-4 S3): a scoped verdict is a candidate only for its own
+# tree, where the cover pass answers first.
+for _ac in AC2 AC3; do
   build_bg_fixture "pm-full-$_ac" "$PM_DECL" || bad "PM could not build its fixture"
   _b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam x; _x=$(git rev-parse HEAD)
   [ "$_ac" = AC3 ] && { echo f >> src/x.sh; git commit -qam f; _b=$(git rev-parse HEAD); }
   echo 2 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
-  [ "$_ac" = AC2 ] || { echo 3 >> src/x.sh; git commit -qam t; }
-  write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
-  write_pm_red "$_x"; _m0=$(read_bg_marks); run_bg_push GOV_GATE_CMD="$BG_WRAP"
+  write_bg_verdict "$_b" full ""; write_bg_verdict "$_l" scoped "$_b"
+  write_pm_red "$_x"; _m0=$(read_bg_marks); run_bg_push
   case "$_ac|$(read_bg_marks)|$BG_OUT" in
-    "AC1|$((_m0 + 1))|"*"FULL gate on main push"*"RED at ${_x:0:8}"*"BAR base= full=1"*|"AC2|$((_m0 + 1))|"*"FULL gate on main push"*"RED at ${_x:0:8}"*"BAR base= full=1"*)
+    "AC2|$((_m0 + 1))|"*"FULL gate on main push"*"RED at ${_x:0:8}"*"BAR base= full=1"*)
       case "$BG_OUT" in *cleared*) bad "PM TOOL-aFrugalTurnstile-15 $_ac printed a cleared line: $BG_OUT" ;;
         *) ok "PM TOOL-aFrugalTurnstile-15 $_ac a scoped record whose base is older than the red forces FULL, no cleared line" ;; esac ;;
-    "AC3|$((_m0 + 1))|"*"red ${_x:0:8} on origin is cleared for this push — the adopted green ${_b:0:8} descends from it"*"scoped gate on main push"*)
-      ok "PM TOOL-aFrugalTurnstile-15 AC3 a full base strictly descending from the red clears it and scopes" ;;
+    "AC3|$_m0|"*"red ${_x:0:8} on origin is cleared for this push — the adopted green ${_b:0:8} descends from it"*"covered on main push"*)
+      ok "PM TOOL-aFrugalTurnstile-15 AC3 a full base strictly descending from the red clears it and the push is covered" ;;
     *) bad "PM TOOL-aFrugalTurnstile-15 $_ac red ${_x:0:8}: unexpected decision, marker $_m0/$(read_bg_marks): $BG_OUT" ;;
   esac
   cd "$pfx_home" || exit 2
@@ -2777,58 +2990,33 @@ case "$BG_OUT" in
 esac
 cd "$pfx_home" || exit 2
 
-# AC12 — a scoped record written on a scoped base names that base's FULL green, and the next push adopts it.
-build_bg_fixture pm-chain || bad "PM could not build its fixture"
-echo 1 >> src/x.sh; git commit -qam c1; _c1=$(git rev-parse HEAD); run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
-echo 2 >> src/x.sh; git commit -qam c2; run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
-echo 3 >> src/x.sh; git commit -qam c3; _c3=$(git rev-parse HEAD); run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
-[ "$(read_bg_key "$bg_gd/gate-bar-green.scoped" sha)|$(read_bg_key "$bg_gd/gate-bar-green.scoped" base)" = "$_c3|$_c1" ] \
-  && ok "PM AC12 the scoped record written on a scoped base names the full green ${_c1:0:8}" \
-  || bad "PM AC12 expected gate-bar-green.scoped at ${_c3:0:8} with base ${_c1:0:8}: $(cat "$bg_gd/gate-bar-green.scoped" 2>&1)"
-echo 4 >> src/x.sh; git commit -qam c4; run_bg_push GOV_GATE_CMD="$BG_WRAP"
-case "$BG_OUT" in
-  *"scoped gate on main push"*"scoped bar green ${_c3:0:8}"*) ok "PM AC12 the next push adopts the new scoped record" ;;
-  *) bad "PM AC12 expected the push to scope from ${_c3:0:8}, got: $BG_OUT" ;;
-esac
-cd "$pfx_home" || exit 2
-
-# TOOL-aFrugalTurnstile-16 AC1 — adopting a `kind scoped` record M whose base is B, --decide prints
-# BOTH: `scoped M B`. RED against the hook at 9873a25f, which printed `scoped M` alone.
-build_bg_fixture t16a || bad "T16 could not build its fixture"
-_b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
-write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
-echo 2 >> src/x.sh; git commit -qam t; run_pm_decide GOV_GATE_CMD="$BG_WRAP" -- "$(git rev-parse HEAD)" "$(read_pm_remote)"
-[ "$PM_RC|$PM_OUT" = "0|scoped $_l $_b" ] && ok "T16 AC1 an adopted scoped record's line names it and its full base" \
-  || bad "T16 AC1 expected 'scoped ${_l:0:8}… ${_b:0:8}…', got rc $PM_RC: $PM_OUT"
-cd "$pfx_home" || exit 2
-
-# TOOL-aFrugalTurnstile-16 AC4 — scoping from an inherited green prints `-` as the full base and writes
-# no scoped record, naming the inherited green. RED at 9873a25f: it wrote one with base C.
+# TOOL-aFrugalTurnstile-16 AC4 — scoping from an inherited green prints `-` as the full base. RED at
+# 9873a25f, which printed base C.
 build_bg_fixture t16inh 'INHERITED_RED_MAX_AGE=10\n' || bad "T16 could not build its fixture"
 _r=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam c1; _c=$(git rev-parse HEAD); write_bg_stamp "$_c"
-mv "$bg_gd/gate-full-green" "$bg_gd/gate-inherited-green"; printf 'base\t%s\nmax_age\t10\n' "$_r" >> "$bg_gd/gate-inherited-green"
+mv "$bg_gd/gate-full-green" "$bg_gd/gate-inherited-green"; printf 'base\t%s\nmax_age\t10\nblocks\town-only\n' "$_r" >> "$bg_gd/gate-inherited-green"
 echo 2 >> src/x.sh; git commit -qam c2; run_pm_decide -- "$(git rev-parse HEAD)" "$_r"; run_bg_push
-case "$PM_OUT|$([ -e "$bg_gd/gate-bar-green.scoped" ] && echo PRESENT)|$BG_OUT" in
-  "scoped $_c -||"*"no gate-bar-green written — this push scoped from the inherited green ${_c:0:8}"*) ok "T16 AC4 an inherited-green scope prints '-' and writes no scoped record" ;;
-  *) bad "T16 AC4 expected 'scoped ${_c:0:8} -' and no scoped record, got: $PM_OUT | $BG_OUT" ;;
+case "$PM_OUT|$BG_OUT" in
+  "scoped $_c -|"*"scoped gate on main push"*) ok "T16 AC4 an inherited-green scope prints '-' as its full base" ;;
+  *) bad "T16 AC4 expected 'scoped ${_c:0:8} -' and a scoped push, got: $PM_OUT | $BG_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
 
 # TOOL-aFrugalTurnstile-16 AC3 — the cover pass refuses a runner stamp with a foreign manifest, another
-# manifest blob or another fingerprint: the bar runs and no cover line prints. With a non-covering bar
-# record planted (bar `bash other-bar.sh`) the `not covered` line prints, and it names the reason.
+# manifest blob or another fingerprint: the bar runs and no cover line prints. With a non-covering
+# per-tree verdict planted (it reads RED) the `not covered` line prints, and it names the reason.
 # Deleting any of the three refusals reds its arm; the unaltered stamp is the control.
 build_bg_fixture t16stamp || bad "T16 could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
 for _alt in "control:" "manifest:leg manifest elsewhere/other-legs.json" "blob:leg manifest blob 01234567" "fingerprint:graded tree fingerprint 01234567"; do
-  rm -f "$bg_gd"/gate-bar-green*; write_bg_stamp "$_x"
+  rm -rf "$bg_gd/gate-verdict"; write_bg_stamp "$_x"
   case "${_alt%%:*}" in
     manifest) set_bg_key "$bg_gd/gate-full-green" manifest elsewhere/other-legs.json ;;
     blob) set_bg_key "$bg_gd/gate-full-green" manifest_blob 0123456789abcdef0123456789abcdef01234567 ;;
     fingerprint) set_bg_key "$bg_gd/gate-full-green" fingerprint 0123456789abcdef ;;
   esac
-  write_bg_record "$bg_gd/gate-bar-green" "$_x" full "" "bash other-bar.sh"
+  write_bg_verdict "$_x" full ""; set_bg_key "$BG_VF" verdict RED
   _m0=$(read_bg_marks); run_bg_push
   case "${_alt%%:*}|$(read_bg_marks)|$BG_OUT" in
     "control|$_m0|"*"covered on main push"*) ok "T16 AC3 the unaltered runner stamp covers" ;;
@@ -2839,5 +3027,227 @@ for _alt in "control:" "manifest:leg manifest elsewhere/other-legs.json" "blob:l
   esac
 done
 cd "$pfx_home" || exit 2
+
+# ---- TOOL-dWitnessedBar-2 AC3 AC4: EACH HOOK BYPASS RECORDED, AND REFUSED UNDER hooks.bypass = refused --
+# A scratch repo whose R holds the policy kit, the memory-tree kit's trailer reader and the run-gates
+# kit's backend registry, with `hooks.bypass` and `verdict` declared in its policy file. Each push
+# carries two pass commits: one made past the commit check, with no `Commit-Checked:` trailer, and its
+# control, which carries the trailer the check writes. AC3: under `allowed` the push proceeds and the
+# journal gains one `bypass=unwitnessed-commit` line naming the first and never the control. AC4:
+# under `refused` with an off-node `verdict` the push is refused naming the first, as
+# `bypass-refused`, and its record is still written. S6: under `refused` with `verdict = local-hook`
+# no landing proceeds, naming the off-node backends. Staged red by skipping the range walk.
+MT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree commit_trailers.py "$SRC/$KIT_REL") || exit 2
+build_bp_fixture() { # tag · hooks.bypass value · verdict value -> a pushed main at R; cwd moves into its work tree
+  local d="$tmp/bp-$1"
+  mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
+  cd "$d/work" || return 1
+  git config core.hooksPath "$d/hooks"
+  git config core.autocrlf false
+  mkdir -p .githooks .governance "$KIT_REL/$PK" "$MT_DIR" "$RUN_GATES_DIR"
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+     "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/"
+  cp "$SRC/$MT_DIR/commit_trailers.py" "$MT_DIR/"
+  cp "$SRC/$RUN_GATES_DIR/verdict_backends.py" "$SRC/$RUN_GATES_DIR/remote_verdict.py" \
+     "$SRC/$RUN_GATES_DIR/leg_factory.py" "$SRC/$RUN_GATES_DIR/regen.py" "$RUN_GATES_DIR/"
+  printf '[[verdict_backend]]\nname = "%s"\nreader = "verdict_backends:read_local_verdict"\noff_node = %s\nowner = "tFix"\n\n' \
+    local-hook false peer-node true remote-ci true > "$RUN_GATES_DIR/kit.toml"
+  printf 'verdict = "%s"\n\n[hooks]\nbypass = "%s"\n' "$3" "$2" > .governance/policy.toml
+  printf 'GOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+  git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+  git remote add origin "$d/remote.git"
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+}
+run_bp_push() { # -> BP_OUT, BP_RC, BP_UN (the unwitnessed sha) and BP_OK (its control)
+  git commit -q --allow-empty -m "TOOL-tFix-1: past the hooks" -m "Pass: TOOL-tFix-1"; BP_UN=$(git rev-parse HEAD)
+  git commit -q --allow-empty -m "TOOL-tFix-2: through the check" -m "Pass: TOOL-tFix-2
+Commit-Checked: unattended@1.0"; BP_OK=$(git rev-parse HEAD)
+  BP_OUT=$(GATE_SELFTESTS= GOV_GATE_CMD="bash $green" git push origin main 2>&1); BP_RC=$?
+}
+read_bp_journal() { grep -F 'decision=bypass' "$(git rev-parse --git-dir)/runlog/pushes.log" 2>/dev/null; }
+build_bp_fixture allowed allowed local-hook || bad "BP could not build its allowed fixture"
+run_bp_push
+_j=$(read_bp_journal)
+case "$BP_RC|$_j" in
+  "0|"*"bypass=unwitnessed-commit"$'\t'"sha=$BP_UN"$'\t'"policy=allowed"*)
+    case "$_j" in
+      *"$BP_OK"*) bad "BP AC3 the witnessed control was recorded as a bypass: $_j" ;;
+      *) ok "BP TOOL-dWitnessedBar-2 AC3 under allowed the push proceeds and the unwitnessed pass commit alone is recorded" ;;
+    esac ;;
+  *) bad "BP AC3 expected exit 0 and one unwitnessed-commit line naming ${BP_UN:0:8}, got rc $BP_RC: $_j | $BP_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+build_bp_fixture refused refused peer-node || bad "BP could not build its refused fixture"
+run_bp_push
+_j=$(read_bp_journal)
+case "$BP_RC|$(read_token)|$_j|$BP_OUT" in
+  0*) bad "BP AC4 under refused an unwitnessed pass commit was pushed: $BP_OUT" ;;
+  *"|bypass-refused|"*"bypass=unwitnessed-commit"$'\t'"sha=$BP_UN"$'\t'"policy=refused"*"${BP_UN:0:8}"*"carry no Commit-Checked: trailer"*)
+    ok "BP TOOL-dWitnessedBar-2 AC4 under refused with an off-node verdict the push is refused naming the unwitnessed commit, and its record is still written" ;;
+  *) bad "BP AC4 expected a bypass-refused refusal naming ${BP_UN:0:8} and its record, got rc $BP_RC token $(read_token): $_j | $BP_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+build_bp_fixture onnode refused local-hook || bad "BP could not build its on-node fixture"
+BP_OUT=$(GATE_SELFTESTS= GOV_GATE_CMD="bash $green" git commit -q --allow-empty -m "a commit no pass names" && GOV_GATE_CMD="bash $green" git push origin main 2>&1); BP_RC=$?
+case "$BP_RC|$(read_token)|$BP_OUT" in
+  0*) bad "BP S6 under refused with verdict = local-hook a landing proceeded: $BP_OUT" ;;
+  *"|bypass-refused|"*"verdict names no off-node backend"*"off-node backends: peer-node, remote-ci"*)
+    ok "BP TOOL-dWitnessedBar-2 S6 under refused with verdict = local-hook no landing proceeds, naming the off-node backends" ;;
+  *) bad "BP S6 expected a bypass-refused refusal naming the off-node backends, got rc $BP_RC token $(read_token): $BP_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# ---- TOOL-dWitnessedBar-106 AC1 to AC8: THE THREE POLICY READS AT R NEVER READ LOOSER THAN R'S FILE ----
+# The floor harness: the hook's R-scoped read, `_pp_read_fns` above, run in a subshell over a scratch
+# repo committing four revisions of the policy file at the path the policy kit's POLICY_REL names:
+# A names none of the three keys, R declares each at its strictest, R3 spells them as inline tables,
+# and R4 spells each at its strictest as a root dotted key, `verdict.blocks = ...` (TOOL-dWitnessedBar-110).
+# Three kit copies beside them: `kr` the real reader, `kb` a policy.py that exits 3, and `kt` the real
+# reader whose catalogue lists each key without its strictest value. `run_floor_read` stubs the
+# launcher and the kit per plant. The A column and the `real` plant are controls, green before the
+# floor and red under an over-fix reading every key at its strictest. Then the end-to-end push of a
+# tip carrying `git rm` of the policy reader, the single-exit measure and the parity of the orders.
+# WHAT THIS DOES NOT CHECK: a spelling the floor grammar does not name, which reads as no mention.
+fl_d="$tmp/fl"; mkdir -p "$fl_d/kr" "$fl_d/kb" "$fl_d/kt"
+fl_rel=$(sed -n 's/^POLICY_REL = "\(.*\)"\r*$/\1/p' "$SRC/$KIT_REL/$PK/policy.py")
+eval "$(grep -E '^PP_[A-Z]+_ORDER=|^PP_POLICY_REL=' "$SRC/.githooks/pre-push")"
+for fl_k in kr kt; do
+  cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+     "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$fl_d/$fl_k/"
+done
+printf 'import sys\nsys.exit(3)\n' > "$fl_d/kb/policy.py"
+fl_kt=$("$_rkd_py" -c 'import re, sys
+p = sys.argv[1]; text = open(p, encoding="utf-8").read()
+for pair in sys.argv[2:]:
+    name, drop = pair.split(":")
+    m = re.search(r"(name = \"%s\"\nallowed = \[)([^\]]*)\]" % re.escape(name), text)
+    kept = [v.strip() for v in m.group(2).split(",") if v.strip() != "\"%s\"" % drop] if m else []
+    if not m or len(kept) == m.group(2).count(",") + 1: sys.exit("no %s row lists %s" % (name, drop))
+    text = text[:m.start()] + m.group(1) + ", ".join(kept) + "]" + text[m.end():]
+open(p, "w", encoding="utf-8", newline="\n").write(text)
+print("tampered")' "$fl_d/kt/catalogue.toml" "verdict.blocks:${PP_BLOCKS_ORDER##* }" \
+  "verdict.held:${PP_HELD_ORDER##* }" "hooks.bypass:${PP_BYPASS_ORDER##* }" 2>&1)
+[ "$fl_kt" = tampered ] || bad "FL TOOL-dWitnessedBar-106 the kt catalogue could not be narrowed: $fl_kt"
+( cd "$fl_d" && git init -q --template= && git config core.autocrlf false && mkdir -p "${fl_rel%/*}" \
+  && printf '[runtime]\nagents-in-flight = 6\n' > "$fl_rel" && git add "$fl_rel" && git commit -q -m A \
+  && printf '[verdict]\nblocks = "every-red"\nheld = "push-selected"\n\n[hooks]\nbypass = "refused"\n' > "$fl_rel" \
+  && git add "$fl_rel" && git commit -q -m R \
+  && printf 'verdict = { blocks = "own-only", held = "on-demand" }\nhooks = { bypass = "allowed" }\n' > "$fl_rel" \
+  && git add "$fl_rel" && git commit -q -m R3 \
+  && printf 'verdict.blocks = "every-red"\nverdict.held = "push-selected"\nhooks.bypass = "refused"\n' > "$fl_rel" \
+  && git add "$fl_rel" && git commit -q -m R4 ) >/dev/null 2>&1 || bad "FL TOOL-dWitnessedBar-106 could not build the floor harness"
+fl_A=$(git -C "$fl_d" rev-parse HEAD~3 2>/dev/null); fl_R=$(git -C "$fl_d" rev-parse HEAD~2 2>/dev/null)
+fl_R3=$(git -C "$fl_d" rev-parse HEAD~1 2>/dev/null); fl_R4=$(git -C "$fl_d" rev-parse HEAD 2>/dev/null)
+run_floor_read() { # plant (nopy nokit broken tampered real) · sha -> `blocks=<v> held=<v> bypass=<v>`, then the PP_WHY and PP_BYPASS_WHY lines
+  ( cd "$fl_d" || exit 1
+    top=$PWD; main_local=""; PP_READ_AT=""; _gate_env_rel=.githooks/gate-env.sh; def=main
+    eval "$_pp_read_fns"
+    check_reviewed_file() { :; }
+    resolve_python() { printf '%s' "$_rkd_py"; }
+    case "$1" in
+      nopy) resolve_python() { return 1; } ;;
+      nokit) resolve_kit_dir() { return 1; } ;;
+      broken) resolve_kit_dir() { printf kb; } ;;
+      tampered) resolve_kit_dir() { printf kt; } ;;
+      real) resolve_kit_dir() { printf kr; } ;;
+    esac
+    read_policy_at "$2"
+    printf 'blocks=%s held=%s bypass=%s\n%s\n%s\n' "$PP_POLICY" "$PP_HELD" "$PP_BYPASS" "$PP_WHY" "$PP_BYPASS_WHY" )
+}
+# The table of §4 "The arms", one row per plant and revision: AC1 nopy, AC2 nokit, AC3 broken, AC4
+# tampered, AC5 real.
+for fl_row in "AC1 nopy A own-only on-demand allowed" "AC1 nopy R every-red push-selected refused" \
+    "AC1 nopy R3 every-red push-selected refused" "AC2 nokit A own-only on-demand allowed" \
+    "AC2 nokit R every-red push-selected refused" "AC3 broken A every-red on-demand allowed" \
+    "AC3 broken R every-red push-selected refused" "AC4 tampered R every-red push-selected refused" \
+    "AC5 real R3 own-only on-demand allowed" "AC1 nopy R4 every-red push-selected refused"; do
+  read -r fl_ac fl_p fl_at fl_b fl_h fl_y <<< "$fl_row"
+  case "$fl_at" in A) fl_s=$fl_A ;; R) fl_s=$fl_R ;; R3) fl_s=$fl_R3 ;; *) fl_s=$fl_R4 ;; esac
+  _o=$(run_floor_read "$fl_p" "$fl_s")
+  if [ "${_o%%$'\n'*}" = "blocks=$fl_b held=$fl_h bypass=$fl_y" ]; then
+    ok "FL TOOL-dWitnessedBar-106 $fl_ac the $fl_p plant at $fl_at reads $fl_b $fl_h $fl_y"
+  else
+    bad "FL TOOL-dWitnessedBar-106 $fl_ac the $fl_p plant at $fl_at expected $fl_b $fl_h $fl_y, got: $_o"
+  fi
+done
+# AC1: at R and R3 with no python the policy line names the launcher, not a kit.
+for fl_s in "$fl_R" "$fl_R3"; do
+  _o=$(run_floor_read nopy "$fl_s")
+  case "$_o" in
+    *"no policy kit"*) bad "FL TOOL-dWitnessedBar-106 AC1 with no python the policy line names a kit: $_o" ;;
+    *"no python launcher resolves to run the policy reader, so the catalogue default own-only applies"*)
+      ok "FL TOOL-dWitnessedBar-106 AC1 with no python at ${fl_s:0:8} the policy line names the launcher" ;;
+    *) bad "FL TOOL-dWitnessedBar-106 AC1 with no python the policy line does not name the launcher: $_o" ;;
+  esac
+done
+# AC2: each raise is said, and at A the no-kit wording stands.
+_o=$(run_floor_read nokit "$fl_R")
+case "$_o" in
+  *"declares verdict.blocks every-red, which the policy reader did not confirm"*$'\n'*"declares hooks.bypass refused, which the policy reader did not confirm"*)
+    ok "FL TOOL-dWitnessedBar-106 AC2 with no kit at R the policy line and the bypass line each name the raise" ;;
+  *) bad "FL TOOL-dWitnessedBar-106 AC2 with no kit at R a raise went unsaid: $_o" ;;
+esac
+_o=$(run_floor_read nokit "$fl_A")
+case "$_o" in
+  *$'\n'"no policy kit resolves, so the catalogue default own-only applies"*) ok "FL TOOL-dWitnessedBar-106 AC2 with no kit at A the policy line keeps its wording" ;;
+  *) bad "FL TOOL-dWitnessedBar-106 AC2 with no kit at A the policy line moved: $_o" ;;
+esac
+# AC5: an unparsed spelling with no reader says so on the bypass line.
+_o=$(run_floor_read nopy "$fl_R3")
+case "${_o##*$'\n'}" in
+  *"spells hooks.bypass in a form this hook does not parse"*) ok "FL TOOL-dWitnessedBar-106 AC5 an unparsed spelling with no reader raises hooks.bypass and says so" ;;
+  *) bad "FL TOOL-dWitnessedBar-106 AC5 the bypass line does not name the unparsed spelling: $_o" ;;
+esac
+# AC6: a refused R whose pushed tip removes the policy reader still refuses the unwitnessed commit.
+build_bp_fixture nokitrm refused peer-node || bad "FL could not build its refused fixture"
+git rm -q "$KIT_REL/$PK/policy.py" >/dev/null 2>&1 && git commit -q -m "the tip drops the policy reader" >/dev/null 2>&1 \
+  || bad "FL TOOL-dWitnessedBar-106 AC6 could not remove the policy reader on the tip"
+run_bp_push
+_j=$(read_bp_journal)
+case "$BP_RC|$(read_token)|$_j" in
+  0*) bad "FL TOOL-dWitnessedBar-106 AC6 a tip with no policy reader landed an unwitnessed pass commit: $BP_OUT" ;;
+  *"|bypass-refused|"*"bypass=unwitnessed-commit"$'\t'"sha=$BP_UN"$'\t'"policy=refused"*)
+    ok "FL TOOL-dWitnessedBar-106 AC6 a tip with no policy reader meets R's hooks.bypass refused, and the commit is recorded" ;;
+  *) bad "FL TOOL-dWitnessedBar-106 AC6 expected a bypass-refused refusal recording ${BP_UN:0:8} under refused, got rc $BP_RC token $(read_token): $_j | $BP_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+# AC7: after `PP_READ_AT=$sha` the function has one exit, its end. The cut must hold that line, or the
+# measure reads 0 over nothing.
+fl_cut=$(awk '/^read_policy_at\(\)/,/^}/' "$SRC/.githooks/pre-push")
+fl_n=$(printf '%s\n' "$fl_cut" | awk '/PP_READ_AT=\$sha/ {f=1; next} f && /(^|[;&|[:space:]])return([[:space:]]|;|$)/ {n++} END {print n+0}')
+case "$fl_cut|$fl_n" in
+  *'PP_READ_AT=$sha'*"|0") ok "FL TOOL-dWitnessedBar-106 AC7 read_policy_at has no return after PP_READ_AT=\$sha, so every path passes the floor" ;;
+  *) bad "FL TOOL-dWitnessedBar-106 AC7 read_policy_at returns $fl_n time(s) after PP_READ_AT=\$sha, or the cut lost that line" ;;
+esac
+# AC8: the hook's three orders equal the catalogue's allowed lists as sets, and its path the kit's.
+fl_par=$("$_rkd_py" -c 'import sys, tomllib
+rows = {r["name"]: r for r in tomllib.load(open(sys.argv[1], "rb"))["key"]}
+for pair in sys.argv[2:]:
+    name, order = pair.split("=", 1)
+    if set(order.split()) != set(rows[name]["allowed"]): print("%s: the hook orders [%s], the catalogue allows %s" % (name, order, rows[name]["allowed"]))' \
+  "$SRC/$KIT_REL/$PK/catalogue.toml" "verdict.blocks=$PP_BLOCKS_ORDER" "verdict.held=$PP_HELD_ORDER" "hooks.bypass=$PP_BYPASS_ORDER" 2>&1)
+if [ -z "$fl_par" ] && [ -n "$fl_rel" ] && [ "$PP_POLICY_REL" = "$fl_rel" ]; then
+  ok "FL TOOL-dWitnessedBar-106 AC8 the hook's three orders are the catalogue's allowed lists, and its policy path is POLICY_REL"
+else
+  bad "FL TOOL-dWitnessedBar-106 AC8 the orders or the path drifted: ${fl_par:-orders agree} · hook '$PP_POLICY_REL', policy.py '$fl_rel'"
+fi
+
+# ---- TOOL-dWitnessedBar-63 AC11 (S19): A LINE WITH NO TAB IS AN ABSENT KEY TO THE HOOK'S READERS -------
+# `read_bar_file` and `read_green_file`, cut from the hook by their awk ranges and sourced alone, read one
+# record holding `sha<TAB>abc`, a bare `selection.1` line and a bare `reused` line: `bg_sel_rows` stays
+# empty and `rec_reused` empty, and `sha` reads abc, the sentinel that the cut ran. RED against a
+# `read_bar_file` taking a no-TAB line's key as its value. WHAT THIS DOES NOT CHECK: the Python reader,
+# which verdict_backends.py's `key-no-tab` plant holds.
+nt_fns=$(awk '/^read_bar_file\(\)/,/^}/; /^read_green_file\(\)/,/^}/' "$SRC/.githooks/pre-push")
+printf 'sha\tabc\nselection.1\nreused\n' > "$tmp/nt-record"
+nt_out=$( eval "$nt_fns"; read_bar_file "$tmp/nt-record"; read_green_file "$tmp/nt-record"
+  printf 'rows=%s sha=%s reused=[%s]' "${#bg_sel_rows[@]}" "$bg_sha" "$rec_reused" )
+case "$nt_out" in
+  "rows=0 sha=abc reused=[]") ok "TOOL-dWitnessedBar-63 AC11 a bare selection.1 and a bare reused line read as absent keys in the hook" ;;
+  *) bad "TOOL-dWitnessedBar-63 AC11 a no-TAB line was read as a key by the hook's readers: $nt_out" ;;
+esac
 
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

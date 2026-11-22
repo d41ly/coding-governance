@@ -162,20 +162,37 @@ ok = true
 # could name the conf, and the pre-push force being bounded (GATE_FULL_MAX_LAG) is why a scoped push
 # must never be the only thing between a raised pin and a verdict.
 [[gate_leg]]
+tag = "leg.lexicon.lexicon-naming-predicates"
+tests = ["feature.lexicon"]
 name = "lexicon naming predicates"
 subject = "repo"
+purpose = "grades names against the declared lexicon vocabulary"
 argv = ["python", "{kit}/lexicon.py"]
 guard = ["{prefix}/", "skills/session-kickoff/", ".githooks/", ".claude/", ".lexicon.conf"]
 doc_reads = ["{memory_root}/builds/"]
 stage = ["step.test"]
+enforces = ["practice.consistency"]
+
+[gate_leg.gov]
+reads = { base = "it reads the merge-base of a range's parents (TOOL-aSparedSpawn-13 S3).", history = "it walks the merges `rev-list` finds over a range (TOOL-aSparedSpawn-13 S3)." }
+signature = ["python", "{prefix}/lexicon/lexicon.py", "--offenders"]
+chunk = "declarations"
+ceiling = 300
 
 [[gate_leg]]
+tag = "leg.lexicon.lexicon-wiring"
+tests = ["feature.lexicon"]
 name = "lexicon wiring"
 subject = "repo"
+purpose = "verifies the repository's naming-lexicon declaration"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
 guard = []
 doc_reads = ["{memory_root}/builds/"]
 stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "wiring"
+ceiling = 330
 
 [[hole]]
 id = "lexicon-ratified"

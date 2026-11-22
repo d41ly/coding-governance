@@ -219,6 +219,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # MAP_PY is this kit's published override (named in its usage line below and in
 # WIRE-INTO-PROJECT.md), so it is the first candidate. Its old bare-`python` default was the
 # weakest of the three detectors: on a python3-only host it named a launcher that does not exist.
@@ -325,12 +343,34 @@ else
   "$PY" "$HERE/gen_map.py" --scaffold || exit 1
 fi
 
-# Seed the affordance grace list ONCE (seed-if-absent): a fresh scaffold gets `exempt = []`; a repo
-# re-adopting from a pre-affordance kit version gets its existing dossiers graced — green by
-# construction either way. NOT re-seeded when present: the list is shrink-only, so re-seeding a
-# repo with a real (non-exempt) violation would mask it.
-if [ ! -f "${MAP_ROOT:-memory/map}/affordance-exempt.toml" ]; then
-  "$PY" "$HERE/gen_map.py" --seed-affordance-baseline || exit 1
+# Seed the affordance grace list ONCE: a repo re-adopting from a pre-affordance kit version gets its
+# existing dossiers graced — green by construction. The list is a ledger population at
+# `affordance-exempt.txt` (TOOL-dWitnessedBar-16 S6), and a fresh scaffold with no section-less dossier
+# gets the factory's unarmed line: the seed prints `dead probe:`, the factory writes
+# `# unarmed · dead probe · <sha>` and exits 1, and that one `unarmed <home> dead probe` line is the
+# non-zero exit accepted here (§8 F18). WHAT THIS DOES NOT CHECK: an unarmed list is re-seeded by the
+# next adopt, which graces any section-less dossier added since.
+# NOT re-seeded when present: the list is shrink-only, so re-seeding a repo with a real (non-exempt)
+# violation would mask it. The absent-only test is the ledger factory's unregistered form
+# (TOOL-dWitnessedBar-15 S5), run from the memory-tree kit's copy, found through this kit's own
+# MEMORY_TREE_DIR: it seeds only an absent or unarmed home, atomically, and prints `present` otherwise.
+LL_DIR=$("$PY" -c 'import sys
+sys.path.insert(0, sys.argv[1])
+try:
+    import map_lib
+except Exception as exc:
+    sys.exit(str(exc))
+print(map_lib.MEMORY_TREE_DIR.as_posix())' "$HERE" 2>&1) || { echo "codebase-map: the memory-tree kit's legacy_ledger.py was not found: $LL_DIR"; exit 2; }
+[ -f "$LL_DIR/legacy_ledger.py" ] || { echo "codebase-map: no legacy_ledger.py in the memory-tree kit at $LL_DIR, so the affordance list cannot be seeded"; exit 2; }
+_aff=$("$PY" "$LL_DIR/legacy_ledger.py" seed --home "${MAP_ROOT:-memory/map}/affordance-exempt.txt" \
+  -- "$PY" "$HERE/gen_map.py" --seed-affordance-baseline --out '{out}'); _aff_rc=$?
+_aff=${_aff//$'\r'/}
+printf '%s\n' "$_aff"
+if [ "$_aff_rc" != 0 ]; then
+  case "${_aff##*$'\n'}" in
+    "unarmed "*"affordance-exempt.txt dead probe") ;;
+    *) echo "codebase-map: the affordance grace list was not seeded, and only a dead probe is admitted unarmed"; exit 1 ;;
+  esac
 fi
 
 GATE="${GATE_FILE:-tests/test_codebase_map.py}"

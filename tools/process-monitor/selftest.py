@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the process-monitor engine's arms.
 
-gov:kit process-monitor@0.24
+gov:kit process-monitor@0.25
 
 Two kinds of arm and the split is deliberate. PARSING arms run over captured fixtures, so they grade
 column contracts without a live table. LIVENESS arms run over a live read, because a property like
@@ -1132,6 +1132,100 @@ def test_sweep_logs_one_tree_killed_per_target_and_none_dry():
           (True, False, [["reap", "tree-killed", "target 1 killed 4 survivors 0 unsignalable 0"]]))
 
 
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
+
 def resolve_launcher():
     """The POSIX shell whose processes the census can enumerate, plus every candidate RUN.
 
@@ -1142,28 +1236,12 @@ def resolve_launcher():
     candidate's own answer is. This repo already records that lesson for its python launcher,
     which RUNS each candidate because a stub answers `command -v` and then exits 9009.
 
-    Returns `(launcher or None, candidates run)`. The second half is what the arm's skip names,
-    because a skip that cannot say what it looked for reads as coverage.
+    Returns `(launcher or None, candidates run)`, by the one `resolve_bash_py` block above, whose
+    `uname -s` test on a Windows host admits MINGW and MSYS. The second half is what the arm's skip
+    names, because a skip that cannot say what it looked for reads as coverage.
     """
-    candidates = ["bash", shutil.which("bash")]
-    git = shutil.which("git")
-    if git:
-        home = os.path.dirname(os.path.dirname(os.path.dirname(git)))
-        candidates += [os.path.join(home, "usr", "bin", "bash.exe"),
-                       os.path.join(home, "bin", "bash.exe")]
-    ran = []
-    for cand in candidates:
-        if not cand or cand in ran:
-            continue
-        ran.append(cand)
-        try:
-            answer = subprocess.run([cand, "-c", "uname -s"], capture_output=True,
-                                    text=True, timeout=30).stdout.strip()
-        except (OSError, subprocess.TimeoutExpired):
-            continue
-        if answer.startswith(("MINGW", "MSYS", "CYGWIN")):
-            return cand, ran
-    return None, ran
+    found, tried, _refusal = scan_bash()
+    return found or None, tried
 
 
 # How long the live-tree arm waits for its staged tree to appear whole in the census.

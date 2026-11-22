@@ -3,11 +3,52 @@
 Project-agnostic checks for classes that make a script misbehave **silently**.
 
 The kit declares its own gate legs in `kit.toml`: `shell hygiene (a loop fed by a command
-substitution)`, `shell hygiene (a location probe asked from a moved directory)` and
-`shell-hygiene selftest`. It declared NONE until
-`TOOL-aLeakedHandle-1`, and the PowerShell half below is still on no leg anywhere — see
-*What is still unwired*. Anything not declared there is the consuming project's to wire, and the
-two-line adoption step for that is documented here rather than left implicit.
+substitution)`, `shell hygiene (a location probe asked from a moved directory)`, `shell hygiene (a
+fork spent on builtin work)`, `shell hygiene (a fixed-name temp renamed into place)`,
+`shell-hygiene selftest`, `encoding posture (text IO names its encoding)`, `encoding posture (an
+entry point writes stdout as UTF-8)`, `encoding posture (JavaScript text IO names its encoding)`,
+`shell hygiene (a backslashed path handed to bash)`, `shell hygiene (a quoting hazard)`,
+`portability (shell lines only shrink)`, `portability (execution-sensitive files are LF by class)`
+and `powershell hygiene selftest`. It declared NONE until `TOOL-aLeakedHandle-1`. The PowerShell
+SCAN is still on no leg — see *What is still unwired*. Anything not declared there is the consuming
+project's to wire, and the two-line adoption step for that is documented here rather than left
+implicit.
+
+## The portability pack
+
+Every leg above carries `pack = "portability"`, and each scan an `enforces` naming the rule of the
+portable practice it grades, `practice.portable.<rule>` (TOOL-dWitnessedBar-24): a pack is a row
+value, so the scanners stay in this kit. The two selftests carry the pack and no rule. Two more pack legs are the home repository's own and do not ship: the interpreter floor's
+census and the bare-shell-name query, whose subjects are that repository's floor declaration and
+its resolver blocks. Each scan's adopter argv passes no registry, so a first run grades against an
+empty declaration and lists every site the tree carries; the ledger factory's `test.seed` seeds the
+adopter's population at the update, and under `retrofit.unseeded: unarmed` a failed seed reads
+unarmed rather than red.
+
+| Rule | Leg | Population |
+|---|---|---|
+| line endings | `portability (execution-sensitive files are LF by class)` | none |
+| encoding | the three `encoding posture` legs | `encoding-posture-sites`, `encoding-stdout-sites`, `encoding-js-sites` |
+| paths | the location-probe and backslashed-path legs | `location-probe-waivers`, `path-literal-sites` |
+| temp files | `shell hygiene (a fixed-name temp renamed into place)` | `temp-name-sites` |
+| quoting | `shell hygiene (a quoting hazard)` | `quoting-sites` |
+| launch | the loop-fed and fork-spent legs | `substitution-fed-loops`, `spawn-idiom-sites` |
+| language roles | `portability (shell lines only shrink)` | `shell-role` |
+
+## eol_class.py
+
+```bash
+python3 <tool-root>/gate-lint/eol_class.py [root]   # exit 0 every member pinned LF, 1 findings, 2 refusal
+python3 <tool-root>/gate-lint/eol_class.py --selftest
+```
+
+Grades the execution-sensitive class: every tracked `*.sh`, `*.py`, `*.js`, `*.json` and `*.toml`,
+and every extensionless tracked file whose index blob opens with `#!`. Each member's `git check-attr
+eol` must resolve `lf`, and its index column of `git ls-files --eol` must not read `crlf`. It reads
+the attribute and the index, never the worktree: a checkout under `core.autocrlf=true` writes CRLF
+into every file the attribute does not pin, so an LF worktree on one node proves nothing about the
+next. The remedy is one class line per extension in `.gitattributes`, `*.py text eol=lf` and its
+siblings. It carries no population.
 
 ## ps-hygiene.py
 
@@ -196,6 +237,32 @@ string. Admitted, so a miss: a mktemp temp in another directory, whose `mv` is a
 mode's one known false red: a name a function prints, which is not followed into the function; its
 remedy is a binder.
 
+### `--path-literals`, `--quoting` and `--shell-role` — the portability modes
+
+```bash
+python3 <tool-root>/gate-lint/sh_hygiene.py --path-literals [registry-path] [root] [pathspec ...]
+python3 <tool-root>/gate-lint/sh_hygiene.py --quoting [registry-path] [root] [pathspec ...]
+python3 <tool-root>/gate-lint/sh_hygiene.py --shell-role [ledger-path] [root] [pathspec ...]
+python3 <tool-root>/gate-lint/sh_hygiene.py <mode> --measure [root] [pathspec ...]
+```
+
+Each reads the code half of every tracked shell source, so a comment and a quoted heredoc's body are
+never a site. `--path-literals` counts a word holding a drive letter and a backslash (`C:\`),
+`backslash-path`: bash reads the backslash as an escape. `--quoting` counts a heredoc whose
+redirection target ends `.sh`, `.py` or `.js` (`heredoc-source`) and a `read` under the prefix
+`IFS=$'\t'` (`tab-ifs-read`), where a tab is IFS whitespace and an empty field collapses. Both key on
+(path, class) in a shrink-only registry. `--shell-role` holds each shell file's code lines, its lines
+neither blank nor a comment, on one `shrink-only` ledger row per file: a new file, a grown file and a
+row whose file is gone are red, and so is a file that shrank, `count fell`, until its row is lowered in
+the same commit, so shell outside a shim only shrinks, a trim cannot regrow unrecorded, and a shim
+earns its lines through the ledger factory's widen route. The rows a pass owes are DERIVED, never
+listed by unit: each shell file whose `--measure` count, after the pass's own edits, differs from its
+row or has none. Every grown or new key goes through one `ratchet.py widen shell-role --key <path> ...
+--unit <the pass's unit>` call, whose record names the derivation, and each owed row's count is then set
+to its measured count, a shrunk file's lowered to it. `--measure` prints the rows a seed writes and grades
+nothing. What they do not check: a path split across a continuation or built in a variable, a source
+written by `tee` or `printf`, and an IFS set on an earlier line.
+
 ### `--stage-commits` — a stage committed with no staged-diff test
 
 ```bash
@@ -278,8 +345,20 @@ the home repository's leg is its own, because its ceilings name that repository'
 
 ```bash
 python3 <tool-root>/gate-lint/encoding_posture.py [registry-path] [root] [pathspec ...]   # exit 0 clean, 1 findings, 2 refusal
+python3 <tool-root>/gate-lint/encoding_posture.py --stdout [registry-path] [root] [pathspec ...]
+python3 <tool-root>/gate-lint/encoding_posture.py --js [registry-path] [root] [pathspec ...]
+python3 <tool-root>/gate-lint/encoding_posture.py [--stdout | --js] --measure [root] [pathspec ...]
 python3 <tool-root>/gate-lint/encoding_posture.py --selftest
 ```
+
+`--stdout` grades a tracked `*.py` entry point, one holding a module-level `if __name__ ==
+"__main__":`, that calls `print` or writes `sys.stdout` and holds neither a `.reconfigure(...)`
+naming `encoding` nor a reference to `sys.stdout.buffer`: one site per file, keyed `<path>`
+`stdout`. `--js` grades a tracked `*.js` call to `readFileSync`, `writeFileSync`, `appendFileSync`,
+`spawnSync`, `execFileSync` or `execSync` whose argument list, read across lines with strings and
+comments masked, names neither `'utf8'`, `'utf-8'` nor an `encoding` key, keyed `<path>` `js-io`; a
+call through an alias is a miss. `--measure` prints each key's fields and its count, the rows a
+ledger seed writes, and grades nothing.
 
 Scans **every tracked** `*.py` under the root, narrowed by any pathspecs, for text IO that names no
 encoding: `open` / `.read_text` / `.write_text` / a provably-Path `.open` in text mode, and
@@ -293,8 +372,8 @@ The registry is the shell scanner's shape keyed on the ARM instead of the delimi
 `<path>\t<arm>\t<count>\t<why it is carried>`, where the arm is `file-io` or `subprocess`. Same
 optional argument, same both-directions set equality, same refusal of a supplied path that does
 not resolve. The clean line prints the graded file count, and a run over an empty population exits
-1 rather than reading as coverage. No leg ships for it: wiring it, and seeding a registry, is the
-consuming project's choice.
+1 rather than reading as coverage. Its three legs ship (TOOL-dWitnessedBar-24): each adopter argv
+names no registry, and the ledger factory seeds the adopter's populations at the update.
 
 ## Wiring it into a host project
 
@@ -311,10 +390,11 @@ can still fail after a refactor.
 
 ## What is still unwired
 
-`ps-hygiene.py` is on no leg, here or anywhere. That is deliberate and it is a gap rather than a
-decision: the kit's home repository has zero tracked `.ps1` files, and both scanners refuse an empty
-population, so a leg here would red on every run. Wiring it earns its place in a repo where
-PowerShell exists.
+The `ps-hygiene.py` SCAN is on no leg, here or anywhere; its `--selftest` is the `powershell
+hygiene selftest` leg, so its predicates run on every bar. That is deliberate: the kit's home
+repository has zero tracked `.ps1` files, and the scan refuses an empty population, so a scan leg
+here would red on every run. An adopter tracking `.ps1` adds the scan leg itself, as the next
+paragraph and *Wiring it into a host project* say.
 
 **Adoption is not automatic.** A repo with no tracked `.ps1` files gets the refusal and exit 2, not
 a green line; the scan only earns its place where PowerShell exists.

@@ -43,11 +43,11 @@ python <prefix>/playbook/core.py new preset <name> --from <preset>
 ```
 
 ## `kind.gate-leg`
-<!-- usage: kind:kind.gate-leg 1bc90e49 -->
+<!-- usage: kind:kind.gate-leg a899edef -->
 A gate leg: a row of the leg manifest the merge bar runs.
 
 ```text
-a row in <prefix>/gate-legs.json, its name, argv, chunk, subject and ceiling
+python <prefix>/playbook/core.py new gate-leg <name> --kit <id> --argv <json> --subject <kit|repo> --purpose <text> --enforces <tag>
 ```
 
 ## `kind.role`

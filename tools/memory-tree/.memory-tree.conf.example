@@ -191,16 +191,12 @@ REVIEW_VERDICT_CUTOFF=""
 # path from it. Usually AGENTS.md or CLAUDE.md.
 CHARTER="AGENTS.md"
 
-# --- corpus_ids.py (checks 13-15; check 16 is STRUCTURAL and behind no pin). Every number below
-# --- is MEASURED against YOUR corpus by
-# --- `python <kit>/corpus_ids.py --measure`, and NEVER inherited from another repo: a pin
-# --- copied from a larger tree is either vacuous or permanently red. Blank turns its check off.
-# --- Ship them blank, run --measure once the tree has content, and paste what it prints.
-# Orphan ids: cited but never defined. Shrink-only once set.
-ORPHAN_ID_PIN=""
-# Dead repo-path citations in the present-tense corpus. Measure 0 on a fresh tree and it becomes a
-# ratchet: the next unresolving citation reds until it is registered or repaired.
-DEAD_PATH_PIN=""
+# --- corpus_ids.py (checks 13-15; check 16 is STRUCTURAL and behind no setting). No key here arms
+# --- checks 13-15: their two waiver homes do, `$MEMORY_ROOT/project/id-orphan-waiver.txt` (orphan ids,
+# --- check 14) and `$MEMORY_ROOT/project/corpus-path-unresolved.txt` (dead repo-path citations, check
+# --- 15), each a ledger keyed by the offender it waives, and either arms check 13. Present, even
+# --- empty, is ON; absent is OFF. `python <kit>/corpus_ids.py --measure` prints the rows each home
+# --- would key, measured against YOUR corpus and NEVER inherited from another repo.
 # READ_PATH_CEILING and READ_PATH_HEADROOM were RETIRED in memory-tree 2.42. Check 16 no longer
 # sums the read path: check 6 already caps every member by class, so the sum was a second bound over
 # an already-bounded population, and across 27 movements it never once caused a trim. A conf that
@@ -319,21 +315,12 @@ RECALL_EXTRA_SOURCES=""
 # that already has gates.
 ARMS_FLOORS=""
 
-# Check 20 — ids duplicated INSIDE one row document. A POLICY refusal, not a measured-blank
-# pin: ship it with a value. `row_grammar.py --emit-pin` prints the measured count for a tree
-# that already has content.
-ROW_DUPLICATE_PIN="0"
-
-# Check 20's backlog-row ratchets: space-separated `<shard-path>:<count>` tokens, one per shard under
-# $MEMORY_ROOT/backlog/, each a shrink-only ceiling for that shard. A malformed token is a named
-# failure. BLANK = UNARMED: the shard is measured and NOT gated, and every green run prints one
-# NOT MEASURED line per shard per blank pin, so an unarmed ratchet says so. They ship blank because a
-# ceiling measured on another corpus is vacuous or permanently red here; `row_grammar.py --emit-pin`
-# prints both tokens measured against this tree.
-#   SEVERITY_UNLABELLED_PIN - live rows whose severity is not one of BLOCKER / HIGH / MED / LOW.
-#   LIVE_ROW_PIN            - live rows, OPEN / SPECCED / INPROGRESS / BLOCKED.
-SEVERITY_UNLABELLED_PIN=""
-LIVE_ROW_PIN=""
+# Check 20 — ids duplicated INSIDE one row document — reads no key here: the tolerated duplicates are
+# rows of `$MEMORY_ROOT/project/row-duplicates.txt`, keyed by shard and id, and an absent home tolerates
+# none. `python <kit>/legacy_ledger.py seed --population row-duplicates` seeds it from
+# `row_grammar.py --list-duplicates` for a tree that already has content. Each shard's live and
+# unranked rows are counted and announced NOT MEASURED on every green run: their populations,
+# `live-rows` and `severity-unlabelled`, are registered unseeded.
 
 # Check 27 — every decision row and gotcha ADDED since the mainline merge-base is ranked against the
 # records that existed there, with the index builder of this kit's id_grammar.py, and a top hit at or above
@@ -363,10 +350,10 @@ REFUSAL_CEILINGS=""
 
 # check-arms.py - its SECOND discovery signature. `graded` reads every tracked *.sh outside the
 # memory root for refusal sites, an `exit 1` or `status=1` that is not a `fail <n> "…"` call, and
-# grades each one: armed by its sibling suite, or pinned with a reason the gate prints. BLANK = off,
-# and off prints one line counting the sites it does not grade; any other value is refused. Ships
-# BLANK because turning it on reds every unarmed exit in your scripts. To adopt it, set it, run
-# `check-arms.py --emit-pin`, write each REASON-OWED row's reason, then re-run `--emit-floors`.
+# grades each one: armed by its sibling suite, or pinned, each waived site named on every run. BLANK
+# = off, and off prints one line counting the sites it does not grade; any other value is refused.
+# Ships BLANK because turning it on reds every unarmed exit in your scripts. To adopt it, set it, run
+# `check-arms.py --emit-pin`, write its measured rows into the pin ledger, then re-run `--emit-floors`.
 ARMS_REFUSALS=""
 
 # ACCEPTANCE_LEDGER_CUTOFF — the date from which a CLOSED Tier-2 spec owes an acceptance ledger: one

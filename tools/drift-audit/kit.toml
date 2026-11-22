@@ -94,12 +94,21 @@ probe = { must_exist = "{kit}/drift_signals.py" }
 means = "adopted"
 
 [[gate_leg]]
+tag = "leg.drift-audit.drift-audit-records"
 name = "drift-audit records"
 subject = "repo"
+purpose = "checks the repo's record of its state still matches reality"
 argv = ["python", "{kit}/drift_report.py", "--check"]
 guard = []
 history_depth = "full"
 stage = ["step.test"]
+
+[gate_leg.gov]
+reads = { base = "it compares records against its base ref (TOOL-aSparedSpawn-13 S3).", history = "it walks `git log` and `rev-list` from its base to HEAD (TOOL-aSparedSpawn-13 S3)." }
+signature = ["python", "{prefix}/drift-audit/drift_report.py", "--offenders"]
+guard = []
+chunk = "declarations"
+ceiling = 540
 
 [[hole]]
 id = "drift-product-globs"
@@ -130,7 +139,7 @@ id = "drift-pins"
 kind = "measurement"
 blocks_adopt = false
 blocks_gate = true
-why = "PINS ships empty and the reader defaults tolerance to 0, so an unmeasured pin set is indistinguishable from one measured at zero by any probe over the file. The probe below is weaker and differently scoped than the others, and that is stated rather than hidden."
+why = "The drift-pins population ships no row and the reader defaults tolerance to 0, so an unmeasured pin set is indistinguishable from one measured at zero by any probe over the file. The probe below is weaker and differently scoped than the others, and that is stated rather than hidden."
 discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
 
 # TOOL-aScouredKit-30. NO SIBLING PATH IN ANY ARGV HERE, and the reason is a constraint rather than
@@ -141,11 +150,18 @@ discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
 # the only shape that is self-consistent. The pointer is therefore still wrong in a deployed tree,
 # and the script now SAYS SO instead of being silent; the real fix is `TOOL-aScouredKit-26`.
 [[gate_leg]]
+tag = "leg.drift-audit.drift-audit-wiring"
 name = "drift-audit wiring"
 subject = "repo"
+purpose = "checks the drift-audit kit's wiring has not drifted"
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 guard = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "wiring"
+ceiling = 300
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
@@ -153,3 +169,46 @@ stage = ["step.test"]
 [[lf_pin]]
 pattern = ".claude/skills/drift-audit/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"
+
+# THE CONVERTED REGISTRIES (TOOL-dWitnessedBar-16): each list a check of this kit reads, converted in place
+# onto the ledger grammar, its direction the one its old header declared. Every seed is the conversion
+# program's `read-back`, which prints the home's own rows: no reader prints keyed rows of its own.
+# drift's own pins and baselines, its project layer's `PINS` and `BASELINES` dicts until this unit.
+
+[[ledger]]
+population = "drift-pins"
+leg = "drift-audit records"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "drift-pins"]
+key = "key"
+fields = ["signal"]
+drain = "key"
+direction = "ceiling"
+home = "memory/project/drift-pins.txt"
+
+[[ledger]]
+population = "drift-baselines"
+leg = "drift-audit records"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "drift-baselines"]
+key = "record"
+fields = ["signal", "id"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/drift-baselines.txt"
+
+# An adopter's own `PINS` and `BASELINES` dicts become its two files at its next update.
+
+[[upgrade]]
+id = "drift-audit/drift-pins-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/drift-pins.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/drift-pins.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/drift-pins.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+surfaces = ["file:memory/project/drift-pins.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "drift-audit/drift-baselines-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/drift-baselines.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/drift-baselines.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/drift-baselines.txt", "--from", "{prefix}/drift-audit/drift_signals.py"]
+surfaces = ["file:memory/project/drift-baselines.txt"]
+needs-target = false

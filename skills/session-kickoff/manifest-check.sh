@@ -60,7 +60,7 @@
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.38"   # gov:kit kickoff-manifest@1.38 — the registry id
+KIT_MANIFEST_VERSION="1.39"   # gov:kit kickoff-manifest@1.39 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -405,12 +405,15 @@ read_session_id() {
 # The session's Claude Code version, read from `AI_AGENT` by the unattended driver's rule, spelled again
 # here because this kit names no file of another: a `claude-code_` prefix, the field before the next
 # `_`, dashes as dots, two to four integers. ONE READER (KICK-dKeptSession-12 S1): the `cli —` cell and
-# the card-import fixture's verdict both ask it.
-read_session_cli_version() { # -> the version on stdout; 1 and nothing when AI_AGENT names none
-  local s=""
-  case "${AI_AGENT:-}" in claude-code_*) s=${AI_AGENT#claude-code_}; s=${s%%_*}; s=${s//-/.} ;; esac
-  [[ $s =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || return 1
-  printf '%s\n' "$s"
+# the card-import fixture's verdict both ask it. It assigns the variable its argument names by `printf
+# -v`, as `getval` does, so no caller forks a subshell to read it (KICK-dKeptSession-69 S8); that name
+# is never `_rv`, the one local here, which `printf -v` would write instead.
+read_session_cli_version() { # VAR -> VAR set to the version; 1 and VAR empty when AI_AGENT names none
+  local _rv=""
+  printf -v "$1" '%s' ''
+  case "${AI_AGENT:-}" in claude-code_*) _rv=${AI_AGENT#claude-code_}; _rv=${_rv%%_*}; _rv=${_rv//-/.} ;; esac
+  [[ $_rv =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || return 1
+  printf -v "$1" '%s' "$_rv"
 }
 
 # THE CARD-IMPORT FIXTURE'S VERDICT (KICK-dKeptSession-12 S1, S2): one line in the card directory,
@@ -436,7 +439,7 @@ write_card_fixture_verdict() { # scratch dir -> the line it wrote; 2 with nothin
     2) verdict=absent ;;
     *) verdict="red exit $rc" ;;
   esac
-  ver=$(read_session_cli_version) || ver=unknown
+  read_session_cli_version ver || ver=unknown
   printf -v at '%(%Y-%m-%dT%H:%M:%S%z)T' -1
   line="card-fixture — $verdict · fixture ${blob:0:8} · cli $ver · $at"
   { mkdir -p "$CARD_DIR" && printf '%s\n' "$line" > "$CARD_DIR/$CARD_FIXTURE_VERDICT"; } 2>/dev/null \
@@ -459,7 +462,7 @@ read_card_fixture_verdict() { # -> pass, or red: <why>; one line on stdout, 0 al
   [ "$v" = pass ] || { echo "red: $v"; return 0; }
   blob=$(git hash-object -- "$CARD_FIXTURE" 2>/dev/null); blob=${blob:-unhashed}
   [ "${blob:0:8}" = "$old8" ] || { echo "red: recorded for fixture $old8, now ${blob:0:8}"; return 0; }
-  ver=$(read_session_cli_version) || ver=unknown
+  read_session_cli_version ver || ver=unknown
   [ "$ver" = "$oldv" ] || { echo "red: recorded under cli $oldv, now $ver"; return 0; }
   echo pass
 }
@@ -595,7 +598,7 @@ derive_node_tag() {
 derive_cli_line() {
   local s="" p="" t sf rc c=0 i
   local -a toks a b
-  s=$(read_session_cli_version) || { printf 'cli — skipped: AI_AGENT names no Claude Code version\n'; return 0; }
+  read_session_cli_version s || { printf 'cli — skipped: AI_AGENT names no Claude Code version\n'; return 0; }
   command -v claude >/dev/null 2>&1 || { printf 'cli — skipped: no claude on PATH\n'; return 0; }
   sf="$CARD_DIR/.cli.$$"
   mkdir -p "$CARD_DIR" 2>/dev/null
@@ -1437,6 +1440,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
@@ -2789,6 +2810,8 @@ set +f; IFS=$_mb_ifs
 check_budget_breach() {
   if [ "$(read_budget_field "$1" 3)" = warn ]; then
     printf 'BUDGET WARN — %s · %s · %s %s over %s · %s\n' "$1" "$5" "$2" "$3" "$4" "$(read_budget_rule "$1")"
+    # The runner's marker on the next line (TOOL-dWitnessedBar-29 S2), so a passing bar shows it.
+    printf 'gate-warn\tsize\t%s\t%s · %s %s over %s\n' "${5//[$'\t\r\n']/ }" "$1" "$2" "$3" "$4"
     return 0
   fi
   [ -z "$MB_NOTE" ] || { echo "$MB_NOTE"; MB_NOTE=""; }

@@ -24,6 +24,8 @@ set -u
 case "$0" in */*) HERE=${0%/*} ;; *) HERE=. ;; esac
 # shellcheck source=/dev/null
 . "$HERE/resolve-python.sh"
+. "$HERE/refuse-wrong-shell.sh"
+refuse_wrong_shell || exit 2
 case "${1:-}:$#" in
   preflight:1)
     PY=$(resolve_python) || exit 1

@@ -3,6 +3,16 @@ the copies' check, and the floor step's down (TOOL-dSafePassage-11).
 
     python <prefix>/lib/python_floor.py check [--rev <sha>]    # every floor statement and copy finding
     python <prefix>/lib/python_floor.py down <prior> <target> [<to>, required outside gov]  # the step's down: grade, then restore
+    python <prefix>/lib/python_floor.py census       # the tree compiled by a real interpreter at the floor, and its feature census
+
+THE CENSUS (TOOL-dWitnessedBar-24 S10, practice.portable.interpreter-floor) finds an interpreter at
+exactly the declared floor through `resolve_floor_interpreter`, compiles every tracked `*.py` under it
+through `CHILD` in one process, and counts each feature of FLOOR_FEATURES by an AST scan: red on a
+file that does not compile at the floor, on a feature added after the floor and on one removed at or
+before it, one line per feature with its count. No interpreter at the floor is red, naming the floor
+and the install command, never a skip: a floor tested nowhere is the gap this verb closes. WHAT IT
+DOES NOT CHECK: a feature outside the declared table; a use reached through an alias or `getattr`;
+and an attribute read through a name bound by `from <module> import <name>` rather than the module.
 
 THE DECLARATION is `python-floor.txt` beside this file, one `<major>.<minor>` line. Every other
 spelling of the floor is one of two kinds. A GENERATED COPY is the resolver block's `_rp_floor`
@@ -187,6 +197,100 @@ for p in json.load(sys.stdin):
         m = re.search(r"line (\d+)", str(e))
         print("%s:%s: %s" % (p, m.group(1) if m else 0, str(e).splitlines()[0] if str(e) else type(e).__name__))
 """
+
+
+# The census's declared table: a module, or a `(module, attribute)` pair, and the version that bounds
+# it, from the feature census of the dClosedLoop chain's night-pass instruments. An `added` feature is red
+# above the floor; a `removed` one, or one whose `removal` is announced, is red at or below it.
+_PEP594 = ("aifc audioop cgi cgitb chunk crypt imghdr mailcap msilib nis nntplib ossaudiodev pipes sndhdr "
+           "spwd sunau telnetlib uu xdrlib").split()
+FLOOR_FEATURES = {
+    "tomllib": "added 3.11", "zoneinfo": "added 3.9", "graphlib": "added 3.9", "annotationlib": "added 3.14",
+    "compression": "added 3.14", "concurrent.interpreters": "added 3.14",
+    "distutils": "removed 3.12", "imp": "removed 3.12", "asynchat": "removed 3.12", "asyncore": "removed 3.12",
+    "smtpd": "removed 3.12", "lib2to3": "removed 3.13", **{m: "removed 3.13" for m in _PEP594},
+    ("datetime", "UTC"): "added 3.11", ("enum", "StrEnum"): "added 3.11", ("asyncio", "TaskGroup"): "added 3.11",
+    ("asyncio", "timeout"): "added 3.11", ("hashlib", "file_digest"): "added 3.11",
+    ("contextlib", "chdir"): "added 3.11", ("typing", "Self"): "added 3.11",
+    ("typing", "LiteralString"): "added 3.11", ("typing", "Never"): "added 3.11",
+    ("typing", "NotRequired"): "added 3.11", ("typing", "Required"): "added 3.11",
+    ("typing", "assert_never"): "added 3.11", ("typing", "override"): "added 3.12",
+    ("typing", "TypeAliasType"): "added 3.12", ("typing", "TypeIs"): "added 3.13",
+    ("typing", "ReadOnly"): "added 3.13", ("warnings", "deprecated"): "added 3.13",
+    ("copy", "replace"): "added 3.13", ("glob", "translate"): "added 3.13", ("itertools", "batched"): "added 3.12",
+    ("itertools", "pairwise"): "added 3.10", ("concurrent.futures", "InterpreterPoolExecutor"): "added 3.14",
+    ("sys", "_is_gil_enabled"): "added 3.13", ("locale", "getdefaultlocale"): "removal 3.15",
+    ("ast", "Num"): "removed 3.14", ("ast", "Str"): "removed 3.14", ("ast", "Bytes"): "removed 3.14",
+    ("ast", "NameConstant"): "removed 3.14", ("ast", "Ellipsis"): "removed 3.14",
+    ("pkgutil", "find_loader"): "removed 3.14", ("pkgutil", "get_loader"): "removed 3.14",
+    ("unittest", "makeSuite"): "removed 3.13", ("unittest", "findTestCases"): "removed 3.13",
+}
+
+
+def check_feature_red(label, floor):
+    """True where the feature's bound breaks the floor: added after it, or removed at or before it."""
+    kind, version = label.split()
+    bound = tuple(int(x) for x in version.split("."))
+    return bound > floor if kind == "added" else bound <= floor
+
+
+def read_feature_census(root, paths):
+    """`{feature: count}` over `paths` under `root`, every FLOOR_FEATURES key, by an AST scan run on
+    this interpreter; a file that does not parse here is skipped, since `CHILD` grades its compile."""
+    counts = dict.fromkeys(FLOOR_FEATURES, 0)
+    attrs = {key[1] for key in FLOOR_FEATURES if isinstance(key, tuple)}
+
+    def add(key):
+        if key in counts:
+            counts[key] += 1
+    for rel in paths:
+        try:
+            tree = ast.parse((pathlib.Path(root) / rel).read_bytes(), filename=rel)
+        except (SyntaxError, ValueError, OSError):
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    parts = alias.name.split(".")
+                    for k in range(1, len(parts) + 1):
+                        add(".".join(parts[:k]))
+            elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
+                add(node.module)
+                for alias in node.names:
+                    add((node.module, alias.name))
+                    add(f"{node.module}.{alias.name}")
+            elif isinstance(node, ast.Attribute) and node.attr in attrs:
+                add((ast.unparse(node.value), node.attr))
+    return counts
+
+
+def run_census(root):
+    """The census verb: (exit status, lines). 1 where no interpreter at the floor resolves, a file does
+    not compile under it, or a feature breaks the floor; 0 otherwise."""
+    major, minor = read_floor(root)
+    version = f"{major}.{minor}"
+    interp = resolve_floor_interpreter(version)
+    if interp is None:
+        return 1, [f"python-floor census: no interpreter at the floor {version} resolves here, so nothing "
+                   f"was compiled at it; install one: uv python install {version}"]
+    paths = [p for p in run_git(root, "ls-files", "-z", "--", "*.py").split("\0") if p]
+    if not paths:
+        return 1, ["python-floor census: no tracked *.py, so nothing was graded — an empty population is no pass"]
+    p = subprocess.run([interp, "-I", "-c", CHILD], input=json.dumps(paths), cwd=str(root),
+                       capture_output=True, encoding="utf-8", errors="replace", timeout=600)
+    if p.returncode != 0:
+        return 1, [f"python-floor census: the child at {version} exited {p.returncode}: {p.stderr.strip()[:400]}"]
+    lines = [f"python-floor census: {f} does not compile at the floor {version}" for f in p.stdout.splitlines() if f]
+    red = len(lines)
+    for key, count in read_feature_census(root, paths).items():
+        label = FLOOR_FEATURES[key]
+        name = key if isinstance(key, str) else ".".join(key)
+        breaks = count and check_feature_red(label, (major, minor))
+        red += bool(breaks)
+        lines.append(f"python-floor census: {name} · {label} · {count}" + (f" · RED at the floor {version}" if breaks else ""))
+    lines.append(f"python-floor census: {len(paths)} tracked *.py compiled by {interp} at {version}, "
+                 f"{len(FLOOR_FEATURES)} features counted, {red} finding(s)")
+    return (1 if red else 0), lines
 
 
 def _scan_pep701(data):
@@ -409,6 +513,15 @@ def main(argv):
         for path, line, text in found:
             print(f"{path}:{line}: {text}")
         return 1 if found else 0
+    if argv == ["census"]:
+        root = run_git(".", "rev-parse", "--show-toplevel").strip() or "."
+        try:
+            rc, lines = run_census(root)
+        except ValueError as exc:
+            print(f"python-floor census: {exc}", file=sys.stderr)
+            return 2
+        print("\n".join(lines))
+        return rc
     if argv[:1] == ["down"] and len(argv) in (3, 4):
         prior, target = argv[1], pathlib.Path(argv[2])
         # TOOL-dSafePassage-35 S22: <to> defaults to the target's HEAD, so the down always grades

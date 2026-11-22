@@ -5,6 +5,7 @@
     python <prefix>/run-gates/measure_legs.py --concurrent                  # admitted under a live load cap
     python <prefix>/run-gates/measure_legs.py --serial --legs <path> --out <root>
     python <prefix>/run-gates/measure_legs.py --selftest                    # its arms, over its own fixtures
+    python <prefix>/run-gates/measure_legs.py --bare-bash <root>            # each bare bash launch; exit 1 on any
 
 TOOL-dRedressedBar-18. The bar's profile had to be rebuilt from scratch files the runner erases. It
 came from a run with a knob in its environment, saw nothing inside a leg, and called the bar
@@ -1647,6 +1648,8 @@ def parse_flags(argv):
     mode.add_argument("--concurrent", action="store_true",
                       help="admit the next leg only at or under %d%% CPU and %d%% memory" % (CPU_CAP_PCT, MEM_CAP_PCT))
     mode.add_argument("--selftest", action="store_true", help="run this tool's arms over its own fixtures")
+    mode.add_argument("--bare-bash", metavar="ROOT", default=None,
+                      help="print each bare `bash` launch in ROOT's tracked *.py and *.js; exit 1 on any")
     ap.add_argument("--legs", default="", help="a leg manifest (default: the manifest beside this kit dir)")
     ap.add_argument("--out", default="", help="the record root (default: <git-dir>/gate-profile)")
     ap.add_argument("--census-every", type=float, default=CENSUS_EVERY_DEFAULT_S, help="seconds, 1 to 3600")
@@ -1663,8 +1666,23 @@ def parse_flags(argv):
         raise ProfileRefused("--stall-window %g is outside %g to 86400" % (opts.stall_window, 2 * opts.census_every))
     if not 0 < opts.stall_cpu <= 3600:
         raise ProfileRefused("--stall-cpu %g is outside (0, 3600]" % opts.stall_cpu)
-    opts.mode = "serial" if opts.serial else "concurrent" if opts.concurrent else "selftest"
+    opts.mode = ("serial" if opts.serial else "concurrent" if opts.concurrent
+                 else "bare-bash" if opts.bare_bash is not None else "selftest")
     return opts
+
+
+def run_bare_bash(root):
+    """`--bare-bash <root>` (TOOL-dWitnessedBar-24 S9): `scan_bare_bash` over the tracked *.py and *.js
+    at `root`, every hit printed, and 1 on any, an unread language included; 0 with one count line."""
+    hits = scan_bare_bash(root)
+    for hit in hits:
+        print(hit)
+    if hits:
+        print("measure-legs: %d bare bash launch(es) or unread population(s) at %s — launch through the "
+              "resolver block, `resolve_bash_py` or `resolve_bash_js`" % (len(hits), root))
+        return 1
+    print("measure-legs: no bare bash launch in the tracked *.py and *.js at %s" % root)
+    return 0
 
 
 def derive_kit_rel(top):
@@ -2019,6 +2037,8 @@ def main(argv=None):
         return 2
     if opts.mode == "selftest":
         return cmd_selftest()
+    if opts.mode == "bare-bash":
+        return run_bare_bash(opts.bare_bash)
     return run_profile(opts)
 
 
@@ -2679,27 +2699,139 @@ def test_redact_parity(_tmp):
               got == port and got.count(b"://***:***@") >= 5, repr((got, port))[:600])
 
 
-def test_no_bare_bash_argv(tmp):
-    """AC34. An `ast` scan of this file finds no subprocess call whose argv opens with the literal
-    'bash', so every bash this tool starts is the one `resolve_bash` found; and an empty resolve
-    refuses with exit 2 before any leg, naming each candidate. Red when one call spells `["bash", …]`."""
-    with open(os.path.abspath(__file__), encoding="utf-8") as fh:
-        tree = ast.parse(fh.read())
-    calls, bare = 0, []
-    for n in ast.walk(tree):
-        f = n.func if isinstance(n, ast.Call) else None
-        if not (isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name) and f.value.id == "subprocess"
-                and n.args):
+def scan_bare_bash(root):
+    """`<path>:<line>: <shape>` for every tracked `*.py` and `*.js` line at `root`, outside a
+    `resolve_bash_py` or `resolve_bash_js` block, that launches the bare name `bash` or falls back to it
+    (TOOL-dWitnessedBar-26 §4 "The query"). Python is read by `ast`: shape 1, a call whose first
+    argument is a list or tuple literal opening with `bash` or `bash.exe` (`resolve_shell_argv`, which
+    refuses, aside), or an `or` whose last operand is that name; shape 2, a list or tuple literal holding
+    the name `bash` beside another bash candidate, a constant ending `bash.exe`, the constant `/bin/bash`
+    or a call reading `GOV_BASH` (TOOL-dWitnessedBar-48 S2), the candidate list the block alone may
+    spell; a literal that is the right operand of an `in` or `not in` is a membership test and spawns
+    nothing, so shape 2 skips it (S3). JavaScript is read by a regex: shape 3, `spawn`,
+    `spawnSync`, `execFile` or `execFileSync` with that name first, or an `||` or `??` falling back to it.
+    Shape 4 is a PATH lookup of the name, which walks PATH with no launcher filter (TOOL-dWitnessedBar-49
+    S1): in Python a `shutil.which` call whose first argument is the constant `bash` or `bash.exe`, or
+    is not a constant and sits inside an expression comparing that same argument to one of those names
+    (TOOL-dWitnessedBar-57 S5), in JavaScript a `which(` call with that string or an `execSync` or
+    `execFileSync` running `where bash` or `which bash`.
+    A language with no tracked file read is a line too, and so is a `*.py` `ast` cannot parse, so an
+    empty or unread population is never a pass.
+    WHAT THIS DOES NOT SEE: a PATH lookup of `bash` through a variable no comparison in its own
+    expression names as `bash`, a conditional whose `else` is `"bash"`, and a name bound to `"bash"`
+    and launched later."""
+    names = profile_bar.BASH_NAMES
+    # Shape 2's constants are derived from BASH_NAMES or compared alone, never spelled in one literal
+    # beside the name, because such a literal in this file is its own shape 2 hit.
+    bare, exe = min(names, key=len), max(names, key=len)
+    js_rx = re.compile(r"""\b(?:spawn|spawnSync|execFile|execFileSync)\(\s*(['"`])bash(?:\.exe)?\1"""
+                       r"""|(?:\|\||\?\?)\s*(['"`])bash(?:\.exe)?\2""")
+    js4_rx = re.compile(r"""\bwhich\(\s*['"]bash(?:\.exe)?['"]|exec(?:File)?Sync\(\s*['"](?:where|which) bash""")
+    listed = subprocess.run(["git", "ls-files", "-z", "--", "*.py", "*.js"], cwd=root, capture_output=True,
+                            timeout=60).stdout.decode("utf-8", "replace")
+    hits, read = [], {".py": 0, ".js": 0}
+    for rel in sorted(p for p in listed.split("\0") if p):
+        try:
+            with open(os.path.join(root, rel), encoding="utf-8-sig", errors="replace") as fh:
+                lines = fh.read().split("\n")
+        except OSError:
             continue
-        calls += 1
-        a0 = n.args[0]
-        while isinstance(a0, ast.BinOp):
-            a0 = a0.left
-        if isinstance(a0, (ast.List, ast.Tuple)) and a0.elts and isinstance(a0.elts[0], ast.Constant) \
-                and a0.elts[0].value == "bash":
-            bare.append(n.lineno)
-    check_arm("AC34 no subprocess argv opens with a bare 'bash'", calls >= 3 and not bare,
-              "%d subprocess call(s) read, bare at %s" % (calls, bare))
+        ext = os.path.splitext(rel)[1]
+        read[ext] += 1
+        marker = "# " if ext == ".py" else "// "
+        stem = "resolve_bash_py" if ext == ".py" else "resolve_bash_js"
+        outside, inside = set(), False
+        for i, ln in enumerate(lines, 1):
+            if ln.startswith(marker + ">>> " + stem):
+                inside = True
+            if not inside:
+                outside.add(i)
+            if ln.startswith(marker + "<<< " + stem):
+                inside = False
+        if ext == ".js":
+            for i, ln in enumerate(lines, 1):
+                shape = "shape 3" if js_rx.search(ln) else "shape 4" if js4_rx.search(ln) else ""
+                if shape and i in outside:
+                    hits.append("%s:%d: %s" % (rel, i, shape))
+            continue
+        src = "\n".join(lines)
+        try:
+            tree = ast.parse(src)
+        except (SyntaxError, ValueError) as exc:
+            hits.append("%s: not read, %s" % (rel, exc))
+            continue
+        tested = {id(c) for n in ast.walk(tree) if isinstance(n, ast.Compare)
+                  for op, c in zip(n.ops, n.comparators) if isinstance(op, (ast.In, ast.NotIn))}
+        parent = {id(c): n for n in ast.walk(tree) for c in ast.iter_child_nodes(n)}
+
+        def check_compared_bash(call):
+            """True when `call`'s first argument, not a constant, is compared to a bash name inside the
+            outermost expression holding `call` (TOOL-dWitnessedBar-57 S5)."""
+            arg, top = ast.dump(call.args[0]), call
+            while isinstance(parent.get(id(top)), ast.expr):
+                top = parent[id(top)]
+            for c in ast.walk(top):
+                if isinstance(c, ast.Compare):
+                    sides = [c.left, *c.comparators]
+                    if any(ast.dump(s) == arg for s in sides) and any(
+                            isinstance(s, ast.Constant) and s.value in names for s in sides):
+                        return True
+            return False
+
+        def check_other_bash(e):
+            if isinstance(e, ast.Constant) and isinstance(e.value, str):
+                return e.value.endswith(exe) or e.value == "/bin/bash"
+            return isinstance(e, ast.Call) and "GOV_BASH" in (ast.get_source_segment(src, e) or "")
+        for n in ast.walk(tree):
+            shape = ""
+            if isinstance(n, ast.Call) and n.args:
+                a0, f = n.args[0], n.func
+                while isinstance(a0, ast.BinOp):
+                    a0 = a0.left
+                fname = f.id if isinstance(f, ast.Name) else f.attr if isinstance(f, ast.Attribute) else ""
+                if isinstance(a0, (ast.List, ast.Tuple)) and a0.elts and isinstance(a0.elts[0], ast.Constant) \
+                        and a0.elts[0].value in names and fname != "resolve_shell_argv":
+                    shape = "shape 1"
+                elif fname == "which" and isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name) \
+                        and f.value.id == "shutil" and (n.args[0].value in names if isinstance(n.args[0], ast.Constant)
+                                                        else check_compared_bash(n)):
+                    shape = "shape 4"
+            elif isinstance(n, ast.BoolOp) and isinstance(n.op, ast.Or) and isinstance(n.values[-1], ast.Constant) \
+                    and n.values[-1].value in names:
+                shape = "shape 1"
+            elif isinstance(n, (ast.List, ast.Tuple)) and id(n) not in tested \
+                    and any(isinstance(e, ast.Constant) and e.value == bare for e in n.elts) \
+                    and any(check_other_bash(e) for e in n.elts):
+                shape = "shape 2"
+            if shape and n.lineno in outside:
+                hits.append("%s:%d: %s" % (rel, n.lineno, shape))
+    hits += ["no tracked *%s file was read at %s" % (ext, root) for ext, k in read.items() if not k]
+    return hits
+
+
+def test_no_bare_bash_argv(tmp):
+    """AC34, widened by TOOL-dWitnessedBar-26 S6. `scan_bare_bash` over every tracked `*.py` and `*.js`
+    of this repository finds no launch of, and no fall-back to, the bare name `bash`, and read both
+    languages, so every bash a gov file starts is one a resolver found; and an empty resolve refuses
+    with exit 2 before any leg, naming each candidate. Red when one tracked file spells `["bash", …]`,
+    `… or "bash"`, the PATH loop outside the block, or `spawnSync('bash', …)`."""
+    top = profile_bar.run_git(["rev-parse", "--show-toplevel"], cwd=KITDIR)
+    hits = scan_bare_bash(top) if top else ["no repository at %s" % KITDIR]
+    check_arm("AC34 no tracked *.py or *.js launches or falls back to a bare 'bash'", not hits,
+              "; ".join(hits[:20]))
+    # TOOL-dWitnessedBar-57 AC4: a `shutil.which` of a variable its own expression compares to "bash"
+    # is shape 4, and one no comparison names is not. RED against shape 4 matching constants alone.
+    fx = tempfile.mkdtemp(prefix="bb.", dir=tmp)
+    fx_name = "x.py"  # the planted file, named once
+    with open(os.path.join(fx, fx_name), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write('x = (B if a == "bash" else "") or shutil.which(a)\ny = shutil.which(b)\n')
+    with open(os.path.join(fx, "y.js"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("const y = 1;\n")
+    for argv in (["init", "-q"], ["add", "-A"]):
+        subprocess.run(["git", *argv], cwd=fx, capture_output=True, timeout=60)
+    got = scan_bare_bash(fx)
+    check_arm("57 AC4 a shutil.which of a variable compared to 'bash' in its expression is shape 4",
+              got == [fx_name + ":1: shape 4"], repr(got))
     out = tempfile.mkdtemp(prefix="out.", dir=tmp)
     real = profile_bar.resolve_bash
     profile_bar.resolve_bash = lambda *_a, **_k: ("", ["cand-a", "cand-b"])

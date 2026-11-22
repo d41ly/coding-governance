@@ -60,6 +60,12 @@ NODE_KEYS = ("GATE_WSL_DISTRO", "GATE_WSL_MIRROR")
 STAMP_FILE = "held-green"
 PARITY_FILE = "held-parity"
 HOSTS = ("windows", "wsl")
+# THE DECLARATIVE LEG KEYS (TOOL-dWitnessedBar-51 S36, S48): the manifest keys that change neither what a
+# leg runs nor how it is judged. The runner's row hash is taken over a row LESS these keys, so adding or
+# rewording one neither releases a reuse quarantine nor re-earns a held record, and `verdict_flow.py`'s
+# quarantine release reads a row as changed only where a key outside them moved. The runner's embedded
+# manifest reader imports this tuple from this file, its sibling, as `measure_legs.py` imports the reader.
+DECLARATIVE_LEG_KEYS = ("tag", "purpose", "tests", "enforces", "level", "precommit", "pack")
 # The runner's exit precedence: first match wins (`run-gates.sh` header).
 EXIT_OF = {"REFUSED": 2, "RED": 1, "HOST": 4, "TREE MOVED": 3, "GREEN": 0}
 PRECEDENCE = (2, 1, 4, 3, 0)
@@ -73,9 +79,15 @@ def print_refusal(msg):
     raise SystemExit(2)
 
 
+# >>> hold_predicate -- canonical copy: held_halves.py in the gov run-gates kit (byte-identical; gated)
 def test_held(leg):
-    """The runner's hold predicate, one statement of it."""
+    """The runner's kit hold, one statement of it: a manifest row whose `subject` is `kit` or whose
+    `chunk` is `selftests`, the `kit` source of `run-gates.sh#derive_hold_source`. A `quarantine` or
+    `level` hold is a selection row, never a manifest key, so no reader of one row can see it. The
+    drift-audit kit carries this block inline, and `resolve-python.test.sh`'s parity table reds a copy
+    that drifts (TOOL-dWitnessedBar-51 S21)."""
     return leg.get("subject") == "kit" or leg.get("chunk") == "selftests"
+# <<< hold_predicate
 
 
 def load_manifest(path, refuse=print_refusal):

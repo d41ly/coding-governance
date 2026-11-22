@@ -275,35 +275,60 @@ means = "render-failed-half-stamped"
 # `doc_reads` names, so a change that moves only those records leaves it held: run it with the
 # variable at 1, or through `--checks`, after such a change.
 [[gate_leg]]
+tag = "leg.unattended.unattended-kit-gate"
+tests = ["feature.unattended"]
 name = "unattended kit gate"
 subject = "kit"
+purpose = "grades the repository against the unattended-run kit"
 argv = ["bash", "{kit}/check-unattended.sh"]
+unguarded_why = "it grades run-state records, guides and the remote, which no path guard bounds, so it runs whole whenever GATE_SELFTESTS asks"
 reads = { remote = "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`." }
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/guides/", "{memory_root}/archive/"]
 red_after_land = true
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 16040
+
 # the playbook validity leg. No guard: it grades an adopter's playbooks and
 # the kit's own fixture, so a guard scoped to this kit dir would skip it on exactly the commits that
 # change a playbook.
 [[gate_leg]]
+tag = "leg.unattended.playbook-validity-gate"
+tests = ["feature.playbook-mode"]
 name = "playbook validity gate"
 subject = "repo"
+purpose = "grades the validity of every playbook and the kit fixture"
 argv = ["bash", "{kit}/check-playbook.sh"]
 guard = []
 red_after_land = true
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 4940
+
 [[gate_leg]]
+tag = "leg.unattended.pass-order-history"
+tests = ["feature.unattended"]
 name = "pass-order history"
 subject = "repo"
+purpose = "refuses a unit built before it was specced"
 argv = ["bash", "{kit}/check-pass-order.sh"]
 reads = { remote = "its verdict is a function of the REMOTE as well as of the tree: it runs one bounded `ls-remote` to learn the tip the remote advertises and grades only the commits HEAD carries past it (TOOL-dUnstuckLanding-17), so a verdict cached before the remote moved must not be reused." }
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
 stage = ["step.test"]
+enforces = ["practice.spec"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 5400
 
 # the brief-recorded leg. No guard, for `pass-order history`'s reason: its subject is the
 # REPOSITORY's run-state records, so it goes stale with nobody editing this kit, and a guard scoped
@@ -313,8 +338,11 @@ stage = ["step.test"]
 # measured cost already sits at 73% of it: when the graded population catches up, that ceiling is the
 # next thing to red, and re-declaring it with a reason is the right answer then rather than now.
 [[gate_leg]]
+tag = "leg.unattended.brief-recorded"
+tests = ["feature.unattended"]
 name = "brief-recorded"
 subject = "repo"
+purpose = "refuses a closed unit whose build commit records no brief"
 argv = ["bash", "{kit}/check-brief-recorded.sh"]
 reads = { remote = "its verdict is a function of the REMOTE as well as of the tree: it runs one bounded `ls-remote` to learn the tip the remote advertises and grades only the commits HEAD carries past it (TOOL-dUnstuckLanding-17), so a verdict cached before the remote moved must not be reused." }
 guard = []
@@ -322,13 +350,27 @@ doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
 stage = ["step.test"]
 
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 900
+
 [[gate_leg]]
+tag = "leg.unattended.unattended-skill-wiring"
+tests = ["feature.unattended"]
 name = "unattended skill wiring"
 subject = "repo"
+purpose = "verifies the unattended Skill still matches kit and conf"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
+precommit = ["bash", "{kit}/adopt-unattended.sh", "--check"]
 guard = []
 red_after_land = true
 stage = ["step.build", "step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+guard = []
+chunk = "wiring"
+ceiling = 300
 
 # the structural group linter's self-test (TOOL-aBatchedArm-2). A KIT leg, held off the automatic
 # bar like every `subject = kit` row. This kit declares NO self-test as a leg: the arms-groups
@@ -458,3 +500,26 @@ down = ["python", "{gov}/govkit/steps/review_rounds.py", "down", "{target}"]
 witness = ["python", "{gov}/govkit/steps/review_rounds.py", "witness", "{target}"]
 surfaces = ["conf-key:.unattended.conf#REVIEW_ROUNDS"]
 needs-target = false
+
+# THE CONVERTED REGISTRIES (TOOL-dWitnessedBar-16): each list a check of this kit reads, converted in place
+# onto the ledger grammar, its direction the one its old header declared. Every seed is the conversion
+# program's `read-back`, which prints the home's own rows: no reader prints keyed rows of its own.
+[[ledger]]
+population = "brief-recorded-waiver"
+leg = "brief-recorded"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "brief-recorded-waiver"]
+key = "record"
+fields = ["unit"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/brief-recorded-waiver.txt"
+
+[[ledger]]
+population = "pass-order-waiver"
+leg = "pass-order history"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "pass-order-waiver"]
+key = "record"
+fields = ["unit"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/pass-order-waiver.txt"

@@ -370,12 +370,11 @@ migrates your corpus, so it takes a spec, a signed record and one switch-over co
    `python <kit>/gen_build_index.py --check` refuses one, and reword any file outside `<MEMORY_ROOT>`
    that names a deleted archive, which a dead-path gate reads from git history. Then set
    `BACKLOG_MODE="builds"` and the `ASK_CUTOFF` the writer prints, add the `BACKLOG.md` attribute
-   from §3 step 4, and run `python <kit>/gen_build_index.py --write`. Two conf values measured on the
-   shards go stale in the same commit, and the hygiene gate reds on each: re-derive
-   `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN`, if you declared them, with
-   `python <kit>/row_grammar.py --emit-pin` over the rendered views, which count 0; and delete any
-   `curation-debt.txt` row naming a backlog shard, because the view leaves the size checks and the
-   row then hides nothing. Add a gate leg of your own running `python <kit>/merge-rows.py --check`;
+   from §3 step 4, and run `python <kit>/gen_build_index.py --write`. Delete any
+   `curation-debt.txt` row naming a backlog shard in the same commit, because the view leaves the
+   size checks and the row then hides nothing, and the hygiene gate reds on it. The shards' live and
+   unranked rows are counted as the `live-rows` and `severity-unlabelled` populations, registered
+   unseeded, so nothing measured on the shards needs re-deriving. Add a gate leg of your own running `python <kit>/merge-rows.py --check`;
    this repo calls it `row-driver view refusal`, and no kit ships it. Commit when both `--check` runs
    and the hygiene gate exit 0.
 5. **Tell stragglers what to do.** The recipe a pre-switch branch follows is what
@@ -413,9 +412,10 @@ repo measured those for its three known adopters in section 10 of
 
 **An untouched tree with records reds on the first run, and that is the design.** Hygiene check 21
 requires every file under `<MEMORY_ROOT>/builds/*/{build,prompts,reviews}/` to name, in its own head,
-the spec ids it is evidence about. Branch 1 names every record carrying no such line. No value of
-`RECORD_UNBOUND_PIN` makes that green: the pin bounds the deliberate `none` escape, and a record
-nobody has annotated is a different state from one someone declared unbindable.
+the spec ids it is evidence about. Branch 1 names every record carrying no such line. No row of
+`<MEMORY_ROOT>/project/unbound-records.txt` makes that green: the population keys the deliberate
+`none` escape, and a record nobody has annotated is a different state from one someone declared
+unbindable.
 
 This section applies to an EXISTING adopter as much as a new one — `adopt-memory-tree.sh` exits early
 on an already-adopted tree, so a rule added after your adoption reaches you here and nowhere else.
@@ -425,20 +425,20 @@ on an already-adopted tree, so a rule added after your adoption reaches you here
 2. **One mechanical pass.** Give each `**Serves:** none — <why>`. This needs no judgement about what
    any document was about, which is what makes it mechanical rather than a retrofit, and it is not a
    cutoff: nothing is exempted by date and every record stays visible and countable.
-3. **Then measure.** Set `RECORD_UNBOUND_PIN` to the GRADED count check 21 prints on every run,
-   `graded <g> of N <n>`: the `none` records `RECORD_SERVES_CUTOFF` and `legacy-files.txt` leave,
-   which is `N` when you declare neither. Measured against YOUR corpus — a number copied from
-   another repo is either vacuous or permanently red, and a pin above the graded count is slack,
-   which check 21 reds.
+3. **Then seed.** `python <kit>/legacy_ledger.py seed --population unbound-records` writes one row
+   per GRADED record check 21 counts on every run, `grades <g> of N <n>`: the `none` records
+   `RECORD_SERVES_CUTOFF` and `legacy-files.txt` leave, which is all `N` when you declare neither.
+   Seeded from YOUR corpus — rows copied from another repo are either vacuous or permanently red,
+   and a row no graded record matches is stale, which check 21 reds.
 4. **Drain it.** As you bind records for real, replace `none` with
    `**Serves:** <kind> <id> [<id>…]`, `<kind>` from the closed list in `<MEMORY_ROOT>/HYGIENE.md`,
    "Record bindings".
-   The pin is shrink-only, so the ratchet points down from wherever you started.
+   The population is shrink-only, so each record you bind takes its row with it.
 
 Worked example, measured on this repo at kit 2.19: 78 records, of which 72 bound and 6 carry `none`
 with a reason — a build that predates the spec-format ratchet and holds no spec at all, two design
 passes their READMEs grade as rejected or preceding, two commissioning censuses, and one build's own
-design-pass record. That six is the pin, and it falls when those builds gain specs a record can name.
+design-pass record. Those six were the rows, and each leaves when its build gains a spec it can name.
 
 Renaming records so the FILENAME also names its spec is optional and separate. This repo did it; the
 grammar does not change to allow it, because the ordinal is redefined rather than widened. If you do
@@ -557,7 +557,7 @@ or self-prune rule from your kickoff manifest (§4) and from the charter you ren
    project's inventories — this is the real work; follow `<kit>/INVENTORY-DERIVATION.md`
    (prefer registry imports; fail-closed helpers; full extension sets; POSIX keys).
 4. `<kit>/adopt-codebase-map.sh --scaffold` — scaffolds the map tree, seeds the shrink-only
-   baseline from live inventories AND the shrink-only `affordance-exempt.toml` from existing
+   baseline from live inventories AND the shrink-only `affordance-exempt.txt` from existing
    dossiers (so the graced `## Reuse affordance` check never retro-reds the fleet), installs the
    gate at GATE_FILE and runs it once (green on a fresh seed, by construction). `MAP_PY` overrides
    the launcher; unset, the kit RUNS each candidate (`python3`, `python`, `py`) and takes the first
@@ -569,7 +569,7 @@ or self-prune rule from your kickoff manifest (§4) and from the charter you ren
    wire through; list any layer with no symbol extractor in `.codebase-map.conf` `RECALL_DARK_LAYERS`
    so the lookup flags the gap instead of a falsely-confident "no seam fits".
    **DoD (at review):** run `python <kit>/map_diff.py <base>..<head> --drop-affordance-exempt`
-   — touching a graced feature's files drops its `affordance-exempt.toml` grace mechanically, so the
+   — touching a graced feature's files drops its `affordance-exempt.txt` grace mechanically, so the
    gate then demands its `## Reuse affordance` block (no human remembering).
    To converge the active surface up front, `python <kit>/gen_map.py --seed-affordances --top
    <N>` lists the N highest-fan-in seams no dossier yet declares as the backfill worklist.
@@ -1400,7 +1400,7 @@ it.
 
 - Codebase-map (only if §3b adopted): the `codebase-map` kit dir at whatever prefix you chose +
   project-owned `<kit>/map_extractors.py` · `.codebase-map.conf` at the ROOT · the gate at GATE_FILE ·
-  `<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, affordance-exempt.toml, features/, generated/).
+  `<MAP_ROOT>/` (FOUNDATION.md, baseline.txt, affordance-exempt.txt, features/, generated/).
 - Memory-recall (only if §3c adopted): `memory-recall/` kit dir + the generated
   `.claude/skills/memory-recall/SKILL.md` (+ the kit's own `recall-opened.js`, `<prefix>/settings-merge.py`
   and the settings block only if the step-4 opt-in was taken). The index and query log live under the
@@ -2177,7 +2177,7 @@ a `{kit}` token and both the writer and the checker expand it against the fragme
   `<kit>/map_extractors.py` or `.codebase-map.conf`.
   When an overwrite first introduces the graced `## Reuse affordance` check, run
   `python <kit>/gen_map.py --seed-affordance-baseline` ONCE (or re-run the adopter) and
-  commit `<MAP_ROOT>/affordance-exempt.toml` in the same landing — that seed graces the existing
+  commit `<MAP_ROOT>/affordance-exempt.txt` in the same landing — that seed graces the existing
   dossiers so the new check does not retro-red them (it is a no-op once the file is present).
   Any overwrite that moves `KIT_CODEBASE_MAP_VERSION` also owes one `python <kit>/gen_map.py
   --write` in the same landing: the version rides `inventories.json`, `MAP.md` and `symbols.json`

@@ -37,7 +37,7 @@ globs = [
   "tools/run-gates/foreign-prefix.gov.test.sh",
   "tools/check-dead-paths.sh",
   "tools/check-dead-paths.test.sh",
-  "tools/dead-path-waivers.txt",
+  "memory/project/dead-path-waivers.txt",
   "tools/check-remote-literals.sh",
   "tools/check-remote-literals.test.sh",
 ]
@@ -139,7 +139,7 @@ deleted. They are one class — a sentence nothing executes — and they are two
 populations are derived from different sources and neither derivation can see the other's defect.
 
 The two have DIVERGED in one respect since `TOOL-dHonouredPark-3`, deliberately.
-`tools/dead-path-waivers.txt` is keyed by the carrier line's TEXT plus an occurrence ordinal; the
+`memory/project/dead-path-waivers.txt` is keyed by the carrier line's TEXT plus an occurrence ordinal; the
 install-prefix gate's registry stayed `<path>:<line>` until `TOOL-aRepatriatedFork-30` deleted it.
 Line keying cost this repo two cycles in one build — any insertion above a carrier unpinned its row
 — and the owner ruled ONE file rather than moving the sibling by association.

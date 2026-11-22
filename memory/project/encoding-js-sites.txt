@@ -1,0 +1,6 @@
+# ledger · encoding-js-sites · key site path,class · direction shrink-only · drain hunk
+tools/hooks/format-guard.js	js-io	2	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/lib/resolve_bash.js	js-io	2	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/policy/policy-mirror.js	js-io	2	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/process-monitor/procmon-hook.js	js-io	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/unattended/stop-guard.js	js-io	3	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded

@@ -229,6 +229,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 PY=$(resolve_python) || { echo "FAIL no usable python on this host — every arm below is unrunnable"; exit 2; }
 # This kit's own directory NAME, and each sibling kit through the resolver, which reads the install
 # receipt first. `KIT_REL` in this suite is the tool root; the heredocs below read `KIT` from the
@@ -619,6 +637,71 @@ keys "$NOID" && bad "oracle: the driver keyed a row with no id at all"
 { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 theirs; } > "$TMP/b"
 run "disjoint appends" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
 
+# --- 1l. the LEDGER class: disjoint appends and a concurrent drain on a planted ledger --------------
+# TOOL-dWitnessedBar-13 S7. A baseline ledger opens with the header its factory renders from the
+# registration, and its rows are TAB fields keyed by the header's key fields, so neither the bullet
+# plane nor the anchor grammar sees one; `check_ledger` reads the header on all three sides and `merge`
+# hands the ledger plane to every reader of rows. AC5: `%A` and `%B` each append a row, and the result
+# holds both, the header once, census `ledger-keyed` and verdict `clean` — red when the TSV rows fall to
+# the structure plane and the append conflicts, or a postcondition reads the bullet plane. AC6: a key
+# both sides lowered keeps the lower count, and a key `%A` drained while `%B` left it as at `%O` is
+# absent. WHAT THIS DOES NOT CHECK: a ledger's `merge=rows` attribute, which each converting unit adds;
+# the ledger rule's other cases are the 1m arms below (TOOL-dWitnessedBar-51).
+render_ledger_head() { printf '# ledger · fx-refs · key key ref · direction shrink-only · drain key\n'; }
+render_ledger_row() { printf '%s\t%s\t%s\tseeded\n' "$1" "$2" "${3:-abcdef12}"; }
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; } > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-2 1; } > "$TMP/a"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-3 2; } > "$TMP/b"
+cp "$TMP/a" "$TMP/la"
+run "disjoint appends on a ledger" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
+[ "$(grep -c '^# ledger · ' "$TMP/a")" = 1 ] || bad "ledger appends: the header is not written exactly once"
+for k in TOOL-zFixture-2 TOOL-zFixture-3; do
+  grep -q "^$k"$'\t' "$TMP/a" || bad "ledger appends: the appended row $k is not in the result"
+done
+cp "$TMP/la" "$TMP/a"
+lline=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null | grep '^merge-rows: rows ' | tail -1)
+grep -q 'census ledger-keyed, clean$' <<<"$lline" \
+  || bad "ledger appends: the audit line does not read census ledger-keyed and verdict clean: [$lline]"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 5; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 2; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/a"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3 1234abcd; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/b"
+run "concurrent drain on a ledger" 0 "TOOL-zFixture-1 TOOL-zFixture-2 "
+[ "$(grep "^TOOL-zFixture-1"$'\t' "$TMP/a" | cut -f2,3 | tr '\t' ' ')" = "2 abcdef12" ] \
+  || bad "ledger drain: the key both sides lowered did not keep %A's count 2 with its sha: [$(grep "^TOOL-zFixture-1" "$TMP/a" | tr '\t' ' ')]"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 5; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/a"
+cp "$TMP/o" "$TMP/b"
+run "a drained ledger key beats a carried one" 0 "TOOL-zFixture-2 " TOOL-zFixture-1
+grep -q "^TOOL-zFixture-1"$'\t' "$TMP/a" && bad "ledger drain: the key %A drained and %B carried survived the merge"
+
+# --- 1m. the ledger rule's remaining cases (TOOL-dWitnessedBar-51 S31, AC27) ------------------------------
+# A key both sides ADDED takes the lower count, so a widen is never dropped at the merge's choice; a `%O`
+# with no header, a legacy grammar, beside `%A` and `%B` carrying one is still the ledger class; and a key
+# one side took out while the other changed it is a conflict region, never a silent drain. RED where the
+# add/add rule is dropped (rc 1, both rows in markers), where `%O`'s missing header drops the class to
+# the structure plane (the census is not ledger-keyed), or where the removal wins (rc 0).
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; } > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-5 4 1234abcd; } > "$TMP/a"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-5 2; } > "$TMP/b"
+run "a ledger key both sides added" 0 "TOOL-zFixture-1 TOOL-zFixture-5 "
+[ "$(grep "^TOOL-zFixture-5"$'\t' "$TMP/a" | cut -f2,3 | tr '\t' ' ')" = "2 abcdef12" ] \
+  || bad "ledger add/add: the key both sides added did not keep %B's lower count 2 with its sha: [$(grep "^TOOL-zFixture-5" "$TMP/a" | tr '\t' ' ')]"
+printf 'TOOL-zFixture-1\tthe legacy grammar, a reason column\n' > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-2 1; } > "$TMP/a"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-3 2; } > "$TMP/b"
+cp "$TMP/a" "$TMP/la"
+run "a header-less base beside two ledgers" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
+[ "$(grep -c '^# ledger · ' "$TMP/a")" = 1 ] || bad "ledger header-less base: the header is not written exactly once"
+cp "$TMP/la" "$TMP/a"
+lline=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null | grep '^merge-rows: rows ' | tail -1)
+grep -q 'census ledger-keyed, clean$' <<<"$lline" \
+  || bad "ledger header-less base: the audit line does not read census ledger-keyed and verdict clean: [$lline]"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 5; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/a"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3 1234abcd; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/b"
+run "a ledger key removed against changed" 1 "TOOL-zFixture-1 TOOL-zFixture-2 "
+grep -q '^<<<<<<< ours$' "$TMP/a" || bad "ledger removed/changed: no conflict region written for the key %A removed and %B changed"
+
 # --- 2. the shape that broke union: same id, different text, both sides ---------------------------
 { pre; row TOOL-zFixture-1 base; } > "$TMP/o"
 { pre; row TOOL-zFixture-1 ours; } > "$TMP/a"
@@ -848,7 +931,7 @@ E=$(mktemp -d); SCRATCH="$SCRATCH $E"
 mkdir -p "$E/${PFX}${KIT}" "$E/${PFX}${LIB}" "$E/memory/backlog"
 cp .memory-tree.conf "$E/"
 seed_driver_kit "$E/${PFX}${KIT}"
-cp $LIB_DIR/pyrun.sh $LIB_DIR/resolve-python.sh "$E/${PFX}lib/"
+cp $LIB_DIR/pyrun.sh $LIB_DIR/resolve-python.sh $LIB_DIR/refuse-wrong-shell.sh "$E/${PFX}lib/"
 (
   cd "$E" || exit 2
   git init -q -b main
@@ -1901,7 +1984,7 @@ LIB=${PFX}lib
 mkdir -p "$W/$MT" "$W/$LIB" "$W/memory/backlog"
 cp "$ROOT/.memory-tree.conf" "$W/"
 seed_driver_kit "$W/$MT"
-cp "$ROOT/$LIB/pyrun.sh" "$ROOT/$LIB/resolve-python.sh" "$W/$LIB/"
+cp "$ROOT/$LIB/pyrun.sh" "$ROOT/$LIB/resolve-python.sh" "$ROOT/$LIB/refuse-wrong-shell.sh" "$W/$LIB/"
 WT="$W-wt"; SCRATCH="$SCRATCH $WT"
 (
   cd "$W" || exit 2
@@ -1959,7 +2042,7 @@ mkfixrepo() {  # $1 = a directory -> a git repo on `main` with this kit wired as
   mkdir -p "$d/$mt" "$d/$lb" "$d/memory/backlog"
   cp "$ROOT/.memory-tree.conf" "$d/"
   seed_driver_kit "$d/$mt"
-  cp "$ROOT/$LIB_DIR/pyrun.sh" "$ROOT/$LIB_DIR/resolve-python.sh" "$d/$lb/"
+  cp "$ROOT/$LIB_DIR/pyrun.sh" "$ROOT/$LIB_DIR/resolve-python.sh" "$ROOT/$LIB_DIR/refuse-wrong-shell.sh" "$d/$lb/"
   git -C "$d" init -q -b main
   git -C "$d" config user.email t@e
   git -C "$d" config user.name t
@@ -2328,8 +2411,8 @@ check_table_case "only theirs adds a tag" "$MANIFEST" 0 "" red
 # driver, and the count of cases the arithmetic bar binds on.
 ngroups=$(grep -c '^# --- ' "$SELF")
 nruns=$(grep -c '^run "' "$SELF")
-[ "$ngroups" -ge 57 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 57 — a group was deleted"
-[ "$nruns" -ge 42 ] || bad "only $nruns 'run' case(s) remain, expected at least 42 — a group was emptied while its banner stayed, which the banner count cannot see"
+[ "$ngroups" -ge 58 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 58 — a group was deleted"
+[ "$nruns" -ge 45 ] || bad "only $nruns 'run' case(s) remain, expected at least 45 — a group was emptied while its banner stayed, which the banner count cannot see"
 [ "$NEVER_WORSE_BOUND" -ge "$NEVER_WORSE_FLOOR" ]   || bad "the arithmetic never-worse comparison bound on $NEVER_WORSE_BOUND case(s) against a grow-only floor of $NEVER_WORSE_FLOOR — a control flipped from rc 0 to rc 1 and silently left the bar"
 [ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups groups / $nruns run cases held, $NEVER_WORSE_BOUND under the arithmetic never-worse bar, $ncons conservative (cap $CONSERVATIVE_CAP)"
 exit "$st"

@@ -372,7 +372,10 @@ def run_kind_gate(kind, top, kit_rel, render=False, written=()):
         elif kind == "hook":
             from loop_witness import resolve_bash
             gate = resolve_kit_dir(".", "check-hook-destinations.sh", here) / "check-hook-destinations.sh"
-            argv = [resolve_bash(gate.as_posix()) or "bash", gate.as_posix()]
+            bash = resolve_bash(gate.as_posix())
+            if not bash:
+                raise Refused(f"no bash can see {gate.as_posix()}; set GOV_BASH to Git's bash")
+            argv = [bash, gate.as_posix()]
             if written:
                 return run_hook_gate(argv, top, written)
             argvs = [argv]

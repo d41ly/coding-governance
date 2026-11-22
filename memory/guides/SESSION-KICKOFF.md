@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-22T03:48:05+02:00 @ 0d4cf1ea9f60d7ec5f8a24bba1113c2d87e98ac3
+last-audit: 2026-11-22T06:37:14+02:00 @ e7ab8c818222236d6c83040a5a0e326122c3edf0
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 087e6336735bbca6845ff0b50e7f688166d88ff0
+last-body-change: 2c621083fd91278f33ba1baba1ea15f4dada31b0
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -61,14 +61,14 @@ lives where each bullet points.
 ### Gate commands (the merge bar)
 
 ```bash
-bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY at the gate-profiles.txt width or a lower `--calibrate-width` pick; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
+bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY at the gate-profiles.txt width or a lower `--calibrate-width` pick; the leg list is single-sourced from tools/gate-legs.json, which `tools/run-gates/leg_factory.py --write` renders from the kit descriptors and govkit's registry — read THAT for it, not this line
 # Legs report in CHUNKS, each closing with a verdict line, so a red is readable before the run ends. A chunk whose every leg skipped reports skipped, never green.
 bash tools/run-gates/run-gates.sh --regen   # regenerate every declared generated output; a bar refuses while one is stale. TOOL-aPrimedIndex-2, -3
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD and the docs mode (GATE_DOCS_BASE). .githooks/pre-push decides, and prints which it chose and why
-GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
+GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs. A leg the selection record GATE_SELECTION names (`verdict_flow.py select`, by `quarantine` or `level`) stays held under it; `verdict.held` says when held legs run. TOOL-dWitnessedBar-5
 # Per profile row: a whole-RUN wall (GATE_WALL; a breach kills the legs, TOOL-aQuenchedHarness-1), and mempause holding dispatch while used memory is above it (TOOL-aGraftedHelix-7)
-GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. Report-only, the exit never moves; .githooks/pre-push exports the remote sha. TOOL-dDerivedDocket-23
+GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. The exit never moves; each red carries `blocks` under GATE_VERDICT_BLOCKS (verdict.blocks at R), and a red bar lands only when every red passes. TOOL-dDerivedDocket-23, TOOL-dWitnessedBar-3
 bash tools/run-gates/pass-legs.sh --base <rev>   # the declared FAST legs over one pass's diff, at the main loop after a unit pass's commit; `pass.fast-legs` off runs nothing; a role agent's hook refuses it. Its record is `gate-pass-legs.txt` in the git dir. TOOL-aNimbleMend-5, -7
 bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES an uncalibrated row until --pooled --calibrate; bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
 bash tools/unattended/run-unattended-gates.sh --pooled   # DoD for tools/unattended/ work: pooled PARITY against tools/run-gates/selftest-pooled-evidence.txt, or `--selftests --serial --attribute <BASE>` reading `verdict clean`. TOOL-dDerivedDocket-1

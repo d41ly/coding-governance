@@ -427,6 +427,50 @@ python tools/govkit/steps/review_rounds.py down <repo>     # exit 1 if a file ch
 
 Then commit the result, `.governance/steps/unattended/` included.
 
+## Where `INHERITED_RED`'s value lives
+
+Which red blocks a landing is the policy key `verdict.blocks` in `.governance/policy.toml` now, and
+neither the pre-push hook nor the driver reads an `INHERITED_RED` line. Before, each read it from
+its own file: the hook from `.githooks/gate-env.sh`, and the driver from the file `GATE_POLICY_FILE`
+names in `.unattended.conf`, or from `.githooks/gate-env.sh` too where that key is blank or absent
+or there is no conf. The step `govkit/inherited-red-to-verdict-blocks` reads both files, each only
+where present, and writes the value they meant.
+
+It reads each file as the hook and the driver read it: the value is the one on the last line that
+begins exactly `INHERITED_RED=`, a trailing ` # comment` and one pair of quotes taken off. A line in
+any other spelling, such as `export INHERITED_RED=park`, an indented line, a commented one, or
+`INHERITED_RED = land` with spaces around the `=`, is not an assignment, because neither reader
+read it. A last `INHERITED_RED=` with nothing after it means no value, whatever an earlier line said.
+The value it reads becomes:
+
+| What the files hold | What `[verdict] blocks` gets |
+|---|---|
+| `land` | `own-mixed-contended` |
+| `park` | `every-red` |
+| any other value, `Park` and `LAND` included | `every-red`, as both readers read it |
+| a `GATE_POLICY_FILE` that is absolute or climbs out of the tree, beside a key in `.githooks/gate-env.sh` | `every-red`, as the driver read it; that file is neither read nor edited |
+| a blank value, or no `INHERITED_RED` in either file | nothing: the catalogue default `own-only` applies |
+
+Where the two files say different things, the step writes the one that blocks more, `every-red`.
+Where your policy file already sets `verdict.blocks` to another value, the up prints `conflict ·
+verdict.blocks · policy <value> · gate <value>`, exits 1 and writes nothing, so you settle which
+one decides and run it again. It also exits 1, writing nothing, on a file that is not UTF-8. The up
+then takes those `INHERITED_RED=` assignments out of each file, leaves every other line as it was,
+and keeps the file. Its witness prints one line per file it reads, naming the file, the value found
+and the value written, and holds once neither file assigns the key. A line that spells the key in
+another way stays where it is, and the witness names it as `not an assignment <file>:<line>`
+without failing, so you can delete or fix it by hand. Its down puts every file back byte-for-byte.
+`update --write` runs it as one of its steps; to run it by hand, from this checkout: <!-- usage: script:tools/govkit/steps/inherited_red.py#up 7d308cd4 --> <!-- usage: script:tools/govkit/steps/inherited_red.py#witness 79b2b797 --> <!-- usage: script:tools/govkit/steps/inherited_red.py#down 14a9242d -->
+
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and a <repo> placeholder -->
+```sh
+python tools/govkit/steps/inherited_red.py up <repo>       # exit 1, writing nothing, on a conflict
+python tools/govkit/steps/inherited_red.py witness <repo>  # exit 0 once no INHERITED_RED is left
+python tools/govkit/steps/inherited_red.py down <repo>     # exit 1 if a file changed since the up
+```
+
+Then commit the result, `.governance/steps/govkit/` included.
+
 ## What this release's steps do to your repository
 
 Six moves reach an installed repository through `update`, each named here with what it leaves
@@ -447,14 +491,16 @@ behind.
   overlay back byte-for-byte. Commit the result, `.governance/steps/kickoff-manifest/` included, and
   regenerate the policy mirror, since the overlay changed.
 
-- **Your adopter rules move into the overlay.** The step `playbook/adopter-rules-to-overlay` turns
+- **Your adopter rules move into the overlay.** The step `playbook/adopter-rules-to-overlay-2`, the
+  successor the `[[retired]]` row of `playbook/adopter-rules-to-overlay` names, turns
   each `- ` line of `[charter] adopter_rules` in `.governance/deploy.toml` into one level-0 unit of
   `.governance/instructions.toml`, tagged `repo.rule-<NN>-<words>` in the rules' order and scoped to
   every reader, then takes the key out of `deploy.toml`, every other byte kept. The rendered charter
   holds the same rules in the same order before and after. The up refuses, writing nothing, on a key
   line that is not a `- ` line, a rule the overlay reader refuses, a rule over the one-line budget,
   or an overlay already holding a level-0 unit whose tag sorts below the converted rules. Its witness
-  holds once the key is gone and each rule is a unit's text; its down puts both files back
+  holds once the key is gone and each rule is a level-0 unit's text or carries the rule's tag, so a
+  rule you edit after the up still reads applied; its down puts both files back
   byte-for-byte. The key stays a key the render reads, so a repository that has not run the step
   renders as before.
 - **The seeded charter template is retired.** The `playbook` entry no longer copies the template to

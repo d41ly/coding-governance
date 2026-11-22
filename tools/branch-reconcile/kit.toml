@@ -55,11 +55,20 @@ means = "adopted"
 # THE SKILL'S WIRING LEG SHIPS: its subject is the target's own rendered Skill, which goes stale when
 # the template is edited or the kit moves, with nobody touching the adopter.
 [[gate_leg]]
+tag = "leg.branch-reconcile.cleanup-skill-wiring"
+tests = ["feature.branch-reconcile"]
 name = "cleanup skill wiring"
 subject = "repo"
+purpose = "checks the rendered cleanup Skill has not gone stale"
 argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--check"]
 guard = []
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+guard = []
+chunk = "wiring"
+ceiling = 300
 
 # ONE [[lf_pin]], for the rendered Skill, which its own leg byte-compares.
 [[lf_pin]]

@@ -188,7 +188,7 @@ write_card_records() {
   mkdir -p "$R/memory/builds/tFix/reviews"
   printf '## Verdict: CLEAN\n\n**Serves:** spec-audit TOOL-tFix-1@rev-1\n' > "$R/memory/builds/tFix/reviews/2026-01-01-review-TOOL-tFix-1-spec-audit.md"
   printf '# TOOL-tFix-2 — the forked unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-1\n' > "$R/memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-2.md"
-  git -C "$R" add -A memory && git -C "$R" commit -q -m "fixture: tFix's records and its forked unit"
+  git -C "$R" add -A memory && ! git -C "$R" diff --cached --quiet && git -C "$R" commit -q -m "fixture: tFix's records and its forked unit"
 }
 # read_card_section <card file> — its `## pointers` section, the heading to the line before the next `## ` or READY line.
 read_card_section() {
@@ -204,7 +204,7 @@ write_card_fixture || { echo "card-store: the fixture could not be built under $
 # The installed card-import fixture's blob, as the engine hashes it from the tree it runs in, and that
 # tree's toplevel as git spells it, the bytes of the `tree —` cell.
 FX_BLOB=$(git -C "$R" hash-object -- "$HERE/card-compaction.fixture.sh" 2>/dev/null)
-RT=$(git -C "$R" rev-parse --show-toplevel)
+RT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$R" rev-parse --show-toplevel)
 
 case "$PLANT" in
   render)
@@ -392,7 +392,7 @@ case "$PLANT" in
       # The build card published from a linked worktree, so its `tree —` cell names that tree, and the
       # replay below runs in the primary.
       git -C "$R" worktree add -q "$S/wt" -b wt 2>/dev/null || { echo "card-store: no worktree could be added under $S"; exit 2; }
-      WT=$(git -C "$S/wt" rev-parse --show-toplevel)
+      WT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$S/wt" rev-parse --show-toplevel)
       write_card_body "$S/body" 1
       (cd "$S/wt" && bash "$CHECK" --card --append --session t1 < "$S/body") > "$OUT" 2>&1
     else
@@ -586,7 +586,7 @@ case "$PLANT" in
     set_card_position key "$K1"; run_card_append
     git clone -q -b main "$O" "$S/clone2" 2>/dev/null && git -C "$S/clone2" config core.hooksPath "$S/hooks"
     run_card_engine "$S/clone2" --card --lookup --build tFix --session t2
-    C2=$(git -C "$S/clone2" rev-parse --show-toplevel)
+    C2=$(unset GIT_DIR GIT_WORK_TREE; git -C "$S/clone2" rev-parse --show-toplevel)
     printf -v payload '{"session_id":"t2","cwd":"%s"}' "$C2"
     (cd "$S/clone2" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
     print_card_held "AC7 the replay prints the ## pointers section the lookup re-keyed" \

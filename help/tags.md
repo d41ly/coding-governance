@@ -2,7 +2,7 @@
 
 **What it is.** A tag names one thing in the repository: `doc.build-method` is the build method
 guide, `doc.build-method#m5-recall-and-reuse` its `## M5` section. A tag is `<ns>.<seg>(.<seg>)*`,
-lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Fourteen
+lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Eighteen
 namespaces are registered today, each read from the file that declares its members:
 
 | Namespace | Its members come from |
@@ -21,9 +21,13 @@ namespaces are registered today, each read from the file that declares its membe
 | `item` | each `[[item]]` row's `tag` in the same file |
 | `policy` | each `[[key]]` row of `tools/policy/catalogue.toml` whose name is all literal segments, as `policy.<name>` |
 | `command` | each `[[command]]` row, `verb` and `run`, of a kit descriptor, as `command.<kit id>.<verb>` |
+| `leg` | each row's `tag` in `tools/gate-legs.json`, as `leg.<owner>.<name>`, beside the leg's free-text `name`, which stays the key every file keyed by leg joins on |
+| `pack` | each distinct `pack` value of the rows of `tools/gate-legs.json`, as `pack.<word>` |
+| `check` | each `[[numbered_check]]` row of a kit descriptor, `id` and `leg`, beside its `[check]` table, as `check.<kit id>.<check id>` |
 
 A namespace whose file declares nothing yet prints as `unarmed`, and nothing in it is graded: `step`
-and `item` until the loop definition lands, `command` until a descriptor holds a `[[command]]` row.
+and `item` until the loop definition lands, `command` until a descriptor holds a `[[command]]` row,
+`check` until one holds a `[[numbered_check]]` row.
 `policy` is graded today. A tag in a namespace no row registers is red: `role` joins when dBoundRoles
 registers it and `record` with dTotalRecall.
 
@@ -68,8 +72,8 @@ again; past that wait it exits 2 saying the index is locked.
   from nothing; `python tools/playbook/gov_tag.py --gc` deletes the rows of extractor code no live
   worktree carries any more, printing `tag-index — collected: <n> rows of <m> versions`, and refuses
   when a worktree's registry cannot be read; `python tools/playbook/gov_tag.py --list-positional`
-  prints one `<path>` TAB `<ref>` row per positional reference, the rows
-  `memory/project/positional-refs.txt` keeps; and
+  prints one `<path>` TAB `<ref>` row per positional reference, the keys
+  `memory/project/positional-refs.txt` keeps as ledger rows; and
   `python tools/playbook/gov_tag.py --fixture --plant scope` runs one planted case in a scratch
   repository. <!-- usage: script:tools/playbook/gov_tag.py 6cb6638a -->
 
@@ -108,7 +112,15 @@ tag-shaped word that is not a citation, quote it another way, with doubled backt
   not graded for it` and is never red; at a repository that installed the kit, which holds no chain
   registry of its own, that is every owner. See "Where a purpose is read" below.
 - **positional** — a positional reference the list `memory/project/positional-refs.txt` does not
-  hold, or a row the tree no longer cites; an absent list is red. Where the list's folder,
+  hold, or a row the tree no longer cites; an absent list is red. The list is a ledger population,
+  `positional-refs`: a header line naming it, then one row per reference, its key fields (the citing
+  path and the reference) then the count, the SHA it was seeded at and its disposition, TAB-separated.
+  A reference ending in a line number is kept as written. A list a newly installed repository is given holds
+  the header and an `# unarmed` line, no row. The producer list `positional-producers.txt` beside it
+  holds its rows the same way, keyed by path and line text; a hit is kept there through
+  `python tools/memory-tree/ratchet.py widen positional-producers`, whose widen record holds its reason. <!-- usage: script:tools/memory-tree/ratchet.py#widen 1c6a8748 -->
+  The writing practice's `unpinned-facts.txt` (keyed by path and fact) and the render gate's
+  `instructions-legacy.txt` (keyed by path), both under `memory/project/`, are ledger rows too. Where the list's folder,
   `<MEMORY_ROOT>/project/`, is absent too, as at a repository with no memory tree adopted, the arm
   prints `tags: positional · unarmed: <MEMORY_ROOT>/project is absent, so no memory tree is adopted
   here` and is never red.
@@ -244,9 +256,23 @@ work order's `gov:handoff` marker's `unit=` and `build=` as `serves`; an instruc
 `Pass:`, `Gov-Unit:` and `Gov-Item:` as `serves`, `Gov-Act:` as `made-by`, `Gov-Session:` as
 `runs-in` and `Decided:` as `decides`. The trailer keys are the `[[trailer]]` rows of `edges.toml`. A
 row may carry no `type`: it registers a key that carries a value and no edge, which `Gov-Transition:`,
-`Gov-Policy:` and `Red-fix:` are, so gov's one trailer reader reads it and no edge is read from it.
+`Gov-Policy:`, `Red-fix:` and `Commit-Checked:` are, so gov's one trailer reader reads it and no edge
+is read from it. `Commit-Checked: unattended@<kit version>` is written by the unattended commit check
+onto a pass commit it admitted, and a pass commit without it is one the check never saw, which the
+`hooks.bypass` policy key records and, set to `refused`, refuses. It is written with `--where start`, at
+the start of the trailer block, so the charter's agent-commit trailer stays the message's last line.
+That same check asks the trailer reader's `attribution` verb of every message a bound run's commit
+carries, `Pass: none` included: the value is read from the charter's `Commit trailer` fact line in
+`AGENTS.md`, and a `Co-Authored-By:` line naming the charter's address with another value, or any
+line after the charter's trailer, is refused with code 49 naming the line to end the message with.
+The check reads such a line anywhere in the message as git will keep it,
+whether or not git reads it as a trailer, so prose after it does not hide it. The charter's trailer
+followed by trailing whitespace reads as git's cleanup will commit it, without that whitespace. A
+message with no such line is admitted. A charter with no fact line is admitted too, and the check
+prints `unattended: --check-commit did not check attribution:` with the reason, since no attribution
+was checked.
 Where no `edges.toml` is installed, or it holds no `[[trailer]]` row, the reader reads a closed floor of
-keys, `Pass`, `Decided`, `Gov-Transition`, `Gov-Policy` and `Red-fix`, refuses any other by name, and
+keys, `Pass`, `Decided`, `Gov-Transition`, `Gov-Policy`, `Red-fix` and `Commit-Checked`, refuses any other by name, and
 says once on stderr that the check was skipped; a table with rows decides alone. A `serves` trailer is read as edges only when every comma-separated target is a well-formed address; a
 value of prose, or `none`, is counted unread and is neither an edge nor a red, and `--check` prints the
 count. A spec's `### Edges` block declares `consumes-from` and `hands-off` between unit ids, whose

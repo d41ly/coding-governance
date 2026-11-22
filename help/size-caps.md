@@ -19,7 +19,15 @@ in one place.
 
   ```text
   BUDGET WARN — AGENTS.md · AGENTS.md · 20481 bytes over 20480 · budgets.enforce is warn
+  gate-warn	size	AGENTS.md	AGENTS.md · 20481 bytes over 20480
   ```
+
+  The second line is the `gate-warn` marker, TAB-separated: the class `size`, the file the warning
+  measured and what it found. Every size warning prints one after its own line, so a passing bar
+  shows the warning instead of hiding it inside a green leg: the runner prints it as
+  `GATE warn  <leg>  (<file>: <what it found>; grown by <unit>)` before its closing line, counts it
+  there as `(1 warned)`, and records it in the run's verdict. The unit is the newest specced unit
+  whose commits touched the file, which may not be the one that grew it.
 
 - **Make every cap refuse:**
 

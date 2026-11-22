@@ -2,6 +2,27 @@
 # coding-governance pre-commit fast leg. Install once per clone: git config core.hooksPath .githooks
 # Runs only the cheap staged-scoped gates so a scripts-less checkout stays green.
 set -u
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
+# Above: the wrong-shell refusal, inline and ahead of every leg (TOOL-dWitnessedBar-50 S3). The
+# hook's one source of resolve-python.sh sits in resolve_hook_python, which a commit needing no
+# python never reaches, so the refusal cannot wait for it. Git starts a hook at the work tree's top.
 
 # The index git handed this hook, saved before the unset below (TOOL-dGroundRules-72). Under
 # `git commit -a` or `git commit <path>` it is a temporary index, and a staged read of the real one
@@ -193,15 +214,12 @@ print_kit_miss() { # <leg> <kit dir, or ""> <file> [home] -> the announced skip,
 # a temporary index the guard reads itself. Only a resolved launcher is kept, so a failed resolution
 # runs again at the next leg and prints its diagnosis there as it did.
 st_list=$(git diff --cached --name-status --no-renames)
-st_names="" st_memory="" st_wiring="" st_template="" st_map=""
+st_names="" st_memory=""
 while IFS=$'\t' read -r st_status st_path; do
   [ -n "$st_path" ] || continue
   st_names+=$st_path$'\n'
   st_bare=$st_path; case $st_bare in \"*\") st_bare=${st_bare#\"}; st_bare=${st_bare%\"} ;; esac
   case $st_status:$st_bare in [AM]:memory/*) st_memory=1 ;; esac
-  case $st_bare in .unattended.conf|.unattended.conf/*|*SKILL.template.md|.claude/skills/unattended/SKILL.md|.claude/skills/unattended/SKILL.md/*) st_wiring=1 ;; esac
-  case $st_bare in coding-governance-agents.template.md|coding-governance-agents.template.md/*) st_template=1 ;; esac
-  case $st_bare in *.py|*.js) st_map=1 ;; esac
 done <<< "$st_list"
 read_hook_staged() { # the names staged in the index git handed this hook (TOOL-dGroundRules-72)
   if [ -z "$hook_index" ] || [ "$hook_index" -ef "${gd:-}/index" ]; then printf '%s' "$st_names"
@@ -304,77 +322,17 @@ else
   fi
 fi
 
-# kickoff-manifest ratchet, staged leg — its gate decides whether a watched file is staged, so its
-# skip has no trigger here to wait for. Rung 2 names the kit's SOURCE home, where gov keeps it with
-# no receipt; an adopter has it flat at its tool root, which rungs 1 and 3 reach.
-if g=$(resolve_kit_gate "" manifest-check.sh skills/session-kickoff); then
-  bash "$g" --staged || rc=1
+# THE DERIVED LEGS (TOOL-dWitnessedBar-10 S4). No leg is named here: every row of the leg manifest
+# carrying `precommit` runs through the run-gates kit's `--precommit`, when a staged path trips the
+# row's `guard` or at every commit when it has none, so a leg declares its own commit-time argv beside
+# its bar argv and reaches this hook with no edit to it (memory/gotchas/hand-named-gate-list-green-
+# while-the-bar-reds.md). The memory hygiene block above stays hand-named: its commit-time form is a
+# grade, a check-9 render and a regrade that no one argv states. It runs outside `with_hook_index`, as
+# the legs it replaced did, and a runner no rung resolves is an announced skip, as for every leg here.
+if g=$(resolve_kit_gate run-gates run-gates.sh); then
+  bash "$g" --precommit || rc=1
 else
-  print_kit_miss "kickoff-manifest" "" manifest-check.sh skills/session-kickoff
-fi
-
-# unattended skill wiring — only when an input of the rendered Skill, or the Skill itself, is staged:
-# the conf it interpolates, a kit template, or the render. TOOL-aHomedAnchor-4 left-shifts the bar's
-# `unattended skill wiring` leg, so a hand-edited render reds here rather than at the push.
-if [ -n "$st_wiring" ]; then
-  if g=$(resolve_kit_gate unattended adopt-unattended.sh); then
-    bash "$g" --check || rc=1
-  else
-    print_kit_miss "unattended skill wiring" unattended adopt-unattended.sh
-  fi
-fi
-
-# template size — only when the template is staged
-if [ -n "$st_template" ]; then
-  if g=$(resolve_kit_gate "" check-template-size.sh); then
-    bash "$g" || rc=1
-  else
-    print_kit_miss "template-size" "" check-template-size.sh
-  fi
-fi
-
-# codebase-map coverage + freshness — only when .codebase-map.conf exists and a staged path is a .py
-# or .js file. The bar runs this same gate on every run (its leg in the gate manifest has no guard) and
-# nothing before the push boundary did, so a module-level def committed without a regen travelled
-# until a closing review found it. memory/gotchas/hand-named-gate-list-green-while-the-bar-reds.md
-# records the builds it hit, and the rest of the class this leg does not reach. About 1.5 s. Quiet on
-# a pass except for the gate's lines that are not `ok`, so its UNGRADED and skipped-tier announcements
-# stay visible.
-# EVERY PATH IS DERIVED. This file is carried into adopters, where a kit-path literal resolves to
-# nothing at another prefix. The gate and the map root come from the conf, sourced the way the kit
-# documents bash reads it; the python resolver comes from the tracked tree. An empty derivation refuses.
-# WHAT THIS LEG DOES NOT CHECK:
-# - Only .py and .js trigger it, the two populations the symbol tier reads. The map's other
-#   inventories and a dossier claim edit move its artifacts too, and a commit staging only those
-#   still reds first at the bar.
-# - It grades the WORKTREE, not the index, so an unstaged edit to a mapped file can move the verdict
-#   either way. The one mismatch it closes is its own remedy's: artifacts regenerated and not staged.
-if [ -f .codebase-map.conf ] && [ -n "$st_map" ]; then
-  g=$(. ./.codebase-map.conf >/dev/null 2>&1; printf '%s' "${GATE_FILE:-}")
-  if [ -z "$g" ] || [ ! -f "$g" ]; then
-    echo "pre-commit: codebase-map leg REFUSING — GATE_FILE in .codebase-map.conf names no file: '$g'."
-    rc=1
-  elif ! resolve_hook_python; then
-    echo "pre-commit: codebase-map leg cannot run $g — no tracked python resolver, or no usable launcher."
-    rc=1
-  elif ! out=$("$py" "$g" 2>&1); then
-    printf '%s\n' "$out"
-    echo "pre-commit: codebase-map gate failed. STALE artifact: run the regen its STALE line names"
-    echo "  (gen_map.py --write), then stage what it rewrote. UNCLAIMED key: claim it in a dossier."
-    rc=1
-  else
-    printf '%s\n' "$out" | grep -v '^ok ' || true
-    mr=$(. ./.codebase-map.conf >/dev/null 2>&1; printf '%s' "${MAP_ROOT:-}")
-    if [ -z "$mr" ] || [ ! -d "$mr/generated" ]; then
-      echo "pre-commit: codebase-map leg did NOT check for unstaged regenerated artifacts —"
-      echo "  .codebase-map.conf names no MAP_ROOT with a generated/ directory."
-    elif unstaged=$(git diff --name-only -- "$mr/generated/") && [ -n "$unstaged" ]; then
-      echo "pre-commit: the codebase-map artifacts are fresh in the worktree but NOT staged, so this commit"
-      echo "  carries the stale copies. Stage them:"
-      printf '%s\n' "$unstaged" | sed 's/^/    /'
-      rc=1
-    fi
-  fi
+  print_kit_miss "derived pre-commit" run-gates run-gates.sh
 fi
 
 [ "$rc" = 0 ] || echo "pre-commit: a gate failed — fix or 'git commit --no-verify' to override deliberately."

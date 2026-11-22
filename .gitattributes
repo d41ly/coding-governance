@@ -3,6 +3,14 @@
 
 # Execution-sensitive scripts must be LF (run in bash/CI). Covers the relocated tools/ kits.
 *.sh text eol=lf
+# The rest of the execution-sensitive class (TOOL-dWitnessedBar-24 S2): every file an interpreter or a
+# parser reads, pinned by CLASS so a new file lands LF with no edit here. The gate-lint kit's
+# `eol_class.py` grades the class from the attribute and the index, never the worktree. The committed
+# blobs were already LF under `* text=auto`; these lines move only a worktree, on its next checkout.
+*.py text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
 
 # The gate leg manifest is runtime-read by run-gates.sh (a stray CR would corrupt leg names/argv).
 tools/gate-legs.json text eol=lf
@@ -86,6 +94,62 @@ memory/builds/*/BACKLOG.md merge=rows
 # `[[unit]]` table by its `tag`, so two nodes adding a unit merge with both tags once.
 **/instructions.toml merge=rows
 .governance/instructions.toml merge=rows
+# The baseline ledgers (TOOL-dWitnessedBar-13 §3 leaves this line to each unit adding one): the driver
+# reads a ledger's rendered header and keys its TAB rows, so two branches draining one population merge
+# with the lower count. `conf-scalar-pins` is TOOL-dWitnessedBar-14's.
+memory/project/conf-scalar-pins.txt merge=rows
+# TOOL-dWitnessedBar-17 S7: the keyed pin populations, the date cutoffs and the converted dead-path registry.
+memory/project/row-duplicates.txt merge=rows
+memory/project/unbound-records.txt merge=rows
+memory/project/dossier-decisions-empty.txt merge=rows
+memory/project/date-cutoffs.txt merge=rows
+memory/project/corpus-path-unresolved.txt merge=rows
+# The registries converted onto the ledger grammar (TOOL-dWitnessedBar-16 S9): a concurrent drain of
+# one reaches the row-keyed driver's ledger class rather than conflicting on the whole file.
+memory/map/affordance-exempt.txt merge=rows
+memory/map/baseline.txt merge=rows
+memory/project/brief-recorded-waiver.txt merge=rows
+memory/project/curation-debt.txt merge=rows
+memory/project/docs-undocumented.txt merge=rows
+memory/project/encoding-posture-sites.txt merge=rows
+memory/project/fork-ceilings.txt merge=rows
+memory/project/id-orphan-waiver.txt merge=rows
+memory/project/legacy-files.txt merge=rows
+memory/project/location-probe-waivers.txt merge=rows
+memory/project/method-carriers.txt merge=rows
+memory/project/pass-order-waiver.txt merge=rows
+memory/project/readme-contract.txt merge=rows
+memory/project/refusal-retirements.txt merge=rows
+memory/project/spawn-idiom-sites.txt merge=rows
+memory/project/spec-token-waivers.txt merge=rows
+memory/project/stale-header-waiver.txt merge=rows
+memory/project/substitution-fed-loops.txt merge=rows
+memory/project/temp-name-sites.txt merge=rows
+memory/project/trace-waiver.txt merge=rows
+memory/project/unarmed-branches.txt merge=rows
+memory/project/dead-path-waivers.txt merge=rows
+memory/project/playbook-kit-waivers.txt merge=rows
+memory/project/drift-pins.txt merge=rows
+memory/project/drift-baselines.txt merge=rows
+# TOOL-dWitnessedBar-18 S6: dOrderedCharter's keyed lists and dSafePassage's landed step rows, registered.
+memory/project/positional-refs.txt merge=rows
+memory/project/positional-producers.txt merge=rows
+memory/project/unpinned-facts.txt merge=rows
+# TOOL-dWitnessedBar-108 S7: the params arm's kept parameters, a shrink-only ledger keyed by path, function and parameter.
+memory/project/unread-params.txt merge=rows
+memory/project/instructions-legacy.txt merge=rows
+memory/project/landed-steps.txt merge=rows
+# TOOL-dWitnessedBar-20 S7: the legacy policy homes list, a ledger keyed by conf and key.
+memory/project/legacy-homes.txt merge=rows
+# KICK-dKeptSession-69 S5: the policy kit's two plain-name lists, ledgers keyed by name and by namespace.
+memory/project/unnamed-keys.txt merge=rows
+memory/project/unpurposed-namespaces.txt merge=rows
+# TOOL-dWitnessedBar-24 S13: the portability pack's five populations.
+memory/project/encoding-stdout-sites.txt merge=rows
+memory/project/encoding-js-sites.txt merge=rows
+memory/project/path-literal-sites.txt merge=rows
+memory/project/quoting-sites.txt merge=rows
+memory/project/shell-role.txt merge=rows
 
 # Wholly GENERATED views: a merge takes this side, and check 9 (gen_build_index.py --check) or
 # check 17 (gotchas.py --check) then reds the stale result until `--write` re-renders it.
@@ -130,7 +194,7 @@ AGENTS.md text eol=lf
 tools/line-length-limits.txt text eol=lf
 # TOOL-dHonouredPark-3: the dead-path registry became TAB-separated, so its bytes are load-bearing
 # in a way they were not while a row was `<path>:<line>` plus free whitespace.
-tools/dead-path-waivers.txt text eol=lf
+memory/project/dead-path-waivers.txt text eol=lf
 
 # The rendered recall Skill is compared to a fresh render with plain `diff` by
 # `adopt-memory-recall.sh --check`. The renderer always emits LF, so without this pin a Windows
@@ -226,8 +290,8 @@ tools/unattended/*.md text eol=lf
 tools/memory-tree/*.template.md text eol=lf
 
 memory/map/generated/* text eol=lf
-memory/map/baseline.toml text eol=lf
-memory/map/affordance-exempt.toml text eol=lf
+memory/map/baseline.txt text eol=lf
+memory/map/affordance-exempt.txt text eol=lf
 
 # govkit — the deployer's registry and its per-entry descriptors. Pinned for the same reason every
 # other declaration file here is: these are READ by a tool, and a CR byte in a conf or a descriptor

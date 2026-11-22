@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""model.py — one unattended run's sources joined into one account of it. gov:kit runlog@1.17
+"""model.py — one unattended run's sources joined into one account of it. gov:kit runlog@1.18
 
 A run's evidence is spread across its run-state file, three journals, git, its build folder and, where
 local, its session extracts. `build_run_model` joins them into ONE model of ONE run: a timeline, a
@@ -96,7 +96,9 @@ LEDGER_SOURCES = ("decision", "abort", "override", "waiver", "handoff", "rescope
 # value is held to the file that owns it: the withheld self-test extracts these from the driver's
 # source where that file is present, compares both directions, and announces its skip where it is not.
 PARK_KINDS = ("decision", "abort", "override", "waiver", "proposal", "rescope", "dispatch", "review",
-              "brief", "hold", "resume", "handoff", "refusal", "fix-pass")
+              "brief", "hold", "resume", "handoff", "refusal", "fix-pass", "fix-of")
+# `fix-of` joined in TOOL-dWitnessedBar-21: `--dispatch --fix-of`'s history row, the red a fix pass is
+# declared against; not owed, so it joins `--status`'s noted count.
 # `fix-pass` joined in TOOL-dDeclaredLoop-32: `--fix-pass`'s history row, one fix pass against a unit's
 # acceptance; not owed, so it joins `--status`'s noted count.
 # `refusal` joined in TOOL-dDeclaredLoop-14: `--refused`'s history row, read by the loop kit's engine.

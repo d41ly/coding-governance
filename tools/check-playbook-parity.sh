@@ -41,7 +41,7 @@ _self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""   # before 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "playbook-parity: not a git tree"; exit 2; }
 cd "$ROOT" || exit 2
 # THE TOOL ROOT, DERIVED (TOOL-aRepatriatedFork-29 S3): the directory this gate sits in, which is
-# where the kits, their sources and this gate's waiver file live. Underivable is a refusal.
+# where the kits and their sources live. Underivable is a refusal.
 if ! SELF_PRE=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
   echo "playbook-parity: cannot derive this gate's own directory from '$_self_dir' — REFUSING"
   exit 2
@@ -216,6 +216,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
 # table. A shell consumer runs it with the python it already resolved, so the receipt rung is
@@ -291,7 +309,9 @@ TEMPLATE=coding-governance-agents.template.md
 # with no precondition on the runbook, an absent one reds every kit with a wrong reason instead of
 # exiting 2 with the right one.
 RUNBOOK=WIRE-INTO-PROJECT.md
-WAIVERS=${PLAYBOOK_KIT_WAIVERS:-${SELF_PRE}playbook-kit-waivers.txt}
+# The waiver list is the ledger population `playbook-kit-waivers` in `memory/project/`, beside every
+# other population and spelled as check-spec-tokens.py spells its own (TOOL-dWitnessedBar-16 S14).
+WAIVERS=${PLAYBOOK_KIT_WAIVERS:-memory/project/playbook-kit-waivers.txt}
 SENTINEL=memory-tree
 
 status=0
@@ -343,7 +363,29 @@ if [ ! -f "$WAIVERS" ]; then
   exit 1
 fi
 
-waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" | awk '{print $1}' | sort -u)
+# THE REGISTRY IS A LEDGER POPULATION (TOOL-dWitnessedBar-16 S4), `playbook-kit-waivers`, a declared set
+# keyed by <kit>, read through the memory-tree kit's ledger factory, found by the same resolver: one
+# `<kit> TAB <count> TAB <sha> TAB <disposition>` row per waived kit, its reason the conversion record's.
+# A row the factory refuses is listed as its whole text, a kit no tree ships, so it reds as stale.
+LL_DIR=""
+[ -n "${_pp_py:-}" ] && LL_DIR=$(resolve_kit_dir "$_pp_py" memory-tree legacy_ledger.py "$_self_dir" 2>/dev/null)
+if [ -z "$LL_DIR" ]; then
+  printf 'PLAYBOOK-PARITY: cannot run — no python or no memory-tree ledger factory resolves, and %s is read through it\n' "$WAIVERS"
+  exit 2
+fi
+waived=$("$_pp_py" -I -c '
+import sys
+sys.path.insert(0, sys.argv[1])
+import legacy_ledger as LL
+rows, bad = LL.read_rows(sys.argv[2], 1)
+for entry in bad:
+    print(entry[2].replace("\t", " "))
+for key in rows:
+    print(key[0])' "$LL_DIR" "$WAIVERS" | tr -d '\r'; exit "${PIPESTATUS[0]}") || {
+  printf 'PLAYBOOK-PARITY: cannot run — the ledger factory at %s did not read %s\n' "$LL_DIR" "$WAIVERS"
+  exit 2
+}
+waived=$(printf '%s\n' "$waived" | sort -u)
 
 # The match is an anchored PATH SEGMENT, case-sensitive — `tools/<kit>/` or a backticked `<kit>/` —
 # never a bare substring. A substring search scores the kit `lib` many times over the trio — every

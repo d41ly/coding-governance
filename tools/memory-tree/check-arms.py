@@ -93,13 +93,15 @@ signature beside a derived one is two answers to one question, and a marker no d
 is refused, so a marker cannot outlive its site silently. A script this module's quote reader leaves
 inside an unterminated quote or here-document is refused by name rather than read as clean.
 
-Keys and pins. A site is keyed (gate, kind, occurrence, signature): kind `exit` or `status`, the
-occurrence counting that gate's sites of that kind sharing that signature, so an inserted refusal
-does not re-key the rows below it. Its pin row has FIVE tab-separated fields, the last its REASON:
-`gate<TAB>kind<TAB>occurrence<TAB>signature<TAB>reason`. An empty reason or the placeholder
-`REASON-OWED`, which `--emit-pin` writes, is refused, and every waived row prints
-`check-arms: waived <gate>:<line> <kind> — <reason>` on every run. Every pin rule above holds for these
-rows: shrink-only, a pinned site that is armed reds, a row naming no live site reds, and a site pinned
+Keys and pins. A site is keyed (gate, kind, signature): kind `exit` or `status`. THE CENTRAL PIN FILE
+IS A LEDGER POPULATION (TOOL-dWitnessedBar-16), read through the factory beside this module: one row
+per `gate<TAB>check<TAB>signature`, `check` a fail number or `exit` or `status`, then the count of
+unarmed branches or sites of that key, its sha and disposition. The ordinal left the key, so an
+inserted refusal re-keys nothing, and a row's reason is the conversion record's, never the row's. A
+tracked SIDECAR keeps its legacy rows, `gate<TAB>check<TAB>ordinal<TAB>signature`, read and counted per
+key the same way. Each waived site prints `check-arms: waived <gate>:<line> <kind>` on every run. Every
+pin rule above holds, graded through the factory's `compare_counts`: shrink-only, a pinned key that is
+armed reds, a row naming no live site reds, a count above or below the live one reds, and a key pinned
 in two files is refused. A script found only by signature 2 with no sibling test is not an error while
 every one of its sites is pinned.
 
@@ -126,7 +128,16 @@ import sys
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+import legacy_ledger as LL  # noqa: E402  the ledger factory this kit carries (TOOL-dWitnessedBar-13)
 PIN = "project/unarmed-branches.txt"
+# The central pin file's ledger key and the retirement registry's (TOOL-dWitnessedBar-16): the
+# positions a line-number refusal skips are those of the fields holding a number or quoted text.
+PIN_FIELDS = ("path", "check", "signature")
+PIN_VERBATIM = (1, 2)
+RETIREMENT_FIELDS = ("unit", "path", "check", "r1", "r2", "r3", "r4", "survivor", "signature", "replay")
+RETIREMENT_VERBATIM = (2, 3, 4, 5, 6, 8, 9)
 
 FAIL_RE = re.compile(r'\bfail (\d+) "(.*)$')
 HELPER_RE = re.compile(r"^\s*fail\(\)\s*\{")
@@ -150,8 +161,10 @@ HEREDOC_RE = re.compile(r"<<(-?)\s*\\?(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\2")
 MARKER_RE = re.compile(r"^\s*#\s*arm-signature:(.*)$")
 TEST_COND_RE = re.compile(r"!?\s*(\[\[?|test)(\s|$)")
 PRINTF_CONV_RE = re.compile(r"%[-+ #0-9.*]*[a-zA-Z%]|\\[a-z\\]")
-REASON_OWED = "REASON-OWED"
 REFUSAL_KINDS = ("exit", "status")
+# RETIRED with the pin rows' reason column (TOOL-dWitnessedBar-16 S4): `REASON_OWED`, the `REASON-OWED`
+# placeholder `--emit-pin` once wrote in a refusal row's reason field, and the refusal of an empty one.
+# A pin row carries no reason now, so neither has anything left to grade.
 
 
 class Problem(Exception):
@@ -565,11 +578,14 @@ def scan_refusal_sites(root: str, m: str) -> tuple:
 
 
 def parse_pin(root: str, m: str, graded: bool = False) -> tuple:
-    """-> (fail rows, refusal rows, refusal rows not read), from the central file AND every SIDECAR.
+    """-> (fail pins, refusal pins, refusal pins not read), from the central file AND every SIDECAR.
 
-    A fail row is (gate, check, ordinal, sig, line, file). A row whose second field is `exit` or
-    `status` is signature 2's, carries a fifth field, its REASON, and is returned as a dict — or, with
-    the switch off, is not read at all and only counted, which the OFF line reports.
+    A pin is a dict: `gate`, `check` (a fail number, or `exit` or `status`), `sig`, `count`, and the
+    `file` and `line` it was read from. The central file is a ledger population read through the
+    factory (TOOL-dWitnessedBar-16): one row per key, its count the branches or sites of that key. A
+    sidecar keeps its legacy grammar, one row per ordinal, and its rows of one key are counted into one
+    pin. A pin whose check is `exit` or `status` is signature 2's: with the switch off it is not read
+    at all and only counted, which the OFF line reports.
 
     TOOL-aRepatriatedFork-18 S5. A pin for a SHIPPED gate is a fact about gov's bytes, so it travels
     with them: a tracked `unarmed-branches.txt` in any directory other than the central one pins the
@@ -582,11 +598,29 @@ def parse_pin(root: str, m: str, graded: bool = False) -> tuple:
     sidecars = sorted(p for p in run("git", "ls-files", cwd=root).split("\n")
                       if os.path.basename(p) == os.path.basename(PIN) and p != central)
     rows, rrows, unread = [], [], 0
-    for label in [central] + sidecars:
+
+    def add(pins, gate, check, sig, count, line, label):
+        for pin in pins:
+            if (pin["gate"], pin["check"], pin["sig"], pin["file"]) == (gate, check, sig, label):
+                pin["count"] += count
+                return
+        pins.append({"gate": gate, "check": check, "sig": sig, "count": count, "line": line, "file": label})
+
+    p = os.path.join(root, central)
+    if os.path.isfile(p):
+        keyed, bad = LL.read_rows(p, len(PIN_FIELDS), verbatim=PIN_VERBATIM)
+        if bad:
+            raise Problem(f"{central}: {LL.render_malformed(bad[0])}")
+        for (gate, check, sig), (count, _values, line, _row) in keyed.items():
+            if check in REFUSAL_KINDS and not graded:
+                unread += 1
+                continue
+            add(rrows if check in REFUSAL_KINDS else rows, gate, check, sig, count, line, central)
+    for label in sidecars:
         p = os.path.join(root, label)
         if not os.path.isfile(p):
             continue
-        base = "" if label == central else os.path.dirname(label)
+        base = os.path.dirname(label)
         for i, line in enumerate(read(p).split("\n"), 1):
             if not line.strip() or line.lstrip().startswith("#"):
                 continue
@@ -595,24 +629,78 @@ def parse_pin(root: str, m: str, graded: bool = False) -> tuple:
                 if not graded:
                     unread += 1
                     continue
-                # The reason is the LAST field, so an empty one shifts nothing and is refused by name
-                # in cmd_check rather than read as absent.
-                if len(parts) != 5:
-                    raise Problem(f"{label}:{i}: a `{parts[1].strip()}` row takes 5 tab-separated fields "
-                                  f"(gate<TAB>kind<TAB>occurrence<TAB>signature<TAB>reason), got "
-                                  f"{len(parts)}")
-                gate = parts[0].strip()
-                rrows.append({"gate": f"{base}/{gate}" if base else gate, "kind": parts[1].strip(),
-                              "occ": parts[2].strip(), "sig": parts[3].strip(),
-                              "reason": parts[4].strip(), "line": i, "file": label})
+                if len(parts) not in (4, 5):
+                    raise Problem(f"{label}:{i}: a `{parts[1].strip()}` row takes 4 or 5 tab-separated fields "
+                                  f"(gate<TAB>kind<TAB>occurrence<TAB>signature[<TAB>reason]), got {len(parts)}")
+                add(rrows, f"{base}/{parts[0].strip()}", parts[1].strip(), parts[3].strip(), 1, i, label)
                 continue
             if len(parts) != 4:
                 raise Problem(f"{label}:{i}: expected 4 tab-separated fields "
                               f"(gate<TAB>check<TAB>ordinal<TAB>signature), got {len(parts)}")
-            gate = parts[0].strip()
-            gate = f"{base}/{gate}" if base else gate
-            rows.append((gate, parts[1].strip(), parts[2].strip(), parts[3].strip(), i, label))
+            add(rows, f"{base}/{parts[0].strip()}", parts[1].strip(), parts[3].strip(), 1, i, label)
     return rows, rrows, unread
+
+
+def render_pin_kind(check: str) -> str:
+    """How a message names a pin's kind: `check <n> branch` for signature 1, `<kind> site` for signature 2."""
+    return f"{check} site" if check in REFUSAL_KINDS else f"check {check} branch"
+
+
+def derive_pin_index(pins: list, noun: str, bad: list) -> dict:
+    """{(gate, check, sig): pin}, a key pinned in a second file refused by name. ONE key, ONE pin: two
+    rows for it means two files can disagree about its count and each check would read only one."""
+    keys = {}
+    for r in pins:
+        key = (r["gate"], r["check"], r["sig"])
+        if key in keys:
+            o = keys[key]
+            bad.append(f"check-arms: {r['file']}:{r['line']} pins {r['gate']} {render_pin_kind(r['check'])} "
+                       f"{r['sig']!r}, which {o['file']}:{o['line']} already pins — a {noun} is pinned in "
+                       f"exactly one file; delete one of the two rows")
+            continue
+        keys[key] = r
+    return keys
+
+
+def check_pins(items: list, keyed: dict, unpinned, scanned: set, bad: list) -> list:
+    """The pins of one signature against the live population, both ways through the factory's
+    `compare_counts`: an unpinned unarmed item is `unpinned(item)`'s message, a count that rose or fell
+    or a row no unarmed item carries is named over its key and count. -> the pinned unarmed items."""
+    measured, armed, live = {}, set(), {}
+    for it in items:
+        key = it["key"]
+        if it["armed"]:
+            armed.add(key)
+            continue
+        measured[key] = measured.get(key, 0) + 1
+        live.setdefault(key, []).append(it)
+    waived = []
+    for name, key, have, want in LL.compare_counts(measured, {k: r["count"] for k, r in keyed.items()},
+                                                   "shrink-only"):
+        gate, check, sig = key
+        r, kind = keyed.get(key), render_pin_kind(key[1])
+        if name == "undeclared site":
+            bad.extend(unpinned(it) for it in live[key])
+        elif name == "count rose":
+            bad.append(f"check-arms: {gate} has {have} unarmed {kind} {sig!r} and "
+                       f"{r['file']}:{r['line']} pins {want} — the new one has no POSITIVE assertion "
+                       f"naming its own failure text; arm it")
+        elif name == "count fell":
+            why = "the others are armed now" if key in armed else "the others are gone"
+            bad.append(f"check-arms: {r['file']}:{r['line']} pins {want} of {gate} {kind} {sig!r} "
+                       f"and {have} remain unarmed — {why}; lower its count (the pin is shrink-only)")
+        elif key in armed:
+            bad.append(f"check-arms: {r['file']}:{r['line']} pins {gate} {kind} {sig!r}, which IS "
+                       f"armed now — delete the row (the pin is shrink-only)")
+        else:
+            why = ("the gate is no longer in the population" if gate not in scanned
+                   else "the guard was deleted or renumbered, or its message reworded")
+            bad.append(f"check-arms: {r['file']}:{r['line']} pins {gate} {kind} {sig!r}, which no "
+                       f"longer exists — {why}")
+    for key, its in live.items():
+        if key in keyed and measured[key] <= keyed[key]["count"]:
+            waived.extend(its)
+    return waived
 
 
 def parse_floors(conf: dict) -> dict:
@@ -764,46 +852,44 @@ def check_families(root: str, census: dict, log: str) -> tuple:
 def check_retirements(root: str, m: str, log: str) -> tuple:
     """-> (problems, report lines) for the retirement registry, one row per retired refusal.
 
-    The row grammar is the README's: `<decision id> · RETIRES … · R1 … · R2 … · R3 … · R4 … ·
-    survivor <file> "<signature>" · replay "<refusal line>" · supersedes <id>`. A row is graded on its
-    FIELDS and on one join: its survivor file still carries the signature recorded for it.
+    A LEDGER POPULATION (TOOL-dWitnessedBar-16 §8 F12), `append-only`, read through the factory: every
+    field this check grades is a key field, `<decision id> TAB <gate> TAB <check> TAB <R1> … <R4> TAB
+    <survivor file> TAB <its signature> TAB <replay line>`, then a count, sha and disposition. A row
+    with too few fields is the factory's malformed line. A row is graded on its FIELDS and on one join:
+    its survivor file still carries the signature recorded for it.
     """
     rel = f"{m}/{RETIREMENTS}"
     p = os.path.join(root, rel)
     if not os.path.isfile(p):
         return [], [f"check-arms: retirements — no registry at {rel}, so no retired refusal is joined to a survivor"]
-    bad, rows = [], 0
-    for i, row in enumerate(read(p).split("\n"), 1):
-        if not row.strip() or row.lstrip().startswith("#"):
+    keyed, malformed = LL.read_rows(p, len(RETIREMENT_FIELDS), verbatim=RETIREMENT_VERBATIM)
+    bad = [f"check-arms: {rel}: {LL.render_malformed(entry)}" for entry in malformed]
+    for key, (_count, _values, i, _row) in keyed.items():
+        f = dict(zip(RETIREMENT_FIELDS, key))
+        ident = f["unit"]
+        if not ID_SHAPE_RE.fullmatch(ident):
+            bad.append(f"check-arms: {rel}:{i} names `{ident}` in its unit field, which is not a decision "
+                       f"id, so nothing says which decision retired what")
             continue
-        rows += 1
-        hm = re.match(r"(" + ID_SHAPE_RE.pattern + r") · RETIRES ", row)
-        if not hm:
-            bad.append(f"check-arms: {rel}:{i} does not open `<decision id> · RETIRES`, so nothing says "
-                       f"which decision retired what")
-            continue
-        ident = hm.group(1)
         if not check_id_carried(ident, log):
             bad.append(f"check-arms: {rel}:{i} names {ident}, which no DECISIONS.md row carries — a "
                        f"retirement is the owner's decision, and one with no row is nobody's")
         for k in ("R1", "R2", "R3", "R4"):
-            if f" · {k} " not in row:
+            if not f[k.lower()]:
                 bad.append(f"check-arms: {rel}:{i} ({ident}) lacks its {k} field, and the review admits a "
                            f"retirement only with all four criteria filled")
-        sv = re.search(r' · survivor (\S+) "(.+?)"(?= · |$)', row)
-        rp = re.search(r' · replay "(.+?)"(?= · |$)', row)
-        if not sv:
+        if not f["survivor"] or not f["signature"]:
             bad.append(f"check-arms: {rel}:{i} ({ident}) lacks its survivor field, so nothing names where "
                        f"the retired condition still refuses")
-        elif sv.group(2) not in (read(os.path.join(root, sv.group(1)))
-                                 if os.path.isfile(os.path.join(root, sv.group(1))) else ""):
-            bad.append(f"check-arms: {rel}:{i} ({ident}) names the survivor {sv.group(1)}, which no longer "
-                       f"carries its signature {sv.group(2)!r} — the condition this retirement relied on "
+        elif f["signature"] not in (read(os.path.join(root, f["survivor"]))
+                                    if os.path.isfile(os.path.join(root, f["survivor"])) else ""):
+            bad.append(f"check-arms: {rel}:{i} ({ident}) names the survivor {f['survivor']}, which no longer "
+                       f"carries its signature {f['signature']!r} — the condition this retirement relied on "
                        f"surviving may be gone; restore it, or record a new survivor")
-        if not rp:
+        if not f["replay"]:
             bad.append(f"check-arms: {rel}:{i} ({ident}) lacks its replay field, so nothing shows the "
                        f"retired condition was observed refusing after the retirement")
-    return bad, [f"check-arms: retirements — {rows} row(s) read from {rel}"]
+    return bad, [f"check-arms: retirements — {len(keyed) + len(malformed)} row(s) read from {rel}"]
 
 
 def classify(root: str, conf: dict, pairs=None) -> dict:
@@ -871,45 +957,22 @@ def classify(root: str, conf: dict, pairs=None) -> dict:
 
 def check_refusal_sites(st: dict) -> tuple:
     """-> (problems, waived lines, census line) for signature 2, under the switch ON."""
-    bad, waived, rkeys = [], [], {}
-    for r in st["rpinned"]:
-        key = (r["gate"], r["kind"], r["occ"], r["sig"])
-        if key in rkeys:
-            o = rkeys[key]
-            bad.append(f"check-arms: {r['file']}:{r['line']} pins {r['gate']} {r['kind']} site "
-                       f"{r['occ']}, which {o['file']}:{o['line']} already pins — a site is pinned in "
-                       f"exactly one file; delete one of the two rows")
-            continue
-        rkeys[key] = r
-        if r["reason"] in ("", REASON_OWED):
-            what = "an EMPTY reason" if not r["reason"] else f"the placeholder {REASON_OWED}"
-            bad.append(f"check-arms: {r['file']}:{r['line']} pins {r['gate']} {r['kind']} site "
-                       f"{r['occ']} with {what} — a waiver that prints no reason is a silent one; "
-                       f"write why no arm reaches it")
-    armed = 0
-    for s in st["sites"]:
-        r = rkeys.get((s["gate"], s["kind"], str(s["occ"]), s["key_sig"]))
-        if s["armed"]:
-            armed += 1
-            if r:
-                bad.append(f"check-arms: {r['file']}:{r['line']} pins {s['gate']} {s['kind']} site "
-                           f"{s['occ']}, which IS armed now — delete the row (the pin is shrink-only)")
-            continue
-        if r:
-            waived.append(f"check-arms: waived {s['gate']}:{s['line']} {s['kind']} — {r['reason']}")
-            continue
+    bad = []
+    keyed = derive_pin_index(st["rpinned"], "site", bad)
+    items = [dict(s, key=(s["gate"], s["kind"], s["key_sig"])) for s in st["sites"]]
+
+    def render_unpinned(s):
         why = (f" — and {s['test']} is missing, so nothing can arm it" if s["test_missing"]
                else " — an unmarked DELEGATED site: mark its block with `# arm-signature: <text its "
                     "callee prints>` and assert that text, or pin it" if not s["sig"] else "")
-        bad.append(f"check-arms: {s['gate']}:{s['line']} {s['kind']} site ({s['cls']}) has no "
-                   f"POSITIVE assertion naming its own failure text ({s['key_sig']!r}) and is not "
-                   f"pinned in {st['m']}/{PIN} or a sidecar beside the gate{why}")
-    live = {(s["gate"], s["kind"], str(s["occ"]), s["key_sig"]) for s in st["sites"]}
-    for key, r in rkeys.items():
-        if key not in live:
-            bad.append(f"check-arms: {r['file']}:{r['line']} pins {r['gate']} {r['kind']} site "
-                       f"{r['occ']} ({r['sig']!r}), which no live site carries — the refusal was "
-                       f"deleted, reworded, or moved out of the population")
+        return (f"check-arms: {s['gate']}:{s['line']} {s['kind']} site ({s['cls']}) has no "
+                f"POSITIVE assertion naming its own failure text ({s['key_sig']!r}) and is not "
+                f"pinned in {st['m']}/{PIN} or a sidecar beside the gate{why}")
+
+    scanned = {s["gate"] for s in st["sites"]}
+    waived = [f"check-arms: waived {s['gate']}:{s['line']} {s['kind']}"
+              for s in check_pins(items, keyed, render_unpinned, scanned, bad)]
+    armed = sum(1 for s in st["sites"] if s["armed"])
     census = (f"check-arms: refusal signature — {len(st['sites'])} site(s) in "
               f"{len({s['gate'] for s in st['sites']})} script(s): {armed} armed, {len(waived)} "
               f"waived; {len(st['unreasoned'])} unreasoned line(s) not graded")
@@ -920,36 +983,20 @@ def cmd_check(root: str, conf: dict) -> int:
     st = classify(root, conf)
     brs, pinned, m = st["branches"], st["pinned"], st["m"]
     bad = list(st["errors"])
-    pin_keys = {}
-    for r in pinned:
-        key = (r[0], r[1], r[2])
-        if key in pin_keys:
-            # S5: ONE branch, ONE pin. Two rows for it means two files can disagree about its
-            # signature and each shrink-only check would read only one of them.
-            bad.append(f"check-arms: {r[5]}:{r[4]} pins {r[0]} check {r[1]} branch {r[2]}, which "
-                       f"{pin_keys[key][5]}:{pin_keys[key][4]} already pins — a branch is pinned in "
-                       f"exactly one file; delete one of the two rows")
-            continue
-        pin_keys[key] = r
-    for b in brs:
-        key = (b["gate"], str(b["num"]), str(b["ord"]))
-        if b["armed"]:
-            if key in pin_keys:
-                bad.append(f"check-arms: {pin_keys[key][5]}:{pin_keys[key][4]} pins {b['gate']} check "
-                           f"{b['num']} branch {b['ord']}, which IS armed now — delete the row "
-                           f"(the pin is shrink-only)")
-            continue
-        if key not in pin_keys:
-            hint = (f" — a STRANDED prefix at {b['stranded'][0]}:{b['stranded'][1]} stops short of "
-                    f"the signature; copy the whole row --report prints") if b["stranded"] else ""
-            bad.append(f"check-arms: {b['gate']}:{b['line']} check {b['num']} branch {b['ord']} has "
-                       f"no POSITIVE assertion naming its own failure text ({b['sig']!r}) and is not "
-                       f"pinned in {m}/{PIN} or a sidecar beside the gate{hint}")
-        elif pin_keys[key][3] != b["sig"]:
-            bad.append(f"check-arms: {pin_keys[key][5]}:{pin_keys[key][4]} pins {b['gate']} check "
-                       f"{b['num']} branch {b['ord']} with a stale signature — the message was reworded")
-    live = {(b["gate"], str(b["num"]), str(b["ord"])) for b in brs}
+    # S5: ONE branch key, ONE pin, and the pins graded both ways over (gate, check, signature) and the
+    # count of unarmed branches of that key (TOOL-dWitnessedBar-16).
+    pin_keys = derive_pin_index(pinned, "branch", bad)
     scanned = {g for g, _ in st["pairs"]}
+
+    def render_unpinned(b):
+        hint = (f" — a STRANDED prefix at {b['stranded'][0]}:{b['stranded'][1]} stops short of "
+                f"the signature; copy the whole row --report prints") if b["stranded"] else ""
+        return (f"check-arms: {b['gate']}:{b['line']} check {b['num']} branch {b['ord']} has "
+                f"no POSITIVE assertion naming its own failure text ({b['sig']!r}) and is not "
+                f"pinned in {m}/{PIN} or a sidecar beside the gate{hint}")
+
+    check_pins([dict(b, key=(b["gate"], str(b["num"]), b["sig"])) for b in brs], pin_keys,
+               render_unpinned, scanned, bad)
     graded = st["graded"]
     sites = st["sites"] if graded else []
     # The signature-2 line prints LAST of the report lines, after the budget's, so it stays the line
@@ -963,12 +1010,6 @@ def cmd_check(root: str, conf: dict) -> int:
         sig2_line = (f"check-arms: refusal signature OFF — ARMS_REFUSALS is not `graded`, so "
                      f"{len(st['sites'])} refusal site(s) outside fail() go ungraded and {st['unread']} pin "
                      f"row(s) of kind exit or status were not read")
-    for r in pin_keys.values():
-        if (r[0], r[1], r[2]) not in live:
-            why = ("the gate is no longer in the population" if r[0] not in scanned
-                   else "the guard was deleted or renumbered")
-            bad.append(f"check-arms: {r[5]}:{r[4]} pins {r[0]} check {r[1]} branch {r[2]}, which "
-                       f"no longer exists — {why}")
     # PER-GATE floors. An aggregate would let one gate's deletion be masked by another's addition.
     floors = parse_floors(conf)
     # Under the switch ON a script holding a refusal site is a gate too, and its floor counts sites.
@@ -1045,7 +1086,7 @@ def cmd_check(root: str, conf: dict) -> int:
 def cmd_report(root: str, conf: dict) -> int:
     st = classify(root, conf)
     floors = parse_floors(conf)
-    pinned = {(r[0], r[1], r[2]): r[5] for r in st["pinned"]}
+    pinned = {(r["gate"], r["check"], r["sig"]): r["file"] for r in st["pinned"]}
     for gate_rel, test_rel in st["pairs"]:
         gb = [b for b in st["branches"] if b["gate"] == gate_rel]
         want = floors.get(gate_rel, ("unset", "unset"))
@@ -1056,7 +1097,7 @@ def cmd_report(root: str, conf: dict) -> int:
             # The signature prints WHOLE: this row is what the arm author copies, and a row cut at
             # 72 characters was itself the prefix that stranded every arm over a long message.
             # ...and the FILE that armed or pinned it follows, since S5 and S6 made that one of several.
-            pin = pinned.get((b["gate"], str(b["num"]), str(b["ord"])))
+            pin = pinned.get((b["gate"], str(b["num"]), b["sig"]))
             tail = f"  STRANDED {b['stranded'][0]}:{b['stranded'][1]}" if b["stranded"] else ""
             src = (f"  by {b['armed']}" if b["armed"] else f"  in {pin}" if pin else "")
             flag = "ARMED " if b["armed"] else "PINNED" if pin else "      "
@@ -1065,13 +1106,13 @@ def cmd_report(root: str, conf: dict) -> int:
     print(f"pinned rows   : {len(st['pinned'])}")
     # SIGNATURE 2, in both states. `from` is the line the signature was READ from — a reasoned site's
     # print, a delegated site's marker — and is the only defence against a walk's false association.
-    rpin = {(r["gate"], r["kind"], r["occ"], r["sig"]): r["file"] for r in st["rpinned"]}
+    rpin = {(r["gate"], r["check"], r["sig"]): r["file"] for r in st["rpinned"]}
     print(f"refusal signature {'graded' if st['graded'] else 'OFF'} — {len(st['sites'])} site(s)")
     for gate_rel in sorted({s["gate"] for s in st["sites"]}):
         gs = [s for s in st["sites"] if s["gate"] == gate_rel]
         print(f"{gate_rel}  ->  {gs[0]['test']}{'  (missing)' if gs[0]['test_missing'] else ''}")
         for s in gs:
-            pin = rpin.get((s["gate"], s["kind"], str(s["occ"]), s["key_sig"]))
+            pin = rpin.get((s["gate"], s["kind"], s["key_sig"]))
             flag = "ARMED " if s["armed"] else "WAIVED" if pin else "      "
             src = f"  by {s['armed']}" if s["armed"] else f"  in {pin}" if pin else ""
             print(f"      {s['kind']:<6} site {s['occ']}  line {s['line']:>5}  {flag} {s['cls']:<9} "
@@ -1099,22 +1140,22 @@ def cmd_report(root: str, conf: dict) -> int:
 
 
 def cmd_emit_pin(root: str, conf: dict) -> int:
-    """Print the pin file for the CURRENT unarmed set — the measurement, not a guess."""
+    """Print the central pin file's measured rows for the CURRENT unarmed set — the measurement, not a
+    guess: each key's fields and its count, TAB-joined, as the ledger factory's seed reads them
+    (TOOL-dWitnessedBar-16). A row's sha and disposition are the factory's to stamp."""
     st = classify(root, conf)
-    print("# unarmed-branches.txt — `fail` branches with no positive assertion naming their own")
-    print("# failure text. SHRINK-ONLY: a row leaves when its branch gains an arm, and check-arms")
-    print("# reds if a pinned branch is armed, if a pinned branch or its gate disappears, or if a")
-    print("# message is reworded out from under its signature.")
-    print("# Fields: gate<TAB>check<TAB>ordinal<TAB>signature, and under ARMS_REFUSALS=\"graded\"")
-    print("# gate<TAB>exit|status<TAB>occurrence<TAB>signature<TAB>reason for a refusal site.")
+    counts = {}
     for b in st["branches"]:
         if not b["armed"]:
-            print(f"{b['gate']}\t{b['num']}\t{b['ord']}\t{b['sig']}")
+            key = (b["gate"], str(b["num"]), b["sig"])
+            counts[key] = counts.get(key, 0) + 1
     if st["graded"]:
-        # The reason is OWED, never guessed: the gate refuses this placeholder until a person writes it.
         for s in st["sites"]:
             if not s["armed"]:
-                print(f"{s['gate']}\t{s['kind']}\t{s['occ']}\t{s['key_sig']}\t{REASON_OWED}")
+                key = (s["gate"], s["kind"], s["key_sig"])
+                counts[key] = counts.get(key, 0) + 1
+    for key, n in counts.items():
+        print("\t".join([*key, str(n)]))
     return 0
 
 
@@ -1244,29 +1285,29 @@ def cmd_selftest() -> int:
             lambda: 0 if branches(root, f"{PFX}gate-b.sh")[0]["sig"] == "delta branch message here" else 1)
 
         # the PIN key carries the gate: both gates have a (1,1)
-        _w(pin, f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
-                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
+        _w(pin, f"{PFX}gate-a.sh\t1\tbeta branch message here\t1\tabcdef12\tseeded\n"
+                f"{PFX}gate-a.sh\t2\tgamma branch message here\t1\tabcdef12\tseeded\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "p", "--no-verify", cwd=root)
         arm("a fully pinned + armed population passes", None, lambda: cmd_check(root, conf))
         # gate A's (1,1) pinned must NOT exempt gate B's (1,1)
         _w(os.path.join(root, PFX, "gate-b.test.sh"), "# no arm here\n")
-        _w(pin, f"{PFX}gate-a.sh\t1\t1\talpha branch message here\n"
-                f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
-                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
+        _w(pin, f"{PFX}gate-a.sh\t1\talpha branch message here\t1\tabcdef12\tseeded\n"
+                f"{PFX}gate-a.sh\t1\tbeta branch message here\t1\tabcdef12\tseeded\n"
+                f"{PFX}gate-a.sh\t2\tgamma branch message here\t1\tabcdef12\tseeded\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "p2", "--no-verify", cwd=root)
         out = []
         arm("a pin for gate A does not exempt gate B's same key",
             f"{PFX}gate-b.sh:2 check 1 branch 1 has no POSITIVE",
             lambda: _capture(cmd_check, root, conf, out))
         arm("...and raises no stale-signature line against gate B", "[rc=0]",
-            lambda: 0 if not any("gate-b" in l and "stale signature" in l for l in out) else 1)
+            lambda: 0 if not any("gate-b" in l and "reworded" in l for l in out) else 1)
         arm("...and gate A's own armed branch is reported as wrongly pinned",
-            f"pins {PFX}gate-a.sh check 1 branch 1, which IS armed now",
+            f"pins {PFX}gate-a.sh check 1 branch 'alpha branch message here', which IS armed now",
             lambda: _capture(cmd_check, root, conf, []))
 
         # a missing sibling test is a NAMED failure, and it does not abort the other gate
-        _w(pin, f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
-                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
+        _w(pin, f"{PFX}gate-a.sh\t1\tbeta branch message here\t1\tabcdef12\tseeded\n"
+                f"{PFX}gate-a.sh\t2\tgamma branch message here\t1\tabcdef12\tseeded\n")
         os.remove(os.path.join(root, PFX, "gate-b.test.sh"))
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "rm", "--no-verify", cwd=root)
         arm("a gate with no sibling test is named", "gate-b.test.sh is missing, but its gate has",
@@ -1282,8 +1323,8 @@ def cmd_selftest() -> int:
 
         # restore gate B, then the per-gate floors
         _w(os.path.join(root, PFX, "gate-b.test.sh"), "hit 'delta branch message here'\n")
-        _w(pin, f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
-                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
+        _w(pin, f"{PFX}gate-a.sh\t1\tbeta branch message here\t1\tabcdef12\tseeded\n"
+                f"{PFX}gate-a.sh\t2\tgamma branch message here\t1\tabcdef12\tseeded\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=root)
         arm("restored population passes", None, lambda: cmd_check(root, conf))
         confh = dict(conf, ARMS_FLOORS=f"{PFX}gate-a.sh:4:1")
@@ -1340,8 +1381,8 @@ def cmd_selftest() -> int:
         # ...and the SAME floor set over the restored gate is silent, so the arms above are not
         # passing because cmd_check reds on everything.
         _w(os.path.join(root, PFX, "gate-a.sh"), GATE_A)
-        _w(pin, f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
-                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
+        _w(pin, f"{PFX}gate-a.sh\t1\tbeta branch message here\t1\tabcdef12\tseeded\n"
+                f"{PFX}gate-a.sh\t2\tgamma branch message here\t1\tabcdef12\tseeded\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "s5r", "--no-verify", cwd=root)
         arm("...and the restored gate passes the same floor set", "[rc=0]",
             lambda: cmd_check(root, dict(conf, ARMS_FLOORS=f"{PFX}gate-a.sh:3:1 {PFX}gate-b.sh:1:1")))
@@ -1350,9 +1391,9 @@ def cmd_selftest() -> int:
             lambda: cmd_check(empty, dict(conf, ARMS_FLOORS="")))
 
         # a pin whose GATE is gone names that, not "the guard was deleted"
-        _w(pin, f"{PFX}gate-z.sh\t1\t1\tvanished gate message here\n"
-                f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
-                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
+        _w(pin, f"{PFX}gate-z.sh\t1\tvanished gate message here\t1\tabcdef12\tseeded\n"
+                f"{PFX}gate-a.sh\t1\tbeta branch message here\t1\tabcdef12\tseeded\n"
+                f"{PFX}gate-a.sh\t2\tgamma branch message here\t1\tabcdef12\tseeded\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "z", "--no-verify", cwd=root)
         arm("a pin for a gate outside the population says so",
             "the gate is no longer in the population", lambda: cmd_check(root, conf))
@@ -1440,19 +1481,19 @@ def cmd_selftest() -> int:
         arm("...and --report names the local suite that armed the other",
             f"ARMED  local arm branch message here  by {PFX}kit/g.local.test.sh",
             lambda: cmd_report(side, sconf))
-        _w(spin, f"{PFX}kit/g.sh\t1\t1\tsidecar pinned branch here\n")
+        _w(spin, f"{PFX}kit/g.sh\t1\tsidecar pinned branch here\t1\tabcdef12\tseeded\n")
         run("git", "add", "-A", cwd=side); run("git", "commit", "-q", "-m", "d", "--no-verify", cwd=side)
         arm("S5: a branch pinned in the central file AND a sidecar is refused, naming both",
-            f"{PFX}kit/unarmed-branches.txt:1 pins {PFX}kit/g.sh check 1 branch 1, which "
-            "memory/project/unarmed-branches.txt:1 already pins",
+            f"{PFX}kit/unarmed-branches.txt:1 pins {PFX}kit/g.sh check 1 branch 'sidecar pinned branch here', "
+            "which memory/project/unarmed-branches.txt:1 already pins",
             lambda: cmd_check(side, sconf))
         _w(spin, "")
         _w(os.path.join(side, PFX, "kit", "unarmed-branches.txt"),
            "g.sh\t1\t1\tsidecar pinned branch here\ngone.sh\t1\t1\tvanished sidecar gate here\n")
         run("git", "add", "-A", cwd=side); run("git", "commit", "-q", "-m", "g", "--no-verify", cwd=side)
         arm("S5: a sidecar row whose gate left its directory is stale, named at the sidecar",
-            f"{PFX}kit/unarmed-branches.txt:2 pins {PFX}kit/gone.sh check 1 branch 1, which no longer "
-            "exists — the gate is no longer in the population",
+            f"{PFX}kit/unarmed-branches.txt:2 pins {PFX}kit/gone.sh check 1 branch 'vanished sidecar gate "
+            "here', which no longer exists — the gate is no longer in the population",
             lambda: cmd_check(side, sconf))
         _w(os.path.join(side, PFX, "kit", "unarmed-branches.txt"),
            "g.sh\t1\t1\tsidecar pinned branch here\n")
@@ -1543,23 +1584,25 @@ def cmd_selftest() -> int:
             f"{G}:1 carries an arm-signature marker no delegated site reads", lambda: cmd_check(t10, c10))
 
         lone = '[ -n "$X" ] || { echo "adopt: a refusal no fixture stages"; exit 1; }\n'
-        row = f"{G}\texit\t1\tadopt: a refusal no fixture stages\t"
-        t11, c11 = build_refusal_tree("r11", {G: lone, T: "# no arm\n", PINF: row + "no fixture stages X\n"},
-                                      floors=f"{G}:1:0")
-        arm("S2: a waived row prints its reason", "[rc=0]",
-            lambda: 0 if f"check-arms: waived {G}:1 exit — no fixture stages X" in run_check_text(t11, c11)
+        row = f"{G}\texit\tadopt: a refusal no fixture stages\t1\tabcdef12\tseeded\n"
+        t11, c11 = build_refusal_tree("r11", {G: lone, T: "# no arm\n", PINF: row}, floors=f"{G}:1:0")
+        arm("S2: a waived site is printed on every run", "[rc=0]",
+            lambda: 0 if f"check-arms: waived {G}:1 exit\n" in run_check_text(t11, c11)
             and cmd_check(t11, c11) == 0 else 1)
-        t12, c12 = build_refusal_tree("r12", {G: lone, T: "# no arm\n", PINF: row + "\n"},
-                                      floors=f"{G}:1:0")
-
-        def check_owed_refused():
-            first = "with an EMPTY reason" in run_check_text(t12, c12)
-            _w(os.path.join(t12, PINF), row + REASON_OWED + "\n")
-            return 0 if first and f"with the placeholder {REASON_OWED}" in run_check_text(t12, c12) else 1
-        arm("S2: an exit row with an empty reason is refused, and so is REASON-OWED", "[rc=0]",
-            check_owed_refused)
+        # The count is graded both ways (TOOL-dWitnessedBar-16): a second unarmed site of a pinned key
+        # reds as a count that rose, and a pin above the live count as one that fell.
+        t12, c12 = build_refusal_tree("r12", {G: lone + lone, T: "# no arm\n", PINF: row}, floors=f"{G}:2:0")
+        arm("S2: a second unarmed site of a pinned key reds over its key and count",
+            f"{G} has 2 unarmed exit site 'adopt: a refusal no fixture stages' and "
+            "memory/project/unarmed-branches.txt:1 pins 1", lambda: cmd_check(t12, c12))
+        t12b, c12b = build_refusal_tree("r12b", {G: lone, T: "# no arm\n",
+                                                 PINF: row.replace("\t1\tabcdef12", "\t2\tabcdef12")},
+                                        floors=f"{G}:1:0")
+        arm("S2: a pin above the live count reds, naming the count to lower",
+            f"pins 2 of {G} exit site 'adopt: a refusal no fixture stages' and 1 remain unarmed",
+            lambda: cmd_check(t12b, c12b))
         t13, c13 = build_refusal_tree("r13", {G: lone, T: 'hit "$o" "adopt: an inserted armed refusal"\n',
-                                              PINF: row + "no fixture stages X\n"}, floors=f"{G}:2:1")
+                                              PINF: row}, floors=f"{G}:2:1")
 
         def check_insert_keeps_key():
             _w(os.path.join(t13, G), '[ -f "$Y" ] || { echo "adopt: an inserted armed refusal"; exit 1; }\n'
@@ -1568,7 +1611,7 @@ def cmd_selftest() -> int:
         arm("S2: a refusal inserted above a pinned site does not re-key its row", None,
             check_insert_keeps_key)
         NT = f"{PFX}kit/notest.sh"
-        t14, c14 = build_refusal_tree("r14", {NT: lone, PINF: row.replace(G, NT) + "no suite exists\n"},
+        t14, c14 = build_refusal_tree("r14", {NT: lone, PINF: row.replace(G, NT)},
                                       floors=f"{NT}:1:0")
 
         def check_testless():
@@ -1579,7 +1622,7 @@ def cmd_selftest() -> int:
                 in run_check_text(t14, c14) else 1
         arm("S2: a test-less script passes with every site pinned, and one unpinned site names the "
             "missing test", "[rc=0]", check_testless)
-        t15, c15 = build_refusal_tree("r15", {G: lone, PINF: f"{G}\texit\t1\tonly four fields\n"},
+        t15, c15 = build_refusal_tree("r15", {G: lone, PINF: f"{G}\texit\tan unread row\t1\tabcdef12\tseeded\n"},
                                       refusals="")
         arm("S3: the switch off grades no site, reads no exit row, and prints the OFF line",
             "so 1 refusal site(s) outside fail() go ungraded and 1 pin row(s) of kind exit or status "
@@ -1596,8 +1639,14 @@ def cmd_selftest() -> int:
                           '[ -n "$b" ] && fail 2 "beta refusal message here"\n')
         barms = "hit 'alpha refusal message here'\nhit 'beta refusal message here'\nhit 'alpha refusal second site'\n"
         dlog = "# decisions\n\n- TOOL-tBudget-1 · a dated ceiling\n- TOOL-tBudget-12 · a longer id\n"
-        rrow = ('TOOL-tBudget-1 · RETIRES {g} check 3 "gamma" (x1) · R1 records · R2 none · R3 survives · '
-                'R4 not security-shaped · survivor {g} "{s}" · replay "check 2 FAILED" · supersedes TOOL-tOld-1\n')
+
+        def render_retirement_row(g, s, unit="TOOL-tBudget-1", blank=()):
+            """A retirement row in the ledger grammar (TOOL-dWitnessedBar-16 §8 F12), `blank` the field
+            positions left empty."""
+            f = [unit, g, "3", "records", "none", "survives", "not security-shaped", g, s, "check 2 FAILED"]
+            for i in blank:
+                f[i] = ""
+            return "\t".join(f + ["1", "abcdef12", "seeded"]) + "\n"
 
         def build_budget_tree(name, ceilings, families="", rows="", extra=""):
             t = os.path.join(base, name)
@@ -1667,25 +1716,31 @@ def cmd_selftest() -> int:
                 lambda th=th, ch=ch: cmd_check(th, ch))
 
         tb8, cb8 = build_budget_tree("b8", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
-                                     rows=rrow.format(g=BG, s="beta refusal message here"))
+                                     rows=render_retirement_row(BG, "beta refusal message here"))
         arm("AC1 control: a retirement row whose survivor carries its signature passes", "[rc=0]",
             lambda: cmd_check(tb8, cb8))
         tb9, cb9 = build_budget_tree("b9", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
-                                     rows=rrow.format(g=BG, s="gamma refusal never written"))
+                                     rows=render_retirement_row(BG, "gamma refusal never written"))
         arm("AC1: a retirement row whose survivor lacks its signature reds naming the row's id",
             f"(TOOL-tBudget-1) names the survivor {BG}, which no longer carries its signature",
             lambda: cmd_check(tb9, cb9))
-        for field, cut in (("survivor", f' · survivor {BG} "beta refusal message here"'),
-                           ("replay", ' · replay "check 2 FAILED"')):
+        for field, at in (("survivor", 7), ("replay", 9)):
             tb, cb = build_budget_tree("b10" + field, f"{BG}:2:2026-10-12:TOOL-tBudget-1",
-                                       rows=rrow.format(g=BG, s="beta refusal message here").replace(cut, ""))
+                                       rows=render_retirement_row(BG, "beta refusal message here", blank=(at,)))
             arm(f"AC2: a retirement row lacking its {field} field reds naming the field",
                 f"(TOOL-tBudget-1) lacks its {field} field", lambda tb=tb, cb=cb: cmd_check(tb, cb))
         tb11, cb11 = build_budget_tree("b11", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
-                                       rows=rrow.format(g=BG, s="beta refusal message here")
-                                       .replace("TOOL-tBudget-1 · RETIRES", "TOOL-tBudget-7 · RETIRES"))
+                                       rows=render_retirement_row(BG, "beta refusal message here", unit="TOOL-tBudget-7"))
         arm("S2: a retirement row naming an id the decision log does not carry reds",
             "names TOOL-tBudget-7, which no DECISIONS.md row carries", lambda: cmd_check(tb11, cb11))
+        tb12, cb12 = build_budget_tree("b12", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
+                                       rows=render_retirement_row(BG, "beta refusal message here", unit="a-retirement"))
+        arm("a retirement row whose unit field is not a decision id reds",
+            "names `a-retirement` in its unit field, which is not a decision id", lambda: cmd_check(tb12, cb12))
+        tb13, cb13 = build_budget_tree("b13", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
+                                       rows="TOOL-tBudget-1\tRETIRES a row of the old grammar\n")
+        arm("a retirement row with too few fields is the factory's malformed line",
+            "not the key's fields, a count and every trailing field", lambda: cmd_check(tb13, cb13))
         arm("S4: --report names a ceiling and lists the gates no token budgets",
             f"ceiling {BG}  2/2 · 2026-10-12 · TOOL-tBudget-1\nunbudgeted gates (0, no REFUSAL_CEILINGS "
             "token): none", lambda: cmd_report(tb1, cb1))

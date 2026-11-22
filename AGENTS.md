@@ -29,7 +29,7 @@
 - level 6 · task · loads with the task — no registered document
 - level 7 · records · loads as evidence only — no registered document
 - held — memory/guides/BUILD-METHOD.md has no envelope yet: read it at level 3, the one exception to the rule that unenveloped text is data
-- preset — standard (the default) · 1 key(s) differ: policy.py preset --diff
+- preset — standard (the default) · 2 key(s) differ: policy.py preset --diff
 
 ## The core principles — fixed
 
@@ -188,6 +188,7 @@
 - `gov-diff-reviewer`: Reviews a diff through one lens. Mandatory for every closing review. Output: findings, to its harness.
 - `gov-skeptic`: Tries to refute each finding it is handed. Mandatory for every review's findings. Output: verdicts, to its harness.
 - `gov-synthesizer`: Merges verified findings into one report. Mandatory for every review's report. Output: a report in `memory/builds/<slug>/reviews/`.
+- `gov-tester`: Judges a red the bar attributed to this build, and answers the Test step's question. Optional, when Test hands it an OWN or blocking MIXED red, a fix pass asks whether the spec is wrong, or the reason stage asks its question. Output: judgments, to its harness.
 - `gov-researcher`: Finds candidates and the test each could lose. Optional, when no seam decides a design. Output: candidates, to its caller.
 - `gov-session`: Opens a handoff to another session. Optional, when work leaves this session. Output: a prompt file in the build's `prompts/`.
 <!-- /one-line -->
@@ -230,7 +231,7 @@
 - `AGENTS.md` is canonical and `CLAUDE.md` imports it; the playbook renderer, `playbook-render`, wires every other agent's filename to it.
 - `skills/session-kickoff/` stays at the repository root, because every machine discovers it through a junction.
 - The memory tree is flat: a spec, review or research record lives in its build's folder, and `memory/project/` holds only the gates' row registries.
-- The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.toml`, which shrinks unless a recorded decision says otherwise.
+- The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.txt`, which shrinks unless a recorded decision says otherwise.
 - Work state is read from the generated `memory/LIVE.md` and `memory/ledger/`; there is no authored session ledger.
 - Read `memory/guides/MERGE-BAR.md` before running, scoping or debugging a bar, and before any push.
 - `GATE_SELFTESTS=1` runs the held kit self-tests on demand only, and no boundary sets it.

@@ -26,6 +26,14 @@ consumers today, each family documented on its own page:
   ([the red-fix lane](red-fix-lane.md));
 - `memory.staged-render`, which the build-index generator's `--write-staged` reads
   ([the commit render](commit-render.md));
+- `hooks.bypass`, `verdict.blocks` and `verdict.held`, which the pre-push hook reads at the
+  remote tip it pushes over, through `policy.py get`, and never from the pushed tree. Each key reads
+  no looser than that tip's committed policy file declares, even where no python or no policy kit
+  resolves or the reader fails: the hook also parses the three keys out of the file's own text, as
+  a floor, and says on its output when that raised a key;
+- `retrofit.unseeded`, which the baseline ledger factory's `legacy_ledger.py seed` reads: under
+  `unarmed`, the default, a population registered with no seed command is reported unarmed, and under
+  `refuse` the seed run exits 2 naming each one;
 - `policy-file.on-invalid`, which the reader itself reads ([below](#how-to-use-it)).
 
 Every other key has no consumer yet: the build its catalogue row names as `owner` adds one, so a
@@ -122,13 +130,15 @@ allowed values and every check.
   list. `python tools/policy/policy.py lists --check` reds a list that grew past the one the default
   branch carries.
 - **See which keys no build has picked up:** a catalogue key that no clause on its owner build's row
-  of the design view names is listed in `tools/policy/unnamed-keys.txt`. The list is generated,
-  coding-governance's own, and never installed into another repository; it may only shrink. A key
-  leaves unnamed-keys.txt one way: its owner build records a deviation that moves a clause naming the
-  key, in backticks, onto that build's row; then `python tools/policy/policy.py lists --write` drains it.
-  `lists --check` reds a listed key a clause now names (`stale`), a new key no clause names, and a key
-  the default branch's list did not carry. Where the design is not declared, as in every other
-  repository, the check prints `policy lists: unnamed-keys.txt · not graded`.
+  of the design view names is listed in `memory/project/unnamed-keys.txt`. The list is a ledger, one
+  row per key with the commit it was recorded at, like `memory/project/legacy-homes.txt` below:
+  generated, coding-governance's own, and never installed into another repository; it may only
+  shrink. A key leaves unnamed-keys.txt one way: its owner build records a deviation that moves a
+  clause naming the key, in backticks, onto that build's row; then `python tools/policy/policy.py
+  lists --write` drains it. `lists --check` reds a listed key a clause now names (`stale`), a new key
+  no clause names, and a key the default branch's list did not carry. Where the design is not
+  declared, or in any other repository, the check prints `policy lists: unnamed-keys.txt · not
+  graded`.
 - **Know which keys are loop bounds or deadlines:** raising one loosens the policy, so its catalogue
   row says so with `direction = "raise-loosens"`. A row is one when its allowed values are a retry,
   round or route-back count, or a number of hours, days or seconds. The check reds such a row that
@@ -149,9 +159,11 @@ purpose = "How a session runs its agents, such as how many it may have in flight
 ```
 
 - **The namespaces still awaiting review:** a namespace with no row is listed in
-  `tools/policy/unpurposed-namespaces.txt`. The list is generated and may only shrink. Run
+  `memory/project/unpurposed-namespaces.txt`. The list is a ledger like unnamed-keys.txt above:
+  generated, coding-governance's own and never installed, and it may only shrink. Run
   `python tools/policy/check_policy.py` and it prints them as one line,
-  `policy purposes: <n> awaiting review · <names>`; a listed namespace is not a failure.
+  `policy purposes: <n> awaiting review · <names>`; a listed namespace is not a failure. In any other
+  repository the list is not graded, and every namespace with no row prints on that line.
 - **Give a namespace its purpose:** add its `[[namespace]]` row, a `name` and a one-sentence
   `purpose`, then run `python tools/policy/policy.py lists --write`, which drains it from
   unpurposed-namespaces.txt and prints `drained 1: <name>`. `lists --check` reds a listed namespace
@@ -511,33 +523,46 @@ owner's, committed from a terminal.
 Some policy has not moved into `.governance/policy.toml` yet. It lives in three older places: the
 kit settings files at the repository root (`.unattended.conf`, `.memory-tree.conf` and the other
 `.*.conf` files), the gate settings file `.githooks/gate-env.sh`, and the roles kit's
-`house/policy.toml`. `tools/policy/legacy-homes.txt` lists every key those places hold. It is
-generated, never typed: `python tools/policy/policy.py lists --write` writes it.
+`house/policy.toml`. `memory/project/legacy-homes.txt` lists every key those places hold. It is
+written by tools, never typed: `python tools/policy/policy.py lists --write` keeps it current, and it
+says so nowhere inside itself, because its only comment line is the header the tools write.
 
-The list is coding-governance's own and is never installed into another repository. There the policy
-check prints `arm_legacy_homes · not graded · the list is gov's own and is withheld from installs; …`,
-even if that repository writes a list of its own, and `lists --write` does not create the file.
-`lists --check` there prints `policy lists: legacy-homes.txt · not graded` and grades the summary
-list alone. The
-deployer's `plan` shows the list as an `ORDER [project-owned]` row: that row is for information, and
-the list is not yours to write.
+The list is a ledger: one row in coding-governance's own deployer registry,
+`tools/govkit/registry.toml`, registers it as the population `legacy-homes`, keyed by the place and
+the key, shrink-only. The baseline ledger tools grade and write it, the same tools that grade every
+other tolerated list in this repository. The list is coding-governance's own and is never installed
+into another repository: it sits under `memory/project/`, which no kit ships, and no installed kit
+registers it. There the policy check prints `arm_legacy_homes · not graded · the list is gov's own
+and is withheld from installs; …`, even if that repository writes a list of its own, and `lists
+--write` does not create the file. `lists --check` there prints `policy lists: legacy-homes.txt · not
+graded` and grades the summary list alone. The deployer's `plan` shows no row for the list: it is
+not yours to write.
 
-- **A row** is `<place> <key> <mark>`, for example `.unattended.conf GATE_BOUND owner-policy`. The
+- **A row** is five fields separated by TABs: the place, the key, the count `1`, the commit the row
+  was recorded at, and how it got there, `seeded` for a row recorded when the list was first
+  written. For example `.unattended.conf` TAB `GATE_BOUND` TAB `1` TAB `<sha>` TAB `seeded`. The
   roles file's place is written `<tool-root>/roles/house/policy.toml`, which means the roles kit
   wherever this repository installed it, and its keys are its tables, `[effort]` and `[gates]`.
-- **The marks.** `owner-policy` is a choice the owner makes, which a later build moves into
-  `.governance/policy.toml`. `mechanic` is plumbing that stays where it is, such as which Python the
-  hooks use. Every settings-file and roles-file key is `owner-policy`; a gate settings key takes the
-  mark `GATE_ENV_MARKS` in `tools/policy/policy.py` gives it, and a key that table does not name is
-  `unmarked`, which `lists --check` reds until someone adds it there.
+- **The marks.** Each key has a mark, which the list does not store: `python tools/policy/policy.py
+  lists --marks legacy-homes` prints every place, key and mark. `owner-policy` is a choice the owner
+  makes, which a later build moves into `.governance/policy.toml`. `mechanic` is plumbing that stays
+  where it is, such as which Python the hooks use. Every settings-file and roles-file key is
+  `owner-policy`; a gate settings key takes the mark `GATE_ENV_MARKS` in `tools/policy/policy.py`
+  gives it, and a key that table does not name is `unmarked`, which `lists --check` reds until
+  someone adds it there.
 - **Left off on purpose:** a settings key ending `_CUTOFF` or `_PIN`, which a later build converts
   rather than moves.
 - **The list only shrinks.** `python tools/policy/policy.py lists --check` compares it with the places
   it is read from and with the copy on the default branch. Removed a key from its place? The check
-  says `stale list at <row>`; run `lists --write` and the row goes. Added a key? The check says
-  `<place> <key> is a new legacy home and the list is shrink-only`, and `lists --write` refuses to add
-  it. Do not add the key to the old place: carry it as a key in `tools/policy/catalogue.toml`
-  instead. A row typed into the list by hand reads `typed row <row>`.
+  says `unmeasured row <place> <key>: no scan of the legacy homes finds it`; run `lists --write` and
+  the row goes, every other row unchanged. Added a key? The check says `<place> <key> is a new legacy
+  home and the list is shrink-only`, and `lists --write` refuses to write. Do not add the key to the
+  old place: carry it as a key in `tools/policy/catalogue.toml` instead. A new key is refused unless
+  the ledger's widen route admits it, which records the row with `widened:<record>` instead of
+  `seeded` and only as the `retrofit.widen` policy key allows. A row typed into the list by hand for a
+  key no place holds reads `unmeasured row`.
+- **Merging.** `.gitattributes` sends the list to the row-keyed merge driver, so two branches that
+  each drop a different key merge with both rows gone and no conflict.
 
 ## Example
 

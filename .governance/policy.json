@@ -1,5 +1,5 @@
 {
-  "catalogue_blob": "3f474db5ae058edb49c6cfe6ad8c3c90abbaac1e",
+  "catalogue_blob": "dc0821ca76b76844d7e27b2b639fa846348f319e",
   "keys": {
     "actions.free": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -1284,9 +1284,9 @@
       "value": "local-hook"
     },
     "verdict.blocks": {
-      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
-      "source": "default",
-      "value": "own-only"
+      "reason": "set in .governance/policy.toml at {rev}",
+      "source": "file",
+      "value": "own-mixed-contended"
     },
     "verdict.flakes": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -1331,8 +1331,8 @@
   },
   "legacy_blobs": {
     ".agent-cap.conf": null,
-    ".governance/instructions.toml": "4a987627ff3d8cc0b23cf5b10fd126ff0fbe0e08",
+    ".governance/instructions.toml": "6b3049c9cc983619025574c23e5146d330901c22",
     "tools/policy/presets.toml": "28373c5a97a6d5b903ee2de414d250542b1bce47"
   },
-  "policy_blob": "430e68331c5aec17e27ddb9650860a37502d906e"
+  "policy_blob": "1475a5e4ad9d506b5c6084c239bc4bfd0783d60d"
 }

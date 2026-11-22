@@ -59,26 +59,89 @@ function runGit(cwd, args, input) {
   return spawnSync("git", args, { cwd, env: ENV, input, encoding: "utf8", windowsHide: true });
 }
 
-// The bash that can SEE the shim. Each candidate is RUN, and the first under which `test -f` on the
-// shim exits 0 is kept, so a bash's place on PATH sets when it is tried, never whether it is taken.
-// The order: GOV_BASH, then each `bash.exe` and `bash` that exists in each PATH directory, taken
-// in PATH order, then Git for Windows' two paths, then the bare name, a repeat tried once. On Windows
-// the first PATH bash can be the System32 WSL launcher, which cannot open a `C:/` path, and the bare
-// name reaches it too (gotcha subprocess-resolves-a-different-shell), so every later PATH bash is
-// tried before Git's fixed paths. The checker's `resolve_bash` holds the same order with one PATH
-// bash, the one `shutil.which("bash")` names, in that slot. Where none can see the shim,
-// `export GOV_BASH=<path>`. Found once per process.
+// >>> resolve_bash_js -- canonical copy: resolve_bash.js in the gov lib dir (byte-identical; gated)
+// `{found, tried, refusal}`: resolve_bash.py's `scan_bash`, the same candidates, walk and acceptance.
+// GOV_BASH first, and when set nothing after it is tried; then Git's own `bin/bash.exe`, the third
+// parent of `git --exec-path`; then each PATH directory's `bash.exe` and `bash`, a System32 or
+// WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+// its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+// the answer must start MINGW or MSYS, so WSL's launcher is refused under any name. Past GOV_BASH every
+// candidate is run and reported once; `found` is the first that passed, or "" with `refusal` naming
+// every `tried` line. The bare name `bash` is never returned, and nothing is memoised here. On a
+// `posix` host the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/`
+// returns no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried.
+// `wrongShellAt` is resolve_bash.py's `wrong_shell_at` and the shell block `refuse_wrong_shell`'s:
+// true when `wsl` is set and the path sits under a single-letter `/mnt/<drive>/` (TOOL-dWitnessedBar-27).
+function wrongShellAt(path, wsl) {
+  return Boolean(wsl) && /^\/mnt\/[a-z]\//.test(String(path));
+}
+function scanBash({ script = "", host = "" } = {}) {
+  const cp = require("child_process"), fs = require("fs"), path = require("path");
+  const hostRule = host || (process.platform === "win32" ? "windows" : "posix");
+  if (hostRule === "posix") {
+    const here = path.resolve(__filename);
+    const wsl = Boolean(process.env.WSL_DISTRO_NAME) || fs.existsSync("/proc/sys/fs/binfmt_misc/WSLInterop");
+    if (wrongShellAt(here, wsl)) return { found: "", tried: [], refusal: "WSL is running " + here +
+      " from a Windows checkout under /mnt/; run it with Git's bash (C:/Program Files/Git/bin/bash.exe)" };
+  }
+  const tried = [], seen = new Set();
+  const runProbe = (cand) => {
+    const r = cp.spawnSync(cand, ["-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", String(script)],
+      { stdio: ["ignore", "pipe", "pipe"], timeout: 20000, windowsHide: true });
+    if (r.error || r.status === null) return "did not run";
+    const u = (r.stdout || Buffer.alloc(0)).toString("utf8").replace(/\0/g, "").split("\n")[0].trim();
+    if (!u) return "did not run";
+    if (hostRule === "windows" && !u.startsWith("MINGW") && !u.startsWith("MSYS")) return "answered " + u;
+    return r.status === 0 ? "runs" : "cannot see " + String(script);
+  };
+  const checkCandidate = (cand) => {
+    const key = hostRule === "windows" ? cand.toLowerCase() : cand;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    const low = cand.toLowerCase();
+    const why = low.includes("/system32/") || low.includes("/windowsapps/") ? "a launcher" : runProbe(cand);
+    tried.push(cand + ": " + why);
+    return why === "runs";
+  };
+  const checkFile = (p) => { try { return fs.statSync(p).isFile(); } catch (_e) { return false; } };
+  const gov = process.env.GOV_BASH || "";
+  if (gov) {
+    const why = runProbe(gov);
+    tried.push(gov + ": " + why);
+    if (why === "runs") return { found: gov, tried, refusal: "" };
+    return { found: "", tried, refusal: "GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: " +
+      "an override that is set and unusable is refused, never a fall-through" };
+  }
+  const g = cp.spawnSync("git", ["--exec-path"], { stdio: ["ignore", "pipe", "pipe"], timeout: 20000, windowsHide: true });
+  const ex = !g.error && g.status === 0 ? (g.stdout || Buffer.alloc(0)).toString("utf8").trim().replace(/\\/g, "/") : "";
+  let found = "";
+  if (!ex) {
+    tried.push("git --exec-path: did not run");
+  } else {
+    const cand = ex.replace(/\/+$/, "").split("/").slice(0, -3).join("/") + "/bin/bash.exe";
+    if (!checkFile(cand)) tried.push(cand + ": absent");
+    else if (checkCandidate(cand)) found = cand;
+  }
+  for (const d of (process.env.PATH || "").split(path.delimiter)) {
+    for (const name of ["bash.exe", "bash"]) {
+      const cand = (d.replace(/[/\\]+$/, "") + "/" + name).replace(/\\/g, "/");
+      if (d && checkFile(cand) && checkCandidate(cand)) found = found || cand;
+    }
+  }
+  if (found) return { found, tried, refusal: "" };
+  return { found: "", tried, refusal: "no bash runs" + (script ? " that can see " + String(script) : "") + ": " +
+    tried.join("; ") + "; set GOV_BASH to Git's bash" };
+}
+// <<< resolve_bash_js
+
+// The bash that can SEE the shim: the one `resolve_bash_js` block above (TOOL-dWitnessedBar-26) run
+// with the shim, GOV_BASH first, then Git's own `bin/bash.exe`, then PATH, each candidate RUN and a
+// WSL launcher refused under any name, never the bare name (gotcha
+// subprocess-resolves-a-different-shell). null where none resolves, which `runShim` turns into its
+// PolicyRefusal; `export GOV_BASH=<path>` names one. Found once per process.
 let BASH;
 function resolveBash() {
-  if (BASH !== undefined) return BASH;
-  const onPath = (ENV.PATH || ENV.Path || "").split(path.delimiter).filter(Boolean)
-    .flatMap((d) => [path.join(d, "bash.exe"), path.join(d, "bash")]).filter((p) => fs.existsSync(p));
-  const cands = [ENV.GOV_BASH, ...onPath, "C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"];
-  BASH = null;
-  for (const c of [...new Set(cands.filter(Boolean))]) {
-    const r = spawnSync(c, ["-c", 'test -f "$1"', "_", SHIM], { env: ENV, windowsHide: true, timeout: 20000 });
-    if (r.status === 0) { BASH = c; break; }
-  }
+  if (BASH === undefined) BASH = scanBash({ script: SHIM }).found || null;
   return BASH;
 }
 
@@ -87,7 +150,7 @@ function resolveBash() {
 // shim's stderr. Deny by default: a shim that did not run refuses too.
 function runShim(top, args) {
   const bash = resolveBash();
-  if (!bash) throw new PolicyRefusal(`policy: refused · ${MIRROR_REL}:0 · no bash can see ${SHIM}: GOV_BASH, each bash on PATH in order, Git for Windows' two and the bare name were each run; export GOV_BASH=<path> naming one that can`);
+  if (!bash) throw new PolicyRefusal(`policy: refused · ${MIRROR_REL}:0 · no bash can see ${SHIM}: GOV_BASH, Git's own bin/bash.exe and each bash on PATH were each run; export GOV_BASH=<path> naming one that can`);
   const r = spawnSync(bash, [SHIM, ...args], { cwd: top, env: ENV, encoding: "utf8", windowsHide: true });
   if (r.status === 0) return r.stdout;
   const err = (r.stderr || "").trim();
