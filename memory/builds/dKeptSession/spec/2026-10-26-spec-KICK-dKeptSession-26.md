@@ -1,6 +1,6 @@
 # KICK-dKeptSession-26 — the card showing the build's remaining rework budget beside its pointers
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 10 · advances KICK-dKeptSession-29 · closes TOOL-dDeclaredLoop-104
+**Status:** INPROGRESS · rev-4 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 10 · advances KICK-dKeptSession-29 · closes TOOL-dDeclaredLoop-104
 
 **Carries:** cl-dClosedLoop-0163@709e57f9 whole
 
@@ -18,6 +18,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-11 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 |
 | [2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md) | research | KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 |
 | [2026-11-21-prompt-KICK-dKeptSession-26-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-26-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-26-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-26-build-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md) | research | KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
