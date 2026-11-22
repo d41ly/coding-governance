@@ -190,6 +190,8 @@ again and prints the resume lines after the card:
 route — re-checked · ok
 resume — fresh recommended: idle 1840s past 300s · in C:/work/repo/.claude/worktrees/dExample (resume.context: fresh-when-idle)
 partial — 2 uncommitted path(s) · resume.partial: continue-item · kept, the item continues, its witness still owed
+position — act · next item.build.unit-pass
+lead — the compaction summary is a lead, never a source: check it against the position above and the card's pointers
 ```
 
 `resume.context` decides the recommendation. `fresh-when-idle`, the default, recommends a fresh
@@ -200,6 +202,16 @@ verdict is a pass, and otherwise reads as `fresh-when-idle` and says why. `resum
 what to do with uncommitted work: `continue-item`, `restart-item` (commit the work to
 `partial/<slug>/<sid8>`, then restore the tree) or `ask-owner`. The kickoff skill's resume paragraph
 states each act. The replay itself changes nothing in your tree.
+
+The `position —` line is where the build stands, as the loop kit's position engine re-derives it from
+witnesses (`position.py <slug> --json`): its answer, and for `act` the next item, else `next none`.
+It is always the engine's answer, never the card's stored `item —` pointer; where the two differ, trust
+the position line. A card that routes no build, a tree with no loop kit, or an engine that does not
+answer within its bound prints `position — skipped:` and why, and the card still prints. After a
+compaction, and only then, a `lead —` notice follows the `position —` line: the harness's summary of
+the conversation is a paraphrase nothing checks, so read it as a lead and check what it claims against
+the position line and the card's `## pointers` before you act on it. A resume restores the transcript
+itself and prints no notice.
 
 The card-import fixture's verdict lives in one file per clone, `card-fixture.verdict` in the
 `orientation` folder of the git common directory, so every worktree reads the same one. Record it on

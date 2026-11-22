@@ -1112,6 +1112,8 @@ print_replay() {
     REPLAY_KEYS=$(awk '{ sub(/\r$/, "") } sub(/^keys — skipped: /, "keys skipped: ") { print; exit }
       /^keys — view / { print "keys view fresh · remote evidence"; exit }' "$CARD_FILE")
   fi
+  render_position_line "$build"
+  render_lead_notice
   derive_head_state
   printf 'now — HEAD %s · %s · %s · %s · %s\n' "$HEAD_SHA" "$HEAD_BRANCH" "$HEAD_DIRTY" "$TOPLEVEL" "$REPLAY_KEYS"
 }
@@ -2693,6 +2695,49 @@ derive_resume_lines() { # slug -> the route —, resume — and partial — line
     printf 'card — skipped: resume.partial refused: %s\n' "${part%%$'\n'*}"
   fi
   return 0
+}
+
+# The replay's `position —` line (KICK-dKeptSession-15 S1, S2, S4): the build's position as the loop kit's
+# engine re-derives it from witnesses, `position.py <slug> --json`, and never the card's stored `item —`
+# pointer. The engine is found by `resolve_kit_file` and run in the session's own tree, CARD_TREE, entered
+# by a `cd` in the call's subshell, since it takes no root and reads the toplevel of its working directory;
+# stdin closed, into a scratch file under CARD_POSITION_BOUND, as `derive_map_block` bounds the map. An exit
+# 0, or 2, which the engine answers on `invalid-input` and argparse on a refused command line, is read by
+# one `[[ =~ ]]` over the output: `answer` held to the engine's ANSWERS (`tools/loop/position.py#ANSWERS`,
+# spelled again here because this kit names no file of another), and `next.item`, anchored on `next` since
+# `frontier` and `refusals` rows carry an `item` too, held to [A-Za-z0-9._-]+ and named only for `act`.
+# Every failure is one `position — skipped:` line. WHAT THIS DOES NOT CHECK: that the answer is still
+# current when the session reads it, or any field of the JSON past those two.
+render_position_line() { # slug -> one position — line on stdout; 0 always
+  local pos py sf rc out="" ans="" item=none
+  local re_ans='"answer": "([a-z-]+)"' re_item='"next": [{]"item": "([A-Za-z0-9._-]+)"'
+  [ -n "$1" ] || { printf 'position — skipped: the card routes no build\n'; return 0; }
+  pos=$(resolve_kit_file loop position.py)
+  [ -n "$pos" ] || { printf 'position — skipped: no loop kit\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'position — skipped: no Python resolves on this node\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'position — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.position.XXXXXX") \
+    || { printf 'position — skipped: no scratch file under %s to capture the answer in\n' "$CARD_DIR"; return 0; }
+  (cd "$CARD_TREE" && timeout -k 2 "$CARD_POSITION_BOUND" "$py" "$pos" "$1" --json </dev/null >"$sf" 2>/dev/null); rc=$?
+  case "$rc" in 0|2) out=$(<"$sf") ;; esac
+  rm -f "$sf" 2>/dev/null
+  case "$rc" in 124|137) printf 'position — skipped: position.py did not answer within %ss\n' "$CARD_POSITION_BOUND"; return 0 ;; esac
+  [[ $out =~ $re_ans ]] && ans=${BASH_REMATCH[1]}
+  case "$ans" in act|awaiting|blocked|terminal|stuck|invalid-input|stale-remote) ;; *) ans="" ;; esac
+  if [ "$ans" = act ]; then
+    if [[ $out =~ $re_item ]]; then item=${BASH_REMATCH[1]}; else ans=""; fi
+  fi
+  [ -n "$ans" ] || { printf 'position — skipped: position.py printed no answer this replay reads\n'; return 0; }
+  printf 'position — %s · next %s\n' "$ans" "$item"
+}
+
+# The replay's `lead —` notice (KICK-dKeptSession-15 S3), after a compaction alone: the payload's `source`,
+# which `read_session_id` keeps in CARD_SOURCE, reads `compact`. A resume restores the transcript and
+# carries no summary, and a replay run with `--session` or stdin closed reads no payload, so neither prints it.
+render_lead_notice() { # -> the lead — line on stdout after a compaction, else nothing; 0 always
+  [ "$CARD_SOURCE" = compact ] || return 0
+  printf '%s\n' "lead — the compaction summary is a lead, never a source: check it against the position above and the card's pointers"
 }
 
 if [ -n "$CARD" ]; then

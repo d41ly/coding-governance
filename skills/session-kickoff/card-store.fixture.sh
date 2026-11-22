@@ -39,7 +39,8 @@ context-always-fresh context-fixture-red context-transcript-absent partial-conti
 partial-ask terminal-route close-follow-twice follow-offline-publish follow-offline-publish-online
 follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-run fixture-run-cli worktree-named replay-order
 fixture-cli-path-differs fixture-cli-unknown pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay
-budget-open budget-spent budget-unfrozen budget-omitted budget-no-kit"
+budget-open budget-spent budget-unfrozen budget-omitted budget-no-kit
+position-act position-awaiting position-disagrees position-skips lead-compact lead-resume"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
 BRIEF=memory/builds/tFix/prompts/2026-01-01-prompt-TOOL-tFix-1-brief.md
@@ -227,6 +228,23 @@ read_card_budget() {
 run_card_append() {
   write_card_body "$S/body" 1
   (cd "$R" && bash "$CHECK" --card --append --session t1 < "$S/body") > "$OUT" 2>&1
+}
+# run_card_replay [source] — the replay as the hook runs it, its payload piped on stdin with no --session,
+# naming the given `source`, never through run_card_engine, which closes stdin (KICK-dKeptSession-15 S6).
+run_card_replay() {
+  local payload
+  if [ -n "${1:-}" ]; then printf -v payload '{"session_id":"t1","cwd":"%s","source":"%s"}' "$R" "$1"
+  else printf -v payload '{"session_id":"t1","cwd":"%s"}' "$R"; fi
+  (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+}
+# set_card_answer <answer> <next item, empty for null> [rc] — the stub engine's `--json` answer, in the
+# engine's own spelling, a frontier row naming another item ahead of `next`, so a match not anchored on
+# `next` reads that row's item instead.
+set_card_answer() {
+  local nx=null j
+  [ -z "$2" ] || nx="{\"item\": \"$2\", \"unit\": \"TOOL-tFix-1\", \"actor\": \"agent\", \"key\": \"$2@TOOL-tFix-1#aaaa0003\"}"
+  printf -v j '{"slug": "tFix", "state": "building", "units": [{"id": "TOOL-tFix-1", "step": "building", "state": "INPROGRESS"}], "frontier": [{"item": "item.design.unit-spec", "unit": "TOOL-tFix-2", "actor": "agent", "key": "item.design.unit-spec@TOOL-tFix-2#aaaa0004"}], "next": %s, "answer": "%s", "reason": ""}' "$nx" "$1"
+  set_card_position json "$j"; set_card_position rc "${3:-0}"
 }
 
 write_card_fixture || { echo "card-store: the fixture could not be built under $S"; sed 's/^/    /' "$OUT" 2>/dev/null; exit 2; }
@@ -712,5 +730,69 @@ case "$PLANT" in
     run_card_engine "$R" --card --check --session t1; rc=$?
     print_card_held "AC3 --card --check passes the session card carrying the skip" \
       "$([ "$rc" = 0 ] && read_card_section "$R/.git/orientation/t1.md" | grep -qx 'budget — skipped: no loop kit'; echo $?)" ;;
+  position-act)
+    # KICK-dKeptSession-15 AC1: the stub engine answering act at item.build.unit-pass, a frontier row
+    # naming item.design.unit-spec ahead of it, so a match not anchored on `next` misses.
+    run_card_append; set_card_answer act item.build.unit-pass; run_card_replay
+    print_card_held "AC1 act at item.build.unit-pass prints position — act · next item.build.unit-pass" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — act · next item.build.unit-pass'; echo $?)" ;;
+  position-awaiting)
+    # KICK-dKeptSession-15 AC1: a non-act answer names no item, its JSON's next filled or not; an
+    # invalid-input JSON exiting 2 reads as the answer it prints.
+    run_card_append; set_card_answer awaiting item.build.unit-pass; run_card_replay
+    print_card_held "AC1 awaiting, its JSON naming a next item, prints position — awaiting · next none" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — awaiting · next none'; echo $?)"
+    set_card_answer invalid-input "" 2; run_card_replay
+    print_card_held "AC1 invalid-input, exit 2, prints position — invalid-input · next none" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — invalid-input · next none'; echo $?)" ;;
+  position-disagrees)
+    # KICK-dKeptSession-15 AC2, S4: the card's stored item — pointer at item.design.unit-spec, the stub
+    # engine answering item.build.unit-pass; the line takes the engine's and the pointer stays as written.
+    set_card_position key item.design.unit-spec@TOOL-tFix-1#aaaa0001; run_card_append
+    set_card_answer act item.build.unit-pass; run_card_replay
+    print_card_held "AC2 the replayed card's item — pointer names item.design.unit-spec" \
+      "$(read_card_section "$OUT" | grep -q '^item — item\.design\.unit-spec@TOOL-tFix-1#aaaa0001 · at '; echo $?)"
+    print_card_held "AC2 the position line names the engine's item.build.unit-pass" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — act · next item.build.unit-pass'; echo $?)" ;;
+  position-skips)
+    # KICK-dKeptSession-15 AC3: the session card as the fixture wrote it routes no build; then routed, the
+    # copied loop kit's position.py moved aside, then the stub sleeping past a lowered bound, timed against
+    # a control replay whose stub answers at once, as lookup-hung measures; then a usage line exiting 2.
+    run_card_replay
+    print_card_held "AC3 an unrouted card prints position — skipped: the card routes no build, and the card" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — skipped: the card routes no build' && grep -q '^orientation — t1 · ' "$OUT" && grep -q '^READY — none yet' "$OUT"; echo $?)"
+    run_card_append; set_card_answer act item.build.unit-pass
+    f=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file loop position.py); [ -n "$f" ] || { echo "card-store: no position.py resolves in $R"; exit 2; }
+    mv -f "$f" "$f.aside" || { echo "card-store: $f could not be moved aside"; exit 2; }
+    run_card_replay
+    print_card_held "AC3 no position.py resolving prints position — skipped: no loop kit, and the card" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — skipped: no loop kit' && grep -q '^READY — tFix' "$OUT"; echo $?)"
+    mv -f "$f.aside" "$f" || { echo "card-store: $f could not be restored"; exit 2; }
+    t0=$EPOCHSECONDS; run_card_replay; t1=$EPOCHSECONDS
+    set_card_position delay 30
+    t2=$EPOCHSECONDS; CARD_POSITION_BOUND=2 run_card_replay; t3=$EPOCHSECONDS
+    set_card_position delay 0
+    print_card_held "AC3 a stub past CARD_POSITION_BOUND=2 prints did not answer within 2s, and the card" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — skipped: position.py did not answer within 2s' && grep -q '^READY — tFix' "$OUT"; echo $?)"
+    print_card_held "AC3 the slow replay took $((t3 - t2 - t1 + t0))s over the control, within the bound plus 5s" "$([ $((t3 - t2 - t1 + t0)) -le 7 ]; echo $?)"
+    set_card_position json "usage: position.py [-h] [--json | --next-line] [slug]"; set_card_position rc 2; run_card_replay
+    print_card_held "AC3 a usage line exiting 2 prints the unreadable skip, never invalid-input" \
+      "$(tr -d '\r' < "$OUT" | grep -qx 'position — skipped: position.py printed no answer this replay reads' && ! grep -q '^position — invalid-input' "$OUT"; echo $?)" ;;
+  lead-compact|lead-resume)
+    # KICK-dKeptSession-15 AC4, AC5: the payload's source compact, then resume, the position answered by
+    # the stub; after a compaction the notice follows the position line, in I10's slot before now —.
+    run_card_append; set_card_answer act item.build.unit-pass; run_card_replay "${PLANT#lead-}"
+    lead="lead — the compaction summary is a lead, never a source: check it against the position above and the card's pointers"
+    if [ "$PLANT" = lead-compact ]; then
+      print_card_held "AC4 source compact: the lead — notice directly follows the position line" \
+        "$(tr -d '\r' < "$OUT" | grep -A1 -x 'position — act · next item.build.unit-pass' | tail -n 1 | grep -qxF "$lead"; echo $?)"
+      at=$(tr -d '\r' < "$OUT" | awk '/^partial — / && !p { p = NR } /^position — / && !o { o = NR } /^lead — / && !l { l = NR }
+        /^now — / && !n { n = NR } END { print p + 0, o + 0, l + 0, n + 0 }')
+      read -r l1 l2 l3 l4 <<<"$at"
+      print_card_held "AC5 partial, position, lead and now at lines $at, increasing" "$([ "$l1" -gt 0 ] && [ "$l1" -lt "$l2" ] && [ "$l2" -lt "$l3" ] && [ "$l3" -lt "$l4" ]; echo $?)"
+    else
+      print_card_held "AC4 source resume: the position line prints and no lead — line does" \
+        "$(tr -d '\r' < "$OUT" | grep -qx 'position — act · next item.build.unit-pass' && ! grep -q '^lead — ' "$OUT"; echo $?)"
+    fi ;;
 esac
 exit "$MISSED"

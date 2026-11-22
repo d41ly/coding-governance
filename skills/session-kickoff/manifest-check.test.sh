@@ -2530,7 +2530,10 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +5: RAISED by KICK-dKeptSession-26 S4 — the five plants it adds to `--list` (budget-open, budget-spent,
 # budget-unfrozen, budget-omitted, budget-no-kit), one ok row each from the loop above; no suite ran in
 # the pass, each plant was run alone by direct CLI.
-FLOOR_ASSERTIONS=427
+# +6: RAISED by KICK-dKeptSession-15 S6 — the six plants it adds to `--list` (position-act,
+# position-awaiting, position-disagrees, position-skips, lead-compact, lead-resume), one ok row each from
+# the loop above; no suite ran in the pass, each plant was run alone by direct CLI.
+FLOOR_ASSERTIONS=433
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced
