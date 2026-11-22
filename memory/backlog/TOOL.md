@@ -670,7 +670,7 @@ Cite ids, never line numbers.
 | [TOOL-dTieredTribunal-22](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the uncounted filter(Boolean) predicate, the follow-up… |
 | [TOOL-dTieredTribunal-23](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the protocol gate arm TOOL-dTieredTribunal-13's F1 resolved to record… |
 | [TOOL-dTieredTribunal-24](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | two mechanical arms for the amendment-leaves-its-other-half-standing… |
-| [TOOL-dTotalRecall-27](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | MED | TOOL-dTotalRecall-10 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dTotalRecall-27](../builds/dTotalRecall/BACKLOG.md) | INPROGRESS | MED | TOOL-dTotalRecall-8 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dTotalRecall-28](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE RECORD-KIND FACTORY HAS TWO OWNERS ON PAPER. TOOL-dPlacedRequest-1… |
 | [TOOL-dTotalRecall-29](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | MED | TOOL-dTotalRecall-3 | 2026-10-26 | THE SHARED REF WRITER MAY DELETE A CLAIM REF. TOOL-dTotalRecall-3 never… |
 | [TOOL-dTotalRecall-30](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-24 | 2026-10-26 | THE FEED CENSUS CANNOT SEE A RECORD COMMIT. TOOL-dPlacedRequest-13's… |
@@ -680,8 +680,8 @@ Cite ids, never line numbers.
 | [TOOL-dTotalRecall-34](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-20 | 2026-10-26 | THE SHIM KINDS HAVE NO VERB. TOOL-dTotalRecall-20 forwards --new-build… |
 | [TOOL-dTotalRecall-35](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-12 | 2026-10-26 | THE SLICE CHANNEL HAS NO PRODUCER. TOOL-dTotalRecall-12 counts the work… |
 | [TOOL-dTotalRecall-101](../builds/dTotalRecall/BACKLOG.md) | OPEN | HIGH | — | 2026-10-26 | held red: suite policy fixtures red at 60d90cb7 on the daily held job,… |
-| [TOOL-dTotalRecall-102](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-8 | 2026-10-26 | THE MAP AND CODE SLOTS NAME dBoundRoles AS THEIR DELIVERY.… |
-| [TOOL-dTotalRecall-103](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | MED | TOOL-dTotalRecall-8 | 2026-10-26 | THE CODE RECORD LANDS NO NEIGHBOURHOOD READER. TOOL-dFurnishedOrders-17… |
+| [TOOL-dTotalRecall-102](../builds/dTotalRecall/BACKLOG.md) | INPROGRESS | LOW | TOOL-dTotalRecall-8 | 2026-10-26 | THE MAP AND CODE SLOTS NAME dBoundRoles AS THEIR DELIVERY.… |
+| [TOOL-dTotalRecall-103](../builds/dTotalRecall/BACKLOG.md) | INPROGRESS | MED | TOOL-dTotalRecall-8 | 2026-10-26 | THE CODE RECORD LANDS NO NEIGHBOURHOOD READER. TOOL-dFurnishedOrders-17… |
 | [TOOL-dTotalRecall-104](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE MEMORY READ LIST IS RENDERED AS A SECOND BLOCK. TOOL-dTotalRecall-9… |
 | [TOOL-dTotalRecall-105](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE SHAPE-RUN KIND HAS NO ACT FORM. TOOL-dTotalRecall-11 admits only a… |
 | [TOOL-dTotalRecall-106](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE CAUSES CHECK READS NO BINDING. TOOL-dTotalRecall-19 S8's… |

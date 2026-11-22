@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · closes TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · closes TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0219@62a3f369 whole
 **Carries:** node:record-kind.code
@@ -27,6 +27,7 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-8-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-edges-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-edges-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-edges-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-edges-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-facts-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-facts-brief.md) | journal | — |
