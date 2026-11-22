@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dBoundRoles-61-deviation-612.md](../build/2026-10-26-build-TOOL-dBoundRoles-61-deviation-612.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-61-round5-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-61-round5-fix-return.md) | research | TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-61-round5-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-61-round5-fix-brief.md) | research | TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 |
+| [2026-11-22-prompt-TOOL-dBoundRoles-20-reground-m-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-20-reground-m-brief.md) | journal | TOOL-dBoundRoles-20 TOOL-dBoundRoles-59 TOOL-dBoundRoles-19 TOOL-dBoundRoles-18 |
 | [2026-10-26-review-TOOL-dBoundRoles-61-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-61-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 |
 
 <!-- /gen:spec-records -->

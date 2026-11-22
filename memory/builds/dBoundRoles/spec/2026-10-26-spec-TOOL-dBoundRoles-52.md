@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dBoundRoles-52-deviation-522.md](../build/2026-10-26-build-TOOL-dBoundRoles-52-deviation-522.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-52-round3-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-52-round3-fix-return.md) | research | TOOL-dBoundRoles-53 TOOL-dBoundRoles-55 TOOL-dBoundRoles-58 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-52-round3-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-52-round3-fix-brief.md) | research | TOOL-dBoundRoles-53 TOOL-dBoundRoles-55 TOOL-dBoundRoles-58 |
+| [2026-11-22-prompt-TOOL-dBoundRoles-11-reground-l-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-11-reground-l-brief.md) | journal | TOOL-dBoundRoles-11 TOOL-dBoundRoles-47 TOOL-dBoundRoles-26 TOOL-dBoundRoles-53 |
 | [2026-10-26-review-TOOL-dBoundRoles-52-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-52-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-53 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 |
 
 <!-- /gen:spec-records -->

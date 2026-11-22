@@ -14,6 +14,8 @@
 | [2026-10-26-build-TOOL-dBoundRoles-44-deviation-441.md](../build/2026-10-26-build-TOOL-dBoundRoles-44-deviation-441.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-44-deviation-442.md](../build/2026-10-26-build-TOOL-dBoundRoles-44-deviation-442.md) | deviation | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-20-spec-tokens-d-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-20-spec-tokens-d-brief.md) | journal | TOOL-dBoundRoles-20 TOOL-dBoundRoles-19 TOOL-dBoundRoles-18 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-50 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 |
+| [2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-brief.md) | journal | TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 |
+| [2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 |
 
 <!-- /gen:spec-records -->
