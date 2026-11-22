@@ -30,9 +30,9 @@ reconciled into one note spelling. This unit settles that spelling and grades it
 `TOOL-dWitnessedBar-97` takes ids 2 and 6 and adds the staged reds only their fixes name.
 
 `TOOL-dWitnessedBar-92` §4 "The note check" tests a row's token with `index($0, t)` (spec-92 line
-321 at `d31ee066d`), which asks only that the literal appears. 92 S4 asks each close-time derivation
+321 at `3ffc6c67c`), which asks only that the literal appears. 92 S4 asks each close-time derivation
 note to quote what `resolve_python` printed and the derivation's exit, and the four rows that grade
-those notes carry the bare token `resolve_python:` (spec-92 lines 296-299 at `d31ee066d`). A note
+those notes carry the bare token `resolve_python:` (spec-92 lines 296-299 at `3ffc6c67c`). A note
 reading `resolve_python: , exit 0` passes, so 92 AC4's staged break cannot print its `NO NOTE`. The
 same presence test passes row `90|S10` on a note that lists `AC1` beside the five criteria it names.
 
@@ -45,7 +45,7 @@ and builds one step after it (order 49).
 - **S1** — id 15. The pattern column. A note-table row becomes
   `<unit>|<item>|<ledger unit>|<answer>|<token>[|<pattern>]`. In 92 §4's note check, three fragments
   are rewritten, and nothing else moves:
-  - on spec-92 line 317 at `d31ee066d`, `read -r u s l a t; do` becomes `read -r u s l a t p; do`;
+  - on spec-92 line 317 at `3ffc6c67c`, `read -r u s l a t; do` becomes `read -r u s l a t p; do`;
   - on spec-92 line 321, `-v t="$t" '` becomes `-v t="$t" -v p="$p" '`;
   - on spec-92 line 321, `index($0, t))` becomes `index($0, t)) && (p == "" || $0 ~ p)`.
 
@@ -112,9 +112,9 @@ and builds one step after it (order 49).
 
 ### Evidence
 
-Read on 2026-11-21 at `d31ee066d`. Unit 92 is CLOSED (`186cad841`), records only. Its rev-3
+Read on 2026-11-21 at `3ffc6c67c`. Unit 92 is CLOSED (`27a6568ef`), records only. Its rev-3
 re-ground left §4's note check byte-identical and its four `92|S4` rows and `90|S10` row unchanged,
-moving only their line numbers (DERIVED 2026-11-21, §4 diffed against `a34fd39d9~1`).
+moving only their line numbers (DERIVED 2026-11-21, §4 diffed against `85d53157b~1`).
 
 - `tools/lib/resolve-python.sh@d31ee066d:50` tries `"${1:-}" "${GOV_PYTHON:-}" python3 python py`
   in order, and `:68` prints an override as given and, for the three launcher names, the
@@ -123,10 +123,10 @@ moving only their line numbers (DERIVED 2026-11-21, §4 diffed against `a34fd39d
   line, in `:80-185`, opens `resolve_python: ` and goes to stderr. Sourced on node d with no
   `GOV_PYTHON` and no memo, it printed an absolute `.../python.exe` path holding `py` and no space or
   comma, exit 0 (DERIVED 2026-11-21).
-- Spec-92 line 321 at `d31ee066d` tests `(t == "" || index($0, t))`, line 317 reads
+- Spec-92 line 321 at `3ffc6c67c` tests `(t == "" || index($0, t))`, line 317 reads
   `read -r u s l a t; do`, lines 296-299 give each `92|S4` row the token `resolve_python:`, and line
   284 gives row `90|S10` the token `AC4 AC6 AC7 AC10 AC12`.
-- Probed on 2026-11-21 at `d31ee066d` against a scratch 88 ledger whose `- AC6` answer carries one
+- Probed on 2026-11-21 at `3ffc6c67c` against a scratch 88 ledger whose `- AC6` answer carries one
   continuation note labelled `TOOL-dWitnessedBar-92 S4`. Through spec-92's script with the row
   `92|S4|88|AC6|resolve_python:`, a note holding `resolve_python: , exit 0` printed `NOTES OK 1`.
   Through the script with S1's fragments and S3's row, notes holding `resolve_python: python3 exit 0`,
@@ -163,7 +163,7 @@ None: no stored data changes. A five-field row reads as before, so 92's other ro
 ### Rollout
 
 The pass takes order 49, one above unit 92's 48, beside units 93, 94 and 95, and writes this unit's
-acceptance ledger with AC1 to AC4 owed, as units 91 and 92 did (`b7e2e3d8d`, `186cad841`). At the
+acceptance ledger with AC1 to AC4 owed, as units 91 and 92 did (`81ec5dded`, `27a6568ef`). At the
 close, after every unit is terminal, AC1 to AC3's fixtures run, S5's note is written and AC4 reads
 it. Every derivation note is 92 S4's, written at the close in S2's spelling in the ledgers of units
 88 and 89; this unit writes none of them. `TOOL-dWitnessedBar-97` S8, at order 50, composes S1's
@@ -238,7 +238,7 @@ fragments and S3's rows into the note check every close-time run uses.
 `recall floor` and `recall floor arms` are owed for the ledgers under `memory/`. AC1 to AC3 run by
 fixture at the close. This unit adds no arm and moves none, so it declares no `New arm:` line, and
 `TOOL-dWitnessedBar-92` §4's owner derivation, which takes the place of 88 S6's (92 S12), still names
-unit 90 the floor's owner: run at `d31ee066d` it printed 28 and
+unit 90 the floor's owner: run at `3ffc6c67c` it printed 28 and
 `spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md`, exit 0 (PINNED 2026-11-21).
 
 ## 8. Open questions
@@ -277,7 +277,7 @@ unit 90 the floor's owner: run at `d31ee066d` it printed 28 and
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit of units 91 and 92, id 15
   (HIGH, item H4; ids 2 and 6 are its medium-graded item M1, batched into TOOL-dWitnessedBar-97).
-- rev-2 · 2026-11-21 · §1 to §8 · §10 · re-grounded at `d31ee066d` per
+- rev-2 · 2026-11-21 · §1 to §8 · §10 · re-grounded at `3ffc6c67c` per
   2026-11-19-prompt-TOOL-dWitnessedBar-96-reground-brief. Spec-92 citations move to rev-3's lines;
   `resolve_python` now prints an override, a memo launcher or an executable path, so S2 spells
   `<value>` and S3's claims follow, with §8 F4 keeping S3's pattern; the pattern is a sixth field;

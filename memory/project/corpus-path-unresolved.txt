@@ -1,2 +1,3 @@
 # ledger · corpus-path-unresolved · key site path,cited · direction shrink-only · drain hunk
-# unarmed · dead probe · a3e1779c7e91ac330cb240f761ac817f088a03ca
+memory/builds/dHonouredPark/BACKLOG.md	tools/dead-path-waivers.txt	2	4e7482c5cc245a40087158ad5dd9c753af5fbfdd	seeded
+memory/builds/dSpentCeiling/BACKLOG.md	tools/dead-path-waivers.txt	1	4e7482c5cc245a40087158ad5dd9c753af5fbfdd	seeded

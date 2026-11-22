@@ -9,7 +9,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 16.
 - Built so far through order 15: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11 (the gate-leg factory),
-  14, 45, 54, 16, 46, 17, 52, 53, 18, 20, 24 (`fe49c7d2a`: the portability leg pack) and 10 (`d15371e5e`: the
+  14, 45, 54, 16, 46, 17, 52, 53, 18, 20, 24 (`6d1261958`: the portability leg pack) and 10 (`b671830d8`: the
   pre-commit list derived from each leg's `precommit` key, `precommit` a new `LEG_KEYS` key with its govkit floor).
 - The spec is rev-4, written before most of those landed. `tools/run-gates/leg_factory.py`, `tools/gate-legs.json`,
   `tools/govkit/govkit.py`'s `LEG_KEY_FLOORS` and the policy catalogue have all moved since; verify each claim

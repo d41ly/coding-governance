@@ -96,7 +96,7 @@ S20); each says so and keeps its observation.
 - **S6** — id 5. The `run-gates gov canary` row's `guard` gains `{prefix}/`. The row is declared in
   its `[[exempt_leg]]` row of `tools/govkit/registry.toml` (`@c9500821b:827-840`) and rendered into
   `tools/gate-legs.json` by `python tools/run-gates/leg_factory.py --write`, the route unit 73's
-  guard entry took (`daa7d6534`); the manifest is never hand-edited. Unit 68's arm runs
+  guard entry took (`9408fd742`); the manifest is never hand-edited. Unit 68's arm runs
   `read --backend local-hook`, whose `read_backends(tool_root)` reads every `tools/*/kit.toml`
   (`tools/run-gates/verdict_backends.py#read_backends`) and whose `check_backend` refuses before any
   read (unit 6 S1, S2), so an edit to any kit's descriptor selects the leg and moves its reuse key.
@@ -129,7 +129,7 @@ S20); each says so and keeps its observation.
   touched names `.githooks/pre-push` and for which `python tools/check-spec-tokens.py --spec <path>`
   prints `run-gates gov canary <- .githooks/pre-push`: `PLAY-dConvergedCharter-41`,
   `TOOL-dPlacedRequest-11`, `TOOL-dWellOiledMachine-10` and `TOOL-dWellOiledMachine-17` (four,
-  DERIVED 2026-11-21 at `c9500821b`, §4 Evidence). This unit files one ask row per build (§8 F5) in
+  DERIVED 2026-11-21 at `2bc0afda9`, §4 Evidence). This unit files one ask row per build (§8 F5) in
   `memory/builds/dConvergedCharter/BACKLOG.md`, `memory/builds/dPlacedRequest/BACKLOG.md` and
   `memory/builds/dWellOiledMachine/BACKLOG.md`. Each names its specs and the token
   `run-gates gov canary <- .githooks/pre-push` each spec's §7 owes once it leaves DEFERRED, with a
@@ -173,8 +173,8 @@ S20); each says so and keeps its observation.
 - **S18** — id 14. Unit 71's acceptance ledger beside AC1 names
   `tools/memory-tree/check-verdict-epoch.test.sh@c9500821b:31-32` as the two-key bash precedent for
   S1's `GIT_CONFIG_COUNT=2` plant, and states that `git grep -n GIT_CONFIG_COUNT -- tools` printed
-  35 lines at `c9500821b` (PINNED 2026-11-21 by that `git grep`). Observed by AC19.
-- **S19** — id 13. Present at HEAD: unit 73 rev-5 (`129dee4f6`) cites unit 67's Files touched by
+  35 lines at `2bc0afda9` (PINNED 2026-11-21 by that `git grep`). Observed by AC19.
+- **S19** — id 13. Present at HEAD: unit 73 rev-5 (`95f372679`) cites unit 67's Files touched by
   count and quote, no line of unit 67's spec, so the wrong line numbers are gone. NOT OBSERVED: a
   correction to spec text, which no built artifact carries and no criterion of unit 73 reads. §4
   Evidence of this spec records the measurement.
@@ -228,7 +228,7 @@ held its 23.
 
 ### Evidence
 
-Read at HEAD `c9500821b` on 2026-11-21 unless dated otherwise.
+Read at HEAD `2bc0afda9` on 2026-11-21 unless dated otherwise.
 
 - `read_bar_file` (`.githooks/pre-push#read_bar_file`) loops `while IFS= read -r ln`, with no
   `|| [ -n ]` guard, skips a line with no TAB, then splits with `IFS=$'\t' read -r k v <<<"$ln"`,
@@ -273,7 +273,7 @@ Read at HEAD `c9500821b` on 2026-11-21 unless dated otherwise.
   `awk -v BINMODE=3 ...` printed 41, and `x=$(awk -v BINMODE=3 ... END{printf "%s", v})` held 41
   bytes.
 - `grep -cE 'TOOL-dWitnessedBar-67[.]md:[0-9]'` over unit 73's spec prints 0 (PINNED 2026-11-21).
-- `git grep -n GIT_CONFIG_COUNT -- tools` prints 35 lines (PINNED 2026-11-21 at `c9500821b`), among
+- `git grep -n GIT_CONFIG_COUNT -- tools` prints 35 lines (PINNED 2026-11-21 at `2bc0afda9`), among
   them `tools/memory-tree/check-verdict-epoch.test.sh@c9500821b:31-32`, which exports
   `GIT_CONFIG_COUNT=2` with `core.autocrlf` and `commit.gpgsign`.
 - `tools/lib/resolve_prefix_token.py` holds the canonical `resolve_prefix_token`, the function the
@@ -466,11 +466,11 @@ other units' ledgers at the close.
   `73 AC1:` failure line, and `grep -c '71 S3\|71 AC3' tools/lib/resolve-python.test.sh` prints 0.
   Unit 71's ledger line for AC3 names `TOOL-dWitnessedBar-73` AC1.
   Red when: two assertions grade one fixture's branch, so either builder's red is ambiguous.
-  figure: the builder count is DERIVED at observation time; it read 2 at `c9500821b` (PINNED 2026-11-21).
+  figure: the builder count is DERIVED at observation time; it read 2 at `2bc0afda9` (PINNED 2026-11-21).
 - **AC19** — When `grep -n 'check-verdict-epoch.test.sh@' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-71*acceptance-ledger*`
   runs at the close, the AC1 line names it and states 35 lines (PINNED 2026-11-21 by `git grep -n GIT_CONFIG_COUNT -- tools`).
   Red when: unit 71's reuse audit stands with the two-key precedent unnamed.
-  figure: 35 is PINNED, measured at `c9500821b` on 2026-11-21.
+  figure: 35 is PINNED, measured at `2bc0afda9` on 2026-11-21.
   permission: the ledger is written at the close.
 - **AC20** — When `grep -nE '(^|[;&|(]|then|do)[[:space:]]*python[0-9.]*[[:space:]]' tools/run-gates/run-gates.gov.test.sh`
   runs on the built tree, it prints nothing, and
@@ -553,7 +553,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC8 AC14 · `read_bar_f
   `tools/gate-legs.json`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else
   moved.
 - rev-5 · 2026-11-21 · §1 to §10 · S1 · S6 to S11 · S15 · S17 to S20 · AC8 to AC12 · AC16 · AC18 to
-  AC20 · re-grounded at `c9500821b` over units 68 to 80 as landed, per
+  AC20 · re-grounded at `2bc0afda9` over units 68 to 80 as landed, per
   2026-11-19-prompt-TOOL-dWitnessedBar-78-reground-brief. S1, S10, S11, S17, S19 and S20 find their
   code landed and keep their observations (§8 F4). S6 declares its guard in `registry.toml` and
   renders the manifest. S7 and S8 meet `read_bar_file` and a ten-key inherited green as built, minting
@@ -569,10 +569,10 @@ Each item extends the seam its finding names. S7 and S8 bring `read_bar_file` to
 `check_bar_base`'s `local` idiom (`.githooks/pre-push#check_bar_base`), and S7's arm reuses
 `TOOL-dWitnessedBar-73` S9's derived planting and its `sed` over the cut's `case` labels. S3's probe
 calls the canonical `resolve_prefix_token` (`tools/lib/resolve_prefix_token.py`) rather than a second
-resolver. S6 adds an entry to the existing guard through the registry row unit 73's `daa7d6534`
+resolver. S6 adds an entry to the existing guard through the registry row unit 73's `9408fd742`
 edited. S20 reuses the suite's `PYBIN` and `KITDIR`.
 `python tools/codebase-map/reuse_lookup.py "read a tab separated key value record file line by line keeping carriage return"`,
-re-run at `c9500821b` on 2026-11-21, ranked `read_text`, `key`, `read` and `read_bytes` first, none
+re-run at `2bc0afda9` on 2026-11-21, ranked `read_text`, `key`, `read` and `read_bytes` first, none
 reachable from the hook, so no existing seam fits beyond those named above.
 
 Recall terms used: `python tools/memory-recall/query.py "what did the round-1 audit of units 68 to 73 find" --terms "read_bar_file inherited green gov canary guard kit.toml encoding newline BINMODE GIT_CONFIG_COUNT PYBIN ask row"`

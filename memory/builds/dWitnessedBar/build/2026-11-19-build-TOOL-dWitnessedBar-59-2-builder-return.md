@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-59
 
-# TOOL-dWitnessedBar-59 — builder return 2 (run `wf_15338b0e-3b5`), committed 4657d344dd6cf3bf8dfc449f102a57ae377d7b92
+# TOOL-dWitnessedBar-59 — builder return 2 (run `wf_15338b0e-3b5`), committed 9e7d56e7219d5abb3a9e40dbefd629a9a4898266
 
 ## Why
 
@@ -8,15 +8,15 @@ TOOL-dWitnessedBar-59 is built and committed as one pass. I checked the spec aga
 
 ## Summary
 
-I applied the first builder's saved patch to C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/govkit/selftest.py. It applied cleanly at base b0cf02bad. It adds to `check_inherited_red_step`:
+I applied the first builder's saved patch to C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/govkit/selftest.py. It applied cleanly at base 5b738045b. It adds to `check_inherited_red_step`:
 - the AC1 target `ir59-ac1`, where the up must write `every-red` over `park<CR>INHERITED_RED=land`;
 - the AC2 target `ir59-ac2`, where the witness must exit 1 with `assigns` once and `not an assignment` nowhere, and the up must leave exactly `A=1\nB=2\n`;
 - the AC3 parity row labelled `lone-cr`, whose agreed hook value is `park\rINHERITED_RED=land`. The row-count check now expects 12 rows, and the "WHAT IT DOES NOT CHECK" comment no longer names a lone CR. (DERIVED from the builder's probe)
 
-Commit 4657d344d contains:
+Commit 9e7d56e72 contains:
 - the selftest change;
 - the spec status flip INPROGRESS to CLOSED, dated 2026-11-20 (the pre-commit hook also regenerated the spec's records table);
-- the acceptance ledger C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-59-1-acceptance-ledger.md, re-dated to base b0cf02bad;
+- the acceptance ledger C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-59-1-acceptance-ledger.md, re-dated to base 5b738045b;
 - the files the index generator rewrote: memory/builds/dWitnessedBar/README.md, memory/LIVE.md and memory/backlog/TOOL.md.
 
 It went through the hooks without `--no-verify`, with explicit paths only, and carries the trailers `Pass: TOOL-dWitnessedBar-59` and `Co-Authored-By`. RUN.md had no uncommitted rows, so it is not in the commit. `gen_map.py --check` exited 0, so `symbols.json` did not change. selftest.py is not on the kickoff manifest's watch list (the hook confirmed this), and no deviation record was needed. `--brief` reported the brief already recorded and unchanged. help/reference/drive.md and help/reference/units.md were already modified before I started, and I left them alone.

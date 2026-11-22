@@ -8,8 +8,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 10.
-- Built so far: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11 (the gate-leg factory), 14 (`49f5d3ff6`, red-fix
-  `3fb69a6e7`: the `ratchet` pack in `tools/memory-tree/ratchet.py`, the `conf-scalar-pins` population, the `new at`
+- Built so far: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11 (the gate-leg factory), 14 (`25a3d2970`, red-fix
+  `a17222bd8`: the `ratchet` pack in `tools/memory-tree/ratchet.py`, the `conf-scalar-pins` population, the `new at`
   rule for a population the base holds nowhere, `populated` red on an empty armed population), 45 and 54 (the
   `exists:` form of a generated row's `when`, read by regen, lib-unattended and selfcheck alike).
 - The spec was re-grounded with unit 14's rev-10 as the contract; read `ratchet.py` as it landed, including its

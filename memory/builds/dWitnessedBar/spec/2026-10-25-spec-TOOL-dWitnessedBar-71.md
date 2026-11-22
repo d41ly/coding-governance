@@ -32,7 +32,7 @@ The round-1 spec audit of units 66 and 67
 confirmed finding **id 11 at HIGH**, report item **H2**. No other id shares that item. Report item
 M1 describes the same defect at MEDIUM under ids 3, 18 and 21, which `TOOL-dWitnessedBar-73` takes.
 
-`TOOL-dWitnessedBar-67` S6 landed in `e1d569fc9`. Its block of section `2o` runs every git call with
+`TOOL-dWitnessedBar-67` S6 landed in `af84e1a7a`. Its block of section `2o` runs every git call with
 `GIT_CONFIG_NOSYSTEM=1` and `GIT_CONFIG_GLOBAL` naming an empty scratch file, exported at
 `tools/lib/resolve-python.test.sh@d31bef20:1537` and unset at `tools/lib/resolve-python.test.sh@d31bef20:1628`.
 Unit 67 AC5 names a hostile config, `init.defaultBranch=main` and `init.defaultRefFormat=reftable`,
@@ -252,7 +252,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 AC3 · section `2o`'
   edge of TOOL-dWitnessedBar-78, promoted by the round-1 spec audit of units 68 to 73; nothing else
   moved.
 - rev-3 · 2026-11-21 · §1 to §10 · S1 to S3 · AC1 to AC4 · re-grounded over unit 67 as landed
-  (`e1d569fc9`), per 2026-11-19-prompt-TOOL-dWitnessedBar-71-reground-brief: section `2l` reads `2o`
+  (`af84e1a7a`), per 2026-11-19-prompt-TOOL-dWitnessedBar-71-reground-brief: section `2l` reads `2o`
   outside the carried Edges bullets; the suite plants no hostile config, so S1 adds one; S1's
   subshell becomes `run_planted_git` (§8 F3); S3 names the `child` builder beside the loop's; S1
   corrects the unit-64 header and AC4 observes it; Files touched and the leg line gain

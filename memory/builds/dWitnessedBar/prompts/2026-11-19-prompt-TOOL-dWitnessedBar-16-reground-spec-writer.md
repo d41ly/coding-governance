@@ -118,9 +118,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved lines as `path#symbol` or blob-pinned, never a bare `path:line`.
    What is built so far:
    - Built: unit 26 (`7526c98fa`, the `resolve_bash_py` block `scan_bash` / `scanBash`, `scan_bare_bash` in
-     `tools/run-gates/measure_legs.py`); unit 27 (`cc35bb62c`, `tools/lib/refuse-wrong-shell.sh` in every
-     `resolve_python` member, section `2n`); unit 48 (`75a15d9ce`, row_grammar's resolver an adapter); unit 49
-     (`ef33493d7`, shape 4 of `scan_bare_bash`). Unit 13 (rev-4) is building now; unit 50 (rev-4) builds after it.
+     `tools/run-gates/measure_legs.py`); unit 27 (`8b3aa5783`, `tools/lib/refuse-wrong-shell.sh` in every
+     `resolve_python` member, section `2n`); unit 48 (`15bb9de79`, row_grammar's resolver an adapter); unit 49
+     (`ebe9575ea`, shape 4 of `scan_bare_bash`). Unit 13 (rev-4) is building now; unit 50 (rev-4) builds after it.
    - Queued from re-grounded specs, each the contract for what will exist: unit 13 (rev-4: `tools/lib/legacy_ledger.py`
      with `read_rows`, `read_registrations`, `read_renames`, `compare_to_base`, `write_rows`, the CLI verbs
      `read|compare|carry` with `compare --measured <path>`, parity row `legacy_ledger_py`, section `2o`); unit 15

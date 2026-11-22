@@ -33,9 +33,9 @@ builder can build it as written over HEAD.
      or drop the step.
    - Files touched gains `memory/guides/SESSION-KICKOFF.md` (its watch list names two files this unit edits) and
      `.lexicon.conf` if the unit moves a pin; `.memory-tree.conf` and `.gitattributes` stay listed.
-   Every other claim the builder probed held at `dabb1aa23`; leave those as they are.
+   Every other claim the builder probed held at `cf254a004`; leave those as they are.
 2. Built so far, each landed on this branch: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19 and 11
-   (`b80649e60`: the gate-leg factory; its `new` verb has no `--pack` flag). Units 16 and 46 are being re-grounded
+   (`0ccc23626`: the gate-leg factory; its `new` verb has no `--pack` flag). Units 16 and 46 are being re-grounded
    beside this revision and read this spec as the contract; their specs are not yours to edit.
 3. A choice the revision forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it
    RESOLVED in §8 with the delegated mark, and name it in your return.

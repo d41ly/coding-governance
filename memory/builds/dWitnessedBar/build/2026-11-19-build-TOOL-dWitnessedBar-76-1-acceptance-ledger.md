@@ -15,7 +15,7 @@ stays as `TOOL-dWitnessedBar-73` S15 states it (DERIVED from the builder's probe
 The floor that counts this unit's arms is `FLOOR_ASSERTIONS` in `tools/run-gates/run-gates.gov.test.sh` as `TOOL-dWitnessedBar-82` S1 restates it after unit 78, answering the New-arm line's floor clause, which cites `TOOL-dWitnessedBar-73` S15 (`TOOL-dWitnessedBar-82` S3).
 
 **Evidences:** TOOL-dWitnessedBar-76
-- AC1 — `fingerprint:rec_fp` — TOOL-dWitnessedBar-84 S7, S8: the symbol-tier key `check_canary_keys` was rendered at `bdc10a4df` by `python tools/codebase-map/gen_map.py --write`, and `codebase-map coverage + freshness`, the unguarded leg the minted function moves, is the leg the close runs for it under `TOOL-dWitnessedBar-84` §7; this criterion's whole-suite single-copy observation is `TOOL-dWitnessedBar-84` AC2's probe.
+- AC1 — `fingerprint:rec_fp` — TOOL-dWitnessedBar-84 S7, S8: the symbol-tier key `check_canary_keys` was rendered at `3596751cf` by `python tools/codebase-map/gen_map.py --write`, and `codebase-map coverage + freshness`, the unguarded leg the minted function moves, is the leg the close runs for it under `TOOL-dWitnessedBar-84` §7; this criterion's whole-suite single-copy observation is `TOOL-dWitnessedBar-84` AC2's probe.
   S3's `fingerprint` `sed` over the cut changed one `diff` line and the
   canary's `sed` over that variant one; sourced over the record, its mutant gave
   `printf %s "$rec_fp" | wc -c` 40 and `rec_sha` 41. The `fingerprint:rec_fp` grep names the

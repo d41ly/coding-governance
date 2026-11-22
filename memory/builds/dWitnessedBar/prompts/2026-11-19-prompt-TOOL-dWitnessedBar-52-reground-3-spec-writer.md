@@ -118,10 +118,10 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 10: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11 (the gate-leg
-     factory), 14 (`49f5d3ff6`: the `ratchet` pack, `conf-scalar-pins`), 45, 54, 16 (`87bc9f615`, `3ce285ad7`: gov's
+     factory), 14 (`25a3d2970`: the `ratchet` pack, `conf-scalar-pins`), 45, 54, 16 (`3a7a51471`, `450f7b322`: gov's
      registries on the ledger through `tools/memory-tree/convert_registry.py`, the step program
      `tools/govkit/steps/registry_to_ledger.py`, the four lists once under `tools/` now in `memory/project/`, empty
-     homes written unarmed) and 46 (`028b97364`: the adopter's `--seed-pins`, `keys-not-scalar` red when unarmed, the
+     homes written unarmed) and 46 (`e1efccc6b`: the adopter's `--seed-pins`, `keys-not-scalar` red when unarmed, the
      seven gov-only legs as exempt rows).
    - Unit 17 (order 11) is being revised over its builder's divergence and builds before these; read its spec as the
      contract.

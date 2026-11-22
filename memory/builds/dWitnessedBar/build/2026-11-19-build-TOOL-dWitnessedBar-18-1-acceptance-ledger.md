@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dWitnessedBar-18
 
-One pass, the third builder, at base `4e059ae8f373ef437887db417fef6ad10d167880` over the rev-8 spec. The
+One pass, the third builder, at base `4a79fbe8af7a0d5675925080dd8bd0c22034e9e7` over the rev-8 spec. The
 pass ran no merge bar, no self-test suite and no gate leg; it ran the naming lexicon's `--suggest`, the
 generator `gen_map.py --write`, `owed_rows.py --base HEAD` and each changed module's own verb or plant.
 Each criterion below was checked on node d on 2026-11-20 by a seed verb, a `python -c` probe of the

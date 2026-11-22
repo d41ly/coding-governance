@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-96
 
-# TOOL-dWitnessedBar-96 — builder return 1 (run `wf_55c93f59-2d0`), committed 117ca9731
+# TOOL-dWitnessedBar-96 — builder return 1 (run `wf_55c93f59-2d0`), committed 73fc3773b
 
 ## Why
 
-TOOL-dWitnessedBar-96 is records only. The spec's claims about current code all held at base. Spec-92's note check and the resolve-python.sh lines it cites have not changed since d31ee066d (git diff --stat printed nothing). The spec's lines 317 and 321, rows 284 and 296 to 299, and the one `- AC4` answer in unit 92's ledger match what the spec says. So there was no divergence, and the unit was committed as its spec and brief describe.
+TOOL-dWitnessedBar-96 is records only. The spec's claims about current code all held at base. Spec-92's note check and the resolve-python.sh lines it cites have not changed since 3ffc6c67c (git diff --stat printed nothing). The spec's lines 317 and 321, rows 284 and 296 to 299, and the one `- AC4` answer in unit 92's ledger match what the spec says. So there was no divergence, and the unit was committed as its spec and brief describe.
 
 ## Summary
 
-Commit 117ca9731 holds the pass for TOOL-dWitnessedBar-96, with a `Pass: TOOL-dWitnessedBar-96` trailer, two `Decided:` lines and the Co-Authored-By trailer. Its files:
+Commit 73fc3773b holds the pass for TOOL-dWitnessedBar-96, with a `Pass: TOOL-dWitnessedBar-96` trailer, two `Decided:` lines and the Co-Authored-By trailer. Its files:
 - the new acceptance ledger C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-96-1-acceptance-ledger.md, one line per criterion AC1 to AC4, each opening with a backticked token that criterion spells and each marked OWED to the close;
 - the spec's status header, INPROGRESS to CLOSED, date 2026-11-21;
 - memory/builds/dWitnessedBar/RUN.md, holding the dispatch and brief rows;

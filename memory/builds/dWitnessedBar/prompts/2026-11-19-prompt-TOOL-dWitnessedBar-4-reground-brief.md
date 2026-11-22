@@ -25,7 +25,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 15: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11 (the gate-leg
-     factory), 14, 45, 54, 16, 46, 17, 52, 53, 18, 20, 24 (`fe49c7d2a`: the portability leg pack) and 10 (`d15371e5e`:
+     factory), 14, 45, 54, 16, 46, 17, 52, 53, 18, 20, 24 (`6d1261958`: the portability leg pack) and 10 (`b671830d8`:
      the pre-commit list derived from each leg's `precommit` key, cost evidence keyed by leg and node).
    - Unit 9 (order 16) is being built now, in this working tree. Three files this spec touches are in its write set:
      `tools/run-gates/README.md`, `tools/policy/catalogue.toml` and `tools/policy/unsummarised-keys.txt`. Read those

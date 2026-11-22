@@ -9,9 +9,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 13.
 - Built so far through order 12: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14, 45, 54, 16, 46, 17
-  (`dbbd8caba`: `{prefix}` resolved in seed argvs by the factory), 52, 53 and 18 (`0519457ea`: the playbook lists
+  (`9a29f1e96`: `{prefix}` resolved in seed argvs by the factory), 52, 53 and 18 (`c91fc4e55`: the playbook lists
   registered, `instructions-legacy.txt` moved to `memory/project/`).
-- The spec is rev-4, re-grounded at `dc92afdba`: `legacy-homes.txt` moves to `memory/project/` (§8 F7). Read it whole;
+- The spec is rev-4, re-grounded at `f55a5c018`: `legacy-homes.txt` moves to `memory/project/` (§8 F7). Read it whole;
   hand back any claim the landed code breaks as a divergence.
 - The pass legs carry one known red: install-prefix on the `conf-scalar-pins` seed argv in
   `tools/memory-tree/kit.toml`, held until unit 51. The full `memory hygiene` leg is red at base on checks 13 and 15

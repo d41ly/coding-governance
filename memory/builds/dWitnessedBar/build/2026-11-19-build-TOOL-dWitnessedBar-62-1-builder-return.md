@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-62
 
-# TOOL-dWitnessedBar-62 — builder return 1 (run `wf_ae744491-9ae`), committed f6ce71662e7c5c987559db9e9ec0b49a4b9f7900
+# TOOL-dWitnessedBar-62 — builder return 1 (run `wf_ae744491-9ae`), committed c2bd2371bdbbfee011cd6c7073e97067a5ba23f4
 
 ## Why
 
-TOOL-dWitnessedBar-62 is built from spec rev-5 and committed. I checked every spec claim against the tree first and found nothing that blocks the build, so there is no DIVERGENCE. The pass commit is f6ce71662: it carries the trailer `Pass: TOOL-dWitnessedBar-62` and the only edit to the spec is its status header, now CLOSED dated 2026-11-20. I then ran the bug-class checklist over that commit. It named the inherited-git-dir class, and that applied: the seed-across compare in the hygiene suite read HEAD with a bare `git rev-parse`, which would follow a GIT_DIR inherited from a hook. Commit 7f2b664e8 (`Pass: none`) makes it read HEAD through `legacy_ledger.read_head_sha`. HEAD is now 7f2b664e8.
+TOOL-dWitnessedBar-62 is built from spec rev-5 and committed. I checked every spec claim against the tree first and found nothing that blocks the build, so there is no DIVERGENCE. The pass commit is c2bd2371b: it carries the trailer `Pass: TOOL-dWitnessedBar-62` and the only edit to the spec is its status header, now CLOSED dated 2026-11-20. I then ran the bug-class checklist over that commit. It named the inherited-git-dir class, and that applied: the seed-across compare in the hygiene suite read HEAD with a bare `git rev-parse`, which would follow a GIT_DIR inherited from a hook. Commit 6253d5177 (`Pass: none`) makes it read HEAD through `legacy_ledger.read_head_sha`. HEAD is now 6253d5177.
 
 ## Summary
 
-**Built and committed:** pass commit f6ce71662, then 7f2b664e8 (the checklist fix). Base was b82c0f53.
+**Built and committed:** pass commit c2bd2371b, then 6253d5177 (the checklist fix). Base was 60ca5ed4.
 
 **What changed, by scope item:**
 - **S22, S20 (`exists:` containment):** an `exists:` path that resolves to an absolute path or holds a `..` segment is now refused or skipped by all three readers: `tools/run-gates/regen.py#check_when`, selfcheck's `_check_exists_refused` in `tools/govkit/govkit.py`, and `tools/unattended/lib-unattended.sh#resolve_generated_indexes`. They use the same pattern `read_gate_policy` uses. The unattended README paragraph and the reader's header comment now name both `when` forms, the tokens, the refused shapes and the silent skip of an absent path. The run-gates README `when` table names the refusal.

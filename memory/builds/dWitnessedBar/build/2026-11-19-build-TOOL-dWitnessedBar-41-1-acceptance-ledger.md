@@ -3,7 +3,7 @@
 **Serves:** journal TOOL-dWitnessedBar-41
 
 No merge bar, no self-test suite and no gate leg ran in this pass, the naming lexicon excepted. The
-criteria were observed on node d, 2026-11-20, at base `386b3ebee`, by two scratch probes over
+criteria were observed on node d, 2026-11-20, at base `505cbc487`, by two scratch probes over
 fixture repositories at `%TEMP%/w41a` and `%TEMP%/w41b` that ran this pass's runner and hook, by
 `verdict_flow.py select --check` run over planted files, and by one probe that extracted
 `check_tree_selection` from the hook and ran it under a counting stand-in for `check_selection_at_r`.

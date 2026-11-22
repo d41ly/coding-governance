@@ -58,7 +58,7 @@ defect at two binding grades and stand as items M4 and L1.
 - **S1** — id 17. The canary's verdict on every code. At the canary's single top-level call of
   `check_canary_keys`, a return of 3 already sets `fail=1` and leaves `rgf_ok` at 0, so the call site
   prints nothing beyond the visited line `check_canary_keys` printed on stderr, and no
-  `TOOL-dWitnessedBar-75` S1 line: unit 89's pass `0c2f7e195` built that under its deviation 893.
+  `TOOL-dWitnessedBar-75` S1 line: unit 89's pass `05fdf49d3` built that under its deviation 893.
   This unit adds the remaining branch. A return outside 0 to 3 sets `fail=1`, leaves `rgf_ok` at 0,
   as the suite's rule for a failed canary requires (§4 Evidence), and prints
   `gov-canary: check_canary_keys returned <rc>, a code it does not define`. Returns 0, 1 and 2 keep the
@@ -207,7 +207,7 @@ included (`tools/workflows/unattended-build.js@9b0ad9c97:78`), so a split would 
 
 ### Evidence
 
-Read on 2026-11-21 at `9b0ad9c97`. Units 82 to 89 are CLOSED; unit 28 is deferred unbuilt.
+Read on 2026-11-21 at `93d34f5da`. Units 82 to 89 are CLOSED; unit 28 is deferred unbuilt.
 
 - `tools/run-gates/run-gates.gov.test.sh@9b0ad9c97:243-287`: `a=0` with its trailing comment
   `executed assertions, printed at the end against the pinned floor`, the `TOOL-aShardedFloor-2`
@@ -524,7 +524,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 AC2 · the canary c
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-91 and TOOL-dWitnessedBar-92, promoted by the round-1 spec audit of
   unit 90; nothing else moved.
-- rev-3 · 2026-11-21 · §2 to §8 · §10 · re-grounded at `9b0ad9c97` per
+- rev-3 · 2026-11-21 · §2 to §8 · §10 · re-grounded at `93d34f5da` per
   2026-11-19-prompt-TOOL-dWitnessedBar-90-reground-brief. S1 keeps only the undefined-code branch,
   unit 89's deviation 893 having built the 3; S11 drops every floor-history line and counts built arms
   (F5); AC11 counts `RAISED` too; the shell-role row and its legs join; citations pinned.

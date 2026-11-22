@@ -1,10 +1,10 @@
-# TOOL-dWitnessedBar-51 red-fix 136 — kickoff-manifest ratchet fixed in 05ae9762
+# TOOL-dWitnessedBar-51 red-fix 136 — kickoff-manifest ratchet fixed in 19d3ebde
 
 **Serves:** red-fix TOOL-dWitnessedBar-51
 
 - **Leg:** kickoff-manifest ratchet
-- **Red line:** MANIFEST check 9 FAILED: 10 non-merge commits since b6656244c
+- **Red line:** MANIFEST check 9 FAILED: 10 non-merge commits since f488d65bd
 - **Files:** memory/guides/SESSION-KICKOFF.md
-- **Commit:** 05ae97627379b7e2c2569db7db5c7032bb91b548
+- **Commit:** 19d3ebdeb1efb03db364791aa5296f6b6f9c724d
 - **Rerun:** bash skills/session-kickoff/manifest-check.sh
 - **Caused-by:** TOOL-dWitnessedBar-51

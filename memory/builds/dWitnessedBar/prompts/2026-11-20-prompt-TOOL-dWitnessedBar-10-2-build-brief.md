@@ -9,7 +9,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 15.
 - Built so far through order 14: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11 (the gate-leg factory),
-  14, 45, 54, 16, 46, 17, 52, 53, 18, 20 and 24 (`fe49c7d2a`: the portability leg pack, nine new legs in
+  14, 45, 54, 16, 46, 17, 52, 53, 18, 20 and 24 (`6d1261958`: the portability leg pack, nine new legs in
   `tools/gate-legs.json`).
 - The first builder stopped before writing code; its return is
   `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-10-1-builder-return.md`. The spec is now

@@ -25,4 +25,7 @@ unattended/review-rounds-to-policy	1	9e21ac760dc0a43d6ed007396922722ccee98d57	se
 agent-cap/fanout-cap-to-agents-in-flight	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 playbook/adopter-rules-to-overlay	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 playbook/seeded-template	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-govkit/inherited-red-to-verdict-blocks	1	2123e214652a4a98e7bb1f0521775ac05769d20b	carried:TOOL-dWitnessedBar-3
+govkit/inherited-red-to-verdict-blocks	1	816d4aa91e998e7e5bdbb555dcec7c73b81dfd1d	carried:TOOL-dWitnessedBar-3
+kickoff-manifest/facts-to-overlay	1	8005455c6563c1ef1a861c99bdab87de46161be4	seeded
+playbook/adopter-rules-to-overlay-2	1	8005455c6563c1ef1a861c99bdab87de46161be4	seeded
+playbook/instructions-legacy-seed	1	8005455c6563c1ef1a861c99bdab87de46161be4	seeded

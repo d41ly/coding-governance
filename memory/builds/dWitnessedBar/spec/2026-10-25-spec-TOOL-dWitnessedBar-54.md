@@ -79,7 +79,7 @@ readers learn the form, and a parity arm holds all three to one answer. It repai
 
 ### Evidence
 
-- The readers, DERIVED 2026-11-19 at `4e5497fb7`, the same three as at `98e33d71c`, by
+- The readers, DERIVED 2026-11-19 at `2ca17d9c5`, the same three as at `112526471`, by
   `git grep -nE 'get\("when"\)|\["when"\]|\^when\[|"when", "w"' -- 'tools/*.py' 'tools/*.sh' 'tools/*.js'`:
   `regen.check_when` (`tools/run-gates/regen.py#check_when`, called in
   `tools/run-gates/regen.py#build_items`), govkit selfcheck 6c (`tools/govkit/govkit.py#selfcheck`,
@@ -202,13 +202,13 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 · five `when` forms read by
   `tools/govkit/govkit.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief; nothing
   else moved.
 - rev-4 · 2026-11-19 · §1 · S1 S2 · §3 · §4 Evidence, Migration, Rollout · AC1 · §10 · re-grounded at
-  `98e33d71c` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-46-reground-brief: line citations become
+  `112526471` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-46-reground-brief: line citations become
   `path#symbol` or blob-pinned; the reader population is re-derived by one stated command, with
   `loop_table.py` and runlog named outside it; the callers of `resolve_generated_indexes` are four, at
   moved lines; S3's scratch rows carry `write`, `check` and `stage`, the rows `build_items` admits;
   AC1's scratch is a clone; and the Rollout lands this unit with TOOL-dWitnessedBar-45 in one merge,
   unit 45 first, under one bar, per unit 45 §8 F3.
-- rev-5 · 2026-11-19 · S2 · §4 Evidence · §10 · re-grounded at `4e5497fb7` per brief
+- rev-5 · 2026-11-19 · S2 · §4 Evidence · §10 · re-grounded at `2ca17d9c5` per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief. The `[aWP r2]` case S2 rewrites moved,
   re-pinned to its new blob. The reader population was re-derived by its stated command and holds the
   same three. The four `GENERATED_INDEXES` callers and the lib-unattended blob are unchanged. The
@@ -221,7 +221,7 @@ The seams extended are the two readers themselves, `resolve_generated_indexes` a
 `regen.TOKENS` with `resolve_argv`'s token rule, which both now follow rather than a third token list.
 `python tools/codebase-map/reuse_lookup.py "evaluate a generated row when condition in the shell reader"`
 ranked `rows`, `row`, `read_text`, `read`, `read_bytes`, `read_git` and `read_memory_tree`, re-run at
-`98e33d71c`, generic stems of no condition reader, so no existing seam fits beyond the readers named.
-At `4e5497fb7` the three readers and `regen.TOKENS` are unchanged.
+`112526471`, generic stems of no condition reader, so no existing seam fits beyond the readers named.
+At `2ca17d9c5` the three readers and `regen.TOKENS` are unchanged.
 
 Recall terms used: `python tools/memory-recall/query.py "how do the readers of a generated row condition agree" --terms "generated when regen check_when govkit selfcheck _gwbad resolve_generated_indexes GENERATED_INDEXES shell reader parity"`

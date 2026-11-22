@@ -2,8 +2,8 @@
 
 **Serves:** journal TOOL-dWitnessedBar-16
 
-Two passes. Pass 1 built everything but S12 at base `7dbe0c8d9d2c`; pass 2 built S12, S14, S15 and
-rev-13's S10 respelling at base `773daf5611812b8953fbcaba094b4f005c796b3c` and closed the spec. Neither
+Two passes. Pass 1 built everything but S12 at base `ef4d5554d8e7`; pass 2 built S12, S14, S15 and
+rev-13's S10 respelling at base `ba1de4ed8e95abcf2c8de0e5de696a77c03aff94` and closed the spec. Neither
 pass ran a merge bar, a self-test suite or a gate leg; pass 2 ran the naming lexicon's `--offenders`
 and `--suggest`, and the generators `leg_factory.py --write` and `gen_map.py --write`. Each criterion
 below was checked on node d on 2026-11-19 by `convert_registry.py`'s or `registry_to_ledger.py`'s own
@@ -46,7 +46,7 @@ plant (AC12).
 - AC9 — `merge: rows` — `.gitattributes` carries `<home> merge=rows` for every converted home, S14's
   four at `memory/project/` since pass 2; `git check-attr merge` prints `merge: rows` for those four
   and for `memory/project/spawn-idiom-sites.txt`.
-- AC10 — `up` — on a scratch adopter under `%TEMP%` holding `7dbe0c8d9d2c`'s legacy
+- AC10 — `up` — on a scratch adopter under `%TEMP%` holding `ef4d5554d8e7`'s legacy
   `unarmed-branches.txt`, `registry_to_ledger.py up` exited 0 printing 173 reasons and wrote the header
   `# ledger · unarmed-branches · key site path,check,signature · direction shrink-only · drain hunk` over
   166 rows whose counts sum to 173 (DERIVED); `witness` exited 1 before and 0 after; `convert_registry.py

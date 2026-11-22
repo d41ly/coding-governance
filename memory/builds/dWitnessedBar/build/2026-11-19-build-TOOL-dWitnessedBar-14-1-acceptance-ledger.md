@@ -35,7 +35,7 @@ spec section 7 (`ratchet selftest`, its failing cases staged by `gain`, `gain-re
 - AC6 — `rename` — a staged `git mv src/x.sh src/y.sh` with its rows re-keyed exits 0; the rows left
   on the old path exit 1 printing `rename src/x.sh -> src/y.sh`.
 - AC7 — `keys-not-scalar` — on the built tree, before the leg was a manifest row, it exited 0 printing
-  nine `held` rows (PINNED 2026-11-19, measured at `53307674f`); in the clone with `FOO_PIN="3"` appended
+  nine `held` rows (PINNED 2026-11-19, measured at `c6fc3bcc9`); in the clone with `FOO_PIN="3"` appended
   to `.memory-tree.conf`, `run_keys_not_scalar` returned 1 printing
   `undeclared site · .memory-tree.conf` and `FOO_PIN`, TAB-joined. `--measure` exits 0 printing the nine TAB rows, and
   `python tools/lib/legacy_ledger.py read conf-scalar-pins` prints the nine rows `seed --population

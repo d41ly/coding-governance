@@ -23,6 +23,7 @@
 | [2026-11-19-build-TOOL-dWitnessedBar-14-red-fix-37.md](../build/2026-11-19-build-TOOL-dWitnessedBar-14-red-fix-37.md) | red-fix | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-14-red-fix-38.md](../build/2026-11-19-build-TOOL-dWitnessedBar-14-red-fix-38.md) | red-fix | — |
 | [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
+| [2026-11-22-build-TOOL-dWitnessedBar-14-red-fix-162.md](../build/2026-11-22-build-TOOL-dWitnessedBar-14-red-fix-162.md) | red-fix | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
@@ -55,7 +56,7 @@ through a widen record carrying its reason, or refuses it, as `retrofit.widen` s
 - **S1** — The checker, `tools/memory-tree/ratchet.py`, one verb per pack row, each reading every
   registration through `read_registrations` and every population through the factory's `read_rows`,
   `compare_counts`, `compare_to_base` and `carry_renames` (unit 13's `legacy_ledger.py`, landed at
-  `34f8bb7db`, its memory-tree copy `tools/memory-tree/legacy_ledger.py`). It mints no compare of its
+  `9cdebebc4`, its memory-tree copy `tools/memory-tree/legacy_ledger.py`). It mints no compare of its
   own. Observed by AC1 to AC9 and AC12.
 - **S2** — The pack's legs, each declared through `leg_factory.py` in `tools/memory-tree/kit.toml` in
   the shape unit 11 §4 "The declaration" settles. The base row holds `name`, `subject`, `argv`,
@@ -65,8 +66,8 @@ through a widen record carrying its reason, or refuses it, as `retrofit.widen` s
   `tests = ["feature.memory-tree-hygiene"]`, whose dossier's `[claims] gate-legs` gains the nine names
   (§8 F7, TOOL-dWitnessedBar-22 S5). `chunk` and the measured `ceiling` sit under `[gate_leg.gov]`.
   `tools/gate-legs.json` gains the nine rows only through `leg_factory.py --write`. `pack` is already
-  a manifest key, carried by 6 legs as `"pack": "tags"` (PINNED 2026-11-19 at `4e5497fb7`, unchanged
-  since `05245bf0e`). Observed by AC10.
+  a manifest key, carried by 6 legs as `"pack": "tags"` (PINNED 2026-11-19 at `2ca17d9c5`, unchanged
+  since `42d8ac6dc`). Observed by AC10.
 - **S3** — `never gains`: every refusal `compare_to_base` names for a population's direction, a
   `shrink-only` key `gained` or `raised`, a `ceiling` row `above ceiling`, an `append-only` base row
   the tree rewrote or no longer holds. A raise is admitted only through a widen record: the landed
@@ -237,7 +238,7 @@ reds the row whatever the record says.
 | `.codebase-map.conf` | `DOSSIER_DECISIONS_EMPTY_PIN` | TOOL-dWitnessedBar-17 |
 | `.lexicon.conf` | `VERB_OFFENDER_PIN`, `SUFFIX_OFFENDER_PIN` | dMindYourWords |
 
-Nine, PINNED 2026-11-19 at `4e5497fb7`, unchanged since `05245bf0e`, by
+Nine, PINNED 2026-11-19 at `2ca17d9c5`, unchanged since `42d8ac6dc`, by
 `git grep -nE '^[A-Z_]+_PIN=' -- '.*.conf'`, which returns each name on one line, so each seeds with
 a count of 1, and exactly the nine names of
 `memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md@5b0cb48caa25:287` and
@@ -254,7 +255,7 @@ Minted: `tools/memory-tree/ratchet.py` with verbs `never-gains`, `both-ways`, `u
 `conf-scalar-pins` and its file; the fixture cases of §6. Naming cells: each function is asked of
 `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass. No cell grades a verb:
 `.lexicon.conf`'s `CELLS` declares `js.function`, `js.type`, `py.function`, `py.type` and
-`sh.function` (PINNED 2026-11-19 at `b3b523896`).
+`sh.function` (PINNED 2026-11-19 at `0baa706f3`).
 
 ### Migration
 
@@ -280,7 +281,7 @@ repository root (§8 F6), `python` being the head gov's manifest rows spell, as 
 does. It is seeded at the pass's base with its nine rows through `test.seed`, the
 `seed --population conf-scalar-pins` verb of TOOL-dWitnessedBar-15 S1. Its home's `merge=rows` line
 joins `.gitattributes`, as TOOL-dWitnessedBar-13 §3 leaves to each unit adding a ledger. No
-`[[ledger]]` table is registered at `4e5497fb7` (DERIVED by `git grep -n '^\[\[ledger\]\]' -- '*.toml'`,
+`[[ledger]]` table is registered at `2ca17d9c5` (DERIVED by `git grep -n '^\[\[ledger\]\]' -- '*.toml'`,
 which prints nothing), so this is the first. No existing population changes; each registered later
 joins the pack as data.
 
@@ -373,7 +374,7 @@ and every base leg once the push lands it. The pass runs
   prints the nine rows the seed wrote (the memory-tree copy's CLI carries `seed` alone).
   Red when: the leg reads only the nine named keys, so a tenth pin passes, or the registration's seed
   prints no row, so `test.seed` leaves the population unarmed.
-  figure: nine is PINNED 2026-11-19, measured at `4e5497fb7`; the row count is DERIVED from the file at observation.
+  figure: nine is PINNED 2026-11-19, measured at `2ca17d9c5`; the row count is DERIVED from the file at observation.
 - **AC8** — When `python ratchet.py --fixture --plant key-number` runs, a `key` kind row whose field is
   `412` makes `key-shape` exit 1 naming it.
   Red when: a numeric label passes as a key.
@@ -483,17 +484,17 @@ New arm: tools/memory-tree/ratchet.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 
 - rev-6 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.
 - rev-7 · 2026-11-19 · S1 · S2 · S4 · S5 · S6 · S13 · §3 · §4 The pack, The scalar pins, Migration ·
-  AC7 · §8 F2 · §10 · re-grounded at `5e569d9c9` per brief
+  AC7 · §8 F2 · §10 · re-grounded at `e0236c47e` per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-brief: S4 reads the landed `retrofit.widen`; S5
   writes through `write_record`, no `DOORS` entry; S2 states unit 12's tag and unit 19's `purpose`; S6
   runs unit 15's seed run; S13's base is a remote-tracking ref; citations `path#symbol` or blob-pinned.
 - rev-8 · 2026-11-19 · S1 · S2 · S3 · S4 · S6 · §3 Edges · §4 The pack, The scalar pins, Migration · AC2 ·
-  AC3 · AC7 · §8 F5 · §10 · re-grounded at `05245bf0e` per brief
+  AC3 · AC7 · §8 F5 · §10 · re-grounded at `42d8ac6dc` per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief: S6 grades every registration naming
   `ratchet (both ways)`, since `_check_table` requires a `leg`; S3 and S4 hold a widened row to its
   record (F5); `conf-scalar-pins` names its leg.
 - rev-9 · 2026-11-19 · S2 · S3 · S4 · S6 · S7 · S9 · S11 · §3 Edges · §4 The pack, The scalar pins,
-  Inventory, Migration, Files touched · AC7 · AC10 · §7 · §8 F6, F7 · §10 · re-grounded at `4e5497fb7`
+  Inventory, Migration, Files touched · AC7 · AC10 · §7 · §8 F6, F7 · §10 · re-grounded at `2ca17d9c5`
   per brief 2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief, over units 15, 12, 61, 22, 47
   and 19 as landed and TOOL-dWitnessedBar-11 rev-6: S2's rows take unit 11's shape and carry `tests`
   (F7); S3 holds a `seed --widen` row; S6, S7 and S9 name `run_seed_argv`, `read_home_state` and the
@@ -508,7 +509,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 
 ## 10. Reuse audit
 
 The seam extended is the ledger factory (`tools/lib/legacy_ledger.py`, unit 13, landed at
-`34f8bb7db`), whose `compare_to_base` carries the base rule and whose memory-tree copy this pack
+`9cdebebc4`), whose `compare_to_base` carries the base rule and whose memory-tree copy this pack
 imports; the never-gains precedent is the map's `test_baseline_never_gains_a_key`
 (`tools/codebase-map/test_codebase_map.py#test_baseline_never_gains_a_key`) over
 `derive_baseline_additions` (`tools/codebase-map/map_lib.py#derive_baseline_additions`), and the

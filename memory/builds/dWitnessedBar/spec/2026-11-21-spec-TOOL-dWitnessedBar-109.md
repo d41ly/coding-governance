@@ -29,7 +29,7 @@ Once any plain line follows the agent's `Co-Authored-By:` line, git sees no trai
 function returns `none`, and `check_commit_message` admits the commit. The drifted `Opus 5.5` value
 and a correct trailer that is not last both pass, which is the class check 49 exists to refuse.
 
-This unit builds the skeptic's class-level fix, re-derived against the code at `46b7d39e8`. The agent
+This unit builds the skeptic's class-level fix, re-derived against the code at `34d3c3286`. The agent
 lines are chosen by scanning the message as git will keep it, with the same rules the last-line
 check uses, so the value check and the last-line check run whether or not git reads those lines as
 trailers. Its left-shift gate is five refusal arms and a fixture arm in the unattended suite, a
@@ -110,7 +110,7 @@ bug-class catalogue.
 
 This unit edits only the built code of CLOSED units, never their specs. `TOOL-dWitnessedBar-108`
 built `check_message_attribution`, the `attribution` verb, the S10 arms and the help sentence
-(`41d4e7333`). `TOOL-dDeclaredLoop-23` built the `--fixture` verb and `build_fixture` (`3d335c77b`).
+(`ddf65d6a6`). `TOOL-dDeclaredLoop-23` built the `--fixture` verb and `build_fixture` (`3d335c77b`).
 Each was found by its `Pass:` trailer in `git log` of the file.
 
 ### Edges
@@ -121,7 +121,7 @@ Each was found by its `Pass:` trailer in `git log` of the file.
 
 ### Evidence
 
-Read on 2026-11-21 at `46b7d39e8`, the run branch's HEAD.
+Read on 2026-11-21 at `34d3c3286`, the run branch's HEAD.
 
 - `tools/lib/commit_trailers.py#check_message_attribution` builds `found` from the stdout of
   `git interpret-trailers --parse` (`tools/lib/commit_trailers.py@253aca4e:305-307`), returns
@@ -278,7 +278,7 @@ No path above is on the kickoff manifest's `watch:` line in `memory/guides/SESSI
   fixture: message files under the run's scratch directory.
 - **AC2** — `python tools/lib/commit_trailers.py --fixture` exits 0 and prints six
   `fixture · attribution ·` lines, each ending with the state §4's table plants. Run over a scratch
-  copy of the built file whose `check_message_attribution` is the one at `46b7d39e8`, it exits 1
+  copy of the built file whose `check_message_attribution` is the one at `34d3c3286`, it exits 1
   and prints `FAIL, the case plants refused` on the four cases the parent reads as `none`.
   Red when: the fixture case set passes against the parent reader.
   figure: the six lines are PINNED by §4's table.

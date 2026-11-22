@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 14.
 - Built so far through order 13: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14, 45, 54, 16, 46, 17
-  (`dbbd8caba`: `{prefix}` resolved in seed argvs by the factory), 52 (`fd73e0bbb`: `ratchet.py#read_root_confs`),
-  53, 18 (`0519457ea`: the playbook lists and `landed-steps` registered) and 20 (`8f9313346`: `legacy-homes.txt`
+  (`9a29f1e96`: `{prefix}` resolved in seed argvs by the factory), 52 (`6a075440b`: `ratchet.py#read_root_confs`),
+  53, 18 (`c91fc4e55`: the playbook lists and `landed-steps` registered) and 20 (`ec34083bd`: `legacy-homes.txt`
   moved to `memory/project/` and registered).
 - The first builder built the rev-5 spec whole and stopped when `--dispatch` refused its widening; its return is
   `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-24-1-builder-return.md`. The spec is now

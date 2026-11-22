@@ -1,18 +1,18 @@
 **Serves:** journal TOOL-dWitnessedBar-56
 
-# TOOL-dWitnessedBar-56 — builder return 1 (run `wf_09adf362-e3e`), committed 2d0df6a24
+# TOOL-dWitnessedBar-56 — builder return 1 (run `wf_09adf362-e3e`), committed 43af2959e
 
 ## Why
 
-TOOL-dWitnessedBar-56 is built from spec rev-5 and committed in two commits. 746c0416f is the pass commit: it sets the spec to CLOSED, adds the acceptance ledger and includes the index generator's rewrites. 2d0df6a24 is a portability fix that the bug-class checklist turned up. Every claim the spec makes about current code held: all nine pinned blobs matched HEAD, and every cited symbol and behaviour was there. There was no divergence.
+TOOL-dWitnessedBar-56 is built from spec rev-5 and committed in two commits. f42c4ad16 is the pass commit: it sets the spec to CLOSED, adds the acceptance ledger and includes the index generator's rewrites. 43af2959e is a portability fix that the bug-class checklist turned up. Every claim the spec makes about current code held: all nine pinned blobs matched HEAD, and every cited symbol and behaviour was there. There was no divergence.
 
 ## Summary
 
-Built TOOL-dWitnessedBar-56 in C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3, from base 01e95d21f.
+Built TOOL-dWitnessedBar-56 in C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3, from base 494176fe9.
 
 **Commits**
-- 746c0416f is the pass commit. It sets the spec status to CLOSED, adds the acceptance ledger memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-56-1-acceptance-ledger.md, re-stamps the kickoff manifest at the base, and includes the rewrites from `gen_build_index --write` and `gen_map --write` (memory/map/generated/symbols.json).
-- 2d0df6a24 is a follow-up fix from the bug-class checklist. The hook suite's `seledit` plant used `sed -i` with `\t`, which only works on GNU sed; it now uses the suite's awk-and-move idiom. This commit also carries `Pass: TOOL-dWitnessedBar-56`, but it lands after the spec was CLOSED. If the pass-order leg objects to that, the trailer should have been `Pass: none`.
+- f42c4ad16 is the pass commit. It sets the spec status to CLOSED, adds the acceptance ledger memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-56-1-acceptance-ledger.md, re-stamps the kickoff manifest at the base, and includes the rewrites from `gen_build_index --write` and `gen_map --write` (memory/map/generated/symbols.json).
+- 43af2959e is a follow-up fix from the bug-class checklist. The hook suite's `seledit` plant used `sed -i` with `\t`, which only works on GNU sed; it now uses the suite's awk-and-move idiom. This commit also carries `Pass: TOOL-dWitnessedBar-56`, but it lands after the spec was CLOSED. If the pass-order leg objects to that, the trailer should have been `Pass: none`.
 
 **What changed**
 - **Selection (S1, S3):** in tools/run-gates/run-gates.sh, each accepted selection row is written as `selection.<n>` with its TABs kept. Only accepted rows are hashed, using the field rule of `verdict_flow.py`'s `read_selection`. Every other row is counted in a new `selection_ignored` key. In .githooks/pre-push, `read_bar_file` now reads `selection.<n>` byte for byte, and `check_tree_selection` rebuilds each row as `held<TAB>` plus that value.

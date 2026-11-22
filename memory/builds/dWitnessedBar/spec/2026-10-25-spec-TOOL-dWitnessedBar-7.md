@@ -102,7 +102,7 @@ admission TOOL-dWitnessedBar-14 left to it (§8 F7).
   `seen_red.py` is staged first. TOOL-dDeclaredLoop-12's landed `[[item]]` row in
   `tools/loop/loop.toml` names `command:test.seen-red`, so the pass re-points it to
   `command:memory-tree.seen-red`. No kit descriptor holds a `[[command]]` row yet
-  (`git grep -n '^\[\[command\]\]' -- 'tools/*/kit.toml'` finds none at `174f9d9e5`), so this row
+  (`git grep -n '^\[\[command\]\]' -- 'tools/*/kit.toml'` finds none at `a9be2b275`), so this row
   turns that leg from `unarmed` to green. The item's `[[stand-in]]` row stays: `loop.toml`'s header
   holds a stand-in until its owning build lands, and no landed unit of this build has edited the file
   (`git log cdfbd1cf..HEAD -- tools/loop/loop.toml` lists dDeclaredLoop commits only). Observed by
@@ -116,7 +116,7 @@ admission TOOL-dWitnessedBar-14 left to it (§8 F7).
   `seen_red.py --build <slug>` as the read-back, rendered from
   `tools/memory-tree/BUILD-METHOD.template.md`. The paragraph pays for its words in its own: the
   render measures 30717 bytes (PINNED 2026-11-20, `wc -c memory/guides/BUILD-METHOD.md` at
-  `174f9d9e5`) against the 30720 its row in `tools/template-size-limits.txt` holds, so the paragraph
+  `a9be2b275`) against the 30720 its row in `tools/template-size-limits.txt` holds, so the paragraph
   grows by at most 3 bytes (DERIVED, the difference) and no other text of the method moves (§8 F6).
   Observed by AC7.
 - **S10** — `ratchet (populated)` admits an empty armed population a seen-red record vouches for,
@@ -211,7 +211,7 @@ Minted: the seen-red line grammar; `read_evidence_lines`; `tools/memory-tree/see
 `--plant`; the command row `seen-red` of the memory-tree kit; the ratchet plant
 `populated-seen-red`. Naming cells: `read_evidence_lines`, `read_seen_red_records` and
 `derive_owed_gates` each read OK from `python tools/lexicon/lexicon.py --suggest <name> --as
-py.function` at `174f9d9e5`; the pass asks it of any other name it mints.
+py.function` at `a9be2b275`; the pass asks it of any other name it mints.
 
 ### Migration
 
@@ -245,9 +245,9 @@ header of `tools/memory-tree/check-verdict-epoch.sh` states.
 
 Shared with sibling units: `tools/memory-tree/tree_lib.py`, `tools/memory-tree/HYGIENE.template.md`,
 `memory/HYGIENE.md` and `memory/map/generated/symbols.json` with `TOOL-dWitnessedBar-1` (order 23,
-landed at `ad3949b5f`, its edits the `gate-health` entry of `TYPED_RECORD_KINDS` and of the record-kind
+landed at `ad55d40c1`, its edits the `gate-health` entry of `TYPED_RECORD_KINDS` and of the record-kind
 list, neither the `**Evidences:**` walk nor the "Acceptance ledger" section);
-`memory/map/generated/symbols.json` with `TOOL-dWitnessedBar-30` (order 24, landed at `7b918f7e0`);
+`memory/map/generated/symbols.json` with `TOOL-dWitnessedBar-30` (order 24, landed at `ceeac2dcf`);
 and `tools/memory-tree/check-memory-hygiene.sh` with `TOOL-dWitnessedBar-29` (order 25, its
 `check_cap_findings` and not check 23's awk), each of which lands before this unit; nothing with
 `TOOL-dWitnessedBar-59`, `TOOL-dWitnessedBar-21` or `TOOL-dWitnessedBar-6`.
@@ -281,7 +281,7 @@ and `tools/memory-tree/check-memory-hygiene.sh` with `TOOL-dWitnessedBar-29` (or
 - migration — none, per §4.
 - user docs — none owed: no page under `help/` names the ledger, the seen-red line or
   `ratchet (populated)` (`git grep -n -i 'acceptance ledger\|seen-red\|ratchet (populated)' -- help`
-  finds none at `174f9d9e5`); `memory/HYGIENE.md` is the ledger's page.
+  finds none at `a9be2b275`); `memory/HYGIENE.md` is the ledger's page.
 
 ## 6. Acceptance criteria
 
@@ -397,7 +397,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC8 · the plant `populated-seen
   `c6df3e901`, by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is
   unchanged, as the unit writes each path; nothing else moved.
 - rev-5 · 2026-11-20 · §1 · S1 S2 S3 S4 S5 S7 S8 S9 S10 · §3 · §4 · §5 · AC7 AC8 · §7 · §8 F5 F6 F7 ·
-  §10 · re-grounded on the tree at `a4fd535ed`, every unit through order 22 landed, by the brief
+  §10 · re-grounded on the tree at `e22cdce08`, every unit through order 22 landed, by the brief
   `2026-11-19-prompt-TOOL-dWitnessedBar-7-reground-brief`: line citations become `path#symbol` or
   blob-pinned; `iter_evidence_lines` becomes `read_evidence_lines`, the lexicon declaring no `iter`;
   the owed set reads the manifest through the kit's `resolve_leg_manifest`, `read_blobs_at` and
@@ -408,7 +408,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC8 · the plant `populated-seen
   `verdict epoch (kit version dates the engine)`, `ratchet selftest`, `ratchet (populated)`,
   `loop definition`, `loop command conformance` and `codebase-map coverage + freshness`; the version
   bump is the lander's.
-- rev-6 · 2026-11-20 · S7 S9 · §4 · §5 · §10 · re-grounded on the tree at `174f9d9e5`, every unit
+- rev-6 · 2026-11-20 · S7 S9 · §4 · §5 · §10 · re-grounded on the tree at `a9be2b275`, every unit
   through order 24 landed, by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-7-reground3-brief`:
   every cited path, symbol, section and blob re-read and unchanged, every PINNED fact re-derived at
   the same value and its stamp moved to HEAD; Files touched's shared-paths sentence names
@@ -434,7 +434,7 @@ shipping in `tools/govkit/registry.toml`, its inline carry TOOL-dWitnessedBar-51
 `tools/memory-tree/build_records.py#read_acceptance`, whose record holds `run ·` lines of re-run
 commands; and `tools/memory-tree/build_records.py#read_flake_body`, landed by TOOL-dWitnessedBar-1,
 which reads a flake record's TAB rows and no ledger line. `python tools/codebase-map/reuse_lookup.py
-"read the acceptance ledger lines that record a gate seen red"`, re-run at `174f9d9e5`, ranks generic
+"read the acceptance ledger lines that record a gate seen red"`, re-run at `a9be2b275`, ranks generic
 `read` stems, `read_blobs_at` among them, and no reader of a seen-red observation; the walk in
 `deviation_join.py` was found by `git grep -n Evidences -- '*.py'`, which finds no other walk under
 `tools/`, its other hits being build records' one-off scripts under `memory/builds/dClosedLoop/`

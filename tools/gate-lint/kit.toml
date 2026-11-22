@@ -186,7 +186,7 @@ ceiling = 300
 # repositories commit what they just staged. It enforces the line-endings rule: the stage it catches
 # untested is the one a tree dirty by line endings alone normalises back to the committed bytes.
 [[gate_leg]]
-tag = "leg.gate-lint.shell-hygiene-a-stage-committed-with-no-staged-diff-test"
+tag = "leg.gate-lint.shell-hygiene-stage-committed-untested"
 tests = ["feature.gate-lint"]
 pack = "portability"
 enforces = ["practice.portable.line-endings"]

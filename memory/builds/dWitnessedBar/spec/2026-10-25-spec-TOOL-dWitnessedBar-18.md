@@ -167,10 +167,10 @@ home is written here, so `test.seed` finds none absent. This unit consumes unit 
 step program (§4 Migration) and names no §3 edge on either, since neither spec declares one back
 (unit 16 is CLOSED); the main loop may add the pair.
 
-Rows at `86dac0fcc` (PINNED 2026-11-19, `grep -cvE '^\s*(#|$)' <home>` per list):
-`positional-refs` 38334 (38364 at `045405ff8`, PINNED 2026-11-19), `positional-producers` 15
+Rows at `57547e855` (PINNED 2026-11-19, `grep -cvE '^\s*(#|$)' <home>` per list):
+`positional-refs` 38334 (38364 at `c3884a6b9`, PINNED 2026-11-19), `positional-producers` 15
 (PINNED 2026-11-19), `unpinned-facts` 15216 and `instructions-legacy` 33 (PINNED 2026-11-19).
-`landed-steps` 25 at `192908a02` (PINNED 2026-11-20): the 24 step rows (PINNED 2026-11-20) and the
+`landed-steps` 25 at `4fa55b94e` (PINNED 2026-11-20): the 24 step rows (PINNED 2026-11-20) and the
 1 retired row naming a step id (PINNED 2026-11-20) that `upgrade_steps.py list` prints there; 26 once
 this unit's step row joins (DERIVED, the 25 and Migration's one). No list holds a duplicate row
 (`grep -vE '^\s*(#|$)' <home> | sort | uniq -d` prints nothing) and `read_steps` refuses an id
@@ -189,18 +189,18 @@ Check 3 admits three homes already: `positional-refs.txt` is its named case
 `unpinned-facts.txt` are members of gov's `PROJECT_REGISTRY_EXTRA` in `.memory-tree.conf`, which the
 registry-registered lists need, since no target is written any. `instructions-legacy.txt` and
 `landed-steps.txt` join that assignment, as unit 16's moved `dead-path-waivers.txt` and
-`playbook-kit-waivers.txt` did (`3ce285ad7`).
+`playbook-kit-waivers.txt` did (`450f7b322`).
 
 ### The reference field
 
 A file:line row of `positional-refs` quotes a reference such as `tools/x.py:120`, the population's own
 subject; the factory refuses a key field ending in `:<digits>` as a line number
 (`tools/lib/legacy_ledger.py#LINE_NUMBER_RE`). The registration declares `verbatim = ["ref"]`, the
-field the refusal skips, which unit 13 landed at `34f8bb7db` (`tools/lib/legacy_ledger.py#_check_table`,
+field the refusal skips, which unit 13 landed at `9cdebebc4` (`tools/lib/legacy_ledger.py#_check_table`,
 `#read_ledger`), because the number is the text being tracked and not the row's position (§8 F1). At
-`86dac0fcc` 22217 of the 38334 rows end in `:<digits>` (PINNED 2026-11-19, the rows less the 16117
+`57547e855` 22217 of the 38334 rows end in `:<digits>` (PINNED 2026-11-19, the rows less the 16117
 whose ref does not: `cut -f2 | grep -vcE ':[0-9]+$'`). No `fact` row of `unpinned-facts` and no
-`text` row of `positional-producers` reads as a line number at `86dac0fcc` (PINNED 2026-11-19,
+`text` row of `positional-producers` reads as a line number at `57547e855` (PINNED 2026-11-19,
 `cut -f2 | grep -cE '^[0-9]+$|:[0-9]+$'` prints 0 for each), so neither declares a `verbatim` field.
 
 ### Inventory
@@ -348,7 +348,7 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
 
 ## 7. Gates
 
-The `ratchet` pack's legs, landed by unit 14 at `49f5d3ff6` with no `guard`, grade the five
+The `ratchet` pack's legs, landed by unit 14 at `25a3d2970` with no `guard`, grade the five
 populations at the close and are on the leg line below: AC5 observes `ratchet (never gains)` and
 `ratchet (both ways)`, and the new arm sits in `ratchet selftest`. `step-rows-frozen` reads the step
 rows S3 counts, and
@@ -368,11 +368,11 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
   grammar ("the reference as written"); (c) leave the file:line rows off the population, against -26
   S2's one list. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the only option keeping the
   reference as written and the refusal for every other field; returned to the main loop as an ask on
-  unit 13's `read_rows`, which landed it at `34f8bb7db`. widens: none · relaxes: none
+  unit 13's `read_rows`, which landed it at `9cdebebc4`. widens: none · relaxes: none
 - **F2 — Where does `landed-steps` register, when govkit carries no `kit.toml`?** Options: (a)
   `tools/govkit/registry.toml`, which unit 13's `read_registrations` must also read, the ask unit 16 F3
   makes; (b) the playbook or memory-tree descriptor, which owns no step. RESOLVED (agent, 2026-10-25,
-  delegated): (a), rung 3, the same answer as unit 16 F3; `read_registrations` reads it at `34f8bb7db`.
+  delegated): (a), rung 3, the same answer as unit 16 F3; `read_registrations` reads it at `9cdebebc4`.
   widens: none · relaxes: none
 - **FACT-QUESTION · F3 — Which section of PLAY-dOrderedCharter-20 holds IW-1's legacy list?** Probe:
   `grep -n "instructions-legacy" memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-20.md`.
@@ -380,7 +380,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
   Liveness: the grep would print S4's line if the list were there. RESOLVED (agent, 2026-10-25,
   delegated): S8, rung 2. widens: none · relaxes: none
 - **F4 — Where do the four lists register, now that their legs are gov's and three lists left the
-  kit?** At `045405ff8` every leg reading them is an `[[exempt_leg]]` row of `tools/govkit/registry.toml`
+  kit?** At `c3884a6b9` every leg reading them is an `[[exempt_leg]]` row of `tools/govkit/registry.toml`
   (`tags (the resolver's checks)`, `writing practice (records and units)`, `instruction render (one
   renderer of record)`), and PLAY-dOrderedCharter-72 homed the positional lists under the memory
   root, outside the kit, which ships `tools/playbook/kit.toml` to every target. Options: (a) all four in
@@ -426,7 +426,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
   (`tools/lib/legacy_ledger.py#read_registrations`). So a `home` of `tools/playbook/instructions-legacy.txt`
   or `tools/govkit/landed-steps.txt` adds an offender. Options: (a) both homes under `memory/project/`,
   the list moved by `git mv` and both admitted through gov's `PROJECT_REGISTRY_EXTRA`, as unit 16 moved
-  `tools/dead-path-waivers.txt` and `tools/playbook-kit-waivers.txt` (`3ce285ad7`); (b) both kept under
+  `tools/dead-path-waivers.txt` and `tools/playbook-kit-waivers.txt` (`450f7b322`); (b) both kept under
   `tools/`; (c) a `home` token the factory resolves. (b) reds the ban at this unit's pass, a leg on §7's
   line (veto 1); (c) changes unit 13's landed `read_registrations`, outside this unit's write set
   (veto 3). RESOLVED (agent, 2026-11-19, delegated): (a), the one survivor and unit 16's precedent; the
@@ -469,7 +469,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
   `tools/playbook/positional.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief;
   nothing else moved.
 - rev-5 · 2026-11-19 · §1 · S1 · S2 · S4 · S5 · S6 · S7 (new) · §3 · §4 · §5 · AC1 · AC3 · AC4 · AC5 ·
-  AC6 · AC7 · §7 · §8 F1 F2 F4 F5 F6 · §10 · re-grounded at `045405ff8` by brief
+  AC6 · AC7 · §7 · §8 F1 F2 F4 F5 F6 · §10 · re-grounded at `c3884a6b9` by brief
   2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-brief: the positional lists and the facts list read
   at their homes under `memory/project/` (PLAY-dOrderedCharter-72); `positional-producers.txt` joins as
   the fifth population with its reader and legs, per TOOL-dWitnessedBar-16 §8 F7; registrations split
@@ -478,7 +478,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
   No Goal or Scope intent moved.
 - rev-6 · 2026-11-19 · S1 · S2 · S3 · S5 · §4 The populations, The reference field, Inventory,
   Migration, Files touched, Alternatives rejected · §5 · AC5 · AC6 · §7 · §8 F7 · §10 · re-grounded at
-  `86dac0fcc` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief over units 14, 16 and 46
+  `57547e855` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief over units 14, 16 and 46
   as landed and unit 17's S9: the legacy list and the step rows' home move to `memory/project/`, since
   `install-prefix (shipped surface)` counts a `tools/` home (F7), with the readers that move names; the
   adopter step runs unit 16's `registry_to_ledger.py` over a new `LEGACY` row; seeds spelled `python`
@@ -487,7 +487,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
 - rev-7 · 2026-11-20 · S3 · S4 · §4 The populations, Migration, Files touched · AC1 · AC5 · §7 · §8 F6
   F8 (new) · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-18-spec-fix-brief: `landed-steps`' seed
   prints every step id the graded tree declares and reads no ref (F6 re-resolved to option (a)), so a
-  step's row lands with its step; the step count re-pinned at `192908a02`; `ratchet.py` joins Files
+  step's row lands with its step; the step count re-pinned at `4fa55b94e`; `ratchet.py` joins Files
   touched for the `append-removed` plant. No Goal or Scope intent moved.
 - rev-8 · 2026-11-20 · S5 · §4 Migration · §5 · AC8 (new) · §8 F9 (new) · per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-18-spec-fix-2-brief: an empty list converts to its header and
@@ -497,17 +497,17 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
 
 ## 10. Reuse audit
 
-The seam extended is the ledger factory (`tools/lib/legacy_ledger.py`, unit 13, landed at `34f8bb7db`,
+The seam extended is the ledger factory (`tools/lib/legacy_ledger.py`, unit 13, landed at `9cdebebc4`,
 read through memory-tree's inline copy `tools/memory-tree/legacy_ledger.py`); each list's own check is
 the reader re-pointed, and each seed is that check's existing measurement exposed as a verb, so no
 predicate is written twice. The adopter step reuses unit 16's step program
 `tools/govkit/steps/registry_to_ledger.py` with `tools/memory-tree/convert_registry.py#LEGACY` and its
 `parse_keyed_reason`, and the landed `[[upgrade]]` grammar (`tools/govkit/upgrade_steps.py#STEP_KEYS`),
-minting no step program or parser; the home move follows unit 16's (`3ce285ad7`).
-At `86dac0fcc` the four lists, `positional.py`, `writing_practice.py`, `instruction_units.py`
+minting no step program or parser; the home move follows unit 16's (`450f7b322`).
+At `57547e855` the four lists, `positional.py`, `writing_practice.py`, `instruction_units.py`
 and `upgrade_steps.py` are tracked (`git ls-files`), landed by dOrderedCharter and dSafePassage after
 scout C read the base, where none existed. `python tools/codebase-map/reuse_lookup.py "register an existing keyed list file as an append-only or shrink-only population"`,
-re-run at `86dac0fcc`, ranked `key`, `keys`, `population` (`tools/govkit/refusal_join.py`),
+re-run at `57547e855`, ranked `key`, `keys`, `population` (`tools/govkit/refusal_join.py`),
 `write_fixture_files` and `derive_kit_file`, none of which registers a population; it agrees with source. Scout C's row names PLAY-dOrderedCharter-20 S4 for
 the legacy list; source says S8 (§8 F3).
 

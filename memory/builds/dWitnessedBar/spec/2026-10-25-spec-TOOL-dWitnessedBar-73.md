@@ -40,8 +40,8 @@ stay one. Each finding is named by report id and is its own scope item, includin
 merged ids into one item. The minors land on both `TOOL-dWitnessedBar-66` and `TOOL-dWitnessedBar-67`,
 so this unit repairs no single unit and builds at order 41, after every unit it consumes from.
 
-Units 66, 67, 69 and 71 have landed, at `a04b24c97`, `e1d569fc9`, `298369174` and `ced984440`, and
-this spec is re-grounded over HEAD `d3b748b94`. Unit 67's own re-ground (its rev-4) and unit 65's (its
+Units 66, 67, 69 and 71 have landed, at `e3cdc2201`, `af84e1a7a`, `9ff80bb15` and `2972b3755`, and
+this spec is re-grounded over HEAD `dd38b467b`. Unit 67's own re-ground (its rev-4) and unit 65's (its
 rev-5) left three findings no target: ids 7, 8 and 13. S17 and S19 are this spec's gate set and a
 spec-text record, S18 and S20 are observed at HEAD, and S4 follows unit 67 S7 as it landed, on every
 git call. The rest are built.
@@ -180,7 +180,7 @@ unit 71's plant.
   keeps `run-gates canary`, the leg whose suite runs `regen.py --check`, `--write` and `--list`, as its
   guard `{prefix}/` covers every file this unit writes under `tools/`. NOT OBSERVED: the item is this
   spec's declared gate set, which the close runs; no criterion of a unit observes its own §7.
-- **S18** — id 8. Answered at HEAD. Unit 65's rev-5 (`453dfa886`) took out the sentence "Unit 22, the
+- **S18** — id 8. Answered at HEAD. Unit 65's rev-5 (`b15a70702`) took out the sentence "Unit 22, the
   one unit at order 6, writes none of unit 47's files" from its §4, so the build holds one answer to
   whether units 22 and 47 share a read set, unit 67 S16's. Nothing is left for unit 65's ledger to
   name. Observed by AC17.
@@ -258,7 +258,7 @@ either. One unit holds all 23 findings, as `TOOL-dWitnessedBar-67` §4 held its 
 
 ### Evidence
 
-Read at HEAD `d3b748b94` on 2026-11-21; each probe ran on git 2.54.0.windows.1, GNU bash 5.3.9
+Read at HEAD `dd38b467b` on 2026-11-21; each probe ran on git 2.54.0.windows.1, GNU bash 5.3.9
 (`x86_64-pc-cygwin`) and Python 3.15.2, PINNED 2026-11-21.
 
 - The `run-gates gov canary` guard is `["{prefix}/run-gates/", "{prefix}/gate-legs.json"]`, subject
@@ -299,7 +299,7 @@ Read at HEAD `d3b748b94` on 2026-11-21; each probe ran on git 2.54.0.windows.1, 
 - S12's predicate, over `tools/run-gates/post-merge.sh` with comment lines dropped, prints 1. With
   `declare PM_SCRUB="x"`, `true; PM_SCRUB+=" y"`, `printf -v PM_SCRUB %s z` or
   `PM_SCRUB="${PM_SCRUB/GATE_SELECTION/}"` appended it prints 2; with `  # note PM_SCRUB="x"` it
-  prints 1 (PINNED 2026-11-21 at `d3b748b94`). The arm's count at HEAD is the line-leading form
+  prints 1 (PINNED 2026-11-21 at `dd38b467b`). The arm's count at HEAD is the line-leading form
   (`tools/run-gates/run-gates.gov.test.sh@d3b748b94:1115`).
 - The evaluated compare prints `printf '%s\n' $PM_SCRUB` unfolded
   (`tools/run-gates/run-gates.gov.test.sh@d3b748b94:1106`). A `$'\n'` inside `$(...)` keeps its one
@@ -461,7 +461,7 @@ widen record declared through `--dispatch`, as unit 71 did.
   line for AC14 records that reading as a re-tie guard and names `TOOL-dWitnessedBar-73`.
   Red when: AC14 is recorded as evidence the build made the move, or on a grep that matches body lines.
 - **AC17** — When `grep -c "writes none of unit 47's files" memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-65.md`
-  runs, it prints 0, and `git log -S` for that sentence over the file names `453dfa886`.
+  runs, it prints 0, and `git log -S` for that sentence over the file names `b15a70702`.
   Red when: unit 65 again offers the sentence as the reason order 6's tie is honest.
 - **AC18** — When `grep -rl 'é:x' tools/` runs, it prints nothing, and `grep -cE 'check-wiring[.]sh:[0-9]+'`
   over `memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-67.md` prints 0.

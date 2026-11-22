@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-71
 
-# TOOL-dWitnessedBar-71 — builder return 1 (run `wf_49ee0db5-e6b`), committed ced984440
+# TOOL-dWitnessedBar-71 — builder return 1 (run `wf_49ee0db5-e6b`), committed 2972b3755
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-71 is built as spec rev-3 states and committed in one pass co
 
 ## Summary
 
-The unit is committed as ced984440 on base 7378b97c7. No gate, suite or bar ran.
+The unit is committed as 2972b3755 on base 6a9b8bc52. No gate, suite or bar ran.
 
 **What changed in `C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/lib/resolve-python.test.sh`, section `2o`:**
 - **S1:** a new function, `run_planted_git`, sits inside unit 67's isolated block just above the corrupt-HEAD loop. It puts `GIT_CONFIG_COUNT=2` with `init.defaultRefFormat=reftable` and `init.defaultBranch=main` in front of its one `git` call only. Unit 67's isolation is untouched. The loop's five fixtures and the `child` fixture are now built with `run_planted_git -c init.defaultBranch=master init -q --ref-format=files`. The unit-64 header now opens "Five fresh `git init`s" and says the four broken fixtures exit 1 and `chain` arms.

@@ -25,9 +25,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 40's third unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41,
-     55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68, 67 (`e1d569fc9`), 70
-     (`09718851e`), 71 (`ced984440`: `run_planted_git` in the resolver suite), 72 (`e0cf5fa91`: the canary's `rgf_mr`
-     measures `rec_fp` beside `rec_sha`) and 74 (`7c579ad47`: `check_cr_reached <file> <record> <var>` is a top-level
+     55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68, 67 (`af84e1a7a`), 70
+     (`0890c99d1`), 71 (`2972b3755`: `run_planted_git` in the resolver suite), 72 (`fa536b7cd`: the canary's `rgf_mr`
+     measures `rec_fp` beside `rec_sha`) and 74 (`6a12d559c`: `check_cr_reached <file> <record> <var>` is a top-level
      function in the gov suite, with a `${_rg_v%?}` liveness variant seen red on every run). Unit 75 (order 40) is
      being re-grounded alongside this spec and builds before order 41. Every unit this spec consumes from is CLOSED.
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes (asks TOOL-dWitnessedBar-101 to -103) and the run

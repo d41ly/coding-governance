@@ -82,12 +82,12 @@ That is 22 MEDIUM and 12 LOW findings by raw id (DERIVED from the table above).
   Observed by AC1.
 - **S3** — id 26. The arm prints the count of names it read from each of the four lists. On the built
   tree `PM_SCRUB` holds `GIT_DIR` and `GATE_REUSE_DAY`, the names on its first and last physical lines,
-  and counts 30 (DERIVED 2026-11-21 at `22ae2c4c0` by the arm's range cut). A staged copy with the
+  and counts 30 (DERIVED 2026-11-21 at `00b4866b4` by the arm's range cut). A staged copy with the
   assignment taken out fails naming `PM_SCRUB reads empty`, a case unit 60's builder return names as
   unarmed. Observed by AC1 and AC2.
 - **S4** — id 4. `TOOL-dWitnessedBar-62`'s AC13 is answered on a figure the built tree re-derives: the
   probe's third number equals the `derived from <n> files` figure `refuse-wrong-shell.sh --coverage`
-  prints on the built tree. 96 is the figure pinned at `4cf1a82ca` (unit 62 S19), and no criterion of
+  prints on the built tree. 96 is the figure pinned at `eb94d2c32` (unit 62 S19), and no criterion of
   this pass holds the built tree to it. Unit 62's AC13 ledger line names this item. Observed by AC3.
 - **S5** — id 21. Unit 62's AC17 is answered the same way: each of the five spelling fixtures is a
   member, and the built tree's `derived from` figure equals the probe's total. Unit 62's AC17 ledger
@@ -129,7 +129,7 @@ That is 22 MEDIUM and 12 LOW findings by raw id (DERIVED from the table above).
   that raises `ValueError`, on every host; on a Windows host it also runs `seed --home Z:/x` with the
   fixture on another drive letter. Observed by AC6.
 - **S14** — id 2. Present at HEAD: unit 61 sits at order 5 and `TOOL-dWitnessedBar-47` at order 6,
-  both CLOSED, and unit 61's pass commit `9c8821605` is an ancestor of unit 47's `14cf1b1bc`, each found
+  both CLOSED, and unit 61's pass commit `67768466e` is an ancestor of unit 47's `fc6050375`, each found
   by `tools/unattended/lib-unattended.sh#build_commit` (DERIVED 2026-11-21 by AC7's call). That
   observation answers unit 61's Rollout sentence, which no tool reads. This pass writes none.
   Observed by AC7.
@@ -265,7 +265,7 @@ stub item (id 14) writes too. One unit holds them, building after every other un
 
 ### Evidence
 
-Read at HEAD `22ae2c4c0`, 2026-11-21.
+Read at HEAD `00b4866b4`, 2026-11-21.
 
 - `PM_SCRUB` spans `tools/run-gates/post-merge.sh@22ae2c4c0:37-41`, 30 names, and the hook's lists and
   `_gknobs` hold 6, 8 and 14 (DERIVED 2026-11-21 by `check_bar_scrub_parity`'s four cuts); the arm
@@ -363,7 +363,7 @@ the main loop at the close, on the tree they grade.
   the four lists, `PM_SCRUB`'s 30 (DERIVED), and no missing name;
   `sed -n '/^PM_SCRUB="/,/"$/p' tools/run-gates/post-merge.sh` prints the whole assignment, and the arm's `PM_SCRUB` holds `GIT_DIR` and `GATE_REUSE_DAY`.
   Red when: the arm reads a short `PM_SCRUB` and prints no count that shows it.
-  figure: 30 is DERIVED 2026-11-21 at `22ae2c4c0`; the close re-reads it from the arm's own count.
+  figure: 30 is DERIVED 2026-11-21 at `00b4866b4`; the close re-reads it from the arm's own count.
 - **AC2** — When the arm runs over a scratch copy of `tools/run-gates/post-merge.sh` with
   `GATE_SELECTION` cut from `PM_SCRUB`, it fails naming `GATE_SELECTION` and `PM_SCRUB`; with the
   assignment taken out, it fails naming `PM_SCRUB reads empty`.
@@ -372,8 +372,8 @@ the main loop at the close, on the tree they grade.
   built tree, the probe's third number equals the tool's `derived from <n> files` figure, and the
   coverage arm lists each of the five spelling fixtures as a member.
   Red when: the two figures part, or a ledger line holds the built tree to a figure pinned at a base.
-  figure: DERIVED at the close by the probe; 96 is PINNED at `4cf1a82ca` for unit 62's base, and both
-  read 96 at `22ae2c4c0` (DERIVED 2026-11-21).
+  figure: DERIVED at the close by the probe; 96 is PINNED at `eb94d2c32` for unit 62's base, and both
+  read 96 at `00b4866b4` (DERIVED 2026-11-21).
 - **AC4** — When `run_seed_cli` runs with `read_head_sha` replaced by a stand-in returning no SHA and
   `no HEAD: fatal: boom`, stdout carries `unarmed p no HEAD: fatal: boom`, stderr names that reason and
   `nothing written`, and no home is written; when `read_head_sha` runs with `_run_git` answering exit
@@ -397,7 +397,7 @@ the main loop at the close, on the tree they grade.
   `TOOL-dWitnessedBar-47` with `tools/unattended/lib-unattended.sh` sourced, and
   `git merge-base --is-ancestor <61's sha> <47's sha>` runs, it exits 0.
   Red when: unit 47's pass landed before the unborn rule it consumes.
-  figure: `9c8821605` and `14cf1b1bc`, DERIVED 2026-11-21 by that call.
+  figure: `67768466e` and `fc6050375`, DERIVED 2026-11-21 by that call.
 - **AC8** — When `python inherited_red.py up <target>` runs over unit 59's AC2 lone-CR fixture on the
   built tree, `cmp` finds `.githooks/gate-env.sh` equal to `A=1<LF>B=2<LF>`, and
   `grep -c 'A=1<LF>B=2<LF>' memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-59-1-acceptance-ledger.md`
@@ -549,7 +549,7 @@ New arm: .githooks/pre-push.test.sh · covers AC11 AC19 · `read_bar_file` over 
   `tools/unattended/unattended.sh`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief;
   nothing else moved.
 - rev-4 · 2026-11-21 · §1 §2 §3 §4 §5 §6 §7 §8 §10 · S1 to S34 · AC1 to AC24 · re-grounded over units
-  55 to 62 as landed at `22ae2c4c0`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-63-reground-brief:
+  55 to 62 as landed at `00b4866b4`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-63-reground-brief:
   S1, S2, S7, S12, S14, S15, S16, S18, S23, S26, S30, S33 and S34's twin read Present at HEAD; S6
   narrows to the stderr line; section `2l` is `2o`; the containment rule is `derive_contained_rel`
   (§8 F6); the signer temp keeps `gov-signers-` (§8 F7); S19 names `read_bar_file`; AC4, AC8, AC10,

@@ -24,7 +24,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    in Files touched with the legs its guard names on the gates section's leg line, and a prose-only mention named as
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
-   - Unit 51 is CLOSED (`7b649d671`). Its pass legs red `writing practice (records and units)` on one line of this
+   - Unit 51 is CLOSED (`55e427e66`). Its pass legs red `writing practice (records and units)` on one line of this
      spec: §8 F5's "At HEAD 24 rows differ from the" names a count without an id, a path:line, PINNED or DERIVED.
 2. A choice the re-ground forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it
    RESOLVED in §8 with the delegated mark, and name it in your return.

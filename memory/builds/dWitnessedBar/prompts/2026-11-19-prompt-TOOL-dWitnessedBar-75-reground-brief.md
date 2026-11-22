@@ -25,9 +25,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 40's third unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41,
-     55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68, 67, 70 (`09718851e`), 71,
-     72 (`e0cf5fa91`: the canary's `rgf_mr` measures `rec_fp` beside `rec_sha`, both compares counted only when
-     `rgf_ok` is set) and 74 (`7c579ad47`: `check_cr_reached <file> <record> <var>` is a top-level function in the gov
+     55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68, 67, 70 (`0890c99d1`), 71,
+     72 (`fa536b7cd`: the canary's `rgf_mr` measures `rec_fp` beside `rec_sha`, both compares counted only when
+     `rgf_ok` is set) and 74 (`6a12d559c`: `check_cr_reached <file> <record> <var>` is a top-level function in the gov
      suite; the canary's mutant and a `${_rg_v%?}` liveness variant are written under `$rgf_t`, and a failed liveness
      check prints `gov-canary: the rec_sha byte check was not seen red on its liveness variant (<reason>)`). Every
      unit this spec consumes from is CLOSED.

@@ -5,7 +5,7 @@
 - **Leg:** tags (the resolver's checks)
 - **Hash:** 9b9b9c81eb63dff4c5789058dc693fb16422a844
 - **Run:** unattended-179529481580044524711-1640412
-- **Sha:** 079d8513ce2ba90ffd4755b9b8677ab9b4bba1ee
+- **Sha:** f9ee3f8e0f2e994c7bad52ae0779fcf31c9c94db
 - **Cause:** run:dWitnessedBar
 
 ```
@@ -46,7 +46,7 @@ tags: positional · symbol, frozen record, printed · memory/builds/dWitnessedBa
 tags: positional · symbol, frozen record, printed · memory/builds/dWitnessedBar/spec/2026-11-21-spec-TOOL-dWitnessedBar-110.md:70 · `verdict_backends.py#run_stale_slot_plant` · verdict_backends.py is not tracked
 tags: positional · shrink-only · 35675 file:line and 2131 section rows listed, 0 unlisted, 3209 grandfathered, 0 stale; 4402 pins read, 0 red, 109 printed; 5915 symbol citations read, 0 red, 517 printed, 25 passed over at another suffix
 tags: unclosed fence, frozen record, printed · memory/builds/dFramedEntrypoint/build/2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md:717
-tags: tools/gate-legs.json:227 · shape · leg.gate-lint.shell-hygiene-a-stage-committed-with-no-staged-diff-test · over 64 bytes (70)
+tags: tools/gate-legs.json@4f4a16bf:227 · shape · leg.gate-lint.shell-hygiene-a-stage-committed-with-no-staged-diff-test · over 64 bytes (70)
 tags: slot point.instruction.name-check · searched-empty
 tags: 18 namespaces, 918 tags, 969 shape-graded, 148 citations graded, 0 unresolved, 0 retired-cited, 245 bare refs; 60 file names not graded; 6634 in build records not graded; 731 paths outside Markdown not read; 0 blobs parsed, 0 extractor runs, 0 skipped as fresh
 tags: unarmed check (0 not graded)

@@ -292,11 +292,11 @@ window is empty and nothing is held until a leg flakes twice.
 - `memory/guides/SESSION-KICKOFF.md`: its `watch:` line holds `tools/run-gates/run-gates.sh`, so its
   `last-audit` is re-stamped
 
-`TOOL-dWitnessedBar-41` (`5a4f86e0c`) moved the runner's selection loop and per-tree verdict writer
+`TOOL-dWitnessedBar-41` (`38a68ee1d`) moved the runner's selection loop and per-tree verdict writer
 and the hook suite's per-tree plants and arms, regions this unit does not edit; in `verdict_flow.py`
 it moved `cmd_select_check` and `main`'s `--run` rule, which `flakes` extends (§8 F10), and in the
 README "Held by policy", "The verdict per tree" and "The pieces", which this unit extends (§5). This
-unit's runner edit owes its own manifest stamp. `TOOL-dWitnessedBar-55` (`599c23cef`) edited no path here.
+unit's runner edit owes its own manifest stamp. `TOOL-dWitnessedBar-55` (`dff3ca0d6`) edited no path here.
 
 ### Alternatives rejected
 
@@ -508,7 +508,7 @@ PLAY-dClosedLoop-16; AC7 observes the extraction directly. No arm reads the fact
   `tools/memory-tree/build_records.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief;
   nothing else moved.
 - rev-5 · 2026-11-20 · §2 S1 S2 S3 S5 S6 S8 S9 · §3 · §4 · §5 · §6 AC1 AC4 AC7 AC8 AC9 · §7 · §8 F4 F5
-  F6 F7 F8 F9 · §10 · re-grounded at HEAD `cb1494fc` over units 3, 5 and 25 as landed, per brief
+  F6 F7 F8 F9 · §10 · re-grounded at HEAD `d0a59de7` over units 3, 5 and 25 as landed, per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-8-reground-brief: every moved line re-cited by symbol or blob
   pin; the record written through the landed factory's `write_record` as `keep_tails.py` writes
   `leg-tail` (F5); `GATE_RERUN` classified inert for the hook suite's `H49 class` arm (F6); the two
@@ -517,13 +517,13 @@ PLAY-dClosedLoop-16; AC7 observes the extraction directly. No arm reads the fact
   landed typed-kinds plant; Files touched gains the hook suite, the policy files, the page, the
   mirror and the kickoff manifest, with the paths shared with `TOOL-dWitnessedBar-41`.
 - rev-6 · 2026-11-20 · §2 S1 S4 S6 S7 · §3 · §4 Evidence, Files touched · §5 · §8 F4 F6 F10 · §10 ·
-  re-grounded at HEAD `387241cf1` over units 41 and 55 as landed, per brief
+  re-grounded at HEAD `6caf205c3` over units 41 and 55 as landed, per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-8-reground2-brief: the runner's and hook suite's line
   citations re-pinned to their HEAD blobs; `main`'s argument handling as unit 41 left it, and the
   `flakes` verb's place in it (F10); the hook's two `select --check` callers named as re-deriving the
   `quarantine` row; the shared regions and README sections settled; F4's lexicon figures re-pinned.
 - rev-7 · 2026-11-20 · §2 · §3 · §4 · §5 · §6 AC3 AC4 · §7 · §8 F2 F3 F5-F12 · §10 · the builder return's
-  three divergences folded at HEAD `ead6e4957`, per brief
+  three divergences folded at HEAD `c4f259863`, per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-8-fix1-brief: one `hold` line form in S4, §4 and AC4; the
   release dated by the commit adding the CLOSED row (F11); `read`'s fall-through by `read_record`
   (F12); prose tightened under the size ceiling, no criterion dropped.
@@ -536,7 +536,7 @@ at its second instance; PLAY-dOrderedCharter-7 S7's factory and its `TYPED_RECOR
 (PLAY-dOrderedCharter-42), written as unit 25's `leg-tail` is, through
 `tools/run-gates/keep_tails.py#load_factory`; `tools/run-gates/verdict_flow.py#derive_route` and
 `ROUTES`, unit 5's `SELECT_SOURCES`, `write_leg_tails`, `read_held_runner`, unit 41's rules in
-`tools/run-gates/verdict_flow.py#main`; and, at HEAD `ead6e4957`, `read`'s fall-through in
+`tools/run-gates/verdict_flow.py#main`; and, at HEAD `c4f259863`, `read`'s fall-through in
 `tools/memory-tree/build_records.py#main` (F12) and
 `tools/memory-tree/deviation_join.py#read_row_commit` (F11), found by grepping `tools/` for `-S`
 pickaxes after `reuse_lookup.py "the oldest commit that added a backlog row and its date"` ranked

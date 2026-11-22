@@ -25,9 +25,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 12: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14, 45, 54, 16
-     (`87bc9f615`, `3ce285ad7`: gov's registries on the ledger, homes once under `tools/` moved to `memory/project/`,
-     the step program `tools/govkit/steps/registry_to_ledger.py`), 46, 17 (`dbbd8caba`: `{prefix}` resolved in seed
-     argvs by the factory), 52 (`fd73e0bbb`), 53 (`b4d0b0f50`) and 18 (`0519457ea`: the playbook lists registered,
+     (`3a7a51471`, `450f7b322`: gov's registries on the ledger, homes once under `tools/` moved to `memory/project/`,
+     the step program `tools/govkit/steps/registry_to_ledger.py`), 46, 17 (`9a29f1e96`: `{prefix}` resolved in seed
+     argvs by the factory), 52 (`6a075440b`), 53 (`3ab7c7312`) and 18 (`c91fc4e55`: the playbook lists registered,
      `memory/project/instructions-legacy.txt` moved off the tool root).
    - A `[[ledger]]` home spelled under `tools/<kit>/` reds `install-prefix (shipped surface)`, which takes no waiver:
      `tools/lib/legacy_ledger.py#read_registrations` reads `home` literally, so a home under the tool root names

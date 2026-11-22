@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-78
 
-# TOOL-dWitnessedBar-78 — builder return 1 (run `wf_01c7ef60-ba2`), committed 253e21771
+# TOOL-dWitnessedBar-78 — builder return 1 (run `wf_01c7ef60-ba2`), committed 0e5103294
 
 ## Why
 
-Every claim the spec makes about current code still held at the base (read_bar_file's IFS split, the inherited green's ten awk reads, the guard in registry.toml, the four DEFERRED specs, the landed verdict_backends open, section 2o's two assertions, the 35 GIT_CONFIG_COUNT lines). So TOOL-dWitnessedBar-78 was built as written and committed with its spec set to CLOSED. The orientation card said the unit was Tier-2 DEFERRED, but the spec already read INPROGRESS at base 1ab2e0605. No divergence.
+Every claim the spec makes about current code still held at the base (read_bar_file's IFS split, the inherited green's ten awk reads, the guard in registry.toml, the four DEFERRED specs, the landed verdict_backends open, section 2o's two assertions, the 35 GIT_CONFIG_COUNT lines). So TOOL-dWitnessedBar-78 was built as written and committed with its spec set to CLOSED. The orientation card said the unit was Tier-2 DEFERRED, but the spec already read INPROGRESS at base 35fb24798. No divergence.
 
 ## Summary
 
-Built TOOL-dWitnessedBar-78 in commit 253e21771, on top of 1ab2e0605. It has the `Pass: TOOL-dWitnessedBar-78` trailer and sets the spec header to CLOSED. No gate, suite or bar ran.
+Built TOOL-dWitnessedBar-78 in commit 0e5103294, on top of 35fb24798. It has the `Pass: TOOL-dWitnessedBar-78` trailer and sets the spec header to CLOSED. No gate, suite or bar ran.
 
 **What changed:**
 - **`.githooks/pre-push` (S7, S8):** `read_bar_file` now reads with `read_green_file`'s rules: the whole line is read, an unterminated last line included; the key is split at the first TAB; one CR is stripped; the last repeated key wins. It uses `_rb_` locals and one `<key>) bg_<name>=` per case line, and gains `bg_age` and `bg_blocks`. A new `read_inherited_green` replaces the inherited green's ten awk reads, with every `bg_*` declared local. `check_bar_base`'s local list names the two new variables.

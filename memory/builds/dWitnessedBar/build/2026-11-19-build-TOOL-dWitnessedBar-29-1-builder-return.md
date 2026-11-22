@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-29
 
-# TOOL-dWitnessedBar-29 — builder return 1 (run `wf_4f3b1452-30d`), committed b0ad989581b307fcb739a7b8f548509171a897c8
+# TOOL-dWitnessedBar-29 — builder return 1 (run `wf_4f3b1452-30d`), committed 79a4f9c2088e5dc309444202257321bfe66b6c7e
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-29 is built from spec rev-5 and committed as one pass commit 
 
 ## Summary
 
-Built and committed TOOL-dWitnessedBar-29 as b0ad989581b3 on base 60f08d3db831. No gate, suite, bar or `--selftest` ran. The only check of that kind was the naming lexicon's `--suggest`, which passed for `render_warn_marker`, `scan_leg_warnings` and `run_warn_slice`.
+Built and committed TOOL-dWitnessedBar-29 as 79a4f9c2088e on base d3555bde9718. No gate, suite, bar or `--selftest` ran. The only check of that kind was the naming lexicon's `--suggest`, which passed for `render_warn_marker`, `scan_leg_warnings` and `run_warn_slice`.
 
 **What changed**
 - **The marker:** `tools/policy/budgets.py` gains `render_warn_marker`, and its `check` verb prints the marker after a warned verdict. All 13 emitter files in the census now print the `gate-warn` marker. The four shell sites use one printf each; the Python sites call the factory.

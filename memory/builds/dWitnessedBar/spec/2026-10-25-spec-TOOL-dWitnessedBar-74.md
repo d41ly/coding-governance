@@ -42,7 +42,7 @@ AC1 and AC2 green.
 This unit gives the comparison a red it reaches, on every run. A variant of the cut function differs
 from it in one line, and its `sha` value loses its CR after the read. The canary's own `sed` still
 changes one line of the variant, so only the byte comparison can tell the variant's mutant from the
-real one. It repairs `TOOL-dWitnessedBar-70`, CLOSED at `09718851e`, and builds at order 40 after
+real one. It repairs `TOOL-dWitnessedBar-70`, CLOSED at `0890c99d1`, and builds at order 40 after
 `TOOL-dWitnessedBar-72`.
 
 ## 2. Scope (IN)
@@ -104,7 +104,7 @@ real one. It repairs `TOOL-dWitnessedBar-70`, CLOSED at `09718851e`, and builds 
 
 ### Evidence
 
-Probed at `921f83fff` on 2026-11-21 under `uname -s` `MINGW64_NT-10.0-22621`, GNU bash 5.3.9
+Probed at `552b72210` on 2026-11-21 under `uname -s` `MINGW64_NT-10.0-22621`, GNU bash 5.3.9
 `x86_64-pc-cygwin`, GNU Awk 5.4.0 and GNU sed 4.9 (PINNED 2026-11-21). The probe cut HEAD's
 `.githooks/pre-push#read_green_file` and read a hand-built record laid out as the AC12 arm's:
 `verdict<TAB>GREEN<CR>`, `sha<TAB>` forty `a` `<LF>`, `sha<TAB>` forty `b` `<CR><LF>`,
@@ -159,8 +159,8 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 40, after `TOOL-dWitnessedBar-70` (39, CLOSED at `09718851e`). Order 40 is
-shared with `TOOL-dWitnessedBar-71` (CLOSED at `ced984440`), `TOOL-dWitnessedBar-72` and
+Live at landing, at order 40, after `TOOL-dWitnessedBar-70` (39, CLOSED at `0890c99d1`). Order 40 is
+shared with `TOOL-dWitnessedBar-71` (CLOSED at `2972b3755`), `TOOL-dWitnessedBar-72` and
 `TOOL-dWitnessedBar-75`. Dispatch is strictly sequential and sorts a tie by id string
 (`tools/workflows/unattended-build.js@921f83fff:78-82`, `:692-697`), so unit 72 builds before this
 unit and unit 75 after it. Units 72, 74 and 75 all edit the gov suite, so they build one at a time.
@@ -170,7 +170,7 @@ at order 41.
 ### Files touched (estimate)
 
 - `tools/run-gates/run-gates.gov.test.sh`
-- `memory/project/shell-role.txt`: S1 to S3 grow the suite past its row, 715 at `921f83fff` (PINNED
+- `memory/project/shell-role.txt`: S1 to S3 grow the suite past its row, 715 at `552b72210` (PINNED
   2026-11-21 by `memory/project/shell-role.txt`, widened by unit 70). Unit 72 may widen it first, so
   the pass reads the row from the file. It widens that row with
   `python tools/memory-tree/ratchet.py widen shell-role`, which writes its widen record under
@@ -217,7 +217,7 @@ at order 41.
   `grep -nE 'check_cr_reached +"[^"]+" +"[^"]+" +rec_sha' tools/run-gates/run-gates.gov.test.sh`
   names two lines, the canary's call and S2's.
   `grep -n 'rec_sha' tools/run-gates/run-gates.gov.test.sh | grep -E 'wc -c|tail -c|[$][{]#|: -1[}]'`
-  prints nothing, where at `921f83fff` it prints line 874 (PINNED 2026-11-21).
+  prints nothing, where at `552b72210` it prints line 874 (PINNED 2026-11-21).
   Red when: the variant stops at the canary's count step, or the comparison has a second copy the
   liveness check never runs.
   fixture: the AC12 record, which `TOOL-dWitnessedBar-68` S1 and `TOOL-dWitnessedBar-67` S2 build.

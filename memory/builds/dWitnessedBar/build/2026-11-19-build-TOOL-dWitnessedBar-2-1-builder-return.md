@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-2
 
-# TOOL-dWitnessedBar-2 — builder return 1 (run `wf_297d3007-93e`), committed 7f3e24092b9c6da7a87362ca7157bf0c49eec368
+# TOOL-dWitnessedBar-2 — builder return 1 (run `wf_297d3007-93e`), committed c8727978dd6c1db7f698cf887b93b9e4815361fc
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-2 is built as its rev-4 spec says. It is committed as one pas
 
 ## Summary
 
-Built TOOL-dWitnessedBar-2 and committed it as 7f3e24092b9c (base 795eccc80fb4). No gate, suite or bar ran. Every criterion was checked with a probe of this unit's own code; those probes stand in for section 7's legs, which the close still owes.
+Built TOOL-dWitnessedBar-2 and committed it as c8727978dd6c (base 1f54e6391bd0). No gate, suite or bar ran. Every criterion was checked with a probe of this unit's own code; those probes stand in for section 7's legs, which the close still owes.
 
 **What was built:**
 - **Bypass record:** `write_bypass_line` writes one `decision=bypass` line to `runlog/pushes.log`. It is byte-identical in `tools/push-main.sh` and `.githooks/pre-push`.

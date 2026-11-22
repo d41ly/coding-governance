@@ -1,35 +1,35 @@
 # ledger · spec-token-waivers · key key token · direction shrink-only · drain key
-codebase-map/selftest.py	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/run-gates.sh	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-selftest	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-in-flight/.gitkeep	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-in-flight/{a,b,c}.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/project/journal/2026-07-15-aRuledParchment.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-verifier fan-out (≤5 verify agents per review)	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/archive/ledger/{a,b,c}.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/architecture/project/legacy-files.txt	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/project/tstray.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/guides/tfixture.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/guides/tguide.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/map/features/tdoss.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/project/IN-FLIGHT.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/project/MEMORY.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/project/README.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-.claude/SESSION-KICKOFF.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/backlog/<FAMILY>.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-testsuite counts	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-review-join ban	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-.claude/hooks/agent-cap.js	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-.claude/hooks/scratch-guard.js	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-build-index selftest <- tools/check-spec-tokens.py	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory-hygiene self-test <- tools/check-spec-tokens.py	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-routed-commits selftest <- tools/unattended/	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/hooks/agent-cap.js:2092	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy fixtures <- tools/workflows/unattended-build.template.js	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy fixtures <- skills/session-kickoff/manifest-check.sh	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy fixtures <- tools/codebase-map/map_lib.py	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy fixtures <- tools/memory-tree/check-memory-hygiene.sh	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy fixtures <- tools/check-spec-tokens.py	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy fixtures <- tools/workflows/kit.toml	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/hooks/agent-cap.js:1972	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-hook destinations self-test <- tools/workflows/kit.toml	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+codebase-map/selftest.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/run-gates.sh	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+selftest	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+in-flight/.gitkeep	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+in-flight/{a,b,c}.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/project/journal/2026-07-15-aRuledParchment.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+verifier fan-out (≤5 verify agents per review)	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/archive/ledger/{a,b,c}.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/architecture/project/legacy-files.txt	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/project/tstray.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/guides/tfixture.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/guides/tguide.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/map/features/tdoss.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/project/IN-FLIGHT.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/project/MEMORY.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/project/README.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+.claude/SESSION-KICKOFF.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/backlog/<FAMILY>.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+testsuite counts	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+review-join ban	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+.claude/hooks/agent-cap.js	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+.claude/hooks/scratch-guard.js	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+build-index selftest <- tools/check-spec-tokens.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory-hygiene self-test <- tools/check-spec-tokens.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+routed-commits selftest <- tools/unattended/	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/hooks/agent-cap.js:2092	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- tools/workflows/unattended-build.template.js	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- skills/session-kickoff/manifest-check.sh	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- tools/codebase-map/map_lib.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- tools/memory-tree/check-memory-hygiene.sh	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- tools/check-spec-tokens.py	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+policy fixtures <- tools/workflows/kit.toml	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/hooks/agent-cap.js:1972	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+hook destinations self-test <- tools/workflows/kit.toml	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

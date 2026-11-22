@@ -3,7 +3,7 @@
 **Serves:** journal TOOL-dWitnessedBar-59
 
 No merge bar, no self-test suite and no gate leg ran in this pass, the naming lexicon excepted. The
-criteria were observed on node d, 2026-11-20, at base `b0cf02bad`, by a scratch probe that drove
+criteria were observed on node d, 2026-11-20, at base `5b738045b`, by a scratch probe that drove
 `tools/govkit/steps/inherited_red.py` under `-I` over fixture targets at `%TEMP%/ir59p`, cut
 `read_policy_key` from `.githooks/pre-push` as the parity arm cuts it and ran it under the resolved
 bash, and ran the same three observations over a staged copy of the step whose five `.split("\n")`

@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-63
 
-# TOOL-dWitnessedBar-63 — builder return 1 (run `wf_da412000-42b`), committed 44989eebd
+# TOOL-dWitnessedBar-63 — builder return 1 (run `wf_da412000-42b`), committed 6932f9604
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-63 is built from spec rev-4 and committed as one pass commit 
 
 ## Summary
 
-Built commit 44989eebd on base e1c032c1. No gate, suite or bar ran. I checked my changes with probes of the code over scratch fixtures, plus the greps the acceptance criteria spell. Every criterion is either observed or marked OWED in C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-63-1-acceptance-ledger.md.
+Built commit 6932f9604 on base a07a2203. No gate, suite or bar ran. I checked my changes with probes of the code over scratch fixtures, plus the greps the acceptance criteria spell. Every criterion is either observed or marked OWED in C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-63-1-acceptance-ledger.md.
 
 What changed:
 - **Seed (all three legacy_ledger.py copies):** the no-HEAD path now writes `legacy_ledger: <population>: <reason>; nothing written` to stderr (S6). Only an exit 1 with nothing printed counts as an unborn HEAD (S8). The unborn line goes to stderr (S32).

@@ -210,7 +210,7 @@ New arm: tools/run-gates/adopt-run-gates.test.sh · covers AC1 AC2 AC3 · a scra
   delegated): (a), rung 3, an extension of the condition regen already honours. widens: none ·
   relaxes: none
 - **F3 — How does this unit land green while govkit selfcheck refuses the `exists:` form?** The
-  re-ground at `5e569d9c9` read `tools/govkit/govkit.py#selfcheck`: its `[[generated]]` arm refuses
+  re-ground at `e0236c47e` read `tools/govkit/govkit.py#selfcheck`: its `[[generated]]` arm refuses
   every `when` outside `<conf>:<KEY>=<value>`, and its leg runs on every bar. TOOL-dWitnessedBar-54 S2
   widens that arm, and its S3 parity arm needs this unit's `exists:` reading in `regen.py`, so neither
   unit lands green alone. Options: (a) the two land on local main in one merge, this unit's commit
@@ -238,14 +238,14 @@ New arm: tools/run-gates/adopt-run-gates.test.sh · covers AC1 AC2 AC3 · a scra
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-54, TOOL-dWitnessedBar-56, TOOL-dWitnessedBar-57, promoted by the
   round-1 spec audit of units 40 to 51; nothing else moved.
-- rev-3 · 2026-11-19 · §1 · S1 · §4 Evidence, Rollout · §7 · §8 F3 · re-grounded at `5e569d9c9` per
+- rev-3 · 2026-11-19 · §1 · S1 · §4 Evidence, Rollout · §7 · §8 F3 · re-grounded at `e0236c47e` per
   brief 2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-brief: line citations become `path#symbol`
   or blob-pinned (the descriptor's `include = "**"` moved to line 23); S1 states that a `when`-skipped
   row joins regen's `skipped` list with its own reason, which `print_items` lacks today; govkit
   selfcheck's `when` arm, which refuses `exists:` until unit 54, joins the evidence and the leg line,
   and F3 lands the two units in one merge.
 - rev-4 · 2026-11-19 · S2 · S3 · §4 Evidence, Inventory · §5 · AC2 · AC3 · §8 F4 · §10 · re-grounded at
-  `4e5497fb7` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief, against
+  `2ca17d9c5` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief, against
   TOOL-dWitnessedBar-11 rev-6 as the contract. S2's module-level imports now name `pass_legs`, which
   unit 11 §4 step 5 renders `pass_leg` through. `load_govkit` wraps unit 11's inline
   `resolve_kit_dir` and exits with its `LookupError` line. S3 states what an adopter's `--conform`

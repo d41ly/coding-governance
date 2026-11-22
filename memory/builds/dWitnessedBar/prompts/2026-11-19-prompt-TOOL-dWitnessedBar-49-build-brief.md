@@ -10,12 +10,12 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   table's order. This unit is build order 2.
 - Built so far: unit 26 (`7526c98fa`) — `scan_bash(script, host)` with `BASH_NAMES` in the `resolve_bash_py` block,
   its twin `scanBash`, name-keeping adapters, and `scan_bare_bash` in `tools/run-gates/measure_legs.py`. Unit 27
-  (`cc35bb62c`) — `tools/lib/refuse-wrong-shell.sh`, the refusal in every `resolve_python` member, and
-  `wrong_shell_at` / `wrongShellAt` in both resolver blocks. Unit 48 (`75a15d9ce`) — row_grammar's
+  (`8b3aa5783`) — `tools/lib/refuse-wrong-shell.sh`, the refusal in every `resolve_python` member, and
+  `wrong_shell_at` / `wrongShellAt` in both resolver blocks. Unit 48 (`15bb9de79`) — row_grammar's
   `resolve_shell_ere` an adapter over its own inline block copy, and `scan_bare_bash`'s shape 2 widened to any list
   holding a bare `bash` beside a second candidate, with `in` / `not in` operands skipped and the names read from
   `profile_bar.BASH_NAMES`. Read the scanner as unit 48 left it.
-- The spec is rev-4, re-grounded at `d08ded6f1`. Each new inline copy of the `resolve_bash_py` block is the canonical at
+- The spec is rev-4, re-grounded at `fed701a30`. Each new inline copy of the `resolve_bash_py` block is the canonical at
   this pass's tip; the parity row finds it by its marker. An inline copy raises the lexicon's `VERB_OFFENDER_PIN` by
   one per copy (`wrong_shell_at`); re-measure it as unit 48 did, declaring `.lexicon.conf` with `--dispatch` first.
 - Unit 26's builder left one bug-class minor for the close review: `scan_bare_bash` hides the rest of a file whose

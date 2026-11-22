@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-89
 
-# TOOL-dWitnessedBar-89 — builder return 1 (run `wf_ed08853c-0c9`), committed 0c2f7e195
+# TOOL-dWitnessedBar-89 — builder return 1 (run `wf_ed08853c-0c9`), committed 05fdf49d3
 
 ## Why
 
-Built TOOL-dWitnessedBar-89 from spec rev-4 as one pass commit. Before writing anything I probed the spec's claims against the tree: the line numbers cited at 75ce047f5, FLOOR_ASSERTIONS=80, a `Raised` count of 7, a shell-role row of 850, and the region/verb_plan behaviour all hold, so I found no divergence. One change goes beyond what the spec states, and it is recorded as deviation 893: the canary call site now also reds on a return of 3 and leaves rgf_ok at 0. Without it, an empty slot list on a 3 would certify the canary. The round-1 audit's id 7 fix asks for exactly this.
+Built TOOL-dWitnessedBar-89 from spec rev-4 as one pass commit. Before writing anything I probed the spec's claims against the tree: the line numbers cited at 8bed2005c, FLOOR_ASSERTIONS=80, a `Raised` count of 7, a shell-role row of 850, and the region/verb_plan behaviour all hold, so I found no divergence. One change goes beyond what the spec states, and it is recorded as deviation 893: the canary call site now also reds on a return of 3 and leaves rgf_ok at 0. Without it, an empty slot list on a 3 would certify the canary. The round-1 audit's id 7 fix asks for exactly this.
 
 ## Summary
 
-Commit 0c2f7e195 is on branch/unattended-dwitnessedbar-2ed3b3, base 971e3894f, with trailers `Pass: TOOL-dWitnessedBar-89` and Co-Authored-By. In that same commit the spec's status header is set to CLOSED (the date was already 2026-11-21), and the generator refreshed its records region.
+Commit 05fdf49d3 is on branch/unattended-dwitnessedbar-2ed3b3, base 4d5152195, with trailers `Pass: TOOL-dWitnessedBar-89` and Co-Authored-By. In that same commit the spec's status header is set to CLOSED (the date was already 2026-11-21), and the generator refreshed its records region.
 
 What changed in C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/run-gates/run-gates.gov.test.sh:
 - **S4:** `check_canary_keys` now returns 3 when its visited count fails, and still prints the visited line on stderr. `check_key_variant` returns 3 without printing, ahead of its rc-2 branch. On a 3, the liveness loop sets fail=1, adds nothing to `a` or `rgf_whys`, and adds the key to no `rgf_seen` (`rgf_kvr` and `rgf_k3` are new variables, no new functions). The canary call site takes its `unread` slot only on a 2; on a 3 it sets fail=1 and leaves rgf_ok at 0 (the deviation-893 change).

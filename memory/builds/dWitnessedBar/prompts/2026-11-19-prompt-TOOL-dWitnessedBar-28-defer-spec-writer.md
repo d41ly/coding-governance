@@ -117,10 +117,10 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    in Files touched with the legs its guard names on the gates section's leg line, and a prose-only mention named as
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
-   - Spec rev-6 (`240f53acb`) cannot be built inside this run: S1's `schema` key waits on §8 F8's ask and S5 and S8
+   - Spec rev-6 (`bfc815174`) cannot be built inside this run: S1's `schema` key waits on §8 F8's ask and S5 and S8
      wait on F6's, all changes to dOrderedCharter's kits, and the build method lets no plan depend on a build outside
      it. The run carries the unit forward: it filed the asks as TOOL-dWitnessedBar-101 (F6), -102 (F7) and -103 (F8)
-     in `memory/builds/dWitnessedBar/BACKLOG.md` (`5bc4bf968`) and defers the unit with `--rescope --act defer`.
+     in `memory/builds/dWitnessedBar/BACKLOG.md` (`daeb93d75`) and defers the unit with `--rescope --act defer`.
    - Unit 51 consumes `leg sources`, its `enforces` and the S26 composition from this unit (ids 7 and 46); its own
      re-ground drops that edge, so this spec's matching hands-off bullet to unit 51 goes too.
 2. A choice the re-ground forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it

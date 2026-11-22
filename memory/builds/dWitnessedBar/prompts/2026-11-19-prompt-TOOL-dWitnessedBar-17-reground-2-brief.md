@@ -26,9 +26,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    What is built so far:
    - Built and landed on this branch, in order: units 26, 27, 48, 49, 13, 50, 15 (the seed verb), 12 (a `tag` on every
      leg), 61, 22 (`tests` and `enforces` on legs), 47, 19 (a `purpose` on every leg), 11 (the gate-leg factory
-     `tools/run-gates/leg_factory.py`), 14 (`49f5d3ff6`: the `ratchet` pack in `tools/memory-tree/ratchet.py`, the
-     `conf-scalar-pins` population, `new at` for a population the base holds nowhere), 45 and 54 (`383e7b739`,
-     `c647b572e`: the `exists:` form of a generated row's `when`).
+     `tools/run-gates/leg_factory.py`), 14 (`25a3d2970`: the `ratchet` pack in `tools/memory-tree/ratchet.py`, the
+     `conf-scalar-pins` population, `new at` for a population the base holds nowhere), 45 and 54 (`f08675df4`,
+     `da620a77f`: the `exists:` form of a generated row's `when`).
    - Unit 16 (gov's registries converted onto the ledger, order 10) is being revised over its builder's divergence and
      unit 46 builds after it; read their specs as the contract for what will exist.
    - `memory/project/readme-contract.txt` and `memory/DECISIONS.md` are shared records no pass may declare; a spec that

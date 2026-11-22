@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-81
 
-# TOOL-dWitnessedBar-81 — builder return 1 (run `wf_54550986-563`), committed dc1205950
+# TOOL-dWitnessedBar-81 — builder return 1 (run `wf_54550986-563`), committed 778c11528
 
 ## Why
 
@@ -8,7 +8,7 @@ The spec could be built as written. Its claims about current code hold at HEAD. 
 
 ## Summary
 
-Committed dc1205950 with subject `records(dWitnessedBar): TOOL-dWitnessedBar-81, ...` and trailers `Decided:`, `Pass: TOOL-dWitnessedBar-81` and `Co-Authored-By`. No code changed in this unit.
+Committed 778c11528 with subject `records(dWitnessedBar): TOOL-dWitnessedBar-81, ...` and trailers `Decided:`, `Pass: TOOL-dWitnessedBar-81` and `Co-Authored-By`. No code changed in this unit.
 
 Files in the commit:
 - C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-81-1-acceptance-ledger.md (new; AC1 records the probe, AC2 and AC3 are marked OWED)

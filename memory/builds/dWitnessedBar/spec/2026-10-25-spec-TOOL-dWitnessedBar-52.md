@@ -38,7 +38,7 @@
 The round-1 spec audit of units 40 to 51
 (`memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md`)
 confirmed finding **id 1 at HIGH**, in its item **H1**, which it shares with id 13
-(`TOOL-dWitnessedBar-53`). `TOOL-dWitnessedBar-46` S2, landed at `028b97364`, has the memory-tree
+(`TOOL-dWitnessedBar-53`). `TOOL-dWitnessedBar-46` S2, landed at `e1efccc6b`, has the memory-tree
 adopter seed `conf-scalar-pins` at the end of `--scaffold`, measuring "the tree's tracked root confs".
 At that moment `.memory-tree.conf` has been copied from the example by the adopter's seed-and-stop
 (`tools/memory-tree/adopt-memory-tree.sh@fbbf1499d9a4:98-102`) and is untracked: the scaffold stages
@@ -58,7 +58,7 @@ fix: the seed reads the root confs present in the working tree, tracked or not. 
   lists, run at the repository root. A conf copied but not yet committed is read, and a conf the
   repository ignores is not. `tools/memory-tree/ratchet.py#read_root_conf_lines`, the one conf walk
   `#measure_scalar_pins` and `#measure_cutoffs` share since `TOOL-dWitnessedBar-17` landed it at
-  `dbbd8caba` (its §4 "The cutoffs"), takes the paths `read_tracked_paths(root)` lists that
+  `9a29f1e96` (its §4 "The cutoffs"), takes the paths `read_tracked_paths(root)` lists that
   `ROOT_CONF_RE` matches; it takes `read_root_confs(root)` instead, and `ROOT_CONF_RE`
   (`tools/memory-tree/ratchet.py@586cad8fe8a9:97`), whose one reader is that filter (`:489`), is
   deleted with it. `read_tracked_paths` stays for its other caller, the widen check of
@@ -69,7 +69,7 @@ fix: the seed reads the root confs present in the working tree, tracked or not. 
   filter this item replaces is its one reader, so NO VALUE READERS beyond it.
 - **S2** — The leg reads the same set. `keys-not-scalar` without `--measure`, the check of
   `TOOL-dWitnessedBar-14` S11, measures through the same `measure_scalar_pins` call as its seed
-  (`tools/memory-tree/ratchet.py#run_keys_not_scalar`, landed at `49f5d3ff6`), so S1's one change
+  (`tools/memory-tree/ratchet.py#run_keys_not_scalar`, landed at `25a3d2970`), so S1's one change
   reaches both and this unit adds no second call; the seed and the leg never measure two different
   sets. Observed by AC1 and AC3.
 - **S3** — What it does not check, stated. `ratchet.py`'s docstring for `read_root_confs` names the blind
@@ -113,27 +113,27 @@ fix: the seed reads the root confs present in the working tree, tracked or not. 
   writes a header and nothing else" (`adopt-memory-tree.sh@fbbf1499d9a4:824-829`).
 - The example conf assigns `ROW_DUPLICATE_PIN="0"`
   (`tools/memory-tree/.memory-tree.conf.example@815710c14c4b:325`), the one scalar count among its
-  five `*_PIN=` lines, PINNED 2026-11-19 at `86dac0fcc` by
+  five `*_PIN=` lines, PINNED 2026-11-19 at `57547e855` by
   `grep -nE '^[A-Z_]+_PIN=' tools/memory-tree/.memory-tree.conf.example`. `TOOL-dWitnessedBar-17` S3,
   which builds before this unit, removes every one of those lines from that file (§8 F2).
 - The defect, probed in a scratch target built as AC1's fixture. The scaffold printed
-  `armed conf-scalar-pins 0` (PINNED 2026-11-19 at `86dac0fcc`). After `git add -A && git commit`, with
+  `armed conf-scalar-pins 0` (PINNED 2026-11-19 at `57547e855`). After `git add -A && git commit`, with
   the home removed, `python tools/memory-tree/legacy_ledger.py seed --population conf-scalar-pins`
-  printed `armed conf-scalar-pins 6`, the example's pins and the plant (PINNED 2026-11-19 at `86dac0fcc`).
+  printed `armed conf-scalar-pins 6`, the example's pins and the plant (PINNED 2026-11-19 at `57547e855`).
 - `read_registrations` reads tracked descriptors only (`tools/lib/legacy_ledger.py#read_registrations`,
   TOOL-dWitnessedBar-13 §8 F7), and `govkit apply` stages every file it lands before any adopter runs
   (`tools/govkit/govkit.py#_cmd_apply`, its STAGE block). So at a governed install the seed sees the
   kit's registration while the conf the adopter copied stays unstaged; AC1's fixture is that state.
 - Unit 15 §4: a live result with zero rows is written armed and empty, and a present armed home is
   left alone on a rerun.
-- The read, probed 2026-11-19 at `045405ff8`: in gov's tree
+- The read, probed 2026-11-19 at `c3884a6b9`: in gov's tree
   `git ls-files --cached --others --exclude-standard -- ':(glob).*.conf'` lists the confs
-  `git ls-files -- '.*.conf'` lists, five each (PINNED 2026-11-19 at `045405ff8`, and again at
-  `2b0490b8d` and `86dac0fcc`); in a scratch `git init` it lists an untracked root
+  `git ls-files -- '.*.conf'` lists, five each (PINNED 2026-11-19 at `c3884a6b9`, and again at
+  `578296c1f` and `57547e855`); in a scratch `git init` it lists an untracked root
   `.x.conf`, and neither a nested `sub/.y.conf` nor a root conf named in `.git/info/exclude`.
-- The landed measure, read at `3721879a2`: unit 14 (`49f5d3ff6`) has `#run_keys_not_scalar` call
+- The landed measure, read at `6df29c83d`: unit 14 (`25a3d2970`) has `#run_keys_not_scalar` call
   `tools/memory-tree/ratchet.py#measure_scalar_pins` once for both the seed and the leg; unit 17
-  (`dbbd8caba`) moved that function's conf walk into `#read_root_conf_lines`, which `#measure_cutoffs`
+  (`9a29f1e96`) moved that function's conf walk into `#read_root_conf_lines`, which `#measure_cutoffs`
   shares and which walks each tracked root conf through `#read_tracked_paths` filtered by
   `ROOT_CONF_RE`. No other line reads `ROOT_CONF_RE` (`git grep -n ROOT_CONF_RE -- tools skills`).
 - The policy kit spells the same pathspec over the tracked set only:
@@ -166,7 +166,7 @@ Minted: the function `read_root_confs`, and the plant functions `run_plant_untra
 `run_plant_ignored_conf` behind the `PLANTS` cases `untracked-conf` and `ignored-conf`, spelled as the
 table's other cases are (`tools/memory-tree/ratchet.py@586cad8fe8a9:1039-1050`). Removed: the constant
 `ROOT_CONF_RE`. Naming cells: `python tools/lexicon/lexicon.py --suggest <name> --as py.function`
-answered OK for each minted name, asked 2026-11-19 at `3721879a2`. `read` is the verb the file's other
+answered OK for each minted name, asked 2026-11-19 at `6df29c83d`. `read` is the verb the file's other
 readers `read_tracked_paths` and `read_root_conf_lines` lead with, and the lexicon steers
 `list_root_confs` to `read_root_confs`; `derive_root_confs` is accepted too but is the name of
 govkit's descriptor-class read (`tools/govkit/govkit.py#derive_root_confs`), a different set.
@@ -174,7 +174,7 @@ govkit's descriptor-class read (`tools/govkit/govkit.py#derive_root_confs`), a d
 ### Migration
 
 None for gov: every root conf of gov's tree is tracked, so the set is the tracked set, the confs of
-§4 Evidence (five, PINNED 2026-11-19 at `86dac0fcc`).
+§4 Evidence (five, PINNED 2026-11-19 at `57547e855`).
 
 ### Rollout
 
@@ -235,7 +235,7 @@ pin (§8 F2) keeps AC1 observable over the drained example.
 
 `memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `ratchet selftest` · `ratchet (keys, not a scalar)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms`
 
-`ratchet selftest`, landed by `TOOL-dWitnessedBar-14` at `49f5d3ff6`, runs the plants of AC2 and AC3;
+`ratchet selftest`, landed by `TOOL-dWitnessedBar-14` at `25a3d2970`, runs the plants of AC2 and AC3;
 `ratchet (keys, not a scalar)` is the leg S2 binds to the seed's read. `lexicon naming predicates`
 grades the minted names against `VERB_OFFENDER_PIN`, which this unit leaves where it is; the map and
 recall legs read the regenerated `memory/map/generated/symbols.json`.
@@ -251,7 +251,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC2 AC3 · the plants `untracked
   2026-10-25, delegated): (a), rung 3, the precedent `TOOL-dDeclaredLoop-36` §8 F1 set.
   widens: none · relaxes: none
 - **F2 — Where does AC1's fixture get its scalar pin, once unit 17 drains the example's?** The
-  re-ground at `045405ff8` read `TOOL-dWitnessedBar-17` S3, which removes every `*_PIN=` line from the
+  re-ground at `c3884a6b9` read `TOOL-dWitnessedBar-17` S3, which removes every `*_PIN=` line from the
   example conf at this unit's order (§4 Evidence). Options: (a) the fixture's conf is the example plus
   one planted line `FOO_PIN="3"`, and AC1 names the planted row; (b) the fixture relies on the
   example's `ROW_DUPLICATE_PIN`, and the main loop lands this unit before unit 17; (c) the fixture
@@ -281,21 +281,21 @@ New arm: tools/memory-tree/ratchet.py · covers AC2 AC3 · the plants `untracked
   TOOL-dWitnessedBar-61's hands-off edge and the hands-off bullet mirroring TOOL-dWitnessedBar-62's
   consumes-from edge, promoted by the round-1 spec audit of units 52 to 57; nothing else moved.
 - rev-3 · 2026-11-19 · §1 · §3 · §4 Evidence, Migration, Rollout, Alternatives rejected · AC1 · §8 F2 F3
-  · §10 · re-grounded at `045405ff8` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-brief:
+  · §10 · re-grounded at `c3884a6b9` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-brief:
   the adopter and example-conf citations become blob-pinned at their moved lines, and the pin and conf
   counts are re-pinned; unit 46's seed now runs at the end of `--scaffold` and from its `--seed-pins`
   row; AC1's fixture stages the kit, since `read_registrations` reads tracked descriptors only, and
   plants `FOO_PIN` because unit 17 S3 drains the example's pins at this order (F2); the policy kit's
   root-conf read, landed since the base, is left alone (F3).
 - rev-4 · 2026-11-19 · S1 · S2 · §4 Evidence, The read, Migration · AC3 · §7 · §10 · re-grounded at
-  `2b0490b8d` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief over unit 14 as landed
-  at `49f5d3ff6`: `root_confs` replaces the conf walk of `measure_scalar_pins`, which the leg and its
+  `578296c1f` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief over unit 14 as landed
+  at `25a3d2970`: `root_confs` replaces the conf walk of `measure_scalar_pins`, which the leg and its
   seed already share, so AC3 counts one call where it counted two, and `read_tracked_paths` keeps its
   widen-check caller; `root_confs` sits behind the walk unit 17 shares with `measure-cutoffs`;
   `ratchet selftest` and `ratchet (keys, not a scalar)`, now in the manifest, join the leg line; the
   conf count is re-pinned, unchanged.
 - rev-5 · 2026-11-19 · §1 · S1 · §4 Evidence, Migration, Rollout, Alternatives rejected · §10 ·
-  re-grounded at `86dac0fcc` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief over
+  re-grounded at `57547e855` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief over
   units 16 and 46 as landed: the adopter, descriptor and example-conf citations re-pinned at their
   moved lines, unit 46's seed cited at `#seed_scalar_pins`, and the defect recorded as probed in AC1's
   fixture; unit 17 builds before this unit, so S1 and the rollout drop "whichever lands first"; the
@@ -303,7 +303,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC2 AC3 · the plants `untracked
 - rev-6 · 2026-11-19 · S1 · S3 · §3 · §4 Evidence, The read, Inventory, Files touched · AC2 · AC3 · §7 ·
   §8 F3 · §10 · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-rename-brief, after the first
   builder's return: the conf read is renamed `read_root_confs`, a name the naming lexicon accepts, and
-  restated behind `read_root_conf_lines`, the walk unit 17 landed at `dbbd8caba`; `ROOT_CONF_RE`, whose
+  restated behind `read_root_conf_lines`, the walk unit 17 landed at `9a29f1e96`; `ROOT_CONF_RE`, whose
   one reader that walk's filter was, is deleted with it and AC3 observes its absence; the plant
   functions join the inventory and `memory/map/generated/symbols.json` joins Files touched, with the
   naming, map and recall legs its guards and the rename name joining the §7 leg line.
@@ -315,9 +315,9 @@ The seam is the adopter's own working-tree fallback for the `method-carriers.txt
 the tracked-only-seed class, expressed as one `git ls-files` call with `--others --exclude-standard` so
 the leg and the seed share it; the call it replaces is the conf filter of
 `tools/memory-tree/ratchet.py#read_root_conf_lines`, the walk unit 17 moved out of `#measure_scalar_pins`
-at `dbbd8caba`, which the new read sits behind.
+at `9a29f1e96`, which the new read sits behind.
 `python tools/codebase-map/reuse_lookup.py "seed measure untracked root
-conf before first commit"`, re-run at `86dac0fcc`, ranked `before`, `seed` (test helpers), `repo_root`,
+conf before first commit"`, re-run at `57547e855`, ranked `before`, `seed` (test helpers), `repo_root`,
 `load_conf`, `parse_conf` and `write_commit`; none lists a working tree's root confs. A `git grep` for the pathspec
 found `tools/policy/policy.py#derive_legacy_homes`, which lists the tracked root confs for the policy
 kit's legacy-home conversion; §8 F3 records why this unit does not share it. No existing seam fits

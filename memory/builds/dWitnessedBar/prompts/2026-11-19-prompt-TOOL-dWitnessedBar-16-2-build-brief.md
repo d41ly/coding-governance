@@ -8,8 +8,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 10.
-- THIS IS PASS 2 of the two-pass unit. Pass 1 landed as `87bc9f615` and `6c989def1`, and the main loop committed the
-  converted `memory/project/readme-contract.txt` in `1f4ce2c30`. The spec is now rev-13: build S12 (delete the
+- THIS IS PASS 2 of the two-pass unit. Pass 1 landed as `3a7a51471` and `25bfe539f`, and the main loop committed the
+  converted `memory/project/readme-contract.txt` in `58de83325`. The spec is now rev-13: build S12 (delete the
   transitional read, observe AC14), S14 (move the four lists under the tool root to `memory/project/` with every
   name of them) and S15 (pass 1's remaining pass-leg reds), and move the spec's status to `CLOSED` in this pass's
   commit.

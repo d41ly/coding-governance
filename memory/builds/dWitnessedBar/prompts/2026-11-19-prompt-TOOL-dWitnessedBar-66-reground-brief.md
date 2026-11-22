@@ -25,7 +25,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 37: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59,
-     30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64 (`b26061af2`) and 65 (`139d6fea1`: lib-unattended refuses
+     30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64 (`ef54d1d89`) and 65 (`f2fcd51c6`: lib-unattended refuses
      an `exists:` path that normalises to `.`, `check_when_forms_agree` compares 17 refused forms, the seed refuses
      with no repository root before reading a registration, `read_green_file` keeps the last repeated key and strips
      one CR). Every unit this spec consumes from is CLOSED.

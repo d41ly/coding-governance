@@ -29,7 +29,7 @@ calls `shutil.which("bash")` in `test_parser_vs_bash`, `test_no_conf_adopt`, `ad
 and `test_hook_test`, and passes the result straight into `subprocess.run`
 (`tools/memory-recall/selftest.py#adopt`). `shutil.which` walks PATH with no System32 or WindowsApps
 filter. The file is in neither `TOOL-dWitnessedBar-26`'s site table nor any of its query's three shapes,
-so `test_no_bare_bash_argv` reads `[]` at `88352ca5` (PINNED, measured 2026-11-19), and so would the
+so `test_no_bare_bash_argv` reads `[]` at `a50c0a56` (PINNED, measured 2026-11-19), and so would the
 bare-shell-name leg `TOOL-dWitnessedBar-24` S9 runs over the same scan, while that selftest launches
 whatever bash PATH yields, WSL's launcher included on node d. This unit takes the report's fix. It
 repairs `TOOL-dWitnessedBar-26`.
@@ -72,7 +72,7 @@ repairs `TOOL-dWitnessedBar-26`.
   lacks, `test_no_conf_adopt`, `adopt` and `test_hook_test` say "no bash on PATH", and
   `test_python3_only` says "needs bash and git on PATH" beside its own `shutil.which("git")`. `adopt` runs
   `[bash, str(kitdir / "adopt-memory-recall.sh"), *args]` (`tools/memory-recall/selftest.py#adopt`).
-- Shape 4's population at `88352ca5` is those calls alone: no other tracked `*.py` calls `shutil.which`
+- Shape 4's population at `a50c0a56` is those calls alone: no other tracked `*.py` calls `shutil.which`
   on the constant `bash` or `bash.exe`, and no tracked `*.js` matches the JavaScript shape (PINNED,
   measured 2026-11-19 with an `ast` probe over 241 tracked `*.py` and §4's regex over 38 tracked `*.js`).
 - The block keeps no memo and runs every candidate past `GOV_BASH`
@@ -167,7 +167,7 @@ New arm: tools/run-gates/measure_legs.py · covers AC1 · `test_no_bare_bash_arg
   `measure-legs selftest` suite, which stays on the New arm line, per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief; nothing else moved.
 - rev-4 · 2026-11-19 · §1 §2 §3 §4 §5 §6 §10 · S2 AC1 AC2 · re-grounded on unit 26 as landed at
-  `88352ca5`: the sites are cited by function, their skip texts as they read, and the `git` lookup of
+  `a50c0a56`: the sites are cited by function, their skip texts as they read, and the `git` lookup of
   `test_python3_only` stays; the Non-goals record that unit 26 removed the profile_bar and
   process-monitor lookups and name regen's variable lookup outside the shape; §4 re-derives shape 4's
   population, names the block's missing memo the adapter keeps, and drops `resolve-python.test.sh` from Files touched, its
@@ -178,7 +178,7 @@ New arm: tools/run-gates/measure_legs.py · covers AC1 · `test_no_bare_bash_arg
 
 The seams are unit 26's `resolve_bash_py` block, carried to one more site under its parity row, and
 `scan_bare_bash` (`tools/run-gates/measure_legs.py#scan_bare_bash`), given a fourth shape; both
-re-verified at `88352ca5`. `python tools/codebase-map/reuse_lookup.py "find a bash looked up on PATH by
+re-verified at `a50c0a56`. `python tools/codebase-map/reuse_lookup.py "find a bash looked up on PATH by
 shutil.which"`, re-run 2026-11-19, ranked `resolve_bash` (the adapters unit 26 landed),
 `load_memory_tree_path`, `resolve_tool_path`, `resolve_charter_path`, `build_spec_path_re` and
 `scan_bash`; none is the memory-recall selftest's lookup, which the report's grep found.

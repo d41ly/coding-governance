@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-95
 
-# TOOL-dWitnessedBar-95 — builder return 1 (run `wf_98e38fc9-a02`), committed 5ec78f578
+# TOOL-dWitnessedBar-95 — builder return 1 (run `wf_98e38fc9-a02`), committed f6fb4fc49
 
 ## Why
 
@@ -8,9 +8,9 @@ TOOL-dWitnessedBar-95 is built as its rev-2 spec says. It changes records only: 
 
 ## Summary
 
-The unit is committed as 5ec78f578 on top of base 4cd455e5c. AC1 was observed at the pass; AC2 and AC3 were probed and still owe their runs at the close; AC4 and its note are owed to the close.
+The unit is committed as f6fb4fc49 on top of base f3de2c8e2. AC1 was observed at the pass; AC2 and AC3 were probed and still owe their runs at the close; AC4 and its note are owed to the close.
 
-**Pre-build check:** the spec's claims about the code hold in the tree. `read_pass_declarations` prints every key unless given `current`, and `covers` and `is_repo_root` behave as the spec says (both in `tools/unattended/lib-unattended.sh`). `check_commit_message` in `tools/unattended/unattended.sh` reads the declarations in `current` mode and admits a path through `covers`. The run-state file has one dispatch row for unit 92, `item 5518fe43`. No divergence was found.
+**Pre-build check:** the spec's claims about the code hold in the tree. `read_pass_declarations` prints every key unless given `current`, and `covers` and `is_repo_root` behave as the spec says (both in `tools/unattended/lib-unattended.sh`). `check_commit_message` in `tools/unattended/unattended.sh` reads the declarations in `current` mode and admits a path through `covers`. The run-state file has one dispatch row for unit 92, `item 1e38f6eb`. No divergence was found.
 
 **What the commit holds** (files staged by name; the unstaged `help/reference/drive.md` and `help/reference/units.md` were left alone):
 - the new ledger `C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-95-1-acceptance-ledger.md`, one line per criterion, each opening with a token that criterion spells

@@ -39,9 +39,9 @@ platform fact as id 10 (B1) and id 19 (H3), in a separate clause of a separate s
 drop that CR, so `rec_fp` was forty bytes whether or not the strip existed, and unit 67's AC2 break
 could not go red on any Windows node or on `windows-latest` CI.
 
-`TOOL-dWitnessedBar-69` (`298369174`) made `fingerprint` one case of a whole-line read loop with one
+`TOOL-dWitnessedBar-69` (`9ff80bb15`) made `fingerprint` one case of a whole-line read loop with one
 strip, and unit 67's builder saw the break red on `rec_fp` on this node (its ledger, AC2). Nothing
-keeps it so. `TOOL-dWitnessedBar-70`'s canary (`09718851e`) proves the CR reaches the read for
+keeps it so. `TOOL-dWitnessedBar-70`'s canary (`0890c99d1`) proves the CR reaches the read for
 `rec_sha` alone, and counts unit 67 S2's `rec_fp` compare uncanaried. A later `fingerprint` read
 through a bare `$(awk ...)` leaves the whole arm green on this node (§4 Evidence).
 
@@ -63,7 +63,7 @@ break with its failing line. It repairs `TOOL-dWitnessedBar-67` and builds one s
   the compare still runs and prints its own line. The arm's comment names the `rec_fp` grading as
   canaried, in place of "uncanaried". Observed by AC1.
 - **S2** — The `fingerprint` read is the `fingerprint` case of unit 69 S1's loop, with no read of its
-  own. This holds at HEAD since unit 69 (`298369174`); this unit changes nothing in
+  own. This holds at HEAD since unit 69 (`9ff80bb15`); this unit changes nothing in
   `.githooks/pre-push`. Observed by AC2.
 - **S3** — Unit 67 AC2's break is recorded with its failing line. At the close, on a Windows node, the
   main loop stages a `read_green_file` that lacks its CR strip, since unit 69 the one strip for every
@@ -101,12 +101,12 @@ break with its failing line. It repairs `TOOL-dWitnessedBar-67` and builds one s
 - On this node (GNU Awk 5.4.0, bash 5.3.9 `x86_64-pc-cygwin`), a `fingerprint<TAB>` forty `c`
   `<CR><LF>` line read by `awk -F'\t' '$1=="fingerprint"{print length($2)}'` printed 40 (PINNED
   2026-10-25).
-- At HEAD `921f83fff`, `.githooks/pre-push#read_green_file` reads `fingerprint` as the case
+- At HEAD `552b72210`, `.githooks/pre-push#read_green_file` reads `fingerprint` as the case
   `fingerprint) rec_fp=$_rg_v ;;` of its loop, and AC2's two greps print 1 and 0 (PINNED 2026-11-21).
 - The suite counts unit 67 S2's compare with a bare `a=$((a+1))`
   (`tools/run-gates/run-gates.gov.test.sh@921f83fff:882`), where the `rec_sha` compare's is gated on
   `rgf_ok` (`:879`), and the arm's comment calls the `rec_fp` grading uncanaried (`:836`).
-- Probed at `921f83fff` under `uname -s` `MINGW64_NT-10.0-22621` and git 2.54.0.windows.1 (PINNED
+- Probed at `552b72210` under `uname -s` `MINGW64_NT-10.0-22621` and git 2.54.0.windows.1 (PINNED
   2026-11-21): the arm's own lines, cut from `rgf_t=$(mktemp -d)` to `rm -rf "$rgf_t"`, over the
   record `run_local_plant` builds, then the arm's mutant sourced once more to measure `rec_fp`. Each
   copy of the hook is one `diff` line from it:
@@ -134,9 +134,9 @@ None: no stored data changes.
 ### Rollout
 
 Live at landing, at order 40, after `TOOL-dWitnessedBar-67`, `TOOL-dWitnessedBar-69` and
-`TOOL-dWitnessedBar-70`, order 39, CLOSED at `e1d569fc9`, `298369174` and `09718851e`. The dispatch
+`TOOL-dWitnessedBar-70`, order 39, CLOSED at `af84e1a7a`, `9ff80bb15` and `0890c99d1`. The dispatch
 edge refusal (`tools/unattended/unattended.sh#verb_dispatch`) holds this unit until all three are
-CLOSED, and they are. Order 40's `TOOL-dWitnessedBar-71`, CLOSED at `ced984440`, wrote
+CLOSED, and they are. Order 40's `TOOL-dWitnessedBar-71`, CLOSED at `2972b3755`, wrote
 `tools/lib/resolve-python.test.sh`, apart from this unit's set. `TOOL-dWitnessedBar-74` and
 `TOOL-dWitnessedBar-75` edit this unit's suite and build after it, one at a time: 72, then 74, then 75.
 

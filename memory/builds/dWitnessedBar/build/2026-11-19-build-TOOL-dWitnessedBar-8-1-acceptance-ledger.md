@@ -3,7 +3,7 @@
 **Serves:** journal TOOL-dWitnessedBar-8
 
 No merge bar, no self-test suite and no gate leg ran in this pass, the naming lexicon excepted. The
-criteria were observed on node d, 2026-11-20, at base `531336dcb`, by `verdict_flow.py`'s own
+criteria were observed on node d, 2026-11-20, at base `08cdbb708`, by `verdict_flow.py`'s own
 fixtures, by the factory's `typed-kinds` plant, by `grep`, `sed` and `bash -n` over the edited files, and
 by one probe that sliced `write_leg_ask` out of the driver and ran it over a scratch repository with its
 collaborators stubbed. A fixture bar of this pass's runner under `GATE_RERUN=1` was refused by the

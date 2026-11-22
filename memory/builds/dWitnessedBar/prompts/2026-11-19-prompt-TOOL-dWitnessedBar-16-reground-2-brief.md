@@ -26,7 +26,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    What is built so far:
    - Built and landed on this branch, in order: units 26, 27, 48, 49, 13, 50, 15 (the seed verb), 12 (a `tag` on every
      leg), 61 (`read_head_sha`, `NULL_SHA`), 22 (`tests` and `enforces` on legs), 47 (a seed home admitted when its
-     directory exists), 19 (a `purpose` on every leg) and 11 (`b80649e60`: the gate-leg factory
+     directory exists), 19 (a `purpose` on every leg) and 11 (`0ccc23626`: the gate-leg factory
      `tools/run-gates/leg_factory.py` with `--write`, `--check`, `--conform` and `new`; gov-only keys under
      `[gate_leg.gov]`; the manifest written only by `--write`; govkit's 7h join retired).
    - Unit 14 (the `ratchet` pack, order 9) is being revised over its builder's divergence; unit 14's rev-9 mints

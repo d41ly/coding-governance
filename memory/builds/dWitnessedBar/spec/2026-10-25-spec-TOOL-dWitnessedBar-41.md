@@ -26,7 +26,7 @@
 
 The round-1 spec audit (`memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md`)
 confirmed finding **id 59 at HIGH**, its item **H2**, alone in that item. `TOOL-dWitnessedBar-5` S7, as
-landed (`eef75404f`), re-derives a selection at R only from the run record of the bar the hook itself
+landed (`e896a6198`), re-derives a selection at R only from the run record of the bar the hook itself
 ran, `<git-dir>/gate-run/<run id>/selection` (`.githooks/pre-push@cfb339de:2555-2576`). Run records sit
 in the per-worktree `<git-dir>/gate-run/` (`tools/run-gates/run-gates.sh@d9c0c2e8:2782`) and are swept
 past `GATE_RUN_KEEP` (`tools/run-gates/run-gates.sh@d9c0c2e8:6110-6113`). The per-tree record the hook
@@ -88,8 +88,8 @@ This unit takes the report's fix. It repairs `TOOL-dWitnessedBar-5`.
 
 ### Evidence
 
-Read at HEAD `cb1494fc5`, which holds every unit through order 21 landed, units 3, 4, 40, 44 and 5
-among them, with their pass-leg fixes `b94fc8d10`. Every cited file is clean in the working tree, and
+Read at HEAD `d0a59de77`, which holds every unit through order 21 landed, units 3, 4, 40, 44 and 5
+among them, with their pass-leg fixes `ed02517ba`. Every cited file is clean in the working tree, and
 each line citation is pinned to the blob HEAD holds.
 
 - Run records: `RUNROOT="$gd/gate-run"` (`tools/run-gates/run-gates.sh@d9c0c2e8:2782`), `$gd` the
@@ -167,7 +167,7 @@ at most once per push. `read_bar_file` gains `bg_sel` and the rebuilt rows, and 
 
 S3 refuses a keyless record, so every per-tree record a hook suite plants for adoption gains
 `selection none`. The population is DERIVED by
-`git grep -nF 'verdict\tGREEN\nkind\t' -- .githooks tools`, run 2026-11-20 at `cb1494fc5`:
+`git grep -nF 'verdict\tGREEN\nkind\t' -- .githooks tools`, run 2026-11-20 at `d0a59de77`:
 
 | Plant | Its arms |
 |---|---|
@@ -295,7 +295,7 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC1 · a full run 
   edges of TOOL-dWitnessedBar-56, promoted by the round-1 spec audit of units 40 to 51; nothing else
   moved.
 - rev-3 · 2026-11-20 · §1 · §3 · §4 · §5 · §6 · §7 · §10 · S1 · S2 · S3 · S4 · AC1 · AC2 · AC3 ·
-  re-grounded at HEAD `cb1494fc5` over order 21 as landed, by brief
+  re-grounded at HEAD `d0a59de77` over order 21 as landed, by brief
   2026-11-19-prompt-TOOL-dWitnessedBar-41-reground-brief. Bare line citations become blob-pinned or
   `path#symbol`; S2 names the two per-tree readers as landed and the S7 block extracted as
   `check_selection_at_r`; S3 names the hook suites' plants, the runlog suite's joining Files touched;

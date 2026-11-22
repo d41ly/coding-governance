@@ -26,7 +26,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    What is built so far:
    - Built and landed through order 17: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11 (the gate-leg
      factory), 14, 45, 54, 16, 46, 17, 52, 53, 18, 20, 24 (the portability leg pack), 10 (the derived pre-commit
-     list), 9 (`34a36429d`: the product-test contract leg, run-gates at 1.54) and 4 (`7a2701739`: the runner's
+     list), 9 (`f7526f6d8`: the product-test contract leg, run-gates at 1.54) and 4 (`153d4bdb2`: the runner's
      per-tree verdict record under `<common-dir>/gate-verdict/<tree>`, the pre-push hook adopting only the pushed
      tree's GREEN record, `write_bar_green` deleted, `push-main.sh --prepare` reading `verdict.tree`).
    - Both specs here consume from unit 4 and build at the same order but share four files, so they build one after the other; settle every claim about unit 4's

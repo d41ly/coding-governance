@@ -32,9 +32,9 @@ confirmed finding **id 2 at HIGH**, report item **H2**. Id 14 shares that item a
 The §7 New-arm lines of `TOOL-dWitnessedBar-76` and `-77` each read "none, the floor is stated by
 `TOOL-dWitnessedBar-73` S15", and `-78`'s reads "none, `FLOOR_ASSERTIONS` is a minimum ... and
 `TOOL-dWitnessedBar-82` restates it". `TOOL-dWitnessedBar-73` S15 stated `FLOOR_ASSERTIONS=72` at the
-count the suite executed at its own pass, `71f212ad1`, first of order 41. The suite checks the floor
+count the suite executed at its own pass, `563d828df`, first of order 41. The suite checks the floor
 only as a minimum (`tools/run-gates/run-gates.gov.test.sh@bbb83eb90:1263`). Then
-`TOOL-dWitnessedBar-78` (`253e21771`, order 42) added its third and fourth records, one assertion each,
+`TOOL-dWitnessedBar-78` (`0e5103294`, order 42) added its third and fourth records, one assertion each,
 and left the floor where it was (`2026-11-19-build-TOOL-dWitnessedBar-78-1-builder-return`). Either
 can be deleted with the canary green, while the New-arm lines certify coverage the floor does not
 hold. Units 74, 76, 77, 79 and 80 add nothing to `a`. Their liveness loop and variants only decide
@@ -106,8 +106,8 @@ report names as the floor's owner, and builds one step after it (order 43).
   prints `PASS ($a assertions)`.
 - `tools/check-testsuite-counts.sh#compliant` requires `^FLOOR_ASSERTIONS=[0-9]+$`, so a comment after
   the number on the assignment line reds `testsuite counts (every bar self-test prints one)`.
-- The executed count at `bbb83eb90` by reading: unit 73's 72 (`TOOL-dWitnessedBar-73` S15) plus the
-  two `a=$((a+1))` lines `git diff 71f212ad1 bbb83eb90 -- tools/run-gates/run-gates.gov.test.sh` adds,
+- The executed count at `454ee101c` by reading: unit 73's 72 (`TOOL-dWitnessedBar-73` S15) plus the
+  two `a=$((a+1))` lines `git diff 563d828df 454ee101c -- tools/run-gates/run-gates.gov.test.sh` adds,
   `@bbb83eb90:999` for the third record and `@bbb83eb90:1012` for the fourth (DERIVED; S1's builder
   re-derives it at its pass). Its other changed `a=` lines are the compares' counted lines, replaced
   one for one by lines gated on `rgf_seen` (`TOOL-dWitnessedBar-76` S3).
@@ -137,9 +137,9 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 43, after `TOOL-dWitnessedBar-78` (42, `253e21771`) and the order-41 variants
-of units 79 (`08f226f3d`) and 80 (`a967359a8`), over unit 73's floor (`71f212ad1`) and the loops of
-units 76 (`bdc10a4df`) and 77 (`7228b0a9a`), every one CLOSED. `TOOL-dWitnessedBar-83` shares order 43,
+Live at landing, at order 43, after `TOOL-dWitnessedBar-78` (42, `0e5103294`) and the order-41 variants
+of units 79 (`b9326245e`) and 80 (`c0310ecd8`), over unit 73's floor (`563d828df`) and the loops of
+units 76 (`3596751cf`) and 77 (`18907b769`), every one CLOSED. `TOOL-dWitnessedBar-83` shares order 43,
 consumes this unit and builds after it. Units 84, 85 and 86 build at order 44 one at a time; 84 and
 85 add counted arms and restate the floor for them, so the value this unit writes is the floor for
 every pass between order 43 and order 44.
@@ -247,7 +247,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC2 · the floor restat
 - rev-4 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edge of TOOL-dWitnessedBar-90, the minors batch of the round-1 spec audit of unit 89; nothing else
   moved.
-- rev-5 · 2026-11-21 · §1 · S1 · S2 · S3 · §3 · §4 · §7 · §10 · re-grounded at `bbb83eb90` under
+- rev-5 · 2026-11-21 · §1 · S1 · S2 · S3 · §3 · §4 · §7 · §10 · re-grounded at `454ee101c` under
   `2026-11-19-prompt-TOOL-dWitnessedBar-82-reground-brief`: the landed floor and unit 78's two
   assertions, the variants that add nothing to `a` until unit 85, unit 78's New-arm clause, unit 28's
   arm out of scope, the re-pinned New-arm population, Rollout's CLOSED shas, Files touched listed

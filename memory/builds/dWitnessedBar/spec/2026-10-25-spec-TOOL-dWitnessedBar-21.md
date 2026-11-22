@@ -346,7 +346,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC3 AC4 AC5 AC6 · each p
   `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is unchanged, as the unit writes
   that path; nothing else moved.
 - rev-4 · 2026-11-20 · §1 · S1 S3 S4 S5 S6 S7 S8 · §3 · §4 · §5 · AC7 AC8 · §7 · §8 F1 F5 · §10 ·
-  re-grounded on the tree at `174f9d9e5`, every unit through order 24 landed, by the brief
+  re-grounded on the tree at `a9be2b275`, every unit through order 24 landed, by the brief
   `2026-11-19-prompt-TOOL-dWitnessedBar-21-reground3-brief`: line citations become `path#symbol` or
   blob-pinned; the re-dispatch's rework-budget draw and the landed `--fix-pass` kind are named; the
   keeps run under `resolve_python`, refuse before the budget draw, and sit in one helper

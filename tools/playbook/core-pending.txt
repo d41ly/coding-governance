@@ -29,7 +29,6 @@ practice	practice.yagni	dWitnessedBar
 practice	practice.reuse	dWitnessedBar
 practice	practice.core	dWitnessedBar
 practice	practice.contract	dWitnessedBar
-practice	practice.verify	dWitnessedBar
 practice	practice.class	dWitnessedBar
 practice	practice.left-shift	dWitnessedBar
 practice	practice.bar	dWitnessedBar
@@ -60,7 +59,6 @@ leg	build-method size	dWitnessedBar
 leg	unattended protocol size	dWitnessedBar
 leg	unattended skill size	dWitnessedBar
 leg	kickoff engine size <=18KiB	dWitnessedBar
-leg	shell hygiene (a stage committed with no staged-diff test)	dWitnessedBar
 leg	spawn budget (forks per hot entrypoint)	dWitnessedBar
 leg	shell-hygiene selftest	dWitnessedBar
 leg	powershell hygiene selftest	dWitnessedBar

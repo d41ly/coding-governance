@@ -25,11 +25,11 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved lines as `path#symbol` or blob-pinned, never a bare `path:line`.
    What is built so far:
    - Built and landed on this branch, in order: units 26, 27, 48, 49, 13, 50, 15 (the seed verb in
-     `tools/lib/legacy_ledger.py`), 12 (`9dbb7bc44`: a `tag` on every leg; the `leg`, `pack` and `check` namespaces;
-     run-gates 1.51; govkit's `LEG_KEY_FLOORS`), 61 (`9c8821605`: `read_head_sha`, `NULL_SHA`), 22 (`44eb041c6`:
+     `tools/lib/legacy_ledger.py`), 12 (`6b3f271c6`: a `tag` on every leg; the `leg`, `pack` and `check` namespaces;
+     run-gates 1.51; govkit's `LEG_KEY_FLOORS`), 61 (`67768466e`: `read_head_sha`, `NULL_SHA`), 22 (`d92f12115`:
      `tests` and `enforces` on leg rows and descriptors; `read_leg_edges` at the leg-row edge site; selfcheck 7h
-     comparing both; selftest run g; canary floor 458), 47 (`14cf1b1bc`: a seed home admitted when its directory
-     exists) and 19 (`7c5a3989a`: a `purpose` on every leg; run-gates 1.52; 7h's purpose arms; selftest runs h and i;
+     comparing both; selftest run g; canary floor 458), 47 (`fc6050375`: a seed home admitted when its directory
+     exists) and 19 (`e4e4e7ef0`: a `purpose` on every leg; run-gates 1.52; 7h's purpose arms; selftest runs h and i;
      canary floor 459).
    - Unit 11 (the gate-leg factory, order 8) is being revised over its builder's divergence and builds next; read its
      spec as the contract for what will exist, and name any claim it settles that these specs repeat.

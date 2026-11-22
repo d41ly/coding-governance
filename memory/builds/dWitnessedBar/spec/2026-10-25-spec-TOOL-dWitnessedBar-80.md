@@ -104,7 +104,7 @@ and builds one step after it (order 41).
 
 ### Evidence
 
-Probed at `09179148e` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GNU sed 4.9
+Probed at `14b71616e` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GNU sed 4.9
 (PINNED 2026-11-21). The probe cut the hook's `.githooks/pre-push#read_green_file` and evaluated the
 suite's `check_cr_reached`, `CANARY_KEYS`, `check_canary_keys` and `check_key_variant` as landed. It
 called `check_key_variant` for each pair with S1's replacement and S3's label and passed reason, then
@@ -153,8 +153,8 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 41. Units 73, 76, 77 and 79 are CLOSED at `71f212ad1`, `bdc10a4df`,
-`7228b0a9a` and `08f226f3d`. Unit 81 remains at order 41 and also edits
+Live at landing, at order 41. Units 73, 76, 77 and 79 are CLOSED at `563d828df`, `3596751cf`,
+`18907b769` and `b9326245e`. Unit 81 remains at order 41 and also edits
 `tools/run-gates/run-gates.gov.test.sh`. Dispatch is strictly sequential and sorts a tie by id
 string (`tools/workflows/unattended-build.js@648a4d5d5:78-82`, `:692-697`), so unit 81 builds after
 this unit and reads the tail call as S1 and S3 leave it. Unit 79's `check_key_variant` carries both
@@ -264,7 +264,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC2 · the tail variant
   Evidence re-probes at HEAD; Rollout names units 77 and 79 ahead and the shared suite. Citations
   move to `path#symbol` or blob-pinned lines.
 - rev-4 · 2026-11-21 · §1 to §10 · S1 · S3 · AC1 · AC3 · re-grounded over unit 79 as landed at
-  `08f226f3d`, per 2026-11-19-prompt-TOOL-dWitnessedBar-80-reground2-brief. S1 and S3 become the tail
+  `b9326245e`, per 2026-11-19-prompt-TOOL-dWitnessedBar-80-reground2-brief. S1 and S3 become the tail
   call's three arguments to `check_key_variant` (replacement, label `tail `, passed reason), with the
   header comment's two clauses on the tail variant; §3 names the function as unit 79's (its §8 F5).
   AC1 spells its edit; AC3 adds the call's label and reason and the old reason's absence. §4 Evidence
@@ -278,7 +278,7 @@ called from `TOOL-dWitnessedBar-76`'s per-key liveness loop over `CANARY_KEYS`, 
 arguments change, with the liveness control of
 `tools/run-gates/run-gates.evidence.test.sh@648a4d5d5:2327-2336`.
 `python tools/codebase-map/reuse_lookup.py "prove each condition of a two-condition check can fail on its own variant"`,
-re-run at `09179148e` on 2026-11-21, ranked `check`, `fail`, `checks` and `check_line` first, none a
+re-run at `14b71616e` on 2026-11-21, ranked `check`, `fail`, `checks` and `check_line` first, none a
 variant that isolates one condition of a comparison, so no existing seam fits beyond the function
 named above.
 

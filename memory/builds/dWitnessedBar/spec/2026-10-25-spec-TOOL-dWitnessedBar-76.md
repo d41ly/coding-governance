@@ -107,7 +107,7 @@ step after it (order 41).
 
 ### Evidence
 
-Probed at `d3b748b94` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GNU sed 4.9
+Probed at `dd38b467b` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GNU sed 4.9
 (PINNED 2026-11-21). The probe cut `tools/run-gates/run-gates.gov.test.sh#check_cr_reached` and the
 hook's `read_green_file`, defined a prototype of S2's function over S1's two pairs, and read a
 hand-built record laid out as the AC12 arm's: `verdict<TAB>GREEN<CR>`, two `sha` lines the second
@@ -157,7 +157,7 @@ None: no stored data changes.
 ### Rollout
 
 Live at landing, at order 41, after `TOOL-dWitnessedBar-72` and `TOOL-dWitnessedBar-74` (order 40,
-CLOSED at `e0cf5fa91` and `7c579ad47`) and `TOOL-dWitnessedBar-75`, order 40's last unit, whose
+CLOSED at `fa536b7cd` and `6a12d559c`) and `TOOL-dWitnessedBar-75`, order 40's last unit, whose
 `rgf_what` chain S2 changes. Order 41 is shared with `TOOL-dWitnessedBar-73`, `-77`, `-79`, `-80`
 and `-81`. Dispatch is strictly sequential and sorts a tie by id string
 (`tools/workflows/unattended-build.js@d3b748b94:78-82`, `:692-697`), so unit 73 builds first and
@@ -167,7 +167,7 @@ builder reads the canary as units 73 and 75 leave it.
 ### Files touched (estimate)
 
 - `tools/run-gates/run-gates.gov.test.sh`: S1's list, S2's function and call, S3's loop.
-- `memory/project/shell-role.txt`: the suite's row reads 735 at `d3b748b94` (PINNED 2026-11-21), and
+- `memory/project/shell-role.txt`: the suite's row reads 735 at `dd38b467b` (PINNED 2026-11-21), and
   `sh_hygiene.py`'s `measure_code_lines` measures the suite at 735 (PINNED 2026-11-21). Unit 75 widens the row before
   this unit, so the pass reads it from the file; when S1 to S3 grow the suite past it, it widens it
   with `python tools/memory-tree/ratchet.py widen shell-role --key tools/run-gates/run-gates.gov.test.sh --unit TOOL-dWitnessedBar-76`,
@@ -208,7 +208,7 @@ builder reads the canary as units 73 and 75 leave it.
   `grep -n 'fingerprint:rec_fp' tools/run-gates/run-gates.gov.test.sh` names the `CANARY_KEYS` line,
   and `grep -c '^check_canary_keys()' tools/run-gates/run-gates.gov.test.sh` prints 1 (PINNED by S2).
   `grep -n 'rec_fp' tools/run-gates/run-gates.gov.test.sh | grep -E 'wc -c|tail -c|[$][{]#|: -1[}]'`
-  prints nothing, where at `d3b748b94` it prints line 890 (PINNED 2026-11-21).
+  prints nothing, where at `dd38b467b` it prints line 890 (PINNED 2026-11-21).
   Red when: the list holds `sha:rec_sha` alone, or `rec_fp`'s comparison is an inline copy outside
   `check_canary_keys`.
   fixture: the AC12 record, which `TOOL-dWitnessedBar-68` S1 and `TOOL-dWitnessedBar-67` S2 build.

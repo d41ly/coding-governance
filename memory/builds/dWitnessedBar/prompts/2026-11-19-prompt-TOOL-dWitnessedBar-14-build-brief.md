@@ -8,11 +8,11 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 9.
-- Built so far: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47 and 19, and unit 11 (`b80649e60`, red-fix
-  `b982f3e16`): the gate-leg factory `tools/run-gates/leg_factory.py` with `--write`, `--check`, `--conform` and `new`,
+- Built so far: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47 and 19, and unit 11 (`0ccc23626`, red-fix
+  `f80932061`): the gate-leg factory `tools/run-gates/leg_factory.py` with `--write`, `--check`, `--conform` and `new`,
   each descriptor leg's gov-only keys under `[gate_leg.gov]`, the manifest written only by `--write`, and govkit's 7h
   join retired. A new leg is declared through the factory's `new` verb, never by editing `tools/gate-legs.json`.
-- The spec is rev-9, re-grounded at `4e5497fb7` with unit 11's rev-7 spec as the contract; read the factory as it
+- The spec is rev-9, re-grounded at `2ca17d9c5` with unit 11's rev-7 spec as the contract; read the factory as it
   landed, and hand back any claim its landed shape breaks as a divergence.
 - Unit 45 builds after this unit at the same order; its spec is rev-4.
 - Every roster spec was re-grounded at `e4ac7c40c` so `check-spec-tokens.py --spec` admits it; the spec's base is still

@@ -6,7 +6,7 @@ No merge bar, no self-test suite and no gate leg ran in this pass, the naming le
 criteria were observed through probes of the unit's own code on node d, 2026-11-19: the canonical
 `tools/lib/legacy_ledger.py` CLI run over a scratch fixture repo under `%TEMP%` whose `main` sits on a
 bare remote it fetched, the row-keyed driver run over planted ledger blobs, the two gate-lint adapters
-compared with their own code at `98e33d71c`, and the block cut out of each copy with the parity arm's
+compared with their own code at `112526471`, and the block cut out of each copy with the parity arm's
 `blk` range. Both `New arm:` lines of spec section 7 still owe their RED-first observation, which the
 main loop makes at the close, and so does every leg that section names; AC8's own commands are two
 gate legs, refused to this role, so the main loop owes them too.
@@ -42,7 +42,7 @@ gate legs, refused to this role, so the main loop owes them too.
   `compare_base_py` blocks of `tools/gate-lint/coverage_join.py` equalled memory-tree's.
 - AC8 — `python tools/gate-lint/sh_hygiene.py memory/project/substitution-fed-loops.txt` — the two
   commands are the gate legs this role may not run, so the main loop owes them at the close. Standing
-  in: `read_registry` and `check_registry` of both scanners, new and as at `98e33d71c`, compared over
+  in: `read_registry` and `check_registry` of both scanners, new and as at `112526471`, compared over
   6054 inputs (400 generated registries under every key shape, the tracked `memory/project/*.txt`
   registries, and 2000 measured and declared pairs with and without `explained` and `listing`), and
   none differed.

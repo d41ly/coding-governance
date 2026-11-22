@@ -12,7 +12,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   `--coverage` population, `scan_bare_bash`), unit 13 (`tools/lib/legacy_ledger.py`, section `2o` of
   `tools/lib/resolve-python.test.sh`) and unit 15 (`test.seed` at every check's registration; read what its pass
   committed before building on it).
-- The spec is rev-6, re-grounded at `98e33d71c`: 198 manifest rows, 70 `[[gate_leg]]` rows in 27 descriptors, `LEG_KEYS`
+- The spec is rev-6, re-grounded at `112526471`: 198 manifest rows, 70 `[[gate_leg]]` rows in 27 descriptors, `LEG_KEYS`
   the landed keys plus `tag`, `owed_rows.py` reading `LEG_KEYS`, and `derive_kit_rows` shared by `extract_check` and
   `extract_command`. §8 F6 points each namespace row at a plain path, F7 puts `leg` and `pack` in `layer.flow` and
   `check` in `layer.distribution`, F8 names the rows `[[numbered_check]]`, and F9 spells the policy kit's owner

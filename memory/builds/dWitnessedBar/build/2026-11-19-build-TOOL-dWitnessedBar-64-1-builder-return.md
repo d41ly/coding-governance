@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-64
 
-# TOOL-dWitnessedBar-64 — builder return 1 (run `wf_18824237-a96`), committed b26061af2
+# TOOL-dWitnessedBar-64 — builder return 1 (run `wf_18824237-a96`), committed ef54d1d89
 
 ## Why
 
-TOOL-dWitnessedBar-64 is built as spec rev-3 states and committed in pass commit b26061af2, with the spec header set to CLOSED. The spec's claims about current code all held when checked against the tree: read_head_sha, run_seed_cli's no-HEAD route, section 2o's unborn-seed and no-HEAD blocks, both WHAT THIS DOES NOT CHECK clauses, build_ll_seeded, the unit-63 exit-128 case, the three-file population, and the git evidence table, re-probed with git 2.54.0.windows.1. No divergence was found.
+TOOL-dWitnessedBar-64 is built as spec rev-3 states and committed in pass commit ef54d1d89, with the spec header set to CLOSED. The spec's claims about current code all held when checked against the tree: read_head_sha, run_seed_cli's no-HEAD route, section 2o's unborn-seed and no-HEAD blocks, both WHAT THIS DOES NOT CHECK clauses, build_ll_seeded, the unit-63 exit-128 case, the three-file population, and the git evidence table, re-probed with git 2.54.0.windows.1. No divergence was found.
 
 ## Summary
 
-Pass commit b26061af2 (`Pass: TOOL-dWitnessedBar-64`). It was followed by 82657d2b4 (`Pass: none`), which acts on the M6 checklist: the class ledger-token-wrapped-across-a-line-joins-nothing found two code spans in the acceptance ledger's AC1 line split across a line break, and they are re-wrapped. The base was ed120ffc7.
+Pass commit ef54d1d89 (`Pass: TOOL-dWitnessedBar-64`). It was followed by b5db4abb1 (`Pass: none`), which acts on the M6 checklist: the class ledger-token-wrapped-across-a-line-joins-nothing found two code spans in the acceptance ledger's AC1 line split across a line break, and they are re-wrapped. The base was e9b8399f5.
 
 What changed:
 - `read_head_sha` now asks for `HEAD^{commit}` (S1).

@@ -535,7 +535,7 @@ New arm: tools/policy/check_policy.py · covers AC4 AC5 AC6 AC7 AC9 · the `--fi
   the row count re-pins (PINNED 2026-11-19, §5); `policy check` and the govkit legs guarding
   `tools/govkit/registry.toml` join the leg line.
 - rev-4 · 2026-11-20 · §1 · S1 to S5 · S7 to S10 · §3 · §4 · §5 · AC1 to AC3 · AC9 · AC10 (new) · §7 ·
-  §8 F4 to F6 · F7 (new) · §10 · re-grounded at `dc92afdba` per brief
+  §8 F4 to F6 · F7 (new) · §10 · re-grounded at `f55a5c018` per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-20-reground-brief: the home moves to
   `memory/project/legacy-homes.txt` (§8 F7), since a home under `tools/<kit>/` reds `install-prefix
   (shipped surface)`; the policy kit's withholding rule and the three govkit kit-copy ignore patterns

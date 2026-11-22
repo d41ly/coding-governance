@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-4
 
-# TOOL-dWitnessedBar-4 — builder return 1 (run `wf_3e736891-7fe`), committed 7a2701739851d39b4e064a799de1f3589b7fa315
+# TOOL-dWitnessedBar-4 — builder return 1 (run `wf_3e736891-7fe`), committed 153d4bdb2cd0029f362408858d84f4900df66531
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-4 is built and committed as one pass commit with a `Pass: TOO
 
 ## Summary
 
-The unit is built and committed as 7a2701739 on base 8a98c9cf. A sibling's spec commit, 875e875a, landed in this worktree during the pass and touches none of my paths.
+The unit is built and committed as 153d4bdb2 on base 9cde7938. A sibling's spec commit, ccc9a84c, landed in this worktree during the pass and touches none of my paths.
 
 **What changed**
 - **Runner** (`tools/run-gates/run-gates.sh`): the run record's `verdict` file now carries `tree` (`-` when the run started dirty). Every run that started clean and did not move writes `<common-dir>/gate-verdict/<tree>` (full run) or `<tree>.scoped` (scoped run) in the spec's twelve keys, through a temp name and a rename. A dirty start or a moved tree writes nothing and prints why on one line.

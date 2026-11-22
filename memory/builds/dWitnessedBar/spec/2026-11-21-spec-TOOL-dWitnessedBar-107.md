@@ -121,7 +121,7 @@ none
 
 ### Evidence
 
-Probed on this node at `63be790a2` (PINNED 2026-11-21). The blob of
+Probed on this node at `fcd4c95d8` (PINNED 2026-11-21). The blob of
 `tools/run-gates/verdict_backends.py` at HEAD is `d75ea52b` and of `tools/run-gates/run-gates.sh` is
 `04da8977`, the blobs the review cites, so its line numbers hold at HEAD (PINNED 2026-11-21).
 
@@ -149,7 +149,7 @@ Probed on this node at `63be790a2` (PINNED 2026-11-21). The blob of
   `peer-signed` ran in 2.3 s and the probe in 1.5 s wall (PINNED 2026-11-21).
 - **Counts.** `sh_hygiene.py --shell-role --measure . tools/run-gates/run-gates.gov.test.sh` printed
   `853`, equal to the row in `memory/project/shell-role.txt` (PINNED 2026-11-21). The canary's last
-  commit is `da3fbc953`, TOOL-dWitnessedBar-90's, so no arm landed after its absolute count of 80
+  commit is `b5a33a39c`, TOOL-dWitnessedBar-90's, so no arm landed after its absolute count of 80
   (DERIVED by `git log -1 -- tools/run-gates/run-gates.gov.test.sh`).
 
 ### Data model

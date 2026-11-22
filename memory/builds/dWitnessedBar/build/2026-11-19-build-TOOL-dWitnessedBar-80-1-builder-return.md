@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-80
 
-# TOOL-dWitnessedBar-80 — builder return 1 (run `wf_152b67bc-051`), committed a967359a8
+# TOOL-dWitnessedBar-80 — builder return 1 (run `wf_152b67bc-051`), committed c0310ecd8
 
 ## Why
 
@@ -8,7 +8,7 @@ The spec, rev-4, matched the tree at base. The tail call at tools/run-gates/run-
 
 ## Summary
 
-Unit TOOL-dWitnessedBar-80 is built and committed as a967359a8 on top of dbbf94f72. No gate, suite or bar ran: AC1 and AC3 were checked by probe and grep, and AC2's arm run is left for the main loop at the close.
+Unit TOOL-dWitnessedBar-80 is built and committed as c0310ecd8 on top of c95183f60. No gate, suite or bar ran: AC1 and AC3 were checked by probe and grep, and AC2's arm run is left for the main loop at the close.
 
 **What changed**
 - S1: the per-key liveness loop's tail call to `check_key_variant` in `tools/run-gates/run-gates.gov.test.sh` now passes `'${_rg_v%?}x'`, a 41-byte value ending in `x`, instead of `'${_rg_v%?}'`.

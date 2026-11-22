@@ -8,7 +8,7 @@ BLOCKED, and it is not a spec divergence. The build is finished and checked, but
 
 ## Summary
 
-TOOL-dWitnessedBar-52 is built but not committed. It is saved as C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/TOOL-dWitnessedBar-52-pass.patch (9 files, +136/-14), which `git apply --check --index` confirmed applies at base 6175d439d. The worktree is back at base apart from memory/builds/dWitnessedBar/RUN.md, which the verbs wrote to.
+TOOL-dWitnessedBar-52 is built but not committed. It is saved as C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/TOOL-dWitnessedBar-52-pass.patch (9 files, +136/-14), which `git apply --check --index` confirmed applies at base 8eb893914. The worktree is back at base apart from memory/builds/dWitnessedBar/RUN.md, which the verbs wrote to.
 
 What the patch holds:
 - tools/memory-tree/ratchet.py: a new `read_root_confs(root)` that runs `git ls-files -z --cached --others --exclude-standard -- ':(glob).*.conf'`. Its docstring states the blind spot that an ignored root conf is never read. `read_root_conf_lines` now walks it, and `ROOT_CONF_RE` is deleted. `read_tracked_paths` stays for the widen check. The module, `measure_scalar_pins` and `measure_cutoffs` docstrings now say the set is no longer tracked-only.

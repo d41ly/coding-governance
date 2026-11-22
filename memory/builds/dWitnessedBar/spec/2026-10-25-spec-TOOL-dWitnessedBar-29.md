@@ -50,7 +50,7 @@ halves).
   (`tools/check-template-size.sh@c76defce:520`), subject `$key`, detail
   `<recorded> -> <bytes> (+<delta>) over high-water`. Observed by AC1.
 - **S2** — Every size-warning emitter the census of §4 names carries the marker, the thirteen files of
-  §4's site table at HEAD `174f9d9e5` (PINNED, measured 2026-11-20). A `BUDGET WARN` site's detail is
+  §4's site table at HEAD `a9be2b275` (PINNED, measured 2026-11-20). A `BUDGET WARN` site's detail is
   `<cap> · <measured> <unit> over <value>`, the tail of the grammar `tools/policy/README.md` states
   (`tools/policy/README.md@76690102:493`). Python sites build the line through S9's factory and the
   four shell sites print it with one `printf` each (§8 F6). A site that gathers its lines into a list
@@ -143,7 +143,7 @@ git grep -nE 'check_cap|verdict\.line|budgets\.py" check' -- tools .githooks ski
 
 The first query finds every line that writes a size warning, the two that compose the word `WARN`
 from a variable included. The second finds the printers of `check_cap`'s verdict line, which the
-first cannot see. At HEAD `174f9d9e5` the first prints thirteen lines in twelve files, and the second
+first cannot see. At HEAD `a9be2b275` the first prints thirteen lines in twelve files, and the second
 adds one file, `tools/check-spec-tokens.py` (PINNED, measured 2026-11-20). The pathspec exclusion of
 `tools/policy/check_policy.py` drops eleven expected-output strings of the switch fixtures (PINNED,
 measured 2026-11-20); a comment or docstring naming `BUDGET WARN` carries no dash after it and is not
@@ -200,7 +200,7 @@ Minted: the marker prefix `gate-warn`, its class word `size`; `scan_leg_warnings
 `--newest-unit`; `render_warn_marker`. Naming cells:
 `python tools/lexicon/lexicon.py --suggest scan_leg_warnings --as sh.function` and
 `python tools/lexicon/lexicon.py --suggest render_warn_marker --as py.function` each print OK at HEAD
-`174f9d9e5`, measured 2026-11-20. The rev-3 name `collect_leg_warnings` is refused there, since
+`a9be2b275`, measured 2026-11-20. The rev-3 name `collect_leg_warnings` is refused there, since
 `collect` is not a declared verb.
 
 ### Migration
@@ -345,12 +345,12 @@ New arm: tools/memory-tree/routed_commits.py · covers AC5 · a `--selftest` fix
   relaxes: none
 - **FACT-QUESTION · F3 — How many size-warning emitters exist?** Probe: the census of §4.
   Observation, 2026-10-25 at base: one, `tools/check-template-size.sh` (blob `cdfbd1cf`'s line 221).
-  Re-observed 2026-11-20 at HEAD `a4fd535ed`, after TOOL-dGroundRules-9 landed: the rev-3 query
+  Re-observed 2026-11-20 at HEAD `e22cdce08`, after TOOL-dGroundRules-9 landed: the rev-3 query
   matched comments, docstrings and fixture strings and missed the two lines composing `WARN` from a
   variable, so §4 now states two queries, which name the thirteen files of its table. Liveness: the
   first query prints three lines of `.test.sh` files when that exclusion is dropped, so it can find a
-  hit. Re-observed again 2026-11-20 at HEAD `174f9d9e5`, after units 1, 59 and 30 landed: the same
-  thirteen lines in twelve files and the one added file, none of them moved since `a4fd535ed`.
+  hit. Re-observed again 2026-11-20 at HEAD `a9be2b275`, after units 1, 59 and 30 landed: the same
+  thirteen lines in twelve files and the one added file, none of them moved since `e22cdce08`.
   RESOLVED (agent, 2026-11-20, delegated): S2 marks every site the census names at the pass's
   base. widens: none · relaxes: none
 - **F4 — Which stream carries the marker?** The runner's capture writes the leg's stderr into the same
@@ -400,7 +400,7 @@ New arm: tools/memory-tree/routed_commits.py · covers AC5 · a `--selftest` fix
   `c6df3e901`, by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is
   unchanged, as the unit writes each path; nothing else moved.
 - rev-4 · 2026-11-20 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · §8 · §10 · S1 S2 S3 S6 S7 S8 · AC1 AC2 AC3
-  AC7 · re-grounded over HEAD `a4fd535ed` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-29-reground-brief:
+  AC7 · re-grounded over HEAD `e22cdce08` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-29-reground-brief:
   code citations by symbol or blob-pinned; the census restated as two queries over the emitters
   TOOL-dGroundRules-9 landed, its thirteen files tabled and listed in Files touched (F3), with the
   stream (F4), non-path subjects (F5) and the factory S9 (F6) decided; S3 reads the retry copy and
@@ -409,7 +409,7 @@ New arm: tools/memory-tree/routed_commits.py · covers AC5 · a `--selftest` fix
   limit; S8 and AC7 add `help/size-caps.md`; AC9 added; Rollout derives the kit versions; the run-gates
   arm moves `FLOOR_ASSERTIONS`; the leg line gains the thirteen legs the new paths' guards and the
   profile reader name (PINNED, measured 2026-11-20 by the spec-token checker's guards join).
-- rev-5 · 2026-11-20 · §2 · §4 · §6 · §8 · §10 · S2 S3 S7 · AC3 · re-grounded over HEAD `174f9d9e5`
+- rev-5 · 2026-11-20 · §2 · §4 · §6 · §8 · §10 · S2 S3 S7 · AC3 · re-grounded over HEAD `a9be2b275`
   per brief 2026-11-19-prompt-TOOL-dWitnessedBar-29-reground3-brief, after units 1, 59 and 30
   landed: the verdict block and header citations re-pinned to the runner's blob `e044bc9f`; S3 and
   AC3 settle unit 30's held leg run outside the verdict (F7); the census, its counts and the lexicon
@@ -425,7 +425,7 @@ the verdict block at `tools/run-gates/run-gates.sh@e044bc9f:5979-6016`,
 verb pin (`tools/run-gates/profile_bar.py#derive_runner_verbs`), and the unit reader
 `tools/memory-tree/routed_commits.py#read_newest_unit`, whose CLI takes exactly two arguments today
 (`tools/memory-tree/routed_commits.py#main`). `python tools/codebase-map/reuse_lookup.py "show a
-warning a passing gate leg prints in the runner summary"`, re-run at HEAD `174f9d9e5` on 2026-11-20,
+warning a passing gate leg prints in the runner summary"`, re-run at HEAD `a9be2b275` on 2026-11-20,
 ranked generic stems (`legs`, `leg`, `print_report`) and named `derive_runner_verbs`, the verb pin S10
 extends; it named no seam that carries warnings, which agrees with scout A: no reader of a passing
 leg's output exists. The recall probe, re-run the same day, returned this spec, this build's brief and

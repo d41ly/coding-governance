@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-91
 
-# TOOL-dWitnessedBar-91 — builder return 1 (run `wf_07b2835e-57d`), committed b7e2e3d8d
+# TOOL-dWitnessedBar-91 — builder return 1 (run `wf_07b2835e-57d`), committed 81ec5dded
 
 ## Why
 
-The rev-3 spec held when I checked it against the tree at f8a905a4b. The unedited built .githooks/pre-push printed 2 for grep -c 'rec_sha="', 0 for the anchored grep -c 'sha)[[:space:]]*rec_sha="', 1 for the read_green_file cut piped to grep -o 'sha)' | wc -l, and 2 for grep -c 'rec_sha=""'. grep -n 'sha)' named two arms, one in #read_green_file and one in #read_bar_file. All of that matches spec section 4. The unit writes records only, so I built it as written and found no divergence.
+The rev-3 spec held when I checked it against the tree at d83669eb9. The unedited built .githooks/pre-push printed 2 for grep -c 'rec_sha="', 0 for the anchored grep -c 'sha)[[:space:]]*rec_sha="', 1 for the read_green_file cut piped to grep -o 'sha)' | wc -l, and 2 for grep -c 'rec_sha=""'. grep -n 'sha)' named two arms, one in #read_green_file and one in #read_bar_file. All of that matches spec section 4. The unit writes records only, so I built it as written and found no divergence.
 
 ## Summary
 
-I committed TOOL-dWitnessedBar-91 as b7e2e3d8d. It is a records-only pass: no code file changed and no function was added.
+I committed TOOL-dWitnessedBar-91 as 81ec5dded. It is a records-only pass: no code file changed and no function was added.
 
 **What the commit holds:**
 - A new acceptance ledger, C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-91-1-acceptance-ledger.md, with one line per criterion, each on one physical line.

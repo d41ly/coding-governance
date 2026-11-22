@@ -108,7 +108,7 @@ three lists and holds them together. It repairs `TOOL-dWitnessedBar-56`.
 - `PM_SCRUB` today: `GIT_DIR … GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_BASE GATE_DOCS_BASE
   GATE_PUSH_BASE GATE_ATTRIBUTE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT GATE_RUN_ID
   GATE_TURNSTILE_HOLDER` over four lines (`tools/run-gates/post-merge.sh@835331f2:35`); S4's range read
-  prints 23 names at HEAD `382de3937` (PINNED 2026-11-20), and the one-line cut prints nothing.
+  prints 23 names at HEAD `6dc6b3fd7` (PINNED 2026-11-20), and the one-line cut prints nothing.
 - `_gknobs="GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR
   GATE_VERDICT_FAULT"`, and every bar call of the gates-green item runs `env "${_gscrub[@]}"`
   (`tools/unattended/unattended.sh@4663de42:12082`, `:12191`, `:12193`, `:12202`).
@@ -118,7 +118,7 @@ three lists and holds them together. It repairs `TOOL-dWitnessedBar-56`.
   unseen while those suites are waived.
 - The runner honours `GATE_REUSE_PUSH` (`tools/run-gates/run-gates.sh@e1f36202:2844`), which neither
   caller scrubs.
-- The population, re-derived at HEAD `382de3937` by the one-line cut of `BAR_SCRUBBED_KNOBS` plus S1's
+- The population, re-derived at HEAD `6dc6b3fd7` by the one-line cut of `BAR_SCRUBBED_KNOBS` plus S1's
   eight names against each caller list: 14 hook names, each caller lacking S2's 7 (PINNED 2026-11-20).
   The grep for a list scrubbing the arm seams finds no third caller.
 - `GATE_BASE_FROM=x env -u GATE_BASE_FROM GATE_BASE_FROM=inherited bash -c 'echo "${GATE_BASE_FROM-unset}"'`
@@ -250,7 +250,7 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC3 · a post-merg
   manifest guards hold the §4 path `tools/unattended/unattended.sh`, per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else moved.
 - rev-4 · 2026-11-20 · §1 · S1 to S5 · §3 · §4 · §5 · AC4 · §7 · §8 F3 · §10 · re-grounded at HEAD
-  `382de3937` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-60-reground-brief: every line citation
+  `6dc6b3fd7` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-60-reground-brief: every line citation
   blob-pinned or cited by symbol; S3 finds unit 40's `_gfrom` already after the scrub, so AC4 greps it;
   S4 reads `PM_SCRUB` as a range (F3) in a named `check_bar_scrub_parity`; the population re-derived and
   pinned, the policy keys named outside it; Rollout builds after unit 58; the gov floor chains from
@@ -264,7 +264,7 @@ reuses from a suite that is not waived, and post-merge's own fold of `PM_SCRUB`
 (`tools/run-gates/post-merge.sh@835331f2:43`), which S4's range read mirrors.
 `python tools/codebase-map/reuse_lookup.py "scrub bar knobs inherited from the environment before a
 trusted green"` ranked `before`, `write_before_image`, `check_bar`, `write_inherited_asks` and
-`MERGE-BAR.md` at HEAD `382de3937`; none is a scrub or a list parity, so no existing seam fits beyond
+`MERGE-BAR.md` at HEAD `6dc6b3fd7`; none is a scrub or a list parity, so no existing seam fits beyond
 the three lists, the parity arm and the fold named.
 
 Recall terms used: `python tools/memory-recall/query.py "where does a bar caller scrub the knobs the pre-push hook clears" --terms "BAR_SCRUBBED_KNOBS PM_SCRUB _gknobs GATE_DOCS_BASE gates-green trusted gate-bar-green inherited knob scrub parity"`

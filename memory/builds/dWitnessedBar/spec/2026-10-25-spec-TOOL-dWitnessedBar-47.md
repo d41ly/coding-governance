@@ -195,7 +195,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC1 AC3 · section `2o`'s se
   closing the round-1 audit of unit 63's id 1 (MEDIUM, item M3). The Edges block gains the hands-off
   bullet mirroring TOOL-dWitnessedBar-65's consumes-from edge.
 - rev-6 · 2026-11-19 · §1 · S2 · §4 Evidence · §5 · AC1 · §7 · §8 F3 · §10 · re-grounded on the tree at
-  `66f4e8d98` by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-47-reground-brief`: the three adopter
+  `a4cffc2cb` by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-47-reground-brief`: the three adopter
   citations moved and are blob-pinned; the new arm names section `2o`, unit 13's factory section, where
   it cited `2l`, now the envelope's, and moves unit 15's AC5 case to an absent directory; the README
   has no §4, so F3 homes the blind spot in its `## Notes` section; AC1's fixture names the suite's
@@ -209,7 +209,7 @@ whose directory an adopter just created"` ranked `seed`, `adopt`, `require_adopt
 `seed_affordances` and `resolve_adopter_argv`; `require_adopted_root` refuses an unadopted root, a
 different question, and none admits a home, so no existing seam fits beyond the block.
 
-Re-verified 2026-11-19 at `66f4e8d98`: the block is still unit 13's to land, and unit 15 rev-8's §4
+Re-verified 2026-11-19 at `a4cffc2cb`: the block is still unit 13's to land, and unit 15 rev-8's §4
 "The rule" still holds the tracked-file home test this unit replaces. The same lookup re-run ranked
 `seed`, `adopt`, `require_adopted_root`, `ask_home_of`, `seed_affordances`, `check_legacy_homes` and
 `resolve_adopter_argv`; `check_legacy_homes` (`tools/policy/policy.py#check_legacy_homes`), landed

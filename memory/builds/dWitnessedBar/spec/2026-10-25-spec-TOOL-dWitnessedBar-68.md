@@ -36,7 +36,7 @@ with the second `sha`. The CLI reads `<common-dir>/gate-verdict/<tree hash>`, ne
 and prints the QUERIED SHA, never the record's `sha` key (`tools/run-gates/verdict_backends.py#run_read`,
 `#read_local_verdict`). On a record with no reuse pair or no `selection` key it reads `NONE`
 (`#check_local_record`). Unit 66 rev-3 landed its AC3 on `read_tag_lines`, the parse, instead
-(`a04b24c97`). So the AC12 arm writes its record to a scratch file at no path the reader reads, and
+(`e3cdc2201`). So the AC12 arm writes its record to a scratch file at no path the reader reads, and
 `read_local_verdict` never runs over it. Unit 65's acceptance ledger still records AC12's local-hook
 half on the `sha` that `read_tag_lines` returns.
 
@@ -132,7 +132,7 @@ builds one step after it (order 39).
   prints 0 (PINNED 2026-11-21).
 - At HEAD the arm writes `printf 'verdict\tGREEN\r\nsha\t%s\nsha\t%s\r\n'` to `$rgf_t/record`, and
   its two compares count one assertion each (`run-gates.gov.test.sh@248c8263a:829-840`).
-- A probe at `248c8263a` ran S1's call over `tools/run-gates` (PINNED 2026-11-21). It printed
+- A probe at `b557ab5a3` ran S1's call over `tools/run-gates` (PINNED 2026-11-21). It printed
   `verdict: local-hook · GREEN · <sha8> · witness witnessed`. The plant's own lines ended in CR-LF on
   this Windows node, its `write_text` passing `newline=None`. `od -c` showed `\r \n` after `GREEN`,
   after the forty `b` and after `reused_cache<TAB>0`. The record's name equalled the fixture's
@@ -152,7 +152,7 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 39, after `TOOL-dWitnessedBar-66` (38, CLOSED at `a04b24c97`). Order 39 is
+Live at landing, at order 39, after `TOOL-dWitnessedBar-66` (38, CLOSED at `e3cdc2201`). Order 39 is
 shared with `TOOL-dWitnessedBar-67`, `TOOL-dWitnessedBar-69` and `TOOL-dWitnessedBar-70`. 67, 68 and
 70 all write `run-gates.gov.test.sh`, so M6's first condition fails. Dispatch is strictly sequential
 and sorts a tie by id string (`tools/workflows/unattended-build.js@248c8263a:78`, `:692-697`), so the

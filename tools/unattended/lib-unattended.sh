@@ -210,7 +210,7 @@ read_record_keys() {
   [ -n "$py" ] || { printf '%s\n' "lib-unattended: read_record_keys found no python launcher, so $2 was not read" >&2; return 2; }
   here=$(dirname -- "${BASH_SOURCE[0]}")
   d=$(resolve_kit_dir "$py" memory-tree legacy_ledger.py "$here") || { printf '%s\n' "lib-unattended: read_record_keys found no memory-tree ledger factory, so $2 was not read" >&2; return 2; }
-  top=$(git -C "$here" rev-parse --show-toplevel 2>/dev/null) || top=$here
+  top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$here" rev-parse --show-toplevel 2>/dev/null) || top=$here
   GIT show "$1:$2" 2>/dev/null | "$py" -I -c '
 import sys
 sys.path.insert(0, sys.argv[1])

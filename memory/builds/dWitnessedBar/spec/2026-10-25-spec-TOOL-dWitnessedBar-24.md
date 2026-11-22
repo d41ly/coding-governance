@@ -22,6 +22,7 @@
 | [2026-11-20-build-TOOL-dWitnessedBar-24-red-fix-61.md](../build/2026-11-20-build-TOOL-dWitnessedBar-24-red-fix-61.md) | red-fix | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-24-red-fix-62.md](../build/2026-11-20-build-TOOL-dWitnessedBar-24-red-fix-62.md) | red-fix | — |
 | [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
+| [2026-11-22-build-TOOL-dWitnessedBar-24-red-fix-158.md](../build/2026-11-22-build-TOOL-dWitnessedBar-24-red-fix-158.md) | red-fix | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
@@ -40,7 +41,7 @@ P37's portable practice (PLAY-dOrderedCharter-30) pairs each of its eight rules 
 of the eight are pending on this build: line endings, quoting and language roles
 (`tools/playbook/core-pending.txt`). Encoding has a Python-only leg that no adopter receives, line
 endings are pinned per directory while 153 of 245 tracked `.py` files check out CRLF on this node
-(PINNED 2026-11-19, `git ls-files --eol -- '*.py'` at `05245bf0e`), the floor is tested by no
+(PINNED 2026-11-19, `git ls-files --eol -- '*.py'` at `42d8ac6dc`), the floor is tested by no
 interpreter at the floor over the tree, and the PowerShell scan is on no leg (gap-tool-13,
 gap-tool-15, gap-tool-21, gap-test-09). This unit lands the `portability` pack: one leg per rule, each
 arm seen red on a planted case, its debt held on ledger populations.
@@ -210,7 +211,7 @@ member is pinned by its own path line.
 
 `--stdout`: a tracked `*.py` with an `if __name__ == "__main__":` block that calls `print` or writes
 `sys.stdout`, and holds neither a `sys.stdout.reconfigure(encoding=...)` call nor a write to
-`sys.stdout.buffer`, is one site, keyed `<path>` `stdout`. Measured 2026-11-19 at `05245bf0e` over
+`sys.stdout.buffer`, is one site, keyed `<path>` `stdout`. Measured 2026-11-19 at `42d8ac6dc` over
 `git ls-files -- 'tools/*.py' 'skills/*.py' '.githooks/*.py'`, a line-level probe and not the arm:
 144 files hold a `__main__` guard (PINNED 2026-11-19), 132 of them print, and 72 of those name a reconfigure or a buffer
 write (PINNED; the seed re-derives the population). The arm does not check that the reconfigure
@@ -514,7 +515,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC10 · the census verb's in
 - rev-4 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
   `tools/gate-lint/kit.toml`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing
   else moved.
-- rev-5 · 2026-11-19 · §1 to §10 · re-grounded on the tree at `05245bf0e`, per brief
+- rev-5 · 2026-11-19 · §1 to §10 · re-grounded on the tree at `42d8ac6dc`, per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-20-reground-brief: the CRLF, stdout and file counts re-pinned;
   the registry, gate-lint, attribute, conf and README lines blob-pinned; `enforces` named as landed by
   PLAY-dOrderedCharter-7; S14's readers landed; the floor arm becomes `python_floor.py census` (§8 F8);

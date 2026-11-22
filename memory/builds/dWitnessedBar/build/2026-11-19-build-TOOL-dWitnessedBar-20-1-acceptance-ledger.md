@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dWitnessedBar-20
 
-One pass, the second builder, at base `abf06676dfb430ec05e00414258f70121fca93a2` over the rev-5 spec. The
+One pass, the second builder, at base `4dd5ab1d928cbfe20b79875b178d12cc2a080a4f` over the rev-5 spec. The
 pass ran no merge bar, no self-test suite and no gate leg; it ran the naming lexicon's `--suggest`, the
 generators `leg_factory.py --write`, `gen_map.py --write` and `gen_build_index.py --write`, the changed
 verbs `policy.py lists --check | --derive | --marks` on the tree, the canonical `legacy_ledger.py read`,

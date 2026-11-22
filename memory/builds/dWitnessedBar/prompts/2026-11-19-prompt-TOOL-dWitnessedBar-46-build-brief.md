@@ -8,9 +8,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 10.
-- Built so far: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11 (the gate-leg factory), 14 (`49f5d3ff6`: the
+- Built so far: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11 (the gate-leg factory), 14 (`25a3d2970`: the
   `ratchet` pack, the `conf-scalar-pins` registration and its `keys-not-scalar --measure` seed), 45 and 54, and unit
-  16 (`87bc9f615`, `3ce285ad7`: gov's registries converted onto the ledger, `tools/memory-tree/convert_registry.py`,
+  16 (`3a7a51471`, `450f7b322`: gov's registries converted onto the ledger, `tools/memory-tree/convert_registry.py`,
   the step program `tools/govkit/steps/registry_to_ledger.py`, and the four lists that sat under `tools/` moved to
   `memory/project/`).
 - The spec is rev-6, re-grounded before unit 16 landed; read the memory-tree kit's descriptor, its exempt rows and its

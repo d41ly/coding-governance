@@ -9,9 +9,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 11.
 - Built so far through order 10: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14 (the `ratchet` pack,
-  `conf-scalar-pins`), 45, 54, 16 (`87bc9f615`, `3ce285ad7`: gov's registries on the ledger,
+  `conf-scalar-pins`), 45, 54, 16 (`3a7a51471`, `450f7b322`: gov's registries on the ledger,
   `tools/memory-tree/convert_registry.py`, the four lists once under `tools/` now in `memory/project/`) and 46
-  (`028b97364`: the adopter's `seed_scalar_pins` and `--seed-pins`, `keys-not-scalar` red when unarmed, the seven
+  (`e1efccc6b`: the adopter's `seed_scalar_pins` and `--seed-pins`, `keys-not-scalar` red when unarmed, the seven
   gov-only legs as exempt rows).
 - Two builders stopped at divergences, committing nothing; their returns are
   `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-1-builder-return.md` and

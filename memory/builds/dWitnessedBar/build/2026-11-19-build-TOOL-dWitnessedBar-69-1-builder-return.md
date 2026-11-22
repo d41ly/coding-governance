@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-69
 
-# TOOL-dWitnessedBar-69 — builder return 1 (run `wf_e30e4e79-91f`), committed 298369174
+# TOOL-dWitnessedBar-69 — builder return 1 (run `wf_e30e4e79-91f`), committed 9ff80bb15
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-69 is built as its rev-5 spec states it. I checked the spec a
 
 ## Summary
 
-Built and committed TOOL-dWitnessedBar-69 as 298369174. The base was 09281c279. All four acceptance criteria were seen pass, and where a criterion has a red case, that red was seen too. No gate, suite or bar ran.
+Built and committed TOOL-dWitnessedBar-69 as 9ff80bb15. The base was 7a00429bf. All four acceptance criteria were seen pass, and where a criterion has a red case, that red was seen too. No gate, suite or bar ran.
 
 **S1 (`.githooks/pre-push#read_green_file`):** the seven `$(awk ...)` reads are now one loop, `while IFS= read -r _rg_l || [ -n "$_rg_l" ]; do ... done 2>/dev/null < "$1"`. A line with no TAB is skipped. The key is the text before the first TAB and the value everything after it. One trailing CR is stripped with `${_rg_v%$'\r'}`, on a line of its own. A `case` assigns each key without quotes (`sha) rec_sha=$_rg_v ;;` and so on). The three new variables are `local`, the comments now sit beside their case lines and never name awk, and the closing `}` is still the only one at column 0.
 

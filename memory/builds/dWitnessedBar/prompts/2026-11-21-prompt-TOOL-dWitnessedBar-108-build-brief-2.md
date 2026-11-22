@@ -6,7 +6,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 ## Where the build stands
 
-- PASS 2. Unit 108's pass 1 (`41d4e7333`, its red fix `2648b26dd`) left one defect its own return named: with `GIT_DIR`
+- PASS 2. Unit 108's pass 1 (`ddf65d6a6`, its red fix `3fc130f1e`) left one defect its own return named: with `GIT_DIR`
   exported, as git exports it to a pre-push hook in a linked worktree, `tools/run-gates/leg_factory.py#check_precommit_trigger`
   prints `arm FAIL` for the remove, rename and edit-inside cases, because `precommit.read_staged` inherits the caller's
   environment while the arm's own git and bash calls drop it. This pass fixes that and only that: set the `GIT_*`
@@ -15,7 +15,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   CLOSED again in the pass commit, with no other spec edit; the attribution refusal and its ceiling are settled.
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 51.
-- Built so far: every unit of the roster but TOOL-dWitnessedBar-28, which is deferred against asks TOOL-dWitnessedBar-101 to -103 and is not built; the last landed passes are unit 106 (`88537507c`: the pre-push hook's R-scoped policy floor) and unit 107 (`71ba863c2`: verify-peer publishes only a slot the bar wrote; `FLOOR_ASSERTIONS=81`). This unit is one of three the closing diff review's round 1 promoted (`memory/builds/dWitnessedBar/reviews/2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md`); its spec, rev-1, was written at `358ab3483`.
+- Built so far: every unit of the roster but TOOL-dWitnessedBar-28, which is deferred against asks TOOL-dWitnessedBar-101 to -103 and is not built; the last landed passes are unit 106 (`217e87725`: the pre-push hook's R-scoped policy floor) and unit 107 (`29d1be033`: verify-peer publishes only a slot the bar wrote; `FLOOR_ASSERTIONS=81`). This unit is one of three the closing diff review's round 1 promoted (`memory/builds/dWitnessedBar/reviews/2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md`); its spec, rev-1, was written at `1733790ec`.
 - It batches four disjoint fixes: M1 in `tools/run-gates/precommit.py` and `leg_factory.py --selftest`; M2 in `tools/memory-tree/adopt-memory-tree.sh` and its hygiene suite; L1 in `tools/run-gates/verdict_flow.py` with the new shrink-only `memory/project/unread-params.txt` ledger and its `py_reads.py` check; L2 the trailer check in the unattended kit. The owner's standing instruction forbids running the unattended kit's self-test suites: do not run `unattended.test.sh` or any `tools/unattended/` suite; its arms stay owed to the close.
 - Units 106, 107 and 108 build one at a time at order 51, in that order; nothing else is in flight in this working tree: commit directly here. Your pass commit ends with the charter's trailer, `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
 - The full `memory hygiene` leg is red at base on checks 13 and 15 from other records, and whole-tree spec tokens on one

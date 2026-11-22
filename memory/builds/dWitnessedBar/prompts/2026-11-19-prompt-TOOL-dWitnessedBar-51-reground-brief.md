@@ -25,8 +25,8 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 29: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59,
-     30, 29, 7, 21 (`cd03e4e75`: `fix-of` joined the park-kind set and its two held copies, so S23 and AC19 of this
-     spec are already present), 6, 2 (`7f3e24092`: `hooks.bypass`, `Commit-Checked`) and 43 (`5308f3c08`: signed peer
+     30, 29, 7, 21 (`744515922`: `fix-of` joined the park-kind set and its two held copies, so S23 and AC19 of this
+     spec are already present), 6, 2 (`c8727978d`: `hooks.bypass`, `Commit-Checked`) and 43 (`e940250ec`: signed peer
      verdicts, `check_pin_source`).
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes, filed as TOOL-dWitnessedBar-101 to -103, and the
      run defers it. Drop this spec's `consumes-from` edge onto TOOL-dWitnessedBar-28: the round-1 minors ids 7 and 46

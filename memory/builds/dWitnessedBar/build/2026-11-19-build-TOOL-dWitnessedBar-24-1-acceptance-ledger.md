@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dWitnessedBar-24
 
-One pass, the second builder, at base `55d935afe45b551d5a0f34c428b9a914b62854ff` over the rev-6 spec, starting from
+One pass, the second builder, at base `63fda85259e62e81300be901589470dde43d916b` over the rev-6 spec, starting from
 the first builder's saved rev-5 work re-checked against rev-6: the PowerShell self-test's guard narrowed to
 `{kit}/ps-hygiene.py` (§8 F12), and the shell-role scan graded `shrink-only`, a fall red as `count fell` (§8 F11).
 The pass ran no merge bar, no self-test suite and no gate leg. It ran the naming lexicon's `--suggest`, the

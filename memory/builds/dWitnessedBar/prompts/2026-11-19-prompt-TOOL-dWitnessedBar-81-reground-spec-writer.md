@@ -119,9 +119,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    What is built so far:
    - Built and landed through order 41's fifth unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41,
      55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68, 67, 70, 71, 72, 74, 75, 73
-     (`71f212ad1`), 76 (`bdc10a4df`: `CANARY_KEYS`, `check_canary_keys`), 77 (`7228b0a9a`: one failure line per value
-     in `rgf_whats`), 79 (`08f226f3d`: `check_key_variant <key>:<var> <replacement> <label> <passed reason> <other
-     lead>`, called for a tail and a length variant per key) and 80 (`a967359a8`: the tail call passes
+     (`563d828df`), 76 (`3596751cf`: `CANARY_KEYS`, `check_canary_keys`), 77 (`18907b769`: one failure line per value
+     in `rgf_whats`), 79 (`b9326245e`: `check_key_variant <key>:<var> <replacement> <label> <passed reason> <other
+     lead>`, called for a tail and a length variant per key) and 80 (`c0310ecd8`: the tail call passes
      `'${_rg_v%?}x'`, label `'tail '`, reason `the tail variant passed a value whose last byte is not CR`). The gov
      suite's shell-role row is 797. Every unit this spec consumes from is CLOSED.
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes (asks TOOL-dWitnessedBar-101 to -103) and the run

@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-108
 
-# TOOL-dWitnessedBar-108 — builder return 2 (run `wf_8a2f101f-175`), committed d609c6a21f5692bd074986a582018656067d2672
+# TOOL-dWitnessedBar-108 — builder return 2 (run `wf_8a2f101f-175`), committed b79eab48afa85f4b9570849b3841151a8c2417c3
 
 ## Why
 
-Pass 2 fixes the one defect pass 1 left open. When GIT_DIR is exported, as git does for a pre-push hook in a linked worktree, `tools/run-gates/leg_factory.py#check_precommit_trigger` printed `arm FAIL` for the remove, rename and edit-inside cases. The cause: `precommit.read_staged` uses the caller's environment, but the arm's own git and bash calls drop the GIT_* variables. The fix and the spec's CLOSED status are in commit d609c6a21.
+Pass 2 fixes the one defect pass 1 left open. When GIT_DIR is exported, as git does for a pre-push hook in a linked worktree, `tools/run-gates/leg_factory.py#check_precommit_trigger` printed `arm FAIL` for the remove, rename and edit-inside cases. The cause: `precommit.read_staged` uses the caller's environment, but the arm's own git and bash calls drop the GIT_* variables. The fix and the spec's CLOSED status are in commit b79eab48a.
 
 ## Summary
 
-Built TOOL-dWitnessedBar-108 pass 2 in commit d609c6a21f5692bd074986a582018656067d2672 (base 732e605d5).
+Built TOOL-dWitnessedBar-108 pass 2 in commit b79eab48afa85f4b9570849b3841151a8c2417c3 (base ee10bbd51).
 
 Change: in `tools/run-gates/leg_factory.py#check_precommit_trigger`, every GIT_* variable is now removed from `os.environ` just before the `precommit.read_staged(scratch)` call and put back in a try/finally right after it. `read_staged` itself is unchanged: the real pre-commit hook still uses the caller's environment, which it needs for GIT_INDEX_FILE. No function was added, renamed or removed, so the codebase map was not regenerated. The commit has a `Decided:` trailer explaining why I did not add an env parameter to `read_staged`.
 

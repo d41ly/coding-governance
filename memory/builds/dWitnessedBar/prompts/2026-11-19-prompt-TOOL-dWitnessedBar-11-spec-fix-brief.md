@@ -32,8 +32,8 @@ builder can build it as written over HEAD.
      codebase-map dossier that claims the two new legs, `memory/map/generated/symbols.json` and
      `memory/builds/dWitnessedBar/RUN.md`.
    Cite every moved line as `path#symbol` or blob-pinned.
-2. Built so far, each landed on this branch: units 26, 27, 48, 49, 13, 50, 15, 12 (`9dbb7bc44`), 61, 22 (`44eb041c6`),
-   47 and 19 (`7c5a3989a`). Units 14, 45 and 54 are being re-grounded beside this revision and read this spec as the
+2. Built so far, each landed on this branch: units 26, 27, 48, 49, 13, 50, 15, 12 (`6b3f271c6`), 61, 22 (`d92f12115`),
+   47 and 19 (`e4e4e7ef0`). Units 14, 45 and 54 are being re-grounded beside this revision and read this spec as the
    contract; their specs are not yours to edit.
 3. A choice the revision forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it
    RESOLVED in §8 with the delegated mark, and name it in your return.

@@ -1,10 +1,10 @@
-# TOOL-dWitnessedBar-22 red-fix 26 — positional (the citation check alone) fixed in 4c930d94
+# TOOL-dWitnessedBar-22 red-fix 26 — positional (the citation check alone) fixed in 94559c36
 
 **Serves:** red-fix TOOL-dWitnessedBar-22
 
 - **Leg:** positional (the citation check alone)
 - **Red line:** tags: positional · unlisted: the edge plants' expected output and three record citations
 - **Files:** memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-22-1-acceptance-ledger.md, memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-22-1-builder-return.md, memory/project/positional-producers.txt
-- **Commit:** 4c930d94d7d77fff5bc96f3d55ef74f5c478e3b0
-- **Rerun:** bash tools/run-gates/pass-legs.sh --base 3ed02ff31
+- **Commit:** 94559c3616b5c3a71b3427ec57dc843666e16dc7
+- **Rerun:** bash tools/run-gates/pass-legs.sh --base a154a45ee
 - **Caused-by:** TOOL-dWitnessedBar-22

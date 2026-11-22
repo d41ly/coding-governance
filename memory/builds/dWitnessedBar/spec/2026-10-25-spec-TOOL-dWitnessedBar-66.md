@@ -31,7 +31,7 @@ The round-1 spec audit of units 64 and 65
 confirmed finding **id 6 at HIGH**, its item **H1**. The report keeps it apart from item M1 (ids 1
 and 12), which describes the same AC12 defect at MEDIUM and which `TOOL-dWitnessedBar-67` takes.
 
-`TOOL-dWitnessedBar-65` AC12, as landed at `139d6fea1`, plants its only CR on a `verdict<TAB>GREEN<CR>`
+`TOOL-dWitnessedBar-65` AC12, as landed at `f2fcd51c6`, plants its only CR on a `verdict<TAB>GREEN<CR>`
 line (`tools/run-gates/run-gates.gov.test.sh@57bfdf31:826`). The hook's `read_green_file`
 (`.githooks/pre-push#read_green_file`) reads seven keys, and `verdict` is not one of them. So the staged
 red "removing the hook's CR strip" leaves the arm green, as unit 65's builder return records and hands
@@ -105,10 +105,10 @@ here. This unit moves the hook half's CR onto the second `sha` line, which `read
 - `read_green_file` sets `rec_sha`, `rec_fp`, `rec_blob`, `rec_man`, `rec_st`, `rec_reused` and
   `rec_reused_cache` from the keys `sha`, `fingerprint`, `manifest_blob`, `manifest`, `selftests`,
   `reused` and `reused_cache` (`.githooks/pre-push#read_green_file`).
-  `awk '/^read_green_file\(\)/,/^}/' .githooks/pre-push | grep -c verdict` prints 0 at `9fde76576`
+  `awk '/^read_green_file\(\)/,/^}/' .githooks/pre-push | grep -c verdict` prints 0 at `a0fe9d87d`
   (PINNED 2026-11-21).
 - At HEAD each read is `awk -F'\t' '$1=="<key>"{v=$2} END{sub(/\r$/, "", v); print v}'`, unit 65 S15 as
-  landed at `139d6fea1`: the last match wins and one CR is stripped. The hook calls `read_green_file`
+  landed at `f2fcd51c6`: the last match wins and one CR is stripped. The hook calls `read_green_file`
   once, for its full-green record (`.githooks/pre-push@86500358:2074`).
 - The arm at HEAD ends only its `verdict` line in CR-LF (`tools/run-gates/run-gates.gov.test.sh@57bfdf31:826`),
   and its two compares, at `:830` and `:836`, count one assertion each.
@@ -134,7 +134,7 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, one step after `TOOL-dWitnessedBar-65` (order 37, CLOSED at `139d6fea1`). Units 67,
+Live at landing, one step after `TOOL-dWitnessedBar-65` (order 37, CLOSED at `f2fcd51c6`). Units 67,
 68, 69 and 70 build at order 39; 67, 68 and 70 extend this arm, and 69 S1 moves the hook's read into a
 bash loop that lets S4's first break go red on Git for Windows.
 
@@ -235,7 +235,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 AC2 AC3 · the hook
   edges of TOOL-dWitnessedBar-68, TOOL-dWitnessedBar-70 and TOOL-dWitnessedBar-73, promoted by the
   round-1 spec audit of units 66 and 67; nothing else moved.
 - rev-3 · 2026-11-21 · §1 to §8 · §10 · S1 to S4 · AC1 to AC3 · re-grounded over unit 65 as landed
-  at `139d6fea1`, per 2026-11-19-prompt-TOOL-dWitnessedBar-66-reground-brief: S1 to S3 name the arm's
+  at `f2fcd51c6`, per 2026-11-19-prompt-TOOL-dWitnessedBar-66-reground-brief: S1 to S3 name the arm's
   record, compares and `read_tag_lines` half as built; §4 Evidence replaces "keeps a CR" with this
   node's probe; AC2's CR-strip half is observed where the CR survives (§8 F3); the floor does not move;
   citations move to `path#symbol` or blob-pinned lines.
@@ -245,7 +245,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 AC2 AC3 · the hook
 The seam is unit 65's AC12 arm in `tools/run-gates/run-gates.gov.test.sh`, extended in place, and the
 cut-and-source idiom unit 65 already names for both hook and runner readers
 (`awk '/^read_green_file\(\)/,/^}/'`). `python tools/codebase-map/reuse_lookup.py "strip a trailing carriage return from a key value record line"`
-ranked `key`, `keys`, `records` and `build_records` first at `9fde76576`. None of them reads the green
+ranked `key`, `keys`, `records` and `build_records` first at `a0fe9d87d`. None of them reads the green
 stamp, so no existing seam fits beyond the arm named above. The runner's own strip is `${_rk_v%$'\r'}`
 in `tools/run-gates/run-gates.sh#read_record_keys`, which unit 65 S14 keeps and this unit does not
 touch.

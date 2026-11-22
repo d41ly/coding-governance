@@ -25,8 +25,8 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 32: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59,
-     30, 29, 7, 21, 6, 2, 43, 51, 56 (`746c0416f`: the hook and runner clear `GATE_BASE_FROM` and `GATE_SELECTION` for
-     every bar, `base_from` carries a third field `inherited`, `selection.<n>` keeps its TABs) and 57 (`8359ae2b8`, its pass-leg fixes `282cd388e`).
+     30, 29, 7, 21, 6, 2, 43, 51, 56 (`f42c4ad16`: the hook and runner clear `GATE_BASE_FROM` and `GATE_SELECTION` for
+     every bar, `base_from` carries a third field `inherited`, `selection.<n>` keeps its TABs) and 57 (`e63ac2503`, its pass-leg fixes `4dabf6e0d`).
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes (asks TOOL-dWitnessedBar-101 to -103) and the run
      defers it; any item of this spec that needs it leaves the scope, named in §3 as waiting with unit 28.
    - Units 58 and 60 share order 33 but both touch `tools/run-gates/run-gates.evidence.test.sh`, so they build one

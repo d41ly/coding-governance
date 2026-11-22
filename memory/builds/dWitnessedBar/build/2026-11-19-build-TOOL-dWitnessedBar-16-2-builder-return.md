@@ -24,7 +24,7 @@ No path was changed and nothing was committed.
 
 ## Summary
 
-I stopped before writing any code, because the TOOL-dWitnessedBar-16 spec (rev-10) can't be built as written. Nothing is committed, and the tree is clean at 6f80e4e8e29393486a144eefe114ae20c5f94c17.
+I stopped before writing any code, because the TOOL-dWitnessedBar-16 spec (rev-10) can't be built as written. Nothing is committed, and the tree is clean at 7f3d1a541ba7c6776dfcf716dcd5a2c4524b1051.
 
 **What I checked (reading only, no code written):**
 - **Population:** `git ls-files` matches §4: 29 homes to convert, plus unit 14's `conf-scalar-pins.txt` and the three lists §3 leaves to unit 18.

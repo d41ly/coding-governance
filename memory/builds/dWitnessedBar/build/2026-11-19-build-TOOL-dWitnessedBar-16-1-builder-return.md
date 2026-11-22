@@ -18,7 +18,7 @@ The ledger row is key fields, count, sha and disposition, so none of these survi
 
 (2) §4's `memory/project/unarmed-branches.txt` row, with AC10, conflicts with the factory's `_check_table`. The row is `site · gate, check, signature`, and AC10 says one row per `gate, check, signature`. `tools/lib/legacy_ledger.py#_check_table` (lines 137-138) refuses a `site` table whose fields lack `path`, so a header rendered as written (`key site gate,check,signature`) cannot register. Also, the check field of shape-1 rows is a bare integer, which `LINE_NUMBER_RE` refuses unless the registration declares it `verbatim`. The spec has to say either that the gate field is named `path`, or that the key kind is `key`, and that `check` is verbatim. The same field naming should be stated for `corpus-path-unresolved.txt` (`citing path, cited path`) and `trace-waiver.txt` (`spec path, subject`), whose column text cannot be header field names as written. The same is true of fork-ceilings' integer `base` key field, which needs `verbatim`.
 
-Nothing was written or committed. The tree is clean at base 9b69042ee.
+Nothing was written or committed. The tree is clean at base 1fc4e5c6e.
 
 ## Summary
 
@@ -34,4 +34,4 @@ I stopped before writing any code: the spec for TOOL-dWitnessedBar-16 can't be b
 
 **Checks run:** the spec's claims probed against the source only. I read the ledger factory, `check_retirements` and its selftest cases, the step grammar in `upgrade_steps.py`, `ratchet.py`'s probe and plant functions, the 29 registry headers and their rows, and the list of kits that carry a copy of the factory. No gate, suite or bar ran, and no command timed out or was skipped. None of these reads stands in for a gate; every §7 leg and both `New arm:` RED-first observations are still owed at the close once the unit is rebuilt.
 
-`bash tools/unattended/unattended.sh --brief` reported the brief as already recorded and unchanged at 25468d36ee60, so it wrote nothing. The tree is clean at base 9b69042ee. `gotchas.py --for-diff` was not run because there is no commit. No scratch file was made: `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/readme-contract.converted.txt` was not written, since the conversion was never started.
+`bash tools/unattended/unattended.sh --brief` reported the brief as already recorded and unchanged at 25468d36ee60, so it wrote nothing. The tree is clean at base 1fc4e5c6e. `gotchas.py --for-diff` was not run because there is no commit. No scratch file was made: `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/readme-contract.converted.txt` was not written, since the conversion was never started.

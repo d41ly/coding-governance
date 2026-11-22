@@ -8,10 +8,10 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 18.
-- Built so far through order 18: every unit up to and including 4 (`7a2701739`: the runner's per-tree verdict
-  record, the pre-push hook adopting only the pushed tree's GREEN record) and 25 (`55d911b39`: the verdict names
+- Built so far through order 18: every unit up to and including 4 (`153d4bdb2`: the runner's per-tree verdict
+  record, the pre-push hook adopting only the pushed tree's GREEN record) and 25 (`b843687cc`: the verdict names
   its `run_id` and `cause`, a failing leg's tail kept by hash as a `leg-tail` record).
-- The spec is rev-6, re-grounded at `c34f63b6` over unit 4 but before unit 25 landed. Unit 25 changed
+- The spec is rev-6, re-grounded at `0b8f2445` over unit 4 but before unit 25 landed. Unit 25 changed
   `tools/run-gates/run-gates.sh`, `.githooks/pre-push`, the evidence suite and `tools/unattended/unattended.sh`, all
   four of which this unit touches: verify every claim about them against the tree, and hand back any claim unit 25's
   landed shape breaks as a divergence.

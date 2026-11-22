@@ -38,7 +38,7 @@ Declare on each leg's own row what the leg tests and which principles or practic
 read both as typed edges of the one closed edge set, so the facts "this leg tests that feature" and
 "this leg enforces that principle" are declared once, where the leg lives, and every inverse is
 derived (night pass, point 4: `night-pass.md:250`). Today no leg carries `tests`, and 51 of the 198
-manifest rows carry `enforces` (PINNED 2026-11-19 at `66f4e8d98`), the key PLAY-dOrderedCharter-7
+manifest rows carry `enforces` (PINNED 2026-11-19 at `a4cffc2cb`), the key PLAY-dOrderedCharter-7
 landed and its meta-check `tools/playbook/core.py` reads, which no edge site reads as an edge; the
 feature-to-leg fact lives only in the dossiers' `gate-legs` claims.
 
@@ -52,7 +52,7 @@ feature-to-leg fact lives only in the dossiers' `gate-legs` claims.
   `practice.*` tags. This unit makes it an edge field read at the leg row; the values for every leg
   are TOOL-dWitnessedBar-11's and TOOL-dWitnessedBar-24's to write. Observed by AC3.
 - **S3** — `LEG_KEYS` (TOOL-dWitnessedBar-12's one key set) gains `tests`. `enforces` is in both
-  `KNOWN` copies of `tools/run-gates/run-gates.test.sh` at `66f4e8d98`, put there by
+  `KNOWN` copies of `tools/run-gates/run-gates.test.sh` at `a4cffc2cb`, put there by
   PLAY-dOrderedCharter-50 S1, and in the `LEG_KEYS` value TOOL-dWitnessedBar-12 §4 writes, so it is
   not added twice. Observed by AC2.
 - **S4** — The leg-row site of the edge grammar: one adapter `read_leg_edges(text, path)` in
@@ -73,7 +73,7 @@ feature-to-leg fact lives only in the dossiers' `gate-legs` claims.
 - **S6** — govkit selfcheck 7h's both-ways join (`tools/govkit/govkit.py#selfcheck`, its `7h`
   block) gains `tests` and `enforces`, presence included: a descriptor row and its manifest row carry
   the same lists. The descriptor-claimed legs whose manifest row carries `enforces` and whose
-  descriptor row does not (6, PINNED 2026-11-19 at `66f4e8d98`, §4 "The `enforces` copies") gain the
+  descriptor row does not (6, PINNED 2026-11-19 at `a4cffc2cb`, §4 "The `enforces` copies") gain the
   manifest's list on their descriptor row at the pass (§8 F5). Observed by AC6.
 
 ## 3. Non-goals (OUT)
@@ -112,7 +112,7 @@ feature-to-leg fact lives only in the dossiers' `gate-legs` claims.
 
 ### The `tests` values
 
-At `66f4e8d98`, 180 of the 198 legs are claimed by exactly one of the 33 dossiers (PINNED 2026-11-19)
+At `a4cffc2cb`, 180 of the 198 legs are claimed by exactly one of the 33 dossiers (PINNED 2026-11-19)
 under `memory/map/features/`, in its `[claims] gate-legs` list, none by two, and 18 by none (PINNED
 2026-11-19, by a probe over each dossier's first fenced TOML, the fence
 `tools/codebase-map/map_lib.py#parse_dossier` reads). Of the 18, 17 (PINNED 2026-11-19) are map
@@ -139,7 +139,7 @@ read_leg_edges(text, path) -> list[dict]
 #  "targets": ["principle.p16"], "site": "leg", "source": "leg.roles.roles-catalogue"}
 ```
 
-Both rows are the tags TOOL-dWitnessedBar-12's §4 rule yields at `66f4e8d98`: `branch-reconcile
+Both rows are the tags TOOL-dWitnessedBar-12's §4 rule yields at `a4cffc2cb`: `branch-reconcile
 selftest` is a registry `[[exempt_leg]]` leg, so its owner segment is `gov`, and `roles catalogue` is
 the roles kit's.
 
@@ -189,7 +189,7 @@ a target on it as unarmed and never resolves it, the contract `run_edge_arm` sta
   `tools/playbook/core.py#run_meta_check` already joins it to the catalogue's rules both ways, a
   rule-member tag no row declares being red there. It is that check's verdict, run by the leg `core
   meta-check`, and this one adds none, as `run_resolve` leaves a `serves` target to check 21. 13
-  targets on 8 legs are this form (PINNED 2026-11-19 at `99fea7aca`, the first builder's return).
+  targets on 8 legs are this form (PINNED 2026-11-19 at `4b1d8cec6`, the first builder's return).
 
 Every other leg-row target is graded as any site's is: an `enforces` target outside `unit`,
 `practice` and `principle`, and a two-segment `practice.*` or a `principle.*` tag the index does not
@@ -209,7 +209,7 @@ edges: leg rows · <n> enforces target(s) unarmed, practice rules core meta-chec
 
 `enforces` follows the leg-row grammar of PLAY-dOrderedCharter-7 S2: its targets are `principle.*`
 and `practice.*`. The `enforces` row of `tools/playbook/edges.toml` reads
-`to = ["unit", "practice", "principle"]` at `66f4e8d98`, so §8 F1's ask has landed and the pass
+`to = ["unit", "practice", "principle"]` at `a4cffc2cb`, so §8 F1's ask has landed and the pass
 widens no row.
 
 `tools/playbook/tag_bundle.py#read_bundle_rows` reads the same edges, so a bundle of a principle or
@@ -217,7 +217,7 @@ two-segment practice tag lists the manifest among its `enforced-by` rows; no pla
 
 ### The `enforces` copies
 
-The 6 descriptor-claimed legs whose manifest row carries `enforces` at `66f4e8d98` (PINNED
+The 6 descriptor-claimed legs whose manifest row carries `enforces` at `a4cffc2cb` (PINNED
 2026-11-19, by joining each descriptor `[[gate_leg]]` name to its manifest row): `shell hygiene (a
 location probe asked from a moved directory)` and `shell hygiene (a fixed-name temp renamed into
 place)` in `tools/gate-lint/kit.toml`, `roles catalogue` in `tools/roles/kit.toml`, `policy check` in
@@ -251,7 +251,7 @@ Additive. No adopter row changes; no name-keyed file moves.
 - `tools/playbook/adopt-playbook.sh` (the plant rows of §7's edge-grammar arm)
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
-- 23 of the 27 descriptors carrying `[[gate_leg]]` rows (PINNED 2026-11-19 at `66f4e8d98`, the
+- 23 of the 27 descriptors carrying `[[gate_leg]]` rows (PINNED 2026-11-19 at `a4cffc2cb`, the
   27 as TOOL-dWitnessedBar-12 lists them), each holding a dossier-claimed leg or one of §4's
   `enforces` copies: `tools/branch-reconcile/kit.toml`, `tools/codebase-map/kit.toml`,
   `tools/gate-lint/kit.toml`, `tools/lexicon/kit.toml`, `tools/loop/kit.toml`,
@@ -278,7 +278,7 @@ Additive. No adopter row changes; no name-keyed file moves.
 
 - security — no new write path.
 - perf / scale — one pass over the manifest's rows and the dossiers' fences (198 and 33, PINNED
-  2026-11-19 at `66f4e8d98`, §4).
+  2026-11-19 at `a4cffc2cb`, §4).
 - error / empty / loading states — a `tests` target in an unregistered namespace and a rule-member
   `enforces` target each print their `edges: leg rows` count; a malformed manifest value is a refusal
   line naming the manifest, its line and the key; a compare miss names the leg, the dossier and the
@@ -287,7 +287,7 @@ Additive. No adopter row changes; no name-keyed file moves.
   line, and its `unarmed` count includes both leg-row marks, split by the `edges: leg rows` lines.
 - risks — 180 `tests` edges (PINNED, §4) stay unresolved until dTotalRecall registers `feature`;
   the compare arm is what holds them meanwhile. The rule-member `enforces` targets (13, PINNED
-  2026-11-19 at `99fea7aca`) stay unresolved by the edges check until the tag index resolves the
+  2026-11-19 at `4b1d8cec6`) stay unresolved by the edges check until the tag index resolves the
   member form; `core meta-check` is what holds them meanwhile.
 - testing — AC1 to AC7 by a pass; the arms of §7 at the close.
 - migration — additive.
@@ -299,7 +299,7 @@ Additive. No adopter row changes; no name-keyed file moves.
   `memory/map/features/` claims carries `tests` equal to `["feature.<f>"]` for its claiming dossier,
   and no other leg carries the key, `run-gates evidence` included.
   Red when: a value is guessed for an unclaimed leg, or a claimed leg's value names another feature.
-  figure: 180 and 18 are PINNED 2026-11-19 at `66f4e8d98`; the probe re-derives both from the
+  figure: 180 and 18 are PINNED 2026-11-19 at `a4cffc2cb`; the probe re-derives both from the
   dossiers under `memory/map/features/`.
 - **AC2** — When the canary's key-set arm runs over a fixture manifest row carrying `tests` and
   `enforces`, it passes; with `tests` cut from `LEG_KEYS`, it fails.
@@ -355,7 +355,7 @@ New arm: tools/govkit/selftest.py · covers AC6 · 7h's `tests` and `enforces` j
   ("every leg declaring the principles it enforces"); (c) adds a type to the closed set.
   RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the brief's direction; the ask for
   PLAY-dOrderedCharter-24's row is named in this unit's return, and the pass widens the row only
-  where the ask has not landed. widens: none · relaxes: none. At `66f4e8d98` the row's `to` admits
+  where the ask has not landed. widens: none · relaxes: none. At `a4cffc2cb` the row's `to` admits
   `principle` (§4 "The edge read"), so the pass widens nothing.
 - **F2 — Where is `tests` declared, given the dossiers already claim legs?** Options: (a) the leg
   row, values derived once from the claims, a both-ways compare until the map derives its side;
@@ -378,7 +378,7 @@ New arm: tools/govkit/selftest.py · covers AC6 · 7h's `tests` and `enforces` j
   edges whose targets an adopter's registry may not hold. RESOLVED (agent, 2026-10-25, delegated):
   (a), rung 3. widens: none · relaxes: none
 - **F5 — What does 7h's `enforces` join do with a leg whose manifest row carries `enforces` and
-  whose descriptor row does not?** At `66f4e8d98` six descriptor-claimed legs are that case (§4 "The
+  whose descriptor row does not?** At `a4cffc2cb` six descriptor-claimed legs are that case (§4 "The
   `enforces` copies"), since PLAY-dOrderedCharter-7 wrote the key on the manifest alone. Options:
   (a) the pass copies each manifest list onto its descriptor row, and the join grades presence as
   S6 states; (b) the join compares only where the descriptor declares the key, as 7h's `reads` and
@@ -389,7 +389,7 @@ New arm: tools/govkit/selftest.py · covers AC6 · 7h's `tests` and `enforces` j
   feature-rich survivor, meeting S6 and AC6 with no veto tripped and no question left open; per
   brief 2026-11-19-prompt-TOOL-dWitnessedBar-22-reground-brief. widens: none · relaxes: none
 - **F6 — What does the leg-row site do with an `enforces` target of the rule-member form
-  `practice.<practice>.<rule>`?** At `99fea7aca` 13 targets on 8 legs are that form (PINNED
+  `practice.<practice>.<rule>`?** At `4b1d8cec6` 13 targets on 8 legs are that form (PINNED
   2026-11-19, the first builder's return). `tools/playbook/practices.toml` admits it as a row's
   `rules` entry and `tools/playbook/core.py#run_meta_check` joins it, but the tag index resolves it to
   no row, so the `edges` leg would red each one once the site is read. Options: (a) the tag index
@@ -428,7 +428,7 @@ New arm: tools/govkit/selftest.py · covers AC6 · 7h's `tests` and `enforces` j
   `policy fixtures`, whose manifest guard holds the §4 path `tools/gate-legs.json`; per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief; nothing else moved.
 - rev-4 · 2026-11-19 · §1 §2 §4 §5 §6 §7 §8 §10 · S2 S3 S4 S6 · AC1 · F1 F5 · re-grounded at
-  `66f4e8d98` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-22-reground-brief: the claim counts
+  `a4cffc2cb` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-22-reground-brief: the claim counts
   are re-pinned (PINNED, §4), with `memory/map/FOUNDATION.md`'s claim named outside the population;
   `enforces` has landed on manifest rows and in both `KNOWN` copies, so S3 adds `tests` alone; the
   `enforces` row of `edges.toml` admits `principle`, so F1's widen is moot and the file leaves Files
@@ -456,11 +456,11 @@ New arm: tools/govkit/selftest.py · covers AC6 · 7h's `tests` and `enforces` j
 The seams extended are PLAY-dOrderedCharter-7 S2's `enforces` key, read by `tools/playbook/core.py`'s
 meta-check, PLAY-dOrderedCharter-24's edge rows in `tools/playbook/edges.toml` and parser, and -28
 S5's site adapters, gathered by `tools/playbook/edge_grammar.py#read_tree_edges`, all CLOSED and
-landed when re-verified at `66f4e8d98`; within the last, `check_edges`' `unarmed` mark, which its id
+landed when re-verified at `a4cffc2cb`; within the last, `check_edges`' `unarmed` mark, which its id
 branch writes and `run_resolve` skips and counts, extended to the leg site rather than a second
 withholding path, and `check_site_targets`, the target grammar the header and work-order adapters
-answer to (re-read at `99fea7aca`); TOOL-dWitnessedBar-12's `LEG_KEYS` and leg tags, landed at
-`9dbb7bc44`;
+answer to (re-read at `4b1d8cec6`); TOOL-dWitnessedBar-12's `LEG_KEYS` and leg tags, landed at
+`6b3f271c6`;
 govkit selfcheck 7h (`tools/govkit/govkit.py#selfcheck`, its `7h` block), whose `doc_reads`, `impure`
 and `stage` arms are the presence-included joins S6 copies; and the dossiers' `[claims] gate-legs`
 lists, parsed by `tools/codebase-map/map_lib.py#parse_dossier` and joined to the manifest's leg names,
@@ -470,7 +470,7 @@ which `tools/codebase-map/map_extractors.py#_gate_legs` extracts, by
 `and which principles it enforces` appended ranked generic `leg`, `legs` and `declares` stems and
 named no seam, as expected with neither key built. One disagreement with scout B: it gives the
 dossiers' leg claims as front matter `gate-legs = [...]`; at `cdfbd1cf` they sit in each dossier's
-fenced TOML under `[claims]`, 122 legs claimed once and 20 unclaimed, and at `66f4e8d98` 180 and 18
+fenced TOML under `[claims]`, 122 legs claimed once and 20 unclaimed, and at `a4cffc2cb` 180 and 18
 (PINNED, §4). The recall probe returned scout B's row and the brief's settle-in-§8 instruction; none
 disagreed with source otherwise. At rev-5 the lookup
 `python tools/codebase-map/reuse_lookup.py "mark an edge target unarmed so the edge check does not red it"`

@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-108
 
-# TOOL-dWitnessedBar-108 — builder return 1 (run `wf_d0036dda-3f9`), committed 41d4e7333
+# TOOL-dWitnessedBar-108 — builder return 1 (run `wf_d0036dda-3f9`), committed ddf65d6a6
 
 ## Why
 
-Built TOOL-dWitnessedBar-108 from its rev-1 spec in one pass commit, 41d4e7333, with the spec status set to CLOSED in that commit. The spec's code claims held against the tree before the first write. One defect, found by the bug-class checklist after the commit, is open: the new trigger-parity arm gives a false red when a hook has exported GIT_DIR. scratch-guard refused the fix because the spec is now CLOSED.
+Built TOOL-dWitnessedBar-108 from its rev-1 spec in one pass commit, ddf65d6a6, with the spec status set to CLOSED in that commit. The spec's code claims held against the tree before the first write. One defect, found by the bug-class checklist after the commit, is open: the new trigger-parity arm gives a false red when a hook has exported GIT_DIR. scratch-guard refused the fix because the spec is now CLOSED.
 
 ## Summary
 
-Pass commit 41d4e7333 on base 74ae4b50d, subject naming TOOL-dWitnessedBar-108. Its trailer block ends with `Pass: TOOL-dWitnessedBar-108` and then `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`. That is the charter's value, chosen over the harness reminder's Opus 5.5, as S8 requires. The live commit-msg hook admitted the commit, wrote `Commit-Checked: unattended@1.129` at the start of the trailer block, and left the charter trailer as the last line. The spec's four items fall into four disjoint write sets (§4 "Why one unit"); they were built here as one unit, as the spec says.
+Pass commit ddf65d6a6 on base 7ccc1b50b, subject naming TOOL-dWitnessedBar-108. Its trailer block ends with `Pass: TOOL-dWitnessedBar-108` and then `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`. That is the charter's value, chosen over the harness reminder's Opus 5.5, as S8 requires. The live commit-msg hook admitted the commit, wrote `Commit-Checked: unattended@1.129` at the start of the trailer block, and left the charter trailer as the last line. The spec's four items fall into four disjoint write sets (§4 "Why one unit"); they were built here as one unit, as the spec says.
 
 OPEN FINDING, not fixed: with GIT_DIR exported, `tools/run-gates/leg_factory.py#check_precommit_trigger` prints `arm FAIL` for the remove, rename and edit-inside cases (probe returned (3, 4)). The cause is that `precommit.read_staged` inherits the environment, while the arm's own git and bash calls drop it. A pre-push bar run from a linked worktree may hit this. The fix is to set the GIT_* variables aside around the `read_staged(scratch)` call. scratch-guard refused the edit after the spec went to CLOSED, so the fix needs a re-dispatch or a new unit.
 
@@ -26,7 +26,7 @@ What changed:
 
 Also in the commit:
 - One widen record, `memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-108-widen-27.md`, covers four shell-role rows. Each row was then set to its measured count, as unit 51 S1 states: adopt-memory-tree.sh 638, check-memory-hygiene.test.sh 3393, unattended.sh 9792, unattended.test.sh 13935. I added `memory/project/shell-role.txt` to the write set with `--dispatch`.
-- The kickoff manifest `last-audit` re-stamped at 74ae4b50d.
+- The kickoff manifest `last-audit` re-stamped at 7ccc1b50b.
 - The codebase map regenerated, `gen_build_index` rendered, and the acceptance ledger written.
 
 Checks that ran, all probes standing in for gates:

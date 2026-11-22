@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 7.
 - Built so far: units 26, 27, 48, 49, 50, 13, 15, 61 and 47, and the two units that last moved this unit's files:
-  unit 12 (`9dbb7bc44`: a `tag` on every row of `tools/gate-legs.json` and every descriptor `[[gate_leg]]` row,
-  `LEG_KEYS` gaining `tag`, run-gates at 1.51, govkit's `LEG_KEY_FLOORS`) and unit 22 (`44eb041c6`: `tests` and
+  unit 12 (`6b3f271c6`: a `tag` on every row of `tools/gate-legs.json` and every descriptor `[[gate_leg]]` row,
+  `LEG_KEYS` gaining `tag`, run-gates at 1.51, govkit's `LEG_KEY_FLOORS`) and unit 22 (`d92f12115`: `tests` and
   `enforces` on the leg rows and descriptors, `LEG_KEYS` gaining `tests`, selfcheck 7h comparing both, selftest run
   g). Read those files as they stand: this unit's `purpose` key lands on the same rows and follows the same floor and
   7h pattern.

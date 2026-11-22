@@ -116,7 +116,7 @@ policy is `INHERITED_RED=park|land`, which only knows `INHERITED`; it is retired
   key and `policy.py lists --write` drains its row from `memory/project/legacy-homes.txt`. The new step
   id gains its row in `memory/project/landed-steps.txt`, the append-only `landed-steps` population of
   `tools/govkit/registry.toml`. Observed by AC6 and AC7.
-  **Readers:** by name: the 16 files AC6's grep lists with -l, DERIVED 2026-11-20 at HEAD ab6dc6e8,
+  **Readers:** by name: the 16 files AC6's grep lists with -l, DERIVED 2026-11-20 at HEAD 430300b4,
   `.githooks/gate-env.sh`,
   `.githooks/pre-push`, `.githooks/pre-push.test.sh`, `.unattended.conf`, `tools/govkit/govkit.py`
   (`POLICY_KEYS`), `tools/govkit/selftest.py`, `tools/policy/check_policy.py`, `tools/policy/policy.py`,
@@ -196,7 +196,7 @@ policy is `INHERITED_RED=park|land`, which only knows `INHERITED`; it is retired
 - `own-only`, `own-mixed-contended` and `every-red` are spelled only in the `verdict.blocks` row of
   `tools/policy/catalogue.toml`, and the default `own-only` in the mirror `.governance/policy.json`; no
   code reads either key, and `python tools/policy/policy.py get verdict.blocks` prints `own-only`
-  (run at `ab6dc6e8`, 2026-11-20).
+  (run at `430300b4`, 2026-11-20).
 - A `DEAD PROBE` is what every red reads when `lib-attribute.sh` is absent
   (`tools/run-gates/run-gates.sh@ab6dc6e8:5152-5153`).
 - v2's `[policies]`: `verdict.blocks` values `own-mixed-contended`, `every-red`, `own-only`, default
@@ -274,7 +274,7 @@ TOOL-dDeclaredLoop-12 S4), so `judge` reaches both siblings by subprocess, each 
 `resolve_kit_dir`, imported from `leg_factory`, the kit's inline copy under the `resolve_kit_dir`
 parity row, as `tools/run-gates/keep_tails.py` imports it: `policy.py get verdict.red-route` for the
 value, and for `item.test.attribute`'s outcomes `loop_lib.py items --tag`, the verb §8 F6 asks
-dDeclaredLoop for. No verb of `loop_lib.py` prints one item's outcomes: its verbs at `ab6dc6e8` are
+dDeclaredLoop for. No verb of `loop_lib.py` prints one item's outcomes: its verbs at `430300b4` are
 `--check`, `--scopes`, `--selftest`, `--fixture --plant` and `--grade-site`
 (`tools/loop/loop_lib.py#main`), and `read_outcome_set` (`tools/loop/loop_lib.py#read_outcome_set`)
 is a function a sibling may not import. Until that verb lands `judge` exits 2 naming it; a missing
@@ -440,7 +440,7 @@ lands from a live unattended run's branch or the owner (`tools/policy/guard.py`)
   Red when: `judge` accepts a word outside `item.test.attribute`'s outcomes, or imports a sibling kit.
 - **AC6** — When `git grep -nwE "(GATE_)?INHERITED_RED" -- .githooks tools .unattended.conf` runs
   after the pass, it prints only lines of the step's own row and script, `inherited_red.py`, and the
-  run-gates README's migration note; at `ab6dc6e8` it lists 16 files (DERIVED 2026-11-20 by the same
+  run-gates README's migration note; at `430300b4` it lists 16 files (DERIVED 2026-11-20 by the same
   grep with `-l`).
   Red when: a reader still parses or exports the retired key, or the policy kit still marks or plants
   it.
@@ -591,7 +591,7 @@ this landing by the README's self-test waiver rule, its clean reading owed with 
   TOOL-dWitnessedBar-5's consumes-from edge for `verdict_flow.py`, per brief
   2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-brief; nothing else moved.
 - rev-7 · 2026-11-20 · S2 S3 S4 S5 S8 S9 · §3 · §3 Edges · §4 · §5 · AC6 AC8 · §7 · §8 F7 to F11 · §10 ·
-  re-grounded at `ab6dc6e8` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-3-reground-brief: runner,
+  re-grounded at `430300b4` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-3-reground-brief: runner,
   hook and driver citations moved to symbols or blob pins; the hook's doc-only scoping, stamp reader,
   export and landing branch joined S5's readers, the stamp gaining `blocks` (F8);
   `check_inherited_override` keeps the class, since `--hold --code inherited-red` calls it (F7); the
@@ -614,7 +614,7 @@ dGroundRules' `policy.py get`, reached as the hook's floor reader and the driver
 `tools/govkit/steps/conf_to_policy.py`, the shared part of a step moving a conf key into policy keys,
 extracted at that kind's second instance; `judge` imports `resolve_kit_dir` from `leg_factory` as
 `keep_tails.py` does. `python tools/codebase-map/reuse_lookup.py "decide which red legs block a
-landing from their attribution class"`, re-run at `ab6dc6e8` on 2026-11-20, ranked the `leg` and
+landing from their attribution class"`, re-run at `430300b4` on 2026-11-20, ranked the `leg` and
 `legs` stems, `derive_attribution`, `check_landed_facts_due` and `read_attribution_tokens`
 (`tools/unattended/lib-unattended.sh#read_attribution_tokens`), which reads commit subjects and
 trailers, not the attribution record, so it is no seam here; no existing table maps a class to a

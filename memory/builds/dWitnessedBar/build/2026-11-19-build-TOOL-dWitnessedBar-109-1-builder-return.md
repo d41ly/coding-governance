@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-109
 
-# TOOL-dWitnessedBar-109 — builder return 1 (run `wf_18d03e5b-35e`), committed be96be174688799cec34ccb31c361d425bd136ec
+# TOOL-dWitnessedBar-109 — builder return 1 (run `wf_18d03e5b-35e`), committed 0e2211a01c46f987ce4bfc626e5d812447dc955c
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-109 is built as the spec states and committed as one pass com
 
 ## Summary
 
-Built TOOL-dWitnessedBar-109 at be96be174 (base fb784a421). The attribution check now reads the agent's Co-Authored-By: line anywhere in the message git keeps, so a trailer followed by prose is no longer admitted as carrying nothing. The commit-msg hook passed the pass commit itself: it added Commit-Checked: at the start of the trailer block, and the charter's trailer stayed the last line.
+Built TOOL-dWitnessedBar-109 at 0e2211a01 (base 6c69c225e). The attribution check now reads the agent's Co-Authored-By: line anywhere in the message git keeps, so a trailer followed by prose is no longer admitted as carrying nothing. The commit-msg hook passed the pass commit itself: it added Commit-Checked: at the start of the trailer block, and the charter's trailer stayed the last line.
 
 What changed:
 - S1/S2: `tools/lib/commit_trailers.py` gains `extract_message_lines`, which holds the old last-line loop's rules as one list. `check_message_attribution` now picks agent lines from that list with `(?i)^<key>[ \t]*:` plus the address, and no longer calls a subprocess. Its signature, states and detail strings are unchanged, and its docstring's WHAT IT DOES NOT CHECK note names the continuation line, `trailer.separators` and `core.commentChar`.
@@ -25,7 +25,7 @@ Spec miscount (no code impact): AC1 says "five refusal shapes" of §4's fixture 
 
 Checks run in this pass (no gate, suite or bar ran):
 - **AC1:** the `attribution` verb over seven scratch message files gave refused/exit 1 for all five refusal shapes, ok for the charter's line last, and none for `Pass: none` alone. At base the same four table shapes printed `ATTRIBUTION none`. This stands in for the suite's attribution arms.
-- **AC2:** `--fixture` exits 0 and prints the six lines. A scratch copy using the parent's (46b7d39e8) `check_message_attribution` exits 1 with `FAIL, the case plants refused` on four cases. That is the RED half of the second `New arm:` line, seen here.
+- **AC2:** `--fixture` exits 0 and prints the six lines. A scratch copy using the parent's (34d3c3286) `check_message_attribution` exits 1 with `FAIL, the case plants refused` on four cases. That is the RED half of the second `New arm:` line, seen here.
 - **AC3:** diffing the three marker spans printed nothing, and `--fixture` from each kit directory printed six attribution lines. This stands in for the `python resolver (... inline parity ...)` leg.
 - **AC4:** an `inspect.getsource` probe found no `subprocess`, found the `extract_message_lines(` call, and found the three docstring terms.
 - **AC5:** the grep named all six arms. This is by reading only.

@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 12.
 - Built so far through order 11: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14, 45, 54, 16, 46, 17
-  (`dbbd8caba`: keyed record and row populations, `{prefix}` resolved in every seed argv by the factory, a fresh
-  scaffold writing neither waiver home), 52 (`fd73e0bbb`: `ratchet.py#read_root_confs`) and 53 (`b4d0b0f50`).
+  (`9a29f1e96`: keyed record and row populations, `{prefix}` resolved in every seed argv by the factory, a fresh
+  scaffold writing neither waiver home), 52 (`6a075440b`: `ratchet.py#read_root_confs`) and 53 (`3ab7c7312`).
 - The spec is rev-6, re-grounded over unit 17's rev-7 text; unit 17 landed at rev-9. Read the landed factory, the
   step programs on `tools/govkit/steps/` and the homes under `memory/project/` as they stand, and hand back any claim
   their landed shape breaks as a divergence.

@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-41 — the folded homes' named readers re-pointed: the four `read_policy_key` copies, `read_modes`, `held_halves.py`, govkit's conf-key gap check and the placeholder arm, with the house-file arm
 
-**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base 923954b6 · streams playbook · order 3 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 923954b6 · streams playbook · order 3 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0485@43490b62 part 2/2
 
@@ -170,7 +170,7 @@ S3 grades gov's tree only once PLAY-dConvergedCharter-21 retires the seed.
   reads both homes there. Once every reader of S1 is re-pointed the table holds its two permanent
   rows, `read_modes`, which reads a home's history by revision, and the `.githooks/pre-push` source of
   the gate file, which binds only `mechanic` keys (unit 11 S5). Observed by AC7 and AC8.
-  **Readers:** by name: the readers of S1, `tools/policy/legacy-homes.txt`, and
+  **Readers:** by name: the readers of S1, `memory/project/legacy-homes.txt`, and
   `tools/policy/policy.py`, whose lists verb alone drains it. by value: `FOLDED_HOME_EXEMPT` in
   `tools/policy/check_policy.py`, whose transitional rows leave, and the folded readers
   PLAY-dConvergedCharter-11 S4 re-pointed, which read each held key from the policy file once it moves,
@@ -530,6 +530,7 @@ New arm: tools/push-main.test.sh · covers none · the `pm9` parity arm deleted 
   the permanent rows unit 11 S5 names) and 30 (M10: `read_modes` takes unit 11 S3's invalid-blob rule,
   AC3's `invalid-mid` cases); the consumes-from edge to PLAY-dConvergedCharter-11 names the absent-kit
   rule, the derived guard join and the invalid-blob rule.
+- rev-5 · 2026-11-22 · S2 · the **Readers:** by name: half re-pointed from `tools/policy/legacy-homes.txt` to `memory/project/legacy-homes.txt`, where TOOL-dWitnessedBar-20 moved it; nothing else moves. From the brief `2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief`.
 
 ## 10. Reuse audit
 

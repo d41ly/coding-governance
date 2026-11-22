@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-68
 
-# TOOL-dWitnessedBar-68 — builder return 1 (run `wf_7c8c96ec-c1d`), committed 14f441638
+# TOOL-dWitnessedBar-68 — builder return 1 (run `wf_7c8c96ec-c1d`), committed 52bcf7599
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-68 is built as rev-3 states. The spec's claims about current 
 
 ## Summary
 
-Pass commit 14f441638 on base f2160bb52. Subject names TOOL-dWitnessedBar-68; trailers are `Pass: TOOL-dWitnessedBar-68` and Co-Authored-By. The spec status is now CLOSED · rev-3 · 2026-11-21, a one-line header edit; the index generator also refreshed the spec's spec-records block.
+Pass commit 52bcf7599 on base f6bcc989c. Subject names TOOL-dWitnessedBar-68; trailers are `Pass: TOOL-dWitnessedBar-68` and Co-Authored-By. The spec status is now CLOSED · rev-3 · 2026-11-21, a one-line header edit; the index generator also refreshed the spec's spec-records block.
 
 What changed:
 - **S1** (tools/run-gates/run-gates.gov.test.sh, the AC12 arm): one `"$PYBIN" -c` call, with `$KITDIR` on `sys.path`. It clears run_fixture's git variables, runs `run_local_plant("clean", <mktemp -d>, lambda *a, **k: None)` and rewrites `<common-dir>/gate-verdict/<tree>` in binary. Every plant line except verdict, sha and reused_cache is kept byte for byte, followed by the 5 lines S1 lists. The call's last line prints `<sha> <record path>`. (DERIVED from the builder's probe)
@@ -36,6 +36,6 @@ Owed at the close (not run here):
 - The `New arm:` RED-first observation on run-gates.gov.test.sh: AC1-AC3, staged red by a verdict_backends.py whose read_tag_lines keeps the first of a repeated key.
 - AC4 is checked by a grep on the ledger at the close.
 
-Found, not caused by this unit: the shell-role seed (`sh_hygiene.py --shell-role --measure . :!memory/`) measures .githooks/pre-push at 1731, but its row says 1720. That row is unit 69's, from commit 298369174, and pre-push is unchanged since. So the portability leg is likely red at base on pre-push. I did not touch that row, because a widen from this unit would name the wrong cause.
+Found, not caused by this unit: the shell-role seed (`sh_hygiene.py --shell-role --measure . :!memory/`) measures .githooks/pre-push at 1731, but its row says 1720. That row is unit 69's, from commit 9ff80bb15, and pre-push is unchanged since. So the portability leg is likely red at base on pre-push. I did not touch that row, because a widen from this unit would name the wrong cause.
 
 Skipped commands: none.

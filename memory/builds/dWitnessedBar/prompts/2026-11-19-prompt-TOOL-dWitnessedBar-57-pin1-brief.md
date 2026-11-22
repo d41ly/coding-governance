@@ -24,7 +24,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    in Files touched with the legs its guard names on the gates section's leg line, and a prose-only mention named as
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
-   - This spec's rev-5 (`e4a3aa8c8`) reds `writing practice (records and units)` on one line: the pinned-facts check
+   - This spec's rev-5 (`1015352be`) reds `writing practice (records and units)` on one line: the pinned-facts check
      reads `§8 records one` in S21's fork text as the count `8 records`, with no id, path:line, PINNED or DERIVED.
 2. A choice the re-ground forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it
    RESOLVED in §8 with the delegated mark, and name it in your return.

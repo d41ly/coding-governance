@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-79
 
-# TOOL-dWitnessedBar-79 — builder return 1 (run `wf_7ea119b0-4e3`), committed 08f226f3d
+# TOOL-dWitnessedBar-79 — builder return 1 (run `wf_7ea119b0-4e3`), committed b9326245e
 
 ## Why
 
@@ -8,7 +8,7 @@ Unit 79 is built as rev-3 of its spec says, and the spec header is now CLOSED. I
 
 ## Summary
 
-Commit 08f226f3d (Pass: TOOL-dWitnessedBar-79) changes C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/run-gates/run-gates.gov.test.sh in three places.
+Commit b9326245e (Pass: TOOL-dWitnessedBar-79) changes C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/run-gates/run-gates.gov.test.sh in three places.
 - A new top-level function `check_key_variant <key>:<var> <replacement> <label> <passed reason> <other lead>`, whose variables are all local. It holds the old loop body: the one `<key>)` sed edit, the two diff counts and the `check_canary_keys` call. It returns 0 silently, or prints one reason and returns 1.
 - The per-key loop calls it twice per pair. First the tail variant, `'${_rg_v%?}'` with an empty label, so its four reasons are byte-identical. Then the length variant, `'${_rg_v:1}'` with label `length ` and reason `the length variant passed a value one byte short`. Each failed call's reason prints unit 74 S3's line and sets fail=1. A key joins rgf_seen only when both variants were seen red.
 - The arm's header comment names the length variant and says the `-ge 41` hole is not checked.

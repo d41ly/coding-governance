@@ -21,6 +21,7 @@
 | [2026-11-20-build-TOOL-dWitnessedBar-23-red-fix-84.md](../build/2026-11-20-build-TOOL-dWitnessedBar-23-red-fix-84.md) | red-fix | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-23-red-fix-85.md](../build/2026-11-20-build-TOOL-dWitnessedBar-23-red-fix-85.md) | red-fix | — |
 | [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
+| [2026-11-22-build-TOOL-dWitnessedBar-23-widen-33.md](../build/2026-11-22-build-TOOL-dWitnessedBar-23-widen-33.md) | widen | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
@@ -108,7 +109,7 @@ slot exists.
 ### Evidence
 
 - Ten slots exist and none is a tester: `tools/roles/agents/*.agent.md`, ten files DERIVED by
-  `ls tools/roles/agents/` at HEAD `8a98c9cf`, one of them, `gov-session`, `agent: false`.
+  `ls tools/roles/agents/` at HEAD `9cde7938`, one of them, `gov-session`, `agent: false`.
 - `gate-bar` is a `program` driver with `roles = []` (tools/roles/workflows.toml@d41e845e:68-74). R8
   refuses an agent or workflow driver with no role and says nothing of a program driver with one;
   the `handoff` workflow, also a program driver, lists `gov-session`
@@ -249,7 +250,7 @@ the descriptor rules that already cover the other ten.
   `grep -c 'KEEP|seed", 0) == 15' selftest.py` there prints 1.
   Red when: the overlay is not named in the seed list, so an adopter is never seeded it, or a typed
   count is left beside the roster it counts, or the seed preview keeps the 14 the new seed moves.
-  figure: 15 PINNED 2026-11-20, the HEAD `8a98c9cf` pin of 14 plus the one overlay this unit seeds.
+  figure: 15 PINNED 2026-11-20, the HEAD `9cde7938` pin of 14 plus the one overlay this unit seeds.
 - **AC4** — When `python tools/roles/render_agents.py --check` runs after the pass, it exits 0, and
   `python -c "import json,sys; r = json.load(open(sys.argv[1]))['roles']['gov-tester']; print(r['writes'], r['gates'])" .claude/roles.json`
   prints `none []`.
@@ -266,7 +267,7 @@ the descriptor rules that already cover the other ten.
   `role:gov-tester ['code-miss', 'spec-wrong'] ['code-miss', 'spec-wrong']`, and `python loop_lib.py
   --check` run there exits 0 and prints no line holding `role:gov-tester · pending`.
   Red when: the slot is absent, so `--check` still prints `item.test.attribute` and
-  `item.test.reason` as `pending`, two lines at HEAD `8a98c9cf`, DERIVED by that run; or the row's actor or outcome set
+  `item.test.reason` as `pending`, two lines at HEAD `9cde7938`, DERIVED by that run; or the row's actor or outcome set
   has moved off the two words this slot judges.
 
 ## 7. Gates
@@ -315,7 +316,7 @@ The pass adds no leg: `roles catalogue` and `roles render wiring` grade the slot
   `tools/roles/kit.toml`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing else
   moved.
 - rev-5 · 2026-11-20 · §3 · §4 · §5 · S4 · S5 · S6 · S7 · AC3 · AC4 · AC5 · AC6 · §8 · §10 ·
-  re-grounded at `8a98c9cf` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief: moved
+  re-grounded at `9cde7938` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief: moved
   lines blob-pinned and the rest cited as `path#symbol`; S7 edits nothing, since the
   `item.test.attribute` row already holds the actor, the two outcomes and their routes, and
   `tools/loop/loop.toml` leaves Files touched; S6 also re-pins the default plan's seed preview, 14
@@ -330,7 +331,7 @@ The seam extended is the roles kit's slot pair, `tools/roles/agents/<slot>.agent
 `tools/roles/house/<slot>.md`, rendered by `render_agents.py` and graded by `check_roles.py`, with
 `gov-skeptic` as the `writes: none` precedent; no new mechanism is built. `python
 tools/codebase-map/reuse_lookup.py "an agent role that judges a red gate as a code miss or a wrong
-spec"`, re-run at HEAD `8a98c9cf`, ranked `load_roles` and `RolesError` in `tools/roles/roles_lib.py`,
+spec"`, re-run at HEAD `9cde7938`, ranked `load_roles` and `RolesError` in `tools/roles/roles_lib.py`,
 `check_roles` and `loadRoleIndex`, the seam named and the index reader AC5 exercises, and
 `read_role_defaults` in `tools/loop/loop_lib.py`, the loop's read of the same catalogue, which is why
 the slot alone clears the `pending` lines AC6 reads. The rest were generic stems (`miss`,

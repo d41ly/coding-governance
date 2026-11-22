@@ -10,10 +10,10 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   table's order. This unit is build order 2.
 - Built so far: unit 26 (`7526c98fa`) — the `resolve_bash_py` block is `scan_bash(script, host)` with `BASH_NAMES`, its
   twin `scanBash`, name-keeping adapters at every site, and `scan_bare_bash` in `tools/run-gates/measure_legs.py`
-  behind `test_no_bare_bash_argv`. Unit 27 (`cc35bb62c`) — `tools/lib/refuse-wrong-shell.sh`, the refusal call in
+  behind `test_no_bare_bash_argv`. Unit 27 (`8b3aa5783`) — `tools/lib/refuse-wrong-shell.sh`, the refusal call in
   every `resolve_python` member, `wrong_shell_at` / `wrongShellAt` added to both resolver blocks (every copy
   byte-identical), and section `2n` of `tools/lib/resolve-python.test.sh`.
-- The spec is rev-4, re-grounded at `d08ded6f1`; each new inline copy of the `resolve_bash_py` block is the canonical
+- The spec is rev-4, re-grounded at `fed701a30`; each new inline copy of the `resolve_bash_py` block is the canonical
   at this pass's tip, unit 27's `wrong_shell_at` included, and the parity row finds it by its marker.
 - Unit 26's builder left one bug-class minor for the close review: `scan_bare_bash` hides the rest of a file whose
   block never closes. This unit widens shape 2 of that scanner; widen only what the spec states.

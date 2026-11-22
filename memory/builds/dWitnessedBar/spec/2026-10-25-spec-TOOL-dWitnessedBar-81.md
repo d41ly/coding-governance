@@ -94,7 +94,7 @@ last-byte test defeats the tail condition and must reach `TOOL-dWitnessedBar-80`
 
 ### Evidence
 
-Read at `c9500821b` on 2026-11-21.
+Read at `2bc0afda9` on 2026-11-21.
 
 - `spec/2026-10-25-spec-TOOL-dWitnessedBar-74.md` rev-3 §6 AC2 stages a `check_cr_reached` whose
   comparison is `true` and quotes `(it passed a value that lost its CR)`; its §7 New-arm line claims
@@ -102,7 +102,7 @@ Read at `c9500821b` on 2026-11-21.
   §6 AC2 quotes that reason for `rec_fp`, over a `check_canary_keys` that skips `rec_fp`.
 - The report's skeptics probed the `-ge 0` break on a unit-69-shaped loop: with the tail test kept,
   the `${_rg_v%?}` variant's mutant returned 1, so no line printed (ids 1, 7 and 18). Unit 74 §4
-  Evidence re-probed it at `921f83fff` with the same result.
+  Evidence re-probed it at `552b72210` with the same result.
 - At HEAD the per-key loop calls `check_key_variant` first with `'${_rg_v%?}x'`, label `'tail '` and
   `the tail variant passed a value whose last byte is not CR`, then with `'${_rg_v:1}'`, label
   `'length '` and `the length variant passed a value one byte short`.
@@ -131,7 +131,7 @@ None: no stored data changes.
 At the close, after every unit is terminal. The unit takes order 41 so that it sits beside the
 variants it observes. Dispatch is strictly sequential and sorts a tie by id string
 (`tools/workflows/unattended-build.js@c9500821b:78-82`, `:692-697`), so order 41's units 73, 76, 77,
-79 and 80, CLOSED at `71f212ad1`, `bdc10a4df`, `7228b0a9a`, `08f226f3d` and `a967359a8`, build before
+79 and 80, CLOSED at `563d828df`, `3596751cf`, `18907b769`, `b9326245e` and `c0310ecd8`, build before
 it, and it closes order 41. `TOOL-dWitnessedBar-87`, at order 42, writes unit 76's ledger and this
 unit's after it. Its records are written at the close, when the arm runs.
 

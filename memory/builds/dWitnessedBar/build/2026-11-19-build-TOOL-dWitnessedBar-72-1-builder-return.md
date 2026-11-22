@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-72
 
-# TOOL-dWitnessedBar-72 — builder return 1 (run `wf_17c7e5af-02a`), committed e0cf5fa919c763b735be4334ad7f86868091eb23
+# TOOL-dWitnessedBar-72 — builder return 1 (run `wf_17c7e5af-02a`), committed fa536b7cd90ea1f469146ee88bf13443a15ea603
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-72 is built as spec rev-4 describes. Before writing anything 
 
 ## Summary
 
-TOOL-dWitnessedBar-72 is committed as e0cf5fa919c763b735be4334ad7f86868091eb23 on base 001ee47f839d51c80be24619eee43cdac36bd703. AC1 and AC2 were observed by probe on this node; AC3 and the New arm's RED-first observation are owed to the main loop at the close.
+TOOL-dWitnessedBar-72 is committed as fa536b7cd90ea1f469146ee88bf13443a15ea603 on base c02a7d3a35d39b42d9cc3c0b1bb8ed840e999440. AC1 and AC2 were observed by probe on this node; AC3 and the New arm's RED-first observation are owed to the main loop at the close.
 
 **What changed** in C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/run-gates/run-gates.gov.test.sh:
 - The mutant subshell `rgf_mr` now measures `rec_fp` the same way it measures `rec_sha`, with the CR test reading `rgf_crb`.

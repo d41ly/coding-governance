@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 26.
 - Built so far through order 25: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59, 30 and
-  29 (`b0ad98958`: the `gate-warn` marker in 13 emitters, `scan_leg_warnings` in the runner). This spec, rev-6, was
-  re-grounded at `0f0e2ad5c`, before unit 29 landed.
+  29 (`79a4f9c20`: the `gate-warn` marker in 13 emitters, `scan_leg_warnings` in the runner). This spec, rev-6, was
+  re-grounded at `f063d1c73`, before unit 29 landed.
 - Unit 29 also edited `tools/memory-tree/check-memory-hygiene.sh` (in `check_cap_findings`, not check 23's awk), so the
   file's blob has moved past the one S8 pins: read check 23 at HEAD and treat a pin that no longer matches as a
   divergence only if check 23's own text moved.

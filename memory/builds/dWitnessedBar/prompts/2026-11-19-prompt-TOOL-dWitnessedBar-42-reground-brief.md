@@ -24,8 +24,8 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    in Files touched with the legs its guard names on the gates section's leg line, and a prose-only mention named as
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
-   - Built and landed through order 18: every unit up to and including 4 (`7a2701739`: the runner's per-tree verdict
-     record, the pre-push hook adopting only the pushed tree's GREEN record) and 25 (`55d911b39`: the verdict names
+   - Built and landed through order 18: every unit up to and including 4 (`153d4bdb2`: the runner's per-tree verdict
+     record, the pre-push hook adopting only the pushed tree's GREEN record) and 25 (`b843687cc`: the verdict names
      its `run_id` and `cause`, a failing leg's tail kept by hash as a `leg-tail` record, `keep_tails.py`).
    - Unit 40 (order 18) is being built now, in this working tree, and edits `tools/run-gates/run-gates.sh` and its
      evidence suite, which this spec also touches; it does not consume from unit 40. Read every file `git status`

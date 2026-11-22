@@ -179,7 +179,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 · section `2o` gain
   (HIGH, item H4; the same defect is id 2, item M2, in `TOOL-dWitnessedBar-62`).
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-63's
   consumes-from edge, promoted by the round-1 spec audit of units 58 to 62; nothing else moved.
-- rev-3 · 2026-11-19 · §4 · AC1 · §7 · §10 · re-grounded at `a30a26466` per brief
+- rev-3 · 2026-11-19 · §4 · AC1 · §7 · §10 · re-grounded at `632894bd1` per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-12-reground-brief: the fixture and the new arm name section
   `2o`, `TOOL-dWitnessedBar-13`'s factory section, where they cited its old `2l`; §4 Rollout reads
   unit 47 at order 6, one step after this unit, where it said the two shared order 5; the evidence

@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-20
 
-# TOOL-dWitnessedBar-20 — builder return 2 (run `wf_3119acf3-9ce`), committed 8f93133461be769b41b506188e02ab559036c02b
+# TOOL-dWitnessedBar-20 — builder return 2 (run `wf_3119acf3-9ce`), committed ec34083bdf2af143d5a8411390cef2cedd4d55b4
 
 ## Why
 
-Built TOOL-dWitnessedBar-20 from its rev-5 spec. Every claim the spec makes about the current code held when probed against the tree, so there was no divergence to report. The work is one pass commit, 8f9313346. Its spec status is CLOSED, it carries the `Pass: TOOL-dWitnessedBar-20` trailer, and every path it touches was declared in the dispatch's write set or is the acceptance ledger.
+Built TOOL-dWitnessedBar-20 from its rev-5 spec. Every claim the spec makes about the current code held when probed against the tree, so there was no divergence to report. The work is one pass commit, ec34083bd. Its spec status is CLOSED, it carries the `Pass: TOOL-dWitnessedBar-20` trailer, and every path it touches was declared in the dispatch's write set or is the acceptance ledger.
 
 ## Summary
 
-TOOL-dWitnessedBar-20 is built and committed: the legacy-homes list is now one ledger population keyed by conf and key (commit 8f93133461be769b41b506188e02ab559036c02b, base abf06676dfb430ec05e00414258f70121fca93a2). Every criterion is either observed by a probe here or listed below as owed to the close.
+TOOL-dWitnessedBar-20 is built and committed: the legacy-homes list is now one ledger population keyed by conf and key (commit ec34083bdf2af143d5a8411390cef2cedd4d55b4, base 4dd5ab1d928cbfe20b79875b178d12cc2a080a4f). Every criterion is either observed by a probe here or listed below as owed to the close.
 
 **What changed:**
 - **The list:** `tools/policy/legacy-homes.txt` moved by `git mv` to `C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/project/legacy-homes.txt`. It was rewritten through the factory's `write_rows` into the ledger grammar: the 114 keys the list held at the run's base 9e21ac76, each row with count 1, that base sha and `seeded`. (DERIVED from the builder's probe)

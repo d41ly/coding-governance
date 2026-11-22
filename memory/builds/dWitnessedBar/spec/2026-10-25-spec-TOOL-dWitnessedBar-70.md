@@ -31,11 +31,11 @@ The round-1 spec audit of units 66 and 67
 confirmed finding **id 10 at BLOCKER**, report item **B1**, the round's one blocker. No other id
 shares that item.
 
-When `TOOL-dWitnessedBar-66` was built (`a04b24c97`), the hook read each key through `$(awk ...)`. On
+When `TOOL-dWitnessedBar-66` was built (`e3cdc2201`), the hook read each key through `$(awk ...)`. On
 Git for Windows, and on the `windows-latest` CI the bar runs on, gawk reads in text mode and bash
 `$(...)` drops a trailing CR-LF. So with the CR strip removed `rec_sha` stayed forty bytes, unit 66's
 staged red "CR strip removed" stayed green, and its ledger records that half as owed to this unit's
-S3. `TOOL-dWitnessedBar-69` (`298369174`) replaced those reads with one `IFS= read -r` loop and one
+S3. `TOOL-dWitnessedBar-69` (`9ff80bb15`) replaced those reads with one `IFS= read -r` loop and one
 `${_rg_v%$'\r'}` strip. The break now reds on this node: unit 67's builder saw it red on `rec_fp`,
 and this re-ground's probe saw it red on `rec_sha` (§4 Evidence). Nothing keeps it that way. A later
 read that eats the CR again would leave the arm green and the strip unexercised.
@@ -113,7 +113,7 @@ after unit 69 within that order.
   ends in CR-LF gave 81 bytes with no CR on this node (PINNED 2026-10-25, GNU Awk 5.4.0).
   Unit 66's ledger, beside AC2, records the strip-less copy green under unit 66's awk reads, at
   40 bytes (PINNED 2026-11-21 by that ledger).
-- Probed at `d31bef203` (PINNED 2026-11-21) under `uname -s` `MINGW64_NT-10.0-22621`, bash 5.3.9
+- Probed at `09b2a2c2e` (PINNED 2026-11-21) under `uname -s` `MINGW64_NT-10.0-22621`, bash 5.3.9
   `x86_64-pc-cygwin` and git 2.54.0.windows.1 (PINNED 2026-11-21). The arm's own lines, cut from the
   gov suite from `rgf_t=$(mktemp -d)` to `rm -rf "$rgf_t"`, built the `clean` plant's record. A
   prototype canary over HEAD's cut had its `diff` count one line, and the mutant read `rec_sha` as
@@ -154,8 +154,8 @@ None: no stored data changes.
 ### Rollout
 
 Live at landing, at order 39, the last of that order. It follows `TOOL-dWitnessedBar-66` (38, CLOSED
-at `a04b24c97`), and `TOOL-dWitnessedBar-69`, `TOOL-dWitnessedBar-68` and `TOOL-dWitnessedBar-67`
-(CLOSED at `298369174`, `14f441638` and `e1d569fc9`). The dispatch edge refusal
+at `e3cdc2201`), and `TOOL-dWitnessedBar-69`, `TOOL-dWitnessedBar-68` and `TOOL-dWitnessedBar-67`
+(CLOSED at `9ff80bb15`, `52bcf7599` and `af84e1a7a`). The dispatch edge refusal
 (`tools/unattended/unattended.sh#verb_dispatch`) holds this unit until 66 and 69 are CLOSED, and
 both are.
 

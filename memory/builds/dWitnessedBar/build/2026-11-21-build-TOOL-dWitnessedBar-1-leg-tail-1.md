@@ -5,7 +5,7 @@
 - **Leg:** drift-audit records
 - **Hash:** b930f547759c2f680a7db50efcbc1928921f3593
 - **Run:** unattended-179529481580044524711-1640412
-- **Sha:** 079d8513ce2ba90ffd4755b9b8677ab9b4bba1ee
+- **Sha:** f9ee3f8e0f2e994c7bad52ae0779fcf31c9c94db
 - **Cause:** run:dWitnessedBar
 
 ```
@@ -14,7 +14,7 @@ lexicon: 8 file(s) not graded here — kit files .governance/install.json instal
 
 drift-report: non_terminal_specs_cited_by_product_source = 2 against drift-baselines (1 listed) — this set is shrink-only
   new   PLAY-dClosedLoop-1 — an offender the set does not list: remove its cause, never list it
-# drift-report at 079d8513 (base refs/remotes/origin/main @ c2a407b0) · kit 1.35
+# drift-report at f9ee3f8e (base refs/remotes/origin/main @ c2a407b0) · kit 1.35
 # dead-for-N: 173 readings recorded at C:\projects\coding-governance\.git\drift-history.tsv · limit 10
 # signal                                             value     of  status
   lexicon_marginal_offense_rate                        968  10214  report only, no pin

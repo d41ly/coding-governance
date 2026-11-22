@@ -92,7 +92,7 @@ the population becomes a predicate the arm derives, and the hook gains its refus
 
 ### Evidence
 
-Measured at `d08ded6f1` on 2026-11-19, the tree as built through unit 26:
+Measured at `fed701a30` on 2026-11-19, the tree as built through unit 26:
 
 - The hook resolves python lazily. `resolve_hook_python` (`.githooks/pre-commit#resolve_hook_python`)
   runs `r=$(git ls-files -- '*resolve-python.sh' | head -n 1)`, then `. "./$r"` and
@@ -178,7 +178,7 @@ Live at landing, one step after `TOOL-dWitnessedBar-27`.
   derived population count, names S2's three exclusions each with its reason, and exits 0;
   `grep -c 'refuse_wrong_shell || exit 2' .githooks/pre-commit` prints 1.
   Red when: the population is a typed list, so `.githooks/pre-commit` is not a member.
-  figure: the count is DERIVED at the run; §4 Evidence pins 89 at `d08ded6f1`.
+  figure: the count is DERIVED at the run; §4 Evidence pins 89 at `fed701a30`.
 - **AC2** — When `wsl.exe -e bash .githooks/pre-commit` runs with its working directory at this
   worktree's root on node d and nothing staged, it exits 2 with the `refuse_wrong_shell:` lines
   before any other output.
@@ -241,7 +241,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC1 AC3 · the coverage arm 
   `tools/check-line-length.sh`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief;
   nothing else moved.
 - rev-4 · 2026-11-19 · §1 · S2 S3 S4 · §3 · §4 · §5 · AC1 AC2 AC3 · §7 · §8 · §10 · re-grounded at
-  `d08ded6f1` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-50-reground-brief, against unit 27's
+  `fed701a30` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-50-reground-brief, against unit 27's
   rev-5 spec: the population is re-pinned at 89 (PINNED) with its probe stated; S2 names
   `tools/unattended/pass-tree.sh` and `tools/unattended/pass-tree.test.sh` beside
   `lib-unattended.sh` (F3); S3 leaves `tools/check-line-length.sh` and `tools/playbook/adopt-playbook.sh`
@@ -256,9 +256,9 @@ The seams are unit 27's `refuse-wrong-shell.sh`, which gains the `--coverage` mo
 its coverage arm in `tools/lib/resolve-python.test.sh`, whose population this unit derives from a
 predicate in place of a list; its `refuse_wrong_shell` parity row, whose copy grep already reads the
 hooks; and the hook's own inline-copy shape. `python tools/codebase-map/reuse_lookup.py "derive the
-entry points that must refuse a wrong shell"`, re-run at `d08ded6f1` on 2026-11-19, ranked
+entry points that must refuse a wrong shell"`, re-run at `fed701a30` on 2026-11-19, ranked
 `PolicyRefused`, `CensusRefused`, `ScopeRefused`, `derive_kit_prefix` and other `derive_*` stems, none
 a shell-entry census; no existing seam fits beyond the arm. The recall probe returned scout C's row,
-the build brief's line for unit 27 and unit 27's own §10; none disagreed with source at `d08ded6f1`.
+the build brief's line for unit 27 and unit 27's own §10; none disagreed with source at `fed701a30`.
 
 Recall terms used: `python tools/memory-recall/query.py "which shell entry points must refuse WSL bash on a windows checkout" --terms "refuse_wrong_shell pre-commit resolve_python population coverage arm entry point WSL mnt predicate"`

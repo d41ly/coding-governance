@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-43
 
-# TOOL-dWitnessedBar-43 — builder return 1 (run `wf_a0729b11-8b2`), committed 5308f3c08e6c456920728c56d4f64e56515ff547
+# TOOL-dWitnessedBar-43 — builder return 1 (run `wf_a0729b11-8b2`), committed e940250ece012352c65c2de142e470e58d7782cf
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-43 is built from its rev-5 spec as written. Before writing, I
 
 ## Summary
 
-I committed one pass commit, 5308f3c08 (subject names TOOL-dWitnessedBar-43; trailers are Decided lines, `Pass: TOOL-dWitnessedBar-43` and `Co-Authored-By: Claude Opus 5` as the charter fact says). The same commit sets the spec's status header to CLOSED (date already 2026-11-20), adds the acceptance ledger, includes RUN.md, and includes the files `gen_build_index.py --write` rewrote: the build README, memory/LIVE.md, memory/backlog/TOOL.md and the spec's generated records region. The pre-commit and commit-msg hooks passed.
+I committed one pass commit, e940250ec (subject names TOOL-dWitnessedBar-43; trailers are Decided lines, `Pass: TOOL-dWitnessedBar-43` and `Co-Authored-By: Claude Opus 5` as the charter fact says). The same commit sets the spec's status header to CLOSED (date already 2026-11-20), adds the acceptance ledger, includes RUN.md, and includes the files `gen_build_index.py --write` rewrote: the build README, memory/LIVE.md, memory/backlog/TOOL.md and the spec's generated records region. The pre-commit and commit-msg hooks passed.
 
 **What changed**
 - `C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/run-gates/remote_verdict.py`: the source check is now one function, `check_pin_source(backend, sha, keys, repo=".")`. `read_remote_verdict` calls it for both its no-pin return and its source check, so no remote-ci state changes.

@@ -55,7 +55,7 @@ ids TOOL-bConvergentLodestar-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-bConvergentLodestar-1 — reuse-convergence layer for codebase-map](spec/2026-07-22-spec-bConvergentLodestar-1.md) | — | 2 | SPECCED | rev-2 | 2026-07-22 |
+| [TOOL-bConvergentLodestar-1 — reuse-convergence layer for codebase-map](spec/2026-07-22-spec-bConvergentLodestar-1.md) | — | 2 | SPECCED | rev-3 | 2026-11-22 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).

@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-57
 
-# TOOL-dWitnessedBar-57 — builder return 1 (run `wf_87c41b7b-f8c`), committed 593e58112e339b2046d12463c97f5238ea712afb
+# TOOL-dWitnessedBar-57 — builder return 1 (run `wf_87c41b7b-f8c`), committed 508c18b1649db85025565964fc77303192310228
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-57 is built as the spec states and committed. I checked every
 
 ## Summary
 
-Pass commit 8359ae2b8ec35e742dcc26a1fa59f274ea5a1041 carries `Pass: TOOL-dWitnessedBar-57`. The bug-class checklist over it selected line-claim-matched-over-the-whole-output, and that found a real defect: the `held` fixture's no-`--selection` check could pass off the previous run's output line, which also contains `--selection`. Fix commit 593e58112e339b2046d12463c97f5238ea712afb (also `Pass: TOOL-dWitnessedBar-57`) makes it read only the error lines that run printed.
+Pass commit e63ac250389a711df5aa3c4320327589b07e14cf carries `Pass: TOOL-dWitnessedBar-57`. The bug-class checklist over it selected line-claim-matched-over-the-whole-output, and that found a real defect: the `held` fixture's no-`--selection` check could pass off the previous run's output line, which also contains `--selection`. Fix commit 508c18b1649db85025565964fc77303192310228 (also `Pass: TOOL-dWitnessedBar-57`) makes it read only the error lines that run printed.
 
 What was built:
 - **S1, S3, S4** (`tools/lib/refuse-wrong-shell.sh`): both readers now share one call test. A call is `$(resolve_python`, or `resolve_python` as the first word of a command, indented or after `;`, `&`, `|`, `!` or `if`/`then`/`do`/`else`. A `resolve_python()` definition is never counted as a call. `--coverage` now prints a `dropped:` line naming `tools/lib/resolve-python.sh` with its reason.

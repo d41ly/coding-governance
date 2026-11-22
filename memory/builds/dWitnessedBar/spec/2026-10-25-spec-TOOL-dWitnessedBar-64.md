@@ -104,7 +104,7 @@ resolve to a commit, and holds it with one corrupt-state fixture beside each cle
 ### Evidence
 
 All of these were probed with git 2.54.0.windows.1 in scratch repositories under `%TEMP%` on
-2026-10-25, and re-probed at HEAD `dc5d941a3` with the same results (PINNED 2026-11-21):
+2026-10-25, and re-probed at HEAD `02ed06b1a` with the same results (PINNED 2026-11-21):
 
 | state | `rev-parse --verify -q HEAD` | `HEAD^{commit}` form | `symbolic-ref -q HEAD` | `for-each-ref <ref>` |
 |---|---|---|---|---|

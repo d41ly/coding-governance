@@ -1,10 +1,10 @@
-# TOOL-dWitnessedBar-23 red-fix 85 — method carriers (every pointer declared) fixed in 9b3a50c5
+# TOOL-dWitnessedBar-23 red-fix 85 — method carriers (every pointer declared) fixed in 11a11dd9
 
 **Serves:** red-fix TOOL-dWitnessedBar-23
 
 - **Leg:** method carriers (every pointer declared)
 - **Red line:** the rendered gov-tester agent names BUILD-METHOD.md and was undeclared
-- **Files:** help/roles.md, memory/builds/dWitnessedBar/README.md, memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-23-1-builder-return.md, memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-42-1-acceptance-ledger.md, memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md, memory/project/method-carriers.txt
-- **Commit:** 9b3a50c5df8bc4a32a7894983359aa6e7d875992
-- **Rerun:** bash tools/run-gates/pass-legs.sh --base 853fc00ea9ce7d8b67d14cdcf15f94cedd45bd12
+- **Files:** help/roles.md, memory/builds/dWitnessedBar/README.md, memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-23-1-builder-return.md, memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-42-1-acceptance-ledger.md, memory/project/method-carriers.txt
+- **Commit:** 11a11dd97f34c8eabac622560b78d23c41470a83
+- **Rerun:** bash tools/run-gates/pass-legs.sh --base 367eac1e471a96cb0222b523210e130ab4da1e2e
 - **Caused-by:** TOOL-dWitnessedBar-23

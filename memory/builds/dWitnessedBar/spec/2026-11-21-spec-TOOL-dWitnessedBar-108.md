@@ -31,7 +31,7 @@ The closing diff review's round 1
 (`memory/builds/dWitnessedBar/reviews/2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md`)
 read CLEAN WITH FIXES with six confirmed findings. Its two HIGHs are their own units. This unit takes
 the four minors, each by the class-level fix and the left-shift gate the record carries, re-derived
-against the code at `63be790a2`, so each class reds when it recurs.
+against the code at `fcd4c95d8`, so each class reds when it recurs.
 
 | Report item | Severity | Finding | Lands on | Scope items |
 |---|---|---|---|---|
@@ -101,10 +101,10 @@ S11 keeps the pages that describe the changed behaviour current.
 - A guard change on any leg. §8 F1 homes the M1 arm where no guard needs one.
 
 This unit edits only the built code of CLOSED units, never their specs. `TOOL-dWitnessedBar-10`
-built `read_staged` (`d15371e5e`), `TOOL-dWitnessedBar-16` built the ledger conversions of the four
-populations and the scaffold's two typed headers (`87bc9f615`), `TOOL-dWitnessedBar-30` built
-`run_quiet_leg` (`7b918f7e0`), and `TOOL-dWitnessedBar-2` built the `Commit-Checked:` write
-(`7f3e24092`), each found by its `Pass:` trailer.
+built `read_staged` (`b671830d8`), `TOOL-dWitnessedBar-16` built the ledger conversions of the four
+populations and the scaffold's two typed headers (`3a7a51471`), `TOOL-dWitnessedBar-30` built
+`run_quiet_leg` (`ceeac2dcf`), and `TOOL-dWitnessedBar-2` built the `Commit-Checked:` write
+(`c8727978d`), each found by its `Pass:` trailer.
 
 ### Edges
 
@@ -124,7 +124,7 @@ the return says the split exists.
 
 ### Evidence
 
-Read on 2026-11-21 at `63be790a2`, the run branch's HEAD.
+Read on 2026-11-21 at `fcd4c95d8`, the run branch's HEAD.
 
 - `tools/run-gates/precommit.py#read_staged` runs `git diff --cached --name-only --diff-filter=ACMR -z`.
   `tools/run-gates/run-gates.sh@04da8977:599` defines `changed` as
@@ -144,12 +144,12 @@ Read on 2026-11-21 at `63be790a2`, the run branch's HEAD.
   header nor an unarmed line, and `#read_home_state` reads a header with no row as armed.
 - Probed: an `-I -c` program putting `tools/memory-tree` on `sys.path`, reading its `kit.toml` with
   `tomllib` and calling `render_header` on a `types.SimpleNamespace` of the population's table printed
-  lines equal to the first lines of gov's six homes at `63be790a2`.
+  lines equal to the first lines of gov's six homes at `fcd4c95d8`.
 - Probed: a tree scaffolded today from a stand-in conf, `registry_to_ledger.py witness` exited 1 for
   each of the four homes, printing `is in its legacy grammar: not applied`, and 0 for readme-contract
   and method-carriers.
 - `tools/memory-tree/kit.toml@f835ca7c` carries 16 `[[ledger]]` tables and 14 `*-to-ledger`
-  `[[upgrade]]` rows (DERIVED 2026-11-21 by `grep -c` at `63be790a2`), each with a `witness` argv in
+  `[[upgrade]]` rows (DERIVED 2026-11-21 by `grep -c` at `fcd4c95d8`), each with a `witness` argv in
   the `{gov}` and `{target}` grammar, eight through `registry_to_ledger.py` and six through
   `conf_pins_to_ledger.py`.
 - `tools/memory-tree/check-arms.py#parse_pin` reads pins through `read_rows` with `PIN_FIELDS`, the
@@ -173,7 +173,7 @@ Read on 2026-11-21 at `63be790a2`, the run branch's HEAD.
 - `AGENTS.md@71a6071e:278` reads ``- **Commit trailer:** every agent commit ends with `Co-Authored-By:
   Claude Opus 5 <noreply@anthropic.com>`.``, rendered from
   `coding-governance-agents.template.md`'s `{{COMMIT_TRAILER}}` line.
-- `git log --format=%B 9e21ac760dc0..63be790a2 | grep -o 'Co-Authored-By: Claude Opus [0-9.]*' | sort |
+- `git log --format=%B 9e21ac760dc0..fcd4c95d8 | grep -o 'Co-Authored-By: Claude Opus [0-9.]*' | sort |
   uniq -c` printed 258 `Opus 5` and 287 `Opus 5.5` (DERIVED 2026-11-21).
 - `tools/unattended/unattended.sh#check_commit_message` returns 0 before any check where no run binds
   the branch, reads the message through `commit_trailers.py message`, and returns 0 at

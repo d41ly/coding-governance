@@ -4,7 +4,7 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass, the naming lexicon's `--suggest`
 and the command factory's own `loop command conformance` run excepted. The criteria were observed on
-node d, 2026-11-20, at base `0b01f7ccd`, by `seen_red.py --fixture` over its five scratch
+node d, 2026-11-20, at base `8614bf41c`, by `seen_red.py --fixture` over its five scratch
 repositories, by the ratchet plant `populated-seen-red` called in process over a scratch repository,
 by the new memory-hygiene self-test block extracted into a scratch script with `hit` and the counters
 stubbed, by check 23's ledger awk extracted from the engine and run over a scratch ledger, and by

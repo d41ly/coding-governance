@@ -155,7 +155,7 @@ That is 25 MEDIUM and 14 LOW findings by raw id.
   a new `PARITY_ROWS` row in `tools/lib/resolve-python.test.sh`, as unit 51 S21 carries
   `hold_predicate`. Observed by AC11.
 - **S18** — id 29. Every `drift_report.py --gate-health` caller passes `--selection`. Present at HEAD
-  (unit 57 S18, `8359ae2b8`): the mode exits 2 without it, `verdict_flow.py`'s `write_gate_health`
+  (unit 57 S18, `e63ac2503`): the mode exits 2 without it, `verdict_flow.py`'s `write_gate_health`
   passes the run's selection or an empty temporary file, and the drift-audit selftest's fixture loop
   passes an empty file. Left, as unit 57's builder return names: the call `tools/run-gates/README.md`'s
   `flakes` paragraph and `tools/drift-audit/README.md`'s gate-health section spell gains `--selection`;
@@ -166,7 +166,7 @@ That is 25 MEDIUM and 14 LOW findings by raw id.
 - **S19** — id 30. Present at HEAD: unit 57 re-pinned its probe and its AC1 compares `--coverage`'s
   `derived from <n> files` figure, taken before the named exclusions, so unit 50's exclusion of
   `tools/unattended/lib-unattended.sh` no longer parts the two. The §4 probe, on S25's predicate, prints
-  `86 10 96` and the tool `derived from 96 files` (PINNED 2026-11-20 at `4cf1a82ca`). Observed by AC13.
+  `86 10 96` and the tool `derived from 96 files` (PINNED 2026-11-20 at `eb94d2c32`). Observed by AC13.
 - **S20** — id 33. `tools/unattended/README.md`'s `[[generated]]` paragraph names the conf form alone
   and says selfcheck refuses any other shape. It and the header comment above
   `resolve_generated_indexes` name both `when` forms, the tokens `exists:` resolves (`{prefix}`,
@@ -200,7 +200,7 @@ That is 25 MEDIUM and 14 LOW findings by raw id.
 - **S26** — id 22. The coverage arm carries a caller in each spelling unit 57 S1 missed:
   `elif resolve_python`, `while resolve_python`, `$( resolve_python )`, a backtick call and
   `{ resolve_python; }`. The built tree's count does not move.
-  It stays `derived from 96 files`, 93 members (PINNED 2026-11-20 at `4cf1a82ca`). Observed by AC17.
+  It stays `derived from 96 files`, 93 members (PINNED 2026-11-20 at `eb94d2c32`). Observed by AC17.
 - **S27** — id 44. Present at HEAD (unit 57 S11): `tools/lib/legacy_ledger.py#check_home_admitted`
   unarms `outside the tree <path>` a home with any path component `.git`, case folded, one inside the
   git dir, and one whose path relative to the work tree climbs out of it, as a linked worktree's common
@@ -298,7 +298,7 @@ as an acceptance input (clause 2). One unit holds them, building after every uni
 
 ### Evidence
 
-Read at HEAD `4cf1a82ca`, 2026-11-20.
+Read at HEAD `eb94d2c32`, 2026-11-20.
 
 - `regen.build_items` skips a row lacking all of `write`, `check` and `stage` before it reads `when`;
   `check_when` raises `Refusal` with no per-row catch and refuses an empty `exists:` path, and tests no
@@ -310,7 +310,7 @@ Read at HEAD `4cf1a82ca`, 2026-11-20.
   `_check_exists_refused` (`tools/govkit/govkit.py#selfcheck`).
 - `read_gate_policy` refuses `/*|[A-Za-z]:*|..|../*|*/..|*/../*` (`tools/unattended/unattended.sh#read_gate_policy`).
 - `build_commit` matches attribution tokens through `read_attribution_tokens` and excludes the build
-  folder (`tools/unattended/lib-unattended.sh#build_commit`); at HEAD AC10's call prints `fe49c7d2a`,
+  folder (`tools/unattended/lib-unattended.sh#build_commit`); at HEAD AC10's call prints `6d1261958`,
   unit 24's pass.
 - The floors are `-ge` checks on executed assertions
   (`tools/memory-tree/check-memory-hygiene.test.sh@4cf1a82ca:5255`).
@@ -318,7 +318,7 @@ Read at HEAD `4cf1a82ca`, 2026-11-20.
 
 ### The coverage probe (S19, S25, S26)
 
-Measured 2026-11-20 at `4cf1a82ca`. PINNED: 86 block carriers, 10 callers, 96, as `--coverage` prints
+Measured 2026-11-20 at `eb94d2c32`. PINNED: 86 block carriers, 10 callers, 96, as `--coverage` prints
 `derived from 96 files`. The class reading S25 rejects prints `86 11 97` (PINNED, the same day; §8 F5).
 
 ```
@@ -464,7 +464,7 @@ S18, S28 and S30 are observed by the main loop at the close, on the tree they gr
 - **AC13** — When the §4 coverage probe runs, it prints `86 10 96`, and `bash refuse-wrong-shell.sh
   --coverage` in `tools/lib/` prints `derived from 96 files` (PINNED 2026-11-20, the §4 coverage probe).
   Red when: the figure and the tool's count part.
-  figure: 96 is PINNED at `4cf1a82ca`, measured 2026-11-20.
+  figure: 96 is PINNED at `eb94d2c32`, measured 2026-11-20.
 - **AC14** — When `grep -n 'exists:' tools/unattended/README.md tools/unattended/lib-unattended.sh` runs,
   it names the README's `when` paragraph and the reader's header comment, and each names the absolute
   and `..` refusal and the absent-path skip.
@@ -560,7 +560,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC11 AC17 AC18 · the `selec
   widens: none · relaxes: none
 - **F5 — Which call predicate does S25 take?** Forced by the re-ground: a class reading of every
   `resolve_python` word selects `tools/lib/refuse-wrong-shell.sh` through its own call reader's regex.
-  The probe then prints `86 11 97` (PINNED 2026-11-20 at `4cf1a82ca`). Options: (a) that class reading;
+  The probe then prints `86 11 97` (PINNED 2026-11-20 at `eb94d2c32`). Options: (a) that class reading;
   (b) the class reading with quoted and regex text read out; (c) unit 57's contexts widened by the
   missed ones, a `#` before the match no call. (a) moves the tool's `derived from` count and parts unit
   57's AC1 from its probe, so veto 1 discards it. (b) and (c) meet AC17; (b) leaves multi-line quotes and
@@ -580,7 +580,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC11 AC17 AC18 · the `selec
 - rev-4 · 2026-11-19 · S23 · §3 · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-rename-brief: S23
   and the Edges bullet name unit 52's conf read `read_root_confs`, the name its rev-6 gives it; nothing
   else moved.
-- rev-5 · 2026-11-20 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · §8 F4 F5 · §10 · re-grounded at HEAD `4cf1a82ca`
+- rev-5 · 2026-11-20 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · §8 F4 F5 · §10 · re-grounded at HEAD `eb94d2c32`
   per brief 2026-11-19-prompt-TOOL-dWitnessedBar-62-reground-brief: every citation by symbol or
   blob-pinned; S9, S12, S14, S15, S19, S21, S24, S29, S31 and S34 read present at HEAD, and S27 and
   S35 keep only their arm cases; S5's P takes a listing run's `armed` lines (F4) and S25 widens the

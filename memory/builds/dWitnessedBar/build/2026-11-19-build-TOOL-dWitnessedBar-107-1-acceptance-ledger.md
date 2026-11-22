@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dWitnessedBar-107
 
-No merge bar, no self-test suite and no gate leg ran in this pass. Its pass-time probes ran on node d, 2026-11-21, from base `45fff6c26`: the unit's own CLI, `python tools/run-gates/verdict_backends.py --fixture --plant peer-stale-slot`, over the scratch repository the plant makes, ssh-keygen running; grep and the shell-role measure over the edited files. Every line marked OWED is the main loop's at the close, after the last unit is terminal: the gov canary, the New arm's RED-first observation against the base `run_verify_peer`, and the legs §7 names.
+No merge bar, no self-test suite and no gate leg ran in this pass. Its pass-time probes ran on node d, 2026-11-21, from base `55fa356b3`: the unit's own CLI, `python tools/run-gates/verdict_backends.py --fixture --plant peer-stale-slot`, over the scratch repository the plant makes, ssh-keygen running; grep and the shell-role measure over the edited files. Every line marked OWED is the main loop's at the close, after the last unit is terminal: the gov canary, the New arm's RED-first observation against the base `run_verify_peer`, and the legs §7 names.
 
 **Evidences:** TOOL-dWitnessedBar-107
 - AC1 — `at run r0, a record it did not write` — at the pass, scenario 1 printed `exit 1 · owed 1` and `held`, its line `not published: the bar exited 1 and left gate-verdict/<t8> at run r0, a record it did not write`, and scenario 4 held with `verdict refs: 0`. OWED: the canary's `peer-stale-slot:0` case, and its RED-first observation against the base `run_verify_peer`, at the close.

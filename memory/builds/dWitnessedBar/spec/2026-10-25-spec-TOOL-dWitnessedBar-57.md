@@ -81,7 +81,7 @@ That is 12 MEDIUM and 12 LOW findings by raw id.
   `refuse-wrong-shell.sh`" when a line matches `^\s*(\.|source)\s+\S*refuse-wrong-shell\.sh`, the
   `--coverage` arm's own `git grep -E`. Observed by AC1.
 - **S2** — id 19. The population figure is re-pinned by the §4 probe, stated verbatim.
-  It prints 86 block carriers and 10 callers, 96, at `60b2d421a` (PINNED 2026-11-20).
+  It prints 86 block carriers and 10 callers, 96, at `20e6f7ab3` (PINNED 2026-11-20).
   The whitespace-tolerant reading that keeps definitions, and the column-0 reading `--coverage` runs at
   HEAD, give the same 10 callers there (PINNED 2026-11-20). Observed by AC1.
 - **S3** — id 51. An indented stub `resolve_python() { echo bash; }` is a definition and never makes its
@@ -136,7 +136,7 @@ That is 12 MEDIUM and 12 LOW findings by raw id.
   LF in `tools/govkit/steps/inherited_red.py#render_gate_rest`, takes out only the lines
   `TOOL-dWitnessedBar-55` S3 names, and keeps every other byte, line ends included. This pass adds the
   LF and CRLF arm §7 names. Observed by AC12.
-- **S15** — id 31. Present at HEAD (`TOOL-dWitnessedBar-21` S8, `cd03e4e75`):
+- **S15** — id 31. Present at HEAD (`TOOL-dWitnessedBar-21` S8, `744515922`):
   `tools/runlog/record.py#EXCLUDED_KINDS_BEFORE_FIX_OF` is the excluded set less `fix-of`;
   `EXCLUDED_KINDS_BEFORE_REFUSAL` and `EXCLUDED_KINDS_BEFORE_HOLD` derive from it, so they leave `fix-of`
   out as well; the `excluded rows` fact admits a template rendered from each set. Observed by AC13.
@@ -160,7 +160,7 @@ That is 12 MEDIUM and 12 LOW findings by raw id.
   unit's §7 names `spec-tokens self-test`; and unit 51's pass commit touches no path outside `memory/` that
   its Files touched omits, `tools/memory-tree/merge-rows.py`, `tools/memory-tree/merge-rows.test.sh` and
   `tools/run-gates/keep_tails.py` among those it lists. Observed by AC17.
-- **S20** — id 30. Present at HEAD (`TOOL-dWitnessedBar-54`, `c647b572e`):
+- **S20** — id 30. Present at HEAD (`TOOL-dWitnessedBar-54`, `da620a77f`):
   `tools/govkit/govkit.py#selfcheck` grades a `[[generated]]` row's `exists:` `when` through its nested `_check_exists_refused`, which refuses
   an `exists:` with no path, so gov's factory row passes and a pathless one fails; this unit's §7 names
   `govkit selfcheck`, the leg unit 45's §7 never names. Observed by AC18.
@@ -187,7 +187,7 @@ That is 12 MEDIUM and 12 LOW findings by raw id.
   defers it: no item here needs them. This unit's ids 7 and 46 (S12, S17) are the report of units 40 to
   51's, a separate numbering, and build here.
 - An edge onto `TOOL-dWitnessedBar-21`, whose S8 (§8 F5) built S15 (id 31): that spec is CLOSED and
-  declares no hands-off here, so S15 names it and its commit `cd03e4e75`, and id 31 leaves the unit 51
+  declares no hands-off here, so S15 names it and its commit `744515922`, and id 31 leaves the unit 51
   edge.
 
 ### Edges
@@ -216,7 +216,7 @@ That is 12 MEDIUM and 12 LOW findings by raw id.
 
 ### Evidence
 
-- `resolve_python` callers at `60b2d421a`: the 10 the §4 probe prints (PINNED 2026-11-20).
+- `resolve_python` callers at `20e6f7ab3`: the 10 the §4 probe prints (PINNED 2026-11-20).
   `tools/check-line-length.sh` and `tools/playbook/adopt-playbook.sh`, callers at the base, carry a block
   at HEAD; `tools/push-main.test.sh` and `tools/unattended/unattended.test.sh` carry one beside their
   indented stub definitions.
@@ -241,7 +241,7 @@ That is 12 MEDIUM and 12 LOW findings by raw id.
 
 ### The two pinned probes (S2, S8)
 
-Measured 2026-11-20 at `60b2d421a`. The first reads the working tree; the second reads blobs at
+Measured 2026-11-20 at `20e6f7ab3`. The first reads the working tree; the second reads blobs at
 `cdfbd1cf`:
 
 ```
@@ -425,14 +425,14 @@ S4, S5, S14, S15 and S19 at HEAD. No path here is on the `watch:` line of
   Red when: a shell file main grew exceeds its row on the merge the bar grades.
 - **AC15** — When the §4 pass-commit rule runs for `TOOL-dWitnessedBar-28` while the run defers it, it
   prints nothing and the derivation refuses naming the id; for `TOOL-dWitnessedBar-24` it prints
-  `fe49c7d2a`'s SHA, and for `TOOL-dWitnessedBar-6` the older of its two, `aecf1c95a`, never `ad002a024`.
+  `6d1261958`'s SHA, and for `TOOL-dWitnessedBar-6` the older of its two, `0b7e0fceb`, never `ad002a024`.
   Red when: a subject search resolves to the spec commit.
 - **AC16** — When `python drift_report.py --gate-health --fixture held --selection <fixture>` runs in
   `tools/drift-audit/`, a leg held by a `quarantine` row and one held as `kit` are neither a bar leg; with
   no `--selection` it exits 2 naming the flag.
   Red when: the population omits the runner's quarantine holds.
 - **AC17** — When `grep -c '^# >>> acceptance_reader\|^# >>> arm_walk' tools/check-spec-tokens.py` runs, it
-  prints 2, and `git show --name-only --format= 7b649d671`, unit 51's pass commit by the §4 rule, lists no
+  prints 2, and `git show --name-only --format= 55e427e66`, unit 51's pass commit by the §4 rule, lists no
   path outside `memory/` that its Files touched omits.
   Red when: a parity row's canonical side lacks its markers, or an unlisted product write lands.
 - **AC18** — When `sed -n '/def _check_exists_refused/,/return False/p' tools/govkit/govkit.py` runs, it
@@ -441,12 +441,12 @@ S4, S5, S14, S15 and S19 at HEAD. No path here is on the `watch:` line of
   Red when: selfcheck reds gov's tree, or admits a pathless `exists:`.
 - **AC19** — When `grep -n -A1 'grants: PLAY-dClosedLoop-3' 2026-10-25-spec-TOOL-dWitnessedBar-51.md` runs in
   this build's `spec/` folder, it prints §8 F3's grant naming `memory/HYGIENE.md` and
-  `memory/guides/BUILD-METHOD.md`, and `git show --name-only --format= 28edeaa0b`, unit 7's pass commit by
+  `memory/guides/BUILD-METHOD.md`, and `git show --name-only --format= 636ec0364`, unit 7's pass commit by
   the §4 rule, lists both.
   Red when: unit 7's carrier edits land with no recorded grant.
-- **AC20** — When `git log --merges --oneline cc35bb62c^..ef33493d7 -- tools/lib/resolve-python.test.sh`
-  runs, it prints nothing, and `git log --format=%h cc35bb62c^..ef33493d7 -- tools/lib/resolve-python.test.sh`
-  names unit 27's pass `cc35bb62c` and neither `75a15d9ce` nor `ef33493d7`, the passes of units 48 and 49.
+- **AC20** — When `git log --merges --oneline 8b3aa5783^..ebe9575ea -- tools/lib/resolve-python.test.sh`
+  runs, it prints nothing, and `git log --format=%h 8b3aa5783^..ebe9575ea -- tools/lib/resolve-python.test.sh`
+  names unit 27's pass `8b3aa5783` and neither `15bb9de79` nor `ebe9575ea`, the passes of units 48 and 49.
   Red when: two order-2 passes edited the file concurrently.
 - **AC21** — When `grep -vE '^[[:space:]]*#' .memory-tree.conf | grep -cE 'encoding-stdout-sites|encoding-js-sites|path-literal-sites|quoting-sites|shell-role'`
   runs at gov's root on the built tree, it prints 0.
@@ -487,7 +487,7 @@ New arm: tools/drift-audit/drift_report.py · covers AC16 · the `held` fixture 
   2026-11-20, delegated): (a), rung 3: it meets the finding's criterion, a `PATH` bash never launched,
   and (b) builds a guard nothing reaches ([yagni]). widens: none · relaxes: none
 - **F4 — Where is unit 51's AC36 answered, now that its carrier edits landed with no grant trailer
-  (id 10)?** Unit 7's pass `28edeaa0b` edits `memory/HYGIENE.md` and `memory/guides/BUILD-METHOD.md` and
+  (id 10)?** Unit 7's pass `636ec0364` edits `memory/HYGIENE.md` and `memory/guides/BUILD-METHOD.md` and
   carries `Pass` alone, and `cdfbd1cf..HEAD` holds other builds' edits of both files. (a) the grant where
   the Open questions section records one, unit 51's F3 `grants:` line naming both carriers, beside that
   pass commit's paths; (b) the trailer rule as written, which reds over landed commits no pass may
@@ -514,7 +514,7 @@ New arm: tools/drift-audit/drift_report.py · covers AC16 · the `held` fixture 
   `tools/memory-tree/corpus_ids.py` and `tools/memory-tree/row_grammar.py`, per
   brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else moved.
 - rev-5 · 2026-11-20 · S1 to S24 · §3 · §4 · §5 · AC1 · AC4 · AC5 · AC7 · AC9 · AC13 · AC15 ·
-  AC17 to AC22 · §8 F2 F3 F4 F5 · §10 · re-grounded at `60b2d421a` per brief
+  AC17 to AC22 · §8 F2 F3 F4 F5 · §10 · re-grounded at `20e6f7ab3` per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-57-reground-brief: S5, S6, S10, S13 to S15, S19, S20, S22 and S23
   marked present at HEAD; the population re-pinned (PINNED 2026-11-20); S17's subject shape and S22's range
   taken from the landed commits; S18 cites `read_gate_health` and gains `verdict_flow.py` and the drift

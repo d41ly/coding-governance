@@ -29,6 +29,8 @@
 | [2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-136.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-136.md) | red-fix | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-51-widen-1.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-widen-1.md) | widen | — |
 | [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
+| [2026-11-22-build-TOOL-dWitnessedBar-51-red-fix-160.md](../build/2026-11-22-build-TOOL-dWitnessedBar-51-red-fix-160.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-51-red-fix-163.md](../build/2026-11-22-build-TOOL-dWitnessedBar-51-red-fix-163.md) | red-fix | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-51-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-51-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
@@ -74,7 +76,7 @@ leave this unit's scope. The items §4 "What HEAD already holds" lists landed wi
   differs from its row in `memory/project/shell-role.txt`. Every grown or new key goes through one
   `python tools/memory-tree/ratchet.py widen shell-role --key <path> [--key <path>] --reason <text> --unit TOOL-dWitnessedBar-51`,
   so its one record is this unit's and its `Caused-by` names `TOOL-dWitnessedBar-51`; `<text>` states
-  the derivation, the pass commits after unit 24's (`fe49c7d2a`) that touched each key (§8 F10). Each
+  the derivation, the pass commits after unit 24's (`6d1261958`) that touched each key (§8 F10). Each
   widened row's count is then set to the measured count (§8 F5); a shrunk file's row is lowered to its
   count. Observed by AC1.
 - **S2** — id 40. Units 4 and 25, which `TOOL-dWitnessedBar-24` §4 Rollout names as owing a widen row,
@@ -151,9 +153,9 @@ leave this unit's scope. The items §4 "What HEAD already holds" lists landed wi
   `tools/govkit/govkit.py@7999040a:2603` read `derive_hold_source`'s word or state why each stays.
   Observed by AC17.
 - **S22** — id 36. Present at HEAD: `memory/project/readme-contract.txt` was converted by the main
-  loop's commit `1f4ce2c30`, carrying `Pass: none`. Observed by AC18.
+  loop's commit `58de83325`, carrying `Pass: none`. Observed by AC18.
 - **S23** — id 38. Present at HEAD: `fix-of` joined `_RUN_PARK_KINDS` in
-  `tools/drift-audit/drift_report.py` and `PARK_KINDS` in `tools/runlog/model.py` (unit 21, `cd03e4e75`).
+  `tools/drift-audit/drift_report.py` and `PARK_KINDS` in `tools/runlog/model.py` (unit 21, `744515922`).
   Observed by AC19.
 - **S24** — id 39. `memory/guides/UNATTENDED-PROTOCOL.md` and its template stay within their row in
   `tools/template-size-limits.txt`: any protocol byte this pass adds is trimmed in the same pass.
@@ -299,7 +301,7 @@ S21.
 
 ### What HEAD already holds
 
-S7, S9, S10, S11, S14, S17, S18, S22, S23, S30, S38 to S43, S46 and S49 hold at HEAD `762c6d8c6`: the
+S7, S9, S10, S11, S14, S17, S18, S22, S23, S30, S38 to S43, S46 and S49 hold at HEAD `3977a137b`: the
 units their scope item names landed them, or this spec's text carries them. This pass builds nothing for
 them and observes each through its criterion.
 
@@ -352,7 +354,7 @@ print(n)"
 ### The shell-role settlement (S1, S2)
 
 ```
-c24   = fe49c7d2a, unit 24's pass commit
+c24   = 6d1261958, unit 24's pass commit
 owed  = each shell file whose seed count, after the pass's edits, differs from its row or has none
 ratchet.py widen shell-role --key k for every owed k grown or new
     --reason "grown by the pass commits in c24..HEAD touching each key" --unit TOOL-dWitnessedBar-51
@@ -460,7 +462,7 @@ Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD`
   added legs `gate-leg conformance` and `leg-factory selftest`; and after `govkit.py apply --target
   <scratch> --all` at HEAD, `grep -c 'leg-factory selftest' <scratch>/tools/gate-legs.json` prints 0.
   Red when: a `gov` value moved in the migration, or an exempt leg reaches an adopter.
-  fixture: `<c11>` is `b80649e60`, found by `git log --format=%H` over subjects naming
+  fixture: `<c11>` is `0ccc23626`, found by `git log --format=%H` over subjects naming
   `TOOL-dWitnessedBar-11`.
 - **AC10** — When `bash check-memory-hygiene.sh --only 3` runs in a scratch adopter after a seed writes the
   five homes, it exits 0, and `grep -c 'shell-role.txt' .memory-tree.conf` prints 0.
@@ -670,7 +672,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC16 AC31 · the plants `
   `tools/memory-tree/check-memory-hygiene.sh`, `AGENTS.md` and `tools/unattended/unattended.sh`, per
   brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else moved.
 - rev-6 · 2026-11-20 · §1 · S1 to S51 · §3 · §4 · §5 · AC1 to AC41 · §7 · §8 F2, F5 to F9 · §10 ·
-  re-grounded over HEAD `762c6d8c6` past order 29 by the brief
+  re-grounded over HEAD `3977a137b` past order 29 by the brief
   `2026-11-19-prompt-TOOL-dWitnessedBar-51-reground-spec-writer`: code citations by symbol or
   blob-pinned; S12, S26, AC9 and AC22 leave scope with unit 28, whose edge goes, and id 38 leaves the
   unit 21 edge; S7, S9 to S11, S14, S17, S18, S22, S23, S30, S38 to S43, S46 and S49 read as present;

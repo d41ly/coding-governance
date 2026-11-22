@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-28 — the unattended kit dissolved: its hooks and its tick taken into the runtime kit, `RESUME_SCHEDULE_*` retired, `/unattended` a client of `run`, with the upgrade steps that carry adopters across
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 61 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node a · Tier-2 · base 0689e7fa · streams tooling · order 61 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0306@a3aa83b5 whole
 
@@ -135,7 +135,7 @@ upgrade step (night pass `[p1-unattended]` point 1, P38; layer-runtime `[supervi
   `tools/unattended/adopt-unattended.sh`, `tools/unattended/kit.toml`,
   `tools/unattended/resume-tick.sh:295`, `tools/unattended/SKILL.template.md`,
   `tools/unattended/STOPS.template.md`, `tools/unattended/VERBS.template.md`,
-  `tools/unattended/PROTOCOL.template.md`, `tools/policy/legacy-homes.txt`, and the suites
+  `tools/unattended/PROTOCOL.template.md`, `memory/project/legacy-homes.txt`, and the suites
   `tools/unattended/unattended.test.sh`, `tools/unattended/check-unattended.test.sh`,
   `tools/unattended/adopt-unattended.test.sh`, `tools/unattended/cross-component.test.sh`, whose arms
   asserting the retired behaviour are deleted; `tools/workflows/unattended-build.test.sh` (lines 2342 and 2380)
@@ -457,6 +457,7 @@ requires the condition to survive elsewhere.
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-64, TOOL-dWellOiledMachine-79.
 - rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
+- rev-4 · 2026-11-22 · S7 · the **Readers:** by name: half re-pointed from `tools/policy/legacy-homes.txt` to `memory/project/legacy-homes.txt`, where TOOL-dWitnessedBar-20 moved it; nothing else moves. From the brief `2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief`.
 
 ## 10. Reuse audit
 

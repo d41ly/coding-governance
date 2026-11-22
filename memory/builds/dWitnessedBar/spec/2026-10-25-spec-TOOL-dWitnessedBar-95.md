@@ -36,7 +36,7 @@ prints 0.
 
 This unit replaces AC5's dispatch half with a check that reads the declarations through
 `read_pass_declarations` and asks `covers` of each declared path. It repairs
-`TOOL-dWitnessedBar-92`, which landed at `186cad841`, and builds one step after it (order 49).
+`TOOL-dWitnessedBar-92`, which landed at `27a6568ef`, and builds one step after it (order 49).
 
 ## 2. Scope (IN)
 
@@ -80,7 +80,7 @@ This unit replaces AC5's dispatch half with a check that reads the declarations 
 
 ### Evidence
 
-Read on 2026-11-21 at `d31ee066d`. Unit 92 is CLOSED at `186cad841`; unit 28 is deferred unbuilt.
+Read on 2026-11-21 at `3ffc6c67c`. Unit 92 is CLOSED at `27a6568ef`; unit 28 is deferred unbuilt.
 
 - `tools/unattended/unattended.sh#check_commit_message` walks each unit of the `Pass:` trailer. It
   builds that unit's declaration from `read_pass_declarations "$rel" current`, the unit's last key
@@ -94,7 +94,7 @@ Read on 2026-11-21 at `d31ee066d`. Unit 92 is CLOSED at `186cad841`; unit 28 is 
 - `tools/unattended/lib-unattended.sh#read_pass_declarations` prints one line per dispatch key in the
   raw row's shape, `<utc> dispatch · item <anchor> <unit> · reason <paths>`. Without its `current`
   argument it prints every key, so a unit with several passes prints one line per pass.
-- `memory/builds/dWitnessedBar/RUN.md` holds one dispatch row of unit 92, `item 5518fe43`, which
+- `memory/builds/dWitnessedBar/RUN.md` holds one dispatch row of unit 92, `item 1e38f6eb`, which
   declares its own spec file and `memory/builds/dWitnessedBar/build`, never the spec directory. 92
   AC5's literal count over it printed 0 at the pass (unit 92's acceptance ledger, `- AC5`) and again
   on 2026-11-21 (DERIVED).
@@ -243,7 +243,7 @@ and `spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md` (DERIVED).
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit of units 91 and 92, id 8
   (HIGH, item H3).
-- rev-2 · 2026-11-21 · §1 to §4 · §6 · §7 · §10 · re-grounded at `d31ee066d` per
+- rev-2 · 2026-11-21 · §1 to §4 · §6 · §7 · §10 · re-grounded at `3ffc6c67c` per
   2026-11-19-prompt-TOOL-dWitnessedBar-95-reground-brief. Code citations moved to symbols; unit 92's
   landed dispatch row makes AC1 a pass-time read, AC2's figure one above AC1's and AC3's copy a
   removal; Evidence re-probed; Files touched listed exactly; intent unchanged.

@@ -27,9 +27,9 @@ The round-1 spec audit of units 91 and 92
 confirmed finding **id 1 at HIGH**, report item **H1**. No other id shares the item.
 
 `TOOL-dWitnessedBar-92` §4 "The note check" prints `MISPLACED` when any note it selects for a row
-sits under another answer (its `grep -qvE ... && {` line, spec-92 line 323 at `d31ee066d`). Four of
+sits under another answer (its `grep -qvE ... && {` line, spec-92 line 323 at `3ffc6c67c`). Four of
 its note-table rows share one label and one token across two answers of one ledger: `92|S4|88|AC6`
-with `92|S4|88|AC18`, and `92|S4|89|AC9` with `92|S4|89|AC12` (spec-92 lines 296-299 at `d31ee066d`).
+with `92|S4|88|AC18`, and `92|S4|89|AC9` with `92|S4|89|AC12` (spec-92 lines 296-299 at `3ffc6c67c`).
 A correct build writes a note under each answer, so the check selects both openers and prints
 `MISPLACED` for both rows. 92 AC4's `NOTES OK 5` and AC12's `NOTES OK 29` cannot print on a correct
 build.
@@ -41,7 +41,7 @@ step after it (order 49).
 ## 2. Scope (IN)
 
 - **S1** — id 1. The placement test, inverted. In 92 §4's note check, the one fragment
-  `grep -qvE "^- (\*\*)?$a[^0-9]" && {` on spec-92 line 323 at `d31ee066d` becomes
+  `grep -qvE "^- (\*\*)?$a[^0-9]" && {` on spec-92 line 323 at `3ffc6c67c` becomes
   `grep -qE "^- (\*\*)?$a[^0-9]" || {`. The line then reads:
 
   ```bash
@@ -53,7 +53,7 @@ step after it (order 49).
   `TOOL-dWitnessedBar-96` S1 the `read` and the awk's variables and test, and `TOOL-dWitnessedBar-97`
   S8 the two ledger lines and the awk's opener reset and file argument; none of them touches this
   line. Observed by AC1 and AC2.
-- **S2** — id 1. 92 §5's risk line corrected. Spec-92 lines 433-435 at `d31ee066d` claim that "a row
+- **S2** — id 1. 92 §5's risk line corrected. Spec-92 lines 433-435 at `3ffc6c67c` claim that "a row
   whose token two notes carry passes on either". Under S1 that claim holds, so this unit's §5 restates
   it as the risk that stands: a stray copy of a correctly placed note under a second answer is not
   refused by the note check. Observed by AC1.
@@ -83,10 +83,10 @@ step after it (order 49).
 
 ### Evidence
 
-Read on 2026-11-21 at `d31ee066d`. Unit 92 is CLOSED (`186cad841`), and its rev-3 re-ground left
+Read on 2026-11-21 at `3ffc6c67c`. Unit 92 is CLOSED (`27a6568ef`), and its rev-3 re-ground left
 §4's script byte-identical to rev-2's, moving only its line numbers.
 
-- Spec-92 lines 314-328 at `d31ee066d` hold the note check's script. Line 321's awk prints the opener
+- Spec-92 lines 314-328 at `3ffc6c67c` hold the note check's script. Line 321's awk prints the opener
   `o` of every line that carries the row's label and token, so a label and token written under two
   answers print two openers. Line 323 prints `MISPLACED` when any printed opener fails
   `^- (\*\*)?$a[^0-9]`.
@@ -95,7 +95,7 @@ Read on 2026-11-21 at `d31ee066d`. Unit 92 is CLOSED (`186cad841`), and its rev-
   Rows `92|S4|88|AC6|resolve_python:` and `92|S4|88|AC18|resolve_python:` printed
   `MISPLACED 92 S4 resolve_python:` twice, exit 1, through spec-92's script. With S1's line it
   printed `NOTES OK 2`, exit 0. It printed the same with the fragments of 94 S1, 96 S1 and 97 S8, as
-  their specs read at `d31ee066d`, applied beside S1's. With the note under `- AC18` removed, all
+  their specs read at `3ffc6c67c`, applied beside S1's. With the note under `- AC18` removed, all
   three scripts printed `MISPLACED 92 S4 resolve_python:` once, for the AC18 row, exit 1, so the
   placement test still reds (PINNED 2026-11-21).
 - `memory/HYGIENE.md` "Acceptance ledger — how a built unit evidences its criteria" gives one answer
@@ -118,7 +118,7 @@ None: no stored data changes.
 ### Rollout
 
 The pass takes order 49, one above unit 92's 48, beside units 94, 95 and 96, and writes this unit's
-acceptance ledger with AC1 to AC3 owed, as units 91 and 92 did (`b7e2e3d8d`, `186cad841`). At the
+acceptance ledger with AC1 to AC3 owed, as units 91 and 92 did (`81ec5dded`, `27a6568ef`). At the
 close, after every unit is terminal, AC1's and AC2's fixtures run, S3's note is written and AC3 reads
 it. `TOOL-dWitnessedBar-97` S8, at order 50, composes S1's line with the other fragments for every
 note-check run at the close.
@@ -147,7 +147,7 @@ note-check run at the close.
 - security — no new write path. The fixture ledgers sit under the run's scratch directory.
 - perf / scale — one `grep -q` per row, as before.
 - error / empty / loading states — an empty selection still prints `NO NOTE`, from spec-92 line 322
-  at `d31ee066d`, which S1 leaves in place.
+  at `3ffc6c67c`, which S1 leaves in place.
 - observability — `MISPLACED` now means that no selected note sits under the row's answer.
 - risks — a stray copy of a correctly placed note under a second answer passes the note check. 92
   S6's exact count of each answer refuses a stray copy spelled as its own `- AC<n>` line.
@@ -183,7 +183,7 @@ note-check run at the close.
 `recall floor` and `recall floor arms` are owed for the ledgers under `memory/`. AC1 and AC2 run by
 fixture at the close. This unit adds no arm and moves none, so it declares no `New arm:` line, and
 `TOOL-dWitnessedBar-92` §4's owner derivation, which takes the place of 88 S6's (92 S12), still names
-unit 90 the floor's owner: run at `d31ee066d` it printed 28 and
+unit 90 the floor's owner: run at `3ffc6c67c` it printed 28 and
 `spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md`, exit 0 (PINNED 2026-11-21).
 
 ## 8. Open questions
@@ -204,9 +204,9 @@ unit 90 the floor's owner: run at `d31ee066d` it printed 28 and
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit of units 91 and 92, id 1
   (HIGH, item H1).
-- rev-2 · 2026-11-21 · §1 to §5 · §7 · §10 · re-grounded at `d31ee066d` per
+- rev-2 · 2026-11-21 · §1 to §5 · §7 · §10 · re-grounded at `3ffc6c67c` per
   2026-11-19-prompt-TOOL-dWitnessedBar-93-reground-brief. Spec-92 cited at its rev-3 lines, pinned to
-  `d31ee066d`; Evidence re-probed with the siblings' fragments as they read now; S3 names unit 92's
+  `3ffc6c67c`; Evidence re-probed with the siblings' fragments as they read now; S3 names unit 92's
   built ledger; Rollout and Files touched list the pass's records and the close's note; §3 names unit
   28; §7 re-runs 92's owner derivation; criteria unchanged.
 

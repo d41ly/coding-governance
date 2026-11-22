@@ -88,7 +88,7 @@ item L6 (id 22) are one defect at two grades, and M7 (id 14) shares its placemen
   other return prints the passed reason. S3, S10 and S17 rewrite existing lines only, so the
   `memory/project/shell-role.txt` row stands. Observed by AC3.
 - **S4** — id 4. Unit 84's ledger obligations observed. The lines 84 S6, S7 and S10 require, which
-  unit 84's pass `e1ad4ef32` wrote, are graded by this unit's AC4 and this unit writes none of them:
+  unit 84's pass `bd7804842` wrote, are graded by this unit's AC4 and this unit writes none of them:
   unit 74's ledger beside AC3 names `TOOL-dWitnessedBar-84` S6; the ledgers of units 74 and 76 beside
   AC1 name `check_cr_reached` or `check_canary_keys` and `TOOL-dWitnessedBar-84`; unit 78's ledger
   beside AC8 names `_derive_case_keys`. Observed by AC4.
@@ -236,7 +236,7 @@ holds all 19 findings, as `TOOL-dWitnessedBar-84` §4 held its 16.
 
 ### Evidence
 
-Read on 2026-11-21 at `94be07370`.
+Read on 2026-11-21 at `fbc77dc8b`.
 
 - `tools/run-gates/run-gates.gov.test.sh@94be07370:243-287`: `a=0`, the `TOOL-aShardedFloor-2`
   comment's two lines, `FLOOR_ASSERTIONS=80`, then every `RAISED` and `Raised` line.
@@ -268,7 +268,7 @@ Read on 2026-11-21 at `94be07370`.
   each of its five `sha)` spellings in one line, kept the alignment and left `fingerprint)` alone;
   the canary's `sed` then changed only the strip.
 - `tools/codebase-map/gen_map.py#_artifacts` renders every file under `memory/map/generated/`, and
-  `git show --stat --format= e1ad4ef32 -- memory/map/generated/` prints nothing.
+  `git show --stat --format= bd7804842 -- memory/map/generated/` prints nothing.
 - New-arm list: 83 AC1's pipeline printed 24 specs at `162f4ec8c`, unit 12 at order 5 to unit 84 at
   order 44, and 26 at the commit that adds this spec, with units 85 and 88, the last line this spec at
   order 45. PINNED at that commit; AC13 re-derives it there.
@@ -473,7 +473,7 @@ S7 to S12, S14 to S16, S18 and S19 are answered in other units' ledgers at the c
   permission: the ledgers are written at the close.
 - **AC16** — When `grep -n 'AC7' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-84*acceptance-ledger*`
   runs at the close, a printed line holds `memory/map/generated/`, `gen_map.py --check` and
-  `TOOL-dWitnessedBar-88`, and `git show --stat --format= e1ad4ef32 -- memory/map/generated/` prints
+  `TOOL-dWitnessedBar-88`, and `git show --stat --format= bd7804842 -- memory/map/generated/` prints
   nothing.
   Red when: the render rewrites a generated file no record names, or an empty list stands alone.
   permission: the ledger is written at the close.
@@ -560,7 +560,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC2 AC10 AC17 · the le
 - rev-5 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
   `tools/gate-legs.json`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else
   moved.
-- rev-6 · 2026-11-21 · §1 to §4 · §6 to §8 · §10 · re-grounded at `94be07370` per
+- rev-6 · 2026-11-21 · §1 to §4 · §6 to §8 · §10 · re-grounded at `fbc77dc8b` per
   2026-11-19-prompt-TOOL-dWitnessedBar-88-reground-brief. S7 leaves the floor at 80 with the
   owner line unit 90's; S9's range ends at `^\)$`; S11 writes the registry; citations pinned.
 

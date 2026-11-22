@@ -3,7 +3,7 @@
 **Serves:** journal TOOL-dWitnessedBar-29
 
 No merge bar, no self-test suite and no gate leg ran in this pass, the naming lexicon's `--suggest`
-excepted. The criteria were observed on node d, 2026-11-20, at base `60f08d3db`, by the size gate and
+excepted. The criteria were observed on node d, 2026-11-20, at base `d3555bde9`, by the size gate and
 the policy kit's `budgets.py` run over scratch fixtures, by `routed_commits.py --newest-unit` in this
 repository and its own fixture builder over a scratch repository, by slices of the runner's
 `scan_leg_warnings`, its inlined resolver and its verdict-write block run over planted work dirs, by

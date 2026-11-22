@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-55
 
-# TOOL-dWitnessedBar-55 — builder return 2 (run `wf_123ab74c-619`), committed 599c23cef
+# TOOL-dWitnessedBar-55 — builder return 2 (run `wf_123ab74c-619`), committed dff3ca0d6
 
 ## Why
 
@@ -8,7 +8,7 @@ The spec as written could be built. I found no divergence: the hook's live `read
 
 ## Summary
 
-Committed TOOL-dWitnessedBar-55 as 599c23cef, starting from da5eef59a. The step now reads INHERITED_RED the way the pre-push hook does, and every check below passed. No gate ran.
+Committed TOOL-dWitnessedBar-55 as dff3ca0d6, starting from 8e93b5cda. The step now reads INHERITED_RED the way the pre-push hook does, and every check below passed. No gate ran.
 
 **What the commit holds (11 files, all staged by name):** (DERIVED from the builder's probe)
 - C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/govkit/steps/inherited_red.py

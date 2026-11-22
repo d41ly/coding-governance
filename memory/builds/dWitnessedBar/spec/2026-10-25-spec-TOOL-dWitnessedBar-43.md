@@ -102,7 +102,7 @@ repairs `TOOL-dWitnessedBar-6`.
 
 ### Evidence
 
-- Unit 6 as landed (`aecf1c95a`, `1533b56d4`, red fix `ff89a2ff5`): `read_peer_verdict` stands when the
+- Unit 6 as landed (`0b7e0fceb`, `5b3fbe429`, red fix `b0e8c63b9`): `read_peer_verdict` stands when the
   fetched tag points at the SHA, its `tree` line is the SHA's tree, its `node` line is set and is not
   `GOV_NODE`, and its `verdict` line reads `GREEN`; it applies no source check and no signature check,
   as its module docstring's `WHAT THIS DOES NOT CHECK` names this unit
@@ -191,7 +191,7 @@ lander (`govkit.py mint`, `tools/govkit/govkit.py#cmd_epoch`), never by this uni
 - `help/verdict-backends.md`
 - `memory/map/generated/symbols.json` (re-rendered by the codebase-map kit's `gen_map.py --write`)
 
-Shared with the order-29 and order-30 siblings, read 2026-11-20 from their specs at `fed256d71`:
+Shared with the order-29 and order-30 siblings, read 2026-11-20 from their specs at `4fc2e7383`:
 `TOOL-dWitnessedBar-2` and `TOOL-dWitnessedBar-28` list none of these paths, so unit 2 may build beside
 this one. `memory/map/generated/symbols.json` is re-rendered by any unit that adds a symbol, so a
 sibling that adds one re-renders it at its own landing.
@@ -303,7 +303,7 @@ New arm: tools/loop/guard.py · covers AC3 · the `signers-owner-only` plant, ru
   `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is unchanged, as the unit writes
   that path; nothing else moved.
 - rev-5 · 2026-11-20 · S1 to S4 · §3 · §4 · §5 · AC1 · AC2 · AC3 · §7 · §8 · §10 · re-grounded over
-  HEAD `fed256d71` past the landed TOOL-dWitnessedBar-6 by the brief
+  HEAD `4fc2e7383` past the landed TOOL-dWitnessedBar-6 by the brief
   `2026-11-19-prompt-TOOL-dWitnessedBar-43-reground-brief`: `check_pin_source` takes the landed
   `read_remote_keys` triple and its backend; the signer list is a set (F3) read through
   `read_policy_value` at the landed revision; `verify-tag`'s line is read from standard error;

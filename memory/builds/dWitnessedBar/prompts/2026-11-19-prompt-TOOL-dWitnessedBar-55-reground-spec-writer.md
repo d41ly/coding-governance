@@ -118,11 +118,11 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    in Files touched with the legs its guard names on the gates section's leg line, and a prose-only mention named as
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
-   - Built and landed through order 21: every unit up to and including 4, 25, 40, 23, 42, 3 (`930a5289d`:
-     `verdict.blocks`, `lib-verdict.sh`, `verdict_flow.py` with `route` and `judge`), 44 (`acd04756e`: the inherited-red
-     step reads both policy files) and 5 (`eef75404f`: `derive_hold_source`, `GATE_SELECTION`, `verdict.held`,
+   - Built and landed through order 21: every unit up to and including 4, 25, 40, 23, 42, 3 (`9991872c0`:
+     `verdict.blocks`, `lib-verdict.sh`, `verdict_flow.py` with `route` and `judge`), 44 (`9de4bf5cd`: the inherited-red
+     step reads both policy files) and 5 (`e896a6198`: `derive_hold_source`, `GATE_SELECTION`, `verdict.held`,
      `verdict_flow.py select` and `select --check`, the `held guard` arm and `unguarded_why`), with their pass-leg
-     fixes `b94fc8d10`.
+     fixes `ed02517ba`.
    - Settle every claim about the landed shape of each unit this spec consumes from against the tree.
    - Units 41, 55 and 8 sit at order 22 and will build in parallel where their Files touched are disjoint; keep each
      spec's Files touched disjoint from the other two's wherever the tree allows, and name any shared path in your

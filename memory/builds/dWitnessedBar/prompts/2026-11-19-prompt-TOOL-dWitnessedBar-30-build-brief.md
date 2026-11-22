@@ -9,7 +9,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 24.
 - Built so far through order 23: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1
-  (`ad3949b5f`: gate health from the flake records) and 59 (`4657d344d`). This spec, rev-4, was re-grounded over them.
+  (`ad55d40c1`: gate health from the flake records) and 59 (`9e7d56e72`). This spec, rev-4, was re-grounded over them.
 - This unit builds alone; nothing else is in flight in this working tree, so commit directly here.
 - The pass legs carry one known red: install-prefix on the `conf-scalar-pins` seed argv in
   `tools/memory-tree/kit.toml`, held until unit 51. The full `memory hygiene` leg is red at base on checks 13 and 15

@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-73
 
-# TOOL-dWitnessedBar-73 — builder return 1 (run `wf_224f48c2-3e7`), committed 71f212ad1
+# TOOL-dWitnessedBar-73 — builder return 1 (run `wf_224f48c2-3e7`), committed 563d828df
 
 ## Why
 
@@ -38,7 +38,7 @@ Checks that ran (each a probe of changed code, standing in for the suite or leg 
 
 Owed to the main loop at the close:
 - The legs of §7, among them `install-prefix (shipped surface)` for S8 and the python resolver parity.
-- Both suite runs. AC15 needs the suite's `PASS (<n> assertions)` count to equal 72 in a scratch clone at 71f212ad1.
+- Both suite runs. AC15 needs the suite's `PASS (<n> assertions)` count to equal 72 in a scratch clone at 563d828df.
 - RED-first for the gov-suite `New arm:` line: a `selftests` case keeping its first value (reaches `rec_st`), a sweep testing existence (reaches `gov-signers-d` and `gov-signers-l`), a `declare` write of `PM_SCRUB`, and a `rec_verdict` read.
 - RED-first for the resolver-suite `New arm:` line: deleting `-c init.defaultBranch=master` (must name `refs/heads/main`), a literal branch file, `for-each-ref` spawned outside `subprocess.run` (use `Popen`, because `check_output` goes through the patched `run`), and dropping the S23 stderr line from the `tools/lib/` copy.
 - Every staged break against a `.py` file runs as S13 says: `__pycache__` cleared and `PYTHONDONTWRITEBYTECODE=1` exported.

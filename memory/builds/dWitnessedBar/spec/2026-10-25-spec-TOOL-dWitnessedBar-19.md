@@ -48,7 +48,7 @@ reach to the owner instead of guessing (PM-5, v2:390).
   trailing space, and no two legs of one manifest share one. Observed by AC2 and AC3.
 - **S3** — Every row carries it. Every row of `tools/gate-legs.json` carries `purpose`, except a leg
   on the pending population of S6, and every descriptor `[[gate_leg]]` row in the 27 `kit.toml`
-  files §4 lists (PINNED 2026-11-19 at `66f4e8d98`) carries the same string as its manifest row. An
+  files §4 lists (PINNED 2026-11-19 at `a4cffc2cb`) carries the same string as its manifest row. An
   `[[exempt_leg]]` leg carries it in the manifest only, as its `subject` is. Observed by AC4 and AC6.
 - **S4** — The derivation. Each value is derived by §4's rule from one source the leg carries, and the
   review record `memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-19-purpose-review.md`
@@ -110,16 +110,16 @@ the same gate script.
 
 | Step | Source | Reaches |
 |---|---|---|
-| 1 | the parenthetical in the leg's `name` | 35 legs at `66f4e8d98` (PINNED, 2026-11-19): most name the defect the leg catches, the rest what it grades |
+| 1 | the parenthetical in the leg's `name` | 35 legs at `a4cffc2cb` (PINNED, 2026-11-19): most name the defect the leg catches, the rest what it grades |
 | 2 | the comment block directly above the leg's `[[gate_leg]]` row in its descriptor | a descriptor-claimed leg whose row carries one |
-| 3 | the gate script's header, its module docstring or leading comment, first sentence, qualified by the `argv` word that tells this leg from every other leg running that script | every leg: each of the 198 rows names one of 164 tracked scripts carrying a header, and no two of the legs sharing one of the 19 shared scripts carry the same `argv` (PINNED, 2026-11-19, measured over `tools/gate-legs.json` at `66f4e8d98`) |
-| 4 | the `title` of the dossier under `memory/map/features/` whose `[claims] gate-legs` names the leg, qualified as in step 3 | 180 legs at `66f4e8d98` (PINNED, 2026-11-19) |
+| 3 | the gate script's header, its module docstring or leading comment, first sentence, qualified by the `argv` word that tells this leg from every other leg running that script | every leg: each of the 198 rows names one of 164 tracked scripts carrying a header, and no two of the legs sharing one of the 19 shared scripts carry the same `argv` (PINNED, 2026-11-19, measured over `tools/gate-legs.json` at `a4cffc2cb`) |
+| 4 | the `title` of the dossier under `memory/map/features/` whose `[claims] gate-legs` names the leg, qualified as in step 3 | 180 legs at `a4cffc2cb` (PINNED, 2026-11-19) |
 | — | none of the four | put to the owner (S6, S7) |
 
 The pass reads each source and writes at most 60 characters that say what the source says, citing it.
 The 60 is the project map's line grammar, `purpose := at most 60 characters, verbatim from the
 namespace's declared purpose source` (project-map.md:555): the field is that declared source, so the
-map renders it verbatim. Two worked rows, from the tree at `19d6aae6`, both re-read at `66f4e8d98`:
+map renders it verbatim. Two worked rows, from the tree at `19d6aae6`, both re-read at `a4cffc2cb`:
 
 | Leg | Step | Source | Purpose |
 |---|---|---|---|
@@ -145,7 +145,7 @@ TOOL-dWitnessedBar-19`. The record cites; it is never read by a gate.
 ### The 7h arms
 
 Read from the manifest, as `subject` is, so the 128 `[[exempt_leg]]` legs are graded by the same arm
-as the 70 claimed ones (PINNED 2026-11-19 at `66f4e8d98`, by counting `tools/govkit/registry.toml`'s
+as the 70 claimed ones (PINNED 2026-11-19 at `a4cffc2cb`, by counting `tools/govkit/registry.toml`'s
 `[[exempt_leg]]` rows and the descriptors' `[[gate_leg]]` rows, the two populations 7h's note
 line `legs: <n> in the manifest · <c> claimed · <x> exempt` counts). Each finding names the leg and
 the arm:
@@ -234,7 +234,7 @@ kit's version moves with its canary's key set, which is what the `purpose` floor
 
 - security — no write path beyond tracked declarations; the emitter writes the key only under its
   floor, so no target's canary reds.
-- perf / scale — three arms over the manifest's rows (198, PINNED 2026-11-19 at `66f4e8d98`) inside
+- perf / scale — three arms over the manifest's rows (198, PINNED 2026-11-19 at `a4cffc2cb`) inside
   an existing selfcheck; no new leg.
 - error / empty / loading states — an absent pending file is no exception list, never an empty one
   read green; an unreadable one is a 7h failure naming it.
@@ -306,7 +306,7 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC6 · plants beside D3 
   read anything but 140 and would read 140 on the clause's own tree. RESOLVED (agent, 2026-10-25,
   delegated): the review covers every leg the manifest holds at the build run's base, derived there;
   "140" is the clause's measurement of the same population (the brief's D4), so no deviation is owed
-  for the count, rung 2. widens: none · relaxes: none. Re-observed 2026-11-19 at `66f4e8d98`: 198,
+  for the count, rung 2. widens: none · relaxes: none. Re-observed 2026-11-19 at `a4cffc2cb`: 198,
   the same population moved, so the resolution holds.
 - **F2 — Where does an underived leg wait for the owner?** Options: (a) a `shrink-only` population on
   I4, keyed by leg name, written only when non-empty; (b) a sentinel `purpose` value; (c) the leg left
@@ -338,7 +338,7 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC6 · plants beside D3 
   successor `playbook-render` is tested by `playbook render selftest`, already on the line; it gains
   `policy fixtures`, whose manifest guard holds the §4 path `tools/gate-legs.json`; per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief; nothing else moved.
-- rev-4 · 2026-11-19 · §2 §4 §5 §7 §8 §10 · S3 S5 S6 S8 · F1 · re-grounded at `66f4e8d98` per brief
+- rev-4 · 2026-11-19 · §2 §4 §5 §7 §8 §10 · S3 S5 S6 S8 · F1 · re-grounded at `a4cffc2cb` per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-22-reground-brief: the rule's step counts, the 7h populations
   and the descriptor count are re-pinned (PINNED, §4), step 4 naming the features dossiers alone; S6
   spells unit 13's `.gitattributes` line and unit 15's seed row contract; Files touched drops the retired agent-instructions descriptor and gains the loop and
@@ -353,17 +353,17 @@ whose `doc_reads` agreement arm and exempt-leg subject arm are the shape S5 copi
 builder in `tools/govkit/govkit.py#write_gate_legs` with its floor reader
 `tools/govkit/govkit.py#check_target_reads_subject`, extended the way
 `tools/govkit/govkit.py#DOC_READS_FLOOR_RUN_GATES` was, through I1's `LEG_KEY_FLOORS` table, all
-re-verified at `66f4e8d98`. The pending population reuses the ledger factory
-`tools/lib/legacy_ledger.py` (I4, unit 13), not built at `66f4e8d98` and queued at its rev-3, whose
+re-verified at `a4cffc2cb`. The pending population reuses the ledger factory
+`tools/lib/legacy_ledger.py` (I4, unit 13), not built at `a4cffc2cb` and queued at its rev-3, whose
 `[[ledger]]` registration S6 fills field for field.
 `python tools/codebase-map/reuse_lookup.py "a prose purpose field on every gate leg row derived from what the leg carries"`
 ranked name-stem matches only (`rows`, `legs`, `field`, `derive_*`) and named no purpose source,
 which agrees with source: no leg row and no descriptor carries a prose field at base (measured: the
-descriptors' top-level keys and the manifest's nine row keys hold none), nor at `66f4e8d98`, where
+descriptors' top-level keys and the manifest's nine row keys hold none), nor at `a4cffc2cb`, where
 the manifest's rows use 14 keys and the descriptors' `[[gate_leg]]` rows 10 (PINNED 2026-11-19), none
 of them prose. Scout B's row named the
 dossier front matter and the parentheticals; reading source added the descriptor comment blocks and
 the gate scripts' headers, the only source reaching every leg. Scout B's "140 legs" and its seam lines
-agree with source at `19d6aae6` except the count, 142 (§8 F1); at `66f4e8d98` it is 198 (PINNED).
+agree with source at `19d6aae6` except the count, 142 (§8 F1); at `a4cffc2cb` it is 198 (PINNED).
 
 Recall terms used: `python tools/memory-recall/query.py "where does a gate leg declare its purpose and how is a purposeless node reviewed" --terms "leg purpose field gate-legs.json PM-5 map-purpose review derive owner ask dossier parenthetical"`

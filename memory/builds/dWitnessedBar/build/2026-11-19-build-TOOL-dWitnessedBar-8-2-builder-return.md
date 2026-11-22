@@ -1,18 +1,18 @@
 **Serves:** journal TOOL-dWitnessedBar-8
 
-# TOOL-dWitnessedBar-8 — builder return 2 (run `wf_b6ee5899-0be`), committed 5944dcc3cb203ef0a97ce1aceb964195f6b9d71a
+# TOOL-dWitnessedBar-8 — builder return 2 (run `wf_b6ee5899-0be`), committed dd90f8abb0209f48a69a901e430203ed1cc097d6
 
 ## Why
 
-TOOL-dWitnessedBar-8 is built from spec rev-7 and committed in pass commit 5944dcc3c, which carries `Pass: TOOL-dWitnessedBar-8` and sets the spec status to CLOSED. A second commit, 2e15cfa04 (`Pass: none`), re-renders .governance/policy.json. It comes after the pass because the mirror refuses a catalogue that is not committed, which is how unit 25 did it. Before writing anything I checked every claim the spec makes about the code against HEAD (paths, symbols, blob-pinned lines, the `.leg` row fields, the verdict's `tree`/`run_id`/`ended` keys, ASKS_CMD, read_row_commit, add_scratch_worktree, BAR_INERT_KNOBS, the catalogue rows, the HYGIENE kind list, and the kickoff manifest's watch line). All of them held, so there was no divergence to report.
+TOOL-dWitnessedBar-8 is built from spec rev-7 and committed in pass commit dd90f8abb, which carries `Pass: TOOL-dWitnessedBar-8` and sets the spec status to CLOSED. A second commit, 191fb9648 (`Pass: none`), re-renders .governance/policy.json. It comes after the pass because the mirror refuses a catalogue that is not committed, which is how unit 25 did it. Before writing anything I checked every claim the spec makes about the code against HEAD (paths, symbols, blob-pinned lines, the `.leg` row fields, the verdict's `tree`/`run_id`/`ended` keys, ASKS_CMD, read_row_commit, add_scratch_worktree, BAR_INERT_KNOBS, the catalogue rows, the HYGIENE kind list, and the kickoff manifest's watch line). All of them held, so there was no divergence to report.
 
 ## Summary
 
 The unit is built and committed; AC1's fixture-bar behaviour and every gate in §7 are still owed to the main loop at the close.
 
-**Commits** (base 531336dcb5a5a599bdaa025da5f611f1ea912eab):
-- Pass commit 5944dcc3cb203ef0a97ce1aceb964195f6b9d71a. It sets the spec to CLOSED and includes RUN.md, the acceptance ledger memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-8-1-acceptance-ledger.md, and deviation record memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-8-deviation-82.md (number 81 was already taken). It also includes what `gen_build_index.py --write` and `gen_map.py --write` rewrote, and the kickoff manifest re-stamped at base.
-- Follow-up commit 2e15cfa04fa4761e7d956c9feff66a23d0dcb4d2 (`Pass: none`): the .governance/policy.json mirror.
+**Commits** (base 08cdbb7085d3b2d3b4410fb3321a220d0fd3e774):
+- Pass commit dd90f8abb0209f48a69a901e430203ed1cc097d6. It sets the spec to CLOSED and includes RUN.md, the acceptance ledger memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-8-1-acceptance-ledger.md, and deviation record memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-8-deviation-82.md (number 81 was already taken). It also includes what `gen_build_index.py --write` and `gen_map.py --write` rewrote, and the kickoff manifest re-stamped at base.
+- Follow-up commit 191fb9648566ba15eb6a458dede6bae6f4685e31 (`Pass: none`): the .governance/policy.json mirror.
 - No path outside the dispatched write set was written. help/reference/drive.md and units.md were already modified before this pass (line endings only) and were left unstaged.
 
 **What changed:**

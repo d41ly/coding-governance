@@ -41,7 +41,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.55   # gov:kit run-gates@1.55
+KIT_RUN_GATES_VERSION=1.56   # gov:kit run-gates@1.56
 # 1.53 -> 1.54: the canary's one key set, `LEG_KEYS`, admits `level`, govkit's `LEG_KEY_FLOORS["level"]`, and `product_tests.py` grades it (TOOL-dWitnessedBar-9).
 # 1.52 -> 1.53: the canary's one key set, `LEG_KEYS`, admits `precommit`, govkit's `LEG_KEY_FLOORS["precommit"]`, and `--precommit` runs it (TOOL-dWitnessedBar-10).
 # 1.51 -> 1.52: the canary's one key set, `LEG_KEYS`, admits `purpose`, govkit's `LEG_KEY_FLOORS["purpose"]` (TOOL-dWitnessedBar-19).
@@ -6095,7 +6095,7 @@ if [ -n "$RUNDIR" ] && [ -n "$RED_LEGS" ] && [ -n "$RG_COMMON_RAW" ]; then
       derive_temp_path _tp "$_td/tail" || continue
       if [ -f "$_tsrc" ]; then tail -n 60 "$_tsrc" | tail -c 8192 > "$_tp" 2>/dev/null; else : > "$_tp"; fi
       _tk=$(od -An -tx1 -N3 "$_tp" 2>/dev/null | awk '{ for (j = 1; j <= NF; j++) { if ($j ~ /^[89ab]/) k++; else exit } } END { print k + 0 }')
-      if [ "${_tk:-0}" -gt 0 ]; then tail -c "+$((_tk + 1))" "$_tp" > "$_tp.cut" 2>/dev/null && mv -f "$_tp.cut" "$_tp"; fi
+      if [ "${_tk:-0}" -gt 0 ] && derive_temp_path _tc "$_td/cut"; then tail -c "+$((_tk + 1))" "$_tp" > "$_tc" 2>/dev/null && mv -f "$_tc" "$_tp"; fi
       _th=$(git hash-object --stdin < "$_tp" 2>/dev/null)
       case "$_th" in
         ''|*[!0-9a-f]*) rm -f "$_tp" 2>/dev/null; echo "run-gates: no tail kept for ${names[$i]} — git could not hash it" >&2; continue ;;

@@ -10,9 +10,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   table's order. This unit is build order 20.
 - Built so far through order 19: every unit up to and including 4 (the runner's per-tree verdict record, the pre-push
   hook adopting only the pushed tree's GREEN record), 25 (the verdict's `run_id` and `cause`, failing-leg tails kept by
-  hash), 40 (the per-tree verdict's declines and reuse pair), 23 (`66ad2ab39`: the `gov-tester` role) and 42
-  (`22f207038`: the tail sweep across worktrees). Spec rev-8 was re-grounded over all of them at `d9b5251da`.
-- §8 F6's ask is filed in this build's own backlog as TOOL-dWitnessedBar-100 (`70acc009c`), not under the
+  hash), 40 (the per-tree verdict's declines and reuse pair), 23 (`ea0716032`: the `gov-tester` role) and 42
+  (`cf49c1ba4`: the tail sweep across worktrees). Spec rev-8 was re-grounded over all of them at `1e74cb2c8`.
+- §8 F6's ask is filed in this build's own backlog as TOOL-dWitnessedBar-100 (`7210e2755`), not under the
   TOOL-dDeclaredLoop-12 id the spec names, which dDeclaredLoop already holds for a closed unit. Cite the filed id where
   your code or records name the ask; the spec's wording is fixed at the close.
 - This unit builds alone at order 20; units 44, 5 and 8 consume from it and wait for its pass.

@@ -48,6 +48,15 @@
 | [2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-8.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-8.md) | leg-tail | — |
 | [2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-9.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-9.md) | leg-tail | — |
 | [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-override-1.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-override-1.md) | override | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-red-fix-155.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-red-fix-155.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-red-fix-161.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-red-fix-161.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md) | widen | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md) | widen | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-widen-34.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-34.md) | widen | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-widen-35.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-35.md) | widen | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-widen-36.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-36.md) | widen | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-widen-37.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-37.md) | widen | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md) | journal | — |
@@ -83,6 +92,8 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-1-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-1-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-reground-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-28 |
+| [2026-11-22-prompt-TOOL-dWitnessedBar-1-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dWitnessedBar-1-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief.md](../prompts/2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 | [2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md](../reviews/2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md) | diff-review | TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
 
@@ -185,7 +196,7 @@ until the record holds one. Today nothing measures a flake rate, and the flake r
 
 ### Evidence
 
-Read at `a4fd535ed`, 2026-11-20.
+Read at `e22cdce08`, 2026-11-20.
 
 - `drift_report.py#measure_legs_retried_after_timeout` reads every run record's `verdict` under every
   git dir of the clone and returns one signal dict with `value`, `of`, `tolerance`, `gateable`, `live`
@@ -205,7 +216,7 @@ Read at `a4fd535ed`, 2026-11-20.
   `verdict_flow.py#run_fixture_flakes_window` asserts the factory does not yet hold the kind.
 - The flake body's rows are read in `verdict_flow.py#read_flake_record`, the flake test in
   `verdict_flow.py#derive_flake_holds`; no other kit reads either.
-- PINNED 2026-11-20: the manifest holds 219 legs at `a4fd535ed`, 101 held by the kit hold, so 118.
+- PINNED 2026-11-20: the manifest holds 219 legs at `e22cdce08`, 101 held by the kit hold, so 118.
   Measured by loading `tools/gate-legs.json` and counting rows whose `subject` is `kit` or `chunk`
   `selftests`; the measurement re-derives both from the manifest it reads.
   PINNED 2026-10-25: it held 142 legs at `cdfbd1cf`.
@@ -383,12 +394,12 @@ kickoff manifest.
   --print-bindings`; and `grep -n 'gate-health' memory/HYGIENE.md` names the closed kind list's entry.
   Red when: the record serves as `journal`, or the kind is added to the factory alone, so the factory
   refuses at import or the record reads malformed.
-  figure: 13 is DERIVED, the length of `tree_lib.py#TYPED_RECORD_KINDS`, which held 12 at `a4fd535ed`
+  figure: 13 is DERIVED, the length of `tree_lib.py#TYPED_RECORD_KINDS`, which held 12 at `e22cdce08`
   (PINNED 2026-11-20), plus this unit's one.
 - **AC7** — When `grep -n 'read_flake_body\|derive_flaked' tools/run-gates/verdict_flow.py
   tools/drift-audit/drift_report.py` runs at the repository root, it names a call of each in each
   file, and `grep -nF 'count("\t") == 2' tools/run-gates/verdict_flow.py tools/drift-audit/drift_report.py`,
-  which names `verdict_flow.py#read_flake_record`'s row test at `a4fd535ed`, names nothing.
+  which names `verdict_flow.py#read_flake_record`'s row test at `e22cdce08`, names nothing.
   Red when: either kit keeps its own copy of the flake row grammar or the flake test.
 - **AC8** — When `python verdict_flow.py --fixture flakes-window` runs in `tools/run-gates/` with the
   kind registered by this unit, it prints `fixture flakes-window ok`: `hold  A  2/10` (v2:1274's
@@ -403,7 +414,7 @@ kickoff manifest.
 
 `drift-audit selftest` · `drift-audit records` · `run-gates canary` · `policy fixtures` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 AC4 · `test_gate_health` over drift's four `--fixture` cases, the short set staged by deleting one row of one leg · `CHECK_FLOOR`, 486 at `a4fd535ed` (PINNED 2026-11-20), raised by the arm's counted checks
+New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 AC4 · `test_gate_health` over drift's four `--fixture` cases, the short set staged by deleting one row of one leg · `CHECK_FLOOR`, 486 at `e22cdce08` (PINNED 2026-11-20), raised by the arm's counted checks
 
 The arm re-observes drift's half of AC2 and AC4; their `verdict_flow.py` halves, AC5, AC7 and AC8 are
 direct observations, since no suite runs `verdict_flow.py --fixture`. `memory-hygiene self-test` re-runs
@@ -466,7 +477,7 @@ AC6's plant, a record of every `TYPED_RECORD_KINDS` member.
   `c6df3e901`, by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is
   unchanged, as the unit writes that path; nothing else moved.
 - rev-6 · 2026-11-20 · §1 · S1 S2 S4 S5 · S6 S7 S8 · §3 · §4 · §5 · AC1 to AC8 · §7 · §8 ·
-  §10 · re-grounded on the tree at `a4fd535ed`, after `TOOL-dWitnessedBar-8` landed at `5944dcc3c`, by
+  §10 · re-grounded on the tree at `e22cdce08`, after `TOOL-dWitnessedBar-8` landed at `dd90f8abb`, by
   the brief `2026-11-19-prompt-TOOL-dWitnessedBar-1-reground-brief`: line citations become `path#symbol`;
   the manifest re-pinned at 219 legs, 118 on the bar (PINNED 2026-11-20); the factory loaded in-process, not run as a
   subprocess, since its `new` is closed over `DOORS` (F4); `--with` counts the record `flakes` just

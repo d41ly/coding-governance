@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-75
 
-# TOOL-dWitnessedBar-75 — builder return 1 (run `wf_c4b11e71-5df`), committed 1b3295a52
+# TOOL-dWitnessedBar-75 — builder return 1 (run `wf_c4b11e71-5df`), committed 5b7349498
 
 ## Why
 
@@ -8,7 +8,7 @@ I built TOOL-dWitnessedBar-75 as its spec, rev-3, states, and committed it as on
 
 ## Summary
 
-The pass commit is 1b3295a52 and the base is ba3a0a5ed. The canary's failure line now says which check failed first: `count <n>`, then `rec_sha`, then `rec_fp`. Probes over scratch copies of the hook show each break prints its own distinct line. Three things are still owed to you at the close: AC2's scratch-clone runs, AC3's two ledger records, and the New-arm RED-first observation.
+The pass commit is 5b7349498 and the base is dcb2854c4. The canary's failure line now says which check failed first: `count <n>`, then `rec_sha`, then `rec_fp`. Probes over scratch copies of the hook show each break prints its own distinct line. Three things are still owed to you at the close: AC2's scratch-clone runs, AC3's two ledger records, and the New-arm RED-first observation.
 
 **What changed.** In C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/run-gates/run-gates.gov.test.sh, the canary's single && chain is now an if/elif chain that sets `rgf_what`, the same shape as unit 74's `rgf_why`:
 - `count $rgf_n` when the mutant changed anything other than one line.

@@ -27,7 +27,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    - Built and landed through order 19: every unit up to and including 4 (the runner's per-tree verdict record, the
      pre-push hook adopting only the pushed tree's GREEN record, `push-main.sh --prepare` reading `verdict.tree`),
      25 (the verdict's `run_id` and `cause`, failing-leg tails kept by hash), 40 (the per-tree verdict's declines and
-     reuse pair), 23 (`66ad2ab39`: the `gov-tester` role) and 42 (`22f207038`: the tail sweep across worktrees).
+     reuse pair), 23 (`ea0716032`: the `gov-tester` role) and 42 (`cf49c1ba4`: the tail sweep across worktrees).
    - This spec consumes from units 4 and 23, both landed, and hands off to unit 5: settle every claim about their
      landed shape against the tree.
 2. A choice the re-ground forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it

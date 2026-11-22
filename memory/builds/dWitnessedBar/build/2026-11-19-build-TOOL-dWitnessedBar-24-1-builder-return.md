@@ -16,7 +16,7 @@ DIVERGENCE: `unattended.sh --dispatch` refused the pass, and its refusal is bind
 
 ## Summary
 
-Nothing was committed and the worktree is clean at base 7a787b95c. The brief was already recorded, unchanged, at 335861ab2526.
+Nothing was committed and the worktree is clean at base 85a1c4507. The brief was already recorded, unchanged, at 335861ab2526.
 
 **What happened.** I built the whole unit, then tried to declare two more write paths (tools/govkit/subject-pins.tsv and a deviation record). `--dispatch` refused, because the spec-token checker fails the spec once the new guarded `powershell hygiene selftest` leg is in the manifest. I stopped there and restored every path I had changed or created.
 

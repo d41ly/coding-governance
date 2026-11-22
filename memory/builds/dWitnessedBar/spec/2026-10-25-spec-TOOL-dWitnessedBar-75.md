@@ -73,7 +73,7 @@ the line it printed. It repairs `TOOL-dWitnessedBar-70` and closes order 40, aft
   record of unit 72 AC1's break with its printed line. Both are `TOOL-dWitnessedBar-77`'s. This unit
   names `rec_fp` only when it is the first check to fail (§8 F3).
 - The liveness variant and `check_cr_reached`, which are `TOOL-dWitnessedBar-74`'s, CLOSED at
-  `7c579ad47`.
+  `6a12d559c`.
 - The slot's `unread` value for a read failure, which is `TOOL-dWitnessedBar-84` S13's.
 - Whether unit 66 S2's own assertion still runs and prints after the canary fails, which
   `TOOL-dWitnessedBar-78` S1 states for id 1.
@@ -95,7 +95,7 @@ the line it printed. It repairs `TOOL-dWitnessedBar-70` and closes order 40, aft
 
 ### Evidence
 
-Probed at `d3b748b94` on 2026-11-21 under `uname -s` `MINGW64_NT-10.0-22621` and GNU bash 5.3.9
+Probed at `dd38b467b` on 2026-11-21 under `uname -s` `MINGW64_NT-10.0-22621` and GNU bash 5.3.9
 `x86_64-pc-cygwin` (PINNED 2026-11-21). The probe cut `tools/run-gates/run-gates.gov.test.sh#check_cr_reached`
 and the canary's own `sed`, `diff` count and `rgf_mr` measure, and read a hand-built record laid out
 as the AC12 arm's: `verdict<TAB>GREEN<CR>`, two `sha` lines the second CR-ended, `reused_cache` 1
@@ -119,7 +119,7 @@ canary's line alone.
   then one failure statement with no slot (`tools/run-gates/run-gates.gov.test.sh@d3b748b94:891-895`).
   `grep -c 'the planted CR never reached read_green_file on' tools/run-gates/run-gates.gov.test.sh`
   prints 1 (PINNED 2026-11-21), so the line already has one site; the slot is what is missing.
-- Unit 72 put the `rec_fp` compare inside that chain (`TOOL-dWitnessedBar-72` S1, `e0cf5fa91`), so a
+- Unit 72 put the `rec_fp` compare inside that chain (`TOOL-dWitnessedBar-72` S1, `fa536b7cd`), so a
   `fingerprint` CR that did not arrive already fails the canary before unit 77 builds, and with S1's
   first two values alone it would have nothing to print in the slot (§8 F3).
 - Unit 74's liveness check names its reason through an `if`/`elif` chain setting `rgf_why`, printed
@@ -142,16 +142,16 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 40, after `TOOL-dWitnessedBar-70` (39, CLOSED at `09718851e`). Order 40 is
-shared with `TOOL-dWitnessedBar-71` (CLOSED at `ced984440`), `TOOL-dWitnessedBar-72` (CLOSED at
-`e0cf5fa91`) and `TOOL-dWitnessedBar-74` (CLOSED at `7c579ad47`). Dispatch is strictly sequential
+Live at landing, at order 40, after `TOOL-dWitnessedBar-70` (39, CLOSED at `0890c99d1`). Order 40 is
+shared with `TOOL-dWitnessedBar-71` (CLOSED at `2972b3755`), `TOOL-dWitnessedBar-72` (CLOSED at
+`fa536b7cd`) and `TOOL-dWitnessedBar-74` (CLOSED at `6a12d559c`). Dispatch is strictly sequential
 and sorts a tie by id string (`tools/workflows/unattended-build.js@d3b748b94:78-82`, `:692-697`), so
 this unit builds last of the four and alone, after unit 74, whose function and variant it reads.
 
 ### Files touched (estimate)
 
 - `tools/run-gates/run-gates.gov.test.sh`
-- `memory/project/shell-role.txt`: the suite's row reads 735 at `d3b748b94`, and `sh_hygiene.py`'s
+- `memory/project/shell-role.txt`: the suite's row reads 735 at `dd38b467b`, and `sh_hygiene.py`'s
   `measure_code_lines` measures the suite at 735 (PINNED 2026-11-21, widened by unit 74), so S2's
   chain grows it past the row. The pass reads the row from the file and widens it with
   `python tools/memory-tree/ratchet.py widen shell-role`, which writes its widen record under

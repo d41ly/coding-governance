@@ -24,9 +24,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    in Files touched with the legs its guard names on the gates section's leg line, and a prose-only mention named as
    outside the population. Cite moved lines as `path#symbol` or blob-pinned, never a bare `path:line`.
    What is built so far:
-   - Built: unit 26 (`7526c98fa`, the `resolve_bash_py` block, `scan_bare_bash`); unit 27 (`cc35bb62c`,
-     `tools/lib/refuse-wrong-shell.sh`, section `2n`); unit 48 (`75a15d9ce`); unit 49 (`ef33493d7`); unit 13
-     (`34f8bb7db`, red-fixes `010323e92` and `2bd7e6e36`: `tools/lib/legacy_ledger.py` with `read_rows`,
+   - Built: unit 26 (`7526c98fa`, the `resolve_bash_py` block, `scan_bare_bash`); unit 27 (`8b3aa5783`,
+     `tools/lib/refuse-wrong-shell.sh`, section `2n`); unit 48 (`15bb9de79`); unit 49 (`ebe9575ea`); unit 13
+     (`9cdebebc4`, red-fixes `a96cb1dec` and `15710a90a`: `tools/lib/legacy_ledger.py` with `read_rows`,
      `read_registrations` over every tracked `kit.toml` and the `DEPLOYER_HOME` registry, `read_renames`,
      `compare_to_base`, `write_rows`, the CLI `read|compare|carry` with `compare --measured <path>`, inline copies in
      memory-tree and gate-lint, the ledger class in `tools/memory-tree/merge-rows.py`, section `2o`). Unit 50 (rev-4)

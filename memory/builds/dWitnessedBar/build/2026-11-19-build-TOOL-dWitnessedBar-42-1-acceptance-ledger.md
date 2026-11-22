@@ -5,7 +5,7 @@
 This pass ran no merge bar, no gate leg and no suite. Every criterion below was checked on node d on
 2026-11-20 by a probe script driving the changed runner over a scratch clone under `%TEMP%/p42` with a
 linked worktree `p42.wt`, one red leg `fx/varied.sh` whose output varies with `FX_N`; the same probe
-over the base runner (`git show HEAD:tools/run-gates/run-gates.sh` at `853fc00ea`) read red on AC1's
+over the base runner (`git show HEAD:tools/run-gates/run-gates.sh` at `367eac1e4`) read red on AC1's
 named tail, AC2 and AC3. The close owes every leg of section 7 and the RED-first observation of the
 `New arm:` line: the evidence suite's AC1-AC3 arms, staged red by restricting the sweep to `RUNROOT`,
 by dropping the grace and by dropping the `touch -c`, and unit 25's AC5 case with its tails aged.

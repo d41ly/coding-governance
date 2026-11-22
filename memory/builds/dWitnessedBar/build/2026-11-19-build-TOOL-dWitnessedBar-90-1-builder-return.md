@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-90
 
-# TOOL-dWitnessedBar-90 — builder return 1 (run `wf_ff7cd4ad-9b9`), committed da3fbc953e0214526a29594fe5bac8bb4e12290d
+# TOOL-dWitnessedBar-90 — builder return 1 (run `wf_ff7cd4ad-9b9`), committed b5a33a39c19041ed7f38088fb1b9585c47e730f6
 
 ## Why
 
-Built TOOL-dWitnessedBar-90 (rev-3) as written. Before any edit, every code claim in spec section 4 Evidence checked out against the tree. That covers suite lines 243-288 and the call site at 968-979 (the file is unchanged since 9b0ad9c97), the 17 Raised/RAISED count, FLOOR_ASSERTIONS=80, the shell-role row at 852 and the owner derivation's output of 28. No divergence was found.
+Built TOOL-dWitnessedBar-90 (rev-3) as written. Before any edit, every code claim in spec section 4 Evidence checked out against the tree. That covers suite lines 243-288 and the call site at 968-979 (the file is unchanged since 93d34f5da), the 17 Raised/RAISED count, FLOOR_ASSERTIONS=80, the shell-role row at 852 and the owner derivation's output of 28. No divergence was found.
 
 ## Summary
 
-Commit da3fbc953 on branch/unattended-dwitnessedbar-2ed3b3, built from base 197df554d. Its trailers are Decided, Pass: TOOL-dWitnessedBar-90 and Co-Authored-By. The spec header is set to CLOSED with date 2026-11-21. The spec's gen:spec-records region also moved, as S13 requires.
+Commit b5a33a39c on branch/unattended-dwitnessedbar-2ed3b3, built from base d7c4a6739. Its trailers are Decided, Pass: TOOL-dWitnessedBar-90 and Co-Authored-By. The spec header is set to CLOSED with date 2026-11-21. The spec's gen:spec-records region also moved, as S13 requires.
 
 Code changes, all in C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/run-gates/run-gates.gov.test.sh:
 - S1: the canary call site has a new elif for any check_canary_keys return outside 0 to 3. It prints `gov-canary: check_canary_keys returned <rc>, a code it does not define`, sets fail=1, and rgf_ok is now set only on code 0 or 1 (it used to be set on anything but 3). A two-line comment above the block describes the branch.

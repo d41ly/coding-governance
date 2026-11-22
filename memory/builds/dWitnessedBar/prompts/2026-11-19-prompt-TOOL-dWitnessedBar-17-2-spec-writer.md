@@ -122,7 +122,7 @@ builder can build it as written over HEAD.
    - A zero-bound population is empty, so a read-back seed leaves its home unarmed and S4 disarms checks 13 to 15 in
      gov itself, against AC4. Say what arms an empty zero-bound population, and whether this unit changes unit 16's
      `id-orphan-waiver` registration or home, with those paths in Files touched if so.
-   Every other claim the builder probed held at `61e27a4a9`; leave those as they are.
+   Every other claim the builder probed held at `4cc97d97b`; leave those as they are.
 2. A ledger home or a step program this revision names sits outside any `tools/<kit>/` path or is spelled through a
    token the landed reader resolves, since `install-prefix (shipped surface)` takes no waiver. Leave carried clause
    tokens byte-identical; blob-pin only code-file line citations.

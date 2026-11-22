@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-70
 
-# TOOL-dWitnessedBar-70 — builder return 1 (run `wf_4133ee0c-d3b`), committed 09718851e
+# TOOL-dWitnessedBar-70 — builder return 1 (run `wf_4133ee0c-d3b`), committed 0890c99d1
 
 ## Why
 
@@ -8,7 +8,7 @@ The spec was buildable as written. Its claims held at HEAD: the cut range, the s
 
 ## Summary
 
-Pass commit 09718851e for TOOL-dWitnessedBar-70. Its trailers are `Pass: TOOL-dWitnessedBar-70` and Co-Authored-By. The spec header moves INPROGRESS to CLOSED with no other edit; the generator also rewrote the spec's own records table.
+Pass commit 0890c99d1 for TOOL-dWitnessedBar-70. Its trailers are `Pass: TOOL-dWitnessedBar-70` and Co-Authored-By. The spec header moves INPROGRESS to CLOSED with no other edit; the generator also rewrote the spec's own records table.
 
 What changed:
 - `C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/run-gates/run-gates.gov.test.sh`: the AC12 arm now builds a mutant of the cut `read_green_file` by `sed 's/%[$].[\]r.}/}/'`. It counts the `diff` lines opening `>` and requires exactly 1. It evals the mutant in a subshell over `$rgf_rec` and requires `rec_sha` to be 41 bytes ending in CR. If that fails, the arm prints `gov-canary: the planted CR never reached read_green_file on $(uname -s); the CR-strip assertion is not counted` and sets `fail=1`. The `rec_sha` compare's `a=$((a+1))` only runs when the canary passes, but the compare itself always runs and prints its own line (F3). No assertion was added, so FLOOR_ASSERTIONS stays 54. The arm's comment now names the canary and S3's two breaks. Its WHAT THIS DOES NOT CHECK clause says a strip spelled other than `%$'\r'}`, or spelled twice, fails the canary at its count; the "lose the CR" sentence is gone. (DERIVED from the builder's probe)
