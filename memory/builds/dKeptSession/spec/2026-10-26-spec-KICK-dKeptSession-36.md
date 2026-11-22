@@ -1,6 +1,6 @@
 # KICK-dKeptSession-36 — the transition guard runs the driver through a bash that shares this filesystem, never the bare name, and an unresolved shell refuses
 
-**Status:** DEFERRED · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -20,6 +20,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md) | research | KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 |
 | [2026-11-21-prompt-KICK-dKeptSession-36-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-36-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md) | research | KICK-dKeptSession-27 KICK-dKeptSession-24 |
+| [2026-11-22-prompt-KICK-dKeptSession-36-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-36-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-KICK-dKeptSession-36-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-36-reground-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
@@ -35,25 +37,30 @@ confirmed finding **id 22 at HIGH**, report item **H4**, which no other id share
 which sees another filesystem, so the driver path does not resolve and S9 passed "an absent driver"
 with a NOTE: the guard passed with open mail and certified a check it never ran. The class is
 recorded in `memory/gotchas/subprocess-resolves-a-different-shell.md`. The loop kit now carries the
-one resolver that runs each candidate, and unit 5's rev-9 S9 launches the guard through it and the
+one resolver that runs each candidate, and unit 5's rev-12 S9 launches the guard through it and the
 kit's one locator. This unit holds what that launch leaves to it: the missing-shell refusal's words,
-the plants that observe the launch, the absent pass and the refusal, and the user page's sentence.
+the plants that observe the launch, the absent pass and the refusal, and the user texts' sentences.
 It builds one step after `KICK-dKeptSession-5` (order 17).
 
 ## 2. Scope (IN)
 
 - **S1** — id 22. The resolver, already landed: `tools/loop/loop_witness.py#resolve_bash`, the
-  loop kit's inline copy of the canonical `tools/lib/resolve_bash.py#resolve_bash`
-  (TOOL-dGroundRules-25 S28), held byte-identical by the `resolve_bash_py` row of
-  `tools/lib/resolve-python.test.sh`. `resolve_bash(script)` tries `GOV_BASH`, the bash PATH names
-  and Git for Windows' two paths, keeps the first under which `test -f <script>` exits 0, and
-  returns `None` when none does. This unit mints no resolver and edits none; it observes the landed
-  one on this node. Observed by AC1 and AC2.
+  adapter that answers `None` for a refusal of the loop kit's inline `resolve_bash_py` block,
+  `tools/loop/loop_witness.py#scan_bash`, a copy of the canonical `tools/lib/resolve_bash.py#scan_bash`
+  (TOOL-dGroundRules-25 S28, rewritten by TOOL-dWitnessedBar-26), held byte-identical by the
+  `resolve_bash_py` row of `tools/lib/resolve-python.test.sh`. `scan_bash(script)` runs `GOV_BASH`
+  first and, when it is set, nothing after it, refusing it where it cannot see `script`; else Git's
+  own `bash.exe` in its `bin` directory, under the third parent of `git --exec-path`, then each PATH
+  directory's `bash.exe` and `bash`, a System32 or WindowsApps launcher reported and never run. A
+  candidate passes when one run
+  prints `uname -s`, starting `MINGW` or `MSYS` on Windows, and `test -f <script>` exits 0. This unit
+  mints no resolver and edits none; it observes the landed one on this node. Observed by AC1 and AC2.
 - **S2** — id 22. The guard's argv, observed. `KICK-dKeptSession-5` S9's `read_mail_rows(root,
   build)` in `tools/loop/loop_transition.py` runs `[<bash>, <driver>, "--mail", "read", <slug>]`,
   `<driver>` being `resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"` through
   `tools/loop/loop_lib.py#resolve_kit_dir`, and `<bash>` being `resolve_bash(<driver>)`, both
-  imported inside the function as `tools/loop/loop_transition.py#write_card_follow` imports them.
+  imported inside the function, as `tools/loop/loop_transition.py#resolve_kickoff_engine` imports the
+  first and `tools/loop/loop_transition.py#write_card_follow` the second.
   The read is unfiltered, with no `--open`: it is the one read the guard and the disposal share
   (spec-5 F9). This unit adds nothing to that launch; where unit 5 landed another, it sets the launch
   to this one. Observed by AC3.
@@ -61,11 +68,11 @@ It builds one step after `KICK-dKeptSession-5` (order 17).
   passes as "an absent driver" only when `resolve_kit_dir` raises its `LookupError`, which names the
   kit and the three places looked (`tools/lib/resolve_kit_dir.py#resolve_kit_dir`), unit 5's
   `loop: mail · unarmed · <why>` line carrying that error's text. A located driver for which
-  `resolve_bash` returns `None` raises unit 5's `ValueError`, whose words unit 5 S9 already spells
-  from this item, `mail unknown: no bash that can see <driver>`; `record` prints it after
-  `loop: unanswered` and exits 2 on (`tools/loop/loop_transition.py#main`), writing nothing. This
-  unit observes those words, and sets them to these only where unit 5 landed others. Observed by
-  AC4.
+  `resolve_bash` returns `None`, a set `GOV_BASH` that cannot see it among them (S1), raises unit
+  5's `ValueError`, whose words unit 5 S9 already spells from this item, `mail unknown: no bash that
+  can see <driver>`, and unit 5's AC12 probes; `record` prints it after `loop: unanswered · ` and
+  exits 2 on (`tools/loop/loop_transition.py#main`), writing nothing. This unit observes those words
+  through a plant, and sets them to these only where unit 5 landed others. Observed by AC4.
 - **S4** — The plants, in `tools/loop/loop_transition.py`'s fixture: `mail-argv` wraps
   `subprocess.run`, the spawn unit 5's `read_mail_rows` makes as `write_card_follow` does, recording
   the one call whose argv carries `--mail` and answering it zero rows, and passing every other call,
@@ -74,23 +81,36 @@ It builds one step after `KICK-dKeptSession-5` (order 17).
   `resolve_bash` answer `None`. Each rebinds the name the guard imports inside its function, on
   `loop_lib`, `loop_witness` or `subprocess`, and restores it after the run, so the guard carries no
   test hook. Each first writes the driver's conf with `RUN_CLAIMS` on into the fixture root through
-  the seeding unit 5's `mail-` plants use (spec-5 AC6), since a root with no `.unattended.conf`
-  passes the guard before the locator or the resolver runs (spec-5 S9), which would pass all three
-  plants for the wrong reason. `mail-no-bash` counts the fixture's commits before and after the move
-  and prints `loop: fixture · commits unchanged` or `changed`, as `no-row` does; `mail-argv` prints
-  `loop: fixture · mail-argv · held`, or `MISSED` with the argv it recorded, as `descope-spent`
-  prints its verdict; and `run_selftest`'s case table gains one row per line AC3 and AC4 read. The
-  plants are branches of `run_transition_fixture` and their wrappers nested functions, so no
-  module-level symbol is added and `memory/map/generated/symbols.json` does not move. The three
+  the seeding unit 5's `mail-` plants use (spec-5 AC6), since unit 5's guard passes a root with no
+  `.unattended.conf`, launching nothing (spec-5 S9), which would pass all three plants for the wrong
+  reason; none needs unit 5's bare remote, since no plant's read reaches the driver. `mail-no-bash`
+  counts the fixture's commits before and after the move and prints `loop: fixture · commits
+  unchanged` or `changed`, as `no-row` does; `mail-argv` answers the recorded call exit 0 with no
+  output, and prints `loop: fixture · mail-argv · held`, or `MISSED` with the argv it recorded, as
+  `descope-spent` prints its verdict; and `run_selftest`'s case table gains one row per line AC3 and
+  AC4 read. The plants are branches of `run_transition_fixture` and their wrappers nested functions,
+  so no module-level symbol is added and `memory/map/generated/symbols.json` does not move, as it
+  lists none of that function's nested `run_verb`, `read_count` or `read_folder` today. The three
   join `PLANTS`, so the `loop transition record` row of `tools/run-gates/selftest-budgets.txt`
-  carries a `plants=<n>` token three above the count unit 5 leaves, re-priced over the three, which
-  `check_plant_tokens` in `tools/run-gates/run-selftests.sh` holds equal to `len(PLANTS)` once the
-  module is imported. No bare `bash` launch is left to supersede: unit 5's rev-9 S9 already launches through
-  `loop_witness.resolve_bash`, so the supersession rev-3's S4 named is void and this item holds only
-  the plants. Observed by AC3, AC4, AC6.
-- **S5** — The user page. `help/loop.md`'s guard paragraph (`KICK-dKeptSession-5` S14) gains one
-  sentence: the driver runs under the bash that can see it, `GOV_BASH` tried first, and a node where
-  none can refuses the transition as `mail unknown`. Observed by AC5.
+  carries `plants=18` where unit 5 leaves `plants=15` (DERIVED, `len(PLANTS)` 13 at `c9e89a057`
+  plus unit 5's two, 2026-11-22), its reading re-priced by direct CLI over the three as unit 5
+  re-prices its two, which `tools/run-gates/run-selftests.sh#check_plant_tokens` holds equal to
+  `len(PLANTS)` once the module is imported. No bare `bash` launch is left to supersede: unit 5's
+  S9 already launches through `loop_witness.resolve_bash`, so the supersession rev-3's S4 named is
+  void and this item holds only the plants. Observed by AC3, AC4, AC6.
+- **S5** — The user texts. `help/loop.md`'s guard paragraph under "Recording a build's move"
+  (`KICK-dKeptSession-5` S14) gains one sentence: the driver runs under the bash that can see it,
+  `GOV_BASH`, when set, the only one tried, and a node where none can refuses the transition as
+  `mail unknown`. The fixture-cases sentence of the same section, after "The cases are", and its
+  twin in `tools/loop/README.md`'s `loop_transition.py` section, after "`--fixture --plant <case>`
+  runs both over a scratch repository", each name every key of `PLANTS` the module holds at build
+  time: the three plants, and `descope-spent`, `mail-open` and `mail-disposed`, which both omit at
+  `c9e89a057` and unit 5's text does not add. The page's
+  `<!-- usage: script:tools/loop/loop_transition.py ... -->` anchor stays: its row in
+  `tools/govkit/usage.toml` fingerprints the flags `--fixture` and `--plant=`, not the plant names,
+  so a plant moves no field it hashes: `python tools/govkit/docs_leg.py --fingerprints` prints
+  `930359dc` for it (PINNED, 2026-11-22), and the builder re-reads it at build time and re-stamps
+  the anchor only if it moved. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -119,17 +139,19 @@ It builds one step after `KICK-dKeptSession-5` (order 17).
 - The audit's probe from Windows python: `subprocess.run(['bash','-c','uname -a; pwd'])` printed
   `microsoft-standard-WSL2` and `/mnt/c/projects/...`, while `shutil.which('bash')` named git-bash
   and the System32 launcher exists.
-- Re-probed at this rev: `loop_witness.resolve_bash` over the driver's absolute `C:/` path answered
-  Git for Windows' `usr/bin` bash, and answered it again with `GOV_BASH` naming the System32 WSL
-  launcher, whose `test -f` over that path exits 1.
+- Re-probed at this rev, `c9e89a057`: `loop_witness.resolve_bash` over the driver's absolute `C:/`
+  path answered the `bash.exe` in Git for Windows' `bin` directory; with `GOV_BASH` naming the
+  System32 `bash.exe`, the WSL launcher, it answered `None`, `scan_bash`'s refusal reading "GOV_BASH
+  is set to '<the launcher>' and answered Linux, so nothing after it is tried".
 - The loop kit already spells this launch at each driver call: `resolve_item_seed` locates the
   driver, runs `resolve_bash(driver)`, and answers `unarmed` where either fails
   (`tools/loop/loop_lib.py#resolve_item_seed`); `write_card_follow` does the same for the kickoff
   engine and prints `card — skipped` where no bash resolves
   (`tools/loop/loop_transition.py#write_card_follow`); `read_handover` and `run_driver` raise
   `LookupError` (`tools/loop/position.py#read_handover`, `tools/loop/position.py#run_driver`).
-- `KICK-dKeptSession-5` rev-9 S9: "`mail — off`, the locator's `LookupError` and zero rows each
-  pass", and "a present driver no bash runs" raises `ValueError`, exit 2 (spec-5 S9).
+- `KICK-dKeptSession-5` rev-12 S9: `mail — off`, the locator's `LookupError`, a `root` with no
+  `.unattended.conf` and zero rows each pass, and "a driver no bash sees" is a `ValueError`, exit 2,
+  "unknown and never none" (spec-5 S9).
 - `record` prints a `LookupError` after `loop: unarmed` and a `ValueError` after
   `loop: unanswered`, each exit 2 (`tools/loop/loop_transition.py#main`).
 
@@ -140,7 +162,26 @@ It builds one step after `KICK-dKeptSession-5` (order 17).
 2. `resolve_bash(<driver>)`; `None` raises S3's `ValueError`, exit 2, and nothing is spawned.
 3. The spawn of S2's argv in the repository, under unit 5's bound and exits.
 
-Steps 1 to 3 are unit 5's code; this unit's diff is step 2's words, the plants and the page.
+Steps 1 to 3 are unit 5's code; this unit's diff is step 2's words, the plants and the texts.
+
+### Shipped texts
+
+| Text | Names |
+|---|---|
+| `help/loop.md`, "Recording a build's move": the guard paragraph; the fixture-cases sentence | the shell rule; every plant (S5) |
+| `tools/loop/README.md`, the `loop_transition.py` section's `--fixture --plant <case>` sentence | every plant (S5) |
+| `tools/run-gates/selftest-budgets.txt`, the `loop transition record` row's note | `plants=18` and its reading (S4) |
+
+Left true: `tools/loop/loop_transition.py`'s module docstring, whose `--fixture` paragraph describes
+`field`, `backward-rows` and `skip-backward` as examples and lists no complete set, and whose exit
+paragraph unit 5 rewrites for the guard (spec-5 §4 Shipped texts); `run_selftest`'s docstring, which
+names no plant; `memory/gotchas/subprocess-resolves-a-different-shell.md`, which states the class
+and names no guard; `tools/loop/README.md`'s `loop_witness.py` paragraphs, which already say the
+normaliser and the computed witnesses run through the inline `resolve_bash`. No
+`tools/policy/catalogue.toml` summary names the guard or its shell, so `.governance/policy.json`
+stays. This unit edits no `tools/unattended/unattended.sh`, so its refusal sites at the
+harness-arms ceiling do not move, and it adds no suite floor: its arm is three plants in the
+`loop transition record` leg's `PLANTS`, re-pricing that one budget row (S4).
 
 ### Inventory
 
@@ -158,7 +199,8 @@ None: the guard is new in `KICK-dKeptSession-5`.
   `read_mail_rows` only where unit 5 landed others
 - `tools/run-gates/selftest-budgets.txt`: the `loop transition record` row's `plants=<n>` token and
   its re-priced reading (S4)
-- `help/loop.md`: S5's sentence
+- `help/loop.md`: S5's sentence and the fixture-cases sentence
+- `tools/loop/README.md`: S5's fixture-cases sentence
 
 ### Alternatives rejected
 
@@ -178,17 +220,20 @@ None: the guard is new in `KICK-dKeptSession-5`.
 - risks — a host with only a WSL bash cannot transition; that is the intended refusal.
 - testing — the plants of §6 and the arm in §7.
 - migration — none.
-- user docs — `help/loop.md`, S5.
+- user docs — `help/loop.md` and `tools/loop/README.md`, S5.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `python -c "import sys, pathlib; sys.path.insert(0, 'tools/loop'); import
   loop_witness as w; print(w.resolve_bash(pathlib.Path('tools/unattended/unattended.sh').absolute().as_posix()))"`
-  runs on this node, it prints a Git for Windows bash and never the System32 WSL launcher.
+  runs on this node, it prints the `bash.exe` in Git for Windows' `bin` directory, as it
+  did on 2026-11-22 (PINNED), and never the System32 WSL launcher.
   Red when: the resolver returns the bare name or the WSL launcher.
-- **AC2** — When the same probe runs with `GOV_BASH` naming the System32 WSL launcher, it still
-  prints the Git for Windows bash.
-  Red when: an override that cannot see the driver is returned.
+- **AC2** — When the same probe runs with `GOV_BASH` naming the System32 `bash.exe`, the WSL
+  launcher, it prints `None`, and `w.scan_bash(<that path>)[2]` names `GOV_BASH` and `answered Linux`, so the guard over it
+  raises S3's `mail unknown`.
+  Red when: an override that cannot see the driver is returned, or the scan falls through it to
+  another bash.
 - **AC3** — When `python tools/loop/loop_transition.py --fixture --plant mail-argv` records the
   guard's spawn argv over a fixture build, `argv[0]` equals `resolve_bash(argv[1])`, `argv[1]` equals
   the absolute path `resolve_kit_dir("unattended", "unattended.sh", KIT)` resolved, joined with
@@ -197,23 +242,24 @@ None: the guard is new in `KICK-dKeptSession-5`.
   Red when: `argv[0]` is `bash`, as a scratch copy of the guard launching the bare name shows, or
   no call is recorded, as the plant over a root with no `.unattended.conf` shows.
 - **AC4** — When `--plant mail-no-driver` runs, the move records and prints `loop: mail · unarmed`
-  with the error naming the `unattended` kit; when `--plant mail-no-bash` runs, the move exits 2
-  printing `mail unknown: no bash that can see` after `loop: unanswered`, and the fixture's commit
-  count is unchanged.
+  with the error `no unattended kit holding unattended.sh in this install`; when `--plant
+  mail-no-bash` runs, the move exits 2 printing `loop: unanswered · mail unknown: no bash that can
+  see`, and `loop: fixture · commits unchanged`.
   Red when: a located driver with no usable shell passes as absent, as a scratch copy reading a
   `None` bash as the locator's refusal shows.
 - **AC5** — When `grep -n "GOV_BASH" help/loop.md` runs, the guard paragraph names `GOV_BASH` and
-  `mail unknown`.
-  Red when: the page is silent on which shell runs the driver.
+  `mail unknown`; and `grep -c "mail-no-bash" help/loop.md tools/loop/README.md` counts at least one
+  in each, each fixture-cases sentence naming every key of `PLANTS`.
+  Red when: the page is silent on which shell runs the driver, or a cases sentence omits a plant.
 - **AC6** — When `python -c "import sys; sys.path.insert(0, 'tools/loop'); import loop_transition as
-  t; print(len(t.PLANTS))"` runs, it prints the `plants=<n>` token of the `loop transition record` row
-  in `tools/run-gates/selftest-budgets.txt`, and `mail-argv`, `mail-no-driver` and `mail-no-bash` are
-  among the plants.
+  t; print(len(t.PLANTS))"` runs, it prints 18 (DERIVED, S4's sum), the `plants=<n>` token of the
+  `loop transition record` row in `tools/run-gates/selftest-budgets.txt`, and `mail-argv`,
+  `mail-no-driver` and `mail-no-bash` are among the plants.
   Red when: the row still carries the count from before the three plants.
 
 ## 7. Gates
 
-`loop transition record` · `policy fixtures` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop transition record` · `policy fixtures` · `python resolver (behaviour + inline parity + idiom ban)` · `docs` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/loop_transition.py · covers AC3 AC4 · the `mail-argv`, `mail-no-driver` and `mail-no-bash` plants, staged red by a scratch copy of `read_mail_rows` launching bare `bash` and reading a `None` bash as absent · the `loop transition record` row's `plants=<n>` token rises by three
 
@@ -223,7 +269,8 @@ New arm: tools/loop/loop_transition.py · covers AC3 AC4 · the `mail-argv`, `ma
   minted `resolve_bash()` in `loop_lib.py` with a `LoopError` on an unusable `GOV_BASH` and a `uname`
   test. Since then TOOL-dGroundRules-25 S28 landed the canonical block and its loop-kit copy in
   `loop_witness.py`, which keeps a candidate only when it can see the script. Options: (a) take the
-  landed copy, the override's fall-through included; (b) mint the rev-3 resolver beside it.
+  landed copy, its refusal of a set override that cannot see the script included (TOOL-dWitnessedBar-26
+  replaced the fall-through rev-4 read); (b) mint the rev-3 resolver beside it.
   RESOLVED (agent, 2026-11-21, delegated): (a), rung 3; the charter's `[reuse]` rule, and the
   landed probe already refuses the WSL launcher over a `C:/` path, so id 22 closes with no second
   spelling. widens: none · relaxes: none
@@ -265,17 +312,25 @@ New arm: tools/loop/loop_transition.py · covers AC3 AC4 · the `mail-argv`, `ma
   `plants=<n>` token `check_plant_tokens` holds, so `tools/run-gates/selftest-budgets.txt` joins
   Files touched and AC6 observes it; S3's words are unit 5 S9's, reduced to their observation;
   `policy fixtures`, whose guard holds `tools/loop/` and `tools/run-gates/`, joins the leg line.
+- rev-7 · 2026-11-22 · §1 · S1 · S2 · S3 · S4 · S5 · §4 · §5 · AC1 · AC2 · AC4 · AC5 · AC6 · §7 · §8
+  F1 · §10 · re-grounded at `c9e89a057` by `2026-11-22-prompt-KICK-dKeptSession-36-reground-brief`,
+  unit 5 rev-12 read as landed: S1 states the resolver as TOOL-dWitnessedBar-26 rewrote it, an
+  adapter over the inline `scan_bash` that refuses a set `GOV_BASH` rather than falling through, so
+  AC2 now reads `None` and F1's option (a) is reworded; S2 cites the two import sites; S4 pins
+  `plants=15` to `18` and drops the bare remote; S5 and Shipped texts add the fixture-cases sentences
+  of `help/loop.md` and `tools/loop/README.md` and keep the usage anchor; `docs` joins the leg line.
 
 ## 10. Reuse audit
 
-The seam is the loop kit's landed `tools/loop/loop_witness.py#resolve_bash`, the inline copy of
-`tools/lib/resolve_bash.py#resolve_bash` that the parity table holds, taken with
+The seam is the loop kit's landed `tools/loop/loop_witness.py#resolve_bash`, the adapter over its
+inline copy of `tools/lib/resolve_bash.py#scan_bash` that the parity table holds, taken with
 `tools/loop/loop_lib.py#resolve_kit_dir` in the pair `tools/loop/loop_lib.py#resolve_item_seed`
 already spells and unit 5's `read_mail_rows` takes. `python tools/codebase-map/reuse_lookup.py
-"resolve the bash that shares this filesystem by running each candidate"`, re-run 2026-11-21,
-ranked `resolve_kit_dir` and `resolve_bash`, the latter across twelve files with
-`tools/lib/resolve_bash.py` and `tools/loop/loop_witness.py` among them; `resolve_bash` is the seam
-named, and the rev-3 premise that `tools/lib` held no bash resolver no longer holds. The recall
+"resolve the bash that shares this filesystem by running each candidate"`, re-run 2026-11-22,
+ranked `resolve_kit_dir`, `resolve_bash`, across twelve files (DERIVED, that run) with
+`tools/loop/loop_witness.py` among them, and `scan_bash`, with `tools/lib/resolve_bash.py` among its
+files; `resolve_bash` is the seam named, and the rev-3 premise that `tools/lib` held no bash
+resolver no longer holds. The recall
 query returned TOOL-aMendedFleet-98, a suite's `bash` resolved to Git-Bash, and scout C's row of
 dWitnessedBar naming the `tools/lib/resolve_bash.py` dGroundRules landed; neither disagrees with
 source.
