@@ -416,13 +416,37 @@ read_session_cli_version() { # VAR -> VAR set to the version; 1 and VAR empty wh
   printf -v "$1" '%s' "$_rv"
 }
 
+# PATH's `claude` version, ONE READ (KICK-dKeptSession-37 S1): the `cli —` cell and the card-import
+# fixture's verdict both ask it, so the bound and the parse live once. Bounded by CARD_CLI_BOUND and
+# landed in a scratch file under the card dir, never a `$( )` capture a grandchild could hold open;
+# the first token of two to four integers on the first line it prints.
+read_claude_version() { # -> the version, 0; or `unknown: <why>`, 1
+  local p="" t sf rc
+  local -a toks
+  command -v claude >/dev/null 2>&1 || { printf 'unknown: no claude on PATH\n'; return 1; }
+  sf="$CARD_DIR/.cli.$$"
+  mkdir -p "$CARD_DIR" 2>/dev/null
+  timeout -k 2 "$CARD_CLI_BOUND" claude --version </dev/null >"$sf" 2>/dev/null; rc=$?
+  [ -f "$sf" ] && read -r -a toks < "$sf"
+  rm -f "$sf" 2>/dev/null
+  case "$rc" in 124|137) printf 'unknown: claude --version did not answer within %ss\n' "$CARD_CLI_BOUND"; return 1 ;; esac
+  for t in ${toks[@]+"${toks[@]}"}; do
+    t=${t%$'\r'}
+    [[ $t =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] && { p=$t; break; }
+  done
+  [ -n "$p" ] || { printf 'unknown: claude --version printed no version\n'; return 1; }
+  printf '%s\n' "$p"
+}
+
 # THE CARD-IMPORT FIXTURE'S VERDICT (KICK-dKeptSession-12 S1, S2): one line in the card directory,
 # `card-fixture — <verdict> · fixture <blob8> · cli <version> · <iso>`, node-local because the harness
 # that compacts is the node's, and overwritten by every `--card --fixture-run`. The verdict is `pass`
 # for the fixture's exit 0, `red <limb>` for exit 1 with the limb its last line names after `FAILED
 # limb`, `absent` for its could-not-run exit 2, and `red exit <rc>` otherwise; the blob is `git
-# hash-object` over the fixture, the version `read_session_cli_version`'s, else `unknown`. The writer
-# writes nothing outside the scratch directory but this file; the fixture's harness keeps its own
+# hash-object` over the fixture, the version `read_claude_version`'s, read just before the fixture runs,
+# so it names the binary the fixture's `claude -p` resolves and never the session's (KICK-dKeptSession-37
+# S2), else `unknown`. The writer writes nothing outside the scratch directory but this file and the
+# version read's scratch file, which it removes; the fixture's harness keeps its own
 # transcripts, the one write it names. WHAT THIS DOES NOT CHECK: that the fixture judged anything — a
 # stub under CARD_FIXTURE records a pass as readily as the real one, and the blob is what tells them apart.
 write_card_fixture_verdict() { # scratch dir -> the line it wrote; 2 with nothing written when no fixture runs
@@ -431,6 +455,7 @@ write_card_fixture_verdict() { # scratch dir -> the line it wrote; 2 with nothin
   blob=$(git hash-object -- "$CARD_FIXTURE" 2>/dev/null) && [ -n "$blob" ] \
     || { echo "MANIFEST env ERROR — git hash-object could not read $CARD_FIXTURE, so nothing ran and no verdict was written"; return 2; }
   case "$dir" in /*|[A-Za-z]:*) ;; *) dir="$CALLER_PWD/$dir" ;; esac
+  ver=$(read_claude_version) || ver=unknown
   out=$(bash "$CARD_FIXTURE" "$dir" </dev/null 2>&1); rc=$?
   out=${out//$'\r'/}
   case "$rc" in
@@ -439,7 +464,6 @@ write_card_fixture_verdict() { # scratch dir -> the line it wrote; 2 with nothin
     2) verdict=absent ;;
     *) verdict="red exit $rc" ;;
   esac
-  read_session_cli_version ver || ver=unknown
   printf -v at '%(%Y-%m-%dT%H:%M:%S%z)T' -1
   line="card-fixture — $verdict · fixture ${blob:0:8} · cli $ver · $at"
   { mkdir -p "$CARD_DIR" && printf '%s\n' "$line" > "$CARD_DIR/$CARD_FIXTURE_VERDICT"; } 2>/dev/null \
@@ -591,26 +615,15 @@ derive_node_tag() {
 }
 
 # The `cli —` cell (KICK-aMendedFleet-4): PATH's `claude --version` against the running session's
-# version. The session's is `read_session_cli_version`'s, the one reader of `AI_AGENT`. The PATH read
-# is bounded and lands in a scratch file under the card dir, never a `$( )` capture a grandchild could
-# hold open. Fields compare as integers, a missing one as 0; every failure is its own `skipped:` line,
-# and none moves the card's exit.
+# version. The session's is `read_session_cli_version`'s, the one reader of `AI_AGENT`, and PATH's
+# `read_claude_version`'s, the one read of that binary, whose `unknown:` reason is the `skipped:` line.
+# Fields compare as integers, a missing one as 0; every failure is its own `skipped:` line, and none
+# moves the card's exit.
 derive_cli_line() {
-  local s="" p="" t sf rc c=0 i
-  local -a toks a b
+  local s="" p="" c=0 i
+  local -a a b
   read_session_cli_version s || { printf 'cli — skipped: AI_AGENT names no Claude Code version\n'; return 0; }
-  command -v claude >/dev/null 2>&1 || { printf 'cli — skipped: no claude on PATH\n'; return 0; }
-  sf="$CARD_DIR/.cli.$$"
-  mkdir -p "$CARD_DIR" 2>/dev/null
-  timeout -k 2 "$CARD_CLI_BOUND" claude --version </dev/null >"$sf" 2>/dev/null; rc=$?
-  [ -f "$sf" ] && read -r -a toks < "$sf"
-  rm -f "$sf" 2>/dev/null
-  case "$rc" in 124|137) printf 'cli — skipped: claude --version did not answer within %ss\n' "$CARD_CLI_BOUND"; return 0 ;; esac
-  for t in ${toks[@]+"${toks[@]}"}; do
-    t=${t%$'\r'}
-    [[ $t =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] && { p=$t; break; }
-  done
-  [ -n "$p" ] || { printf 'cli — skipped: claude --version printed no version\n'; return 0; }
+  p=$(read_claude_version) || { printf 'cli — skipped: %s\n' "${p#unknown: }"; return 0; }
   a=(${p//./ }); b=(${s//./ })
   for i in 0 1 2 3; do
     (( 10#${a[i]:-0} == 10#${b[i]:-0} )) && continue
