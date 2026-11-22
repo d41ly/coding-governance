@@ -59,7 +59,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `e239d8161fb3a02a24f65039f3045947b0b382aa`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `62ccec623069583d765b86d723e0533c739169e5`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -68,7 +68,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `b1b9c9b613365fa43ad0e9eb94db3b96a03eba6e`
+- rendered at: `26f5ff5ad4d34164eece6a3bb43f8c3fec301d5f`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -140,22 +140,22 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dRankedPl
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dRankedPlan-1` · README:60 | 1 | `TOOL-dRankedPlan-1` | `cl-dClosedLoop-0369@9f2afd12` | priority beside `parents:` and the generated plan view |
-- unit id `TOOL-dRankedPlan-2` · README:61 | 2 | `TOOL-dRankedPlan-2` | `cl-dClosedLoop-0370@23b0ac8f` | the planner and triager role and Plan workflow |
-- unit id `TOOL-dRankedPlan-3` · README:62 | 3 | `TOOL-dRankedPlan-3` | `cl-dClosedLoop-0371@3ec4f25f` | triage as `plan.triage` says: by `plan.triage-rule`'s declared rules |
-- unit id `TOOL-dRankedPlan-4` · README:63 | 4 | `TOOL-dRankedPlan-4` | `cl-dClosedLoop-0372@5c733981` | dormancy disposal |
-- unit id `TOOL-dRankedPlan-5` · README:64 | 5 | `TOOL-dRankedPlan-5` | `cl-dClosedLoop-0373@70fb5631` | the live-build mapping carried out |
-- unit id `TOOL-dRankedPlan-6` · README:65 | 6 | `TOOL-dRankedPlan-6` | `cl-dClosedLoop-0374@c6143eda` | Plan Review |
-- unit id `TOOL-dRankedPlan-7` · README:66 | 7 | `TOOL-dRankedPlan-7` | `cl-dClosedLoop-0375@33084fbd` | kickoff using the plan as `plan.kickoff` says: offering the plan's next item under `offer-next` |
-- unit id `TOOL-dRankedPlan-8` · README:67 | 8 | `TOOL-dRankedPlan-8` | `cl-dClosedLoop-0376@f1c33063` | the full kickoff only where `kickoff.runs` says |
-- unit id `TOOL-dRankedPlan-9` · README:68 | 9 | `TOOL-dRankedPlan-9` | `cl-dClosedLoop-0377@fd363a7f` | the session's intake log |
-- unit id `TOOL-dRankedPlan-10` · README:69 | 10 | `TOOL-dRankedPlan-10` | `cl-dClosedLoop-0378@ed811c10` | until the intake kind lands and the harness's adapter declares the prompt-submit event in its capability table |
-- unit id `TOOL-dRankedPlan-11` · README:70 | 11 | `TOOL-dRankedPlan-11` | `cl-dClosedLoop-0379@f1807fe1` | each role item's memory read set sized at Plan |
-- unit id `TOOL-dRankedPlan-12` · README:71 | 12 | `TOOL-dRankedPlan-12` | `cl-dClosedLoop-0380@1e2f59a7` | `plan.record` declaring the probes owed before Design (night pass |
-- unit id `TOOL-dRankedPlan-13` · README:72 | 13 | `TOOL-dRankedPlan-13` | `cl-dClosedLoop-0381@634c7b47` | the plan record's intent fields: the affected systems derived from the `code` record and checked |
-- unit id `TOOL-dRankedPlan-14` · README:73 | 14 | `TOOL-dRankedPlan-14` | `cl-dClosedLoop-0382@182ba9ba` | the plan record's scenario field |
-- unit id `TOOL-dRankedPlan-15` · README:74 | 15 | `TOOL-dRankedPlan-15` | `cl-dClosedLoop-0497@2b8de50e` | the plan revision record: a fork the goal cannot survive moving the build from designing back to planning |
-- unit id `TOOL-dRankedPlan-16` · README:75 | 16 | `TOOL-dRankedPlan-16` | `cl-dClosedLoop-0498@e9d43f26` | the artifact levels declared as the owner confirmed them in the flow round: the card at the session's level above the plan |
+- unit id `TOOL-dRankedPlan-1` · README:59 | 1 | `TOOL-dRankedPlan-1` | `cl-dClosedLoop-0369@9f2afd12` | priority beside `parents:` and the generated plan view |
+- unit id `TOOL-dRankedPlan-2` · README:60 | 2 | `TOOL-dRankedPlan-2` | `cl-dClosedLoop-0370@23b0ac8f` | the planner and triager role and Plan workflow |
+- unit id `TOOL-dRankedPlan-3` · README:61 | 3 | `TOOL-dRankedPlan-3` | `cl-dClosedLoop-0371@3ec4f25f` | triage as `plan.triage` says: by `plan.triage-rule`'s declared rules |
+- unit id `TOOL-dRankedPlan-4` · README:62 | 4 | `TOOL-dRankedPlan-4` | `cl-dClosedLoop-0372@5c733981` | dormancy disposal |
+- unit id `TOOL-dRankedPlan-5` · README:63 | 5 | `TOOL-dRankedPlan-5` | `cl-dClosedLoop-0373@70fb5631` | the live-build mapping carried out |
+- unit id `TOOL-dRankedPlan-6` · README:64 | 6 | `TOOL-dRankedPlan-6` | `cl-dClosedLoop-0374@c6143eda` | Plan Review |
+- unit id `TOOL-dRankedPlan-7` · README:65 | 7 | `TOOL-dRankedPlan-7` | `cl-dClosedLoop-0375@33084fbd` | kickoff using the plan as `plan.kickoff` says: offering the plan's next item under `offer-next` |
+- unit id `TOOL-dRankedPlan-8` · README:66 | 8 | `TOOL-dRankedPlan-8` | `cl-dClosedLoop-0376@f1c33063` | the full kickoff only where `kickoff.runs` says |
+- unit id `TOOL-dRankedPlan-9` · README:67 | 9 | `TOOL-dRankedPlan-9` | `cl-dClosedLoop-0377@fd363a7f` | the session's intake log |
+- unit id `TOOL-dRankedPlan-10` · README:68 | 10 | `TOOL-dRankedPlan-10` | `cl-dClosedLoop-0378@ed811c10` | until the intake kind lands and the harness's adapter declares the prompt-submit event in its capability table |
+- unit id `TOOL-dRankedPlan-11` · README:69 | 11 | `TOOL-dRankedPlan-11` | `cl-dClosedLoop-0379@f1807fe1` | each role item's memory read set sized at Plan |
+- unit id `TOOL-dRankedPlan-12` · README:70 | 12 | `TOOL-dRankedPlan-12` | `cl-dClosedLoop-0380@1e2f59a7` | `plan.record` declaring the probes owed before Design (night pass |
+- unit id `TOOL-dRankedPlan-13` · README:71 | 13 | `TOOL-dRankedPlan-13` | `cl-dClosedLoop-0381@634c7b47` | the plan record's intent fields: the affected systems derived from the `code` record and checked |
+- unit id `TOOL-dRankedPlan-14` · README:72 | 14 | `TOOL-dRankedPlan-14` | `cl-dClosedLoop-0382@182ba9ba` | the plan record's scenario field |
+- unit id `TOOL-dRankedPlan-15` · README:73 | 15 | `TOOL-dRankedPlan-15` | `cl-dClosedLoop-0497@2b8de50e` | the plan revision record: a fork the goal cannot survive moving the build from designing back to planning |
+- unit id `TOOL-dRankedPlan-16` · README:74 | 16 | `TOOL-dRankedPlan-16` | `cl-dClosedLoop-0498@e9d43f26` | the artifact levels declared as the owner confirmed them in the flow round: the card at the session's level above the plan |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
