@@ -1,6 +1,6 @@
 # TOOL-aWrappedRoster-1 — the leg-manifest parser reads an object-wrapped manifest
 
-**Status:** SPECCED · rev-1 · 2026-11-22 · node a · Tier-1 · base 8b8b1374 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-11-22 · node a · Tier-1 · base 8b8b1374 · streams tooling
 
 <!-- gen:spec-records -->
 
