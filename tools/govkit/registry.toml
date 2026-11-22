@@ -845,6 +845,21 @@ enforces = ["practice.portable.launch", "practice.portable.interpreter-floor"]
 stage = ["step.test"]
 
 [[exempt_leg]]
+name = "history-store selftest"
+why = """
+self-tests <prefix>/lib/history_store.py, the history verdict store and its one `cat-file --batch` reader, in a scratch repository of its own. <prefix>/lib/ is the permanently exempt gov-internal directory and has no kit descriptor, so the leg is declared here; the kits that carry the module inline are graded against it by the python resolver's parity rows. TOOL-dQuietDisk-1.
+"""
+tag = "leg.gov.history-store-selftest"
+purpose = "self-tests the history verdict store and its batch reader"
+argv = ["python3", "{prefix}/lib/history_store.py", "--selftest"]
+guard = ["{prefix}/lib/history_store.py", "{prefix}/lib/history-store.sh"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 120
+stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[[exempt_leg]]
 name = "run-gates gov canary"
 why = """
 the GOV-ONLY arms of the run-gates canary, gov-only for the reason the recall-floor pair above is: each arm is keyed on THIS repo's corpus — gov's declared chunk names, gov's network-calling leg names, a named gov leg's guard — so in any other tree they would red on absence rather than on behaviour. `<prefix>/run-gates/kit.toml` withholds the file from the payload with a `project-owned` rule, so an adopter never receives the program this leg runs, and the harness REFUSES (exit 2) rather than passing when the manifest it is pointed at is not gov's. The SHIPPED canary keeps every assertion true in any tree and is claimed, as a [[gate_leg]] of the run-gates entry.

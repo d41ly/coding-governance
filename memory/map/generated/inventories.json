@@ -54,6 +54,7 @@
       "held-halves selftest",
       "help page commands",
       "help reference pages",
+      "history-store selftest",
       "hook destinations (every declared hook path ships)",
       "hook destinations self-test",
       "install-prefix (shipped surface)",

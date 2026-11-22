@@ -442,6 +442,8 @@ selection_row|$ROOT/$RUNGATES_DIR/verdict_flow.py|$RUNGATES_DIR/verdict_flow
 gov_ref_sh|$ROOT/$KIT_REL/gov-ref.sh|$KIT_REL/gov-ref
 gov_feed_sh|$ROOT/$KIT_REL/gov-feed.sh|$KIT_REL/gov-feed
 home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
+history_store_py|$ROOT/$KIT_REL/history_store.py|$KIT_REL/history_store
+history_store_sh|$ROOT/$KIT_REL/history-store.sh|$KIT_REL/history-store
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -527,6 +529,9 @@ home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
 # gov_ref_sh (TOOL-dPlacedRequest-11 S1, S2) is the one compare-and-swap writer of a governance ref
 # and its parented commit: the unattended driver's claim write and post-merge's bar-red ref each carry
 # it inline, and part 2p below holds the canonical to its failed-build contract.
+# history_store_py and history_store_sh (TOOL-dQuietDisk-1 S10) are the history verdict store and its
+# `cat-file --batch` reader, and their bash face: the unattended kit's and the memory-tree kit's
+# history_store.py are the module whole, and the unattended kit's lib-unattended.sh carries the face.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one

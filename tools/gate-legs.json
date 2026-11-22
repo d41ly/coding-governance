@@ -2575,6 +2575,29 @@
     ]
   },
   {
+    "name": "history-store selftest",
+    "tag": "leg.gov.history-store-selftest",
+    "purpose": "self-tests the history verdict store and its batch reader",
+    "argv": [
+      "python3",
+      "{prefix}/lib/history_store.py",
+      "--selftest"
+    ],
+    "guard": [
+      "{prefix}/lib/history_store.py",
+      "{prefix}/lib/history-store.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 120,
+    "enforces": [
+      "practice.gate"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
     "name": "run-gates gov canary",
     "tag": "leg.gov.run-gates-gov-canary",
     "tests": [

@@ -291,6 +291,14 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
+## `tests.history-verdicts`
+<!-- usage: policy:tests.history-verdicts 67c74b61 -->
+Whether a history leg keeps each item's verdict in a store under the git common dir, keyed by the commit and blob ids the item reads and by the grading code's bytes, so a run grades only what is new, or regrades all of history on every run.
+
+```text
+tests.history-verdicts = "regraded"
+```
+
 ## Not yet summarised (226)
 - `preset`
 - `design.forks`
