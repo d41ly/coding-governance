@@ -32,3 +32,4 @@ memory/guides/UNATTENDED-STOPS.md	1	9e21ac760dc0a43d6ed007396922722ccee98d57	see
 memory/guides/UNATTENDED-VERBS.md	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 skills/deploy-governance/SKILL.md	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 skills/session-kickoff/SKILL.md	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+.claude/agents/gov-tester.md	1	a29bc9f761c27789683d4d3666e5c5b0bcf8a98e	widened:2026-11-22-build-TOOL-dWitnessedBar-23-widen-33
