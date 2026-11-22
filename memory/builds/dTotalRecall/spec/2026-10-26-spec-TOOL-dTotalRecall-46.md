@@ -1,6 +1,6 @@
-# TOOL-dTotalRecall-46 — `parse_id_parts` reads the named groups of `tree_lib.build_id_token_re`, and a correction suffix parses
+# TOOL-dTotalRecall-46 — the `parse_id_parts` unit 54 built reads the named groups of `tree_lib.build_id_token_re`, and a correction suffix parses
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base c2143acf · streams tooling · order 9 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base b71b6dd0 · streams tooling · order 9 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,7 +11,10 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-46-deviation-461.md](../build/2026-10-26-build-TOOL-dTotalRecall-46-deviation-461.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-46-deviation-462.md](../build/2026-10-26-build-TOOL-dTotalRecall-46-deviation-462.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-46-reground-2-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-46-reground-2-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-46-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-46-reground-return.md) | research | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-46-reground-2-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-46-reground-2-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-46-reground-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-46-reground-2-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-46-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-46-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-46-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-46-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 |
@@ -30,8 +33,9 @@ PLAY-dOrderedCharter-18 moved them out of `extract.py`), and `TOOL-dTotalRecall-
 every call raises `IndexError: no such group`. Its `int(seq)` also raises on a correction id such as
 `TOOL-aDrainedSluice-9b`, which the session era's `[a-z]*` tail admits (`#_eras`). The named groups
 already exist: `tools/memory-tree/tree_lib.py#build_id_token_re` carries `fam`, `slug`, `seq` and
-`rev`, and unit 5 S13 binds its slug class to the grammar at step 7. This unit rebuilds the parser on
-that regex. It repairs `TOOL-dTotalRecall-38`.
+`rev`, and unit 5 S13 bound its slug class to the grammar at step 7 (`202a354a4`,
+`tools/memory-tree/tree_lib.py#read_slug_class`). `TOOL-dTotalRecall-54` built the parser on that
+regex at step 8 (`74af3faa4`), and this unit observes it. It repairs `TOOL-dTotalRecall-38`.
 
 ## 2. Scope (IN)
 
@@ -42,9 +46,13 @@ that regex. It repairs `TOOL-dTotalRecall-38`.
   `slug` and `seq`. This unit's pass builds no body and observes that one. Observed by AC1.
 - **S2** — A correction suffix parses. Before the match unit 54's body strips one trailing run of
   lowercase letters after the final digits, the session era's `[a-z]*`, so `TOOL-aDrainedSluice-9b`
-  returns `("TOOL", "aDrainedSluice", 9)`. No re-pointed caller reads the suffix: each takes the slug,
-  and the one sort key compares sequences, where today's `int(i.rsplit("-", 1)[1])` raises on the same
-  id. Observed by AC2.
+  returns `("TOOL", "aDrainedSluice", 9)`. No re-pointed caller reads the suffix (DERIVED 2026-11-22,
+  `git grep -n parse_id_parts -- tools`): seven take the slug, and three sort keys compare the
+  sequence as a number (`tools/memory-tree/backlog.py#build_ask_sort_key`,
+  `tools/memory-tree/migrate_backlog.py#build_id_sort_key`, the `ids.sort` key in
+  `tools/memory-tree/gen_build_index.py#cmd_new_build`), where the split shape
+  `int(i.rsplit("-", 1)[1])` still spelled by `tools/memory-tree/gen_build_index.py#_roster_sort_key`
+  raises on the same id. Observed by AC2.
 - **S3** — Unit 54's body raises `ValueError` naming any id `build_id_token_re` does not
   match whole, a flat-era `ARCH-001` and a node-scoped `ABL-d119` among them, and each caller keeps
   the answer it gives a malformed id. Observed by AC3.
@@ -52,7 +60,7 @@ that regex. It repairs `TOOL-dTotalRecall-38`.
 ## 3. Non-goals (OUT)
 
 - The grammar, `grammar_for`, `ID_RE` and the slug class: `TOOL-dTotalRecall-5`'s.
-- Which callers parse: `TOOL-dTotalRecall-38`'s ten and `TOOL-dTotalRecall-45`'s three.
+- Which callers parse: `TOOL-dTotalRecall-38`'s ten and `TOOL-dTotalRecall-45`'s four.
 - What each re-pointed caller answered for the flat and node-scoped eras: the batch
   `TOOL-dTotalRecall-53` holds that answer equal to base for id 2.
 - Returning the suffix. A caller that needs it is a later unit's, which widens the tuple then.
@@ -98,17 +106,20 @@ none: the pass observes unit 54's body
 - error / empty / loading states — `ValueError` on any id the session-era regex does not match whole.
 - observability — the error names the id.
 - risks — a caller that wanted a suffixed id kept distinct from its parent sees them sort together;
-  no such caller exists at base.
+  none exists at HEAD: two sort keys break the tie on the whole id, and `cmd_new_build` sorts ids
+  `read_idlist` admitted through `build_id_token_re`, whose `\d+$` takes no suffix.
 - testing — AC1 to AC3 by the pass
 - migration — none.
 - user docs — none under `help/`.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a `python -c` probe calls `parse_id_parts("TOOL-dTotalRecall-38", ".")` from
-  `id_grammar.py`, it returns `("TOOL", "dTotalRecall", 38)`, and `grep -c 'ID_RE' ` over the function's
-  source prints `0`. In a scratch tree whose `.memory-tree.conf` declares `RECALL_CITED_FAMILIES` with
+- **AC1** — When a `python -c` probe run from the repository root, with `tools/memory-tree` on
+  `sys.path`, calls `id_grammar.parse_id_parts("TOOL-dTotalRecall-38", ".")`, it returns
+  `("TOOL", "dTotalRecall", 38)`, and `grep -c 'ID_RE'` over the function's `inspect.getsource`
+  prints `0` (grep exits 1 on no match). In a scratch tree whose `.memory-tree.conf` declares `RECALL_CITED_FAMILIES` with
   `ZED`, the call on `ZED-aFoo-2` returns `("ZED", "aFoo", 2)`.
+  That conf also declares `MEMORY_ROOT` and `FAMILIES`, without which `id_grammar.py#resolve` refuses.
   Red when: the parser reads a group `ID_RE` lacks, or refuses a cited family.
   fixture: the scratch tree under the run's scratch directory; the pass makes it.
 - **AC2** — When the same probe calls it with `TOOL-aDrainedSluice-9b`, it returns
@@ -130,7 +141,7 @@ none: the pass observes unit 54's body
   carry of `TOOL-dTotalRecall-5`'s clause, which would split a clause that unit carries whole. (b)
   reds the parts join; veto 1 discards it. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the
   precedent `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
-- **F2 — Does the re-ground fold units 63's and 64's amendments into this spec?** At HEAD no
+- **F2 — Does the re-ground fold units 63's and 64's amendments into this spec?** At base `c2143acf` no
   `parse_id_parts` exists; `TOOL-dTotalRecall-54` lands it at step 8 on `grammar_for(root).families`,
   and `TOOL-dTotalRecall-64` S1 to S4 rewrite this spec's S1, §4, §5, §7 New arm line, §10 and the
   edge to unit 38 to observe that body, with `TOOL-dTotalRecall-63` S1 adding AC1's cited case, both
@@ -159,6 +170,12 @@ none: the pass observes unit 54's body
   §5 perf and testing follow; §7's New arm line is struck, unit 54's arm covering the same cases at
   the close; §10 names unit 54's body as the seam; the consumes-from edge to unit 38 names unit 54 as
   the body's builder.
+- rev-7 · 2026-11-22 · title §1 S2 §3 §5 AC1 §8 · re-grounded at base `b71b6dd0` per
+  `2026-11-22-prompt-TOOL-dTotalRecall-46-reground-2-brief`: the title and §1 name unit 54 as the
+  parser's builder and this unit as its observer; S2 names the three sort keys at HEAD; §3 counts
+  unit 45's four readers; §5's risk is checked at HEAD; AC1's probe runs from the repository root,
+  where `tools/memory-tree/` stopped on the conf refusal, and names the scratch conf's two required
+  keys; F2 says base where it said HEAD.
 
 ## 10. Reuse audit
 
