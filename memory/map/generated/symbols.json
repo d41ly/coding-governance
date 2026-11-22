@@ -20350,7 +20350,7 @@
     {
       "id": "read_card_fixture_verdict",
       "kind": "function",
-      "file": "skills/session-kickoff/card-store.fixture.sh"
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "read_card_policy",
@@ -23978,6 +23978,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_session_cli_version",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "read_session_id",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -24406,6 +24411,11 @@
       "id": "read_store_json",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_stored_tree_cell",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "read_stub_log",
@@ -34848,6 +34858,11 @@
       "file": "skills/session-kickoff/card-store.fixture.sh"
     },
     {
+      "id": "set_card_verdict",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
       "id": "set_cf_tree",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -38046,6 +38061,11 @@
       "id": "write_card_fixture",
       "kind": "function",
       "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
+      "id": "write_card_fixture_verdict",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "write_card_follow",

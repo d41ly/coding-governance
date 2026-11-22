@@ -1,6 +1,6 @@
 # KICK-dKeptSession-12 — a fresh session in the build's worktree recommended until the card-import fixture passes
 
-**Status:** INPROGRESS · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 8 · advances KICK-dKeptSession-29 · closes KICK-dKeptSession-66
+**Status:** CLOSED · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 8 · advances KICK-dKeptSession-29 · closes KICK-dKeptSession-66
 
 **Carries:** cl-dClosedLoop-0150@1c3b5ca1 whole
 
@@ -14,6 +14,7 @@
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-12-deviation-121.md](../build/2026-10-26-build-KICK-dKeptSession-12-deviation-121.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-12-deviation-122.md](../build/2026-10-26-build-KICK-dKeptSession-12-deviation-122.md) | deviation | — |
+| [2026-11-21-build-KICK-dKeptSession-12-1-acceptance-ledger.md](../build/2026-11-21-build-KICK-dKeptSession-12-1-acceptance-ledger.md) | journal | — |
 | [2026-11-21-build-KICK-dKeptSession-16-reground-orders-7-13-returns.md](../build/2026-11-21-build-KICK-dKeptSession-16-reground-orders-7-13-returns.md) | research | KICK-dKeptSession-16 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-5 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-14 KICK-dKeptSession-28 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |

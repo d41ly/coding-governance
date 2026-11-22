@@ -2486,7 +2486,10 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # list ran 8, so 26 more ok rows, and its liveness check_eq; S2's upper-cased USERNAME arm, one
 # run_card and one check_eq. Counted off the block; no suite ran in the pass, each plant was run
 # alone by direct CLI.
-FLOOR_ASSERTIONS=408
+# +4: RAISED by KICK-dKeptSession-12 S6 — the four plants it adds to `--list` (fixture-stale,
+# fixture-run, worktree-named, replay-order), one ok row each from the loop above; no suite ran in
+# the pass, each plant was run alone by direct CLI.
+FLOOR_ASSERTIONS=412
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced
