@@ -137,8 +137,8 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-9 — the memory extractors, `record find` and `record show` over the one index, and the per-item read budget](spec/2026-10-26-spec-TOOL-dTotalRecall-9.md) | 18 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dTotalRecall-23 — the memory legs read the one index's rows for unchanged blobs and re-parse only changed ones](spec/2026-10-26-spec-TOOL-dTotalRecall-23.md) | 19 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-61 — unit 53 keeps the build-folder rows of its two file-keyed constants through its own pass, so no keep it needs lands after it](spec/2026-10-26-spec-TOOL-dTotalRecall-61.md) | 19 | 2 | DEFERRED | rev-3 | 2026-11-22 |
-| [TOOL-dTotalRecall-24 — every landed commit that touches a record appended to the change feed](spec/2026-10-26-spec-TOOL-dTotalRecall-24.md) | 20 | 2 | DEFERRED | rev-1 | 2026-10-26 |
-| [TOOL-dTotalRecall-67 — unit 61's amendments to units 55, 56 and 57 are read by their own text at step 20, and any it left unwritten is written before those units build](spec/2026-10-26-spec-TOOL-dTotalRecall-67.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-26 |
+| [TOOL-dTotalRecall-24 — every landed commit that touches a record appended to the change feed](spec/2026-10-26-spec-TOOL-dTotalRecall-24.md) | 20 | 2 | DEFERRED | rev-2 | 2026-11-23 |
+| [TOOL-dTotalRecall-67 — unit 61's amendments to units 55, 56 and 57 are read by their own text at step 20, and any it left unwritten is written before those units build](spec/2026-10-26-spec-TOOL-dTotalRecall-67.md) | 20 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-20 — this build's own upgrade steps: the journal alias, the scaffold verbs forwarded to record, the front matter graded, and the retag](spec/2026-10-26-spec-TOOL-dTotalRecall-20.md) | 21 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dTotalRecall-71 — unit 57's edge to unit 56 is certified at step 21 by a probe proven live on a copy without it, and unit 67's false reading is recorded](spec/2026-10-26-spec-TOOL-dTotalRecall-71.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-72 — unit 57's edge to unit 56 is read at step 21 by a probe no shell quotes, and written with its mirror before unit 57 builds if absent](spec/2026-10-26-spec-TOOL-dTotalRecall-72.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-26 |
@@ -192,20 +192,20 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 511 bound to this build, across 4 record folder(s).
+Records: 518 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dTotalRecall-100 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99.
 
 Ids whose spec moved past its audited revision: TOOL-dTotalRecall-1@rev-1 TOOL-dTotalRecall-10@rev-1 TOOL-dTotalRecall-11@rev-1 TOOL-dTotalRecall-12@rev-1 TOOL-dTotalRecall-13@rev-1 TOOL-dTotalRecall-14@rev-1 TOOL-dTotalRecall-15@rev-1 TOOL-dTotalRecall-16@rev-1 TOOL-dTotalRecall-17@rev-1
-TOOL-dTotalRecall-18@rev-1 TOOL-dTotalRecall-19@rev-1 TOOL-dTotalRecall-2@rev-1 TOOL-dTotalRecall-20@rev-1 TOOL-dTotalRecall-21@rev-1 TOOL-dTotalRecall-22@rev-1 TOOL-dTotalRecall-23@rev-1 TOOL-dTotalRecall-25@rev-1 TOOL-dTotalRecall-26@rev-1 TOOL-dTotalRecall-3@rev-1 TOOL-dTotalRecall-36@rev-1
-TOOL-dTotalRecall-37@rev-1 TOOL-dTotalRecall-38@rev-1 TOOL-dTotalRecall-39@rev-1 TOOL-dTotalRecall-4@rev-1 TOOL-dTotalRecall-40@rev-1 TOOL-dTotalRecall-41@rev-1 TOOL-dTotalRecall-42@rev-1 TOOL-dTotalRecall-43@rev-1 TOOL-dTotalRecall-44@rev-1 TOOL-dTotalRecall-45@rev-1 TOOL-dTotalRecall-46@rev-1
-TOOL-dTotalRecall-47@rev-1 TOOL-dTotalRecall-48@rev-1 TOOL-dTotalRecall-49@rev-1 TOOL-dTotalRecall-5@rev-1 TOOL-dTotalRecall-50@rev-1 TOOL-dTotalRecall-51@rev-1 TOOL-dTotalRecall-52@rev-1 TOOL-dTotalRecall-53@rev-1 TOOL-dTotalRecall-54@rev-1 TOOL-dTotalRecall-55@rev-1 TOOL-dTotalRecall-56@rev-1
-TOOL-dTotalRecall-57@rev-1 TOOL-dTotalRecall-58@rev-1 TOOL-dTotalRecall-59@rev-1 TOOL-dTotalRecall-6@rev-1 TOOL-dTotalRecall-60@rev-1 TOOL-dTotalRecall-61@rev-1 TOOL-dTotalRecall-62@rev-1 TOOL-dTotalRecall-63@rev-1 TOOL-dTotalRecall-64@rev-1 TOOL-dTotalRecall-65@rev-1 TOOL-dTotalRecall-66@rev-1
-TOOL-dTotalRecall-67@rev-1 TOOL-dTotalRecall-68@rev-1 TOOL-dTotalRecall-69@rev-1 TOOL-dTotalRecall-7@rev-1 TOOL-dTotalRecall-70@rev-1 TOOL-dTotalRecall-71@rev-1 TOOL-dTotalRecall-72@rev-1 TOOL-dTotalRecall-73@rev-1 TOOL-dTotalRecall-74@rev-1 TOOL-dTotalRecall-75@rev-1 TOOL-dTotalRecall-76@rev-1
-TOOL-dTotalRecall-77@rev-1 TOOL-dTotalRecall-78@rev-1 TOOL-dTotalRecall-79@rev-1 TOOL-dTotalRecall-8@rev-1 TOOL-dTotalRecall-80@rev-1 TOOL-dTotalRecall-81@rev-1 TOOL-dTotalRecall-82@rev-1 TOOL-dTotalRecall-83@rev-1 TOOL-dTotalRecall-84@rev-1 TOOL-dTotalRecall-85@rev-1 TOOL-dTotalRecall-86@rev-1
-TOOL-dTotalRecall-87@rev-1 TOOL-dTotalRecall-88@rev-1 TOOL-dTotalRecall-89@rev-1 TOOL-dTotalRecall-9@rev-1 TOOL-dTotalRecall-90@rev-1 TOOL-dTotalRecall-91@rev-1 TOOL-dTotalRecall-92@rev-1.
+TOOL-dTotalRecall-18@rev-1 TOOL-dTotalRecall-19@rev-1 TOOL-dTotalRecall-2@rev-1 TOOL-dTotalRecall-20@rev-1 TOOL-dTotalRecall-21@rev-1 TOOL-dTotalRecall-22@rev-1 TOOL-dTotalRecall-23@rev-1 TOOL-dTotalRecall-24@rev-1 TOOL-dTotalRecall-25@rev-1 TOOL-dTotalRecall-26@rev-1 TOOL-dTotalRecall-3@rev-1
+TOOL-dTotalRecall-36@rev-1 TOOL-dTotalRecall-37@rev-1 TOOL-dTotalRecall-38@rev-1 TOOL-dTotalRecall-39@rev-1 TOOL-dTotalRecall-4@rev-1 TOOL-dTotalRecall-40@rev-1 TOOL-dTotalRecall-41@rev-1 TOOL-dTotalRecall-42@rev-1 TOOL-dTotalRecall-43@rev-1 TOOL-dTotalRecall-44@rev-1 TOOL-dTotalRecall-45@rev-1
+TOOL-dTotalRecall-46@rev-1 TOOL-dTotalRecall-47@rev-1 TOOL-dTotalRecall-48@rev-1 TOOL-dTotalRecall-49@rev-1 TOOL-dTotalRecall-5@rev-1 TOOL-dTotalRecall-50@rev-1 TOOL-dTotalRecall-51@rev-1 TOOL-dTotalRecall-52@rev-1 TOOL-dTotalRecall-53@rev-1 TOOL-dTotalRecall-54@rev-1 TOOL-dTotalRecall-55@rev-1
+TOOL-dTotalRecall-56@rev-1 TOOL-dTotalRecall-57@rev-1 TOOL-dTotalRecall-58@rev-1 TOOL-dTotalRecall-59@rev-1 TOOL-dTotalRecall-6@rev-1 TOOL-dTotalRecall-60@rev-1 TOOL-dTotalRecall-61@rev-1 TOOL-dTotalRecall-62@rev-1 TOOL-dTotalRecall-63@rev-1 TOOL-dTotalRecall-64@rev-1 TOOL-dTotalRecall-65@rev-1
+TOOL-dTotalRecall-66@rev-1 TOOL-dTotalRecall-67@rev-1 TOOL-dTotalRecall-68@rev-1 TOOL-dTotalRecall-69@rev-1 TOOL-dTotalRecall-7@rev-1 TOOL-dTotalRecall-70@rev-1 TOOL-dTotalRecall-71@rev-1 TOOL-dTotalRecall-72@rev-1 TOOL-dTotalRecall-73@rev-1 TOOL-dTotalRecall-74@rev-1 TOOL-dTotalRecall-75@rev-1
+TOOL-dTotalRecall-76@rev-1 TOOL-dTotalRecall-77@rev-1 TOOL-dTotalRecall-78@rev-1 TOOL-dTotalRecall-79@rev-1 TOOL-dTotalRecall-8@rev-1 TOOL-dTotalRecall-80@rev-1 TOOL-dTotalRecall-81@rev-1 TOOL-dTotalRecall-82@rev-1 TOOL-dTotalRecall-83@rev-1 TOOL-dTotalRecall-84@rev-1 TOOL-dTotalRecall-85@rev-1
+TOOL-dTotalRecall-86@rev-1 TOOL-dTotalRecall-87@rev-1 TOOL-dTotalRecall-88@rev-1 TOOL-dTotalRecall-89@rev-1 TOOL-dTotalRecall-9@rev-1 TOOL-dTotalRecall-90@rev-1 TOOL-dTotalRecall-91@rev-1 TOOL-dTotalRecall-92@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
@@ -298,13 +298,13 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-brief.md` and 210 more under prompts/ |
+| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-brief.md` and 214 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-22-build-TOOL-dTotalRecall-8-deviation-83.md`, `2026-11-22-build-TOOL-dTotalRecall-6-deviation-63.md` and 136 more under build/ |
 | red-fix | `2026-11-22-build-TOOL-dTotalRecall-6-red-fix-13.md`, `2026-11-22-build-TOOL-dTotalRecall-5-red-fix-9.md` and 12 more under build/ |
 | widen | `2026-11-22-build-TOOL-dTotalRecall-8-widen-1.md`, `2026-11-22-build-TOOL-dTotalRecall-7-widen-4.md` and 2 more under build/ |
-| research | `2026-11-22-build-TOOL-dTotalRecall-9-reground-return.md`, `2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md` and 89 more under build/ |
-| logs | `2026-11-22-build-TOOL-dTotalRecall-7-2-builder-return.md`, `2026-11-22-build-TOOL-dTotalRecall-7-2-acceptance-ledger.md` and 41 more under build/ |
+| research | `2026-11-22-build-TOOL-dTotalRecall-9-reground-return.md`, `2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md` and 91 more under build/ |
+| logs | `2026-11-22-build-TOOL-dTotalRecall-7-2-builder-return.md`, `2026-11-22-build-TOOL-dTotalRecall-7-2-acceptance-ledger.md` and 42 more under build/ |
 | open asks | `BACKLOG.md`, 10 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->

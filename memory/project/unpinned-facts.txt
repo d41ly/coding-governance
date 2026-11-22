@@ -14378,8 +14378,6 @@ memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-13.md	8 calls	
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-14.md	16,384 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-14.md	32,768 B	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-17.md	900 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-24.md	5 MB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-24.md	5,801 commits	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-26.md	1,000 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-26.md	275,094 B	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-26.md	4 records	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

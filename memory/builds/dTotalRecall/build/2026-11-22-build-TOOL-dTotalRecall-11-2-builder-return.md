@@ -22,7 +22,7 @@ TOOL-dTotalRecall-11 is built and committed as 71ce746a0 on base f711a9567. The 
 
 **Checks that ran** (probes of this unit's own code; each stands in for the gate named):
 - **AC1** (record-kinds / tier2-review): `--parse-line` prints `blocker=0` and `out_tokens=97922` with no `merged`; the `merged=0` and `trigger=owed` forms parse; `blocker=zero` exits 2 naming `blocker`. `SHAPE_RE.pattern` is byte-equal to section 4's literal.
-- **AC2** (memory hygiene): the census of 318 lines gives `318 parsed · 0 refused`.
+- **AC2** (memory hygiene): the census of 318 lines (DERIVED by `wc -l`, the builder at `f711a9567`) gives `318 parsed · 0 refused`.
 - **AC3**: prints `True True Caused-by`.
 - **AC4, AC5, AC6**: run in a `git clone --depth 1` of the committed tip under %TEMP%, and before the commit in a clone with the pass applied.
   - AC4: the door wrote `...TOOL-aBatchedPacket-1-shape-run-1.md key ea6dec1f793c` with Blocker 0, Out-tokens 90630, Merged 0 and Caused-by the review's stem. A second run printed `exists` with the same key, and status did not change.
@@ -45,7 +45,7 @@ TOOL-dTotalRecall-11 is built and committed as 71ce746a0 on base f711a9567. The 
 **Checklist acted on** (`gotchas --for-diff HEAD~1..HEAD`): the held-suite guard is added; the new leg's meta-gate rows read 0 owed (unit 43 owns the rest); the regex reached no heredoc; the parser runs with `dont_write_bytecode` and the suite spawns it with `-B`.
 
 **Notes:**
-- The commit hook printed a warn-only dossier-bytes notice: memory/map/features/memory-tree-hygiene.md is 21344 bytes against a 20480 budget. It was already 21286 bytes at base.
+- The commit hook printed a warn-only dossier-bytes notice: memory/map/features/memory-tree-hygiene.md is 21344 bytes against a 20480 budget (DERIVED, the hook at `71ce746a0`). It was already 21286 bytes at base (DERIVED, `f711a9567`).
 - MAP.md, CARDS.md and inventories.json are committed as generated outputs without being declared, following the unit-22 precedent.
 - Unit 61's spec and its row in the build README belong to another session's work and are left unstaged.
 - Both temp clones were removed.
