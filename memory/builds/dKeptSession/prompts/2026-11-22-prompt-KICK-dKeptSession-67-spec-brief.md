@@ -17,7 +17,7 @@ Its pass legs are green. Even so, `bash tools/unattended/pass-tree.sh --merge dK
 following lines:
 
 - `regen: FAILED · stage 2 · policy · .governance/policy.json · write: python tools/policy/policy.py mirror --write (exit 2, 0s)`
-- `policy: refused · tools/policy/catalogue.toml:0 · uncommitted changes; the mirror renders a revision, commit first`
+- `policy: refused · tools/policy/catalogue.toml@9d43738c:0 · uncommitted changes; the mirror renders a revision, commit first`
 - `pass-tree: REFUSING - the regeneration failed, as its lines above say, so the merge was undone`
 
 The cause: `run_pass_tree_regen` in `tools/unattended/pass-tree.sh` runs `regen.py --write` over the merge before it
