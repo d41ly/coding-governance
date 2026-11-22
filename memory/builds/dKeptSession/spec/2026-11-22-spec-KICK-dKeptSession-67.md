@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-21-prompt-KICK-dKeptSession-67-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-67-build-brief.md) | research | — |
 | [2026-11-22-prompt-KICK-dKeptSession-67-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-67-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-KICK-dKeptSession-67-2-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-67-2-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-KICK-dKeptSession-67-bind-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-67-bind-brief.md) | research | — |
