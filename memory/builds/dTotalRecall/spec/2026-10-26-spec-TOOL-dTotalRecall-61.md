@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-61 — unit 53 keeps the build-folder rows of its two file-keyed constants through its own pass, so no keep it needs lands after it
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 19 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 19 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,9 +11,12 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-61-deviation-611.md](../build/2026-10-26-build-TOOL-dTotalRecall-61-deviation-611.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-61-round4-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-61-round4-fix-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-61-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-61-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-61-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-61-1-spec-writer.md) | journal | TOOL-dTotalRecall-1 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-61-round4-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-61-round4-fix-brief.md) | research | — |
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-61-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-61-reground-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-61-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-61-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-62 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 |
 
 <!-- /gen:spec-records -->
@@ -25,11 +28,14 @@ The round-1 spec audit of units 54 to 60
 confirmed finding **id 1 at HIGH**, its item **H1**, alone in that item. `TOOL-dTotalRecall-53`
 (order 29) S34 makes the file-keyed constants `CAUSE_WRITER_KEPT` and `ALIAS_COMPARE_KEPT` give way
 to an in-file marker, and its AC34 requires both gone at its own tip. Their build-folder rows cannot
-take a marker: unit 50 §4 keeps eight build-folder scripts by `CAUSE_WRITER_KEPT`, and S22 keeps the
-pinned `deviations.py:380` compare. The path-keyed table that holds them instead lands with
+take a marker: unit 50 §4 keeps eight build-folder scripts by `CAUSE_WRITER_KEPT` (DERIVED
+2026-11-22: unit 50 §4's `awk 'NR>12'` reading over the build folders' tracked code files finds nine
+census files, and `deviations.py` takes `CAUSE_WRITER_PINNED`), and S22 keeps the pinned
+`deviations.py:380` compare (blob `30a1f15b`, which HEAD `f711a9567` holds). The path-keyed table that
+holds them instead lands with
 `TOOL-dTotalRecall-55` and `TOOL-dTotalRecall-56` at order 30, one step after unit 53's pass. So
 at unit 53's tip those hits have no keep. Writing a marker into them moves pinned blobs and stops
-the run at `packet.py --check` (README:38-39); not writing one leaves 53's AC22, AC28, AC34 and AC35
+the run at `packet.py --check` (`memory/builds/dTotalRecall/README.md:37-38`); not writing one leaves 53's AC22, AC28, AC34 and AC35
 red at its own pass, and no later step can make that pass green.
 
 The defect sits in the hand-off from unit 50's keep, the eight rows it writes at order 18, to unit
@@ -96,8 +102,11 @@ Unit 53 S34, its first sentence kept and the rest reading:
 Its **Readers:** clause is kept as written.
 
 Unit 53 S22, the keep clause reading: "the pinned `deviations.py` `!= "journal"` (`:380`) is kept by
-an `ALIAS_COMPARE_KEPT` row with the reason `pinned instrument`, never by a marker in its bytes, until
-`TOOL-dTotalRecall-56` moves that row to the path-keyed table".
+an `ALIAS_COMPARE_KEPT` row keyed by its repository path with the reason `pinned instrument`, never by
+a marker in its bytes, until `TOOL-dTotalRecall-56` moves that row to the path-keyed table". The
+repository-path key is the tree's: the landed `tools/memory-tree/record_kinds.py#check_alias_compares`
+keys each file by its path under the tool root, which no build-folder file has, and unit 50 S1 keys
+its build-folder rows of `CAUSE_WRITER_KEPT` by repository path the same way.
 
 Unit 53 AC34:
 
@@ -197,11 +206,18 @@ No new arm: this unit writes spec text, and the criteria it amends carry their u
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 54 to 60, id 1
   (HIGH, item H1).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-67, TOOL-dTotalRecall-70, each the other end of an edge a unit the round-1 spec audit of units 61 to 66 promoted wrote; nothing else moved.
+- rev-3 · 2026-11-22 · §1 · §4 unit 53 S22 · §10 · per `2026-11-22-prompt-TOOL-dTotalRecall-61-reground-brief`,
+  re-grounded at `f711a9567`: the eight kept rows re-derived over unit 50 rev-4 §4; the pinned
+  instrument's blob held at HEAD; the README rule's line moved; unit 40 landed `ALIAS_COMPARE_KEPT`
+  keyed under the tool root, so S22's build-folder row is keyed by repository path. AC1 to AC3 and the
+  §4 strings unit 67 pins are unchanged, their audit defects left to units 67 and 70.
 
 ## 10. Reuse audit
 
-The seam is the pair of file-keyed constants already in the design, `CAUSE_WRITER_KEPT`
-(`TOOL-dTotalRecall-36` S7, rows from unit 50 §4) and `ALIAS_COMPARE_KEPT` (`TOOL-dTotalRecall-40`),
+The seam is the pair of file-keyed constants, `CAUSE_WRITER_KEPT` (`TOOL-dTotalRecall-36` S7, unbuilt,
+in `tools/memory-tree/record_causes.py`, rows from unit 50 §4) and `ALIAS_COMPARE_KEPT`
+(`TOOL-dTotalRecall-40`, CLOSED, landed as `tools/memory-tree/record_kinds.py#ALIAS_COMPARE_KEPT`, its
+two tool-root rows the `govkit` shim pair with `homonym:` reasons, which S34's marker takes),
 kept one step longer, and unit 55's path-keyed table, which receives their last rows. No mechanism is
 minted. `python tools/codebase-map/reuse_lookup.py "amend a sibling spec before its unit builds"`
 ranked name-stem neighbours (`before`, `build`, `units`) and no seam for sequencing an amendment, so

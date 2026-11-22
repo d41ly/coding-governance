@@ -135,8 +135,8 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-50 — the cause census reads the build folders' instruments, and the pinned departures writer is a declared row that drains when its owner repins](spec/2026-10-26-spec-TOOL-dTotalRecall-50.md) | 18 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dTotalRecall-51 — a non-markdown record's cause line wears its Serves line's comment prefix, the header reader reads it, and a bare one is refused](spec/2026-10-26-spec-TOOL-dTotalRecall-51.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-9 — the memory extractors, `record find` and `record show` over the one index, and the per-item read budget](spec/2026-10-26-spec-TOOL-dTotalRecall-9.md) | 18 | 2 | DEFERRED | rev-5 | 2026-11-22 |
-| [TOOL-dTotalRecall-23 — the memory legs read the one index's rows for unchanged blobs and re-parse only changed ones](spec/2026-10-26-spec-TOOL-dTotalRecall-23.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [TOOL-dTotalRecall-61 — unit 53 keeps the build-folder rows of its two file-keyed constants through its own pass, so no keep it needs lands after it](spec/2026-10-26-spec-TOOL-dTotalRecall-61.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-26 |
+| [TOOL-dTotalRecall-23 — the memory legs read the one index's rows for unchanged blobs and re-parse only changed ones](spec/2026-10-26-spec-TOOL-dTotalRecall-23.md) | 19 | 2 | DEFERRED | rev-3 | 2026-11-22 |
+| [TOOL-dTotalRecall-61 — unit 53 keeps the build-folder rows of its two file-keyed constants through its own pass, so no keep it needs lands after it](spec/2026-10-26-spec-TOOL-dTotalRecall-61.md) | 19 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-24 — every landed commit that touches a record appended to the change feed](spec/2026-10-26-spec-TOOL-dTotalRecall-24.md) | 20 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 | [TOOL-dTotalRecall-67 — unit 61's amendments to units 55, 56 and 57 are read by their own text at step 20, and any it left unwritten is written before those units build](spec/2026-10-26-spec-TOOL-dTotalRecall-67.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-20 — this build's own upgrade steps: the journal alias, the scaffold verbs forwarded to record, the front matter graded, and the retag](spec/2026-10-26-spec-TOOL-dTotalRecall-20.md) | 21 | 2 | DEFERRED | rev-4 | 2026-11-05 |
@@ -192,7 +192,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 502 bound to this build, across 4 record folder(s).
+Records: 509 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -298,13 +298,13 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-brief.md` and 205 more under prompts/ |
+| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-brief.md` and 209 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-22-build-TOOL-dTotalRecall-8-deviation-83.md`, `2026-11-22-build-TOOL-dTotalRecall-6-deviation-63.md` and 136 more under build/ |
 | red-fix | `2026-11-22-build-TOOL-dTotalRecall-6-red-fix-13.md`, `2026-11-22-build-TOOL-dTotalRecall-5-red-fix-9.md` and 12 more under build/ |
 | widen | `2026-11-22-build-TOOL-dTotalRecall-8-widen-1.md`, `2026-11-22-build-TOOL-dTotalRecall-7-widen-4.md` and 2 more under build/ |
-| research | `2026-11-22-build-TOOL-dTotalRecall-9-reground-return.md`, `2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md` and 87 more under build/ |
-| logs | `2026-11-22-build-TOOL-dTotalRecall-7-2-builder-return.md`, `2026-11-22-build-TOOL-dTotalRecall-7-2-acceptance-ledger.md` and 39 more under build/ |
+| research | `2026-11-22-build-TOOL-dTotalRecall-9-reground-return.md`, `2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md` and 89 more under build/ |
+| logs | `2026-11-22-build-TOOL-dTotalRecall-7-2-builder-return.md`, `2026-11-22-build-TOOL-dTotalRecall-7-2-acceptance-ledger.md` and 40 more under build/ |
 | open asks | `BACKLOG.md`, 10 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->
