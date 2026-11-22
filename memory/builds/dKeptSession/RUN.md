@@ -240,3 +240,5 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T20:13:42Z brief · item KICK-dKeptSession-22 · reason 277aa1e0f90d memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-22-build-brief.md
 
 2026-11-22T20:16:19Z dispatch · item 244faa72 KICK-dKeptSession-22 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-22-1-acceptance-ledger.md
+
+2026-11-22T20:51:40Z brief · item KICK-dKeptSession-31 · reason 5b2c3b11f334 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-31-build-brief.md
