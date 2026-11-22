@@ -50,12 +50,12 @@ ids TOOL-aFlattenedSeed-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aFlattenedSeed-1 — three kit readers read an adopter's own layout](spec/2026-11-22-spec-TOOL-aFlattenedSeed-1.md) | — | 1 | CLOSED | rev-3 | 2026-11-22 |
+| [TOOL-aFlattenedSeed-1 — three kit readers read an adopter's own layout](spec/2026-11-22-spec-TOOL-aFlattenedSeed-1.md) | — | 1 | CLOSED | rev-4 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 0 bound to this build, across 1 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aFlattenedSeed-1.
 
 Ids no `spec-audit` record has ever named: TOOL-aFlattenedSeed-1.
 

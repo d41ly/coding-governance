@@ -1,12 +1,10 @@
 # TOOL-aFlattenedSeed-1 — three kit readers read an adopter's own layout
 
-**Status:** CLOSED · rev-3 · 2026-11-22 · node a · Tier-1 · base b2eec4b6 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-11-22 · node a · Tier-1 · base b2eec4b6 · streams tooling
 
 <!-- gen:spec-records -->
 
-| Record | Kind | Also serves |
-|---|---|---|
-| [2026-11-22-build-TOOL-aFlattenedSeed-1-widen-1.md](../build/2026-11-22-build-TOOL-aFlattenedSeed-1-widen-1.md) | widen | — |
+*No record names this unit.*
 
 <!-- /gen:spec-records -->
 
@@ -55,7 +53,7 @@ ledger seed whose kit is installed flat. After it, inCMS can seed its population
 
 - `tools/run-gates/product_tests.py`, `tools/gate-lint/eol_class.py`
 - `tools/lib/legacy_ledger.py`, `tools/memory-tree/legacy_ledger.py`, `tools/gate-lint/legacy_ledger.py`
-- `tools/lib/resolve-python.test.sh`
+- `tools/memory-tree/ratchet.py`
 
 ## 5. Acceptance criteria
 
@@ -68,15 +66,15 @@ ledger seed whose kit is installed flat. After it, inCMS can seed its population
 - **AC3** — When a seed argv names a kit file under a home directory the fixture lacks, and only a
   receipt row places that file, in a flat directory, `seed` arms the population. Red when: the token resolves only against the tool
   root and the seed exits non-zero.
-  Observed red against the base block on 2026-11-22: `unarmed fx-flat exit 2`.
+  Observed red against the base block on 2026-11-22: the seed read `exit 2`.
 
 ## 6. Gates
 
-`product-test contract (tests.product)` · `portability (execution-sensitive files are LF by class)` · `python resolver (behaviour + inline parity + idiom ban)` · `shell-hygiene selftest` · `memory hygiene` · `line length` · `spec tokens (a spec's own names resolve)`
+`product-test contract (tests.product)` · `portability (execution-sensitive files are LF by class)` · `python resolver (behaviour + inline parity + idiom ban)` · `ratchet selftest` · `shell-hygiene selftest` · `memory hygiene` · `line length` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/run-gates/product_tests.py · covers AC1 · `--fixture` reads a planted wrapped manifest through `read_manifest_rows`; staged red against the base reader · none
 New arm: tools/gate-lint/eol_class.py · covers AC2 · `--selftest` plants a gitlink with an absent commit; staged red against the base reader · none
-New arm: tools/lib/resolve-python.test.sh · covers AC3 · part 2o seeds `fx-flat` through a receipt row on a flat layout · none
+New arm: tools/memory-tree/ratchet.py · covers AC3 · `--fixture`'s `flat-seed` plant runs `run_seed_argv` from a flat copy whose receipt places the kit file; staged red against the base block · none
 
 ## 7. Open questions
 
@@ -87,3 +85,4 @@ none
 - rev-1 · 2026-11-22 · initial draft.
 - rev-2 · 2026-11-22 · AC3 · closed: the arm's red against the base block recorded.
 - rev-3 · 2026-11-22 · AC3 · §6 · the bar's spec-tokens leg: AC3 names the fixture without paths gov does not track, and §6 names the leg `eol_class.py` guards.
+- rev-4 · 2026-11-22 · AC3 · §6 · the bar's seed-laundering leg: AC3's arm moves from the shell suite to `ratchet.py --fixture`, since an existing shell-role row cannot be widened.

@@ -1565,16 +1565,6 @@ ll_parent=$(cd "$LLR" && "$REALPY" -B -c 'import os, sys; print(sys.executable);
 { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-run 1" <<<"$out" \
   && [ "$(tr -d '\r' < "$LLR/argv-run.txt")" = "$ll_parent" ]; } \
   || bad "2o seed S32: a python3 head did not run as the running interpreter at the root: ${out//$'\n'/ | } / $(tr '\n' ' ' < "$LLR/argv-run.txt" 2>/dev/null)"; ok
-# TOOL-aFlattenedSeed-1 S3 — a seed argv `{prefix}/<home>/<file>` whose kit the adopter installed FLAT,
-# with no `<home>` directory under its tool root, runs the file its receipt row places. RED where the token
-# resolves only against the tool root: the argv names tools/fx2/fxflat.py, no file, and the seed reads unarmed.
-mkdir -p "$LLR/flat" "$LLR/.governance"; printf 'print("f\\t1")\n' > "$LLR/flat/fxflat.py"
-printf '{"files": [{"path": "flat/fxflat.py", "source": "tools/fx2/fxflat.py"}]}\n' > "$LLR/.governance/install.json"
-build_ll_seeded fx-flat memory/project/fx-flat.txt "['$LL_EXE', '{prefix}/fx2/fxflat.py']" >> "$LLR/tools/fx/kit.toml"
-out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$PK/legacy_ledger.py" seed --population fx-flat) 2>&1 | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
-{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-flat 1" <<<"$out"; } \
-  || bad "2o seed S3: a seed argv's {prefix}/<home>/<file> did not resolve through the receipt on a flat install: ${out//$'\n'/ | }"; ok
-rm -rf "$LLR/flat" "$LLR/.governance/install.json"
 # TOOL-dWitnessedBar-51 S50, AC40 — a registered home that exists and whose first line is no header, a
 # legacy-grammar file, is refused: `refused <population>`, exit 2, the home byte-identical. RED where it
 # reads `present` (an armed home) or is treated as absent and rewritten.

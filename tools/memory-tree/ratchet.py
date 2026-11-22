@@ -1236,7 +1236,26 @@ def run_plant_unarmed_home(top, results):
                      ["unarmed %s" % SCALAR_POPULATION, "its home is unarmed"], ["pass"])
 
 
+def run_plant_flat_seed(top, results):
+    """TOOL-aFlattenedSeed-1 S3: on an install that lands this kit FLAT, a seed argv's `{prefix}/<home>/<file>`
+    runs the file its receipt row places, never `<tool root>/<home>/<file>`, which no flat install holds."""
+    write_fixture_repo(top, [], {"flat/fxflat.py": 'print("f\\t1")\n', ".governance/install.json": json.dumps(
+        {"files": [{"path": "flat/fxflat.py", "source": "tools/fx2/fxflat.py"}]})})
+    scripts = pathlib.Path(top, "scripts")
+    scripts.mkdir()
+    for src in KIT.glob("*.py"):
+        shutil.copyfile(src, scripts / src.name)
+    code = "import legacy_ledger as L; print(L.run_seed_argv(['python', '{prefix}/fx2/fxflat.py'], '.'))"
+    p = subprocess.run([sys.executable, "-c", code], cwd=str(top), capture_output=True, text=True, encoding="utf-8",
+                       errors="replace", env={**FIXTURE_ENV, "PYTHONPATH": str(scripts)}, stdin=subprocess.DEVNULL)
+    ok = p.returncode == 0 and p.stdout.strip() == repr(("f\t1\n", ""))
+    results.append(ok)
+    print_line("PASS" if ok else "FAIL", "flat-seed", "a flat install's receipt places a seed argv's kit file",
+               "exit %d: %s" % (p.returncode, (p.stdout + p.stderr).strip()[-300:]))
+
+
 PLANTS = {
+    "flat-seed": run_plant_flat_seed,
     "gain": run_plant_gain, "ceiling-raised": run_plant_ceiling_raised, "append-edited": run_plant_append_edited,
     "append-removed": run_plant_append_removed, "gain-widened": run_plant_gain_widened, "gain-refused": run_plant_gain_refused,
     "ceiling-widened": run_plant_ceiling_widened, "both-ways": run_plant_both_ways,
