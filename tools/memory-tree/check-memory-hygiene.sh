@@ -3600,7 +3600,7 @@ alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
 # ----
 # ---- NARROWED, NO LONGER HELD (TOOL-dPavedRoad-4). Under `--staged` both listings keep only the
 # ---- build folders a staged path sits in (`_SBUILD`), and the units graded are those whose spec is
-# ---- staged or whose id a staged journal record's `**Evidences:**` line names, each against every
+# ---- staged or whose id a staged log record's `**Evidences:**` line names, each against every
 # ---- record in its own build folder, as the full run grades it. A unit the commit names nowhere stays
 # ---- silent, and a record in another build evidencing a graded unit is read only by the full run.
 # ---- The announce line counts the graded units, so an empty selection reads 0 rather than a pass.
@@ -3628,7 +3628,7 @@ if [ -n "$alcut" ]; then
       while ((getline line < f) > 0) {    # from a fresh process per file, and losing it would
         sub(/\r$/, "", line)              # a CRLF worktree on Linux delivers the CR into awk
         $0 = line                         # attribute one record'"'"'s criteria to the next
-        if ($0 ~ /^\*\*Serves:\*\*/) j = ($0 ~ /\*\*Serves:\*\* *journal/)
+        if ($0 ~ /^\*\*Serves:\*\*/) j = ($0 ~ /\*\*Serves:\*\* *(log|journal) /)
         if ($0 ~ /^\*\*Evidences:\*\* /) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
           u = (j ? $2 : ""); continue }
         if ($0 ~ /^#/) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
@@ -3849,13 +3849,13 @@ if [ -n "$alcut" ]; then
     [ -n "$_uuid" ] || continue
     [ -n "${ALHASLAB[$_useq]+x}" ] || alnolab="$alnolab $_uuid"
   done <<<"$alU"
-  [ -z "$algap" ] || fail 23 "a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
+  [ -z "$algap" ] || fail 23 "a CLOSED unit numbers an acceptance criterion that no log record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
   [ -z "$albad" ] || fail 23 "an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox:$albad"
   [ -z "$alnolab" ] || fail 23 "a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true:$alnolab"
-  [ -z "$alorph" ] || fail 23 "a journal record evidences a criterion label its own spec does not number, so the answer satisfies nothing and reads as coverage:$alorph"
+  [ -z "$alorph" ] || fail 23 "a log record evidences a criterion label its own spec does not number, so the answer satisfies nothing and reads as coverage:$alorph"
   [ -z "$altokbad" ] || fail 23 "a ledger answer shares no backticked token with the criterion it claims to answer, so the two are joined by label alone and may describe different things:$altokbad"
   if [ "$STAGED" = 1 ]; then
-    printf 'memory-hygiene: check 23 graded %s unit(s) that a staged spec or journal record names, against the records of their own build folders; the push-boundary run grades every closed unit\n' "$alpop"
+    printf 'memory-hygiene: check 23 graded %s unit(s) that a staged spec or log record names, against the records of their own build folders; the push-boundary run grades every closed unit\n' "$alpop"
   else
   [ "$alpop" -gt 0 ] || printf 'memory-hygiene: check 23 measured NO unit — every closed Tier-2 spec predates ACCEPTANCE_LEDGER_CUTOFF, so a green verdict here is coverage of nothing\n'
   # TOOL-aJoinedCanon-6: each new arm announces its OWN empty population. Both cutoffs ship ahead of

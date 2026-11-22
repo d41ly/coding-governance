@@ -689,7 +689,7 @@ item's return's `## Establishes` rows into handed rows `<upstream item>#<row id>
 `check_upstream_answers` joins them with the item's `## Upstream` answers: each handed id answered,
 `dropped` or `doubled`, an unhanded id `invented`, an answer `bad-answer` or `no-reason`, and `bypassed`
 a finding on either edge, every finding graded on its edge's gate so only a `measured` edge refuses.
-`write_upstream_record` writes the join as a journal record under the build's `build/` folder. Both
+`write_upstream_record` writes the join as a log record under the build's `build/` folder. Both
 verbs read the composition through `loop_items.read_composed_items`, which `position.py` reads too.
 
 ```bash

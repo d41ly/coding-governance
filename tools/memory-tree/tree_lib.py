@@ -616,7 +616,16 @@ BIND_HEAD_LINES = 12
 TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition", "acceptance",
                       "transition", "recommendation", "widen", "leg-tail", "flake", "gate-health", "card",
                       "probe-trigger", "probe")
-RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
+RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "log", "research") + TYPED_RECORD_KINDS
+# TOOL-dTotalRecall-18 S7: `journal` was the evidence kind's name until the kind became `log`. The old
+# token is a READ-ONLY alias: a record written under it is bound as written, so no records region
+# re-renders, and every comparison by value reads it through `resolve_kind`. No writer emits it.
+KIND_ALIASES = {"journal": "log"}
+
+
+def resolve_kind(token):
+    """The kind `token` names: an alias's target, any other token unchanged."""
+    return KIND_ALIASES.get(token, token)
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally
 # exclude the one file most easily forgotten.
@@ -632,7 +641,7 @@ def read_evidence_lines(text: str) -> list:
     block opens at its `**Evidences:**` line and ends at the next one or at a line opening `#`, a
     heading. The walk `deviation_join.read_population`'s ledger arm did inline, extracted at its second
     Python instance, `seen_red.read_seen_red_records` (TOOL-dWitnessedBar-7 S2). It reads no binding:
-    whether the text is a `journal` record is each caller's test, through `read_bindings`."""
+    whether the text is a `log` record is each caller's test, through `read_bindings`."""
     out, unit = [], None
     for n, line in enumerate(text.split("\n"), 1):
         ev = EVIDENCES_RE.match(line)
@@ -774,7 +783,7 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                 rec["why"] = ""
                 continue
             toks = rest.split()
-            if toks and toks[0] in RECORD_KIND_TOKENS:
+            if toks and (toks[0] in RECORD_KIND_TOKENS or toks[0] in KIND_ALIASES):
                 served = " ".join(toks[1:])
                 ids, bad = _expand_ids(served, alt)
                 rec["kind"] = toks[0]
@@ -795,7 +804,9 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                 rec["state"] = "malformed"
                 got = toks[0] if toks else "(empty)"
                 rec["why"] = (f"first token {got} is not one of "
-                              + " ".join(RECORD_KIND_TOKENS) + ", and the line is not the none form")
+                              + " ".join(RECORD_KIND_TOKENS) + " (" + ", ".join(
+                                  f"{a} a read-only alias of {t}" for a, t in KIND_ALIASES.items())
+                              + "), and the line is not the none form")
         # TOOL-dTrueNorth-4 S2, every typed kind by PLAY-dOrderedCharter-42 S3 — the kind joined to the
         # file name, both ways: a file on a typed kind's stem must say it is one, and a record saying so
         # must be on its stem. A record with no Serves line keeps its own reason.

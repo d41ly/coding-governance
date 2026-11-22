@@ -279,25 +279,39 @@ row: `never gains` admits a widened row only where that record is tracked, names
 the key, and gives a reason. Under `retrofit.widen = "refuse"` the door writes nothing and the leg
 admits only a record the compare base already tracks. A widened row's count is not checked.
 
-## The record-kind registry — one declaration per kind (TOOL-dTotalRecall-1)
+## The record-kind registry — one declaration per kind (TOOL-dTotalRecall-1, -18)
 
-`<prefix>/memory-tree/record-kinds.toml` declares every kind of record the memory tree holds, one
-`[[record-kind]]` row each, and `<prefix>/memory-tree/record_kinds.py` is its reader, gate, view and
-factory. Its columns, in order: `name`; `tag`, `record.<name>`; `layer`; `home`, the `git ls-files`
-glob of the kind's records, required on a `fields` row; `id-rule`, the name grammar or `""`;
-`schema`, `{ form, source, fields }`, `form` one of `fields`, `header`, `rows`, `generated`, `source`
-an optional `<path>:<NAME>[.<key>]...` literal another module declares the same fields in, read by
-`ast` and never imported; `writer`, the door writing the kind, `generator:<path>` or `hand`;
-`readers`; `lifecycle`; `check`, the leg grading it. `layer`, `readers` and `lifecycle` are admitted
-and stay empty until TOOL-dTotalRecall-18 requires them; `root` and `sections` are admitted for
-their owners.
+`<prefix>/memory-tree/record-kinds.toml` declares every kind of record the memory tree holds, and one
+witness row per family of pockets outside it, one `[[record-kind]]` row each, and
+`<prefix>/memory-tree/record_kinds.py` is its reader, gate, view and factory. Its columns, in order:
+`name`; `tag`, `record.<name>`; `layer`, the `layer.<name>` tag of the kit whose writer writes the
+kind; `home`, one glob or a list, each a tracked-path glob, `refs/gov/<glob>` or
+`<git-common-dir>/<glob>`, a `fields` row's one tracked glob, the population it grades; `id-rule`,
+the name grammar or `""`; `schema`, `{ form, source, fields }`, `form` one of `fields`, `header`,
+`rows`, `generated`, `source` an optional `<path>:<NAME>[.<key>]...` literal another module declares
+the same fields in, read by `ast` and never imported; `writer`, the door writing the kind,
+`generator:<path>` or `hand`; `readers`, the work-order read keys a handoff fills from a record of the
+kind, or `[]` beside `readers-none`, the reason no role reads it; `lifecycle`, one of `append-only`,
+`current-state`, `frozen`, `generated` or `out`; `check`, the leg grading it. The four columns
+`home`, `lifecycle`, `readers` (or `readers-none`) and `layer` are REQUIRED on every row, as are
+`name`, `tag`, `schema`, `writer` and `check`; `root` and `sections` are admitted for their owners.
+
+The view's `Read by` cell names the roles whose `reads:` holds one of a row's `readers` and the loop
+items whose `inputs` hold a typed record reference `<layer tag>:record-kind.<name>[@<n>]`; its
+`Written by` cell the roles whose `writes:` folder covers a row's home and the items whose `returns`
+is `record-kind.<name>`. Both are read afresh from the roles and loop kits, each a `requires_if` row
+of this kit's `kit.toml`, on every `--check`, `--write` and `new`, so the byte compare is with a live
+re-derivation; an unresolved kit, an empty role population or a definition that does not read is
+`unarmed`, red under `--check`. The kind once named `journal` is `log`: `tree_lib.KIND_ALIASES` keeps
+`journal` a read-only alias, bound as written and compared through `resolve_kind`, and the runlog
+kit's `SERVES_ALIASES` is held to it.
 
 | Verb | What it does |
 |---|---|
-| `--check` | the `record-kinds` leg: every row's columns, its `check` leg and its `source` both ways, the factory's `TYPED_RECORD_KINDS` joined to the rows both ways, every `fields` record outside the legacy ledger carrying its fields in order, each deviation's `Follow-through: gap <key>` resolved, and the view byte for byte |
+| `--check` | the `record-kinds` leg: every row's columns and their grammar, its readers against the roles, its `check` leg and its `source` both ways, the factory's `TYPED_RECORD_KINDS` joined to the rows both ways, every `fields` record outside the legacy ledger carrying its fields in order, each deviation's `Follow-through: gap <key>` resolved, the view byte for byte against a fresh read of the roles and items, the common git dir's entries each matched by a witness row's home, and the runlog kit's alias literal; one `view · <kind> · read by … · written by …` line per row |
 | `--write` | renders the `gen:record-kinds` region of `HYGIENE.template.md`, which `adopt-memory-tree.sh --render` carries into `<memory root>/HYGIENE.md` |
 | `--template <kind>` | prints the skeleton one `fields` row defines, the layout `build_records.py` writes |
-| `new <name> --tag record.<name> --writer <door> --check <leg> --field <Key>... --home <glob>` | the factory: appends one conforming row and re-renders the view, exit 2 writing nothing on a missing column |
+| `new <name> --tag record.<name> --writer <door> --check <leg> --field <Key>... --home <glob> --layer <tag> --lifecycle <value> (--reader <key>... \| --readers-none <reason>)` | the factory: appends one conforming row and re-renders the view, exit 2 writing nothing on a missing column or one outside its grammar |
 | `--seed-legacy` | prints the `record-kinds-legacy` population, `<path> TAB <row name> TAB 1` per record a `fields` row grades, for `legacy_ledger.py seed` |
 | `--print-gap-keys` | the `gap-key` native class's members, the first cells of every tracked gap register; exit 3 where none is tracked |
 | `--fixture [--plant <case>]` | builds a throwaway repository and runs `--check` there; `--selftest` asserts every plant red |
@@ -306,8 +320,10 @@ A typed kind's row grades only the records its `build_records.py` name grammar m
 `…-probe-design.md` its glob also matches falls to the `research` row. A typed kind with no record
 yet prints `<kind>: unarmed — no record yet` and passes; any other empty population reds. The step
 gate's `record-kind-schema` class holds `<kind>.<field>` per field of every row, so a removed field is
-a vanished member. What it does not check: whether a `writer` writes its kind, a field's value, and
-a `header`, `rows` or `generated` row's records, which its `check` leg's owner grades.
+a vanished member; `journal.Serves`, which left with the rename, is named by a `[[retired]]` row of
+the govkit registry. What it does not check: whether a `writer` writes its kind, a field's value, a
+`header`, `rows` or `generated` row's records, which its `check` leg's owner grades, a pocket's
+contents, and whether a `layer` tag is a row of the layer register.
 
 ## Backlog modes — authored shards and per-build asks
 

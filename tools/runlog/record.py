@@ -79,7 +79,11 @@ LIST_BOUND = 20
 NONE = "-"
 RECORD_TAG = "runlog"
 TITLE = "# Run record"
-SERVES_KIND = "journal"
+SERVES_KIND = "log"
+# The kind's read-only alias (TOOL-dTotalRecall-18 S8): a committed run record headed `journal`, the
+# kind's name before it became `log`, still binds. Inline, since this kit requires none; the memory-tree
+# kit's `record_kinds.py --check` holds it to `tree_lib.KIND_ALIASES` by `ast`, never by import.
+SERVES_ALIASES = ("journal",)
 INTRO = ("Rendered from the run model by the runlog kit's `record` command. Every value below is drawn "
          "from a closed schema, so no line carries free text. Re-render it rather than edit it.")
 DATA_OPEN = "```json"
@@ -1471,12 +1475,13 @@ def scan_forbidden(lines) -> list:
 
 
 def check_serves_line(ln, line, slug, own_ids) -> list:
-    """The head's binding line: `**Serves:** journal <ids>`, every id one a spec of THIS build defines."""
+    """The head's binding line: `**Serves:** log <ids>`, or its read-only alias `journal`, every id one a
+    spec of THIS build defines."""
     m = re.fullmatch(r"\*\*Serves:\*\* (\S+) (.+)", line or "")
     if m is None:
         return [(ln, "serves", "the head's third line is not `**Serves:** <kind> <ids>`")]
     out = []
-    if m.group(1) != SERVES_KIND:
+    if m.group(1) != SERVES_KIND and m.group(1) not in SERVES_ALIASES:
         out.append((ln, "serves", f"the binding kind is not `{SERVES_KIND}`"))
     for tok in m.group(2).split(" "):
         r = re.fullmatch(r"([A-Z]+)-([A-Za-z0-9]+)-([0-9]+)(?:\.\.([0-9]+))?", tok)

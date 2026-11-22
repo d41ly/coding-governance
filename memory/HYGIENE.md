@@ -666,7 +666,9 @@ carry it too:
 ```
 
 - `<kind>` is closed: `spec-audit` (a pre-code pass over a spec) · `diff-review` (a pass over built
-  code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs) ·
+  code) · `log` (evidence of what was built; `journal`, its name until TOOL-dTotalRecall-18, is a
+  read-only alias still bound and graded as `log`, and no writer emits it) · `research` (a report
+  that precedes the specs) ·
   `deviation` (a departure from the design or from a spec, in the grammar under "Deviation records") ·
   `exception` (a principle excused for one part, minted by `PLAY-dOrderedCharter-7`'s record factory) ·
   `override` (minted by `PLAY-dOrderedCharter-2`) · `change` (minted by `PLAY-dOrderedCharter-15`) ·
@@ -808,40 +810,62 @@ leg reds it when it differs by one byte. A kind joins through `record_kinds.py n
 
 <!-- gen:record-kinds -->
 
-| Kind | Tag | Home | Writer | Check |
-|---|---|---|---|---|
-| `spec` | `record.spec` | — | `gen_build_index.py --new-spec` | `memory hygiene` |
-| `spec-audit` | `record.spec-audit` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | `memory hygiene` |
-| `diff-review` | `record.diff-review` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | `memory hygiene` |
-| `journal` | `record.journal` | `memory/builds/*/prompts/*.md` | `hand` | `memory hygiene` |
-| `research` | `record.research` | `memory/builds/*/build/*.md` | `hand` | `memory hygiene` |
-| `run-record` | `record.run-record` | — | `runlog.py record --write` | `runlog record schema` |
-| `backlog-row` | `record.backlog-row` | — | `hand` | `memory hygiene` |
-| `design-record` | `record.design-record` | `memory/builds/*/build/*-architecture-v*.md` | `hand` | `memory hygiene` |
-| `dossier` | `record.dossier` | — | `hand` | `codebase-map gate coverage` |
-| `deviation` | `record.deviation` | `memory/builds/*/build/*-build-*-deviation-*.md` | `hand` | `memory hygiene` |
-| `exception` | `record.exception` | `memory/builds/*/build/*-build-*-exception-*.md` | `build_records.py new exception` | `memory hygiene` |
-| `override` | `record.override` | `memory/builds/*/build/*-build-*-override-*.md` | `build_records.py new override` | `memory hygiene` |
-| `change` | `record.change` | `memory/builds/*/build/*-build-*-change-*.md` | `build_records.py new change` | `memory hygiene` |
-| `red-fix` | `record.red-fix` | `memory/builds/*/build/*-build-*-red-fix-*.md` | `build_records.py new red-fix` | `memory hygiene` |
-| `disposition` | `record.disposition` | `memory/builds/*/build/*-build-*-disposition-*.md` | `build_records.py new disposition` | `memory hygiene` |
-| `acceptance` | `record.acceptance` | `memory/builds/*/build/*-build-*-acceptance-*.md` | `loop_witness.py acceptance` | `memory hygiene` |
-| `transition` | `record.transition` | `memory/builds/*/build/*-build-*-transition-*.md` | `loop_transition.py record` | `memory hygiene` |
-| `recommendation` | `record.recommendation` | `memory/builds/*/build/*-build-*-recommendation-*.md` | `build_records.py new recommendation` | `memory hygiene` |
-| `widen` | `record.widen` | `memory/builds/*/build/*-build-*-widen-*.md` | `ratchet.py widen` | `memory hygiene` |
-| `leg-tail` | `record.leg-tail` | `memory/builds/*/build/*-build-*-leg-tail-*.md` | `keep_tails.py` | `memory hygiene` |
-| `flake` | `record.flake` | `memory/builds/*/build/*-build-*-flake-*.md` | `verdict_flow.py flakes` | `memory hygiene` |
-| `gate-health` | `record.gate-health` | `memory/builds/*/build/*-build-*-gate-health-*.md` | `drift_report.py --gate-health --write` | `memory hygiene` |
-| `card` | `record.card` | `memory/builds/*/build/*-build-*-card-*.md` | `manifest-check.sh --card --follow` | `memory hygiene` |
-| `probe-trigger` | `record.probe-trigger` | `memory/builds/*/build/*-build-*-probe-trigger-*.md` | `probe.py trigger` | `memory hygiene` |
-| `probe` | `record.probe` | `memory/builds/*/build/*-build-*-probe-*.md` | `probe.py pin` | `memory hygiene` |
+| Kind | Tag | Home | Writer | Read by | Written by | Check |
+|---|---|---|---|---|---|---|
+| `spec` | `record.spec` | `memory/builds/*/spec/*.md` | `gen_build_index.py --new-spec` | `gov-builder`, `gov-diff-reviewer`, `gov-skeptic`, `gov-spec-reviewer`, `gov-spec-writer`, `gov-synthesizer`, `gov-tester` | `gov-spec-writer` | `memory hygiene` |
+| `spec-audit` | `record.spec-audit` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | — | `gov-synthesizer` | `memory hygiene` |
+| `diff-review` | `record.diff-review` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | — | `gov-synthesizer` | `memory hygiene` |
+| `log` | `record.log` | `memory/builds/*/prompts/*.md` | `hand` | `gov-builder`, `gov-orienter`, `gov-researcher`, `gov-session`, `gov-spec-reviewer`, `gov-spec-writer` | — | `memory hygiene` |
+| `research` | `record.research` | `memory/builds/*/build/*.md` | `hand` | — | — | `memory hygiene` |
+| `run-record` | `record.run-record` | `memory/builds/*/build/*-runlog-*.md` | `runlog.py record --write` | — | — | `runlog record schema` |
+| `backlog-row` | `record.backlog-row` | `memory/backlog/*.md` | `hand` | — | — | `memory hygiene` |
+| `design-record` | `record.design-record` | `memory/builds/*/build/*-architecture-v*.md` | `hand` | — | — | `memory hygiene` |
+| `dossier` | `record.dossier` | `memory/map/features/*.md` | `hand` | — | — | `codebase-map gate coverage` |
+| `deviation` | `record.deviation` | `memory/builds/*/build/*-build-*-deviation-*.md` | `hand` | — | — | `memory hygiene` |
+| `exception` | `record.exception` | `memory/builds/*/build/*-build-*-exception-*.md` | `build_records.py new exception` | — | — | `memory hygiene` |
+| `override` | `record.override` | `memory/builds/*/build/*-build-*-override-*.md` | `build_records.py new override` | — | — | `memory hygiene` |
+| `change` | `record.change` | `memory/builds/*/build/*-build-*-change-*.md` | `build_records.py new change` | — | — | `memory hygiene` |
+| `red-fix` | `record.red-fix` | `memory/builds/*/build/*-build-*-red-fix-*.md` | `build_records.py new red-fix` | — | — | `memory hygiene` |
+| `disposition` | `record.disposition` | `memory/builds/*/build/*-build-*-disposition-*.md` | `build_records.py new disposition` | — | `item.entry.place-owner`, `item.build.ratify` | `memory hygiene` |
+| `acceptance` | `record.acceptance` | `memory/builds/*/build/*-build-*-acceptance-*.md` | `loop_witness.py acceptance` | — | `item.build.acceptance` | `memory hygiene` |
+| `transition` | `record.transition` | `memory/builds/*/build/*-build-*-transition-*.md` | `loop_transition.py record` | — | `item.plan.exit`, `item.design.exit`, `item.build.exit`, `item.test.exit`, `item.deploy.close` | `memory hygiene` |
+| `recommendation` | `record.recommendation` | `memory/builds/*/build/*-build-*-recommendation-*.md` | `build_records.py new recommendation` | — | `item.plan.recommend`, `item.design.recommend`, `item.build.recommend`, `item.test.recommend`, `item.deploy.recommend` | `memory hygiene` |
+| `widen` | `record.widen` | `memory/builds/*/build/*-build-*-widen-*.md` | `ratchet.py widen` | — | — | `memory hygiene` |
+| `leg-tail` | `record.leg-tail` | `memory/builds/*/build/*-build-*-leg-tail-*.md` | `keep_tails.py` | — | — | `memory hygiene` |
+| `flake` | `record.flake` | `memory/builds/*/build/*-build-*-flake-*.md` | `verdict_flow.py flakes` | — | `item.test.flakes` | `memory hygiene` |
+| `gate-health` | `record.gate-health` | `memory/builds/*/build/*-build-*-gate-health-*.md` | `drift_report.py --gate-health --write` | — | — | `memory hygiene` |
+| `card` | `record.card` | `memory/builds/*/build/*-build-*-card-*.md` | `manifest-check.sh --card --follow` | — | — | `memory hygiene` |
+| `probe-trigger` | `record.probe-trigger` | `memory/builds/*/build/*-build-*-probe-trigger-*.md` | `probe.py trigger` | — | `item.probe.trigger` | `memory hygiene` |
+| `probe` | `record.probe` | `memory/builds/*/build/*-build-*-probe-*.md` | `probe.py pin` | — | `item.probe.pin`, `item.probe.run`, `item.probe.judge`, `item.probe.return` | `memory hygiene` |
+| `view` | `record.view` | `memory/LIVE.md`, `memory/ledger/*.md`, `memory/map/generated/*` | `gen_build_index.py --write` | — | — | `memory hygiene` |
+| `registry` | `record.registry` | `memory/project/*.txt`, `memory/project/*.toml` | `hand` | — | — | `ratchet (never gains)` |
+| `archive` | `record.archive` | `memory/archive/**` | `hand` | — | — | `memory hygiene` |
+| `instrument` | `record.instrument` | `memory/builds/*/build/*.py`, `memory/builds/*/build/*.sh`, `memory/builds/*/build/*.js`, `memory/builds/*/build/*.json`, `memory/builds/*/build/*.tsv`, `memory/builds/*/build/*.txt`, `memory/builds/*/build/*.svg`, `memory/builds/*/build/*.html`, `memory/builds/*/build/*.log`, `memory/builds/*/build/*.out` | `hand` | — | — | `memory hygiene` |
+| `witness` | `record.witness` | `refs/gov/**` | `gov-ref.sh` | — | — | `record-kinds` |
+| `orientation-cards` | `record.orientation-cards` | `<git-common-dir>/orientation/*` | `manifest-check.sh --card` | `gov-builder`, `gov-reuse-scout`, `gov-session`, `gov-spec-writer` | — | `record-kinds` |
+| `unattended-sidecars` | `record.unattended-sidecars` | `<git-common-dir>/unattended/*`, `<git-common-dir>/unattended-landed` | `unattended.sh` | — | — | `record-kinds` |
+| `runlog-journal` | `record.runlog-journal` | `<git-common-dir>/runlog/*`, `<git-common-dir>/runlog-stamp-*` | `runlog.py` | — | — | `record-kinds` |
+| `drift-history` | `record.drift-history` | `<git-common-dir>/drift-history.tsv` | `drift_report.py` | — | — | `record-kinds` |
+| `gate-ledger` | `record.gate-ledger` | `<git-common-dir>/gate-*`, `<git-common-dir>/pre-push-*`, `<git-common-dir>/selftest-baseline` | `run-gates.sh` | — | — | `record-kinds` |
+| `health-logs` | `record.health-logs` | `<git-common-dir>/health.log`, `<git-common-dir>/procmon-stamp` | `health-log.sh` | — | — | `record-kinds` |
+| `hook-state` | `record.hook-state` | `<git-common-dir>/agent-cap/*` | `agent-cap.js` | — | — | `record-kinds` |
+| `reuse-lookups` | `record.reuse-lookups` | `<git-common-dir>/codebase-map/*` | `reuse_lookup.py` | — | — | `record-kinds` |
+| `recall-cache` | `record.recall-cache` | `<git-common-dir>/recall/*` | `query.py` | — | — | `record-kinds` |
+| `review-lenses` | `record.review-lenses` | `<git-common-dir>/review-lenses/*` | `tier2-review.js` | — | — | `record-kinds` |
+| `transition-cache` | `record.transition-cache` | `<git-common-dir>/transition-audit-cache` | `transition_audit.py` | — | — | `record-kinds` |
+| `gov-index` | `record.gov-index` | `<git-common-dir>/gov/*` | `tag_index.py` | — | — | `record-kinds` |
+| `gov-feed` | `record.gov-feed` | `<git-common-dir>/gov-feed.*`, `<git-common-dir>/gov-last-fetch` | `gov-feed.sh` | — | — | `record-kinds` |
+| `handoff-calls` | `record.handoff-calls` | `<git-common-dir>/handoff-calls/*` | `handoff.py` | — | — | `record-kinds` |
+| `index-render-stamp` | `record.index-render-stamp` | `<git-common-dir>/gen-build-index-render-stamp` | `gen_build_index.py` | — | — | `record-kinds` |
+| `git-client-state` | `record.git-client-state` | `<git-common-dir>/sourcetreeconfig.json` | `hand` | — | — | `record-kinds` |
 
 <!-- /gen:record-kinds -->
 
 ## Acceptance ledger — how a built unit evidences its criteria
 
-Inside a record whose `**Serves:**` kind is `journal`, which is already defined as evidence of what
-was built. Two further arms once the SPEC's filename date reaches `LEDGER_LABEL_CUTOFF` and
+Inside a record whose `**Serves:**` kind is `log`, which is already defined as evidence of what
+was built, or its read-only alias `journal`, graded alike. Two further arms once the SPEC's filename
+date reaches `LEDGER_LABEL_CUTOFF` and
 `LEDGER_TOKEN_CUTOFF`: an answer whose criterion label the spec does not number is a finding, and an
 answer must share a backticked token with the criterion it answers, case-folded and either way round.
 Both are branches of the same check, so a blank `ACCEPTANCE_LEDGER_CUTOFF` disarms them too. One `**Evidences:**` line per unit, and one line per criterion beneath it:
@@ -868,7 +892,7 @@ Both are branches of the same check, so a blank `ACCEPTANCE_LEDGER_CUTOFF` disar
 - The gate reads SHAPE and COVERAGE only. It asserts every criterion a closed spec numbers has a line
   in one of the two forms; it does NOT assert the token names anything real, that the observation was
   actually made, or that an amendment was justified. Its header says so.
-- Under `--staged` it grades the closed units a staged spec or a staged journal record names,
+- Under `--staged` it grades the closed units a staged spec or a staged log record names,
   against the records of their own build folders. A record in another build that evidences one of
   them is read only by the full run.
 

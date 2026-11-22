@@ -302,7 +302,7 @@ def write_upstream_record(root, build, unit, item, lines, today=None):
     name = re.compile(r"\d{4}-\d{2}-\d{2}-build-%s-upstream-(\d+)\.md" % re.escape(unit))
     n = max((int(m.group(1)) for p in out.iterdir() if (m := name.fullmatch(p.name))), default=0) + 1
     path = out / ("%s-build-%s-upstream-%d.md" % (today or datetime.date.today().isoformat(), unit, n))
-    body = ["# %s upstream %d — %s" % (unit, n, item), "", "**Serves:** journal %s" % unit, ""]
+    body = ["# %s upstream %d — %s" % (unit, n, item), "", "**Serves:** log %s" % unit, ""]
     with open(path, "x", encoding="utf-8", newline="\n") as fh:   # never over a record already there
         fh.write("\n".join(body + ["- " + ln for ln in lines]) + "\n")
     return path.relative_to(root).as_posix()
@@ -392,7 +392,7 @@ def run_fixture(case, top):
             path = write_upstream_record(top, FX_BUILD, FX_UNIT, FX_ITEM, lines)
             print("%s · record · %s" % (SAY, path))
             text = (top / path).read_text(encoding="utf-8")
-            lost = [ln for ln in ["**Serves:** journal %s" % FX_UNIT] + ["- " + ln for ln in lines]
+            lost = [ln for ln in ["**Serves:** log %s" % FX_UNIT] + ["- " + ln for ln in lines]
                     if ln not in text.split("\n")]
             if lost:
                 print("%s · fixture · FAIL · the record %s lacks %s" % (SAY, path, lost[0]))

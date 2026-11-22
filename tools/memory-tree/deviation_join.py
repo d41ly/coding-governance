@@ -30,7 +30,7 @@ hand-off and its departing commit:
     revision the commit changed;
   - a spec revision that is not an ancestor of the commit adding the newest `spec-audit` record whose
     `**Serves:**` pins `<unit>@rev-N`, read from `tree_lib.read_bindings`' `pins`;
-  - an `amended rev-N` ledger line under an `**Evidences:** <unit>` block of a `journal` record,
+  - an `amended rev-N` ledger line under an `**Evidences:** <unit>` block of a `log` record,
     `<unit>@rev-<N-1>`;
   - a divergence hand-back, a `prompts/` record whose `### Goal` opens `DIVERGENCE:`;
   - a rescope row of a chain build's `RUN.md` or rotated `RUN.*.md`, but a `defer` row, dated by the
@@ -142,7 +142,7 @@ from design_lib import (  # noqa: E402  the one parser of the design, and its cl
     read_spec_revisions, read_tracked_builds, scan_chain_specs, write_design_fixture)
 from tree_lib import (  # noqa: E402
     GIT_ENV_LEAKS, HDR_RE, parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at,
-    read_evidence_lines)
+    read_evidence_lines, resolve_kind)
 from build_records import (  # noqa: E402  the typed record factory: FIELD, the grammar of deviations.py:123
     FIELD, derive_stem, read_record as read_typed_record, read_records as read_typed_records)
 
@@ -325,7 +325,7 @@ def read_row_commit(root, row, path):
     `scan_rescope_members` does: the oldest commit changing the row's count anywhere in that folder is the
     one that wrote it into `RUN.md`, so a row dates alike from the live file and from a rotated
     `RUN.<phase>.<blob8>.md`, where a pickaxe over the archive alone answers the commit that rotated it.
-    The ledger arm passes the one journal record the line sits in: a journal record is never rotated, and
+    The ledger arm passes the one log record the line sits in: a log record is never rotated, and
     two ledgers of one build folder can hold one ledger line's text, so a folder pickaxe there would date
     the line by the other record's commit."""
     out = (run_git(root, "log", "--reverse", "--format=%H", f"-S{row}", "HEAD", "--", path) or b"").split()
@@ -607,9 +607,9 @@ def read_population(root, conf, commits):
             members.append({"kind": "audit", "build": b, "address": f"{unit}@rev-{pin_n}", "hand": "spec-revised",
                             "sha": sha, "what": f"{unit}'s spec changed at {sha[:9]}, past its audited revision "
                                                 f"rev-{pin_n} ({pin_sha[:9]})"})
-    # The ledger arm: an `amended rev-N` line under an `**Evidences:** <unit>` block of a journal record.
+    # The ledger arm: an `amended rev-N` line under an `**Evidences:** <unit>` block of a log record.
     for rel in rels:
-        if binds.get(rel, {}).get("kind") != "journal":
+        if resolve_kind(binds.get(rel, {}).get("kind")) != "log":
             continue
         for n, unit, ln in read_evidence_lines(read_text(rel)):
             a = LEDGER.match(ln)
@@ -1043,7 +1043,7 @@ class Fixture:
                           + (f"@rev-{pin}" if pin else ""), "", "**Verdict:** CLEAN", ""])
 
     def render_ledger(self, unit, rev):
-        return "\n".join([f"# {unit} acceptance ledger", "", f"**Serves:** journal {unit}", "",
+        return "\n".join([f"# {unit} acceptance ledger", "", f"**Serves:** log {unit}", "",
                           f"**Evidences:** {unit}", f"- AC1 — amended rev-{rev} — the fixture line narrowed, logged in §9",
                           "- AC2 — `fixture` — observed", ""])
 

@@ -917,6 +917,19 @@ mkdir -p "$D/build"
   printf '**Evidences:** ARCH-tFixture-72\n- AC1 — it just works.\n\n'
   printf '**Evidences:** ARCH-tFixture-73\n- AC1 — `x` — observed.\n'
 } > "$D/build/2026-08-20-build-ARCH-tFixture-70-1-ledger.md"
+# ---- TOOL-dTotalRecall-18 S7: the ledger set is read by kind through the alias. 150 is evidenced by a
+# ---- `log` record, its AC1 answered and its AC2 in neither form; 151 by a `journal` record, the
+# ---- kind's read-only alias, its AC1 answered. A ledger read matching `journal` alone leaves 150's
+# ---- AC1 unevidenced, so the miss on it is the arm.
+ledspec 150 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `x`.
+- **AC2** — another thing, observed by `y`.'
+ledspec 151 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `x`.'
+{ printf '# ledger\n\n**Serves:** log ARCH-tFixture-150\n\n'
+  printf '**Evidences:** ARCH-tFixture-150\n- AC1 — `x` — observed.\n- AC2 — it just works.\n'
+} > "$D/build/2026-08-20-build-ARCH-tFixture-150-1-ledger.md"
+{ printf '# ledger\n\n**Serves:** journal ARCH-tFixture-151\n\n'
+  printf '**Evidences:** ARCH-tFixture-151\n- AC1 — `x` — observed.\n'
+} > "$D/build/2026-08-20-build-ARCH-tFixture-151-1-ledger.md"
 
 # ---- TOOL-aJoinedCanon-6: the two ledger-JOIN arms. LEDGER_LABEL_CUTOFF and LEDGER_TOKEN_CUTOFF are
 # ---- both 2026-08-20 in the shared conf, so these four specs are in the graded era; what each
@@ -1462,10 +1475,13 @@ miss 'ARCH-tFixture-73'                        # grandfathered BY ID, with its r
 miss 'ARCH-tFixture-74'                        # WONTDO owes nothing
 miss 'ARCH-tFixture-75'                        # Tier-1 whose section 6 is Gates: legal, and located by HEADING
 miss 'ARCH-tFixture-76'                        # dated before the cutoff
-hit  'a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable'
+hit  'a CLOSED unit numbers an acceptance criterion that no log record evidences, so nothing says which observation answered it and conformance is unreadable'
+miss 'ARCH-tFixture-150/AC1'                   # TOOL-dTotalRecall-18: a `log` record is a ledger
+hit  'ARCH-tFixture-150/AC2'                   # ...and its line in neither form reds
+miss 'ARCH-tFixture-151/AC1'                   # a `journal` record, the alias, is graded as one
 
 # ---- TOOL-aJoinedCanon-6: the two ledger-join arms, and the two `fail 23` branches they add.
-hit  'a journal record evidences a criterion label its own spec does not number, so the answer satisfies nothing and reads as coverage'
+hit  'a log record evidences a criterion label its own spec does not number, so the answer satisfies nothing and reads as coverage'
 hit  'ARCH-tFixture-140/AC9'                   # the answer labels a criterion §6 does not number
 miss 'ARCH-tFixture-140/AC1'                   # ...and its properly-labelled sibling is silent
 hit  'a ledger answer shares no backticked token with the criterion it claims to answer, so the two are joined by label alone and may describe different things'
@@ -5099,7 +5115,7 @@ fi
 
 # ---- TOOL-dPavedRoad-4 — THE STAGED JOINS, in a tree of its own so no verdict above moves. Under
 # ---- --staged check 12's edge joins read each staged spec's whole build and report an edge either
-# ---- of whose ends is staged, and check 23 grades the units a staged spec or journal record names,
+# ---- of whose ends is staged, and check 23 grades the units a staged spec or log record names,
 # ---- against their own build folders. Ten specs in build tPair: 1 hands-off 2 one-way, 4 and 5 a
 # ---- conforming pair, 6 hands-off 7 one-way, 8 with no Edges block, and 3, 9 and 10 CLOSED with
 # ---- ledgers; build tOther holds a record evidencing ARCH-tPair-9 with an AC8 its spec never numbers.
@@ -5163,10 +5179,10 @@ n=$((n+1)); grep -qF "memory-hygiene: the §3 edge JOINS grade each staged spec 
 n=$((n+1)); grep -qF 'the §3 edge JOINS are held under --staged' <<<"$out" && { echo "FAIL --staged still holds the edge joins"; st=1; }
 # AC3 and AC4 — check 23 grades the unit a staged spec or a staged record names, and no other.
 run_pr4_staged "$PR4S/2026-11-10-spec-ARCH-tPair-3.md"; pr4o3=$out
-n=$((n+1)); grep -F 'HYGIENE check 23' <<<"$pr4o3" | grep -F 'a CLOSED unit numbers an acceptance criterion that no journal record evidences' | grep -qF 'ARCH-tPair-3/AC2' \
+n=$((n+1)); grep -F 'HYGIENE check 23' <<<"$pr4o3" | grep -F 'a CLOSED unit numbers an acceptance criterion that no log record evidences' | grep -qF 'ARCH-tPair-3/AC2' \
   || { echo "FAIL --staged did not grade check 23 for a staged CLOSED spec"; st=1; }
 run_pr4_staged "$PR4B/2026-11-10-build-ARCH-tPair-9-1-acceptance-ledger.md"; pr4o9=$out
-n=$((n+1)); grep -F 'HYGIENE check 23' <<<"$pr4o9" | grep -F 'a journal record evidences a criterion label its own spec does not number' | grep -qF 'ARCH-tPair-9/AC9' \
+n=$((n+1)); grep -F 'HYGIENE check 23' <<<"$pr4o9" | grep -F 'a log record evidences a criterion label its own spec does not number' | grep -qF 'ARCH-tPair-9/AC9' \
   || { echo "FAIL --staged did not grade check 23 for the unit a staged ledger record evidences"; st=1; }
 for out in "$pr4o3" "$pr4o9"; do
   n=$((n+1)); grep -qE 'ARCH-tPair-10/AC9|ARCH-tPair-9/AC8' <<<"$out" \

@@ -1191,7 +1191,7 @@ upstream item and the key at fault.
   prints one line per answered row, one `upstream · finding · <class> · <row id> · <why>` line per
   finding and `upstream · verdict · clean`, `finding` or `refused` last. It exits 1 on `refused`, or
   where `check` would refuse the composition, and 0 otherwise. With `--write --build <slug> --unit <id>`
-  it also writes every line into a new journal record under the build's `build/` folder and prints its
+  it also writes every line into a new log record under the build's `build/` folder and prints its
   path. Either verb exits 2 on a bad argument, a path outside your repository, or a composition that
   does not read.
 

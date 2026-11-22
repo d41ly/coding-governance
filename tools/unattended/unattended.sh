@@ -17350,7 +17350,7 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
     mkdir -p "${rec%/*}" 2>/dev/null || print_env_failure 118 "cannot create the build's record folder, so no round was written: ${rec%/*}"
   fi
   {
-    [ -n "$_chain_rec" ] || printf '# %s — the spec-audit chain'\''s rounds\n\n**Serves:** journal %s\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\n' "$slug" "$named"
+    [ -n "$_chain_rec" ] || printf '# %s — the spec-audit chain'\''s rounds\n\n**Serves:** log %s\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\n' "$slug" "$named"
     printf '%s' "$rows"
   } >> "$rec" || print_env_failure 118 "cannot append to the record, so this round is not recorded: $rec"
   stage_runmd "$rec" || print_env_failure 118 "the round is written and git could not stage it, so the next call cannot find the record: $rec"
@@ -17410,7 +17410,7 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
     }
     { sub(/\r$/, "") }
     /^$/ { next }
-    !body && (/^# / || /^\*\*Serves:\*\* journal / || /^Appended by /) { next }
+    !body && (/^# / || /^\*\*Serves:\*\* (log|journal) / || /^Appended by /) { next }
     {
       body = 1
       k = split($0, f, " · "); c = split(f[1], w, " ")

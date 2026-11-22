@@ -4692,7 +4692,7 @@ def test_record_ac1_names():
         kind, ids = read_serves_ids(text)
         check(f"record AC1: {n[:40]} passes check 5's recording-name grammar", bool(CHECK5_RE.fullmatch(n)), True)
         check(f"record AC1: {n[:40]} projects an id its own Serves line lists", check_projection(n, ids), True)
-        check(f"record AC1: {n[:40]} binds as a journal", kind, "journal")
+        check(f"record AC1: {n[:40]} binds as a log", kind, "log")
     # THE GRADERS' OWN NEAR MISSES, so each is seen able to fail: a name with no family projects no id,
     # one naming an id its head does not serve fails the projection, and a free name fails check 5.
     check("record AC1 liveness: a name dropping the family fails the projection",
@@ -4760,7 +4760,7 @@ def test_record_ac2_serves():
     text = rl_record.render_record(model)
     kind, ids = read_serves_ids(text)
     check("record AC2: the record's head binds exactly those ids, read as check 21 reads them",
-          (kind, ids), ("journal", [units[1], units[2], units[4]]))
+          (kind, ids), ("log", [units[1], units[2], units[4]]))
     check_true("record AC2: the undefined id reaches the head nowhere", f"X-{FX_SLUG}-9" not in text.split("\n")[2],
                text.split("\n")[2])
     # CLOSED and named by an own commit is served; CLOSED and named by none is not.
@@ -4810,7 +4810,7 @@ def test_record_ac3_shape():
           {k: [(t["header"], t["rows"]) for t in v["tables"]] for k, v in twin.items()},
           {k: [(t["header"], t["rows"]) for t in md[k]["tables"]] for k in twin})
     check("record AC3: the record's first line is its title and its Serves line is in its head",
-          (text.split("\n")[0], read_serves_ids(text)[0]), (rl_record.TITLE, "journal"))
+          (text.split("\n")[0], read_serves_ids(text)[0]), (rl_record.TITLE, "log"))
 
 
 # ONE EVENT SHAPE PER RETIRED KIND, so the class model can carry a real instance of each and AC1 can

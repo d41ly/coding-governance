@@ -373,9 +373,12 @@ python <this kit>/runlog.py verify <record> [--journals <dir>]
 **Where it goes.** `<memory root>/builds/<slug>/build/<date>-build-<lowest unit id>-runlog-<key>.md`,
 where the key is the first 8 hex of the commit that started the run, read from the model and never
 re-derived. A re-render finds the run's existing file by that key, whatever its date, so a run has one
-record. The head is `**Serves:** journal <ids>`: the units the run dispatched, or closed with a commit
+record. The head is `**Serves:** log <ids>`: the units the run dispatched, or closed with a commit
 naming them, among those a spec in the build defines, in ranges where contiguous. A run that served no
-such unit gets a `no spec-defined unit` line and no file, because an unbound record moves a pin.
+such unit gets a `no spec-defined unit` line and no file, because an unbound record moves a pin. A
+committed record headed `journal`, the kind's name before it became `log`, still binds:
+`SERVES_ALIASES` beside `SERVES_KIND` in `record.py` admits it read-only, and the memory-tree kit's
+`record_kinds.py --check` holds that tuple to its own alias table, read by `ast`.
 
 **What it holds.** Eight sections in a fixed order: Summary, Timeline, Units, Decisions, Conformance,
 Anomalies, Coverage and Data. Each carries only the fact lines and tables `RECORD_SCHEMA` declares

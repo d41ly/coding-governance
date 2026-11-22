@@ -2924,7 +2924,7 @@ hit "$out" "chain round recorded"
 _fc_f=$(read_chain_file)
 same "FA5 AC4 one record, tracked" "$(grep -c 'chain-rounds.md$' <<<"$_fc_f")" "1"
 same "FA5 AC4 no run-state file was made" "$(cd "$_fc_r" && git ls-files memory/builds/dFix/RUN.md)" ""
-same "FA5 AC4 the second non-blank line binds the first id" "$(grep -v '^$' "$_fc_r/$_fc_f" | sed -n 2p)" "**Serves:** journal FIX-dFix-1"
+same "FA5 AC4 the second non-blank line binds the first id" "$(grep -v '^$' "$_fc_r/$_fc_f" | sed -n 2p)" "**Serves:** log FIX-dFix-1"
 hit "$(<"$_fc_r/$_fc_f")" "round 1 · finding 7 · HIGH · local · specs FIX-dFix-1 · unit FIX-dFix-1 · rev 2"
 write_fixture_round dFix-spec-set-r2 FIX-dFix-3 0 0 --finding 9/LOW/local/FIX-dFix-3/FIX-dFix-3/2
 hit "$(<"$_fc_r/$_fc_f")" "round 2 · subject dFix-spec-set-r2 · audited FIX-dFix-3"

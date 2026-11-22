@@ -6983,6 +6983,11 @@
       "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
+      "id": "check_home",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "check_home_admitted",
       "kind": "function",
       "file": "tools/gate-lint/legacy_ledger.py"
@@ -8033,6 +8038,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_pockets",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "check_point",
       "kind": "function",
       "file": "tools/playbook/check_layers.py"
@@ -8301,6 +8311,11 @@
       "id": "check_reader_pair",
       "kind": "function",
       "file": "tools/memory-tree/marker-contract.test.sh"
+    },
+    {
+      "id": "check_readers",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "check_rebased_copy",
@@ -8886,6 +8901,11 @@
       "id": "check_self_containment",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "check_serves_aliases",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "check_serves_line",
@@ -10685,6 +10705,11 @@
     {
       "id": "common_git_dir",
       "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
+      "id": "common_git_dir",
+      "kind": "function",
       "file": "tools/playbook/memory_index.py"
     },
     {
@@ -12253,6 +12278,11 @@
       "file": "tools/playbook/pins.py"
     },
     {
+      "id": "derive_folder_glob",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "derive_folds",
       "kind": "function",
       "file": "tools/playbook/tag_bundle.py"
@@ -12491,6 +12521,11 @@
       "id": "derive_holder_where",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_home_globs",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "derive_home_graded",
@@ -13526,6 +13561,11 @@
       "id": "derive_reach_units",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
+    },
+    {
+      "id": "derive_read_by",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "derive_read_path",
@@ -14926,6 +14966,11 @@
       "id": "derive_write_command",
       "kind": "function",
       "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "derive_written_by",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "derive_yes_no",
@@ -23100,6 +23145,11 @@
     {
       "id": "read_git_stdout",
       "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
+      "id": "read_git_stdout",
+      "kind": "function",
       "file": "tools/playbook/memory_index.py"
     },
     {
@@ -25133,6 +25183,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_record_doors",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
       "id": "read_record_fields",
       "kind": "function",
       "file": "tools/loop/probe.py"
@@ -27131,6 +27186,11 @@
       "id": "read_view_inputs",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "read_view_joins",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "read_view_state",
@@ -31128,6 +31188,11 @@
       "file": "tools/loop/loop_transition.py"
     },
     {
+      "id": "resolve_kind",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "resolve_kit_descriptor",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -31366,6 +31431,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "resolve_kit_dir",

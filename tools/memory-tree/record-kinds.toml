@@ -1,309 +1,608 @@
-# record-kinds.toml — the record-kind registry (TOOL-dTotalRecall-1): one [[record-kind]] row per kind of
-# record the memory tree holds, the memory contract's one declaration of each. Columns, in this order:
-# `name`; `tag`, record.<name>; `layer`; `home`, the `git ls-files` glob of its records, required on a
-# `fields` row; `id-rule`, its name grammar or ""; `schema`, { form, source, fields }, `form` one of
+# record-kinds.toml — the record-kind registry (TOOL-dTotalRecall-1, -18): one [[record-kind]] row per
+# kind of record the memory tree holds, and one witness row per family of pockets outside it, the
+# memory contract's one declaration of each. Columns, in this order: `name`; `tag`, record.<name>;
+# `layer`, the `layer.<name>` tag of the kit whose writer writes the kind; `home`, one glob or a list:
+# a tracked-path glob (`git ls-files`), `refs/gov/<glob>` or `<git-common-dir>/<glob>`, one tracked glob
+# on a `fields` row; `id-rule`, its name grammar or ""; `schema`, { form, source, fields }, `form` one of
 # fields, header, rows, generated, `source` the literal another module declares the fields in, read by
-# `ast`; `writer`, the command that writes it, `generator:<path>` or `hand`; `readers`; `lifecycle`;
-# `check`, the leg of <prefix>/gate-legs.json grading it. `layer`, `readers` and `lifecycle` stay empty
-# until TOOL-dTotalRecall-18 requires them. A kind joins through
-# `python <prefix>/memory-tree/record_kinds.py new`, and `record_kinds.py --check` grades the file.
+# `ast`; `writer`, the command that writes it, `generator:<path>` or `hand`; `readers`, the work-order
+# read keys a handoff fills from a record of the kind, or [] beside `readers-none`, the reason no role
+# reads it; `lifecycle`, one of append-only, current-state, frozen, generated, out; `check`, the leg of
+# <prefix>/gate-legs.json grading it. Every column but `id-rule` is required and non-empty. A kind
+# joins through `python <prefix>/memory-tree/record_kinds.py new`, and `record_kinds.py --check` grades
+# the file.
 
 [[record-kind]]
 name = "spec"
 tag = "record.spec"
-layer = ""
-home = ""
+layer = "layer.memory"
+home = "memory/builds/*/spec/*.md"
 id-rule = "<date>-spec-<unit id>.md"
 schema = { form = "header", fields = [] }
 writer = "gen_build_index.py --new-spec"
-readers = []
-lifecycle = ""
+readers = ["input:spec"]
+lifecycle = "current-state"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "spec-audit"
 tag = "record.spec-audit"
-layer = ""
+layer = "layer.roles"
 home = "memory/builds/*/reviews/*.md"
 id-rule = ""
 schema = { form = "fields", fields = ["Serves"] }
 writer = "tier2-review.js"
 readers = []
-lifecycle = ""
+readers-none = "a review record is read by the index and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "diff-review"
 tag = "record.diff-review"
-layer = ""
+layer = "layer.roles"
 home = "memory/builds/*/reviews/*.md"
 id-rule = ""
 schema = { form = "fields", fields = ["Serves"] }
 writer = "tier2-review.js"
 readers = []
-lifecycle = ""
+readers-none = "a review record is read by the index and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
-name = "journal"
-tag = "record.journal"
-layer = ""
+name = "log"
+tag = "record.log"
+layer = "layer.memory"
 home = "memory/builds/*/prompts/*.md"
 id-rule = ""
 schema = { form = "fields", fields = ["Serves"] }
 writer = "hand"
-readers = []
-lifecycle = ""
+readers = ["brief:prompt", "brief:goal", "brief:items", "brief:acceptance", "brief:gates", "brief:non-goals", "input:prompt"]
+lifecycle = "append-only"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "research"
 tag = "record.research"
-layer = ""
+layer = "layer.memory"
 home = "memory/builds/*/build/*.md"
 id-rule = ""
 schema = { form = "fields", fields = ["Serves"] }
 writer = "hand"
 readers = []
-lifecycle = ""
+readers-none = "a report is cited by a spec's reuse audit, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "run-record"
 tag = "record.run-record"
-layer = ""
-home = ""
+layer = "layer.observability"
+home = "memory/builds/*/build/*-runlog-*.md"
 id-rule = ""
 schema = { form = "header", fields = [] }
 writer = "runlog.py record --write"
 readers = []
-lifecycle = ""
+readers-none = "a run record is read by the runlog kit's verify, never filled into a work order"
+lifecycle = "generated"
 check = "runlog record schema"
 
 [[record-kind]]
 name = "backlog-row"
 tag = "record.backlog-row"
-layer = ""
-home = ""
+layer = "layer.memory"
+home = "memory/backlog/*.md"
 id-rule = ""
 schema = { form = "rows", fields = [] }
 writer = "hand"
 readers = []
-lifecycle = ""
+readers-none = "an ask row is read by the index generator's ask views, never filled into a work order"
+lifecycle = "current-state"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "design-record"
 tag = "record.design-record"
-layer = ""
+layer = "layer.memory"
 home = "memory/builds/*/build/*-architecture-v*.md"
 id-rule = ""
 schema = { form = "fields", fields = ["Serves"] }
 writer = "hand"
 readers = []
-lifecycle = ""
+readers-none = "a design record is read by the deviation join, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "dossier"
 tag = "record.dossier"
-layer = ""
-home = ""
+layer = "layer.memory.map"
+home = "memory/map/features/*.md"
 id-rule = ""
 schema = { form = "header", fields = [] }
 writer = "hand"
 readers = []
-lifecycle = ""
+readers-none = "a dossier is consulted through the map's lookups, never filled into a work order"
+lifecycle = "current-state"
 check = "codebase-map gate coverage"
 
 [[record-kind]]
 name = "deviation"
 tag = "record.deviation"
-layer = ""
+layer = "layer.memory"
 home = "memory/builds/*/build/*-build-*-deviation-*.md"
 id-rule = "<date>-build-<unit id>-deviation-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.deviation.required", fields = ["Departs from", "Hand-off", "Before", "After", "Cause", "Reason", "Evidence", "Risk", "Approver", "Follow-through", "Caused-by"] }
 writer = "hand"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "exception"
 tag = "record.exception"
-layer = ""
+layer = "layer.memory"
 home = "memory/builds/*/build/*-build-*-exception-*.md"
 id-rule = "<date>-build-<unit id>-exception-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.exception.required", fields = ["Principle", "Excuses", "Reason", "Caused-by"] }
 writer = "build_records.py new exception"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "override"
 tag = "record.override"
-layer = ""
+layer = "layer.memory"
 home = "memory/builds/*/build/*-build-*-override-*.md"
 id-rule = "<date>-build-<unit id>-override-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.override.required", fields = ["Rule", "Words", "Session", "Value", "Caused-by"] }
 writer = "build_records.py new override"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "change"
 tag = "record.change"
-layer = ""
+layer = "layer.memory"
 home = "memory/builds/*/build/*-build-*-change-*.md"
 id-rule = "<date>-build-<unit id>-change-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.change.required", fields = ["Unit", "Action", "Before", "After", "Mark", "Proof", "Caused-by"] }
 writer = "build_records.py new change"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "red-fix"
 tag = "record.red-fix"
-layer = ""
+layer = "layer.memory"
 home = "memory/builds/*/build/*-build-*-red-fix-*.md"
 id-rule = "<date>-build-<unit id>-red-fix-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.red-fix.required", fields = ["Leg", "Red line", "Files", "Commit", "Rerun", "Caused-by"] }
 writer = "build_records.py new red-fix"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "disposition"
 tag = "record.disposition"
-layer = ""
+layer = "layer.memory"
 home = "memory/builds/*/build/*-build-*-disposition-*.md"
 id-rule = "<date>-build-<unit id>-disposition-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.disposition.required", fields = ["Item", "Disposition", "Channel", "Caused-by"] }
 writer = "build_records.py new disposition"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "acceptance"
 tag = "record.acceptance"
-layer = ""
+layer = "layer.flow"
 home = "memory/builds/*/build/*-build-*-acceptance-*.md"
 id-rule = "<date>-build-<unit id>-acceptance-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.acceptance.required", fields = ["Sha", "Writer", "Caused-by"] }
 writer = "loop_witness.py acceptance"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "transition"
 tag = "record.transition"
-layer = ""
+layer = "layer.flow"
 home = "memory/builds/*/build/*-build-*-transition-*.md"
 id-rule = "<date>-build-<unit id>-transition-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.transition.required", fields = ["Build", "From", "To", "Item", "Sha"] }
 writer = "loop_transition.py record"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "recommendation"
 tag = "record.recommendation"
-layer = ""
+layer = "layer.memory"
 home = "memory/builds/*/build/*-build-*-recommendation-*.md"
 id-rule = "<date>-build-<unit id>-recommendation-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.recommendation.required", fields = ["Stage", "Score", "Source", "Binds", "Reason", "Role", "Caused-by"] }
 writer = "build_records.py new recommendation"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "widen"
 tag = "record.widen"
-layer = ""
+layer = "layer.memory"
 home = "memory/builds/*/build/*-build-*-widen-*.md"
 id-rule = "<date>-build-<unit id>-widen-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.widen.required", fields = ["Population", "Keys", "Reason", "Caused-by"] }
 writer = "ratchet.py widen"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "leg-tail"
 tag = "record.leg-tail"
-layer = ""
+layer = "layer.flow"
 home = "memory/builds/*/build/*-build-*-leg-tail-*.md"
 id-rule = "<date>-build-<unit id>-leg-tail-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.leg-tail.required", fields = ["Leg", "Hash", "Run", "Sha", "Cause"] }
 writer = "keep_tails.py"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "flake"
 tag = "record.flake"
-layer = ""
+layer = "layer.flow"
 home = "memory/builds/*/build/*-build-*-flake-*.md"
 id-rule = "<date>-build-<unit id>-flake-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.flake.required", fields = ["Run", "Ended", "Sha", "Tree", "Legs"] }
 writer = "verdict_flow.py flakes"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "gate-health"
 tag = "record.gate-health"
-layer = ""
+layer = "layer.observability"
 home = "memory/builds/*/build/*-build-*-gate-health-*.md"
 id-rule = "<date>-build-<unit id>-gate-health-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.gate-health.required", fields = ["Measured", "Verdicts", "Legs"] }
 writer = "drift_report.py --gate-health --write"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "card"
 tag = "record.card"
-layer = ""
+layer = "layer.instruction"
 home = "memory/builds/*/build/*-build-*-card-*.md"
 id-rule = "<date>-build-<unit id>-card-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.card.required", fields = ["Build", "Step", "Ref"] }
 writer = "manifest-check.sh --card --follow"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "probe-trigger"
 tag = "record.probe-trigger"
-layer = ""
+layer = "layer.flow"
 home = "memory/builds/*/build/*-build-*-probe-trigger-*.md"
 id-rule = "<date>-build-<unit id>-probe-trigger-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.probe-trigger.required", fields = ["Cause", "Asker", "Subject", "At", "Key"] }
 writer = "probe.py trigger"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
 
 [[record-kind]]
 name = "probe"
 tag = "record.probe"
-layer = ""
+layer = "layer.flow"
 home = "memory/builds/*/build/*-build-*-probe-*.md"
 id-rule = "<date>-build-<unit id>-probe-<n>.md"
 schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.probe.required", fields = ["Sha", "Kind", "Question", "Losing", "Asker", "Trigger"] }
 writer = "probe.py pin"
 readers = []
-lifecycle = ""
+readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
+lifecycle = "frozen"
 check = "memory hygiene"
+
+[[record-kind]]
+name = "view"
+tag = "record.view"
+layer = "layer.memory"
+home = ["memory/LIVE.md", "memory/ledger/*.md", "memory/map/generated/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "gen_build_index.py --write"
+readers = []
+readers-none = "a generated view is read by people and its own generator's check, never filled into a work order"
+lifecycle = "generated"
+check = "memory hygiene"
+
+[[record-kind]]
+name = "registry"
+tag = "record.registry"
+layer = "layer.memory"
+home = ["memory/project/*.txt", "memory/project/*.toml"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "hand"
+readers = []
+readers-none = "a row registry is read by the gate that registers it, never filled into a work order"
+lifecycle = "current-state"
+check = "ratchet (never gains)"
+
+[[record-kind]]
+name = "archive"
+tag = "record.archive"
+layer = "layer.memory"
+home = ["memory/archive/**"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "hand"
+readers = []
+readers-none = "a rotated record is read only by a reader that asks for history, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+
+[[record-kind]]
+name = "instrument"
+tag = "record.instrument"
+layer = "layer.memory"
+home = ["memory/builds/*/build/*.py", "memory/builds/*/build/*.sh", "memory/builds/*/build/*.js", "memory/builds/*/build/*.json", "memory/builds/*/build/*.tsv", "memory/builds/*/build/*.txt", "memory/builds/*/build/*.svg", "memory/builds/*/build/*.html", "memory/builds/*/build/*.log", "memory/builds/*/build/*.out"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "hand"
+readers = []
+readers-none = "an instrument is run or read beside the record it serves, never filled into a work order"
+lifecycle = "frozen"
+check = "memory hygiene"
+
+[[record-kind]]
+name = "witness"
+tag = "record.witness"
+layer = "layer.runtime"
+home = ["refs/gov/**"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "gov-ref.sh"
+readers = []
+readers-none = "a witness is joined by its key in its owner's check, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "orientation-cards"
+tag = "record.orientation-cards"
+layer = "layer.instruction"
+home = ["<git-common-dir>/orientation/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "manifest-check.sh --card"
+readers = ["card:route", "card:reuse", "task:in", "task:todo", "task:reuse"]
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "unattended-sidecars"
+tag = "record.unattended-sidecars"
+layer = "layer.runtime"
+home = ["<git-common-dir>/unattended/*", "<git-common-dir>/unattended-landed"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "unattended.sh"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "runlog-journal"
+tag = "record.runlog-journal"
+layer = "layer.observability"
+home = ["<git-common-dir>/runlog/*", "<git-common-dir>/runlog-stamp-*"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "runlog.py"
+readers = []
+readers-none = "a store is read by its own kit's reader, never filled into a work order"
+lifecycle = "append-only"
+check = "record-kinds"
+
+[[record-kind]]
+name = "drift-history"
+tag = "record.drift-history"
+layer = "layer.observability"
+home = ["<git-common-dir>/drift-history.tsv"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "drift_report.py"
+readers = []
+readers-none = "a store is read by its own kit's reader, never filled into a work order"
+lifecycle = "append-only"
+check = "record-kinds"
+
+[[record-kind]]
+name = "gate-ledger"
+tag = "record.gate-ledger"
+layer = "layer.flow"
+home = ["<git-common-dir>/gate-*", "<git-common-dir>/pre-push-*", "<git-common-dir>/selftest-baseline"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "run-gates.sh"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "health-logs"
+tag = "record.health-logs"
+layer = "layer.runtime"
+home = ["<git-common-dir>/health.log", "<git-common-dir>/procmon-stamp"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "health-log.sh"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "hook-state"
+tag = "record.hook-state"
+layer = "layer.runtime"
+home = ["<git-common-dir>/agent-cap/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "agent-cap.js"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "reuse-lookups"
+tag = "record.reuse-lookups"
+layer = "layer.memory.map"
+home = ["<git-common-dir>/codebase-map/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "reuse_lookup.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "recall-cache"
+tag = "record.recall-cache"
+layer = "layer.memory.recall"
+home = ["<git-common-dir>/recall/*"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "query.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "review-lenses"
+tag = "record.review-lenses"
+layer = "layer.roles"
+home = ["<git-common-dir>/review-lenses/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "tier2-review.js"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "transition-cache"
+tag = "record.transition-cache"
+layer = "layer.memory"
+home = ["<git-common-dir>/transition-audit-cache"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "transition_audit.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "gov-index"
+tag = "record.gov-index"
+layer = "layer.instruction"
+home = ["<git-common-dir>/gov/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "tag_index.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "generated"
+check = "record-kinds"
+
+[[record-kind]]
+name = "gov-feed"
+tag = "record.gov-feed"
+layer = "layer.runtime"
+home = ["<git-common-dir>/gov-feed.*", "<git-common-dir>/gov-last-fetch"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "gov-feed.sh"
+readers = []
+readers-none = "a store is read by its own kit's reader, never filled into a work order"
+lifecycle = "append-only"
+check = "record-kinds"
+
+[[record-kind]]
+name = "handoff-calls"
+tag = "record.handoff-calls"
+layer = "layer.roles"
+home = ["<git-common-dir>/handoff-calls/*"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "handoff.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "index-render-stamp"
+tag = "record.index-render-stamp"
+layer = "layer.memory"
+home = ["<git-common-dir>/gen-build-index-render-stamp"]
+id-rule = ""
+schema = { form = "rows", fields = [] }
+writer = "gen_build_index.py"
+readers = []
+readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
+lifecycle = "out"
+check = "record-kinds"
+
+[[record-kind]]
+name = "git-client-state"
+tag = "record.git-client-state"
+layer = "layer.integrations"
+home = ["<git-common-dir>/sourcetreeconfig.json"]
+id-rule = ""
+schema = { form = "generated", fields = [] }
+writer = "hand"
+readers = []
+readers-none = "a desktop git client's own state, read by that client alone"
+lifecycle = "out"
+check = "record-kinds"

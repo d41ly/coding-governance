@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""record_kinds.py — the record-kind registry's reader, gate, view and factory (TOOL-dTotalRecall-1).
+"""record_kinds.py — the record-kind registry's reader, gate, view and factory (TOOL-dTotalRecall-1, -18).
 
     python <prefix>/memory-tree/record_kinds.py --check             # the `record-kinds` leg
     python <prefix>/memory-tree/record_kinds.py --write             # the HYGIENE template's kind region
     python <prefix>/memory-tree/record_kinds.py --template <kind>   # the record skeleton of one kind
     python <prefix>/memory-tree/record_kinds.py new <name> --tag record.<name> --writer <door>
                                                 --check <leg> --field <Key>... --home <glob>
+                                                --layer <tag> --lifecycle <value>
+                                                (--reader <key>... | --readers-none <reason>)
     python <prefix>/memory-tree/record_kinds.py --seed-legacy       # the record-kinds-legacy seed
     python <prefix>/memory-tree/record_kinds.py --print-gap-keys    # the gap-key native class's members
     python <prefix>/memory-tree/record_kinds.py --fixture [--plant <case>]
@@ -13,43 +15,76 @@
 
 ONE DECLARATION PER KIND. `record-kinds.toml` beside this file holds one `[[record-kind]]` row per
 record kind, its columns `name`, `tag`, `layer`, `home`, `id-rule`, `schema`, `writer`, `readers`,
-`lifecycle` and `check`; `root` and `sections` are admitted for the units that add them. Every row
-carries `name`, `tag` (`record.<name>`), `schema`, `writer` and `check`, and a `fields` row its
-`home`, a `git ls-files` glob. `schema` is `{ form, fields, source }`: `form` one of `fields`,
-`header`, `rows`, `generated`; `fields` the `**Key:**` lines a record carries; `source`, optional,
-`<path>:<NAME>[.<key>]...`, its path spelled through `{prefix}`, the literal another module declares
-the same fields in, read with `ast` and never by import, so a sibling kit's table is read without
-crossing a kit boundary.
+`readers-none`, `lifecycle` and `check`; `root` and `sections` are admitted for the units that
+add them. Every row carries `name`, `tag` (`record.<name>`), `layer` (a `layer.<name>` tag, the
+layer of the kit whose writer writes the kind), `home`, `schema`, `writer`, `readers`, `lifecycle`
+(one of `LIFECYCLES`) and `check`. `home` is one glob or a list of them, each a tracked-path glob,
+a ref glob `refs/gov/<glob>` or `<git-common-dir>/<glob>`; a `fields` row's is one tracked glob, the
+population it grades. `readers` lists the work-order read keys a handoff fills from a record of the
+kind, each a member of the roles kit's `READ_KEYS` that some role's `reads:` names; a kind no role
+reads carries `readers = []` and a non-empty `readers-none` reason. `schema` is
+`{ form, fields, source }`: `form` one of `fields`, `header`, `rows`, `generated`; `fields` the
+`**Key:**` lines a record carries; `source`, optional, `<path>:<NAME>[.<key>]...`, its path spelled
+through `{prefix}`, the literal another module declares the same fields in, read with `ast` and
+never by import, so a sibling kit's table is read without crossing a kit boundary.
+
+THE VIEW, the HYGIENE template's `gen:record-kinds` region, is one table line per row: `Kind`, `Tag`,
+`Home`, `Writer`, `Read by`, `Written by` and `Check`, each `|` in a value written `\\|`. `Read by`
+is the roles whose `reads:` holds one of the row's `readers` and the loop items whose `inputs` hold a
+typed record reference `<layer tag>:record-kind.<name>[@<n>]` (`loop_items.derive_record_ref`); a
+prose input joins nothing. `Written by` is the roles whose `writes:` folder in the roles kit's
+`WRITE_FOLDERS` covers one of the row's homes, `<slug>` read as `*`, and the items whose `returns`
+reads as `record-kind.<name>`. The roles come from `roles_lib.load_roles` and the items from
+`loop_lib.read_definition` and `read_item_rows`, both kits found by the inline `resolve_kit_dir`
+block (the `requires_if` rows of this kit's `kit.toml`), their modules from this install and their
+role files and definition from the tree checked. `--check`, `--write` and `new` each read them
+afresh, so the byte compare is with a live re-derivation; an empty role population, a kit that does
+not resolve or a definition that does not read is `unarmed` naming it: red under `--check`, `unarmed`
+cells under `--write` and `new`.
 
 THE GATE, `--check`, reds: no row; a row missing a required column or carrying an unknown one; a
-`fields` row with an empty `home`; an empty `writer`; a `check` naming no leg of the tool root's
-`gate-legs.json`; a `source` whose literal does not hold the row's `fields` both ways; a member of
-the typed kind list (`tree_lib.TYPED_RECORD_KINDS`) with no row, and a factory row (its `source` the
-factory's `KINDS.<kind>.required`) naming no member. It grades each `fields` row's population: every
-tracked record its `home` matches carries each field as a `**Key:**` line, bare or a `- **Key:**`
-bullet, in the row's order, except a record the `record-kinds-legacy` ledger lists against that row.
+column outside its grammar; a reader key outside `READ_KEYS` or read by no role; an empty `writer`;
+a `check` naming no leg of the tool root's `gate-legs.json`; a `source` whose literal does not hold
+the row's `fields` both ways; a member of the typed kind list (`tree_lib.TYPED_RECORD_KINDS`) with no
+row, and a factory row (its `source` the factory's `KINDS.<kind>.required`) naming no member. It
+grades each `fields` row's population: every tracked record its `home` matches carries each field as
+a `**Key:**` line, bare or a `- **Key:**` bullet, in the row's order, except a record the
+`record-kinds-legacy` ledger lists against that row, each ledger row's section read through
+`tree_lib.resolve_kind`, so the rows keyed `journal` stand for the `log` row with their bytes kept.
 A typed kind's row grades only the paths its name grammar (`build_records.derive_record_name`) also
 matches, and a path a typed grammar matches is graded by that kind's row alone. A typed kind whose home
 matches nothing prints `<kind>: unarmed — no record yet` and passes; any other empty population
 reds. A graded deviation's `Follow-through: gap <key>` must name a key some tracked gap register
 holds, and no register holding a key reds. The HYGIENE template's `gen:record-kinds` region must be
-byte for byte what `--write` writes. It prints one count line naming every row, each `fields` kind's
-graded and legacy counts, each `unarmed` kind and every red with its row.
+byte for byte what `--write` writes. THE POCKET ARM, `check_pockets`, lists the top-level entries of
+the common git dir (the inline `common_git_dir` block), skips git's own (`GIT_OWN`), and reds each
+entry no row's `<git-common-dir>/` home glob matches on its first segment. THE ALIAS JOIN reads the
+runlog kit's `SERVES_ALIASES` from its `record.py` by `ast` and reds where it differs from the
+`tree_lib.KIND_ALIASES` keys whose target is `log`; where that kit does not resolve it prints
+`unarmed` and passes, since this kit does not require it. It prints one count line naming every row,
+each `fields` kind's graded and legacy counts, each `unarmed` kind, one `view` line per row, each
+pocket entry with the row it matched, and every red with its row.
 
 Exit 0 green, 1 a red, 2 a refusal: a registry that does not parse, or a verb's malformed arguments.
 `new` appends the row and re-renders that region from the registry, so the two move together; it
 exits 2 and writes nothing on a duplicate name, a tag that is not `record.<name>`, an empty
-writer, no `--home` or no `--field`, or a check no leg carries. `--print-gap-keys` exits 3 where no
+writer, no `--home` or no `--field`, a check no leg carries, no `--layer` or one that is no
+`layer.<name>` tag, no `--lifecycle` or one outside `LIFECYCLES`, or no `--reader` and no
+`--readers-none`, both, or a reader key the roles do not read. `--print-gap-keys` exits 3 where no
 gap register is tracked, the native class's not-armed answer.
 
 WHAT IT DOES NOT CHECK. Whether a row's `writer` writes the kind: the cell is read, never run. A
 field's value, only its line. A `gap-key` at an edge site, since no edge type names the class. A
-`header`, `rows` or `generated` row's records, which its `check` leg's owner grades.
+`header`, `rows` or `generated` row's records, which its `check` leg's owner grades. Whether a
+non-`fields` row's tracked home matches a file, or a `refs/gov/` home a ref. Whether a `layer` tag
+is a row of the playbook kit's layer register: its shape only. A `WRITE_FOLDERS` value that is no
+folder (the product class's conf key) covers no home. A pocket's contents, which it never reads.
 """
 from __future__ import annotations
 
 import argparse
 import ast
+import fnmatch
 import json
 import os
 import pathlib
@@ -70,9 +105,19 @@ TEMPLATE = "HYGIENE.template.md"
 LEGS = "gate-legs.json"
 LEGACY = "record-kinds-legacy"
 REGION_OPEN, REGION_CLOSE = "<!-- gen:record-kinds -->", "<!-- /gen:record-kinds -->"
-COLUMNS = ("name", "tag", "layer", "home", "id-rule", "schema", "writer", "readers", "lifecycle", "check")
+COLUMNS = ("name", "tag", "layer", "home", "id-rule", "schema", "writer", "readers", "readers-none", "lifecycle",
+           "check")
 LATER_COLUMNS = ("root", "sections")   # TOOL-dTotalRecall-19's and -9's, admitted and graded by their owners
-REQUIRED = ("name", "tag", "schema", "writer", "check")
+REQUIRED = ("name", "tag", "layer", "home", "schema", "writer", "readers", "lifecycle", "check")
+LIFECYCLES = ("append-only", "current-state", "frozen", "generated", "out")
+LAYER_RE = re.compile(r"layer\.[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)*")
+COMMON_DIR_HOME = "<git-common-dir>/"
+REF_HOME = "refs/gov/"
+#: Git's own entries of a common dir, never a pocket (TOOL-dTotalRecall-18 S6).
+GIT_OWN = frozenset(("HEAD", "ORIG_HEAD", "FETCH_HEAD", "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD",
+                     "COMMIT_EDITMSG", "config", "description", "hooks", "index", "info", "logs", "objects",
+                     "packed-refs", "refs", "worktrees", "modules", "lost-found", "shallow", "gc.log"))
+UNARMED = "unarmed"
 FORMS = ("fields", "header", "rows", "generated")
 SCHEMA_KEYS = ("form", "fields", "source")
 NAME_RE = re.compile(r"[a-z][a-z0-9-]*")
@@ -127,6 +172,69 @@ def read_memory_root(root) -> str:
     return (read_design_conf(root).get("MEMORY_ROOT") or "memory").strip().strip("/")
 
 
+def read_git_stdout(repo, *args: str) -> str:
+    """`git -C <repo> <args>`'s standard output; RecordKindsError where git refuses."""
+    p = run_git(repo, *args)
+    if p.returncode != 0:
+        raise RecordKindsError(f"git {' '.join(args)} refused in {repo}: {p.stderr.strip()}")
+    return p.stdout
+
+
+git = read_git_stdout  # the name the common_git_dir block below calls
+
+# >>> common_git_dir -- canonical copy: common_dir.py in the gov lib dir (byte-identical; gated)
+def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
+    """The MAIN repository's git directory, shared by every worktree.
+
+    ``--git-dir`` in a linked worktree is ``.git/worktrees/<name>``, which ``git worktree remove``
+    deletes outright -- taking the query log with it. It is also RELATIVE (bare ``.git``) when run
+    at the repo root and absolute elsewhere, so the raw value is not a usable path either way.
+    """
+    raw = git(repo, "rev-parse", "--git-common-dir").strip()
+    p = pathlib.Path(raw)
+    return p.resolve() if p.is_absolute() else (repo / raw).resolve()
+# <<< common_git_dir
+
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
 # ---------------------------------------------------------------------------------- the registry
 def read_record_kinds(root, kit_rel: str | None = None) -> list[dict] | None:
     """The registry's rows at `root`, or None where the registry is absent. RecordKindsError where it
@@ -178,6 +286,33 @@ def read_schema_source(root, source: str, tool_rel: str):
     return list(value) if isinstance(value, (list, tuple, dict)) else value
 
 
+def derive_home_globs(home) -> list[str]:
+    """A row's `home` as its list of globs: one string, or each string of a list."""
+    if isinstance(home, str):
+        return [home] if home.strip() else []
+    return [h for h in home if isinstance(h, str)] if isinstance(home, list) else []
+
+
+def check_home(home, at: str, form) -> list[str]:
+    """The reds of one row's `home`: one glob or a non-empty list, each a tracked-path glob, `refs/gov/<glob>`
+    or `<git-common-dir>/<glob>`; a `fields` row's one tracked glob."""
+    if not (isinstance(home, str) or (isinstance(home, list) and home and all(isinstance(h, str) for h in home))):
+        return [f"{at}: `home` is neither a glob nor a non-empty list of globs"]
+    globs = derive_home_globs(home)
+    if not globs:
+        return [f"{at}: the column `home` is empty: name the glob its records live at"]
+    reds = []
+    for g in globs:
+        lead = next((p for p in (COMMON_DIR_HOME, REF_HOME) if g.startswith(p)), "")
+        rest = g[len(lead):]
+        if (not rest.strip() or rest.startswith("/") or "\\" in g or ".." in rest.split("/")
+                or (not lead and ("<" in g or g.startswith("refs/")))):
+            reds.append(f"{at}: home {g!r} is none of a tracked-path glob, `{REF_HOME}<glob>` or `{COMMON_DIR_HOME}<glob>`")
+        elif form == "fields" and (lead or not isinstance(home, str)):
+            reds.append(f"{at}: a `fields` row's home {g!r} is not one tracked-path glob, the population it grades")
+    return reds
+
+
 def check_row(row: dict, n: int, legs: set, root, tool_rel: str) -> list[str]:
     """The reds one row earns on its own, each naming the row."""
     name = row.get("name") if isinstance(row.get("name"), str) and row.get("name") else f"#{n}"
@@ -196,11 +331,24 @@ def check_row(row: dict, n: int, legs: set, root, tool_rel: str) -> list[str]:
         reds.append(f"{at}: the column `writer` is empty: name the door, `generator:<path>` or `hand`")
     if "check" in row and row["check"] not in legs:
         reds.append(f"{at}: check {row['check']!r} names no leg of {LEGS}")
-    for col in ("layer", "lifecycle", "id-rule", "home"):
+    for col in ("layer", "lifecycle", "id-rule"):
         if col in row and not isinstance(row[col], str):
             reds.append(f"{at}: `{col}` is not a string")
-    if "readers" in row and not (isinstance(row["readers"], list) and all(isinstance(r, str) for r in row["readers"])):
-        reds.append(f"{at}: `readers` is not a list of strings")
+    if isinstance(row.get("layer"), str) and not LAYER_RE.fullmatch(row["layer"]):
+        reds.append(f"{at}: the column `layer` {row['layer']!r} is no `layer.<name>` tag: name the layer of the "
+                    f"kit whose writer writes the kind")
+    if isinstance(row.get("lifecycle"), str) and row["lifecycle"] not in LIFECYCLES:
+        reds.append(f"{at}: the column `lifecycle` {row['lifecycle']!r} is not one of {', '.join(LIFECYCLES)}")
+    if "home" in row:
+        reds += check_home(row["home"], at, (row.get("schema") or {}).get("form") if isinstance(row.get("schema"), dict) else None)
+    readers, none_why = row.get("readers"), row.get("readers-none")
+    if "readers" in row and not (isinstance(readers, list) and all(isinstance(r, str) and r for r in readers)):
+        reds.append(f"{at}: `readers` is not a list of read keys")
+    elif "readers" in row and not readers and not (isinstance(none_why, str) and none_why.strip()):
+        reds.append(f"{at}: `readers` is empty and `readers-none` gives no reason: name the read keys a handoff "
+                    f"fills from the kind, or say why no role reads it")
+    elif readers and "readers-none" in row:
+        reds.append(f"{at}: `readers` names keys and `readers-none` says no role reads the kind: keep one")
     schema = row.get("schema")
     if "schema" not in row:
         return reds
@@ -216,7 +364,7 @@ def check_row(row: dict, n: int, legs: set, root, tool_rel: str) -> list[str]:
         if not fields:
             reds.append(f"{at}: a `fields` row declares no field")
         if not (isinstance(row.get("home"), str) and row["home"].strip()):
-            reds.append(f"{at}: a `fields` row's `home` is empty, so it grades no record")
+            reds.append(f"{at}: a `fields` row's `home` is not one tracked glob, so it grades no record")
     source = schema.get("source")
     if source is not None:
         try:
@@ -321,13 +469,107 @@ def print_gap_keys(root) -> int:
 
 
 # ------------------------------------------------------------------------------------- the view
-def render_kind_region(rows: list[dict]) -> str:
-    """The `gen:record-kinds` region, its markers included: one table line per row."""
+def read_view_joins(root, kit_rel: str) -> dict:
+    """S2's sources, read afresh from the tree at `root`: `{"unarmed": [why...], "roles": {slot: (reads, writes)},
+    "items": [(tag, inputs, returns)], "read_keys", "folders", "record_ref", "memory_root"}`. The roles and loop
+    kits' modules are this install's, found by `resolve_kit_dir` from this file; their role files and their
+    definition are the tree's, found from the kit directory under `root`. A kit that does not resolve, an empty
+    role population or a definition that does not read is one `unarmed` reason naming it."""
+    out = {"unarmed": [], "roles": {}, "items": [], "read_keys": frozenset(), "folders": {}, "record_ref": None,
+           "memory_root": "memory"}
+    here = pathlib.Path(root, kit_rel)
+    try:
+        out["memory_root"] = read_memory_root(root)
+    except (OSError, ValueError):
+        pass
+    try:
+        code = resolve_kit_dir("roles", "roles_lib.py", KIT)
+        if str(code) not in sys.path:
+            sys.path.append(str(code))
+        import check_roles
+        import roles_lib
+        out["read_keys"], out["folders"] = roles_lib.READ_KEYS, dict(check_roles.WRITE_FOLDERS)
+        tree = resolve_kit_dir("roles", "roles_lib.py", here)
+        roles = roles_lib.load_roles(tree)
+        if not roles:
+            out["unarmed"].append(f"the roles kit at {tree.as_posix()} holds no role under agents/, so no role reads "
+                                  f"or writes a kind")
+        for slot, role in roles.items():
+            keys = role.get("keys") or {}
+            reads = {k.strip().rstrip("?") for k in str(keys.get("reads") or "").split(",") if k.strip()}
+            out["roles"][slot] = (reads, str(keys.get("writes") or "").strip())
+    except LookupError as e:
+        out["unarmed"].append(f"the roles kit does not resolve: {e}")
+    except Exception as e:   # noqa: BLE001 — `RolesError`, the roles kit's one refusal, is a bare Exception
+        out["unarmed"].append(f"the roles kit's role files do not read: {type(e).__name__}: {e}")
+    try:
+        code = resolve_kit_dir("loop", "loop_lib.py", KIT)
+        if str(code) not in sys.path:
+            sys.path.append(str(code))
+        import loop_items
+        import loop_lib
+        out["record_ref"] = loop_items.derive_record_ref
+        data, where = loop_lib.read_definition(resolve_kit_dir("loop", "loop_lib.py", here))
+        for r in loop_lib.read_item_rows(data, where):
+            inputs = r.get("inputs") if isinstance(r.get("inputs"), list) else []
+            returns = r.get("returns")
+            out["items"].append((str(r.get("tag") or "?"), [i for i in inputs if isinstance(i, str)],
+                                 [x for x in (returns if isinstance(returns, list) else [returns]) if isinstance(x, str)]))
+    except LookupError as e:
+        out["unarmed"].append(f"the loop kit does not resolve: {e}")
+    except (ImportError, OSError, ValueError) as e:   # LoopError is a ValueError naming the file and the row
+        out["unarmed"].append(f"the loop kit's definition does not read: {type(e).__name__}: {e}")
+    return out
+
+
+def derive_read_by(row: dict, joins: dict) -> list[str]:
+    """The roles whose `reads:` holds one of the row's `readers`, then the items whose `inputs` hold a typed
+    record reference to the row's kind; never an input's prose."""
+    keys = set(row.get("readers") or []) if isinstance(row.get("readers"), list) else set()
+    roles = [slot for slot, (reads, _w) in sorted(joins["roles"].items()) if reads & keys]
+    want = f"record-kind.{row.get('name')}"
+    ref = joins["record_ref"]
+    items = [tag for tag, inputs, _r in joins["items"]
+             if ref and any((got := ref(i.partition(":")[2])) and got[0] == want for i in inputs)]
+    return roles + items
+
+
+def derive_folder_glob(folder: str, memory_root: str) -> str | None:
+    """A `WRITE_FOLDERS` value as a home-glob prefix, `<slug>` read as `*`; None for a value that is no folder."""
+    if not folder.endswith("/"):
+        return None
+    return folder.replace("{{MEMORY_ROOT}}", memory_root).replace("<slug>", "*")
+
+
+def derive_written_by(row: dict, joins: dict) -> list[str]:
+    """The roles whose `writes:` folder covers one of the row's homes, then the items whose `returns` reads as
+    the row's kind."""
+    homes = derive_home_globs(row.get("home"))
+    roles = []
+    for slot, (_reads, writes) in sorted(joins["roles"].items()):
+        prefix = derive_folder_glob(joins["folders"].get(writes, ""), joins["memory_root"])
+        if prefix and any(h.startswith(prefix) for h in homes):
+            roles.append(slot)
+    want, ref = f"record-kind.{row.get('name')}", joins["record_ref"]
+    items = [tag for tag, _i, returns in joins["items"]
+             if ref and any((got := ref(x)) and got[0] == want for x in returns)]
+    return roles + items
+
+
+def render_kind_region(rows: list[dict], joins: dict) -> str:
+    """The `gen:record-kinds` region, its markers included: one table line per row, its `Read by` and
+    `Written by` cells derived from `joins` (`unarmed` where they are), each `|` in a value written `\\|`."""
     def render_cell(v):
-        return f"`{v}`" if isinstance(v, str) and v else "—"
-    lines = [REGION_OPEN, "", "| Kind | Tag | Home | Writer | Check |", "|---|---|---|---|---|"]
-    lines += [f"| {render_cell(r.get('name'))} | {render_cell(r.get('tag'))} | {render_cell(r.get('home'))} | {render_cell(r.get('writer'))} | "
-              f"{render_cell(r.get('check'))} |" for r in rows]
+        if isinstance(v, list):
+            return ", ".join(render_cell(x) for x in v) if v else "—"
+        return ("`" + v.replace("|", "\\|") + "`") if isinstance(v, str) and v else "—"
+    def render_join(names):
+        return UNARMED if joins["unarmed"] else render_cell(names)
+    lines = [REGION_OPEN, "", "| Kind | Tag | Home | Writer | Read by | Written by | Check |",
+             "|---|---|---|---|---|---|---|"]
+    lines += [f"| {render_cell(r.get('name'))} | {render_cell(r.get('tag'))} | {render_cell(r.get('home'))} | "
+              f"{render_cell(r.get('writer'))} | {render_join(derive_read_by(r, joins))} | "
+              f"{render_join(derive_written_by(r, joins))} | {render_cell(r.get('check'))} |" for r in rows]
     return "\n".join(lines + ["", REGION_CLOSE])
 
 
@@ -348,7 +590,10 @@ def write_kind_region(root, kit_rel: str | None = None) -> int:
     if span is None:
         print(f"{SAY}: refused · {TEMPLATE} holds no {REGION_OPEN} … {REGION_CLOSE} region")
         return 2
-    new = text[:span[0]] + render_kind_region(rows) + text[span[1]:]
+    joins = read_view_joins(root, kit_rel)
+    for why in joins["unarmed"]:
+        print(f"{SAY}: {UNARMED} — {why}; the view's read-by and written-by cells say so")
+    new = text[:span[0]] + render_kind_region(rows, joins) + text[span[1]:]
     if new != text:
         path.write_bytes(new.encode("utf-8"))
     print(f"{SAY}: wrote the region of {TEMPLATE}, {len(rows)} rows" if new != text else f"{SAY}: region current")
@@ -356,6 +601,67 @@ def write_kind_region(root, kit_rel: str | None = None) -> int:
 
 
 # -------------------------------------------------------------------------------------- the gate
+def check_readers(rows: list[dict], joins: dict) -> list[str]:
+    """S1's reader grammar: each key of a row's `readers` a member of `READ_KEYS` some role's `reads:` names."""
+    read = set().union(*(reads for reads, _w in joins["roles"].values())) if joins["roles"] else set()
+    reds = []
+    for row in rows:
+        for key in row.get("readers") or [] if isinstance(row.get("readers"), list) else []:
+            if key not in joins["read_keys"]:
+                reds.append(f"row {row.get('name')}: reader {key!r} is no read key of the roles kit's READ_KEYS")
+            elif key not in read:
+                reds.append(f"row {row.get('name')}: reader {key!r} is a read key no role's `reads:` names")
+    return reds
+
+
+def check_pockets(root, rows: list[dict]) -> tuple[list[str], list[str]]:
+    """S6's pocket arm: `(lines, reds)` over the top-level entries of the common git dir, git's own
+    (`GIT_OWN`) skipped, each other entry matched against every row's `<git-common-dir>/` home glob on its
+    first segment; an entry no row matches is a red naming it and the remedy. It lists, never reads."""
+    try:
+        common = common_git_dir(pathlib.Path(root))
+        entries = sorted(p.name for p in common.iterdir())
+    except (RecordKindsError, OSError) as e:
+        return [], [f"pocket: {UNARMED} — the common git dir does not list: {e}"]
+    globs = [(r.get("name"), g[len(COMMON_DIR_HOME):].split("/")[0]) for r in rows
+             for g in derive_home_globs(r.get("home")) if g.startswith(COMMON_DIR_HOME)]
+    lines, reds, own = [], [], 0
+    for entry in entries:
+        if entry in GIT_OWN:
+            own += 1
+            continue
+        hit = sorted({str(n) for n, seg in globs if fnmatch.fnmatchcase(entry, seg)})
+        if hit:
+            lines.append(f"pocket · {entry} · {', '.join(hit)}")
+        else:
+            lines.append(f"pocket · {entry} · no row")
+            reds.append(f"pocket {entry}: no row's `{COMMON_DIR_HOME}` home matches this entry of {common.as_posix()}; "
+                        f"register its family as a witness row, or move it out of the common dir")
+    lines.append(f"pocket · {len(entries)} entries of {common.as_posix()} · {own} git's own · "
+                 f"{len(entries) - own - len(reds)} matched · {len(reds)} unmatched")
+    return lines, reds
+
+
+def check_serves_aliases(root, kit_rel: str, tool_rel: str) -> tuple[str, list[str]]:
+    """S13's join: `(line, reds)`, the runlog kit's `SERVES_ALIASES`, read from its `record.py` by `ast`, held
+    to the `tree_lib.KIND_ALIASES` keys whose target is `log`; `unarmed` and no red where that kit is absent."""
+    from tree_lib import KIND_ALIASES
+    want = sorted(a for a, t in KIND_ALIASES.items() if t == "log")
+    try:
+        kit = resolve_kit_dir("runlog", "record.py", pathlib.Path(root, kit_rel))
+    except LookupError:
+        return f"alias · {UNARMED} — no runlog kit in this tree, so its SERVES_ALIASES is joined to nothing", []
+    rel = pathlib.Path(os.path.relpath(kit / "record.py", pathlib.Path(root).absolute())).as_posix()
+    try:
+        got = read_schema_source(root, f"{rel}:SERVES_ALIASES", tool_rel)
+    except RecordKindsError as e:
+        return f"alias · {rel} · red", [f"alias SERVES_ALIASES: {e}"]
+    if not isinstance(got, list) or sorted(got) != want:
+        return (f"alias · {rel} · red", [f"alias SERVES_ALIASES: {rel} holds {got!r}, and tree_lib's KIND_ALIASES "
+                                         f"names {want!r} for `log`: the alias's two homes drift"])
+    return f"alias · {rel} · SERVES_ALIASES {', '.join(got)} · held to KIND_ALIASES", []
+
+
 def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tuple[list[str], int]:
     """S3, S4, S6 and the gap-key join over the tree at `root`: `(lines, exit)`. `typed_kinds` stands in
     for `tree_lib.TYPED_RECORD_KINDS` (the fixture's list)."""
@@ -389,7 +695,13 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
         if m and (m[1] not in typed_kinds or m[1] != row.get("name")):
             reds.append(f"row {row.get('name')}: a factory row naming {m[1]}, which is no member of the factory's "
                         f"kind list under this name")
+    joins = read_view_joins(root, kit_rel)
+    reds += [f"{UNARMED} — {why}, so the view's read-by and written-by cells are no derivation" for why in joins["unarmed"]]
+    if not joins["unarmed"]:
+        reds += check_readers(rows, joins)
+    from tree_lib import resolve_kind
     legacy, note = read_legacy_keys(root)
+    legacy = {(p, resolve_kind(s)) for p, s in legacy}   # S7: a row keyed `journal` stands for `log`, bytes kept
     population = scan_legacy_records(root, rows, typed_kinds)
     counts, unarmed, graded_paths = [], [], {}
     for row in rows:
@@ -429,16 +741,25 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
     if span is None:
         reds.append(f"region gen:record-kinds: {kit_rel}/{TEMPLATE} holds no such region")
     else:
-        have, want = text[span[0]:span[1]].split("\n"), render_kind_region(rows).split("\n")
+        have, want = text[span[0]:span[1]].split("\n"), render_kind_region(rows, joins).split("\n")
         if have != want:
             i = next((i for i, (a, b) in enumerate(zip(have, want)) if a != b), min(len(have), len(want)))
             first = have[i] if i < len(have) else "(the region ends)"
             reds.append(f"region gen:record-kinds: line {i + 1} of the region, {first!r}, is not what --write "
-                        f"writes; run --write")
+                        f"writes from the registry and a fresh read of the roles and items; run --write")
+    pocket_lines, pocket_reds = check_pockets(root, rows)
+    reds += pocket_reds
+    alias_line, alias_reds = check_serves_aliases(root, kit_rel, tool_rel)
+    reds += alias_reds
     lines = [f"{SAY}: {len(rows)} rows · " + " · ".join(counts)]
     lines += [f"{SAY}: {u}" for u in unarmed]
     if note:
         lines.append(f"{SAY}: legacy · {note}")
+    def render_view_names(names):
+        return UNARMED if joins["unarmed"] else ", ".join(names) or "—"
+    lines += [f"{SAY}: view · {r.get('name')} · read by {render_view_names(derive_read_by(r, joins))} · written by "
+              f"{render_view_names(derive_written_by(r, joins))}" for r in rows]
+    lines += [f"{SAY}: {ln}" for ln in pocket_lines + [alias_line]]
     lines += [f"{SAY}: RED {r}" for r in reds]
     lines.append(f"{SAY}: {'red' if reds else 'green'}")
     return lines, 1 if reds else 0
@@ -446,9 +767,11 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
 
 # ---------------------------------------------------------------------------------- the factory
 def render_row(row: dict) -> str:
-    """One `[[record-kind]]` table in the registry's column order."""
+    """One `[[record-kind]]` table in the registry's column order, `readers-none` only where the row sets it."""
     out = ["[[record-kind]]"]
     for col in COLUMNS:
+        if col == "readers-none" and col not in row:
+            continue
         v = row[col]
         if col == "schema":
             parts = [f"form = {json.dumps(v['form'])}"] + ([f"source = {json.dumps(v['source'])}"] if v.get("source") else [])
@@ -481,13 +804,32 @@ def add_record_kind(root, a, kit_rel: str | None = None) -> int:
         bad.append("--field is required, one per **Key:** line the kind carries")
     if a.check not in legs:
         bad.append(f"--check {a.check!r} names no leg of {LEGS}")
+    if not LAYER_RE.fullmatch(a.layer or ""):
+        bad.append((f"--layer {a.layer!r} is no" if a.layer else "--layer is required, a")
+                   + " `layer.<name>` tag: the layer of the kit whose writer writes the kind")
+    if a.lifecycle not in LIFECYCLES:
+        bad.append(f"--lifecycle {a.lifecycle!r} is not one of {', '.join(LIFECYCLES)}" if a.lifecycle
+                   else f"--lifecycle is required, one of {', '.join(LIFECYCLES)}")
+    readers, none_why = list(a.reader or []), (a.readers_none or "").strip()
+    if bool(readers) == bool(none_why):
+        bad.append("--reader <key>, repeated, or --readers-none <reason> is required, and only one of them: "
+                   "the read keys a handoff fills from the kind, or why no role reads it")
+    elif readers:
+        joins = read_view_joins(root, kit_rel)
+        if joins["unarmed"]:
+            bad += [f"--reader cannot be graded: {UNARMED} — {why}" for why in joins["unarmed"]]
+        else:
+            row_probe = {"name": a.name, "readers": readers}
+            bad += [r.split(": ", 1)[1].replace("reader ", "--reader ", 1) for r in check_readers([row_probe], joins)]
     if bad:
         for b in bad + ["nothing written"]:
             print(f"{SAY}: refused · {b}")
         return 2
-    row = {"name": a.name, "tag": a.tag, "layer": "", "home": a.home, "id-rule": "",
-           "schema": {"form": "fields", "fields": list(a.field)}, "writer": a.writer, "readers": [],
-           "lifecycle": "", "check": a.check}
+    row = {"name": a.name, "tag": a.tag, "layer": a.layer, "home": a.home, "id-rule": "",
+           "schema": {"form": "fields", "fields": list(a.field)}, "writer": a.writer, "readers": readers,
+           "lifecycle": a.lifecycle, "check": a.check}
+    if none_why:
+        row["readers-none"] = none_why
     path = pathlib.Path(root, kit_rel, REGISTRY)
     text = path.read_bytes().decode("utf-8") if path.is_file() else ""
     path.write_bytes((text.rstrip("\n") + "\n\n" + render_row(row) if text.strip() else render_row(row)).encode("utf-8"))
@@ -545,14 +887,27 @@ def write_kind_schema_plant(clone) -> str:
 FIXTURE_TYPED = ("deviation",)
 FIXTURE_BUILD = "bFix"
 PLANTS = ("writer-missing", "check-unknown", "source-drift", "factory-kind-unrowed", "field-missing",
-          "field-missing-legacy", "region-edited", "gap-unresolved")
+          "field-missing-legacy", "region-edited", "gap-unresolved", "lifecycle-missing", "role-reads-moved",
+          "item-inputs", "roles-unresolved", "pocket-stray", "pocket-registered", "new-row", "pipe-cell",
+          "alias-drift")
+#: The fixture's roles, `slot: (reads, writes)`, and its loop items, `(tag, input)`: the first input a typed
+#: record reference, the second the prose a kind's name must never be matched in (S2, §8 F5).
+FIXTURE_ROLES = {"gov-builder": ("input:spec", "product"), "gov-diff-reviewer": ("input:diff", "none"),
+                 "gov-spec-writer": ("input:spec", "spec")}
+FIXTURE_ITEMS = (("item.build.typed", "layer.memory:record-kind.log@1"),
+                 ("item.build.prose", "layer.memory:plan record"))
+FIXTURE_NEW = ["new", "widget", "--tag", "record.widget", "--writer", "hand", "--check", "memory hygiene", "--field",
+               "Serves", "--home", "memory/builds/*/build/*.md", "--layer", "layer.memory", "--lifecycle",
+               "append-only", "--reader", "input:spec"]
 
 
 def build_fixture(tmp, plant: str | None = None):
-    """A throwaway repository at `tmp` laid out as this kit's own tree: a three-row registry, a two-leg
+    """A throwaway repository at `tmp` laid out as this kit's own tree: a four-row registry, a two-leg
     manifest, a govkit registry holding the legacy ledger's table, its home, a gap register and records,
-    one a `…-deviation-notes.md` holding no deviation field, `plant` applied, committed. -> the typed
-    kind list its check reads."""
+    one a `…-deviation-notes.md` holding no deviation field, a roles kit of three role files, a loop kit
+    whose definition holds the items `item-inputs` plants, a runlog kit's alias literal, `plant` applied,
+    committed, and its view rendered from the registry and a read of those kits before the commit.
+    -> the typed kind list its check reads."""
     from build_records import KINDS
     tmp = pathlib.Path(tmp)
     kit_rel = derive_kit_rel()
@@ -567,33 +922,55 @@ def build_fixture(tmp, plant: str | None = None):
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_bytes(text.encode("utf-8"))
 
+    def derive_sibling_rel(kit, name):   # spelled in parts: the install-prefix ban reads a kit path
+        return "/".join(x for x in (tool_rel, kit, name) if x)
+
     write_fixture_file(".memory-tree.conf", 'MEMORY_ROOT="memory"\n')
     write_fixture_file(f"{tool_rel}/{LEGS}" if tool_rel else LEGS, json.dumps([{"name": "memory hygiene"}, {"name": SAY}], indent=2) + "\n")
     write_fixture_file(f"{kit_rel}/build_records.py", "LEVELS = ('a', 'b')\nKINDS = {\n    'deviation': {\n        'required': ("
         + ", ".join(json.dumps(f) for f in dev + (["Extra"] if plant == "source-drift" else [])) + "),\n"
         "        'closed': (('Risk', LEVELS),),\n    },\n}\n")
     rows = [
-        {"name": "spec", "tag": "record.spec", "layer": "", "home": "", "id-rule": "<date>-spec-<unit id>.md",
-         "schema": {"form": "header", "fields": []}, "writer": "hand", "readers": [], "lifecycle": "",
-         "check": "memory hygiene"},
-        {"name": "research", "tag": "record.research", "layer": "", "home": "memory/builds/*/build/*.md", "id-rule": "",
-         "schema": {"form": "fields", "fields": ["Serves"]}, "writer": "hand", "readers": [], "lifecycle": "",
+        {"name": "spec", "tag": "record.spec", "layer": "layer.memory", "home": "memory/builds/*/spec/*.md",
+         "id-rule": "<date>-spec-<unit id>.md", "schema": {"form": "header", "fields": []}, "writer": "hand",
+         "readers": ["input:spec"], "lifecycle": "current-state", "check": "memory hygiene"},
+        {"name": "log", "tag": "record.log", "layer": "layer.memory", "home": "memory/builds/*/prompts/*.md",
+         "id-rule": "", "schema": {"form": "fields", "fields": ["Serves"]}, "writer": "hand", "readers": [],
+         "readers-none": "no fixture role reads a brief", "lifecycle": "append-only", "check": "memory hygiene"},
+        {"name": "research", "tag": "record.research", "layer": "layer.memory", "home": "memory/builds/*/build/*.md",
+         "id-rule": "", "schema": {"form": "fields", "fields": ["Serves"]},
+         "writer": "a | b" if plant == "pipe-cell" else "hand", "readers": ["input:diff"], "lifecycle": "append-only",
          "check": "no such leg" if plant == "check-unknown" else "memory hygiene"},
-        {"name": "deviation", "tag": "record.deviation", "layer": "",
+        {"name": "deviation", "tag": "record.deviation", "layer": "layer.memory",
          "home": "memory/builds/*/build/*-build-*-deviation-*.md", "id-rule": "<date>-build-<unit id>-deviation-<n>.md",
          "schema": {"form": "fields", "source": f"{prefix}/{kit_rel[len(tool_rel) + 1:] if tool_rel else kit_rel}"
                     f"/build_records.py:KINDS.deviation.required", "fields": dev},
-         "writer": "hand", "readers": [], "lifecycle": "", "check": "memory hygiene"},
+         "writer": "hand", "readers": [], "readers-none": "a departure is read by the deviation join, no role",
+         "lifecycle": "frozen", "check": "memory hygiene"},
     ]
+    if plant == "pocket-registered":   # the stray's family registered as a witness row
+        rows.append({"name": "stray", "tag": "record.stray", "layer": "layer.memory",
+                     "home": [f"{COMMON_DIR_HOME}stray/*"], "id-rule": "", "schema": {"form": "rows", "fields": []},
+                     "writer": "hand", "readers": [], "readers-none": "a cache no role reads", "lifecycle": "out",
+                     "check": SAY})
     registry = "\n".join(render_row(r) for r in rows)
     if plant == "writer-missing":   # the deviation row, the last, loses its writer
         head, _, tail = registry.partition('name = "deviation"\n')
         registry = head + 'name = "deviation"\n' + tail.replace('writer = "hand"\n', "", 1)
+    if plant == "lifecycle-missing":   # the deviation row loses its lifecycle, now a required column
+        registry = registry.replace('lifecycle = "frozen"\n', "", 1)
     write_fixture_file(f"{kit_rel}/{REGISTRY}", registry)
-    region = render_kind_region(tomllib.loads(registry)["record-kind"])
-    if plant == "region-edited":
-        region = region.replace("| Kind |", "| Kinds |", 1)
-    write_fixture_file(f"{kit_rel}/{TEMPLATE}", "# fixture hygiene\n\n## Record kinds — the registry's view\n\n" + region + "\n")
+    if plant != "roles-unresolved":
+        write_fixture_file(derive_sibling_rel("roles", "roles_lib.py"), "# the fixture's roles kit: its role files\n")
+        for slot, (reads, writes) in FIXTURE_ROLES.items():
+            write_fixture_file(derive_sibling_rel("roles", f"agents/{slot}.agent.md"),
+                               f"---\nname: {slot}\nreads: {reads}\nwrites: {writes}\n---\n\nThe fixture role.\n")
+    items = "".join(f'[[item]]\ntag = "{tag}"\ninputs = ["{text}"]\nreturns = "a fixture return"\n\n'
+                    for tag, text in FIXTURE_ITEMS) if plant == "item-inputs" else ""
+    write_fixture_file(derive_sibling_rel("loop", "loop_lib.py"), "# the fixture's loop kit: its definition\n")
+    write_fixture_file(derive_sibling_rel("loop", "loop.toml"), "# the fixture's definition\n\n" + items)
+    write_fixture_file(derive_sibling_rel("runlog", "record.py"), 'SERVES_KIND = "log"\nSERVES_ALIASES = '
+                       + ("()" if plant == "alias-drift" else '("journal",)') + "\n")
     sibling = "/".join(("govkit", "registry.toml"))   # spelled in parts: the install-prefix ban reads a kit path
     write_fixture_file(f"{tool_rel}/{sibling}" if tool_rel else sibling,
         f'[[ledger]]\npopulation = "{LEGACY}"\nleg = "{SAY}"\nseed = ["python", "{prefix}/{kit_rel[len(tool_rel) + 1:] if tool_rel else kit_rel}/record_kinds.py", "--seed-legacy"]\n'
@@ -616,6 +993,15 @@ def build_fixture(tmp, plant: str | None = None):
     write_fixture_file(f"{build}/2026-01-03-build-{unit}-deviation-notes.md", f"**Serves:** research {unit}\n\nnotes, no field\n")
     write_fixture_file(f"{build}/2026-01-01-build-{unit}-gap-register.md", f"**Serves:** research {unit}\n\n| Key | Gap |\n|---|---|\n"
         "| gap-mem-01 | the fixture's one gap |\n")
+    write_fixture_file(f"memory/builds/{FIXTURE_BUILD}/prompts/2026-01-01-prompt-{unit}-brief.md",
+                       f"**Serves:** log {unit}\n\nthe fixture's brief\n")
+    region = render_kind_region(tomllib.loads(registry)["record-kind"], read_view_joins(tmp, kit_rel))
+    if plant == "region-edited":
+        region = region.replace("| Kind |", "| Kinds |", 1)
+    write_fixture_file(f"{kit_rel}/{TEMPLATE}", "# fixture hygiene\n\n## Record kinds — the registry's view\n\n" + region + "\n")
+    if plant == "role-reads-moved":   # a role's reads move after its view was rendered
+        write_fixture_file(derive_sibling_rel("roles", "agents/gov-builder.agent.md"),
+                           "---\nname: gov-builder\nreads: input:spec, input:diff\nwrites: product\n---\n\nThe fixture role.\n")
     hooks = tmp / ".nohooks"
     hooks.mkdir(exist_ok=True)
     for args in (("init", "-q"), ("add", "-A", "--", "."),
@@ -625,18 +1011,29 @@ def build_fixture(tmp, plant: str | None = None):
         p = run_git(tmp, *args)
         if p.returncode != 0:
             raise RecordKindsError(f"the fixture's git {args[0]} refused: {p.stderr.strip()}")
+    if plant in ("pocket-stray", "pocket-registered"):   # a pocket in the common dir, the worktree's own here
+        common_git_dir(tmp).joinpath("stray").mkdir()
     return FIXTURE_TYPED + (("exception",) if plant == "factory-kind-unrowed" else ())
 
 
 def run_fixture(plant: str | None) -> tuple[list[str], int]:
-    """`--fixture [--plant <case>]`: the fixture built under the system temp directory, `--check` run there."""
+    """`--fixture [--plant <case>]`: the fixture built under the system temp directory, `--check` run there;
+    `new-row` runs `new` with every flag first, and `pipe-cell` prints the region line of the piped row."""
     if plant is not None and plant not in PLANTS:
         return [f"{SAY}: refused · no plant {plant!r}: the plants are {', '.join(PLANTS)}"], 2
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="rk-"))
     try:
         typed = build_fixture(tmp, plant)
+        head = [f"{SAY}: fixture {plant or 'green'}"]
+        if plant == "new-row":
+            rc = main(FIXTURE_NEW, root=tmp)
+            if rc:
+                return head + [f"{SAY}: fixture new-row · new exited {rc}"], rc
         lines, rc = check_record_kinds(tmp, typed)
-        return [f"{SAY}: fixture {plant or 'green'}"] + lines, rc
+        if plant == "pipe-cell":
+            text = pathlib.Path(tmp, derive_kit_rel(), TEMPLATE).read_bytes().decode("utf-8")
+            head += [f"{SAY}: fixture pipe-cell · region · {ln}" for ln in text.split("\n") if ln.startswith("| `research` |")]
+        return head + lines, rc
     finally:
         remove_tree(tmp)
 
@@ -653,14 +1050,27 @@ def remove_tree(path) -> None:
 
 
 def run_selftest() -> int:
-    """Every plant red naming its subject, the green fixture and the legacy plant green, `new`'s round trip
-    and its refusal, and `--write` restoring an edited region."""
+    """Every plant red naming its subject, the green fixture and the green plants green with what each shows,
+    `new`'s round trip and its refusals, and `--write` restoring an edited region."""
     want = {"writer-missing": ("row deviation", "`writer`"), "check-unknown": ("row research", "no such leg"),
             "source-drift": ("row deviation", "Extra"), "factory-kind-unrowed": ("typed kind exception",),
             "field-missing": ("deviation-2.md", "**Caused-by:**"), "region-edited": ("region gen:record-kinds",),
-            "gap-unresolved": ("gap-mem-99",)}
+            "gap-unresolved": ("gap-mem-99",), "lifecycle-missing": ("row deviation", "`lifecycle`"),
+            "role-reads-moved": ("region gen:record-kinds",), "roles-unresolved": (UNARMED, "roles kit"),
+            "pocket-stray": ("pocket stray",), "alias-drift": ("SERVES_ALIASES",)}
+
+    def test_pipe_cell(lines):
+        row = next((ln.split(" · region · ", 1)[1] for ln in lines if " · region · " in ln), "")
+        return "a \\| b" in row and len(re.split(r"(?<!\\)\|", row)) == 9   # seven cells between eight pipes
+
+    shows = {"item-inputs": lambda ls: any(ln.startswith(f"{SAY}: view · log · read by") and "item.build.typed" in ln
+                                           for ln in ls) and not any(" view · " in ln and "item.build.prose" in ln
+                                                                      for ln in ls),
+             "pocket-registered": lambda ls: f"{SAY}: pocket · stray · stray" in ls,
+             "new-row": lambda ls: any(" rows · " in ln and "widget 2 graded" in ln for ln in ls),
+             "pipe-cell": test_pipe_cell}
     fails = []
-    for plant in (None, "field-missing-legacy", *want):
+    for plant in (None, "field-missing-legacy", *shows, *want):
         lines, rc = run_fixture(plant)
         out = "\n".join(lines)
         reds = [ln for ln in lines if " RED " in ln]
@@ -668,21 +1078,22 @@ def run_selftest() -> int:
             fails.append(f"{plant}: want exit 1 naming {', '.join(want[plant])}, got {rc}: {out[-400:]}")
         elif plant not in want and rc != 0:
             fails.append(f"{plant or 'green'}: want exit 0, got {rc}: {out[-400:]}")
+        elif plant in shows and not shows[plant](lines):
+            fails.append(f"{plant}: exit 0 and not what it shows: {out[-400:]}")
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="rk-"))
     try:
         typed = build_fixture(tmp)
-        argv = ["new", "widget", "--tag", "record.widget", "--writer", "hand", "--check", "memory hygiene",
-                "--field", "Serves", "--home", "memory/builds/*/build/*.md"]
         reg = pathlib.Path(tmp, derive_kit_rel(), REGISTRY)
         before = reg.read_bytes()
-        rc = main([a for a in argv if a not in ("--writer", "hand")], root=tmp)
+        for drop in (("--writer", "hand"), ("--layer", "layer.memory"), ("--lifecycle", "append-only"),
+                     ("--reader", "input:spec")):
+            argv = [a for i, a in enumerate(FIXTURE_NEW) if not (a == drop[0] or (i and FIXTURE_NEW[i - 1] == drop[0]))]
+            rc = main(argv, root=tmp)
+            if rc != 2 or reg.read_bytes() != before:
+                fails.append(f"new without {drop[0]}: want exit 2 and nothing written, got {rc}")
+        rc = main(FIXTURE_NEW[:-2] + ["--reader", "task:goal"], root=tmp)
         if rc != 2 or reg.read_bytes() != before:
-            fails.append(f"new without --writer: want exit 2 and nothing written, got {rc}")
-        rc = main(argv, root=tmp)   # AC10: `new` alone, its view re-rendered with the row
-        lines, rc_c = check_record_kinds(tmp, typed)
-        if rc or rc_c or "widget 2 graded" not in lines[0]:
-            fails.append(f"new widget: want a row the gate grades green, got new {rc}, check {rc_c}: "
-                         + " | ".join(lines))
+            fails.append(f"new with a reader no role reads: want exit 2 and nothing written, got {rc}")
         tpl = pathlib.Path(tmp, derive_kit_rel(), TEMPLATE)
         tpl.write_bytes(tpl.read_bytes().replace(b"| Kind |", b"| Kinds |", 1))
         rc_w = main(["--write"], root=tmp)
@@ -716,6 +1127,10 @@ def main(argv: list[str], root=None) -> int:
             ap.add_argument("--check")
             ap.add_argument("--field", action="append")
             ap.add_argument("--home")
+            ap.add_argument("--layer")
+            ap.add_argument("--lifecycle")
+            ap.add_argument("--reader", action="append")
+            ap.add_argument("--readers-none", dest="readers_none")
             try:
                 a = ap.parse_args(argv[1:])
             except SystemExit as e:

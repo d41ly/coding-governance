@@ -241,6 +241,15 @@ id = "playbook/adopter-rules-to-overlay"
 successor = "playbook/adopter-rules-to-overlay-2"
 surfaces = []
 
+# TOOL-dTotalRecall-18 S12: the record kind `journal` became `log`, its old token a read-only alias, so the
+# `record-kind-schema` member `journal.Serves` left the registry with the row's name. No adopter's file
+# moves: every record keeps its bytes. TOOL-dTotalRecall-20 ships the adopter's upgrade step for the alias
+# and may name it in this row's place.
+[[retired]]
+id = "memory-tree/record-kind-journal"
+successor = "none"
+surfaces = ["record-kind-schema:journal.Serves"]
+
 # ------------------------------------------------------------------------------------- exemptions
 # Each carries a non-empty reason. `selfcheck` reds on an exemption whose path no longer exists, so
 # a stale exemption cannot quietly widen the surface.
