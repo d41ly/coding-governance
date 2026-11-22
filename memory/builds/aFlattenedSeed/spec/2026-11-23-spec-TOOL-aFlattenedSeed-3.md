@@ -1,6 +1,6 @@
 # TOOL-aFlattenedSeed-3 — an adopter's ledger legs grade the population their seeds armed
 
-**Status:** INPROGRESS · rev-1 · 2026-11-23 · node a · Tier-1 · base 87c8a917 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-11-23 · node a · Tier-1 · base 87c8a917 · streams tooling
 
 <!-- gen:spec-records -->
 

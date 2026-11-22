@@ -46,7 +46,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-11-22 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-11-22 · streams tooling
 ids TOOL-aFlattenedSeed-1 TOOL-aFlattenedSeed-2 TOOL-aFlattenedSeed-3
 
 <!-- gen:build-units -->
@@ -54,7 +54,7 @@ ids TOOL-aFlattenedSeed-1 TOOL-aFlattenedSeed-2 TOOL-aFlattenedSeed-3
 |---|---|---|---|---|---|
 | [TOOL-aFlattenedSeed-1 — three kit readers read an adopter's own layout](spec/2026-11-22-spec-TOOL-aFlattenedSeed-1.md) | — | 1 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-aFlattenedSeed-2 — sh_hygiene's home-graded note rides stderr](spec/2026-11-23-spec-TOOL-aFlattenedSeed-2.md) | — | 1 | CLOSED | rev-1 | 2026-11-23 |
-| [TOOL-aFlattenedSeed-3 — an adopter's ledger legs grade the population their seeds armed](spec/2026-11-23-spec-TOOL-aFlattenedSeed-3.md) | — | 1 | INPROGRESS | rev-1 | 2026-11-23 |
+| [TOOL-aFlattenedSeed-3 — an adopter's ledger legs grade the population their seeds armed](spec/2026-11-23-spec-TOOL-aFlattenedSeed-3.md) | — | 1 | CLOSED | rev-1 | 2026-11-23 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
