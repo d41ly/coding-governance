@@ -199,6 +199,8 @@ NOT_ARMED = 3
 #: kind). Each key is spelled in parts: the install-prefix ban reads a kit path.
 ALIAS_COMPARE_KEPT = {"/".join(("govkit", f)): "homonym: the shim's install.on-shim-call mode"
                       for f in ("shims.py", "selftest.py")}
+#: The fixture's raw-compare plant, under the fixture's tool root; its red line names it by line.
+ALIAS_COMPARE_PLANT = "planted/compare.py"
 
 
 class RecordKindsError(Exception):
@@ -1750,7 +1752,7 @@ def build_fixture(tmp, plant: str | None = None):
                        f"**Serves:** log {unit}\n\nthe fixture's brief\n")
     if plant in ("raw-alias-compare", "alias-compare-kept"):   # TOOL-dTotalRecall-40: the census's plant, its
         from tree_lib import KIND_ALIASES                        # token read off the alias table, so no hit here
-        planted = "planted/compare.py" if plant == "raw-alias-compare" else sorted(ALIAS_COMPARE_KEPT)[0]
+        planted = ALIAS_COMPARE_PLANT if plant == "raw-alias-compare" else sorted(ALIAS_COMPARE_KEPT)[0]
         write_fixture_file(f"{tool_rel}/{planted}" if tool_rel else planted,
                            f"def read(kind):\n    if kind == {json.dumps(sorted(KIND_ALIASES)[0])}:\n        return 1\n")
     fence = FIXTURE_FENCE.replace(*FIXTURE_STREAM_EDITS[plant], 1) if plant in FIXTURE_STREAM_EDITS else FIXTURE_FENCE
@@ -1870,7 +1872,7 @@ def run_selftest() -> int:
             "stream-unit-twice": (FIXTURE_PLAN, f"unit TOOL-{FIXTURE_BUILD}-2 is named in"),
             "stream-fence-missing": (FIXTURE_PLAN, "fence"),
             "stream-validator-missing": ("row stream-plan", "record_kinds:no_such_check"),
-            "raw-alias-compare": ("alias-compare", "planted/compare.py:2")}
+            "raw-alias-compare": ("alias-compare", f"{ALIAS_COMPARE_PLANT}:2")}
     refusals = {"value-ledger-unregistered": PURPOSE_PENDING, "value-refused": "memory.map-purpose"}
 
     def test_pipe_cell(lines):
