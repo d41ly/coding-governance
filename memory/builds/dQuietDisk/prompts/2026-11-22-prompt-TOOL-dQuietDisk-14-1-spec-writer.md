@@ -259,7 +259,7 @@ memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.m
 
 ### task:reuse
 
-run-gates.sh REUSE_CACHE and gate-selftest-last records; verdict_flow.py select (dWitnessedBar); aPiecewiseGrade-1's per-spec incremental cache; routed_commits.py:454 and lexicon.py:4241 cat-file batch; upgrade_steps.py:2628 blob_at batch=; lib-selftest.sh and fixture_target.py.
+run-gates.sh REUSE_CACHE and gate-selftest-last records; verdict_flow.py select (dWitnessedBar); aPiecewiseGrade-1's per-spec incremental cache; tools/memory-tree/routed_commits.py@7ef53bccab4f:454 and tools/lexicon/lexicon.py@a4787e4f4051:4241 cat-file batch; tools/govkit/upgrade_steps.py@89c3c58a02b2:2628 blob_at batch=; lib-selftest.sh and fixture_target.py.
 
 ### card:route
 
