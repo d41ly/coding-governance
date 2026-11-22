@@ -16,10 +16,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every roster spec was re-grounded on HEAD before this dispatch, so its citations hold at HEAD or name the earlier
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
-- This pass runs in parallel with TOOL-dBoundRoles-16, which writes the roles kit and never
-  `tools/govkit/selftest.py`; the call carries `passBase`, so name any extra path in your return. Unit 49's builder
-  confirmed this unit's §1 defect at build time: its AC2 probe redded only because the plan side and the expected side
-  read different descriptors. TOOL-dBoundRoles-55 builds after you over the same file.
+- This is the second dispatch. The first builder (run `wf_6da83969-b78`) stopped on rev-5's edit to unit 49's CLOSED
+  spec; rev-6 replaces it with the deviation record `build/2026-11-22-build-TOOL-dBoundRoles-54-deviation-543.md`, now
+  in the write set, and never touches unit 49's spec. Its record reads `report` as the grading policy and
+  `author-recorded` as the approval, with a Follow-through `deviation_join.py` admits.
+- This pass runs in parallel with TOOL-dBoundRoles-16, which writes the roles kit and never `tools/govkit/selftest.py`.
+  Generated outputs are admitted undeclared and belong in the pass commit: every file `gen_build_index.py --write`
+  rewrites, the dClosedLoop as-built view and the map generator's output. Any other path outside the declared set:
+  name it in your return and do not write it. TOOL-dBoundRoles-55 builds after you over the same file.
 
 ## What the main loop needs from your commit
 

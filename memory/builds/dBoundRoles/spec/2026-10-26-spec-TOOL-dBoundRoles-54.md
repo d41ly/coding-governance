@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-54 — unit 49's overlay check reads its expected side from the roster, one `house/<slot>.md` per role slot, never from the seed rule it is compared with
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -49,18 +49,26 @@ criterion for it. It repairs `TOOL-dBoundRoles-49` and builds one step after it 
   `house/<slot>.md` for every slot of the installed kit's roster, read through the same
   `roles_lib.load_roles` load `TOOL-dBoundRoles-37` S1 makes. Every slot counts, `agent: false`
   included. Where unit 37 left that load inline, this pass lifts it into one function both call, so the
-  selftest holds one loader. At HEAD the load is inline in `check_roles_install`, TOOL-dWitnessedBar-23
-  S6's (`tools/govkit/selftest.py@c2b02d78:3236-3241`), which unit 37 S3 routes through its function.
-  Observed by AC1.
+  selftest holds one loader. At HEAD `6f93ab7fd` unit 37 is built and the load is inline in
+  `tools/govkit/selftest.py#derive_roles_expected`, which keeps only the agent-true slots, and which
+  `check_roles_install` and unit 49's S3 check both call. Observed by AC1.
 - **S2** — The compare, both ways. S3 of unit 49 compares S1's set with the `src` of every roles-kit row
   `derive_seed_expected` returns whose source matches `house/*.md`. A row's `src` is the repo path
   `tools/roles/house/<file>`, since `read_descriptors` homes the kit and `rule_sources` joins the include
   to that home, so the compare reads its `house/<file>` tail. A slot whose overlay is not seeded
   reds naming the slot; a seeded overlay no slot owns reds naming the file. Each failure prints both
   sets. Observed by AC1 and AC2.
-- **S3** — Unit 49's spec follows the check. The pass bumps `TOOL-dBoundRoles-49`'s spec with S3, §4 "Why
-  two checks" and AC2 restated for S1's set, and a §9 line naming this unit, before it edits the check
-  (BUILD-METHOD M2, READY). Unit 49's ledger answers AC2 `amended rev-<n>`, naming that revision.
+- **S3** — Unit 49's criterion is superseded by a record, not edited. `TOOL-dBoundRoles-49`'s spec is
+  CLOSED at rev-5 and BUILD-METHOD M4 freezes a CLOSED spec, so the pass edits no line of it. This
+  spec's AC2 is unit 49's AC2 restated for S1's set. Before it edits the check, the pass writes one
+  deviation record, `memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-deviation-543.md`,
+  in memory hygiene's deviation grammar, graded under the build's deviation values `report` and
+  `author-recorded`. Its fields: Departs from `TOOL-dBoundRoles-49@rev-5 [AC2]`; Hand-off `spec-revised`;
+  Cause `review finding`; Risk `stricter`; Approver `spec writer`, citing this spec's §8 F3 and the
+  `author-recorded` value; Follow-through `new unit TOOL-dBoundRoles-54`; Caused-by `TOOL-dBoundRoles-54`.
+  Its Before quotes unit 49's AC2 and its §4 "Why two checks" claim that S3 ties the figure to the
+  roster. Its After says both are superseded by this spec's AC2 and S1's roster set. Its Reason says
+  the frozen spec cannot carry the restatement, since M4 corrects a CLOSED spec only by a unit on top.
   Observed by AC3.
 
 ## 3. Non-goals (OUT)
@@ -98,6 +106,14 @@ Read at base `462d20f3` on 2026-10-26, and re-read at HEAD `a01362eb0` on 2026-1
   each of its four new roles, and `TOOL-dWitnessedBar-23` S4, CLOSED, seeded
   `tools/roles/house/gov-tester.md`: one overlay per role is the convention every role-adding spec
   follows.
+- Re-probed at HEAD `6f93ab7fd` on 2026-11-22: `gk.rule_sources` over the roles descriptor still prints
+  each overlay as `tools/roles/house/<file>`; `tools/govkit/selftest.py#derive_seed_expected` returns
+  rows carrying `kit` and `src`; and the roster and the overlays number thirteen each
+  (`ls tools/roles/agents tools/roles/house`). `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-49.md`
+  is CLOSED at rev-5, by `fa3e705e1`.
+- `tools/memory-tree/deviation_join.py#FOLLOW` admits `amends`, `supersedes`, `new unit`, `gap`, `ask` and
+  `usage` as a Follow-through, so `report` is the build's grading policy, not a field value;
+  `python tools/memory-tree/build_records.py read <record>` exits 1 naming a malformed field.
 
 ### What the check ties
 
@@ -125,7 +141,8 @@ file, so `--dispatch` holds it until this unit is CLOSED.
 ### Files touched (estimate)
 
 - `tools/govkit/selftest.py`
-- the spec of TOOL-dBoundRoles-49, a rev bump (S3), named here for the dispatch write set
+- `memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-deviation-543.md`, the
+  deviation record of S3, named here for the dispatch write set
 
 ### Alternatives rejected
 
@@ -159,15 +176,20 @@ file, so `--dispatch` holds it until this unit is CLOSED.
   fixture: the target and the scratch kit copy are built under the run's scratch path by the probe.
 - **AC2** — When the same probe removes the entry for `tools/roles/house/gov-builder.md` from the seed
   include of a scratch `kit.toml` while the file stays present and tracked and the role exists, S2's
-  compare names `gov-builder`.
+  compare names `gov-builder`. This is unit 49's AC2 restated for S1's set, and it supersedes that
+  criterion (S3).
   Red when: dropping an include removes the overlay from both sides at once.
-- **AC3** — When `grep -n 'TOOL-dBoundRoles-54' memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-49.md`
-  runs, it prints a §9 line, and that spec's AC2 names the roster.
-  Red when: unit 49's criterion still describes a check that compares the descriptor with itself.
+- **AC3** — When `python tools/memory-tree/build_records.py read <S3's record path>` runs on the built
+  tree over the deviation record S3 names, it exits 0 with no `malformed` row and prints a Departs from row naming
+  `TOOL-dBoundRoles-49@rev-5`, an Approver row naming `author-recorded` and an After row naming this
+  spec's AC2; and `git diff --name-only <the pass's base>..HEAD -- memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-49.md`
+  prints nothing.
+  Red when: the record is absent or malformed, so unit 49's frozen AC2 still stands as the criterion of
+  record for a check that compares the descriptor with itself; or the pass edits the CLOSED spec.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC1 AC2 · the roster-side overlay compare, staged by restoring the expected side to the seed rule's includes, which turns AC2's dropped include green · none
 
@@ -182,6 +204,12 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · the roster-side overlay c
   fails a correct tree. (c) passes a role added with no overlay. (a) catches all three breaks of §4's
   table. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the most feature-rich survivor.
   widens: none · relaxes: none
+- **F3 — Where does unit 49's restated criterion live, now that unit 49 is CLOSED?** Options: (a) this
+  spec's §6 carries it, and one deviation record in `build/` says unit 49's AC2 and its "Why two
+  checks" claim are superseded; (b) the pass rev-bumps unit 49's CLOSED spec and widens its write set.
+  (b) edits a frozen spec, which BUILD-METHOD M4 forbids, and fails rev-5's own write set; (a) is M4's
+  correction by a unit on top. RESOLVED (agent, 2026-11-22, delegated, M3): (a), the survivor, the
+  first builder's route (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -201,6 +229,16 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · the roster-side overlay c
   fail, reads the count the kit holds; S2 states the row's `src` form, probed; S1 notes HEAD's inline
   load in `check_roles_install`. Unit 37's load and unit 49's `derive_seed_expected` were checked against
   their specs, not HEAD, and unit 1's roster change against its S2 and S3; nothing else moved.
+- rev-6 · 2026-11-22 · §2 · §4 · §6 · §7 · §8 · S1 · S3 · AC2 · AC3 · F3 · by
+  `2026-11-22-prompt-TOOL-dBoundRoles-54-fix-1-spec-writer` on
+  `2026-11-22-build-TOOL-dBoundRoles-54-1-builder-return`: unit 49's spec is CLOSED and frozen, so S3
+  writes deviation record 543 instead of bumping it; Files touched names that record; AC2 states it
+  restates and supersedes unit 49's AC2; AC3 observes the record and an untouched spec 49; F3 records
+  the route; §7 gains `recall floor`, whose guard holds `memory/` and so the record. The record's
+  Follow-through is `new unit TOOL-dBoundRoles-54`, since `deviation_join.py#FOLLOW` refuses `report`,
+  which stays the build's grading policy. Re-probed at
+  `6f93ab7fd`, S1's HEAD note moves from an inline load in `check_roles_install` to the one in
+  `#derive_roles_expected`, now built; S2, AC1 and AC2 held. Nothing else moved.
 
 ## 10. Reuse audit
 

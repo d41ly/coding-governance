@@ -20,8 +20,13 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   write set lacked the four `add` change records §8 F7 (a) asks for; it found no spec divergence. The write set now
   names them, `build/2026-11-22-build-TOOL-dBoundRoles-16-change-1.md` to `-change-4.md`, one per new unit row
   (`unit.orient.producer`, `unit.orient.verifier-cold`, `unit.checklist.for-paths`, `unit.checklist.for-diff`), written
-  by `tools/memory-tree/build_records.py new change`. The call carries `passBase`; name any other extra path in your
-  return. Rev-6 keeps `gov-orienter` at `high` (§8 F5, the owner's ruling TOOL-dEasedEffort-1), its deviation in `build/`.
+  by `tools/memory-tree/build_records.py new change`. A second builder (run `wf_f845c411-bc5`) then stopped on the
+  generated outputs. Those are admitted undeclared, and you write and commit them in the pass commit:
+  `.claude/roles.json` and `.claude/agents/` as `render_agents.py --write` renders them, every file
+  `gen_build_index.py --write` rewrites (this spec's `gen:spec-records` region, the build README, `memory/LIVE.md`,
+  `memory/backlog/TOOL.md`, the dClosedLoop as-built view) and the map generator's output. The deviation record
+  `build/2026-11-22-build-TOOL-dBoundRoles-16-deviation-163.md` is declared for choice 2 below. Any other path
+  outside the declared set: name it in your return and do not write it. Rev-6 keeps `gov-orienter` at `high` (§8 F5, the owner's ruling TOOL-dEasedEffort-1), its deviation in `build/`.
 - The main loop decided the first builder's four open choices, as M3 delegated resolutions, `widens: none` and
   `relaxes: none` each; record any of them that the spec does not state as a deviation:
   1. The `experiment` kind row omits `fan` and `cap`, and `derive_stage_rows` takes them from the table's `fan`.
