@@ -10,7 +10,7 @@ The gov-spec-writer return for [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence
 - A caller-and-suite trace covers every function and regex S4, S7 and S13 change; the one widening is `backlog.SLUG_RE` losing its capital lookahead, asserted by no suite. The test-side copies the return named are kept, each with its reason.
 - Files touched grows by 22 fixture files, §7 by seven gates, new AC15; no other criterion's observation moved.
 - Beyond the return: `tools/workflows/unattended-build.test.sh` holds 354 matching lines where the builder counted 4; the runlog self-test's names table is named by hand; `design_lib.py`'s `\w` patterns and `loop_lib.py`'s `SEED_BUILD` keep their own spelling, an open gap stated in §4 and §5.
-- The writer judged the write set (about 78 files) more than one pass safely carries and did not split the unit.
+- The writer judged the write set (about 78 files, DERIVED from rev-11's Files touched) more than one pass safely carries and did not split the unit.
 
 ## The main loop's decision on the write-set size
 
