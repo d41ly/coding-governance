@@ -11,6 +11,7 @@
 | [2026-11-22-build-TOOL-dQuietDisk-26-deviation-1.md](../build/2026-11-22-build-TOOL-dQuietDisk-26-deviation-1.md) | deviation | — |
 | [2026-11-22-build-TOOL-dQuietDisk-26-widen-12.md](../build/2026-11-22-build-TOOL-dQuietDisk-26-widen-12.md) | widen | — |
 | [2026-11-22-build-TOOL-dQuietDisk-26-widen-13.md](../build/2026-11-22-build-TOOL-dQuietDisk-26-widen-13.md) | widen | — |
+| [2026-11-22-build-TOOL-dQuietDisk-26-widen-17.md](../build/2026-11-22-build-TOOL-dQuietDisk-26-widen-17.md) | widen | — |
 | [2026-11-20-prompt-TOOL-dQuietDisk-26-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-26-1-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md) | research | TOOL-dQuietDisk-8 TOOL-dQuietDisk-10 TOOL-dQuietDisk-17 TOOL-dQuietDisk-19 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |

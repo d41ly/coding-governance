@@ -76,7 +76,7 @@ tools/check-testsuite-counts.sh	path-subst	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a
 tools/check-testsuite-counts.test.sh	path-subst	4	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/check-wiring.sh	path-subst	19	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/check-wiring.sh	pure-fn-subst	5	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-tools/check-wiring.sh	var-pipe	3	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-wiring.sh	var-pipe	4	3470633ba7207796277d51f89fca8329073ba9d3	widened:2026-11-22-build-TOOL-dQuietDisk-26-widen-17
 tools/check-wiring.test.sh	cat-file	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/check-wiring.test.sh	path-subst	5	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/check-wiring.test.sh	pure-fn-subst	9	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
@@ -101,7 +101,7 @@ tools/lexicon/adopt-lexicon.sh	var-pipe	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d
 tools/lib/extract-arms.sh	var-pipe	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/lib/extract-arms.test.sh	path-subst	4	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/lib/kit-rel.sh	path-subst	3	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-tools/lib/lib-selftest.test.sh	cat-file	13	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lib/lib-selftest.test.sh	cat-file	26	3470633ba7207796277d51f89fca8329073ba9d3	widened:2026-11-22-build-TOOL-dQuietDisk-7-widen-18
 tools/lib/lib-selftest.test.sh	path-subst	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/lib/pyrun.sh	path-subst	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/lib/refuse-wrong-shell.sh	path-subst	1	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-37
@@ -197,7 +197,7 @@ tools/run-gates/run-gates.test.sh	date-fmt	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a
 tools/run-gates/run-gates.test.sh	path-subst	12	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/run-gates/run-gates.test.sh	printf-subst	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/run-gates/run-gates.test.sh	pure-fn-subst	11	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-tools/run-gates/run-gates.test.sh	var-pipe	161	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-37
+tools/run-gates/run-gates.test.sh	var-pipe	164	3470633ba7207796277d51f89fca8329073ba9d3	widened:2026-11-22-build-TOOL-dQuietDisk-5-widen-19
 tools/run-gates/run-gates.turnstile.test.sh	cat-file	15	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/run-gates/run-gates.turnstile.test.sh	date-fmt	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/run-gates/run-gates.turnstile.test.sh	path-subst	5	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
@@ -208,7 +208,7 @@ tools/run-gates/run-held-wsl.sh	path-subst	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a
 tools/run-gates/run-held-wsl.sh	var-pipe	3	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/run-gates/run-selftests.sh	date-fmt	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/run-gates/run-selftests.sh	path-subst	9	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-tools/run-gates/run-selftests.sh	pure-fn-subst	3	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/run-gates/run-selftests.sh	pure-fn-subst	4	3470633ba7207796277d51f89fca8329073ba9d3	widened:2026-11-22-build-TOOL-dQuietDisk-9-widen-16
 tools/run-gates/run-selftests.sh	var-pipe	10	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/run-gates/run-selftests.test.sh	cat-file	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/run-gates/run-selftests.test.sh	path-subst	12	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

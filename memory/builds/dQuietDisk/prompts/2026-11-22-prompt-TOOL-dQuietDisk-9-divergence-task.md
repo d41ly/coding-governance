@@ -28,7 +28,7 @@ owned swept scratch root and one chmod-and-retry removal, does not move.
 4. **Kit versions.** Section 3's "no hand bump" stands: versions move when the close mints. The pass was right to
    follow it.
 5. **The pass's patches are the base for the next pass.** Name them in the revision-log line:
-   `TOOL-dQuietDisk-9-build.patch` (56 files) and, for the record, `TOOL-dQuietDisk-9-frozen-steps.patch`, which the
+   `TOOL-dQuietDisk-9-build.patch` (56 files, PINNED by the first pass's return) and, for the record, `TOOL-dQuietDisk-9-frozen-steps.patch`, which the
    next pass does not apply.
 
 ## Before you return
