@@ -2766,8 +2766,9 @@ render_lead_notice() { # -> the lead — line on stdout after a compaction, else
 # replay every outcome is one line, a failure `context — skipped: <why>`. At a boundary, `boundary`, the
 # one line is the fresh-now line at or past the threshold; anything else, a skip or a refusal included,
 # prints nothing, since a line at every boundary that changes no act teaches the session to skip it, and
-# under `compact-with-card` nothing is measured. WHAT THIS DOES NOT CHECK: that the window is the model's,
-# a pinned constant in the runlog kit; or that the session acts on the line.
+# under `compact-with-card` nothing is measured. WHAT THIS DOES NOT CHECK: that the window is the model's
+# real one, since the runlog kit derives it, CLAUDE_CODE_MAX_CONTEXT_TOKENS where set, else the node's
+# observed usage rounded up to a rung, and nothing checks either; or that the session acts on the line.
 render_context_line() { # [boundary] -> one context — line on stdout at a replay; at a boundary the fresh-now line or nothing; 0 always
   local at=${1:-replay} mode thr="" t rl py sf rc out="" n="" why=""
   if ! mode=$(read_card_policy context.on-full); then

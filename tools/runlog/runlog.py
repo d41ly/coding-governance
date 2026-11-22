@@ -31,9 +31,10 @@ recomputes a record's journal commitment on this machine: exit 0 when it matches
 object per session on stdout; `--measure` and `--ready` write nothing and print a report. `narration` prints a
 window of redacted text framed as data and writes nothing. The extractor's rules are the kit README's.
 `context` prints how full one transcript's main context window is (KICK-dKeptSession-14): `<n>%`, the
-share of `extract.CONTEXT_WINDOW_TOKENS` its last main `usage` event read, times 100 rounded down, or
-`none` with no main usage in it; it parses the main file alone, writes nothing and exits 0, or 2 when
-the path names no file.
+share of the window `extract.derive_context_window` derives for its model (KICK-dKeptSession-30) that
+its last main `usage` event read, times 100 rounded down, with `context: window <tokens> · <source>` on
+stderr; or `none` with no main usage in it, and nothing on stderr. It parses the main file alone,
+writes nothing and exits 0, or 2 when the path names no file.
 `model` joins one run's sources into the run model and prints it, the whole JSON with `--json`, and
 writes a local copy beside the extracts; it exits 2 when the build has no committed run-state file or
 the run number names no run, and a store that does not resolve costs the copy, never the print.
@@ -325,9 +326,13 @@ def cmd_context(args) -> int:
     if not path.is_file():
         print(f"runlog: context {path.as_posix()} names no file", file=sys.stderr)
         return 2
-    fill = ex.measure_context_fill(path)
+    fill, window, source = ex.measure_context_fill(path)
+    if fill is None:
+        print("none")
+        return 0
     # Rounded to nine places before the floor, so a share of exactly 0.6 reads 60, never 59.
-    print("none" if fill is None else f"{int(round(fill * 100, 9))}%")
+    print(f"{int(round(fill * 100, 9))}%")
+    print(f"context: window {window} · {source}", file=sys.stderr)
     return 0
 
 

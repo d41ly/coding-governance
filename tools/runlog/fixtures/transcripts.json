@@ -167,7 +167,7 @@
       ]
     },
     "context-fill": {
-      "about": "KICK-dKeptSession-14 AC1. An earlier main request reading 180000 tokens of context, a later one reading 120000 after a compaction, and an agent file whose request, later than both, reads 190000: the share is the later main request's alone, 60% of the pinned 200000.",
+      "about": "KICK-dKeptSession-14 AC1. An earlier main request reading 180000 tokens of context, a later one reading 120000 after a compaction, and an agent file whose request, later than both, reads 190000: the share is the later main request's alone, 60% of the 200000 rung the case's root derives from its 180000 at most.",
       "main": [
         {"type": "user", "uuid": "c-u0", "timestamp": "2026-09-13T10:00:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Start the fixture work."}, "origin": {"kind": "human"}},
         {"type": "assistant", "uuid": "c-a1", "timestamp": "2026-09-13T10:00:05.000Z", "version": "9.9.1", "requestId": "req-c1", "message": {"id": "msg-req-c1", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_fill_1", "name": "Agent", "input": {"subagent_type": "fixture-lens", "description": "a fixture lens", "prompt": "Review the fixture."}}], "usage": {"input_tokens": 1000, "output_tokens": 10, "cache_read_input_tokens": 170000, "cache_creation_input_tokens": 9000}}},
@@ -179,6 +179,21 @@
           {"type": "assistant", "uuid": "cf-a1", "timestamp": "2026-09-13T10:00:30.000Z", "version": "9.9.1", "requestId": "req-cf1", "message": {"id": "msg-req-cf1", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "The fixture lens reads a long file."}], "usage": {"input_tokens": 1000, "output_tokens": 30, "cache_read_input_tokens": 180000, "cache_creation_input_tokens": 9000}}, "isSidechain": true, "agentId": "fxcf1"}
         ]}
       }
+    },
+    "context-window": {
+      "about": "KICK-dKeptSession-30 AC2, AC3, AC4. A main session whose last request reads 150000 tokens of context on fixture-model: 75% of the 200000 rung from a root holding it alone, 15% of the 1000000 rung from a root that also holds context-window-sibling.",
+      "main": [
+        {"type": "user", "uuid": "w-u0", "timestamp": "2026-09-13T10:00:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Start the fixture work."}, "origin": {"kind": "human"}},
+        {"type": "assistant", "uuid": "w-a1", "timestamp": "2026-09-13T10:00:05.000Z", "version": "9.9.1", "requestId": "req-w1", "message": {"id": "msg-req-w1", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Reading the fixture notes."}], "usage": {"input_tokens": 1000, "output_tokens": 10, "cache_read_input_tokens": 90000, "cache_creation_input_tokens": 9000}}},
+        {"type": "assistant", "uuid": "w-a2", "timestamp": "2026-09-13T10:00:20.000Z", "version": "9.9.1", "requestId": "req-w2", "message": {"id": "msg-req-w2", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Carrying on with the fixture work."}], "usage": {"input_tokens": 1000, "output_tokens": 20, "cache_read_input_tokens": 140000, "cache_creation_input_tokens": 9000}}}
+      ]
+    },
+    "context-window-sibling": {
+      "about": "KICK-dKeptSession-30 AC1, AC2. One main request reading 900000 tokens of context on fixture-model: the observation that puts the model on the 1000000 rung, 90% of it.",
+      "main": [
+        {"type": "user", "uuid": "ws-u0", "timestamp": "2026-09-13T11:00:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Start the long fixture work."}, "origin": {"kind": "human"}},
+        {"type": "assistant", "uuid": "ws-a1", "timestamp": "2026-09-13T11:00:05.000Z", "version": "9.9.1", "requestId": "req-ws1", "message": {"id": "msg-req-ws1", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Reading the long fixture file."}], "usage": {"input_tokens": 1000, "output_tokens": 10, "cache_read_input_tokens": 890000, "cache_creation_input_tokens": 9000}}}
+      ]
     }
   }
 }

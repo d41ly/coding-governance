@@ -11813,6 +11813,11 @@
       "file": "tools/runlog/extract.py"
     },
     {
+      "id": "derive_context_window",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "derive_converted_text",
       "kind": "function",
       "file": "tools/memory-tree/convert_registry.py"
@@ -39744,6 +39749,11 @@
     },
     {
       "id": "test_extract_context_fill",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_context_window",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
