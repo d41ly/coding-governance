@@ -82,6 +82,5 @@ You build ONE unit from its spec. The spec is the contract. This brief adds only
 - **S12 and AC13 (the shell-role widen) are owed to the main loop.** Do not write `memory/project/shell-role.txt` or
   a widen record. Right after your commit, the main loop runs the pass legs. The portability leg reds on the three
   rows, and the main loop widens them as an inline red fix. Mark AC13 owed in the ledger.
-- **What your commit carries.** Spec rev-4 is in the working tree, uncommitted, and your pass commit carries it with
-  the status flip. `memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-7.md` is also modified in the
-  working tree. Do NOT stage it: the main loop commits it after yours.
+- **What your commit carries.** Spec rev-4 and TOOL-dQuietDisk-7 rev-3 are committed (`3be1a5528`). Your pass
+  commit carries the rev-4 spec's status flip to `CLOSED`, and nothing of TOOL-dQuietDisk-7.
