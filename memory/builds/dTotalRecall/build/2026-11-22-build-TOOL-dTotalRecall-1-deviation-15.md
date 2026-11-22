@@ -1,10 +1,10 @@
-# TOOL-dTotalRecall-1 deviation 15 — the `record-kinds` leg's ceiling is 122 seconds, not the spec's 120
+# TOOL-dTotalRecall-1 deviation 15 — the `record-kinds` leg's ceiling raised to clear its evidence
 
 **Serves:** deviation TOOL-dTotalRecall-1
 
-- **Departs from:** `TOOL-dTotalRecall-1@rev-7` [§2 S3]
+- **Departs from:** `TOOL-dTotalRecall-1@rev-7` [§2 S11]
 - **Hand-off:** spec-to-code
-- **Before:** S3 declares the `record-kinds` leg with a ceiling of 120 seconds.
+- **Before:** S11 declares the `record-kinds` leg with a ceiling of 120 seconds (PINNED 2026-11-22, `TOOL-dTotalRecall-1@rev-7` S11).
 - **After:** the `[[exempt_leg]]` row in `tools/govkit/registry.toml` declares `ceiling = 122`, rendered into `tools/gate-legs.json`.
 - **Cause:** builder discovery
 - **Reason:** the `leg ceilings clear their evidenced maximum` pass leg requires a ceiling to clear its evidenced maximum by max(120 s, 1.0x) (DERIVED, that leg's failure line at `a9b4e3739`'s parent), and the leg's evidence is 1.6 s (`tools/run-gates/ceiling-evidence.txt`, the `record-kinds` row), so 120 fell short and 122 clears it.

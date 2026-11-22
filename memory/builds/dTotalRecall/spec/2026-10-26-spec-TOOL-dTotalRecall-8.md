@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · closes TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · closes TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0219@62a3f369 whole
 **Carries:** node:record-kind.code
@@ -17,6 +17,7 @@
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-36 TOOL-dTotalRecall-2 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-10-26-build-TOOL-dTotalRecall-8-deviation-81.md](../build/2026-10-26-build-TOOL-dTotalRecall-8-deviation-81.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-8-deviation-82.md](../build/2026-10-26-build-TOOL-dTotalRecall-8-deviation-82.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-8-facts-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-facts-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-8-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
@@ -25,6 +26,8 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-8-facts-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-facts-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-8-facts-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-facts-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-reground-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -123,9 +126,14 @@ is never built.
 - **S13** — The leg `code record`, declared once where TOOL-dWitnessedBar-11 S1 puts a leg whose
   program an adopter receives: a `[[gate_leg]]` row of `tools/playbook/kit.toml`, the playbook-render
   descriptor, argv `["python3", "{prefix}/playbook/code_record.py", "--check"]`, `subject = "repo"`,
-  gov's `ceiling` 60 s (twice the clause's 30 s line) and gov's `guard` the closure `python
-  tools/run-gates/py_reads.py --guards "code record"` prints. `python tools/run-gates/leg_factory.py
-  new` writes it and its `--write` renders `tools/gate-legs.json`. It carries `enforces =
+  gov's `ceiling` the `leg ceilings clear their evidenced maximum` rule over the leg's measured time t:
+  t plus max(120 s, 1.0 × t), rounded up, so 150 s at AC1's 30 s line (PINNED 2026-11-22, the rule
+  `tools/run-gates/ceiling-margin.txt:26` declares and `tools/run-gates/derive-ceilings.py` grades).
+  t is `--check`'s wall time at the pass tip, which the builder records as the leg's row of
+  `tools/run-gates/ceiling-evidence.txt` by `python tools/run-gates/derive-ceilings.py --write
+  --observed 'code record=<t>' --how '<how>'` before declaring the ceiling. Gov's `guard` is the
+  closure `python tools/run-gates/py_reads.py --guards "code record"` prints. `python
+  tools/run-gates/leg_factory.py new` writes it and its `--write` renders `tools/gate-legs.json`. It carries `enforces =
   ["principle.p32"]`: P32's row in `tools/playbook/principles.toml` names cl-dClosedLoop-0219, the
   clause this unit carries (TOOL-dWitnessedBar-11 §4 "The enforces rule", step 1). The row `principle
   principle.p32 dPlacedRequest` leaves `tools/playbook/core-pending.txt`, since
@@ -227,8 +235,8 @@ past the losing line.
 
 `bytes` is the length of `python code_record.py --dump --tree <rev>`, the record's rows rendered as
 sorted TSV, one row per line: the size an agent's read of the whole record would cost. The night pass
-measured 13.1 s and 941 KB on a prototype
-(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md@8b8b1374:202-206`);
+measured 13.1 s and 941 KB on a prototype (PINNED 2026-11-22, that record's line 205 at `8b8b1374`,
+`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md@8b8b1374:205`);
 that figure is not this record's.
 
 ### The neighbourhood
@@ -306,7 +314,9 @@ on 2026-11-22; a nested helper leads with a `.lexicon.conf` VERBS verb.
 - security — no new write surface beyond the tables of S7 in the index file under the git common dir;
   ctags is run only from `PATH` under an opted-in value, with `--output-format=json` and no shell.
 - perf / scale — the losing line is 30 s cold and 1 MB, measured by S1 before anything is built; warm
-  runs parse only blobs `code_parsed` lacks; the leg's ceiling is 60 s.
+  runs parse only blobs `code_parsed` lacks; the leg's ceiling is S13's rule over its measured time,
+  150 s at the 30 s line (PINNED 2026-11-22, `tools/run-gates/ceiling-margin.txt:26`), its evidence
+  row in `tools/run-gates/ceiling-evidence.txt`.
 - error / empty / loading states — a missing ctags under a ctags value is exit 2; a degraded record
   says so in `code_meta`, its readers use `git grep` and `neighbourhood` exits 2; an empty tree is
   `unarmed`, red.
@@ -469,6 +479,11 @@ any adopter tree but the planted one; whether a `test` row's definition really t
   text; `new --form` (F7); P32's pending row deleted; the dossier anchors hashed in `map_diff.py`
   through the map kit's own copy; asks TOOL-dTotalRecall-102 and TOOL-dTotalRecall-103 folded (S14,
   AC11); cites by symbol; the cap's largest file re-pinned; the spec-token legs named.
+- rev-5 · 2026-11-22 · S13 · §4 Record size · §5 perf / scale · a facts pass per
+  `2026-11-22-prompt-TOOL-dTotalRecall-8-facts-brief`: the leg's ceiling, a fixed figure the
+  `leg ceilings clear their evidenced maximum` floor could never pass, restated as that leg's rule over
+  the measured time with its evidence row named; the night pass's prototype size pinned to the line
+  that records it. No criterion moved.
 
 ## 10. Reuse audit
 

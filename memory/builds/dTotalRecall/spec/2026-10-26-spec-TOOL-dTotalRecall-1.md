@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-1 — the record-kind registry, the memory contract's one declaration of every kind
 
-**Status:** CLOSED · rev-7 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 1 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-8 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 1 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0212@121cf0ba whole
 **Carries:** node:system.memory-structure
@@ -144,7 +144,8 @@ a writer, schema or check per kind (gap-mem-01).
   exit 3 (not armed) where no `*-gap-register.md` is tracked. Observed by AC9.
 - **S11** — The leg's meta-gate rows: its `[[exempt_leg]]` row in `tools/govkit/registry.toml`,
   written by `leg_factory.py new record-kinds --exempt <why>`, `enforces` among its keys (S3), no
-  `guard`, a declared `ceiling` of 120 seconds; `tools/govkit/subject-pins.tsv` and
+  `guard`, a declared `ceiling` of 120 seconds (PINNED 2026-11-22, built at 122 by
+  `2026-11-22-build-TOOL-dTotalRecall-1-deviation-15`); `tools/govkit/subject-pins.tsv` and
   `tools/run-gates/ceiling-evidence.txt`, each by its own writer; the `gate-legs` claim of
   `memory/map/features/memory-tree-hygiene.md`. NOT OBSERVED by a criterion: each row is graded by its
   own meta-gate at the close.
@@ -520,6 +521,9 @@ a typed record named outside its grammar, which `tree_lib.py#read_bindings` reds
   `2026-11-22-build-TOOL-dTotalRecall-1-1-builder-return`: a typed row grades only its grammar's paths
   (F8); F7's empty count is nine, not eight (forced); `help/reference/kinds.md` joins Files touched,
   its legs §7; other prose tightened for the size ceiling, no decision moved.
+- rev-8 · 2026-11-22 · S11 · per `2026-11-22-prompt-TOOL-dTotalRecall-8-facts-brief`: a record-only
+  pin to a CLOSED spec, the leg's ceiling line pinned and pointed at
+  `2026-11-22-build-TOOL-dTotalRecall-1-deviation-15`, which built it higher. No criterion moved.
 
 ## 10. Reuse audit
 
