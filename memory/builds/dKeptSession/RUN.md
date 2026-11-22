@@ -138,3 +138,5 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-21T23:51:02Z rescope · item defer KICK-dKeptSession-16 · reason its green pass (8426252e0 plus its mirror commit 4ee5af863) cannot merge until KICK-dKeptSession-67 lets pass-tree.sh merge a pass that changes a mirror input; re-dispatched after 67 lands
 
 2026-11-22T00:20:03Z brief · item KICK-dKeptSession-67 · reason 1f477ee42e08 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-67-build-brief.md
+
+2026-11-22T00:25:45Z dispatch · item 7d4c4653 KICK-dKeptSession-67 · reason tools/unattended/pass-tree.sh tools/unattended/pass-tree.test.sh tools/unattended/README.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-67-1-acceptance-ledger.md
