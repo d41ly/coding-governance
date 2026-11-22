@@ -47,8 +47,19 @@ trap 'rm -rf "$NEWREPO_SEED"' EXIT
 ( cd "$NEWREPO_SEED" && git init -q --template= -b main && mkdir .githooks \
   && printf '#!/bin/sh\nexit 0\n' > .githooks/pre-commit && chmod +x .githooks/pre-commit \
   && git add --chmod=+x .githooks/pre-commit && git commit -q -m init ) || exit 2
-newrepo() {   # cd (in THIS shell) into a fresh repo with a tracked .githooks/pre-commit
+# The WIRED config is captured once per run, here, as the bytes git itself writes, and the seed is
+# written back byte for byte (TOOL-dQuietDisk-10 S1, S4), so `newrepo wired` wires a copy with a
+# builtin and spawns no git. `read -d ''` stops at NUL, which a config never holds, so it takes the
+# whole file; its end-of-file status is absorbed, and the last guard refuses a capture that took
+# nothing or changed nothing.
+IFS= read -r -d '' _nr_plain < "$NEWREPO_SEED/.git/config" || :
+git -C "$NEWREPO_SEED" config core.hooksPath .githooks || exit 2
+IFS= read -r -d '' NEWREPO_WIRED_CONFIG < "$NEWREPO_SEED/.git/config" || :
+printf '%s' "$_nr_plain" > "$NEWREPO_SEED/.git/config" || exit 2
+[ -n "$NEWREPO_WIRED_CONFIG" ] && [ "$NEWREPO_WIRED_CONFIG" != "$_nr_plain" ] || exit 2
+newrepo() {   # [wired] -> cd (in THIS shell) into a fresh repo with a tracked .githooks/pre-commit
   D=$(mktemp -d); cp -a "$NEWREPO_SEED/." "$D/" || exit 2; cd "$D" || exit 2
+  [ "${1:-}" != wired ] || printf '%s' "$NEWREPO_WIRED_CONFIG" > .git/config || exit 2
 }
 cleanup() { cd "$REPO"; [ -n "$D" ] && rm -rf "$D"; [ -n "$OOT" ] && rm -rf "$OOT"; D=""; OOT=""; }
 chk() { bash "$SCRIPT" "$@" 2>/dev/null; }   # run the checker, drop stderr noise
@@ -401,7 +412,7 @@ out=$(chk --check); rc=$?
 cleanup
 
 # AC5a — all wired -> exit 0
-newrepo; git config core.hooksPath .githooks; chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 all wired -> exit 0" 1 || ck "AC5 all wired -> exit 0" 0
+newrepo wired; chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 all wired -> exit 0" 1 || ck "AC5 all wired -> exit 0" 0
 cleanup
 # AC5b — non-git dir -> exit 0
 D=$(mktemp -d); cd "$D" || exit 2; chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 non-git -> exit 0" 1 || ck "AC5 non-git -> exit 0" 0
@@ -1340,12 +1351,12 @@ fi
 # So this arm does not proof-read the README. It DERIVES both spellings by running `--fix` in a
 # complete fixture of each layout, then requires the README to publish exactly those two and no
 # third one. A future prefix change moves the derived strings and reds the doc automatically.
-newrepo; git config core.hooksPath .githooks; install_driver "${KP}"
+newrepo wired; install_driver "${KP}"
 chk --fix >/dev/null; S_TOOLS=$(git config merge.rows.driver 2>/dev/null || true); cleanup
 # The ROOT layout's command comes from a checker installed AT the root. The checker finds a kit at
 # its own prefix or through the receipt and no longer guesses the root from another prefix
 # (TOOL-aRepatriatedFork-24 S8), so a root-layout fixture holds its own root copy of the checker.
-newrepo; git config core.hooksPath .githooks; install_driver ""; cp "$SCRIPT" ./check-wiring.sh
+newrepo wired; install_driver ""; cp "$SCRIPT" ./check-wiring.sh
 bash ./check-wiring.sh --fix >/dev/null 2>&1; S_ROOT=$(git config merge.rows.driver 2>/dev/null || true); cleanup
 cd "$REPO"
 # LIVENESS, before anything is compared against the doc: two layouts that produced the SAME string,
@@ -1838,7 +1849,7 @@ rows = [{"path": a.split("=", 1)[0], "role": "engine", "kit": "fixture", "source
 open(".governance/install.json", "w", newline="\n").write(json.dumps({"schema": 3, "prefix": "scripts", "files": rows}, indent=2) + "\n")' "$@"
 }
 if [ -f "$SMERGE" ] && [ -f "$SGFRAG" ] && [ -n "$FRAG" ]; then
-  newrepo; git config core.hooksPath .githooks   # isolate: hooks wired, so only the arms under test move
+  newrepo wired   # isolate: hooks wired, so only the arms under test move
   mkdir -p scripts/memory-recall scripts/recall .claude/hooks memory/backlog ${KIT_REL:-.}
   _flat="${ROOTPFX}${MT_KIT}/merge-rows.py ${ROOTPFX}${MT_KIT}/merge-rows.sh"  # src_of keys under the tool root; the scratch repo lays them FLAT under scripts/, where no probe looks
   for rel in $_flat; do cp "$(src_of "$rel")" "scripts/${rel#*/}"; done
@@ -1932,7 +1943,7 @@ fi
 # AC5 — the eol arm's SECOND named glob: a tracked, pinned `.claude/workflows/*.js` holding CR bytes
 # is named. The bound half rides along: a pinned `.claude/hooks/*.js` with the same CR bytes is NOT,
 # because the population is two named globs and never "every eol=lf path under .claude/".
-newrepo; git config core.hooksPath .githooks
+newrepo wired
 mkdir -p .claude/skills/y .claude/workflows .claude/hooks
 printf '.claude/skills/**/*.md eol=lf\n.claude/workflows/*.js eol=lf\n.claude/hooks/*.js eol=lf\n' > .gitattributes
 printf 'a\nb\n' > .claude/skills/y/SKILL.md
@@ -1955,7 +1966,7 @@ cleanup
 # git reads `merge.ours.driver` from them too, so a node that set it globally would make "unset"
 # unreachable here and red the arm for the machine's reasons.
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
-newrepo; git config core.hooksPath .githooks
+newrepo wired
 mkdir -p memory; printf 'x\n' > memory/LIVE.md
 out=$(chk --check); rc=$?
 ck "U22 AC3 no path declares merge=ours -> skip, exit 0" \
@@ -2010,7 +2021,7 @@ unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
 # example.invalid, never contacted, and nothing pushes. WANT is the definition line run alone.
 PM=$(src_of "${ROOTPFX}push-main.sh")
 seed_ssh_fixture() {  # $1 = origin URL ("" = no remote) -> a wired repo holding a copy of push-main.sh
-  newrepo; git config core.hooksPath .githooks
+  newrepo wired
   export GIT_CONFIG_GLOBAL="$D/.git/fixture-global" GIT_CONFIG_NOSYSTEM=1; : > "$GIT_CONFIG_GLOBAL"
   unset GIT_SSH GIT_SSH_VARIANT   # an operator's SSH choice makes the arm stand back (TOOL-aLevelledCopy-7 S5)
   mkdir -p "${KP:-.}"; cp "$PM" "${KP}push-main.sh"
@@ -2217,7 +2228,7 @@ fi
 # filesystem, so the fixture is the same on a core.fileMode=false host and on a POSIX one. Each arm
 # greps the `hooks` lines: other arms print their own lines in these fixtures.
 seed_mode_fixture() {   # hooks pre-commit + post-merge at 100644, pre-push 100755, two non-hooks 100644
-  newrepo; git config core.hooksPath .githooks
+  newrepo wired
   printf '#!/bin/sh\nexit 0\n' > .githooks/post-merge; printf '#!/bin/sh\nexit 0\n' > .githooks/pre-push
   printf 'x=1\n' > .githooks/gate-env.sh; printf '#!/bin/sh\nexit 0\n' > .githooks/pre-commit.test.sh
   git add --chmod=-x .githooks/post-merge .githooks/gate-env.sh .githooks/pre-commit.test.sh
@@ -2303,7 +2314,7 @@ cleanup
 ROLES_DIR=$(resolve_kit_dir "$_rkd_py" roles workflows.toml "$HERE" 2>/dev/null) || ROLES_DIR=""
 if [ -n "$ROLES_DIR" ]; then
   RL="${ROLES_DIR##*/}"
-  newrepo; git config core.hooksPath .githooks
+  newrepo wired
   mkdir -p "./${KP}$RL/agents"
   cp "$SCRIPT" "./${KP}check-wiring.sh"
   cp "$REPO/$ROLES_DIR/workflows.toml" "./${KP}$RL/"
@@ -2363,7 +2374,7 @@ if [ -n "$ROLES_DIR" ]; then
   ck "OC8 AC6 a CR-carrying pinned agent type is named by the eol arm" \
      "$(printf '%s' "$out" | grep -qF "note     eol       — $_a" && echo 1 || echo 0)"
   cleanup
-  newrepo; git config core.hooksPath .githooks; mkdir -p "./${KP}"; cp "$SCRIPT" "./${KP}check-wiring.sh"
+  newrepo wired; mkdir -p "./${KP}"; cp "$SCRIPT" "./${KP}check-wiring.sh"
   out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null)
   ck "OC8 AC6 a tree without the roles kit skips the arm" \
      "$(printf '%s' "$out" | grep -q '^skip     roles     — the roles kit is not installed here' && echo 1 || echo 0)"

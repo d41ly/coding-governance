@@ -108,3 +108,7 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-22T09:27:02Z brief · item TOOL-dQuietDisk-18 · reason 2915422b6be3 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-18-build-brief.md
 
 2026-11-22T09:28:34Z dispatch · item 0cd623a9 TOOL-dQuietDisk-18 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/policy/catalogue.toml help/reference/policy.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/CARDS.md memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-18.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-18-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-18-deviation-1.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-22T09:48:48Z brief · item TOOL-dQuietDisk-10 · reason 0643cce08f44 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-10-build-brief.md
+
+2026-11-22T09:50:13Z dispatch · item 4192edd5 TOOL-dQuietDisk-10 · reason tools/check-wiring.test.sh memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-10.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-10-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-10-deviation-1.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
