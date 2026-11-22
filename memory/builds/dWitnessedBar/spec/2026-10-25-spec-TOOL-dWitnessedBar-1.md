@@ -51,6 +51,7 @@
 | [2026-11-22-build-TOOL-dWitnessedBar-1-override-1.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-override-1.md) | override | — |
 | [2026-11-22-build-TOOL-dWitnessedBar-1-red-fix-155.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-red-fix-155.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dWitnessedBar-1-red-fix-161.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-red-fix-161.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-replay.py](../build/2026-11-22-build-TOOL-dWitnessedBar-1-replay.py) | journal | — |
 | [2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md) | widen | — |
 | [2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md) | widen | — |
 | [2026-11-22-build-TOOL-dWitnessedBar-1-widen-34.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-34.md) | widen | — |
