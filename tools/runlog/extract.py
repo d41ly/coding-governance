@@ -1304,9 +1304,11 @@ def derive_context_window(model, root=None, held=None) -> tuple:
     `resolve_projects_root` resolves from the process environment, as every transcript-reading verb
     does; KICK-dKeptSession-45 S1), source `observed <n> on <model>`; else the bottom rung, source
     `no observation`, or `no root: <why>` where no root resolves (S2), never a raise. A transcript's
-    observation is its largest main `usage` sum on `model` and its largest integer compaction
-    `pre_tokens`. Each is parsed as a tree holding its main file alone, and `held`, `(path, events)`,
-    stands in for that path's parse where it is among them. An unreadable transcript is skipped."""
+    observation is its largest main `usage` sum on `model` and the largest integer `pre_tokens` of a
+    compaction whose newest earlier main usage in the same transcript is on `model`
+    (KICK-dKeptSession-47 S1); a compaction with no main usage before it joins no model. Each is
+    parsed as a tree holding its main file alone, and `held`, `(path, events)`, stands in for that
+    path's parse where it is among them. An unreadable transcript is skipped."""
     # The harness's own variable for a model's real window: read here, never written.
     raw = os.environ.get("CLAUDE_CODE_MAX_CONTEXT_TOKENS", "").strip()
     if re.fullmatch(r"[0-9]+", raw) and int(raw) > 0:
@@ -1336,10 +1338,15 @@ def derive_context_window(model, root=None, held=None) -> tuple:
                 events = extract_session(SessionTree(sid=p.stem, main=p))["events"]
             except (OSError, ValueError):
                 continue
+        # Events are sorted by `t`, so the last main usage walked is the newest before a compaction.
+        on_model = False
         for ev in events:
-            if ev["kind"] == "usage" and ev["src"] == "main" and ev.get("model") == model:
+            if ev["kind"] == "usage" and ev["src"] == "main":
+                on_model = ev.get("model") == model
+                if not on_model:
+                    continue
                 tokens = derive_context_tokens(ev)
-            elif ev["kind"] == "compact" and type(ev.get("pre_tokens")) is int:
+            elif ev["kind"] == "compact" and on_model and type(ev.get("pre_tokens")) is int:
                 tokens = ev["pre_tokens"]
             else:
                 continue

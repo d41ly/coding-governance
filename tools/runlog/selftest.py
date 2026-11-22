@@ -365,7 +365,12 @@ from collections import Counter  # noqa: E402
 # neither window nor root (AC3). The context-fill liveness check now passes its case's root and adds
 # none. Its decoy checks move it by 3.
 # 3 + 3 = 6
-ASSERTION_FLOOR = 1624
+# RAISED 1624 -> 1629 by KICK-dKeptSession-47, the attributed compaction: ONE new arm with 2 checks —
+# `test_extract_context_window_compact`'s 150000-token turn beside another model's 900000-token
+# compaction reading 75% (AC1), and beside its own model's reading 15% (AC2). Its decoy checks move
+# it by 3.
+# 2 + 3 = 5
+ASSERTION_FLOOR = 1629
 
 PASS = []
 FAIL = []
@@ -2107,6 +2112,25 @@ def test_extract_context_window():
     check("extract context-window AC3: the 150000-token turn alone reads 75% of the 200000 rung it observed",
           (r.returncode, r.stdout.strip(), r.stderr.strip()),
           (0, "75%", "context: window 200000 · observed 150000 on fixture-model"))
+
+
+def test_extract_context_window_compact():
+    """KICK-dKeptSession-47 AC1 and AC2: a compaction joins a model's observation only when the newest
+    main usage before it in its transcript is on that model, so another model's 900000-token compaction
+    leaves the 150000-token turn on the 200000 rung, and the model's own lifts it to the 1000000 rung."""
+    for name, want in (("context-window-compact-other",
+                        ("AC1: another model's 900000 compaction leaves the 150000-token turn at 75%",
+                         (0, "75%", "context: window 200000 · observed 150000 on fixture-model"))),
+                       ("context-window-compact-own",
+                        ("AC2: the model's own 900000 compaction lifts the 150000-token turn to 15%",
+                         (0, "15%", "context: window 1000000 · observed 900000 on fixture-model")))):
+        base, projects = build_projects("runlog-window-compact-")
+        sid = build_scenario(projects, "context-window")
+        build_scenario(projects, name)
+        r = run_runlog(["context", str(projects / FIXTURE_PROJECT / f"{sid}.jsonl")], base,
+                       build_arm_env(base))
+        check(f"extract context-window compact {want[0]}",
+              (r.returncode, r.stdout.strip(), r.stderr.strip()), want[1])
 
 
 def test_extract_context_window_root():

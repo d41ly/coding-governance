@@ -253,7 +253,8 @@ share, keeps no text, writes nothing and exits 0, or 2 when the path names no fi
 harness's `CLAUDE_CODE_MAX_CONTEXT_TOKENS` where it is set to a positive integer, source `env`; else
 the smallest `CONTEXT_WINDOW_RUNGS` rung at or above the largest context the node has observed for
 that model, source `observed <n> on <model>`: the largest main `usage` sum on the model and the
-largest compaction `preTokens` across the newest `CONTEXT_WINDOW_SCAN` main transcripts under the
+largest `preTokens` of a compaction whose newest earlier main usage in the same transcript is on that
+model (KICK-dKeptSession-47), across the newest `CONTEXT_WINDOW_SCAN` main transcripts under the
 read transcript's own projects root, each parsed as its main file alone, the read transcript's own
 parse standing in for its file; else the bottom rung, source `no observation`. An observation past
 the top rung is its own window. The share passes 100% only where the variable is set below the

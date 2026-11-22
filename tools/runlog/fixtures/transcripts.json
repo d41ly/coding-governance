@@ -194,6 +194,22 @@
         {"type": "user", "uuid": "ws-u0", "timestamp": "2026-09-13T11:00:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Start the long fixture work."}, "origin": {"kind": "human"}},
         {"type": "assistant", "uuid": "ws-a1", "timestamp": "2026-09-13T11:00:05.000Z", "version": "9.9.1", "requestId": "req-ws1", "message": {"id": "msg-req-ws1", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Reading the long fixture file."}], "usage": {"input_tokens": 1000, "output_tokens": 10, "cache_read_input_tokens": 890000, "cache_creation_input_tokens": 9000}}}
       ]
+    },
+    "context-window-compact-other": {
+      "about": "KICK-dKeptSession-47 AC1. One main request reading 50000 tokens of context on other-model, then a compaction of 900000 tokens timed after it: the compaction is other-model's, so beside context-window the fixture-model turn still reads 75% of the 200000 rung.",
+      "main": [
+        {"type": "user", "uuid": "wo-u0", "timestamp": "2026-09-13T12:00:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Start the other model's fixture work."}, "origin": {"kind": "human"}},
+        {"type": "assistant", "uuid": "wo-a1", "timestamp": "2026-09-13T12:00:05.000Z", "version": "9.9.1", "requestId": "req-wo1", "message": {"id": "msg-req-wo1", "role": "assistant", "model": "other-model", "content": [{"type": "text", "text": "Reading the other model's notes."}], "usage": {"input_tokens": 1000, "output_tokens": 10, "cache_read_input_tokens": 40000, "cache_creation_input_tokens": 9000}}},
+        {"type": "system", "subtype": "compact_boundary", "uuid": "wo-s1", "timestamp": "2026-09-13T12:00:10.000Z", "version": "9.9.1", "content": "Conversation compacted", "compactMetadata": {"trigger": "auto", "preTokens": 900000}}
+      ]
+    },
+    "context-window-compact-own": {
+      "about": "KICK-dKeptSession-47 AC2. context-window-compact-other with its request on fixture-model: the 900000-token compaction is fixture-model's, so beside context-window the 150000-token turn reads 15% of the 1000000 rung.",
+      "main": [
+        {"type": "user", "uuid": "wn-u0", "timestamp": "2026-09-13T12:00:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Start the own model's fixture work."}, "origin": {"kind": "human"}},
+        {"type": "assistant", "uuid": "wn-a1", "timestamp": "2026-09-13T12:00:05.000Z", "version": "9.9.1", "requestId": "req-wn1", "message": {"id": "msg-req-wn1", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Reading the own model's notes."}], "usage": {"input_tokens": 1000, "output_tokens": 10, "cache_read_input_tokens": 40000, "cache_creation_input_tokens": 9000}}},
+        {"type": "system", "subtype": "compact_boundary", "uuid": "wn-s1", "timestamp": "2026-09-13T12:00:10.000Z", "version": "9.9.1", "content": "Conversation compacted", "compactMetadata": {"trigger": "auto", "preTokens": 900000}}
+      ]
     }
   }
 }
