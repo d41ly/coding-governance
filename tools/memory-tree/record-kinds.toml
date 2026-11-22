@@ -1,4 +1,4 @@
-# record-kinds.toml — the record-kind registry (TOOL-dTotalRecall-1, -18): one [[record-kind]] row per
+# record-kinds.toml — the record-kind registry (TOOL-dTotalRecall-1, -18, -16): one [[record-kind]] row per
 # kind of record the memory tree holds, and one witness row per family of pockets outside it, the
 # memory contract's one declaration of each. Columns, in this order: `name`; `tag`, record.<name>;
 # `layer`, the `layer.<name>` tag of the kit whose writer writes the kind; `home`, one glob or a list:
@@ -8,9 +8,11 @@
 # `ast`; `writer`, the command that writes it, `generator:<path>` or `hand`; `readers`, the work-order
 # read keys a handoff fills from a record of the kind, or [] beside `readers-none`, the reason no role
 # reads it; `lifecycle`, one of append-only, current-state, frozen, generated, out; `check`, the leg of
-# <prefix>/gate-legs.json grading it. Every column but `id-rule` is required and non-empty. A kind
+# <prefix>/gate-legs.json grading it; `purpose`, last, { text, source }, one line of at most
+# PURPOSE_BYTES cited <path>:<line> or `owner`, or { pending = "<id>" }, which `memory.map-purpose`
+# grades. Every column but `id-rule` is required and non-empty. A kind
 # joins through `python <prefix>/memory-tree/record_kinds.py new`, and `record_kinds.py --check` grades
-# the file.
+# the file; `record_kinds.py --purpose-review` derives a missing purpose and writes it as one line of its row.
 
 [[record-kind]]
 name = "spec"
