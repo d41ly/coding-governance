@@ -215,8 +215,10 @@ the position line and the card's `## pointers` before you act on it. A resume re
 itself and prints no notice.
 
 The `context —` line shows how full the session's context window is, as a whole percent: the tokens
-its last request read, as its transcript records them, over a pinned window. A subagent's requests
-never count. The `context.on-full` policy key decides what a filling window leads to, and
+its last request read, as its transcript records them, over the window derived per model from this
+node's observed usage: `CLAUDE_CODE_MAX_CONTEXT_TOKENS` where the harness sets it, else the largest
+context this node's recent transcripts show on that model, rounded up to the 200k or the 1M window.
+A subagent's requests never count. The `context.on-full` policy key decides what a filling window leads to, and
 `context.threshold` where it starts: <!-- usage: policy:context.on-full 50e931f0 --> <!-- usage: policy:context.threshold ba7d79dc -->
 
 - `fresh-at-boundary` (the default): once the share reaches `context.threshold` (`60%` by default),

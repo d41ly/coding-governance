@@ -644,7 +644,7 @@ name = "context.threshold"
 allowed = { type = "pattern", regex = "(100|[1-9]?[0-9])%" }
 default = "60%"
 owner = "dKeptSession"
-summary = "The share of the context window, a whole percent, at or past which a session under context.on-full fresh-at-boundary is told to start fresh at its next item boundary: the last main request's tokens over the runlog kit's pinned window. Read only under fresh-at-boundary."
+summary = "The share of the context window, a whole percent, at or past which a session under context.on-full fresh-at-boundary is told to start fresh at its next item boundary: the last main request's tokens over the window the runlog kit derives per model from the node's observed usage, or CLAUDE_CODE_MAX_CONTEXT_TOKENS where set. Read only under fresh-at-boundary."
 usage = 'context.threshold = "75%"'
 
 [[key]]

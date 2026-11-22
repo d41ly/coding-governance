@@ -341,7 +341,12 @@ from collections import Counter  # noqa: E402
 # earlier request read through `until`, an agent file read alone printing `none`, and the liveness that
 # the whole tree's last usage is the agent's. Its decoy checks move it by 3.
 # 4 + 3 = 7
-ASSERTION_FLOOR = 1587
+# RAISED 1587 -> 1595 by KICK-dKeptSession-30, the derived window: ONE new arm with 5 checks —
+# `test_extract_context_window`'s 900000-token sibling read alone (AC1), the 150000-token turn beside
+# it (AC2), that read under CLAUDE_CODE_MAX_CONTEXT_TOKENS set to 500000 and to `x` (AC4), and the
+# turn read alone (AC3). Its decoy checks move it by 3.
+# 5 + 3 = 8
+ASSERTION_FLOOR = 1595
 
 PASS = []
 FAIL = []
@@ -2026,8 +2031,9 @@ def test_extract_ready():
 
 
 def test_extract_context_fill():
-    """KICK-dKeptSession-14 AC1: the fill is the main file's last main usage over the pinned window,
-    never an earlier turn's and never a subagent's, though the agent's request is the session's last."""
+    """KICK-dKeptSession-14 AC1: the fill is the main file's last main usage over the 200000 rung the
+    case's root derives, never an earlier turn's and never a subagent's, though the agent's request is
+    the session's last."""
     base, projects = build_projects("runlog-fill-")
     sid = build_scenario(projects, "context-fill")
     main = projects / FIXTURE_PROJECT / f"{sid}.jsonl"
@@ -2036,7 +2042,7 @@ def test_extract_context_fill():
           (r.returncode, r.stdout.strip()), (0, "60%"))
     t_mid = rx.parse_time("2026-09-13T10:00:10Z")
     check("extract context-fill: with `until` before the compaction the earlier request's 180000 reads 0.9",
-          rx.measure_context_fill(main, until=t_mid), 0.9)
+          rx.measure_context_fill(main, until=t_mid)[0], 0.9)
     agent = next((projects / FIXTURE_PROJECT / sid / "subagents").glob("agent-*.jsonl"))
     r = run_runlog(["context", str(agent)], base, build_arm_env(base))
     check("extract context-fill: an agent file read as a transcript holds no main usage, so prints none",
@@ -2046,6 +2052,41 @@ def test_extract_context_fill():
     check("extract context-fill liveness: the whole tree's last usage is the agent's 190000, 0.95, the "
           "decoy the share must not read", (usage[-1]["src"], rx.derive_context_fill(usage[-1])) if usage
           else None, ("agent", 0.95))
+
+
+def test_extract_context_window():
+    """KICK-dKeptSession-30 AC1 to AC4: the window is derived per model from what the transcripts under
+    the read transcript's own projects root observed, rounded up to a rung, and the harness's
+    CLAUDE_CODE_MAX_CONTEXT_TOKENS wins where it is a positive integer. `main` drops that variable
+    before any arm, so each read here sets it in its own child's environment or not at all."""
+    base, alone = build_projects("runlog-window-sibling-")
+    sid = build_scenario(alone, "context-window-sibling")
+    r = run_runlog(["context", str(alone / FIXTURE_PROJECT / f"{sid}.jsonl")], base, build_arm_env(base))
+    check("extract context-window AC1: a 900000-token main turn alone reads 90% of the 1000000 rung",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()),
+          (0, "90%", "context: window 1000000 · observed 900000 on fixture-model"))
+    base, both = build_projects("runlog-window-both-")
+    sid = build_scenario(both, "context-window")
+    build_scenario(both, "context-window-sibling")
+    main = both / FIXTURE_PROJECT / f"{sid}.jsonl"
+    r = run_runlog(["context", str(main)], base, build_arm_env(base))
+    check("extract context-window AC2: a 150000-token turn beside its sibling's 900000 reads 15%",
+          (r.returncode, r.stdout.strip()), (0, "15%"))
+    env = build_arm_env(base)
+    env["CLAUDE_CODE_MAX_CONTEXT_TOKENS"] = "500000"
+    r = run_runlog(["context", str(main)], base, env)
+    check("extract context-window AC4: CLAUDE_CODE_MAX_CONTEXT_TOKENS=500000 reads 30% with source env",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()), (0, "30%", "context: window 500000 · env"))
+    env["CLAUDE_CODE_MAX_CONTEXT_TOKENS"] = "x"
+    r = run_runlog(["context", str(main)], base, env)
+    check("extract context-window AC4: a malformed CLAUDE_CODE_MAX_CONTEXT_TOKENS is ignored, so AC2's 15%",
+          (r.returncode, r.stdout.strip()), (0, "15%"))
+    base, small = build_projects("runlog-window-alone-")
+    sid = build_scenario(small, "context-window")
+    r = run_runlog(["context", str(small / FIXTURE_PROJECT / f"{sid}.jsonl")], base, build_arm_env(base))
+    check("extract context-window AC3: the 150000-token turn alone reads 75% of the 200000 rung it observed",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()),
+          (0, "75%", "context: window 200000 · observed 150000 on fixture-model"))
 
 
 def test_extract_ac10_members():
@@ -8903,6 +8944,9 @@ def main():
     for var, sub in DECOY_VARS:
         os.environ[var] = str(decoy / sub)
     os.environ.pop("RUNLOG_STATE_DIR", None)
+    # The harness's window variable (KICK-dKeptSession-30 S4) goes too, so no node's setting moves a
+    # context arm; the one arm that reads it sets it in its own child's environment.
+    os.environ.pop("CLAUDE_CODE_MAX_CONTEXT_TOKENS", None)
     try:
         for name, fn in sorted(globals().items()):
             if name.startswith("test_") and callable(fn):

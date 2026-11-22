@@ -1236,34 +1236,96 @@ def measure_ready_tree(root) -> dict:
     return out
 
 
-# The window a context share is taken of, in tokens: ONE pinned constant beside the sum, unverified
-# against the platform's documentation in this tree (KICK-dKeptSession-14 F2). A main session can read
-# past it, so the share can pass 1.0; KICK-dKeptSession-30 derives the window per model and retires it.
-CONTEXT_WINDOW_TOKENS = 200000
+# The windows a context share can be taken of, in tokens (KICK-dKeptSession-30 S1). No transcript
+# record names the window an account runs, so `derive_context_window` rounds the largest context the
+# node has observed for a model up to the smallest of these at or above it; 1000000 is the harness's
+# own 1M figure. An observation past the top rung is its own window.
+CONTEXT_WINDOW_RUNGS = (200000, 1000000)
+# How many of the newest main transcripts under a projects root that observation reads.
+CONTEXT_WINDOW_SCAN = 20
 
 
 def derive_context_tokens(ev) -> int:
     """The context one `usage` event read: its `in`, `cache_read` and `cache_write` summed, the one
-    such sum in the kit, which `measure_ready_tree` and `measure_context_fill` both call."""
+    such sum in the kit, which `measure_ready_tree`, `derive_context_fill` and `derive_context_window`
+    call."""
     return ev["in"] + ev["cache_read"] + ev["cache_write"]
 
 
-def derive_context_fill(ev) -> float:
-    """The share of CONTEXT_WINDOW_TOKENS one `usage` event's context used, for a reader that holds
-    events already and takes the share of any of them without re-reading a transcript."""
-    return derive_context_tokens(ev) / CONTEXT_WINDOW_TOKENS
+def derive_context_window(model, root=None, held=None) -> tuple:
+    """`(tokens, source)`: the window a context share on `model` is taken of (KICK-dKeptSession-30 S1).
+    The harness's `CLAUDE_CODE_MAX_CONTEXT_TOKENS` when it is a positive integer, source `env`; else
+    the smallest rung at or above the largest context observed for `model` in the newest
+    CONTEXT_WINDOW_SCAN main transcripts under `root` (the harness's `~/.claude/projects` when None),
+    source `observed <n> on <model>`; else the bottom rung, source `no observation`. A transcript's
+    observation is its largest main `usage` sum on `model` and its largest integer compaction
+    `pre_tokens`. Each is parsed as a tree holding its main file alone, and `held`, `(path, events)`,
+    stands in for that path's parse where it is among them. An unreadable transcript is skipped."""
+    # The harness's own variable for a model's real window: read here, never written.
+    raw = os.environ.get("CLAUDE_CODE_MAX_CONTEXT_TOKENS", "").strip()
+    if re.fullmatch(r"[0-9]+", raw) and int(raw) > 0:
+        return int(raw), "env"
+    root = pathlib.Path.home() / ".claude" / "projects" if root is None else pathlib.Path(root)
+    held_path, held_events = held if held else (None, None)
+    held_key = None if held_path is None else os.path.normcase(os.path.abspath(held_path))
+    found = []
+    for p in root.glob("*/*.jsonl"):
+        if not SID_RE.fullmatch(p.name[:-len(".jsonl")]):
+            continue
+        try:
+            found.append((p.stat().st_mtime, p))
+        except OSError:
+            continue
+    seen = None
+    for _mtime, p in sorted(found, key=lambda row: row[0], reverse=True)[:CONTEXT_WINDOW_SCAN]:
+        if held_key is not None and os.path.normcase(os.path.abspath(p)) == held_key:
+            events = held_events
+        else:
+            try:
+                events = extract_session(SessionTree(sid=p.stem, main=p))["events"]
+            except (OSError, ValueError):
+                continue
+        for ev in events:
+            if ev["kind"] == "usage" and ev["src"] == "main" and ev.get("model") == model:
+                tokens = derive_context_tokens(ev)
+            elif ev["kind"] == "compact" and type(ev.get("pre_tokens")) is int:
+                tokens = ev["pre_tokens"]
+            else:
+                continue
+            seen = tokens if seen is None else max(seen, tokens)
+    if seen is None:
+        return CONTEXT_WINDOW_RUNGS[0], "no observation"
+    window = next((rung for rung in CONTEXT_WINDOW_RUNGS if rung >= seen), seen)
+    return window, f"observed {seen} on {model}"
 
 
-def measure_context_fill(transcript, until=None) -> float | None:
-    """The share of the window the transcript's last `usage` event with `src` `main` used, at or before
-    `until` (an epoch second; the end when None), or None with no such event (KICK-dKeptSession-14 S1).
+def derive_context_fill(ev, window=None) -> float:
+    """The share of a window one `usage` event's context used, for a reader that holds events already
+    and takes the share of any of them without re-reading a transcript: over `window` when given, else
+    over the one `derive_context_window` derives for the event's model under the default root."""
+    if window is None:
+        window = derive_context_window(ev.get("model"))[0]
+    return derive_context_tokens(ev) / window
+
+
+def measure_context_fill(transcript, until=None) -> tuple:
+    """`(share, tokens, source)`: the share of its model's window the transcript's last `usage` event
+    with `src` `main` used, at or before `until` (an epoch second; the end when None), and that window
+    as `derive_context_window` derives it under the transcript's own projects root, its parent's
+    parent; `(None, None, None)` with no such event (KICK-dKeptSession-14 S1, KICK-dKeptSession-30 S2).
     The MAIN file alone is parsed: no agent file is listed, so a subagent's usage cannot decide the
     share, and a sidechain record inside the main file is read as `agent`, as `extract_session` reads it.
-    Only usage counts leave the transcript; no text is kept."""
+    That one parse stands in for the transcript's own in the window's scan. Only usage counts leave the
+    transcript; no text is kept."""
     path = pathlib.Path(transcript)
     tree = SessionTree(sid=path.stem, main=path)
+    events = extract_session(tree)["events"]
     last = None
-    for ev in extract_session(tree)["events"]:
+    for ev in events:
         if ev["kind"] == "usage" and ev["src"] == "main" and (until is None or ev["t"] <= until):
             last = ev
-    return None if last is None else derive_context_fill(last)
+    if last is None:
+        return None, None, None
+    window, source = derive_context_window(last.get("model"), root=path.parent.parent,
+                                           held=(path, events))
+    return derive_context_fill(last, window), window, source

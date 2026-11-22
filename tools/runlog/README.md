@@ -212,13 +212,23 @@ it counts as the witness.
 
 **`context`** prints how full one session's main context window is (KICK-dKeptSession-14): `<n>%`, the
 `in`, `cache_read` and `cache_write` of the transcript's last `usage` event with `src` `main`, summed by
-`derive_context_tokens` (the one such sum, which `--ready` calls too), over `CONTEXT_WINDOW_TOKENS`,
-times 100 rounded down; or `none` when the transcript holds no main usage. It parses the main file
-alone, so no subagent's request can decide the share, keeps no text, writes nothing and exits 0, or 2
-when the path names no file. The window is one pinned constant, unverified against the platform's
-documentation, and a session can read past it, so the share can pass 100%. `measure_context_fill(transcript,
-until=None)` is the same read for a caller, the share at or before an epoch second, and
-`derive_context_fill(ev)` the share of one event a caller already holds. The kickoff engine's
+`derive_context_tokens` (the one such sum, which `--ready` calls too), over the window
+`derive_context_window` derives for the event's model (KICK-dKeptSession-30), times 100 rounded down,
+with `context: window <tokens> · <source>` on stderr; or `none` when the transcript holds no main
+usage, and nothing on stderr. It parses the main file alone, so no subagent's request can decide the
+share, keeps no text, writes nothing and exits 0, or 2 when the path names no file. The window is the
+harness's `CLAUDE_CODE_MAX_CONTEXT_TOKENS` where it is set to a positive integer, source `env`; else
+the smallest `CONTEXT_WINDOW_RUNGS` rung at or above the largest context the node has observed for
+that model, source `observed <n> on <model>`: the largest main `usage` sum on the model and the
+largest compaction `preTokens` across the newest `CONTEXT_WINDOW_SCAN` main transcripts under the
+read transcript's own projects root, each parsed as its main file alone, the read transcript's own
+parse standing in for its file; else the bottom rung, source `no observation`. An observation past
+the top rung is its own window. The share passes 100% only where the variable is set below the
+context read or the transcript is outside the scan. `measure_context_fill(transcript, until=None)` is
+the same read for a caller, `(share, tokens, source)` at or before an epoch second, `(None, None,
+None)` with no main usage, and `derive_context_fill(ev, window=None)` the share of one event a caller
+already holds, over `window` or, when it is None, the window derived for the event's model under the
+harness's default projects root. The kickoff engine's
 `context —` line reads it, as the `context.on-full` and `context.threshold` policy keys decide.
 
 **The self-test never reads or writes a real store.** Its `main` aims `HOME`, `USERPROFILE`,
