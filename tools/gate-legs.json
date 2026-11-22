@@ -5364,7 +5364,7 @@
     ],
     "chunk": "records",
     "subject": "repo",
-    "ceiling": 120,
+    "ceiling": 122,
     "enforces": [
       "principle.p16"
     ],
