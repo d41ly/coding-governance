@@ -14,10 +14,14 @@
 # planted values from a file outside the repository, and a stub playbook kit whose `pockets` verb
 # prints one fact. The engine writes the session card `t1`, appends a READY body with a `## route`
 # naming `tFix`, and the case runs its verbs and prints one `card-store: <case> · <what> · held|MISSED`
-# line per observation. The scratch tree is removed at exit.
+# line per observation. The scratch tree is removed at exit. The card-import fixture's verdict
+# (KICK-dKeptSession-12) is planted in its file, or recorded by `--card --fixture-run` over a stub
+# fixture named by CARD_FIXTURE; those cases and every `context-` case export one `AI_AGENT`, so no
+# outcome reads the version of the session running the suite.
 # Exit 2 is a usage error, or a fixture that could not be built.
 # WHAT THIS DOES NOT CHECK: a remote other than a local bare one; a lost compare-and-swap, which needs
-# two writers between one read and its push; the engine's other cells, which their own arms cover.
+# two writers between one read and its push; the engine's other cells, which their own arms cover; the
+# real card-compaction.fixture.sh, which starts harness sessions and is never run here.
 set -u
 case "$0" in */*) HERE=${0%/*} ;; *) HERE=. ;; esac
 HERE=$(CDPATH= cd -- "$HERE" && pwd) || exit 2
@@ -26,7 +30,7 @@ PLANTS="render publish publish-off publish-unwritten publish-late publish-hung s
 follow-fixed snapshot-terminal snapshot-every lookup lookup-offline lookup-upstream lookup-hung replay context-idle context-always-resume
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
 partial-ask terminal-route close-follow-twice follow-offline-publish follow-offline-publish-online
-follow-foreign-after-cached follow-foreign-after-offline"
+follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-run worktree-named replay-order"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
 BRIEF=memory/builds/tFix/prompts/2026-01-01-prompt-TOOL-tFix-1-brief.md
@@ -81,6 +85,13 @@ read_ref_card() {
 }
 # measure_card_records <tree> — the build's card records.
 measure_card_records() { ls "$1/memory/builds/tFix/build/" 2>/dev/null | grep -c -- '-card-[0-9]*\.md$'; }
+# set_card_verdict <verdict> <blob8> <cli> — the card-import fixture's recorded verdict, planted in the
+# writer's grammar where the engine's reader finds it.
+set_card_verdict() {
+  local at; printf -v at '%(%Y-%m-%dT%H:%M:%S%z)T' -1
+  mkdir -p "$R/.git/orientation" \
+    && printf 'card-fixture — %s · fixture %s · cli %s · %s\n' "$1" "$2" "$3" "$at" > "$R/.git/orientation/card-fixture.verdict"
+}
 
 # The scratch repository: its build, the copied kits and the two stubs, committed and pushed.
 write_card_fixture() {
@@ -139,6 +150,10 @@ run_card_append() {
 }
 
 write_card_fixture || { echo "card-store: the fixture could not be built under $S"; sed 's/^/    /' "$OUT" 2>/dev/null; exit 2; }
+# The installed card-import fixture's blob, as the engine hashes it from the tree it runs in, and that
+# tree's toplevel as git spells it, the bytes of the `tree —` cell.
+FX_BLOB=$(git -C "$R" hash-object -- "$HERE/card-compaction.fixture.sh" 2>/dev/null)
+RT=$(git -C "$R" rev-parse --show-toplevel)
 
 case "$PLANT" in
   render)
@@ -297,22 +312,54 @@ case "$PLANT" in
     (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
     print_card_held "AC12 the replay re-keyed the routed build's card" "$(grep -q '^card — tFix · ' "$OUT"; echo $?)"
     print_card_held "AC12 FETCH_HEAD's mtime is unchanged" "$([ "$(stat -c %Y "$R/.git/FETCH_HEAD")" = "$m0" ]; echo $?)" ;;
-  context-*|partial-*|terminal-route)
-    run_card_append
+  fixture-run)
+    # KICK-dKeptSession-12 AC4: the verb over a stub fixture exiting 0, 1 and 2, each into its own
+    # scratch dir; every file under the scratch tree but those dirs and the case's output is listed
+    # before and after, so a write outside <dir> other than the verdict is seen.
+    export AI_AGENT=claude-code_9-9-2_agent
+    v="$R/.git/orientation/card-fixture.verdict"; mkdir -p "$S/snap"
+    printf 'exit 0\n' > "$S/stub0.sh"
+    printf '%s\n' 'echo "card-compaction: FAILED limb B — the stub names its limb"' 'exit 1' > "$S/stub1.sh"
+    printf 'exit 2\n' > "$S/stub2.sh"
+    find "$S" -path "$S/snap" -prune -o -path "$S/fx*" -prune -o -path "$OUT" -prune -o -type f -printf '%p %s %T@\n' | sort > "$S/snap/before"
+    for x in 0 1 2; do
+      CARD_FIXTURE="$S/stub$x.sh" run_card_engine "$R" --card --fixture-run "$S/fx$x"; rc=$?
+      case "$x" in 0) want='pass' ;; 1) want='red B' ;; 2) want='absent' ;; esac
+      b8=$(git -C "$R" hash-object -- "$S/stub$x.sh" | cut -c1-8)
+      print_card_held "AC4 a stub exiting $x records $want, and the verb prints that line and exits 0" \
+        "$([ "$rc" = 0 ] && grep -qx "card-fixture — $want · fixture $b8 · cli 9\.9\.2 · [0-9T:+-]*" "$v" && [ "$(tr -d '\r' < "$OUT")" = "$(tr -d '\r' < "$v")" ]; echo $?)"
+    done
+    find "$S" -path "$S/snap" -prune -o -path "$S/fx*" -prune -o -path "$OUT" -prune -o -type f -printf '%p %s %T@\n' | sort > "$S/snap/after"
+    moved=$(diff "$S/snap/before" "$S/snap/after" | sed -n 's/^[<>] \(.*\) [0-9]* [0-9.]*$/\1/p' | sort -u)
+    print_card_held "AC4 nothing outside the scratch dirs was written but the verdict (moved: ${moved:-none})" "$([ "$moved" = "$v" ]; echo $?)"
+    rm -f "$v"
+    CARD_FIXTURE="$S/stub9.sh" run_card_engine "$R" --card --fixture-run "$S/fx9"; rc=$?
+    print_card_held "AC4 with CARD_FIXTURE naming no file the verb exits 2 and writes no verdict" "$([ "$rc" = 2 ] && [ ! -e "$v" ]; echo $?)" ;;
+  context-*|partial-*|terminal-route|fixture-stale|worktree-named|replay-order)
+    case "$PLANT" in context-*|fixture-stale|worktree-named|replay-order) export AI_AGENT=claude-code_9-9-2_agent ;; esac
+    if [ "$PLANT" = worktree-named ]; then
+      # The build card published from a linked worktree, so its `tree —` cell names that tree, and the
+      # replay below runs in the primary.
+      git -C "$R" worktree add -q "$S/wt" -b wt 2>/dev/null || { echo "card-store: no worktree could be added under $S"; exit 2; }
+      WT=$(git -C "$S/wt" rev-parse --show-toplevel)
+      write_card_body "$S/body" 1
+      (cd "$S/wt" && bash "$CHECK" --card --append --session t1 < "$S/body") > "$OUT" 2>&1
+    else
+      run_card_append
+    fi
     case "$PLANT" in
-      context-always-resume|context-fixture-red) set_card_policy resume.context always-resume ;;
+      context-always-resume|context-fixture-red|fixture-stale) set_card_policy resume.context always-resume ;;
       context-always-fresh) set_card_policy resume.context always-fresh ;;
       partial-restart) set_card_policy resume.partial restart-item ;; partial-ask) set_card_policy resume.partial ask-owner ;;
     esac
     tx="$S/transcript.jsonl"; : > "$tx"; touch -d "@$(( EPOCHSECONDS - 1800 ))" "$tx"
     printf -v payload '{"session_id":"t1","transcript_path":"%s","cwd":"%s"}' "$tx" "$R"
-    read_card_fixture_verdict() { printf 'pass\n'; }
-    export -f read_card_fixture_verdict
     case "$PLANT" in
+      context-always-resume) set_card_verdict pass "${FX_BLOB:0:8}" 9.9.2 ;;
       context-fixture-red)
         printf '@.claude/orientation-card.md\n' > "$R/CLAUDE.md"
-        read_card_fixture_verdict() { printf 'red: no recorded run\n'; }
-        export -f read_card_fixture_verdict ;;
+        set_card_verdict 'red A' "${FX_BLOB:0:8}" 9.9.2 ;;
+      fixture-stale) set_card_verdict pass 00000000 9.9.2 ;;
       context-transcript-absent) printf -v payload '{"session_id":"t1","cwd":"%s"}' "$R" ;;
       partial-*) : > "$R/one.txt"; : > "$R/two.txt" ;;
     esac
@@ -326,20 +373,32 @@ case "$PLANT" in
     fi
     (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
     case "$PLANT" in
-      context-idle) print_card_held "AC7 fresh-when-idle, idle 1800s: fresh" "$(grep -q '^resume — fresh recommended: idle 1[0-9]*s past 300s (resume.context: fresh-when-idle)$' "$OUT"; echo $?)" ;;
-      context-always-resume) print_card_held "AC7 always-resume, the verdict pass: resume" "$(grep -qx 'resume — resume recommended (resume.context: always-resume)' "$OUT"; echo $?)" ;;
-      context-always-fresh) print_card_held "AC7 always-fresh: fresh" "$(grep -qx 'resume — fresh recommended (resume.context: always-fresh)' "$OUT"; echo $?)" ;;
+      context-idle) print_card_held "AC7 fresh-when-idle, idle 1800s: fresh, in the publisher's tree" "$([[ $(grep '^resume — ' "$OUT" | tr -d '\r') == "resume — fresh recommended: idle 1"*"s past 300s · in $RT (resume.context: fresh-when-idle)" ]]; echo $?)" ;;
+      context-always-resume) print_card_held "AC2 always-resume, a pass recorded for this fixture and cli: resume, no override" "$(grep -qx 'resume — resume recommended (resume.context: always-resume)' "$OUT"; echo $?)" ;;
+      context-always-fresh) print_card_held "AC7 always-fresh: fresh, in the publisher's tree" "$(grep -qxF "resume — fresh recommended · in $RT (resume.context: always-fresh)" "$OUT"; echo $?)" ;;
       context-fixture-red)
-        want='(resume.context: always-resume read as fresh-when-idle · card-import fixture red: no recorded run)'
-        print_card_held "AC7 always-resume, the verdict red and the import line present: fresh, the override named" "$(grep -F "$want" "$OUT" | grep -q '^resume — fresh recommended: idle '; echo $?)"
-        unset -f read_card_fixture_verdict
+        want='(resume.context: always-resume read as fresh-when-idle · card-import fixture red: red A)'
+        print_card_held "AC1 always-resume, a red verdict recorded and the import line present: fresh, the override named" "$(grep -F "$want" "$OUT" | grep -q '^resume — fresh recommended: idle '; echo $?)" ;;
+      fixture-stale)
+        print_card_held "AC3 a pass recorded for another fixture blob overrides" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: recorded for fixture 00000000, now ${FX_BLOB:0:8})"; echo $?)"
+        set_card_verdict pass "${FX_BLOB:0:8}" 1.0.0
         (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
-        print_card_held "AC7 ...and with no reader exported, the same" "$(grep -qF "$want" "$OUT" && grep -q '^resume — fresh recommended' "$OUT"; echo $?)" ;;
+        print_card_held "AC3 a pass recorded under another cli overrides" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF "card-import fixture red: recorded under cli 1.0.0, now 9.9.2)"; echo $?)" ;;
+      worktree-named)
+        print_card_held "AC5 a fresh recommendation names the worktree the stored tree cell names" "$([[ $(grep '^resume — ' "$OUT" | tr -d '\r') == "resume — fresh recommended: idle 1"*"s past 300s · in $WT (resume.context: fresh-when-idle)" ]] && [ "$WT" != "$RT" ]; echo $?)"
+        git -C "$R" worktree remove --force "$S/wt" 2>/dev/null
+        (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+        print_card_held "AC5 that tree no longer listed: a new worktree of tFix" "$(grep '^resume — fresh recommended: idle ' "$OUT" | grep -qF ' · in a new worktree of tFix (resume.context: fresh-when-idle)'; echo $?)" ;;
+      replay-order)
+        at=$(tr -d '\r' < "$OUT" | awk '/^READY — tFix/ && !r { r = NR } /^card — tFix · / && !c { c = NR } /^route — / && !o { o = NR }
+          /^resume — / && !e { e = NR } /^partial — / && !p { p = NR } /^now — / && !n { n = NR } END { print r + 0, c + 0, o + 0, e + 0, p + 0, n + 0 }')
+        read -r l1 l2 l3 l4 l5 l6 <<<"$at"
+        print_card_held "AC6 READY, card, route, resume, partial and now at lines $at, increasing" "$([ "$l1" -gt 0 ] && [ "$l1" -lt "$l2" ] && [ "$l2" -lt "$l3" ] && [ "$l3" -lt "$l4" ] && [ "$l4" -lt "$l5" ] && [ "$l5" -lt "$l6" ]; echo $?)" ;;
       context-transcript-absent)
-        print_card_held "AC7 no transcript_path: fresh, transcript absent" "$(grep -qx 'resume — fresh recommended: transcript absent (resume.context: fresh-when-idle)' "$OUT"; echo $?)"
+        print_card_held "AC7 no transcript_path: fresh, transcript absent, in the publisher's tree" "$(grep -qxF "resume — fresh recommended: transcript absent · in $RT (resume.context: fresh-when-idle)" "$OUT"; echo $?)"
         printf -v payload '{"session_id":"t1","transcript_path":"%s","cwd":"%s"}' "$S/deleted.jsonl" "$R"
         (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
-        print_card_held "AC7 a transcript_path naming a deleted file: the same" "$(grep -qx 'resume — fresh recommended: transcript absent (resume.context: fresh-when-idle)' "$OUT"; echo $?)" ;;
+        print_card_held "AC7 a transcript_path naming a deleted file: the same" "$(grep -qxF "resume — fresh recommended: transcript absent · in $RT (resume.context: fresh-when-idle)" "$OUT"; echo $?)" ;;
       partial-*)
         v=${PLANT#partial-}; case "$v" in continue) v=continue-item ;; restart) v=restart-item ;; ask) v=ask-owner ;; esac
         print_card_held "AC8 the partial line counts 2 paths and names $v" "$(grep -q "^partial — 2 uncommitted path(s) · resume.partial: $v · " "$OUT"; echo $?)"

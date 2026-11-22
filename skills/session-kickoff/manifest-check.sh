@@ -30,7 +30,9 @@
 #                                         # re-published at a stage move, as card.follows says
 #   manifest-check.sh --card --lookup --build <slug> --session <sid>    # the build card read back from
 #                                         # its first store that answers, re-keyed into the session's card
-#   manifest-check.sh --brief-skeleton    # the brief record's skeleton and the card's `## route`
+#   manifest-check.sh --card --fixture-run <scratch-dir>   # run card-compaction.fixture.sh there and
+#                                         # record its verdict in <git-common-dir>/orientation/card-fixture.verdict
+#   manifest-check.sh --brief-skeleton   # the brief record's skeleton and the card's `## route`
 #                                         # skeleton; like --task-skeleton, it needs no repository
 #     A body carrying `## route` is held to the route rules beside `check_card_route`: every unit,
 #     its spec and the brief must RESOLVE, or nothing is appended (KICK-aRoutedQuill-1).
@@ -193,17 +195,19 @@ done
 # through to that catch-all exactly as they did before this block existed.
 # The build card's verbs (TOOL-dPlacedRequest-2) take `--build <slug>`, and the follow `--to <state>`
 # and `--terminal`; each value is held to its grammar here, before it is joined into a ref or a path.
-CARD=""; CARD_VERB=""; CARD_SID=""; CARD_BUILD=""; CARD_STEP=""; CARD_TERMINAL=0; _rest=(); _want=""
+CARD=""; CARD_VERB=""; CARD_SID=""; CARD_BUILD=""; CARD_STEP=""; CARD_TERMINAL=0; CARD_FIXTURE_DIR=""; _rest=(); _want=""
 for _a in "$@"; do [ "$_a" = --card ] && CARD=1; done
 for _a in "$@"; do
   case "$_want" in
     sid) CARD_SID="$_a"; _want=""; continue ;;
     build) CARD_BUILD="$_a"; _want=""; continue ;;
     to) CARD_STEP="$_a"; _want=""; continue ;;
+    fixture) CARD_FIXTURE_DIR="$_a"; _want=""; continue ;;
   esac
   case "$CARD$_a" in
     1--card) ;;
     1--write|1--replay|1--path|1--append|1--check|1--publish|1--follow|1--lookup) CARD_VERB="${_a#--}" ;;
+    1--fixture-run) CARD_VERB=fixture-run; _want=fixture ;;
     1--session) _want=sid ;;
     1--session=*) CARD_SID="${_a#--session=}" ;;
     1--build) _want=build ;;
@@ -214,13 +218,15 @@ for _a in "$@"; do
 done
 set -- ${_rest[@]+"${_rest[@]}"}
 if [ -n "$CARD" ] && [ -z "$CARD_VERB" ]; then
-  echo "MANIFEST env ERROR — --card needs one of --write, --replay, --path, --append, --check, --publish, --follow or --lookup"; exit 2
+  echo "MANIFEST env ERROR — --card needs one of --write, --replay, --path, --append, --check, --publish, --follow, --lookup or --fixture-run"; exit 2
 fi
 if [ -n "$CARD" ]; then
   case "$CARD_VERB:${CARD_BUILD:+b}" in
     publish:|follow:|lookup:) echo "MANIFEST env ERROR — --card --$CARD_VERB needs --build <slug>"; exit 2 ;;
-    write:b|replay:b|append:b|check:b) echo "MANIFEST env ERROR — --build is the build card's flag, and --card --$CARD_VERB takes none"; exit 2 ;;
+    write:b|replay:b|append:b|check:b|fixture-run:b) echo "MANIFEST env ERROR — --build is the build card's flag, and --card --$CARD_VERB takes none"; exit 2 ;;
   esac
+  [ "$CARD_VERB" != fixture-run ] || [ -n "$CARD_FIXTURE_DIR" ] \
+    || { echo "MANIFEST env ERROR — --card --fixture-run needs <scratch-dir>, the directory the card-import fixture builds under"; exit 2; }
   [ -z "$CARD_BUILD" ] || [[ $CARD_BUILD =~ ^[A-Za-z0-9]+$ ]] \
     || { echo "MANIFEST env ERROR — --build '$CARD_BUILD' is not a build slug, [A-Za-z0-9]+, and is not joined into a ref or a path"; exit 2; }
   if [ "$CARD_VERB" = follow ]; then
@@ -245,6 +251,11 @@ cd "$ROOT" || exit 2
 # instruction from nobody. The cap is one constant; the append verb of the next unit refuses against
 # the same one. The env override exists for the self-test's over-cap arm and is not an adopter knob.
 CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
+# The card-import fixture `--card --fixture-run` runs and `read_card_fixture_verdict` hashes, the kickoff
+# engine's sibling (KICK-dKeptSession-12 S1). The env override exists for the self-test's stub fixture,
+# as CARD_CAP_BYTES's does, and is not an adopter knob.
+CARD_FIXTURE=${CARD_FIXTURE:-$MC_DIR/card-compaction.fixture.sh}
+CARD_FIXTURE_VERDICT=card-fixture.verdict
 # The `overlaps —` cell's two constants (KICK-aMendedFleet-2): the read's bound in seconds and the
 # row cap. The bound's env override exists for the self-test's slow-driver arm, as CARD_CAP_BYTES's
 # does; neither is an adopter knob.
@@ -357,6 +368,68 @@ read_session_id() {
   CARD_SID="$sid"
 }
 
+# The session's Claude Code version, read from `AI_AGENT` by the unattended driver's rule, spelled again
+# here because this kit names no file of another: a `claude-code_` prefix, the field before the next
+# `_`, dashes as dots, two to four integers. ONE READER (KICK-dKeptSession-12 S1): the `cli —` cell and
+# the card-import fixture's verdict both ask it.
+read_session_cli_version() { # -> the version on stdout; 1 and nothing when AI_AGENT names none
+  local s=""
+  case "${AI_AGENT:-}" in claude-code_*) s=${AI_AGENT#claude-code_}; s=${s%%_*}; s=${s//-/.} ;; esac
+  [[ $s =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || return 1
+  printf '%s\n' "$s"
+}
+
+# THE CARD-IMPORT FIXTURE'S VERDICT (KICK-dKeptSession-12 S1, S2): one line in the card directory,
+# `card-fixture — <verdict> · fixture <blob8> · cli <version> · <iso>`, node-local because the harness
+# that compacts is the node's, and overwritten by every `--card --fixture-run`. The verdict is `pass`
+# for the fixture's exit 0, `red <limb>` for exit 1 with the limb its last line names after `FAILED
+# limb`, `absent` for its could-not-run exit 2, and `red exit <rc>` otherwise; the blob is `git
+# hash-object` over the fixture, the version `read_session_cli_version`'s, else `unknown`. The writer
+# writes nothing outside the scratch directory but this file; the fixture's harness keeps its own
+# transcripts, the one write it names. WHAT THIS DOES NOT CHECK: that the fixture judged anything — a
+# stub under CARD_FIXTURE records a pass as readily as the real one, and the blob is what tells them apart.
+write_card_fixture_verdict() { # scratch dir -> the line it wrote; 2 with nothing written when no fixture runs
+  local dir=$1 out rc verdict blob ver at line re_limb='FAILED limb ([A-Za-z0-9]+)'
+  [ -f "$CARD_FIXTURE" ] || { echo "MANIFEST env ERROR — no card-import fixture at $CARD_FIXTURE, so nothing ran and no verdict was written"; return 2; }
+  blob=$(git hash-object -- "$CARD_FIXTURE" 2>/dev/null) && [ -n "$blob" ] \
+    || { echo "MANIFEST env ERROR — git hash-object could not read $CARD_FIXTURE, so nothing ran and no verdict was written"; return 2; }
+  case "$dir" in /*|[A-Za-z]:*) ;; *) dir="$CALLER_PWD/$dir" ;; esac
+  out=$(bash "$CARD_FIXTURE" "$dir" </dev/null 2>&1); rc=$?
+  out=${out//$'\r'/}
+  case "$rc" in
+    0) verdict=pass ;;
+    1) verdict="red exit 1"; [[ ${out##*$'\n'} =~ $re_limb ]] && verdict="red ${BASH_REMATCH[1]}" ;;
+    2) verdict=absent ;;
+    *) verdict="red exit $rc" ;;
+  esac
+  ver=$(read_session_cli_version) || ver=unknown
+  printf -v at '%(%Y-%m-%dT%H:%M:%S%z)T' -1
+  line="card-fixture — $verdict · fixture ${blob:0:8} · cli $ver · $at"
+  { mkdir -p "$CARD_DIR" && printf '%s\n' "$line" > "$CARD_DIR/$CARD_FIXTURE_VERDICT"; } 2>/dev/null \
+    || { echo "MANIFEST env ERROR — cannot write $CARD_DIR/$CARD_FIXTURE_VERDICT, so the fixture's $verdict is unrecorded"; return 2; }
+  printf '%s\n' "$line"
+}
+
+# The verdict's reader, which `derive_resume_lines`' `always-resume` arm asks: `pass` only while the
+# recorded verdict is `pass`, its blob is the installed fixture's now and its version
+# `read_session_cli_version`'s now; otherwise one `red: <why>` line. A line off the writer's grammar
+# reads as no run, so the override can only fail towards recommending a fresh session.
+read_card_fixture_verdict() { # -> pass, or red: <why>; one line on stdout, 0 always
+  local l="" v old8 oldv blob ver
+  local re='^card-fixture — (pass|absent|red [A-Za-z0-9 ]+) · fixture ([0-9a-f]{8}) · cli ([0-9]+(\.[0-9]+){1,3}|unknown) · [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[+-][0-9]{4}$'
+  [ -f "$CARD_FIXTURE" ] || { echo "red: no fixture installed"; return 0; }
+  [ -f "$CARD_DIR/$CARD_FIXTURE_VERDICT" ] && IFS= read -r l < "$CARD_DIR/$CARD_FIXTURE_VERDICT"
+  l=${l%$'\r'}
+  [[ $l =~ $re ]] || { echo "red: no recorded run"; return 0; }
+  v=${BASH_REMATCH[1]}; old8=${BASH_REMATCH[2]}; oldv=${BASH_REMATCH[3]}
+  [ "$v" = pass ] || { echo "red: $v"; return 0; }
+  blob=$(git hash-object -- "$CARD_FIXTURE" 2>/dev/null); blob=${blob:-unhashed}
+  [ "${blob:0:8}" = "$old8" ] || { echo "red: recorded for fixture $old8, now ${blob:0:8}"; return 0; }
+  ver=$(read_session_cli_version) || ver=unknown
+  [ "$ver" = "$oldv" ] || { echo "red: recorded under cli $oldv, now $ver"; return 0; }
+  echo pass
+}
+
 # `--path` answers here, before the manifest resolves: it needs the repository (for the common dir)
 # and the id, and nothing else. Print-only, exit 0, no `fail` branch — the `--locations` shape.
 if [ -n "$CARD" ]; then
@@ -365,6 +438,9 @@ if [ -n "$CARD" ]; then
   CARD_DIR="$CARD_DIR/orientation"
   # The build card's cache path is keyed by the build, so it needs no session (TOOL-dPlacedRequest-2 S10).
   [ "$CARD_VERB:${CARD_BUILD:+b}" = path:b ] && { printf '%s/%s.md\n' "$CARD_DIR" "$CARD_BUILD"; exit 0; }
+  # The fixture's run judges the node's harness, not a session's, so it takes no session and reads no
+  # stdin, and answers before `read_session_id`, which would refuse it or wait on stdin (KICK-dKeptSession-12 S1).
+  [ "$CARD_VERB" != fixture-run ] || { write_card_fixture_verdict "$CARD_FIXTURE_DIR"; exit $?; }
   # A follow runs from the loop kit's transition writer, which holds no session: the card names the
   # harness's session where one is in the environment, else `none`.
   [ "$CARD_VERB" != follow ] || [ -n "$CARD_SID" ] || CARD_SID=${CLAUDE_CODE_SESSION_ID:-none}
@@ -474,16 +550,14 @@ derive_node_tag() {
 }
 
 # The `cli —` cell (KICK-aMendedFleet-4): PATH's `claude --version` against the running session's
-# version. The session's is read from `AI_AGENT` by the unattended driver's rule, spelled again here
-# because this kit names no file of another: a `claude-code_` prefix, the field before the next `_`,
-# dashes as dots, two to four integers. The PATH read is bounded and lands in a scratch file under
-# the card dir, never a `$( )` capture a grandchild could hold open. Fields compare as integers, a
-# missing one as 0; every failure is its own `skipped:` line, and none moves the card's exit.
+# version. The session's is `read_session_cli_version`'s, the one reader of `AI_AGENT`. The PATH read
+# is bounded and lands in a scratch file under the card dir, never a `$( )` capture a grandchild could
+# hold open. Fields compare as integers, a missing one as 0; every failure is its own `skipped:` line,
+# and none moves the card's exit.
 derive_cli_line() {
   local s="" p="" t sf rc c=0 i
   local -a toks a b
-  case "${AI_AGENT:-}" in claude-code_*) s=${AI_AGENT#claude-code_}; s=${s%%_*}; s=${s//-/.} ;; esac
-  [[ $s =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || { printf 'cli — skipped: AI_AGENT names no Claude Code version\n'; return 0; }
+  s=$(read_session_cli_version) || { printf 'cli — skipped: AI_AGENT names no Claude Code version\n'; return 0; }
   command -v claude >/dev/null 2>&1 || { printf 'cli — skipped: no claude on PATH\n'; return 0; }
   sf="$CARD_DIR/.cli.$$"
   mkdir -p "$CARD_DIR" 2>/dev/null
@@ -955,6 +1029,11 @@ derive_pockets_block() {
 REPLAY_KEYS=""
 print_replay() {
   local build="" said="" keep
+  # I10, THE REPLAY ORDER, stated here alone and fixed by the order of these calls (KICK-dKeptSession-12
+  # S5): the map block, the stored card re-keyed, its `card —` line, then `derive_resume_lines`' `route —`,
+  # `resume —` and `partial —` lines, then the computed lines the session units add after `partial —` —
+  # `position —` and, after a compaction, its `lead —` notice (KICK-dKeptSession-15), then `context —`
+  # (KICK-dKeptSession-14) — and the one `now —` line last.
   derive_map_block
   if [ -f "$CARD_FILE" ]; then
     build=$(read_card_build "$CARD_FILE")
@@ -2238,14 +2317,23 @@ read_card_build() { # file -> the slug, or nothing
     inr && /^- build: [A-Za-z0-9]+$/ { print substr($0, 10); exit }' "$1"
 }
 
+# The publisher's tree (KICK-dKeptSession-12 S4): the `tree —` cell's first field, up to ` · `, of the
+# build card `resolve_build_card` stored in `$CARD_TMP/bc.found` before its re-key, since the re-key
+# re-renders that cell in the replaying session's own tree. Nothing when no card was found.
+read_stored_tree_cell() { # -> the path, or nothing; 0 always
+  [ -f "$CARD_TMP/bc.found" ] || return 0
+  awk '{ sub(/\r$/, "") } /^tree — / { sub(/^tree — /, ""); i = index($0, " · "); print (i ? substr($0, 1, i - 1) : $0); exit }' "$CARD_TMP/bc.found"
+}
+
 # The resume (S7), after the replay's lookup: the route re-checked over the re-keyed card, then the
 # `resume —` line under resume.context and the `partial —` line under resume.partial. `always-resume`
-# holds only while the card-import fixture's recorded verdict, KICK-dKeptSession-12's
-# `read_card_fixture_verdict`, answers `pass`; while no such reader is defined it reads `red: no recorded
-# run`, that unit's own reason. The entry file is not consulted. The `partial —` line names the act the
-# kickoff skill's resume paragraph states; the replay performs none of them.
+# holds only while the card-import fixture's recorded verdict, `read_card_fixture_verdict`, answers
+# `pass`. The entry file is not consulted. Every line recommending fresh names the tree to start it in
+# (KICK-dKeptSession-12 S4): the stored build card's `tree —` path where `git worktree list` lists it
+# byte for byte, else a new worktree of the build. The `partial —` line names the act the kickoff
+# skill's resume paragraph states; the replay performs none of them.
 derive_resume_lines() { # slug -> the route —, resume — and partial — lines; 0 always
-  local out rc rule ctx rec part act v mtime idle n tx=$CARD_TRANSCRIPT
+  local out rc rule ctx rec part act v mtime idle n tx=$CARD_TRANSCRIPT tree wl where
   out=$( CARD_TMP="$CARD_TMP/rc" && mkdir -p "$CARD_TMP" && check_card_citations "$CARD_FILE" >/dev/null 2>&1 \
          && extract_card_parts "$CARD_FILE" && check_card_route "$CARD_FILE" 1 2>&1 ); rc=$?
   rule=ok
@@ -2255,20 +2343,22 @@ derive_resume_lines() { # slug -> the route —, resume — and partial — line
   fi
   printf 'route — re-checked · %s\n' "${rule:-unchecked: the check exited $rc}"
   if ctx=$(read_card_policy resume.context); then
-    rec="fresh recommended: transcript absent"
+    tree=$(read_stored_tree_cell); where="a new worktree of $1"
+    if [ -n "$tree" ] && wl=$(git worktree list --porcelain 2>/dev/null); then
+      wl=${wl//$'\r'/}
+      [[ $'\n'$wl$'\n' == *$'\n'"worktree $tree"$'\n'* ]] && where=$tree
+    fi
+    rec="fresh recommended: transcript absent · in $where"
     if [ -n "$tx" ] && [ -f "$tx" ] && mtime=$(stat -c %Y -- "$tx" 2>/dev/null) && [[ $mtime =~ ^[0-9]+$ ]]; then
       idle=$(( EPOCHSECONDS - mtime ))
-      if [ "$idle" -gt "$RESUME_IDLE_S" ]; then rec="fresh recommended: idle ${idle}s past ${RESUME_IDLE_S}s"
+      if [ "$idle" -gt "$RESUME_IDLE_S" ]; then rec="fresh recommended: idle ${idle}s past ${RESUME_IDLE_S}s · in $where"
       else rec="resume recommended: idle ${idle}s within ${RESUME_IDLE_S}s"; fi
     fi
     case "$ctx" in
-      always-fresh) printf 'resume — fresh recommended (resume.context: always-fresh)\n' ;;
+      always-fresh) printf 'resume — fresh recommended · in %s (resume.context: always-fresh)\n' "$where" ;;
       fresh-when-idle) printf 'resume — %s (resume.context: fresh-when-idle)\n' "$rec" ;;
       always-resume)
-        v="red: no recorded run"
-        if declare -F read_card_fixture_verdict >/dev/null; then
-          v=$(read_card_fixture_verdict 2>/dev/null | head -n 1 | tr -d '\r'); v=${v:-red: the reader printed nothing}
-        fi
+        v=$(read_card_fixture_verdict); v=${v:-red: the reader printed nothing}
         if [ "$v" = pass ]; then printf 'resume — resume recommended (resume.context: always-resume)\n'
         else printf 'resume — %s (resume.context: always-resume read as fresh-when-idle · card-import fixture red: %s)\n' "$rec" "${v#red: }"; fi ;;
     esac

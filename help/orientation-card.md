@@ -140,7 +140,7 @@ again and prints the resume lines after the card:
 
 ```text
 route — re-checked · ok
-resume — fresh recommended: idle 1840s past 300s (resume.context: fresh-when-idle)
+resume — fresh recommended: idle 1840s past 300s · in C:/work/repo/.claude/worktrees/dExample (resume.context: fresh-when-idle)
 partial — 2 uncommitted path(s) · resume.partial: continue-item · kept, the item continues, its witness still owed
 ```
 
@@ -152,3 +152,15 @@ verdict is a pass, and otherwise reads as `fresh-when-idle` and says why. `resum
 what to do with uncommitted work: `continue-item`, `restart-item` (commit the work to
 `partial/<slug>/<sid8>`, then restore the tree) or `ask-owner`. The kickoff skill's resume paragraph
 states each act. The replay itself changes nothing in your tree.
+
+The card-import fixture's verdict lives in one file per clone, `card-fixture.verdict` in the
+`orientation` folder of the git common directory, so every worktree reads the same one. Record it on
+a machine by running `manifest-check.sh --card --fixture-run <empty-dir>`: it runs
+`card-compaction.fixture.sh` in that directory, which starts two headless sessions and takes
+minutes, then writes and prints one line such as `card-fixture — pass · fixture 3f9c2a71 · cli
+2.1.308 · 2026-10-27T09:14:02+0000`. A pass counts only while the fixture file and the Claude Code
+version are both still the ones it names, so editing the fixture or upgrading the CLI makes it stale,
+and the override returns until you run the fixture again. With no file, the reason printed is `no
+recorded run`. Every fresh recommendation names the tree to start in after `· in`: the worktree the
+build's card was published from, when `git worktree list` still lists it, else `a new worktree of
+<slug>`.
