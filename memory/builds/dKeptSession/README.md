@@ -127,7 +127,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-9 — orientation cost recorded per stage and held as `orient.budget` says](spec/2026-10-26-spec-KICK-dKeptSession-9.md) | 13 | 2 | CLOSED | rev-7 | 2026-11-22 |
 | [KICK-dKeptSession-28 — a mailbox recipient names a build, a unit, a node by its fleet tag, or the whole project](spec/2026-10-26-spec-KICK-dKeptSession-28.md) | 14 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [KICK-dKeptSession-45 — the window scan's default root resolved by `resolve_projects_root`, never a literal profile path](spec/2026-10-26-spec-KICK-dKeptSession-45.md) | 14 | 2 | CLOSED | rev-5 | 2026-11-22 |
-| [KICK-dKeptSession-46 — every fill reader passes the projects root it already resolved, so the window is derived under the tree the reader reads](spec/2026-10-26-spec-KICK-dKeptSession-46.md) | 14 | 2 | INPROGRESS | rev-5 | 2026-11-22 |
+| [KICK-dKeptSession-46 — every fill reader passes the projects root it already resolved, so the window is derived under the tree the reader reads](spec/2026-10-26-spec-KICK-dKeptSession-46.md) | 14 | 2 | INPROGRESS | rev-6 | 2026-11-22 |
 | [KICK-dKeptSession-47 — a compaction counts towards a model's window only when the session's last main usage before it is on that model](spec/2026-10-26-spec-KICK-dKeptSession-47.md) | 14 | 2 | DEFERRED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-48 — the mixed-window limit stated, and a 200k session on a 1M-observed model read against its own window by the harness's variable](spec/2026-10-26-spec-KICK-dKeptSession-48.md) | 14 | 2 | DEFERRED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-22 — each message's id derived from what it says, never from its sender's session, and a retried post refused across the build's session refs](spec/2026-10-26-spec-KICK-dKeptSession-22.md) | 15 | 2 | DEFERRED | rev-7 | 2026-11-21 |
@@ -165,7 +165,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-2 | 2026-11-21 |
 <!-- /gen:build-units -->
 
-Records: 331 bound to this build, across 4 record folder(s).
+Records: 333 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
