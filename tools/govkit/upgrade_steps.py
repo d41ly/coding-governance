@@ -2728,10 +2728,12 @@ def blob_at(root, commit: str, path: str, batch=None) -> bytes | None:
     `git show` per blob. TOOL-dQuietDisk-16 S2: a `missing` or `ambiguous` reply is None, as the
     spawn is; an end of stream or a header that does not parse answers through the spawn and
     marks the handle dead, so a dead process never reads as a missing blob, and a name holding a
-    newline, which the line-framed protocol cannot carry, is a spawn too.
+    newline or a CR, which the line-framed protocol cannot carry, is a spawn too, as
+    `BatchReader.read_reply` sends it: the batch reads a name ending in a CR as the name without it,
+    so it would answer one file's bytes for another file's name (TOOL-dQuietDisk-37 S9).
     """
     name = f"{commit}:{path}"
-    if batch is not None and not batch.dead and "\n" not in name:
+    if batch is not None and not batch.dead and "\n" not in name and "\r" not in name:
         proc = batch.init_process()
         try:
             proc.stdin.write(f"{name}\n".encode("utf-8"))

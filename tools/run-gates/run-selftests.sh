@@ -1032,8 +1032,13 @@ export SELFTEST_INNER_WIDTH=$(( W / OUTER )); [ "$SELFTEST_INNER_WIDTH" -ge 1 ] 
 # the next bar or the next run of this one. The record and the sweep are the bar's `owned_work_sh`
 # block, inlined below with the three helpers it calls and defines none of: the `health_log_sh` block,
 # and the bar's `derive_temp_path` and `ts_alive` one-liners, copied as the runner spells them.
-# Every row's TMPDIR, TEMP and TMP sit under it, so a row's template cache finds this root's
-# `templates` through the cache's own walk, and a native child's temp lands inside it too.
+# Two modes run rows under it, so a row's template cache finds this root's `templates` through the
+# cache's own walk and a native child's temp lands inside it too: `--pooled` sets each row's TMPDIR,
+# TEMP and TMP to `$RS_SCRATCH/s/<row>/tmp`, and `--serial` exports all three as the root itself,
+# whose own entries are names no `mktemp` makes (TOOL-dQuietDisk-37 S11). `--attribute` keeps the
+# ambient TMPDIR: its L and R runs grade two revisions, and under one root they would share one
+# template cache, whose key leaves a builder's helpers out, so R could reuse a template L built with
+# other helpers and report a wrong baseline; keeping the sides apart would cost two more owned roots.
 # >>> health_log_sh — canonical copy: health-log.sh in gov's lib dir (byte-identical; gated)
 # I3, THE HEALTH LOG (TOOL-aGraftedHelix-8): `<git-common-dir>/health.log`, one LF-terminated UTF-8
 # line per automatic self-heal, four TAB-separated fields: utc (`YYYY-MM-DDTHH:MM:SS+00:00`), source
@@ -2391,6 +2396,9 @@ fi
 
 echo "run-selftests: $NROWS suite(s), declared total $(( (TOTAL + 59) / 60 )) minutes, width $W (outer $OUTER, inner $SELFTEST_INNER_WIDTH)"
 st=0; ran=0; over=0
+# THE SERIAL ROWS RUN UNDER THE OWNED ROOT (TOOL-dQuietDisk-37 S11), so the EXIT trap removes their
+# scratch and a killed run strands nothing the next one cannot sweep; the root itself, no new entry.
+export TMPDIR="$RS_SCRATCH" TEMP="$RS_SCRATCH" TMP="$RS_SCRATCH"
 while IFS=$'\t' read -r state name budget argv; do
   [ -n "${name:-}" ] || continue
   # THE STATE IS READ HERE TOO. This loop used to ignore it entirely, so an UNRESOLVED row -- whose

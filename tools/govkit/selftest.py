@@ -6086,6 +6086,213 @@ def check_step_rollback() -> None:
                   needle in refused if needle else refused == "", refused or "passed")
 
 
+def check_kit_attestations(tmp: pathlib.Path) -> None:
+    """TOOL-dQuietDisk-37 S1, the review's M1: `derive_kit_attestations` against a record the RUNNER
+    wrote. One scratch gov holds `demo`, whose `kit` leg requires `dep`, `dep`, and a `run-gates`
+    home carrying the runner and `held_halves.py`; one fixture bar under `GATE_SELFTESTS=1` writes
+    `gate-selftest-last`. The manifest row carries `purpose`, a declarative key, so the first line
+    reds when either side hashes the whole row and the other leaves the key out: two copies of one
+    expression, with this the one comparison of them. Every later line is graded only where the
+    restored fixture attests again, so none passes on a fixture that never attested."""
+    G = govkit_module()
+    g = tmp / "kit-attest"
+    gk, rg = g / PFX / KIT_NAMES["govkit"], g / PFX / KIT_NAMES["run-gates"]
+    for d in (gk, rg, g / PFX / "demo", g / PFX / "dep"):
+        d.mkdir(parents=True)
+    for name in ("govkit.py", "upgrade_steps.py", "adopters.toml"):
+        shutil.copy2(GOVKIT.parent / name, gk / name)
+    # held_halves.py imports its verdict grammar from profile_bar.py, so the sibling travels with it.
+    for name in ("run-gates.sh", "gate-profiles.txt", "gate-fingerprint.sh", "held_halves.py", "profile_bar.py"):
+        shutil.copy2(KIT_DIRS["run-gates"] / name, rg / name)
+    (gk / "registry.toml").write_text(
+        '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
+        + "".join(f'[[entry]]\nid = "{e}"\ndescriptor = "{{prefix}}/{h}/kit.toml"\n\n'
+                  for e, h in (("demo", "demo"), ("dep", "dep"), ("run-gates", KIT_NAMES["run-gates"])))
+        + '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n', encoding="utf-8", newline="\n")
+    tail = 'version_from = { none = "fixture" }\n\n[adopt]\nargv = []\nmutates_index = false\n'
+    (g / PFX / "demo" / "kit.toml").write_text(
+        'id = "demo"\nhome = "demo"\nrequires = ["dep"]\n' + tail
+        + '\n[[files]]\ninclude = ["a.sh"]\nrole = "engine"\n\n[[gate_leg]]\nname = "demo"\n'
+        f'argv = ["bash", "{PFX}demo/a.sh"]\nguard = []\nsubject = "kit"\n', encoding="utf-8", newline="\n")
+    (g / PFX / "dep" / "kit.toml").write_text(
+        'id = "dep"\nhome = "dep"\nrequires = []\n' + tail + '\n[[files]]\ninclude = ["a.sh"]\nrole = "engine"\n',
+        encoding="utf-8", newline="\n")
+    (rg / "kit.toml").write_text(f'id = "run-gates"\nhome = "{KIT_NAMES["run-gates"]}"\nrequires = []\n' + tail,
+                                 encoding="utf-8", newline="\n")
+    for e in ("demo", "dep"):
+        (g / PFX / e / "a.sh").write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8", newline="\n")
+    (g / PFX / "gate-legs.json").write_text(json.dumps(
+        [{"name": "demo", "argv": ["bash", f"{PFX}demo/a.sh"], "guard": [], "subject": "kit",
+          "purpose": "the fixture leg whose row hash leaves this key out"}], indent=2) + "\n",
+        encoding="utf-8", newline="\n")
+    pin = ("-c", "core.autocrlf=false", "-c", "core.hooksPath=", "-c", "commit.gpgsign=false",
+           "-c", "user.name=t", "-c", "user.email=t@e")
+    git(g, "init", "-q", "--template=", "--object-format=sha1", "-b", "main")
+    git(g, *pin, "add", "-A")
+    git(g, *pin, "commit", "-qm", "base")
+    (g / "README.md").write_text("fixture\n", encoding="utf-8", newline="\n")
+    git(g, *pin, "add", "README.md")
+    git(g, *pin, "commit", "-qm", "readme")
+    revs = subprocess.run(["git", "-C", str(g), "rev-list", "--reverse", "HEAD"], capture_output=True,
+                          text=True, check=False).stdout.split()
+    first, head = (revs + ["", ""])[:2] if len(revs) == 2 else ("", "")
+    # The bar's environment: no inherited GATE_ name, and no git location or pathspec variable, so it
+    # answers about this fixture and never about an outer run or repository.
+    env = {k: v for k, v in os.environ.items()
+           if not k.startswith("GATE_") and not (k.startswith("GIT_") and not k.startswith("GIT_CONFIG"))}
+    env.update(GATE_SELFTESTS="1", GATE_FULL="1", GATE_PROFILE="minimal", GATE_TURNSTILE="0", GATE_WALL="0",
+               PYTHONDONTWRITEBYTECODE="1")
+    try:
+        bar = subprocess.run(G.resolve_shell_argv(["bash", f"{PFX}{KIT_NAMES['run-gates']}/run-gates.sh"]),
+                             cwd=str(g), env=env, capture_output=True, text=True, encoding="utf-8",
+                             errors="replace", timeout=600, check=False)
+        said, rc = bar.stdout + bar.stderr, bar.returncode
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        said, rc = str(exc), -1
+    record = g / ".git" / "gate-selftest-last" / hashlib.sha1(b"demo").hexdigest()[:16]
+    saved = record.read_bytes() if record.is_file() else b""
+    rec = dict(ln.split("\t", 1) for ln in saved.decode("utf-8", "replace").splitlines() if "\t" in ln)
+    sources = sorted(f"{PFX}{e}/a.sh" for e in ("demo", "dep"))
+
+    def read_demo_attestation(to_commit: str = "") -> dict | None:
+        return next((a for a in G.derive_kit_attestations(g, to_commit or head) if a.get("kit") == "demo"), None)
+
+    att = read_demo_attestation() if saved and head else None
+    check("[dQD-37] S1 the runner's own record attests demo, whose row carries `purpose`, and its legs row is the record's",
+          rc == 0 and rec.get("sha") == head and att is not None and [x.get("row") for x in att["legs"]] == [rec.get("row")],
+          f"bar exit {rc}, record {rec!r}, attestation {att!r}; the bar said:\n{said[-3000:]}")
+    listed = subprocess.run(["git", "-C", str(g), "ls-tree", "-r", "HEAD"], capture_output=True, text=True,
+                            check=False).stdout.splitlines()
+    oids = {ln.split("\t", 1)[1]: ln.split()[2] for ln in listed if "\t" in ln}
+    digest = hashlib.sha256("".join(f"{s}\t{oids.get(s)}\n" for s in sources).encode("utf-8")).hexdigest()
+    check("[dQD-37] S1 the digest is the SHA-256 of demo's and dep's ls-tree lines, and the legs entry holds the record's sha",
+          att is not None and [s for s, _o in att["sources"]] == sources and att["digest"] == digest
+          and [x.get("sha") for x in att["legs"]] == [head], f"{att!r} want digest {digest}")
+
+    def check_unattested(label: str, broken) -> None:
+        try:
+            got = broken()
+        finally:
+            record.parent.mkdir(parents=True, exist_ok=True)
+            record.write_bytes(saved)
+            git(g, "reset", "-q", "--hard", head)
+        check(f"[dQD-37] S1 {label}, demo is not attested", att is not None and got is None
+              and read_demo_attestation() is not None, f"under the break {got!r}")
+
+    def write_moved_source(e: str):
+        (g / PFX / e / "a.sh").write_text("#!/usr/bin/env bash\n# moved\nexit 0\n", encoding="utf-8", newline="\n")
+        git(g, *pin, "commit", "-qm", f"move {e}", "--", f"{PFX}{e}/a.sh")
+        return read_demo_attestation(subprocess.run(["git", "-C", str(g), "rev-parse", "HEAD"], capture_output=True,
+                                                    text=True, check=False).stdout.strip())
+
+    check_unattested("with no record file", lambda: (record.unlink(missing_ok=True), read_demo_attestation())[1])
+    check_unattested("with the record's row forty zeros", lambda: (record.write_bytes(
+        saved.replace(f"row\t{rec.get('row', '')}".encode(), b"row\t" + b"0" * 40)), read_demo_attestation())[1])
+    check_unattested("with a demo source moved after the record's sha", lambda: write_moved_source("demo"))
+    check_unattested("with a dep source moved after the record's sha", lambda: write_moved_source("dep"))
+    got7 = G.derive_kit_attestations(g, first) if first else None
+    check("[dQD-37] S1 at a to_commit that is the fixture's first commit and not HEAD, the answer is []",
+          att is not None and bool(first) and first != head and got7 == [], f"{got7!r}")
+
+
+def check_blob_batch(tmp: pathlib.Path) -> None:
+    """TOOL-dQuietDisk-37 S10, the review's L1 and L3: `blob_at`'s batch branches, each asked with
+    and without a `BlobBatch` over one scratch repository holding a committed `a`. A missing path and
+    an ambiguous commit prefix are None and keep the handle live; an `ambiguous` reply, which no
+    `<commit>:<path>` name reaches on git 2.54, comes from a stand-in process; a killed process
+    answers through the spawn and marks the handle dead; a name holding a newline or a CR never
+    reaches the batch, whose line framing would read `a` followed by a CR as `a`."""
+    us = govkit_module().upgrade_steps
+    repo = tmp / "blob-batch"
+    repo.mkdir(parents=True)
+    pin = ("-c", "core.autocrlf=false", "-c", "core.hooksPath=", "-c", "commit.gpgsign=false",
+           "-c", "user.name=t", "-c", "user.email=t@e")
+    git(repo, "init", "-q", "--object-format=sha1", "-b", "main")
+    (repo / "a").write_bytes(b"the bytes of a\n")
+    git(repo, *pin, "add", "a")
+    git(repo, *pin, "commit", "-qm", "a")
+    want = subprocess.run(["git", "-C", str(repo), "show", "HEAD:a"], capture_output=True, check=False).stdout
+
+    class SpyBatch(us.BlobBatch):
+        """A real handle that records whether `blob_at` ever started its process."""
+        started = False
+
+        def init_process(self) -> subprocess.Popen:
+            self.started = True
+            return super().init_process()
+
+    class StandInBatch(us.BlobBatch):
+        """A handle whose process answers every name `<name> ambiguous`, the reply git gives a bare prefix."""
+
+        def init_process(self) -> subprocess.Popen:
+            if self._proc is None:
+                self._proc = subprocess.Popen(
+                    [sys.executable, "-c", "import sys\nfor ln in sys.stdin.buffer:\n"
+                     "    sys.stdout.buffer.write(ln.rstrip(b'\\n') + b' ambiguous\\n'); sys.stdout.buffer.flush()\n"],
+                    stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            return self._proc
+
+    handles: list = []
+    try:
+        b1 = us.BlobBatch(repo)
+        handles.append(b1)
+        got = (us.blob_at(repo, "HEAD", "nope"), us.blob_at(repo, "HEAD", "nope", b1))
+        again = us.blob_at(repo, "HEAD", "a", b1)
+        check("[dQD-37] S10 a missing path is None both ways, and the handle stays live and answers a's bytes next",
+              bool(want) and got == (None, None) and not b1.dead and again == want, f"{got!r} dead={b1.dead} next={again!r}")
+
+        # Two commits sharing a 4-hex prefix, found by hashing what git would store and written as is.
+        tree = subprocess.run(["git", "-C", str(repo), "rev-parse", "HEAD^{tree}"], capture_output=True,
+                              text=True, check=False).stdout.strip()
+        seen: dict = {}
+        pair = None
+        for i in range(100000):
+            body = (f"tree {tree}\nauthor t <t@e> 0 +0000\ncommitter t <t@e> 0 +0000\n\nm{i}\n").encode()
+            oid = hashlib.sha1(b"commit %d\0" % len(body) + body).hexdigest()
+            if oid[:4] in seen:
+                pair = (seen[oid[:4]], body)
+                break
+            seen[oid[:4]] = body
+        if pair is None:
+            check("[dQD-37] S10 two commits sharing a 4-hex prefix were found within the 100000-try bound", False)
+        else:
+            wrote = {subprocess.run(["git", "-C", str(repo), "hash-object", "-t", "commit", "-w", "--stdin"],
+                                    input=body, capture_output=True, check=False).stdout.decode().strip()[:4]
+                     for body in pair}
+            prefix = wrote.pop() if len(wrote) == 1 else ""
+            b2 = us.BlobBatch(repo)
+            handles.append(b2)
+            got = (us.blob_at(repo, prefix, "a"), us.blob_at(repo, prefix, "a", b2)) if prefix else ("unwritten",)
+            check("[dQD-37] S10 a commit prefix naming two commits is None both ways, and the handle stays live",
+                  got == (None, None) and not b2.dead and us.blob_at(repo, "HEAD", "a", b2) == want,
+                  f"prefix={prefix!r} {got!r} dead={b2.dead}")
+
+        b3 = StandInBatch(repo)
+        handles.append(b3)
+        got3 = us.blob_at(repo, "HEAD", "a", b3)
+        check("[dQD-37] S10 an `ambiguous` reply is None, and the handle stays live",
+              got3 is None and not b3.dead and b3._proc is not None, f"{got3!r} dead={b3.dead}")
+
+        b4 = us.BlobBatch(repo)
+        handles.append(b4)
+        proc = b4.init_process()
+        proc.kill()
+        proc.wait()
+        got4 = us.blob_at(repo, "HEAD", "a", b4)
+        check("[dQD-37] S10 after the handle's process is killed the next read answers git show's bytes, and the handle is dead",
+              got4 == want and b4.dead, f"{got4!r} dead={b4.dead}")
+
+        for label, path in (("a newline", "a\nb"), ("a CR", "a\r")):
+            spy = SpyBatch(repo)
+            handles.append(spy)
+            got = (us.blob_at(repo, "HEAD", path), us.blob_at(repo, "HEAD", path, spy))
+            check(f"[dQD-37] S9 a name holding {label} is None both ways, and a spy handle never started its process",
+                  got == (None, None) and not spy.started, f"{got!r} started={spy.started}")
+    finally:
+        for h in handles:
+            h.remove_process()
+
+
 def check_receipt_schema(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-3 AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC14 — the receipt's schema 4: the
     back-fill pinned below 3, who writes 4, the step `govkit/receipt-schema-4`, and the `steps`
@@ -6734,6 +6941,8 @@ def main() -> int:
         check_review_rounds_step(tmp / "drr")
         check_inherited_red_step(tmp / "dir")
         check_receipt_schema(tmp / "drs")
+        check_kit_attestations(tmp / "dka")
+        check_blob_batch(tmp / "dbb")
         check_steps_recordable()
         check_step_isolation(tmp / "dsi")
         check_step_walk()

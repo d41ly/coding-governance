@@ -20,7 +20,12 @@ KEY. The SHA-1, in git's blob form, of `template-cache v1`, the face, the builde
 definition and the caller's declared inputs. The bash face reads the definition with `declare -f` and
 each input file's blob id with one `git hash-object --no-filters --stdin-paths`; this face hashes the
 caller's `inputs` mapping in-process, and its builder's definition is whatever the caller spells
-into `builder_id` or `inputs`, since a python callable has no `declare -f`.
+into `builder_id` or `inputs`, since a python callable has no `declare -f`. The bash face's
+`resolve_template` also folds the builder arguments a caller passes after the builder into the key
+its directory is named by: one more `git hash-object` over `template-cache args v1`, the caller's
+key and one `%q` line per argument, the key unchanged where no argument is passed
+(TOOL-dQuietDisk-37 S4). This face takes no builder arguments, so a value its `build` callable binds,
+a closure's or a `functools.partial`'s, belongs in `inputs`, or two such callables share a template.
 
 BUILD. The builder runs in the stage's `repo`. Where it leaves no `.git`, the face runs
 `git init -q --template=` there; then it stages and commits everything as `base` with

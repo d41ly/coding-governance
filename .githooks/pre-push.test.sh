@@ -289,9 +289,13 @@ derive_template_key() ( # <builder> [<input file>...] -> the key, 40 hex, from t
     [ "$#" -eq 0 ] || printf '%s\n' "$@" | git hash-object --no-filters --stdin-paths
   } | git hash-object --stdin
 )
-resolve_template() ( # <root> <key> <builder> [<arg>...] -> <root>/<key>/repo on stdout, built once per root
+resolve_template() ( # <root> <key> <builder> [<arg>...] -> <root>/<key>/repo, <key> folding the args; built once per root
   remove_git_env_leaks
   local _tc_r=$1 _tc_k=$2 _tc_l _tc_n; shift 2
+  if [ "$#" -gt 1 ]; then
+    _tc_k=$({ printf 'template-cache args v1\n%s\n' "$_tc_k"; printf '%q\n' "${@:2}"; } | git hash-object --stdin) \
+      || { echo "template-cache: the key of $1's arguments could not be derived" >&2; return 2; }
+  fi
   local _tc_dir="$_tc_r/$_tc_k" _tc_s="$_tc_r/.stage-$_tc_k-$BASHPID"
   local -a _tc_c=(-c core.autocrlf=false -c core.hooksPath= -c commit.gpgsign=false -c user.name=t -c user.email=t@e)
   if [ -e "$_tc_dir/ready" ]; then
@@ -363,8 +367,9 @@ build_pushed_fixture() { # <dir> <work name> <tree fn> [<arg>...] -> a pushed fi
   if [ "${FX_TEMPLATE:-}" != 1 ] || [ "$_fx_mode" = per-case ]; then "$fn" "$d" "$d/$w" "$@"; return; fi
   printf -v a '%q ' "$fn" "$@"; v=${FX_MEMO[$a]:-}
   if [ -z "$v" ]; then
-    { [ "$#" -eq 0 ] || printf '%q ' "$@"; } > "$tmp/fx-args" || return 1
-    x=$(cd "$tmp" && derive_template_key "$fn" fx-args ${FX_INPUTS[@]+"${FX_INPUTS[@]}"}) \
+    # The tree half's arguments key its template through resolve_template's own fold (TOOL-dQuietDisk-37
+    # S6); the `cd` keeps the key's repository discovery away from the caller's directory.
+    x=$(cd "$tmp" && derive_template_key "$fn" ${FX_INPUTS[@]+"${FX_INPUTS[@]}"}) \
       && t=$(resolve_template "$FX_ROOT" "$x" run_tree_in_stage "$fn" "$@") \
       && o=$(cd "$t/.git/objects" && { pwd -W 2>/dev/null || pwd; }) \
       && r=$(cd "${t%/*}/remote.git/objects" && { pwd -W 2>/dev/null || pwd; }) || return 1

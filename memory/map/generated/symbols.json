@@ -5958,6 +5958,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "check_blob_batch",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_blob_reader",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -7511,6 +7516,11 @@
       "id": "check_kind_row",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "check_kit_attestations",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_kit_cites",

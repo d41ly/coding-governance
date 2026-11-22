@@ -321,7 +321,9 @@ fail=0
 # the bar and five through the sliced `scan_leg_warnings`. Not gated. Counted by reading; no suite ran.
 # 480 -> 490, TOOL-dQuietDisk-5: arm 3h1's ten, nine `check_gm_line` calls and the trace's re-diff
 # check. Not gated. Counted by reading; this pass runs no suite.
-FLOOR_ASSERTIONS=490
+# 490 -> 497, TOOL-dQuietDisk-37: arm 8's 8f1 to 8f4 and 8g, and arm 3h1's two trace-line checks. Not
+# gated. Counted off the new `n=$((n+1))` and `check_gm_line` lines; this pass runs no suite.
+FLOOR_ASSERTIONS=497
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -1492,11 +1494,11 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
 #     Each case reds a different break: a guard matched as a substring skips nothing it should, a
 #     failed diff read as clean skips every guarded leg, a recorded sha diffed again shows in the trace.
 GM="$SCRATCH/guarded-moved"
-mkdir -p "$GM/${PFX}${KIT}" "$GM/fx" "$GM/ga" "$GM/xga" "$GM/hk"
+mkdir -p "$GM/${PFX}${KIT}" "$GM/fx" "$GM/ga" "$GM/xga" "$GM/gax" "$GM/hk"
 cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$GM/${PFX}${KIT}/run-gates.sh"
 cp "$KITDIR/gate-fingerprint.sh" "$GM/${PFX}${KIT}/" 2>/dev/null || true
 cp "$SCRATCH/fx/instant.sh" "$GM/fx/a.sh"; cp "$SCRATCH/fx/instant.sh" "$GM/hk/h.test.sh"
-printf 'f\n' > "$GM/ga/f"; printf 'f\n' > "$GM/xga/f"
+printf 'f\n' > "$GM/ga/f"; printf 'f\n' > "$GM/xga/f"; printf 'f\n' > "$GM/gax/f"
 cat > "$GM/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "plain one",  "argv": ["bash", "fx/a.sh"]},
@@ -1510,9 +1512,11 @@ check_gm_line() { # label · ERE one whole line of o must match
   n=$((n+1))
   printf '%s\n' "$o" | grep -qE -- "$2" || { echo "canary: one moved list — $1: no line matched /$2/ in:"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 }
-printf 'x\n' >> "$GM/xga/f"
+# gax/f is the slice's BOUNDARY (TOOL-dQuietDisk-37 S8): a slice comparing only the guard's own bytes
+# would match it under `ga/`, where xga/f grades the substring case.
+printf 'x\n' >> "$GM/xga/f"; printf 'x\n' >> "$GM/gax/f"
 o=$( cd "$GM" && GATE_FULL= GATE_BASE=HEAD GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
-check_gm_line "a near-miss path xga/f does not move guard ga/" '^GATE skip  dir guard  \(unchanged vs [^)]*\)$'
+check_gm_line "near-miss paths xga/f and gax/f do not move guard ga/" '^GATE skip  dir guard  \(unchanged vs [^)]*\)$'
 check_gm_line "control: an unmoved glob guard skips" '^GATE skip  glob guard  \(unchanged vs [^)]*\)$'
 printf 'x\n' >> "$GM/ga/f"; printf '# moved\n' >> "$GM/fx/a.sh"
 o=$( cd "$GM" && GATE_FULL= GATE_BASE=HEAD GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
@@ -1532,6 +1536,14 @@ check_gm_line "control: the bar read its moved list once" ' diff --name-only --n
 n=$((n+1))
 printf '%s\n' "$o" | grep -qE ' diff --name-only --no-renames [0-9a-f]{40}$' \
   && { echo "canary: one moved list — the held selection diffed a recorded sha equal to the base again"; fail=1; }
+# THE ONE-DIFF RULE, read in the trace (TOOL-dQuietDisk-37 S8): a plain guard is answered from the moved
+# list and never diffed alone, and a glob guard still falls back to its own diff. GIT_TRACE prints the
+# plain guard bare and the glob in single quotes (measured with git 2.54.0, 2026-11-22). Red when
+# check_plain_guard returns 1, and `ga/` is diffed by itself.
+n=$((n+1))
+printf '%s\n' "$o" | grep -qE ' diff --quiet [0-9a-f]{40} -- ga/$' \
+  && { echo "canary: one moved list — the plain guard ga/ was diffed alone rather than answered from the moved list"; fail=1; }
+check_gm_line "the glob guard fx/*.sh was decided by its own diff" " diff --quiet [0-9a-f]{40} -- 'fx/\*\.sh'$"
 
 # 3h2. SUBJECT: a kit-subject leg is HELD unless asked, and GATE_FULL does not ask.
 #     TOOL-dUnstalledConvoy-26. A kit self-test stages a break into a copy of a checker and asserts
@@ -3367,6 +3379,13 @@ if [ -n "${RG_READY:-}" ]; then
 fi
 exit 0
 HOLD
+  # THE READER records the temp names and the outer root as a leg sees them, OUTSIDE the tree, so 8f
+  # and 8g can tell the runner's export from an inherited value (TOOL-dQuietDisk-37 S2).
+  cat > "$d/fx/env.sh" <<'ENV'
+#!/usr/bin/env bash
+[ -z "${RG_PATHS:-}" ] || printf '%s\n' "${TEMP-}" "${TMP-}" "${GATE_OUTER_AMBIENT_TMP-unset}" >> "$RG_PATHS"
+exit 0
+ENV
   ( cd "$d" && git init -q --template= -b main . \
       && git add -A && git commit -qm seed ) >/dev/null 2>&1
 }
@@ -3507,6 +3526,41 @@ else
   printf '%s\n' "$_acmd" | grep -qE "^(/|[A-Za-z]:[/\\\\]).*/$KIT_REL/run-gates\.sh\$" \
     || { echo "canary: absolute argv — the runner's argv carries no absolute path to its own script, so the fence cannot attribute it:"; printf '%s\n' "$_acmd" | sed 's/^/    /'; fail=1; }
 fi
+
+# 8f. THE OUTER ROOT IS COUNTED AND SWEPT, AND NO LEG INHERITS IT (TOOL-dQuietDisk-37 S2, the review's
+#     M2). The first bar runs under GATE_OUTER_AMBIENT_TMP naming A, which holds three plain files and
+#     one dead ORPHAN owner, a dead pid whose absolute common dir under $OS is never made, so the case
+#     does not lean on how the runner spells this repository's common dir. Each case reds one break:
+#     8f1 a count of the inner ambient prints 1, 8f2 a sweep of it leaves the orphan, 8f3 a dropped
+#     `unset` lets the leg read A, 8f4 a dropped NOTE branch prints nothing for a missing root.
+# 8g. TEMP AND TMP ARE THE BAR'S OWN, never the decoy the bar was started with: a leg's bash reads
+#     them exactly as the runner exported them, so they match the ambient's gate-work.*/tmp.
+printf '[\n  {"name": "env", "argv": ["bash", "fx/env.sh"]}\n]\n' > "$OS/env.json"
+OA="$OS/outer"; mkdir -p "$OA/gate-work.orphan" "$OS/amb-outer" "$OS/decoy"
+: > "$OA/one"; : > "$OA/two"; : > "$OA/three"
+printf '999993\t%s\t0\n' "$OS/gone/.git" > "$OA/gate-work.orphan/owner"; : > "$OA/gate-work.orphan/left"
+: > "$OS/envpaths"
+run_owned_bar "$OM" "$OS/amb-outer" "$OS/outer.out" GATE_LEGS="$OS/env.json" RG_PATHS="$OS/envpaths" \
+  GATE_OUTER_AMBIENT_TMP="$OA" TEMP="$OS/decoy" TMP="$OS/decoy"; oarc=$?
+mapfile -t _ev < "$OS/envpaths"
+n=$((n+1))
+grep -q '^TMPDIR entries 3$' "$OS/outer.out" \
+  || { echo "canary: outer root — 8f1 the bar (exit $oarc) did not count the outer root's 3 entries after its sweep"; sed 's/^/    /' "$OS/outer.out"; fail=1; }
+n=$((n+1))
+{ [ ! -e "$OA/gate-work.orphan" ] && grep -q '^run-gates: sweeping the scratch of a dead bar (pid 999993)$' "$OS/outer.out"; } \
+  || { echo "canary: outer root — 8f2 the dead orphan owner in the outer root was not swept and announced"; fail=1; }
+n=$((n+1))
+[ "${_ev[2]:-}" = unset ] \
+  || { echo "canary: outer root — 8f3 the leg read GATE_OUTER_AMBIENT_TMP as '${_ev[2]:-<no line>}', not unset"; fail=1; }
+n=$((n+1))
+case "${_ev[0]:-}|${_ev[1]:-}" in
+  "$OS/amb-outer"/gate-work.*/tmp\|"$OS/amb-outer"/gate-work.*/tmp) ;;
+  *) echo "canary: outer root — 8g the leg's TEMP and TMP were '${_ev[0]:-}' and '${_ev[1]:-}', not the bar's own gate-work.*/tmp"; fail=1 ;;
+esac
+run_owned_bar "$OM" "$OS/amb-outer" "$OS/outer2.out" GATE_LEGS="$OS/env.json" GATE_OUTER_AMBIENT_TMP="$OS/nowhere"
+n=$((n+1))
+grep -q '^run-gates: NOTE - GATE_OUTER_AMBIENT_TMP names no directory' "$OS/outer2.out" \
+  || { echo "canary: outer root — 8f4 a GATE_OUTER_AMBIENT_TMP naming no directory printed no NOTE line"; sed 's/^/    /' "$OS/outer2.out"; fail=1; }
 rm -rf "$OS" 2>/dev/null || true
 rm -rf "$_nf4" 2>/dev/null || true
 

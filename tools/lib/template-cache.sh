@@ -10,18 +10,23 @@
 #
 #   root=$(resolve_template_root) || exit 2              # S2's one rule for the cache root
 #   key=$(derive_template_key <builder> <input file>...) || exit 2
-#   t=$(resolve_template "$root" "$key" <builder> [<arg>...]) || exit 2   # <root>/<key>/repo
+#   t=$(resolve_template "$root" "$key" <builder> [<arg>...]) || exit 2   # <root>/<key>/repo, or
+#                                                        # <root>/<the key folded with the args>/repo
 #   build_template_clone "$t" <dest> || exit 2           # a --shared clone, no remote
 #   mode=$(read_template_mode <python> <policy.py>)      # tests.fixture-templates: per-case or shared
 #
 # resolve_template says `template: <key8> built` or `template: <key8> reused` once on stderr, and
 # its builder's own output goes there too, so stdout carries the template path alone. Every call
 # but the clone and the key is builtins; the key is two `git hash-object` processes, the clone
-# three git processes. The key, the template and the clone each run in a subshell that first calls
-# remove_git_env_leaks, so no git call and no builder sees an inherited GIT_DIR or its eleven kin;
-# resolve_template_root and read_template_mode run no git and keep the caller's environment
-# (TOOL-dQuietDisk-36). WHAT THIS DOES NOT CHECK: a builder function's helpers, whose definitions
-# the key does not read, and a template a racing run left half-built, which no `ready` names.
+# three git processes, and a resolve_template call carrying builder arguments one more
+# `git hash-object`, which folds each argument's `%q` line into the key it names its directory by,
+# so two argument lists never share a template. The key, the template and the clone each run in a
+# subshell that first calls remove_git_env_leaks, so no git call and no builder sees an inherited
+# GIT_DIR or its eleven kin; resolve_template_root and read_template_mode run no git and keep the
+# caller's environment (TOOL-dQuietDisk-36). WHAT THIS DOES NOT CHECK: a builder function's helpers,
+# whose definitions the key does not read, a value a builder reads from its environment rather than
+# from its arguments, which no key folds, and a template a racing run left half-built, which no
+# `ready` names.
 
 # >>> template_cache_sh — canonical copy: template-cache.sh in gov's lib dir (byte-identical; gated)
 resolve_template_root() { # -> the cache root: SELFTEST_TEMPLATE_ROOT, a bar's owned $WORK, or $SELFTEST_ROOT
@@ -51,9 +56,13 @@ derive_template_key() ( # <builder> [<input file>...] -> the key, 40 hex, from t
     [ "$#" -eq 0 ] || printf '%s\n' "$@" | git hash-object --no-filters --stdin-paths
   } | git hash-object --stdin
 )
-resolve_template() ( # <root> <key> <builder> [<arg>...] -> <root>/<key>/repo on stdout, built once per root
+resolve_template() ( # <root> <key> <builder> [<arg>...] -> <root>/<key>/repo, <key> folding the args; built once per root
   remove_git_env_leaks
   local _tc_r=$1 _tc_k=$2 _tc_l _tc_n; shift 2
+  if [ "$#" -gt 1 ]; then
+    _tc_k=$({ printf 'template-cache args v1\n%s\n' "$_tc_k"; printf '%q\n' "${@:2}"; } | git hash-object --stdin) \
+      || { echo "template-cache: the key of $1's arguments could not be derived" >&2; return 2; }
+  fi
   local _tc_dir="$_tc_r/$_tc_k" _tc_s="$_tc_r/.stage-$_tc_k-$BASHPID"
   local -a _tc_c=(-c core.autocrlf=false -c core.hooksPath= -c commit.gpgsign=false -c user.name=t -c user.email=t@e)
   if [ -e "$_tc_dir/ready" ]; then

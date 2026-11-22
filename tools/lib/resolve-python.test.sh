@@ -583,6 +583,42 @@ gel_sh=$(awk '/^remove_git_env_leaks\(\) \{/{f=1; next} f && /^}/{exit} f' "$ROO
 { [ -n "$gel_py" ] && [ -n "$gel_sh" ] && [ "$gel_py" = "$gel_sh" ]; } \
   || bad "remove_git_env_leaks in $KIT_REL/template-cache.sh unsets '${gel_sh//$'\n'/ }', not GIT_ENV_LEAKS of $KIT_REL/git_env_leaks.py '${gel_py//$'\n'/ }'"; ok
 
+# THE PYTHON SWEEP'S PREDICATE, BY ITS SURVIVORS (TOOL-dQuietDisk-37 S3, the review's M2). A child
+# program imports the canonical owned_scratch.py, plants six gate-work roots under a scratch ambient
+# and calls scan_dead_scratch once: a live `py:` owner of the common dir, a dead one, a dead one of
+# another existing directory, a dead ORPHAN whose absolute common dir does not exist, a dead one with
+# a relative common dir, and a dead bash owner with no `py:`. The dead pid is a child it started and
+# waited for. It writes the survivors and its stderr to a file, so a widened predicate reds by name:
+# the `py:` test dropped sweeps bash-owned, the `isdir` test dead-other, the `isabs` test relative.
+# WHAT THIS DOES NOT CHECK: init_owned_tempdir's root-making branch, unreachable inside a bar.
+SW="$TMP/sweep"; mkdir -p "$SW/amb"
+( cd "$SW" && "$REALPY" -I -c 'import contextlib, io, os, subprocess, sys
+sys.path.insert(0, sys.argv[1])
+import owned_scratch
+amb, out = sys.argv[2], sys.argv[3]
+common, other = os.path.join(amb, "common"), os.path.join(amb, "other")
+os.mkdir(common); os.mkdir(other)
+child = subprocess.Popen([sys.executable, "-c", "pass"]); child.wait()
+rows = {"live": f"py:{os.getpid()}\t{common}", "dead-same": f"py:{child.pid}\t{common}",
+        "dead-other": f"py:{child.pid}\t{other}", "orphan": f"py:{child.pid}\t" + os.path.join(amb, "gone", ".git"),
+        "relative": f"py:{child.pid}\trel/.git", "bash-owned": f"{child.pid}\t{common}"}
+for name, line in rows.items():
+    os.mkdir(os.path.join(amb, "gate-work." + name))
+    with open(os.path.join(amb, "gate-work." + name, "owner"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(line + "\t0\n")
+said = io.StringIO()
+with contextlib.redirect_stderr(said):
+    owned_scratch.scan_dead_scratch(amb, common)
+with open(out, "w", encoding="utf-8", newline="\n") as fh:
+    fh.write("kept " + " ".join(sorted(n[len("gate-work."):] for n in os.listdir(amb) if n.startswith("gate-work."))) + "\n")
+    fh.write(said.getvalue())' "$HERE" "$SW/amb" "$SW/out" ) >/dev/null 2>&1
+[ "$(head -1 "$SW/out" 2>/dev/null)" = "kept bash-owned dead-other live relative" ] \
+  || bad "scan_dead_scratch kept '$(head -1 "$SW/out" 2>/dev/null)', not exactly the live, dead-other, relative and bash-owned roots"; ok
+sw_lines=$(grep '^owned-scratch: sweeping ' "$SW/out" 2>/dev/null)
+{ [ "$(printf '%s\n' "$sw_lines" | grep -c .)" = 2 ] && grep -q 'gate-work\.dead-same$' <<<"$sw_lines" \
+    && grep -q 'gate-work\.orphan$' <<<"$sw_lines"; } \
+  || bad "scan_dead_scratch did not say exactly two sweeping lines naming dead-same and orphan: ${sw_lines:-<none>}"; ok
+
 # THE WRONG-SHELL REFUSAL'S COVERAGE, BOTH WAYS (TOOL-dWitnessedBar-27 S5). The parity row above holds
 # every inline `refuse_wrong_shell` block to its canonical; this holds the population to the refusal,
 # over sets re-derived at every run from the tracked shell files outside the memory tree, each break

@@ -20,7 +20,8 @@ nope() { n=$((n+1)); bad=1; printf 'nope %s — %s\n' "$1" "${2:-}"; }
 
 # FLOOR_ASSERTIONS grades whether this SUITE still carries its arms, not whether this box could run
 # them. A suite that silently shrinks reports green over a population it stopped grading.
-FLOOR_ASSERTIONS=34
+FLOOR_ASSERTIONS=38
+# RAISED 34 -> 38 by TOOL-dQuietDisk-37 S7: three argument-key assertions and the race arm's built-2 line.
 
 # run_harness <name> <body> [<dir>] -> writes $TMP/<name>.out, returns the harness's exit status; the
 # body runs in <dir>, the repository root by default, whose policy a `--template` batch reads
@@ -175,7 +176,7 @@ for r in "$DEF" "$PC"; do
     && git -C "$r" -c core.autocrlf=false -c core.hooksPath= -c commit.gpgsign=false -c user.name=t -c user.email=t@t \
       commit -qm base || { echo "lib-selftest-test: cannot build the switch repositories"; exit 2; }
 done
-export TMP_IN=$TMP/key.in TMP_RACE=$TMP/race TMP_COST=$TMP/cost
+export TMP_IN=$TMP/key.in TMP_RACE=$TMP/race TMP_COST=$TMP/cost TMP_ARGS=$TMP/args
 TFIX='mkrepo() { git init -q && git config user.email t@t && printf "base\n" > subject.txt; }
 build_fixture --template "" mkrepo || exit 2'
 
@@ -212,6 +213,33 @@ read -r _ k1 k1b k2 k3 < <(grep '^keys ' "$TMP/tkey.out")
 [ -n "${k3:-}" ] && [ "$k2" != "$k3" ] && ok "one byte of one input file moves the key" \
   || nope "a changed input kept its key" "$(cat "$TMP/tkey.out")"
 
+# THE BUILDER'S ARGUMENTS KEY ITS TEMPLATE (TOOL-dQuietDisk-37 S4, S7). `mka` writes its first argument,
+# so a key that ignored the arguments hands the second caller the first one's value; with none the key
+# is the caller's own. Red against the base block, which named the directory by the caller's key alone.
+mkdir -p "$TMP/tr.args"
+SELFTEST_TEMPLATE_ROOT=$TMP/tr.args run_harness targs 'mka() { printf "%s\n" "$1" > v; }
+build_fixture --template "" mka x || exit 2
+arm "the x batch" 0 "x" "true" "cat v"
+run_arms x
+build_fixture --template "" mka y || exit 2
+arm "the y batch" 0 "y" "true" "cat v"
+run_arms y' "$DEF"
+rc=$?
+[ "$rc" = 0 ] && grep -q '^ok    the x batch' "$TMP/targs.out" && grep -q '^ok    the y batch' "$TMP/targs.out" \
+  && ok "two build_fixture --template batches of one builder with two arguments each grade their own value" \
+  || nope "a second argument list was handed the first one's template (exit $rc)" "$(cat "$TMP/targs.out")"
+run_harness tdirect 'mka() { printf "%s\n" "${1-none}" > v; }
+k=$(derive_template_key mka) || exit 2
+a=$(resolve_template "$TMP_ARGS" "$k" mka x 2>/dev/null) && b=$(resolve_template "$TMP_ARGS" "$k" mka y 2>/dev/null) \
+  && c=$(resolve_template "$TMP_ARGS" "$k" mka 2>/dev/null) || exit 2
+[ "$a" != "$b" ] && echo "paths two $(cat "$a/v") $(cat "$b/v")"
+[ "$c" = "$TMP_ARGS/$k/repo" ] && echo "bare keyed"' "$DEF"
+grep -qx 'paths two x y' "$TMP/tdirect.out" \
+  && ok "two direct resolve_template calls of one key with arguments x and y print two templates, each its own value" \
+  || nope "one key with two argument lists resolved one template" "$(cat "$TMP/tdirect.out")"
+grep -qx 'bare keyed' "$TMP/tdirect.out" && ok "and a call with no argument still prints <root>/<key>/repo" \
+  || nope "a call with no argument moved its key" "$(cat "$TMP/tdirect.out")"
+
 # An exported GIT_DIR reaches none of the three git-running verbs (TOOL-dQuietDisk-36 S4). It names a
 # scratch SHA-256 repository with one commit and an origin remote, so a leak moves its HEAD, drops its
 # remote, or derives a 64-hex key; the body exports it only after the harness is sourced, and unsets it
@@ -242,15 +270,24 @@ read -r _ lk0 lk1 < <(grep '^keys ' "$TMP/tleak.out")
 [[ ${lk0:-} =~ ^[0-9a-f]{40}$ ]] && [ "${lk1:-}" = "$lk0" ] && ok "and the key equals the key derived with GIT_DIR unset" \
   || nope "the key moved under an exported GIT_DIR" "$(cat "$TMP/tleak.out")"
 
-# A racing stage left behind: two shells resolve one key at once in one root.
-run_harness trace 'mkr() { sleep 1; git init -q && printf r > f; }
+# A racing stage left behind: two shells resolve one key at once in one root. THE BARRIER holds each
+# builder until both have entered (TOOL-dQuietDisk-37 S7): each leaves a marker named for its own
+# $BASHPID beside the root, never inside it, and builds only once two exist, so both are building at
+# once and the second rename meets the `mv -T` collision. A fixed sleep let a racer that forked after
+# the first had written `ready` reuse it and never build; `built <n>` is the marker count.
+run_harness trace 'mkr() { : > "$TMP_RACE.m.$BASHPID"; local i=0; local -a m
+  while m=("$TMP_RACE".m.*); [ "${#m[@]}" -lt 2 ] && [ "$i" -lt 300 ]; do sleep 0.1; i=$((i + 1)); done
+  git init -q && printf r > f; }
 k=$(derive_template_key mkr) || exit 2
 ( resolve_template "$TMP_RACE" "$k" mkr > "$TMP_RACE.a" 2>/dev/null ) &
 ( resolve_template "$TMP_RACE" "$k" mkr > "$TMP_RACE.b" 2>/dev/null ) &
 wait
 cmp -s "$TMP_RACE.a" "$TMP_RACE.b" && [ -s "$TMP_RACE.a" ] && echo "same template"
+echo "built $(ls "$TMP_RACE".m.* 2>/dev/null | wc -l)"
 echo "entries $(ls -A "$TMP_RACE" | wc -l) nested $(ls -A "$TMP_RACE/$k" | grep -c "^\.stage-")"' "$DEF"
-grep -q '^entries 1 nested 0$' "$TMP/trace.out" \
+grep -q '^built 2$' "$TMP/trace.out" && ok "both racers built, so the arm below grades a real collision" \
+  || nope "one racer reused the other's template and never built, so no collision was met" "$(cat "$TMP/trace.out")"
+grep -q '^built 2$' "$TMP/trace.out" && grep -q '^entries 1 nested 0$' "$TMP/trace.out" \
   && ok "two racing builds leave one key directory, and no stage beside it or inside it" \
   || nope "a racing stage was left behind or renamed over the winner" "$(cat "$TMP/trace.out")"
 grep -q '^same template$' "$TMP/trace.out" && ok "and both racers get the same template" \
