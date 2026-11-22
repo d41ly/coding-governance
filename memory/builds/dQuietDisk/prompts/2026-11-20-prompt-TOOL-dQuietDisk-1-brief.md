@@ -135,7 +135,7 @@ measured before and after.
 16. A content-addressed attestation that a kit tree passed its self-tests, recorded by gov and carried to adopters with the minted kit [planned TOOL-dQuietDisk-14]
 17. An adopter's kit self-test leg is held when its vendored kit tree hash is attested, and runs as today when the hash is unknown [parked TOOL-dQuietDisk-15 is DEFERRED by its fork F1: both adopters' default bars already hold every gov kit self-test, so the hold saves nothing until a bar is handed a selection, ask TOOL-dQuietDisk-33]
 18. `govkit update` passes one `blob_at(..., batch=)` handle to every receipt-row read [planned TOOL-dQuietDisk-16]
-19. `govkit update` runs each `adopt-*.sh --check` once [planned TOOL-dQuietDisk-17]
+19. `govkit update` runs each `adopt-*.sh --check` once [parked TOOL-dQuietDisk-17 is WONTDO by its fork F2 (c): the in-run reuse fires only on a run that fails by construction or wrote nothing, and both build forms add git processes; asks TOOL-dQuietDisk-34 and TOOL-dQuietDisk-35]
 20. `govkit apply` takes its before map from the target's reuse cache and re-runs only legs whose guards meet the files it wrote [planned TOOL-dQuietDisk-18]
 21. Measured before and after: git processes, peak and residual temp entries, and wall time for `check-wiring.test.sh`, `check-pass-order.sh` and one `govkit/selftest.py` shard [planned TOOL-dQuietDisk-19]
 22. Fix 4 in nicocares and incms, with the incms pin bump [parked it lands in those repositories under their own governance, through side sessions; the nicocares seed-suite numbers come from there]

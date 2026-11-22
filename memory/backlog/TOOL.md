@@ -600,12 +600,14 @@ Cite ids, never line numbers.
 | [TOOL-dQuietDisk-23](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE REST OF THE G-C STATIC LINT IS UNBUILT. TOOL-dQuietDisk-9 lands… |
 | [TOOL-dQuietDisk-24](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | unattended.test.sh REBUILDS ITS PROLOGUE IN EVERY SHARD (K2). Each of… |
 | [TOOL-dQuietDisk-25](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | check-unattended.test.sh BUILDS A REPOSITORY PER CASE. It has 13 git… |
-| [TOOL-dQuietDisk-27](../builds/dQuietDisk/BACKLOG.md) | SPECCED | MED | TOOL-dQuietDisk-9 | 2026-11-20 | THE RUNNER'S OWNED TEMP ROOT REACHES NEITHER NATIVE CHILDREN NOR A… |
+| [TOOL-dQuietDisk-27](../builds/dQuietDisk/BACKLOG.md) | INPROGRESS | MED | TOOL-dQuietDisk-9 | 2026-11-20 | THE RUNNER'S OWNED TEMP ROOT REACHES NEITHER NATIVE CHILDREN NOR A… |
 | [TOOL-dQuietDisk-29](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | A HISTORY-STORE HIT NEVER REFRESHES ITS ITEM.… |
 | [TOOL-dQuietDisk-30](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE HELD SELECTION MATCHES A DIRECTORY GUARD AGAINST A FILE OF THE SAME… |
 | [TOOL-dQuietDisk-31](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE RUNNER'S REUSE KEY HASHES GATE_REGEN_CHECK, SO A GOVKIT APPLY'S… |
 | [TOOL-dQuietDisk-32](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE TEMPLATE CACHE HANDS OUT ONLY A CLONE, AT THREE GIT PROCESSES A… |
 | [TOOL-dQuietDisk-33](../builds/dQuietDisk/BACKLOG.md) | DEFERRED | LOW | TOOL-dQuietDisk-15 | 2026-11-22 | AN ATTESTED KIT'S SELF-TEST LEG HOLDS ONLY ONCE A BAR IS HANDED A… |
+| [TOOL-dQuietDisk-34](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | A KIT'S [check] RESULT IS NEVER REUSED ACROSS SEPARATE govkit update… |
+| [TOOL-dQuietDisk-35](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | A HELD KIT'S VERIFY CHECK RUNS THOUGH IT DECIDES NOTHING.… |
 | [TOOL-dRankedPlan-17](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dRankedPlan-18](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-6 | 2026-10-26 | A PLAN REVIEW'S FINDINGS HAVE NO DISPOSAL ROUTE. review.dispose… |
 | [TOOL-dRemeasuredRender-2](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the location-probe scanner does not see a probe whose cd <dir> carries… |
