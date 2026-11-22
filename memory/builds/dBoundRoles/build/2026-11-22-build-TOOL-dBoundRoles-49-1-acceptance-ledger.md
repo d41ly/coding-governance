@@ -6,7 +6,7 @@ Each criterion of section 6, read by the pass that built the unit with a probe o
 worktree before the pass commit: `tools/govkit/selftest.py#derive_seed_expected` and
 `tools/govkit/selftest.py#measure_plan_marks`, imported as a library by a `python` probe, which runs no case,
 over default targets and a `git clone --shared` of the tree built under a short fixture path. No gate, suite or
-bar ran in the pass: the one `New arm:` arm of section 7 and its RED-first observation, and the section 7 legs,
+bar ran in the pass: the one `New arm:` arm of section 7 and its RED-first observation, and the legs section 7 lists,
 are owed to the main loop at the close.
 
 **Evidences:** TOOL-dBoundRoles-49
