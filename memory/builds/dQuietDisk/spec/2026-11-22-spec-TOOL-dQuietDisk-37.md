@@ -9,6 +9,7 @@
 | [2026-11-20-build-TOOL-dQuietDisk-1-agent-ledger.md](../build/2026-11-20-build-TOOL-dQuietDisk-1-agent-ledger.md) | journal | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 TOOL-dQuietDisk-28 TOOL-dQuietDisk-36 |
 | [2026-11-22-build-TOOL-dQuietDisk-37-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dQuietDisk-37-1-acceptance-ledger.md) | journal | — |
 | [2026-11-22-build-TOOL-dQuietDisk-37-deviation-1.md](../build/2026-11-22-build-TOOL-dQuietDisk-37-deviation-1.md) | deviation | — |
+| [2026-11-22-build-TOOL-dQuietDisk-37-red-fix-10.md](../build/2026-11-22-build-TOOL-dQuietDisk-37-red-fix-10.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dQuietDisk-37-red-fix-9.md](../build/2026-11-22-build-TOOL-dQuietDisk-37-red-fix-9.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dQuietDisk-37-widen-22.md](../build/2026-11-22-build-TOOL-dQuietDisk-37-widen-22.md) | widen | — |
 | [2026-11-22-build-TOOL-dQuietDisk-37-widen-23.md](../build/2026-11-22-build-TOOL-dQuietDisk-37-widen-23.md) | widen | — |
