@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader
 
-**Status:** INPROGRESS · rev-10 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-11 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0216@f8936b35 whole
 **Carries:** node:policy-key.builds.slug-words
@@ -18,7 +18,9 @@
 | [2026-10-26-build-TOOL-dTotalRecall-5-deviation-51.md](../build/2026-10-26-build-TOOL-dTotalRecall-5-deviation-51.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-1-builder-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-2-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-2-builder-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-3-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-3-builder-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-divergence-2-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-2-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-divergence-3-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-3-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-divergence-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
@@ -30,6 +32,8 @@
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-spec-writer.md) | log | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-3-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-3-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-3-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-3-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-reground-brief.md) | journal | — |
@@ -120,7 +124,12 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
 - **S7** — Every reader the grammar's own search finds is re-pointed, by the disposition rule of §4
   "The readers". The search is `id_grammar.py --readers`, a predicate over tracked code, never an
   enumerated list; it is run at the pass before the first edit and after the last, and after the last
-  it lists no site outside the grammar's own entry points but the hits the pass keeps. Observed by AC7.
+  it lists no site outside the grammar's own entry points but the hits the pass keeps. A fixture
+  slug or id that a suite feeds a reader S4, S7 or S13 changes, and that `slug_class` refuses, is
+  re-spelled by the rule of §4 "The fixtures", never admitted by a looser class (§8 F13). That
+  section's two searches fix the population and its table gives each hit its disposition; a suite
+  that reds at the pass on such a fixture neither search printed is in the population too. Observed
+  by AC7 and AC15.
 - **S8** — The legacy fallback for a kit that does not require memory-tree: the canonical blocks
   `slug_legacy_py` and `slug_legacy_sh` in `id_grammar.py` and `check-memory-hygiene.sh`, each one
   constant, the legacy shape; inline Python copies in `tools/runlog/runlog_lib.py` and
@@ -168,8 +177,8 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
   root. `_expand_ids`'s range form `rng` splices the same class as its `slug` group in place of its
   own `[A-Za-z0-9]+` (`tools/memory-tree/tree_lib.py@a8748ffaa:685`), so a range admits exactly the
   slugs the single token admits and `TOOL-dX-1..3` is a bad token, as `TOOL-dX-2` is (§8 F10). A
-  fixture id a suite reads through these functions with a slug the class refuses is re-spelled to the
-  legacy shape. Observed by AC12.
+  fixture id a suite reads through these functions with a slug the class refuses is re-spelled by
+  S7's fixture rule. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -186,7 +195,8 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
 - The front-matter schema that admits `slug-grammar:`: TOOL-dTotalRecall-4's. Until it lands front
   matter is open-world, so writing the key here refuses nothing.
 - Renaming any existing slug or id, or rewriting any README to add the key: a README recording no
-  grammar is read under the legacy shape.
+  grammar is read under the legacy shape. A suite's fixture slug under `tools/`, `skills/` or
+  `.githooks/` is no record; S7 re-spells the ones the class refuses.
 - A gate over the reader population. The search is the inventory; the readers' own suites are the arms.
 
 ### Edges
@@ -378,9 +388,164 @@ A hit that is not a slug or id reader at all is recorded as kept: `tools/memory-
 (a gap key), the harness's `CLASS_SLUG` (a lens class name), and a scratch-path or agent-type shape
 the predicate's slug half catches. Each re-pointed site keeps its own name (`SLUG_RE`, `UNIT_RE`,
 `ID_RE`, `check_slug_shape`), bound from the grammar at first use, so no name retires and its callers
-do not change.
+do not change. A slug reader binds `BUILD_SLUG_RE` and an id reader splices `slug_class`.
 
-### The flips
+A test-side copy of a reader's pattern that grades text apart from the reader it tests is kept, by
+`[class]`, and each admits every slug the class admits under the defaults:
+
+| Copy | Why it is kept |
+|---|---|
+| `tools/memory-tree/merge-rows.test.sh`'s `ORACLE` | its own rule, "never to point it at the driver's regex" (`tools/memory-tree/merge-rows.test.sh@17f07b292:344`) |
+| `tools/memory-tree/hygiene-parity.test.sh@17f07b292:173` | it derives check 12's population over the real corpus, where every spec name fits the class (§4 "The grammar") |
+| `tools/runlog/selftest.py`'s `CHECK5_RE`, `ANCHOR_ID`, `check_projection` and floor-raise grader | graders typed from the owning documents, since "Two operands from one generator would assert nothing" (`tools/runlog/selftest.py@17f07b292:4515`) |
+| `tools/govkit/selftest.py@17f07b292:422` and `:607` | each grades an authored row's unit id, and every authored id fits the class |
+
+Three sites read slugs in a spelling the predicate does not see, and how each is handled:
+
+- The case-glob checks `check_slug_shape` (`tools/unattended/unattended.sh@17f07b292:5430`) and
+  push-main's slug case (`tools/push-main.sh@17f07b292:128`) are re-pointed by name. Each is in
+  Files touched.
+- `tools/memory-tree/design_lib.py`'s `_BUILD` and `_DECISION` spell the slug with `\w`. Their pattern
+  is `d[A-Z]\w+`, the design node's clause and decision ids alone.
+- `tools/loop/loop_lib.py`'s `SEED_BUILD` is a binding whose name holds no `slug`.
+
+The last two keep their own spelling. They are a gap this unit states rather than closes (§5 risks).
+
+### The fixtures
+
+Under the defaults `slug_class` is the legacy shape `[a-z][A-Za-z]{2,}`. That is narrower than the
+`[A-Za-z0-9]+` and `[A-Za-z]+` slug parts most of the readers above spell today. So it refuses the
+fixture slugs suites feed those readers that are one or two letters long, carry a digit, or open
+upper-case (`2026-11-22-build-TOOL-dTotalRecall-5-3-builder-return`). Each such slug is re-spelled
+(§8 F13).
+
+The population is fixed by two searches over tracked `tools/`, `skills/` and `.githooks/`. The
+first finds the id shape and the second the slug contexts:
+
+```bash
+git grep -nP -e '(?<![\[A-Za-z0-9_])[A-Z][A-Z0-9]*-(?![a-z][A-Za-z]{2,}-[0-9])[A-Za-z][A-Za-z0-9]*-[0-9]+(?![A-Za-z0-9_\]])' -e '(?<=[\\][nrt])[A-Z][A-Z0-9]*-(?![a-z][A-Za-z]{2,}-[0-9])[A-Za-z][A-Za-z0-9]*-[0-9]+(?![A-Za-z0-9_\]])' <rev> -- tools skills .githooks
+git grep -nP '(?:builds/|--(?:build|dispatch|slug|origin|preflight)[= ]["\x27]?|"slug": ?"|\bslug=["\x27]|\b[A-Z_]*(?:SLUG|BUILD)[A-Z0-9_]* ?= ?["\x27]?)(?![a-z][A-Za-z]{2,}(?![A-Za-z0-9]))[a-z][A-Za-z0-9]*(?![A-Za-z0-9_-])' <rev> -- tools skills .githooks
+```
+
+- **The id search.** It finds an id `<FAMILY>-<slug>-<n>` whose slug the legacy shape refuses, where
+  the id follows a non-word character or a `\n`, `\r` or `\t` escape. Its backslash is bracketed,
+  `[\\]`, as the census's is: git 2.54.0.windows.1 matched nothing with `\\[nrt]` (measured
+  2026-11-22).
+- **The slug search.** It finds such a slug in any of these places:
+  - a `builds/` segment;
+  - the value of `--build`, `--dispatch`, `--slug`, `--origin` or `--preflight`;
+  - a `"slug":` or `slug=` value;
+  - the value of a name holding `SLUG` or `BUILD`.
+- **The counts.** At `17f07b292` the id search prints 528 lines in 27 files and the slug search 353
+  lines in 41 files. Together they print 793 distinct lines in 53 files (PINNED 2026-11-22, same
+  git; the pass re-derives them at its base).
+
+**The rule.** A refused slug is re-spelled in this order:
+
+1. Each digit becomes its capitalised English word, so `tFix2` becomes `tFixTwo`.
+2. A result the legacy shape still refuses takes the suffix `Fix`, so `x` becomes `xFix` and `tB`
+   becomes `tBFix`.
+3. A result that the same file already uses as a slug takes a second `Fix`.
+
+Where the slug moves depends on its length:
+
+- **Three or more characters.** It moves at every whole-word occurrence in its file.
+- **One or two characters.** It moves only where it appears in an id or a slug context:
+  - a `builds/<slug>/` segment;
+  - a slug flag's value;
+  - a `slug` key, variable or constant;
+  - a record heading naming the build;
+  - the expected text the suite matches.
+
+  The same letters in any other role stay. Examples are the leg `x` of
+  `.githooks/pre-push.test.sh@17f07b292:2687`, the run id `fx-1` of
+  `tools/run-gates/keep_tails.py@17f07b292:356`, and the node letter of `a:163` at
+  `tools/memory-recall/selftest.py@17f07b292:3231`. A branch name or other occurrence whose role is
+  unclear moves only where the suite derives it from the slug.
+
+What the suite builds from a re-spelled fixture:
+
+- A value it derives at run time, such as a `git hash-object` of the planted text, moves with the
+  fixture.
+- A literal it pins from one, such as a digest, a count or a width, is re-derived by running the
+  suite's own derivation. The pass's return names it.
+
+A fixture the class refuses can be one neither search printed: a slug built at run time, or bound
+to a name no slug context matches. If a §7 suite, or one `bash tools/unattended/run-unattended-gates.sh`
+runs, reds at the pass on such a fixture, that fixture is in the population too. The rule applies
+to it, and its file joins the pass's `--dispatch --writes` set before its edit.
+
+The dispositions of the 53 files, each hit by its file:
+
+| File | Refused slugs | Disposition |
+|---|---|---|
+| `tools/workflows/unattended-build.test.sh` | `tB` (ids of the `A`, `B` and `TOOL` families, and the slug), `bD`, `tX` | re-spelled; the arm labels `PV-R2-<n>` and the prose `--dispatch is` are not slugs |
+| `tools/workflows/tier2-review.test.sh` | `x`, `dX`, `tB` | re-spelled |
+| `tools/hooks/scratch-guard.test.sh` | `x`, `y`, `z`, `bx` | re-spelled |
+| `tools/push-main.test.sh` | `tB`, `x`, `fx` | re-spelled; `--slug 'a b'` (`tools/push-main.test.sh@17f07b292:1967`) is a planted refusal |
+| `.githooks/straggler-guard.test.sh` | `x` | re-spelled |
+| `.githooks/pre-push.test.sh` | `x` in `TOOL-x-7` and `TOOL-x-8` | re-spelled; the leg `x` stays |
+| `tools/run-gates/run-gates.evidence.test.sh` | `x` in `TOOL-x-7` | re-spelled |
+| `tools/run-gates/verdict_backends.py` | `x` in `TOOL-x-7` | re-spelled |
+| `tools/run-gates/keep_tails.py` | `x` | re-spelled; the run id `fx-1` stays |
+| `tools/roles/adopt-roles.test.sh` | `bx` | re-spelled |
+| `tools/hooks/agent-cap.test.sh` | `bx` | re-spelled |
+| `tools/roles/render_agents.py` | `fx` | re-spelled |
+| `tools/playbook/load_sets.py` | `bx` | re-spelled |
+| `tools/playbook/instruction_units.py` | `fx`, `x` | re-spelled |
+| `tools/memory-tree/row_grammar.py` | `tA`, `tB`, `tL`, `tE`, `tT` | re-spelled; the comment at `tools/memory-tree/row_grammar.py@17f07b292:874` and the classes at `:488` and `:498` are not slugs |
+| `tools/memory-tree/gen_build_index.py` | `dX`, `dY`, `x`, `zA`, `b` | re-spelled |
+| `tools/memory-recall/selftest.py` | `x` | re-spelled; the node letter `a` stays |
+| `tools/policy/check_policy.py` | `x`, `bx`, `bX` | re-spelled |
+| `tools/workflows/replay_scorer.py` | `dX` | re-spelled |
+| `tools/loop/scenario.py` | `tFix2` | re-spelled |
+| `tools/unattended/unattended.test.sh` | `tW`, `tBr2`, `tOwn2`, `tSplit2`, `tSplit3` | re-spelled; `of` and `by` are prose |
+| `tools/unattended/check-unattended.test.sh` | `b`, `tOther2`, `tOther3` | re-spelled; `t Spaced` is a planted refusal and `is` is prose |
+| `tools/unattended/gate-guard.test.sh` | `s`, `fx`, `gx` | re-spelled |
+| `tools/unattended/stop-guard.test.sh` | `fx` | re-spelled |
+| `tools/unattended/stall-recorder.test.sh` | `fx` | re-spelled |
+| `tools/lib/resolve-python.test.sh` | `b` | re-spelled |
+| `tools/runlog/selftest.py` | the names table at `tools/runlog/selftest.py@17f07b292:4489`, which neither search sees | `my-build` and `a` become `myBuild` and `aFix`. The liveness message names two names the class admits. `Z9`, `trailing-` and `a--b` move to the refused side. The template text at `:8578` reaches no reader and stays |
+| `tools/unattended/runlog-writer.test.sh` | `a1` | kept: a planted refusal (`tools/unattended/runlog-writer.test.sh@17f07b292:888`) |
+| `skills/session-kickoff/manifest-check.test.sh` | `a`, `is`, `on` | kept: `a/b` is a planted refusal and the rest are prose |
+| `tools/unattended/lib-unattended.sh`, `tools/unattended/check-pass-order.sh`, `tools/unattended/unattended.sh`, `tools/unattended/check-unattended.sh`, `tools/run-gates/README.md`, `tools/lexicon/selftest.py`, `tools/hooks/scratch-guard.js`, `skills/session-kickoff/manifest-check.sh`, `tools/workflows/unattended-build.template.js`, `tools/workflows/unattended-build.js` | `x`, `dX`, prose words | kept: comments, messages and prose, which no reader parses |
+| `tools/playbook/gov_tag.py`, `tools/playbook/positional.py`, `tools/check-dead-paths.test.sh`, `tools/govkit/selftest.py` | `x` | kept: a fixture path segment that no reader S4, S7 or S13 changes parses |
+| `tools/loop/breakpoints.py`, `tools/loop/placement.py`, `tools/loop/loop_lib.py`, `tools/memory-tree/backlog.py`, `tools/memory-tree/build_records.py`, `tools/memory-tree/merge-rows.py`, `tools/memory-tree/seen_red.py`, `tools/memory-tree/design_lib.py`, `tools/roles/roles_lib.py`, `tools/runlog/runlog_lib.py` | `re`, `r` | kept: the hit is a reader's own binding. S7 re-points it, or §4 "The readers" states it as unseen |
+
+That is 26 files re-spelled and the runlog table rewritten. The re-spelled files hold 726 of the 793
+lines (PINNED 2026-11-22 at `17f07b292`).
+
+**The trace.** Every function and regex S4, S7 and S13 change, and the suites that feed it ids or
+slugs, read at `17f07b292`. The close runs the unattended suites with
+`bash tools/unattended/run-unattended-gates.sh`, which runs them by its budget rows:
+
+| Changed | Suites that feed it | What they assert | Fixtures |
+|---|---|---|---|
+| S4: `_eras`, `grammar_for().ID_RE` and drift-audit's local copy | `row-keyed merge driver replay`, `transition-audit arms`, `drift-audit selftest`, `corpus-ids selftest`, `memory-recall kit selftest`, `recall floor`, `unattended kit gate` through `ASK_ANCHOR_PY` | the ids each finds or keys. Under the defaults `ID_RE` finds today's 4420 (S4), so no assertion moves | none beyond the S13 row |
+| S13: the tree_lib token functions and `read_bindings` | `build-index selftest`, `memory-recall kit selftest`, `policy fixtures`, `loop scenario fixtures`, `straggler-guard arms`, and `tools/workflows/replay_scorer.py`'s `--selftest` | each fixture head or row reads its ids | re-spelled |
+| S7: the unattended driver's `check_slug_shape`, `check_slug`, `UNIT_ID_ERE`, and the id readers of `unattended.sh`, `lib-unattended.sh`, `check-unattended.sh`, `check-pass-order.sh` and `check-brief-recorded.sh` | the suites `run-unattended-gates.sh` runs, plus `scratch-guard self-test`, `unattended kit gate`, `pass-order history` and `brief-recorded` | a verb proceeds for a fixture build. The planted refusals `../x`, `../etc`, `bad/slug` and `t Spaced` still exit 2, and the message text they match is not edited (`tools/unattended/unattended.test.sh@17f07b292:1036`) | re-spelled; the planted refusals stay |
+| S7: push-main's slug case | `push-main self-test` | `--prepare` and `--land` proceed for `fx` and `tB`. `'a b'` is refused by its message prefix (`tools/push-main.test.sh@17f07b292:1969`) | re-spelled |
+| S7: `tools/runlog/runlog_lib.py`'s `SLUG_RE` beside `check_slug_shape` | `runlog selftest` | the two agree over the names table, and the driver accepts the table's second and third names | the table row above |
+| S7: the templates' `PIN_ID` (`tools/workflows/tier2-review.template.js@17f07b292:773`), `UNIT_ID` and `reviewSlug` | `tier2-review self-test`, `unattended-build self-test` | a subject whose id `PIN_ID` admits proceeds (`tools/workflows/tier2-review.template.js@17f07b292:821`) | re-spelled |
+| S7: `tools/roles/roles_lib.py`'s `SLUG_RE` and `tools/roles/handoff.py`'s `LABEL_UNIT_RE` | `roles adopter self-test`, `roles render selftest`, `agent-cap self-test`, `policy fixtures` | a handoff renders for build `bx` and unit `TOOL-bx-1` | re-spelled |
+| S7: the memory-tree readers of Files touched | `build-index selftest`, `row-grammar selftest`, `backlog migration selftest`, `routed-commits selftest`, `check-arms selftest`, `ratchet selftest`, `row-keyed merge driver replay`, and `run-gates evidence` (which runs `keep_tails.py --selftest` through `build_records`) | each fixture row or id is keyed or read | re-spelled where a search hits; the other suites print no hit |
+| S7: run-gates' `A_OWNID` and the quarantine note | `pre-push self-test`, `run-gates evidence`, `tools/run-gates/verdict_backends.py`'s selftest | the selection row naming `TOOL-x-7` is named in the refusal | re-spelled |
+| S7: the loop readers | `loop adapt fixtures`, `loop breakpoint fixtures`, `loop guard fixtures`, `loop placement fixtures`, `loop position fixtures`, `loop claim fixtures`, `loop scenario fixtures` | each fixture build reads | `tFix` (`tools/loop/adapt.py@17f07b292:108`), `tPos` (`tools/loop/position.py@17f07b292:195`), `dExample` and `dUpstream` fit the class; `tFix2` is re-spelled |
+| S7: `tools/playbook/instruction_units.py`'s `CHANGE_RECORD_RE` and `HOLD_RE` | `instruction units selftest` | `PLAY-x-1 F2` holds, and the change record of `ARCH-fx-1` is read | re-spelled |
+| S7: `tools/check-spec-tokens.py`'s `UNIT_ID`, `tools/branch-reconcile/branch_reconcile.py`'s `ID_RE`, runlog's `record.py` and `model.py` | `spec-tokens self-test`, `branch-reconcile selftest`, `runlog selftest` | no search hit. Runlog's `FX_SLUG` is `xFixtureRun` (`tools/runlog/selftest.py@17f07b292:2188`) | none |
+| S6 and S7: the hygiene script's readers and check 4 | `memory-hygiene self-test`, plus `scratch-guard self-test` and `straggler-guard arms`, which run the script | fixture folders pass check 4 except the planted ones | the hygiene suite's folders fit, except the planted ones (`2026-11-22-build-TOOL-dTotalRecall-5-3-builder-return`); the other two are re-spelled |
+
+**The widening.** One reader widens, where every other narrows. `tools/memory-tree/backlog.py`'s
+`SLUG_RE` (`tools/memory-tree/backlog.py@17f07b292:129`) binds `BUILD_SLUG_RE` and drops its capital
+lookahead, so an all-lower-case slug such as `nosuch` reads as a slug at these places:
+
+- backlog's REOPEN `of` slot;
+- the `--doctor` and `--new-spec` checks of `gen_build_index.py`;
+- `tools/loop/claim.py`.
+
+The two new-build doors move to `mint_re` (S3), which still requires a capital word. No suite asserts
+an all-lower-case slug refused through any of those places (DERIVED 2026-11-22 by `git grep` for
+their refusal messages).
 
 `id_grammar.py --flip-probe <clone>` runs in a scratch clone the pass makes under `%TEMP%/<short>`,
 with `main` reset to the pass tip and its remote removed, so the policy reader's landed revision is
@@ -432,7 +597,7 @@ which TOOL-dTotalRecall-20's upgrade steps may grade.
 - `tools/memory-tree/gen_build_index.py`
 - `tools/memory-tree/backlog.py`
 - `tools/memory-tree/tree_lib.py`
-- `tools/memory-recall/selftest.py` (a fixture id S13 re-spells, where one reads through `_expand_ids`)
+- `tools/memory-recall/selftest.py` (its fixture ids, by S7's fixture rule)
 - `tools/memory-tree/row_grammar.py`
 - `tools/memory-tree/merge-rows.py`
 - `tools/memory-tree/migrate_backlog.py`
@@ -476,9 +641,38 @@ which TOOL-dTotalRecall-20's upgrade steps may grade.
 - `tools/policy/unsummarised-keys.txt`
 - `help/reference/policy.md` (the render of `render_playbook.py --reference`)
 - `memory/project/docs-undocumented.txt`
+- the fixture homes of §4 "The fixtures" not named above:
+  - `tools/workflows/unattended-build.test.sh`
+  - `tools/workflows/tier2-review.test.sh`
+  - `tools/workflows/replay_scorer.py`
+  - `tools/hooks/scratch-guard.test.sh`
+  - `tools/hooks/agent-cap.test.sh`
+  - `tools/push-main.test.sh`
+  - `.githooks/straggler-guard.test.sh`
+  - `.githooks/pre-push.test.sh`
+  - `tools/run-gates/run-gates.evidence.test.sh`
+  - `tools/run-gates/verdict_backends.py`
+  - `tools/run-gates/keep_tails.py`
+  - `tools/roles/adopt-roles.test.sh`
+  - `tools/roles/render_agents.py`
+  - `tools/playbook/load_sets.py`
+  - `tools/policy/check_policy.py`
+  - `tools/loop/scenario.py`
+  - `tools/unattended/unattended.test.sh`
+  - `tools/unattended/check-unattended.test.sh`
+  - `tools/unattended/gate-guard.test.sh`
+  - `tools/unattended/stop-guard.test.sh`
+  - `tools/unattended/stall-recorder.test.sh`
+  - `tools/runlog/selftest.py`
 
-The search of §4 "The readers" re-derives this list at the pass; a hit outside it joins the pass's
-`--dispatch --writes` set before its edit.
+Four files above are also fixture homes: `tools/playbook/instruction_units.py`,
+`tools/memory-tree/row_grammar.py`, `tools/memory-tree/gen_build_index.py` and
+`tools/lib/resolve-python.test.sh`.
+
+The search of §4 "The readers" and the two of §4 "The fixtures" re-derive this list at the pass. A
+hit outside it, or a suite file that S7's fixture rule reaches, joins the pass's `--dispatch --writes`
+set before its edit. The list is 22 files longer than rev-10's, and the fixture rule's lines are
+counted in §4 "The fixtures".
 
 ### Alternatives rejected
 
@@ -506,8 +700,13 @@ The search of §4 "The readers" re-derives this list at the pass; a hit outside 
 - risks — a reader the search cannot see (a pattern built at runtime) keeps its own spelling; the
   search's population is printed so the pass can read it, and the flip probe is the backstop.
   `SLUG_DEFAULTS` restates the catalogue's defaults for a tree with no policy kit; the build-index
-  self-test arm of §7 compares the two where the policy kit resolves.
-- testing — AC1 to AC14 by a pass; the arms of §7 at the close.
+  self-test arm of §7 compares the two where the policy kit resolves. `design_lib.py`'s `_BUILD` and
+  `_DECISION` and `loop_lib.py`'s `SEED_BUILD` are such readers, named in §4 "The readers", and
+  under an `in-slug` grammar they refuse a dated slug. The fixture rule's 726 lines in 26 files are
+  most of this pass's write set. A fixture neither search sees reds a suite rather than passing
+  silently, and the rule covers it.
+- testing — AC1 to AC15 by a pass; the arms of §7 at the close, and the unattended kit's suites by
+  `bash tools/unattended/run-unattended-gates.sh`.
 - migration — none for records; a set conf `BUILD_SLUG_RE` is refused by name.
 - user docs — `help/reference/policy.md` gains the three keys' sections by its render (S12); S11
   updates the hygiene prose. No new surface class: the new flags and print modes join no `[[class]]`
@@ -613,10 +812,18 @@ The search of §4 "The readers" re-derives this list at the pass; a hit outside 
   for this tree, the two are byte-equal; and `_build_local_ident(families)` still matches `TOOL-dTotalRecall-5` whole.
   Red when: the local copy keeps its own session spelling, so drift-audit's parity arm reds once S4
   splices the class, or the fallback loses the legacy shape.
+- **AC15** — When the two searches of §4 "The fixtures" run at the pass tip, every line they print
+  in a file that section's table marks re-spelled is one of the hits the same row keeps. Also, when a
+  probe at the tip imports `tools/runlog/runlog_lib.py` and prints
+  `bool(SLUG_RE.fullmatch(s))` for `myBuild`, `aFix`, `my-build` and `a`, it prints
+  `True True False False`.
+  Red when: a re-spelled file still holds a fixture slug the class refuses, or the runlog table's
+  accepted side keeps a name the class refuses.
+  figure: the 793 lines in 53 files, 726 of them in the 26 re-spelled files, are PINNED 2026-11-22 at `17f07b292` by the two searches; the pass re-derives the before-count at its base.
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `memory-recall kit selftest` · `branch-reconcile selftest` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `routed-commits selftest` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `pass-order history` · `brief-recorded` · `push-main self-test` · `roles render selftest` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `review-protocol parity (kit vs dogfood)` · `kit placeholders (a declared token its adopter substitutes)` · `playbook render selftest` · `branch-guard self-test` · `drift-audit selftest` · `scratch-guard self-test` · `corpus-ids selftest` · `transition-audit arms` · `verdict-epoch self-test` · `loop adapt fixtures` · `loop breakpoint fixtures` · `loop guard fixtures` · `loop placement fixtures` · `loop position fixtures` · `loop claim fixtures` · `ratchet selftest` · `instruction units selftest` · `policy check` · `policy fixtures` · `docs` · `help reference pages` · `govkit selfcheck` · `govkit acceptance matrix` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates`
+`memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `memory-recall kit selftest` · `branch-reconcile selftest` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `routed-commits selftest` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `pass-order history` · `brief-recorded` · `push-main self-test` · `roles render selftest` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `review-protocol parity (kit vs dogfood)` · `kit placeholders (a declared token its adopter substitutes)` · `playbook render selftest` · `branch-guard self-test` · `drift-audit selftest` · `scratch-guard self-test` · `corpus-ids selftest` · `transition-audit arms` · `verdict-epoch self-test` · `loop adapt fixtures` · `loop breakpoint fixtures` · `loop guard fixtures` · `loop placement fixtures` · `loop position fixtures` · `loop claim fixtures` · `ratchet selftest` · `instruction units selftest` · `policy check` · `policy fixtures` · `docs` · `help reference pages` · `govkit selfcheck` · `govkit acceptance matrix` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `straggler-guard arms` · `pre-push self-test` · `run-gates evidence` · `roles adopter self-test` · `agent-cap self-test` · `row-grammar selftest` · `loop scenario fixtures`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC8 · the `slug_legacy_py` and `slug_legacy_sh` parity rows, staged by one byte changed in the run-gates copy · that suite's assertion count, raised by the two rows and by the two `resolve_kit_dir` copies S8 adds to the existing row's population
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 AC6 AC13 · the `BUILD_SLUG_RE` arms from `tools/memory-tree/check-memory-hygiene.test.sh@b4137f489:3896` rewritten: a set conf value refuses naming the three keys, and check 4 reds a planted folder `d_bad` the derived pattern refuses with the `fallback` line once after it, the master-pinned fixture having no landed revision, staged by restoring the conf read and by printing the line on every run · none
@@ -734,6 +941,37 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--se
   veto 1: it covers (a)'s no-landed-revision case and the invalid-file case with one rule, and ties
   to the precedent the brief named, the size switch's read, per
   `2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-2-brief`. widens: none · relaxes: none
+- **F13 — What happens to a fixture slug the bound class refuses?** Rev-10 points every reader at
+  `slug_class`. Under the defaults that class is the legacy shape, which refuses the short, digit and
+  upper-case-first fixture slugs that the suites of §7 feed those readers and expect read. The two
+  searches of §4 "The fixtures" find them on 793 lines in 53 files at `17f07b292` (PINNED
+  2026-11-22), and rev-10 re-spelled only the two homes of S13
+  (`2026-11-22-build-TOOL-dTotalRecall-5-3-builder-return`). The options:
+  - (a) Lift S13's re-spelling rule to S7 and re-spell every refused fixture by one stated rule.
+    The population is fixed by stated searches, and a suite red on a fixture they miss joins it.
+  - (b) Readers whose only refused population is fixtures keep a looser class.
+  - (c) Alternate a frozen short-slug arm into `slug_class` itself.
+
+  Each measured against the unit:
+
+  - **(b).** Every re-pointed reader's refused population is fixtures alone: every build folder,
+    the 4420 ids of `ID_RE` and the 3062 of `read_bindings` fit the class (§4 "The grammar"). So (b)
+    is every S7 reader keeping a looser class.
+    - Spelled as each reader's own literal, it leaves an `in-slug` date refused by each of them.
+      That breaks the Goal's "no reader rejects a slug or id minted under it", which a run may not
+      amend.
+    - Spelled as a second class derived in `id_grammar.py`, it needs a print mode and a render token
+      this unit does not price, veto 2. It also gives two answers to "is this a slug", the split F10
+      refused for the token, and the two classes would be held equal nowhere but on the real corpus,
+      where they agree by construction.
+  - **(c).** It widens `ID_RE` beyond the 4420 ids S4 pins, and AC12's refusal of `TOOL-x-1` fails,
+    veto 1.
+  - **(a).** It fails no criterion and needs no surface. Its cost is the write set: 726 lines in 26
+    files and one table rewritten. Most of it is a mechanical rename that each file's own suite
+    checks. It keeps `[one-fact]`: one class answers for every reader and every fixture.
+
+  Recommendation (a). RESOLVED (agent, 2026-11-22, delegated): (a), the one survivor of the vetoes,
+  per `2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-3-brief`. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -781,6 +1019,18 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--se
   f-string's doubled braces, which finds drift-audit's local era copy, re-pointed in S4 with its
   parity arm, and every figure on it is re-pinned at `a8748ffaa`. AC1's and AC12's observations
   widen, AC7's planted lines gain one, and AC13 and AC14 are new.
+- rev-11 · 2026-11-22 · S7 · S13 · §3 · §4 "The readers", "The fixtures", Files touched · §5 · AC15 ·
+  §7 · §8 F13 · per `2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-3-brief` and
+  `2026-11-22-build-TOOL-dTotalRecall-5-3-builder-return`, which found the bound class refusing short
+  fixture slugs in suites §7 expects green:
+  - S7 carries the fixture rule S13 held, by F13.
+  - The new §4 "The fixtures" fixes the population by two stated searches (793 lines in 53 files at
+    `17f07b292`), gives each file its disposition, re-spells by one rule, and traces every changed
+    reader to the suites that feed it, the one widening, `backlog.SLUG_RE`, included.
+  - §4 "The readers" keeps the four test-side copies the return named, each with its reason, and
+    states the readers the predicate does not see.
+  - Files touched gains the 22 fixture homes, and §7 gains their gates.
+  - AC15 is new. No other criterion's observation moved.
 
 ## 10. Reuse audit
 
