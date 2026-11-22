@@ -3158,20 +3158,46 @@ def check_roles_default() -> None:
         derive_listed_role(x) == "project-owned" for x in tests), str({x: derive_listed_role(x) for x in tests}))
 
 
-def derive_roles_expected(kit: pathlib.Path, descriptor: dict) -> tuple[set, set]:
-    """TOOL-dBoundRoles-37 S1: the roster a roles install is graded against, DERIVED, never typed.
-    `agents` is the slot of every `agents/*.agent.md` of `kit` whose front matter does not set
-    `agent: false`, an absent key counting true, read by that kit's own `roles_lib.load_roles` loaded
-    by path, so this carries no second front-matter grammar. `overlays` is every `house/*.md` include
-    of `descriptor`'s `seed` rows, `descriptor` a parsed roles `kit.toml`. Runs no case."""
+def load_kit_roster(kit: pathlib.Path) -> dict:
+    """The roster of the roles kit at `kit`: `{slot: {"path", "keys", "body"}}`, read by that kit's own
+    `roles_lib.load_roles` loaded by path, so the selftest carries no second front-matter grammar and
+    holds one roster loader (TOOL-dBoundRoles-37 S1, lifted by TOOL-dBoundRoles-54 S1). Runs no case."""
     spec = importlib.util.spec_from_file_location("roles_lib_roster", pathlib.Path(kit) / "roles_lib.py")
     rlib = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(rlib)
-    agents = {s for s, r in rlib.load_roles(kit).items() if r["keys"].get("agent", "true") != "false"}
+    return rlib.load_roles(kit)
+
+
+def derive_roles_expected(kit: pathlib.Path, descriptor: dict) -> tuple[set, set]:
+    """TOOL-dBoundRoles-37 S1: the roster a roles install is graded against, DERIVED, never typed.
+    `agents` is the slot of every `agents/*.agent.md` of `kit` whose front matter does not set
+    `agent: false`, an absent key counting true, read through `load_kit_roster`. `overlays` is every
+    `house/*.md` include of `descriptor`'s `seed` rows, `descriptor` a parsed roles `kit.toml`. Runs no
+    case."""
+    agents = {s for s, r in load_kit_roster(kit).items() if r["keys"].get("agent", "true") != "false"}
     seeds = [x for f in descriptor.get("files", []) if f.get("role") == "seed"
              for x in (f["include"] if isinstance(f["include"], list) else [f["include"]])]
     overlays = {x for x in seeds if x.startswith("house/") and x.endswith(".md") and x.count("/") == 1}
     return agents, overlays
+
+
+def derive_overlay_expected(kit: pathlib.Path) -> set:
+    """TOOL-dBoundRoles-54 S1: the house overlays the roles kit at `kit` owes, DERIVED from its roster
+    and never from the seed rule they are compared with: `house/<slot>.md` for EVERY slot
+    `load_kit_roster` reads, `agent: false` included, since `gov-session` is no agent and has one.
+    Runs no case."""
+    return {"house/%s.md" % s for s in load_kit_roster(kit)}
+
+
+def derive_overlay_drift(expected: set, rows: list[dict]) -> tuple[list, list]:
+    """TOOL-dBoundRoles-54 S2: `expected`, `derive_overlay_expected`'s set, compared both ways with the
+    `house/*.md` sources of the `roles` rows of `rows`, `derive_seed_expected`'s. A row's `src` is gov's
+    repo path `<home>/house/<file>`, so its `house/<file>` tail is what is compared. Returns `(slots,
+    files)`: the slot of each expected overlay no roles seed row sources, and each seeded overlay no
+    slot owns, both sorted. Runs no case."""
+    tails = ("/".join(str(r["src"]).replace("\\", "/").split("/")[-2:]) for r in rows if r["kit"] == "roles")
+    seeded = {x for x in tails if _re.fullmatch(r"house/[^/]+\.md", x)}
+    return (sorted(o[len("house/"):-len(".md")] for o in expected - seeded), sorted(seeded - expected))
 
 
 def derive_seed_expected(target: pathlib.Path, descs: dict, selection: list[str]) -> list[dict]:
@@ -10474,7 +10500,6 @@ user_skills = "/tmp/gk-fake-skills"
             # rows `derive_seed_expected` reads from the plan model, over the same target and the
             # selection `cmd_plan` resolves for it, so a roster that seeds one more file moves both
             # sides. The `ORDER|project-owned` half stays the measurement recorded above.
-            import tomllib  # noqa: PLC0415
             _gk49 = govkit_module()
             _reg49 = _gk49.load_registry(GOV_ROOT)
             _descs49 = _gk49.read_descriptors(GOV_ROOT, _reg49, _gk49.Report())
@@ -10488,18 +10513,23 @@ user_skills = "/tmp/gk-fake-skills"
                   _seed_got == len(_seed_rows) and marks.get("ORDER|project-owned") == 34,
                   "previewed %d seed row(s), the plan model derives %d, by kit %s; marks %s"
                   % (_seed_got, len(_seed_rows), _seed_by_kit, marks))
-            # TOOL-dBoundRoles-49 S3: the roles share is the roster's. Every overlay
-            # `derive_roles_expected` reads from the roles kit is the source of exactly one derived
-            # seed row of the `roles` kit, so an overlay the roster seeds and the plan drops reds by name.
-            _ov49 = derive_roles_expected(KIT_DIRS["roles"], tomllib.loads(
-                (KIT_DIRS["roles"] / "kit.toml").read_text(encoding="utf-8")))[1]
-            _home49 = (_descs49.get("roles", ({}, ""))[0].get("home") or "").rstrip("/")
-            _roles_src49 = [_sr["src"] for _sr in _seed_rows if _sr["kit"] == "roles"]
-            _ov_unrowed = sorted(o for o in _ov49 if _roles_src49.count(_home49 + "/" + o) != 1)
-            check("...and every roles house overlay is the source of one previewed roles seed row",
-                  bool(_ov49) and not _ov_unrowed,
-                  "overlays without exactly one roles seed row %s; roster overlays %d, roles seed sources %s"
-                  % (_ov_unrowed, len(_ov49), sorted(_roles_src49)))
+            # TOOL-dBoundRoles-49 S3, its expected side re-derived by TOOL-dBoundRoles-54 S1 and S2:
+            # the roles share is the roster's. The expected set is `house/<slot>.md` for every slot of
+            # the roles kit's roster, read independently of the seed rule, and it is compared both
+            # ways with the `house/*.md` sources of the derived roles seed rows. So an include removed
+            # while its file stays, and a role added with no overlay seeded, red naming the slot; an
+            # overlay seeded for no role reds naming the file. It does not check tracked house files
+            # that no role owns and no include seeds: such a file seeds and previews nothing.
+            _ov54 = derive_overlay_expected(KIT_DIRS["roles"])
+            _slots54, _files54 = derive_overlay_drift(_ov54, _seed_rows)
+            _roles_src54 = sorted(str(_sr["src"]) for _sr in _seed_rows if _sr["kit"] == "roles")
+            check("...and every roster slot's house overlay is the source of a previewed roles seed row",
+                  bool(_ov54) and not _slots54,
+                  "slots whose overlay is not seeded %s; roster overlays %s, roles seed sources %s"
+                  % (_slots54, sorted(_ov54), _roles_src54))
+            check("...and every seeded roles house overlay belongs to a roster slot", not _files54,
+                  "seeded overlays no slot owns %s; roster overlays %s, roles seed sources %s"
+                  % (_files54, sorted(_ov54), _roles_src54))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
             check("...and NO project-owned row is previewed as a write",

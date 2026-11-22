@@ -1,0 +1,16 @@
+**Serves:** journal TOOL-dBoundRoles-54
+
+# TOOL-dBoundRoles-54 — acceptance ledger
+
+Each criterion of section 6, read by the pass that built the unit with a probe of the code it changed, on the
+worktree before the pass commit: `tools/govkit/selftest.py#derive_overlay_expected`,
+`tools/govkit/selftest.py#derive_overlay_drift`, `tools/govkit/selftest.py#load_kit_roster` and
+`tools/govkit/selftest.py#derive_seed_expected`, imported as a library by a `python` probe that puts
+`tools/govkit` on `sys.path` and runs no case, over default targets and a scratch copy of the roles kit built
+under a short fixture path. No gate, suite or bar ran in the pass: the one `New arm:` arm of section 7 and its
+RED-first observation, and the legs section 7 lists, are owed to the main loop at the close.
+
+**Evidences:** TOOL-dBoundRoles-54
+- AC1 — `derive_overlay_expected` — over the installed roles kit of a default target, `build_target(<scratch>, DEPLOY_REGISTRY_DEFAULT)` plus gov's `apply`, it returned 13 overlays beside 13 role files under that kit's `agents/`, `house/gov-session.md` among them (DERIVED, the probe over the pass's base `d173e8ced`); over gov's tree and a default plan's derived seed rows, `derive_overlay_drift` returned `([], [])`; with a scratch kit copy carrying `agents/gov-extra.agent.md` and no overlay it returned `(['gov-extra'], [])`, naming the slot. That `apply` exited 1 on the playbook-render adopter's refusal of the fixture's deploy text, a path this pass does not touch, after the roles kit was installed. OWED: the section 7 arm and the `govkit selftest` leg's default-plan checks, at the close.
+- AC2 — `tools/roles/house/gov-builder.md` — with `"house/gov-builder.md"` dropped from the seed include of a scratch `kit.toml`, the file still present under the copy's `house/` and the role present, the plan rows `derive_seed_expected` derived over that descriptor gave `derive_overlay_drift` `(['gov-builder'], [])`, naming the slot; unit 49's former expected side, the seed rule's own includes, named nothing over the same drop. A copy with `agents/gov-tester.agent.md` removed and the full seed rule gave `([], ['house/gov-tester.md'])`, naming the file. OWED: the section 7 arm, staged by restoring the expected side to the seed rule's includes, RED first, at the close.
+- AC3 — `TOOL-dBoundRoles-49@rev-5` — `python tools/memory-tree/build_records.py read` over `memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-deviation-543.md` exited 0 with no `malformed` row, printing a Departs from row naming `TOOL-dBoundRoles-49@rev-5`, an Approver row naming `author-recorded` and an After row naming this spec's AC2; the pass writes no line of unit 49's spec, so the AC3 `git diff --name-only` over it prints nothing. OWED: the `memory hygiene` and `recall floor` legs over the record, at the close.
