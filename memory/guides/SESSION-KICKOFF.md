@@ -121,7 +121,7 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   owner; run its red legs on an `origin/main` worktree early to tell its own reds apart · prune when the
   attribution can grade a run that edits the runner.
 - 2026-11-22 · `GATE_ATTRIBUTE=<rev>` over `pass-legs.sh` · it attributes no red there: every red reads `DEAD PROBE`, its
-  bound 0s (the sum of the red legs' R ceilings), so a pass's red is told inherited only by running that leg at the pass base
+  bound 0s (DERIVED: run-gates' `attributing red legs` line, the sum of the red legs' R ceilings), so a pass's red is told inherited only by running that leg at the pass base
   by hand and comparing its findings (dKeptSession) · prune when a pass leg's red reads OWN or INHERITED under it.
 
 
