@@ -1425,6 +1425,28 @@
     ]
   },
   {
+    "name": "shape-run records (each record equals its review line)",
+    "tag": "leg.memory-tree.shape-run-records-each-record-equals-its-review",
+    "tests": [
+      "feature.memory-tree-hygiene"
+    ],
+    "purpose": "compares each shape-run record with its review line",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/shape_run.py",
+      "--check"
+    ],
+    "chunk": "records",
+    "subject": "repo",
+    "ceiling": 125,
+    "enforces": [
+      "practice.one-fact"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
     "name": "playbook render wiring",
     "pass_leg": true,
     "tag": "leg.playbook-render.playbook-render-wiring",
@@ -3612,7 +3634,8 @@
     "guard": [
       "{prefix}/workflows/",
       "{prefix}/memory-tree/gen_build_index.py",
-      "{prefix}/unattended/unattended.sh"
+      "{prefix}/unattended/unattended.sh",
+      "{prefix}/memory-tree/shape_run.py"
     ],
     "chunk": "selftests",
     "subject": "kit",

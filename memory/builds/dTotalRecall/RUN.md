@@ -219,3 +219,8 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T20:49:35Z draw · re-dispatch · TOOL-dTotalRecall-11 · 26/186 · 20261122T204935Z-d82341
 
 2026-11-22T20:49:35Z dispatch · item 4993aec7 TOOL-dTotalRecall-11 · reason memory/HYGIENE.md memory/map/features/memory-tree-hygiene.md tools/run-gates/ceiling-evidence.txt
+
+2026-11-22T21:12:32Z brief · item TOOL-dTotalRecall-11 · reason 4396225f91f7 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-11-build-brief-2.md
+2026-11-22T21:15:54Z draw · re-dispatch · TOOL-dTotalRecall-11 · 27/186 · 20261122T211554Z-4dc620
+
+2026-11-22T21:15:54Z dispatch · item f711a956 TOOL-dTotalRecall-11 · reason tools/memory-tree/shape_run.py tools/memory-tree/gov_record.py tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/memory-tree/record-kinds.toml tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/README.md tools/memory-tree/kit.toml tools/govkit/registry.toml tools/gate-legs.json tools/govkit/subject-pins.tsv memory/map/features/memory-tree-hygiene.md tools/run-gates/ceiling-evidence.txt tools/workflows/tier2-review.test.sh tools/workflows/README.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-11.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-11-2-acceptance-ledger.md

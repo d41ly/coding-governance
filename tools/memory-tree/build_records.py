@@ -109,6 +109,14 @@ judgment carrying no `Verdict`) and `Writer` (`stand-in` until the executor land
 are their readers. Neither kind has a `new` door: the loop kit's `probe.py` computes every field and calls
 `write_record`.
 
+THE SHAPE-RUN KIND (TOOL-dTotalRecall-11): `<date>-build-<unit id>-shape-run-<n>.md`, one review exit's
+`review-shape` line as typed fields, `Kind` to `Out-tokens` in the line's order and `Caused-by` the review
+record's stem, then each optional field the line carries (`Merged`, `Trigger`, `Shape`, `Efforts`,
+`Role-sha`). `Kind`, `Intensity` and `At` are closed to `SHAPE_KINDS`, `SHAPE_INTENSITIES` and
+`SHAPE_STAGES`, the sets `shape_run.SHAPE_RE` compiles. Its door is the record door's `gov_record.py new
+shape-run --review <path>`, never this file's `new`, and `shape_run.py --check` compares each record with
+its review's line.
+
 ONE LINE PER VALUE, at the one writer (PLAY-dOrderedCharter-49 S53): `write_record` refuses a field value
 holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so no door's value forges a
 field; every door's refusal exits 1, writing nothing. Its `lines`, written after the fields, are refused
@@ -198,6 +206,11 @@ PROBE_VERDICTS = {"verification": ("confirmed", "refuted", "inconclusive", "unru
                   "reproduction": ("confirmed", "refuted", "inconclusive", "unrunnable"),
                   "experiment": ("measured", "within-noise", "aborted", "unrunnable")}
 PROBE_JUDGED = ("computed", "claimed")   # how a probe's judgment was reached, a fact beside its verdict
+#: a review exit's closed words on its `review-shape` line (TOOL-dTotalRecall-11), which `shape_run.SHAPE_RE`
+#: compiles from: the review's kind, its intensity and the stage it reached
+SHAPE_KINDS = ("diff-review", "spec-audit")
+SHAPE_INTENSITIES = ("full", "light")
+SHAPE_STAGES = ("find", "verify", "synth")
 METHOD_MARKS = ("judge claimed", "visual")   # a method entry's optional trailing fields
 #: one entry of a probe's method: the predicted `<exit>:<hash12>`, the command, which never holds the field
 #: separator, then any of `METHOD_MARKS`, each after a ` · `
@@ -280,6 +293,13 @@ KINDS = {
     "stream-plan": {   # TOOL-dTotalRecall-25 S6: one TOML fence, no field; `record_kinds.check_stream_plan` grades it
         "required": (),
         "closed": (),
+    },
+    "shape-run": {   # TOOL-dTotalRecall-11: one review exit's `review-shape` line, written by `gov_record.py new
+        # shape-run`; each optional field the line carries follows `Caused-by`, and `shape_run.py --check`
+        # re-parses the line to hold the counts
+        "required": ("Kind", "Round", "Intensity", "At", "Raw", "Confirmed", "Refuted", "Unverified", "Blocker",
+                     "High", "Medium", "Low", "Agents", "Out-tokens", "Caused-by"),
+        "closed": (("Kind", SHAPE_KINDS), ("Intensity", SHAPE_INTENSITIES), ("At", SHAPE_STAGES)),
     },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):

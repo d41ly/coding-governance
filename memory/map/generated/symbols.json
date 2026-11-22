@@ -9068,6 +9068,11 @@
       "file": ".githooks/pre-push.runlog.test.sh"
     },
     {
+      "id": "check_shape_runs",
+      "kind": "function",
+      "file": "tools/memory-tree/shape_run.py"
+    },
+    {
       "id": "check_shell_file",
       "kind": "function",
       "file": "tools/playbook/check_layers.py"
@@ -13838,6 +13843,11 @@
       "file": "tools/codebase-map/replay-phrases.py"
     },
     {
+      "id": "derive_record_field",
+      "kind": "function",
+      "file": "tools/memory-tree/shape_run.py"
+    },
+    {
       "id": "derive_record_hash",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
@@ -13896,6 +13906,11 @@
       "id": "derive_refusal_reason",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "derive_refused_field",
+      "kind": "function",
+      "file": "tools/memory-tree/shape_run.py"
     },
     {
       "id": "derive_regenerate_argvs",
@@ -14561,6 +14576,11 @@
       "id": "derive_settings",
       "kind": "function",
       "file": "tools/govkit/steps/review_rounds.py"
+    },
+    {
+      "id": "derive_shape_pattern",
+      "kind": "function",
+      "file": "tools/memory-tree/shape_run.py"
     },
     {
       "id": "derive_shim_window",
@@ -18130,6 +18150,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-tree/shape_run.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
@@ -20078,6 +20103,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "parse_shape_line",
+      "kind": "function",
+      "file": "tools/memory-tree/shape_run.py"
+    },
+    {
       "id": "parse_shell_defs",
       "kind": "function",
       "file": "tools/codebase-map/extract_code.py"
@@ -20946,6 +20976,11 @@
       "id": "print_wake",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "print_written",
+      "kind": "function",
+      "file": "tools/memory-tree/gov_record.py"
     },
     {
       "id": "probe",
@@ -26381,6 +26416,16 @@
       "id": "read_sg_token",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_shape_line",
+      "kind": "function",
+      "file": "tools/memory-tree/shape_run.py"
+    },
+    {
+      "id": "read_shape_record",
+      "kind": "function",
+      "file": "tools/memory-tree/shape_run.py"
     },
     {
       "id": "read_shebang_members",
@@ -37053,6 +37098,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "run_shape_run",
+      "kind": "function",
+      "file": "tools/memory-tree/gov_record.py"
+    },
+    {
       "id": "run_shell_role_scan",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -44536,6 +44586,11 @@
       "id": "write_settle_claim",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_shape_run",
+      "kind": "function",
+      "file": "tools/memory-tree/gov_record.py"
     },
     {
       "id": "write_shard",

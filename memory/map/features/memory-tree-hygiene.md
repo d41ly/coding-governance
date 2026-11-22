@@ -10,7 +10,7 @@ decisions = ["TOOL-aRelaxedShard-1", "TOOL-aWidenedGuide-1", "TOOL-dDerivedDocke
 stage = ["step.build", "step.test"]
 
 [claims]
-gate-legs = ["memory hygiene", "memory hygiene (the pass checks)", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms", "backlog migration selftest", "straggler-guard arms", "routed commits name a specced unit", "routed-commits selftest", "ratchet (never gains)", "ratchet (both ways)", "ratchet (unarmed)", "ratchet (populated)", "ratchet (seed laundering)", "ratchet (rename)", "ratchet (keys, not a scalar)", "ratchet (key shape)", "ratchet selftest", "record-kinds"]
+gate-legs = ["memory hygiene", "memory hygiene (the pass checks)", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms", "backlog migration selftest", "straggler-guard arms", "routed commits name a specced unit", "routed-commits selftest", "ratchet (never gains)", "ratchet (both ways)", "ratchet (unarmed)", "ratchet (populated)", "ratchet (seed laundering)", "ratchet (rename)", "ratchet (keys, not a scalar)", "ratchet (key shape)", "ratchet selftest", "record-kinds", "shape-run records (each record equals its review line)"]
 kits = ["memory-tree"]
 git-hooks = ["commit-msg", "pre-rebase"]
 harness-hooks = []

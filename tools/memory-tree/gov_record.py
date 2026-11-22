@@ -7,6 +7,7 @@
     python <prefix>/memory-tree/gov_record.py new spec <id> --tier 1|2 [--order <n>] [--base <sha>]
     python <prefix>/memory-tree/gov_record.py new ask --build <slug> --family <FAMILY> --text <text> --sev <LEVEL> <why>
                                               [--clause <label> <value>]... [--unit] [--pointer <path>]
+    python <prefix>/memory-tree/gov_record.py new shape-run --review <path>
 
 It stands in for `gov record` the way `gov_tag.py` stands in for `gov tag`, and runs in the repository at
 the current directory. A kind is written here only where its `[[record-kind]]` row in `record-kinds.toml`
@@ -23,7 +24,9 @@ input is not a field list takes its handler in `KIND_HANDLERS`: `build-readme` a
 `--new-build` and `--new-spec` scaffolds of `gen_build_index.py`, imported, every flag passed through;
 `ask` grades the ask's clauses by `asks.acceptance` before any mint, then writes its ask and `SEV` rows
 into the build's `BACKLOG.md` under an id the `--family` counter mints (TOOL-dTotalRecall-7), printing
-`wrote <path> <id> key <key>` or `exists <path> <id> key <key>`, and `graded: not ready (R5)` under `grade`.
+`wrote <path> <id> key <key>` or `exists <path> <id> key <key>`, and `graded: not ready (R5)` under `grade`;
+`shape-run` takes `--review <path>` alone, a tracked review record whose one `review-shape` line `shape_run.py`
+parses, and writes its fields through `write_new_record` (TOOL-dTotalRecall-11).
 
 Exit and stdout: 0 `wrote <path> key <content key>` · 0 `exists <path> key <content key>` · 2 `refused
 <kind>: <why>` · 4 `waiting offline <ref>`, nothing written. A handler prints its scaffold's lines.
@@ -219,8 +222,73 @@ def write_new_ask(root, argv):
     return 0
 
 
+def write_shape_run(root, review):
+    """`new shape-run --review <path>`: one review exit's `review-shape` line as a shape-run record
+    (TOOL-dTotalRecall-11 S4). `review` is a tracked file of a `<memory root>/builds/<slug>/reviews/` folder,
+    read from the working copy; its one column-0 line is taken by `shape_run.read_shape_line` and parsed by
+    `parse_shape_line`, and the record written by `build_records.write_new_record` under `<slug>`, serving
+    the first id of the review's `**Serves:**` line with its `@rev-<N>` pin cut (§8 F5), titled with the
+    review's stem, its fields the line's in line order and `Caused-by` that stem. The content key makes a
+    second call for the same line `exists`. ValueError for every refusal, nothing written.
+    WHAT IT DOES NOT CHECK: that the line is the one the review's harness printed."""
+    import re
+    import shape_run  # noqa: E402  the line's one grammar
+    from tree_lib import read_bindings  # noqa: E402  the Serves line's one reader
+    conf = build_records.read_design_conf(root)
+    memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
+    where = f"a tracked file of a {memory_root}/builds/<slug>/reviews/ folder"
+    path = pathlib.Path(review)
+    path = (path if path.is_absolute() else pathlib.Path.cwd() / path).resolve()
+    try:
+        rel = path.relative_to(pathlib.Path(root).resolve()).as_posix()
+    except ValueError:
+        raise ValueError(f"--review {review} is not {where}") from None
+    m = re.fullmatch(re.escape(memory_root) + r"/builds/(?P<slug>[^/]+)/reviews/(?P<stem>[^/]+)\.md", rel)
+    tracked = subprocess.run(["git", "ls-files", "--", f":(literal){rel}"], cwd=str(root), capture_output=True,
+                             text=True, encoding="utf-8").stdout.strip()
+    if not m or tracked != rel or not path.is_file():
+        raise ValueError(f"--review {review} is not {where}")
+    try:
+        line = shape_run.read_shape_line(path.read_bytes().decode("utf-8"))
+    except UnicodeDecodeError:
+        raise ValueError(f"{rel} is not UTF-8 text") from None
+    except ValueError as exc:
+        raise ValueError(f"{rel} carries {exc}") from None
+    try:
+        parsed = shape_run.parse_shape_line(line)
+    except ValueError as exc:
+        raise ValueError(f"the {shape_run.LINE_HEAD} line of {rel} is refused at {exc}") from None
+    binding = read_bindings(str(root), [rel], dict(conf, MEMORY_ROOT=memory_root)).get(rel) or {}
+    if binding.get("state") != "bound":
+        raise ValueError(f"{rel} binds no unit on its **Serves:** line: {binding.get('why') or 'not read'}")
+    fields = [(shape_run.derive_record_field(name), parsed[name.replace("-", "_")])
+              for name, _p, _o in shape_run.SHAPE_FIELDS if name.replace("-", "_") in parsed]
+    fields.append(("Caused-by", m.group("stem")))
+    return print_written(*build_records.write_new_record(root, shape_run.KIND, m.group("slug"), binding["ids"][0],
+                                                         m.group("stem"), fields))
+
+
+def run_shape_run(root, argv):
+    """`new shape-run --review <path>`, its one flag: `write_shape_run`."""
+    ap = argparse.ArgumentParser(prog="gov_record.py new shape-run", allow_abbrev=False)
+    ap.add_argument("--review", required=True)
+    return write_shape_run(root, ap.parse_args(argv).review)
+
+
+def print_written(word, said, key, lines):
+    """The door's report of one `write_new_record` result: the authority's lines, then `waiting <ref>` exit 4,
+    or `<word> <path> key <key>` exit 0."""
+    for line in lines:
+        print(line)
+    if word == "waiting":
+        print(said)
+        return 4
+    print(f"{word} {said} key {key}")
+    return 0
+
+
 #: The kinds whose input is no field list, each a handler taking the repository and its own arguments.
-KIND_HANDLERS = {"build-readme": run_build_readme, "spec": run_spec, "ask": write_new_ask}
+KIND_HANDLERS = {"build-readme": run_build_readme, "spec": run_spec, "ask": write_new_ask, "shape-run": run_shape_run}
 
 
 def main(argv):
@@ -252,17 +320,11 @@ def main(argv):
             if not eq or not key:
                 raise ValueError(f"--field {spelled!r} is not <Name>=<value>")
             fields.append((key, value))
-        word, said, key, lines = build_records.write_new_record(root, kind, a.build, a.unit, a.title, fields, a.name)
+        written = build_records.write_new_record(root, kind, a.build, a.unit, a.title, fields, a.name)
     except ValueError as exc:
         print(f"refused {kind}: {exc}")
         return 2
-    for line in lines:
-        print(line)
-    if word == "waiting":
-        print(said)
-        return 4
-    print(f"{word} {said} key {key}")
-    return 0
+    return print_written(*written)
 
 
 if __name__ == "__main__":

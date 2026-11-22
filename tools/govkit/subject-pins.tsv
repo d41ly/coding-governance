@@ -199,6 +199,7 @@ runlog skill wiring	repo	wiring
 scratch-guard self-test	kit	selftests
 selftest harness self-test	kit	selftests
 settings-merge selftest	kit	selftests
+shape-run records (each record equals its review line)	repo	records
 shell hygiene (a backslashed path handed to bash)	repo	product
 shell hygiene (a fixed-name temp renamed into place)	repo	product
 shell hygiene (a fork spent on builtin work)	repo	product

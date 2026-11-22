@@ -619,8 +619,13 @@ Every return carries seven fields beside the counts:
   `count=- state=-` (TOOL-dFairHearing-20): a gapped walk's count is no clean reading, so no caller routing on
   the counts may take its `0` and `CONVERGED` as one.
 
-- `shape` — one record line, also logged, in this fixed grammar:
-  `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> merged=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown> trigger=<cause|-> shape=- efforts=- role-sha=-`.
+- `shape` — one record line, also logged, opening `review-shape` and carrying, in this order, `kind`,
+  `round`, `intensity`, `at`, `raw`, `confirmed`, `refuted`, `merged`, `unverified`, `blocker`, `high`,
+  `medium`, `low`, `agents`, `out-tokens`, `trigger`, `shape`, `efforts` and `role-sha`, each as
+  `<field>=<value>`. Its grammar is `SHAPE_RE` in the memory-tree kit's `shape_run.py`, the one spelling of
+  it (TOOL-dTotalRecall-11): the suite's shape arm parses each exit's line through `shape_run.py
+  --parse-line`, and `gov_record.py new shape-run --review <path>` files a review record's line as a
+  typed record.
   `trigger`, `shape`, `efforts` and `role-sha` are `review.cost`'s fields (TOOL-dDeclaredLoop-20): the cause the
   caller passed, and three a shape registry will supply, each `-` while absent. `at` is the stage the exit reached; a count that stage has not produced is `-`, never `0`, and the
   every-lens-dead exit prints `raw=-`. `merged` counts the findings a skeptic refuted as `duplicate of

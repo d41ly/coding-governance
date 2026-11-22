@@ -162,6 +162,7 @@ runlog skill wiring	3.9	2	a	2026-09-24	runner
 scratch-guard self-test	187.0	1	a	2026-11-13	the leg's own argv alone on a scratch clone of 2ba17e9d6 on node a, one whole run, timed by date arithmetic, close of TOOL-aNimbleMend-15
 selftest harness self-test	26.8	2	a	2026-09-24	runner
 settings-merge selftest	6.8	2	a	2026-09-24	runner
+shape-run records (each record equals its review line)	1.3	1	d	2026-11-22	shape_run.py --check on the worktree at f711a9567 with the pass applied, timed by bash time and date arithmetic, 1.3s wall at most of three runs, build pass 2 of TOOL-dTotalRecall-11
 shell hygiene (a loop fed by a command substitution)	2.1	1	a	2026-11-13	runner
 shell hygiene (a loop fed by a command substitution)	1.1	1	d	2026-11-22	runner
 shell-hygiene selftest	0.9	2	a	2026-09-24	runner

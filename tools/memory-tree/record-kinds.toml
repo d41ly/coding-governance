@@ -728,3 +728,18 @@ readers-none = "an ask row is read by backlog.py's fold and the index generator'
 lifecycle = "current-state"
 check = "memory hygiene"
 purpose = { text = "the ask kind's acceptance at filing; its writers are the items that file asks, each filing stating its acceptance", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:455" }
+
+[[record-kind]]
+name = "shape-run"
+tag = "record.shape-run"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-build-*-shape-run-*.md"
+id-rule = "<date>-build-<unit id>-shape-run-<n>.md"
+schema = { form = "fields", source = "{prefix}/memory-tree/build_records.py:KINDS.shape-run.required", fields = ["Kind", "Round", "Intensity", "At", "Raw", "Confirmed", "Refuted", "Unverified", "Blocker", "High", "Medium", "Low", "Agents", "Out-tokens", "Caused-by"] }
+writer = "gov_record.py new shape-run"
+readers = []
+readers-none = "a shape-run record is read by shape_run.py's check and the Loop Review, never filled into a work order"
+lifecycle = "append-only"
+check = "shape-run records (each record equals its review line)"
+purpose = { text = "one review exit's review-shape line as typed fields, compared back to that line by shape_run.py", source = "owner" }
+cardinality = { caused-by = { per-source = "1", per-target = "many" } }

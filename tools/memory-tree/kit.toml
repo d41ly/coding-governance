@@ -1065,3 +1065,17 @@ ceiling = 300
 [[command]]
 verb = "seen-red"
 run = "seen_red.py"
+
+[[gate_leg]]
+name = "shape-run records (each record equals its review line)"
+tag = "leg.memory-tree.shape-run-records-each-record-equals-its-review"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "compares each shape-run record with its review line"
+argv = ["python3", "{kit}/shape_run.py", "--check"]
+subject = "repo"
+enforces = ["practice.one-fact"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "records"
+ceiling = 125

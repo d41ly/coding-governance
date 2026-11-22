@@ -698,7 +698,8 @@ carry it too:
   `Key`) · `probe` (the probe it opened: its pinned head, its `## Method` entries, its run lines and
   its `Verdict` beside `Judged`, written by the loop kit's `probe.py`) · `stream-plan` (a build's
   units grouped into ordered streams, no field and one TOML fence of `[[stream]]` tables, written by
-  dIndexedDesign's planner). The seventeen after `research`
+  dIndexedDesign's planner) · `shape-run` (one review exit's `review-shape` line as typed fields,
+  written by `gov_record.py new shape-run`, TOOL-dTotalRecall-11). The eighteen after `research`
   are the typed kinds: each record is named
   `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
@@ -824,7 +825,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 
 <!-- gen:record-kinds -->
 
-50 kinds · 24 purposes pending
+51 kinds · 24 purposes pending
 
 | Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |
 |---|---|---|---|---|---|---|---|
@@ -878,6 +879,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 | `git-client-state` | `record.git-client-state` | `<git-common-dir>/sourcetreeconfig.json` | `hand` | — | — | `record-kinds` | — |
 | `stream-plan` | `record.stream-plan` | `memory/builds/*/build/*-stream-plan-*.md` | `hand` | — | — | `record-kinds` | a build's units grouped into ordered streams, written by dIndexedDesign's planner, read by dWellOiledMachine's pick |
 | `ask` | `record.ask` | `memory/builds/*/BACKLOG.md` | `gov_record.py new ask` | — | — | `memory hygiene` | the ask kind's acceptance at filing; its writers are the items that file asks, each filing stating its acceptance |
+| `shape-run` | `record.shape-run` | `memory/builds/*/build/*-build-*-shape-run-*.md` | `gov_record.py new shape-run` | — | — | `shape-run records (each record equals its review line)` | one review exit's review-shape line as typed fields, compared back to that line by shape_run.py |
 
 <!-- /gen:record-kinds -->
 

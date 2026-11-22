@@ -2050,7 +2050,21 @@ async function runLedgerArms() {
   const regradedWrong = []
   // TOOL-aMendedFleet-18 - each exit's `shape` matches the S1 grammar at the stage its path reaches,
   // is logged, and reads `out-tokens=unknown` because the stub runtime's `budget` has no `spent`.
-  const SHAPE_RE = /^review-shape kind=(diff-review|spec-audit) round=\d+ intensity=(full|light) at=(find|verify|synth) raw=(\d+|-) confirmed=(\d+|-) refuted=(\d+|-) merged=(\d+|-) unverified=(\d+|-) blocker=(\d+|-) high=(\d+|-) medium=(\d+|-) low=(\d+|-) agents=\d+ out-tokens=unknown trigger=- shape=- efforts=- role-sha=-$/
+  // TOOL-dTotalRecall-11 S7 - the grammar is the memory-tree kit's `shape_run.py` SHAPE_RE, its one home:
+  // each exit's line is parsed by spawning `shape_run.py --parse-line` with the python and the kit directory
+  // this runner is passed, and an empty one reds the arm by name rather than skipping it.
+  const shapePy = process.argv[5] || ''
+  const shapeKit = process.argv[4] || ''
+  const shapeWhy = !shapePy ? 'no python was resolved' : !shapeKit ? 'no memory-tree kit directory was passed' : ''
+  const parseShape = (line) => {
+    if (shapeWhy) return { why: shapeWhy }
+    const p = require('child_process').spawnSync(shapePy, ['-B', require('path').join(shapeKit, 'shape_run.py'), '--parse-line', line],
+      { encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONUTF8: '1' }) })
+    if (p.status !== 0) return { why: 'shape_run.py exited ' + p.status + ': ' + ((p.stdout || '') + (p.stderr || '') || String(p.error)).trim().split('\n')[0] }
+    const fields = {}
+    for (const ln of p.stdout.split(/\r?\n/)) { const i = ln.indexOf('='); if (i > 0) fields[ln.slice(0, i)] = ln.slice(i + 1) }
+    return { fields: fields }
+  }
   const shapeStage = { 'every lens dead': 'find', 'no finding raised': 'find', 'every finding refuted': 'verify',
     'one skeptic batch dead': 'verify', 'the synthesis dead': 'synth', complete: 'synth' }
   let shapeSeen = 0
@@ -2065,7 +2079,12 @@ async function runLedgerArms() {
     if (what === 'complete' ? !Array.isArray(r.result.regraded) : 'regraded' in r.result) regradedWrong.push(what)
     shapeSeen++
     const sh = typeof r.result.shape === 'string' ? r.result.shape : ''
-    if (!SHAPE_RE.test(sh) || sh.indexOf(' at=' + shapeStage[what] + ' ') === -1 || r.logs.indexOf(sh) === -1) shapeWrong.push(what)
+    const parsed = parseShape(sh)
+    const f = parsed.fields
+    if (!f || f.at !== shapeStage[what] || !('merged' in f) || f.out_tokens !== 'unknown' ||
+        !['trigger', 'shape', 'efforts', 'role_sha'].every((k) => f[k] === '-') || r.logs.indexOf(sh) === -1) {
+      shapeWrong.push(what + (parsed.why ? ' (' + parsed.why + ')' : ''))
+    }
     if (what === 'complete') {
       const sp = r.trace.find((t) => t.label === 'synth')
       synthPromptShape = !!sp && sh.length > 0 && sp.prompt.indexOf('<<<SHAPE\n' + sh + '\nSHAPE>>>') !== -1 &&

@@ -192,6 +192,7 @@
       "scratch-guard self-test",
       "selftest harness self-test",
       "settings-merge selftest",
+      "shape-run records (each record equals its review line)",
       "shell hygiene (a backslashed path handed to bash)",
       "shell hygiene (a fixed-name temp renamed into place)",
       "shell hygiene (a fork spent on builtin work)",

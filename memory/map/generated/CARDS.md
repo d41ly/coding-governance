@@ -177,12 +177,12 @@ check-memory-hygiene.sh: the memory tree's structural gate, its per-class size c
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/memory-tree-hygiene.md`
 - decisions 3: `TOOL-aRelaxedShard-1`, `TOOL-aWidenedGuide-1`, `TOOL-dDerivedDocket-31`
-- gate-legs 22: `memory hygiene`, `memory hygiene (the pass checks)`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`, `routed commits name a specced unit`, `routed-commits selftest`, `ratchet (never gains)`, `ratchet (both ways)`, `ratchet (unarmed)`, `ratchet (populated)`, `ratchet (seed laundering)`, `ratchet (rename)`, `ratchet (keys, not a scalar)`, `ratchet (key shape)`
+- gate-legs 23: `memory hygiene`, `memory hygiene (the pass checks)`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`, `routed commits name a specced unit`, `routed-commits selftest`, `ratchet (never gains)`, `ratchet (both ways)`, `ratchet (unarmed)`, `ratchet (populated)`, `ratchet (seed laundering)`, `ratchet (rename)`, `ratchet (keys, not a scalar)`, `ratchet (key shape)`
 - kits 1
 - git-hooks 2
 - gotcha-classes 22
 - globs 11
-- cut 38 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 39 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-tree-merge-driver
 

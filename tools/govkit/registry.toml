@@ -1552,6 +1552,7 @@ guard = [
   "{prefix}/workflows/",
   "{prefix}/memory-tree/gen_build_index.py",
   "{prefix}/unattended/unattended.sh",
+  "{prefix}/memory-tree/shape_run.py",
 ]
 chunk = "selftests"
 subject = "kit"
