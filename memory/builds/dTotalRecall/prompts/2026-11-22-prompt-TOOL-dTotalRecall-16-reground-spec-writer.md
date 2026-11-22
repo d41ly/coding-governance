@@ -2,7 +2,7 @@
 
 # gov-spec-writer handoff — TOOL-dTotalRecall-16
 
-<!-- gov:handoff role=gov-spec-writer build=dTotalRecall unit=TOOL-dTotalRecall-16 path=memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-16-reground-spec-writer.md role-sha=91ec0ce505aa task-sha=3c7457ab0378 -->
+<!-- gov:handoff role=gov-spec-writer build=dTotalRecall unit=TOOL-dTotalRecall-16 path=memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-16-reground-spec-writer.md role-sha=91ec0ce505aa task-sha=94bc5e215bad -->
 
 ## Role
 
@@ -144,7 +144,7 @@ so a builder can build it as written over HEAD. Where every claim already holds,
 5. A `[[ledger]]` home spelled under `tools/<kit>/` reds `install-prefix (shipped surface)`; keep every home under
    `memory/project/`. A spec over its ceiling of 49152 B (PINNED 2026-11-20 by the spec size check) is tightened
    in prose you touch, never by dropping a criterion. Name every new function the spec introduces with a verb from
-   `.lexicon.conf`'s VERBS table, nested helpers included. A new leg's `ceiling` clears its evidenced maximum by max(120 s, 1.0x)
+   `.lexicon.conf`'s VERBS table, nested helpers included. A new leg's `ceiling` clears its evidenced maximum by max(120 s, 1.0x) (PINNED 2026-11-22, deviation 15)
    (`memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-1-deviation-15.md`), and a new surface
    class needs its `[[class]]` row in `tools/govkit/usage.toml`; every number the spec states carries an id, a
    path:line, PINNED or DERIVED on its line (`python tools/playbook/writing_practice.py check pinned-facts`).

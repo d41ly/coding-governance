@@ -18,17 +18,17 @@ Revise both specs in place, each as a rev bump with one revision-log line naming
 
 ### Items
 
-1. `memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-8.md` (DEFERRED, rev-4): its facts `60 s` and
+1. `memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-8.md` (DEFERRED, rev-4): its facts `60 s` and (PINNED 2026-11-22, deviation 15)
    `941 KB` are unpinned. The `941 KB` measurement is a prototype figure: pin it with what measured it, or cut it if
-   nothing on disk records it. The `60 s` is the new leg's declared ceiling, and the
+   nothing on disk records it. The `60 s` is the new leg's declared ceiling, and the (PINNED 2026-11-22, deviation 15)
    `leg ceilings clear their evidenced maximum` leg requires a ceiling to clear the leg's evidenced maximum by
    max(120 s, 1.0x) (DERIVED, that leg's failure line for unit 1's `record-kinds` leg, recorded in
-   `memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-1-deviation-15.md`), so a 60 s ceiling can never
+   `memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-1-deviation-15.md`), so a 60 s ceiling can never (PINNED 2026-11-22, deviation 15)
    pass. Restate the ceiling as that rule gives it over the spec's own measured time, PINNED with today's date and the
    rule, in every place the spec states it (S-lines, Design, Gates), and say where the builder records the evidence row
    (`tools/run-gates/ceiling-evidence.txt`).
 2. `memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-1.md` (CLOSED, rev-7): its S3 fact
-   `120 seconds` is unpinned and the unit was built at 122 by deviation 15. Pin that one line, citing the deviation
+   `120 seconds` is unpinned and the unit was built at 122 by deviation 15. Pin that one line, citing the deviation (PINNED 2026-11-22, deviation 15)
    record by its file stem, as a rev-8 bump whose revision-log line names this brief and says the change is a
    record-only pin to a CLOSED spec, no criterion moved. Change nothing else in that spec.
 3. Keep every other claim of both specs as it stands; this is a facts pass, not a re-ground.

@@ -18,7 +18,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   `.lexicon.conf`'s VERBS table (`python tools/lexicon/lexicon.py --suggest <name> --as py.function`); spell no
   sibling kit's path (`<kit>/<file>`) in a shipped file, fixtures included (`install-prefix (shipped surface)`);
   a new surface class needs its `[[class]]` row in `tools/govkit/usage.toml` (`docs`); a new leg's ceiling clears
-  its evidenced maximum by max(120 s, 1.0x); every number in a record you write carries an id, a path:line,
+  its evidenced maximum by max(120 s, 1.0x); every number in a record you write carries an id, a path:line, (PINNED 2026-11-22, deviation 15)
   PINNED or DERIVED on its line.
 - `lexicon naming predicates` and `lexicon wiring` read 1432 verb offenders over the pin 1421 at the run's base
   (DERIVED, `lexicon.py` at `8b8b1374c`). This unit edits the lexicon, a grader, so it owns every red that grader
