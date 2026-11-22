@@ -149,8 +149,15 @@
  * `while` or `until` loop; P3 sleep at or over 5 s, a `sleep` of `POLL_SLEEP_FLOOR_S` or more, or
  * of a duration that does not read. A shell comment is read by no row. A gate row refusing the same command wins, and the background
  * command's exit notification is the wait. The index is read at the checkout root of the payload `cwd`, else of
- * `CLAUDE_PROJECT_DIR`; neither resolving adds no arm, with one witness line when
- * `CLAUDE_PROJECT_DIR` is set. An absent
+ * `CLAUDE_PROJECT_DIR`, else of the directory of a candidate's launched script, resolved against the
+ * payload `cwd` (TOOL-dBoundRoles-8 S1), so a gate run by absolute path from outside every checkout
+ * reads the index of the checkout holding the script. None resolving, G2 and G3 still refuse with an
+ * empty allowlist, saying no checkout root was found, and G1 and the polling rows are unarmed with one
+ * witness line naming the three starts. THE FIELD MEASUREMENT (TOOL-dBoundRoles-8, gap-orient-09):
+ * the typed gate runs a field count found admitted were commands naming a gate script as an
+ * argument, a `sed` read, a `grep` alternation inside quotes, a path assigned to a variable, which
+ * this arm correctly admits; a census of role gate runs replays the recorded commands through the
+ * exported `checkRoleGate` and `scanCommandHeads`, never a regex of its own. An absent
  * index adds no arm, except in a governed tree, where it refuses a candidate naming the re-render
  * (TOOL-dBoundRoles-6 S3); a broken one refuses a candidate; a manifest that does not read leaves G1
  * unarmed with one witness line while G2 and G3 bind; a throw refuses a role agent. THE CEILING:
@@ -1926,7 +1933,9 @@ function renderGateDeny(type, c, row, leg, allow, shown) {
   return (
     `BLOCKED by scratch-guard: a role agent runs no gate. Agent type ${type} ran \`${c.text}\`, which is ` +
     `row ${row}${leg ? `, the leg "${leg.name}"` : ''}.\n\n` +
-    `The allowlist of ${type} in the role index ${shown} is ${allow.length ? allow.map((n) => `"${n}"`).join(', ') : 'empty'}. ` +
+    (shown === null
+      ? `No checkout root was found from the payload cwd, CLAUDE_PROJECT_DIR or the script's directory, so no role index was read and the allowlist of ${type} is empty. `
+      : `The allowlist of ${type} in the role index ${shown} is ${allow.length ? allow.map((n) => `"${n}"`).join(', ') : 'empty'}. `) +
     'Gates run in the main session at the merge or push threshold, so return the need in your result, ' +
     'and verify your change with a fixture or a probe of your own code.\n'
   )
@@ -1934,12 +1943,21 @@ function renderGateDeny(type, c, row, leg, allow, shown) {
 
 /**
  * The checkout root a role arm reads its index at (TOOL-aOrientedCast-14): the toplevel above the
- * payload <cwd>, else above `env.CLAUDE_PROJECT_DIR`, each start resolved as checkRouted resolves its
- * session start, else null. The cwd comes first because the command or spawn runs there.
+ * payload <cwd>, else above `env.CLAUDE_PROJECT_DIR`, else above the directory of each of <cands>'
+ * launched script, its head resolved against the payload <cwd> (TOOL-dBoundRoles-8 S1), each start
+ * resolved as checkRouted resolves its session start, else null. The cwd comes first because the
+ * command or spawn runs there; a relative head with no payload cwd is no start. Agent-cap's rule 6
+ * passes no <cands>, so only the first two starts apply there.
  */
-function resolveRoleRoot(cwd, env) {
+function resolveRoleRoot(cwd, env, cands) {
   const path = require('path')
-  for (const start of [cwd, env && env.CLAUDE_PROJECT_DIR]) {
+  const starts = [cwd, env && env.CLAUDE_PROJECT_DIR]
+  for (const c of cands || []) {
+    const head = buildNativePath(c.head)
+    if (typeof cwd === 'string' && cwd !== '') starts.push(path.dirname(path.resolve(buildNativePath(cwd), head)))
+    else if (path.isAbsolute(head)) starts.push(path.dirname(path.resolve(head)))
+  }
+  for (const start of starts) {
     if (typeof start !== 'string' || start === '') continue
     const hit = resolveToplevel(path.resolve(buildNativePath(start)))
     if (hit) return hit.toplevel
@@ -1953,8 +1971,10 @@ function resolveRoleRoot(cwd, env) {
  *  1. `agent_type` absent or empty → null (the main loop runs every gate)
  *  2. no simple command whose head is a launched script, a path-bearing word, or a G2 or G3 shape,
  *     and no polling hit by checkPollWait → null, with no file read
- *  3. no root by resolveRoleRoot (the payload `cwd`, then `CLAUDE_PROJECT_DIR`) → null, or one
- *     witness naming both starts when `CLAUDE_PROJECT_DIR` is set
+ *  3. no root by resolveRoleRoot (the payload `cwd`, then `CLAUDE_PROJECT_DIR`, then each candidate's
+ *     launched script's directory, TOOL-dBoundRoles-8 S1) → each candidate tried against G2 and G3
+ *     with an empty allowlist, a match refusing and saying no checkout root was found; otherwise one
+ *     witness naming the three starts and that G1 and the polling rows are unarmed (§8 F4)
  *  4. loadRoleIndex: absent → null, or deny naming the index and its re-render where the tree is
  *     governed (checkRoleGoverned, TOOL-dBoundRoles-6 S3); broken → deny naming the index
  *  5. the allowlist: the index's `gates` list for the type, else empty — `workflow-subagent` and
@@ -1974,10 +1994,13 @@ function checkRoleGate(cmd, data, env) {
   if (cands.length === 0 && !poll) return null
   const raw = typeof data.cwd === 'string' ? data.cwd : ''
   const project = env && env.CLAUDE_PROJECT_DIR
-  const top = resolveRoleRoot(raw, env)
+  const top = resolveRoleRoot(raw, env, cands)
   if (!top) {
-    if (!project) return null
-    return { witness: `role-gate unarmed — neither the payload cwd ${raw || '(none)'} nor CLAUDE_PROJECT_DIR ${project} lies in a checkout, so no role index was read` }
+    for (const c of cands) {
+      const row = checkGateRunner(c) ? 'G2 runner' : checkGateSuite(c) ? 'G3 suite' : null
+      if (row) return { deny: renderGateDeny(type, c, row, null, [], null) }
+    }
+    return { witness: `role-gate rows G1 leg and P1 to P3 unarmed — neither the payload cwd ${raw || '(none)'}, CLAUDE_PROJECT_DIR ${project || '(unset)'} nor a launched script's directory lies in a checkout, so no role index was read; rows G2 runner and G3 suite still bind` }
   }
   // G1 resolves the command's paths against the payload cwd, and against the root when it has none.
   const cwd = raw ? path.resolve(raw) : top

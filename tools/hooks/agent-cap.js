@@ -1198,7 +1198,8 @@ function main() {
   {
     let deny = null
     try {
-      // TOOL-aOrientedCast-14: the root of the payload cwd, else of CLAUDE_PROJECT_DIR.
+      // TOOL-aOrientedCast-14: the root of the payload cwd, else of CLAUDE_PROJECT_DIR. No candidates
+      // are passed, so the third start, a launched script's directory, never applies (TOOL-dBoundRoles-8 S2).
       const { loadRoleIndex, resolveRoleRoot, checkRoleGoverned } = require(require('path').join(__dirname, 'scratch-guard.js'))
       const cwd = data.cwd || process.cwd()
       root = resolveRoleRoot(cwd, process.env)

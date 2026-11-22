@@ -1559,14 +1559,34 @@ run_role_bash "W9-AC4 F7 sleep 4s, under the floor -> allow, stderr EMPTY" 0 emp
 # ---- AC3: the anchor — a cwd under no checkout falls back to CLAUDE_PROJECT_DIR; against a ---------
 # ---- checkRoleGate reading the payload cwd alone, the first row exits 0 and the third says nothing -
 run_role_bash "O-AC3 cwd under no checkout, CLAUDE_PROJECT_DIR the fixture -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh" "$SG_NOREPO" "$SG_CWD_WT"
-run_role_bash "O-AC3 cwd under no checkout, no CLAUDE_PROJECT_DIR -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh" "$SG_NOREPO"
-run_role_bash "O-AC3 cwd and CLAUDE_PROJECT_DIR under no checkout -> allow, one witness" 0 "one;;role-gate unarmed" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh" "$SG_NOREPO" "$SG_NOREPO/$SGP"
+# TOOL-dBoundRoles-8 S1 turned the next row from an admit into G2's refusal, the runner's own
+# directory sitting in no checkout either, and the witness row onto a script no row names.
+run_role_bash "O-AC3 cwd and the runner under no checkout, no CLAUDE_PROJECT_DIR -> deny naming G2 and no checkout root" 2 "any;;G2 runner;;No checkout root was found" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh" "$SG_NOREPO"
+run_role_bash "O-AC3 cwd, CLAUDE_PROJECT_DIR and the script under no checkout -> allow, one witness" 0 "one;;role-gate rows G1 leg and P1 to P3 unarmed;;G2 runner and G3 suite still bind" gov-builder Bash "python kit/$SG_K_ROLES/check_roles.py" "$SG_NOREPO" "$SG_NOREPO/$SGP"
+# ---- TOOL-dBoundRoles-8: a gate run by absolute path from outside every checkout. The index is read --
+# ---- at the checkout holding the script; with none, G2 and G3 bind with an empty allowlist. Against --
+# ---- step 3 returning null with no root, as at base, both BR8-AC1/AC2 exit-2 rows exit 0, the -------
+# ---- --help row and the leg row print nothing, and BR8-AC3's broken-index row below exits 0 ---------
+SG_NOREPO_FWD=${SG_NOREPO//\\//}
+SG_CWD_WT_FWD=${SG_CWD_WT//\\//}
+run_role_bash "BR8-AC1 the bar runner by absolute path in no checkout, cwd in none, no CLAUDE_PROJECT_DIR -> deny naming G2" 2 "any;;G2 runner;;No checkout root was found" gov-builder Bash "bash $SG_NOREPO_FWD/$SGP/run-gates.sh" "$SG_NOREPO"
+run_role_bash "BR8-AC2 a suite by absolute path in no checkout -> deny naming G3" 2 "any;;G3 suite;;No checkout root was found" gov-builder Bash "bash $SG_NOREPO_FWD/$SGP/x.test.sh" "$SG_NOREPO"
+run_role_bash "BR8-AC2 the same suite carrying --help -> allow, one witness naming the unarmed rows" 0 "one;;G1 leg and P1 to P3 unarmed" gov-builder Bash "bash $SG_NOREPO_FWD/$SGP/x.test.sh --help" "$SG_NOREPO"
+run_role_bash "BR8-AC3 an allowlisted leg by absolute path in the fixture checkout, cwd in none -> allow, stderr EMPTY" 0 empty gov-builder Bash "python $SG_CWD_WT_FWD/kit/$SG_K_LEXICON/lexicon.py" "$SG_NOREPO"
+sg8_rr=$(env -u CLAUDE_PROJECT_DIR node -p "require(process.argv[1]).resolveRoleRoot(process.argv[2], {})" "$HOOK" "$SG_NOREPO" 2>&1)
+if [ "$sg8_rr" = null ]; then echo "ok   BR8-AC3 agent-cap's call, resolveRoleRoot with no candidates from a cwd in no checkout -> null, as at base"; pass=$((pass+1))
+else echo "FAIL BR8-AC3 resolveRoleRoot with no candidates from a cwd in no checkout returned $sg8_rr"; fail=$((fail+1)); fi
+# AC4: three field shapes that only NAME a gate script, read inside the checkout; each is admitted.
+run_role_bash "BR8-AC4 a suite path assigned to a variable and read with sed -> allow, stderr EMPTY" 0 empty gov-builder Bash "f=kit/$SG_K_ROLES/adopt-roles.test.sh && sed -n 1,5p \"\$f\""
+run_role_bash "BR8-AC4 a grep -E whose quoted alternation names the bar runner -> allow, stderr EMPTY" 0 empty gov-builder Bash "grep -E 'serve.sh|run-gates.sh|await.sh' AGENTS.md"
+run_role_bash "BR8-AC4 a sed read of a suite file -> allow, stderr EMPTY" 0 empty gov-builder Bash "sed -n 5p kit/$SG_K_HOOKS/agent-cap.test.sh"
 # ---- AC3: arming — no index, a broken index, a manifest that does not read ------------------------
 write_roles absent
 run_role_bash "G-AC3 no index: gov-builder runs the bar -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh"
 write_roles broken
 run_role_bash "G-AC3 an index holding { : gov-builder runs the bar -> deny naming the index" 2 "any;;$SG_ROLES_SHOWN;;is not JSON" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh"
 run_role_bash "G-AC3 an index holding { : gov-builder runs ls -> allow, stderr EMPTY (no candidate reads no index)" 0 empty gov-builder Bash 'ls'
+run_role_bash "BR8-AC3 an index holding { in the script's checkout, cwd in none -> deny naming that index" 2 "any;;$SG_ROLES_SHOWN;;is not JSON" gov-builder Bash "bash $SG_CWD_WT_FWD/kit/$RUN_GATES/run-gates.sh" "$SG_NOREPO"
 write_gate_manifest kit/missing.json
 run_role_bash "G-AC3 a manifest that does not read: a leg's exact argv -> allow, one witness naming the unarmed row" 0 "one;;G1 leg unarmed" gov-builder Bash "python kit/$SG_K_ROLES/check_roles.py"
 run_role_bash "G-AC3 a manifest that does not read: the bar runner still -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh"
