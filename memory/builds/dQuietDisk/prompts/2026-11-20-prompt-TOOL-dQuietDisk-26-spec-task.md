@@ -9,7 +9,7 @@ cache a switch, safe fallback, and no unattended-kit suite.
 
 ## 1. Mark the resolved forks in place
 
-The run resolved these under its mandate (BUILD-METHOD M3). Mark each in the shape `memory/TEMPLATE-SPEC.md` §8
+The run resolved these under its mandate (`doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority`). Mark each in the shape `memory/TEMPLATE-SPEC.md` §8
 states, `RESOLVED (agent, 2026-11-20, delegated): <pick>`, with the one-line reason given below. Then apply what the
 pick changes to the spec's own scope, design and acceptance, bump its rev, and add a revision-log line naming this
 task file by its stem.

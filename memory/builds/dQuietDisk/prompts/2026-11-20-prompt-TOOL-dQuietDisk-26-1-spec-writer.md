@@ -91,104 +91,106 @@ Not supplied, optional: `card:route`, `input:code`.
 
 ### brief:prompt
 
-> Background (from the session that started this one):
-> C: (Intel RST RAID 0 NVMe, about 88% full) sits at 100% active time from small-file and git-process churn caused by the governance and test workflows in coding-governance (gov), incms and nicocares.
->
-> A read-only analysis session measured and traced the causes: hermetic per-case git repos, history legs whose cache keys include HEAD, adopters re-running gov's kit selftests, govkit baseline bars, and unswept test output. That session wrote the report referenced in the brief, which ranks the reworks.
->
-> Temp-leak fixes have already landed: gov `5a311c9fa`, incms `b4850abfb`, nicocares `bb2e6543`. The owner is separately turning off 8.3 names and last-access updates on C:.
->
-> Commits in these repos follow strict governance (specs, gate bars, landers), and other sessions are active:
-> - dWitnessedBar's unattended build run in gov;
-> - gov-upgrade runs in the incms and nicocares `gov-upgrade` worktrees.
->
-> Integration with those runs and with gov's adopters is the owner's explicit requirement.
->
-> Task:
-> Build fixes 1–4 from the disk-churn analysis as an UNATTENDED run. Use this repo's `/unattended` skill, under gov's own governance (spec → build → closing review → bar → lander).
->
-> The owner's words, which are your authorization for an unattended run: "Gather all the necessary details and build fixes 1-4 in an unattended handoff session, ENSURING it cleanly integrates into the in-progress dClosedLoop rebuild and works cleanly with gov's adopters."
->
-> READ FIRST: the full report, `C:\Users\d41ly\AppData\Local\Claude-Data\claude_pzs8sxrjxfjjc\side-session-notes\local_22c30fbd-4971-4107-b3d9-acd2fca20e6a\disk-churn-analysis.md`. It has file:line evidence, measured numbers and the rework ids (K1–K12, P1–P8, R1–R8) used below.
->
-> ## The four fixes
->
-> **Fix 1 — history checks cache their answers and batch git (K5 + K6).**
-> - `check-pass-order.sh`, `check-brief-recorded.sh` and `routed_commits.py` currently regrade all of history on every commit.
->   - Their cache key includes HEAD: `tools/run-gates/run-gates.sh:3370`, `head $RG_HEAD` for legs declaring history.
->   - They launch git once per question: `lib-unattended.sh:1323`, `check-pass-order.sh:475-531, 599-630`, `check-brief-recorded.sh:520-619`, `routed_commits.py:353, 410-413`.
-> - Cache each unit/commit verdict under the commit and blob ids it reads, and grade only new units (`rev-list <last-graded>..HEAD`).
-> - Use one `git cat-file --batch` coprocess per leg. `routed_commits.py:454` and `lexicon.py:4241-4292` already do this.
-> - Run one `git diff --name-only BASE` for all guarded legs instead of one per leg (`run-gates.sh:3249-3295`).
-> - Scope the pickaxe in `skills/session-kickoff/manifest-check.sh:1971`.
->
-> **Fix 2 — fixtures built once per suite (K1 + K2 + K3 + K12).**
-> - Generalise `tools/lib/lib-selftest.sh` and `tools/govkit/fixture_target.py` into one template cache, keyed by kit tree hash, under the runner's owned `$WORK`.
-> - Each test case gets a `git clone --shared` or a worktree of the template.
-> - Arms that only read share one read-only checkout. Arms that mutate get a `--shared` clone.
-> - Build ONE shared sparse no-checkout snapshot for:
->   - `foreign-prefix.gov.test.sh:453`, `chain-packet.test.sh:295`, `check_policy.py:1270-1290` / `loop/factories.py`, `govkit/selftest.py:5867`, `matrix.py:976` and `upgrade_walk.py:230`.
-> - Build the `unattended.test.sh` prologue once as a bundle, not once per shard.
-> - Put every scratch path under one owned, swept root. Replace `rmtree(ignore_errors=True)` and `ignore_cleanup_errors=True` with a chmod-and-retry handler.
-> - Biggest targets: `unattended/unattended.test.sh`, `check-unattended.test.sh`, `govkit/selftest.py`, `.githooks/pre-push.test.sh`, `run-gates*.test.sh`, `check-wiring.test.sh`.
->   - check-wiring measured 3,786 git processes in 350 s.
->
-> **Fix 3 — adopters stop re-running gov's kit selftests; govkit stops redoing work (K4 + K7 + K8).**
-> - Add a content-addressed attestation: "kit tree <hash> passed its selftests". Adopter bars (incms `scripts/gov-bar.sh`, nicocares `scripts/nc-bar.sh`) check it and run the selftests only when the vendored kit tree hash is unattested.
-> - `govkit update`: pass the existing `blob_at(..., batch=)` handle (`upgrade_steps.py:2628`; callers at `govkit.py:9993, 9244-9245, 9481, 9490`), and run each `adopt-*.sh --check` once (`govkit.py:11169` and `:12507`).
-> - `govkit apply`: the before/after maps (`read_gate_verdicts`, `govkit.py:6239`, `:7763`, `:8465`) come from the target's reuse cache, and only legs whose guards intersect the written files are re-run.
->
-> **Fix 4 — incms and nicocares tests (P1 + P2 + P4 + P5).**
-> - nicocares `tests/v3_harness.py:191-264`: seed `v3_seeded` once per session, then copy the template DB per test (`sqlite3` `backup()` or `copyfile`).
-> - Set `STORAGE_LOCAL_PATH` to a per-session temp dir in nicocares `tests/conftest.py`, incms `scripts/check-vendor-suite.sh`, `scripts/run-core-venv.sh` and the e2e `run.sh`. The default is repo-relative: `services/api/app/core/config.py:1078`.
-> - incms `scripts/gate.sh` gets the owned, swept `TMPDIR` / `--basetemp` block from `run-gates.sh:2333-2358`. It also stops leaking its `mktemp` table files (`:121, :126`).
-> - incms `web-build` (`apps/web/build-check.sh:34`) goes through the turbo cache, with no `standalone` output in the gate.
-> - Fix 4 lands in the nicocares repo (`C:\projects\nicocares\main`, remote d41ly/nc) and in incms (`C:\projects\incms\main`), each under its own governance (`/unattended` there), followed by the incms submodule pin bump.
-> - You may start your own side sessions in those folders for it.
->
-> ## Integration — the hard requirement
->
-> 1. **dWitnessedBar, the dClosedLoop chain's Test build, is running unattended RIGHT NOW.**
->    - Worktree `.claude/worktrees/unattended-dwitnessedbar-2ed3b3`, branch `branch/unattended-dwitnessedbar-2ed3b3`, about 302 commits ahead of main, base `9e21ac760`.
->    - Its lease is in that branch's `memory/builds/dWitnessedBar/RUN.md`.
->    - Never write into its worktree or branch.
->    - It already changes files fixes 1–2 need: `run-gates.sh`, `run-selftests.sh`, `selftest-budgets.txt`, `check-pass-order.sh`, `check-brief-recorded.sh`, `lib-unattended.sh`, `unattended.test.sh`, and a new `tools/run-gates/verdict_flow.py` (verdict routing, leg `select`, the flake ledger).
->    - Read its specs (`memory/builds/dWitnessedBar/spec/`) and its branch diff before writing yours.
->    - Extend its verdict/ledger machinery rather than adding a parallel store.
->    - Units touching those files must be built on its landed tip. Wait for it to land, or for its land branch, rather than racing it. Units with no overlap may go first.
-> 2. **The chain's rules** are in `memory/builds/dClosedLoop/README.md` "Build-level rules" and `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` `[chain]` (line ~1760).
->    - A live build sharing a subject finishes on its own track and is reconciled at the merge.
->    - Map each of your units to the chain build that owns the area, and record that mapping in your build README:
->      - dWitnessedBar (Test) for gate health and budgets;
->      - dSafePassage (Supersession, DEFERRED, specs in `memory/builds/dSafePassage/spec/`; see 5, 10, 25–27) for govkit update/apply;
->      - dScopedBuild where relevant.
->    - Do not contradict their specs. Name any overlap so they can absorb it.
-> 3. **Adopters** are listed in `tools/govkit/adopters.toml`: nc, ic, swydee.
->    - Kit changes reach them only through minted kit versions and `govkit update`. Never hand-edit vendored kit copies in adopters.
->    - The attestation must fall back safely: unknown hash → run the selftests as today.
->    - Prove each kit change on adopter fixtures (`tools/govkit/fixtures/`) and with `govkit check` against incms and nicocares, run read-only from gov.
-> 4. **Gov upgrades are in progress** in `C:\projects\incms\gov-upgrade` and `C:\projects\nicocares\gov-upgrade` (branch `feature/gov-upgrade`, another session).
->    - Do not touch or run anything heavy there.
->    - Before changing incms `scripts/gate.sh` or nicocares runner files, check whether that branch changes them, and sequence your fix-4 landings after it, or tell the owner.
->
-> ## Done means
->
-> - Each fix is specced, built, reviewed, green on its repo's bar, and landed by that repo's lander, OR deferred with a recorded reason.
-> - Measured before/after numbers for at least `check-wiring.test.sh`, `check-pass-order.sh`, one `govkit/selftest.py` shard and the nicocares seed suite:
->   - git processes, via `GIT_TRACE2_EVENT=<dir>` and counting files;
->   - peak and residual temp entries, with `TEMP`/`TMP`/`TMPDIR` pointed at a scratch dir;
->   - wall time.
-> - Add the R1–R8 rules and the G-A/G-B budgets only if they fit a unit cleanly; otherwise record them as backlog asks.
->
-> ## Do NOT
->
-> - Change host settings (8.3 names, last access, Dev Drive).
-> - Delete incms `services/api/var/media` (202k files). Leave that to the owner and say so.
-> - Run gates inside other sessions' worktrees.
->
-> Report back: the landing commits per repo, the measured reductions, and anything deferred or waiting on dWitnessedBar or gov-upgrade.
->
-> Shared notes folder for this group of sessions (outside the repo; read siblings' notes there, leave hand-over notes or large findings there instead of pasting them into messages): C:\Users\d41ly\AppData\Local\Claude-Data\claude_pzs8sxrjxfjjc\side-session-notes\local_80075476-7489-4b7f-a330-9218f30d7721
+```text
+Background (from the session that started this one):
+C: (Intel RST RAID 0 NVMe, about 88% full) sits at 100% active time from small-file and git-process churn caused by the governance and test workflows in coding-governance (gov), incms and nicocares.
+
+A read-only analysis session measured and traced the causes: hermetic per-case git repos, history legs whose cache keys include HEAD, adopters re-running gov's kit selftests, govkit baseline bars, and unswept test output. That session wrote the report referenced in the brief, which ranks the reworks.
+
+Temp-leak fixes have already landed: gov `5a311c9fa`, incms `b4850abfb`, nicocares `bb2e6543`. The owner is separately turning off 8.3 names and last-access updates on C:.
+
+Commits in these repos follow strict governance (specs, gate bars, landers), and other sessions are active:
+- dWitnessedBar's unattended build run in gov;
+- gov-upgrade runs in the incms and nicocares `gov-upgrade` worktrees.
+
+Integration with those runs and with gov's adopters is the owner's explicit requirement.
+
+Task:
+Build fixes 1–4 from the disk-churn analysis as an UNATTENDED run. Use this repo's `/unattended` skill, under gov's own governance (spec → build → closing review → bar → lander).
+
+The owner's words, which are your authorization for an unattended run: "Gather all the necessary details and build fixes 1-4 in an unattended handoff session, ENSURING it cleanly integrates into the in-progress dClosedLoop rebuild and works cleanly with gov's adopters."
+
+READ FIRST: the full report, `C:\Users\d41ly\AppData\Local\Claude-Data\claude_pzs8sxrjxfjjc\side-session-notes\local_22c30fbd-4971-4107-b3d9-acd2fca20e6a\disk-churn-analysis.md`. It has file:line evidence, measured numbers and the rework ids (K1–K12, P1–P8, R1–R8) used below.
+
+## The four fixes
+
+**Fix 1 — history checks cache their answers and batch git (K5 + K6).**
+- `check-pass-order.sh`, `check-brief-recorded.sh` and `routed_commits.py` currently regrade all of history on every commit.
+  - Their cache key includes HEAD: `tools/run-gates/run-gates.sh@db46050c:3370`, `head $RG_HEAD` for legs declaring history.
+  - They launch git once per question: `lib-unattended.sh:1323`, `check-pass-order.sh:475-531, 599-630`, `check-brief-recorded.sh:520-619`, `routed_commits.py:353, 410-413`.
+- Cache each unit/commit verdict under the commit and blob ids it reads, and grade only new units (`rev-list <last-graded>..HEAD`).
+- Use one `git cat-file --batch` coprocess per leg. `routed_commits.py:454` and `lexicon.py:4241-4292` already do this.
+- Run one `git diff --name-only BASE` for all guarded legs instead of one per leg (`run-gates.sh:3249-3295`).
+- Scope the pickaxe in `skills/session-kickoff/manifest-check.sh@b12d3cd4:1971`.
+
+**Fix 2 — fixtures built once per suite (K1 + K2 + K3 + K12).**
+- Generalise `tools/lib/lib-selftest.sh` and `tools/govkit/fixture_target.py` into one template cache, keyed by kit tree hash, under the runner's owned `$WORK`.
+- Each test case gets a `git clone --shared` or a worktree of the template.
+- Arms that only read share one read-only checkout. Arms that mutate get a `--shared` clone.
+- Build ONE shared sparse no-checkout snapshot for:
+  - `foreign-prefix.gov.test.sh:453`, `chain-packet.test.sh:295`, `check_policy.py:1270-1290` / `loop/factories.py`, `govkit/selftest.py:5867`, `matrix.py:976` and `upgrade_walk.py:230`.
+- Build the `unattended.test.sh` prologue once as a bundle, not once per shard.
+- Put every scratch path under one owned, swept root. Replace `rmtree(ignore_errors=True)` and `ignore_cleanup_errors=True` with a chmod-and-retry handler.
+- Biggest targets: `unattended/unattended.test.sh`, `check-unattended.test.sh`, `govkit/selftest.py`, `.githooks/pre-push.test.sh`, `run-gates*.test.sh`, `check-wiring.test.sh`.
+  - check-wiring measured 3,786 git processes in 350 s.
+
+**Fix 3 — adopters stop re-running gov's kit selftests; govkit stops redoing work (K4 + K7 + K8).**
+- Add a content-addressed attestation: "kit tree <hash> passed its selftests". Adopter bars (incms `scripts/gov-bar.sh`, nicocares `scripts/nc-bar.sh`) check it and run the selftests only when the vendored kit tree hash is unattested.
+- `govkit update`: pass the existing `blob_at(..., batch=)` handle (`upgrade_steps.py:2628`; callers at `govkit.py:9993, 9244-9245, 9481, 9490`), and run each `adopt-*.sh --check` once (`govkit.py:11169` and `:12507`).
+- `govkit apply`: the before/after maps (`read_gate_verdicts`, `govkit.py:6239`, `:7763`, `:8465`) come from the target's reuse cache, and only legs whose guards intersect the written files are re-run.
+
+**Fix 4 — incms and nicocares tests (P1 + P2 + P4 + P5).**
+- nicocares `tests/v3_harness.py:191-264`: seed `v3_seeded` once per session, then copy the template DB per test (`sqlite3` `backup()` or `copyfile`).
+- Set `STORAGE_LOCAL_PATH` to a per-session temp dir in nicocares `tests/conftest.py`, incms `scripts/check-vendor-suite.sh`, `scripts/run-core-venv.sh` and the e2e `run.sh`. The default is repo-relative: `services/api/app/core/config.py:1078`.
+- incms `scripts/gate.sh` gets the owned, swept `TMPDIR` / `--basetemp` block from `run-gates.sh:2333-2358`. It also stops leaking its `mktemp` table files (`:121, :126`).
+- incms `web-build` (`apps/web/build-check.sh:34`) goes through the turbo cache, with no `standalone` output in the gate.
+- Fix 4 lands in the nicocares repo (`C:\projects\nicocares\main`, remote d41ly/nc) and in incms (`C:\projects\incms\main`), each under its own governance (`/unattended` there), followed by the incms submodule pin bump.
+- You may start your own side sessions in those folders for it.
+
+## Integration — the hard requirement
+
+1. **dWitnessedBar, the dClosedLoop chain's Test build, is running unattended RIGHT NOW.**
+   - Worktree `.claude/worktrees/unattended-dwitnessedbar-2ed3b3`, branch `branch/unattended-dwitnessedbar-2ed3b3`, about 302 commits ahead of main, base `9e21ac760`.
+   - Its lease is in that branch's `memory/builds/dWitnessedBar/RUN.md`.
+   - Never write into its worktree or branch.
+   - It already changes files fixes 1–2 need: `run-gates.sh`, `run-selftests.sh`, `selftest-budgets.txt`, `check-pass-order.sh`, `check-brief-recorded.sh`, `lib-unattended.sh`, `unattended.test.sh`, and a new `tools/run-gates/verdict_flow.py` (verdict routing, leg `select`, the flake ledger).
+   - Read its specs (`memory/builds/dWitnessedBar/spec/`) and its branch diff before writing yours.
+   - Extend its verdict/ledger machinery rather than adding a parallel store.
+   - Units touching those files must be built on its landed tip. Wait for it to land, or for its land branch, rather than racing it. Units with no overlap may go first.
+2. **The chain's rules** are in `memory/builds/dClosedLoop/README.md` "Build-level rules" and `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` `[chain]` (line ~1760).
+   - A live build sharing a subject finishes on its own track and is reconciled at the merge.
+   - Map each of your units to the chain build that owns the area, and record that mapping in your build README:
+     - dWitnessedBar (Test) for gate health and budgets;
+     - dSafePassage (Supersession, DEFERRED, specs in `memory/builds/dSafePassage/spec/`; see 5, 10, 25–27) for govkit update/apply;
+     - dScopedBuild where relevant.
+   - Do not contradict their specs. Name any overlap so they can absorb it.
+3. **Adopters** are listed in `tools/govkit/adopters.toml`: nc, ic, swydee.
+   - Kit changes reach them only through minted kit versions and `govkit update`. Never hand-edit vendored kit copies in adopters.
+   - The attestation must fall back safely: unknown hash → run the selftests as today.
+   - Prove each kit change on adopter fixtures (`tools/govkit/fixtures/`) and with `govkit check` against incms and nicocares, run read-only from gov.
+4. **Gov upgrades are in progress** in `C:\projects\incms\gov-upgrade` and `C:\projects\nicocares\gov-upgrade` (branch `feature/gov-upgrade`, another session).
+   - Do not touch or run anything heavy there.
+   - Before changing incms `scripts/gate.sh` or nicocares runner files, check whether that branch changes them, and sequence your fix-4 landings after it, or tell the owner.
+
+## Done means
+
+- Each fix is specced, built, reviewed, green on its repo's bar, and landed by that repo's lander, OR deferred with a recorded reason.
+- Measured before/after numbers for at least `check-wiring.test.sh`, `check-pass-order.sh`, one `govkit/selftest.py` shard and the nicocares seed suite:
+  - git processes, via `GIT_TRACE2_EVENT=<dir>` and counting files;
+  - peak and residual temp entries, with `TEMP`/`TMP`/`TMPDIR` pointed at a scratch dir;
+  - wall time.
+- Add the R1–R8 rules and the G-A/G-B budgets only if they fit a unit cleanly; otherwise record them as backlog asks.
+
+## Do NOT
+
+- Change host settings (8.3 names, last access, Dev Drive).
+- Delete incms `services/api/var/media` (202k files). Leave that to the owner and say so.
+- Run gates inside other sessions' worktrees.
+
+Report back: the landing commits per repo, the measured reductions, and anything deferred or waiting on dWitnessedBar or gov-upgrade.
+
+Shared notes folder for this group of sessions (outside the repo; read siblings' notes there, leave hand-over notes or large findings there instead of pasting them into messages): C:\Users\d41ly\AppData\Local\Claude-Data\claude_pzs8sxrjxfjjc\side-session-notes\local_80075476-7489-4b7f-a330-9218f30d7721
+```
 
 ### brief:goal
 
@@ -220,7 +222,7 @@ measured before and after.
 20. `govkit apply` takes its before map from the target's reuse cache and re-runs only legs whose guards meet the files it wrote [planned TOOL-dQuietDisk-18]
 21. Measured before and after: git processes, peak and residual temp entries, and wall time for `check-wiring.test.sh`, `check-pass-order.sh` and one `govkit/selftest.py` shard [planned TOOL-dQuietDisk-19]
 22. Fix 4 in nicocares and incms, with the incms pin bump [parked it lands in those repositories under their own governance, through side sessions; the nicocares seed-suite numbers come from there]
-23. The R1 to R8 design rules and the G-A and G-B budgets [parked R1 to R8 change governance carriers, which a run may not change (BUILD-METHOD M3, veto 2), and the G-A and G-B rows sit in files dWitnessedBar owns; both are filed as asks in this build's `BACKLOG.md`]
+23. The R1 to R8 design rules and the G-A and G-B budgets [parked R1 to R8 change governance carriers, which a run may not change (`doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority`, veto 2), and the G-A and G-B rows sit in files dWitnessedBar owns; both are filed as asks in this build's `BACKLOG.md`]
 
 ### brief:acceptance
 

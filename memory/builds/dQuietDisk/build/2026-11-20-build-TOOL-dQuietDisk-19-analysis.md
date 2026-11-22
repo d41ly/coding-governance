@@ -2,10 +2,11 @@
 
 **Serves:** research TOOL-dQuietDisk-19
 
-Copied whole below the rule, its headings demoted one level and nothing else changed, from the analysis session's notes folder (`side-session-notes/local_22c30fbd-4971-4107-b3d9-acd2fca20e6a/disk-churn-analysis.md`, 45,125 bytes, written 2026-11-20 04:31), because that folder is not durable. Its BASE is gov `608aa364c`.
-
+Copied whole below the rule inside one `text` fence, its headings demoted one level and nothing else changed, from the analysis session's notes folder (`side-session-notes/local_22c30fbd-4971-4107-b3d9-acd2fca20e6a/disk-churn-analysis.md`, 45,125 bytes PINNED, written 2026-11-20 04:31), because that folder is not durable. Its BASE is gov `608aa364c`.
+ The fence keeps the report's file:line citations and measured figures as the quoted evidence they are; this record's own claims sit above it.
 ---
 
+```text
 ## Why C: sits at 100% active time: small-file and git-process churn in gov, incms and nicocares
 
 **Date:** 2026-11-20
@@ -351,3 +352,4 @@ Each finding needs a waiver line in a registry, the same pattern as `dead-path-w
   - 447,230 files in gov `.claude/worktrees`;
   - `swy-` at `Test-Analyze.ps1:411`.
 - Process-count estimates for the history legs use 55 ms per spawn under load. Idle measurements were 21–39 ms.
+```
