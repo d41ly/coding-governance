@@ -31,6 +31,14 @@ reference; this page is the short version.
    `used`, `bypassed` or `not-applicable` in its return. Without `--upstream` the task names the key as
    not supplied; for a role not reading it, `--upstream` is refused. A required input that is missing
    or still a placeholder refuses by name. The prompt carries no charter text: the charter rides once, in the agent file.
+   Every value is handed as its content, never as a path the agent must open: `--input spec=<path>`
+   and `--input prompt=<path>` hand the file's text. Each block opens with one fact line,
+   `<!-- gov:fact key=<key> class=<class> -->`. The key names what the value was cut from:
+   `record:<path>@<12 hex>` for a record or the card, `blob:<path>@<12 hex>:1-<n>` for `input:code`,
+   `cmd:` for a typed argument. The class, `witnessed`, `decided` or `claimed`, is derived from the key
+   and its source, never typed. `handoff.py facts --build <slug> --unit <id> --input prompt=<brief>
+   --input spec=<spec>` prints the same cut as one JSON list for a caller that hands it on: the unit
+   harness takes it as `facts` wherever `roles.builder` travels, and refuses a call without it.
    Its `gov:handoff` marker line names the item the work order was cut for as `item=`: pass
    `--item <tag>`, a tag in the `item.<step>.<name>` shape, or the marker reads `item=-`. A tag in
    any other shape is refused and nothing is written.
@@ -233,6 +241,9 @@ until an owner writes its first row.
   holds for that role; the refusal names both values. Re-render the handoff, or the index with
   `render_agents.py --write` where the role changed after it. An index holding no `role-sha` for the
   role, as one rendered before the key existed does, refuses every spawn of it until it is re-rendered.
+- A handoff whose handed fact moved: a `blob:` or `record:` key whose source now holds other bytes
+  than the ones it was cut from, or none. The refusal names the key and both blob ids. Re-render the
+  handoff, which cuts it fresh. A handoff rendered before fact lines existed carries none and passes.
 - A tool write to `.claude/roles.json`, or to the agent file `.claude/agents/<role>.md` of a role the
   index names, from any writer, the main session included. `render_agents.py --write` is their one
   writer. Your own files under `.claude/agents/` are not affected. The policy kit's commit guard also

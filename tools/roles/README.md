@@ -132,6 +132,30 @@ The card is `--card`, else the file the kickoff checker's `--card --path` prints
 `--input prompt=`, else the one file under the build's `prompts/` folder carrying both a
 `## The prompt` and a `## The brief` line; two such files refuse.
 
+**Inputs handed as content** (TOOL-dBoundRoles-13). Every `reads` value is handed as its content, never
+as a path the role must open: `--input spec=` and `--input prompt=` hand the file's text, CRLF folded,
+as `input:code` already did. Each block opens with one fact line, `<!-- gov:fact key=<key>
+class=<class> -->`, `roles_lib.FACT_RE`'s grammar, then the content. The key is
+`roles_lib.derive_fact_key`'s, the one deriver: `record:<path>@<sha12>` for `input:spec`,
+`input:prompt`, a `brief:` value and the `upstream:rows` file, its contract after the rows unkeyed;
+`record:card/<session id>` for a `task:` or `card:` value, a `--card` inside the repository keyed by its
+own path and one outside by `card/<stem>`; `blob:<path>@<blob12>:1-<n>` for `input:code`, the tree's own
+bytes cut whole; and `cmd:<argv12>:<out12>` for a typed `question` or `diff`, over the fixed argv
+`--input`, NUL, `<name>`. `blob12` and `sha12` are the first 12 hex digits of the git blob id of the
+source's bytes with CRLF folded, so one fact keys one way on every checkout. The class is
+`roles_lib.derive_fact_class(key, root)`'s, read off the key and its source, so no agent types one:
+`decided` for `.governance/policy.toml`, `<MEMORY_ROOT>/DECISIONS.md` and a record whose status header
+tail carries `ratified <date>`; `claimed` for any other `record:` key and a typed argument; `witnessed`
+for any other `blob:` or `cmd:` key. The hooks kit's spawn guard re-derives each `blob:` and `record:`
+key at the spawn and refuses one whose source moved; a handoff rendered before this carries no fact
+line and is admitted as before. `python handoff.py facts --build <slug> [--unit <id>] --input
+<key>=<value>...` prints the same cut, one line of JSON, the list `[{name, key, class, text}]` in the
+order the inputs were given, refusing as `render` refuses: the unit harness's caller cuts
+`--input prompt=<briefPath> --input spec=<specPath>` immediately before each call and passes it as
+`facts`, which that harness requires wherever `roles.builder` travels. It reads no charter. A path
+holding whitespace refuses, since `FACT_RE` could not read its key back. What it does not check: that
+a fact is true, only where it was cut from; a `cmd:` key is never re-run.
+
 The file is written under the build's `prompts/` folder as
 `<date>-prompt-<id>-<n>-<role without gov->.md`, and its `gov:handoff` marker line carries a hash of
 each section: `<!-- gov:handoff role=<slot> build=<slug> unit=<id|-> item=<item.step.name|-> path=<rel>

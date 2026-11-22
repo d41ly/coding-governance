@@ -3333,8 +3333,13 @@ same   "OC4 AC2 typed: the audit forwards its three review roles" "$(printf '%s'
 has    "OC4 AC2 typed: ...beside workerType none" "$(printf '%s' "$OC_TYPED" | grep '^wargs:' | head -1)" '"workerType":"none"'
 has    "OC4 AC2 typed: the builder type travels to the child" "$(printf '%s\n' "$OC_T0" | grep '^RESULT')" '"roles":{"builder":"gov-builder"}'
 has    "OC4 AC2 typed: the log names each typed stage" "$OC_T0" "log:roles: specWriter spawns as the gov-spec-writer agent type"
+# TOOL-dBoundRoles-13 AC5 - where the builder travels, `facts` varies per unit and `cutFacts` names its cut;
+# with no builder role neither appears. Against the template with both conditionals cut, the typed rows red.
+has    "BR13 AC5 typed: dispatch names facts among the per-unit fields" "$(printf '%s\n' "$OC_T0" | grep '^RESULT')" '"perUnit":["unitId","specPath","briefPath","facts"]'
+has    "BR13 AC5 typed: ...and cutFacts names the cut" "$(printf '%s\n' "$OC_T0" | grep '^RESULT')" "roles/handoff.py facts --build tB --unit <unitId> --input prompt=<briefPath> --input spec=<specPath>"
 o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","roles":'"$OC_NOB"',#')" "$(returns CONVERGED 0)")
 hasnt_ "OC4 AC2 no builder role: dispatch.args carries no roles key" "$(printf '%s\n' "$o" | grep '^RESULT')" '"roles"'
+hasnt_ "BR13 AC5 no builder role: ...and dispatch names no facts cut" "$(printf '%s\n' "$o" | grep '^RESULT')" '"cutFacts"'
 o=$(run_wf "${UNITS/'"slug":"tB",'/'"slug":"tB","roles":{"specWriter":"gov-spec-writer"},'}" "$(returns CONVERGED 0)")
 same   "OC4 AC2 no audit role: the audit forwards no roles" "$(printf '%s\n' "$o" | grep '^wfroles:')" "wfroles:-"
 # AC3 - a malformed or misspelt role refuses by name in either harness, before any spawn.
@@ -3363,7 +3368,10 @@ for m in unattended attended; do
   hasnt_ "OC4 AC1 child $m untyped: ...nor the status-only flip" "$o" "changes nothing else in the spec"
   hasnt_ "OC4 AC1 child $m untyped: ...nor a role stamp" "$(printf '%s\n' "$o" | grep '^prompt:')" "This stage runs as the"
 done
-OC_CT=${OC_CHILD/'"slug":"tB",'/'"slug":"tB","roles":{"builder":"gov-builder"},'}
+# TOOL-dBoundRoles-13 S6 - a typed child carries `facts`, the list `handoff.py facts` prints for its brief b1
+# and its spec s1; every typed child arm below passes it.
+OC_FACTS='"facts":[{"name":"input:prompt","key":"record:b1@0123456789ab","class":"claimed","text":"The brief line."},{"name":"input:spec","key":"record:s1@abcdef012345","class":"claimed","text":"The spec line."}],'
+OC_CT=${OC_CHILD/'"slug":"tB",'/'"slug":"tB","roles":{"builder":"gov-builder"},'"$OC_FACTS"}
 o=$(run_wf "$OC_CT" '{}' "$C")
 same   "OC4 AC4 the typed child spawns as gov-builder" "$(printf '%s\n' "$o" | grep '^type:')" "type:build:gov-builder"
 has    "OC4 AC4 ...stamped" "$o" "This stage runs as the gov-builder agent type"
@@ -3376,6 +3384,22 @@ o=$(run_wf "$OC_CT" '{"build":{"committed":false,"sha":"","why":"DIVERGENCE: §4
 has    "OC4 AC4 a DIVERGENCE: why returns diverged true" "$o" '"diverged":true'
 o=$(run_wf "$OC_CT" '{"build":{"committed":false,"sha":"","why":"tests red","summary":"s"}}' "$C")
 has    "OC4 AC4 any other why returns diverged false" "$o" '"diverged":false'
+# ---- TOOL-dBoundRoles-13 AC5: THE TYPED CHILD IS HANDED ITS BRIEF AND SPEC AS CONTENT. A typed call with
+# ---- no `facts` throws naming the key and the cut; with them the prompt carries the spec's own line under
+# ---- its fact line and no `the SPEC at` clause; a `facts` cut from another spec throws naming both paths.
+# ---- Against the child with its facts step cut out, the two throw rows read a spawn and the prompt row
+# ---- reads `the SPEC at`. An untyped call with none is the OC4 AC1 rows above, byte for byte.
+_br13=${OC_CHILD/'"slug":"tB",'/'"slug":"tB","roles":{"builder":"gov-builder"},'}; o=$(run_wf "$_br13" '{}' "$C")
+has    "BR13 AC5 a typed child with no facts throws naming facts" "$o" 'THROW unattended-unit: args must carry `facts`'
+has    "BR13 AC5 ...and names the cut that makes them" "$o" 'handoff.py facts --build tB --unit A-tB-1 --input prompt=b1 --input spec=s1'
+hasnt_ "BR13 AC5 ...before any spawn" "$o" "agent:"
+o=$(run_wf "$OC_CT" '{}' "$C"); _p=$(printf '%s\n' "$o" | grep '^prompt:')
+has    "BR13 AC5 with facts the prompt carries the spec's own line" "$_p" "The spec line."
+has    "BR13 AC5 ...under its fact line" "$_p" '<!-- gov:fact key=record:s1@abcdef012345 class=claimed -->'
+hasnt_ "BR13 AC5 ...and no clause handing the spec by path" "$_p" "the SPEC at"
+o=$(run_wf "${OC_CT/'"specPath":"s1"'/'"specPath":"s9"'}" '{}' "$C")
+has    "BR13 AC5 a facts cut from another spec throws naming both specs" "$o" "the spec s1, and this call names the brief b1 and the spec s9"
+hasnt_ "BR13 AC5 ...before any spawn" "$o" "agent:"
 # AC7 - a roled audit's deferral promises no reuse its judges never wrote; an untyped one's is unchanged.
 # The double carries `blockers: null` as the review harness's every deferred return does (the DP arms'
 # fixture above): without it the harness's returned-nothing refusal reads it as a dead sub-workflow.
@@ -3424,7 +3448,7 @@ done
 _wfu=${OC_CHILD/'"slug":"tB",'/'"slug":"tB","efforts":{"builder":"max"},'}; o=$(run_wf "$_wfu" '{}' "$C")
 same   "OC10 AC6 the unit harness spawns its builder at its level" "$(printf '%s\n' "$o" | grep '^effort:')" "effort:build:max"
 has    "OC10 AC6 ...and logs it" "$o" "log:effort builder: max — efforts.builder"
-_wfu=${OC_CHILD/'"slug":"tB",'/'"slug":"tB","roles":{"builder":"gov-builder"},"efforts":{"builder":"high"},'}; o=$(run_wf "$_wfu" '{}' "$C")
+_wfu=${OC_CHILD/'"slug":"tB",'/'"slug":"tB","roles":{"builder":"gov-builder"},"efforts":{"builder":"high"},'"$OC_FACTS"}; o=$(run_wf "$_wfu" '{}' "$C")
 same   "OC10 AC6 a typed builder takes its level too" "$(printf '%s\n' "$o" | grep -E '^(type|effort):')" "type:build:gov-builder
 effort:build:high"
 for v in '[]' '{"finder":"high"}' '{"builder":"High"}'; do

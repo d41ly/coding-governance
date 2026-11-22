@@ -3179,7 +3179,9 @@ const handOut = {
       // TOOL-aOrientedCast-10 S7 - `efforts.builder` travels the same way, and alone.
       ...(efforts.builder ? { efforts: { builder: efforts.builder } } : {}),
     },
-    perUnit: ['unitId', 'specPath', 'briefPath'],
+    // TOOL-dBoundRoles-13 S6 - `facts` varies per unit too where `roles.builder` travels, the child's
+    // one case that requires it; `cutFacts` names the command that cuts it, beside `declare`.
+    perUnit: roles.builder ? ['unitId', 'specPath', 'briefPath', 'facts'] : ['unitId', 'specPath', 'briefPath'],
     resolvePathsWith: DRIVER + ' --plan ' + slug + ' --paths',
     // TOOL-aLightenedLoop-3 S1 - THE FIRST --dispatch IS THE MAIN LOOP'S, before the spawn, so a
     // refusal costs no child. A Workflow script has no shell, so the instruction travels as a field
@@ -3189,6 +3191,14 @@ const handOut = {
       declare: "Before each unit's Workflow call, run `" + DRIVER + ' --dispatch ' + slug +
         ' --pass <unitId> --writes <path>` with one --writes per backticked path under that unit ' +
         "spec's `### Files touched (estimate)`, in the foreground with the tool's timeout at 600000 ms. " +
+        'A refusal is binding: make no Workflow call for that unit, and act on what the refusal names.',
+    } : {}),
+    // TOOL-dBoundRoles-13 S6 - THE CUT IS THE UNIT'S ACT LAUNCH: run immediately before each call, after
+    // `declare`'s --dispatch where it applies, so the brief and the spec are handed as they stand then.
+    ...(roles.builder ? {
+      cutFacts: "Immediately before each unit's Workflow call" + (mode === 'unattended' ? ", after `declare`'s --dispatch," : ',') +
+        ' run `python tools/roles/handoff.py facts --build ' + slug + ' --unit <unitId> --input prompt=<briefPath> ' +
+        '--input spec=<specPath>` in the foreground and pass the one JSON list it prints as that call\'s `facts`. ' +
         'A refusal is binding: make no Workflow call for that unit, and act on what the refusal names.',
     } : {}),
   },

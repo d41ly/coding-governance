@@ -70,8 +70,10 @@ Until `--plan --paths` prints `next: none - every tracked spec is terminal`, for
 2. append a `## route` naming the unit, as the brief skeleton's route lines say, through the kickoff
    check script's `--card --append`;
 3. call the hand-out's `dispatch.scriptPath` with `dispatch.args` plus `unitId`, `specPath`,
-   `briefPath`, `roles` from `handoff.py harness-args unattended-unit` and `efforts` from
-   `handoff.py stage-efforts build --model <id>`, on every dispatch;
+   `briefPath`, `roles` from `handoff.py harness-args unattended-unit`, `efforts` from
+   `handoff.py stage-efforts build --model <id>` and `facts` from `handoff.py facts --build <slug>
+   --unit <id> --input prompt=<briefPath> --input spec=<specPath>`, cut just before the call, on every
+   dispatch;
 4. act on the return's `nextAction`, where it carries one, before the next dispatch;
 5. on `diverged: true`, write a revision record under the build's `prompts/` holding `## The brief`
    and no `## The prompt`, its Goal the builder's `why` verbatim and its other four sub-heads copied

@@ -1198,7 +1198,11 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   review. `<id>` is the model in use: the session's own model id, exactly as the session's
   environment states it, read again at each call. A direct role spawn's `Agent` call carries `effort`
   too, its role's value in the JSON `handoff.py role-efforts --model <id>` prints; the roles kit's
-  README states the limits. With no
+  README states the limits. **A unit harness call whose `roles` names a `builder` also carries
+  `facts`**: the JSON list `handoff.py facts --build <slug> --unit <unit-id> --input prompt=<briefPath>
+  --input spec=<specPath>` prints, cut immediately before that call, after its `--dispatch`, which the
+  hand-out's `dispatch.cutFacts` names. The child hands the brief and the spec as that content, and
+  refuses a typed call without `facts` or with a list cut from another brief or spec. With no
   `.claude/roles.json` the roles kit is not installed: pass no `roles` and no `efforts`, and each
   harness logs its per-stage fallback. A session started
   before the rendered agent types existed cannot spawn them: it passes none too, and once the spawn

@@ -5,6 +5,7 @@
                              [--input <key>=<value>]... [--upstream <rows file>]
                              [--out <path> | --stdout | --stand-in]
                              [--part full|task]
+    python handoff.py facts --build <slug> [--unit <id>] --input <key>=<value>...
     python handoff.py harness-args <harness>
     python handoff.py stage-efforts <workflow> [--model <id>]
     python handoff.py role-efforts [--model <id>]
@@ -112,8 +113,19 @@ that checker's rule. A required key resolving to nothing, an empty value or a pl
 and writes nothing; an optional one is named on the `Not supplied` line. A relative path
 given to `--card`, `--out`, an `--input`, `--upstream` or `check` is read from the repository root.
 
+Every value is handed as content (TOOL-dBoundRoles-13): its block opens with a fact line,
+`<!-- gov:fact key=<key> class=<class> -->`, `roles_lib.FACT_RE`'s grammar, then the content. The key is
+`roles_lib.derive_fact_key`'s: `record:<path>@<sha12>` for `input:spec`, `input:prompt`, a brief value and the
+`upstream:rows` file, `record:card/<session id>` for a card value (a `--card` inside the repository keys by
+its own path, else `card/<stem>`), `blob:<path>@<blob12>:1-<n>` for `input:code`, and `cmd:<argv12>:<out12>`
+over the fixed argv `--input`, NUL, `<name>` for a typed argument; the class is `roles_lib.derive_fact_class`'s,
+so no agent types one. The hooks kit's spawn guard re-derives each `blob:` and `record:` key at the spawn and
+refuses a moved one. `facts` prints, as one line of JSON, the list `[{name, key, class, text}]` of each
+`--input` as `render` hands it, refusing as it refuses; a caller that cannot spawn through the guard, the
+unit harness's caller, passes it on.
+
 Exit 0 on success, 1 on a refusal naming its key, file, role or missing waiver row, 2 on usage or an unarmed
-environment: no repository, no MEMORY_ROOT, no CHARTER (`roster` needs no CHARTER). `agents` exits 1
+environment: no repository, no MEMORY_ROOT, no CHARTER (`roster` and `facts` need none). `agents` exits 1
 on no marker in the handoff, no matching call, no run journal, a missing shape, an underived
 placeholder or two ledgers in one build, and 2 with no session file or role index as well.
 
@@ -150,7 +162,8 @@ import roles_lib as lib  # noqa: E402  (the kit's own library, beside this file)
 #: each render reads them off the kickoff checker's `--task-skeleton` and zips them with these
 #: (TOOL-aOrientedCast-15 S3), so the checker that grades a card is the one source of its labels.
 TASK_FIELDS = ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates")
-INPUT_NAMES = ("spec", "diff", "question", "prompt", "code")
+#: The typed names are the library's `ARGUMENT_INPUTS`, which `derive_fact_class` reads (TOOL-dBoundRoles-13).
+INPUT_NAMES = ("spec",) + lib.ARGUMENT_INPUTS + ("prompt", "code")
 PATH_INPUTS = ("spec", "prompt", "code")
 #: Every role's `code` slot (PLAY-dOrderedCharter-27): derived for each role, never written into its `reads`,
 #: so its key is read as optional and the CLI admits it for any role; its block holds the file's text.
@@ -505,6 +518,53 @@ def render_card_block(root):
     return "## Card\n\n%s\n%s\n%s" % (lines[0], route, lines[-1]) if route else ""
 
 
+def read_repo_file(root, name, value):
+    """`(rel, bytes, text)` of the file `value` names under `root`, its text UTF-8 with CRLF folded; a value
+    naming no file inside the repository, or one that does not read as UTF-8, raises RolesError naming `name`."""
+    p = pathlib.Path(os.path.normpath(root / value))
+    if root not in p.parents or not p.is_file():
+        raise lib.RolesError("%s — %s names no file inside the repository" % (name, value))
+    try:
+        raw = p.read_bytes()
+        return p.relative_to(root).as_posix(), raw, raw.decode("utf-8").replace("\r\n", "\n")
+    except (OSError, UnicodeDecodeError) as e:
+        raise lib.RolesError("%s — %s cannot be read as UTF-8: %s" % (name, value, e))
+
+
+def derive_input_facts(root, inputs):
+    """`{"input:<name>": (key, text)}` of each `--input`, in the order given (TOOL-dBoundRoles-13 S3): `spec`
+    and `prompt` hand the file's text keyed `record:<path>@<sha12>`, `code` the file's text keyed
+    `blob:<path>@<blob12>:1-<n>` (§8 F4), and a typed argument its value keyed `cmd:` over the fixed argv
+    `--input`, NUL, `<name>`. `render_handoff` and the `facts` verb both cut here, so one input keys one way
+    by either route; a path input naming no file inside the repository raises RolesError naming it."""
+    out = {}
+    for name, v in inputs.items():
+        if name in PATH_INPUTS and v:
+            rel, raw, text = read_repo_file(root, "input:" + name, v)
+            key = lib.derive_fact_key("blob" if name == CODE_INPUT else "record", rel, raw)
+        else:
+            text, key = v, lib.derive_fact_key("cmd", ["--input", name], v)
+        out["input:" + name] = (key, text.replace("\r\n", "\n"))
+    return out
+
+
+def print_input_facts(root, memory_root, slug, inputs):
+    """S5 of TOOL-dBoundRoles-13: one line of JSON, the list `[{name, key, class, text}]` of each `--input` as
+    `render_handoff` hands it, the text with its blank edges trimmed as a block's is; the build folder that does
+    not exist, an input naming no file and an empty or placeholder value refuse as the render refuses."""
+    build_dir = root / memory_root / "builds" / slug
+    if not build_dir.is_dir():
+        raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
+    facts = []
+    for name, (key, text) in derive_input_facts(root, inputs).items():
+        text = BLANK_EDGES_RE.sub("", text)
+        if check_placeholder(text):
+            raise lib.RolesError("%s — not supplied; pass --input %s=<value>" % (name, name[6:]))
+        line = lib.FACT_RE.match(lib.render_fact_line(key, root))
+        facts.append({"name": name, "key": key, "class": line.group("class"), "text": text})
+    write_json_line(facts)
+
+
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
                    notes=None, tail="", upstream=None, item=None):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
@@ -518,22 +578,17 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
-    values = {}
+    # TOOL-dBoundRoles-13 S3: every `reads` value is handed as content under the key it was cut by, the
+    # rows file's `record:` key (§8 F4) on its rows, the renderer's contract after them unkeyed
+    values, fact_keys = {}, {}
     if upstream:
-        p = pathlib.Path(os.path.normpath(root / upstream))
-        if root not in p.parents or not p.is_file():
-            raise lib.RolesError("%s — %s names no file inside the repository" % (UPSTREAM_KEY, upstream))
-        rows = lib.load_text(p).strip("\n")
+        rel, raw, rows = read_repo_file(root, UPSTREAM_KEY, upstream)
+        rows = rows.strip("\n")
         if rows.strip():   # an empty rows file hands nothing, so the key reads as not supplied
             values[UPSTREAM_KEY] = rows + "\n\n" + UPSTREAM_CONTRACT
-    for name, v in inputs.items():
-        if name in PATH_INPUTS and v:
-            p = pathlib.Path(os.path.normpath(root / v))
-            if root not in p.parents or not p.is_file():
-                raise lib.RolesError("input:%s — %s names no file inside the repository" % (name, v))
-            # the code block holds the file's text, since its ranges are the payload; spec and prompt the path
-            v = lib.load_text(p) if name == CODE_INPUT else p.relative_to(root).as_posix()
-        values["input:" + name] = v.replace("\r\n", "\n")
+            fact_keys[UPSTREAM_KEY] = lib.derive_fact_key("record", rel, raw)
+    for name, (key, text) in derive_input_facts(root, inputs).items():
+        values[name], fact_keys[name] = text, key
     # PLAY-dOrderedCharter-11 S4: the role's load set and its block's budget, before any card or brief is read;
     # a supplied code block is measured beside it, CR stripped (PLAY-dOrderedCharter-27 S4)
     # TOOL-dBoundRoles-2 S6: the role closes with its never list, its ceiling and its return, the ceiling's
@@ -625,6 +680,12 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     if any(k.startswith(("task:", "card:")) for k in reads):
         card, why["card"] = resolve_card_path(root, card_arg)
         card_text = lib.load_text(card) if card else ""
+        if card:
+            # the session's card is `card/<session id>`; a `--card` inside the repository its own path, else
+            # `card/<stem>` (TOOL-dBoundRoles-13 S1)
+            ref = (card.relative_to(root).as_posix() if card_arg is not None and root in card.parents else
+                   "card/%s" % (card.stem if card_arg is not None else os.environ.get("CLAUDE_CODE_SESSION_ID", "")))
+            fact_keys["task"] = fact_keys["card"] = lib.derive_fact_key("record", ref, card.read_bytes())
         values.update(("task:" + f, v) for f, v in extract_task_fields(card_text, labels).items())
         for k in reads:
             if k.startswith("card:") and card:
@@ -633,10 +694,13 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
                     values[k.rstrip("?")] = section
     if any(k.startswith("brief:") for k in reads):
         prompts = build_dir / "prompts"
-        brief = resolve_brief_record(prompts, values.get("input:prompt") and root / values["input:prompt"])
+        brief = resolve_brief_record(prompts, inputs.get("prompt") and pathlib.Path(
+            os.path.normpath(root / inputs["prompt"])))
         why["brief record"] = None if brief else (
             "no file under %s carries both a '## The prompt' and a '## The brief' line" % prompts.as_posix())
         brief_text = lib.load_text(brief) if brief else ""
+        if brief:
+            fact_keys["brief"] = lib.derive_fact_key("record", brief.relative_to(root).as_posix(), brief.read_bytes())
         for k in reads:
             if k.startswith("brief:") and brief:
                 # TOOL-dPavedRoad-3: the owner's words are the record's own `## The prompt` section,
@@ -653,7 +717,9 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         key = k.rstrip("?")
         v = BLANK_EDGES_RE.sub("", values.get(key, ""))
         if not check_placeholder(v):
-            blocks.append("### %s\n\n%s" % (key, v))
+            # TOOL-dBoundRoles-13 S3: the fact line, then the content, under the `reads` key's heading
+            fact = fact_keys.get(key) or fact_keys[key.split(":")[0]]
+            blocks.append("### %s\n\n%s\n\n%s" % (key, lib.render_fact_line(fact, root), v))
             continue
         src, path = sources[key.split(":")[0]]
         what = ("no %s: %s" % (src, why[src])) if why.get(src) else (
@@ -1376,6 +1442,10 @@ def main(argv):
     dest.add_argument("--stdout", action="store_true")
     dest.add_argument("--stand-in", action="store_true")
     r.add_argument("--part", choices=("full", "task"), default="full")
+    fa = sub.add_parser("facts")
+    fa.add_argument("--build", required=True)
+    fa.add_argument("--unit")
+    fa.add_argument("--input", action="append", default=[])
     sub.add_parser("harness-args").add_argument("harness")
     se = sub.add_parser("stage-efforts")
     se.add_argument("workflow")
@@ -1412,7 +1482,9 @@ def main(argv):
             print("handoff: %s" % e, file=sys.stderr)
             return 1
     inputs = {}
-    if a.verb == "render":
+    if a.verb == "facts" and not a.input:
+        ap.error("facts: name at least one --input <name>=<value>")
+    if a.verb in ("render", "facts"):
         for item in a.input:
             name, eq, value = item.partition("=")
             if not eq or name not in INPUT_NAMES or name in inputs:
@@ -1444,7 +1516,7 @@ def main(argv):
         if not memory_root:
             raise lib.RolesError("%s declares no MEMORY_ROOT, or is absent" % conf.as_posix())
         # the roster reads no charter: on a first install the playbook render writes it
-        charter_path = None if a.verb == "roster" else lib.resolve_charter_path(root)
+        charter_path = None if a.verb in ("roster", "facts") else lib.resolve_charter_path(root)
     except lib.RolesError as e:
         print("handoff: %s" % e, file=sys.stderr)
         return 2
@@ -1465,6 +1537,9 @@ def main(argv):
     try:
         if a.verb == "roster":
             print_roster(memory_root)
+            return 0
+        if a.verb == "facts":
+            print_input_facts(root, memory_root, a.build, inputs)
             return 0
         roles = lib.load_roles(KIT_DIR)
         if a.role not in roles:

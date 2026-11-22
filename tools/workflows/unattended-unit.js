@@ -60,6 +60,12 @@
 // The shape is a COPY of the review harness's `workerType` test, because the parent's guard does not
 // travel to a child a caller composes args for; the protocol-parity leg holds the copies to one.
 //
+// `facts` IS REQUIRED WHERE `roles.builder` TRAVELS (TOOL-dBoundRoles-13 S6), and optional elsewhere: the
+// list `handoff.py facts` prints for the brief and the spec, `[{name, key, class, text}]`. Given, the
+// prompt hands both documents as their content under their keys and classes, in place of their paths,
+// and a list missing either input, or naming a path other than `briefPath` or `specPath`, is refused.
+// Absent on an untyped call, the prompt and options are byte-identical to the file without it.
+//
 // `efforts` IS OPTIONAL (TOOL-aOrientedCast-10), with the same one key: `builder`, the reasoning
 // effort the builder spawns at, which the parent forwards in `dispatch.args` beside `roles`.
 //
@@ -234,6 +240,56 @@ if (roles.builder === 'none') {
 }
 const builder = roleKeys === 'builder' ? roles.builder : ''
 
+// TOOL-dBoundRoles-13 S6 - `facts` HANDS THE BRIEF AND THE SPEC AS CONTENT: the JSON list the roles kit's
+// `handoff.py facts` prints for `--input prompt=<briefPath> --input spec=<specPath>`, cut by the main loop
+// immediately before this call, after its `--dispatch`, so the call is the unit's act launch. This file
+// cannot read a file, so it compares the paths the keys name and trusts the cut, as it trusts `briefPath`.
+// REQUIRED WHERE `roles.builder` TRAVELS and nowhere else: the roles kit that prints it is the one that
+// names a builder role. `briefPath` stays, since the `--brief` order hashes the brief at it.
+const facts = cfg.facts === undefined ? null : cfg.facts
+const FACT_CUT = '`handoff.py facts --build ' + cfg.slug + ' --unit ' + cfg.unitId + ' --input prompt=' +
+  cfg.briefPath + ' --input spec=' + cfg.specPath + '`'
+if (builder && facts === null) {
+  throw new Error(
+    'unattended-unit: args must carry `facts` where `roles.builder` travels: the JSON list ' + FACT_CUT +
+      ' prints, cut immediately before this call. Refusing rather than handing the two documents by path.',
+  )
+}
+const FACT_KEY = /^record:(.+)@[0-9a-f]{12}$/
+const FACT_CLASS = /^(witnessed|decided|claimed)$/
+const fact0 = facts && facts[0]
+const fact1 = facts && facts[1]
+const briefFact = fact0 && fact0.name === 'input:prompt' ? fact0 : fact1 && fact1.name === 'input:prompt' ? fact1 : null
+const specFact = fact0 && fact0.name === 'input:spec' ? fact0 : fact1 && fact1.name === 'input:spec' ? fact1 : null
+if (facts !== null && (!Array.isArray(facts) || facts.length !== 2 || !briefFact || !specFact)) {
+  throw new Error(
+    'unattended-unit: `facts` must be the list of two, `input:prompt` and `input:spec`, that ' + FACT_CUT +
+      ' prints; got ' + JSON.stringify(facts).slice(0, 200) + '.',
+  )
+}
+if (facts !== null && (
+  typeof briefFact.key !== 'string' || !FACT_KEY.test(briefFact.key) || !FACT_CLASS.test(String(briefFact.class)) ||
+  typeof briefFact.text !== 'string' || typeof specFact.key !== 'string' || !FACT_KEY.test(specFact.key) ||
+  !FACT_CLASS.test(String(specFact.class)) || typeof specFact.text !== 'string')) {
+  throw new Error(
+    'unattended-unit: each `facts` entry must carry a `record:<path>@<12 hex>` key, a class of witnessed, ' +
+      'decided or claimed, and its text, as ' + FACT_CUT + ' prints them.',
+  )
+}
+const briefCut = facts === null ? '' : FACT_KEY.exec(briefFact.key)[1]
+const specCut = facts === null ? '' : FACT_KEY.exec(specFact.key)[1]
+if (facts !== null && (briefCut !== cfg.briefPath || specCut !== cfg.specPath)) {
+  throw new Error(
+    'unattended-unit: `facts` was cut from the brief ' + briefCut + ' and the spec ' + specCut + ', and this ' +
+      'call names the brief ' + cfg.briefPath + ' and the spec ' + cfg.specPath + '. Cut them again with ' + FACT_CUT + '.',
+  )
+}
+// The two handed blocks, each under its `reads` heading with the fact line the renderer writes atop it.
+const HANDED = facts === null ? ''
+  : '### input:prompt\n\n<!-- gov:fact key=' + briefFact.key + ' class=' + briefFact.class + ' -->\n\n' +
+    briefFact.text + '\n\n### input:spec\n\n<!-- gov:fact key=' + specFact.key + ' class=' + specFact.class +
+    ' -->\n\n' + specFact.text + '\n\n'
+
 // `efforts` IS OPTIONAL TOO (TOOL-aOrientedCast-10), keyed as `roles` is and independent of it: an
 // untyped builder still takes its level. Its one legal key is `builder`, a level of lower-case letters
 // the parent forwards in `dispatch.args`. The vocabulary is the roles library's; this file grades the
@@ -349,7 +405,11 @@ const PROMPT =
       '`git rev-parse --show-toplevel` prints it.') +
   '\n\nBuild exactly ONE unit: ' + cfg.unitId + '. You are handed two documents' +
   (builder ? '' : ' and you read both whole before you touch code') +
-  ': the BRIEF at ' + cfg.briefPath + ' and the SPEC at ' + cfg.specPath + '. ' +
+  // TOOL-dBoundRoles-13 S6 - with `facts`, each as its content under its key and class, not by its path.
+  (facts === null
+    ? ': the BRIEF at ' + cfg.briefPath + ' and the SPEC at ' + cfg.specPath + '. '
+    : ', each below as its content under its key and class: the BRIEF, cut from ' + cfg.briefPath +
+      ', and the SPEC, cut from ' + cfg.specPath + '.\n\n' + HANDED) +
   // TOOL-aLightenedLoop-4 - the feasibility check is reading craft: the role carries it for a typed builder, and the untyped arm carries it inline.
   (builder
     ? 'The spec is the design and you do not edit it. Where the code you are about to write would diverge ' +
@@ -425,6 +485,8 @@ if (cfg.prebuild !== undefined) log('unit ' + cfg.unitId + ': prebuild checklist
 if (cfg.passLegs !== undefined) log('unit ' + cfg.unitId + ': pass legs `' + cfg.passLegs + '`')
 if (cfg.passBase !== undefined) log('unit ' + cfg.unitId + ': own worktree from `' + cfg.passBase + '`' +
   (cfg.writes === undefined ? '' : ', declared writes `' + cfg.writes + '`'))
+
+if (facts !== null) log('unit ' + cfg.unitId + ': handed as content `' + briefFact.key + '` and `' + specFact.key + '`')
 
 log('unit ' + cfg.unitId + ': builder ' + (builder
   ? 'spawns as the ' + builder + ' agent type'

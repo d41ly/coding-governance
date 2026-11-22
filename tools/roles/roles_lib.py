@@ -15,7 +15,8 @@ two into the agent file's body, the block R5 measures against the role's `budget
 `check_single_carry` keeps `instructions.task-charter` from carrying the charter twice (TOOL-dBoundRoles-15).
 `render_role_section` is the one composition of a handoff's `## Role` section and `derive_section_sha` the
 one hash of it, so the role index's `role-sha` and a handoff marker's are one value (TOOL-dBoundRoles-6).
-Stdlib only; every text read
+`derive_fact_key` is the one key of a handed fact and `derive_fact_class` its one class, written on the
+`FACT_RE` line `render_fact_line` composes (TOOL-dBoundRoles-13). Stdlib only; every text read
 folds CRLF to LF and names its encoding.
 
 The front-matter grammar: a `---` block at line 1, one `key: value` per line at COLUMN 0, values kept
@@ -99,6 +100,15 @@ SLUG_RE = re.compile(r"^[A-Za-z]+$")
 MARKER_RE = re.compile(r"^<!-- gov:handoff role=(?P<role>\S+) build=(?P<build>\S+) "
                        r"unit=(?P<unit>\S+)(?: item=(?P<item>\S+))? path=(?P<path>\S+) "
                        r"role-sha=(?P<role_sha>[0-9a-f]{12}) task-sha=(?P<task_sha>[0-9a-f]{12}) -->$", re.M)
+#: A handed fact's line (TOOL-dBoundRoles-13 S3): the one grammar of the line `render_handoff` writes atop each
+#: `reads` block, its key `derive_fact_key`'s and its class `derive_fact_class`'s; the hooks kit's spawn guard
+#: spells it again, as a kit imports no sibling kit.
+FACT_RE = re.compile(r"^<!-- gov:fact key=(?P<key>\S+) class=(?P<class>witnessed|decided|claimed) -->$", re.M)
+#: The `--input` names whose value is typed on the command line rather than read from a file: each is keyed
+#: `cmd:` over the fixed argv `--input`, NUL, `<name>`, which is how `derive_fact_class` tells it `claimed`.
+ARGUMENT_INPUTS = ("diff", "question")
+#: A record's status header whose tail carries `ratified <date>`, which classes its facts `decided`.
+RATIFIED_RE = re.compile(r"^\*\*Status:\*\*.*\bratified [0-9]{4}-[0-9]{2}-[0-9]{2}\b", re.M)
 #: An `item=` tag the renderer admits: `item.<step>.<name>`, the loop kit's item tag shape, its segment the
 #: loop kit's `SEG`, the adopter form `item.<step>.adopter.<name>` included (TOOL-dBoundRoles-17 S3).
 ITEM_VALUE_RE = re.compile(r"^item(\.[a-z0-9][a-z0-9-]*){2,}$")
@@ -1472,6 +1482,64 @@ def derive_section_sha(section):
     """The first 12 lowercase hex digits of the SHA-256 of a section's bytes, CRLF folded to LF: a handoff
     marker's `role-sha` and `task-sha`, and the role index's `role-sha` (TOOL-dBoundRoles-6 S4)."""
     return hashlib.sha256(section.replace("\r\n", "\n").encode("utf-8")).hexdigest()[:12]
+
+
+def derive_fact_key(form, ref, data, lines=None):
+    """A handed fact's key (TOOL-dBoundRoles-13 S1), the one deriver. `form` is `blob`, `record` or `cmd`.
+    `blob`: `blob:<ref>@<blob12>:<lo>-<hi>`, `ref` the file's repo-relative path, `data` its bytes or text,
+    `lines` the excerpt's `(lo, hi)`, the whole file when None. `record`: `record:<ref>@<sha12>`, `ref` a
+    repo-relative path or `card/<session id>`. `blob12` and `sha12` are the first 12 hex digits of the git
+    blob id of `data` with CRLF folded to LF, so one fact keys one way on every checkout. `cmd`:
+    `cmd:<argv12>:<out12>`, `ref` the argv list and `data` its output, each the first 12 hex digits of the
+    SHA-256 of the argv joined by NUL and of the output's UTF-8 bytes."""
+    raw = data.encode("utf-8") if isinstance(data, str) else bytes(data)
+    if form == "cmd":
+        argv = "\0".join(ref).encode("utf-8")
+        return "cmd:%s:%s" % (hashlib.sha256(argv).hexdigest()[:12], hashlib.sha256(raw).hexdigest()[:12])
+    raw = raw.replace(b"\r\n", b"\n")
+    blob = hashlib.sha1(b"blob %d\0" % len(raw) + raw).hexdigest()[:12]
+    if form == "record":
+        return "record:%s@%s" % (ref, blob)
+    if form != "blob":
+        raise RolesError("derive_fact_key: the form '%s' is none of blob, record, cmd" % form)
+    if lines is None:
+        lines = (1, raw.count(b"\n") + (0 if raw.endswith(b"\n") or not raw else 1))
+    return "blob:%s@%s:%d-%d" % (ref, blob, lines[0], lines[1])
+
+
+def derive_fact_class(key, root):
+    """A fact key's class by §4 "The classes" of TOOL-dBoundRoles-13, read off the key and its source's own
+    bytes under `root`, never an agent's word: `decided` for `.governance/policy.toml`, the memory root's
+    `DECISIONS.md` and a record whose status header tail carries `ratified <date>`; `claimed` for any other
+    `record:` key, the card's included, and for a `cmd:` key over a typed `--input` argument; `witnessed`
+    for any other `blob:` or `cmd:` key."""
+    root = pathlib.Path(root)
+    if key.startswith("cmd:"):
+        typed = {"cmd:%s" % hashlib.sha256(("--input\0" + n).encode("utf-8")).hexdigest()[:12] for n in ARGUMENT_INPUTS}
+        return "claimed" if key.rsplit(":", 1)[0] in typed else "witnessed"
+    form, _, rest = key.partition(":")
+    path = rest.rsplit("@", 1)[0]
+    if form == "record" and path.startswith("card/"):
+        return "claimed"
+    conf = root / ".memory-tree.conf"
+    memory_root = read_conf_key(conf, "MEMORY_ROOT") if conf.is_file() else None
+    decided = path == ".governance/policy.toml" or (memory_root and path == "%s/DECISIONS.md" % memory_root)
+    if not decided and (root / path).is_file():
+        try:
+            decided = bool(RATIFIED_RE.search(load_text(root / path)))
+        except (RolesError, UnicodeDecodeError):
+            decided = False
+    return "decided" if decided else "witnessed" if form == "blob" else "claimed"
+
+
+def render_fact_line(key, root):
+    """`<!-- gov:fact key=<key> class=<class> -->`, the class `derive_fact_class`'s; a key `FACT_RE` cannot
+    read back, a path holding whitespace say, raises RolesError naming it."""
+    line = "<!-- gov:fact key=%s class=%s -->" % (key, derive_fact_class(key, root))
+    if not FACT_RE.match(line):
+        raise RolesError("the fact key %r does not read back through FACT_RE: a path holding whitespace "
+                         "cannot be handed as a keyed fact" % key)
+    return line
 
 
 def extract_drive_lines(text, role):

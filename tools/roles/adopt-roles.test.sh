@@ -54,7 +54,8 @@
 # outside its stage's kind, the role index's `shapes`, and an orientation tag naming no unit, resolved and
 # unarmed (arm 31); and the work order's `item=` written by `--item`, a malformed tag refused, and R16 over
 # a return's `**Answers:**` line, a work order planted after the seed with no `item=` or no marker, and no
-# legacy home (arm 33). Every arm is a self-contained block below the prologue, so a
+# legacy home (arm 33); and the spec writer's handoff handing its spec as content under a `record:` fact line,
+# and `handoff.py facts` cutting it to the same key (arm 34). Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 25
 # arm 9's writer and lines.
 #
@@ -126,7 +127,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +10 for arm 31 (TOOL-dBoundRoles-16).
 # +8 for arm 32 (TOOL-dBoundRoles-15).
 # +9 for arm 33 (TOOL-dBoundRoles-17).
-FLOOR_ASSERTIONS=129
+# +2 for arm 34 (TOOL-dBoundRoles-13).
+FLOOR_ASSERTIONS=131
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1869,6 +1871,52 @@ check_arm "arm 33 with no home one R16 unarmed note names the seed command and n
    "$([ "$rc" = 0 ] && [ "$(grep -c '^roles: note: R16 unarmed' "$A33R")" = 1 ] \
       && grep '^roles: note: R16 unarmed' "$A33R" | grep -qF 'legacy_ledger.py seed --home' \
       && grep -qF 'R16 unarmed, 0 handoff(s)' "$A33R" && echo 1 || echo 0)"
+
+# ---- arm 34 (TOOL-dBoundRoles-13 AC1 AC4): the spec writer's handoff hands its spec as content, under a
+# ---- fact line keyed `record:<path>@<sha12>` and classed `claimed`, with no line that is the path alone;
+# ---- and `handoff.py facts` cuts the same spec, with its brief, to the same key. The keys are the fixture
+# ---- kit's gov-spec-writer reads filtered to the `brief:` and `input:` families, as arm 22 filters them:
+# ---- `task:` needs the kickoff checker and `card:` the session's card, which a roles-kit fixture lacks.
+# ---- The spec is written with CRLF endings, so a key over the raw bytes differs from the verb's only
+# ---- where the two cut differently. The failing case, observed at the close and not by the pass that
+# ---- wrote this: `render_handoff` handing the spec's path string again, as before this unit.
+build_fixture; _rc34=$?
+A34=$("$PY" -B -c 'import json, pathlib, subprocess, sys
+fx, kit, mr = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve(), sys.argv[3]
+sys.path.insert(0, str(kit))
+import handoff, roles_lib as lib
+role = lib.load_roles(handoff.KIT_DIR)["gov-spec-writer"]["keys"]
+keys = dict(role)
+keys["reads"] = ", ".join(k for k in role["reads"].split(", ") if lib.parse_read_key(k)[0].startswith(("brief:", "input:")))
+build = fx / mr / "builds" / "tFix"
+(build / "prompts").mkdir(parents=True, exist_ok=True)
+(build / "spec").mkdir(parents=True, exist_ok=True)
+brief = build / "prompts" / "2026-11-22-prompt-TOOL-tFix-1-brief.md"
+heads = ("Goal", "Items", "Acceptance", "Gates", "Non-goals")
+brief.write_text("# Brief\n\n## The prompt\n\n> owner words\n\n## The brief\n\n" + "".join(
+    "### %s\n\n%s text\n\n" % (h, h) for h in heads), encoding="utf-8")
+spec = build / "spec" / "2026-10-25-spec-TOOL-tFix-1.md"
+spec.write_bytes(b"# TOOL-tFix-1\r\n\r\nThe spec line one.\r\n")
+srel, brel = spec.relative_to(fx).as_posix(), brief.relative_to(fx).as_posix()
+task = handoff.render_handoff(fx, mr, lib.resolve_charter_path(fx), "gov-spec-writer", keys, "tFix",
+                              "TOOL-tFix-1", None, {"spec": srel}, None)[2]
+block = task.split("### input:spec\n\n", 1)[-1].split("\n### ", 1)[0]
+fact = lib.FACT_RE.search(block)
+print("render %d" % (fact is not None and fact.group("key").startswith("record:%s@" % srel)
+                     and fact.group("class") == "claimed" and "The spec line one." in block.split("\n")
+                     and srel not in [ln.strip() for ln in block.split("\n")]))
+r = subprocess.run([sys.executable, "-B", str(kit / "handoff.py"), "facts", "--build", "tFix", "--unit", "TOOL-tFix-1",
+                    "--input", "spec=" + srel, "--input", "prompt=" + brel], cwd=fx, capture_output=True, encoding="utf-8")
+got = json.loads(r.stdout) if r.returncode == 0 else []
+shaped = [f["name"] for f in got] == ["input:spec", "input:prompt"] and all(set(f) == {"name", "key", "class", "text"} for f in got)
+print("facts %d" % (shaped and fact is not None and got[0]["key"] == fact.group("key")))
+' "$FX" "$FX/$KREL" "$MR" 2>&1)
+A34=${A34//$'\r'/}
+check_arm "arm 34 the spec writer's handoff hands its spec as content under a claimed record: fact line" \
+   "$([ "$_rc34" = 0 ] && [ "${A34%%$'\n'*}" = 'render 1' ] && echo 1 || echo 0)"
+check_arm "arm 34 handoff.py facts cuts the same spec to the same key, beside its brief" \
+   "$([ "${A34#*$'\n'}" = 'facts 1' ] && echo 1 || echo 0)"
+[ "$A34" = $'render 1\nfacts 1' ] || printf '    %s\n' "${A34//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

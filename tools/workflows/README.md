@@ -787,8 +787,8 @@ under `workerType` in the review harness, and each harness logs one line per sta
 // dispatch.args to each unit; specFinder, skeptic and synthesis are forwarded to the audit's review call
 args: { repo, slug, scratch, units, roles: { specWriter: 'gov-spec-writer', disposal: 'gov-spec-writer',
         builder: 'gov-builder', specFinder: 'gov-spec-reviewer', skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' } }
-// unattended-unit.js: its one key
-args: { ..., roles: { builder: 'gov-builder' } }
+// unattended-unit.js: its one key, with the `facts` list `handoff.py facts` prints beside it
+args: { ..., roles: { builder: 'gov-builder' }, facts: [{ name: 'input:prompt', ... }, { name: 'input:spec', ... }] }
 // tier2-review.js: its four keys, only the running kind's finder key read
 args: { repo, base, head, reviewDir, roles: { diffFinder: 'gov-diff-reviewer', specFinder: 'gov-spec-reviewer',
         skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' } }
@@ -803,6 +803,19 @@ harness's reserved untyped literal; an untyped stage is spelled by leaving its k
   commits nothing and returns `why` opening `DIVERGENCE:`. The unit harness returns `diverged: true`
   exactly then, so the caller branches on a field: it has the spec-writer role revise the spec and
   dispatches the unit again. Untyped, the builder keeps today's order to change the spec first.
+- **The builder's facts** (TOOL-dBoundRoles-13 S6). Wherever `roles.builder` travels, the unit harness
+  requires `facts`: the one JSON list `python <prefix>/roles/handoff.py facts --build <slug> --unit
+  <unitId> --input prompt=<briefPath> --input spec=<specPath>` prints, `[{name, key, class, text}]`. Its
+  prompt then hands the brief and the spec as their content, each under its `### input:<name>` heading
+  and its `<!-- gov:fact key=<key> class=<class> -->` line, in place of the two paths. The harness
+  refuses, before any spawn, a typed call carrying no `facts`, naming the cut; a list missing either
+  input or malformed; and one whose `record:` keys name a brief or spec other than `briefPath` and
+  `specPath`, naming both. A workflow script cannot read a file, so it compares the paths and trusts the
+  cut, as it trusts `briefPath`, which stays because the `--brief` order hashes the brief at it. The
+  build harness's hand-out adds `facts` to `dispatch.perUnit` and names the cut in `dispatch.cutFacts`,
+  beside `declare` and `resolvePathsWith`, only where it carries a builder role: the main loop runs it
+  immediately before each unit's call, after `declare`'s `--dispatch`, so the call is the unit's act
+  launch. Untyped, the prompt and options are those of the file before `facts`.
 - **The audit's roles.** The review keys reach the review harness's `roles` beside `workerType: 'none'`,
   which then governs only a judge stage no role names. A judge run under a role writes no lens or verify
   file, so a deferred-platform return whose review says `durable: false` tells the caller the re-run

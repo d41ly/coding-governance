@@ -292,6 +292,16 @@ kit's `render_role_section` composes, the same section a handoff carries. An ind
 both values, as `role-sha: the handoff was rendered from role text <marker's>, and <type> was rendered
 from <index's>; re-render the handoff`. So a handoff rendered before its role's text changed no longer
 spawns.
+Then the handed facts (TOOL-dBoundRoles-13 S4): every line of the section that is a `gov:fact` line,
+`<!-- gov:fact key=<key> class=<class> -->`, the roles kit's `FACT_RE` spelled again as `FACT_RE`
+here, has its `blob:` or `record:` key re-derived from the bytes at its source now: the first 12 hex
+digits of the git blob id with CRLF folded, `card/<session id>` read through scratch-guard's
+`readCard` and any other key from the checkout root. A key whose source moved, vanished or names a path
+outside the checkout refuses, as `fact: <key> was cut at <old>, and its source now reads <new>:
+re-render the handoff, which cuts it fresh`. A `cmd:` key rides the `task-sha` and is not re-run, and a
+handoff rendered before the fact line carries none and re-derives nothing. The spawn is the act launch,
+so a role is never handed a fact its source no longer holds. It reads every line matching the grammar,
+so content that quotes a fact line is read as one until the handed blocks are fenced.
 Last, its `description`, ends trimmed, must be the spawn's name `handoff.py render` prints on stderr
 as `handoff: description — <name>`: `<build> · <unit> · <workflow>`, from the marker's build and unit
 and the index's `workflow` for that role, or `<build> · <workflow>` for a marker whose unit is `-`

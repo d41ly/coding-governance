@@ -30,7 +30,11 @@
  * same single marker and a section whose SHA-256 prefix is the marker's `task-sha`, the marker's
  * `role-sha` the one the index holds for that role, the hash of the role text its agent type was
  * rendered from (TOOL-dBoundRoles-6 S6: an index holding none refuses naming the index's re-render, a
- * differing one naming both values and the handoff's re-render), and its
+ * differing one naming both values and the handoff's re-render), every `gov:fact` line of the section
+ * holding a `blob:` or `record:` key whose source, read now, still has the blob it was cut at
+ * (TOOL-dBoundRoles-13 S4: `card/<sid>` read through the sibling's `readCard`, any other key from the
+ * checkout root; a moved or vanished source refuses naming the key, both blobs and the re-render; a
+ * `cmd:` key rides the task-sha and is not re-run; a handoff carrying no fact line re-derives nothing), and its
  * `description`, ends trimmed, the name the renderer prints on stderr: `<build> · <unit> · <workflow>`
  * from the marker and the index's `workflow` for that role, the unit part left out for a `-` unit
  * (TOOL-aOrientedCast-27). That step stops a stale or freeform name, never a forged one. A `Workflow`
@@ -685,6 +689,48 @@ function buildTaskDigest(section) {
   return require('crypto').createHash('sha256').update(String(section), 'utf8').digest('hex').slice(0, 12)
 }
 
+// TOOL-dBoundRoles-13 S4 - a handed fact's line, the roles kit's `FACT_RE` spelled again with the same
+// named groups, since a kit imports no sibling kit: the key `derive_fact_key` cut and the class
+// `derive_fact_class` gave it, written atop each `reads` block of the `## Task` section.
+const FACT_RE = /^<!-- gov:fact key=(?<key>\S+) class=(?<class>witnessed|decided|claimed) -->$/
+const FACT_SOURCE_RE = /^(?<form>blob|record):(?<ref>.+)@(?<sha>[0-9a-f]{12})(?::[0-9]+-[0-9]+)?$/
+
+// The first twelve hex digits of the git blob id of `buf` with CRLF folded to LF: the roles kit's
+// `derive_fact_key` over the same bytes, so a fact keys one way on every checkout.
+function deriveBlobId(buf) {
+  const folded = Buffer.from(Buffer.from(buf).toString('latin1').replace(/\r\n/g, '\n'), 'latin1')
+  return require('crypto').createHash('sha1').update(Buffer.concat([Buffer.from(`blob ${folded.length}\0`, 'latin1'), folded])).digest('hex').slice(0, 12)
+}
+
+// S4 - THE RE-CUT AT THE ACT LAUNCH: every fact line of the task section, each `blob:` and `record:` key
+// re-derived from the bytes now at its source, `card/<sid>` through the sibling hook's `readCard`, a
+// repo-relative path from the checkout root; a `cmd:` key is covered by the task-sha and not re-run.
+// null when every key holds, else the refusal naming the key, both blobs and the re-render.
+function checkFactKeys(section, root) {
+  const fs = require('fs')
+  const path = require('path')
+  for (const line of String(section).split('\n')) {
+    const f = FACT_RE.exec(line)
+    const m = f ? FACT_SOURCE_RE.exec(f.groups.key) : null
+    if (!m) continue
+    const g = m.groups
+    let now = null
+    const card = g.form === 'record' && g.ref.startsWith('card/') ? g.ref.slice(5) : null
+    if (card !== null) {
+      const sg = require(path.join(__dirname, 'scratch-guard.js'))
+      const top = sg.resolveToplevel(root)
+      const read = top ? sg.readCard(sg.resolveCommonDir(top), card) : { text: null, shown: '(no card: no checkout)' }
+      now = read.text === null ? `nothing, ${read.shown}` : deriveBlobId(Buffer.from(read.text, 'utf8'))
+    } else if (path.isAbsolute(g.ref) || /^[A-Za-z]:/.test(g.ref) || g.ref.split(/[\\/]/).includes('..')) {
+      now = 'nothing: the key names no path inside the checkout'
+    } else {
+      try { now = deriveBlobId(fs.readFileSync(path.join(root, ...g.ref.split('/')))) } catch { now = 'nothing: no file is there' }
+    }
+    if (now !== g.sha) return `fact: ${f.groups.key} was cut at ${g.sha}, and its source now reads ${now}: re-render the handoff, which cuts it fresh, with handoff.py render.`
+  }
+  return null
+}
+
 // The refusal: the rule, the tool, the reason, and the route that passes.
 function renderHandoffDeny(tool, why, index) {
   const roles = index && index.roles ? Object.keys(index.roles).filter((n) => index.roles[n].agent === true).sort() : []
@@ -756,6 +802,10 @@ function checkHandoffSpawn(data, index, root) {
   if (indexed !== m.roleSha) {
     return renderHandoffDeny('Agent', `role-sha: the handoff was rendered from role text ${m.roleSha}, and ${type} was rendered from ${indexed}; re-render the handoff with handoff.py render, or the index with render_agents.py --write where the role's text moved after it.`, index)
   }
+  // TOOL-dBoundRoles-13 S4 - the handed facts: each key re-derived from its source at the spawn, after the
+  // role text and before the description. A handoff rendered before the fact line carries none: admitted.
+  const moved = checkFactKeys(section, root)
+  if (moved) return renderHandoffDeny('Agent', moved, index)
   // TOOL-aOrientedCast-27 step 2.10 - after the digest and the role text, so the one remedy left is the description.
   const workflow = index.roles[type].workflow
   if (typeof workflow !== 'string' || workflow === '') {
