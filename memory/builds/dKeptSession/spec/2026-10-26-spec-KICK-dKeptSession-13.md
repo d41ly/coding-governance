@@ -1,6 +1,6 @@
 # KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`
 
-**Status:** DEFERRED · rev-7 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-7 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0151@32b6ed5a whole
 **Carries:** node:policy-key.card.pointers
@@ -22,6 +22,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-26 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-11 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 |
 | [2026-11-21-prompt-KICK-dKeptSession-13-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-13-2-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-2-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-13-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-build-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-13-docs-row-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-docs-row-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md) | research | KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 |
 | [2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md) | research | KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-37 KICK-dKeptSession-38 |
