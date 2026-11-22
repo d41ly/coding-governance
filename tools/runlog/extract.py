@@ -1350,12 +1350,16 @@ def derive_context_window(model, root=None, held=None) -> tuple:
     return window, f"observed {seen} on {model}"
 
 
-def derive_context_fill(ev, window=None) -> float:
+def derive_context_fill(ev, *, window=None, root=None) -> float:
     """The share of a window one `usage` event's context used, for a reader that holds events already
     and takes the share of any of them without re-reading a transcript: over `window` when given, else
-    over the one `derive_context_window` derives for the event's model under the default root."""
+    over the one `derive_context_window` derives for the event's model under `root`, the projects root
+    the caller resolved (KICK-dKeptSession-46 S1). With neither it raises `ValueError`: it never falls
+    back to a default root, since a caller that forgot would read a tree it never named."""
     if window is None:
-        window = derive_context_window(ev.get("model"))[0]
+        if root is None:
+            raise ValueError("derive_context_fill: pass window= or root=")
+        window = derive_context_window(ev.get("model"), root=root)[0]
     return derive_context_tokens(ev) / window
 
 
@@ -1379,7 +1383,7 @@ def measure_context_fill(transcript, until=None) -> tuple:
         return None, None, None
     window, source = derive_context_window(last.get("model"), root=path.parent.parent,
                                            held=(path, events))
-    return derive_context_fill(last, window), window, source
+    return derive_context_fill(last, window=window), window, source
 
 
 # ---------------------------------------------------------------------------------- orientation
@@ -1519,8 +1523,8 @@ def measure_orient_tree(root, repo, slug) -> dict:
     `build_session_tree`, its `source` `main` or the agent file's stem: `action` the class of its first
     tool event in ORIENT_ACTIONS, or `none`; `calls` the tool events before it; `tokens` the four
     counts of its usage events before it; `context` `derive_context_fill` of the main file's last main
-    usage before it, or None; `stage` the session's, `derive_orient_stage` at its main file's first
-    timed record. One scan per file; writes nothing."""
+    usage before it, over the window derived under `root`, or None; `stage` the session's,
+    `derive_orient_stage` at its main file's first timed record. One scan per file; writes nothing."""
     root = pathlib.Path(root)
     attributed = {sid: "heuristic" for sid, _slug in scan_preflights(root, slug)}
     moves, notes = _read_orient_moves(repo, slug)
@@ -1561,10 +1565,11 @@ def measure_orient_tree(root, repo, slug) -> dict:
                     break
                 last = ev
             if last is not None:
-                # ponytail: one window per model per run, the share derive_context_fill(ev) takes.
+                # ponytail: one window per model per run, derived under `root`, the dir this reader
+                # reads (KICK-dKeptSession-46 S2); derive_context_fill(last, window=...) takes it.
                 model = last.get("model")
                 if model not in windows:
-                    windows[model] = derive_context_window(model)[0]
-                row["context"] = derive_context_fill(last, windows[model])
+                    windows[model] = derive_context_window(model, root=root)[0]
+                row["context"] = derive_context_fill(last, window=windows[model])
             out["rows"].append(row)
     return out
