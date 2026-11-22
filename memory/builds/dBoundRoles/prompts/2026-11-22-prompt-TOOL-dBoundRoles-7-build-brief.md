@@ -49,7 +49,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   write set and record it in that deviation record. Hand back as a divergence only a design choice the spec leaves
   open; any other path outside the set: name it in your return and do not write it.
 - Name every new shell or Python helper with a verb the naming lexicon declares (`lexicon.py --suggest <name> --as
-  sh.function`), and every new JavaScript function too (`--as js.function`).
+  sh.function`), and every new JavaScript function too (`--as js.function`). The spec mints `matchRoutedEntry`, and
+  `match` is no declared verb: name it `checkRoutedEntry`, or another name `--suggest` accepts, and record the rename.
 ## What the main loop needs from your commit
 
 - One pass commit, its subject naming `TOOL-dBoundRoles-7`, its final trailer block carrying `Pass: TOOL-dBoundRoles-7` beside

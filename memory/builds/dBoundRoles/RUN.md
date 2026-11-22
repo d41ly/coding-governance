@@ -272,3 +272,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T21:26:38Z dispatch · item 1403e58f TOOL-dBoundRoles-7 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md help/roles.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-7-deviation-73.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-7-1-acceptance-ledger.md memory/map/generated/symbols.json
 
 2026-11-22T21:26:39Z brief · item TOOL-dBoundRoles-7 · reason b86b8e3463ef memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-7-build-brief.md
+
+2026-11-22T21:28:27Z brief · item TOOL-dBoundRoles-7 · reason cd3bece63516 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-7-build-brief.md
