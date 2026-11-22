@@ -6668,6 +6668,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_fleet_tag",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "check_floor_bash",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -7456,6 +7461,16 @@
       "id": "check_m26_probe",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_mail_addressed",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_mail_recipient",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_main_guard",

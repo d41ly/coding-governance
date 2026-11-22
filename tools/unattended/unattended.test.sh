@@ -20509,6 +20509,46 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# KICK-dKeptSession-28 — WHO A MAILBOX MESSAGE IS FOR. One subshell sources the tracked driver, so
+# `check_fleet_tag` reads the tracked `tools/playbook/fleet.toml`, and prints one line per criterion:
+# `check_mail_recipient` returns 0 on build:fx, unit:KICK-fx-3, node:a and project (AC1); 2 with one
+# `mail — refused · recipient` line on stderr on build:, unit:fx, unit:KICK-fx-x, the leading-digit
+# slug of unit:KICK-3x-3, everyone, Project and the empty text (AC1); 2 on node:z with one line naming
+# fleet.toml, and 0 on node:b (AC2); and, `check_fleet_tag` redefined last to count its calls and
+# answer an unread registry, 2 on node:a carrying that cause and 0 on build:fx, one call counted
+# (AC3). `check_mail_addressed` reads build:fx's unit as the build's and nothing else across the
+# build, node and project readers (AC4). RED, observed at the close, is the base driver, which has
+# no recipient checker. WHAT THIS BLOCK DOES NOT DRIVE: the mailbox post and reader that call these,
+# KICK-dKeptSession-5's.
+# ==================================================================================================
+mr_n=$(mktemp)
+mr_out=$( set +u; . "$SCRIPT" >/dev/null 2>&1
+  for mr_r in build:fx unit:KICK-fx-3 node:a project; do check_mail_recipient "$mr_r" 2>/dev/null; printf '%s ' "$?"; done; echo
+  for mr_r in build: unit:fx unit:KICK-fx-x unit:KICK-3x-3 everyone Project ""; do
+    mr_e=$(check_mail_recipient "$mr_r" 2>&1 >/dev/null); mr_c=$?
+    printf '%s %s;' "$mr_c" "$(printf '%s\n' "$mr_e" | grep -c '^mail — refused · recipient ')"
+  done; echo
+  mr_e=$(check_mail_recipient node:z 2>&1 >/dev/null); mr_c=$?
+  printf '%s %s %s;' "$mr_c" "$(printf '%s\n' "$mr_e" | grep -c .)" "$(printf '%s\n' "$mr_e" | grep -c '^mail — refused · recipient node:z: .*fleet\.toml')"
+  check_mail_recipient node:b 2>/dev/null; echo "$?"
+  for mr_w in build:fx node:a project; do
+    for mr_r in build:fx unit:KICK-fx-3 build:fy unit:KICK-fy-3 node:a project; do check_mail_addressed "$mr_r" "$mr_w"; printf '%s' "$?"; done; printf ' '
+  done; echo
+  check_fleet_tag() { echo asked >>"$mr_n"; LEASE_WHY="fleet.toml could not be read: planted"; return 2; }
+  mr_e=$(check_mail_recipient node:a 2>&1 >/dev/null); mr_c=$?
+  check_mail_recipient build:fx 2>/dev/null; printf '%s [%s] %s\n' "$mr_c" "$mr_e" "$?" )
+same "KDS28 AC1 build:fx, unit:KICK-fx-3, node:a and project each return 0" "$(sed -n 1p <<<"$mr_out")" "0 0 0 0 "
+same "KDS28 AC1 build:, unit:fx, unit:KICK-fx-x, unit:KICK-3x-3, everyone, Project and empty each return 2 with one refusal line" \
+  "$(sed -n 2p <<<"$mr_out")" "2 1;2 1;2 1;2 1;2 1;2 1;2 1;"
+same "KDS28 AC2 node:z returns 2 with one line naming fleet.toml, node:b 0" "$(sed -n 3p <<<"$mr_out")" "2 1 1;0"
+same "KDS28 AC4 build:fx reads its own unit, node:a and project only themselves" "$(sed -n 4p <<<"$mr_out")" "001111 111101 111110 "
+same "KDS28 AC3 an unread registry refuses node:a with its cause, build:fx asks nothing, one call counted" \
+  "$(sed -n 5p <<<"$mr_out") $(grep -c . "$mr_n")" "2 [mail — refused · recipient node:a: fleet.toml could not be read: planted] 0 1"
+rm -f "$mr_n"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-18 — THE CADENCE SEGMENT IS THE TAG GRAMMAR'S. The sourced driver's
 # `check_cadence_segment` over the spec's probe set, each refusal naming its rule (AC1); the playbook
 # kit's `parse_tag` over each `unit.<name>`, a name admitted there when the tag reads as namespace
@@ -23974,7 +24014,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # floor where it was: its AC16 AC31 arm's two `hit` lines in region three, the light-profile and
 # writes-fixture plants of fix_keeps.py, each unconditional, so FLOOR_SHARD_3 carries the same +2. COUNTED
 # off the block's own lines; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=4067
+# RAISED 4067 -> 4072 by KICK-dKeptSession-28 on 2026-11-22: the recipient block's 5 region-eight `same`
+# (AC1's 2, AC2's, AC4's and AC3's), each unconditional and outside any loop, off the diff's own lines;
+# no skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4072
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24258,7 +24301,8 @@ FLOOR_SHARD_7=311
 # RAISED 1257 -> 1263 by TOOL-dPlacedRequest-59: the same 6 region-eight claim-line reader assertions, see FLOOR_ASSERTIONS.
 # RAISED 1263 -> 1275 by TOOL-dPlacedRequest-96: the same 12 region-eight stale take-over assertions, see FLOOR_ASSERTIONS.
 # RAISED 1275 -> 1284 by TOOL-dPlacedRequest-97: the same 9 region-eight id-less fence assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1284
+# RAISED 1284 -> 1289 by KICK-dKeptSession-28: the same 5 region-eight recipient assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1289
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

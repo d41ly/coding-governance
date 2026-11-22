@@ -3682,6 +3682,43 @@ print("held" if sys.argv[2] in tags else "absent")' "$d" "$tag" 2>&1)
   esac
 }
 
+# WHO A MAILBOX MESSAGE IS FOR (KICK-dKeptSession-28 S1 to S3), checked once at the write, four forms and
+# nothing else: `build:<slug>`, a slug `check_slug_shape` passes; `unit:<id>`, `UNIT_ID_ERE` anchored at
+# both ends with its slug segment through `check_slug_shape` too, which refuses the leading digit the
+# ERE admits; `node:<tag>`, a tag `check_fleet_tag` finds in the registry, its rc 1 and rc 2 each
+# refused with the LEASE_WHY it sets; and the bare word `project`. Only a `node:` recipient starts
+# Python. KICK-dKeptSession-5's post calls this, and its reader `check_mail_addressed`. WHAT THIS DOES
+# NOT CHECK: that the unit or the build exists (F2), or which recipients gate a transition.
+check_mail_recipient() { # to -> 0 legal; 2 with one `mail — refused · recipient` line on stderr
+  local LC_ALL=C to="${1:-}" why id s
+  case "$to" in
+    project) return 0 ;;
+    build:*) check_slug_shape "${to#build:}" && return 0
+      why="a build is named by its slug, a letter then letters, digits or dashes" ;;
+    unit:*) id=${to#unit:}; s=${id#*-}; s=${s%-*}
+      [[ $id =~ ^${UNIT_ID_ERE}$ ]] && check_slug_shape "$s" && return 0
+      why="a unit is named by its id, <FAMILY>-<slug>-<n>, its slug a letter then letters, digits or dashes" ;;
+    node:*) check_fleet_tag "${to#node:}" && return 0
+      why=$LEASE_WHY ;;
+    *) why="a recipient is build:<slug>, unit:<id>, node:<fleet tag> or project" ;;
+  esac
+  printf 'mail — refused · recipient %s: %s\n' "$to" "$why" >&2
+  return 2
+}
+
+# "ADDRESSED TO ME" (KICK-dKeptSession-28 S4), the one predicate every mailbox reader asks once per
+# recipient it answers for: <to> equals <who>, or <who> is `build:<slug>` and <to> a `unit:` id whose
+# slug segment is <slug>. It checks neither form: <to> passed `check_mail_recipient` at its post and
+# <who> is the reader's own.
+check_mail_addressed() { # to · who -> 0 when <to> addresses <who>, 1 otherwise
+  local to="${1:-}" who="${2:-}" s
+  [ "$to" = "$who" ] && return 0
+  case "$who" in build:?*) ;; *) return 1 ;; esac
+  case "$to" in unit:*-*) ;; *) return 1 ;; esac
+  s=${to#unit:*-}; s=${s%-*}
+  [ "build:$s" = "$who" ]
+}
+
 # A CADENCE SEGMENT (TOOL-dPlacedRequest-18 S1): the tag grammar's `seg` production of
 # PLAY-dOrderedCharter-19 S1, `[a-z0-9][a-z0-9-]*`, at most 64 bytes — `RULE_KEY_RE`'s shape in
 # the roles kit's `roles_lib.py` less its optional `?`, and never a list of cadence kinds, so a cadence an
