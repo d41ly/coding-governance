@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-64 — unit 46's spec observes unit 54's parser body and designs none of its own
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 94e17798 · streams tooling · order 9 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-4 · 2026-11-22 · node d · Tier-2 · base 94e17798 · streams tooling · order 9 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-26-build-TOOL-dTotalRecall-64-deviation-641.md](../build/2026-10-26-build-TOOL-dTotalRecall-64-deviation-641.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-64-reground-2-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-64-reground-2-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-64-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-64-reground-return.md) | research | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-64-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-64-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-64-reground-2-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-64-reground-2-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-64-reground-2-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-64-reground-2-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-64-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-64-reground-brief.md) | journal | — |
