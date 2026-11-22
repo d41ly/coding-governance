@@ -436,6 +436,7 @@ why = "its registry declares THIS repository's waived sites, by path, so the leg
 tag = "leg.gov.cleanup-posture-a-tree-removal-that-swallows-its-error"
 tests = ["feature.gate-lint"]
 purpose = "catches a tree removal that swallows its error"
+enforces = ["practice.portable.temp-files"]
 argv = ["python3", "{prefix}/gate-lint/encoding_posture.py", "--cleanup", "memory/project/cleanup-sites.txt", ".", "{prefix}", "skills", ".githooks"]
 chunk = "product"
 subject = "repo"

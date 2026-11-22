@@ -2008,6 +2008,9 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 300,
+    "enforces": [
+      "practice.portable.temp-files"
+    ],
     "stage": [
       "step.test"
     ]
