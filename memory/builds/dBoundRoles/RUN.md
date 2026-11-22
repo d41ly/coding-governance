@@ -274,3 +274,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T21:26:39Z brief · item TOOL-dBoundRoles-7 · reason b86b8e3463ef memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-7-build-brief.md
 
 2026-11-22T21:28:27Z brief · item TOOL-dBoundRoles-7 · reason cd3bece63516 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-7-build-brief.md
+
+2026-11-22T22:02:54Z dispatch · item 490630dc TOOL-dBoundRoles-5 · reason tools/roles/roles_lib.py tools/roles/handoff.py tools/roles/return-check.sh tools/roles/return-check.fragment.json tools/roles/README.md help/roles.md tools/roles/SKILL.template.md tools/check-wiring.sh .claude/settings.json tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/unattended-unit.js tools/workflows/README.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-5-deviation-53.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-5-1-acceptance-ledger.md memory/map/generated/symbols.json
+
+2026-11-22T22:03:15Z brief · item TOOL-dBoundRoles-5 · reason 54641fa742b7 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-build-brief.md
