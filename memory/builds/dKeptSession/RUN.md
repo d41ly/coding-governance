@@ -236,3 +236,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T19:54:27Z brief · item KICK-dKeptSession-48 · reason 4c9c677f0f81 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-48-build-brief.md
 
 2026-11-22T19:57:06Z dispatch · item 23e49663 KICK-dKeptSession-48 · reason tools/runlog/extract.py tools/runlog/README.md help/orientation-card.md tools/runlog/selftest.py memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-48-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-22T20:13:42Z brief · item KICK-dKeptSession-22 · reason 277aa1e0f90d memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-22-build-brief.md
+
+2026-11-22T20:16:19Z dispatch · item 244faa72 KICK-dKeptSession-22 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-22-1-acceptance-ledger.md
