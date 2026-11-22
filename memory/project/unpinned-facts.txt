@@ -15150,3 +15150,4 @@ memory/map/features/row-grammar.md	137 rows	1	9e21ac760dc0a43d6ed007396922722cce
 memory/map/features/runlog.md	100,000 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/features/unattended-mandate.md	2 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/map/generated/CARDS.md	1024 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-22-build-brief.md	120 s	1	491dfe31c4fb9890ce3086eb73793d40f10dce1d	widened:2026-11-22-build-TOOL-dTotalRecall-22-widen-2

@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-22T19:12:57+02:00 @ 1ca91e84945c2b4b7860765be1dc3c643cd43efd
+last-audit: 2026-11-22T19:29:36+02:00 @ 491dfe31c4fb9890ce3086eb73793d40f10dce1d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2c621083fd91278f33ba1baba1ea15f4dada31b0
+last-body-change: 491dfe31c4fb9890ce3086eb73793d40f10dce1d
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -100,9 +100,11 @@ Tier 1 (a micro-spec, graded by heading title in check 12 from `SPEC_TIER1_CUTOF
 
 `FAMILY-<slug>-<seq>`, families `PLAY`/`KICK`/`TOOL`/`DEPL` (per `.memory-tree.conf`). Slug = YOUR node tag
 (identify the node by machine/user against the AGENTS.md registry, never by path: all four rows pin
-one primary tree) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Work state is
+one primary tree) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. The slug grammar is the `builds.slug-*` policy keys,
+derived once by `tools/memory-tree/id_grammar.py#derive_slug_grammar` (TOOL-dTotalRecall-5). Work state is
 READ from the GENERATED `memory/LIVE.md` + `memory/ledger/<month>.md` (`gen_build_index.py --write`
-re-renders them from build front matter); there is no authored ledger to update. Build folders are
+re-renders them from build front matter, whose keys `gen_build_index.py` declares and whose `node`, `roster`
+and `streams` it derives; TOOL-dTotalRecall-4); there is no authored ledger to update. Build folders are
 `memory/builds/<slug>/`; the discipline is the spec header's `streams` value (`STREAMS_CUTOFF` in
 `.memory-tree.conf` arms it). A unit id is DEFINED by its spec's H1 under `builds/<slug>/spec/`: the
 index generator and recall read that line through one predicate, `tree_lib.parse_spec_h1`, and

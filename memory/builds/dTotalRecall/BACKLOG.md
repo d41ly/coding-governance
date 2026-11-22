@@ -35,7 +35,7 @@
 - SEV · TOOL-dTotalRecall-31 · LOW · the README's relation keys sit outside the edge registry that types them
 - CLOSED · TOOL-dTotalRecall-31 · by TOOL-dTotalRecall-6 · the README's relation keys are typed by the `[[front-matter]]` table in `tools/playbook/edges.toml`, with `implements`, `amends` and `supersedes` taking a build and `patches` a family id — closed by TOOL-dTotalRecall-6 (`ce198f660`); its deviation 62 states the rows
 - SEV · TOOL-dTotalRecall-32 · LOW · an edge type with no declared cardinality is never checked after a merge
-- DEFERRED · TOOL-dTotalRecall-32 · until TOOL-dTotalRecall-22 · TOOL-dTotalRecall-22's build run requires the key per its deviation 221, so the two specs agree there at the latest (the spec run carries it forward with the unit it waits on)
+- CLOSED · TOOL-dTotalRecall-32 · by TOOL-dTotalRecall-22 · every declared edge row in `tools/playbook/edges.toml` carries a `cardinality` key and `edge_grammar.py#read_edge_types` refuses a row without one — closed by TOOL-dTotalRecall-22 (`491dfe31c`)
 - SEV · TOOL-dTotalRecall-33 · LOW · one name answers two questions in one kit
 - DEFERRED · TOOL-dTotalRecall-33 · until TOOL-dTotalRecall-21 · TOOL-dTotalRecall-21's build run renames the builder per its deviation 211, so the two specs agree there at the latest (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dTotalRecall-34 · LOW · the scaffold verbs' forward has no shim kind to register under
