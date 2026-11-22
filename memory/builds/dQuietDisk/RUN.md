@@ -68,3 +68,7 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-22T04:17:19Z draw · re-dispatch · TOOL-dQuietDisk-2 · 3/44 · 20261122T041719Z-a2fd26
 
 2026-11-22T04:17:19Z dispatch · item ec3eb942 TOOL-dQuietDisk-2 · reason tools/unattended/check-pass-order.sh tools/unattended/check-pass-order.test.sh memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-2.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-2-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-2-deviation-1.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-22T04:49:04Z brief · item TOOL-dQuietDisk-3 · reason 217b728e73d1 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-3-build-brief.md
+
+2026-11-22T04:50:40Z dispatch · item 53af6058 TOOL-dQuietDisk-3 · reason tools/unattended/check-brief-recorded.sh tools/unattended/check-brief-recorded.test.sh memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-3.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-3-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-3-deviation-1.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-3 — the brief-recorded leg grades only units whose key moved since its last graded tip
 
-**Status:** INPROGRESS · rev-4 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2
+**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -13,6 +13,7 @@
 | [2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md) | research | TOOL-dQuietDisk-2 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-3-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-3-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-3-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-3-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-3-divergence-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-3-divergence-task.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -37,10 +38,12 @@ here.
 ## 2. Scope (IN)
 
 - **S1** — The leg opens the store once per run, after the cutoff check and before the subject
-  cache. It calls `init_hs brief-recorded` with its four code paths. It starts the coprocess with
-  `GIT_NO_REPLACE_OBJECTS=1 init_bh`, and resolves HEAD once, to the full sha G, through
-  `read_bh_info HEAD`. It closes the coprocess with `remove_bh` on exit. Where `init_hs` or
-  `init_bh` fails, or a store verb exits non-zero, every read misses and the leg grades as today.
+  cache. It calls `init_hs brief-recorded` with its four code paths. Each path is named relative to
+  the repository root only where `$ROOT/<rel>` is the leg's own directory, and absolute otherwise.
+  It starts the coprocess with `GIT_NO_REPLACE_OBJECTS=1 init_bh`, and resolves HEAD once, to the
+  full sha G, through `read_bh_info HEAD`. It closes the coprocess with `remove_bh` on exit. Where
+  `init_hs` or `init_bh` fails, or a store verb exits non-zero, every read misses and the leg grades
+  as today.
   Observed by AC1, AC8, AC9 and AC10.
 - **S2** — The loop that fills `_SUBJ` from the one `read_attribution_tokens HEAD` stream also fills
   `BR_CANDS`. That map takes each token to the commits whose line carries it, in stream order. No
@@ -63,9 +66,11 @@ here.
   timestamp, or when a cell breaks the grammar. Observed by AC1, AC5 and AC8.
 - **S6** — The counters, the violation lines through `add_violation`, the `announced` lines, the
   waiver bookkeeping, the stale-waiver rule and the summary lines come from the outcomes in loop
-  order, as today. Every short sha a line names is rendered after the loop, by one
-  `GIT rev-parse --short` over all of them, and is never stored. The leg prints no line of its own
-  about the store, and it discards the store's stderr. Observed by AC1.
+  order, as today. Every short sha a line names is rendered after the loop and never stored. One
+  `GIT log --no-walk=unsorted --format=%h --stdin` reads them, given each distinct sha once on
+  stdin. Where that batch answers other than one line per sha, the leg falls back to one
+  `GIT rev-parse --short` per sha, the read the base leg makes. The leg prints no line of its own
+  about the store, and it discards the store's stderr. Observed by AC1 and AC4.
 - **S7** — The leg writes with one `write_hs_items` call and passes no tip. The call runs after the
   unit loop, and only when one `GIT rev-parse HEAD` still reads G. Its request holds every outcome
   this run graded that S5 allows to be stored. The call is skipped when there is none. The lookup
@@ -164,9 +169,12 @@ The leg passes four code paths:
 - the driver `unattended.sh`, whose `PHASES_TERMINAL` the leg parses;
 - `commit_trailers.py`, the token reader.
 
-Each is named relative to the repository root, through
-`tools/unattended/lib-unattended.sh#derive_self_rel`, so every worktree shares the items. Where that walk fails, the absolute paths are passed, and the
-items are then that checkout's own.
+`tools/lib/history_store.py#derive_code_digest` reads a relative path under the repository the CLI
+runs in, which is the graded one, not the checkout the leg sits in. So the leg names a path
+relative, through `tools/unattended/lib-unattended.sh#derive_self_rel`, only where `$ROOT/<rel>` is
+the leg's own directory. Otherwise it passes the absolute path, as it must when the leg runs by path
+from another checkout, as AC1's new leg does. Items stay shared across worktrees either way,
+because the store names an absolute path inside its repository relative to that repository.
 
 ### The key
 
@@ -271,7 +279,11 @@ outcome is not stored. That check runs only for a miss being stored, and starts 
    no-base builds as today and derives every unit's key. One `read_hs_items` answers all of them.
 5. The unit loop takes each hit and grades each miss as today, in today's order. It holds each line
    with its full shas.
-6. One `GIT rev-parse --short` renders the named shas. S7's write runs. The summary, the lines and
+6. One `GIT log --no-walk=unsorted --format=%h --stdin` renders the named shas, each distinct sha
+   given once on stdin, so the input order holds and no argument-length limit applies. Where it
+   answers other than one line per sha, one `GIT rev-parse --short` per sha renders them, since
+   `rev-parse --short` takes a single revision and exits 128 given two [PINNED, the divergence
+   task's first ruling]. S7's write runs. The summary, the lines and
    the waiver rule print as today, and the leg exits as today. The `EXIT` handler closes the
    coprocess.
 
@@ -291,7 +303,7 @@ These counts are for a warm run at an unmoved tip, with no remote.
 | the builds' `ls-tree` | 1 |
 | the coprocess | 1 |
 | one `read_hs_items` | 8 |
-| the batched `rev-parse --short`, where a line names a sha | 1 |
+| the batched `log --no-walk=unsorted --format=%h --stdin`, where a line names a sha | 1 |
 
 That makes 19, in the fixture of section 6 and in a scratch clone of the real tree with its remote
 removed. This unit promises **at most 25 git processes** for such a run, whatever the unit count.
@@ -347,7 +359,7 @@ builds in parallel with each.
   write path is TOOL-dQuietDisk-1's. The coprocess is pinned against replace refs (S1, AC10).
 - perf / scale: a warm run is at most 25 git processes (AC4). A cold run costs today's per-unit
   spawns, plus 18 for the coprocess, the two store verbs and the guard. It saves 4 reads per build
-  the walk reaches, and every per-line `rev-parse --short` but one.
+  the walk reaches, and replaces every per-line `rev-parse --short` with one batched `log`.
 - error / empty / loading states: a missing, unreadable, truncated, foreign-version or unparsable
   item regrades its unit. A store that cannot open regrades all of them (S1, S5, AC8).
 - observability: the leg's output is unchanged. The store's `lookup` verb, run by hand with the
@@ -422,8 +434,9 @@ G1). Each such reading below is owed to the main loop at the close.
 - **AC4** — When the new leg runs warm at an unmoved tip under `GIT_TRACE2_EVENT=<dir>`, the
   directory holds at most 25 files [PINNED] at each size of F, and the two counts are equal. The
   same bound holds warm after one single-parent commit that names no unit. Each cold count, and the
-  old leg's count, is printed beside the warm count. The main loop takes the unmoved-tip count over
-  the real tree at the close, in AC1's clone, held to the same 25.
+  old leg's count, is printed beside the warm count. The trace holds one
+  `log --no-walk=unsorted --format=%h --stdin` and no `rev-parse --short`. The main loop takes the
+  unmoved-tip count over the real tree at the close, in AC1's clone, held to the same 25.
   Red when: a per-build or per-unit git call survives on the warm path, or the count grows with F.
   figure: 25 is PINNED as a promise; the cold and old counts are DERIVED at observation.
   permission: the real-tree count is owed to the main loop.
@@ -480,6 +493,10 @@ New arm: tools/unattended/check-brief-recorded.test.sh · covers AC2 AC3 AC8 · 
 The arm is observed by the main loop, never by a unit pass. The real-tree halves of AC1 and AC4
 are the main loop's one-time observations at the close. No standing arm compares against a literal
 sha, which is `memory/gotchas/test-oracle-read-from-a-historical-sha.md`'s class.
+
+The pass grows the leg and its suite past their rows in `memory/project/shell-role.txt`. The pass
+does not edit that ledger. The main loop widens the leg's row and the suite's after the pass, as it
+did for TOOL-dQuietDisk-1 and TOOL-dQuietDisk-2, so Files touched does not name it.
 
 ## 8. Open questions
 
@@ -557,6 +574,20 @@ sha, which is `memory/gotchas/test-oracle-read-from-a-historical-sha.md`'s class
     which rev-3 lacked, is AC11. The new key, fallbacks, pins and the temp count are observed by
     AC3 and AC5 to AC10.
   - The fixture's old leg is now the copy at `40def53f7`.
+- rev-5 · 2026-11-22 · §2 §4 §5 §6 §7 · S1 S6 · AC4 · under
+  `2026-11-22-prompt-TOOL-dQuietDisk-3-divergence-task`, the run's rulings on the first build
+  pass's divergences:
+  - `rev-parse --short` takes a single revision and exits 128 [PINNED, the task's first ruling]
+    given two. So the batched short-sha
+    read is one `GIT log --no-walk=unsorted --format=%h --stdin`, given each distinct sha once, with
+    one `GIT rev-parse --short` per sha where the batch does not answer line for line. That changes
+    S6, the run's last step, the warm-bound row, the perf line and AC4. TOOL-dQuietDisk-2's rev-6
+    took the same ruling.
+  - The store reads a relative code path under the graded repository, not the leg's checkout. So a
+    code path is relative only where `$ROOT/<rel>` is the leg's own directory, and absolute
+    otherwise (S1, section 4).
+  - Section 7 says the main loop widens the leg's and its suite's `memory/project/shell-role.txt`
+    rows after the pass. Files touched is unchanged, and the warm bound stays 25.
 
 ## 10. Reuse audit
 

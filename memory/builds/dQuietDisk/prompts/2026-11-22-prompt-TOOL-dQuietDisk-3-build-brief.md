@@ -56,3 +56,16 @@ You build ONE unit from its spec. The spec is the contract. This brief adds only
   before you stage it.
 - **Record every deviation.** A change the spec did not state is a deviation record in `build/`, named
   `…-TOOL-dQuietDisk-3-deviation-1.md`. Its values are `report` and `author-recorded`.
+
+## Second dispatch (after rev-5) — what changed
+
+- **The first pass built the unit and stopped on a divergence** (run `wf_10a96845-9d5`). The run ruled on each point
+  in `memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-3-divergence-task.md`, and the spec is now
+  rev-5.
+- **Apply the saved patch first:**
+  `C:/Users/d41ly/AppData/Local/Temp/claude/b3f6db677b077b04/0840beea-0651-4dc3-9fe7-f227915b6b42/scratchpad/TOOL-dQuietDisk-3-pass1.patch`.
+  It applies cleanly at this tip and already carries rev-5's short-sha batch and code-path rule. Its probes sit beside
+  it in the scratch root.
+- **Then finish the pass:** confirm the patch against rev-5, re-run the AC1 and AC4 probes, write the acceptance
+  ledger, flip the spec to CLOSED and commit.
+- **The shell-line widen is the main loop's.** Report the measured code lines of the leg and its suite in your return.
