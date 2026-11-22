@@ -122,7 +122,7 @@ measured before and after.
 3. `check-brief-recorded.sh` grades only units new since its last graded tip [planned TOOL-dQuietDisk-3]
 4. `routed_commits.py` grades only commits past its last graded tip [planned TOOL-dQuietDisk-4]
 5. One `git diff --name-only BASE` serves every guarded leg of a bar [planned TOOL-dQuietDisk-5]
-6. The pickaxe in `manifest-check.sh` is scoped by path and range [planned TOOL-dQuietDisk-6]
+6. The pickaxe in `manifest-check.sh` is scoped by path and range [parked TOOL-dQuietDisk-6 is WONTDO by its fork F1: its re-ground measured today's pickaxe stopping at its first valid match, so scoping it adds a git process and saves none]
 7. One template cache keyed by kit tree hash under the runner's owned `$WORK`; a `--shared` clone or worktree per mutating case, one read-only checkout for reading cases [planned TOOL-dQuietDisk-7]
 8. One shared sparse no-checkout snapshot for the six whole-tree copies the prompt names [planned TOOL-dQuietDisk-8]
 9. The `unattended.test.sh` prologue built once as a bundle [parked the owner's standing rule of 2026-08-23 forbids running the unattended kit's suites, so the change cannot be observed by this run]
