@@ -9415,32 +9415,92 @@
     {
       "id": "check_ts_arrow",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "check_ts_arrow",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "check_ts_arrow",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "check_ts_body",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "check_ts_body",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "check_ts_body",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "check_ts_generic",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "check_ts_generic",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "check_ts_generic",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "check_ts_generic_close",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "check_ts_generic_close",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "check_ts_generic_close",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "check_ts_generic_fn_type",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "check_ts_generic_fn_type",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "check_ts_generic_fn_type",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "check_ts_member_annotation",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "check_ts_member_annotation",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "check_ts_member_annotation",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "check_ts_reading",
@@ -9450,17 +9510,47 @@
     {
       "id": "check_ts_returned",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "check_ts_returned",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "check_ts_returned",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "check_ts_tag_start",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "check_ts_tag_start",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "check_ts_tag_start",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "check_ts_type_position",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "check_ts_type_position",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "check_ts_type_position",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "check_two_writers",
@@ -15130,7 +15220,17 @@
     {
       "id": "ext_of",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "ext_of",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "ext_of",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "extract",
@@ -15640,7 +15740,17 @@
     {
       "id": "extract_text",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "extract_text",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "extract_text",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "extract_unit",
@@ -19610,7 +19720,17 @@
     {
       "id": "parse_shell_defs",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "parse_shell_defs",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "parse_shell_defs",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "parse_spaced_reason",
@@ -19670,17 +19790,47 @@
     {
       "id": "parse_ts_defs",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "parse_ts_defs",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "parse_ts_defs",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "parse_ts_source",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "parse_ts_source",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "parse_ts_source",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "parse_tsx_defs",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "parse_tsx_defs",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "parse_tsx_defs",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "parse_unarmed_branch",
@@ -21218,6 +21368,21 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "read_blob_batch",
+      "kind": "function",
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_blob_batch",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_blob_batch",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
+    },
+    {
       "id": "read_blob_fact",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -22061,6 +22226,21 @@
       "id": "read_definition",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "read_defs_at",
+      "kind": "function",
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_defs_at",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_defs_at",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "read_defs_at_sha",
@@ -26073,6 +26253,21 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "read_state_listing",
+      "kind": "function",
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_state_listing",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_state_listing",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
+    },
+    {
       "id": "read_stderr_tail",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -26600,32 +26795,92 @@
     {
       "id": "read_ts_angle_end",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_ts_angle_end",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_ts_angle_end",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "read_ts_arrow_body",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_ts_arrow_body",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_ts_arrow_body",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "read_ts_block_kind",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_ts_block_kind",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_ts_block_kind",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "read_ts_body_start",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_ts_body_start",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_ts_body_start",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "read_ts_brace_end",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_ts_brace_end",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_ts_brace_end",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "read_ts_expr_end",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_ts_expr_end",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_ts_expr_end",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "read_ts_fixtures",
@@ -26635,7 +26890,17 @@
     {
       "id": "read_ts_jsx_defs",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_ts_jsx_defs",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_ts_jsx_defs",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "read_ts_mode",
@@ -26645,7 +26910,17 @@
     {
       "id": "read_ts_paren_end",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_ts_paren_end",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_ts_paren_end",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "read_ts_readers",
@@ -26655,7 +26930,17 @@
     {
       "id": "read_ts_type_end",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "read_ts_type_end",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "read_ts_type_end",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "read_turnstile",
@@ -30595,7 +30880,17 @@
     {
       "id": "resolve_extractor",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "resolve_extractor",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "resolve_extractor",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "resolve_extractor_module",
@@ -37495,7 +37790,17 @@
     {
       "id": "scan_shell_tokens",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "scan_shell_tokens",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "scan_shell_tokens",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "scan_sibling_path",
@@ -37645,7 +37950,17 @@
     {
       "id": "scan_ts_tokens",
       "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
+      "file": "tools/codebase-map/extract_code.py"
+    },
+    {
+      "id": "scan_ts_tokens",
+      "kind": "function",
+      "file": "tools/lexicon/extract_code.py"
+    },
+    {
+      "id": "scan_ts_tokens",
+      "kind": "function",
+      "file": "tools/lib/extract_code.py"
     },
     {
       "id": "scan_turns",
@@ -40449,6 +40764,11 @@
     },
     {
       "id": "test_shell_layer_indexes_public_definitions_only",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_shell_layer_needs_no_lexicon_kit",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },

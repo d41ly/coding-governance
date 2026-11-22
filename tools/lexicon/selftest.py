@@ -4282,7 +4282,7 @@ _c, _o = run_case({"bin/x.sh": _L1_SH}, _L1_CONF)
 check("L1: a `<<-` heredoc with a TAB-indented terminator parses, and the definition after it is "
       "reached", _c == 0 and "does not parse" not in _o, _o)
 _c, _o = run_case({"bin/x.sh": _L1_SH}, _L1_CONF,
-                  patch=("lexicon.py", r'(raw.lstrip("\t") if strip else raw) == delim',
+                  patch=("extract_code.py", r'(raw.lstrip("\t") if strip else raw) == delim',
                          "raw == delim"))
 check("STAGED: dropping the tab strip turns that file into an unterminated heredoc refusal",
       _c != 0 and "does not parse" in _o, _o)
@@ -5359,7 +5359,7 @@ check("AC7: ...and the printed coverage line COUNTS the fixture's .ts and .tsx f
 # is an assertion about nothing.
 code, out = run_case(
     TS_FILES, TS_CONF,
-    patch=("    if pset in PARSERS:\n        return PARSERS[pset]\n",
+    patch=("extract_code.py", "    if pset in PARSERS:\n        return PARSERS[pset]\n",
            '    if pset in PARSERS and mode == "parser":\n        return PARSERS[pset]\n'))
 check("AC7 red: with the DISPATCH half of F1 reverted, the run refuses the row by name",
       code != 0 and "does not ship" in out, out)
@@ -5996,6 +5996,49 @@ check("AC6 green: ...and a reading at or above it earns `parser`, so the two are
 check("AC6: ...and a refusal-blown reading earns `probe` too, so F2 reaches the label and not "
       "only F1", read_ts_mode(_ts_all) == "probe" and _ts_all["clears_f1"],
       f"{read_ts_mode(_ts_all)} clears_f1={_ts_all['clears_f1']}")
+
+
+# ---- TOOL-dTotalRecall-13 S2: `read_defs_at`, the shared block's state reader --------------------
+#
+# ONE scratch repository whose `a.py` defines `f` at HEAD, `g` in the staged index and `h` in the
+# working tree, so each state must read its OWN text, under its own blob id, the worktree's being
+# git's own as `git hash-object` computes it. Then the two failure cases: a revision that does not
+# exist answers `None`, never an empty tree, and a blob holding a syntax error maps its path to the
+# EMPTY triple rather than dropping it, beside the same path parsing at HEAD so the empty triple is
+# the parse error's and not the reader's. The staged break is the index read through the worktree
+# branch, which reds the first arm with `h` where `g` stood.
+with build_tempdir() as _td:
+    _r = Path(_td)
+    _git = lambda *a: subprocess.run(["git", "-c", "core.autocrlf=false", *a], cwd=_r,  # noqa: E731
+                                     capture_output=True, text=True, encoding="utf-8")
+    _git("init", "-q", "--template=")
+    _git("config", "user.email", "selftest@example.invalid")
+    _git("config", "user.name", "selftest")
+    (_r / "a.py").write_text("def f():\n    return 1\n", encoding="utf-8", newline="\n")
+    (_r / "bad.py").write_text("def ok():\n    pass\n", encoding="utf-8", newline="\n")
+    _git("add", "-A")
+    _git("commit", "-qm", "head")
+    (_r / "a.py").write_text("def g():\n    return 2\n", encoding="utf-8", newline="\n")
+    _git("add", "a.py")
+    (_r / "a.py").write_text("def h():\n    return 3\n", encoding="utf-8", newline="\n")
+    (_r / "bad.py").write_text("def (:\n", encoding="utf-8", newline="\n")
+    _rd = {_st: lex.read_defs_at(_r, _st) for _st in ("HEAD", "index", "worktree")}
+    _rd_names = {_st: [_n for _n, _ln in _got["a.py"][1][0]] if _got and "a.py" in _got else None
+                 for _st, _got in _rd.items()}
+    _rd_blobs = {_st: _got["a.py"][0] if _got and "a.py" in _got else None for _st, _got in _rd.items()}
+    _rd_hash = _git("hash-object", "a.py").stdout.strip()
+    _rd_missing = lex.read_defs_at(_r, "no-such-revision")
+check("read_defs_at: HEAD, the staged index and the worktree each read their own text — f, g and h",
+      _rd_names == {"HEAD": ["f"], "index": ["g"], "worktree": ["h"]}, str(_rd_names))
+check("read_defs_at: ...each under its own blob id, the worktree's equal to `git hash-object`'s",
+      len(set(_rd_blobs.values())) == 3 and _rd_blobs["worktree"] == _rd_hash, f"{_rd_blobs} {_rd_hash}")
+check("read_defs_at: a revision that does not exist answers None, which is not an empty tree",
+      _rd_missing is None, repr(_rd_missing))
+check("read_defs_at: a blob holding a syntax error maps its path to the EMPTY triple, never a drop, "
+      "where the same path parses at HEAD",
+      bool(_rd["worktree"]) and _rd["worktree"].get("bad.py", (None, None))[1] == ([], [], [])
+      and bool(_rd["HEAD"]) and [_n for _n, _ln in _rd["HEAD"]["bad.py"][1][0]] == ["ok"],
+      f"{(_rd['worktree'] or {}).get('bad.py')} {(_rd['HEAD'] or {}).get('bad.py')}")
 
 
 # ---- TOOL-aMendedFleet-3: `--merge-losses`, a merge that LOSES a definition a parent carried ------

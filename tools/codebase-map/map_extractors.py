@@ -281,10 +281,10 @@ def _read_lexicon_verbs() -> list[str]:
 # SYMBOL_EXTRACTORS — the reuse RECALL tier. Feeds generated/symbols.json only, never the
 # ratchet, so a new symbol never fails CI.
 #
-# Shell is COVERED by `kit-sh`, through the lexicon kit's tokenizer `parse_shell_defs` rather than
-# a regex: a regex over shell function definitions would be exactly the silently-skips-what-it-forgot
-# extractor the fail-closed law bans, and it reports a function inside a heredoc body as shell.
-# PROJECT-OWNED and never in the template: an adopter without the lexicon has no tokenizer to call.
+# Shell is COVERED by `kit-sh`, through the tokenizer `parse_shell_defs` in this kit's own
+# `extract_code.py` rather than a regex: a regex over shell function definitions would be exactly the
+# silently-skips-what-it-forgot extractor the fail-closed law bans, and it reports a function inside a
+# heredoc body as shell. PROJECT-OWNED and never in the template, which no clause asks to grow a layer.
 # --------------------------------------------------------------------------------------
 
 #: The PRODUCT shell roots (TOOL-aMendedFleet-35 F1): the tool root, the tracked hooks and the
@@ -295,23 +295,18 @@ SHELL_ROOTS = (TOOLS, ROOT / ".githooks", ROOT / "skills")
 def scan_shell_layer(layer: str, roots, *, root: Path | None = None) -> list[dict[str, str]]:
     """One `function` row per PUBLIC shell definition in every `*.sh` under `roots`.
 
-    Read through the lexicon kit's `parse_shell_defs`, a tokenizer, so a heredoc-embedded function
-    is not a definition. A name starting with `_` is private and skipped, the rule `python_symbols`
-    applies to Python. `file` is POSIX-relative to `root` (the repo root by default).
+    Read through `parse_shell_defs` in this kit's own `extract_code.py`, a tokenizer, so a
+    heredoc-embedded function is not a definition. A name starting with `_` is private and skipped,
+    the rule `python_symbols` applies to Python. `file` is POSIX-relative to `root` (the repo root by
+    default).
 
-    FAIL CLOSED, none of which yields a smaller index: a lexicon kit the resolver cannot find, a
-    root that is not a directory, a file the tokenizer refuses, and a layer that yields zero rows
-    over all roots (the `_live_py` liveness rule) each raise MapError.
+    FAIL CLOSED, none of which yields a smaller index: a root that is not a directory, a file the
+    tokenizer refuses, and a layer that yields zero rows over all roots (the `_live_py` liveness
+    rule) each raise MapError. No sibling kit is resolved: the tokenizer ships in this kit
+    (TOOL-dTotalRecall-13 S5).
     """
-    import sys as _sys
+    from extract_code import parse_shell_defs
     root = root or ROOT
-    try:
-        kit = str(resolve_kit_dir("lexicon", "lexicon.py", TOOLS))
-    except LookupError as exc:
-        raise m.MapError(f"{layer}: the shell layer needs the lexicon kit's tokenizer: {exc}") from exc
-    if kit not in _sys.path:
-        _sys.path.insert(0, kit)
-    from lexicon import parse_shell_defs  # noqa: E402
 
     out: list[dict[str, str]] = []
     for base in roots:
@@ -385,7 +380,8 @@ SYMBOL_EXTRACTORS: dict[str, object] = {
     "kit-py": lambda: _live_py("kit-py"),
     # Export scan UNION definition probe — see _build_js_layer for why one of them alone indexed 3 of 33.
     "kit-js": lambda: _build_js_layer("kit-js"),
-    # Tokenizer-backed (the lexicon's parse_shell_defs); raises MapError on a file it refuses.
+    # Tokenizer-backed (parse_shell_defs, in this kit's own extract_code.py); raises MapError on a
+    # file it refuses.
     "kit-sh": lambda: scan_shell_layer("kit-sh", SHELL_ROOTS),
 }
 

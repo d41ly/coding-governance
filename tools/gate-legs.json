@@ -2964,6 +2964,7 @@
       "{prefix}/memory-tree/id_grammar.py",
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/lexicon/canon.py",
+      "{prefix}/lexicon/extract_code.py",
       "{prefix}/lexicon/lexicon.py",
       "{prefix}/lexicon/lexicon_conf.py",
       "{prefix}/lexicon/scaffold_lexicon.py",

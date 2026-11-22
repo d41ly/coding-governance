@@ -1992,6 +1992,9 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check("shell layer: public definitions only, untokenizable refuses (aMendedFleet-35)",
                           lambda: test_shell_layer_indexes_public_definitions_only(Path(td)))
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+        failures += check("shell layer: builds with no lexicon kit reachable (dTotalRecall-13 S5)",
+                          lambda: test_shell_layer_needs_no_lexicon_kit(Path(td)))
     with tempfile.TemporaryDirectory() as td:
         failures += check("gate-coverage: an uncompared artifact fails (AC1)",
                           lambda: test_gate_coverage_fails_on_an_uncompared_artifact(Path(td)))
@@ -2473,6 +2476,41 @@ def test_shell_layer_indexes_public_definitions_only(tmp: Path):
         assert "bad/broken.sh" in str(exc), exc
     else:
         raise AssertionError("an untokenizable shell file was indexed as nothing, not refused")
+
+
+def test_shell_layer_needs_no_lexicon_kit(tmp: Path):
+    """TOOL-dTotalRecall-13 S5 — the `kit-sh` layer reads this kit's OWN `extract_code.py`, so it builds
+    in a tree holding no lexicon kit at all, the tree an adopter taking the map alone has.
+
+    A tool root carrying this kit and the memory-tree kit it requires, and nothing else, runs
+    `scan_shell_layer` in a CHILD over one fixture shell file: a child, because this process already
+    holds the lexicon kit beside this one, and an in-process call could reach it. The public
+    definition is the one row. Staged by restoring the `from lexicon import` line, under which the
+    child cannot import the tokenizer and prints no row.
+    """
+    import shutil
+    import subprocess
+
+    repo = tmp / "repo"
+    kit = repo / PFX / KIT_NAME
+    shutil.copytree(Path(os.path.abspath(__file__)).parent, kit,
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    shutil.copytree(m.MEMORY_TREE_DIR, kit.parent / Path(m.MEMORY_TREE_DIR).name,
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    assert not (kit.parent / "lexicon").exists(), "the fixture tool root holds a lexicon kit"
+    (repo / ".git").mkdir()
+    (repo / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+    (repo / "sh").mkdir()
+    (repo / "sh" / "lib.sh").write_text("build_thing() {\n  echo hi\n}\n", encoding="utf-8")
+    env = {k: v for k, v in os.environ.items() if k != "CODEBASE_MAP_ROOT"}
+    got = subprocess.run(
+        [sys.executable, "-c",
+         "import sys; sys.path.insert(0, sys.argv[1]); import pathlib, map_extractors as mx; "
+         "r = pathlib.Path(sys.argv[2]); print(mx.scan_shell_layer('kit-sh', (r / 'sh',), root=r))",
+         str(kit), str(repo)],
+        cwd=str(repo), env=env, capture_output=True, text=True, encoding="utf-8")
+    want = str([{"id": "build_thing", "kind": "function", "file": "sh/lib.sh"}])
+    assert got.returncode == 0 and got.stdout.strip() == want, got.stdout + got.stderr
 
 
 # --- left-shifts from the closing diff review (dTracedLattice round 1) ----------------------------

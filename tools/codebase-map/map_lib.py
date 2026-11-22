@@ -45,6 +45,13 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatchcase
 from pathlib import Path
 
+# THE IDENTIFIER LEXER LIVES IN THIS KIT'S `extract_code.py`, the shared block the lexicon kit carries
+# byte-identical too (TOOL-dTotalRecall-13 S6), found through the directory this module loads from,
+# which every importer holds on `sys.path`. Imported BY NAME, so `map_lib.<name>` still resolves.
+from extract_code import (DEFINITION_CARRYING_EXTS, _DATA_EXTS, _IDENT_TOKEN_RE,  # noqa: F401
+                          _LEX_PROFILES, _PROFILE_C, _PROFILE_PY, _PROFILE_SH, _PY_PREFIX_CHARS,
+                          _TRIPLE_QUOTES, _identifier_tokens)
+
 #: gov:kit codebase-map@1.37 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
 KIT_CODEBASE_MAP_VERSION = "1.37"
@@ -638,184 +645,6 @@ def stems(text: str) -> frozenset[str]:
     return frozenset(
         _stem(t) for t in subtokens(text) if t not in _STOPWORDS and len(t) >= 2
     )
-
-
-_IDENT_TOKEN_RE = re.compile(r"[A-Za-z_$][\w$]*")
-
-
-#: Per-language lexical PROFILE — the sole declaration of the field set (TOOL-aLexedStripper-1 §4,
-#: seventh field by TOOL-aLexedStripper-6). Fields, in order:
-#:   line_markers             tokens opening a comment that runs to end of line
-#:   marker_needs_word_start  whether a marker opens a comment ONLY at line start or after space
-#:   block_pair               the block-comment open/close pair, or None
-#:   quote_chars              characters opening a single-line string
-#:   triple_quoted            whether ''' and \"\"\" open a multi-line string
-#:   backtick_is_string       whether a backtick opens a string whose content is NOT code
-#:   interpolation_pair       open/close tokens whose BODY is code, or None
-#: `marker_needs_word_start` is shell-only: `$#` is the argument count and `${p#/opt/}` is a prefix
-#: strip, and treating either as a comment deletes the rest of the line. Backtick is NOT a string in
-#: shell, where it opens command substitution and the content IS code. `interpolation_pair` is what
-#: lets one rule cover a JS template's `${…}` and a Python f-string's `{…}`; the Python row applies
-#: it only inside a string whose prefix carries `f`.
-_PROFILE_C = (("//",), False, ("/*", "*/"), ("'", '"'), False, True, ("${", "}"))
-_PROFILE_PY = (("#",), False, None, ("'", '"'), True, False, ("{", "}"))
-_PROFILE_SH = (("#",), True, None, ("'", '"'), False, False, None)
-
-_LEX_PROFILES = {}
-for _e in (".js .jsx .mjs .cjs .ts .tsx .c .h .cc .cpp .hpp .java .go .rs .cs .swift .kt "
-           ".scala .php").split():
-    _LEX_PROFILES[_e] = _PROFILE_C
-for _e in (".py", ".pyi"):
-    _LEX_PROFILES[_e] = _PROFILE_PY
-for _e in ".sh .bash .zsh .toml .yaml .yml .cfg .ini .conf".split():
-    _LEX_PROFILES[_e] = _PROFILE_SH
-
-#: Extensions `_LEX_PROFILES` knows a comment syntax for but which declare no functions. This is the
-#: ONLY authored half of the definition-carrying set below — the language half is DERIVED from the
-#: profile table, so a language the tokenizer learns is covered the day it is added.
-#:
-#: A SECOND COPY OF A JUDGEMENT, said plainly. The lexicon kit reaches the same conclusion for its
-#: own coverage denominator and argues it at greater length there. It cannot be imported: this repo
-#: relies on a directional layer rule forbidding that kit from importing this one, and the reverse
-#: direction is no better, so the two are independent readings of one question and may diverge.
-_DATA_EXTS = frozenset({".toml", ".yaml", ".yml", ".cfg", ".ini", ".conf"})
-
-#: What this kit believes CAN carry a definition. Derived, minus the data formats above.
-#:
-#: WHAT IT CANNOT SEE: a language `_LEX_PROFILES` has no profile for. `_identifier_tokens` handles
-#: one fail-open, by design, and a dark-layer check built on this set therefore MISSES it rather
-#: than reporting it — a false negative, chosen over the false positive of calling every unknown
-#: extension a source layer.
-DEFINITION_CARRYING_EXTS = frozenset(_LEX_PROFILES) - _DATA_EXTS
-
-_TRIPLE_QUOTES = ('"""', "'''")
-#: String prefix letters Python allows before a quote. Only `f` (any case) turns the
-#: `interpolation_pair` on, but all of them have to be RECOGNISED so `rf"…"` is still seen as
-#: f-prefixed and `b"…"` is not.
-_PY_PREFIX_CHARS = "rRbBuUfF"
-
-
-def _identifier_tokens(source: str, suffix: str = "") -> set[str]:
-    """Distinct identifier tokens in a source file's CODE, with comments and string CONTENT removed
-    by ONE left-to-right pass over the lexical profile for ``suffix``.
-
-    A regex chain cannot express that comments and strings EXCLUDE each other, and whichever it
-    strips first wins. The three regexes this replaced applied C syntax to every language, so a
-    ``/*`` inside a Python docstring opened a comment running to the next ``*/`` (measured: 674
-    lines swallowed, one file down to 18.8% recall against ``tokenize`` ground truth), a ``//``
-    truncated a line of floor division, and a ``#`` truncated a line of TypeScript.
-
-    An UNDECLARED suffix strips NOTHING and returns every token. Over-counting is this scan's
-    documented fail-open direction — it feeds a RANKING, never a gate — and guessing a
-    comment syntax is exactly how the old chain got here.
-
-    A multi-line construct left UNTERMINATED at EOF is ABANDONED, the pass resuming just after the
-    opener, so an odd backtick cannot reproduce the same swallow this function exists to remove.
-    """
-    prof = _LEX_PROFILES.get(suffix)
-    if prof is None:
-        return set(_IDENT_TOKEN_RE.findall(source))
-    markers, word_start, block, quotes, triple, backtick, interp = prof
-    out: list[str] = []
-    i, n = 0, len(source)
-
-    def _string(start: int, delim: str, multiline: bool, interpolate: bool) -> int:
-        """Consume a string opened at ``start`` by ``delim``. Text is blanked; an interpolation body
-        is COPIED, because it holds real code. Returns the index just past the close, or past the
-        opener when the literal is unterminated (the abandon rule)."""
-        j = start + len(delim)
-        while j < n:
-            if source[j] == "\\":
-                j += 2
-                continue
-            if interpolate and source.startswith(interp[0], j):
-                if source.startswith(interp[0] * 2, j) and interp[0] == "{":
-                    j += 2  # `{{` is a literal brace and opens nothing
-                    continue
-                k = j + len(interp[0])
-                depth = 0
-                body = []
-                closed = False
-                while k < n:
-                    c = source[k]
-                    # A brace inside a NESTED STRING is text, not structure. Counting it inflated the
-                    # depth so the real closer never matched, and the walk ran on past the literal
-                    # consuming comments and string bodies as code -- the over-capture direction of
-                    # the same defect this scanner exists to remove. Measured: `{` inside a quoted
-                    # argument leaked a following comment's prose into the index.
-                    if c in quotes:
-                        e = k + 1
-                        while e < n and source[e] != c:
-                            if source[e] == chr(92):
-                                e += 2
-                                continue
-                            if source[e] == chr(10):
-                                break
-                            e += 1
-                        if e < n and source[e] == c:
-                            body.append(" " * (e - k + 1))
-                            k = e + 1
-                            continue
-                    if c == interp[0][-1]:
-                        depth += 1
-                    elif c == interp[1]:
-                        if depth == 0:
-                            closed = True
-                            break
-                        depth -= 1
-                    body.append(c)
-                    k += 1
-                # An interpolation that never closes is TEXT, not code. Emitting the body anyway
-                # walked to EOF and leaked the whole rest of the file into the index as identifiers
-                # -- the over-capture direction of the same defect this scanner exists to remove.
-                out.append(" " + "".join(body) + " " if closed else " ")
-                j = k + 1 if closed else k
-                continue
-            if not multiline and source[j] == "\n":
-                return j  # a single-line literal never crosses its line
-            if source.startswith(delim, j):
-                return j + len(delim)
-            j += 1
-        return start + len(delim)  # unterminated: abandon, rescan from just after the opener
-
-    while i < n:
-        ch = source[i]
-        if block and source.startswith(block[0], i):
-            j = source.find(block[1], i + len(block[0]))
-            i = i + len(block[0]) if j < 0 else j + len(block[1])
-            out.append(" ")
-            continue
-        hit = next((m for m in markers if source.startswith(m, i)), None)
-        if hit and (not word_start or i == 0 or source[i - 1].isspace()):
-            j = source.find("\n", i)
-            i = n if j < 0 else j
-            out.append(" ")
-            continue
-        if ch in quotes or (backtick and ch == "`"):
-            # Python string prefixes sit immediately before the quote; `f` (any case) turns on the
-            # replacement field. A prefix run is at most a few letters and is already in ``out``.
-            # The prefix run is a PYTHON construct, so it is read only for a profile that has
-            # them. Running it for the C family cost nothing but said the opposite of what it meant.
-            fstring = False
-            if triple:
-                k = i - 1
-                pre = ""
-                while k >= 0 and source[k] in _PY_PREFIX_CHARS:
-                    pre = source[k] + pre
-                    k -= 1
-                fstring = "f" in pre.lower()
-            if triple and any(source.startswith(d, i) for d in _TRIPLE_QUOTES):
-                d = source[i : i + 3]
-                i = _string(i, d, True, bool(interp) and fstring)
-            elif ch == "`":
-                i = _string(i, "`", True, bool(interp))
-            else:
-                i = _string(i, ch, False, bool(interp) and fstring)
-            out.append(" ")
-            continue
-        out.append(ch)
-        i += 1
-    return set(_IDENT_TOKEN_RE.findall("".join(out)))
 
 
 def derive_present_layers(root: Path, skip_dirs: frozenset[str] = _SKIP_DIRS) -> dict[str, int]:

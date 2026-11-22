@@ -1555,56 +1555,6 @@ def _build_armed_exts(langs_value, lex, _langs, sets):
     return out
 
 
-def _read_defs_at_sha(ctx, sha, armed, lex, sets):
-    """`{(path, name)}` — every function definition an armed extractor sees in the tree at `sha`.
-
-    ONE `git cat-file --batch` for the whole tree, not one read per file. Measured on node `d`: the
-    per-file shape cost 2.774 s for both shas at 108 spawns, and this box taxes every exec by roughly
-    0.022 s (`memory/gotchas/process-creation-is-the-suite-cost.md`), so 108 spawns IS 2.4 s of that.
-    The cost here is spawn count rather than compute, and the batched read is what keeps it off the
-    signal's budget.
-    """
-    listing = ctx.git.run("ls-tree", "-r", sha)
-    if listing.returncode != 0:
-        return None
-    want = []
-    for line in listing.stdout.splitlines():
-        meta, _, path = line.partition("\t")
-        bits = meta.split()
-        if len(bits) < 3 or bits[1] != "blob" or lex.ext_of(path) not in armed:
-            continue
-        want.append((bits[2], path))
-    if not want:
-        return set()
-    batch = subprocess.run(
-        ["git", "-C", str(ctx.root), "cat-file", "--batch"],
-        input="".join(b + "\n" for b, _ in want).encode(),
-        capture_output=True,
-    )
-    if batch.returncode != 0:
-        return None
-    defs, buf, i = set(), batch.stdout, 0
-    for _blob, path in want:
-        nl = buf.find(b"\n", i)
-        if nl < 0:
-            return None
-        header = buf[i:nl].split()
-        if len(header) < 3:
-            return None
-        size = int(header[2])
-        src = buf[nl + 1: nl + 1 + size].decode("utf-8", errors="replace")
-        i = nl + 1 + size + 1
-        pset, mode = armed[lex.ext_of(path)]
-        try:
-            got = lex.extract_text(src, mode, pset, sets=sets)
-        except (SyntaxError, ValueError, KeyError):
-            continue
-        if got:
-            for nm, _ln in got[0]:
-                defs.add((path, nm))
-    return defs
-
-
 def build_lexicon_marginal_offense_rate(ctx) -> dict:
     """Offenders ADDED per definition ADDED, between the commit that adopted the declaration and HEAD.
 
@@ -1695,8 +1645,10 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     # dict never survives to a second run anyway, which is a moving part with no consumer.
     sets = _resolve_lexicon_sets(ctx, lex)
     armed = _build_armed_exts(langs_value, lex, _langs, sets)
-    at_base = _read_defs_at_sha(ctx, base, armed, lex, sets)
-    at_head = _read_defs_at_sha(ctx, head, armed, lex, sets)
+    # THE LEXICON'S OWN BATCHED READER, one `git ls-tree` and one `git cat-file --batch` per sha; the
+    # copy this file kept retired once the reader moved into the shared block (TOOL-dTotalRecall-13 S7).
+    at_base = lex.read_defs_at_sha(ctx.root, base, armed, sets)
+    at_head = lex.read_defs_at_sha(ctx.root, head, armed, sets)
     # L2 and L3 — a population that is empty at either end means the extractor is not reading, which
     # is indistinguishable from a clean window unless it is said out loud.
     if at_base is None or at_head is None or not at_base or not at_head:

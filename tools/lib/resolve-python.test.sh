@@ -442,6 +442,7 @@ selection_row|$ROOT/$RUNGATES_DIR/verdict_flow.py|$RUNGATES_DIR/verdict_flow
 gov_ref_sh|$ROOT/$KIT_REL/gov-ref.sh|$KIT_REL/gov-ref
 gov_feed_sh|$ROOT/$KIT_REL/gov-feed.sh|$KIT_REL/gov-feed
 home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
+extract_code|$ROOT/$KIT_REL/extract_code.py|$KIT_REL/extract_code
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -527,6 +528,9 @@ home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
 # gov_ref_sh (TOOL-dPlacedRequest-11 S1, S2) is the one compare-and-swap writer of a governance ref
 # and its parented commit: the unattended driver's claim write and post-merge's bar-red ref each carry
 # it inline, and part 2p below holds the canonical to its failed-build contract.
+# extract_code (TOOL-dTotalRecall-13 S3) is the shared extraction primitive: the definition extractors,
+# their tokenizers, the state reader and the map's identifier lexer. The lexicon kit's and the
+# codebase-map kit's extract_code.py are each that block whole, beside a comment header of their own.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
