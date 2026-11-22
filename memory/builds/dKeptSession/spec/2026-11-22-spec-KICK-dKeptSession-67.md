@@ -1,6 +1,6 @@
 # KICK-dKeptSession-67 — pass-tree regenerates over the merge as it will be committed, so a pass that changes a mirror input merges
 
-**Status:** CLOSED · rev-2 · 2026-11-22 · node d · Tier-2 · base ce776cccc · streams tooling · order 7 · advances KICK-dKeptSession-29
+**Status:** CLOSED · rev-3 · 2026-11-22 · node d · Tier-2 · base ce776cccc · streams tooling · order 7 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,7 +12,9 @@
 | [2026-11-21-prompt-KICK-dKeptSession-67-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-67-build-brief.md) | research | — |
 | [2026-11-22-prompt-KICK-dKeptSession-67-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-67-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-KICK-dKeptSession-67-2-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-67-2-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-KICK-dKeptSession-67-3-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-67-3-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-KICK-dKeptSession-67-bind-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-67-bind-brief.md) | research | — |
+| [2026-11-22-prompt-KICK-dKeptSession-67-pin-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-67-pin-brief.md) | research | — |
 | [2026-11-22-prompt-KICK-dKeptSession-67-spec-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-67-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -294,7 +296,7 @@ directory as the suite's fixture section builds it, with S3's row, `rev.sh` and 
 - **AC4** — When `grep -c "over the merge as it will be committed" README.md` runs in the unattended
   kit, it prints `1`. `grep -c "provisional commit of the merge" pass-tree.sh` prints `1`, the
   header's sentence, and `grep -c "tools/" pass-tree.sh README.md pass-tree.test.sh` prints
-  `pass-tree.sh:0`, `README.md:0` and `pass-tree.test.sh:0`, one per line.
+  one line per file it names, in that order, each with the count 0.
   Red when: the README still says only "re-renders the outputs", or a new line spells a kit path.
   figure: the three zero counts are PINNED, measured 2026-11-22 at ce776cccc by the same command.
 - **AC5** — When, after this unit's pass has merged, `bash tools/unattended/pass-tree.sh --merge
@@ -302,8 +304,8 @@ directory as the suite's fixture section builds it, with S3's row, `rev.sh` and 
   b4b570ef771580c665b07105eb9c85d33ae89926` runs in the run's tree, it exits 0 and prints one sha
   whose second parent is `4ee5af863`. Its stderr carries no `regen: FAILED` line, and
   `python tools/policy/policy.py mirror --check` then prints `policy: mirror fresh` and exits 0.
-  Red when: the refusal the brief reports recurs, `policy: refused · tools/policy/catalogue.toml:0
-  · uncommitted changes`.
+  Red when: the refusal the brief reports recurs, a `policy: refused` line naming
+  `tools/policy/catalogue.toml` at line 0 with `uncommitted changes`.
   fixture: branch `worktree-wf_ce213496-950-1` at `4ee5af863`, forking from `b4b570ef7`, held in this
   tree on 2026-11-22.
   permission: the main loop's act, which moves the run's branch, made after this unit's own merge.
@@ -352,6 +354,10 @@ New arm: tools/unattended/pass-tree.test.sh · covers AC1 AC2 AC3 · the `K67` b
   unit to the design as one the build added, from the brief
   `2026-11-22-prompt-KICK-dKeptSession-67-bind-brief`. No clause asks for this unit, so no Carries line
   fits, and the Moved, Retired and Deferred keys each release a clause. §1 to §8 and §10 are unchanged.
+- rev-3 · 2026-11-22 · AC4's three zero counts and AC5's quoted refusal now name their files and
+  the value 0 without a file:line suffix, which the positional check read as three unlisted
+  line-zero citations, from the brief `2026-11-22-prompt-KICK-dKeptSession-67-3-spec-writer`. Both
+  criteria observe what they did before, and the rest of the text is unchanged.
 
 ## 10. Reuse audit
 
