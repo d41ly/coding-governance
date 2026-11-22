@@ -53,6 +53,9 @@
 | [2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md) | widen | — |
 | [2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md) | widen | — |
 | [2026-11-22-build-TOOL-dWitnessedBar-1-widen-34.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-34.md) | widen | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-widen-35.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-35.md) | widen | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-widen-36.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-36.md) | widen | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-widen-37.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-37.md) | widen | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md) | journal | — |

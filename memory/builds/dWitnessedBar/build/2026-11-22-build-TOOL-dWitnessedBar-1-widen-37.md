@@ -1,0 +1,8 @@
+# TOOL-dWitnessedBar-1 widen 37 — spawn-idiom-sites widened
+
+**Serves:** widen TOOL-dWitnessedBar-1
+
+- **Population:** spawn-idiom-sites
+- **Keys:** `.githooks/pre-push	pure-fn-subst`, `.githooks/pre-push	var-pipe`, `.githooks/pre-push.runlog.test.sh	var-pipe`, `.githooks/pre-push.test.sh	cat-file`, `tools/codebase-map/adopt-codebase-map.test.sh	path-subst`, `tools/codebase-map/adopt-codebase-map.test.sh	var-pipe`, `tools/lib/resolve-python.test.sh	path-subst`, `tools/lib/resolve-python.test.sh	var-pipe`, `tools/memory-tree/check-memory-hygiene.sh	var-pipe`, `tools/memory-tree/check-memory-hygiene.test.sh	var-pipe`, `tools/run-gates/adopt-run-gates.test.sh	var-pipe`, `tools/run-gates/run-gates.evidence.test.sh	cat-file`, `tools/run-gates/run-gates.evidence.test.sh	var-pipe`, `tools/run-gates/run-gates.sh	date-fmt`, `tools/run-gates/run-gates.sh	pure-fn-subst`, `tools/run-gates/run-gates.test.sh	cat-file`, `tools/run-gates/run-gates.test.sh	var-pipe`, `tools/unattended/lib-unattended.sh	path-subst`, `tools/unattended/unattended.sh	var-pipe`, `tools/drift-audit/adopt-drift-audit.sh	var-pipe`, `tools/gate-lint/fork-count.sh	path-subst`, `tools/lib/refuse-wrong-shell.sh	path-subst`, `tools/lib/refuse-wrong-shell.sh	var-pipe`, `tools/lib/resolve-python.test.sh	pure-fn-subst`, `tools/run-gates/profile_bar.test.sh	var-pipe`, `tools/run-gates/run-gates.gov.test.sh	var-pipe`
+- **Reason:** the landing merge over origin/main c2a407b03 brought origin's shell code, landed since this run's base, under this build's shell gates, and joined it with this branch's; each row takes the count the scan measures at the merge
+- **Caused-by:** TOOL-dWitnessedBar-1

@@ -1,5 +1,4 @@
 # ledger · temp-name-sites · key site path,class · direction shrink-only · drain hunk
-.githooks/pre-push	fixed-temp	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 skills/session-kickoff/card-store.fixture.sh	fixed-temp	8	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 skills/session-kickoff/manifest-check.sh	fixed-temp	5	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/branch-reconcile/adopt-branch-reconcile.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
@@ -15,4 +14,3 @@ tools/run-gates/run-gates.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d
 tools/runlog/adopt-runlog.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/unattended/adopt-unattended.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/unattended/lib-unattended.sh	fixed-temp	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-tools/unattended/unattended.sh	fixed-temp	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
