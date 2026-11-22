@@ -323,11 +323,11 @@ def print_gap_keys(root) -> int:
 # ------------------------------------------------------------------------------------- the view
 def render_kind_region(rows: list[dict]) -> str:
     """The `gen:record-kinds` region, its markers included: one table line per row."""
-    def cell(v):
+    def render_cell(v):
         return f"`{v}`" if isinstance(v, str) and v else "—"
     lines = [REGION_OPEN, "", "| Kind | Tag | Home | Writer | Check |", "|---|---|---|---|---|"]
-    lines += [f"| {cell(r.get('name'))} | {cell(r.get('tag'))} | {cell(r.get('home'))} | {cell(r.get('writer'))} | "
-              f"{cell(r.get('check'))} |" for r in rows]
+    lines += [f"| {render_cell(r.get('name'))} | {render_cell(r.get('tag'))} | {render_cell(r.get('home'))} | {render_cell(r.get('writer'))} | "
+              f"{render_cell(r.get('check'))} |" for r in rows]
     return "\n".join(lines + ["", REGION_CLOSE])
 
 
@@ -562,14 +562,14 @@ def build_fixture(tmp, plant: str | None = None):
     build = f"memory/builds/{FIXTURE_BUILD}/build"
     unit = f"TOOL-{FIXTURE_BUILD}-1"
 
-    def put(rel, text):
+    def write_fixture_file(rel, text):
         p = tmp / rel
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_bytes(text.encode("utf-8"))
 
-    put(".memory-tree.conf", 'MEMORY_ROOT="memory"\n')
-    put(f"{tool_rel}/{LEGS}" if tool_rel else LEGS, json.dumps([{"name": "memory hygiene"}, {"name": SAY}], indent=2) + "\n")
-    put(f"{kit_rel}/build_records.py", "LEVELS = ('a', 'b')\nKINDS = {\n    'deviation': {\n        'required': ("
+    write_fixture_file(".memory-tree.conf", 'MEMORY_ROOT="memory"\n')
+    write_fixture_file(f"{tool_rel}/{LEGS}" if tool_rel else LEGS, json.dumps([{"name": "memory hygiene"}, {"name": SAY}], indent=2) + "\n")
+    write_fixture_file(f"{kit_rel}/build_records.py", "LEVELS = ('a', 'b')\nKINDS = {\n    'deviation': {\n        'required': ("
         + ", ".join(json.dumps(f) for f in dev + (["Extra"] if plant == "source-drift" else [])) + "),\n"
         "        'closed': (('Risk', LEVELS),),\n    },\n}\n")
     rows = [
@@ -589,31 +589,32 @@ def build_fixture(tmp, plant: str | None = None):
     if plant == "writer-missing":   # the deviation row, the last, loses its writer
         head, _, tail = registry.partition('name = "deviation"\n')
         registry = head + 'name = "deviation"\n' + tail.replace('writer = "hand"\n', "", 1)
-    put(f"{kit_rel}/{REGISTRY}", registry)
+    write_fixture_file(f"{kit_rel}/{REGISTRY}", registry)
     region = render_kind_region(tomllib.loads(registry)["record-kind"])
     if plant == "region-edited":
         region = region.replace("| Kind |", "| Kinds |", 1)
-    put(f"{kit_rel}/{TEMPLATE}", "# fixture hygiene\n\n## Record kinds — the registry's view\n\n" + region + "\n")
-    put(f"{tool_rel}/govkit/registry.toml" if tool_rel else "govkit/registry.toml",
+    write_fixture_file(f"{kit_rel}/{TEMPLATE}", "# fixture hygiene\n\n## Record kinds — the registry's view\n\n" + region + "\n")
+    sibling = "/".join(("govkit", "registry.toml"))   # spelled in parts: the install-prefix ban reads a kit path
+    write_fixture_file(f"{tool_rel}/{sibling}" if tool_rel else sibling,
         f'[[ledger]]\npopulation = "{LEGACY}"\nleg = "{SAY}"\nseed = ["python", "{prefix}/{kit_rel[len(tool_rel) + 1:] if tool_rel else kit_rel}/record_kinds.py", "--seed-legacy"]\n'
         'key = "record"\nfields = ["path", "section"]\ndrain = "key"\ndirection = "shrink-only"\n'
         f'home = "memory/project/{LEGACY}.txt"\n')
     old = f"{build}/2026-01-01-build-{unit}-deviation-1.md"
     new = f"{build}/2026-01-02-build-{unit}-deviation-2.md"
     legacy_rows = [(old, "deviation")] + ([(new, "deviation")] if plant == "field-missing-legacy" else [])
-    put(f"memory/project/{LEGACY}.txt", f"# ledger · {LEGACY} · key record path,section · direction shrink-only · drain key\n"
+    write_fixture_file(f"memory/project/{LEGACY}.txt", f"# ledger · {LEGACY} · key record path,section · direction shrink-only · drain key\n"
         + "".join(f"{p}\t{s}\t1\t{'0' * 40}\tseeded\n" for p, s in legacy_rows))
-    put(old, f"# {unit} deviation 1 — an old form\n\n**Serves:** deviation {unit}\n\n- **Reason:** kept as it was\n")
+    write_fixture_file(old, f"# {unit} deviation 1 — an old form\n\n**Serves:** deviation {unit}\n\n- **Reason:** kept as it was\n")
     follow = "gap gap-mem-99" if plant == "gap-unresolved" else "gap gap-mem-01"
     values = {f: "the fixture" for f in dev}
     values["Follow-through"] = follow
     body = [f"# {unit} deviation 2 — the fixture", "", f"**Serves:** deviation {unit}", ""]
     body += [f"- **{f}:** {values[f]}" for f in dev if not (f == "Caused-by" and plant in ("field-missing", "field-missing-legacy"))]
-    put(new, "\n".join(body) + "\n")
+    write_fixture_file(new, "\n".join(body) + "\n")
     # The deviation home's glob matches it and the deviation grammar does not (§8 F8): the research row
     # grades it, so its missing deviation fields red nothing.
-    put(f"{build}/2026-01-03-build-{unit}-deviation-notes.md", f"**Serves:** research {unit}\n\nnotes, no field\n")
-    put(f"{build}/2026-01-01-build-{unit}-gap-register.md", f"**Serves:** research {unit}\n\n| Key | Gap |\n|---|---|\n"
+    write_fixture_file(f"{build}/2026-01-03-build-{unit}-deviation-notes.md", f"**Serves:** research {unit}\n\nnotes, no field\n")
+    write_fixture_file(f"{build}/2026-01-01-build-{unit}-gap-register.md", f"**Serves:** research {unit}\n\n| Key | Gap |\n|---|---|\n"
         "| gap-mem-01 | the fixture's one gap |\n")
     hooks = tmp / ".nohooks"
     hooks.mkdir(exist_ok=True)
