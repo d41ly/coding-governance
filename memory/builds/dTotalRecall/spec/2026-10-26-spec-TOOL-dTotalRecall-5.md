@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader
 
-**Status:** CLOSED · rev-11 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-12 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0216@f8936b35 whole
 **Carries:** node:policy-key.builds.slug-words
@@ -20,10 +20,15 @@
 | [2026-11-22-build-TOOL-dTotalRecall-5-2-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-2-builder-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-3-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-3-builder-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-4-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-4-acceptance-ledger.md) | log | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-4-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-4-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-deviation-52.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-deviation-52.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-divergence-2-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-2-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-divergence-3-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-3-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-divergence-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-facts-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-facts-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-red-fix-10.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-red-fix-10.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-red-fix-8.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-red-fix-8.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-red-fix-9.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-red-fix-9.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
@@ -39,6 +44,8 @@
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-3-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-3-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-spec-writer.md) | log | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-5-facts-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-facts-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-5-facts-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-facts-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-reground-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -357,14 +364,14 @@ git grep -nE '\[[^]]*a-z[^]]*\]([*+]|\{\{?[0-9]*,?[0-9]*\}\}?)?-([\\]d|\[0-9\]|\
 
 Its file count is the same command with `cut -d: -f2 | sort -u | wc -l` in place of `wc -l`. The
 backslash of its first digit arm is bracketed, `[\\]d`: rev-8 spelled it `\\d`, which on git
-2.54.0.windows.1 matched no backslash-d spelling, so that command printed 49 lines in 21 files at
+2.54.0.windows.1 matched no backslash-d spelling, so that command printed 49 lines in 21 files (DERIVED) at
 `b4137f489` and at `44c6800aa` (measured 2026-11-22). Its brace interval admits an f-string's doubled
 braces, `\{\{?...\}\}?`: rev-9's single-brace arm missed the session era's two f-string spellings,
 `tools/memory-tree/id_grammar.py#_eras`, the grammar's own, and
-`tools/drift-audit/drift_report.py@a8748ffaa:730`, a reader (S4), and found 71 lines in 35 files at
-`b4137f489`, at `44c6800aa` and at `a8748ffaa`. As spelled here it finds 73 lines in 37 files at
-`b4137f489`, at `44c6800aa` and at `a8748ffaa`, 72 lines in 36 files at the base `8b8b1374`, and 64
-lines in 31 files at `fb872a37e` (each PINNED 2026-11-22, same git), so rev-5's figure, which stated no command, does not reproduce. Among them is every site scout C listed
+`tools/drift-audit/drift_report.py@a8748ffaa:730`, a reader (S4), and found 71 lines in 35 files (DERIVED) at
+`b4137f489`, at `44c6800aa` and at `a8748ffaa`. As spelled here it finds 73 lines in 37 files (DERIVED) at
+`b4137f489`, at `44c6800aa` and at `a8748ffaa`, 72 lines in 36 files (DERIVED) at the base `8b8b1374`, and 64
+lines in 31 files at `fb872a37e` (each DERIVED 2026-11-22, same git), so rev-5's figure, which stated no command, does not reproduce. Among them is every site scout C listed
 (`2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-c.md`), each found at HEAD on 2026-11-22 under
 the same name, the JavaScript `reviewSlug` among them
 (`tools/workflows/tier2-review.template.js@b4137f489:631`). Readers landed since the base join
@@ -439,8 +446,8 @@ git grep -nP '(?:builds/|--(?:build|dispatch|slug|origin|preflight)[= ]["\x27]?|
   - the value of `--build`, `--dispatch`, `--slug`, `--origin` or `--preflight`;
   - a `"slug":` or `slug=` value;
   - the value of a name holding `SLUG` or `BUILD`.
-- **The counts.** At `17f07b292` the id search prints 528 lines in 27 files and the slug search 353
-  lines in 41 files. Together they print 793 distinct lines in 53 files (PINNED 2026-11-22, same
+- **The counts.** At `17f07b292` the id search prints 528 lines in 27 files (DERIVED) and the slug search 353
+  lines in 41 files. Together they print 793 distinct lines in 53 files (DERIVED 2026-11-22, same
   git; the pass re-derives them at its base).
 
 **The rule.** A refused slug is re-spelled in this order:
@@ -478,7 +485,7 @@ to a name no slug context matches. If a §7 suite, or one `bash tools/unattended
 runs, reds at the pass on such a fixture, that fixture is in the population too. The rule applies
 to it, and its file joins the pass's `--dispatch --writes` set before its edit.
 
-The dispositions of the 53 files, each hit by its file:
+The dispositions of the 53 files (DERIVED at `17f07b292`), each hit by its file:
 
 | File | Refused slugs | Disposition |
 |---|---|---|
@@ -515,7 +522,7 @@ The dispositions of the 53 files, each hit by its file:
 | `tools/playbook/gov_tag.py`, `tools/playbook/positional.py`, `tools/check-dead-paths.test.sh`, `tools/govkit/selftest.py` | `x` | kept: a fixture path segment that no reader S4, S7 or S13 changes parses |
 | `tools/loop/breakpoints.py`, `tools/loop/placement.py`, `tools/loop/loop_lib.py`, `tools/memory-tree/backlog.py`, `tools/memory-tree/build_records.py`, `tools/memory-tree/merge-rows.py`, `tools/memory-tree/seen_red.py`, `tools/memory-tree/design_lib.py`, `tools/roles/roles_lib.py`, `tools/runlog/runlog_lib.py` | `re`, `r` | kept: the hit is a reader's own binding. S7 re-points it, or §4 "The readers" states it as unseen |
 
-That is 26 files re-spelled and the runlog table rewritten. The re-spelled files hold 726 of the 793
+That is 26 files re-spelled (DERIVED from the table) and the runlog table rewritten. The re-spelled files hold 726 of the 793
 lines (PINNED 2026-11-22 at `17f07b292`).
 
 **The trace.** Every function and regex S4, S7 and S13 change, and the suites that feed it ids or
@@ -674,7 +681,7 @@ Four files above are also fixture homes: `tools/playbook/instruction_units.py`,
 
 The search of §4 "The readers" and the two of §4 "The fixtures" re-derive this list at the pass. A
 hit outside it, or a suite file that S7's fixture rule reaches, joins the pass's `--dispatch --writes`
-set before its edit. The list is 22 files longer than rev-10's, and the fixture rule's lines are
+set before its edit. The list is 22 files longer than rev-10's at `17f07b292` (DERIVED), and the fixture rule's lines are
 counted in §4 "The fixtures".
 
 ### Alternatives rejected
@@ -705,7 +712,7 @@ counted in §4 "The fixtures".
   `SLUG_DEFAULTS` restates the catalogue's defaults for a tree with no policy kit; the build-index
   self-test arm of §7 compares the two where the policy kit resolves. `design_lib.py`'s `_BUILD` and
   `_DECISION` and `loop_lib.py`'s `SEED_BUILD` are such readers, named in §4 "The readers", and
-  under an `in-slug` grammar they refuse a dated slug. The fixture rule's 726 lines in 26 files are
+  under an `in-slug` grammar they refuse a dated slug. The fixture rule's 726 lines in 26 files (DERIVED at `17f07b292`) are
   most of this pass's write set. A fixture neither search sees reds a suite rather than passing
   silently, and the rule covers it.
 - testing — AC1 to AC15 by a pass; the arms of §7 at the close, and the unattended kit's suites by
@@ -969,8 +976,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--se
       where they agree by construction.
   - **(c).** It widens `ID_RE` beyond the 4420 ids S4 pins, and AC12's refusal of `TOOL-x-1` fails,
     veto 1.
-  - **(a).** It fails no criterion and needs no surface. Its cost is the write set: 726 lines in 26
-    files and one table rewritten. Most of it is a mechanical rename that each file's own suite
+  - **(a).** It fails no criterion and needs no surface. Its cost is the write set: 726 lines in 26 files (DERIVED
+    at `17f07b292`) and one table rewritten. Most of it is a mechanical rename that each file's own suite
     checks. It keeps `[one-fact]`: one class answers for every reader and every fixture.
 
   Recommendation (a). RESOLVED (agent, 2026-11-22, delegated): (a), the one survivor of the vetoes,
@@ -1027,13 +1034,16 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--se
   `2026-11-22-build-TOOL-dTotalRecall-5-3-builder-return`, which found the bound class refusing short
   fixture slugs in suites §7 expects green:
   - S7 carries the fixture rule S13 held, by F13.
-  - The new §4 "The fixtures" fixes the population by two stated searches (793 lines in 53 files at
+  - The new §4 "The fixtures" fixes the population by two stated searches (793 lines in 53 files, DERIVED at
     `17f07b292`), gives each file its disposition, re-spells by one rule, and traces every changed
     reader to the suites that feed it, the one widening, `backlog.SLUG_RE`, included.
   - §4 "The readers" keeps the four test-side copies the return named, each with its reason, and
     states the readers the predicate does not see.
   - Files touched gains the 22 fixture homes, and §7 gains their gates.
   - AC15 is new. No other criterion's observation moved.
+- rev-12 · 2026-11-22 · §4 "The readers", "The fixtures", Files touched · §5 · §8 F13 · §9 · per
+  `2026-11-22-prompt-TOOL-dTotalRecall-5-facts-brief`: a record-only pin to a CLOSED spec, each search
+  count marked DERIVED on its own line, re-derived by its stated search on 2026-11-22; no criterion moved.
 
 ## 10. Reuse audit
 
