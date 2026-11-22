@@ -1,6 +1,6 @@
 # KICK-dKeptSession-47 — a compaction counts towards a model's window only when the session's last main usage before it is on that model
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -16,6 +16,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-48 |
 | [2026-11-21-prompt-KICK-dKeptSession-47-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-47-build-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md) | research | KICK-dKeptSession-50 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-61 |
+| [2026-11-22-prompt-KICK-dKeptSession-47-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-47-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-KICK-dKeptSession-47-divergence-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-47-divergence-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 
 <!-- /gen:spec-records -->
@@ -41,8 +43,13 @@ each compaction to the model it compacted. It repairs `KICK-dKeptSession-30`, un
 - **S1** — id 16. The attribution. In `derive_context_window(model, root=None, held=None)`, a
   `compact` event joins `model`'s observation only when the newest main-source `usage` event before
   it in the same transcript's event list is on `model`, the `held` events standing in for their file
-  as unit 30 S1 has them. A compaction with no main usage before it joins no model. Observed by AC1
-  and AC2.
+  as unit 30 S1 has them. A compaction with no main usage before it joins no model. The rule's two
+  statements are rewritten with it: the `derive_context_window` docstring's "its largest integer
+  compaction `pre_tokens`" reads "the largest integer `pre_tokens` of a compaction whose newest
+  earlier main usage in the same transcript is on `model`", and the `context` paragraph of
+  `tools/runlog/README.md`, KICK-dKeptSession-30 S5's, has its "largest compaction `preTokens`"
+  read "the largest `preTokens` of a compaction whose newest earlier main usage in the same
+  transcript is on that model". Observed by AC1, AC2 and AC4.
 - **S2** — id 16. The fixture. One scenario in `tools/runlog/fixtures/transcripts.json`,
   `context-window-compact-other`: one main usage of 50000 tokens on `other-model`, then a compaction
   whose `compactMetadata.preTokens` is 900000, written the way the store's other scenarios are, a
@@ -94,6 +101,12 @@ each compaction to the model it compacted. It repairs `KICK-dKeptSession-30`, un
   to the 1M rung.
 - `derive_context_window` is not in the tree at `c2a407b0` nor at the run's tree of 2026-11-21: unit
   30 mints it at order 13, so this unit edits unit 30's landed fold.
+- At `e8b22050` both statements of the rule fold every compaction: the docstring's "a transcript's
+  observation is its largest main `usage` sum on `model` and its largest integer compaction
+  `pre_tokens`" (`tools/runlog/extract.py#derive_context_window`), and the README's `context`
+  paragraph, "the largest main `usage` sum on the model and the largest compaction `preTokens`
+  across the newest `CONTEXT_WINDOW_SCAN` main transcripts" (`tools/runlog/README.md`), so S1
+  rewrites both.
 
 ### The fold
 
@@ -115,7 +128,8 @@ None: no stored state holds a window.
 
 ### Files touched (estimate)
 
-- `tools/runlog/extract.py`: S1 in `derive_context_window`
+- `tools/runlog/extract.py`: S1 in `derive_context_window`, its fold and its docstring
+- `tools/runlog/README.md`: S1's rewritten compaction clause in the `context` paragraph
 - `tools/runlog/fixtures/transcripts.json`: S2
 - `tools/runlog/selftest.py`: the cases of the Acceptance criteria, one `test_` function, and the
   `ASSERTION_FLOOR` raise with its `RAISED` comment
@@ -142,7 +156,8 @@ None: no stored state holds a window.
   harness compacts between turns, so the newest usage is the compacted context's.
 - testing — the cases of the Acceptance criteria and the arm on the Gates line.
 - migration — none.
-- user docs — none beyond unit 30 S5's paragraph, which names no compaction rule.
+- user docs — unit 30 S5's `context` paragraph in `tools/runlog/README.md` states the unfiltered
+  compaction rule, so S1 rewrites its clause to the attributed one; AC4 observes it.
 
 ## 6. Acceptance criteria
 
@@ -164,6 +179,13 @@ removed, as the selftest's `main` pops it since unit 30 S4, so unit 30's rung 1 
   `git diff --name-only <pass base> HEAD --` over unit 30's spec and its acceptance ledger prints
   nothing.
   Red when: S3's answer lands in a record of unit 30, or this unit's ledger quotes neither passage.
+- **AC4** — `tr -s ' 
+' ' '` over `tools/runlog/README.md` piped into `grep -c "whose newest earlier
+  main usage in the same transcript is on that model"` prints `1`, and into `grep -c "largest
+  compaction"` prints `0`; and the same over `tools/runlog/extract.py` piped into `grep -c "whose
+  newest earlier main usage in the same transcript is on"` prints `1`, and into `grep -c "largest
+  integer compaction"` prints `0`.
+  Red when: either statement still folds every compaction, or keeps the old clause beside the new.
 
 ## 7. Gates
 
@@ -205,6 +227,10 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 · an other-model compaction
   acceptance ledger, which joins Files touched, F1 resolved (b) and AC3 observing the quoted
   passages, under the brief `2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief`; the class of
   `KICK-dKeptSession-50`'s divergence, which unit 49's rev-6 first resolved.
+- rev-6 · 2026-11-22 · S1 · §4 · §5 · AC4 · the README's `context` paragraph and the
+  `derive_context_window` docstring, both stating the unfiltered rule, rewritten under S1, the README
+  joining Files touched and AC4 observing both, under the brief
+  `2026-11-22-prompt-KICK-dKeptSession-47-divergence-brief`.
 
 ## 10. Reuse audit
 
