@@ -20,7 +20,7 @@ hold-reason: The work is sound and merged onto origin/main at c2a407b03 with eve
 hold-until: owner
 hold-code: owner-decision
 held-from: VERIFYING
-refreshed-at: c2a407b0390f3d57a118b58e376c326aeb207c13 · handoff · ? touching
+refreshed-at: c2a407b0390f3d57a118b58e376c326aeb207c13 · park · ? touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: de0768e3ab65b8c79df5c40158730e05fe3ade83
 phase: VERIFYING
@@ -883,3 +883,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T18:20:04Z hold · item owner-decision · reason until owner · reaped 0b5bfd26 · resume none(owner)
 
 2026-11-21T18:42:39Z resume · item dWitnessedBar · reason held · keepalive 1f189298 · manual
+
+2026-11-22T02:00:37Z decision · item landing-hook-bypass: the owner asked to land as is; the pre-push hook blocks on the build's remaining own reds (remote literals, layer dependencies, python reads) and the packet pin only the owner can re-pin. Options: (a) the owner authorizes the hook's own documented override for this one landing push, recorded as an override; (b) fix the reds first and land through the hook · reason skipping a hook is the owner's explicit call by the charter, never inferred from 'as is'; no resolver the mandate delegates may skip one
