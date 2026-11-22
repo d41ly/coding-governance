@@ -1,6 +1,6 @@
 # KICK-dKeptSession-43 — the `actions.free` arm reads every form of the item pointer, a skipped pointer leaving it unarmed and saying so
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 26 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 26 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -41,15 +41,22 @@ and builds one step after it (order 26).
   `item —` line of `## pointers` into exactly one of `{ key, at }`, `{ none: true, at }` or
   `{ skipped: <why>, at }`, by `KICK-dKeptSession-13` S2's grammar: `item — <instance key|none> · at
   <sha8>` or `item — skipped: <why> · at <sha8>`, the why running to the last ` · at <sha8>` of the
-  line. A line matching none of the three is the fourth answer, `{ malformed: <line> }`. Observed by
+  line. A line matching none of the three is the fourth answer, `{ malformed: <line> }`. The parse
+  is extended inside `readItemPointer`, minting no top-level function, so
+  `memory/map/generated/symbols.json`, which indexes the hook's functions, does not move. Observed by
   AC1 and AC3.
 - **S2** — id 57. Unarmed on skipped. `checkFreeAction` admits the act when the pointer is
-  `skipped`, printing `scratch-guard: actions.free unarmed — item pointer skipped: <why>`, one line,
-  beside `KICK-dKeptSession-8` S7's unarmed cases. Observed by AC1 and AC2.
+  `skipped`, its unarmed why `item pointer skipped: <why>`, beside `KICK-dKeptSession-8` S7's
+  unarmed cases, so each caller prints it as unit 8 S7 prints those: `scratch-guard.js` one line
+  `scratch-guard: actions.free unarmed — item pointer skipped: <why>`, and `agent-cap.js`'s rule 9,
+  the arm's other caller (`KICK-dKeptSession-8` S6), one line `agent-cap: rule 9 unarmed — item
+  pointer skipped: <why>`, its code unchanged. Observed by AC1, AC2 and AC4.
 - **S3** — id 57. Refused on malformed. A malformed `item —` line is a throw inside the armed arm, so
   it refuses as `KICK-dKeptSession-8` S7 says, naming the line. Observed by AC3.
 - **S4** — id 57. The plants `item-skipped` and `item-malformed` in
-  `tools/hooks/actions-free.fixture.sh` (`KICK-dKeptSession-8` S8). Observed by AC1, AC2 and AC3.
+  `tools/hooks/actions-free.fixture.sh` (`KICK-dKeptSession-8` S8), `item-skipped` piping a Bash
+  and an `Agent` payload as unit 8's `probes-none` and `spawn-none` do. Observed by AC1, AC2, AC3 and
+  AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -102,7 +109,8 @@ None.
 
 - `tools/hooks/scratch-guard.js`: S1 to S3
 - `tools/hooks/actions-free.fixture.sh`: S4
-- `tools/hooks/scratch-guard.test.sh`: the arm in §7
+- `tools/hooks/scratch-guard.test.sh`: the first arm in §7
+- `tools/hooks/agent-cap.test.sh`: the second arm in §7
 
 ### Alternatives rejected
 
@@ -118,7 +126,7 @@ None.
 - observability — the unarmed line names the producer's why.
 - risks — a producer printing `skipped` for a resolvable engine disarms the arm; the line shows it on
   every call.
-- testing — the plants of §6 and the arm in §7.
+- testing — the plants of §6 and the arms in §7.
 - migration — none.
 - user docs — `help/orientation-card.md`'s `actions.free` section (`KICK-dKeptSession-8` S9) names
   the skipped case, by `KICK-dKeptSession-56` S42.
@@ -136,12 +144,17 @@ None.
 - **AC3** — When `--plant item-malformed` writes `item — ???`, the `echo x > f` payload exits 2 naming
   the line.
   Red when: an unparsable pointer admits the act.
+- **AC4** — When `--plant item-skipped` pipes an `Agent` payload to `agent-cap.js`, it exits 0 and
+  prints `agent-cap: rule 9 unarmed — item pointer skipped: position.py not resolved`.
+  Red when: rule 9 refuses a spawn on the skipped line, or admits it silently.
 
 ## 7. Gates
 
 `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `hook destinations self-test` · `review-join self-test` · `verifier fan-out self-test` · `policy fixtures` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 · the two plants, `item-skipped` staged red against unit 8's arm, which takes the line as a throw and refuses it · none
+
+New arm: tools/hooks/agent-cap.test.sh · covers AC4 · `item-skipped`'s `Agent` payload through rule 9, staged red against unit 8's arm, which refuses the throw · none
 
 ## 8. Open questions
 
@@ -159,6 +172,11 @@ none
   line as a throw, named as the failing case the arm stages; the evidence re-cited from line numbers
   to scope ids; the page's text handed to unit 56 in §3; the version-constant move left to the
   lander; `policy fixtures` named.
+- rev-4 · 2026-11-22 · S1 · S2 · S4 · §4 Files touched · AC4 · §7 · checked for behaviour by
+  `2026-11-21-prompt-KICK-dKeptSession-11-precheck-brief`: the skipped answer reaches the arm's
+  second caller, `agent-cap.js`'s rule 9, which prints its own unarmed line, observed by AC4 on the
+  `agent-cap.test.sh` arm now in Files touched; the parse kept inside `readItemPointer`, so the symbol
+  map does not move.
 
 ## 10. Reuse audit
 

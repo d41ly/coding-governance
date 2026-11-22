@@ -1,6 +1,6 @@
 # KICK-dKeptSession-11 — progress reported by `notify.owner`: one `progress —` line at the events the value selects
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 26 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 26 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0149@d9aa0a3a whole
 **Carries:** node:policy-key.notify.owner
@@ -59,38 +59,82 @@ and no push channel is built here.
 - **S3** — The verb, `python tools/loop/loop_transition.py progress --build <slug> --event
   <park|landing|transition> --detail <text> [--root <path>]`. It reads `notify.owner` at HEAD the way
   `read_record_channels` reads `transitions.record`, through `read_policy_kit()`
-  (`tools/loop/loop_parents.py#read_policy_kit`) and `policy.resolve` (§8 F3), and prints the line
-  when the event is among the value's events and nothing otherwise, exit 0. An event outside the
-  three exits 2 naming the three. A refusal of the key prints `loop: unanswered · <why>` and an
-  unresolved policy kit `loop: unarmed · <why>`, each exit 2, as the module's other verbs answer
-  (`tools/loop/loop_transition.py#main`). Observed by AC1 and AC2.
+  (`tools/loop/loop_parents.py#read_policy_kit`) and `policy.resolve` (§8 F3), the key passed as
+  the module constant `NOTIFY_KEY = "notify.owner"` beside `KEY`, the one shape besides a literal
+  the policy kit's reader coverage counts as a read (`tools/policy/check_policy.py#check_reader_coverage`).
+  It prints the line when the event is among the value's events and nothing otherwise, exit 0.
+  `--event` takes any word, never argparse `choices`, whose refusal raises `SystemExit` out of an
+  in-process selftest case: an event outside the three raises `ValueError` before any policy read,
+  printed `loop: unanswered · ` and naming `park`, `landing` and `transition`, exit 2. A refusal of
+  the key prints `loop: unanswered · <why>` and an unresolved policy kit `loop: unarmed · <why>`,
+  each exit 2, as the module's other verbs answer (`tools/loop/loop_transition.py#main`). Observed
+  by AC1 and AC2.
 - **S4** — The transition emitter. `write_transition` (`tools/loop/loop_transition.py#write_transition`)
   reads `notify.owner` at HEAD before the move, beside the channel set, and after its commit appends
   the line, event `transition`, detail `<from> → <to> · <item tag>`, to the order lines it returns,
-  which `record` and `claim.py`'s first move both print. A refusal of this key appends
-  `loop: progress · unread · <why>` instead and never refuses the move, as the card follow's lines
-  never do. Observed by AC1.
+  which `record` and `claim.py`'s first move both print (`tools/loop/claim.py#write_first_transition`);
+  `budget.py`'s plants call the writer and discard those lines, so neither caller changes. A refusal
+  of this key appends `loop: progress · unread · <why>` instead and never refuses the move, as the
+  card follow's lines never do. Observed by AC1.
 - **S5** — The driver emitter. `print_progress <slug> <event> <detail>` in
   `tools/unattended/unattended.sh` runs S3's verb with the python `resolve_python` gives and the loop
   kit `resolve_kit_dir` finds, as `run_request_draw` finds `budget.py`
-  (`tools/unattended/unattended.sh#run_request_draw`); with no python or no loop kit it prints
-  nothing, and it never moves its caller's exit. `verb_park` calls it, event `park`, detail the item,
+  (`tools/unattended/unattended.sh#run_request_draw`), a repository-relative answer joined to the
+  toplevel as that function joins it. With no python or no loop kit it prints nothing; otherwise it
+  prints the verb's stdout as given, a `loop: unanswered` or `loop: unarmed` refusal included, so a
+  key that does not read is said and never read as the default, and it discards the verb's exit, so
+  it never moves its caller's. Its comment names the loop kit by its home, `loop`, and spells no kit
+  path, which the install-prefix leg bans in a shipped file. `verb_park` calls it, event `park`,
   after its `decision parked —` line, never on the `already parked, unchanged` return
-  (`tools/unattended/unattended.sh#verb_park`). `verb_landed` calls it, event `landing`, detail the
-  landing commit's sha8, after each `phase LANDED` line it prints
-  (`tools/unattended/unattended.sh#verb_landed`). Neither verb's own lines change. Observed by AC3.
+  (`tools/unattended/unattended.sh#verb_park`), detail `item <item>` as §4's line reads.
+  `verb_landed` calls it, event `landing`, after each of its three `phase LANDED` lines, detail the
+  landing commit's sha8: `DP_LANDING`'s on
+  the in-place arm and `head`'s, the witness, on the recorded arms, the shas `KICK-dKeptSession-35`
+  S2 reads (`tools/unattended/unattended.sh#verb_landed`). Neither verb's own lines change. The
+  suite's existing `--park` and `--landed` arms read those lines and the run-state file through
+  `hit`, `miss` and `same` (`tools/unattended/unattended.test.sh`), and its fixture's policy file
+  sets no `notify` key, so each reads the default and prints nothing new; each call spawns one
+  python more. Observed by AC3.
 - **S6** — The shape in the charter. `progress — <slug> · <event> · <detail>` joins the
   microformats fence of `coding-governance-agents.template.md`, beside the `transition` shape, and the
   `[events]` rule names "a progress notice `progress`" among its shapes; `AGENTS.md` is its render by
   the playbook kit's adopter, `adopt-playbook.sh --target <repo>` (`tools/playbook/README.md`). The
   definition checker of `check`, `check_transition_definition`, becomes `check_line_definition(root,
   line)`, the kind's second instance, held by `check` and `check --selftest` over both
-  `TRANSITION_LINE` and `PROGRESS_LINE`. Observed by AC4.
-- **S7** — The page `help/loop.md` gains a section naming the four values, the events each reports
-  and that no value pushes. Observed by AC5.
+  `TRANSITION_LINE` and `PROGRESS_LINE`; its one other caller is `check_transition_channels`, and
+  the `definition` case of `run_selftest` reads gov's own `AGENTS.md`, so the render lands in the
+  unit's commit. The render re-writes the `AGENTS.md` row's `blob` in `.governance/instructions.lock`,
+  as KICK-dKeptSession-3's charter change moved it (`2b84cd488`). Observed by AC4.
+- **S7** — The page `help/loop.md` gains, under "Recording a build's move", a section naming the four
+  values, the events each reports and that no value pushes, and showing the verb as
+  `python tools/loop/loop_transition.py progress --build <slug> --event <event> --detail <text>` with
+  its anchor `<!-- usage: script:tools/loop/loop_transition.py#progress <fp8> -->`, the fingerprint
+  `python tools/govkit/docs_leg.py --fingerprints` prints. The anchor's row,
+  `script:{prefix}/loop/loop_transition.py#progress` with the flags `--build=`, `--event=`,
+  `--detail=` and `--root=`, joins `tools/govkit/usage.toml` beside the `#record` and `#check` rows:
+  the docs leg tests each inline `python` command against a declared verb and holds each shaped
+  member anchored on one page (`tools/govkit/docs_leg.py`, its THE ANCHOR and THE COMMANDS
+  paragraphs). The section anchors no `policy:notify.owner`: KICK-dKeptSession-41 S6 gives that key
+  its reference-page section, so its row stays on `memory/project/docs-undocumented.txt`. Observed by
+  AC5.
 - **S8** — The budget row. The five `notify-*` plants move the `plants=<n>` token of the `loop
   transition record` row in `tools/run-gates/selftest-budgets.txt`, re-priced as §4's budget row
   states. Observed by AC7.
+- **S9** — The fixture. `write_transition_plant`
+  (`tools/loop/loop_transition.py#write_transition_plant`) writes `PROGRESS_LINE`'s definition into
+  every plant's `AGENTS.md` fence beside `TRANSITION_LINE`'s, `notify-shape`'s lacking ` · <detail>`
+  as `line-drift`'s transition definition lacks ` · <item tag>`. Without it, S6's check owes every
+  plant a missing progress definition: this module's cases owing `· 0 finding(s)` and the outside
+  callers of the
+  shared plant, `budget.py`'s `run_budget_plant`, which holds the check to no finding, and
+  `guard.py`'s `run_floor_readers`, would all red. It commits `[notify]` `owner = "<value>"` as
+  `.governance/policy.toml` for `notify-park-landing`, `notify-every` and `notify-park-only`, as it
+  commits `PLANT_SETS`' `[transitions]` values, and none for `notify-micro`, so the catalogue default
+  answers. Each `notify-*` plant but `notify-shape` records the B4 move, runs `progress --event park
+  --detail "item fx-fork"` and `progress --event landing --detail <the witness's sha8>` in process,
+  counts the `progress —` lines the three print and prints `loop: fixture · progress <n>`, the line its
+  `run_selftest` cases read, since a case holds a printed line and cannot hold an absent one
+  (`tools/loop/loop_lib.py#run_selftest_cases`). Observed by AC1, AC2 and AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -125,8 +169,9 @@ and no push channel is built here.
 
 The default prints nothing new: the owner hears through the micro-formats that end each turn, as FR-3
 answered. Strict's `every-transition` and guarded's `park-and-landing`
-(`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c9:1548`)
-each print a line the default does not.
+(`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c9:1548`),
+which the landed preset store carries in `[preset.strict]` and `[preset.guarded]` of
+`tools/policy/presets.toml`, each print a line the default does not.
 
 ### The line
 
@@ -144,9 +189,9 @@ the definition and the line cannot drift.
 
 | Minted | Kind | Lexicon cell |
 |---|---|---|
-| `NOTIFY_OWNER_EVENTS`, `PROGRESS_LINE` | Python constants, `tools/loop/loop_transition.py` | none declared |
+| `NOTIFY_KEY`, `NOTIFY_OWNER_EVENTS`, `PROGRESS_LINE` | Python constants, `tools/loop/loop_transition.py` | none declared |
 | `derive_owner_events`, `render_progress_line`, `check_line_definition` | Python functions, the same module | `py.function`, OK by `lexicon.py --suggest` |
-| `progress` | verb of `loop_transition.py` | none |
+| `progress` | verb of `loop_transition.py`, its `usage.toml` row and docs anchor | none |
 | `print_progress` | bash function, `unattended.sh` | `sh.function`, OK by `lexicon.py --suggest` |
 | `progress — …` | micro-format definition | graded by `tools/check-microformats.sh` |
 | plants `notify-micro`, `notify-park-landing`, `notify-every`, `notify-park-only`, `notify-shape` | `PLANTS` cases of `loop_transition.py --fixture` | none |
@@ -195,16 +240,24 @@ the raise for the owner, and it never edits `tools/gate-legs.json`.
 ### Files touched (estimate)
 
 - `tools/loop/loop_transition.py`: the table, the renderer, the verb, the read in `write_transition`,
-  `check_line_definition` and the plants
+  `check_line_definition`, `write_transition_plant`'s definition and policy file (S9) and the plants,
+  each a branch of `run_transition_fixture`
+- `tools/loop/README.md`: the kit's usage block gains the `progress` line beside `record` and `check`
+- `memory/map/generated/symbols.json`: `derive_owner_events`, `render_progress_line`,
+  `check_line_definition` and `print_progress` added and `check_transition_definition` gone, the
+  commit hook's regeneration
 - `tools/run-gates/selftest-budgets.txt`: S8, the `loop transition record` row's `plants=` token five
-  above its count at the unit's base and its note's re-read (DERIVED: `len(PLANTS)`)
+  above its count at the unit's base and its note's re-read (DERIVED: `len(PLANTS)`), moved in place:
+  the check refuses a note carrying two `plants=` tokens
 - `tools/unattended/unattended.sh`: `print_progress` and its two callers
 - `tools/unattended/unattended.test.sh`: the arm the §7 line declares
 - `coding-governance-agents.template.md`: the definition and the `[events]` rule
 - `memory/guides/SESSION-KICKOFF.md`: the kickoff manifest, `last-audit` re-stamped, as `watch:`
   names the template
 - `AGENTS.md`: its render, by the playbook kit's adopter, which this unit runs and does not edit
+- `.governance/instructions.lock`: the `AGENTS.md` row's `blob`, which that render re-writes (S6)
 - `help/loop.md`: S7
+- `tools/govkit/usage.toml`: S7's `#progress` row
 
 ### Alternatives rejected
 
@@ -224,31 +277,42 @@ the raise for the owner, and it never edits `tools/gate-legs.json`.
   in the driver; a refusal is the verb's `unanswered` line, and inside a move one `unread` line.
 - observability — the line is the observation.
 - risks — under `every-transition` with `transitions.record`'s `micro-format` selected the owner
-  reads a `transition —` and a `progress —` line per move; the two answer different keys.
+  reads a `transition —` and a `progress —` line per move; the two answer different keys. An adopter
+  whose `AGENTS.md` predates the template's progress definition reads one `definition` finding from
+  `check` until its playbook kit re-renders the charter, the pairing the charter and the loop kit
+  already keep for `TRANSITION_LINE`.
 - testing — the plants by a pass; the arms in §7 observed RED then GREEN by the main loop.
 - migration — none.
 - user docs — `help/loop.md`.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python loop_transition.py --fixture --plant notify-every` records a B4 move and
-  runs `progress --event park` and `progress --event landing`, stdout carries three `progress —`
-  lines, one per event, the transition's reading `planning → designing · item.plan.exit`; with
-  `notify-micro` it carries none.
+- **AC1** — When `python tools/loop/loop_transition.py --fixture --plant notify-every` records a B4
+  move and runs `progress --event park` and `progress --event landing`, it prints three
+  `progress —` lines, the transition's `progress — tFix · transition · planning → designing ·
+  item.plan.exit`, then `loop: fixture · progress 3`, and exits 0; `--plant notify-micro`, which
+  commits no policy file, prints `loop: fixture · progress 0` and exits 0.
   Red when: the default prints a line, or `every-transition` misses an event.
-- **AC2** — When the plants `notify-park-landing` and `notify-park-only` run AC1's three calls, the
-  first prints the park and landing lines only and the second the park line only; and
-  `progress --event lunch` exits 2 naming `park`, `landing` and `transition`.
+- **AC2** — When `--plant notify-park-landing` runs AC1's three calls it prints
+  `loop: fixture · progress 2`, its park and landing lines, and `--plant notify-park-only` prints
+  `loop: fixture · progress 1`, its park line; and
+  `python tools/loop/loop_transition.py progress --build tFix --event lunch --detail x` prints a
+  `loop: unanswered · ` line naming `park`, `landing` and `transition` and exits 2, run in process as
+  a `run_selftest` case.
   Red when: a value reports an event its row omits, or an unknown event prints nothing and exits 0.
-- **AC3** — When `grep -n 'print_progress' unattended.sh` runs in the unattended kit's directory, it
-  finds the definition and calls in `verb_park` and `verb_landed`, and none before the `already
-  parked, unchanged` return.
-  Red when: a park that changed nothing reports progress.
+- **AC3** — When the suite's fixture build `tRun` commits `[notify]` `owner = "park-only"`,
+  `bash unattended.sh --park tRun --item q --reason r` prints `progress — tRun · park · item q` after
+  `unattended: decision parked — q`, and the same call again prints `already parked, unchanged` and
+  no `progress —` line; and under `park-and-landing` a `--landed tRun` that prints `phase LANDED`
+  prints `progress — tRun · landing · <sha8>` after it, the sha8 its `witness` line names.
+  Red when: a park that changed nothing reports progress, or a landing the value selects reports none.
 - **AC4** — When `grep -n 'progress — <slug> · <event> · <detail>' coding-governance-agents.template.md`
-  runs, it finds the definition inside the microformats fence; and the plant `notify-shape`, an
-  `AGENTS.md` whose progress definition omits `<detail>`, owes one `definition` finding naming
-  `PROGRESS_LINE`.
-  Red when: the line and its definition drift and `check` stays clean.
+  runs, it finds the definition inside the microformats fence; `--plant notify-shape`, whose
+  `AGENTS.md` progress definition omits ` · <detail>`, prints
+  `loop: transition · definition · AGENTS.md reads progress — <slug> · <event>` and exits 1, its one
+  finding; and every other plant's `check` still prints `· 0 finding(s)` where its case owes it.
+  Red when: the line and its definition drift and `check` stays clean, or the shared plant's
+  `AGENTS.md` lacks the progress definition.
 - **AC5** — When `grep -c 'notify.owner' loop.md` runs in `help/`, it prints at least 1.
   Red when: the page omits the values.
 - **AC6** — When `python -c "import tomllib, sys; r=[k for k in tomllib.load(open(sys.argv[1], 'rb'))['key'] if k['name'] == 'notify.owner']; print(r[0]['owner'], r[0]['default'])" catalogue.toml`
@@ -267,11 +331,13 @@ the raise for the owner, and it never edits `tools/gate-legs.json`.
 
 ## 7. Gates
 
-`loop transition record` · `every held leg is budgeted, every budget row resolves` · `micro-format definitions` · `charter size` · `template size <=48KiB` · `playbook parity` · `playbook render selftest` · `unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`loop transition record` · `loop budget fixtures` · `loop guard fixtures` · `every held leg is budgeted, every budget row resolves` · `micro-format definitions` · `charter size` · `template size <=48KiB` · `playbook parity` · `playbook render selftest` · `unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `policy check` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC4 · the five `notify-*` plants under `check --selftest`, staged against the base module, which prints no `progress —` line · the `loop transition record` row's `plants=<n>` token rises by five
 
-New arm: tools/unattended/unattended.test.sh · covers AC3 · `--park` and `--landed` on a fixture build under `park-only`, staged against the base driver, which reports no progress · none
+New arm: tools/unattended/unattended.test.sh · covers AC3 · `--park` twice under `park-only` and a `--landed` under `park-and-landing` on the fixture build, staged against the base driver, which reports no progress · the effective `FLOOR_ASSERTIONS` pin and its region's `FLOOR_SHARD_<k>` rise by the arm's counted assertions
+
+`loop budget fixtures` and `loop guard fixtures` run plants over `write_transition_plant`'s repository and its `check` (S9), `policy check` counts the new read of `notify.owner` through `NOTIFY_KEY`, and the three `govkit` legs guard `tools/govkit/usage.toml`, which S7's row moves.
 
 ## 8. Open questions
 
@@ -322,6 +388,16 @@ New arm: tools/unattended/unattended.test.sh · covers AC3 · `--park` and `--la
   `check_plant_tokens` grades, so S8 and AC7 observe it, `tools/run-gates/selftest-budgets.txt` joins
   Files touched, §4 states the row's re-price over the earlier units' plants and the stop at the
   leg's ceiling, and §7 names the budget leg.
+- rev-6 · 2026-11-22 · S3 · S4 · S5 · S6 · S7 · S9 · §4 · §4 Files touched · §5 · AC1 to AC4 · §7 ·
+  checked for behaviour by `2026-11-21-prompt-KICK-dKeptSession-11-precheck-brief`: S9 added, the
+  shared plant's `AGENTS.md` carrying the progress definition so `budget.py`'s and `guard.py`'s
+  callers stay clean, its policy file per value, and a `progress <n>` verdict line a case can hold;
+  the unknown event refused as `unanswered` in process, never by argparse; the key read through
+  `NOTIFY_KEY`, which reader coverage counts; `print_progress` passing a refusal through, its landing
+  shas named, its comment spelling no kit path; the render's `instructions.lock` row, the symbol map,
+  the kit README and the `#progress` usage row and anchor joining Files touched; AC3 observed on the
+  driver; the presets re-cited to `tools/policy/presets.toml`; §7 gains the budget, guard, policy,
+  docs and hygiene legs and the suite arm's floor rise.
 
 ## 10. Reuse audit
 

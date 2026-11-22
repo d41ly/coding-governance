@@ -1,6 +1,6 @@
 # KICK-dKeptSession-52 — the per-exit pass observed on a repeated interface, so dropping `--pass` prints a duplicate
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 26 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 26 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -41,15 +41,22 @@ it (order 26).
   (`tools/loop/loop_transition.py#run_selftest`), moves the parent out of Design three times with the
   interface texts A, B and B, through the B5 and B21 rows `KICK-dKeptSession-35`'s
   `notices-two-dependents` plant walks, and two dependent READMEs, so exits 2 and 3 publish two
-  `changed` notices with one content key to each dependent. Observed by AC1.
+  `changed` notices with one content key to each dependent. It rebinds `run_sourced`, the launcher
+  the writer imports inside its function (`KICK-dKeptSession-7` §4), as unit 35's plants do, and
+  restores it after the run. It is a branch of `run_transition_fixture`, as `KICK-dKeptSession-36`
+  S4's plants are, so it adds no module-level symbol and `memory/map/generated/symbols.json` does
+  not move. Observed by AC1.
 - **S2** — id 3. The staged red named. The case's staged break is a scratch copy of
   `loop_transition.py` whose `write_dependency_notices` passes no `--pass`; on it, exit 3 prints
-  `mail — duplicate` for each dependent, and the build records that line in unit 35's acceptance
-  ledger before the fix lands. Observed by AC2.
-- **S3** — id 3. The sibling text, already carried. `KICK-dKeptSession-35` rev-3's AC1 "Red when"
-  clause and its §4 Alternatives line read: the pass separates a `changed` from a later `changed`
-  with the same key, while kind and key already separate the A, B, A posts. NOT OBSERVED: unit 35's
-  rev-3 text carries it, and no behaviour moves with it.
+  `mail — duplicate` for each dependent, and the build records that line in this unit's own
+  acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-52-1-acceptance-ledger.md`,
+  before the fix lands. Unit 35 builds at order 25 and is CLOSED when this unit builds, so neither its
+  spec nor its ledger is written, as KICK-dKeptSession-49 rev-6 ruled. Observed by AC2.
+- **S3** — id 3. The sibling text, already carried. `KICK-dKeptSession-35` rev-6's §4 Alternatives
+  line "The content key alone telling exits apart" reads: a later `changed` that publishes an earlier
+  `changed`'s text repeats both its kind and its key, so only the pass separates the two.
+  NOT OBSERVED: unit 35's text carries it, and no behaviour moves with it.
 - **S4** — The budget row. `notices-repeat-key` moves the `plants=<n>` token of the `loop transition
   record` row in `tools/run-gates/selftest-budgets.txt`, re-priced as §4's budget row states.
   Observed by AC3.
@@ -137,7 +144,10 @@ leg's ceiling, the unit stops before it lands and names the raise for the owner,
 
 - `tools/loop/loop_transition.py`: S1's plant and case
 - `tools/run-gates/selftest-budgets.txt`: S4, the `loop transition record` row's `plants=` token one
-  above its count at the unit's base and its note's re-read (DERIVED: `len(PLANTS)`)
+  above its count at the unit's base and its note's re-read (DERIVED: `len(PLANTS)`), moved in place:
+  the check refuses a note carrying two `plants=` tokens
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-52-1-acceptance-ledger.md`:
+  S2's recorded red beside the criteria observed
 
 ### Alternatives rejected
 
@@ -167,9 +177,11 @@ parent, a bare origin under `%TEMP%` and `RUN_CLAIMS=on`.
   list one `confirmed` and two `changed`, every post printing `mail — posted`.
   Red when: a post prints `mail — duplicate`.
 - **AC2** — When the same plant runs against the scratch copy whose `write_dependency_notices`
-  passes no `--pass`, exit 3 prints `mail — duplicate` for each dependent, and unit 35's acceptance
-  ledger holds that line.
-  Red when: the copy stays green, so the case does not decide S1 of unit 35.
+  passes no `--pass`, exit 3 prints `mail — duplicate` for each dependent, and `grep -c "mail —
+  duplicate"` over this unit's acceptance ledger prints at least `1`; and `git diff --name-only
+  <pass base> HEAD --` over unit 35's spec and its acceptance ledger prints nothing.
+  Red when: the copy stays green, so the case does not decide S1 of unit 35, or the line lands in a
+  record of unit 35.
 - **AC3** — When, at the unit's commit,
   `python -I -c "import sys; sys.path.insert(0, 'tools/loop'); import loop_transition as m; print(len(m.PLANTS))"`
   runs, it prints the number that
@@ -181,7 +193,7 @@ parent, a bare origin under `%TEMP%` and `RUN_CLAIMS=on`.
 
 ## 7. Gates
 
-`loop transition record` · `every held leg is budgeted, every budget row resolves` · `policy fixtures` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop transition record` · `every held leg is budgeted, every budget row resolves` · `policy fixtures` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/loop_transition.py · covers AC1 AC2 · three Design exits with interface texts A, B, B to two dependents, staged red by a scratch copy dropping `--pass` · the `loop transition record` row's `plants=<n>` token rises by one
 
@@ -206,6 +218,12 @@ none
   Files touched, §4 states the row's re-price over the earlier units' plants and the stop at the
   leg's ceiling, and §7 names the budget leg and `policy fixtures`, whose guard
   `tools/loop/loop_transition.py` trips.
+- rev-5 · 2026-11-22 · S1 · S2 · S3 · §4 Files touched · AC2 · §7 · checked for behaviour by
+  `2026-11-21-prompt-KICK-dKeptSession-11-precheck-brief`: S2's recorded red moves from unit 35's
+  ledger, a CLOSED unit's record, to this unit's own, which joins Files touched and trips the two
+  `recall floor` legs now on §7's leg line, AC2 observing both, as KICK-dKeptSession-49 rev-6 ruled;
+  S1's plant rebinds unit 7's `run_sourced` launch as unit 35's do and, a nested branch, leaves
+  `symbols.json` unmoved; S3 re-cited to unit 35 rev-6's §4 line; the `plants=` token moved in place.
 
 ## 10. Reuse audit
 

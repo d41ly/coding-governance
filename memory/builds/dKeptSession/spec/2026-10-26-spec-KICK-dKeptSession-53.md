@@ -1,6 +1,6 @@
 # KICK-dKeptSession-53 — a consumed interface notice supersedes the parent's earlier rows by content key and by the session chain, never by arrival
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 26 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 26 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -52,9 +52,9 @@ remove. This unit orders the parent's rows by what they say and by the session c
   current <id>`, `write_consumed_acks` acknowledges that row, every `open` `confirmed` or `changed`
   row from the same parent whose `content-key`, column 14, equals the current key, and every one the
   chain places before the current row. A row the chain places after it, or cannot place at all,
-  stays open and the guard names it. The guard table `KICK-dKeptSession-42` S5 writes into
-  `help/loop.md` says a row is superseded "by content key or by the session chain". Observed by AC1,
-  AC2, AC3 and AC4.
+  stays open and the guard names it. The table "Who acknowledges what" that `KICK-dKeptSession-42`
+  S5 writes into `help/loop.md` says a row is superseded "by content key or by the session chain".
+  Observed by AC1, AC2, AC3 and AC4.
 - **S3** — id 4. The sibling text superseded by name. `KICK-dKeptSession-42` S2's "earlier by
   `first-seen`" reads as S1 and S2 here, and unit 42 §4's table row "superseded by a current one"
   means superseded by key or by the chain. Answered in this unit's own acceptance ledger,
@@ -64,7 +64,9 @@ remove. This unit orders the parent's rows by what they say and by the session c
   (F1). Observed by AC1 and AC5.
 - **S4** — The budget row. `acks-takeover` and `acks-later-key` move the `plants=<n>` token of the
   `loop transition record` row in `tools/run-gates/selftest-budgets.txt`, re-priced as §4's budget
-  row states. Observed by AC6.
+  row states. Both are branches of `run_transition_fixture`, as `KICK-dKeptSession-42` S6's are, so
+  neither adds a module-level symbol; `derive_mail_chain`, S1's, is the one the module gains, and
+  `memory/map/generated/symbols.json` moves by it alone. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -161,9 +163,11 @@ leg's ceiling, the unit stops before it lands and names the raise for the owner,
 ### Files touched (estimate)
 
 - `tools/loop/loop_transition.py`: S1, S2 in `write_consumed_acks`, and the two plants
+- `memory/map/generated/symbols.json`: `derive_mail_chain` added, the commit hook's regeneration
 - `tools/run-gates/selftest-budgets.txt`: S4, the `loop transition record` row's `plants=` token two
-  above its count at the unit's base and its note's re-read (DERIVED: `len(PLANTS)`)
-- `help/loop.md`: the guard table's superseded row, S2
+  above its count at the unit's base and its note's re-read (DERIVED: `len(PLANTS)`), moved in place:
+  the check refuses a note carrying two `plants=` tokens
+- `help/loop.md`: the superseded row of "Who acknowledges what", S2
 - `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-53-1-acceptance-ledger.md`:
   S3's answer beside the criteria observed
 
@@ -193,18 +197,21 @@ leg's ceiling, the unit stops before it lands and names the raise for the owner,
 
 The fixture is `KICK-dKeptSession-42`'s two-build scratch repository with a bare origin under
 `%TEMP%` and `RUN_CLAIMS=on`, with `KICK-dKeptSession-27` AC4's plant: session `s1`'s `confirmed`
-of key K1, then a take-over session `s2`'s `changed` of key K2, the `changed` sighted first.
+of key K1, then a take-over session `s2`'s `changed` of key K2, the `changed` sighted first, its
+feed line planted one minute before the `confirmed`'s, since `seen-utc` counts whole seconds
+(`KICK-dKeptSession-27` rev-6).
 
 - **AC1** — When `python tools/loop/loop_transition.py --fixture --plant acks-takeover` has the
-  dependent, whose listing recomputes K2, run one `record` with no manual ack, the transition
-  succeeds and `--mail read <dependent>` shows both rows `acked`.
+  dependent, whose listing recomputes K2, run one `record` with no manual ack, `record` exits 0 and
+  `--mail read <dependent>` shows both rows `acked`.
   Red when: the predecessor's `confirmed`, sighted later, stays `open` and the guard refuses, as the
   `first-seen` rule leaves it.
 - **AC2** — When a probe calls `derive_mail_chain` over that plant's rows, it answers that `s1`'s row
   precedes `s2`'s, and over the same rows with `first-seen` swapped it answers the same.
   Red when: the answer moves with arrival order.
 - **AC3** — When `--plant acks-later-key` has `s2` post a second `changed` of key K3 after K2 and the
-  dependent recompute K2, the transition is refused naming the K3 row, which stays `open`.
+  dependent recompute K2, `record` exits 1 printing `refused — <dependent> · mail open <the K3 row's
+  id>`, `KICK-dKeptSession-5` S9's `MailHeld`, and the K3 row stays `open`.
   Red when: a row the chain places after the current one is acked unconsumed.
 - **AC4** — When `grep -n "content key or by the session chain" loop.md` runs in `help/`, it prints
   the guard table's row for a superseded `confirmed` or `changed`.
@@ -266,6 +273,12 @@ New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 · unit 27's take-o
   `check_plant_tokens` grades, so S4 and AC6 observe it, `tools/run-gates/selftest-budgets.txt` joins
   Files touched, §4 states the row's re-price over the earlier units' plants and the stop at the
   leg's ceiling, and §7 names the budget leg.
+- rev-7 · 2026-11-22 · S2 · S4 · §4 Files touched · §6 · AC1 · AC3 · checked for behaviour by
+  `2026-11-21-prompt-KICK-dKeptSession-11-precheck-brief`: `derive_mail_chain` moves
+  `memory/map/generated/symbols.json`, which joins Files touched, the plants being nested branches;
+  AC1 and AC3 name `record`'s exits, 0 and unit 5 S9's `MailHeld` refusal at 1; the fixture's
+  sighting order planted a minute apart as unit 27 rev-6 plants it; the page's table named as unit 42
+  writes it; the `plants=` token moved in place.
 
 ## 10. Reuse audit
 

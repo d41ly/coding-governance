@@ -1,6 +1,6 @@
 # KICK-dKeptSession-17 — the attendance rule: `attendance` adds only the owner's interactions, its arm refusing any that swaps an actor
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 27 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 27 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0155@6d913746 whole
 **Carries:** node:policy-key.attendance
@@ -49,7 +49,8 @@ stand-ins until dWellOiledMachine and dFurnishedOrders land them.
   `.governance/policy.json` holds the key. This unit writes neither file and runs no factory: the row's
   `summary` and `usage` are KICK-dKeptSession-41's. Presets never touch the key: v2 lists it among the
   keys no preset sets (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c9:1434`),
-  which KICK-dKeptSession-1's `never` list carries. Observed by AC7.
+  which KICK-dKeptSession-1's landed `never` list in `tools/policy/presets.toml` carries. Observed by
+  AC7.
 - **S2** — The declarations, `[[attendance]]` rows of `tools/loop/loop.toml`, one per value, each with
   exactly the keys `value` and `adds`, `adds` a list of members of the closed interaction set
   `ATTENDANCE_INTERACTIONS` in `tools/loop/loop_lib.py` (§4). `read_attendance(kit_dir)` beside
@@ -104,8 +105,12 @@ stand-ins until dWellOiledMachine and dFurnishedOrders land them.
   and run by `--selftest`: `attendance-values` (AC1 to AC4), `attendance-missing` (the `[[attendance]]`
   rows read with `confirm-steps` taken out, in memory) and `attendance-plan` (the driver's `--plan`
   under `attendance = "confirm-steps"`), each over the scratch repository `write_transition_plant`
-  builds for the `values` plant. They move the `plants=<n>` token of the `loop breakpoint fixtures`
-  row, re-priced as §4's budget rows state. Observed by AC1 to AC4, AC6 and AC8.
+  builds for the `values` plant. Each prints `breakpoints: fixture · <case> · held` and exits 0
+  where its owed lines hold, the line `run_selftest`'s one case per plant reads
+  (`tools/loop/breakpoints.py#run_selftest`), and `MISSED <why>`, exit 1, where one does not; a
+  `list` a plant runs inside it exits as the criteria say. They move the `plants=<n>` token of the
+  `loop breakpoint fixtures` row, re-priced as §4's budget rows state. Observed by AC1 to AC4, AC6
+  and AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -228,10 +233,14 @@ in `tools/run-gates/ceiling-evidence.txt`, so no evidenced maximum moves.
 
 - `tools/loop/loop.toml`: the four rows
 - `tools/loop/loop_lib.py`: the constant, the reader, the arm and its plants
+- `memory/map/generated/symbols.json`: `read_attendance` and `check_attendance_rows` added, the
+  commit hook's regeneration; the plants are branches of `write_loop_plant` and
+  `run_breakpoint_plant`, so they add none
 - `tools/loop/breakpoints.py`: the read, the attendance source, its line and its plants
 - `tools/run-gates/selftest-budgets.txt`: the `loop definition fixtures` row's `plants=` token 56 to
   59 and the `loop breakpoint fixtures` row's 14 to 17, each note's re-read (DERIVED: `len(PLANTS)`
-  at the unit's base)
+  at the unit's base), each token moved in place: the check refuses a note carrying two `plants=`
+  tokens
 - `help/loop.md`: the attendance bullet and its anchor
 - `memory/project/docs-undocumented.txt`: the `policy:attendance` row, taken off
 
@@ -266,7 +275,9 @@ in `tools/run-gates/ceiling-evidence.txt`, so no evidenced maximum moves.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python breakpoints.py --fixture --plant attendance-values` runs `list` with no policy
-  file, it prints the same lines as the `values` plant's default and no `breakpoints: attendance` line.
+  file, the list prints the same lines as the `values` plant's default and no `breakpoints:
+  attendance` line, and the plant, once AC2 to AC4 hold too, prints `breakpoints: fixture ·
+  attendance-values · held` and exits 0.
   Red when: the default adds a gate or a line.
 - **AC2** — When the plant sets `attendance = "confirm-steps"`, the list adds an `owner gate` with cause
   `attendance` at each step's exit item but `item.plan.exit`, which `autonomy`'s gate already holds, and
@@ -286,9 +297,10 @@ in `tools/run-gates/ceiling-evidence.txt`, so no evidenced maximum moves.
   `attendance-twice` names the value; and `python loop_lib.py --check` over the shipped rows exits 0.
   Red when: a planted declaration that swaps an actor passes the check.
 - **AC6** — When `python breakpoints.py --fixture --plant attendance-missing` runs `list` under
-  `attendance = "confirm-steps"` with that row left out, it exits 2 naming `attendance` and
-  `confirm-steps`; and `--plant attendance-plan` has the driver's `--plan` print one `breakpoint:` line
-  per gate the list prints, each attendance gate's cause `attendance`.
+  `attendance = "confirm-steps"` with that row left out, the list exits 2 printing `breakpoints:
+  refused · ` naming `attendance` and `confirm-steps` (`tools/loop/breakpoints.py#main`), and the
+  plant prints its `held` line and exits 0; and `--plant attendance-plan` has the driver's `--plan`
+  print one `breakpoint:` line per gate the list prints, each attendance gate's cause `attendance`.
   Red when: a value with no declaration reads as `unattended`, or `--plan` derives its own list.
 - **AC7** — When `python -c "import tomllib, sys; r=[k for k in tomllib.load(open(sys.argv[1], 'rb'))['key'] if k['name'] == 'attendance']; print(r[0]['owner'], r[0]['default'])" catalogue.toml`
   runs in the policy kit's directory, it prints `dKeptSession unattended`, true at base since S1 stands;
@@ -335,8 +347,9 @@ anchor and the list row S7 moves.
 
 ## 9. Revision log
 
-- rev-1 · 2026-10-26 · initial draft, from the packet's Items 17, P4 (v2:858-863), v2:1149 and :1434,
-  flow-steps.md:543-560, night-pass point 1, and TOOL-dDeclaredLoop-19, -9 and -13 read at origin's main.
+- rev-1 · 2026-10-26 · initial draft, from the packet's Items 17, v2's P4, its `attendance` row and
+  its list of keys no preset sets, flow-steps' attendance rule, night-pass point 1, and
+  TOOL-dDeclaredLoop-19, -9 and -13 read at origin's main.
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-41` mirrored, the other ends of
   the edges the round-1 spec audit's promoted units declare; no other section moved.
 - rev-3 · 2026-11-21 · §1 · S1 to S8 · §3 · §4 · §5 · AC1 to AC7 · §7 · §8 F2 F3 · §10 · re-grounded on
@@ -354,6 +367,12 @@ anchor and the list row S7 moves.
   `plants=<n>` tokens `check_plant_tokens` grades, so `tools/run-gates/selftest-budgets.txt` joins
   Files touched, §4 states both rows' re-price over unit 5's plant, AC8 observes the tokens, and §7
   names the budget leg and `policy fixtures`, whose guard `tools/loop/loop.toml` trips.
+- rev-5 · 2026-11-22 · S1 · S8 · §4 Files touched · AC1 · AC6 · §9 rev-1 · checked for behaviour by
+  `2026-11-21-prompt-KICK-dKeptSession-11-precheck-brief`: the two new functions move
+  `memory/map/generated/symbols.json`, which joins Files touched; each breakpoint plant's own verdict
+  line and exit, which `run_selftest`'s one case reads, told apart from the exit of the `list` it
+  runs; the `never` list re-cited to `tools/policy/presets.toml`; the `plants=` tokens moved in
+  place; rev-1's line-number citations described, no positional token left standing.
 
 ## 10. Reuse audit
 
