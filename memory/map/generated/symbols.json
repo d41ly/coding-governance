@@ -8483,6 +8483,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "check_refused35",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
       "id": "check_refused_fa3",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -27716,11 +27721,6 @@
       "id": "refuse_wrong_shell",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
-    },
-    {
-      "id": "refused35",
-      "kind": "function",
-      "file": "tools/roles/adopt-roles.test.sh"
     },
     {
       "id": "regen_cmd",

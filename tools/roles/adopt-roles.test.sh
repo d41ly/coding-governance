@@ -1969,19 +1969,19 @@ check_arm "arm 35 AC1 the builder's item work order holds the five blocks in ## 
 [ "$_rc" = 0 ] && [ "$_ck" = 0 ] || { printf '    exit %s check %s\n' "$_rc" "$_ck"; sed 's/^/    /' "$A35E"; }
 [ "$A35" = "blocks 1"$'\n'"allow - $FXK/handoff.py"$'\n'"item 1" ] || printf '    %s\n' "${A35//$'\n'/$'\n'    }"
 _ls=$(ls -A "$A35P")
-refused35() { # name needle render-args...: exit 1, the needle on stderr, nothing written
+check_refused35() { # name needle render-args...: exit 1, the needle on stderr, nothing written
   local name=$1 needle=$2; shift 2
   render35 "$@" >/dev/null; local rc=$?
   check_arm "$name" "$([ "$rc" = 1 ] && grep -qF -- "$needle" "$A35E" && [ "$(ls -A "$A35P")" = "$_ls" ] && echo 1 || echo 0)"
   [ "$rc" = 1 ] && grep -qF -- "$needle" "$A35E" || { printf '    exit %s, want 1 naming %s\n' "$rc" "$needle"; sed 's/^/    /' "$A35E"; }
 }
-refused35 "arm 35 AC2 a render naming gov-spec-writer exits 1 naming the item's actor role:gov-builder and writes nothing" \
+check_refused35 "arm 35 AC2 a render naming gov-spec-writer exits 1 naming the item's actor role:gov-builder and writes nothing" \
   'role:gov-builder' --role gov-spec-writer --item item.build.unit --allowance "$FXK/handoff.py" --input "spec=$A35S"
-refused35 "arm 35 AC3 with no --allowance the product item exits 1 naming the class and the flag" \
+check_refused35 "arm 35 AC3 with no --allowance the product item exits 1 naming the class and the flag" \
   'product class, which takes only the paths the dispatch grants: pass --allowance' --role gov-builder --item item.build.unit --input "spec=$A35S"
-refused35 "arm 35 AC4 a granted path under no ROUTED_PATHS entry exits 1 naming it" \
+check_refused35 "arm 35 AC4 a granted path under no ROUTED_PATHS entry exits 1 naming it" \
   "--allowance $MR/notes.md sits under no ROUTED_PATHS entry" --role gov-builder --item item.build.unit --allowance "$MR/notes.md" --input "spec=$A35S"
-refused35 "arm 35 AC6 an item the loop does not declare exits 1 naming the tag" \
+check_refused35 "arm 35 AC6 an item the loop does not declare exits 1 naming the tag" \
   'no [[item]] row declares item.build.nothing' --role gov-builder --item item.build.nothing --allowance "$FXK/handoff.py" --input "spec=$A35S"
 for _t in tspec tnone; do
   _w=$(render35 --role gov-spec-writer --item "item.design.$_t" --input "spec=$A35S"); _w=${_w%$'\r'}
@@ -2005,7 +2005,7 @@ check_arm "arm 35 AC7 the work order without its ### witness block, re-hashed, f
    "$([ "$_rc" = 1 ] && [[ $_ck == *"lacks its '### witness' block"* ]] && echo 1 || echo 0)"
 rm -f "$A35K"; _ls=$(ls -A "$A35P")
 mv "$FX/$FXL" "$TMP_ROOT/a35-loop"
-refused35 "arm 35 AC6 with the loop kit taken away the render exits 1 naming no loop kit" \
+check_refused35 "arm 35 AC6 with the loop kit taken away the render exits 1 naming no loop kit" \
   'no loop kit' --role gov-builder --item item.build.unit --allowance "$FXK/handoff.py" --input "spec=$A35S"
 mv "$TMP_ROOT/a35-loop" "$FX/$FXL"
 
