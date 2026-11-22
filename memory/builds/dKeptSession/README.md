@@ -131,8 +131,8 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-47 — a compaction counts towards a model's window only when the session's last main usage before it is on that model](spec/2026-10-26-spec-KICK-dKeptSession-47.md) | 14 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [KICK-dKeptSession-48 — the mixed-window limit stated, and a 200k session on a 1M-observed model read against its own window by the harness's variable](spec/2026-10-26-spec-KICK-dKeptSession-48.md) | 14 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [KICK-dKeptSession-22 — each message's id derived from what it says, never from its sender's session, and a retried post refused across the build's session refs](spec/2026-10-26-spec-KICK-dKeptSession-22.md) | 15 | 2 | INPROGRESS | rev-7 | 2026-11-21 |
-| [KICK-dKeptSession-31 — the message id derived over its recipient and its content key, so two legitimate notices never share one id](spec/2026-10-26-spec-KICK-dKeptSession-31.md) | 16 | 2 | DEFERRED | rev-4 | 2026-11-21 |
-| [KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition](spec/2026-10-26-spec-KICK-dKeptSession-5.md) | 16 | 2 | DEFERRED | rev-11 | 2026-11-21 |
+| [KICK-dKeptSession-31 — the message id derived over its recipient and its content key, so two legitimate notices never share one id](spec/2026-10-26-spec-KICK-dKeptSession-31.md) | 16 | 2 | DEFERRED | rev-5 | 2026-11-22 |
+| [KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition](spec/2026-10-26-spec-KICK-dKeptSession-5.md) | 16 | 2 | DEFERRED | rev-12 | 2026-11-22 |
 | [KICK-dKeptSession-23 — every mail write appended to the change feed once its ref update lands, inside the feed's census](spec/2026-10-26-spec-KICK-dKeptSession-23.md) | 17 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-36 — the transition guard runs the driver through a bash that shares this filesystem, never the bare name, and an unresolved shell refuses](spec/2026-10-26-spec-KICK-dKeptSession-36.md) | 17 | 2 | DEFERRED | rev-6 | 2026-11-21 |
 | [KICK-dKeptSession-39 — `mailbox-message` a typed record kind, served as itself and joined to its file name both ways](spec/2026-10-26-spec-KICK-dKeptSession-39.md) | 17 | 2 | DEFERRED | rev-4 | 2026-11-21 |
@@ -165,7 +165,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-2 | 2026-11-21 |
 <!-- /gen:build-units -->
 
-Records: 343 bound to this build, across 4 record folder(s).
+Records: 347 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
