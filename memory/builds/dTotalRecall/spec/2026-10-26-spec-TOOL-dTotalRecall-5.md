@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader
 
-**Status:** INPROGRESS · rev-8 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-9 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0216@f8936b35 whole
 **Carries:** node:policy-key.builds.slug-words
@@ -16,12 +16,17 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-5-deviation-51.md](../build/2026-10-26-build-TOOL-dTotalRecall-5-deviation-51.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-1-builder-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-5-divergence-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-divergence-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-5-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-5-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-5-1-spec-reviewer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-5-1-spec-reviewer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief-2.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief-2.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-5-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-5-reground-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -35,7 +40,7 @@ One slug grammar, declared by the three policy keys `builds.slug-words`, `builds
 is what every slug and id reader in the tree reads, so an owner can change the grammar in one place
 and no reader rejects a slug or id minted under it or before it (gap-mem-06). Today each reader
 spells its own pattern: the id-shape census of §4 "The readers" finds 71 lines in 35 files (PINNED
-2026-11-22 at `b4137f489`). A digit date breaks six of the readers the slug research probed and a
+2026-11-22 at `b4137f489` and at `44c6800aa`). A digit date breaks six of the readers the slug research probed and a
 hyphenated date ten (`research-memory-builds.md:92`), and the one setting that exists,
 `BUILD_SLUG_RE`, reaches check 4 alone (`layer-memory.md:531-560`).
 
@@ -62,7 +67,9 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
   beside the node class and builds its session era from it instead of `[<node>][A-Za-z]{2,}`,
   `tools/memory-tree/id_grammar.py#build_grammar` passing `derive_slug_grammar(conf.root).slug_class`,
   so `grammar_for(root)`'s `ID_RE` parses an id whose slug carries an `in-slug` date in either form.
-  `Conf.digest` folds that class beside `derive_grammar_epoch()`, so a README recording a new grammar
+  That is the era's one widening: under `none` and `shown` every slug the strict shape admits the
+  legacy shape admits too (§4 "The grammar", §8 F11), so `ID_RE` finds the 4420 distinct ids it finds
+  today in tracked `memory/**/*.md`, and no more (PINNED 2026-11-22 at `44c6800aa`). `Conf.digest` folds that class beside `derive_grammar_epoch()`, so a README recording a new grammar
   invalidates a warm recall cache, the class its docstring measured. Observed by AC4.
 - **S5** — The export to shell and to JavaScript: `id_grammar.py --print slug-re|slug-class|slug-grammar`,
   and `check-memory-hygiene.sh --print-slug-re` and `--print-slug-class`, each running the module once
@@ -100,8 +107,15 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
   `slug_legacy_py` and `slug_legacy_sh` in `id_grammar.py` and `check-memory-hygiene.sh`, each one
   constant, the legacy shape; inline Python copies in `tools/runlog/runlog_lib.py` and
   `tools/branch-reconcile/branch_reconcile.py`, inline shell copies in `tools/run-gates/run-gates.sh`
-  and the workflows kit's renderer `tools/workflows/check-protocol-parity.test.sh`; two rows of
-  `tools/lib/resolve-python.test.sh#PARITY_ROWS`; and a `requires_if` row naming memory-tree in the
+  and the workflows kit's renderer `tools/workflows/check-protocol-parity.test.sh`; two new rows of
+  `tools/lib/resolve-python.test.sh#PARITY_ROWS`, `slug_legacy_py` and `slug_legacy_sh`. The two
+  Python files reach `id_grammar` through `resolve_kit_dir("memory-tree", "id_grammar.py", <the
+  file's own directory>)`, and neither holds a copy at `44c6800aa` (run-gates does, at
+  `tools/run-gates/run-gates.sh@44c6800aa:231`), so this pass adds the canonical block of
+  `tools/lib/resolve_kit_dir.py` to `runlog_lib.py` and `branch_reconcile.py`, byte for byte. Those two
+  copies join the existing `resolve_kit_dir` row's population, which the row's loop derives by the
+  block's marker (`tools/lib/resolve-python.test.sh@44c6800aa:544`), so that row's text does not
+  change; and a `requires_if` row naming memory-tree in the
   `kit.toml` of the runlog, branch-reconcile, run-gates and review-harness entries, the last homed at
   `tools/workflows/kit.toml`. Observed by AC8.
 - **S9** — The `shown` date: `SlugGrammar.render_label(slug, opened)` renders `<slug> (<opened>)`
@@ -191,19 +205,25 @@ SlugGrammar(words=(lo, hi), style, date, node, slug_class, slug_ere, BUILD_SLUG_
 | `date` | `builds.slug-date`, `none`, `shown` or `in-slug`; default `none` |
 | `node` | the conf's node-tag class, `Conf.node_tag_class`, which `_eras` already reads |
 
-One grammar `g` has the shape `<node-letter><date><word>{lo,hi}`, where a word is `[A-Z][a-z0-9]*`,
-`<node-letter>` is one character of `[<node>]`, and `<date>` is empty unless `g.date` is `in-slug`, when
+One grammar `g` has the shape `<node-letter><date><word>{lo,hi}`, where a word is `[A-Z][a-z]+`, a
+capital and at least one lower-case letter after it (§8 F11), `<node-letter>` is one character of
+`[<node>]`, and `<date>` is empty unless `g.date` is `in-slug`, when
 it is `[0-9]{8}` or `[0-9]{4}-[0-9]{2}-[0-9]{2}`, the digit and the hyphenated form. The date follows
 the node letter, so a node's dated slugs sort by date. `style` is the minting source and never a
-shape (`layer-memory.md:556`).
+shape (`layer-memory.md:556`). A word carries no digit, as the slug rule's "`[A-Za-z]` only" states
+(`memory/HYGIENE.md@b4137f489:191`), so an undated shape admits only slugs the legacy shape admits:
+`dX`, `x` and `dFoo1` fail both, and a digit in a slug is an `in-slug` date and nothing else.
 
 - `mint_re` is `^<shape of the grammar in force>$`.
 - The legacy shape is `[<node>][A-Za-z]{2,}`, exactly the session era's slug part today
   (`tools/memory-tree/id_grammar.py#_eras`). It is frozen and admits every slug and id in the tree:
   229 build folders, 227 of two words and 2 of three, all on the strict shape too (PINNED 2026-11-22
-  at `b4137f489`). Of the 286 distinct slugs in the session-era ids `grammar_for().ID_RE` finds in
-  tracked `memory/**/*.md`, only the fixture slugs `nosuch` and `other` fail the strict
-  one-to-three-word shape (PINNED, measured 2026-11-22 at `b4137f489`).
+  at `b4137f489` and at `44c6800aa`). Of the 286 distinct slugs in the session-era ids
+  `grammar_for().ID_RE` finds in tracked `memory/**/*.md` at `b4137f489`, and of the 288 at
+  `44c6800aa`, only the fixture slugs `nosuch` and `other` fail the strict one-to-three-word shape
+  (PINNED, measured 2026-11-22 at both). Every one of the 3062 distinct ids
+  `tools/memory-tree/tree_lib.py#read_bindings` reads at `44c6800aa` fits `slug_class` under the
+  defaults (PINNED 2026-11-22), and so do the six slugs of §4 "The flips" under their flips.
 - `slug_class` is the alternation of the legacy shape, the shape of the grammar in force, and the
   shape of every distinct grammar a tracked `memory/builds/*/README.md` records in `slug-grammar:`,
   in that order, deduplicated; `slug_ere` is the same alternation in ERE. `BUILD_SLUG_RE` is
@@ -255,11 +275,15 @@ containing `SLUG` or `slug` to a regex literal (the slug shape), outside the gra
 points. Its id-shape half, in the narrower form with no parenthesis between, is this command:
 
 ```bash
-git grep -nE '\[[^]]*a-z[^]]*\]([*+]|\{[0-9]*,?[0-9]*\})?-(\\d|\[0-9\]|\[1-9\])' <rev> -- 'tools/*.py' 'tools/*.sh' 'tools/*.js' 'skills/*.py' 'skills/*.sh' 'skills/*.js' '.githooks/*' | wc -l
+git grep -nE '\[[^]]*a-z[^]]*\]([*+]|\{[0-9]*,?[0-9]*\})?-([\\]d|\[0-9\]|\[1-9\])' <rev> -- 'tools/*.py' 'tools/*.sh' 'tools/*.js' 'skills/*.py' 'skills/*.sh' 'skills/*.js' '.githooks/*' | wc -l
 ```
 
-It finds 71 lines in 35 files at `b4137f489` (PINNED 2026-11-22), and 62 lines in 29 files at
-`fb872a37e` (PINNED 2026-11-22), so rev-5's figure, which stated no command, does not reproduce. Among them is every site scout C listed
+Its file count is the same command with `cut -d: -f2 | sort -u | wc -l` in place of `wc -l`. The
+backslash of its first digit arm is bracketed, `[\\]d`: rev-8 spelled it `\\d`, which on git
+2.54.0.windows.1 matched no backslash-d spelling, so that command printed 49 lines in 21 files at
+`b4137f489` and at `44c6800aa` (measured 2026-11-22). As spelled here it finds 71 lines in 35 files at
+`b4137f489` and at `44c6800aa`, 70 lines in 34 files at the base `8b8b1374`, and 62 lines in 29 files
+at `fb872a37e` (each PINNED 2026-11-22, same git), so rev-5's figure, which stated no command, does not reproduce. Among them is every site scout C listed
 (`2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-c.md`), each found at HEAD on 2026-11-22 under
 the same name, the JavaScript `reviewSlug` among them
 (`tools/workflows/tier2-review.template.js@b4137f489:631`). Readers landed since the base join
@@ -278,7 +302,7 @@ Each hit takes one disposition; the pass commit's `Decided:` trailer names any h
 | memory-tree | a sibling import of `id_grammar` |
 | a kit that requires memory-tree (roles, unattended's Python, memory-recall, loop, playbook-render) | that kit's existing `resolve_kit_dir` copy, the loop kit's in `tools/loop/loop_lib.py` |
 | a repo-root tool (`tools/check-spec-tokens.py`) | its `resolve_kit_dir` copy |
-| a kit that does not require memory-tree (runlog, branch-reconcile, run-gates) | its `resolve_kit_dir` copy; where memory-tree does not resolve, its inline `slug_legacy_*` block and one stderr line, `slug grammar: memory-tree not installed, the legacy shape applies` |
+| a kit that does not require memory-tree (runlog, branch-reconcile, run-gates) | a `resolve_kit_dir` copy: run-gates' existing one, and in `tools/runlog/runlog_lib.py` and `tools/branch-reconcile/branch_reconcile.py` the one this pass adds (S8), neither file holding one at `44c6800aa`; where memory-tree does not resolve, its inline `slug_legacy_*` block and one stderr line, `slug grammar: memory-tree not installed, the legacy shape applies` |
 | shell (unattended, push-main, run-gates, the hygiene script) | `check-memory-hygiene.sh --print-slug-class` or `--print-slug-re`, resolved once per run |
 | a workflow template | the `{{SLUG_CLASS}}` render token |
 
@@ -352,11 +376,11 @@ which TOOL-dTotalRecall-20's upgrade steps may grade.
 - `tools/memory-tree/seen_red.py`
 - `tools/roles/roles_lib.py`
 - `tools/roles/handoff.py`
-- `tools/runlog/runlog_lib.py`
+- `tools/runlog/runlog_lib.py` (its slug reader, and the `resolve_kit_dir` and `slug_legacy_py` blocks S8 adds)
 - `tools/runlog/record.py`
 - `tools/runlog/model.py`
 - `tools/runlog/kit.toml`
-- `tools/branch-reconcile/branch_reconcile.py`
+- `tools/branch-reconcile/branch_reconcile.py` (its id and slug readers, and the `resolve_kit_dir` and `slug_legacy_py` blocks S8 adds)
 - `tools/branch-reconcile/kit.toml`
 - `tools/loop/adapt.py`
 - `tools/loop/breakpoints.py`
@@ -458,7 +482,7 @@ The search of §4 "The readers" re-derives this list at the pass; a hit outside 
   planted `.githooks/x` holding `grep -E '[A-Z]+-[A-Za-z]+-[0-9]+'`, it lists both lines.
   Red when: the predicate misses either planted id-shape spelling, or the tip still holds an
   un-re-pointed reader.
-  figure: the narrower form's 71 lines in 35 files at `b4137f489` are PINNED 2026-11-22 by the command of §4 "The readers"; the pass re-derives the before-count with it at its base.
+  figure: the narrower form's 71 lines in 35 files at `b4137f489` and at `44c6800aa` are PINNED 2026-11-22 by the command of §4 "The readers", its first digit arm bracketed; the pass re-derives the before-count with it at its base.
 - **AC8** — When `tools/memory-tree` is renamed away in a scratch clone and a probe calls runlog's
   slug reader in `tools/runlog/runlog_lib.py` on `dTotalRecall`, it accepts the slug and prints
   `slug grammar: memory-tree not installed, the legacy shape applies` once; and when the
@@ -495,7 +519,7 @@ The search of §4 "The readers" re-derives this list at the pass; a hit outside 
 
 `memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `memory-recall kit selftest` · `branch-reconcile selftest` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `routed-commits selftest` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `pass-order history` · `brief-recorded` · `push-main self-test` · `roles render selftest` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `review-protocol parity (kit vs dogfood)` · `kit placeholders (a declared token its adopter substitutes)` · `playbook render selftest` · `branch-guard self-test` · `drift-audit selftest` · `scratch-guard self-test` · `corpus-ids selftest` · `transition-audit arms` · `verdict-epoch self-test` · `loop adapt fixtures` · `loop breakpoint fixtures` · `loop guard fixtures` · `loop placement fixtures` · `loop position fixtures` · `loop claim fixtures` · `ratchet selftest` · `instruction units selftest` · `policy check` · `policy fixtures` · `docs` · `help reference pages` · `govkit selfcheck` · `govkit acceptance matrix` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates`
 
-New arm: tools/lib/resolve-python.test.sh · covers AC8 · the `slug_legacy_py` and `slug_legacy_sh` parity rows, staged by one byte changed in the run-gates copy · that suite's assertion count, raised by the two rows
+New arm: tools/lib/resolve-python.test.sh · covers AC8 · the `slug_legacy_py` and `slug_legacy_sh` parity rows, staged by one byte changed in the run-gates copy · that suite's assertion count, raised by the two rows and by the two `resolve_kit_dir` copies S8 adds to the existing row's population
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 AC6 · the `BUILD_SLUG_RE` arms from `tools/memory-tree/check-memory-hygiene.test.sh@b4137f489:3896` rewritten: a set conf value refuses naming the three keys, and check 4 reds a planted folder `d_bad` the derived pattern refuses, staged by restoring the conf read · none
 New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--selftest` gains the `slug-grammar:` line in both scaffolded READMEs, the `shown` label, and `SLUG_DEFAULTS` against the catalogue rows' defaults where the policy kit resolves, one SKIP line where it does not, staged by dropping the key from `render_new_build_readme` · none
 
@@ -566,6 +590,22 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--se
   RESOLVED (agent, 2026-11-22, delegated): (a), the item 3 wording of
   `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`, and the one reading of an id.
   widens: none · relaxes: none
+- **F11 — What is a word of the strict shape?** Rev-8's `[A-Z][a-z0-9]*` admits the one-word slug
+  `dX`, so the bound class of S13 matches `TOOL-dX-2`, which AC12 and F10 say it refuses, and the same
+  shape widened `ID_RE`'s session era (S4) without saying so: over tracked `memory/**/*.md` at
+  `44c6800aa` it finds 4447 distinct ids to today's 4420, `TOOL-dX-2` and `TOOL-tA-1` among the 27 new
+  ones (PINNED 2026-11-22). Options: (a) `[A-Z][a-z0-9]+`, the return's (a); (b) keep rev-8's word,
+  drop the `TOOL-dX-2` refusal from AC12 and F10, and state the widening in S4; (c) `[A-Z][a-z]+`.
+  (b) fails AC12 as written, veto 1. (a) satisfies every criterion here but still widens the era by
+  `TOOL-dFoo1-3` (4421 ids, PINNED 2026-11-22 at `44c6800aa`), which TOOL-dTotalRecall-66 S9 and AC6
+  rest on `grammar_for(root).ID_RE` refusing for the digit in its slug, a repair of that spec left
+  open. (c) satisfies every criterion here, finds the 4420 ids of today, keeps unit 66's premise, and
+  is the slug rule's "`[A-Za-z]` only" (`memory/HYGIENE.md@b4137f489:191`); every build folder, every
+  flip slug and every id `read_bindings` reads fits it (§4 "The grammar", PINNED 2026-11-22 at
+  `44c6800aa`). Recommendation (c). RESOLVED (agent, 2026-11-22, delegated): (c), the most
+  feature-rich survivor of veto 1, satisfying the criteria (a) does with no follow-up left open; it is
+  the return's (a) with its digits dropped, per
+  `2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-brief`. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -594,6 +634,15 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--se
   Edges block gains the hands-off mirror of TOOL-dTotalRecall-45, whose re-ground consumes
   branch-reconcile's route to `id_grammar`, the grammar-bound id matches and the flipped clone;
   nothing else moved.
+- rev-9 · 2026-11-22 · S4 · S8 · §1 · §4 "The grammar", "The readers", Files touched · AC7 · §7
+  `New arm:` · §8 F11 · per `2026-11-22-prompt-TOOL-dTotalRecall-5-divergence-brief` and
+  `2026-11-22-build-TOOL-dTotalRecall-5-1-builder-return`: a word is `[A-Z][a-z]+` (F11), so AC12's
+  and F10's `TOOL-dX-2` refusal holds and S4 states the era's one widening, the `in-slug` date; the
+  digits dropped from the return's (a) are the one change no finding named, forced by unit 66's S9;
+  S8 adds the canonical `resolve_kit_dir` block to `runlog_lib.py` and `branch_reconcile.py`, which
+  join that row's marker-derived population with the row unchanged, beside two new rows; the census
+  command's first digit arm is bracketed and every figure on it re-pinned at `44c6800aa`. No
+  criterion's observation moved.
 
 ## 10. Reuse audit
 
