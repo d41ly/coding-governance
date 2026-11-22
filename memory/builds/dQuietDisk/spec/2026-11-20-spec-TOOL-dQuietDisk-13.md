@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-13 — the run-gates suites build each repeated scratch repository once and clone it per arm, where a clone saves
 
-**Status:** SPECCED · rev-4 · 2026-11-22 · node d · Tier-2 · base 7b8c737b · streams tooling · order 3 · ratified 2026-11-22
+**Status:** INPROGRESS · rev-4 · 2026-11-22 · node d · Tier-2 · base 7b8c737b · streams tooling · order 3 · ratified 2026-11-22
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-13-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-13-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-13-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-13-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-6-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-6-reground-task.md) | research | TOOL-dQuietDisk-6 TOOL-dQuietDisk-10 TOOL-dQuietDisk-12 TOOL-dQuietDisk-18 |
 
 <!-- /gen:spec-records -->
