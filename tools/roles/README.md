@@ -134,7 +134,14 @@ The card is `--card`, else the file the kickoff checker's `--card --path` prints
 
 The file is written under the build's `prompts/` folder as
 `<date>-prompt-<id>-<n>-<role without gov->.md`, and its `gov:handoff` marker line carries a hash of
-each section. `python handoff.py check <file>` re-derives both hashes and the marker's path, then
+each section: `<!-- gov:handoff role=<slot> build=<slug> unit=<id|-> item=<item.step.name|-> path=<rel>
+role-sha=<12hex> task-sha=<12hex> -->`. `item=` names the item the work order was cut for, the
+`--item <tag>` flag's value or `-` without it; a tag outside `item.<step>.<name>` refuses with exit 1
+and writes nothing, and only the shape is checked (TOOL-dBoundRoles-17). A marker written before
+`item=` still parses, every reader taking its fields by group name. A research return names the work
+order it answers on a `**Answers:** <work order path> task-sha=<12hex>` line beside its `**Serves:**`
+line, the value `roles_lib.derive_answers_value` writes, and the catalogue checker grades both as R16.
+`python handoff.py check <file>` re-derives both hashes and the marker's path, then
 grades the envelopes: every one opened closes, and their levels never decrease down the `## Role` part
 or the `## Task` part, each failure naming the envelope; it prints each part's levels in order, and a
 file holding no envelope, a prompt record rendered before them, reads `unranked` and passes;
@@ -533,7 +540,16 @@ the lists are graded by the `seg` shape with one note, and with no policy kit th
 note calling it unarmed; the summary counts the rows and names the limit they were graded against.
 Each entry's shape is graded as R9 too, as "The workflow shapes" says.
 A stand-in declaration and the owner's waiver rows are joined as R15, under "Standing in for
-a role". It prints one line per defect naming the file and the rule (the rules are listed in its
+a role". Work orders and returns are graded as R16 (TOOL-dBoundRoles-17): a work order, a file under
+a build's `prompts/` named as `handoff.py render` names one, whose marker is absent or carries no
+`item=`; a `research` record under a build's `build/` naming exactly one work order's file name, with
+no `**Answers:**` line, one naming another path, or one whose `task-sha` is not that work order's
+marker's. The paths `<MEMORY_ROOT>/project/work-order-legacy.txt` lists, exact paths, are skipped; a
+row that no longer offends is counted stale and never red. That home is seeded once, absent-only, by
+the memory-tree kit's `legacy_ledger.py seed --home <home> -- python check_roles.py --legacy-rows
+--out {out}`, which `adopt-roles.sh --scaffold` runs; `--legacy-rows` stamps HEAD's full sha on the
+home's `#` header. With no home, one `roles: note: R16 unarmed` line names that command and nothing
+is graded. It prints one line per defect naming the file and the rule (the rules are listed in its
 header, with what it does not check), then a summary of every count it graded, the charter's shape among
 them. Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the conf, its
 `CHARTER` or its `MEMORY_ROOT` is missing, or the doc is no charter this kit reads. `--write` re-renders the region below from the table and the front matter, and nothing

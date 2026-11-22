@@ -274,7 +274,10 @@ An `Agent` call passes only when `subagent_type` is an `agent`-true role (a buil
 `Explore` or `general-purpose` never is), and `prompt`, line endings folded and its ends trimmed, is
 exactly the output of `handoff.py render --role <name> --build <slug> --part task`: ONE
 `gov:handoff` marker line naming that role, blank lines, then the `## Task` section of the file the
-marker's `path` names. That path is repo-relative under `builds/<build>/prompts/`; the file must hold
+marker's `path` names. The marker is `<!-- gov:handoff role=<slot> build=<slug> unit=<id|->
+item=<item.step.name|-> path=<rel> role-sha=<12hex> task-sha=<12hex> -->`, its fields read by name;
+`item=` is optional, so a marker written before the renderer wrote it is admitted too
+(TOOL-dBoundRoles-17). That path is repo-relative under `builds/<build>/prompts/`; the file must hold
 the same single marker, and its section must hash to the marker's `task-sha`, so a file edited after
 rendering is refused too. A refusal names the first prompt line that differs; resend the file's bytes.
 Last, its `description`, ends trimmed, must be the spawn's name `handoff.py render` prints on stderr

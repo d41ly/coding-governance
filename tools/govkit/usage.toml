@@ -114,7 +114,7 @@ id = "script:{prefix}/roles/handoff.py#render"
 shape = "verb"
 entry = "{prefix}/roles/handoff.py"
 verb = "render"
-flags = ["--role=", "--build=", "--unit=", "--card=", "--input=", "--upstream=", "--out=", "--stdout", "--stand-in", "--part="]
+flags = ["--role=", "--build=", "--unit=", "--item=", "--card=", "--input=", "--upstream=", "--out=", "--stdout", "--stand-in", "--part="]
 
 [[usage]]
 id = "script:{prefix}/roles/handoff.py#roster"

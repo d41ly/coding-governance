@@ -90,9 +90,24 @@ HARNESS_RE = re.compile(r"^\{prefix\}/([^/{}\s]+)/([^/{}\s]+)$")
 TOOL_ROOT_CITE_RE = re.compile(r"\{\{TOOL_ROOT\}\}([\w.-]+)/([\w.-]+)")
 #: A build slug, as `handoff.py render --build` takes it and a stand-in waiver row names it.
 SLUG_RE = re.compile(r"^[A-Za-z]+$")
-#: The rendered handoff's marker line; `handoff.py` reads this one pattern (TOOL-aOrientedCast-19).
-MARKER_RE = re.compile(r"^<!-- gov:handoff role=(\S+) build=(\S+) unit=(\S+) path=(\S+) "
-                       r"role-sha=([0-9a-f]{12}) task-sha=([0-9a-f]{12}) -->$", re.M)
+#: The rendered handoff's marker line; `handoff.py` reads this one pattern (TOOL-aOrientedCast-19), every
+#: reader by group name. `item=` is optional, so a marker written before it parses with `item` None; the
+#: renderer always writes it, the item tag or `-` (TOOL-dBoundRoles-17 S1).
+MARKER_RE = re.compile(r"^<!-- gov:handoff role=(?P<role>\S+) build=(?P<build>\S+) "
+                       r"unit=(?P<unit>\S+)(?: item=(?P<item>\S+))? path=(?P<path>\S+) "
+                       r"role-sha=(?P<role_sha>[0-9a-f]{12}) task-sha=(?P<task_sha>[0-9a-f]{12}) -->$", re.M)
+#: An `item=` tag the renderer admits: `item.<step>.<name>`, the loop kit's item tag shape, its segment the
+#: loop kit's `SEG`, the adopter form `item.<step>.adopter.<name>` included (TOOL-dBoundRoles-17 S3).
+ITEM_VALUE_RE = re.compile(r"^item(\.[a-z0-9][a-z0-9-]*){2,}$")
+#: A return's header line naming the work order it answers (TOOL-dBoundRoles-17 S4): the value
+#: `derive_answers_value` writes, behind the bold key. A harness return's `answers` field is the same
+#: value without the key.
+ANSWERS_RE = re.compile(r"^\*\*Answers:\*\* (?P<path>\S+) task-sha=(?P<task_sha>[0-9a-f]{12})$", re.M)
+ANSWERS_KEY = "**Answers:**"
+#: The work-order legacy population's home under `<MEMORY_ROOT>/project/`, seeded once (R16), and the
+#: line a seed that failed leaves at its head, the memory-tree kit's `legacy_ledger.UNARMED_LEAD`.
+WORK_ORDER_LEGACY = "work-order-legacy.txt"
+LEGACY_UNARMED_LEAD = "# unarmed · "
 #: The owner's stand-in waiver registry under `<MEMORY_ROOT>/project/`, and the file-name tail a
 #: handoff rendered by a stand-in carries before `.md` (TOOL-aOrientedCast-19).
 STAND_IN_WAIVER = "role-stand-in-waiver.txt"
@@ -1187,8 +1202,107 @@ def scan_stand_in_declarations(root, memory_root):
             defects.append("%s: R15 — named as a stand-in declaration and carries no gov:handoff "
                            "marker line, so it names no role" % rel)
             continue
-        found.append({"path": rel, "role": m.group(1), "build": m.group(2), "unit": m.group(3)})
+        found.append({"path": rel, "role": m.group("role"), "build": m.group("build"), "unit": m.group("unit")})
     return found, defects
+
+
+def derive_answers_value(path, task_sha):
+    """`<path> task-sha=<task_sha>`, the one value a return's `**Answers:**` line and a harness return's
+    `answers` field carry: `path` the work order's repo-relative path, forward-slashed (TOOL-dBoundRoles-17 S4)."""
+    return "%s task-sha=%s" % (pathlib.PurePath(str(path).replace("\\", "/")).as_posix(), task_sha)
+
+
+def scan_work_orders(root, memory_root, slots):
+    """`(found, counts)` of rule R16 over the two populations of TOOL-dBoundRoles-17 §4, every record read
+    and none written. A HANDOFF is a file `<MEMORY_ROOT>/builds/<slug>/prompts/<date>-prompt-<id>-<n>-<tail>
+    [-<suffix>].md` whose `<tail>` is one of `slots` without `gov-`, the name `derive_prompt_name` writes; it
+    offends with no marker line, or a marker carrying no `item=`. A RETURN is a record under
+    `<MEMORY_ROOT>/builds/<slug>/build/` whose first `**Serves:**` kind is `research` and whose text, its
+    own `**Answers:**` lines set aside, names exactly one handoff's file name, in whatever path cites it;
+    it offends with no `ANSWERS_RE` line, or one whose path is not that handoff's or whose `task-sha` is
+    not that handoff's marker's. `found` is `[(repo-relative path, what)]`, sorted, one per offence; an
+    unreadable record is one. `counts` holds `handoffs` and `returns`. WHAT IT DOES NOT CHECK: a handoff
+    under another name, a return of another kind or naming its work order by no file name, a return
+    naming two work orders, nor whether a marker's `item=` names an item the loop defines."""
+    root = pathlib.Path(root)
+    tails = sorted((s[4:] if s.startswith("gov-") else s for s in slots), key=len, reverse=True)
+    if not tails:
+        return [], {"handoffs": 0, "returns": 0}
+    name_re = re.compile(r"^\d{4}-\d{2}-\d{2}-prompt-\S+?-[0-9]+-(?:%s)(?:-[a-z0-9-]+)?\.md$"
+                         % "|".join(re.escape(t) for t in tails))
+    builds = root / memory_root / "builds"
+    found, handoffs = [], {}
+    for p in sorted(builds.glob("*/prompts/*.md")):
+        if not name_re.match(p.name):
+            continue
+        rel = p.relative_to(root).as_posix()
+        try:
+            m = MARKER_RE.search(load_text(p))
+        except (RolesError, UnicodeDecodeError) as e:
+            found.append((rel, "the work order cannot be read as UTF-8 — %s" % e))
+            handoffs[p.name] = (rel, None)
+            continue
+        handoffs[p.name] = (rel, m)
+        if not m:
+            found.append((rel, "the work order carries no gov:handoff marker line; render it with handoff.py "
+                               "render, whose marker names the item it was cut for"))
+        elif m.group("item") is None:
+            found.append((rel, "the work order's marker carries no item= field; render it with handoff.py "
+                               "render, which writes item=<tag> or item=-"))
+    names_re = re.compile(r"\d{4}-\d{2}-\d{2}-prompt-[A-Za-z0-9-]+\.md")
+    serves_re = re.compile(r"^\*\*Serves:\*\*[ \t]+(\S+)", re.M)
+    n_returns = 0
+    for p in sorted(builds.glob("*/build/*.md")):
+        rel = p.relative_to(root).as_posix()
+        try:
+            text = load_text(p)
+        except (RolesError, UnicodeDecodeError) as e:
+            found.append((rel, "the record cannot be read as UTF-8 — %s" % e))
+            continue
+        kind = serves_re.search(text)
+        if not kind or kind.group(1) != "research":
+            continue
+        lines = text.split("\n")
+        rest = "\n".join(ln for ln in lines if not ln.startswith(ANSWERS_KEY))
+        named = sorted({n for n in names_re.findall(rest) if n in handoffs})
+        if len(named) != 1:
+            continue
+        n_returns += 1
+        want, marker = handoffs[named[0]]
+        said = [a for a in (ANSWERS_RE.fullmatch(ln) for ln in lines) if a]
+        if not said:
+            found.append((rel, "the return names the work order %s and carries no '%s %s' line"
+                          % (want, ANSWERS_KEY, derive_answers_value(want, "<12hex>"))))
+        for a in said:
+            if a.group("path") != want:
+                found.append((rel, "the %s line names %s, and the work order its text names is %s"
+                              % (ANSWERS_KEY, a.group("path"), want)))
+            elif marker is None:
+                found.append((rel, "the %s line's task-sha %s cannot be compared: %s carries no readable "
+                                   "gov:handoff marker" % (ANSWERS_KEY, a.group("task_sha"), want)))
+            elif a.group("task_sha") != marker.group("task_sha"):
+                found.append((rel, "the %s line's task-sha %s is not %s, the task-sha of %s's marker"
+                              % (ANSWERS_KEY, a.group("task_sha"), marker.group("task_sha"), want)))
+    return sorted(found), {"handoffs": len(handoffs), "returns": n_returns}
+
+
+def read_work_order_legacy(root, memory_root):
+    """`(rows, why)` of the work-order legacy home `<MEMORY_ROOT>/project/work-order-legacy.txt`: `rows` the
+    set of repo-relative paths it lists, one per line, `#` lines and blank ones skipped, each read as an
+    exact path and never a pattern; None with `why` where the home is absent, does not read, or holds a
+    failed seed's `# unarmed · ` line among its first two, so R16 grades nothing and says why."""
+    home = pathlib.Path(root) / memory_root / "project" / WORK_ORDER_LEGACY
+    try:
+        text = home.read_bytes().decode("utf-8").replace("\r\n", "\n")
+    except FileNotFoundError:
+        return None, "no %s/project/%s" % (memory_root, WORK_ORDER_LEGACY)
+    except (OSError, UnicodeDecodeError) as e:
+        return None, "%s/project/%s does not read — %s" % (memory_root, WORK_ORDER_LEGACY, e)
+    lines = text.split("\n")
+    if any(ln.startswith(LEGACY_UNARMED_LEAD) for ln in lines[:2]):
+        return None, "%s/project/%s is unarmed: %s" % (memory_root, WORK_ORDER_LEGACY,
+                                                        next(ln for ln in lines[:2] if ln.startswith(LEGACY_UNARMED_LEAD)))
+    return {ln.strip() for ln in lines if ln.strip() and not ln.startswith("#")}, ""
 
 
 def resolve_profile(policy, model):

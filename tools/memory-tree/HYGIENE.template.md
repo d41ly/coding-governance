@@ -171,6 +171,10 @@ never parsed by hand; a row's reason is the conversion record's or its widen rec
 - **`positional-refs.txt`** — the playbook kit's positional check reads its list at this default
   path and reds it absent, and that kit's write mode writes it empty, so the project-registry
   whitelist admits it by name wherever that kit is adopted. Its rows are this tree's own.
+- **`work-order-legacy.txt`** — the roles kit's catalogue checker reads it at this default path as
+  rule R16's legacy population, and that kit's adopter seeds it once, absent-only, so check 3 admits
+  it by name wherever that kit is adopted. A registry a PROJECT adds goes in
+  `PROJECT_REGISTRY_EXTRA` instead.
 - `project/method-carriers.txt` — every file outside the memory tree that POINTS AT
   `guides/BUILD-METHOD.md`, one ledger row keyed by `path` each, read by
   `check-method-carriers.sh`. Keyed on PATH alone, never `<path>:<line>`. It is per-repo and the kit

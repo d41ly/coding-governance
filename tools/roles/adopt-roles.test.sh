@@ -52,7 +52,9 @@
 # the rows' declared levels read with no house file and no key (arm 30); and the workflow shapes graded as R9, a
 # kind's cap above a committed limit, an experiment table naming both, neither or a stray reruns key, a role
 # outside its stage's kind, the role index's `shapes`, and an orientation tag naming no unit, resolved and
-# unarmed (arm 31). Every arm is a self-contained block below the prologue, so a
+# unarmed (arm 31); and the work order's `item=` written by `--item`, a malformed tag refused, and R16 over
+# a return's `**Answers:**` line, a work order planted after the seed with no `item=` or no marker, and no
+# legacy home (arm 33). Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 25
 # arm 9's writer and lines.
 #
@@ -123,7 +125,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +8 for arm 30 (TOOL-dBoundRoles-22).
 # +10 for arm 31 (TOOL-dBoundRoles-16).
 # +8 for arm 32 (TOOL-dBoundRoles-15).
-FLOOR_ASSERTIONS=120
+# +9 for arm 33 (TOOL-dBoundRoles-17).
+FLOOR_ASSERTIONS=129
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1794,6 +1797,77 @@ check_arm "arm 32 a cited rule past gov-reuse-scout's headroom is one R5 line na
    "$([[ $A32 == *'ac3a 1'* ]] && echo 1 || echo 0)"
 check_arm "arm 32 ...and with the rule taken out the catalogue checks clean" "$([[ $A32 == *'ac3b 1'* ]] && echo 1 || echo 0)"
 [ "$A32" = $'ac1 1\nac2a 1\nac2b 1\nac2c 1\nac2d 1\nac7 1\nac3a 1\nac3b 1' ] || printf '    %s\n' "${A32//$'\n'/$'\n'    }"
+
+# ---- arm 33 (TOOL-dBoundRoles-17 AC1 AC3 AC4 AC6): the work order's `item=` and the return's `**Answers:**`
+# ---- line, graded as R16 after the fixture's seed. The fixture gains the memory-tree kit's `legacy_ledger.py`
+# ---- at the home `memory-tree`, where the library's resolver probes, and is committed, so a `--scaffold`
+# ---- seeds `work-order-legacy.txt` from an empty population: its header and no row. A render with `--item
+# ---- item.build.unit` writes that tag into its marker and `handoff.py check` passes it; `--item Item.Build`
+# ---- exits 1 naming `--item` and writes nothing; no `--item` writes `item=-`. A `research` return naming the
+# ---- first work order with a matching `**Answers:**` line checks clean; without the line it is one R16 line
+# ---- naming the record, and with its `task-sha` one digit off one naming the mismatch. A work order planted
+# ---- after the seed whose marker carries no `item=`, and one with no marker line, are each one R16 line. With
+# ---- the home removed, one `R16 unarmed` note names the seed command and nothing is graded. The failing
+# ---- cases, owed at the close and not observed by the pass that wrote this: a stale `task-sha` passing
+# ---- because the line is graded on presence alone, and the legacy home read as a pattern so a planted
+# ---- unmarked work order passes. WHAT IT DOES NOT CHECK: a return naming two work orders, or a seed over
+# ---- an unborn HEAD, which leaves the home unarmed.
+build_fixture
+_mt=memory-tree; [[ $FXK == */* ]] && _mt=${FXK%/*}/memory-tree
+A33P="$FX/$MR/builds/tFix/prompts"; A33B="$FX/$MR/builds/tFix/build"; A33R="$TMP_ROOT/a33.out"
+A33H="$FX/$MR/project/work-order-legacy.txt"
+mkdir -p "$FX/$_mt" "$A33P" "$A33B" && cp "$HERE/../memory-tree/legacy_ledger.py" "$FX/$_mt"/
+(cd "$FX" && unset GIT_DIR GIT_WORK_TREE && git add -A && git -c user.name=fx -c user.email=fx@fx commit -qm fx) >/dev/null 2>&1
+run_adopter --scaffold > "$A33R"
+A33W=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build tFix --unit TOOL-tFix-1 \
+   --item item.build.unit --input "question=q" 2>/dev/null); A33W=${A33W%$'\r'}
+_mk=$(grep -m1 '^<!-- gov:handoff ' "$FX/$A33W" 2>/dev/null)
+(cd "$FX" && "$PY" -B "$KREL/handoff.py" check "$A33W") >/dev/null 2>&1; rc=$?
+check_arm "arm 33 --item item.build.unit is the marker's item= and handoff.py check passes the work order" \
+   "$([ -n "$A33W" ] && [[ $_mk == *' unit=TOOL-tFix-1 item=item.build.unit path='* ]] && [ "$rc" = 0 ] && echo 1 || echo 0)"
+_ls=$(ls -A "$A33P")
+(cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build tFix --unit TOOL-tFix-1 \
+   --item Item.Build --input "question=q") > /dev/null 2>"$TMP_ROOT/a33.err"; rc=$?
+check_arm "arm 33 --item Item.Build exits 1 naming --item and writes nothing" \
+   "$([ "$rc" = 1 ] && grep -qF -- '--item' "$TMP_ROOT/a33.err" && [ "$(ls -A "$A33P")" = "$_ls" ] && echo 1 || echo 0)"
+_dash=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build tFix --unit TOOL-tFix-1 \
+   --input "question=q" 2>/dev/null); _dash=${_dash%$'\r'}
+check_arm "arm 33 with no --item the marker reads item=-" \
+   "$([ -n "$_dash" ] && grep -q '^<!-- gov:handoff .* unit=TOOL-tFix-1 item=- path=' "$FX/$_dash" && echo 1 || echo 0)"
+_sha=$(printf '%s\n' "$_mk" | sed -n 's/.* task-sha=\([0-9a-f]\{12\}\) -->.*/\1/p')
+A33A="$A33B/2026-11-22-build-TOOL-tFix-1-findings.md"
+_ans="**Answers:** $A33W task-sha=$_sha"
+printf '**Serves:** research TOOL-tFix-1\n%s\n\n# findings\n\nAnswering ../prompts/%s.\n' "$_ans" "${A33W##*/}" > "$A33A"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A33R" 2>&1); rc=$?
+check_arm "arm 33 after the seed's empty home a return with a matching Answers line checks clean, both graded" \
+   "$([ "$rc" = 0 ] && [ -n "$_sha" ] && [ "$(grep -vc '^#' "$A33H" 2>/dev/null)" = 0 ] && ! grep -q ': R16 — ' "$A33R" \
+      && grep -qF 'R16 2 handoff(s) and 1 return(s) graded, 0 legacy row(s)' "$A33R" && echo 1 || echo 0)"
+[ "$rc" = 0 ] || sed 's/^/    /' "$A33R"
+printf '**Serves:** research TOOL-tFix-1\n\n# findings\n\nAnswering ../prompts/%s.\n' "${A33W##*/}" > "$A33A"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A33R" 2>&1); rc=$?
+check_arm "arm 33 the Answers line removed is one R16 line naming the record" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R16 — ' "$A33R")" = 1 ] && grep ': R16 — ' "$A33R" | grep -qF "${A33A##*/}" && echo 1 || echo 0)"
+_bad=${_sha%?}; [ "${_sha: -1}" = 0 ] && _bad=${_bad}1 || _bad=${_bad}0
+printf '**Serves:** research TOOL-tFix-1\n%s\n\n# findings\n\nAnswering ../prompts/%s.\n' "${_ans% *} task-sha=$_bad" "${A33W##*/}" > "$A33A"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A33R" 2>&1); rc=$?
+check_arm "arm 33 a task-sha one digit off is one R16 line naming the mismatch" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R16 — ' "$A33R")" = 1 ] && grep ': R16 — ' "$A33R" | grep -F "$_bad" | grep -qF "$_sha" && echo 1 || echo 0)"
+printf '**Serves:** research TOOL-tFix-1\n%s\n\n# findings\n\nAnswering ../prompts/%s.\n' "$_ans" "${A33W##*/}" > "$A33A"
+A33U="$A33P/2026-11-22-prompt-TOOL-tFix-2-1-builder.md"
+sed 's/ item=item\.build\.unit / /' "$FX/$A33W" > "$A33U"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A33R" 2>&1); rc=$?
+check_arm "arm 33 a work order planted after the seed with no item= is one R16 line naming it" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R16 — ' "$A33R")" = 1 ] && grep ': R16 — ' "$A33R" | grep -qF "${A33U##*/}" && echo 1 || echo 0)"
+printf '# no marker\n\n## Role\n\n## Task\n' > "$A33U"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A33R" 2>&1); rc=$?
+check_arm "arm 33 ...and one with no marker line at all is refused the same way" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R16 — ' "$A33R")" = 1 ] && grep ': R16 — ' "$A33R" | grep -qF "${A33U##*/}" && echo 1 || echo 0)"
+rm -f "$A33U" "$A33H"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A33R" 2>&1); rc=$?
+check_arm "arm 33 with no home one R16 unarmed note names the seed command and no handoff is graded" \
+   "$([ "$rc" = 0 ] && [ "$(grep -c '^roles: note: R16 unarmed' "$A33R")" = 1 ] \
+      && grep '^roles: note: R16 unarmed' "$A33R" | grep -qF 'legacy_ledger.py seed --home' \
+      && grep -qF 'R16 unarmed, 0 handoff(s)' "$A33R" && echo 1 || echo 0)"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

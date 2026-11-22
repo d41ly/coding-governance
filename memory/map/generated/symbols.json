@@ -9698,6 +9698,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "check_work_orders",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
+    },
+    {
       "id": "check_worksheets_fresh",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -11261,6 +11266,11 @@
       "id": "derive_answer",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "derive_answers_value",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "derive_archive_name",
@@ -12861,6 +12871,11 @@
       "id": "derive_legacy_path",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "derive_legacy_seed_command",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
     },
     {
       "id": "derive_legs_path",
@@ -27038,6 +27053,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "read_work_order_legacy",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "read_workflow_order",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
@@ -37783,6 +37803,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "scan_work_orders",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "scan_worktrees",
       "kind": "function",
       "file": "tools/unattended/resume-tick.sh"
@@ -42596,6 +42621,11 @@
       "id": "write_legacy_homes",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "write_legacy_rows",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
     },
     {
       "id": "write_legs",
