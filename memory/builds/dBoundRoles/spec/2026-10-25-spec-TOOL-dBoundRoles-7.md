@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-7 — shell writes held to the work order's allowance
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 14 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 14 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0172@d88edbe8 whole
 
@@ -19,6 +19,7 @@
 | [2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-8 TOOL-dBoundRoles-10 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-46 TOOL-dBoundRoles-58 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief.md) | journal | TOOL-dBoundRoles-17 TOOL-dBoundRoles-6 TOOL-dBoundRoles-13 TOOL-dBoundRoles-3 TOOL-dBoundRoles-38 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-48 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-48-reground-i-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-48-reground-i-brief.md) | journal | TOOL-dBoundRoles-48 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
+| [2026-11-22-prompt-TOOL-dBoundRoles-7-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-7-build-brief.md) | journal | — |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
