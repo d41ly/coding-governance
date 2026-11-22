@@ -489,14 +489,14 @@ def run_git(repo, *args, data=None) -> bytes:
 
 
 def build_scratch_repo(repo: pathlib.Path) -> pathlib.Path:
-    """A repository on `main` holding twenty committed files and the code path `lib/check.sh`."""
+    """A repository on `main` holding twenty committed files and the code path `src/check.sh`."""
     repo.mkdir(parents=True)
     run_git(repo, "init", "-q", "-b", "main", ".")
     for key, value in (("core.autocrlf", "false"), ("user.name", "fx"), ("user.email", "fx@example.invalid"),
                        ("commit.gpgsign", "false")):
         run_git(repo, "config", key, value)
-    (repo / "lib").mkdir()
-    (repo / "lib" / "check.sh").write_bytes(b"echo graded\n")
+    (repo / "src").mkdir()
+    (repo / "src" / "check.sh").write_bytes(b"echo graded\n")
     for i in range(20):
         (repo / ("f%02d.txt" % i)).write_bytes(("file %d\n" % i).encode("ascii") * (i + 1))
     run_git(repo, "add", "-A")
@@ -542,7 +542,7 @@ def test_reader(repo, check_arm) -> None:
 
 
 def test_store(repo, check_arm) -> None:
-    code = ["lib/check.sh"]
+    code = ["src/check.sh"]
     store = resolve_store(repo, "selftest-leg", code)
     fields = ["commit", "0" * 40, "blob", "1" * 40]
     body = "rc 0\tone\nwith a back\\slash"
@@ -558,7 +558,7 @@ def test_store(repo, check_arm) -> None:
     check_arm("store: an item cut one byte short, or of another version, is a miss",
               short is None and foreign is None and store.read(fields) == body,
               "short %r, foreign %r" % (short, foreign))
-    check_path = repo / "lib" / "check.sh"
+    check_path = repo / "src" / "check.sh"
     kept = check_path.read_bytes()
     check_path.write_bytes(kept + b"# an uncommitted edit\n")
     edited = resolve_store(repo, "selftest-leg", code)
@@ -566,7 +566,7 @@ def test_store(repo, check_arm) -> None:
     check_arm("store: an uncommitted edit to a code path moves every key",
               edited.stored and edited.code != store.code and edited.read(fields) is None,
               "the digest did not move")
-    gone = resolve_store(repo, "selftest-leg", ["lib/absent.sh"])
+    gone = resolve_store(repo, "selftest-leg", ["src/absent.sh"])
     check_arm("store: a code path that does not read turns the store off",
               not gone.stored and gone.read(fields) is None and not gone.write(fields, body), "it stayed on")
     try:
@@ -580,7 +580,7 @@ def test_store(repo, check_arm) -> None:
 
 
 def test_worktree_tips(repo, scratch, check_arm) -> None:
-    code = ["lib/check.sh"]
+    code = ["src/check.sh"]
     tree = scratch / "wt"
     run_git(repo, "worktree", "add", "-q", "--detach", str(tree))
     one, two = resolve_store(repo, "selftest-tip", code), resolve_store(tree, "selftest-tip", code)
@@ -595,7 +595,7 @@ def test_worktree_tips(repo, scratch, check_arm) -> None:
 
 
 def test_prune(repo, check_arm) -> None:
-    store = resolve_store(repo, "selftest-prune", ["lib/check.sh"])
+    store = resolve_store(repo, "selftest-prune", ["src/check.sh"])
     now = time.time()
     paths = {}
     for name, days in (("old", 31), ("young", 29)):
@@ -616,7 +616,7 @@ def test_prune(repo, check_arm) -> None:
 def test_cli(repo, check_arm) -> None:
     head = run_git(repo, "rev-parse", "HEAD").decode("ascii").strip()
     body = "a\tb\nc\\d"
-    argv = [sys.executable, str(pathlib.Path(__file__).absolute()), "--leg", "selftest-cli", "--code", "lib/check.sh"]
+    argv = [sys.executable, str(pathlib.Path(__file__).absolute()), "--leg", "selftest-cli", "--code", "src/check.sh"]
 
     def run_cli(verb, data):
         return subprocess.run([*argv, *verb], cwd=str(repo), input=data.encode("utf-8"), capture_output=True,
@@ -642,7 +642,7 @@ def test_switch(scratch, check_arm) -> None:
         print("skip switch: no policy kit resolves beside this module, so the switch reads its default: %s" % exc)
         return
     repo = build_scratch_repo(scratch / "switch")
-    code = ["lib/check.sh"]
+    code = ["src/check.sh"]
     resolve_store(repo, "selftest-switch", code).write(["item"], "verdict")
     (repo / ".governance").mkdir()
     (repo / ".governance" / "policy.toml").write_bytes(b'tests.history-verdicts = "regraded"\n')
