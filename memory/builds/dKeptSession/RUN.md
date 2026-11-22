@@ -9,7 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: c2a407b0390f3d57a118b58e376c326aeb207c13 · park · 0 touching
+refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: a4dd146d6773f436a4527d2a9740a7beec69e405
 phase: BUILDING
@@ -157,3 +157,5 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T02:06:32Z dispatch · item 020af060 KICK-dKeptSession-37 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-37-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
 
 2026-11-22T04:53:43Z rescope · item add KICK-dKeptSession-69 · reason origin/main moved 634 commits past BASE (dWitnessedBar landed at 8b8b1374) and the primary tree fast-forwarded, so every commit here ran main's hooks over the pre-main tree and was refused; the reconcile merge ad02f1a6a is this unit's build. A blocker between the run and its landing is a discovery, adopted as this unit.
+
+2026-11-22T05:25:24Z decision · item dWitnessedBar's packet pin: run, at a console, python memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --repin memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py · reason origin/main 8b8b1374 moved the schedule instrument (pinned 5aa5421e265b, HEAD holds 6184e5717b59), so dWitnessedBar's packet reds its pin arm on main itself. check-spec-tokens reds the live tree over it, and --dispatch (check 49) refuses every dispatch while it does. --repin admits only an owner at a console, and the spec-token waiver ledger is shrink-only, so the run cannot clear it. Options: (a) the owner re-pins and the run resumes; (b) the owner rules dWitnessedBar terminal so its packet leaves the live tree.
