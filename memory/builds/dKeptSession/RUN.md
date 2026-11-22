@@ -151,3 +151,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T01:19:10Z brief · item KICK-dKeptSession-13 · reason 051873635d64 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-13-build-brief.md
 
 2026-11-22T01:23:36Z dispatch · item 5caf0cd7 KICK-dKeptSession-13 · reason tools/loop/position.py tools/run-gates/selftest-budgets.txt skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-store.fixture.sh tools/memory-tree/gen_build_index.py tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt help/reference/policy.md memory/project/docs-undocumented.txt help/orientation-card.md memory/map/generated/symbols.json memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-13-1-acceptance-ledger.md
+
+2026-11-22T02:05:07Z brief · item KICK-dKeptSession-37 · reason bbdb9ac9b579 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-37-build-brief.md
+
+2026-11-22T02:06:32Z dispatch · item 020af060 KICK-dKeptSession-37 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-37-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
