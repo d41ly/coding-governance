@@ -59,6 +59,9 @@ GET_BOUND = 30
 APP_SLUG = "github-actions"
 TRUST = ("pinned-workflow", "owner-reviews-workflow-change", "app-only")
 SCOPES = ("workflow", "dispatch-closure")
+TRUST_KEY = "verdict.remote.trust"  # the three keys, passed by name so the policy check's reader scan sees each read
+SCOPE_KEY = "verdict.remote.pin-scope"
+PIN_KEY = "verdict.remote.pin"
 ANCHOR = re.compile(r"(?:https://github\.com/|ssh://git@github\.com/|git@github\.com:)([A-Za-z0-9._-]+)/([A-Za-z0-9._-]+?)(?:\.git)?/?")
 WORKFLOW_FILE = re.compile(r"[A-Za-z0-9._-]+\.ya?ml")
 DERIVED_REFUSAL = "a derived default no reader computes yet"  # the policy kit's DERIVED_WHY
@@ -252,13 +255,13 @@ def read_remote_keys(repo):
     """(trust, scope, pin or None) at the landed revision; a DeadProbe naming any refusal but the pin's
     derived default, which is no pin."""
     got = {}
-    for key, default in (("verdict.remote.trust", TRUST[0]), ("verdict.remote.pin-scope", SCOPES[0]),
-                         ("verdict.remote.pin", None)):
-        value, refused = read_policy_value(repo, key)
-        if refused and not (key == "verdict.remote.pin" and DERIVED_REFUSAL in refused):
+    for key, default, (value, refused) in ((TRUST_KEY, TRUST[0], read_policy_value(repo, TRUST_KEY)),
+                                           (SCOPE_KEY, SCOPES[0], read_policy_value(repo, SCOPE_KEY)),
+                                           (PIN_KEY, None, read_policy_value(repo, PIN_KEY))):
+        if refused and not (key == PIN_KEY and DERIVED_REFUSAL in refused):
             raise DeadProbe(f"{key} does not read: {refused}")
         got[key] = value if value is not None or refused else default
-    return got["verdict.remote.trust"], got["verdict.remote.pin-scope"], got["verdict.remote.pin"]
+    return got[TRUST_KEY], got[SCOPE_KEY], got[PIN_KEY]
 
 
 def check_pin_source(backend, sha, keys, repo="."):
@@ -354,7 +357,7 @@ def run_pin(repo="."):
     """The `pin` verb: the lines and the id the owner would set at HEAD; writes nothing."""
     try:
         backend = check_backend("remote-ci", read_backends(TOOL_ROOT))
-        scope, refused = read_policy_value(repo, "verdict.remote.pin-scope")
+        scope, refused = read_policy_value(repo, SCOPE_KEY)
         if refused:
             raise Refusal(f"verdict.remote.pin-scope does not read: {refused}")
         rc, head = run_git(repo, "rev-parse", "--verify", "-q", "HEAD")
