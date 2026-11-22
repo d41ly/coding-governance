@@ -17,7 +17,7 @@ criterion sets it. The self-test case `test_extract_context_window` itself did n
 Owed to the close: every leg the spec's section 7 names; the runlog self-test, whose new case and
 floor are below; the `New arm:` line's RED-first observation, the window case staged red by a copy of
 `extract.py` dividing by 200000 (PINNED, the spec's `New arm:` line); and AC9's reference-page check
-and its mirror check, which read the commit that re-writes the mirror after this one.
+and its `mirror --check`, which read the commit that re-writes the mirror.
 
 ## S3's answer to KICK-dKeptSession-14
 
@@ -48,6 +48,6 @@ rounded up to a rung, then the bottom rung. Neither unit 14's spec nor its ledge
 - AC6 — in `help/`, `grep -n "CLAUDE_CODE_MAX_CONTEXT_TOKENS" orientation-card.md` printed one line of the `context —` paragraph, and `grep -c "pinned window" orientation-card.md` printed `0` (DERIVED, that probe).
 - AC7 — `tr -s ' \r\n' ' '` over this ledger piped into `grep -c "is one constant beside the sum"` printed `1`, and into `grep -c "until KICK-dKeptSession-30 derives it"` printed `1` (DERIVED, that probe); this pass stages neither unit 14's spec nor its ledger.
 - AC8 — the spec's `git grep -n` over the four paths printed nothing, and `git grep -c CLAUDE_CODE_MAX_CONTEXT_TOKENS` printed one row for each of `tools/runlog/README.md`, `tools/policy/catalogue.toml` and `skills/session-kickoff/manifest-check.sh` (DERIVED, that probe).
-- AC9 — `python tools/govkit/docs_leg.py --fingerprints` printed `ba7d79dc` on its `policy:context.threshold` row after the summary edit, the fingerprint the key's anchor on `help/orientation-card.md` carries (DERIVED, that probe). The mirror is re-written by `python tools/policy/policy.py mirror --write` in the commit after this one, since the mirror renders HEAD; its `--check` and the reference check are the close's.
+- AC9 — `python tools/govkit/docs_leg.py --fingerprints` printed `ba7d79dc` on its `policy:context.threshold` row after the summary edit, the fingerprint the key's anchor on `help/orientation-card.md` carries (DERIVED, that probe). After the build's commit `python tools/policy/policy.py mirror --write` printed `catalogue 7607b1a8`, and the mirror's `catalogue_blob` equals the blob `git ls-tree HEAD tools/policy/catalogue.toml` printed there, no longer `4be1f801` (DERIVED, that probe); the mirror is committed in the commit after the build's, since it renders HEAD. Its `--check` and the reference check are the close's.
 - Beyond the criteria: the `context-fill` scenario still printed `60%`, with `context: window 200000 · observed 180000 on fixture-model`, and `measure_context_fill` with `until` before its compaction returned `(0.9, 200000, 'observed 180000 on fixture-model')`; a model never observed read `(200000, 'no observation')`; a 1300000-token turn read its own window; a missing root read the bottom rung; and `held` stood in for its own path's parse (DERIVED, that probe). Over this node's real `~/.claude/projects`, `derive_context_window("claude-opus-5-5")` returned `(1000000, 'observed 988875 on claude-opus-5-5')` in 4.24 s (DERIVED, that probe).
 - `ASSERTION_FLOOR` rises from 1587 to 1595: the new case's 5 checks and its 3 decoy checks (PINNED, the count its `RAISED` comment prices).
