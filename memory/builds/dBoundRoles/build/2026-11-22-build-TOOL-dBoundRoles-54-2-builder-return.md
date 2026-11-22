@@ -19,8 +19,7 @@ true`.
    both derivations to call, and `derive_overlay_drift`, the two-way compare a probe observes. The lexicon accepted
    both.
 
-The main loop found two positional reds in the spec at `8a5cf9347`: an unlisted `BUILD-METHOD M4` reference whose
-tag cite is `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it`, and a stale
-`BUILD-METHOD M2` row the register's shrink drops.
+The main loop also found two positional reds in the spec at `8a5cf9347`, both bare build-method section references:
+one unlisted, which takes the section's tag cite, and one stale, which the register's shrink drops.
 
 Every other claim held. The probe stood for AC1, AC2 and AC3 over fixtures and passed each.

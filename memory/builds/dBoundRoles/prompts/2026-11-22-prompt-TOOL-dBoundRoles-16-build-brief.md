@@ -16,7 +16,11 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every roster spec was re-grounded on HEAD before this dispatch, so its citations hold at HEAD or name the earlier
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
-- This is the second dispatch. The first builder (run `wf_2669408c-2f0`) stopped before its first write because the
+- This is the fourth dispatch. The third builder (run `wf_e3c2d4a9-882`) found the loop kit's factories writing none
+  of the fields S2 and S5 make required; rev-7 resolves it in §8 F8 (the role factory writes `shapes` from its
+  workflow entry's `kind`, the workflow factory writes the three fields for a non-empty `--roles`), adds
+  `tools/loop/factories.py` to Files touched and the write set, and adds AC8.
+- Earlier dispatches, still in force: this is the second dispatch's text. The first builder (run `wf_2669408c-2f0`) stopped before its first write because the
   write set lacked the four `add` change records §8 F7 (a) asks for; it found no spec divergence. The write set now
   names them, `build/2026-11-22-build-TOOL-dBoundRoles-16-change-1.md` to `-change-4.md`, one per new unit row
   (`unit.orient.producer`, `unit.orient.verifier-cold`, `unit.checklist.for-paths`, `unit.checklist.for-diff`), written

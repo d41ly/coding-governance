@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-54 — unit 49's overlay check reads its expected side from the roster, one `house/<slot>.md` per role slot, never from the seed rule it is compared with
 
-**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dBoundRoles-54-deviation-542.md](../build/2026-10-26-build-TOOL-dBoundRoles-54-deviation-542.md) | deviation | — |
 | [2026-11-22-build-TOOL-dBoundRoles-54-1-builder-return.md](../build/2026-11-22-build-TOOL-dBoundRoles-54-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dBoundRoles-54-2-builder-return.md](../build/2026-11-22-build-TOOL-dBoundRoles-54-2-builder-return.md) | journal | — |
+| [2026-11-22-build-TOOL-dBoundRoles-54-widen-6.md](../build/2026-11-22-build-TOOL-dBoundRoles-54-widen-6.md) | widen | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief.md) | journal | TOOL-dBoundRoles-14 TOOL-dBoundRoles-2 TOOL-dBoundRoles-1 TOOL-dBoundRoles-21 TOOL-dBoundRoles-37 TOOL-dBoundRoles-22 TOOL-dBoundRoles-49 TOOL-dBoundRoles-16 TOOL-dBoundRoles-55 TOOL-dBoundRoles-15 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-49-reground-f-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-49-reground-f-brief.md) | journal | TOOL-dBoundRoles-49 TOOL-dBoundRoles-16 TOOL-dBoundRoles-55 |
@@ -51,8 +52,9 @@ criterion for it. It repairs `TOOL-dBoundRoles-49` and builds one step after it 
 - **S1** — The expected side, `derive_overlay_expected(kit)` in `tools/govkit/selftest.py`: the set
   `house/<slot>.md` for every slot of the installed kit's roster, read through the same
   `roles_lib.load_roles` load `TOOL-dBoundRoles-37` S1 makes. Every slot counts, `agent: false`
-  included. Where unit 37 left that load inline, this pass lifts it into one function both call, so the
-  selftest holds one loader. At HEAD `6f93ab7fd` unit 37 is built and the load is inline in
+  included. Where unit 37 left that load inline, this pass lifts it into `load_kit_roster`, which both
+  derivations, `derive_roles_expected` and `derive_overlay_expected`, call, so the selftest holds one
+  loader. At HEAD `6f93ab7fd` unit 37 is built and the load is inline in
   `tools/govkit/selftest.py#derive_roles_expected`, which keeps only the agent-true slots, and which
   `check_roles_install` and unit 49's S3 check both call. Observed by AC1.
 - **S2** — The compare, both ways. S3 of unit 49 compares S1's set with the `src` of every roles-kit row
@@ -62,11 +64,13 @@ criterion for it. It repairs `TOOL-dBoundRoles-49` and builds one step after it 
   reds naming the slot; a seeded overlay no slot owns reds naming the file. Each failure prints both
   sets. Observed by AC1 and AC2.
 - **S3** — Unit 49's criterion is superseded by a record, not edited. `TOOL-dBoundRoles-49`'s spec is
-  CLOSED at rev-5 and BUILD-METHOD M4 freezes a CLOSED spec, so the pass edits no line of it. This
+  CLOSED at rev-5 and `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it`
+  freezes a CLOSED spec, so the pass edits no line of it. This
   spec's AC2 is unit 49's AC2 restated for S1's set. Before it edits the check, the pass writes one
   deviation record, `memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-deviation-543.md`,
   in memory hygiene's deviation grammar, graded under the build's deviation values `report` and
-  `author-recorded`. Its fields: Departs from `TOOL-dBoundRoles-49@rev-5 [AC2]`; Hand-off `spec-revised`;
+  `author-recorded`. Its fields: Departs from `TOOL-dBoundRoles-49@rev-5` [AC2], the criterion bracket outside the code span as
+  `tools/memory-tree/deviation_join.py#DEPARTS` admits it; Hand-off `spec-revised`;
   Cause `review finding`; Risk `stricter`; Approver `spec writer`, citing this spec's §8 F3 and the
   `author-recorded` value; Follow-through `new unit TOOL-dBoundRoles-54`; Caused-by `TOOL-dBoundRoles-54`.
   Its Before quotes unit 49's AC2 and its §4 "Why two checks" claim that S3 ties the figure to the
@@ -128,8 +132,16 @@ Read at base `462d20f3` on 2026-10-26, and re-read at HEAD `a01362eb0` on 2026-1
 
 ### Inventory
 
-Minted: `derive_overlay_expected` (`py.function`), asked of
-`python tools/lexicon/lexicon.py --suggest derive_overlay_expected --as py.function` at the pass.
+Minted (`py.function`, each asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function`
+at the pass):
+
+- `derive_overlay_expected` — S1's set: `house/<slot>.md` for every slot `load_kit_roster` reads from
+  the kit at its argument.
+- `load_kit_roster` — the roster of the roles kit at its argument, `{slot: {path, keys, body}}`, read by
+  that kit's own `roles_lib.load_roles`; the one loader both derivations call.
+- `derive_overlay_drift` — S2's compare of S1's set with the `house/*.md` tails of the roles rows
+  `derive_seed_expected` returns, both ways: the sorted slots whose overlay no row seeds, and the sorted
+  seeded files no slot owns.
 
 ### Migration
 
@@ -210,9 +222,11 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · the roster-side overlay c
 - **F3 — Where does unit 49's restated criterion live, now that unit 49 is CLOSED?** Options: (a) this
   spec's §6 carries it, and one deviation record in `build/` says unit 49's AC2 and its "Why two
   checks" claim are superseded; (b) the pass rev-bumps unit 49's CLOSED spec and widens its write set.
-  (b) edits a frozen spec, which BUILD-METHOD M4 forbids, and fails rev-5's own write set; (a) is M4's
-  correction by a unit on top. RESOLVED (agent, 2026-11-22, delegated, M3): (a), the survivor, the
-  first builder's route (a). widens: none · relaxes: none
+  (b) edits a frozen spec, which
+  `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it` forbids,
+  and fails rev-5's own write set; (a) is M4's correction by a unit on top.
+  RESOLVED (agent, 2026-11-22, delegated): (a), M3, the survivor, the first builder's route (a).
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -242,6 +256,14 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · the roster-side overlay c
   which stays the build's grading policy. Re-probed at
   `6f93ab7fd`, S1's HEAD note moves from an inline load in `check_roles_install` to the one in
   `#derive_roles_expected`, now built; S2, AC1 and AC2 held. Nothing else moved.
+- rev-7 · 2026-11-22 · §2 · §4 · §8 · S1 · S3 · F3 · by
+  `2026-11-22-prompt-TOOL-dBoundRoles-54-fix-2-spec-writer` on
+  `2026-11-22-build-TOOL-dBoundRoles-54-2-builder-return`: F3's mark takes the conforming shape, `M3`
+  outside the parenthesis as F1 and F2 spell it; S3's Departs from puts the `[AC2]` bracket outside the
+  code span, as `tools/memory-tree/deviation_join.py#DEPARTS` admits; the Inventory names the two helpers the pass mints,
+  `load_kit_roster` and `derive_overlay_drift`, each with its contract, and S1 says both derivations
+  call `load_kit_roster`; the bare build-method M4 reference in S3 and F3 becomes its tag cite. Every
+  criterion keeps its number. Nothing else moved.
 
 ## 10. Reuse audit
 

@@ -172,3 +172,13 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T12:27:59Z dispatch · item 6f93ab7f TOOL-dBoundRoles-54 · reason tools/govkit/selftest.py memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-1-acceptance-ledger.md memory/map/generated/symbols.json memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-deviation-543.md
 
 2026-11-22T12:28:00Z brief · item TOOL-dBoundRoles-54 · reason 87b6311eac90 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-54-build-brief.md
+2026-11-22T12:53:14Z draw · re-dispatch · TOOL-dBoundRoles-16 · 28/122 · 20261122T125314Z-9772be
+
+2026-11-22T12:53:14Z dispatch · item 1a50cffc TOOL-dBoundRoles-16 · reason tools/roles/workflows.toml tools/roles/instructions.toml tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/handoff.py tools/roles/render_agents.py tools/roles/role-schema.toml tools/roles/agents tools/roles/README.md tools/roles/adopt-roles.test.sh memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-16-1-acceptance-ledger.md memory/map/generated/symbols.json memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-16-change-1.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-16-change-2.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-16-change-3.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-16-change-4.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-16-deviation-163.md tools/loop/factories.py
+
+2026-11-22T12:53:15Z brief · item TOOL-dBoundRoles-16 · reason b2437e4e8e1f memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-16-build-brief.md
+2026-11-22T12:55:55Z draw · re-dispatch · TOOL-dBoundRoles-54 · 29/122 · 20261122T125555Z-2e58f7
+
+2026-11-22T12:55:55Z dispatch · item 1a50cffc TOOL-dBoundRoles-54 · reason tools/govkit/selftest.py memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-1-acceptance-ledger.md memory/map/generated/symbols.json memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-deviation-543.md
+
+2026-11-22T12:55:56Z brief · item TOOL-dBoundRoles-54 · reason b7e3e02fc778 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-54-build-brief.md

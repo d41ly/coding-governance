@@ -12368,6 +12368,8 @@ memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-reground-
 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-reground-c-spec-writer.md	tools/hooks/agent-cap.js:2089	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-reground-c-spec-writer.md	tools/hooks/agent-cap.js:2102	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-reground-c-spec-writer.md	tools/hooks/agent-cap.js:2135	1	09e06346622e0341193272288a28ab45d245bfdd	widened:2026-11-22-build-TOOL-dBoundRoles-14-widen-1
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-54-fix-2-spec-writer.md	BUILD-METHOD M4	1	1a50cffcc8fd5e0f61a09d237d71024701550af9	widened:2026-11-22-build-TOOL-dBoundRoles-54-widen-6
+memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-54-spec-fix-2-brief.md	BUILD-METHOD M4	1	1a50cffcc8fd5e0f61a09d237d71024701550af9	widened:2026-11-22-build-TOOL-dBoundRoles-54-widen-6
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md	BUILD-METHOD M7	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md	adopt-memory-tree.sh:649-662	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md	check-dead-paths.sh:192-197	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

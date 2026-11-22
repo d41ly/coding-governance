@@ -16,7 +16,11 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every roster spec was re-grounded on HEAD before this dispatch, so its citations hold at HEAD or name the earlier
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
-- This is the second dispatch. The first builder (run `wf_6da83969-b78`) stopped on rev-5's edit to unit 49's CLOSED
+- This is the third dispatch. The second builder (run `wf_9f781b86-8b6`) built the pass on rev-6 and the pre-commit
+  hook refused it on §8 F3's mark; rev-7 fixes the mark, the record's Departs from spelling and the Inventory. Its
+  staged pass is `TOOL-dBoundRoles-54-pass.patch` in the session scratchpad: re-apply it with `git apply --index`,
+  check it against rev-7, refresh every generated output, and commit.
+- The second dispatch's note still holds. The first builder (run `wf_6da83969-b78`) stopped on rev-5's edit to unit 49's CLOSED
   spec; rev-6 replaces it with the deviation record `build/2026-11-22-build-TOOL-dBoundRoles-54-deviation-543.md`, now
   in the write set, and never touches unit 49's spec. Its record reads `report` as the grading policy and
   `author-recorded` as the approval, with a Follow-through `deviation_join.py` admits.

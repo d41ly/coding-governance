@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-16 — the shapes: each workflow entry's kind, checklist, orientation, merge and twin rule, the five kinds as defaults over the stage rows
 
-**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0181@03bd0858 whole
 **Carries:** node:system.role-shapes
@@ -49,7 +49,8 @@ though aScoutedSeam measured that the shape moves recall and cost (gap-roles-18)
   each `none` or an instruction unit tag; `merge`, one of `none`, `concat`, `synth`, `defect-map`;
   `twin`, `never` or the policy key whose value decides a second run; and on a `twin` entry `of`, the
   entry it runs twice. A stage row may carry `kind` where it differs from its entry's. Observed by AC1
-  and AC6.
+  and AC6. The loop kit's workflow factory writes `kind`, `checklist` and `orientation` on an entry it
+  makes with a role, and its role factory writes S5's `shapes`, per §4 Migration (§8 F8). Observed by AC8.
 - **S3** — The agent cap bounded: every kind default's `cap`, and every cap a default gives a row, at or
   under `runtime.agents-in-flight` through TOOL-dBoundRoles-22's `read_agent_limit`, the bound that was
   agent-cap's `FANOUT_CAP` before the night pass two's point 7. Observed by AC2.
@@ -242,6 +243,30 @@ adopter's own role file lacking `shapes` reds R2 on update; the roles README sta
 values reach a new install only: an adopter's existing `house/policy.toml` is a seed `update` never
 rewrites, so its levels stand until it sets a key (D2, no deviation owed).
 
+The loop kit's two factories write the new required fields, so `core.py new role` and `core.py new
+workflow` keep writing an instance R2, R6 and R9 grade green (§8 F8):
+
+- `tools/loop/factories.py#write_role` writes `shapes` as the `kind` of the entry its `--workflow`
+  names, read from `workflows.toml` through `roles_lib.load_workflows` before any write, beside the
+  `effort` it writes from `ROLE_EFFORT` (`tools/loop/factories.py@6d385de1:113`, `:571-573`). An entry
+  that carries no `kind`, or a table `load_workflows` refuses, is a refusal, exit 2 naming `--workflow`,
+  and nothing written. The `role-new` plant and `factory-interrupt` both join `build`
+  (`tools/loop/factories.py@6d385de1:142`, `#run_interrupt_plant`), so each writes `shapes: per-unit`.
+- `tools/loop/factories.py#write_workflow` writes `kind = "single"`, `checklist = "none"` and
+  `orientation = "none"` after the row's `roles` line where `--roles` lists a slot, and none of the three
+  where it lists none, as `bookkeeping` carries none. It writes no `merge`, `twin` or `of`, so the
+  `single` row's `none` and `never` apply, and no stage row. The `workflow-new` plant passes an empty
+  `--roles` (`tools/loop/factories.py@6d385de1:146`), so its row is unchanged.
+
+Neither factory gains a flag, so `NEW_ARGV`, `PLANTS`, `CASES`, the usage rows and `help/loop.md`'s
+factory lines do not change, and the `role-new` and `workflow-new` cases stay green. The `role-hand`
+plant's file also lacks `shapes`, and R2 names each absent key on its own line, so that case still
+meets the `writes` line it owes. The roles README's `shapes` bullet says what `core.py new role`
+writes, as the `effort` bullet's "`core.py new role` writes `medium`" does
+(`tools/roles/README.md@c9836b7f:50`): the kind of its `--workflow` entry, refused where that entry
+carries none. It also says that `core.py new workflow` writes `kind = "single"` with `checklist` and
+`orientation` at `none` where its `--roles` lists a slot.
+
 ### Rollout
 
 Live at landing on the `roles catalogue` leg; the moved efforts reach an agent type at the next session.
@@ -257,7 +282,13 @@ Live at landing on the `roles catalogue` leg; the moved efforts reach an agent t
 - `tools/roles/role-schema.toml`
 - `tools/roles/agents/` (`shapes` on every agent role; `effort` on `gov-orienter` and `gov-builder`)
 - `tools/roles/README.md`
-- `tools/roles/adopt-roles.test.sh` (the arms of §7)
+- `tools/loop/factories.py` (`write_role` writes `shapes`, `write_workflow` the three entry fields, §4
+  Migration). `tools/loop/README.md` is not touched: its factories section names each factory's flags,
+  gate and restore, and no value a factory writes.
+- `tools/roles/adopt-roles.test.sh` (the arms of §7; arm 30's `scratch` entry, which the arm adds "the
+  way the loop kit's workflow factory adds one", gains `kind = "single"`, `checklist = "none"` and
+  `orientation = "none"`, and its `judge` row `kind = "panel"`, the kind `gov-skeptic` declares, so the
+  arm's green cases stay green)
 - `.claude/agents/` and `.claude/roles.json` (rendered by `render_agents.py --write`)
 - `memory/builds/dBoundRoles/build/` (one `add` change record per unit row, written by
   `python tools/memory-tree/build_records.py new change`, §8 F7)
@@ -323,10 +354,30 @@ Live at landing on the `roles catalogue` leg; the moved efforts reach an agent t
   spec-review` run in `tools/roles/`, each prints the same JSON as before this unit, and `git grep -n
   'FANOUT_CAP' -- tools/roles` prints nothing.
   Red when: a reader still reads the rows without the kind defaults, so a defaulted row drops from the map.
+- **AC8** — Over the fixture, when `python tools/playbook/core.py new role gov-fixture` runs with the
+  `role-new` plant's flags (`tools/loop/factories.py@6d385de1:142`), it exits 0 and `grep -c '^shapes: per-unit$'
+  tools/roles/agents/gov-fixture.agent.md` prints 1. The same call with `--workflow bookkeeping` exits 2
+  naming `--workflow`, and `git status --porcelain` prints nothing. `python tools/playbook/core.py new
+  workflow fixture` with the `workflow-new` plant's flags (`@6d385de1:146`) but `--roles gov-researcher` exits 0, and its
+  `workflows.toml` row holds `kind = "single"`, `checklist = "none"` and `orientation = "none"`. With
+  `--roles ""` the row holds none of the three. `python tools/loop/factories.py --fixture --plant role-new`
+  and `--plant workflow-new` each print a `gate green` line.
+  Red when: the factories write no shape field, so R2 refuses every `core.py new role` and R6 every
+  `core.py new workflow --roles <slot>`, and each is put back.
+  fixture: a git clone of the working tree under `%TEMP%`, short-named, one per call.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `instruction units (schema, one fact)` · `instruction grammar (statement types, provenance lock)` · `instruction edits (manifest checks)` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `instruction units (schema, one fact)` · `instruction grammar (statement types, provenance lock)` · `instruction edits (manifest checks)` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `loop factories fixtures` · `tags (the resolver's checks)`
+
+`loop factories fixtures` runs the `role-new`, `role-hand`, `workflow-new` and `factory-interrupt` plants
+over the factories §4 Migration changes. The four unit rows of S6 are scoped to `role.<slot>` selectors,
+and those selectors arm the role-bindings join of `tags (the resolver's checks)`
+(`tools/playbook/gov_tag.py#check_role_bindings`). At HEAD `1a50cffcc` no tracked unit row names a
+`role.` selector, so that join prints its `unarmed` line (`tools/playbook/gov_tag.py@643b5525:238`). The
+close observes the join's line move from `unarmed` to graded, `0 red`. The rows name no `practice.`
+selector, so the join forms no unit pair, and what it does not check here is a role's `rules` against these
+units.
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC3 AC4 AC6 · a fixture kit planting a kind cap above a committed limit, an experiment table with both and with neither scorer and judge, a role outside its stage's kind and an orientation tag naming no unit · none
 
@@ -399,6 +450,37 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC3 AC4 AC6 · a fixture 
   follows, as `TOOL-dWitnessedBar-3`'s change 1 did for its unit. RESOLVED (agent, 2026-11-22,
   delegated): (a), rung 3, the most feature-rich survivor.
   widens: the write set, by one change record per row under the build's own `build/` folder · relaxes: none
+- **F8 — What do the loop kit's factories write once S2 and S5 make the shape fields required?**
+  Probed at HEAD `1a50cffcc`: `tools/loop/factories.py#write_role` builds its front matter from a
+  `values` dict holding no `shapes` (`tools/loop/factories.py@6d385de1:571-573`), and
+  `render_front_matter` drops a key `values` lacks. `tools/loop/factories.py#write_workflow` writes a row
+  of name, driver, harness, roles, enforced-by and trigger only (`@6d385de1:596`). Each factory runs its
+  kind's gate innermost and puts every path back on a red (`tools/loop/factories.py#write_kind_instance`),
+  so after this unit every `core.py new role` reds on R2, and every `core.py new workflow` that lists a
+  slot reds on R6. Options for the role factory: (a) a typed constant `shapes`, `single`, on
+  `ROLE_EFFORT`'s line, as TOOL-dBoundRoles-21 §8 F11 typed `effort`; (b) `shapes` written as the kind of
+  the entry `--workflow` names, read at write time; (c) a `--shapes` flag. Options for the workflow
+  factory: (d) `kind = "single"` with `checklist` and `orientation` at `none` where `--roles` lists a slot;
+  (e) `checklist` and `orientation` defaults added to the `[[kind]]` rows, the factory writing `kind`
+  alone; (f) a refusal of any non-empty `--roles`; (g) `--kind`, `--checklist` and `--orientation` flags.
+  (c) and (g) are new public surface, the factory's argv with its usage rows, `help/loop.md` and the
+  `NEW_ARGV` plants (veto 2). (a) types a lasting declaration: F11's constant is the last step of an
+  effort order whose house default still applies at render, but no later step supplies `shapes`. A
+  `single` role joined to `build`, a `per-unit` entry, would be refused by R9 at its first stage row, and
+  TOOL-dBoundRoles-20 would read that wrong kind, a follow-up (b) leaves none of. (b) reads only the
+  table `write_role` already reads to place the slot (`tools/loop/factories.py#write_workflow_roles`),
+  and the role it writes joins that entry and no stage row, so its `shapes` is the kind its one workflow
+  runs. (f) removes a capability the factory has at HEAD, a stage-less entry listing roles, as
+  `gate-bar` and `research` are. (e) changes S1's kind rows to supply values every gov entry overrides,
+  and its `single` row would hold `none` for both, which is (d)'s output reached with more open
+  questions. In (d), `single`'s cap of 1 meets every agent limit of at least 1, so S3 cannot red, and of
+  the five kinds only `twin` and `experiment` need a field a flagless write cannot supply, `of` and the
+  `[workflow.experiment]` table. R9 grades a role's kind per stage row, and the factory writes none.
+  RESOLVED (agent, 2026-11-22, delegated): (b) and (d), rung 3, the most feature-rich survivors after
+  veto 2. (b) beats (a) by the follow-up it leaves closed, and (d) beats (e) by fewer open questions.
+  What they do not check: that a listed role of a factory-made workflow declares `single`. A role added
+  to an entry with no `kind` is refused rather than given one. Values in §4 Migration; observed by AC8.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -436,6 +518,16 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC3 AC4 AC6 · a fixture 
   value, recorded in `2026-11-22-build-TOOL-dBoundRoles-16-deviation-162`; S7 moves no seed level and
   AC5 reads `effort: high`, its number kept; the `role-efforts` row and the `policy.toml` line of Files
   touched, which restated the move, follow S7; nothing else moved.
+- rev-7 · 2026-11-22 · S2 · §4 Migration · §4 Files touched · AC8 · §7 · §8 F8 · folds
+  `2026-11-22-build-TOOL-dBoundRoles-16-1-builder-return` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-16-spec-fix-1-brief`, grounded at `1a50cffcc`. New F8 decides how the
+  loop kit's factories meet the fields S2 and S5 require: the role factory writes its `--workflow`
+  entry's kind as `shapes`, and the workflow factory writes `kind = "single"` with `checklist` and
+  `orientation` at `none` where it lists a slot, with no new flag. `tools/loop/factories.py` joins Files
+  touched and `tools/loop/README.md` does not, since it names no written value. §4 Migration states the
+  values and the roles README sentence. AC8 is new and observes them. §7 gains `loop factories fixtures`
+  and `tags (the resolver's checks)`, whose role-bindings join the `role.`-scoped unit rows arm. Arm 30's
+  `scratch` entry and `judge` row carry their kinds. Each criterion keeps its number; nothing else moved.
 
 ## 10. Reuse audit
 
