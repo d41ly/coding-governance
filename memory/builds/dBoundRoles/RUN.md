@@ -42,3 +42,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T03:15:02Z draw · re-dispatch · TOOL-dBoundRoles-14 · 2/122 · 20261122T031502Z-cfb5e1
 
 2026-11-22T03:15:02Z dispatch · item 760bfa18 TOOL-dBoundRoles-14 · reason tools/playbook/namespaces.toml tools/playbook/tag_index.py tools/playbook/gov_tag.py tools/playbook/adopt-playbook.sh tools/playbook/README.md tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/handoff.py tools/roles/adopt-roles.test.sh tools/roles/agents tools/roles/README.md help/tags.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-1-acceptance-ledger.md
+
+2026-11-22T03:27:07Z brief · item TOOL-dBoundRoles-14 · reason c710a5e929a3 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-build-brief.md

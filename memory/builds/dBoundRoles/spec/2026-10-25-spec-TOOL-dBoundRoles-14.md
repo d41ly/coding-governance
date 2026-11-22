@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-14 — the `role` and `field` tag namespaces, their extractors and the role binding join
 
-**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0179@f74e2fff whole
 **Carries:** node:tag-namespace.role
@@ -73,8 +73,11 @@ keeps its own `:` separator beside the tag grammar's `.` (research-tags-b F1).
 - **S5** — The role binding join, `check_role_bindings` in `tools/playbook/gov_tag.py`, run by
   `run_check` under `check`: the widening of the rule-tag binding
   (`tools/roles/roles_lib.py#check_rule_tags`) to `role.<slot>` both ways, per §4 "### The binding
-  join". It prints `unarmed` while no indexed unit row names a `role.` selector, never green.
-  Observed by AC2.
+  join". Its units are each indexed unit manifest re-parsed through
+  `instruction_units.parse_unit_rows`, one `Unit` the group of its own `role.` and `practice.`
+  selectors, each manifest's text read by `read_served_text`, a module function of
+  `tools/playbook/tag_index.py` lifted out of `check_namespace_purpose` (§8 F7). It prints `unarmed`
+  while no unit it reads names a `role.` selector, never green. Observed by AC2.
 - **S6** — The cited-but-undeclared join for both namespaces through PLAY-dOrderedCharter-10 S4's
   `check_namespace_joins` (`tools/playbook/tag_index.py#check_namespace_joins`): a `role.` or `field.`
   tag cited anywhere the index reads and declared by no extractor is red, naming the citation's path
@@ -255,10 +258,28 @@ injective and no two keys share a tag. The extractor dedupes a key several workf
 ### The binding join
 
 layer-roles `[tags]` widens the `rules:` binding both ways: a unit's `role.*` scope and each role's
-`rules:` must agree. Read from the index: the units' selector rows as PLAY-dOrderedCharter-10 S4
-reads them, a unit's selectors sharing its `tag` row's path and line
-(`tools/playbook/instruction_units.py#extract_unit`), and the `role` rows' text (S2), read through
-`tools/playbook/tag_index.py#read_text_of`.
+`rules:` must agree. The index holds no grouping of a unit's selectors: `extract_unit` puts its `tag`
+row on the `tag =` line and each selector row on the line of the `scope` entry holding it, so neither a
+shared line nor the nearest `tag` row above groups them, since `scope` may precede `tag`
+(`tools/playbook/instruction_units.py#extract_unit`; §8 F7). The join re-parses instead:
+
+- Its paths are the view's `tag` and `selector` rows whose extractor is one of
+  `tools/playbook/tag_index.py#UNIT_EXTRACTORS`, each path once: the kit manifests and the overlay
+  `extract_repo` serves, and never a change record, whose row is of kind `retired`.
+- Each path's text is `read_served_text(ctx, path)`: the worktree file, which is the served blob,
+  since the view is HEAD plus this worktree's edits and an edited file's blob is a `hash-object`
+  written to no object store (`tools/playbook/tag_index.py#build_overlay`), so no read by blob id
+  reaches it. `check_namespace_purpose` holds that read inline today as `read_served`
+  (`tools/playbook/tag_index.py#check_namespace_purpose`); it is lifted to the module function both
+  call, the cache staying the caller's, rather than copied.
+- Each text goes through `instruction_units.parse_unit_rows(text, path)`
+  (`tools/playbook/instruction_units.py#parse_unit_rows`), its faults left to the schema check. One
+  `Unit` is one group: its `role.` selectors are its `scope` entries with that prefix, and its
+  practices each `<tag>` of a `scope` entry `practice.<tag>`.
+
+A unit is named by its `tag`, or `unit row <index>` when it has none, at `<path>:<line>`, its
+`[[unit]]` header's line. A role's `rules` value is its `role` row's text (S2), read through
+`tools/playbook/tag_index.py#read_text_of`, and a red against a role sits at that row's path and line.
 
 ```
 for each unit u whose scope names role.<slot> and practice.<tag>:
@@ -269,6 +290,7 @@ for each role <slot> whose rules cites <tag>:
 ```
 
 A unit naming `practice.<tag>` and no role selector binds every reader, so it is never a disagreement.
+While no unit read names a `role.` selector, the join prints one `unarmed` line and grades nothing.
 `check_rule_tags` itself is unchanged: it still grades a `rules` value against the charter's
 practices, and this join grades the same value against the units. `run_check`
 (`tools/playbook/gov_tag.py#run_check`) calls the join beside `check_namespace_joins` and adds its
@@ -276,7 +298,7 @@ reds to the run's.
 
 ### Inventory
 
-Minted: the two rows of S1; `extract_role` and `extract_field`; `READ_FAMILIES`, `derive_field_tag`,
+Minted: the two rows of S1; `extract_role` and `extract_field`; `read_served_text`; `READ_FAMILIES`, `derive_field_tag`,
 `parse_read_key` and `derive_stage_field_tag` in `roles_lib.py`; the `--print-tag-rows role|stage`
 mode of `check_roles.py`; `check_role_bindings`; the plants of S8. Naming cells: each function is
 asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass.
@@ -297,7 +319,7 @@ registered namespace's extractor, and on the `roles catalogue` leg for R3.
 ### Files touched (estimate)
 
 - `tools/playbook/namespaces.toml`
-- `tools/playbook/tag_index.py`
+- `tools/playbook/tag_index.py` (the extractors, and `read_served_text` lifted out of `check_namespace_purpose`)
 - `tools/playbook/gov_tag.py`
 - `tools/playbook/adopt-playbook.sh` (the plant rows of S8)
 - `tools/playbook/README.md`
@@ -354,12 +376,18 @@ registered namespace's extractor, and on the `roles catalogue` leg for R3.
   Red when: `extract_role` yields nothing, or yields a kind outside `DEFINE_KINDS`, so both citations
   read undeclared; or the `role` row is absent, so both read `namespace not registered`; or the
   extractor imports the roles library.
-- **AC2** — When `python gov_tag.py --fixture --plant role-binding` runs, a unit scoped
-  `role.gov-builder` and `practice.yagni` beside a `gov-builder` whose `rules` lacks `yagni` exits 1
-  naming the unit; a second unit scoped `practice.verify` and `role.gov-skeptic` beside a
-  `gov-builder` citing `verify` exits 1 naming `role.gov-builder`; with both `rules` values fixed it
-  exits 0.
-  Red when: `check_role_bindings` grades one direction only, so the second plant passes.
+- **AC2** — When `python gov_tag.py --fixture --plant role-binding` runs, its fixture declaring
+  `practice.verify` and `practice.yagni` and holding one unit manifest, the fixture kit's,
+  whose first row is `unit.beta`, its `tag` line before `scope = ["practice.verify", "role.gov-skeptic"]`,
+  and whose second is `unit.alpha`, `scope = ["role.gov-builder", "practice.yagni"]` before its `tag`
+  line, beside a `gov-builder` whose `rules` cites `verify` and not `yagni` and a `gov-skeptic` citing
+  `verify`: it exits 1 with two role-binding reds, one naming `unit.alpha` at its `[[unit]]` line and
+  one naming `role.gov-builder` as citing `verify`, and no role-binding red names `unit.beta`. With
+  `gov-builder`'s `rules` set to `yagni` alone, it exits 0.
+  Red when: `check_role_bindings` grades one direction only, so the `role.gov-builder` red is absent;
+  or it groups selectors by a shared line, so no unit binds a role and the `unit.alpha` red is absent;
+  or by the nearest `tag` row above, so `unit.alpha`'s selectors read as `unit.beta`'s and a red names
+  `unit.beta`.
 - **AC3** — When `python gov_tag.py --fixture --plant field-rows` runs, the index holds
   `field.task.title`, `field.input.spec` and `field.stage.spec-writer`, each once, and a guide citing
   `field.task.titel` exits 1 naming it.
@@ -454,6 +482,19 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC6 · a fixture role whose `
   probe leaves path-only the one form the `role` row can pass, and (a) keeps rev-5's source, the
   brief's non-goal of no change beyond what a divergence forces.
   widens: none · relaxes: none
+- **F7 — How does the binding join group a unit's `role.` and `practice.` selectors, when the index
+  carries no grouping?** `extract_unit` gives each selector row the line of its `scope` entry and the
+  `tag` row its own line, and no row carries the unit's span (the second builder's return
+  `2026-11-22-build-TOOL-dBoundRoles-14-2-builder-return`). Options: (a) `check_role_bindings`
+  re-parses each indexed unit manifest's blob through `instruction_units.parse_unit_rows`, which
+  `gov_tag.py` already imports; (b) `extract_unit` emits each unit's selector rows at its `tag` row's
+  line, or carries the unit's span as the `tag` row's end line; (c) another grouping key. (b) widens
+  Files touched into `tools/playbook/instruction_units.py` and moves the red locations
+  `check_namespace_joins` prints for every selector; (c) names no key the code carries. RESOLVED
+  (agent, 2026-11-22, delegated): (a), rung 3, reuse of a seam already imported; the served text it
+  parses is read by `read_served_text`, lifted out of `check_namespace_purpose` in a file Files touched
+  already names, per §4 "### The binding join".
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -480,6 +521,12 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC6 · a fixture role whose `
   and arm 22 of `adopt-roles.test.sh` read `reads` too, so S4 and S7 name them; `help/tags.md` is the
   registry's user page, so S9 and §5 owe it; the leg is `tags (the resolver's checks)`; §5 states the
   extractor version's subprocess gap; every moved citation re-pointed to a symbol or a pinned line.
+- rev-7 · 2026-11-22 · S5 · §4 The binding join · §4 Inventory · §4 Files touched · AC2 · §8 F7 · §10 ·
+  by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-fix-2-brief`, folding the divergence of
+  `2026-11-22-build-TOOL-dBoundRoles-14-2-builder-return`: the join re-parses each indexed unit
+  manifest through `parse_unit_rows`, one `Unit` per group, its text read by `read_served_text`, lifted
+  out of `check_namespace_purpose`; AC2's fixture puts `scope` before `tag` so a line-keyed or
+  nearest-tag grouping reds it; nothing else moved.
 
 ## 10. Reuse audit
 
@@ -492,7 +539,10 @@ TOOL-dDeclaredLoop-18 S1-S6 as the copied pattern and `extract_step`, `extract_l
 `check_rule_tags` (`#check_rule_tags`) and R3 (`tools/roles/check_roles.py@760bfa18:209-222`), each
 re-read at `760bfa18`; the kit reaches the roles kit through the `resolve_kit_dir` copy
 `tools/playbook/tag_index.py#load_memory_tree` already imports from `policy_value.py`, and the plants
-extend `tools/playbook/gov_tag.py#SHAPE_PLANTS`. The task's recall named TOOL-dBoundRoles-6 and
+extend `tools/playbook/gov_tag.py#SHAPE_PLANTS`. The binding join reuses `parse_unit_rows`
+(`tools/playbook/instruction_units.py#parse_unit_rows`), the one manifest parser, through the
+`instruction_units` import `gov_tag.py` already holds (`tools/playbook/gov_tag.py@71b54e13:42`), and the
+served-text read of `tools/playbook/tag_index.py#check_namespace_purpose`, lifted, never copied (§8 F7). The task's recall named TOOL-dBoundRoles-6 and
 TOOL-dWitnessedBar-23, the unit that added `gov-tester`, the eleventh role file. `python
 tools/codebase-map/reuse_lookup.py "register a tag namespace for role slots and read-key fields"` ranked
 generic name stems at rev-1, before the registry existed; at rev-6, `python

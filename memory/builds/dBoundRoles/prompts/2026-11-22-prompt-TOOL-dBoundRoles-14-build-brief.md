@@ -21,6 +21,10 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   kind `tag`, a path-only `purpose-source` (§8 F6), and three readers rev-5 missed (`handoff.py` render's input check,
   `adopt-roles.test.sh` arm 22, `help/tags.md`). Its citations are re-pointed at HEAD `760bfa18`; still verify each claim
   about current code against source before building on it, and hand a claim that no longer holds back as a divergence.
+- Rev-7 then folded the second builder's divergence
+  (`build/2026-11-22-build-TOOL-dBoundRoles-14-2-builder-return.md`): the binding join re-parses each unit manifest
+  through `instruction_units.parse_unit_rows` (§8 F7), reading its text through a `read_served_text(ctx, path)` helper
+  lifted out of `check_namespace_purpose` in `tag_index.py`.
 - §5 discloses one gap left open on purpose: the index's extractor version does not hash `check_roles.py` or
   `roles_lib.py`, so an edit to either leaves cached rows stale until `gov_tag.py --rebuild`. Do not close it here.
 

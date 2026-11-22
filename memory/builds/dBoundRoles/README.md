@@ -97,7 +97,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dBoundRoles-14 — the `role` and `field` tag namespaces, their extractors and the role binding join](spec/2026-10-25-spec-TOOL-dBoundRoles-14.md) | 1 | 2 | INPROGRESS | rev-6 | 2026-11-22 |
+| [TOOL-dBoundRoles-14 — the `role` and `field` tag namespaces, their extractors and the role binding join](spec/2026-10-25-spec-TOOL-dBoundRoles-14.md) | 1 | 2 | INPROGRESS | rev-7 | 2026-11-22 |
 | [TOOL-dBoundRoles-2 — each role's static instructions as structured fields: the never list with its enforcers, the ceiling and the typed return](spec/2026-10-25-spec-TOOL-dBoundRoles-2.md) | 2 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles](spec/2026-10-25-spec-TOOL-dBoundRoles-1.md) | 3 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-21 — the effort and model keys, `default` reserved, and the gate grant a role field, every reader re-pointed](spec/2026-10-25-spec-TOOL-dBoundRoles-21.md) | 4 | 2 | DEFERRED | rev-4 | 2026-11-22 |
