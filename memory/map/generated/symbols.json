@@ -14323,6 +14323,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "derive_stage_map",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "derive_stage_rows",
       "kind": "function",
       "file": "tools/loop/termination.py"
@@ -20951,6 +20956,11 @@
       "id": "read_advertised_tip",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_agent_limit",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "read_agent_members",

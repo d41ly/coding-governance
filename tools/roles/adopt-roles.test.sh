@@ -46,7 +46,10 @@
 # in either spelling, a misspelt `field.` tag named and a bare `field.card.reuse` refused (arm 26); and the
 # policy keys `roles.effort.<role>` and `roles.model.<role>.<harness>` read before the house file through a
 # copied policy kit, a role's `gates` field beating its house row, the reserved `default` slot, and an
-# absent house file falling to the declared effort (arm 29). Every arm is a self-contained block below the prologue, so a
+# absent house file falling to the declared effort (arm 29); and the stage rows of `workflows.toml` graded as
+# R9, a two-stage mixed-role entry clean, a zero fan, an unknown effort and an unknown row kind refused with
+# and without the loop kit's `kinds` verb, a cap above a committed `runtime.agents-in-flight` refused, and
+# the rows' declared levels read with no house file and no key (arm 30). Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 25
 # arm 9's writer and lines.
 #
@@ -114,7 +117,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +6 for arm 27 (TOOL-dBoundRoles-2).
 # +3 for arm 28 (TOOL-dBoundRoles-1).
 # +6 for arm 29 (TOOL-dBoundRoles-21).
-FLOOR_ASSERTIONS=94
+# +8 for arm 30 (TOOL-dBoundRoles-22).
+FLOOR_ASSERTIONS=102
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -331,8 +335,8 @@ sys.stdout.buffer.write(("build: stage %s would run at " % sorted(roles)[0]).enc
   check_arm "arm 6 a harness call over the rendered index is admitted at the profile's levels, refused with none naming the stage, and admitted at the default levels on an unmatched model" "$_a6ok"
   [ "$_a6ok" = 1 ] || { echo "    exits: $_a6h"; sed 's/^/    /' "$TMP_ROOT/a6w.err" "$TMP_ROOT"/a6.w?.hook; }
   # ...and the rendered tables against the verbs and the agent files, for every workflow whose entry
-  # in the fixture kit's `workflows.toml` holds a `stages` table, read here by `tomllib` and never
-  # through the kit. Against a renderer resolving a profile's `stages` with no model, the tfam
+  # in the fixture kit's `workflows.toml` holds `[[workflow.stages]]` rows (TOOL-dBoundRoles-22), read
+  # here by `tomllib` and never through the kit. Against a renderer resolving a profile's `stages` with no model, the tfam
   # table is the default one and the second comparison fails. No staged workflow fails the arm.
   out=$("$PY" -B -c 'import json, pathlib, subprocess, sys, tomllib
 fx, kit = pathlib.Path(sys.argv[1]), sys.argv[2]
@@ -340,10 +344,10 @@ def verb(*a):
     return json.loads(subprocess.run([sys.executable, "-B", kit + "/handoff.py", *a], cwd=str(fx),
                                      capture_output=True, check=True).stdout.decode("utf-8"))
 with open(fx / kit / "workflows.toml", "rb") as fh:
-    staged = [w for w in tomllib.load(fh)["workflow"] if isinstance(w.get("stages"), dict)]
+    staged = [w for w in tomllib.load(fh)["workflow"] if isinstance(w.get("stages"), list) and w["stages"]]
 with open(fx / ".claude" / "roles.json", encoding="utf-8") as fh:
     e = json.load(fh)["effort"]
-bad = [] if staged else ["no workflow of workflows.toml holds a stages table"]
+bad = [] if staged else ["no workflow of workflows.toml holds a stage row"]
 def level(slot):
     lines = (fx / ".claude" / "agents" / (slot + ".md")).read_text(encoding="utf-8").split("\n")
     return next((ln[len("effort: "):] for ln in lines if ln.startswith("effort: ")), None)
@@ -353,7 +357,7 @@ for w in staged:
         bad.append("default.stages.%s is not what stage-efforts prints" % name)
     if e["profiles"]["tfam"]["stages"].get(name) != verb("stage-efforts", name, "--model", "vendor-tfam-9"):
         bad.append("profiles.tfam.stages.%s is not what stage-efforts --model vendor-tfam-9 prints" % name)
-    for key, slot in w["stages"].items():
+    for key, slot in ((r["key"], r["role"]) for r in w["stages"]):
         want = level(slot)
         if want is None or e["unset"].get(name, {}).get(key) != want or e["default"]["roles"].get(slot) != want:
             bad.append("unset.%s.%s or default.roles.%s is not the effort line of %s.md, %r" % (name, key, slot, slot, want))
@@ -940,7 +944,8 @@ if what == "roles":
         out = {s: level(s) for s, r in json.load(fh)["roles"].items() if r["agent"]}
 else:
     with open(kit / "workflows.toml", "rb") as fh:
-        stages = next(w["stages"] for w in tomllib.load(fh)["workflow"] if w["name"] == what)
+        stages = {r["key"]: r["role"] for r in next(w["stages"] for w in tomllib.load(fh)["workflow"]
+                                                     if w["name"] == what)}
     over = effort.get("stages", {}).get(what, {})
     out = {k: over.get(k, level(s)) for k, s in stages.items()}
 sys.stdout.buffer.write((json.dumps(out, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8"))'
@@ -1419,6 +1424,134 @@ check_arm "arm 29 a role file whose slot is default is one R2 line naming the re
 check_arm "arm 29 an absent house file falls to the declared effort and is no R12 line" \
    "$([[ $A29 == *'ac6 1'* ]] && echo 1 || echo 0)"
 [ "$A29" = $'ac2 1\nac3 1\nac1 1\nac4 1\nac5 1\nac6 1' ] || printf '    %s\n' "${A29//$'\n'/$'\n'    }"
+
+# ---- arm 30 (TOOL-dBoundRoles-22 AC2 AC4 AC5, and AC3's house-less half): the stage rows graded as R9,
+# ---- and a row's declared effort read after the keys and the house file. The fixture adds the workflow
+# ---- `scratch` the way the loop kit's workflow factory adds one, its name to the copied checker's
+# ---- WORKFLOW_NAMES and its row to the copied loop definition, so R6 places it; its two stage rows are
+# ---- `scout` as gov-reuse-scout and `judge` as gov-skeptic. A plant rewrites `judge` alone. The fixture's
+# ---- loop kit holds no `upstream.py` (a01362eb0's kit answers no `kinds` verb either), so the row kinds
+# ---- fall to the seg shape; a stub `upstream.py` answering `kinds` stands for the verb §8 F5 asked of
+# ---- dDeclaredLoop. The policy kit is copied, and each limit committed on `main`, as arm 29 does. The
+# ---- failing cases, owed at the close and not observed by the pass that wrote this: a stage map typed
+# ---- per entry admitting one role (ac2), the row fields read without validation (ac4a, ac4b), the
+# ---- kinds verb unread (ac4b), the cap compared with a literal (ac5d), and the row's effort read after
+# ---- the role's declaration (ac3), the house file deleted last, so every plant above reads it.
+# ---- WHAT IT DOES NOT CHECK: a refusing policy reader, a repeated key, a row on a non-workflow driver,
+# ---- or `receives` against the kinds; nor the real loop kit's `kinds` verb, which has not landed.
+build_fixture; _rc30=$?
+_pk=policy; [[ $FXK == */* ]] && _pk=${FXK%/*}/policy
+A30=$("$PY" -B -c 'import json, os, pathlib, re, shutil, subprocess, sys, tomllib
+fx, kit, loop, policy_src, policy_dst = (pathlib.Path(a).resolve() for a in sys.argv[1:6])
+env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_") and k != "GOV_DEFAULT_BRANCH"}
+def git(*a):
+    return subprocess.run(["git", "-c", "user.name=fx", "-c", "user.email=fx@fx", "-C", str(fx), *a], env=env,
+                          capture_output=True, text=True).returncode
+def run(*a):
+    p = subprocess.run([sys.executable, "-B", *a], cwd=str(kit), env=env, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    return p.returncode, p.stdout.strip()
+def check():
+    rc, out = run("check_roles.py", "--root", str(fx))
+    return rc, out, [ln for ln in out.splitlines() if ": R9 — " in ln]
+ENTRY = """
+[[workflow]]
+name = "scratch"
+driver = "workflow"
+harness = "{prefix}/workflows/scratch.js"
+roles = ["gov-reuse-scout", "gov-skeptic"]
+enforced-by = ["agent-cap.js spawn guard"]
+trigger = "any time this arm plants it"
+"""
+ROW = """
+[[workflow.stages]]
+key = "%s"
+role = "%s"
+fan = %s
+cap = %s
+effort = "%s"
+receives = %s
+returns = %s
+"""
+STUB = """import sys
+if sys.argv[1:] != ["kinds"]:
+    sys.exit(2)
+for kind in ("seam", "criterion", "interface", "fork", "finding", "repair"):
+    print(kind)
+"""
+table, checker = kit / "workflows.toml", kit / "check_roles.py"
+held = table.read_text(encoding="utf-8")
+def plant(fan=1, cap=1, effort="medium", returns=("finding",)):
+    table.write_text(held + ENTRY + ROW % ("scout", "gov-reuse-scout", 1, 1, "medium", "[]", json.dumps(["seam"]))
+                     + ROW % ("judge", "gov-skeptic", fan, cap, effort, json.dumps(["seam"]), json.dumps(list(returns))),
+                     encoding="utf-8")
+def commit(n):
+    (fx / ".governance").mkdir(exist_ok=True)
+    (fx / ".governance" / "policy.toml").write_text("runtime.agents-in-flight = %d\n" % n, encoding="utf-8")
+    return git("add", "-A") == 0 and git("commit", "-q", "--allow-empty", "-m", "limit %d" % n) == 0
+text = checker.read_text(encoding="utf-8")
+added = text.replace("WORKFLOW_NAMES = (", "WORKFLOW_NAMES = (%s, " % json.dumps("scratch"), 1)
+checker.write_text(added, encoding="utf-8")
+with open(loop / "loop.toml", "a", encoding="utf-8") as fh:
+    fh.write("\n[[workflow]]\nname = %s\norder = 0\nstep = %s\n" % (json.dumps("scratch"), json.dumps("none")))
+plant()
+ok = added != text and git("symbolic-ref", "HEAD", "refs/heads/main") == 0 \
+    and run("check_roles.py", "--root", str(fx), "--write")[0] == 0
+rc, out, r9 = check()
+args = run("handoff.py", "harness-args", "scratch")[1]
+print("ac2 %d" % int(ok and rc == 0 and not r9
+                     and args == json.dumps({"judge": "gov-skeptic", "scout": "gov-reuse-scout"}, separators=(",", ":"))))
+plant(fan=0, effort="huge", returns=("bug",))
+rc, out, r9 = check()
+print("ac4a %d" % int(rc == 1 and len(r9) == 2 and all("stage judge" in ln for ln in r9)
+                      and any("fan 0 " in ln for ln in r9) and any("huge" in ln for ln in r9)
+                      and "seg shape alone" in out))
+(loop / "upstream.py").write_text(STUB, encoding="utf-8")
+rc, out, r9 = check()
+(loop / "upstream.py").unlink()
+print("ac4b %d" % int(rc == 1 and len(r9) == 3 and all("stage judge" in ln for ln in r9)
+                      and any("bug" in ln for ln in r9) and "seg shape alone" not in out))
+plant(cap=7)
+rc, out, r9 = check()
+print("ac5a %d" % int(rc == 0 and not r9 and "stage cap arm is unarmed" in out))
+shutil.copytree(policy_src, policy_dst, dirs_exist_ok=True)
+rc, out, r9 = check() if commit(6) else (None, "", [])
+print("ac5b %d" % int(rc == 1 and len(r9) == 1
+                      and all(s in r9[0] for s in ("stage judge", "caps 7 agents", "agents-in-flight 6"))))
+plant(cap=6)
+rc, out, r9 = check()
+print("ac5c %d" % int(rc == 0 and not r9 and "against runtime.agents-in-flight 6," in out))
+rc, out, r9 = check() if commit(5) else (None, "", [])
+print("ac5d %d" % int(rc == 1 and any(all(s in ln for s in ("stage judge", "caps 6 agents", "agents-in-flight 5"))
+                                      for ln in r9)))
+(kit / "house" / "policy.toml").unlink()
+with open(table, "rb") as fh:
+    rows = next(w["stages"] for w in tomllib.load(fh)["workflow"] if w["name"] == "spec-write")
+def declared(slot):
+    text = (kit / "agents" / (slot + ".agent.md")).read_text(encoding="utf-8")
+    return re.search(r"(?m)^effort: *(.*?)\r?$", text.split("\n---", 1)[0]).group(1)
+got = json.loads(run("handoff.py", "stage-efforts", "spec-write")[1] or "{}")
+print("ac3 %d" % int(got == {r["key"]: r["effort"] for r in rows}
+                     and any(r["effort"] != declared(r["role"]) for r in rows)))
+' "$FX" "$FX/$KREL" "$FX/$FXL" "$HERE/../policy" "$FX/$_pk" 2>&1)
+A30=${A30//$'\r'/}
+check_arm "arm 30 a two-stage mixed-role entry grades no R9 line, and harness-args maps both keys to their roles" \
+   "$([ "$_rc30" = 0 ] && [[ $A30 == *'ac2 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 30 a zero fan and an unknown effort are two R9 lines naming the stage, and the seg-shape note, with no kinds verb" \
+   "$([[ $A30 == *'ac4a 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 30 ...and beside a loop kit answering kinds, the unknown row kind is the third" \
+   "$([[ $A30 == *'ac4b 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 30 with no policy kit a cap of 7 grades no R9 line and the cap arm prints unarmed" \
+   "$([[ $A30 == *'ac5a 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 30 a cap of 7 over a committed limit of 6 is one R9 line naming judge, 7 and 6" \
+   "$([[ $A30 == *'ac5b 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 30 ...a cap of 6 exits 0, the summary naming the limit" \
+   "$([[ $A30 == *'ac5c 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 30 ...and the limit lowered to 5 reds the cap of 6" \
+   "$([[ $A30 == *'ac5d 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 30 with the house file deleted and no key set, stage-efforts prints the rows' declared levels, one differing from its role's" \
+   "$([[ $A30 == *'ac3 1'* ]] && echo 1 || echo 0)"
+[ "$A30" = $'ac2 1\nac4a 1\nac4b 1\nac5a 1\nac5b 1\nac5c 1\nac5d 1\nac3 1' ] || printf '    %s\n' "${A30//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

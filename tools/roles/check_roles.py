@@ -51,9 +51,17 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
   R7  a role whose `workflow` names no entry, or whose entry does not list it
   R8  a `roles` entry naming no role file; an agent or workflow driver with no role; a role file no
       entry lists
-  R9  a workflow driver whose harness is not a `{prefix}/<home>/<file>.js` path; a `stages` table on
-      another driver, a key outside its pattern, or a value outside the entry's roles or naming an
-      `agent: false` role. A well-formed harness the tree does not hold prints one `roles: note:`
+  R9  a workflow driver whose harness is not a `{prefix}/<home>/<file>.js` path, or that declares no
+      `[[workflow.stages]]` row; stage rows on another driver, or a `stages` that is no array of
+      tables; and per row (TOOL-dBoundRoles-22 S4), a `key` outside its pattern or repeated in its
+      entry, a `role` outside the entry's roles or naming an `agent: false` role, a `fan` or `cap`
+      that is not an integer of at least 1, an `effort` outside the five levels, a `receives` or
+      `returns` that is no list or holds an entry outside the loop kit's row kinds, and a `cap` above
+      `runtime.agents-in-flight` (TOOL-dBoundRoles-22 S5), each one line naming the entry and the
+      stage. The row kinds are what the loop kit's `upstream.py kinds` prints; where it does not
+      answer, each entry is graded by the `seg` shape alone and one `roles: note:` says so. With no
+      policy kit the cap arm prints one `roles: note:` calling it unarmed and grades no cap. A
+      well-formed harness the tree does not hold prints one `roles: note:`
   R10 a house overlay naming no role, or carrying a `# `/`## ` line, a token other than
       {{MEMORY_ROOT}}, or the file name of a protocol the charter's Protocols section names
   R11 the README's catalogue region absent, or different from a fresh render
@@ -62,7 +70,7 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       level then falls to the policy keys and the role's declared `effort` (TOOL-dBoundRoles-21 S7);
       an unknown key, no `default`, a level outside the five, a role entry
       naming no role file or an `agent: false` role, a stages table naming no workflow or a
-      workflow with no stages, or a stage key that workflow does not hold; under
+      workflow with no stage rows, or a stage key that workflow's rows do not hold; under
       `effort.profiles`, a profile that is not a table, any of those defects in its own `default`,
       `roles` and `stages`, or a `match` that is absent, not a list of strings, empty, holding an
       entry that is not one word, or holding a word an earlier profile holds
@@ -105,9 +113,13 @@ designing in this pass") passes; R14 does not compare an `output` with where the
 actually writes; and a `mandatory` value's when-clause is never tested for truth. R15 does not check
 whether the tool truly could not spawn, whether the `owner` who signed a row is the owner, whether a
 reason says anything, whether a marker's build matches its folder, an inline stand-in nobody
-declared, or a declared stand-in that was in fact spawned, which is harmless overstatement.
+declared, or a declared stand-in that was in fact spawned, which is harmless overstatement. R9 does
+not compare a stage row's `fan` or `cap` with the harness literal it states, nor `cap` with `fan`,
+nor whether a stage truly takes and hands on the row kinds it names, nor a key a row adds beside its
+seven fields.
 """
 import json
+import os
 import pathlib
 import re
 import subprocess
@@ -157,6 +169,9 @@ HOOK_ENTRY_RE = re.compile(r"^[^\s/\\]+\.js(?=[\s,]|$)")
 #: A backticked path ending in `.md` in the carried Protocols body: a protocol's file.
 PROTOCOL_PATH_RE = re.compile(r"`([^`\s]*\.md)`")
 STAGE_KEY_RE = re.compile(r"^[a-z][A-Za-z]*$")
+#: A row kind's shape where the loop kit does not print its closed set: one tag segment, the loop kit's
+#: `loop_lib.py#SEG` spelled again, since a kit imports no sibling kit (TOOL-dBoundRoles-22 §4).
+ROW_KIND_SEG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 JS_HARNESS_RE = re.compile(r"^\{prefix\}/[^/{}\s]+/[^/{}\s]+\.js$")
 REGION_OPEN, REGION_CLOSE = "<!-- gen:roles-catalogue -->", "<!-- /gen:roles-catalogue -->"
 
@@ -180,7 +195,8 @@ def render_catalogue_region(roles, workflows):
     """The two tables between the region markers, in file order."""
     out =["", "**Workflows**, from `workflows.toml`:", "",
            "| " + " | ".join(WORKFLOW_KEYS) + " |", "|" + "---|" * len(WORKFLOW_KEYS)]
-    out += ["| " + " | ".join(render_cell(w.get(k)) for k in WORKFLOW_KEYS) + " |" for w in workflows]
+    out += ["| " + " | ".join(render_cell(lib.derive_stage_map(w) if k == "stages" else w.get(k))
+                              for k in WORKFLOW_KEYS) + " |" for w in workflows]
     cols = ("workflow", "writes", "reads", "rules", "agent", "return")
     out += ["", "**Roles**, from `agents/*.agent.md`:", "",
             "| role | " + " | ".join(cols) + " |", "|" + "---|" * (len(cols) + 1)]
@@ -380,6 +396,35 @@ def check_roles(root, kit_dir, write=False):
         workflows = []
     if not workflows:
         add_defect(table, "R1", "DEAD PROBE: no workflow entry, so this check graded nothing")
+    # THE STAGE ROWS' TWO OUTSIDE READS (TOOL-dBoundRoles-22 S4, S5), each once per run: the agent limit a
+    # `cap` is graded against, and the loop kit's closed set of row kinds, by its `kinds` verb.
+    limit, limit_why = None, None
+    try:
+        limit = lib.read_agent_limit(root)
+    except lib.RolesError as e:
+        add_defect(table, "R9", "the agent limit does not read, so no stage cap is graded: %s" % e)
+        limit_why = "refused"
+    if limit is None and limit_why is None:
+        limit_why = "unarmed"
+        notes.append("roles: note: the stage cap arm is unarmed — no policy kit answers runtime.agents-in-flight, "
+                     "so no stage row's cap is graded")
+    kinds, kinds_why = None, None
+    try:
+        loop_kit = lib.resolve_kit_dir("loop", "upstream.py", kit_dir)
+        p = subprocess.run([sys.executable, "-B", str(loop_kit / "upstream.py"), "kinds"], cwd=str(root),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           stdin=subprocess.DEVNULL, timeout=60,
+                           env={k: v for k, v in os.environ.items() if not k.startswith("GIT_")})
+        printed = [ln.strip() for ln in (p.stdout or "").splitlines() if ln.strip()]
+        if p.returncode == 0 and printed:
+            kinds = printed
+        else:
+            kinds_why = "its upstream.py kinds exited %d printing no kind" % p.returncode
+    except LookupError as e:
+        kinds_why = str(e)
+    except (OSError, subprocess.SubprocessError) as e:
+        kinds_why = "its upstream.py kinds did not run: %s" % e
+    n_stage_rows, kinds_noted = 0, False
     by_name = {}
     for i, w in enumerate(workflows, 1):
         where = "entry %d (%s)" % (i, w.get("name", "unnamed"))
@@ -421,19 +466,54 @@ def check_roles(root, kit_dir, write=False):
                 if not held:
                     notes.append("roles: note: %s harness %s is not held by this tree" % (where, harness))
         stages = w.get("stages")
-        if stages is not None:
-            if w.get("driver") != "workflow":
-                add_defect(table, "R9", "%s carries a stages table on a '%s' driver" % (where, w.get("driver")))
-            elif not isinstance(stages, dict):
-                add_defect(table, "R9", "%s stages is not a table" % where)
-            else:
-                for key, slot in stages.items():
-                    if not STAGE_KEY_RE.match(key):
-                        add_defect(table, "R9", "%s stage key '%s' does not match %s" % (where, key, STAGE_KEY_RE.pattern))
-                    if slot not in listed:
-                        add_defect(table, "R9", "%s stage %s maps to '%s', which its roles do not list" % (where, key, slot))
-                    elif slot in roles and roles[slot]["keys"].get("agent", "true") == "false":
-                        add_defect(table, "R9", "%s stage %s maps to '%s', an agent: false role" % (where, key, slot))
+        if stages is None:
+            if w.get("driver") == "workflow":
+                add_defect(table, "R9", "%s is driven by a workflow and declares no [[workflow.stages]] row, "
+                           "so no harness stage takes a role" % where)
+        elif w.get("driver") != "workflow":
+            add_defect(table, "R9", "%s carries stage rows on a '%s' driver" % (where, w.get("driver")))
+        elif not isinstance(stages, list) or not stages or not all(isinstance(r, dict) for r in stages):
+            add_defect(table, "R9", "%s stages is not a non-empty array of [[workflow.stages]] tables" % where)
+        else:
+            seen_keys = set()
+            for row in stages:
+                n_stage_rows += 1
+                key = row.get("key")
+                stage = "%s stage %s" % (where, key if isinstance(key, str) else repr(key))
+                if not isinstance(key, str) or not STAGE_KEY_RE.match(key):
+                    add_defect(table, "R9", "%s: key %r does not match %s" % (stage, key, STAGE_KEY_RE.pattern))
+                elif key in seen_keys:
+                    add_defect(table, "R9", "%s: the key is repeated in its entry" % stage)
+                seen_keys.add(key if isinstance(key, str) else None)
+                slot = row.get("role")
+                if slot not in listed:
+                    add_defect(table, "R9", "%s maps to %r, which its roles do not list" % (stage, slot))
+                elif slot in roles and roles[slot]["keys"].get("agent", "true") == "false":
+                    add_defect(table, "R9", "%s maps to '%s', an agent: false role" % (stage, slot))
+                for field in ("fan", "cap"):
+                    v = row.get(field)
+                    if not isinstance(v, int) or isinstance(v, bool) or v < 1:
+                        add_defect(table, "R9", "%s: %s %r is not an integer of at least 1" % (stage, field, v))
+                if row.get("effort") not in lib.EFFORT_LEVELS:
+                    add_defect(table, "R9", "%s: effort %r is not one of %s"
+                               % (stage, row.get("effort"), " ".join(lib.EFFORT_LEVELS)))
+                for field in ("receives", "returns"):
+                    v = row.get(field)
+                    if not isinstance(v, list) or not all(isinstance(x, str) for x in v):
+                        add_defect(table, "R9", "%s: %s %r is not a list of row kinds" % (stage, field, v))
+                        continue
+                    if kinds is None and v and not kinds_noted:
+                        kinds_noted = True
+                        notes.append("roles: note: no loop kit prints its row kinds, so each stage row's "
+                                     "receives and returns are graded by the seg shape alone: %s" % kinds_why)
+                    off = [x for x in v if (x not in kinds if kinds is not None else not ROW_KIND_SEG_RE.match(x))]
+                    if off:
+                        add_defect(table, "R9", "%s: %s holds %s, outside the row kinds %s" % (
+                            stage, field, ", ".join(repr(x) for x in off),
+                            " ".join(kinds) if kinds is not None else "(the seg shape %s)" % ROW_KIND_SEG_RE.pattern))
+                cap = row.get("cap")
+                if limit is not None and isinstance(cap, int) and not isinstance(cap, bool) and cap > limit:
+                    add_defect(table, "R9", "%s caps %d agents, above runtime.agents-in-flight %d" % (stage, cap, limit))
     for name in WORKFLOW_NAMES:
         if workflows and name not in by_name:
             add_defect(table, "R6", "the workflow '%s' has no entry" % name)
@@ -529,11 +609,13 @@ def check_roles(root, kit_dir, write=False):
     if problem:
         add_defect(readme, "R11", problem)
 
-    summary = ("roles: graded %d roles, %d overlays, %d workflows, %d reads keys, %d mandatory roles, "
+    summary = ("roles: graded %d roles, %d overlays, %d workflows, %d stage rows against "
+               "runtime.agents-in-flight %s, %d reads keys, %d mandatory roles, "
                "%d writer outputs, %d never entries (%d unenforced), %d rule tags and %d protocol file "
                "names against %s, a %s charter; roles by layer %s, by acts-as %s; "
                "overlay bytes %s; %d stand-in waiver(s), %d stand-in declaration(s); %d defect(s)" % (
-                   len(files), len(overlays), len(workflows), n_reads, n_mandatory, n_outputs, n_never,
+                   len(files), len(overlays), len(workflows), n_stage_rows,
+                   limit if limit is not None else limit_why, n_reads, n_mandatory, n_outputs, n_never,
                    n_unenforced, n_rules,
                    len(protocol_files), doc,
                    "tagged" if charter["shape"] == "tagged" else "pre-tag",
@@ -549,8 +631,9 @@ def print_tag_rows(mode, text):
     `{"tag", "line", "text"}`, of the text handed on stdin and of nothing else, so the tag index's rows
     stay keyed by committed blob. `role`: a role file's `role.<name>` at its `name:` line, its text the
     raw `rules` value, through `parse_front_matter`. `stage`: each distinct stage key of every
-    `[[workflow]]` entry's `stages`, `derive_stage_field_tag`'s fold at the first `stages` line carrying
-    it, its text the key. The rows are not validated: a malformed name is the shape check's to red.
+    `[[workflow]]` entry's stage rows, through `derive_stage_map`, `derive_stage_field_tag`'s fold at the
+    first `key =` line of a `[[workflow.stages]]` row carrying it (TOOL-dBoundRoles-22 S2), its text the
+    key. The rows are not validated: a malformed name is the shape check's to red.
     A text that does not parse prints the defect on stderr, exit 2."""
     text = text.replace("\r\n", "\n")
     rows = []
@@ -569,18 +652,24 @@ def print_tag_rows(mode, text):
         except tomllib.TOMLDecodeError as e:
             print("roles: <stdin>: R6 — not valid TOML — %s" % e, file=sys.stderr)
             return 2
-        lines, seen = text.split("\n"), set()
+        # the line of each row's `key =`, read inside a `[[workflow.stages]]` table only, first one wins
+        at, table = {}, None
+        for i, ln in enumerate(text.split("\n"), 1):
+            head = re.match(r"\s*\[\[?\s*([^\]]*?)\s*\]\]?", ln)
+            if head:
+                table = head.group(1)
+                continue
+            m = re.match(r"""\s*key\s*=\s*(["'])(.*?)\1""", ln)
+            if table == "workflow.stages" and m:
+                at.setdefault(m.group(2), i)
+        seen = set()
         for entry in entries if isinstance(entries, list) else ():
-            stages = entry.get("stages") if isinstance(entry, dict) else None
-            for key in stages if isinstance(stages, dict) else ():
+            for key in lib.derive_stage_map(entry):
                 tag = lib.derive_stage_field_tag(key)
                 if tag in seen:
                     continue
                 seen.add(tag)
-                held = re.compile(r"(?<![\w-])%s\s*=" % re.escape(key))
-                n = next((i for i, ln in enumerate(lines, 1)
-                          if re.match(r"\s*stages\s*=", ln) and held.search(ln)), 1)
-                rows.append({"tag": tag, "line": n, "text": key})
+                rows.append({"tag": tag, "line": at.get(key, 1), "text": key})
     for row in rows:
         print(json.dumps(row, ensure_ascii=False))
     return 0

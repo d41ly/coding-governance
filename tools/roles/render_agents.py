@@ -251,8 +251,9 @@ def derive_effort_index(policy, roles, workflows, tool_root, target_root):
     role's level, and `stages`, each stage key's level for every `workflow`-driver workflow, a
     profile's read with its first `match` word as the model and its `match` beside them;
     `harnesses` maps each listed harness, spelled as `derive_harness_paths` spells it, to the
-    sorted names of the workflows it runs; `unset` holds each stage key's slot's rendered level.
-    A driven workflow with no `stages` table keeps its harness and reads `{}` in every `stages`
+    sorted names of the workflows it runs; `unset` holds each stage key's slot's rendered level, the
+    keys and slots `derive_stage_map` reads from the stage rows (TOOL-dBoundRoles-22 S2).
+    A driven workflow with no stage rows keeps its harness and reads `{}` in every `stages`
     map and in `unset` (TOOL-aGuardedEffort-2 S3): the spawn guard holds the maps to one
     population of stage keys, and a missing entry is a broken index to it."""
     slots = [s for s, r in roles.items() if r["keys"].get("agent", "true") == "true"]
@@ -272,7 +273,7 @@ def derive_effort_index(policy, roles, workflows, tool_root, target_root):
             "profiles": {n: dict(tables[n], match=list(p["match"])) for n, p in profiles.items()},
             "harnesses": {rel: sorted(names) for rel, names in runs.items()},
             "unset": {w["name"]: {key: lib.resolve_effort(policy, slot, None, target_root)
-                                  for key, slot in (w.get("stages") or {}).items()} for w in driven}}
+                                  for key, slot in lib.derive_stage_map(w).items()} for w in driven}}
 
 
 def render_roles_index(roles, harnesses, policy, manifest, effort):
@@ -676,7 +677,7 @@ def run_selftest():
                   "an absent harness is not listed in harnesses at the resolver's path")
         check_arm(state, 10, all((agents / (s + ".md")).is_file() for s in ("r-one", "r-two")),
                   "a write noting an absent harness did not write every type")
-        # Arm 20 (TOOL-aGuardedEffort-2 S3): `w5` above is a driven workflow with no `stages` table.
+        # Arm 20 (TOOL-aGuardedEffort-2 S3): `w5` above is a driven workflow with no stage rows.
         effort = index.get("effort", {})
         check_arm(state, 20, "w5" in effort.get("harnesses", {}).get(missing, []),
                   "a stageless driven workflow left effort.harnesses")
@@ -930,8 +931,12 @@ def run_selftest():
         ven = fam + '\n[effort.profiles.ven]\nmatch = ["vendor", "vend2"]\ndefault = "medium"\n'
         kit, tool_root = build_fixture(root, roles, fam)
         with open(kit / "workflows.toml", "a", encoding="utf-8") as fh:
+            # Two stage rows (TOOL-dBoundRoles-22 S2), each declaring `low`, a level no expected stage
+            # map below holds, so a resolver reading a row's effort before the house file reds 19a.
             fh.write('\n[[workflow]]\nname = "w5"\ndriver = "workflow"\nharness = "%s"\n'
-                     'stages = { k1 = "r-one", k2 = "r-two" }\n' % FIXTURE_HARNESS)
+                     % FIXTURE_HARNESS + "".join(
+                         '\n[[workflow.stages]]\nkey = "%s"\nrole = "%s"\nfan = 1\ncap = 1\neffort = "low"\n'
+                         'receives = []\nreturns = []\n' % kr for kr in (("k1", "r-one"), ("k2", "r-two"))))
         w5 = lib.load_workflows(kit)[-1]
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             rc = run_mode("write", kit, tool_root, root)
