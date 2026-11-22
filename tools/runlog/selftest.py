@@ -354,7 +354,12 @@ from collections import Counter  # noqa: E402
 # owner's cap at 30 and its absence (AC5); and the empty dir's DEAD PROBE (AC6). Its decoy checks move
 # it by 3.
 # 14 + 3 = 17
-ASSERTION_FLOOR = 1612
+# RAISED 1612 -> 1618 by KICK-dKeptSession-45, the window's default root: ONE new arm with 3 checks —
+# `test_extract_context_window_root`'s read under a scratch CLAUDE_CONFIG_DIR beside an empty home
+# (AC1), the home's own projects read with that variable unset (liveness), and the bottom rung with a
+# `no root:` source when no root variable is set (AC3). Its decoy checks move it by 3.
+# 3 + 3 = 6
+ASSERTION_FLOOR = 1618
 
 PASS = []
 FAIL = []
@@ -2095,6 +2100,50 @@ def test_extract_context_window():
     check("extract context-window AC3: the 150000-token turn alone reads 75% of the 200000 rung it observed",
           (r.returncode, r.stdout.strip(), r.stderr.strip()),
           (0, "75%", "context: window 200000 · observed 150000 on fixture-model"))
+
+
+def test_extract_context_window_root():
+    """KICK-dKeptSession-45 AC1 and AC3: with no root given, the window scans the projects root
+    `resolve_projects_root` resolves, so a node's CLAUDE_CONFIG_DIR is read before the profile's home,
+    and with no root resolving it reads the bottom rung with a `no root:` source instead of raising.
+    Each read is a child `python -c` in the kit, so the environment it is given is the one it reads."""
+    base, cfg_projects = build_projects("runlog-window-root-")
+    build_scenario(cfg_projects, "context-window-sibling")
+    empty = base / "empty"
+    empty.mkdir()
+    home = base / "home"
+    build_scenario(home / ".claude" / "projects", "context-window-sibling")
+    probe = "import extract; print(repr(extract.derive_context_window('fixture-model')))"
+
+    def run_window(env):
+        r = subprocess.run([sys.executable, "-c", probe], cwd=str(HERE), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        EMITTED.extend((r.stdout, r.stderr))
+        try:
+            return r.returncode, ast.literal_eval(r.stdout.strip())
+        except (ValueError, SyntaxError):
+            return r.returncode, r.stdout.strip() + r.stderr.strip()[-200:]
+
+    env = build_arm_env(base)
+    env.update(CLAUDE_CONFIG_DIR=str(base), HOME=str(empty), USERPROFILE=str(empty))
+    check("extract context-window root AC1: CLAUDE_CONFIG_DIR's projects are scanned before the empty "
+          "home's, so the sibling's 900000 reads the 1000000 rung",
+          run_window(env), (0, (1000000, "observed 900000 on fixture-model")))
+    env = build_arm_env(base)
+    env.pop("CLAUDE_CONFIG_DIR")
+    env.update(HOME=str(home), USERPROFILE=str(home))
+    check("extract context-window root liveness: with CLAUDE_CONFIG_DIR unset the home's .claude/projects "
+          "is scanned, so the same observation reads", run_window(env),
+          (0, (1000000, "observed 900000 on fixture-model")))
+    env = build_arm_env(base)
+    for var in ("CLAUDE_CONFIG_DIR", "HOME", "USERPROFILE"):
+        env.pop(var)
+    rc, got = run_window(env)
+    check("extract context-window root AC3: with no root resolving the bottom rung reads with a `no root:` "
+          "source and the read exits 0",
+          (rc, got[0] if isinstance(got, tuple) else got,
+           isinstance(got, tuple) and got[1].startswith("no root: runlog: no transcripts root resolves")),
+          (0, 200000, True))
 
 
 # KICK-dKeptSession-9: the orientation report's fixture. Each design session starts between the two
