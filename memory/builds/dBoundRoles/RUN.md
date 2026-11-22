@@ -33,3 +33,12 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T02:48:51Z dispatch · item 7e9a8e15 TOOL-dBoundRoles-14 · reason tools/playbook/namespaces.toml tools/playbook/tag_index.py tools/playbook/gov_tag.py tools/playbook/README.md tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/handoff.py tools/roles/agents tools/roles/README.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-1-acceptance-ledger.md
 
 2026-11-22T02:49:13Z brief · item TOOL-dBoundRoles-14 · reason 2b353b27a191 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-build-brief.md
+
+2026-11-22T03:08:52Z brief · item TOOL-dBoundRoles-14 · reason 485b8dc1ee96 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-build-brief.md
+2026-11-22T03:11:52Z budget · frozen · 59 unit(s) · 122
+2026-11-22T03:11:52Z draw · re-dispatch · TOOL-dBoundRoles-14 · 1/122 · 20261122T031152Z-fdc23c
+
+2026-11-22T03:11:52Z dispatch · item 760bfa18 TOOL-dBoundRoles-14 · reason tools/playbook/adopt-playbook.sh tools/roles/adopt-roles.test.sh help/tags.md
+2026-11-22T03:15:02Z draw · re-dispatch · TOOL-dBoundRoles-14 · 2/122 · 20261122T031502Z-cfb5e1
+
+2026-11-22T03:15:02Z dispatch · item 760bfa18 TOOL-dBoundRoles-14 · reason tools/playbook/namespaces.toml tools/playbook/tag_index.py tools/playbook/gov_tag.py tools/playbook/adopt-playbook.sh tools/playbook/README.md tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/handoff.py tools/roles/adopt-roles.test.sh tools/roles/agents tools/roles/README.md help/tags.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-14-1-acceptance-ledger.md

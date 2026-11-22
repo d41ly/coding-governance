@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-14 — the `role` and `field` tag namespaces, their extractors and the role binding join
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0179@f74e2fff whole
 **Carries:** node:tag-namespace.role
@@ -41,43 +41,60 @@ keeps its own `:` separator beside the tag grammar's `.` (research-tags-b F1).
 
 ## 2. Scope (IN)
 
-- **S1** — Two `[[namespace]]` rows in `tools/playbook/namespaces.toml`, in PLAY-dOrderedCharter-19
-  S2's row shape (`ns`, `owner`, `layer`, `source`, `extractor`, `role`, `purpose-source`,
-  `join-armed-by`), per §4 "### The two rows". Observed by AC4.
-- **S2** — `extract_role` in `tools/playbook/tag_index.py`: one member `role.<slot>` per role file
-  `tools/roles/agents/<slot>.agent.md`, `<slot>` the front matter's `name`, parsed by the roles kit's
-  `parse_front_matter` behind the verb `check_roles.py --print-tag-rows role`, run as a subprocess
-  and found through the inline `resolve_kit_dir("roles", "check_roles.py", here)` (§4 "The
-  extractors", §8 F5), so no second front-matter grammar exists and no roles module is imported. The
-  row's text carries the role's raw `rules` value for S5. Observed by AC1.
-- **S3** — `extract_field` in `tools/playbook/tag_index.py`: one member `field.<family>.<name>` per
-  read key of `READ_FAMILIES` in `tools/roles/roles_lib.py`, its text the native key
-  (`task:title`), and one member `field.stage.<seg>` per stage key of every `tools/roles/workflows.toml`
-  entry, `<seg>` the key folded by `derive_stage_field_tag` behind the same verb's `stage` mode.
-  Observed by AC3.
+- **S1** — Two `[[namespace]]` rows in `tools/playbook/namespaces.toml`, in the registry's row shape
+  (`tools/playbook/tag_index.py#REGISTRY_FIELDS`: `ns`, `owner`, `layer`, `source`, `extractor`,
+  `role`, `purpose-source`, `join-armed-by`), per §4 "### The two rows". Observed by AC4.
+- **S2** — `extract_role` in `tools/playbook/tag_index.py`: one row of kind `tag`, `role.<slot>`, per
+  role file `{prefix}/roles/agents/<slot>.agent.md`, `<slot>` the front matter's `name`, parsed by the
+  roles kit's `parse_front_matter` behind the verb `check_roles.py --print-tag-rows role`, run as a
+  subprocess. The verb is found through `resolve_kit_dir("roles", "check_roles.py", KIT_DIR)`, the
+  copy `tools/playbook/policy_value.py` carries and `tools/playbook/tag_index.py#load_memory_tree`
+  already imports (§4 "### The extractors", §8 F5), so no second front-matter grammar exists and no
+  roles module is imported. The row's text carries the role's raw `rules` value for S5. Observed by
+  AC1.
+- **S3** — `extract_field` in `tools/playbook/tag_index.py`: one row of kind `tag`,
+  `field.<family>.<name>`, per read key of `READ_FAMILIES` in `{prefix}/roles/roles_lib.py`, its text
+  the native key (`task:title`); and one, `field.stage.<seg>`, per distinct stage key of every
+  `{prefix}/roles/workflows.toml` entry, `<seg>` the key folded by `derive_stage_field_tag` behind the
+  same verb's `stage` mode. Observed by AC3.
 - **S4** — The one read-key vocabulary, kept in `tools/roles/roles_lib.py`: `READ_KEYS` is derived
-  from a new literal `READ_FAMILIES` (a dict from family to its field names, the same 23 keys
-  `READ_KEYS` holds at base), `derive_field_tag(key)` maps a native key to its tag, and
+  from a new literal `READ_FAMILIES`, a dict from family to its field names holding the same 25 keys
+  `READ_KEYS` holds at `760bfa18` (PINNED, measured 2026-11-22), `brief:prompt` and the `upstream`
+  family among them. `derive_field_tag(key)` maps a native key to its tag, and
   `parse_read_key(entry)` accepts either spelling, `task:title?` or `field.task.title?`, and returns
-  the native key and its optional flag. R3 in `tools/roles/check_roles.py` and `render_handoff` in
-  `tools/roles/handoff.py` read every `reads` entry through `parse_read_key` and nothing else.
-  Observed by AC5 and AC6.
-- **S5** — The role binding join, `check_role_bindings` in `tools/playbook/gov_tag.py`, run under
-  `check`, the widening of the rule-tag binding (`check_rule_tags`, `tools/roles/roles_lib.py:257`)
-  to `role.<slot>` both ways, per §4 "### The binding join". It prints `unarmed` while no indexed
-  unit row names a `role.` selector, never green. Observed by AC2.
+  the native key and its optional flag. Every reader of a role's `reads` value reads each entry
+  through `parse_read_key` and nothing else: R3 in `tools/roles/check_roles.py`, whose
+  must-be-optional checks for `card:reuse` and `upstream:rows` grade the native key and the flag it
+  returns; and, in `tools/roles/handoff.py`, `render_handoff` and the `render` verb's `--input` and
+  `--upstream` check in `main`. Observed by AC5 and AC6.
+- **S5** — The role binding join, `check_role_bindings` in `tools/playbook/gov_tag.py`, run by
+  `run_check` under `check`: the widening of the rule-tag binding
+  (`tools/roles/roles_lib.py#check_rule_tags`) to `role.<slot>` both ways, per §4 "### The binding
+  join". It prints `unarmed` while no indexed unit row names a `role.` selector, never green.
+  Observed by AC2.
 - **S6** — The cited-but-undeclared join for both namespaces through PLAY-dOrderedCharter-10 S4's
-  `check_namespace_joins`: a `role.` or `field.` tag cited anywhere the index reads and declared by no
-  extractor is red, naming the citation's path and line. Observed by AC1 and AC3.
-- **S7** — Gov's ten role files' `reads:` lines rewritten to the tag spelling (`input:spec` becomes
-  `field.input.spec`), and the catalogue region of `tools/roles/README.md` re-rendered by
-  `check_roles.py --write`. A handoff's task block keeps the native key as its `###` heading, so its
-  bytes and its task-sha are unchanged for the same inputs. Observed by AC6.
+  `check_namespace_joins` (`tools/playbook/tag_index.py#check_namespace_joins`): a `role.` or `field.`
+  tag cited anywhere the index reads and declared by no extractor is red, naming the citation's path
+  and line. Observed by AC1 and AC3.
+- **S7** — Gov's eleven role files' `reads:` lines rewritten to the tag spelling (`input:spec`
+  becomes `field.input.spec`), `gov-tester` among them. The catalogue region of
+  `tools/roles/README.md` is re-rendered by `check_roles.py --write`, and that README's paragraph on
+  how each `reads` key is sourced gains one sentence saying a key may be spelled as its tag. Arm 22 of
+  `tools/roles/adopt-roles.test.sh`, which filters gov-spec-writer's raw `reads` entries by the
+  `brief:` prefix, filters on the native key `parse_read_key` returns, so it still hands the brief
+  family. A handoff's task block keeps the native key as its `###` heading, so its bytes and its
+  task-sha are unchanged for the same inputs. Observed by AC6.
 - **S8** — The fixture plants, on PLAY-dOrderedCharter-19 S13's `gov_tag.py --fixture --plant
-  <case>`: `role-rows`, `role-binding` and `field-rows`. Observed by AC1, AC2 and AC3.
-- **S9** — The name-check point: `role` and `field` reach `lexicon.py --tags`, PLAY-dOrderedCharter-10
-  S7's hand-off, through the registry they now sit in, and `tools/playbook/README.md`'s line naming
-  the build that arms each later namespace loses its `role` entry. Observed by AC7.
+  <case>`: `role-rows`, `role-binding` and `field-rows`, each a `SHAPE_PLANTS` entry named in
+  `PLANTS` (`tools/playbook/gov_tag.py#SHAPE_PLANTS`) and a row of the `run_plant_rows tags` table in
+  `tools/playbook/adopt-playbook.sh`. Observed by AC1, AC2 and AC3.
+- **S9** — The name-check point and the registry's two pages. `role` and `field` reach `lexicon.py
+  --tags`, PLAY-dOrderedCharter-10 S7's hand-off, through the registry they now sit in.
+  `tools/playbook/README.md`'s table of the build that arms each later namespace loses its `role`
+  row, and a sentence there names dBoundRoles as registering `role` and `field`. `help/tags.md` counts
+  twenty registered namespaces where it says eighteen, gains a `role` and a `field` row in its
+  namespace table, and loses its sentence saying `role` joins when dBoundRoles registers it. Observed
+  by AC4 and AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -88,9 +105,12 @@ keeps its own `:` separator beside the tag grammar's `.` (research-tags-b F1).
   role file joins as data once that unit composes it.
 - The item actor's native id `role:<slot>` (TOOL-dDeclaredLoop-24 S6) stays as it is; whether an
   actor names a declared role is that kind's composition check, not this join.
+- A role item's inputs. `resolve_item_declaration` (`tools/loop/loop_lib.py#resolve_item_declaration`)
+  hands a role item its role's `reads` value raw, and the loop's layer check grades only an item row's
+  own `inputs`, so neither moves here.
 - Renaming the harness stage keys themselves. `specWriter`, `diffFinder` and their siblings are JSON
-  keys every harness template reads (`tools/workflows/tier2-review.template.js:236`,
-  `tools/workflows/unattended-build.template.js:455`); only their tags are folded (§8 F2).
+  keys every harness template reads (`tools/workflows/tier2-review.template.js#ROLE_KEYS`,
+  `tools/workflows/unattended-build.template.js#ROLE_KEYS`); only their tags are folded (§8 F2).
 - The `[[workflow.stages]]` row form: TOOL-dBoundRoles-22 re-points `extract_field`'s stage half to
   each row's `key` when it moves the table.
 - Expanding a `field` tag into the work order: TOOL-dBoundRoles-3 reads the tags when it renders.
@@ -112,64 +132,89 @@ keeps its own `:` separator beside the tag grammar's `.` (research-tags-b F1).
 ### The two rows
 
 ```toml
-# tools/playbook/namespaces.toml, beside PLAY-dOrderedCharter-10's eight
+# tools/playbook/namespaces.toml, after its last [[namespace]] row (`check`), before its [[native]] rows
 [[namespace]]
 ns = "role"
 owner = "dBoundRoles"
 layer = "layer.roles"
-source = "tools/roles/agents/*.agent.md"
+source = "{prefix}/roles/agents/*.agent.md"
 extractor = "tag_index:extract_role"
 role = "selects"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md"
 join-armed-by = "dBoundRoles"
 
 [[namespace]]
 ns = "field"
 owner = "dBoundRoles"
 layer = "layer.roles"
-source = "tools/roles/roles_lib.py, tools/roles/workflows.toml"
+source = "{prefix}/roles/roles_lib.py, {prefix}/roles/workflows.toml"
 extractor = "tag_index:extract_field"
 role = "describes"
-purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md"
 join-armed-by = "dBoundRoles"
 ```
 
 `role` selects: an instruction unit's `scope` names a role (layer-roles `[tags]`, "every instruction
 unit names the roles it binds"; PLAY-dOrderedCharter-11 S1 selects by it). `field` describes: it names
-an input, and no unit selects by it. `layer.roles` is v2 `[layers]`' core row for the roles layer
-(v2:816), and the roles kit is core, so PLAY-dOrderedCharter-19 S14's `owned` arm admits both.
+an input, and no unit selects by it. Because `role` selects, `check_namespace_joins` grades each
+declared role as selecting a unit once any unit's `scope` names a `role.` tag, and prints `selects ·
+unarmed` until then; at `760bfa18` no unit row of `tools/playbook/instructions.toml` or
+`.governance/instructions.toml` names one. `layer.roles` is a `kind = "core"` row of
+`tools/playbook/layers.toml`, the layer `tools/roles/kit.toml` declares, so PLAY-dOrderedCharter-19
+S14's `owned` arm (`tools/playbook/tag_index.py#check_owned`) reds neither row's members.
 
-| `ns` | Members at base | Source |
+A `source` spells the tool root `{prefix}/`, as the registry's header says
+(`tools/playbook/namespaces.toml@760bfa18:11`). The `purpose-source` is the systems record,
+path-only: `check_namespace_purpose` (`tools/playbook/tag_index.py#check_namespace_purpose`) reads a
+`<path>#<field>` source only at a `.toml` or `.py` path, so rev-5's `.md` source with `#design-tags`
+reds both rows, and a path-only source prints in its `path_only` count and grades no field (§8 F6).
+`owner = "dBoundRoles"` is a `[[build]]` row of `memory/project/chain.toml`.
+
+| `ns` | Members at `760bfa18` | Source |
 |---|---|---|
-| `role` | 10, one per file under `tools/roles/agents/` | each file's `name` |
-| `field` | 23 read keys plus 7 distinct stage keys | `READ_FAMILIES`; each `stages` key |
+| `role` | 11, one per file under `tools/roles/agents/` | each file's `name` |
+| `field` | 25 read keys plus 7 distinct stage keys | `READ_FAMILIES`; each `stages` key |
 
-The counts are PINNED, measured 2026-10-25 at `4ed9e567` (`ls tools/roles/agents`, `READ_KEYS` at
-`tools/roles/roles_lib.py:36-40`, the four `stages` tables at `tools/roles/workflows.toml:37`, `:47`,
-`:57`, `:67`); the check DERIVES them at every run.
+The counts are PINNED, measured 2026-11-22 at `760bfa18` (`ls tools/roles/agents`,
+`tools/roles/roles_lib.py#READ_KEYS`, the four `stages` tables at
+`tools/roles/workflows.toml@760bfa18:37`, `:46`, `:55` and `:64`); the check DERIVES them at every run.
 
 ### The extractors
 
-Each takes a blob's path and text, as the index runs every extractor whose `source` matches the path
-(PLAY-dOrderedCharter-19 S4), and yields `(tag, kind, line)` with the row text the index stores.
+Each keeps the index's extractor contract (`tools/playbook/tag_index.py#_derive_applicable`,
+`#_write_parsed`): `fn(ctx, path, text=None)`. With `text` None it is the applicability probe and
+returns `""` for a path it reads and None for any other. Given the blob's text it returns 5-tuples
+`(tag, kind, line, end, text)`, which `_write_parsed` inserts into `blob_row`. The kind is `tag`:
+only a kind of `DEFINE_KINDS` (`doc`, `section`, `tag`) declares a member to `check_namespace_joins`,
+`check_tag_shape` and `check_namespace_purpose`, so any other kind leaves both namespaces declaring
+nothing and every citation undeclared.
 
 ```
-extract_role(path, text)   -> ("role.<name>", "member", line of `name:`), text = the raw `rules` value
-extract_field(path, text)  -> roles_lib.py:    ("field.<family>.<name>", "member", line), text = "<family>:<name>"
-                              workflows.toml:  ("field.stage.<seg>", "member", line), text = the stage key
+extract_role(ctx, path)        -> "" for {prefix}/roles/agents/*.agent.md under the tool root, else None
+extract_role(ctx, path, text)  -> [("role.<name>", "tag", n, n, the raw `rules` value)], n the `name:` line
+extract_field(ctx, path)       -> "" for {prefix}/roles/roles_lib.py or {prefix}/roles/workflows.toml, else None
+extract_field(ctx, path, text) -> roles_lib.py:   ("field.<family>.<name>", "tag", n, n, "<family>:<name>")
+                                  workflows.toml: ("field.stage.<seg>", "tag", n, n, the stage key)
 ```
+
+The tool root is the parent of `ctx["kit"]`, each `{prefix}/` spelling resolved by
+`resolve_prefix_token`, as `tools/playbook/tag_index.py#_read_tool_file` derives it for
+`extract_step`; `extract_field` probes through `_read_tool_file` itself, and `extract_role` matches
+the resolved glob with `fnmatch`. A read key's `n` is the line of its name in the literal; a stage
+key's is the first `stages` line that carries it.
 
 `extract_field` reads `READ_FAMILIES` from the blob with `ast.parse` and `ast.literal_eval` of that one
-assignment, so the index reads the committed vocabulary, never the importing process's module. The role
-grammar is reached by subprocess, since a kit imports no sibling kit (PLAY-dOrderedCharter-7 §4 "The
-policy reads"; TOOL-dDeclaredLoop-18 §4, "the policy kit is reached only by that subprocess"):
-`extract_role` and the `workflows.toml` half of `extract_field` run the roles kit's
-`check_roles.py --print-tag-rows role|stage` under `sys.executable`, the blob's text on stdin. The
-verb, minted here, prints one JSON object per member, `{"tag", "line", "text"}`, from
-`parse_front_matter` over a role file or from `derive_stage_field_tag` over each `stages` key of a
-`tomllib` parse, deduped; it reads only the text it is handed, so the rows stay keyed by committed
+assignment, as `extract_level` reads `LEVELS`, so the index reads the committed vocabulary, never the
+importing process's module. The role grammar is reached by subprocess, since a kit imports no sibling
+kit (PLAY-dOrderedCharter-7 §4 "The policy reads"; TOOL-dDeclaredLoop-18 §4, "the policy kit is
+reached only by that subprocess"): `extract_role` and the `workflows.toml` half of `extract_field`
+run the roles kit's `check_roles.py --print-tag-rows role|stage` under `sys.executable`, the blob's
+text on stdin. The verb, minted here, prints one JSON object per member, `{"tag", "line", "text"}`,
+from `parse_front_matter` over a role file or from `derive_stage_field_tag` over each `stages` key of
+a `tomllib` parse, deduped; it reads only the text it is handed, so the rows stay keyed by committed
 blob. A blob it cannot parse exits 2 naming the defect, which the extractor prints and yields nothing
-for. The extractors never validate: a malformed `name` reaches PLAY-dOrderedCharter-10 S3's
+for. A `resolve_kit_dir` that raises `LookupError` is printed once, and both extractors yield nothing.
+The extractors never validate: a malformed `name` reaches PLAY-dOrderedCharter-10 S3's
 `check_tag_shape`, which reds it with its reason.
 
 ### The read-key vocabulary
@@ -177,31 +222,40 @@ for. The extractors never validate: a malformed `name` reaches PLAY-dOrderedChar
 ```python
 READ_FAMILIES = {"task": ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates"),
                  "card": ("route", "records", "classes", "read", "open", "reuse"),
-                 "brief": ("goal", "items", "acceptance", "gates", "non-goals"),
-                 "input": ("spec", "diff", "question", "prompt")}
+                 "brief": ("prompt", "goal", "items", "acceptance", "gates", "non-goals"),
+                 "input": ("spec", "diff", "question", "prompt"),
+                 # legal only optional, since only an item naming upstream items has rows (TOOL-dDeclaredLoop-29)
+                 "upstream": ("rows",)}
 READ_KEYS = frozenset("%s:%s" % (f, n) for f, names in READ_FAMILIES.items() for n in names)
 ```
 
 The native key `task:title` stays the vocabulary's member and the tag `field.task.title` its tag, the
 two-name form systems.md `[design-tags]` gives a node with a native id ("the resolver accepts both").
-`parse_read_key` folds a tag spelling back to the native key before any reader sees it, so
-`render_handoff`'s family dispatch (`tools/roles/handoff.py:338-379`) and its `### <key>` block
-headings read native keys exactly as at base. A `field.` entry naming no member, or the two spellings
-of one key in one `reads` value, is an R3 defect (named twice). A later family (TOOL-dDeclaredLoop-29
-S5's `upstream`) joins by one `READ_FAMILIES` entry.
+`parse_read_key` strips one trailing `?` as the optional flag, folds `field.<family>.<name>` to
+`<family>:<name>`, and returns any other entry unchanged. R3 grades what it returns on all four
+checks, where `tools/roles/check_roles.py@760bfa18:209-222` grades the raw entry today: a key outside
+`READ_KEYS` (`field.task.titel` folds to `task:titel`), with the message naming the raw entry; a key
+named twice, the two spellings of one key included; and `card:reuse` or `upstream:rows` without the
+flag, whichever spelling carries it. `render_handoff`'s family dispatch and its `### <key>` block
+headings (`tools/roles/handoff.py#render_handoff`), and the `render` verb's `--input` and `--upstream`
+check (`tools/roles/handoff.py#main`), read native keys exactly as at `760bfa18`. The `upstream` family
+TOOL-dDeclaredLoop-29 added is one `READ_FAMILIES` entry, and a later family joins the same way.
 
 ### The stage-key fold
 
 `derive_stage_field_tag(key)` lower-cases each capital and puts a hyphen before it:
-`specWriter` → `field.stage.spec-writer`. `STAGE_KEY_RE` (`tools/roles/check_roles.py:110`,
-`^[a-z][A-Za-z]*$`) admits no digit and no hyphen, so the fold is injective and no two keys share a tag;
-the extractor dedupes a key several workflows share (`skeptic`, `synthesis`).
+`specWriter` → `field.stage.spec-writer`. `STAGE_KEY_RE` (`tools/roles/check_roles.py#STAGE_KEY_RE`,
+`^[a-z][A-Za-z]*$`), by which R9 grades every stage key, admits no digit and no hyphen, so the fold is
+injective and no two keys share a tag. The extractor dedupes a key several workflows share
+(`specFinder`, `builder`, `skeptic`, `synthesis`).
 
 ### The binding join
 
 layer-roles `[tags]` widens the `rules:` binding both ways: a unit's `role.*` scope and each role's
-`rules:` must agree. Read from the index: the units' selector fields as PLAY-dOrderedCharter-10 S4
-reads them, and the `role` rows' text (S2).
+`rules:` must agree. Read from the index: the units' selector rows as PLAY-dOrderedCharter-10 S4
+reads them, a unit's selectors sharing its `tag` row's path and line
+(`tools/playbook/instruction_units.py#extract_unit`), and the `role` rows' text (S2), read through
+`tools/playbook/tag_index.py#read_text_of`.
 
 ```
 for each unit u whose scope names role.<slot> and practice.<tag>:
@@ -212,8 +266,10 @@ for each role <slot> whose rules cites <tag>:
 ```
 
 A unit naming `practice.<tag>` and no role selector binds every reader, so it is never a disagreement.
-`check_rule_tags` itself is unchanged: it still grades a `rules` value against the charter's section 1,
-and this join grades the same value against the units.
+`check_rule_tags` itself is unchanged: it still grades a `rules` value against the charter's
+practices, and this join grades the same value against the units. `run_check`
+(`tools/playbook/gov_tag.py#run_check`) calls the join beside `check_namespace_joins` and adds its
+reds to the run's.
 
 ### Inventory
 
@@ -225,25 +281,30 @@ asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at 
 ### Migration
 
 Additive. The colon spelling stays legal in every `reads` value, so an adopter's own role file renders
-unchanged; gov's ten files move to the tag spelling in this unit (S7). No tag in either namespace is
-cited in a source at base, so the joins' first run grades the members alone.
+unchanged; gov's eleven files move to the tag spelling in this unit (S7). At `760bfa18` no tracked
+Markdown outside the build records cites a backticked or bracketed `role.` or `field.` span (PINNED,
+`git grep` on 2026-11-22), and the join grades no build record, so its first run grades the members
+alone.
 
 ### Rollout
 
-Live at landing on PLAY-dOrderedCharter-19's `tags` leg, which already runs every registered
-namespace's extractor, and on the `roles catalogue` leg for R3.
+Live at landing on the `tags (the resolver's checks)` leg, `gov_tag.py check`, which already runs every
+registered namespace's extractor, and on the `roles catalogue` leg for R3.
 
 ### Files touched (estimate)
 
 - `tools/playbook/namespaces.toml`
 - `tools/playbook/tag_index.py`
 - `tools/playbook/gov_tag.py`
+- `tools/playbook/adopt-playbook.sh` (the plant rows of S8)
 - `tools/playbook/README.md`
 - `tools/roles/roles_lib.py`
 - `tools/roles/check_roles.py` (R3 and the `--print-tag-rows` mode)
 - `tools/roles/handoff.py`
-- `tools/roles/agents/` (the ten `reads:` lines)
-- `tools/roles/README.md` (the catalogue region, rendered by `check_roles.py --write`)
+- `tools/roles/adopt-roles.test.sh` (arm 22's filter and the new R3 arm)
+- `tools/roles/agents/` (the eleven `reads:` lines)
+- `tools/roles/README.md` (the catalogue region, rendered by `check_roles.py --write`, and one sentence)
+- `help/tags.md`
 
 ### Alternatives rejected
 
@@ -260,29 +321,36 @@ namespace's extractor, and on the `roles catalogue` leg for R3.
 
 - security — no write path; the extractors parse committed blobs read-only, and `ast.literal_eval`
   evaluates one literal and never runs code.
-- perf / scale — two extractors over eleven blobs, one subprocess per role or `workflows.toml` blob;
-  the index re-parses only changed blobs.
+- perf / scale — two extractors over thirteen blobs (eleven role files, `roles_lib.py` and
+  `workflows.toml`), one subprocess per role or `workflows.toml` blob, twelve on a cold index; the
+  index re-parses only changed blobs.
 - error / empty / loading states — an empty population prints `unarmed`, never green; a roles kit the
   index cannot resolve leaves both namespaces `unarmed` with one line saying why.
-- observability — `gov_tag.py check` prints each namespace's member count and the binding join's
-  graded pair count.
+- observability — `gov_tag.py check` names each armed namespace on its joins line and prints one
+  `unarmed` line per empty one, and the binding join adds one line with its graded pair count.
 - risks — a role file renamed without its citations reds the join at that pass, which is the intent;
-  the fold hides a stage key's case from the shape check, said in §4.
+  the fold hides a stage key's case from the shape check, said in §4. The extractor version hashes
+  `tag_index.py` and its import closure (`tools/playbook/tag_index.py#derive_extractor_versions`), and
+  `check_roles.py` and `roles_lib.py`, reached by subprocess, sit outside it: an edit to
+  `parse_front_matter` or `derive_stage_field_tag` re-parses no blob the index already holds until that
+  blob or `tag_index.py` changes, and `gov_tag.py --rebuild` is what clears it.
 - testing — the plants of S8 and the R3 case, observed by a pass through the fixture and the checker;
   the suite arms in §7 are observed RED then GREEN by the main loop at the close.
 - migration — none owed by an adopter, as §4 Migration says.
-- user docs — none owed: no page under `help/` describes the tag registry or the `reads` grammar;
-  `tools/playbook/README.md` and `tools/roles/README.md` are updated by S7 and S9.
+- user docs — `help/tags.md`, the page on the tag registry, is updated by S9; no page under `help/`
+  describes the `reads` grammar. `tools/playbook/README.md` and `tools/roles/README.md` are updated
+  by S7 and S9.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `python gov_tag.py --fixture --plant role-rows` runs, its fixture holding role files
   named `gov-builder` and `gov-skeptic` and a guide citing `role.gov-builder` and `role.gov-buildr`, the
-  index holds both `role` members and the check exits 1 naming `role.gov-buildr` alone as cited but
-  undeclared; and `grep -nE "import roles_lib|roles_lib\.(parse|derive)" tag_index.py` run in
+  index holds both `role` members and the check exits 1 naming `role.gov-buildr` alone as cited and
+  undeclared in `role`; and `grep -nE "import roles_lib|roles_lib\.(parse|derive)" tag_index.py` run in
   `tools/playbook/` prints nothing.
-  Red when: `extract_role` yields nothing, so both citations read undeclared, or the `role` row is
-  absent, so both read `namespace not registered`, or the extractor imports the roles library.
+  Red when: `extract_role` yields nothing, or yields a kind outside `DEFINE_KINDS`, so both citations
+  read undeclared; or the `role` row is absent, so both read `namespace not registered`; or the
+  extractor imports the roles library.
 - **AC2** — When `python gov_tag.py --fixture --plant role-binding` runs, a unit scoped
   `role.gov-builder` and `practice.yagni` beside a `gov-builder` whose `rules` lacks `yagni` exits 1
   naming the unit; a second unit scoped `practice.verify` and `role.gov-skeptic` beside a
@@ -295,28 +363,35 @@ namespace's extractor, and on the `roles catalogue` leg for R3.
   Red when: the stage half yields `field.stage.specWriter`, which the shape check reds as `segment
   outside seg`, or a shared key such as `skeptic` is yielded twice.
 - **AC4** — When `grep -cE '^ns = "(role|field)"' namespaces.toml` runs in `tools/playbook/`, it
-  prints 2, and `grep -n 'dBoundRoles' README.md` run there names `role` as registered.
-  Red when: a row is missing, so a tag in that namespace still reads `namespace not registered`.
+  prints 2; `grep -nE '^purpose-source = "[^"]*\.md#' namespaces.toml` run there prints nothing;
+  `grep -n 'dBoundRoles' README.md` run there names `role` and `field` as registered; and
+  `grep -cE '^\| .(role|field). \|' help/tags.md` run at the repository root prints 2.
+  Red when: a row is missing, so a tag in that namespace still reads `namespace not registered`; or a
+  row's `purpose-source` names a field in a `.md` file, which the `purpose` arm reds.
 - **AC5** — When `python -c "import roles_lib as l; print(l.parse_read_key('field.task.title?'), l.parse_read_key('task:title'), l.derive_stage_field_tag('diffFinder'))"`
   runs in `tools/roles/`, it prints `('task:title', True) ('task:title', False) field.stage.diff-finder`.
   Red when: the tag spelling is not folded to the native key, so `render_handoff` dispatches it to no
   family.
-- **AC6** — When `python check_roles.py` runs in `tools/roles/` over the tree with the ten migrated
+- **AC6** — When `python check_roles.py` runs in `tools/roles/` over the tree with the eleven migrated
   `reads:` lines, it exits 0; with one entry planted as `field.task.titel` it exits 1 with one R3 line
-  naming it; and `python handoff.py render --role gov-skeptic --build dBoundRoles --input spec=<a
-  spec path> --stdout` prints the same `task-sha=` at base and after the migration.
-  Red when: R3 reads the raw entry rather than `parse_read_key`'s result, so a migrated line reds, or
-  the task block's heading moves to the tag spelling and the task-sha changes.
+  naming it; with gov-reuse-scout's `field.card.reuse?` planted without its `?` it exits 1 with one R3
+  line saying `card:reuse` must be optional; and `python handoff.py render --role gov-skeptic --build
+  dBoundRoles --input spec=<a spec path> --stdout` prints the same `task-sha=` before and after the
+  migration.
+  Red when: R3 reads the raw entry rather than `parse_read_key`'s result, so a migrated line reds or
+  the bare tag spelling of `card:reuse` passes; or the `render` verb's input check reads the raw entry,
+  so `--input spec` is refused as a key gov-skeptic does not read; or the task block's heading moves
+  to the tag spelling and the task-sha changes.
 - **AC7** — When `printf 'role.field.x\n' | python tools/lexicon/lexicon.py --tags` runs, it exits 1
   refusing a first segment that is a namespace word, the word read from the registry.
   Red when: `field` is not a registered word, so the name passes.
 
 ## 7. Gates
 
-The pass adds no leg: PLAY-dOrderedCharter-19's `tags` leg runs the extractors and the joins once its
-build lands, and this unit's rows join it as data.
+The pass adds no leg: the `tags (the resolver's checks)` leg, `gov_tag.py check`, runs every
+registered namespace's extractor and the joins, and this unit's rows join it as data.
 
-`roles catalogue` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit acceptance matrix` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `tags (the resolver's checks)` · `govkit acceptance matrix` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the playbook-render selftest runs `gov_tag.py --fixture` under each plant of S8, its failing case staged by `role-rows` and `role-binding` · none
 New arm: tools/roles/adopt-roles.test.sh · covers AC6 · a fixture role whose `reads` carries `field.task.titel` stages the failing case, one R3 line, while `field.task.title` yields none · none
@@ -350,17 +425,31 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC6 · a fixture role whose `
   PLAY-dOrderedCharter-19 S2, S4, S13 and PLAY-dOrderedCharter-10 S3, S4, S7 have no code at base.
   RESOLVED (agent, 2026-10-25, delegated): the build run re-grounds on each section at its base and
   stops this unit if one is still absent then, rung 1, the brief's rule for every unbuilt parent.
+  Discharged at `760bfa18`: each section has code there, as the first builder's return
+  `2026-11-22-build-TOOL-dBoundRoles-14-1-builder-return` records and rev-6 re-read.
   widens: none · relaxes: none
 - **F5 — How do the playbook kit's extractors reach the roles kit's front-matter parser and stage
   fold?** A kit imports no sibling kit (PLAY-dOrderedCharter-7 §4; TOOL-dDeclaredLoop-18 §4, the
   pattern this unit copies). Options: (a) a roles-kit verb, `check_roles.py --print-tag-rows role|stage`,
   minted here and run as a subprocess with the blob's text on stdin; (b) a declared `requires_if` row
-  on the playbook kit's descriptor naming `roles`, keeping the import, the shape of
-  `tools/memory-tree/kit.toml:8`; (c) a parser and a fold copied into `tag_index.py`. (b) makes the
-  playbook kit the one in-process consumer of a kit its siblings reach by subprocess, and (c) is the
-  second grammar §4 rejects. Rev-3 imported `roles_lib` through `resolve_kit_dir`, which the rule
+  on the playbook kit's descriptor naming `roles`, keeping the import, the shape of the `requires_if`
+  rows of `tools/memory-tree/kit.toml`; (c) a parser and a fold copied into `tag_index.py`. (b) makes
+  the playbook kit the one in-process consumer of a kit its siblings reach by subprocess, and (c) is
+  the second grammar §4 rejects. Rev-3 imported `roles_lib` through `resolve_kit_dir`, which the rule
   rules out. RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, PLAY-dOrderedCharter-7 §4 and
   TOOL-dDeclaredLoop-18 §4.
+  widens: none · relaxes: none
+- **FACT-QUESTION · F6 — Which `purpose-source` do the two rows carry, when the `purpose` arm reads no
+  field in a `.md` file?** Options: (a) rev-5's systems record, path-only, its `#design-tags` dropped;
+  (b) `#h1` for `role`, each role file's first `# ` line, and `{prefix}/roles/roles_lib.py#READ_FAMILIES`
+  for `field`; (c) each row's own source path-only, `tools/roles/README.md` for `role`. The probe:
+  `check_namespace_purpose` reads `h1` only as a Markdown member's first `# ` line, and
+  `grep -c "^# " tools/roles/agents/*.agent.md` prints 0 for all eleven at `760bfa18`, since R5
+  refuses a `# ` line in a role body, so (b)'s `role` half reds every member; its `field` half grades
+  only the read-key members, and only that the module assigns the name. (c) grades no more than (a)
+  and moves rev-5's source for nothing. RESOLVED (agent, 2026-11-22, delegated): (a), rung 2, the
+  probe leaves path-only the one form the `role` row can pass, and (a) keeps rev-5's source, the
+  brief's non-goal of no change beyond what a divergence forces.
   widens: none · relaxes: none
 
 ## 9. Revision log
@@ -378,18 +467,36 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC6 · a fixture role whose `
 - rev-5 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
   `tools/playbook/tag_index.py` that §4 Files touched names, by
   `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else moved.
+- rev-6 · 2026-11-22 · S1 to S9 · §3 · §4 · §5 · AC1 · AC4 · AC6 · §7 · §8 F4 F5 F6 · §10 · re-grounded
+  at `760bfa18` by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-fix-1-brief`, folding the four
+  divergences of `2026-11-22-build-TOOL-dBoundRoles-14-1-builder-return`: `READ_FAMILIES` holds all 25
+  keys, `brief:prompt` and the `upstream` family included, and R3's must-be-optional checks grade
+  `parse_read_key`'s native key; eleven role files, `gov-tester` among them; the extractor contract
+  `fn(ctx, path, text=None)` returning 5-tuples of kind `tag`; a path-only `purpose-source` (F6) and
+  `source` spelled from `{prefix}/`. Stale claims re-grounded: `handoff.py`'s `render` input check
+  and arm 22 of `adopt-roles.test.sh` read `reads` too, so S4 and S7 name them; `help/tags.md` is the
+  registry's user page, so S9 and §5 owe it; the leg is `tags (the resolver's checks)`; §5 states the
+  extractor version's subprocess gap; every moved citation re-pointed to a symbol or a pinned line.
 
 ## 10. Reuse audit
 
 The seam extended is PLAY-dOrderedCharter-19's namespace registry and PLAY-dOrderedCharter-10's
-extractor module, shape check and per-namespace join, specced and DEFERRED, with TOOL-dDeclaredLoop-18
-S1-S6 as the copied pattern; in the kit today the seams are `READ_KEYS`
-(`tools/roles/roles_lib.py:36-40`), `parse_front_matter` (`:306`), `check_rule_tags` (`:257`) and R3
-(`tools/roles/check_roles.py:197-207`), each verified against source at `4ed9e567`. `python
+extractor module, shape check and per-namespace join, built at `760bfa18`
+(`tools/playbook/tag_index.py#read_namespaces`, `#check_tag_shape`, `#check_namespace_joins`), with
+TOOL-dDeclaredLoop-18 S1-S6 as the copied pattern and `extract_step`, `extract_level` and
+`_read_tool_file` as the extractors copied. In the roles kit the seams are `READ_KEYS`
+(`tools/roles/roles_lib.py#READ_KEYS`), `parse_front_matter` (`#parse_front_matter`),
+`check_rule_tags` (`#check_rule_tags`) and R3 (`tools/roles/check_roles.py@760bfa18:209-222`), each
+re-read at `760bfa18`; the kit reaches the roles kit through the `resolve_kit_dir` copy
+`tools/playbook/tag_index.py#load_memory_tree` already imports from `policy_value.py`, and the plants
+extend `tools/playbook/gov_tag.py#SHAPE_PLANTS`. The task's recall named TOOL-dBoundRoles-6 and
+TOOL-dWitnessedBar-23, the unit that added `gov-tester`, the eleventh role file. `python
 tools/codebase-map/reuse_lookup.py "register a tag namespace for role slots and read-key fields"` ranked
-generic name stems (`read`, `key`, `field`, `read_conf_key`) and named no namespace seam, the expected
-answer: neither registry nor index exists at base. The recall probe returned this build's brief row,
-scout A's row, TOOL-dDeclaredLoop-18's rows and TOOL-dWitnessedBar-12's `leg` rows as the precedents;
-scout A cites `RULE_KEY_RE` at `:65` and `check_rule_tags` at `:257-281`, both as source reads.
+generic name stems at rev-1, before the registry existed; at rev-6, `python
+tools/codebase-map/reuse_lookup.py "a tag extractor reading a sibling kit's file under the tool root"`
+ranked `resolve_kit_dir` and `read_rows` as seams, both reused here. The recall probe returned this
+build's brief row, scout A's row, TOOL-dDeclaredLoop-18's rows and TOOL-dWitnessedBar-12's `leg` rows
+as the precedents; scout A's line numbers for `RULE_KEY_RE` and `check_rule_tags` are base-era, and
+the symbols above replace them.
 
 Recall terms used: `python tools/memory-recall/query.py "how are the role and field tag namespaces registered" --terms "role namespace field namespace READ_KEYS reads vocabulary stage keys tag extractor namespaces.toml rule tags"`

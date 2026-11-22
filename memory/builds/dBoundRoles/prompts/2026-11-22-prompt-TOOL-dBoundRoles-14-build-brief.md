@@ -15,10 +15,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - §8 F4 is yours to discharge: PLAY-dOrderedCharter-19 S2, S4, S13 and PLAY-dOrderedCharter-10 S3, S4, S7 were unbuilt at
   the spec's base. dOrderedCharter has landed since; confirm each section's code exists at HEAD before building on it,
   and hand back a divergence naming the section if one is still absent.
-- The spec was re-grounded to rev-5 this run for its leg line only
-  (`prompts/2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief.md`). Line numbers its §4 and §10 cite were read
-  at its base; re-derive each at HEAD and verify each claim about current code against source before building on it.
-  A claim that no longer holds is handed back as a divergence rather than built around.
+- The spec is rev-6, revised at the main loop over the first builder's divergence
+  (`build/2026-11-22-build-TOOL-dBoundRoles-14-1-builder-return.md`): 25 read keys with `brief:prompt` and the
+  `upstream` family, eleven role files with `gov-tester`, the extractor contract `fn(ctx, path, text=None)` returning
+  kind `tag`, a path-only `purpose-source` (§8 F6), and three readers rev-5 missed (`handoff.py` render's input check,
+  `adopt-roles.test.sh` arm 22, `help/tags.md`). Its citations are re-pointed at HEAD `760bfa18`; still verify each claim
+  about current code against source before building on it, and hand a claim that no longer holds back as a divergence.
+- §5 discloses one gap left open on purpose: the index's extractor version does not hash `check_roles.py` or
+  `roles_lib.py`, so an edit to either leaves cached rows stale until `gov_tag.py --rebuild`. Do not close it here.
 
 ## What the main loop needs from your commit
 
