@@ -6134,7 +6134,7 @@ def check_kit_attestations(tmp: pathlib.Path) -> None:
     git(g, *pin, "add", "README.md")
     git(g, *pin, "commit", "-qm", "readme")
     revs = subprocess.run(["git", "-C", str(g), "rev-list", "--reverse", "HEAD"], capture_output=True,
-                          text=True, check=False).stdout.split()
+                          encoding="utf-8", text=True, check=False).stdout.split()
     first, head = (revs + ["", ""])[:2] if len(revs) == 2 else ("", "")
     # The bar's environment: no inherited GATE_ name, and no git location or pathspec variable, so it
     # answers about this fixture and never about an outer run or repository.
@@ -6161,7 +6161,7 @@ def check_kit_attestations(tmp: pathlib.Path) -> None:
     check("[dQD-37] S1 the runner's own record attests demo, whose row carries `purpose`, and its legs row is the record's",
           rc == 0 and rec.get("sha") == head and att is not None and [x.get("row") for x in att["legs"]] == [rec.get("row")],
           f"bar exit {rc}, record {rec!r}, attestation {att!r}; the bar said:\n{said[-3000:]}")
-    listed = subprocess.run(["git", "-C", str(g), "ls-tree", "-r", "HEAD"], capture_output=True, text=True,
+    listed = subprocess.run(["git", "-C", str(g), "ls-tree", "-r", "HEAD"], capture_output=True, encoding="utf-8", text=True,
                             check=False).stdout.splitlines()
     oids = {ln.split("\t", 1)[1]: ln.split()[2] for ln in listed if "\t" in ln}
     digest = hashlib.sha256("".join(f"{s}\t{oids.get(s)}\n" for s in sources).encode("utf-8")).hexdigest()
@@ -6183,7 +6183,7 @@ def check_kit_attestations(tmp: pathlib.Path) -> None:
         (g / PFX / e / "a.sh").write_text("#!/usr/bin/env bash\n# moved\nexit 0\n", encoding="utf-8", newline="\n")
         git(g, *pin, "commit", "-qm", f"move {e}", "--", f"{PFX}{e}/a.sh")
         return read_demo_attestation(subprocess.run(["git", "-C", str(g), "rev-parse", "HEAD"], capture_output=True,
-                                                    text=True, check=False).stdout.strip())
+                                                    encoding="utf-8", text=True, check=False).stdout.strip())
 
     check_unattested("with no record file", lambda: (record.unlink(missing_ok=True), read_demo_attestation())[1])
     check_unattested("with the record's row forty zeros", lambda: (record.write_bytes(
@@ -6243,7 +6243,7 @@ def check_blob_batch(tmp: pathlib.Path) -> None:
 
         # Two commits sharing a 4-hex prefix, found by hashing what git would store and written as is.
         tree = subprocess.run(["git", "-C", str(repo), "rev-parse", "HEAD^{tree}"], capture_output=True,
-                              text=True, check=False).stdout.strip()
+                              encoding="utf-8", text=True, check=False).stdout.strip()
         seen: dict = {}
         pair = None
         for i in range(100000):
