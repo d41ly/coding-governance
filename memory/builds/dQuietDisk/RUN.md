@@ -77,3 +77,7 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-22T05:32:52Z draw · re-dispatch · TOOL-dQuietDisk-3 · 4/44 · 20261122T053252Z-173ebb
 
 2026-11-22T05:32:52Z dispatch · item 959a1c43 TOOL-dQuietDisk-3 · reason tools/unattended/check-brief-recorded.sh tools/unattended/check-brief-recorded.test.sh memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-3.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-3-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-3-deviation-1.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-22T06:12:49Z brief · item TOOL-dQuietDisk-4 · reason ff8d8de1fd83 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-4-build-brief.md
+
+2026-11-22T06:14:21Z dispatch · item 982d3235 TOOL-dQuietDisk-4 · reason tools/memory-tree/routed_commits.py memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-4.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-4-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-4-deviation-1.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/CARDS.md

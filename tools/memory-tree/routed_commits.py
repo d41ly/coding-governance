@@ -82,12 +82,29 @@ deviation`, and it runs the chain's `report` value, so it never moves the exit. 
 declares all four DESIGN_* keys, in one line and with no git call, so the
 constant spawn count holds there; armed, its spawns grow with the chain-build specs' revisions. A
 declared design it cannot measure is REFUSED, exit 2.
+
+THE HISTORY VERDICT STORE (TOOL-dQuietDisk-4). A commit's log record never changes once its id exists,
+so the leg keeps the parsed records in TOOL-dQuietDisk-1's history verdict store, through this kit's
+copy of `history_store.py`, under the leg name `routed-commits`. An item is one bucket: the records of
+every commit of HEAD's history whose id opens with the same RECORD_BUCKET_HEX hex digits, a JSON array
+sorted by id, keyed by the prefix and a digest of its member ids, and by the working bytes of this
+file, the trailer reader, `tree_lib.py` and the trailer key table, so an edit to any of them misses
+every bucket. A run reads each bucket, recovers a moved bucket's old members through this worktree's
+last filled tip, and logs only the commits no bucket holds: by id, or over `HEAD` past
+LOG_BATCH_BOUND. Each population's order is one `git rev-list`, so a warm run with no new commit runs
+no `log --name-only` and still pays the store's resolve, the switch's policy read and one `rev-parse`,
+which are not in the counted spawns above. A torn, foreign or misshapen bucket is logged again, and a
+fill that leaves a commit unread writes nothing. The policy key `tests.history-verdicts` is the switch:
+at `regraded`, or where the store cannot resolve, each population is read by its one log pass and
+nothing is written. No verdict is stored: every commit is graded on every run, against HEAD's id map.
 """
 from __future__ import annotations
 
 import contextlib
 import datetime
+import hashlib
 import io
+import json
 import os
 import pathlib
 import re
@@ -104,9 +121,15 @@ if str(KIT) not in sys.path:
     sys.path.append(str(KIT))
 from tree_lib import (GIT_ENV_LEAKS, RED_FIX_TRAILER, build_git_env, build_spec_path_re, parse_conf,  # noqa: E402
                       parse_leg_names, parse_spec_h1, read_policy_value)
-from commit_trailers import derive_attribution, read_commits  # noqa: E402  the kit's one trailer reader
+from commit_trailers import derive_attribution, read_commits, read_key_table  # noqa: E402  the kit's one trailer reader
+from history_store import HistoryStore, resolve_store  # noqa: E402  the kit's copy of the history verdict store
 
 SAY = "routed-commits"
+#: TOOL-dQuietDisk-4: the most commit ids one log reads by id; past it the fill logs `HEAD` whole.
+#: 500 ids at 41 bytes hold the argv near 21 KB, under the 32,767-character command line of Windows.
+LOG_BATCH_BOUND = 500
+#: TOOL-dQuietDisk-4: the hex digits of a commit id that name its bucket, so 256 buckets.
+RECORD_BUCKET_HEX = 2
 #: TOOL-aNimbleMend-10 F1: the most paths under ROUTED_PATHS one `Red-fix:` commit may change.
 RED_FIX_MAX_PATHS = 3
 #: TOOL-aNimbleMend-10 F1: the most lines, added plus deleted, it may change over those paths.
@@ -266,7 +289,7 @@ def derive_commit_range(repo, env) -> tuple:
     return "RANGE", [f"{sha}..{head}"], f"RANGE {sha[:8]}..{head[:8]}"
 
 
-def read_routed_commits(repo, rev_args: list) -> list:
+def read_routed_commits(repo, rev_args: list, held: dict | None = None) -> list:
     """Every commit in the range, newest first, from ONE log pass (S6): sha, parents, committer date,
     subject, `Pass:` trailer and the paths it touches, renames read as a deletion plus an addition.
     `red_fix` is the list of its `Red-fix:` trailer values (TOOL-aNimbleMend-8 S5), one leg name per
@@ -274,16 +297,112 @@ def read_routed_commits(repo, rev_args: list) -> list:
     The pass is the one trailer reader's, run through this module's pinned, counted runner
     (TOOL-dDeclaredLoop-23 S5); a key the trailer table does not register and a stream that ends
     mid-record are each a Refusal. Where no playbook kit resolves, or its table holds no row, the
-    reader reads its floor keys, which hold both keys read here (TOOL-dDeclaredLoop-40)."""
-    try:
-        commits = read_commits(repo, rev_args, ("Pass", RED_FIX_TRAILER), files=True,
-                               run=lambda at, argv: run_git(at, *argv))
-    except (LookupError, ValueError) as exc:
-        raise Refusal(f"the commit log cannot be read: {exc}") from None
-    for c in commits:
+    reader reads its floor keys, which hold both keys read here (TOOL-dDeclaredLoop-40).
+
+    `held` is the leg's one dict per run (TOOL-dQuietDisk-4 S1). Given, the first call fills it from
+    the history verdict store over `git rev-list HEAD`, and each population's order is one `rev-list`
+    over its revision arguments, `HEAD` reusing the fill's, its records taken from the fill's map. A
+    commit no record holds is skipped, so a short log yields a short list. With the store off, and
+    with `held` absent, the read is the one log pass above."""
+    def read_logged_commits(revs) -> list:
+        try:
+            return read_commits(repo, revs, ("Pass", RED_FIX_TRAILER), files=True,
+                                run=lambda at, argv: run_git(at, *argv))
+        except (LookupError, ValueError) as exc:
+            raise Refusal(f"the commit log cannot be read: {exc}") from None
+
+    def derive_routed_record(c) -> dict:
         c["trailer"] = " ".join(c["trailers"]["Pass"]).strip()
         c["red_fix"] = [v for v in c["trailers"][RED_FIX_TRAILER] if v]
-    return commits
+        return c
+
+    def derive_bucket_fields(prefix, members) -> list:
+        return [prefix, hashlib.sha256("\n".join(sorted(members)).encode("ascii")).hexdigest()]
+
+    def parse_bucket(body, members) -> dict:
+        """`{sha: record}` from a bucket's body; ValueError on a body that does not parse, a record
+        of another shape, or a set of ids other than `members` (S4)."""
+        rows = json.loads(body)
+        strs = (lambda v: isinstance(v, list) and all(isinstance(x, str) for x in v))
+        got = {}
+        for row in rows if isinstance(rows, list) else [None]:
+            if not (isinstance(row, dict)
+                    and set(row) == {"sha", "parents", "date", "subject", "trailers", "paths"}
+                    and isinstance(row["sha"], str) and isinstance(row["date"], str)
+                    and isinstance(row["subject"], str) and strs(row["parents"]) and strs(row["paths"])
+                    and isinstance(row["trailers"], dict) and set(row["trailers"]) == {"Pass", RED_FIX_TRAILER}
+                    and all(strs(v) for v in row["trailers"].values())):
+                raise ValueError("a bucket record is not the reader's shape")
+            got[row["sha"]] = row
+        if len(got) != len(rows) or set(got) != set(members):
+            raise ValueError("a bucket holds ids other than its members")
+        return got
+
+    def render_bucket(members, records) -> str:
+        keys = ("sha", "parents", "date", "subject", "trailers", "paths")
+        rows = [{k: records[sha][k] for k in keys} for sha in sorted(members)]
+        return json.dumps(rows, sort_keys=True, separators=(",", ":"))
+
+    def read_bucket(store, prefix, members):
+        body = store.read(derive_bucket_fields(prefix, members))
+        try:
+            return None if body is None else parse_bucket(body, members)
+        except ValueError:
+            return None
+
+    def load_record_map() -> None:
+        """S2, S3: open the store once, then fill `held` over HEAD's whole order, logging only the
+        commits no bucket holds, and write only when every commit of the order has its record."""
+        try:
+            _keys, table = read_key_table()
+        except (LookupError, ValueError) as exc:
+            raise Refusal(f"the commit log cannot be read: {exc}") from None
+        code = [KIT / name for name in ("routed_commits.py", "commit_trailers.py", "tree_lib.py")]
+        store = held["store"] = resolve_store(repo, SAY, code + ([pathlib.Path(table).resolve()] if table else []))
+        if not store.stored:
+            return
+        order = held["order"] = run_git(repo, "rev-list", "HEAD").decode("ascii").split()
+        buckets: dict = {}
+        for sha in order:
+            buckets.setdefault(sha[:RECORD_BUCKET_HEX], []).append(sha)
+        records, missed = {}, []
+        for prefix, members in buckets.items():
+            got = read_bucket(store, prefix, members)
+            if got is None:
+                missed.append(prefix)
+            else:
+                records.update(got)
+        tip = store.read_tip()
+        if missed and tip and tip != order[0]:
+            # A moved bucket's old members, through the last filled tip; a tip naming no commit gives none.
+            old: dict = {}
+            moved = set(missed)
+            for sha in (run_git(repo, "rev-list", tip, may_fail=True) or b"").decode("ascii", "replace").split():
+                if sha[:RECORD_BUCKET_HEX] in moved:
+                    old.setdefault(sha[:RECORD_BUCKET_HEX], []).append(sha)
+            for prefix, members in old.items():
+                records.update(read_bucket(store, prefix, members) or {})
+        lack = [sha for sha in order if sha not in records]
+        if len(lack) > LOG_BATCH_BOUND:
+            records.update((c["sha"], c) for c in read_logged_commits(["HEAD"]))
+        elif lack:
+            records.update((c["sha"], c) for c in read_logged_commits(["--no-walk=unsorted", *lack]))
+        held["records"] = records
+        if all(sha in records for sha in order):     # S5: a short log writes nothing
+            for prefix in missed:
+                store.write(derive_bucket_fields(prefix, buckets[prefix]), render_bucket(buckets[prefix], records))
+            if tip != order[0]:
+                store.write_tip(order[0])
+            store.remove_aged()
+
+    if held is None:
+        return [derive_routed_record(c) for c in read_logged_commits(rev_args)]
+    if not held:
+        load_record_map()
+    if not held["store"].stored:
+        return [derive_routed_record(c) for c in read_logged_commits(rev_args)]
+    order = held["order"] if rev_args == ["HEAD"] else run_git(repo, "rev-list", *rev_args).decode("ascii").split()
+    return [derive_routed_record(dict(held["records"][sha])) for sha in order if sha in held["records"]]
 
 
 def read_lane_state(repo) -> tuple:
@@ -418,8 +537,10 @@ def check_routed_commits(repo, env) -> tuple:
     manifest = resolve_leg_manifest(repo, conf)
     # TOOL-aNimbleMend-10: the limits pass's lines, its listed shas, and its one-slot guarded-list cache.
     limit_lines, limit_shas, guarded = [], set(), []
+    # TOOL-dQuietDisk-4 S1: the store, the WHOLE order and the record map, filled once for both populations.
+    held: dict = {}
     for mode, rev_args, label, tag in populations:
-        commits = read_routed_commits(repo, rev_args)
+        commits = read_routed_commits(repo, rev_args, held)
         read.append((mode, label.split(" (")[0], commits))
         total = int(run_git(repo, "rev-list", "--count", *rev_args).decode("utf-8").strip())
         if total != len(commits):
@@ -739,6 +860,10 @@ def run_selftest() -> int:
         return rc, "\n".join(lines)
 
     root = pathlib.Path(tempfile.mkdtemp(prefix="rc-"))
+    # TOOL-dQuietDisk-4 S7: every arm runs the store off, so each keeps the one log pass and its spawn
+    # count; the record-store arm alone restores the real resolver.
+    real_store = globals()["resolve_store"]
+    globals()["resolve_store"] = lambda _repo, leg, _paths: HistoryStore(None, leg, "", "", False)
     try:
         # ---- AC1 AC2 AC3 AC8: one history, graded whole, by range and with waivers
         repo, s = build_fixture(root, "main", [
@@ -1430,7 +1555,73 @@ def run_selftest() -> int:
         print_arm(got.stdout.splitlines()[:1] == want40[:1] and note40 in got.stderr,
             "TOOL-dDeclaredLoop-40 AC5 a trailer key table of no rows reads the floor keys, with the note",
             f"{got.stdout}\n{got.stderr}")
+
+        # ---- TOOL-dQuietDisk-4 AC4 AC5: the record store against this module's own store-off read, over
+        # one history holding a lane commit, a merge and an unattributed routed commit: cold, warm, after
+        # one added commit and after one torn bucket. The bound is patched to 2, so the cold fill logs
+        # HEAD and the later ones log by id. Staged by a fill that reads the buckets and logs no lack:
+        # the added commit and the torn bucket's members then go unread, and the leg refuses at exit 2.
+        repo, s = build_fixture(root, "stored", [
+            {"msg": "init", "date": OLD_EPOCH,
+             "files": {"README.md": "x\n", "legs.json": '[{"name": "leg one"}]\n', "src/a.txt": "0\n"}},
+            {"msg": "spec TOOL-tFix-1", "files": {SPEC1: "# TOOL-tFix-1 — one\n"}},
+            {"msg": "fix: clear leg one\n\nRed-fix: leg one\nPass: none", "files": {"src/a.txt": "a\n"}},
+            {"msg": "side: docs", "files": {"README.md": "side\n"}},
+            {"msg": "TOOL-tFix-1: main step", "files": {"src/m.txt": "m\n"}, "parent": 3},
+            {"msg": "Merge side", "files": {"README.md": "side\n"}, "parent": 5, "merge": [4]},
+            {"msg": "chore: no id", "files": {"src/c.txt": "c\n"}},
+        ])
+        set_fixture_conf(repo, LEG_MANIFEST="legs.json")
+        items = repo / ".git" / "history-verdicts" / "v1" / SAY / "items"
+        bound_name, logged, seen4 = "LOG_BATCH_BOUND", [], []
+        off_store, real_read, real_bound = globals()["resolve_store"], globals()["read_commits"], globals()[bound_name]
+
+        def read_spied_commits(at, revs, *a, **kw):
+            logged.append(list(revs))
+            return real_read(at, revs, *a, **kw)
+
+        def check_stored_read(what, owed_logs) -> None:
+            globals()["resolve_store"] = off_store
+            want = run_check(repo)
+            globals()["resolve_store"] = real_store
+            logged.clear()
+            got = run_check(repo)
+            files = sorted(p for p in items.rglob("*") if p.is_file()) if items.is_dir() else []
+            seen4.append(f"{what}: logs {logged} · {len(files)} item(s)")
+            print_arm(got == want and logged == owed_logs and bool(files),
+                f"TOOL-dQuietDisk-4 AC4 AC5 {what}: the store-on read prints the store-off read's bytes and exit, "
+                f"logging {owed_logs}", f"{seen4[-1]}\nwant {want!r}\ngot  {got!r}")
+
+        def add_fixture_commit(msg, path) -> str:
+            head = run_git(repo, "rev-parse", "HEAD").decode("ascii").strip()
+            data, when = msg.encode("utf-8"), BASE_EPOCH + 3600
+            run_git(repo, "fast-import", "--quiet", stdin=b"commit refs/heads/main\ncommitter T <t@e> %d +0000\n"
+                    b"data %d\n%s\nfrom %s\nM 100644 inline %s\ndata 2\nn\n\n"
+                    % (when, len(data), data, head.encode("ascii"), path.encode("utf-8")))
+            return run_git(repo, "rev-parse", "HEAD").decode("ascii").strip()
+
+        globals()["read_commits"], globals()[bound_name] = read_spied_commits, 2
+        try:
+            check_stored_read("cold", [["HEAD"]])
+            check_stored_read("warm at an unmoved HEAD", [])
+            added = add_fixture_commit("chore: added, no id", "src/n.txt")
+            check_stored_read("after one added commit", [["--no-walk=unsorted", added]])
+            # A LIVE bucket: one whose members are every commit under its prefix, never the item the added
+            # commit's bucket left behind, which no run reads again.
+            order = run_git(repo, "rev-list", "HEAD").decode("ascii").split()
+            for torn in sorted(p for p in items.rglob("*") if p.is_file()):
+                data = torn.read_bytes()
+                members = [row["sha"] for row in json.loads(data.partition(b"\n")[2].decode("utf-8"))]
+                if sorted(members) == sorted(x for x in order if x[:RECORD_BUCKET_HEX] == members[0][:RECORD_BUCKET_HEX]):
+                    break
+            torn.write_bytes(data[: len(data) // 2])
+            lack = [x for x in order if x in members]
+            check_stored_read("after one torn bucket", [["HEAD"] if len(lack) > 2 else ["--no-walk=unsorted", *lack]])
+        finally:
+            globals()["read_commits"], globals()[bound_name] = real_read, real_bound
+            globals()["resolve_store"] = off_store
     finally:
+        globals()["resolve_store"] = real_store
         import deviation_join  # noqa: E402  its remover: git's objects are read-only on Windows
         deviation_join.remove_tree(root)
     print(f"{SAY} selftest: {'all arms held' if not failed else f'{len(failed)} arm(s) FAILED'}")
