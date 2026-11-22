@@ -8338,10 +8338,11 @@ user_skills = "/tmp/gk-fake-skills"
         for _k, _needle in (("run", "install.baseline = 'run'"), ("bad", "install.baseline could not be read"),
                             ("notm", "declares no observed_reused")):
             _p18, _o18, _l18 = _r18[_k]
+            # The reason is graded ON the mode line, never over the whole output.
+            _ml18 = [_ln for _ln in _o18.splitlines() if "the baseline reads in the `run` mode" in _ln]
             check(f"[dQuietDisk-18] AC5 `{_k}` reads as run on one line, completes, and passes no GATE_REUSE",
-                  _p18.returncode == 0 and _l18 == ""
-                  and sum("the baseline reads in the `run` mode" in _ln for _ln in _o18.splitlines()) == 1
-                  and _needle in _o18, _o18 + _l18)
+                  _p18.returncode == 0 and _l18 == "" and len(_ml18) == 1 and _needle in _ml18[0],
+                  _o18 + _l18)
 
         # ===== unit 6: the merged region =====
         NLc = chr(10)
