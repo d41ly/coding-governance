@@ -6,5 +6,5 @@
 - **Red line:** record_kinds.py's fixture helpers cell and put led with verbs the VERBS table lacks
 - **Files:** tools/memory-tree/record_kinds.py
 - **Commit:** c7f0bb0a41c925f0cdc1d92a6df135bf19e9aa6d
-- **Rerun:** bash tools/run-gates/pass-legs.sh --base d6de992c6649d18b8483164cc182b1ec16d08d2c
+- **Rerun:** bash tools/run-gates/pass-legs.sh --base d6de992c6649d18b8483164cc182b1ec16d08d2c at the fix commit plus its records: the leg reads 1432 verb offenders, the count the run's base `8b8b1374c` reads (DERIVED, `lexicon.py` at both), so the two offenders this unit added are gone and the red that stands is inherited
 - **Caused-by:** TOOL-dTotalRecall-1

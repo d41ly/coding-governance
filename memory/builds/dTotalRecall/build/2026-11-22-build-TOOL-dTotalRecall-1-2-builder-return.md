@@ -13,7 +13,7 @@ TOOL-dTotalRecall-1 is built at rev-7 and committed as one pass commit, 360b653f
 TOOL-dTotalRecall-1 is built and committed (360b653fd on branch/unattended-dtotalrecall-ae256e, base d6de992c6). No gate, suite or bar ran. Several criteria and both new arms' RED-first observations are owed to the close, listed below.
 
 **What landed.**
-- `tools/memory-tree/record-kinds.toml`: 25 rows (generated from pass 1's script).
+- `tools/memory-tree/record-kinds.toml`: 25 rows (generated from pass 1's script). (DERIVED, the builder's own run)
 - `tools/memory-tree/record_kinds.py`: pass 1's draft plus four changes:
   - the F8 population rule, where a typed row grades only its own grammar's paths and the untyped rows take the rest;
   - the fixture's `…-deviation-notes.md` record;
@@ -21,7 +21,7 @@ TOOL-dTotalRecall-1 is built and committed (360b653fd on branch/unattended-dtota
   - the helper renamed to `remove_read_only`.
 - The `gen:record-kinds` region and its section in `tools/memory-tree/HYGIENE.template.md`, rendered into `memory/HYGIENE.md` by `adopt-memory-tree.sh --render`.
 - `[[ledger]] record-kinds-legacy` and the `record-kinds` `[[exempt_leg]]` row in `tools/govkit/registry.toml`. The exempt row was written by `leg_factory.py new --exempt` with ceiling 120, which also re-rendered `tools/gate-legs.json`.
-- `memory/project/record-kinds-legacy.txt`: 11135 rows, seeded by `tools/lib/legacy_ledger.py seed` before this pass's own ledger was written.
+- `memory/project/record-kinds-legacy.txt`: 11135 rows, seeded by `tools/lib/legacy_ledger.py seed` before this pass's own ledger was written. (DERIVED, the builder's own run)
 - The `kind.record-kind` row of `tools/playbook/kinds.toml` now names its population, factory and gate, with owner dTotalRecall. Its pending row in `core-pending.txt` is deleted.
 - The `gap-key` native row, the `record-kind-schema` class row, and a section in `tools/memory-tree/README.md`.
 - Re-rendered by their own writers: `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt` (node d, 1.6s, `--observed`), `help/reference/kinds.md`, and the map files under `memory/map/generated/`.
@@ -53,8 +53,8 @@ TOOL-dTotalRecall-1 is built and committed (360b653fd on branch/unattended-dtota
 - Possible meta-gate reds from the new leg, and the `kit epoch` leg for the memory-tree and playbook kits, whose shipped bytes moved without a version bump.
 
 **Skipped or not done.**
-- **Timed-out dispatch:** the second `--dispatch` (the three generated map files plus a deviation record path) timed out at 100s and was not re-run. The map files went in as generated renders. The deviation record for `new` writing two files (§5 says one) was not written. It is named in the commit's `Decided:` lines and is owed.
+- **Timed-out dispatch:** the second `--dispatch` (the three generated map files plus a deviation record path) timed out at 100s and was not re-run. The map files went in as generated renders. The deviation record for `new` writing two files (§5 says one) was not written. It is named in the commit's `Decided:` lines and is owed. (DERIVED, the builder's own run)
 - **Pipe-escape edit refused:** after the gotchas checklist, the scratch-guard hook refused a one-line edit to `record_kinds.py` because the unit is now CLOSED. The edit would escape a `|` in view cells (class pipe-in-a-code-span-splits-a-table-cell). No current row holds a pipe, so the view is correct today. It is a follow-up.
-- **Dossier over budget:** the pre-commit hook printed a warning only: `memory-tree-hygiene.md` is 21286 bytes against its 20480 budget.
+- **Dossier over budget:** the pre-commit hook printed a warning only: `memory-tree-hygiene.md` is 21286 bytes against its 20480 budget. (DERIVED, the builder's own run)
 - **Gotchas run:** `gotchas.py --for-diff HEAD~1..HEAD` selected 45 classes. Apart from the pipe escape, the relevant ones (fixture-finds-nothing, new-leg meta-gates, idempotent append, empty field, record without Serves) checked clean.
 - **Untracked files:** the two TOOL-dTotalRecall-8 prompt files in `prompts/` are not mine and are left untracked.

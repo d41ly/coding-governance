@@ -32,10 +32,14 @@
 | [2026-11-22-build-TOOL-dTotalRecall-1-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-1-builder-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-2-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-2-acceptance-ledger.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-2-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-2-builder-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-1-deviation-14.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-deviation-14.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-1-deviation-15.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-deviation-15.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-divergence-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-divergence-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-red-fix-1.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-red-fix-1.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-red-fix-2.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-red-fix-2.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-red-fix-3.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-red-fix-3.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dTotalRecall-1-red-fix-4.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-red-fix-4.md) | red-fix | — |
+| [2026-11-22-build-TOOL-dTotalRecall-1-red-fix-5.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-red-fix-5.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dTotalRecall-1-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-1-reground-return.md) | research | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-2-reuse-scout.md) | journal | — |
