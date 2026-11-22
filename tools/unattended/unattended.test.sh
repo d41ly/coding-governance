@@ -20549,6 +20549,61 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# KICK-dKeptSession-22 — A MESSAGE'S ID IS WHAT IT SAYS, AND A RETRY IS REFUSED ACROSS THE BUILD'S
+# SESSION REFS. One subshell sources the tracked driver and prints one line per criterion:
+# `derive_problem_id` equal to the landed hand pipe over a body file, and `derive_gov_id --file` over
+# a missing file rc 1 (AC1); `derive_message_id` one 12-hex id under two sessions, and a new id for a
+# change to each of its six fields (AC2); in a scratch repository whose cache ref
+# `refs/gov/remote/mail/fx/a/s1` holds a planted `gov-mail fx/<id>`, `check_mail_duplicate fx <id>`
+# rc 1 naming that ref (AC3), still so with session s2's ref holding another message, and rc 0 for an
+# id planted only under build fxy (AC4); and, in a fresh repository with no commit and no mail ref,
+# two acks' two ids each rc 0, the second rc 0 and the first rc 1 once the first is planted (AC5).
+# RED, observed at the close, is the base driver, which has no message id. WHAT THIS BLOCK DOES NOT
+# DRIVE: the post that fetches, calls these and writes, KICK-dKeptSession-5's.
+# ==================================================================================================
+md_d=$(mktemp -d)
+md_out=$( set +u; . "$SCRIPT" >/dev/null 2>&1
+  build_mail_commit() { git -c user.name=t -c user.email=t@t commit-tree "$(git hash-object -t tree -w --stdin </dev/null)" -m "$1" 2>/dev/null; }
+  cd "$md_d" && printf 'a body\nline two\n' >body.txt || exit 1
+  md_p=$(derive_problem_id s1 entry.claim push-main.sh body.txt)
+  md_h=$({ printf 's1\0entry.claim\0push-main.sh\0'; cat body.txt; printf '\0'; } | git hash-object --stdin)
+  derive_gov_id --file "$md_d/missing.txt" s1 >/dev/null; md_r=$?
+  printf '%s %s\n' "$([ -n "$md_p" ] && [ "$md_p" = "${md_h:0:12}" ] && echo equal || echo "differ $md_p ${md_h:0:12}")" "$md_r"
+  md_i=$(CLAUDE_CODE_SESSION_ID=s1 derive_message_id fx 'item.design.exit@1#0a1b2c3d' 1 question I16 none)
+  md_j=$(CLAUDE_CODE_SESSION_ID=s2 derive_message_id fx 'item.design.exit@1#0a1b2c3d' 1 question I16 none)
+  printf '%s ' "$([[ $md_i =~ ^[0-9a-f]{12}$ ]] && [ "$md_i" = "$md_j" ] && echo one || echo "two $md_i $md_j")"
+  for md_k in 0 1 2 3 4 5; do
+    md_a=(fx 'item.design.exit@1#0a1b2c3d' 1 question I16 none); md_a[md_k]+=x
+    [ "$(derive_message_id "${md_a[@]}")" != "$md_i" ] && printf 'n' || printf 's'
+  done; echo
+  git init -q r && cd r || exit 1
+  git update-ref refs/gov/remote/mail/fx/a/s1 "$(build_mail_commit "gov-mail fx/$md_i")" 2>/dev/null
+  md_e=$(check_mail_duplicate fx "$md_i"); printf '%s %s\n' "$?" "${md_e//$md_i/<id>}"
+  git update-ref refs/gov/remote/mail/fx/a/s2 "$(build_mail_commit "gov-mail fx/000000000000")" 2>/dev/null
+  git update-ref refs/gov/remote/mail/fxy/a/s3 "$(build_mail_commit "gov-mail fxy/111111111111")" 2>/dev/null
+  md_e=$(check_mail_duplicate fx "$md_i"); printf '%s %s;' "$?" "${md_e//$md_i/<id>}"
+  check_mail_duplicate fx 111111111111 >/dev/null; echo "$?"
+  cd "$md_d" && git init -q e && cd e || exit 1
+  md_i=$(derive_message_id fx 'item.x@1#00' 2 ack re q1); md_j=$(derive_message_id fx 'item.x@1#00' 2 ack re q2)
+  printf '%s ' "$([ "$md_i" != "$md_j" ] && echo two || echo one)"
+  check_mail_duplicate fx "$md_i" >/dev/null; printf '%s ' "$?"
+  check_mail_duplicate fx "$md_j" >/dev/null; printf '%s ' "$?"
+  git update-ref refs/gov/remote/mail/fx/a/s1 "$(build_mail_commit "gov-mail fx/$md_i")" 2>/dev/null
+  check_mail_duplicate fx "$md_j" >/dev/null; printf '%s ' "$?"
+  check_mail_duplicate fx "$md_i" >/dev/null; echo "$?" )
+same "KDS22 AC1 the problem id equals the landed hand pipe, and a missing file is rc 1" "$(sed -n 1p <<<"$md_out")" "equal 1"
+same "KDS22 AC2 one id under two sessions, a new one for each of the six fields" "$(sed -n 2p <<<"$md_out")" "one nnnnnn"
+same "KDS22 AC3 the id planted on s1's ref is refused naming that ref" \
+  "$(sed -n 3p <<<"$md_out")" "1 mail — duplicate <id> · refs/gov/remote/mail/fx/a/s1"
+same "KDS22 AC4 a retry from s2 is refused on s1's ref, and build fxy's ref is not fx's" \
+  "$(sed -n 4p <<<"$md_out")" "1 mail — duplicate <id> · refs/gov/remote/mail/fx/a/s1;0"
+same "KDS22 AC5 two acks are two ids, each 0 over an empty cache, the second 0 once the first lands" \
+  "$(sed -n 5p <<<"$md_out")" "two 0 0 0 1"
+rm -rf "$md_d"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-18 — THE CADENCE SEGMENT IS THE TAG GRAMMAR'S. The sourced driver's
 # `check_cadence_segment` over the spec's probe set, each refusal naming its rule (AC1); the playbook
 # kit's `parse_tag` over each `unit.<name>`, a name admitted there when the tag reads as namespace
@@ -24017,7 +24072,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4067 -> 4072 by KICK-dKeptSession-28 on 2026-11-22: the recipient block's 5 region-eight `same`
 # (AC1's 2, AC2's, AC4's and AC3's), each unconditional and outside any loop, off the diff's own lines;
 # no skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4072
+# RAISED 4072 -> 4077 by KICK-dKeptSession-22 on 2026-11-22: the message-id block's 5 region-eight
+# `same` (AC1 to AC5, one each), each unconditional and outside any loop, off the diff's own lines;
+# no skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4077
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24302,7 +24360,8 @@ FLOOR_SHARD_7=311
 # RAISED 1263 -> 1275 by TOOL-dPlacedRequest-96: the same 12 region-eight stale take-over assertions, see FLOOR_ASSERTIONS.
 # RAISED 1275 -> 1284 by TOOL-dPlacedRequest-97: the same 9 region-eight id-less fence assertions, see FLOOR_ASSERTIONS.
 # RAISED 1284 -> 1289 by KICK-dKeptSession-28: the same 5 region-eight recipient assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1289
+# RAISED 1289 -> 1294 by KICK-dKeptSession-22: the same 5 region-eight message-id assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1294
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

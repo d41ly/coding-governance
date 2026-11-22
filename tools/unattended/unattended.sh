@@ -3719,6 +3719,34 @@ check_mail_addressed() { # to · who -> 0 when <to> addresses <who>, 1 otherwise
   [ "build:$s" = "$who" ]
 }
 
+# A MESSAGE'S ID (KICK-dKeptSession-22 S2): `derive_gov_id` over its build, its item's instance key,
+# its pass, its kind, its subject and the id it answers, in that order, each absent one written
+# `none`. No session and no time is a field, so a post retried from the same session or a new one
+# carries the id of the post it retries, and two answers to two messages carry two ids.
+derive_message_id() { # build · item · pass · kind · subject · answers -> the first 12 hex digits; rc 1 when git cannot hash
+  derive_gov_id "${1:-none}" "${2:-none}" "${3:-none}" "${4:-none}" "${5:-none}" "${6:-none}"
+}
+
+# A RETRIED POST (KICK-dKeptSession-22 S3): every ref this node's cache holds under
+# `refs/gov/remote/mail/<build>/`, one per writing session, listed by one `for-each-ref`, then one
+# first-parent `log --source` across them all, matched on the subject `gov-mail <build>/<id>`, the
+# message's header. With no ref listed the log is never run: a log given no revision reads HEAD,
+# which a repository with no commit does not have. It reads the cache only; its caller fetches
+# first. WHAT THIS DOES NOT CHECK: two sessions posting one id to two refs at one instant, which a
+# compare-and-swap on one ref cannot see; the mailbox reader collapses those.
+check_mail_duplicate() { # build · id -> 0 no cached ref holds it, 1 printing `mail — duplicate <id> · <ref>`, 2 the cache unread
+  local b="${1:-}" id="${2:-}" out ref
+  local -a refs=()
+  out=$(GIT for-each-ref --format='%(refname)' "refs/gov/remote/mail/$b/" 2>/dev/null) || return 2
+  [ -n "$out" ] || return 0
+  mapfile -t refs <<<"$out"
+  out=$(GIT log --source --first-parent --format='%S%x09%s' "${refs[@]}" -- 2>/dev/null) || return 2
+  ref=$(MD_SUBJECT="gov-mail $b/$id" awk -F'\t' '{ s = substr($0, length($1) + 2) } s == ENVIRON["MD_SUBJECT"] { print $1; exit }' <<<"$out")
+  [ -n "$ref" ] || return 0
+  printf 'mail — duplicate %s · %s\n' "$id" "$ref"
+  return 1
+}
+
 # A CADENCE SEGMENT (TOOL-dPlacedRequest-18 S1): the tag grammar's `seg` production of
 # PLAY-dOrderedCharter-19 S1, `[a-z0-9][a-z0-9-]*`, at most 64 bytes — `RULE_KEY_RE`'s shape in
 # the roles kit's `roles_lib.py` less its optional `?`, and never a list of cadence kinds, so a cadence an
@@ -4551,11 +4579,24 @@ derive_decision_key() { # item · fork -> `<item segment>+<fork segment>`; rc 1 
   derive_ref_segment "$1" >/dev/null && a=$_segment && derive_ref_segment "$2" >/dev/null && b=$_segment || return 1
   printf '%s+%s\n' "$a" "$b"
 }
-derive_problem_id() { # session · item · subject · body file -> the first 12 hex digits; rc 1 when git cannot hash
-  local h
-  h=$({ printf '%s\0%s\0%s\0' "$1" "$2" "$3"; cat -- "$4" && printf '\0'; } | GIT hash-object --stdin 2>/dev/null) || return 1
+# THE ONE GOV ID OVER FIELDS (KICK-dKeptSession-22 S1): the first 12 hex digits of `GIT hash-object
+# --stdin` over each field followed by one NUL, then, with `--file`, that file's bytes and one NUL;
+# zero fields with `--file` hash the file alone. The file is tested before the pipe, since the pipe
+# answers rc 0 over a missing file with the fields' hash alone. `derive_problem_id` and
+# `derive_message_id` are its two callers.
+derive_gov_id() { # [--file <path>] [<field>…] -> the first 12 hex digits; rc 1 when the file cannot be read or git cannot hash
+  local f="" h
+  if [ "${1:-}" = --file ]; then
+    [ "$#" -ge 2 ] || return 1
+    f=$2; shift 2
+    [ -f "$f" ] && [ -r "$f" ] || return 1
+  fi
+  h=$({ [ "$#" = 0 ] || printf '%s\0' "$@"; [ -z "$f" ] || { cat -- "$f" && printf '\0'; }; } | GIT hash-object --stdin 2>/dev/null) || return 1
   [[ $h =~ ^[0-9a-f]{12} ]] || return 1
   printf '%s\n' "${h:0:12}"
+}
+derive_problem_id() { # session · item · subject · body file -> the first 12 hex digits; rc 1 when the file cannot be read or git cannot hash
+  derive_gov_id --file "$4" "$1" "$2" "$3"
 }
 write_register() { # decision <build> <item> <fork> <file> | problem <subject> <item> <file> -> 0 written, 1 exists, 2 not written
   local kind="${1:-}" b="" it="" fk="" sub="" f="" comp ref sid n bad msg c rc d LC_ALL=C

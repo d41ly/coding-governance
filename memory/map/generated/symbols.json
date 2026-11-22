@@ -3663,6 +3663,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "build_mail_commit",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "build_main",
       "kind": "function",
       "file": "tools/push-main.test.sh"
@@ -7464,6 +7469,11 @@
     },
     {
       "id": "check_mail_addressed",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_mail_duplicate",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
@@ -12418,6 +12428,11 @@
       "file": "tools/run-gates/product_tests.py"
     },
     {
+      "id": "derive_gov_id",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_gov_root",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
@@ -13166,6 +13181,11 @@
       "id": "derive_merged_subclass",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_message_id",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_minute",
