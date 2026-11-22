@@ -23,6 +23,7 @@ writer = "gen_build_index.py --new-spec"
 readers = ["input:spec"]
 lifecycle = "current-state"
 check = "memory hygiene"
+purpose = { text = "its writer is `design.unit-spec`; the spec redesigned as a structured, tagged contract", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:412" }
 
 [[record-kind]]
 name = "spec-audit"
@@ -36,6 +37,7 @@ readers = []
 readers-none = "a review record is read by the index and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "diff-review"
@@ -49,6 +51,7 @@ readers = []
 readers-none = "a review record is read by the index and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "log"
@@ -61,6 +64,7 @@ writer = "hand"
 readers = ["brief:prompt", "brief:goal", "brief:items", "brief:acceptance", "brief:gates", "brief:non-goals", "input:prompt"]
 lifecycle = "append-only"
 check = "memory hygiene"
+purpose = { text = "the journal grammar moved into the core; writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:446" }
 
 [[record-kind]]
 name = "research"
@@ -74,6 +78,7 @@ readers = []
 readers-none = "a report is cited by a spec's reuse audit, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "run-record"
@@ -87,6 +92,7 @@ readers = []
 readers-none = "a run record is read by the runlog kit's verify, never filled into a work order"
 lifecycle = "generated"
 check = "runlog record schema"
+purpose = { text = "observability's journal reader writes it when the journal shows a run closed, as `observability.run-record` says", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:450" }
 
 [[record-kind]]
 name = "backlog-row"
@@ -100,6 +106,7 @@ readers = []
 readers-none = "an ask row is read by the index generator's ask views, never filled into a work order"
 lifecycle = "current-state"
 check = "memory hygiene"
+purpose = { text = "the ask register's row store; the memory contract declares it; writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:456" }
 
 [[record-kind]]
 name = "design-record"
@@ -113,6 +120,7 @@ readers = []
 readers-none = "a design record is read by the deviation join, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "a core memory kind with no writer item; the memory contract declares it", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:454" }
 
 [[record-kind]]
 name = "dossier"
@@ -126,6 +134,7 @@ readers = []
 readers-none = "a dossier is consulted through the map's lookups, never filled into a work order"
 lifecycle = "current-state"
 check = "codebase-map gate coverage"
+purpose = { text = "dossiers anchored to symbol keys; its writer, where the map is installed, is `build.unit-pass`, the claiming dossier's", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:459" }
 
 [[record-kind]]
 name = "deviation"
@@ -139,6 +148,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "the record kept in its departing build's `build/` folder, read by the deviation join, the as-built view", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:399" }
 
 [[record-kind]]
 name = "exception"
@@ -152,6 +162,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "the exception register, kept in the building build's `build/` folder as a deviation record is; writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:400" }
 
 [[record-kind]]
 name = "override"
@@ -165,6 +176,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "`charter.override` and its record, under the precedence and override rule, the record kept in the building build's", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:401" }
 
 [[record-kind]]
 name = "change"
@@ -178,6 +190,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "red-fix"
@@ -191,6 +204,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "disposition"
@@ -204,6 +218,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt.", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:442" }
 
 [[record-kind]]
 name = "acceptance"
@@ -217,6 +232,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "its writer is `build.acceptance`; dDeclaredLoop builds the witnesses computed rather than typed, the acceptance re-run", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:420" }
 
 [[record-kind]]
 name = "transition"
@@ -230,6 +246,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "the transition record three ways; every step's exit item writes it: `plan.exit`, `design.exit`, `build.exit`", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:439" }
 
 [[record-kind]]
 name = "recommendation"
@@ -243,6 +260,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "every `*.recommend` item writes it; the stage-exit recommendation is one mechanism, dDeclaredLoop's (AF-1)", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:470" }
 
 [[record-kind]]
 name = "widen"
@@ -256,6 +274,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "leg-tail"
@@ -269,6 +288,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "flake"
@@ -282,6 +302,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "its writer is `test.flakes`; flake quarantine", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:425" }
 
 [[record-kind]]
 name = "gate-health"
@@ -295,6 +316,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "card"
@@ -308,6 +330,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "the build's orientation card at level 1, its stores and snapshot; its writer is `entry.orient`, which composes it", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:406" }
 
 [[record-kind]]
 name = "probe-trigger"
@@ -321,6 +344,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "its writer is `probe.trigger`: why the probe opened, keyed by the boundary or the raising return, or by content for a", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:472" }
 
 [[record-kind]]
 name = "probe"
@@ -334,6 +358,7 @@ readers = []
 readers-none = "a typed record is read by its own reader and the hygiene checks, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "its writer is `probe.return`: one record per probe, its kind a verification, a reproduction or an experiment, an", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:471" }
 
 [[record-kind]]
 name = "view"
@@ -347,6 +372,7 @@ readers = []
 readers-none = "a generated view is read by people and its own generator's check, never filled into a work order"
 lifecycle = "generated"
 check = "memory hygiene"
+purpose = { text = "a generated view: LIVE.md, the ledger, the ask views; re-rendered, never merged (the away pass); writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:477" }
 
 [[record-kind]]
 name = "registry"
@@ -360,6 +386,7 @@ readers = []
 readers-none = "a row registry is read by the gate that registers it, never filled into a work order"
 lifecycle = "current-state"
 check = "ratchet (never gains)"
+purpose = { text = "a gate's row registry under `memory/project/`, written by its gate's pin emitter (the away pass); writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:478" }
 
 [[record-kind]]
 name = "archive"
@@ -373,6 +400,7 @@ readers = []
 readers-none = "a rotated record is read only by a reader that asks for history, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "a rotated record under `memory/archive/`, written by rotation (the away pass); writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:479" }
 
 [[record-kind]]
 name = "instrument"
@@ -386,6 +414,7 @@ readers = []
 readers-none = "an instrument is run or read beside the record it serves, never filled into a work order"
 lifecycle = "frozen"
 check = "memory hygiene"
+purpose = { text = "a script, table or drawing kept beside the record it serves (the away pass); writer item not named: the session that", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:480" }
 
 [[record-kind]]
 name = "witness"
@@ -399,6 +428,7 @@ readers = []
 readers-none = "a witness is joined by its key in its owner's check, never filled into a work order"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { text = "a declared pocket outside the tree, such as a transcript, a Codex rollout, the auto-memory, the live inbox or a", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:481" }
 
 [[record-kind]]
 name = "orientation-cards"
@@ -411,6 +441,7 @@ writer = "manifest-check.sh --card"
 readers = ["card:route", "card:reuse", "task:in", "task:todo", "task:reuse"]
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "unattended-sidecars"
@@ -424,6 +455,7 @@ readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "runlog-journal"
@@ -437,6 +469,7 @@ readers = []
 readers-none = "a store is read by its own kit's reader, never filled into a work order"
 lifecycle = "append-only"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "drift-history"
@@ -450,6 +483,7 @@ readers = []
 readers-none = "a store is read by its own kit's reader, never filled into a work order"
 lifecycle = "append-only"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "gate-ledger"
@@ -463,6 +497,7 @@ readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "health-logs"
@@ -476,6 +511,7 @@ readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "hook-state"
@@ -489,6 +525,7 @@ readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "reuse-lookups"
@@ -502,6 +539,7 @@ readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "recall-cache"
@@ -515,6 +553,7 @@ readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "review-lenses"
@@ -528,6 +567,7 @@ readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "transition-cache"
@@ -541,6 +581,7 @@ readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "gov-index"
@@ -554,6 +595,7 @@ readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "generated"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "gov-feed"
@@ -567,6 +609,7 @@ readers = []
 readers-none = "a store is read by its own kit's reader, never filled into a work order"
 lifecycle = "append-only"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "handoff-calls"
@@ -580,6 +623,7 @@ readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "index-render-stamp"
@@ -593,6 +637,7 @@ readers = []
 readers-none = "a cache or a mechanic is read by its own writer, never filled into a work order"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }
 
 [[record-kind]]
 name = "git-client-state"
@@ -606,3 +651,4 @@ readers = []
 readers-none = "a desktop git client's own state, read by that client alone"
 lifecycle = "out"
 check = "record-kinds"
+purpose = { pending = "TOOL-dTotalRecall-110" }

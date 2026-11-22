@@ -116,7 +116,6 @@ memory.legacy-anchors
 memory.load-budget
 memory.map-budget
 memory.map-overflow
-memory.map-purpose
 memory.map-unfold
 memory.mirror
 memory.over-budget

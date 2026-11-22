@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""record_kinds.py — the record-kind registry's reader, gate, view and factory (TOOL-dTotalRecall-1, -18).
+"""record_kinds.py — the record-kind registry's reader, gate, view and factory (TOOL-dTotalRecall-1, -18, -16).
 
     python <prefix>/memory-tree/record_kinds.py --check             # the `record-kinds` leg
     python <prefix>/memory-tree/record_kinds.py --write             # the HYGIENE template's kind region
     python <prefix>/memory-tree/record_kinds.py --template <kind>   # the record skeleton of one kind
     python <prefix>/memory-tree/record_kinds.py new <name> --tag record.<name> --writer <door>
                                                 --check <leg> --field <Key>... --home <glob>
-                                                --layer <tag> --lifecycle <value>
+                                                --layer <tag> --lifecycle <value> --purpose <text>
                                                 (--reader <key>... | --readers-none <reason>)
+    python <prefix>/memory-tree/record_kinds.py --purpose-review [--from <path>] [--write [--ask <id>]]
+    python <prefix>/memory-tree/record_kinds.py --print-purpose-pending   # the purpose-pending seed
     python <prefix>/memory-tree/record_kinds.py --seed-legacy       # the record-kinds-legacy seed
     python <prefix>/memory-tree/record_kinds.py --print-gap-keys    # the gap-key native class's members
     python <prefix>/memory-tree/record_kinds.py --fixture [--plant <case>]
@@ -15,10 +17,12 @@
 
 ONE DECLARATION PER KIND. `record-kinds.toml` beside this file holds one `[[record-kind]]` row per
 record kind, its columns `name`, `tag`, `layer`, `home`, `id-rule`, `schema`, `writer`, `readers`,
-`readers-none`, `lifecycle` and `check`; `root` and `sections` are admitted for the units that
+`readers-none`, `lifecycle`, `check` and `purpose`; `root` and `sections` are admitted for the units that
 add them. Every row carries `name`, `tag` (`record.<name>`), `layer` (a `layer.<name>` tag, the
 layer of the kit whose writer writes the kind), `home`, `schema`, `writer`, `readers`, `lifecycle`
-(one of `LIFECYCLES`) and `check`. `home` is one glob or a list of them, each a tracked-path glob,
+(one of `LIFECYCLES`), `check` and `purpose`. `purpose` is `{ text, source }`, one line of at most
+`PURPOSE_BYTES` and its source `<path>:<line>`, a tracked path and a line in it, or `owner`; or
+`{ pending = "<id>" }`, which `memory.map-purpose` grades. `home` is one glob or a list of them, each a tracked-path glob,
 a ref glob `refs/gov/<glob>` or `<git-common-dir>/<glob>`; a `fields` row's is one tracked glob, the
 population it grades. `readers` lists the work-order read keys a handoff fills from a record of the
 kind, each a member of the roles kit's `READ_KEYS` that some role's `reads:` names; a kind no role
@@ -28,8 +32,9 @@ reads carries `readers = []` and a non-empty `readers-none` reason. `schema` is
 through `{prefix}`, the literal another module declares the same fields in, read with `ast` and
 never by import, so a sibling kit's table is read without crossing a kit boundary.
 
-THE VIEW, the HYGIENE template's `gen:record-kinds` region, is one table line per row: `Kind`, `Tag`,
-`Home`, `Writer`, `Read by`, `Written by` and `Check`, each `|` in a value written `\\|`. `Read by`
+THE VIEW, the HYGIENE template's `gen:record-kinds` region, is one `<n> kinds · <p> purposes pending`
+line and one table line per row: `Kind`, `Tag`, `Home`, `Writer`, `Read by`, `Written by`, `Check` and
+`Purpose`, the text or `—`, each `|` in a value written `\\|`. `Read by`
 is the roles whose `reads:` holds one of the row's `readers` and the loop items whose `inputs` hold a
 typed record reference `<layer tag>:record-kind.<name>[@<n>]` (`loop_items.derive_record_ref`); a
 prose input joins nothing. `Written by` is the roles whose `writes:` folder in the roles kit's
@@ -61,16 +66,37 @@ the common git dir (the inline `common_git_dir` block), skips git's own (`GIT_OW
 entry no row's `<git-common-dir>/` home glob matches on its first segment. THE ALIAS JOIN reads the
 runlog kit's `SERVES_ALIASES` from its `record.py` by `ast` and reds where it differs from the
 `tree_lib.KIND_ALIASES` keys whose target is `log`; where that kit does not resolve it prints
-`unarmed` and passes, since this kit does not require it. It prints one count line naming every row,
-each `fields` kind's graded and legacy counts, each `unarmed` kind, one `view` line per row, each
-pocket entry with the row it matched, and every red with its row.
+`unarmed` and passes, since this kit does not require it. THE PENDING RULE reads `memory.map-purpose`
+once through `tree_lib.read_policy_value` and grades each `pending` row by it: under `review` an open
+ask, a row of a tracked `<memory root>/builds/*/BACKLOG.md` no `CLOSED` or `WONTDO` row names; under
+`ledger` `purpose-pending` and the node a row of that `[[ledger]]` population, a listed node now
+carrying a text red; under `derive` `none-found`; under `refuse` no pending at all. No policy kit
+reads the default `review` with one line saying so; a refused read exits 2 naming the key. It prints one
+count line naming every row, each `fields` kind's graded and legacy counts, each `unarmed` kind, the
+purpose line, one `view` line per row, each pocket entry with the row it matched, and every red with
+its row.
+
+THE PURPOSE REVIEW, `--purpose-review`, tries each registry row with no `text` and each row of the
+chain registry with no `purpose` (`<memory root>/` plus the playbook kit's `tag_index.py`
+CHAIN_REGISTRY, read by `ast`; `unarmed chain` where it does not resolve) in order: the H1 of the
+node's file after its name and the dash (a chain build's README; a kind has none), then the row of a
+Markdown table of the tracked `--from` record whose first cell, `-` read as a space and through
+`resolve_kind`, names the kind, its last cell the text; a text cut at a word boundary under
+`PURPOSE_BYTES`, one only repeating the name tried past. It prints `derived <node> · <text> ·
+<source>` or `none <node> · <found>` per node and one `ask <namespace> · …` draft per namespace with a
+`none` node, none under `derive`. `--write` inserts one line per node: a registry row's `purpose`
+table, a chain row's `purpose` string, and each `none` registry row's pending, `--ask`'s open ask
+under `review`, `purpose-pending` under `ledger`, `none-found` under `derive`, nothing under
+`refuse`; a `none` chain row is never written. It exits 2 writing nothing on an untracked `--from`, an
+`--ask` that is no open ask, or `ledger` with no `[[ledger]]` row registering `purpose-pending`.
 
 Exit 0 green, 1 a red, 2 a refusal: a registry that does not parse, or a verb's malformed arguments.
 `new` appends the row and re-renders that region from the registry, so the two move together; it
 exits 2 and writes nothing on a duplicate name, a tag that is not `record.<name>`, an empty
 writer, no `--home` or no `--field`, a check no leg carries, no `--layer` or one that is no
-`layer.<name>` tag, no `--lifecycle` or one outside `LIFECYCLES`, or no `--reader` and no
-`--readers-none`, both, or a reader key the roles do not read. `--print-gap-keys` exits 3 where no
+`layer.<name>` tag, no `--lifecycle` or one outside `LIFECYCLES`, no `--reader` and no
+`--readers-none`, both, or a reader key the roles do not read, or no `--purpose`, an empty one, one
+past `PURPOSE_BYTES` or one holding a newline; its row's `source` is `owner`. `--print-gap-keys` exits 3 where no
 gap register is tracked, the native class's not-armed answer.
 
 WHAT IT DOES NOT CHECK. Whether a row's `writer` writes the kind: the cell is read, never run. A
@@ -79,6 +105,8 @@ field's value, only its line. A `gap-key` at an edge site, since no edge type na
 non-`fields` row's tracked home matches a file, or a `refs/gov/` home a ref. Whether a `layer` tag
 is a row of the playbook kit's layer register: its shape only. A `WRITE_FOLDERS` value that is no
 folder (the product class's conf key) covers no home. A pocket's contents, which it never reads.
+Whether a derived purpose describes its node: the citation makes it checkable, never checked. An ask
+closed only by a spec header's `closes`, read as open. The chain rows, which `--check` never grades.
 """
 from __future__ import annotations
 
@@ -106,9 +134,19 @@ LEGS = "gate-legs.json"
 LEGACY = "record-kinds-legacy"
 REGION_OPEN, REGION_CLOSE = "<!-- gen:record-kinds -->", "<!-- /gen:record-kinds -->"
 COLUMNS = ("name", "tag", "layer", "home", "id-rule", "schema", "writer", "readers", "readers-none", "lifecycle",
-           "check")
+           "check", "purpose")
 LATER_COLUMNS = ("root", "sections")   # TOOL-dTotalRecall-19's and -9's, admitted and graded by their owners
-REQUIRED = ("name", "tag", "layer", "home", "schema", "writer", "readers", "lifecycle", "check")
+REQUIRED = ("name", "tag", "layer", "home", "schema", "writer", "readers", "lifecycle", "check", "purpose")
+#: TOOL-dTotalRecall-16 S1: a purpose's one line, in UTF-8 bytes (PINNED, the cap that spec sets).
+PURPOSE_BYTES = 120
+PURPOSE_KEYS = ("text", "source", "pending")
+PURPOSE_SOURCE_RE = re.compile(r"(?P<path>[^\s:][^:]*):(?P<line>[1-9][0-9]*)")
+#: `memory.map-purpose`'s values, its catalogue default, and the two pending values S6 mints.
+MAP_PURPOSE_VALUES = ("review", "ledger", "derive", "refuse")
+MAP_PURPOSE_DEFAULT = "review"
+PURPOSE_PENDING = "purpose-pending"
+NONE_FOUND = "none-found"
+REGISTRY_NS, CHAIN_NS = "record-kind", "chain"
 LIFECYCLES = ("append-only", "current-state", "frozen", "generated", "out")
 LAYER_RE = re.compile(r"layer\.[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)*")
 COMMON_DIR_HOME = "<git-common-dir>/"
@@ -349,6 +387,8 @@ def check_row(row: dict, n: int, legs: set, root, tool_rel: str) -> list[str]:
                     f"fills from the kind, or say why no role reads it")
     elif readers and "readers-none" in row:
         reds.append(f"{at}: `readers` names keys and `readers-none` says no role reads the kind: keep one")
+    if "purpose" in row:
+        reds += check_purpose_cell(row["purpose"], at, root)
     schema = row.get("schema")
     if "schema" not in row:
         return reds
@@ -377,6 +417,40 @@ def check_row(row: dict, n: int, legs: set, root, tool_rel: str) -> list[str]:
                             f"{', '.join(lack) or 'nothing'}; the source alone holds {', '.join(extra) or 'nothing'}")
         except RecordKindsError as e:
             reds.append(f"{at}: {e}")
+    return reds
+
+
+def check_purpose_cell(purpose, at: str, root) -> list[str]:
+    """S1's grammar of one row's `purpose`: `{ text, source }` or `{ pending }`, no other key and never both
+    forms; `text` one line of at most `PURPOSE_BYTES`; `source` `owner` or `<path>:<line>`, a tracked path
+    and a line inside it."""
+    if not isinstance(purpose, dict):
+        return [f"{at}: `purpose` is not a table: write {{ text, source }} or {{ pending }}"]
+    reds = [f"{at}: `purpose.{k}` is no purpose key ({', '.join(PURPOSE_KEYS)})" for k in purpose if k not in PURPOSE_KEYS]
+    if "pending" in purpose and ("text" in purpose or "source" in purpose):
+        return reds + [f"{at}: `purpose` holds a text and a pending at once: keep one"]
+    if "pending" in purpose:
+        if not (isinstance(purpose["pending"], str) and purpose["pending"].strip()):
+            reds.append(f"{at}: `purpose.pending` is no id: name the ask, `{PURPOSE_PENDING}` or `{NONE_FOUND}`")
+        return reds
+    text, source = purpose.get("text"), purpose.get("source")
+    if not (isinstance(text, str) and text.strip()):
+        reds.append(f"{at}: `purpose.text` is empty or missing: say what the kind is for in one line")
+    elif "\n" in text or "\r" in text:
+        reds.append(f"{at}: `purpose.text` holds a newline: a purpose is one line")
+    elif len(text.encode("utf-8")) > PURPOSE_BYTES:
+        reds.append(f"{at}: `purpose.text` is {len(text.encode('utf-8'))} bytes, past PURPOSE_BYTES {PURPOSE_BYTES}")
+    m = PURPOSE_SOURCE_RE.fullmatch(source) if isinstance(source, str) else None
+    if source == "owner":
+        return reds
+    if m is None:
+        return reds + [f"{at}: `purpose.source` {source!r} is neither `owner` nor `<path>:<line>`"]
+    path = pathlib.Path(root, m["path"])
+    tracked = run_git(root, "ls-files", "--", f":(literal){m['path']}").stdout.strip()
+    if not tracked or not path.is_file():
+        return reds + [f"{at}: `purpose.source` {source!r} cites {m['path']}, which is no tracked file"]
+    if int(m["line"]) > len(path.read_bytes().decode("utf-8", "replace").rstrip("\n").split("\n")):
+        reds.append(f"{at}: `purpose.source` {source!r} cites a line past the end of {m['path']}")
     return reds
 
 
@@ -565,11 +639,17 @@ def render_kind_region(rows: list[dict], joins: dict) -> str:
         return ("`" + v.replace("|", "\\|") + "`") if isinstance(v, str) and v else "—"
     def render_join(names):
         return UNARMED if joins["unarmed"] else render_cell(names)
-    lines = [REGION_OPEN, "", "| Kind | Tag | Home | Writer | Read by | Written by | Check |",
-             "|---|---|---|---|---|---|---|"]
+    def render_purpose(purpose):   # the text as prose, its `|` escaped; `—` for a pending or no purpose
+        text = purpose.get("text") if isinstance(purpose, dict) else None
+        return text.replace("|", "\\|") if isinstance(text, str) and text else "—"
+    pending = sum(1 for r in rows if isinstance(r.get("purpose"), dict) and "pending" in r["purpose"])
+    lines = [REGION_OPEN, "", f"{len(rows)} kinds · {pending} purposes pending", "",
+             "| Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |",
+             "|---|---|---|---|---|---|---|---|"]
     lines += [f"| {render_cell(r.get('name'))} | {render_cell(r.get('tag'))} | {render_cell(r.get('home'))} | "
               f"{render_cell(r.get('writer'))} | {render_join(derive_read_by(r, joins))} | "
-              f"{render_join(derive_written_by(r, joins))} | {render_cell(r.get('check'))} |" for r in rows]
+              f"{render_join(derive_written_by(r, joins))} | {render_cell(r.get('check'))} | "
+              f"{render_purpose(r.get('purpose'))} |" for r in rows]
     return "\n".join(lines + ["", REGION_CLOSE])
 
 
@@ -675,6 +755,10 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
         return [f"{SAY}: refused · {e}"], 2
     if not rows:
         return [f"{SAY}: unarmed — the registry {kit_rel}/{REGISTRY} holds no row", f"{SAY}: red"], 1
+    try:
+        value, value_note = read_map_purpose(root)
+    except RecordKindsError as e:
+        return [f"{SAY}: refused · {e}"], 2
     legs = read_leg_names(root, tool_rel)
     reds = [] if legs is not None else [f"{tool_rel}/{LEGS} is absent or unreadable, so no `check` resolves"]
     legs = legs or set()
@@ -751,7 +835,13 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
     reds += pocket_reds
     alias_line, alias_reds = check_serves_aliases(root, kit_rel, tool_rel)
     reds += alias_reds
+    try:
+        purpose_line, purpose_reds = check_purpose(root, rows, value)
+    except RecordKindsError as e:
+        return [f"{SAY}: refused · {e}"], 2
+    reds += purpose_reds
     lines = [f"{SAY}: {len(rows)} rows · " + " · ".join(counts)]
+    lines += [f"{SAY}: {ln}" for ln in ([value_note] if value_note else []) + [purpose_line]]
     lines += [f"{SAY}: {u}" for u in unarmed]
     if note:
         lines.append(f"{SAY}: legacy · {note}")
@@ -767,13 +857,16 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
 
 # ---------------------------------------------------------------------------------- the factory
 def render_row(row: dict) -> str:
-    """One `[[record-kind]]` table in the registry's column order, `readers-none` only where the row sets it."""
+    """One `[[record-kind]]` table in the registry's column order, `readers-none` and `purpose` only where the
+    row sets them, `purpose` the last line."""
     out = ["[[record-kind]]"]
     for col in COLUMNS:
-        if col == "readers-none" and col not in row:
+        if col in ("readers-none", "purpose") and col not in row:
             continue
         v = row[col]
-        if col == "schema":
+        if col == "purpose":
+            out.append(render_purpose_line(v))
+        elif col == "schema":
             parts = [f"form = {json.dumps(v['form'])}"] + ([f"source = {json.dumps(v['source'])}"] if v.get("source") else [])
             parts.append("fields = [" + ", ".join(json.dumps(f) for f in v["fields"]) + "]")
             out.append("schema = { " + ", ".join(parts) + " }")
@@ -821,6 +914,13 @@ def add_record_kind(root, a, kit_rel: str | None = None) -> int:
         else:
             row_probe = {"name": a.name, "readers": readers}
             bad += [r.split(": ", 1)[1].replace("reader ", "--reader ", 1) for r in check_readers([row_probe], joins)]
+    purpose = a.purpose or ""
+    if not purpose.strip():
+        bad.append("--purpose <text> is required: one line saying what the kind is for")
+    elif "\n" in purpose or "\r" in purpose:
+        bad.append("--purpose holds a newline: a purpose is one line")
+    elif len(purpose.encode("utf-8")) > PURPOSE_BYTES:
+        bad.append(f"--purpose is {len(purpose.encode('utf-8'))} bytes, past PURPOSE_BYTES {PURPOSE_BYTES}")
     if bad:
         for b in bad + ["nothing written"]:
             print(f"{SAY}: refused · {b}")
@@ -830,6 +930,7 @@ def add_record_kind(root, a, kit_rel: str | None = None) -> int:
            "lifecycle": a.lifecycle, "check": a.check}
     if none_why:
         row["readers-none"] = none_why
+    row["purpose"] = {"text": purpose, "source": "owner"}
     path = pathlib.Path(root, kit_rel, REGISTRY)
     text = path.read_bytes().decode("utf-8") if path.is_file() else ""
     path.write_bytes((text.rstrip("\n") + "\n\n" + render_row(row) if text.strip() else render_row(row)).encode("utf-8"))
@@ -851,6 +952,355 @@ def render_template(rows: list[dict], kind: str, typed_kinds=None) -> str | None
     out = [f"# <unit id> {kind} <n> — <title>" if factory else "# <title>", "", f"**Serves:** {kind} <unit id>", ""]
     out += [f"- **{f}:** " for f in schema.get("fields", []) if f != "Serves"]
     return "\n".join(out) + "\n"
+
+
+# ---------------------------------------------------------------------------------- the purpose
+def render_purpose_line(purpose: dict) -> str:
+    """One `purpose = { … }` line, each value through `json.dumps` as `render_row` writes every value."""
+    if "pending" in purpose:
+        return f"purpose = {{ pending = {json.dumps(purpose['pending'])} }}"
+    return f"purpose = {{ text = {json.dumps(purpose['text'])}, source = {json.dumps(purpose['source'])} }}"
+
+
+def read_map_purpose(root) -> tuple[str, str]:
+    """S3: `(value, note)` of `memory.map-purpose` at `root`'s landed revision, read once through
+    `tree_lib.read_policy_value`. Where no policy kit resolves, the catalogue default `review` and a note
+    saying so (§8 F8); RecordKindsError naming the key where the reader refuses."""
+    from tree_lib import read_policy_value
+    try:
+        value = read_policy_value("memory.map-purpose", root)
+    except LookupError as e:
+        return MAP_PURPOSE_DEFAULT, (f"purpose · no policy kit resolves, so memory.map-purpose reads its "
+                                     f"catalogue default {MAP_PURPOSE_DEFAULT}: {e}")
+    except ValueError as e:
+        raise RecordKindsError(str(e)) from None
+    if value not in MAP_PURPOSE_VALUES:
+        raise RecordKindsError(f"memory.map-purpose read {value!r}, outside {' | '.join(MAP_PURPOSE_VALUES)}")
+    return value, ""
+
+
+def read_open_asks(root) -> set:
+    """The open asks at `root`: every ask row of a tracked `<memory root>/builds/*/BACKLOG.md`, read by
+    `backlog.parse_file` under the conf's FAMILIES, less each id a status row of `backlog.TERMINAL` names.
+    An ask closed only by a spec header's `closes` reads as open."""
+    import backlog
+    from design_lib import read_design_conf
+    fams = [p.split(":", 1)[1] for p in (read_design_conf(root).get("FAMILIES") or "").split() if ":" in p]
+    try:
+        grammar = backlog.build_grammar(fams)
+    except backlog.Problem as e:
+        raise RecordKindsError(f"the conf's FAMILIES do not compile: {e}") from None
+    asks, closed = set(), set()
+    for rel in read_tracked(root, f"{read_memory_root(root)}/builds/*/BACKLOG.md"):
+        parsed = backlog.parse_file(rel, pathlib.Path(root, rel).read_bytes().decode("utf-8", "replace"), grammar)
+        asks |= {a.id for a in parsed.asks}
+        closed |= {r.target for r in parsed.rows if r.verb in backlog.TERMINAL}
+    return asks - closed
+
+
+def read_purpose_ledger(root) -> tuple[set | None, str]:
+    """`(nodes, why)`: the node keys the `purpose-pending` ledger lists, an empty set where its home is
+    absent; None and why where no `[[ledger]]` table registers the population or the registrations do not
+    read (§8 F7)."""
+    import legacy_ledger as ll
+    try:
+        reg = next((r for r in ll.read_registrations(root) if r.population == PURPOSE_PENDING), None)
+    except ValueError as e:
+        return None, f"the ledger registrations do not read: {str(e).splitlines()[0]}"
+    if reg is None:
+        return None, f"no [[ledger]] table registers {PURPOSE_PENDING}"
+    if not pathlib.Path(root, reg.home).is_file():
+        return set(), f"{PURPOSE_PENDING}'s home {reg.home} is absent"
+    rows, _bad = ll.read_ledger(root, reg)
+    return {k[0] for k in rows}, ""
+
+
+def check_purpose(root, rows: list[dict], value: str) -> tuple[str, list[str]]:
+    """S3's pending rule: `(line, reds)`, each `pending` row graded by `memory.map-purpose`'s `value`, §4 "The
+    values": under `review` an open ask's id; under `ledger` `purpose-pending` and the row's node on that
+    ledger, a listed node now carrying a text red; under `derive` `none-found`; under `refuse` none."""
+    def read_cell(r, key):
+        p = r.get("purpose")
+        return p.get(key) if isinstance(p, dict) and isinstance(p.get(key), str) else None
+    pending = [(r.get("name"), read_cell(r, "pending")) for r in rows if read_cell(r, "pending") is not None]
+    texts = {r.get("name") for r in rows if read_cell(r, "text")}
+    reds = []
+    if value == "refuse":
+        reds += [f"row {n}: memory.map-purpose is refuse and its purpose is pending on {p}: give it a text"
+                 for n, p in pending]
+    elif value == "derive":
+        reds += [f"row {n}: its purpose is pending on {p}; under derive the one pending is {NONE_FOUND}"
+                 for n, p in pending if p != NONE_FOUND]
+    elif value == "review" and pending:
+        open_asks = read_open_asks(root)
+        reds += [f"row {n}: its purpose is pending on {p}, which is no open ask of a tracked BACKLOG.md"
+                 for n, p in pending if p not in open_asks]
+    elif value == "ledger":
+        listed, why = read_purpose_ledger(root)
+        for n, p in pending:
+            if p != PURPOSE_PENDING:
+                reds.append(f"row {n}: its purpose is pending on {p}; under ledger the one pending is {PURPOSE_PENDING}")
+            elif not listed or f"{REGISTRY_NS}:{n}" not in listed:
+                reds.append(f"row {n}: its purpose is pending on {PURPOSE_PENDING} and no row of that ledger lists "
+                            f"{REGISTRY_NS}:{n}{f' ({why})' if why else ''}")
+        reds += [f"ledger {PURPOSE_PENDING}: its row {node} names a kind that now carries a text: drain the row"
+                 for node in sorted(listed or ()) if node.startswith(f"{REGISTRY_NS}:")
+                 and node[len(REGISTRY_NS) + 1:] in texts]
+    return f"purpose · memory.map-purpose {value} · {len(texts)} texts · {len(pending)} pending", reds
+
+
+def read_chain_rows(root, kit_rel: str) -> tuple[list[dict] | None, str, str]:
+    """S4: `(rows, path, why)` of the chain registry, `<memory root>/` plus the path the playbook kit's
+    `tag_index.py` holds in CHAIN_REGISTRY, read by `ast` through `read_schema_source` and never by import;
+    an absent file holds no row. `rows` None and `why` said where the kit or the literal does not resolve."""
+    try:
+        kit = resolve_kit_dir("playbook", "tag_index.py", pathlib.Path(root, kit_rel))
+    except LookupError as e:
+        return None, "", f"no playbook kit in this tree: {e}"
+    rel = pathlib.Path(os.path.relpath(kit / "tag_index.py", pathlib.Path(root).absolute())).as_posix()
+    try:
+        held = read_schema_source(root, f"{rel}:CHAIN_REGISTRY", "")
+    except RecordKindsError as e:
+        return None, "", str(e)
+    if not isinstance(held, str) or not held.strip():
+        return None, "", f"{rel}'s CHAIN_REGISTRY is no path"
+    chain_rel = f"{read_memory_root(root)}/{held.strip().strip('/')}"
+    path = pathlib.Path(root, chain_rel)
+    if not path.is_file():
+        return [], chain_rel, ""
+    try:
+        data = tomllib.loads(path.read_bytes().decode("utf-8"))
+    except (UnicodeDecodeError, tomllib.TOMLDecodeError) as e:
+        raise RecordKindsError(f"the chain registry {chain_rel} does not parse: {e}") from None
+    builds = data.get("build") or []
+    return [r for r in builds if isinstance(r, dict) and isinstance(r.get("slug"), str) and r["slug"]], chain_rel, ""
+
+
+def derive_purpose_cut(text: str) -> str:
+    """A found text as a purpose: its whitespace folded, cut at the last word boundary before
+    `PURPOSE_BYTES`, its trailing punctuation dropped and an unclosed code span cut before its tick."""
+    text = " ".join(text.split())
+    if len(text.encode("utf-8")) > PURPOSE_BYTES:
+        head = text.encode("utf-8")[:PURPOSE_BYTES + 1].decode("utf-8", "ignore")
+        text = head[:head.rfind(" ")] if " " in head else ""
+    text = text.rstrip(" ,;:—–-")
+    if text.count("`") % 2:
+        text = text[:text.rfind("`")].rstrip(" ,;:—–-")
+    return text
+
+
+def check_repeats_name(text: str, name: str) -> bool:
+    """Whether `text` only repeats `name`, `-` read as a space, case, ticks and punctuation aside."""
+    def derive_words(s):
+        return re.sub(r"[`*_.,;:'\"()]", "", s).replace("-", " ").lower().split()
+    return derive_words(text) == derive_words(name)
+
+
+def derive_purpose(name: str, candidates) -> tuple[tuple[str, str] | None, str]:
+    """§4's derivation order: `((text, source), "")` from the first of `candidates`, each `(text or None,
+    source, what was found)` in order, whose text survives `derive_purpose_cut` and does not only repeat
+    `name`; else `(None, what was found)`, each candidate's finding joined."""
+    found = []
+    for text, source, what in candidates:
+        cut = derive_purpose_cut(text) if text is not None else ""
+        if text is None:
+            found.append(what)
+        elif not cut or check_repeats_name(cut, name):
+            found.append(f"{what} only repeats its name")
+        else:
+            return (cut, source), ""
+    return None, "; ".join(found)
+
+
+def read_readme_h1(root, rel: str, slug: str) -> tuple[str | None, str, str]:
+    """§4 step 1 for a chain build: `(text, "<path>:<line>", what)` of the first `# ` line outside a fence of
+    its tracked README, after its slug and the dash; `(None, "", what)` where there is none."""
+    from tree_lib import unfenced_lines
+    path = pathlib.Path(root, rel)
+    if not run_git(root, "ls-files", "--", f":(literal){rel}").stdout.strip() or not path.is_file():
+        return None, "", f"no tracked README at {rel}"
+    for n, line in unfenced_lines(path.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")):
+        if line is not None and line.startswith("# "):
+            text = line[2:].strip()
+            if text.startswith(slug):
+                text = text[len(slug):].lstrip(" —–-:")
+            return text, f"{rel}:{n}", f"the H1 at {rel}:{n}"
+    return None, "", f"no H1 outside a fence in {rel}"
+
+
+def read_from_table(root, from_rel: str) -> dict:
+    """§4 step 2's source: `{kind key: (last cell, "<path>:<line>")}` of every Markdown table row outside a
+    fence of the `--from` record, its first cell, `-` read as a space and through `tree_lib.resolve_kind`,
+    the key; the first row naming a kind wins."""
+    from tree_lib import resolve_kind, unfenced_lines
+    out = {}
+    text = pathlib.Path(root, from_rel).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
+    for n, line in unfenced_lines(text):
+        if line is None or not line.strip().startswith("|"):
+            continue
+        cells = [c.strip() for c in re.split(r"(?<!\\)\|", line.strip())[1:-1]]
+        if len(cells) < 2 or all(re.fullmatch(r":?-+:?", c) for c in cells):
+            continue
+        out.setdefault(" ".join(resolve_kind(cells[0].replace("-", " ").strip()).split()),
+                       (cells[-1].replace("\\|", "|"), f"{from_rel}:{n}"))
+    return out
+
+
+def scan_purpose_nodes(root, rows: list[dict], chain_rows, from_rel: str | None) -> list[dict]:
+    """S4's two populations, each node tried in §4's derivation order: the registry's rows with no `text`
+    and the chain registry's rows with no `purpose`. -> `[{"node", "ns", "name", "derived": (text, source)
+    or None, "found"}]`, the registry's first."""
+    table = read_from_table(root, from_rel) if from_rel else {}
+    nodes = []
+    for r in rows:
+        p = r.get("purpose")
+        if isinstance(p, dict) and isinstance(p.get("text"), str) and p["text"].strip():
+            continue
+        name = str(r.get("name"))
+        hit = table.get(" ".join(name.replace("-", " ").split()))
+        cands = [(None, "", "no H1: a record kind lives in the shared registry"),
+                 (hit[0], hit[1], f"the --from row at {hit[1]}") if hit else
+                 (None, "", "no row of the --from table names it" if from_rel else "no --from record given")]
+        derived, found = derive_purpose(name, cands)
+        nodes.append({"node": f"{REGISTRY_NS}:{name}", "ns": REGISTRY_NS, "name": name, "derived": derived,
+                      "found": found})
+    memory_root = read_memory_root(root)
+    for r in chain_rows or []:
+        if isinstance(r.get("purpose"), str) and r["purpose"].strip():
+            continue
+        slug = r["slug"]
+        derived, found = derive_purpose(slug, [read_readme_h1(root, f"{memory_root}/builds/{slug}/README.md", slug)])
+        nodes.append({"node": f"{CHAIN_NS}:{slug}", "ns": CHAIN_NS, "name": slug, "derived": derived, "found": found})
+    return nodes
+
+
+def render_ask_draft(ns: str, nodes: list[dict]) -> str:
+    """One namespace's ask draft, every `none` node of it listed with what was found."""
+    return f"ask {ns} · " + "; ".join(f"{n['node']} ({n['found']})" for n in nodes)
+
+
+def write_purpose_line(text: str, table: str, key: str, value: str, line: str) -> str:
+    """`text` with `line` as the `purpose` of the `[[<table>]]` row whose `<key>` is `value`: that row's own
+    `purpose =` line replaced, else one line inserted after its last key line, so every comment and every
+    other row keeps its bytes. RecordKindsError where no such row is found."""
+    lines = text.split("\n")
+    starts = [i for i, ln in enumerate(lines) if ln.strip() == f"[[{table}]]"]
+    want = f"{key} = {json.dumps(value)}"
+    for k, s in enumerate(starts):
+        body = range(s + 1, starts[k + 1] if k + 1 < len(starts) else len(lines))
+        if not any(lines[i].strip() == want for i in body):
+            continue
+        eol = "\r" if lines[s].endswith("\r") else ""
+        at = next((i for i in body if re.match(r"purpose\s*=", lines[i])), None)
+        if at is not None:
+            lines[at] = line + eol
+        else:
+            lines.insert(max(i for i in body if re.match(r"[A-Za-z0-9_-]+\s*=", lines[i])) + 1, line + eol)
+        return "\n".join(lines)
+    raise RecordKindsError(f"no [[{table}]] row holds {want}, so its purpose has no line to take")
+
+
+def write_purposes(root, kit_rel: str, nodes: list[dict], value: str, ask: str | None, chain_rel: str) -> int:
+    """S5 and S6: each derived purpose written into its node's own field, the registry row's `purpose` table
+    and the chain row's `purpose` string, and each `none` registry row's pending by `value`: `--ask`'s id
+    under `review`, `purpose-pending` under `ledger`, `none-found` under `derive`, nothing under `refuse`. A
+    `none` chain row is never written. Exit 2 writing nothing on an `--ask` that is no open ask, an `--ask`
+    under another value, or `ledger` with no registration of its population."""
+    none_rows = [n for n in nodes if n["derived"] is None and n["ns"] == REGISTRY_NS]
+    pending, refusal = None, ""
+    if ask and value != "review":
+        refusal = f"--ask {ask} files an owner ask, which memory.map-purpose {value} does not take"
+    elif ask and ask not in read_open_asks(root):
+        refusal = f"--ask {ask} is no open ask of a tracked BACKLOG.md"
+    elif value == "review":
+        pending = ask
+    elif value == "ledger":
+        listed, why = read_purpose_ledger(root)
+        refusal = f"{why}: register {PURPOSE_PENDING} before a ledger write" if listed is None else ""
+        pending = PURPOSE_PENDING
+    elif value == "derive":
+        pending = NONE_FOUND
+    if refusal:
+        print(f"{SAY}: refused · {refusal}; nothing written")
+        return 2
+    reg_path, chain_path = pathlib.Path(root, kit_rel, REGISTRY), pathlib.Path(root, chain_rel or ".")
+    reg_text = reg_path.read_bytes().decode("utf-8")
+    chain_text = chain_path.read_bytes().decode("utf-8") if chain_rel and chain_path.is_file() else ""
+    reg_want, chain_want = {}, {}
+    for n in nodes:
+        if n["derived"] and n["ns"] == REGISTRY_NS:
+            reg_want[n["name"]] = {"text": n["derived"][0], "source": n["derived"][1]}
+        elif n["derived"]:
+            chain_want[n["name"]] = n["derived"][0]
+    for n in none_rows if pending else []:
+        reg_want[n["name"]] = {"pending": pending}
+    for name, purpose in reg_want.items():
+        reg_text = write_purpose_line(reg_text, "record-kind", "name", name, render_purpose_line(purpose))
+    for slug, text in chain_want.items():
+        chain_text = write_purpose_line(chain_text, "build", "slug", slug, f"purpose = {json.dumps(text)}")
+    try:
+        got = {r.get("name"): r.get("purpose") for r in tomllib.loads(reg_text).get("record-kind", [])}
+        got_chain = {r.get("slug"): r.get("purpose") for r in tomllib.loads(chain_text).get("build", [])}
+    except tomllib.TOMLDecodeError as e:
+        raise RecordKindsError(f"the purpose write would leave a file that does not parse: {e}") from None
+    if any(got.get(k) != v for k, v in reg_want.items()) or any(got_chain.get(k) != v for k, v in chain_want.items()):
+        raise RecordKindsError("the purpose write did not read back as written; nothing written")
+    if reg_want:
+        reg_path.write_bytes(reg_text.encode("utf-8"))
+    if chain_want:
+        chain_path.write_bytes(chain_text.encode("utf-8"))
+    print(f"{SAY}: purpose · wrote {len(reg_want)} registry rows, {sum(1 for v in reg_want.values() if 'pending' in v)} "
+          f"of them pending, and {len(chain_want)} chain rows")
+    if reg_want and pathlib.Path(root, kit_rel, TEMPLATE).is_file():
+        return write_kind_region(root, kit_rel)   # the view renders the column, so it moves with the rows
+    return 0
+
+
+def run_purpose_review(root, from_rel: str | None, write: bool, ask: str | None, kit_rel: str | None = None) -> int:
+    """`--purpose-review [--from <path>] [--write [--ask <id>]]`: one `derived <node> · <text> · <source>` or
+    `none <node> · <what was found>` line per node of S4's populations, one `ask <namespace> · …` draft per
+    namespace holding a `none` node (none under `derive`), then the write where `--write` asks for it."""
+    kit_rel = kit_rel or derive_kit_rel()
+    rows = read_record_kinds(root, kit_rel)
+    if rows is None:
+        print(f"{SAY}: refused · no registry {kit_rel}/{REGISTRY} to review")
+        return 2
+    if from_rel is not None:
+        from_rel = from_rel.replace("\\", "/")
+        if not run_git(root, "ls-files", "--", f":(literal){from_rel}").stdout.strip():
+            print(f"{SAY}: refused · --from {from_rel} is no tracked file")
+            return 2
+    value, note = read_map_purpose(root)
+    print(f"{SAY}: purpose · memory.map-purpose {value}" + (f" · {note}" if note else ""))
+    chain_rows, chain_rel, why = read_chain_rows(root, kit_rel)
+    if chain_rows is None:
+        print(f"unarmed chain · {why}")
+    nodes = scan_purpose_nodes(root, rows, chain_rows, from_rel)
+    for n in nodes:
+        print(f"derived {n['node']} · {n['derived'][0]} · {n['derived'][1]}" if n["derived"]
+              else f"none {n['node']} · {n['found']}")
+    for ns in (REGISTRY_NS, CHAIN_NS):
+        none = [n for n in nodes if n["ns"] == ns and n["derived"] is None]
+        if none and value != "derive":
+            print(render_ask_draft(ns, none))
+    return write_purposes(root, kit_rel, nodes, value, ask, chain_rel) if write else 0
+
+
+def print_purpose_pending(root, kit_rel: str | None = None) -> int:
+    """`--print-purpose-pending`: the `purpose-pending` population for `legacy_ledger.py seed`, `<node> TAB 1`
+    per registry row pending on it and per chain row with no purpose."""
+    kit_rel = kit_rel or derive_kit_rel()
+    for r in read_record_kinds(root, kit_rel) or []:
+        p = r.get("purpose")
+        if isinstance(p, dict) and p.get("pending") == PURPOSE_PENDING:
+            print(f"{REGISTRY_NS}:{r.get('name')}\t1")
+    chain_rows, _rel, why = read_chain_rows(root, kit_rel)
+    if chain_rows is None:
+        print(f"{SAY}: unarmed chain · {why}", file=sys.stderr)
+    for r in chain_rows or []:
+        if not (isinstance(r.get("purpose"), str) and r["purpose"].strip()):
+            print(f"{CHAIN_NS}:{r['slug']}\t1")
+    return 0
 
 
 # ------------------------------------------------------------------------------- the step gate
@@ -889,7 +1339,17 @@ FIXTURE_BUILD = "bFix"
 PLANTS = ("writer-missing", "check-unknown", "source-drift", "factory-kind-unrowed", "field-missing",
           "field-missing-legacy", "region-edited", "gap-unresolved", "lifecycle-missing", "role-reads-moved",
           "item-inputs", "roles-unresolved", "pocket-stray", "pocket-registered", "new-row", "pipe-cell",
-          "alias-drift")
+          "alias-drift", "new-purpose", "review", "review-write", "purpose-missing", "purpose-long",
+          "pending-closed", "value-refuse", "value-derive", "value-ledger", "value-ledger-unregistered",
+          "value-refused")
+#: TOOL-dTotalRecall-16's fixture: its open and closed asks, the plants whose registry holds the review's three
+#: purposeless rows, each plant's `memory.map-purpose` value, the `--from` record and the review's two chain builds.
+FIXTURE_OPEN_ASK, FIXTURE_CLOSED_ASK = f"TOOL-{FIXTURE_BUILD}-101", f"TOOL-{FIXTURE_BUILD}-102"
+REVIEW_PLANTS = ("review", "review-write", "value-derive", "value-ledger", "value-ledger-unregistered")
+FIXTURE_VALUES = {"value-refuse": "refuse", "value-derive": "derive", "value-ledger": "ledger",
+                  "value-ledger-unregistered": "ledger", "value-refused": "unbounded"}
+FIXTURE_FROM = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-04-build-TOOL-{FIXTURE_BUILD}-1-kinds.md"
+FIXTURE_CHAIN = ("bOne", "bTwo")
 #: The fixture's roles, `slot: (reads, writes)`, and its loop items, `(tag, input)`: the first input a typed
 #: record reference, the second the prose a kind's name must never be matched in (S2, §8 F5).
 FIXTURE_ROLES = {"gov-builder": ("input:spec", "product"), "gov-diff-reviewer": ("input:diff", "none"),
@@ -898,15 +1358,17 @@ FIXTURE_ITEMS = (("item.build.typed", "layer.memory:record-kind.log@1"),
                  ("item.build.prose", "layer.memory:plan record"))
 FIXTURE_NEW = ["new", "widget", "--tag", "record.widget", "--writer", "hand", "--check", "memory hygiene", "--field",
                "Serves", "--home", "memory/builds/*/build/*.md", "--layer", "layer.memory", "--lifecycle",
-               "append-only", "--reader", "input:spec"]
+               "append-only", "--purpose", "a planted kind", "--reader", "input:spec"]
 
 
 def build_fixture(tmp, plant: str | None = None):
     """A throwaway repository at `tmp` laid out as this kit's own tree: a four-row registry, a two-leg
     manifest, a govkit registry holding the legacy ledger's table, its home, a gap register and records,
     one a `…-deviation-notes.md` holding no deviation field, a roles kit of three role files, a loop kit
-    whose definition holds the items `item-inputs` plants, a runlog kit's alias literal, `plant` applied,
-    committed, and its view rendered from the registry and a read of those kits before the commit.
+    whose definition holds the items `item-inputs` plants, a runlog kit's alias literal, a BACKLOG.md of
+    one open and one closed ask, a two-row chain registry and the playbook kit's literal naming it, the
+    purpose review's `--from` record, `plant` applied, committed on `main` (the policy reader's landed
+    branch), and its view rendered from the registry and a read of those kits before the commit.
     -> the typed kind list its check reads."""
     from build_records import KINDS
     tmp = pathlib.Path(tmp)
@@ -925,7 +1387,7 @@ def build_fixture(tmp, plant: str | None = None):
     def derive_sibling_rel(kit, name):   # spelled in parts: the install-prefix ban reads a kit path
         return "/".join(x for x in (tool_rel, kit, name) if x)
 
-    write_fixture_file(".memory-tree.conf", 'MEMORY_ROOT="memory"\n')
+    write_fixture_file(".memory-tree.conf", 'MEMORY_ROOT="memory"\nFAMILIES="tooling:TOOL"\n')
     write_fixture_file(f"{tool_rel}/{LEGS}" if tool_rel else LEGS, json.dumps([{"name": "memory hygiene"}, {"name": SAY}], indent=2) + "\n")
     write_fixture_file(f"{kit_rel}/build_records.py", "LEVELS = ('a', 'b')\nKINDS = {\n    'deviation': {\n        'required': ("
         + ", ".join(json.dumps(f) for f in dev + (["Extra"] if plant == "source-drift" else [])) + "),\n"
@@ -948,11 +1410,27 @@ def build_fixture(tmp, plant: str | None = None):
          "writer": "hand", "readers": [], "readers-none": "a departure is read by the deviation join, no role",
          "lifecycle": "frozen", "check": "memory hygiene"},
     ]
+    for row in rows:
+        row["purpose"] = {"text": f"the fixture's {row['name']} record", "source": "owner"}
+    if plant == "purpose-missing":
+        del rows[-1]["purpose"]
+    elif plant == "purpose-long":   # one byte past the cap
+        rows[-1]["purpose"] = {"text": "x" * (PURPOSE_BYTES + 1), "source": "owner"}
+    elif plant == "pending-closed":
+        rows[-1]["purpose"] = {"pending": FIXTURE_CLOSED_ASK}
+    elif plant == "value-refuse":   # an open ask's pending, which refuse admits no more than any other
+        rows[1]["purpose"] = {"pending": FIXTURE_OPEN_ASK}
+    if plant in REVIEW_PLANTS:   # S4's population: alpha the --from table names, beta named nowhere, gamma's
+        for name in ("alpha", "beta", "gamma"):   # cell only repeating its name
+            rows.append({"name": name, "tag": f"record.{name}", "layer": "layer.memory",
+                         "home": "memory/builds/*/spec/*.md", "id-rule": "", "schema": {"form": "header", "fields": []},
+                         "writer": "hand", "readers": [], "readers-none": "a fixture kind no role reads",
+                         "lifecycle": "current-state", "check": "memory hygiene"})
     if plant == "pocket-registered":   # the stray's family registered as a witness row
         rows.append({"name": "stray", "tag": "record.stray", "layer": "layer.memory",
                      "home": [f"{COMMON_DIR_HOME}stray/*"], "id-rule": "", "schema": {"form": "rows", "fields": []},
                      "writer": "hand", "readers": [], "readers-none": "a cache no role reads", "lifecycle": "out",
-                     "check": SAY})
+                     "check": SAY, "purpose": {"text": "the fixture's pocket", "source": "owner"}})
     registry = "\n".join(render_row(r) for r in rows)
     if plant == "writer-missing":   # the deviation row, the last, loses its writer
         head, _, tail = registry.partition('name = "deviation"\n')
@@ -975,7 +1453,25 @@ def build_fixture(tmp, plant: str | None = None):
     write_fixture_file(f"{tool_rel}/{sibling}" if tool_rel else sibling,
         f'[[ledger]]\npopulation = "{LEGACY}"\nleg = "{SAY}"\nseed = ["python", "{prefix}/{kit_rel[len(tool_rel) + 1:] if tool_rel else kit_rel}/record_kinds.py", "--seed-legacy"]\n'
         'key = "record"\nfields = ["path", "section"]\ndrain = "key"\ndirection = "shrink-only"\n'
-        f'home = "memory/project/{LEGACY}.txt"\n')
+        f'home = "memory/project/{LEGACY}.txt"\n' + (   # value-ledger registers the population, its seed this file
+            f'\n[[ledger]]\npopulation = "{PURPOSE_PENDING}"\nleg = "{SAY}"\nseed = ["python", '
+            f'{json.dumps((KIT / "record_kinds.py").as_posix())}, "--print-purpose-pending"]\nkey = "key"\n'
+            f'fields = ["node"]\ndrain = "key"\ndirection = "shrink-only"\nhome = "memory/project/{PURPOSE_PENDING}.txt"\n'
+            if plant == "value-ledger" else ""))
+    write_fixture_file(f"memory/builds/{FIXTURE_BUILD}/BACKLOG.md", f"# {FIXTURE_BUILD} — asks\n\n## Asks\n\n"
+                       f"- {FIXTURE_OPEN_ASK} · filed 2026-01-01 · the fixture's open purpose ask\n"
+                       f"- {FIXTURE_CLOSED_ASK} · filed 2026-01-01 · the fixture's closed ask\n\n## Dispositions\n\n"
+                       f"- CLOSED · {FIXTURE_CLOSED_ASK} · by {unit} · answered\n")
+    write_fixture_file(derive_sibling_rel("playbook", "tag_index.py"), 'CHAIN_REGISTRY = "project/chain.toml"\n')
+    write_fixture_file("memory/project/chain.toml", "# the fixture's chain registry\n\n"
+                       + "\n".join(f'[[build]]\nslug = "{s}"\n' for s in FIXTURE_CHAIN))
+    write_fixture_file(f"memory/builds/{FIXTURE_CHAIN[0]}/README.md",
+                       f"# {FIXTURE_CHAIN[0]} — the fixture's first chain build\n\nIts README.\n")
+    write_fixture_file(FIXTURE_FROM, f"**Serves:** research {unit}\n\n| Kind | Owner | What names it |\n|---|---|---|\n"
+                       f"| alpha | {FIXTURE_BUILD} | the fixture's first kind, which the review derives |\n"
+                       f"| gamma | {FIXTURE_BUILD} | gamma |\n")
+    if plant in FIXTURE_VALUES:
+        write_fixture_file(".governance/policy.toml", f'[memory]\nmap-purpose = "{FIXTURE_VALUES[plant]}"\n')
     old = f"{build}/2026-01-01-build-{unit}-deviation-1.md"
     new = f"{build}/2026-01-02-build-{unit}-deviation-2.md"
     legacy_rows = [(old, "deviation")] + ([(new, "deviation")] if plant == "field-missing-legacy" else [])
@@ -1004,7 +1500,7 @@ def build_fixture(tmp, plant: str | None = None):
                            "---\nname: gov-builder\nreads: input:spec, input:diff\nwrites: product\n---\n\nThe fixture role.\n")
     hooks = tmp / ".nohooks"
     hooks.mkdir(exist_ok=True)
-    for args in (("init", "-q"), ("add", "-A", "--", "."),
+    for args in (("init", "-q", "-b", "main"), ("add", "-A", "--", "."),   # main: the policy reader's landed branch
                  ("-c", "user.name=record-kinds", "-c", "user.email=record-kinds@fixture.invalid", "-c",
                   "commit.gpgsign=false", "-c", f"core.hooksPath={hooks.as_posix()}", "commit", "-q", "--no-verify",
                   "-m", f"record-kinds fixture: {plant or 'green'}")):
@@ -1018,17 +1514,50 @@ def build_fixture(tmp, plant: str | None = None):
 
 def run_fixture(plant: str | None) -> tuple[list[str], int]:
     """`--fixture [--plant <case>]`: the fixture built under the system temp directory, `--check` run there;
-    `new-row` runs `new` with every flag first, and `pipe-cell` prints the region line of the piped row."""
+    `new-row` and `new-purpose` run `new` with every flag first, and `pipe-cell` prints the region line of the
+    piped row. `review` prints the purpose review alone; `review-write` writes it under the closed ask, then
+    the open one, and prints each reviewed node's purpose; the `value-*` writes print theirs, and
+    `value-ledger` runs the population's seed before the check."""
     if plant is not None and plant not in PLANTS:
         return [f"{SAY}: refused · no plant {plant!r}: the plants are {', '.join(PLANTS)}"], 2
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="rk-"))
     try:
         typed = build_fixture(tmp, plant)
         head = [f"{SAY}: fixture {plant or 'green'}"]
-        if plant == "new-row":
+        if plant in ("new-row", "new-purpose"):
             rc = main(FIXTURE_NEW, root=tmp)
             if rc:
-                return head + [f"{SAY}: fixture new-row · new exited {rc}"], rc
+                return head + [f"{SAY}: fixture {plant} · new exited {rc}"], rc
+        if plant == "new-purpose":
+            row = next((r for r in read_record_kinds(tmp) or [] if r.get("name") == "widget"), {})
+            head.append(f"{SAY}: fixture new-purpose · widget · source {(row.get('purpose') or {}).get('source')}")
+        review = ["--purpose-review", "--from", FIXTURE_FROM]
+        if plant == "review":
+            return run_captured(review, tmp, head)
+        if plant == "review-write":   # the closed ask first, refused with the bytes kept, then the open one
+            reg = pathlib.Path(tmp, derive_kit_rel(), REGISTRY)
+            before = reg.read_bytes()
+            _out, rc = run_captured(review + ["--write", "--ask", FIXTURE_CLOSED_ASK], tmp, [])
+            head.append(f"{SAY}: fixture review-write · closed ask · exit {rc} · registry "
+                        f"{'unchanged' if reg.read_bytes() == before else 'changed'}")
+            head, rc = run_captured(review + ["--write", "--ask", FIXTURE_OPEN_ASK], tmp, head)
+            if rc:
+                return head, rc
+            head += [f"{SAY}: fixture review-write · {REGISTRY_NS}:{r.get('name')} · {json.dumps(r.get('purpose'))}"
+                     for r in read_record_kinds(tmp) or [] if r.get("name") in ("alpha", "beta", "gamma")]
+            head += [f"{SAY}: fixture review-write · {CHAIN_NS}:{r['slug']} · {json.dumps(r.get('purpose'))}"
+                     for r in (read_chain_rows(tmp, derive_kit_rel())[0] or [])]
+        if plant in ("value-derive", "value-ledger", "value-ledger-unregistered"):
+            head, rc = run_captured(review + ["--write"], tmp, head)
+            if rc:
+                return head, rc
+            head += [f"{SAY}: fixture {plant} · {REGISTRY_NS}:{r.get('name')} · {json.dumps(r.get('purpose'))}"
+                     for r in read_record_kinds(tmp) or [] if r.get("name") in ("alpha", "beta", "gamma")]
+        if plant == "value-ledger":   # the registration's seed, `--print-purpose-pending`, run as `seed` runs it
+            import legacy_ledger as ll
+            reg = next(r for r in ll.read_registrations(tmp) if r.population == PURPOSE_PENDING)
+            line, _ok = ll.seed_population(tmp, reg, "0" * 40)
+            head.append(f"{SAY}: fixture value-ledger · seed · {line}")
         lines, rc = check_record_kinds(tmp, typed)
         if plant == "pipe-cell":
             text = pathlib.Path(tmp, derive_kit_rel(), TEMPLATE).read_bytes().decode("utf-8")
@@ -1036,6 +1565,16 @@ def run_fixture(plant: str | None) -> tuple[list[str], int]:
         return head + lines, rc
     finally:
         remove_tree(tmp)
+
+
+def run_captured(argv: list[str], root, head: list[str]) -> tuple[list[str], int]:
+    """`(head + the lines main printed, its exit)` of one verb run at the fixture's `root`."""
+    import contextlib
+    import io
+    out = io.StringIO()
+    with contextlib.redirect_stdout(out):
+        rc = main(argv, root=root)
+    return head + out.getvalue().splitlines(), rc
 
 
 def remove_tree(path) -> None:
@@ -1057,26 +1596,55 @@ def run_selftest() -> int:
             "field-missing": ("deviation-2.md", "**Caused-by:**"), "region-edited": ("region gen:record-kinds",),
             "gap-unresolved": ("gap-mem-99",), "lifecycle-missing": ("row deviation", "`lifecycle`"),
             "role-reads-moved": ("region gen:record-kinds",), "roles-unresolved": (UNARMED, "roles kit"),
-            "pocket-stray": ("pocket stray",), "alias-drift": ("SERVES_ALIASES",)}
+            "pocket-stray": ("pocket stray",), "alias-drift": ("SERVES_ALIASES",),
+            "purpose-missing": ("row deviation", "`purpose`"), "purpose-long": ("row deviation", "past PURPOSE_BYTES"),
+            "pending-closed": ("row deviation", FIXTURE_CLOSED_ASK), "value-refuse": ("row log", "refuse")}
+    refusals = {"value-ledger-unregistered": PURPOSE_PENDING, "value-refused": "memory.map-purpose"}
 
     def test_pipe_cell(lines):
         row = next((ln.split(" · region · ", 1)[1] for ln in lines if " · region · " in ln), "")
-        return "a \\| b" in row and len(re.split(r"(?<!\\)\|", row)) == 9   # seven cells between eight pipes
+        return "a \\| b" in row and len(re.split(r"(?<!\\)\|", row)) == 10   # eight cells between nine pipes
+
+    def test_review(lines):   # AC3: the order, a source on every derived line, one draft per namespace
+        asks = [ln for ln in lines if ln.startswith("ask ")]
+        return (any(ln.startswith(f"derived {REGISTRY_NS}:alpha · ") and f" · {FIXTURE_FROM}:" in ln for ln in lines)
+                and any(ln.startswith(f"derived {CHAIN_NS}:bOne · ") and ln.endswith("/bOne/README.md:1") for ln in lines)
+                and all(any(ln.startswith(f"none {n} · ") for ln in lines)
+                        for n in (f"{REGISTRY_NS}:beta", f"{REGISTRY_NS}:gamma", f"{CHAIN_NS}:bTwo"))
+                and len(asks) == 2 and any(ln.startswith(f"ask {REGISTRY_NS} · ") and "beta" in ln and "gamma" in ln
+                                           for ln in asks))
+
+    def test_review_write(lines):   # AC4
+        return all(any(s in ln for ln in lines) for s in (
+            "closed ask · exit 2 · registry unchanged", f'{REGISTRY_NS}:alpha · {{"text": ',
+            f'{REGISTRY_NS}:beta · {{"pending": "{FIXTURE_OPEN_ASK}"}}', f'{REGISTRY_NS}:gamma · {{"pending": "{FIXTURE_OPEN_ASK}"}}',
+            f"{CHAIN_NS}:bOne · \"the fixture's first chain build\"", f"{CHAIN_NS}:bTwo · null"))
+
+    def test_value_pending(pending, draft):   # AC6: the write's pending, and whether a draft printed
+        return lambda ls: (all(any(f'{REGISTRY_NS}:{n} · {{"pending": "{pending}"}}' in ln for ln in ls)
+                               for n in ("beta", "gamma")) and draft == any(ln.startswith("ask ") for ln in ls))
 
     shows = {"item-inputs": lambda ls: any(ln.startswith(f"{SAY}: view · log · read by") and "item.build.typed" in ln
                                            for ln in ls) and not any(" view · " in ln and "item.build.prose" in ln
                                                                       for ln in ls),
              "pocket-registered": lambda ls: f"{SAY}: pocket · stray · stray" in ls,
-             "new-row": lambda ls: any(" rows · " in ln and "widget 2 graded" in ln for ln in ls),
-             "pipe-cell": test_pipe_cell}
+             "new-row": lambda ls: any(" rows · " in ln and "widget 3 graded" in ln for ln in ls),
+             "pipe-cell": test_pipe_cell,
+             "new-purpose": lambda ls: f"{SAY}: fixture new-purpose · widget · source owner" in ls,
+             "review": test_review, "review-write": test_review_write,
+             "value-derive": test_value_pending(NONE_FOUND, False),
+             "value-ledger": lambda ls: (test_value_pending(PURPOSE_PENDING, True)(ls)
+                                         and any(f"seed · armed {PURPOSE_PENDING} 3" in ln for ln in ls))}
     fails = []
-    for plant in (None, "field-missing-legacy", *shows, *want):
+    for plant in (None, "field-missing-legacy", *shows, *want, *refusals):
         lines, rc = run_fixture(plant)
         out = "\n".join(lines)
         reds = [ln for ln in lines if " RED " in ln]
         if plant in want and not (rc == 1 and any(all(s in ln for s in want[plant]) for ln in reds)):
             fails.append(f"{plant}: want exit 1 naming {', '.join(want[plant])}, got {rc}: {out[-400:]}")
-        elif plant not in want and rc != 0:
+        elif plant in refusals and not (rc == 2 and any(refusals[plant] in ln for ln in lines)):
+            fails.append(f"{plant}: want exit 2 naming {refusals[plant]}, got {rc}: {out[-400:]}")
+        elif plant not in want and plant not in refusals and rc != 0:
             fails.append(f"{plant or 'green'}: want exit 0, got {rc}: {out[-400:]}")
         elif plant in shows and not shows[plant](lines):
             fails.append(f"{plant}: exit 0 and not what it shows: {out[-400:]}")
@@ -1086,11 +1654,16 @@ def run_selftest() -> int:
         reg = pathlib.Path(tmp, derive_kit_rel(), REGISTRY)
         before = reg.read_bytes()
         for drop in (("--writer", "hand"), ("--layer", "layer.memory"), ("--lifecycle", "append-only"),
-                     ("--reader", "input:spec")):
+                     ("--reader", "input:spec"), ("--purpose", "a planted kind")):
             argv = [a for i, a in enumerate(FIXTURE_NEW) if not (a == drop[0] or (i and FIXTURE_NEW[i - 1] == drop[0]))]
             rc = main(argv, root=tmp)
             if rc != 2 or reg.read_bytes() != before:
                 fails.append(f"new without {drop[0]}: want exit 2 and nothing written, got {rc}")
+        for bad in ("", "x" * (PURPOSE_BYTES + 1), "two\nlines"):
+            argv = [bad if i and FIXTURE_NEW[i - 1] == "--purpose" else a for i, a in enumerate(FIXTURE_NEW)]
+            rc = main(argv, root=tmp)
+            if rc != 2 or reg.read_bytes() != before:
+                fails.append(f"new with --purpose {bad[:12]!r}: want exit 2 and nothing written, got {rc}")
         rc = main(FIXTURE_NEW[:-2] + ["--reader", "task:goal"], root=tmp)
         if rc != 2 or reg.read_bytes() != before:
             fails.append(f"new with a reader no role reads: want exit 2 and nothing written, got {rc}")
@@ -1131,11 +1704,28 @@ def main(argv: list[str], root=None) -> int:
             ap.add_argument("--lifecycle")
             ap.add_argument("--reader", action="append")
             ap.add_argument("--readers-none", dest="readers_none")
+            ap.add_argument("--purpose")
             try:
                 a = ap.parse_args(argv[1:])
             except SystemExit as e:
                 return int(e.code or 0)
             return add_record_kind(root, a)
+        if argv[:1] == ["--purpose-review"]:
+            ap = argparse.ArgumentParser(prog="record_kinds.py --purpose-review",
+                                         description="review the purposes S4's populations lack")
+            ap.add_argument("--from", dest="from_rel")
+            ap.add_argument("--write", action="store_true")
+            ap.add_argument("--ask")
+            try:
+                a = ap.parse_args(argv[1:])
+            except SystemExit as e:
+                return int(e.code or 0)
+            if a.ask and not a.write:
+                print(f"{SAY}: refused · --ask names the pending a write records: give --write")
+                return 2
+            return run_purpose_review(root, a.from_rel, a.write, a.ask)
+        if argv == ["--print-purpose-pending"]:
+            return print_purpose_pending(root)
         if argv == ["--check"]:
             lines, rc = check_record_kinds(root)
         elif argv == ["--write"]:

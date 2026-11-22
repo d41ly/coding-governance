@@ -31,7 +31,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dScopedBuild](builds/dScopedBuild/README.md) | DEFERRED | d | 2026-10-21 | tooling | 43 | 2026-11-03 | active | 0 |
 | [dShippedRelease](builds/dShippedRelease/README.md) | DEFERRED | d | 2026-10-21 | deployer | 145 | 2026-11-12 | active | 0 |
 | [dTendedCadence](builds/dTendedCadence/README.md) | DEFERRED | d | 2026-10-21 | tooling | 74 | 2026-11-03 | active | 0 |
-| [dTotalRecall](builds/dTotalRecall/README.md) | INPROGRESS | d | 2026-10-21 | tooling | 109 | 2026-11-22 | active | 0 |
+| [dTotalRecall](builds/dTotalRecall/README.md) | DEFERRED | d | 2026-10-21 | tooling | 110 | 2026-11-22 | active | 0 |
 | [dWellOiledMachine](builds/dWellOiledMachine/README.md) | DEFERRED | d | 2026-10-21 | tooling | 132 | 2026-11-22 | active | 0 |
 | [dWitnessedBar](builds/dWitnessedBar/README.md) | DEFERRED | d | 2026-10-21 | tooling | 116 | 2026-11-22 | active | 0 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 | 2026-08-08 | dormant | 1 |
@@ -48,7 +48,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [aTunedCompass](builds/aTunedCompass/README.md) | BLOCKED | a | 2026-09-04 | tooling | 11 | 2026-09-05 | dormant | 0 |
 | [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 10 | 2026-08-18 | dormant | 0 |
 | [aWeighedCanon](builds/aWeighedCanon/README.md) | OPEN | a | 2026-09-04 | tooling | 2 | 2026-09-04 | dormant | 0 |
-| [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 40 | 2026-10-26 | dormant | 0 |
+| [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 40 | 2026-10-26 | dormant | 1 |
 | [dPinnedHandoff](builds/dPinnedHandoff/README.md) | SPECCED | d | 2026-09-22 | tooling | 3 | 2026-09-28 | dormant | 0 |
 | [dPromptedSeam](builds/dPromptedSeam/README.md) | DEFERRED | d | 2026-08-25 | tooling | 4 | 2026-08-25 | dormant | 0 |
 | [dRetiredFork](builds/dRetiredFork/README.md) | DEFERRED | d | 2026-09-02 | tooling+deployer | 56 | 2026-09-03 | dormant | 0 |

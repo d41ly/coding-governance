@@ -9,66 +9,88 @@
 
 [[build]]
 slug = "dTrueNorth"
+purpose = "the Fidelity build of the dClosedLoop chain"
 
 [[build]]
 slug = "dGroundRules"
+purpose = "the Policy build of the dClosedLoop chain"
 
 [[build]]
 slug = "dSafePassage"
+purpose = "the Supersession build of the dClosedLoop chain"
 
 [[build]]
 slug = "dOrderedCharter"
+purpose = "the Foundation build of the dClosedLoop chain"
 
 [[build]]
 slug = "dFairHearing"
+purpose = "the Review harness build of the dClosedLoop chain"
 
 [[build]]
 slug = "dDeclaredLoop"
+purpose = "the Spine build of the dClosedLoop chain"
 
 [[build]]
 slug = "dPlacedRequest"
+purpose = "the Entry build of the dClosedLoop chain"
 
 [[build]]
 slug = "dKeptSession"
+purpose = "the Session build of the dClosedLoop chain"
 
 [[build]]
 slug = "dBoundRoles"
+purpose = "the Roles build of the dClosedLoop chain"
 
 [[build]]
 slug = "dFurnishedOrders"
+purpose = "the Orders build of the dClosedLoop chain"
 
 [[build]]
 slug = "dTotalRecall"
+purpose = "the Memory build of the dClosedLoop chain"
 
 [[build]]
 slug = "dLinkedLibrary"
+purpose = "the Library build of the dClosedLoop chain"
 
 [[build]]
 slug = "dMindYourWords"
+purpose = "the Lexicon build of the dClosedLoop chain"
 
 [[build]]
 slug = "dWellOiledMachine"
+purpose = "the Runtime build of the dClosedLoop chain"
 
 [[build]]
 slug = "dWitnessedBar"
+purpose = "the Test build of the dClosedLoop chain"
 
 [[build]]
 slug = "dRankedPlan"
+purpose = "the Plan build of the dClosedLoop chain"
 
 [[build]]
 slug = "dIndexedDesign"
+purpose = "the Design build of the dClosedLoop chain"
 
 [[build]]
 slug = "dScopedBuild"
+purpose = "the Build build of the dClosedLoop chain"
 
 [[build]]
 slug = "dShippedRelease"
+purpose = "the Deploy build of the dClosedLoop chain"
 
 [[build]]
 slug = "dTendedCadence"
+purpose = "the Maintain build of the dClosedLoop chain"
 
 [[build]]
 slug = "dCalibratedLens"
+purpose = "the Review build of the dClosedLoop chain"
 
 [[build]]
 slug = "dConvergedCharter"
+purpose = "the Convergence build of the dClosedLoop chain"

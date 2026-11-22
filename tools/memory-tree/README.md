@@ -292,9 +292,15 @@ the name grammar or `""`; `schema`, `{ form, source, fields }`, `form` one of `f
 the same fields in, read by `ast` and never imported; `writer`, the door writing the kind,
 `generator:<path>` or `hand`; `readers`, the work-order read keys a handoff fills from a record of the
 kind, or `[]` beside `readers-none`, the reason no role reads it; `lifecycle`, one of `append-only`,
-`current-state`, `frozen`, `generated` or `out`; `check`, the leg grading it. The four columns
+`current-state`, `frozen`, `generated` or `out`; `check`, the leg grading it; `purpose`, last,
+`{ text, source }`, one line of at most `PURPOSE_BYTES` bytes, cited `<path>:<line>` or `owner`, or
+`{ pending = "<id>" }` (TOOL-dTotalRecall-16). The four columns
 `home`, `lifecycle`, `readers` (or `readers-none`) and `layer` are REQUIRED on every row, as are
-`name`, `tag`, `schema`, `writer` and `check`; `root` and `sections` are admitted for their owners.
+`name`, `tag`, `schema`, `writer`, `check` and `purpose`; `root` and `sections` are admitted for their owners.
+A `pending` is graded by the policy key `memory.map-purpose`: under `review`, its default, an open
+ask of a tracked `BACKLOG.md`; under `ledger` `purpose-pending`, the node a row of that ledger
+population, which the repository setting `ledger` registers; under `derive` `none-found`; under
+`refuse` none. The view renders each `text`, or `—` for a pending.
 
 The view's `Read by` cell names the roles whose `reads:` holds one of a row's `readers` and the loop
 items whose `inputs` hold a typed record reference `<layer tag>:record-kind.<name>[@<n>]`; its
@@ -311,7 +317,10 @@ kit's `SERVES_ALIASES` is held to it.
 | `--check` | the `record-kinds` leg: every row's columns and their grammar, its readers against the roles, its `check` leg and its `source` both ways, the factory's `TYPED_RECORD_KINDS` joined to the rows both ways, every `fields` record outside the legacy ledger carrying its fields in order, each deviation's `Follow-through: gap <key>` resolved, the view byte for byte against a fresh read of the roles and items, the common git dir's entries each matched by a witness row's home, and the runlog kit's alias literal; one `view · <kind> · read by … · written by …` line per row |
 | `--write` | renders the `gen:record-kinds` region of `HYGIENE.template.md`, which `adopt-memory-tree.sh --render` carries into `<memory root>/HYGIENE.md` |
 | `--template <kind>` | prints the skeleton one `fields` row defines, the layout `build_records.py` writes |
-| `new <name> --tag record.<name> --writer <door> --check <leg> --field <Key>... --home <glob> --layer <tag> --lifecycle <value> (--reader <key>... \| --readers-none <reason>)` | the factory: appends one conforming row and re-renders the view, exit 2 writing nothing on a missing column or one outside its grammar |
+| `new <name> --tag record.<name> --writer <door> --check <leg> --field <Key>... --home <glob> --layer <tag> --lifecycle <value> --purpose <text> (--reader <key>... \| --readers-none <reason>)` | the factory: appends one conforming row, its purpose `source = "owner"`, and re-renders the view, exit 2 writing nothing on a missing column or one outside its grammar |
+| `--purpose-review [--from <path>]` | the purpose review: each registry row with no `text` and each chain registry row with no `purpose`, tried by the H1 of its file, then the `--from` record's table row naming the kind; one `derived <node> · <text> · <source>` or `none <node> · <found>` line each and one `ask <namespace> · …` draft per namespace holding a `none` node; `unarmed chain` where the playbook kit's CHAIN_REGISTRY does not resolve |
+| `--purpose-review … --write [--ask <id>]` | writes each derived purpose into its node's own field, one inserted line each, and each `none` registry row's pending by `memory.map-purpose`: `--ask`'s open ask, `purpose-pending` or `none-found`; exit 2 writing nothing on a closed or unknown ask, or `ledger` with no registration |
+| `--print-purpose-pending` | prints the `purpose-pending` population, `<node> TAB 1` per registry row pending on it and per chain row with no purpose, for `legacy_ledger.py seed` |
 | `--seed-legacy` | prints the `record-kinds-legacy` population, `<path> TAB <row name> TAB 1` per record a `fields` row grades, for `legacy_ledger.py seed` |
 | `--print-gap-keys` | the `gap-key` native class's members, the first cells of every tracked gap register; exit 3 where none is tracked |
 | `--fixture [--plant <case>]` | builds a throwaway repository and runs `--check` there; `--selftest` asserts every plant red |
@@ -323,7 +332,8 @@ gate's `record-kind-schema` class holds `<kind>.<field>` per field of every row,
 a vanished member; `journal.Serves`, which left with the rename, is named by a `[[retired]]` row of
 the govkit registry. What it does not check: whether a `writer` writes its kind, a field's value, a
 `header`, `rows` or `generated` row's records, which its `check` leg's owner grades, a pocket's
-contents, and whether a `layer` tag is a row of the layer register.
+contents, whether a `layer` tag is a row of the layer register, whether a derived purpose describes
+its node, and an ask closed only by a spec header's `closes`, which reads as open.
 
 ## Backlog modes — authored shards and per-build asks
 

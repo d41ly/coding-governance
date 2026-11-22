@@ -271,6 +271,14 @@ What the render gate does with the list of instruction files not yet rendered fr
 instructions.legacy = "refuse"
 ```
 
+## `memory.map-purpose`
+<!-- usage: policy:memory.map-purpose be71b553 -->
+How a record kind with no declared purpose is graded: review, each derived with its source or put to the owner in one ask per namespace; ledger, listed on the purpose-pending ledger; derive, derived with no ask; or refuse, record-kinds red while any lacks one.
+
+```text
+memory.map-purpose = "review"
+```
+
 ## `trace.leg-output`
 <!-- usage: policy:trace.leg-output b5f47620 -->
 Where a failing leg's output tail lives: kept by its hash in the common dir and named in the verdict under either value, and under `tail-by-hash` also committed as a `leg-tail` record by the run-gates kit's `keep_tails.py`.
@@ -291,7 +299,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (226)
+## Not yet summarised (225)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -492,7 +500,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `memory.map-budget`
 - `memory.map-overflow`
 - `memory.map-unfold`
-- `memory.map-purpose`
 - `memory.legacy-anchors`
 - `memory.superseded-slices`
 - `retrofit.drain`

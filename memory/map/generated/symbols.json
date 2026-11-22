@@ -8228,6 +8228,16 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "check_purpose",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
+      "id": "check_purpose_cell",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "check_push_allow",
       "kind": "function",
       "file": "tools/push-main.sh"
@@ -8531,6 +8541,11 @@
       "id": "check_renderers",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "check_repeats_name",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "check_replay",
@@ -13536,6 +13551,16 @@
       "id": "derive_protocol_paths",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "derive_purpose",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
+      "id": "derive_purpose_cut",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "derive_push_failure",
@@ -20403,6 +20428,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "print_purpose_pending",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "print_pw_out",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -21798,6 +21828,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "read_chain_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "read_chain_verdict",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -22971,6 +23006,11 @@
       "id": "read_fragment_keys",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "read_from_table",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "read_front_matter",
@@ -24198,6 +24238,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "read_map_purpose",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "read_margin",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -24461,6 +24506,11 @@
       "id": "read_one_signal",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "read_open_asks",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "read_open_passes",
@@ -25098,6 +25148,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_purpose_ledger",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "read_py_assigns",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -25116,6 +25171,11 @@
       "id": "read_raw_output",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "read_readme_h1",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "read_readme_opened",
@@ -28888,6 +28948,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_ask_draft",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "render_ask_row",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -29746,6 +29811,11 @@
       "id": "render_prose_report",
       "kind": "function",
       "file": "tools/runlog/prose.py"
+    },
+    {
+      "id": "render_purpose_line",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "render_push_lines",
@@ -33518,6 +33588,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_captured",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "run_card",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -35838,6 +35913,11 @@
       "file": "tools/playbook/gov_tag.py"
     },
     {
+      "id": "run_purpose_review",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "run_push",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -37741,6 +37821,11 @@
       "id": "scan_produced_destinations",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_purpose_nodes",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "scan_python_stdout",
@@ -43401,6 +43486,16 @@
       "id": "write_published_conf",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_purpose_line",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
+      "id": "write_purposes",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "write_pw_cost",

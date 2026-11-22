@@ -91,11 +91,11 @@ python <prefix>/playbook/core.py new charter-practice <name> --line <text>
 ```
 
 ## `kind.record-kind`
-<!-- usage: kind:kind.record-kind 253f428b -->
+<!-- usage: kind:kind.record-kind ec1032d2 -->
 A kind of record the memory tree holds.
 
 ```text
-python <prefix>/memory-tree/record_kinds.py new <name> --tag record.<name> --writer <door> --check <leg> --field <Key>... --home <glob> --layer <tag> --lifecycle <value> (--reader <key>... | --readers-none <reason>)
+python <prefix>/memory-tree/record_kinds.py new <name> --tag record.<name> --writer <door> --check <leg> --field <Key>... --home <glob> --layer <tag> --lifecycle <value> --purpose <text> (--reader <key>... | --readers-none <reason>)
 ```
 
 ## `kind.stage`

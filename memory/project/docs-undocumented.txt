@@ -185,7 +185,6 @@ policy:memory.legacy-anchors	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.load-budget	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.map-budget	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.map-overflow	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:memory.map-purpose	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.map-unfold	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.mirror	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:memory.over-budget	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

@@ -1601,6 +1601,8 @@ owner = "dFurnishedOrders"
 name = "memory.map-purpose"
 allowed = ["review", "ledger", "derive", "refuse"]
 default = "review"
+summary = "How a record kind with no declared purpose is graded: review, each derived with its source or put to the owner in one ask per namespace; ledger, listed on the purpose-pending ledger; derive, derived with no ask; or refuse, record-kinds red while any lacks one."
+usage = 'memory.map-purpose = "review"'
 owner = "dTotalRecall"
 
 [[key]]
