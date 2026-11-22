@@ -3,6 +3,7 @@
 
     python loop_lib.py --check                    # read the definition, print what was read
     python loop_lib.py --steps                    # one `<step tag> TAB <state>` line per step
+    python loop_lib.py --mail-kinds               # the mailbox's closed kind set, one kind per line
     python loop_lib.py --scopes                   # each item's instruction scope, derived
     python loop_lib.py --fixture --plant <case>   # read it with one break planted in memory
     python loop_lib.py --selftest                 # every plant, each held to the exit and line it owes
@@ -23,6 +24,12 @@ declares `outcomes = "dispositions"` and the row's own list otherwise, and `chec
 joins an owner's disposition record to its item's set: True for a member, LoopError for any other word,
 None for an item the definition does not declare, which a caller prints as `unarmed` and never as green.
 The join compares the word as written, never through an alias.
+
+The definition also holds the mailbox's one closed kind set (KICK-dKeptSession-5 S3): `[mail]` with its
+`kinds`, the words a message's `kind` may be. `check_loop` grades it where present as it grades the
+disposition set, an empty list, a repeated member or one outside `SEG` refused, and `read_mail_kinds`
+returns the members, LoopError where the table is absent. `--mail-kinds` prints one kind per line, exit 0,
+or `loop: <why>`, exit 1; the unattended driver's `--mail post` runs it before any commit.
 
 The definition also classes every witness (TOOL-dDeclaredLoop-5): `[witnesses]` with its `classes`, the
 facts the acting agent cannot type, and its `refused` class `actor`, a fact it typed; `[[witness-alias]]`
@@ -289,7 +296,8 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "probe-step": "a copy of item.probe.trigger tagged item.plan.x, at step none",
           "role-no-probe": "item.plan.research's probe outcome and its route taken out",
           "probe-self": "item.probe.design given the probe outcome, routed to the probe tool",
-          "probe-route": "item.plan.research's probe outcome routed to item.probe.trigger"}
+          "probe-route": "item.plan.research's probe outcome routed to item.probe.trigger",
+          "mail-kinds-repeated": "the mail kind confirm-request given twice in the [mail] kinds"}
 #: `--selftest`'s owed answer of each plant (TOOL-dDeclaredLoop-67 S30): its exit, the opening of a line
 #: it prints and a needle that line holds, each pair found by running the plant alone at the pass's base.
 #: A definition the reader refuses prints `loop: <path>: <why>`, a graded refusal `loop: refused · <why>`.
@@ -355,7 +363,8 @@ PLANT_OWED = {"missing-step": (1, "loop: ", "the step step.deploy is missing"),
                                                        "outcome"),
               "probe-self": (1, "loop: refused · ", "the item item.probe.design carries the probe outcome"),
               "probe-route": (1, "loop: refused · ", "the item item.plan.research routes probe to "
-                                                     "'item.probe.trigger', not ")}
+                                                     "'item.probe.trigger', not "),
+              "mail-kinds-repeated": (1, "loop: ", "the mail kind confirm-request is given twice")}
 #: The kit home whose `namespaces.toml` registers the namespace words an item unfolds (TOOL-dPlacedRequest-6 S3).
 NS_KIT_HOME = "playbook"
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
@@ -466,6 +475,17 @@ def check_loop(data, where):
                 raise LoopError(where, "the disposition %s is given twice" % word)
     check_alias_rows(tables.pop("disposition-alias"), members, "disposition-alias", where)
     tables["dispositions"] = list(members)
+    kinds = []
+    if "mail" in data:   # KICK-dKeptSession-5 S3: the mailbox's closed kind set, graded as the disposition set is
+        kinds = data["mail"].get("kinds") if isinstance(data["mail"], dict) else None
+        if not isinstance(kinds, list) or not kinds:
+            raise LoopError(where, "'mail' carries no non-empty kinds")
+        for word in kinds:
+            if not isinstance(word, str) or not SEG.fullmatch(word):
+                raise LoopError(where, "the mail kind %r is not one word of the shape %s" % (word, SEG.pattern))
+            if kinds.count(word) > 1:
+                raise LoopError(where, "the mail kind %s is given twice" % word)
+    tables["mail"] = list(kinds)
     return tables
 
 
@@ -1339,6 +1359,16 @@ def read_dispositions(kit_dir):
     return members
 
 
+def read_mail_kinds(kit_dir):
+    """The members of the mailbox's one closed kind set, `[mail]`'s `kinds`, in file order
+    (KICK-dKeptSession-5 S3); LoopError for a definition that declares none."""
+    data, where = read_definition(kit_dir)
+    kinds = check_loop(data, where)["mail"]
+    if not kinds:
+        raise LoopError(where, "declares no mail kinds, a [mail] table with its kinds")
+    return kinds
+
+
 def resolve_disposition(kit_dir, word):
     """The member `word` is or, through a `[[disposition-alias]]` row, means; LoopError for any other word."""
     data, where = read_definition(kit_dir)
@@ -1980,6 +2010,8 @@ def write_loop_plant(data, case, rows, base_rows):
         workflows["spec-review"]["reach"] = "revew"
     elif case == "disposition-unknown":
         data["dispositions"]["set"].append("ask")
+    elif case == "mail-kinds-repeated":
+        data["mail"]["kinds"].append("confirm-request")
     elif case == "disposition-alias":
         next(r for r in data["disposition-alias"] if r.get("word") == "defer")["means"] = "postpone"
     elif case in ("computed-actor", "computed-unserved"):
@@ -2103,8 +2135,17 @@ def main(argv):
         for s in steps:
             print("%s\t%s" % (s["tag"], s["state"]))
         return 0
+    if argv == ["--mail-kinds"]:   # KICK-dKeptSession-5 S3: the mailbox's closed kind set, one per line
+        try:
+            kinds = read_mail_kinds(kit_dir)
+        except LoopError as e:
+            print("loop: %s" % e)
+            return 1
+        for kind in kinds:
+            print(kind)
+        return 0
     if argv not in (["--check"], ["--scopes"]) and plant not in PLANTS:
-        print("usage: python loop_lib.py --check | --steps | --scopes | --selftest | --fixture --plant <%s> | --grade-site <%s> "
+        print("usage: python loop_lib.py --check | --steps | --mail-kinds | --scopes | --selftest | --fixture --plant <%s> | --grade-site <%s> "
               "<entry>... | seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]" % (
             "|".join(PLANTS), "|".join(DECLARATION_SITES)), file=sys.stderr)
         return 2

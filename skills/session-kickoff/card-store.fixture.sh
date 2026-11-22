@@ -20,7 +20,9 @@
 # runs the real module either (KICK-dKeptSession-26 S4); and the runlog kit's `runlog.py`, at the path the
 # engine's resolver finds it, as a stub answering `context <path>` with the planted `fill` from that same file
 # after the planted `fill-delay`, `none` where no fill is planted, so no case parses a transcript
-# (KICK-dKeptSession-14 S7). The stub policy kit appends each key it is asked to `$CARD_STUB_POLICY.log`, so
+# (KICK-dKeptSession-14 S7). The `mail-` cases put each mail message straight into the bare remote by
+# `update-ref` under the `gov-claim` identity, never a post, since the stub playbook kit holds no fleet
+# reader for the driver's fleet tag (KICK-dKeptSession-5 S13). The stub policy kit appends each key it is asked to `$CARD_STUB_POLICY.log`, so
 # a case can see a key never read. The engine writes the session card `t1`, appends a READY body with a `## route`
 # naming `tFix`, and the case runs its verbs and prints one `card-store: <case> · <what> · held|MISSED`
 # line per observation. The scratch tree is removed at exit. The card-import fixture's verdict
@@ -45,7 +47,8 @@ follow-foreign-after-cached follow-foreign-after-offline fixture-stale fixture-r
 fixture-cli-path-differs fixture-cli-unknown pointers-render pointers-boundary pointers-at-transitions pointers-cap pointers-replay
 budget-open budget-spent budget-unfrozen budget-omitted budget-no-kit
 position-act position-awaiting position-disagrees position-skips lead-compact lead-resume
-fill-fresh-past fill-under fill-compact fill-replay fill-slow"
+fill-fresh-past fill-under fill-compact fill-replay fill-slow
+mail-open mail-none mail-off"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
 BRIEF=memory/builds/tFix/prompts/2026-01-01-prompt-TOOL-tFix-1-brief.md
@@ -243,6 +246,17 @@ read_card_section() {
 # read_card_budget <card file> — the line of its `## pointers` section directly after the `item —` line.
 read_card_budget() {
   read_card_section "$1" | awk 'i { print; exit } /^item — / { i = 1 }'
+}
+# write_card_mail <ref> <build> <id> <to> <kind> <answers> — one mail commit over the empty tree, as the driver's
+# `--mail post` records it, set on the bare remote's <ref> by `update-ref` (KICK-dKeptSession-5 S13).
+write_card_mail() {
+  local t c m
+  printf -v m 'gov-mail %s/%s\n\nid: %s\nbuild: %s\nfrom-tag: z\nfrom-session: s-other\nto: %s\nkind: %s\nitem: none\npass: none\nsubject: the fixture'"'"'s question\nanswers: %s\n\nthe fixture'"'"'s message' \
+    "$2" "$3" "$3" "$2" "$4" "$5" "$6"
+  t=$(git --git-dir="$O" mktree </dev/null) \
+    && c=$(GIT_AUTHOR_NAME=gov-claim GIT_AUTHOR_EMAIL=gov-claim@invalid GIT_COMMITTER_NAME=gov-claim GIT_COMMITTER_EMAIL=gov-claim@invalid \
+         git --git-dir="$O" commit-tree "$t" -m "$m") && git --git-dir="$O" update-ref "$1" "$c" \
+    || { echo "card-store: the mail message $3 could not be set on $1"; exit 2; }
 }
 # The append at READY, which publishes the build card.
 run_card_append() {
@@ -879,5 +893,20 @@ case "$PLANT" in
     print_card_held "AC10 a stub past CARD_CONTEXT_BOUND=2 prints did not answer within 2s, and the replay still ends with its now — line" \
       "$(tr -d '\r' < "$OUT" | grep -qx 'context — skipped: runlog.py did not answer within 2s' && tr -d '\r' < "$OUT" | tail -n 1 | grep -q '^now — '; echo $?)"
     print_card_held "AC10 the slow replay took $((t3 - t2 - t1 + t0))s over the control, within the bound plus 5s" "$([ $((t3 - t2 - t1 + t0)) -le 7 ]; echo $?)" ;;
+  mail-open|mail-none|mail-off)
+    # KICK-dKeptSession-5 AC8: fy's question to build:tFix on the remote; mail-none adds tFix's ack of it,
+    # mail-off turns RUN_CLAIMS off in the repository's conf. Staged against a pointers writer omitting the
+    # `mail —` line, or reading the mailbox without --open, the row reds.
+    write_card_mail refs/gov/mail/fy/z/s-other fy a1b2c3d4e5f6 build:tFix question none
+    [ "$PLANT" != mail-none ] || write_card_mail refs/gov/mail/tFix/z/s-fx tFix 0f1e2d3c4b5a build:fy ack a1b2c3d4e5f6
+    if [ "$PLANT" = mail-off ]; then
+      sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$R/.unattended.conf" && git -C "$R" commit -q -am "fixture: RUN_CLAIMS off" \
+        || { echo "card-store: RUN_CLAIMS could not be turned off in $R"; exit 2; }
+    fi
+    case "$PLANT" in mail-open) want='mail — a1b2c3d4e5f6' ;; mail-none) want='mail — none' ;; *) want='mail — skipped: RUN_CLAIMS is off' ;; esac
+    set_card_position key "$K1"; run_card_append
+    run_card_engine "$R" --card --pointers --build tFix --session t1
+    print_card_held "AC8 the session card's pointers section carries $want" \
+      "$(read_card_section "$R/.git/orientation/t1.md" | grep -qxF "$want"; echo $?)" ;;
 esac
 exit "$MISSED"

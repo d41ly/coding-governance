@@ -65,7 +65,19 @@ where the set at HEAD stores nothing; then its summary. `read_transitions(build,
 moves newest first, from the trailer where one was written and from the record otherwise, each with
 its `direction` derived over this kit's definition.
 
-Exit: `record` 0 recorded, 1 refused by the table; `check` 0 clean, 1 on a finding, `pending` or
+THE MAIL GUARD (KICK-dKeptSession-5 S9, S10): after the set is read and before the table answers, `record`
+runs the unattended driver's `--mail read <slug>` once (`read_mail_rows`, under `MAIL_GUARD_SECONDS`). A
+row reading `open`, a message addressed to the build or one of its units neither answered nor
+acknowledged, refuses the move as `refused — <slug> · mail open <id> …`, exit 1, writing nothing
+(`MailHeld`). `mail — off`, no driver, or a root with no `.unattended.conf` passes with one `loop: mail ·
+unarmed · <why>` line; a driver no bash sees, a read silent within the bound, or a non-zero read with no
+row is `loop: unanswered · mail unknown: ...`, exit 2. Past the guard, each `answered`, `acked` or
+`expired` row no earlier move names is recorded in the derived field `disposed=<id>+<id>`, and where the
+set holds `log` one `mailbox-message` record per id is written after the move's own record and committed
+with it (`write_mail_records`). `--fixture --plant mail-open` holds the refusal over an open question on
+a bare remote, `mail-disposed` the disposal after its `ack` and a second move that disposes nothing.
+
+Exit: `record` 0 recorded, 1 refused by the table or held by open mail; `check` 0 clean, 1 on a finding, `pending` or
 `unstored`. Both exit 2 printing `loop: unanswered · <why>` on a value outside its grammar, a witness
 that is not HEAD or its ancestor, a staged index, or a policy refusal naming `transitions.record`, an
 empty set with no valid revision before it among them; and 2 printing `loop: unarmed · <why>` where the
@@ -102,7 +114,7 @@ from loop_lib import read_definition, read_memory_tree, resolve_memory_root, run
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_table import (TransitionRefused, derive_direction, derive_move, read_stand_ins,  # noqa: E402
                         read_transition_rows)
-from loop_witness import read_git, remove_tree, resolve_commit, run_fixture_git, write_fixture_files  # noqa: E402
+from loop_witness import FIXTURE_REMOTE, read_git, remove_tree, resolve_commit, run_fixture_git, write_fixture_files  # noqa: E402
 
 SAY = "loop"
 KEY = "transitions.record"
@@ -113,9 +125,18 @@ KIND = "transition"
 #: `trailer` and no `log` and the build holds no log record, and refuses either from a `--field`.
 BUDGET_FIELDS = ("budget", "draw")
 #: The extension fields a trailer and a record may carry after `build`, `item` and `sha`, in the order
-#: they are written; later units extend it. `composition`, `scenario`, `scenario-settled` and the
-#: `BUDGET_FIELDS` it ends with are derived by the writer, never given.
-TRANSITION_FIELDS = ("stand-in", "composition", "scenario", "scenario-settled") + BUDGET_FIELDS + ("tree",)
+#: they are written; later units extend it. `composition`, `scenario`, `scenario-settled`, the
+#: `BUDGET_FIELDS` and `disposed`, the mail the move disposed (KICK-dKeptSession-5 S10), are derived by
+#: the writer, never given; the `mail-open` and `mail-disposed` plants hold the guard and the disposal.
+TRANSITION_FIELDS = ("stand-in", "composition", "scenario", "scenario-settled") + BUDGET_FIELDS + ("tree", "disposed")
+#: The mail guard's bound in seconds on the unattended driver's `--mail read` (KICK-dKeptSession-5 S9),
+#: twice the kickoff engine's claims read, since the guard fetches every build's mail refs.
+MAIL_GUARD_SECONDS = 30
+#: The columns of one `--mail read` row, in order (KICK-dKeptSession-5 S6), and the states a move disposes.
+MAIL_COLUMNS = ("id", "kind", "to", "state", "first-seen", "from-build", "subject", "answers", "ref", "commit", "reply")
+MAIL_DISPOSED_STATES = ("answered", "acked", "expired")
+#: The record kind a disposed message is written as (KICK-dKeptSession-5 S12).
+MAIL_KIND = "mailbox-message"
 #: The move whose `tree` field must name a GREEN full per-tree verdict (TOOL-dWitnessedBar-4 S6): Test's
 #: exit, `item.test.exit` from testing into deploying, and the runner's directory it reads under the
 #: common dir.
@@ -154,7 +175,15 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
           "backward-rows": "B4, B5 and B7 forward, then B13, B8 and B6 back, each trailer and read printed",
           "skip-backward": "the six moves of backward-rows, then the newest record, B6's, deleted",
           "descope-spent": "flow.rework-budget = 0: B4, B5 and B7 forward, B13 back refused as spent, then "
-                           "@any's descope from testing"}
+                           "@any's descope from testing",
+          "mail-open": "the driver's conf with RUN_CLAIMS on and a bare remote holding fy's question to build:tFix: "
+                       "B4 refused naming it, no commit",
+          "mail-disposed": "the same question and tFix's ack of it: B4 disposes it in one commit, its record read, "
+                           "then B5 disposes nothing"}
+#: The mail plants' messages, each `(ref, build, id, to, kind, subject, answers)`, put straight on the fixture's
+#: remote; `mail-disposed` adds the ack.
+FX_QUESTION = ("refs/gov/mail/fy/z/s-other", "fy", "a1b2c3d4e5f6", "build:tFix", "question", "the fixture's question", "none")
+FX_ACK = ("refs/gov/mail/tFix/z/s-fx", "tFix", "0f1e2d3c4b5a", "build:fy", "ack", "the fixture's question", "a1b2c3d4e5f6")
 #: The moves the backward plants record in order, each an argv tail for `record` before its witness.
 BACKWARD_MOVES = (("--from", "planning", "--item", "item.plan.exit", "--outcome", "recorded"),
                   ("--from", "designing", "--item", "item.design.exit", "--outcome", "recorded"),
@@ -405,6 +434,85 @@ def check_tree_verdict(root, tree):
     return None
 
 
+class MailHeld(TransitionRefused):
+    """A message addressed to the build is open, neither answered nor acknowledged (KICK-dKeptSession-5 S9);
+    the message names the build and every open id."""
+
+    def __init__(self, build, ids):
+        Exception.__init__(self, "%s · mail open %s · a message addressed to the build holds its moves until it is "
+                                 "answered or acknowledged" % (build, " ".join(ids)))
+
+
+def read_mail_rows(root, build):
+    """The build's mailbox as the unattended driver's `--mail read <build>` prints it, run in `root` with stdin
+    closed, under `read_clean_env()` and `MAIL_GUARD_SECONDS`, the bash `resolve_bash`'s, as `write_card_follow`
+    runs the engine: `(rows, unarmed)`, each row a dict of `MAIL_COLUMNS`, `unarmed` why the mailbox was not
+    read or None. Unarmed: the driver's locator answering LookupError, a `root` with no `.unattended.conf`,
+    which launches nothing, and `mail — off`. ValueError, `mail unknown: ...`, for a driver no bash sees, a
+    read silent within the bound, and any other non-zero read with no row: unknown, never none."""
+    import subprocess
+    import loop_witness
+    from loop_lib import resolve_kit_dir
+    try:
+        driver = resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
+    except LookupError as e:
+        return [], str(e)
+    if not pathlib.Path(root, ".unattended.conf").is_file():
+        return [], "no .unattended.conf at %s, so no driver reads its mailbox" % pathlib.Path(root).as_posix()
+    bash = loop_witness.resolve_bash(driver.as_posix())
+    if bash is None:
+        raise ValueError("mail unknown: no bash that can see %s" % driver.as_posix())
+    try:
+        p = subprocess.run([bash, driver.as_posix(), "--mail", "read", build], cwd=str(root), stdin=subprocess.DEVNULL,
+                           capture_output=True, encoding="utf-8", errors="replace", timeout=MAIL_GUARD_SECONDS,
+                           env=loop_witness.read_clean_env())
+    except subprocess.TimeoutExpired:
+        raise ValueError("mail unknown: --mail read %s printed no answer within %ds" % (build, MAIL_GUARD_SECONDS)) from None
+    except OSError as e:
+        raise ValueError("mail unknown: --mail read %s did not start: %s" % (build, e)) from None
+    lines = [ln.rstrip("\r") for ln in p.stdout.splitlines() if ln.strip()]
+    rows = [dict(zip(MAIL_COLUMNS, ln.split("\t"))) for ln in lines if ln.count("\t") >= len(MAIL_COLUMNS) - 1]
+    if lines[:1] == ["mail — off"]:
+        return [], "mail — off"
+    if p.returncode != 0 and not rows:
+        raise ValueError("mail unknown: --mail read %s exited %d: %s" % (
+            build, p.returncode, (lines or p.stderr.strip().splitlines() or ["no output"])[0]))
+    return rows, None
+
+
+def write_mail_records(root, build, anchor, rows):
+    """One `mailbox-message` record per row under `anchor`, the build's anchor unit (KICK-dKeptSession-5 S12):
+    its fields from the row, its body the message's text after its `key: value` block, read from the row's
+    commit in `root`, in one `~~~~` fenced block. -> the records' repo-relative paths. ValueError where a
+    commit does not read or the factory refuses a record."""
+    read_memory_tree("build_records.py")
+    from build_records import write_record
+    out = []
+    for r in rows:
+        rc, text = read_git(root, "log", "-1", "--format=%B", r["commit"], "--")
+        if rc != 0:
+            raise ValueError("the message %s's commit %s does not read in %s" % (r["id"], r["commit"], root.as_posix()))
+        lines = text.replace("\r\n", "\n").split("\n")
+        at = next((i for i in range(2, len(lines)) if lines[i] == ""), len(lines))
+        body = lines[at + 1:]
+        while body and body[-1] == "":
+            body.pop()
+        fields = [(k.capitalize(), r[n]) for k, n in (("id", "id"), ("from", "from-build"), ("to", "to"),
+                                                       ("kind", "kind"), ("subject", "subject"), ("answers", "answers"),
+                                                       ("state", "state"), ("reply", "reply"), ("ref", "ref"))]
+        out.append(write_record(root, build, anchor, MAIL_KIND, "%s %s" % (r["kind"], r["id"]), fields,
+                                lines=["~~~~", *body, "~~~~"]))
+    return out
+
+
+def render_fixture_mail(build, mid, to, kind, subject, answers="none"):
+    """A mail commit's message as the driver's `--mail post` writes it, for a plant that puts one straight on its
+    remote: the header, the ten keys, `from-tag` `z` and `from-session` `s-other`, and a one-line body."""
+    keys = (("id", mid), ("build", build), ("from-tag", "z"), ("from-session", "s-other"), ("to", to), ("kind", kind),
+            ("item", "none"), ("pass", "none"), ("subject", subject), ("answers", answers))
+    return "gov-mail %s/%s\n\n%s\nthe fixture's message\n" % (build, mid, "".join("%s: %s\n" % kv for kv in keys))
+
+
 def write_transition_record(root, anchor, move, lines=()):
     """The next transition record of the move's build, under `anchor`, from `move`'s fields, then `lines`,
     the rework budget's rows: its path."""
@@ -420,13 +528,23 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     sha or None, [record paths], the line or None, [order lines])`, the order lines `loop: order · <path>`
     per `item-ended` order or one `loop: composition · unread · <why>`, after a `loop: scenario · unread`
     line where the scenario composition is unarmed, then the build card follow's `card —` lines
-    (`write_card_follow`, TOOL-dPlacedRequest-2 S4). TransitionRefused where no row holds the move;
-    ValueError on a value, witness, index, policy read, tag resolver or scenario conflict refused, writing
-    no record; LookupError where a kit it reads does not resolve."""
+    (`write_card_follow`, TOOL-dPlacedRequest-2 S4), a `loop: mail · unarmed` line first where the mailbox
+    was not read. TransitionRefused where no row holds the move, `MailHeld` where a message addressed to the
+    build is open; ValueError on a value, witness, index, policy read, tag resolver, scenario conflict or
+    unknown mailbox refused, writing no record; LookupError where a kit it reads does not resolve."""
     from composition import PINNED, derive_composition_revision, read_step_composition, write_ended_orders
     from scenario import derive_move_scenarios   # it imports this module through composition.py, so here
     cache = {}
     chosen = read_cached_channels(root, "HEAD", cache)
+    # the mail guard (KICK-dKeptSession-5 S9): one read of the build's mailbox, its open rows refusing the
+    # move before any write and its answered and acknowledged rows disposed below; an unarmed mailbox is a line
+    said = []
+    mail, unarmed = read_mail_rows(root, build)
+    if unarmed:
+        said.append("%s: mail · unarmed · %s" % (SAY, unarmed))
+    held = [r["id"] for r in mail if r.get("state") == "open"]
+    if held:
+        raise MailHeld(build, held)
     data, where = read_definition(KIT)
     row, to = derive_move("build", state, item, outcome, facts, read_transition_rows(data, where))
     if to == "designing":   # a placed patch waits on its owner's ratification (TOOL-dPlacedRequest-21 S6)
@@ -456,6 +574,9 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         if name in BUDGET_FIELDS:
             raise ValueError("--field %s is derived: the writer places the move's rework budget rows on the trailer "
                              "where no log record holds them, so it is never given" % name)
+        if name == "disposed":
+            raise ValueError("--field disposed is derived: the writer sets it to the mail the move disposes, so it is "
+                             "never given")
         move[name] = value
     if (state, item, to) == TREE_GATED_MOVE:
         why = check_tree_verdict(root, move.get("tree"))
@@ -465,8 +586,13 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     if owner:
         move["stand-in"] = owner
     move["composition"] = derive_composition_revision(root)[:8]
-    said = []
     before = read_transitions(build, root)
+    # the disposal (KICK-dKeptSession-5 S10): each answered, acknowledged or expired message no earlier move
+    # names in `disposed`, joined by `+`, so the trailer and the log record both carry it
+    done = {i for m in before for i in (m.get("disposed") or "").split("+") if i}
+    disposing = [r for r in mail if r.get("state") in MAIL_DISPOSED_STATES and r.get("id") not in done]
+    if disposing:
+        move["disposed"] = "+".join(r["id"] for r in disposing)
     placed = derive_move_scenarios(root, state, facts, before)
     if placed is None:
         said.append("%s: scenario · unread · the scenario composition at HEAD answers unarmed, so the move records "
@@ -555,6 +681,8 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
                     for _c, t in moves["owing"][len(moves["paired"]):]:
                         wrote.append(write_transition_record(root, anchor, t, () if wrote else carried))
                     wrote.append(write_transition_record(root, anchor, move, ([] if wrote else carried) + rows))
+                    # one record per disposed message after this move's own, staged by the one commit below
+                    wrote += write_mail_records(root, build, anchor, disposing)
                 except (ValueError, OSError):
                     for rel in wrote:
                         pathlib.Path(root, rel).unlink()
@@ -707,9 +835,23 @@ def write_transition_plant(top, case):
         files[".governance/policy.toml"] = "[transitions]\nrecord = %s\n" % PLANT_SETS[case]
     if case == "descope-spent":
         files[".governance/policy.toml"] = "[flow]\nrework-budget = 0\n"
+    if case.startswith("mail-"):   # the driver's conf, RUN_CLAIMS on, as the placement plants copy it
+        src = next((d for d in (KIT, *KIT.parents) if (d / ".unattended.conf").is_file()), None)
+        if src is None:
+            raise LookupError("the mail plants copy .unattended.conf from this tree, which holds none")
+        files[".unattended.conf"] = (src / ".unattended.conf").read_text(encoding="utf-8") + \
+            '\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="on"\n'
     write_fixture_files(top, files)
     run_fixture_git(top, "add", "-A")
     run_fixture_git(top, "commit", "-q", "-m", "fixture")
+    if case.startswith("mail-"):   # a bare remote inside the git dir, so the scratch's removal takes it too
+        from placement import write_fixture_gov_ref
+        origin = top / ".git" / "fx-origin.git"
+        run_fixture_git(top, "init", "-q", "--bare", "--template=", str(origin))
+        run_fixture_git(top, "remote", "add", FIXTURE_REMOTE, str(origin))
+        run_fixture_git(top, "push", "-q", FIXTURE_REMOTE, "main")
+        for ref, *mail in (FX_QUESTION, FX_ACK) if case == "mail-disposed" else (FX_QUESTION,):
+            write_fixture_gov_ref(top, ref, render_fixture_mail(*mail))
     return run_fixture_git(top, "rev-parse", "HEAD")
 
 
@@ -758,6 +900,36 @@ def run_transition_fixture(case):
                 (not held["draws"], "the descope drew a row")) if not ok]
             print("%s: fixture · descope-spent · %s" % (SAY, "held" if not misses else "MISSED " + "; ".join(misses)))
             return 0 if not misses else 1
+        if case == "mail-open":   # KICK-dKeptSession-5 AC6: the open question refuses B4, writing nothing
+            before = read_count()
+            rc = run_verb(b4)
+            print("%s: fixture · commits %s" % (SAY, "unchanged" if read_count() == before else "changed"))
+            return rc
+        if case == "mail-disposed":   # KICK-dKeptSession-5 AC6: B4 disposes the acknowledged question in one commit
+            read_memory_tree("build_records.py")
+            import build_records
+            before = read_count()
+            run_verb(b4)
+            files = [p for p in run_fixture_git(top, "show", "--format=", "--name-only", "HEAD").splitlines() if p]
+            mails = [p for p in files if "-%s-" % MAIL_KIND in p]
+            print("%s: fixture · commits %d · %d file(s) · %d %s record(s)" % (
+                SAY, int(read_count()) - int(before), len(files), len(mails), MAIL_KIND))
+            print("%s: fixture · trailer %s" % (SAY, run_fixture_git(top, "log", "-1", "--format=%%(trailers:key=%s,valueonly)"
+                                                                      % TRAILER_KEY) or "none"))
+            for rec in read_folder():
+                print("%s: fixture · record %s-%d · disposed %s" % (SAY, KIND, rec["n"], rec["fields"].get("disposed", "none")))
+            for rel in mails:
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    rc = build_records.main(["read", str(top / rel)])
+                text = (top / rel).read_text(encoding="utf-8")
+                serves, state = (re.search(r"^%s$" % p, text, re.M) for p in (r"\*\*Serves:\*\* (.+)", r"- \*\*State:\*\* (.+)"))
+                print("%s: fixture · %s · read exit %d · Serves %s · State %s" % (
+                    SAY, rel, rc, serves.group(1) if serves else "none", state.group(1) if state else "none"))
+            run_verb(["record", *at, *BACKWARD_MOVES[1][:6], "--witness", "HEAD"])
+            value = run_fixture_git(top, "log", "-1", "--format=%%(trailers:key=%s,valueonly)" % TRAILER_KEY)
+            print("%s: fixture · next move · %s" % (SAY, "disposes again: " + value if "disposed=" in value else "disposes nothing"))
+            return run_verb(["check", *at])
         if case in ("no-row", "empty-set"):
             before = read_count()
             argv = b4 if case == "empty-set" else b4[:7] + ["--item", "item.design.exit"] + b4[9:]
@@ -887,7 +1059,18 @@ def run_selftest():
              ("skip-backward", fx("skip-backward"), 1, "%s: transition · commit " % SAY,
               "· log · the move designing -> planning owes a record, and none holds it"),
              ("descope-spent refused", fx("descope-spent"), 0, "%s: unanswered · the rework budget is spent" % SAY, ""),
-             ("descope-spent", fx("descope-spent"), 0, "%s: fixture · descope-spent · held" % SAY, "")]
+             ("descope-spent", fx("descope-spent"), 0, "%s: fixture · descope-spent · held" % SAY, ""),
+             ("mail-open", fx("mail-open"), 1, "refused — %s · mail open %s" % (FX_BUILD, FX_QUESTION[2]), ""),
+             ("mail-open commits", fx("mail-open"), 1, "%s: fixture · commits unchanged" % SAY, ""),
+             ("mail-disposed commit", fx("mail-disposed"), 0, "%s: fixture · commits 1 · " % SAY,
+              "1 %s record(s)" % MAIL_KIND),
+             ("mail-disposed trailer", fx("mail-disposed"), 0, trailer, " · disposed=%s" % FX_QUESTION[2]),
+             ("mail-disposed log", fx("mail-disposed"), 0, "%s: fixture · record %s-1 · disposed %s" % (
+                 SAY, KIND, FX_QUESTION[2]), ""),
+             ("mail-disposed record", fx("mail-disposed"), 0, "%s: fixture · memory/builds/%s/build/" % (SAY, FX_BUILD),
+              "%s-1.md · read exit 0 · Serves %s %s · State acked" % (MAIL_KIND, MAIL_KIND, FX_UNIT)),
+             ("mail-disposed next", fx("mail-disposed"), 0, "%s: fixture · next move · disposes nothing" % SAY, ""),
+             ("mail-disposed check", fx("mail-disposed"), 0, check, "· 0 finding(s)")]
     return run_selftest_cases(run_cached_case, cases, "%s: transition selftest" % SAY)
 
 

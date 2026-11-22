@@ -1617,7 +1617,7 @@ check_eq "K2 AC6 --card --check reports each miss once, never its own annotation
 # KICK-dKeptSession-13 S2: a `## pointers` section lacking a POINTER_LINES word is refused by that
 # word, one POINTERS line per word; the card is restored byte for byte after the arm.
 cp "$K2CARD" "$TMP/k2card.pointers.bak"
-printf '## pointers\nrecords — r\nitem — i\nbudget — b\n' >> "$K2CARD"
+printf '## pointers\nrecords — r\nitem — i\nbudget — b\nmail — m\n' >> "$K2CARD"
 run_card "K13 --card --check names the pointers word the section lacks and exits 1" "$CWT" 1 "POINTERS — the '## pointers' section has no 'forks —' line, which POINTER_LINES lists; --card --pointers --build <slug> --session" --card --check --session "$K2A"
 check_eq "K13 --card --check prints one POINTERS line per missing word" "1" "$(grep -c '^POINTERS — ' "$CARD_OUT")"
 cp "$TMP/k2card.pointers.bak" "$K2CARD"
@@ -2536,7 +2536,10 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +5: RAISED by KICK-dKeptSession-14 S7 — the five plants it adds to `--list` (fill-fresh-past,
 # fill-under, fill-compact, fill-replay, fill-slow), one ok row each from the loop above; no suite ran in
 # the pass, each plant was run alone by direct CLI.
-FLOOR_ASSERTIONS=438
+# +3: RAISED by KICK-dKeptSession-5 S13 — the three plants it adds to `--list` (mail-open, mail-none,
+# mail-off), one ok row each from the loop above; K13's plant gains its `mail — m` line, its one row as
+# before. No suite ran in the pass, each plant was run alone by direct CLI.
+FLOOR_ASSERTIONS=441
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced
