@@ -63,7 +63,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `e239d8161fb3a02a24f65039f3045947b0b382aa`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `62ccec623069583d765b86d723e0533c739169e5`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -72,7 +72,8 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `b1b9c9b613365fa43ad0e9eb94db3b96a03eba6e`
+- repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `6184e5717b5909ebff84695a6d317548b6ab2ff5` at `ca1c5a7824d93143367edefa64f3d876dc03c080` by an owner at a console, over memory/builds/dKeptSession/RUN.md (phase HELD); memory/builds/dWitnessedBar/RUN.md (phase HELD)
+- rendered at: `ca1c5a7824d93143367edefa64f3d876dc03c080`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -154,26 +155,26 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dFurnishe
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dFurnishedOrders-1` · README:62 | 1 | `TOOL-dFurnishedOrders-1` | `cl-dClosedLoop-0192@e52307f5` | the orientation scout composing the card in a sidechain at session start |
-- unit id `TOOL-dFurnishedOrders-2` · README:63 | 2 | `TOOL-dFurnishedOrders-2` | `cl-dClosedLoop-0193@a564937b` | prompt-writer calls batched by `prompts.batch` |
-- unit id `TOOL-dFurnishedOrders-3` · README:64 | 3 | `TOOL-dFurnishedOrders-3` | `cl-dClosedLoop-0194@48cbc488` | a return's harness notices persisted with it |
-- unit id `TOOL-dFurnishedOrders-4` · README:65 | 4 | `TOOL-dFurnishedOrders-4` | `cl-dClosedLoop-0195@d3ad9dda` | work-order fields an optional component or an expansion fills (the map's dossiers) declared as optional slots in their three states |
-- unit id `TOOL-dFurnishedOrders-5` · README:66 | 5 | `TOOL-dFurnishedOrders-5` | `cl-dClosedLoop-0196@f158a89c` | each role's trust profile and context temperature declared and rendered (`roles.trust` |
-- unit id `TOOL-dFurnishedOrders-6` · README:67 | 6 | `TOOL-dFurnishedOrders-6` | `cl-dClosedLoop-0197@ced122c4` | the answered-call hook (`roles.answered-calls`) |
-- unit id `TOOL-dFurnishedOrders-7` · README:68 | 7 | `TOOL-dFurnishedOrders-7` | `cl-dClosedLoop-0198@9197dfef` | repairs recorded in returns and filed as asks against the producer's record (`roles.on-contradiction`) |
-- unit id `TOOL-dFurnishedOrders-8` · README:69 | 8 | `TOOL-dFurnishedOrders-8` | `cl-dClosedLoop-0199@871337bc` | the role files' re-verification orders and protocol pointers replaced by rendered slices |
-- unit id `TOOL-dFurnishedOrders-9` · README:70 | 9 | `TOOL-dFurnishedOrders-9` | `cl-dClosedLoop-0200@89a5045e` | the role-by-step matrix derived from the item declarations and joined both ways |
-- unit id `TOOL-dFurnishedOrders-10` · README:71 | 10 | `TOOL-dFurnishedOrders-10` | `cl-dClosedLoop-0201@53144abb` | role metrics per role and item into the value ledger |
-- unit id `TOOL-dFurnishedOrders-11` · README:72 | 11 | `TOOL-dFurnishedOrders-11` | `cl-dClosedLoop-0202@504bb58f` | the work order's memory slices |
-- unit id `TOOL-dFurnishedOrders-12` · README:73 | 12 | `TOOL-dFurnishedOrders-12` | `cl-dClosedLoop-0203@325cbb22` | the work order's `map` slot for the roles `memory.project-map` names |
-- unit id `TOOL-dFurnishedOrders-13` · README:74 | 13 | `TOOL-dFurnishedOrders-13` | `cl-dClosedLoop-0204@34f664ed` | the orientation scout composing the card's map cell |
-- unit id `TOOL-dFurnishedOrders-14` · README:75 | 14 | `TOOL-dFurnishedOrders-14` | `cl-dClosedLoop-0205@5bbb1b2c` | the answered-call hook's range matching |
-- unit id `TOOL-dFurnishedOrders-15` · README:76 | 15 | `TOOL-dFurnishedOrders-15` | `cl-dClosedLoop-0206@e18404dd` | the tester agent |
-- unit id `TOOL-dFurnishedOrders-16` · README:77 | 16 | `TOOL-dFurnishedOrders-16` | `cl-dClosedLoop-0207@770af750` | owner questions asked live while the build is attended |
-- unit id `TOOL-dFurnishedOrders-17` · README:78 | 17 | `TOOL-dFurnishedOrders-17` | `cl-dClosedLoop-0208@b6c1dedb` | the `code` slot rendered per item from its declared seed: the seed's definitions with their ranges |
-- unit id `TOOL-dFurnishedOrders-18` · README:79 | 18 | `TOOL-dFurnishedOrders-18` | `cl-dClosedLoop-0209@97727c41` | the work order selecting instruction units by `feature.*` once dLinkedLibrary arms that selector |
-- unit id `TOOL-dFurnishedOrders-19` · README:80 | 19 | `TOOL-dFurnishedOrders-19` | `cl-dClosedLoop-0210@c44de500` | every role return declaring the rows it establishes (seams |
-- unit id `TOOL-dFurnishedOrders-20` · README:81 | 20 | `TOOL-dFurnishedOrders-20` | `cl-dClosedLoop-0211@6b17e1fe` | the problems whose subject intersects an item's seed handed in its work order as rows |
+- unit id `TOOL-dFurnishedOrders-1` · README:61 | 1 | `TOOL-dFurnishedOrders-1` | `cl-dClosedLoop-0192@e52307f5` | the orientation scout composing the card in a sidechain at session start |
+- unit id `TOOL-dFurnishedOrders-2` · README:62 | 2 | `TOOL-dFurnishedOrders-2` | `cl-dClosedLoop-0193@a564937b` | prompt-writer calls batched by `prompts.batch` |
+- unit id `TOOL-dFurnishedOrders-3` · README:63 | 3 | `TOOL-dFurnishedOrders-3` | `cl-dClosedLoop-0194@48cbc488` | a return's harness notices persisted with it |
+- unit id `TOOL-dFurnishedOrders-4` · README:64 | 4 | `TOOL-dFurnishedOrders-4` | `cl-dClosedLoop-0195@d3ad9dda` | work-order fields an optional component or an expansion fills (the map's dossiers) declared as optional slots in their three states |
+- unit id `TOOL-dFurnishedOrders-5` · README:65 | 5 | `TOOL-dFurnishedOrders-5` | `cl-dClosedLoop-0196@f158a89c` | each role's trust profile and context temperature declared and rendered (`roles.trust` |
+- unit id `TOOL-dFurnishedOrders-6` · README:66 | 6 | `TOOL-dFurnishedOrders-6` | `cl-dClosedLoop-0197@ced122c4` | the answered-call hook (`roles.answered-calls`) |
+- unit id `TOOL-dFurnishedOrders-7` · README:67 | 7 | `TOOL-dFurnishedOrders-7` | `cl-dClosedLoop-0198@9197dfef` | repairs recorded in returns and filed as asks against the producer's record (`roles.on-contradiction`) |
+- unit id `TOOL-dFurnishedOrders-8` · README:68 | 8 | `TOOL-dFurnishedOrders-8` | `cl-dClosedLoop-0199@871337bc` | the role files' re-verification orders and protocol pointers replaced by rendered slices |
+- unit id `TOOL-dFurnishedOrders-9` · README:69 | 9 | `TOOL-dFurnishedOrders-9` | `cl-dClosedLoop-0200@89a5045e` | the role-by-step matrix derived from the item declarations and joined both ways |
+- unit id `TOOL-dFurnishedOrders-10` · README:70 | 10 | `TOOL-dFurnishedOrders-10` | `cl-dClosedLoop-0201@53144abb` | role metrics per role and item into the value ledger |
+- unit id `TOOL-dFurnishedOrders-11` · README:71 | 11 | `TOOL-dFurnishedOrders-11` | `cl-dClosedLoop-0202@504bb58f` | the work order's memory slices |
+- unit id `TOOL-dFurnishedOrders-12` · README:72 | 12 | `TOOL-dFurnishedOrders-12` | `cl-dClosedLoop-0203@325cbb22` | the work order's `map` slot for the roles `memory.project-map` names |
+- unit id `TOOL-dFurnishedOrders-13` · README:73 | 13 | `TOOL-dFurnishedOrders-13` | `cl-dClosedLoop-0204@34f664ed` | the orientation scout composing the card's map cell |
+- unit id `TOOL-dFurnishedOrders-14` · README:74 | 14 | `TOOL-dFurnishedOrders-14` | `cl-dClosedLoop-0205@5bbb1b2c` | the answered-call hook's range matching |
+- unit id `TOOL-dFurnishedOrders-15` · README:75 | 15 | `TOOL-dFurnishedOrders-15` | `cl-dClosedLoop-0206@e18404dd` | the tester agent |
+- unit id `TOOL-dFurnishedOrders-16` · README:76 | 16 | `TOOL-dFurnishedOrders-16` | `cl-dClosedLoop-0207@770af750` | owner questions asked live while the build is attended |
+- unit id `TOOL-dFurnishedOrders-17` · README:77 | 17 | `TOOL-dFurnishedOrders-17` | `cl-dClosedLoop-0208@b6c1dedb` | the `code` slot rendered per item from its declared seed: the seed's definitions with their ranges |
+- unit id `TOOL-dFurnishedOrders-18` · README:78 | 18 | `TOOL-dFurnishedOrders-18` | `cl-dClosedLoop-0209@97727c41` | the work order selecting instruction units by `feature.*` once dLinkedLibrary arms that selector |
+- unit id `TOOL-dFurnishedOrders-19` · README:79 | 19 | `TOOL-dFurnishedOrders-19` | `cl-dClosedLoop-0210@c44de500` | every role return declaring the rows it establishes (seams |
+- unit id `TOOL-dFurnishedOrders-20` · README:80 | 20 | `TOOL-dFurnishedOrders-20` | `cl-dClosedLoop-0211@6b17e1fe` | the problems whose subject intersects an item's seed handed in its work order as rows |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 

@@ -59,7 +59,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `e239d8161fb3a02a24f65039f3045947b0b382aa`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `62ccec623069583d765b86d723e0533c739169e5`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -68,7 +68,8 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `b1b9c9b613365fa43ad0e9eb94db3b96a03eba6e`
+- repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `6184e5717b5909ebff84695a6d317548b6ab2ff5` at `ca1c5a7824d93143367edefa64f3d876dc03c080` by an owner at a console, over memory/builds/dKeptSession/RUN.md (phase HELD); memory/builds/dWitnessedBar/RUN.md (phase HELD)
+- rendered at: `ca1c5a7824d93143367edefa64f3d876dc03c080`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -83,7 +84,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 ### Parents
 
 - dWellOiledMachine: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: none
-- dWitnessedBar: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0351@d6eaa553` (`tools/lib`); `cl-dClosedLoop-0364@2fbc8cf5` (`tools/lib`)
+- dWitnessedBar: specs done yes, build done yes, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0351@d6eaa553` (`tools/lib`); `cl-dClosedLoop-0364@2fbc8cf5` (`tools/lib`)
 - dLinkedLibrary: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0255@c0b78911` (`tools/lib`)
 - dFurnishedOrders: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: none
 
@@ -127,23 +128,23 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dMindYour
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dMindYourWords-1` · README:60 | 1 | `TOOL-dMindYourWords-1` | `cl-dClosedLoop-0262@8be7fb04` | the definition classes (conforming |
-- unit id `TOOL-dMindYourWords-2` · README:61 | 2 | `TOOL-dMindYourWords-2` | `cl-dClosedLoop-0263@bab0ffd1` | forced names recognised by what forces them (`lexicon.forced`): packs keyed by base member |
-- unit id `TOOL-dMindYourWords-3` · README:62 | 3 | `TOOL-dMindYourWords-3` | `cl-dClosedLoop-0264@a1b36116` | gov's own contract-forced names declared in a table the instruction write path owns |
-- unit id `TOOL-dMindYourWords-4` · README:63 | 4 | `TOOL-dMindYourWords-4` | `cl-dClosedLoop-0265@a234cd84` | override markers verified against the packs |
-- unit id `TOOL-dMindYourWords-5` · README:64 | 5 | `TOOL-dMindYourWords-5` | `cl-dClosedLoop-0266@db50d898` | a reasoned site suppression as the owner's counted fallback |
-- unit id `TOOL-dMindYourWords-6` · README:65 | 6 | `TOOL-dMindYourWords-6` | `cl-dClosedLoop-0267@06ce7948` | `--suggest` made forced-aware |
-- unit id `TOOL-dMindYourWords-7` · README:66 | 7 | `TOOL-dMindYourWords-7` | `cl-dClosedLoop-0268@2d14651f` | the packs |
-- unit id `TOOL-dMindYourWords-8` · README:67 | 8 | `TOOL-dMindYourWords-8` | `cl-dClosedLoop-0269@f2bbdcc2` | packs detected from the import census and manifests and declared by the owner |
-- unit id `TOOL-dMindYourWords-9` · README:68 | 9 | `TOOL-dMindYourWords-9` | `cl-dClosedLoop-0270@01096b8c` | enforcement: the work order's vocabulary slice and forced-aware answers |
-- unit id `TOOL-dMindYourWords-10` · README:69 | 10 | `TOOL-dMindYourWords-10` | `cl-dClosedLoop-0271@09fb0fff` | drift beyond verbs (`lexicon.drift`): one verb per declared family per object |
-- unit id `TOOL-dMindYourWords-11` · README:70 | 11 | `TOOL-dMindYourWords-11` | `cl-dClosedLoop-0272@aac8dd76` | the vocabulary changed only through the instruction write path |
-- unit id `TOOL-dMindYourWords-12` · README:71 | 12 | `TOOL-dMindYourWords-12` | `cl-dClosedLoop-0273@e1bd67f4` | one extraction primitive in `tools/lib` |
-- unit id `TOOL-dMindYourWords-13` · README:72 | 13 | `TOOL-dMindYourWords-13` | `cl-dClosedLoop-0274@5185348f` | the tag-name vocabulary check |
-- unit id `TOOL-dMindYourWords-14` · README:73 | 14 | `TOOL-dMindYourWords-14` | `cl-dClosedLoop-0275@f7d892e0` | the kit's defects fixed: repeated block headers refused |
-- unit id `TOOL-dMindYourWords-15` · README:74 | 15 | `TOOL-dMindYourWords-15` | `cl-dClosedLoop-0276@c565a516` | records kept out by the path selector |
-- unit id `TOOL-dMindYourWords-16` · README:75 | 16 | `TOOL-dMindYourWords-16` | `cl-dClosedLoop-0277@11ec04ed` | the two lexicon drift signals as the lexicon's own leg pack |
-- unit id `TOOL-dMindYourWords-17` · README:76 | 17 | `TOOL-dMindYourWords-17` | `cl-dClosedLoop-0278@3bd5d4af` | the overloaded terms settled: attended as a session kind and as a mode |
+- unit id `TOOL-dMindYourWords-1` · README:59 | 1 | `TOOL-dMindYourWords-1` | `cl-dClosedLoop-0262@8be7fb04` | the definition classes (conforming |
+- unit id `TOOL-dMindYourWords-2` · README:60 | 2 | `TOOL-dMindYourWords-2` | `cl-dClosedLoop-0263@bab0ffd1` | forced names recognised by what forces them (`lexicon.forced`): packs keyed by base member |
+- unit id `TOOL-dMindYourWords-3` · README:61 | 3 | `TOOL-dMindYourWords-3` | `cl-dClosedLoop-0264@a1b36116` | gov's own contract-forced names declared in a table the instruction write path owns |
+- unit id `TOOL-dMindYourWords-4` · README:62 | 4 | `TOOL-dMindYourWords-4` | `cl-dClosedLoop-0265@a234cd84` | override markers verified against the packs |
+- unit id `TOOL-dMindYourWords-5` · README:63 | 5 | `TOOL-dMindYourWords-5` | `cl-dClosedLoop-0266@db50d898` | a reasoned site suppression as the owner's counted fallback |
+- unit id `TOOL-dMindYourWords-6` · README:64 | 6 | `TOOL-dMindYourWords-6` | `cl-dClosedLoop-0267@06ce7948` | `--suggest` made forced-aware |
+- unit id `TOOL-dMindYourWords-7` · README:65 | 7 | `TOOL-dMindYourWords-7` | `cl-dClosedLoop-0268@2d14651f` | the packs |
+- unit id `TOOL-dMindYourWords-8` · README:66 | 8 | `TOOL-dMindYourWords-8` | `cl-dClosedLoop-0269@f2bbdcc2` | packs detected from the import census and manifests and declared by the owner |
+- unit id `TOOL-dMindYourWords-9` · README:67 | 9 | `TOOL-dMindYourWords-9` | `cl-dClosedLoop-0270@01096b8c` | enforcement: the work order's vocabulary slice and forced-aware answers |
+- unit id `TOOL-dMindYourWords-10` · README:68 | 10 | `TOOL-dMindYourWords-10` | `cl-dClosedLoop-0271@09fb0fff` | drift beyond verbs (`lexicon.drift`): one verb per declared family per object |
+- unit id `TOOL-dMindYourWords-11` · README:69 | 11 | `TOOL-dMindYourWords-11` | `cl-dClosedLoop-0272@aac8dd76` | the vocabulary changed only through the instruction write path |
+- unit id `TOOL-dMindYourWords-12` · README:70 | 12 | `TOOL-dMindYourWords-12` | `cl-dClosedLoop-0273@e1bd67f4` | one extraction primitive in `tools/lib` |
+- unit id `TOOL-dMindYourWords-13` · README:71 | 13 | `TOOL-dMindYourWords-13` | `cl-dClosedLoop-0274@5185348f` | the tag-name vocabulary check |
+- unit id `TOOL-dMindYourWords-14` · README:72 | 14 | `TOOL-dMindYourWords-14` | `cl-dClosedLoop-0275@f7d892e0` | the kit's defects fixed: repeated block headers refused |
+- unit id `TOOL-dMindYourWords-15` · README:73 | 15 | `TOOL-dMindYourWords-15` | `cl-dClosedLoop-0276@c565a516` | records kept out by the path selector |
+- unit id `TOOL-dMindYourWords-16` · README:74 | 16 | `TOOL-dMindYourWords-16` | `cl-dClosedLoop-0277@11ec04ed` | the two lexicon drift signals as the lexicon's own leg pack |
+- unit id `TOOL-dMindYourWords-17` · README:75 | 17 | `TOOL-dMindYourWords-17` | `cl-dClosedLoop-0278@3bd5d4af` | the overloaded terms settled: attended as a session kind and as a mode |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 

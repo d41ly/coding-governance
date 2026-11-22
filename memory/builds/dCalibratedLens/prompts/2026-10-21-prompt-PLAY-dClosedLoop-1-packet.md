@@ -59,7 +59,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `e239d8161fb3a02a24f65039f3045947b0b382aa`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `62ccec623069583d765b86d723e0533c739169e5`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -68,7 +68,8 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `b1b9c9b613365fa43ad0e9eb94db3b96a03eba6e`
+- repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `6184e5717b5909ebff84695a6d317548b6ab2ff5` at `ca1c5a7824d93143367edefa64f3d876dc03c080` by an owner at a console, over memory/builds/dKeptSession/RUN.md (phase HELD); memory/builds/dWitnessedBar/RUN.md (phase HELD)
+- rendered at: `ca1c5a7824d93143367edefa64f3d876dc03c080`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -137,23 +138,23 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dCalibrat
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dCalibratedLens-1` · README:60 | 1 | `TOOL-dCalibratedLens-1` | `cl-dClosedLoop-0458@5429e502` | each stage review's lenses and effort: lenses for Plan |
-- unit id `TOOL-dCalibratedLens-2` · README:61 | 2 | `TOOL-dCalibratedLens-2` | `cl-dClosedLoop-0459@facc646b` | the shared value ledger |
-- unit id `TOOL-dCalibratedLens-3` · README:62 | 3 | `TOOL-dCalibratedLens-3` | `cl-dClosedLoop-0460@401ecbd8` | the Loop Review |
-- unit id `TOOL-dCalibratedLens-4` · README:63 | 4 | `TOOL-dCalibratedLens-4` | `cl-dClosedLoop-0461@ea09b304` | caps re-derived from evidence and review cost |
-- unit id `TOOL-dCalibratedLens-5` · README:64 | 5 | `TOOL-dCalibratedLens-5` | `cl-dClosedLoop-0462@cad135ef` | instruction effectiveness measured from returns and findings that cite unit tags |
-- unit id `TOOL-dCalibratedLens-6` · README:65 | 6 | `TOOL-dCalibratedLens-6` | `cl-dClosedLoop-0463@33710e39` | each role's `memory.item-budget` derived from its p90 over 30 sliced work orders under `measured` |
-- unit id `TOOL-dCalibratedLens-7` · README:66 | 7 | `TOOL-dCalibratedLens-7` | `cl-dClosedLoop-0464@b1127f93` | the value ledger's shape rows |
-- unit id `TOOL-dCalibratedLens-8` · README:67 | 8 | `TOOL-dCalibratedLens-8` | `cl-dClosedLoop-0465@4003d147` | the not-in-view cause added to `review.dispose`'s record |
-- unit id `TOOL-dCalibratedLens-9` · README:68 | 9 | `TOOL-dCalibratedLens-9` | `cl-dClosedLoop-0466@f36d2aed` | probe cost priced in the value ledger |
-- unit id `TOOL-dCalibratedLens-10` · README:69 | 10 | `TOOL-dCalibratedLens-10` | `cl-dClosedLoop-0467@58bd6ee5` | instruction evals: a replay suite of recorded items with known outcomes |
-- unit id `TOOL-dCalibratedLens-11` · README:70 | 11 | `TOOL-dCalibratedLens-11` | `cl-dClosedLoop-0468@8f541e2a` | the Loop Review's delivery metrics: lead time |
-- unit id `TOOL-dCalibratedLens-12` · README:71 | 12 | `TOOL-dCalibratedLens-12` | `cl-dClosedLoop-0469@653feb80` | the Loop Review pricing cost per item kind from trace rows (P35) |
-- unit id `TOOL-dCalibratedLens-13` · README:72 | 13 | `TOOL-dCalibratedLens-13` | `cl-dClosedLoop-0470@dfafc75a` | the `lens` kind and namespace |
-- unit id `TOOL-dCalibratedLens-14` · README:73 | 14 | `TOOL-dCalibratedLens-14` | `cl-dClosedLoop-0471@453f9872` | lens removal by a swap or by excluding a default lens |
-- unit id `TOOL-dCalibratedLens-15` · README:74 | 15 | `TOOL-dCalibratedLens-15` | `cl-dClosedLoop-0472@bf8d8ee5` | each size breach priced in the value ledger by its bytes and its reads |
-- unit id `TOOL-dCalibratedLens-16` · README:75 | 16 | `TOOL-dCalibratedLens-16` | `cl-dClosedLoop-0473@17126ed2` | the stall and loop classes Runtime journals |
-- unit id `TOOL-dCalibratedLens-17` · README:76 | 17 | `TOOL-dCalibratedLens-17` | `cl-dClosedLoop-0474@b1852db0` | the node beats and the pools' ledgers trended |
+- unit id `TOOL-dCalibratedLens-1` · README:59 | 1 | `TOOL-dCalibratedLens-1` | `cl-dClosedLoop-0458@5429e502` | each stage review's lenses and effort: lenses for Plan |
+- unit id `TOOL-dCalibratedLens-2` · README:60 | 2 | `TOOL-dCalibratedLens-2` | `cl-dClosedLoop-0459@facc646b` | the shared value ledger |
+- unit id `TOOL-dCalibratedLens-3` · README:61 | 3 | `TOOL-dCalibratedLens-3` | `cl-dClosedLoop-0460@401ecbd8` | the Loop Review |
+- unit id `TOOL-dCalibratedLens-4` · README:62 | 4 | `TOOL-dCalibratedLens-4` | `cl-dClosedLoop-0461@ea09b304` | caps re-derived from evidence and review cost |
+- unit id `TOOL-dCalibratedLens-5` · README:63 | 5 | `TOOL-dCalibratedLens-5` | `cl-dClosedLoop-0462@cad135ef` | instruction effectiveness measured from returns and findings that cite unit tags |
+- unit id `TOOL-dCalibratedLens-6` · README:64 | 6 | `TOOL-dCalibratedLens-6` | `cl-dClosedLoop-0463@33710e39` | each role's `memory.item-budget` derived from its p90 over 30 sliced work orders under `measured` |
+- unit id `TOOL-dCalibratedLens-7` · README:65 | 7 | `TOOL-dCalibratedLens-7` | `cl-dClosedLoop-0464@b1127f93` | the value ledger's shape rows |
+- unit id `TOOL-dCalibratedLens-8` · README:66 | 8 | `TOOL-dCalibratedLens-8` | `cl-dClosedLoop-0465@4003d147` | the not-in-view cause added to `review.dispose`'s record |
+- unit id `TOOL-dCalibratedLens-9` · README:67 | 9 | `TOOL-dCalibratedLens-9` | `cl-dClosedLoop-0466@f36d2aed` | probe cost priced in the value ledger |
+- unit id `TOOL-dCalibratedLens-10` · README:68 | 10 | `TOOL-dCalibratedLens-10` | `cl-dClosedLoop-0467@58bd6ee5` | instruction evals: a replay suite of recorded items with known outcomes |
+- unit id `TOOL-dCalibratedLens-11` · README:69 | 11 | `TOOL-dCalibratedLens-11` | `cl-dClosedLoop-0468@8f541e2a` | the Loop Review's delivery metrics: lead time |
+- unit id `TOOL-dCalibratedLens-12` · README:70 | 12 | `TOOL-dCalibratedLens-12` | `cl-dClosedLoop-0469@653feb80` | the Loop Review pricing cost per item kind from trace rows (P35) |
+- unit id `TOOL-dCalibratedLens-13` · README:71 | 13 | `TOOL-dCalibratedLens-13` | `cl-dClosedLoop-0470@dfafc75a` | the `lens` kind and namespace |
+- unit id `TOOL-dCalibratedLens-14` · README:72 | 14 | `TOOL-dCalibratedLens-14` | `cl-dClosedLoop-0471@453f9872` | lens removal by a swap or by excluding a default lens |
+- unit id `TOOL-dCalibratedLens-15` · README:73 | 15 | `TOOL-dCalibratedLens-15` | `cl-dClosedLoop-0472@bf8d8ee5` | each size breach priced in the value ledger by its bytes and its reads |
+- unit id `TOOL-dCalibratedLens-16` · README:74 | 16 | `TOOL-dCalibratedLens-16` | `cl-dClosedLoop-0473@17126ed2` | the stall and loop classes Runtime journals |
+- unit id `TOOL-dCalibratedLens-17` · README:75 | 17 | `TOOL-dCalibratedLens-17` | `cl-dClosedLoop-0474@b1852db0` | the node beats and the pools' ledgers trended |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 

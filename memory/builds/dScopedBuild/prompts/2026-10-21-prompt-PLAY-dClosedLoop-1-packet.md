@@ -57,7 +57,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `e239d8161fb3a02a24f65039f3045947b0b382aa`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `62ccec623069583d765b86d723e0533c739169e5`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -66,7 +66,8 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `b1b9c9b613365fa43ad0e9eb94db3b96a03eba6e`
+- repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `6184e5717b5909ebff84695a6d317548b6ab2ff5` at `ca1c5a7824d93143367edefa64f3d876dc03c080` by an owner at a console, over memory/builds/dKeptSession/RUN.md (phase HELD); memory/builds/dWitnessedBar/RUN.md (phase HELD)
+- rendered at: `ca1c5a7824d93143367edefa64f3d876dc03c080`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -98,7 +99,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 ### Parents
 
 - dIndexedDesign: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0397@155d665e` (`off`)
-- dWitnessedBar: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0345@3265ae12` (`build.acceptance`, `test.seen-red`); `cl-dClosedLoop-0351@d6eaa553` (`tools/lib`); `cl-dClosedLoop-0364@2fbc8cf5` (`tools/lib`)
+- dWitnessedBar: specs done yes, build done yes, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0345@3265ae12` (`build.acceptance`, `test.seen-red`); `cl-dClosedLoop-0351@d6eaa553` (`tools/lib`); `cl-dClosedLoop-0364@2fbc8cf5` (`tools/lib`)
 - dWellOiledMachine: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: none
 - dFurnishedOrders: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: none
 
@@ -144,21 +145,21 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dScopedBu
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dScopedBuild-1` · README:60 | 1 | `TOOL-dScopedBuild-1` | `cl-dClosedLoop-0399@182b9f2d` | one exit contract with a history-derived base |
-- unit id `TOOL-dScopedBuild-2` · README:61 | 2 | `TOOL-dScopedBuild-2` | `cl-dClosedLoop-0400@d5dcbafa` | built specs frozen |
-- unit id `TOOL-dScopedBuild-3` · README:62 | 3 | `TOOL-dScopedBuild-3` | `cl-dClosedLoop-0401@e53987d9` | scope at the push |
-- unit id `TOOL-dScopedBuild-4` · README:63 | 4 | `TOOL-dScopedBuild-4` | `cl-dClosedLoop-0402@19e9688b` | the closing review recorded |
-- unit id `TOOL-dScopedBuild-5` · README:64 | 5 | `TOOL-dScopedBuild-5` | `cl-dClosedLoop-0403@3c89f2a1` | a write gate reading derived state |
-- unit id `TOOL-dScopedBuild-6` · README:65 | 6 | `TOOL-dScopedBuild-6` | `cl-dClosedLoop-0404@f111410c` | the per-pass checklist's retirement witnessed at Build |
-- unit id `TOOL-dScopedBuild-7` · README:66 | 7 | `TOOL-dScopedBuild-7` | `cl-dClosedLoop-0405@431edacd` | the core checks run by the executor at Build's exit |
-- unit id `TOOL-dScopedBuild-8` · README:67 | 8 | `TOOL-dScopedBuild-8` | `cl-dClosedLoop-0406@c1850071` | `build.unit-pass` and `build.scope` draining the legacy a unit touches as `retrofit.drain` says |
-- unit id `TOOL-dScopedBuild-9` · README:68 | 9 | `TOOL-dScopedBuild-9` | `cl-dClosedLoop-0407@b6ab4b28` | the touch join as `build.scope`'s one check |
-- unit id `TOOL-dScopedBuild-10` · README:69 | 10 | `TOOL-dScopedBuild-10` | `cl-dClosedLoop-0408@e14d93bc` | a red-first reproduction |
-- unit id `TOOL-dScopedBuild-11` · README:70 | 11 | `TOOL-dScopedBuild-11` | `cl-dClosedLoop-0409@5b78cbe2` | a playbook's pieces built as units with piece records joined by hash |
-- unit id `TOOL-dScopedBuild-12` · README:71 | 12 | `TOOL-dScopedBuild-12` | `cl-dClosedLoop-0410@dce90a3a` | `build.reuse-check` |
-- unit id `TOOL-dScopedBuild-13` · README:72 | 13 | `TOOL-dScopedBuild-13` | `cl-dClosedLoop-0411@78cc90dd` | the closing review handed |
-- unit id `TOOL-dScopedBuild-14` · README:73 | 14 | `TOOL-dScopedBuild-14` | `cl-dClosedLoop-0412@021fa28b` | the deviation gate under `deviation.gate`: dTrueNorth's joins read at the commit and at the Build exit beside `build.scope` |
-- unit id `TOOL-dScopedBuild-15` · README:74 | 15 | `TOOL-dScopedBuild-15` | `cl-dClosedLoop-0506@2200c4c7` | `build.acceptance` writing the seen-red record: the executor re-running each new or changed gate's planted red beside the unit's acceptance commands |
+- unit id `TOOL-dScopedBuild-1` · README:59 | 1 | `TOOL-dScopedBuild-1` | `cl-dClosedLoop-0399@182b9f2d` | one exit contract with a history-derived base |
+- unit id `TOOL-dScopedBuild-2` · README:60 | 2 | `TOOL-dScopedBuild-2` | `cl-dClosedLoop-0400@d5dcbafa` | built specs frozen |
+- unit id `TOOL-dScopedBuild-3` · README:61 | 3 | `TOOL-dScopedBuild-3` | `cl-dClosedLoop-0401@e53987d9` | scope at the push |
+- unit id `TOOL-dScopedBuild-4` · README:62 | 4 | `TOOL-dScopedBuild-4` | `cl-dClosedLoop-0402@19e9688b` | the closing review recorded |
+- unit id `TOOL-dScopedBuild-5` · README:63 | 5 | `TOOL-dScopedBuild-5` | `cl-dClosedLoop-0403@3c89f2a1` | a write gate reading derived state |
+- unit id `TOOL-dScopedBuild-6` · README:64 | 6 | `TOOL-dScopedBuild-6` | `cl-dClosedLoop-0404@f111410c` | the per-pass checklist's retirement witnessed at Build |
+- unit id `TOOL-dScopedBuild-7` · README:65 | 7 | `TOOL-dScopedBuild-7` | `cl-dClosedLoop-0405@431edacd` | the core checks run by the executor at Build's exit |
+- unit id `TOOL-dScopedBuild-8` · README:66 | 8 | `TOOL-dScopedBuild-8` | `cl-dClosedLoop-0406@c1850071` | `build.unit-pass` and `build.scope` draining the legacy a unit touches as `retrofit.drain` says |
+- unit id `TOOL-dScopedBuild-9` · README:67 | 9 | `TOOL-dScopedBuild-9` | `cl-dClosedLoop-0407@b6ab4b28` | the touch join as `build.scope`'s one check |
+- unit id `TOOL-dScopedBuild-10` · README:68 | 10 | `TOOL-dScopedBuild-10` | `cl-dClosedLoop-0408@e14d93bc` | a red-first reproduction |
+- unit id `TOOL-dScopedBuild-11` · README:69 | 11 | `TOOL-dScopedBuild-11` | `cl-dClosedLoop-0409@5b78cbe2` | a playbook's pieces built as units with piece records joined by hash |
+- unit id `TOOL-dScopedBuild-12` · README:70 | 12 | `TOOL-dScopedBuild-12` | `cl-dClosedLoop-0410@dce90a3a` | `build.reuse-check` |
+- unit id `TOOL-dScopedBuild-13` · README:71 | 13 | `TOOL-dScopedBuild-13` | `cl-dClosedLoop-0411@78cc90dd` | the closing review handed |
+- unit id `TOOL-dScopedBuild-14` · README:72 | 14 | `TOOL-dScopedBuild-14` | `cl-dClosedLoop-0412@021fa28b` | the deviation gate under `deviation.gate`: dTrueNorth's joins read at the commit and at the Build exit beside `build.scope` |
+- unit id `TOOL-dScopedBuild-15` · README:73 | 15 | `TOOL-dScopedBuild-15` | `cl-dClosedLoop-0506@2200c4c7` | `build.acceptance` writing the seen-red record: the executor re-running each new or changed gate's planted red beside the unit's acceptance commands |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 

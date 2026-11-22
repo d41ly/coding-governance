@@ -58,7 +58,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `e239d8161fb3a02a24f65039f3045947b0b382aa`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `62ccec623069583d765b86d723e0533c739169e5`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -67,7 +67,8 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `b1b9c9b613365fa43ad0e9eb94db3b96a03eba6e`
+- repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `6184e5717b5909ebff84695a6d317548b6ab2ff5` at `ca1c5a7824d93143367edefa64f3d876dc03c080` by an owner at a console, over memory/builds/dKeptSession/RUN.md (phase HELD); memory/builds/dWitnessedBar/RUN.md (phase HELD)
+- rendered at: `ca1c5a7824d93143367edefa64f3d876dc03c080`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -155,23 +156,23 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dIndexedD
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dIndexedDesign-1` · README:60 | 1 | `TOOL-dIndexedDesign-1` | `cl-dClosedLoop-0383@77f2882f` | the Design-to-Build hand-off as `design.handoff` says |
-- unit id `TOOL-dIndexedDesign-2` · README:61 | 2 | `TOOL-dIndexedDesign-2` | `cl-dClosedLoop-0384@372bd58d` | the design index |
-- unit id `TOOL-dIndexedDesign-3` · README:62 | 3 | `TOOL-dIndexedDesign-3` | `cl-dClosedLoop-0385@7bdb7329` | design review by policy |
-- unit id `TOOL-dIndexedDesign-4` · README:63 | 4 | `TOOL-dIndexedDesign-4` | `cl-dClosedLoop-0386@1f72161f` | reuse and alternatives backed by recorded probes |
-- unit id `TOOL-dIndexedDesign-5` · README:64 | 5 | `TOOL-dIndexedDesign-5` | `cl-dClosedLoop-0387@f264e3f3` | the research harness |
-- unit id `TOOL-dIndexedDesign-6` · README:65 | 6 | `TOOL-dIndexedDesign-6` | `cl-dClosedLoop-0388@deaac21c` | agreement and tier checks |
-- unit id `TOOL-dIndexedDesign-7` · README:66 | 7 | `TOOL-dIndexedDesign-7` | `cl-dClosedLoop-0389@158d7ac4` | the spec measured |
-- unit id `TOOL-dIndexedDesign-8` · README:67 | 8 | `TOOL-dIndexedDesign-8` | `cl-dClosedLoop-0390@a096f77c` | the feature level (build |
-- unit id `TOOL-dIndexedDesign-9` · README:68 | 9 | `TOOL-dIndexedDesign-9` | `cl-dClosedLoop-0391@17b40187` | spec sections named by tag across tiers |
-- unit id `TOOL-dIndexedDesign-10` · README:69 | 10 | `TOOL-dIndexedDesign-10` | `cl-dClosedLoop-0392@c9f3c2f0` | the playbook record kind: dScriptedRepeat's canon |
-- unit id `TOOL-dIndexedDesign-11` · README:70 | 11 | `TOOL-dIndexedDesign-11` | `cl-dClosedLoop-0393@c8409a33` | the playbook set record and its set check |
-- unit id `TOOL-dIndexedDesign-12` · README:71 | 12 | `TOOL-dIndexedDesign-12` | `cl-dClosedLoop-0394@97e00df6` | the structured spec declaring `implements=` and `decides=` edges |
-- unit id `TOOL-dIndexedDesign-13` · README:72 | 13 | `TOOL-dIndexedDesign-13` | `cl-dClosedLoop-0395@07a81090` | the reuse scout's return under aScoutedSeam's M1c contract: needs and a concrete sketch before the search |
-- unit id `TOOL-dIndexedDesign-14` · README:73 | 14 | `TOOL-dIndexedDesign-14` | `cl-dClosedLoop-0396@bf718415` | the reuse scout's return also naming at most five bug classes by intent |
-- unit id `TOOL-dIndexedDesign-15` · README:74 | 15 | `TOOL-dIndexedDesign-15` | `cl-dClosedLoop-0397@155d665e` | the planner's `design.streams` item after `design.overlaps` |
-- unit id `TOOL-dIndexedDesign-16` · README:75 | 16 | `TOOL-dIndexedDesign-16` | `cl-dClosedLoop-0398@f6f6546a` | the design coverage under `design.coverage` and `design.coverage.semantic`: dTrueNorth's join read at each Design exit and at each spec's revision |
-- unit id `TOOL-dIndexedDesign-20` · README:76 | 17 | `TOOL-dIndexedDesign-20` | `cl-dClosedLoop-0390@a096f77c` part 2/2 | the feature level's re-entry by `design.reentry`, the additive-versus-breaking diff, `design.input` and the re-design inventory |
+- unit id `TOOL-dIndexedDesign-1` · README:59 | 1 | `TOOL-dIndexedDesign-1` | `cl-dClosedLoop-0383@77f2882f` | the Design-to-Build hand-off as `design.handoff` says |
+- unit id `TOOL-dIndexedDesign-2` · README:60 | 2 | `TOOL-dIndexedDesign-2` | `cl-dClosedLoop-0384@372bd58d` | the design index |
+- unit id `TOOL-dIndexedDesign-3` · README:61 | 3 | `TOOL-dIndexedDesign-3` | `cl-dClosedLoop-0385@7bdb7329` | design review by policy |
+- unit id `TOOL-dIndexedDesign-4` · README:62 | 4 | `TOOL-dIndexedDesign-4` | `cl-dClosedLoop-0386@1f72161f` | reuse and alternatives backed by recorded probes |
+- unit id `TOOL-dIndexedDesign-5` · README:63 | 5 | `TOOL-dIndexedDesign-5` | `cl-dClosedLoop-0387@f264e3f3` | the research harness |
+- unit id `TOOL-dIndexedDesign-6` · README:64 | 6 | `TOOL-dIndexedDesign-6` | `cl-dClosedLoop-0388@deaac21c` | agreement and tier checks |
+- unit id `TOOL-dIndexedDesign-7` · README:65 | 7 | `TOOL-dIndexedDesign-7` | `cl-dClosedLoop-0389@158d7ac4` | the spec measured |
+- unit id `TOOL-dIndexedDesign-8` · README:66 | 8 | `TOOL-dIndexedDesign-8` | `cl-dClosedLoop-0390@a096f77c` | the feature level (build |
+- unit id `TOOL-dIndexedDesign-9` · README:67 | 9 | `TOOL-dIndexedDesign-9` | `cl-dClosedLoop-0391@17b40187` | spec sections named by tag across tiers |
+- unit id `TOOL-dIndexedDesign-10` · README:68 | 10 | `TOOL-dIndexedDesign-10` | `cl-dClosedLoop-0392@c9f3c2f0` | the playbook record kind: dScriptedRepeat's canon |
+- unit id `TOOL-dIndexedDesign-11` · README:69 | 11 | `TOOL-dIndexedDesign-11` | `cl-dClosedLoop-0393@c8409a33` | the playbook set record and its set check |
+- unit id `TOOL-dIndexedDesign-12` · README:70 | 12 | `TOOL-dIndexedDesign-12` | `cl-dClosedLoop-0394@97e00df6` | the structured spec declaring `implements=` and `decides=` edges |
+- unit id `TOOL-dIndexedDesign-13` · README:71 | 13 | `TOOL-dIndexedDesign-13` | `cl-dClosedLoop-0395@07a81090` | the reuse scout's return under aScoutedSeam's M1c contract: needs and a concrete sketch before the search |
+- unit id `TOOL-dIndexedDesign-14` · README:72 | 14 | `TOOL-dIndexedDesign-14` | `cl-dClosedLoop-0396@bf718415` | the reuse scout's return also naming at most five bug classes by intent |
+- unit id `TOOL-dIndexedDesign-15` · README:73 | 15 | `TOOL-dIndexedDesign-15` | `cl-dClosedLoop-0397@155d665e` | the planner's `design.streams` item after `design.overlaps` |
+- unit id `TOOL-dIndexedDesign-16` · README:74 | 16 | `TOOL-dIndexedDesign-16` | `cl-dClosedLoop-0398@f6f6546a` | the design coverage under `design.coverage` and `design.coverage.semantic`: dTrueNorth's join read at each Design exit and at each spec's revision |
+- unit id `TOOL-dIndexedDesign-20` · README:75 | 17 | `TOOL-dIndexedDesign-20` | `cl-dClosedLoop-0390@a096f77c` part 2/2 | the feature level's re-entry by `design.reentry`, the additive-versus-breaking diff, `design.input` and the re-design inventory |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
