@@ -87,7 +87,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 66 unit(s) · node d · opened 2026-10-21 · streams kickoff
+**Build status:** DEFERRED · 66 unit(s) · node d · opened 2026-10-21 · streams kickoff
 ids KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14
 ids KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28
 ids KICK-dKeptSession-29 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42
@@ -135,7 +135,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition](spec/2026-10-26-spec-KICK-dKeptSession-5.md) | 16 | 2 | CLOSED | rev-12 | 2026-11-22 |
 | [KICK-dKeptSession-23 — every mail write appended to the change feed once its ref update lands, inside the feed's census](spec/2026-10-26-spec-KICK-dKeptSession-23.md) | 17 | 2 | CLOSED | rev-5 | 2026-11-23 |
 | [KICK-dKeptSession-36 — the transition guard runs the driver through a bash that shares this filesystem, never the bare name, and an unresolved shell refuses](spec/2026-10-26-spec-KICK-dKeptSession-36.md) | 17 | 2 | CLOSED | rev-7 | 2026-11-23 |
-| [KICK-dKeptSession-39 — `mailbox-message` a typed record kind, served as itself and joined to its file name both ways](spec/2026-10-26-spec-KICK-dKeptSession-39.md) | 17 | 2 | INPROGRESS | rev-6 | 2026-11-23 |
+| [KICK-dKeptSession-39 — `mailbox-message` a typed record kind, served as itself and joined to its file name both ways](spec/2026-10-26-spec-KICK-dKeptSession-39.md) | 17 | 2 | CLOSED | rev-6 | 2026-11-23 |
 | [KICK-dKeptSession-51 — the act's place in the message id is the ninth field, after the recipient and the content key, in every text that states it](spec/2026-10-26-spec-KICK-dKeptSession-51.md) | 17 | 2 | DEFERRED | rev-5 | 2026-11-23 |
 | [KICK-dKeptSession-27 — each message carrying its session's sequence number, a take-over its predecessor, and an interface notice its content key](spec/2026-10-26-spec-KICK-dKeptSession-27.md) | 18 | 2 | DEFERRED | rev-7 | 2026-11-23 |
 | [KICK-dKeptSession-24 — a mail deadline judged by the observer clock: `flow.wait-ceiling` declared on each message, the asker's default past it](spec/2026-10-26-spec-KICK-dKeptSession-24.md) | 19 | 2 | DEFERRED | rev-5 | 2026-11-23 |
@@ -165,7 +165,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-2 | 2026-11-21 |
 <!-- /gen:build-units -->
 
-Records: 374 bound to this build, across 4 record folder(s).
+Records: 375 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
