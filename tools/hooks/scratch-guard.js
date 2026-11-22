@@ -2029,6 +2029,77 @@ function renderRouteText(data, top, common, reserve) {
   return out.join('\n')
 }
 
+// ---- the item boundary (KICK-dKeptSession-13 S7) -------------------------------------------------
+
+/**
+ * THE ITEM-BOUNDARY STEP, run from `main` after every arm admits a Bash or PowerShell call: what the
+ * call is told, or '' for nothing. It never refuses. THE ONE EVALUATION ORDER:
+ *  1. `agent_type` or `agent_id` present, or a `session_id` that is not id-shaped → '' (the main
+ *     session's step alone)
+ *  2. the payload `cwd`, else `CLAUDE_PROJECT_DIR`, under no `.git` → ''
+ *  3. the tree's card file at CARD_FILE_REL absent, its `card-owner —` line naming another session, or
+ *     its route naming no build (extractRouteUnits) → '' — the card file is read, and no checker spawned
+ *  4. `<git common dir>/orientation/<sid>.boundary` present → its text, cut to ROUTE_CONTEXT_CAP, is the
+ *     return, and the file is unlinked; then the rows below
+ *  5. the card's `## pointers` `item —` line's `at` equal to `git rev-parse --short=8 HEAD` → no verb,
+ *     the one git spawn
+ *  6. otherwise the kickoff checker's `--card --boundary` starts DETACHED, `--out` naming that file, run
+ *     by the bash resolveCardBash finds, and the step returns without waiting: the verb's position read
+ *     alone took 7.3 s, so its lines are reported at the next shell call after it finishes (§8 F4)
+ * `checker` overrides the resolved one, for the self-test's stub. WHAT THIS DOES NOT CHECK: a boundary
+ * with no local commit, which the next commit or transition notices; a verb the session's next call
+ * starts while one runs, which derives the same answer, a lost compare-and-swap re-rendering once.
+ */
+function checkItemBoundary(data, env, checker) {
+  const fs = require('fs')
+  const path = require('path')
+  const { spawn, spawnSync } = require('child_process')
+  if (!data || data.agent_type || data.agent_id) return ''
+  const sid = typeof data.session_id === 'string' ? data.session_id : ''
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(sid)) return ''
+  const start = typeof data.cwd === 'string' && data.cwd ? data.cwd : (env && env.CLAUDE_PROJECT_DIR) || ''
+  if (!start) return ''
+  const hit = resolveToplevel(path.resolve(buildNativePath(start)))
+  const common = hit && resolveCommonDir(hit)
+  if (!common) return ''
+  let text
+  try { text = fs.readFileSync(path.join(hit.toplevel, CARD_FILE_REL), 'utf8') } catch { return '' }
+  const lines = text.split(/\r?\n/)
+  const owner = lines.map((l) => /^card-owner — ([A-Za-z0-9][A-Za-z0-9._-]*)(?: · .*)?$/.exec(l)).find(Boolean)
+  if (!owner || owner[1] !== sid) return ''
+  const build = extractRouteUnits(text).build
+  if (!/^[A-Za-z0-9]+$/.test(build)) return ''
+  const file = path.join(common, 'orientation', `${sid}.boundary`)
+  let context = ''
+  if (fs.existsSync(file)) {
+    context = fs.readFileSync(file, 'utf8').trim().slice(0, ROUTE_CONTEXT_CAP)
+    fs.unlinkSync(file)
+  }
+  let inPointers = false
+  let at = null
+  for (const l of lines) {
+    if (/^## pointers\s*$/.test(l)) { inPointers = true; continue }
+    if (inPointers && (l.startsWith('## ') || l.replace(/^- /, '').startsWith('READY — '))) inPointers = false
+    const m = inPointers && / · at ([0-9a-f]+|unborn)$/.exec(l)
+    if (m && l.startsWith('item — ')) { at = m[1]; break }
+  }
+  if (at !== null) {
+    const r = spawnSync('git', ['rev-parse', '--short=8', 'HEAD'], { cwd: hit.toplevel, encoding: 'utf8', timeout: CARD_PATH_BOUND_MS, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true })
+    if (r && r.status === 0 && String(r.stdout || '').trim() === at) return context
+  }
+  const engine = checker === undefined ? resolveKickoffChecker() : checker
+  if (!engine) return context
+  const found = resolveCardBash(engine)
+  if (!found.bash) return context
+  // The file's spelling with forward slashes, the one a bash on every host reads as one path.
+  const args = [engine, '--card', '--boundary', '--build', build, '--session', sid, '--out', file.replace(/\\/g, '/')]
+  if (typeof data.transcript_path === 'string' && data.transcript_path) args.push('--transcript', data.transcript_path.replace(/\\/g, '/'))
+  const child = spawn(found.bash, args, { cwd: hit.toplevel, detached: true, stdio: 'ignore', windowsHide: true })
+  child.on('error', () => {})
+  child.unref()
+  return context
+}
+
 function main() {
   let data
   try {
@@ -2111,8 +2182,17 @@ function main() {
     process.exit(2)
   }
   if (gate && gate.witness) process.stderr.write(`scratch-guard: ${gate.witness}\n`)
-  process.exit(0)
+  // The item-boundary step, once every arm above admitted the call (KICK-dKeptSession-13 S7). It NEVER
+  // REFUSES and fails open: a throw prints nothing. Returning rather than exiting lets node flush a piped
+  // stdout, as the SubagentStart branch does.
+  let context = ''
+  try {
+    context = checkItemBoundary(data, process.env)
+  } catch {
+    context = ''
+  }
+  if (context) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext: context } }) + '\n')
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkItemBoundary, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane }

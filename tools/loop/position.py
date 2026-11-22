@@ -2,6 +2,7 @@
 """position.py — where a build is and what runs next, from witnesses alone (TOOL-dDeclaredLoop-7).
 
     python position.py <slug> [--json | --next-line [--frontier]]   # the position of <slug> in this working directory
+    python position.py <slug> --boundary <key|none>     # the item boundary, I12, against a held pointer
     python position.py --check-refusal <tag> <key>      # may the driver record this refusal row
     python position.py --fixture --plant <case>         # one fixture case
     python position.py --selftest                       # every case
@@ -82,6 +83,15 @@ as one object, each unit carrying `acceptance_armed`, false exactly where its li
 unarmed` (TOOL-dDeclaredLoop-67 S50); `--next-line` the `next:` shape `render_next_line` picks from `NEXT_SHAPES`. Exit 0 for
 every answer but `invalid-input`, which exits 2.
 
+THE ITEM BOUNDARY, I12 (KICK-dKeptSession-13 S1). `derive_item_boundary(repo, slug, pointer, pos=None)`
+reads one position, or the `pos` its caller already derived, and returns the build's current item where
+it differs from `pointer`, else None. The current item is the `act` answer's `next.key`, the instance
+key `derive_instance_key` spells; any other answer is `none`, except `stale-remote` and `invalid-input`,
+which say nothing about the item and keep `pointer`. `--boundary <key|none>` derives once and prints
+`boundary — <pointer> → <key|none>` or `boundary — none crossed · item <pointer>`, the second form
+ending ` · <answer>` for a kept pointer, then `forked — <unit id> · …` or `forked — none`, the units the
+same derivation's hand-over grades `FORKED`; it exits 0, and 2 on `invalid-input` after both lines.
+
 THE ABSENT REMOTE (TOOL-dDeclaredLoop-56 S36). Where the ladder names no remote and refuses nothing, or
 the tracking ref of its default branch does not resolve, the remote reads absent: the answer is taken on
 local witnesses, so no unit reads `deployed`, the interrupt `remote · none` prints, and no remote-tip
@@ -136,6 +146,8 @@ from loop_witness import read_clean_env, read_git, remove_tree, resolve_bash, ru
 
 SAY = "position"
 ANSWERS = ("act", "awaiting", "blocked", "terminal", "stuck", "invalid-input", "stale-remote")
+#: The answers that say nothing about the item, so the item boundary keeps its pointer (KICK-dKeptSession-13 F5).
+KEPT_ANSWERS = ("stale-remote", "invalid-input")
 #: The environment hand-over from the driver's `--plan`.
 HANDOVER = "GOV_POSITION_STATES"
 #: The reason of the one invalid-input answer that renders the nothing-graded shape.
@@ -191,7 +203,9 @@ PLANTS = {"steps": "unit 1 deployed, unit 2 built, unit 3 designed: act at unit 
                        "then FETCH_HEAD naming main of another URL, skipped as no line for main of origin, no "
                        "password printed; then a fetch over git's dumb http from 127.0.0.1, its written URL owed equal",
           "plan-line": "the driver's next: line equals render_next_line's, in three states",
-          "status-line": "the driver's --status prints the engine's position line"}
+          "status-line": "the driver's --status prints the engine's position line",
+          "boundary": "over planted engine answers: the key held is no crossing, another key crosses, awaiting "
+                      "crosses to none, stale-remote keeps the pointer, and forked names the FORKED unit"}
 FX_SLUG = "tPos"
 FX_IDS = ["TOOL-tPos-1", "TOOL-tPos-2", "TOOL-tPos-3"]
 FX_ASK = "TOOL-tAsk-1"
@@ -540,6 +554,30 @@ def derive_position(repo, slug, definition=None):
     except (LoopError, ValueError, OSError, LookupError, KeyError, subprocess.SubprocessError) as e:
         pos.update(answer="invalid-input", reason=str(e) or type(e).__name__)
     return pos
+
+
+def derive_item_boundary(repo, slug, pointer, pos=None):
+    """I12 (KICK-dKeptSession-13 S1): the build's current item where it differs from `pointer`, else
+    None. `pos` is a position the caller already derived, else one is derived here. The current item is
+    the `act` answer's `next.key`, `none` for every other answer but `KEPT_ANSWERS`, which keep `pointer`."""
+    pos = derive_position(repo, slug) if pos is None else pos
+    if pos["answer"] in KEPT_ANSWERS:
+        return None
+    current = pos["next"]["key"] if pos["answer"] == "act" and pos["next"] else "none"
+    return current if current != (pointer or "none") else None
+
+
+def render_boundary_lines(pos, pointer):
+    """`--boundary`'s two lines over one position: the crossing or its absence, then the `forked —`
+    line, the units its hand-over grades FORKED."""
+    to = derive_item_boundary(None, pos["slug"], pointer, pos)
+    if to is not None:
+        lines = ["boundary — %s → %s" % (pointer, to)]
+    else:
+        kept = " · %s" % pos["answer"] if pos["answer"] in KEPT_ANSWERS else ""
+        lines = ["boundary — none crossed · item %s%s" % (pointer, kept)]
+    forked = [u["id"] for u in pos["units"] if u.get("state") == "FORKED"]
+    return lines + ["forked — %s" % (" · ".join(forked) or "none")]
 
 
 def read_build_items(repo, slug, moves, pin, read=None):
@@ -1160,8 +1198,33 @@ def check_url_forms_rows(top, repo, definition, handover):
     return misses
 
 
+def run_boundary_plant():
+    """The `boundary` case's misses (KICK-dKeptSession-13 AC4), over planted engine answers rather
+    than a scratch repository: AC4 grades `derive_item_boundary`'s comparison, not the derivation."""
+    k1, k2 = "%s@%s#aaaa0001" % (FX_A, FX_IDS[0]), "%s@%s#aaaa0002" % (FX_A, FX_IDS[0])
+    units = [{"id": FX_IDS[0], "state": "READY"}, {"id": FX_IDS[1], "state": "FORKED"}]
+    misses = []
+    for label, answer, nxt, pointer, want in (
+            ("the key held", "act", k1, k1, "boundary — none crossed · item %s" % k1),
+            ("another key", "act", k2, k1, "boundary — %s → %s" % (k1, k2)),
+            ("awaiting", "awaiting", None, k1, "boundary — %s → none" % k1),
+            ("none held while awaiting", "awaiting", None, "none", "boundary — none crossed · item none"),
+            ("stale-remote", "stale-remote", k2, k1, "boundary — none crossed · item %s · stale-remote" % k1),
+            ("invalid-input", "invalid-input", None, k1, "boundary — none crossed · item %s · invalid-input" % k1)):
+        pos = {"slug": FX_SLUG, "answer": answer, "next": {"key": nxt} if nxt else None, "units": units}
+        lines = render_boundary_lines(pos, pointer)
+        print("%s: fixture · boundary · %s · %s" % (SAY, label, " / ".join(lines)))
+        if lines != [want, "forked — %s" % FX_IDS[1]]:
+            misses.append("%s printed %r, owed %r" % (label, lines, want))
+    return misses
+
+
 def run_plant(case):
     """One fixture case: its lines, then `held` or `MISSED`; the engine's exit where it held."""
+    if case == "boundary":   # planted engine answers, so no scratch repository is built
+        misses = run_boundary_plant()
+        print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
+        return 0 if not misses else 1
     top = pathlib.Path(tempfile.mkdtemp(prefix="pos-"))
     # TOOL-dDeclaredLoop-75 S34: the machine's git config reaches no plant, every git under it reading one empty file
     kept = {k: os.environ.get(k) for k in ("GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM")}
@@ -1239,6 +1302,7 @@ def main(argv):
     out.add_argument("--json", action="store_true", help="one JSON object")
     out.add_argument("--next-line", action="store_true", help="the next: shape alone")
     ap.add_argument("--frontier", action="store_true", help="with --next-line, the frontier's tags on a second line")
+    ap.add_argument("--boundary", metavar="KEY", help="the item boundary against the held pointer <key|none>")
     ap.add_argument("--check-refusal", nargs=2, metavar=("TAG", "KEY"), help="may a refusal row name TAG at KEY")
     ap.add_argument("--fixture", action="store_true", help="run one fixture case")
     ap.add_argument("--plant", choices=list(PLANTS))
@@ -1254,6 +1318,9 @@ def main(argv):
         return print_check_refusal(*args.check_refusal)
     if args.frontier and not args.next_line:
         ap.error("--frontier is a second line of --next-line")
+    if args.boundary is not None and (args.json or args.next_line or args.fixture or not args.slug
+                                      or not re.fullmatch(r"\S+", args.boundary)):
+        ap.error("--boundary takes a slug and one pointer, <key|none>, and nothing else")
     if args.fixture != bool(args.plant) or (args.fixture and args.slug):
         ap.error("--fixture takes --plant <case> and no slug")
     if args.fixture:
@@ -1262,7 +1329,10 @@ def main(argv):
         ap.error("a slug, or --fixture --plant <case>, or --selftest")
     rc, top = read_git(".", "rev-parse", "--show-toplevel")
     pos = derive_position(top if rc == 0 and top else ".", args.slug)
-    if args.json:
+    if args.boundary is not None:
+        for line in render_boundary_lines(pos, args.boundary):
+            print(line)
+    elif args.json:
         # TOOL-dDeclaredLoop-67 S50: the unarmed half as its own field, false exactly where the line ends
         # `· acceptance unarmed`
         print(json.dumps(dict(pos, units=[dict({k: u[k] for k in ("id", "step", "state")},

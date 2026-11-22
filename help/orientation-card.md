@@ -117,6 +117,46 @@ terminal state, a second terminal move keeps it and prints `card — snapshot ke
 recorded`. Once a build's card is at a terminal step, appending a route to that build is refused
 with `route R7 REFUSED`.
 
+## The card's pointers
+
+The build's card, and a session card once its first item boundary is crossed, carry a `## pointers`
+section directly above the `READY` line, saying where the build is now rather than where it started:
+
+```text
+## pointers
+records — journal memory/builds/dExample/build/2026-10-27-build-KICK-dExample-1-agent-ledger.md · spec-audit memory/builds/dExample/reviews/2026-10-27-review-KICK-dExample-1-spec-audit.md
+forks — memory/builds/dExample/spec/2026-10-27-spec-KICK-dExample-3.md §8
+item — item.build.base@KICK-dExample-2#3f9c2a71 · at 8c1e0b42
+```
+
+- `records —` names the build's newest record of each kind, one per kind, read by the memory-tree
+  kit's `gen_build_index.py --latest-records <slug>`.
+- `forks —` names the spec of each unit whose open questions are still unresolved, with its `§8`, or
+  `none`.
+- `item —` names the item in flight, the loop kit's instance key, or `none` while the build waits on
+  something other than an item, and the commit it was read at. While the remote is stale or the
+  build's inputs do not read, the item already named is kept.
+
+A line whose source does not answer reads `<word> — skipped: <why>`. `manifest-check.sh --card
+--check` refuses a stored section missing one of its lines.
+
+**When the section is rewritten.** Every publish and every follow writes a fresh section into the
+build's card. Between those, the item boundary does: after a commit, the session's next shell call
+notices that HEAD has moved past the `at` of its card's `item —` line and starts `manifest-check.sh
+--card --boundary --build <slug> --session <sid>` in the background, so the call is not held up. The
+verb moves `at` to HEAD and reads the build's current item. When the item has changed it prints
+`boundary — <old> → <new>` and rewrites your session card's section. The `card.pointers` policy key
+decides whether the build's card is published too:
+
+- `every-item` (the default): the build's card is published at every item boundary.
+- `at-transitions`: only your session card is rewritten; the build's card gets a fresh section at the
+  next stage move.
+
+The verb's lines are reported to the session at the shell call after it finishes. Run
+`manifest-check.sh --card --pointers --build <slug> --session <sid>` to write the section by hand.
+A card the section would push past `CARD_CAP_BYTES` is not written and prints `card — pointers not
+written: <n> bytes over the cap`.
+
 ## Finding the card on another session or machine
 
 `manifest-check.sh --card --lookup --build <slug> --session <sid>` reads the build's card from the

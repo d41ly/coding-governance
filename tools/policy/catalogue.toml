@@ -646,6 +646,8 @@ name = "card.pointers"
 allowed = ["every-item", "at-transitions"]
 default = "every-item"
 owner = "dKeptSession"
+summary = "When the build card's pointers section, its latest records, open forks and item in flight, is published: at every item boundary the session crosses, or only at a stage move, the session's own card still rewritten at each boundary."
+usage = 'card.pointers = "at-transitions"'
 
 [[key]]
 name = "notices.record"

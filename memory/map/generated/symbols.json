@@ -4893,6 +4893,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkItemBoundary",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkLane",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -5631,6 +5636,11 @@
       "id": "check_card_import",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "check_card_pointers",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "check_card_route",
@@ -9763,6 +9773,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "cmd_latest_records",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "cmd_list",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -12011,6 +12026,11 @@
       "id": "derive_iso",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_item_boundary",
+      "kind": "function",
+      "file": "tools/loop/position.py"
     },
     {
       "id": "derive_item_scope",
@@ -20353,6 +20373,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "read_card_item_key",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "read_card_policy",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -20366,6 +20391,11 @@
       "id": "read_card_ref",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "read_card_section",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
     },
     {
       "id": "read_card_stored",
@@ -26298,6 +26328,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "render_boundary_lines",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "render_bounds_line",
       "kind": "function",
       "file": "tools/loop/review_bounds.py"
@@ -26971,6 +27006,11 @@
       "id": "render_pointer",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "render_pointers",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "render_policy_bytes",
@@ -30445,6 +30485,11 @@
     {
       "id": "run_boundary_plant",
       "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
+      "id": "run_boundary_plant",
+      "kind": "function",
       "file": "tools/loop/termination.py"
     },
     {
@@ -30561,6 +30606,11 @@
       "id": "run_card_append",
       "kind": "function",
       "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
+      "id": "run_card_boundary",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "run_card_engine",
@@ -31716,6 +31766,11 @@
       "id": "run_isolation_fixture",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_item_boundary",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "run_join",
@@ -33006,6 +33061,11 @@
       "id": "run_sg_signal",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "run_sgib",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "run_ships_join",
@@ -34854,6 +34914,11 @@
     },
     {
       "id": "set_card_policy",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
+      "id": "set_card_position",
       "kind": "function",
       "file": "skills/session-kickoff/card-store.fixture.sh"
     },
@@ -38078,14 +38143,29 @@
       "file": "tools/loop/loop_transition.py"
     },
     {
+      "id": "write_card_parts",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "write_card_plant",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "write_card_pointers",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "write_card_publish",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "write_card_records",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
     },
     {
       "id": "write_card_ref",
@@ -39368,6 +39448,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "write_pointers",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "write_points",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -39881,6 +39966,11 @@
       "id": "write_settle_claim",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_sgib_card",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_shard",

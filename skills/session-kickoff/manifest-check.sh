@@ -30,6 +30,12 @@
 #                                         # re-published at a stage move, as card.follows says
 #   manifest-check.sh --card --lookup --build <slug> --session <sid>    # the build card read back from
 #                                         # its first store that answers, re-keyed into the session's card
+#   manifest-check.sh --card --pointers --build <slug> [--session <sid>]   # the `## pointers` section
+#                                         # published to each store card.store selects, and with
+#                                         # --session written into that session's card too
+#   manifest-check.sh --card --boundary --build <slug> --session <sid> [--transcript <path>] [--out <file>]
+#                                         # the item boundary, I12: the card's `item —` line moved to
+#                                         # HEAD, and a crossing written and published as card.pointers says
 #   manifest-check.sh --card --fixture-run <scratch-dir>   # run card-compaction.fixture.sh there and
 #                                         # record its verdict in <git-common-dir>/orientation/card-fixture.verdict
 #   manifest-check.sh --brief-skeleton   # the brief record's skeleton and the card's `## route`
@@ -196,6 +202,7 @@ done
 # The build card's verbs (TOOL-dPlacedRequest-2) take `--build <slug>`, and the follow `--to <state>`
 # and `--terminal`; each value is held to its grammar here, before it is joined into a ref or a path.
 CARD=""; CARD_VERB=""; CARD_SID=""; CARD_BUILD=""; CARD_STEP=""; CARD_TERMINAL=0; CARD_FIXTURE_DIR=""; _rest=(); _want=""
+CARD_TX_ARG=""; CARD_OUT=""
 for _a in "$@"; do [ "$_a" = --card ] && CARD=1; done
 for _a in "$@"; do
   case "$_want" in
@@ -203,28 +210,46 @@ for _a in "$@"; do
     build) CARD_BUILD="$_a"; _want=""; continue ;;
     to) CARD_STEP="$_a"; _want=""; continue ;;
     fixture) CARD_FIXTURE_DIR="$_a"; _want=""; continue ;;
+    tx) CARD_TX_ARG="$_a"; _want=""; continue ;;
+    out) CARD_OUT="$_a"; _want=""; continue ;;
   esac
   case "$CARD$_a" in
     1--card) ;;
-    1--write|1--replay|1--path|1--append|1--check|1--publish|1--follow|1--lookup) CARD_VERB="${_a#--}" ;;
+    1--write|1--replay|1--path|1--append|1--check|1--publish|1--follow|1--lookup|1--pointers|1--boundary) CARD_VERB="${_a#--}" ;;
     1--fixture-run) CARD_VERB=fixture-run; _want=fixture ;;
     1--session) _want=sid ;;
     1--session=*) CARD_SID="${_a#--session=}" ;;
     1--build) _want=build ;;
     1--to) _want=to ;;
     1--terminal) CARD_TERMINAL=1 ;;
+    1--transcript) _want=tx ;;
+    1--out) _want=out ;;
     *) _rest+=("$_a") ;;
   esac
 done
 set -- ${_rest[@]+"${_rest[@]}"}
 if [ -n "$CARD" ] && [ -z "$CARD_VERB" ]; then
-  echo "MANIFEST env ERROR — --card needs one of --write, --replay, --path, --append, --check, --publish, --follow, --lookup or --fixture-run"; exit 2
+  echo "MANIFEST env ERROR — --card needs one of --write, --replay, --path, --append, --check, --publish, --follow, --lookup, --pointers, --boundary or --fixture-run"; exit 2
 fi
+# The session the caller named, before a follow's or a pointers publish's default fills CARD_SID below:
+# `--card --pointers` writes a session card only when one was named (KICK-dKeptSession-13 S4).
+CARD_SID_GIVEN=${CARD_SID:+1}
 if [ -n "$CARD" ]; then
   case "$CARD_VERB:${CARD_BUILD:+b}" in
-    publish:|follow:|lookup:) echo "MANIFEST env ERROR — --card --$CARD_VERB needs --build <slug>"; exit 2 ;;
+    publish:|follow:|lookup:|pointers:|boundary:) echo "MANIFEST env ERROR — --card --$CARD_VERB needs --build <slug>"; exit 2 ;;
     write:b|replay:b|append:b|check:b|fixture-run:b) echo "MANIFEST env ERROR — --build is the build card's flag, and --card --$CARD_VERB takes none"; exit 2 ;;
   esac
+  # The boundary verb's flags (KICK-dKeptSession-13 S6): it reads one named session's card, and its `--out`
+  # file is written through a temp beside it, so a directory that does not exist is refused here.
+  if [ "$CARD_VERB" = boundary ]; then
+    [ -n "$CARD_SID" ] || { echo "MANIFEST env ERROR — --card --boundary needs --session <sid>, the session whose card holds the item"; exit 2; }
+    if [ -n "$CARD_OUT" ]; then
+      case "$CARD_OUT" in /*|[A-Za-z]:*) ;; *) CARD_OUT="$PWD/$CARD_OUT" ;; esac
+      [ -d "${CARD_OUT%/*}" ] || { echo "MANIFEST env ERROR — --out $CARD_OUT names a file in a directory that does not exist, so nothing ran"; exit 2; }
+    fi
+  elif [ -n "$CARD_TX_ARG" ] || [ -n "$CARD_OUT" ]; then
+    echo "MANIFEST env ERROR — --transcript and --out are --card --boundary's flags"; exit 2
+  fi
   [ "$CARD_VERB" != fixture-run ] || [ -n "$CARD_FIXTURE_DIR" ] \
     || { echo "MANIFEST env ERROR — --card --fixture-run needs <scratch-dir>, the directory the card-import fixture builds under"; exit 2; }
   [ -z "$CARD_BUILD" ] || [[ $CARD_BUILD =~ ^[A-Za-z0-9]+$ ]] \
@@ -273,6 +298,15 @@ CARD_CLI_BOUND=${CARD_CLI_BOUND:-5}
 # The `memory —` cell's bound on the playbook kit's index measure, in seconds (PLAY-dOrderedCharter-14);
 # the env override exists for the self-test's slow-stub arm and is not an adopter knob.
 CARD_MEMORY_BOUND=${CARD_MEMORY_BOUND:-5}
+# The `## pointers` section's two bounds, in seconds (KICK-dKeptSession-13): the loop kit's item boundary,
+# `position.py --boundary`, PINNED 2026-11-21 at KICK-dKeptSession-15's figure for the same read, above the
+# 7.3 s measured over dKeptSession; and the records reader, `gen_build_index.py --latest-records`. The env
+# overrides exist for the self-test's slow-stub arms, as CARD_CLI_BOUND's does; neither is an adopter knob.
+CARD_POSITION_BOUND=${CARD_POSITION_BOUND:-10}
+CARD_RECORDS_BOUND=${CARD_RECORDS_BOUND:-5}
+# The lines a stored `## pointers` section holds, the one list `check_card_pointers` reads: each later
+# session unit appends its own word (KICK-dKeptSession-26 `budget`, KICK-dKeptSession-5 `mail`).
+POINTER_LINES="records forks item"
 # The `claims —` cell's three constants (TOOL-aGraftedHelix-2): the read's bound in seconds, the
 # second clock's hide age, and the row cap. The bound's env override exists for the self-test's
 # slow-driver arm, as CARD_CAP_BYTES's does; none of the three is an adopter knob.
@@ -444,7 +478,11 @@ if [ -n "$CARD" ]; then
   # A follow runs from the loop kit's transition writer, which holds no session: the card names the
   # harness's session where one is in the environment, else `none`.
   [ "$CARD_VERB" != follow ] || [ -n "$CARD_SID" ] || CARD_SID=${CLAUDE_CODE_SESSION_ID:-none}
+  # A pointers publish with no session names a build card alone, and is by that session or `none` alike.
+  [ "$CARD_VERB" != pointers ] || [ -n "$CARD_SID" ] || CARD_SID=${CLAUDE_CODE_SESSION_ID:-none}
   read_session_id
+  # The boundary verb's transcript, for the card file's owner line (KICK-dKeptSession-13 S6).
+  [ -z "$CARD_TX_ARG" ] || CARD_TRANSCRIPT=$CARD_TX_ARG
   CARD_FILE="$CARD_DIR/$CARD_SID.md"
   [ "$CARD_VERB" = path ] && { printf '%s\n' "$CARD_FILE"; exit 0; }
   # The session's own tree, resolved once: the payload's `cwd` when git places it in a repository.
@@ -1833,7 +1871,7 @@ add_card_body() {
 # numbers still address the rows they belong to): a commit subject naming a since-removed path is
 # not a citation (the aReplayedCard closing review, F9).
 check_card() {
-  local real
+  local real lacks
   [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE; write one with --card --write --session $CARD_SID"; exit 2; }
   real=$(grep "$CARD_READY_RE" "$CARD_FILE" | grep -vc "${CARD_READY_RE}none yet"); real=${real:-0}
   if [ "$real" -gt 0 ] && ! grep -q '^## task' "$CARD_FILE"; then
@@ -1845,11 +1883,24 @@ check_card() {
        { inlog=0; print ln }' "$CARD_FILE" > "$CARD_TMP/checked"
   check_card_citations "$CARD_TMP/checked"
   [ "$CARD_TOKENS" -gt 0 ] || { echo "MANIFEST env ERROR — DEAD PROBE: nothing to check — $CARD_FILE carries no path-shaped and no id-shaped token"; exit 1; }
-  if [ -s "$CARD_TMP/misses" ]; then
+  lacks=$(check_card_pointers "$CARD_FILE")
+  if [ -s "$CARD_TMP/misses" ] || [ -n "$lacks" ]; then
     awk -F '\t' '{print $2 " · line " $1}' "$CARD_TMP/misses"
+    for real in $lacks; do printf "POINTERS — the '## pointers' section has no '%s —' line, which POINTER_LINES lists\n" "$real"; done
     exit 1
   fi
   exit 0
+}
+
+# The `## pointers` section's required lines (KICK-dKeptSession-13 S2): each POINTER_LINES word the
+# section of the card at `$1` carries no `<word> —` line for, one per line. A card with no section
+# prints nothing, so a card written before the section landed checks as it did.
+check_card_pointers() { # card file -> each missing word on stdout; 0 always
+  LC_ALL=C awk -v want="$POINTER_LINES" '{ sub(/\r$/, "") }
+    /^## pointers[[:space:]]*$/ { inp = 1; seen = 1; next }
+    inp && (/^## / || /^(- )?READY — /) { inp = 0 }
+    inp { split($0, w, " "); if (w[2] == "—") has[w[1]] = 1 }
+    END { if (!seen) exit; n = split(want, k, " "); for (i = 1; i <= n; i++) if (!(k[i] in has)) print k[i] }' "$1"
 }
 
 # ---- the build card (TOOL-dPlacedRequest-2) ------------------------------------------------------
@@ -1876,7 +1927,7 @@ check_card() {
 # fetches from the remote it resolves into the cache ref, writing no `FETCH_HEAD`, and sights the feed,
 # so this engine carries no feed block and no writer. A lost compare-and-swap re-reads the tip, re-renders once on it and writes
 # again. Every store's failure is its own `card —` line and never changes the caller's exit.
-# THE FIVE POLICY KEYS are read by `read_card_policy`, one literal `get` line per key, the shape the
+# THE SIX POLICY KEYS are read by `read_card_policy`, one literal `get` line per key, the shape the
 # policy kit's reader coverage counts (as `read_spec_audit_switch` in the unattended driver does).
 # WHAT THIS DOES NOT CHECK: that the card's text is true, which its cells derive; who may publish a build's
 # card, which the lease and the claim decide.
@@ -1893,15 +1944,16 @@ CARD_PUBLISH_BOUND=${CARD_PUBLISH_BOUND:-140}   # seconds the driver's write of 
 RESUME_IDLE_S=300
 CARD_REF_TIP=""; CARD_REF_WHY=""; CARD_DRV=""; CARD_STORED_STEP=""; CARD_STORED_FROM=""; CARD_REC=""; CARD_REC_STEP=""
 
-read_card_policy() { # card.follows|card.store|card.snapshot|resume.context|resume.partial -> its value on stdout, a set's members one per line; 1 and the refusal on stdout
+read_card_policy() { # card.follows|card.store|card.snapshot|card.pointers|resume.context|resume.partial -> its value on stdout, a set's members one per line; 1 and the refusal on stdout
   local def pk d py out v n=0
   case "${1:-}" in
     card.follows) def=re-render-at-transition ;;
     card.store) def="remote-ref build-folder local-clone" ;;
     card.snapshot) def=terminal-only ;;
+    card.pointers) def=every-item ;;
     resume.context) def=fresh-when-idle ;;
     resume.partial) def=continue-item ;;
-    *) printf "read_card_policy reads card.follows, card.store, card.snapshot, resume.context or resume.partial, and was asked for '%s'\n" "${1:-}"
+    *) printf "read_card_policy reads card.follows, card.store, card.snapshot, card.pointers, resume.context or resume.partial, and was asked for '%s'\n" "${1:-}"
        return 1 ;;
   esac
   pk=$(resolve_kit_file policy policy.py)
@@ -1915,6 +1967,7 @@ read_card_policy() { # card.follows|card.store|card.snapshot|resume.context|resu
     card.follows) out=$("$py" "$d/policy.py" get card.follows 2>&1) ;;
     card.store) out=$("$py" "$d/policy.py" get card.store 2>&1) ;;
     card.snapshot) out=$("$py" "$d/policy.py" get card.snapshot 2>&1) ;;
+    card.pointers) out=$("$py" "$d/policy.py" get card.pointers 2>&1) ;;
     resume.context) out=$("$py" "$d/policy.py" get resume.context 2>&1) ;;
     resume.partial) out=$("$py" "$d/policy.py" get resume.partial 2>&1) ;;
   esac || { printf '%s\n' "${out:-policy.py get $1 exited non-zero}"; return 1; }
@@ -1925,6 +1978,7 @@ read_card_policy() { # card.follows|card.store|card.snapshot|resume.context|resu
       card.follows:re-render-at-transition|card.follows:card-per-step|card.follows:fixed-at-start) ;;
       card.store:remote-ref|card.store:build-folder|card.store:local-clone) ;;
       card.snapshot:terminal-only|card.snapshot:every-transition) ;;
+      card.pointers:every-item|card.pointers:at-transitions) ;;
       resume.context:fresh-when-idle|resume.context:always-resume|resume.context:always-fresh) ;;
       resume.partial:continue-item|resume.partial:restart-item|resume.partial:ask-owner) ;;
       *) printf "%s answered '%s', which is outside the closed set this engine branches on\n" "$1" "$v"; return 1 ;;
@@ -2088,7 +2142,7 @@ render_build_card() { # slug · step · tail file · writer verb -> the card on 
 # the stored card's, else `unrecorded`. Snapshot 1 writes the `card` record where build-folder is selected.
 write_build_card() { # slug · step or empty · session|stored|none · writer verb · snapshot 0|1 · terminal 0|1 -> its card — lines; 0 always
   local slug=$1 step=$2 mode=$3 verb=$4 snap=$5 term=$6 stores ref="refs/gov/remote/builds/$1/card" card="$CARD_TMP/bc.card"
-  local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark="" a from=""
+  local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark="" a from="" bytes sb
   [ "$term" != 1 ] || mark=" · terminal"
   stores=$(read_card_policy card.store) || { printf 'card — skipped: card.store refused: %s\n' "${stores%%$'\n'*}"; return 0; }
   stores=" ${stores//$'\n'/ } "
@@ -2109,11 +2163,24 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
               else printf 'READY — none yet\n' > "$tail"; fi ;;
       none) printf 'READY — none yet\n' > "$tail" ;;
     esac
+    # Every tail carries a fresh `## pointers` section, so every publish and every follow does, under
+    # both values of card.pointers (KICK-dKeptSession-13 S4, S8).
+    write_pointers "$tail" "$slug"
     if [ -z "$2" ]; then
       step=unrecorded
       ! read_card_stored "$slug" "$CARD_TMP/bc.stored" "$stores" || [ -z "$CARD_STORED_STEP" ] || step=$CARD_STORED_STEP
     fi
-    render_build_card "$slug" "$step" "$tail" "$verb" > "$card" || { cat "$card"; return 0; }
+    if ! render_build_card "$slug" "$step" "$tail" "$verb" > "$card"; then
+      # A card the section alone pushes past the cap is named as the section's refusal (S4).
+      bytes=$(wc -c < "$CARD_TMP/bc.render" | tr -d '[:space:]')
+      sb=$(wc -c < "$CARD_TMP/pointers.sec" 2>/dev/null | tr -d '[:space:]')
+      if [ -n "$sb" ] && [ $((bytes - sb)) -le "$CARD_CAP_BYTES" ]; then
+        printf 'card — pointers not written: %s bytes over the cap\n' "$((bytes - CARD_CAP_BYTES))"
+      else
+        cat "$card"
+      fi
+      return 0
+    fi
     [ "$remote" = 1 ] || break
     printf -v msg 'gov-card %s\n\nstep: %s%s\nsession: %s\n\n%s' "$slug" "$step" "$mark" "$CARD_SID" "$(<"$card")"
     printf '%s' "$msg" > "$CARD_TMP/bc.msg" || { printf 'card — remote-ref not written: cannot write the message to %s\n' "$CARD_TMP/bc.msg"; remote=2; break; }
@@ -2238,6 +2305,181 @@ write_card_follow() { # slug · state · terminal 0|1 -> its card — lines; 0 a
     printf 'card — snapshot kept: %s already recorded\n' "$2"; snap=0
   fi
   write_build_card "$1" "$2" "$mode" follow "$snap" "$3"
+}
+
+# ---- the card's pointers (KICK-dKeptSession-13) ---------------------------------------------------
+# THE SECTION, I11: `## pointers` and its lines, in each tail `write_build_card` builds and in a session's
+# card, directly above the READY line, which stays last:
+#   records — <kind> <path> · …      the build's newest bound record of each kind, `gen_build_index.py
+#                                     --latest-records`, under CARD_RECORDS_BOUND
+#   forks — <spec path> §8 · …       each unit the item boundary's derivation grades FORKED, by its tracked
+#                                     spec under the build's `spec/`; the `§8` a word apart, so the path is
+#                                     one token `extract_card_tokens` finds tracked
+#   item — <instance key|none> · at <sha8>   the boundary's answer and the HEAD it was derived at
+# A source that does not resolve is its line's `<word> — skipped: <why>`, the `item —` line still ending
+# ` · at <sha8>`. THE ITEM BOUNDARY, I12, is the loop kit's `position.py <slug> --boundary <pointer>`, run by
+# `run_item_boundary` under CARD_POSITION_BOUND, once per process: its file is kept for every later write.
+# `card.pointers` decides what a crossing publishes: `every-item` the build card, `at-transitions`
+# nothing, a follow re-rendering the section under both. WHAT THIS DOES NOT CHECK: that a record's text or
+# a fork is current between two boundaries; the section is as fresh as its last write.
+run_item_boundary() { # slug · pointer · file -> 0 with the boundary's two lines in the file, 1 with one why line in it
+  local pos py rc
+  pos=$(resolve_kit_file loop position.py)
+  [ -n "$pos" ] || { printf 'no loop kit position.py resolves in this tree\n' > "$3"; return 1; }
+  py=$(resolve_python 2>/dev/null) || { printf 'no Python resolves on this node\n' > "$3"; return 1; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'this node has no working timeout -k, so the read would be unbounded and none ran\n' > "$3"; return 1; }
+  timeout -k 2 "$CARD_POSITION_BOUND" "$py" "$pos" "$1" --boundary "$2" </dev/null > "$3.raw" 2>&1; rc=$?
+  if { [ "$rc" = 0 ] || [ "$rc" = 2 ]; } && tr -d '\r' < "$3.raw" | head -n 1 | grep -q '^boundary — '; then
+    tr -d '\r' < "$3.raw" > "$3"; rm -f "$3.raw"; return 0
+  fi
+  case "$rc" in
+    124|137) printf 'the position read did not answer within %ss\n' "$CARD_POSITION_BOUND" > "$3" ;;
+    *) LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+         NF && f == "" { f = $0 }
+         END { if (f == "") f = "position.py --boundary exited " rc " and printed nothing"
+               if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+               print f }' "$3.raw" > "$3" ;;
+  esac
+  rm -f "$3.raw"
+  return 1
+}
+
+# The section over one boundary file, `run_item_boundary`'s: its key the crossing's target, or the
+# pointer it kept; the `at` HEAD now, read in the same process that derived it.
+render_pointers() { # slug · boundary file -> the section on stdout; 0 always
+  local at gbi py rc recs b item ids id spec forks="" memroot
+  at=$(git rev-parse --short=8 HEAD 2>/dev/null | tr -d '\r'); at=${at:-unborn}
+  printf '## pointers\n'
+  gbi=$(resolve_kit_file memory-tree gen_build_index.py)
+  if [ -z "$gbi" ]; then
+    printf 'records — skipped: no memory-tree gen_build_index.py resolves in this tree\n'
+  elif ! py=$(resolve_python 2>/dev/null); then
+    printf 'records — skipped: no Python resolves on this node\n'
+  else
+    timeout -k 2 "$CARD_RECORDS_BOUND" "$py" "$gbi" --latest-records "$1" </dev/null > "$CARD_TMP/pointers.recs" 2>&1; rc=$?
+    case "$rc" in
+      0) recs=$(LC_ALL=C awk '{ sub(/\r$/, "") } NF { printf "%s%s", (n++ ? " · " : ""), $0 }' "$CARD_TMP/pointers.recs")
+         printf 'records — %s\n' "${recs:-none}" ;;
+      124|137) printf 'records — skipped: the records read did not answer within %ss\n' "$CARD_RECORDS_BOUND" ;;
+      *) LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") } NF && f == "" { f = $0 }
+           END { if (f == "") f = "gen_build_index.py --latest-records exited " rc " and printed nothing"
+                 if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+                 print "records — skipped: " f }' "$CARD_TMP/pointers.recs" ;;
+    esac
+  fi
+  b=$(sed -n '1p' "$2" 2>/dev/null)
+  case "$b" in
+    "boundary — none crossed · item "*) item=${b#boundary — none crossed · item }; item=${item%% · *} ;;
+    "boundary — "*" → "*) item=${b##* → } ;;
+    *) printf 'forks — skipped: %s\n' "${b:-no boundary was read}"
+       printf 'item — skipped: %s · at %s\n' "${b:-no boundary was read}" "$at"; return 0 ;;
+  esac
+  ids=$(sed -n 's/^forked — //p' "$2" | head -n 1)
+  memroot=$(read_memory_root) || memroot=""
+  if [ -z "$memroot" ]; then
+    printf 'forks — skipped: no MEMORY_ROOT names the build folder\n'
+  else
+    for id in ${ids// · / }; do
+      [[ $id =~ ^[A-Za-z]+-[A-Za-z0-9]+-[0-9]+$ ]] || continue
+      spec=$(git ls-files -- "$memroot/builds/$1/spec/*-spec-$id.md" 2>/dev/null | head -n 1)
+      [ -z "$spec" ] || forks="${forks:+$forks · }$spec §8"
+    done
+    printf 'forks — %s\n' "${forks:-none}"
+  fi
+  printf 'item — %s · at %s\n' "$item" "$at"
+}
+
+# The `item —` line's key in a card or a tail, `none` where the section, the line or a key is absent.
+read_card_item_key() { # card or tail file -> the key on stdout; 0 always
+  local k
+  k=$(LC_ALL=C awk '{ sub(/\r$/, "") } /^## pointers[[:space:]]*$/ { inp = 1; next } inp && (/^## / || /^(- )?READY — /) { inp = 0 }
+    inp && /^item — [^ ]+ · at / { split($0, w, " "); print w[3]; exit }' "$1")
+  case "$k" in ""|skipped:) k=none ;; esac
+  printf '%s\n' "$k"
+}
+
+# S4: the tail's `## pointers` section replaced, its heading to the line before the next `## ` heading or
+# READY line, or inserted directly before the READY line. The boundary is read once per process, at the
+# tail's own `item —` key; the section written is kept in `$CARD_TMP/pointers.sec` for the cap's refusal.
+write_pointers() { # tail file · slug -> 0 always
+  local bf="$CARD_TMP/pointers.boundary" sec="$CARD_TMP/pointers.sec"
+  [ -f "$bf" ] || run_item_boundary "$2" "$(read_card_item_key "$1")" "$bf"
+  render_pointers "$2" "$bf" > "$sec"
+  PT_SEC="$sec" LC_ALL=C awk 'BEGIN { while ((getline l < ENVIRON["PT_SEC"]) > 0) s = s l "\n" }
+    { sub(/\r$/, "") }
+    /^## pointers[[:space:]]*$/ { skip = 1; next }
+    skip && (/^## / || /^(- )?READY — /) { skip = 0 }
+    skip { next }
+    !done && /^(- )?READY — / { printf "%s", s; done = 1 }
+    { print }
+    END { if (!done) printf "%s", s }' "$1" > "$1.p" && mv -f "$1.p" "$1"
+  return 0
+}
+
+# The session's card rewritten from `$CARD_TMP/startup` and the tail file, its `## pockets` section refitted
+# to the room, then re-rendered into the card file; refused past CARD_CAP_BYTES with the card left as it was.
+write_card_parts() { # tail file -> 0 written, 1 not, its card — line printed
+  local new="$CARD_TMP/parts.new" bytes
+  cat "$CARD_TMP/startup" "$1" | derive_pockets_block > "$new"
+  bytes=$(wc -c < "$new" | tr -d '[:space:]')
+  if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
+    printf 'card — pointers not written: %s bytes over the cap\n' "$((bytes - CARD_CAP_BYTES))"; return 1
+  fi
+  cat "$new" > "$CARD_FILE" 2>/dev/null || { printf 'card — pointers not written: cannot write %s\n' "$CARD_FILE"; return 1; }
+  write_card_file
+  return 0
+}
+
+# The section written into the session's card (S4's `--session`, S6's crossing).
+write_card_pointers() { # slug -> 0 always
+  extract_card_parts "$CARD_FILE"
+  write_pointers "$CARD_TMP/tail" "$1"
+  write_card_parts "$CARD_TMP/tail"
+  return 0
+}
+
+# S6, the one item-boundary point. First the session card's `item —` line moves to HEAD, a section holding
+# `item — none · at <sha8>` written where the card has none, so the hook starts no second verb at this
+# HEAD; then the boundary is read once at the line's old key. A crossing rewrites the session card's
+# section and, under `every-item`, publishes the build card in `stored` mode; with none crossed nothing is
+# published, and the section is rewritten only where it lacks a POINTER_LINES line, so a card the first
+# step gave a section passes `--card --check`. Every later item-boundary reader runs here, after S1:
+# `context.on-full` (KICK-dKeptSession-14), `mailbox.reads` (KICK-dKeptSession-10) and `mailbox.notice`
+# (KICK-dKeptSession-21); `actions.free` (KICK-dKeptSession-8) reads the `item —` line this leaves.
+run_card_boundary() { # slug -> the verb's lines on stdout; 0, or 2 with no session card
+  local slug=$1 old at b mode bf="$CARD_TMP/pointers.boundary"
+  [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE, so it holds no item"; return 2; }
+  old=$(read_card_item_key "$CARD_FILE")
+  at=$(git rev-parse --short=8 HEAD 2>/dev/null | tr -d '\r'); at=${at:-unborn}
+  extract_card_parts "$CARD_FILE"
+  LC_ALL=C awk -v at="$at" '{ sub(/\r$/, "") }
+    /^## pointers[[:space:]]*$/ { inp = 1; seen = 1; print; next }
+    inp && (/^## / || /^(- )?READY — /) { if (!item) print "item — none · at " at; inp = 0; item = 1 }
+    inp && /^item — / { sub(/ · at [^ ]*$/, ""); print $0 " · at " at; item = 1; next }
+    !seen && /^(- )?READY — / { print "## pointers"; print "item — none · at " at; seen = 1; item = 1 }
+    { print }
+    END { if (inp && !item) print "item — none · at " at; if (!seen) { print "## pointers"; print "item — none · at " at } }' \
+    "$CARD_TMP/tail" > "$CARD_TMP/tail.at" && write_card_parts "$CARD_TMP/tail.at"
+  run_item_boundary "$slug" "$old" "$bf"
+  b=$(sed -n '1p' "$bf")
+  case "$b" in
+    "boundary — none crossed"*)
+      printf '%s\n' "$b"
+      [ -z "$(check_card_pointers "$CARD_FILE")" ] || write_card_pointers "$slug" ;;
+    "boundary — "*" → "*)
+      printf '%s\n' "$b"
+      write_card_pointers "$slug"
+      if mode=$(read_card_policy card.pointers); then
+        [ "$mode" != every-item ] || write_build_card "$slug" "" stored boundary 0 0
+      else
+        printf 'card — skipped: card.pointers refused: %s\n' "${mode%%$'\n'*}"
+      fi ;;
+    *)
+      printf 'boundary — skipped: %s\n' "$b"
+      write_card_pointers "$slug" ;;
+  esac
+  return 0
 }
 
 # The verdict on a cached card against the ref (TOOL-dDeclaredLoop-8 S3's words), the loop kit's
@@ -2381,7 +2623,7 @@ derive_resume_lines() { # slug -> the route —, resume — and partial — line
 
 if [ -n "$CARD" ]; then
   case "$CARD_VERB" in
-    replay|publish|follow|lookup)
+    replay|publish|follow|lookup|pointers|boundary)
       CARD_TMP=$(mktemp -d "${TMPDIR:-/tmp}/mfcard.XXXXXX") || { echo "MANIFEST env ERROR — cannot create a scratch dir under ${TMPDIR:-/tmp}"; exit 2; }
       trap 'rm -rf "$CARD_TMP"' EXIT ;;
   esac
@@ -2403,6 +2645,19 @@ if [ -n "$CARD" ]; then
       write_card_publish "$CARD_BUILD" publish ;;
     follow) write_card_follow "$CARD_BUILD" "$CARD_STEP" "$CARD_TERMINAL" ;;
     lookup) resolve_build_card "$CARD_BUILD"; write_card_file ;;
+    # S4: the build card in `stored` mode, its section fresh; with a named session, that card's too.
+    pointers)
+      [ -z "$CARD_SID_GIVEN" ] || [ -f "$CARD_FILE" ] \
+        || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE, so there is no card to write the pointers into"; exit 2; }
+      write_build_card "$CARD_BUILD" "" stored pointers 0 0
+      [ -z "$CARD_SID_GIVEN" ] || write_card_pointers "$CARD_BUILD" ;;
+    # S6: every line to stdout, or with `--out` to that file through a temp beside it and a rename.
+    boundary)
+      if [ -z "$CARD_OUT" ]; then run_card_boundary "$CARD_BUILD"; exit $?; fi
+      _bt=$(mktemp "$CARD_OUT.XXXXXX" 2>/dev/null) || { echo "MANIFEST env ERROR — no temp beside $CARD_OUT, so nothing ran"; exit 2; }
+      run_card_boundary "$CARD_BUILD" > "$_bt" 2>&1; _brc=$?
+      mv -f "$_bt" "$CARD_OUT" 2>/dev/null || { rm -f "$_bt"; echo "MANIFEST env ERROR — cannot rename the verb's lines into $CARD_OUT"; exit 2; }
+      exit "$_brc" ;;
   esac
   exit 0
 fi

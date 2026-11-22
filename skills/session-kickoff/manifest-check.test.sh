@@ -2375,7 +2375,9 @@ run "C12 a CR byte in the manifest is named" "$R" 1 "the manifest carries a CR b
 # R7's refusal of a route to an ended build (AC9) and a terminal follow run twice leaving one record
 # (AC13); and TOOL-dPlacedRequest-33's three, the publish under RUN_CLAIMS off writing no ref and under
 # it on writing one the feed names (its AC1, AC2), no conf, no driver and a driver refusal each named
-# unwritten (its S2), and a driver that never answers bounded (its AC3).
+# unwritten (its S2), and a driver that never answers bounded (its AC3). KICK-dKeptSession-13's five
+# `pointers-` plants run the pointers and boundary verbs over the fixture's stub loop kit, the failing case
+# a crossing that leaves the ref's `item —` unchanged (its AC1 to AC3, AC6, AC7, AC11).
 # A plant counts only when it exits 0 and printed a held line. The fixture is gov's and ships
 # to no adopter (the deployer registry exempts it), so a copy of this suite with no fixture beside
 # its checker says so and runs no fixture arm.
@@ -2489,7 +2491,10 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +4: RAISED by KICK-dKeptSession-12 S6 — the four plants it adds to `--list` (fixture-stale,
 # fixture-run, worktree-named, replay-order), one ok row each from the loop above; no suite ran in
 # the pass, each plant was run alone by direct CLI.
-FLOOR_ASSERTIONS=412
+# +5: RAISED by KICK-dKeptSession-13 S9 — the five plants it adds to `--list` (pointers-render,
+# pointers-boundary, pointers-at-transitions, pointers-cap, pointers-replay), one ok row each from the
+# loop above; no suite ran in the pass, each plant was run alone by direct CLI.
+FLOOR_ASSERTIONS=417
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced
