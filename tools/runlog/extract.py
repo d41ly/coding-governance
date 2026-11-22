@@ -1300,8 +1300,10 @@ def derive_context_window(model, root=None, held=None) -> tuple:
     """`(tokens, source)`: the window a context share on `model` is taken of (KICK-dKeptSession-30 S1).
     The harness's `CLAUDE_CODE_MAX_CONTEXT_TOKENS` when it is a positive integer, source `env`; else
     the smallest rung at or above the largest context observed for `model` in the newest
-    CONTEXT_WINDOW_SCAN main transcripts under `root` (the harness's `~/.claude/projects` when None),
-    source `observed <n> on <model>`; else the bottom rung, source `no observation`. A transcript's
+    CONTEXT_WINDOW_SCAN main transcripts under `root` (when None, the projects root
+    `resolve_projects_root` resolves from the process environment, as every transcript-reading verb
+    does; KICK-dKeptSession-45 S1), source `observed <n> on <model>`; else the bottom rung, source
+    `no observation`, or `no root: <why>` where no root resolves (S2), never a raise. A transcript's
     observation is its largest main `usage` sum on `model` and its largest integer compaction
     `pre_tokens`. Each is parsed as a tree holding its main file alone, and `held`, `(path, events)`,
     stands in for that path's parse where it is among them. An unreadable transcript is skipped."""
@@ -1309,7 +1311,12 @@ def derive_context_window(model, root=None, held=None) -> tuple:
     raw = os.environ.get("CLAUDE_CODE_MAX_CONTEXT_TOKENS", "").strip()
     if re.fullmatch(r"[0-9]+", raw) and int(raw) > 0:
         return int(raw), "env"
-    root = pathlib.Path.home() / ".claude" / "projects" if root is None else pathlib.Path(root)
+    if root is None:
+        try:
+            root = resolve_projects_root()
+        except ValueError as e:
+            return CONTEXT_WINDOW_RUNGS[0], f"no root: {e}"
+    root = pathlib.Path(root)
     held_path, held_events = held if held else (None, None)
     held_key = None if held_path is None else os.path.normcase(os.path.abspath(held_path))
     found = []
