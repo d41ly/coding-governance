@@ -175,7 +175,7 @@ build_fixture() {
     . "$_st_lib/resolve-python.sh"
     . "$_st_lib/refuse-wrong-shell.sh"
     refuse_wrong_shell || exit 2
-    _st_x=$_st_lib/../policy/policy.py
+    _st_pk=policy; _st_x=$_st_lib/../$_st_pk/$_st_pk.py
     if [ -f "$_st_x" ] && _st_r=$(resolve_python 2>/dev/null); then
       _st_x=$("$_st_r" "$_st_x" get tests.fixture-templates 2>/dev/null) && [ "${_st_x%$'\r'}" = per-case ] \
         && _st_tmode=per-case
