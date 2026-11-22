@@ -3958,14 +3958,16 @@ read_mailbox() { # who · soft|strict -> 0 with one TAB row per message addresse
 # post of kind `ack` from <slug>, answering <id>, to `build:<from-build>` of that row, with its subject
 # and an empty body, so the post's exits are the ack's. Dark while RUN_CLAIMS is not `on`.
 write_mail_ack() { # slug · id -> the post's exits
-  local slug="${1:-}" id="${2:-}" rows fb="" sub="" f rc
-  local -a row=()
+  local slug="${1:-}" id="${2:-}" rows fb="" sub="" f rc line
+  local -a row=() lines=()
   [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 2; }
   rows=$(read_mailbox "$slug" soft) || { printf '%s\n' "$rows"; return 2; }
-  while IFS=$'\t' read -r -a row; do
+  mapfile -t lines <<<"$rows"
+  for line in "${lines[@]}"; do
+    IFS=$'\t' read -r -a row <<<"$line"
     [ "${row[0]:-}" = "$id" ] || continue
     fb=${row[5]:-}; sub=${row[6]:-}; break
-  done <<<"$rows"
+  done
   [ -n "$fb" ] || { echo "mail — not written · $id is no message addressed to $slug"; return 2; }
   f=$(mktemp) || { echo "mail — not written · no scratch file for the ack's empty body"; return 2; }
   write_mail_post "$slug" "build:$fb" ack "$sub" none none "$id" "$f"; rc=$?
@@ -3978,15 +3980,17 @@ write_mail_ack() { # slug · id -> the post's exits
 # While RUN_CLAIMS is not `on` it prints `mail — off`, exit 0 and no row; a refused read exits 2.
 print_mailbox() { # who · open 0|1 · ids 0|1 -> 0 read or off, 2 not read
   local rows line st ids=""
+  local -a lines=()
   [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 0; }
   rows=$(read_mailbox "${1:-}" soft) || { printf '%s\n' "$rows"; return 2; }
-  while IFS= read -r line; do
+  mapfile -t lines <<<"$rows"
+  for line in "${lines[@]}"; do
     st=${line#*$'\t'}; st=${st#*$'\t'}; st=${st#*$'\t'}; st=${st%%$'\t'*}
     [ "$st" != "$line" ] || continue
     [ "${2:-0}" = 0 ] || [ "$st" = open ] || continue
     if [ "${3:-0}" = 1 ]; then ids="${ids:+$ids }${line%%$'\t'*}"
     else printf '%s\n' "$line"; fi
-  done <<<"$rows"
+  done
   [ "${3:-0}" = 0 ] || printf '%s\n' "${ids:-none}"
   return 0
 }
