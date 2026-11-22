@@ -1308,7 +1308,10 @@ def derive_context_window(model, root=None, held=None) -> tuple:
     compaction whose newest earlier main usage in the same transcript is on `model`
     (KICK-dKeptSession-47 S1); a compaction with no main usage before it joins no model. Each is
     parsed as a tree holding its main file alone, and `held`, `(path, events)`, stands in for that
-    path's parse where it is among them. An unreadable transcript is skipped."""
+    path's parse where it is among them. An unreadable transcript is skipped. No transcript record
+    names the window, so every session of a model observed past 200000 under the root reads the 1M
+    rung, a 200k session of that model included; that session's override is
+    `CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000`, rung 1 (KICK-dKeptSession-48 S1)."""
     # The harness's own variable for a model's real window: read here, never written.
     raw = os.environ.get("CLAUDE_CODE_MAX_CONTEXT_TOKENS", "").strip()
     if re.fullmatch(r"[0-9]+", raw) and int(raw) > 0:

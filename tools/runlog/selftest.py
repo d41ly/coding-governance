@@ -370,7 +370,11 @@ from collections import Counter  # noqa: E402
 # compaction reading 75% (AC1), and beside its own model's reading 15% (AC2). Its decoy checks move
 # it by 3.
 # 2 + 3 = 5
-ASSERTION_FLOOR = 1629
+# RAISED 1629 -> 1630 by KICK-dKeptSession-48, the mixed-window override: NO new arm, so no decoy
+# check moves, and one check lands in `test_extract_context_window` — the 150000-token turn beside its
+# 900000-token sibling read under CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000 at 75% with source env (AC1).
+# 1 + 0 = 1
+ASSERTION_FLOOR = 1630
 
 PASS = []
 FAIL = []
@@ -2080,10 +2084,12 @@ def test_extract_context_fill():
 
 
 def test_extract_context_window():
-    """KICK-dKeptSession-30 AC1 to AC4: the window is derived per model from what the transcripts under
-    the read transcript's own projects root observed, rounded up to a rung, and the harness's
-    CLAUDE_CODE_MAX_CONTEXT_TOKENS wins where it is a positive integer. `main` drops that variable
-    before any arm, so each read here sets it in its own child's environment or not at all."""
+    """KICK-dKeptSession-30 AC1 to AC4 and KICK-dKeptSession-48 AC1: the window is derived per model
+    from what the transcripts under the read transcript's own projects root observed, rounded up to a
+    rung, and the harness's CLAUDE_CODE_MAX_CONTEXT_TOKENS wins where it is a positive integer, so a
+    200k session on a root that observed the model past 200000 reads its own window only under that
+    variable at 200000. `main` drops that variable before any arm, so each read here sets it in its
+    own child's environment or not at all."""
     base, alone = build_projects("runlog-window-sibling-")
     sid = build_scenario(alone, "context-window-sibling")
     r = run_runlog(["context", str(alone / FIXTURE_PROJECT / f"{sid}.jsonl")], base, build_arm_env(base))
@@ -2102,6 +2108,12 @@ def test_extract_context_window():
     r = run_runlog(["context", str(main)], base, env)
     check("extract context-window AC4: CLAUDE_CODE_MAX_CONTEXT_TOKENS=500000 reads 30% with source env",
           (r.returncode, r.stdout.strip(), r.stderr.strip()), (0, "30%", "context: window 500000 · env"))
+    env = build_arm_env(base)
+    env["CLAUDE_CODE_MAX_CONTEXT_TOKENS"] = "200000"
+    r = run_runlog(["context", str(main)], base, env)
+    check("extract context-window KICK-dKeptSession-48 AC1: a 200k session beside a 1M sibling reads its "
+          "own window, 75%, under CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000",
+          (r.returncode, r.stdout.strip(), r.stderr.strip()), (0, "75%", "context: window 200000 · env"))
     env["CLAUDE_CODE_MAX_CONTEXT_TOKENS"] = "x"
     r = run_runlog(["context", str(main)], base, env)
     check("extract context-window AC4: a malformed CLAUDE_CODE_MAX_CONTEXT_TOKENS is ignored, so AC2's 15%",
