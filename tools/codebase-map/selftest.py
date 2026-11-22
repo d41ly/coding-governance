@@ -2497,7 +2497,7 @@ def test_shell_layer_needs_no_lexicon_kit(tmp: Path):
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     shutil.copytree(m.MEMORY_TREE_DIR, kit.parent / Path(m.MEMORY_TREE_DIR).name,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-    assert not (kit.parent / "lexicon").exists(), "the fixture tool root holds a lexicon kit"
+    assert sorted(p.name for p in kit.parent.iterdir()) == sorted([KIT_NAME, Path(m.MEMORY_TREE_DIR).name]),         "the fixture tool root holds a kit beyond this one and the memory tree"
     (repo / ".git").mkdir()
     (repo / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
     (repo / "sh").mkdir()

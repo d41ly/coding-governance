@@ -47,7 +47,12 @@ from pathlib import Path
 
 # THE IDENTIFIER LEXER LIVES IN THIS KIT'S `extract_code.py`, the shared block the lexicon kit carries
 # byte-identical too (TOOL-dTotalRecall-13 S6), found through the directory this module loads from,
-# which every importer holds on `sys.path`. Imported BY NAME, so `map_lib.<name>` still resolves.
+# which every importer holds on `sys.path`; a reader loading this file by path (the docs leg's class
+# readers) holds no such entry, so the directory is put there first. Imported BY NAME, so
+# `map_lib.<name>` still resolves.
+_KIT_DIR = str(Path(__file__).resolve().parent)
+if _KIT_DIR not in sys.path:
+    sys.path.insert(0, _KIT_DIR)
 from extract_code import (DEFINITION_CARRYING_EXTS, _DATA_EXTS, _IDENT_TOKEN_RE,  # noqa: F401
                           _LEX_PROFILES, _PROFILE_C, _PROFILE_PY, _PROFILE_SH, _PY_PREFIX_CHARS,
                           _TRIPLE_QUOTES, _identifier_tokens)
