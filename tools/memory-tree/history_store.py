@@ -299,20 +299,21 @@ def render_resolved(repo, resolved) -> str:
 def parse_resolved(text, repo):
     """The `(mode, note, git dir, common dir)` a `render_resolved` line holds, where it was rendered for
     `repo`: its tag this one, six fields, its key `repo`'s, its mode one of MODES and, under `stored`,
-    both dirs absolute and directories. None for any other text, which means resolve afresh."""
+    both dirs absolute and directories. None for any other text, which means resolve afresh. The key is
+    compared by rendering the answer again for `repo`, so `render_resolved` alone spells it."""
     cells = (text or "").split("\t")
     if len(cells) != 6 or cells[0] != RESOLVED_TAG or cells[2] not in MODES:
-        return None
-    if cells[1] != os.path.normcase(str(pathlib.Path(repo).absolute())):
         return None
     try:
         if cells[2] == MODES[0] and not all(
                 pathlib.Path(d).is_absolute() and pathlib.Path(d).is_dir() for d in cells[3:5]):
             return None
-        note = parse_escaped(cells[5])
+        held = cells[2], parse_escaped(cells[5]), cells[3], cells[4]
     except (OSError, ValueError):
         return None
-    return cells[2], note, cells[3], cells[4]
+    if render_resolved(repo, held) != text:
+        return None
+    return held
 
 
 class BatchReader:
@@ -720,13 +721,16 @@ def test_resolved(repo, scratch, check_arm) -> None:
     subprocess.run = count_run
     try:
         again = resolve_store(repo, "selftest-held", code, parse_resolved(text, repo))
+        quiet = len(spawned)
+        want = resolve_store(repo, "selftest-held", code)
     finally:
         subprocess.run = real_run
-    want = resolve_store(repo, "selftest-held", code)
     same = (again.stored, again.root, again.scope, again.code) == (want.stored, want.root, want.scope, want.code)
     check_arm("resolved: a resolve line read back in its own directory resolves the same store, no git run",
-              fresh.returncode == 0 and not fresh.stderr and lied.stdout == fresh.stdout and not spawned and same,
-              "rc %d, stderr %r, spawned %d, read %r" % (fresh.returncode, fresh.stderr, len(spawned), text))
+              fresh.returncode == 0 and not fresh.stderr and lied.stdout == fresh.stdout and same
+              and quiet == 0 and len(spawned) > 0,
+              "rc %d, stderr %r, spawned %d then %d, read %r" % (
+                  fresh.returncode, fresh.stderr, quiet, len(spawned), text))
 
 
 def test_switch(scratch, check_arm) -> None:
