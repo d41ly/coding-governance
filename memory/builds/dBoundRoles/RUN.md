@@ -57,3 +57,8 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T04:28:23Z brief · item TOOL-dBoundRoles-2 · reason 67e356b9dc5d memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-2-build-brief.md
 
 2026-11-22T04:32:23Z dispatch · item eb1647ea TOOL-dBoundRoles-2 · reason tools/roles/role-schema.toml tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/render_agents.py tools/roles/handoff.py tools/roles/agents tools/roles/README.md tools/roles/adopt-roles.test.sh memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-2-1-acceptance-ledger.md
+
+2026-11-22T05:01:10Z brief · item TOOL-dBoundRoles-2 · reason 04b0a96c99e4 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-2-build-brief.md
+2026-11-22T05:04:04Z draw · re-dispatch · TOOL-dBoundRoles-2 · 6/122 · 20261122T050404Z-70358f
+
+2026-11-22T05:04:04Z dispatch · item a01362eb TOOL-dBoundRoles-2 · reason tools/roles/role-schema.toml tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/render_agents.py tools/roles/handoff.py tools/roles/agents tools/roles/README.md tools/roles/adopt-roles.test.sh tools/loop/factories.py tools/loop/loop_lib.py tools/loop/README.md tools/playbook/kinds.toml tools/govkit/usage.toml help/loop.md help/reference/kinds.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-2-1-acceptance-ledger.md

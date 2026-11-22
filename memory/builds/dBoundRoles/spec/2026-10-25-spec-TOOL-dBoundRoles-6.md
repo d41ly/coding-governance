@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-6 — the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 9 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 9 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0171@efd80f4f whole
 
@@ -38,49 +38,70 @@ from").
 
 ## 2. Scope (IN)
 
-- **S1** — Out of reach at the tool call. The write gate `checkRouted` (`tools/hooks/scratch-guard.js:1113`)
-  gains a step before its class step 6: a target that is the role index (`ROLE_INDEX`,
-  `.claude/roles.json`, `scratch-guard.js:941`) or the agent file `.claude/agents/<name>.md` of a role
-  the index names is refused for every writer, a role agent and the main loop alike, its line naming
-  `render_agents.py --write` as the one writer. An adopter's own file under `.claude/agents/`, named
-  by no index row, keeps today's verdict. TOOL-dDeclaredLoop-2 S10's policy-path arm in the same
-  function denies a write to a listed path naming `policy_edit.py`; this step runs before that arm and
-  answers the two render entries, and that arm passes over any path under them, the ask §8 F4 files in
-  dDeclaredLoop's `BACKLOG.md`. Observed by AC1.
+- **S1** — Out of reach at the tool call. The write gate `checkRouted`
+  (`tools/hooks/scratch-guard.js#checkRouted`) gains a step 5a before its class step 6: a target that is
+  the role index (`ROLE_INDEX`, `.claude/roles.json`, `tools/hooks/scratch-guard.js@0251d34d:1124`) or
+  the agent file `.claude/agents/<name>.md` of a role the index names is refused for every writer, a
+  role agent and the main loop alike, its line naming `render_agents.py --write` as the one writer. An
+  adopter's own file under `.claude/agents/`, named by no index row, keeps today's verdict.
+  TOOL-dDeclaredLoop-2 S10's arm in the same function is step 3a, `checkPolicyFile`
+  (`tools/hooks/scratch-guard.js#checkPolicyFile`): it denies a tool write to the policy file alone,
+  the `POLICY_REL` the policy kit's `policy-mirror.js` exports, naming `policy_edit.py`, and reads no
+  other path of the guarded list, so it never meets the two render entries and step 5a answers them,
+  as §8 F4 resolved. Observed by AC1.
 - **S2** — Out of reach at the commit, extending TOOL-dGroundRules-6: `tools/policy/guarded-paths.txt`
-  gains `.claude/roles.json` and `.claude/agents/`, and the minimal guard `tools/policy/guard.py
-  --staged` gains one admitted shape for them: every staged path under those two that the staged index
-  names is byte-equal, CR stripped, to its working-tree file, and `render_agents.py --check`, found
+  gains the render lines, `.claude/roles.json` and one `.claude/agents/<slot>.md` line per agent-true
+  role the index names at the pass, since every reader of the list matches a staged path to a line
+  exactly (`tools/policy/guard.py#read_touched_paths`, and `.githooks/pre-commit`'s `grep -xF` trigger)
+  (§8 F7). The minimal guard `tools/policy/guard.py --staged` gains one admitted shape for them: every
+  staged render path is byte-equal, CR stripped, to its working-tree file, and `render_agents.py --check`, found
   through `resolve_kit_dir("roles", "render_agents.py", here)`, exits 0 over that tree. A staged file
   under `.claude/agents/` the index names no role for is not guarded. The pre-commit verdict is
   TOOL-dDeclaredLoop-2's `tools/loop/guard.py --staged` (its S11), which runs that shape under
-  `owner-only` and decides each other value as §4 "The guard's admitted shape" states. Its guard-self
-  step refuses an agent commit to the list file under every value of `policy-file.guard` (its S3), so
-  the list's two lines are the owner's terminal commit: the pass prepares them, the build run hands
-  them to the owner, and the pass's own commit holds the rest. The owner's terminal proof
-  (TOOL-dGroundRules-6 S4) is unchanged. Observed by AC2.
+  every value, as §4 "The guard's admitted shape" states. Its guard-self step refuses an agent commit
+  to the list file off a live run's branch under every value of `policy-file.guard`, and admits it on
+  a live run's branch, where the minimal guard's `check_run_mandate` names the run, and its record step
+  then owes a staged change record whose `Unit` is `kit.policy` (`tools/loop/guard.py#check_staged`,
+  steps 2 and 3). So the pass commits the list's render lines on the run's branch with that record (§8
+  F6). The owner's terminal proof (TOOL-dGroundRules-6 S4) is unchanged. Observed by AC2.
 - **S3** — A governed tree with no index is refused by both hooks. Where `loadRoleIndex` reads
   `absent` and `checkRoleGoverned(top)` of §4 holds, `checkRoleWrite`
-  (`scratch-guard.js:1065`), `checkRoleGate` (`scratch-guard.js:1437`) and agent-cap's rule 6 (the
-  `index.state` branch, `tools/hooks/agent-cap.js@935a910d:1044-1046`) refuse, each naming the index path and
-  the re-render; a tree that is not governed keeps today's no-arm verdict. Observed by AC3.
+  (`tools/hooks/scratch-guard.js#checkRoleWrite`), `checkRoleGate`
+  (`tools/hooks/scratch-guard.js#checkRoleGate`) and agent-cap's rule 6 (the `index.state` branch,
+  `tools/hooks/agent-cap.js@935a910d:1044-1046`) refuse, each naming the index path and the
+  re-render; a tree that is not governed keeps today's no-arm verdict. The red-fix lane added after
+  base, `checkRedLane` (`tools/hooks/scratch-guard.js#checkRedLane`), admits a typed writer's product
+  write at its step 5 when the index is absent; in a governed tree it reads that index as its step 3
+  reads a broken one, and leaves the refusal standing. Observed by AC3.
 - **S4** — One role section and one hash in the library (I6): `derive_section_sha` moves from
-  `tools/roles/handoff.py:307-309` into `tools/roles/roles_lib.py`, and `render_role_section(kit_dir,
-  slot, memory_root)` returns the exact `## Role` section bytes `render_handoff` builds today
-  (`handoff.py:415`), which `render_handoff` then calls. Observed by AC4.
+  `tools/roles/handoff.py#derive_section_sha` into `tools/roles/roles_lib.py`, and
+  `render_role_section(kit_dir, slot, memory_root, charter_text, gates=(), rows=None)` returns the exact
+  `## Role` section bytes `render_handoff` builds today, the role part `render_work_order` returns
+  (`tools/roles/handoff.py#render_work_order`) for the role fill and the wrap `render_handoff` hands it
+  (`tools/roles/handoff.py@ba4a9fad:687-708`), which `render_handoff` then calls. `charter_text` gives
+  the role's drive lines (`tools/roles/handoff.py#extract_drive_lines`), `gates` the legs
+  TOOL-dBoundRoles-2 S6 hands `render_role`, and `rows` the registry whose agent-file row wraps the
+  section. Observed by AC4.
+  **Readers:** by name: `tools/roles/handoff.py` (the marker writer in `render_handoff` and
+  `check_handoff`, which re-derive both hashes); `tools/roles/render_agents.py` (its selftest's
+  re-stamp of a planted handoff, through `handoff.derive_section_sha`), each re-pointed to the library
+  · by value: `tools/loop/request.py`, whose comment names the twelve-hex convention, unchanged.
 - **S5** — The index carries each role's `role-sha` (I4): `render_roles_index`
-  (`tools/roles/render_agents.py:207-216`) writes `"role-sha": derive_section_sha(render_role_section(…))`
-  per role, and `loadRoleIndex` (`scratch-guard.js:952-989`) admits the key, a string of 12 lowercase
-  hex digits when present, refusing any other value as `broken`. Observed by AC4.
+  (`tools/roles/render_agents.py#render_roles_index`) writes `"role-sha":
+  derive_section_sha(render_role_section(…))` per role, and `loadRoleIndex`
+  (`tools/hooks/scratch-guard.js#loadRoleIndex`), which today grades a role's `writes`, `agent` and
+  optional `gates` and passes any other key through, grades the key too: a string of 12 lowercase hex
+  digits when present, any other value read as `broken`. Observed by AC4.
 - **S6** — `role-sha` compared at spawn: `checkHandoffSpawn` (`tools/hooks/agent-cap.js@935a910d:691-750`), after the
   task digest and before the description step, reads the marker's `role-sha` through
   `extractHandoffMarker`'s named group and compares it with `index.roles[type]['role-sha']`. An index
   holding no `role-sha` for the type refuses with the re-render of the index; a differing one refuses
   with the re-render of the handoff, naming both values. Observed by AC4 and AC5.
 - **S7** — The headers and docs say it: agent-cap's rule-6 comment (`tools/hooks/agent-cap.js@935a910d:30-37`, "it never
-  compares `role-sha`"), scratch-guard's role-arm paragraph (`scratch-guard.js:99-101`, "An ABSENT
-  index adds no arm"), the two arms' sections of `tools/hooks/README.md` and the index paragraph of
-  `tools/roles/README.md`. Observed by AC6.
+  compares `role-sha`"), scratch-guard's role-arm paragraph (`tools/hooks/scratch-guard.js@0251d34d:99-101`,
+  "An ABSENT index adds no arm"), `checkRedLane`'s step list ("the index is absent → witness"), the
+  two arms' sections of `tools/hooks/README.md` and the index paragraph of `tools/roles/README.md`.
+  Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -109,7 +130,7 @@ from").
 `checkRoleGoverned(top)` in `scratch-guard.js`, exported beside `loadRoleIndex` so agent-cap reads
 it through the one reader: true when `.claude/agents/` at `top` holds a file whose front matter carries
 both a `workflow:` and a `writes:` line, the two gov keys `render_agent_file` writes and Claude Code's
-own agent files never carry (`tools/roles/render_agents.py:147-148`). A tree whose index was deleted
+own agent files never carry (`tools/roles/render_agents.py@0d96af1a:167-168`). A tree whose index was deleted
 while its renders remain is governed; a tree that never adopted the roles kit is not, and keeps
 today's verdict. What it does not see: a tree whose index and every rendered agent file were both
 deleted, which S1 and S2 refuse at the tool call and at the commit, and a shell deletion, which is
@@ -132,20 +153,24 @@ names no sibling kit by literal.
 ### The guard's admitted shape
 
 `tools/policy/guard.py --staged` keeps its one rule and adds one row beside TOOL-dGroundRules-6 S3's:
-the staged set's guarded part lies wholly under `.claude/roles.json` and `.claude/agents/`, every such
-path equals its working-tree bytes, and the renderer's `--check` exits 0. Then the committed renders
+the staged set's guarded part lies wholly among the render lines, every such path equals its
+working-tree bytes, and the renderer's `--check` exits 0. Then the committed renders
 are exactly what the staged catalogue renders. A hand edit, a deleted index or a rename refuses, naming
 the path and the failed condition. With the roles kit not found the row cannot hold, so the commit
-refuses, as any guarded change does without its shape.
+refuses, as any guarded change does without its shape. On a live run's branch the minimal guard admits
+any staged change before its rows are read (PLAY-dOrderedCharter-84), so the row never refuses there:
+S1's tool-call step is what holds a run's agent, and a shell write on that branch escapes both.
 
 The pre-commit block runs TOOL-dDeclaredLoop-2's verdict, `tools/loop/guard.py --staged`, for an
-agent's commit. Its guard-self step comes first and refuses a change to the list file under every value
-(its S3, `floor.guard-self` on). A staged render with the shape holding is then decided:
+agent's commit (`tools/loop/guard.py#check_staged`). Its guard-self step comes first and refuses a
+change to the list file off a live run's branch under every value (its S3, `floor.guard-self` on). A
+staged render touches no policy leaf and not the list file, so its record step owes nothing, and the
+value's rule decides:
 
 | `policy-file.guard` | A staged render, the shape holding |
 |---|---|
-| `owner-only` (default) | admitted: the verdict's agent arm is the minimal guard, run as a subprocess (its S1), and this row answers |
-| `agents-with-reason`, `agents-within-mandate` | admitted: after guard-self and before the value's rule, the verdict answers a guarded touch set lying wholly under the two render lines by the minimal guard, the ask §8 F5 files in dDeclaredLoop's `BACKLOG.md`, and this row answers |
+| `owner-only` (default), `agents-within-mandate` | admitted: the verdict's step 4 admits where the minimal guard, run as a subprocess, exits 0, and this row answers |
+| `agents-with-reason` | admitted the same way: that value admits where the minimal guard exits 0, and also a policy-file-only change with a decision row, as §8 F5 resolved |
 
 ### Data model
 
@@ -155,10 +180,12 @@ agent's commit. Its guard-self step comes first and refuses a change to the list
 ```
 
 `role-sha` hashes the `## Role` section as `render_role_section` returns it: the heading, a blank
-line, the rendered role with its blank edges trimmed, and two newlines; CRLF folded to LF; the first 12
-hex digits of its SHA-256. It is the hash `render_handoff` writes into a marker and `check_handoff`
-(`handoff.py:443`) re-derives, so a handoff and its agent type agree exactly when both were rendered
-from one role text.
+line, the rendered role with its blank edges trimmed and, where the charter holds drive lines for the
+role, its `### Drive` block, all inside the agent file's level-5 envelope where the registry reads,
+and two newlines; CRLF folded to LF; the first 12 hex digits of its SHA-256. It is the hash
+`render_handoff` writes into a marker and `check_handoff` (`tools/roles/handoff.py#check_handoff`)
+re-derives, so a handoff and its agent type agree exactly when both were rendered from one role text
+and one charter's drive lines.
 
 ### Inventory
 
@@ -171,14 +198,17 @@ guard's rendered-paths row; the refusal lines above. Naming cells: `render_role_
 
 The index is re-rendered in the pass, so gov's carries `role-sha` at landing. An adopter's index
 without the key loads as before and refuses its next spawn with the re-render line; the roles kit's
-`[[regenerate]]` row (`tools/roles/kit.toml:72-73`) re-renders it on upgrade. A handoff rendered
+`[[regenerate]]` row (`tools/roles/kit.toml@b9102919:75-76`, `adopt-roles.sh --scaffold`) re-renders
+it on upgrade. A handoff rendered
 before a role's text changed refuses at spawn, which is the point; its remedy is a re-render.
 
 ### Rollout
 
 Live at landing. S1 and S3 are hook arms; S2's row runs under the verdict TOOL-dDeclaredLoop-2 S11
-re-points the pre-commit block to, and guards the renders from the commit after the owner's commit of
-the list's two lines, since the list is read at HEAD.
+re-points the pre-commit block to, and guards the renders from the commit after the pass's commit of
+the list's render lines, since the list is read at HEAD. A role added after the pass renders an agent
+file no list line names, so its commit is unguarded until the role's line lands with it (§8 F7); S1
+holds it at the tool call meanwhile.
 
 ### Files touched (estimate)
 
@@ -194,6 +224,8 @@ the list's two lines, since the list is read at HEAD.
 - `tools/policy/guarded-paths.txt`
 - `tools/policy/guard.py`
 - `tools/policy/check_policy.py` (the guard's cases)
+- `memory/builds/dBoundRoles/build/<date>-build-TOOL-dBoundRoles-6-change-1.md`, the `kit.policy`
+  change record the list's render lines owe (§8 F6)
 - `.claude/roles.json`, the render, by `render_agents.py --write`
 
 ### Alternatives rejected
@@ -230,6 +262,8 @@ the list's two lines, since the list is read at HEAD.
   it and a role body change is re-rendered and staged with its role file, it exits 0; with the loop kit
   in the clone and `policy-file.guard` unset, the loop kit's `guard.py --staged` gives the same two exits.
   Red when: a hand-edited render commits, or a true re-render is refused.
+  fixture: the clone checked out on a branch no live run's run-state file names, so the minimal
+  guard's run admission (PLAY-dOrderedCharter-84) answers nothing and the render row decides.
 - **AC3** — When `.claude/roles.json` is removed from a scratch adopter whose `.claude/agents/` keeps
   its renders, a `Write` to a spec path, a `gov-builder` Bash payload running a `.test.sh` suite and an
   `Agent` payload each exit 2 naming the absent index; in a scratch tree with neither the index nor a
@@ -251,7 +285,7 @@ the list's two lines, since the list is read at HEAD.
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `routed-commits selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `routed-commits selftest` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC3 · a write to the index and to an owned agent file, and an index removed beside its renders · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC4 AC5 · a handoff rendered before a role body change, and an index row without `role-sha` · none
@@ -276,6 +310,8 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC4 AC5 · a handoff rendered b
   RESOLVED (agent, 2026-10-25, delegated): the build run re-grounds on each at the pass and stops the
   unit if a called section is still absent then, rung 1 (the brief's rule for DEFERRED parents).
   widens: none · relaxes: none
+  At `a01362eb` all three are built: `tools/policy/guarded-paths.txt`, `tools/policy/guard.py`, and the
+  pre-commit verdict `tools/loop/guard.py#check_staged` that TOOL-dDeclaredLoop-2 S11 points it at.
 - **F4 — Which arm answers a tool write to `.claude/roles.json` or `.claude/agents/<file>` once the
   list names both?** TOOL-dDeclaredLoop-2 S10's policy-path arm in `checkRouted` denies a write to a
   listed path, naming `policy_edit.py` as the door; S1's step 5a names `render_agents.py --write`. If
@@ -291,6 +327,9 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC4 AC5 · a handoff rendered b
   over the render lines. The ask the build run files in dDeclaredLoop's `BACKLOG.md` is
   "TOOL-dDeclaredLoop-2 S10: the policy-path arm passes over a path under `.claude/roles.json` or
   `.claude/agents/`, which the roles arm before it answers".
+  Re-grounded at `a01362eb`: the arm is `checkPolicyFile`, step 3a, and it matches the policy file
+  alone, so it already passes over both render entries; (a) holds with no change to it, and the ask
+  is met as written.
 - **F5 — How is a true re-render admitted under `agents-with-reason` and `agents-within-mandate`?**
   TOOL-dDeclaredLoop-2's verdict admits under either value only a change to `.governance/policy.toml`
   with its change record, so S2's row is never consulted there and every agent re-render is refused.
@@ -306,6 +345,29 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC4 AC5 · a handoff rendered b
   guarded touch set
   lying wholly under `.claude/roles.json` and `.claude/agents/` is answered by the minimal guard under
   every value of `policy-file.guard`".
+  Re-grounded at `a01362eb`: the verdict's step 4 already admits under every value where the minimal
+  guard exits 0 (`tools/loop/guard.py#check_staged`), so (a) holds with no change to it, and the ask
+  is met as written.
+- **F6 — Who commits the list's render lines, now that guard-self admits a list change on a live run's
+  branch (the owner's 2026-11-12 ruling, `tools/loop/guard.py#check_staged` step 2)?** Options: (a) the
+  pass, on the run's branch, staging the `kit.policy` change record the verdict's record step owes;
+  (b) the owner at a terminal, the build run handing the lines over, as rev-6 wrote; (c) the
+  build run's landing commit, outside the pass. (b) adds an owner turn the ruling removed and leaves
+  S2 unarmed until it is taken; (c) puts a guarded change in a commit no pass gate graded. RESOLVED
+  (agent, 2026-11-22, delegated): (a), rung 3, the most feature-rich survivor, landing S2 whole in
+  its own pass. widens: none · relaxes: none
+- **F7 — How does the list name the agent files, when every reader matches a staged path to a line
+  exactly?** A `.claude/agents/` line guards no file: `read_touched_paths` keeps a path only where it
+  is a line, and the pre-commit block fires on `grep -xF`. Options: (a) one `.claude/agents/<slot>.md`
+  line per agent-true role, exact paths every reader matches today; (b) a line ending `/` read as a
+  directory by every reader, the minimal guard, the pre-commit trigger, the loop verdict through the
+  minimal guard, `tools/memory-tree/routed_commits.py#read_guarded_paths` and the playbook overlay's
+  list read; (c) the index's line alone, the guard deriving the agent files from the index at HEAD.
+  (b) changes TOOL-dGroundRules-6's list grammar and five readers in four kits, the widening rev-3's
+  F4 already declined for a door column; (c) never fires the pre-commit trigger on a commit staging an
+  agent file alone. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the survivor that fits the
+  landed grammar; its gap, a later role's file unguarded at commit until its line lands, is said in §4
+  "Rollout". widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -331,21 +393,40 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC4 AC5 · a handoff rendered b
   fixtures` and `routed-commits selftest`, the legs whose guards the Files touched paths
   `tools/hooks/scratch-guard.js` and `tools/policy/guarded-paths.txt` trip.
 - rev-6 · 2026-11-22 · §2 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; nothing else moved.
+- rev-7 · 2026-11-22 · S1 to S5 · S7 · §4 · AC2 · §7 · §8 F3 F4 F5 F6 F7 · §10 · re-grounded at `a01362eb` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-15-reground-g-brief`: dDeclaredLoop's arm is `checkPolicyFile`,
+  step 3a, matching the policy file alone, and the loop verdict's step 4 admits under every value where
+  the minimal guard exits 0, so F4 and F5 hold with no change there; guard-self now admits a list
+  change on a live run's branch, so the pass commits the list's render lines with their `kit.policy`
+  change record (F6); every list reader matches exactly, so the list names each owned agent file by
+  its path rather than by a `.claude/agents/` line (F7); a live run's branch admits any staged change, said in §4; S3 gains the red-fix
+  lane's absent-index admission; S4's `render_role_section` takes the charter's drive lines, the
+  registry rows and unit 2 S6's `gates`, since the `## Role` section now holds a `### Drive` block and
+  an envelope, checked against TOOL-dBoundRoles-2's spec, and lists `derive_section_sha`'s readers;
+  AC2's fixture leaves the run admission out; S5 states what `loadRoleIndex` grades; the leg line gains `recall floor` and `recall floor arms`,
+  whose guards hold the change record's path; `tools/hooks/agent-cap.js` is still blob `935a910d`; every
+  other moved citation re-pointed to a symbol or a pinned line.
 
 ## 10. Reuse audit
 
-The seams extended: the write gate's evaluation order in `checkRouted` (`tools/hooks/scratch-guard.js:1113-1185`)
-and `checkRoleWrite` (`:1064-1086`); `loadRoleIndex` (`:952-989`), the one index reader both hooks
-use; `checkRoleGate` (`:1421-1451`); rule 6's `checkHandoffSpawn` (`tools/hooks/agent-cap.js@935a910d:691-750`)
-and its dispatch (`:1034-1057`); `render_roles_index` (`tools/roles/render_agents.py:207-216`), the one
-index writer; `derive_section_sha` (`tools/roles/handoff.py:307-309`), moved to the library as I6
-says; TOOL-dGroundRules-6's guarded list and guard, under TOOL-dDeclaredLoop-2's verdict. `python tools/codebase-map/reuse_lookup.py "refuse
+The seams extended: the write gate's evaluation order in `checkRouted`
+(`tools/hooks/scratch-guard.js#checkRouted`) and `checkRoleWrite`
+(`tools/hooks/scratch-guard.js#checkRoleWrite`); `loadRoleIndex`
+(`tools/hooks/scratch-guard.js#loadRoleIndex`), the one index reader both hooks use; `checkRoleGate`
+(`tools/hooks/scratch-guard.js#checkRoleGate`) and `checkRedLane`
+(`tools/hooks/scratch-guard.js#checkRedLane`); rule 6's `checkHandoffSpawn`
+(`tools/hooks/agent-cap.js@935a910d:691-750`) and its dispatch (`:1034-1057`); `render_roles_index`
+(`tools/roles/render_agents.py#render_roles_index`), the one index writer; `derive_section_sha`
+(`tools/roles/handoff.py#derive_section_sha`), moved to the library as I6 says; TOOL-dGroundRules-6's
+guarded list and guard, under TOOL-dDeclaredLoop-2's verdict. `python tools/codebase-map/reuse_lookup.py "refuse
 a write to the generated role index and compare the role hash at spawn"` ranked generic write and
 index stems (`write` in `gotchas.py`, `build_index`, `resolve_generated_indexes` in the unattended
 kit) and `RolesError`; none is a guard over a rendered file or a hash compared at spawn, so the seams
 above are read from source, the answer M5 says a miss is. Scout A's line numbers (read at `748b309f`) match source at `4283cb44`, except
 that it cites rule 6's "absent adds no rule" at `agent-cap.js:43`, which is the header's wording, and
-the branch itself is at `:2282-2284`.
+the branch itself is at `:2282-2284`. At `a01362eb` `tools/hooks/agent-cap.js` is still blob
+`935a910d`, so its citations stand, and every `scratch-guard.js` and roles-kit line had moved and is
+re-read above.
 
 Recall terms used: `python tools/memory-recall/query.py "how is the role index guarded and when is
 role-sha compared" --terms "roles.json loadRoleIndex absent index unarmed role-sha checkHandoffSpawn

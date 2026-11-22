@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-37 — govkit's roles install case derives the agent types and house overlays it expects from the roster and the seed rows, so no roster change leaves a typed count to red
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -27,40 +27,48 @@ The round-1 spec audit of the 26 unit specs
 HIGH**, report item **H5**. Id 47 is the same defect seen from the blast-radius lens at MEDIUM, report
 item M25, and takes its own scope item in `TOOL-dBoundRoles-43`.
 
-`tools/govkit/selftest.py:2837` checks `len(agents) == 9` and `:2838` checks ten seeded house
-overlays, both typed. `TOOL-dBoundRoles-1` S2 and S3 add four roles with four empty overlays and remove
-the two reviewers, so both literals are wrong once unit 1 lands. The `govkit selftest` leg's guard in
-`tools/gate-legs.json` covers `{prefix}/govkit/` and three other paths, none under `tools/roles/`, so a
-guarded run skips the leg and the red surfaces on a later, unrelated govkit change.
+At base `462d20f3`, `tools/govkit/selftest.py:2837` checked `len(agents) == 9` and `:2838` ten seeded
+house overlays, both typed, and `TOOL-dBoundRoles-1` S2 and S3, adding four roles with four empty
+overlays and removing the two reviewers, would have made both wrong. The `govkit selftest` leg's guard
+in `tools/gate-legs.json` covers `{prefix}/govkit/` and four other paths (PINNED at
+`tools/gate-legs.json@e07c84d3`), none under `tools/roles/`, so a guarded run skips the leg and a red
+would surface on a later, unrelated govkit change.
 
-This unit replaces both literals with sets derived at run time: the agent-true roles of the installed
-roles kit, and the `house/*.md` entries of the roles descriptor's seed rows. A roster change then
-moves the expectation with it. It repairs `TOOL-dBoundRoles-1` and builds one step after it (order 4).
+`TOOL-dWitnessedBar-23` S6 has since landed both as derivations, spelled inline in
+`check_roles_install` (`tools/govkit/selftest.py@c2b02d78:3232-3250`): the agent-true roles of the
+source roles kit through its own `roles_lib.load_roles`, and the `house/*.md` entries of its
+descriptor's seed rows. No literal is left to red. This unit takes S3's landed branch, which §8 F2's
+probe now selects: it lifts the inline derivation into S1's one function, which AC1 probes without
+running a case, and routes the two checks through it. It repairs `TOOL-dBoundRoles-1` and builds one
+step after it (order 4).
 
 ## 2. Scope (IN)
 
 - **S1** — The derivation, `derive_roles_expected(kit, descriptor)` in `tools/govkit/selftest.py`,
   returning `(agents, overlays)`. `agents` is the set of slots of `kit`'s `agents/*.agent.md` whose
-  front matter sets `agent: true`, read through the installed kit's own `roles_lib.load_roles`
-  (`tools/roles/roles_lib.py:330`), loaded by path with `importlib.util`, so the selftest carries no
-  second front-matter grammar. `overlays` is the set of `include` entries matching `house/*.md` in the
-  descriptor's `[[files]]` rows whose `role` is `seed`, the rows `check_roles_default` already reads
-  through `gk.read_descriptors` (`tools/govkit/selftest.py:2720`, the rules at `:2745`). Observed by
-  AC1 and AC2.
-- **S2** — The two checks of `check_roles_install` compare sets. "renders nine agent types" becomes
-  "renders one agent type per agent-true role": the `gov-*.md` stems under the target's
-  `.claude/agents` equal `agents`. "seeds ten house overlays" becomes "seeds every house overlay its
-  descriptor lists": the `house/*.md` names under the installed kit equal `overlays`. Each failure
-  prints both sets and their difference. Observed by AC2 and AC3.
+  front matter does not set `agent: false`, an absent key counting true as the landed derivation counts
+  it (`@c2b02d78:3240-3241`), read through that kit's own `roles_lib.load_roles`
+  (`tools/roles/roles_lib.py#load_roles`), loaded by path with `importlib.util`, so the selftest carries
+  no second front-matter grammar. `overlays` is the set of `include` entries matching `house/*.md` in
+  the `[[files]]` rows of `descriptor`, a parsed roles descriptor, whose `role` is `seed`, as the landed
+  code reads `tools/roles/kit.toml` with `tomllib` (`@c2b02d78:3242-3245`). The call site passes gov's
+  source kit, `KIT_DIRS["roles"]`, as the landed derivation does. Observed by AC1 and AC2.
+- **S2** — The two landed checks of `check_roles_install` (`@c2b02d78:3246-3250`) compare S1's sets,
+  their labels kept: "renders one agent type per agent role (<n>)", the `gov-*.md` stems under the
+  target's `.claude/agents` equal to `agents`, and "seeds one house overlay per seed-list entry (<n>)",
+  the `house/*.md` names under the installed kit equal to `overlays`, with its non-empty guard. Each
+  failure prints both sets, as the landed messages do. Observed by AC2 and AC3.
 - **S3** — Built once. Where `TOOL-dWitnessedBar-23` S6 has landed the same derivation at the build run's
   base, this pass keeps it, routes it through S1's function if it is spelled inline, and adds nothing
-  beside it; otherwise this pass builds S1 and S2 in that section's form (§8 F2). Observed by AC3.
+  beside it; otherwise this pass builds S1 and S2 in that section's form (§8 F2). It has landed inline
+  at `a01362eb0`, so this pass takes the first branch. Observed by AC3.
 
 ## 3. Non-goals (OUT)
 
-- The docstring of `check_roles_install` (`tools/govkit/selftest.py:2769`), which still says "nine
-  agent types, ten seeded house overlays": `TOOL-dBoundRoles-43`'s, for id 47.
-- The `OC8 AC2` check that every house overlay is a seed row (`:2756`), which reads the files present:
+- The docstring of `check_roles_install` (`tools/govkit/selftest.py#check_roles_install`):
+  `TOOL-dBoundRoles-43`'s, for id 47. At `a01362eb0` it no longer says "nine agent types, ten seeded
+  house overlays"; TOOL-dWitnessedBar-23 S6 rewrote it, so unit 43's item finds it done.
+- The `OC8 AC2` check that every house overlay is a seed row (`@c2b02d78:3150`), which reads the files present:
   `TOOL-dBoundRoles-19` S5 re-points it when the house files leave the kit.
 - Widening the `govkit selftest` leg's guard to `tools/roles/` (§4 "Alternatives rejected").
 - The report's left-shift text beyond the derivation. The derivation is the regression: no literal is
@@ -89,19 +97,31 @@ Read at base `462d20f3` on 2026-10-26:
 - `tools/gate-legs.json`'s `govkit selftest` row has the guard `{prefix}/govkit/`,
   `{prefix}/hooks/kit.toml`, `{prefix}/settings-merge.py` and `{prefix}/codebase-map/kit.toml`.
 
+Re-read at `a01362eb0` on 2026-11-22:
+
+- `grep -n 'len(agents) == 9' tools/govkit/selftest.py` prints nothing; the derivation sits inline in
+  `check_roles_install` (`tools/govkit/selftest.py@c2b02d78:3232-3250`), and `:3213` resolves the
+  installed kit as `kit`.
+- `tools/roles/kit.toml@b9102919:39-42` names eleven `house/*.md` seeds, `gov-tester`'s among them, and
+  `house/policy.toml` in one `seed` row.
+- `.claude/roles.json` sets `agent` true for ten of eleven roles, `gov-session` false.
+- The `govkit selftest` guard adds `{prefix}/process-monitor/census.py` to the four above.
+
 ### The checks after this unit
 
 ```python
-agents_want, overlays_want = derive_roles_expected(kit, descs["roles"][0])
+agents_want, overlays_want = derive_roles_expected(KIT_DIRS["roles"], tomllib.loads(
+    (KIT_DIRS["roles"] / "kit.toml").read_text(encoding="utf-8")))
 agents_got = {p.stem for p in (t / ".claude" / "agents").glob("gov-*.md")}
 overlays_got = {"house/" + p.name for p in (kit / "house").glob("*.md")}
-check("OC8 AC4 ...renders one agent type per agent-true role", agents_got == agents_want, ...)
-check("OC8 AC4 ...seeds every house overlay its descriptor lists", overlays_got == overlays_want, ...)
+check("OC8 AC4 ...renders one agent type per agent role (%d)" % len(agents_want), agents_got == agents_want, ...)
+check("OC8 AC4 ...seeds one house overlay per seed-list entry (%d)" % len(overlays_want),
+      bool(overlays_want) and overlays_got == overlays_want, ...)
 ```
 
-`descs` is read once per call through the same `gk.read_descriptors(GOV_ROOT, reg, rep)` that
-`check_roles_default` uses. A set compare is stronger than a count: a renamed role whose file count is
-unchanged still reds.
+Both wants are read from gov's tree and both gots from the target, as the landed comment states
+(`@c2b02d78:3232-3235`), so the install is graded against what it was handed. A set compare is as
+strong as the landed sorted-list compare: a renamed role whose file count is unchanged still reds.
 
 ### Inventory
 
@@ -114,7 +134,7 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 4. Dispatch sorts a tie by id string (`tools/workflows/unattended-build.js:608-613`),
+Live at landing, at order 4. Dispatch sorts a tie by id string (`tools/workflows/unattended-build.js@9da9556b:692-697`),
 so `TOOL-dBoundRoles-21` builds before this unit at the same order.
 
 ### Files touched (estimate)
@@ -135,8 +155,9 @@ so `TOOL-dBoundRoles-21` builds before this unit at the same order.
 
 - security — no new write path; the selftest reads a scratch target it built.
 - perf / scale — one `load_roles` over about a dozen role files per install case.
-- error / empty / loading states — an empty `overlays` set is legal and compares equal to an empty
-  `house` folder, the state `TOOL-dBoundRoles-19` leaves.
+- error / empty / loading states — an empty `overlays` set reds the landed overlay check's non-empty
+  guard (`@c2b02d78:3250`), so an empty population never reads as coverage; `TOOL-dBoundRoles-19` S5
+  re-points the OC8 house checks when its house files leave the seed rows.
 - observability — each failing check prints both sets and their difference.
 - risks — a descriptor whose seed row is not a list include yields no overlays; the check then reds
   against any seeded file, which names the gap.
@@ -160,12 +181,14 @@ so `TOOL-dBoundRoles-21` builds before this unit at the same order.
 - **AC3** — When `grep -nE 'len\(agents\) == [0-9]|glob\("\*\.md"\)\)\) == [0-9]' tools/govkit/selftest.py`
   runs on the built tree, it prints nothing.
   Red when: a typed count is left beside the roster it counts.
+  figure: it prints nothing at `a01362eb0` too, the literals gone with TOOL-dWitnessedBar-23 S6; the
+  criterion holds them gone.
 
 ## 7. Gates
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC2 · the OC8 AC4 roles install case with S2's set checks, staged by removing one rendered `gov-*.md` from the scratch target after its apply, which reds "renders one agent type per agent-true role" naming the missing slot · none
+New arm: tools/govkit/selftest.py · covers AC1 AC2 · the OC8 AC4 roles install case with S2's set checks, staged by removing one rendered `gov-*.md` from the scratch target after its apply, which reds "renders one agent type per agent role", its message naming both sets · none
 
 ## 8. Open questions
 
@@ -181,6 +204,8 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · the OC8 AC4 roles install
   same grep print nothing, so the probe moves when it lands. RESOLVED (agent, 2026-10-26, delegated):
   the pass reads the probe; with a hit it builds S1 and S2, with none it keeps the landed derivation and
   routes it through S1. widens: none · relaxes: none
+  Observation at `a01362eb0`: the probe prints nothing, and `want_agents` and `want_house` sit at
+  `tools/govkit/selftest.py@c2b02d78:3240` and `:3245`, so the probe moved and the second branch holds.
 
 ## 9. Revision log
 
@@ -191,11 +216,20 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · the OC8 AC4 roles install
 - rev-4 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds `tools/govkit/selftest.py`
   that §4 Files touched names, by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else
   moved.
+- rev-5 · 2026-11-22 · §1 · S1 S2 S3 · §3 · §4 · §5 · AC3 · §7 · §8 F2 · §10 · re-grounded at HEAD
+  `a01362eb0` by `2026-11-22-prompt-TOOL-dBoundRoles-1-reground-e-brief`. TOOL-dWitnessedBar-23 S6
+  landed the derivation inline, so F2's probe now selects S3's keep-and-route branch: S1 states the
+  landed predicate and source kit, S2 keeps the landed labels, messages and non-empty overlay guard,
+  and §5 no longer calls an empty overlay set legal. The docstring non-goal is already met; the guard
+  count is four other paths; every citation is re-pointed to a symbol or a blob. Unit 1's roster
+  change was checked against TOOL-dBoundRoles-1's spec, not HEAD.
 
 ## 10. Reuse audit
 
-The seam is `TOOL-dWitnessedBar-23` S6, which specifies the same two derivations, and the descriptor read
-`check_roles_default` already makes (`tools/govkit/selftest.py:2720`, its rule walk at `:2745-2757`).
+The seam is `TOOL-dWitnessedBar-23` S6's landed derivation, spelled inline in `check_roles_install`
+(`tools/govkit/selftest.py@c2b02d78:3232-3250`), which S1 lifts into one function, beside the descriptor
+read `check_roles_default` makes (`tools/govkit/selftest.py#check_roles_default`, its rule walk at
+`@c2b02d78:3141-3157`).
 `python tools/codebase-map/reuse_lookup.py "derive an expected count from a kit seed list instead of a literal"`
 ranked `counts`, `seed`, `kit_rel` and `resolve_kit_dir`, none a derivation of a roster count; the
 recall probe returned `TOOL-dWitnessedBar-23` S6 as the existing design, which this unit reuses rather

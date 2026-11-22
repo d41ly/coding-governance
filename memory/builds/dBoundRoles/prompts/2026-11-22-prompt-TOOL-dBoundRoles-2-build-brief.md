@@ -14,7 +14,11 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - The spec's base is `4ed9e567`; the run's is `8b8b1374`. Since then TOOL-dWitnessedBar-23 added
   `tools/roles/agents/gov-tester.agent.md`, so there are eleven role files; §8 F4 is yours to discharge against it at
   HEAD.
-- Two earlier builders of this run diverged on stale claims the spec checker cannot see. Before your first write,
+- The spec is rev-5, revised over the first builder's divergence
+  (`build/2026-11-22-build-TOOL-dBoundRoles-2-1-builder-return.md`): the three sections render after `## Charter`
+  (§8 F5), the role factory in `tools/loop/factories.py` and its readers in `tools/loop/loop_lib.py`, `kinds.toml`,
+  `usage.toml` and the help pages joined its Files touched, and the outcome grammar admits a one-value set (§8 F6).
+- Earlier builders of this run diverged on stale claims the spec checker cannot see. Before your first write,
   verify every claim the spec makes about current code against HEAD: each path, line, function, count and behaviour.
   Hand any claim that no longer holds back as a divergence rather than building around it.
 

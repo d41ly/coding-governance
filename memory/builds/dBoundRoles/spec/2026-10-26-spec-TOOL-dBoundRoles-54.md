@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-54 — unit 49's overlay check reads its expected side from the roster, one `house/<slot>.md` per role slot, never from the seed rule it is compared with
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -28,8 +28,10 @@ finding **id 14 at HIGH**, report item **H2**. Id 40 shares the item at HIGH and
 Id 14 is the grounding face of the item. `TOOL-dBoundRoles-49` S3 checks that every entry of the
 `overlays` set `derive_roles_expected` returns is the source of one roles seed row of the default plan.
 `TOOL-dBoundRoles-37` S1 defines `overlays` as the `house/*.md` includes of the descriptor's seed rows,
-and `planned_writes` builds those rows from the same includes (`tools/govkit/govkit.py:321-338`,
-`rule_sources`). Both sides come from one `[[files]]` seed rule in `tools/roles/kit.toml:35-39`, so 49
+and `planned_writes` builds those rows from the same includes: a list include's pool is
+`tools/govkit/govkit.py#rule_sources`' paths, returned by `tools/govkit/govkit.py#resolve_rule_pool`
+unchecked, one plan row each. Both sides come from one `[[files]]` seed rule in
+`tools/roles/kit.toml@b9102919:38-43`, so 49
 AC2, which drops an overlay's seed row, removes it from both sides and is red against a correct build,
 and 49 §4's claim that S3 ties the figure to the roster is false: a role added with no seeded overlay,
 or an include removed while its file stays, passes.
@@ -43,9 +45,13 @@ criterion for it. It repairs `TOOL-dBoundRoles-49` and builds one step after it 
   `house/<slot>.md` for every slot of the installed kit's roster, read through the same
   `roles_lib.load_roles` load `TOOL-dBoundRoles-37` S1 makes. Every slot counts, `agent: false`
   included. Where unit 37 left that load inline, this pass lifts it into one function both call, so the
-  selftest holds one loader. Observed by AC1.
+  selftest holds one loader. At HEAD the load is inline in `check_roles_install`, TOOL-dWitnessedBar-23
+  S6's (`tools/govkit/selftest.py@c2b02d78:3236-3241`), which unit 37 S3 routes through its function.
+  Observed by AC1.
 - **S2** — The compare, both ways. S3 of unit 49 compares S1's set with the `src` of every roles-kit row
-  `derive_seed_expected` returns whose source matches `house/*.md`. A slot whose overlay is not seeded
+  `derive_seed_expected` returns whose source matches `house/*.md`. A row's `src` is the repo path
+  `tools/roles/house/<file>`, since `read_descriptors` homes the kit and `rule_sources` joins the include
+  to that home, so the compare reads its `house/<file>` tail. A slot whose overlay is not seeded
   reds naming the slot; a seeded overlay no slot owns reds naming the file. Each failure prints both
   sets. Observed by AC1 and AC2.
 - **S3** — Unit 49's spec follows the check. The pass bumps `TOOL-dBoundRoles-49`'s spec with S3, §4 "Why
@@ -74,16 +80,20 @@ criterion for it. It repairs `TOOL-dBoundRoles-49` and builds one step after it 
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at base `462d20f3` on 2026-10-26, and re-read at HEAD `a01362eb0` on 2026-11-22:
 
-- `tools/roles/kit.toml:35-39` lists the ten house overlays and `house/policy.toml` in one seed rule;
-  `tools/govkit/govkit.py:321-338` returns a list include's paths unchecked, one plan row each.
-- `tools/roles/agents/` holds ten role files and `tools/roles/house/` ten `.md` overlays, one per slot;
-  `gov-session.agent.md` sets `agent: false` and still has `house/gov-session.md`, so the agent-true set
-  is not the overlay set.
+- `tools/roles/kit.toml@b9102919:38-43` lists every house overlay and `house/policy.toml` in one seed
+  rule, eleven overlays at `a01362eb0` (`@b9102919:39-42`); `tools/govkit/govkit.py#resolve_rule_pool`
+  returns a list include's `rule_sources` paths unchecked, one plan row each, and a probe of
+  `gk.rule_sources` over the roles descriptor printed each as `tools/roles/house/<file>`.
+- `tools/roles/agents/` holds one role file per slot and `tools/roles/house/` one `.md` overlay per slot,
+  eleven each at `a01362eb0` (`ls tools/roles/agents tools/roles/house`); `gov-session.agent.md` sets
+  `agent: false` and still has `house/gov-session.md`, so the agent-true set is not the overlay set.
+  `tools/roles/roles_lib.py#load_roles` returned all eleven slots, `gov-session` included.
 - `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md` S2 seeds an empty overlay for
-  each of its four new roles, and `TOOL-dWitnessedBar-23` S4 seeds `tools/roles/house/gov-tester.md`:
-  one overlay per role is the convention every role-adding spec follows.
+  each of its four new roles, and `TOOL-dWitnessedBar-23` S4, CLOSED, seeded
+  `tools/roles/house/gov-tester.md`: one overlay per role is the convention every role-adding spec
+  follows.
 
 ### What the check ties
 
@@ -137,9 +147,9 @@ file, so `--dispatch` holds it until this unit is CLOSED.
 
 - **AC1** — When a `python -c` slice puts `tools/govkit` on `sys.path`, imports govkit's self-test module
   as a library and runs no suite, the form unit 49 AC1 uses, and calls `derive_overlay_expected` on the
-  installed roles kit of a default target, it returns one house overlay path per role file, ten at
-  base; with a scratch kit copy carrying one more role file and no overlay, S2's compare names that
-  slot.
+  installed roles kit of a default target, it returns one house overlay path per role file, as many as
+  that kit's `agents/` holds (eleven at `a01362eb0`, moved by unit 1's S2 and S3 before this pass); with
+  a scratch kit copy carrying one more role file and no overlay, S2's compare names that slot.
   Red when: the expected side is read from the seed rule, so a role with no overlay passes.
   figure: the set is DERIVED from the roster at observation time.
   fixture: the target and the scratch kit copy are built under the run's scratch path by the probe.
@@ -179,6 +189,14 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · the roster-side overlay c
 - rev-4 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds `tools/govkit/selftest.py`
   that §4 Files touched names, by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else
   moved.
+- rev-5 · 2026-11-22 · §1 · §2 · §4 · §6 · S1 · S2 · AC1 · re-grounded at HEAD `a01362eb0` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-49-reground-f-brief`: the seed rule's citation moves from
+  `tools/roles/kit.toml@f9c47b2b:35-39` to `@b9102919:38-43`, and `tools/govkit/govkit.py@bc180202:321-338` to `#rule_sources` and
+  `#resolve_rule_pool`, which now pools a list include; the roster and the overlays are eleven, not ten,
+  since TOOL-dWitnessedBar-23 seeded `gov-tester`, so AC1's "ten at base", which a correct build would
+  fail, reads the count the kit holds; S2 states the row's `src` form, probed; S1 notes HEAD's inline
+  load in `check_roles_install`. Unit 37's load and unit 49's `derive_seed_expected` were checked against
+  their specs, not HEAD, and unit 1's roster change against its S2 and S3; nothing else moved.
 
 ## 10. Reuse audit
 

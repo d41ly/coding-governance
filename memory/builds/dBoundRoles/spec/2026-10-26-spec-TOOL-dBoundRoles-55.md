@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-55 — unit 49's overlay check refuses an empty expected set, and ends where unit 19 moves the house files out of the kit
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -29,7 +29,7 @@ finding **id 40 at HIGH**, report item **H2**. Id 14 shares the item at HIGH and
 
 Id 40 is the failure-envelope face of the item: `TOOL-dBoundRoles-49` S3 claims a roster-to-plan tie it
 does not test, and the report's fix adds that it must "refuse an empty expected set rather than pass,
-and state what it checks after unit 19, or retire it there". `TOOL-dBoundRoles-19` S5 moves the ten
+and state what it checks after unit 19, or retire it there". `TOOL-dBoundRoles-19` S5 moves the
 `house/*.md` files out of the roles kit and keeps one seed path, `house/policy.toml`. From order 24 on
 the roles kit seeds no overlay, so a check that compares overlays either passes over an empty
 population or, on unit 54's roster side, reds on every role.
@@ -48,14 +48,24 @@ the files it moves. It repairs `TOOL-dBoundRoles-49` and builds one step after i
   (its §4 Files touched), deletes S3's compare and `derive_overlay_expected` in the same pass, as its
   consumes-from edge to this unit says. From then on the moved overlays are graded where they live,
   `.governance/instructions.toml`, by 19's own criteria. Observed by AC2.
-  **Readers:** by name: no product file spells the function's name at this unit's base, since unit 54
-  mints it at its pass; the files that spell it are
+  **Readers:** by name: no product file spells the function's name at HEAD, since unit 54 mints it at
+  its pass; a git grep of the tools tree for it printed nothing at commit a01362eb0. The live specs
+  that spell it are
   `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-54.md` (S1 mints it, its AC calls it),
-  `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-49.md:65` (the edge naming it as
-  S3's expected side) and `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-19.md:99`
-  (the edge that deletes it), and from unit 54's pass to unit 19's, `tools/govkit/selftest.py`, where
-  S3's compare is its one caller. by value: `tools/govkit/selftest.py`, S3's compare, the one reader of
-  the expected set, deleted in the same pass; nothing else reads it.
+  `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-49.md` (§3's hands-off edge to unit 54,
+  naming it as S3's expected side),
+  `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-19.md` (its §3 consumes-from edge to
+  this unit, the edge that deletes it),
+  `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-60.md` (S10, S19, S27, AC14 and AC17,
+  which restate this unit and unit 54), and
+  `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-63.md`,
+  `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-67.md` and
+  `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-68.md`, whose git pickaxe on the name
+  finds the commit unit 19's deletion makes. The reviews and build returns that spell it are frozen
+  records. From unit 54's pass to unit 19's, `tools/govkit/selftest.py` spells it, where S3's compare
+  is its one caller. by value:
+  `tools/govkit/selftest.py`, S3's compare, the one reader of the expected set, deleted in the same
+  pass; nothing else reads it.
 - **S3** — What S3 checks, written beside it. The check's comment states the population it reads, the
   three breaks of unit 54 §4's table it reds, that it refuses an empty set, and that unit 19 deletes it.
   Observed by AC3.
@@ -79,13 +89,16 @@ the files it moves. It repairs `TOOL-dBoundRoles-49` and builds one step after i
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at base `462d20f3` on 2026-10-26, and re-read at HEAD `a01362eb0` on 2026-11-22:
 
-- `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-19.md` S5 removes the ten
+- `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-19.md` S5 removes the
   `house/*.md` files and keeps `house/policy.toml` seeded; its §4 Files touched lists
-  `tools/govkit/selftest.py` for the OC8 checks.
-- `tools/govkit/selftest.py:6886-6891` attributes ten seed rows to the house overlays, the population S3
-  reads.
+  `tools/govkit/selftest.py` for the OC8 checks. Its S5 counts ten files, which HEAD holds eleven of
+  (`tools/roles/house/` at `a01362eb0`) and unit 1 moves again; S1 to S3 here read every overlay the
+  roster holds, whatever that count is.
+- `tools/govkit/selftest.py@c2b02d78:10439-10449` attributes the roles kit's seed rows to its house
+  overlays, ten at `:10440` and `house/gov-tester.md` at `:10449`, beside `house/policy.toml` at
+  `:10442`: the population S3 reads.
 
 ### Why delete at 19 rather than re-point
 
@@ -172,6 +185,13 @@ New arm: tools/govkit/selftest.py · covers AC1 · the empty-roster refusal, sta
 - rev-4 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds `tools/govkit/selftest.py`
   that §4 Files touched names, by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else
   moved.
+- rev-5 · 2026-11-22 · §1 · §2 · §4 · S2 · re-grounded at HEAD `a01362eb0` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-49-reground-f-brief`: §1 and §4 drop the "ten" house files, eleven
+  at HEAD since TOOL-dWitnessedBar-23 seeded `gov-tester`; `tools/govkit/selftest.py@2d4e0cc4:6886-6891` moves to
+  `@c2b02d78:10439-10449`; S2's reader list names unit 19's and unit 49's specs by their §3 edges, the
+  first at line 104 of blob 6129a29b, not `:99`, and the second no longer at `:65`, and gains specs 60,
+  63, 67 and 68, which a grep of HEAD found spelling the name, with the grep that shows no product file
+  does. Units 19, 49 and 54 were checked against their specs, not HEAD; nothing else moved.
 
 ## 10. Reuse audit
 

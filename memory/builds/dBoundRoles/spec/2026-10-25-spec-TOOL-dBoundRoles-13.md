@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-13 — inputs handed as content, each fact keyed and classed by the executor and re-cut fresh at act launch
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 10 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 10 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0178@f3b0d6ea whole
 
@@ -43,16 +43,23 @@ their parent had read before the dispatch (gap-roles-11), agents read their own 
   orientation card. Observed by AC2.
 - **S2** — The class: `derive_fact_class(key)` in `roles_lib.py` by §4 "The classes", so no agent
   types one. Observed by AC1.
-- **S3** — Inputs handed as content: `render_handoff` (`tools/roles/handoff.py:312`) renders each
-  `reads` value as a block holding a fact line `<!-- gov:fact key=<key> class=<class> -->` and then
-  the content. The two path inputs, `spec` and `prompt` (`PATH_INPUTS`, `handoff.py:99`), today handed
-  as the path string (`handoff.py:330-335`), hand the file's content keyed `record:<path>@<sha12>`; the
-  card's and the brief's values keep their content and gain their record key. `FACT_RE` in
-  `roles_lib.py` is the fact line's one grammar. Observed by AC1.
+- **S3** — Inputs handed as content: `render_handoff` (`tools/roles/handoff.py#render_handoff`)
+  renders each `reads` value as a block holding a fact line `<!-- gov:fact key=<key> class=<class> -->`
+  and then the content. `PATH_INPUTS` holds three inputs at HEAD, `spec`, `prompt` and `code`
+  (`tools/roles/handoff.py@ba4a9fad:132`): `code` is handed as the file's text since
+  PLAY-dOrderedCharter-27, and `spec` and `prompt` are still handed as the path string
+  (`tools/roles/handoff.py@ba4a9fad:554-561`). Those two hand the file's content keyed
+  `record:<path>@<sha12>`; `code` keeps its content and gains the key §8 F4 gives it, and so does the
+  `upstream:rows` value the `--upstream` rows file fills (`tools/roles/handoff.py@ba4a9fad:547-553`),
+  an input added after base; the card's and the brief's values keep their content and gain their
+  record key. The practices block and the card block PLAY-dOrderedCharter-21 and -8 place in the task
+  are no `reads` value and carry no fact line. `FACT_RE` in `roles_lib.py` is the fact line's one
+  grammar. Observed by AC1.
 - **S4** — Re-cut at the direct route's act launch: `checkHandoffSpawn`
   (`tools/hooks/agent-cap.js@935a910d:691-750`), after the task digest, reads every fact line of the task
   section through a JavaScript copy of `FACT_RE` and re-derives each `blob:` and `record:` key from
-  the bytes at the spawn, the card through scratch-guard's exported `readCard`. A key that moved
+  the bytes at the spawn, the card through scratch-guard's exported `readCard`
+  (`tools/hooks/scratch-guard.js#readCard`). A key that moved
   refuses, naming the key, the blob now at its source and the re-render that cuts it fresh. A `cmd:`
   key is covered by the task-sha and is not re-run. Observed by AC3.
 - **S5** — The same cut for a caller that is not the direct route: `python handoff.py facts --build
@@ -60,12 +67,15 @@ their parent had read before the dispatch (gap-roles-11), agents read their own 
   `[{name, key, class, text}]` `render_handoff` would hand, refusing as it refuses. Observed by AC4.
 - **S6** — The unit harness hands its brief and spec as content: `tools/workflows/unattended-unit.js`
   takes a required `facts` argument, the list S5 prints for `--input prompt=<briefPath> --input
-  spec=<specPath>`, and its prompt (`unattended-unit.js:257-266`) carries each as its content under
-  its key and class in place of "the BRIEF at <path> and the SPEC at <path>"; it refuses a `facts`
-  missing either input or naming a path other than `briefPath` or `specPath`. The build harness's
-  dispatch row (`tools/workflows/unattended-build.template.js:2470-2490`) adds `facts` to `perUnit`
-  and names the command that cuts it, which the main loop runs immediately before each unit's
-  `Workflow` call: that call is the unit's act launch. Observed by AC5.
+  spec=<specPath>`, and its prompt (`tools/workflows/unattended-unit.js@3aa27411:350-352`) carries
+  each as its content under its key and class in place of "the BRIEF at <path> and the SPEC at
+  <path>"; it refuses a `facts` missing either input or naming a path other than `briefPath` or
+  `specPath`, beside the `check` refusals of its other keys. `briefPath` stays, since the prompt's
+  `--brief` order hashes the brief at it. The build harness's dispatch object
+  (`tools/workflows/unattended-build.template.js@55695bb4:3162-3192`) adds `facts` to `perUnit` and
+  names the command that cuts it in a field beside `declare` and `resolvePathsWith`, the instructions
+  the main loop already runs before each unit's `Workflow` call; the cut runs immediately before that
+  call, after `declare`'s `--dispatch`, so the call is the unit's act launch. Observed by AC5.
 - **S7** — The callers and docs: the two Skill templates that dispatch the unit harness
   (`tools/roles/SKILL.template.md`, `tools/unattended/SKILL.template.md`), `tools/unattended/VERBS.template.md`'s
   dispatch section, `tools/workflows/README.md`, `tools/roles/README.md`'s handoff section and the
@@ -123,6 +133,8 @@ the `## Task` section, so the task-sha covers it.
 | the card's `task:` and `card:` values | `record:card/<sid>` | `claimed` |
 | a brief's `brief:` sub-head, `input:prompt`, `input:spec` | `record:<path>` | `claimed` |
 | a typed `--input` value (`question`, `diff`) | `cmd:` over the argument | `claimed` |
+| `input:code`, a file's whole text (§8 F4) | `blob:<path>@<blob12>:1-<n>` | `witnessed` |
+| `upstream:rows`, the `--upstream` rows file (§8 F4) | `record:<path>` | `claimed` |
 
 The rule reads the key and the source's own bytes, never an agent's word: P29's "the executor writes
 keys and classes, and no agent types one" (`layer-roles.md:249`). A spec's statements are `claimed`,
@@ -201,6 +213,8 @@ Live at landing on both routes.
   a line copied from that spec, a fact line whose key opens `record:` with the spec's path and whose
   class is `claimed`, and no line that is the path alone.
   Red when: the block hands the path string, as today, so the role must open the file.
+  fixture: the build `tFix` holds a brief record carrying `## The prompt` and `## The brief`, which
+  `gov-spec-writer`'s required `brief:` reads, `brief:prompt` among them, need to render at all.
 - **AC2** — When `python -c` calls `roles_lib.derive_fact_key` on a scratch file with LF endings and
   on a copy with CRLF endings, both `blob:` keys carry the first 12 hex digits `git hash-object` prints
   for the LF file.
@@ -246,10 +260,25 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC4 · a render and a `fa
   handed by path, unbuilt. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the most feature-rich
   survivor, on the dispatch row that already makes one main-loop call per unit
   (`unattended-build.template.js:2460`). widens: none · relaxes: none
+  At `a01362eb` that sentence is `tools/workflows/unattended-build.template.js@55695bb4:3153`, and the
+  dispatch object beside it carries `declare`, a command the main loop runs before each call, the
+  seam S6 extends.
 - **F3 — The parents this unit calls.** It calls no unbuilt parent: the renderer, the guard and the two
   harnesses exist at base `4ed9e567`, and TOOL-dBoundRoles-6's `role-sha` step precedes S4 in the
   guard's order. RESOLVED (agent, 2026-10-25, delegated): build on base; if TOOL-dBoundRoles-6 has not
   landed at the pass, S4 sits after the task digest alone, rung 1 (the build order the brief fixes).
+  widens: none · relaxes: none
+  At `a01362eb` the build order is fixed: TOOL-dBoundRoles-6 is order 9 and this unit order 10, so S4
+  follows unit 6's step, which its S6 places after the task digest and before the description step.
+- **F4 — Which key and class do the two `reads` inputs added after base carry?** `input:code`
+  (PLAY-dOrderedCharter-27) hands a file's whole text, and `upstream:rows` (the `upstream` family of
+  `READ_FAMILIES`) hands a rows file's text with the renderer's answer contract after it. Options: (a)
+  `input:code` as `blob:<path>@<blob12>:1-<n>`, `witnessed`, the tree's own bytes cut whole, and
+  `upstream:rows` as `record:<path>@<sha12>`, `claimed`, rows another item's producer wrote; (b) both
+  `record:` and `claimed`, as `input:spec` is; (c) neither keyed. (c) leaves two handed facts with no
+  key, against S3 and the clause; (b) types source code a claim, which P29 keeps for statements such as
+  a spec's. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the survivor that classes each by
+  its source as §4 "The classes" does; the contract text is the renderer's own and is not keyed.
   widens: none · relaxes: none
 
 ## 9. Revision log
@@ -263,18 +292,28 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC4 · a render and a `fa
   before the step S4 adds; the §7 leg line gains `format-guard self-test` and `policy fixtures`, the
   legs whose guards the Files touched paths `tools/hooks/agent-cap.js` and `tools/roles/roles_lib.py` trip.
 - rev-4 · 2026-11-22 · §2 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; nothing else moved.
+- rev-5 · 2026-11-22 · S3 · S4 · S6 · §4 · AC1 · §8 F2 F3 F4 · §10 · re-grounded at `a01362eb` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-15-reground-g-brief`: `PATH_INPUTS` holds `code` too, handed as
+  content already, and `upstream:rows` is a new `reads` value, so §4 "The classes" gains their two rows
+  (F4) and S3 says which task blocks carry no fact line; the build harness's dispatch row moved into its
+  `dispatch` object, whose `declare` field is the seam S6's cut sits beside; AC1's fixture names the
+  brief record `gov-spec-writer`'s required reads need; F3's order is fixed, and `derive_section_sha`'s
+  move into the library is checked against TOOL-dBoundRoles-6's spec; `tools/hooks/agent-cap.js` is
+  still blob `935a910d`; every other moved citation re-pointed to a symbol or a pinned line.
 
 ## 10. Reuse audit
 
-The seams extended: `render_handoff`'s reads walk (`tools/roles/handoff.py:330-396`), which already
-hands card, brief and argument values as content; `derive_section_sha` (`handoff.py:307-309`), the
-12-hex precedent; rule 6's `checkHandoffSpawn` (`tools/hooks/agent-cap.js@935a910d:691-750`), which already
+The seams extended: `render_handoff`'s reads walk (`tools/roles/handoff.py#render_handoff`), which
+already hands card, brief, code, rows and argument values as content; `derive_section_sha`, the 12-hex
+precedent, in the library by the time this unit builds (TOOL-dBoundRoles-6 S4, checked against that
+unit's spec); rule 6's `checkHandoffSpawn` (`tools/hooks/agent-cap.js@935a910d:691-750`), which already
 re-derives the task-sha at the spawn; scratch-guard's exported `readCard`; the unit harness's prompt
-(`tools/workflows/unattended-unit.js:257-266`) and the build harness's dispatch row. The blob-key
-primitive is `git hash-object` cut to 12 hex, as `verb_brief` hashes a brief (`tools/unattended/unattended.sh:13004`;
-scout B cites `:13029`, inside the same verb). `python tools/codebase-map/reuse_lookup.py "hand a work order's inputs as content
+(`tools/workflows/unattended-unit.js@3aa27411:350-352`) and the build harness's dispatch object with
+its `declare` field. The blob-key primitive is `git hash-object` cut to 12 hex, as `verb_brief` hashes
+a brief (`tools/unattended/unattended.sh#verb_brief`; scout B cited `:13029` at `4283cb44`, inside the
+same verb). `python tools/codebase-map/reuse_lookup.py "hand a work order's inputs as content
 keyed by the blob they were cut from"` ranked generic `key` stems and `read_blobs_at`
-(`tools/memory-tree/tree_lib.py`), a blob reader at a commit, which a kit may not import across kits;
+(`tools/memory-tree/tree_lib.py#read_blobs_at`), a blob reader at a commit, which a kit may not import across kits;
 no fact key exists to extend, so `derive_fact_key` is new, built on the `git hash-object` shape above.
 The recall probe returned this build's brief row and v2's P29 paragraph; neither disagreed with
 source.

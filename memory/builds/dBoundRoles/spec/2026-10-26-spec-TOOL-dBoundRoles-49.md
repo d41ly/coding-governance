@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-49 — govkit's default plan derives the seed rows it expects to preview from the plan model and the roles roster, so the third typed roles count cannot red late
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 5 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 5 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -28,9 +28,12 @@ The round-1 spec audit of the eight promoted specs 37 to 44
 finding **id 23 at HIGH**, report item **H2**. No other id shares the item.
 
 `TOOL-dBoundRoles-37` promises that no roster change leaves a typed count to red, and derives the two
-literals of `check_roles_install`. A third stays. `tools/govkit/selftest.py:6896-6898` checks
-`marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 14` on the default plan, and its comments at
-`:6886-6891` attribute ten of the fourteen to the roles kit's house overlays and one to `policy.toml`.
+literals of `check_roles_install`, which TOOL-dWitnessedBar-23 S6 already derives inline at HEAD
+(`tools/govkit/selftest.py@c2b02d78:3233-3251`) and unit 37 S3 routes through its function. A third
+stays. `tools/govkit/selftest.py@c2b02d78:10450-10453` checks
+`marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 15` on the default plan (`@c2b02d78:10451`).
+Its comments at `@c2b02d78:10439-10449` attribute ten of the fifteen to the roles kit's house overlays,
+one to `policy.toml` and one to `house/gov-tester.md` (`@c2b02d78:10440`, `:10442`, `:10449`).
 `TOOL-dBoundRoles-1` S2 seeds four new overlays and S3 merges two, so the count moves, and
 `TOOL-dBoundRoles-19` moves it again. The `govkit selftest` leg's guard covers nothing under
 `tools/roles/`, so a guarded run skips the leg and the red surfaces on a later, unrelated govkit change:
@@ -43,11 +46,11 @@ of it to the overlay set 37 derives. It repairs `TOOL-dBoundRoles-37` and builds
 ## 2. Scope (IN)
 
 - **S1** — The derivation, `derive_seed_expected(target, descs, selection)` in
-  `tools/govkit/selftest.py`: the rows `gk.planned_writes` (`tools/govkit/govkit.py:3988`) returns for the
-  target whose `kind` is `write`, whose `role` is `seed` and which are not `missing`. That is the one
-  predicate `cmd_plan` prints both seed marks from (`govkit.py:5048-5053`), so the preview and its
-  expectation cannot classify a row two ways. Observed by AC1.
-- **S2** — The seed check compares counts. The check at `:6896-6898` compares the printed
+  `tools/govkit/selftest.py`: the rows `gk.planned_writes` (`tools/govkit/govkit.py#planned_writes`) returns
+  for the target whose `kind` is `write`, whose `role` is `seed` and which are not `missing`. That is the
+  one predicate `cmd_plan` prints both seed marks from (`tools/govkit/govkit.py@327dd3f6:5011-5018`), so
+  the preview and its expectation cannot classify a row two ways. Observed by AC1.
+- **S2** — The seed check compares counts. The check at `selftest.py@c2b02d78:10450-10453` compares the printed
   `write|seed` and `KEEP|seed` sum with `len(derive_seed_expected(t2, descs, selection))`, the default
   target `t2` and the selection the default plan used. On failure it prints both figures and the derived
   rows per kit. The `ORDER|project-owned` half of the same check is not this unit's. Observed by AC1 and
@@ -59,11 +62,13 @@ of it to the overlay set 37 derives. It repairs `TOOL-dBoundRoles-37` and builds
 ## 3. Non-goals (OUT)
 
 - `derive_roles_expected` and the two checks of `check_roles_install`: `TOOL-dBoundRoles-37`'s, read here.
-- The `ORDER|project-owned == 34` literal beside the seed sum, and the `SIDE|rendered == 6` check above
-  it. Neither counts a roles file; the comments at `:6856-6895` record each as a measurement of the tree.
+- The `ORDER|project-owned == 34` literal beside the seed sum (`selftest.py@c2b02d78:10452`), and the
+  `SIDE|rendered == 6` check above it (`@c2b02d78:10410-10411`). Neither counts a roles file; the comments
+  at `@c2b02d78:10409-10449` record each as a measurement of the tree.
 - Widening the `govkit selftest` leg's guard to `tools/roles/`: `TOOL-dBoundRoles-37` §4 measured that it
-  reds `spec tokens` on nine specs this build does not own.
-- The comment block at `:6880-6895`, a dated changelog of past measurements, which stays true as history.
+  reds `spec tokens` on nine specs this build does not own (`TOOL-dBoundRoles-37` §4).
+- The comment block at `selftest.py@c2b02d78:10428-10449`, a dated changelog of past measurements, which
+  stays true as history.
 
 ### Edges
 
@@ -76,15 +81,23 @@ of it to the overlay set 37 derives. It repairs `TOOL-dBoundRoles-37` and builds
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at base `462d20f3` on 2026-10-26, and re-read at HEAD `a01362eb0` on 2026-11-22:
 
-- `tools/govkit/selftest.py:6810-6814` builds the default target `t2` and runs `plan` on it, `:6855`
-  measures its marks, and `:6896-6898` holds the typed sum.
-- `tools/govkit/govkit.py:5022-5053`: `cmd_plan` reads the descriptors, resolves the selection, calls
-  `planned_writes`, and prints `KEEP` for a `write` seed row whose destination exists, `write` otherwise.
-- `memory/DECISIONS.md:81`, `TOOL-dClosedLexicon-13`: a preview and the verb it previews classify with
-  one predicate, and the role alone is not it. Counting seed rules by role in the descriptors would be a
-  second predicate; S1 reads the plan model's.
+- `tools/govkit/selftest.py@c2b02d78:10363-10367` builds the default target `t2` with `build_target`, the
+  factory the suite imports from `tools/govkit/fixture_target.py#build_target` (`@c2b02d78:715`), applies
+  and then runs `plan` on it; `@c2b02d78:10408` measures its marks through `measure_plan_marks`
+  (`tools/govkit/selftest.py#measure_plan_marks`), and `@c2b02d78:10450-10453` holds the typed sum.
+- `tools/govkit/govkit.py#cmd_plan` (`@327dd3f6:4991-4994`) reads the descriptors, resolves the
+  selection and calls `planned_writes`; `@327dd3f6:5011-5018` prints `KEEP` for a `write` seed row whose
+  destination exists and the kind's mark, `write`, otherwise.
+- `tools/govkit/govkit.py#planned_writes` takes the gov root, the target, the target's deploy answers,
+  the descriptors, the selection and a `Report`, so S1 supplies the first, third and last itself.
+- `tools/govkit/selftest.py#govkit_module` is the engine the suite calls as `gk`, and importing the
+  suite as a library runs no case: `python -c "import sys; sys.path.insert(0,'tools/govkit'); import
+  selftest"` returned in under a second at `a01362eb0` with `FAILURES` empty.
+- `memory/DECISIONS.md@050b819f:83`, `TOOL-dClosedLexicon-13`: a preview and the verb it previews classify
+  with one predicate, and the role alone is not it. Counting seed rules by role in the descriptors would
+  be a second predicate; S1 reads the plan model's.
 
 ### Why two checks
 
@@ -133,8 +146,8 @@ Live at landing, at order 5. `TOOL-dBoundRoles-22` holds order 5 and writes no f
 ## 6. Acceptance criteria
 
 - **AC1** — When a `python -c` slice puts `tools/govkit` on `sys.path`, imports govkit's self-test module
-  as a library and runs no suite, the form units 40 and 43 use, builds a default target with its
-  `make_target(..., DEPLOY_REGISTRY_DEFAULT)`, runs `govkit.py plan` on it and prints
+  as a library and runs no suite, the form units 40 and 43 use, builds a default target with the suite's
+  `build_target(<scratch>, DEPLOY_REGISTRY_DEFAULT)`, runs `govkit.py plan` on it and prints
   `measure_plan_marks`'s `write|seed` plus `KEEP|seed` beside `len(derive_seed_expected(...))`, the two
   figures are equal; with one more `house/*.md` overlay seeded in a scratch copy of the roles kit, both
   rise by one.
@@ -152,7 +165,7 @@ Live at landing, at order 5. `TOOL-dBoundRoles-22` holds order 5 and writes no f
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC2 · the default plan's seed checks of S2 and S3, staged by restoring the literal `== 14` while a scratch roles copy seeds unit 1's four extra overlays, which reds the seed check · none
+New arm: tools/govkit/selftest.py · covers AC1 AC2 · the default plan's seed checks of S2 and S3, staged by restoring the typed literal the pass removes (`== 15` at `a01362eb0`, `tools/govkit/selftest.py@c2b02d78:10451`) while a scratch roles copy seeds unit 1's four extra overlays, which reds the seed check · none
 
 ## 8. Open questions
 
@@ -176,10 +189,19 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · the default plan's seed c
 - rev-4 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds `tools/govkit/selftest.py`
   that §4 Files touched names, by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else
   moved.
+- rev-5 · 2026-11-22 · §1 · §2 · §3 · §4 · §6 · §7 · §10 · AC1 · re-grounded at HEAD `a01362eb0` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-49-reground-f-brief`: the typed seed sum is `== 15`, not `== 14`,
+  since TOOL-dWitnessedBar-23 seeded `house/gov-tester.md`, and §1 names that third attribution; every
+  `selftest.py` citation moves from `:6810-6898` to `@c2b02d78:10363-10453`, the `cmd_plan` and
+  `planned_writes` citations to `govkit.py#cmd_plan` and `#planned_writes`, and `DECISIONS.md:81` to
+  `@050b819f:83`; AC1's `make_target` is the suite's `build_target` from `fixture_target.py`, and §4
+  states `planned_writes`' signature and the library import, both probed; the arm's staged literal is
+  the one HEAD holds. Unit 37's derivation and unit 1's roster change were checked against their specs,
+  not HEAD, and §1 adds that HEAD already derives unit 37's two checks inline; nothing else moved.
 
 ## 10. Reuse audit
 
-The seams are `gk.planned_writes` (`tools/govkit/govkit.py:3988`), the plan model `cmd_plan` prints from,
+The seams are `gk.planned_writes` (`tools/govkit/govkit.py#planned_writes`), the plan model `cmd_plan` prints from,
 and `TOOL-dBoundRoles-37`'s `derive_roles_expected`. `python tools/codebase-map/reuse_lookup.py "derive an expected seed row count from the kit descriptors instead of a literal"`
 ranked `rows`, `row`, `counts` and `seed`, none a plan-model count; the recall probe returned
 `TOOL-dClosedLexicon-13`, which rules the descriptor count out, and `TOOL-dBoundRoles-37`, whose

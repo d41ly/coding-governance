@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-17 — every work order's marker carrying `item=`, every return naming the work order it `answers`, today's population seeded
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 8 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 8 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0182@0cc5ed88 whole
 
@@ -36,21 +36,31 @@ it arms (the memory plan's `[sites]` work-order row and its `[gates]` "work orde
 
 - **S1** — The marker grammar with `item=` (I5): `<!-- gov:handoff role=<slot> build=<slug>
   unit=<id|-> item=<item.step.name|-> path=<rel> role-sha=<12hex> task-sha=<12hex> -->`. `MARKER_RE`
-  (`tools/roles/roles_lib.py:79-80`) and its JavaScript copy `HANDOFF_MARK_RE`
+  (`tools/roles/roles_lib.py#MARKER_RE`) and its JavaScript copy `HANDOFF_MARK_RE`
   (`tools/hooks/agent-cap.js@935a910d:646`) both take `item=` as an optional field between `unit=` and
   `path=`, so a marker written before this unit still parses, and both move to named groups. Observed
   by AC1 and AC2.
 - **S2** — Every reader reads by name, never by position: `check_handoff`
-  (`tools/roles/handoff.py:437-450`, today groups 4, 5 and 6), `print_agent_lines`
-  (`tools/roles/handoff.py:834-850`, groups 1 to 4), `scan_stand_in_declarations`
-  (`tools/roles/roles_lib.py:553-561`, groups 1 to 3) and `extractHandoffMarker`
-  (`tools/hooks/agent-cap.js@935a910d:651-658`, `m[1]` to `m[6]`), each returning an `item` beside the fields
-  it returned before. Observed by AC2.
-- **S3** — The writer: `render_handoff` takes an `item` argument and `handoff.py render` an
-  `--item <tag>` flag; the marker it writes always carries `item=`, the tag or `-` when none is given.
-  A tag outside `ITEM_VALUE_RE`, `^item(\.[a-z0-9][a-z0-9-]*){2,}$` (the `item.<step>.<name>` shape of
-  TOOL-dDeclaredLoop-9 S1, the adopter form `item.<step>.adopter.<name>` included), refuses with
-  exit 1 and writes nothing. Observed by AC1.
+  (`tools/roles/handoff.py#check_handoff`, today groups 4, 5 and 6), `print_agent_lines`
+  (`tools/roles/handoff.py#print_agent_lines`, groups 1 to 4), `scan_stand_in_declarations`
+  (`tools/roles/roles_lib.py#scan_stand_in_declarations`, groups 1 to 3), `read_handoff_edges`
+  (`tools/playbook/edge_grammar.py#read_handoff_edges`, groups 3 and 2, the work-order `serves`
+  edge PLAY-dOrderedCharter-28 S5 built, which imports `MARKER_RE` from the roles kit found by
+  `resolve_kit_dir`) and `extractHandoffMarker` (`tools/hooks/agent-cap.js@935a910d:651-658`, `m[1]` to
+  `m[6]`), each returning an `item` beside the fields it returned before. `readHandoffVia` in
+  `tools/hooks/format-guard.js` reads `extractHandoffMarker`'s `path` field by name and is unchanged;
+  `extract_prompt_marker`'s callers read `group(0)`, the whole line, and are unchanged. Observed by
+  AC2.
+- **S3** — The writer: `render_handoff` takes an `item` keyword argument, none by default, and
+  `handoff.py render` an `--item <tag>` flag; the marker it writes always carries `item=`, the tag or
+  `-` when none is given. A tag outside `ITEM_VALUE_RE`, `^item(\.[a-z0-9][a-z0-9-]*){2,}$` (the
+  `item.<step>.<name>` shape of TOOL-dDeclaredLoop-9 S1, whose segment is `SEG`,
+  `tools/loop/loop_lib.py@f69b2287:211`, the adopter form `item.<step>.adopter.<name>` included),
+  refuses with exit 1 and writes nothing. Observed by AC1.
+  **Readers:** by name: `tools/roles/handoff.py` (`main`, the one caller passing it);
+  `tools/roles/render_agents.py` (the selftest's handoff arm) and `tools/roles/adopt-roles.test.sh`
+  (two embedded calls), which pass none, so their markers carry the dash · by value: NO VALUE READERS — the marker's
+  readers are S2's list.
 - **S4** — The `answers` line (I14): a record return carries `**Answers:** <work order path>
   task-sha=<12hex>` among its header lines beside `**Serves:**`; a harness return carries a required
   schema field `answers` holding the same value. `ANSWERS_RE` and `derive_answers_value(path,
@@ -103,7 +113,7 @@ Measured over gov at `4283cb44` on 2026-10-25 (PINNED; the pass re-derives each 
 
 | Population | Predicate | Today | Graded |
 |---|---|---|---|
-| handoffs | a file `<MEMORY_ROOT>/builds/<slug>/prompts/<date>-prompt-<id>-<n>-<tail>[-<suffix>].md` whose `<tail>` is a catalogue role's slot without `gov-`, the name `derive_prompt_name` (`tools/roles/handoff.py:297-305`) writes | 536 of 1297 prompt records; all 536 marked, none with `item=` | marker present, `item=` present |
+| handoffs | a file `<MEMORY_ROOT>/builds/<slug>/prompts/<date>-prompt-<id>-<n>-<tail>[-<suffix>].md` whose `<tail>` is a catalogue role's slot without `gov-`, the name `derive_prompt_name` (`tools/roles/handoff.py#derive_prompt_name`) writes | 536 of 1297 prompt records; all 536 marked, none with `item=` | marker present, `item=` present |
 | returns | a record under `<MEMORY_ROOT>/builds/<slug>/build/` whose `**Serves:**` kind is `research` and whose text names exactly one handoff's path | 213; none with `**Answers:**` | `**Answers:**` naming that handoff, its `task-sha` equal to the handoff marker's |
 
 The other 761 prompt records are mandates, packets and briefs (`build-brief` 239, `spec-brief` 33,
@@ -174,6 +184,7 @@ Live at landing on the `roles catalogue` leg, which runs `check_roles.py`.
 - `tools/hooks/agent-cap.js`
 - `tools/hooks/agent-cap.test.sh`
 - `tools/hooks/README.md`
+- `tools/playbook/edge_grammar.py` (`read_handoff_edges`, by name)
 - `memory/project/work-order-legacy.txt` (written by the seed)
 
 ### Alternatives rejected
@@ -235,7 +246,7 @@ Live at landing on the `roles catalogue` leg, which runs `check_roles.py`.
 
 ## 7. Gates
 
-`roles catalogue` · `roles adopter self-test` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles adopter self-test` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `playbook render selftest` · `govkit acceptance matrix` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC3 AC4 AC6 · a planted unmarked handoff and a planted return with a wrong `task-sha` after the fixture's seed · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC2 · a rule-6 case whose prompt carries the marker with `item=`, beside the existing six-field cases kept as the legacy shape · none
@@ -267,6 +278,9 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC2 · a rule-6 case whose prom
   tree. RESOLVED (agent, 2026-10-25, delegated): the build run re-grounds on each at the pass and stops
   the unit if a called section is still absent then, rung 1 (the brief's rule for DEFERRED parents).
   widens: none · relaxes: none
+  At `a01362eb` both are built: the unregistered seed is
+  `tools/memory-tree/legacy_ledger.py#run_seed_cli`, each `{out}` in its argv replaced, and the item
+  tag's step-and-segment shape is `tools/loop/loop_lib.py@f69b2287:600`.
 
 ## 9. Revision log
 
@@ -280,21 +294,32 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC2 · a rule-6 case whose prom
   code unchanged in behaviour; the §7 leg line gains `format-guard self-test` and `policy fixtures`,
   the legs whose guards the Files touched paths `tools/hooks/agent-cap.js` and `tools/roles/roles_lib.py` trip.
 - rev-4 · 2026-11-22 · §2 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; nothing else moved.
+- rev-5 · 2026-11-22 · S1 · S2 · S3 · §4 · §7 · §8 F4 · §10 · re-grounded at `a01362eb` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-15-reground-g-brief`: S2 gains `read_handoff_edges` in the
+  playbook kit, a positional reader of `MARKER_RE` added after base, and names the two readers that
+  read by name already; S3 makes `item` a keyword argument and lists `render_handoff`'s three other
+  callers; the leg line gains `playbook render selftest` and `govkit acceptance matrix`, whose guards
+  hold `tools/playbook/edge_grammar.py`; F4's two parents are built and cited; `tools/hooks/agent-cap.js` is still blob `935a910d`,
+  so its citations stand; every roles-kit and memory-tree line citation re-pointed to a symbol or a
+  pinned line; `render_handoff`'s earlier change by TOOL-dBoundRoles-15 S6 was checked against that
+  unit's spec and leaves the marker untouched.
 
 ## 10. Reuse audit
 
-The seams extended: `MARKER_RE` (`tools/roles/roles_lib.py:79-80`), the one Python marker grammar,
-and its JavaScript copy `HANDOFF_MARK_RE` (`tools/hooks/agent-cap.js@935a910d:646`); the marker writer in
-`render_handoff` (`tools/roles/handoff.py:420-421`); `derive_prompt_name`
-(`tools/roles/handoff.py:297-305`), whose name grammar is the handoff predicate; R15's scan of
-`prompts/` (`scan_stand_in_declarations`, `tools/roles/roles_lib.py:543-562`), the precedent for a
-`check_roles.py` rule over handoff records; TOOL-dWitnessedBar-15 S4's seed form for the population.
+The seams extended: `MARKER_RE` (`tools/roles/roles_lib.py#MARKER_RE`), the one Python marker
+grammar, and its JavaScript copy `HANDOFF_MARK_RE` (`tools/hooks/agent-cap.js@935a910d:646`); the
+marker writer in `render_handoff` (`tools/roles/handoff.py@ba4a9fad:709-710`); `derive_prompt_name`
+(`tools/roles/handoff.py#derive_prompt_name`), whose name grammar is the handoff predicate; R15's
+scan of `prompts/` (`tools/roles/roles_lib.py#scan_stand_in_declarations`), the precedent for a
+`check_roles.py` rule over handoff records; TOOL-dWitnessedBar-15 S4's seed form for the population,
+`tools/memory-tree/legacy_ledger.py#run_seed_cli`.
 `python tools/codebase-map/reuse_lookup.py "mark a handoff with the item it serves and bind a return
 to its work order"` ranked `derive_serves` (`tools/runlog/record.py`), `extract_prompt_marker` and
-`read_bindings` (`tools/memory-tree/tree_lib.py:471`) first. `read_bindings` reads a record's header
+`read_bindings` (`tools/memory-tree/tree_lib.py#read_bindings`) first. `read_bindings` reads a record's header
 bindings, and R16 does not call it: the roles kit imports no sibling kit, so `ANSWERS_RE` reads the one
 `**Answers:**` line itself, as `MARKER_RE` reads the marker. Scout B's line numbers (read at
-`748b309f`) match source at `4283cb44`. The recall probe returned scout B's row, the brief's row and the night pass's
+`748b309f`) matched source at `4283cb44`; at `a01362eb` each roles-kit citation had moved and is
+re-read above. The recall probe returned scout B's row, the brief's row and the night pass's
 instrument line showing the work-order site once gained `act=` beside `item=` and kept `item=` alone;
 none disagreed with source.
 

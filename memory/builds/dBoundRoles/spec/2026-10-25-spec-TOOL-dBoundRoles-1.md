@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0166@83615023 whole
 
@@ -65,42 +65,58 @@ had no spawn in 60 days and two double up (gap-roles-07), and no check keeps cor
   `layer`, a `layer.<seg>` tag naming a `[[layer]]` row of `tools/playbook/layers.toml`
   (PLAY-dOrderedCharter-16 S1), and `acts-as`, `item` or `cycle`, both required on every role and graded
   by R2 in `tools/roles/check_roles.py`, whose summary line counts the roles per layer and per `acts-as`
-  value. Observed by AC1 and AC2.
+  value. The role kind's factory, `write_role` (`tools/loop/factories.py#write_role`), writes both keys
+  from two required flags, `--layer` and `--acts-as`, beside the `never` and `return` flags
+  TOOL-dBoundRoles-2 gives it, and the kind's `usage` row in `tools/playbook/kinds.toml` names them
+  (§8 F8). Observed by AC1 and AC2.
 - **S2** — The core roster, per §4 "### The roster": the four new role files
   `tools/roles/agents/gov-prompt-writer.agent.md`, `gov-planner.agent.md`, `gov-architect.agent.md` and
   `gov-reviewer.agent.md`, each with its body, `never`, `return`, its `BODY_CEILINGS` row and an empty
-  house overlay seeded in `tools/roles/kit.toml`; `gov-tester` (TOOL-dWitnessedBar-23) gaining the two
-  fields; every existing role file gaining them. Observed by AC2.
+  house overlay seeded in `tools/roles/kit.toml`; `gov-tester` (TOOL-dWitnessedBar-23, landed as
+  `tools/roles/agents/gov-tester.agent.md`) gaining the two fields; every existing role file gaining
+  them. Observed by AC2.
 - **S3** — The reviewers merged into `gov-reviewer`, one reviewer with a lens per step (RL-1): the slots
   `gov-spec-reviewer` and `gov-diff-reviewer` leave gov's catalogue, every gov key they held re-keyed in
   this unit, per §4 "### The merge".
   **Readers:** by name: `tools/roles/workflows.toml`, `tools/roles/house/policy.toml`,
-  `tools/roles/kit.toml`, `tools/roles/check_roles.py`, `tools/roles/README.md`, `tools/workflows/README.md`,
-  `tools/workflows/tier2-review.test.sh`, `tools/workflows/unattended-build.test.sh`, the rendered
-  `AGENTS.md` and `.claude/roles.json`, and the files `tools/roles/agents/gov-spec-reviewer.agent.md`,
+  `tools/roles/kit.toml`, `tools/roles/check_roles.py`, `tools/roles/README.md`, `tools/workflows/kit.toml`
+  (its two `[[drive]]` rows), `tools/workflows/README.md`, `tools/workflows/tier2-review.test.sh`,
+  `tools/workflows/unattended-build.test.sh`, the rendered `AGENTS.md` (its roster and drive regions),
+  `help/reference/drive.md`, `.claude/roles.json`, `.claude/agents/gov-spec-reviewer.md` and
+  `.claude/agents/gov-diff-reviewer.md`, `.governance/install.json` (receipt rows the landing rewrites),
+  and the files `tools/roles/agents/gov-spec-reviewer.agent.md`,
   `tools/roles/agents/gov-diff-reviewer.agent.md`, `tools/roles/house/gov-spec-reviewer.md` and
   `tools/roles/house/gov-diff-reviewer.md` · by value: `print_harness_args`
-  (`tools/roles/handoff.py:453`), whose `{key: slot}` map every review harness call passes as
-  `args.roles`, and `checkHarnessCall` (`tools/hooks/agent-cap.js@935a910d:759`), which admits each value only
-  as an agent-true role of the index; both read the re-keyed rows and need no edit. Observed by AC3.
+  (`tools/roles/handoff.py#print_harness_args`), whose `{key: slot}` map every review harness call passes
+  as `args.roles`, and `checkHarnessCall` (`tools/hooks/agent-cap.js@935a910d:759`), which admits each
+  value only as an agent-true role of the index (`@935a910d:772-776`); both read the re-keyed rows and
+  need no edit. Observed by AC3.
 - **S4** — Two workflow entries, `plan` (roles `gov-planner`) and `design` (roles `gov-architect`), in
-  `tools/roles/workflows.toml`, and `WORKFLOW_NAMES` (`tools/roles/check_roles.py:90`) holding them, so R7
-  and R8 hold for both new slots; `gov-prompt-writer` is listed by the `handoff` entry. Observed by AC2.
+  `tools/roles/workflows.toml`, each placed by a `[[workflow]]` row of the loop definition
+  `tools/loop/loop.toml` at order 0, steps `step.plan` and `step.design` (§8 F9), which R6 joins both
+  ways (`tools/roles/check_roles.py@abcde1da:345-360`), and `WORKFLOW_NAMES`
+  (`tools/roles/check_roles.py#WORKFLOW_NAMES`) holding them, so R6, R7 and R8 hold for both new slots.
+  The three edits are the ones the `workflow` kind's factory writes
+  (`tools/loop/factories.py#write_workflow`). `gov-prompt-writer` is listed by the `handoff` entry. Observed by AC2.
 - **S5** — The expansion roles and lenses registered through their layer contracts: `roles` and
   `lenses` lists on the `[[layer]]` rows of `tools/playbook/layers.toml`, `gov-deployer` on
   `layer.distribution` and `layer.integrations`, `gov-maintainer` and the lenses `maintenance-run` and
-  `loop` on `layer.observability`, graded by `check_layer_roles` in `tools/playbook/check_layers.py`, per
-  §4 "### The registration". No role file defines either role. Observed by AC4.
+  `loop` on `layer.observability`, graded by `check_layer_roles` in `tools/playbook/check_layers.py`,
+  which `check_layers` (`tools/playbook/check_layers.py#check_layers`) calls, per §4 "### The
+  registration". No role file defines either role. Observed by AC4.
 - **S6** — The role index carries each role's `layer` and `acts-as`, rendered by `render_roles_index`
-  (`tools/roles/render_agents.py:207`). Observed by AC5.
+  (`tools/roles/render_agents.py#render_roles_index`). Observed by AC5.
 - **S7** — The P28 matrix arm, `check_item_roles` in `tools/loop/loop_items.py`, called by
-  TOOL-dDeclaredLoop-24 S4's `check_item_composition` over the composition its S3 builds, gov's rows as
-  patched and the repository's rows alike: an item whose actor `role:<slot>` names a role an expansion
-  registers or whose index `layer` is an expansion row, and any item whose actor names a `cycle` role,
-  is a refusal naming the item and the role. Observed by AC6.
+  `check_item_composition` (`tools/loop/loop_items.py#check_item_composition`, TOOL-dDeclaredLoop-24 S4)
+  over the composed rows `run_check` hands it, gov's rows as patched and the repository's rows alike: an
+  item whose actor `role:<slot>` names a role an expansion registers or whose declared `layer` is not a
+  core row, and any item whose actor names a `cycle` role, is a refusal naming the item and the role. It
+  reads each role from the catalogue `check_item_composition` already takes (§8 F7). Observed by AC6.
 - **S8** — The renders: `.claude/agents/` and `.claude/roles.json` by `render_agents.py --write`, the
-  catalogue region of `tools/roles/README.md` by `check_roles.py --write`, and the roster region of
-  `AGENTS.md` by the playbook render, which prints `handoff.py roster`. Observed by AC5.
+  catalogue region of `tools/roles/README.md` by `check_roles.py --write`, the roster and drive regions
+  of `AGENTS.md` by the playbook render, which prints `handoff.py roster` and the kits' `[[drive]]` rows,
+  and `help/reference/drive.md` and `help/reference/kinds.md` by `render_playbook.py --reference`.
+  Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -116,6 +132,7 @@ had no spawn in 60 days and two double up (gap-roles-07), and no check keeps cor
   item: TOOL-dBoundRoles-20's. This unit's arm reads the same composition, repository rows included.
 - The prompt writer's job and its authorship key: TOOL-dBoundRoles-4's. Its file here carries a body
   stating the job the roster names and nothing a later unit decides.
+- `[[drive]]` rows for the three new slots (§8 F10); the two reviewer rows are re-keyed, not added.
 
 ### Edges
 
@@ -151,29 +168,36 @@ had no spawn in 60 days and two double up (gap-roles-07), and no check keeps cor
 The twelve are layer-roles `[roster]`'s core rows, slots per the brief's D6. `gov-session` is the
 thirteenth file and no roster role: its layer is Runtime's, which owns its retirement (§8 F2). The
 planner and the architect write `records`, so R14 demands their `output` name `{{MEMORY_ROOT}}/`
-(`tools/roles/check_roles.py:99-101`). The prompt writer writes nothing in this unit; its writes are
-TOOL-dBoundRoles-4's to set. Each new body states the role's job from layer-roles `[roster]` and
-roles.md RL-1 to RL-8 and keeps every limit in `never` (TOOL-dBoundRoles-2 S3). `BODY_CEILINGS` gains
+(`tools/roles/check_roles.py#WRITE_FOLDERS`, compared at `@abcde1da:268-272`). The prompt writer writes
+nothing in this unit; its writes are TOOL-dBoundRoles-4's to set. Each new body states the role's job
+from layer-roles `[roster]` and roles.md RL-1 to RL-8 and keeps every limit in `never`
+(TOOL-dBoundRoles-2 S3). `BODY_CEILINGS` (`tools/roles/check_roles.py#BODY_CEILINGS`) gains
 `gov-prompt-writer`, `gov-planner` and `gov-architect` at 3072 and `gov-reviewer` at 4096, the
-reviewers' ceiling at base, until TOOL-dBoundRoles-15 makes the ceiling a role field.
+reviewers' ceiling at `a01362eb0`, until TOOL-dBoundRoles-15 makes the ceiling a role field.
 
 ### The merge
 
-| Key | Base | After |
+| Key | At `a01362eb0` | After |
 |---|---|---|
 | `workflows.toml` `spec-write`, `spec-review` roles and `specFinder` | `gov-spec-reviewer` | `gov-reviewer` |
 | `workflows.toml` `closing-review` roles and `diffFinder` | `gov-diff-reviewer` | `gov-reviewer` |
-| `house/policy.toml` `[effort.roles]` | `gov-spec-reviewer = "medium"`, `gov-diff-reviewer = "high"` | `gov-reviewer = "high"` |
-| `house/policy.toml` `[effort.stages.spec-review]`, `[effort.stages.spec-write]` | no `specFinder` row | `specFinder = "medium"` |
+| `house/policy.toml` `[effort.roles]` | `gov-spec-reviewer = "medium"`, `gov-diff-reviewer = "medium"` | `gov-reviewer = "medium"` |
+| `tools/workflows/kit.toml` `[[drive]]` rows of `spec-review` and `closing-review` | the two slots | `gov-reviewer` |
 | `kit.toml` seed list, `house/` | the two overlays | `house/gov-reviewer.md` |
-| `BODY_CEILINGS` | two rows | one `gov-reviewer` row |
+| `BODY_CEILINGS` | two rows at 4096 | one `gov-reviewer` row at 4096 |
 
-Every stage's resolved level is unchanged: `handoff.py stage-efforts spec-review` prints `specFinder`
-at `medium` before and after, and `closing-review` prints `diffFinder` at `high`
-(`tools/roles/house/policy.toml:11-13`, `:17-23`). The two base overlays are empty at `4ed9e567`, so
-nothing of gov's text is lost; an adopter's filled overlay is TOOL-dBoundRoles-18's to carry. The
-review harness's stage keys stay, and `harness-args tier2-review` now maps both finder keys to one
-slot, which `print_harness_args` admits because each key still maps to one role.
+Every stage's resolved level is unchanged, because the two reviewers hold one level
+(`tools/roles/house/policy.toml@339f54fa:13`, `:15`) and no `[effort.stages]` table keys a finder:
+`handoff.py stage-efforts spec-review` prints `specFinder` at `medium` before and after, and
+`closing-review` prints `diffFinder` at `medium`, both measured at `a01362eb0`. The base split, the
+diff reviewer at `high` at `4ed9e567`, no longer stands, so the two `specFinder` stage rows rev-5 added
+to keep it apart are not written. The profile `[effort.profiles.fable]` keys no role. The two overlays
+are empty at `a01362eb0`, so nothing of gov's text is lost; an adopter's filled overlay is
+TOOL-dBoundRoles-18's to carry. The review harness's stage keys stay, and `harness-args tier2-review`
+now maps both finder keys to one slot, which `print_harness_args` admits because each key still maps to
+one role. The two drive rows' tags move to `drive.spec-review.gov-reviewer` and
+`drive.closing-review.gov-reviewer`, which only `help/reference/drive.md` spells, rendered by
+`read_drive_reference_rows` (`tools/playbook/render_playbook.py#read_drive_reference_rows`).
 
 ### The registration
 
@@ -193,28 +217,43 @@ roles = ["gov-deployer"]
 
 `layer.integrations` carries `roles = ["gov-deployer"]` too: the deployer acts for both, release notes
 for distribution and verify judgment for integrations (layer-roles `[roster]`). `check_layer_roles`
-adds four reds to the layer contract's conformance gate (PLAY-dOrderedCharter-16 S3), each naming the
-row or file: a `roles` or `lenses` list on a `core` row; an entry outside the `seg` shape; a role file
-under the roles kit whose slot an expansion row registers and whose `layer` is not one of the
-registering rows; and a role file whose slot no expansion registers and whose `layer` names a non-core
-row. Each role's slot and `layer` are read as JSON data from `.claude/roles.json`, the index S6
-renders, so the playbook kit neither imports the roles kit ("A kit may not import a sibling kit",
+adds four reds to `check_layers`' contract reds (PLAY-dOrderedCharter-16 S3), the leg
+`layer dependencies (the core never depends on an expansion)`, each naming the row or file: a `roles`
+or `lenses` list on a `core` row; an entry outside the `seg` shape; a role file under the roles kit
+whose slot an expansion row registers and whose `layer` is not one of the registering rows; and a role
+file whose slot no expansion registers and whose `layer` names a non-core row. Each role's slot and
+`layer` are read as JSON data from `.claude/roles.json` at the checked root, the index S6 renders, so
+the playbook kit neither imports the roles kit ("A kit may not import a sibling kit",
 PLAY-dOrderedCharter-7 §4 "The policy reads") nor types a role grammar (§8 F6). An index older than
 its role files is the `roles render wiring` leg's red; with no index the role half prints `unarmed`.
+`--list`'s row line (`tools/playbook/check_layers.py@b68f9e5c:442-444`) gains the row's `roles`.
+
+The check reads only its own register beside it, so the plants live in its fixture mode:
+`build_layers_fixture` (`tools/playbook/check_layers.py#build_layers_fixture`) writes three rows of its
+own, `layer.core`, `layer.core.map` and the expansion `layer.exp`, and gains two plants. `role-on-expansion`
+puts `roles = ["gov-builder"]` on `layer.exp` and writes a fixture `.claude/roles.json` holding
+`gov-builder` at `layer.core`; `roles-on-core` puts a `roles` list on `layer.core`. Each joins `PLANTS`
+and a row of the plant heredoc `tools/playbook/adopt-playbook.sh` runs (`@b05a8294:233-270`).
 
 ### The item arm
 
 ```
-check_item_roles(items, index, layers) -> list of refusals
+check_item_roles(items, roles, layers) -> list of refusals
   for each item of the composition (TOOL-dDeclaredLoop-24 S3) whose actor is role:<slot>:
       "item <tag> names role.<slot>, which <layer> registers as an expansion role"  when an expansion row's roles holds <slot>
-      "item <tag> names role.<slot>, whose layer <layer> is not core"                 when index.roles[<slot>].layer is not a core row
-      "item <tag> names role.<slot>, a cycle role, which acts in no item"            when index.roles[<slot>].acts-as is cycle
+      "item <tag> names role.<slot>, whose layer <layer> is not core"                 when roles[<slot>].keys.layer is not a core row
+      "item <tag> names role.<slot>, a cycle role, which acts in no item"            when roles[<slot>].keys.acts-as is cycle
 ```
 
-`index` is `.claude/roles.json`, the generated contract the loop kit already reads beside the roles
-kit, never a role file; `layers` is `layers.toml`. An actor naming no role of the index is the actor
-arm's refusal (layer-roles `[matrix]` arm 1), unchanged here. `items` is the composition
+`roles` is the catalogue `check_item_composition` already takes, `roles_lib.load_roles` reached
+through `read_role_defaults` (`tools/loop/loop_lib.py#read_role_defaults`), so the arm reads each
+role's `layer` and `acts-as` as its role file declares them and reads no second file (§8 F7). `layers`
+is the register's `[[layer]]` rows with their `kind` and `roles`, read in `run_check` from the
+`layers.toml` that `read_layer_tags` resolves (`tools/loop/loop_lib.py#read_layer_tags`), which returns
+the tags alone. An actor naming no role file prints `pending` in `check_item_declarations`
+(`tools/loop/loop_lib.py#check_item_declarations`) and is no refusal; the first case reads the
+register, so `role:gov-deployer`, which no role file defines, is refused by its registration alone.
+`items` is the composition
 `check_item_composition` grades, gov's `[[item]]` rows as their pinned patches leave them and the
 overlay's repository rows (`item.<step>.adopter.<name>`), and every check of TOOL-dDeclaredLoop-24 S4
 runs over it (its S3). Every row is an item of the core loop, so the arm grades each one and skips
@@ -222,16 +261,26 @@ none: a repository item naming an expansion role binds the core loop to an expan
 would, and an `amends` of a gov item's actor is graded as composed. layer-roles `[matrix]` (FA-4):
 "every arm reads the composition, never gov's rows alone".
 
+The `check` verb reads the tree it sits in, so the arm's plants are two `PLANTS` and `CASES` rows of
+`loop_items.py` (`tools/loop/loop_items.py@a28dd711:93-138`), written by `write_fixture_plant` over the
+scratch `build_scratch_tree` copies from this working tree (`tools/loop/loop_items.py#build_scratch_tree`):
+`role-layer`, AC6's three items, owing exit 1, and `role-core`, the same items acting as
+`role:gov-builder`, owing exit 0. Each planted item carries no `inputs`, `allowance` or `returns` of its
+own, so `check_item_declarations` refuses nothing of it.
+
 ### Inventory
 
 Minted: the keys `layer` and `acts-as`; the slots of S2; the workflow names `plan` and `design`; the
-layer-row keys `roles` and `lenses`; `check_layer_roles` and `check_item_roles`. Naming cells: each
-function is asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass.
+layer-row keys `roles` and `lenses`; `check_layer_roles` and `check_item_roles`; the factory flags
+`--layer` and `--acts-as`; the plants `role-on-expansion` and `roles-on-core` of `check_layers.py` and
+`role-layer` and `role-core` of `loop_items.py`. Naming cells: each function is asked of
+`python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass.
 
 ### Migration
 
 An adopter's own role file lacking `layer` and `acts-as` reds R2 on update; the roles README states
-both. The reviewers' rename in an adopter is TOOL-dBoundRoles-18's step.
+both, and a role the factory writes passes the two flags. The reviewers' rename in an adopter is
+TOOL-dBoundRoles-18's step.
 
 ### Rollout
 
@@ -248,10 +297,17 @@ Live at landing on the `roles catalogue` leg; the new agent types reach a sessio
 - `tools/roles/workflows.toml`
 - `tools/roles/README.md`
 - `tools/playbook/layers.toml`
-- `tools/playbook/check_layers.py`
-- `tools/loop/loop_items.py`
+- `tools/playbook/check_layers.py` (`check_layer_roles`, the `--list` row line, two plants)
+- `tools/playbook/adopt-playbook.sh` (two plant rows)
+- `tools/playbook/kinds.toml` (the `kind.role` usage row)
+- `tools/loop/loop_items.py` (`check_item_roles`, two plants)
+- `tools/loop/loop.toml` (two `[[workflow]]` rows)
+- `tools/loop/factories.py` (`write_role`'s two flags, the `role-new` argv and the `role-hand` plant)
+- `tools/workflows/kit.toml` (two `[[drive]]` rows re-keyed)
+- `help/loop.md` (the role factory's usage line)
+- `help/reference/drive.md` and `help/reference/kinds.md` (rendered by `render_playbook.py --reference`)
 - `.claude/agents/` and `.claude/roles.json` (rendered by `render_agents.py --write`)
-- `AGENTS.md` (its roster region, rendered by the playbook render from `coding-governance-agents.template.md`)
+- `AGENTS.md` (its roster and drive regions, rendered by the playbook render from `coding-governance-agents.template.md`)
 
 ### Alternatives rejected
 
@@ -270,61 +326,68 @@ Live at landing on the `roles catalogue` leg; the new agent types reach a sessio
 - error / empty / loading states — a layer register the roles kit cannot resolve makes R2's layer
   join a note, never a pass; the item arm with no items prints `unarmed`.
 - observability — `check_roles.py`'s summary line counts roles by layer and by `acts-as` (S1).
-- risks — the AGENTS.md roster grows by three lines, which the template's size gate reads through the
-  render; the review harness keeps two finder keys on one slot, which the lens per step needs.
+- risks — the AGENTS.md roster grows by two lines, eleven to thirteen (PINNED: `handoff.py roster`
+  prints eleven at `a01362eb0`), which the template's size gate reads through the render; each new
+  roster line sits under the 200-character `roster-line` budget the same verb warns on; the review
+  harness keeps two finder keys on one slot, which the lens per step needs.
 - testing — each criterion is a probe or a scratch copy of the kit; the arms in §7 are observed RED
   then GREEN by the main loop at the close.
 - migration — adopter role files need the two fields, as §4 Migration says.
-- user docs — none owed: no page under `help/` lists the roster; `tools/roles/README.md` does.
+- user docs — `help/loop.md` gains the factory's two flags on its role usage line
+  (`help/loop.md@bba26063:1320`); `help/reference/drive.md` and `help/reference/kinds.md` re-render from the re-keyed drive rows and
+  the `kind.role` usage row; no page under `help/` lists the roster, which `tools/roles/README.md` does.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python check_roles.py --root <repo>` runs from a scratch copy of `tools/roles/` whose
-  `gov-builder.agent.md` carries `layer: layer.nowhere` and whose `gov-skeptic.agent.md` carries
-  `acts-as: helper`, it exits 1 with two R2 lines naming them; over the tree it exits 0.
+- **AC1** — When `python check_roles.py --root <repo>` runs in the `roles/` of a scratch tool root
+  holding copies of `tools/roles/` and `tools/loop/` side by side, whose `gov-builder.agent.md` carries
+  `layer: layer.nowhere` and whose `gov-skeptic.agent.md` carries `acts-as: helper`, it exits 1 with two
+  R2 lines naming them; over the tree it exits 0.
   Red when: `layer` is graded by shape alone, so a tag naming no layer row passes.
+  fixture: measured at `a01362eb0`, a copy of `tools/roles/` alone exits 1 on R6, "no loop kit places
+  the workflows" (`read_workflow_order` in `tools/roles/roles_lib.py`), and with `tools/loop/` beside it
+  exits 0.
 - **AC2** — When `python check_roles.py` runs in `tools/roles/` over the tree, its summary counts 12
   roles at `layer.roles` and one at `layer.runtime`, and `python handoff.py roster` prints a line for
   each of `gov-prompt-writer`, `gov-planner`, `gov-architect` and `gov-reviewer`.
   Red when: a new slot has no workflow entry listing it, so R8 reds it.
-  figure: the 12 and the 1 are PINNED from layer-roles `[roster]`, counting `gov-tester` once
-  TOOL-dWitnessedBar-23 has landed; the check derives them.
+  figure: the 12 and the 1 are PINNED from layer-roles `[roster]`, counting `gov-tester`, whose role
+  file TOOL-dWitnessedBar-23 has landed at `a01362eb0`; the check derives them.
 - **AC3** — When `git grep -nE 'gov-(spec|diff)-reviewer' -- tools/roles` runs, it prints nothing, and
   `python handoff.py stage-efforts spec-review` and `python handoff.py stage-efforts closing-review`
-  print `specFinder` at `medium` and `diffFinder` at `high`, as at base.
-  Red when: the merged effort row sets one level for both finders, so the spec audit's finder moves to
-  `high`.
-- **AC4** — When `python check_layers.py` runs in `tools/playbook/` over a scratch copy of
-  `layers.toml` carrying `roles = ["gov-builder"]` on `layer.distribution`, it exits 1 naming
-  `gov-builder`, a core role file registered by an expansion; with `roles` on the `layer.roles` row it
-  exits 1 naming the core row; over the tree it exits 0 with `gov-deployer` and `gov-maintainer`
-  registered.
+  print `specFinder` at `medium` and `diffFinder` at `medium`, as at `a01362eb0`.
+  Red when: the merged effort row takes a level neither reviewer held, such as `high`, so both finders'
+  levels move.
+- **AC4** — When `python check_layers.py --fixture --plant role-on-expansion` runs in `tools/playbook/`,
+  it exits 1 naming `gov-builder`, a core role file registered by an expansion row; with
+  `--plant roles-on-core` it exits 1 naming the fixture's core row; and `python check_layers.py --list`
+  over the tree exits 0, its row lines naming `gov-deployer` and `gov-maintainer`.
   Red when: the registration is read by nobody, so either plant passes.
 - **AC5** — When `python render_agents.py --write` runs in `tools/roles/`, `.claude/roles.json` holds
   `layer` and `acts-as` for every role, `gov-prompt-writer` at `cycle`, and no
   `gov-spec-reviewer` or `gov-diff-reviewer` agent file remains under `.claude/agents/`.
   Red when: the stale owned types are left beside `gov-reviewer`, which the renderer's ownership rule
   unlinks.
-- **AC6** — When `python loop_items.py check` runs in the loop kit's directory over a fixture loop definition
-  holding one item with `actor = "role:gov-deployer"` and one with `actor = "role:gov-prompt-writer"`,
-  and an overlay adding the repository item `item.build.adopter.ship` with `actor = "role:gov-deployer"`,
-  it exits 1 with three refusals: the first and the third naming `layer.distribution`, the third naming
-  `item.build.adopter.ship`, the second naming a cycle role; with all three actors set to
-  `role:gov-builder` it exits 0.
-  Red when: the arm reads the actor's slot without the index, or reads gov's rows alone, so an expansion
-  role passes.
-  fixture: the loop kit is TOOL-dDeclaredLoop-24's and is absent at `4ed9e567`; the build run
-  re-grounds on its fixture mode.
+- **AC6** — When `python loop_items.py --fixture --plant role-layer` runs in `tools/loop/`, its scratch
+  definition holding one item with `actor = "role:gov-deployer"` and one with
+  `actor = "role:gov-prompt-writer"`, and its overlay adding the repository item
+  `item.build.adopter.ship` with `actor = "role:gov-deployer"`, it exits 1 with three refusals: the
+  first and the third naming `layer.distribution`, the third naming `item.build.adopter.ship`, the second
+  naming a cycle role; with `--plant role-core`, all three actors set to `role:gov-builder`, it exits 0.
+  Red when: the arm reads the actor's slot without the register and the catalogue, or reads gov's rows
+  alone, so an expansion role passes.
+  fixture: the loop kit landed with its fixture mode, `--fixture --plant <case>`
+  (`run_fixture` in `tools/loop/loop_items.py`); its scratch copies this working tree's loop, playbook,
+  memory-tree, policy and roles kits, so it holds the built `layers.toml` and role files.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit acceptance matrix` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
-
-The loop kit's leg `loop item kind` (TOOL-dDeclaredLoop-24 S8) runs S7's arm once that build lands;
-it is not in the manifest at base, so it is named here in prose.
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit acceptance matrix` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `layer dependencies (the core never depends on an expansion)` · `loop item kind` · `loop definition` · `loop factories fixtures` · `loop stage coverage` · `help reference pages` · `instruction render (one renderer of record)` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 · a fixture kit planting a layer tag naming no row and an `acts-as` outside the two values, each one R2 line · none
-New arm: tools/playbook/adopt-playbook.sh · covers AC4 · the playbook-render selftest runs `check_layers.py` over a fixture register planting a core role on an expansion row and a `roles` list on a core row · none
+New arm: tools/playbook/adopt-playbook.sh · covers AC4 · two rows of its layer-check plant heredoc, `role-on-expansion` and `roles-on-core`, each owing exit 1 and the line naming the role or the core row · none
+New arm: tools/loop/loop_items.py · covers AC6 · two `CASES` rows of its `check --selftest`, `role-layer` owing exit 1 and a refusal naming `layer.distribution`, `role-core` owing exit 0 · none
+New arm: tools/loop/factories.py · covers none · the `role-new` row's argv gains `--layer layer.roles --acts-as item`, staged by dropping either flag, which reds R2 · none
 
 ## 8. Open questions
 
@@ -358,15 +421,54 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC4 · the playbook-render s
   section this unit calls and stops the unit if one is still absent then; `gov-tester` gains the two
   fields only where its file has landed, rung 1, the brief's rule for unbuilt parents.
   widens: none · relaxes: none
+  Observed at `a01362eb0`: all three have landed, `tools/playbook/layers.toml`,
+  `tools/playbook/check_layers.py`, `tools/loop/loop_items.py` and `tools/roles/agents/gov-tester.agent.md`
+  present, so no stop is owed.
 - **F6 — How does `check_layers.py`, a playbook-kit module, read each role's slot and `layer`?** A kit
   may not import a sibling kit (PLAY-dOrderedCharter-7 §4 "The policy reads"; TOOL-dDeclaredLoop-12 S4).
   Options: (a) read `.claude/roles.json`, the generated index S6 renders with `layer` per role, as
   JSON data; (b) a roles-kit print verb run as a subprocess through the inline `resolve_kit_dir`;
   (c) a declared `requires_if` row on the playbook kit's descriptor naming `roles`, keeping the
-  import, the shape of `tools/memory-tree/kit.toml:8`. (b) adds a verb that prints what the index
+  import, the shape of `tools/memory-tree/kit.toml@f835ca7c:9`. (b) adds a verb that prints what the index
   already holds, and (c) keeps the one in-process sibling read the rule refuses. Rev-2 imported
   `roles_lib.load_roles`, which the rule rules out. RESOLVED (agent, 2026-10-26, delegated): (a),
   rung 1, PLAY-dOrderedCharter-7 §4 and F4's choice that the loop kit reads the same index.
+  widens: none · relaxes: none
+  Re-read at `a01362eb0`: `check_layers.py` imports the memory-tree kit's `import_walk`
+  (`tools/playbook/check_layers.py@b68f9e5c:106-108`); (a) adds no second sibling import.
+- **F7 — The item arm was to read `.claude/roles.json`, "the generated contract the loop kit already
+  reads"; at `a01362eb0` the loop kit reads no index and takes the roles through `roles_lib.load_roles`
+  (`tools/loop/loop_lib.py#read_role_defaults`), which `check_item_composition` already receives.
+  Which does the arm read?** Options: (a) the catalogue `check_item_composition` is handed, each role's
+  `layer` and `acts-as` as its file declares them; (b) the index, through a new JSON read in the loop
+  kit, with the fixture's scratch rendering an index it does not hold today (`build_scratch_tree`
+  copies kit directories only). (b) adds a reader and a fixture step for a fact the arm already holds.
+  RESOLVED (agent, 2026-11-22, delegated): (a), rung 1, the loop kit's own read at HEAD; S6 still
+  renders both keys into the index, F4's additive shape for TOOL-dBoundRoles-6.
+  widens: none · relaxes: none
+- **F8 — The role factory writes every front-matter key, and R2 will demand two more; how does it
+  write them?** `write_role` (`tools/loop/factories.py#write_role`) renders `roles_lib.FRONT_MATTER_KEYS`
+  from its flags. Options: (a) two required flags, `--layer` and `--acts-as`; (b) fixed values,
+  `layer.roles` and `item`. (b) files every factory role as a core item role, so a cycle role is
+  written wrong and passes. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the most
+  feature-rich survivor, the shape `2026-11-22-prompt-TOOL-dBoundRoles-2-spec-fix-1-brief` gives unit 2's
+  `never` and `return` flags; the `role-new`
+  argv passes `--layer layer.roles --acts-as item`, and the `role-hand` plant carries both keys so its
+  R2 stays the missing `writes` it names.
+  widens: none · relaxes: none
+- **F9 — R6 joins every workflow entry to a `[[workflow]]` row of `tools/loop/loop.toml` both ways;
+  what order and step do `plan` and `design` take?** Options: (a) order 0, any-time, at `step.plan`
+  and `step.design`, the shape of `research` (`tools/loop/loop.toml@9c303e80:249-252`); (b) build
+  orders in the stage sequence, which renumbers the rows from 1 to 7 and the `/build` Skill's stages.
+  (b) moves every stage number for two roles that run no `/build` stage. RESOLVED (agent, 2026-11-22,
+  delegated): (a), rung 3, tie-broken by the smaller change.
+  widens: none · relaxes: none
+- **F10 — Do the three new slots get `[[drive]]` rows?** `check_drive`
+  (`tools/playbook/instruction_units.py#check_drive`) reds a workflow role with no row, is wired to no
+  leg, and already reds `gov-tester` at `a01362eb0`. Options: (a) re-key the two reviewer rows only;
+  (b) also add rows for the three. (b) needs a command for each, and `plan` and `design` have harness
+  `none` while the prompt writer's verb is TOOL-dBoundRoles-4's. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3,
+  tie-broken by fewer open questions.
   widens: none · relaxes: none
 
 ## 9. Revision log
@@ -385,18 +487,33 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC4 · the playbook-render s
   `resolveHarnessEntry` (TOOL-aGuardedEffort-1) and its `args.roles` admission is unchanged, so S3's sentence
   stands; by `2026-11-22-prompt-TOOL-dBoundRoles-14-spec-tokens-a-brief`; nothing else moved.
 - rev-5 · 2026-11-22 · §2 · §9 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; each figure the re-ground wrote carries a pin on its line; nothing else moved.
+- rev-6 · 2026-11-22 · S1 S3 S4 S5 S6 S7 S8 · §3 · §4 · §5 · AC1 AC2 AC3 AC4 AC6 · §7 · §8 F5 F6 F7 F8 F9 F10 · §10 ·
+  re-grounded at HEAD `a01362eb0` by `2026-11-22-prompt-TOOL-dBoundRoles-1-reground-e-brief`. Both
+  reviewers sit at `medium`, so the merged row is `medium`, the `specFinder` stage rows go and AC3 reads
+  `diffFinder` at `medium`. The parents landed (F5): AC4 and AC6 run the landed fixture modes, and
+  AC1's scratch carries `tools/loop/` for R6. S4 gains the `loop.toml` rows (F9), S1 the role factory
+  (F8), S3 the drive rows and rendered readers (F10), and S7 reads the loop kit's role catalogue (F7). The leg line gains the eleven legs the new files reach,
+  `loop item kind` among them and four guarded by `tools/workflows/kit.toml`. Claims about `role-schema.toml`, `never` and `return` were checked
+  against TOOL-dBoundRoles-2's spec, not HEAD, and the `role.<slot>` members against
+  TOOL-dBoundRoles-14, CLOSED at `7a58950fb`.
 
 ## 10. Reuse audit
 
-The seams extended are the role catalogue, `load_roles` (`tools/roles/roles_lib.py:330`), R2, R7 and
-R8 with `BODY_CEILINGS` and `WORKFLOW_NAMES` (`tools/roles/check_roles.py:85-91`, `:184-196`,
-`:315-337`), `render_roles_index` (`tools/roles/render_agents.py:207`) and the roster print
-`print_roster` (`tools/roles/handoff.py:491`), each verified at `4ed9e567`; the parents are
-PLAY-dOrderedCharter-16's layer register and TOOL-dDeclaredLoop-24 S4's composition check, both DEFERRED.
+The seams extended are the role catalogue, `load_roles` (`tools/roles/roles_lib.py#load_roles`), R2,
+R6, R7 and R8 with `BODY_CEILINGS` and `WORKFLOW_NAMES` (`tools/roles/check_roles.py@abcde1da:100-107`,
+`:201-213`, `:345-384`), `render_roles_index` (`tools/roles/render_agents.py#render_roles_index`), the
+roster print `print_roster` (`tools/roles/handoff.py#print_roster`), the kinds' factories `write_role`
+and `write_workflow` (`tools/loop/factories.py#write_role`, `tools/loop/factories.py#write_workflow`), each verified at
+`a01362eb0`. The parents have landed: PLAY-dOrderedCharter-16's register and its check
+(`tools/playbook/check_layers.py#check_layers`, with its fixture `tools/playbook/check_layers.py#build_layers_fixture`) and
+TOOL-dDeclaredLoop-24 S4's composition check (`tools/loop/loop_items.py#check_item_composition`, with
+its plants through `tools/loop/loop_items.py#run_fixture`). At `4ed9e567`
 `python tools/codebase-map/reuse_lookup.py "check that core items name only core roles by layer"`
-ranked generic `check` stems, `load_roles` and `render_role`, and named no layer join, the expected
-answer: no `layers.toml` and no `tools/loop/` exist at base. The recall probe returned the brief row,
-scout A's row, layer-roles `[roster]` at `:461` and the gap register's gap-roles-14; scout A cites
-`print_roster` at `:491` and `render_catalogue_region` at `:130-141`, which agree with source.
+ranked generic `check` stems, `load_roles` and `render_role`, and named no layer join, since no
+`layers.toml` and no `tools/loop/` existed then; the seams above are the ones HEAD added. The recall
+probe returned the brief row, scout A's row, layer-roles `[roster]` at `:461` and the gap register's
+gap-roles-14; scout A's `print_roster` at `:491` and `render_catalogue_region` at `:130-141` held at
+`4ed9e567` and sit at `tools/roles/handoff.py@ba4a9fad:828` and `tools/roles/check_roles.py@abcde1da:146`
+at `a01362eb0`.
 
 Recall terms used: `python tools/memory-recall/query.py "how is the role roster sorted into core and expansion layers" --terms "roster core roles expansion roles deployer maintainer layer acts-as reviewer merge P28 matrix"`
