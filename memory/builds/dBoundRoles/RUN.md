@@ -74,3 +74,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T05:56:45Z draw · re-dispatch · TOOL-dBoundRoles-2 · 10/122 · 20261122T055645Z-2d4969
 
 2026-11-22T05:56:45Z dispatch · item 85a3f6e4 TOOL-dBoundRoles-2 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-22T06:14:47Z brief · item TOOL-dBoundRoles-1 · reason 2cf4ade16200 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-1-build-brief.md
