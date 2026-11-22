@@ -13868,6 +13868,11 @@
       "file": "tools/loop/loop_items.py"
     },
     {
+      "id": "derive_record_kind",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "derive_record_name",
       "kind": "function",
       "file": "tools/memory-tree/build_records.py"
@@ -30801,6 +30806,11 @@
       "id": "render_twin",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "render_unarmed_line",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "render_under_schema",

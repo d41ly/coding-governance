@@ -299,7 +299,12 @@ kind, or `[]` beside `readers-none`, the reason no role reads it; `lifecycle`, o
 `{ text, source }`, one line of at most `PURPOSE_BYTES` bytes, cited `<path>:<line>` or `owner`, or
 `{ pending = "<id>" }` (TOOL-dTotalRecall-16). The four columns
 `home`, `lifecycle`, `readers` (or `readers-none`) and `layer` are REQUIRED on every row, as are
-`name`, `tag`, `schema`, `writer`, `check` and `purpose`; `root` and `sections` are admitted for their owners.
+`name`, `tag`, `schema`, `writer`, `check` and `purpose`; `root`, `sections` and `cardinality` are admitted
+for their owners, and `unarmed`, set by hand on a typed kind's `fields` or `fence` row whose home holds no
+record yet, is the reason its unarmed line gives, naming the writer that will arm it (TOOL-dTotalRecall-42):
+red on an untyped row, on any other form, as an empty or non-string value, and once the row grades a
+record. A tracked-path home names its records' glob: one ending in `/`, or one with no `**` segment for
+which `<glob>/**` lists a tracked file, names a directory, which `:(glob)` reads as no file, and is red.
 A `pending` is graded by the policy key `memory.map-purpose`: under `review`, its default, an open
 ask of a tracked `BACKLOG.md`; under `ledger` `purpose-pending`, the node a row of that ledger
 population, which the repository setting `ledger` registers; under `derive` `none-found`; under
@@ -326,16 +331,20 @@ kit's `SERVES_ALIASES` is held to it.
 | `--print-purpose-pending` | prints the `purpose-pending` population, `<node> TAB 1` per registry row pending on it and per chain row with no purpose, for `legacy_ledger.py seed` |
 | `--seed-legacy` | prints the `record-kinds-legacy` population, `<path> TAB <row name> TAB 1` per record a `fields` row grades, for `legacy_ledger.py seed` |
 | `--print-gap-keys` | the `gap-key` native class's members, the first cells of every tracked gap register; exit 3 where none is tracked |
-| `--fixture [--plant <case>]` | builds a throwaway repository and runs `--check` there, its registry holding a typed `stream-plan` `fence` row and one well-formed plan of two streams; the `stream-unordered`, `stream-empty`, `stream-order-text`, `stream-unit-twice`, `stream-fence-missing` and `stream-validator-missing` plants each red the plan or the row; `--selftest` asserts every plant red and `new`'s two `fence` refusals |
+| `--fixture [--plant <case>]` | builds a throwaway repository and runs `--check` there, its registry holding a typed `stream-plan` `fence` row and one well-formed plan of two streams; the `stream-unordered`, `stream-empty`, `stream-order-text`, `stream-unit-twice`, `stream-fence-missing` and `stream-validator-missing` plants each red the plan or the row; `unarmed-reason` prints the stream-plan row's key on its unarmed line, `unarmed-with-record` and `unarmed-untyped` red the key beside a plan and on the `research` row, `home-slash` and `home-directory` red a directory home, and `shared-home` grades a `log` record under the research home by the `log` row alone; `--selftest` asserts every plant red and `new`'s two `fence` refusals |
 
 A typed kind's row grades only the records its `build_records.py` name grammar matches, so a
-`…-probe-design.md` its glob also matches falls to the `research` row. A typed kind with no record
-yet prints `<kind>: unarmed — no record yet` and passes; any other empty population reds. A `fence`
+`…-probe-design.md` its glob also matches falls to the `research` row. An untyped `fields` row grades a
+record its home admits unless the record's Serves kind names another row whose home admits it too
+(`derive_record_kind`), so `spec-audit` and `diff-review`, sharing one home, each grade their own; such a
+record is counted `<kind> <n> graded <m> legacy <k> other-kind`, and a home every record of which is
+another kind's reds nothing. A typed kind with no record yet prints `<kind>: unarmed — no record yet`,
+then `; <reason>` from its row's `unarmed` key, and passes; any other empty population reds. A `fence`
 row's records are graded by its validator, each red prefixed `row <kind>: <path>:` and the row counted
 `<kind> fence <n> graded`; the `stream-plan` kind's, `check_stream_plan`, reds a missing or unparseable
 fence, a stream with no units, a unit with no `order` or one that is no whole number the spec header's
 `· order <n>` grammar reads, and a unit id in two streams, and while no plan exists its unarmed line
-names dIndexedDesign's planner as its writer. The step
+gives the reason its row's `unarmed` key holds. The step
 gate's `record-kind-schema` class holds `<kind>.<field>` per field of every row, so a removed field is
 a vanished member; `journal.Serves`, which left with the rename, is named by a `[[retired]]` row of
 the govkit registry. What it does not check: whether a `writer` writes its kind, a field's value, a

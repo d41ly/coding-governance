@@ -18,14 +18,17 @@
 
 ONE DECLARATION PER KIND. `record-kinds.toml` beside this file holds one `[[record-kind]]` row per
 record kind, its columns `name`, `tag`, `layer`, `home`, `id-rule`, `schema`, `writer`, `readers`,
-`readers-none`, `lifecycle`, `check` and `purpose`; `root` and `sections` are admitted for the units that
-add them. Every row carries `name`, `tag` (`record.<name>`), `layer` (a `layer.<name>` tag, the
+`readers-none`, `lifecycle`, `check` and `purpose`; `root`, `sections`, `cardinality` and `unarmed` are
+admitted for the units that add them. Every row carries `name`, `tag` (`record.<name>`), `layer` (a `layer.<name>` tag, the
 layer of the kit whose writer writes the kind), `home`, `schema`, `writer`, `readers`, `lifecycle`
 (one of `LIFECYCLES`), `check` and `purpose`. `purpose` is `{ text, source }`, one line of at most
 `PURPOSE_BYTES` and its source `<path>:<line>`, a tracked path and a line in it, or `owner`; or
 `{ pending = "<id>" }`, which `memory.map-purpose` grades. `home` is one glob or a list of them, each a tracked-path glob,
 a ref glob `refs/gov/<glob>` or `<git-common-dir>/<glob>`; a `fields` row's is one tracked glob, the
-population it grades. `readers` lists the work-order read keys a handoff fills from a record of the
+population it grades. A tracked-path glob never names a directory: one ending in `/`, or one with no `**`
+segment for which `<glob>/**` lists a tracked file, is red (TOOL-dTotalRecall-42 S4). `unarmed`, on a typed
+kind's `fields` or `fence` row alone, is the non-empty reason its empty home reads unarmed, naming the
+writer that will arm it, and is red once the row grades a record. `readers` lists the work-order read keys a handoff fills from a record of the
 kind, each a member of the roles kit's `READ_KEYS` that some role's `reads:` names; a kind no role
 reads carries `readers = []` and a non-empty `readers-none` reason. `schema` is
 `{ form, fields, source, validator }`: `form` one of `fields`, `header`, `rows`, `generated`, `fence`;
@@ -60,14 +63,17 @@ a `**Key:**` line, bare or a `- **Key:**` bullet, in the row's order, except a r
 `record-kinds-legacy` ledger lists against that row, each ledger row's section read through
 `tree_lib.resolve_kind`, so the rows keyed `journal` stand for the `log` row with their bytes kept.
 A typed kind's row grades only the paths its name grammar (`build_records.derive_record_name`) also
-matches, and a path a typed grammar matches is graded by that kind's row alone. A typed kind whose home
-matches nothing prints `<kind>: unarmed — no record yet` and passes; any other empty population
-reds. THE FENCE ARM, `check_fence_records`, runs each `fence` row's resolved validator over every
+matches, and a path a typed grammar matches is graded by that kind's row alone. An untyped row grades a
+path its home admits unless `derive_record_kind` names another row, the row of the record's Serves kind
+when that row's home admits the path too; such a path is counted `other-kind` (TOOL-dTotalRecall-42 S5).
+A typed kind whose home matches nothing prints `render_unarmed_line`'s `<kind>: unarmed — no record yet`,
+then `; <unarmed>` where its row carries the key, and passes; any other empty home reds, read before the
+Serves kind narrows it. THE FENCE ARM, `check_fence_records`, runs each `fence` row's resolved validator over every
 tracked record its home matches, narrowed as a `fields` row's is, each red prefixed `row <kind>: <path>:`
 and the row counted `<kind> fence <n> graded`; a validator that does not resolve is one red of the row
 and grades nothing. `check_stream_plan` is the `stream-plan` kind's: its one TOML fence of `[[stream]]`
-tables, each unit's `order` read by the spec header verb's grammar, and its unarmed line names its
-writer (`STREAM_PLAN_UNARMED`). A graded deviation's `Follow-through: gap <key>` must name a key some tracked gap register
+tables, each unit's `order` read by the spec header verb's grammar, and its row's `unarmed` key names its
+writer. A graded deviation's `Follow-through: gap <key>` must name a key some tracked gap register
 holds, and no register holding a key reds. The HYGIENE template's `gen:record-kinds` region must be
 byte for byte what `--write` writes. THE POCKET ARM, `check_pockets`, lists the top-level entries of
 the common git dir (the inline `common_git_dir` block), skips git's own (`GIT_OWN`), and reds each
@@ -87,7 +93,8 @@ ask, a row of a tracked `<memory root>/builds/*/BACKLOG.md` no `CLOSED` or `WONT
 `ledger` `purpose-pending` and the node a row of that `[[ledger]]` population, a listed node now
 carrying a text red; under `derive` `none-found`; under `refuse` no pending at all. No policy kit
 reads the default `review` with one line saying so; a refused read exits 2 naming the key. It prints one
-count line naming every row, each `fields` kind's graded and legacy counts, each `unarmed` kind, the
+count line naming every row, each `fields` kind's graded and legacy counts and an untyped one's
+other-kind count, each `unarmed` kind with its reason, the
 purpose line, one `view` line per row, each pocket entry with the row it matched, and every red with
 its row.
 
@@ -160,7 +167,8 @@ LEGACY = "record-kinds-legacy"
 REGION_OPEN, REGION_CLOSE = "<!-- gen:record-kinds -->", "<!-- /gen:record-kinds -->"
 COLUMNS = ("name", "tag", "layer", "home", "id-rule", "schema", "writer", "readers", "readers-none", "lifecycle",
            "check", "purpose")
-LATER_COLUMNS = ("root", "sections", "cardinality")   # TOOL-dTotalRecall-19's, -9's and -22's, admitted and graded by their owners
+#: TOOL-dTotalRecall-19's, -9's, -22's and -42's, admitted and graded by their owners; `render_row` writes none
+LATER_COLUMNS = ("root", "sections", "cardinality", "unarmed")
 REQUIRED = ("name", "tag", "layer", "home", "schema", "writer", "readers", "lifecycle", "check", "purpose")
 #: TOOL-dTotalRecall-16 S1: a purpose's one line, in UTF-8 bytes (PINNED, the cap that spec sets).
 PURPOSE_BYTES = 120
@@ -369,9 +377,11 @@ def derive_home_globs(home) -> list[str]:
     return [h for h in home if isinstance(h, str)] if isinstance(home, list) else []
 
 
-def check_home(home, at: str, form) -> list[str]:
+def check_home(home, at: str, form, root) -> list[str]:
     """The reds of one row's `home`: one glob or a non-empty list, each a tracked-path glob, `refs/gov/<glob>`
-    or `<git-common-dir>/<glob>`; a `fields` row's one tracked glob."""
+    or `<git-common-dir>/<glob>`; a `fields` row's one tracked glob. A tracked-path glob naming a directory
+    is red (TOOL-dTotalRecall-42 S4): one ending in `/`, or one with no `**` segment for which `<glob>/**`
+    lists a tracked file at `root`, since `:(glob)` reads a directory as no file at all."""
     if not (isinstance(home, str) or (isinstance(home, list) and home and all(isinstance(h, str) for h in home))):
         return [f"{at}: `home` is neither a glob nor a non-empty list of globs"]
     globs = derive_home_globs(home)
@@ -386,6 +396,9 @@ def check_home(home, at: str, form) -> list[str]:
             reds.append(f"{at}: home {g!r} is none of a tracked-path glob, `{REF_HOME}<glob>` or `{COMMON_DIR_HOME}<glob>`")
         elif form == "fields" and (lead or not isinstance(home, str)):
             reds.append(f"{at}: a `fields` row's home {g!r} is not one tracked-path glob, the population it grades")
+        elif not lead and (g.endswith("/") or ("**" not in g.split("/") and read_tracked(root, g + "/**"))):
+            reds.append(f"{at}: home {g!r} names a directory, which `:(glob)` reads as no file: name the glob of "
+                        f"its records")
     return reds
 
 
@@ -416,7 +429,8 @@ def check_row(row: dict, n: int, legs: set, root, tool_rel: str) -> list[str]:
     if isinstance(row.get("lifecycle"), str) and row["lifecycle"] not in LIFECYCLES:
         reds.append(f"{at}: the column `lifecycle` {row['lifecycle']!r} is not one of {', '.join(LIFECYCLES)}")
     if "home" in row:
-        reds += check_home(row["home"], at, (row.get("schema") or {}).get("form") if isinstance(row.get("schema"), dict) else None)
+        reds += check_home(row["home"], at, (row.get("schema") or {}).get("form") if isinstance(row.get("schema"), dict) else None,
+                           root)
     readers, none_why = row.get("readers"), row.get("readers-none")
     if "readers" in row and not (isinstance(readers, list) and all(isinstance(r, str) and r for r in readers)):
         reds.append(f"{at}: `readers` is not a list of read keys")
@@ -509,26 +523,73 @@ def read_leg_names(root, tool_rel: str) -> set | None:
 
 
 # -------------------------------------------------------------------------------- the population
-def scan_legacy_records(root, rows: list[dict], typed_kinds) -> dict:
+def derive_record_kind(path: str, text: str, rows: list[dict]) -> dict | None:
+    """TOOL-dTotalRecall-42 S5: the row of the record's Serves kind, where one of that row's tracked-path
+    globs admits `path`; None otherwise. The kind is the first token of the first `**Serves:**` line
+    `tree_lib.BIND_RE` matches in the first `BIND_HEAD_LINES` unfenced lines, when it is a member of
+    `RECORD_KIND_TOKENS` or a `KIND_ALIASES` key, read through `resolve_kind`. A glob admits a path
+    segment by segment under `fnmatch.fnmatchcase`, the segment counts equal: `:(glob)`'s reading of a
+    glob with no `**`."""
+    import itertools
+    from tree_lib import BIND_HEAD_LINES, BIND_RE, KIND_ALIASES, RECORD_KIND_TOKENS, resolve_kind, unfenced
+    kind = None
+    for line in itertools.islice(unfenced(text.replace("\r\n", "\n")), BIND_HEAD_LINES):
+        m = BIND_RE.match(line)
+        if m and m.group("key") == "Serves":
+            toks = m.group("rest").split()
+            if toks and (toks[0] in RECORD_KIND_TOKENS or toks[0] in KIND_ALIASES):
+                kind = resolve_kind(toks[0])
+            break
+    if kind is None:
+        return None
+    segs = path.split("/")
+    for row in rows:
+        if row.get("name") != kind:
+            continue
+        for g in derive_home_globs(row.get("home")):
+            parts = g.split("/")
+            if (not g.startswith((COMMON_DIR_HOME, REF_HOME)) and len(parts) == len(segs)
+                    and all(fnmatch.fnmatchcase(s, p) for s, p in zip(segs, parts))):
+                return row
+    return None
+
+
+def scan_legacy_records(root, rows: list[dict], typed_kinds, other_kind: dict | None = None) -> dict:
     """`{row name: [path...]}`: every tracked record each `fields` row's home matches. A typed kind's row
     keeps only the paths its own name grammar (`build_records.derive_record_name`) also matches, and a
     path some typed grammar matches is kept for that kind's row alone (§8 F8), so a `…-probe-design.md`
-    or an `…-acceptance-ledger.md` its glob matches falls to the untyped rows. The population S4 grades
+    or an `…-acceptance-ledger.md` its glob matches falls to the untyped rows. An untyped row keeps a path
+    only where `derive_record_kind` returns that row or None (TOOL-dTotalRecall-42 S5), each path it drops
+    listed under the row's name in `other_kind` where the caller passes one. The population S4 grades
     before the legacy ledger takes its rows out, and what `--seed-legacy` prints."""
     from build_records import derive_record_name
     grammars = {k: derive_record_name(k) for k in typed_kinds}
+    decided = {}   # path -> its Serves kind's admitting row, one head read per path across the rows
     out = {}
     for row in rows:
         schema = row.get("schema") if isinstance(row.get("schema"), dict) else {}
         home = row.get("home")
         if schema.get("form") != "fields" or not isinstance(home, str) or not home.strip():
             continue
-        name, keep = row.get("name"), []
+        name, keep, other = row.get("name"), [], []
         for path in read_tracked(root, home):
             typed = [k for k, g in grammars.items() if g.search(path)]
-            if (name in typed) if name in grammars else not typed:
-                keep.append(path)
+            if name in grammars:
+                if name in typed:
+                    keep.append(path)
+                continue
+            if typed:
+                continue
+            if path not in decided:
+                try:
+                    text = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace")
+                except OSError:
+                    text = ""
+                decided[path] = derive_record_kind(path, text, rows)
+            (keep if decided[path] is None or decided[path] is row else other).append(path)
         out[name] = keep
+        if other_kind is not None and name not in grammars:
+            other_kind[name] = other
     return out
 
 
@@ -583,7 +644,7 @@ def check_fence_records(root, rows: list[dict], typed_kinds) -> tuple[list[str],
     """S4's grading arm: `(reds, unarmed)`. Each `fence` row whose validator resolves runs it over every record
     `scan_fence_records` keeps for it, each red it returns prefixed `row <kind>: <path>:`; a row whose
     validator does not resolve is `check_row`'s red alone, skipped here. A typed row matching no record is
-    `unarmed`, the stream-plan kind's line naming its writer; any other empty population reds."""
+    `unarmed`, its line `render_unarmed_line`'s; any other empty population reds."""
     reds, unarmed = [], []
     population = scan_fence_records(root, rows, typed_kinds)
     for row in rows:
@@ -595,8 +656,7 @@ def check_fence_records(root, rows: list[dict], typed_kinds) -> tuple[list[str],
             continue
         paths = population[name]
         if not paths and name in typed_kinds:
-            tail = f"; {STREAM_PLAN_UNARMED}" if getattr(fn, "__name__", "") == check_stream_plan.__name__ else ""
-            unarmed.append(f"{name}: {UNARMED} — no record yet{tail}")
+            unarmed.append(render_unarmed_line(row))
         elif not paths:
             reds.append(f"row {name}: its home {row.get('home')!r} matches no tracked record")
         for p in paths:
@@ -609,8 +669,11 @@ def check_fence_records(root, rows: list[dict], typed_kinds) -> tuple[list[str],
     return reds, unarmed
 
 
-#: the tail of the stream-plan kind's unarmed line, the text TOOL-dTotalRecall-42 S3 moves onto the row
-STREAM_PLAN_UNARMED = "its writer is dIndexedDesign's planner"
+def render_unarmed_line(row: dict) -> str:
+    """TOOL-dTotalRecall-42 S3: a typed kind's line while its home holds no record, `<name>: unarmed — no
+    record yet`, then `; <unarmed>` where the row carries the key, the reason naming its writer."""
+    why = row.get(UNARMED)
+    return f"{row.get('name')}: {UNARMED} — no record yet" + (f"; {why}" if isinstance(why, str) and why.strip() else "")
 
 
 def check_stream_plan(text: str) -> list[str]:
@@ -992,11 +1055,24 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
     from tree_lib import resolve_kind
     legacy, note = read_legacy_keys(root)
     legacy = {(p, resolve_kind(s)) for p, s in legacy}   # S7: a row keyed `journal` stands for `log`, bytes kept
-    population = scan_legacy_records(root, rows, typed_kinds)
+    other_kind = {}
+    population = scan_legacy_records(root, rows, typed_kinds, other_kind)
     fenced = scan_fence_records(root, rows, typed_kinds)
     counts, unarmed, graded_paths = [], [], {}
     for row in rows:
         name, schema = row.get("name"), row.get("schema") if isinstance(row.get("schema"), dict) else {}
+        if UNARMED in row:   # TOOL-dTotalRecall-42 S2: a typed `fields` or `fence` row's reason, while it grades nothing
+            why, held = row[UNARMED], population.get(name) or fenced.get(name) or []
+            if not (isinstance(why, str) and why.strip()):
+                reds.append(f"row {name}: `{UNARMED}` is no non-empty string: name the writer that will arm the kind")
+            elif name not in typed_kinds:
+                reds.append(f"row {name}: `{UNARMED}` on an untyped row: only a typed kind's empty home reads unarmed")
+            elif schema.get("form") not in NEW_FORMS:
+                reds.append(f"row {name}: `{UNARMED}` on a {schema.get('form')!r} row: only a `fields` or `fence` "
+                            f"row carries the key")
+            elif held:
+                reds.append(f"row {name}: `{UNARMED}` beside {len(held)} graded record(s): the kind is armed, so "
+                            f"delete the key")
         if name in fenced:   # S4: graded by `check_fence_records` below, 0 where its validator does not resolve
             counts.append(f"{name} fence {len(fenced[name]) if resolve_validator(schema.get('validator'))[0] else 0} graded")
             continue
@@ -1004,15 +1080,15 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
             counts.append(f"{name} {schema.get('form', '?')}")
             continue
         paths = population[name]
-        if not paths:
-            if name in typed_kinds:
-                unarmed.append(f"{name}: unarmed — no record yet")
-            else:
-                reds.append(f"row {name}: its home {row.get('home')!r} matches no tracked record")
+        if not paths and name in typed_kinds:
+            unarmed.append(render_unarmed_line(row))
+        elif not paths and not other_kind.get(name):   # the home's paths before the Serves kind narrows them
+            reds.append(f"row {name}: its home {row.get('home')!r} matches no tracked record")
         old = [p for p in paths if (p, name) in legacy]
         new = [p for p in paths if (p, name) not in legacy]
         graded_paths[name] = new
-        counts.append(f"{name} {len(new)} graded {len(old)} legacy")
+        tail = f" {len(other_kind[name])} other-kind" if name in other_kind else ""
+        counts.append(f"{name} {len(new)} graded {len(old)} legacy{tail}")
         for p in new:
             missing, order = derive_field_lines(pathlib.Path(root, p).read_bytes().decode("utf-8", "replace"),
                                                 schema.get("fields", []))
@@ -1581,7 +1657,14 @@ PLANTS = ("writer-missing", "check-unknown", "source-drift", "factory-kind-unrow
           "alias-drift", "new-purpose", "review", "review-write", "purpose-missing", "purpose-long",
           "pending-closed", "value-refuse", "value-derive", "value-ledger", "value-ledger-unregistered",
           "value-refused", "stream-unordered", "stream-empty", "stream-order-text", "stream-unit-twice",
-          "stream-fence-missing", "stream-validator-missing", "raw-alias-compare", "alias-compare-kept")
+          "stream-fence-missing", "stream-validator-missing", "raw-alias-compare", "alias-compare-kept",
+          "unarmed-reason", "unarmed-with-record", "unarmed-untyped", "home-slash", "home-directory", "shared-home")
+#: TOOL-dTotalRecall-42's fixture: the `unarmed` plants' key, each its row, the directory homes the deviation
+#: row takes, and the record serving `log` that `shared-home` plants under the research row's home
+FIXTURE_UNARMED = "the fixture's planner arms it"
+FIXTURE_UNARMED_ROWS = {"unarmed-reason": "stream-plan", "unarmed-with-record": "stream-plan", "unarmed-untyped": "research"}
+FIXTURE_DIRECTORY_HOMES = {"home-slash": "memory/builds/*/build/", "home-directory": "memory/builds/*/build"}
+FIXTURE_SHARED = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-06-build-TOOL-{FIXTURE_BUILD}-1-shared-notes.md"
 #: TOOL-dTotalRecall-25's fixture: the well-formed plan of two streams, and each stream plant's edit of its fence
 FIXTURE_PLAN = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-05-build-TOOL-{FIXTURE_BUILD}-1-stream-plan-1.md"
 FIXTURE_FENCE = ('```toml\n[[stream]]\nname = "tooling"\n'
@@ -1671,6 +1754,10 @@ def build_fixture(tmp, plant: str | None = None):
         "check": SAY})
     for row in rows:
         row["purpose"] = {"text": f"the fixture's {row['name']} record", "source": "owner"}
+    if plant in FIXTURE_DIRECTORY_HOMES:
+        rows[-1]["home"] = FIXTURE_DIRECTORY_HOMES[plant]
+    elif plant == "shared-home":   # the log row takes the research row's home
+        rows[1]["home"] = rows[2]["home"]
     if plant == "purpose-missing":
         del rows[-1]["purpose"]
     elif plant == "purpose-long":   # one byte past the cap
@@ -1696,6 +1783,9 @@ def build_fixture(tmp, plant: str | None = None):
         registry = head + 'name = "deviation"\n' + tail.replace('writer = "hand"\n', "", 1)
     if plant == "lifecycle-missing":   # the deviation row loses its lifecycle, now a required column
         registry = registry.replace('lifecycle = "frozen"\n', "", 1)
+    if plant in FIXTURE_UNARMED_ROWS:   # `render_row` writes no `unarmed`, so the key is set as a row gains it, by hand
+        at = f'name = "{FIXTURE_UNARMED_ROWS[plant]}"\n'
+        registry = registry.replace(at, f"{at}{UNARMED} = {json.dumps(FIXTURE_UNARMED)}\n", 1)
     write_fixture_file(f"{kit_rel}/{REGISTRY}", registry)
     if plant != "roles-unresolved":
         write_fixture_file(derive_sibling_rel("roles", "roles_lib.py"), "# the fixture's roles kit: its role files\n")
@@ -1750,14 +1840,17 @@ def build_fixture(tmp, plant: str | None = None):
         "| gap-mem-01 | the fixture's one gap |\n")
     write_fixture_file(f"memory/builds/{FIXTURE_BUILD}/prompts/2026-01-01-prompt-{unit}-brief.md",
                        f"**Serves:** log {unit}\n\nthe fixture's brief\n")
+    if plant == "shared-home":
+        write_fixture_file(FIXTURE_SHARED, f"**Serves:** log {unit}\n\na log record under the research row's home\n")
     if plant in ("raw-alias-compare", "alias-compare-kept"):   # TOOL-dTotalRecall-40: the census's plant, its
         from tree_lib import KIND_ALIASES                        # token read off the alias table, so no hit here
         planted = ALIAS_COMPARE_PLANT if plant == "raw-alias-compare" else sorted(ALIAS_COMPARE_KEPT)[0]
         write_fixture_file(f"{tool_rel}/{planted}" if tool_rel else planted,
                            f"def read(kind):\n    if kind == {json.dumps(sorted(KIND_ALIASES)[0])}:\n        return 1\n")
     fence = FIXTURE_FENCE.replace(*FIXTURE_STREAM_EDITS[plant], 1) if plant in FIXTURE_STREAM_EDITS else FIXTURE_FENCE
-    write_fixture_file(FIXTURE_PLAN, f"**Serves:** stream-plan {unit} TOOL-{FIXTURE_BUILD}-2 TOOL-{FIXTURE_BUILD}-3\n\n"
-                       f"# {unit} stream-plan 1 — the fixture's plan\n\n{fence}")
+    if plant != "unarmed-reason":   # its stream-plan row carries the key and its home no plan
+        write_fixture_file(FIXTURE_PLAN, f"**Serves:** stream-plan {unit} TOOL-{FIXTURE_BUILD}-2 TOOL-{FIXTURE_BUILD}-3\n\n"
+                           f"# {unit} stream-plan 1 — the fixture's plan\n\n{fence}")
     region = render_kind_region(tomllib.loads(registry)["record-kind"], read_view_joins(tmp, kit_rel))
     if plant == "region-edited":
         region = region.replace("| Kind |", "| Kinds |", 1)
@@ -1872,7 +1965,9 @@ def run_selftest() -> int:
             "stream-unit-twice": (FIXTURE_PLAN, f"unit TOOL-{FIXTURE_BUILD}-2 is named in"),
             "stream-fence-missing": (FIXTURE_PLAN, "fence"),
             "stream-validator-missing": ("row stream-plan", "record_kinds:no_such_check"),
-            "raw-alias-compare": ("alias-compare", f"{ALIAS_COMPARE_PLANT}:2")}
+            "raw-alias-compare": ("alias-compare", f"{ALIAS_COMPARE_PLANT}:2"),
+            "unarmed-with-record": ("row stream-plan", f"`{UNARMED}`"), "unarmed-untyped": ("row research", f"`{UNARMED}`"),
+            "home-slash": ("row deviation", "names a directory"), "home-directory": ("row deviation", "names a directory")}
     refusals = {"value-ledger-unregistered": PURPOSE_PENDING, "value-refused": "memory.map-purpose"}
 
     def test_pipe_cell(lines):
@@ -1904,7 +1999,11 @@ def run_selftest() -> int:
              "pocket-registered": lambda ls: f"{SAY}: pocket · stray · stray" in ls,
              "alias-compare-kept": lambda ls: any(ln.startswith(f"{SAY}: alias-compare · ") and ":2 · kept homonym: " in ln
                                                   for ln in ls),
-             "new-row": lambda ls: any(" rows · " in ln and "widget 3 graded" in ln for ln in ls),
+             # the widget row shares the research row's home, whose three records serve research (S5)
+             "new-row": lambda ls: any(" rows · " in ln and "widget 0 graded 0 legacy 3 other-kind" in ln for ln in ls),
+             "unarmed-reason": lambda ls: f"{SAY}: stream-plan: {UNARMED} — no record yet; {FIXTURE_UNARMED}" in ls,
+             "shared-home": lambda ls: any(" rows · " in ln and "log 1 graded 0 legacy 3 other-kind" in ln
+                                           and "research 3 graded 0 legacy 1 other-kind" in ln for ln in ls),
              "pipe-cell": test_pipe_cell,
              "new-purpose": lambda ls: f"{SAY}: fixture new-purpose · widget · source owner" in ls,
              "review": test_review, "review-write": test_review_write,
