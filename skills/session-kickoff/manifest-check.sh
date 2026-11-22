@@ -2703,7 +2703,7 @@ derive_resume_lines() { # slug -> the route —, resume — and partial — line
 # by a `cd` in the call's subshell, since it takes no root and reads the toplevel of its working directory;
 # stdin closed, into a scratch file under CARD_POSITION_BOUND, as `derive_map_block` bounds the map. An exit
 # 0, or 2, which the engine answers on `invalid-input` and argparse on a refused command line, is read by
-# one `[[ =~ ]]` over the output: `answer` held to the engine's ANSWERS (`tools/loop/position.py#ANSWERS`,
+# one `[[ =~ ]]` over the output: `answer` held to the engine's ANSWERS (the loop kit's `position.py#ANSWERS`,
 # spelled again here because this kit names no file of another), and `next.item`, anchored on `next` since
 # `frontier` and `refusals` rows carry an `item` too, held to [A-Za-z0-9._-]+ and named only for `act`.
 # Every failure is one `position — skipped:` line. WHAT THIS DOES NOT CHECK: that the answer is still

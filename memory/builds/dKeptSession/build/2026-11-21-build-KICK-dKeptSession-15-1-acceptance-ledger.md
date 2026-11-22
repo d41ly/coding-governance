@@ -18,7 +18,7 @@ stub module: an answer outside `ANSWERS`, an `act` whose `next` is null, an `act
 space, and an exit 3 each printed the unreadable skip; a `reason` string carrying an escaped
 `"answer": "act"` ahead of the real `stuck` printed `position — stuck · next none`; a frontier row's
 item ahead of `next` under exit 2 printed `position — act · next item.n`; `terminal` with a `next`
-filled printed `next none`; a stub sleeping past a bound of 1 s printed the bound skip and returned
+filled printed `next none`; a stub sleeping past a bound of 1 s (DERIVED, that probe's bound) printed the bound skip and returned
 in 1 s (DERIVED, that probe); an empty slug printed the unrouted skip; the notice printed for
 `compact` alone, not for `resume` or an empty source, and no scratch file was left under the card dir.
 The real engine, `position.py dKeptSession --json` over this tree, answered in 8 s (DERIVED, that run),
