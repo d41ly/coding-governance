@@ -1,0 +1,18 @@
+**Serves:** journal TOOL-dBoundRoles-45
+
+# TOOL-dBoundRoles-45 — acceptance ledger
+
+Each criterion of section 6, read by the pass that built the unit with a probe of the code it changed, on the
+worktree before the pass commit at base `faad60aef`: a scratch git repository under the host temp folder, short-pathed,
+holding copies of the roles kit, the loop kit's definition and reader, the playbook kit's layer register, the
+enforcer scripts the shipped roles name, the charter and a conf naming the memory root and the charter, scaffolded by
+the kit's adopter, with the build `tFix` holding a brief record that carries `## The prompt` and the `## The brief`
+sub-heads, and its gov-spec-writer `reads` edited to its brief fields and `field.input.spec?` as the new arm edits
+it. Every render ran through `handoff.py render` in that repository. No gate, suite or bar ran in the pass: the
+`New arm:` arm the spec declares, its RED-first observation, and the legs its gate line lists are owed to the main
+loop at the close.
+
+**Evidences:** TOOL-dBoundRoles-45
+- AC1 — `plain words` — `handoff.py render --role gov-researcher --build tFix --unit TOOL-tFix-1 --input "question=plain words" --stdout` exited 0, and its `### input:question` block read the `cmd:` fact line classed `claimed`, a blank line, then `plain words`, with no fence line between; the `--role gov-spec-writer` render of `--input spec=` naming a scratch spec exited 0 with the spec's bytes between two three-backtick lines under its `record:` fact line. The writer is `tools/roles/handoff.py#render_handoff`, the typed set `tools/roles/handoff.py#TYPED_INPUTS`, which `python -c` printed as `diff` and `question`. OWED: arm 37 of `tools/roles/adopt-roles.test.sh` at the close, RED first with `render_handoff` fencing the typed value and skipping `check_authored_lines`, and the `roles adopter self-test` leg; `policy fixtures` reads the re-pinned `tools/playbook/instruction_units.py#ORDER_CASES`, whose task-sha `cad635aee1d1` a scratch render's `## Task` matched.
+- AC2 — `input:question` — the same researcher render, its question a first line and then, one case each, a whole fact line keyed `record:x@000000000000` classed `witnessed`, a `### allowance` line, a whole `gov:handoff` marker line, a `Framed by:` line and a line of four backticks nothing closes, exited 1 each, stderr naming `input:question — line 2 reads as a fact line`, `a heading`, `a gov:handoff marker line`, `a Framed by: line` and `input:question — a fence opened at line 2 of the value is never closed`, and the prompts folder held only the brief record afterwards; a question quoting words inside a closed three-backtick fence exited 0 with the fence lines written raw under its fact line. `python -c` over `tools/roles/roles_lib.py#check_authored_lines` printed no line for plain words, a closed fence around plain words, a level-four heading or `#tag`. OWED: arm 37 at the close, with the same staged break.
+- AC3 — `a typed input is authored` — `grep -n 'a typed input is authored' tools/roles/README.md` prints one line, in the `**Handed content is fenced**` paragraph of the handoff section, the sentence naming `input:question` and `input:diff` written unfenced, the four refused line shapes, the open fence and the anchor check grading the value whole.

@@ -113,7 +113,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-13 — inputs handed as content, each fact keyed and classed by the executor and re-cut fresh at act launch](spec/2026-10-25-spec-TOOL-dBoundRoles-13.md) | 10 | 2 | CLOSED | rev-6 | 2026-11-22 |
 | [TOOL-dBoundRoles-3 — the work order rendered per item, hashed into the spawn marker and bound to its act](spec/2026-10-25-spec-TOOL-dBoundRoles-3.md) | 11 | 2 | CLOSED | rev-8 | 2026-11-22 |
 | [TOOL-dBoundRoles-38 — handed content fenced inside the work order, and every reader of a fact line or a marker line skips what a fence holds](spec/2026-10-26-spec-TOOL-dBoundRoles-38.md) | 11 | 2 | CLOSED | rev-6 | 2026-11-22 |
-| [TOOL-dBoundRoles-45 — a typed `--input` value is authored text: written unfenced, refused when a line would stand as an executor line, so the anchor check grades it](spec/2026-10-26-spec-TOOL-dBoundRoles-45.md) | 12 | 2 | INPROGRESS | rev-5 | 2026-11-22 |
+| [TOOL-dBoundRoles-45 — a typed `--input` value is authored text: written unfenced, refused when a line would stand as an executor line, so the anchor check grades it](spec/2026-10-26-spec-TOOL-dBoundRoles-45.md) | 12 | 2 | CLOSED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-46 — the spawn guard holds a typed block to the authored-line rule: a fact, marker or `Framed by:` line in `input:question` or `input:diff`, or a fence left open there, is denied](spec/2026-10-26-spec-TOOL-dBoundRoles-46.md) | 12 | 2 | INPROGRESS | rev-6 | 2026-11-22 |
 | [TOOL-dBoundRoles-48 — the composed task section checked block by block: every block opens outside a fence, and each handed block's content lies inside its own, at render and at spawn](spec/2026-10-26-spec-TOOL-dBoundRoles-48.md) | 12 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-8 — the role-gate arm's field escape explained and closed](spec/2026-10-25-spec-TOOL-dBoundRoles-8.md) | 12 | 2 | DEFERRED | rev-4 | 2026-11-22 |
@@ -158,7 +158,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 328 bound to this build, across 4 record folder(s).
+Records: 330 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

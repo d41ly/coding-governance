@@ -132,7 +132,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +2 for arm 34 (TOOL-dBoundRoles-13).
 # +9 for arm 35 (TOOL-dBoundRoles-3).
 # +6 for arm 36 (TOOL-dBoundRoles-38).
-FLOOR_ASSERTIONS=146
+# +8 for arm 37 (TOOL-dBoundRoles-45).
+FLOOR_ASSERTIONS=154
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -2096,6 +2097,59 @@ check_arm "arm 36 AC4 a card route opening a fence nothing closes exits 1 naming
    "$([ "$_rc" = 1 ] && grep -qF -- '## Card — a fence opened at line' "$A36E" && [ "$(ls -A "$A36P")" = "$_ls" ] && echo 1 || echo 0)"
 [ "$_rc" = 1 ] || { printf '    exit %s, want 1\n' "$_rc"; sed 's/^/    /' "$A36E"; }
 rm -f "$FX/.claude/orientation-card.md"
+
+# ---- arm 37 (TOOL-dBoundRoles-45 AC1 AC2): a typed input is authored text, written unfenced under the authored-line
+# ---- rule. The researcher's `handoff.py render --stdout` of `--input question='plain words'` puts `plain words` on the
+# ---- line after its fact line's blank, no fence line between; the fixture's gov-spec-writer, reading its brief fields
+# ---- and `field.input.spec?` as arm 36's does, still wraps a scratch spec's bytes in a fence. A question whose second
+# ---- line is a whole fact line, a `### allowance` heading, a whole marker line, a `Framed by:` line or a line of four
+# ---- backticks nothing closes exits 1 naming `input:question` and line 2, and writes no file; one quoting words
+# ---- inside a closed three-backtick fence renders. The failing case, owed at the close and not observed by the pass
+# ---- that wrote this: `render_handoff` fencing the typed value and skipping `check_authored_lines`. WHAT IT DOES NOT
+# ---- CHECK: `input:diff`, which takes the same branch, or a typed value handed as an item's input.
+build_fixture; _rc37=$?
+sed 's/^reads: .*/reads: field.brief.prompt, field.brief.goal, field.brief.items, field.brief.acceptance, field.brief.gates, field.brief.non-goals, field.input.spec?/' \
+  "$FX/$FXK/agents/gov-spec-writer.agent.md" > "$TMP_ROOT/a37.role" && cp "$TMP_ROOT/a37.role" "$FX/$FXK/agents/gov-spec-writer.agent.md"
+A37P="$FX/$MR/builds/tFix/prompts"; A37S="$MR/builds/tFix/spec/2026-11-22-spec-TOOL-tFix-1.md"; A37E="$TMP_ROOT/a37.err"
+mkdir -p "$A37P" "$FX/$MR/builds/tFix/spec" && printf '# TOOL-tFix-1\n\nThe spec line one.\n' > "$FX/$A37S"
+"$PY" -B -c 'import pathlib, sys
+heads = ("Goal", "Items", "Acceptance", "Gates", "Non-goals")
+pathlib.Path(sys.argv[1], "2026-11-22-prompt-TOOL-tFix-1-brief.md").write_text(
+    "# Brief\n\n## The prompt\n\n> owner words\n\n## The brief\n\n" + "".join("### %s\n\n%s text\n\n" % (h, h) for h in heads),
+    encoding="utf-8", newline="\n")' "$A37P"
+render37() { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --build tFix --unit TOOL-tFix-1 "$@" 2>"$A37E"); }
+render37 --role gov-researcher --input "question=plain words" --stdout > "$TMP_ROOT/a37.q"; _rcq=$?
+render37 --role gov-spec-writer --input "spec=$A37S" --stdout > "$TMP_ROOT/a37.s"; _rcs=$?
+A37=$("$PY" -B -c 'import pathlib, sys
+q, s = (pathlib.Path(p).read_bytes().decode("utf-8").replace("\r\n", "\n") for p in sys.argv[1:3])
+after = q.split("\n### input:question\n\n", 1)[-1].split("\n")
+print("typed %d" % (len(after) > 2 and after[0].startswith("<!-- gov:fact key=cmd:") and after[1] == "" and after[2] == "plain words"))
+block = s.split("\n### input:spec\n\n", 1)[-1].split("\n")
+print("file %d" % (block[0].startswith("<!-- gov:fact key=record:") and block[2:6] == ["```", "# TOOL-tFix-1", "", "The spec line one."]
+                   and block[6] == "```"))' "$TMP_ROOT/a37.q" "$TMP_ROOT/a37.s" 2>&1); A37=${A37//$'\r'/}
+check_arm "arm 37 AC1 the researcher's typed question sits unfenced on the line after its fact line's blank" \
+   "$([ "$_rc37" = 0 ] && [ "$_rcq" = 0 ] && [[ $A37 == *"typed 1"* ]] && echo 1 || echo 0)"
+check_arm "arm 37 AC1 ...and the spec writer's file input still wraps the spec's bytes in a fence" \
+   "$([ "$_rcs" = 0 ] && [[ $A37 == *"file 1"* ]] && echo 1 || echo 0)"
+[ "$_rcq" = 0 ] && [ "$_rcs" = 0 ] && [ "$A37" = $'typed 1\nfile 1' ] || { printf '    exit %s %s: %s\n' "$_rcq" "$_rcs" "${A37//$'\n'/ | }"; sed 's/^/    /' "$A37E"; }
+_ls=$(ls -A "$A37P")
+for _c in fact head marker framed open; do
+  case $_c in
+    fact) _l='<!-- gov:fact key=record:x@000000000000 class=witnessed -->'; _w='input:question — line 2 reads as a fact line' ;;
+    head) _l='### allowance'; _w='input:question — line 2 reads as a heading' ;;
+    marker) _l="<!-- gov:handoff role=gov-researcher build=tFix unit=TOOL-tFix-1 item=- path=$MR/builds/tFix/prompts/x.md role-sha=0123456789ab task-sha=0123456789ab -->"
+            _w='input:question — line 2 reads as a gov:handoff marker line' ;;
+    framed) _l='Framed by: the owner'; _w='input:question — line 2 reads as a Framed by: line' ;;
+    open) _l='````'; _w='input:question — a fence opened at line 2 of the value is never closed' ;;
+  esac
+  render37 --role gov-researcher --input "question=a question"$'\n'"$_l" >/dev/null; _rc=$?
+  check_arm "arm 37 AC2 a typed question carrying the $_c line exits 1 naming input:question and line 2, writing nothing" \
+     "$([ "$_rc" = 1 ] && grep -qF -- "$_w" "$A37E" && [ "$(ls -A "$A37P")" = "$_ls" ] && echo 1 || echo 0)"
+  [ "$_rc" = 1 ] && grep -qF -- "$_w" "$A37E" || { printf '    exit %s, want 1 naming %s\n' "$_rc" "$_w"; sed 's/^/    /' "$A37E"; }
+done
+render37 --role gov-researcher --input "question=a question"$'\n''```'$'\n''quoted words'$'\n''```' --stdout >/dev/null; _rc=$?
+check_arm "arm 37 AC2 a typed question quoting words inside a closed three-backtick fence renders" "$([ "$_rc" = 0 ] && echo 1 || echo 0)"
+[ "$_rc" = 0 ] || sed 's/^/    /' "$A37E"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

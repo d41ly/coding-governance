@@ -38,7 +38,11 @@ reference; this page is the short version.
    `cmd:` for a typed argument. The class, `witnessed`, `decided` or `claimed`, is derived from the key
    and its source, never typed. The content follows its fact line inside a fence of backticks one
    longer than any backtick run it holds, so a fact line or `gov:handoff` marker line the content
-   quotes, as a spec often does, is read as text, never as a fact or a marker. A render whose task
+   quotes, as a spec often does, is read as text, never as a fact or a marker. A typed value,
+   `--input question=` or `--input diff=`, is your own text and is written without a fence. A line
+   of it that reads as a heading, a fact line, a `gov:handoff` marker line or a `Framed by:` line is
+   refused, naming `input:<name>` and the line, and so is a fence it opens and never closes. To quote
+   such lines, hand them in a file with `--input spec=<path>`. A render whose task
    would end inside an unclosed fence is refused, naming the block and the line, and nothing is
    written. `handoff.py facts --build <slug> --unit <id> --input prompt=<brief>
    --input spec=<spec>` prints the same cut as one JSON list for a caller that hands it on: the unit

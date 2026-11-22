@@ -782,6 +782,31 @@ def render_handed_fence(content):
     return "%s\n%s%s%s" % (bar, content, "" if not content or content.endswith("\n") else "\n", bar)
 
 
+#: The line shapes a typed input may not carry (TOOL-dBoundRoles-45 S2), each one a handoff's reader acts on:
+#: a heading of level one to three, a fact line, a `gov:handoff` marker line and a framing line.
+AUTHORED_LINE_SHAPES = (("a heading", re.compile(r"#{1,3} ")), ("a fact line", FACT_RE),
+                        ("a gov:handoff marker line", MARKER_RE), ("a Framed by: line", re.compile(r"Framed by:")))
+
+
+def check_authored_lines(value, field):
+    """One refusal line per line of `value` that matches a shape of `AUTHORED_LINE_SHAPES`, naming `field` and
+    the line's number, then one more where `read_unfenced_lines(value)` ends on its open-fence yield, naming
+    the line the fence opened at; `[]` for a value that would stand as text alone. A typed input is written
+    unfenced, so a line of one of those shapes would stand as an executor line; a fence the value opens and
+    closes is legal (TOOL-dBoundRoles-45 S2)."""
+    text, out = str(value), []
+    for n, line in enumerate(text.split("\n"), 1):
+        what = next((what for what, shape in AUTHORED_LINE_SHAPES if shape.match(line)), None)
+        if what:
+            out.append("%s — line %d reads as %s, which a typed input may not carry: it is written unfenced, so "
+                       "the line would stand as one; hand quoted text as a file through --input spec=<path>"
+                       % (field, n, what))
+    out +=["%s — a fence opened at line %d of the value is never closed, so every line after it would be read "
+            "as content; close it in the value and render again" % (field, n)
+            for n, line in read_unfenced_lines(text) if line is None]
+    return out
+
+
 def extract_prompt_marker(prompt):
     """The `MARKER_RE` match of the marker line an `Agent` prompt opens with, read as the hooks
     kit's spawn guard reads it (its rule 6): exactly one line outside every fence, carriage returns

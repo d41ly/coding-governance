@@ -5593,6 +5593,11 @@
       "file": "tools/loop/placement.py"
     },
     {
+      "id": "check_authored_lines",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_authorization",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -28149,6 +28154,11 @@
     },
     {
       "id": "render35",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
+      "id": "render37",
       "kind": "function",
       "file": "tools/roles/adopt-roles.test.sh"
     },
