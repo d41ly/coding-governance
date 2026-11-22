@@ -1,6 +1,6 @@
 # KICK-dKeptSession-24 — a mail deadline judged by the observer clock: `flow.wait-ceiling` declared on each message, the asker's default past it
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 19 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-23 · node a · Tier-2 · base 8b8b1374 · streams kickoff · order 19 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0162@6ce67958 whole
 
@@ -18,6 +18,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-24-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-24-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md) | research | KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-5 |
 | [2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md) | research | KICK-dKeptSession-36 KICK-dKeptSession-27 |
+| [2026-11-22-prompt-KICK-dKeptSession-24-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-24-reground-brief.md) | research | — |
+| [2026-11-23-prompt-KICK-dKeptSession-24-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-24-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -31,71 +33,126 @@ deadline the message reads `expired`, the asker's default answers it, and the re
 transitions go on (P39, the whole-design audit's A2-F6). Without this, a question nobody answers
 blocks the recipient for ever, and a reader whose clock runs a day ahead expires every message a day
 early, gap-conc-14's class, which TOOL-dPlacedRequest-17 S3 closed for leases in
-`tools/unattended/unattended.sh#read_claims` and which no mail code meets yet.
+`tools/unattended/unattended.sh#read_claims` and which the landed mailbox does not meet: its reader
+names a deadline as what it does not check (`tools/unattended/unattended.sh#read_mailbox`).
 
 ## 2. Scope (IN)
 
-- **S1** — The declared deadline. `unattended.sh --mail post` (I19, `KICK-dKeptSession-5`) writes the
-  I17 field `deadline` as the hours `flow.wait-ceiling` reads at the post, a non-negative number,
-  read through `read_lease_policy flow.wait-ceiling`, a new arm of
-  `tools/unattended/unattended.sh#read_lease_policy` (§8 F6): its catalogue default `72` beside the
-  other keys' defaults, one literal `policy.py get flow.wait-ceiling` line, and the number check its
-  lease bounds take, the key joining its NOTE's and its refusal's key lists. That `get` answers at the
-  landed revision: the file's value, then the preset the file names, then the catalogue default
-  (`tools/policy/policy.py#RESOLUTION_ORDER`). A policy kit that does not resolve writes that default
-  under the reader's one NOTE; a refused `get` refuses the post with exit 2 naming the refusal, before
-  any commit is built. Every message carries one, whatever its kind, `--mail ack`'s included (§8 F2).
-  Observed by AC1 and AC5.
-- **S2** — The declared default. `--mail post` takes `--default <text>` into the I17 field `default`.
-  A `question` or a `confirm-request` posted without `--default` is refused with exit 2 naming the
-  flag, before any commit is built; every other kind writes `default: ack`. The text is a record
-  value, so `build_gov_message` refuses one carrying a newline (`KICK-dKeptSession-5` S4), and this
-  unit refuses one carrying any other control byte but tab, or longer than S4's body limit. Each
-  `question` or `confirm-request` post the units before this one land in
-  `tools/unattended/unattended.test.sh`, unit 5's AC4 arm and `KICK-dKeptSession-23`'s cases among
-  them, gains `--default`, so each keeps the row or refusal it observes. Observed by AC1.
+- **S1** — The declared deadline. `tools/unattended/unattended.sh#write_mail_post`, the `--mail post`
+  verb `KICK-dKeptSession-5` landed, writes the key `deadline: <hours>` into every record it builds,
+  after unit 5's ten keys and the keys `KICK-dKeptSession-27` appends, the hours `flow.wait-ceiling`
+  reads at the post. It reads them through `read_lease_policy flow.wait-ceiling`, a new arm of
+  `tools/unattended/unattended.sh#read_lease_policy` (§8 F6): the default `72` beside the other keys'
+  defaults, one literal `get flow.wait-ceiling` line in the closed `case` the reader's comment says
+  the policy kit's reader coverage counts, the number check its three bounds take, and the key
+  joining the NOTE's key list, the refusal's key list and the signature comment. The number refusal
+  reads "the non-negative number this driver ages a lease or a message by". The call is direct,
+  never in a substitution, as that comment requires, and sits in the post's body-and-values step
+  after `check_mail_recipient` and before the fetch; a refused read prints
+  `mail — not written · <LP_VALUE>`, exit 2, before any fetch or commit. `get` answers at the landed
+  revision, for a read naming no build: the file's value, then the preset the file names, then the
+  catalogue default (`tools/policy/policy.py#RESOLUTION_ORDER`). A policy kit that does not resolve
+  writes `72` under the reader's one NOTE. `--mail ack` posts through `write_mail_post`
+  (`tools/unattended/unattended.sh#write_mail_ack`), so an ack carries one too (§8 F2). Neither key
+  joins `derive_message_id`'s eight fields (`tools/unattended/unattended.sh#derive_message_id`), so a
+  retried post naming another default is refused as a duplicate, as any retry is. The post's comment
+  gains the two keys and the policy read in its order list. Observed by AC1 and AC5.
+- **S2** — The declared default. The driver's `--mail` arm parses `--default <text>` beside `--to`
+  and the other valued flags, and its texts name it: the header usage line of `--mail post`
+  (`tools/unattended/unattended.sh@a11693ddbd88:51`) gains `[--default <text>]`, the unknown-flag
+  refusal's list and the form refusal gain `--default`, and the `read` form refuses it as it refuses
+  `--to`. `write_mail_post` takes it as its last argument, after any `KICK-dKeptSession-27` appends,
+  and writes `default: <text>`: the text where given, on any kind; where absent, a `question` or a
+  `confirm-request` is refused `mail — not written · a <kind> declares its default with --default`,
+  exit 2, and every other kind writes `default: ack`. That refusal sits after the kind check and
+  before `check_mail_recipient`, so the switch, slug, session and fleet-tag refusals unit 5 orders
+  before the kind print as they landed. The text is a value pair of
+  `tools/unattended/unattended.sh#build_gov_message`, which refuses an empty value or one carrying
+  any control byte, tab and newline included, printed `mail — not written · <GOVMSG_WHY>`; no length
+  limit beyond the subject's is added. No disposed record carries the default, so the `**<Word>:**`
+  check the subject takes does not apply. Unit 5's AC1 posts and its AC4 question in
+  `tools/unattended/unattended.test.sh` gain `--default`, so each keeps the row it observes; its AC7
+  and AC9 posts refuse before the kind and stay as landed; each `question` or `confirm-request` post
+  `KICK-dKeptSession-23` or `KICK-dKeptSession-27` lands gains `--default` too. Observed by AC1.
 - **S3** — The judgment, `check_mail_deadline <ref> <commit> <hours>` (I23), in
   `tools/unattended/unattended.sh`, the name `tools/unattended/unattended.sh#check_lease_witness`
   already probes with `declare -F`. It spells `<ref>` as the feed keys it, a leading
   `refs/gov/remote/` re-spelled `refs/gov/`; converts `<hours>` to whole seconds through
-  `derive_bound_seconds <number> <multiplier>`, extracted from `read_lease_bound`'s arithmetic, a
-  fraction truncated to the whole second, which `read_lease_bound` then calls with its
-  output unchanged; and returns the code of `check_deadline_passed <ref> <commit> <seconds>`
-  (`tools/unattended/unattended.sh#check_deadline_passed`): 0 passed, 1 not yet, 2 not sighted. An
-  `<hours>` that is not a non-negative number returns 2. With it defined beside unit 5's
-  `read_mailbox`, `check_lease_witness`'s `declare -F` probe of the two names can no longer fail in
-  the driver, so this unit deletes the probe, the suite's DPR1 AC11 assertion that the question exits
-  2 with the two functions absent, and the `check_mail_deadline` stub both DPR1 lease arms export,
-  which a process run of the driver loses to its own (§8 F7). **Readers:** by name:
+  `derive_bound_seconds <number> <multiplier>`, which sets DB_VALUE and prints it, returns 1 on a
+  number outside `^[0-9]+(\.[0-9]+)?$`, and holds `read_lease_bound`'s arithmetic, extracted: the
+  first six fraction digits kept and the rest of the second dropped. `read_lease_bound` then calls it
+  directly with its output unchanged. A return of 1 makes `check_mail_deadline` return 2; else it
+  returns the code of `check_deadline_passed <ref> <commit> <seconds>`
+  (`tools/unattended/unattended.sh#check_deadline_passed`): 0 passed, 1 not yet, 2 not sighted. The
+  comment above `check_deadline_passed` names a mail deadline beside its two callers, and
+  `read_lease_bound`'s names the extraction. With the name defined beside `read_mailbox`,
+  `check_lease_witness`'s probe `declare -F read_mailbox >/dev/null && declare -F
+  check_mail_deadline` can no longer fail in the driver, so this unit deletes it: the mailbox is
+  read on every call, and its comment's "where `declare -F` finds both …, inert until it lands"
+  clause reads "first the mailbox is read". Every `--lease renew --witness` therefore makes the one
+  bounded mail fetch TOOL-dPlacedRequest-1 S8 designed. In the suite it deletes the DPR1 AC11
+  assertion that the question exits 2 with the two functions absent
+  (`tools/unattended/unattended.test.sh@92da5fb2d5cc:19257`), the `$LF/stubs.sh` stub of
+  `check_mail_deadline`, both `. "$LF/stubs.sh"` sources in the AC11 and AC12 arms, and the block
+  comment's lines naming the stub and the unlanded deadline (§8 F7). **Readers:** by name:
   `tools/unattended/unattended.sh` and `tools/unattended/unattended.test.sh`, the only files that
   spell the probe and the stub; by value: NO VALUE READERS, since the probe gates a read and stores
-  nothing. Observed by AC2, AC3, AC4 and AC8.
-- **S4** — The sightings. `KICK-dKeptSession-5`'s `read_mailbox` runs `add_feed_sightings` after its
-  fetch (unit 5 S6), and its writer builds every message commit by `build_gov_commit` under the fixed
-  `gov-claim` identity (unit 5 S2), which the sightings walk requires. The walk keys a cached ref
-  `<prefix><rest>` as `refs/gov/<rest>` (`tools/lib/gov-feed.sh#derive_feed_events`), so the one
-  argument that keys mail under `refs/gov/mail/` is `refs/gov/remote/`, every landed caller's
-  (`tools/unattended/unattended.sh#read_claims`). This unit holds that call to that argument, setting
-  it where unit 5 landed another, and adds no call. Observed by AC6.
-- **S5** — The `expired` state. In `read_mailbox`'s rows, a message whose state would be `open` and
-  whose `check_mail_deadline` returns 0 reads `expired`; a return of 1 or 2 keeps it `open`, so an
-  unsighted message never expires (§8 F4). The row gains the columns `deadline` and `default`, after
-  the columns `KICK-dKeptSession-27` appends after unit 5's `reply`, so `--mail read` prints an `expired` row beside the
-  asker's declared answer. The transition guard of
-  `KICK-dKeptSession-5` refuses on `open` rows only, so an expired message lets the recipient's
-  transitions go on, and unit 5 S10's disposal takes the `expired` row, its record's `State`
-  `expired`; where unit 5 landed a disposal set without `expired`, this unit adds it. A record with no
-  `deadline`, as every commit a fixture pushes straight is, reads `-` in both columns and judges 2,
-  so it stays `open`: the DPR1 lease arms' question still renews. Each suite arm comparing a whole
-  row gains the two columns. The plant `mail-expired` of `tools/loop/loop_transition.py`'s fixture,
-  seeded as unit 5's `mail-open` is, plants its question's sighting 31 hours old in the fixture's
-  `gov-feed.log`, `deadline: 30`, so the move records past the guard. Observed by AC2, AC3 and AC4.
-- **S6** — The verbs guide: the `--mail` section unit 5 adds to `tools/unattended/VERBS.template.md`
-  (rendered to `memory/guides/UNATTENDED-VERBS.md`) states `--default`, the `deadline` field, the
-  observer rule and the `expired` state. The `--mail` paragraph unit 5 adds to `help/loop.md` names
-  `--default` and `expired`, its `verb:unattended.sh:--mail` anchor re-stamped with the fingerprint
-  `python tools/govkit/docs_leg.py --fingerprints` prints, since `--default` joins the flags that
-  fingerprint hashes (`tools/govkit/docs_leg.py#read_verb_usage`). Observed by AC7.
+  nothing. Observed by AC2, AC3, AC4 and AC7.
+- **S4** — The sightings, landed. `read_mailbox` and `write_mail_post` each run
+  `add_feed_sightings refs/gov/remote/` after their fetch, the one argument under which the walk
+  keys a cached mail ref as `refs/gov/mail/…` (`tools/lib/gov-feed.sh#derive_feed_events`), and
+  `tools/unattended/unattended.sh#write_mail_ref` builds every message by `build_gov_commit` under
+  the fixed `gov-claim` identity the walk requires. This unit adds no call and changes none. NOT
+  OBSERVED here: it is landed code this unit relies on, which `KICK-dKeptSession-23`'s AC5, landing
+  at order 17, observes as a fetched message sighted; rev-4's AC6 restated that criterion, which
+  this spec now leaves to unit 23.
+- **S5** — The `expired` state. `read_mailbox`'s parse reads `deadline` and `default` through
+  `read_kv` under a second key set beside the required one, so a record without them keeps its row
+  and reads `-` in each. The row appends the two columns after the three `KICK-dKeptSession-27` S4
+  appends after unit 5's `reply`, sixteen in all; the first fourteen keep their places, where
+  `check_lease_witness` reads 2, 4 and 10 and `tools/loop/loop_transition.py#read_mail_rows` takes
+  the first eleven of any row holding at least eleven. After the state pass, each `open` row is
+  judged by `check_mail_deadline` over its own ref, commit and deadline: rc 0 sets its state
+  `expired`, its `reply` kept `-`; 1 or 2 keeps it `open`, so an unsighted message never expires
+  (§8 F4). The reader's comment names the fifth state, the two columns, and what stays unchecked:
+  a clock offset between nodes (§3). `print_mailbox` selects `open` alone under `--open`, so an
+  expired row leaves `--open --ids`. The guard of `KICK-dKeptSession-5` holds on `open` rows only, so
+  an expired message lets the recipient's transitions go on; `MAIL_DISPOSED_STATES` already holds
+  `expired` (`tools/loop/loop_transition.py@2f3a26de0fd2:137`), so the disposal takes the row and
+  its record's `State` reads `expired`, no edit there. `MailHeld`'s message, "holds its moves until it
+  is answered or acknowledged", gains "or past its deadline". An expired question reads
+  `question-closed` to `check_lease_witness`, which renews nothing on it. A record with no
+  `deadline`, as `seed_mail_at` and `tools/loop/loop_transition.py#render_fixture_mail` plant one,
+  judges 2 and stays `open`: the DPR1 lease arms' question still renews and `mail-open` still
+  refuses. The three planters that put a message straight on a remote, `seed_mail_at`,
+  `render_fixture_mail` and `skills/session-kickoff/card-store.fixture.sh#write_card_mail`, each say
+  they write it as `--mail post` records it, which this unit's two keys make false; each comment
+  reads "as `KICK-dKeptSession-5`'s post recorded it, with no deadline". No landed arm compares a whole row: unit 5's read columns by `cut -f` and `awk` (PINNED,
+  2026-11-23 at `9900b200`); an arm unit 23 or 27 lands that does gains the two columns. The plant
+  `mail-expired` of `tools/loop/loop_transition.py#write_transition_plant`: `render_fixture_mail`
+  takes optional `deadline` and `default` keys; the plant puts `FX_QUESTION` with `deadline: 30` and
+  `default: no` on the fixture's remote as `mail-open` does, reads its commit by `ls-remote`, and
+  appends one line for that ref and commit, sighted 31 hours ago, to the fixture's
+  `<git-common-dir>/gov-feed.log` in the six-field shape `tools/loop/claim.py#check_claim_plant`'s
+  `stale-holder` plant writes. Its branch of `tools/loop/loop_transition.py#run_transition_fixture`
+  runs B4 and prints the commit count, the trailer and each mail record's `State`, as `mail-disposed`
+  does; `PLANTS` gains the key and `tools/loop/loop_transition.py#run_selftest`'s case table one row
+  per line AC2 reads. Observed by AC2, AC3 and AC4.
+- **S6** — The user texts. The `--mail` entry of `tools/unattended/VERBS.template.md`, and its
+  byte-equal installed copy `memory/guides/UNATTENDED-VERBS.md` under the unattended kit gate's
+  check 10: the usage gains `[--default <text>]`; the record's key list gains `deadline` and
+  `default`; the row's column list gains them; "The four states" becomes five, `expired` stated as
+  an `open` message this node first saw more than its `deadline` hours ago, by its own clock, its
+  `default` the answer; and the transition sentence disposes "each answered, acknowledged or expired
+  message". `help/loop.md`: the `--mail` paragraph names `--default`, the two columns and `expired`,
+  its `verb:unattended.sh:--mail` anchor re-stamped with the fingerprint
+  `python tools/govkit/docs_leg.py --fingerprints` prints at build time, since `--default` joins the
+  flags it hashes (`tools/govkit/docs_leg.py#read_verb_usage`); the guard paragraph under "Recording
+  a build's move" says a message past its deadline holds no move and is disposed with the answered
+  and acknowledged ones; and the fixture-cases sentence names `mail-expired`. `tools/loop/README.md`:
+  the mail guard paragraph's `open` row reads "neither answered, acknowledged nor past its deadline",
+  and its plant list names `mail-expired`. The module docstring of `tools/loop/loop_transition.py`
+  and its comment above `TRANSITION_FIELDS` name the plant and the expiry. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -106,6 +163,8 @@ early, gap-conc-14's class, which TOOL-dPlacedRequest-17 S3 closed for leases in
 - No answering: who answers a `question`, the `mailbox.answer` item and the lease renewal while a
   build waits are `KICK-dKeptSession-25`'s.
 - No written answer on expiry. The default is derived from the message, never posted (§8 F5).
+- No default in a disposed record: `write_mail_records`' fields are unit 5's, and the message's
+  commit at its `Ref` holds the default.
 - No clock offset correction: the second rule of the `leases.expiry-hours` row of v2
   (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c9:1160`)
   is dWellOiledMachine's supervisor's.
@@ -121,36 +180,35 @@ early, gap-conc-14's class, which TOOL-dPlacedRequest-17 S3 closed for leases in
 
 ### Evidence
 
-- The lease ages already read the first sighting: `read_claims`' age pass feeds its pairs to
-  `read_first_seen` (`tools/unattended/unattended.sh#read_claims`), and an offer's deadline and a
-  tombstone's prune age call `check_deadline_passed`. No mail code exists: the one reference is
-  `check_lease_witness`, which reads the mailbox only where `declare -F` finds both `read_mailbox`
-  and `check_mail_deadline`, and calls a `question` row `question-closed` in any state but `open`.
+Read on the run tree at `9900b200`, 2026-11-23, with units 23, 36, 39, 51 and 27 read as landed.
+
+- The mailbox is landed and judges no deadline: `read_mailbox` prints eleven columns, its four states
+  `reply`, `answered`, `acked` and `open`, and its record keys are unit 5's ten, none a deadline
+  (`tools/unattended/unattended.sh#read_mailbox`, `tools/unattended/unattended.sh#write_mail_post`).
+- The lease ages read the first sighting: `read_claims`' age pass feeds its pairs to
+  `read_first_seen`, and an offer's deadline and a tombstone's prune age call
+  `check_deadline_passed`, which returns 2 on a bound that is not whole seconds.
 - The feed keys a sighting by `ref`, `blob` and `commit` and stamps `seen-utc` on this node's clock
-  (`tools/lib/gov-feed.sh#add_feed_event`); a write this node makes is sighted at its success exit
-  (`tools/lib/gov-feed.sh#write_feed_success`), and a fetched one by the walk, which stops at the
-  first commit not authored `gov-claim`.
+  (`tools/lib/gov-feed.sh#add_feed_event`); `read_first_seen` reads a line of six fields
+  (`tools/lib/gov-feed.sh#read_first_seen`), and the walk stops at the first commit not authored
+  `gov-claim`, so a fixture's message committed by `fx` is sighted only by a planted line.
 - `flow.wait-ceiling` is an `hours` row of default 72 with a minimum of 0 (`tools/policy/catalogue.toml`),
   and the reader admits an integer or a fraction for that type (`tools/policy/policy.py#check_value`);
-  `python tools/policy/policy.py get flow.wait-ceiling` printed `72` on this tree at this rev.
-  DERIVED: the catalogue row is the owning source; the printed value re-derives from it.
-- `get` reads `.governance/policy.toml` at the landed revision, `refs/remotes/<remote>/<branch>`,
-  never the working tree (`tools/policy/policy.py#derive_landed_revision`), so a fixture's value reads
-  once committed, pushed and fetched, as the suite's `write_lease_policy` does. A file `validate`
-  refuses reads its last valid first-parent revision and refuses only where none precedes it
+  `python tools/policy/policy.py get flow.wait-ceiling` printed `72` on this tree, 2026-11-23.
+  DERIVED: the catalogue row is the owning source; the printed value re-derives from it. The preset
+  `strict` sets it to 168 (`tools/policy/presets.toml@28373c5a97a6:634`, PINNED 2026-11-23).
+- `get` reads `.governance/policy.toml` at the landed revision, `refs/remotes/<remote>/<branch>`
+  (`tools/policy/policy.py#derive_landed_revision`), so a fixture's value reads once committed,
+  pushed and fetched, as the suite's `write_lease_policy` does. A file `validate` refuses reads its
+  last valid first-parent revision and refuses only where none precedes it
   (`tools/policy/policy.py#read_last_valid_value`), which DPR1 AC17 stages with an unparsable first
-  revision after a fresh `write_lease_fixture`. Probed 2026-11-21 in a scratch clone (PINNED): a file
-  setting `wait-ceiling = 30` under `[flow]` printed 30, an invalid file over it printed 30 with exit
-  0, an invalid first revision exited 2, and `preset = "strict"` printed 168 (`tools/policy/presets.toml`).
-- `check_lease_witness` reads the mailbox only where `declare -F` finds `read_mailbox` and
-  `check_mail_deadline`; the suite's DPR1 AC11 and AC12 arms export a `check_mail_deadline` stub, and
-  AC11 asserts that with neither exported the question exits 2 (`tools/unattended/unattended.test.sh`).
-- The unattended suite runs no transition writer; a move over mail is observed by the loop kit's
-  `mail-` plants (spec-5 AC6), and each plant moves the `plants=<n>` token of the `loop transition
-  record` row (`tools/run-gates/run-selftests.sh#check_plant_tokens`).
+  revision after a fresh `write_lease_fixture`.
+- `build_gov_message` refuses an empty value and any value matching `[[:cntrl:]]`, tab included,
+  and holds no value to a length.
+- The transition guard's row split takes any row of eleven or more fields, and its disposal set is
+  `answered`, `acked` and `expired` (`tools/loop/loop_transition.py#read_mail_rows`,
+  `tools/loop/loop_transition.py@2f3a26de0fd2:137`).
 - The lander mints kit versions, so a branch owes no bump (`tools/push-main.sh@78f40c3c2475:27`).
-- The loop kit's waits declare `deadline = "policy.flow.wait-ceiling"` (`tools/loop/loop.toml`), the
-  shape TOOL-dDeclaredLoop-33 S5 gives a wait.
 
 ### The rule
 
@@ -165,7 +223,7 @@ so each side judges the same declared deadline on its own clock, and a constant 
 A message no answer and no acknowledgement disposes stays `open` until then and reads `expired`
 after; an answered or acknowledged one keeps the state unit 5's reader gives it.
 
-### The post's two fields
+### The post's two keys
 
 ```
 deadline: 72
@@ -179,11 +237,39 @@ kind that only needs acknowledging (`changed`, `landed`, `overlap`, `takeover`, 
 
 ### The read
 
-1. `read_mailbox`'s bounded fetch, then `add_feed_sightings refs/gov/remote/`.
-2. Its parse yields each message's `ref`, `commit`, `state` and `first-seen`, as unit 5 S6 defines them.
+1. `read_mailbox`'s bounded fetch, then `add_feed_sightings refs/gov/remote/`, both landed.
+2. Its parse yields each message's `ref`, `commit`, `state`, `deadline` and `default`.
 3. For each `open` row, `check_mail_deadline <ref> <commit> <deadline>`; rc 0 sets `expired`.
-   `check_deadline_passed` is called per row, and each call is one `read_first_seen` pass over the
-   feed and one `date`, so the cost is linear in open messages, which the guard keeps few.
+   Each call is one `read_first_seen` pass over the feed and one `date`, so the cost is linear in
+   open messages, which the guard keeps few.
+
+### Shipped texts
+
+| Text | Clause |
+|---|---|
+| `tools/unattended/unattended.sh`: the usage line, the `--mail` refusals, and the comments of `write_mail_post`, `read_mailbox`, `read_lease_policy`, `read_lease_bound`, `check_deadline_passed` and `check_lease_witness` | S1, S2, S3, S5 |
+| `tools/unattended/unattended.test.sh`: the DPR1 AC11 block comment naming the stub | S3 |
+| `tools/unattended/VERBS.template.md`, `memory/guides/UNATTENDED-VERBS.md`, `help/loop.md`, `tools/loop/README.md` | S6 |
+| `tools/loop/loop_transition.py`: its docstring, its plant comment and `MailHeld`'s message | S5, S6 |
+| the comments of `seed_mail_at`, `render_fixture_mail` and `write_card_mail` | S5 |
+
+These stay true and are left as they are. `tools/unattended/STOPS.template.md`'s lease-key table
+lists the keys that shape a lease, which `flow.wait-ceiling` does not. Its sentence calling an
+offer's deadline and a tombstone's prune age "the same judgment" denies no third caller. The
+`--lease` entry's "a witness that … is no open question" holds, since an expired question is not
+open. `help/reference/policy.md` and the catalogue row are unchanged, and the row carries no summary,
+so `.governance/policy.json` does not move. `help/loop.md`'s loop-wait `deadline =
+"policy.flow.wait-ceiling"` and the `--entry-claim` ceiling text govern a wait and a claim, never a
+message. The key already has readers in `tools/loop/claim.py` and `tools/loop/termination.py`, so
+the policy kit's reader coverage moves by nothing a gate reads.
+
+### The refusal ceiling
+
+`tools/unattended/unattended.sh` sits at its ceiling, 347 sites (PINNED,
+`.memory-tree.conf@d4f8d497b8c3:661`, 2026-11-23). The census counts a `fail <n> "` call, an `exit 1`
+word and a `status=1` assignment (`tools/memory-tree/check-arms.py@60d9015821da:157`). This unit adds
+none: every refusal it adds is `echo …; return 2` inside a function or `_rl_rc=2` in the `--mail`
+arm, and the probe it deletes is no site. The ceiling is met unraised.
 
 ### Inventory
 
@@ -192,12 +278,14 @@ kind that only needs acknowledging (`changed`, `landed`, `overlap`, `takeover`, 
 | `check_mail_deadline` | shell function | `check`, OK |
 | `derive_bound_seconds` | shell function | `derive`, OK |
 | `--default` | flag of `--mail post` | none |
+| `deadline`, `default` | record keys and `read_mailbox` columns | none |
 | `expired` | a state of I20's rows | none |
 | `mail-expired` | plant of `loop_transition.py --fixture` | none |
 
 ### Migration
 
-None. No message exists before unit 5 lands, and unit 5 lands before this unit (order 16 before 19).
+None. A message posted before this unit carries no `deadline`, reads `-` in both columns, judges 2
+and stays `open` until an answer or an ack disposes it, as unit 5 lands it.
 
 ### Rollout
 
@@ -207,21 +295,26 @@ change.
 ### Files touched (estimate)
 
 - `tools/unattended/unattended.sh`: `check_mail_deadline`, `derive_bound_seconds` and
-  `read_lease_bound`'s call of it, `read_lease_policy`'s new arm, the post's two fields, the
-  sightings call's argument, the `expired` state and its two columns, and `check_lease_witness`'s
-  `declare -F` probe deleted
-- `tools/unattended/unattended.test.sh`: the arms of §7; `--default` on the earlier units' question
-  posts; the two columns on whole-row comparisons; DPR1 AC11's absent-functions assertion and both
-  arms' `check_mail_deadline` stub deleted; the effective `FLOOR_ASSERTIONS` and its region's
-  `FLOOR_SHARD_<k>` moved by the net count
-- `tools/loop/loop_transition.py`: the `mail-expired` plant and its case, and `expired` in the
-  disposal set only where unit 5 landed none
-- `tools/run-gates/selftest-budgets.txt`: the `loop transition record` row's `plants=<n>` token one
-  above the count the units before it leave, its reading re-priced by direct CLI (DERIVED: `len(PLANTS)`)
-- `memory/map/generated/symbols.json`: `check_mail_deadline` and `derive_bound_seconds`
-- `help/loop.md`: `--default` and `expired` in the `--mail` paragraph, its anchor re-stamped
-- `tools/unattended/VERBS.template.md`: the `--mail` section's flag, field and state
-- `memory/guides/UNATTENDED-VERBS.md`: its render
+  `read_lease_bound`'s call of it, `read_lease_policy`'s new arm, the post's two keys and
+  `--default`, the `expired` state and its two columns, `check_lease_witness`'s probe deleted, and
+  the texts §4's table names
+- `tools/unattended/unattended.test.sh`: the arm of §7; `--default` on the earlier question posts;
+  DPR1 AC11's absent-functions assertion, the stub and its sources deleted; the effective
+  `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8` moved by the arm's counted assertions less one, each with
+  a `RAISED` line. At `9900b200` they read 4095 and 1312
+  (`tools/unattended/unattended.test.sh@92da5fb2d5cc:24236` and `:24524`, DERIVED, the last
+  assignment of each), and units 23 and 27 raise both first
+- `tools/loop/loop_transition.py`: the `mail-expired` plant and its cases, `render_fixture_mail`'s
+  two keys, `MailHeld`'s message, the docstring and the plant comment
+- `tools/run-gates/selftest-budgets.txt`: the `loop transition record` row's `plants=<n>` token, 15
+  at `9900b200` (`tools/run-gates/selftest-budgets.txt@9709091da4b8:82`) and 18 once
+  `KICK-dKeptSession-36` lands its three, set to 19 (DERIVED: `len(PLANTS)`), its reading re-priced
+  by direct CLI over `mail-expired` as unit 5 re-priced its two
+- `memory/map/generated/symbols.json`: `check_mail_deadline` and `derive_bound_seconds`, by
+  `gen_map.py --write`
+- `help/loop.md`, `tools/loop/README.md`, `tools/unattended/VERBS.template.md` and
+  `memory/guides/UNATTENDED-VERBS.md`: S6
+- `skills/session-kickoff/card-store.fixture.sh`: `write_card_mail`'s comment (S5)
 
 ### Alternatives rejected
 
@@ -232,12 +325,15 @@ change.
   written once per reading node (§8 F5).
 - **A second hours-to-seconds conversion inside `check_mail_deadline`.** `read_lease_bound` already
   spells it, so this second instance extracts it.
+- **A length limit on `--default`.** No other record value carries one, and `build_gov_message` is
+  the one value check.
 
 ## 5. Production-readiness checklist
 
-- security — `--default` text passes the value checks before any commit; a refused policy read
-  writes nothing; no new outbound call.
-- perf / scale — one feed pass per open message per read; the sightings walk is the feed's own.
+- security — `--default` passes `build_gov_message`'s value checks before any commit; a refused
+  policy read writes nothing; no new outbound call.
+- perf / scale — one feed pass and one `date` per open message per read; every witness check now
+  makes the one bounded mail fetch its design names.
 - error / empty / loading states — an unsighted message reads `open`, never `expired`; an unresolved
   policy kit writes the default with a NOTE; a malformed `deadline` judges rc 2 and stays `open`.
 - observability — `--mail read` prints each expired row's state and its `default` column.
@@ -245,36 +341,40 @@ change.
   deadline and never advances it.
 - testing — the probes of §6 and the arms of §7.
 - migration — none.
-- user docs — `memory/guides/UNATTENDED-VERBS.md` and the `--mail` paragraph of `help/loop.md`.
+- user docs — the verbs guide, `help/loop.md` and `tools/loop/README.md` (S6).
 
 ## 6. Acceptance criteria
+
+The fixture is `KICK-dKeptSession-5`'s two-clone mailbox, or the lease fixture's clone, under
+`%TEMP%`, `RUN_CLAIMS` on, a fleet tag and `CLAUDE_CODE_SESSION_ID` set.
 
 - **AC1** — When `bash tools/unattended/unattended.sh --mail post` posts a `question` with
   `--default no` after `write_lease_policy` lands `wait-ceiling = 30` under `[flow]`, the new mail
   commit's message carries `deadline: 30` and `default: no`; the same post without `--default` exits
-  2 naming `--default` and builds no commit; a `landed` post carries `default: ack`; and with the file
+  2 printing `mail — not written · a question declares its default with --default` and the remote
+  gains no ref; a `landed` post and a `--mail ack` each carry `default: ack`; and with the file
   landed as `preset = "strict"` alone, a post carries `deadline: 168`.
   Red when: a message is written with no deadline, a question with no declared default, or the
   post reads a value other than the one `get` answers at the landed revision.
-  fixture: a scratch clone with a bare origin under `%TEMP%`, `RUN_CLAIMS=on`, a fleet tag and
-  `CLAUDE_CODE_SESSION_ID` set.
   figure: 30 is the fixture's PINNED literal; 168 is DERIVED by `policy.py get flow.wait-ceiling` in
   that clone.
 - **AC2** — When a question addressed to `build:<slug>` with `deadline: 30` has its feed line, keyed
-  `refs/gov/mail/…`, planted with `seen-utc` 31 hours ago, `--mail read <slug>` prints its row with the
-  state `expired` and the `default` column `no`, and `--mail read <slug> --open --ids` prints `none`;
-  with the line planted one hour ago the row reads `open` and `--ids` prints its id. When `python
-  tools/loop/loop_transition.py --fixture --plant mail-expired` runs, the move records, exit 0, its
-  trailer carrying `disposed=<id>` and its `mailbox-message` record `**State:** expired`, where unit
-  5's `--plant mail-open` over an unexpired question exits 1. This is the clause's planted question
-  nobody answers.
+  `refs/gov/mail/…`, planted by `add_claim_sighting` 31 hours ago, `--mail read <slug>` prints its row
+  with the state `expired` and the `default` column `no`, and `--mail read <slug> --open --ids` prints
+  `none`; with the line planted one hour ago the row reads `open` and `--ids` prints its id. When
+  `python tools/loop/loop_transition.py --fixture --plant mail-expired` runs, the move records, exit
+  0, one commit, its trailer carrying `disposed=a1b2c3d4e5f6` and its `mailbox-message` record
+  `State expired`, where `--plant mail-open` over the same question with no deadline exits 1. This
+  is the clause's planted question nobody answers.
   Red when: an unanswered question blocks the transition past its deadline, as a guard reading
   `expired` as `open` shows.
+  figure: 30, 31 and the id are PINNED literals of the fixtures.
 - **AC3** — When the question's commit carries a committer date 25 hours before now, as a holder a
   day behind the reader stamps it, its `deadline` is 24 and this node's feed sights it a minute ago,
   `--mail read` prints it `open`; a scratch copy of the driver whose `check_mail_deadline` ages
   `now - %ct` prints it `expired`. This is the clause's reader whose clock runs a day ahead.
   Red when: the sender's stamp decides the deadline.
+  figure: PINNED, the fixture's own literals.
 - **AC4** — When `check_mail_deadline <ref> <sha> 1` runs in a shell that has sourced
   `tools/unattended/unattended.sh`, it returns 0 over a commit whose feed line is planted
   `7200` seconds before now, 1 over one planted `60` seconds before now, 2 over an unsighted sha, and 2
@@ -286,31 +386,31 @@ change.
 - **AC5** — When `--mail post` runs from a scratch copy of the driver with no policy kit beside it,
   it writes `deadline: 72` and prints one NOTE whose key list names `flow.wait-ceiling`; when a fresh
   `write_lease_fixture` lands an unparsable first policy revision, as DPR1 AC17 stages one, so
-  `policy.py get` exits 2, the post exits 2 naming the refusal and builds no commit.
+  `policy.py get` exits 2, the post exits 2 printing `mail — not written · ` and the refusal, and the
+  remote gains no ref.
   Red when: a refused read writes a deadline, or an unresolved policy kit writes a value other than
   the catalogue default.
-- **AC6** — When clone A posts a message and clone B runs `--mail read <slug>`, B's `gov-feed.log`
-  holds a line whose ref column reads A's `refs/gov/mail/<slug>/<tag>/<segment>` and whose commit is
-  A's, and `git log -1 --format=%an <commit>` prints `gov-claim`.
-  Red when: the read path sights nothing, or keys the line under another spelling, so every fetched
-  message stays `open` for ever.
-- **AC7** — When `grep -n -- '--default\|deadline\|expired\|first saw'` runs over
-  `tools/unattended/VERBS.template.md`, each is found in its `--mail` section; `grep -n -- '--default'
-  help/loop.md` finds the `--mail` paragraph; and `python tools/govkit/docs_leg.py --fingerprints`
-  prints `verb:unattended.sh:--mail` with the fingerprint that paragraph's anchor carries.
-  Red when: the guide states no deadline rule, or the anchor keeps the fingerprint from before
+  figure: 72 is DERIVED by `policy.py get flow.wait-ceiling` over the catalogue.
+- **AC6** — When `grep -n -- '--default\|deadline\|expired\|first saw'` runs over
+  `tools/unattended/VERBS.template.md`, each is found in its `--mail` entry, and `cmp` finds
+  `memory/guides/UNATTENDED-VERBS.md` byte-equal to it; `grep -n -- '--default' help/loop.md` finds
+  the `--mail` paragraph and `grep -n 'deadline' help/loop.md` the guard paragraph;
+  `grep -n 'mail-expired' help/loop.md tools/loop/README.md` finds each plant list; and
+  `python tools/govkit/docs_leg.py --fingerprints` prints `verb:unattended.sh:--mail` with the
+  fingerprint that paragraph's anchor carries.
+  Red when: a text states no deadline rule, or the anchor keeps the fingerprint from before
   `--default`.
-- **AC8** — When `grep -c 'declare -F check_mail_deadline' tools/unattended/unattended.sh` runs it
+- **AC7** — When `grep -c 'declare -F check_mail_deadline' tools/unattended/unattended.sh` runs it
   prints 0, and `grep -c "functions absent" tools/unattended/unattended.test.sh` prints 0.
   Red when: a probe that can no longer fail stays in the driver, or the suite still asserts its
   absent case.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `scratch-guard self-test` · `tier2-review self-test` · `policy check` · `policy fixtures` · `loop transition record` · `docs`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `scratch-guard self-test` · `tier2-review self-test` · `policy check` · `policy fixtures` · `loop transition record` · `docs` · `manifest-check self-test`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · the deadline arms over planted feed lines and mail commits, staged by a scratch copy whose judgment reads the commit's own date · the effective `FLOOR_ASSERTIONS` and its region's `FLOOR_SHARD_<k>` move by the arms' count less DPR1 AC11's retired assertion, counted off the diff
-New arm: tools/loop/loop_transition.py · covers AC2 · the `mail-expired` plant, staged by a guard reading `expired` as `open` · the `loop transition record` row's `plants=<n>` token rises by one
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · the deadline arms over planted feed lines and mail commits, staged by a scratch copy whose judgment reads the commit's own date · the effective `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8` move by the arms' counted assertions less DPR1 AC11's retired one, counted off the diff
+New arm: tools/loop/loop_transition.py · covers AC2 · the `mail-expired` plant, staged by a guard reading `expired` as `open` · the `loop transition record` row's `plants=<n>` token rises by one, to 19 over unit 36's 18
 
 ## 8. Open questions
 
@@ -384,21 +484,36 @@ New arm: tools/loop/loop_transition.py · covers AC2 · the `mail-expired` plant
   left Files touched, which gained `symbols.json`, the plant and its budget row; `policy fixtures`,
   `loop transition record` and `docs` joined §7.
 
+- rev-5 · 2026-11-23 · §1 · S1 · S2 · S3 · S4 · S5 · S6 · §3 · §4 · §5 · AC1 · AC2 · AC5 · AC6 · AC7 ·
+  §7 · §10 · re-grounded on the run tree at `9900b200` under
+  `2026-11-22-prompt-KICK-dKeptSession-24-reground-brief`: unit 5 landed the post, the reader's
+  eleven columns, `add_feed_sightings refs/gov/remote/` and `expired` in the disposal set, so S4
+  observes landed code and rev-4's AC6, a restatement of unit 23's AC5, is retired, AC7 and AC8
+  renumbered AC6 and AC7; S2 names the `--mail` arm's texts, orders its refusal after the kind and
+  drops the length limit no other value carries; S5 reads the two keys under a second key set after
+  unit 27's three columns, rewrites `MailHeld`'s message and the three planters' comments, and
+  plants the expired plant's feed line;
+  §4 gains the shipped-texts table and the refusal ceiling, met unraised, and §7 the
+  `manifest-check self-test` leg the card-store fixture's comment trips; the floors, the plant
+  count and the strict preset are pinned; base moved to `8b8b1374`, the default-branch sha the run
+  branch reconciled.
+
 ## 10. Reuse audit
 
 The seam extended is the landed `tools/unattended/unattended.sh#check_deadline_passed`, the one
 judgment of a deadline by first sighting, which this unit calls with a mail ref, a message commit
 and the declared hours in seconds; its sighting is `tools/lib/gov-feed.sh#read_first_seen` over the
 feed `tools/lib/gov-feed.sh#add_feed_sightings` fills, both carried in the driver's `gov_feed_sh`
-block. The policy read extends `tools/unattended/unattended.sh#read_lease_policy` by one arm, and the
-conversion is `read_lease_bound`'s arithmetic, extracted at this second instance. `python
+block. The policy read extends `tools/unattended/unattended.sh#read_lease_policy` by one arm, the
+conversion is `read_lease_bound`'s arithmetic, extracted at this second instance, the value check is
+`build_gov_message`'s, and the state extends `read_mailbox`'s one state pass. `python
 tools/codebase-map/reuse_lookup.py "a deadline judged by the time this node first saw a record"`,
-re-run 2026-11-21, ranked `records`, `build_records`, `read_records` and `write_record`, name stems
+re-run 2026-11-23, ranked `records`, `build_records`, `write_record` and `read_records`, name stems
 only, and `python tools/codebase-map/reuse_lookup.py "convert a policy duration in hours to whole
-seconds"` ranked `read_policy_value`, `read_policy_kit` and `PolicyRefused`, Python readers that do
-not convert; neither probe names a shell judgment or conversion, so no seam fits beyond the driver's
-own. `python tools/memory-recall/query.py "how does a mailbox message expire by the observer clock"`
-returned scout B's row 7 and this spec; scout B's row agrees with source on `check_deadline_passed`'s
-arguments and predates the landed feed's ref spelling.
+seconds"` ranked `read_policy_value`, `read_policy_kit`, `PolicyRefused` and `load_policy`, Python
+readers that do not convert; neither probe names a shell judgment or conversion, so no seam fits
+beyond the driver's own. `python tools/memory-recall/query.py "how does a mailbox message expire by
+the observer clock"` returned scout B's row 7 and this spec; scout B's row agrees with source on
+`check_deadline_passed`'s arguments and predates the landed feed's ref spelling.
 
 Recall terms used: mailbox deadline flow.wait-ceiling observer clock first sighting check_deadline_passed expired default read_first_seen add_feed_sightings
