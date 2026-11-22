@@ -6,7 +6,7 @@ Each criterion of section 6, read by the pass that built the unit with a fixture
 changed, on the worktree before the pass commit. The scratch copy below is `tools/roles/` with copies of the
 loop, hooks, policy and lib kits and `tools/gate-legs.json` beside it, under the run's scratchpad, its checker
 run with `--root` at the worktree. No gate, suite or bar ran in the pass: the three `New arm:` arms of section 7
-and their RED-first observations, and the section 7 legs, are owed to the main loop at the close.
+and their RED-first observations, and the section 7 legs (DERIVED from the spec's Gates heading), are owed to the main loop at the close.
 
 **Evidences:** TOOL-dBoundRoles-2
 - AC1 — `edits the spec` — `python -c "import roles_lib as l; print(l.check_never_entries('edits the spec', '..'))"` in `tools/roles/` printed one defect saying the entry names no enforcer. OWED: arm 27's bare-limit plant, RED first, at the close.
