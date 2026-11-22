@@ -346,7 +346,15 @@ from collections import Counter  # noqa: E402
 # it (AC2), that read under CLAUDE_CODE_MAX_CONTEXT_TOKENS set to 500000 and to `x` (AC4), and the
 # turn read alone (AC3). Its decoy checks move it by 3.
 # 5 + 3 = 8
-ASSERTION_FLOOR = 1595
+# RAISED 1595 -> 1612 by KICK-dKeptSession-9, the orientation report: ONE new arm with 14 checks —
+# `test_extract_orient`'s row per file, the edit row's counts stopping at its edit, the no-edit row
+# counted to its end and the agent file's row (AC1); both stages under the default channels and under
+# `log`, and every row `none` with one NOTE under `micro-format` alone (AC2); the strict read, its one
+# WARN past p90 and the build stage's missing ceiling (AC3, AC6); standard's quiet report (AC4); the
+# owner's cap at 30 and its absence (AC5); and the empty dir's DEAD PROBE (AC6). Its decoy checks move
+# it by 3.
+# 14 + 3 = 17
+ASSERTION_FLOOR = 1612
 
 PASS = []
 FAIL = []
@@ -2087,6 +2095,155 @@ def test_extract_context_window():
     check("extract context-window AC3: the 150000-token turn alone reads 75% of the 200000 rung it observed",
           (r.returncode, r.stdout.strip(), r.stderr.strip()),
           (0, "75%", "context: window 200000 · observed 150000 on fixture-model"))
+
+
+# KICK-dKeptSession-9: the orientation report's fixture. Each design session starts between the two
+# transitions and each build session after the second, so the stage is read off the commit dates.
+ORIENT_SLUG = "fx"
+ORIENT_MOVES = (("2026-09-01T00:00:00Z", "planning", "designing"), ("2026-09-20T00:00:00Z", "designing", "building"))
+ORIENT_DESIGN_START = "2026-09-13T10:00:00Z"
+ORIENT_BUILD_START = "2026-09-25T10:00:00Z"
+
+
+def build_orient_transcript(projects, start, calls, action=True, after=2, agent_calls=None):
+    """One planted session of ORIENT_SLUG under `projects`, its first record at the epoch `start`: the
+    driver's preflight, `calls` - 1 reads, one Edit where `action`, then `after` more reads. Every
+    tool call is one request of 60011 tokens whose context is 60010. With `agent_calls`, one agent file
+    of that many sidechain reads and no edit sits beside it. Its session id comes back."""
+    sid = str(uuid.uuid4())
+
+    def render_stamp(i):
+        return time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime(start + i))
+
+    def render_call(i, name, args, side=False):
+        return {"type": "assistant", "uuid": f"{sid[:8]}-{'s' if side else 'a'}{i}", "timestamp": render_stamp(i),
+                "isSidechain": side, "requestId": f"req-{sid[:8]}-{'s' if side else 'a'}{i}",
+                "message": {"id": f"msg-{sid[:8]}-{i}", "role": "assistant", "model": "fixture-model",
+                            "content": [{"type": "tool_use", "id": f"toolu_{sid[:8]}_{i}", "name": name,
+                                         "input": args}],
+                            "usage": {"input_tokens": 10, "output_tokens": 1, "cache_read_input_tokens": 60000,
+                                      "cache_creation_input_tokens": 0}}}
+    read = ("Read", {"file_path": "notes.txt"})
+    calls_made = ([("Bash", {"command": f"bash unattended.sh --preflight {ORIENT_SLUG}"})] + [read] * (calls - 1)
+                  + ([("Edit", {"file_path": "notes.txt", "old_string": "a", "new_string": "b"})] if action else [])
+                  + [read] * after)
+    records = [{"type": "user", "uuid": f"{sid[:8]}-u0", "timestamp": render_stamp(0),
+                "message": {"role": "user", "content": "Start the fixture work."}, "origin": {"kind": "human"}}]
+    records += [render_call(i, name, args) for i, (name, args) in enumerate(calls_made, 1)]
+    home = pathlib.Path(projects) / FIXTURE_PROJECT
+    write_transcript_lines(home / f"{sid}.jsonl", records)
+    if agent_calls:
+        write_transcript_lines(home / sid / "subagents" / "agent-orient.jsonl",
+                               [render_call(100 + i, *read, side=True) for i in range(agent_calls)])
+    return sid
+
+
+def build_orient_repo(base):
+    """A repository on `main` with no remote, holding ORIENT_SLUG's two moves on both stored channels:
+    each commit, dated as ORIENT_MOVES says, adds the move's transition record and carries its
+    `Gov-Transition` trailer. -> (repo, the function committing a policy file)."""
+    repo = base / "repo"
+    hooks = base / "nohooks"
+    for d in (repo, hooks):
+        d.mkdir()
+    ident = ["-c", "user.name=runlog selftest", "-c", "user.email=selftest@runlog.invalid",
+             "-c", "commit.gpgsign=false", "-c", "core.hooksPath=" + hooks.as_posix()]
+    run_git(["init", "-q"], repo)
+    run_git(["symbolic-ref", "HEAD", "refs/heads/main"], repo)
+
+    def write_commit(message, date=None):
+        env = {**os.environ, **({"GIT_AUTHOR_DATE": date, "GIT_COMMITTER_DATE": date} if date else {})}
+        run_git(["add", "-A"], repo)
+        subprocess.run(["git", *ident, "commit", "-q", "--allow-empty", "-m", message], cwd=str(repo),
+                       capture_output=True, env=env)
+    folder = repo / "memory" / "builds" / ORIENT_SLUG / "build"
+    folder.mkdir(parents=True)
+    for n, (date, frm, to) in enumerate(ORIENT_MOVES, 1):
+        (folder / f"{date[:10]}-build-KICK-{ORIENT_SLUG}-1-transition-{n}.md").write_bytes(
+            (f"# KICK-{ORIENT_SLUG}-1 transition {n} — {frm} -> {to}\n\n**Serves:** transition KICK-{ORIENT_SLUG}-1\n\n"
+             f"- **Build:** {ORIENT_SLUG}\n- **From:** {frm}\n- **To:** {to}\n").encode("utf-8"))
+        write_commit(f"loop transition({ORIENT_SLUG}): {frm} -> {to}\n\nGov-Transition: {frm} -> {to} · "
+                     f"build={ORIENT_SLUG} · item=item.plan.exit · sha=0123abcd", date)
+
+    def write_policy(text):
+        (repo / ".governance").mkdir(exist_ok=True)
+        (repo / ".governance" / "policy.toml").write_bytes(text.encode("utf-8"))
+        write_commit("the case's policy file")
+    return repo, write_policy
+
+
+def test_extract_orient():
+    """KICK-dKeptSession-9 AC1 to AC6: `extract --orient` over 29 planted sessions of one build, 23 of
+    them between its move into designing and its move into building and 6 after: 21 design sessions
+    of 3 calls before their edit, one of 40, one with no edit and an agent file, and 6 build sessions
+    of 3 calls. Each run commits its policy file first, since the policy reader reads the landed
+    revision and never the working tree."""
+    base, projects = build_projects("runlog-orient-")
+    design = rx.parse_time(ORIENT_DESIGN_START)
+    sids = [build_orient_transcript(projects, design + 600 * k, 3) for k in range(21)]
+    heavy = build_orient_transcript(projects, design + 600 * 21, 40)
+    idle = build_orient_transcript(projects, design + 600 * 22, 3, action=False, agent_calls=1)
+    built = [build_orient_transcript(projects, rx.parse_time(ORIENT_BUILD_START) + 600 * k, 3) for k in range(6)]
+    repo, write_policy = build_orient_repo(base)
+    argv = ["extract", "--orient", str(projects), "--slug", ORIENT_SLUG, "--repo", str(repo)]
+
+    def run_orient(policy):
+        write_policy(policy)
+        r = run_runlog(argv, base, build_arm_env(base))
+        lines = r.stdout.splitlines()
+        rows = {(m["sid"], m["source"]): m for m in (dict(kv.split("=", 1) for kv in ln.split()[3:] if "=" in kv)
+                                                      for ln in lines if ln.startswith("runlog: orient row "))}
+        return r, lines, rows
+    r, lines, rows = run_orient('preset = "strict"\n')
+    check("orient AC1: one row per session file, 29 main files and the one agent file",
+          (r.returncode, len(rows), sorted({src for _sid, src in rows})), (0, 30, ["agent-orient", "main"]))
+    check("orient AC1: a 3-call session's row stops at its edit: calls, tokens and context before it",
+          {k: rows.get((sids[0], "main"), {}).get(k) for k in ("action", "calls", "tokens", "context")},
+          {"action": "edit", "calls": "3", "tokens": "180033", "context": "30%"})
+    check("orient AC1: the session with no edit reads action=none, its calls counted to the file's end",
+          {k: rows.get((idle, "main"), {}).get(k) for k in ("action", "calls")}, {"action": "none", "calls": "5"})
+    check("orient AC1: the agent file is its own row, its source the file's stem",
+          {k: rows.get((idle, "agent-orient"), {}).get(k) for k in ("action", "calls", "stage")},
+          {"action": "none", "calls": "1", "stage": "step.design"})
+    check("orient AC2: under the default channels the earlier row reads step.design and the later step.build",
+          (rows.get((sids[0], "main"), {}).get("stage"), rows.get((built[0], "main"), {}).get("stage")),
+          ("step.design", "step.build"))
+    check("orient AC3: a strict-named policy file reads warn-at-evidence-ceiling from presets.toml",
+          sum("orient.budget=warn-at-evidence-ceiling" in ln for ln in lines if ln.startswith("runlog: orient (")), 1)
+    check("orient AC3: the 22 design rows derive p90 3, and only the 40-call row warns past it",
+          ([ln.split(" calls ", 1)[1] for ln in lines if ln.startswith("runlog: orient WARN")],
+           [ln.split("sid=")[1].split()[0] for ln in lines if ln.startswith("runlog: orient WARN")],
+           any(ln.startswith("runlog: orient stage step.design n=22 ") and ln.endswith(" ceiling p90=3")
+               for ln in lines)),
+          (["40 past the evidence ceiling 3 (p90 of n=22)"], [heavy], True))
+    check("orient AC6: the 6 build rows derive no ceiling, and say so",
+          "runlog: orient — no ceiling · step.build · n=6 under 20" in lines, True)
+    r, lines, rows = run_orient('preset = "strict"\n[transitions]\nrecord = ["log"]\n')
+    check("orient AC2: with transitions.record = [\"log\"] the records give the same two stages",
+          (rows.get((sids[0], "main"), {}).get("stage"), rows.get((built[0], "main"), {}).get("stage")),
+          ("step.design", "step.build"))
+    r, lines, rows = run_orient('[transitions]\nrecord = ["micro-format"]\n')
+    check("orient AC2 liveness: with nothing stored every row reads none, under one NOTE naming the key",
+          ({row.get("stage") for row in rows.values()},
+           sum(ln.startswith("runlog: orient NOTE transitions.record") for ln in lines)), ({"none"}, 1))
+    r, lines, rows = run_orient('preset = "standard"\n')
+    check("orient AC4: a standard-named file reads record-only: every row, no WARN, exit 0",
+          (r.returncode, len(rows), sum("orient.budget=record-only" in ln for ln in lines),
+           sum(ln.startswith("runlog: orient WARN") for ln in lines)), (0, 30, 1, 0))
+    r, lines, rows = run_orient('[orient]\nbudget = "owner-ceiling"\n\n[budgets]\n"orient-calls" = 30\n')
+    check("orient AC5: owner-ceiling at 30 warns on the 40-call row alone, the budgets kit's line after it",
+          (r.returncode, [ln.split("sid=")[1] for ln in lines if ln.startswith("runlog: orient WARN")],
+           sum(ln.startswith("BUDGET WARN — orient-calls") for ln in lines)),
+          (0, [f"{heavy} source=main stage=step.design calls 40 past the owner ceiling 30"], 1))
+    r, lines, rows = run_orient('[orient]\nbudget = "owner-ceiling"\n')
+    check("orient AC5: owner-ceiling with no budgets.orient-calls prints one NOTE naming it and no WARN",
+          (r.returncode, sum(ln.startswith("runlog: orient NOTE budgets.orient-calls") for ln in lines),
+           sum("WARN" in ln for ln in lines)), (0, 1, 0))
+    _base, empty = build_projects("runlog-orient-empty-")
+    r = run_runlog(["extract", "--orient", str(empty), "--slug", ORIENT_SLUG, "--repo", str(repo)], base,
+                   build_arm_env(base))
+    check("orient AC6: a projects dir holding no session of the slug is a DEAD PROBE, exit 2",
+          (r.returncode, r.stdout.startswith("runlog: orient DEAD PROBE")), (2, True))
 
 
 def test_extract_ac10_members():

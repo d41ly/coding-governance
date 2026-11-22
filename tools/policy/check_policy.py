@@ -4951,6 +4951,40 @@ def derive_outside_probe_plant(cap):
                                   f"import {mod}; print({mod}.{key})"], "warn": str(v)}
 
 
+def derive_orient_calls_plant(cap):
+    """The enforcer's kit and the policy kit copied in, so the copy finds `policy.py` and `budgets.py` beside
+    it and the census it reads holds the row, and one planted projects dir: a main transcript running the
+    driver's preflight for `fx`, then more tool calls than `budgets.orient-calls`, then one `Edit`
+    (KICK-dKeptSession-9 S10). The cap's value is the plant's `extra`; `orient.budget = "owner-ceiling"`
+    is its `post`, appended and committed, because `derive_zero_plant` replaces `extra` whole and keeps
+    `post`, so the zero mode reads the cap too. The window variable is set, so no context read scans
+    the host's transcripts."""
+    rel = derive_enforcer_rel(cap)
+    v, sid = 2, "00000000-0000-4000-8000-00000000000a"
+
+    def render_turn(i, name, args):
+        return json.dumps({"type": "assistant", "uuid": f"o-a{i}", "timestamp": f"2026-01-01T00:00:{i:02d}.000Z",
+                           "requestId": f"req-o{i}", "message": {
+                               "id": f"msg-o{i}", "role": "assistant", "model": "fixture-model",
+                               "content": [{"type": "tool_use", "id": f"toolu_o{i}", "name": name, "input": args}],
+                               "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0,
+                                         "cache_creation_input_tokens": 0}}})
+    lines = [json.dumps({"type": "user", "uuid": "o-u0", "timestamp": "2026-01-01T00:00:00.000Z",
+                         "message": {"role": "user", "content": "go"}}),
+             render_turn(1, "Bash", {"command": "bash unattended.sh --preflight fx"})]
+    lines += [render_turn(i, "Read", {"file_path": "notes.txt"}) for i in range(2, v + 2)]
+    lines.append(render_turn(v + 2, "Edit", {"file_path": "notes.txt", "old_string": "a", "new_string": "b"}))
+
+    def write_owner_ceiling(t):
+        with open(Path(t, *POLICY_FILE), "a", encoding="utf-8", newline="\n") as fh:
+            fh.write('\n[orient]\nbudget = "owner-ceiling"\n')
+    return {"files": {f"projects/case/{sid}.jsonl": "\n".join(lines) + "\n"}, "extra": f'"{cap.name}" = {v}\n',
+            "post": write_owner_ceiling, "copies": (posixpath.dirname(rel), budgets.derive_kit_rel().rstrip("/")),
+            "env": {"CLAUDE_CODE_MAX_CONTEXT_TOKENS": "200000"},
+            "argv": [sys.executable, rel, "extract", "--orient", "projects", "--slug", "fx"],
+            "warn": f"BUDGET WARN — {cap.name}", "refuse": "budgets.enforce is refuse"}
+
+
 def derive_zero_plant(cap, p):
     """`p`, a census row's plant, with the row's value at 0 in the policy file and none in its legacy
     home, so the reader answers 0 from the file: a `limits:` row's line left out of the limits file the
@@ -4984,6 +5018,7 @@ CAP_CASES = {
     "orientation-card": derive_outside_probe_plant, "cited-file-cap": derive_outside_probe_plant,
     "codex-instructions": derive_outside_probe_plant, "runlog-record": derive_outside_probe_plant,
     "feature-card": derive_outside_probe_plant, "hook-context": derive_outside_probe_plant,
+    "orient-calls": derive_orient_calls_plant,
 }
 
 

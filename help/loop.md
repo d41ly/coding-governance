@@ -2066,7 +2066,7 @@ outside the flow, one that lives in code with a deadline of its own.
 
 ## How to use it
 
-- **Read the loop:** `python tools/loop/loop_lib.py --check` prints one line per step and per <!-- usage: script:tools/loop/loop_lib.py a3a33b34 -->
+- **Read the loop:** `python tools/loop/loop_lib.py --check` prints one line per step and per <!-- usage: script:tools/loop/loop_lib.py d50887a1 -->
   workflow with its order, step and reach word, then the dispositions and one line per alias. It
   prints one `loop: program` line per step, with its items in an order where each comes after the
   items it needs, then a `loop: program review` line for the review program, whose items are tagged
@@ -2105,6 +2105,16 @@ outside the flow, one that lives in code with a deadline of its own.
   exits 1 for an actor entry the list does not hold, and for a list row that no actor entry matches.
   A `DOD_EXTRA` actor entry is admitted, its line ending `adopter-declared, not on the shipped list`.
   Check 53 of the unattended leg runs it over the driver's `DOD_CORE` and your conf's `DOD_EXTRA`.
+
+- **List the steps:** `python tools/loop/loop_lib.py --steps` prints one line per step, its tag, a
+  tab and the state the build is in during that step, in the loop's order, and exits 0. It reads the
+  file as `--check` does and exits 1 with a `loop:` line when the file is refused. The runlog kit's
+  orientation report reads a session's stage through it.
+
+  ```text
+  step.plan	planning
+  step.design	designing
+  ```
 
 - **See each item's scope:** `python tools/loop/loop_lib.py --scopes` checks the file as `--check` does,
   then prints one line per item with the instruction units scoped to it. It runs the playbook kit's

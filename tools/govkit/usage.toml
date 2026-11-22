@@ -298,7 +298,7 @@ flags = ["--scaffold", "--check", "--target=", "--preset="]
 id = "script:{prefix}/loop/loop_lib.py"
 shape = "verb"
 entry = "{prefix}/loop/loop_lib.py"
-flags = ["--check", "--scopes", "--selftest", "--fixture", "--plant=", "--grade-site="]
+flags = ["--check", "--steps", "--scopes", "--selftest", "--fixture", "--plant=", "--grade-site="]
 
 [[usage]]
 id = "script:{prefix}/loop/loop_witness.py"

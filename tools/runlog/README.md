@@ -149,6 +149,8 @@ python <this kit>/runlog.py extract --session <sid>          # one session, attr
 python <this kit>/runlog.py extract --discover [--slug <s>]  # runs with no journal: a heuristic
 python <this kit>/runlog.py extract --measure <projects dir>  # rate and peak memory, writes nothing
 python <this kit>/runlog.py extract --ready <projects dir>    # spend before READY, writes nothing
+python <this kit>/runlog.py extract --orient <projects dir> --slug <slug> [--repo <dir>]
+                                        # spend before the first item action, per stage
 python <this kit>/runlog.py narration --session <sid> --from <t> --to <t>
 python <this kit>/runlog.py context <transcript>               # how full the main context window is
 ```
@@ -209,6 +211,37 @@ keeps times and counts only, matching both witnesses in memory, and writes nothi
 session is a `DEAD PROBE`, exit 2. What `--ready` cannot see: a session that reached READY with
 neither witness, which it counts as not ready, and a READY line quoted inside a longer message, which
 it counts as the witness.
+
+**`--orient`** reports what each session of one build spent before its first item action, per stage
+of the build, and holds the report as the `orient.budget` policy key says (KICK-dKeptSession-9). Its
+sessions are the ones the two attributions name for `--slug`: a preflight call under the projects
+dir, a heuristic, and the driver journal of `--repo` (the working directory by default). It prints
+one `orient row` per file, the main file and each agent file, with its `attribution`, its `source`
+(`main` or the agent file's stem), its `stage`, its `action`, the class of its first `edit`, `write`
+or `git-commit` tool event or `none`, its `calls`, the tool events before that action, its
+`tokens`, the four counts of the usage before it, and its `context`, the main file's last main
+usage before it as `context` reads it. The stage is the step whose state the build entered at the
+newest transition at or before the session's first timed record, read with git in `--repo` on the
+channels `transitions.record` selects and mapped through the loop kit's `--steps` verb; `none` where
+no transition precedes it, and every row `none`, with one NOTE, where nothing is stored or the
+policy or loop kit does not answer. Per stage it prints the quartiles of `calls` over the rows with
+an action and their evidence ceiling, the nearest-rank 90th percentile, derived at every run; a
+stage with fewer than `ORIENT_CEILING_FLOOR` such rows has none and prints `orient — no ceiling`.
+The key's three values:
+
+- `record-only`, the catalogue default and what an unreadable policy reads, with one NOTE: the rows
+  and the quartiles, no warning.
+- `warn-at-evidence-ceiling`: also one `orient WARN` per row whose `calls` pass its stage's ceiling.
+- `owner-ceiling`: also one `orient WARN` per row whose `calls` pass the owner's cap,
+  `budgets.orient-calls` in the policy kit's cap census, each row judged by that kit's `budgets.py
+  check` and followed by its verdict line. Where `budgets.enforce` or `budgets.pinned` makes the cap
+  refuse, the row prints `orient REFUSED` and the report exits 1. An unset cap, or 0, is no owner
+  number: one NOTE, read as `record-only`.
+
+It exits 0 otherwise, writes nothing, and a projects dir with no session of the slug is a `DEAD
+PROBE`, exit 2. What `--orient` cannot see: which file an action wrote, since the extract keeps no
+path, so a session whose first write is its card route counts that write as its action; a session
+neither attribution names; and an agent file's own context, since `context` is always the main file's.
 
 **`context`** prints how full one session's main context window is (KICK-dKeptSession-14): `<n>%`, the
 `in`, `cache_read` and `cache_write` of the transcript's last `usage` event with `src` `main`, summed by
