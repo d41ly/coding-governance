@@ -168,8 +168,14 @@ least as long with nothing after it but whitespace), as `extract_prompt_marker` 
 `read_handoff_edges` do, and the hooks kit's spawn guard walks its copy, `readUnfencedLines`. So a spec
 that quotes a fact line, a heading-then-fact pair or a marker is handed whole and read as text. The
 practices block, the `## Card` block and the work-order blocks other than `### inputs`' sub-blocks are no
-handed value and are not fenced. A task section whose walk ends inside a fence refuses at render, naming
-the block and the line the fence opened at, and writes no file. A handoff rendered before this unit
+handed value and are not fenced. The section is checked block by block (TOOL-dBoundRoles-48): every block
+opens outside a fence, and a handed block's heading and fact line lie outside every fence and its content
+inside its own, checked at render and at spawn. `roles_lib.check_block_fences` walks the composed section once
+and reads each block's extents from the parts the render placed, never from the section's own headings or
+fences, so a framing or other authored block that flips the fence state across a handed one refuses even when
+the walk ends balanced; a refusal names the block and the line of the `## Task` section, and no file is
+written. A walk that ends inside a fence refuses too, naming the block the fence opened in. The hooks kit's
+spawn guard holds the file to the same rule. A handoff rendered before this unit
 carries unfenced content, whose lines are read as before; a re-render fences it. But a typed input is authored
 (TOOL-dBoundRoles-45): `input:question` and `input:diff`, `handoff.py`'s `TYPED_INPUTS`, are written unfenced, a
 render is refused naming `input:<name>` and the line when a line of the value would read as a heading, a fact line, a

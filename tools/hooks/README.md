@@ -315,6 +315,17 @@ is in `TYPED_INPUTS`, `question` and `diff`, `handoff.py`'s `INPUT_NAMES` less i
 fact, marker or `Framed by:` line after the block's own fact line, fenced or not, or a fence the block
 leaves open, denies the spawn, naming the block and the line of the file; the section is split into
 blocks at each line beginning `### `.
+Every block of the task section opens outside a fence, and a handed block's content must lie inside its own,
+checked at render and at spawn (TOOL-dBoundRoles-48, `checkBlockFences`): walked once by `readUnfencedLines`,
+an unfenced `gov:fact` line that is not the line two below an unfenced `### ` heading denies the spawn, and
+such a heading-then-fact pair heads a handed block whose next non-blank line must open a fence, whose lines
+up to that fence's closer must all be read inside it, and after whose closer only blank lines may stand up
+to the next unfenced heading. After the last handed block the one other line admitted is the task
+envelope's closer, `[/<path>]` naming the marker's own `path`, as the section's last non-blank line. A
+block headed `### input:question` or `### input:diff`, a typed input, is held to the pair rule alone. So
+a section an authored line flipped across its handed blocks, whose walk ends balanced, is denied, naming
+the block and the line of the file. What it does not check: a flipped section whose surfaced content
+carries no fact line and no heading-then-fact pair.
 Then the card check (TOOL-dBoundRoles-3 S5): a marker whose `item=` is a tag, a work order cut for one
 item, is admitted only when the payload session's orientation card routes the marker's `unit=`. The card
 is read through scratch-guard's `readCard`, its path the kickoff checker's `--card --path --session <sid>`

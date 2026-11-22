@@ -132,8 +132,10 @@ Every value is handed as content (TOOL-dBoundRoles-13): its block opens with a f
 `<!-- gov:fact key=<key> class=<class> -->`, `roles_lib.FACT_RE`'s grammar, then the content inside a fence of
 backticks one longer than its longest backtick run and at least three, `roles_lib.render_handed_fence`'s, so a
 fact or marker line the content quotes is content to every reader, each of which walks
-`roles_lib.read_unfenced_lines` (TOOL-dBoundRoles-38); a task section that ends inside a fence refuses,
-naming the block and the line, and writes nothing. A typed input, `TYPED_INPUTS`, is authored text and
+`roles_lib.read_unfenced_lines` (TOOL-dBoundRoles-38); a task section whose walk reads a block's first line
+inside a fence, a handed block's heading or fact line inside one or its content outside its own, or ends
+inside one, refuses, naming the block and the line, and writes nothing (`roles_lib.check_block_fences`,
+TOOL-dBoundRoles-48). A typed input, `TYPED_INPUTS`, is authored text and
 is written unfenced: a line of it that reads as a heading, a fact line, a marker line or a `Framed by:`
 line, or a fence it never closes, refuses naming `input:<name>` and the line (TOOL-dBoundRoles-45). The key is
 `roles_lib.derive_fact_key`'s: `record:<path>@<sha12>` for `input:spec`, `input:prompt`, a brief value and the
@@ -638,6 +640,42 @@ def render_work_order_blocks(item, declaration, prefixes, inputs):
     return ["%s\n\n%s" % (head, body) for head, body in zip(lib.WORK_ORDER_BLOCKS, bodies)]
 
 
+def derive_block_extents(section, lead, opening, blocks, handed):
+    """`(key, first, last, fence)` of every block of the task part `section`, `lib.check_block_fences`' extents
+    (TOOL-dBoundRoles-48 S2, §8 F3): the parts `lead` of the practices fill, the `opening` and the `blocks` of
+    the reads fill, each fill found as an exact string in slot order, each search starting where the previous
+    fill ended, and each part's first line counted from the lengths of the parts before it in its fill.
+    `handed` maps a block's index in `blocks` to the `(line offset, fence)` of each handed block it holds,
+    whose fence opens four lines below its heading. A key is the part's first line where that is a heading,
+    else the fill's name. No heading or fence of `section` is read; RolesError where a fill is not found."""
+    out, at = [], 0
+    for name, parts in (("practices", lead), ("opening", [opening]), ("reads", blocks)):
+        texts = [str(p).rstrip("\n") for p in parts]
+        fill = "\n\n".join(t for t in texts if t)
+        if not fill:
+            continue
+        start = section.find(fill, at)
+        if start < 0:
+            raise lib.RolesError("the task's %s is not in the ## Task section render_work_order_section composed, so "
+                                 "its blocks' extents cannot be read; nothing is written" % name)
+        at, line = start + len(fill), section.count("\n", 0, start) + 1
+        for i, text in enumerate(texts):
+            if not text:
+                continue
+            head, last = text.split("\n", 1)[0], line + text.count("\n")
+            out.append((head if head.startswith("#") else "the task's %s" % name, line, last, None))
+            for off, fence in handed.get(i, ()) if name == "reads" else ():
+                opens = line + off + 4
+                closes = opens + fence.count("\n")
+                extent = (text.split("\n")[off], line + off, closes, (opens, closes))
+                if off:
+                    out.append(extent)
+                else:
+                    out[-1] = extent
+            line = last + 2
+    return out
+
+
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
                    notes=None, tail="", upstream=None, item=None, allowance=()):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
@@ -801,7 +839,9 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
                     values[k.rstrip("?")] = section
     sources = {"task": ("card", card), "card": ("card", card), "brief": ("brief record", brief),
                "input": ("arguments", None), "upstream": ("arguments", None)}
-    blocks, absent, reasons = [], [], []
+    # TOOL-dBoundRoles-48 S2: `handed` maps a block's index in `blocks` to `(line offset, fence)` of each handed
+    # block it holds, so the extents are the render's own; a block appended with no entry is checked as authored
+    blocks, absent, reasons, handed = [], [], [], {}
     for k in reads:
         key = k.rstrip("?")
         v = BLANK_EDGES_RE.sub("", values.get(key, ""))
@@ -814,8 +854,10 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             typed = key.startswith("input:") and key[6:] in TYPED_INPUTS
             if typed:
                 refusals += lib.check_authored_lines(v, key)
+            else:
+                handed[len(blocks)] = [(0, lib.render_handed_fence(v))]
             blocks.append("### %s\n\n%s\n\n%s" % (key, lib.render_fact_line(fact, root),
-                                                  v if typed else lib.render_handed_fence(v)))
+                                                  v if typed else handed[len(blocks)][0][1]))
             continue
         src, path = sources[key.split(":")[0]]
         what = ("no %s: %s" % (src, why[src])) if why.get(src) else (
@@ -830,19 +872,26 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     if declaration is not None:
         # TOOL-dBoundRoles-3 S2: each input of the item handed as content under its own level-3 heading, a `reads`
         # key spelled as its `field.` tag, its fact line two below; one it cannot resolve refuses or is not supplied
-        subs = []
+        subs, fences = [], []
         for k in item_keys:
             key = k.rstrip("?")
             head = lib.derive_field_tag(key) if key in lib.READ_KEYS else key
             v = BLANK_EDGES_RE.sub("", values.get(key, ""))
             fact = fact_keys.get(key) or fact_keys.get(key.split(":")[0])
             if fact and not check_placeholder(v):
-                subs.append("### %s\n\n%s\n\n%s" % (head, lib.render_fact_line(fact, root), lib.render_handed_fence(v)))
+                fences.append(lib.render_handed_fence(v))
+                subs.append("### %s\n\n%s\n\n%s" % (head, lib.render_fact_line(fact, root), fences[-1]))
             elif not k.endswith("?"):
                 if not any(r.startswith(key + " — ") for r in refusals):
                     refusals.append("%s — the item %s's input carries no value this render resolves" % (head, item))
             elif key not in absent:
                 absent.append(key)
+        # the `### inputs` block's sub-blocks sit two lines below its heading, a blank line between each
+        at, offsets = 2, []
+        for sub, fence in zip(subs, fences):
+            offsets.append((at, fence))
+            at += sub.count("\n") + 2
+        handed[len(blocks) + lib.WORK_ORDER_BLOCKS.index("### inputs")] = offsets
         blocks += render_work_order_blocks(item, declaration, prefixes, subs)
     if charter_error is not None:
         raise charter_error
@@ -870,6 +919,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             practices = lib.render_envelope(PRACTICES_DOC % (doc, step), row[0], row[1], practices)
     # PLAY-dOrderedCharter-8 S7: the card's level-1 block leads the task part after the level-0 practices
     card_block = render_card_block(root)
+    lead = [practices, card_block]
     if card_block:
         practices = practices.rstrip("\n") + "\n\n" + card_block if practices else card_block
     # TOOL-dBoundRoles-6 S4: the role section is the library's one composition, the one the role index's
@@ -877,16 +927,12 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     role_sec = lib.render_role_section(KIT_DIR, role, memory_root, charter_text, granted.get(role, ()), rows)
     task_sec = lib.render_work_order_section(WORK_ORDER, lib.extract_work_order_parts(WORK_ORDER)[1], {
         "opening": opening, "reads": "\n\n".join(blocks), "practices": practices}, wraps) + "\n"
-    # TOOL-dBoundRoles-38 S5: a section whose walk ends inside a fence would hide every later fact line from
-    # the spawn's re-cut, so it refuses, naming the block the fence opened in and its line, and nothing is written
-    block_at = "the task's opening"
-    for n, line in lib.read_unfenced_lines(task_sec):
-        if line is None:
-            raise lib.RolesError("%s — a fence opened at line %d of the ## Task section is never closed, so every "
-                                 "fact line after it would be read as content; close it in the value that opened "
-                                 "it and render again" % (block_at, n))
-        if line.startswith(("## ", "### ")):
-            block_at = line
+    # TOOL-dBoundRoles-48 S2: the fence state checked at every block's extents, the render's own, once the section
+    # is composed and before the marker hashes it, so a block that opens inside a fence, a handed block's content
+    # read outside its own and a walk ending inside one (TOOL-dBoundRoles-38 S5) refuse, and nothing is written
+    fenced = lib.check_block_fences(task_sec, derive_block_extents(task_sec, lead, opening, blocks, handed))
+    if fenced:
+        raise lib.RolesError("\n".join(fenced))
     marker ="<!-- gov:handoff role=%s build=%s unit=%s item=%s path=%s role-sha=%s task-sha=%s -->" % (
         role, slug, unit or "-", item or "-", rel, lib.derive_section_sha(role_sec), lib.derive_section_sha(task_sec))
     head = "**Serves:** journal %s\n%s\n# %s handoff — %s\n\n%s\n\n" % (

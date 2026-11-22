@@ -42,9 +42,10 @@ reference; this page is the short version.
    `--input question=` or `--input diff=`, is your own text and is written without a fence. A line
    of it that reads as a heading, a fact line, a `gov:handoff` marker line or a `Framed by:` line is
    refused, naming `input:<name>` and the line, and so is a fence it opens and never closes. To quote
-   such lines, hand them in a file with `--input spec=<path>`. A render whose task
-   would end inside an unclosed fence is refused, naming the block and the line, and nothing is
-   written. `handoff.py facts --build <slug> --unit <id> --input prompt=<brief>
+   such lines, hand them in a file with `--input spec=<path>`. The task is checked block by block:
+   a render in which a block would start inside a fence an earlier block left open, a handed block's
+   content would be read outside its own fence, or the task would end inside an unclosed fence is
+   refused, naming the block and the line, and nothing is written. `handoff.py facts --build <slug> --unit <id> --input prompt=<brief>
    --input spec=<spec>` prints the same cut as one JSON list for a caller that hands it on: the unit
    harness takes it as `facts` wherever `roles.builder` travels, and refuses a call without it.
    Its `gov:handoff` marker line names the item the work order was cut for as `item=`: pass
@@ -270,6 +271,14 @@ until an owner writes its first row.
   A fact line or marker line inside a fence is content and is neither re-cut nor counted.
 - A handoff whose `## Task` section ends inside a fence that never closes. The refusal names the line
   of the file the fence opened at. Re-render the handoff.
+- A handoff whose typed block, `### input:question` or `### input:diff`, holds a fact line, a
+  `gov:handoff` marker line or a `Framed by:` line, inside a fence or not, or leaves a fence open. The
+  refusal names the block and the line of the file. Correct the value and re-render the handoff.
+- A handoff whose fences were moved across its blocks: a fact line that does not sit two lines below
+  its block's heading, or a handed block whose content does not sit inside its own fence, or whose
+  fence is followed by anything but blank lines before the next block. The task envelope's closing
+  line may follow the last one. The refusal names the block and the line of the file. Re-render the
+  handoff.
 - A tool write to `.claude/roles.json`, or to the agent file `.claude/agents/<role>.md` of a role the
   index names, from any writer, the main session included. `render_agents.py --write` is their one
   writer. Your own files under `.claude/agents/` are not affected. The policy kit's commit guard also
