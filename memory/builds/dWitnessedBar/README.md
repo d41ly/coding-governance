@@ -204,7 +204,7 @@ ids TOOL-dWitnessedBar-105 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dW
 | [TOOL-dWitnessedBar-110 — the closing review round 2's five minors batched: verify-peer's bar carries a fresh run id, an unarmed attribution check says so, a trailer's trailing whitespace reads as git's cleanup reads it, and two accepted shapes gain the arms that fail when they break](spec/2026-11-21-spec-TOOL-dWitnessedBar-110.md) | 51 | 2 | CLOSED | rev-1 | 2026-11-21 |
 <!-- /gen:build-units -->
 
-Records: 1027 bound to this build, across 4 record folder(s).
+Records: 1028 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
