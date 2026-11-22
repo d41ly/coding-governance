@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing
 
-**Status:** DEFERRED · rev-10 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-11 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0213@bfd195a1 whole
 
@@ -29,6 +29,8 @@
 | [2026-11-02-prompt-TOOL-dTotalRecall-2-owner-fork.md](../prompts/2026-11-02-prompt-TOOL-dTotalRecall-2-owner-fork.md) | research | — |
 | [2026-11-03-prompt-TOOL-dTotalRecall-2-1-spec-writer.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-2-1-spec-writer.md) | journal | — |
 | [2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md](../prompts/2026-11-03-prompt-TOOL-dTotalRecall-2-owner-fork.md) | research | TOOL-dTotalRecall-1 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-2-carries-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-carries-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -237,8 +239,8 @@ read is the remote's, never a local-only ref. Else the slug claim `refs/gov/clai
 `session` key is this session's (TOOL-dTotalRecall-3's claim keys; TOOL-dPlacedRequest-21's claim body,
 `tools/loop/claim.py#render_claim_body`, carries `session` too); a lease or claim held by another
 refuses, naming the holder. A build with neither, every build opened before TOOL-dTotalRecall-3, mints
-under the charter's per-session rule and prints `minted under the session rule: no claim or lease for
-<slug>`; a tree where the unattended kit does not resolve prints `unarmed — no unattended kit` first.
+under the charter's per-session rule and prints `minted under the session rule: no claim or lease for <slug>`;
+a tree where the unattended kit does not resolve prints `unarmed — no unattended kit` first.
 The offline value passed to `gov-claim.sh` is `read_policy_value("leases.offline", root)` (I8), the
 memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`, since TOOL-dTotalRecall-8
 mints no `policy_value.py`.
@@ -475,6 +477,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC3 AC
   offline and no-remote answers follow TOOL-dTotalRecall-3 rev-4 (exit 4 added); `deviation` is `hand`
   at HEAD, so S9 moves it; code citations re-pointed to `#symbol`; the arms move to the memory-hygiene
   self-test and the leg line gains the legs the touched files' guards name.
+- rev-11 · 2026-11-22 · §4 "Minting" · per `2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer`:
+  the paragraph is rewrapped so cl-dClosedLoop-0213's token `minted under the session rule: no claim or lease for <slug>`
+  stands whole on one line, as the clause carries it; no word changed.
 
 ## 10. Reuse audit
 

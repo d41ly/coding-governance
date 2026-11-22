@@ -168,3 +168,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T15:53:11Z draw · re-dispatch · TOOL-dTotalRecall-6 · 17/186 · 20261122T155311Z-9d2b14
 
 2026-11-22T15:53:11Z dispatch · item 803a3b80 TOOL-dTotalRecall-6 · reason memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-6-deviation-62.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-6-deviation-63.md
+
+2026-11-22T16:44:19Z brief · item TOOL-dTotalRecall-22 · reason 82f81cb8b6ee memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-22-build-brief.md
