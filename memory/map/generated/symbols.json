@@ -29313,6 +29313,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "render_lead_notice",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "render_ledger",
       "kind": "function",
       "file": "tools/memory-tree/seen_red.py"
@@ -29621,6 +29626,11 @@
       "id": "render_population",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "render_position_line",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "render_position_lines",
@@ -33436,6 +33446,11 @@
       "id": "run_card_file",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "run_card_replay",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
     },
     {
       "id": "run_case",
@@ -38556,6 +38571,11 @@
       "id": "set_builds_mode",
       "kind": "function",
       "file": ".githooks/straggler-guard.test.sh"
+    },
+    {
+      "id": "set_card_answer",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
     },
     {
       "id": "set_card_policy",
