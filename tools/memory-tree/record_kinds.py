@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""record_kinds.py — the record-kind registry's reader, gate, view and factory (TOOL-dTotalRecall-1, -18, -16, -25).
+"""record_kinds.py — the record-kind registry's reader, gate, view and factory (TOOL-dTotalRecall-1, -18, -16, -25, -40).
 
     python <prefix>/memory-tree/record_kinds.py --check             # the `record-kinds` leg
     python <prefix>/memory-tree/record_kinds.py --write             # the HYGIENE template's kind region
@@ -74,7 +74,14 @@ the common git dir (the inline `common_git_dir` block), skips git's own (`GIT_OW
 entry no row's `<git-common-dir>/` home glob matches on its first segment. THE ALIAS JOIN reads the
 runlog kit's `SERVES_ALIASES` from its `record.py` by `ast` and reds where it differs from the
 `tree_lib.KIND_ALIASES` keys whose target is `log`; where that kit does not resolve it prints
-`unarmed` and passes, since this kit does not require it. THE PENDING RULE reads `memory.map-purpose`
+`unarmed` and passes, since this kit does not require it. THE ALIAS CENSUS, `check_alias_compares`,
+reads every tracked `*.py`, `*.sh` and `*.js` file under the tool root and lists each line spelling a
+`tree_lib.KIND_ALIASES` key as a quoted literal that is an operand of `==`, `!=`, `===` or `!==`, a
+member of the bracket after ` in (` or ` in [`, or in a `*.sh` file a `case` pattern: a retired kind
+token compared raw, where `tree_lib.resolve_kind` is the one reader. A listed line is red unless
+`ALIAS_COMPARE_KEPT` keys its file by its path under the tool root, and is then printed `kept <reason>`,
+the reason a fixture planting a legacy record on purpose or a homonym naming no record kind; a count
+line closes it. THE PENDING RULE reads `memory.map-purpose`
 once through `tree_lib.read_policy_value` and grades each `pending` row by it: under `review` an open
 ask, a row of a tracked `<memory root>/builds/*/BACKLOG.md` no `CLOSED` or `WONTDO` row names; under
 `ledger` `purpose-pending` and the node a row of that `[[ledger]]` population, a listed node now
@@ -120,6 +127,10 @@ is a row of the playbook kit's layer register: its shape only. A `WRITE_FOLDERS`
 folder (the product class's conf key) covers no home. A pocket's contents, which it never reads.
 Whether a derived purpose describes its node: the citation makes it checkable, never checked. An ask
 closed only by a spec header's `closes`, read as open. The chain rows, which `--check` never grades.
+The alias census does not see a comparison through a variable holding the alias, a regex form such as
+an `awk` alternation of both tokens, an unquoted shell test, or any file outside the tool root; a real
+kind comparison added to a kept file, which the file-keyed keep hides; or a kept file that no longer
+hits, which it keeps keying.
 """
 from __future__ import annotations
 
@@ -183,6 +194,11 @@ FACTORY_SOURCE = re.compile(r"(?:^|/)build_records\.py:KINDS\.([^.]+)\.required$
 GAP_KEY_RE = re.compile(r"gap-[a-z]+-\d{2,3}")
 FOLLOW_GAP = re.compile(r"^gap (\S+)")
 NOT_ARMED = 3
+#: TOOL-dTotalRecall-40 S2: the files whose alias-compare hits are kept, `{<path under the tool root>: <reason>}`,
+#: each reason `fixture: ...` (a legacy record planted on purpose) or `homonym: ...` (a token naming no record
+#: kind). Each key is spelled in parts: the install-prefix ban reads a kit path.
+ALIAS_COMPARE_KEPT = {"/".join(("govkit", f)): "homonym: the shim's install.on-shim-call mode"
+                      for f in ("shims.py", "selftest.py")}
 
 
 class RecordKindsError(Exception):
@@ -896,6 +912,40 @@ def check_serves_aliases(root, kit_rel: str, tool_rel: str) -> tuple[str, list[s
     return f"alias · {rel} · SERVES_ALIASES {', '.join(got)} · held to KIND_ALIASES", []
 
 
+def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
+    """TOOL-dTotalRecall-40 S2's alias census: `(lines, reds)` over every tracked `*.py`, `*.sh` and `*.js`
+    file under the tool root, each line spelling a `tree_lib.KIND_ALIASES` key as a quoted literal that is
+    an operand of an equality operator, a member of the bracket after an `in`, or in a `*.sh` file a `case`
+    pattern. A hit is red unless `ALIAS_COMPARE_KEPT` keys its file by its path under the tool root, and
+    is then printed `kept <reason>`; a count line closes the list. It reads, never writes."""
+    from tree_lib import KIND_ALIASES
+    quoted = r"""(?P<q>["'])(?:%s)(?P=q)""" % "|".join(re.escape(a) for a in sorted(KIND_ALIASES))
+    operands = (re.compile(rf"(?:==|!=)=?\s*{quoted}"), re.compile(rf"{quoted}\s*(?:==|!=)"))
+    member, token = re.compile(r" in [(\[]([^)\]]*)"), re.compile(quoted)
+    case = re.compile(r"^\s*\(?([^()]*)\)")
+    paths = sorted({p for ext in ("py", "sh", "js")
+                    for p in read_tracked(root, f"{tool_rel}/**/*.{ext}" if tool_rel else f"**/*.{ext}")})
+    lines, reds, kept = [], [], 0
+    for path in paths:
+        key = path[len(tool_rel) + 1:] if tool_rel else path
+        text = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace")
+        for n, ln in enumerate(text.splitlines(), 1):
+            m = case.match(ln) if path.endswith(".sh") else None
+            if not (any(o.search(ln) for o in operands) or any(token.search(g) for g in member.findall(ln))
+                    or (m and any(token.fullmatch(alt.strip()) for alt in m[1].split("|")))):
+                continue
+            if key in ALIAS_COMPARE_KEPT:
+                kept += 1
+                lines.append(f"alias-compare · {path}:{n} · kept {ALIAS_COMPARE_KEPT[key]}")
+                continue
+            lines.append(f"alias-compare · {path}:{n} · red")
+            reds.append(f"alias-compare {path}:{n}: compares a retired kind token raw, {ln.strip()[:120]!r}; read "
+                        f"the kind through tree_lib.resolve_kind, or key the file in ALIAS_COMPARE_KEPT with its reason")
+    lines.append(f"alias-compare · {len(paths)} code files under {tool_rel or '.'} · {kept + len(reds)} hits · "
+                 f"{kept} kept · {len(reds)} red")
+    return lines, reds
+
+
 def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tuple[list[str], int]:
     """S3, S4, S6 and the gap-key join over the tree at `root`: `(lines, exit)`. `typed_kinds` stands in
     for `tree_lib.TYPED_RECORD_KINDS` (the fixture's list)."""
@@ -996,6 +1046,8 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
     reds += pocket_reds
     alias_line, alias_reds = check_serves_aliases(root, kit_rel, tool_rel)
     reds += alias_reds
+    compare_lines, compare_reds = check_alias_compares(root, tool_rel)
+    reds += compare_reds
     try:
         purpose_line, purpose_reds = check_purpose(root, rows, value)
     except RecordKindsError as e:
@@ -1010,7 +1062,7 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
         return UNARMED if joins["unarmed"] else ", ".join(names) or "—"
     lines += [f"{SAY}: view · {r.get('name')} · read by {render_view_names(derive_read_by(r, joins))} · written by "
               f"{render_view_names(derive_written_by(r, joins))}" for r in rows]
-    lines += [f"{SAY}: {ln}" for ln in pocket_lines + [alias_line]]
+    lines += [f"{SAY}: {ln}" for ln in pocket_lines + [alias_line] + compare_lines]
     lines += [f"{SAY}: RED {r}" for r in reds]
     lines.append(f"{SAY}: {'red' if reds else 'green'}")
     return lines, 1 if reds else 0
@@ -1527,7 +1579,7 @@ PLANTS = ("writer-missing", "check-unknown", "source-drift", "factory-kind-unrow
           "alias-drift", "new-purpose", "review", "review-write", "purpose-missing", "purpose-long",
           "pending-closed", "value-refuse", "value-derive", "value-ledger", "value-ledger-unregistered",
           "value-refused", "stream-unordered", "stream-empty", "stream-order-text", "stream-unit-twice",
-          "stream-fence-missing", "stream-validator-missing")
+          "stream-fence-missing", "stream-validator-missing", "raw-alias-compare", "alias-compare-kept")
 #: TOOL-dTotalRecall-25's fixture: the well-formed plan of two streams, and each stream plant's edit of its fence
 FIXTURE_PLAN = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-05-build-TOOL-{FIXTURE_BUILD}-1-stream-plan-1.md"
 FIXTURE_FENCE = ('```toml\n[[stream]]\nname = "tooling"\n'
@@ -1696,6 +1748,11 @@ def build_fixture(tmp, plant: str | None = None):
         "| gap-mem-01 | the fixture's one gap |\n")
     write_fixture_file(f"memory/builds/{FIXTURE_BUILD}/prompts/2026-01-01-prompt-{unit}-brief.md",
                        f"**Serves:** log {unit}\n\nthe fixture's brief\n")
+    if plant in ("raw-alias-compare", "alias-compare-kept"):   # TOOL-dTotalRecall-40: the census's plant, its
+        from tree_lib import KIND_ALIASES                        # token read off the alias table, so no hit here
+        planted = "planted/compare.py" if plant == "raw-alias-compare" else sorted(ALIAS_COMPARE_KEPT)[0]
+        write_fixture_file(f"{tool_rel}/{planted}" if tool_rel else planted,
+                           f"def read(kind):\n    if kind == {json.dumps(sorted(KIND_ALIASES)[0])}:\n        return 1\n")
     fence = FIXTURE_FENCE.replace(*FIXTURE_STREAM_EDITS[plant], 1) if plant in FIXTURE_STREAM_EDITS else FIXTURE_FENCE
     write_fixture_file(FIXTURE_PLAN, f"**Serves:** stream-plan {unit} TOOL-{FIXTURE_BUILD}-2 TOOL-{FIXTURE_BUILD}-3\n\n"
                        f"# {unit} stream-plan 1 — the fixture's plan\n\n{fence}")
@@ -1812,7 +1869,8 @@ def run_selftest() -> int:
             "stream-order-text": (FIXTURE_PLAN, f"unit TOOL-{FIXTURE_BUILD}-2", "order '2'"),
             "stream-unit-twice": (FIXTURE_PLAN, f"unit TOOL-{FIXTURE_BUILD}-2 is named in"),
             "stream-fence-missing": (FIXTURE_PLAN, "fence"),
-            "stream-validator-missing": ("row stream-plan", "record_kinds:no_such_check")}
+            "stream-validator-missing": ("row stream-plan", "record_kinds:no_such_check"),
+            "raw-alias-compare": ("alias-compare", "planted/compare.py:2")}
     refusals = {"value-ledger-unregistered": PURPOSE_PENDING, "value-refused": "memory.map-purpose"}
 
     def test_pipe_cell(lines):
@@ -1842,6 +1900,8 @@ def run_selftest() -> int:
                                            for ln in ls) and not any(" view · " in ln and "item.build.prose" in ln
                                                                       for ln in ls),
              "pocket-registered": lambda ls: f"{SAY}: pocket · stray · stray" in ls,
+             "alias-compare-kept": lambda ls: any(ln.startswith(f"{SAY}: alias-compare · ") and ":2 · kept homonym: " in ln
+                                                  for ln in ls),
              "new-row": lambda ls: any(" rows · " in ln and "widget 3 graded" in ln for ln in ls),
              "pipe-cell": test_pipe_cell,
              "new-purpose": lambda ls: f"{SAY}: fixture new-purpose · widget · source owner" in ls,

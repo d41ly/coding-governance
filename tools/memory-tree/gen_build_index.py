@@ -2265,7 +2265,8 @@ ROUTE_NAMED = 2
 def render_routes(build: dict) -> str:
     """The ROUTING region (TOOL-dTotalRecall-4 S5): one table routing a reader to each record of this
     build by purpose. The typed rows are read from `TYPED_RECORD_KINDS`, one per member that has a
-    record, and every kind from the bindings `plan()` attached (`build["records"]`), never re-parsed;
+    record, and every kind from the bindings `plan()` attached (`build["records"]`), never re-parsed,
+    read once through `resolve_kind`, so a `logs` row holds a record bound by the retired token too;
     a row renders only where its purpose has a member, save `card ref`, which names the build's card
     ref and never reads it, so the region's bytes are the same on every node. A purpose with more
     than `ROUTE_NAMED` records names the newest by filename date and counts the rest under its folder.
@@ -2277,12 +2278,14 @@ def render_routes(build: dict) -> str:
         rows.append(("run state", "`RUN.md`"))
     if build["units"]:
         rows.append(("the units", "the units table above"))
-    in_build = [r for r in build.get("records", []) if r["path"].startswith(pre + "build/")]
+    # TOOL-dTotalRecall-40 S1: each kind read once through `resolve_kind`, so a retired token routes as its alias.
+    in_build = [(r["path"], resolve_kind(r.get("kind"))) for r in build.get("records", [])
+                if r["path"].startswith(pre + "build/")]
     purposes = [("briefs", "prompts", [p for p in build["docs"] if p.startswith(pre + "prompts/")]),
                 ("reviews", "reviews", [p for p in build["docs"] if p.startswith(pre + "reviews/")])]
-    purposes += [(k, "build", [r["path"] for r in in_build if r.get("kind") == k]) for k in TYPED_RECORD_KINDS]
-    purposes += [("research", "build", [r["path"] for r in in_build if r.get("kind") == "research"]),
-                 ("logs", "build", [r["path"] for r in in_build if resolve_kind(r.get("kind")) == "log"])]
+    purposes += [(k, "build", [p for p, kind in in_build if kind == k]) for k in TYPED_RECORD_KINDS]
+    purposes += [("research", "build", [p for p, kind in in_build if kind == "research"]),
+                 ("logs", "build", [p for p, kind in in_build if kind == "log"])]
     for purpose, folder, paths in purposes:
         if not paths:
             continue
@@ -6253,6 +6256,12 @@ def test_front_matter_schema(arm) -> None:
         lambda: str(all(f"| {k} | `2026-08-01-build-ARCH-tR-1-{k}-1.md` |" in region for k in TYPED_RECORD_KINDS)
                     and "| card ref | `refs/gov/builds/tR/card` |" in region
                     and max(len(ln) for ln in region.split("\n")) <= 350))
+    # TOOL-dTotalRecall-40 S1 — a `log` and a `journal` binding in one build both route under `logs`.
+    pair = dict(build, docs=[], records=[{"path": pre + f"build/2026-08-0{n}-build-ARCH-tR-1-{k}.md", "kind": k}
+                                         for n, k in ((1, "log"), (2, "journal"))])
+    arm("TOOL-dTotalRecall-40 S1 — a log and a journal record in one build both route under logs",
+        "| logs | `2026-08-02-build-ARCH-tR-1-journal.md`, `2026-08-01-build-ARCH-tR-1-log.md` |",
+        lambda: render_routes(pair))
 
 
 def check_expand_contract() -> str:

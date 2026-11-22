@@ -5448,6 +5448,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "check_alias_compares",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "check_alias_copies",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
