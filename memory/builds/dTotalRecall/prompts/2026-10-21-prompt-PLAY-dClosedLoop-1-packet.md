@@ -69,7 +69,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `e239d8161fb3a02a24f65039f3045947b0b382aa`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `62ccec623069583d765b86d723e0533c739169e5`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -78,7 +78,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `b1b9c9b613365fa43ad0e9eb94db3b96a03eba6e`
+- rendered at: `8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -123,8 +123,8 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 ### Parents
 
 - dDeclaredLoop: specs done yes, build done yes, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0108@df656363` (`serves`); `cl-dClosedLoop-0109@48e119fc` (`supersedes`)
-- dWitnessedBar: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0351@d6eaa553` (`tools/lib`); `cl-dClosedLoop-0353@24ae0391` (`test.seed`); `cl-dClosedLoop-0364@2fbc8cf5` (`tools/lib`)
-- dPlacedRequest: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0120@5d655f07` (`leases.offline`); `cl-dClosedLoop-0124@b8ada8e4` (`map`); `cl-dClosedLoop-0125@4e0727e5` (`probe`); `cl-dClosedLoop-0127@4f0c1452` (`[pockets]`); `cl-dClosedLoop-0501@e1101a14` (`owner`)
+- dWitnessedBar: specs done yes, build done yes, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0351@d6eaa553` (`tools/lib`); `cl-dClosedLoop-0353@24ae0391` (`test.seed`); `cl-dClosedLoop-0364@2fbc8cf5` (`tools/lib`)
+- dPlacedRequest: specs done yes, build done yes, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0120@5d655f07` (`leases.offline`); `cl-dClosedLoop-0124@b8ada8e4` (`map`); `cl-dClosedLoop-0125@4e0727e5` (`probe`); `cl-dClosedLoop-0127@4f0c1452` (`[pockets]`); `cl-dClosedLoop-0501@e1101a14` (`owner`)
 
 ### Children
 
@@ -200,32 +200,32 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dTotalRec
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dTotalRecall-1` · README:61 | 1 | `TOOL-dTotalRecall-1` | `cl-dClosedLoop-0212@121cf0ba` | the memory contract: the record-kind registry (per kind: tag |
-- unit id `TOOL-dTotalRecall-2` · README:62 | 2 | `TOOL-dTotalRecall-2` | `cl-dClosedLoop-0213@09982ca6` | the one `record` write command |
-- unit id `TOOL-dTotalRecall-3` · README:63 | 3 | `TOOL-dTotalRecall-3` | `cl-dClosedLoop-0214@78961f0f` | for every filer outside a build |
-- unit id `TOOL-dTotalRecall-4` · README:64 | 4 | `TOOL-dTotalRecall-4` | `cl-dClosedLoop-0215@10676c23` | the build README's declared front-matter schema |
-- unit id `TOOL-dTotalRecall-5` · README:65 | 5 | `TOOL-dTotalRecall-5` | `cl-dClosedLoop-0216@f8936b35` | the slug and id grammar exported once and read by every slug and id reader (`builds.slug-words` |
-- unit id `TOOL-dTotalRecall-6` · README:66 | 6 | `TOOL-dTotalRecall-6` | `cl-dClosedLoop-0217@631907d1` | typed relations (`depends-on` |
-- unit id `TOOL-dTotalRecall-7` · README:67 | 7 | `TOOL-dTotalRecall-7` | `cl-dClosedLoop-0218@939beda1` | the ask kind's acceptance at filing (`asks.acceptance`) |
-- unit id `TOOL-dTotalRecall-8` · README:68 | 8 | `TOOL-dTotalRecall-8` | `cl-dClosedLoop-0219@927a3172` | the core `code` record (night pass |
-- unit id `TOOL-dTotalRecall-9` · README:69 | 9 | `TOOL-dTotalRecall-9` | `cl-dClosedLoop-0220@d0de1caf` | the `section` |
-- unit id `TOOL-dTotalRecall-10` · README:70 | 10 | `TOOL-dTotalRecall-10` | `cl-dClosedLoop-0221@5746ccbd` | derived anchors suffixed for a repeated heading |
-- unit id `TOOL-dTotalRecall-11` · README:71 | 11 | `TOOL-dTotalRecall-11` | `cl-dClosedLoop-0222@bc317ce6` | the shape-run kind |
-- unit id `TOOL-dTotalRecall-12` · README:72 | 12 | `TOOL-dTotalRecall-12` | `cl-dClosedLoop-0223@18c3e1ad` | the acceptance re-measure counted over every read channel |
-- unit id `TOOL-dTotalRecall-13` · README:73 | 13 | `TOOL-dTotalRecall-13` | `cl-dClosedLoop-0224@bfb0a85c` | the shared extraction primitive in `tools/lib` (LX-2) |
-- unit id `TOOL-dTotalRecall-14` · README:74 | 14 | `TOOL-dTotalRecall-14` | `cl-dClosedLoop-0225@db15491d` | the level-0 project map (PM-1 |
-- unit id `TOOL-dTotalRecall-15` · README:75 | 15 | `TOOL-dTotalRecall-15` | `cl-dClosedLoop-0226@0bd15de1` | the three-way completeness check and the `map` leg pack |
-- unit id `TOOL-dTotalRecall-16` · README:76 | 16 | `TOOL-dTotalRecall-16` | `cl-dClosedLoop-0227@b1bcbcb9` | the record-kind registry's purpose field |
-- unit id `TOOL-dTotalRecall-17` · README:77 | 17 | `TOOL-dTotalRecall-17` | `cl-dClosedLoop-0228@fcc9ca71` | the replay with the map and without at its first unit |
-- unit id `TOOL-dTotalRecall-18` · README:78 | 18 | `TOOL-dTotalRecall-18` | `cl-dClosedLoop-0229@03c635cf` | the kind registry completed: home |
-- unit id `TOOL-dTotalRecall-19` · README:79 | 19 | `TOOL-dTotalRecall-19` | `cl-dClosedLoop-0230@63f11811` | `record` writing each record's header (Serves |
-- unit id `TOOL-dTotalRecall-20` · README:80 | 20 | `TOOL-dTotalRecall-20` | `cl-dClosedLoop-0231@392c9e56` | its own upgrade steps: the `journal` alias |
-- unit id `TOOL-dTotalRecall-21` · README:81 | 21 | `TOOL-dTotalRecall-21` | `cl-dClosedLoop-0232@94a25816` | memory-recall's FTS5 tables moved into the one index file |
-- unit id `TOOL-dTotalRecall-22` · README:82 | 22 | `TOOL-dTotalRecall-22` | `cl-dClosedLoop-0233@50683b2a` | each edge type's cardinality declared per target as well as per source in the kind registry and checked over the merged tree after every merge |
-- unit id `TOOL-dTotalRecall-23` · README:83 | 23 | `TOOL-dTotalRecall-23` | `cl-dClosedLoop-0234@eb7b1784` | the memory legs reading the index's rows for unchanged blobs and re-parsing only changed ones |
-- unit id `TOOL-dTotalRecall-24` · README:84 | 24 | `TOOL-dTotalRecall-24` | `cl-dClosedLoop-0235@dba1fb83` | every commit that touches a record appended to the change feed with its edges once it lands |
-- unit id `TOOL-dTotalRecall-25` · README:85 | 25 | `TOOL-dTotalRecall-25` | `cl-dClosedLoop-0236@4e9bd61a` | the stream-plan kind: a build's units grouped into streams |
-- unit id `TOOL-dTotalRecall-26` · README:86 | 26 | `TOOL-dTotalRecall-26` | `cl-dClosedLoop-0237@0c51b12a` | the atlas under `help/atlas/` |
+- unit id `TOOL-dTotalRecall-1` · README:60 | 1 | `TOOL-dTotalRecall-1` | `cl-dClosedLoop-0212@121cf0ba` | the memory contract: the record-kind registry (per kind: tag |
+- unit id `TOOL-dTotalRecall-2` · README:61 | 2 | `TOOL-dTotalRecall-2` | `cl-dClosedLoop-0213@09982ca6` | the one `record` write command |
+- unit id `TOOL-dTotalRecall-3` · README:62 | 3 | `TOOL-dTotalRecall-3` | `cl-dClosedLoop-0214@78961f0f` | for every filer outside a build |
+- unit id `TOOL-dTotalRecall-4` · README:63 | 4 | `TOOL-dTotalRecall-4` | `cl-dClosedLoop-0215@10676c23` | the build README's declared front-matter schema |
+- unit id `TOOL-dTotalRecall-5` · README:64 | 5 | `TOOL-dTotalRecall-5` | `cl-dClosedLoop-0216@f8936b35` | the slug and id grammar exported once and read by every slug and id reader (`builds.slug-words` |
+- unit id `TOOL-dTotalRecall-6` · README:65 | 6 | `TOOL-dTotalRecall-6` | `cl-dClosedLoop-0217@631907d1` | typed relations (`depends-on` |
+- unit id `TOOL-dTotalRecall-7` · README:66 | 7 | `TOOL-dTotalRecall-7` | `cl-dClosedLoop-0218@939beda1` | the ask kind's acceptance at filing (`asks.acceptance`) |
+- unit id `TOOL-dTotalRecall-8` · README:67 | 8 | `TOOL-dTotalRecall-8` | `cl-dClosedLoop-0219@927a3172` | the core `code` record (night pass |
+- unit id `TOOL-dTotalRecall-9` · README:68 | 9 | `TOOL-dTotalRecall-9` | `cl-dClosedLoop-0220@d0de1caf` | the `section` |
+- unit id `TOOL-dTotalRecall-10` · README:69 | 10 | `TOOL-dTotalRecall-10` | `cl-dClosedLoop-0221@5746ccbd` | derived anchors suffixed for a repeated heading |
+- unit id `TOOL-dTotalRecall-11` · README:70 | 11 | `TOOL-dTotalRecall-11` | `cl-dClosedLoop-0222@bc317ce6` | the shape-run kind |
+- unit id `TOOL-dTotalRecall-12` · README:71 | 12 | `TOOL-dTotalRecall-12` | `cl-dClosedLoop-0223@18c3e1ad` | the acceptance re-measure counted over every read channel |
+- unit id `TOOL-dTotalRecall-13` · README:72 | 13 | `TOOL-dTotalRecall-13` | `cl-dClosedLoop-0224@bfb0a85c` | the shared extraction primitive in `tools/lib` (LX-2) |
+- unit id `TOOL-dTotalRecall-14` · README:73 | 14 | `TOOL-dTotalRecall-14` | `cl-dClosedLoop-0225@db15491d` | the level-0 project map (PM-1 |
+- unit id `TOOL-dTotalRecall-15` · README:74 | 15 | `TOOL-dTotalRecall-15` | `cl-dClosedLoop-0226@0bd15de1` | the three-way completeness check and the `map` leg pack |
+- unit id `TOOL-dTotalRecall-16` · README:75 | 16 | `TOOL-dTotalRecall-16` | `cl-dClosedLoop-0227@b1bcbcb9` | the record-kind registry's purpose field |
+- unit id `TOOL-dTotalRecall-17` · README:76 | 17 | `TOOL-dTotalRecall-17` | `cl-dClosedLoop-0228@fcc9ca71` | the replay with the map and without at its first unit |
+- unit id `TOOL-dTotalRecall-18` · README:77 | 18 | `TOOL-dTotalRecall-18` | `cl-dClosedLoop-0229@03c635cf` | the kind registry completed: home |
+- unit id `TOOL-dTotalRecall-19` · README:78 | 19 | `TOOL-dTotalRecall-19` | `cl-dClosedLoop-0230@63f11811` | `record` writing each record's header (Serves |
+- unit id `TOOL-dTotalRecall-20` · README:79 | 20 | `TOOL-dTotalRecall-20` | `cl-dClosedLoop-0231@392c9e56` | its own upgrade steps: the `journal` alias |
+- unit id `TOOL-dTotalRecall-21` · README:80 | 21 | `TOOL-dTotalRecall-21` | `cl-dClosedLoop-0232@94a25816` | memory-recall's FTS5 tables moved into the one index file |
+- unit id `TOOL-dTotalRecall-22` · README:81 | 22 | `TOOL-dTotalRecall-22` | `cl-dClosedLoop-0233@50683b2a` | each edge type's cardinality declared per target as well as per source in the kind registry and checked over the merged tree after every merge |
+- unit id `TOOL-dTotalRecall-23` · README:82 | 23 | `TOOL-dTotalRecall-23` | `cl-dClosedLoop-0234@eb7b1784` | the memory legs reading the index's rows for unchanged blobs and re-parsing only changed ones |
+- unit id `TOOL-dTotalRecall-24` · README:83 | 24 | `TOOL-dTotalRecall-24` | `cl-dClosedLoop-0235@dba1fb83` | every commit that touches a record appended to the change feed with its edges once it lands |
+- unit id `TOOL-dTotalRecall-25` · README:84 | 25 | `TOOL-dTotalRecall-25` | `cl-dClosedLoop-0236@4e9bd61a` | the stream-plan kind: a build's units grouped into streams |
+- unit id `TOOL-dTotalRecall-26` · README:85 | 26 | `TOOL-dTotalRecall-26` | `cl-dClosedLoop-0237@0c51b12a` | the atlas under `help/atlas/` |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
