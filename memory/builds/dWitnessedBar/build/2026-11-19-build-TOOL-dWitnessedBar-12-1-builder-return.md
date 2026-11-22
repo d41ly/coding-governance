@@ -19,7 +19,7 @@ DIVERGENCE: The spec does not design how `check` reds a duplicated leg tag, but 
 
 For the dispatcher, not the spec: the declared write set (RUN.md line 107) leaves out the 27 descriptors that §4 Files touched lists and S1 needs. A re-dispatch should declare them.
 
-What still holds against the tree at base c05abd81:
+What still holds against the tree at base cbad1ae7:
 - 198 manifest rows with 0 tags; 70 `[[gate_leg]]` rows in 27 descriptors; 128 `[[exempt_leg]]` rows.
 - The tag rule gives 198 unique tags, 6 cut, and only `leg.policy-kit.policy-check` needs F9's suffix. Both readings of the cut rule give identical tags.
 - Both `KNOWN` literals are at tools/run-gates/run-gates.test.sh@20bb181a:409 and :830 with the 15 keys; `read_known_copies` and its "two KNOWN copies that differ" case exist; the four `*_FLOOR_RUN_GATES` constants exist; `KIT_RUN_GATES_VERSION=1.50`; `REGISTRY_FIELDS`, `ROW_TAG_KEYS`, `extract_command` and the 15 namespace rows match what the spec says.
@@ -28,7 +28,7 @@ Nothing was written, staged or committed. The brief was already recorded (a94857
 
 ## Summary
 
-I built nothing on TOOL-dWitnessedBar-12: the spec can't be built as written, so I stopped before the first edit. The worktree is clean at base c05abd8102b4cfa406e6f7cc6b6c3413840ae16a and there is no commit.
+I built nothing on TOOL-dWitnessedBar-12: the spec can't be built as written, so I stopped before the first edit. The worktree is clean at base cbad1ae7192aba9b504d3fb03817b7317c815640 and there is no commit.
 
 **The blocker:** AC3 requires `gov_tag.py check` to exit 1 when two leg rows share one tag (the `leg-dup` plant). No current check does that, and the spec neither designs one nor allows one: §3 puts the shape check, the index and the join factory out of scope. Two smaller spec problems go into the same divergence:
 - §4 Files touched leaves out `tools/playbook/adopt-playbook.sh`, which §7's new arm has to edit.

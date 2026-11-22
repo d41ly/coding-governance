@@ -4,7 +4,7 @@
 
 ## Why
 
-DIVERGENCE: rev-9 cannot be built as written. Every finding from the pre-build probe of the spec at dabb1aa23 is listed here, in one report.
+DIVERGENCE: rev-9 cannot be built as written. Every finding from the pre-build probe of the spec at cf254a004 is listed here, in one report.
 
 (1) §2 S3, the §4 "The pack" line saying a leg with no base reads `unresolved` and is never green, and §4 "Rollout" ("Live at landing ... never gains grades conf-scalar-pins alone") cannot both hold.
 - `conf-scalar-pins` is the first `[[ledger]]` registration, and this pass is what adds its home.
@@ -34,7 +34,7 @@ Nothing was written or committed.
 
 ## Summary
 
-I built nothing: the probe of rev-9 against the tree found two problems a build cannot work around and three smaller defects. All five are listed in `why`. The worktree is clean at base dabb1aa23d29720bdad63e7c886b9030fddcef6a.
+I built nothing: the probe of rev-9 against the tree found two problems a build cannot work around and three smaller defects. All five are listed in `why`. The worktree is clean at base cf254a004dfde902c748f808c248d7f5447878e0.
 
 - **Brief:** the `--brief` verb answered "already recorded, unchanged" at d10430e4a002, so nothing changed.
 - **Spec claims that held against source:**

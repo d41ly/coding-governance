@@ -108,7 +108,7 @@ slot exists.
 ### Evidence
 
 - Ten slots exist and none is a tester: `tools/roles/agents/*.agent.md`, ten files DERIVED by
-  `ls tools/roles/agents/` at HEAD `8a98c9cf`, one of them, `gov-session`, `agent: false`.
+  `ls tools/roles/agents/` at HEAD `9cde7938`, one of them, `gov-session`, `agent: false`.
 - `gate-bar` is a `program` driver with `roles = []` (tools/roles/workflows.toml@d41e845e:68-74). R8
   refuses an agent or workflow driver with no role and says nothing of a program driver with one;
   the `handoff` workflow, also a program driver, lists `gov-session`
@@ -249,7 +249,7 @@ the descriptor rules that already cover the other ten.
   `grep -c 'KEEP|seed", 0) == 15' selftest.py` there prints 1.
   Red when: the overlay is not named in the seed list, so an adopter is never seeded it, or a typed
   count is left beside the roster it counts, or the seed preview keeps the 14 the new seed moves.
-  figure: 15 PINNED 2026-11-20, the HEAD `8a98c9cf` pin of 14 plus the one overlay this unit seeds.
+  figure: 15 PINNED 2026-11-20, the HEAD `9cde7938` pin of 14 plus the one overlay this unit seeds.
 - **AC4** — When `python tools/roles/render_agents.py --check` runs after the pass, it exits 0, and
   `python -c "import json,sys; r = json.load(open(sys.argv[1]))['roles']['gov-tester']; print(r['writes'], r['gates'])" .claude/roles.json`
   prints `none []`.
@@ -266,7 +266,7 @@ the descriptor rules that already cover the other ten.
   `role:gov-tester ['code-miss', 'spec-wrong'] ['code-miss', 'spec-wrong']`, and `python loop_lib.py
   --check` run there exits 0 and prints no line holding `role:gov-tester · pending`.
   Red when: the slot is absent, so `--check` still prints `item.test.attribute` and
-  `item.test.reason` as `pending`, two lines at HEAD `8a98c9cf`, DERIVED by that run; or the row's actor or outcome set
+  `item.test.reason` as `pending`, two lines at HEAD `9cde7938`, DERIVED by that run; or the row's actor or outcome set
   has moved off the two words this slot judges.
 
 ## 7. Gates
@@ -315,7 +315,7 @@ The pass adds no leg: `roles catalogue` and `roles render wiring` grade the slot
   `tools/roles/kit.toml`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing else
   moved.
 - rev-5 · 2026-11-20 · §3 · §4 · §5 · S4 · S5 · S6 · S7 · AC3 · AC4 · AC5 · AC6 · §8 · §10 ·
-  re-grounded at `8a98c9cf` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief: moved
+  re-grounded at `9cde7938` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief: moved
   lines blob-pinned and the rest cited as `path#symbol`; S7 edits nothing, since the
   `item.test.attribute` row already holds the actor, the two outcomes and their routes, and
   `tools/loop/loop.toml` leaves Files touched; S6 also re-pins the default plan's seed preview, 14
@@ -330,7 +330,7 @@ The seam extended is the roles kit's slot pair, `tools/roles/agents/<slot>.agent
 `tools/roles/house/<slot>.md`, rendered by `render_agents.py` and graded by `check_roles.py`, with
 `gov-skeptic` as the `writes: none` precedent; no new mechanism is built. `python
 tools/codebase-map/reuse_lookup.py "an agent role that judges a red gate as a code miss or a wrong
-spec"`, re-run at HEAD `8a98c9cf`, ranked `load_roles` and `RolesError` in `tools/roles/roles_lib.py`,
+spec"`, re-run at HEAD `9cde7938`, ranked `load_roles` and `RolesError` in `tools/roles/roles_lib.py`,
 `check_roles` and `loadRoleIndex`, the seam named and the index reader AC5 exercises, and
 `read_role_defaults` in `tools/loop/loop_lib.py`, the loop's read of the same catalogue, which is why
 the slot alone clears the `pending` lines AC6 reads. The rest were generic stems (`miss`,

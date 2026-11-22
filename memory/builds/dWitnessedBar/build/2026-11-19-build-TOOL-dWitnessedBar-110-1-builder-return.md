@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-110
 
-# TOOL-dWitnessedBar-110 — builder return 1 (run `wf_13dae94e-10b`), committed 8443f6d857f558a179aff2deabb0e3a0e663240a
+# TOOL-dWitnessedBar-110 — builder return 1 (run `wf_13dae94e-10b`), committed fcda2634081d8272d7fe080597956d23c3835549
 
 ## Why
 
-Every claim the spec makes about current code still holds at base 4bfcda23f, including unit 109's landed extract_message_lines, _ATTRIBUTION_FIXTURE, A4 and A6. So TOOL-dWitnessedBar-110 was built as written, with no divergence, and committed as one pass commit. Its trailers are Pass: TOOL-dWitnessedBar-110 and the charter's Co-Authored-By line, and the spec status is set to CLOSED in the same commit.
+Every claim the spec makes about current code still holds at base 41bb06854, including unit 109's landed extract_message_lines, _ATTRIBUTION_FIXTURE, A4 and A6. So TOOL-dWitnessedBar-110 was built as written, with no divergence, and committed as one pass commit. Its trailers are Pass: TOOL-dWitnessedBar-110 and the charter's Co-Authored-By line, and the spec status is set to CLOSED in the same commit.
 
 ## Summary
 
-Built TOOL-dWitnessedBar-110 in commit 8443f6d85 on base 4bfcda23f. The commit-msg hook admitted it and added Commit-Checked: unattended@1.129.
+Built TOOL-dWitnessedBar-110 in commit fcda26340 on base 41bb06854. The commit-msg hook admitted it and added Commit-Checked: unattended@1.129.
 
 **What changed:**
 - **S1 to S3, verify-peer:** `run_verify_peer` in `tools/run-gates/verdict_backends.py` now hands its bar `GATE_RUN_ID=vp-<secrets.token_hex(8)>` and publishes a slot only when the slot's `run_id` equals that id, at both the read and the re-read. The `before` read, its refusal and the `env.pop` call are gone. The plant's stub modes write the id they are given, and the new `redok` and `foreign` modes bring it to ten scenarios. The docstrings and `help/verdict-backends.md` now describe this.

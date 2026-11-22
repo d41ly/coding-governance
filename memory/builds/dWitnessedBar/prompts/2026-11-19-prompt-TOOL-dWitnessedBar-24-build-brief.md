@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 14.
 - Built so far through order 13: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14, 45, 54, 16, 46, 17
-  (`dbbd8caba`: `{prefix}` resolved in seed argvs by the factory), 52 (`fd73e0bbb`: `ratchet.py#read_root_confs`),
-  53, 18 (`0519457ea`: the playbook lists and `landed-steps` registered) and 20 (`8f9313346`: `legacy-homes.txt`
+  (`9a29f1e96`: `{prefix}` resolved in seed argvs by the factory), 52 (`6a075440b`: `ratchet.py#read_root_confs`),
+  53, 18 (`c91fc4e55`: the playbook lists and `landed-steps` registered) and 20 (`ec34083bd`: `legacy-homes.txt`
   moved to `memory/project/` and registered).
 - The spec is rev-5, re-grounded before units 16 to 20 landed. Verify each claim about the factory, the registries
   and `tools/gate-legs.json` against the tree as it stands, and hand back any claim their landed shape breaks as a

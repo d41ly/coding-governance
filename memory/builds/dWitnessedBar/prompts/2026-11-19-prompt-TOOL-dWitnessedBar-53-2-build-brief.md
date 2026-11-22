@@ -9,14 +9,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 11.
 - Built so far through order 10: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14 (the `ratchet` pack,
-  `conf-scalar-pins`), 45, 54, 16 (`87bc9f615`, `3ce285ad7`: gov's registries on the ledger,
-  `tools/memory-tree/convert_registry.py`) and 46 (`028b97364`: the adopter's `seed_scalar_pins` and `--seed-pins`).
-- Unit 17 (order 11) landed at `dbbd8caba` and `384e6761d`: the seven record and row pins are keyed populations, the
+  `conf-scalar-pins`), 45, 54, 16 (`3a7a51471`, `450f7b322`: gov's registries on the ledger,
+  `tools/memory-tree/convert_registry.py`) and 46 (`e1efccc6b`: the adopter's `seed_scalar_pins` and `--seed-pins`).
+- Unit 17 (order 11) landed at `9a29f1e96` and `b9fecf589`: the seven record and row pins are keyed populations, the
   date cutoffs are registered, every seed argv's `{prefix}` resolves in the factory (its S9), and
   `adopt-memory-tree.sh --scaffold` no longer writes `id-orphan-waiver.txt` or `corpus-path-unresolved.txt`. This
   spec was re-grounded over unit 17's rev-7 text; read unit 17's landed code and hand back any claim its landed shape
   breaks as a divergence.
-- Unit 52, which this unit consumes from, landed at `fd73e0bbb`: `tools/memory-tree/ratchet.py#read_root_confs` reads
+- Unit 52, which this unit consumes from, landed at `6a075440b`: `tools/memory-tree/ratchet.py#read_root_confs` reads
   every root conf the working tree holds, tracked or not, behind `read_root_conf_lines`. The spec is rev-7, aligned to
   that name.
 - The pass legs carry one known red: install-prefix on the `conf-scalar-pins` seed argv in

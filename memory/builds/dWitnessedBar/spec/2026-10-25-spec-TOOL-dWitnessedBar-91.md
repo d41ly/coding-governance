@@ -83,7 +83,7 @@ repairs `TOOL-dWitnessedBar-90` and builds one step after it (order 48).
 
 ### Evidence
 
-Read on 2026-11-21 at `380aa64c5`. Units 69 and 90 are CLOSED.
+Read on 2026-11-21 at `2e0d7c562`. Units 69 and 90 are CLOSED.
 
 - `.githooks/pre-push@380aa64c5:1600` is the top-level `rec_sha=""; rec_fp=""; ...` initialiser, and
   `.githooks/pre-push#read_green_file` opens on the next line and repeats the same reset in its body.
@@ -164,7 +164,7 @@ unit is terminal, S1's counts run in 90 AC2's clones and S2's note is written.
   reset deleted or a second `sha)` arm in the reader.
   fixture: 90 AC2's scratch clones under `%TEMP%/<short-name>`.
   figure: the reset count is DERIVED at observation time from the unedited built hook; it read 2 on
-  2026-11-21 at `380aa64c5`.
+  2026-11-21 at `2e0d7c562`.
   permission: the clones are the main loop's, at the close.
 - **AC2** — When
   `awk '/^\*\*Evidences:\*\*|^#/{o=""} /^- /{o=$0} /TOOL-dWitnessedBar-91 S2([^0-9]|$)/{print o}' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-90*acceptance-ledger*`
@@ -204,7 +204,7 @@ the owner derivation of `TOOL-dWitnessedBar-90` §4 still names unit 90 the floo
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edge of TOOL-dWitnessedBar-97, promoted by the round-1 spec audit of units 91 and 92; nothing else
   moved.
-- rev-3 · 2026-11-21 · §4 · §5 · §6 · §7 · §10 · re-grounded at `380aa64c5` per
+- rev-3 · 2026-11-21 · §4 · §5 · §6 · §7 · §10 · re-grounded at `2e0d7c562` per
   2026-11-19-prompt-TOOL-dWitnessedBar-91-reground-brief. Evidence cites the hook by symbol over
   unit 69 as built, whose cut now prints 1 and beside which `read_bar_file` holds a second `sha)`;
   counts re-pinned; Rollout and Files touched list the pass's records; criteria unchanged.

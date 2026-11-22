@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-87
 
-# TOOL-dWitnessedBar-87 — builder return 1 (run `wf_a15e669e-c13`), committed d2a1d891d
+# TOOL-dWitnessedBar-87 — builder return 1 (run `wf_a15e669e-c13`), committed 300c033ce
 
 ## Why
 
-The spec could be built as written. Its claims about the code still hold at HEAD: `grep -c 'lost its CR' tools/run-gates/run-gates.gov.test.sh` prints 0, the per-key loop calls `check_key_variant` with the tail reason first and then the length reason, and the gov suite and .githooks/pre-push have not changed since 6381c364f. The spec's Rollout and the permission lines on AC2 and AC3 say the records for S2 and S3 are written at the close, when the arm runs, after unit 81's own records beside 76 AC2, which are also still owed. So this pass did three things: it probed S1's break, it wrote this unit's own acceptance ledger, and it set the spec to CLOSED. It left the ledgers of units 76 and 81 unwritten. Unit 81's pass took the same route.
+The spec could be built as written. Its claims about the code still hold at HEAD: `grep -c 'lost its CR' tools/run-gates/run-gates.gov.test.sh` prints 0, the per-key loop calls `check_key_variant` with the tail reason first and then the length reason, and the gov suite and .githooks/pre-push have not changed since 9a4949f1c. The spec's Rollout and the permission lines on AC2 and AC3 say the records for S2 and S3 are written at the close, when the arm runs, after unit 81's own records beside 76 AC2, which are also still owed. So this pass did three things: it probed S1's break, it wrote this unit's own acceptance ledger, and it set the spec to CLOSED. It left the ledgers of units 76 and 81 unwritten. Unit 81's pass took the same route.
 
 ## Summary
 
-Committed d2a1d891d on branch/unattended-dwitnessedbar-2ed3b3. Subject names TOOL-dWitnessedBar-87. Trailers are `Decided:`, `Pass: TOOL-dWitnessedBar-87` and `Co-Authored-By`. No code changed.
+Committed 300c033ce on branch/unattended-dwitnessedbar-2ed3b3. Subject names TOOL-dWitnessedBar-87. Trailers are `Decided:`, `Pass: TOOL-dWitnessedBar-87` and `Co-Authored-By`. No code changed.
 
 Files in the commit:
 - C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-87-1-acceptance-ledger.md (new). Each criterion is answered on one line and leads with a token the criterion spells: AC1 `check_canary_keys` (the probe result), AC2 `TOOL-dWitnessedBar-80` (OWED), AC3 `TOOL-dWitnessedBar-76` (OWED).

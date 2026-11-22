@@ -97,8 +97,8 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | 2026-11-21T16:58:59Z | run-state | dispatch | TOOL-dWitnessedBar-109 | - | - | - |
 | 2026-11-21T17:08:52Z | run-state | brief | TOOL-dWitnessedBar-110 | - | - | - |
 | 2026-11-21T17:11:18Z | run-state | dispatch | TOOL-dWitnessedBar-110 | - | - | - |
-| 2026-11-21T17:24:00Z | run-state | phase | fbba9ffd9328 | VERIFYING | - | - |
-| 2026-11-21T18:20:15Z | run-state | phase | bdbd89e9550f | HELD | - | - |
+| 2026-11-21T17:24:00Z | run-state | phase | fd50ad83531b | VERIFYING | - | - |
+| 2026-11-21T18:20:15Z | run-state | phase | f8fdf8d61b87 | HELD | - | - |
 
 ## Units
 
@@ -246,8 +246,8 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["2026-11-21T16:58:59Z","run-state","dispatch","TOOL-dWitnessedBar-109","-","-","-"],
 ["2026-11-21T17:08:52Z","run-state","brief","TOOL-dWitnessedBar-110","-","-","-"],
 ["2026-11-21T17:11:18Z","run-state","dispatch","TOOL-dWitnessedBar-110","-","-","-"],
-["2026-11-21T17:24:00Z","run-state","phase","fbba9ffd9328","VERIFYING","-","-"],
-["2026-11-21T18:20:15Z","run-state","phase","bdbd89e9550f","HELD","-","-"]]}]},
+["2026-11-21T17:24:00Z","run-state","phase","fd50ad83531b","VERIFYING","-","-"],
+["2026-11-21T18:20:15Z","run-state","phase","f8fdf8d61b87","HELD","-","-"]]}]},
 "Units":{"facts":{"units":"93 · shown 0 · aggregated yes"},"tables":[{"name":"by-status","header":["#","status","units"],"rows":[
 ["1","DEFERRED","1"],
 ["2","CLOSED","92"]]}]},

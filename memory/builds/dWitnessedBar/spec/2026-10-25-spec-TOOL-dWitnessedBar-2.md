@@ -74,7 +74,7 @@ through the off-node verdict, because a hook on the bypassing node cannot refuse
   interpret-trailers --in-place`. A commit the hook never saw carries no such trailer. A failed append
   prints one line and still admits, so the driver gains no refusal site: `check-arms.py
   --emit-floors` keeps it at 343 sites, 339 armed, against its `REFUSAL_CEILINGS` row of 343
-  (TOOL-dDeclaredLoop-52), DERIVED 2026-11-20 at `fed256d71`. Observed by AC3.
+  (TOOL-dDeclaredLoop-52), DERIVED 2026-11-20 at `4fc2e7383`. Observed by AC3.
 - **S5** — Kind `unwitnessed-commit`: the pre-push hook walks the pushed range,
   `main_remote..main_local`, through the one trailer reader's `unchecked` verb (F6), which lists each
   non-merge commit whose `Pass:` trailer names a unit (`none` excluded) and that carries no
@@ -193,7 +193,7 @@ until `verdict` names an off-node backend (S6). The pass moves no kit version: t
 next version of every kit whose shipped bytes moved, at the landing
 (`tools/push-main.sh#run_minter`, TOOL-aMendedFleet-65). The policy mirror `.governance/policy.json`
 re-renders its `catalogue_blob` in the records commit after the pass, as unit 6's did at
-`931d4f7cb`.
+`2075a43d5`.
 
 ### Files touched (estimate)
 
@@ -226,10 +226,10 @@ against a backend and is outside the `off-node` verb's population, which only th
 ask. `help/policy.md` is no longer touched (F7). No path of the kickoff manifest's `watch:` line
 (`memory/guides/SESSION-KICKOFF.md`) is touched.
 
-Shared with landed sibling units, settled at `fed256d71`: `tools/push-main.sh` and
+Shared with landed sibling units, settled at `4fc2e7383`: `tools/push-main.sh` and
 `tools/push-main.test.sh` gained `check_landing_verdict` and its arms under `TOOL-dWitnessedBar-6`
-(`aecf1c95a`, red fix `ff89a2ff5`), whose call sites S6 extends; `tools/unattended/unattended.sh`
-gained `check_fix_keeps` inside `check_commit_message` under `TOOL-dWitnessedBar-21` (`cd03e4e75`),
+(`0b7e0fceb`, red fix `b0e8c63b9`), whose call sites S6 extends; `tools/unattended/unattended.sh`
+gained `check_fix_keeps` inside `check_commit_message` under `TOOL-dWitnessedBar-21` (`744515922`),
 before the per-unit loop's path walk and away from S4's admitting `return 0`. Shared with
 `TOOL-dWitnessedBar-43`, at the same order: `tools/run-gates/verdict_backends.py` and
 `tools/policy/catalogue.toml`.
@@ -355,7 +355,7 @@ New arm: tools/unattended/check-pass-order.test.sh · covers AC6 · the unwitnes
   with no `summary` or `usage`, so `help/reference/policy.md` lists the key as not yet summarised, and
   `help/policy.md`'s key table holds only the keys the policy file sets today. Options: (a) the row's
   `summary` and `usage`, drained from the list and rendered into the reference page, as unit 6 did
-  for its four keys (`aecf1c95a`); (b) a prose section of `help/policy.md`, as S8 wrote. (b) states
+  for its four keys (`0b7e0fceb`); (b) a prose section of `help/policy.md`, as S8 wrote. (b) states
   the key's meaning beside a reference page still listing it unsummarised, one fact in two places.
   RESOLVED (agent, 2026-11-20, delegated): (a), rung 3, tie-broken by reuse of the reference
   renderer. widens: none · relaxes: none
@@ -382,7 +382,7 @@ New arm: tools/unattended/check-pass-order.test.sh · covers AC6 · the unwitnes
   `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is unchanged, as the unit writes
   each path; nothing else moved.
 - rev-4 · 2026-11-20 · §1 · S1 S2 S3 S4 S5 S6 S7 S8 · §3 · §4 · §5 · AC1 AC2 AC3 AC4 AC5 AC6 AC7 ·
-  §7 · §8 F5 F6 F7 F8 · §10 · re-grounded over HEAD `fed256d71` past the landed TOOL-dWitnessedBar-6,
+  §7 · §8 F5 F6 F7 F8 · §10 · re-grounded over HEAD `4fc2e7383` past the landed TOOL-dWitnessedBar-6,
   TOOL-dWitnessedBar-21 and TOOL-dDeclaredLoop-23, by the brief
   `2026-11-19-prompt-TOOL-dWitnessedBar-2-reground-spec-writer`: code citations by symbol or
   blob-pinned; S1 reads the landed catalogue row and names its three readers, AC1 observing them;
@@ -414,7 +414,7 @@ bypassed the hooks"` ranked the runlog kit's `write_record` and `render_record`
 (`tools/runlog/record.py`), which write the committed run record and not a journal line, so they are
 not this seam, and `read_commits` as a SEAM across its three copies, which S5 and S7 extend; `python
 tools/codebase-map/reuse_lookup.py "which verdict backend is off node"` ranked `check_backend`,
-which the `off-node` verb calls. Nothing records a bypass at HEAD `fed256d71`, which agrees with
+which the `off-node` verb calls. Nothing records a bypass at HEAD `4fc2e7383`, which agrees with
 scout A.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a hook bypass recorded and when is it refused" --terms "hooks.bypass no-verify ungated landing lander allow record commit check trailer pushes journal off-node"`

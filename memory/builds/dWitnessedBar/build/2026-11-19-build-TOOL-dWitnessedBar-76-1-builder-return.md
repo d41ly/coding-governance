@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-76
 
-# TOOL-dWitnessedBar-76 — builder return 1 (run `wf_bc21c809-da9`), committed bdc10a4dfcdea136d6bb8b8750f936972bd4bedd
+# TOOL-dWitnessedBar-76 — builder return 1 (run `wf_bc21c809-da9`), committed 3596751cf00fccdf72cdfe721716a32fc1ceecf3
 
 ## Why
 
@@ -8,7 +8,7 @@ Built TOOL-dWitnessedBar-76 as rev-4 of its spec says. I checked the spec agains
 
 ## Summary
 
-TOOL-dWitnessedBar-76 is built and committed as bdc10a4df. Its probes match AC1 to AC3, but the suite exits for AC2 and AC3, the legs of §7 and the new arm's RED-first observation are still owed to the main loop at the close.
+TOOL-dWitnessedBar-76 is built and committed as 3596751cf. Its probes match AC1 to AC3, but the suite exits for AC2 and AC3, the legs of §7 and the new arm's RED-first observation are still owed to the main loop at the close.
 
 **What changed** in `C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/run-gates/run-gates.gov.test.sh`:
 - **S1:** `CANARY_KEYS=(sha:rec_sha fingerprint:rec_fp)` is one line at the top level.

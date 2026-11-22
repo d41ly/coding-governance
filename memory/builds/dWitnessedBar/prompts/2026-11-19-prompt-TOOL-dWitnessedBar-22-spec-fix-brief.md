@@ -30,8 +30,8 @@ builder can build it as written over HEAD.
    - `read_leg_edges(manifest_rows)` cannot see the fixture registry AC4 grades its withholding against. Name the
      adapter's registry input, or move the withholding to the caller that holds the namespaces, and name the edge-dict
      shape (`path`, `line`, `site`) its tuples become for `check_edges`.
-   Every other claim the builder probed held at `99fea7aca`; leave those as they are.
-2. Built so far, each landed on this branch: units 26, 27, 48, 49, 13, 50, 15, 12 (`9dbb7bc44`: a `tag` on every leg,
+   Every other claim the builder probed held at `4b1d8cec6`; leave those as they are.
+2. Built so far, each landed on this branch: units 26, 27, 48, 49, 13, 50, 15, 12 (`6b3f271c6`: a `tag` on every leg,
    the `leg`, `pack` and `check` namespaces) and 61. Unit 47 builds after this revision and touches none of its files.
 3. A choice the revision forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it
    RESOLVED in §8 with the delegated mark, and name it in your return.

@@ -1,10 +1,10 @@
 # ledger · trace-waiver · key site path,subject · direction shrink-only · drain hunk
-memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-2-v1-arms-every-gate.md	TOOL-aDrainedSluice-2	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-3-v3-nested-recordings.md	TOOL-aDrainedSluice-3	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-4-v4-rev-scan-reset.md	TOOL-aDrainedSluice-4	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md	TOOL-aDrainedSluice-9	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/builds/aWireWarden/spec/2026-07-15-spec-aWireWarden-1.md	TOOL-aWireWarden-1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/builds/dSettledRoster/spec/2026-08-20-spec-TOOL-dSettledRoster-5.md	TOOL-dSettledRoster-5	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/builds/aScannedThrottle/spec/2026-08-20-spec-TOOL-aScannedThrottle-1.md	TOOL-aScannedThrottle-1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/builds/aWeighedCompass/spec/2026-09-04-spec-TOOL-aWeighedCompass-1.md	TOOL-aWeighedCompass-1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/builds/aProbedToolkit/spec/2026-09-03-spec-TOOL-aProbedToolkit-1.md	TOOL-aProbedToolkit-1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-2-v1-arms-every-gate.md	TOOL-aDrainedSluice-2	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-3-v3-nested-recordings.md	TOOL-aDrainedSluice-3	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-4-v4-rev-scan-reset.md	TOOL-aDrainedSluice-4	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md	TOOL-aDrainedSluice-9	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/builds/aWireWarden/spec/2026-07-15-spec-aWireWarden-1.md	TOOL-aWireWarden-1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/builds/dSettledRoster/spec/2026-08-20-spec-TOOL-dSettledRoster-5.md	TOOL-dSettledRoster-5	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/builds/aScannedThrottle/spec/2026-08-20-spec-TOOL-aScannedThrottle-1.md	TOOL-aScannedThrottle-1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/builds/aWeighedCompass/spec/2026-09-04-spec-TOOL-aWeighedCompass-1.md	TOOL-aWeighedCompass-1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/builds/aProbedToolkit/spec/2026-09-03-spec-TOOL-aProbedToolkit-1.md	TOOL-aProbedToolkit-1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

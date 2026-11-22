@@ -25,7 +25,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 34: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59,
-     30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58 (`75914afa1`), 60 (`f9230803d`) and 62 (`f6ce71662`). Every unit this
+     30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58 (`ab9635b0d`), 60 (`a3ee7a20d`) and 62 (`c2bd2371b`). Every unit this
      spec consumes from is CLOSED.
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes (asks TOOL-dWitnessedBar-101 to -103) and the run
      defers it; any item of this spec that needs it leaves the scope, named in §3 as waiting with unit 28.

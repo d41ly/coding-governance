@@ -47,13 +47,13 @@ key of every file keyed by leg, and register the `leg`, `check` and `pack` names
 extractors, so a leg, a check and a pack can be addressed, selected and shape-checked like every
 other tagged thing. 139 of 140 leg names failed the tag shape (systems.md:270) when the systems
 record measured them, and no leg carries a tag today: `grep -c '"tag"' tools/gate-legs.json` prints
-0 (PINNED 2026-11-19 at `a30a26466`).
+0 (PINNED 2026-11-19 at `632894bd1`).
 
 ## 2. Scope (IN)
 
-- **S1** — A `tag` on each of the 198 rows of `tools/gate-legs.json` (PINNED 2026-11-19 at `a30a26466`)
+- **S1** — A `tag` on each of the 198 rows of `tools/gate-legs.json` (PINNED 2026-11-19 at `632894bd1`)
   and on each of the 70 `[[gate_leg]]` rows in the 27 kit descriptors that carry one (PINNED
-  2026-11-19 at `a30a26466` by §8 F4's probe), by the rule of §4 "The tag rule". Observed by AC1.
+  2026-11-19 at `632894bd1` by §8 F4's probe), by the rule of §4 "The tag rule". Observed by AC1.
 - **S2** — Three `[[namespace]]` rows in `tools/playbook/namespaces.toml`, each carrying every field
   of `REGISTRY_FIELDS` (`tools/playbook/tag_index.py#REGISTRY_FIELDS`), per §4 "The three rows".
   Observed by AC2.
@@ -77,7 +77,7 @@ record measured them, and no leg carries a tag today: `grep -c '"tag"' tools/gat
   by value: `tools/run-gates/owed_rows.py#read_known_copies`, the one reader that compares the
   copies and derives the owed key rows from them, which reads `LEG_KEYS` after the pass.
 - **S5** — `LEG_KEY_FLOORS` in `tools/govkit/govkit.py`, beside the `*_FLOOR_RUN_GATES` constants,
-  four (PINNED 2026-11-19 at `a30a26466`): `SUBJECT_`, `DOC_READS_`, `CEILING_` and
+  four (PINNED 2026-11-19 at `632894bd1`): `SUBJECT_`, `DOC_READS_`, `CEILING_` and
   `STAGE_FLOOR_RUN_GATES`. It is one table from row key to the run-gates version whose canary
   admits it, `tag` its first entry. The emitter, `tools/govkit/govkit.py#write_gate_legs`, carries a descriptor's `tag`
   into a target's row only at or above that floor, through
@@ -152,9 +152,9 @@ record measured them, and no leg carries a tag today: `grep -c '"tag"' tools/gat
 hyphen and the ends trimmed. Where a descriptor's `id` is a namespace word of
 `tools/playbook/namespaces.toml` at the pass, `<owner>` is that id with `-kit` appended (§8 F9). A
 tag over `tools/playbook/tag_index.py#TAG_MAX_BYTES` (64) bytes is cut at its last hyphen within it.
-Applied at `a30a26466` the rule yields 198 tags (PINNED 2026-11-19 by §8 F4's probe):
-70 under a descriptor's id and 128 under `gov` (PINNED 2026-11-19 at `a30a26466`), 6 cut (PINNED
-2026-11-19 at `a30a26466`), no two equal, every one matching `seg := [a-z0-9][a-z0-9-]*`, and one
+Applied at `632894bd1` the rule yields 198 tags (PINNED 2026-11-19 by §8 F4's probe):
+70 under a descriptor's id and 128 under `gov` (PINNED 2026-11-19 at `632894bd1`), 6 cut (PINNED
+2026-11-19 at `632894bd1`), no two equal, every one matching `seg := [a-z0-9][a-z0-9-]*`, and one
 owner, the policy kit's `policy`, a namespace word, so its leg reads `leg.policy-kit.policy-check`.
 
 The rule runs once, at the pass, to write the tags. After that a tag is the leg's declared identity
@@ -165,7 +165,7 @@ shape and uniqueness arm and 7h hold it to.
 ### The three rows
 
 ```toml
-# tools/playbook/namespaces.toml, after its 15 rows (PINNED 2026-11-19 at a30a26466:
+# tools/playbook/namespaces.toml, after its 15 rows (PINNED 2026-11-19 at 632894bd1:
 # PLAY-dOrderedCharter-10's ten and dDeclaredLoop's five)
 [[namespace]]
 ns = "leg"
@@ -201,7 +201,7 @@ join-armed-by = "dWitnessedBar"
 | `ns` | Members at landing |
 |---|---|
 | `leg` | 198, DERIVED from the manifest's rows |
-| `pack` | `pack.tags` alone, DERIVED from the 6 rows carrying `"pack": "tags"` (PINNED 2026-11-19 at `a30a26466`); `ratchet`, `portability` and `adopter` join as their units land |
+| `pack` | `pack.tags` alone, DERIVED from the 6 rows carrying `"pack": "tags"` (PINNED 2026-11-19 at `632894bd1`); `ratchet`, `portability` and `adopter` join as their units land |
 | `check` | none: `tags: unarmed check` |
 
 `leg` and `pack` select: a later instruction unit's or a test selection's scope names them. Each
@@ -215,7 +215,7 @@ them.
 Registering the three words adds no red to the tree as it stands: no defined tag, selector or family
 row has `leg`, `check` or `pack` as its first segment after its namespace, and no backticked or
 bracketed span outside `memory/builds/` opens with one of them (both PINNED 2026-11-19 at
-`a30a26466`, by `tools/playbook/tag_index.py#read_rows` and
+`632894bd1`, by `tools/playbook/tag_index.py#read_rows` and
 `tools/playbook/tag_index.py#read_population` over the loaded view).
 
 ### The one key set
@@ -227,14 +227,14 @@ LEG_KEYS="name argv guard impure reads chunk subject ceiling signature doc_reads
 
 Both Python programs that read the key set today (the arm and `keyset_probe`, cited in S4) take it
 from `LEG_KEYS` as an argument, so a key cannot be admitted by one and refused by the other. The
-value is the 15 keys both copies spell at `a30a26466` (PINNED 2026-11-19) plus `tag`.
+value is the 15 keys both copies spell at `632894bd1` (PINNED 2026-11-19) plus `tag`.
 `tools/run-gates/owed_rows.py` reads the `LEG_KEYS="…"` line where `read_known_copies` read each
 `KNOWN = {...}` line; the row it owes for a key outside the set names `LEG_KEYS`, and its fixture's
 canary text plants one `LEG_KEYS` line.
 
 The run-gates kit's version moves at this pass, and `LEG_KEY_FLOORS["tag"]` is that version
 (DERIVED at the pass from `KIT_RUN_GATES_VERSION`, `tools/run-gates/run-gates.sh@c828502568bf:36`,
-1.50 at `a30a26466`), so an adopter whose installed canary predates `tag` never meets the key.
+1.50 at `632894bd1`), so an adopter whose installed canary predates `tag` never meets the key.
 
 ### Inventory
 
@@ -267,8 +267,8 @@ through `apply` or `update` above the floor.
 - `tools/govkit/selftest.py`
 - `help/tags.md`
 
-The 27 descriptors carrying `[[gate_leg]]` rows (PINNED 2026-11-19 at `a30a26466`;
-DERIVED again 2026-11-19 at `d832ccb37`, 70 rows, the same set):
+The 27 descriptors carrying `[[gate_leg]]` rows (PINNED 2026-11-19 at `632894bd1`;
+DERIVED again 2026-11-19 at `f03072f16`, 70 rows, the same set):
 
 - `tools/branch-reconcile/kit.toml`
 - `tools/codebase-map/kit.toml`
@@ -340,7 +340,7 @@ DERIVED again 2026-11-19 at `d832ccb37`, 70 rows, the same set):
   canary's tag arm, given a copy with one tag duplicated, names both rows.
   Red when: a row lacks a tag, two legs share one, or the policy kit's leg reads
   `leg.policy.policy-check`.
-  figure: the row count is DERIVED from the manifest at observation; 198 is PINNED 2026-11-19 at `a30a26466`.
+  figure: the row count is DERIVED from the manifest at observation; 198 is PINNED 2026-11-19 at `632894bd1`.
 - **AC2** — When `grep -cE '^ns = "(leg|check|pack)"' namespaces.toml` runs in `tools/playbook/`,
   it prints 3, and `grep -cE '^\| .(leg|check|pack). \|' help/tags.md` run at the repository root
   prints 3.
@@ -411,7 +411,7 @@ New arm: tools/govkit/selftest.py · covers AC6 AC7 · the `tag` floor pair and 
   2026-10-25: 142 tags, 3 cut at 64 bytes, no collision, every segment valid. Liveness: before the
   cut, 3 tags exceeded 64 bytes, so the probe reports a negative when the cut is removed. RESOLVED
   (agent, 2026-10-25, delegated): the rule as stated, rung 2. widens: none · relaxes: none.
-  Re-observed 2026-11-19 at `a30a26466`: 198 tags, 70 descriptor-owned in 27 descriptors (PINNED)
+  Re-observed 2026-11-19 at `632894bd1`: 198 tags, 70 descriptor-owned in 27 descriptors (PINNED)
   and 128 exempt, 6 cut (PINNED 2026-11-19), no collision, every segment valid; both graders refuse
   exactly one, `leg.policy.policy-check`, whose first segment is the namespace word `policy`, which
   F9 settles. Liveness: before the cut, 6 tags exceeded `TAG_MAX_BYTES` (PINNED 2026-11-19).
@@ -438,7 +438,7 @@ New arm: tools/govkit/selftest.py · covers AC6 AC7 · the `tag` floor pair and 
 - **F7 — Which layer row does each of the three rows name?** rev-5 named `layer.flow` for `leg` and
   none for the other two. The `owned` arm (`tools/playbook/tag_index.py#check_owned`) reds a member
   of a core layer's namespace minted in a kit whose descriptor names an `optional` or `expansion`
-  layer, and 8 of the descriptors do (PINNED 2026-11-19 at `a30a26466`). Options: (a) `leg` and `pack`
+  layer, and 8 of the descriptors do (PINNED 2026-11-19 at `632894bd1`). Options: (a) `leg` and `pack`
   in `layer.flow`, `check` in `layer.distribution`; (b) all three in `layer.flow`; (c) `pack` in the
   optional `layer.flow.leg-packs`. (b) reds a `[[numbered_check]]` row any of those kits declares,
   and `leg` and `pack` members sit in the manifest under no kit, so the arm never reaches them;
@@ -446,7 +446,7 @@ New arm: tools/govkit/selftest.py · covers AC6 AC7 · the `tag` floor pair and 
   2026-11-19, delegated): (a), rung 3, the precedent of `kit` and `command`, the two rows minted from
   descriptors. widens: none · relaxes: none
 - **F8 — What table declares a check member, when every descriptor already holds `[check]`?** Every
-  descriptor the govkit registry names, 30 (PINNED 2026-11-19 at `a30a26466`), declares the `[check]`
+  descriptor the govkit registry names, 30 (PINNED 2026-11-19 at `632894bd1`), declares the `[check]`
   table, govkit's verifier `argv` or `none`, which selfcheck 7j2 requires
   (`tools/govkit/govkit.py#selfcheck`), and TOML refuses a `[[check]]` array beside it ("Cannot overwrite a value", asked of
   `tomllib`). Options: (a) a top-level `[[numbered_check]]` table, its rows read by `derive_tag_rows`
@@ -503,7 +503,7 @@ New arm: tools/govkit/selftest.py · covers AC6 AC7 · the `tag` floor pair and 
   `policy fixtures`, whose manifest guard holds the §4 path `tools/gate-legs.json`; per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief; nothing else moved.
 - rev-6 · 2026-11-19 · §1 §2 §3 §4 §5 §6 §7 §8 §10 · S1 S2 S3 S4 S5 S6 S9 · AC1 AC2 AC4 AC5 ·
-  F2 F3 F4 F6 F7 F8 F9 · re-grounded at `a30a26466` per brief
+  F2 F3 F4 F6 F7 F8 F9 · re-grounded at `632894bd1` per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-12-reground-brief: the manifest, descriptor and exempt counts
   are re-pinned and the tag rule re-measured, which refuses the policy kit's leg, whose owner segment
   F9 suffixes; the namespace registry's rows and its `purpose` and `owned` arms have landed, so the
@@ -520,7 +520,7 @@ New arm: tools/govkit/selftest.py · covers AC6 AC7 · the `tag` floor pair and 
   2026-11-19-prompt-TOOL-dWitnessedBar-12-2-spec-writer, over the first builder's divergence: AC3's
   duplicate half moves to the gov canary arm AC1 observes (F10) and the `leg-dup` plant is dropped;
   Files touched gains `tools/playbook/adopt-playbook.sh`, whose `run_plant_rows` heredoc takes the
-  plant rows, and lists each descriptor (27, DERIVED at `d832ccb37`) as its own bullet; §5's
+  plant rows, and lists each descriptor (27, DERIVED at `f03072f16`) as its own bullet; §5's
   observability line states what `run_check` prints; nothing else moved.
 - rev-8 · 2026-11-19 · §4 · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-12-pin-fix-brief: the
   descriptor list's lead-in is rewrapped so its `DERIVED` marker sits on the line carrying the row
@@ -540,12 +540,12 @@ PLAY-dOrderedCharter-10's extractor module and shape check, landed since `cdfbd1
 (`tools/govkit/govkit.py#STAGE_FLOOR_RUN_GATES` and the three before it) and their reader
 `tools/govkit/govkit.py#check_target_reads_subject`, the emitter's row builder in
 `tools/govkit/govkit.py#write_gate_legs`, and selfcheck 7h in `tools/govkit/govkit.py#selfcheck`.
-Re-run at `a30a26466`, the lookup
+Re-run at `632894bd1`, the lookup
 `python tools/codebase-map/reuse_lookup.py "give each gate leg a tag beside its free-text name"`
 ranked generic `read_text`, `legs` and `leg` stems, `TagError` and `build_tags_fixture` and named no
 seam for the tag itself, which is the expected answer: no tag field exists. One disagreement with
 scout B stands corrected: it counts 70 descriptor rows; at `cdfbd1cf` 68 `[[gate_leg]]` rows sat in
-26 descriptors, and at `a30a26466` 70 sit in 27, which with 128 `[[exempt_leg]]` rows covers all 198
+26 descriptors, and at `632894bd1` 70 sit in 27, which with 128 `[[exempt_leg]]` rows covers all 198
 legs. The recall probe returned scout B's row, the systems-retrofit review that introduced the `tag`
 field, PLAY-dOrderedCharter-19 and TOOL-dDeclaredLoop-18's brief; none disagreed with source
 otherwise.

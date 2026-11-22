@@ -119,13 +119,13 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    What is built so far:
    - Built and landed through order 43's first unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41,
      55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68, 67, 70, 71, 72, 74, 75, 73
-     (`71f212ad1`), 76 (`bdc10a4df`: `CANARY_KEYS`, `check_canary_keys`), 77 (`7228b0a9a`: one failure line per value
-     in `rgf_whats`), 79 (`08f226f3d`: `check_key_variant <key>:<var> <replacement> <label> <passed reason> <other
-     lead>`, called for a tail and a length variant per key), 80 (`a967359a8`: the tail call passes
-     `'${_rg_v%?}x'`, label `'tail '`, reason `the tail variant passed a value whose last byte is not CR`), 81 (`dc1205950`:
-     records only; its records in units 74's and 76's ledgers are owed at the close), 78 (`253e21771`:
+     (`563d828df`), 76 (`3596751cf`: `CANARY_KEYS`, `check_canary_keys`), 77 (`18907b769`: one failure line per value
+     in `rgf_whats`), 79 (`b9326245e`: `check_key_variant <key>:<var> <replacement> <label> <passed reason> <other
+     lead>`, called for a tail and a length variant per key), 80 (`c0310ecd8`: the tail call passes
+     `'${_rg_v%?}x'`, label `'tail '`, reason `the tail variant passed a value whose last byte is not CR`), 81 (`778c11528`:
+     records only; its records in units 74's and 76's ledgers are owed at the close), 78 (`0e5103294`:
      `read_bar_file` and the new `read_inherited_green` read with `read_green_file`'s rules; the gov suite's
-     shell-role row is 820, the hook's 1743), 87 (`d2a1d891d`: records only; its records in units 76's and 81's ledgers and its clone arm are owed at the close) and 82 (`47ab62ebf`: `FLOOR_ASSERTIONS=74` with a `# RAISED 72 -> 74 by TOOL-dWitnessedBar-82` comment below it; its lines in units 76's, 77's and 78's ledgers are written). Every unit this spec consumes from is CLOSED.
+     shell-role row is 820, the hook's 1743), 87 (`300c033ce`: records only; its records in units 76's and 81's ledgers and its clone arm are owed at the close) and 82 (`e8cdc8e3c`: `FLOOR_ASSERTIONS=74` with a `# RAISED 72 -> 74 by TOOL-dWitnessedBar-82` comment below it; its lines in units 76's, 77's and 78's ledgers are written). Every unit this spec consumes from is CLOSED.
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes (asks TOOL-dWitnessedBar-101 to -103) and the run
      defers it; any item of this spec that needs it leaves the scope, named in §3 as waiting with unit 28.
    - This unit closes order 43 and builds alone. Order 44's units 84, 85 and 86 all touch the gov suite or its records and build one at a time. List Files touched exactly.

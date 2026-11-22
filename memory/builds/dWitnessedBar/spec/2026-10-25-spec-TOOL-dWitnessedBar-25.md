@@ -61,7 +61,7 @@ owner's AP-22), commits it as a record a later reader finds by that hash.
   bar's `env` argv in `tools/unattended/unattended.sh#dod_met`; and `tools/run-gates/pass-legs.sh`,
   landed since the base, as `pass:<head sha>` on its one runner call
   (`tools/run-gates/pass-legs.sh@0a13e66a:364`, §8 F6). That is every tracked caller pinning
-  `GATE_RUN_ID`, by `git grep -n 'GATE_RUN_ID='` outside the suites, re-derived at `c34f63b6` on
+  `GATE_RUN_ID`, by `git grep -n 'GATE_RUN_ID='` outside the suites, re-derived at `0b8f2445` on
   2026-11-20; `tools/run-gates/run-held-wsl.sh`'s halves, which run in a scratch clone or mirror no
   boundary reads, are outside it and read `attended`. Observed by AC2.
 - **S3** — The tail. For each leg whose result is a failure, the runner takes the last 60 lines of its
@@ -110,7 +110,7 @@ owner's AP-22), commits it as a record a later reader finds by that hash.
   `python tools/playbook/render_playbook.py --reference`, giving the key a section of its own, as
   unit 4's S7 did for `verdict.tree`. The mirror `.governance/policy.json` renders a committed
   catalogue only, so `python tools/policy/policy.py mirror --write` re-renders it after the pass
-  commit, as unit 4's red-fix `56569347a` did. Observed by AC8.
+  commit, as unit 4's red-fix `ee3fb94fe` did. Observed by AC8.
 - **S8** — The kit page. `tools/run-gates/README.md` states `run_id`, `cause`, `tail.<n>`, the tails
   directory and the keep verb, in its sections "The run record" and "The verdict per tree".
   NOT OBSERVED — prose, read by the closing review.
@@ -362,7 +362,7 @@ New arm: tools/run-gates/keep_tails.py --selftest · covers AC6 AC7 AC9 · a tai
   `tools/unattended/unattended.sh`, `tools/policy/catalogue.toml` and `tools/memory-tree/build_records.py`,
   per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing else moved.
 - rev-5 · 2026-11-20 · §1 · S1 S2 S5 S6 S7 S8 · §4 · §5 · AC1 AC8 · §7 · §8 F4 F5 F6 · §10 · re-grounded
-  at `c34f63b6` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-25-reground-brief: runner and hook lines
+  at `0b8f2445` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-25-reground-brief: runner and hook lines
   blob-pinned, the rest cited as `path#symbol`; S2's callers re-derived, `pass-legs.sh` added and
   `run-held-wsl.sh` named outside; S5 reaches the landed factory's `write_record` by import and the
   driver's call sits on `gates-green`'s red path; S6 names the landed door tuple and the kind count;
@@ -383,7 +383,7 @@ per-tree verdict writer (`tools/run-gates/run-gates.sh@86758a96:5858-5888`), the
 `tools/memory-tree/build_records.py#write_record`, extended by one kind and its `TYPED_RECORD_KINDS`
 member (PLAY-dOrderedCharter-42) and reached as `tools/drift-audit/drift_report.py` reaches a
 memory-tree module. `python tools/codebase-map/reuse_lookup.py "keep a failing leg's output tail by
-its hash beyond the worktree"`, re-run at `c34f63b6`, ranked generic stems (`legs`, `fail`,
+its hash beyond the worktree"`, re-run at `0b8f2445`, ranked generic stems (`legs`, `fail`,
 `read_git_output`) and named no tail store, which is the expected answer: scout A found output living
 only in the run directory, and `tools/run-gates/run-gates.sh#derive_fail_tail` names a failure's
 reason, not its output. The recall probe returned the brief's row, scout A's row and v2's

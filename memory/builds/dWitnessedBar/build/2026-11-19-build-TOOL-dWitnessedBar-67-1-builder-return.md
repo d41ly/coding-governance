@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-67
 
-# TOOL-dWitnessedBar-67 — builder return 1 (run `wf_02fcf431-8ee`), committed e1d569fc9de1f9eca0aca307a3d30a6d9d57c127
+# TOOL-dWitnessedBar-67 — builder return 1 (run `wf_02fcf431-8ee`), committed af84e1a7ac04b2f865f3d077c28bb51dbe3a479c
 
 ## Why
 
@@ -8,7 +8,7 @@ The spec was checked against the tree before the first write and matched: rev-4 
 
 ## Summary
 
-Built TOOL-dWitnessedBar-67 in pass commit e1d569fc9 on base 17034486d.
+Built TOOL-dWitnessedBar-67 in pass commit af84e1a7a on base 4ee815572.
 
 **What changed**
 - tools/lib/legacy_ledger.py, plus the identical block in tools/memory-tree/ and tools/gate-lint/ (all three checksums match):

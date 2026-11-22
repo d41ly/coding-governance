@@ -9,9 +9,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 18.
 - Built so far through order 17: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14, 45, 54, 16, 46, 17,
-  52, 53, 18, 20, 24, 10, 9 and 4 (`7a2701739`: the runner's per-tree verdict record, the pre-push hook adopting
+  52, 53, 18, 20, 24, 10, 9 and 4 (`153d4bdb2`: the runner's per-tree verdict record, the pre-push hook adopting
   only the pushed tree's GREEN record, `write_bar_green` deleted).
-- The spec is rev-5, re-grounded at `c34f63b6` over unit 4 as landed. Read it whole; it is the contract.
+- The spec is rev-5, re-grounded at `0b8f2445` over unit 4 as landed. Read it whole; it is the contract.
 - Unit 40 builds after this unit: the two share `.githooks/pre-push`, `tools/run-gates/run-gates.sh`, its evidence
   suite and `tools/unattended/unattended.sh`.
 - The pass legs carry one known red: install-prefix on the `conf-scalar-pins` seed argv in

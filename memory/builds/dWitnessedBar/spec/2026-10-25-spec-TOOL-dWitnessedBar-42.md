@@ -25,7 +25,7 @@
 
 The round-1 spec audit (`memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md`)
 confirmed finding **id 60 at HIGH**, its item **H3**, alone in that item. `TOOL-dWitnessedBar-25`, landed at
-`55d911b39`, writes tails to the shared `<common-dir>/gate-tails/` so they outlive their worktree, and its S4
+`b843687cc`, writes tails to the shared `<common-dir>/gate-tails/` so they outlive their worktree, and its S4
 makes the run sweep keep "exactly the tails some retained run record names". That sweep reads only the
 running worktree's `RUNROOT` (`tools/run-gates/run-gates.sh@4430926f:6013`), and its own comment says so
 (`tools/run-gates/run-gates.sh@4430926f:6009-6010`). A bar finishing in worktree A deletes tails only worktree B's
@@ -120,7 +120,7 @@ TAIL_GRACE_S` at the pass.
 
 ### Migration
 
-None: tails exist only from `TOOL-dWitnessedBar-25`'s pass (`55d911b39`), and a tail already on disk is
+None: tails exist only from `TOOL-dWitnessedBar-25`'s pass (`b843687cc`), and a tail already on disk is
 read by the same rule.
 
 ### Rollout
@@ -161,7 +161,7 @@ Live at landing.
 - user docs — `tools/run-gates/README.md`'s tails paragraph names the grace and the every-worktree
   reading at the pass, and drops its "What the sweep does not check: another worktree's retained runs"
   sentence; no page under `help/` names the tails directory (`git grep -n gate-tails HEAD -- help/`
-  prints nothing, DERIVED at `ebe139e1` on 2026-11-20).
+  prints nothing, DERIVED at `8eabe633` on 2026-11-20).
 
 ## 6. Acceptance criteria
 
@@ -219,7 +219,7 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC1 AC2 AC3 · two
   edges of TOOL-dWitnessedBar-56, promoted by the round-1 spec audit of units 40 to 51; nothing else
   moved.
 - rev-3 · 2026-11-20 · §1 · S3 S4 · §3 · §4 · §5 · AC1 AC3 · §7 · §8 F2 F3 · §10 · re-grounded at
-  `ebe139e1` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-42-reground-brief: runner and suite lines
+  `8eabe633` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-42-reground-brief: runner and suite lines
   blob-pinned; S3 becomes the freshen of a re-hashed tail, since unit 25 landed the atomic write (F3);
   S4 ages every tail before each loop run, as the landed AC5 case's exact check needs; §3 names unit 56
   S13's temp unlink and keeps the landed hex-name skip; the rejected beacon alternative names the
@@ -236,7 +236,7 @@ prune, the reuse cache's 30-day mtime sweep (`tools/run-gates/run-gates.sh@44309
 fires, keeps no set and swallows every error, and its bound ages out entries no run names while the tail
 grace bounds only a bar still running (audit id 23, whose comment `TOOL-dWitnessedBar-56` S14 writes).
 `python tools/codebase-map/reuse_lookup.py "sweep a common-dir cache across every worktree's retained
-runs"`, re-run at `ebe139e1` on 2026-11-20, ranked `run`, `resolve_kit_dir`, `run_git`,
+runs"`, re-run at `8eabe633` on 2026-11-20, ranked `run`, `resolve_kit_dir`, `run_git`,
 `run_selftest_cases`, `run_fixture_git` and `run_probe` first, none a sweep; no existing seam reads every
 worktree's run dirs, so the reading is added to the tail sweep there is.
 

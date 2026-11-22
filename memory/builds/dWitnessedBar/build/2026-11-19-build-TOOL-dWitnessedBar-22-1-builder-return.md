@@ -16,7 +16,7 @@ DIVERGENCE: §2 S4 and §4 "The edge read" (and §7, which lists the `edges (eve
 
 A second point, so the revision covers both: §4 pins the signature `read_leg_edges(manifest_rows) -> [(type, from_tag, to_tag)]`, yet the adapter is what withholds a target whose namespace is not registered (S4, §4), and AC4 grades that against a FIXTURE registry. A function that takes only `manifest_rows` cannot see the fixture registry. The spec should name the adapter's registry input, or move the withholding to the caller that holds the namespaces (`run_check` / `run_parse`). It should also name the edge-dict shape (`path`, `line`, `site`) that the tuples become for `check_edges`.
 
-Every other probed claim held at base 99fea7ac:
+Every other probed claim held at base 4b1d8cec:
 - 198 rows (DERIVED), every one tagged; 51 carry `enforces`, none carries `tests`.
 - 33 dossiers: 180 legs (DERIVED) claimed once, none twice, 18 unclaimed, `run-gates evidence` among them; every claim names a manifest leg.
 - 27 descriptors, the same 4 with no claimed leg.
@@ -30,9 +30,9 @@ Every other probed claim held at base 99fea7ac:
 
 I committed nothing: TOOL-dWitnessedBar-22 goes back as a divergence, because building it as the spec says would turn the `edges` leg red on 13 targets.
 
-**Base:** 99fea7aca079f143a7ef3ed6ae43050456657127. The worktree is clean; no product path was edited, so nothing needed restoring.
+**Base:** 4b1d8cec614edb83d95dac87b8af8e5b51fb960a. The worktree is clean; no product path was edited, so nothing needed restoring.
 
-**Brief:** I did not run `--brief` again. RUN.md line 125 already records it (`brief · item TOOL-dWitnessedBar-22`, committed in 0e023dcde), and a second record would have changed a path I then had to restore.
+**Brief:** I did not run `--brief` again. RUN.md line 125 already records it (`brief · item TOOL-dWitnessedBar-22`, committed in 51ee2852d), and a second record would have changed a path I then had to restore.
 
 **What I checked** (read-only probes in place of the gates that need them, the closest being `edges (every declared edge parses, is registered and resolves)`; no gate, suite or bar ran):
 - `python -c` over `tools/gate-legs.json` for row and key counts, and over the dossiers' TOML fences under `memory/map/features/` for the claim counts. Both re-derived 180 claimed, 18 unclaimed, none claimed twice, so AC1's pinned figures hold.

@@ -39,8 +39,8 @@ merged ids into one item. Every finding lands on `TOOL-dWitnessedBar-63`, so thi
 unit and builds after it (order 37, one step after `TOOL-dWitnessedBar-64`). The report's ids 4, 9 and 12 were refuted by the audit
 itself and are no finding here.
 
-Both units it repairs have landed, `TOOL-dWitnessedBar-63` at `44989eebd` and `TOOL-dWitnessedBar-64`
-at `b26061af2`, and this spec is re-grounded over HEAD `76a3b4bc2`. Ten items are present at HEAD and
+Both units it repairs have landed, `TOOL-dWitnessedBar-63` at `6932f9604` and `TOOL-dWitnessedBar-64`
+at `ef54d1d89`, and this spec is re-grounded over HEAD `38c757199`. Ten items are present at HEAD and
 are observed, not built: S3 to S7, S14, S16, S19, S20 and S22. Nine are built: S1, S2, S8 to S11,
 S15, S17 and S21. S12 and S13 are ledger lines at the close, and S18 is this spec's gate set.
 
@@ -100,8 +100,8 @@ That is 11 MEDIUM and 11 LOW findings by raw id.
   own new assertions (§7). This pass writes none. Observed by AC3.
 - **S6** — id 1. Present at HEAD: `TOOL-dWitnessedBar-47` sits at order 6, applied as its rev-5 with
   its §9 line (§8 F3), and `TOOL-dWitnessedBar-61` at order 5, both CLOSED. Unit 61's dispatch row
-  precedes unit 47's in `memory/builds/dWitnessedBar/RUN.md`, and unit 61's pass commit `9c8821605` is
-  an ancestor of unit 47's `14cf1b1bc` (DERIVED 2026-11-21 by AC4's commands). Unit 63 S14 records the
+  precedes unit 47's in `memory/builds/dWitnessedBar/RUN.md`, and unit 61's pass commit `67768466e` is
+  an ancestor of unit 47's `fc6050375` (DERIVED 2026-11-21 by AC4's commands). Unit 63 S14 records the
   same sequence, and unit 61's Rollout already names order 6 for unit 47. This pass writes none.
   Observed by AC4.
 - **S7** — id 15. Present at HEAD (`TOOL-dWitnessedBar-63` AC23): section `2o` of
@@ -186,7 +186,7 @@ That is 11 MEDIUM and 11 LOW findings by raw id.
   `tools/run-gates/kit.toml` declares `id = "run-gates"` (`tools/run-gates/kit.toml@76a3b4bc2:11`) and
   `include = "**"` (`tools/run-gates/kit.toml@76a3b4bc2:23`). Observed by AC15.
 - **S22** — id 18. Present at HEAD: unit 62's re-ground re-pinned its coverage figure to 96 at
-  `4cf1a82ca`, so `grep -nw 77` over its spec prints only its records-table line naming
+  `eb94d2c32`, so `grep -nw 77` over its spec prints only its records-table line naming
   `TOOL-dWitnessedBar-77` (PINNED 2026-11-21 by AC16's grep), and no 77-carrier is left to answer. Unit
   63 S4 answers unit 62's AC13 on the figure the built tree re-derives. This pass writes none.
   Observed by AC16.
@@ -224,7 +224,7 @@ holds all 22 findings.
 
 ### Evidence
 
-Read at HEAD `76a3b4bc2` on 2026-11-21.
+Read at HEAD `38c757199` on 2026-11-21.
 
 - The landed rules. lib-unattended folds `\` and tests `/*|*:*|..|../*|*/..|*/../*`
   (`tools/unattended/lib-unattended.sh#resolve_generated_indexes`). `derive_contained_rel` refuses a
@@ -395,7 +395,7 @@ S1 states, its record declared through `--dispatch`.
   list's first word is `GIT_DIR` and its last is `GATE_REUSE_DAY`, each a whole word, and no word holds
   `=` or `"`.
   Red when: the first word reads `PM_SCRUB=GIT_DIR`.
-  figure: both names are PINNED at `76a3b4bc2`, measured 2026-11-21 by the §4 `sed` range.
+  figure: both names are PINNED at `38c757199`, measured 2026-11-21 by the §4 `sed` range.
 - **AC14** — When the reader runs over a scratch copy of `tools/run-gates/post-merge.sh` with
   `  # note GATE_SELECTION` after the closing quote, and over one with the assignment on a single line,
   each reads exactly the base list. With `GATE_SELECTION` cut from the list while the comment still
@@ -411,7 +411,7 @@ S1 states, its record declared through `--dispatch`.
   runs, it prints one line, the records-table row naming `TOOL-dWitnessedBar-77`. At the close, unit
   62's ledger line for AC13 names the built tree's derived figure.
   Red when: a 77-carrier of unit 62 is answered by no ledger line.
-  figure: the one line is PINNED at `76a3b4bc2`, measured 2026-11-21.
+  figure: the one line is PINNED at `38c757199`, measured 2026-11-21.
 
 ## 7. Gates
 

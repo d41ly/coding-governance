@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-65
 
-# TOOL-dWitnessedBar-65 — builder return 1 (run `wf_f61f66fe-f0a`), committed 139d6fea1556278566c20aaad9ce30a77011d79d
+# TOOL-dWitnessedBar-65 — builder return 1 (run `wf_f61f66fe-f0a`), committed f2fcd51c6c51f1ed83568b7c19fb6a8ddbb26e06
 
 ## Why
 
@@ -8,7 +8,7 @@ I built TOOL-dWitnessedBar-65 from spec rev-5. Every claim I probed against curr
 
 ## Summary
 
-Built and committed as 139d6fea1 on base eb9443a71. The commit carries `Pass: TOOL-dWitnessedBar-65` and the spec header now reads CLOSED · 2026-11-21.
+Built and committed as f2fcd51c6 on base f9688a4a8. The commit carries `Pass: TOOL-dWitnessedBar-65` and the spec header now reads CLOSED · 2026-11-21.
 
 **What was built**
 - **S2:** `resolve_generated_indexes` in tools/unattended/lib-unattended.sh now refuses an `exists:` path that the kit's own `normpath` reads as `.`. It prints the same skip line as the other refused forms.

@@ -10,7 +10,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   table's order. This unit is build order 5.
 - Built so far: units 26, 27, 48, 49, 50, 13 and 15, and unit 12 (`leg`, `check`, `pack` namespaces, a `tag` on every
   leg) builds before this unit at the same order. Read `tools/lib/legacy_ledger.py` and unit 15's seed as they stand.
-- The spec is rev-3, re-grounded at `98e33d71c`: its fixture and arm cite unit 13's section `2o`, and §4 and §10 name
+- The spec is rev-3, re-grounded at `112526471`: its fixture and arm cite unit 13's section `2o`, and §4 and §10 name
   `tools/playbook/overlay.py#check_born` as a second unborn-HEAD reader the ledger factory cannot import.
 - Every roster spec was re-grounded at `e4ac7c40c` so `check-spec-tokens.py --spec` admits it; the spec's base is still
   older than the run's `9e21ac76`. Verify each claim about current code against source before building on it, and hand

@@ -4,7 +4,7 @@
 
 ## Why
 
-DIVERGENCE: before writing anything I checked spec rev-11 (memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-16.md) against the tree at f294dafda. It cannot be built as written. Items (1) to (3) block the build; (4) to (6) are smaller gaps reported now so this unit does not diverge again over them.
+DIVERGENCE: before writing anything I checked spec rev-11 (memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-16.md) against the tree at 92c84feaa. It cannot be built as written. Items (1) to (3) block the build; (4) to (6) are smaller gaps reported now so this unit does not diverge again over them.
 
 (1) Three shipped readers have no way to reach the factory. This hits S4, the §4 "The populations" rows for lexicon-suffix-waivers, lexicon-verb-waivers, testsuite-count-waivers and agent-cap-restatement-waivers, §4 Files touched and §10. S4 requires every reader in §4's table to read rows through the factory's `read_rows` and grade them through `compare_counts`/`compare_to_base`. A factory copy exists only in tools/lib/ (gov-internal, ships nothing), tools/memory-tree/ and tools/gate-lint/, and the `legacy_ledger_py` row of tools/lib/resolve-python.test.sh's parity table holds the copies identical. Three readers ship to adopters from kits that neither carry a copy nor require a kit that does:
 - `tools/lexicon/lexicon.py#load_waivers`: tools/lexicon/kit.toml declares no `requires`. `lexicon.py#check_self_containment` refuses any import that is neither stdlib nor a sibling `.py` ("this kit must install without its neighbours"), and that rule runs on the `lexicon selftest` / `lexicon naming predicates` legs §7 names.
@@ -24,13 +24,13 @@ Getting around that rule with a dynamic import or a subprocess call into memory-
 
 (5) tools/run-gates/owed_rows.py#derive_owed_rows also reads spawn-idiom-sites.txt, testsuite-count-waivers.txt and unarmed-branches.txt by their first column, for the path-deleted population. Its FIXTURE plants a legacy unarmed-branches row at line 282. §4's table does not name owed_rows as a reader of those three, and S6 cites it only for baseline.toml, so S4's "every reader" leaves it out.
 
-(6) memory/map/affordance-exempt.toml holds `exempt = []` at HEAD and at c52a74c4d. That makes it an eighth home with no row. S2's general rule writes it unarmed, but F14 and AC13 pin seven homes. F10's adopter seed, via `seed --home` with `--out` writing the ledger grammar, writes a header-only armed home wherever an adopter's list is empty, and `ratchet (populated)` reds that home.
+(6) memory/map/affordance-exempt.toml holds `exempt = []` at HEAD and at 8ace93188. That makes it an eighth home with no row. S2's general rule writes it unarmed, but F14 and AC13 pin seven homes. F10's adopter seed, via `seed --home` with `--out` writing the ledger grammar, writes a header-only armed home wherever an adopter's list is empty, and `ratchet (populated)` reds that home.
 
-Nothing was written or committed. The tree is clean at f294dafda. The `--brief` verb reported the brief already recorded and unchanged at ce2fc79546f0, and wrote nothing.
+Nothing was written or committed. The tree is clean at 92c84feaa. The `--brief` verb reported the brief already recorded and unchanged at ce2fc79546f0, and wrote nothing.
 
 ## Summary
 
-I didn't build TOOL-dWitnessedBar-16: spec rev-11 can't be built as written, so I stopped before writing any code. Nothing is committed, and the tree is clean at base f294dafda60b8ad68560416402724d09f7686339.
+I didn't build TOOL-dWitnessedBar-16: spec rev-11 can't be built as written, so I stopped before writing any code. Nothing is committed, and the tree is clean at base 92c84feaa9d459f9c0ffcf87bcba59987ac0067a.
 
 **The blocker:** S4 requires every reader in §4's table to read through the ledger factory. Three of those readers ship to adopters from kits that neither carry a copy of the factory nor require a kit that does:
 - `tools/lexicon/lexicon.py`: the lexicon kit declares no dependency, and its own gate refuses any import from outside the kit.

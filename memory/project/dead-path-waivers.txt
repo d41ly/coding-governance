@@ -1,25 +1,25 @@
 # ledger · dead-path-waivers · key site path,text · direction declared-set · drain hunk
-WIRE-INTO-PROJECT.md	carries `<MEMORY_ROOT>/project/IN-FLIGHT.md` (the pointer stub) plus `<MEMORY_ROOT>/project/in-flight/<tag>.md`	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-WIRE-INTO-PROJECT.md	`<MEMORY_ROOT>/archive/ledger/<tag>.md`, and fold `IN-FLIGHT.md`'s protocol prose into	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/memory-tree/check-memory-hygiene.sh	# machinery it used to also hold — MEMORY.md, IN-FLIGHT.md, in-flight/, journal/, project/README.md —	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/memory-tree/check-memory-hygiene.sh	#     STATUS.md was RETIRED by TOOL-aRuledFrontispiece-7: one existed across the whole corpus, it	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/memory-tree/check-memory-hygiene.test.sh	for p in MEMORY.md IN-FLIGHT.md README.md in-flight journal; do	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/memory-tree/check-memory-hygiene.test.sh	{ printf '# ARCH status\n'; i=1; while [ "$i" -le 800 ]; do printf -- '- r%d\n' "$i"; i=$((i+1)); done; } > memory/builds/tLong/STATUS.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/memory-tree/check-memory-hygiene.test.sh	chit 6 'memory/builds/tLong/STATUS.md'	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/memory-tree/check-memory-hygiene.test.sh	cnot 6 'memory/builds/tLong/STATUS.md'	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"{prefix}/lexicon/lexicon-layer-waivers.txt",	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"{prefix}/lexicon/lexicon-layer-waivers.txt"	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"path": "{prefix}/lexicon/lexicon-layer-waivers.txt",	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"source": "{prefix}/lexicon/lexicon-layer-waivers.txt"	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/govkit/matrix.py	+ "[[files]]" + NL + 'include = ["moved.template.txt"]' + NL	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/govkit/matrix.py	_aged_rr = {"kept.txt": ROLE_V2, "moved.txt": ROLE_V2, "moved.template.txt": "<<BODY>>" + NL}	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-skills/session-kickoff/manifest-check.test.sh	mkdir -p "$mm_dir" && printf -- '- [a rule](a-rule.md) — one rule\n' > "$mm_dir/MEMORY.md"	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/playbook/memory_index.py	THE INDEX. The harness writes `MEMORY.md` under `AUTO_MEMORY_TEMPLATE` and injects it into every session;	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/playbook/memory_index.py	text = (d / "MEMORY.md").read_text(encoding="utf-8")	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/playbook/memory_index.py	raw = (d / "MEMORY.md").read_bytes()	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/playbook/memory_index.py	return derive_byte_cut(f"{CELL} MEMORY.md {measured['bytes']} B {side} its {measured['budget']} B budget "	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/playbook/render_playbook.py	(d / 'MEMORY.md').write_text(links + 'x' * (9000 - len(links.encode('utf-8')) - 1) + '\n', encoding='utf-8', newline='')	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/playbook/render_playbook.py	(d / 'MEMORY.md').write_bytes((d / 'MEMORY.md').read_bytes()[:3999] + b'\n')	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/playbook/render_playbook.py	with open(d / 'MEMORY.md', 'a', encoding='utf-8', newline='') as fh:	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/govkit/registry.toml	"file:{prefix}/agent-instructions/adopt-agent-instructions.sh",	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-{prefix}/govkit/registry.toml	"installable:{prefix}/agent-instructions/adopt-agent-instructions.sh",	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+WIRE-INTO-PROJECT.md	carries `<MEMORY_ROOT>/project/IN-FLIGHT.md` (the pointer stub) plus `<MEMORY_ROOT>/project/in-flight/<tag>.md`	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+WIRE-INTO-PROJECT.md	`<MEMORY_ROOT>/archive/ledger/<tag>.md`, and fold `IN-FLIGHT.md`'s protocol prose into	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/memory-tree/check-memory-hygiene.sh	# machinery it used to also hold — MEMORY.md, IN-FLIGHT.md, in-flight/, journal/, project/README.md —	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/memory-tree/check-memory-hygiene.sh	#     STATUS.md was RETIRED by TOOL-aRuledFrontispiece-7: one existed across the whole corpus, it	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/memory-tree/check-memory-hygiene.test.sh	for p in MEMORY.md IN-FLIGHT.md README.md in-flight journal; do	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/memory-tree/check-memory-hygiene.test.sh	{ printf '# ARCH status\n'; i=1; while [ "$i" -le 800 ]; do printf -- '- r%d\n' "$i"; i=$((i+1)); done; } > memory/builds/tLong/STATUS.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/memory-tree/check-memory-hygiene.test.sh	chit 6 'memory/builds/tLong/STATUS.md'	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/memory-tree/check-memory-hygiene.test.sh	cnot 6 'memory/builds/tLong/STATUS.md'	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"{prefix}/lexicon/lexicon-layer-waivers.txt",	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"{prefix}/lexicon/lexicon-layer-waivers.txt"	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"path": "{prefix}/lexicon/lexicon-layer-waivers.txt",	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"source": "{prefix}/lexicon/lexicon-layer-waivers.txt"	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/govkit/matrix.py	+ "[[files]]" + NL + 'include = ["moved.template.txt"]' + NL	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/govkit/matrix.py	_aged_rr = {"kept.txt": ROLE_V2, "moved.txt": ROLE_V2, "moved.template.txt": "<<BODY>>" + NL}	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+skills/session-kickoff/manifest-check.test.sh	mkdir -p "$mm_dir" && printf -- '- [a rule](a-rule.md) — one rule\n' > "$mm_dir/MEMORY.md"	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/playbook/memory_index.py	THE INDEX. The harness writes `MEMORY.md` under `AUTO_MEMORY_TEMPLATE` and injects it into every session;	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/playbook/memory_index.py	text = (d / "MEMORY.md").read_text(encoding="utf-8")	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/playbook/memory_index.py	raw = (d / "MEMORY.md").read_bytes()	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/playbook/memory_index.py	return derive_byte_cut(f"{CELL} MEMORY.md {measured['bytes']} B {side} its {measured['budget']} B budget "	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/playbook/render_playbook.py	(d / 'MEMORY.md').write_text(links + 'x' * (9000 - len(links.encode('utf-8')) - 1) + '\n', encoding='utf-8', newline='')	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/playbook/render_playbook.py	(d / 'MEMORY.md').write_bytes((d / 'MEMORY.md').read_bytes()[:3999] + b'\n')	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/playbook/render_playbook.py	with open(d / 'MEMORY.md', 'a', encoding='utf-8', newline='') as fh:	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/govkit/registry.toml	"file:{prefix}/agent-instructions/adopt-agent-instructions.sh",	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+{prefix}/govkit/registry.toml	"installable:{prefix}/agent-instructions/adopt-agent-instructions.sh",	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

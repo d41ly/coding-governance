@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 32.
 - Built so far through order 31: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59, 30, 29,
-  7, 21, 6, 2, 43 and 51 (`7b649d671`, its pass-leg fixes `0cd5982f3` and `05ae97627`). Unit 28 (order 30) is deferred
-  against asks TOOL-dWitnessedBar-101 to -103 and is not built. This spec, rev-5, was re-grounded at `e4a3aa8c8`.
+  7, 21, 6, 2, 43 and 51 (`55e427e66`, its pass-leg fixes `41efe4ddb` and `19d3ebdeb`). Unit 28 (order 30) is deferred
+  against asks TOOL-dWitnessedBar-101 to -103 and is not built. This spec, rev-5, was re-grounded at `1015352be`.
 - Unit 57 shares order 32 and builds after this unit lands, so nothing else is in flight in this working tree: commit
   directly here.
 - The driver `tools/unattended/unattended.sh` sits at its refusal-site ceiling (343 sites, 339 armed, DERIVED from unit

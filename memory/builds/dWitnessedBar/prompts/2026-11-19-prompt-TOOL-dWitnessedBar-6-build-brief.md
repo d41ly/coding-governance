@@ -9,7 +9,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 28.
 - Built so far through order 27: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59, 30, 29,
-  7 and 21 (`cd03e4e75`). This spec, rev-7, was re-grounded over them.
+  7 and 21 (`744515922`). This spec, rev-7, was re-grounded over them.
 - The driver sits exactly at its refusal-site ceiling (343 sites, 339 armed, DERIVED from unit 21's builder probe);
   this spec adds no refusal site to it, so keep every new driver line a print that returns 0.
 - This unit builds alone; nothing else is in flight in this working tree, so commit directly here.

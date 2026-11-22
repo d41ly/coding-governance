@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 12.
 - Built so far through order 11: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14, 45, 54, 16, 46, 17
-  (`dbbd8caba`: keyed record and row populations, `{prefix}` resolved in every seed argv by the factory, a fresh
-  scaffold writing neither waiver home), 52 (`fd73e0bbb`: `ratchet.py#read_root_confs`) and 53 (`b4d0b0f50`).
+  (`9a29f1e96`: keyed record and row populations, `{prefix}` resolved in every seed argv by the factory, a fresh
+  scaffold writing neither waiver home), 52 (`6a075440b`: `ratchet.py#read_root_confs`) and 53 (`3ab7c7312`).
 - Two builders stopped before writing code; their returns are
   `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-18-1-builder-return.md` and
   `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-18-2-builder-return.md`. The spec is now

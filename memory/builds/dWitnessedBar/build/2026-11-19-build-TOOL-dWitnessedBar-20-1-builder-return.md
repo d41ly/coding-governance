@@ -22,7 +22,7 @@ Every other claim I probed held. Nothing was written to the repository and no co
 
 ## Summary
 
-Nothing was built or committed for TOOL-dWitnessedBar-20. The spec misses a third caller of `check_legacy_graded`, a fixture case its new rule would turn red, so I stopped before the first product edit (details in `why`). The worktree is clean at base 53c625a5d5cda7728b6028d8be22acd62dd3b763.
+Nothing was built or committed for TOOL-dWitnessedBar-20. The spec misses a third caller of `check_legacy_graded`, a fixture case its new rule would turn red, so I stopped before the first product edit (details in `why`). The worktree is clean at base 53cb8c5a249468313804af0664fe3d58828b3337.
 
 **What ran:**
 - Read `memory/guides/BUILD-METHOD.md` whole, the spec (memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-20.md, rev-4) and the brief.

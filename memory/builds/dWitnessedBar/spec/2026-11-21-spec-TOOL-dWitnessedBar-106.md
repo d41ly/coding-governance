@@ -91,8 +91,8 @@ longer read any of the three keys looser than R's own bytes declare.
 
 The code this unit changes was built by three CLOSED units of this build, found from the `Pass:`
 trailers of `git log -L` over `read_policy_at`: TOOL-dWitnessedBar-3 (`verdict.blocks` and the no-kit
-branch, 930a5289d), TOOL-dWitnessedBar-5 (`verdict.held`, eef75404f) and TOOL-dWitnessedBar-2
-(`hooks.bypass` and the bypass block, 7f3e24092). This unit edits only their built code and their
+branch, 9991872c0), TOOL-dWitnessedBar-5 (`verdict.held`, e896a6198) and TOOL-dWitnessedBar-2
+(`hooks.bypass` and the bypass block, c8727978d). This unit edits only their built code and their
 arms, never their specs, which are frozen.
 
 ### Edges
@@ -106,7 +106,7 @@ arms, never their specs, which are frozen.
 
 ### Evidence
 
-Read on 2026-11-21 at `63be790a2`. Its blobs are `.githooks/pre-push` 13e24816, the blob the review
+Read on 2026-11-21 at `fcd4c95d8`. Its blobs are `.githooks/pre-push` 13e24816, the blob the review
 cites, `.githooks/pre-push.test.sh` 45c73d4d, `tools/policy/catalogue.toml` 25076c3d,
 `tools/policy/policy.py` 77f33396 and `help/policy.md` f0103fb0.
 

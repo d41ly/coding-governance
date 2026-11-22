@@ -30,7 +30,7 @@
 
 The round-1 spec audit (`memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md`)
 confirmed finding **id 18 at HIGH**, its item **H1**, alone in that item. `TOOL-dWitnessedBar-4`,
-landed at `7a2701739`, has the runner write `gate-verdict/<tree>[.scoped]` on every run that started
+landed at `153d4bdb2`, has the runner write `gate-verdict/<tree>[.scoped]` on every run that started
 clean and did not move (`tools/run-gates/run-gates.sh@86758a96:5858-5888`), and deleted the hook's
 writer. That writer declined in two cases the runner never learns of: a doc-only scoped push and a
 scoped push resting on an inherited green (`.githooks/pre-push@176f5913:2619-2625`). The runner's
@@ -239,7 +239,7 @@ New arm: .githooks/pre-push.test.sh · covers AC4 · a per-tree record planted w
   manifest guards hold the §4 path `tools/unattended/unattended.sh`, per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing else moved.
 - rev-6 · 2026-11-20 · §1 · S1 S2 S3 S4 · §3 · §4 · §5 · AC1 AC4 · §7 · §8 F3 · §10 · re-grounded at
-  `c34f63b6` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-25-reground-brief: unit 4 landed the
+  `0b8f2445` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-25-reground-brief: unit 4 landed the
   runner's per-tree writer, deleted the hook's, and put `check_green_reuse` on both per-tree readers,
   so S4 narrows to the keyless refusal and AC4 and its arm to that case; the retired declines are
   cited at their last blob, the floor's named outside; runner and hook lines blob-pinned, the rest
@@ -254,7 +254,7 @@ over rather than re-derived, into unit 4's per-tree writer beside its own two
 (`tools/run-gates/run-gates.sh@86758a96:5858-5888`), and predicate 9
 `.githooks/pre-push#check_green_reuse` on the two per-tree readers unit 4 landed. `python
 tools/codebase-map/reuse_lookup.py "decline to record a per-tree green for a doc-only or
-inherited-base bar"`, re-run at `c34f63b6`, ranked generic stems (`tree`, `records`, `build_records`,
+inherited-base bar"`, re-run at `0b8f2445`, ranked generic stems (`tree`, `records`, `build_records`,
 `read_records`, `write_record`) and no decline of the per-tree record; no existing seam fits beyond
 the ones named, since the runner's writer declines only a dirty start, a moved tree and an unread
 fingerprint today.

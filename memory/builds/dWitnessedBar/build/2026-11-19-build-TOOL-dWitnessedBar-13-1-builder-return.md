@@ -4,7 +4,7 @@
 
 ## Why
 
-DIVERGENCE: I checked rev-3 of memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-13.md against the tree at 5e569d9c9 before writing anything. It can't be built as written. The spec writer needs to settle the points below; I've listed them all here so one revision covers them.
+DIVERGENCE: I checked rev-3 of memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-13.md against the tree at e0236c47e before writing anything. It can't be built as written. The spec writer needs to settle the points below; I've listed them all here so one revision covers them.
 
 (1) S10, AC2, AC4 and section 4's function table: `compare <population>` has no measurement source. AC2 needs "a site measured that no row declares" and AC4 needs "no drain". But `compare_counts(measured, declared, direction)` takes `measured` as input, and nothing in the spec says where the CLI gets it. The only candidate is running the registration's `seed` argv. How that argv runs is designed by other units:
 - TOOL-dWitnessedBar-15 section 4: the stdout row grammar, the 600 s bound (PINNED, unit 15 section 4), `dead probe:` liveness.
@@ -45,7 +45,7 @@ The main one is that the `compare` command has no defined way to get the counts 
 - Run "unchanged", the merge driver's `no_row_loss` check would refuse every ledger merge, because it only recognises bullet lines as rows.
 
 **What ran:**
-- `git rev-parse HEAD` returned 5e569d9c90a0d207c3200daf4df1f893750ab4bb; this is `base`.
+- `git rev-parse HEAD` returned e0236c47e3caa61629f035e94785f352883c923c; this is `base`.
 - `unattended.sh --brief` said the brief was already recorded and unchanged at 183b97abe5c6.
 - I read the build method, the brief and the spec whole.
 - I checked each claim the spec makes about current code against these files:

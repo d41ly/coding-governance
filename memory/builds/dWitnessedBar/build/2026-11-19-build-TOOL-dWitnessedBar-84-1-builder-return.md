@@ -1,10 +1,10 @@
 **Serves:** journal TOOL-dWitnessedBar-84
 
-# TOOL-dWitnessedBar-84 — builder return 1 (run `wf_b8b2787a-c48`), committed e1ad4ef32f2f7ef1261b2f7166a724b780383495
+# TOOL-dWitnessedBar-84 — builder return 1 (run `wf_b8b2787a-c48`), committed bd7804842aae2615d24fa3ca080b2b2ca0115fa4
 
 ## Why
 
-TOOL-dWitnessedBar-84 is built from its rev-5 spec in one pass commit, e1ad4ef32 on top of base 78cf6b856. The pass commit sets the spec header to CLOSED and carries the `Pass: TOOL-dWitnessedBar-84` trailer. Before writing, I checked the spec's claims against the tree and none had drifted. The suite lines, `FLOOR_ASSERTIONS=74` with unit 82's comment, the registry guard row, the read loops of both hook readers and the four DEFERRED specs naming the guide under Files touched all matched. So there was no divergence to return.
+TOOL-dWitnessedBar-84 is built from its rev-5 spec in one pass commit, bd7804842 on top of base bcb8fcc24. The pass commit sets the spec header to CLOSED and carries the `Pass: TOOL-dWitnessedBar-84` trailer. Before writing, I checked the spec's claims against the tree and none had drifted. The suite lines, `FLOOR_ASSERTIONS=74` with unit 82's comment, the registry guard row, the read loops of both hook readers and the four DEFERRED specs naming the guide under Files touched all matched. So there was no divergence to return.
 
 ## Summary
 
@@ -25,7 +25,7 @@ TOOL-dWitnessedBar-84 is built from its rev-5 spec in one pass commit, e1ad4ef32
 **Checks that ran:** probes only, no gate, suite or bar. Each stands in for the gate leg named in brackets.
 - `bash -n` on the suite passed [portability / the gov canary's parse].
 - AC2: the awk probe prints nothing on the built suite and prints the planted line on a scratch copy [gov canary single-copy arm].
-- AC3: unit 74's pass commit `7c579ad47` shows 2 matching lines, and the probe restricted to `rec_sha` prints nothing there.
+- AC3: unit 74's pass commit `6a12d559c` shows 2 matching lines, and the probe restricted to `rec_sha` prints nothing there.
 - AC6: with the cut's functions sourced in `bash -c`, the quoted `sha` arm is edited and passes both variants, and a split arm prints `tail variant changed 0 lines` and `length variant changed 0 lines`.
 - AC13: return code 2 in all three read-failure cases, 1 on the length mutant, 0 on the canary's mutant. A variant pointed at a path it never wrote prints `could not be sourced or read (rc 2)`.
 - AC14: an empty `CANARY_KEYS` prints `visited 0 of 0` for both loops; loops that stop after the first pair print `visited 1 of 2`.

@@ -18,7 +18,7 @@ two new legs `gate-leg conformance` and `leg-factory selftest`, and the criteria
   `probe leg` appended to `tools/gate-lint/kit.toml` and no `--write`, it exits 1 printing
   `leg 'probe leg' added`.
 - AC2 — `True` — the criterion's own `python -c` over `tools/gate-legs.json` against the pass's start
-  `591fc220e` printed `True` after the migration's `--write`, before S6's tags and the two new legs
+  `18f3dafc3` printed `True` after the migration's `--write`, before S6's tags and the two new legs
   changed rows on purpose. 70 claimed legs gained a `[gate_leg.gov]` sub-table (`chunk` 70, `ceiling` 63,
   `guard` 56, `argv` 8, `reads` 7, `signature` 4, DERIVED; deviation 113 says why `guard` is not 19)
   and 128 exempt rows took their whole manifest row.

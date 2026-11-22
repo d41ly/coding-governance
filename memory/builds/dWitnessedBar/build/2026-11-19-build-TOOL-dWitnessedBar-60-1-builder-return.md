@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-60
 
-# TOOL-dWitnessedBar-60 — builder return 1 (run `wf_ddec5eff-e0c`), committed f9230803d
+# TOOL-dWitnessedBar-60 — builder return 1 (run `wf_ddec5eff-e0c`), committed a3ee7a20d
 
 ## Why
 
@@ -10,7 +10,7 @@ TOOL-dWitnessedBar-60 is built and committed in one pass commit (subject names t
 
 ## TOOL-dWitnessedBar-60: built and committed, gates and RED-first observations owed at the close
 
-The unit is in commit f9230803d (base db4b2b67022cf13a4e72e9bc2520c5f4ca445e3d). I ran no gate, suite or bar. Every criterion was checked by a probe of the changed code, listed below.
+The unit is in commit a3ee7a20d (base b82f6b194399b4c1c2c007ffe40c9a96c48001cb). I ran no gate, suite or bar. Every criterion was checked by a probe of the changed code, listed below.
 
 ### What changed
 - **`.githooks/pre-push`:** a new `BAR_CLEARED_KNOBS` list holds the eight knobs the hook clears. One loop over it replaces the four separate clears. `ENV_CLEARED` keeps the old order, which the hook suite's TOOL-dWitnessedBar-56 AC7 arm depends on.

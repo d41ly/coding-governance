@@ -90,7 +90,7 @@ repairs `TOOL-dWitnessedBar-82` and builds after `TOOL-dWitnessedBar-85`, the la
 
 ### Evidence
 
-Read at `e62583e7b` on 2026-11-21; the suite is unchanged there since unit 85's `0a5a198f6`.
+Read at `2381fcbb4` on 2026-11-21; the suite is unchanged there since unit 85's `42aa8827c`.
 
 - `spec/2026-10-25-spec-TOOL-dWitnessedBar-82.md` S2 and AC2 stage a copy lacking the `_rg_v:1}`
   variant and expect `below the pinned floor`; S2 says that copy reds at the close through unit 85 S1
@@ -122,7 +122,7 @@ Read at `e62583e7b` on 2026-11-21; the suite is unchanged there since unit 85's 
   changes no line and prints `length variant changed 0 lines` (§8 F2).
 - `tools/unattended/lib-unattended.sh#build_commit` answers which commit is a unit's pass, as
   `TOOL-dWitnessedBar-62` S16 rules. Sourced beside `tools/lib/resolve-python.sh`, it names
-  `47ab62ebf` for unit 82 (DERIVED 2026-11-21); without the resolver, `#read_attribution_tokens`
+  `e8cdc8e3c` for unit 82 (DERIVED 2026-11-21); without the resolver, `#read_attribution_tokens`
   finds no launcher and the call returns 1.
 - `memory/gotchas/ledger-token-wrapped-across-a-line-joins-nothing.md` records that a ledger grep
   reads one physical line.
@@ -138,11 +138,11 @@ None: no stored data changes.
 
 ### Rollout
 
-Units 79, 80, 82 and 85 are CLOSED (`08f226f3d`, `a967359a8`, `47ab62ebf`, `0a5a198f6`). Dispatch is
+Units 79, 80, 82 and 85 are CLOSED (`b9326245e`, `c0310ecd8`, `e8cdc8e3c`, `42aa8827c`). Dispatch is
 strictly sequential and sorts a tie by id string
 (`tools/workflows/unattended-build.js@e62583e7b:78-82`, `:692-697`), so this unit builds alone after
 unit 85, the last of order 44. At its pass it writes its own acceptance ledger, each criterion OWED to
-the close, as units 81 and 87 did at theirs (`d2a1d891d`). At the close, after every unit is
+the close, as units 81 and 87 did at theirs (`300c033ce`). At the close, after every unit is
 terminal, the main loop runs S1's and S2's clones and writes S3's and S4's lines and its observations.
 
 ### Files touched (estimate)
@@ -248,7 +248,7 @@ it declares no `New arm:` line.
   edge of TOOL-dWitnessedBar-89, the minors batch of the round-1 spec audit of units 85 to 88;
   nothing else moved.
 - rev-3 · 2026-11-21 · §1 · S1 · S3 · §3 · §4 · §5 · AC1 · AC2 · §8 F2 · §10 · re-grounded at
-  `e62583e7b` per 2026-11-19-prompt-TOOL-dWitnessedBar-86-reground-brief: units 79, 80, 82 and 85 as
+  `2381fcbb4` per 2026-11-19-prompt-TOOL-dWitnessedBar-86-reground-brief: units 79, 80, 82 and 85 as
   landed, 82's claim read from its S2, an absence staged as a whole `check_key_variant` call, AC2's
   resolver sourced, F2's reasoning over the landed replacement, Rollout and Files touched listed
   exactly, and blob-pinned citations; intent unchanged.

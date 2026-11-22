@@ -82,7 +82,7 @@ half only id 6's fix names.
   One item writes each label, so no item's clause can pass on another item's line. Observed by AC3.
 - **S4** — id 4. Two criteria that can red. First, 90 AC3's `grep -c 'sha)'` over the probe's own
   scratch files is struck. The probe's diff counts read the built match, which no act of this build
-  changes, so they stand PINNED by 90 §4 Evidence (2026-11-21) and by 90's pass (`da3fbc953`) under
+  changes, so they stand PINNED by 90 §4 Evidence (2026-11-21) and by 90's pass (`b5a33a39c`) under
   its `- AC3` answer, and the close does not run them again. 90 S2's
   clones, 89 AC6's clone and 88 AC10's clones grade the built loop. Second, 90 AC15's
   `sed ... | grep -cE 'python3? -c'` clause over 90's own text is struck. In its place, each
@@ -121,7 +121,7 @@ half only id 6's fix names.
   `grep -n -i floor tools/run-gates/run-gates.gov.test.sh` prints lines 20, 91, 92, 94, 262, 377,
   378, 396, 408 and 459. It does not print `tools/run-gates/run-gates.gov.test.sh@cdfbd1cf:93` or
   `:95`, which are a continuation line and the `TOOL-dDerivedDocket-23` line. This spec's §4 Evidence
-  carries it. 90 §4 Evidence, re-grounded at rev-3 over `9b0ad9c97`, no longer states a
+  carries it. 90 §4 Evidence, re-grounded at rev-3 over `93d34f5da`, no longer states a
   `grep -i floor` inventory, so S8 stands as the record of the base inventory S9's keep list is
   drawn from. NOT OBSERVED by the build: the inventory reads a base blob that no build act changes,
   and S9 observes on the built tree the keep list it decides.
@@ -130,12 +130,12 @@ half only id 6's fix names.
   (`test_recall_floor.py from the payload`) and `:262` (`1565 s floor`). So does `@cdfbd1cf:396`, the
   section header
   `# ---- THE SHARD CONTRACT, both directions (TOOL-aShardedFloor-2) ----`, though it carries the unit
-  id 90 S11 keeps off the owner line. On the tree 90's pass built (`da3fbc953`) each of the three
+  id 90 S11 keeps off the owner line. On the tree 90's pass built (`b5a33a39c`) each of the three
   counts 1 (§4 Evidence), so this pass restores none and writes no suite line; any other count is a
   divergence the builder returns. This unit's pass reads all three on the built tree, and unit 90's
   ledger records the reading in note row `92|S9`. Observed by AC8.
 - **S10** — id 5. Each act at its phase. 90 §4 Rollout is superseded. S1, S11, S14 and S15's probes
-  ran at 90's pass (`da3fbc953`), and S3's probe stands PINNED (S4). S1, S2 and S9's clones run at the
+  ran at 90's pass (`b5a33a39c`), and S3's probe stands PINNED (S4). S1, S2 and S9's clones run at the
   close. AC13's regeneration runs after the pass commit, and every ledger note is written at the
   close. 90 S10's
   reading of unit 89's schedule is superseded too. 89 AC4, AC6, AC7, AC10 and AC12 have a half at the
@@ -156,7 +156,7 @@ half only id 6's fix names.
   (exit 8) for an index row naming a spec it cannot read, and `TOKEN READER FAILED <path>` (exit 9)
   for an `extract_gates` that raises. Every close-time run of the owner derivation runs this script:
   88 S6, AC6 and AC18, 89 S9, AC9 and AC12, and 90 AC15's, which ran 90's script at its pass
-  (`da3fbc953`) and which AC11 runs again with every staging. Unit 90's ledger records the staged
+  (`b5a33a39c`) and which AC11 runs again with every staging. Unit 90's ledger records the staged
   exits in note row `92|S12`. Observed by AC11.
 - **S13** — id 16. A note's grepped tokens on one physical line. Every note units 90 and 92 write
   carries its label and every token its note-table row names on one physical line, and wraps only
@@ -208,7 +208,7 @@ would share those records. Dispatch is strictly sequential, a shared order inclu
 
 ### Evidence
 
-Read on 2026-11-21 at `f50a17e83`. Units 69 and 87 to 91 are CLOSED; unit 28 is deferred unbuilt.
+Read on 2026-11-21 at `51424faa1`. Units 69 and 87 to 91 are CLOSED; unit 28 is deferred unbuilt.
 
 - `tools/run-gates/run-gates.gov.test.sh@cdfbd1cf`: `grep -n -i floor` prints 20, 91, 92, 94, 262,
   377, 378, 396, 408 and 459, and `:93` and `:95` hold no `floor`. On the built suite
@@ -218,7 +218,7 @@ Read on 2026-11-21 at `f50a17e83`. Units 69 and 87 to 91 are CLOSED; unit 28 is 
   `:1290-1295` print `PASS ($a assertions)` only when `fail` is 0.
 - The canary's call site (`tools/run-gates/run-gates.gov.test.sh@f50a17e83:928-936`) adds its
   visited increment before the call of `check_canary_keys`, sets `fail=1` on a 3 (unit 89,
-  `0c2f7e195`) and on a code outside 0 to 3 (unit 90, `da3fbc953`), and sets `rgf_ok` only on 0 or 1
+  `05fdf49d3`) and on a code outside 0 to 3 (unit 90, `b5a33a39c`), and sets `rgf_ok` only on 0 or 1
   with `rgf_whats` empty. The `rec_sha` and `rec_fp` compares add to `a` only under `rgf_ok`
   (`:966`, `:969`):
   `grep -c '^\[ "\$rgf_ok" = 1 \] && case' tools/run-gates/run-gates.gov.test.sh` prints 2 (PINNED
@@ -240,9 +240,9 @@ Read on 2026-11-21 at `f50a17e83`. Units 69 and 87 to 91 are CLOSED; unit 28 is 
   none of them.
 - `memory/builds/dWitnessedBar/RUN.md` records a dispatch as
   `dispatch · item <sha8> <unit> · reason <declared paths>`. Unit 89's row declares its own spec
-  alone under `spec/`, unit 90's (`item 197df554`) declares `memory/builds/dWitnessedBar/spec`, and
-  unit 91's declares its own spec file twice and the directory never. Pass commits `0c2f7e195` and
-  `da3fbc953` each change their own spec alone under `spec/`, so the after-the-fact read covers 0
+  alone under `spec/`, unit 90's (`item d7c4a673`) declares `memory/builds/dWitnessedBar/spec`, and
+  unit 91's declares its own spec file twice and the directory never. Pass commits `05fdf49d3` and
+  `b5a33a39c` each change their own spec alone under `spec/`, so the after-the-fact read covers 0
   paths (PINNED 2026-11-21 by `git diff --name-only <c>~1 <c>`).
 - `.githooks/pre-commit@f50a17e83:216-223` reads `git diff --cached --name-status --no-renames` once
   and sets the memory flag on `[AM]:memory/*`; `:283-291` runs hygiene with `--staged` under that
@@ -455,7 +455,7 @@ the close, with every note.
   Red when: a call site that handles 0, 1 and 2 alone fails the isolated clone through the floor.
   fixture: scratch clones under `%TEMP%/<short-name>`.
   figure: the increment count is DERIVED at observation time by S2's `grep -c` over the built suite;
-  it read 2 on 2026-11-21 at `f50a17e83` (§4 Evidence).
+  it read 2 on 2026-11-21 at `51424faa1` (§4 Evidence).
   permission: the arm's run is the main loop's, at the close.
 - **AC3** — When §4's note check is fed every note-table row opening `90|`, it prints
   `NOTES OK 17` and exits 0. In a scratch copy of the ledgers where the note holding `for unread` is
@@ -515,7 +515,7 @@ the close, with every note.
   `grep -c '1565 s floor' tools/run-gates/run-gates.gov.test.sh`. When §4's note check is fed the rows
   opening `92|S9|`, it prints `NOTES OK 1`.
   Red when: a sweep by `grep -i floor` deletes a comment outside the assertion floor.
-  figure: each count is PINNED at 1 over base `cdfbd1cf` and over `f50a17e83` (2026-11-21).
+  figure: each count is PINNED at 1 over base `cdfbd1cf` and over `51424faa1` (2026-11-21).
 - **AC9** — When §4's note check is fed the rows opening `92|S10|` and `90|S10|`, it prints
   `NOTES OK 2`, so 90 S10's note quotes `AC4 AC6 AC7 AC10 AC12` as the criteria with a pass half.
   Red when: 90 S10's note records 90 S10's own list, which gives 89 AC1 a pass half and 89 AC7 none.
@@ -581,7 +581,7 @@ owner derivation still names unit 90 the floor's owner: run on 2026-11-21 it pri
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-93 to TOOL-dWitnessedBar-97, promoted by the round-1 spec audit of
   units 91 and 92; nothing else moved.
-- rev-3 · 2026-11-21 · §2 to §7 · §10 · re-grounded at `f50a17e83` per
+- rev-3 · 2026-11-21 · §2 to §7 · §10 · re-grounded at `51424faa1` per
   2026-11-19-prompt-TOOL-dWitnessedBar-92-reground-brief. S2's added line counts the built
   `rgf_ok`-gated increments; S9 restores nothing, so the suite leaves Files touched and its legs the
   gates; S11 and its note token follow the hook's `[AM]:memory/*` trigger; Evidence re-cited and

@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-83
 
-# TOOL-dWitnessedBar-83 — builder return 1 (run `wf_789d0c4b-a54`), committed d21afc3fd
+# TOOL-dWitnessedBar-83 — builder return 1 (run `wf_789d0c4b-a54`), committed d9d627c44
 
 ## Why
 
@@ -8,7 +8,7 @@ The spec held as written when I checked it against the tree at base. The AC1 pip
 
 ## Summary
 
-Built and committed TOOL-dWitnessedBar-83 as d21afc3fd from base 8d1aa5123. The unit writes records only. Three observations are still owed to the main loop at the close: AC1's owner list and comment check, AC2's PASS count against the floor, and AC3's PASS count from a clone at 71f212ad1.
+Built and committed TOOL-dWitnessedBar-83 as d9d627c44 from base 83fa6ac7c. The unit writes records only. Three observations are still owed to the main loop at the close: AC1's owner list and comment check, AC2's PASS count against the floor, and AC3's PASS count from a clone at 563d828df.
 
 **What the commit holds:**
 - **S3's clause:** appended to the AC15 line of C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-73-1-acceptance-ledger.md. It names `TOOL-dWitnessedBar-83` AC2 as the close's equality against the final floor, and it is still one line.
@@ -28,7 +28,7 @@ Built and committed TOOL-dWitnessedBar-83 as d21afc3fd from base 8d1aa5123. The 
 **Owed at the close (main loop):**
 - **AC1:** run the owner pipeline over the built tree. The comment directly above `FLOOR_ASSERTIONS=` must name the id on the list's last line, which is TOOL-dWitnessedBar-90 today.
 - **AC2:** run the `run-gates gov canary` arm over the built tree. Its `PASS (<n> assertions)` count must equal `FLOOR_ASSERTIONS`, and both numbers and the owner go on this ledger's AC2 line.
-- **AC3:** take the PASS count from a scratch clone at `71f212ad1` and write it on unit 73's AC15 line, beside the 72 already there.
+- **AC3:** take the PASS count from a scratch clone at `563d828df` and write it on unit 73's AC15 line, beside the 72 already there.
 - **Section 7:** the legs `memory hygiene`, `recall floor` and `recall floor arms`.
 
 The unit declares no `New arm:` line, so no RED-first observation is owed. No command hit its timeout, and nothing was skipped. The help/reference/drive.md and help/reference/units.md changes that were already in the worktree are not mine and were left unstaged.

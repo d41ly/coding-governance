@@ -68,14 +68,14 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
   Observed by AC5.
 - **S3** — The seven keys leave the confs, the example confs and every reader, and the
   `conf-scalar-pins` population (unit 14) drains their seven rows. Observed by AC1 and AC6. The
-  readers below are found by `git grep -l` on the seven keys at `2b0490b8d`; where they sit there:
+  readers below are found by `git grep -l` on the seven keys at `578296c1f`; where they sit there:
   six assignments in `.memory-tree.conf` (blob `a63207924120`) and one in `.codebase-map.conf` (blob
   `c6ea39004527`); check 21's pin read at `tools/memory-tree/check-memory-hygiene.sh@2c0cb6f24513:1772-1792`
   and the comment naming checks 13 to 15 at `tools/memory-tree/check-memory-hygiene.sh@2c0cb6f24513:3288`;
   the template's commented row at `tools/drift-audit/drift_signals.template.py@05c8f8f9110f:234`; three
   passages of `WIRE-INTO-PROJECT.md` (blob `31e9d889c82e`); and the precedent comments at
   `.lexicon.conf@f2bb3e765e3b:59` and `tools/lexicon/LEXICON.md@5f647076ee39:183`. One member is
-  new since `045405ff8`: `memory/project/conf-scalar-pins.txt`, unit 14's home (`49f5d3ff6`), whose
+  new since `c3884a6b9`: `memory/project/conf-scalar-pins.txt`, unit 14's home (`25a3d2970`), whose
   rows name the seven keys and which this unit drains.
   **Readers:** by name: `.memory-tree.conf`, `.codebase-map.conf`, `memory/project/conf-scalar-pins.txt`,
   `tools/memory-tree/.memory-tree.conf.example`, `tools/codebase-map/.codebase-map.conf.example`,
@@ -119,7 +119,7 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
   texts name the homes where they name the pins; the memory-tree descriptor's `conditional_keys` drops
   the two keys, and the `measured-pins` hole's `discharge` command tests the two homes instead of the
   two keys, its `why` re-worded to match. The `requires_if` row on
-  memory-recall that read the two keys at the base is gone at `045405ff8`, removed by
+  memory-recall that read the two keys at the base is gone at `c3884a6b9`, removed by
   PLAY-dOrderedCharter-18 (`2d03321ab`), so no descriptor edge reads them. Observed by AC4.
   **Readers:** by name: `tools/memory-tree/kit.toml` (`conditional_keys`, the `measured-pins` hole),
   `corpus_ids.py` (`armed`, `_PIN_WHY`, `_PIN_CURE_ABSENT`, `_PIN_CURE_OUTDATED`) · by value: govkit's
@@ -228,7 +228,7 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
 
 ### The pins
 
-| Pin | Value at `2b0490b8d` | Population | Key kind · fields | Seed argv | Leg | Registered in |
+| Pin | Value at `578296c1f` | Population | Key kind · fields | Seed argv | Leg | Registered in |
 |---|---|---|---|---|---|---|
 | `ORPHAN_ID_PIN` | 0 | `id-orphan-waiver` (unit 16) | record · id | unit 16's | unit 16's | memory-tree |
 | `DEAD_PATH_PIN` | 0 | `corpus-path-unresolved` | site · path, cited | `convert_registry.py read-back corpus-path-unresolved` | `memory hygiene` | memory-tree |
@@ -238,12 +238,12 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
 | `SEVERITY_UNLABELLED_PIN` | unset | `severity-unlabelled`, unseeded | record · shard, row key | `[]` | `memory hygiene` | memory-tree |
 | `LIVE_ROW_PIN` | unset | `live-rows`, unseeded | record · shard, row key | `[]` | `memory hygiene` | memory-tree |
 
-Values PINNED at `2b0490b8d` (2026-11-19, `git grep -nE '^[A-Z_]+_PIN=' -- '.*.conf'`), unchanged
-from `045405ff8` and `19d6aae6`. A pin of 0 over a waiver already keyed by the offender is the waiver's own both-ways
+Values PINNED at `578296c1f` (2026-11-19, `git grep -nE '^[A-Z_]+_PIN=' -- '.*.conf'`), unchanged
+from `c3884a6b9` and `19d6aae6`. A pin of 0 over a waiver already keyed by the offender is the waiver's own both-ways
 rule, so the two zero pins fold rather than mint a population, each home empty and arming its check
 by being present (S4); the three counted pins become their
 offenders' keys, seeded at the base so their rows number what the pin did (`row-duplicates` 3,
-`unbound-records` 16 and `dossier-decisions-empty` 16, PINNED at `2b0490b8d`, re-measured by the seed
+`unbound-records` 16 and `dossier-decisions-empty` 16, PINNED at `578296c1f`, re-measured by the seed
 at the build run's base; there `row_grammar.py --emit-pin` printed `ROW_DUPLICATE_PIN="3"` and check
 21 graded 16 of 16 unbound records). Each seed argv is the check's own measurement exposed as a verb,
 printing the key's fields then the count, TAB-separated (unit 15 §4 "The rule"), its path spelled
@@ -274,7 +274,7 @@ generator of `{map_root}/generated` (`tools/codebase-map/kit.toml@8dfb2a659a2e:1
 (`tools/codebase-map/map_diff.py@aacff5d2425c:108-127`). The unseeded homes are `memory/project/severity-unlabelled.txt` and
 `memory/project/live-rows.txt`, declared and never written while `seed = []`. Check 3 reads no
 registration (`git grep -n legacy_ledger tools/memory-tree/check-memory-hygiene.sh` prints nothing at
-`2b0490b8d`), so the unit that gives either a seed adds its name to check 3's list as S7 does.
+`578296c1f`), so the unit that gives either a seed adds its name to check 3's list as S7 does.
 `date-cutoffs` registers in the memory-tree descriptor, which ships `ratchet.py`, with the leg of §8 F5.
 
 ### The dead-path registry
@@ -318,11 +318,11 @@ and its `project/` comment says an absent home keeps its check off (§8 F11).
 .unattended.conf	PASS_ORDER_CUTOFF	20260901	<base sha>	seeded
 ```
 
-At `2b0490b8d` the tracked root confs hold 39 cutoff keys, 28 in `.memory-tree.conf` and 11 in
+At `578296c1f` the tracked root confs hold 39 cutoff keys, 28 in `.memory-tree.conf` and 11 in
 `.unattended.conf` (PINNED 2026-11-19, measured by `git grep -cE '^[A-Z0-9_]+_CUTOFF=' -- '.*.conf'`;
-36 at `19d6aae6`, §8 F4; 39 at `045405ff8`), and drift's `cutoff_keys_armed` pin reads 39 there
+36 at `19d6aae6`, §8 F4; 39 at `c3884a6b9`), and drift's `cutoff_keys_armed` pin reads 39 there
 (`tools/drift-audit/drift_signals.py@31bcfc663a7a:370`); the seed derives the set at the build run's
-base, so the row count is never typed. No cutoff is blank at `2b0490b8d`. The rule matches drift's
+base, so the row count is never typed. No cutoff is blank at `578296c1f`. The rule matches drift's
 `tools/drift-audit/drift_report.py#build_cutoff_keys_armed`, which reads every tracked root
 `.<name>.conf`, and a cutoff a new conf adds is a measured key with no row, red in `ratchet (both
 ways)` until its row is written through the widen route or a seed.
@@ -496,7 +496,7 @@ data. The pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its
   `python tools/memory-tree/ratchet.py both-ways` exits 0 with a `date-cutoffs` line naming as many
   rows as measured.
   Red when: a cutoff in a conf other than the two the clause's census read is not measured.
-  figure: both counts DERIVED at observation; 36 is PINNED at `19d6aae6`, 39 PINNED at `2b0490b8d`.
+  figure: both counts DERIVED at observation; 36 is PINNED at `19d6aae6`, 39 PINNED at `578296c1f`.
 - **AC9** — When `bash tools/memory-tree/check-memory-hygiene.sh --only 3` runs on the landed tree, it
   exits 0 with the four new homes, and `git check-attr merge -- date-cutoffs.txt` run in
   `memory/project/` prints `merge: rows`.
@@ -529,7 +529,7 @@ data. The pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its
 
 ## 7. Gates
 
-The `ratchet` pack's legs, landed by unit 14 at `49f5d3ff6`, read every registration and carry no
+The `ratchet` pack's legs, landed by unit 14 at `25a3d2970`, read every registration and carry no
 `guard` (`tools/memory-tree/kit.toml`, their `[[gate_leg]]` rows), so each grades the new populations
 on any change; they are on the leg line below because AC1 and AC5 to AC8 observe them.
 
@@ -571,7 +571,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC7 · a `cutoff-later` and a `c
 - **FACT-QUESTION · F4 — How many cutoffs does the clause's census cover today?** Probe:
   `grep -cE '^[A-Z0-9_]+_CUTOFF=' .memory-tree.conf .unattended.conf`. Observation at `cdfbd1cf` and
   `19d6aae6`: 26 and 10, 36; the brief's D2 says 23 and 10, and retrofit.md:296 says 24 and 10;
-  re-observed at `045405ff8` (2026-11-19): 28 and 11, 39 (PINNED); and at `2b0490b8d` (2026-11-19):
+  re-observed at `c3884a6b9` (2026-11-19): 28 and 11, 39 (PINNED); and at `578296c1f` (2026-11-19):
   28 and 11, 39 (PINNED).
   Liveness: the count moves with every cutoff a unit adds. RESOLVED (agent, 2026-10-25, delegated): the
   clause states no count, so the seed derives the set at the build run's base and no deviation is owed,
@@ -585,7 +585,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC7 · a `cutoff-later` and a `c
   leg would measure it; (c) an empty `leg`, a change to unit 13's landed `_check_table` against §3
   (veto 1). (b) fails AC8's both-ways match (veto 1). RESOLVED (agent, 2026-11-19, delegated): (a), the
   one survivor, the answer TOOL-dWitnessedBar-18 §8 F6 gives `landed-steps`; the ask on unit 14 S6 is
-  met at `49f5d3ff6`, where `run_both_ways` runs the seed of every registration naming its leg and
+  met at `25a3d2970`, where `run_both_ways` runs the seed of every registration naming its leg and
   prints `graded by <leg>` for the rest (`tools/memory-tree/ratchet.py#run_both_ways`).
   widens: none · relaxes: none
 - **F6 — What head does the `unbound-records` seed carry, given the factory runs argv as written?**
@@ -602,7 +602,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC7 · a `cutoff-later` and a `c
   seam that keeps the filter in its one shell definition. widens: none · relaxes: none
 - **F7 — What does unit 46's scaffold arm count once the example conf holds no pin?** Unit 46, at
   order 10, adds an arm to `check-memory-hygiene.test.sh` asserting the five `conf-scalar-pins` rows a
-  conf made from the example seeds (TOOL-dWitnessedBar-46 AC2, five PINNED there at `b3b523896`); S3
+  conf made from the example seeds (TOOL-dWitnessedBar-46 AC2, five PINNED there at `0baa706f3`); S3
   removes all five `*_PIN=` lines from `tools/memory-tree/.memory-tree.conf.example`. Options: (a) this
   unit re-points that arm to append one planted `FOO_PIN="3"` to the copied example and assert its one
   row, the plant TOOL-dWitnessedBar-52 §8 F2 and TOOL-dWitnessedBar-53 §8 F3 take; (b) leave the arm
@@ -687,14 +687,14 @@ New arm: tools/memory-tree/ratchet.py · covers AC7 · a `cutoff-later` and a `c
   `tools/memory-tree/corpus_ids.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief;
   nothing else moved.
 - rev-4 · 2026-11-19 · S1 · S2 · S3 · S4 · S6 · S7 · S8 · §3 · §4 · §5 · AC5 · AC8 · AC10 · §7 · §8 F1
-  F2 F4 F5 · §10 · re-grounded at `045405ff8` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-brief:
+  F2 F4 F5 · §10 · re-grounded at `c3884a6b9` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-brief:
   S3's readers re-derived by `git grep -l` and cited by symbol or blob (new: `gotchas.py`'s fixture
   conf and the `row-grammar` dossier; prose outside named); S4 on the descriptor as it stands, its
   `requires_if` row gone at `2d03321ab`; each population's seed argv, leg and descriptor named in §4,
   as the landed factory requires (F5); AC5 on unit 15's `seed` verb, `read` printing no unarmed state;
   S8 on the landed `[[upgrade]]` grammar; cutoffs re-pinned at 39. No Goal or Scope intent moved.
 - rev-5 · 2026-11-19 · S3 · S6 · S7 · S8 · §4 The pins, The cutoffs, Inventory · AC1 · AC6 · AC7 · AC8
-  · AC10 · §7 · §8 F5 F6 F7 · §10 · re-grounded at `2b0490b8d` by brief
+  · AC10 · §7 · §8 F5 F6 F7 · §10 · re-grounded at `578296c1f` by brief
   2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief over units 14, 15, 45 and 54 as landed:
   S3's readers gain `conf-scalar-pins.txt` and unit 46's scaffold arm (F7); the seed argvs spelled as
   the landed table spells them, the unbound seed headed by `python` (F6); `measure-cutoffs` shares
@@ -725,7 +725,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC7 · a `cutoff-later` and a `c
 ## 10. Reuse audit
 
 The seams extended are the ledger factory (`tools/lib/legacy_ledger.py`, unit 13, landed at
-`34f8bb7db`) and the `ratchet` pack (unit 14, landed at `49f5d3ff6`), whose `ceiling` direction and
+`9cdebebc4`) and the `ratchet` pack (unit 14, landed at `25a3d2970`), whose `ceiling` direction and
 `both ways` and `never gains` legs grade both the pins' populations and the cutoffs; `measure-cutoffs`
 shares the conf walk of `tools/memory-tree/ratchet.py#measure_scalar_pins`, the kind's first instance;
 the cutoff rule reuses drift's `tools/drift-audit/drift_report.py#build_cutoff_keys_armed` reading.
@@ -743,10 +743,10 @@ converts through unit 16's `tools/memory-tree/convert_registry.py#LEGACY` and
 `tools/govkit/steps/registry_to_ledger.py`; S9 resolves through the existing
 `tools/lib/resolve_prefix_token.py#resolve_prefix_token` block.
 `python tools/codebase-map/reuse_lookup.py "a scalar count pin in a conf file converted to a keyed population; date cutoffs registered"`
-ranked, re-run at `2b0490b8d`, the conf readers `load_conf`, `parse_conf` and `read_conf`,
+ranked, re-run at `578296c1f`, the conf readers `load_conf`, `parse_conf` and `read_conf`,
 `refusal_join.py`'s `population` and the factory's `compare_counts`; none but the factory keys a
 population, which agrees with source; S8's step
 reads the conf through `tools/govkit/steps/conf_to_policy.py#parse_conf`, as `review_rounds.py` does. Scout C counted 33 cutoffs; source holds 36 at the base
-and 39 at `2b0490b8d` (§8 F4); its pin lines agree with source.
+and 39 at `578296c1f` (§8 F4); its pin lines agree with source.
 
 Recall terms used: `python tools/memory-recall/query.py "how do the count pins in the memory-tree conf become keyed populations and cutoffs registered" --terms "pin ORPHAN_ID_PIN RECORD_UNBOUND_PIN ROW_DUPLICATE_PIN keyed population cutoff never gains ratchet conf"`

@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-66
 
-# TOOL-dWitnessedBar-66 — builder return 1 (run `wf_525fb61c-14b`), committed a04b24c97
+# TOOL-dWitnessedBar-66 — builder return 1 (run `wf_525fb61c-14b`), committed e3cdc2201
 
 ## Why
 
@@ -8,7 +8,7 @@ Unit 66 is built as its spec (rev-3) says. The AC12 arm in C:/projects/coding-go
 
 ## Summary
 
-Built TOOL-dWitnessedBar-66 and committed it as one pass commit, a04b24c97, on base 16c366ede. The commit carries the `Pass: TOOL-dWitnessedBar-66` trailer.
+Built TOOL-dWitnessedBar-66 and committed it as one pass commit, e3cdc2201, on base 248058974. The commit carries the `Pass: TOOL-dWitnessedBar-66` trailer.
 
 What the commit changes:
 - **The arm (S1 to S4):** I edited the arm in place in `tools/run-gates/run-gates.gov.test.sh`.

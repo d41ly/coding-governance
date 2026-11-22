@@ -5,7 +5,7 @@
 - **Leg:** policy check
 - **Hash:** 438cfa6a96a04a32602c2beb23bb053f320403de
 - **Run:** unattended-179529481580044524711-1640412
-- **Sha:** 079d8513ce2ba90ffd4755b9b8677ab9b4bba1ee
+- **Sha:** f9ee3f8e0f2e994c7bad52ae0779fcf31c9c94db
 - **Cause:** run:dWitnessedBar
 
 ```
@@ -14,7 +14,7 @@ policy-check: arm_schema · 0 finding(s) · 6 key(s) of .governance/policy.toml 
 policy-check: arm_shape · 0 finding(s) · 274 row(s), 20 set-valued, 11 never-empty
 policy-check: arm_summaries · 0 finding(s) · 226 of 274 row(s) unsummarised · base c2a407b0390f (merge-base of HEAD and origin/main) carried 242, the list carries 226
 policy-check: arm_direction · 0 finding(s) · 20 loop bound and deadline row(s)
-policy-check: arm_on_invalid · 0 finding(s) · .governance/policy.toml at 079d8513 is valid
+policy-check: arm_on_invalid · 0 finding(s) · .governance/policy.toml at f9ee3f8e is valid
 policy-check: arm_mirror_parity · 0 finding(s) · 260 key(s) of .governance/policy.json against its render at HEAD
 policy-check: arm_mirror_landed · 0 finding(s) · 5 key(s) the policy file sets at c2a407b0, the helper against the reader
 policy-check: arm_mirror_readers · 0 finding(s) · 303 tracked code file(s) outside tools/policy/, the memory root, help/ and the self-tests

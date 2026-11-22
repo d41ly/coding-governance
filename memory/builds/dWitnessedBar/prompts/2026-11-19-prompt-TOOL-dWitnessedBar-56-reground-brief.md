@@ -25,7 +25,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 31: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59,
-     30, 29, 7, 21, 6, 2, 43 and 51 (`7b649d671`, with its pass-leg fixes in `0cd5982f3`: `precommit.py`'s nested
+     30, 29, 7, 21, 6, 2, 43 and 51 (`55e427e66`, with its pass-leg fixes in `41efe4ddb`: `precommit.py`'s nested
      refusal helper is `print_refusal`, the verdict prune loop in `run-gates.sh` is fed by a pipe).
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes (asks TOOL-dWitnessedBar-101 to -103) and the run
      defers it. Unit 51 dropped its edge onto 28, so the round-1 minors ids 7 and 46 wait with unit 28; any item of

@@ -82,7 +82,7 @@ left-shift folds into M6's helper, so S11 builds on S10.
   `check_cr_reached()` line to the first line opening `)`; a cut ending at `}` runs on through
   `check_canary_keys` (§4 Evidence). On the built tree the probe prints nothing; on a planted copy
   it prints the planted line. Observed by AC2.
-- **S3** — id 20. Unit 74 AC1 is observed at unit 74's own pass commit, `7c579ad47`, with checks that
+- **S3** — id 20. Unit 74 AC1 is observed at unit 74's own pass commit, `6a12d559c`, with checks that
   exist at order 40. In the suite as that commit holds it, the lines calling `check_cr_reached` for
   `rec_sha` number 2 (PINNED 2026-11-21, §4 Evidence), the canary's assertion and the liveness call,
   and S2's probe restricted to `rec_sha` prints nothing. Neither check reads `CANARY_KEYS`, which unit 76 mints at order 41. Unit
@@ -106,8 +106,8 @@ left-shift folds into M6's helper, so S11 builds on S10.
   Unit 74's ledger beside AC3 records that its quoted-spelling red is superseded by this item.
   Observed by AC6.
 - **S7** — id 15. The symbol tier already holds `check_cr_reached` and `check_canary_keys`: units 74
-  and 76 each ran `python tools/codebase-map/gen_map.py --write` at their passes, `7c579ad47` and
-  `bdc10a4df`, so this unit renders nothing. The ledgers of units 74 and 76 beside AC1 each name the
+  and 76 each ran `python tools/codebase-map/gen_map.py --write` at their passes, `6a12d559c` and
+  `3596751cf`, so this unit renders nothing. The ledgers of units 74 and 76 beside AC1 each name the
   key, the commit that rendered it and this unit. Observed by AC7.
 - **S8** — id 5. This unit's §7 names `codebase-map coverage + freshness`, the unguarded leg the two
   minted functions move, with `recall floor` and `recall floor arms` for the paths under `memory/`.
@@ -230,11 +230,11 @@ holds all 16 findings, as `TOOL-dWitnessedBar-78` §4 held its 20.
 
 ### Evidence
 
-Read at `fe6302db3` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GNU sed 4.9 (PINNED
+Read at `4e65b609f` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GNU sed 4.9 (PINNED
 2026-11-21), unless a line names another commit.
 
 - `memory/map/generated/symbols.json` lists `check_cr_reached`, `check_canary_keys` and
-  `check_key_variant` once each, added at `7c579ad47`, `bdc10a4df` and `08f226f3d`, and
+  `check_key_variant` once each, added at `6a12d559c`, `3596751cf` and `b9326245e`, and
   `python tools/codebase-map/gen_map.py --check` exits 0 (PINNED 2026-11-21).
   `tools/codebase-map/map_extractors.py#scan_shell_layer` skips a name opening with `_` as private,
   so S10's helper adds no symbol-tier key. `.githooks/pre-commit` runs no map check, and the leg
@@ -259,7 +259,7 @@ Read at `fe6302db3` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GN
   2026-11-21). `LIVE` (`tools/check-spec-tokens.py@fe6302db3:616`) excludes DEFERRED and CLOSED.
 - `memory/builds/aScoutedSeam/` holds no `BACKLOG.md`, and the build README allows outside writes
   only as an ask row in another build's `BACKLOG.md`. Unit 78 S9 filed `PLAY-dConvergedCharter-42`
-  in `memory/builds/dConvergedCharter/BACKLOG.md` at `253e21771`, under that build's family.
+  in `memory/builds/dConvergedCharter/BACKLOG.md` at `0e5103294`, under that build's family.
 - `tools/check-spec-tokens.py#print_legs_for` resolves each guard through `resolve_prefix_token`
   against `derive_legs_path`'s tool root and joins through `derive_tripped_legs`. On 2026-11-21
   `--legs-for .githooks/pre-push` printed `run-gates gov canary <- .githooks/pre-push [selftests/repo]`
@@ -275,9 +275,9 @@ Read at `fe6302db3` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GN
   16 assignments (PINNED 2026-11-21) both to the anchored `sed` at `:994` and to
   `grep -oE '[a-z_]+\) bg_[a-z_]+='`, and `read_green_file`'s gives 7 (PINNED 2026-11-21) both ways.
   A cut whose line holds two arms is where a first-label rule and the count part.
-- At `7c579ad47`, `grep -c 'check_cr_reached .*rec_sha'` prints 2 (PINNED 2026-11-21). S2's probe cut at
+- At `6a12d559c`, `grep -c 'check_cr_reached .*rec_sha'` prints 2 (PINNED 2026-11-21). S2's probe cut at
   the first `)` line prints nothing for `rec_sha` and prints `:890`, unit 72's inline `rec_fp`
-  measure, for `rec_fp`; cut at `}` it prints nothing for either. At `fe6302db3` both cuts print
+  measure, for `rec_fp`; cut at `}` it prints nothing for either. At `4e65b609f` both cuts print
   nothing, and a planted `[ "$(printf %s "$rec_fp" | wc -c)" -eq 41 ]` at the file's end prints
   (PINNED 2026-11-21).
 - `FLOOR_ASSERTIONS=74` sits at `tools/run-gates/run-gates.gov.test.sh@fe6302db3:246` with unit 82's
@@ -364,7 +364,7 @@ close.
   fixture: a scratch copy under `%TEMP%/<short-name>`.
 - **AC3** — When the first line of
   `git log --reverse --format='%H %s' -- tools/run-gates/run-gates.gov.test.sh | grep 'TOOL-dWitnessedBar-74'`
-  names unit 74's pass commit, `7c579ad47`, `git show <sha>:tools/run-gates/run-gates.gov.test.sh | grep -c 'check_cr_reached .*rec_sha'`
+  names unit 74's pass commit, `6a12d559c`, `git show <sha>:tools/run-gates/run-gates.gov.test.sh | grep -c 'check_cr_reached .*rec_sha'`
   prints 2, and AC2's probe over that blob, with `rec_(sha|fp)` read as `rec_sha`, prints nothing.
   Unit 74's ledger line for AC1 quotes both results.
   Red when: unit 74 AC1 is graded against `CANARY_KEYS`, which its pass did not hold.
@@ -418,7 +418,7 @@ close.
   and a scratch helper reading only the first label of each line returns 1 naming the cut and both
   numbers.
   Red when: a derivation misses an arm that shares a line with another, with the arm green.
-  figure: the count is DERIVED from the cut at observation time; it read 16 at `fe6302db3` (PINNED
+  figure: the count is DERIVED from the cut at observation time; it read 16 at `4e65b609f` (PINNED
   2026-11-21).
 - **AC12** — When each of the eight greps that unit 75 AC3, unit 77 AC2 and unit 78 AC2, AC3, AC13,
   AC15, AC16 and AC19 name runs at the close, every line it prints carries every token its criterion
@@ -458,7 +458,7 @@ close.
   `PASS (<n> assertions)` with `<n>` equal to the `FLOOR_ASSERTIONS` value there.
   `grep -A1 '^FLOOR_ASSERTIONS=' tools/run-gates/run-gates.gov.test.sh | tail -1` names
   `TOOL-dWitnessedBar-84`, and `grep -B1 '^FLOOR_ASSERTIONS=' tools/run-gates/run-gates.gov.test.sh | head -1`
-  prints the line it printed at `fe6302db3`.
+  prints the line it printed at `4e65b609f`.
   Red when: the arms this unit adds sit above the floor and can be deleted with the canary green.
   figure: both numbers are DERIVED at observation time.
   permission: the arm's run is the main loop's, at the close.
@@ -500,7 +500,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC11 AC13 AC14 AC17 · 
   guard literally (`tools/run-gates/run-gates.sh#build_input_keys`), so a glob moves no reuse key and a stale green is carried forward, which fails S9's Red-when; veto 1 discards
   it. RESOLVED (agent, 2026-10-25, delegated): (b), rung 3, the one survivor; its follow-up is the ask
   row S9 files, whose precondition is `TOOL-aScoutedSeam-1` naming the leg or closing. Re-checked at
-  `fe6302db3` on 2026-11-21, per 2026-11-19-prompt-TOOL-dWitnessedBar-84-reground-brief.
+  `4e65b609f` on 2026-11-21, per 2026-11-19-prompt-TOOL-dWitnessedBar-84-reground-brief.
   widens: none · relaxes: none
 - **F3 — Where is the case-arm spelling the liveness edit consumes fixed (id 6)?** Options: (a) a grep
   criterion on unit 69's built text, through this unit; (b) the edit derived from the cut's `<key>)`
@@ -534,7 +534,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC11 AC13 AC14 AC17 · 
 - rev-4 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
   `tools/gate-legs.json`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else
   moved.
-- rev-5 · 2026-11-21 · §1 · S2 · S4 · S6 · S7 · S9 to S11 · S13 to S16 · §3 · §4 · AC2 · AC3 · AC4 · AC9 · AC11 · AC13 · AC15 · AC17 · §7 · §8 · §10 · re-grounded at `fe6302db3` per 2026-11-19-prompt-TOOL-dWitnessedBar-84-reground-brief. S2's cut ends at the `)` closing `check_cr_reached`. S4 answers unit 74 rev-3's grep. S7 renders nothing. S9 edits the registry row and renders the manifest, its population re-derived to four DEFERRED specs. S10 and S11 extract the two landed derivations, now 16 keys (PINNED 2026-11-21). S13 and S14 fit `check_key_variant` and the `$(...)` calls (§8 F4). S14's comment goes below the constant, the owner unit 90. S15 is answered by units 75's and 77's re-grounds. §3 names unit 28's and unit 89's shares; the §7 legs follow Files touched.
+- rev-5 · 2026-11-21 · §1 · S2 · S4 · S6 · S7 · S9 to S11 · S13 to S16 · §3 · §4 · AC2 · AC3 · AC4 · AC9 · AC11 · AC13 · AC15 · AC17 · §7 · §8 · §10 · re-grounded at `4e65b609f` per 2026-11-19-prompt-TOOL-dWitnessedBar-84-reground-brief. S2's cut ends at the `)` closing `check_cr_reached`. S4 answers unit 74 rev-3's grep. S7 renders nothing. S9 edits the registry row and renders the manifest, its population re-derived to four DEFERRED specs. S10 and S11 extract the two landed derivations, now 16 keys (PINNED 2026-11-21). S13 and S14 fit `check_key_variant` and the `$(...)` calls (§8 F4). S14's comment goes below the constant, the owner unit 90. S15 is answered by units 75's and 77's re-grounds. §3 names unit 28's and unit 89's shares; the §7 legs follow Files touched.
 
 ## 10. Reuse audit
 

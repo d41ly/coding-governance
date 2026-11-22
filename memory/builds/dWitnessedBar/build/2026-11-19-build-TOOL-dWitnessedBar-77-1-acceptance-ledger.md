@@ -19,7 +19,7 @@ The floor that counts this unit's arms is `FLOOR_ASSERTIONS` in `tools/run-gates
   Over the cut as the hook has it the slice printed no line, `fail` 0,
   `rgf_ok` 1. Over the cut whose `sha` and `fingerprint` cases both read `${_rg_v%?}` it printed
   `gov-canary: the planted CR never reached read_green_file on MINGW64_NT-10.0-22621 for rec_sha; the CR-strip assertion is not counted`
-  then the same line `for rec_fp;`, and no `for count` line; the suite as `1f34660b7` has it printed the
+  then the same line `for rec_fp;`, and no `for count` line; the suite as `367404c59` has it printed the
   `for rec_sha` line alone over that cut. Over the cut with no `    _rg_v=${_rg_v%$'\r'}` line it printed the
   `for count 0;` line once and no `for rec_sha` or `for rec_fp` line. The `fingerprint` edit alone printed the
   `for rec_fp` line once. `grep -n 'the planted CR never reached read_green_file on'` over the suite prints

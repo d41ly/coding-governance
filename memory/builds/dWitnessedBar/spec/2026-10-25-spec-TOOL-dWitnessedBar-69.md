@@ -106,7 +106,7 @@ at order 39.
 
 ### Evidence
 
-Probed on this node at `9fde76576` (PINNED 2026-11-21): GNU Awk 5.4.0, GNU bash 5.3.9
+Probed on this node at `a0fe9d87d` (PINNED 2026-11-21): GNU Awk 5.4.0, GNU bash 5.3.9
 (`x86_64-pc-cygwin`), git 2.54.0.windows.1. The record held `sha<TAB>` forty `a` `<LF>`, `sha<TAB>`
 forty `b` `<CR><LF>`, `manifest<TAB>x<TAB><LF>`, a bare `fingerprint<LF>` and `selftests<TAB>on`.
 

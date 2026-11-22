@@ -118,8 +118,8 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 28: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59,
-     30, 29 (`b0ad98958`: the `gate-warn` marker), 7 (`28edeaa0b`: `seen_red.py`), 21 (`cd03e4e75`: `--fix-of`,
-     `fix_keeps.py`) and 6 (`aecf1c95a`, `1533b56d4`, red fix `ff89a2ff5`: the verdict-backend registry
+     30, 29 (`79a4f9c20`: the `gate-warn` marker), 7 (`636ec0364`: `seen_red.py`), 21 (`744515922`: `--fix-of`,
+     `fix_keeps.py`) and 6 (`0b7e0fceb`, `5b3fbe429`, red fix `b0e8c63b9`: the verdict-backend registry
      `verdict_backends.py`, `remote_verdict.py` with `read_held_runs` moved out of the driver, the lander's
      `check_landing_verdict`, `OWNER_ONLY_KEYS` in `tools/loop/guard.py`, `help/verdict-backends.md`).
    - Settle every claim about the landed shape of each unit this spec consumes from against the tree. The driver

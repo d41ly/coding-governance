@@ -123,7 +123,7 @@ builder can build it as written over HEAD.
      with no `path` field, and its integer check field needs `verbatim`. Name the fields so each converted header
      registers, and do the same for `corpus-path-unresolved.txt`, `trace-waiver.txt` and `fork-ceilings.txt`'s integer
      `base`.
-   Every other claim the builder probed held at `9b69042ee`; leave those as they are.
+   Every other claim the builder probed held at `1fc4e5c6e`; leave those as they are.
 2. `memory/project/readme-contract.txt` is a shared record no pass may declare; the build brief already routes its
    converted bytes through the main loop, so the spec need not change for that. Leave carried clause tokens
    byte-identical; blob-pin only code-file line citations.

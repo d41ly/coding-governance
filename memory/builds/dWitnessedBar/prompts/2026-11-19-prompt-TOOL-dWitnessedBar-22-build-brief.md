@@ -8,7 +8,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 6.
-- Built so far: units 26, 27, 48, 49, 50, 13, 15 and 61, and unit 12 (`9dbb7bc44`: a `tag` on every row of
+- Built so far: units 26, 27, 48, 49, 50, 13, 15 and 61, and unit 12 (`6b3f271c6`: a `tag` on every row of
   `tools/gate-legs.json` and every descriptor `[[gate_leg]]` row, `LEG_KEYS` gaining `tag`, the `leg`, `pack` and
   `check` namespaces, run-gates at 1.51 and govkit's `LEG_KEY_FLOORS`). Read those files as they stand: this unit's
   edge fields land on the rows unit 12 tagged, and any new leg key follows the floor pattern unit 12 set.

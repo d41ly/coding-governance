@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-58
 
-# TOOL-dWitnessedBar-58 — builder return 1 (run `wf_2590829d-f7b`), committed 75914afa1
+# TOOL-dWitnessedBar-58 — builder return 1 (run `wf_2590829d-f7b`), committed ab9635b0d
 
 ## Why
 
@@ -8,7 +8,7 @@ Built TOOL-dWitnessedBar-58 as specified. Every blob pin in the spec matched HEA
 
 ## Summary
 
-Commit 75914afa1, base d463c6241. Both new arms passed in fixture probes; no gate, suite or bar ran.
+Commit ab9635b0d, base 8972a052d. Both new arms passed in fixture probes; no gate, suite or bar ran.
 Changes:
 - S1/AC1, .githooks/pre-push.test.sh: the IR AC4 c2 push now runs a stub in place of $green that writes ${GATE_BASE_FROM-unset} to ir-base-from under the fixture's git dir and exits 0. A new case passes only if the file reads `inherited`; a missing file fails it.
 - S2/AC2, tools/run-gates/run-gates.evidence.test.sh: one new ok/nope pair after unit 56's AC8 run, checking that no .scoped file exists for the tree and the leg's 0.out reads `base_from_seen 0`. FLOOR_ASSERTIONS 309 to 310 with a RAISED note.

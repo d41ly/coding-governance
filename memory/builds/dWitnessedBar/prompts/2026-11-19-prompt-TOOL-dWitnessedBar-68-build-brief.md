@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 39.
 - Built so far through order 39's first unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59, 30, 29,
-  7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66 and 69 (`298369174`: `read_green_file` reads with one `IFS= read -r` loop and strips one CR, `read_tag_lines` splits on LF and strips one CR). Unit 28 (order 30) is deferred
-  against asks TOOL-dWitnessedBar-101 to -103 and is not built. This spec, rev-3, was re-grounded at `e8de8744c`.
+  7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66 and 69 (`9ff80bb15`: `read_green_file` reads with one `IFS= read -r` loop and strips one CR, `read_tag_lines` splits on LF and strips one CR). Unit 28 (order 30) is deferred
+  against asks TOOL-dWitnessedBar-101 to -103 and is not built. This spec, rev-3, was re-grounded at `6380eac0a`.
 - This unit builds second at order 39, after unit 69 and before units 67 and 70; nothing else is in flight in this working tree: commit directly here.
 - The full `memory hygiene` leg is red at base on checks 13 and 15 from other records, and whole-tree spec tokens on one
   aMendedLedger spec; the main loop owns those at the close. Any other red is this unit's to fix.

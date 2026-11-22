@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-1
 
-# TOOL-dWitnessedBar-1 — builder return 1 (run `wf_fda2e89d-645`), committed 8bd06547be032ed1ba54a657ce83af289ce9e758
+# TOOL-dWitnessedBar-1 — builder return 1 (run `wf_fda2e89d-645`), committed 13223aa8b829a31325b130a3b304a37e53d39726
 
 ## Why
 
-TOOL-dWitnessedBar-1 is built and committed. The pass commit is ad3949b5fbaa5e72665ec9ea6f0b6ef227debb13 (Pass: TOOL-dWitnessedBar-1, spec moved INPROGRESS -> CLOSED, date 2026-11-20). A follow-up commit, 8bd06547b (Pass: none), renames three nested fixture helpers to verbs the naming lexicon accepts. Every spec claim checked against the tree held: manifest at 219 legs, 118 on the bar; 12 typed kinds before this unit; every cited symbol exists. So there was no divergence.
+TOOL-dWitnessedBar-1 is built and committed. The pass commit is ad55d40c13eee591d330e13a000483b5d2fd75b0 (Pass: TOOL-dWitnessedBar-1, spec moved INPROGRESS -> CLOSED, date 2026-11-20). A follow-up commit, 13223aa8b (Pass: none), renames three nested fixture helpers to verbs the naming lexicon accepts. Every spec claim checked against the tree held: manifest at 219 legs, 118 on the bar; 12 typed kinds before this unit; every cited symbol exists. So there was no divergence.
 
 ## Summary
 
-Built TOOL-dWitnessedBar-1 from spec rev-6. Both commits went through a clean clone at %TEMP%/u1c, with a linked worktree, and passed every hook (no --no-verify). The branch was moved by compare-and-swap update-ref from base 609cd40b1 to ad3949b5f, then to 8bd06547b. Only this unit's paths were aligned in this tree. Unit 59's paths, its builder-return file and the help/ edits that were already in the tree were left untouched. The scratch clone has been removed.
+Built TOOL-dWitnessedBar-1 from spec rev-6. Both commits went through a clean clone at %TEMP%/u1c, with a linked worktree, and passed every hook (no --no-verify). The branch was moved by compare-and-swap update-ref from base 59e882afd to ad55d40c1, then to 13223aa8b. Only this unit's paths were aligned in this tree. Unit 59's paths, its builder-return file and the help/ edits that were already in the tree were left untouched. The scratch clone has been removed.
 
 What landed:
 - tools/drift-audit/drift_report.py

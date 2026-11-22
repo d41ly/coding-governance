@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-92
 
-# TOOL-dWitnessedBar-92 — builder return 1 (run `wf_4d5a4d22-af9`), committed 186cad841
+# TOOL-dWitnessedBar-92 — builder return 1 (run `wf_4d5a4d22-af9`), committed 27a6568ef
 
 ## Why
 
-TOOL-dWitnessedBar-92 is built and committed. It writes records only, as rev-3 says. I found no divergence: before any write I checked the spec's claims against the tree at 5518fe43b and every one held. (1) The anchored count `grep -c 'sha)[[:space:]]*rec_sha="' .githooks/pre-push` printed 0. (2) The suite's `rgf_ok` case-line count printed 2. (3) The three floor comments each counted 1, at lines 696, 20 and 412. (4) `GENERATED_INDEXES` names none of LIVE.md, ledger or backlog. (5) This unit's dispatch row names its own spec file and never the spec directory. (6) Pass commits 0c2f7e195 and da3fbc953 each change only their own spec under `spec/`. The orientation card calls the unit "Tier-2 at DEFERRED", but that is out of date: the spec header read INPROGRESS. The `--brief` call answered "already recorded, unchanged".
+TOOL-dWitnessedBar-92 is built and committed. It writes records only, as rev-3 says. I found no divergence: before any write I checked the spec's claims against the tree at 1e38f6eb1 and every one held. (1) The anchored count `grep -c 'sha)[[:space:]]*rec_sha="' .githooks/pre-push` printed 0. (2) The suite's `rgf_ok` case-line count printed 2. (3) The three floor comments each counted 1, at lines 696, 20 and 412. (4) `GENERATED_INDEXES` names none of LIVE.md, ledger or backlog. (5) This unit's dispatch row names its own spec file and never the spec directory. (6) Pass commits 05fdf49d3 and b5a33a39c each change only their own spec under `spec/`. The orientation card calls the unit "Tier-2 at DEFERRED", but that is out of date: the spec header read INPROGRESS. The `--brief` call answered "already recorded, unchanged".
 
 ## Summary
 
-Commit 186cad841 is the pass for TOOL-dWitnessedBar-92. It changes 6 files: the new acceptance ledger, the spec's status header and its gen:spec-records region, `RUN.md` (the dispatch row that was already staged), and the README, `memory/backlog/TOOL.md` and `memory/LIVE.md` as `gen_build_index.py --write` rendered them. The trailer block carries `Pass: TOOL-dWitnessedBar-92` and Co-Authored-By. The only spec edit is CLOSED in the status header; its date was already 2026-11-21.
+Commit 27a6568ef is the pass for TOOL-dWitnessedBar-92. It changes 6 files: the new acceptance ledger, the spec's status header and its gen:spec-records region, `RUN.md` (the dispatch row that was already staged), and the README, `memory/backlog/TOOL.md` and `memory/LIVE.md` as `gen_build_index.py --write` rendered them. The trailer block carries `Pass: TOOL-dWitnessedBar-92` and Co-Authored-By. The only spec edit is CLOSED in the status header; its date was already 2026-11-21.
 
 The regenerated index now shows the build and TOOL-dWitnessedBar-31 as DEFERRED, and the -31 backlog row names TOOL-dWitnessedBar-28. That follows from unit 28 being the only open unit; I did not edit it.
 

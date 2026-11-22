@@ -21,7 +21,6 @@
 | [2026-11-19-build-TOOL-dWitnessedBar-4-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-4-1-acceptance-ledger.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md) | journal | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-4-deviation-42.md](../build/2026-11-20-build-TOOL-dWitnessedBar-4-deviation-42.md) | deviation | — |
-| [2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-73.md](../build/2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-73.md) | red-fix | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-74.md](../build/2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-74.md) | red-fix | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-75.md](../build/2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-75.md) | red-fix | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-76.md](../build/2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-76.md) | red-fix | — |
@@ -78,7 +77,7 @@ writers, gives the Test step's merge its policy `verdict.tree`, and records the 
   `tools/unattended/unattended.test.sh`, `tools/run-gates/post-merge.sh`,
   `tools/run-gates/run-gates.evidence.test.sh` and `tools/run-gates/README.md`, every tracked file
   outside the memory tree that spells `write_bar_green` or `gate-bar-green`, by a git grep at the base,
-  re-derived at HEAD 666874a8 on 2026-11-20 as the same files, by the same git grep
+  re-derived at HEAD d6fb6ef4 on 2026-11-20 as the same files, by the same git grep
   · by value: `check_bar_record`, `check_bar_base` and `check_cover_record` in `.githooks/pre-push`,
   which compare a record's `sha`, `tree`, `kind`, `base` and `bar`, re-pointed by S3; `tools/unattended/unattended.sh`'s gates-green
   check, which reads the record it wrote.
@@ -337,7 +336,7 @@ New arm: tools/push-main.test.sh · covers AC7 · `verdict.tree` planted as `bui
   `tools/unattended/unattended.sh` and `tools/policy/catalogue.toml`, per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing else moved.
 - rev-5 · 2026-11-20 · §1 · S3 S4 S5 S6 S7 · §3 · §4 · §5 · AC1 AC7 AC8 AC9 · §7 · §8 F4 · §10 ·
-  re-grounded at `666874a8` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-4-reground-brief: moved
+  re-grounded at `d6fb6ef4` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-4-reground-brief: moved
   hook and runner lines blob-pinned, the rest cited as `path#symbol`; S3 names the cover pass and
   `check_green_reuse`; S4 names the floor's advisory-red decline the call gained; S5 reads through
   `resolve_lander_kit` and F4 gives `--land` the landing merge under `build-tip`; S7 re-renders
@@ -351,7 +350,7 @@ The seams extended are the runner's `$RUNDIR/verdict` block and its `.shared` co
 (`tools/run-gates/run-gates.sh@4e410b10:5733-5839`), the hook's `read_bar_file` and runner-stamp
 predicates (`.githooks/pre-push@176f5913:1618-1653`), `tools/push-main.sh#cmd_prepare` with its kit
 resolution `tools/push-main.sh#resolve_lander_kit`, and dDeclaredLoop's
-`tools/loop/loop_transition.py#TRANSITION_FIELDS`. The lookup below, re-run at `666874a8`, ranks the
+`tools/loop/loop_transition.py#TRANSITION_FIELDS`. The lookup below, re-run at `d6fb6ef4`, ranks the
 same generic stems. `python tools/codebase-map/reuse_lookup.py "record the bar's verdict for a tree
 hash so the push boundary can adopt it"` ranked generic stems (`tree` in a selftest, `records` in
 `tools/memory-tree/gotchas.py`, runlog's `write_record`) and named none of the three writers, which

@@ -31,12 +31,12 @@
 
 The round-1 spec audit (`memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md`)
 confirmed finding **id 62 at HIGH**, its item **H5**, alone in that item. `TOOL-dWitnessedBar-3` S8's
-upgrade step, landed at `930a5289d` as `tools/govkit/steps/inherited_red.py`, reads `INHERITED_RED`
+upgrade step, landed at `9991872c0` as `tools/govkit/steps/inherited_red.py`, reads `INHERITED_RED`
 from `.githooks/gate-env.sh` alone (`tools/govkit/steps/inherited_red.py#cmd_up`). It maps `park` and
 `land` and refuses any other value (`tools/govkit/steps/inherited_red.py#parse_gate`). The kit before
 it read the key in two places. The driver read it from the file `.unattended.conf`'s
 `GATE_POLICY_FILE` names (`tools/unattended/unattended.sh@3cdd562d75:10285-10333`, the blob at
-`2123e2146`, unit 3's parent), and the hook read `.githooks/gate-env.sh`
+`816d4aa91`, unit 3's parent), and the hook read `.githooks/gate-env.sh`
 (`.githooks/pre-push@47ddffbc5f:1523-1544`). Both read any other value as `park`
 (`tools/unattended/unattended.sh@3cdd562d75:10332`, `.githooks/pre-push@47ddffbc5f:1543`).
 An adopter with a custom `GATE_POLICY_FILE` blocked every red on that kit. The step finds no key in the
@@ -82,7 +82,7 @@ and leaves it on the retired key. This unit takes the report's fix. It repairs `
   `memory/project/legacy-homes.txt` name `GATE_POLICY_FILE` and read no file. All of these sit outside
   the population · by value: `.githooks/pre-push` `read_policy_at` and `tools/unattended/unattended.sh`
   `read_gate_blocks`, which read `verdict.blocks` through `policy.py get --rev` since unit 3 landed;
-  the value table §4 maps is theirs before it, at `2123e2146`.
+  the value table §4 maps is theirs before it, at `816d4aa91`.
 - **S5** — The step documented. `help/upgrade-steps.md` gains a section for
   `govkit/inherited-red-to-verdict-blocks` in the shape of its `.agent-cap.conf` and review-round
   sections: the two files read, the §4 table, the stricter-of-two rule, the conflict refusal, and the
@@ -129,7 +129,7 @@ and leaves it on the retired key. This unit takes the report's fix. It repairs `
   (`tools/govkit/steps/inherited_red.py#parse_gate`, `#cmd_up`, `#cmd_witness`).
 - The walk runs a step's witness first and spawns no up where it holds
   (`tools/govkit/upgrade_steps.py#run_step_walk`).
-- The retired key's spellers: `git grep -lw INHERITED_RED` at `e222688b2`, the `memory/` tree set
+- The retired key's spellers: `git grep -lw INHERITED_RED` at `3f8509570`, the `memory/` tree set
   aside, lists three files, S4's (DERIVED 2026-11-20).
 - Gov's own conf: `GATE_POLICY_FILE=".githooks/gate-env.sh"` (`.unattended.conf@81b19169e0:203`); the
   example ships it blank (`tools/unattended/.unattended.conf.example@2dbb0ef4fd:214`). Gov's gate file
@@ -172,8 +172,8 @@ its gate file holds no `INHERITED_RED`, so the widened step's witness holds ther
 ### Rollout
 
 Live at landing, in the same kit version as `TOOL-dWitnessedBar-3`'s step. The step's row reads
-`unlanded` (DERIVED 2026-11-20 by `python tools/govkit/upgrade_steps.py list` at `e222688b2`), since
-`930a5289d` is not yet on the default branch, so the `step-rows-frozen` leg does not grade an edit of
+`unlanded` (DERIVED 2026-11-20 by `python tools/govkit/upgrade_steps.py list` at `3f8509570`), since
+`9991872c0` is not yet on the default branch, so the `step-rows-frozen` leg does not grade an edit of
 `inherited_red.py`. Once the row lands there, a widening must ship as a new step; a builder who finds
 the row landed stops at that divergence.
 
@@ -224,7 +224,7 @@ the row landed stops at that divergence.
   `down` restores both files byte for byte.
   Red when: the step writes the milder value, or leaves one file holding the retired key.
 - **AC4** — When `grep -c inherited_red.py help/upgrade-steps.md` runs at the root, it prints at least
-  3, one per verb of the section's fence, where it prints 0 at `e222688b2` (DERIVED 2026-11-20);
+  3, one per verb of the section's fence, where it prints 0 at `3f8509570` (DERIVED 2026-11-20);
   `grep -c GATE_POLICY_FILE help/upgrade-steps.md` prints at least 1, where it prints 0 there (DERIVED
   2026-11-20).
   Red when: the page names no section for the step, or one that omits the driver's file.
@@ -266,7 +266,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the step's table over
   else moved.
 - rev-4 · 2026-11-20 · §1 · S1 to S5 · §3 · §3 Edges · §4 · §5 · AC2 AC4 · §7 · §8 F3 · §10 · re-grounded
   over unit 3 as landed per brief 2026-11-19-prompt-TOOL-dWitnessedBar-44-reground-brief: the
-  pre-step readers blob-pinned at `2123e2146` and the landed step cited by symbol, its off-table
+  pre-step readers blob-pinned at `816d4aa91` and the landed step cited by symbol, its off-table
   refusal and conflict rule named; the `INHERITED_RED` population re-derived at three files (DERIVED
   2026-11-20); AC2's off-tree fixture given a declared key, since the walk spawns no up where the
   witness holds; the README note left to unit 56, disjoint from unit 5, and S5 with AC4 documenting
@@ -283,7 +283,7 @@ The value table is the pre-step readers', `read_gate_policy`
 (`.githooks/pre-push@47ddffbc5f:1523`), copied as the step's mapping rows rather than re-invented.
 The new arm sits beside `tools/govkit/selftest.py#check_review_rounds_step`, the sibling step's arm.
 `python tools/codebase-map/reuse_lookup.py "convert a retired policy key in an upgrade step mapping
-every value"`, re-run 2026-11-20 at `e222688b2`, ranked `key`, `keys`, `step` (govkit),
+every value"`, re-run 2026-11-20 at `3f8509570`, ranked `key`, `keys`, `step` (govkit),
 `read_policy_value`, `PolicyRefused`, `read_policy_kit`, `parse_key` and `read_conf_key`, each a
 reader or a refusal of one key and none a value table, so no existing seam fits beyond the landed
 step and the two readers whose table it copies.

@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-41
 
-# TOOL-dWitnessedBar-41 — builder return 1 (run `wf_9b2631d7-a7c`), committed 5a4f86e0c17436a5d4ae35dd8cf59a91535acbe5
+# TOOL-dWitnessedBar-41 — builder return 1 (run `wf_9b2631d7-a7c`), committed 38a68ee1d407309291904497b079e7db1c085c62
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-41 is built as its spec (rev-3) says. Every citation in the s
 
 ## Summary
 
-Unit TOOL-dWitnessedBar-41 is built and committed as 5a4f86e0c (base 386b3ebee), with a `Pass: TOOL-dWitnessedBar-41` trailer and the spec status moved to CLOSED in the same commit.
+Unit TOOL-dWitnessedBar-41 is built and committed as 38a68ee1d (base 505cbc487), with a `Pass: TOOL-dWitnessedBar-41` trailer and the spec status moved to CLOSED in the same commit.
 
 **What changed**
 - `tools/run-gates/run-gates.sh`: while it reads the selection file, the runner now also builds the canonical text: every line whose first field is `held`, with a trailing CR cut. Each row is still parsed exactly as before. The per-tree verdict gains `selection` (the hash of that text, or `none` when there is no file) and one `selection.<n>` key per row, written next to `run_id`.
@@ -42,7 +42,7 @@ Unit TOOL-dWitnessedBar-41 is built and committed as 5a4f86e0c (base 386b3ebee),
 **How the commit was made**
 - The shared worktree held unit 55's uncommitted files, which would have made the generated-file checks in the pre-commit hook read stale. So I committed in a clean clone (base plus only this unit's paths), through a linked worktree there: the hook refuses commits on the clone's primary tree.
 - I regenerated the index (`gen_build_index`) and the codebase map in that clone; the generated files that changed were `memory/backlog/TOOL.md`, `memory/builds/dWitnessedBar/README.md` and `memory/map/generated/symbols.json`. All hooks passed with no `--no-verify`.
-- I then moved the shared branch forward with a compare-and-swap `update-ref` from 386b3ebee, and aligned only this unit's index and working-tree entries to the commit.
+- I then moved the shared branch forward with a compare-and-swap `update-ref` from 505cbc487, and aligned only this unit's index and working-tree entries to the commit.
 - **Unit 55:** its working files were left untouched. Its working copy of `memory/builds/dWitnessedBar/README.md` still shows unit 41 as INPROGRESS until it regenerates. Its RUN.md row also declares `memory/map/generated/symbols.json`, which is in this unit's write set too.
 - The clones and fixture repositories are deleted.
 

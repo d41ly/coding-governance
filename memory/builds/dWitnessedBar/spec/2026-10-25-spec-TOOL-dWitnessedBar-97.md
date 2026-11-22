@@ -155,8 +155,8 @@ notes do. Dispatch is strictly sequential, a shared order included
 
 ### Evidence
 
-Read on 2026-11-21 at `cb03a9f8c`. Units 87 to 96 are CLOSED; units 91 to 96 wrote records only, and
-spec-92 last moved at `d31ee066d` (rev-3). Unit 28 is deferred unbuilt.
+Read on 2026-11-21 at `10b5fd993`. Units 87 to 96 are CLOSED; units 91 to 96 wrote records only, and
+spec-92 last moved at `3ffc6c67c` (rev-3). Unit 28 is deferred unbuilt.
 
 - `tools/lib/resolve-python.sh#resolve_python` prints one line on stdout: the memo launcher of
   `GATE_RESOLVED_PY`, admitted only absolute; else an override, the caller's argument or
@@ -193,10 +193,10 @@ spec-92 last moved at `d31ee066d` (rev-3). Unit 28 is deferred unbuilt.
   prints one row per dispatch key, the rows under one key joined. Check 23 takes its window the same
   way (`tools/unattended/check-unattended.sh@cb03a9f8c:4625-4632`). `#build_commit` returns one
   commit per unit.
-- §4's pass-commit read was probed on 2026-11-21 at `cb03a9f8c`, where `RUN.md` holds one dispatch
+- §4's pass-commit read was probed on 2026-11-21 at `10b5fd993`, where `RUN.md` holds one dispatch
   key for each of units 89 and 90. Without its first line it printed the reader's refusal and
   `NO PASS COMMIT` for both units, exit 1. As written it printed `PASS COMMIT` for
-  `TOOL-dWitnessedBar-89` at `0c2f7e195` and for `TOOL-dWitnessedBar-90` at `da3fbc953`, each with
+  `TOOL-dWitnessedBar-89` at `05fdf49d3` and for `TOOL-dWitnessedBar-90` at `b5a33a39c`, each with
   `paths 0`, exit 0. In a scratch clone with AC10's staging, it printed
   `BODY EDIT TOOL-dWitnessedBar-89 <sha> memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md`
   and a second `PASS COMMIT` for unit 89, `paths 1`, exit 1.
@@ -221,7 +221,7 @@ spec-92 last moved at `d31ee066d` (rev-3). Unit 28 is deferred unbuilt.
 
 ### The ledger fragments
 
-S8 rewrites two lines of 92 §4's note check. Spec-92 lines 319-320 at `d31ee066d` become:
+S8 rewrites two lines of 92 §4's note check. Spec-92 lines 319-320 at `3ffc6c67c` become:
 
 ```bash
   set -- $b/*TOOL-dWitnessedBar-${l}-*acceptance-ledger*
@@ -329,8 +329,8 @@ None: no stored data changes.
 
 At order 50, building alone after every other unit of the build but the deferred unit 28. The pass
 writes this unit's acceptance ledger with AC1 to AC10 owed to the close, as units 93 to 96 did
-(`695e9600c`, `58b8e5283`, `5ec78f578`, `117ca9731`). The pass commits of units 89 and 90 exist
-(`0c2f7e195`, `da3fbc953`), so S5 and S10's read runs at the close with the rest. S4's clone, the
+(`4bb681e94`, `f6b3da04b`, `f6fb4fc49`, `73fc3773b`). The pass commits of units 89 and 90 exist
+(`05fdf49d3`, `b5a33a39c`), so S5 and S10's read runs at the close with the rest. S4's clone, the
 scratch copies and every note run at the close, where every derivation run uses the bytes S3
 extracts.
 
@@ -378,7 +378,7 @@ extracts.
 - risks — the note check admits a note in a lower-numbered ledger that carries its answer, where S7
   says to write it in the highest; either placement sits under an answer of that criterion.
 - testing — AC1 to AC3 and AC6 to AC9 by fixture at the close; AC4 by scratch clone at the close; AC5
-  and AC10 at the close over the pass commits `0c2f7e195` and `da3fbc953`, AC10's red in a scratch
+  and AC10 at the close over the pass commits `05fdf49d3` and `b5a33a39c`, AC10's red in a scratch
   clone.
 - migration — none.
 - user docs — none under `help/`; no user-facing surface changes.
@@ -417,7 +417,7 @@ The note check below is 92 §4's script composed as S8 states, fed rows on stdin
   note check fed `92|S5|90|AC13|pass_commit` prints `NOTES OK 1`.
   Red when: either unit's pass commits are missed and the read passes on none.
   figure: the number of lines is DERIVED from the dispatch rows at observation time; on 2026-11-21
-  at `cb03a9f8c` the read printed one line for each unit, `paths 0`, exit 0, and with its first line
+  at `10b5fd993` the read printed one line for each unit, `paths 0`, exit 0, and with its first line
   removed both `NO PASS COMMIT` lines, exit 1 (§4 Evidence).
   permission: the ledger is written at the close.
 - **AC6** — At the close, the note check fed `91|S2|90|AC2|sha)[[:space:]]*rec_sha="` prints
@@ -472,7 +472,7 @@ The note check below is 92 §4's script composed as S8 states, fed rows on stdin
 `recall floor` and `recall floor arms` are owed for the ledgers under `memory/`. AC4 reads 92 AC2's
 clones at the close; this unit adds no arm and moves none, so it declares no `New arm:` line, and
 `TOOL-dWitnessedBar-92` §4's owner derivation, which takes the place of 88 S6's (92 S12), still names
-unit 90 the floor's owner: run at `cb03a9f8c` it printed 28 and
+unit 90 the floor's owner: run at `10b5fd993` it printed 28 and
 `spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md`, exit 0 (PINNED 2026-11-21).
 
 ## 8. Open questions
@@ -499,7 +499,7 @@ unit 90 the floor's owner: run at `cb03a9f8c` it printed 28 and
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit of units 91 and 92: 9
   MEDIUM and 1 LOW findings, batched.
-- rev-2 · 2026-11-21 · §1 to §7 · §10 · re-grounded at `cb03a9f8c` per
+- rev-2 · 2026-11-21 · §1 to §7 · §10 · re-grounded at `10b5fd993` per
   2026-11-19-prompt-TOOL-dWitnessedBar-97-reground-brief. S1 and AC1 quote the value and the refusal
   line `resolve_python` prints today; S5's read sources the resolver `read_attribution_tokens` needs;
   S4 and §4 cite 90 AC1 and 89 S4 as built; spec-92 and code citations move to rev-3 and to symbols;

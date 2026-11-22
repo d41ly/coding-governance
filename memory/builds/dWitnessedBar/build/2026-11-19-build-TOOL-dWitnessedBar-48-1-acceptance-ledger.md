@@ -19,7 +19,7 @@ close, and so does every suite the section names.
 - AC2 — `GOV_BASH` — over a fixture repo tracking `const x = 1;` in a `.js` and a `.py` holding the
   list of a `GOV_BASH` read, the constant `bash` and Git's own bash.exe path, `scan_bare_bash` named
   that `.py` file's list line as `shape 2`; over the same `.js` beside a `.py` holding
-  `if argv[0] not in ("bash", "bash.exe"): pass` it returned `[]`. The scanner at `a30a26466`, run on
+  `if argv[0] not in ("bash", "bash.exe"): pass` it returned `[]`. The scanner at `632894bd1`, run on
   the same two fixtures, returned `[]` for the first and named the membership line as `shape 2` for
   the second, each criterion's red. Three more
   literals were probed: `("bash", "/bin/bash")` and `["bash", "bash.exe"]` matched shape 2, and

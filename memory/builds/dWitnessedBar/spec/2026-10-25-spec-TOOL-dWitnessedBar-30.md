@@ -367,7 +367,7 @@ New arm: tools/run-gates/profile_bar.test.sh · covers AC6 · the POSIX arm driv
   spec-token checker's guards join named them at `c6df3e901`, by the brief
   `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is unchanged, as the unit writes
   that path; nothing else moved.
-- rev-4 · 2026-11-20 · §2, §3, §4, §5, §6, §7, §8, §10 · re-grounded at `c68021778` over order 23 as
+- rev-4 · 2026-11-20 · §2, §3, §4, §5, §6, §7, §8, §10 · re-grounded at `a496e6788` over order 23 as
   landed, by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-30-reground-brief`: every bare line
   citation re-cited by symbol or blob-pinned; S1 names the two four-field readers, `read_held_keys`'
   count and `cmd_select_check`'s whole-row compare; S2 reads the flake records at R in
@@ -394,7 +394,7 @@ and the every-return-code site of `unattended.sh#write_held_asks`; `unattended.s
 owner item; and the backlog's `CLOSED` disposition row, appended where `unattended.sh#write_backlog_rows`
 appends its dispositions and rendered through `unattended.sh#write_ask_views`. `python
 tools/codebase-map/reuse_lookup.py "release a quarantined leg after consecutive greens and re-run a
-contended leg on a quiet host"`, re-run at `c68021778`, ranked `check_quiet` among generic `run` and
+contended leg on a quiet host"`, re-run at `a496e6788`, ranked `check_quiet` among generic `run` and
 `leg` stems, the seam taken. The recall probe, re-run there, returned the brief's unit row, which says
 "the turnstile's census", and scout A's row, which names the turnstile's `run-gates.sh#measure_held_slots`
 and `run-gates.sh#derive_foreign` for the quiet host; both agree with source, and both are per-clone or

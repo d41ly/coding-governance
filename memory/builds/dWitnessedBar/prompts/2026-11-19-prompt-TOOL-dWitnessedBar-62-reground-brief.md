@@ -25,9 +25,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 33: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59,
-     30, 29, 7, 21, 6, 2, 43, 51, 56, 57 (`8359ae2b8`: `drift_report.py --gate-health` requires `--selection`, and
+     30, 29, 7, 21, 6, 2, 43, 51, 56, 57 (`e63ac2503`: `drift_report.py --gate-health` requires `--selection`, and
      `verdict_flow.py`'s `write_gate_health` passes the run's selection file or an empty temporary one), 58 and 60
-     (`f9230803d`, its pass-leg fix `f6ca2b809`). Every unit this spec consumes from is CLOSED.
+     (`a3ee7a20d`, its pass-leg fix `410dcbe4b`). Every unit this spec consumes from is CLOSED.
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes (asks TOOL-dWitnessedBar-101 to -103) and the run
      defers it; any item of this spec that needs it leaves the scope, named in §3 as waiting with unit 28.
    - Unit 55 rev-4 F2 added three parity fixtures, and unit 59 rev-4 counts eleven plus `lone-cr`: wherever this spec

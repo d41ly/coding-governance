@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 31.
 - Built so far through order 29: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59, 30, 29,
-  7, 21, 6, 2 and 43 (`5308f3c08`). Unit 28 (order 30) is deferred against asks TOOL-dWitnessedBar-101 to -103 and is
-  not built; this spec, rev-6, was re-grounded at `510f79a69` without its edge onto unit 28.
+  7, 21, 6, 2 and 43 (`e940250ec`). Unit 28 (order 30) is deferred against asks TOOL-dWitnessedBar-101 to -103 and is
+  not built; this spec, rev-6, was re-grounded at `f600db1c1` without its edge onto unit 28.
 - This unit builds alone; nothing else is in flight in this working tree, so commit directly here.
 - The driver sits at its refusal-site ceiling (343 sites, 339 armed, DERIVED from unit 21's builder probe).
 - Every earlier pass carried one red, install-prefix on `tools/memory-tree/kit.toml`'s `conf-scalar-pins` seed argv;
@@ -44,6 +44,6 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   return. Its edits are still in this working tree, unstaged, across 43 files (DERIVED by `git status --short`); a patch of them is
   `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/unit51-partial.patch`.
 - Treat that work as unverified and possibly incomplete: read the spec whole, check each edit in the tree against it,
-  finish what is missing, and write nothing the spec does not ask for. The re-dispatch at `df15ee81e` declares every
+  finish what is missing, and write nothing the spec does not ask for. The re-dispatch at `c71d0a380` declares every
   path, including the root-level ones and the widen record.
 - Commit the pass through the hooks with the trailer `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.

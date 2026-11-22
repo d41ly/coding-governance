@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-94
 
-# TOOL-dWitnessedBar-94 — builder return 1 (run `wf_6ba08f04-2a9`), committed 58b8e5283
+# TOOL-dWitnessedBar-94 — builder return 1 (run `wf_6ba08f04-2a9`), committed f6b3da04b
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-94 is a records-only unit at rev-2, status INPROGRESS. Every 
 
 ## Summary
 
-TOOL-dWitnessedBar-94 is committed as 58b8e5283 on base 05ab4b7fc. It changes records only, no code file. The commit's last trailer lines are `Pass: TOOL-dWitnessedBar-94` and the Co-Authored-By line.
+TOOL-dWitnessedBar-94 is committed as f6b3da04b on base 20cced7ed. It changes records only, no code file. The commit's last trailer lines are `Pass: TOOL-dWitnessedBar-94` and the Co-Authored-By line.
 
 **What the commit holds:**
 - A new acceptance ledger, C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-94-1-acceptance-ledger.md. It has one line per criterion, AC1 to AC4, each opening with a backticked token that criterion spells.

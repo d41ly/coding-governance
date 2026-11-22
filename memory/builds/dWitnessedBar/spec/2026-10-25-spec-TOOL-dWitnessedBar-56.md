@@ -64,7 +64,7 @@ units, so this unit repairs none in particular and builds after every unit (orde
 
 That is 13 MEDIUM and 7 LOW findings by raw id.
 
-Re-grounded at HEAD `60b2d421a`, past every unit through order 31. The units this one consumes from
+Re-grounded at HEAD `20e6f7ab3`, past every unit through order 31. The units this one consumes from
 landed eight of its items as they built: S2, S4, S5, S6, S11, S16, S17 and S18 each say so, build
 nothing, and keep the criterion that observes the landed code.
 
@@ -233,7 +233,7 @@ file or a generated index.
 
 ### Evidence
 
-Read at HEAD `60b2d421a`, which holds every unit through order 31 landed. Every cited file is clean in
+Read at HEAD `20e6f7ab3`, which holds every unit through order 31 landed. Every cited file is clean in
 the working tree, and each line citation is pinned to the blob HEAD holds.
 
 - The runner's selection loop (`tools/run-gates/run-gates.sh@e410947a:3146-3173`) cuts the CR, keeps
@@ -473,7 +473,7 @@ New arm: tools/run-gates/keep_tails.py · covers AC10 · the `controls` case, st
   key-level `OWNER_ONLY_KEYS` refusal under `agents-with-reason`, not a trailer check, which
   `--staged` cannot make at pre-commit.
 - rev-5 · 2026-11-20 · §1 · S1 to S20 · §3 · §4 · §5 · AC3 AC4 AC5 AC8 AC10 AC11 AC13 AC14 AC16 AC17
-  AC18 · §7 · §8 F3 · §10 · re-grounded at HEAD `60b2d421a` per brief
+  AC18 · §7 · §8 F3 · §10 · re-grounded at HEAD `20e6f7ab3` per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-56-reground-brief: S2, S4, S5, S6, S11, S16, S17 and S18 are
   present as landed, S4's `selection none` plants dropped; S1 and S3 carry unit 30's mode field and the
   field rule of `read_selection`; S8 checks at the landed revision; S12's escape lives in the keep (F3);

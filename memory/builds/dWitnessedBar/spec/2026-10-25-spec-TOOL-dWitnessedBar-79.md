@@ -104,7 +104,7 @@ fails the count alone. It repairs `TOOL-dWitnessedBar-74` and builds at order 41
 
 ### Evidence
 
-Probed at `648a4d5d5` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GNU sed 4.9
+Probed at `a85424f0f` on 2026-11-21 under GNU bash 5.3.9 `x86_64-pc-cygwin` and GNU sed 4.9
 (PINNED 2026-11-21). The probe cut the hook's `read_green_file` (`.githooks/pre-push#read_green_file`)
 and read a hand-built record laid out as the AC12 arm's: `verdict<TAB>GREEN<CR>`, two `sha` lines the
 second CR-ended, `reused_cache` 1 then 0`<CR>`, a CR-ended `fingerprint` (PINNED 2026-11-21). It
@@ -133,7 +133,7 @@ and two calls. The arm's own record, from `run_local_plant`, is the main loop's 
   and checks them against `FLOOR_ASSERTIONS`, set at `@648a4d5d5:246`, only as a minimum (`:1204`).
   The two compares count only for a variable in `rgf_seen` (`@648a4d5d5:933`, `:936`).
 - `tools/gate-lint/sh_hygiene.py#measure_code_lines` measures the suite's code lines at 784 (PINNED
-  2026-11-21), the count its `memory/project/shell-role.txt` row holds at `648a4d5d5`.
+  2026-11-21), the count its `memory/project/shell-role.txt` row holds at `a85424f0f`.
 - Unit 76 §4 Evidence and unit 74's builder return record `check_cr_reached` called inside `$(...)`
   returning as it does directly (DERIVED from those builders' probes), so S1's calls may capture the
   reason with `$(...)`; the CR stays spelled in `check_cr_reached`'s top-level body.
@@ -151,7 +151,7 @@ None: no stored data changes.
 ### Rollout
 
 Live at landing, at order 41. Order 41 holds `TOOL-dWitnessedBar-73` and `-76`, CLOSED at
-`71f212ad1` and `bdc10a4df`, and `-77`, `-79`, `-80` and `-81`. Dispatch is strictly sequential and
+`563d828df` and `3596751cf`, and `-77`, `-79`, `-80` and `-81`. Dispatch is strictly sequential and
 sorts a tie by id string (`tools/workflows/unattended-build.js@648a4d5d5:78-82`, `:692-697`), so unit
 77 builds before this unit and units 80 and 81 after it. Units 77 and 80 name this suite in their
 Files touched, so the three build one at a time and the builder reads the loop as unit 77 leaves it.
@@ -160,7 +160,7 @@ Unit 80 then edits the tail call's arguments, not an inline body (§8 F5).
 ### Files touched (estimate)
 
 - `tools/run-gates/run-gates.gov.test.sh`: S1's function, the loop's two calls and the arm's header comment.
-- `memory/project/shell-role.txt`: the suite's row reads 784 at `648a4d5d5` (PINNED 2026-11-21), the
+- `memory/project/shell-role.txt`: the suite's row reads 784 at `a85424f0f` (PINNED 2026-11-21), the
   count the suite measures (§4 Evidence), so the row has no headroom. When S1 grows the suite past
   it, the pass widens it with
   `python tools/memory-tree/ratchet.py widen shell-role --key tools/run-gates/run-gates.gov.test.sh --reason "TOOL-dWitnessedBar-79 S1: the length variant through check_key_variant" --unit TOOL-dWitnessedBar-79`

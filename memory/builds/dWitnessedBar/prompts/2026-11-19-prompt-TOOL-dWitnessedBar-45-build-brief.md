@@ -8,10 +8,10 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 9.
-- Built so far: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, unit 11 (`b80649e60`: the gate-leg factory
+- Built so far: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, unit 11 (`0ccc23626`: the gate-leg factory
   `tools/run-gates/leg_factory.py`, its inline `resolve_kit_dir`, `--conform`'s `enforces` arm) and unit 14
-  (`49f5d3ff6`: the `ratchet` pack, `tools/memory-tree/ratchet.py`, the `conf-scalar-pins` registration).
-- The spec is rev-4, re-grounded at `4e5497fb7` with unit 11's spec as the contract; read the factory as it landed and
+  (`25a3d2970`: the `ratchet` pack, `tools/memory-tree/ratchet.py`, the `conf-scalar-pins` registration).
+- The spec is rev-4, re-grounded at `2ca17d9c5` with unit 11's spec as the contract; read the factory as it landed and
   hand back any claim its landed shape breaks as a divergence.
 - The pass legs carry one known red: install-prefix on the `conf-scalar-pins` seed argv in
   `tools/memory-tree/kit.toml`, held until unit 51 resolves `{kit}` in seed argvs. Any other install-prefix line is

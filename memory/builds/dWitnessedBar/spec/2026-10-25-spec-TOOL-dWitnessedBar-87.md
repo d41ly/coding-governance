@@ -91,7 +91,7 @@ lines it prints. It corrects 81's reading of 76 AC2 in 81's ledger. It repairs
 
 ### Evidence
 
-Read at `6381c364f` on 2026-11-21. Units 76, 79, 80 and 81 are CLOSED.
+Read at `9a4949f1c` on 2026-11-21. Units 76, 79, 80 and 81 are CLOSED.
 
 - `spec/2026-10-25-spec-TOOL-dWitnessedBar-76.md` rev-4 S3 defines `it passed a value that lost its
   CR` for an absent `<var>`, AC2 stages a `check_canary_keys` that skips `rec_fp` and quotes that
@@ -111,7 +111,7 @@ Read at `6381c364f` on 2026-11-21. Units 76, 79, 80 and 81 are CLOSED.
   (`tools/run-gates/run-gates.gov.test.sh@6381c364f:895`). With `rec_fp` skipped, `rec_fp` is absent
   for both its variants, and `rec_sha`'s variants are untouched.
   `grep -c 'lost its CR' tools/run-gates/run-gates.gov.test.sh` prints 0 (PINNED 2026-11-21).
-- A spec-writer probe at `6381c364f` sourced `check_cr_reached` through `check_key_variant` and the
+- A spec-writer probe at `9a4949f1c` sourced `check_cr_reached` through `check_key_variant` and the
   liveness loop over a hand-built AC12-shaped record, with `check_canary_keys` skipping `rec_fp` in
   one `diff` line. It printed the `rec_fp` line with the tail reason, then with the length reason, no
   other line, `fail` 1, `rgf_seen` ` rec_sha` (DERIVED from that probe, 2026-11-21). It is not S1's
@@ -134,9 +134,9 @@ None: no stored data changes.
 ### Rollout
 
 At the close, after every unit is terminal. The unit takes order 42, one above unit 81's 41, so it
-sits after units 76, 79, 80 and 81, CLOSED at `bdc10a4df`, `08f226f3d`, `a967359a8` and
-`dc1205950`, whose reasons and records it reads. Order 42's other unit, `TOOL-dWitnessedBar-78`,
-CLOSED at `253e21771`, so this unit closes order 42 and builds alone. Its records are written at the
+sits after units 76, 79, 80 and 81, CLOSED at `3596751cf`, `b9326245e`, `c0310ecd8` and
+`778c11528`, whose reasons and records it reads. Order 42's other unit, `TOOL-dWitnessedBar-78`,
+CLOSED at `0e5103294`, so this unit closes order 42 and builds alone. Its records are written at the
 close, when the arm runs, after unit 81's records beside 76 AC2.
 
 ### Files touched (estimate)
@@ -230,7 +230,7 @@ it declares no `New arm:` line.
 - rev-4 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edge of TOOL-dWitnessedBar-92, the minors batch of the round-1 spec audit of unit 90; nothing else
   moved.
-- rev-5 · 2026-11-21 · §1 · S3 · §3 · §4 · AC2 · AC3 · re-grounded at `6381c364f` under
+- rev-5 · 2026-11-21 · §1 · S3 · §3 · §4 · AC2 · AC3 · re-grounded at `9a4949f1c` under
   `2026-11-19-prompt-TOOL-dWitnessedBar-87-reground-brief`: unit 81's rev-4 §1 reading and §4
   Evidence, unit 80's rev-4 S3 answer, the landed loop and a probe of the skip, Rollout's CLOSED
   shas, Files touched listed exactly, and AC2 told apart from 81 S4's records; intent unchanged.

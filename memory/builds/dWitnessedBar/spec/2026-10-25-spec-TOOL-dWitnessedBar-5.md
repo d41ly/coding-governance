@@ -96,8 +96,8 @@ leg's history. Today the predicate "subject `kit` or chunk `selftests`" is spell
   where that key reads `every-declared`, unless
   `tests.without-cadence` reads `run-at-landing` while no cadence is installed; a row for each source
   in its `SELECT_SOURCES` table, which `TOOL-dWitnessedBar-8` extends with `quarantine`; and a header
-  naming the values it read. Unit 3 landed `verdict_flow.py` (`930a5289d`, its pass-leg fix
-  `e37158660`) with the verbs `route` and `judge` and the fixtures `route` and `red-route` in its
+  naming the values it read. Unit 3 landed `verdict_flow.py` (`9991872c0`, its pass-leg fix
+  `b140294d7`) with the verbs `route` and `judge` and the fixtures `route` and `red-route` in its
   `FIXTURES` table (`tools/run-gates/verdict_flow.py#main`); `select` is a third verb of that file
   (§8 F4), its fixtures join `FIXTURES`, and `--run`, which `main` requires of every verb today, is
   asked of `route`, `judge` and `select --check` alone. Observed by AC5.
@@ -123,7 +123,7 @@ leg's history. Today the predicate "subject `kit` or chunk `selftests`" is spell
   (`TOOL-dWitnessedBar-11` S4), refuses a held declaration with neither, or with an empty reason,
   and the count line `run_conform` prints,
   `legs: <n> declared · <c> claimed · <e> exempt · <p> enforces-pending`, gains
-  `· <h> held · <u> unguarded`. The 36 held legs with no guard at HEAD `e222688b`, listed in §4
+  `· <h> held · <u> unguarded`. The 36 held legs with no guard at HEAD `3f850957`, listed in §4
   "Held legs guarded (S8)", each gain a guard or a reason; `held-halves selftest` and
   `review-replay selftest` move the reason their comments already state
   (tools/run-gates/kit.toml@1ad6398f:248-249, tools/workflows/kit.toml@0e164a5f:205-207) into the
@@ -177,7 +177,7 @@ leg's history. Today the predicate "subject `kit` or chunk `selftests`" is spell
 
 ### Evidence
 
-Read at HEAD `e222688b`, which holds units 4, 25, 40, 23, 42 and 3 landed; every cited path is clean
+Read at HEAD `3f850957`, which holds units 4, 25, 40, 23, 42 and 3 landed; every cited path is clean
 in the working tree, and each line citation is pinned to the blob HEAD holds.
 
 - The predicate `{ [ "${subjects[$i]}" = kit ] || [ "${chunks[$i]}" = selftests ]; }` is spelled at
@@ -273,11 +273,11 @@ TAB or a newline, and `select` refuses to write a row whose leg name holds ` · 
 | `unguarded_why`, the `held guard` arm | descriptor key, conformance arm | asked at the pass |
 
 A fixture helper in `verdict_flow.py` takes a declared verb, as unit 3's did once its red fix
-(`e37158660`) renamed its `plant_` and `case_` helpers to `write_` and `run_`.
+(`b140294d7`) renamed its `plant_` and `case_` helpers to `write_` and `run_`.
 
 ### Held legs guarded (S8)
 
-The held legs with no guard at HEAD `e222688b`, measured as the manifest rows whose `subject` is
+The held legs with no guard at HEAD `3f850957`, measured as the manifest rows whose `subject` is
 `kit` or whose `chunk` is `selftests` and whose `guard` is absent or empty,
 PINNED 2026-11-20: 36 of 101 held rows, of 219 rows, by reading `tools/gate-legs.json` at HEAD, each
 declaration found by `python tools/run-gates/leg_factory.py --list`. The eight the base draft counted at `19d6aae6` are
@@ -318,7 +318,7 @@ commit that adds the arm.
 
 Live at landing. Gov's `verdict.held` stays the catalogue default `on-demand`. The mirror
 `.governance/policy.json` is a path `tools/policy/guarded-paths.txt` lists, so it is re-rendered by
-`policy.py mirror --write` in the commit after the pass, as `00dd2757c` did for unit 3.
+`policy.py mirror --write` in the commit after the pass, as `06e78f959` did for unit 3.
 
 ### Files touched (estimate)
 
@@ -375,7 +375,7 @@ Disjoint from `TOOL-dWitnessedBar-44`'s, which builds beside this unit at order 
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -c '= selftests \]' run-gates.sh` runs in `tools/run-gates/` it prints 1, the
-  predicate's one body (it prints 3 at HEAD `e222688b`), and
+  predicate's one body (it prints 3 at HEAD `3f850957`), and
   `grep -c 'derive_hold_source' run-gates.sh` prints at least 4, the definition and its three
   callers.
   Red when: a call site keeps its own copy of the predicate.
@@ -389,7 +389,7 @@ Disjoint from `TOOL-dWitnessedBar-44`'s, which builds beside this unit at order 
   kit self-test.
 - **AC3** — When `grep -c "printf 'GATE held  " run-gates.sh` runs in `tools/run-gates/`, it prints
   1, the one format `report_one` emits every held line through, and
-  `grep -c "(self-test," run-gates.sh` prints 0; each prints 2 at HEAD `e222688b`.
+  `grep -c "(self-test," run-gates.sh` prints 0; each prints 2 at HEAD `3f850957`.
   Red when: a second held-line format survives beside the first.
 - **AC4** — When `python verdict_flow.py --fixture held-keys` runs, it reads a planted verdict
   record holding `held.1` to `held.3` through the runner's key grammar and prints each as leg,
@@ -417,11 +417,11 @@ Disjoint from `TOOL-dWitnessedBar-44`'s, which builds beside this unit at order 
   fixture: a clone of the tree under `%TEMP%/<short-name>`, none in the tree today.
 - **AC8** — When `grep -cx 'verdict\.held' tools/policy/unsummarised-keys.txt` runs at the root on the
   built tree it prints 0, and `grep -cE '^## .verdict\.held.$' help/reference/policy.md` prints 1;
-  they print 1 and 0 at HEAD `e222688b`.
+  they print 1 and 0 at HEAD `3f850957`.
   Red when: the key a pusher now sets keeps an empty `summary` or `usage`, or the reference page still
   lists it bare.
 - **AC9** — When `grep -E '^BAR_INERT_KNOBS=' .githooks/pre-push.test.sh | grep -cw GATE_SELECTION`
-  runs at the root on the built tree it prints 1 (0 at HEAD `e222688b`), and
+  runs at the root on the built tree it prints 1 (0 at HEAD `3f850957`), and
   `grep -cw GATE_SELECTION .githooks/pre-push` prints 0, the hook's clear left to unit 56.
   Red when: the runner reads `GATE_SELECTION` and the knob sits in no class.
 
@@ -497,7 +497,7 @@ New arm: .githooks/pre-push.test.sh · covers AC5 AC6 · a planted push whose ru
   `tools/gate-legs.json`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing else
   moved.
 - rev-6 · 2026-11-20 · §4 · §8 · §10 · S1 · S3 · S4 · S5 · S8 · AC1 · AC3 · AC7 · re-grounded at
-  `8a98c9cf` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief, reading the runner
+  `9cde7938` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief, reading the runner
   at HEAD while unit 4's builder holds it modified: runner, README and descriptor lines blob-pinned
   and the rest cited as `path#symbol`; S8's population re-derived, 36 unguarded of 101 held rows
   where it was 8 of 71, listed in §4, with `tools/memory-tree/kit.toml` and
@@ -510,7 +510,7 @@ New arm: .githooks/pre-push.test.sh · covers AC5 AC6 · a planted push whose ru
   3's `hands-off`; F4 re-resolved to (a), the edge; S8's count sentence rewrapped so its PINNED mark
   shares the `219 rows` line; nothing else moved.
 - rev-8 · 2026-11-20 · §3 Edges · §4 · §5 · §6 · §7 · §8 · §10 · S2 · S3 · S4 · S5 · S7 · S8 · S9 · per
-  brief 2026-11-19-prompt-TOOL-dWitnessedBar-5-reground-brief: re-grounded at `e222688b` over unit 3
+  brief 2026-11-19-prompt-TOOL-dWitnessedBar-5-reground-brief: re-grounded at `3f850957` over unit 3
   as landed; runner citations re-pinned to blob `924ce451`, README and runlog cites blob-pinned,
   govkit's planted bar to `29f3c503`; S5 names `verdict_flow.py`'s landed `main` and `FIXTURES`, S7
   its hook admission site, S4 the per-tree verdict as outside its writers; S8's population re-derived
@@ -531,7 +531,7 @@ extends unit 3's `tools/run-gates/verdict_flow.py`: its verb dispatch in `main`,
 table, `run_kit` for every policy read, and `read_verdict`, whose `tail.<n>` collection the
 `held-keys` fixture's reading of `held.<n>` follows.
 `python tools/codebase-map/reuse_lookup.py "hold a gate leg out of the bar by a policy and record its result"`,
-re-run at HEAD `e222688b`, ranked generic `leg` and `record` stems (`legs` in
+re-run at HEAD `3f850957`, ranked generic `leg` and `record` stems (`legs` in
 `run-gates.turnstile.test.sh`, `records` in `tools/memory-tree/gotchas.py`), the cross-kit policy
 readers `read_policy_value` (`tools/playbook/policy_value.py`) and `load_policy`
 (`tools/roles/roles_lib.py`), `write_record` and `render_record` (`tools/runlog/record.py`, the

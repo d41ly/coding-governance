@@ -103,7 +103,7 @@ fix. It repairs `TOOL-dWitnessedBar-14`.
 - The example conf: `ROW_DUPLICATE_PIN="0"`
   (`tools/memory-tree/.memory-tree.conf.example@7159dd975131:325`); the other four `*_PIN=` lines
   there are blank (`:200`, `:203`, `:335`, `:336`). Five assignments, one of them a count, PINNED
-  2026-11-19 at `b3b523896`, the blob unchanged since `98e33d71c`, by
+  2026-11-19 at `0baa706f3`, the blob unchanged since `112526471`, by
   `grep -nE '^[A-Z_]+_PIN=' tools/memory-tree/.memory-tree.conf.example`. Unit 14's leg reads every
   `*_PIN=` assignment, a blank one included (TOOL-dWitnessedBar-14 §4 "The scalar pins"), so each
   assignment the grep finds is a key the adopter's population holds.
@@ -124,7 +124,7 @@ fix. It repairs `TOOL-dWitnessedBar-14`.
   path holds only at the prefix `tools` (§8 F4).
 - A leg an adopter does not receive is an `[[exempt_leg]]` row of the deployer's registry carrying its
   whole row (`tools/run-gates/leg_factory.py`, its module docstring, landed by TOOL-dWitnessedBar-11 at
-  `b80649e60`); its owner segment is `gov` (`tools/run-gates/leg_factory.py#derive_leg_tag`,
+  `0ccc23626`); its owner segment is `gov` (`tools/run-gates/leg_factory.py#derive_leg_tag`,
   TOOL-dWitnessedBar-12 §8 F1).
 - `govkit apply` stages every file it lands before it runs any adopter
   (`tools/govkit/govkit.py#_cmd_apply`, its STAGE block), so at a governed install the kit's
@@ -164,7 +164,7 @@ name `conf-scalar-pins.txt`; seven `[[exempt_leg]]` rows (DERIVED, S5), each tag
 Naming cells: the shell function is asked of `python tools/lexicon/lexicon.py --suggest <name> --as
 sh.function` at the pass. The flag has no cell: the lexicon's surfaces are function, type, file and
 constant, and `--suggest seed-pins --as cli.flag` is refused as MALFORMED (run 2026-11-19 at
-`b3b523896`).
+`0baa706f3`).
 
 ### Migration
 
@@ -229,7 +229,7 @@ Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD`
   naming five rows, each `.memory-tree.conf` and one `*_PIN` key of the example, `ROW_DUPLICATE_PIN`
   among them, and check 3 passes with `conf-scalar-pins.txt` present.
   Red when: the adopter's pin is not seeded, or check 3 refuses its home.
-  figure: five is PINNED 2026-11-19 at `b3b523896` by §4 Evidence's grep; the rows are DERIVED at observation.
+  figure: five is PINNED 2026-11-19 at `0baa706f3` by §4 Evidence's grep; the rows are DERIVED at observation.
   fixture: a scratch `git init` target under `%TEMP%/<short-name>` holding the kit copied to
   `tools/memory-tree/` and the example copied to `.memory-tree.conf`, both staged before `--scaffold`,
   the kit as `govkit apply` leaves it (§4 Evidence); the tree holds none.
@@ -263,7 +263,7 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 AC3 AC4 ·
   the example conf's pin unseen where it ships. RESOLVED (agent, 2026-10-25, delegated): (b), rung 3,
   the most criteria met that can be observed at an adopter today. widens: none · relaxes: none
 - **F3 — Where does the adopter's seed run, so the update the Goal names reaches it?** The re-ground
-  at `98e33d71c` read `tools/memory-tree/adopt-memory-tree.sh` and `tools/govkit/govkit.py#_cmd_update`:
+  at `112526471` read `tools/memory-tree/adopt-memory-tree.sh` and `tools/govkit/govkit.py#_cmd_update`:
   `--scaffold` exits 0 at its marker before any write, and an update runs only the descriptor's
   `[[regenerate]]` rows (§4 Evidence). Options: (a) the seed at the end of `--scaffold` alone, as rev-4
   read; (b) one seed function called at the end of `--scaffold` and by a narrow `--seed-pins` mode, run
@@ -288,7 +288,7 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 AC3 AC4 ·
   a kit as owner of a leg its descriptor does not declare) and holds a tag as the leg's declared
   identity, not re-derived when its `name` changes (its §4 "The tag rule"). No code outside
   `tools/gate-legs.json` and `tools/memory-tree/kit.toml` spells a `leg.memory-tree.` tag (DERIVED at
-  `b3b523896` by `git grep -l 'leg\.memory-tree\.'`, its other hits record and spec prose). Options:
+  `0baa706f3` by `git grep -l 'leg\.memory-tree\.'`, its other hits record and spec prose). Options:
   (a) each moved row carries `leg.gov.<slug>`, as `tools/run-gates/leg_factory.py#derive_leg_tag`
   gives a registry row; (b) each keeps `leg.memory-tree.<slug>`. No veto discards either; (b) leaves
   seven tags (S5) naming an owner that does not declare them, the shape unit 12 F1 discarded.
@@ -308,7 +308,7 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 AC3 AC4 ·
   `tools/memory-tree/kit.toml`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief;
   nothing else moved.
 - rev-5 · 2026-11-19 · §1 · S2 · §4 Evidence, the adopter-receives table, Inventory, Migration,
-  Alternatives rejected, Files touched · §5 · AC2 AC4 · §7 · §8 F3 · §10 · re-grounded at `98e33d71c`
+  Alternatives rejected, Files touched · §5 · AC2 AC4 · §7 · §8 F3 · §10 · re-grounded at `112526471`
   per brief 2026-11-19-prompt-TOOL-dWitnessedBar-46-reground-brief: line citations become
   `path#symbol` or blob-pinned, the example conf's pins re-pinned at moved lines; `govkit update` runs
   `[[regenerate]]` rows and never `--scaffold`, so F3 adds the `--seed-pins` mode and its row,
@@ -317,7 +317,7 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 AC3 AC4 ·
   ships by default, so the policy clause leaves Alternatives rejected; the lexicon has no flag cell, so
   Inventory names none; Files touched gains the memory-tree README §5 already names.
 - rev-6 · 2026-11-19 · S2 · S5 · §3 · §4 Evidence, Inventory, Migration, Files touched · §5 · AC1 · AC2 ·
-  §8 F4 F5 · §10 · re-grounded at `b3b523896` per brief
+  §8 F4 F5 · §10 · re-grounded at `0baa706f3` per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief, over units 15, 12, 61, 22, 47, 19 and 11 as
   landed and TOOL-dWitnessedBar-14's spec as the contract, rev-10 as it stands, these points unmoved
   since rev-9: `keys-not-scalar --measure` and the
@@ -331,10 +331,10 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 AC3 AC4 ·
 The seams are unit 15's `seed` verb, check 3's named list of kit-shipped registries
 (`tools/memory-tree/check-memory-hygiene.sh@2c0cb6f24513:993-1046`), the adopter's narrow-mode
 `[[regenerate]]` row that `--arm-routing` already is (`tools/memory-tree/kit.toml@2dd59ca54ee6:245-251`),
-and the `[[exempt_leg]]` row unit 11 landed at `b80649e60`, read whole by
+and the `[[exempt_leg]]` row unit 11 landed at `0ccc23626`, read whole by
 `tools/run-gates/leg_factory.py#read_declarations`, tagged by its `derive_leg_tag`.
 `python tools/codebase-map/reuse_lookup.py "seed an adopter's scalar pin population at update"`, re-run
-at `98e33d71c`, ranked `seed` (test helpers), `adopt`, `population` (`tools/govkit/refusal_join.py`),
+at `112526471`, ranked `seed` (test helpers), `adopt`, `population` (`tools/govkit/refusal_join.py`),
 `derive_unit_pin`, `derive_pin_hash`, `require_adopted_root` and `declared_scalar`; none seeds a ledger
 at an adopter, so the adopter calls the one verb that does.
 

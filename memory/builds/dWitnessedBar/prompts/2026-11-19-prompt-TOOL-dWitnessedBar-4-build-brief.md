@@ -9,9 +9,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 17.
 - Built so far through order 16: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14, 45, 54, 16, 46, 17,
-  52, 53, 18, 20, 24, 10 (`d15371e5e`: the pre-commit list derived from each leg's `precommit` key) and 9
-  (`34a36429d`: the product-test contract leg and the `level` key; run-gates at 1.54).
-- The spec is rev-5, re-grounded at `666874a8` while unit 9 was building; unit 9 has since landed and changed
+  52, 53, 18, 20, 24, 10 (`b671830d8`: the pre-commit list derived from each leg's `precommit` key) and 9
+  (`f7526f6d8`: the product-test contract leg and the `level` key; run-gates at 1.54).
+- The spec is rev-5, re-grounded at `d6fb6ef4` while unit 9 was building; unit 9 has since landed and changed
   `tools/run-gates/README.md`, `tools/policy/catalogue.toml` and `tools/policy/unsummarised-keys.txt`. Verify each
   claim against the tree as it stands, and hand back any claim the landed code breaks as a divergence.
 - The pass legs carry one known red: install-prefix on the `conf-scalar-pins` seed argv in

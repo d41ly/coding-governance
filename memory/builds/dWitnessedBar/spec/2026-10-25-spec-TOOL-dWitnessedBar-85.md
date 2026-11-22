@@ -100,7 +100,7 @@ is restated for those counts. It repairs `TOOL-dWitnessedBar-82` and builds afte
 
 ### Evidence
 
-Read at `612cac75f` on 2026-11-21; the suite is unchanged there since `e1ad4ef32`.
+Read at `a162b531c` on 2026-11-21; the suite is unchanged there since `bd7804842`.
 
 - `tools/run-gates/run-gates.gov.test.sh@612cac75f:243` sets `a=0`, `:246` holds
   `FLOOR_ASSERTIONS=76` (PINNED 2026-11-21), and `:1315` fails only when `a` is below the floor. `a`
@@ -149,7 +149,7 @@ None: no stored data changes.
 Live at landing, at order 44. Order 44 holds `TOOL-dWitnessedBar-84`, this unit and
 `TOOL-dWitnessedBar-86`. Dispatch is strictly sequential and sorts a tie by id string
 (`tools/workflows/unattended-build.js@612cac75f:78-82`, `:692-697`), so unit 84 built and restated
-the floor first (`e1ad4ef32`), and unit 86 builds after this unit lands, re-grounded over it. Units
+the floor first (`bd7804842`), and unit 86 builds after this unit lands, re-grounded over it. Units
 88, 89 and 90 restate after, at orders 45 to 47, and unit 90 is the owner that writes the line above
 the constant.
 
@@ -251,7 +251,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 · the per-variant 
   per 2026-11-19-prompt-TOOL-dWitnessedBar-85-reground-brief.
   widens: none · relaxes: none
 - **F4 — How far below must AC1's `-ge 0` clone read?** Rev-2 read "at least" the word count below
-  the floor. At `612cac75f` the clone also loses each key's gated compare (§4 Evidence), so a build
+  the floor. At `a162b531c` the clone also loses each key's gated compare (§4 Evidence), so a build
   counting a failed variant still reads the word count below, and "at least" cannot see AC1's
   Red-when. Options: (a) keep "at least", which fails that Red-when, so veto 1 discards it; (b) twice
   the word count below the unedited clone's count. Recommendation (b). RESOLVED (agent, 2026-11-21,
@@ -266,7 +266,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 · the per-variant 
   edge of TOOL-dWitnessedBar-89, the minors batch of the round-1 spec audit of units 85 to 88;
   nothing else moved.
 - rev-3 · 2026-11-21 · §1 · S1 to S3 · §3 · §4 · §5 · AC1 to AC3 · §7 · §8 · §10 · re-grounded at
-  `612cac75f` per 2026-11-19-prompt-TOOL-dWitnessedBar-85-reground-brief. S1 counts on
+  `a162b531c` per 2026-11-19-prompt-TOOL-dWitnessedBar-85-reground-brief. S1 counts on
   `check_key_variant`'s status at the loop's top level. S2's comment goes below the constant, the
   owner unit 90. S3 and F3 hold the shell-role row; F4 makes AC1's clone read twice the word count.
   §3 names units 28's and 89's shares and the later restatements; citations blob-pinned.

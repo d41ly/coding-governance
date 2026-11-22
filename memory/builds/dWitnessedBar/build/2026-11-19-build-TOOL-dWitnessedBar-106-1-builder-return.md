@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-106
 
-# TOOL-dWitnessedBar-106 — builder return 1 (run `wf_bb638a48-c67`), committed 88537507c
+# TOOL-dWitnessedBar-106 — builder return 1 (run `wf_bb638a48-c67`), committed 217e87725
 
 ## Why
 
-TOOL-dWitnessedBar-106 is built as its spec (rev-1) describes and committed as 88537507c with a Pass: TOOL-dWitnessedBar-106 trailer. The spec's status header is set to CLOSED in that commit. Every claim the spec makes about current code held against the tree: blobs 13e24816, 45c73d4d, 25076c3d and f0103fb0; the cited lines of read_policy_at; no fail(); AC7's measure printing 1; POLICY_REL; and the catalogue's allowed lists. No divergence was found. One change the spec did not state is recorded as deviation 1061.
+TOOL-dWitnessedBar-106 is built as its spec (rev-1) describes and committed as 217e87725 with a Pass: TOOL-dWitnessedBar-106 trailer. The spec's status header is set to CLOSED in that commit. Every claim the spec makes about current code held against the tree: blobs 13e24816, 45c73d4d, 25076c3d and f0103fb0; the cited lines of read_policy_at; no fail(); AC7's measure printing 1; POLICY_REL; and the catalogue's allowed lists. No divergence was found. One change the spec did not state is recorded as deviation 1061.
 
 ## Summary
 
-Built and committed TOOL-dWitnessedBar-106 as 88537507c on top of 1ed4aae31. No gate, suite, bar or --selftest ran. Probes I wrote myself stand in for the gates.
+Built and committed TOOL-dWitnessedBar-106 as 217e87725 on top of 8e5bf6088. No gate, suite, bar or --selftest ran. Probes I wrote myself stand in for the gates.
 
 **What the commit does**
 - **The hook (`.githooks/pre-push`):**

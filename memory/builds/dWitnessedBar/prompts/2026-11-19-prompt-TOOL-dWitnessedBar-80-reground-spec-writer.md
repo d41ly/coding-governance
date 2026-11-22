@@ -119,9 +119,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    What is built so far:
    - Built and landed through order 41's second unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41,
      55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68, 67, 70, 71, 72, 74, 75
-     (`1b3295a52`: the canary's failure line names `rgf_what`: `count <n>`, `rec_sha` or `rec_fp`), 73 (`71f212ad1`,
-     with `da6037d48`: the gov suite derives every key the hook reads from the cut's `case` labels, `FLOOR_ASSERTIONS`
-     72) and 76 (`bdc10a4df`: `CANARY_KEYS=(sha:rec_sha fingerprint:rec_fp)`, `check_canary_keys` prints each variable
+     (`5b7349498`: the canary's failure line names `rgf_what`: `count <n>`, `rec_sha` or `rec_fp`), 73 (`563d828df`,
+     with `815598a5d`: the gov suite derives every key the hook reads from the cut's `case` labels, `FLOOR_ASSERTIONS`
+     72) and 76 (`3596751cf`: `CANARY_KEYS=(sha:rec_sha fingerprint:rec_fp)`, `check_canary_keys` prints each variable
      whose CR did not arrive, and one liveness loop over `CANARY_KEYS` requires it to name exactly that key; the
      `rgf_mr` measure and `rgf_crb` are gone). Every unit this spec consumes from is CLOSED.
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes (asks TOOL-dWitnessedBar-101 to -103) and the run

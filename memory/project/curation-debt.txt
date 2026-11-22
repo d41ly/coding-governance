@@ -1,3 +1,3 @@
 # ledger · curation-debt · key site path · direction shrink-only · drain hunk
-memory/builds/aBoundedVerdict/README.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-memory/builds/aUnmannedHelm/README.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+memory/builds/aBoundedVerdict/README.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/builds/aUnmannedHelm/README.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

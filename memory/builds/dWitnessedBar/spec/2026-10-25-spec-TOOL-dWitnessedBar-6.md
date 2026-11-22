@@ -296,18 +296,18 @@ pass moves each version it names at the kit's own version home.
 - `memory/guides/SESSION-KICKOFF.md`: its `watch:` line holds `tools/run-gates/run-gates.sh`, so its
   `last-audit` is re-stamped
 
-Shared with landed sibling units, settled at `51fb8d207`; this unit builds alone at order 28.
-`TOOL-dWitnessedBar-29` (`b0ad98958`) moved `tools/run-gates/run-gates.sh` (`scan_leg_warnings`,
+Shared with landed sibling units, settled at `74edc4d00`; this unit builds alone at order 28.
+`TOOL-dWitnessedBar-29` (`79a4f9c20`) moved `tools/run-gates/run-gates.sh` (`scan_leg_warnings`,
 whose `warn.<k>` rows go to the run record, never to S4's per-tree writer),
 `tools/run-gates/README.md` and `memory/guides/SESSION-KICKOFF.md`'s `last-audit`;
-`tools/policy/policy.py` moved under none of them (`git diff 174f9d9e5 HEAD` prints nothing for it).
+`tools/policy/policy.py` moved under none of them (`git diff a9be2b275 HEAD` prints nothing for it).
 `memory/map/generated/symbols.json` moved under `TOOL-dWitnessedBar-29`, `TOOL-dWitnessedBar-7`
-(`28edeaa0b`) and `TOOL-dWitnessedBar-21` (`cd03e4e75`), whose driver and suite hunks sit in
+(`636ec0364`) and `TOOL-dWitnessedBar-21` (`744515922`), whose driver and suite hunks sit in
 `--dispatch`, `--check-commit` and their arms, away from S7's and S8's sites. The driver gains no
 refusal site: S7's and S8's lines print and return 0, never `exit 1` or `status=1`, and
 `read_held_reds` holds none, so `check-arms.py --emit-floors` keeps the driver at
 343 sites, 339 armed, its `REFUSAL_CEILINGS` row 343 (TOOL-dDeclaredLoop-52) unmoved (DERIVED
-2026-11-20 at `51fb8d207`). Earlier, `tools/run-gates/README.md` was moved by `TOOL-dWitnessedBar-1`
+2026-11-20 at `74edc4d00`). Earlier, `tools/run-gates/README.md` was moved by `TOOL-dWitnessedBar-1`
 and `TOOL-dWitnessedBar-30`, and `tools/unattended/unattended.sh`, `tools/policy/catalogue.toml`,
 `tools/policy/unsummarised-keys.txt` and `help/reference/policy.md` by `TOOL-dWitnessedBar-30`, whose
 `write_flake_releases` now sits beside `write_held_asks` at S8's call site.
@@ -502,7 +502,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC7 · the h9 arm re-poin
   `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is unchanged, as the unit writes
   that path; nothing else moved.
 - rev-6 · 2026-11-20 · §1 · S2 S4 S5 S6 S7 S8 S9 S10 S11 · §3 · §4 · §5 · AC2 AC3 AC8 AC10 · §7 ·
-  §8 F6 F7 F8 F9 F10 · §10 · re-grounded over HEAD `174f9d9e5` by the brief
+  §8 F6 F7 F8 F9 F10 · §10 · re-grounded over HEAD `a9be2b275` by the brief
   `2026-11-19-prompt-TOOL-dWitnessedBar-6-reground3-brief`: code citations by symbol or blob-pinned;
   S2 reads the landed catalogue row, its enum and default, and a reader's refusal is never
   `local-hook` (F8, AC2's `undeclared` plant); S4 and AC3 read the full slot only; S5 runs the bar
@@ -515,7 +515,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC7 · the h9 arm re-poin
   kickoff manifest, the gov arm suite and the policy and loop kits' version lines; the leg line gains
   the legs those paths' guards name (PINNED, measured 2026-11-20 by the spec-token checker's guards
   join).
-- rev-7 · 2026-11-20 · S4 S7 S8 · §4 · AC7 · §10 · re-grounded over HEAD `51fb8d207` past the
+- rev-7 · 2026-11-20 · S4 S7 S8 · §4 · AC7 · §10 · re-grounded over HEAD `74edc4d00` past the
   landed TOOL-dWitnessedBar-29, TOOL-dWitnessedBar-7 and TOOL-dWitnessedBar-21 by the brief
   `2026-11-19-prompt-TOOL-dWitnessedBar-6-reground4-brief`: the moved runner, driver and suite
   citations re-pinned there; Files touched's shared paragraph names what each landed unit moved,
@@ -541,6 +541,6 @@ tools/codebase-map/reuse_lookup.py "read a remote CI verdict for a commit sha fr
 ranked generic stems (`read_text`, `read`, `git`, `run_git`) and missed `read_held_reds`, whose body
 is a Python program inside a bash function, outside the symbol tier (re-run 2026-11-20); scout A found
 it by reading. No registry of verdict backends exists at HEAD: `git grep -n verdict_backend --
-':!memory'` prints nothing (PINNED 2026-11-20 at `51fb8d207`).
+':!memory'` prints nothing (PINNED 2026-11-20 at `74edc4d00`).
 
 Recall terms used: `python tools/memory-recall/query.py "when does a remote CI verdict stand as a witness for a landing and what backends exist" --terms "verdict backend remote-ci peer-node local-hook head_sha workflow pin trust held reader registry"`

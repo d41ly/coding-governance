@@ -118,10 +118,10 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 39's third unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41,
-     55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66 (`a04b24c97`), 69 (`298369174`:
-     `read_green_file` is one `IFS= read -r` loop with one `${_rg_v%$'\r'}` strip), 68 (`14f441638`: the AC12 arm
+     55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66 (`e3cdc2201`), 69 (`9ff80bb15`:
+     `read_green_file` is one `IFS= read -r` loop with one `${_rg_v%$'\r'}` strip), 68 (`52bcf7599`: the AC12 arm
      builds the `clean` plant's record where the local-hook reader looks and grades the CLI's state) and 67
-     (`e1d569fc9`: the AC12 record gains a CR-ended `fingerprint` line and the arm checks `rec_fp`). Every unit this
+     (`af84e1a7a`: the AC12 record gains a CR-ended `fingerprint` line and the arm checks `rec_fp`). Every unit this
      spec consumes from is CLOSED.
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes (asks TOOL-dWitnessedBar-101 to -103) and the run
      defers it; any item of this spec that needs it leaves the scope, named in §3 as waiting with unit 28.

@@ -9,7 +9,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 23.
 - Built so far through order 22: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55 and 8
-  (`5944dcc3c`: flake quarantine and the `flake` record kind). This spec was re-grounded over them at `cd003aeca`.
+  (`dd90f8abb`: flake quarantine and the `flake` record kind). This spec was re-grounded over them at `965b98c9c`.
 - Units 1 and 59 build at order 23 IN PARALLEL in this one working tree. Their Files touched are disjoint: stage
   explicit paths only, never `git add -A`, and never stage, edit or revert a path the other unit's spec names. The
   session card routes both units, so each builder may flip its own spec's status.

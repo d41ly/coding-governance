@@ -8,8 +8,8 @@
 - **After:** the stub is at the bytes the landed row `lib/python-floor-3.15` names; where no bash resolves, the Refusal propagates and prints a traceback, exit 1, and no bare `bash` is spawned, since `resolve_shell_argv` raises (S7 stands).
 - **Cause:** owner ruling
 - **Reason:** the stub is the program of a landed upgrade row, and `step-rows-frozen` reds a moved byte of it; F8 was resolved without that rule, which surfaced at the landing's prepare. The owner chose option (a) of the parked decision `landing-python-floor-frozen` over shipping the one-line refusal as a new step: "Yes, fix both".
-- **Evidence:** `python tools/govkit/upgrade_steps.py frozen` read 1 problem naming `lib/python-floor-3.15` at fb38204e5 and 0 at 871d58171.
+- **Evidence:** `python tools/govkit/upgrade_steps.py frozen` read 1 problem naming `lib/python-floor-3.15` at 8c0bf91ca and 0 at a430383c0.
 - **Risk:** loosening
-- **Approver:** owner, in the session that ran the landing, 2026-11-21, quoted in commit 871d58171
+- **Approver:** owner, in the session that ran the landing, 2026-11-21, quoted in commit a430383c0
 - **Follow-through:** ask TOOL-dWitnessedBar-112
 - **Caused-by:** TOOL-dWitnessedBar-26

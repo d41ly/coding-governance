@@ -1,10 +1,10 @@
 **Serves:** journal TOOL-dWitnessedBar-30
 
-# TOOL-dWitnessedBar-30 — builder return 1 (run `wf_01af1077-4ae`), committed d2c61077c53b8e7465342274edb61f8f6538b2dc
+# TOOL-dWitnessedBar-30 — builder return 1 (run `wf_01af1077-4ae`), committed 9487ac1f09ef156f784ed988746d6a45debf5cbc
 
 ## Why
 
-TOOL-dWitnessedBar-30 is built as rev-4 says and committed in two commits, both with `Pass: TOOL-dWitnessedBar-30`. The pass commit is 7b918f7e0b71b1f75f41173ab04d3eefdd7a0c0e and sets the spec status to CLOSED. The follow-up, d2c61077c, fixes two findings from the bug-class checklist. Before writing, I checked every symbol, blob pin, policy default, README heading and path in the spec's write set against the tree. All of them held, so there is no divergence to report.
+TOOL-dWitnessedBar-30 is built as rev-4 says and committed in two commits, both with `Pass: TOOL-dWitnessedBar-30`. The pass commit is ceeac2dcfcf4dd40d53938b3f5fc38859481a80c and sets the spec status to CLOSED. The follow-up, 9487ac1f0, fixes two findings from the bug-class checklist. Before writing, I checked every symbol, blob pin, policy default, README heading and path in the spec's write set against the tree. All of them held, so there is no divergence to report.
 
 ## Summary
 

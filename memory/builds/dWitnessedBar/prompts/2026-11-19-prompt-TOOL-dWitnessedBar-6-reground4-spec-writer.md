@@ -117,9 +117,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    in Files touched with the legs its guard names on the gates section's leg line, and a prose-only mention named as
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
-   - Spec rev-6 was re-grounded at `0f0e2ad5c`. Since then units 29 (`b0ad98958`: the `gate-warn` marker,
-     `scan_leg_warnings` in the runner, `render_warn_marker` in `tools/policy/budgets.py`), 7 (`28edeaa0b`:
-     `seen_red.py`) and 21 (`cd03e4e75`: `--dispatch --fix-of`, `check_fix_keeps` in the driver, `fix_keeps.py`) have
+   - Spec rev-6 was re-grounded at `f063d1c73`. Since then units 29 (`79a4f9c20`: the `gate-warn` marker,
+     `scan_leg_warnings` in the runner, `render_warn_marker` in `tools/policy/budgets.py`), 7 (`636ec0364`:
+     `seen_red.py`) and 21 (`744515922`: `--dispatch --fix-of`, `check_fix_keeps` in the driver, `fix_keeps.py`) have
      landed. Settle every claim, citation and region about the files this spec shares with them against HEAD:
      `tools/run-gates/run-gates.sh`, `tools/run-gates/README.md`, `tools/policy/policy.py`,
      `memory/guides/SESSION-KICKOFF.md`, `tools/unattended/unattended.sh` and `tools/unattended/unattended.test.sh`.

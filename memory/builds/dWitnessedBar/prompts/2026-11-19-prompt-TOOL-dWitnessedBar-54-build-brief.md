@@ -9,11 +9,11 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 10.
 - Built so far: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11 (the gate-leg factory), 14 (the `ratchet`
-  pack) and unit 45 (`383e7b739`: `regen.check_when` admits `exists:<path>`, the factory's `[[generated]]` row in
+  pack) and unit 45 (`f08675df4`: `regen.check_when` admits `exists:<path>`, the factory's `[[generated]]` row in
   `tools/run-gates/kit.toml` carries `when = "exists:{prefix}/govkit/govkit.py"`, and a row whose `when` fails is
   reported skipped). This unit lands in the same merge as unit 45: govkit selfcheck refuses the `exists:` form until
   this unit's S2 admits it, so the pass legs run once over both.
-- The spec is rev-5, re-grounded at `4e5497fb7`; read unit 45's row as it landed and hand back any claim it breaks as a
+- The spec is rev-5, re-grounded at `2ca17d9c5`; read unit 45's row as it landed and hand back any claim it breaks as a
   divergence.
 - The pass legs carry one known red: install-prefix on the `conf-scalar-pins` seed argv in
   `tools/memory-tree/kit.toml`, held until unit 51. Any other red is this unit's or unit 45's to fix.

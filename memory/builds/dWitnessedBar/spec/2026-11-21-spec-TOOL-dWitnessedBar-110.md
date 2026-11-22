@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-110 — the closing review round 2's five minors batched: verify-peer's bar carries a fresh run id, an unarmed attribution check says so, a trailer's trailing whitespace reads as git's cleanup reads it, and two accepted shapes gain the arms that fail when they break
 
-**Status:** CLOSED · rev-1 · 2026-11-21 · node d · Tier-2 · base 46b7d39e · streams tooling · order 51 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-1 · 2026-11-21 · node d · Tier-2 · base 34d3c328 · streams tooling · order 51 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -25,7 +25,7 @@ The closing diff review's round 2
 (`memory/builds/dWitnessedBar/reviews/2026-11-21-review-TOOL-dWitnessedBar-106-closing-diff-review-round2.md`)
 read CLEAN WITH FIXES and NON-CONVERGENT. Its HIGH, H1, is `TOOL-dWitnessedBar-109`'s. This unit
 takes the two MEDIUMs and the three LOWs, each by the class-level fix and the left-shift gate the
-record carries, re-derived against the code at `46b7d39e`.
+record carries, re-derived against the code at `34d3c328`.
 
 | Report item | Finding | Lands on | Scope items |
 |---|---|---|---|
@@ -115,11 +115,11 @@ S9 keeps `help/tags.md` current, and S10 keeps the shell-role ledger equal to th
   owes its exit 0, which a failing case turns to 1 (§8 F3).
 
 The code this unit changes was built by CLOSED units, found by the `Pass:` trailers of `git log -S`
-over it. `TOOL-dWitnessedBar-6` built `run_verify_peer` (`aecf1c95a`); `TOOL-dWitnessedBar-107` built
-its before-and-after test, the `GATE_RUN_ID` removal and `run_stale_slot_plant` (`71ba863c2`);
+over it. `TOOL-dWitnessedBar-6` built `run_verify_peer` (`0b7e0fceb`); `TOOL-dWitnessedBar-107` built
+its before-and-after test, the `GATE_RUN_ID` removal and `run_stale_slot_plant` (`29d1be033`);
 `TOOL-dWitnessedBar-108` built `check_message_attribution` and the attribution branch of
-`check_commit_message` with its S10 arms (`41d4e7333`); and `TOOL-dWitnessedBar-106` built
-`scan_policy_bytes` and the FL harness (`88537507c`). Their specs stay frozen, so no edge names them.
+`check_commit_message` with its S10 arms (`ddf65d6a6`); and `TOOL-dWitnessedBar-106` built
+`scan_policy_bytes` and the FL harness (`217e87725`). Their specs stay frozen, so no edge names them.
 
 `TOOL-dWitnessedBar-109` is a live sibling: it adds `extract_message_lines`, `_ATTRIBUTION_FIXTURE`
 and the S10 arms A1 to A6, the text S5 to S7 build over, and its §3 hands this unit L1's rule and M2's
@@ -142,7 +142,7 @@ holds them, and the return says the split exists.
 
 ### Evidence
 
-Read on 2026-11-21 at `46b7d39e8`, the run branch's HEAD. The blobs are those the review cites:
+Read on 2026-11-21 at `34d3c3286`, the run branch's HEAD. The blobs are those the review cites:
 `verdict_backends.py` `d895f6c6`, `run-gates.sh` `04da8977`, `tools/lib/commit_trailers.py`
 `253aca4e`, `unattended.sh` `ca417ff0`, `unattended.test.sh` `d85005ad`, `.githooks/pre-push`
 `b5c2ab04` and `.githooks/pre-push.test.sh` `9fa63b3d` (PINNED 2026-11-21).

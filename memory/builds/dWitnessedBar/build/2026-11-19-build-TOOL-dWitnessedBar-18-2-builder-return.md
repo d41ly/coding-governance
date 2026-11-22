@@ -8,13 +8,13 @@ DIVERGENCE: §4 Migration and §5 contradict each other about how an empty list 
 
 ## Summary
 
-I stopped before writing any code. TOOL-dWitnessedBar-18's rev-7 spec says two things about an empty converted list that cannot both be true, so nothing is committed. The working tree is clean at the base, 353bb51bf7ebab04cba455287b3d33e1dced3c2a, and the full divergence is in `why`.
+I stopped before writing any code. TOOL-dWitnessedBar-18's rev-7 spec says two things about an empty converted list that cannot both be true, so nothing is committed. The working tree is clean at the base, d912b77b25a887577fa4bd4d3269a14c0d252a01, and the full divergence is in `why`.
 
 **The divergence:** §4 Migration says an empty list converts to the header alone. The step program it reuses, through `convert_registry.py#derive_converted_text`, writes the header plus a `# unarmed · dead probe · <sha>` line, which reads as unarmed. §5 says the same thing as the code. Making §4 true would change unit 16's landed converter, which is outside this unit's write set. The spec writer should also say how S5's `write_empty_lists` output for a new target should read, armed or unarmed, and what a list writer does when no registration names the list.
 
 **Everything else I probed holds at the base:**
 - Every path, symbol and flag S1–S7, §4, §8 and §10 cite exists as described. That includes the pinned lines `check-method-carriers.sh@91073d780040:65` (`"$M"/*) continue ;;`) and `check-memory-hygiene.sh@2ef59a33f96d:1044` (`F:positional-refs.txt) ;;`).
-- `upgrade_steps.py` declares 24 step rows and 1 retired row naming a step id, so 25 distinct ids, matching §4's pin at 192908a02.
+- `upgrade_steps.py` declares 24 step rows and 1 retired row naming a step id, so 25 distinct ids, matching §4's pin at 4fa55b94e.
 - The four lists hold 38334, 15, 15216 and 33 rows, matching the pins, with no whitespace-padded field. (DERIVED from the builder's probe)
 - Each list, given count 1, the run's base SHA 9e21ac760dc0a43d6ed007396922722ccee98d57 and `seeded`, parses through `legacy_ledger._parse_rows` with no refusal. `verbatim` covers the `ref` field of `positional-refs` only.
 - The `[dOC-71 S3]` arms can be re-pointed to `core-pending.txt`, because govkit reads `include = []` as naming no source.

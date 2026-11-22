@@ -9,7 +9,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 29.
 - Built so far through order 29's first unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8,
-  1, 59, 30, 29, 7, 21, 6 and 2 (`7f3e24092`, red fix `a5dc3e3ad`). This spec, rev-5, was re-grounded at `240f53acb`,
+  1, 59, 30, 29, 7, 21, 6 and 2 (`c8727978d`, red fix `3ad02a018`). This spec, rev-5, was re-grounded at `bfc815174`,
   before unit 2 landed.
 - Unit 2 also edited `tools/run-gates/verdict_backends.py` (a new `off-node` verb and a `lander-refused` fixture plant)
   and `tools/policy/catalogue.toml` (the `hooks.bypass` row's summary and usage). Read both at HEAD and build beside

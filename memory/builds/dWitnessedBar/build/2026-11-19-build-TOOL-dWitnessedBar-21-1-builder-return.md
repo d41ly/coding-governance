@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-21
 
-# TOOL-dWitnessedBar-21 — builder return 1 (run `wf_8888fc86-57d`), committed cd03e4e7544ab02745980926c1dfda82e99b9ba0
+# TOOL-dWitnessedBar-21 — builder return 1 (run `wf_8888fc86-57d`), committed 744515922c1c6e32cac838a3dd6029abd992092d
 
 ## Why
 
@@ -8,7 +8,7 @@ The spec was buildable as written. Every claim it makes about the code held at H
 
 ## Summary
 
-TOOL-dWitnessedBar-21 is built and committed in two commits. The pass commit is cd03e4e7544ab02745980926c1dfda82e99b9ba0 (trailer `Pass: TOOL-dWitnessedBar-21`, spec set to CLOSED, ledger and RUN.md included). After it comes 057c43cef92661175ceec8621074c844356eef20 (`Pass: none`). That second commit renames a nested fixture helper from `drive` to `run_driver`, because the gotchas checklist flagged that the naming leg grades nested helpers and the lexicon does not declare `drive`.
+TOOL-dWitnessedBar-21 is built and committed in two commits. The pass commit is 744515922c1c6e32cac838a3dd6029abd992092d (trailer `Pass: TOOL-dWitnessedBar-21`, spec set to CLOSED, ledger and RUN.md included). After it comes ca5c3feed0c21761cd2801382ea599d3dfb29e75 (`Pass: none`). That second commit renames a nested fixture helper from `drive` to `run_driver`, because the gotchas checklist flagged that the naming leg grades nested helpers and the lexicon does not declare `drive`.
 
 **What was built**
 - **New module** `C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/unattended/fix_keeps.py`:

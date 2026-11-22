@@ -1,175 +1,175 @@
 # ledger · unarmed-branches · key site path,check,signature · direction shrink-only · drain hunk
-skills/session-kickoff/manifest-check.sh	exit	MANIFEST env ERROR — DEAD PROBE: nothing to check — the body carries no path-shaped and no id-shaped token, so nothing was appended	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-skills/session-kickoff/manifest-check.sh	exit	carries a real READY line and no '## task' section: a kickoff ran and left no scope on disk	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-skills/session-kickoff/manifest-check.sh	exit	MANIFEST env ERROR — DEAD PROBE: nothing to check —	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-agent-cap-restatement.sh	status	AGENT-CAP-RESTATEMENT FAILED — live prose asserts a fan-out bound as a bare number.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-agent-cap-restatement.sh	status	AGENT-CAP-RESTATEMENT FAILED — a waiver row matches nothing, so it excuses a hit that is gone: '	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-dead-paths.sh	exit	dead-paths: the derived needle set is EMPTY, so this gate would match nothing and pass	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-dead-paths.sh	exit	' is not in the derived needle set.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-dead-paths.sh	exit	dead-paths: the frozen rename sentinel '	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-dead-paths.sh	exit	dead-paths: MALFORMED waiver row(s) -- the ordinal is absent, zero or not a number	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-dead-paths.sh	exit	dead-paths: a file outside memory/, or a map dossier, names a path this repo DELETED or renamed away. A reader	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-dead-paths.sh	exit	dead-paths: stale waiver(s) — the carrier they excuse is gone; delete the row	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-hook-destinations.sh	exit	hook-dest: REFUSING — no *.fragment.json is tracked, so this gate has no subject.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-hook-destinations.sh	exit	hook-dest: REFUSING — the descriptors resolved NO destinations at all	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-hook-destinations.sh	exit	hook-dest: REFUSING — the deployer names no canonical prefix	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-hook-destinations.sh	exit	hook-dest: REFUSING — the descriptors declare NO kind=flat home, so no flat-kit {here} fragment could be judged	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-hook-destinations.sh	exit	hook-dest: REFUSING — no adopter script is tracked, so arm 2 has no subject	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-install-prefix.sh	exit	install-prefix: no kit directories under	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-install-prefix.sh	exit	install-prefix: govkit's shipped verb failed, so the templates the render rule matches against	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-install-prefix.sh	exit	install-prefix: so it measured nothing. Refusing to read that as a tree carrying zero literals	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-kit-versions.sh	exit	declared carrier(s) under	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-playbook-parity.sh	exit	PLAYBOOK-PARITY: stopping — S1 cannot be evaluated without the registry.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-playbook-parity.sh	exit	PLAYBOOK-PARITY: stopping — S2 cannot be evaluated without a writable results file.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/check-wiring.sh	exit	[ "$unwired" = 0 ] && exit 0 || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/codebase-map/adopt-codebase-map.sh	exit	refusing: this kit dir belongs to the repo at	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/codebase-map/adopt-codebase-map.sh	exit	) — copy the kit in as a directory named codebase-map/	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/codebase-map/adopt-codebase-map.sh	exit	) — the gate template resolves it by that name; a one-segment prefix above it is fine	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/codebase-map/adopt-codebase-map.sh	exit	install prefix is deeper than one segment	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/codebase-map/adopt-codebase-map.sh	exit	created .codebase-map.conf from the example — EDIT IT (MAP_ROOT, GATE_FILE), then re-run.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/codebase-map/adopt-codebase-map.sh	exit	/map_extractors.py from the template — declare your inventories	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/codebase-map/adopt-codebase-map.sh	exit	"$PY" "$HERE/gen_map.py" --write || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/codebase-map/adopt-codebase-map.sh	exit	"$PY" "$HERE/gen_map.py" --scaffold || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/codebase-map/adopt-codebase-map.sh	exit	codebase-map: the affordance grace list was not seeded, and only a dead probe is admitted unarmed	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/codebase-map/adopt-codebase-map.sh	exit	gate FAILED on the freshly seeded tree — fix before committing	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/drift-audit/adopt-drift-audit.sh	exit	drift-audit: SKILL.template.md missing from the kit	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/drift-audit/adopt-drift-audit.sh	exit	[ "$LL_RC" = 0 ] || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/drift-audit/adopt-drift-audit.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/drift-audit/adopt-drift-audit.sh	exit	not rendered — run	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/drift-audit/adopt-drift-audit.sh	exit	is out of sync with SKILL.template.md + .memory-tree.conf	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/drift-audit/adopt-drift-audit.sh	exit	drift-audit: drift_signals.py missing — the report cannot run	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: no .lexicon.conf; nothing to render from	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	write_skill || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	check_skill || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: NOT ADOPTED — no .lexicon.conf at the repo root, so there is no table to	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: ALREADY EXPANDED — .lexicon.conf carries `expanded=	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	"$PY" "$KIT_DIR/lexicon.py" --expand || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: DIRTY TREE — refusing to stamp. The sha in `expanded=` names the tree the	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: UNTRACKED DECLARATION — refusing to stamp. .lexicon.conf is not tracked, so	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: NO SHA — refusing to stamp. `git rev-parse HEAD` produced nothing, so there	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: no writable temp dir; NOT stamping	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: the stamp rewrite failed	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: the stamp write failed	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: ORPHANED EXTRACTOR — .lexicon.conf is gone but map_extractors.py still	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: .lexicon.conf already exists — refusing to overwrite a curated declaration.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	"$PY" "$KIT_DIR/scaffold_lexicon.py" "$CONF" || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: the declaration was written but the Skill was NOT rendered.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lib/lib-selftest.sh	exit	if [ "$probe" = 1 ]; then [ "$fails" -eq 0 ] && exit 0; exit 1; fi	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lib/python-floor.sh	exit	PY=$(resolve_python) || exit 1	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lib/python-floor.sh	exit	VER=$("$PY" -I -c 'import sys; print("%d.%d.%d" % sys.version_info[:3])') || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lib/python-floor.sh	exit	must be one <major>.<minor> line, and it reads	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lib/render-doc.sh	exit	out=$( cat "$1" || exit 1; printf X ) || return 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-recall/adopt-memory-recall.sh	exit	conf="$("$PY" "$HERE/recall_conf.py")" || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-recall/adopt-memory-recall.sh	exit	/SKILL.template.md does not — cannot verify drift	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-recall/adopt-memory-recall.sh	exit	/SKILL.template.md not installed, nothing to render	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-recall/adopt-memory-recall.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-recall/adopt-memory-recall.sh	exit	memory-recall: unsubstituted placeholder(s) in SKILL.template.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-recall/adopt-memory-recall.sh	exit	/adopt-memory-recall.sh --scaffold	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-recall/adopt-memory-recall.sh	exit	memory-recall: the render produced an EMPTY file — comparing it to an equally empty Skill is the green-by-absence shape this kit refuses	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-recall/adopt-memory-recall.sh	exit	memory-recall: .claude/skills/memory-recall/SKILL.md has DRIFTED from .memory-tree.conf.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-recall/adopt-memory-recall.sh	exit	render > "$SKILL.tmp" && mv "$SKILL.tmp" "$SKILL" || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-recall/adopt-memory-recall.sh	exit	once .governance/deploy.toml declares [kit.memory-recall] with_hook = "yes" (then: govkit update --write)	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/adopt-memory-tree.sh	exit	created .memory-tree.conf from the example — EDIT IT (MEMORY_ROOT, DISCIPLINES, FAMILIES, and the ROUTED_PATHS candidate with its ROUTED_COMMIT_CUTOFF), then re-run.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/adopt-memory-tree.sh	exit	adopt-memory-tree: REFUSING — READINESS_ROWS is not declared in .memory-tree.conf, so the §5 checklist would render as one empty bullet. Copy the line from .memory-tree.conf.example and edit it.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/adopt-memory-tree.sh	exit	out=$( cat "$1" || exit 1; printf X ) || return 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/adopt-memory-tree.sh	exit	render_all || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/adopt-memory-tree.sh	exit	/ exists without a memory-tree marker — refusing to overwrite. If a prior scaffold crashed, 'rm -rf	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/check-memory-hygiene.sh	status	[ "$_tarc" -ne 0 ] && status=1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/check-memory-hygiene.sh	status	but READINESS_ROWS is empty, so the §5 row arm would grade no row and report the same zero as a conforming tree.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/check-memory-hygiene.sh	status	[ "$_gotrc" -ne 0 ] && status=1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/check-memory-hygiene.sh	status	' "$rowg"; status=1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/check-verdict-epoch.sh	exit	behaviour-bearing line(s) of the engine moved in	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/push-main.sh	exit	moved again between the re-prepare and this attempt.	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/push-main.sh	exit	check_carry_set "$R" || exit 1	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/push-main.sh	exit	write_lander_marker || exit 1	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/push-main.sh	exit	attempts exhausted) — land when the fleet is quieter, or coordinate.	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/push-main.sh	exit	t=$(check_prepared_merge "$R") || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/push-main.sh	exit	push-main: reconcile CONFLICT — resolve manually, commit, then re-run push-main. Aborted (no push).	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/push-main.sh	exit	push-main: the kit versions this landing owes could not be minted (named above). Aborted (no push).	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/push-main.sh	exit	push-main: could not commit the minted versions. Aborted (no push).	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/push-main.sh	exit	push-main: could not commit gov's receipt of the upgrade steps. Aborted (no push).	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/push-main.sh	exit	push-main: the regeneration could not snapshot the untracked files before it ran, so it did not run. Aborted (no push).	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/push-main.sh	exit	push-main: could not commit the regenerated outputs. Aborted (no push).	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/run-gates/fixtures/measure-legs/stall.sh	exit	d=$(mktemp -d "${TMPDIR:-/tmp}/stall.XXXXXXXX") || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/run-gates/fixtures/measure-legs/stall.sh	exit	mkfifo "$d/fifo" || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/run-gates/run-gates.sh	exit	exit 1	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/runlog/adopt-runlog.sh	exit	/SKILL.template.md does not, so its drift cannot be checked	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/runlog/adopt-runlog.sh	exit	/SKILL.template.md is not installed, so there is nothing to render	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/runlog/adopt-runlog.sh	exit	' "$HERE" "$ROOT")" || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/runlog/adopt-runlog.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/runlog/adopt-runlog.sh	exit	/SKILL.template.md could not be read	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/runlog/adopt-runlog.sh	exit	check_render "$TMP" || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/runlog/adopt-runlog.sh	exit	/adopt-runlog.sh --scaffold	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/runlog/adopt-runlog.sh	exit	has DRIFTED from a fresh render of	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/runlog/adopt-runlog.sh	exit	mkdir -p "$(dirname "$SKILL")" || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/runlog/adopt-runlog.sh	exit	cp "$TMP" "$SKILL.tmp" && mv "$SKILL.tmp" "$SKILL" || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: could not write the stamp into	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the stamp did not land — .unattended.conf still carries a path token after the rewrite	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	is not rendered — run	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the render FAILED — the template could not be read; refusing to compare	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the render produced an EMPTY file — comparing it to an equally empty Skill is the green-by-absence shape this kit refuses	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	is out of sync with SKILL.template.md + .unattended.conf	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	still carries an unfilled placeholder — .unattended.conf declares no value for it	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	to install the protocol's live half	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	has drifted from the shipped protocol; re-run	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	to install the playbook template	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	has drifted from the shipped playbook template; re-run	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	to install the verb carrier	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	has drifted from the shipped verb carrier; re-run	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	to install the stop contract	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	has drifted from the shipped stop contract; re-run	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	to install the ask guide	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	has drifted from the shipped ask guide; re-run	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the fixture render FAILED — refusing to compare	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the fixture render produced an EMPTY file — comparing it to an equally empty fixture is the green-by-absence shape this kit refuses	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	is out of sync with playbook.fixture.template.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	still carries an unfilled placeholder	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	, which is not a file, so the gate-guard wiring cannot be read from the file the operator declared	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	declares no name or no marker, so the wiring arm has nothing to look for	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	declares no event or no matcher, so the wiring arm cannot say which group the marker must sit in	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	, so the wired entry would point at nothing — re-copy the kit	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	, so no hook wiring can be checked and nothing else on the bar asserts the files — re-copy the kit	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the fixture render left an unfilled placeholder — refusing to write	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the fixture render FAILED or was empty — refusing to write	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	.template.md is missing from the kit, so the fixture record it renders cannot be written -- re-copy the kit	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the fixture-record render left an unfilled placeholder -- refusing to write	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the fixture-record render FAILED or was empty -- refusing to write	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the render FAILED — the template could not be read; the Skill is unchanged	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the render produced an EMPTY file — refusing to install it over the Skill	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/adopt-unattended.sh	exit	unattended: the render carries an unfilled placeholder — refusing to install it over the Skill	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/check-pass-order.sh	exit	waives unit(s) this leg no longer reports as a violation, and a stale exemption widens the surface it was written to narrow	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/unattended/unattended.sh	status	, and --close will refuse this run too, with no override, while the refusal above stands; where that refusal names a working-tree remedy, apply it first. Otherwise the run has two exits. Rotate: commit a build README this driver admits, then --abort	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/workflows/check-review-join.sh	exit	— the population is empty, which is not a pass	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/workflows/check-review-join.sh	exit	review-join: none of the named files exist — nothing was scanned, which is not a pass	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/workflows/check-verifier-fanout.sh	exit	verifier-fanout: none of the named files exist — nothing was scanned, which is not a pass	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/run-gates/post-merge.sh	exit	post-merge: publish FAILED —	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/branch-reconcile/adopt-branch-reconcile.sh	exit	/SKILL.template.md does not, so its drift cannot be checked	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/branch-reconcile/adopt-branch-reconcile.sh	exit	/SKILL.template.md is not installed, so there is nothing to render	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/branch-reconcile/adopt-branch-reconcile.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/branch-reconcile/adopt-branch-reconcile.sh	exit	/SKILL.template.md could not be read	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/branch-reconcile/adopt-branch-reconcile.sh	exit	check_render "$TMP" || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/branch-reconcile/adopt-branch-reconcile.sh	exit	/adopt-branch-reconcile.sh --scaffold	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/branch-reconcile/adopt-branch-reconcile.sh	exit	has DRIFTED from a fresh render of	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/branch-reconcile/adopt-branch-reconcile.sh	exit	mkdir -p "${SKILL%/*}" || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/branch-reconcile/adopt-branch-reconcile.sh	exit	cp "$TMP" "$SKILL.tmp" && mv "$SKILL.tmp" "$SKILL" || exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/branch-reconcile/adopt-branch-reconcile.sh	exit	check_old_render || exit 1	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/playbook/adopt-playbook.sh	exit	layer-check arm(s) failed	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/playbook/adopt-playbook.sh	exit	tag-resolver arm(s) failed	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/playbook/adopt-playbook.sh	exit	edge-grammar arm(s) failed	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/playbook/adopt-playbook.sh	exit	load-set arm(s) failed	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/playbook/adopt-playbook.sh	exit	policy-namespace arm(s) failed	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb A1 — session A printed no session_id	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb A — session A names the primary's nonce	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb A — session A names neither	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb B — the session in a tree with no card file did not print ok	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/lib/refuse-wrong-shell.sh	exit	exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt, so no unbound record was graded	1	384e6761d5906ff2699b79165e275e5c610d8e7f	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-3-builder-return.md
-tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt the ledger factory refuses or whose count is not 1	1	384e6761d5906ff2699b79165e275e5c610d8e7f	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-3-builder-return.md
-tools/push-main.sh	exit	branch=$(check_run_branch) || exit 1	1	56569347a42ff8777e3577a2b9076973c13a6ca8	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md
-tools/push-main.sh	exit	write_prepared_merge "$branch" "$R" >&2 || exit 1	1	56569347a42ff8777e3577a2b9076973c13a6ca8	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md
-tools/push-main.sh	exit	check_landing_verdict "$(git rev-parse --verify HEAD)" || exit 1	1	aecf1c95a1e0c9a16da273dc98edb9c6f6c4f67e	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-6-1-builder-return.md
-tools/push-main.sh	exit	check_landing_verdict "$(git rev-parse --verify "refs/heads/$def")" || exit 1	1	aecf1c95a1e0c9a16da273dc98edb9c6f6c4f67e	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-6-1-builder-return.md
+skills/session-kickoff/manifest-check.sh	exit	MANIFEST env ERROR — DEAD PROBE: nothing to check — the body carries no path-shaped and no id-shaped token, so nothing was appended	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+skills/session-kickoff/manifest-check.sh	exit	carries a real READY line and no '## task' section: a kickoff ran and left no scope on disk	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+skills/session-kickoff/manifest-check.sh	exit	MANIFEST env ERROR — DEAD PROBE: nothing to check —	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-agent-cap-restatement.sh	status	AGENT-CAP-RESTATEMENT FAILED — live prose asserts a fan-out bound as a bare number.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-agent-cap-restatement.sh	status	AGENT-CAP-RESTATEMENT FAILED — a waiver row matches nothing, so it excuses a hit that is gone: '	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-dead-paths.sh	exit	dead-paths: the derived needle set is EMPTY, so this gate would match nothing and pass	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-dead-paths.sh	exit	' is not in the derived needle set.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-dead-paths.sh	exit	dead-paths: the frozen rename sentinel '	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-dead-paths.sh	exit	dead-paths: MALFORMED waiver row(s) -- the ordinal is absent, zero or not a number	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-dead-paths.sh	exit	dead-paths: a file outside memory/, or a map dossier, names a path this repo DELETED or renamed away. A reader	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-dead-paths.sh	exit	dead-paths: stale waiver(s) — the carrier they excuse is gone; delete the row	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-hook-destinations.sh	exit	hook-dest: REFUSING — no *.fragment.json is tracked, so this gate has no subject.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-hook-destinations.sh	exit	hook-dest: REFUSING — the descriptors resolved NO destinations at all	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-hook-destinations.sh	exit	hook-dest: REFUSING — the deployer names no canonical prefix	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-hook-destinations.sh	exit	hook-dest: REFUSING — the descriptors declare NO kind=flat home, so no flat-kit {here} fragment could be judged	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-hook-destinations.sh	exit	hook-dest: REFUSING — no adopter script is tracked, so arm 2 has no subject	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-install-prefix.sh	exit	install-prefix: no kit directories under	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-install-prefix.sh	exit	install-prefix: govkit's shipped verb failed, so the templates the render rule matches against	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-install-prefix.sh	exit	install-prefix: so it measured nothing. Refusing to read that as a tree carrying zero literals	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-kit-versions.sh	exit	declared carrier(s) under	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-playbook-parity.sh	exit	PLAYBOOK-PARITY: stopping — S1 cannot be evaluated without the registry.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-playbook-parity.sh	exit	PLAYBOOK-PARITY: stopping — S2 cannot be evaluated without a writable results file.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/check-wiring.sh	exit	[ "$unwired" = 0 ] && exit 0 || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/codebase-map/adopt-codebase-map.sh	exit	refusing: this kit dir belongs to the repo at	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/codebase-map/adopt-codebase-map.sh	exit	) — copy the kit in as a directory named codebase-map/	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/codebase-map/adopt-codebase-map.sh	exit	) — the gate template resolves it by that name; a one-segment prefix above it is fine	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/codebase-map/adopt-codebase-map.sh	exit	install prefix is deeper than one segment	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/codebase-map/adopt-codebase-map.sh	exit	created .codebase-map.conf from the example — EDIT IT (MAP_ROOT, GATE_FILE), then re-run.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/codebase-map/adopt-codebase-map.sh	exit	/map_extractors.py from the template — declare your inventories	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/codebase-map/adopt-codebase-map.sh	exit	"$PY" "$HERE/gen_map.py" --write || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/codebase-map/adopt-codebase-map.sh	exit	"$PY" "$HERE/gen_map.py" --scaffold || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/codebase-map/adopt-codebase-map.sh	exit	codebase-map: the affordance grace list was not seeded, and only a dead probe is admitted unarmed	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/codebase-map/adopt-codebase-map.sh	exit	gate FAILED on the freshly seeded tree — fix before committing	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/drift-audit/adopt-drift-audit.sh	exit	drift-audit: SKILL.template.md missing from the kit	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/drift-audit/adopt-drift-audit.sh	exit	[ "$LL_RC" = 0 ] || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/drift-audit/adopt-drift-audit.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/drift-audit/adopt-drift-audit.sh	exit	not rendered — run	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/drift-audit/adopt-drift-audit.sh	exit	is out of sync with SKILL.template.md + .memory-tree.conf	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/drift-audit/adopt-drift-audit.sh	exit	drift-audit: drift_signals.py missing — the report cannot run	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: no .lexicon.conf; nothing to render from	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	write_skill || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	check_skill || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: NOT ADOPTED — no .lexicon.conf at the repo root, so there is no table to	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: ALREADY EXPANDED — .lexicon.conf carries `expanded=	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	"$PY" "$KIT_DIR/lexicon.py" --expand || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: DIRTY TREE — refusing to stamp. The sha in `expanded=` names the tree the	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: UNTRACKED DECLARATION — refusing to stamp. .lexicon.conf is not tracked, so	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: NO SHA — refusing to stamp. `git rev-parse HEAD` produced nothing, so there	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: no writable temp dir; NOT stamping	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: the stamp rewrite failed	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: the stamp write failed	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: ORPHANED EXTRACTOR — .lexicon.conf is gone but map_extractors.py still	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: .lexicon.conf already exists — refusing to overwrite a curated declaration.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	"$PY" "$KIT_DIR/scaffold_lexicon.py" "$CONF" || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lexicon/adopt-lexicon.sh	exit	lexicon-adopt: the declaration was written but the Skill was NOT rendered.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lib/lib-selftest.sh	exit	if [ "$probe" = 1 ]; then [ "$fails" -eq 0 ] && exit 0; exit 1; fi	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lib/python-floor.sh	exit	PY=$(resolve_python) || exit 1	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lib/python-floor.sh	exit	VER=$("$PY" -I -c 'import sys; print("%d.%d.%d" % sys.version_info[:3])') || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lib/python-floor.sh	exit	must be one <major>.<minor> line, and it reads	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lib/render-doc.sh	exit	out=$( cat "$1" || exit 1; printf X ) || return 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-recall/adopt-memory-recall.sh	exit	conf="$("$PY" "$HERE/recall_conf.py")" || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-recall/adopt-memory-recall.sh	exit	/SKILL.template.md does not — cannot verify drift	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-recall/adopt-memory-recall.sh	exit	/SKILL.template.md not installed, nothing to render	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-recall/adopt-memory-recall.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-recall/adopt-memory-recall.sh	exit	memory-recall: unsubstituted placeholder(s) in SKILL.template.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-recall/adopt-memory-recall.sh	exit	/adopt-memory-recall.sh --scaffold	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-recall/adopt-memory-recall.sh	exit	memory-recall: the render produced an EMPTY file — comparing it to an equally empty Skill is the green-by-absence shape this kit refuses	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-recall/adopt-memory-recall.sh	exit	memory-recall: .claude/skills/memory-recall/SKILL.md has DRIFTED from .memory-tree.conf.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-recall/adopt-memory-recall.sh	exit	render > "$SKILL.tmp" && mv "$SKILL.tmp" "$SKILL" || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-recall/adopt-memory-recall.sh	exit	once .governance/deploy.toml declares [kit.memory-recall] with_hook = "yes" (then: govkit update --write)	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/adopt-memory-tree.sh	exit	created .memory-tree.conf from the example — EDIT IT (MEMORY_ROOT, DISCIPLINES, FAMILIES, and the ROUTED_PATHS candidate with its ROUTED_COMMIT_CUTOFF), then re-run.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/adopt-memory-tree.sh	exit	adopt-memory-tree: REFUSING — READINESS_ROWS is not declared in .memory-tree.conf, so the §5 checklist would render as one empty bullet. Copy the line from .memory-tree.conf.example and edit it.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/adopt-memory-tree.sh	exit	out=$( cat "$1" || exit 1; printf X ) || return 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/adopt-memory-tree.sh	exit	render_all || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/adopt-memory-tree.sh	exit	/ exists without a memory-tree marker — refusing to overwrite. If a prior scaffold crashed, 'rm -rf	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/check-memory-hygiene.sh	status	[ "$_tarc" -ne 0 ] && status=1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/check-memory-hygiene.sh	status	but READINESS_ROWS is empty, so the §5 row arm would grade no row and report the same zero as a conforming tree.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/check-memory-hygiene.sh	status	[ "$_gotrc" -ne 0 ] && status=1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/check-memory-hygiene.sh	status	' "$rowg"; status=1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/check-verdict-epoch.sh	exit	behaviour-bearing line(s) of the engine moved in	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	exit	moved again between the re-prepare and this attempt.	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	exit	check_carry_set "$R" || exit 1	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	exit	write_lander_marker || exit 1	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	exit	attempts exhausted) — land when the fleet is quieter, or coordinate.	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	exit	t=$(check_prepared_merge "$R") || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	exit	push-main: reconcile CONFLICT — resolve manually, commit, then re-run push-main. Aborted (no push).	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	exit	push-main: the kit versions this landing owes could not be minted (named above). Aborted (no push).	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	exit	push-main: could not commit the minted versions. Aborted (no push).	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	exit	push-main: could not commit gov's receipt of the upgrade steps. Aborted (no push).	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	exit	push-main: the regeneration could not snapshot the untracked files before it ran, so it did not run. Aborted (no push).	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/push-main.sh	exit	push-main: could not commit the regenerated outputs. Aborted (no push).	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/run-gates/fixtures/measure-legs/stall.sh	exit	d=$(mktemp -d "${TMPDIR:-/tmp}/stall.XXXXXXXX") || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/run-gates/fixtures/measure-legs/stall.sh	exit	mkfifo "$d/fifo" || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/run-gates/run-gates.sh	exit	exit 1	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/runlog/adopt-runlog.sh	exit	/SKILL.template.md does not, so its drift cannot be checked	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/runlog/adopt-runlog.sh	exit	/SKILL.template.md is not installed, so there is nothing to render	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/runlog/adopt-runlog.sh	exit	' "$HERE" "$ROOT")" || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/runlog/adopt-runlog.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/runlog/adopt-runlog.sh	exit	/SKILL.template.md could not be read	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/runlog/adopt-runlog.sh	exit	check_render "$TMP" || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/runlog/adopt-runlog.sh	exit	/adopt-runlog.sh --scaffold	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/runlog/adopt-runlog.sh	exit	has DRIFTED from a fresh render of	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/runlog/adopt-runlog.sh	exit	mkdir -p "$(dirname "$SKILL")" || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/runlog/adopt-runlog.sh	exit	cp "$TMP" "$SKILL.tmp" && mv "$SKILL.tmp" "$SKILL" || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: could not write the stamp into	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the stamp did not land — .unattended.conf still carries a path token after the rewrite	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	is not rendered — run	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the render FAILED — the template could not be read; refusing to compare	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the render produced an EMPTY file — comparing it to an equally empty Skill is the green-by-absence shape this kit refuses	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	is out of sync with SKILL.template.md + .unattended.conf	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	still carries an unfilled placeholder — .unattended.conf declares no value for it	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	to install the protocol's live half	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	has drifted from the shipped protocol; re-run	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	to install the playbook template	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	has drifted from the shipped playbook template; re-run	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	to install the verb carrier	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	has drifted from the shipped verb carrier; re-run	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	to install the stop contract	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	has drifted from the shipped stop contract; re-run	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	to install the ask guide	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	has drifted from the shipped ask guide; re-run	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the fixture render FAILED — refusing to compare	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the fixture render produced an EMPTY file — comparing it to an equally empty fixture is the green-by-absence shape this kit refuses	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	is out of sync with playbook.fixture.template.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	still carries an unfilled placeholder	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	, which is not a file, so the gate-guard wiring cannot be read from the file the operator declared	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	declares no name or no marker, so the wiring arm has nothing to look for	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	declares no event or no matcher, so the wiring arm cannot say which group the marker must sit in	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	, so the wired entry would point at nothing — re-copy the kit	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	, so no hook wiring can be checked and nothing else on the bar asserts the files — re-copy the kit	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the fixture render left an unfilled placeholder — refusing to write	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the fixture render FAILED or was empty — refusing to write	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	.template.md is missing from the kit, so the fixture record it renders cannot be written -- re-copy the kit	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the fixture-record render left an unfilled placeholder -- refusing to write	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the fixture-record render FAILED or was empty -- refusing to write	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the render FAILED — the template could not be read; the Skill is unchanged	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the render produced an EMPTY file — refusing to install it over the Skill	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/adopt-unattended.sh	exit	unattended: the render carries an unfilled placeholder — refusing to install it over the Skill	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/check-pass-order.sh	exit	waives unit(s) this leg no longer reports as a violation, and a stale exemption widens the surface it was written to narrow	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/unattended/unattended.sh	status	, and --close will refuse this run too, with no override, while the refusal above stands; where that refusal names a working-tree remedy, apply it first. Otherwise the run has two exits. Rotate: commit a build README this driver admits, then --abort	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/workflows/check-review-join.sh	exit	— the population is empty, which is not a pass	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/workflows/check-review-join.sh	exit	review-join: none of the named files exist — nothing was scanned, which is not a pass	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/workflows/check-verifier-fanout.sh	exit	verifier-fanout: none of the named files exist — nothing was scanned, which is not a pass	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/run-gates/post-merge.sh	exit	post-merge: publish FAILED —	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/branch-reconcile/adopt-branch-reconcile.sh	exit	/SKILL.template.md does not, so its drift cannot be checked	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/branch-reconcile/adopt-branch-reconcile.sh	exit	/SKILL.template.md is not installed, so there is nothing to render	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/branch-reconcile/adopt-branch-reconcile.sh	exit	out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/branch-reconcile/adopt-branch-reconcile.sh	exit	/SKILL.template.md could not be read	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/branch-reconcile/adopt-branch-reconcile.sh	exit	check_render "$TMP" || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/branch-reconcile/adopt-branch-reconcile.sh	exit	/adopt-branch-reconcile.sh --scaffold	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/branch-reconcile/adopt-branch-reconcile.sh	exit	has DRIFTED from a fresh render of	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/branch-reconcile/adopt-branch-reconcile.sh	exit	mkdir -p "${SKILL%/*}" || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/branch-reconcile/adopt-branch-reconcile.sh	exit	cp "$TMP" "$SKILL.tmp" && mv "$SKILL.tmp" "$SKILL" || exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/branch-reconcile/adopt-branch-reconcile.sh	exit	check_old_render || exit 1	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/playbook/adopt-playbook.sh	exit	layer-check arm(s) failed	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/playbook/adopt-playbook.sh	exit	tag-resolver arm(s) failed	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/playbook/adopt-playbook.sh	exit	edge-grammar arm(s) failed	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/playbook/adopt-playbook.sh	exit	load-set arm(s) failed	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/playbook/adopt-playbook.sh	exit	policy-namespace arm(s) failed	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb A1 — session A printed no session_id	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb A — session A names the primary's nonce	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb A — session A names neither	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb B — the session in a tree with no card file did not print ok	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/lib/refuse-wrong-shell.sh	exit	exit 1	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt, so no unbound record was graded	1	b9fecf589fddded92e6eec659d2f63d3cda9a815	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-3-builder-return.md
+tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt the ledger factory refuses or whose count is not 1	1	b9fecf589fddded92e6eec659d2f63d3cda9a815	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-3-builder-return.md
+tools/push-main.sh	exit	branch=$(check_run_branch) || exit 1	1	ee3fb94feaba1bc9205daf3efa7e4d9b3de12128	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md
+tools/push-main.sh	exit	write_prepared_merge "$branch" "$R" >&2 || exit 1	1	ee3fb94feaba1bc9205daf3efa7e4d9b3de12128	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md
+tools/push-main.sh	exit	check_landing_verdict "$(git rev-parse --verify HEAD)" || exit 1	1	0b7e0fceb2fb91cda124074148a284281a387499	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-6-1-builder-return.md
+tools/push-main.sh	exit	check_landing_verdict "$(git rev-parse --verify "refs/heads/$def")" || exit 1	1	0b7e0fceb2fb91cda124074148a284281a387499	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-6-1-builder-return.md
 tools/push-main.sh	exit	push-main: could not stage gov's receipt of the upgrade steps. Aborted (no push).	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 tools/push-main.sh	exit	push-main: could not stage the minted versions. Aborted (no push).	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded

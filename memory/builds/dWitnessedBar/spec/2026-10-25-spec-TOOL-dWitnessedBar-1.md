@@ -190,7 +190,7 @@ until the record holds one. Today nothing measures a flake rate, and the flake r
 
 ### Evidence
 
-Read at `a4fd535ed`, 2026-11-20.
+Read at `e22cdce08`, 2026-11-20.
 
 - `drift_report.py#measure_legs_retried_after_timeout` reads every run record's `verdict` under every
   git dir of the clone and returns one signal dict with `value`, `of`, `tolerance`, `gateable`, `live`
@@ -210,7 +210,7 @@ Read at `a4fd535ed`, 2026-11-20.
   `verdict_flow.py#run_fixture_flakes_window` asserts the factory does not yet hold the kind.
 - The flake body's rows are read in `verdict_flow.py#read_flake_record`, the flake test in
   `verdict_flow.py#derive_flake_holds`; no other kit reads either.
-- PINNED 2026-11-20: the manifest holds 219 legs at `a4fd535ed`, 101 held by the kit hold, so 118.
+- PINNED 2026-11-20: the manifest holds 219 legs at `e22cdce08`, 101 held by the kit hold, so 118.
   Measured by loading `tools/gate-legs.json` and counting rows whose `subject` is `kit` or `chunk`
   `selftests`; the measurement re-derives both from the manifest it reads.
   PINNED 2026-10-25: it held 142 legs at `cdfbd1cf`.
@@ -388,12 +388,12 @@ kickoff manifest.
   --print-bindings`; and `grep -n 'gate-health' memory/HYGIENE.md` names the closed kind list's entry.
   Red when: the record serves as `journal`, or the kind is added to the factory alone, so the factory
   refuses at import or the record reads malformed.
-  figure: 13 is DERIVED, the length of `tree_lib.py#TYPED_RECORD_KINDS`, which held 12 at `a4fd535ed`
+  figure: 13 is DERIVED, the length of `tree_lib.py#TYPED_RECORD_KINDS`, which held 12 at `e22cdce08`
   (PINNED 2026-11-20), plus this unit's one.
 - **AC7** — When `grep -n 'read_flake_body\|derive_flaked' tools/run-gates/verdict_flow.py
   tools/drift-audit/drift_report.py` runs at the repository root, it names a call of each in each
   file, and `grep -nF 'count("\t") == 2' tools/run-gates/verdict_flow.py tools/drift-audit/drift_report.py`,
-  which names `verdict_flow.py#read_flake_record`'s row test at `a4fd535ed`, names nothing.
+  which names `verdict_flow.py#read_flake_record`'s row test at `e22cdce08`, names nothing.
   Red when: either kit keeps its own copy of the flake row grammar or the flake test.
 - **AC8** — When `python verdict_flow.py --fixture flakes-window` runs in `tools/run-gates/` with the
   kind registered by this unit, it prints `fixture flakes-window ok`: `hold  A  2/10` (v2:1274's
@@ -408,7 +408,7 @@ kickoff manifest.
 
 `drift-audit selftest` · `drift-audit records` · `run-gates canary` · `policy fixtures` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 AC4 · `test_gate_health` over drift's four `--fixture` cases, the short set staged by deleting one row of one leg · `CHECK_FLOOR`, 486 at `a4fd535ed` (PINNED 2026-11-20), raised by the arm's counted checks
+New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 AC4 · `test_gate_health` over drift's four `--fixture` cases, the short set staged by deleting one row of one leg · `CHECK_FLOOR`, 486 at `e22cdce08` (PINNED 2026-11-20), raised by the arm's counted checks
 
 The arm re-observes drift's half of AC2 and AC4; their `verdict_flow.py` halves, AC5, AC7 and AC8 are
 direct observations, since no suite runs `verdict_flow.py --fixture`. `memory-hygiene self-test` re-runs
@@ -471,7 +471,7 @@ AC6's plant, a record of every `TYPED_RECORD_KINDS` member.
   `c6df3e901`, by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is
   unchanged, as the unit writes that path; nothing else moved.
 - rev-6 · 2026-11-20 · §1 · S1 S2 S4 S5 · S6 S7 S8 · §3 · §4 · §5 · AC1 to AC8 · §7 · §8 ·
-  §10 · re-grounded on the tree at `a4fd535ed`, after `TOOL-dWitnessedBar-8` landed at `5944dcc3c`, by
+  §10 · re-grounded on the tree at `e22cdce08`, after `TOOL-dWitnessedBar-8` landed at `dd90f8abb`, by
   the brief `2026-11-19-prompt-TOOL-dWitnessedBar-1-reground-brief`: line citations become `path#symbol`;
   the manifest re-pinned at 219 legs, 118 on the bar (PINNED 2026-11-20); the factory loaded in-process, not run as a
   subprocess, since its `new` is closed over `DOORS` (F4); `--with` counts the record `flakes` just

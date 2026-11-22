@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-3
 
-# TOOL-dWitnessedBar-3 — builder return 1 (run `wf_61d7a898-fd8`), committed 930a5289d
+# TOOL-dWitnessedBar-3 — builder return 1 (run `wf_61d7a898-fd8`), committed 9991872c0
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-3 is built and committed as one pass commit. The spec was bui
 
 ## Summary
 
-TOOL-dWitnessedBar-3 is committed as 930a5289d on top of 2123e2146. The spec header reads CLOSED at 2026-11-20. The commit carries `Pass: TOOL-dWitnessedBar-3`, the Gov-Policy and Proof trailers that policy_edit.py asked for, and three `Decided:` lines.
+TOOL-dWitnessedBar-3 is committed as 9991872c0 on top of 816d4aa91. The spec header reads CLOSED at 2026-11-20. The commit carries `Pass: TOOL-dWitnessedBar-3`, the Gov-Policy and Proof trailers that policy_edit.py asked for, and three `Decided:` lines.
 
 **What was built**
 - **Block table:** new `tools/run-gates/lib-verdict.sh` with `derive_red_blocks`. It is on the runner's KF3 list.

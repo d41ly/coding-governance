@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-51
 
-# TOOL-dWitnessedBar-51 — builder return 2 (run `wf_3454832f-9ef`), committed 7b649d6717fc89dcbaf8f252751717ba6a2d3340
+# TOOL-dWitnessedBar-51 — builder return 2 (run `wf_3454832f-9ef`), committed 55e427e66a73824c5943546e4b4d00d150472073
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-51 is built from spec rev-7 and committed as one pass commit.
 
 ## Summary
 
-Pass commit 7b649d671 on base fc999262b. 57 files changed. Every hook passed on the second attempt.
+Pass commit 55e427e66 on base 99c65d5e3. 57 files changed. Every hook passed on the second attempt.
 
 **Checked from the resumed pass (unverified until now):**
 - S2, S4/S20, S5/S6, S8, S13, S15, S16, S19, S21, S25, S27–S29, S31–S37, S44, S45, S47, S48, S50 and S51 are in the tree and match the spec.

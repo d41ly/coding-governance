@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 29.
 - Built so far through order 28: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59, 30, 29,
-  7, 21 and 6 (`aecf1c95a`, red fix `ff89a2ff5`: `verdict_backends.py`, `remote_verdict.py`,
-  `check_landing_verdict`). This spec, rev-4, was re-grounded over them at `240f53acb`.
+  7, 21 and 6 (`0b7e0fceb`, red fix `b0e8c63b9`: `verdict_backends.py`, `remote_verdict.py`,
+  `check_landing_verdict`). This spec, rev-4, was re-grounded over them at `bfc815174`.
 - This unit builds alone; unit 43 (also order 29) shares `verdict_backends.py` and the policy catalogue with it and
   builds after it. Nothing else is in flight in this working tree, so commit directly here.
 - The driver sits at its refusal-site ceiling (343 sites, 339 armed, DERIVED from unit 21's builder probe); this

@@ -20,6 +20,7 @@
 | [2026-11-19-build-TOOL-dWitnessedBar-13-red-fix-12.md](../build/2026-11-19-build-TOOL-dWitnessedBar-13-red-fix-12.md) | red-fix | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-13-red-fix-13.md](../build/2026-11-19-build-TOOL-dWitnessedBar-13-red-fix-13.md) | red-fix | — |
 | [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
+| [2026-11-22-build-TOOL-dWitnessedBar-13-red-fix-157.md](../build/2026-11-22-build-TOOL-dWitnessedBar-13-red-fix-157.md) | red-fix | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
@@ -308,7 +309,7 @@ block `legacy_ledger_py`, the `[[ledger]]` descriptor table and its govkit regis
 `read_renames`, `compare_to_base`, `carry_renames`, the CLI's three verbs and its `--measured` flag,
 `check_ledger`, the row-plane parameter of the merge driver's row readers, the audit census value
 `ledger-keyed`, the `PARITY_ROWS` row `legacy_ledger_py`, and section `2o`, the first free section of
-part 2, unit 27 having landed `2n` in `cc35bb62c`. Naming cells: each function is asked of the
+part 2, unit 27 having landed `2n` in `8b3aa5783`. Naming cells: each function is asked of the
 lexicon's `--suggest` under `--as py.function` at the pass.
 
 ### Migration
@@ -468,7 +469,7 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC5 AC6 · the disjoint-
   Liveness: the probe names `tools/lib/coverage_join.py` once S9 lands. RESOLVED (agent, 2026-10-25,
   delegated): cite S9 as the import, rung 2; the build run re-grounds on the landed module and, if S9
   is still absent there, stops this unit rather than copying `map_lib`'s functions. widens: none ·
-  relaxes: none. Re-observed 2026-11-19 at `d08ded6f1`: S9 landed in `9cb93347d`, so the probe names
+  relaxes: none. Re-observed 2026-11-19 at `fed701a30`: S9 landed in `9cb93347d`, so the probe names
   `tools/lib/coverage_join.py#compute_coverage` and memory-tree's copy; `resolve_compare_base` sits
   in `tools/lib/compare_base.py#resolve_compare_base` (TOOL-dGroundRules-21 S7), also carried by
   memory-tree's `coverage_join.py` and by `tools/policy/policy.py`. The stop clause does not fire, and
@@ -500,7 +501,7 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC5 AC6 · the disjoint-
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edges of TOOL-dWitnessedBar-51, written by the round-1 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-19 · §1 §2 §3 §4 §5 §6 §7 §8 §10 · S4 S8 S10 AC8 F5 · re-grounded on the tree at
-  `d08ded6f1`: `resolve_compare_base` is imported from `tools/lib/compare_base.py`, and gate-lint's
+  `fed701a30`: `resolve_compare_base` is imported from `tools/lib/compare_base.py`, and gate-lint's
   `coverage_join.py` carries the three blocks memory-tree's does; the factory's behaviour section is
   `2o`, since `2k` to `2m` are taken and unit 27 takes `2n`; one new parity row, the existing rows
   finding the gate-lint copy by marker; `merge` now dispatches the table class first, named in §4,
@@ -508,7 +509,7 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC5 AC6 · the disjoint-
   since `cdfbd1cf`; citations re-pinned as `path#symbol` or blob-pinned; Files touched gains the
   memory-tree README; per brief 2026-11-19-prompt-TOOL-dWitnessedBar-13-reground-brief.
 - rev-4 · 2026-11-19 · §2 §3 §4 §5 §6 §7 §8 §10 · S1 S2 S5 S6 S9 S10 AC1 AC2 AC3 AC4 AC5 AC9 AC10 ·
-  the first builder's six points (run `wf_62b9efd5-0fc`) settled at `5e569d9c9`: `compare --measured`
+  the first builder's six points (run `wf_62b9efd5-0fc`) settled at `e0236c47e`: `compare --measured`
   (F6); AC1 run in the fixture; descriptors read with no tool root (F7); renames span base to
   working tree and re-key the base rows; `carry` writes only a tracked home; the driver's row
   readers take the selected plane. §4 gains "The CLI"; two record citations blob-pinned; per brief
@@ -517,7 +518,7 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC5 AC6 · the disjoint-
 ## 10. Reuse audit
 
 The seams extended are the ones the clause and scout C name, first verified at `cdfbd1cf` and
-re-verified at `d08ded6f1`: the count ratchet `tools/gate-lint/sh_hygiene.py#read_registry` and
+re-verified at `fed701a30`: the count ratchet `tools/gate-lint/sh_hygiene.py#read_registry` and
 `tools/gate-lint/sh_hygiene.py#check_registry`, and their twin
 `tools/gate-lint/encoding_posture.py#read_registry` and `tools/gate-lint/encoding_posture.py#check_registry`,
 both files unchanged since `cdfbd1cf`; the both-ways engine `tools/lib/coverage_join.py#compute_coverage`
@@ -538,7 +539,7 @@ policy kit's shrink-only lists (`tools/policy/policy.py#check_list`) read their 
 same `resolve_compare_base`; the legacy-homes list is TOOL-dWitnessedBar-20's conversion, outside this
 unit.
 
-Rev-4 re-verified these at `5e569d9c9` and extends the driver's row readers that split by
+Rev-4 re-verified these at `e0236c47e` and extends the driver's row readers that split by
 `_ROW_RE`, `tools/memory-tree/merge-rows.py#no_row_loss` and
 `tools/memory-tree/merge-rows.py#structure_identity` among them. Measured rows reuse `read_rows`.
 For finding descriptors no existing seam fits: `tools/govkit/govkit.py#derive_tool_root` needs a
@@ -547,13 +548,13 @@ govkit registry and `tools/lib/resolve_kit_dir.py#resolve_kit_dir` finds one nam
 generic `read` stems and `resolve_kit_dir`.
 
 The lookup `python tools/codebase-map/reuse_lookup.py "a shrink-only keyed baseline of counted sites compared both ways"`,
-re-run at `d08ded6f1`, ranks `resolve_compare_base` (now in `tools/lib/compare_base.py`, memory-tree's
+re-run at `fed701a30`, ranks `resolve_compare_base` (now in `tools/lib/compare_base.py`, memory-tree's
 `coverage_join.py` and `tools/policy/policy.py`) and `derive_baseline_additions` as seams and otherwise
 generic `key` and `count` stems; it does not rank `read_registry`, which scout C and the clause found.
 One disagreement with scout C, kept from rev-1: it places `merge()`'s wiring at
 `tools/memory-tree/merge-rows.py@b4a8ac18daa0:1279-1281`, where at `cdfbd1cf` the class test and the
 postcondition calls are at `tools/memory-tree/merge-rows.py@b4a8ac18daa0:1283-1288`. The recall probe,
-re-run at `d08ded6f1`, returns scout C's row, the systems-retrofit review naming `compute_coverage` as
+re-run at `fed701a30`, returns scout C's row, the systems-retrofit review naming `compute_coverage` as
 the engine, and the brief's item for this unit; none disagrees with source beyond the moves above.
 
 Recall terms used: `python tools/memory-recall/query.py "where is the count ratchet for a keyed registry and how are TSV rows merged" --terms "legacy ledger factory shrink-only registry count ratchet read_registry check_registry merge-rows row-keyed driver compute_coverage"`

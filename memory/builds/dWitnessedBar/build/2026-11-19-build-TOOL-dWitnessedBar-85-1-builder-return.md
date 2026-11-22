@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-85
 
-# TOOL-dWitnessedBar-85 — builder return 1 (run `wf_709652e5-bbb`), committed 0a5a198f6
+# TOOL-dWitnessedBar-85 — builder return 1 (run `wf_709652e5-bbb`), committed 42aa8827c
 
 ## Why
 
-Built as the spec states. I checked every claim spec rev-3 makes about the code against the tree at base e7504f024, and all of them hold: a=0, FLOOR_ASSERTIONS=76, the tail and length calls at :980 and :982, the floor check at :1315, check_key_variant returning 0 only when the variant is seen red, CANARY_KEYS with two words, and the shell-role row at 850. Nothing diverged from the spec.
+Built as the spec states. I checked every claim spec rev-3 makes about the code against the tree at base b4946d5c9, and all of them hold: a=0, FLOOR_ASSERTIONS=76, the tail and length calls at :980 and :982, the floor check at :1315, check_key_variant returning 0 only when the variant is seen red, CANARY_KEYS with two words, and the shell-role row at 850. Nothing diverged from the spec.
 
 ## Summary
 
-TOOL-dWitnessedBar-85 is built and committed as 0a5a198f6. The subject names the unit and the trailer block ends with `Pass: TOOL-dWitnessedBar-85` and Co-Authored-By. It touches only paths that were declared, so no extra --dispatch was needed.
+TOOL-dWitnessedBar-85 is built and committed as 42aa8827c. The subject names the unit and the trailer block ends with `Pass: TOOL-dWitnessedBar-85` and Co-Authored-By. It touches only paths that were declared, so no extra --dispatch was needed.
 
 Changes:
 - **S1:** In the liveness loop of tools/run-gates/run-gates.gov.test.sh, the tail call and the length call of check_key_variant each have `&& a=$((a+1)) ||` on their existing continuation line. This is at the loop's top level, outside the `$(...)`, so `a` only goes up when the call returns 0. That adds 2 per key and 4 across today's two keys.

@@ -9,9 +9,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 8.
 - Built so far: units 26, 27, 48, 49, 50, 13, 15, 61 and 47, and three units that moved this unit's files after its
-  spec was re-grounded: unit 12 (`9dbb7bc44`: a `tag` on every leg, the `leg`, `pack` and `check` namespaces, run-gates
-  1.51, govkit's `LEG_KEY_FLOORS`), unit 22 (`44eb041c6`: `tests` and `enforces` on leg rows and descriptors, selfcheck
-  7h comparing both, selftest run g, canary floor 458) and unit 19 (`7c5a3989a`: a `purpose` on every leg, run-gates
+  spec was re-grounded: unit 12 (`6b3f271c6`: a `tag` on every leg, the `leg`, `pack` and `check` namespaces, run-gates
+  1.51, govkit's `LEG_KEY_FLOORS`), unit 22 (`d92f12115`: `tests` and `enforces` on leg rows and descriptors, selfcheck
+  7h comparing both, selftest run g, canary floor 458) and unit 19 (`e4e4e7ef0`: a `purpose` on every leg, run-gates
   1.52, selfcheck 7h's purpose arms, selftest runs h and i, canary floor 459). Read those files as they stand.
 - The spec is rev-6, re-grounded before units 12, 22 and 19 landed; where their landed code differs from what the spec
   assumed (a key set, a floor, a version, a selftest run letter, a descriptor's row shape), hand it back as a

@@ -30,7 +30,7 @@ in `cmd_selftest` (`tools/memory-tree/row_grammar.py#resolve_shell_ere`), keeps 
 (`tools/memory-tree/row_grammar.py@2b622305:1945`), with a bare `bash` second. `TOOL-dWitnessedBar-26`'s
 site table omits it, and its query as landed (`tools/run-gates/measure_legs.py#scan_bare_bash`) misses
 it: shape 2 needs both exact constants `bash.exe` and `bash`, and shape 1 a literal argv head or an `or`
-falling back to the name. Unit 26's AC7 reads `[]` at `88352ca5` with the copy present (PINNED,
+falling back to the name. Unit 26's AC7 reads `[]` at `a50c0a56` with the copy present (PINNED,
 measured 2026-11-19), against the goal that the one resolver is the only way a gov Python file finds a
 bash. This unit takes the report's fix. It repairs `TOOL-dWitnessedBar-26`.
 
@@ -46,7 +46,7 @@ bash. This unit takes the report's fix. It repairs `TOOL-dWitnessedBar-26`.
 - **S3** — A membership test is not a launch. A literal that is the right operand of an `in` or
   `not in` comparison spawns nothing and is skipped by shape 2, so a test such as
   `argv[0] not in ("bash", "bash.exe")` stays out of the query. No tracked file holds one at
-  `88352ca5`: `resolve_shell_argv`, whose literal this item was written for, now tests
+  `a50c0a56`: `resolve_shell_argv`, whose literal this item was written for, now tests
   `argv[0] not in BASH_NAMES` (`tools/govkit/upgrade_steps.py@a814a6ae:491`), and the rule stays for
   the class and for `TOOL-dWitnessedBar-51` S18, which reads it (§8 F2). Observed by AC2.
 
@@ -83,7 +83,7 @@ bash. This unit takes the report's fix. It repairs `TOOL-dWitnessedBar-26`.
   constants are spelled where no tracked list holds them beside `bash`.
 - The scan lists a language with no tracked file read as a line of its own
   (`tools/run-gates/measure_legs.py@95b532a7:2744`), so each fixture repo of AC2 also tracks one `.js`.
-- The widened shape over the tree at `88352ca5` finds one literal outside a block, row_grammar's list
+- The widened shape over the tree at `a50c0a56` finds one literal outside a block, row_grammar's list
   above, and no membership comparator; every `BASH_NAMES` tuple it also matches sits inside a
   `resolve_bash_py` block (PINNED, measured 2026-11-19 with an `ast` probe over 241 tracked `*.py`).
 - The parity row finds its copies by a `git grep` of the block marker
@@ -167,13 +167,13 @@ New arm: tools/run-gates/measure_legs.py · covers AC2 · `test_no_bare_bash_arg
   `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
 - **F2 — Does S3's membership rule stay once its one instance is gone?** Unit 26 rewrote
   `resolve_shell_argv` to test `argv[0]` against `BASH_NAMES`, so no tracked comparator holds a literal
-  pair at `88352ca5`. Options: (a) keep S3, so shape 2 skips a membership comparator and AC2's second
+  pair at `a50c0a56`. Options: (a) keep S3, so shape 2 skips a membership comparator and AC2's second
   fixture observes it; (b) drop S3 and AC2's second fixture, so a membership literal is listed as a
   launch and answered by reading `BASH_NAMES`, as unit 26's F5 did. (b) fails AC2 as written, veto 1,
   and strands `TOOL-dWitnessedBar-51` S18, which consumes the rule; and a fork is not decided by a
   signal reading zero (M3's counter-rule). RESOLVED (agent, 2026-11-19, delegated): (a), the one
   option M3's veto 1 leaves. widens: none · relaxes: shape 2 stops listing a membership comparator
-  holding both names, which the shape at `88352ca5` lists; none is tracked there
+  holding both names, which the shape at `a50c0a56` lists; none is tracked there
 
 ## 9. Revision log
 
@@ -186,7 +186,7 @@ New arm: tools/run-gates/measure_legs.py · covers AC2 · `test_no_bare_bash_arg
   `policy fixtures`, whose manifest guard holds the §4 path `tools/memory-tree/row_grammar.py`, per
   brief 2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief; nothing else moved.
 - rev-4 · 2026-11-19 · §1 §2 §3 §4 §6 §7 §8 §10 · S3 AC2 · re-grounded on unit 26 as landed at
-  `88352ca5`: citations re-pinned as `path#symbol` or blob-pinned; S3 names `resolve_shell_argv` in
+  `a50c0a56`: citations re-pinned as `path#symbol` or blob-pinned; S3 names `resolve_shell_argv` in
   `upgrade_steps.py` reading `BASH_NAMES`, and F2 keeps its rule; §4 Evidence re-derives the widened
   shape's population and drops `resolve-python.test.sh` from Files touched, its parity row finding the
   copy by marker; AC2's fixtures each track one `.js`, which the scan now requires; the leg line gains
@@ -197,7 +197,7 @@ New arm: tools/run-gates/measure_legs.py · covers AC2 · `test_no_bare_bash_arg
 
 The seams are unit 26's `resolve_bash_py` block, carried to one more site under its parity row, and
 `scan_bare_bash` (`tools/run-gates/measure_legs.py#scan_bare_bash`), widened in place; both re-verified
-at `88352ca5`. `python tools/codebase-map/reuse_lookup.py "find every bash candidate list a python file
+at `a50c0a56`. `python tools/codebase-map/reuse_lookup.py "find every bash candidate list a python file
 probes"`, re-run 2026-11-19, ranked `probe`, `resolve_bash` (the adapters unit 26 landed),
 `run_probe` and generic file and list readers; it did not surface `resolve_shell_ere`, which the
 report's grep found, so the map's blind spot is the nested function this unit adapts.

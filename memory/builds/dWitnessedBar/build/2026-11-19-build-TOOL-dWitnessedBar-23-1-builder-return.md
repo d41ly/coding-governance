@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-23
 
-# TOOL-dWitnessedBar-23 — builder return 1 (run `wf_3bc39100-b9a`), committed 66ad2ab395754a0e29455285d5ad3c9cbb096a30
+# TOOL-dWitnessedBar-23 — builder return 1 (run `wf_3bc39100-b9a`), committed ea0716032b110497575c5d0975d99952a2969200
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-23 is built as its spec says and committed as one pass commit
 
 ## Summary
 
-Built TOOL-dWitnessedBar-23 in commit 66ad2ab39 (base 853fc00ea). It adds the `gov-tester` role to the roles kit and covers S1 to S7.
+Built TOOL-dWitnessedBar-23 in commit ea0716032 (base 367eac1e4). It adds the `gov-tester` role to the roles kit and covers S1 to S7.
 
 **What changed**
 - New role file `tools/roles/agents/gov-tester.agent.md`, with the spec's front matter word for word. Its body is 1649 bytes against a 3072-byte ceiling. (DERIVED from the builder's probe)

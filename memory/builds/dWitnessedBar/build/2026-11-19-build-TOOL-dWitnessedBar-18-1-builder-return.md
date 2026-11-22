@@ -6,7 +6,7 @@
 
 DIVERGENCE: the spec's `landed-steps` population (S3, S4, §4 "The populations" and Migration, AC1, AC5, §7, §8 F6) is graded by `ratchet (both ways)` against a seed whose output depends on `origin/main`, which moves outside the commit being graded. Under the spec as written, the act AC5 calls green reds a leg on §7's own line, and the population goes red the moment the build lands.
 
-Evidence from the tree at 4472a6338:
+Evidence from the tree at 03b75c054:
 (1) `tools/memory-tree/ratchet.py#run_both_ways` runs the seed of each registration naming that leg and compares counts through `LL.compare_counts`. Under `append-only`, a declared row the seed does not print is an `unmeasured row` (red), and a measured key with no row is an `undeclared site` (red).
 (2) The seed has to print landed ids only. S3 says "one row per landed step id", §4 pins "landed steps 5 of 16 step rows against the landed ref origin/main", and AC1 requires the row count to equal the seed's line count. `upgrade_steps.py#cmd_list` derives landed through `resolve_landed_ref` (the remote ladder, `origin/main`). `python tools/govkit/upgrade_steps.py list` at HEAD prints 24 step rows, 5 landed and 19 unlanded (rows 6-24, unit 16/17's `*-to-ledger` steps).
 (3) So AC5's "adding a new step row and its ledger row exits 0" holds for `never-gains` but reds `both-ways`: the new step is unlanded, so its row is an `unmeasured row`. Leaving the row out is the only way to keep the bar green at the close.
@@ -36,7 +36,7 @@ I stopped before writing any code: one design defect in the spec blocks TOOL-dWi
 The problem is the `landed-steps` population. Its seed counts only steps already on `origin/main`, and `ratchet (both ways)` compares the ledger against that seed. So adding a step row together with its ledger row (green under AC5) turns `ratchet (both ways)` red, and leaving the row out turns it red once the build lands. At HEAD that means 19 steps plus this unit's own new step. `upgrade_steps.py list` shows 24 step rows, 5 of them landed.
 
 Checks that ran (all read-only):
-- `git rev-parse HEAD`, which gave the base 4472a6338.
+- `git rev-parse HEAD`, which gave the base 03b75c054.
 - `unattended.sh --brief`, which reported the brief already recorded and unchanged.
 - Each symbol, path and line the spec cites, looked up in the source.
 - Row counts, field shapes and duplicate checks on the four list files, using the spec's own `grep`/`cut` forms.
@@ -49,4 +49,4 @@ Not run here, owed at the close once the spec is revised and the unit rebuilt:
 - AC1 to AC7.
 - The `New arm:` `append-removed` plant in `ratchet selftest`: its red-first, then green observation is owed.
 
-The gotchas checklist (`gotchas.py --for-diff`) did not run because there is no commit to check. The working tree is clean at 4472a6338.
+The gotchas checklist (`gotchas.py --for-diff`) did not run because there is no commit to check. The working tree is clean at 03b75c054.

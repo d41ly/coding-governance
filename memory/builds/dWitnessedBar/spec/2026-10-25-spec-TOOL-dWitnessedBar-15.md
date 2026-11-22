@@ -350,7 +350,7 @@ New arm: tools/codebase-map/adopt-codebase-map.test.sh · covers AC7 · a second
   `node:item.test.seed` and flow-steps' tag, beyond what the tree forces; (c) is (a) unstated. The
   owner's pick in F4 stands; this fork words its ask. Recommendation (a). RESOLVED (agent,
   2026-11-19, delegated): (a); the ask filed in `memory/builds/dDeclaredLoop/BACKLOG.md`, absent there
-  at `a30a26466`, reads F4's sentence and then "A row naming `program` keeps its tag's step segment,
+  at `632894bd1`, reads F4's sentence and then "A row naming `program` keeps its tag's step segment,
   such as `item.test.seed`, and `check_program` grades it under the program it names, as
   TOOL-dDeclaredLoop-50 grades `item.review.<name>` rows". widens: none · relaxes: none
 - **F8 — How does each adopter find memory-tree's `legacy_ledger.py`?** Neither adopter resolves the
@@ -388,7 +388,7 @@ New arm: tools/codebase-map/adopt-codebase-map.test.sh · covers AC7 · a second
   `tools/loop/loop.toml` with `program = "adopt"` and `returns = "none"`, by the two asks filed in
   dDeclaredLoop's `BACKLOG.md`; nothing else moved.
 - rev-8 · 2026-11-19 · S3 S5 S6 · §3 · §4 The rule · §4 The item · §4 Files touched · §5 · AC6 · AC8
-  · §7 · §8 F6 F7 F8 · §10 · re-grounded on the tree at `a30a26466` by the brief
+  · §7 · §8 F6 F7 F8 · §10 · re-grounded on the tree at `632894bd1` by the brief
   `2026-11-19-prompt-TOOL-dWitnessedBar-15-reground-brief`: the policy reader and the catalogue row
   `retrofit.unseeded` have landed, so S3 reads the key through `policy.py get` (F6) and AC6 stages a
   committed policy file; the loop kit has landed and `check_program` refuses the row today, so F7
@@ -398,7 +398,7 @@ New arm: tools/codebase-map/adopt-codebase-map.test.sh · covers AC7 · a second
 
 ## 10. Reuse audit
 
-The seams extended are the absent-only guards the design names, re-verified at `a30a26466`: the
+The seams extended are the absent-only guards the design names, re-verified at `632894bd1`: the
 codebase-map adopter's test (`tools/codebase-map/adopt-codebase-map.sh@f64a75b312c4:350`) and the
 drift-audit adopter's (`tools/drift-audit/adopt-drift-audit.sh@de36607714d0:393`), each moved since
 `cdfbd1cf`, where rev-1 read them a line or two from where scout C cited them; plus
@@ -409,11 +409,11 @@ has already passed. The reader seams are the policy kit's `get` (§8 F6) and eac
 `resolve_kit_dir` (§8 F8). The lookup
 `python tools/codebase-map/reuse_lookup.py "seed a population only when it is absent"`, with the
 words `and record a failed seed unarmed` appended, ranked generic `absent`, `seed` and `records` stems in test
-files and no seam, at `cdfbd1cf` and again at `a30a26466`; scout C's search named `checkUnarmed`
+files and no seam, at `cdfbd1cf` and again at `632894bd1`; scout C's search named `checkUnarmed`
 and `DECLARED_EMPTY` and found neither a seed, and `git grep -nE 'def \w*(unarmed|seed)\w*\('` over
-`tools` at `a30a26466` finds only fixture helpers and gen_map's own seed functions, so for
+`tools` at `632894bd1` finds only fixture helpers and gen_map's own seed functions, so for
 unarmed reporting no existing seam fits. The recall probe returned scout C's row, the brief's I5,
-`retrofit.md:310` and the systems-retrofit review's laundering probe, and at `a30a26466` also
+`retrofit.md:310` and the systems-retrofit review's laundering probe, and at `632894bd1` also
 DEPL-dShippedRelease-2's scout, which plans to reuse S2's unarmed line; none disagreed with source.
 
 Recall terms used: `python tools/memory-recall/query.py "how does test.seed seed only an absent population and record a failed seed unarmed" --terms "test.seed seed absent population unarmed dead probe retrofit.unseeded widened adopt guard re-seed mask ratchet"`

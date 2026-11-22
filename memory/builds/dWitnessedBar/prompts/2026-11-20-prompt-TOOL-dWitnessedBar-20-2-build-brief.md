@@ -9,7 +9,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 13.
 - Built so far through order 12: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14, 45, 54, 16, 46, 17
-  (`dbbd8caba`: `{prefix}` resolved in seed argvs by the factory), 52, 53 and 18 (`0519457ea`: the playbook lists
+  (`9a29f1e96`: `{prefix}` resolved in seed argvs by the factory), 52, 53 and 18 (`c91fc4e55`: the playbook lists
   registered, `instructions-legacy.txt` moved to `memory/project/`).
 - The first builder stopped before writing code; its return is
   `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-20-1-builder-return.md`. The spec is now

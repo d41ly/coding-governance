@@ -57,7 +57,7 @@ the `for rec_fp` line it prints. It builds after `TOOL-dWitnessedBar-76` at orde
   once. Observed by AC1.
 - **S2** — Unit 72 AC1's staged red is recorded with its line. At the close, on a Windows node, the
   main loop stages in a scratch clone's `.githooks/pre-push` the `fingerprint` edit
-  `TOOL-dWitnessedBar-76` S3's loop writes at `648a4d5d5`, `fingerprint) rec_fp=${_rg_v%?} ;;`.
+  `TOOL-dWitnessedBar-76` S3's loop writes at `a85424f0f`, `fingerprint) rec_fp=${_rg_v%?} ;;`.
   Unit 72's acceptance ledger records it as a second line opening `- AC1 — ` under its
   `**Evidences:** TOOL-dWitnessedBar-72` block. The line quotes the printed `for rec_fp` line, states
   that no line holding `for rec_sha` or `for count` printed, and names the `uname -s` it ran under
@@ -66,9 +66,9 @@ the `for rec_fp` line it prints. It builds after `TOOL-dWitnessedBar-76` at orde
 ## 3. Non-goals (OUT)
 
 - The slot and its `count <n>`, `rec_sha` and `rec_fp` values, which are `TOOL-dWitnessedBar-75`'s,
-  CLOSED at `1b3295a52`.
+  CLOSED at `5b7349498`.
 - `CANARY_KEYS`, `check_canary_keys` and the per-key liveness loop, which are
-  `TOOL-dWitnessedBar-76`'s, CLOSED at `bdc10a4df`. Its liveness lines are unchanged.
+  `TOOL-dWitnessedBar-76`'s, CLOSED at `3596751cf`. Its liveness lines are unchanged.
 - The slot's `unread` value for a read failure, `TOOL-dWitnessedBar-84` S13's.
 - The `for count 2` record of unit 72 AC1's `$(awk ...)`-plus-strip break, `TOOL-dWitnessedBar-84`
   S5's.
@@ -92,7 +92,7 @@ the `for rec_fp` line it prints. It builds after `TOOL-dWitnessedBar-76` at orde
 
 ### Evidence
 
-Probed at `648a4d5d5` (PINNED 2026-11-21) under `uname -s` `MINGW64_NT-10.0-22621`,
+Probed at `a85424f0f` (PINNED 2026-11-21) under `uname -s` `MINGW64_NT-10.0-22621`,
 GNU bash 5.3.9 `x86_64-pc-cygwin` and GNU sed 4.9 (PINNED 2026-11-21). The probe sourced the suite's
 `check_cr_reached`, `CANARY_KEYS` and `check_canary_keys`, cut the hook's `read_green_file`, and
 read a hand-built record laid out as the AC12 arm's record, which `TOOL-dWitnessedBar-68` S1 and
@@ -141,8 +141,8 @@ None: no stored data changes.
 ### Rollout
 
 Live at landing, at order 41, after `TOOL-dWitnessedBar-72` and `TOOL-dWitnessedBar-75` (order 40,
-CLOSED at `e0cf5fa91` and `1b3295a52`). Order 41's `TOOL-dWitnessedBar-73` and `-76` are CLOSED at
-`71f212ad1` and `bdc10a4df`. Dispatch is strictly sequential and sorts a tie by id string
+CLOSED at `fa536b7cd` and `5b7349498`). Order 41's `TOOL-dWitnessedBar-73` and `-76` are CLOSED at
+`563d828df` and `3596751cf`. Dispatch is strictly sequential and sorts a tie by id string
 (`tools/workflows/unattended-build.js@648a4d5d5:78-82`, `:692-697`), so this unit builds next, before
 `TOOL-dWitnessedBar-79`, `-80` and `-81`. Units 79 and 80 also edit
 `tools/run-gates/run-gates.gov.test.sh`, and unit 81 writes under `memory/builds/dWitnessedBar/build/`,
@@ -151,7 +151,7 @@ where S2's ledger sits, so none of them builds beside this unit.
 ### Files touched (estimate)
 
 - `tools/run-gates/run-gates.gov.test.sh`: S1's array and loop around the one emission statement.
-- `memory/project/shell-role.txt`: the suite's row reads 784 (PINNED 2026-11-21 at `648a4d5d5`),
+- `memory/project/shell-role.txt`: the suite's row reads 784 (PINNED 2026-11-21 at `a85424f0f`),
   and `sh_hygiene.py`'s `measure_code_lines` measures it at 784 (PINNED 2026-11-21). When S1 grows
   the suite past the row, the pass widens it with
   `python tools/memory-tree/ratchet.py widen shell-role --key tools/run-gates/run-gates.gov.test.sh --reason "TOOL-dWitnessedBar-77 S1" --unit TOOL-dWitnessedBar-77`,
@@ -225,7 +225,7 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 · one canary line 
   delegated): (a), rung 3, the precedent `TOOL-dDeclaredLoop-36` §8 F1 set.
   widens: none · relaxes: none
 - **F2 — What does this unit build once unit 75 §8 F3 landed the `rec_fp` value?** The `fingerprint`
-  variant already prints `for rec_fp` at `648a4d5d5` (§4 Evidence), so rev-3's AC1 passes before any
+  variant already prints `for rec_fp` at `a85424f0f` (§4 Evidence), so rev-3's AC1 passes before any
   build. Options: (a) S1 is the one-line-per-variable printing alone, and AC1 and the New arm stage a
   break losing both keys' CRs, which HEAD prints as `for rec_sha` alone; (b) keep rev-3's AC1, an arm
   never seen red against the code it guards; (c) close the unit as built, dropping the printing unit

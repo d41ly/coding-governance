@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 27.
 - Built so far through order 26: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59, 30, 29
-  (`b0ad98958`: the `gate-warn` marker) and 7 (`28edeaa0b`: `seen_red.py`, `read_evidence_lines` in `tree_lib.py`).
-  This spec, rev-4, was re-grounded at `0f0e2ad5c`, before units 29 and 7 landed; verify every claim against HEAD.
+  (`79a4f9c20`: the `gate-warn` marker) and 7 (`636ec0364`: `seen_red.py`, `read_evidence_lines` in `tree_lib.py`).
+  This spec, rev-4, was re-grounded at `f063d1c73`, before units 29 and 7 landed; verify every claim against HEAD.
 - This unit builds alone; nothing else is in flight in this working tree, so commit directly here.
 - The pass legs carry one known red: install-prefix on the `conf-scalar-pins` seed argv in
   `tools/memory-tree/kit.toml`, held until unit 51. The full `memory hygiene` leg is red at base on checks 13 and 15

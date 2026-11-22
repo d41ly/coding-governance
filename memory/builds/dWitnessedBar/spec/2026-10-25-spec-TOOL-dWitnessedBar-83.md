@@ -31,10 +31,10 @@ The round-1 spec audit of units 74 to 78
 confirmed finding **id 14 at HIGH**, report item **H2**. Id 2 shares that item and takes
 `TOOL-dWitnessedBar-82`.
 
-`TOOL-dWitnessedBar-73` S15 stated `FLOOR_ASSERTIONS=72` at unit 73's pass, `71f212ad1`, and its
+`TOOL-dWitnessedBar-73` S15 stated `FLOOR_ASSERTIONS=72` at unit 73's pass, `563d828df`, and its
 rev-5 AC15 holds the `PASS (<n> assertions)` equality in a scratch clone at that pass commit, naming
 this unit for the close's. Units built after `TOOL-dWitnessedBar-73` add executed assertions:
-`TOOL-dWitnessedBar-78` (`253e21771`) added two, and `TOOL-dWitnessedBar-82` (`47ab62ebf`) restated
+`TOOL-dWitnessedBar-78` (`0e5103294`) added two, and `TOOL-dWitnessedBar-82` (`e8cdc8e3c`) restated
 the floor at 74 (`2026-11-19-build-TOOL-dWitnessedBar-82-1-builder-return`). Units 84, 85, 88, 89 and
 90 declare gov-canary arms after that, and each restates the floor for its own (`TOOL-dWitnessedBar-84`
 S14, `TOOL-dWitnessedBar-85` S2, `TOOL-dWitnessedBar-88` S7, `TOOL-dWitnessedBar-89` S10,
@@ -63,7 +63,7 @@ after `TOOL-dWitnessedBar-82` within order 43, and closes that order alone.
   `2026-11-19-build-TOOL-dWitnessedBar-73-1-acceptance-ledger` a clause naming `TOOL-dWitnessedBar-83`
   AC2 as the close's equality, since the units after unit 73 in S1's list add arms after its pass.
   At the close the main loop writes, on that same line, the `PASS` count unit 73 AC15 owes from a
-  scratch clone at `71f212ad1`, beside the floor that line already records, so the line holds both
+  scratch clone at `563d828df`, beside the floor that line already records, so the line holds both
   numbers and the name. Observed by AC3.
 
 ## 3. Non-goals (OUT)
@@ -126,7 +126,7 @@ None: no stored data changes.
 
 ### Rollout
 
-The pass takes order 43 after `TOOL-dWitnessedBar-82` (`47ab62ebf`) and builds alone. It writes S3's
+The pass takes order 43 after `TOOL-dWitnessedBar-82` (`e8cdc8e3c`) and builds alone. It writes S3's
 clause and this unit's ledger, with the AC1 to AC3 observations OWED to the main loop. Those are made
 at the close, after every unit this run builds is terminal, which is after `TOOL-dWitnessedBar-90` at
 order 47, the owner S1 names today. `TOOL-dWitnessedBar-28` is deferred by the run and is not waited on.
@@ -227,7 +227,7 @@ No code file and no other record.
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edge of TOOL-dWitnessedBar-88, promoted by the round-1 spec audit of units 79 to 84; nothing else
   moved.
-- rev-3 · 2026-11-21 · §1 · S1 · S2 · S3 · §3 · §4 · AC1 · §8 · §10 · re-grounded at `8519d2244`
+- rev-3 · 2026-11-21 · §1 · S1 · S2 · S3 · §3 · §4 · AC1 · §8 · §10 · re-grounded at `c7f045506`
   under `2026-11-19-prompt-TOOL-dWitnessedBar-83-reground-brief`: units 73, 78 and 82 as landed, the
   owner now `TOOL-dWitnessedBar-90` over 28 specs (PINNED 2026-11-21), unit 28's arm out of scope, S3's writer and line,
   AC1's comment read on the side the later units state (F3), Rollout and Files touched listed

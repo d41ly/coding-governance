@@ -217,7 +217,7 @@ AC1's FULL half is re-observed by the landed `RP TOOL-dWitnessedBar-56 AC7` arm,
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-63's
   consumes-from edge, promoted by the round-1 spec audit of units 58 to 62; nothing else moved.
 - rev-3 · 2026-11-20 · S1 · S2 · S3 · §3 · §4 · §5 · AC1 · AC2 · AC3 · §7 · §8 F2 · §10 · re-grounded at
-  `382de393` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-58-reground-brief: every line citation
+  `6dc6b3fd` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-58-reground-brief: every line citation
   blob-pinned at HEAD; S1's FULL half and S2's decline found armed by units 56 and 40, so S1 keeps the
   inherited-green capture and S2 becomes one assertion after unit 56's `AC8` run (F2); the floor chained
   309 to 310; AC2 reads the landed leg's `base_from_seen`; AC3 graded on the ledger line HEAD left owed;
@@ -230,7 +230,7 @@ The seams are the hook suite's `IR AC4` inherited-green push
 (`@e054b306:1189`), plus the evidence suite's unit-40 fixture manifest and unit 56's `AC8` run
 (`tools/run-gates/run-gates.evidence.test.sh@8ce5496e:886-920`) that S2 extends by one assertion.
 `python tools/codebase-map/reuse_lookup.py "observe an environment knob the hook exports to the bar"`,
-re-run at `382de393`, ranked `export` (memory-recall), `enumerate_exports` and `check_bar`, none a
+re-run at `6dc6b3fd`, ranked `export` (memory-recall), `enumerate_exports` and `check_bar`, none a
 capture of a bar's environment, so no existing seam fits beyond the arms named, which were found by
 reading the two suites.
 

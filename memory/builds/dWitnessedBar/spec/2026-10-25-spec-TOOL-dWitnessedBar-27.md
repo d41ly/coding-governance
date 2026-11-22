@@ -154,7 +154,7 @@ the function, and the refusal is the next statement after the block, so it runs 
 A **sourcer member** carries no block and sources the canonical `resolve-python.sh`. The line after
 that source sources `refuse-wrong-shell.sh` from the same directory, spelling the file name
 literally, which is the pattern `TOOL-dWitnessedBar-57` S1 reads. The next line is
-`refuse_wrong_shell || exit 2`. The six sourcers (PINNED, 2026-11-19 at `88352ca59`) and the line each
+`refuse_wrong_shell || exit 2`. The six sourcers (PINNED, 2026-11-19 at `a50c0a56c`) and the line each
 edit follows:
 
 | Sourcer | Its source of the canonical | Its new source line |
@@ -181,7 +181,7 @@ scratch lib dir therefore copies a file with no new dependency: the run-gates su
 A fixture that copies a sourcer into a scratch lib dir and runs it there would reach
 `refuse_wrong_shell || exit 2` with no sibling to define it, and exit 2. Each such copy adds
 `refuse-wrong-shell.sh` to the files it copies. The copies are five lines (PINNED, 2026-11-19 at
-`88352ca59`), re-derived by
+`a50c0a56c`), re-derived by
 `git grep -n -E 'cp .*(pyrun|python-floor)\.sh|_rels=.*pyrun' -- '*.test.sh'`:
 
 - `tools/memory-tree/merge-rows.test.sh@8ee4551fce97:850`, `:1903` and `:1961`, each copying
@@ -197,7 +197,7 @@ The commit-msg fixture of `tools/memory-tree/transition-audit.test.sh` copies th
 Every tracked shell file under `tools/`, `skills/` and `.githooks/` that carries a
 `# >>> resolve_python` block, less the library, plus every one that sources the canonical
 `resolve-python.sh` and calls `resolve_python`, less `.githooks/pre-commit` (§3).
-Measured at `88352ca59` (PINNED, 2026-11-19):
+Measured at `a50c0a56c` (PINNED, 2026-11-19):
 
 - `git grep -l '^# >>> resolve_python' -- tools skills .githooks` lists 83 files (PINNED); less the
   library, 82 inline members (PINNED).
@@ -253,7 +253,7 @@ order against `resolve_python`, which is unit 51's; and a fixture's copy set, wh
 
 ### The resolver sites
 
-The `resolve_bash_py` and `resolve_bash_js` copies at `88352ca59` are 15 (PINNED, 2026-11-19).
+The `resolve_bash_py` and `resolve_bash_js` copies at `a50c0a56c` are 15 (PINNED, 2026-11-19).
 `git grep -l -E '^(# |// )>>> resolve_bash_(py|js)' -- tools skills .githooks` re-derives them: it
 lists 17 files (PINNED), the copies and the two canonicals. `tools/govkit/govkit.py` holds none:
 it binds `resolve_shell_argv` from `tools/govkit/upgrade_steps.py`
@@ -269,7 +269,7 @@ it binds `resolve_shell_argv` from `tools/govkit/upgrade_steps.py`
 Minted: `tools/lib/refuse-wrong-shell.sh`, the block `refuse_wrong_shell`, the functions
 `wrong_shell_at`, `refuse_wrong_shell`, `wrongShellAt` and their `--probe` mode, the `wrongShellAt`
 export of `resolve_bash.js`, the `PARITY_ROWS` row, the coverage arm, section `2n` and the
-`help/python-floor.md` section. Section `2n` follows `2m`, the last section of part 2 at `88352ca59`
+`help/python-floor.md` section. Section `2n` follows `2m`, the last section of part 2 at `a50c0a56c`
 (`tools/lib/resolve-python.test.sh@caa9482acf3a:941`). Naming cells: each function is asked of the
 lexicon's `--suggest` under `--as sh.function`, `py.function` or `js.function` at the pass.
 
@@ -317,7 +317,7 @@ Live at landing in every entry point. No switch: the refusal fires only on the d
 - `tools/runlog/selftest.py`
 - `tools/settings-merge.py`
 - `tools/unattended/stop-guard.js`
-- the population, derived at `88352ca59` (its fixture edits fall in members already listed):
+- the population, derived at `a50c0a56c` (its fixture edits fall in members already listed):
 - `.githooks/commit-msg`
 - `.githooks/pre-push`
 - `.githooks/pre-push.runlog.test.sh`
@@ -450,7 +450,7 @@ Live at landing in every entry point. No switch: the refusal fires only on the d
   with one member's call cut, the comparison names that file, and with a new `.sh` carrying only a
   `resolve_python` block, it names that file too.
   Red when: an entry point resolves python with no refusal before it.
-  figure: the comparison re-derives both sets, DERIVED; §4 "The population" pins 88 at `88352ca59`.
+  figure: the comparison re-derives both sets, DERIVED; §4 "The population" pins 88 at `a50c0a56c`.
 - **AC6** — When `python resolve_bash.py` and `node resolve_bash.js` run under `wsl.exe` from this
   worktree's `tools/lib/`, each exits 2 with the wrong-shell refusal and no `tried:` line.
   Red when: the resolver tries a candidate before judging its own location.
@@ -530,7 +530,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC5 AC7 · the `refuse_wrong
   and `tools/policy/check_policy.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief;
   nothing else moved.
 - rev-5 · 2026-11-19 · S2 S3 S4 S5 S6 · §3 · §4 · §5 · AC1 AC5 AC6 AC8 AC9 · §7 · §8 · §10 ·
-  re-grounded at `88352ca59` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-27-reground-brief,
+  re-grounded at `a50c0a56c` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-27-reground-brief,
   settling the first builder's four defects: the new section is `2n`, since `2k` to `2m` are taken;
   the population is re-pinned at 88 (PINNED) with its 14 new members (PINNED) listed,
   `.githooks/pre-commit` left to unit 50 and the prose-only mentions named outside; the resolver
@@ -545,7 +545,7 @@ Scout C recorded "no seam fits" for the predicate (`git grep` for `/mnt/`, `WSL_
 `microsoft-standard` and `osrelease` over `*.sh`, `*.py` and `*.js` returned nothing), and so did
 the lookup `python tools/codebase-map/reuse_lookup.py "refuse a script started by the wrong shell"`
 with the words `on a mounted windows drive` appended, which ranked only refusal classes and
-`resolve_shell_argv`; re-run at `88352ca59` on 2026-11-19, it ranks the same kinds and no predicate.
+`resolve_shell_argv`; re-run at `a50c0a56c` on 2026-11-19, it ranks the same kinds and no predicate.
 Two precedents sit in `tools/run-gates/run-held-wsl.sh`: its WSL half refuses a tree under `/mnt/*`
 (`tools/run-gates/run-held-wsl.sh@75984c4253d7:292`) and its Windows side refuses a `uname -s` that
 is not MINGW, MSYS or CYGWIN (`tools/run-gates/run-held-wsl.sh@75984c4253d7:307`); this unit
@@ -553,6 +553,6 @@ generalises the first to every entry point. The carrier is the inline-block mech
 `tools/lib/resolve-python.test.sh` (`PARITY_ROWS`, `tools/lib/resolve-python.test.sh@caa9482acf3a:378`),
 and the population is the one the `resolve_python` block already reaches. The sourcer shape reuses
 the one `tools/lib/pyrun.sh` takes for the resolver itself. The recall probe returned scout C's row,
-the brief's I7 and `TOOL-dSettledRoster-3`; none disagreed with source at `88352ca59`.
+the brief's I7 and `TOOL-dSettledRoster-3`; none disagreed with source at `a50c0a56c`.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a gov script refuse when WSL bash runs it from a Windows checkout under /mnt" --terms "wrong-shell WSL /mnt drvfs Windows checkout entry point refuse Git bash mirror ext4 resolve_python"`

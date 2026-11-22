@@ -126,7 +126,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
 2. A choice the re-ground forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it
    RESOLVED in §8 with the delegated mark, and name it in your return.
 3. The first builder's return, `build/2026-11-19-build-TOOL-dWitnessedBar-27-1-builder-return.md`, names four
-   defects measured at `88352ca59`; settle each: section `2k` of `tools/lib/resolve-python.test.sh` is taken (`2k`,
+   defects measured at `a50c0a56c`; settle each: section `2k` of `tools/lib/resolve-python.test.sh` is taken (`2k`,
    `2l`, `2m` exist), so name a free section; the population is no longer the PINNED 75 (the builder counted 83
    carriers and 95 with the files naming `resolve-python.sh`), with twenty entry points missing from Files touched and
    four prose-only mentions; `tools/govkit/govkit.py` holds no `resolve_bash_py` block while

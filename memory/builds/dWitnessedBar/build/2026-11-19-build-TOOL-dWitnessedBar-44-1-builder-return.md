@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-44
 
-# TOOL-dWitnessedBar-44 — builder return 1 (run `wf_d566f269-487`), committed acd04756e3efbb052507d628da0055ae44f992eb
+# TOOL-dWitnessedBar-44 — builder return 1 (run `wf_d566f269-487`), committed 9de4bf5cd0aeb27452ee8e424dd93069a43420bd
 
 ## Why
 
-TOOL-dWitnessedBar-44 is built to spec rev-4 and its spec status is now CLOSED in the same pass commit. The spec's claims about the code held when I checked them. The step row still reads `unlanded` (`upgrade_steps.py list`) and 930a5289d is on neither main nor origin/main, so the widening could go into inherited_red.py itself instead of shipping as a new step.
+TOOL-dWitnessedBar-44 is built to spec rev-4 and its spec status is now CLOSED in the same pass commit. The spec's claims about the code held when I checked them. The step row still reads `unlanded` (`upgrade_steps.py list`) and 9991872c0 is on neither main nor origin/main, so the widening could go into inherited_red.py itself instead of shipping as a new step.
 
 ## Summary
 
-Commit acd04756e (base c9b50206f) has the `Pass: TOOL-dWitnessedBar-44` trailer.
+Commit 9de4bf5cd (base fc3ffe414) has the `Pass: TOOL-dWitnessedBar-44` trailer.
 
 **The change:**
 - C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/govkit/steps/inherited_red.py now reads `INHERITED_RED` from two files: `.githooks/gate-env.sh` and the file `.unattended.conf`'s `GATE_POLICY_FILE` names. A blank or absent key, or no conf, means the gate file is read once.
@@ -36,7 +36,7 @@ Unit 5's working files were not touched, and both clones are deleted.
 
 **Checks run here:**
 - A scratch probe (C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/probe44.py) ran the step's verbs under `-I` over fixture repos in `%TEMP%/p44`. All 31 cases passed: AC1, AC2 (including off-tree `/etc/x`, `C:/x`, `../x`, `a/../b` and `..`), AC3 (two witness lines and a byte-for-byte `down`), the conflict, non-UTF-8, an absent named file, a converging re-run, and the gate file named twice. This stands in for the `govkit selftest` arm.
-- The same probe against the step at c9b50206 failed on AC1, AC2 and AC3, so the probe can fail.
+- The same probe against the step at fc3ffe41 failed on AC1, AC2 and AC3, so the probe can fail.
 - AC4 by grep: `inherited_red.py` counts 4 and `GATE_POLICY_FILE` counts 2 on the new page, both 0 at base.
 - I ran the naming lexicon `--suggest` on each new function name, and `gen_map --check`/`--write` only inside the clean clone.
 

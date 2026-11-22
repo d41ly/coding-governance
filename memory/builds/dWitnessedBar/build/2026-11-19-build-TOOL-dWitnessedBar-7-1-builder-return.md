@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-7
 
-# TOOL-dWitnessedBar-7 — builder return 1 (run `wf_83129641-dea`), committed 28edeaa0b
+# TOOL-dWitnessedBar-7 — builder return 1 (run `wf_83129641-dea`), committed 636ec0364
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-7 is built as rev-6 of its spec states it and is committed as
 
 ## Summary
 
-I built TOOL-dWitnessedBar-7 and committed it as 28edeaa0b on base 0b01f7ccd. No gate, suite or bar ran in this pass. The suite arms and their RED-first observations are owed at the close.
+I built TOOL-dWitnessedBar-7 and committed it as 636ec0364 on base 8614bf41c. No gate, suite or bar ran in this pass. The suite arms and their RED-first observations are owed at the close.
 
 **What changed**
 - `tools/memory-tree/tree_lib.py` gains `read_evidence_lines`, the `**Evidences:**` block walk taken out of `deviation_join.read_population`. `deviation_join.py` now calls it.

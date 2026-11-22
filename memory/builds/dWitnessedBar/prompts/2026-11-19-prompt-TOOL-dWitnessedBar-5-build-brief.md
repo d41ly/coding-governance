@@ -8,9 +8,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 21.
-- Built so far through order 20: every unit up to and including 4, 25, 40, 23, 42 and 3 (`930a5289d`, its pass-leg
-  fix `e37158660`: `verdict.blocks`, `lib-verdict.sh`, `verdict_flow.py` with `route` and `judge`, and the upgrade step
-  `tools/govkit/steps/inherited_red.py`). This spec was re-grounded over unit 3 as landed at `e95e88c85`.
+- Built so far through order 20: every unit up to and including 4, 25, 40, 23, 42 and 3 (`9991872c0`, its pass-leg
+  fix `b140294d7`: `verdict.blocks`, `lib-verdict.sh`, `verdict_flow.py` with `route` and `judge`, and the upgrade step
+  `tools/govkit/steps/inherited_red.py`). This spec was re-grounded over unit 3 as landed at `dd7d67b05`.
 - Units 44 and 5 build at order 21 IN PARALLEL in this one working tree. Their Files touched are disjoint: stage
   explicit paths only, never `git add -A`, and never stage, edit or revert a path the other unit's spec names. The
   session card routes both units, so each builder may flip its own spec's status.
@@ -44,7 +44,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - The first builder of this unit (`wf_f155de9c-57a`) built the whole unit but could not commit. Its pre-commit
   refused the pass for the kickoff manifest's re-stamp, and `--dispatch` then refused to declare that file over a
   stale packet. Its return is `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-5-1-builder-return.md`.
-- The packet is re-pinned at `bf873d18c`, and this unit is re-dispatched there with
+- The packet is re-pinned at `84ca7f5f0`, and this unit is re-dispatched there with
   `memory/guides/SESSION-KICKOFF.md`, `tools/playbook/kit.toml` and
   `memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-5-deviation-52.md` and `-53.md` declared.
 - That builder's work is still in this working tree, unstaged, with its acceptance ledger written. Verify it against

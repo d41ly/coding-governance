@@ -7,7 +7,7 @@
 BLOCKED AT THE COMMIT, NOT A SPEC DIVERGENCE. The commit has to carry a path that `--dispatch` refuses to declare, so nothing was committed.
 
 1. The pre-commit hook refused the pass commit with `MANIFEST check 5 FAILED`. `tools/run-gates/run-gates.sh` is on the `watch:` list in memory/guides/SESSION-KICKOFF.md, so the hook requires the manifest's `last-audit` re-stamp in the same commit.
-2. memory/guides/SESSION-KICKOFF.md is not in the declared write set. I ran `bash tools/unattended/unattended.sh --dispatch dWitnessedBar --pass TOOL-dWitnessedBar-5 --writes ...` twice. Both runs were refused by `UNATTENDED check 49 FAILED`: the spec-token checker is red over the live tree because `chain-packet.py --check dWitnessedBar` reports `byte compare red`. The packet pins the as-built view memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md at blob d951c621 (as at c9b50206). Sibling commit acd04756e (TOOL-dWitnessedBar-44) moved that file to ec1fdfea and did not re-pin the packet.
+2. memory/guides/SESSION-KICKOFF.md is not in the declared write set. I ran `bash tools/unattended/unattended.sh --dispatch dWitnessedBar --pass TOOL-dWitnessedBar-5 --writes ...` twice. Both runs were refused by `UNATTENDED check 49 FAILED`: the spec-token checker is red over the live tree because `chain-packet.py --check dWitnessedBar` reports `byte compare red`. The packet pins the as-built view memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md at blob d951c621 (as at fc3ffe41). Sibling commit 9de4bf5cd (TOOL-dWitnessedBar-44) moved that file to ec1fdfea and did not re-pin the packet.
 3. The same refusal also blocked two other paths I meant to add: tools/playbook/kit.toml and a deviation record under build/.
 
 That refusal is binding, and `--no-verify` would route around the hook, so I stopped.
@@ -20,7 +20,7 @@ I put the spec header back to INPROGRESS so the driver's `--plan` does not read 
 
 ## Summary
 
-TOOL-dWitnessedBar-5 is NOT committed. The whole build is in the shared working tree, uncommitted and unstaged. The pre-commit hook needs a kickoff-manifest re-stamp in the same commit, and `--dispatch` refused to declare that file because of a packet red introduced by sibling commit acd04756e (details in `why`). Base: c9b50206fdd4df08a52f6cddbd0ee9594525cb05.
+TOOL-dWitnessedBar-5 is NOT committed. The whole build is in the shared working tree, uncommitted and unstaged. The pre-commit hook needs a kickoff-manifest re-stamp in the same commit, and `--dispatch` refused to declare that file because of a packet red introduced by sibling commit 9de4bf5cd (details in `why`). Base: fc3ffe4144c5a6883d9b47a0364f17a2e078d327.
 
 **Left in the working tree, all inside the declared write set:**
 - `.githooks/pre-push`: reads `verdict.held` at R next to `verdict.blocks`. Under `push-selected`, when the pusher set no `GATE_SELFTESTS`, it exports `GATE_SELFTESTS=changed` before the recorded greens are read. Before admitting a bar whose run record holds a `selection`, it runs `verdict_flow.py select --check`.
@@ -41,8 +41,8 @@ TOOL-dWitnessedBar-5 is NOT committed. The whole build is in the shared working 
 The spec header and the files `gen_build_index.py --write` rewrote (`memory/LIVE.md`, `memory/backlog/TOOL.md`, the build README) are back at HEAD. The commit message is ready at `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/msg5.txt`. `gotchas.py --for-diff` was not run, because there is no commit.
 
 **Checks that ran (each stands in for the named leg, not for the gate itself):**
-- AC1, AC3, AC7 (README part), AC8, AC9: greps over the built tree, compared with c9b50206. Each read green now and red at c9b50206. These stand in for `spec tokens` and `help reference pages`.
-- AC2, AC4, AC5, AC6: `verdict_flow.py --fixture` for selection-rows, held-keys, select and held-policy all exited 0, and `route` and `red-route` stay green. At c9b50206 the same fixture names are refused with a usage line. These stand in for the `run-gates canary`.
+- AC1, AC3, AC7 (README part), AC8, AC9: greps over the built tree, compared with fc3ffe41. Each read green now and red at fc3ffe41. These stand in for `spec tokens` and `help reference pages`.
+- AC2, AC4, AC5, AC6: `verdict_flow.py --fixture` for selection-rows, held-keys, select and held-policy all exited 0, and `route` and `red-route` stay green. At fc3ffe41 the same fixture names are refused with a usage line. These stand in for the `run-gates canary`.
 - Runner hold block and `report_one`: extracted and run over planted arrays. This stands in for `run-gates canary` and `run-gates gov canary`.
 - Hook admission and export blocks: extracted and run over a planted repo at `%TEMP%/v5h`. This stands in for `pre-push self-test`.
 - `check_knob_classes`, extracted, was clean over the built runner.

@@ -35,7 +35,7 @@ and 92 S3 claims that no item's clause can pass on another item's line. A note w
 another item's label passes that item's row with that item's note absent.
 
 This unit anchors the label at the start of a continuation line, two or more spaces in, as 92 S6
-spells a note. It repairs `TOOL-dWitnessedBar-92`, CLOSED at `186cad841`, and builds one step after
+spells a note. It repairs `TOOL-dWitnessedBar-92`, CLOSED at `27a6568ef`, and builds one step after
 it (order 49).
 
 ## 2. Scope (IN)
@@ -83,14 +83,14 @@ it (order 49).
 
 ### Evidence
 
-Read on 2026-11-21 at `d31ee066d`. Unit 92 is CLOSED at rev-3, so every spec-92 line cited here is
-of that frozen text. Units 91 and 92 wrote records only (`186cad841`); unit 28 is deferred unbuilt.
+Read on 2026-11-21 at `3ffc6c67c`. Unit 92 is CLOSED at rev-3, so every spec-92 line cited here is
+of that frozen text. Units 91 and 92 wrote records only (`27a6568ef`); unit 28 is deferred unbuilt.
 
 - Spec-92 line 321 builds the selector as `awk -v k="TOOL-dWitnessedBar-$u $s([^0-9]|\$)"` and tests
   `$0 ~ k`, with no anchor. `/^- /{o=$0}` sets the opener on each answer line. 92 S3 (lines 76-80)
   and spec-91 S2 (lines 56-59) say a note opens with its label, and 92 S6 (lines 105-107) says a
   note is a continuation line two spaces in.
-- Probed on 2026-11-21 at `d31ee066d` with spec-92 lines 315-327 run as a script, against a scratch
+- Probed on 2026-11-21 at `3ffc6c67c` with spec-92 lines 315-327 run as a script, against a scratch
   89 ledger whose only note under `- AC4` reads `  TOOL-dWitnessedBar-90 S9` then the backticked
   `for unread` and prose citing `TOOL-dWitnessedBar-90 S1`. Rows `90|S1|89|AC4|` and
   `90|S9|89|AC4|for unread` printed `NOTES OK 2`, exit 0. With S1's pattern they printed
@@ -188,7 +188,7 @@ fragments for every note-check run at the close.
 `recall floor` and `recall floor arms` are owed for the ledgers under `memory/`. AC1 to AC3 run by
 fixture at the close. This unit adds no arm and moves none, so it declares no `New arm:` line, and
 the owner derivation of `TOOL-dWitnessedBar-92` §4 still names unit 90 the floor's owner: run on
-2026-11-21 at `d31ee066d` it printed 28 and `spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md`, exit 0
+2026-11-21 at `3ffc6c67c` it printed 28 and `spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md`, exit 0
 (PINNED).
 
 ## 8. Open questions
@@ -214,7 +214,7 @@ the owner derivation of `TOOL-dWitnessedBar-92` §4 still names unit 90 the floo
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit of units 91 and 92, id 5
   (HIGH, item H2; id 16 is its medium-graded item M7, batched into TOOL-dWitnessedBar-97).
-- rev-2 · 2026-11-21 · §1 · §2 · §3 · §4 · §5 · §7 · §10 · re-grounded at `d31ee066d` per
+- rev-2 · 2026-11-21 · §1 · §2 · §3 · §4 · §5 · §7 · §10 · re-grounded at `3ffc6c67c` per
   2026-11-19-prompt-TOOL-dWitnessedBar-94-reground-brief. Spec-92 citations follow its CLOSED rev-3
   text; S2 names 92 §5's matching risk clause; S3 names unit 92's ledger and its written `- AC3`
   answer; probes re-run and re-pinned; Rollout and Files touched list the pass's records; §3 names

@@ -118,7 +118,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 35: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59,
-     30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62 and 63 (`44989eebd`: whole-line readers for every `when` and
+     30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62 and 63 (`6932f9604`: whole-line readers for every `when` and
      record form, a colon refused anywhere in a path, `gov-signers-` temps swept after `PEER_SIGNERS_GRACE_S`, the
      scrub lists counted). Every unit this spec consumes from is CLOSED.
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes (asks TOOL-dWitnessedBar-101 to -103) and the run

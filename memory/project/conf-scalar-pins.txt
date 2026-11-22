@@ -1,3 +1,3 @@
 # ledger · conf-scalar-pins · key key conf,key · direction shrink-only · drain key
-.lexicon.conf	SUFFIX_OFFENDER_PIN	1	53307674f389019c422b7d0ed670b199bc8e298b	seeded
-.lexicon.conf	VERB_OFFENDER_PIN	1	53307674f389019c422b7d0ed670b199bc8e298b	seeded
+.lexicon.conf	SUFFIX_OFFENDER_PIN	1	c6fc3bcc910f47499211e13a2c28709655403c09	seeded
+.lexicon.conf	VERB_OFFENDER_PIN	1	c6fc3bcc910f47499211e13a2c28709655403c09	seeded

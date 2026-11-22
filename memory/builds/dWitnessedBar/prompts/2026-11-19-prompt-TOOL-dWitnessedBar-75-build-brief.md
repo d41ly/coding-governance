@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 40.
 - Built so far through order 40's third unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59, 30, 29,
-  7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69 (`298369174`: `read_green_file` reads with one `IFS= read -r` loop and strips one CR, `read_tag_lines` splits on LF and strips one CR), 68 (`14f441638`), 67 (`e1d569fc9`: section `2o` fixtures built with `-c init.defaultBranch=master init --ref-format=files` under exported `GIT_CONFIG_NOSYSTEM`/`GIT_CONFIG_GLOBAL`), 70 (`09718851e`: the AC12 canary), 71 (`ced984440`), 72 (`e0cf5fa91`) and 74 (`7c579ad47`: `check_cr_reached` and its liveness variant, with `rgf_why`). Unit 28 (order 30) is deferred
-  against asks TOOL-dWitnessedBar-101 to -103 and is not built. This spec, rev-3, was re-grounded at `6a5ecf938`.
+  7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69 (`9ff80bb15`: `read_green_file` reads with one `IFS= read -r` loop and strips one CR, `read_tag_lines` splits on LF and strips one CR), 68 (`52bcf7599`), 67 (`af84e1a7a`: section `2o` fixtures built with `-c init.defaultBranch=master init --ref-format=files` under exported `GIT_CONFIG_NOSYSTEM`/`GIT_CONFIG_GLOBAL`), 70 (`0890c99d1`: the AC12 canary), 71 (`2972b3755`), 72 (`fa536b7cd`) and 74 (`6a12d559c`: `check_cr_reached` and its liveness variant, with `rgf_why`). Unit 28 (order 30) is deferred
+  against asks TOOL-dWitnessedBar-101 to -103 and is not built. This spec, rev-3, was re-grounded at `68e08268c`.
 - This unit builds last at order 40, after units 71, 72 and 74; nothing else is in flight in this working tree: commit directly here.
 - The full `memory hygiene` leg is red at base on checks 13 and 15 from other records, and whole-tree spec tokens on one
   aMendedLedger spec; the main loop owns those at the close. Any other red is this unit's to fix.

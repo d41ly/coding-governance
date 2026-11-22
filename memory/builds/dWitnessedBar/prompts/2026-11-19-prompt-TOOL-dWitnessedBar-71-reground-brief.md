@@ -25,7 +25,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 39's third unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41,
-     55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68 and 67 (`e1d569fc9`: every
+     55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68 and 67 (`af84e1a7a`: every
      fixture in section `2o` of `tools/lib/resolve-python.test.sh` is built with `-c init.defaultBranch=master init
      --ref-format=files`, with `GIT_CONFIG_NOSYSTEM`/`GIT_CONFIG_GLOBAL` exported for the block and unset after it;
      its builder left AC5's red with `--ref-format=files` dropped to this unit). Every unit this spec consumes from is

@@ -56,7 +56,7 @@
 ## 1. Goal
 
 gov tolerates its debt in registries of at least six grammars, and drift tracks six of them by a
-hand-typed list (gap-test-14, gap-test-15; six PINNED 2026-11-19 at `b3b523896`, `SHRINK_ONLY`'s keys). This unit converts every registry the population rule
+hand-typed list (gap-test-14, gap-test-15; six PINNED 2026-11-19 at `0baa706f3`, `SHRINK_ONLY`'s keys). This unit converts every registry the population rule
 finds whose every reader the conversion can carry today, in place and in its own home, onto the
 ledger factory's row grammar, registers each with the
 direction its own header declares (`shrink-only` debt, `append-only` history, `declared-set` or
@@ -71,9 +71,9 @@ retrofit.md below, each of its lines cited at that blob).
   (`memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md:1087-1090`) finds at the build run's base: `memory/project/*.txt` at
   depth two, every tracked `tools/**/*waivers*.txt`, `memory/map/baseline.toml` and
   `memory/map/affordance-exempt.toml`. 28 at `19d6aae6` (PINNED, 2026-10-25), one more than the clause
-  counts: deviation 161. 32 at `05245bf0e` (PINNED, 2026-11-19), four landed since `19d6aae6`:
+  counts: deviation 161. 32 at `42d8ac6dc` (PINNED, 2026-11-19), four landed since `19d6aae6`:
   `docs-undocumented.txt` (TOOL-dSafePassage-13), this unit's 29th, and three dOrderedCharter keyed
-  lists §3 leaves to TOOL-dWitnessedBar-18 (§8 F7). The same 32 at `b3b523896` and at `a966a5779`
+  lists §3 leaves to TOOL-dWitnessedBar-18 (§8 F7). The same 32 at `0baa706f3` and at `266965be7`
   (PINNED, 2026-11-19). The rule also finds `memory/project/conf-scalar-pins.txt`, which
   TOOL-dWitnessedBar-14 landed in the ledger grammar and registered, so it is outside the
   conversion and §4's table. Six more stay in their grammar, F16's (§3). Observed by AC1.
@@ -103,7 +103,7 @@ retrofit.md below, each of its lines cited at that blob).
   `read_rows` and grades through `compare_counts` and `compare_to_base`, keeping its messages and its
   exit codes; no reader keeps a parser of the old grammar. That promise is narrowed where the row
   grammar forces it. First, a message that grades or prints a row's reason retires with the reason
-  column (§8 F1, F12). By a grep for a reason refusal over §4's readers at `2b0490b8d`, those are:
+  column (§8 F1, F12). By a grep for a reason refusal over §4's readers at `578296c1f`, those are:
   `check-arms.py#check_refusal_sites`' refusal of an empty reason or `REASON-OWED`, and the
   ` — <reason>` tail of its `waived` line; `check-spec-tokens.py`'s `carries no reason` waiver
   finding; `gen_build_index.py`'s exempt row that `carries no reason`; and the reason refusals and
@@ -122,7 +122,7 @@ retrofit.md below, each of its lines cited at that blob).
   field of each non-`#` line, which is the `path` key field in either grammar, so it is not
   re-pointed; its `FIXTURE` row for `unarmed-branches.txt` is respelled as a ledger row. Observed by
   AC3 and AC4.
-  **Readers:** by name: a git grep over `tools/` at 2b0490b8d finds `REASON-OWED` in
+  **Readers:** by name: a git grep over `tools/` at 578296c1f finds `REASON-OWED` in
   `tools/memory-tree/check-arms.py` (its module docstring, `REASON_OWED`, `check_refusal_sites`,
   `cmd_emit_pin` and the `cmd_selftest` arm staging it), in `tools/memory-tree/README.md` and in
   `tools/memory-tree/.memory-tree.conf.example`'s `ARMS_REFUSALS` comment; it finds `carries no reason`
@@ -144,14 +144,14 @@ retrofit.md below, each of its lines cited at that blob).
   TOOL-dWitnessedBar-51 S5 re-points it, and F8's adapter answers a name no registration homes with
   `None` and its reason, so that never-gains test prints `UNGRADED` in the span. Observed by AC5
   and AC11.
-  **Readers:** by name: a git grep for the two names over `tools/` at b3b523896 finds
+  **Readers:** by name: a git grep for the two names over `tools/` at 0baa706f3 finds
   `tools/codebase-map/map_lib.py` (`load_map_tree`, `load_affordance_exempt`,
   `render_affordance_exempt`, `render_baseline`, `derive_baseline_additions`),
   `tools/codebase-map/gen_map.py` (`_seed_baseline`, `_seed_affordance_baseline` and its `--out`),
   `tools/codebase-map/map_diff.py` (`_drop_affordance_exempt`), `tools/codebase-map/adopt-codebase-map.sh`
   (its `legacy_ledger.py seed --home` call, TOOL-dWitnessedBar-15 S5, kept in that form over the
   `.txt` name with `--out` writing the ledger grammar, §8 F10, and an empty list unarmed, §8 F18), its suite
-  `tools/codebase-map/adopt-codebase-map.test.sh` (arms 7 and 8, landed since 05245bf0e),
+  `tools/codebase-map/adopt-codebase-map.test.sh` (arms 7 and 8, landed since 42d8ac6dc),
   `tools/codebase-map/selftest.py`, `tools/memory-tree/check-memory-hygiene.sh`
   (its check 3 case), `tools/run-gates/owed_rows.py` (`derive_owed_rows` and its `FIXTURE`, the
   leg-removed population of PLAY-dOrderedCharter-50 S2), and comments in
@@ -178,7 +178,7 @@ retrofit.md below, each of its lines cited at that blob).
   `tools/memory-tree/adopt-memory-tree.sh` (its `readme-contract.txt` seed),
   `tools/policy/check_policy.py` (the fixture `derive_readme_slot_plant`) and
   `tools/govkit/check_runbook_parity.py` (a comment, at tools/govkit/check_runbook_parity.py@0ed63820bdfd:44),
-  found by a git grep for the line's key at b3b523896; check 3's case keeps the name ·
+  found by a git grep for the line's key at 0baa706f3; check 3's case keeps the name ·
   by value: `gen_build_index.py`'s equality of the pin with the measured exempt count, replaced by the
   base compare.
 - **S8** — Drift's hand-typed index retired. `SHRINK_ONLY` becomes the registrations whose direction
@@ -188,7 +188,7 @@ retrofit.md below, each of its lines cited at that blob).
   is derived from an empty registration list; and the six `RATCHETS` rows naming `drift_signals.py`'s
   own keys retire, a raised `drift-pins` row being the `ratchet` pack's widen case. `derive_low_waters`
   keeps every list's low water. Observed by AC7 and AC8.
-  **Readers:** by name: a git grep for the four names at b3b523896 finds `tools/drift-audit/drift_report.py`
+  **Readers:** by name: a git grep for the four names at 0baa706f3 finds `tools/drift-audit/drift_report.py`
   (its module docstring, `load_project_layer`, `build_baseline_findings`, `build_live_backlog_rows`,
   `build_cutoff_keys_armed`, `Ctx`, `main`, and comments naming the dicts, reworded with the file),
   `tools/drift-audit/drift_signals.py` (`SHRINK_ONLY`,
@@ -274,7 +274,7 @@ retrofit.md below, each of its lines cited at that blob).
   admits each name by its own rule (`tools/memory-tree/check-memory-hygiene.sh@3794d1a0dc3b:1030-1035`).
   drift's two, which drift-audit's steps write at every adopter, join its admitted list. Gov's two
   join gov's `PROJECT_REGISTRY_EXTRA` (`.memory-tree.conf@a63207924120:960`). Observed by AC15.
-  **Readers:** by name: a git grep for the four names over the tree at c084b29f0 finds
+  **Readers:** by name: a git grep for the four names over the tree at bdbbcbd88 finds
   `tools/check-dead-paths.sh` (`WAIVERS`) with `tools/check-dead-paths.test.sh`;
   `tools/check-playbook-parity.sh` (`WAIVERS`) with `tools/check-playbook-parity.test.sh`;
   `tools/govkit/registry.toml` (two `[[exempt]]`, two `[[ledger]]` and a leg guard) and
@@ -332,7 +332,7 @@ retrofit.md below, each of its lines cited at that blob).
 
 - The factory, its grammar, its directions and its merge class: unit 13's (I4).
 - The seven conf pins, the date cutoffs and the `RATCHETS` rows naming conf keys: unit 17's.
-- dOrderedCharter's keyed lists and dSafePassage's step rows: unit 18's, at `98e33d71c`
+- dOrderedCharter's keyed lists and dSafePassage's step rows: unit 18's, at `112526471`
   `memory/project/positional-refs.txt`, `unpinned-facts.txt` and `positional-producers.txt`, the last
   landed after unit 18's spec named the other two (§8 F7); the legacy-homes list: unit 20's.
 - Six registries stay in their grammar (§8 F16): `lexicon-suffix-waivers.txt`,
@@ -366,9 +366,9 @@ retrofit.md below, each of its lines cited at that blob).
 Directions read from each file's header (registry_directions.py's table,
 `memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md@ea5286ca8704:1063-1079`,
 plus `memory/project/temp-name-sites.txt@28bd69a328bb:1-12` and `docs-undocumented.txt`'s
-`SHRINK-ONLY` header). Measured at `19d6aae6` (PINNED, 2026-10-25), re-read at `05245bf0e` (PINNED,
-2026-11-19), where no header of the 28 (PINNED, S1) changed its direction, and unchanged at `b3b523896`:
-`git diff 05245bf0e b3b523896` over the 32 homes moves rows of three and no header (DERIVED by it).
+`SHRINK-ONLY` header). Measured at `19d6aae6` (PINNED, 2026-10-25), re-read at `42d8ac6dc` (PINNED,
+2026-11-19), where no header of the 28 (PINNED, S1) changed its direction, and unchanged at `0baa706f3`:
+`git diff 42d8ac6dc 0baa706f3` over the 32 homes moves rows of three and no header (DERIVED by it).
 The pass re-derives the set at its base and re-reads each header; a disagreement is a fork for the pass.
 
 | Home | Direction | Key kind · fields | Count | Reader re-pointed | Registered in |
@@ -418,11 +418,11 @@ registry's column takes the name the table gives it:
 
 A field is `verbatim` when it holds a bare integer or quoted text, never a path, id or name, because
 `LINE_NUMBER_RE` in that file refuses a non-verbatim key field reading as a line number. At
-`2b0490b8d` (DERIVED by a probe running `_check_table` over each header and `LINE_NUMBER_RE` over each
+`578296c1f` (DERIVED by a probe running `_check_table` over each header and `LINE_NUMBER_RE` over each
 row) that refusal would hit fork-ceilings' `base` on every row, both `tools/hooks/agent-cap.js:<n>`
 tokens of `spec-token-waivers.txt`, and each `refusal-retirements.txt` `check`. Shape 1 of
 `unarmed-branches.txt` keys `check` by a bare `fail` number, as the sidecar
-`tools/unattended/unarmed-branches.txt` does. The central file's rows at `2b0490b8d` are all shape 2.
+`tools/unattended/unarmed-branches.txt` does. The central file's rows at `578296c1f` are all shape 2.
 refusal-retirements' signature head, sites and `supersedes` clause go to the conversion record
 beside their keys, as S5's reasons do.
 
@@ -456,7 +456,7 @@ one row per key keeps the low water, and the two ordinal registries' low water f
 conversion, to the keyed count. The `docs` leg reads its list's low water through the same function
 (`tools/govkit/docs_leg.py#check_legacy_low_water`), so it holds there too.
 A pin of 0 writes no `drift-pins` row, since a row's count is at least 1
-(`tools/lib/legacy_ledger.py#_parse_rows`). Each zero pin at `c52a74c4d` (DERIVED by importing
+(`tools/lib/legacy_ledger.py#_parse_rows`). Each zero pin at `8ace93188` (DERIVED by importing
 `drift_signals.py`) names a signal whose record already carries tolerance 0, which
 `ctx.pins.get(<signal>, <tolerance>)` in `tools/drift-audit/drift_report.py#main` keeps.
 
@@ -615,7 +615,7 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 - migration — §4 and S10.
 - user docs — `tools/drift-audit/README.md` replaces its `SHRINK_ONLY`, `PINS` and `BASELINES` rows;
   `help/docs-leg.md`, the one page under
-  `help/` that spells a row of this unit's populations at `98e33d71c` (`docs-undocumented.txt`'s `<id>` TAB reason), takes the ledger row.
+  `help/` that spells a row of this unit's populations at `112526471` (`docs-undocumented.txt`'s `<id>` TAB reason), takes the ledger row.
 
 ## 6. Acceptance criteria
 
@@ -628,7 +628,7 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   `FIVE REGISTRIES STAY IN THEIR GRAMMAR`.
   Red when: a registry the rule finds has no registration, so it is graded by no engine, or F16's
   five are left with no ask to carry them.
-  figure: the set is DERIVED at observation; 28 is PINNED at `19d6aae6`, 32 PINNED at `05245bf0e` and at `b3b523896`.
+  figure: the set is DERIVED at observation; 28 is PINNED at `19d6aae6`, 32 PINNED at `42d8ac6dc` and at `0baa706f3`.
 - **AC2** — When the conversion record's before and after tables are compared with
   `python legacy_ledger.py read <population>` for each population, every legacy row's key appears once,
   with its count, and every former reason appears beside its key in the record.
@@ -703,7 +703,7 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   exit 0, printing each of §8 F14's homes `unarmed`.
   Red when: a seed prints what the factory cannot parse, or an empty home reads armed, so
   `populated` reds the bar.
-  figure: F14's four homes are PINNED at `a966a5779` (2026-11-19).
+  figure: F14's four homes are PINNED at `266965be7` (2026-11-19).
 - **AC14** — When `git grep -n read_legacy_rows -- tools/memory-tree/gen_build_index.py` runs after
   S12's second pass, it prints nothing, nor does `git grep -n "import convert_registry" -- tools`,
   and `python tools/memory-tree/gen_build_index.py --check-format` exits 0 over the converted file.
@@ -775,7 +775,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
 - **FACT-QUESTION · F5 — Does drift's low water survive a regrammar?** Probe:
   `tools/drift-audit/drift_report.py#derive_low_waters` and
   `tools/drift-audit/drift_report.py#check_shrink_row`, read for what they count. Observation at
-  `19d6aae6`, unchanged at `98e33d71c`: each counts a list's non-blank, non-`#` lines per historical blob.
+  `19d6aae6`, unchanged at `112526471`: each counts a list's non-blank, non-`#` lines per historical blob.
   Liveness: a reader counting all lines would count the header. RESOLVED (agent, 2026-10-25, delegated):
   it survives wherever one row per key is kept, and AC8 observes it; the ordinal registries' single
   drop is said in §4. widens: none · relaxes: none
@@ -786,7 +786,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
 - **F7 — Who converts the three registries dOrderedCharter landed after this spec's base?**
   `positional-refs.txt` and `unpinned-facts.txt` (TOOL-dWitnessedBar-18 S1 names both) and
   `positional-producers.txt` (PLAY-dOrderedCharter-72, read by `tools/playbook/positional.py` beside the
-  first) are found by S1's rule at `98e33d71c`. Options: (a) this unit converts all three; (b) it takes
+  first) are found by S1's rule at `112526471`. Options: (a) this unit converts all three; (b) it takes
   `positional-producers.txt` alone; (c) all three are unit 18's, the third returned to the main loop for
   unit 18's re-ground. (a) and (b) fail veto 1, §3 leaving dOrderedCharter's keyed lists to unit 18.
   RESOLVED (agent, 2026-11-19, delegated): (c), the one survivor; AC1 excludes the three until
@@ -855,7 +855,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
   `seed laundering` never sees a removed row; each reader's leg grades that where it measures (AC4),
   and `never gains` for an append-only population. widens: none · relaxes: `seed laundering`'s
   removal arm over these populations
-- **F14 — What is a converted home holding no row?** Four are empty at `a966a5779` (PINNED,
+- **F14 — What is a converted home holding no row?** Four are empty at `266965be7` (PINNED,
   2026-11-19): `id-orphan-waiver.txt`, `location-probe-waivers.txt`, `stale-header-waiver.txt` and
   `memory/map/affordance-exempt.toml`, whose one line is `exempt = []`; rev-11's seven lost four to
   F16 and missed the map list. Options: (a) the header alone, which `ratchet.py#run_populated` reds
@@ -883,7 +883,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
   lacking `accounted` (`2026-11-19-build-TOOL-dWitnessedBar-16-3-builder-return`). Options: (a)
   unit 17 takes `corpus-path-unresolved.txt` by the hands-off edge, its S1 and S4 already reaching
   that file and `corpus_ids.py`, and S13's one ask takes the other five, which no later unit of this
-  build names (a grep of its specs for each home at `a966a5779`); (b) the ask takes all six, leaving
+  build names (a grep of its specs for each home at `266965be7`); (b) the ask takes all six, leaving
   unit 17 consuming a conversion no unit makes; (c) one ask per registry; (d) convert them here with
   a factory copy or a `requires` edge per kit, a dependency change (veto 2). RESOLVED (agent,
   2026-11-19, delegated): (a), the fewest follow-ups left open and the least text. widens: none ·
@@ -963,17 +963,17 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
   `tools/memory-tree/check-memory-hygiene.sh` and `tools/lexicon/lexicon-suffix-waivers.txt`, per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief; nothing else moved.
 - rev-6 · 2026-11-19 · §1 · S1 · S3 · S6 · S7 · S8 · S10 · §3 · §4 · §5 · AC1 · AC6 · AC10 · §7 · §8 F3 F5 F7 F8 ·
-  §10 · re-grounded at `98e33d71c` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-brief: the
+  §10 · re-grounded at `112526471` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-brief: the
   population re-derived (32 PINNED in S1; `docs-undocumented.txt` joins, dOrderedCharter's three lists
   stay unit 18's, F7); moved citations re-cited by symbol; S6 to S8's readers re-derived; S10 on the
   landed `[[upgrade]]` grammar; the baseline compare per F8; `help/docs-leg.md` owed; the leg line
   re-joined. No Goal or Scope intent moved.
-- rev-7 · 2026-11-19 · §1 S1 S3 S6 S7 S8 §3 §4 §5 AC1 §8 F3 F9 §10 · re-grounded at `05245bf0e` by brief
+- rev-7 · 2026-11-19 · §1 S1 S3 S6 S7 S8 §3 §4 §5 AC1 §8 F3 F9 §10 · re-grounded at `42d8ac6dc` by brief
   2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief: the entry lists register in the govkit
   registry (F9); S6 gains two prose carriers; unit 13's landed README and adapters re-cited.
 - rev-8 · 2026-11-19 · §1 · S1 · S3 · S6 · S7 · S8 · S10 · S11 (new) · §3 Edges · §4 The populations,
   Inventory, Rollout, Files touched · §5 · AC1 · AC12 (new) · §7 · §8 F10 F11 · §10 · re-grounded at
-  `b3b523896` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief, over units 15, 12,
+  `0baa706f3` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief, over units 15, 12,
   61, 22, 47, 19 and 11 as landed and TOOL-dWitnessedBar-14's spec as the contract, rev-10 as it
   stands: the population re-derived, the same 32, with unit 14's `conf-scalar-pins.txt` outside the
   conversion and drift's shrink list 21; unit 15's adopter seeds and the codebase-map adopter suite
@@ -986,21 +986,21 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
   the coverage join matches it; the other blob pins stay; nothing else moved.
 - rev-10 · 2026-11-19 · S2 · S4 · §4 The populations, Field names (new), Files touched · §5 · AC3 ·
   AC10 · §8 F1 F12 (new) · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-16-4-spec-writer, over the
-  first builder's divergence at `9b69042ee`. Every header field is named so its `[[ledger]]` table
+  first builder's divergence at `1fc4e5c6e`. Every header field is named so its `[[ledger]]` table
   registers under `_check_table`, with `verbatim` fields declared. `refusal-retirements.txt` keys every
   field `check_retirements` grades (F12). S4 is narrowed in words for reason, ordinal and grammar
   messages, and for the sidecar left to unit 51. No Goal or Scope intent moved.
 - rev-11 · 2026-11-19 · S2 · S3 · S4 · S6 · S7 · S12 (new) · §3 Edges · §4 The conversion, Drift,
   Inventory · §5 · AC1 · AC6 · AC13 AC14 (new) · §7 · §8 F10 F11 F12 · F13 F14 F15 (new) · §10 · per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-16-5-spec-writer, over the second builder's divergence at
-  `6f80e4e8e`: every seed is the `read-back` argv (F13); the seven empty homes are written unarmed
+  `7f3d1a541`: every seed is the `read-back` argv (F13); the seven empty homes are written unarmed
   (F14); `readme-contract.txt` is read transitionally until a second pass deletes that read (F15);
   the map test's `UNGRADED` gap and drift's zero pins are stated; F11 drops its stale conditional on
   an open unit 14; F10 to F12 tightened in wording, no claim moved. No Goal moved.
 - rev-12 · 2026-11-19 · §1 · S1 S2 S3 S4 S6 S10 S13 (new) · §3 · §4 The populations, Field names,
   The conversion, Inventory, Migration, Rollout, Files touched · §5 · AC1 AC3 AC5 AC13 · §7 · §8 F9
   F14 · F16 F17 F18 (new) · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-16-6-spec-writer, over the
-  third builder's divergence at `f294dafda`: the unit narrowed to the populations whose every reader
+  third builder's divergence at `92c84feaa`: the unit narrowed to the populations whose every reader
   it can carry; six stay in their grammar, `corpus-path-unresolved.txt` handed to unit 17 and the
   other five to S13's ask (F16); `convert` stamps HEAD's sha (F17); `owed_rows.py`'s first-field read
   stated in S4; the empty homes re-pinned at four, the map list among them (F14); an empty adopter

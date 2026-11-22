@@ -37,8 +37,8 @@ report merged ids into one item. The minors land on both `TOOL-dWitnessedBar-64`
 `TOOL-dWitnessedBar-65`, so this unit repairs no single unit and builds after both, at order 39. The
 report's ids 2, 8 and 10 were refuted by the audit itself and are no finding here.
 
-Units 64, 65 and 66 have landed, at `b26061af2`, `139d6fea1` and `a04b24c97`, and this spec is
-re-grounded over HEAD `248c8263a`. Seven items are present at HEAD and are observed, not built: S1,
+Units 64, 65 and 66 have landed, at `ef54d1d89`, `f2fcd51c6` and `e3cdc2201`, and this spec is
+re-grounded over HEAD `b557ab5a3`. Seven items are present at HEAD and are observed, not built: S1,
 S8, S11, S12, S16 and S19 by the landed code, S5 as this spec's gate set. S14 is a ledger line at the
 close. The rest are built.
 
@@ -214,7 +214,7 @@ concurrency. One unit holds all 19 findings.
 
 ### Evidence
 
-Read at HEAD `248c8263a` on 2026-11-21; each probe ran on git 2.54.0.windows.1, GNU bash 5.3.9
+Read at HEAD `b557ab5a3` on 2026-11-21; each probe ran on git 2.54.0.windows.1, GNU bash 5.3.9
 (`x86_64-pc-cygwin`) and Python 3.15.2, PINNED 2026-11-21.
 
 - `read_green_file` sets seven variables, none from a `verdict` key, and reads `fingerprint` into

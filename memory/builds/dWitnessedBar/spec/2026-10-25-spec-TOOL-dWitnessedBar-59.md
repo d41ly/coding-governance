@@ -36,7 +36,7 @@ readers' `read_policy_key` (`.githooks/pre-push@1ecf9aa6:1306-1321`, the same by
 Over `INHERITED_RED=park<CR>INHERITED_RED=land<LF>` the hook read one line, value
 `park<CR>INHERITED_RED=land`, which its `*` arm mapped to park (`.githooks/pre-push@1ecf9aa6:1343`); a
 text-mode step reads two lines and takes `land`, writing `own-mixed-contended`, so MIXED and CONTENDED
-reds that blocked yesterday land. Unit 55 landed at `599c23cef` with the step splitting on LF alone
+reds that blocked yesterday land. Unit 55 landed at `dff3ca0d6` with the step splitting on LF alone
 (`tools/govkit/steps/inherited_red.py#read_value`), so the step meets S1 at HEAD, but nothing holds it
 there. None of the rows of unit 55's parity arm holds a lone CR, and the arm's comment names a lone CR as
 what it does not check (`tools/govkit/selftest.py#check_inherited_red_step`). This unit takes the
@@ -75,7 +75,7 @@ report's fix. It repairs `TOOL-dWitnessedBar-55`.
 
 ### Edges
 
-- **consumes-from** `TOOL-dWitnessedBar-55` — the step's LF-only reader, landed at `599c23cef`, and S4's parity fixture set, whose line separator S1 states and to which S3 adds the lone-CR row
+- **consumes-from** `TOOL-dWitnessedBar-55` — the step's LF-only reader, landed at `dff3ca0d6`, and S4's parity fixture set, whose line separator S1 states and to which S3 adds the lone-CR row
 - **hands-off** `TOOL-dWitnessedBar-62` — the lone-CR parity row, which the minors batch's id 26 item carries onto `check_conf_reader_parity` with the rows unit 55 landed
 - **hands-off** `TOOL-dWitnessedBar-63` — AC2's byte half, answered by unit 57's AC12, AC3's bytes capture of bash's stdout, and S1's split observed on `.unattended.conf` too (ids 3, 8, 33)
 
@@ -86,7 +86,7 @@ report's fix. It repairs `TOOL-dWitnessedBar-55`.
 - `while IFS= read -r line || [ -n "$line" ]; do line=${line%$'\r'}; … done <<< "$1"`
   (`.githooks/pre-push#read_policy_key`, the same bytes at `.githooks/pre-push@1ecf9aa6:1306-1312` when
   it read `INHERITED_RED`): one line per LF, a CR only cut when it ends the line. Probed 2026-11-20 at
-  HEAD `a4fd535ed`, the function cut from the hook prints `park<CR>INHERITED_RED=land` for S3's bytes.
+  HEAD `e22cdce08`, the function cut from the hook prints `park<CR>INHERITED_RED=land` for S3's bytes.
 - `case "$pol" in land) … park) … '') … *) PP_WHY="… outside 'park land', which reads park"`
   (`.githooks/pre-push@1ecf9aa6:1338-1344`). The hook reads no `INHERITED_RED` at HEAD:
   `TOOL-dWitnessedBar-3` retired it onto `verdict.blocks`.
@@ -94,7 +94,7 @@ report's fix. It repairs `TOOL-dWitnessedBar-55`.
   (`tools/govkit/steps/inherited_red.py#parse_gate`, over its `OTHER`).
 - The landed step reads each file with `read_bytes()` and splits with `.split("\n")`, in
   `tools/govkit/steps/inherited_red.py#read_value`, `#render_gate_rest`, `#cmd_up` and `#cmd_witness`;
-  `#derive_reads` reads `.unattended.conf` through `read_value`. Probed 2026-11-20 at HEAD `a4fd535ed`
+  `#derive_reads` reads `.unattended.conf` through `read_value`. Probed 2026-11-20 at HEAD `e22cdce08`
   over a scratch target holding `A=1<LF>INHERITED_RED=park<CR>INHERITED_RED=land<LF>B=2<LF>`: `up`
   wrote `blocks = "every-red"` and left `A=1<LF>B=2<LF>`. Over S2's target of AC2, `witness` before
   `up` printed `assigns` once and `not an assignment` nowhere, and `up` left `A=1<LF>B=2<LF>`.
@@ -206,7 +206,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the `lone-cr` row rea
   whose text after the lone CR spells the key indented, which a CR-splitting `up` keeps and a
   CR-splitting `witness` names; (c) mark S2 NOT OBSERVED. (a) fails AC2's red-when, so veto 1 discards
   it; (c) satisfies fewer criteria than (b). RESOLVED (agent, 2026-11-20, delegated): (b), the
-  feature-rich option, probed green over the landed step at HEAD `a4fd535ed`.
+  feature-rich option, probed green over the landed step at HEAD `e22cdce08`.
   widens: none · relaxes: none
 
 ## 9. Revision log
@@ -219,9 +219,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the `lone-cr` row rea
   `tools/govkit/selftest.py` trips, as the spec-token checker's guards join named it at `c6df3e901`,
   by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is unchanged, as the
   unit writes that path; nothing else moved.
-- rev-4 · 2026-11-20 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · §8 · §10 · re-grounded over HEAD `a4fd535ed`
+- rev-4 · 2026-11-20 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · §8 · §10 · re-grounded over HEAD `e22cdce08`
   by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-59-reground-brief`: the pre-step readers cited
-  blob-pinned at the base and the live ones by symbol; unit 55, landed at `599c23cef`, already splits on
+  blob-pinned at the base and the live ones by symbol; unit 55, landed at `dff3ca0d6`, already splits on
   LF alone, so S1 and S2 are observed rather than built and `inherited_red.py` leaves Files touched;
   the parity row is named `lone-cr` beside the rows unit 55 landed rather than as a ninth; AC2 runs over
   its own target (F2); the New arm line's staged break and §10's probe ranks restated.

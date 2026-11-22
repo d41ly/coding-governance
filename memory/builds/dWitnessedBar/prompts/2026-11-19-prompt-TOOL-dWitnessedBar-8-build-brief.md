@@ -8,9 +8,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 22.
-- Built so far through order 22: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41 (`5a4f86e0c`: the
-  per-tree verdict's selection and the hook's `check_tree_selection`) and 55 (`599c23cef`). This spec, rev-6, was
-  re-grounded over units 41 and 55 as landed at `387241cf1`.
+- Built so far through order 22: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41 (`38a68ee1d`: the
+  per-tree verdict's selection and the hook's `check_tree_selection`) and 55 (`dff3ca0d6`). This spec, rev-6, was
+  re-grounded over units 41 and 55 as landed at `6caf205c3`.
 - This unit builds alone; nothing else is in flight in this working tree.
 - The pass legs carry one known red: install-prefix on the `conf-scalar-pins` seed argv in
   `tools/memory-tree/kit.toml`, held until unit 51. The full `memory hygiene` leg is red at base on checks 13 and 15

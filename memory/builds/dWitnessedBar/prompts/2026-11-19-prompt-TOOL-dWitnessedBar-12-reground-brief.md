@@ -27,7 +27,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    - Unit 26 (`7526c98fa`): the `resolve_bash_py` block is `scan_bash(script, host)` with `BASH_NAMES` and its twin
      `scanBash`, behind name-keeping adapters; `scan_bare_bash` in `tools/run-gates/measure_legs.py` widens
      `test_no_bare_bash_argv`; section `2j` of `tools/lib/resolve-python.test.sh` is the resolver truth table.
-   - Unit 27 (`cc35bb62c`, red-fix `94e566d88`): `tools/lib/refuse-wrong-shell.sh`, the refusal call in every
+   - Unit 27 (`8b3aa5783`, red-fix `105781740`): `tools/lib/refuse-wrong-shell.sh`, the refusal call in every
      `resolve_python` member, `wrong_shell_at` / `wrongShellAt` in both resolver blocks, section `2n`.
    - Being built or queued from re-grounded specs, each the contract for what will exist: unit 48 (rev-4, building
      now: row_grammar's resolver an adapter, shape 2 widened), unit 49 (rev-4), unit 13 (rev-3: retrofit's ledger

@@ -118,8 +118,8 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 16: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11 (the gate-leg
-     factory), 14, 45, 54, 16, 46, 17, 52, 53, 18, 20, 24 (the portability leg pack), 10 (`d15371e5e`: the pre-commit
-     list derived from each leg's `precommit` key) and 9 (`34a36429d`: the product-test contract leg, the `level`
+     factory), 14, 45, 54, 16, 46, 17, 52, 53, 18, 20, 24 (the portability leg pack), 10 (`b671830d8`: the pre-commit
+     list derived from each leg's `precommit` key) and 9 (`f7526f6d8`: the product-test contract leg, the `level`
      key; run-gates at 1.54).
    - Unit 4 (order 17) is being built now, in this working tree; neither spec here consumes from it. Read every file
      `git status` shows modified at HEAD with `git show HEAD:<path>`, never from the working tree, and cite only

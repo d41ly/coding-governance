@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-88
 
-# TOOL-dWitnessedBar-88 — builder return 1 (run `wf_81a62cd1-8d0`), committed 7f1e87a6d557681ecf5a45b875e824852def7432
+# TOOL-dWitnessedBar-88 — builder return 1 (run `wf_81a62cd1-8d0`), committed 7cf3999b8454bf35f4022cb89348a7c1394052d6
 
 ## Why
 
@@ -8,7 +8,7 @@ Every claim the spec makes about current code held when I checked it before the 
 
 ## Summary
 
-TOOL-dWitnessedBar-88 is built and committed as 7f1e87a6d557681ecf5a45b875e824852def7432, starting from base fd9628af8. The commit carries a `Pass: TOOL-dWitnessedBar-88` trailer and sets the spec header to CLOSED, dated 2026-11-21. No gate, suite or bar was run.
+TOOL-dWitnessedBar-88 is built and committed as 7cf3999b8454bf35f4022cb89348a7c1394052d6, starting from base 75855b151. The commit carries a `Pass: TOOL-dWitnessedBar-88` trailer and sets the spec header to CLOSED, dated 2026-11-21. No gate, suite or bar was run.
 
 **What changed**
 - `tools/run-gates/run-gates.gov.test.sh`, existing lines rewritten only:
@@ -17,7 +17,7 @@ TOOL-dWitnessedBar-88 is built and committed as 7f1e87a6d557681ecf5a45b875e82485
   - S17: the length call's fifth argument is now `the length variant named`.
   - Shell-role stays at 850 and `FLOOR_ASSERTIONS=80` is untouched, with no line added above it.
 - S11: the `run-gates gov canary` guard in `tools/govkit/registry.toml` gains `.githooks/` last, and `tools/gate-legs.json` was re-rendered with `leg_factory.py --write`.
-- `memory/guides/SESSION-KICKOFF.md`: `last-audit` re-stamped at fd9628af8.
+- `memory/guides/SESSION-KICKOFF.md`: `last-audit` re-stamped at 75855b151.
 - `memory/builds/dWitnessedBar/BACKLOG.md`: new ask TOOL-dWitnessedBar-105 with a LOW `SEV` line, covering the two `manifest-check` files and naming DEPL-aScoutedSeam-1 and KICK-aScoutedSeam-1.
 - New acceptance ledger at `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-88-1-acceptance-ledger.md`, one line per criterion.
 - `gen_build_index.py --write` re-rendered the build README, `memory/LIVE.md`, `memory/backlog/TOOL.md` and the spec's records region, and `RUN.md` is committed with the pass. `gen_map.py --write` changed nothing, because no function was added or renamed.

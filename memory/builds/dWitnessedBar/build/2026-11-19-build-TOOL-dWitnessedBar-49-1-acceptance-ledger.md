@@ -12,7 +12,7 @@ makes at the close, and so does every suite the section names.
 **Evidences:** TOOL-dWitnessedBar-49
 - AC1 — `scan_bare_bash` — over a fixture repo tracking `const x = 1;` in a `.js` and a `.py` holding
   `bash = shutil.which("bash")`, it returned one hit naming `a.py`, line 2, shape 4; over the same `.js` beside the
-  same line inside a `resolve_bash_py` block it returned `[]`. The scanner at `66f4e8d98`, run on the
+  same line inside a `resolve_bash_py` block it returned `[]`. The scanner at `a4cffc2cb`, run on the
   first fixture, returned `[]`, the criterion's red. Further probes: `shutil.which("bash.exe")`
   matched shape 4 and `shutil.which("git")` and `shutil.which(name)` did not; in a `.js`,
   `which('bash')`, `execSync("where bash")` and `execFileSync('which bash')` matched shape 4, while

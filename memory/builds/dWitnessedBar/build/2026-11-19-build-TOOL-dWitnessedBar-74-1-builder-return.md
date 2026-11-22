@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-74
 
-# TOOL-dWitnessedBar-74 — builder return 1 (run `wf_c191cf83-648`), committed 7c579ad47
+# TOOL-dWitnessedBar-74 — builder return 1 (run `wf_c191cf83-648`), committed 6a12d559c
 
 ## Why
 
@@ -8,7 +8,7 @@ The spec could be built as written. Every claim it makes about current code held
 
 ## Summary
 
-Unit TOOL-dWitnessedBar-74 is built and committed as 7c579ad47, on top of f61e597d8. The commit carries `Pass: TOOL-dWitnessedBar-74` and the spec status is set to CLOSED.
+Unit TOOL-dWitnessedBar-74 is built and committed as 6a12d559c, on top of d94b52e24. The commit carries `Pass: TOOL-dWitnessedBar-74` and the spec status is set to CLOSED.
 
 What changed in tools/run-gates/run-gates.gov.test.sh:
 - **S1:** a new top-level function, `check_cr_reached() ( LC_ALL=C; . "$1" || exit 1; read_green_file "$2"; _cc_v=${!3}; [ "${#_cc_v}" -eq 41 ] && [ "${_cc_v: -1}" = $'\r' ] )`. The canary's mutant is now also written to `$rgf_t/cut-mut.sh`, and `rgf_ok` calls `check_cr_reached "$rgf_t/cut-mut.sh" "$rgf_rec" rec_sha`. The `rec_fp` half stays inline in `rgf_mr` and now expects `41 cr`.

@@ -1,14 +1,14 @@
 **Serves:** journal TOOL-dWitnessedBar-17
 
-# TOOL-dWitnessedBar-17 — builder return 3 (run `wf_abaf325d-859`), committed 384e6761d
+# TOOL-dWitnessedBar-17 — builder return 3 (run `wf_abaf325d-859`), committed b9fecf589
 
 ## Why
 
-TOOL-dWitnessedBar-17 is built from its rev-9 spec. The pass commit is dbbd8caba (`Pass: TOOL-dWitnessedBar-17`, spec header set to CLOSED). The bug-class checklist then found one doc reader still describing the old pins, fixed in 384e6761d (`Pass: none`). I started from the second builder's saved patch, which applied cleanly at a3e1779c7. Every spec claim I checked matched the tree: blobs aacff5d2425c, fbbf1499d9a4, 8dfb2a659a2e, c6d425b34ac1 and aca25b09b5ce, and 39 cutoffs (28 + 11). No divergence.
+TOOL-dWitnessedBar-17 is built from its rev-9 spec. The pass commit is 9a29f1e96 (`Pass: TOOL-dWitnessedBar-17`, spec header set to CLOSED). The bug-class checklist then found one doc reader still describing the old pins, fixed in b9fecf589 (`Pass: none`). I started from the second builder's saved patch, which applied cleanly at f43096072. Every spec claim I checked matched the tree: blobs aacff5d2425c, fbbf1499d9a4, 8dfb2a659a2e, c6d425b34ac1 and aca25b09b5ce, and 39 cutoffs (28 + 11). No divergence.
 
 ## Summary
 
-The unit is committed on branch/unattended-dwitnessedbar-2ed3b3: dbbd8caba is the pass commit and 384e6761d the checklist fix. No merge bar, suite or gate leg ran. The role hook refused `ratchet.py both-ways`, so the remaining `ratchet` legs, `check-memory-hygiene.sh` and every self-test were not run. Each criterion only those can observe is owed to the close.
+The unit is committed on branch/unattended-dwitnessedbar-2ed3b3: 9a29f1e96 is the pass commit and b9fecf589 the checklist fix. No merge bar, suite or gate leg ran. The role hook refused `ratchet.py both-ways`, so the remaining `ratchet` legs, `check-memory-hygiene.sh` and every self-test were not run. Each criterion only those can observe is owed to the close.
 
 **What changed on top of the saved patch (rev-8 and rev-9 of the spec)**
 - `tools/codebase-map/map_diff.py` has a new `--list-empty-decisions` flag. It is refused with a range, `--stale-dossiers`, `--tree` or `--drop-affordance-exempt`, writes no file, and has a docstring usage line.
@@ -23,7 +23,7 @@ The unit is committed on branch/unattended-dwitnessedbar-2ed3b3: dbbd8caba is th
   - the NOT MEASURED text is updated, and a new check-20 fixture plants a duplicate.
 - `resolve-python.test.sh` gains the `{prefix}` seed arm.
 - The `gotchas.py` fixture conf, the `govkit/selftest.py` comment, `README.md`, `HYGIENE.template.md` (re-rendered to `memory/HYGIENE.md`), `WIRE-INTO-PROJECT.md`, `.lexicon.conf`, `LEXICON.md`, the row-grammar dossier and the `reuse_lookup.py` docstring are re-worded.
-- I re-seeded all four homes and re-converted `corpus-path-unresolved.txt` at a3e1779c7: 3, 16, 14 and 39 rows. (DERIVED from the builder's probe)
+- I re-seeded all four homes and re-converted `corpus-path-unresolved.txt` at f43096072: 3, 16, 14 and 39 rows. (DERIVED from the builder's probe)
 - The kickoff manifest is re-stamped, and the map (`symbols.json`) and build index are regenerated.
 - The acceptance ledger is at `C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-1-acceptance-ledger.md`.
 

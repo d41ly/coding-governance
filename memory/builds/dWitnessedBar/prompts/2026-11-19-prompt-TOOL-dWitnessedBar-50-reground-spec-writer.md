@@ -121,7 +121,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
      returning `(found, tried, refusal)` with `BASH_NAMES`; its twin `scanBash` is in `tools/lib/resolve_bash.js`; both
      are inlined behind name-keeping adapters; `scan_bare_bash` in `tools/run-gates/measure_legs.py` widens
      `test_no_bare_bash_argv`; section `2j` of `tools/lib/resolve-python.test.sh` is the resolver truth table.
-   - Unit 27 (order 2) is being built now from its rev-5 spec (`d08ded6f1`); treat that spec as the contract for what
+   - Unit 27 (order 2) is being built now from its rev-5 spec (`fed701a30`); treat that spec as the contract for what
      will exist: `tools/lib/refuse-wrong-shell.sh`, the refusal call in each of its PINNED population's members, its
      section `2n`, and §8 F3 (b) — `tools/lib/resolve-python.sh` carries neither block nor call, each sourcer
      sources `refuse-wrong-shell.sh` beside it.

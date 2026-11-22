@@ -1,6 +1,6 @@
 **Serves:** journal TOOL-dWitnessedBar-77
 
-# TOOL-dWitnessedBar-77 — builder return 1 (run `wf_7f4b2302-8e5`), committed 7228b0a9a
+# TOOL-dWitnessedBar-77 — builder return 1 (run `wf_7f4b2302-8e5`), committed 18907b769
 
 ## Why
 
@@ -8,7 +8,7 @@ TOOL-dWitnessedBar-77 S1 is built as its rev-4 spec states it, with no divergenc
 
 ## Summary
 
-Built and committed as 7228b0a9a, starting from base 1f34660b7. S1 is done. S2 and AC2 are owed to the main loop at the close.
+Built and committed as 18907b769, starting from base 367404c59. S1 is done. S2 and AC2 are owed to the main loop at the close.
 
 What changed in C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/run-gates/run-gates.gov.test.sh:
 - The canary now gathers its slot values in one array, `rgf_whats`. It holds `count <n>` alone when the line count fails. Otherwise it holds each variable `check_canary_keys` prints, split as `for rgf_g in $rgf_miss`.

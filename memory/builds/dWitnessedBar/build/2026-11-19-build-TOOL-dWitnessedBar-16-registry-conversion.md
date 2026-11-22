@@ -2,7 +2,7 @@
 
 # TOOL-dWitnessedBar-16 — the registry conversion record
 
-What each converted registry held that the ledger row has no field for, and how many rows it held before and after (§2 S5, §4 "The conversion"). Every registry was converted by `tools/memory-tree/convert_registry.py convert --home <home>` at `7dbe0c8d9d2c`, each row `seeded` at that sha (§8 F17); `readme-contract.txt` was converted the same way into the pass's scratch and committed by the main loop (§3 Edges, §8 F15). A row's key is its fields TAB-joined, as the factory prints it.
+What each converted registry held that the ledger row has no field for, and how many rows it held before and after (§2 S5, §4 "The conversion"). Every registry was converted by `tools/memory-tree/convert_registry.py convert --home <home>` at `ef4d5554d8e7`, each row `seeded` at that sha (§8 F17); `readme-contract.txt` was converted the same way into the pass's scratch and committed by the main loop (§3 Edges, §8 F15). A row's key is its fields TAB-joined, as the factory prints it.
 
 Decided where the spec is silent: each registration's `drain` is `hunk` for a `site` key, `key` for a `key` or `record` key, and `none` for the `append-only` retirements; and each population's name is its home's file stem, `drift-pins` and `drift-baselines` as §4 names them.
 
@@ -123,7 +123,7 @@ skills/session-kickoff/manifest-check.test.sh	mkdir -p "$mm_dir" && printf -- '-
 {prefix}/govkit/registry.toml	"installable:{prefix}/agent-instructions/adopt-agent-instructions.sh",	a [[retired]] row's surfaces name what the retired entry shipped, so update withdraws the file from an adopter's tree that still holds it and the step gate witnesses the vanished member; a landed row is frozen (migration, PLAY-dOrderedCharter-80 S2)
 ```
 
-- Pass 2 added 20 rows (DERIVED from the rows whose disposition is `carried:TOOL-dWitnessedBar-51`), each of count 1 at `773daf5611812b8953fbcaba094b4f005c796b3c`: the carriers of the two map `.toml` names that TOOL-dWitnessedBar-51 S5 respells (§2 S15). Each key, then the scope item that carries it, TAB-separated:
+- Pass 2 added 20 rows (DERIVED from the rows whose disposition is `carried:TOOL-dWitnessedBar-51`), each of count 1 at `ba1de4ed8e95abcf2c8de0e5de696a77c03aff94`: the carriers of the two map `.toml` names that TOOL-dWitnessedBar-51 S5 respells (§2 S15). Each key, then the scope item that carries it, TAB-separated:
 
 ```text
 .gitattributes	memory/map/baseline.toml text eol=lf	S5
@@ -511,14 +511,14 @@ verb:unattended.sh:--version	undocumented when the docs leg landed
 ## drift-baselines
 
 - Home: `memory/project/drift-baselines.txt`, moved from `tools/drift-audit/` by pass 2 (§2 S14) · registered in `tools/drift-audit/kit.toml` · direction `shrink-only`, key `record signal,id`.
-- Converted from the `BASELINES` dict of `tools/drift-audit/drift_signals.py` at `7dbe0c8d9d2c`; each entry's history was the comment above it there, read at that sha. A pin of 0 wrote no row.
+- Converted from the `BASELINES` dict of `tools/drift-audit/drift_signals.py` at `ef4d5554d8e7`; each entry's history was the comment above it there, read at that sha. A pin of 0 wrote no row.
 - After: 2 ledger row(s), counts summing to 2.
 - Former reasons: none; no row of the legacy file carried one.
 
 ## drift-pins
 
 - Home: `memory/project/drift-pins.txt`, moved from `tools/drift-audit/` by pass 2 (§2 S14) · registered in `tools/drift-audit/kit.toml` · direction `ceiling`, key `key signal`.
-- Converted from the `PINS` dict of `tools/drift-audit/drift_signals.py` at `7dbe0c8d9d2c`; each entry's history was the comment above it there, read at that sha. A pin of 0 wrote no row.
+- Converted from the `PINS` dict of `tools/drift-audit/drift_signals.py` at `ef4d5554d8e7`; each entry's history was the comment above it there, read at that sha. A pin of 0 wrote no row.
 - After: 6 ledger row(s), counts summing to 520.
 - Former reasons: none; no row of the legacy file carried one.
 

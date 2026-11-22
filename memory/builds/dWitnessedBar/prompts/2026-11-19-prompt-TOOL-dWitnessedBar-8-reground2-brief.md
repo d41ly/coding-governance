@@ -24,10 +24,10 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    in Files touched with the legs its guard names on the gates section's leg line, and a prose-only mention named as
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
-   - Spec rev-5 was re-grounded at `cb1494fc5`, before its order-22 siblings landed. They have now landed: 41
-     (`5a4f86e0c`: the per-tree verdict's `selection` and `selection.<n>` keys, the hook's `check_tree_selection` and
+   - Spec rev-5 was re-grounded at `d0a59de77`, before its order-22 siblings landed. They have now landed: 41
+     (`38a68ee1d`: the per-tree verdict's `selection` and `selection.<n>` keys, the hook's `check_tree_selection` and
      `check_selection_at_r`, and `verdict_flow.py select --check` taking exactly one of `--run` or `--selection` in
-     `main`) and 55 (`599c23cef`: the inherited-red step's reader). Both are past their pass legs.
+     `main`) and 55 (`dff3ca0d6`: the inherited-red step's reader). Both are past their pass legs.
    - This spec shares `tools/run-gates/run-gates.sh`, `tools/run-gates/verdict_flow.py`, `.githooks/pre-push.test.sh`
      and the kickoff manifest re-stamp with unit 41: settle every claim, citation and region about those files
      against the tree as unit 41 left it, including `verdict_flow.py#main`'s argument handling, and list

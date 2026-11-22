@@ -20,7 +20,7 @@ Every other claim I checked holds at HEAD, including the blob-pinned lines 5506,
 
 ## Summary
 
-No commit: TOOL-dWitnessedBar-8 stopped before the first code edit because the spec has three divergences (listed in `why`). `base` is d4a97bfab6f05f349611ba001584cec75f722acf.
+No commit: TOOL-dWitnessedBar-8 stopped before the first code edit because the spec has three divergences (listed in `why`). `base` is 9a050f4ca741df1634d26244e89de6caa6d49113.
 
 **What ran:**
 - `unattended.sh --brief` answered "already recorded, unchanged".

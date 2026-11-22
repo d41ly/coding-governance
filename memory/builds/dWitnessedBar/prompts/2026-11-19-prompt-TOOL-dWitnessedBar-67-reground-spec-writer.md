@@ -118,7 +118,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 38: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59,
-     30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64 (`b26061af2`), 65 (`139d6fea1`) and 66 (`a04b24c97`: the
+     30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64 (`ef54d1d89`), 65 (`f2fcd51c6`) and 66 (`e3cdc2201`: the
      AC12 arm in `run-gates.gov.test.sh` writes `verdict GREEN<CR>`, `sha a×40`, `sha b×40<CR>`, its hook half grades
      `rec_sha`, its `read_tag_lines` half prints `repr` of `verdict` and `sha`). Every unit this spec consumes from is
      CLOSED.
@@ -130,7 +130,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
      fallback reason `git <verb> exited <rc>`, a colon refused anywhere in a path (so a second-character colon row is
      moot). Suite floors at HEAD: read each from its suite file, never from this spec.
    - Order 39 builds 68 beside 69 (disjoint files), then 67 (it shares `run-gates.gov.test.sh` with 68 and
-     `verdict_backends.py` with 69), then 70 (it consumes 69). Unit 69's spec is rev-5 at `6c6a0ceaf`; where this spec
+     `verdict_backends.py` with 69), then 70 (it consumes 69). Unit 69's spec is rev-5 at `27f338070`; where this spec
      and unit 69 touch the same reader, read unit 69's spec as the shape that lands first.
    - Settle every claim about the landed shape of each unit this spec consumes from against the tree, reading each
      unit's committed builder return under `memory/builds/dWitnessedBar/build/` where the spec relies on what it built.

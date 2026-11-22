@@ -52,19 +52,19 @@ observation of its six `New arm:` lines, and AC14 and AC18, which only the close
 - AC14 — `push-main.sh --prepare` — not observable in a pass: the close runs the shell-role derivation on
   that merge. This pass's own growth is settled in `2026-11-20-build-TOOL-dWitnessedBar-57-widen-2`, each
   row set to its measured count (353, 116, 1167).
-- AC15 — `fe49c7d2a` — the §4 pass-commit rule printed nothing for `TOOL-dWitnessedBar-28`, `fe49c7d2a`'s
-  SHA for `TOOL-dWitnessedBar-24` and `aecf1c95a`'s for `TOOL-dWitnessedBar-6`, never `ad002a024`.
+- AC15 — `6d1261958` — the §4 pass-commit rule printed nothing for `TOOL-dWitnessedBar-28`, `6d1261958`'s
+  SHA for `TOOL-dWitnessedBar-24` and `0b7e0fceb`'s for `TOOL-dWitnessedBar-6`, never `ad002a024`.
 - AC16 — `--fixture held` — `drift_report.py --gate-health --fixture held --selection <empty file>` printed
   `gate-health fixture held ok`: with its quarantine row appended the bar read `legs 1/1`, and with no
   `--selection` the mode exited 2 naming the flag; the bare `--gate-health --fixture held` exited 2.
 - AC17 — `^# >>> acceptance_reader` — the grep printed 2, and every path outside `memory/` that
-  `git show --name-only --format= 7b649d671` lists is spelled in unit 51's spec.
+  `git show --name-only --format= 55e427e66` lists is spelled in unit 51's spec.
 - AC18 — `_check_exists_refused` — the `sed -n` range prints the `not w` refusal; the scratch-copy
   `govkit.py selfcheck` half is a gate leg's command, owed at close.
 - AC19 — `grants: PLAY-dClosedLoop-3` — the grep printed §8 F3's grant naming `memory/HYGIENE.md` and
-  `memory/guides/BUILD-METHOD.md`, and `git show --name-only --format= 28edeaa0b` lists both.
-- AC20 — `git log --merges --oneline cc35bb62c^..ef33493d7` — printed nothing, and the `--format=%h` log
-  named `94e566d88` and `cc35bb62c`, neither `75a15d9ce` nor `ef33493d7`.
+  `memory/guides/BUILD-METHOD.md`, and `git show --name-only --format= 636ec0364` lists both.
+- AC20 — `git log --merges --oneline 8b3aa5783^..ebe9575ea` — printed nothing, and the `--format=%h` log
+  named `105781740` and `8b3aa5783`, neither `15bb9de79` nor `ebe9575ea`.
 - AC21 — `.memory-tree.conf` — the grep over its uncommented lines printed 0.
 - AC22 — `mismatch []` — §4's pack probe printed `portability 15`, `product-tests 1` and `mismatch []`,
   exit 0; over a scratch copy of the manifest with every `pack` key removed it printed

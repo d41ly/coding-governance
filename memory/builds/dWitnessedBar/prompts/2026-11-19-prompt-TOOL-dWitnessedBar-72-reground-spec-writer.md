@@ -118,11 +118,11 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 40's first unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41,
-     55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68, 67 (`e1d569fc9`: the AC12
+     55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68, 67 (`af84e1a7a`: the AC12
      record gains a CR-ended `fingerprint` line, the arm checks `rec_fp`, and deleting the hook strip reds on this
-     node), 70 (`09718851e`: the AC12 arm's canary builds a strip-less mutant of the cut `read_green_file`, requires a
+     node), 70 (`0890c99d1`: the AC12 arm's canary builds a strip-less mutant of the cut `read_green_file`, requires a
      one-line `diff` and a 41-byte CR-ended `rec_sha`, and the `rec_sha` compare always prints but counts only when the
-     canary passes) and 71 (`ced984440`: `run_planted_git` in the resolver suite). Every unit this spec consumes from is
+     canary passes) and 71 (`2972b3755`: `run_planted_git` in the resolver suite). Every unit this spec consumes from is
      CLOSED.
    - Unit 28 is NOT built: it waits on three dOrderedCharter changes (asks TOOL-dWitnessedBar-101 to -103) and the run
      defers it; any item of this spec that needs it leaves the scope, named in §3 as waiting with unit 28.

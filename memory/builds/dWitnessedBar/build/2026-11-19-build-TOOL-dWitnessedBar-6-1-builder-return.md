@@ -1,18 +1,18 @@
 **Serves:** journal TOOL-dWitnessedBar-6
 
-# TOOL-dWitnessedBar-6 — builder return 1 (run `wf_ceedcefd-a16`), committed 1533b56d4
+# TOOL-dWitnessedBar-6 — builder return 1 (run `wf_ceedcefd-a16`), committed 5b3fbe429
 
 ## Why
 
-TOOL-dWitnessedBar-6 is built and committed, and its spec is closed. The checks on whether the spec could be built held against the tree before any code was written: every citation (every line the spec's rev-7 pins at `51fb8d207`, push-main.sh's two landing pushes, guard.py#check_staged/check_run_mandate, policy.py#DerivedDefault, verdict_flow/leg_factory seams, remote-ci.yml job `bar` and its step name) matched, and no section contradicted another. So there was no divergence to return.
+TOOL-dWitnessedBar-6 is built and committed, and its spec is closed. The checks on whether the spec could be built held against the tree before any code was written: every citation (every line the spec's rev-7 pins at `74edc4d00`, push-main.sh's two landing pushes, guard.py#check_staged/check_run_mandate, policy.py#DerivedDefault, verdict_flow/leg_factory seams, remote-ci.yml job `bar` and its step name) matched, and no section contradicted another. So there was no divergence to return.
 
 ## Summary
 
 I built TOOL-dWitnessedBar-6 in two commits, both carrying `Pass: TOOL-dWitnessedBar-6`. All ten criteria were observed with fixtures or probes of my own code. No gate, suite or bar ran, and the three new arms and their red-first observations are owed at the close.
 
 **Commits**
-- `aecf1c95a` (feat) is the pass commit. It moves the spec to CLOSED and adds the acceptance ledger at `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-6-1-acceptance-ledger.md`. It also carries the staged RUN.md rows and the index rewrites (LIVE.md, backlog/TOOL.md, the build README and the spec's generated records table).
-- `1533b56d4` (fix) is a follow-up the bug-class checklist asked for. The fixture now drops any inherited git variable (such as a hook's `GIT_DIR`) before its plants run. The peer plant still held with `GIT_DIR` pointed at this checkout.
+- `0b7e0fceb` (feat) is the pass commit. It moves the spec to CLOSED and adds the acceptance ledger at `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-6-1-acceptance-ledger.md`. It also carries the staged RUN.md rows and the index rewrites (LIVE.md, backlog/TOOL.md, the build README and the spec's generated records table).
+- `5b3fbe429` (fix) is a follow-up the bug-class checklist asked for. The fixture now drops any inherited git variable (such as a hook's `GIT_DIR`) before its plants run. The peer plant still held with `GIT_DIR` pointed at this checkout.
 
 **What was built**
 - **Two new modules:**

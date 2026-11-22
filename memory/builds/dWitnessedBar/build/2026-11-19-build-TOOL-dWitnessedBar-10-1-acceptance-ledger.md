@@ -18,7 +18,7 @@ lines, and AC2's commit-time `cost:` reading.
   --precommit`), `kickoff-manifest ratchet` (`bash skills/session-kickoff/manifest-check.sh --staged`),
   `unattended skill wiring` (`bash tools/unattended/adopt-unattended.sh --check`) and `template size
   <=48KiB` (`bash tools/check-template-size.sh`); no `memory hygiene` row. The criterion's `grep -cE` (DERIVED from the leg declarations)
-  over `.githooks/pre-commit` printed 0. `git diff eed402e7 -U0 -- .githooks/pre-commit` has hunks at
+  over `.githooks/pre-commit` printed 0. `git diff 4d5860a6 -U0 -- .githooks/pre-commit` has hunks at
   base lines 217, 223-225 and 328 on, none inside the hygiene block at base lines 286-326.
   `leg_factory.py --check` read the manifest fresh after `--write`.
 - AC2 — `not tripped` — over a scratch repository, a fixture manifest with `A` guarded on `a/` and

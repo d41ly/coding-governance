@@ -118,9 +118,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved lines as `path#symbol` or blob-pinned, never a bare `path:line`.
    What is built so far:
    - Built: unit 26 (`7526c98fa`, the `resolve_bash_py` block `scan_bash` / `scanBash`, `scan_bare_bash` in
-     `tools/run-gates/measure_legs.py`, section `2j`); unit 27 (`cc35bb62c`, `tools/lib/refuse-wrong-shell.sh` and the
-     refusal in every `resolve_python` member, section `2n`); unit 48 (`75a15d9ce`, row_grammar's resolver an adapter,
-     `scan_bare_bash` shape 2 widened). Unit 49 (`ef33493d7`, shape 4 of `scan_bare_bash`: a PATH lookup of `bash`). Unit 13 (rev-3) is building now.
+     `tools/run-gates/measure_legs.py`, section `2j`); unit 27 (`8b3aa5783`, `tools/lib/refuse-wrong-shell.sh` and the
+     refusal in every `resolve_python` member, section `2n`); unit 48 (`15bb9de79`, row_grammar's resolver an adapter,
+     `scan_bare_bash` shape 2 widened). Unit 49 (`ebe9575ea`, shape 4 of `scan_bare_bash`: a PATH lookup of `bash`). Unit 13 (rev-3) is building now.
    - Queued from re-grounded specs, each the contract for what will exist: unit 13 (rev-3, building now: `tools/lib/legacy_ledger.py`,
      parity row `legacy_ledger_py`, section `2o`), unit 50 (rev-4), unit 15 (rev-8: `test.seed` at every check's
      registration, `retrofit.unseeded` read through `policy.py get`), unit 12 (rev-6: the `leg`, `check` and `pack` tag

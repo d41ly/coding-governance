@@ -119,12 +119,12 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    What is built so far:
    - Built and landed through order 41's fourth unit: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41,
      55, 8, 1, 59, 30, 29, 7, 21, 6, 2, 43, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 69, 68, 67, 70, 71, 72, 74, 75, 73,
-     76 (`bdc10a4df`), 77 (`7228b0a9a`: one failure line per value in `rgf_whats`) and 79 (`08f226f3d`: the per-key
+     76 (`3596751cf`), 77 (`18907b769`: one failure line per value in `rgf_whats`) and 79 (`b9326245e`: the per-key
      loop's body is now the top-level `check_key_variant <key>:<var> <replacement> <label> <passed reason> <other
      lead>`, called twice per key: the tail variant with replacement `'${_rg_v%?}'` and an empty label, then the
      length variant with `'${_rg_v:1}'` and label `length `; the shell-role row is 797). Every unit this spec
      consumes from is CLOSED.
-   - This spec, rev-3, was written at `93b41881e`, before unit 79 moved the variant check into `check_key_variant`.
+   - This spec, rev-3, was written at `f2d425c77`, before unit 79 moved the variant check into `check_key_variant`.
      Unit 79's spec (§8 F5) states what this unit's change becomes now: the arguments of the tail call (the
      replacement `${_rg_v%?}x`, the label `tail `, and its passed reason that the tail variant passed a value whose
      last byte is not CR), and AC3's grep must allow for the comment text naming that variant. Re-ground S1, S3, AC3

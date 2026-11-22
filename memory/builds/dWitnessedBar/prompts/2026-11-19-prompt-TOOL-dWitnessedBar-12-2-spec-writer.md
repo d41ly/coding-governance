@@ -124,9 +124,9 @@ builder can build it as written over HEAD.
      Rewrite the claim to what the code prints, or add the item that prints it.
 2. In Files touched, list each of the 27 descriptors as its own `- \`path\`` bullet, as every other entry is listed,
    so the dispatch's declared write set carries them (DERIVED: the builder counted 27 descriptors carrying
-   `[[gate_leg]]` rows at `c05abd810`).
-   Built so far, each landed on this branch: units 26, 27, 48, 49, 13, 50 and 15 (`53d61e754`: the seed verb in
-   `tools/lib/legacy_ledger.py`). Every other claim the builder re-checked still holds at `c05abd810`; leave those as
+   `[[gate_leg]]` rows at `cbad1ae71`).
+   Built so far, each landed on this branch: units 26, 27, 48, 49, 13, 50 and 15 (`0b6b02bdb`: the seed verb in
+   `tools/lib/legacy_ledger.py`). Every other claim the builder re-checked still holds at `cbad1ae71`; leave those as
    they are.
 3. A choice the revision forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it
    RESOLVED in §8 with the delegated mark, and name it in your return.

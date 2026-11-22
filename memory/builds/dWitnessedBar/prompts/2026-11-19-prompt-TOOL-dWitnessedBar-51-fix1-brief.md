@@ -24,7 +24,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    in Files touched with the legs its guard names on the gates section's leg line, and a prose-only mention named as
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
-   - Spec rev-6 (`510f79a69`) was handed to its builder, which stopped before any edit at three divergences. Its return
+   - Spec rev-6 (`f600db1c1`) was handed to its builder, which stopped before any edit at three divergences. Its return
      is `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-51-1-builder-return.md`; read it whole.
    - Nothing else is in flight in this working tree.
 2. A choice the re-ground forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it

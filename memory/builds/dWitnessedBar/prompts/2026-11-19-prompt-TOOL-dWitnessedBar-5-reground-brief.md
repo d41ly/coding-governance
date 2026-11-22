@@ -25,7 +25,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 20: every unit up to and including 4 (the runner's per-tree verdict record),
-     25, 40, 23 (the `gov-tester` role), 42 and 3 (`930a5289d` with its pass-leg fix `e37158660`: `verdict.blocks`
+     25, 40, 23 (the `gov-tester` role), 42 and 3 (`9991872c0` with its pass-leg fix `b140294d7`: `verdict.blocks`
      joins each red's attribution class to block or pass, `tools/run-gates/lib-verdict.sh` and
      `tools/run-gates/verdict_flow.py` with `route` and `judge`, the upgrade step `tools/govkit/steps/inherited_red.py`,
      and `INHERITED_RED` retired onto the new key).

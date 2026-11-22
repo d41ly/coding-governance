@@ -9,7 +9,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 19.
 - Built so far through order 18: every unit up to and including 4 (the runner's per-tree verdict record), 25 (the
-  verdict's `run_id` and `cause`, failing-leg tails kept by hash) and 40 (`ebe139e1e`: the per-tree verdict's docs and
+  verdict's `run_id` and `cause`, failing-leg tails kept by hash) and 40 (`8eabe6333`: the per-tree verdict's docs and
   inherited-base declines and its reuse pair).
 - Units 23 and 42 build at order 19 IN PARALLEL in this one working tree. Their Files touched are disjoint: stage
   explicit paths only, never `git add -A`, and never stage, edit or revert a path the other unit's spec names. The

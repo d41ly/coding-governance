@@ -9,10 +9,10 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 4.
 - Built so far: units 26, 27, 48, 49 (the `resolve_bash_py` block, `tools/lib/refuse-wrong-shell.sh`, `scan_bare_bash`),
-  unit 13 (`34f8bb7db`, red-fixes `010323e92` and `2bd7e6e36`: `tools/lib/legacy_ledger.py` with `read_rows`,
+  unit 13 (`9cdebebc4`, red-fixes `a96cb1dec` and `15710a90a`: `tools/lib/legacy_ledger.py` with `read_rows`,
   `read_registrations` over every tracked file named exactly `kit.toml` and the `DEPLOYER_HOME` registry, the CLI
   `read|compare|carry` with `compare --measured <path>`, copies in memory-tree and gate-lint, section `2o` of
-  `tools/lib/resolve-python.test.sh`) and unit 50 (`2b4d10063`: `--coverage` in `tools/lib/refuse-wrong-shell.sh`).
+  `tools/lib/resolve-python.test.sh`) and unit 50 (`091488ac9`: `--coverage` in `tools/lib/refuse-wrong-shell.sh`).
   Read the factory as unit 13 left it.
 - Unit 13 rev-4 §8 F6 makes `compare` read measured rows from `--measured <path>` through `read_rows(path, arity,
   tail=())`; this unit's seed run prints those rows, so its output grammar is what `read_rows` parses. Name `read_rows`

@@ -318,7 +318,7 @@ row keys reach a target only at or above `LEG_KEY_FLOORS`' floor (TOOL-dWitnesse
 - `help/overlay-rows.md`
 - `memory/map/generated/symbols.json` (re-rendered by the codebase-map kit's `gen_map.py --write`)
 
-Shared with the order-29 siblings, read 2026-11-20 at `fed256d71`: TOOL-dWitnessedBar-43 lists
+Shared with the order-29 siblings, read 2026-11-20 at `4fc2e7383`: TOOL-dWitnessedBar-43 lists
 `tools/run-gates/run-gates.gov.test.sh` and `memory/map/generated/symbols.json`, and
 TOOL-dWitnessedBar-2 none of these paths. This unit builds over both as landed.
 
@@ -399,7 +399,7 @@ TOOL-dWitnessedBar-2 none of these paths. This unit builds over both as landed.
 - **AC12** — When `grep -n 'leg sources' overlay-rows.md` runs in `help/`, the page's leg section
   names the leg, the legacy list and the seen-red count.
   Red when: the repository's route to its own legs is undocumented.
-  fixture: the page is PLAY-dOrderedCharter-35 S12's, tracked at `fed256d71`.
+  fixture: the page is PLAY-dOrderedCharter-35 S12's, tracked at `4fc2e7383`.
 - **AC13** — When `python leg_factory.py --fixture --plant exclude-at-head` runs, the leg `HEAD`'s
   policy excludes is absent from the written manifest with its state `excluded`; and when
   `--plant unborn-head` runs, no `policy.py get` is made, every gov leg is written, and the
@@ -480,7 +480,7 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   the one composition per update, writing every kind's orders and holding the update under `refuse`
   before a byte is written. RESOLVED (owner, 2026-11-05): (a) the drift verb governs, by an ask to
   dOrderedCharter, filed as TOOL-dWitnessedBar-101: (a)'s three changes, beside TOOL-dDeclaredLoop-26
-  F5's. Re-grounded at `fed256d71`, the ruling unchanged: (b)'s `compose` verb has since landed and serves neither S5 nor S8 (§2 S8), and (a)'s
+  F5's. Re-grounded at `4fc2e7383`, the ruling unchanged: (b)'s `compose` verb has since landed and serves neither S5 nor S8 (§2 S8), and (a)'s
   changes are all still owed (§2 S5).
 - **F7 — Does a refused overlay row withhold the leg step?** PLAY-dOrderedCharter-36 S7 makes a check
   finding refuse the whole composition, so under the parents as written a patch to a fixed leg, an
@@ -497,7 +497,7 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   ask to dOrderedCharter, filed as TOOL-dWitnessedBar-102: (a)'s row-level hold, recorded as a
   deviation of 36 S7 until it lands.
 - **F8 — Does the render compose the gate-leg kind once S1 gives it a `schema`?** Forced by the
-  re-ground at `fed256d71`. `tools/playbook/render_playbook.py#read_kind_rows` composes every kind the
+  re-ground at `4fc2e7383`. `tools/playbook/render_playbook.py#read_kind_rows` composes every kind the
   register lists with a `schema` through `tools/playbook/overlay_rows.py#derive_kind_composition`
   (TOOL-dDeclaredLoop-24 S3), and `render_delta_report` refuses the render on any refused
   composition. That body reads gov's rows from the namespace row keyed by the kind's name, and the
@@ -527,7 +527,7 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   AC16 observes it, and §5 risks states what `leg sources` then does not check. widens: none ·
   relaxes: `leg sources` reds no unsourced row in a target with no memory tree
 - **F10 — Where does `cmd_update` get gov's leg rows before its write loop?** Forced by the
-  re-ground at `fed256d71`. The drift verb runs before the write loop, through
+  re-ground at `4fc2e7383`. The drift verb runs before the write loop, through
   `tools/govkit/govkit.py#read_unit_drift`, and the leg step after it
   (`tools/govkit/govkit.py@7999040a:12911`). There `write_gate_legs` builds gov's rows: tokens
   resolved, each `guard` filtered against `have`, the index read after the write loop and the
@@ -567,7 +567,7 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   unchanged, as the unit writes that path; nothing else moved.
 - rev-6 · 2026-11-20 · §1 · §2 S2 to S8, S10 to S12 · §3 Edges · §4 the schema excerpt, The legacy
   list, The plants, Inventory, Files touched · §5 · AC7, AC12, AC16 (new) · §7 · §8 F1, F6, F8 to F10
-  (new) · §10 · re-grounded at `fed256d71` by the brief
+  (new) · §10 · re-grounded at `4fc2e7383` by the brief
   `2026-11-19-prompt-TOOL-dWitnessedBar-28-reground-brief`: bare lines blob-pinned or cited by
   symbol; the landed composer, field reader and order writer named; S11 reuses the shared witness;
   unit 12's tags fill S3; the ledger home moves under `memory/project/`; Files touched gains the
@@ -587,7 +587,7 @@ TOOL-dSafePassage-10 with its shared witness `tools/playbook/pins.py#read_change
 specced and built before this unit. `python tools/codebase-map/reuse_lookup.py "emit an adopter's
 gate legs into its manifest beside gov's"` ranked generic stems (`legs`, `manifest`, `adopt`) and
 missed `write_gate_legs`, which scout B found by reading; no composition of adopter legs exists at
-base. Re-run at `fed256d71` on 2026-11-20, it ranks the same stems and still misses
+base. Re-run at `4fc2e7383` on 2026-11-20, it ranks the same stems and still misses
 `write_gate_legs`.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a repository add or patch its own gate legs without its manifest being withheld" --terms "adopter leg overlay instructions.toml amends pin exclude fixed set widening write_gate_legs withhold re-append legacy"`

@@ -9,8 +9,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 33.
 - Built so far through order 32: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8, 1, 59, 30, 29,
-  7, 21, 6, 2, 43, 51, 56 and 57 (`8359ae2b8`, its pass-leg fixes `282cd388e`). Unit 28 (order 30) is deferred against
-  asks TOOL-dWitnessedBar-101 to -103 and is not built. This spec, rev-3, was re-grounded at `c9d20a65b`.
+  7, 21, 6, 2, 43, 51, 56 and 57 (`e63ac2503`, its pass-leg fixes `4dabf6e0d`). Unit 28 (order 30) is deferred against
+  asks TOOL-dWitnessedBar-101 to -103 and is not built. This spec, rev-3, was re-grounded at `430ca515a`.
 - Unit 60 shares order 33 and builds after this unit lands, since both touch the run-gates evidence suite, so nothing
   else is in flight in this working tree: commit directly here.
 - The full `memory hygiene` leg is red at base on checks 13 and 15 from other records, and whole-tree spec tokens on one

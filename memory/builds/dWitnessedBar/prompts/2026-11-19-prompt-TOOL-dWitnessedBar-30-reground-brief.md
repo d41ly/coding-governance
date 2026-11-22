@@ -25,9 +25,9 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 23: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41, 55, 8
-     (`5944dcc3c`: flake quarantine, `write_leg_ask`, the `flake` kind), 1 (`ad3949b5f`: gate health measured from the
+     (`dd90f8abb`: flake quarantine, `write_leg_ask`, the `flake` kind), 1 (`ad55d40c1`: gate health measured from the
      flake records, the `gate-health` kind, `read_flake_body` and `derive_flaked` in the record factory) and 59
-     (`4657d344d`).
+     (`9e7d56e72`).
    - Settle every claim about the landed shape of each unit this spec consumes from against the tree.
    - This unit builds alone at order 24.
 2. A choice the re-ground forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it

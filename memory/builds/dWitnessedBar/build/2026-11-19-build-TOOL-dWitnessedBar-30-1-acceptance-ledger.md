@@ -3,7 +3,7 @@
 **Serves:** journal TOOL-dWitnessedBar-30
 
 No merge bar, no self-test suite and no gate leg ran in this pass, the naming lexicon's `--suggest`
-excepted. The criteria were observed on node d, 2026-11-20, at base `69bfa6d38`, by `verdict_flow.py`'s
+excepted. The criteria were observed on node d, 2026-11-20, at base `f769a2756`, by `verdict_flow.py`'s
 own fixtures, by in-process mutation probes of them, by stub-runner probes of `check_quiet` and
 `run_quiet_leg`, by slices of the runner's selection parse and of the driver's `write_backlog_rows`,
 `write_ask_closing`, `write_flake_releases` and `run_verdict_route` run over scratch fixtures with

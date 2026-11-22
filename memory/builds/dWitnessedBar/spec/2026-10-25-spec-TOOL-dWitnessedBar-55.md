@@ -252,7 +252,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 · the S4 fixture se
   `tools/govkit/selftest.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing
   else moved.
 - rev-4 · 2026-11-20 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · §8 · §10 · re-grounded over HEAD
-  `cb1494fc` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-55-reground-brief: the pre-step readers cited blob-pinned
+  `d0a59de7` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-55-reground-brief: the pre-step readers cited blob-pinned
   at the base, the live parsers by symbol; the landed step's reader, `read_value` over
   `conf_to_policy.py#build_line_re`, named as what this unit changes, with its probed divergences in
   §4's table and S4's set (F2); S5 and AC5 add the help page unit 44 landed; Files touched gains

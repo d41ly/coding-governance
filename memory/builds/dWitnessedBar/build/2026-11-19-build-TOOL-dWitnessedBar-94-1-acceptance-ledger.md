@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dWitnessedBar-94
 
-No merge bar, no self-test suite and no gate leg ran in this pass. This unit writes records only: it touches no code file and mints no function. Its pass-time probe ran on node d, 2026-11-21, from base `05ab4b7fc`, over scratch roots under the run's scratch directory, with 92 §4's note check cut from spec-92 at `d31ee066d` and a copy carrying S1's pattern, `^  +TOOL-dWitnessedBar-$u $s([^0-9]|\$)`. Every line marked OWED is the main loop's at the close, after the last unit is terminal: AC1's to AC3's fixtures, S3's note in unit 92's ledger and AC4's read of it (§4 Rollout).
+No merge bar, no self-test suite and no gate leg ran in this pass. This unit writes records only: it touches no code file and mints no function. Its pass-time probe ran on node d, 2026-11-21, from base `20cced7ed`, over scratch roots under the run's scratch directory, with 92 §4's note check cut from spec-92 at `3ffc6c67c` and a copy carrying S1's pattern, `^  +TOOL-dWitnessedBar-$u $s([^0-9]|\$)`. Every line marked OWED is the main loop's at the close, after the last unit is terminal: AC1's to AC3's fixtures, S3's note in unit 92's ledger and AC4's read of it (§4 Rollout).
 
 **Evidences:** TOOL-dWitnessedBar-94
 - AC1 — `NO NOTE 90 S1` — at the pass, a scratch 89 ledger whose only note under `- AC4` opens `TOOL-dWitnessedBar-90 S9`, holds the backticked `for unread` and cites `TOOL-dWitnessedBar-90 S1` in prose, fed `90|S1|89|AC4|` and `90|S9|89|AC4|for unread`, printed `NO NOTE 90 S1`, exit 1, through the check with S1's pattern, and `NOTES OK 2`, exit 0, through spec-92's unreplaced script (PINNED 2026-11-21). OWED: the fixture's run at the close, with the fragments of units 93, 96 and 97 composed beside S1's.

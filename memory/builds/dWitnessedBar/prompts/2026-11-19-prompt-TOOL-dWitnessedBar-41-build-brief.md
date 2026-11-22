@@ -8,8 +8,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 22.
-- Built so far through order 21: every unit up to and including 4, 25, 40, 23, 42, 3, 44 (`acd04756e`) and 5
-  (`eef75404f`), with their pass-leg fixes `b94fc8d10`. This spec was re-grounded over them at `0a8d5b160`.
+- Built so far through order 21: every unit up to and including 4, 25, 40, 23, 42, 3, 44 (`9de4bf5cd`) and 5
+  (`e896a6198`), with their pass-leg fixes `ed02517ba`. This spec was re-grounded over them at `dee8251d8`.
 - Units 41 and 55 build at order 22 IN PARALLEL in this one working tree. Their Files touched are disjoint: stage
   explicit paths only, never `git add -A`, and never stage, edit or revert a path the other unit's spec names. The
   session card routes both units, so each builder may flip its own spec's status. Unit 8 (order 22) builds after

@@ -118,8 +118,8 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
    - Built and landed through order 22: every unit up to and including 4, 25, 40, 23, 42, 3, 44, 5, 41
-     (`5a4f86e0c`: the per-tree verdict's selection), 55 (`599c23cef`: the inherited-red step's reader) and 8
-     (`5944dcc3c`: flake quarantine, the `flake` record kind, `verdict_flow.py flakes`, `write_leg_ask` in the driver,
+     (`38a68ee1d`: the per-tree verdict's selection), 55 (`dff3ca0d6`: the inherited-red step's reader) and 8
+     (`dd90f8abb`: flake quarantine, the `flake` record kind, `verdict_flow.py flakes`, `write_leg_ask` in the driver,
      and `build_records.py read` reading every typed kind by its own `KINDS` entry).
    - Settle every claim about the landed shape of each unit this spec consumes from against the tree.
    - Units 1 and 59 sit at order 23 and will build in parallel where their Files touched are disjoint; units 29 and 7
