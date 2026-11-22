@@ -870,12 +870,24 @@ _READER_ID_SHAPE = re.compile(r"\[[^\]\n]*a-z[^\]\n]*\](?:[*+]|\{\{?[0-9]*,?[0-9
 _READER_SLUG_SHAPE = re.compile(r"\w*(?:SLUG|[Ss]lug)\w*\s*=\s*(?:re\.compile\(\s*)?\(?\s*"
                                 r"(?:[rRbBfF]{0,2}(['\"])[^'\"\n]*\[|/[^/\n]*\[)")
 _READER_BLOCK = re.compile(r"^(?:# |// )(>>>|<<<) slug_legacy_")
+# The split shapes (TOOL-dTotalRecall-38 S2): a value whose name holds `id`, `slug` or `unit`, case
+# ignored, split on a hyphen by Python's `.split("-")` or `.rsplit("-"`, by a shell `${name%-*}`,
+# `${name%%-*}`, `${name#*-}` or `${name##*-}`, or on a line that names one beside a `cut -d-`,
+# `cut -d '-'` or `IFS=-`. The value's NAME is read, so a split of a value named otherwise is outside
+# it, and so is `.partition`.
+_SPLIT_NAME = r"[A-Za-z_]*(?:id|slug|unit)[A-Za-z_]*"
+_READER_SPLIT_SHAPE = re.compile(
+    _SPLIT_NAME + r"\.r?split\(\s*(['\"])-\1"
+    r"|\$\{" + _SPLIT_NAME + r"(?:%%?-\*|##?\*-)\}"
+    r"|^(?=.*\$\{?" + _SPLIT_NAME + r").*(?:\bcut\s+-d\s*(?:-|'-'|\"-\")(?=\s|$)|\bIFS=-(?=\s|;|$))",
+    re.I)
 
 
 def scan_readers(root) -> list[str]:
     """`path:line:text` for every line of a tracked `*.py`, `*.sh` or `*.js` file under `tools/` and
-    `skills/`, and of every tracked file under `.githooks/`, that spells a slug or id shape, outside
-    the grammar's own entry points: this module and every `slug_legacy_*` block."""
+    `skills/`, and of every tracked file under `.githooks/`, that spells a slug or id shape or splits
+    an id-named value on a hyphen (`_READER_SPLIT_SHAPE`), outside the grammar's own entry points:
+    this module and every `slug_legacy_*` block."""
     root = pathlib.Path(root)
     tool_root = pathlib.Path(__file__).resolve().parent.parent
     try:  # the tool root as this tree places it, so an adopter's install prefix is the one scanned
@@ -906,7 +918,8 @@ def scan_readers(root) -> list[str]:
             if mark:
                 inside = mark.group(1) == ">>>"
                 continue
-            if not inside and (_READER_ID_SHAPE.search(line) or _READER_SLUG_SHAPE.search(line)):
+            if not inside and (_READER_ID_SHAPE.search(line) or _READER_SLUG_SHAPE.search(line)
+                               or _READER_SPLIT_SHAPE.search(line)):
                 hits.append(f"{rel}:{n}:{line}")
     return hits
 
@@ -926,10 +939,15 @@ def run_flip_probe(clone) -> int:
     """Each flip of `_FLIPS`, committed to `main` of the scratch clone `clone`, whose remote is removed
     so the policy reader's landed revision is that `main`: the new slug passes `mint_re`; a legacy
     two-word slug the flip does not admit fails it and passes `BUILD_SLUG_RE`, or the shape is stated
-    unchanged; every tracked folder passes `BUILD_SLUG_RE`; `ID_RE` matches `TOOL-<slug>-3` whole.
+    unchanged; every tracked folder passes `BUILD_SLUG_RE`; `ID_RE` matches `TOOL-<slug>-3` whole;
+    `parse_id_parts` returns the new slug and 3 for it; and the clone's census lists no split hit, by
+    path and line text, that the census over this probe's own tree does not (TOOL-dTotalRecall-38 S4).
     One `flip <name>: ok` line or the failed checks each; 1 on any failure, 2 on an unusable clone."""
     global _default, _cached
     clone = pathlib.Path(clone).resolve()
+    # The copy `tree_lib` imports, whose slug cache the parser's token regex reads: a second module
+    # when this one runs as `__main__`, so both caches are cleared at each flip.
+    twin = load_sibling("id_grammar")
 
     def run(*args: str) -> str:
         return subprocess.run(["git", "-C", str(clone), "-c", "user.name=flip-probe",
@@ -953,7 +971,10 @@ def run_flip_probe(clone) -> int:
     node, memory_root = read_slug_node(clone)
     depth = len(memory_root.split("/"))
     _slug_cache.clear()
+    twin._slug_cache.clear()
     base_mint = derive_slug_grammar(clone).mint_re.pattern
+    own_splits = {tuple(h.split(":", 2)[::2]) for h in scan_readers(repo_root())
+                  if _READER_SPLIT_SHAPE.search(h.split(":", 2)[2])}
     failed = 0
     try:
         for name, key, value, slug in _FLIPS:
@@ -972,6 +993,7 @@ def run_flip_probe(clone) -> int:
             run("add", "--", policy.relative_to(clone).as_posix(), readme.relative_to(clone).as_posix())
             run("commit", "-q", "--no-verify", "-m", f"flip-probe: {name}")
             _slug_cache.clear()
+            twin._slug_cache.clear()
             _default = _cached = None
             g = derive_slug_grammar(clone)
             why = []
@@ -993,6 +1015,16 @@ def run_flip_probe(clone) -> int:
             m = grammar_for(clone).ID_RE.search(f"see {ident} here")
             if not m or m.group(0) != ident or not m.group(0).endswith("-3"):
                 why.append(f"ID_RE does not match {ident} whole: {m.group(0) if m else 'no match'}")
+            try:
+                parts = parse_id_parts(ident, clone)
+            except ValueError as exc:
+                parts = str(exc)
+            if parts != ("TOOL", slug, 3):
+                why.append(f"parse_id_parts does not return {slug} and 3 for {ident}: {parts}")
+            stray = [h for h in scan_readers(clone) if _READER_SPLIT_SHAPE.search(h.split(":", 2)[2])
+                     and tuple(h.split(":", 2)[::2]) not in own_splits]
+            if stray:
+                why.append("the clone's census lists split hit(s) this tree's does not: " + " | ".join(stray[:5]))
             if value == "shown" and g.render_label("dClosedLoop", "2026-10-26") != "dClosedLoop (2026-10-26)":
                 why.append("render_label does not render dClosedLoop (2026-10-26)")
             if why:
@@ -1003,6 +1035,7 @@ def run_flip_probe(clone) -> int:
     finally:
         run("reset", "-q", "--hard", start)
         _slug_cache.clear()
+        twin._slug_cache.clear()
         _default = _cached = None
     return 1 if failed else 0
 

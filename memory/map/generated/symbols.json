@@ -41248,6 +41248,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_split_census_and_the_flip_probe_census_check",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_stage_key",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"

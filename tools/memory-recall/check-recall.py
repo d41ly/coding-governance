@@ -504,11 +504,19 @@ def derive_probe_labels(spec: dict) -> list[str]:
     """The ids this spec cites OUTSIDE section 10, minus its own build's, minus any section 10 cites.
 
     Section 10 is where the author wrote down what the probe returned, so grading the probe on those
-    ids is circular. Every probe of one spec shares this set.
+    ids is circular. Every probe of one spec shares this set. The build is read by the one id parser,
+    through extract's import (TOOL-dTotalRecall-38 S3); an id it refuses names no build, so it stays.
     """
     inside = set(extract.ID_RE.findall(spec["s10"]))
-    return [i for i in dict.fromkeys(extract.ID_RE.findall(spec["outside"]))
-            if i.split("-")[1] != spec["slug"] and i not in inside]
+    labels = []
+    for i in dict.fromkeys(extract.ID_RE.findall(spec["outside"])):
+        try:
+            own = extract.id_grammar.parse_id_parts(i, None)[1] == spec["slug"]
+        except ValueError:
+            own = False
+        if not own and i not in inside:
+            labels.append(i)
+    return labels
 
 
 def print_spec_probes(root: pathlib.Path) -> int:

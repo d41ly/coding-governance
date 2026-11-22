@@ -1496,8 +1496,10 @@ def measure_answer_used(repo: pathlib.Path) -> int:
                                               *map(str, row.get("terms") or [])])))
         words = set("".join(c if c.isalpha() else " " for c in subject).split())
         for rank, rid in enumerate(ranked, 1):
-            seg = rid.split("-")
-            slug = seg[1] if len(seg) == 3 and seg[1].isalpha() else None
+            try:  # the one id parser, through extract's import (TOOL-dTotalRecall-38 S3)
+                slug = E.id_grammar.parse_id_parts(rid, None)[1]
+            except ValueError:
+                slug = None
             if rid in ids and rid not in held and slug not in words:
                 used += 1
                 hist[rank] += 1

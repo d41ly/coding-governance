@@ -244,7 +244,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 87
+SELFTEST_ARMS = 88
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -300,6 +300,10 @@ SELFTEST_ARMS = 87
 #   and caller-bound `alt` ids parse, flat, node-scoped, undeclared, malformed and pinned ids are
 #   refused naming the id, `alt` is keyword-only, `tree_lib` loads on first call, and over a foreign
 #   root the parser binds that root's families and slug class.
+# 87 -> 88 on 2026-11-22 (TOOL-dTotalRecall-38): ONE arm, the split census and the flip probe's
+#   census check - `--readers` lists the `py-split`, `sh-cut` and `sh-expansion` plants and not a
+#   control, and `--flip-probe` over a clone reverting a re-pointed reader to its split exits 1
+#   naming the reverted line on every flip, where the unreverted clone names no census failure.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -3655,6 +3659,69 @@ def test_id_parts_parse_under_each_tree_grammar():
             "the foreign root binds its own families and slug class")
 
 
+# --- TOOL-dTotalRecall-38: the split census and the flip probe's census check ---------------------
+# One plant per split shape the census reads, and a control whose split value is named for no id.
+_SPLIT_PLANTS = {
+    "py-split": ("plant/py_split.py", 'slug = unit_id.split("-")[1]\n'),
+    "sh-cut": ("plant/sh_cut.sh", "slug=$(printf '%s' \"$unit_id\" | cut -d- -f2)\n"),
+    "sh-expansion": ("plant/sh_expansion.sh", "fam=${unit_id%%-*}\n"),
+    "control": ("plant/control.py", 'stem = path.split("-")[0]\n'),
+}
+# The re-pointed reader the clone reverts to its split, and the split it reverts to.
+_REPOINTED = ("        return backlog.load_id_grammar().parse_id_parts(ident, None, alt=backlog.ANY_FAMILY)[1]\n",
+              '        return ident.split("-")[1]\n')
+
+
+@check("the reader census lists each split shape, and the flip probe fails a clone that reverts a re-pointed reader")
+def test_split_census_and_the_flip_probe_census_check():
+    """TOOL-dTotalRecall-38 AC2, AC4. In `make_repo`'s throwaway tree, which carries every memory-tree
+    `*.py`, that tree's own `id_grammar.py --readers` lists the `py-split`, `sh-cut` and
+    `sh-expansion` plants and not the control. Its `--flip-probe` over a clone of that tree names no
+    census failure, and over the clone with `migrate_backlog.read_slug` reverted to its split and
+    committed, every flip names the reverted line and the probe exits 1. The throwaway carries no
+    policy kit, so its flips' other checks are not read here."""
+    import extract as E
+    mt = E.resolve_kit_dir("memory-tree", "tree_lib.py", KIT).name  # the name `make_repo` copies it under
+    root, _kitdir = make_repo()
+    clone = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-flip-")).resolve()
+    git = ["git", "-c", "user.name=selftest", "-c", "user.email=selftest@invalid", "-c", "core.autocrlf=false"]
+    try:
+        for rel, text in _SPLIT_PLANTS.values():
+            (root / rel).parent.mkdir(parents=True, exist_ok=True)
+            (root / rel).write_text(text, encoding="utf-8", newline="\n")
+        subprocess.run([*git, "-C", str(root), "add", "-A"], check=True, capture_output=True)
+        subprocess.run([*git, "-C", str(root), "commit", "-q", "--no-verify", "-m", "fixture"],
+                       check=True, capture_output=True)
+        grammar = root / mt / "id_grammar.py"
+        p = subprocess.run([sys.executable, str(grammar), "--readers"], cwd=str(root),
+                           capture_output=True, text=True, encoding="utf-8")
+        assert p.returncode == 0, f"--readers crashed:\n{p.stderr[-600:]}"
+        listed = {name for name, (rel, _text) in _SPLIT_PLANTS.items() if f"{rel}:1:" in p.stdout}
+        assert listed == {"py-split", "sh-cut", "sh-expansion"}, f"the census listed the plants {sorted(listed)}"
+        subprocess.run(["git", "clone", "-q", str(root), str(clone)], check=True, capture_output=True)
+        subprocess.run(["git", "-C", str(clone), "remote", "remove", "origin"], check=True, capture_output=True)
+        probe = [sys.executable, str(grammar), "--flip-probe", str(clone)]
+        green = subprocess.run(probe, cwd=str(root), capture_output=True, text=True, encoding="utf-8")
+        flips = [ln for ln in green.stdout.splitlines() if ln.startswith("flip ")]
+        assert len(flips) == 6 and not [ln for ln in flips if "census lists" in ln], (
+            f"the unreverted clone failed the census check:\n{green.stdout[-800:]}{green.stderr[-400:]}")
+        reader = clone / mt / "migrate_backlog.py"
+        text = reader.read_text(encoding="utf-8")
+        assert text.count(_REPOINTED[0]) == 1, "the re-pointed read_slug line is not in the fixture's copy"
+        reader.write_text(text.replace(*_REPOINTED), encoding="utf-8", newline="\n")
+        subprocess.run([*git, "-C", str(clone), "commit", "-q", "--no-verify", "-am", "revert read_slug"],
+                       check=True, capture_output=True)
+        red = subprocess.run(probe, cwd=str(root), capture_output=True, text=True, encoding="utf-8")
+        named = [ln for ln in red.stdout.splitlines()
+                 if "census lists" in ln and f"{mt}/migrate_backlog.py:" in ln and _REPOINTED[1].strip() in ln]
+        assert red.returncode == 1 and len(named) == 6, (
+            f"exit {red.returncode}, {len(named)} of 6 flips named the reverted line:\n{red.stdout[-800:]}{red.stderr[-400:]}")
+    finally:
+        cleanup(root)
+        cleanup(clone)
+    return "3 split plants listed, the control not; 6 flips name the reverted reader and the probe exits 1"
+
+
 def main() -> int:
     # The live-log baseline is NOT taken here. It is taken at module scope, above the first `@check`,
     # because every arm runs at decoration time and a baseline taken in this function brackets
@@ -3715,6 +3782,8 @@ def main() -> int:
         test_supersession_tag_in_both_renderers,
         # TOOL-dTotalRecall-54: the id parser
         test_id_parts_parse_under_each_tree_grammar,
+        # TOOL-dTotalRecall-38: the split census and the flip probe's census check
+        test_split_census_and_the_flip_probe_census_check,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
     # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the

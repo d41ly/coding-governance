@@ -185,7 +185,11 @@ class Problem(Exception):
     """A named, user-facing failure. Never a traceback, and never raised by CONTENT."""
 
 
-FAMILY_SHAPE = re.compile(r"^[A-Za-z][A-Za-z0-9]*$")
+#: A well-formed family, the one spelling `FAMILY_SHAPE` and `GRANT_ID_RE` splice, and the alternation a
+#: reader passes `parse_id_parts` for an id `check_id` passed under a CALLER's families, which no tree
+#: declares (TOOL-dTotalRecall-38 S3): that grammar already narrowed the family.
+ANY_FAMILY = r"[A-Za-z][A-Za-z0-9]*"
+FAMILY_SHAPE = re.compile(r"^" + ANY_FAMILY + r"$")
 
 
 def build_grammar(families) -> Grammar:
@@ -463,7 +467,7 @@ def extract_grants(value: str) -> tuple:
 #: build's asks are filed under — grading it against the backlog allowlist would refuse a
 #: legitimate grant on any tree whose two sets differ. Whether the id RESOLVES is the question the
 #: unit that HONOURS a grant asks, at the moment it honours one.
-GRANT_ID_RE = load_id_grammar().SlugPattern(lambda g: r"^[A-Za-z][A-Za-z0-9]*-(?:" + g.slug_class + r")-\d+$")
+GRANT_ID_RE = load_id_grammar().SlugPattern(lambda g: r"^" + ANY_FAMILY + r"-(?:" + g.slug_class + r")-\d+$")
 
 
 def check_grant(grant: str) -> bool:
@@ -1049,10 +1053,14 @@ def derive_verdicts(corpus: Corpus, conf: Conf) -> list:
     closing_specs, advancing_specs = _read_links(corpus, asks)
     fold = derive_statuses(corpus)
 
-    # V1 — the ask's id slug against the folder it is filed in.
+    # V1 — the ask's id slug against the folder it is filed in, parsed by the one id parser under the
+    # caller-bound families the ask's id passed (TOOL-dTotalRecall-38 S3), "" for an id it refuses.
     for parsed in corpus.files:
         for ask in parsed.asks:
-            slug = ask.id.split("-")[1] if ask.id.count("-") >= 2 else ""
+            try:
+                slug = load_id_grammar().parse_id_parts(ask.id, None, alt=ANY_FAMILY)[1]
+            except ValueError:
+                slug = ""
             if parsed.slug and slug and slug != parsed.slug:
                 out.append(Verdict(1, f"{ask.path}:{ask.line}: ask {ask.id} carries slug `{slug}` "
                                       f"and is filed in build folder `{parsed.slug}`", (ask.path,)))
@@ -1445,8 +1453,12 @@ def derive_ready(grader: Grader, ask_id: str) -> Ready:
     status = grader.fold.statuses.get(ask_id, UNRESOLVED)
     missing: list = []
 
-    # R1 — FILED. Exactly one row, in the folder the id's own slug names.
-    if len(rows) != 1 or rows[0].slug != (ask_id.split("-")[1] if ask_id.count("-") >= 2 else ""):
+    # R1 — FILED. Exactly one row, in the folder the id's own slug names, "" for an id the parser refuses.
+    try:
+        home = load_id_grammar().parse_id_parts(ask_id, None, alt=ANY_FAMILY)[1]
+    except ValueError:
+        home = ""
+    if len(rows) != 1 or rows[0].slug != home:
         missing.append("R1")
 
     # R2 — LIVE, and the closers field it produces on the way. A foreign live spec is a LIVE CLAIM
@@ -1704,9 +1716,10 @@ def build_ask_sort_key(ask: Ask):
     PUBLIC because the view and the print modes must agree on it: a table whose order differs from the
     view it explains is two answers to the question "where is this ask in the list".
     """
-    parts = ask.id.split("-")
-    slug = parts[1] if len(parts) > 2 else ""
-    seq = int(parts[2]) if len(parts) > 2 and parts[2].isdigit() else 0
+    try:
+        _fam, slug, seq = load_id_grammar().parse_id_parts(ask.id, None, alt=ANY_FAMILY)
+    except ValueError:
+        return ("", 0, ask.id)
     return (slug, seq, ask.id)
 
 

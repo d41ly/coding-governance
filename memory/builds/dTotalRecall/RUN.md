@@ -117,3 +117,10 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T11:34:35Z brief · item TOOL-dTotalRecall-54 · reason 6754e63891d5 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-54-build-brief.md
 
 2026-11-22T11:37:51Z dispatch · item c3bee259 TOOL-dTotalRecall-54 · reason tools/memory-tree/id_grammar.py tools/memory-recall/selftest.py memory/map/generated tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-54.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-54-1-acceptance-ledger.md
+
+2026-11-22T11:57:29Z brief · item TOOL-dTotalRecall-38 · reason d40718cafaf2 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-38-build-brief.md
+
+2026-11-22T12:00:50Z dispatch · item 7047890d TOOL-dTotalRecall-38 · reason tools/memory-tree/id_grammar.py tools/memory-recall/selftest.py tools/memory-tree/backlog.py tools/memory-tree/gen_build_index.py tools/memory-tree/migrate_backlog.py tools/memory-recall/check-recall.py tools/memory-recall/query.py tools/drift-audit/drift_report.py memory/map/generated tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-38.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-38-1-acceptance-ledger.md
+2026-11-22T12:20:08Z draw · re-dispatch · TOOL-dTotalRecall-38 · 13/186 · 20261122T122008Z-5fac8b
+
+2026-11-22T12:20:08Z dispatch · item 7047890d TOOL-dTotalRecall-38 · reason memory/builds/dTotalRecall/README.md

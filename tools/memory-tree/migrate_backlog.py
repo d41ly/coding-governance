@@ -325,17 +325,23 @@ def parse_legacy_rows(root: str, paths: list, live_paths: set, grammar) -> tuple
 
 def build_id_sort_key(ident: str):
     """Family, slug, then the sequence as a NUMBER. Lexical order puts `-10` before `-2`, which
-    reads as data loss to anyone scanning a worksheet for the newest id."""
-    parts = ident.split("-")
-    seq = int(parts[2]) if len(parts) > 2 and parts[2].isdigit() else 0
-    return (parts[0], parts[1] if len(parts) > 1 else "", seq, ident)
+    reads as data loss to anyone scanning a worksheet for the newest id. Parsed by the one id parser
+    under the caller-bound families (TOOL-dTotalRecall-38 S3); an id it refuses sorts first."""
+    try:
+        fam, slug, seq = backlog.load_id_grammar().parse_id_parts(ident, None, alt=backlog.ANY_FAMILY)
+    except ValueError:
+        return ("", "", 0, ident)
+    return (fam, slug, seq, ident)
 
 
 def read_slug(ident: str) -> str:
     """The build folder an id belongs to. An id SPELLS its build — family, slug, sequence — so the
-    routing needs no side table and cannot disagree with the roster the generator derives."""
-    parts = ident.split("-")
-    return parts[1] if len(parts) > 2 else ""
+    routing needs no side table and cannot disagree with the roster the generator derives. Parsed by
+    the one id parser (TOOL-dTotalRecall-38 S3), so a hyphenated slug reads whole; "" for an id it refuses."""
+    try:
+        return backlog.load_id_grammar().parse_id_parts(ident, None, alt=backlog.ANY_FAMILY)[1]
+    except ValueError:
+        return ""
 
 
 def resolve_copy(copies: list) -> tuple:

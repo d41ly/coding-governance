@@ -837,15 +837,26 @@ def _read_families(conf) -> tuple:
     return tuple(out)
 
 
-def _parse_slug(uid: str):
-    """The slug PROJECTION of a matched id, or None for an era that has none.
+def _parse_slug(uid: str, root=None):
+    """The slug PROJECTION of a matched id under `root`'s grammar, None the default tree, or None for
+    an era that has none.
 
     DERIVED, not captured. The shipped alternation carries no groups of its own and exposes no
-    per-era parts, so a second capture group would mean re-deriving the session era's shape here —
-    the second grammar the import above exists to remove.
+    per-era parts, so the slug is the memory-tree kit's one id parser's (TOOL-dTotalRecall-38 S3),
+    never a second grammar here. Where that kit does not load, or loads and refuses the tree, the
+    family and the sequence are stripped instead, the first and the last hyphen's segments, which is
+    right under every slug grammar (§8 F5), as `_resolve_ident` keeps a present-but-unusable sibling
+    from taking the report down.
     """
-    parts = uid.split("-")
-    return parts[1] if len(parts) == 3 else None
+    try:
+        return load_memory_tree("id_grammar.py", "id grammar",
+                                "drift parses an id's slug through it").parse_id_parts(uid, root)[1]
+    except ValueError:
+        return None
+    except Exception:
+        pass
+    middle = uid.partition("-")[2].rpartition("-")[0]
+    return middle or None
 NON_TERMINAL = frozenset({"OPEN", "SPECCED", "BLOCKED", "INPROGRESS"})
 
 
@@ -1299,7 +1310,7 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         if when.group(1) < ctx.trace_cutoff:
             unjudged += 1  # grandfathered: it closed before the convention it would be judged by.
             continue
-        uid, slug = own.group(1), _parse_slug(own.group(1))
+        uid, slug = own.group(1), _parse_slug(own.group(1), ctx.root)
         if slug is None:
             unjudged += 1  # an era with no slug: this BUILD-level question has no key here.
             continue
@@ -2356,7 +2367,7 @@ def build_source_cited_ids_with_no_record(ctx) -> dict:
             for m in anchor.finditer(text):
                 uid = m.group(1)
                 defined.add(uid)
-                s = _parse_slug(uid)
+                s = _parse_slug(uid, ctx.root)
                 if s:
                     slugs.add(s)
 
@@ -2380,7 +2391,7 @@ def build_source_cited_ids_with_no_record(ctx) -> dict:
     for uid in sorted(cited):
         if uid in defined:
             continue
-        s = _parse_slug(uid)
+        s = _parse_slug(uid, ctx.root)
         if not s or s not in slugs:
             continue  # a slug no record anchors: a fixture, not a finding
         findings.append({"id": uid, "cited_in": sorted(cited[uid])[:3]})

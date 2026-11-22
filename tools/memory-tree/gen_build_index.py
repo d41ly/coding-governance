@@ -3993,8 +3993,14 @@ def build_grade_row(grader, deciders: dict, ask_id: str) -> dict:
     # THE HOME IS NEVER EMPTY. A filed ask's home is the folder it is filed in; an id nobody filed
     # still names its build in its own slug component, and printing THAT rather than a blank is
     # what lets the reader of a `no · R1` row go and look in the right place.
-    home = rows[0].slug if len(rows) == 1 and rows[0].slug else (
-        ask_id.split("-")[1] if ask_id.count("-") >= 2 else ask_id)
+    # Parsed by the one id parser under the caller-bound families (TOOL-dTotalRecall-38 S3); the id
+    # itself where it refuses.
+    home = rows[0].slug if len(rows) == 1 and rows[0].slug else None
+    if home is None:
+        try:
+            home = backlog.load_id_grammar().parse_id_parts(ask_id, None, alt=backlog.ANY_FAMILY)[1]
+        except ValueError:
+            home = ask_id
     return {
         "id": ask_id,
         "status": grader.fold.statuses.get(ask_id, backlog.UNRESOLVED),
@@ -4548,8 +4554,12 @@ def cmd_new_build(root: str, conf: dict, args: dict) -> int:
     # the staged README then blocks the re-run the refusal asks for (TOOL-dHomedResolver-5, M1).
     check_archives_tracked(root, conf)
     grammar = check_slug_minted(root, slug)
-    ids = read_idlist(args["asks"], _id_alternation(conf))
-    ids.sort(key=lambda i: (i.split("-")[1], i.split("-")[0], int(i.rsplit("-", 1)[1])))
+    alt = _id_alternation(conf)
+    ids = read_idlist(args["asks"], alt)
+    # Slug, family, sequence, parsed under the alternation `read_idlist` validated each id against
+    # (TOOL-dTotalRecall-38 S3), so no ValueError arises.
+    parse_id_parts = backlog.load_id_grammar().parse_id_parts
+    ids.sort(key=lambda i: tuple(parse_id_parts(i, None, alt=alt)[k] for k in (1, 0, 2)))
     claimed = check_slug_claimed(root, conf, slug)
     if claimed:
         raise Problem(f"--new-build {slug}: {claimed}")
