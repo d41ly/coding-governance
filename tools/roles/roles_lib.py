@@ -391,7 +391,8 @@ def read_cap_answer(request, root, kit_dir):
     `resolve_kit_dir` from `kit_dir`, and its `budgets.resolve_caps` answers: a value is the policy
     file's where it sets one, else what was handed in, None for a family. No kit, or any refusal of
     the reader, answers the handed-in value under `refuse`, as before that unit, the rule saying why.
-    The roles kit's one reach into the policy kit, which `check_roles` and `handoff` share."""
+    The roles kit's reach into the policy kit's caps, which `check_roles` and `handoff` share; a policy
+    key is read through `read_policy_setting` instead."""
     import sys
     cap, _eq, how = request.partition("=")
     held = int(how.split(":", 1)[1]) if how.startswith("default:") else None
@@ -408,6 +409,66 @@ def read_cap_answer(request, root, kit_dir):
     except (LookupError, ImportError) as exc:
         why = "no policy kit answered: %s" % exc
     return held, "refuse", "%s; a breach refuses as before" % why
+
+
+#: The policy kit's refusal of a key whose catalogue row carries a derived default, its `DERIVED_WHY`
+#: (`tools/policy/policy.py#DERIVED_WHY`) spelled again, since a kit imports no sibling kit, under the
+#: name the playbook kit spells it: a key refused with it is unset (TOOL-dBoundRoles-21 §8 F8).
+POLICY_DERIVED_LINE = "a derived default no reader computes yet"
+#: Each `(key, root)` read this process, mapped to `(value, source)`, `(None, None)` for an unset key, so
+#: a key is read once per process and root (TOOL-dBoundRoles-21 §8 F7); under None, the one note printed
+#: when no policy kit answers.
+_POLICY_ANSWERS = {}
+
+
+def read_policy_setting(key, root, with_default=False):
+    """The value of the policy key `key` in the repository at `root`, or None where it is unset
+    (TOOL-dBoundRoles-21 S1). It runs `<policy kit>/policy.py get <key> --json` in `root`, the kit found
+    through `resolve_kit_dir` from this file's own directory, since a kit imports no sibling kit, so `get`
+    reads the landed revision. A `source` of `file` or `last-valid` answers the `value`; `default`
+    answers None, or the value under `with_default`. A refusal whose stderr carries POLICY_DERIVED_LINE
+    is an unset key, None in both forms; any other refusal raises RolesError naming the key and the
+    reader's line. No policy kit answers None for every key and prints one note on stderr. Each key is
+    read once per process and root, its answer kept in `_POLICY_ANSWERS`.
+
+    WHAT THIS DOES NOT CHECK: that POLICY_DERIVED_LINE still equals the policy kit's `DERIVED_WHY`, a
+    reword there turning every unset key into a refusal; nor which row a derived refusal names."""
+    import os
+    import subprocess
+    import sys
+    at = (key, pathlib.Path(root).absolute().as_posix())
+    if at not in _POLICY_ANSWERS:
+        try:
+            kit = resolve_kit_dir("policy", "policy.py", pathlib.Path(__file__).absolute().parent)
+        except LookupError as exc:
+            if None not in _POLICY_ANSWERS:
+                _POLICY_ANSWERS[None] = str(exc)
+                print("roles: note — no policy kit answers, so every roles.effort and roles.model key "
+                      "reads unset: %s" % exc, file=sys.stderr)
+            return None
+        env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        try:
+            p = subprocess.run([sys.executable, str(kit / "policy.py"), "get", key, "--json"], cwd=str(root),
+                               capture_output=True, text=True, encoding="utf-8", errors="replace",
+                               stdin=subprocess.DEVNULL, env=env)
+        except OSError as exc:
+            raise RolesError("%s — the policy reader did not run: %s" % (key, exc))
+        err = [ln for ln in (p.stderr or "").splitlines() if ln.strip()]
+        if p.returncode == 0:
+            try:
+                hit = json.loads(p.stdout)
+                _POLICY_ANSWERS[at] = (hit["value"], hit["source"])
+            except (ValueError, KeyError, TypeError):
+                raise RolesError("%s — the policy reader printed no value and source: %r" % (key, p.stdout))
+        elif any(POLICY_DERIVED_LINE in ln for ln in err):
+            _POLICY_ANSWERS[at] = (None, None)
+        else:
+            raise RolesError("%s — the policy reader refused: %s"
+                             % (key, err[-1] if err else "policy.py get exited %d" % p.returncode))
+    value, source = _POLICY_ANSWERS[at]
+    if value is None or not (with_default or source in ("file", "last-valid")):
+        return None
+    return value
 
 
 def check_load_set(root, kit_dir, blocks, points=(), reach=False):
@@ -769,18 +830,43 @@ def load_gate_leg_names(tool_root):
     return {g["name"] for g in legs}
 
 
+def check_gate_names(names, legs, where):
+    """`(defects, notes)` of one role's granted leg names `names` against `legs`, the tool root's gate
+    manifest's names or None where it does not read (TOOL-dBoundRoles-21 S6), `where` the prefix each
+    line opens with, `<file>: <rule> — <key>`. A name ending in `?` is optional (TOOL-aOrientedCast-13):
+    a leg the manifest lacks is a note rather than a defect, and a `?` alone names no leg. Both grant
+    homes, the house file's `[gates]` row and a role's `gates` field, are graded here."""
+    defects, notes = [], []
+    for n in names:
+        leg = n[:-1] if n.endswith("?") else n
+        if not leg:
+            defects.append("%s — %r names no leg" % (where, n))
+        elif legs is not None and leg not in legs:
+            if leg == n:
+                defects.append("%s — %r names no leg of %s" % (where, n, GATE_MANIFEST))
+            else:
+                notes.append("holds no leg '%s', which %s marks optional, so it is granted no such leg here"
+                             % (leg, where))
+    return defects, notes
+
+
 def load_policy(kit_dir, roles, workflows, notes=None):
     """The parsed `house/policy.toml`, validated against the roles and the workflow table.
 
     Every defect is collected, then raised once as a RolesError with one line per defect, each
-    naming the file, the dotted key and the rule (R12). An absent or unparsable file refuses
-    (TOOL-aOrientedCast-10 §8 F3): no fallback level stands in for the owner's.
+    naming the file, the dotted key and the rule (R12). An absent file is an empty fallback
+    (TOOL-dBoundRoles-21 S7): the returned policy holds no `effort` table, so each level falls to the
+    policy keys and the role's declared `effort`. An unreadable or unparsable file refuses.
 
-    `[gates]` (TOOL-aOrientedCast-11) maps a role slot whose `agent` is true to the gate legs it may
-    run, by name. A name is checked against the tool root's gate manifest only when that manifest
-    reads; when it does not, one line is appended to `notes` (when given) instead of a defect.
-    A name ending in `?` is OPTIONAL (TOOL-aOrientedCast-13): a leg the manifest lacks is a note
-    rather than a defect, and the returned policy carries every name with its `?` taken off.
+    `gates` in the returned policy is the MERGED grant (TOOL-dBoundRoles-21 S6, §8 F10): each role
+    slot maps to the legs of its `gates` field, else to the house file's `[gates]` row only where the
+    role sets no field, so every reader takes this one map. `[gates]` (TOOL-aOrientedCast-11) maps a
+    role slot whose `agent` is true to the gate legs it may run, by name; both homes are graded by
+    `check_gate_names` against the tool root's gate manifest, only when that manifest reads; when it
+    does not, one line is appended to `notes` (when given) instead of a defect. A name ending in `?`
+    is OPTIONAL (TOOL-aOrientedCast-13): a leg the manifest lacks is a note rather than a defect, and
+    the returned grant carries every name with its `?` taken off. `declared` maps each role slot to
+    its front matter's `effort`, the last step of the effort order.
 
     `[effort.profiles.<name>]` (TOOL-aProfiledEffort-1) is a level table for one model family: a
     `match` list of words and the keys of `[effort]` itself, graded by the same helper. A word two
@@ -789,9 +875,12 @@ def load_policy(kit_dir, roles, workflows, notes=None):
     """
     path = pathlib.Path(kit_dir) / "house" / "policy.toml"
     where = path.as_posix()
+    present = True
     try:
         with open(path, "rb") as fh:
             data = tomllib.load(fh)
+    except FileNotFoundError:   # the empty fallback: no house level, no house grant
+        data, present = {}, False
     except OSError as e:
         raise RolesError("%s: R12 — the policy file cannot be read — %s" % (where, e.strerror))
     except tomllib.TOMLDecodeError as e:
@@ -858,7 +947,8 @@ def load_policy(kit_dir, roles, workflows, notes=None):
     if not isinstance(effort, dict):
         effort = {}
         bad.append("%s: R12 — effort — is not a table" % where)
-    check_effort_table("effort", effort, "profiles")
+    if present:
+        check_effort_table("effort", effort, "profiles")
     profiles = effort.get("profiles", {})
     if not isinstance(profiles, dict):
         profiles = {}
@@ -890,7 +980,11 @@ def load_policy(kit_dir, roles, workflows, notes=None):
         gates = {}
         bad.append("%s: R12 — gates — is not a table" % where)
     manifest = (pathlib.Path(kit_dir).parent / GATE_MANIFEST).as_posix()
-    legs = load_gate_leg_names(pathlib.Path(kit_dir).parent) if gates else None
+    # each role's `gates` field, comma-separated as `[gates]` spells a row's names (TOOL-dBoundRoles-21 S6)
+    fields = {slot: [n.strip() for n in r["keys"]["gates"].split(",") if n.strip()]
+              for slot, r in roles.items() if "gates" in r["keys"]}
+    legs = load_gate_leg_names(pathlib.Path(kit_dir).parent) if gates or fields else None
+    graded = []   # `(where, names)` of every grant, the house rows first, then the fields
     for slot, names in gates.items():
         key = "gates." + slot
         if slot not in roles:
@@ -901,23 +995,25 @@ def load_policy(kit_dir, roles, workflows, notes=None):
         if not isinstance(names, list) or not all(isinstance(n, str) for n in names):
             bad.append("%s: R12 — %s — is not a list of strings" % (where, key))
             continue
-        for n in names:
-            leg = n[:-1] if n.endswith("?") else n
-            if not leg:
-                bad.append("%s: R12 — %s — %r names no leg" % (where, key, n))
-            elif legs is not None and leg not in legs:
-                if leg == n:
-                    bad.append("%s: R12 — %s — %r names no leg of %s" % (where, key, n, manifest))
-                elif notes is not None:
-                    notes.append("%s holds no leg '%s', which gates.%s marks optional, so %s is "
-                                 "granted no such leg here" % (manifest, leg, slot, slot))
-    if gates and legs is None and notes is not None:
-        notes.append("%s cannot be read, so the leg names under [gates] in %s are not checked"
-                     % (manifest, where))
+        graded.append(("%s: R12 — %s" % (where, key), names))
+    for slot, names in fields.items():
+        at = "%s: R2 — gates" % roles[slot]["path"].as_posix()
+        if roles[slot]["keys"].get("agent", "true") == "false":
+            bad.append("%s — is set on an agent: false role, so no agent type carries it" % at)
+        graded.append((at, names))
+    for at, names in graded:
+        defects, said = check_gate_names(names, legs, at)
+        bad.extend(defects)
+        if notes is not None:
+            notes.extend("%s %s" % (manifest, n) for n in said)
+    if (gates or fields) and legs is None and notes is not None:
+        notes.append("%s cannot be read, so the leg names under [gates] in %s and in the roles' gates "
+                     "fields are not checked" % (manifest, where))
     if bad:
         raise RolesError("\n".join(bad))
-    for slot in gates:
-        gates[slot] = [n[:-1] if n.endswith("?") else n for n in gates[slot]]
+    data["gates"] = {slot: [n[:-1] if n.endswith("?") else n for n in names]
+                     for slot, names in {**gates, **fields}.items()}
+    data["declared"] = {slot: r["keys"].get("effort") for slot, r in roles.items()}
     return data
 
 
@@ -1007,7 +1103,7 @@ def resolve_profile(policy, model):
     words = set(MODEL_SEGMENT_RE.findall((model or "").lower()))
     if not words:
         return None
-    hits = [name for name, profile in policy["effort"].get("profiles", {}).items()
+    hits = [name for name, profile in policy.get("effort", {}).get("profiles", {}).items()
             if words.intersection(profile["match"])]
     if len(hits) > 1:
         raise RolesError("R12 — the model %r — matches %s, so no one profile's levels are its own"
@@ -1015,22 +1111,75 @@ def resolve_profile(policy, model):
     return hits[0] if hits else None
 
 
-def resolve_effort(policy, slot, model=None):
-    """A role's level in the level table `model` takes, the profile `resolve_profile` names or else
-    `[effort]`, read alone: that table's `roles` entry, else its `default`."""
+def resolve_house_table(policy, model):
+    """The house file's level table `model` takes, the profile `resolve_profile` names or else
+    `[effort]`; None where the house file is absent, its empty fallback."""
+    if "effort" not in policy:
+        return None
     name = resolve_profile(policy, model)
-    table = policy["effort"]["profiles"][name] if name else policy["effort"]
-    return table.get("roles", {}).get(slot, table["default"])
+    return policy["effort"]["profiles"][name] if name else policy["effort"]
 
 
-def resolve_stage_efforts(policy, workflow, model=None):
-    """`{stage key: level}` for every key of a workflow entry's `stages` table, in the level table
-    `model` takes: its `stages.<workflow>` entry, else the level of the slot the table maps it to."""
-    name = resolve_profile(policy, model)
-    table = policy["effort"]["profiles"][name] if name else policy["effort"]
-    over = table.get("stages", {}).get(workflow.get("name"), {})
-    return {key: over.get(key, resolve_effort(policy, slot, model))
-            for key, slot in (workflow.get("stages") or {}).items()}
+def resolve_effort(policy, slot, model, root):
+    """A role's level for its agent type, the first of (TOOL-dBoundRoles-21 S2, §4 "The order"): the
+    policy key `roles.effort.<slot>`, then `roles.effort.default`, both read in the repository at
+    `root`; then the house file's level table `model` takes, its `roles` entry, else its `default`;
+    then the role's declared `effort`. RolesError where none of them gives a level."""
+    level = read_policy_setting(f"roles.effort.{slot}", root)
+    if level is None:
+        level = read_policy_setting("roles.effort.default", root)
+    if level is None:
+        table = resolve_house_table(policy, model)
+        level = table.get("roles", {}).get(slot, table["default"]) if table is not None else None
+    if level is None:
+        level = policy.get("declared", {}).get(slot)
+    if not level:
+        raise RolesError("%s — no policy key, no house file and no declared effort give the role a level"
+                         % slot)
+    return level
+
+
+def resolve_stage_efforts(policy, workflow, model, root):
+    """`{stage key: level}` for every key of a workflow entry's `stages` table, each the first of
+    (TOOL-dBoundRoles-21 S2, §4 "The order"): the policy key `roles.effort.<workflow>.<stage>`, read in
+    the repository at `root`; then the house file's `stages.<workflow>` entry in the level table
+    `model` takes, where no role key or blanket key is set; else the level `resolve_effort` gives the
+    slot the stage maps to."""
+    name, out = workflow.get("name"), {}
+    table = None
+    for key, slot in (workflow.get("stages") or {}).items():
+        level = read_policy_setting(f"roles.effort.{name}.{key}", root)
+        if level is None and read_policy_setting(f"roles.effort.{slot}", root) is None \
+                and read_policy_setting("roles.effort.default", root) is None:
+            table = table if table is not None else resolve_house_table(policy, model) or {}
+            level = table.get("stages", {}).get(name, {}).get(key)
+        out[key] = level if level is not None else resolve_effort(policy, slot, model, root)
+    return out
+
+
+#: Each harness adapter's equivalent of a role's declared `model` (TOOL-dBoundRoles-21 S5): `claude-code`,
+#: the one adapter, takes the declared value as written.
+HARNESS_MODEL_EQUIVALENT = {"claude-code": lambda declared: declared}
+
+
+def resolve_role_model(slot, harness, root, kit_dir=None):
+    """The model the role `slot` runs on `harness` (TOOL-dBoundRoles-21 S5): the policy key
+    `roles.model.<slot>.<harness>` read in the repository at `root`, else the harness adapter's
+    equivalent of the role's declared `model`, read from the role file in `kit_dir`, this file's own
+    directory unless given, None where the role declares none. An unknown harness is a RolesError,
+    never a guess."""
+    if harness not in HARNESS_MODEL_EQUIVALENT:
+        raise RolesError("the harness '%s' has no model adapter; the adapters are %s"
+                         % (harness, ", ".join(sorted(HARNESS_MODEL_EQUIVALENT))))
+    value = read_policy_setting(f"roles.model.{slot}.{harness}", root)
+    if value is not None:
+        return value
+    kit = pathlib.Path(kit_dir) if kit_dir is not None else pathlib.Path(__file__).absolute().parent
+    path = kit / "agents" / (slot + ".agent.md")
+    if not path.is_file():
+        raise RolesError("%s: R8 — no role file, so the role %s declares no model" % (path.as_posix(), slot))
+    keys, _body = parse_front_matter(path.as_posix(), load_text(path))
+    return HARNESS_MODEL_EQUIVALENT[harness](keys.get("model"))
 
 
 def render_role(kit_dir, name, memory_root, gates=()):

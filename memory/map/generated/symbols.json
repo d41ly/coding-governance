@@ -6693,6 +6693,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "check_gate_names",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_gate_refused",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -24673,6 +24678,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_policy_setting",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "read_policy_text",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -30753,6 +30763,11 @@
       "file": "tools/settings-merge.py"
     },
     {
+      "id": "resolve_house_table",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "resolve_id_reader",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -32226,6 +32241,11 @@
       "id": "resolve_rev",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "resolve_role_model",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "resolve_roles_verb",

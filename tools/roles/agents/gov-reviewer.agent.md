@@ -13,6 +13,7 @@ mandatory: for every spec audit owed and every closing review
 output: findings, to its harness
 never: writes a product or spec path — scratch-guard.js role arm; runs a gate, a suite or a --selftest — scratch-guard.js role-gate arm; writes any other file in the repository — unenforced — its tools hold no Write or Edit, and a probe that would need a write is described in the finding's fix; fixes the specs or the code, or builds anything — unenforced — it produces findings; reviews outside the specs or the diff it was handed — unenforced — the lens is its subject; checks a claim about code against a spec's account — unenforced — the code is read; reports a non-goal, a resolved fork, the security model or a tracked issue as a finding — unenforced — the harness hands them over as by design; reports a finding it did not read — unenforced — each finding is established by a read-only probe
 return: outcome:findings|clean, findings:list
+effort: medium
 ---
 
 You are a reviewer hunting defects in one subject through the lens your task names: a specification

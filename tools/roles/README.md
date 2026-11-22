@@ -44,9 +44,20 @@ later key is one row there.
   core roles sit at `layer.roles`; `gov-session` sits at `layer.runtime`. The expansion roles, the
   deployer and the maintainer, have no file here: the playbook kit's layer rows register them, and
   the loop kit refuses a core item naming one.
+- `effort` is the role's declared reasoning effort, one of the five levels under "The effort
+  policy", required on every agent role and graded by R2 (TOOL-dBoundRoles-21). It is the last step
+  of the effort order, read only where no policy key is set and no house file is present, so a role
+  file of your own that lacks it is an R2 defect on update; `core.py new role` writes `medium`. No
+  role file may be named `default`: that slot is reserved, since `roles.effort.default` is the
+  blanket key and `roles.effort.<role>` would read a role of that name as it.
+- `gates` is the gate legs the role may run, comma-separated, a trailing `?` marking one optional, as
+  a `[gates]` row of the house file spells them. Where a role carries it, its house row is not read.
+  gov's two grants live here, on `gov-spec-writer` and `gov-builder`. A leg name holding a comma
+  cannot be granted through the field; it stays a `[gates]` row.
 
 A rendered role closes with `## Never`, `## Ceiling` (its tools, its write class and the gate legs
-the policy's `[gates]` grants it) and `## Return`, by every route that renders a role.
+its grant gives it, its `gates` field else its house `[gates]` row) and `## Return`, by every route
+that renders a role.
 
 A base block POINTS at the document that owns a rule — the spec format, the build method, the
 review protocol, all under `{{MEMORY_ROOT}}` — and never restates it. Stage protocol (return
@@ -249,10 +260,28 @@ signer is the owner, or that the reason says anything, and it cannot see a stand
 
 ## The effort policy
 
-`house/policy.toml` sets the reasoning effort every role agent runs at (TOOL-aOrientedCast-10). It is
+A role's level and model are read in this order (TOOL-dBoundRoles-21), the first that yields winning:
+
+1. the policy key `roles.effort.<workflow>.<stage>`, for a harness stage;
+2. `roles.effort.<role>`;
+3. `roles.effort.default`;
+4. `house/policy.toml`, where present, as the rest of this section reads it;
+5. the role file's declared `effort`.
+
+The keys are read through the policy kit's one reader, `policy.py get <key> --json`, run by
+`roles_lib.read_policy_setting` in the repository at its landed revision, so an uncommitted edit of
+the policy file moves no level. An unset key, whose catalogue row carries a derived default,
+yields nothing, and with no policy kit installed every key reads unset with one note. The model an
+agent type declares is `roles.model.<role>.claude-code` where set, else the role file's `model`; a
+key for another harness is never read by this render. Set a key, then `render_agents.py --write` and a
+new session, as for the house file.
+
+`house/policy.toml` sets the reasoning effort every role agent runs at where no key is set
+(TOOL-aOrientedCast-10). It is
 seeded: an adopter receives it once and owns it, and `update` never rewrites it, so it is yours to
 edit. `roles_lib.load_policy` is its one reader and validator; `check_roles.py` reports its defects as
-R12 and every render refuses it with exit 2, so no level falls back silently.
+R12 and every render refuses it with exit 2, so no level falls back silently. An absent file is an
+empty fallback, no defect: each level then falls to the keys and the declared `effort`.
 
 - `[effort]` holds `default`, the level of every role and stage the file does not name.
 - `[effort.roles]` holds one entry per role slot whose `agent` is true. `render_agents.py` writes the
@@ -304,8 +333,11 @@ file or an `agent: false` role, a value that is not a list of strings, and a nam
 no leg for, which it checks only when the manifest reads. A name ending in `?` is optional
 (TOOL-aOrientedCast-13): a leg the manifest lacks is then a note rather than a refusal, for a leg
 whose kit a target may not install, and the `?` is taken off before anything reads the name; a bare
-name still refuses, so a misspelt required leg is caught. `render_agents.py` writes each role's list
-into the index as `gates`, empty where this table names none, and the manifest's path as
+name still refuses, so a misspelt required leg is caught. A row here applies only to a role whose
+file carries no `gates` field (TOOL-dBoundRoles-21), and `load_policy` returns the merged grant, the
+field else the row, graded alike by `check_gate_names`; gov seeds no row, its grants being fields.
+`render_agents.py` writes each role's list
+into the index as `gates`, empty where neither names any, and the manifest's path as
 `gates.manifest`; the hooks kit's scratch guard reads both and refuses a role agent any other gate.
 An adopter that received this file before the table existed gains it only by its own edit, and until
 then every role's list is empty, the strict reading.

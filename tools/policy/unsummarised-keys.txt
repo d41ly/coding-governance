@@ -189,11 +189,7 @@ review.unclassed
 review.unverified
 roles.answered-calls
 roles.auth.<role>
-roles.effort.<role>
-roles.effort.<workflow>.<stage>
-roles.effort.default
 roles.harness.<role>
-roles.model.<role>.<harness>
 roles.no-spawn
 roles.on-contradiction
 roles.orientation.house-index

@@ -104,3 +104,19 @@ key = "agent"
 owner = "gov"
 shape = "bool"
 required = "optional"
+
+# `effort` and `gates` (TOOL-dBoundRoles-21 S3, S6): the role's declared reasoning effort, one of the
+# kit's EFFORT_LEVELS, the last step of the effort order and graded by R2 by its key; and the gate legs
+# the role may run, comma-separated, a trailing `?` marking one optional, which take the place of the
+# house file's `[gates]` row for the role. A leg name holding a comma cannot be granted here.
+[[field]]
+key = "effort"
+owner = "gov"
+shape = "text"
+required = "agent"
+
+[[field]]
+key = "gates"
+owner = "gov"
+shape = "list"
+required = "optional"

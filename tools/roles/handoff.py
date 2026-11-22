@@ -14,7 +14,8 @@
 
 `render` fills the work-order template, `templates/work-order.template.md` in this kit, whose slots are
 `role`, `roles_lib.render_role`'s output, closing with the role's `## Never`, `## Ceiling` and `## Return`
-sections, the ceiling's gate legs the policy's `[gates]` grant (TOOL-dBoundRoles-2 S6), then a `### Drive` block holding the charter's drive lines for the
+sections, the ceiling's gate legs the merged grant, the role's `gates` field else the house file's
+`[gates]` row (TOOL-dBoundRoles-2 S6, TOOL-dBoundRoles-21 S6), then a `### Drive` block holding the charter's drive lines for the
 role where it has any (PLAY-dOrderedCharter-6); `opening`; `reads`, a block per input the role's `reads`
 declares, in that order, then the optional `input:code` every role carries (PLAY-dOrderedCharter-27): the
 text of the file `--input code=` names, measured against `memory.code-budget` by the load-set check; and
@@ -48,8 +49,11 @@ each failure naming the envelope; it prints each part's levels in order, or `unr
 no envelope, which passes (PLAY-dOrderedCharter-5 S4).
 `harness-args` prints, as one line of sorted JSON, the union of the `stages` tables of every
 workflow whose harness names that script. `stage-efforts` prints, the same way, the reasoning effort
-`house/policy.toml` resolves for every stage key of ONE workflow's `stages` table: a harness call
-passes it as its `efforts` argument (TOOL-aOrientedCast-10). `role-efforts` prints, the same way,
+resolved for every stage key of ONE workflow's `stages` table: a harness call passes it as its
+`efforts` argument (TOOL-aOrientedCast-10). The order is TOOL-dBoundRoles-21's: the policy keys
+`roles.effort.<workflow>.<stage>`, `roles.effort.<role>` and `roles.effort.default` of the working
+directory's repository, then `house/policy.toml` where present, then the role's declared `effort`.
+`role-efforts` prints, the same way,
 the level of every role whose `agent` is true, and a direct spawn passes its role's value. With
 `--model <id>` the two verbs resolve the levels the policy's profiles give that model id; without
 the flag, or for an id no profile matches, they resolve the default tables, so `stage-efforts`
@@ -563,7 +567,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     # PLAY-dOrderedCharter-11 S4: the role's load set and its block's budget, before any card or brief is read;
     # a supplied code block is measured beside it, CR stripped (PLAY-dOrderedCharter-27 S4)
     # TOOL-dBoundRoles-2 S6: the role closes with its never list, its ceiling and its return, the ceiling's
-    # gate legs the policy's grant, loaded as `print_role_efforts` loads it, so both routes render one block
+    # gate legs the policy's merged grant (TOOL-dBoundRoles-21 S6), loaded as `print_role_efforts` loads
+    # it, so both routes render one block
     roles = lib.load_roles(KIT_DIR)
     granted = lib.load_policy(KIT_DIR, roles, lib.load_workflows(KIT_DIR)).get("gates", {})
     role_text = lib.render_role(KIT_DIR, role, memory_root, granted.get(role, ()))
@@ -804,12 +809,13 @@ def print_harness_args(harness):
     write_json_line(union)
 
 
-def print_stage_efforts(workflow, model=None):
+def print_stage_efforts(workflow, model, root):
     """Print the resolved level of every stage key of one workflow's `stages` table as one line of
     sorted JSON (TOOL-aOrientedCast-10); RolesError on an unknown name, a workflow with no `stages`
     table, or a policy defect. Keyed by workflow, not harness: a harness serving two workflows runs
     one role at two levels, which a union cannot carry. `model` goes to the resolver unchanged
-    (TOOL-aProfiledEffort-2)."""
+    (TOOL-aProfiledEffort-2), and `root`, the repository whose policy keys it reads first
+    (TOOL-dBoundRoles-21 S7)."""
     workflows = lib.load_workflows(KIT_DIR)
     policy = lib.load_policy(KIT_DIR, lib.load_roles(KIT_DIR), workflows)
     entry = next((w for w in workflows if w.get("name") == workflow), None)
@@ -818,15 +824,16 @@ def print_stage_efforts(workflow, model=None):
     if not isinstance(entry.get("stages"), dict):
         raise lib.RolesError("the workflow %s has no stages table, so no harness stage takes a level"
                              % workflow)
-    write_json_line(lib.resolve_stage_efforts(policy, entry, model))
+    write_json_line(lib.resolve_stage_efforts(policy, entry, model, root))
 
 
-def print_role_efforts(model=None):
+def print_role_efforts(model, root):
     """Print the resolved level of every role whose `agent` is true as one line of sorted JSON
-    (TOOL-aProfiledEffort-2); RolesError on a policy defect."""
+    (TOOL-aProfiledEffort-2), the policy keys of the repository at `root` read first
+    (TOOL-dBoundRoles-21 S7); RolesError on a policy defect."""
     roles = lib.load_roles(KIT_DIR)
     policy = lib.load_policy(KIT_DIR, roles, lib.load_workflows(KIT_DIR))
-    write_json_line({slot: lib.resolve_effort(policy, slot, model) for slot, role in roles.items()
+    write_json_line({slot: lib.resolve_effort(policy, slot, model, root) for slot, role in roles.items()
                      if role["keys"].get("agent", "true") == "true"})
 
 
@@ -1407,10 +1414,15 @@ def main(argv):
         try:
             if a.verb == "harness-args":
                 print_harness_args(a.harness)
-            elif a.verb == "stage-efforts":
-                print_stage_efforts(a.workflow, a.model)
+                return 0
+            # the repository whose policy keys the levels read first (TOOL-dBoundRoles-21 S7): the
+            # working directory's toplevel, else the directory itself, where the reader refuses by name
+            g = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, encoding="utf-8")
+            root = pathlib.Path(g.stdout.strip() if g.returncode == 0 and g.stdout.strip() else os.getcwd())
+            if a.verb == "stage-efforts":
+                print_stage_efforts(a.workflow, a.model, root)
             else:
-                print_role_efforts(a.model)
+                print_role_efforts(a.model, root)
             return 0
         except lib.RolesError as e:
             print("handoff: %s" % e, file=sys.stderr)

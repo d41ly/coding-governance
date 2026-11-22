@@ -129,3 +129,9 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T10:32:09Z draw · re-dispatch · TOOL-dBoundRoles-21 · 20/122 · 20261122T103209Z-e00c62
 
 2026-11-22T10:32:09Z dispatch · item f5673cdc TOOL-dBoundRoles-21 · reason tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/handoff.py tools/roles/render_agents.py tools/roles/role-schema.toml tools/roles/agents tools/roles/house/policy.toml tools/roles/README.md tools/roles/adopt-roles.test.sh tools/loop/factories.py tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt help/reference/policy.md .governance/policy.json memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-21-1-acceptance-ledger.md
+2026-11-22T10:53:41Z draw · re-dispatch · TOOL-dBoundRoles-21 · 21/122 · 20261122T105341Z-6a8112
+
+2026-11-22T10:53:41Z dispatch · item 7a0e819c TOOL-dBoundRoles-21 · reason help/roles.md tools/hooks/README.md memory/map/generated/symbols.json memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-21.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-21-deviation-213.md
+2026-11-22T10:57:39Z draw · re-dispatch · TOOL-dBoundRoles-21 · 22/122 · 20261122T105739Z-53591d
+
+2026-11-22T10:57:39Z dispatch · item 7a0e819c TOOL-dBoundRoles-21 · reason tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/handoff.py tools/roles/render_agents.py tools/roles/role-schema.toml tools/roles/agents tools/roles/house/policy.toml tools/roles/README.md tools/roles/adopt-roles.test.sh tools/loop/factories.py tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt help/reference/policy.md .governance/policy.json memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-21-1-acceptance-ledger.md help/roles.md tools/hooks/README.md memory/map/generated/symbols.json memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-21.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-21-deviation-213.md

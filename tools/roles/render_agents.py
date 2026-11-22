@@ -4,13 +4,17 @@
     python render_agents.py --write | --check | --selftest
 
 `--write` renders one agent type per role whose `agent` is true, at `.claude/agents/<name>.md` under
-the repository root: the role's Claude keys, then `effort: <level>` as `roles_lib.resolve_effort`
-reads it from the kit's `house/policy.toml` (TOOL-aOrientedCast-10) with no model named, so a type
-carries the default tables' level and never a profile's (TOOL-aProfiledEffort-1), then
+the repository root: the role's Claude keys, its `model:` the one `roles_lib.resolve_role_model`
+gives on `claude-code`, the policy key `roles.model.<role>.claude-code` else the declared value
+(TOOL-dBoundRoles-21 S5), then `effort: <level>` as `roles_lib.resolve_effort` reads it, the policy
+keys `roles.effort.<role>` and `roles.effort.default` first, then the kit's `house/policy.toml`
+(TOOL-aOrientedCast-10) with no model named, so a type carries the default tables' level and never a
+profile's (TOOL-aProfiledEffort-1), then the role's declared `effort`, then
 `omitClaudeMd: true`, then gov's `workflow` and
 `writes`, then a body that is `roles_lib.render_role`'s output, which closes the role with its
-`## Never`, `## Ceiling` and `## Return` sections, the gate legs the policy's `[gates]` grants it
-handed in (TOOL-dBoundRoles-2 S6), and, under `## Charter`,
+`## Never`, `## Ceiling` and `## Return` sections, the gate legs the merged grant gives it, its
+`gates` field else the house file's `[gates]` row (TOOL-dBoundRoles-21 S6), handed in
+(TOOL-dBoundRoles-2 S6), and, under `## Charter`,
 `roles_lib.render_charter_blocks` for the role: the practice lines its `rules` key cites, then
 the charter's carried sections whole (TOOL-aOrientedCast-16). Where the playbook kit's document registry
 reads, the body is ranked (PLAY-dOrderedCharter-5 S1): `## Charter` first, in the envelope of the charter's
@@ -19,7 +23,7 @@ role comes first and the charter after it, unenveloped, and one `envelope — un
 that does not read refuses, naming it. A pre-tag charter renders no
 `## Charter` and prints one note. Beside them it writes the generated
 index `.claude/roles.json`: every role with its `workflow`, `writes`, `agent` and `gates`, the gate legs
-the policy's `[gates]` table lets it run (empty where it names none), its `layer` and `acts-as`, which
+the merged grant lets it run (empty where neither home names any), its `layer` and `acts-as`, which
 the playbook kit's layer check reads as data (TOOL-dBoundRoles-1 S6), `harnesses`, the repo-relative
 scripts of every workflow whose `driver` is `workflow`, and `gates.manifest`, the repo-relative path of
 the tool root's gate manifest or null when no file is there (TOOL-aOrientedCast-11; scratch-guard.js reads
@@ -158,15 +162,17 @@ def load_catalogue(kit_dir, target_root):
 
 
 def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort, missing=(), rows=None,
-                      charter_doc="", gates=()):
-    """One agent type's text: Claude keys, its effort, the trim, gov's two keys, then the body. With
+                      charter_doc="", gates=(), model=None):
+    """One agent type's text: Claude keys, its effort, the trim, gov's two keys, then the body. `model`,
+    where given, is the `model:` line's value, `roles_lib.resolve_role_model`'s for `claude-code`
+    (TOOL-dBoundRoles-21 S5); else the role's declared one. With
     `rows`, the document registry, the body is ranked (PLAY-dOrderedCharter-5 S1): `## Charter` and the
     role's charter blocks first, in the envelope of the charter's row at `charter_doc`, then the rendered
     role and each `Missing required unit:` line the load-set check printed for it under `warn`, all in the
     agent file's own envelope. With `rows` None, no playbook kit, the role comes first and the charter
     after it, unenveloped. A charter that yields no block renders no `## Charter`. `gates` is the role's
     granted gate legs, which its `## Ceiling` names."""
-    keys = role["keys"]
+    keys = dict(role["keys"], **({"model": model} if model is not None else {}))
     head = ["---"] + ["%s: %s" % (k, keys[k]) for k in CLAUDE_KEYS if k in keys]
     head += ["effort: %s" % effort, "omitClaudeMd: true", "workflow: %s" % keys.get("workflow", ""),
              "writes: %s" % keys.get("writes", ""), "---"]
@@ -252,10 +258,11 @@ def derive_effort_index(policy, roles, workflows, tool_root, target_root):
     slots = [s for s, r in roles.items() if r["keys"].get("agent", "true") == "true"]
     driven = [w for w in workflows if w.get("driver") == "workflow"]
     tables = {}
-    profiles = policy["effort"].get("profiles", {})
+    profiles = policy.get("effort", {}).get("profiles", {})
     for name, model in [(None, None)] + [(n, p["match"][0]) for n, p in profiles.items()]:
-        tables[name] = {"roles": {s: lib.resolve_effort(policy, s, model) for s in slots},
-                        "stages": {w["name"]: lib.resolve_stage_efforts(policy, w, model) for w in driven}}
+        tables[name] = {"roles": {s: lib.resolve_effort(policy, s, model, target_root) for s in slots},
+                        "stages": {w["name"]: lib.resolve_stage_efforts(policy, w, model, target_root)
+                                   for w in driven}}
     runs = {}
     for w in driven:
         path, _held = lib.resolve_harness_path(tool_root, w.get("harness"))
@@ -264,7 +271,7 @@ def derive_effort_index(policy, roles, workflows, tool_root, target_root):
     return {"default": tables[None],
             "profiles": {n: dict(tables[n], match=list(p["match"])) for n, p in profiles.items()},
             "harnesses": {rel: sorted(names) for rel, names in runs.items()},
-            "unset": {w["name"]: {key: lib.resolve_effort(policy, slot)
+            "unset": {w["name"]: {key: lib.resolve_effort(policy, slot, None, target_root)
                                   for key, slot in (w.get("stages") or {}).items()} for w in driven}}
 
 
@@ -338,7 +345,8 @@ def run_mode(mode, kit_dir, tool_root, target_root):
     try:
         cat = load_catalogue(kit_dir, target_root)
         agents = [slot for slot, role in cat["roles"].items() if role["keys"].get("agent", "true") == "true"]
-        granted = cat["policy"].get("gates", {})   # each role's legs, which its rendered ceiling names
+        # each role's legs, which its rendered ceiling names: the merged grant, its field else its house row
+        granted = cat["policy"].get("gates", {})
         # PLAY-dOrderedCharter-11 S4: every agent type's load set and role block, ONE check before writing
         refused, gate = lib.check_load_set(target_root, kit_dir, [
             (slot, len(lib.render_role(kit_dir, slot, cat["memory_root"], granted.get(slot, ())).encode("utf-8")))
@@ -357,8 +365,9 @@ def run_mode(mode, kit_dir, tool_root, target_root):
         for slot in agents:
             rendered["%s/%s.md" % (AGENTS_REL, slot)] = render_agent_file(
                 kit_dir, slot, cat["roles"][slot], cat["memory_root"], cat["charter"], cat["notes"],
-                lib.resolve_effort(cat["policy"], slot), missing[slot], rows, cat["charter_doc"],
-                granted.get(slot, ()))
+                lib.resolve_effort(cat["policy"], slot, None, target_root), missing[slot], rows,
+                cat["charter_doc"], granted.get(slot, ()),
+                lib.resolve_role_model(slot, "claude-code", target_root, kit_dir))
         harnesses, absent = derive_harness_paths(cat["workflows"], tool_root, target_root)
         manifest = resolve_gate_manifest(tool_root, target_root)
         rendered[INDEX_REL] = render_roles_index(
@@ -573,7 +582,13 @@ def check_fields_arm(state):
 
 
 def run_selftest():
-    """The arms over fixture catalogues; prints PASS or FAIL with the assertion count."""
+    """The arms over fixture catalogues; prints PASS or FAIL with the assertion count. Each fixture is a
+    non-git temporary directory, where the policy kit's reader names no commit, so the run binds
+    `lib.read_policy_setting` to a reader answering None for every key and restores it after, as arm 20
+    binds `lib.check_load_set` (TOOL-dBoundRoles-21 §8 F9): every arm reads the house-file levels. The
+    real reader is observed by the adopter self-test's git fixture, which copies the policy kit."""
+    own_reader = lib.read_policy_setting
+    lib.read_policy_setting = lambda key, root, with_default=False: None
     state = {"n": 0, "fail": []}
     roles = {"r-one": ("maxTurns: 7\nworkflow: w1\nreads: input:spec\nwrites: product\n"
                        "rules: two, one\n", "Overlay line.\n"),
@@ -937,8 +952,9 @@ def run_selftest():
             (kit / "house" / "policy.toml").write_text(text, encoding="utf-8")
             try:
                 policy = load_catalogue(kit, root)["policy"]
-                got = (lib.resolve_effort(policy, "r-one", model), lib.resolve_effort(policy, "r-two", model),
-                       lib.resolve_stage_efforts(policy, w5, model))
+                got = (lib.resolve_effort(policy, "r-one", model, root),
+                       lib.resolve_effort(policy, "r-two", model, root),
+                       lib.resolve_stage_efforts(policy, w5, model, root))
             except lib.RolesError as e:
                 got = str(e)
             if want is None:   # the model two profiles match: a refusal naming it and both `match` keys
@@ -975,6 +991,7 @@ def run_selftest():
                 p: p.read_bytes() for p in (root / ".claude").rglob("*") if p.is_file()},
                 "19e: a refused profile holding %r moved a file under .claude" % (lines,))
     check_fields_arm(state)
+    lib.read_policy_setting = own_reader
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)
     print("%s (%d assertions)" % ("FAIL" if state["fail"] else "PASS", state["n"]))

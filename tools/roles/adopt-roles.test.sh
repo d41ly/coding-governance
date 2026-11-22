@@ -43,7 +43,10 @@
 # (arm 23); and the agents verb's
 # session record, cold, warm, read, resumed after an append and a torn line, and keyed off by a
 # transcript edit, a foreign key or an unwritable folder (arm 25); and R3 reading each `reads` entry
-# in either spelling, a misspelt `field.` tag named and a bare `field.card.reuse` refused (arm 26). Every arm is a self-contained block below the prologue, so a
+# in either spelling, a misspelt `field.` tag named and a bare `field.card.reuse` refused (arm 26); and the
+# policy keys `roles.effort.<role>` and `roles.model.<role>.<harness>` read before the house file through a
+# copied policy kit, a role's `gates` field beating its house row, the reserved `default` slot, and an
+# absent house file falling to the declared effort (arm 29). Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 25
 # arm 9's writer and lines.
 #
@@ -110,7 +113,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +4 for arm 26 (TOOL-dBoundRoles-14).
 # +6 for arm 27 (TOOL-dBoundRoles-2).
 # +3 for arm 28 (TOOL-dBoundRoles-1).
-FLOOR_ASSERTIONS=88
+# +6 for arm 29 (TOOL-dBoundRoles-21).
+FLOOR_ASSERTIONS=94
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1326,6 +1330,93 @@ check_arm "arm 28 a layer naming no row and an acts-as outside item and cycle ar
    "$([[ $A28 == *'planted 1'* ]] && echo 1 || echo 0)"
 check_arm "arm 28 restored, the fixture grades no R2 line again" "$([[ $A28 == *'restored 1'* ]] && echo 1 || echo 0)"
 [ "$A28" = $'clean 1\nplanted 1\nrestored 1' ] || printf '    %s\n' "${A28//$'\n'/$'\n'    }"
+
+# ---- arm 29 (TOOL-dBoundRoles-21 AC1 to AC6): the policy keys read before the house file, the grant a role
+# ---- field. The fixture gains a copy of the policy kit at the home `policy` beside the roles kit and commits on
+# ---- `main`, the branch `policy.py get` reads as the landed revision of a clone with no remote; each plant
+# ---- commits its own `.governance/policy.toml`. The house file's gov-builder level is raised to `xhigh`
+# ---- first, so a set key and the house level differ. The expected levels and model are read from the
+# ---- fixture's files inline, never through the kit. The failing cases, observed at the close and not by
+# ---- the pass that wrote this: the house file read before the keys (AC2), a stage that inherits no role
+# ---- key (AC3), the model key matched by role alone (AC1), the index or the ceiling reading the house row
+# ---- before the field (AC4), the `default` slot admitted (AC5), and an absent house file refusing (AC6).
+# ---- WHAT IT DOES NOT CHECK: a key's `last-valid` source, a profile beside a set key, or `roles.effort.default`.
+build_fixture; _rc29=$?
+_pk=policy; [[ $FXK == */* ]] && _pk=${FXK%/*}/policy
+mkdir -p "$FX/$_pk" && cp -R "$HERE/../policy"/. "$FX/$_pk"/ || _rc29=2
+A29=$("$PY" -B -c 'import json, os, pathlib, re, subprocess, sys
+fx, kit = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve()
+env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_") and k != "GOV_DEFAULT_BRANCH"}
+def git(*a):
+    return subprocess.run(["git", "-c", "user.name=fx", "-c", "user.email=fx@fx", "-C", str(fx), *a], env=env,
+                          capture_output=True, text=True).returncode
+def commit(*lines):
+    (fx / ".governance").mkdir(exist_ok=True)
+    (fx / ".governance" / "policy.toml").write_text("".join(ln + "\n" for ln in lines) or "# no key\n", encoding="utf-8")
+    return git("add", "-A") == 0 and git("commit", "-q", "--allow-empty", "-m", "plant") == 0
+def run(*a):
+    p = subprocess.run([sys.executable, "-B", *a], cwd=str(kit), env=env, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    return p.returncode, p.stdout.strip(), p.stderr
+def front(slot, key):
+    text = (kit / "agents" / (slot + ".agent.md")).read_text(encoding="utf-8")
+    return re.search(r"(?m)^%s: *(.*?)\r?$" % re.escape(key), text.split("\n---", 1)[0]).group(1)
+house = kit / "house" / "policy.toml"
+house.write_text(re.sub(r"(?m)^gov-builder = \"high\"", "gov-builder = \"xhigh\"", house.read_text(encoding="utf-8")),
+                 encoding="utf-8")
+ok = git("symbolic-ref", "HEAD", "refs/heads/main") == 0 and commit()
+efforts = lambda w: run("handoff.py", "stage-efforts", w)[1]
+model = lambda: run("-c", "import roles_lib as l; print(l.resolve_role_model(%r, %r, %r))"
+                    % ("gov-builder", "claude-code", str(fx)))[1]
+ok2 = ok and commit("roles.effort.gov-builder = \"high\"") and efforts("build") == json.dumps({"builder": "high"}, separators=(",", ":"))
+print("ac2 %d" % int(ok2 and commit() and efforts("build") == json.dumps({"builder": "xhigh"}, separators=(",", ":"))))
+got = json.loads(efforts("spec-review") or "{}") if commit("roles.effort.gov-skeptic = \"max\"") else {}
+print("ac3 %d" % int(got.get("skeptic") == "max"))
+a = model() if commit("roles.model.gov-builder.codex = \"gpt-x\"") else None
+b = model() if commit("roles.model.gov-builder.codex = \"gpt-x\"", "roles.model.gov-builder.claude-code = \"opus\"") else None
+print("ac1 %d" % int(a == front("gov-builder", "model") and b == "opus"))
+role = kit / "agents" / "gov-builder.agent.md"
+held = role.read_bytes()
+def grant():
+    rc = run("render_agents.py", "--write")[0]
+    index = json.loads((fx / ".claude" / "roles.json").read_text(encoding="utf-8"))
+    ceiling = [ln for ln in (fx / ".claude" / "agents" / "gov-builder.md").read_text(encoding="utf-8").splitlines()
+               if ln.startswith("- gate legs: ")]
+    return rc, index["roles"]["gov-builder"]["gates"], ceiling
+commit()
+house.write_text(house.read_text(encoding="utf-8") + "gov-builder = [\"memory hygiene\"]\n", encoding="utf-8")
+f = grant()   # the shipped gov-builder file, whose field grants `lexicon naming predicates?`
+role.write_bytes(re.sub(rb"(?m)^gates: .*\r?\n", b"", held))
+h = grant()
+role.write_bytes(held)
+print("ac4 %d" % int(re.search(rb"(?m)^gates: lexicon naming predicates\?\r?$", held) is not None
+                     and f == (0, ["lexicon naming predicates"], ["- gate legs: lexicon naming predicates"])
+                     and h == (0, ["memory hygiene"], ["- gate legs: memory hygiene"])))
+plant = kit / "agents" / "default.agent.md"
+plant.write_bytes(re.sub(rb"(?m)^name: gov-tester(\r?)$", rb"name: default\1", (kit / "agents" / "gov-tester.agent.md").read_bytes()))
+rc, out, _err = run("check_roles.py", "--root", str(fx))
+plant.unlink()
+said = [ln for ln in out.splitlines() if ": R2 — " in ln]
+print("ac5 %d" % int(rc == 1 and len(said) == 1 and "default" in said[0] and "reserved" in said[0]))
+house.unlink()
+_rc, out, _err = run("check_roles.py", "--root", str(fx))
+print("ac6 %d" % int(efforts("build") == json.dumps({"builder": front("gov-builder", "effort")}, separators=(",", ":"))
+                     and " R12 " not in out and ": R12 — " not in out))
+' "$FX" "$FX/$KREL" 2>&1)
+A29=${A29//$'\r'/}
+check_arm "arm 29 a set roles.effort.<role> key beats the house file's level, and absent the house level reads" \
+   "$([ "$_rc29" = 0 ] && [[ $A29 == *'ac2 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 29 a stage with only its role's key set reads that key before the house stage row" \
+   "$([[ $A29 == *'ac3 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 29 a codex model key leaves the claude-code model the declared one, and a claude-code key sets it" \
+   "$([[ $A29 == *'ac1 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 29 a role's gates field beats its house [gates] row in the index and the ceiling, and absent the row reads" \
+   "$([[ $A29 == *'ac4 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 29 a role file whose slot is default is one R2 line naming the reserved slot" \
+   "$([[ $A29 == *'ac5 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 29 an absent house file falls to the declared effort and is no R12 line" \
+   "$([[ $A29 == *'ac6 1'* ]] && echo 1 || echo 0)"
+[ "$A29" = $'ac2 1\nac3 1\nac1 1\nac4 1\nac5 1\nac6 1' ] || printf '    %s\n' "${A29//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

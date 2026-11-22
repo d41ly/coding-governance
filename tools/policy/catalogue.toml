@@ -309,24 +309,32 @@ owner = "dFurnishedOrders"
 name = "roles.effort.<role>"
 allowed = { type = "name", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "the role efforts" }
 default = { derived = "`roles.effort.default`, then the role's declared effort" }
+summary = "The reasoning effort one role's agent runs at, the second step of the effort order: it beats roles.effort.default and the roles kit's house file, and loses only to a harness stage's own key. Unset, the level falls to roles.effort.default, the house file, then the role's declared effort."
+usage = 'roles.effort.gov-builder = "high"'
 owner = "dBoundRoles"
 
 [[key]]
 name = "roles.effort.<workflow>.<stage>"
 allowed = { type = "name", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "the role efforts" }
 default = { derived = "`roles.effort.<role>` for the stage's role, then `roles.effort.default`, then that role's declared effort" }
+summary = "The reasoning effort one stage of a harness workflow runs at, the first step of the effort order: it beats the stage's role key, roles.effort.default and the roles kit's house file. Unset, the stage takes its role's level."
+usage = 'roles.effort.spec-review.skeptic = "medium"'
 owner = "dBoundRoles"
 
 [[key]]
 name = "roles.effort.default"
 allowed = { type = "name", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "the role efforts" }
 default = { derived = "unset" }
+summary = "The reasoning effort every role agent runs at, the third step of the effort order: it beats the roles kit's house file and the role's declared effort, and loses to a role's or a stage's own key. Unset, the house file's levels apply, then each role's declared effort."
+usage = 'roles.effort.default = "medium"'
 owner = "dBoundRoles"
 
 [[key]]
 name = "roles.model.<role>.<harness>"
 allowed = { type = "name", item = "\\S+", registry = "the models the harness adapter offers" }
 default = { derived = "that harness adapter's equivalent of the role's declared model" }
+summary = "The model one role's agent runs on one harness, keyed by the harness so a key for another harness never moves this one's; the claude-code render writes it as the agent type's model. Unset, the role's declared model applies."
+usage = 'roles.model.gov-builder.claude-code = "opus"'
 owner = "dBoundRoles"
 
 [[key]]

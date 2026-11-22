@@ -32,5 +32,5 @@ default = "medium"            # every role, and every stage key of a workflow's 
 
 [gates]                       # the gate legs a role may run, by manifest name; every other role runs none
 # A trailing `?` marks a leg whose kit a target may not install: absent from the manifest, it is a note.
-gov-spec-writer = ["memory hygiene", "lexicon naming predicates?", "spec tokens (a spec's own names resolve)?"]
-gov-builder = ["lexicon naming predicates?"]
+# A row here applies only to a role whose definition carries no `gates` field; gov's own grants live in
+# its role files' `gates` fields, so this table seeds none.

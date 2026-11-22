@@ -661,7 +661,7 @@ exit notification is the wait. A gate row refusing the same command wins. The ro
 | P3 sleep at or over 5 s | a `sleep` of `POLL_SLEEP_FLOOR_S` (5) seconds or more, summed as GNU `sleep` sums, or of a duration that does not read | never |
 
 The allowlist is the role index's `gates` list for that type, which the roles kit renders from the
-`[gates]` table of its policy file; a type the index does not name, `workflow-subagent` and every
+role's `gates` field, else the `[gates]` table of its policy file; a type the index does not name, `workflow-subagent` and every
 built-in among them, may run nothing. `checkRoleGate`'s comment is the ONE evaluation order. An absent
 index adds no arm; a broken one refuses a candidate; a manifest that does not read leaves G1 unarmed
 with one witness line, and G2 and G3 still bind; a throw inside the arm refuses a role agent. The

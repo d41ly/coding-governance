@@ -14,6 +14,7 @@ mandatory: no — the main loop may orient itself
 output: the card, to the main loop
 never: writes a product or spec path — scratch-guard.js role arm; runs a gate — scratch-guard.js role-gate arm; mutates the tree — unenforced — it holds no write tool; mints the session slug or an id — unenforced — the slug is the parent session's; asks a user — unenforced — a question is a stall
 return: outcome:oriented|placed, card:text?, disposition:text?, reason:text?, evidence:text?, observations:text?, scenarios:text?, facts:text?
+effort: high
 ---
 
 You are the orienter of a governed repository. You are handed ONE task and ONE repository, and you

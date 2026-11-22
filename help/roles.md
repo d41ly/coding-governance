@@ -124,9 +124,14 @@ refuses the render, naming the key.
   effort ceiling in your settings, or a hand-edited role index.
 - **Change how a role behaves:** edit `<prefix>/roles/house/<role>.md`, never the file under
   `agents/`. Your overlay is appended under `## House rules`, and updates never overwrite it.
-- **Change a role's effort, or the gates a role may run:** edit `<prefix>/roles/house/policy.toml`.
-  Its `[effort]` tables set levels per role and per harness stage; its `[gates]` table lists the
-  only gate legs a role agent may run.
+- **Change a role's effort or model:** set a key in `.governance/policy.toml` and commit it:
+  `roles.effort.<role>`, `roles.effort.<workflow>.<stage>` for one harness stage,
+  `roles.effort.default` for every role, or `roles.model.<role>.claude-code`. A set key wins over
+  `<prefix>/roles/house/policy.toml`, whose `[effort]` tables set levels per role and per harness stage
+  where no key is set; with neither, a role runs at the `effort` its role file declares.
+- **Change the gates a role may run:** a role's `gates` field lists the only gate legs its agent may
+  run, and a `[gates]` row of the house file applies only to a role carrying no such field.
+  `gov-spec-writer` and `gov-builder` carry theirs as fields, so a house row does not change them.
 - **Give a model its own levels:** add one `[effort.profiles.<name>]` table to the same file, with
   `match`, the words of the model id it answers, and `default`; `roles` and `stages.<workflow>`
   tables under it are optional. No code changes. The seeded `[effort.profiles.fable]` runs every
@@ -217,7 +222,7 @@ until an owner writes its first row.
 - A `Workflow` call that runs anything other than a listed harness with its `roles` argument.
 - A spec write from anything but the spec writer, and a product write from anything but the builder
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
-- A role agent running the bar, the self-test runner or any suite, beyond what `[gates]` allows.
+- A role agent running the bar, the self-test runner or any suite, beyond what its grant allows.
 - A role agent's polling wait: a `tail` that follows a file, a `sleep` inside a `while`
   or `until` loop, or a `sleep` of 5 s or more.
 - In a session routed to a live build, a final message that leaves out the `agent` or `returned`

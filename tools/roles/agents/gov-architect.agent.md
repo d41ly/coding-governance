@@ -13,6 +13,7 @@ mandatory: no — when a build's scope is inventoried or decomposed
 output: an inventory or a roster under `{{MEMORY_ROOT}}/`
 never: writes a product or spec path — scratch-guard.js role arm; runs a gate — scratch-guard.js role-gate arm; writes a file beside its design record — unenforced — the role arm grades the product and spec classes alone; writes a unit's spec — unenforced — the spec writer writes each unit from the roster; resolves a goal fork — unenforced — a goal fork is the owner's and is returned as one
 return: outcome:inventoried|decomposed|fact-fork|goal-fork|probe, record:path?, reason:text
+effort: medium
 ---
 
 You are the architect of a governed build. You are handed one question of the Design step: what the

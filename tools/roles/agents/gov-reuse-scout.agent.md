@@ -13,6 +13,7 @@ mandatory: no — when kickoff asks for one
 output: the seam, to its caller
 never: writes a product or spec path — scratch-guard.js role arm; runs a gate — scratch-guard.js role-gate arm; designs or builds the behaviour — unenforced — it finds the seam, and its caller designs
 return: outcome:seam|none-fits, seam:path?, evidence:text
+effort: medium
 ---
 
 You are the reuse scout for a governed repository. You are handed one behaviour that is about to be

@@ -22,7 +22,10 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       required read from `role-schema.toml` through `roles_lib.load_role_schema`, an absent or
       invalid schema exit 2 (`rules` may be empty; `mandatory`, `output`, `never` and `return` may
       not, on any role); `name` not the file stem; `writes` outside its set; `agent` not
-      true/false; `tools` or `model` absent on an agent role; a `return` template
+      true/false; `tools`, `model` or `effort` absent on an agent role, or an `effort` outside the
+      five levels; a role file whose slot is `default`, reserved for the blanket key
+      `roles.effort.default` (TOOL-dBoundRoles-21 S3, S4); a `gates` field on an `agent: false`
+      role or naming a leg as R12 grades a `[gates]` row; a `return` template
       `parse_return_template` refuses, a required `outcome` of a closed set among what it owes
       (TOOL-dBoundRoles-2); a `layer` that is no `layer.<seg>` tag or names no `[[layer]]` row of the
       playbook kit's `layers.toml`, joined only where that register resolves and a `roles: note:`
@@ -55,7 +58,9 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       {{MEMORY_ROOT}}, or the file name of a protocol the charter's Protocols section names
   R11 the README's catalogue region absent, or different from a fresh render
   R12 a `house/policy.toml` defect, one line per line of `roles_lib.load_policy`'s refusal: the file
-      absent or not TOML, an unknown key, no `default`, a level outside the five, a role entry
+      unreadable or not TOML, an absent file being an empty fallback that no defect names, since each
+      level then falls to the policy keys and the role's declared `effort` (TOOL-dBoundRoles-21 S7);
+      an unknown key, no `default`, a level outside the five, a role entry
       naming no role file or an `agent: false` role, a stages table naming no workflow or a
       workflow with no stages, or a stage key that workflow does not hold; under
       `effort.profiles`, a profile that is not a table, any of those defects in its own `default`,
@@ -66,7 +71,8 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       leg name the tool root's gate manifest does not hold, checked only when that manifest reads
       and a `roles: note:` otherwise (TOOL-aOrientedCast-11); a name ending in `?` is optional, so
       a leg the manifest lacks is a `roles: note:` too, and a `?` alone names no leg
-      (TOOL-aOrientedCast-13)
+      (TOOL-aOrientedCast-13). A row there applies only to a role whose file carries no `gates`
+      field, and both homes are graded by `roles_lib.check_gate_names` (TOOL-dBoundRoles-21 S6)
   R13 a `mandatory` value carrying a token other than {{MEMORY_ROOT}}; or one calling its role
       mandatory (anything but `no` or `no — <when>`) whose `workflow` entry's `enforced-by` holds no
       hook entry, one whose first word is a `.js` file name, and that carries no
@@ -276,6 +282,13 @@ def check_roles(root, kit_dir, write=False):
             for k in AGENT_ROLE_KEYS:
                 if not keys.get(k):
                     add_defect(p, "R2", "'%s' is absent on an agent role" % k)
+        # TOOL-dBoundRoles-21 S3, S4: the declared effort is a level, and `default` is no slot, since
+        # `roles.effort.default` is the blanket level that `roles.effort.<role>` would read as a role
+        if keys.get("effort") and keys["effort"] not in lib.EFFORT_LEVELS:
+            add_defect(p, "R2", "effort '%s' is not one of %s" % (keys["effort"], " ".join(lib.EFFORT_LEVELS)))
+        if slot == "default":
+            add_defect(p, "R2", "the slot 'default' is reserved: roles.effort.default is the blanket level, so "
+                       "roles.effort.<role> would read a role of that name as the blanket")
         seen = set()
         for item in [x.strip() for x in keys.get("reads", "").split(",") if x.strip()]:
             n_reads += 1

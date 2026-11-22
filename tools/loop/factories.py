@@ -107,8 +107,10 @@ GATES = {"command": "loop command conformance", "policy-key": "policy check",
 #: The policy key factory's gate: the arms of `check_policy.py` that read the working tree's catalogue, its
 #: policy file and the kit's own list, never a render at a revision (TOOL-dDeclaredLoop-6 F7).
 POLICY_KEY_ARMS = ("arm_schema", "arm_shape", "arm_summaries", "arm_direction")
-#: The tools and model a factory-made agent role carries until its author narrows them.
-ROLE_TOOLS, ROLE_MODEL = "Read, Grep, Glob, Bash", "inherit"
+#: The tools, model and effort a factory-made agent role carries until its author narrows them; the
+#: effort is gov's house `[effort] default`, which an adopter's own house default still beats at render
+#: (TOOL-dBoundRoles-21 §8 F11).
+ROLE_TOOLS, ROLE_MODEL, ROLE_EFFORT = "Read, Grep, Glob, Bash", "inherit", "medium"
 PLANTS = {
     "command-new": "core.py new command check --kit loop --run loop_lib.py, then check-commands",
     "command-hand": "a hand [[command]] row in the loop kit's descriptor whose run names no file",
@@ -567,7 +569,8 @@ def write_role(top, kit_rel, slot, workflow, writes, description, reads, never, 
         raise Refused("%s exists; the factory writes a new role" % role.relative_to(top).as_posix())
     table, checker = roles / "workflows.toml", roles / "check_roles.py"
     values = dict(name=slot, description=description, tools=ROLE_TOOLS, model=ROLE_MODEL, workflow=workflow,
-                  layer=layer, reads=reads, writes=writes, rules="", mandatory="no", output=output, never=never)
+                  layer=layer, reads=reads, writes=writes, rules="", mandatory="no", output=output, never=never,
+                  effort=ROLE_EFFORT)
     values["return"] = template   # `return` is a Python keyword, so the key is set by subscript
     values["acts-as"] = acts_as   # a hyphenated key, so it is set by subscript as `return` is
     body = "You are the %s role of the %s workflow; what it does beyond its front matter is its author's to write.\n" % (

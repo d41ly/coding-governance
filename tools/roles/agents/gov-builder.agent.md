@@ -13,6 +13,8 @@ mandatory: for every unit built
 output: commits under `ROUTED_PATHS`
 never: edits a spec beyond its status header — scratch-guard.js role arm; writes a product path while no routed unit is buildable — scratch-guard.js write gate; runs a gate, a suite or a --selftest beyond the naming lexicon — scratch-guard.js role-gate arm; resolves a divergence by editing the spec or by building the intersection — unenforced — the role arm admits a status edit, and a divergence is returned instead; reports a failed check in a dispatch of its own — unenforced — every failed check goes in one divergence; stages everything in the tree — unenforced — other units' work may share the worktree, so paths are staged by name; re-runs or waits on a probe past its bound — unenforced — an overrun probe is skipped and named; authors a shell or script edit with a heredoc — unenforced — a heredoc mangles backslashes, and a working copy may hold CRLF; amends a commit — unenforced — every pass is a new commit
 return: outcome:committed|returned, commit:sha?, why:text?, checks:list
+effort: high
+gates: lexicon naming predicates?
 ---
 
 You are a software engineer building ONE unit of a larger build: the one your task names, from its

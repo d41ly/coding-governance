@@ -40,6 +40,38 @@ Whether a hook bypass is only recorded or also refused. Under both values each o
 hooks.bypass = "refused"
 ```
 
+## `roles.effort.<role>`
+<!-- usage: policy:roles.effort.<role> 1369dc13 -->
+The reasoning effort one role's agent runs at, the second step of the effort order: it beats roles.effort.default and the roles kit's house file, and loses only to a harness stage's own key. Unset, the level falls to roles.effort.default, the house file, then the role's declared effort.
+
+```text
+roles.effort.gov-builder = "high"
+```
+
+## `roles.effort.<workflow>.<stage>`
+<!-- usage: policy:roles.effort.<workflow>.<stage> 28a188d0 -->
+The reasoning effort one stage of a harness workflow runs at, the first step of the effort order: it beats the stage's role key, roles.effort.default and the roles kit's house file. Unset, the stage takes its role's level.
+
+```text
+roles.effort.spec-review.skeptic = "medium"
+```
+
+## `roles.effort.default`
+<!-- usage: policy:roles.effort.default 894f4c65 -->
+The reasoning effort every role agent runs at, the third step of the effort order: it beats the roles kit's house file and the role's declared effort, and loses to a role's or a stage's own key. Unset, the house file's levels apply, then each role's declared effort.
+
+```text
+roles.effort.default = "medium"
+```
+
+## `roles.model.<role>.<harness>`
+<!-- usage: policy:roles.model.<role>.<harness> 29078b7c -->
+The model one role's agent runs on one harness, keyed by the harness so a key for another harness never moves this one's; the claude-code render writes it as the agent type's model. Unset, the role's declared model applies.
+
+```text
+roles.model.gov-builder.claude-code = "opus"
+```
+
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
 
@@ -291,7 +323,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (226)
+## Not yet summarised (222)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -332,10 +364,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `roles.answered-calls`
 - `roles.verifier-context`
 - `roles.on-contradiction`
-- `roles.effort.<role>`
-- `roles.effort.<workflow>.<stage>`
-- `roles.effort.default`
-- `roles.model.<role>.<harness>`
 - `roles.harness.<role>`
 - `roles.auth.<role>`
 - `reuse.delivery`
