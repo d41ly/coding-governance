@@ -1618,7 +1618,7 @@ check_eq "K2 AC6 --card --check reports each miss once, never its own annotation
 # word, one POINTERS line per word; the card is restored byte for byte after the arm.
 cp "$K2CARD" "$TMP/k2card.pointers.bak"
 printf '## pointers\nrecords — r\nitem — i\nbudget — b\n' >> "$K2CARD"
-run_card "K13 --card --check names the pointers word the section lacks and exits 1" "$CWT" 1 "POINTERS — the '## pointers' section has no 'forks —' line, which POINTER_LINES lists" --card --check --session "$K2A"
+run_card "K13 --card --check names the pointers word the section lacks and exits 1" "$CWT" 1 "POINTERS — the '## pointers' section has no 'forks —' line, which POINTER_LINES lists; --card --pointers --build <slug> --session" --card --check --session "$K2A"
 check_eq "K13 --card --check prints one POINTERS line per missing word" "1" "$(grep -c '^POINTERS — ' "$CARD_OUT")"
 cp "$TMP/k2card.pointers.bak" "$K2CARD"
 

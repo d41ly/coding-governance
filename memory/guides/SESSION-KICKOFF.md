@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-22T16:23:17+02:00 @ 4b77f6590d44fac7342701d463364e57de0a1aef
+last-audit: 2026-11-22T16:44:00+02:00 @ a347e56f6467ffa40c18041f19af632af93a83ff
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2c621083fd91278f33ba1baba1ea15f4dada31b0
+last-body-change: a347e56f6467ffa40c18041f19af632af93a83ff
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -120,10 +120,9 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   (its KF3: the run edited its own grader), so such a build cannot land itself and hands its landing to the
   owner; run its red legs on an `origin/main` worktree early to tell its own reds apart · prune when the
   attribution can grade a run that edits the runner.
-- 2026-11-10 · `unattended.sh --rescope --act defer` · a deferral releases neither the dispatch order gate nor a dispatched unit's
-  path reservation: move an independent later unit into the deferred unit's order group, and close a dispatched one's pass with a
-  commit under its own `Pass:` trailer (dOrderedCharter) · prune when the session "Make --dispatch refuse fast and honour deferrals"
-  lands its fix on main.
+- 2026-11-22 · `GATE_ATTRIBUTE=<rev>` over `pass-legs.sh` · it attributes no red there: every red reads `DEAD PROBE`, its
+  bound 0s (the sum of the red legs' R ceilings), so a pass's red is told inherited only by running that leg at the pass base
+  by hand and comparing its findings (dKeptSession) · prune when a pass leg's red reads OWN or INHERITED under it.
 
 
 ### Environment traps worth front-loading
