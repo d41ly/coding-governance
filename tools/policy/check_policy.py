@@ -561,7 +561,19 @@ def derive_run_kind(repo, build, base, conf, families, readers):
         row = backlog.extract_row(ln, grammar)
         if row is not None and row.cls == "status" and row.verb in tree_lib.TERMINAL:
             disposed.add(row.target)
-    if not any(a not in disposed and a.split("-")[1] == build for a in asks):
+    # Each open ask's slug is the id parser's, any family, under the default tree's slug class the row
+    # regex bound; an ask id the parser refuses matches no build (TOOL-dTotalRecall-45 S5).
+    parse_id_parts, homed = backlog.load_id_grammar().parse_id_parts, False
+    for a in asks:
+        if a in disposed:
+            continue
+        try:
+            homed = parse_id_parts(a, None, alt=backlog.ANY_FAMILY)[1] == build
+        except ValueError:
+            continue
+        if homed:
+            break
+    if not homed:
         return "build"
     roster, inside = [], False
     for ln in (texts[(base, f"{folder}/README.md")] or "").split("\n"):

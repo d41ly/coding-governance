@@ -986,6 +986,13 @@ def scan_records(root, conf):
     """
     m = conf["MEMORY_ROOT"]
     rowre = derive_row_re(conf)
+    # A row's slug is the id parser's, under the default tree's slug class the row regex bound and
+    # any family (TOOL-dTotalRecall-45 S3); `backlog` is imported late, as `read_backlog_mode` says.
+    _here = os.path.dirname(os.path.abspath(__file__))
+    if _here not in sys.path:
+        sys.path.insert(0, _here)
+    import backlog  # noqa: E402  (deliberately late: see `read_backlog_mode`)
+    parse_id_parts = backlog.load_id_grammar().parse_id_parts
     out = []
     for p in row_docs(root, m, conf):
         if os.path.basename(p).split(".")[0] != "DECISIONS":
@@ -999,9 +1006,12 @@ def scan_records(root, conf):
             mm = rowre.match(line) if line is not None else None
             if mm:
                 rid = mm.group(1)
+                try:
+                    slug = parse_id_parts(rid, None, alt=backlog.ANY_FAMILY)[1]
+                except ValueError:
+                    slug = ""
                 out.append({"kind": "row", "ident": rid, "names": [rid], "where": f"{p}:{n}",
-                            "path": p, "summary": line[mm.end():], "full": line,
-                            "slug": rid.split("-")[1]})
+                            "path": p, "summary": line[mm.end():], "full": line, "slug": slug})
     gdir = f"{m}/gotchas/"
     for p in run("git", "ls-files", "--", gdir, cwd=root).split("\n"):
         if not p.endswith(".md") or "/" in p[len(gdir):] or p == f"{gdir}INDEX.md":
@@ -2659,6 +2669,24 @@ def cmd_selftest():
         arm("check 27: an id_grammar.py that cannot be imported refuses by name",
             "could not import this kit's id_grammar.py",
             lambda: run_fixture(f2, "--check-relations", b2))
+
+        # TOOL-dTotalRecall-45 AC3 — `scan_records` keys a row's slug through the id parser, so a
+        # hyphenated slug is taken whole. Copy-install, because the row regex binds the slug class of
+        # the tree its module sits in: the build README's recorded grammar admits the slug there with
+        # no policy kit, and a `python -c` in the fixture imports the copy. The split answered `d2026`.
+        f3, b3 = build_fixture("slug-hyphenated")
+        set_branch(f3, b3, dict(add_rows("- ARCH-d2026-10-26ClosedLoop-3 · a decision of a hyphenated slug"), **{
+            "memory/builds/d2026-10-26ClosedLoop/README.md":
+                "---\nslug: d2026-10-26ClosedLoop\nslug-grammar: words=1-3 style=humorous date=in-slug\n"
+                "opened: 2026-10-26\n---\n\n# d2026-10-26ClosedLoop\n"}))
+        arm("scan_records keys a hyphenated slug whole, through the id parser",
+            "['d2026-10-26ClosedLoop']",
+            lambda: (lambda p: p.stdout + p.stderr)(subprocess.run(
+                [sys.executable, "-c", "import sys; sys.path.insert(0, sys.argv[1]); import row_grammar as r; "
+                 "print([x['slug'] for x in r.scan_records('.', r.load_conf('.')) "
+                 "if x['ident'] == 'ARCH-d2026-10-26ClosedLoop-3'])", os.path.join(f3, mrel)],
+                cwd=f3, capture_output=True, text=True, encoding="utf-8",
+                env={k: v for k, v in os.environ.items() if k != "GOV_DEFAULT_BRANCH"})))
 
         # ------------------------------------------------- CHECK 28 (TOOL-aGraftedHelix-6)
         # In-process: the check reads no sibling kit, so no copy-install fixture is owed. Each

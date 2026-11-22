@@ -9895,8 +9895,8 @@ def cmd_selftest() -> int:
               "## 1. Aim\n\n## 2. Scope (IN)\n\n## 5. Production-readiness checklist\n\n"
               "```markdown\n- AC1 example\n```\n\n## 6. Acceptance criteria\n\n## 11. Extra\n```\n")
     _n_args = ("memory/TEMPLATE-SPEC.md", "ARCH-aFix-3", "2", "0123abcd", "2026-10-04", "arch")
-    _n_out = render_spec_skeleton(_n_tpl, *_n_args, "", ["alpha", "beta / gamma"])
-    _n_ord = render_spec_skeleton(_n_tpl, *_n_args, "7", ["alpha"])
+    _n_out = render_spec_skeleton(_n_tpl, *_n_args, "", ["alpha", "beta / gamma"], slug="aFix")
+    _n_ord = render_spec_skeleton(_n_tpl, *_n_args, "7", ["alpha"], slug="aFix")
     arm("TOOL-aMendedFleet-20 AC5 — the fixture fence's headings, in order, and nothing else",
         "['## 1. Aim', '## 2. Scope (IN)', '## 5. Production-readiness checklist', "
         "'## 6. Acceptance criteria', '## 11. Extra']",
@@ -9913,7 +9913,7 @@ def cmd_selftest() -> int:
                                  _n_ord.split("\n")[2].endswith("· streams arch · order 7")))
     arm("TOOL-aMendedFleet-20 S3 — a template with no skeleton fence is refused, never guessed",
         "carries no skeleton fence",
-        lambda: render_spec_skeleton("# T\n\n## 1. Goal\n", *_n_args, "", []))
+        lambda: render_spec_skeleton("# T\n\n## 1. Goal\n", *_n_args, "", [], slug="aFix"))
 
     # TOOL-aRoutedQuill-1 AC6 — a template carrying BOTH fences, the Tier-1 one above a Tier-2 one
     # that nests a fence. The base generator took the first fence as the start and the last fence
@@ -9928,8 +9928,8 @@ def cmd_selftest() -> int:
              "## 9. Revision log\n```\n")
     _q_both = "# T\n\n" + _q_t1 + _q_t2
     _q_args = ("memory/TEMPLATE-SPEC.md", "ARCH-aFix-3", "1", "0123abcd", "2026-10-04", "arch")
-    _q_one = render_spec_skeleton(_q_both, *_q_args, "", ["alpha"])
-    _q_two = render_spec_skeleton(_q_both, *(_q_args[:2] + ("2",) + _q_args[3:]), "", ["alpha"])
+    _q_one = render_spec_skeleton(_q_both, *_q_args, "", ["alpha"], slug="aFix")
+    _q_two = render_spec_skeleton(_q_both, *(_q_args[:2] + ("2",) + _q_args[3:]), "", ["alpha"], slug="aFix")
     arm("TOOL-aRoutedQuill-1 AC6 — --tier 1 writes the Tier-1 fence's eight headings and nothing else",
         "['## 1. Goal', '## 2. Scope (IN)', '## 3. Non-goals (OUT)', '## 4. Design', "
         "'## 5. Acceptance criteria', '## 6. Gates', '## 7. Open questions', '## 8. Revision log']",
@@ -9941,10 +9941,10 @@ def cmd_selftest() -> int:
     arm("TOOL-aRoutedQuill-1 AC6 — --tier 2 reads the LAST fence only, byte-identical to a template "
         "without the Tier-1 fence", "True",
         lambda: str(_q_two == render_spec_skeleton("# T\n\n" + _q_t2, *(_q_args[:2] + ("2",)
-                                                    + _q_args[3:]), "", ["alpha"])))
+                                                    + _q_args[3:]), "", ["alpha"], slug="aFix")))
     arm("TOOL-aRoutedQuill-1 S5 — --tier 1 against a template with no Tier-1 fence is refused by name",
         "carries no Tier-1 skeleton fence",
-        lambda: render_spec_skeleton("# T\n\n" + _q_t2, *_q_args, "", []))
+        lambda: render_spec_skeleton("# T\n\n" + _q_t2, *_q_args, "", [], slug="aFix"))
 
     test_staged_render(arm)
     test_staged_write(arm)
@@ -10173,8 +10173,11 @@ def read_new_spec_args(argv: list) -> dict:
 
 
 def render_spec_skeleton(template: str, template_rel: str, spec_id: str, tier: str, base: str,
-                         today: str, streams: str, order: str, rows: list) -> str:
+                         today: str, streams: str, order: str, rows: list, *, slug: str) -> str:
     """The new spec's bytes: a filled header, the template's `##` headings, a slot per authored part.
+
+    The header's node is `slug[0]`, the slug the caller's id match took, and no part of `spec_id` is
+    read for it, so a hyphen inside a slug cannot move it (TOOL-dTotalRecall-45 S2).
 
     The headings are READ from the tier's skeleton fence of the installed template (F2), so the
     section canon keeps one spelling. Tier-2 is the LAST fence opening on the placeholder H1 and
@@ -10227,7 +10230,7 @@ def render_spec_skeleton(template: str, template_rel: str, spec_id: str, tier: s
                          "existing seam fits with the evidence"), "",
              f"Recall terms used: {fill.format('the query and its 8-14 terms, verbatim')}"],
     }
-    header = (f"**Status:** OPEN · rev-1 · {today} · node {spec_id.split('-')[1][0]} · Tier-{tier} "
+    header = (f"**Status:** OPEN · rev-1 · {today} · node {slug[0]} · Tier-{tier} "
               f"· base {base} · streams {streams}" + (f" · order {order}" if order else ""))
     out = [f"# {spec_id} — {fill.format('title')}", "", header]
     for h in headings:
@@ -10276,7 +10279,7 @@ def cmd_new_spec(root: str, conf: dict, args: dict) -> int:
         raise Problem(f"--new-spec: {template_rel} {why}")
     rows = [r for r in conf.get("READINESS_ROWS", "").split("|") if r]
     text = render_spec_skeleton(template, template_rel, spec_id, args["tier"], base, today,
-                                disciplines[family], args["order"], rows)
+                                disciplines[family], args["order"], rows, slug=slug)
     write_text(os.path.join(root, rel), text)
     print(f"build-index: wrote {rel} carrying {text.count(FILL_MARKER)} fill slot(s); check 12 "
           f"refuses it until every `{FILL_MARKER} …>` is filled. Then: git add {rel} && "

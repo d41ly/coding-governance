@@ -578,8 +578,11 @@ def derive_row_lines(lines):
     return rows
 
 
+# The family class a unit id carries here, spliced by `ID_RE` and passed to the id parser as its
+# family alternation, so both read one spelling (TOOL-dTotalRecall-45 S1).
+FAMILY_CLASS = r"[A-Z][A-Z0-9]{1,9}"
 # A unit id and a `type(slug):` scope, each slug the slug grammar's class (TOOL-dTotalRecall-5 S7).
-ID_RE = derive_slug_pattern(lambda c: r"(?<![A-Za-z0-9-])[A-Z][A-Z0-9]{1,9}-(?:" + c + r")-\d+(?![A-Za-z0-9])")
+ID_RE = derive_slug_pattern(lambda c: r"(?<![A-Za-z0-9-])" + FAMILY_CLASS + r"-(?:" + c + r")-\d+(?![A-Za-z0-9])")
 # A row's head: optional list or table markup, an optional link bracket, then the id.
 ROW_HEAD = r"^[ \t]*([-*|][ \t]*)?\[?"
 SCOPE_RE = derive_slug_pattern(lambda c: r"^[a-z][a-z-]*\(((?:" + c + r"))\)")
@@ -587,9 +590,21 @@ DRIFT_LINES = 4
 
 
 def derive_names(subject):
-    """-> the unit ids and slugs a commit subject names: `FAMILY-slug-seq` ids and a `type(slug):` scope."""
+    """-> the unit ids and slugs a commit subject names: `FAMILY-slug-seq` ids and a `type(slug):` scope.
+
+    Each id's slug is the id parser's, under the default tree's slug class `ID_RE` was bound by and
+    `FAMILY_CLASS` (TOOL-dTotalRecall-45 S1); an id it refuses adds no slug. Where memory-tree does
+    not resolve, the slug is the text between the first and the last hyphen, the legacy shape
+    admitting none inside a slug."""
     names = set(ID_RE.findall(subject))
-    names |= {i.split("-")[1] for i in list(names)}
+    for i in list(names):
+        if _SLUG_GRAMMAR is None:
+            names.add(i[i.index("-") + 1:i.rindex("-")])
+            continue
+        try:
+            names.add(_SLUG_GRAMMAR.parse_id_parts(i, None, alt=FAMILY_CLASS)[1])
+        except ValueError:
+            pass
     m = SCOPE_RE.match(subject)
     if m:
         names.add(m.group(1))
