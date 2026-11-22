@@ -59,6 +59,9 @@ GET_BOUND = 30
 APP_SLUG = "github-actions"
 TRUST = ("pinned-workflow", "owner-reviews-workflow-change", "app-only")
 SCOPES = ("workflow", "dispatch-closure")
+TRUST_KEY = "verdict.remote.trust"  # the three keys, passed by name so the policy check's reader scan sees each read
+SCOPE_KEY = "verdict.remote.pin-scope"
+PIN_KEY = "verdict.remote.pin"
 ANCHOR = re.compile(r"(?:https://github\.com/|ssh://git@github\.com/|git@github\.com:)([A-Za-z0-9._-]+)/([A-Za-z0-9._-]+?)(?:\.git)?/?")
 WORKFLOW_FILE = re.compile(r"[A-Za-z0-9._-]+\.ya?ml")
 DERIVED_REFUSAL = "a derived default no reader computes yet"  # the policy kit's DERIVED_WHY
@@ -74,6 +77,61 @@ class RefuseRedirect(urllib.request.HTTPRedirectHandler):
 
 
 OPENER = urllib.request.build_opener(RefuseRedirect)
+
+
+# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
+def resolve_remote(root):
+    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+
+    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
+              Several remotes and none chosen, or a chosen name that is not a remote here, is a
+              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
+              keeps its own no-remote fallback.
+    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
+              only CROSS-CHECKS the observation reads this one.
+    branch    GOV_DEFAULT_BRANCH, else observed, else "".
+    A refusal empties the other three, so no caller can pick a remote the ladder refused.
+    """
+    import os
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    names = read("remote").split()
+    listed = " ".join(names) or "none"
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
+    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
+    if not remote and cur:
+        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
+        if remote == ".":
+            remote = ""
+    if not remote and len(names) == 1:
+        remote = names[0]
+    if not remote and len(names) > 1:
+        where = "branch " + cur if cur else "a detached HEAD"
+        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
+                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
+                            % (where, len(names), listed))
+    if remote and remote not in names:
+        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
+                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
+    observed = ""
+    if remote:
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
+    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
+# <<< remote_ladder_py
 
 
 def derive_response_name(path):
@@ -197,13 +255,13 @@ def read_remote_keys(repo):
     """(trust, scope, pin or None) at the landed revision; a DeadProbe naming any refusal but the pin's
     derived default, which is no pin."""
     got = {}
-    for key, default in (("verdict.remote.trust", TRUST[0]), ("verdict.remote.pin-scope", SCOPES[0]),
-                         ("verdict.remote.pin", None)):
-        value, refused = read_policy_value(repo, key)
-        if refused and not (key == "verdict.remote.pin" and DERIVED_REFUSAL in refused):
+    for key, default, (value, refused) in ((TRUST_KEY, TRUST[0], read_policy_value(repo, TRUST_KEY)),
+                                           (SCOPE_KEY, SCOPES[0], read_policy_value(repo, SCOPE_KEY)),
+                                           (PIN_KEY, None, read_policy_value(repo, PIN_KEY))):
+        if refused and not (key == PIN_KEY and DERIVED_REFUSAL in refused):
             raise DeadProbe(f"{key} does not read: {refused}")
         got[key] = value if value is not None or refused else default
-    return got["verdict.remote.trust"], got["verdict.remote.pin-scope"], got["verdict.remote.pin"]
+    return got[TRUST_KEY], got[SCOPE_KEY], got[PIN_KEY]
 
 
 def check_pin_source(backend, sha, keys, repo="."):
@@ -238,7 +296,8 @@ def read_remote_verdict(backend, sha, tree, repo=".", responses=None):
         trust, _scope, pin = keys
         if trust != "app-only" and not pin:
             return check_pin_source(backend, sha, keys, repo)
-        rc, url = run_git(repo, "remote", "get-url", os.environ.get("GOV_REMOTE") or "origin")
+        remote, _branch, _observed, refusal = resolve_remote(repo)
+        rc, url = run_git(repo, "remote", "get-url", remote) if remote else (1, refusal)
         owner, name = read_anchor(url if rc == 0 else "")
         workflow = backend.get("workflow") or ".github/workflows/remote-ci.yml"
         base = f"/repos/{owner}/{name}"
@@ -298,7 +357,7 @@ def run_pin(repo="."):
     """The `pin` verb: the lines and the id the owner would set at HEAD; writes nothing."""
     try:
         backend = check_backend("remote-ci", read_backends(TOOL_ROOT))
-        scope, refused = read_policy_value(repo, "verdict.remote.pin-scope")
+        scope, refused = read_policy_value(repo, SCOPE_KEY)
         if refused:
             raise Refusal(f"verdict.remote.pin-scope does not read: {refused}")
         rc, head = run_git(repo, "rev-parse", "--verify", "-q", "HEAD")

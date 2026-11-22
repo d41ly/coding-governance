@@ -419,6 +419,22 @@ def run_populated(root):
     return print_verdict(leg, red, len(regs))
 
 
+def check_marker_repaired(root, reg, key, was, now, sha, seen):
+    """-> True when a rewritten disposition only repairs a base `widened:` marker that names no widen
+    record in the base's tree into one that admits the key now: the rewrite never gains demands, and
+    no laundering, since the base row admitted nothing. `seen` caches the policy and both path sets."""
+    if reg.direction not in WIDEN_DIRECTIONS or not (was.startswith(WIDENED_LEAD) and now.startswith(WIDENED_LEAD)):
+        return False
+    if "base" not in seen:
+        rc, out = LL._run_git(root, "ls-tree", "-r", "-z", "--name-only", sha)
+        seen.update(base=[p for p in out.split("\0") if p] if rc == 0 else None,
+                    policy=read_widen_policy(root), tracked=read_tracked_paths(root))
+    named, stem = derive_record_name(WIDEN_KIND), was[len(WIDENED_LEAD):]
+    if seen["base"] is None or any(p.rsplit("/", 1)[-1] == stem + ".md" and named.search(p) for p in seen["base"]):
+        return False
+    return check_widen_admitted(root, reg, key, now[len(WIDENED_LEAD):], seen["policy"], sha, seen["tracked"])[0]
+
+
 def run_seed_laundering(root):
     """`ratchet (seed laundering)`: against the base, a surviving key whose sha or disposition the tree
     rewrote, or a row removed while its seed still measures the key."""
@@ -428,7 +444,7 @@ def run_seed_laundering(root):
         print_line("unarmed", leg, derive_leg_population(regs, "seed-laundering")[1])
         return 0
     sha, why = LL.resolve_compare_base(root)
-    red = 0
+    red, seen = 0, {}
     for reg in regs:
         if sha and check_new_at_base(root, reg, sha):
             print_line(leg, reg.population, "new at %s" % sha[:12], "%d rows" % measure_rows(root, reg))
@@ -455,7 +471,9 @@ def run_seed_laundering(root):
             if now[0] != values[0]:
                 print_line(leg, reg.population, "re-dated", render_key(key), "%s -> %s" % (values[0], now[0]))
                 red = 1
-            if now[1] != values[1]:
+            if now[1] != values[1] and check_marker_repaired(root, reg, key, values[1], now[1], sha, seen):
+                print_line(leg, reg.population, "marker repaired", render_key(key), "%s -> %s" % (values[1], now[1]))
+            elif now[1] != values[1]:
                 print_line(leg, reg.population, "disposition rewritten", render_key(key),
                            "%s -> %s" % (values[1], now[1]))
                 red = 1
@@ -784,9 +802,12 @@ def write_files(top, files):
         p.write_bytes(text.encode("utf-8"))
 
 
+FX_REMOTE = "fx"  # the fixtures' scratch remote: a name no real remote of gov is likely to carry
+
+
 def write_fixture_repo(top, tables, files):
     """A scratch repository at `top`: `kit/kit.toml` holding `tables`, a build folder, and `files`,
-    committed as the base on `main`, which `refs/remotes/origin/main` names."""
+    committed as the base on `main`, which the scratch remote's `main` tracking ref names."""
     pathlib.Path(top).mkdir(parents=True)
     write_files(top, {"kit/kit.toml": 'id = "fix"\n\n' + "".join(tables),
                       "memory/builds/dFix/README.md": "# dFix\n", **files})
@@ -796,8 +817,8 @@ def write_fixture_repo(top, tables, files):
         run_git_in(top, "config", k, v)
     run_git_in(top, "add", "-A")
     run_git_in(top, "commit", "-q", "-m", "base")
-    run_git_in(top, "remote", "add", "origin", "../no-remote")
-    run_git_in(top, "update-ref", "refs/remotes/origin/main", "HEAD")
+    run_git_in(top, "remote", "add", FX_REMOTE, "../no-remote")
+    run_git_in(top, "update-ref", f"refs/remotes/{FX_REMOTE}/main", "HEAD")
     return top
 
 
@@ -993,7 +1014,7 @@ def run_plant_no_base_remedy(top, results):
     `unresolved`, its reason and the remedy."""
     rows = [(("a",), 1, SHA_A, "seeded")]
     write_fixture_repo(top, [render_table()], {"pop/rows.txt": render_rows(rows)})
-    run_git_in(top, "update-ref", "-d", "refs/remotes/origin/main")
+    run_git_in(top, "update-ref", "-d", f"refs/remotes/{FX_REMOTE}/main")
     check_plant_case(results, "no-base-remedy", "never gains with no compare base", top, ["never-gains"], 1,
                      ["fix-pop · unresolved", NO_BASE_REMEDY], ["pass"])
 
@@ -1144,7 +1165,7 @@ def run_plant_regrammared(top, results):
                      ["regrammared at"], ["unresolved"])
     run_git_in(top, "add", "-A")
     run_git_in(top, "commit", "-q", "-m", "the base home regrammared")
-    run_git_in(top, "update-ref", "refs/remotes/origin/main", "HEAD")
+    run_git_in(top, "update-ref", f"refs/remotes/{FX_REMOTE}/main", "HEAD")
     write_files(top, {"pop/rows.txt": render_rows([(("a",), 1, SHA_A, "seeded"), (("b",), 1, SHA_A, "seeded"),
                                                    (("c",), 1, SHA_A, "seeded")])})
     check_plant_case(results, "regrammared", "a ledger-headed base home is graded, not regrammared", top,

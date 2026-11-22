@@ -74,7 +74,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `e239d8161fb3a02a24f65039f3045947b0b382aa`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `62ccec623069583d765b86d723e0533c739169e5`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -83,7 +83,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `b1b9c9b613365fa43ad0e9eb94db3b96a03eba6e`
+- rendered at: `26f5ff5ad4d34164eece6a3bb43f8c3fec301d5f`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -151,7 +151,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 ### Parents
 
-- dWitnessedBar: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0353@24ae0391` (`test.seed`)
+- dWitnessedBar: specs done yes, build done yes, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0353@24ae0391` (`test.seed`)
 - dTotalRecall: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0230@63f11811` (`test.seed`)
 - dBoundRoles: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0181@6ebedcff` (`roles.effort.*`); `cl-dClosedLoop-0182@0cc5ed88` (`test.seed`); `cl-dClosedLoop-0185@ce70dc70` (`add`); `cl-dClosedLoop-0186@e356242a` (`default`, `roles.effort.default`); `cl-dClosedLoop-0188@23b122f8` (`roles.effort.*`, `roles.effort.default`)
 - dWellOiledMachine: specs done yes, build done no, as the schedule script's `tree_state` reads HEAD. Its clauses this build's clauses name, by a backticked name both carry: `cl-dClosedLoop-0317@9d62f0b1` (`--no-merges`, `<current default>..HEAD`, `carries`); `cl-dClosedLoop-0505@d65ddfae` (`deploy.unlease`)
@@ -230,37 +230,37 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dShippedR
 
 The opened README's roster, every unit with its row:
 
-- unit id `DEPL-dShippedRelease-1` · README:62 | 1 | `DEPL-dShippedRelease-1` | `cl-dClosedLoop-0413@7914d7c9` | the landing record |
-- unit id `DEPL-dShippedRelease-2` · README:63 | 2 | `DEPL-dShippedRelease-2` | `cl-dClosedLoop-0507@e74286a1` | `deploy.distill` unarmed until dScopedBuild lands `build.distill`: it records on the landing record that it measured nothing |
-- unit id `DEPL-dShippedRelease-3` · README:64 | 3 | `DEPL-dShippedRelease-3` | `cl-dClosedLoop-0414@d9d47e83` | kit release notes |
-- unit id `DEPL-dShippedRelease-4` · README:65 | 4 | `DEPL-dShippedRelease-4` | `cl-dClosedLoop-0415@82cfbcec` | the deploy engine |
-- unit id `DEPL-dShippedRelease-5` · README:66 | 5 | `DEPL-dShippedRelease-5` | `cl-dClosedLoop-0508@68f388b5` | the release arms dWellOiledMachine's sweep and lander leave to this build: a `deploy.released` wait given `build.release-ceiling` as its declared deadline |
-- unit id `DEPL-dShippedRelease-6` · README:67 | 6 | `DEPL-dShippedRelease-6` | `cl-dClosedLoop-0416@7154a42c` | the first engine adapter |
-- unit id `DEPL-dShippedRelease-7` · README:68 | 7 | `DEPL-dShippedRelease-7` | `cl-dClosedLoop-0417@3e86117a` | the adopter register and currency watch |
-- unit id `DEPL-dShippedRelease-8` · README:69 | 8 | `DEPL-dShippedRelease-8` | `cl-dClosedLoop-0418@0096c2c8` | optional emitted CI |
-- unit id `DEPL-dShippedRelease-9` · README:70 | 9 | `DEPL-dShippedRelease-9` | `cl-dClosedLoop-0419@c78ef1a4` | a derived runbook: the operator order for install and update |
-- unit id `DEPL-dShippedRelease-10` · README:71 | 10 | `DEPL-dShippedRelease-10` | `cl-dClosedLoop-0420@7a9716bf` | the kit factory and its conformance gate |
-- unit id `DEPL-dShippedRelease-11` · README:72 | 11 | `DEPL-dShippedRelease-11` | `cl-dClosedLoop-0421@62dc6590` | a dependent's landing held until its parent lands (`deps.landing`) |
-- unit id `DEPL-dShippedRelease-12` · README:73 | 12 | `DEPL-dShippedRelease-12` | `cl-dClosedLoop-0422@027c3b9f` | landings ordered through the landing queue it builds |
-- unit id `DEPL-dShippedRelease-13` · README:74 | 13 | `DEPL-dShippedRelease-13` | `cl-dClosedLoop-0423@a58b92bf` | the lander running the core checks on the landed tree before it releases the build |
-- unit id `DEPL-dShippedRelease-14` · README:75 | 14 | `DEPL-dShippedRelease-14` | `cl-dClosedLoop-0424@efed0e2f` | the landing review blocking the build's close rather than the push |
-- unit id `DEPL-dShippedRelease-15` · README:76 | 15 | `DEPL-dShippedRelease-15` | `cl-dClosedLoop-0425@3b7313d6` | promotion after landing through environments as an integrations extension point |
-- unit id `DEPL-dShippedRelease-16` · README:77 | 16 | `DEPL-dShippedRelease-16` | `cl-dClosedLoop-0426@a52a5e6d` | an unattended `kits.offer` in a govkit mode that runs nothing from the adopter's tree |
-- unit id `DEPL-dShippedRelease-17` · README:78 | 17 | `DEPL-dShippedRelease-17` | `cl-dClosedLoop-0427@131c1447` | the install and update hooks that call `adopt` and `test.seed` |
-- unit id `DEPL-dShippedRelease-18` · README:79 | 18 | `DEPL-dShippedRelease-18` | `cl-dClosedLoop-0428@e9fcd4a6` | every release updating gov's own install first |
-- unit id `DEPL-dShippedRelease-19` · README:80 | 19 | `DEPL-dShippedRelease-19` | `cl-dClosedLoop-0429@78bd7623` | the integrations import of an adopter's CI jobs as legs |
-- unit id `DEPL-dShippedRelease-20` · README:81 | 20 | `DEPL-dShippedRelease-20` | `cl-dClosedLoop-0430@25fe9858` | an update `kits.offer` offers runs neither `adopt` nor `test.seed` in the adopter's tree |
-- unit id `DEPL-dShippedRelease-21` · README:82 | 21 | `DEPL-dShippedRelease-21` | `cl-dClosedLoop-0431@3ef16038` | the kit factory's purpose field and a `kit.toml` for govkit and lib |
-- unit id `DEPL-dShippedRelease-22` · README:83 | 22 | `DEPL-dShippedRelease-22` | `cl-dClosedLoop-0432@e42728b4` | the ask tracker's one-way mirror |
-- unit id `DEPL-dShippedRelease-23` · README:84 | 23 | `DEPL-dShippedRelease-23` | `cl-dClosedLoop-0433@ff09e77e` | the deployer's definition |
-- unit id `DEPL-dShippedRelease-24` · README:85 | 24 | `DEPL-dShippedRelease-24` | `cl-dClosedLoop-0434@df3486aa` | `install.guards`: the core guards installed into the project's settings |
-- unit id `DEPL-dShippedRelease-25` · README:86 | 25 | `DEPL-dShippedRelease-25` | `cl-dClosedLoop-0435@df636953` | the receipt's schema 5 gaining `superseded` |
-- unit id `DEPL-dShippedRelease-26` · README:87 | 26 | `DEPL-dShippedRelease-26` | `cl-dClosedLoop-0436@57841d5d` | the platform matrix verified per release: platform runner adapters for `platforms.supported` under `platforms.verify` |
-- unit id `DEPL-dShippedRelease-27` · README:88 | 27 | `DEPL-dShippedRelease-27` | `cl-dClosedLoop-0437@b595f1f2` | `carries` on the landing record |
-- unit id `DEPL-dShippedRelease-28` · README:89 | 28 | `DEPL-dShippedRelease-28` | `cl-dClosedLoop-0438@088c545a` | `adopt.declarations`: at install and update |
-- unit id `DEPL-dShippedRelease-29` · README:90 | 29 | `DEPL-dShippedRelease-29` | `cl-dClosedLoop-0439@1aecad6a` | the update's report extended to every kind: each gov row's state in the repository |
-- unit id `DEPL-dShippedRelease-30` · README:91 | 30 | `DEPL-dShippedRelease-30` | `cl-dClosedLoop-0440@13cc3301` | a patch build raised by a landing |
-- unit id `DEPL-dShippedRelease-31` · README:92 | 31 | `DEPL-dShippedRelease-31` | `cl-dClosedLoop-0441@1aab6ce8` | the word fleet left to node units: the register of adopters built as the adopter register |
+- unit id `DEPL-dShippedRelease-1` · README:61 | 1 | `DEPL-dShippedRelease-1` | `cl-dClosedLoop-0413@7914d7c9` | the landing record |
+- unit id `DEPL-dShippedRelease-2` · README:62 | 2 | `DEPL-dShippedRelease-2` | `cl-dClosedLoop-0507@e74286a1` | `deploy.distill` unarmed until dScopedBuild lands `build.distill`: it records on the landing record that it measured nothing |
+- unit id `DEPL-dShippedRelease-3` · README:63 | 3 | `DEPL-dShippedRelease-3` | `cl-dClosedLoop-0414@d9d47e83` | kit release notes |
+- unit id `DEPL-dShippedRelease-4` · README:64 | 4 | `DEPL-dShippedRelease-4` | `cl-dClosedLoop-0415@82cfbcec` | the deploy engine |
+- unit id `DEPL-dShippedRelease-5` · README:65 | 5 | `DEPL-dShippedRelease-5` | `cl-dClosedLoop-0508@68f388b5` | the release arms dWellOiledMachine's sweep and lander leave to this build: a `deploy.released` wait given `build.release-ceiling` as its declared deadline |
+- unit id `DEPL-dShippedRelease-6` · README:66 | 6 | `DEPL-dShippedRelease-6` | `cl-dClosedLoop-0416@7154a42c` | the first engine adapter |
+- unit id `DEPL-dShippedRelease-7` · README:67 | 7 | `DEPL-dShippedRelease-7` | `cl-dClosedLoop-0417@3e86117a` | the adopter register and currency watch |
+- unit id `DEPL-dShippedRelease-8` · README:68 | 8 | `DEPL-dShippedRelease-8` | `cl-dClosedLoop-0418@0096c2c8` | optional emitted CI |
+- unit id `DEPL-dShippedRelease-9` · README:69 | 9 | `DEPL-dShippedRelease-9` | `cl-dClosedLoop-0419@c78ef1a4` | a derived runbook: the operator order for install and update |
+- unit id `DEPL-dShippedRelease-10` · README:70 | 10 | `DEPL-dShippedRelease-10` | `cl-dClosedLoop-0420@7a9716bf` | the kit factory and its conformance gate |
+- unit id `DEPL-dShippedRelease-11` · README:71 | 11 | `DEPL-dShippedRelease-11` | `cl-dClosedLoop-0421@62dc6590` | a dependent's landing held until its parent lands (`deps.landing`) |
+- unit id `DEPL-dShippedRelease-12` · README:72 | 12 | `DEPL-dShippedRelease-12` | `cl-dClosedLoop-0422@027c3b9f` | landings ordered through the landing queue it builds |
+- unit id `DEPL-dShippedRelease-13` · README:73 | 13 | `DEPL-dShippedRelease-13` | `cl-dClosedLoop-0423@a58b92bf` | the lander running the core checks on the landed tree before it releases the build |
+- unit id `DEPL-dShippedRelease-14` · README:74 | 14 | `DEPL-dShippedRelease-14` | `cl-dClosedLoop-0424@efed0e2f` | the landing review blocking the build's close rather than the push |
+- unit id `DEPL-dShippedRelease-15` · README:75 | 15 | `DEPL-dShippedRelease-15` | `cl-dClosedLoop-0425@3b7313d6` | promotion after landing through environments as an integrations extension point |
+- unit id `DEPL-dShippedRelease-16` · README:76 | 16 | `DEPL-dShippedRelease-16` | `cl-dClosedLoop-0426@a52a5e6d` | an unattended `kits.offer` in a govkit mode that runs nothing from the adopter's tree |
+- unit id `DEPL-dShippedRelease-17` · README:77 | 17 | `DEPL-dShippedRelease-17` | `cl-dClosedLoop-0427@131c1447` | the install and update hooks that call `adopt` and `test.seed` |
+- unit id `DEPL-dShippedRelease-18` · README:78 | 18 | `DEPL-dShippedRelease-18` | `cl-dClosedLoop-0428@e9fcd4a6` | every release updating gov's own install first |
+- unit id `DEPL-dShippedRelease-19` · README:79 | 19 | `DEPL-dShippedRelease-19` | `cl-dClosedLoop-0429@78bd7623` | the integrations import of an adopter's CI jobs as legs |
+- unit id `DEPL-dShippedRelease-20` · README:80 | 20 | `DEPL-dShippedRelease-20` | `cl-dClosedLoop-0430@25fe9858` | an update `kits.offer` offers runs neither `adopt` nor `test.seed` in the adopter's tree |
+- unit id `DEPL-dShippedRelease-21` · README:81 | 21 | `DEPL-dShippedRelease-21` | `cl-dClosedLoop-0431@3ef16038` | the kit factory's purpose field and a `kit.toml` for govkit and lib |
+- unit id `DEPL-dShippedRelease-22` · README:82 | 22 | `DEPL-dShippedRelease-22` | `cl-dClosedLoop-0432@e42728b4` | the ask tracker's one-way mirror |
+- unit id `DEPL-dShippedRelease-23` · README:83 | 23 | `DEPL-dShippedRelease-23` | `cl-dClosedLoop-0433@ff09e77e` | the deployer's definition |
+- unit id `DEPL-dShippedRelease-24` · README:84 | 24 | `DEPL-dShippedRelease-24` | `cl-dClosedLoop-0434@df3486aa` | `install.guards`: the core guards installed into the project's settings |
+- unit id `DEPL-dShippedRelease-25` · README:85 | 25 | `DEPL-dShippedRelease-25` | `cl-dClosedLoop-0435@df636953` | the receipt's schema 5 gaining `superseded` |
+- unit id `DEPL-dShippedRelease-26` · README:86 | 26 | `DEPL-dShippedRelease-26` | `cl-dClosedLoop-0436@57841d5d` | the platform matrix verified per release: platform runner adapters for `platforms.supported` under `platforms.verify` |
+- unit id `DEPL-dShippedRelease-27` · README:87 | 27 | `DEPL-dShippedRelease-27` | `cl-dClosedLoop-0437@b595f1f2` | `carries` on the landing record |
+- unit id `DEPL-dShippedRelease-28` · README:88 | 28 | `DEPL-dShippedRelease-28` | `cl-dClosedLoop-0438@088c545a` | `adopt.declarations`: at install and update |
+- unit id `DEPL-dShippedRelease-29` · README:89 | 29 | `DEPL-dShippedRelease-29` | `cl-dClosedLoop-0439@1aecad6a` | the update's report extended to every kind: each gov row's state in the repository |
+- unit id `DEPL-dShippedRelease-30` · README:90 | 30 | `DEPL-dShippedRelease-30` | `cl-dClosedLoop-0440@13cc3301` | a patch build raised by a landing |
+- unit id `DEPL-dShippedRelease-31` · README:91 | 31 | `DEPL-dShippedRelease-31` | `cl-dClosedLoop-0441@1aab6ce8` | the word fleet left to node units: the register of adopters built as the adopter register |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 

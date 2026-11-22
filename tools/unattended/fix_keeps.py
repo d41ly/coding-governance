@@ -499,8 +499,8 @@ def write_fixture_repo(root):
     for where in (("-C", str(repo)), ("--git-dir", str(origin))):
         run_fixture_git(root, *where, "config", "user.email", "fx@example.invalid")
         run_fixture_git(root, *where, "config", "user.name", "fx")
-    run_fixture_git(repo, "remote", "add", "origin", str(origin))
-    run_fixture_git(repo, "push", "-q", "origin", "main")
+    run_fixture_git(repo, "remote", "add", "fx", str(origin))
+    run_fixture_git(repo, "push", "-q", "fx", "main")
     base = run_fixture_git(repo, "rev-parse", "HEAD")
     run_fixture_git(repo, "checkout", "-q", "-b", "unit")
     run_fixture_git(repo, "commit", "-q", "--allow-empty", "-m", "unit work")
