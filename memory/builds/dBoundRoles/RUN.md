@@ -149,3 +149,11 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T11:23:41Z draw · re-dispatch · TOOL-dBoundRoles-49 · 24/122 · 20261122T112341Z-566977
 
 2026-11-22T11:23:41Z dispatch · item 79dc80ed TOOL-dBoundRoles-49 · reason tools/govkit/selftest.py memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-49-1-acceptance-ledger.md memory/map/generated/symbols.json
+
+2026-11-22T11:55:55Z brief · item TOOL-dBoundRoles-16 · reason 411a1f3fc145 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-16-build-brief.md
+
+2026-11-22T11:58:50Z dispatch · item df41811d TOOL-dBoundRoles-54 · reason tools/govkit/selftest.py memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-54-1-acceptance-ledger.md memory/map/generated/symbols.json
+
+2026-11-22T11:58:52Z brief · item TOOL-dBoundRoles-54 · reason 9ae349c5e53d memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-54-build-brief.md
+
+2026-11-22T12:03:42Z dispatch · item df41811d TOOL-dBoundRoles-16 · reason tools/roles/workflows.toml tools/roles/instructions.toml tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/handoff.py tools/roles/render_agents.py tools/roles/role-schema.toml tools/roles/agents tools/roles/README.md tools/roles/adopt-roles.test.sh memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-16-1-acceptance-ledger.md memory/map/generated/symbols.json
