@@ -16,10 +16,20 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every roster spec was re-grounded on HEAD before this dispatch, so its citations hold at HEAD or name the earlier
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
-- This pass runs in parallel with TOOL-dBoundRoles-54, which writes only `tools/govkit/selftest.py`; the call carries
-  `passBase`, so name any extra path in your return. Rev-6 keeps `gov-orienter` at `high` (§8 F5, the owner's
-  ruling TOOL-dEasedEffort-1), with its deviation recorded in `build/`. Rendering `.claude/agents/` changes agent
-  types the running session cannot spawn until a new session starts, which is expected and not yours to fix.
+- This is the second dispatch. The first builder (run `wf_2669408c-2f0`) stopped before its first write because the
+  write set lacked the four `add` change records §8 F7 (a) asks for; it found no spec divergence. The write set now
+  names them, `build/2026-11-22-build-TOOL-dBoundRoles-16-change-1.md` to `-change-4.md`, one per new unit row
+  (`unit.orient.producer`, `unit.orient.verifier-cold`, `unit.checklist.for-paths`, `unit.checklist.for-diff`), written
+  by `tools/memory-tree/build_records.py new change`. The call carries `passBase`; name any other extra path in your
+  return. Rev-6 keeps `gov-orienter` at `high` (§8 F5, the owner's ruling TOOL-dEasedEffort-1), its deviation in `build/`.
+- The main loop decided the first builder's four open choices, as M3 delegated resolutions, `widens: none` and
+  `relaxes: none` each; record any of them that the spec does not state as a deviation:
+  1. The `experiment` kind row omits `fan` and `cap`, and `derive_stage_rows` takes them from the table's `fan`.
+  2. R9 prints one line per role and missing kind, naming every stage the role runs in, so AC4's one line holds.
+  3. AC3's exit-0 fixture reuses an existing workflow name (the scratch `reuse` entry as `kind = "experiment"`).
+  4. The four unit rows carry no `usage`, so no rendered reference page outside the write set moves.
+- Rendering `.claude/agents/` changes agent types the running session cannot spawn until a new session starts, which
+  is expected and not yours to fix.
 
 ## What the main loop needs from your commit
 
