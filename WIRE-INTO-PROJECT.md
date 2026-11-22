@@ -1105,6 +1105,18 @@ checkout itself; an existing `install.json` without `--re-adopt`; and a target i
 from HEAD. That last one is the INDEX only — an unstaged edit in your own worktree does not block,
 because `adopt` reads identities out of the index and writes nothing you could lose.
 
+**The receipt's `attestations` key says which kits gov's own self-tests proved.** Every receipt
+`apply`, `update --write` and `adopt --write` writes carries a top-level `attestations` list, one
+entry per kit, each with a `digest` over the sorted `(source, gov_oid)` pairs of the kit's shipped
+files and of every kit it requires, the `gov_commit` it was taken at, those `sources`, and the `legs`
+that proved it.
+The evidence for `attestations` is gov's own: a kit enters it only when each of its `kit` self-test
+legs passed first time on a clean gov tree, under the leg's current manifest row, and at a commit
+holding the same blob for every one of those sources. `apply` and `update` print
+`attestations: <n> kit(s) attested at <sha8>`. An `update --to` other than gov's HEAD writes
+`"attestations": []`. **A missing, empty or unmatched `attestations` key changes nothing in your bar**:
+every leg runs as before, `check-receipt.py` reads `files` alone, and `install.sums` is unchanged.
+
 ### One thing `apply` will refuse to hand you
 
 A kit can declare a gate leg whose argv runs an engine gov does not actually ship — and until this

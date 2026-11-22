@@ -4115,13 +4115,152 @@ ADOPTER_BAR_PATHS = ('gr["file"]', 'receipt_path', '"install.sums"')
 write_atomic = upgrade_steps.write_atomic
 
 
-def write_install_receipt(target: pathlib.Path, receipt_path: pathlib.Path, doc: dict) -> None:
+def derive_kit_attestations(root: pathlib.Path, to_commit: str) -> list[dict]:
+    """TOOL-dQuietDisk-14 S1 to S4. Which kits gov's own green held runs proved, by content.
+
+    One `{"kit", "digest", "gov_commit", "sources", "legs"}` per entry whose every `subject = "kit"`
+    `[[gate_leg]]` holds a held-tier record, `<git common dir>/gate-selftest-last/<name key>`, the
+    file `run-gates.sh` writes after a first-attempt green on a clean, unmoved tree. The record's
+    `row` must equal the runner's row hash of the leg's current manifest row, and every attested
+    `(source, gov_oid)` pair, the entry's `EPOCH_ROLES` survivors and those of every entry it
+    requires transitively, must name the same blob at the record's `sha` as at `to_commit`. The
+    digest is the SHA-256 of the sorted `<source>TAB<gov_oid>LF` lines; `sources` is that list.
+
+    The record's `sha` is read for blob identity only, never as a verdict. The survivors come from
+    the working tree's descriptors, as `cmd_shipped` resolves them, so a `to_commit` other than
+    HEAD answers `[]`. A failure at any step costs that entry its attestation, never the caller's
+    write, and every blob is asked through one `git cat-file --batch-check`.
+    """
+    root = pathlib.Path(root)
+    try:
+        if git(root, "rev-parse", "HEAD").strip() != to_commit:
+            return []
+        descs = read_shipped_descriptors(root)
+        manifest = json.loads(resolve_tool_path(root, "gate-legs.json").read_text(encoding="utf-8"))
+        common = pathlib.Path(git(root, "rev-parse", "--git-common-dir").strip())
+    except (Refusal, OSError, ValueError):
+        return []
+    rows = {str(m.get("name")): m for m in manifest if isinstance(m, dict)} \
+        if isinstance(manifest, list) else {}
+    held = (common if common.is_absolute() else root / common) / "gate-selftest-last"
+    # THE RUNNER'S ROW HASH, its declarative keys read from their one home beside the runner, loaded
+    # by path as `regen.py` is. Where that file will not load, the whole row is hashed, the runner's
+    # own fallback, so a record earned under the tuple reads stale rather than attesting.
+    keys: tuple = ()
+    rg_home = (descs.get("run-gates", ({}, ""))[0].get("home") or "").rstrip("/")
+    if rg_home and (root / rg_home / "held_halves.py").is_file():
+        saved = list(sys.path)
+        try:
+            spec = importlib.util.spec_from_file_location(
+                "gov_held_halves", str(root / rg_home / "held_halves.py"))
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            keys = tuple(mod.DECLARATIVE_LEG_KEYS)
+        except Exception:
+            keys = ()
+        finally:
+            sys.path[:] = saved
+    legs = {eid: [g for g in (d.get("gate_leg") or []) if isinstance(g, dict) and g.get("subject") == "kit"]
+            for eid, (d, _p) in descs.items()}
+    legs = {eid: gs for eid, gs in legs.items() if gs}
+    # The `requires` closure at `to_commit`, through the one vintage reader; `None` is unknown.
+    requires: dict[str, list[str] | None] = {}
+    frontier = sorted(legs)
+    while frontier:
+        try:
+            at, unknown = read_requires_at(root, to_commit, frontier)
+        except Refusal:
+            at, unknown = {}, {e: "" for e in frontier}
+        for e in frontier:
+            requires[e] = None if e in unknown or e not in at else [str(x) for x in at[e][0]["requires"]]
+        frontier = sorted({x for e in frontier for x in (requires[e] or []) if x not in requires})
+    survivors: dict[str, set[str] | None] = {}
+    candidates: dict[str, tuple[set[str], list[dict]]] = {}
+    for eid in sorted(legs):
+        members, todo = {eid}, [eid]
+        while todo:
+            nxt = requires.get(todo.pop())
+            if nxt is None:
+                members = set()
+                break
+            todo += [x for x in nxt if x not in members]
+            members |= set(nxt)
+        srcs: set[str] = set()
+        for m in sorted(members):
+            if m not in survivors:
+                try:
+                    survivors[m] = {row["src"] for row in resolve_entry(
+                        root, descs[m][0], canonical_ctx(m))["survivors"]
+                        if row.get("src") and row["role"] in EPOCH_ROLES} if m in descs else None
+                except Refusal:
+                    survivors[m] = None
+            if survivors[m] is None:
+                srcs = set()
+                break
+            srcs |= survivors[m]
+        evidence: list[dict] = []
+        for g in legs[eid] if srcs else []:
+            name = str(g.get("name"))
+            try:
+                lines = (held / hashlib.sha1(name.encode()).hexdigest()[:16]).read_text(
+                    encoding="utf-8").splitlines()
+            except OSError:
+                break
+            rec = dict(ln.rstrip("\r").split("\t", 1) for ln in lines if "\t" in ln)
+            row = rows.get(name)
+            if row is None or not rec.get("sha") or rec.get("row") != hashlib.sha1(json.dumps(
+                    {k: v for k, v in row.items() if k not in keys}, sort_keys=True).encode()).hexdigest():
+                break
+            evidence.append({"name": name, "sha": rec["sha"], "row": rec["row"]})
+        else:
+            if srcs and evidence:
+                candidates[eid] = (srcs, evidence)
+    asks = sorted({f"{c}:{s}" for srcs, ev in candidates.values()
+                   for c in {to_commit, *(e["sha"] for e in ev)} for s in srcs if "\n" not in s})
+    if not asks:
+        return []
+    out = subprocess.run(["git", "-C", str(root), "cat-file", "--batch-check"], capture_output=True,
+                         input="".join(f"{a}\n" for a in asks).encode("utf-8"), check=False)
+    answers = out.stdout.decode("utf-8", "replace").splitlines() if out.returncode == 0 else []
+    oids = {a: ans.split()[0] for a, ans in zip(asks, answers)
+            if len(ans.split()) == 3 and ans.split()[1] == "blob"}
+    attestations: list[dict] = []
+    for eid, (srcs, ev) in sorted(candidates.items()):
+        pairs = sorted((s, oids.get(f"{to_commit}:{s}")) for s in srcs)
+        if any(o is None for _s, o in pairs) or any(
+                oids.get(f"{e['sha']}:{s}") != o for e in ev for s, o in pairs):
+            continue
+        attestations.append({
+            "kit": eid,
+            "digest": hashlib.sha256("".join(f"{s}\t{o}\n" for s, o in pairs).encode("utf-8")).hexdigest(),
+            "gov_commit": to_commit, "sources": [[s, o] for s, o in pairs], "legs": ev})
+    return attestations
+
+
+def write_install_receipt(target: pathlib.Path, receipt_path: pathlib.Path, doc: dict,
+                          attest: tuple[pathlib.Path, str] | None = None) -> list[dict] | None:
     """Write `.governance/install.sums` from every `doc["files"]` row carrying `sha256`, then the
     receipt `doc` at `receipt_path`, each through `write_atomic` and in that order
-    (TOOL-dRedressedBar-19 S40). The one writer of the pair (TOOL-dSafePassage-62 S2)."""
+    (TOOL-dRedressedBar-19 S40). The one writer of the pair (TOOL-dSafePassage-62 S2).
+
+    TOOL-dQuietDisk-14 S5. With `attest=(root, to_commit)` the top-level `attestations` key is set
+    from `derive_kit_attestations` before the write, replacing any the document held, and the list
+    is returned for the caller's count line. A key new to the document goes before `steps`, which
+    stays the receipt's last key. Without it the document is written as given and None returned;
+    `install.sums` is derived from `files` alone either way."""
+    att = None
+    if attest is not None:
+        att = derive_kit_attestations(*attest)
+        if "attestations" not in doc and "steps" in doc:
+            steps = doc.pop("steps")
+            doc["attestations"] = att
+            doc["steps"] = steps
+        else:
+            doc["attestations"] = att
     write_atomic(target / ".governance" / "install.sums",
                  "".join(f"{f['sha256']}  {f['path']}\n" for f in doc["files"] if "sha256" in f))
     write_atomic(receipt_path, json.dumps(doc, indent=2) + "\n")
+    return att
 
 
 def derive_receipt_schema(prior) -> dict:
@@ -8470,7 +8609,8 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
                         "emitted": emitted, "legs_withheld": _legs_withheld}})
     # TOOL-dRedressedBar-19 S40: the sidecar first, the receipt last, each through `write_atomic`.
-    write_install_receipt(target, receipt_path, _rcpt_doc)
+    _att = write_install_receipt(target, receipt_path, _rcpt_doc, attest=(root, commit))
+    print(f"govkit apply — attestations: {len(_att)} kit(s) attested at {commit[:8]}")
     if _carried_kits:
         print(f"govkit apply — receipt KEEPS {len(_carried_kits)} kit(s) this selection did not "
               f"name, with their {len(_carried_rows)} row(s) verbatim: {', '.join(_carried_kits)}")
@@ -12077,7 +12217,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # S1), so a step killed here left a receipt naming the old bytes for every file the loop moved,
         # and a rollback read each one as an adopter's edit and kept it. Above schema 4 the walk's
         # first record writes the same receipt; this closes the window before it.
-        write_install_receipt(target, receipt_path, receipt)
+        write_install_receipt(target, receipt_path, receipt, attest=(root, to_commit))
         _sw_walk = upgrade_steps.run_step_walk(root, target, receipt_path, receipt, _sw_pending)
         print(f"govkit update — steps: {_sw_walk['pending']} pending · {_sw_walk['applied']} applied "
               f"· {_sw_walk['skipped']} skipped · stopped at {_sw_walk['stopped'] or 'none'}")
@@ -13100,7 +13240,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # skips that guard entirely and overwrites the project-owned file the first run refused to touch.
     # A partial update leaves the receipt describing what it did, at the commit it came from.
     if r.problems:
-        write_install_receipt(target, receipt_path, receipt)
+        _att = write_install_receipt(target, receipt_path, receipt, attest=(root, to_commit))
+        print(f"govkit update — attestations: {len(_att)} kit(s) attested at {to_commit[:8]}")
         print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
               f"deleted {len(deleted)}, withheld {withheld}, "
               f"{conflicts} conflict(s). The receipt is NOT re-stamped: this run had findings, and a "
@@ -13143,12 +13284,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"and this run graded none of them, so advancing gov_commit would move the base they "
               f"must be attributed from. Clear them with "
               f"`govkit adopt --re-adopt --pin <path>=<rev> --write`")
-        write_install_receipt(target, receipt_path, receipt)
+        _att = write_install_receipt(target, receipt_path, receipt, attest=(root, to_commit))
+        print(f"govkit update — attestations: {len(_att)} kit(s) attested at {to_commit[:8]}")
         _write_rb_finish(f"not moved, {ungraded} row(s) carry evidence unattributed")
         return r.emit()
 
     receipt["gov_commit"] = to_commit
-    write_install_receipt(target, receipt_path, receipt)
+    _att = write_install_receipt(target, receipt_path, receipt, attest=(root, to_commit))
+    print(f"govkit update — attestations: {len(_att)} kit(s) attested at {to_commit[:8]}")
     # DEPL-cMendedVintage-4 S3. dGaugedVintage-8 S2's "what it overrode" clause went with the
     # override: reaching here now proves `ungraded` is 0, so the clause could only ever render empty.
     print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
@@ -13782,7 +13925,7 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     # TOOL-dSafePassage-3 S5: `schema` in place and, where it is given, `steps` as the last key —
     # carried verbatim from the receipt `--re-adopt` replaces, for D2's reason, or a first install's.
     envelope.update(derive_receipt_schema(_prior))
-    write_install_receipt(target, receipt_path, envelope)
+    write_install_receipt(target, receipt_path, envelope, attest=(root, commit))
     print(f"govkit adopt — receipt written: {len(rows)} row(s), {len(selection)} kit(s), "
           f"schema {envelope['schema']}, gov_commit {commit[:8]}")
     if staged:

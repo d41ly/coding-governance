@@ -12688,6 +12688,11 @@
       "file": "tools/playbook/overlay_rows.py"
     },
     {
+      "id": "derive_kit_attestations",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_kit_command",
       "kind": "function",
       "file": "tools/loop/policy_edit.py"
