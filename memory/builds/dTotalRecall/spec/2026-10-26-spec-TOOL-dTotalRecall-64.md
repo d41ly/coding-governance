@@ -104,7 +104,7 @@ Together they are one rev bump with one §9 line of the form
 
 ### Unit 38's spec
 
-No write. Unit 38 builds at order 8 and is CLOSED when this pass runs, and BUILD-METHOD M4 keeps a
+No write. Unit 38 builds at order 8 and is CLOSED when this pass runs, and the build method's `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it` keeps a
 CLOSED spec frozen, its correction a new unit on top (landed at `5699553e8`, after base `462d20f3`).
 Its hands-off line to unit 46, "whose body that unit rebuilds on `tree_lib.build_id_token_re`",
 stands as written; `TOOL-dTotalRecall-70` S14 records it as a deviation of unit 38 (§8 F2).
@@ -172,7 +172,7 @@ No new arm: this unit writes spec text, and unit 54's arm holds the body at the 
   reds the parts join; veto 1 discards it. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the
   precedent `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
 - **F2 — Does this pass still amend unit 38's hands-off line?** Unit 38 builds at order 8 and is
-  CLOSED when this order-9 pass runs, and BUILD-METHOD M4 (landed at `5699553e8`, after base
+  CLOSED when this order-9 pass runs, and the build method's `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it` (landed at `5699553e8`, after base
   `462d20f3`) keeps a CLOSED spec frozen, its correction a new unit on top. Options: (a) amend it as
   rev-2 designed; (b) leave it frozen, `TOOL-dTotalRecall-70` S14 already writing the deviation of
   unit 38 for that line; (c) leave it frozen and have this pass write that deviation. (a) breaks the

@@ -37,6 +37,6 @@ Checks that ran (each stands in for part of the `record-kinds` leg or for `--sel
 The hook refused `record_kinds.py --check` on the real tree, so these are owed to the close:
 - AC1 and AC5 on the tree: `--check` exiting 0, its count line naming `stream-plan fence` and printing the unarmed line. It stays red until the stray `dHomedResolver/` pocket is moved (unit 18 §8 F2).
 - The new arm's RED-first observation: `tools/memory-tree/record_kinds.py --selftest`, covering AC2, AC3, AC4 and AC7, staged red by making `check_stream_plan` accept a unit with no order, then green restored.
-- The section 7 legs: memory hygiene, memory-hygiene self-test, kit/dogfood doc parity, recall floor, recall floor arms, record-kinds, policy fixtures, playbook render selftest, govkit acceptance matrix, core kinds, help reference pages, docs. Also the `check-memory-hygiene.test.sh` arm that writes a record of every typed kind.
+- The legs the gates section names: memory hygiene, memory-hygiene self-test, kit/dogfood doc parity, recall floor, recall floor arms, record-kinds, policy fixtures, playbook render selftest, govkit acceptance matrix, core kinds, help reference pages, docs. Also the `check-memory-hygiene.test.sh` arm that writes a record of every typed kind.
 
 For the main loop: as after unit 16, the dTotalRecall packet may need re-rendering now that the as-built view's deviation count moved (2344 to 2345).
