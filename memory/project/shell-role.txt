@@ -41,7 +41,7 @@ tools/check-template-size.test.sh	255	99c65d5e352d061e856a81d01d00f3454294071c	w
 tools/check-testsuite-counts.sh	85	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/check-testsuite-counts.test.sh	306	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/check-wiring.sh	1306	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/check-wiring.test.sh	1660	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/check-wiring.test.sh	1660	fadd401b0dc06cd54b91aa0b77f0d63fa11e6b6c	widened:2026-11-22-build-TOOL-dQuietDisk-10-widen-9
 tools/codebase-map/adopt-codebase-map.sh	277	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/codebase-map/adopt-codebase-map.test.sh	353	2e4634f8cf060cbf11c9d8046da58737629773e5	widened:2026-11-20-build-TOOL-dWitnessedBar-57-widen-2
 tools/drift-audit/adopt-drift-audit.sh	262	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
@@ -57,7 +57,7 @@ tools/lib/extract-arms.test.sh	56	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seede
 tools/lib/gov-feed.sh	296	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
 tools/lib/gov-ref.sh	48	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
 tools/lib/health-log.sh	35	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/lib/history-store.sh	61d9c6b61ae11133aabe0688eba33821d925bdd480	widened:2026-11-22-build-TOOL-dQuietDisk-28-widen-8
+tools/lib/history-store.sh	61	d9c6b61ae11133aabe0688eba33821d925bdd480	widened:2026-11-22-build-TOOL-dQuietDisk-28-widen-8
 tools/lib/kit-rel.sh	18	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/lib-selftest.sh	243	95c5ddd3b324b4693f904e8f223e64121048a6ea	widened:2026-11-22-build-TOOL-dQuietDisk-7-widen-7
 tools/lib/lib-selftest.test.sh	221	95c5ddd3b324b4693f904e8f223e64121048a6ea	widened:2026-11-22-build-TOOL-dQuietDisk-7-widen-7
@@ -132,7 +132,7 @@ tools/unattended/check-unattended.sh	3708	85a1c45076fd9093f1b9a08a2d720c8146aa1a
 tools/unattended/check-unattended.test.sh	4442	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/cross-component.test.sh	149	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/gate-guard.test.sh	635	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/unattended/lib-unattended.sh	1392d9c6b61ae11133aabe0688eba33821d925bdd480	widened:2026-11-22-build-TOOL-dQuietDisk-28-widen-8
+tools/unattended/lib-unattended.sh	1392	d9c6b61ae11133aabe0688eba33821d925bdd480	widened:2026-11-22-build-TOOL-dQuietDisk-28-widen-8
 tools/unattended/pass-tree.sh	244	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/pass-tree.test.sh	321	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/unattended/resume-tick.sh	213	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
