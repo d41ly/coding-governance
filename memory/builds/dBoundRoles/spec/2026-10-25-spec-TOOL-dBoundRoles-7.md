@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-7 — shell writes held to the work order's allowance
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 14 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 14 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0172@d88edbe8 whole
 
@@ -27,7 +27,7 @@
 
 A role agent's Bash or PowerShell write reaches no write gate today: the hook's header says so ("a
 Bash or PowerShell write (`sed -i`, an interpreter, a redirect) is never seen",
-`tools/hooks/scratch-guard.js:85-87`), and 66 typed-role shell writes passed the role arm after it
+`tools/hooks/scratch-guard.js@0251d34d:86-88`), and 66 typed-role shell writes passed the role arm after it
 landed (gap-roles-03, gap register `:155`). This unit holds every shell write a role agent makes to the
 same verdict an `Edit` or `Write` of that target would get, and, where the agent's work order hands an
 `allowance`, to that allowance as well. The scanner that finds shell write targets is widened to the
@@ -36,7 +36,8 @@ shapes that were measured escaping it: `sed -i`, an interpreter's write call and
 
 ## 2. Scope (IN)
 
-- **S1** — `scanWriteTargets` (`scratch-guard.js:339-384`), the one shell write-target scanner, gains
+- **S1** — `scanWriteTargets` (`tools/hooks/scratch-guard.js@0251d34d:368-412`), the one shell
+  write-target scanner, gains
   three shapes, each target carrying its `why`: the file operands of `sed -i` and `sed --in-place`
   (and of `perl -i`); the first string-literal argument of an interpreter's write call inside a
   `python`, `python3` or `py` `-c` body, a `node -e` body, or the heredoc body of `python -`,
@@ -44,17 +45,24 @@ shapes that were measured escaping it: `sed -i`, an interpreter's write call and
   `Path(<lit>).write_bytes(`, `writeFileSync(<lit>` and `appendFileSync(<lit>`, plus PowerShell's
   `[IO.File]::WriteAllText(<lit>`, `WriteAllBytes(<lit>` and `AppendAllText(<lit>`; and each path a
   `git apply` patch names on a `+++ b/<path>` or `rename to <path>` line, read from the patch file
-  operand resolved against the payload `cwd` or from the command's own heredoc body. Observed by AC1,
-  AC2 and AC3.
-- **S2** — `checkCommand` (`:500-528`) reads the same scanner, so its temp, home and drive-root rules
-  see the three shapes too, with no second scanner. Observed by AC8.
-- **S3** — `checkShellWrites(cmd, data, env)`, a third Bash and PowerShell check in `main`
-  (`:1529-1611`), run after `checkRoleGate` and only for a payload carrying an `agent_type`. Each target
-  S1 finds is resolved against the payload `cwd`; a target in no repository, or in one that is not the
-  session's, is not this check's. Every other target is judged by `checkRouted` (`:1113`) on a
-  synthetic `Write` payload carrying the target as `tool_input.file_path` and the payload's `cwd`,
-  `session_id` and `agent_type`, so the route arm, the role arm and TOOL-dBoundRoles-9's step 6b with
-  its `classes` map class the shell target exactly as they class an `Edit`. Observed by AC4 and AC7.
+  operand resolved against the payload `cwd` or from the command's own heredoc body. The scanner joins
+  `module.exports`, which does not hold it at HEAD (`tools/hooks/scratch-guard.js@0251d34d:2118`), so
+  AC1 to AC3 call it as the suite does. Observed by AC1, AC2 and AC3.
+- **S2** — `checkCommand` (`tools/hooks/scratch-guard.js#checkCommand`) reads the same scanner, so its
+  five rules, the empty temp variable, the temp root, home, the drive root and the POSIX root (DERIVED
+  from `tools/hooks/scratch-guard.js@0251d34d:529-557`), see the three shapes too, with no second
+  scanner. Observed by AC8.
+- **S3** — `checkShellWrites(cmd, data, env)`, a fourth Bash and PowerShell check in `main`
+  (`tools/hooks/scratch-guard.js#main`), after `checkCommand`, `checkOriented` and `checkRoleGate`
+  (DERIVED from `tools/hooks/scratch-guard.js@0251d34d:2067-2114`), and only for a payload carrying an
+  `agent_type`. Each target S1 finds is resolved against the payload `cwd`; a target in no repository,
+  or in one that is not the session's, is not this check's. Every other target is judged by
+  `checkRouted` (`tools/hooks/scratch-guard.js#checkRouted`) on a synthetic `Write` payload carrying the
+  target as `tool_input.file_path` and the payload's `cwd`, `session_id` and `agent_type`, so the route
+  arm, the role arm and TOOL-dBoundRoles-9's step 6b with its `classes` map class the shell target
+  exactly as they class an `Edit`. That order holds, at HEAD, step 3a's policy-file refusal and step
+  10's red-fix lane, whose witness admits a shell write as it admits an `Edit`. Observed by AC4 and
+  AC7.
 - **S4** — The allowance. `readWorkOrderAllowance(data)` locates the agent's work order as it was
   spawned: the agent transcript `<session dir>/subagents/agent-<agent_id>.jsonl`, else
   `<session dir>/subagents/workflows/<run id>/agent-<agent_id>.jsonl`, the session dir being the
@@ -62,25 +70,30 @@ shapes that were measured escaping it: `sed -i`, an interpreter's write call and
   shape `[A-Za-z0-9_-]{1,64}`; its first `user` record is the prompt, and the `allowance` block of that
   prompt's `## Task` section is the allowance, a list of repo-relative prefixes in the `ROUTED_PATHS`
   grammar (shared interface I12). When it is found, a target the class verdict admits is admitted only
-  when it lies under one entry; an empty list admits no repository write. When no block, no transcript
+  when it lies under one entry; an empty list admits no repository write, and a block reading `none`,
+  `TOOL-dBoundRoles-3`'s spelling of the `none` allowance (its §4 "The allowance", checked against that
+  spec), is the empty list. When no block, no transcript
   or no readable first record is found, the class verdict of S3 stands alone and one witness line
   names why. Observed by AC5 and AC6.
 - **S5** — `matchRoutedEntry(rel, entries)`, the one matcher of a repo-relative path against a list in
   the `ROUTED_PATHS` grammar (a trailing `/` meaning the folder and everything under it, any other entry
-  the exact path), extracted from `checkRouted`'s inline `entry` search (`:1163-1166`) and called by
+  the exact path), extracted from `checkRouted`'s inline `entry` search
+  (`tools/hooks/scratch-guard.js@0251d34d:1501-1504`) and called by
   both that search and S4, so the two never disagree on what an entry covers. Observed by AC5.
 - **S6** — Fail-closed for a role agent: a throw in `checkShellWrites` refuses the call, as the
-  role-gate arm's throw does (the catch at `:1604`); the main loop is never refused by this check.
+  role-gate arm's throw does (the catch at `tools/hooks/scratch-guard.js@0251d34d:2104-2108`); the main
+  loop is never refused by this check.
   Observed by AC7.
 - **S7** — Every refusal names the command's target, the shape that wrote it, the verdict `checkRouted`
   gave or the allowance it fell outside with the work order it came from, and the remedy's actor: the
   driver, which re-scopes the work order or routes the write to a role whose class covers it.
   Observed by AC4 and AC5.
-- **S8** — The hook's header paragraph "WHAT ESCAPES THE WRITE GATE" (`:85-90`) and
-  `tools/hooks/README.md`'s section on what the guard cannot see (`:556`) state what is now held and
-  what still escapes (§4 "What it does not check"), and the user page `help/roles.md` amends its
-  sentence that the hooks "do not see writes made through Bash or PowerShell" (`:116-118`) to say a
-  role agent's are held. Observed by AC9.
+- **S8** — The hook's header paragraph "WHAT ESCAPES THE WRITE GATE"
+  (`tools/hooks/scratch-guard.js@0251d34d:86-90`) and `tools/hooks/README.md`'s section on what the
+  guard cannot see (`tools/hooks/README.md@d545b855:711`) state what is now held and what still escapes
+  (§4 "What it does not check"), and the user page `help/roles.md` amends its sentence that the hooks
+  "do not see writes made through Bash or PowerShell" (`help/roles.md@50d4a1c0:217-219`) to say a role
+  agent's are held. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -93,7 +106,8 @@ shapes that were measured escaping it: `sed -i`, an interpreter's write call and
   allowance join is not this unit's.
 - A write a script makes from inside a file it runs (`python tools/x.py`), a write through a variable
   the command computes, `rm`, `git checkout -- <path>`, `git stash` and every other shape S1 does not
-  name: the hook "stops forgetting, not evasion" (`scratch-guard.js:85`), and §4 lists them.
+  name: the hook "stops forgetting, not evasion" (`tools/hooks/scratch-guard.js@0251d34d:86`), and §4
+  lists them.
 - The write classes and their map: TOOL-dBoundRoles-9's.
 
 ### Edges
@@ -122,7 +136,7 @@ checkShellWrites(cmd, data, env)
 
 The synthetic payload carries no `content`, so `checkStatusOnlyEdit` cannot prove a status-only flip and
 a shell edit of a spec by a role outside the spec class is refused; the one admitted flip stays the
-`Edit` route (`scratch-guard.js:1075-1083`).
+`Edit` route (`tools/hooks/scratch-guard.js@0251d34d:1267-1276`).
 
 ### The allowance as the hook reads it
 
@@ -145,6 +159,9 @@ prefix per `- ` bullet, a backtick pair around an entry stripped if present:
 - tools/hooks/
 - tools/hooks/README.md
 ```
+
+A `none` allowance renders the block's body as the single line `none` (TOOL-dBoundRoles-3 §4 "The
+allowance"), which S4 reads as the empty list.
 
 Only an allowance narrows: a target the class verdict refuses is refused whatever the block says, so a
 harness prompt that carried a wider block gains nothing.
@@ -247,7 +264,7 @@ fixture repository made under `%TEMP%` with `git init`, a `.memory-tree.conf`, a
   Red when: `checkCommand` reads a scanner of its own that lacks the new shapes.
 - **AC9** — When `grep -n "sed -i" tools/hooks/scratch-guard.js` runs over the header block, the
   "WHAT ESCAPES THE WRITE GATE" paragraph names the shapes now held and those that still escape, and
-  `tools/hooks/README.md`'s section at `:556` and `help/roles.md`'s closing paragraph of "What the
+  `tools/hooks/README.md`'s section at `tools/hooks/README.md@d545b855:711` and `help/roles.md`'s closing paragraph of "What the
   hooks refuse" name the same.
   Red when: the header or the page still says a role agent's Bash or PowerShell write is never seen.
 
@@ -272,7 +289,9 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
   `- ` bullet, unbackticked. Liveness: that spec could have spelled another heading or a table, and its
   S2 names five blocks with their headings. RESOLVED (agent, 2026-10-25, delegated): read it as
   observed, rung 2; a later revision of that spec that moves the spelling is a rev bump of this one
-  before the pass. widens: none · relaxes: none
+  before the pass. Re-read at that spec's rev-7 on 2026-11-22: the heading and the bullets hold, and its
+  §4 table spells a `none` allowance as the body `none`, which S4 now names.
+  widens: none · relaxes: none
 - **F3 — A role agent whose work order hands no allowance.** Options: (a) hold it to its class through
   `checkRouted`, with a witness; (b) refuse every repository shell write it makes; (c) admit it. (b)
   refuses every harness stage, whose prompts the harness composes and which carry no allowance block
@@ -285,7 +304,7 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
   listed in §4 "What it does not check"; (b) refused for a role agent. (b) refuses every role's own
   scratch writes, which the build method sends to a scratch path a script composes. RESOLVED (agent,
   2026-10-25, delegated): (a), rung 1, the hook's stated model, "it stops forgetting, not evasion"
-  (`scratch-guard.js:85`). widens: none · relaxes: none
+  (`tools/hooks/scratch-guard.js@0251d34d:86`). widens: none · relaxes: none
 - **F5 — The Carries pin of an amended clause: v2's baseline hash or the as-built view's?**
   `memory/builds/dBoundRoles/build/2026-10-25-build-TOOL-dBoundRoles-7-deviation-71.md` amends
   `cl-dClosedLoop-0172`, so the as-built view hashes it `d88edbe8` where v2 hashes it `b73b4974`.
@@ -307,18 +326,33 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
   §4's `checkHandoffSpawn` citation moves from the chain baseline `59ff8f2ac` (2089-2148) to HEAD's
   `agent-cap.js` (691-750), the function unchanged in behaviour; nothing else moved.
 - rev-4 · 2026-11-22 · §4 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; nothing else moved.
+- rev-5 · 2026-11-22 · §1 · S1 · S2 · S3 · S4 · S5 · S6 · S8 · §3 · §4 · AC9 · §8 F2 F4 · §10 ·
+  re-grounded at HEAD `a3efb1d5` by `2026-11-22-prompt-TOOL-dBoundRoles-48-reground-i-brief`. Every
+  `scratch-guard.js` citation moves to blob `0251d34d`: the header paragraph from 85-90 to 86-90,
+  `scanWriteTargets` from 339-384 to 368-412, `checkRouted` and `main` to their symbols, the entry
+  search from 1163-1166 to 1501-1504, the status-flip route from 1075-1083 to 1267-1276 and the
+  role-gate catch from 1604 to 2104-2108. S1 exports `scanWriteTargets`, which `module.exports` does not
+  hold, so AC1 to AC3 can call it; S2 names `checkCommand`'s five rules; S3's check is the fourth in
+  `main`, a count corrected, and inherits the write gate's step 3a and step 10, both landed after base.
+  The README section moves from 556 to 711 of blob `d545b855` and `help/roles.md`'s sentence from
+  116-118 to 217-219 of blob `50d4a1c0`. S4 and §4 read a `none` allowance as the empty list, F2
+  re-read against TOOL-dBoundRoles-3 at its rev-7; §10's transcript reader is the nested
+  `read_transcript` of `print_agent_lines` and format-guard's shape rule `RUN_ID_RE`.
 
 ## 10. Reuse audit
 
-The seams extended are `scanWriteTargets` (`tools/hooks/scratch-guard.js:339-384`), the one shell
-write-target scanner `checkCommand` already reads; `checkRouted` (`:1113-1198`), the write gate's one
-evaluation order, called on a synthetic payload rather than copied; its inline `ROUTED_PATHS` entry
-search (`:1163-1166`), extracted as `matchRoutedEntry`; and `main`'s Bash dispatch (`:1564-1611`), where
-the check sits beside `checkRoleGate`. the probe `reuse_lookup.py` over the phrase "hold a shell command write target to an allowance of path prefixes" ranked `resolve_prefix_token` (`tools/lib/`, an install
+The seams extended are `scanWriteTargets` (`tools/hooks/scratch-guard.js#scanWriteTargets`), the one
+shell write-target scanner `checkCommand` already reads; `checkRouted`
+(`tools/hooks/scratch-guard.js#checkRouted`), the write gate's one evaluation order, called on a
+synthetic payload rather than copied; its inline `ROUTED_PATHS` entry search
+(`tools/hooks/scratch-guard.js@0251d34d:1501-1504`), extracted as `matchRoutedEntry`; and `main`'s Bash
+dispatch (`tools/hooks/scratch-guard.js@0251d34d:2067-2114`), where the check sits beside
+`checkRoleGate`. the probe `reuse_lookup.py` over the phrase "hold a shell command write target to an allowance of path prefixes" ranked `resolve_prefix_token` (`tools/lib/`, an install
 prefix resolver) and generic `write` and `path` stems; none matches a target against an allowance, so
 no existing seam fits for S4's join, and S5 extracts the one inline matcher there is. The transcript
-locator follows format-guard's run-id shape rule (`tools/hooks/format-guard.js:53`) and the layout
-`handoff.py`'s `read_transcript` reads (`tools/roles/handoff.py:825-828`). Scout C's row agreed with
+locator follows format-guard's run-id shape rule (`tools/hooks/format-guard.js#RUN_ID_RE`) and the
+layout `handoff.py`'s `read_transcript` reads, a function nested in `print_agent_lines`
+(`tools/roles/handoff.py@c6d87bbb:1273-1276`). Scout C's row agreed with
 source; its `checkRouted` class reference `:1162-1179` is `:1163-1178` at base.
 
 Recall terms used: `python tools/memory-recall/query.py "how are shell writes held to a role's allowance" --terms "Bash PowerShell shell write allowance scanWriteTargets sed-i write_text git-apply role arm work order"`

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-45 — a typed `--input` value is authored text: written unfenced, refused when a line would stand as an executor line, so the anchor check grades it
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -27,8 +27,9 @@ finding **id 17 at HIGH**, report item **H1**. Ids 1 and 9 share the item at HIG
 `TOOL-dBoundRoles-46` and `TOOL-dBoundRoles-47`.
 
 `TOOL-dBoundRoles-38` S2 fences every block a `reads` value renders, "argument values included", and
-`render_handoff` renders `input:question` as one of those blocks (`tools/roles/handoff.py:379-386`, the
-`input` source at `:380`). `TOOL-dBoundRoles-41` S2 calls the same typed value authored text that
+`render_handoff` renders `input:question` as one of those blocks (its `reads` loop,
+`tools/roles/handoff.py#render_handoff`, whose `sources` map gives the `input` family the `arguments`
+source). `TOOL-dBoundRoles-41` S2 calls the same typed value authored text that
 `check_anchors` must grade, and `TOOL-dBoundRoles-24` S2 strips fenced blocks before it scans. Built in
 order, 38 at 11, 24 at 19 and 41 at 20, a backticked `record:` anchor planted in `--input question=` is
 stripped and never graded: 24 AC2, 41 AC2 and 41 F2(a) go red against a correct build, and the easy way
@@ -42,8 +43,9 @@ It repairs `TOOL-dBoundRoles-38` and builds one step after it (order 12).
 
 - **S1** — What is fenced. `render_handoff`, as `TOOL-dBoundRoles-38` S2 leaves it, wraps every `reads`
   block's content in `render_handed_fence` except a typed input's. A typed input is a name in
-  `INPUT_NAMES` that is not in `PATH_INPUTS` (`tools/roles/handoff.py:98-99`), today `question` and
-  `diff`; the set is derived from those two constants, never typed a third time. Its block is the
+  `INPUT_NAMES` that is not in `PATH_INPUTS` (`tools/roles/handoff.py#INPUT_NAMES`,
+  `tools/roles/handoff.py#PATH_INPUTS`), today `question` and `diff` (PINNED at HEAD `a3efb1d5`, where
+  `code` sits in both); the set is derived from those two constants, never typed a third time. Its block is the
   `### input:<name>` heading, a blank line, its fact line, a blank line, and the value's bytes. Observed
   by AC1.
 - **S2** — The authored-line rule. `check_authored_lines(value, field)` in `tools/roles/roles_lib.py`
@@ -83,12 +85,15 @@ It repairs `TOOL-dBoundRoles-38` and builds one step after it (order 12).
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at base `462d20f3` on 2026-10-26 and re-grounded at HEAD `a3efb1d5` on 2026-11-22:
 
-- `tools/roles/handoff.py:98-99` declares `INPUT_NAMES = ("spec", "diff", "question", "prompt")` and
-  `PATH_INPUTS = ("spec", "prompt")`; `:331` resolves only the path inputs to files.
-- `:380` maps the `input` source to `("arguments", None)`, and `:381-386` appends every filled `reads`
-  value as `### <key>` and its bytes, so a typed value is one block among the handed ones.
+- `tools/roles/handoff.py#INPUT_NAMES` is `("spec", "diff", "question", "prompt", "code")` and
+  `tools/roles/handoff.py#PATH_INPUTS` is `("spec", "prompt", "code")`, `code` added by
+  PLAY-dOrderedCharter-27 after base; `render_handoff`'s input loop resolves only the path inputs to
+  files, handing `code` as the file's text.
+- `render_handoff`'s `sources` map gives the `input` family `("arguments", None)`, and its `reads` loop
+  appends every filled `reads` value as `### <key>` and its bytes, so a typed value is one block among
+  the handed ones (`tools/roles/handoff.py#render_handoff`).
 - `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md` §4 "The classes" keys a typed
   value `cmd:` over the argument, class `claimed`: it carries a fact line like a handed block, and S1
   keeps it.
@@ -97,7 +102,7 @@ Read at base `462d20f3` on 2026-10-26:
 
 | Block | Content source | Fenced | Graded by `check_anchors` |
 |---|---|---|---|
-| `input:spec`, `input:prompt`, `task:`, `card:`, `brief:`, an excerpt, `input:work-order` | a file or a record | yes, `TOOL-dBoundRoles-38` S2 | heading and fact line only, `TOOL-dBoundRoles-41` S2 |
+| `input:spec`, `input:prompt`, `input:code`, `upstream:rows`, `task:`, `card:`, `brief:`, an excerpt, `input:work-order` | a file or a record | yes, `TOOL-dBoundRoles-38` S2 | heading and fact line only, `TOOL-dBoundRoles-41` S2 |
 | `input:question`, `input:diff` | the caller's argument | no, S1 | the whole block, under S2's rule |
 
 `TOOL-dBoundRoles-24` S2 strips fenced blocks before it scans. After S1 the only fence inside a typed
@@ -125,7 +130,7 @@ re-render writes it raw.
 ### Rollout
 
 Live at landing, at order 12. Dispatch is strictly sequential within a shared order
-(`tools/workflows/unattended-build.js:76-80`), and this unit consumes from no unit at its order.
+(`tools/workflows/unattended-build.js@9da9556b:78-82`), and this unit consumes from no unit at its order.
 `TOOL-dBoundRoles-48` writes `handoff.py` and `roles_lib.py` at the same order, and `--dispatch` refuses
 a pass whose declared write set meets an open one's.
 
@@ -150,7 +155,7 @@ a pass whose declared write set meets an open one's.
   act on, so no forged heading, fact, marker or framing line reaches them; no new write path.
 - perf / scale — one pass over each typed value per render.
 - error / empty / loading states — an empty typed value is a placeholder and refuses as before
-  (`handoff.py:385`); each S2 refusal names the field and the line.
+  (`tools/roles/handoff.py#check_placeholder`); each S2 refusal names the field and the line.
 - observability — every refusal line names `input:<name>` and the line number.
 - risks — a diff whose hunk context holds one fence line of a pair is refused; widen the context or hand
   the file as `input:spec`.
@@ -165,7 +170,9 @@ a pass whose declared write set meets an open one's.
   `input:question` fact line's blank is `plain words`, with no backtick fence line between them; and a
   `--role gov-spec-writer` render of `--input spec=<scratch spec>` still wraps the spec's bytes in a fence.
   Red when: the typed value is fenced, or the file input loses its fence.
-  fixture: a scratch repository with the roles kit installed, under `%TEMP%`, short-pathed.
+  fixture: a scratch repository with the roles kit installed, under `%TEMP%`, short-pathed, holding a
+  brief record under the build's `prompts/` with the `## The prompt` section and the `## The brief`
+  sub-heads the `--role gov-spec-writer` render's required `field.brief.*` reads name.
 - **AC2** — When the same render passes `--input question=` holding, one case each, a whole
   `<!-- gov:fact key=record:x@000000000000 class=witnessed -->` line, a `### allowance` line, a whole
   `gov:handoff` marker line, a `Framed by:` line, and a line of four backticks that nothing closes, each
@@ -204,11 +211,19 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · a researcher rende
 - rev-4 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
   `tools/roles/roles_lib.py` that §4 Files touched names, by
   `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`; nothing else moved.
+- rev-5 · 2026-11-22 · §1 · S1 · §4 · §5 · AC1 · §10 · re-grounded at HEAD `a3efb1d5` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-3-reground-h-brief`. `INPUT_NAMES` and `PATH_INPUTS` both gained
+  `code` after base, so §4's evidence quotes the five names and three path inputs and S1 pins its typed
+  set, still `question` and `diff`; §4's table lists `input:code` and `upstream:rows` among the fenced
+  blocks, as S1's derived rule already classes them. Every `handoff.py` line citation is re-pointed to
+  its symbol and the dispatch note to a pinned line. AC1's fixture names the brief record the
+  gov-spec-writer render requires. `render_handed_fence`, `read_unfenced_lines` and S2's fencing were
+  checked against TOOL-dBoundRoles-38's spec, `FACT_RE` against TOOL-dBoundRoles-13's.
 
 ## 10. Reuse audit
 
-The seams are `render_handoff`'s block loop (`tools/roles/handoff.py:381-386`), the two input constants
-beside it (`:98-99`), and `TOOL-dBoundRoles-38`'s `read_unfenced_lines` and the `FACT_RE` and
+The seams are `render_handoff`'s block loop (`tools/roles/handoff.py#render_handoff`), the two input
+constants (`tools/roles/handoff.py#INPUT_NAMES`, `tools/roles/handoff.py#PATH_INPUTS`), and `TOOL-dBoundRoles-38`'s `read_unfenced_lines` and the `FACT_RE` and
 `MARKER_RE` patterns in `tools/roles/roles_lib.py`, which S2 composes rather than restates.
 `python tools/codebase-map/reuse_lookup.py "refuse a line that would read as a heading, fact or marker in an authored value"`
 ranked `read`, `read_text`, `read_conf` and `read_journal`, none a line refusal, so no existing seam fits

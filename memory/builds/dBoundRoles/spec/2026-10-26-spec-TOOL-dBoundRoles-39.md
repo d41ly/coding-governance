@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-39 — the return check grades a direct spawn only: a stop whose transcript is a harness stage's, or whose first record carries no handoff marker, passes untouched
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -25,11 +25,13 @@ HIGH**, report item **H1**. Id 56 shares that item and takes `TOOL-dBoundRoles-4
 
 `TOOL-dBoundRoles-5` wires `handoff.py check-return` on `SubagentStop` with matcher `*`, and its S2 exits
 early only when `agent_type` is absent or names no agent-true role. Harness stages are spawned with the
-same gov-* agent types (`tools/workflows/unattended-unit.js:333-337`,
-`tools/workflows/unattended-build.js:541-543`, `tools/workflows/tier2-review.js:270-272`), so their stops
-reach the check too. A harness stage returns through StructuredOutput against its stage schema, which
-for the builder is `{committed, sha, why, summary}` (`unattended-unit.js:206-215`), while unit 2 gives
-`gov-builder` the template `outcome:committed|returned, …`. The check would find no return object, block
+same gov-* agent types (`tools/workflows/unattended-unit.js@3aa27411:435-440`,
+`tools/workflows/unattended-build.js#renderStageOpts`, `tools/workflows/tier2-review.js#renderStageOpts`),
+so their stops reach the check too. A harness stage returns through StructuredOutput against its stage
+schema, which for the builder requires `{committed, sha, why, summary}`, and `branch` and `worktree`
+beside them under `passBase` (`tools/workflows/unattended-unit.js@3aa27411:265-278`), while unit 2 gives
+`gov-builder` the template `outcome:committed|returned, …`
+(`tools/roles/agents/gov-builder.agent.md@2081c590:13`). The check would find no return object, block
 the stage up to `roles.retries` times, and record it `valid: false` for `TOOL-dBoundRoles-26` to route.
 Nothing in spec 5 separates a direct spawn from a harness agent.
 
@@ -43,7 +45,8 @@ it (order 16).
   S2), before the role is loaded or any record is read. A stop is a direct spawn's when both hold: the
   payload's `agent_transcript_path`, separators folded to `/`, holds no `/subagents/workflows/` segment
   pair; and the agent transcript's first `user` record opens with a marker line that
-  `roles_lib.extract_prompt_marker` (`tools/roles/roles_lib.py:246`) parses. Any other stop exits 0
+  `roles_lib.extract_prompt_marker` (`tools/roles/roles_lib.py#extract_prompt_marker`), as
+  TOOL-dBoundRoles-17 S1 and TOOL-dBoundRoles-38 S4 leave it, parses. Any other stop exits 0
   with nothing on stdout or stderr, and writes no record under `return-check/`. Observed by AC1 and AC2.
 - **S2** — The order of the verb's steps after this unit: the route test, then `TOOL-dBoundRoles-5` S2's
   role and template reads, then S3's retry and record. A stop that fails the route test never reaches
@@ -65,7 +68,8 @@ it (order 16).
   what they do to a direct spawn.
 - The gate that replays a recorded harness stop against every `SubagentStop` hook a settings file
   registers: `TOOL-dBoundRoles-40`'s, for id 56.
-- A harness stage's own retry of a null return: `TOOL-dBoundRoles-5` S6's `spawnWithRetries`.
+- A harness stage's own retry of a null return: `TOOL-dBoundRoles-5` S6's marked re-run loop and its
+  `runWithRetries`.
 - What `TOOL-dBoundRoles-26` routes on a record. With no record written for a harness stage there is
   nothing for it to route.
 
@@ -89,7 +93,9 @@ it (order 16).
   `gov:handoff` marker, which rule 6 admits only as the prompt's first line (`TOOL-dBoundRoles-7` §4,
   read on this node on 2026-10-25; `tools/hooks/agent-cap.js@935a910d:704-731`).
 - A sub-agent's end fires `SubagentStop` with `agent_id`, `agent_transcript_path` and `agent_type`
-  (`memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md:148-150`).
+  (`memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md@0f264e3b:148-150`).
+- The hooks kit already spells the harness layout, `<session dir>/subagents/workflows/<run id>/`
+  (`tools/hooks/format-guard.js@cbfbcff2:53`, `@cbfbcff2:381`).
 
 ### Why two tests
 
@@ -113,8 +119,9 @@ None: no stored data changes, and no record exists before `TOOL-dBoundRoles-5` l
 
 ### Rollout
 
-Live at landing, at order 16. Dispatch sorts a tie by id string (`tools/workflows/unattended-build.js:608-613`),
-so `TOOL-dBoundRoles-10` builds first and `TOOL-dBoundRoles-40` after this unit.
+Live at landing, at order 16. Dispatch sorts a tie by id string
+(`tools/workflows/unattended-build.js@9da9556b:692-697`), so `TOOL-dBoundRoles-10` builds first and
+`TOOL-dBoundRoles-40` after this unit.
 
 ### Files touched (estimate)
 
@@ -178,12 +185,20 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 · the `harness-type
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dBoundRoles-50, the minors batch of the round-1 audit of units 37 to 44; nothing else moved.
 - rev-3 · 2026-11-22 · §4 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/roles/handoff.py` in Files touched trips its guard; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up (DERIVED: baseline line 2089 less HEAD line 691) with its behaviour unchanged, so the cites re-point at HEAD, rule 6's marker-line checks now at `tools/hooks/agent-cap.js@935a910d:704-731`; nothing else moved.
 - rev-4 · 2026-11-22 · §4 · §9 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; each figure the re-ground wrote carries a pin on its line; nothing else moved.
+- rev-5 · 2026-11-22 · §1 · S1 · §3 · §4 · §10 · re-grounded at HEAD `a3efb1d50` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-5-reground-j-brief`: every code citation re-pointed to a symbol or
+  a blob-pinned line; the builder's stage schema gains the `branch` and `worktree` it requires under
+  `passBase`; §3 names unit 5's re-run as its rev-5 renames it, `spawnWithRetries` becoming the marked
+  loop and `runWithRetries`, checked against TOOL-dBoundRoles-5's spec; `extract_prompt_marker` is
+  claimed as TOOL-dBoundRoles-17 S1 and TOOL-dBoundRoles-38 S4 leave it, read against their specs. The
+  route test, the plants and the criteria are unchanged.
 
 ## 10. Reuse audit
 
 The seams are `TOOL-dBoundRoles-5` S2's first-record read and `roles_lib.extract_prompt_marker`
-(`tools/roles/roles_lib.py:246`), the one reader of a prompt's opening marker, and the subagent layout
-`tools/hooks/format-guard.js:101-103` already spells (`RUN_ID_RE`, `WORKFLOW_RUNS_DIR`).
+(`tools/roles/roles_lib.py#extract_prompt_marker`), the one reader of a prompt's opening marker, and
+the subagent layout `tools/hooks/format-guard.js@cbfbcff2:113-115` already spells (`RUN_ID_RE`,
+`WORKFLOW_RUNS_DIR`).
 `python tools/codebase-map/reuse_lookup.py "decide whether a subagent stop belongs to a direct spawn or a harness stage"`
 ranked `resolve_harness_path`, `stage_or_fail`, `write_staged` and `cmd_staged`, none a route test, so no
 existing seam fits beyond the two readers named.

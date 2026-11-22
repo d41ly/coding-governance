@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-8 — the role-gate arm's field escape explained and closed
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0173@a66af889 whole
 
@@ -29,19 +29,20 @@ G3 when no checkout root resolves (§8 F2).
 
 ## 2. Scope (IN)
 
-- **S1** — The convicted exit closed. `resolveRoleRoot(cwd, env)` (`tools/hooks/scratch-guard.js:1396`)
+- **S1** — The convicted exit closed. `resolveRoleRoot(cwd, env)` (`tools/hooks/scratch-guard.js#resolveRoleRoot`)
   takes the candidate commands as a third start: after the payload `cwd` and `CLAUDE_PROJECT_DIR`, the
   directory of each candidate's launched script, resolved against the payload `cwd`, so a gate run by
   absolute path from outside every checkout reads the index of the checkout that holds the script.
-  When no start resolves, `checkRoleGate` (`scratch-guard.js:1421-1451`, its step 3 at `:1430-1433`)
-  no longer returns: rows G2 and G3, which read no index, refuse a matching candidate with an empty
-  allowlist, and only G1 is unarmed, with its witness line. Observed by AC1, AC2 and AC3.
+  When no start resolves, `checkRoleGate` (`tools/hooks/scratch-guard.js@0251d34d:1871-1903`, its step 3
+  at `:1880-1884`) no longer returns: rows G2 and G3, which read no index, refuse a matching candidate
+  with an empty allowlist, and only G1 and the polling rows P1 to P3 are unarmed, named by its witness
+  line (§8 F4). Observed by AC1, AC2 and AC3.
 - **S2** — Agent-cap's rule 6 reads its root through the same `resolveRoleRoot`, which it already
   imports (`tools/hooks/agent-cap.js@935a910d:1040-1042`); it passes no candidates, so its verdict is unchanged.
   Observed by AC3.
 - **S3** — The explanation, where the arm is documented: `tools/hooks/README.md`'s section
-  "scratch-guard's fourth check" (`:491`) and the role-arm paragraph of scratch-guard's header
-  (`scratch-guard.js:105-130`) state the field measurement's result: the counted runs were commands
+  "scratch-guard's fourth check" (`tools/hooks/README.md@d545b855:635`) and the role-arm paragraph of
+  scratch-guard's header (`tools/hooks/scratch-guard.js@0251d34d:125-156`) state the field measurement's result: the counted runs were commands
   naming a gate script as an argument, which the arm correctly admits, and a field census of role gate
   runs replays the recorded commands through the exported `checkRoleGate` and `scanCommandHeads`
   rather than a regex of its own. The evaluation-order comment states S1's new start. Observed by AC4
@@ -92,18 +93,20 @@ checkRoleGate(<the same .test.sh run>, <the same payload>, {})                  
 checkRoleGate(<the same command>, { agent_type: 'gov-builder', cwd: '<gov checkout>' }, {}) -> deny, G2
 ```
 
-Measured on 2026-10-25 through the exported function. A role agent whose working directory is outside
-every checkout, with `CLAUDE_PROJECT_DIR` unset, runs the bar or a suite unrefused; with it set to a
-directory in no checkout, it gets a witness line and runs.
+Measured on 2026-10-25 through the exported function, and re-run at HEAD `a3efb1d5` on 2026-11-22
+with the same three results, the outside `cwd` a directory under the session scratchpad. A role agent
+whose working directory is outside every checkout, with `CLAUDE_PROJECT_DIR` unset, runs the bar or a
+suite unrefused; with it set to a directory in no checkout, it gets a witness line and runs. At HEAD
+the same exit also admits a polling wait (`sleep 30` returns null), which §8 F4 leaves as it is.
 
 ### The new step 3
 
 1. `top = resolveRoleRoot(cwd, env, cands)`: the payload `cwd`, then `CLAUDE_PROJECT_DIR`, then each
    candidate's launched script's directory, the first that resolves a toplevel.
-2. `top` resolved: steps 4 to 7 as today.
+2. `top` resolved: steps 4 to 9 as today, the polling rows' step 8 among them.
 3. `top` unresolved: each candidate is tried against G2 and G3 with an empty allowlist; a match
    refuses naming the row and saying no checkout root was found; otherwise one witness line names the
-   three starts and that G1 is unarmed.
+   three starts and that G1 and the polling rows are unarmed (§8 F4).
 
 ### Inventory
 
@@ -205,6 +208,16 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 · a gov-bu
   from outside unread when its checkout's index would refuse it; (c) refuses reads the textual match
   mistakes for runs. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the most feature-rich
   survivor. widens: none · relaxes: none
+- **F4 — What do the polling rows do when no root resolves?** The arm gained rows P1 to P3 after
+  base: `checkPollWait` reads no index, step 2 now passes a polling hit with no candidate, and step 8
+  refuses it once a root resolves (`tools/hooks/scratch-guard.js@0251d34d:1854-1903`); with no root,
+  step 3 returns before both, so a polling wait is admitted as a gate run is. Options: (a) the polling
+  rows keep that verdict under the new step 3, unarmed and named in its witness line; (b) they bind
+  with no root, as G2 and G3 now do. (b) widens this unit's mechanism past the gate rows its goal and
+  criteria name, and no criterion here observes a polling wait. RESOLVED (agent, 2026-11-22,
+  delegated): (a), rung 3, fewer open questions, the brief's rule that a re-ground never widens a
+  unit; binding the polling rows with no root is a follow-up outside this unit. widens: none ·
+  relaxes: none
 
 ## 9. Revision log
 
@@ -216,11 +229,21 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 · a gov-bu
   rule 6 runs first and is no longer skipped under `--only=`, which S2 does not rely on. The §7 leg
   line gains `policy fixtures`, whose guard the Files touched path `tools/hooks/scratch-guard.js` trips.
 - rev-3 · 2026-11-22 · §2 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; nothing else moved.
+- rev-4 · 2026-11-22 · S1 · S3 · §4 · §8 F4 · §10 · re-grounded at HEAD `a3efb1d5` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-48-reground-i-brief`: the `tools/hooks/scratch-guard.js`
+  citations move to blob `0251d34d`, `checkRoleGate` from 1421-1451 to 1871-1903, its step 3 to
+  1880-1884, `resolveRoleRoot` to its symbol and `scanCommandHeads` from 1279 to 1677, the header
+  paragraph from 105-130 to 125-156, and the README section from 491 to 635 of blob `d545b855`. The
+  arm's evaluation order grew the polling rows and steps 8 and 9 after base, so §4's step 2 reads
+  steps 4 to 9 and F4 keeps the polling rows' no-root verdict. §4's convicted exit was re-run at HEAD
+  and holds. S2's `tools/hooks/agent-cap.js@935a910d:1040-1042` and the absent-index step, checked
+  against TOOL-dBoundRoles-6 S3, hold.
 
 ## 10. Reuse audit
 
-The seams extended: `checkRoleGate` (`tools/hooks/scratch-guard.js:1421-1451`) and `resolveRoleRoot`
-(`:1396`), both exported and already shared with agent-cap's rule 6; `scanCommandHeads` (`:1279`) and
+The seams extended: `checkRoleGate` (`tools/hooks/scratch-guard.js@0251d34d:1871-1903`) and
+`resolveRoleRoot` (`tools/hooks/scratch-guard.js#resolveRoleRoot`), both exported and already shared
+with agent-cap's rule 6; `scanCommandHeads` (`tools/hooks/scratch-guard.js@0251d34d:1677`) and
 `buildCommandView`, the quote-aware scanner the explanation names as the census instrument. The probe
 itself reused the exported functions, as scout C proposed for the replay, and not the transcript
 readers in `handoff.py`, which read agent records rather than tool calls. `python

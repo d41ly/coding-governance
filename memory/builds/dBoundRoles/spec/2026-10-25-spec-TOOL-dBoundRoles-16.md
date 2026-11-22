@@ -1,8 +1,8 @@
 # TOOL-dBoundRoles-16 — the shapes: each workflow entry's kind, checklist, orientation, merge and twin rule, the five kinds as defaults over the stage rows
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
 
-**Carries:** cl-dClosedLoop-0181@6ebedcff whole
+**Carries:** cl-dClosedLoop-0181@03bd0858 whole
 **Carries:** node:system.role-shapes
 
 <!-- gen:spec-records -->
@@ -13,6 +13,7 @@
 | [2026-10-25-build-TOOL-dBoundRoles-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dBoundRoles-1-spec-stage-returns.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-10-26-build-TOOL-dBoundRoles-16-deviation-161.md](../build/2026-10-26-build-TOOL-dBoundRoles-16-deviation-161.md) | deviation | — |
+| [2026-11-22-build-TOOL-dBoundRoles-16-deviation-162.md](../build/2026-11-22-build-TOOL-dBoundRoles-16-deviation-162.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-10 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-46 TOOL-dBoundRoles-58 |
@@ -61,13 +62,14 @@ though aScoutedSeam measured that the shape moves recall and cost (gap-roles-18)
   `unit.orient.verifier-cold`, `unit.checklist.for-paths` and `unit.checklist.for-diff`, per §4 "### The
   units"; R9 resolves every `checklist` and `orientation` tag through PLAY-dOrderedCharter-9 S2's
   `read_units`, and prints the join `unarmed` where the playbook kit does not resolve. Observed by AC6.
-- **S7** — The efforts RS-2 sets: the orientation scout at medium and the builder at high, in the house
-  seed `tools/roles/house/policy.toml`'s `[effort.roles]`, in each role's declared `effort` and in the
+- **S7** — The efforts: the builder at high, RS-2's level, and the orientation scout at high, the level
+  of the owner's ruling TOOL-dEasedEffort-1, which outranks RS-2's medium (§8 F5), in the house seed
+  `tools/roles/house/policy.toml`'s `[effort.roles]`, in each role's declared `effort` and in the
   `builder` stage rows, read through TOOL-dBoundRoles-21's order, the `roles.effort.*` keys first and the
   house file by workflow and stage only where no key is set, until dConvergedCharter's fold of the
   seed. At HEAD TOOL-dEasedEffort-1 already seeds `gov-builder` at `high`
   (`tools/roles/house/policy.toml@339f54fa:14`) and `gov-orienter` at `high` (`@339f54fa:11`), so the
-  seed's one move is the orienter's row to `medium` (§8 F5). Observed by AC5.
+  seed moves no level. Observed by AC5.
 - **S8** — The registry's readers, each read and rewritten in this unit where the shapes change what it
   reads, per §4 "### The readers": R6 to R9 and R12, `resolve_stage_efforts`, `stage-efforts` and
   `harness-args`, `render_agents.py`, `adopt-roles.sh`, `check-wiring.sh`, agent-cap's `args.roles`
@@ -212,7 +214,7 @@ names it instead of a prompt.
 | R12 (`load_policy`) | stage keys read through `derive_stage_map` over `derive_stage_rows` |
 | `resolve_stage_efforts` | iterates `derive_stage_rows`, so a defaulted row is resolved |
 | `stage-efforts`, `harness-args` (`tools/roles/handoff.py#print_stage_efforts`, `tools/roles/handoff.py#print_harness_args`) | read the derived rows; their output for gov's entries is unchanged |
-| `role-efforts` (`tools/roles/handoff.py#print_role_efforts`) | prints the orienter's level S7 moves; its shape is unchanged |
+| `role-efforts` (`tools/roles/handoff.py#print_role_efforts`) | prints the orienter's level S7 holds; its shape is unchanged |
 | `render_agents.py` | renders `shapes` into the index; its harness list (`tools/roles/render_agents.py#derive_harness_paths`) is unchanged |
 | `adopt-roles.sh` | its Skill binder binds the template's `## Stage` headings to `roles_lib.read_workflow_order`, the loop definition's orders, and tests `workflows.toml` for presence only (`tools/roles/adopt-roles.sh@8fb723b3:286-321`); unchanged |
 | `check-wiring.sh` | reads `workflows.toml` as the kit's anchor only (`tools/check-wiring.sh@49c697ec:1880`); unchanged |
@@ -250,7 +252,6 @@ Live at landing on the `roles catalogue` leg; the moved efforts reach an agent t
 - `tools/roles/render_agents.py`
 - `tools/roles/role-schema.toml`
 - `tools/roles/agents/` (`shapes` on every agent role; `effort` on `gov-orienter` and `gov-builder`)
-- `tools/roles/house/policy.toml` (the `gov-orienter` row, the one RS-2 level the seed does not hold, §8 F5)
 - `tools/roles/README.md`
 - `tools/roles/adopt-roles.test.sh` (the arms of §7)
 - `.claude/agents/` and `.claude/roles.json` (rendered by `render_agents.py --write`)
@@ -305,9 +306,10 @@ Live at landing on the `roles catalogue` leg; the moved efforts reach an agent t
   `shapes`.
   Red when: `shapes` is declared and read by no check, so a role runs in any kind.
 - **AC5** — When `python handoff.py stage-efforts build` runs in `tools/roles/` over the tree with no key
-  set, it prints `{"builder":"high"}`, and `.claude/agents/gov-orienter.md` carries `effort: medium`
+  set, it prints `{"builder":"high"}`, and `.claude/agents/gov-orienter.md` carries `effort: high`
   after `python render_agents.py --write`.
-  Red when: the seed's `gov-orienter` row stays at `high`, so RS-2's orientation level never applies.
+  Red when: the seed's `gov-orienter` row or the role's declared `effort` takes RS-2's `medium`, so the
+  owner's later level is reversed.
 - **AC6** — When a scratch copy's `closing-review` entry carries `orientation = "unit.orient.nothing"`,
   `python check_roles.py --root <repo>` exits 1 with one R9 line naming the tag as no declared unit;
   over the tree it exits 0 with the four units resolved, or prints the join `unarmed` where the playbook
@@ -368,11 +370,11 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC3 AC4 AC6 · a fixture 
   `high` (`tools/roles/house/policy.toml@339f54fa:11`, `:14`), which meets RS-2 for the builder and not
   for the orienter. Options: (a) S7 moves the orienter's row to `medium`, as the clause this unit
   carries whole, cl-dClosedLoop-0181, and D2 say; (b) the orienter stays at `high`, the later ruling's
-  level, and S7 moves nothing in the seed. (b) fails AC5's `effort: medium`, so veto 1 discards it.
-  RESOLVED (agent, 2026-11-22, delegated): (a), rung 1, the carried clause and the brief's D2. The
-  later ruling moved the orienter down from `xhigh` and is reversed for that one role, which this item
-  names so that an owner turn can overrule it before the pass.
-  widens: none · relaxes: none
+  level, and S7 moves nothing in the seed. (a) reverses an owner ruling that postdates the clause and
+  names this role and its level. RESOLVED (agent, 2026-11-22, delegated): (b), rung 1, the owner's
+  ruling TOOL-dEasedEffort-1, which outranks the clause it postdates; S7 and AC5 read `high`, and the
+  relaxed bound is recorded in `2026-11-22-build-TOOL-dBoundRoles-16-deviation-162`.
+  widens: none · relaxes: the clause's orienter value, the orientation scout at medium (RS-2)
 - **F6 — With `SPEC_WRITERS` rendered from the agent limit, what does `per-unit`'s fan and cap pin
   to?** At base `SPEC_WRITERS` and `MAX_VERIFIERS` each rendered the `{{FANOUT_CAP}}` token; since
   TOOL-dGroundRules-10 `MAX_VERIFIERS` is a typed literal and `SPEC_WRITERS` renders
@@ -424,6 +426,12 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC3 AC4 AC6 · a fixture 
   records its parents CLOSED; §3, AC2 and §10 re-point their citations. Units 1, 2, 21 and 22's
   `plan`, `design`, `role-schema.toml`, `effort`, stage rows and `read_agent_limit` were checked against
   their specs, not HEAD; nothing else moved.
+- rev-6 · 2026-11-22 · S7 · §4 The readers · §4 Files touched · AC5 · §8 F5 · by
+  `2026-11-22-prompt-TOOL-dBoundRoles-1-spec-fix-1-brief`: F5 now keeps `gov-orienter` at `high`, the
+  owner's ruling TOOL-dEasedEffort-1 outranking the clause it postdates, `relaxes:` the clause's orienter
+  value, recorded in `2026-11-22-build-TOOL-dBoundRoles-16-deviation-162`; S7 moves no seed level and
+  AC5 reads `effort: high`, its number kept; the `role-efforts` row and the `policy.toml` line of Files
+  touched, which restated the move, follow S7; nothing else moved.
 
 ## 10. Reuse audit
 

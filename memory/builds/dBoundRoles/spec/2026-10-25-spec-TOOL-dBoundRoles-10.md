@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-10 — `driver.reads`, `prompts.author` and `roles.no-spawn`, each read and enforced at its seam
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0175@0d300fb9 whole
 **Carries:** node:policy-key.driver.reads
@@ -29,8 +29,8 @@
 
 ## 1. Goal
 
-The owner settled three defaults for how the main session and its roles meet (`roles.md:351-381`):
-the main session reads only cheap state (RL-5), a prompt writer writes every worker's task (RL-4), and
+The owner settled three defaults for how the main session and its roles meet
+(`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-roles.md@e29e16d7:351-381`): the main session reads only cheap state (RL-5), a prompt writer writes every worker's task (RL-4), and
 an item a role must perform is never done inline when no agent can be spawned (RL-8). v2 makes each a
 policy key with its values (v2:1179, :1180, :1182). This unit reads the three keys through the policy
 reader and enforces each value where a seam exists: `driver.reads` at a new main-loop read arm of the
@@ -40,43 +40,61 @@ render. Where a value has no seam at base, the spec says what stands in and who 
 ## 2. Scope (IN)
 
 - **S1** — `driver.reads`, values `none-scout-only`, `state-reads-only` and `read-only-probes`,
-  default `state-reads-only`. `checkDriverRead(data, env)` in `tools/hooks/scratch-guard.js`, run for a
+  default `state-reads-only`. `checkDriverRead(data, env)` in `tools/hooks/scratch-guard.js`, added
+  to the hook's `module.exports` (`tools/hooks/scratch-guard.js@0251d34d:2118`) so §6 runs it, for a
   `Read`, `Grep` or `Glob` payload: a payload carrying an `agent_type` is admitted (workers keep their
   read-only probes, RL-5's settlement); for the main loop, `read-only-probes` admits all three,
   `state-reads-only` refuses `Grep` and `Glob` and admits `Read`, and `none-scout-only` refuses all
   three. Observed by AC1 and AC2.
 - **S2** — The hook's matcher widens to `Read|Grep|Glob` beside its write tools, in
   `tools/hooks/scratch-guard.fragment.json`, and `.claude/settings.json` is re-merged by
-  `settings-merge.py --fragment`; `main` dispatches the three tools to S1 before its write-gate branch.
+  `settings-merge.py --fragment`; `main` (`tools/hooks/scratch-guard.js#main`) dispatches the three tools
+  to S1 after its `SubagentStart` branch and before its write-gate branch. The hook's
+  `SubagentStart` fragment, `tools/hooks/scratch-guard-subagent.fragment.json`, is another event and is
+  untouched. Readers of the matcher's value: `tools/hooks/README.md`
+  (`tools/hooks/README.md@d545b855:365`, `@d545b855:412`), which this unit edits, and
+  `tools/check-wiring.sh` (`tools/check-wiring.sh@49c697ec:1783`, `@49c697ec:1959`), which tests the
+  matcher for any write tool word by word, so the widened value reads as gated with no edit.
   Observed by AC3.
 - **S3** — `prompts.author`, values `prompt-writer` and `requesting-worker-rendered`, default
-  `prompt-writer`. `resolvePromptsAuthor(root)` in `tools/hooks/agent-cap.js` reads it once per `Agent`
+  `prompt-writer`. `resolvePromptsAuthor(root)` in `tools/hooks/agent-cap.js`, added to its
+  `module.exports` (`tools/hooks/agent-cap.js@935a910d:1104-1113`), reads it once per `Agent`
   call in rule 6 (`checkHandoffSpawn`, `tools/hooks/agent-cap.js@935a910d:691`). Under `requesting-worker-rendered`, rule 6
   is today's check, every task a rendered handoff the requesting session made; under `prompt-writer`,
   rule 6 also applies the framing requirement TOOL-dBoundRoles-4 defines. Every rule-6 refusal names
   the value in force. Observed by AC4.
 - **S4** — `roles.no-spawn`, values `executor-role-session`, `recorded-stand-in` and `refuse`, default
-  `executor-role-session`, read by `handoff.py render --stand-in` (`tools/roles/handoff.py:1034-1041`).
-  `recorded-stand-in` keeps today's waiver-backed stand-in (`load_stand_in_waivers`,
-  `roles_lib.py:488`; R15). `refuse` refuses every `--stand-in`, naming the key. `executor-role-session`
+  `executor-role-session`, read by `handoff.py render --stand-in`, whose waiver check precedes the
+  render (`tools/roles/handoff.py@c6d87bbb:1488-1495`); the key is read and its refusal made before
+  that check. `recorded-stand-in` keeps today's waiver-backed stand-in
+  (`tools/roles/roles_lib.py#load_stand_in_waivers`; R15). `refuse` refuses every `--stand-in`, naming the key. `executor-role-session`
   refuses `--stand-in` too, naming the route that is always open, a role spawned through `Agent` or a
   listed harness, and the hand-over: the executor that starts a role session for the item is
-  dWellOiledMachine's. R15's join of waiver rows and declarations (`check_roles.py:360-372`) is unchanged.
+  dWellOiledMachine's. R15's join of waiver rows and declarations
+  (`tools/roles/check_roles.py@15b68874:451-465`) is unchanged.
   Observed by AC5.
 - **S5** — Every key is read through the policy reader, never with `tomllib` over
   `.governance/policy.toml` (shared interface I8): the two hooks through TOOL-dGroundRules-5 S5's
-  `readPolicy`, located as that section states for a hook, and `handoff.py` through TOOL-dGroundRules-2
-  S6's `resolve`, located through `roles_lib.resolve_kit_dir`. A key the file leaves unset reads its
-  catalogue default. Where the policy kit is not installed, each check is unarmed: S1 admits with one
-  witness line, S3 runs today's rule 6, and S4 keeps today's stand-in. The three catalogue rows are
-  TOOL-dGroundRules-1 S3's, written from v2's rows; this unit adds none. Observed by AC2 and AC6.
+  `readPolicy` (`tools/policy/policy-mirror.js@11993c5e:1-34`), located through agent-cap's exported
+  `resolvePolicyHelper` (`tools/hooks/agent-cap.js#resolvePolicyHelper`), the way scratch-guard's
+  red-fix lane reads `bar.inline-red-fixes` (`tools/hooks/scratch-guard.js@0251d34d:1537-1549`); and
+  `handoff.py` through TOOL-dBoundRoles-21 S1's
+  `read_policy_setting("roles.no-spawn", root, with_default=True)`, the roles kit's one runner of
+  `policy.py get`, checked against that unit's spec (§8 F5). Both readers read the landed revision,
+  never the working tree. A key the file leaves unset reads its catalogue default. Where the policy
+  kit is not installed, each check is unarmed: S1 admits with one witness line, S3 runs today's rule
+  6, and S4 keeps today's stand-in, `read_policy_setting` yielding `None` and its one note. The three
+  catalogue rows are TOOL-dGroundRules-1 S3's, landed at `tools/policy/catalogue.toml@25076c3d:259-263`,
+  `@25076c3d:265-269` and `@25076c3d:278-282`, written from v2's rows; this unit adds none. Observed by
+  AC2 and AC6.
 - **S6** — Every refusal names the key, its value, and the remedy with its actor: the driver, which
   dispatches a scout through a rendered handoff (S1), renders the handoff the value requires (S3), or
   spawns the role (S4); or the owner, who may set another value in the guarded policy file.
   Observed by AC1, AC4 and AC5.
-- **S7** — The user page `help/roles.md`: "When no role agent can be spawned" (`:93`) states the three
-  `roles.no-spawn` values and the default's refusal, and "What the hooks refuse" (`:103`) gains the
-  main loop's `Grep` and `Glob` under the default `driver.reads`. Observed by AC7.
+- **S7** — The user page `help/roles.md`: "When no role agent can be spawned"
+  (`help/roles.md@50d4a1c0:191`) states the three `roles.no-spawn` values and the default's refusal,
+  and "What the hooks refuse" (`help/roles.md@50d4a1c0:201`) gains the main loop's `Grep` and `Glob`
+  under the default `driver.reads`. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -88,13 +106,13 @@ render. Where a value has no seam at base, the spec says what stands in and who 
   what was handed exists at base; the driver's binding record is dWellOiledMachine's (§8 F1).
 - The main loop's Bash: `grep`, `find` and `cat` run through Bash are not seen by S1, which reads the
   three read tools only; act binding of the driver's shell is dWellOiledMachine's
-  (`layer-runtime.md:530-531`).
+  (`memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md@c7422838:530-531`).
 - The catalogue rows and the reader: dGroundRules'.
 
 ### Edges
 
 - **hands-off** `TOOL-dBoundRoles-4` — `prompts.author` and its reader `resolvePromptsAuthor`, the switch under which rule 6 applies the prompt writer's framing requirement
-- **consumes-from** external — TOOL-dGroundRules-2 S6's `resolve` and TOOL-dGroundRules-5 S5's `readPolicy`, and the three catalogue rows of TOOL-dGroundRules-1 S3; the build run re-grounds on each and stops the unit if one is still absent
+- **consumes-from** external — TOOL-dGroundRules-2 S7's `policy.py get`, which TOOL-dBoundRoles-21 S1's `read_policy_setting` runs, TOOL-dGroundRules-5 S5's `readPolicy`, and the three catalogue rows of TOOL-dGroundRules-1 S3; each is landed at HEAD `a3efb1d50`, and the build run stops the unit if one is absent at its base
 - **hands-off** `TOOL-dBoundRoles-43` — `checkDriverRead`, `roles.no-spawn` and AC6, which unit 43 gives a verdict on a policy refusal, a stand-in fixture and a falsifiable grep (ids 12, 27, 31 and 60 of the round-1 spec audit)
 - **hands-off** `TOOL-dBoundRoles-44` — `checkDriverRead`'s refusal of the search tool, which unit 44's kickoff line stops naming (id 28 of the round-1 spec audit)
 
@@ -113,7 +131,7 @@ render. Where a value has no seam at base, the spec says what stands in and who 
 ```
 checkDriverRead(data, env)            tool_name in Read | Grep | Glob
  1. agent_type non-empty             -> null   (a worker's probe)
- 2. readPolicy("driver.reads") at the payload cwd's toplevel
+ 2. readPolicy("driver.reads") at the payload cwd's toplevel, through resolvePolicyHelper
       the policy kit not installed   -> { witness: "driver.reads unarmed — …" }
  3. read-only-probes                 -> null
     state-reads-only, Read           -> null
@@ -127,7 +145,7 @@ or the Bash checks.
 
 `state-reads-only` is RL-5's "cheap state reads only", and its settlement names what that is: `next`,
 a record the driver was handed, a short git state command; "anything exploratory is a scout's task"
-(`roles.md:377-378`). `Grep` and `Glob` are the two read tools whose every use is a search; a `Read`
+(`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-roles.md@e29e16d7:377-378`). `Grep` and `Glob` are the two read tools whose every use is a search; a `Read`
 names its one file, and the record it was handed is a file it reads, so the arm admits `Read` under
 this value (§8 F1). BUILD-METHOD M7's regrounding reads by `Read` and Bash only, so the default keeps
 it whole; under `none-scout-only`, the owner's strictest value, M7's reads are refused too, which §5
@@ -203,7 +221,11 @@ file its one write path.
 
 The hook criteria run the exported functions of `tools/hooks/scratch-guard.js` and
 `tools/hooks/agent-cap.js` through `node -e` over a fixture repository under `%TEMP%` whose policy
-file, `policy.toml`, sets the value named.
+file, `policy.toml`, sets the value named. Both readers read `.governance/policy.toml` as committed at
+the landed revision and never the working tree (`tools/policy/policy-mirror.js@11993c5e:9-27`), so the
+fixture commits it on the branch `GOV_DEFAULT_BRANCH` names, as
+`tools/hooks/scratch-guard.test.sh@1bae0749:1282-1296` does for `bar.inline-red-fixes`; with no mirror
+the reader falls to the shim's `get` under `policy-file.on-invalid`'s default `last-valid`.
 
 - **AC1** — When `checkDriverRead` reads a `Grep` payload with no `agent_type` and `driver.reads` unset,
   it returns a `deny` naming `driver.reads`, `state-reads-only` and a scout as the driver's remedy; a
@@ -218,8 +240,9 @@ file, `policy.toml`, sets the value named.
   and `.claude/settings.json` carries the same matcher on the hook's `PreToolUse` group.
   Red when: the matcher stays the write tools', so no read ever reaches S1.
 - **AC4** — When `resolvePromptsAuthor` reads a fixture with `prompts.author` unset, it returns
-  `prompt-writer`; set to `requesting-worker-rendered`, it returns that, and a rule-6 refusal of a
-  freeform prompt names `prompts.author` and the value.
+  `prompt-writer`; set to `requesting-worker-rendered`, it returns that, and an `Agent` payload with a
+  freeform prompt piped to `node tools/hooks/agent-cap.js` from the fixture is refused by rule 6 naming
+  `prompts.author` and the value, since `checkHandoffSpawn` is not among the hook's exports.
   Red when: the value is a literal in the hook, or the refusal does not say which value is in force.
 - **AC5** — When `python tools/roles/handoff.py render --role gov-builder --build x --stand-in` runs over
   a fixture with `roles.no-spawn = "refuse"`, it exits non-zero naming `roles.no-spawn`; unset, it exits
@@ -279,6 +302,13 @@ New arm: tools/roles/render_agents.py · covers AC5 · its self-test renders `--
   (a), rung 1, the spec fix brief's F3; the instrument's red on this clause is `PLAY-dClosedLoop-30`'s
   until its pin moves by the owner's `packet.py --repin`.
   widens: none · relaxes: none
+- **F5 — Which reader does `handoff.py` read `roles.no-spawn` through?** Options: (a)
+  TOOL-dBoundRoles-21 S1's `read_policy_setting` with `with_default`, built at order 4, the roles kit's
+  one runner of `policy.py get`, which TOOL-dBoundRoles-43 S21 names this unit's key as calling; (b)
+  TOOL-dGroundRules-2 S6's `resolve` imported in process, as rev-4 wrote. (b) imports a sibling kit,
+  which PLAY-dOrderedCharter-7 §4 "The policy reads" refuses, the fork TOOL-dBoundRoles-15 §8 F6
+  resolved for its key. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the survivor and the seam
+  M5 names. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -288,18 +318,31 @@ New arm: tools/roles/render_agents.py · covers AC5 · its self-test renders `--
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring the edges of TOOL-dBoundRoles-43, TOOL-dBoundRoles-44, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
 - rev-3 · 2026-11-22 · S2 · §7 · §10 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/hooks/scratch-guard.js` in Files touched trips its guard; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up (DERIVED: baseline line 2089 less HEAD line 691) with its behaviour unchanged, so the cites re-point at HEAD, `checkHandoffSpawn` now at `tools/hooks/agent-cap.js@935a910d:691-750`; nothing else moved.
 - rev-4 · 2026-11-22 · §2 · §9 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; each figure the re-ground wrote carries a pin on its line; nothing else moved.
+- rev-5 · 2026-11-22 · §1 · S1 S2 S3 S4 S5 S7 · §3 · §4 · §6 · AC4 · §8 · §10 · re-grounded at HEAD
+  `a3efb1d50` by `2026-11-22-prompt-TOOL-dBoundRoles-5-reground-j-brief`. Every code citation re-pointed
+  to a symbol or a blob-pinned line, the cited records pinned too. S5's `handoff.py` read moves from an
+  in-process `resolve` to `read_policy_setting` (F5), checked against TOOL-dBoundRoles-21's spec, and
+  its hooks locate `readPolicy` through `resolvePolicyHelper`, the seam scratch-guard already reads; the
+  three catalogue rows are cited as landed. S1 and S3 export their functions, which §6 runs, and AC4
+  observes rule 6's refusal through the hook's stdin, `checkHandoffSpawn` being unexported. S2 names
+  `main`'s `SubagentStart` branch and the matcher's two readers. §6 names the landed-revision read its
+  fixtures commit for. Rule 6 itself is claimed only as today's check, which TOOL-dBoundRoles-3, -6 and
+  -17 change before this unit, read against their specs.
 
 ## 10. Reuse audit
 
 The seams extended are the write gate's hook `tools/hooks/scratch-guard.js` (its `main` dispatch,
-`:1529-1611`, and its fragment's matcher), the spawn guard's rule 6 (`checkHandoffSpawn`,
-`tools/hooks/agent-cap.js@935a910d:691-750`), and the stand-in render (`tools/roles/handoff.py:1034-1048`,
-`load_stand_in_waivers` at `roles_lib.py:488`). the probe `reuse_lookup.py` over the phrase "read a policy key value to gate a spawn or a read" ranked `read_conf_key`, `readConfKey` and `load_policy`;
+`tools/hooks/scratch-guard.js#main`, and its fragment's matcher), the spawn guard's rule 6
+(`checkHandoffSpawn`, `tools/hooks/agent-cap.js@935a910d:691-750`), the hooks' policy locator
+(`tools/hooks/agent-cap.js#resolvePolicyHelper`), the roles kit's policy runner (TOOL-dBoundRoles-21
+S1's `read_policy_setting`), and the stand-in render (`tools/roles/handoff.py@c6d87bbb:1488-1510`,
+`tools/roles/roles_lib.py#load_stand_in_waivers`). the probe `reuse_lookup.py` over the phrase "read a policy key value to gate a spawn or a read" ranked `read_conf_key`, `readConfKey` and `load_policy`;
 the first two read `.memory-tree.conf` and the third the roles kit's house file, and none reads a
 `.governance` key, so the reader is dGroundRules' and no existing seam in this tree fits for it. For
-reads, no hook sees `Read`, `Grep` or `Glob` at base (the fragment's matcher is
-`Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit`), which scout B states and source confirms; the
-matcher is the seam this unit opens. Scout B's row agreed with source; its stand-in reference
-`:1034-1041` covers the waiver check, and the tail write runs to `:1048`.
+reads, no `PreToolUse` hook sees `Read`, `Grep` or `Glob` at base or at HEAD `a3efb1d50` (the
+fragment's matcher is `Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit`; the one `Read` matcher in
+`.claude/settings.json` is memory-recall's `PostToolUse` hook), which scout B states and source
+confirms; the matcher is the seam this unit opens. Scout B's row agreed with source at base; its
+stand-in reference covered the waiver check, and the tail write runs past it to the file write.
 
 Recall terms used: `python tools/memory-recall/query.py "which policy keys govern driver reads prompt authorship and no-spawn" --terms "driver.reads prompts.author roles.no-spawn stand-in waiver main loop read probes catalogue"`

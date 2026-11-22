@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-9 — the `none` and `review` write classes enforced in the role arm
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 13 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 13 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0174@b2c09e04 whole
 
@@ -24,8 +24,8 @@
 
 The role arm of the write gate grades two of the five write classes today: a role declaring `none` or
 `review` is refused only on spec and product paths, and every other repository write it makes is
-admitted (`tools/hooks/scratch-guard.js:102-103`, "`none`, `review` and `records` are declared in the
-index and read by nothing here"; step 6 returns null at `:1173`). This unit makes the role arm enforce
+admitted (`tools/hooks/scratch-guard.js@0251d34d:103-104`, "`none`, `review` and `records` are declared
+in the index and read by nothing here"; step 6 returns null at `:1511`). This unit makes the role arm enforce
 both: a `none` role writes nothing in the repository, and a `review` role writes only under a build's
 reviews folder, the folder the index's new `classes` map names from the one place it is spelled. It
 closes the second half of gap-orient-09 ("the `none` and `review` write classes are declared but read
@@ -33,25 +33,33 @@ by nothing").
 
 ## 2. Scope (IN)
 
-- **S1** — `WRITE_FOLDERS` moves from `tools/roles/check_roles.py:99` into `tools/roles/roles_lib.py`,
-  beside `WRITES`, with its value unchanged; `check_roles.py` reads `lib.WRITE_FOLDERS` at its one use
-  (R14, `check_roles.py:233`). Observed by AC6.
-  **Readers:** by name: `tools/roles/check_roles.py`, its R14 lookup re-pointed to the library's dict ·
-  by value: `tools/roles/check_roles.py`, whose R14 compares each role's `output` with its class's
-  folder, unchanged in verdict, and `tools/roles/render_agents.py`, which renders S2's map from it.
-- **S2** — `render_roles_index` (`tools/roles/render_agents.py:207`) writes a top-level `classes` key
+- **S1** — One spelling of `WRITE_FOLDERS`. `TOOL-dBoundRoles-2` moved the dict into
+  `tools/roles/roles_lib.py` (`tools/roles/roles_lib.py@5cf7c56f:162-164`), its value unchanged, and left
+  the alias `WRITE_FOLDERS = lib.WRITE_FOLDERS` in `tools/roles/check_roles.py`
+  (`tools/roles/check_roles.py@15b68874:137`); `WRITES` stays in `check_roles.py` (`:129`). This unit
+  retires the alias, and `check_roles.py` reads `lib.WRITE_FOLDERS` at its one use (R14, `:311`), by §8
+  F5. Observed by AC6.
+  **Readers:** by name: `tools/roles/check_roles.py`, its alias line and its R14 lookup re-pointed to the
+  library's dict · by value: `tools/roles/check_roles.py`, whose R14 compares each role's `output` with
+  its class's folder, unchanged in verdict; `render_role_fields`
+  (`tools/roles/roles_lib.py#render_role_fields`), whose rendered ceiling names the folder, unchanged;
+  `derive_allowance`, which `TOOL-dBoundRoles-3` S3 adds to the library reading the same dict, checked
+  against that spec; and `tools/roles/render_agents.py`, which renders S2's map from it.
+- **S2** — `render_roles_index` (`tools/roles/render_agents.py#render_roles_index`) writes a top-level `classes` key
   into `.claude/roles.json`: one entry per `WRITE_FOLDERS` key, its value the folder spelled exactly as
   the dict spells it, the `{{MEMORY_ROOT}}` token and the `<slug>` placeholder kept. This is shared
   interface I23; the index's other keys are unchanged. Observed by AC5.
-- **S3** — `loadRoleIndex` (`scratch-guard.js:952`) grades `classes` when present, an object whose every
-  value is a string, and returns it as `classes`, null when absent; any other shape is `broken`, as a
-  malformed role `gates` is today (`:977-979`). Observed by AC5.
+- **S3** — `loadRoleIndex` (`tools/hooks/scratch-guard.js#loadRoleIndex`) grades `classes` when
+  present, an object whose every value is a string, and returns it as `classes`, null when absent, as it
+  returns the top-level `gates` and `effort`; any other shape is `broken`, as a malformed role `gates` is
+  today (`tools/hooks/scratch-guard.js@0251d34d:1163-1165`). Observed by AC5.
 - **S4** — `matchWriteClass(rel, cls, index, memRoot)` in `scratch-guard.js`: whether a repo-relative
   target lies in class `cls`'s folder as the index's `classes` spells it, with `{{MEMORY_ROOT}}`
   substituted by the conf's `MEMORY_ROOT` normalised as `checkUnarmed` normalises it, `<slug>` matching
   exactly one path segment, and a trailing `/` meaning the folder and everything under it. The hook
   carries no second literal of a class folder. Observed by AC2 and AC3.
-- **S5** — Step 6b of `checkRouted`'s one evaluation order (`scratch-guard.js:1113`): a target that is
+- **S5** — Step 6b of `checkRouted`'s one evaluation order
+  (`tools/hooks/scratch-guard.js@0251d34d:1404-1448`): a target that is
   neither a product nor a spec path, written by a payload whose `agent_type` names an `agent`-true role
   of the index, reads that role's `writes`. `none` refuses. `review` admits only a target
   `matchWriteClass(rel, "review", …)` places, and refuses every other. Every other class reads as
@@ -67,10 +75,11 @@ by nothing").
   and a remedy with its actor: the driver, which routes the write to a role whose class covers it, or,
   for a review report under the harness's default `reviews/`, the caller, which passes `reviewDir`
   under `<MEMORY_ROOT>/builds/<slug>/reviews/`. Observed by AC2.
-- **S8** — The hook's header (`scratch-guard.js:91-104`) and the role-arm section of
-  `tools/hooks/README.md` (`:369`) state the four graded classes and that `records` alone is declared
-  and read by nothing here; the user page `help/roles.md`, section "What the hooks refuse" (`:103`),
-  gains the bullet for a `none` role's write and a `review` role's write outside a reviews folder.
+- **S8** — The hook's header (`tools/hooks/scratch-guard.js@0251d34d:92-104`) and the role-arm
+  paragraph of `tools/hooks/README.md` (`tools/hooks/README.md@d545b855:467`, its ceiling sentence on the
+  three classes at `:494-496`) state the four graded classes and that `records` alone is declared and
+  read by nothing here; the user page `help/roles.md`, section "What the hooks refuse"
+  (`help/roles.md@50d4a1c0:201`), gains the bullet for a `none` role's write and a `review` role's write outside a reviews folder.
   Observed by AC8.
 
 ## 3. Non-goals (OUT)
@@ -86,8 +95,10 @@ by nothing").
   predicate.
 - Binding a review role to ONE build's reviews folder. That is the work order's `allowance`
   (TOOL-dBoundRoles-3), which narrows a class and never widens it (§8 F1).
-- The spec class's own path literal at step 6 (`scratch-guard.js:1170-1173`). It stays as it is (§8 F3).
-- The review harness's default `reviewDir` of `reviews/` (`tools/workflows/tier2-review.template.js:297`).
+- The spec class's own path literal at step 6 (`tools/hooks/scratch-guard.js@0251d34d:1508-1511`). It
+  stays as it is (§8 F3).
+- The review harness's default `reviewDir` of `reviews/`
+  (`tools/workflows/tier2-review.template.js@ca520b7a:625`).
   A typed synthesizer writing there is refused by S5, and the refusal names the remedy; changing the
   harness default is not this clause.
 
@@ -108,6 +119,7 @@ by nothing").
     "review": "{{MEMORY_ROOT}}/builds/<slug>/reviews/",
     "spec": "{{MEMORY_ROOT}}/builds/<slug>/spec/"
   },
+  "effort": { "…": "…" },
   "gates": { "manifest": "tools/gate-legs.json" },
   "harnesses": ["…"],
   "roles": { "…": "…" }
@@ -115,15 +127,20 @@ by nothing").
 ```
 
 The values are `WRITE_FOLDERS`'s, copied by `render_roles_index` with `json.dumps(…, sort_keys=True)`
-as every other key is (`render_agents.py:216`). The product class's value is the conf key that holds
-its paths, as the dict already spells it, so `matchWriteClass` is never asked about `product`: step 6
-already places a product target through `ROUTED_PATHS` (`scratch-guard.js:1163-1166`).
+as every other key is (`tools/roles/render_agents.py@f7385dcf:279`). The product class's value is the
+conf key that holds its paths, as the dict already spells it, so `matchWriteClass` is never asked about
+`product`: step 6 already places a product target through `ROUTED_PATHS`
+(`tools/hooks/scratch-guard.js@0251d34d:1501-1504`). The per-role keys earlier units add,
+`TOOL-dBoundRoles-1` S6's `layer` and `acts-as` and `TOOL-dBoundRoles-6` S5's `role-sha` among them,
+sit under `roles` and do not meet the top-level `classes`, checked against those specs.
 
 ### Step 6b
 
 At base, step 6 places a target as product (a `ROUTED_PATHS` entry matched) or spec (under
-`<MEMORY_ROOT>/builds/<seg>/spec/`) and returns null for anything else (`:1173`). Step 6b replaces that
-null for a typed role only:
+`<MEMORY_ROOT>/builds/<seg>/spec/`) and returns null for anything else
+(`tools/hooks/scratch-guard.js@0251d34d:1511`). HEAD keeps that, with step 3a's policy-file arm before
+it and step 10's red-fix lane on product refusals only. Step 6b replaces that null for a typed role
+only:
 
 ```
 6b. neither product nor spec:
@@ -151,19 +168,23 @@ Minted: the `classes` index key; `matchWriteClass`, `checkRoleClass`; step 6b of
 fixture plants of §7's arm (`none-other`, `review-in`, `review-out`, `review-default-dir`,
 `review-mem-root`, `review-no-classes`, `spec-role-other`). Each function name is asked of
 `python tools/lexicon/lexicon.py --suggest <name> --as js.function` at the pass. Both new functions
-join `module.exports` beside `checkRoleGate` (`scratch-guard.js:1615`), so TOOL-dBoundRoles-7 and the
-suite import them.
+join `module.exports` beside `checkRoleGate` (`tools/hooks/scratch-guard.js@0251d34d:2118`), so
+TOOL-dBoundRoles-7 and the suite import them.
 
 ### Migration
 
 Additive for every role but the two classes. The index re-renders through `adopt-roles.sh --scaffold`,
 the roles kit's `[[regenerate]]` row; until it does, a `review` role's write outside spec and product
 paths is refused naming the re-render, and a `none` role's is refused regardless, because a `none`
-role needs no map. In this repository the `review` role is `gov-synthesizer`, and the `none` roles are
-the orienter, the researcher, the reuse scout, the two reviewers and the skeptic (`.claude/roles.json`
-at base); none of them writes a repository file in its workflow today: their records are extracted from
-transcripts by the main loop, and their temporary files go under the session scratchpad, outside the
-repository, which step 3 never gates.
+role needs no map. In this repository the `review` role is `gov-synthesizer`. The agent-true `none`
+roles at this unit's build are the orienter, the prompt writer, the researcher, the reuse scout, the
+tester, the merged reviewer and the skeptic, by `TOOL-dBoundRoles-1` §4 "The roster", checked against
+that spec. At HEAD `a3efb1d5` they are the same less the prompt writer and with the two reviewers
+apart (`.claude/roles.json`, blob `c6505c35`), the tester added after base by TOOL-dWitnessedBar-23.
+None of them writes a repository file in its workflow today: each HEAD role file's `tools:` line
+names neither `Write` nor `Edit` (`tools/roles/agents/`, DERIVED by grep), their records are extracted
+from transcripts by the main loop, and their temporary files go under the session scratchpad, outside
+the repository, which step 3 never gates.
 
 ### Rollout
 
@@ -176,10 +197,11 @@ refuses is the classes that declared they write nothing or only review reports.
 - `tools/hooks/scratch-guard.test.sh`
 - `tools/hooks/README.md`
 - `help/roles.md`
-- `tools/roles/roles_lib.py`
 - `tools/roles/check_roles.py`
 - `tools/roles/render_agents.py`
-- `.claude/roles.json` (the render's copy, written by `render_agents.py --write`)
+- `.claude/roles.json` (the render's copy, written by `render_agents.py --write`; a guarded render
+  from `TOOL-dBoundRoles-6` S2, whose commit is admitted when the staged file equals the working-tree
+  render and `render_agents.py --check` exits 0, checked against that spec)
 
 ### Alternatives rejected
 
@@ -196,7 +218,8 @@ refuses is the classes that declared they write nothing or only review reports.
 - perf / scale — one extra read of `.claude/roles.json`, only for a typed agent's write outside spec and
   product paths; the index is a few KB.
 - error / empty / loading states — absent index, broken index and absent `classes` each have a stated
-  verdict (S5); the hook stays fail-closed on a throw (`scratch-guard.js:1544-1550`).
+  verdict (S5); the hook stays fail-closed on a throw
+  (`tools/hooks/scratch-guard.js@0251d34d:2051-2058`).
 - observability — each refusal names target, class, role, its `writes` and the remedy's actor (S7).
 - risks — a typed synthesizer run with the harness's default `reviewDir` is refused; the refusal names
   the remedy, and BUILD-METHOD M8 already requires an explicit `reviewDir`.
@@ -214,8 +237,8 @@ Each criterion runs `checkRouted` through `node -e` over a fixture repository ma
 - **AC1** — When a `Write` to a file `a.md` under the fixture's `memory/builds/x/build` folder
   carries `agent_type` `gov-researcher` (a `none` role), `checkRouted` returns a `deny` naming the
   class `none`; with `agent_type` empty it returns null.
-  Red when: step 6 still returns null for a target in neither class, as `scratch-guard.js:1173` does at
-  base, so the `none` role's write is admitted.
+  Red when: step 6 still returns null for a target in neither class, as
+  `tools/hooks/scratch-guard.js@0251d34d:1511` does at HEAD, so the `none` role's write is admitted.
 - **AC2** — When `agent_type` is `gov-synthesizer` (`review`), a `Write` to a file `r.md` under
   `memory/builds/x/reviews` returns null, one under `memory/builds/x/build` returns a `deny`, and one
   under the fixture root's `reviews` folder, the harness default, returns a `deny` whose text names
@@ -265,15 +288,16 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC7 · the 
   names. (b) needs a binding from the writing agent to its work order, which the hook does not have at
   base and which TOOL-dBoundRoles-7 builds from TOOL-dBoundRoles-3's `allowance`. RESOLVED (agent,
   2026-10-25, delegated): (a), rung 3, the class the spec arm already applies to any build
-  (`scratch-guard.js:1170-1173`); the allowance narrows it per work order. widens: none · relaxes: none
+  (`tools/hooks/scratch-guard.js@0251d34d:1508-1511`); the allowance narrows it per work order. widens: none · relaxes: none
 - **F2 — Where does `WRITE_FOLDERS` live so the renderer and the checker read one copy?** Options: (a)
   `roles_lib.py`, beside `WRITES`, which TOOL-dDeclaredLoop-9 S4 moves there; (b) `render_agents.py`
   imports `check_roles.py`; (c) a second literal in `render_agents.py`. (c) is the defect I23 names; (b)
   makes the renderer import the checker, whose import of the library is the kit's one direction.
   RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, tie-broken by reuse of the library seam
   TOOL-dDeclaredLoop-9 S4 sets. The build run re-grounds on that section; if `WRITES` is still in
-  `check_roles.py` then, `WRITE_FOLDERS` moves alone and the two sit apart until it lands.
-  widens: none · relaxes: none
+  `check_roles.py` then, `WRITE_FOLDERS` moves alone and the two sit apart until it lands. At HEAD
+  `a3efb1d5` that has happened: `TOOL-dBoundRoles-2` moved `WRITE_FOLDERS` alone, and F5 settles the
+  alias it left. widens: none · relaxes: none
 - **F3 — Does the spec class move onto the `classes` map too?** Options: (a) only `review` reads the
   map; the spec literal at step 6 stays; (b) both read the map. (b) puts an index read in front of every
   main-loop spec write and makes the spec arm depend on an index re-render that a hooks-kit update can
@@ -284,6 +308,13 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC7 · the 
   re-render; (b) fall back to a literal. (b) is a second literal, the defect of F2. RESOLVED (agent,
   2026-10-25, delegated): (a), rung 3, deny by default (the charter's `[security]`).
   widens: none · relaxes: none
+- **F5 — `TOOL-dBoundRoles-2` already moved `WRITE_FOLDERS`; what is left of S1?** At HEAD
+  `a3efb1d5` the dict sits in `tools/roles/roles_lib.py` and `tools/roles/check_roles.py` keeps the
+  alias `WRITE_FOLDERS = lib.WRITE_FOLDERS`, so AC6's grep prints two lines. Options: (a) S1 retires
+  the alias and R14 reads `lib.WRITE_FOLDERS`, so AC6 holds as written; (b) S1 is done, the alias
+  stays and S1 is NOT OBSERVED. (b) fails AC6 as written, which veto 1 discards. RESOLVED (agent,
+  2026-11-22, delegated): (a), rung 3, the one survivor; no reader outside `check_roles.py` spells the
+  alias (`git grep -n WRITE_FOLDERS` over `tools/`). widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -293,13 +324,29 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC7 · the 
 - rev-3 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
   `tools/hooks/scratch-guard.js` that §4 Files touched names, by
   `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`; nothing else moved.
+- rev-4 · 2026-11-22 · §1 · S1 · S2 · S3 · S5 · S8 · §3 · §4 · §5 · AC1 · §8 F1 F2 F5 · §10 · re-grounded
+  at HEAD `a3efb1d5` by `2026-11-22-prompt-TOOL-dBoundRoles-48-reground-i-brief`. `WRITE_FOLDERS`
+  already lives in `roles_lib.py` since TOOL-dBoundRoles-2, so S1 retires the alias `check_roles.py`
+  kept (F5), its Readers line gains `render_role_fields` and TOOL-dBoundRoles-3's `derive_allowance`,
+  checked against that spec, and §4 Files touched drops `tools/roles/roles_lib.py`. Every
+  `scratch-guard.js` citation moves to blob `0251d34d`: step 6's null from 1173 to 1511, the evaluation
+  order from 1113 to 1404-1448, `loadRoleIndex`'s gates check from 977-979 to 1163-1165, the exports
+  from 1615 to 2118 and the fail-closed catch from 1544-1550 to 2051-2058; `render_roles_index` moves
+  to its symbol, its `json.dumps` from 216 to 279 of blob `f7385dcf`, and §4's index example gains
+  `effort`. The README role-arm paragraph moves from 369 to 467 of blob `d545b855`, `help/roles.md`'s
+  section from 103 to 201 of blob `50d4a1c0`, the harness default from 297 to 625 of blob `ca520b7a`.
+  §4 Migration's role list follows TOOL-dBoundRoles-1's roster, checked against that spec, adds the
+  tester TOOL-dWitnessedBar-23 landed, and pins that no `none` role carries a write tool; the
+  `.claude/roles.json` commit is checked against TOOL-dBoundRoles-6 S2.
 
 ## 10. Reuse audit
 
 The seam extended is the role arm of `tools/hooks/scratch-guard.js`: `checkRouted`'s step 6
-(`:1169-1178`), `checkRoleWrite` (`:1064-1086`) and `loadRoleIndex` (`:952-989`), with
-`render_roles_index` (`tools/roles/render_agents.py:207-216`) as the index's one writer and
-`WRITE_FOLDERS` (`tools/roles/check_roles.py:99-101`) as the one spelling of each class folder.
+(`tools/hooks/scratch-guard.js@0251d34d:1507-1517`), `checkRoleWrite`
+(`tools/hooks/scratch-guard.js#checkRoleWrite`) and `loadRoleIndex`
+(`tools/hooks/scratch-guard.js#loadRoleIndex`), with `render_roles_index`
+(`tools/roles/render_agents.py#render_roles_index`) as the index's one writer and `WRITE_FOLDERS`
+(`tools/roles/roles_lib.py@5cf7c56f:162-164`) as the one spelling of each class folder.
 `python tools/codebase-map/reuse_lookup.py "refuse a role agent write outside its write class"` ranked
 generic name stems (`write`, `RolesError`, `load_roles`) and named no class matcher, so no existing seam
 fits for the folder match itself; `matchWriteClass` is new and reads the map rather than a literal.

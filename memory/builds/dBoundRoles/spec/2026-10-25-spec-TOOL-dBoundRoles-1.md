@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles
 
-**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0166@83615023 whole
 
@@ -300,6 +300,7 @@ Live at landing on the `roles catalogue` leg; the new agent types reach a sessio
 - `tools/roles/render_agents.py`
 - `tools/roles/workflows.toml`
 - `tools/roles/README.md`
+- `tools/roles/adopt-roles.test.sh` (AC1's arm, its fixture holding `layers.toml`)
 - `tools/playbook/layers.toml`
 - `tools/playbook/check_layers.py` (`check_layer_roles`, the `--list` row line, two plants)
 - `tools/playbook/adopt-playbook.sh` (two plant rows)
@@ -344,13 +345,15 @@ Live at landing on the `roles catalogue` leg; the new agent types reach a sessio
 ## 6. Acceptance criteria
 
 - **AC1** — When `python check_roles.py --root <repo>` runs in the `roles/` of a scratch tool root
-  holding copies of `tools/roles/` and `tools/loop/` side by side, whose `gov-builder.agent.md` carries
-  `layer: layer.nowhere` and whose `gov-skeptic.agent.md` carries `acts-as: helper`, it exits 1 with two
-  R2 lines naming them; over the tree it exits 0.
+  holding copies of `tools/roles/` and `tools/loop/` side by side and of `tools/playbook/layers.toml` at
+  the home `playbook` beside them, whose `gov-builder.agent.md` carries `layer: layer.nowhere` and whose
+  `gov-skeptic.agent.md` carries `acts-as: helper`, it exits 1 with two R2 lines naming them; over the
+  tree it exits 0.
   Red when: `layer` is graded by shape alone, so a tag naming no layer row passes.
   fixture: measured at `a01362eb0`, a copy of `tools/roles/` alone exits 1 on R6, "no loop kit places
   the workflows" (`read_workflow_order` in `tools/roles/roles_lib.py`), and with `tools/loop/` beside it
-  exits 0.
+  exits 0. The playbook register is needed for R2's layer check as the loop kit is for R6: without it
+  the check is §5's note and prints no R2 line for `layer.nowhere` (§8 F11).
 - **AC2** — When `python check_roles.py` runs in `tools/roles/` over the tree, its summary counts 12
   roles at `layer.roles` and one at `layer.runtime`, and `python handoff.py roster` prints a line for
   each of `gov-prompt-writer`, `gov-planner`, `gov-architect` and `gov-reviewer`.
@@ -388,7 +391,7 @@ Live at landing on the `roles catalogue` leg; the new agent types reach a sessio
 
 `roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `playbook render selftest` · `govkit acceptance matrix` · `check-wiring self-test` · `lexicon naming predicates` · `policy fixtures` · `layer dependencies (the core never depends on an expansion)` · `loop item kind` · `loop definition` · `loop factories fixtures` · `loop stage coverage` · `help reference pages` · `instruction render (one renderer of record)` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/roles/adopt-roles.test.sh · covers AC1 · a fixture kit planting a layer tag naming no row and an `acts-as` outside the two values, each one R2 line · none
+New arm: tools/roles/adopt-roles.test.sh · covers AC1 · a fixture kit planting a layer tag naming no row and an `acts-as` outside the two values, each one R2 line, its fixture copying `layers.toml` to the home `playbook` beside the roles and loop kits · none
 New arm: tools/playbook/adopt-playbook.sh · covers AC4 · two rows of its layer-check plant heredoc, `role-on-expansion` and `roles-on-core`, each owing exit 1 and the line naming the role or the core row · none
 New arm: tools/loop/loop_items.py · covers AC6 · two `CASES` rows of its `check --selftest`, `role-layer` owing exit 1 and a refusal naming `layer.distribution`, `role-core` owing exit 0 · none
 New arm: tools/loop/factories.py · covers none · the `role-new` row's argv gains `--layer layer.roles --acts-as item`, staged by dropping either flag, which reds R2 · none
@@ -474,6 +477,14 @@ New arm: tools/loop/factories.py · covers none · the `role-new` row's argv gai
   `none` while the prompt writer's verb is TOOL-dBoundRoles-4's. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3,
   tie-broken by fewer open questions.
   widens: none · relaxes: none
+- **F11 — Where does AC1's scratch, and its arm's fixture, hold the layer register R2 reads?** With no
+  install receipt `resolve_kit_dir` probes for the home `playbook` only inside the kit and beside it
+  (`tools/roles/roles_lib.py@5cf7c56f:349`), and `build_fixture` copies only the loop kit
+  (`tools/roles/adopt-roles.test.sh@70af238b:130`). Options: (a) a copy of `tools/playbook/layers.toml`
+  at the home `playbook` beside the roles and loop kits; (b) another home, which no reader resolves
+  today, so AC1 fails and veto 1 discards it. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the
+  one survivor.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -500,6 +511,10 @@ New arm: tools/loop/factories.py · covers none · the `role-new` row's argv gai
   `loop item kind` among them and four guarded by `tools/workflows/kit.toml`. Claims about `role-schema.toml`, `never` and `return` were checked
   against TOOL-dBoundRoles-2's spec, not HEAD, and the `role.<slot>` members against
   TOOL-dBoundRoles-14, CLOSED at `7a58950fb`.
+- rev-7 · 2026-11-22 · AC1 · §4 · §7 · §8 F11 · by `2026-11-22-prompt-TOOL-dBoundRoles-1-spec-fix-1-brief`,
+  over `2026-11-22-build-TOOL-dBoundRoles-1-1-builder-return`: AC1's scratch and the arm's fixture hold
+  `layers.toml` (F11); Files touched lists the suite, and already named `.claude/roles.json` and
+  `help/reference/kinds.md`; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -17,6 +17,10 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   §8 F7 to F10 are resolved. Unit 2 landed after that re-ground, so verify every claim the spec makes about the role
   file grammar and `render_role` against HEAD before your first write, and hand a claim that no longer holds back as
   a divergence rather than building around it.
+- Rev-7 then folded the first builder's divergence
+  (`build/2026-11-22-build-TOOL-dBoundRoles-1-1-builder-return.md`): AC1's scratch and the suite fixture carry
+  `tools/playbook/layers.toml` at the home `playbook` (§8 F11), and `tools/roles/adopt-roles.test.sh` joined Files
+  touched. Declare `.claude/roles.json` and `help/reference/kinds.md` by `--dispatch` if you write them.
 - Rendering the new and merged agent types changes `.claude/agents/`; the running session cannot spawn a changed
   type until a new session starts, which is expected and not yours to fix.
 

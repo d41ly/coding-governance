@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-24 — the framing checked at render: every anchor a work order points at resolves to a fact it hands
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 19 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 19 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0189@8d7be499 whole
 
@@ -44,15 +44,16 @@ nothing refuses the render instead of reaching an agent that would then go and r
   prefix and any other shape is a malformed anchor. Observed by AC3 and AC4.
 - **S2** — The check, `check_anchors(text, handed)` in `tools/roles/roles_lib.py`: one refusal line per
   anchor span in `text` that is malformed, or well-formed and absent from `handed`, the set of keys
-  the work order hands. Fenced code blocks are stripped before the scan, so an example key inside one
-  is never graded. It returns the lines in first-seen order, each anchor once, and writes nothing.
+  the work order hands. It scans only the lines `read_unfenced_lines` yields, the one fence walker
+  TOOL-dBoundRoles-38 S3 mints in `roles_lib.py`, so an example key inside a fenced block is never graded. It returns the lines in first-seen order, each anchor once, and writes nothing.
   Observed by AC1 and AC4.
-- **S3** — The call at render. `render_handoff` (`tools/roles/handoff.py:312`), as TOOL-dBoundRoles-23
-  leaves it, calls `check_anchors` over the whole `## Task` section it assembled, with `handed` the
-  keys `derive_fact_key` computed for the facts that work order hands (TOOL-dBoundRoles-13), after
-  every block is added and before the marker is hashed. Each refusal line joins the render's
-  `refusals`, so the render raises `RolesError` naming every unresolved anchor and writes no file.
-  Observed by AC2.
+- **S3** — The call at render. `render_handoff` (`tools/roles/handoff.py#render_handoff`), as
+  TOOL-dBoundRoles-23 leaves it, calls `check_anchors` over the whole `## Task` section it assembled,
+  with `handed` the keys `derive_fact_key` computed for the facts that work order hands
+  (TOOL-dBoundRoles-13), after `render_work_order` assembles the section and before the marker is
+  hashed. Its refusal lines raise together as one `RolesError` there, since the render's `refusals`
+  list has already been raised by then (§8 F4), so the render names every unresolved anchor, exits 1
+  and writes no file, as `main` writes only after `render_handoff` returns. Observed by AC2.
 - **S4** — Parity between the writer of a key and the reader of an anchor. Every key
   `derive_fact_key` returns for a fact of each class fully matches `ANCHOR_RE`, so the grammar this
   unit reads and the grammar unit 13 writes cannot drift apart unseen. Observed by AC3.
@@ -96,7 +97,10 @@ The predicate was run over the real tree first. Over the 1297 tracked files unde
 `(blob|record|cmd):<non-space>` matched 4 lines: three are the prose `record:**` and one is this
 build's brief spelling the I13 grammar. Restricted to backticked spans, the only hits are the brief's
 three grammar spans, and the brief is not a rendered work order. So the backticked form has no false
-red on today's corpus, and the unbackticked form would have three.
+red on today's corpus, and the unbackticked form would have three. Re-run at `a3efb1d50` (PINNED) over
+3951 tracked files under that glob, the backticked form matches only the grammar spans of two spec
+briefs, this build's and `TOOL-dFurnishedOrders-1`'s, and none of the 1623 files (at a3efb1d50) holding a rendered
+handoff's marker line; the unbackticked form matches four prose lines beside them.
 
 ```
 ANCHOR_RE   = `(blob|record|cmd):[^`]*`                 the span, prefix-detected
@@ -117,9 +121,10 @@ def check_anchors(text, handed):
     'anchor `<span>` — resolves to no fact this work order hands'. [] when every anchor resolves."""
 ```
 
-`render_handoff` already collects refusals and raises them together (`handoff.py:329-409`), and a
-refusal leaves no file behind. The anchor lines join that list, so an author sees every bad anchor in
-one run, beside any key that refused for another reason.
+`render_handoff` already collects refusals and raises them together
+(`tools/roles/handoff.py@c6d87bbb:592-674`), and a refusal leaves no file behind. That list is raised
+before the task section is assembled, so the anchor lines raise as a second list in the same function,
+after assembly (§8 F4): an author sees every bad anchor in one run, once every key has resolved.
 
 Why the whole `## Task` section and not a framing block alone: the framing's block name is
 TOOL-dBoundRoles-4's and its position TOOL-dBoundRoles-23's, and a check keyed to one block's name
@@ -143,8 +148,8 @@ Minted: `ANCHOR_RE`, `check_anchors` (each asked of `python tools/lexicon/lexico
 
 ### Migration
 
-None. No rendered handoff at base carries an anchor span (the measurement above), so the first render
-after landing refuses nothing that rendered before.
+None. No rendered handoff at base carries an anchor span, nor any at `a3efb1d50` (the measurement
+above), so the first render after landing refuses nothing that rendered before.
 
 ### Rollout
 
@@ -160,7 +165,8 @@ Live at landing: the check runs inside every `render_handoff` call.
 ### Alternatives rejected
 
 - **An anchor in its own token syntax**, such as `{{fact:<key>}}`. `render_role` refuses every
-  `{{...}}` token but `{{MEMORY_ROOT}}` in a role text (`roles_lib.py:586-590`), and a second token
+  `{{...}}` token but `{{MEMORY_ROOT}}` in a role text (`tools/roles/roles_lib.py@5cf7c56f:1042-1046`),
+  and a second token
   grammar would be a second way to spell a key the executor already writes.
 - **Checking only the prompt writer's framing block.** It depends on a block name two other units own,
   and passes an anchor placed one block over.
@@ -179,8 +185,9 @@ Live at landing: the check runs inside every `render_handoff` call.
   so the scan strips fenced blocks first, and AC4 pins that a fenced span is not graded.
 - testing — the probes of §6, and the arm of §7 observed RED then GREEN by the main loop at the close.
 - migration — none, per §4.
-- user docs — `help/roles.md` gains one sentence under "How a task reaches an agent" that the render
-  refuses an anchor to a fact the work order does not hand.
+- user docs — `tools/roles/README.md` (S5); the sentence in `help/roles.md`, under "How a task reaches
+  an agent", that the render refuses an anchor to a fact the work order does not hand, is
+  TOOL-dBoundRoles-44's, per §3's edge.
 
 ## 6. Acceptance criteria
 
@@ -239,6 +246,17 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC4 · the planted an
   RESOLVED (agent, 2026-10-25, delegated): (a), rung 1, the brief's rule for parent sections; the build
   run re-grounds on `derive_fact_key` and stops this unit if it is still absent then. options: (a) >
   (b) · pick: (a) · admitted-by: principle.p18 · widens: none · relaxes: none
+- **F4 — The render's refusals are raised before `## Task` is assembled: how do the anchor lines
+  refuse?** At HEAD, as at base, `render_handoff` raises its `refusals` list
+  (`tools/roles/handoff.py@c6d87bbb:673-674`) before `render_work_order` assembles the task
+  (`tools/roles/handoff.py@c6d87bbb:710`), so no line computed over the assembled section can join it.
+  Options: (a) the anchor lines raise as one `RolesError` of their own once the section is assembled,
+  before the marker is hashed; (b) move the refusals raise after the assembly, so both join one list;
+  (c) run the check over the blocks before assembly. (b) assembles a task while a required key has
+  refused, which every refusal prevents today, and moves the raise point every refusal of the render
+  shares; (c) scans blocks rather than the section F1 picked. RESOLVED (agent, 2026-11-22, delegated):
+  (a), the most feature-rich option no veto refuses. widens: none · relaxes: §4's "beside any key that
+  refused for another reason", since a key refusal now raises first
 
 ## 9. Revision log
 
@@ -248,17 +266,29 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC4 · the planted an
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the **consumes-from** bullet mirroring TOOL-dBoundRoles-45's hands-off, a promotion of the round-1 audit of units 37 to 44; nothing else moved.
 - rev-4 · 2026-11-22 · §3 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/roles/roles_lib.py` in Files touched trips its guard; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up (DERIVED: baseline line 2089 less HEAD line 691) with its behaviour unchanged, so the cites re-point at HEAD, the task-sha compare now at `tools/hooks/agent-cap.js@935a910d:737-738`; nothing else moved.
 - rev-5 · 2026-11-22 · §3 · §9 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; each figure the re-ground wrote carries a pin on its line; nothing else moved.
+- rev-6 · 2026-11-22 · S2 · S3 · §4 · §5 · §8 F4 · §10 · re-grounded at `a3efb1d50` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-4-reground-k-brief`. S3: `render_handoff` raises its `refusals`
+  before `render_work_order` assembles `## Task`, at HEAD as at base, so the anchor lines raise as their
+  own list after assembly (F4), and a refusal exits 1 before `main` writes. S2 scans through
+  `read_unfenced_lines`, TOOL-dBoundRoles-38 S3's one fence walker, checked against that spec, which
+  also fences every handed block; TOOL-dBoundRoles-45's unfenced typed input keeps AC2 as written. §4
+  re-measures the anchor predicate at HEAD with its pin, and the conclusion holds. §5's help page
+  sentence is TOOL-dBoundRoles-44's, per §3's edge. The edges to units 13 and 23 were checked against
+  their specs and hold; `tools/hooks/agent-cap.js` is still blob `935a910d`; every other moved
+  citation re-pointed to a symbol or a pinned line.
 
 ## 10. Reuse audit
 
 No existing seam checks anchors. `python tools/codebase-map/reuse_lookup.py "refuse a rendered reference
 that names no handed value"` ranked generic stems (`build_reference_index`, `CensusRefused`) and named
 nothing in the roles kit, the answer scout B also recorded from `git grep -i anchor -- tools/roles
-tools/hooks/agent-cap.js`. The nearest shape is `render_shape_line` (`tools/roles/handoff.py:698-709`),
+tools/hooks/agent-cap.js`. The nearest shape is `render_shape_line` (`tools/roles/handoff.py#render_shape_line`),
 which refuses a placeholder its field map does not hold; this unit copies that refuse-the-unheld rule
-and extends `render_handoff`'s existing refusal list (`handoff.py:329-409`) rather than adding a pass.
-The recall probe returned this build's brief row, scout B's rows for units 13 and 24 and the build order
-line; none disagreed with source. Scout B cited `render_handoff` at `:312-416`; at `4283cb44` it spans
-`:312-423`, the marker at `:420-421`.
+and raises beside `render_handoff`'s existing refusal list (`tools/roles/handoff.py@c6d87bbb:592-674`),
+in the same function, rather than adding a pass (§8 F4). The recall probe returned this build's brief
+row, scout B's rows for units 13 and 24 and the build order line; none disagreed with source. Scout B
+cited `render_handoff` at `tools/roles/handoff.py@b6d461b8:312-416`; that blob, which `4283cb44` and
+base hold alike, spans it at `tools/roles/handoff.py@b6d461b8:312-423`, the marker at
+`tools/roles/handoff.py@b6d461b8:420-421`.
 
 Recall terms used: `python tools/memory-recall/query.py "how is the prompt writer framing checked against the facts a work order hands" --terms "prompt writer framing anchor fact key handed content work order render_handoff trust witnessed"`

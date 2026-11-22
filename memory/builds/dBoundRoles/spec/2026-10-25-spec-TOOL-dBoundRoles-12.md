@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-12 — the orientation scout's placement return through the typed channel, recorded and checked by the driver
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0177@4a09db23 whole
 
@@ -39,22 +39,27 @@ return, then run `placement.check`.
 - **S1** — The orientation scout's return template. `gov-orienter`'s `return` field (shared interface
   I1, the field TOOL-dBoundRoles-2 adds) holds the placement block's four keys, `disposition`,
   `reason`, `evidence` and `observations`, spelled exactly as TOOL-dPlacedRequest-4 S3 and S4 spell
-  them (I20), beside the card body the role already returns. The grammar is that unit's; this unit
-  writes no key of its own. Observed by AC4.
+  them (I20). At HEAD it already does: TOOL-dBoundRoles-2 typed the field TOOL-dPlacedRequest-4 gave it
+  at `c64f7c3e6`, `outcome:oriented|placed` with the card the `oriented` half and the four keys,
+  optional, the `placed` half (`tools/roles/agents/gov-orienter.agent.md@fcf461e7:14`). The grammar is
+  that unit's; this unit writes no key and changes no field. Observed by AC4.
 - **S2** — The typed channel at the record. `place --return <file>` in `tools/loop/placement.py`
   (TOOL-dPlacedRequest-4 S1) runs `handoff.py check-return-file --role gov-orienter --file <file>` as a
   subprocess before it reads a key, `handoff.py` found through the inline `resolve_kit_dir("roles",
   "handoff.py", here)` (§8 F4). The verb, minted here in `tools/roles/handoff.py`, prints each line of
   `validate_return(role, text)` (I16, TOOL-dBoundRoles-5) and of S3's check and exits 1, or exits 0
   printing nothing. A refusal prints each line under `placement: refused — return —`, exits 1 and
-  appends no block. Observed by AC1.
+  appends no block. `read_scout_return` (`tools/loop/placement.py#read_scout_return`), which refuses
+  every line outside `RETURN_KEYS` at HEAD, admits the typed channel's two fields that are no block
+  key once the verb has graded them: one `outcome` line, refused unless it reads `placed`, and one
+  `answers` line (§8 F5). Observed by AC1.
 - **S3** — The return answers an orientation work order. The work order the return answers, as
   `validate_return` reads its `answers` value (I14), carries a marker whose `role` is the verb's
   `--role`, read by the verb through `MARKER_RE` (I5). A return answering any other role's work
   order, or one whose answered file carries no marker, is refused naming the role it found, so no
   other role and no driver-typed text becomes an `agent` placement. Observed by AC2.
-- **S4** — The driver's step. The `/build` Skill's "Stage 1 — orient" (`tools/roles/SKILL.template.md:34-36`,
-  rendered at `.claude/skills/build/SKILL.md`) states it: when the orientation scout returned a
+- **S4** — The driver's step. The `/build` Skill's "Stage 1 — orient"
+  (`tools/roles/SKILL.template.md@43c0de5f:40-42`, rendered at `.claude/skills/build/SKILL.md`) states it: when the orientation scout returned a
   placement, the driver writes the return to the request's file, runs `placement.py place --request
   <content key> --return <file>`, then `placement.py check --request <content key>`, and acts only on a
   check that passes; a refusal of either routes back to orientation, never to the driver's own
@@ -66,10 +71,14 @@ return, then run `placement.check`.
 
 - The disposition set, the record block, `place`, `check`, the `placement` and `placement.check` keys
   and their values: TOOL-dPlacedRequest-4's and TOOL-dDeclaredLoop-16's, called here.
-- The entry items and their bodies: TOOL-dPlacedRequest-3's rows. `item.entry.place`'s body is `place`,
-  so the binding of S2 reaches the loop's route with no row changed.
-- The unattended prompt path: TOOL-dPlacedRequest-4 S9's `check_prompt_placement` already places and
-  checks there through the same `place`, so S2 covers it.
+- The entry items and their bodies: TOOL-dPlacedRequest-3's rows. `item.entry.place`'s actor is
+  `role:gov-orienter` and its witness `placement.py check` (`tools/loop/loop.toml@9c303e80:1270-1279`);
+  the scout's return reaches the record only through `place --return`, so the binding of S2 reaches the
+  loop's route with no row changed.
+- The unattended prompt path: TOOL-dPlacedRequest-4 S9's `check_prompt_placement`
+  (`tools/unattended/unattended.sh@7548da57:6458-6491`) runs only `placement.py check`, over a block a
+  `place` already wrote, so it is bound wherever that block's `place --return` ran; this unit adds no
+  step there.
 - The retry of a refused direct-spawn return under `roles.retries`: TOOL-dBoundRoles-5's SubagentStop
   check. The driver re-spawns the scout; this unit retries nothing.
 - `validate_return`, `answers` and the marker grammar: TOOL-dBoundRoles-5's, -17's and -17's; this unit
@@ -80,16 +89,17 @@ return, then run `placement.check`.
 ### Edges
 
 - **consumes-from** `TOOL-dBoundRoles-5` — `validate_return`, the one checker of a role's return against its `return` template; without it the placement record rests on untyped text
-- **consumes-from** external — TOOL-dPlacedRequest-4's `tools/loop/placement.py` with `place --return` and `check`, and its record block, specced and unbuilt at base `4ed9e567`
+- **consumes-from** external — TOOL-dPlacedRequest-4's `tools/loop/placement.py` with `place --return` and `check`, and its record block, unbuilt at base `4ed9e567` and landed at `c64f7c3e6`
 - **hands-off** `TOOL-dBoundRoles-43` — the orientation return and the driver's placement step, which unit 43 spells in full and binds to the scout's transcript (ids 14 and 64 of the round-1 spec audit)
 
 ## 4. Design
 
 ### Where the binding lives
 
-Every route that records an `agent` placement goes through `placement.py place --return`: the loop's
-`item.entry.place` names it as its body (TOOL-dPlacedRequest-3 §4, the item table), and the unattended
-prompt path places through it (TOOL-dPlacedRequest-4 S9). Putting the check inside `place` is one call
+Every route that records an `agent` placement goes through `placement.py place --return`, which
+`write_placement` (`tools/loop/placement.py#write_placement`) takes as the placement under
+`agent-places`: the loop's `item.entry.place` names the orienter as its actor, and the unattended
+driver's `check_prompt_placement` checks a block a `place` already wrote. Putting the check inside `place` is one call
 site for every route, the charter's one-core rule, where a wrapper verb in the roles kit would leave
 the item body and the prompt path unbound.
 
@@ -103,11 +113,13 @@ place --request <key> --return <file>
                                -> "answers a <role> work order"
      exit 1                     -> "placement: refused — return — <line>" each; exit 1
      any exit but 0 or 1        -> refused, naming the exit and the verb's first stderr line
-  3. TOOL-dPlacedRequest-4 S1: read the block, resolve the disposition, append, as specced
+  3. read_scout_return, its outcome (placed) and answers lines admitted (§8 F5),
+     then add_placement: resolve the disposition, append, as TOOL-dPlacedRequest-4 landed it
 ```
 
 The loop kit finds the roles kit the way every kit finds a sibling, `resolve_kit_dir`
-(`tools/roles/roles_lib.py:96-133`, carried inline in each kit by the `resolve_kit_dir` parity row),
+(`tools/roles/roles_lib.py#resolve_kit_dir`, carried inline in each kit by the `resolve_kit_dir` parity
+row, the loop kit's copy `tools/loop/loop_lib.py#resolve_kit_dir`),
 and runs its verb as a subprocess, since a kit imports no sibling kit (PLAY-dOrderedCharter-7 §4 "The
 policy reads"; TOOL-dDeclaredLoop-12 S4), the way TOOL-dWitnessedBar-3's `judge` reaches its siblings.
 Where the roles kit is not installed, `place --return` refuses naming the three places it looked: an
@@ -123,10 +135,10 @@ rather than a claimed one, the [trust] classes' distinction
 
 ### The driver's step
 
-At base the `/build` Skill's Stage 1 says `/session-kickoff` ran orientation and nothing runs there
-(`tools/roles/SKILL.template.md:34-36`). Kickoff's engine is not the place: it measures 18310 bytes
-against its 18432-byte leg (`kickoff engine size <=18KiB`), PINNED at `4283cb44`, and the scout's
-spawn is not a kickoff step today. Stage 1 gains three sentences: the two commands of S4 in order, that
+At base and at HEAD the `/build` Skill's Stage 1 says `/session-kickoff` ran orientation and nothing
+runs there (`tools/roles/SKILL.template.md@43c0de5f:40-42`). Kickoff's engine is not the place: it
+measures 18310 bytes against its 18432-byte leg (`kickoff engine size <=18KiB`), PINNED at `4283cb44`,
+and 18354 bytes, PINNED at `a3efb1d50`, and the scout's spawn is not a kickoff step today. Stage 1 gains three sentences: the two commands of S4 in order, that
 the driver acts on a passing check only, and that a refusal of either routes back to the scout. The
 Skill is rendered by the roles adopter, so the rendered copy is the template's.
 
@@ -140,9 +152,9 @@ refuses `validate`, so the name is unit 5's `check-return` read from a file.
 
 ### Migration
 
-None at base: no placement record exists, since `tools/loop/` is unbuilt (scout B). A record written
-before this unit lands, by TOOL-dPlacedRequest-4's own build, stays as written; only new `place` calls
-are checked.
+None. A placement record is node-local, under the git common dir's `requests` folder, and
+TOOL-dPlacedRequest-4 has written them since `c64f7c3e6`; a block written before this unit lands stays
+as written, and only new `place` calls are checked.
 
 ### Rollout
 
@@ -150,11 +162,8 @@ Live at landing on every `place --return`.
 
 ### Files touched (estimate)
 
-- `tools/loop/placement.py` (the binding in `place`, the two plants)
+- `tools/loop/placement.py` (the binding in `place`, `read_scout_return`'s two lines, the two plants)
 - `tools/roles/handoff.py` (the verb `check-return-file`)
-- `tools/roles/agents/gov-orienter.agent.md` (its `return` field's four keys)
-- `.claude/agents/gov-orienter.md` (its render, by `tools/roles/render_agents.py`)
-- `.claude/roles.json` (re-rendered beside it)
 - `tools/roles/SKILL.template.md` (Stage 1)
 - `.claude/skills/build/SKILL.md` (its render, by `tools/roles/adopt-roles.sh`)
 - `help/roles.md`
@@ -164,8 +173,8 @@ Live at landing on every `place --return`.
 - **A wrapper verb in the roles kit**, `handoff.py` chaining validate, place and check. The loop's item
   body and the unattended prompt path call `place` directly and would stay unbound; `check-return-file`
   only checks, and `place` runs it.
-- **The step in kickoff's engine.** It has 122 bytes of headroom under its leg and does not spawn the
-  scout today.
+- **The step in kickoff's engine.** It has 78 bytes of headroom under its leg, PINNED at `a3efb1d50`,
+  and does not spawn the scout today.
 - **Trusting a `role:` line in the return.** It is a claim the return makes about itself.
 
 ## 5. Production-readiness checklist
@@ -187,9 +196,9 @@ Live at landing on every `place --return`.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python placement.py --fixture --plant return-untyped` runs, its orientation return
-  lacking `reason`, the plant's `place` exits 1 printing `placement: refused — return —` with the line
-  `validate_return` gives for `reason`, and the request's `.placement` file holds no block; with
-  `reason` restored the same plant appends one block and exits 0.
+  lacking `outcome`, the plant's `place` exits 1 printing `placement: refused — return —` with the line
+  `validate_return` gives for `outcome`, and the request's `.placement` file holds no block; with
+  `outcome: placed` restored the same plant appends one block and exits 0.
   Red when: `place` reads the block without running `check-return-file`, so the block is appended.
 - **AC2** — When `python placement.py --fixture --plant return-wrong-role` runs, its return valid and
   answering a work order whose marker names `role=gov-researcher`, `place` exits 1 naming
@@ -200,10 +209,11 @@ Live at landing on every `place --return`.
   `.claude/skills/build/SKILL.md` carries the same lines.
   Red when: Stage 1 still reads that nothing runs there, so no driver step records or checks the
   scout's return.
-- **AC4** — When `validate_return("gov-orienter", text)` runs over today's card-only return, it
-  refuses naming `disposition`; over a return carrying the card body and all four keys of
-  `gov-orienter.agent.md`'s `return` field it returns no line.
-  Red when: the template lacks a key, so a return without it validates.
+- **AC4** — When `validate_return("gov-orienter", text)` runs over a card-only return carrying no
+  `outcome` line, the shape before TOOL-dBoundRoles-2, it refuses naming `outcome`; over a return
+  carrying `outcome: placed` and all four keys of `gov-orienter.agent.md`'s `return` field it returns
+  no line.
+  Red when: the template lacks a key or its closed `outcome`, so a return without it validates.
 - **AC5** — When `grep -n "placement.py" help/roles.md` runs, it names the step S5 adds.
   Red when: the page does not say the driver records and checks the scout's return.
 
@@ -246,6 +256,18 @@ New arm: tools/loop/placement.py · covers AC1 AC2 · the `return-untyped` and `
   RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, PLAY-dOrderedCharter-7 §4 and
   TOOL-dDeclaredLoop-12 S4. options: (a) > (c) > (b) · pick: (a) · admitted-by: principle.p18 ·
   widens: none · relaxes: none
+- **F5 — At HEAD no return file passes both readers: what does `place` admit?** The orienter's typed
+  template requires a closed `outcome` and holds the four keys optional, and `read_scout_return`
+  refuses every line outside `RETURN_KEYS`, `outcome` and `answers` among them
+  (`tools/loop/placement.py@064faf67:146-147`). Options: (a) `read_scout_return` admits one `outcome`
+  line, refused unless `placed`, and one `answers` line, the two fields `check-return-file` has graded
+  before `place` reads a key; (b) `place` validates a copy of the file with an `outcome: placed` line it
+  prepends itself; (c) both readers as landed; (d) `place` reads the block from the validated return
+  object in place of `read_scout_return`. (b) grades text the scout did not write, so a return lacking
+  `outcome` passes, the break AC1 names; (c) admits no return at all, so AC1's restored case cannot
+  exit 0; (d) replaces TOOL-dPlacedRequest-4's reader, the record grammar §3 leaves to that unit.
+  RESOLVED (agent, 2026-11-22, delegated): (a), the one option no veto refuses. widens: none ·
+  relaxes: §3's "`place` ... called here", since `place` now admits two lines it refused
 
 ## 9. Revision log
 
@@ -258,13 +280,27 @@ New arm: tools/loop/placement.py · covers AC1 AC2 · the `return-untyped` and `
   `handoff.py check-return-file` as a subprocess and imports no roles module.
 - rev-4 · 2026-11-22 · §4 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/roles/handoff.py` in Files touched trips its guard; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up (DERIVED: baseline line 2089 less HEAD line 691) with its behaviour unchanged, so the cites re-point at HEAD, the task-sha compare now at `tools/hooks/agent-cap.js@935a910d:737-738`; nothing else moved.
 - rev-5 · 2026-11-22 · §4 · §9 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; each figure the re-ground wrote carries a pin on its line; nothing else moved.
+- rev-6 · 2026-11-22 · S1 · S2 · S4 · §3 · §4 · AC1 · AC4 · §8 F5 · §10 · re-grounded at `a3efb1d50` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-4-reground-k-brief`. TOOL-dPlacedRequest-4 landed at `c64f7c3e6`,
+  and TOOL-dBoundRoles-2 typed the orienter's `return` with the four keys optional under
+  `outcome:oriented|placed`, so S1 changes no field, the orienter's file and its two renders leave Files
+  touched, and AC4's refused case is a return with no `outcome`. `place`'s `read_scout_return` refuses
+  every line outside `RETURN_KEYS`, so S2 admits the `outcome` and `answers` lines (F5), and AC1's plant
+  lacks `outcome`, which `validate_return` alone refuses, where `add_placement` already refuses a
+  missing `reason`. §3 and §4: `item.entry.place`'s actor is the orienter, and `check_prompt_placement`
+  only checks. The kickoff engine's headroom is re-measured with its pin. `validate_return`, `answers`
+  and `MARKER_RE` were checked against TOOL-dBoundRoles-5's and -17's specs and hold;
+  `tools/hooks/agent-cap.js` is still blob `935a910d`; every other moved citation re-pointed to a symbol
+  or a pinned line.
 
 ## 10. Reuse audit
 
-The seam extended is TOOL-dPlacedRequest-4's `place` verb in `tools/loop/placement.py`, specced and
-DEFERRED, with TOOL-dBoundRoles-5's `validate_return` as the checker it calls; at base the only live
-seams are the orienter's prose `returns:` line (`tools/roles/agents/gov-orienter.agent.md:11`) and the
-`/build` Skill's empty Stage 1 (`tools/roles/SKILL.template.md:34-36`). `python
+The seam extended is TOOL-dPlacedRequest-4's `place` verb in `tools/loop/placement.py`,
+landed at `c64f7c3e6`, with TOOL-dBoundRoles-5's `validate_return` as the checker it calls; at base the
+only live seams were the orienter's prose `returns:` line
+(`tools/roles/agents/gov-orienter.agent.md@ad13f002:11`), typed at HEAD
+(`tools/roles/agents/gov-orienter.agent.md@fcf461e7:14`), and the `/build` Skill's empty Stage 1
+(`tools/roles/SKILL.template.md@b66d9e67:34-36`, at HEAD `tools/roles/SKILL.template.md@43c0de5f:40-42`). `python
 tools/codebase-map/reuse_lookup.py "validate a role agent return and record the placement disposition"`
 ranked generic record helpers (`records`, `render_record`, `write_record` in `tools/runlog/record.py`)
 and the roles library's `RolesError` and `load_roles`, none a return validator, which matches scout B: no

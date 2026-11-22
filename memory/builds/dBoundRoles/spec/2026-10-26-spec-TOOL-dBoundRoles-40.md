@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-40 — a recorded harness-stage stop replayed against every `SubagentStop` hook a default install registers, red on any output, any block or any record
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -44,8 +44,10 @@ later unit wires on that event is in the population the day it is merged. It rep
   `gov-builder`. A second payload is the same with `stop_hook_active` true. The field set is §4
   "Evidence"'s. Observed by AC1.
 - **S2** — The population, derived. The arm reads the scratch target's `.claude/settings.json` after
-  `TOOL-aOrientedCast-8`'s default apply in `check_roles_install` (`tools/govkit/selftest.py:2767`) and
-  lists every command under `hooks.SubagentStop`, whatever its matcher. A population of zero is red, so
+  `TOOL-aOrientedCast-8`'s default apply in `check_roles_install`
+  (`tools/govkit/selftest.py#check_roles_install`), whose apply wires every landed `*.fragment.json`
+  through govkit's `run_fragment_merges` (`tools/govkit/govkit.py#run_fragment_merges`), and lists
+  every command under `hooks.SubagentStop`, whatever its matcher. A population of zero is red, so
   the arm cannot pass by reading nothing: at landing it holds `TOOL-dBoundRoles-5`'s return check.
   Observed by AC2.
 - **S3** — The replay. Each command runs once per payload with the payload on stdin, the target as its
@@ -77,17 +79,22 @@ later unit wires on that event is in the population the day it is merged. It rep
 
 - The `SubagentStop` stdin carries the `Stop` fields plus `agent_id`, `agent_transcript_path` and
   `agent_type`, under the parent's `session_id`; a block printed on exit 0 continues the run
-  (`memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md:139-150`).
+  (`memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md@0f264e3b:140-150`).
 - A typed harness agent's transcript sits under `subagents/workflows/<run id>/`, its first `user` record
   the harness's computed task. Read on this node on 2026-10-26 from this stage's own transcript,
   `wf_b19dd66d-878/agent-ad1797852e5d7334e.jsonl`, whose `.meta.json` names `gov-spec-writer`.
-- At base `462d20f3`, `.claude/settings.json` registers no `SubagentStop` hook and one `SubagentStart`
-  hook, `tools/hooks/scratch-guard.js`.
+- At base `462d20f3`, and at HEAD `a3efb1d50` alike (`.claude/settings.json@0428723e`),
+  `.claude/settings.json` registers no `SubagentStop` hook and one `SubagentStart` hook,
+  `tools/hooks/scratch-guard.js`.
+- The default install selects `roles` and `settings-merge` among its kits
+  (`tools/govkit/registry.toml@2dbc48e9:38-61`), and `run_fragment_merges` derives its population from
+  the receipt's landed `*.fragment.json` rows, never from a per-kit list, so TOOL-dBoundRoles-5's
+  fragment, shipped by the roles kit's `**` engine rule, is wired with no govkit edit.
 
 ### Why the default install, and why `SubagentStop` alone
 
-`check_roles_install`'s default apply merges every default kit's fragments into one settings file, so
-its population is every hook an adopter receives on the event. A suite inside one kit would see that
+`check_roles_install`'s default apply merges every default kit's fragments into one settings file,
+through `run_fragment_merges`, so its population is every hook an adopter receives on the event. A suite inside one kit would see that
 kit's hooks only. `SubagentStart` is left out because its output is context the runtime hands the new
 agent, which `scratch-guard.js` prints by design for an unrouted session, and because no start hook can
 block a return.
@@ -104,8 +111,9 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 16. Dispatch sorts a tie by id string (`tools/workflows/unattended-build.js:608-613`),
-so `TOOL-dBoundRoles-39` builds before this unit and the arm reads green at its own pass.
+Live at landing, at order 16. Dispatch sorts a tie by id string
+(`tools/workflows/unattended-build.js@9da9556b:692-697`), so `TOOL-dBoundRoles-39` builds before this
+unit and the arm reads green at its own pass.
 
 ### Files touched (estimate)
 
@@ -177,11 +185,20 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the recorded harness-
   (HIGH, item H1, shared with id 21).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dBoundRoles-50, the minors batch of the round-1 audit of units 37 to 44; nothing else moved.
 - rev-3 · 2026-11-22 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/govkit/selftest.py` in Files touched trips its guard; nothing else moved.
+- rev-4 · 2026-11-22 · S2 · §4 · §10 · re-grounded at HEAD `a3efb1d50` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-5-reground-j-brief`: every code citation re-pointed to a symbol
+  or a blob-pinned line, `check_roles_install` now `tools/govkit/selftest.py#check_roles_install`
+  with the signature the slice calls; S2 and §4 name `run_fragment_merges` as what wires the default
+  install's fragments, and §4 the default kit list holding `roles` and `settings-merge`. That unit 5's
+  fragment is wired by that apply was checked against TOOL-dBoundRoles-5's spec, whose rev-5 §8 F6
+  leaves its wiring to `run_fragment_merges`. The replay, the population and the criteria are
+  unchanged.
 
 ## 10. Reuse audit
 
-The seam is `check_roles_install` (`tools/govkit/selftest.py:2767`), whose default apply already builds a
-target holding every default kit's merged settings, and the recorded payload shape of
+The seam is `check_roles_install` (`tools/govkit/selftest.py#check_roles_install`), whose default
+apply already builds a target holding every default kit's merged settings through
+`tools/govkit/govkit.py#run_fragment_merges`, and the recorded payload shape of
 `TOOL-aWokenSentinel-1-0`. `python tools/codebase-map/reuse_lookup.py "replay a recorded hook payload against every registered hook and fail on output"`
 ranked `fail`, `records`, `read_git_output` and `extract_records`, none a replay over registered hooks,
 so no existing seam fits beyond the install case named.

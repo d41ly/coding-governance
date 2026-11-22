@@ -99,35 +99,35 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 |---|---|---|---|---|---|
 | [TOOL-dBoundRoles-14 — the `role` and `field` tag namespaces, their extractors and the role binding join](spec/2026-10-25-spec-TOOL-dBoundRoles-14.md) | 1 | 2 | CLOSED | rev-7 | 2026-11-22 |
 | [TOOL-dBoundRoles-2 — each role's static instructions as structured fields: the never list with its enforcers, the ceiling and the typed return](spec/2026-10-25-spec-TOOL-dBoundRoles-2.md) | 2 | 2 | CLOSED | rev-5 | 2026-11-22 |
-| [TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles](spec/2026-10-25-spec-TOOL-dBoundRoles-1.md) | 3 | 2 | INPROGRESS | rev-6 | 2026-11-22 |
+| [TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles](spec/2026-10-25-spec-TOOL-dBoundRoles-1.md) | 3 | 2 | INPROGRESS | rev-7 | 2026-11-22 |
 | [TOOL-dBoundRoles-21 — the effort and model keys, `default` reserved, and the gate grant a role field, every reader re-pointed](spec/2026-10-25-spec-TOOL-dBoundRoles-21.md) | 4 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-37 — govkit's roles install case derives the agent types and house overlays it expects from the roster and the seed rows, so no roster change leaves a typed count to red](spec/2026-10-26-spec-TOOL-dBoundRoles-37.md) | 4 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-22 — workflow entries as data: ordered stages, each naming its role, fan, cap, effort and rows, every cap under the agent limit](spec/2026-10-25-spec-TOOL-dBoundRoles-22.md) | 5 | 2 | DEFERRED | rev-6 | 2026-11-22 |
 | [TOOL-dBoundRoles-49 — govkit's default plan derives the seed rows it expects to preview from the plan model and the roles roster, so the third typed roles count cannot red late](spec/2026-10-26-spec-TOOL-dBoundRoles-49.md) | 5 | 2 | DEFERRED | rev-5 | 2026-11-22 |
-| [TOOL-dBoundRoles-16 — the shapes: each workflow entry's kind, checklist, orientation, merge and twin rule, the five kinds as defaults over the stage rows](spec/2026-10-25-spec-TOOL-dBoundRoles-16.md) | 6 | 2 | DEFERRED | rev-5 | 2026-11-22 |
+| [TOOL-dBoundRoles-16 — the shapes: each workflow entry's kind, checklist, orientation, merge and twin rule, the five kinds as defaults over the stage rows](spec/2026-10-25-spec-TOOL-dBoundRoles-16.md) | 6 | 2 | DEFERRED | rev-6 | 2026-11-22 |
 | [TOOL-dBoundRoles-54 — unit 49's overlay check reads its expected side from the roster, one `house/<slot>.md` per role slot, never from the seed rule it is compared with](spec/2026-10-26-spec-TOOL-dBoundRoles-54.md) | 6 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-55 — unit 49's overlay check refuses an empty expected set, and ends where unit 19 moves the house files out of the kit](spec/2026-10-26-spec-TOOL-dBoundRoles-55.md) | 6 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-15 — the role static block carried once per spawn, and its budget over the whole rendered block](spec/2026-10-25-spec-TOOL-dBoundRoles-15.md) | 7 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-17 — every work order's marker carrying `item=`, every return naming the work order it `answers`, today's population seeded](spec/2026-10-25-spec-TOOL-dBoundRoles-17.md) | 8 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-6 — the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn](spec/2026-10-25-spec-TOOL-dBoundRoles-6.md) | 9 | 2 | DEFERRED | rev-7 | 2026-11-22 |
 | [TOOL-dBoundRoles-13 — inputs handed as content, each fact keyed and classed by the executor and re-cut fresh at act launch](spec/2026-10-25-spec-TOOL-dBoundRoles-13.md) | 10 | 2 | DEFERRED | rev-5 | 2026-11-22 |
-| [TOOL-dBoundRoles-3 — the work order rendered per item, hashed into the spawn marker and bound to its act](spec/2026-10-25-spec-TOOL-dBoundRoles-3.md) | 11 | 2 | DEFERRED | rev-6 | 2026-11-22 |
-| [TOOL-dBoundRoles-38 — handed content fenced inside the work order, and every reader of a fact line or a marker line skips what a fence holds](spec/2026-10-26-spec-TOOL-dBoundRoles-38.md) | 11 | 2 | DEFERRED | rev-5 | 2026-11-22 |
-| [TOOL-dBoundRoles-45 — a typed `--input` value is authored text: written unfenced, refused when a line would stand as an executor line, so the anchor check grades it](spec/2026-10-26-spec-TOOL-dBoundRoles-45.md) | 12 | 2 | DEFERRED | rev-4 | 2026-11-22 |
-| [TOOL-dBoundRoles-46 — the spawn guard holds a typed block to the authored-line rule: a fact, marker or `Framed by:` line in `input:question` or `input:diff`, or a fence left open there, is denied](spec/2026-10-26-spec-TOOL-dBoundRoles-46.md) | 12 | 2 | DEFERRED | rev-5 | 2026-11-22 |
-| [TOOL-dBoundRoles-48 — the composed task section checked block by block: every block opens outside a fence, and each handed block's content lies inside its own, at render and at spawn](spec/2026-10-26-spec-TOOL-dBoundRoles-48.md) | 12 | 2 | DEFERRED | rev-3 | 2026-11-22 |
-| [TOOL-dBoundRoles-8 — the role-gate arm's field escape explained and closed](spec/2026-10-25-spec-TOOL-dBoundRoles-8.md) | 12 | 2 | DEFERRED | rev-3 | 2026-11-22 |
-| [TOOL-dBoundRoles-9 — the `none` and `review` write classes enforced in the role arm](spec/2026-10-25-spec-TOOL-dBoundRoles-9.md) | 13 | 2 | DEFERRED | rev-3 | 2026-11-22 |
-| [TOOL-dBoundRoles-7 — shell writes held to the work order's allowance](spec/2026-10-25-spec-TOOL-dBoundRoles-7.md) | 14 | 2 | DEFERRED | rev-4 | 2026-11-22 |
-| [TOOL-dBoundRoles-5 — returns through a schema-forced channel on both routes, residual failures retried by `roles.retries`](spec/2026-10-25-spec-TOOL-dBoundRoles-5.md) | 15 | 2 | DEFERRED | rev-4 | 2026-11-22 |
-| [TOOL-dBoundRoles-10 — `driver.reads`, `prompts.author` and `roles.no-spawn`, each read and enforced at its seam](spec/2026-10-25-spec-TOOL-dBoundRoles-10.md) | 16 | 2 | DEFERRED | rev-4 | 2026-11-22 |
-| [TOOL-dBoundRoles-39 — the return check grades a direct spawn only: a stop whose transcript is a harness stage's, or whose first record carries no handoff marker, passes untouched](spec/2026-10-26-spec-TOOL-dBoundRoles-39.md) | 16 | 2 | DEFERRED | rev-4 | 2026-11-22 |
-| [TOOL-dBoundRoles-40 — a recorded harness-stage stop replayed against every `SubagentStop` hook a default install registers, red on any output, any block or any record](spec/2026-10-26-spec-TOOL-dBoundRoles-40.md) | 16 | 2 | DEFERRED | rev-3 | 2026-11-22 |
-| [TOOL-dBoundRoles-4 — the prompt writer composing every role's task from the driver's details](spec/2026-10-25-spec-TOOL-dBoundRoles-4.md) | 17 | 2 | DEFERRED | rev-4 | 2026-11-22 |
-| [TOOL-dBoundRoles-23 — the prompt writer's default frame, bounded lists, upstream rows, and the medium effort floor](spec/2026-10-25-spec-TOOL-dBoundRoles-23.md) | 18 | 2 | DEFERRED | rev-5 | 2026-11-22 |
-| [TOOL-dBoundRoles-24 — the framing checked at render: every anchor a work order points at resolves to a fact it hands](spec/2026-10-25-spec-TOOL-dBoundRoles-24.md) | 19 | 2 | DEFERRED | rev-5 | 2026-11-22 |
-| [TOOL-dBoundRoles-12 — the orientation scout's placement return through the typed channel, recorded and checked by the driver](spec/2026-10-25-spec-TOOL-dBoundRoles-12.md) | 20 | 2 | DEFERRED | rev-5 | 2026-11-22 |
-| [TOOL-dBoundRoles-41 — the anchor check grades the text a work order authors, never the content it hands, by the block extents the render assembled](spec/2026-10-26-spec-TOOL-dBoundRoles-41.md) | 20 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dBoundRoles-3 — the work order rendered per item, hashed into the spawn marker and bound to its act](spec/2026-10-25-spec-TOOL-dBoundRoles-3.md) | 11 | 2 | DEFERRED | rev-7 | 2026-11-22 |
+| [TOOL-dBoundRoles-38 — handed content fenced inside the work order, and every reader of a fact line or a marker line skips what a fence holds](spec/2026-10-26-spec-TOOL-dBoundRoles-38.md) | 11 | 2 | DEFERRED | rev-6 | 2026-11-22 |
+| [TOOL-dBoundRoles-45 — a typed `--input` value is authored text: written unfenced, refused when a line would stand as an executor line, so the anchor check grades it](spec/2026-10-26-spec-TOOL-dBoundRoles-45.md) | 12 | 2 | DEFERRED | rev-5 | 2026-11-22 |
+| [TOOL-dBoundRoles-46 — the spawn guard holds a typed block to the authored-line rule: a fact, marker or `Framed by:` line in `input:question` or `input:diff`, or a fence left open there, is denied](spec/2026-10-26-spec-TOOL-dBoundRoles-46.md) | 12 | 2 | DEFERRED | rev-6 | 2026-11-22 |
+| [TOOL-dBoundRoles-48 — the composed task section checked block by block: every block opens outside a fence, and each handed block's content lies inside its own, at render and at spawn](spec/2026-10-26-spec-TOOL-dBoundRoles-48.md) | 12 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dBoundRoles-8 — the role-gate arm's field escape explained and closed](spec/2026-10-25-spec-TOOL-dBoundRoles-8.md) | 12 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dBoundRoles-9 — the `none` and `review` write classes enforced in the role arm](spec/2026-10-25-spec-TOOL-dBoundRoles-9.md) | 13 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dBoundRoles-7 — shell writes held to the work order's allowance](spec/2026-10-25-spec-TOOL-dBoundRoles-7.md) | 14 | 2 | DEFERRED | rev-5 | 2026-11-22 |
+| [TOOL-dBoundRoles-5 — returns through a schema-forced channel on both routes, residual failures retried by `roles.retries`](spec/2026-10-25-spec-TOOL-dBoundRoles-5.md) | 15 | 2 | DEFERRED | rev-5 | 2026-11-22 |
+| [TOOL-dBoundRoles-10 — `driver.reads`, `prompts.author` and `roles.no-spawn`, each read and enforced at its seam](spec/2026-10-25-spec-TOOL-dBoundRoles-10.md) | 16 | 2 | DEFERRED | rev-5 | 2026-11-22 |
+| [TOOL-dBoundRoles-39 — the return check grades a direct spawn only: a stop whose transcript is a harness stage's, or whose first record carries no handoff marker, passes untouched](spec/2026-10-26-spec-TOOL-dBoundRoles-39.md) | 16 | 2 | DEFERRED | rev-5 | 2026-11-22 |
+| [TOOL-dBoundRoles-40 — a recorded harness-stage stop replayed against every `SubagentStop` hook a default install registers, red on any output, any block or any record](spec/2026-10-26-spec-TOOL-dBoundRoles-40.md) | 16 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dBoundRoles-4 — the prompt writer composing every role's task from the driver's details](spec/2026-10-25-spec-TOOL-dBoundRoles-4.md) | 17 | 2 | DEFERRED | rev-5 | 2026-11-22 |
+| [TOOL-dBoundRoles-23 — the prompt writer's default frame, bounded lists, upstream rows, and the medium effort floor](spec/2026-10-25-spec-TOOL-dBoundRoles-23.md) | 18 | 2 | DEFERRED | rev-6 | 2026-11-22 |
+| [TOOL-dBoundRoles-24 — the framing checked at render: every anchor a work order points at resolves to a fact it hands](spec/2026-10-25-spec-TOOL-dBoundRoles-24.md) | 19 | 2 | DEFERRED | rev-6 | 2026-11-22 |
+| [TOOL-dBoundRoles-12 — the orientation scout's placement return through the typed channel, recorded and checked by the driver](spec/2026-10-25-spec-TOOL-dBoundRoles-12.md) | 20 | 2 | DEFERRED | rev-6 | 2026-11-22 |
+| [TOOL-dBoundRoles-41 — the anchor check grades the text a work order authors, never the content it hands, by the block extents the render assembled](spec/2026-10-26-spec-TOOL-dBoundRoles-41.md) | 20 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dBoundRoles-11 — every fork resolved by the role that meets it with its full record, or held as `run.on-owner-question` says](spec/2026-10-25-spec-TOOL-dBoundRoles-11.md) | 21 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-47 — one criterion across the fence, the strip and the graded text: with units 38, 45, 24 and 41 landed, an anchor planted in a typed `--input` value is refused](spec/2026-10-26-spec-TOOL-dBoundRoles-47.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dBoundRoles-26 — the typed refusal return: its rule, its remedy and the remedy's actor, routed at once and never re-offered](spec/2026-10-25-spec-TOOL-dBoundRoles-26.md) | 22 | 2 | DEFERRED | rev-4 | 2026-11-22 |
@@ -158,7 +158,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 222 bound to this build, across 4 record folder(s).
+Records: 223 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

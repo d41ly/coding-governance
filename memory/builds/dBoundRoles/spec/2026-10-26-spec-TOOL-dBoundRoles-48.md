@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-48 — the composed task section checked block by block: every block opens outside a fence, and each handed block's content lies inside its own, at render and at spawn
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -44,18 +44,27 @@ the skeptic's corrected fix. It repairs `TOOL-dBoundRoles-38` and builds one ste
   the block key and the line, for each block whose first line the walk reads inside a fence, each handed
   block whose heading or fact line it reads inside a fence, each handed content line it reads outside
   one, and a walk that ends inside one. Observed by AC1.
-- **S2** — The call at render. `render_handoff` computes `extents` from the parts it appended, never by
-  re-reading headings or fences in the joined bytes, and calls S1 once, after the last block is added and
-  before the marker is hashed. Each line joins `refusals`, so the render raises and writes no file. A
-  block a later unit adds before that point is checked with the rest. Observed by AC2.
-- **S3** — The check at spawn. `checkHandoffSpawn` (`tools/hooks/agent-cap.js`), as
+- **S2** — The call at render. `render_handoff` (`tools/roles/handoff.py#render_handoff`) appends each
+  block to its `blocks` list (`tools/roles/handoff.py@c6d87bbb:645-661`) and hands that list, joined, to
+  `render_work_order` (`tools/roles/handoff.py#render_work_order`) as the `reads` fill, beside the
+  `practices` fill, which carries the card block, and the `opening`. That function places the three in
+  the slots of `tools/roles/templates/work-order.template.md`, inside the task envelope where the
+  document registry reads (`:695-713`). `render_handoff` computes `extents` from those parts and the
+  line each starts at in the task part returned, by §8 F3, never by re-reading headings or fences in the
+  joined bytes. It calls S1 once, after `render_work_order` returns and before the marker is hashed
+  (`:714-715`). The render's one raise of `refusals` (`:673-674`) runs before the section is composed, so
+  S1's lines raise as one `RolesError` at the call, and the `render` verb then writes no file
+  (`:1505-1511`). A block a later unit adds to `blocks` is checked with the rest. Observed by AC2.
+- **S3** — The check at spawn. `checkHandoffSpawn` (`tools/hooks/agent-cap.js#checkHandoffSpawn`), as
   `TOOL-dBoundRoles-38` S4 leaves it, denies a prompt file whose task section, walked by
   `readUnfencedLines`, holds an unfenced `FACT_RE` line that is not the line two below an unfenced `### `
   heading, or a block headed by such a pair whose next non-blank line is not a fence opener, whose lines
   up to that fence's closer are not all read inside it, or which holds anything but blank lines between
-  that closer and the next unfenced heading. A block whose heading names a typed input, `question` or
-  `diff`, is exempt from the fence-shape half. Each denial names the block and the line. Observed by
-  AC3.
+  that closer and the next unfenced heading. After the last such block, the one other line admitted is
+  the task envelope's closer, `[/<path>]` naming the marker's own `path`, which the render writes last
+  wherever the document registry reads (§8 F4). A block whose heading names a typed input, `question`
+  or `diff`, is exempt from the fence-shape half. Each denial names the block and the line. Observed
+  by AC3.
 - **S4** — The docs. `tools/roles/README.md`'s handoff section and the rule-6 paragraph of
   `tools/hooks/README.md` each say that every block of the task section opens outside a fence and that a
   handed block's content must lie inside its own fence, checked at render and at spawn. Observed by AC4.
@@ -88,8 +97,19 @@ the skeptic's corrected fix. It repairs `TOOL-dBoundRoles-38` and builds one ste
   ends inside a fence, and S2 leaves charter and framing blocks unfenced.
 - `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-23.md` §4 places `### framing:job`
   before the `reads` blocks and `### framing:added` and `### framing:no-stop` after the allowance.
-- `tools/roles/handoff.py:381-416` builds the section from a list it appends block by block, so the render
-  knows every block's extent without reading its own output.
+- At HEAD `a3efb1d5`, `render_handoff` builds the `reads` fill from the `blocks` list it appends block
+  by block (`tools/roles/handoff.py@c6d87bbb:645-661`), and `render_work_order` joins the `practices`,
+  `opening` and `reads` fills in that slot order under `## Task`, wrapping all but the practices in the
+  task envelope where the registry reads (`tools/roles/handoff.py@c6d87bbb:484-511`,
+  `tools/roles/templates/work-order.template.md`). So the render holds every part it placed and knows
+  each block's extent without reading its own output for headings or fences. `TOOL-dBoundRoles-3` S2
+  appends its five blocks to the same list, checked against that spec.
+- The task envelope's closer is the last line of a wrapped task part: `lib.render_envelope` writes
+  `[/<doc>]` after the body (`tools/roles/roles_lib.py#render_envelope`), and `doc` is the prompt
+  file's repo-relative path, the marker's `path` field (`tools/roles/handoff.py@c6d87bbb:694-698`).
+- The callers of `render_handoff` at HEAD are its `render` verb (`tools/roles/handoff.py#main`), the
+  `render_agents.py` selftest and two arms of `tools/roles/adopt-roles.test.sh`; none composes a block
+  that flips the fence state, so none changes verdict.
 
 ### The attack, walked
 
@@ -127,9 +147,11 @@ unchanged.
 ### Rollout
 
 Live at landing, at order 12. Dispatch is strictly sequential within a shared order
-(`tools/workflows/unattended-build.js:76-80`), and this unit consumes from no unit at its order.
-`TOOL-dBoundRoles-45`, `-46` and `-8` write some of the same files at order 12, and `--dispatch` refuses
-a pass whose declared write set meets an open one's.
+(`tools/workflows/unattended-build.js@9da9556b:78-82`), a tie sorted by id string (`:692-697`), so
+`TOOL-dBoundRoles-45` and `-46` build before this unit and `-8` after it; this unit consumes from no
+unit at its order. Those three write some of the same files, and `--dispatch` refuses a pass whose
+declared write set meets an open one's (`tools/unattended/unattended.sh#verb_dispatch`, condition 1,
+over `read_open_passes`).
 
 ### Files touched (estimate)
 
@@ -177,8 +199,13 @@ a pass whose declared write set meets an open one's.
   fixture: a scratch repository with the roles kit installed, under `%TEMP%`, short-pathed.
 - **AC3** — When an `Agent` payload is piped to `node tools/hooks/agent-cap.js` whose prompt file is
   AC2's render hand-edited into §4's flipped shape, with the marker's task-sha recomputed by
-  `handoff.derive_section_sha`, it exits 2 naming the block; the unedited render exits 0.
-  Red when: the guard reads the surfaced quoted fact line as an executor fact.
+  `roles_lib.derive_section_sha`, which `TOOL-dBoundRoles-6` S4 moves into the library, it exits 2
+  naming the block; the unedited render exits 0, and so does a copy whose opening and blocks are
+  wrapped in the task envelope as `roles_lib.render_envelope` writes it, the task-sha recomputed.
+  Red when: the guard reads the surfaced quoted fact line as an executor fact, or denies the task
+  envelope's closer after the last handed block.
+  fixture: the roles adopter fixture installs no playbook kit, so it carries no document registry,
+  its renders are unwrapped and the wrapped copy is made by hand.
 - **AC4** — When `grep -n 'opens outside a fence' tools/roles/README.md tools/hooks/README.md` runs, it
   prints one line per file.
   Red when: either README still describes only the end-of-walk refusal.
@@ -202,6 +229,26 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC3 · a rule-6 payload whose p
   refusal of S1 misses (§4). RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, fewer follow-ups. The
   skeptic's `--framed-by` fixture is AC1's section by direct call, because `--framed-by` does not exist
   until order 17. widens: none · relaxes: none
+- **F3 — How does the render learn each part's first line in the task part, now that
+  `render_work_order` composes it?** At base the section was the parts joined in one list; at HEAD
+  `render_work_order` (PLAY-dOrderedCharter-20, landed after base) places the fills in a template and
+  wraps them in an envelope. Options: (a) `render_handoff` finds each fill it passed, in slot order,
+  as an exact string in the returned task part, each search starting where the previous fill ended,
+  and counts each block's first line from the lengths of the blocks before it; (b)
+  `render_work_order` returns each fill's first line beside its two sections. (a) reads no heading
+  and no fence, and no search can land early: between one fill's end and the next fill sit only blank
+  lines and, once, the envelope opener. (b) changes the return shape of a function `TOOL-dBoundRoles-6` S4's
+  role-section builder also reads. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, tie-broken
+  by fewer open questions: no signature a sibling unit reads moves. widens: none · relaxes: none
+- **F4 — What may follow the last handed block's fence closer at spawn?** At HEAD, wherever the
+  document registry reads, the task part ends on the task envelope's closer
+  (`tools/roles/roles_lib.py#render_envelope`), which PLAY-dOrderedCharter-5 added after base, so
+  S3's blank-lines-only rule would deny every wrapped render and fail AC3. Options: (a) admit exactly
+  the closer naming the marker's own `path`, as the section's last non-blank line; (b) admit any
+  envelope opener or closer line; (c) stop the gap check at the last handed block. (b) and (c) admit
+  lines a flipped section could use to hide content. RESOLVED (agent, 2026-11-22, delegated): (a),
+  rung 3, the narrowest admission that passes AC3, deny by default (the charter's `[security]`).
+  widens: none · relaxes: S3's gap rule admits the one closer line the render writes
 
 ## 9. Revision log
 
@@ -211,11 +258,23 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC3 · a rule-6 payload whose p
 - rev-3 · 2026-11-22 · §7 · the leg line gains `format-guard self-test` and `policy fixtures`, whose
   guards hold `tools/hooks/agent-cap.js` and `tools/roles/roles_lib.py` that §4 Files touched names, by
   `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-tokens-b-brief`; nothing else moved.
+- rev-4 · 2026-11-22 · S2 · S3 · §4 · AC3 · §8 F3 F4 · §10 · re-grounded at HEAD `a3efb1d5` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-48-reground-i-brief`: the task section is now composed by
+  `render_work_order` from the work-order template and wrapped in the task envelope, so S2 names the
+  parts it hands that function and F3 picks how the extents are found; the render's one raise of
+  `refusals` precedes the composition, so S2's call raises its own lines; the wrapped task part ends
+  on the envelope's closer, which S3 admits after the last block by F4, and AC3 gains the wrapped copy
+  with a `fixture:` line. AC3's `derive_section_sha` is the library's, checked against
+  TOOL-dBoundRoles-6 S4, and the five work-order blocks against TOOL-dBoundRoles-3 S2. The
+  `handoff.py` and `unattended-build.js` line citations are pinned to blobs `c6d87bbb` and `9da9556b`,
+  and `--dispatch`'s write-set refusal is cited.
 
 ## 10. Reuse audit
 
 The seams are `TOOL-dBoundRoles-38`'s two walkers and its S5 refusal, `render_handoff`'s block list
-(`tools/roles/handoff.py:381-416`), and `checkHandoffSpawn` in `tools/hooks/agent-cap.js`.
+(`tools/roles/handoff.py@c6d87bbb:645-661`) and the parts it hands `render_work_order`
+(`tools/roles/handoff.py#render_work_order`), and `checkHandoffSpawn`
+(`tools/hooks/agent-cap.js#checkHandoffSpawn`).
 `python tools/codebase-map/reuse_lookup.py "assert each handed block's fence extent in a composed work order section"`
 ranked `render_charter_blocks`, `build_aborted_work_landed` and `check_work_landed`, none a fence-extent
 check, so no existing seam fits beyond the walkers and the render's list.

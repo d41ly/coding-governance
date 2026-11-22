@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-3 — the work order rendered per item, hashed into the spawn marker and bound to its act
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0168@abfd5f4f whole
 **Carries:** node:record-kind.work-order
@@ -39,26 +39,34 @@ A role's task is a work order cut for one item: the item, its inputs handed as c
 its return template and its witness, hashed into the spawn marker by task-sha and bound to the act
 that runs it by the session's binding record, which until dWellOiledMachine is the marker plus the
 card (I12). Today the work order names no checklist item, allowance or witness key (gap-roles-08), and
-64.5% of a rendered task's bytes are typed input (gap-roles-05).
+64.5% of a rendered task's bytes are typed input (gap-roles-05, PINNED 2026-10-14 by the dClosedLoop
+gap register).
 
 ## 2. Scope (IN)
 
 - **S1** — The item resolved at render: `handoff.py render --item <tag>` (the flag TOOL-dBoundRoles-17
-  adds) reads the item's declaration, TOOL-dDeclaredLoop-9 S2's `resolve_item_declaration` for that one
-  item, by running the loop kit's `loop_lib.py declaration --item <tag> --json` in a subprocess, the
-  file found by `resolve_kit_dir("loop", "loop_lib.py", KIT_DIR)`, since a kit imports no sibling kit,
-  and reading the declaration back as JSON. That unit specs no such verb: its CLI is `loop_lib.py
-  --check`, which prints every item's effective declaration as text, and `--fixture` (its §5 and AC1,
-  AC2), so the verb is the ask the build run files in dDeclaredLoop's `BACKLOG.md`, §8 F5. A tag the
-  loop does not
+  adds) reads the item's declaration, TOOL-dDeclaredLoop-9 S2's `resolve_item_declaration`
+  (`tools/loop/loop_lib.py#resolve_item_declaration`) for that one item with the row fields §8 F6
+  names, by running the loop kit's `loop_lib.py declaration --item <tag> --json` in a subprocess, the
+  file found by `resolve_kit_dir("loop", "loop_lib.py", KIT_DIR)`, and reading the declaration back as
+  JSON. The subprocess is §8 F5's owner pick and no house rule: the roles kit requires the loop kit
+  (`tools/roles/kit.toml@b9102919:15`) and already imports `loop_lib` in process
+  (`tools/roles/roles_lib.py#read_workflow_order`). The loop kit's CLI is `--check`, `--scopes`,
+  `--selftest`, `--fixture --plant`, `--grade-site` and `seed <item tag>`
+  (`tools/loop/loop_lib.py#main`), none printing one item's declaration, so the verb is the ask the
+  build run files in dDeclaredLoop's `BACKLOG.md`, §8 F5 and F6. A tag the loop does not
   declare, an actor other than `role:<the --role slot>`, or no loop kit found refuses with exit 1 and
   writes nothing. Observed by AC1, AC2 and AC6.
-- **S2** — The five blocks, added in `render_handoff` (`tools/roles/handoff.py:312`) after the `reads`
-  blocks and before the charter blocks: `### item` (the tag, its step and its outcome set), `### inputs`
+- **S2** — The five blocks, appended to `render_handoff`'s `blocks` (`tools/roles/handoff.py#render_handoff`)
+  after the `reads` blocks, so they fill the `reads` slot, the last slot of `## Task` in
+  `tools/roles/templates/work-order.template.md`; the task holds no charter blocks, which ride in the
+  agent file (PLAY-dOrderedCharter-5 S3). They are `### item` (the tag, its row's step and its outcome
+  set), `### inputs`
   (each of the declaration's `inputs` handed as content through TOOL-dBoundRoles-13's
   `derive_fact_key`, one fact line each, a `reads` key spelled as its `field.<family>.<name>` tag,
-  TOOL-dBoundRoles-14's form), `### allowance`, `### return` (the role's I1 `return` template, else the
-  declaration's `returns`) and `### witness` (the declaration's witness class and its `by`). Observed
+  TOOL-dBoundRoles-14's form), `### allowance`, `### return` (the declaration's `returns`, which
+  `resolve_item_declaration` takes from the item row, else from its role's `return` template, §8 F7)
+  and `### witness` (the row's witness class and its `by`). Observed
   by AC1.
 - **S3** — The allowance as paths (I12): `derive_allowance(declaration, slug, granted)` in
   `tools/roles/roles_lib.py` turns the declaration's write class into repo-relative path prefixes in
@@ -66,19 +74,23 @@ card (I12). Today the work order names no checklist item, allowance or witness k
   with repeated `--allowance <path>`, each under a `ROUTED_PATHS` entry; a `product` item granted none,
   or a granted path under no entry, refuses. Observed by AC3 and AC4.
 - **S4** — Hashed into the marker: the five blocks sit inside `## Task`, so the marker's `task-sha`
-  (`handoff.py:420-421`) covers them, and the marker carries the item's tag in `item=`. Observed by
-  AC1.
+  (the marker writer in `tools/roles/handoff.py#render_handoff`) covers them, and the marker carries
+  the item's tag in `item=`. Observed by AC1.
 - **S5** — Bound to its act, the stand-in binding record: rule 6's `checkHandoffSpawn`
   (`tools/hooks/agent-cap.js@935a910d:691-750`) admits a work order whose marker carries an `item=` other
   than `-` only when the session's orientation card, read through scratch-guard's exported `readCard`
-  and `extractRouteUnits` (`tools/hooks/scratch-guard.js:667`, `:839`), routes the marker's `unit=`;
-  otherwise it refuses, naming the unit and the card. A marker whose `item=` is `-` or absent is
+  and `extractRouteUnits` (`tools/hooks/scratch-guard.js#readCard`,
+  `tools/hooks/scratch-guard.js#extractRouteUnits`), routes the marker's `unit=`;
+  otherwise it refuses, naming the unit and the card, `readCard`'s `shown` where no card reads. A
+  marker whose `item=` is `-` or absent is
   judged as today. Observed by AC5.
 - **S6** — The record kind `work-order` (`record-kind.work-order`): `WORK_ORDER_KIND` in
   `roles_lib.py` declares its folder (`<MEMORY_ROOT>/builds/<slug>/prompts/`), its name grammar
-  (`derive_prompt_name`'s, `handoff.py:297-305`), its door (`handoff.py render --item`), its required
+  (`derive_prompt_name`'s, `tools/roles/handoff.py#derive_prompt_name`), its door (`handoff.py render
+  --item`), its required
   parts (the marker with `item=`, `## Role`, `## Task`, and the five blocks of S2) and its readers
-  (`check_handoff`, rule 6, and TOOL-dBoundRoles-17's R16). `check_handoff` (`handoff.py:426-450`)
+  (`check_handoff`, rule 6, and TOOL-dBoundRoles-17's R16). `check_handoff`
+  (`tools/roles/handoff.py#check_handoff`)
   refuses a work order with `item=` set that lacks one of the five blocks. Observed by AC7.
 - **S7** — The docs: `handoff.py`'s docstring and `tools/roles/README.md`'s handoff section name the
   five blocks, the allowance rule and the binding; the rule-6 paragraph of `tools/hooks/README.md`
@@ -116,16 +128,19 @@ card (I12). Today the work order names no checklist item, allowance or witness k
 
 | Declaration's allowance | Rendered prefixes | Source |
 |---|---|---|
-| `none` | none; the block reads `none` | TOOL-dDeclaredLoop-9 S2's narrowing |
-| `spec` | `<MEMORY_ROOT>/builds/<slug>/spec/` | `WRITE_FOLDERS` (`tools/roles/check_roles.py:99-101`) |
+| `none` | none; the block reads `none` | TOOL-dDeclaredLoop-9 S1's narrowing (`tools/loop/loop_lib.py#check_item_declarations`) |
+| `spec` | `<MEMORY_ROOT>/builds/<slug>/spec/` | `WRITE_FOLDERS` (`tools/roles/roles_lib.py#WRITE_FOLDERS`) |
 | `review` | `<MEMORY_ROOT>/builds/<slug>/reviews/` | `WRITE_FOLDERS` |
 | `records` | `<MEMORY_ROOT>/` | `WRITE_FOLDERS` |
 | `product` | each `--allowance <path>` granted, under a `ROUTED_PATHS` entry | the unit's `--dispatch --writes` set, which the caller passes |
 
-`<MEMORY_ROOT>` is the conf's value and `<slug>` the render's `--build`, so every prefix is a literal
-path. The class names stay `WRITES`' vocabulary (TOOL-dDeclaredLoop-9 S4 moves it into the library),
-and the folders are read from `WRITE_FOLDERS`, never typed here; TOOL-dBoundRoles-9's `classes` map is
-rendered from the same table.
+`WRITE_FOLDERS` spells the root `{{MEMORY_ROOT}}`, which `derive_allowance` replaces with the conf's
+value as `render_role` does, and `<slug>` with the render's `--build`, so every prefix is a literal
+path; its `product` value is the conf key `ROUTED_PATHS`, never a prefix. The class names stay
+`WRITES`' vocabulary, whose one home stays `tools/roles/check_roles.py#WRITES` (TOOL-dDeclaredLoop-9 S4
+is out of scope from that unit's rev-2). The folders are read from `WRITE_FOLDERS`, in the same
+library as `derive_allowance` since TOOL-dBoundRoles-2, never typed here; TOOL-dBoundRoles-9's
+`classes` map is rendered from the same table.
 
 ### The blocks
 
@@ -150,12 +165,18 @@ history · the unit's commit, its Pass: trailer naming the unit
 
 The `### inputs` block holds one sub-block per input, each with its fact line (TOOL-dBoundRoles-13's
 grammar). An input the declaration marks optional and the render cannot resolve is named on the task's
-`Not supplied` line, as an optional `reads` key is today (`handoff.py:412-414`).
+`Not supplied` line, as an optional `reads` key is today (the opening `render_handoff` composes,
+`tools/roles/handoff.py#render_handoff`).
+
+`## Role` already closes with the role's `## Return` (`tools/roles/roles_lib.py#render_role_fields`,
+TOOL-dBoundRoles-2 S6). `### return` is the item's resolved template, inside the hashed task.
 
 ### The binding
 
-At the spawn the guard holds the session id from the payload. It reads that session's card under the
-checkout's common directory and its `## route` units; the marker's `unit=` must be one of them. A
+At the spawn the guard holds the session id from the payload. It reads that session's card through
+`readCard`, whose path is the kickoff checker's `--card --path --session <sid>` answer, run from the
+common directory's work tree under `CARD_PATH_BOUND_MS`, and the card's `## route` units through
+`extractRouteUnits`; the marker's `unit=` must be one of them. A
 session that renders an item's work order for a unit its card does not route cannot spawn it, so
 the act is bound to the session that was oriented for that unit. What it does not see: two sessions
 routing one unit, and a card edited by hand, which the write gate's card rules govern.
@@ -196,7 +217,8 @@ then each is rendered through this door.
 
 - security — narrows: a `product` work order without a granted allowance refuses, and an item's work
   order spawns only in a session routed to its unit.
-- perf / scale — one loop-kit subprocess per item render; one card read per item spawn.
+- perf / scale — one loop-kit subprocess per item render; one bounded kickoff-checker run and one
+  card read per item spawn, `readCard`'s.
 - error / empty / loading states — an unknown item, a wrong actor, a missing loop kit and an
   ungranted allowance each refuse with their reason.
 - observability — the refusals name the item, the actor, the unit and the card.
@@ -209,12 +231,15 @@ then each is rendered through this door.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python handoff.py render --role gov-builder --build tFix --unit TOOL-tFix-1 --item
-  item.build.unit --allowance tools/roles/handoff.py` runs in a scratch adopter whose loop definition declares
+  item.build.unit --allowance tools/roles/handoff.py --input spec=<scratch spec>` runs in a scratch
+  adopter whose loop definition declares
   `item.build.unit` with actor `role:gov-builder`, the file holds `### item`, `### inputs`,
   `### allowance` listing that one path, `### return` and `### witness` inside `## Task`, its marker
   reads `item=item.build.unit`, and `python handoff.py check <file>` exits 0.
   Red when: a block is missing or sits outside the hashed section, so the task-sha does not cover it.
-  fixture: a scratch clone with the loop kit and a fixture `loop.toml` row; none in the tree today.
+  fixture: a scratch clone with the loop kit and a fixture `loop.toml` row, and a scratch spec, since
+  gov-builder's `reads` requires `field.input.spec`; none in the tree today. The loop kit's
+  `declaration` verb (§8 F5, F6) is absent at HEAD `a3efb1d5`.
 - **AC2** — When the AC1 render names `--role gov-spec-writer`, it exits 1 naming the item's actor
   `role:gov-builder`, and writes nothing.
   Red when: a work order is cut for a role the item does not name.
@@ -229,6 +254,8 @@ then each is rendered through this door.
   session whose card routes `TOOL-tFix-2` only, it exits 2 naming `TOOL-tFix-1` and the card; with the
   card routing `TOOL-tFix-1` it exits 0; a handoff with `item=-` keeps today's exit either way.
   Red when: an item's work order spawns in a session not routed to its unit.
+  fixture: a scratch clone carrying the kickoff kit, whose `manifest-check.sh --card --path --session
+  <sid>` names the card `readCard` reads for each case.
 - **AC6** — When the AC1 render names `--item item.build.nothing`, which the loop does not declare, it
   exits 1 naming the tag; with the loop kit removed from the scratch clone it exits 1 naming the loop
   kit.
@@ -271,6 +298,11 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · an item work order spawn
   in the tree. RESOLVED (agent, 2026-10-25, delegated): the build run re-grounds on each at the pass
   and stops the unit if a called section is still absent then, rung 1 (the brief's rule for DEFERRED
   parents). widens: none · relaxes: none
+  At HEAD `a3efb1d5` three of the parents are built: the loop kit is `tools/loop/`,
+  `resolve_item_declaration` is `tools/loop/loop_lib.py#resolve_item_declaration` (TOOL-dDeclaredLoop-9
+  CLOSED), and the role's `return` field is TOOL-dBoundRoles-2's, CLOSED at `8795c820a`. The one
+  called piece still absent is F5's `declaration` verb: `loop_lib.py#main` parses no such verb and
+  dDeclaredLoop's `BACKLOG.md` carries no ask for it.
 - **F5 — Which loop-kit verb returns one item's declaration?** TOOL-dDeclaredLoop-9 gives
   `resolve_item_declaration(item, roles)` as a function (its S2) and only `loop_lib.py --check` and
   `--fixture` as its CLI (its §5, AC1, AC2); no verb takes one tag and prints JSON. Options: (a) an ask
@@ -287,6 +319,29 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · an item work order spawn
   2026-11-05): (a) the `declaration` verb, asked of dDeclaredLoop. The ask the build run files in
   dDeclaredLoop's `BACKLOG.md` is "TOOL-dDeclaredLoop-9: `loop_lib.py` gains `declaration --item
   <tag> --json`, printing `resolve_item_declaration` for that item and exiting 1 for an undeclared tag".
+- **F6 — What does the `declaration` verb print, now that `resolve_item_declaration` is built?** At
+  HEAD `a3efb1d5` the function returns `inputs`, `allowance`, `returns` and `source` only
+  (`tools/loop/loop_lib.py#resolve_item_declaration`). S1's actor check and S2's `### item` and
+  `### witness` read the row's `actor`, `step`, `outcomes` and `witness`, which that result does not
+  carry. Options: (a) the ask's JSON carries the row's `tag`, `actor`, `step`, `outcomes`, as
+  `read_outcome_set` resolves them (`tools/loop/loop_lib.py#read_outcome_set`), and `witness` beside
+  the function's result; (b) S1 runs a second loop-kit verb for the row, and none prints one: `seed`
+  prints paths and `--check` prints text; (c) S2 drops the step, the outcomes and `### witness`, which
+  fails AC1, veto 1. F5's (c) premise also moved: the roles kit requires the loop kit
+  (`tools/roles/kit.toml@b9102919:15`, which `requires` only kickoff-manifest and memory-tree at base
+  `4ed9e567`) and imports `loop_lib` in process (`tools/roles/roles_lib.py#read_workflow_order`), so
+  the in-process read needs no new edge. F5 stands as the owner's pick; re-picking it is an owner
+  turn, and this fork answers only what F5's verb prints. RESOLVED (agent, 2026-11-22, delegated): (a),
+  rung 3, the one survivor that keeps S1, S2 and AC1 as written. widens: the dDeclaredLoop ask, by
+  the row's `tag`, `actor`, `step`, `outcomes` and `witness` · relaxes: none
+- **F7 — Which source does `### return` take?** rev-1 wrote "the role's I1 `return` template, else the
+  declaration's `returns`". The built `resolve_item_declaration` takes a role item's `returns` from the
+  row when the row declares one, else from the role's `return`, and `check_item_declarations` refuses
+  only a copy of the role's (`tools/loop/loop_lib.py#check_item_declarations`). Options: (a) the
+  declaration's `returns` as the function resolves it; (b) the role's template first, as rev-1 wrote.
+  (b) makes a role item's own `returns` unreachable wherever its role carries a template, and puts a
+  second precedence beside the one S1 reads. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3,
+  tie-broken by reuse of the resolver S1 already calls. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -305,15 +360,31 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · an item work order spawn
   `format-guard self-test` and `policy fixtures`, the legs whose guards the Files touched paths
   `tools/hooks/agent-cap.js` and `tools/roles/roles_lib.py` trip.
 - rev-6 · 2026-11-22 · §2 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; nothing else moved.
+- rev-7 · 2026-11-22 · §1 · S1 · S2 · S4 · S5 · S6 · §4 · §5 · AC1 · AC5 · §8 F4 F6 F7 · §10 · re-grounded
+  at HEAD `a3efb1d5` by `2026-11-22-prompt-TOOL-dBoundRoles-3-reground-h-brief`. TOOL-dDeclaredLoop-9
+  is built: S1 cites `resolve_item_declaration`, drops "a kit imports no sibling kit", since the roles
+  kit now requires and imports the loop kit, and names the loop CLI at HEAD; F4 records which parents
+  are built; F6 adds the row fields the verb must print and records F5's moved premise for the owner;
+  F7 takes the resolver's `returns` precedence. S2's blocks fill the work-order template's `reads`
+  slot, as no charter block is left in the task. `WRITE_FOLDERS` moved into `roles_lib.py` with
+  TOOL-dBoundRoles-2, and `WRITES` stays in `check_roles.py`. `readCard` asks the kickoff checker for
+  the card's path under a bound (S5, §4, §5, AC5's fixture). Each moved `handoff.py` and
+  `scratch-guard.js` line citation is re-pointed to its symbol. AC1 hands the `input:spec`
+  gov-builder requires. The 64.5% figure is pinned. `tools/hooks/agent-cap.js` is still blob
+  `935a910d`. `item=`, `--item` and `derive_fact_key` were checked against the specs of
+  TOOL-dBoundRoles-17 and -13, and the marker writer's hash against TOOL-dBoundRoles-6 S4.
 
 ## 10. Reuse audit
 
-The seams extended: `render_handoff`'s block list (`tools/roles/handoff.py:396-416`), where every
-block of a task is added, and its marker writer (`:420-421`); `check_handoff` (`:426-450`); rule 6's
+The seams extended: `render_handoff`'s `blocks` list and its marker writer
+(`tools/roles/handoff.py#render_handoff`), where every block of a task is added;
+`check_handoff` (`tools/roles/handoff.py#check_handoff`); rule 6's
 `checkHandoffSpawn` (`tools/hooks/agent-cap.js@935a910d:691-750`), which already compares the prompt and the
-task-sha; `readCard` and `extractRouteUnits` (`tools/hooks/scratch-guard.js:667`, `:839`), exported and
-already used for the write gate's route; `WRITE_FOLDERS` (`tools/roles/check_roles.py:99-101`) for the
-allowance folders. `python tools/codebase-map/reuse_lookup.py "render a role's work order for one
+task-sha; `readCard` and `extractRouteUnits` (`tools/hooks/scratch-guard.js#readCard`,
+`tools/hooks/scratch-guard.js#extractRouteUnits`), exported and already used for the write gate's
+route; `WRITE_FOLDERS` (`tools/roles/roles_lib.py#WRITE_FOLDERS`) for the allowance folders; and
+`resolve_item_declaration` (`tools/loop/loop_lib.py#resolve_item_declaration`), the one resolver of an
+item's inputs, allowance and returns. `python tools/codebase-map/reuse_lookup.py "render a role's work order for one
 checklist item with its allowance and witness"` ranked generic `render` stems across kits
 (`render_cards_md`, `render_family_view`, `render_line`) and no work-order renderer, so the seam is
 `render_handoff`, read from source. The recall probe returned scout B's row, which agrees: the session

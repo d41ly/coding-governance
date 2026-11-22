@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-46 — the spawn guard holds a typed block to the authored-line rule: a fact, marker or `Framed by:` line in `input:question` or `input:diff`, or a fence left open there, is denied
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -41,12 +41,15 @@ rule the render applies. It repairs `TOOL-dBoundRoles-38`'s spawn half and build
 ## 2. Scope (IN)
 
 - **S1** — The typed set, `TYPED_INPUTS` in `tools/hooks/agent-cap.js`: `question` and `diff`, with a
-  comment naming `tools/roles/handoff.py:98-99`, whose `INPUT_NAMES` less `PATH_INPUTS` it equals.
+  comment naming `handoff.py`'s `INPUT_NAMES` less `PATH_INPUTS` (`tools/roles/handoff.py#INPUT_NAMES`,
+  `tools/roles/handoff.py#PATH_INPUTS`), which it equals, the renderer named by its bare file name as
+  rule 6's own comment names it (`tools/hooks/agent-cap.js@935a910d:642-644`).
   Observed by AC3.
 - **S2** — The rule at spawn. `checkHandoffSpawn` splits the prompt file's task section into blocks at
   each line that begins `### `. In each block whose heading is `### input:<name>` with `<name>` in
   `TYPED_INPUTS`, every line after the block's own fact line that matches the guard's `FACT_RE` copy,
-  `MARKER_RE`'s copy or `^Framed by:` denies the spawn, naming the block and the line; so does a block
+  `MARKER_RE`'s copy `HANDOFF_MARK_RE` (`tools/hooks/agent-cap.js@935a910d:646`, in the named-group
+  form TOOL-dBoundRoles-17 S1 gives it) or `^Framed by:` denies the spawn, naming the block and the line; so does a block
   whose own walk by `readUnfencedLines` ends on its open-fence yield. A heading line is not graded
   here: at spawn it is a block boundary, and a forged one opens a block the guard's other checks read.
   Observed by AC1 and AC2.
@@ -75,13 +78,16 @@ rule the render applies. It repairs `TOOL-dBoundRoles-38`'s spawn half and build
 ### Evidence
 
 Read at base `462d20f3` on 2026-10-26, the `agent-cap.js` line numbers re-pointed to HEAD on
-2026-11-22 over code unchanged since:
+2026-11-22 over code unchanged since, and the `handoff.py` citations re-grounded at HEAD `a3efb1d5`:
 
 - `tools/hooks/agent-cap.js@935a910d:650-658` walks every line of a prompt for its marker, and
   `checkHandoffSpawn` counts markers on the prompt (`:704-705`) and on the file (`:718-719`);
   `TOOL-dBoundRoles-38` S4 makes both fence-aware and adds the fact re-cut's fence-aware read.
-- `tools/roles/handoff.py:98-99` declares the four input names and the two path inputs; a kit file may
-  not import another kit's code, so the hooks kit spells the two typed names once, with the source cited.
+- `tools/roles/handoff.py#INPUT_NAMES` declares five input names and
+  `tools/roles/handoff.py#PATH_INPUTS` three path inputs (PINNED at HEAD `a3efb1d5`, `code` added to
+  both after base), so the typed names are still `question` and `diff`. The guard is JavaScript and
+  cannot import the Python constants, so the hooks kit spells the two typed names once, with the source
+  cited.
 - The guard compares the file's task-sha with its marker (`tools/hooks/agent-cap.js@935a910d:737-738`), which proves the
   file is unedited since its marker was written, not that the render wrote it.
 
@@ -107,7 +113,7 @@ is the render's own refusal from `TOOL-dBoundRoles-45` on.
 ### Rollout
 
 Live at landing, at order 12. Dispatch is strictly sequential within a shared order
-(`tools/workflows/unattended-build.js:76-80`), and this unit consumes from no unit at its order.
+(`tools/workflows/unattended-build.js@9da9556b:78-82`), and this unit consumes from no unit at its order.
 `TOOL-dBoundRoles-48` and `TOOL-dBoundRoles-8` also write `agent-cap.js` at order 12, and `--dispatch`
 refuses a pass whose declared write set meets an open one's.
 
@@ -142,7 +148,7 @@ refuses a pass whose declared write set meets an open one's.
 - **AC1** — When an `Agent` payload is piped to `node tools/hooks/agent-cap.js` whose prompt file's
   `### input:question` block holds, one case each, a whole `gov:fact` line, a whole `gov:handoff` marker
   line and a `Framed by:` line, with the marker's task-sha recomputed over the edited section by
-  `handoff.derive_section_sha`, each exits 2 naming `input:question` and the line; the same file with a
+  `roles_lib.derive_section_sha`, which TOOL-dBoundRoles-6 S4 moves into the library, each exits 2 naming `input:question` and the line; the same file with a
   plain value exits 0.
   Red when: the guard reads the typed block's forged line as a fact or a second marker.
   fixture: a rendered handoff in a scratch adopter under `%TEMP%`, short-pathed, hand-edited by the case.
@@ -191,6 +197,16 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC1 AC2 AC3 · a rule-6 payload
   The §7 leg line gains `format-guard self-test` and `policy fixtures`, the legs whose guards the Files
   touched path `tools/hooks/agent-cap.js` trips.
 - rev-5 · 2026-11-22 · §4 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; nothing else moved.
+- rev-6 · 2026-11-22 · S1 · S2 · §4 · AC1 · re-grounded at HEAD `a3efb1d5` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-3-reground-h-brief`. `INPUT_NAMES` and `PATH_INPUTS` both gained
+  `code` after base, so §4's evidence counts five names and three path inputs, pinned, and the typed
+  set is still `question` and `diff`; S1's comment names `handoff.py` by its bare file name, as rule
+  6's comment does, and §4 gives the JavaScript guard's real reason for spelling the names again. S2
+  names `HANDOFF_MARK_RE`, checked against TOOL-dBoundRoles-17 S1. AC1 re-hashes through
+  `roles_lib.derive_section_sha`, checked against TOOL-dBoundRoles-6 S4, which moves it out of
+  `handoff.py` at order 9. The dispatch note is a pinned line. `tools/hooks/agent-cap.js` is still blob
+  `935a910d`, and `readUnfencedLines` and the fence-aware readers were checked against
+  TOOL-dBoundRoles-38's spec.
 
 ## 10. Reuse audit
 

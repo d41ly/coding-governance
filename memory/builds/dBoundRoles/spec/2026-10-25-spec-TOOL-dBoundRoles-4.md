@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-4 — the prompt writer composing every role's task from the driver's details
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 17 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 17 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0169@60524f05 whole
 
@@ -38,9 +38,13 @@ bound by hash, with the spawn guard refusing an unframed task while `prompts.aut
 
 ## 2. Scope (IN)
 
-- **S1** — `input:work-order` joins `READ_KEYS` (`tools/roles/roles_lib.py:36-40`), the one `reads`
-  vocabulary. `handoff.py render --for <role>` fills it: `render_handoff` (`tools/roles/handoff.py:312`)
-  resolves the destination role's own blocks, every `reads` value it would render for that role, its
+- **S1** — `work-order` joins the `input` family of `READ_FAMILIES`
+  (`tools/roles/roles_lib.py#READ_FAMILIES`), the one `reads` vocabulary: `READ_KEYS` derives from it,
+  and the tag index mints `field.input.work-order` from it (TOOL-dBoundRoles-14). It stays out of the
+  render verb's `INPUT_NAMES` (`tools/roles/handoff.py#INPUT_NAMES`), so `--input work-order=` is
+  refused, and the key's not-supplied refusal names `--for`, as the `upstream:rows` one names
+  `--upstream`. `handoff.py render --for <role>` fills it: `render_handoff`
+  (`tools/roles/handoff.py#render_handoff`) resolves the destination role's own blocks, every `reads` value it would render for that role, its
   `allowance` (TOOL-dBoundRoles-3) and its `return` template (TOOL-dBoundRoles-2), and hands them to
   the prompt writer as content under `### input:work-order`. Observed by AC1.
 - **S2** — `gov-prompt-writer`'s fields, in the role file TOOL-dBoundRoles-1 creates: `reads` is
@@ -52,11 +56,17 @@ bound by hash, with the spawn guard refusing an unframed task while `prompts.aut
   rather than retyping them. Observed by AC1.
 - **S3** — `handoff.py render --role <dest> … --framed-by <agent-id>`: the prompt writer's framing,
   read mechanically from that agent's transcript, never retyped by the driver. The transcript is found
-  as `read_transcript` finds one (`handoff.py:825-828`), its agent type must be `gov-prompt-writer`, its
-  final return must pass `validate_return` (TOOL-dBoundRoles-5) with `outcome` `framed` and carry `job`
+  as `read_transcript` finds one: `agent-<id>.jsonl` under the session's `subagents` folder, the id in
+  `PATH_ID_RE`'s shape (`print_agent_lines`'s closure, `tools/roles/handoff.py@c6d87bbb:1273-1276`), the
+  session resolved by `resolve_session_file` (`tools/roles/handoff.py#resolve_session_file`) with no
+  `--session` of the render's own (§8 F6). Its agent type, the `type` `load_agent_transcript`
+  (`tools/roles/handoff.py#load_agent_transcript`) reads from the `.meta.json` beside it, must be
+  `gov-prompt-writer`; its final return, read as `check-return` reads one (TOOL-dBoundRoles-5 S2), must
+  pass `validate_return` (TOOL-dBoundRoles-5) with `outcome` `framed` and carry `job`
   and `nostop`, and its first record's marker names the prompt writer's work order. The destination's
   `## Task` gains one block per field the return carries, `### framing:job`, `### framing:population`,
-  `### framing:added` and `### framing:no-stop`, each holding its field verbatim, and
+  `### framing:added` and `### framing:no-stop`, each holding its field verbatim, appended to the blocks
+  that fill the work-order template's `reads` slot (§8 F5), and
   `### framing:job` closes with the line `Framed by: <prompt path> task-sha=<12hex>`, all inside the
   bytes the task-sha covers. Any failed condition refuses the render by name. Observed by AC2.
 - **S4** — Rule 6 under `prompts.author = prompt-writer` (TOOL-dBoundRoles-10's switch): an `Agent`
@@ -70,7 +80,8 @@ bound by hash, with the spawn guard refusing an unframed task while `prompts.aut
   the destination with `--framed-by`. Observed by AC3.
 - **S5** — `gov-session` and the `handoff` workflow's session-to-session route stay as they are: the
   session-handoff template's retirement is Runtime's (the brief's D3). Observed by AC4.
-- **S6** — The user page `help/roles.md`, "How a task reaches an agent" (`:13-27`), gains the prompt
+- **S6** — The user page `help/roles.md`, "How a task reaches an agent" (`help/roles.md@50d4a1c0:13-48`),
+  gains the prompt
   writer's step, and the build Skill (`tools/roles/SKILL.template.md`) states the three-call route for a
   direct spawn. Observed by AC5.
 
@@ -104,20 +115,26 @@ bound by hash, with the spawn guard refusing an unframed task while `prompts.aut
 driver                         handoff.py render --role gov-prompt-writer --build S --unit U \
                                    --for gov-builder --input question="<the driver's details>"
                                  -> prompts/<…>-prompt-writer.md   (input:question, input:work-order)
-driver                         Agent(subagent_type=gov-prompt-writer, prompt=<that task>)
-gov-prompt-writer              returns {"outcome":"framed","job":"…","nostop":"…","answers":"<its prompt> task-sha=…"}
+driver                         Agent(subagent_type=gov-prompt-writer, description=<the name it prints>,
+                                     prompt=<that task>)
+gov-prompt-writer              returns {"outcome":"framed","job":"…","nostop":"…"}
 driver                         handoff.py render --role gov-builder --build S --unit U \
                                    --framed-by <the prompt writer's agent id>
                                  -> prompts/<…>-builder.md          (… ### framing:job, Framed by: …)
-driver                         Agent(subagent_type=gov-builder, prompt=<that task>)
-agent-cap rule 6               marker, bytes, task-sha (today) + framing (S4, prompts.author)
+driver                         Agent(subagent_type=gov-builder, description=<the name it prints>,
+                                     prompt=<that task>)
+agent-cap rule 6               marker, bytes, task-sha, name (today) + framing (S4, prompts.author)
 ```
 
 The driver types only its details, once, into `input:question`. The framing travels from the prompt
 writer's return to the destination's task through the renderer reading the transcript, so no byte of
 it passes through the driver's hands, which is RL-4's "keep as much of the noise out of its context
 as possible". The destination's `### framing:` blocks are part of its `## Task` section, so its
-task-sha binds the framing exactly as it binds every other block.
+task-sha binds the framing exactly as it binds every other block. At HEAD that section is the
+work-order template's `practices`, `opening` and `reads` slots (`tools/roles/templates/work-order.template.md`,
+filled by `tools/roles/handoff.py#render_work_order`), the `reads` fill being the blocks the loop
+`tools/roles/handoff.py@c6d87bbb:645-661` appends; the `### framing:` blocks join that fill after the
+`reads` blocks, inside the task's envelope, and TOOL-dBoundRoles-23 later sorts the fill into its frame.
 
 ### The framing check at spawn
 
@@ -189,16 +206,20 @@ sets `requesting-worker-rendered` keeps today's rule 6.
 ## 6. Acceptance criteria
 
 - **AC1** — When `handoff.py render --role gov-prompt-writer --for gov-builder --input question=q`
-  runs over a fixture build `x`, with `--unit X-1 --stdout`, its task carries
+  runs over a fixture build `x`, with `--build x --unit TOOL-x-1 --input spec=<fixture spec> --stdout`,
+  its task carries
   `### input:question` and one `### input:work-order` block holding the builder's `return` template and
   its `allowance` block.
   Red when: `--for` is not read, so the prompt writer is handed references or nothing.
-- **AC2** — When `handoff.py render --role gov-builder --build x --unit X-1 --framed-by <id>` reads a
-  fixture prompt writer transcript whose final return is `outcome` `framed` with `job` and `nostop`,
+- **AC2** — When `handoff.py render --role gov-builder --build x --unit TOOL-x-1 --input spec=<fixture spec>
+  --framed-by <id>` reads a fixture prompt writer transcript whose final return is `outcome` `framed` with `job` and `nostop`,
   the task carries `### framing:job` and `### framing:no-stop` holding those texts byte for byte, and one
   `Framed by:` line naming the prompt writer's prompt path and task-sha; a transcript whose return lacks
   `nostop`, or whose agent type is `gov-researcher`, refuses naming the failed condition.
   Red when: the framing is taken from a return `validate_return` refuses, or from another role.
+  fixture: a session file under a fixture `CLAUDE_CONFIG_DIR`, named by `CLAUDE_CODE_SESSION_ID`, with
+  the agent's `agent-<id>.jsonl` in its `subagents` folder and its `.meta.json` beside it; the tree
+  holds none today.
 - **AC3** — When rule 6 reads a `gov-builder` spawn whose task has no `### framing:job`, with
   `prompts.author` unset, it returns a deny naming `prompts.author` and the three-call route; with a
   framing whose `Framed by:` names the fixture prompt writer's file, it admits; naming a file whose
@@ -207,7 +228,7 @@ sets `requesting-worker-rendered` keeps today's rule 6.
   Red when: an unframed task is admitted under the default, or the prompt writer's own spawn is
   refused for lacking a framing.
 - **AC4** — When `handoff.py render --role gov-session --build x --input question=q --stdout` runs, it
-  renders as at base, with no `### framing:job` and no `--for`.
+  renders as it does before this unit lands, with no `### framing:job` and no `--for`.
   Red when: the handoff workflow's session route is made to require the prompt writer.
 - **AC5** — When `grep -n "prompt writer" help/roles.md tools/roles/SKILL.template.md` runs, each
   names the three-call route.
@@ -248,6 +269,20 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 · its self-test renders
   (a), rung 1, the spec fix brief's F3; the instrument's red on this clause is `PLAY-dClosedLoop-30`'s
   until its pin moves by the owner's `packet.py --repin`.
   widens: none · relaxes: none
+- **F5 — Where in `## Task` do the `### framing:` blocks go, now that the section is the work-order
+  template's slots?** Options: (a) appended to the fill of the template's `reads` slot, after the
+  `reads` blocks; (b) a new `framing` slot line in `tools/roles/templates/work-order.template.md`. (b)
+  edits a template §4's Files touched does not list, and adds a slot TOOL-dBoundRoles-23's frame must
+  fold back into its own order; (a) changes no template and leaves the order to TOOL-dBoundRoles-23,
+  which sorts that fill. RESOLVED (agent, 2026-11-22, delegated): (a), the option no veto refuses with
+  fewer open questions, tie-broken by reuse of the `reads` fill. widens: none · relaxes: none
+- **F6 — Which session does `--framed-by` read the prompt writer's transcript from?** At HEAD
+  `read_transcript` is a closure of `print_agent_lines`, whose session `resolve_session_file` resolves
+  from the `agents` verb's `--session`, else from `CLAUDE_CODE_SESSION_ID`. Options: (a)
+  `resolve_session_file` with no `--session`, so the driver's own session, which spawned the prompt
+  writer; (b) a `--session` flag on the render verb too. (b) adds a flag no criterion reads. RESOLVED
+  (agent, 2026-11-22, delegated): (a), the option no veto refuses with fewer open questions.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -257,17 +292,34 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 · its self-test renders
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **consumes-from** and **hands-off** bullets mirroring the edges of TOOL-dBoundRoles-38, TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
 - rev-3 · 2026-11-22 · §4 · §7 · §10 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `format-guard self-test`, `policy fixtures`, as `tools/hooks/agent-cap.js` and `tools/roles/handoff.py` in Files touched trip their guards; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up (DERIVED: baseline line 2089 less HEAD line 691) with its behaviour unchanged, so the cites re-point at HEAD, `checkHandoffSpawn` now at `tools/hooks/agent-cap.js@935a910d:691-750` and `extractHandoffMarker` at `:650-658`; nothing else moved.
 - rev-4 · 2026-11-22 · §4 · §9 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; each figure the re-ground wrote carries a pin on its line; nothing else moved.
+- rev-5 · 2026-11-22 · S1 · S3 · S6 · §4 · AC1 · AC2 · AC4 · §8 F5 F6 · §10 · re-grounded at `a3efb1d50` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-4-reground-k-brief`. S1: `READ_KEYS` now derives from the
+  `READ_FAMILIES` literal, which the tag index reads, and the render verb admits `--input` names from a
+  separate `INPUT_NAMES`, so the key joins the literal, stays out of `INPUT_NAMES`, and its refusal names
+  `--for`. S3: `render_handoff` moved, and `read_transcript` is a closure of `print_agent_lines` over
+  `resolve_session_file`'s session, reading the agent type from `.meta.json` (F6). `## Task` is now the
+  work-order template's slots, so the framing joins the `reads` fill (F5). §4: rule 6 also matches the
+  call's `description` to the spawn name, so both spawns pass it, and the prompt writer's sample return
+  drops `answers`, a field S2's template does not name and that TOOL-dBoundRoles-5 S1's
+  `validate_return` refuses (checked against that spec). AC1 and AC2 spell a unit `UNIT_RE` admits,
+  `TOOL-x-1`, and pass the `--input spec=` gov-builder requires; AC4 reads "before this unit lands".
+  The edges to units 1, 3, 10 and 38 were checked against their specs and hold; `tools/hooks/agent-cap.js`
+  is still blob `935a910d`; every other moved citation re-pointed to a symbol or a pinned line.
 
 ## 10. Reuse audit
 
-The seams extended are `render_handoff` (`tools/roles/handoff.py:312-423`), its blocks list
-(`:381-416`) and its transcript locator (`read_transcript`, `:825-828`); the `reads` vocabulary
-`READ_KEYS` (`tools/roles/roles_lib.py:36-40`); and rule 6 (`checkHandoffSpawn`,
-`tools/hooks/agent-cap.js@935a910d:691-750`) with its marker reader `extractHandoffMarker` (`:650-658`).
+The seams extended are `render_handoff` (`tools/roles/handoff.py#render_handoff`), its `reads` blocks
+loop (`tools/roles/handoff.py@c6d87bbb:645-661`) and the template `render_work_order` fills
+(`tools/roles/handoff.py#render_work_order`); the transcript locator `read_transcript`
+(`tools/roles/handoff.py@c6d87bbb:1273-1276`) with `load_agent_transcript` and `resolve_session_file`;
+the `reads` vocabulary `READ_FAMILIES` (`tools/roles/roles_lib.py#READ_FAMILIES`); and rule 6
+(`checkHandoffSpawn`, `tools/hooks/agent-cap.js@935a910d:691-750`) with its marker reader
+`extractHandoffMarker` (`tools/hooks/agent-cap.js@935a910d:650-658`).
 `python tools/codebase-map/reuse_lookup.py "compose a role agent task prompt from the driver details"`
 ranked `extract_prompt_marker`, `render_role`, `load_roles` and `renderPromptLine`, all handoff
 plumbing; no role authors a task at base (scout B: "no seam fits for the role itself", 10 role files and
 no prompt writer), so the role is new and every mechanism around it is an existing seam. Scout B's row
-agreed with source; its blocks-list reference `:381-416` matches base.
+agreed with source at base `4ed9e567`, where the blocks list sat at
+`tools/roles/handoff.py@b6d461b8:381-416`.
 
 Recall terms used: `python tools/memory-recall/query.py "who composes a role agent task prompt" --terms "prompt writer gov-prompt-writer task framing work order driver details handoff render gov-session"`

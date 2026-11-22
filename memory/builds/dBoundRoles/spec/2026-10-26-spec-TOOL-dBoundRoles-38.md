@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-38 — handed content fenced inside the work order, and every reader of a fact line or a marker line skips what a fence holds
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -28,7 +28,9 @@ HIGH**, report item **H4**. No other id shares the item.
 line, and S4's spawn guard re-derives every `FACT_RE` line of the task section. A fact line quoted inside
 handed content therefore reads exactly like one the executor wrote. Spec 13's own §4 example is such a
 line, keyed to a `memory/builds/tFix/...` path that does not exist, so handing spec 13 to its builder
-refuses every spawn. Three tracked specs quote a `<!-- gov:handoff role=` line, and a quoted marker
+refuses every spawn. Five tracked specs quote a `<!-- gov:handoff role=` line, this one and
+`TOOL-dBoundRoles-17` among them (PINNED at HEAD `a3efb1d5` by `git grep -l` over
+`memory/builds/*/spec/*.md`; three at base `462d20f3`), and a quoted marker
 breaks the exactly-one-marker rule that rule 6 and `TOOL-dBoundRoles-4` S4 read. A quoted fact line also
 carries a class its author typed, which P29 forbids.
 
@@ -43,11 +45,13 @@ marker line walk the text fence-aware, so nothing inside a fence is read as eith
   an opening and a closing line of `n` backticks and nothing else, `n` one more than the longest run of
   backticks anywhere in the content and at least 3. The content's bytes are unchanged inside. Observed
   by AC2.
-- **S2** — The render. `render_handoff` (`tools/roles/handoff.py:312`), as `TOOL-dBoundRoles-13` S3
+- **S2** — The render. `render_handoff` (`tools/roles/handoff.py#render_handoff`), as `TOOL-dBoundRoles-13` S3
   leaves it, writes each handed block as its `### <key>` heading, a blank line, its fact line, a blank
   line, and `render_handed_fence(<content>)`. Every block a `reads` value renders is handed content and is
-  fenced, the card, brief and argument values included. The charter blocks and the prompt writer's
-  `### framing:` blocks are not handed content and are not fenced. Observed by AC1.
+  fenced, the card, brief and argument values included. The practices block and the `## Card` block
+  that lead the task (`tools/roles/handoff.py#render_card_block`) are no `reads` value, and they and
+  the prompt writer's `### framing:` blocks are not handed content and are not fenced; no charter
+  block sits in the task since PLAY-dOrderedCharter-5 S3. Observed by AC1.
 - **S3** — One fence walker per language. `read_unfenced_lines(text)` in `tools/roles/roles_lib.py`
   yields `(line number, line)` for every line outside a fence, and finally `(opened at, None)` when the
   text ends inside one. A fence opens on a line of at most three spaces of indent and then three or more
@@ -55,17 +59,25 @@ marker line walk the text fence-aware, so nothing inside a fence is read as eith
   least as long, with nothing after it but whitespace. `readUnfencedLines(text)` in
   `tools/hooks/scratch-guard.js`, added to its `module.exports`, is the same walker for the hooks.
   Observed by AC2 and AC4.
-- **S4** — The readers walk it. `extract_prompt_marker` (`tools/roles/roles_lib.py:246-255`) counts the
+- **S4** — The readers walk it. `extract_prompt_marker` (`tools/roles/roles_lib.py#extract_prompt_marker`) counts the
   marker lines it finds outside a fence. `extractHandoffMarker` (`tools/hooks/agent-cap.js@935a910d:650-658`),
   which rule 6 calls on the prompt and on the prompt file and which `TOOL-dBoundRoles-4` S4 calls on the
   prompt writer's file, reads only unfenced lines. Every reader of `FACT_RE` `TOOL-dBoundRoles-13` builds,
   the Python reader in `roles_lib.py` and the JavaScript copy in `checkHandoffSpawn`, reads only
-  unfenced lines. Observed by AC1 and AC3.
+  unfenced lines. `read_handoff_edges` (`tools/playbook/edge_grammar.py#read_handoff_edges`), which
+  reads every `MARKER_RE` line of a work order as a `serves` edge, reads only the marker lines
+  `read_unfenced_lines` yields, imported from the roles kit beside `MARKER_RE` (§8 F3). Observed by
+  AC1 and AC3.
   **Readers:** by name: `tools/roles/roles_lib.py` (`extract_prompt_marker` and the `FACT_RE` reader),
-  `tools/hooks/agent-cap.js` (`extractHandoffMarker` and the `FACT_RE` copy in `checkHandoffSpawn`) ·
-  by value: `checkHandoffSpawn`'s two marker counts (`tools/hooks/agent-cap.js@935a910d:704-705`, `:718-719`), its fact re-cut, and
-  every `handoff.py` verb that reads a prompt's marker through `extract_prompt_marker`, each now counting
-  unfenced lines only.
+  `tools/hooks/agent-cap.js` (`extractHandoffMarker` and the `FACT_RE` copy in `checkHandoffSpawn`),
+  `tools/playbook/edge_grammar.py` (`read_handoff_edges`) ·
+  by value: `checkHandoffSpawn`'s two marker counts (`tools/hooks/agent-cap.js@935a910d:704-705`, `:718-719`), its fact re-cut,
+  `print_agent_lines` (`tools/roles/handoff.py#print_agent_lines`), the one `handoff.py` verb that
+  reads a prompt's marker through `extract_prompt_marker`, `readHandoffVia`
+  (`tools/hooks/format-guard.js@cbfbcff2:430`), which takes a prompt's handoff path only where
+  `extractHandoffMarker` returns exactly one marker, and arm 11 of `tools/roles/adopt-roles.test.sh`
+  (`tools/roles/adopt-roles.test.sh@70af238b:645`), which holds the two readers to one verdict, each
+  now counting unfenced lines only.
 - **S5** — A fence left open refuses. `render_handoff` refuses a task section whose walk ends inside a
   fence, naming the block and the line the fence opened at, and writes no file. `checkHandoffSpawn` denies
   a prompt file whose task section ends inside a fence, naming the line. A framing or input value that
@@ -103,7 +115,7 @@ marker line walk the text fence-aware, so nothing inside a fence is read as eith
 ### Evidence
 
 Read at base `462d20f3` on 2026-10-26, the `agent-cap.js` line numbers re-pointed to HEAD on
-2026-11-22 over code unchanged since:
+2026-11-22 over code unchanged since, and every other citation re-grounded at HEAD `a3efb1d5`:
 
 - `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-13.md` §4 "The fact line" holds a
   line that `FACT_RE` matches whole, keyed `record:memory/builds/tFix/...`, inside a three-backtick fence.
@@ -112,9 +124,10 @@ Read at base `462d20f3` on 2026-10-26, the `agent-cap.js` line numbers re-pointe
   keeps the outer fence closed.
 - `tools/hooks/agent-cap.js@935a910d:650-658` walks every line, so `checkHandoffSpawn` counts a quoted marker
   (`:704-705` on the prompt, `:718-719` on the file).
-- `tools/memory-tree/tree_lib.py:149-174` is the house's fence walker, with the final open-fence yield
-  S3 copies. It toggles on any run of three, so a three-backtick line inside a four-backtick fence closes
-  it, and a kit file may not import another kit's library.
+- `tools/memory-tree/tree_lib.py#unfenced_lines` is the house's fence walker, with the final open-fence
+  yield S3 copies. It toggles on any run of three, so a three-backtick line inside a four-backtick fence
+  closes it. `tools/playbook/edge_grammar.py#parse_edge_lines` walks it, and
+  `tools/playbook/edge_grammar.py#read_handoff_edges` walks no fence at all.
 - The dClosedLoop instruction review asked for each handed fact to sit in its own data envelope, so a
   quoted directive is not read as one
   (`memory/builds/dClosedLoop/reviews/2026-10-15-review-PLAY-dClosedLoop-1-instruction-b.md:303`).
@@ -157,7 +170,7 @@ re-render fences it.
 ### Rollout
 
 Live at landing on the direct route. At order 11, dispatch sorts a tie by id string
-(`tools/workflows/unattended-build.js:608-613`), so `TOOL-dBoundRoles-3` builds first and its card
+(`tools/workflows/unattended-build.js@9da9556b:692-697`), so `TOOL-dBoundRoles-3` builds first and its card
 binding in `checkHandoffSpawn` is present when this unit edits that function.
 
 ### Files touched (estimate)
@@ -170,6 +183,7 @@ binding in `checkHandoffSpawn` is present when this unit edits that function.
 - `tools/hooks/agent-cap.test.sh`
 - `tools/hooks/scratch-guard.js`
 - `tools/hooks/README.md`
+- `tools/playbook/edge_grammar.py`
 
 ### Alternatives rejected
 
@@ -177,8 +191,8 @@ binding in `checkHandoffSpawn` is present when this unit edits that function.
   handed content can hold a heading followed by a fact line, and spec 13 §4 already does.
 - **Escaping each quoted fact or marker line.** It changes the handed bytes, so the content no longer
   equals the source the key was cut from, and the re-cut compares keys of bytes.
-- **Importing `tree_lib.unfenced_lines`.** It is the memory-tree kit's, and its rule closes a long fence
-  on a short run.
+- **Importing `tree_lib.unfenced_lines`.** Its rule closes a long fence on a short run, and the hooks
+  kit's walker is JavaScript either way.
 
 ## 5. Production-readiness checklist
 
@@ -200,10 +214,13 @@ binding in `checkHandoffSpawn` is present when this unit edits that function.
   --input spec=<scratch spec> --stdout` runs in a scratch adopter, and the scratch spec holds a whole
   `gov:fact` line whose key names a record path that does not exist, a `### input:spec` line followed by
   a second fact line, and a whole `gov:handoff` marker line, the render exits 0. The Python fact reader over the rendered task returns exactly one
-  fact per handed block, none of them the scratch spec's, and `extract_prompt_marker` over the rendered
-  prompt returns the render's own marker.
+  fact per handed block, none of them the scratch spec's, `extract_prompt_marker` over the rendered
+  prompt returns the render's own marker, and `python -c` calling `edge_grammar.read_handoff_edges` from
+  `tools/playbook/` over the rendered file returns one edge, the render's own marker's.
   Red when: a reader counts a line inside the fence, so the planted fact or marker is read.
-  fixture: a scratch repository with the roles kit installed, under `%TEMP%`, short-pathed.
+  fixture: a scratch repository with the roles kit installed, under `%TEMP%`, short-pathed, holding a
+  brief record under the build's `prompts/` with the `## The prompt` section and the `## The brief`
+  sub-heads gov-spec-writer's required `field.brief.*` reads name.
 - **AC2** — When `python -c` calls `roles_lib.render_handed_fence` on a text holding a run of five backticks it
   returns a fence of six on each end, and on a text holding none a fence of three; and
   `list(roles_lib.read_unfenced_lines(t))` over a four-backtick fence holding a three-backtick line yields
@@ -223,7 +240,7 @@ binding in `checkHandoffSpawn` is present when this unit edits that function.
 
 ## 7. Gates
 
-`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `lexicon naming predicates` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles adopter self-test` · `roles catalogue` · `roles render selftest` · `agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `lexicon naming predicates` · `policy fixtures` · `playbook render selftest` · `govkit acceptance matrix` · `edges (every declared edge parses, is registered and resolves)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC4 · a render handing a spec that quotes a fact line, a heading-then-fact pair and a marker line, staged by a `render_handoff` that writes the content unfenced · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC3 AC4 · a rule-6 payload whose handed content quotes a marker inside its fence, staged by an `extractHandoffMarker` that walks every line · none
@@ -241,6 +258,17 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC3 AC4 · a rule-6 payload who
   instance; (c) adds a file every install must ship and wire. RESOLVED (agent, 2026-10-26, delegated):
   (a), rung 3, tie-broken by reuse of the export seam `TOOL-dBoundRoles-25` S4 names as the home of a
   helper two packs read. widens: none · relaxes: none
+- **F3 — Does `read_handoff_edges` skip what a fence holds?** PLAY-dOrderedCharter-28 added it after
+  base `462d20f3`: it reads every `MARKER_RE` line of a work order, `re.M`, as a `serves` edge to that
+  marker's unit and build (`tools/playbook/edge_grammar.py#read_handoff_edges`), so a marker quoted in
+  handed content becomes an edge. Options: (a) it reads only the lines `read_unfenced_lines` yields,
+  imported from the roles kit as it already imports `MARKER_RE`, the file joining §4's Files touched;
+  (b) it walks `tree_lib.unfenced_lines`, which its own file already walks, and which closes S1's
+  longer fence on a quoted three-backtick line; (c) it stays as it is and the Goal's "every reader"
+  excludes it. (b) re-opens the read the Goal closes, and (c) leaves a reader of marker lines the Goal
+  names. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the one survivor that satisfies the Goal,
+  tie-broken by reuse of S3's walker and of the import the reader already makes. widens: the Files
+  touched, by `tools/playbook/edge_grammar.py` · relaxes: none
 
 ## 9. Revision log
 
@@ -259,14 +287,28 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC3 AC4 · a rule-6 payload who
   two sites named, so F2's answer stands. The §7 leg line gains `policy
   fixtures`, whose guard the Files touched path `tools/roles/roles_lib.py` trips.
 - rev-5 · 2026-11-22 · §2 · §4 · §8 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, a basename citation gaining its full path; nothing else moved.
+- rev-6 · 2026-11-22 · §1 · S2 · S4 · §4 · §7 · AC1 · §8 F3 · §10 · re-grounded at HEAD `a3efb1d5` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-3-reground-h-brief`. §1's count of specs quoting a marker is five,
+  pinned. S2 names the practices and `## Card` blocks that now lead the task, as no charter block is
+  left there. S4's readers gain, from a HEAD grep, `read_handoff_edges`, added after base and walking
+  no fence (F3, which adds `tools/playbook/edge_grammar.py` to Files touched, AC1's probe of it, and
+  to §7 the two legs its guards trip and the edges leg that runs it),
+  `print_agent_lines`, format-guard's `readHandoffVia` and adopt-roles arm 11. §4 drops "a kit file
+  may not import another kit's library", as edge_grammar imports both tree_lib and roles_lib, and
+  keeps the length rule. AC1's fixture names the brief record gov-spec-writer requires. `render_handoff`,
+  `extract_prompt_marker`, `unfenced_lines` and the dispatch sort are re-pointed to symbols or pinned
+  lines. `tools/hooks/agent-cap.js` is still blob `935a910d`. The fact line, `FACT_RE` and the handed
+  blocks were checked against TOOL-dBoundRoles-13's spec, and `read_handoff_edges`' named groups
+  against TOOL-dBoundRoles-17 S2.
 
 ## 10. Reuse audit
 
-The seams are `render_handoff`'s block list (`tools/roles/handoff.py:381-416`), the two marker readers
-(`extract_prompt_marker`, `tools/roles/roles_lib.py:246`; `extractHandoffMarker`,
-`tools/hooks/agent-cap.js@935a910d:650`), and `scratch-guard.js`'s exports, which `agent-cap.js` already
+The seams are `render_handoff`'s block list (`tools/roles/handoff.py#render_handoff`), the marker
+readers (`tools/roles/roles_lib.py#extract_prompt_marker`; `extractHandoffMarker`,
+`tools/hooks/agent-cap.js@935a910d:650`; `tools/playbook/edge_grammar.py#read_handoff_edges`), and
+`scratch-guard.js`'s exports, which `agent-cap.js` already
 imports. The fence machine's shape, with its final open-fence yield, is
-`tools/memory-tree/tree_lib.py:149` `unfenced_lines`, copied with a length rule rather than imported.
+`tools/memory-tree/tree_lib.py#unfenced_lines`, copied with a length rule rather than imported.
 `python tools/codebase-map/reuse_lookup.py "skip lines inside a fenced code block when reading a document line by line"`
 ranked `read`, `read_text`, `skip` and `read_conf`, none a fence walker, so no existing seam fits in the
 roles or hooks kits beyond the precedent above.

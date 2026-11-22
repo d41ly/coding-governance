@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-41 — the anchor check grades the text a work order authors, never the content it hands, by the block extents the render assembled
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -28,7 +28,8 @@ item in `TOOL-dBoundRoles-43`.
 fenced blocks. Its claim of no false red was measured over `memory/builds/*/prompts/` at base, where
 handed inputs are paths. After `TOOL-dBoundRoles-13`, specs, briefs and cards are handed as content
 inside `## Task`. The skeptic's grep found 27 backticked `blob:`, `record:` and `cmd:` spans in six
-tracked specs that fail `KEY_FORMS`, spec 13 and spec 24 among them, so the render refuses the builder
+tracked specs that fail `KEY_FORMS` (PINNED,
+`memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md:66`), spec 13 and spec 24 among them, so the render refuses the builder
 work order for unit 24, for unit 13, and for any spec that quotes the key grammar. Spec 24's Migration
 line, that the first render after landing refuses nothing that rendered before, is false.
 
@@ -38,17 +39,22 @@ extents `render_handoff` itself assembled, so only the text the work order autho
 
 ## 2. Scope (IN)
 
-- **S1** — Two texts from one assembly. `render_handoff` (`tools/roles/handoff.py:312`), where it builds
-  the task section from its block list (`:381-416`), builds beside it the graded text: the same section
+- **S1** — Two texts from one assembly. `render_handoff` (`tools/roles/handoff.py#render_handoff`), as
+  `TOOL-dBoundRoles-23` and `TOOL-dBoundRoles-24` leave it, where it assembles the task section from its
+  block list (`tools/roles/handoff.py@c6d87bbb:645-661`) through `render_work_order`
+  (`tools/roles/handoff.py#render_work_order`), builds beside it the graded text: the same section
   with the content of every handed block left out and that block's `### <key>` heading and fact line
   kept. It is built from the parts the render appended, never by re-reading headings or fences in the
   composed bytes. Observed by AC1 and AC3.
 - **S2** — What is handed and what is authored. A handed block is one whose content the render cut from
-  a file or a record: the path inputs `spec` and `prompt` (`PATH_INPUTS`, `handoff.py:99`), the card's
-  `task:` and `card:` values, the brief's `brief:` sections, every excerpt `TOOL-dBoundRoles-3` cuts, and
-  the destination's work order handed under `input:work-order` by `TOOL-dBoundRoles-4`. Authored text is
-  the opening, every charter block, every `### framing:` block, every upstream row, and the value of
-  every typed `--input` that is not a path input. Observed by AC1 and AC2.
+  a file or a record: the path inputs `spec`, `prompt` and `code` (`tools/roles/handoff.py#PATH_INPUTS`),
+  `code`'s block holding its file's text at HEAD (PLAY-dOrderedCharter-27); the card's `task:` and
+  `card:` values; the brief's `brief:` sections; every excerpt `TOOL-dBoundRoles-3` cuts; the
+  destination's work order handed under `input:work-order` by `TOOL-dBoundRoles-4`; and the practices
+  block and the card block that lead the task part, cut from the charter and the card
+  (`tools/roles/handoff.py#render_card_block`). Authored text is the opening, every `### framing:`
+  block, every upstream row, and the value of every typed `--input` that is not a path input. No
+  charter block sits in the task since PLAY-dOrderedCharter-5 S3. Observed by AC1 and AC2.
 - **S3** — The call. `TOOL-dBoundRoles-24` S3's `check_anchors` call takes the graded text in place of
   the whole section, with `handed` unchanged. The marker still hashes the full section. Observed by AC1,
   AC2 and AC3.
@@ -80,18 +86,20 @@ extents `render_handoff` itself assembled, so only the text the work order autho
 ### Evidence
 
 - The skeptic re-ran the grep at the report's base: 27 backticked `(blob|record|cmd):` spans across six
-  tracked specs, including `TOOL-dBoundRoles-13` (its S1 spells `blob:<path>@<blob12>:<lo>-<hi>`),
+  tracked specs (PINNED, the report's id 22 row), including `TOOL-dBoundRoles-13` (its S1 spells `blob:<path>@<blob12>:<lo>-<hi>`),
   `TOOL-dBoundRoles-24`, `PLAY-dOrderedCharter-9:51` (`cmd:<command>`) and `aEvidencedLens-3:223`
   (report, finding 22).
 - `render_handoff` at base assembles the task as `"\n\n".join(["## Task", opening] + blocks)`
-  (`tools/roles/handoff.py:416`) from a list it appended block by block (`:381-409`), so the render
-  knows each block's extent without reading its own output.
+  (`tools/roles/handoff.py@b6d461b8:416`) from a list it appended block by block
+  (`tools/roles/handoff.py@b6d461b8:381-409`). At HEAD it still appends that list block by block
+  (`tools/roles/handoff.py@c6d87bbb:645-661`) and joins it into the work-order template's `reads` slot
+  through `render_work_order`, so the render knows each block's extent without reading its own output.
 
 ### The graded text
 
 ```
-task section   = ## Task, opening, block 1, block 2, …          hashed into the marker
-graded text    = ## Task, opening, block 1', block 2', …       read by check_anchors
+task section   = ## Task, practices, opening, block 1, block 2, …     hashed into the marker
+graded text    = ## Task, practices', opening, block 1', block 2', …  read by check_anchors
 block'         = the block itself                when it is authored (S2)
                = its ### heading and fact line   when it is handed
 ```
@@ -123,8 +131,8 @@ every handed spec and brief.
 
 ### Rollout
 
-Live at landing, at order 20. Dispatch sorts a tie by id string (`tools/workflows/unattended-build.js:608-613`),
-so `TOOL-dBoundRoles-12` builds before this unit.
+Live at landing, at order 20. Dispatch sorts a tie by id string
+(`tools/workflows/unattended-build.js@9da9556b:692-697`), so `TOOL-dBoundRoles-12` builds before this unit.
 
 ### Files touched (estimate)
 
@@ -192,10 +200,21 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · a builder render h
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-45, -47 and -50, promotions of the round-1 audit of units 37 to 44; the -50 bullet names AC3's AMENDED answer. Nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-58, the minors batch of the round-1 audit of units 45 to 51; nothing else moved.
 - rev-4 · 2026-11-22 · §7 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `policy fixtures`, as `tools/roles/handoff.py` in Files touched trips its guard; nothing else moved.
+- rev-5 · 2026-11-22 · §1 · S1 · S2 · §4 · §10 · re-grounded at `a3efb1d50` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-4-reground-k-brief`. `render_handoff` now joins its block list
+  into the work-order template's `reads` slot through `render_work_order`, the list still appended
+  block by block, so S1's extents hold and the graded text is built from the same fills. S2:
+  `PATH_INPUTS` gained `code`, whose block holds its file's text, and the practices and card blocks now
+  lead the task, each cut from a file, so all three are handed by S2's own rule; no charter block sits
+  in the task any longer. The dispatch tie sort moved, unchanged in behaviour. The base cites are
+  pinned to blob `b6d461b8` and the report's figure carries its pin. The edges to units 4, 23 and 24
+  were checked against their specs and hold, unit 24's against its rev-6; every other moved citation
+  re-pointed to a symbol or a pinned line.
 
 ## 10. Reuse audit
 
-The seam is `render_handoff`'s own block list (`tools/roles/handoff.py:381-416`) and
+The seam is `render_handoff`'s own block list (`tools/roles/handoff.py@c6d87bbb:645-661`), with the
+`render_work_order` fills it feeds (`tools/roles/handoff.py#render_work_order`), and
 `TOOL-dBoundRoles-24`'s `check_anchors` call inside it. `python tools/codebase-map/reuse_lookup.py "omit handed content from a check over a rendered prompt"`
 ranked `check`, `checks`, `check_line` and `check_convention`, none an extent-aware scan, so no existing
 seam fits beyond the render's list.
