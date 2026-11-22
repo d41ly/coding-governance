@@ -184,3 +184,5 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T13:57:58Z dispatch · item 9165482e KICK-dKeptSession-69 · reason memory/builds/dKeptSession/spec/2026-11-22-spec-KICK-dKeptSession-69.md memory/builds/dKeptSession/README.md memory/LIVE.md memory/backlog/KICK.md
 
 2026-11-22T14:00:46Z brief · item KICK-dKeptSession-26 · reason 949de18446d6 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-26-build-brief.md
+
+2026-11-22T14:03:45Z rescope · item defer KICK-dKeptSession-69 · reason its acceptance ledger owes AC2, AC3, AC9 and AC11-AC14 to the close's bar run (check 23 refused the CLOSED flip at 302081de8), and its open closing dispatch held the build README every later unit declares (check 49); it is re-dispatched at the close, where a builder pass completes the ledger from the bar's records and flips it CLOSED

@@ -459,7 +459,7 @@ Cite ids, never line numbers.
 | [TOOL-dDeclaredLoop-101](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE ABSENT-EXPANSION REFUSAL ADMITS A VALUE ON A CORE POINT.… |
 | [TOOL-dDeclaredLoop-102](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A NEW POLICY KEY LANDS WITHOUT ITS PRESET VALUES. v2:1421 lets no key… |
 | [TOOL-dDeclaredLoop-103](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE MAILBOX INTERRUPT NAMES THE WRONG ARMING BUILD.… |
-| [TOOL-dDeclaredLoop-104](../builds/dDeclaredLoop/BACKLOG.md) | DEFERRED | LOW | KICK-dKeptSession-26 | 2026-10-26 | THE REMAINING REWORK BUDGET HAS NO ONE-LINE READER.… |
+| [TOOL-dDeclaredLoop-104](../builds/dDeclaredLoop/BACKLOG.md) | INPROGRESS | LOW | KICK-dKeptSession-26 | 2026-10-26 | THE REMAINING REWORK BUDGET HAS NO ONE-LINE READER.… |
 | [TOOL-dDeclaredLoop-105](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE TRANSITION READER RETURNS NO COMMIT OR DATE. KICK-dKeptSession-9… |
 | [TOOL-dDeclaredLoop-106](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PER-ORDER RETURN SCHEMA IS HANDED IN A CIRCLE.… |
 | [TOOL-dDeclaredLoop-107](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | A DROPPED, INVENTED OR DOUBLED ROW STANDS ON A RECORD EDGE.… |

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-69 — the run branch reconciled with origin/main in one merge commit, one list factory kept, and the run's own reds cleared
 
-**Status:** INPROGRESS · rev-3 · 2026-11-22 · node d · Tier-2 · base e7ab8c81 · streams tooling · order 9 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base e7ab8c81 · streams tooling · order 9 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
