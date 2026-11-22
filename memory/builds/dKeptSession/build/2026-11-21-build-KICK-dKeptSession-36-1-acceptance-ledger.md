@@ -10,8 +10,8 @@ AC1 and AC2, an import of the module for AC6, and greps of the two user texts fo
 
 Read against the tree before the first edit: `read_mail_rows` already launches
 `[resolve_bash(<driver>), <driver>, "--mail", "read", <slug>]` with `resolve_kit_dir` and
-`loop_witness` imported inside the function, and already raises `mail unknown: no bash that can see
-<driver>`, so S2's launch and S3's words were left as unit 5 landed them and this unit's diff is the
+`loop_witness` imported inside the function, and already raises
+`mail unknown: no bash that can see <driver>`, so S2's launch and S3's words were left as unit 5 landed them and this unit's diff is the
 plants and the texts. S5's claim that both fixture-cases sentences omit `mail-open` and
 `mail-disposed` did not hold at this base, since unit 5 added them; only `descope-spent` was missing,
 and the outcome S5 asks, every key of `PLANTS` named, is the same.
@@ -26,20 +26,22 @@ the five new selftest cases and `check_plant_tokens` over the re-priced row amon
 - AC1 — the probe printed the `bash.exe` in Git for Windows' `bin` directory, under `Program Files`,
   and not the System32 launcher (DERIVED, that run, 2026-11-23).
 - AC2 — with `GOV_BASH` naming the System32 `bash.exe`, the probe printed `None`, and
-  `scan_bash(<driver>)[2]` read `GOV_BASH is set to '<the launcher>' and answered Linux, so nothing
-  after it is tried` (DERIVED, that run).
+  `scan_bash(<driver>)[2]` read
+  `GOV_BASH is set to '<the launcher>' and answered Linux, so nothing after it is tried`
+  (DERIVED, that run).
 - AC3 — `python tools/loop/loop_transition.py --fixture --plant mail-argv` exited 0, the move
   recorded `planning -> designing`, and it printed `loop: fixture · mail-argv · held`: one `--mail`
   call recorded, `argv[1]` the located driver, `argv[0]` `resolve_bash(argv[1])` and the rest
   `--mail read tFix` (DERIVED, that run). Its red over a bare `bash` is owed (above).
-- AC4 — `--plant mail-no-driver` exited 0, printing `loop: mail · unarmed · no unattended kit holding
-  unattended.sh in this install`, the three places looked after it, then `loop: recorded · planning
-  -> designing`; `--plant mail-no-bash` exited 2 printing `loop: unanswered · mail unknown: no bash
-  that can see` the worktree's driver, then `loop: fixture · commits unchanged` (DERIVED, that run).
+- AC4 — `--plant mail-no-driver` exited 0, printing
+  `loop: mail · unarmed · no unattended kit holding unattended.sh in this install`, the three places
+  looked after it, then `loop: recorded · planning -> designing`; `--plant mail-no-bash` exited 2
+  printing `loop: unanswered · mail unknown: no bash that can see` and the worktree's driver, then
+  `loop: fixture · commits unchanged` (DERIVED, that run).
 - AC5 — `grep -n "GOV_BASH" help/loop.md` names the guard paragraph's new sentence, which says
   `mail unknown`; `grep -c "mail-no-bash"` counted 1 in `help/loop.md` and 1 in
   `tools/loop/README.md` (DERIVED, that run), and a probe found no key of `PLANTS` missing from
-  either cases sentence. `docs_leg.py --fingerprints` still prints `930359dc` for the page's
+  either file, each key added to its cases sentence. `docs_leg.py --fingerprints` still prints `930359dc` for the page's
   `script:tools/loop/loop_transition.py` anchor (DERIVED, that run), so the anchor was not re-stamped.
 - AC6 — the import printed 18 (DERIVED, that run), the five `mail-` keys among `PLANTS`, and the
   `loop transition record` row of `tools/run-gates/selftest-budgets.txt` carries `plants=18` and no
