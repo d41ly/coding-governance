@@ -3611,7 +3611,8 @@ def test_id_parts_parse_under_each_tree_grammar():
     """TOOL-dTotalRecall-54 AC1, AC2, AC3, AC5, AC6. A throwaway tree declaring a cited family `ZED`
     and the node class `a-f` parses with its own copy of the memory-tree kit's `id_grammar.py`; the
     copy `make_repo` copies FROM parses over that tree's root, where `TOOL-xFoo-3` is refused, and
-    over its own tree, where the same id parses, so the refusal is the root's slug class."""
+    over a second throwaway root at the default class, where the same id parses, so the refusal is
+    the root's slug class."""
     import extract as E
     tree_src = E.resolve_kit_dir("memory-tree", "tree_lib.py", KIT)
     good = {"TOOL-aFoo-2": ["TOOL", "aFoo", 2], "ZED-aFoo-2": ["ZED", "aFoo", 2],
@@ -3619,17 +3620,21 @@ def test_id_parts_parse_under_each_tree_grammar():
     bad = ("TOOL-001", "TOOL-d119", "ARCH-aFix-3", "TOOL-x", "TOOL-aFoo-2@rev-2", "TOOL-xFoo-3",
            "EXMP-aFoo-2")
     root, _kitdir = make_repo(conf=CONF + 'RECALL_CITED_FAMILIES="ZED"\nRECALL_NODE_TAG_CLASS="a-f"\n')
+    # A second root at the default a-z class, never the source copy's own tree: that tree's conf is
+    # whatever the adopter running this suite declared.
+    wide, _wide_kitdir = make_repo()
     seen = {}
     try:
         for label, kit, at, ids in (("own", root / tree_src.name, "-", (*good, *bad)),
                                     ("foreign", tree_src, str(root), ("ZED-aFoo-2", "TOOL-xFoo-3")),
-                                    ("home", tree_src, "-", ("TOOL-xFoo-3",))):
+                                    ("wide", tree_src, str(wide), ("TOOL-xFoo-3",))):
             p = subprocess.run([sys.executable, "-c", _PARSER_PROBE, str(kit), at, *ids],
                                cwd=str(root), capture_output=True, text=True, encoding="utf-8")
             assert p.returncode == 0, f"the {label} parser probe crashed:\n{p.stderr[-600:]}"
             seen[label] = json.loads(p.stdout)
     finally:
         cleanup(root)
+        cleanup(wide)
     own = seen["own"]
     for ident, parts in good.items():
         assert own["parts"][ident] == parts, f"{ident} parsed as {own['parts'][ident]}, wanted {parts}"
@@ -3641,10 +3646,11 @@ def test_id_parts_parse_under_each_tree_grammar():
         f"tree_lib at import / after a call: {own['lazy']} / {own['loaded']}, wanted False / True")
     assert (own["id_re"], own["guards"]) == (0, 1), (
         f"ID_RE in the parser {own['id_re']}x, path guards in the module {own['guards']}x, wanted 0 and 1")
-    foreign, home = seen["foreign"]["parts"], seen["home"]["parts"]
+    foreign, wide_parts = seen["foreign"]["parts"], seen["wide"]["parts"]
     assert foreign["ZED-aFoo-2"] == ["ZED", "aFoo", 2], f"the foreign root lost its cited family: {foreign}"
     assert foreign["TOOL-xFoo-3"] == "ValueError", f"the foreign root's a-f slug class was not bound: {foreign}"
-    assert home["TOOL-xFoo-3"] == ["TOOL", "xFoo", 3], f"the home tree refuses x too, so nothing discriminated: {home}"
+    assert wide_parts["TOOL-xFoo-3"] == ["TOOL", "xFoo", 3], (
+        f"the a-z root refuses x too, so the root never moved the answer: {wide_parts}")
     return (f"{len(good)} parsed, {len(bad)} refused naming the id, alt keyword-only, tree_lib lazy; "
             "the foreign root binds its own families and slug class")
 
