@@ -30,8 +30,6 @@ card.snapshot
 card.store
 commits.edge-check
 commits.squash
-context.on-full
-context.threshold
 currency.max-behind
 currency.on-behind
 decisions.major

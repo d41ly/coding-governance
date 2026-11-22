@@ -336,7 +336,12 @@ from collections import Counter  # noqa: E402
 # `unknown` pair line. The figures arm's mixed scenario now carries a two-block message and a
 # sidechain record, which move its pinned narration line and add no check.
 # 1 + 1 = 2
-ASSERTION_FLOOR = 1580
+# RAISED 1580 -> 1587 by KICK-dKeptSession-14, the context fill: ONE new arm with 4 checks —
+# `test_extract_context_fill`'s CLI share of the `context-fill` scenario's last main request, the
+# earlier request read through `until`, an agent file read alone printing `none`, and the liveness that
+# the whole tree's last usage is the agent's. Its decoy checks move it by 3.
+# 4 + 3 = 7
+ASSERTION_FLOOR = 1587
 
 PASS = []
 FAIL = []
@@ -2018,6 +2023,29 @@ def test_extract_ready():
     got = rx.measure_ready_tree(none)
     check("extract ready liveness: with the witness removed and only the placeholder line, ready=0",
           (got["sessions"], got["ready"]), (1, 0))
+
+
+def test_extract_context_fill():
+    """KICK-dKeptSession-14 AC1: the fill is the main file's last main usage over the pinned window,
+    never an earlier turn's and never a subagent's, though the agent's request is the session's last."""
+    base, projects = build_projects("runlog-fill-")
+    sid = build_scenario(projects, "context-fill")
+    main = projects / FIXTURE_PROJECT / f"{sid}.jsonl"
+    r = run_runlog(["context", str(main)], base, build_arm_env(base))
+    check("extract context-fill AC1: runlog.py context prints 60%, the last main request's 120000 of 200000",
+          (r.returncode, r.stdout.strip()), (0, "60%"))
+    t_mid = rx.parse_time("2026-09-13T10:00:10Z")
+    check("extract context-fill: with `until` before the compaction the earlier request's 180000 reads 0.9",
+          rx.measure_context_fill(main, until=t_mid), 0.9)
+    agent = next((projects / FIXTURE_PROJECT / sid / "subagents").glob("agent-*.jsonl"))
+    r = run_runlog(["context", str(agent)], base, build_arm_env(base))
+    check("extract context-fill: an agent file read as a transcript holds no main usage, so prints none",
+          (r.returncode, r.stdout.strip()), (0, "none"))
+    usage = [e for e in rx.extract_session(rx.resolve_session_tree(sid, projects))["events"]
+             if e["kind"] == "usage"]
+    check("extract context-fill liveness: the whole tree's last usage is the agent's 190000, 0.95, the "
+          "decoy the share must not read", (usage[-1]["src"], rx.derive_context_fill(usage[-1])) if usage
+          else None, ("agent", 0.95))
 
 
 def test_extract_ac10_members():

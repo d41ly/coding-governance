@@ -636,12 +636,16 @@ name = "context.on-full"
 allowed = ["compact-with-card", "fresh-at-boundary"]
 default = "fresh-at-boundary"
 owner = "dKeptSession"
+summary = "What a session does as its context window fills, measured from its transcript by the runlog kit's `runlog.py context`: under fresh-at-boundary, at the first item boundary at or past context.threshold the session is told to start fresh there and reorient from its card; under compact-with-card nothing is measured at a boundary, the harness compacts and the replay re-injects the card. The replay's `context —` line names the fill under both."
+usage = 'context.on-full = "compact-with-card"'
 
 [[key]]
 name = "context.threshold"
 allowed = { type = "pattern", regex = "(100|[1-9]?[0-9])%" }
 default = "60%"
 owner = "dKeptSession"
+summary = "The share of the context window, a whole percent, at or past which a session under context.on-full fresh-at-boundary is told to start fresh at its next item boundary: the last main request's tokens over the runlog kit's pinned window. Read only under fresh-at-boundary."
+usage = 'context.threshold = "75%"'
 
 [[key]]
 name = "card.pointers"

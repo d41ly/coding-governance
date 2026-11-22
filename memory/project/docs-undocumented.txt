@@ -99,8 +99,6 @@ policy:card.snapshot	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:card.store	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:commits.edge-check	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:commits.squash	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:context.on-full	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:context.threshold	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:currency.max-behind	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:currency.on-behind	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:decisions.major	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

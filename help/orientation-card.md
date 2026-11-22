@@ -192,6 +192,7 @@ resume — fresh recommended: idle 1840s past 300s · in C:/work/repo/.claude/wo
 partial — 2 uncommitted path(s) · resume.partial: continue-item · kept, the item continues, its witness still owed
 position — act · next item.build.unit-pass
 lead — the compaction summary is a lead, never a source: check it against the position above and the card's pointers
+context — 72% of window · past 60% · fresh at next item boundary (context.on-full: fresh-at-boundary)
 ```
 
 `resume.context` decides the recommendation. `fresh-when-idle`, the default, recommends a fresh
@@ -212,6 +213,25 @@ compaction, and only then, a `lead —` notice follows the `position —` line: 
 the conversation is a paraphrase nothing checks, so read it as a lead and check what it claims against
 the position line and the card's `## pointers` before you act on it. A resume restores the transcript
 itself and prints no notice.
+
+The `context —` line shows how full the session's context window is, as a whole percent: the tokens
+its last request read, as its transcript records them, over a pinned window. A subagent's requests
+never count. The `context.on-full` policy key decides what a filling window leads to, and
+`context.threshold` where it starts: <!-- usage: policy:context.on-full 50e931f0 --> <!-- usage: policy:context.threshold ba7d79dc -->
+
+- `fresh-at-boundary` (the default): once the share reaches `context.threshold` (`60%` by default),
+  end the session at its next item boundary and start a fresh one, which reorients from the card.
+  The replay prints `context — 72% of window · past 60% · fresh at next item boundary
+  (context.on-full: fresh-at-boundary)`, or `context — 41% of window · under 60%` below it. At the
+  item boundary itself, the background boundary verb adds `context — 72% of window · past 60% · fresh
+  now, at this item boundary (context.on-full: fresh-at-boundary)` to the lines reported at your next
+  shell call: that is the point to stop. Below the threshold the boundary prints nothing.
+- `compact-with-card`: nothing is measured at a boundary; the harness compacts the session when its
+  window fills and the replay puts the card back. The replay prints `context — 41% of window
+  (context.on-full: compact-with-card)`.
+
+When the transcript cannot be read, or the measure does not answer within its bound, the replay
+prints `context — skipped:` and why, and the card still prints; a boundary prints nothing.
 
 The card-import fixture's verdict lives in one file per clone, `card-fixture.verdict` in the
 `orientation` folder of the git common directory, so every worktree reads the same one. Record it on

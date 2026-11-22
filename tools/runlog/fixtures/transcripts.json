@@ -165,6 +165,20 @@
         {"type": "user", "uuid": "r-u3", "timestamp": "2026-09-13T10:02:01.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_ready_3", "content": "card appended", "is_error": false}]}},
         {"type": "assistant", "uuid": "r-a4", "timestamp": "2026-09-13T10:03:00.000Z", "version": "9.9.1", "requestId": "req-r4", "message": {"id": "msg-req-r4", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Starting the fixture work after READY."}], "usage": {"input_tokens": 9, "output_tokens": 40, "cache_read_input_tokens": 1500, "cache_creation_input_tokens": 70}}}
       ]
+    },
+    "context-fill": {
+      "about": "KICK-dKeptSession-14 AC1. An earlier main request reading 180000 tokens of context, a later one reading 120000 after a compaction, and an agent file whose request, later than both, reads 190000: the share is the later main request's alone, 60% of the pinned 200000.",
+      "main": [
+        {"type": "user", "uuid": "c-u0", "timestamp": "2026-09-13T10:00:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Start the fixture work."}, "origin": {"kind": "human"}},
+        {"type": "assistant", "uuid": "c-a1", "timestamp": "2026-09-13T10:00:05.000Z", "version": "9.9.1", "requestId": "req-c1", "message": {"id": "msg-req-c1", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_fill_1", "name": "Agent", "input": {"subagent_type": "fixture-lens", "description": "a fixture lens", "prompt": "Review the fixture."}}], "usage": {"input_tokens": 1000, "output_tokens": 10, "cache_read_input_tokens": 170000, "cache_creation_input_tokens": 9000}}},
+        {"type": "system", "subtype": "compact_boundary", "uuid": "c-s1", "timestamp": "2026-09-13T10:00:10.000Z", "version": "9.9.1", "content": "Conversation compacted", "compactMetadata": {"trigger": "auto", "preTokens": 180000}},
+        {"type": "assistant", "uuid": "c-a2", "timestamp": "2026-09-13T10:00:20.000Z", "version": "9.9.1", "requestId": "req-c2", "message": {"id": "msg-req-c2", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Carrying on after the compaction."}], "usage": {"input_tokens": 1000, "output_tokens": 20, "cache_read_input_tokens": 100000, "cache_creation_input_tokens": 19000}}}
+      ],
+      "agents": {
+        "fxcf1": {"meta": {"agentType": "fixture-lens", "spawnDepth": 1, "toolUseId": "toolu_fill_1", "description": "a fixture lens"}, "records": [
+          {"type": "assistant", "uuid": "cf-a1", "timestamp": "2026-09-13T10:00:30.000Z", "version": "9.9.1", "requestId": "req-cf1", "message": {"id": "msg-req-cf1", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "The fixture lens reads a long file."}], "usage": {"input_tokens": 1000, "output_tokens": 30, "cache_read_input_tokens": 180000, "cache_creation_input_tokens": 9000}}, "isSidechain": true, "agentId": "fxcf1"}
+        ]}
+      }
     }
   }
 }
