@@ -44,7 +44,10 @@ Owed to the close: every leg the spec's section 7 names; the unattended suite wh
 `FLOOR_ASSERTIONS` rises from 4077 to 4091 and `FLOOR_SHARD_8` from 1294 to 1308 (PINNED, the block's
 fourteen unconditional `same` rows, all in region eight); the kickoff suite, whose `FLOOR_ASSERTIONS`
 rises from 438 to 441 (PINNED, the three plants' rows from its `--list` loop); and each `New arm:`
-line's RED-first observation.
+line's RED-first observation. Also owed: the `unattended driver selftest shard 8/8` budget row in
+`tools/run-gates/selftest-budgets.txt` was not re-priced for the mailbox block; a scratch fixture making
+the same driver calls measured 45s by direct CLI (DERIVED, that probe), and the edit was refused once
+the spec read CLOSED.
 
 ## Decisions taken in the build
 
@@ -77,7 +80,7 @@ line's RED-first observation.
   (DERIVED, that probe.)
 - AC5 — one id planted on `fy`'s refs `t8` and `t9`, `t9`'s sighting a day earlier, printed once at `t9`'s first-seen and ref; with the remote renamed away the read printed `mail — local copy: the remote did not answer …` on stderr and the cached row, exit 0.
   (DERIVED, that probe.)
-- AC6 — `loop_transition.py --fixture --plant mail-open` printed `refused — tFix · mail open a1b2c3d4e5f6 …`, exit 1, commits unchanged; `--plant mail-disposed` wrote one commit holding the transition record and `…-mailbox-message-1.md`, its trailer and record carrying `disposed=a1b2c3d4e5f6`, the record read by `build_records.py read` with exit 0, `**Serves:** mailbox-message TOOL-tFix-1` and `**State:** acked`; the next move disposed nothing and the check read 0 findings.
+- AC6 — `loop_transition.py --fixture --plant mail-open` printed `refused — tFix · mail open a1b2c3d4e5f6 …`, exit 1 (DERIVED, that probe), commits unchanged; `--plant mail-disposed` wrote one commit holding the transition record and `…-mailbox-message-1.md`, its trailer and record carrying `disposed=a1b2c3d4e5f6`, the record read by `build_records.py read` with exit 0, `**Serves:** mailbox-message TOOL-tFix-1` and `**State:** acked`; the next move disposed nothing and the check read 0 findings.
   (DERIVED, that probe.)
 - AC7 — RUN_CLAIMS off in clone A's conf: the post printed `mail — off`, exit 2, the remote's ref count unchanged; the read printed `mail — off`, exit 0; a `python -c` probe of `read_mail_rows` over that clone returned no row and the unarmed cause `mail — off`, which `write_transition` prints as its one `loop: mail · unarmed` line, and the transition plants whose repository holds no `.unattended.conf` printed that line and recorded.
   (DERIVED, that probe.)
