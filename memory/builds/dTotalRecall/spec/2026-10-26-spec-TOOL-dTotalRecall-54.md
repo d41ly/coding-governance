@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-54 — `parse_id_parts` lands on the named-group regex in step 8, ahead of the readers unit 38 re-points onto it
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -95,6 +95,7 @@ its §4 rule for a landed spelling already says. It repairs `TOOL-dTotalRecall-5
 - **hands-off** `TOOL-dTotalRecall-63` — `parse_id_parts` and its cited-family case, which that unit carries into unit 46's AC1, so unit 46's pass observes this body rather than rebuilding it (the round-1 audit of units 54 to 60, id 3)
 - **hands-off** `TOOL-dTotalRecall-64` — `parse_id_parts`, the body that unit has unit 46's spec name and observe (the round-1 audit of units 54 to 60, id 22)
 - **hands-off** `TOOL-dTotalRecall-66` — `parse_id_parts`, whose refusals, per-root cache and `ConfError` that unit settles (the round-1 audit of units 54 to 60, ids 21, 38 and 39)
+- **hands-off** `TOOL-dTotalRecall-6` — `parse_id_parts`, whose slug names the build a relation's unit-id target belongs to
 
 ## 4. Design
 
@@ -220,6 +221,7 @@ New arm: tools/memory-recall/selftest.py · covers AC1 AC2 AC3 AC5 · the parser
   (HIGH, item H2).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-63, TOOL-dTotalRecall-64, TOOL-dTotalRecall-66, each the other end of an edge a unit the round-1 spec audit of units 54 to 60 promoted wrote; nothing else moved.
 - rev-3 · 2026-11-22 · re-grounded at base `8b8b1374` by 2026-11-22-prompt-TOOL-dTotalRecall-54-reground-spec-writer: §1, §2, §4 and §10 re-point `grammar_for`, `build_grammar`, `_eras` and `resolve` to `id_grammar.py`, where PLAY-dOrderedCharter-18 landed them, citing code as `path#symbol`; S1 admits root `None` (unit 38 S1); S5 and AC5 keep the module's sibling import lazy, through `load_sibling`; the cache claim moves to unit 66 S35 and `ConfError` to its S39; §3 states unit 5's pending slug-class binding; §7 names the four further legs guarding `id_grammar.py` and homes the arm in `tools/memory-recall/selftest.py` (F2).
+- rev-4 · 2026-11-22 · §3 Edges · per `2026-11-22-prompt-TOOL-dTotalRecall-6-reground-brief`: the Edges block gains the hands-off mirror of TOOL-dTotalRecall-6, whose re-ground consumes `parse_id_parts` to type a unit-id target; nothing else moved.
 
 ## 10. Reuse audit
 
