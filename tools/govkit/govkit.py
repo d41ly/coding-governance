@@ -6337,12 +6337,15 @@ def remove_wired_fragments(target: pathlib.Path, rows: list[dict], frags: list[s
     return unwired
 
 
-def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
-    """Parse the target's runner output into leg name -> green|red|skipped.
+def read_gate_verdicts(target: pathlib.Path, gr: dict, reuse: bool = False) -> dict[str, str]:
+    """Parse the target's runner output into leg name -> one of the OBSERVED_STATES.
 
     Run WITHOUT the run-everything escape, deliberately. Running both reads with it doubles the
     target's whole bar AND makes the dead-probe check unreachable, because with every guard
     overridden no leg can report skipped — a liveness half the regime forbids is not one.
+
+    TOOL-dQuietDisk-18 S1: with `reuse` the runner also gets `GATE_REUSE=1`, so a leg whose input key
+    holds an `ok` in the target's reuse cache prints as `reused` rather than executing again.
     """
     cmd = gr.get("command") or []
     if not cmd:
@@ -6356,7 +6359,7 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     # leg line when a declared output is stale, and both reads then parsed an empty map, with which apply
     # could certify an install it never compared. Skipped, a stale output reads as its own leg's red.
     out = subprocess.run(resolve_shell_argv(list(cmd)), cwd=str(target), capture_output=True, text=True,
-                         env=dict(os.environ, GATE_REGEN_CHECK="0"))
+                         env=dict(os.environ, GATE_REGEN_CHECK="0", **({"GATE_REUSE": "1"} if reuse else {})))
     verdicts: dict[str, str] = {}
     for state, key in OBSERVED_STATES:
         for tmpl in (gr.get(key) or []):
@@ -6368,6 +6371,38 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
                 if line.startswith(head) and len(line) > len(head):
                     verdicts.setdefault(line[len(head):].strip().split("  ")[0].strip(), state)
     return verdicts
+
+
+def derive_leg_state(state: str | None) -> str | None:
+    """TOOL-dQuietDisk-18 S3, S4: a leg the runner REUSED is a green one, and every other state is
+    itself. The reuse cache holds only `ok` entries, so a reused leg was proven green under the same
+    input key; every test of a before state, and the receipt's two maps, read through this."""
+    return "green" if state == "reused" else state
+
+
+def read_baseline_mode(target: pathlib.Path, gr: dict) -> str:
+    """TOOL-dQuietDisk-18 S5: `reuse` when the target's `install.baseline` answers `reuse` and its
+    `[gate_runner]` declares a non-empty `observed_reused`, else `run`, with one line naming why.
+
+    A failed read costs a saving and never a verdict, so unlike `read_retired_edits_mode` nothing
+    here refuses. The template is tested first: a runner whose reused legs cannot be parsed would
+    drop them from both maps, and a leg skipped after a green one would no longer be refused."""
+    if not gr.get("observed_reused"):
+        print("govkit apply — the baseline reads in the `run` mode: this target's [gate_runner] "
+              "declares no observed_reused, so a reused leg could not be parsed")
+        return "run"
+    try:
+        value, source, reason = read_policy_value("install.baseline", target)
+    except (LookupError, Refusal) as exc:
+        why = (str(exc).strip().splitlines() or [""])[0]
+        print(f"govkit apply — the baseline reads in the `run` mode: install.baseline could not be "
+              f"read: {why}")
+        return "run"
+    if value == "reuse":
+        return "reuse"
+    print(f"govkit apply — the baseline reads in the `run` mode: install.baseline = {value!r} "
+          f"({source}: {reason})")
+    return "run"
 
 
 def resolve_stand_down(hole: dict, selection: list[str], owned: frozenset | set = frozenset(),
@@ -7857,23 +7892,31 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- came from are printed and recorded, and a CHANGE to either re-prompts.
     before_map: dict[str, str] = {}
     baseline = {"kind": gr.get("kind", "absent")}
+    # TOOL-dQuietDisk-18 S2: ONE mode, read once, for both reads, so the two maps stay comparable.
+    reuse = False
     if gr.get("kind") == "manifest":
         print(f"govkit apply — the baseline will RUN, from this target's own .governance/deploy.toml:"
               f"\n                 {' '.join(gr.get('command') or [])}")
+        reuse = read_baseline_mode(target, gr) == "reuse"
+        if reuse:
+            print("govkit apply — the baseline will RUN, reusing each leg the target's reuse cache "
+                  "holds green")
         step(STEP_BASELINE, "reading the target's own runner")
-        before_map = read_gate_verdicts(target, gr)
-        baseline["legs"] = before_map
+        before_map = read_gate_verdicts(target, gr, reuse=reuse)
+        # S4: the receipt's copy says `green` for a reused leg; `before_map` keeps the runner's word.
+        baseline["legs"] = {n: derive_leg_state(v) for n, v in before_map.items()}
         # A map with nothing green or red carries no information — every leg after the install
         # would land in the row that carries the exemptions. `held` joins `skipped` here by being
         # absent from the green/red test, which is what makes an all-held baseline refuse rather
-        # than sail through on an empty map. TOOL-dUnstalledConvoy-26.
-        if before_map and not any(v in ("green", "red") for v in before_map.values()):
+        # than sail through on an empty map. TOOL-dUnstalledConvoy-26. A REUSED leg is green
+        # (TOOL-dQuietDisk-18 S3), so an all-reused baseline is no dead probe.
+        if before_map and not any(derive_leg_state(v) in ("green", "red") for v in before_map.values()):
             raise Refusal(
                 "DEAD PROBE: the baseline read parsed legs but not one of them is green or red — a "
                 "map that is entirely skipped carries no information, and every leg after the "
                 "install would land in the row that carries the exemptions. Refusing rather than "
                 "rerouting the whole install into its most forgiving branch")
-        reds = [n for n, v in before_map.items() if v == "red"]
+        reds = [n for n, v in before_map.items() if derive_leg_state(v) == "red"]
         if reds and (deploy.get("policy") or {}).get("on_baseline_red") == "refuse":
             raise Refusal(f"on_baseline_red = refuse and these legs are already red before this "
                           f"install: {', '.join(sorted(reds))}")
@@ -8563,9 +8606,11 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     after_map: dict[str, str] = {}
     if gr.get("kind") == "manifest":
         step(STEP_AFTER, "re-reading the target's runner")
-        after_map = read_gate_verdicts(target, gr)
+        after_map = read_gate_verdicts(target, gr, reuse=reuse)
         for nm in sorted(set(before_map) | set(after_map)):
-            b, a2 = before_map.get(nm), after_map.get(nm)
+            # TOOL-dQuietDisk-18 S3: a leg reused before is green before; the after side keeps the
+            # runner's own word, so a reuse after still prints the carried note below.
+            b, a2 = derive_leg_state(before_map.get(nm)), after_map.get(nm)
             if b == "green" and a2 == "red":
                 r.fail(f"leg '{nm}' was green before this install and is red after")
             elif b == "green" and a2 == "held":
@@ -8605,7 +8650,10 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # alone, a narrower apply dropped a carried kit's hole and machine orders while keeping its claim,
     # so `check` stopped reporting its machine destination and verifying its outbox files.
     _rcpt_doc.update({
-        "files": rows + _carried_rows, "orders": orders + _carried_orders, "after": after_map,
+        # TOOL-dQuietDisk-18 S4: `after` records a reused leg as `green`, so the receipt is the same
+        # bytes whichever legs the runner's sample drew, and the same a `run` apply writes.
+        "files": rows + _carried_rows, "orders": orders + _carried_orders,
+        "after": {n: derive_leg_state(v) for n, v in after_map.items()},
         "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
                         "emitted": emitted, "legs_withheld": _legs_withheld}})
     # TOOL-dRedressedBar-19 S40: the sidecar first, the receipt last, each through `write_atomic`.

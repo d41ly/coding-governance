@@ -8271,6 +8271,78 @@ user_skills = "/tmp/gk-fake-skills"
             check("and nothing was installed on that refusal: " + needle[:20],
                   not (bt / ".governance" / "install.json").exists(), "")
 
+        # ---- TOOL-dQuietDisk-18 AC1 to AC5. BOTH READS THROUGH THE TARGET'S REUSE CACHE. The stub
+        # ---- runner logs the `GATE_REUSE` it was handed and prints its first call's lines, then its
+        # ---- later calls', each from a file under `.git` so the tracked tree is the same in every
+        # ---- case. A leg reused before must read as green: bypass `derive_leg_state` and the
+        # ---- all-reused baseline refuses as a DEAD PROBE, and `a`'s red after is no longer refused.
+        STUB18 = ('n=$(cat .git/stub.n 2>/dev/null || echo 0); echo $((n+1)) > .git/stub.n\n'
+                  '[ -n "${GATE_REUSE:-}" ] && echo "GATE_REUSE=$GATE_REUSE" >> .git/stub.log\n'
+                  'if [ "$n" = 0 ]; then cat .git/stub.before; else cat .git/stub.after; fi\n')
+
+        def build_reuse_target18(name: str, before: list, after: list, reused: bool = True,
+                                 policy: str = "") -> pathlib.Path:
+            g = runner_target(name, extra='observed_reused = ["GATE reuse {name}"]\n' if reused else "")
+            (g / PFX / "runner.sh").write_text(STUB18, encoding="utf-8", newline="\n")
+            if policy:
+                (g / ".governance" / "policy.toml").write_text(policy, encoding="utf-8", newline="\n")
+            git(g, "add", "-A"); git(g, "commit", "-qm", "stub runner")
+            for _k, _ls in (("before", before), ("after", after)):
+                (g / ".git" / f"stub.{_k}").write_text("".join(f"{_l}\n" for _l in _ls),
+                                                     encoding="utf-8", newline="\n")
+            return g
+
+        def run_reuse_apply18(g: pathlib.Path) -> tuple:
+            _p = run("apply", "--target", str(g), "--kits", "check-wiring")
+            _lg = g / ".git" / "stub.log"
+            return _p, _p.stdout + _p.stderr, _lg.read_text(encoding="utf-8") if _lg.is_file() else ""
+
+        _c18 = {"rb": (["GATE reuse a"], ["GATE reuse a"], True, ""),
+                "ob": (["GATE ok    a"], ["GATE ok    a"], True, ""),
+                "ac2": (["GATE reuse a", "GATE ok    b"], ["GATE reuse a", "GATE FAIL  b"], True, ""),
+                "ac3": (["GATE reuse a"], ["GATE FAIL  a"], True, ""),
+                "run": (["GATE ok    a"], ["GATE ok    a"], True, 'install.baseline = "run"\n'),
+                "bad": (["GATE ok    a"], ["GATE ok    a"], True,
+                        'policy-file.on-invalid = "refuse"\ninstall.baseline = "maybe"\n'),
+                "notm": (["GATE ok    a"], ["GATE ok    a"], False, "")}
+        _t18 = {_k: build_reuse_target18(f"u18{_k}", *_v) for _k, _v in _c18.items()}
+        import concurrent.futures as _cf18
+        with _cf18.ThreadPoolExecutor(4) as _ex18:
+            _r18 = dict(zip(_t18, _ex18.map(run_reuse_apply18, _t18.values())))
+        _p18, _o18, _l18 = _r18["rb"]
+        check("[dQuietDisk-18] AC1 both reads run with GATE_REUSE=1 under the default `reuse`",
+              _l18 == "GATE_REUSE=1\nGATE_REUSE=1\n", _l18)
+        check("[dQuietDisk-18] AC1 ...printing the argv line and the reuse line",
+              "the baseline will RUN, from this target's own" in _o18
+              and "the baseline will RUN, reusing" in _o18, _o18)
+        check("[dQuietDisk-18] AC3 an all-reused baseline is no DEAD PROBE, and the apply passes",
+              _p18.returncode == 0 and "DEAD PROBE" not in _o18, _o18)
+        _rcp18 = {_k: _t18[_k] / ".governance" / "install.json" for _k in ("rb", "ob")}
+        _d18 = (json.loads(_rcp18["rb"].read_text(encoding="utf-8"))
+                if _rcp18["rb"].is_file() else {})
+        check("[dQuietDisk-18] AC4 the receipt records a reused leg as green, before and after",
+              (_d18.get("baseline") or {}).get("legs") == {"a": "green"}
+              and _d18.get("after") == {"a": "green"}, str(_d18.get("baseline")) + str(_d18.get("after")))
+        check("[dQuietDisk-18] AC4 ...and is the same bytes as the receipt of a stub that printed ok",
+              all(_f.is_file() for _f in _rcp18.values())
+              and _rcp18["rb"].read_bytes() == _rcp18["ob"].read_bytes(), _r18["ob"][1])
+        _p18, _o18, _l18 = _r18["ac2"]
+        check("[dQuietDisk-18] AC2 a leg green before and red after is refused, the reused leg is not",
+              _p18.returncode != 0 and "leg 'b' was green before this install and is red after" in _o18
+              and not any("leg 'a'" in _ln and "REUSED after" not in _ln for _ln in _o18.splitlines()),
+              _o18)
+        _p18, _o18, _l18 = _r18["ac3"]
+        check("[dQuietDisk-18] AC3 a leg reused before and red after is refused",
+              _p18.returncode != 0 and "leg 'a' was green before this install and is red after" in _o18,
+              _o18)
+        for _k, _needle in (("run", "install.baseline = 'run'"), ("bad", "install.baseline could not be read"),
+                            ("notm", "declares no observed_reused")):
+            _p18, _o18, _l18 = _r18[_k]
+            check(f"[dQuietDisk-18] AC5 `{_k}` reads as run on one line, completes, and passes no GATE_REUSE",
+                  _p18.returncode == 0 and _l18 == ""
+                  and sum("the baseline reads in the `run` mode" in _ln for _ln in _o18.splitlines()) == 1
+                  and _needle in _o18, _o18 + _l18)
+
         # ===== unit 6: the merged region =====
         NLc = chr(10)
 

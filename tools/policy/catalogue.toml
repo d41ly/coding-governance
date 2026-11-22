@@ -1796,6 +1796,14 @@ default = "offer"
 owner = "dShippedRelease"
 
 [[key]]
+name = "install.baseline"
+allowed = ["reuse", "run"]
+default = "reuse"
+summary = "Whether govkit apply's two reads of your runner, before and after it writes, reuse each leg your runner's reuse cache holds green for unchanged inputs, or execute every leg as before; a runner with no observed_reused template reads as run."
+usage = 'install.baseline = "run"'
+owner = "dQuietDisk"
+
+[[key]]
 name = "tests.history-verdicts"
 allowed = ["stored", "regraded"]
 default = "stored"

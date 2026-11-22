@@ -12888,6 +12888,11 @@
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
+      "id": "derive_leg_state",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_leg_tag",
       "kind": "function",
       "file": "tools/run-gates/leg_factory.py"
@@ -21321,6 +21326,11 @@
       "id": "read_baseline_line",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "read_baseline_mode",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "read_baseline_rows",
