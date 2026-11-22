@@ -53,3 +53,7 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-22T01:53:44Z brief · item TOOL-dQuietDisk-14 · reason 8a9f9f6042d6 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-14-build-brief.md
 
 2026-11-22T01:55:16Z dispatch · item 638dfecd TOOL-dQuietDisk-14 · reason tools/govkit/govkit.py WIRE-INTO-PROJECT.md memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-14.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-14-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-14-deviation-1.md memory/LIVE.md memory/INDEX.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/guides/SESSION-KICKOFF.md memory/map/FOUNDATION.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/map/generated/CARDS.md tools/govkit/subject-pins.tsv
+
+2026-11-22T03:07:52Z brief · item TOOL-dQuietDisk-1 · reason 3df211fad528 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-build-brief.md
+
+2026-11-22T03:07:54Z brief · item TOOL-dQuietDisk-14 · reason 555b5e672671 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-14-build-brief.md

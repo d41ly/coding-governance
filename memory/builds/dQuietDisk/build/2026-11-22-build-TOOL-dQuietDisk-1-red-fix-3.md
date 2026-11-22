@@ -4,7 +4,7 @@
 
 - **Leg:** build README slot contract
 - **Red line:** build-index: memory/project/readme-contract.txt names neither a bound nor an exempt row for memory/builds/dQuietDisk/README.md
-- **Files:** memory/builds/dQuietDisk/README.md, memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-1-widen-1.md, memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-1.md, memory/project/readme-contract.txt
+- **Files:** memory/builds/dQuietDisk/README.md, memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-1-widen-1.md, memory/project/readme-contract.txt
 - **Commit:** 8e84b9e2d9b1f415f79422a2ec586dee065fab42
 - **Rerun:** build-index: slot contract clean (224 build README(s); heading canon BOUND on 155)
 - **Caused-by:** TOOL-dQuietDisk-1
