@@ -6563,6 +6563,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "check_fence_records",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "check_fenced_case",
       "kind": "function",
       "file": "tools/run-gates/keep_tails.py"
@@ -9231,6 +9236,11 @@
       "id": "check_steps_recordable",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_stream_plan",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "check_sub_context",
@@ -32913,6 +32923,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "resolve_validator",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "resolve_version_value_at",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -37576,6 +37591,11 @@
       "id": "scan_feed_writers",
       "kind": "function",
       "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "scan_fence_records",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "scan_file",

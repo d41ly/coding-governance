@@ -279,7 +279,7 @@ row: `never gains` admits a widened row only where that record is tracked, names
 the key, and gives a reason. Under `retrofit.widen = "refuse"` the door writes nothing and the leg
 admits only a record the compare base already tracks. A widened row's count is not checked.
 
-## The record-kind registry — one declaration per kind (TOOL-dTotalRecall-1, -18)
+## The record-kind registry — one declaration per kind (TOOL-dTotalRecall-1, -18, -25)
 
 `<prefix>/memory-tree/record-kinds.toml` declares every kind of record the memory tree holds, and one
 witness row per family of pockets outside it, one `[[record-kind]]` row each, and
@@ -287,9 +287,11 @@ witness row per family of pockets outside it, one `[[record-kind]]` row each, an
 `name`; `tag`, `record.<name>`; `layer`, the `layer.<name>` tag of the kit whose writer writes the
 kind; `home`, one glob or a list, each a tracked-path glob, `refs/gov/<glob>` or
 `<git-common-dir>/<glob>`, a `fields` row's one tracked glob, the population it grades; `id-rule`,
-the name grammar or `""`; `schema`, `{ form, source, fields }`, `form` one of `fields`, `header`,
-`rows`, `generated`, `source` an optional `<path>:<NAME>[.<key>]...` literal another module declares
-the same fields in, read by `ast` and never imported; `writer`, the door writing the kind,
+the name grammar or `""`; `schema`, `{ form, source, fields, validator }`, `form` one of `fields`,
+`header`, `rows`, `generated` or `fence`, `source` an optional `<path>:<NAME>[.<key>]...` literal another
+module declares the same fields in, read by `ast` and never imported, `validator`, on a `fence` row alone
+and required there, `<module>:<function>`, a `<module>.py` of this kit's directory and a function at
+its top level that takes a record's text and returns its reds; `writer`, the door writing the kind,
 `generator:<path>` or `hand`; `readers`, the work-order read keys a handoff fills from a record of the
 kind, or `[]` beside `readers-none`, the reason no role reads it; `lifecycle`, one of `append-only`,
 `current-state`, `frozen`, `generated` or `out`; `check`, the leg grading it; `purpose`, last,
@@ -317,17 +319,22 @@ kit's `SERVES_ALIASES` is held to it.
 | `--check` | the `record-kinds` leg: every row's columns and their grammar, its readers against the roles, its `check` leg and its `source` both ways, the factory's `TYPED_RECORD_KINDS` joined to the rows both ways, every `fields` record outside the legacy ledger carrying its fields in order, each deviation's `Follow-through: gap <key>` resolved, the view byte for byte against a fresh read of the roles and items, the common git dir's entries each matched by a witness row's home, and the runlog kit's alias literal; one `view · <kind> · read by … · written by …` line per row |
 | `--write` | renders the `gen:record-kinds` region of `HYGIENE.template.md`, which `adopt-memory-tree.sh --render` carries into `<memory root>/HYGIENE.md` |
 | `--template <kind>` | prints the skeleton one `fields` row defines, the layout `build_records.py` writes |
-| `new <name> --tag record.<name> --writer <door> --check <leg> --field <Key>... --home <glob> --layer <tag> --lifecycle <value> --purpose <text> (--reader <key>... \| --readers-none <reason>)` | the factory: appends one conforming row, its purpose `source = "owner"`, and re-renders the view, exit 2 writing nothing on a missing column or one outside its grammar |
+| `new <name> --tag record.<name> --writer <door> --check <leg> --home <glob> --layer <tag> --lifecycle <value> --purpose <text> (--reader <key>... \| --readers-none <reason>) (--field <Key>... \| --form fence --validator <module>:<function>)` | the factory: appends one conforming `fields` row, or with `--form fence` a `fence` row naming its validator, its purpose `source = "owner"`, a typed kind's `source` the factory's `KINDS.<name>.required` and its `id-rule` the typed name, and re-renders the view, exit 2 writing nothing on a missing column or one outside its grammar, a `--field` on a `fence` row, a `--validator` on a `fields` row, or a validator that does not resolve |
 | `--purpose-review [--from <path>]` | the purpose review: each registry row with no `text` and each chain registry row with no `purpose`, tried by the H1 of its file, then the `--from` record's table row naming the kind; one `derived <node> · <text> · <source>` or `none <node> · <found>` line each and one `ask <namespace> · …` draft per namespace holding a `none` node; `unarmed chain` where the playbook kit's CHAIN_REGISTRY does not resolve |
 | `--purpose-review … --write [--ask <id>]` | writes each derived purpose into its node's own field, one inserted line each, and each `none` registry row's pending by `memory.map-purpose`: `--ask`'s open ask, `purpose-pending` or `none-found`; exit 2 writing nothing on a closed or unknown ask, or `ledger` with no registration |
 | `--print-purpose-pending` | prints the `purpose-pending` population, `<node> TAB 1` per registry row pending on it and per chain row with no purpose, for `legacy_ledger.py seed` |
 | `--seed-legacy` | prints the `record-kinds-legacy` population, `<path> TAB <row name> TAB 1` per record a `fields` row grades, for `legacy_ledger.py seed` |
 | `--print-gap-keys` | the `gap-key` native class's members, the first cells of every tracked gap register; exit 3 where none is tracked |
-| `--fixture [--plant <case>]` | builds a throwaway repository and runs `--check` there; `--selftest` asserts every plant red |
+| `--fixture [--plant <case>]` | builds a throwaway repository and runs `--check` there, its registry holding a typed `stream-plan` `fence` row and one well-formed plan of two streams; the `stream-unordered`, `stream-empty`, `stream-order-text`, `stream-unit-twice`, `stream-fence-missing` and `stream-validator-missing` plants each red the plan or the row; `--selftest` asserts every plant red and `new`'s two `fence` refusals |
 
 A typed kind's row grades only the records its `build_records.py` name grammar matches, so a
 `…-probe-design.md` its glob also matches falls to the `research` row. A typed kind with no record
-yet prints `<kind>: unarmed — no record yet` and passes; any other empty population reds. The step
+yet prints `<kind>: unarmed — no record yet` and passes; any other empty population reds. A `fence`
+row's records are graded by its validator, each red prefixed `row <kind>: <path>:` and the row counted
+`<kind> fence <n> graded`; the `stream-plan` kind's, `check_stream_plan`, reds a missing or unparseable
+fence, a stream with no units, a unit with no `order` or one that is no whole number the spec header's
+`· order <n>` grammar reads, and a unit id in two streams, and while no plan exists its unarmed line
+names dIndexedDesign's planner as its writer. The step
 gate's `record-kind-schema` class holds `<kind>.<field>` per field of every row, so a removed field is
 a vanished member; `journal.Serves`, which left with the rename, is named by a `[[retired]]` row of
 the govkit registry. What it does not check: whether a `writer` writes its kind, a field's value, a

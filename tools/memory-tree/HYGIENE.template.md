@@ -685,7 +685,9 @@ carry it too:
   step, its snapshot, fields `Build`, `Step` and `Ref` and the card's text in one `~~~~` fenced block)
   · `probe-trigger` (a probe opened at an item boundary, fields `Cause`, `Asker`, `Subject`, `At` and
   `Key`) · `probe` (the probe it opened: its pinned head, its `## Method` entries, its run lines and
-  its `Verdict` beside `Judged`, written by the loop kit's `probe.py`). The sixteen after `research`
+  its `Verdict` beside `Judged`, written by the loop kit's `probe.py`) · `stream-plan` (a build's
+  units grouped into ordered streams, no field and one TOML fence of `[[stream]]` tables, written by
+  dIndexedDesign's planner). The seventeen after `research`
   are the typed kinds: each record is named
   `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
@@ -811,7 +813,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 
 <!-- gen:record-kinds -->
 
-46 kinds · 24 purposes pending
+47 kinds · 24 purposes pending
 
 | Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |
 |---|---|---|---|---|---|---|---|
@@ -861,6 +863,7 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 | `handoff-calls` | `record.handoff-calls` | `<git-common-dir>/handoff-calls/*` | `handoff.py` | — | — | `record-kinds` | — |
 | `index-render-stamp` | `record.index-render-stamp` | `<git-common-dir>/gen-build-index-render-stamp` | `gen_build_index.py` | — | — | `record-kinds` | — |
 | `git-client-state` | `record.git-client-state` | `<git-common-dir>/sourcetreeconfig.json` | `hand` | — | — | `record-kinds` | — |
+| `stream-plan` | `record.stream-plan` | `memory/builds/*/build/*-stream-plan-*.md` | `hand` | — | — | `record-kinds` | a build's units grouped into ordered streams, written by dIndexedDesign's planner, read by dWellOiledMachine's pick |
 
 <!-- /gen:record-kinds -->
 

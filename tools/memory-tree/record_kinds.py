@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""record_kinds.py — the record-kind registry's reader, gate, view and factory (TOOL-dTotalRecall-1, -18, -16).
+"""record_kinds.py — the record-kind registry's reader, gate, view and factory (TOOL-dTotalRecall-1, -18, -16, -25).
 
     python <prefix>/memory-tree/record_kinds.py --check             # the `record-kinds` leg
     python <prefix>/memory-tree/record_kinds.py --write             # the HYGIENE template's kind region
     python <prefix>/memory-tree/record_kinds.py --template <kind>   # the record skeleton of one kind
     python <prefix>/memory-tree/record_kinds.py new <name> --tag record.<name> --writer <door>
-                                                --check <leg> --field <Key>... --home <glob>
+                                                --check <leg> --home <glob>
                                                 --layer <tag> --lifecycle <value> --purpose <text>
                                                 (--reader <key>... | --readers-none <reason>)
+                                                (--field <Key>... | --form fence --validator <module>:<function>)
     python <prefix>/memory-tree/record_kinds.py --purpose-review [--from <path>] [--write [--ask <id>]]
     python <prefix>/memory-tree/record_kinds.py --print-purpose-pending   # the purpose-pending seed
     python <prefix>/memory-tree/record_kinds.py --seed-legacy       # the record-kinds-legacy seed
@@ -27,10 +28,12 @@ a ref glob `refs/gov/<glob>` or `<git-common-dir>/<glob>`; a `fields` row's is o
 population it grades. `readers` lists the work-order read keys a handoff fills from a record of the
 kind, each a member of the roles kit's `READ_KEYS` that some role's `reads:` names; a kind no role
 reads carries `readers = []` and a non-empty `readers-none` reason. `schema` is
-`{ form, fields, source }`: `form` one of `fields`, `header`, `rows`, `generated`; `fields` the
-`**Key:**` lines a record carries; `source`, optional, `<path>:<NAME>[.<key>]...`, its path spelled
-through `{prefix}`, the literal another module declares the same fields in, read with `ast` and
-never by import, so a sibling kit's table is read without crossing a kit boundary.
+`{ form, fields, source, validator }`: `form` one of `fields`, `header`, `rows`, `generated`, `fence`;
+`fields` the `**Key:**` lines a record carries; `source`, optional, `<path>:<NAME>[.<key>]...`, its path
+spelled through `{prefix}`, the literal another module declares the same fields in, read with `ast` and
+never by import, so a sibling kit's table is read without crossing a kit boundary; `validator`, on a
+`fence` row alone and required there, `<module>:<function>`, a `<module>.py` of this kit's own directory
+and a function at its top level taking a record's text and returning its reds (`resolve_validator`).
 
 THE VIEW, the HYGIENE template's `gen:record-kinds` region, is one `<n> kinds · <p> purposes pending`
 line and one table line per row: `Kind`, `Tag`, `Home`, `Writer`, `Read by`, `Written by`, `Check` and
@@ -59,7 +62,12 @@ a `**Key:**` line, bare or a `- **Key:**` bullet, in the row's order, except a r
 A typed kind's row grades only the paths its name grammar (`build_records.derive_record_name`) also
 matches, and a path a typed grammar matches is graded by that kind's row alone. A typed kind whose home
 matches nothing prints `<kind>: unarmed — no record yet` and passes; any other empty population
-reds. A graded deviation's `Follow-through: gap <key>` must name a key some tracked gap register
+reds. THE FENCE ARM, `check_fence_records`, runs each `fence` row's resolved validator over every
+tracked record its home matches, narrowed as a `fields` row's is, each red prefixed `row <kind>: <path>:`
+and the row counted `<kind> fence <n> graded`; a validator that does not resolve is one red of the row
+and grades nothing. `check_stream_plan` is the `stream-plan` kind's: its one TOML fence of `[[stream]]`
+tables, each unit's `order` read by the spec header verb's grammar, and its unarmed line names its
+writer (`STREAM_PLAN_UNARMED`). A graded deviation's `Follow-through: gap <key>` must name a key some tracked gap register
 holds, and no register holding a key reds. The HYGIENE template's `gen:record-kinds` region must be
 byte for byte what `--write` writes. THE POCKET ARM, `check_pockets`, lists the top-level entries of
 the common git dir (the inline `common_git_dir` block), skips git's own (`GIT_OWN`), and reds each
@@ -93,15 +101,20 @@ under `review`, `purpose-pending` under `ledger`, `none-found` under `derive`, n
 Exit 0 green, 1 a red, 2 a refusal: a registry that does not parse, or a verb's malformed arguments.
 `new` appends the row and re-renders that region from the registry, so the two move together; it
 exits 2 and writes nothing on a duplicate name, a tag that is not `record.<name>`, an empty
-writer, no `--home` or no `--field`, a check no leg carries, no `--layer` or one that is no
+writer, no `--home`, a `--form` other than `fields`, its default, or `fence`, a `fields` row with no
+`--field` or with a `--validator`, a `fence` row with a `--field` or with no `--validator` or one that
+does not resolve, a check no leg carries, no `--layer` or one that is no
 `layer.<name>` tag, no `--lifecycle` or one outside `LIFECYCLES`, no `--reader` and no
 `--readers-none`, both, or a reader key the roles do not read, or no `--purpose`, an empty one, one
-past `PURPOSE_BYTES` or one holding a newline; its row's `source` is `owner`. `--print-gap-keys` exits 3 where no
+past `PURPOSE_BYTES` or one holding a newline; its row's purpose `source` is `owner`, and a member of the
+typed kind list gets the factory's `KINDS.<name>.required` as its schema `source` and
+`<date>-build-<unit id>-<name>-<n>.md` as its `id-rule`. `--print-gap-keys` exits 3 where no
 gap register is tracked, the native class's not-armed answer.
 
 WHAT IT DOES NOT CHECK. Whether a row's `writer` writes the kind: the cell is read, never run. A
 field's value, only its line. A `gap-key` at an edge site, since no edge type names the class. A
-`header`, `rows` or `generated` row's records, which its `check` leg's owner grades. Whether a
+`header`, `rows` or `generated` row's records, which its `check` leg's owner grades. Whether a stream
+plan's unit id names a spec, or agrees with the specs' `order` verbs. Whether a
 non-`fields` row's tracked home matches a file, or a `refs/gov/` home a ref. Whether a `layer` tag
 is a row of the playbook kit's layer register: its shape only. A `WRITE_FOLDERS` value that is no
 folder (the product class's conf key) covers no home. A pocket's contents, which it never reads.
@@ -113,6 +126,7 @@ from __future__ import annotations
 import argparse
 import ast
 import fnmatch
+import importlib
 import json
 import os
 import pathlib
@@ -156,8 +170,14 @@ GIT_OWN = frozenset(("HEAD", "ORIG_HEAD", "FETCH_HEAD", "MERGE_HEAD", "CHERRY_PI
                      "COMMIT_EDITMSG", "config", "description", "hooks", "index", "info", "logs", "objects",
                      "packed-refs", "refs", "worktrees", "modules", "lost-found", "shallow", "gc.log"))
 UNARMED = "unarmed"
-FORMS = ("fields", "header", "rows", "generated")
-SCHEMA_KEYS = ("form", "fields", "source")
+FORMS = ("fields", "header", "rows", "generated", "fence")
+SCHEMA_KEYS = ("form", "fields", "source", "validator")
+NEW_FORMS = ("fields", "fence")   # the forms `new` writes (TOOL-dTotalRecall-25 S7)
+#: a `fence` row's `schema.validator`: a bare module of this kit's directory and a function at its top level
+VALIDATOR_RE = re.compile(r"(?P<module>[A-Za-z_][A-Za-z0-9_]*):(?P<function>[A-Za-z_][A-Za-z0-9_]*)")
+#: a record's machine half, the regex the codebase map's `parse_dossier` reads a dossier's with, carried as
+#: its own constant since the kits do not import each other
+TOML_FENCE_RE = re.compile(r"^```toml[ \t]*\r?$(.*?)^```[ \t]*\r?$", re.MULTILINE | re.DOTALL)
 NAME_RE = re.compile(r"[a-z][a-z0-9-]*")
 FACTORY_SOURCE = re.compile(r"(?:^|/)build_records\.py:KINDS\.([^.]+)\.required$")
 GAP_KEY_RE = re.compile(r"gap-[a-z]+-\d{2,3}")
@@ -398,6 +418,13 @@ def check_row(row: dict, n: int, legs: set, root, tool_rel: str) -> list[str]:
     fields = schema.get("fields", [])
     if schema.get("form") not in FORMS:
         reds.append(f"{at}: schema.form {schema.get('form')!r} is not one of {', '.join(FORMS)}")
+    if schema.get("form") == "fence":   # S4: a fence row's validator resolves, and no other form names one
+        if "validator" not in schema:
+            reds.append(f"{at}: a `fence` row names no `schema.validator` <module>:<function>, so no record of it is graded")
+        else:
+            reds += [f"{at}: {why}" for fn, why in [resolve_validator(schema["validator"])] if fn is None]
+    elif "validator" in schema:
+        reds.append(f"{at}: `schema.validator` on a {schema.get('form')!r} row: only a `fence` row names a validator")
     if not (isinstance(fields, list) and all(isinstance(f, str) and f for f in fields)):
         return reds + [f"{at}: schema.fields is not a list of field names"]
     if schema.get("form") == "fields":
@@ -485,6 +512,133 @@ def scan_legacy_records(root, rows: list[dict], typed_kinds) -> dict:
                 keep.append(path)
         out[name] = keep
     return out
+
+
+def scan_fence_records(root, rows: list[dict], typed_kinds) -> dict:
+    """`{row name: [path...]}`: every tracked record each `fence` row's tracked-path home globs match,
+    narrowed as `scan_legacy_records` narrows a `fields` row's: a typed kind's row keeps the paths its name
+    grammar also matches, and a path some typed grammar matches is kept for that kind's row alone."""
+    from build_records import derive_record_name
+    grammars = {k: derive_record_name(k) for k in typed_kinds}
+    out = {}
+    for row in rows:
+        schema = row.get("schema") if isinstance(row.get("schema"), dict) else {}
+        if schema.get("form") != "fence":
+            continue
+        name, keep = row.get("name"), []
+        for glob in derive_home_globs(row.get("home")):
+            if glob.startswith((COMMON_DIR_HOME, REF_HOME)):
+                continue
+            for path in read_tracked(root, glob):
+                typed = [k for k, g in grammars.items() if g.search(path)]
+                if ((name in typed) if name in grammars else not typed) and path not in keep:
+                    keep.append(path)
+        out[name] = keep
+    return out
+
+
+def resolve_validator(spelled):
+    """S4: `(callable, "")` for a `fence` row's `<module>:<function>`, the module a `<module>.py` in this
+    kit's own directory and the function a callable at its top level; `(None, reason)` where it does not
+    resolve. Only a bare module name of this directory is imported, so a registry cell names no code
+    elsewhere."""
+    m = VALIDATOR_RE.fullmatch(spelled) if isinstance(spelled, str) else None
+    if m is None:
+        return None, (f"validator {spelled!r} is not <module>:<function>, a bare module of the memory-tree kit's "
+                      f"directory and a function at its top level")
+    module, function = m["module"], m["function"]
+    if not (KIT / f"{module}.py").is_file():
+        return None, f"validator {spelled}: no {module}.py in the memory-tree kit's directory"
+    try:   # this module by its own name, whether it runs as a script or was loaded by path
+        mod = sys.modules[__name__] if module == pathlib.Path(__file__).stem else importlib.import_module(module)
+    except Exception as e:   # noqa: BLE001 — any import failure is the reason the cell does not resolve
+        return None, f"validator {spelled}: {module} does not import: {type(e).__name__}: {e}"
+    if pathlib.Path(getattr(mod, "__file__", "") or "").resolve().parent != KIT.resolve():
+        return None, f"validator {spelled}: {module} imports from outside the memory-tree kit's directory"
+    fn = vars(mod).get(function)
+    if not callable(fn):
+        return None, f"validator {spelled}: {module} holds no top-level function {function}"
+    return fn, ""
+
+
+def check_fence_records(root, rows: list[dict], typed_kinds) -> tuple[list[str], list[str]]:
+    """S4's grading arm: `(reds, unarmed)`. Each `fence` row whose validator resolves runs it over every record
+    `scan_fence_records` keeps for it, each red it returns prefixed `row <kind>: <path>:`; a row whose
+    validator does not resolve is `check_row`'s red alone, skipped here. A typed row matching no record is
+    `unarmed`, the stream-plan kind's line naming its writer; any other empty population reds."""
+    reds, unarmed = [], []
+    population = scan_fence_records(root, rows, typed_kinds)
+    for row in rows:
+        name = row.get("name")
+        if name not in population:
+            continue
+        fn, _why = resolve_validator((row.get("schema") or {}).get("validator"))
+        if fn is None:
+            continue
+        paths = population[name]
+        if not paths and name in typed_kinds:
+            tail = f"; {STREAM_PLAN_UNARMED}" if getattr(fn, "__name__", "") == check_stream_plan.__name__ else ""
+            unarmed.append(f"{name}: {UNARMED} — no record yet{tail}")
+        elif not paths:
+            reds.append(f"row {name}: its home {row.get('home')!r} matches no tracked record")
+        for p in paths:
+            text = pathlib.Path(root, p).read_bytes().decode("utf-8", "replace")
+            try:
+                got = fn(text)
+            except Exception as e:   # noqa: BLE001 — a validator that raises grades nothing, and says so
+                got = [f"its validator raised {type(e).__name__}: {e}"]
+            reds += [f"row {name}: {p}: {r}" for r in got]
+    return reds, unarmed
+
+
+#: the tail of the stream-plan kind's unarmed line, the text TOOL-dTotalRecall-42 S3 moves onto the row
+STREAM_PLAN_UNARMED = "its writer is dIndexedDesign's planner"
+
+
+def check_stream_plan(text: str) -> list[str]:
+    """S3: the reds of one stream-plan record, its one TOML fence of `[[stream]]` tables, each a `name` of
+    `build_records.SEG`'s shape and `units`, a non-empty list of `{ id, order }`: a missing or unparseable
+    fence, a stream with no units, a unit with no `order`, an `order` that is no `int` above zero matched
+    whole by the spec header verb's grammar (`gen_build_index.ORDER_RE`), and a unit id named twice."""
+    from build_records import SEG
+    from gen_build_index import ORDER_RE
+    m = TOML_FENCE_RE.search(text)
+    if m is None:
+        return ["no ```toml fence: a stream plan is one TOML fence of [[stream]] tables"]
+    try:
+        data = tomllib.loads(m.group(1))
+    except tomllib.TOMLDecodeError as e:
+        return [f"its toml fence does not parse: {e}"]
+    streams = data.get("stream")
+    if not (isinstance(streams, list) and streams and all(isinstance(s, dict) for s in streams)):
+        return ["its toml fence holds no [[stream]] table"]
+    reds, seen = [], {}
+    for i, stream in enumerate(streams, 1):
+        name = stream.get("name")
+        at = f"stream {name}" if isinstance(name, str) and name else f"stream #{i}"
+        if not (isinstance(name, str) and re.fullmatch(SEG, name)):
+            reds.append(f"{at}: name {name!r} is no word of {SEG}")
+        units = stream.get("units")
+        if not (isinstance(units, list) and units):
+            reds.append(f"{at}: no units: a stream lists one {{ id, order }} per unit")
+            continue
+        for j, unit in enumerate(units, 1):
+            uid = unit.get("id") if isinstance(unit, dict) else None
+            if not (isinstance(uid, str) and uid.strip()):
+                reds.append(f"{at}: unit #{j} names no id")
+                continue
+            seen.setdefault(uid, []).append(at)
+            if "order" not in unit:
+                reds.append(f"{at}: unit {uid} carries no order")
+                continue
+            n = unit["order"]
+            hit = ORDER_RE.search(f"· order {n}") if isinstance(n, int) and not isinstance(n, bool) and n > 0 else None
+            if not (hit and hit.group(1) == str(n)):
+                reds.append(f"{at}: unit {uid}: order {n!r} is no whole number above zero, the grammar a spec "
+                            f"header's `· order <n>` is read by")
+    reds += [f"unit {uid} is named in {' and '.join(ats)}: a unit sits in one stream"
+             for uid, ats in seen.items() if len(ats) > 1]
+    return reds
 
 
 def read_legacy_keys(root) -> tuple[set, str]:
@@ -787,9 +941,13 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
     legacy, note = read_legacy_keys(root)
     legacy = {(p, resolve_kind(s)) for p, s in legacy}   # S7: a row keyed `journal` stands for `log`, bytes kept
     population = scan_legacy_records(root, rows, typed_kinds)
+    fenced = scan_fence_records(root, rows, typed_kinds)
     counts, unarmed, graded_paths = [], [], {}
     for row in rows:
         name, schema = row.get("name"), row.get("schema") if isinstance(row.get("schema"), dict) else {}
+        if name in fenced:   # S4: graded by `check_fence_records` below, 0 where its validator does not resolve
+            counts.append(f"{name} fence {len(fenced[name]) if resolve_validator(schema.get('validator'))[0] else 0} graded")
+            continue
         if name not in population:
             counts.append(f"{name} {schema.get('form', '?')}")
             continue
@@ -809,6 +967,9 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
             reds += [f"row {name}: {p} carries no **{f}:** line" for f in missing]
             if order:
                 reds.append(f"row {name}: {p} carries {', '.join(order)} out of the row's order")
+    fence_reds, fence_unarmed = check_fence_records(root, rows, typed_kinds)
+    reds += fence_reds
+    unarmed += fence_unarmed
     keys = read_gap_keys(root)
     if not keys:
         reds.append("unarmed — no tracked gap register holds a gap key, so no Follow-through gap resolves")
@@ -869,6 +1030,7 @@ def render_row(row: dict) -> str:
         elif col == "schema":
             parts = [f"form = {json.dumps(v['form'])}"] + ([f"source = {json.dumps(v['source'])}"] if v.get("source") else [])
             parts.append("fields = [" + ", ".join(json.dumps(f) for f in v["fields"]) + "]")
+            parts += [f"validator = {json.dumps(v['validator'])}"] if v.get("validator") else []
             out.append("schema = { " + ", ".join(parts) + " }")
         else:
             out.append(f"{col} = {json.dumps(v)}")
@@ -876,9 +1038,12 @@ def render_row(row: dict) -> str:
 
 
 def add_record_kind(root, a, kit_rel: str | None = None) -> int:
-    """`new`: one conforming `fields` row appended to the registry and the HYGIENE template's view
+    """`new`: one conforming `fields` or `fence` row appended to the registry and the HYGIENE template's view
     re-rendered from it, so the gate reads the two in step; or exit 2 naming each refusal and writing
-    nothing."""
+    nothing. A `fence` row takes `--validator` and no `--field`, a `fields` row the reverse; a member of
+    `tree_lib.TYPED_RECORD_KINDS` gets the factory's `KINDS.<name>.required` as its `source` and the typed
+    name as its `id-rule` (TOOL-dTotalRecall-25 S7)."""
+    from tree_lib import TYPED_RECORD_KINDS
     kit_rel = kit_rel or derive_kit_rel()
     rows = read_record_kinds(root, kit_rel) or []
     legs = read_leg_names(root, derive_tool_rel(kit_rel)) or set()
@@ -892,9 +1057,22 @@ def add_record_kind(root, a, kit_rel: str | None = None) -> int:
     if not (a.writer or "").strip():
         bad.append("--writer is required and non-empty: name the door, `generator:<path>` or `hand`")
     if not (a.home or "").strip():
-        bad.append("--home is required: a `fields` row's home is the population its check grades")
-    if not a.field or not all(f.strip() for f in a.field):
-        bad.append("--field is required, one per **Key:** line the kind carries")
+        bad.append("--home is required: a row's home is the population its check grades")
+    form = a.form or "fields"
+    if form not in NEW_FORMS:
+        bad.append(f"--form {form!r} is not one of {', '.join(NEW_FORMS)}, the forms `new` writes")
+    elif form == "fence":
+        if a.field:
+            bad.append("--field is refused on a `fence` row: a fence is no field, its validator grades the record")
+        if not a.validator:
+            bad.append("--validator <module>:<function> is required on a `fence` row, the check its records take")
+        else:
+            bad += [f"--{why}" for fn, why in [resolve_validator(a.validator)] if fn is None]
+    else:
+        if a.validator:
+            bad.append("--validator is refused on a `fields` row: only a `fence` row names a validator")
+        if not a.field or not all(f.strip() for f in a.field):
+            bad.append("--field is required, one per **Key:** line the kind carries")
     if a.check not in legs:
         bad.append(f"--check {a.check!r} names no leg of {LEGS}")
     if not LAYER_RE.fullmatch(a.layer or ""):
@@ -925,8 +1103,15 @@ def add_record_kind(root, a, kit_rel: str | None = None) -> int:
         for b in bad + ["nothing written"]:
             print(f"{SAY}: refused · {b}")
         return 2
-    row = {"name": a.name, "tag": a.tag, "layer": a.layer, "home": a.home, "id-rule": "",
-           "schema": {"form": "fields", "fields": list(a.field)}, "writer": a.writer, "readers": readers,
+    typed = a.name in TYPED_RECORD_KINDS   # the two cells `check_record_kinds` and `read_bindings` hold it to
+    schema = {"form": form, "fields": [] if form == "fence" else list(a.field)}
+    if typed:
+        schema["source"] = f"{{prefix}}/{pathlib.PurePosixPath(kit_rel).name}/build_records.py:KINDS.{a.name}.required"
+    if form == "fence":
+        schema["validator"] = a.validator
+    row = {"name": a.name, "tag": a.tag, "layer": a.layer, "home": a.home,
+           "id-rule": f"<date>-build-<unit id>-{a.name}-<n>.md" if typed else "",
+           "schema": schema, "writer": a.writer, "readers": readers,
            "lifecycle": a.lifecycle, "check": a.check}
     if none_why:
         row["readers-none"] = none_why
@@ -1334,14 +1519,25 @@ def write_kind_schema_plant(clone) -> str:
 
 
 # ---------------------------------------------------------------------------------- the fixture
-FIXTURE_TYPED = ("deviation",)
+FIXTURE_TYPED = ("deviation", "stream-plan")
 FIXTURE_BUILD = "bFix"
 PLANTS = ("writer-missing", "check-unknown", "source-drift", "factory-kind-unrowed", "field-missing",
           "field-missing-legacy", "region-edited", "gap-unresolved", "lifecycle-missing", "role-reads-moved",
           "item-inputs", "roles-unresolved", "pocket-stray", "pocket-registered", "new-row", "pipe-cell",
           "alias-drift", "new-purpose", "review", "review-write", "purpose-missing", "purpose-long",
           "pending-closed", "value-refuse", "value-derive", "value-ledger", "value-ledger-unregistered",
-          "value-refused")
+          "value-refused", "stream-unordered", "stream-empty", "stream-order-text", "stream-unit-twice",
+          "stream-fence-missing", "stream-validator-missing")
+#: TOOL-dTotalRecall-25's fixture: the well-formed plan of two streams, and each stream plant's edit of its fence
+FIXTURE_PLAN = f"memory/builds/{FIXTURE_BUILD}/build/2026-01-05-build-TOOL-{FIXTURE_BUILD}-1-stream-plan-1.md"
+FIXTURE_FENCE = ('```toml\n[[stream]]\nname = "tooling"\n'
+                 f'units = [{{ id = "TOOL-{FIXTURE_BUILD}-1", order = 1 }}, {{ id = "TOOL-{FIXTURE_BUILD}-2", order = 2 }}]\n\n'
+                 f'[[stream]]\nname = "memory"\nunits = [{{ id = "TOOL-{FIXTURE_BUILD}-3", order = 1 }}]\n```\n')
+FIXTURE_STREAM_EDITS = {"stream-unordered": (f'{{ id = "TOOL-{FIXTURE_BUILD}-2", order = 2 }}', f'{{ id = "TOOL-{FIXTURE_BUILD}-2" }}'),
+                        "stream-empty": (f'[{{ id = "TOOL-{FIXTURE_BUILD}-3", order = 1 }}]', "[]"),
+                        "stream-order-text": ("order = 2 }", 'order = "2" }'),
+                        "stream-unit-twice": (f'"TOOL-{FIXTURE_BUILD}-3"', f'"TOOL-{FIXTURE_BUILD}-2"'),
+                        "stream-fence-missing": (FIXTURE_FENCE, "")}
 #: TOOL-dTotalRecall-16's fixture: its open and closed asks, the plants whose registry holds the review's three
 #: purposeless rows, each plant's `memory.map-purpose` value, the `--from` record and the review's two chain builds.
 FIXTURE_OPEN_ASK, FIXTURE_CLOSED_ASK = f"TOOL-{FIXTURE_BUILD}-101", f"TOOL-{FIXTURE_BUILD}-102"
@@ -1362,9 +1558,10 @@ FIXTURE_NEW = ["new", "widget", "--tag", "record.widget", "--writer", "hand", "-
 
 
 def build_fixture(tmp, plant: str | None = None):
-    """A throwaway repository at `tmp` laid out as this kit's own tree: a four-row registry, a two-leg
+    """A throwaway repository at `tmp` laid out as this kit's own tree: a five-row registry, a two-leg
     manifest, a govkit registry holding the legacy ledger's table, its home, a gap register and records,
-    one a `…-deviation-notes.md` holding no deviation field, a roles kit of three role files, a loop kit
+    one a `…-deviation-notes.md` holding no deviation field, one a stream plan of two streams, its `fence`
+    row typed beside `deviation`, a roles kit of three role files, a loop kit
     whose definition holds the items `item-inputs` plants, a runlog kit's alias literal, a BACKLOG.md of
     one open and one closed ask, a two-row chain registry and the playbook kit's literal naming it, the
     purpose review's `--from` record, `plant` applied, committed on `main` (the policy reader's landed
@@ -1391,7 +1588,7 @@ def build_fixture(tmp, plant: str | None = None):
     write_fixture_file(f"{tool_rel}/{LEGS}" if tool_rel else LEGS, json.dumps([{"name": "memory hygiene"}, {"name": SAY}], indent=2) + "\n")
     write_fixture_file(f"{kit_rel}/build_records.py", "LEVELS = ('a', 'b')\nKINDS = {\n    'deviation': {\n        'required': ("
         + ", ".join(json.dumps(f) for f in dev + (["Extra"] if plant == "source-drift" else [])) + "),\n"
-        "        'closed': (('Risk', LEVELS),),\n    },\n}\n")
+        "        'closed': (('Risk', LEVELS),),\n    },\n    'stream-plan': {'required': (), 'closed': ()},\n}\n")
     rows = [
         {"name": "spec", "tag": "record.spec", "layer": "layer.memory", "home": "memory/builds/*/spec/*.md",
          "id-rule": "<date>-spec-<unit id>.md", "schema": {"form": "header", "fields": []}, "writer": "hand",
@@ -1410,6 +1607,14 @@ def build_fixture(tmp, plant: str | None = None):
          "writer": "hand", "readers": [], "readers-none": "a departure is read by the deviation join, no role",
          "lifecycle": "frozen", "check": "memory hygiene"},
     ]
+    rows.insert(-1, {   # before the deviation row, which the plants above name as the last
+        "name": "stream-plan", "tag": "record.stream-plan", "layer": "layer.memory",
+        "home": "memory/builds/*/build/*-stream-plan-*.md", "id-rule": "<date>-build-<unit id>-stream-plan-<n>.md",
+        "schema": {"form": "fence", "source": rows[-1]["schema"]["source"].replace(".deviation.", ".stream-plan."),
+                   "fields": [], "validator": "record_kinds:" + ("no_such_check" if plant == "stream-validator-missing"
+                                                                 else check_stream_plan.__name__)},
+        "writer": "hand", "readers": [], "readers-none": "no fixture role reads a plan", "lifecycle": "current-state",
+        "check": SAY})
     for row in rows:
         row["purpose"] = {"text": f"the fixture's {row['name']} record", "source": "owner"}
     if plant == "purpose-missing":
@@ -1491,6 +1696,9 @@ def build_fixture(tmp, plant: str | None = None):
         "| gap-mem-01 | the fixture's one gap |\n")
     write_fixture_file(f"memory/builds/{FIXTURE_BUILD}/prompts/2026-01-01-prompt-{unit}-brief.md",
                        f"**Serves:** log {unit}\n\nthe fixture's brief\n")
+    fence = FIXTURE_FENCE.replace(*FIXTURE_STREAM_EDITS[plant], 1) if plant in FIXTURE_STREAM_EDITS else FIXTURE_FENCE
+    write_fixture_file(FIXTURE_PLAN, f"**Serves:** stream-plan {unit} TOOL-{FIXTURE_BUILD}-2 TOOL-{FIXTURE_BUILD}-3\n\n"
+                       f"# {unit} stream-plan 1 — the fixture's plan\n\n{fence}")
     region = render_kind_region(tomllib.loads(registry)["record-kind"], read_view_joins(tmp, kit_rel))
     if plant == "region-edited":
         region = region.replace("| Kind |", "| Kinds |", 1)
@@ -1598,7 +1806,13 @@ def run_selftest() -> int:
             "role-reads-moved": ("region gen:record-kinds",), "roles-unresolved": (UNARMED, "roles kit"),
             "pocket-stray": ("pocket stray",), "alias-drift": ("SERVES_ALIASES",),
             "purpose-missing": ("row deviation", "`purpose`"), "purpose-long": ("row deviation", "past PURPOSE_BYTES"),
-            "pending-closed": ("row deviation", FIXTURE_CLOSED_ASK), "value-refuse": ("row log", "refuse")}
+            "pending-closed": ("row deviation", FIXTURE_CLOSED_ASK), "value-refuse": ("row log", "refuse"),
+            "stream-unordered": (FIXTURE_PLAN, "stream tooling", f"unit TOOL-{FIXTURE_BUILD}-2", "no order"),
+            "stream-empty": (FIXTURE_PLAN, "stream memory", "no units"),
+            "stream-order-text": (FIXTURE_PLAN, f"unit TOOL-{FIXTURE_BUILD}-2", "order '2'"),
+            "stream-unit-twice": (FIXTURE_PLAN, f"unit TOOL-{FIXTURE_BUILD}-2 is named in"),
+            "stream-fence-missing": (FIXTURE_PLAN, "fence"),
+            "stream-validator-missing": ("row stream-plan", "record_kinds:no_such_check")}
     refusals = {"value-ledger-unregistered": PURPOSE_PENDING, "value-refused": "memory.map-purpose"}
 
     def test_pipe_cell(lines):
@@ -1646,6 +1860,8 @@ def run_selftest() -> int:
             fails.append(f"{plant}: want exit 2 naming {refusals[plant]}, got {rc}: {out[-400:]}")
         elif plant not in want and plant not in refusals and rc != 0:
             fails.append(f"{plant or 'green'}: want exit 0, got {rc}: {out[-400:]}")
+        elif plant is None and not any(" rows · " in ln and "stream-plan fence 1 graded" in ln for ln in lines):
+            fails.append(f"green: the well-formed plan was not graded: {out[-400:]}")
         elif plant in shows and not shows[plant](lines):
             fails.append(f"{plant}: exit 0 and not what it shows: {out[-400:]}")
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="rk-"))
@@ -1667,6 +1883,12 @@ def run_selftest() -> int:
         rc = main(FIXTURE_NEW[:-2] + ["--reader", "task:goal"], root=tmp)
         if rc != 2 or reg.read_bytes() != before:
             fails.append(f"new with a reader no role reads: want exit 2 and nothing written, got {rc}")
+        unfielded = [a for i, a in enumerate(FIXTURE_NEW) if not (a == "--field" or FIXTURE_NEW[i - 1] == "--field")]
+        for why, argv in (("an unresolvable --validator", unfielded + ["--form", "fence", "--validator", "record_kinds:no_such_check"]),
+                          ("a --field", FIXTURE_NEW + ["--form", "fence", "--validator", f"record_kinds:{check_stream_plan.__name__}"])):
+            rc = main(argv, root=tmp)   # S7: each `fence` refusal exits 2 and writes nothing
+            if rc != 2 or reg.read_bytes() != before:
+                fails.append(f"new --form fence with {why}: want exit 2 and nothing written, got {rc}")
         tpl = pathlib.Path(tmp, derive_kit_rel(), TEMPLATE)
         tpl.write_bytes(tpl.read_bytes().replace(b"| Kind |", b"| Kinds |", 1))
         rc_w = main(["--write"], root=tmp)
@@ -1705,6 +1927,8 @@ def main(argv: list[str], root=None) -> int:
             ap.add_argument("--reader", action="append")
             ap.add_argument("--readers-none", dest="readers_none")
             ap.add_argument("--purpose")
+            ap.add_argument("--form")
+            ap.add_argument("--validator")
             try:
                 a = ap.parse_args(argv[1:])
             except SystemExit as e:

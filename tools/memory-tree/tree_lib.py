@@ -613,9 +613,11 @@ BIND_HEAD_LINES = 12
 # kickoff engine through the factory's `write_record`, no door. `probe-trigger` and `probe`
 # (TOOL-dPlacedRequest-7 S6) are a probe opened at an item boundary and the probe it opened, its head, its
 # method, its run lines and its verdict, written by the loop kit's probe.py through `write_record`, no door.
+# `stream-plan` (TOOL-dTotalRecall-25 S6) is a build's units grouped into ordered streams, one TOML fence and
+# no field, graded by `record_kinds.check_stream_plan`, written by dIndexedDesign's planner, no door.
 TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition", "acceptance",
                       "transition", "recommendation", "widen", "leg-tail", "flake", "gate-health", "card",
-                      "probe-trigger", "probe")
+                      "probe-trigger", "probe", "stream-plan")
 RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "log", "research") + TYPED_RECORD_KINDS
 # TOOL-dTotalRecall-18 S7: `journal` was the evidence kind's name until the kind became `log`. The old
 # token is a READ-ONLY alias: a record written under it is bound as written, so no records region

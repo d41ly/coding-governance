@@ -265,6 +265,10 @@ KINDS = {
         "required": ("Sha", "Kind", "Question", "Losing", "Asker", "Trigger"),
         "closed": (("Kind", PROBE_KINDS), ("Judged", PROBE_JUDGED), ("Writer", ACCEPTANCE_WRITERS)),
     },
+    "stream-plan": {   # TOOL-dTotalRecall-25 S6: one TOML fence, no field; `record_kinds.check_stream_plan` grades it
+        "required": (),
+        "closed": (),
+    },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
     raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "

@@ -1,17 +1,19 @@
-# record-kinds.toml — the record-kind registry (TOOL-dTotalRecall-1, -18, -16): one [[record-kind]] row per
+# record-kinds.toml — the record-kind registry (TOOL-dTotalRecall-1, -18, -16, -25): one [[record-kind]] row per
 # kind of record the memory tree holds, and one witness row per family of pockets outside it, the
 # memory contract's one declaration of each. Columns, in this order: `name`; `tag`, record.<name>;
 # `layer`, the `layer.<name>` tag of the kit whose writer writes the kind; `home`, one glob or a list:
 # a tracked-path glob (`git ls-files`), `refs/gov/<glob>` or `<git-common-dir>/<glob>`, one tracked glob
-# on a `fields` row; `id-rule`, its name grammar or ""; `schema`, { form, source, fields }, `form` one of
-# fields, header, rows, generated, `source` the literal another module declares the fields in, read by
-# `ast`; `writer`, the command that writes it, `generator:<path>` or `hand`; `readers`, the work-order
+# on a `fields` row; `id-rule`, its name grammar or ""; `schema`, { form, source, fields, validator },
+# `form` one of fields, header, rows, generated, fence, `source` the literal another module declares the
+# fields in, read by `ast`, `validator` a `fence` row's <module>:<function> of this kit grading its
+# records; `writer`, the command that writes it, `generator:<path>` or `hand`; `readers`, the work-order
 # read keys a handoff fills from a record of the kind, or [] beside `readers-none`, the reason no role
 # reads it; `lifecycle`, one of append-only, current-state, frozen, generated, out; `check`, the leg of
 # <prefix>/gate-legs.json grading it; `purpose`, last, { text, source }, one line of at most
 # PURPOSE_BYTES cited <path>:<line> or `owner`, or { pending = "<id>" }, which `memory.map-purpose`
 # grades. Every column but `id-rule` is required and non-empty. A kind
-# joins through `python <prefix>/memory-tree/record_kinds.py new`, and `record_kinds.py --check` grades
+# joins through `python <prefix>/memory-tree/record_kinds.py new`, a `fence` row through its
+# `--form fence --validator <module>:<function>`, and `record_kinds.py --check` grades
 # the file; `record_kinds.py --purpose-review` derives a missing purpose and writes it as one line of its row.
 
 [[record-kind]]
@@ -654,3 +656,17 @@ readers-none = "a desktop git client's own state, read by that client alone"
 lifecycle = "out"
 check = "record-kinds"
 purpose = { pending = "TOOL-dTotalRecall-110" }
+
+[[record-kind]]
+name = "stream-plan"
+tag = "record.stream-plan"
+layer = "layer.memory"
+home = "memory/builds/*/build/*-stream-plan-*.md"
+id-rule = "<date>-build-<unit id>-stream-plan-<n>.md"
+schema = { form = "fence", source = "{prefix}/memory-tree/build_records.py:KINDS.stream-plan.required", fields = [], validator = "record_kinds:check_stream_plan" }
+writer = "hand"
+readers = []
+readers-none = "no role's reads: names a stream plan until dWellOiledMachine's pick lands"
+lifecycle = "current-state"
+check = "record-kinds"
+purpose = { text = "a build's units grouped into ordered streams, written by dIndexedDesign's planner, read by dWellOiledMachine's pick", source = "owner" }
