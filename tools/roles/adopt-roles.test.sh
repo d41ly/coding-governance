@@ -118,8 +118,8 @@ check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL 
 # home `loop`, where the library's resolver probes. The source is the loop kit beside this one.
 LOOP_SRC="$HERE/../loop"
 [ -f "$LOOP_SRC/loop_lib.py" ] && [ -f "$LOOP_SRC/loop.toml" ] || { echo "adopt-roles.test: no loop kit beside this one at $LOOP_SRC, so no fixture can place its workflows"; exit 2; }
-LAYERS_SRC="$HERE/../playbook/layers.toml"
-[ -f "$LAYERS_SRC" ] || { echo "adopt-roles.test: no layer register beside this kit at $LAYERS_SRC, so no fixture can join a role's layer"; exit 2; }
+LAYERS_SRC="$HERE/../playbook"
+[ -f "$LAYERS_SRC/layers.toml" ] || { echo "adopt-roles.test: no layer register beside this kit at $LAYERS_SRC, so no fixture can join a role's layer"; exit 2; }
 FX=""; FXK="$KREL"; FXL=""; FXP=""
 build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at the kit path, $KREL
   # unless given, with $ADOPTER as its adopter, and the loop kit beside it at $FXL, scaffolded; rc of
@@ -134,7 +134,7 @@ build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at 
   git init -q "$FX" || return 2
   cp -R "$HERE"/. "$FX/$FXK"/ && cp "$ADOPTER" "$FX/$FXK/adopt-roles.sh" || return 2
   cp "$LOOP_SRC/loop_lib.py" "$LOOP_SRC/loop.toml" "$FX/$FXL"/ || return 2
-  cp "$LAYERS_SRC" "$FX/$FXP"/ || return 2
+  cp "$LAYERS_SRC/layers.toml" "$FX/$FXP"/ || return 2
   # TOOL-dBoundRoles-2 §4 Migration: each script a shipped role's `never` entry names, copied from this
   # repository's tool root to the same path under the fixture's, so the fixture holds the enforcers a
   # default install holds and R13 grades it as it grades one. The list is read from the role files

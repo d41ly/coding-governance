@@ -1,12 +1,10 @@
 # ledger · docs-undocumented · key key id · direction shrink-only · drain key
 agent:gov-builder	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-agent:gov-diff-reviewer	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 agent:gov-orienter	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 agent:gov-researcher	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 agent:gov-reuse-scout	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 agent:gov-session	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 agent:gov-skeptic	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-agent:gov-spec-reviewer	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 agent:gov-spec-writer	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 agent:gov-synthesizer	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 command:cleanup	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

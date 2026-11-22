@@ -20,12 +20,10 @@ tools/template-size-highwater.txt	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	see
 tools/unattended/ASKS.template.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 coding-governance-agents.template.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 .claude/agents/gov-builder.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-.claude/agents/gov-diff-reviewer.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 .claude/agents/gov-orienter.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 .claude/agents/gov-researcher.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 .claude/agents/gov-reuse-scout.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 .claude/agents/gov-skeptic.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-.claude/agents/gov-spec-reviewer.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 .claude/agents/gov-spec-writer.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 .claude/agents/gov-synthesizer.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 .claude/skills/build/SKILL.md	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
@@ -48,3 +46,7 @@ tools/unattended/fix_keeps.py	1	744515922c1c6e32cac838a3dd6029abd992092d	widened
 .governance/instructions.toml	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 help/orientation-card.md	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
 tools/loop/placement.py	1	c2a407b0390f3d57a118b58e376c326aeb207c13	seeded
+.claude/agents/gov-architect.md	1	3b479f2fe8ee3e76efb1352e1b61e1e66295460f	widened:2026-11-22-build-TOOL-dBoundRoles-1-widen-5
+.claude/agents/gov-planner.md	1	3b479f2fe8ee3e76efb1352e1b61e1e66295460f	widened:2026-11-22-build-TOOL-dBoundRoles-1-widen-5
+.claude/agents/gov-prompt-writer.md	1	3b479f2fe8ee3e76efb1352e1b61e1e66295460f	widened:2026-11-22-build-TOOL-dBoundRoles-1-widen-5
+.claude/agents/gov-reviewer.md	1	3b479f2fe8ee3e76efb1352e1b61e1e66295460f	widened:2026-11-22-build-TOOL-dBoundRoles-1-widen-5

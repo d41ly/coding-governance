@@ -188,6 +188,18 @@ The `gov-tester` role judges a red the bar attributed to this build: the Test st
 blocking MIXED red, and it answers whether the code missed or the spec was wrong, with an outcome of
 `code-miss` or `spec-wrong`. It writes nothing. <!-- usage: agent:gov-tester -->
 
+The `gov-reviewer` role reviews a spec set or a diff through one lens, read-only; it replaced the
+separate spec and diff reviewer roles, and both review stages spawn it. It writes nothing.
+<!-- usage: agent:gov-reviewer -->
+
+The `gov-prompt-writer` role composes the task a role agent is handed. It is a cycle role: the
+driver calls it around an item, and no checklist item names it as its actor. It writes nothing.
+<!-- usage: agent:gov-prompt-writer -->
+
+The `gov-planner` role drafts and judges a build's plan, and the `gov-architect` role inventories a
+build's scope and decomposes it into units. Both write records only, under the build's folder.
+<!-- usage: agent:gov-planner --> <!-- usage: agent:gov-architect -->
+
 ## When no role agent can be spawned
 
 Inline work is refused: the main session does not write a spec, review one, build a unit or run the
