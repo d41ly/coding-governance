@@ -1793,6 +1793,11 @@
       "file": "tools/playbook/pins.py"
     },
     {
+      "id": "arm_purposes",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "arm_reader_coverage",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -7278,6 +7283,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "check_namespaces",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "check_native_classes",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
@@ -9144,6 +9154,11 @@
     },
     {
       "id": "check_unnamed_list",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "check_unpurposed_list",
       "kind": "function",
       "file": "tools/policy/policy.py"
     },
@@ -12663,6 +12678,11 @@
       "file": "tools/govkit/upgrade_walk.py"
     },
     {
+      "id": "derive_policy_namespaces",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "derive_policy_reader",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
@@ -13909,6 +13929,11 @@
     },
     {
       "id": "derive_unnamed_keys",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_unpurposed",
       "kind": "function",
       "file": "tools/policy/policy.py"
     },
@@ -16006,6 +16031,11 @@
       "id": "load_module",
       "kind": "function",
       "file": "tools/chain-packet.py"
+    },
+    {
+      "id": "load_namespaces",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "load_overlay",
@@ -32428,6 +32458,11 @@
       "file": "tools/playbook/gov_tag.py"
     },
     {
+      "id": "run_purposes_case",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_push",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -34641,6 +34676,11 @@
       "id": "seed_mode_fixture",
       "kind": "function",
       "file": "tools/check-wiring.test.sh"
+    },
+    {
+      "id": "seed_namespace_new",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "seed_no_empty",

@@ -41,6 +41,11 @@ this kit holds no list, as in every install, it prints `policy-check: arm_legacy
 catalogue keys no clause on their owner build's row of the design view names, as `policy.py lists
 --check` does (KICK-dKeptSession-19); where every `DESIGN_*` key is blank, as in every adopter, or
 the list is withheld, it prints `policy-check: arm_reader_join · not graded · <why>`.
+`arm_purposes` grades the catalogue's `[[namespace]]` rows and the shrink-only
+`unpurposed-namespaces.txt`, the policy namespaces no row purposes, as `memory.map-purpose`'s
+default `review` says (KICK-dKeptSession-16): a new namespace that declares no purpose reds, a
+listed one prints `policy purposes: <a> awaiting review · <names>`, and any other value of the key
+prints that it is dTotalRecall's to arm and is graded as `review`.
 
 THE FIXTURE makes one git repository per case under the system temp directory, with a short prefix
 because a long path fails a Windows clone: a copy of this kit's catalogue and list at the kit's own
@@ -895,6 +900,42 @@ def arm_reader_join(repo, kit):
     return m, f"{n} of {m} catalogue key(s) named on their owner's row · {k} listed · {note}", findings
 
 
+def arm_purposes(repo, kit):
+    """The policy namespaces' purposes (KICK-dKeptSession-16 S5 to S7), graded as `memory.map-purpose`'s
+    default, `review`, says: `policy.check_namespaces` over the catalogue's `[[namespace]]` rows, and
+    `policy.check_unpurposed_list`, the one grade `policy.py lists --check` makes of
+    `unpurposed-namespaces.txt`, so a namespace the list does not carry, or carries above its compare
+    base, reds. The namespaces with no row that the list carries print as one `awaiting review` line
+    and are no finding. The key is read through `policy.resolve` at the landed revision: any value but
+    `review` is dTotalRecall's to arm and prints one line, graded as `review`; a read the reader
+    refuses prints one NOTE line and takes the catalogue default. The population is the derived
+    namespaces, and the arm prints its lines itself, as `arm_cap_census` does."""
+    rows, bad = load_rows(kit)
+    if bad:
+        return 0, "the catalogue did not parse", [bad]
+    purposed = policy.load_namespaces(kit)
+    namespaces = policy.derive_policy_namespaces(rows)
+    findings = policy.check_namespaces(purposed, namespaces)
+    with policy.run_without_git_env():  # the base `lists --check` reads, by the one comparison
+        compare = policy.resolve_compare_base(kit)
+    more, _note = policy.check_unpurposed_list(kit, compare)
+    unpurposed = policy.derive_unpurposed(purposed, namespaces)
+    red = {n for n, _why in more}
+    awaiting = [n for n in unpurposed if n not in red]
+    if awaiting:
+        print(f"policy purposes: {len(awaiting)} awaiting review · {', '.join(awaiting)}")
+    key = "memory.map-purpose"
+    try:
+        value = policy.resolve(key, repo).value
+        if value != "review":
+            print(f"policy purposes: {key} {value} is dTotalRecall's to arm; graded as review until it lands")
+    except (policy.Refusal, UnicodeDecodeError) as exc:
+        why = getattr(exc, "why", None) or str(exc)
+        print(f"policy purposes: NOTE - {key} did not read ({why}); graded as review, its catalogue default")
+    n = len(namespaces)
+    return n, f"{n} namespace(s), {n - len(unpurposed)} purposed, {len(awaiting)} awaiting review", findings + more
+
+
 # ---- the size caps (TOOL-dGroundRules-9) --------------------------------------------------------
 
 # A request of the size switch as an enforcer spells it: a verb of budgets.py's CLI, a
@@ -1192,6 +1233,8 @@ ARMS = [
         empty="announce", why="a tree with no tracked code is legal"),
     Arm("arm_cap_census", arm_cap_census, empty="finding", why="the census ships in the kit, so it always has rows"),
     Arm("arm_presets", arm_presets, empty="finding", why="the presets ship in the kit, so the store always holds them"),
+    Arm("arm_purposes", arm_purposes, empty="finding",
+        why="the catalogue ships in the kit, so its dotted keys always derive a namespace"),
 ]
 ARM = {a.name: a for a in ARMS}
 
@@ -1302,6 +1345,13 @@ def seed_direction_wrong_value(repo, kit, rows):
     write_edit(kit / policy.CATALOGUE, lambda t: set_row_block(
         t, name, lambda b: re.sub(r"^direction = .*$", 'direction = "raise-tightens"', b, flags=re.M)))
     return name, "must be raise-loosens"
+
+
+def seed_namespace_new(repo, kit, rows):
+    """`purposes-new` (KICK-dKeptSession-16 AC1): the planted key opens the namespace `zz`, which no
+    `[[namespace]]` row purposes and the list at the compare base does not carry."""
+    write_edit(kit / policy.CATALOGUE, lambda t: t + render_planted_row(None))
+    return PLANTED.split(".", 1)[0], "declares no purpose"
 
 
 # ---- the adopter's fresh target (TOOL-dGroundRules-16) ------------------------------------------
@@ -3317,15 +3367,16 @@ LEGACY_CASES = ("today", "planted-row", "growth", "shrink", "retrofit", "unmarke
 
 
 def build_legacy_repo(t, gate, house):
-    """A repository at `t`/r holding a copy of this kit's policy.py, catalogue and summary list at the
-    kit's own path, a `.unattended.conf`, the gate file's text `gate` (none where None) and, where
-    `house`, a house file where the copy resolves HOUSE_HOME; committed on main and pushed to one bare
-    remote, then the copy's `lists --write` seeding the legacy list over a header-only one, committed
-    and pushed, so the landed list is that seed. -> the kit copy."""
+    """A repository at `t`/r holding a copy of this kit's policy.py, catalogue, summary list and
+    unpurposed-namespaces list at the kit's own path, a `.unattended.conf`, the gate file's text
+    `gate` (none where None) and, where `house`, a house file where the copy resolves HOUSE_HOME;
+    committed on main and pushed to one bare remote, then the copy's `lists --write` seeding the
+    legacy list over a header-only one, committed and pushed, so the landed list is that seed. -> the
+    kit copy."""
     repo = t / "r"
     kit = repo / (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
     kit.mkdir(parents=True)
-    for f in (*READER_FILES, policy.CATALOGUE, policy.LIST):
+    for f in (*READER_FILES, policy.CATALOGUE, policy.LIST, policy.UNPURPOSED_LIST):
         (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
     homes = {repo / ".unattended.conf": LEGACY_CONF}
     if gate is not None:
@@ -6354,6 +6405,116 @@ def run_presets_core_only(name):
     return print_checks(name, checks)
 
 
+# ---- the policy namespaces' purposes (KICK-dKeptSession-16) -------------------------------------
+
+def run_purposes_case(name):
+    """The outcome cases of `arm_purposes` (KICK-dKeptSession-16 S7). `purposes-listed`: over
+    `build_repo`'s copy, every namespace the committed list carries and no row purposes prints on the
+    `awaiting review` line, and the arm is green. `purposes-drain`: over `build_legacy_repo`'s copy,
+    pushed to one bare remote, a row given to a listed namespace makes the copy's `lists --check`
+    exit 1 naming it stale, `lists --write` drains it alone, and `--check` then exits 0.
+    `purposes-shape`: four planted `[[namespace]]` rows, one naming no namespace, a second row for a
+    purposed namespace, an empty purpose and an unknown field, give `check_namespaces` four
+    findings, one per row, and leave the `[[key]]` rows and each `[[key]]` arm's verdict as they were.
+    `purposes-map-purpose`: `memory.map-purpose = "refuse"` committed at the landed revision prints
+    the stand-in line naming `refuse` with the unplanted verdict; with no landed revision the NOTE
+    line prints, the verdict the same again."""
+    rows, checks = policy.load_catalogue(KIT), []
+
+    def run_arm_quietly(repo, kit, arm=ARM["arm_purposes"]):
+        """-> (verdict, findings, the lines the arm printed), its stdout held."""
+        held = io.StringIO()
+        with contextlib.redirect_stdout(held):
+            verdict, findings = run_arm(arm, repo, kit)
+        return verdict, findings, held.getvalue().replace("\r", "").split("\n")
+
+    t = repo = None
+    try:
+        if name == "purposes-drain":
+            t = Path(tempfile.mkdtemp(prefix="pol-"))
+            kit = build_legacy_repo(t, LEGACY_GATE, True)
+            path = kit / policy.UNPURPOSED_LIST
+            before = policy.parse_list(path.read_text(encoding="utf-8"))
+            ns = before[0] if before else "(none listed)"
+            write_edit(kit / policy.CATALOGUE, lambda s: s + f'\n[[namespace]]\nname = "{ns}"\npurpose = "A planted purpose."\n')
+            rc, out = run_legacy_lists(kit, "--check")
+            stale = f"  {ns}: stale: drain it with `lists --write`"
+            checks.append((f"{ns} given a row", "lists --check", rc == 1 and stale in out.split("\n"),
+                           f"exit {rc} · {render_said(out, f'  {ns}: ')}"))
+            rc, out = run_legacy_lists(kit, "--write")
+            after = policy.parse_list(path.read_text(encoding="utf-8"))
+            wrote = f"policy lists: wrote {policy.UNPURPOSED_LIST} · drained 1: {ns}"
+            checks.append((f"{ns} given a row", "lists --write", rc == 0 and wrote in out.split("\n") and after == before[1:],
+                           f"exit {rc} · {render_said(out, f'wrote {policy.UNPURPOSED_LIST}')} · {len(after)} of {len(before)} kept"))
+            rc, out = run_legacy_lists(kit, "--check")
+            checks.append(("after lists --write", "lists --check", rc == 0,
+                           f"exit {rc} · {render_said(out, f'policy lists: {policy.UNPURPOSED_LIST} · ')}"))
+            return print_checks(name, checks)
+        repo, kit = build_repo(rows)
+        if name == "purposes-listed":
+            listed = policy.parse_list((kit / policy.UNPURPOSED_LIST).read_text(encoding="utf-8"))
+            verdict, findings, lines = run_arm_quietly(repo, kit)
+            told = next((ln for ln in lines if ln.startswith("policy purposes: ") and " awaiting review · " in ln), "")
+            names = told.split(" awaiting review · ", 1)[1].split(", ") if told else []
+            checks.append(("the committed list", f"{len(listed)} listed namespace(s) printed awaiting review, the arm green",
+                           bool(listed) and not findings and names == listed,
+                           f"{verdict} · {told[:200] or 'no awaiting line'} · findings {findings or 'none'}"))
+        elif name == "purposes-shape":
+            arms = [ARM[a] for a in ("arm_schema", "arm_shape", "arm_summaries", "arm_direction")]  # the [[key]] arms
+            was = [run_arm_quietly(repo, kit, a)[:2] for a in arms]
+            held = policy.load_namespaces(kit)
+            free = policy.derive_unpurposed(held, policy.derive_policy_namespaces(rows))
+            if not held or len(free) < 2:
+                checks.append(("the kit copy", "a purposed namespace and two awaiting ones to plant over", False,
+                               f"{len(held)} row(s), {len(free)} awaiting"))
+                return print_checks(name, checks)
+            plants = [("zz-none", 'purpose = "A planted purpose."\n', "names no policy namespace"),
+                      (held[0]["name"], 'purpose = "A planted purpose."\n', "is written twice"),
+                      (free[0], 'purpose = ""\n', "empty or absent `purpose`"),
+                      (free[1], 'purpose = "A planted purpose."\nowner = "dKeptSession"\n', "unknown field `owner`")]
+            write_edit(kit / policy.CATALOGUE,
+                       lambda s: s + "".join(f'\n[[namespace]]\nname = "{n}"\n{body}' for n, body, _w in plants))
+            found = policy.check_namespaces(policy.load_namespaces(kit),
+                                            policy.derive_policy_namespaces(policy.load_catalogue(kit)))
+            for n, _body, needle in plants:
+                hits = [why for k, why in found if k == n]
+                checks.append((f"the planted row {n}", needle, len(hits) == 1 and needle in hits[0], f"{hits or 'no finding'}"))
+            checks.append(("the four planted rows", "four findings, one per row", len(found) == 4, f"{len(found)} finding(s)"))
+            keys = len(policy.load_catalogue(kit))
+            checks.append(("the [[key]] rows", "load_catalogue reads no [[namespace]] row as a key", keys == len(rows),
+                           f"{keys} of {len(rows)} row(s)"))
+            for a, (verdict, findings) in zip(arms, was):
+                now = run_arm_quietly(repo, kit, a)[:2]
+                checks.append(("the [[key]] arms", f"{a.name} keeps its verdict", now == (verdict, findings), f"{now[0]}"))
+        elif name == "purposes-map-purpose":
+            stand = "policy purposes: memory.map-purpose refuse is dTotalRecall's to arm; graded as review until it lands"
+            was = run_arm_quietly(repo, kit)
+            said = [ln for ln in was[2] if ln.startswith(("policy purposes: memory.map-purpose", "policy purposes: NOTE"))]
+            checks.append(("the scaffold landed", "no stand-in line under the default review", not said, f"{was[0]} · {said or 'none'}"))
+            write_edit(Path(repo, *POLICY_FILE), lambda s: s + '\n[memory]\nmap-purpose = "refuse"\n')
+            run_fixture_git(repo, "add", POLICY_REL)
+            run_fixture_git(repo, "commit", "-q", "-m", "memory.map-purpose refuse")
+            run_fixture_git(repo, "update-ref", f"refs/remotes/{FIXTURE_REMOTE}/main", "HEAD")
+            now = run_arm_quietly(repo, kit)
+            checks.append(("refuse at the landed revision", "the stand-in line names refuse, the verdict unplanted's",
+                           stand in now[2] and now[:2] == was[:2], f"{now[0]} · stand-in {'printed' if stand in now[2] else 'ABSENT'}"))
+            run_fixture_git(repo, "update-ref", "-d", f"refs/remotes/{FIXTURE_REMOTE}/main")
+            now = run_arm_quietly(repo, kit)
+            note = next((ln for ln in now[2] if ln.startswith("policy purposes: NOTE - memory.map-purpose did not read (")), "")
+            checks.append(("no landed revision", "the NOTE line, graded as review, the verdict unplanted's",
+                           note.endswith("; graded as review, its catalogue default") and now[:2] == was[:2],
+                           f"{now[0]} · {note[:200] or 'no NOTE line'}"))
+        else:
+            checks.append((name, "a purposes case", False, "no such case"))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        for root in (t, repo):
+            if root is not None:
+                remove_repo(root)
+    return print_checks(name, checks)
+
+
 CASES = [
     ("shape-no-empty", ARM["arm_shape"], seed_no_empty),
     ("shape-unknown-field", ARM["arm_shape"], seed_unknown_field),
@@ -6428,6 +6589,11 @@ CASES = [
     ("presets-core-only", None, run_presets_core_only),  # the load over a core-only register, and its two planted loaders
     ("preset-diff", None, run_preset_diff),  # the preset and its differing keys, three forms (KICK-dKeptSession-3)
     ("scaffold-preset", None, run_scaffold_preset),  # each shipped preset's scaffold reads its preset (KICK-dKeptSession-32)
+    ("purposes-new", ARM["arm_purposes"], seed_namespace_new),  # a new namespace with no purpose (KICK-dKeptSession-16)
+    ("purposes-listed", None, run_purposes_case),  # outcome cases: a listed namespace awaiting review,
+    ("purposes-drain", None, run_purposes_case),  # a purposed one drained, the row shape,
+    ("purposes-shape", None, run_purposes_case),
+    ("purposes-map-purpose", None, run_purposes_case),  # and memory.map-purpose's other values
 ]
 
 
@@ -6444,14 +6610,15 @@ def run_fixture_git(repo, *args):
 
 
 def build_repo(rows):
-    """A committed copy of this kit's catalogue and list at the kit's own path, the scaffold beside it,
-    a consumer outside the kit that reads policy through the helper, and a remote-tracking ref at that
-    commit; then the mirror rendered at it, in the working tree. -> (repo, kit copy)."""
+    """A committed copy of this kit's catalogue, its summary and unpurposed-namespaces lists and its cap
+    census at the kit's own path, the scaffold beside it, a consumer outside the kit that reads policy
+    through the helper, and a remote-tracking ref at that commit; then the mirror rendered at it, in
+    the working tree. -> (repo, kit copy)."""
     repo = Path(tempfile.mkdtemp(prefix="pol-"))
     prefix = (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
     kit = repo / prefix if prefix else repo
     kit.mkdir(parents=True, exist_ok=True)
-    for name in (policy.CATALOGUE, policy.LIST, budgets.CENSUS):
+    for name in (policy.CATALOGUE, policy.LIST, policy.UNPURPOSED_LIST, budgets.CENSUS):
         (kit / name).write_bytes((KIT / name).read_bytes().replace(b"\r\n", b"\n"))
     Path(repo, POLICY_FILE[0]).mkdir()
     Path(repo, *POLICY_FILE).write_bytes(policy.render_scaffold(rows, None).encode("utf-8"))
@@ -6506,8 +6673,8 @@ def run_fixture(only=None):
             continue
         repo, kit = build_repo(rows)
         try:
-            files = [kit / policy.CATALOGUE, kit / policy.LIST, kit / budgets.CENSUS, Path(repo, *POLICY_FILE),
-                     Path(repo, *MIRROR_FILE), Path(repo, *CONSUMER_FILE)]
+            files = [kit / policy.CATALOGUE, kit / policy.LIST, kit / policy.UNPURPOSED_LIST, kit / budgets.CENSUS,
+                     Path(repo, *POLICY_FILE), Path(repo, *MIRROR_FILE), Path(repo, *CONSUMER_FILE)]
             saved = {p: p.read_bytes() for p in files}
             held = set(repo.rglob("*"))
             key, needle = seed(repo, kit, rows)
