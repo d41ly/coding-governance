@@ -108,7 +108,7 @@ ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35
 | [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 7 | 1 | CLOSED | rev-5 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 123 bound to this build, across 3 record folder(s).
+Records: 124 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
