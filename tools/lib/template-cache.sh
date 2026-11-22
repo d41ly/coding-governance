@@ -104,8 +104,8 @@ build_template_clone() ( # <template repo> <dest> -> a --shared clone carrying t
   remove_git_env_leaks
   local _tc_l; local -a _tc_p=()
   while IFS= read -r _tc_l; do [ -n "$_tc_l" ] && _tc_p+=(-c "$_tc_l"); done < "${1%/*}/config-pins" || return 2
-  git -c core.autocrlf=false clone --shared --quiet --template= ${_tc_p[@]+"${_tc_p[@]}"} "$1" "$2" \
-    && git -C "$2" remote remove origin
+  git -c core.autocrlf=false clone --shared --quiet --template= -o template-source ${_tc_p[@]+"${_tc_p[@]}"} "$1" "$2" \
+    && git -C "$2" remote remove template-source
 )
 read_template_mode() { # <python> <policy.py> -> per-case or shared: tests.fixture-templates, shared unless the reader says per-case
   local _tc_v

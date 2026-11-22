@@ -37,7 +37,7 @@ that fails where `<key>/ready` exists is another run having built it: the loser 
 and uses the winner's template.
 
 CLONE. `git -c core.autocrlf=false clone --shared --quiet --template= -c <pin>... <template> <dest>`,
-then `git -C <dest> remote remove origin`: three git processes, objects never copied, the template's
+then `git -C <dest> remote remove <CLONE_REMOTE>`: three git processes, objects never copied, the template's
 config carried, no remote kept, and line endings pinned for the clone process alone.
 
 THE SWITCH. The policy key `tests.fixture-templates`, read once per cache through `policy.py get`:
@@ -123,6 +123,9 @@ GIT_ENV_LEAKS = (
 
 POLICY_KIT = "policy"  # the sibling kit the switch is read through, named once
 POLICY_KEY = "tests.fixture-templates"
+# The name the clone gives its one remote, set with `clone -o` and removed by that name, so neither the
+# clone nor the removal depends on the caller's `clone.defaultRemoteName`.
+CLONE_REMOTE = "template-source"
 MODES = ("shared", "per-case")
 INIT_KEYS = ("core.repositoryformatversion", "core.filemode", "core.bare", "core.logallrefupdates",
              "core.symlinks", "core.ignorecase", "core.precomposeunicode")
@@ -229,6 +232,6 @@ class TemplateCache:
                 pins += ["-c", line]
         template, dest = pathlib.Path(template).absolute(), pathlib.Path(dest).absolute()
         run_git(template, "-c", "core.autocrlf=false", "clone", "--shared", "--quiet", "--template=",
-                *pins, str(template), str(dest))
-        run_git(dest, "remote", "remove", "origin")
+                "-o", CLONE_REMOTE, *pins, str(template), str(dest))
+        run_git(dest, "remote", "remove", CLONE_REMOTE)
         return dest
