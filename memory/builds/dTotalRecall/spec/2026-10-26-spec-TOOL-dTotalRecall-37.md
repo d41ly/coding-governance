@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-37 — only the four rendered workflow scripts are `linguist-generated`, held equal to the kits' render rows both ways
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 4 · advances TOOL-dTotalRecall-27
+**Status:** WONTDO · rev-4 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 4 · advances TOOL-dTotalRecall-27 · retired with the code record it repairs: TOOL-dTotalRecall-8 is WONTDO by its §8 F1 loss route, deviation 2026-11-22-build-TOOL-dTotalRecall-8-deviation-83, and no scope here stands without it (§8 F4)
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -76,8 +76,8 @@ attribute set equal to the kits' render outputs, both ways. It repairs `TOOL-dTo
 ### Edges
 
 - **consumes-from** `TOOL-dTotalRecall-8` — the Bounds row reading `linguist-generated` and the
-  `.gitattributes` registration this unit narrows to the four renders
-- **hands-off** `TOOL-dTotalRecall-53` — `check_generated_attributes` and the four renders' attribute, which that unit gives an `eol` row and carries to adopters (the round-1 audit of units 36 to 43, ids 24 and 25)
+  `.gitattributes` registration this unit narrows to the four renders. Neither is built (deviation 83)
+- **hands-off** `TOOL-dTotalRecall-53` — `check_generated_attributes` and the four renders' attribute, which that unit gives an `eol` row and carries to adopters (the round-1 audit of units 36 to 43, ids 24 and 25). Neither is built (§8 F4), so that unit's S20 and S32 have nothing here to extend
 
 ## 4. Design
 
@@ -207,12 +207,24 @@ AC4's.
   (b) misses a rendered `.mjs` or `.toml` the record reads at file level; (c) fails veto 1. RESOLVED
   (agent, 2026-11-22, delegated): (a), M3, the one option gating the class with no table to keep;
   every rendered row today is `.md` or one of the four (§4). widens: none · relaxes: none
+- **F4 — TOOL-dTotalRecall-8 is retired `WONTDO` (deviation 83): does any of this unit's scope stand
+  with no code record?** Options: (a) none, retire the unit; (b) keep S1 and S2, the four
+  `linguist-generated` lines and their parity arm, for how a forge displays the renders; (c) keep S2's
+  arm and S3's extractions for TOOL-dTotalRecall-53 S32's `[[lf_pin]]` row. The record's Bounds row is
+  the attribute's one reader: `git grep -n linguist` over every tracked path outside `memory/` prints
+  nothing at `b4137f489`, and `.gitattributes` carries no `linguist-` line there. S4 observes the
+  record itself; S3's extractions are owed at their second instance, which is S2's arm; S2 grades the
+  set S1 writes. (b) builds a registration and a gate with no reader this goal names (`[yagni]`); (c)
+  builds an arm whose one row has no reader, scaffolding for a later unit's row (`[yagni]`), and unit
+  53 can build its own arm for that row at its re-ground. RESOLVED (agent, 2026-11-22, delegated):
+  (a), M3, the one option that builds nothing without a reader. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's id 16 (HIGH, item H2).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off mirror of TOOL-dTotalRecall-53, each a consumes-from edge of a unit the round-1 spec audit of units 36 to 43 promoted.
 - rev-3 · 2026-11-22 · §1, §2 S2 to S4, §3, §4, §5, AC1, AC3 to AC5, §7, §8 F3, §10 · re-grounded at base `8b8b1374` per `2026-11-22-prompt-TOOL-dTotalRecall-37-reground-brief`: the workflows kit now tracks fourteen `.js` files, six hand-written; the record is `tools/playbook/code_record.py` beside the tag index; the render set resolves through `resolve_dests` and excludes `.md` (F3); `derive_home_ctx` and `read_attr_population` extracted at their second instance (S3, AC5); `policy fixtures` named on the leg line; citations by symbol.
+- rev-4 · 2026-11-22 · Status · §3 Edges · §8 F4 · retired `WONTDO` per `2026-11-22-prompt-TOOL-dTotalRecall-8-retire-brief`: TOOL-dTotalRecall-8 lost its re-timing (deviation 83) and is not built, and by F4 no scope of this unit stands without its record; both edges say so. No other text moved.
 
 ## 10. Reuse audit
 

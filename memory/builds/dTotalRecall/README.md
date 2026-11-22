@@ -86,7 +86,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 91 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 91 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14
 ids TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27 TOOL-dTotalRecall-28
 ids TOOL-dTotalRecall-29 TOOL-dTotalRecall-30 TOOL-dTotalRecall-31 TOOL-dTotalRecall-32 TOOL-dTotalRecall-33 TOOL-dTotalRecall-34 TOOL-dTotalRecall-35 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42
@@ -101,9 +101,9 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 |---|---|---|---|---|---|
 | [TOOL-dTotalRecall-1 — the record-kind registry, the memory contract's one declaration of every kind](spec/2026-10-26-spec-TOOL-dTotalRecall-1.md) | 1 | 2 | CLOSED | rev-8 | 2026-11-22 |
 | [TOOL-dTotalRecall-13 — the shared extraction primitive in `tools/lib`, which the map and the lexicon each call](spec/2026-10-26-spec-TOOL-dTotalRecall-13.md) | 2 | 2 | CLOSED | rev-3 | 2026-11-22 |
-| [TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built](spec/2026-10-26-spec-TOOL-dTotalRecall-8.md) | 3 | 2 | INPROGRESS | rev-6 | 2026-11-22 |
+| [TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built](spec/2026-10-26-spec-TOOL-dTotalRecall-8.md) | 3 | 2 | WONTDO | rev-7 | 2026-11-22 |
 | [TOOL-dTotalRecall-18 — the kind registry completed: every column declared, readers and writers rendered, the pockets witnessed, and `journal` renamed `log`](spec/2026-10-26-spec-TOOL-dTotalRecall-18.md) | 4 | 2 | DEFERRED | rev-6 | 2026-11-22 |
-| [TOOL-dTotalRecall-37 — only the four rendered workflow scripts are `linguist-generated`, held equal to the kits' render rows both ways](spec/2026-10-26-spec-TOOL-dTotalRecall-37.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-22 |
+| [TOOL-dTotalRecall-37 — only the four rendered workflow scripts are `linguist-generated`, held equal to the kits' render rows both ways](spec/2026-10-26-spec-TOOL-dTotalRecall-37.md) | 4 | 2 | WONTDO | rev-4 | 2026-11-22 |
 | [TOOL-dTotalRecall-16 — the registry's `purpose` field, and every existing node's purpose reviewed as `memory.map-purpose` says](spec/2026-10-26-spec-TOOL-dTotalRecall-16.md) | 5 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dTotalRecall-25 — the stream-plan kind, registered so the planner that writes it and the pick that reads it descend from one row](spec/2026-10-26-spec-TOOL-dTotalRecall-25.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-05 |
 | [TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader](spec/2026-10-26-spec-TOOL-dTotalRecall-5.md) | 7 | 2 | DEFERRED | rev-5 | 2026-10-26 |
@@ -192,7 +192,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 248 bound to this build, across 4 record folder(s).
+Records: 253 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -210,32 +210,32 @@ TOOL-dTotalRecall-87@rev-1 TOOL-dTotalRecall-88@rev-1 TOOL-dTotalRecall-89@rev-1
 
 <!-- gen:build-coverage -->
 
-Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 89 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 26
+- carried whole: 25
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: 0 (none)
+- uncarried: 1 (cl-dClosedLoop-0219)
 - stale: 0 (none)
 - ambiguous: 0 (none)
-- owned nodes no spec names: none
-- specs derived from no clause: `spec/2026-10-26-spec-TOOL-dTotalRecall-100.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-36.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-37.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-38.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-39.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-40.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-41.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-44.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-45.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-46.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-47.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-48.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-49.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-52.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-53.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-56.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-57.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-58.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-59.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-60.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-61.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-62.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-64.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-65.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-66.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-67.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-68.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-69.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-70.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-72.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-73.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-74.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-76.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-77.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-78.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-80.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-81.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-82.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-83.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-84.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-85.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-86.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-87.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-88.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-89.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-90.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-91.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-92.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-93.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-94.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-95.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-96.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-97.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dTotalRecall-98.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-99.md` (PLAY-dClosedLoop-2)
+- owned nodes no spec names: policy-key.memory.code-languages, record-kind.code
+- specs derived from no clause: `spec/2026-10-26-spec-TOOL-dTotalRecall-100.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-36.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-38.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-39.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-40.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-41.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-42.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-44.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-45.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-46.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-47.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-48.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-49.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-50.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-52.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-53.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-54.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-56.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-57.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-58.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-59.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-60.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-61.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-62.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-64.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-65.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-66.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-67.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-68.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-69.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-70.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-72.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-73.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-74.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-76.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-77.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-78.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-80.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-81.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-82.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-83.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-84.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-85.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-86.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-87.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-88.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-89.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-90.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-91.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-92.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-93.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-94.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-95.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-96.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-97.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dTotalRecall-98.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dTotalRecall-99.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0221, cl-dClosedLoop-0222, cl-dClosedLoop-0232, cl-dClosedLoop-0233, cl-dClosedLoop-0236
 <!-- /gen:build-coverage -->
 

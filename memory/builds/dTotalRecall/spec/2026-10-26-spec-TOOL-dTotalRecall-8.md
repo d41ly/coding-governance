@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built
 
-**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · closes TOOL-dTotalRecall-102 TOOL-dTotalRecall-103 · advances TOOL-dTotalRecall-27
+**Status:** WONTDO · rev-7 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · advances TOOL-dTotalRecall-27 · retired by §8 F1's loss route: the cold record measured 10,884,519 bytes against AC1's 1 MB line, deviation 2026-11-22-build-TOOL-dTotalRecall-8-deviation-83
 
 **Carries:** cl-dClosedLoop-0219@62a3f369 whole
 **Carries:** node:record-kind.code
@@ -17,9 +17,12 @@
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-36 TOOL-dTotalRecall-2 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-10-26-build-TOOL-dTotalRecall-8-deviation-81.md](../build/2026-10-26-build-TOOL-dTotalRecall-8-deviation-81.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-8-deviation-82.md](../build/2026-10-26-build-TOOL-dTotalRecall-8-deviation-82.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-8-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-1-builder-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-8-deviation-83.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-deviation-83.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-8-edges-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-edges-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-8-facts-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-facts-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-8-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-reground-return.md) | research | — |
+| [2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
@@ -34,6 +37,8 @@
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-facts-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-facts-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-8-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-reground-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-8-retire-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-retire-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-8-retire-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-retire-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
 <!-- /gen:spec-records -->
@@ -178,7 +183,7 @@ is never built.
 - **consumes-from** `TOOL-dTotalRecall-1` — `record-kinds.toml` and `record_kinds.py new`, where the `code` kind lands its row, `new` gaining `--form` here
 - **consumes-from** `TOOL-dTotalRecall-13` — `extract_code.py`, the primitive, which this unit extends with `extract_ranges` and copies into the playbook-render kit
 - **consumes-from** external — landed and re-grounded at `8b8b1374`: PLAY-dOrderedCharter-19 S4 and S8 (`tag_index.py`'s `load_index`, `derive_index_path` and `read_worktree_trees`; `policy_value.py`), TOOL-dGroundRules-1 S3 and -2 (the catalogue row and `policy.py get`), PLAY-dOrderedCharter-7 S2 and S3 (`enforces` and the meta-check), TOOL-dWitnessedBar-11 S1 to S3 (the leg declaration and `leg_factory.py`)
-- **hands-off** external — dLinkedLibrary retires `symbols.json` and `reuse_lookup.py` onto this record (v2:1775); TOOL-dFurnishedOrders-17's `code` slot reads S14's `neighbourhood` rows (asks TOOL-dTotalRecall-102 and TOOL-dTotalRecall-103)
+- **hands-off** external — dLinkedLibrary retires `symbols.json` and `reuse_lookup.py` onto this record (v2:1775); TOOL-dFurnishedOrders-17's `code` slot reads S14's `neighbourhood` rows (asks TOOL-dTotalRecall-102 and TOOL-dTotalRecall-103). The record is not built (deviation 83), so neither hand-off has a record to read
 - **hands-off** `TOOL-dTotalRecall-16` — the policy read of `memory.map-purpose`: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
 - **hands-off** `TOOL-dTotalRecall-2` — the policy read of `leases.offline`: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
 - **hands-off** `TOOL-dTotalRecall-3` — the policy read of `leases.offline`: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
@@ -187,8 +192,8 @@ is never built.
 - **hands-off** `TOOL-dTotalRecall-7` — the policy read of `asks.acceptance`: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
 - **hands-off** `TOOL-dTotalRecall-9` — the policy read of the budget and slice keys: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
 - **hands-off** `TOOL-dTotalRecall-19` — the policy read of `memory.legacy-anchors`: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
-- **hands-off** `TOOL-dTotalRecall-37` — the `.gitattributes` registration of generated code, which that unit narrows to the four rendered workflow scripts (the round-1 audit's id 16)
-- **hands-off** `TOOL-dTotalRecall-43` — `code_record.py`'s cache and the `code record` leg's meta-gate rows, which that unit routes through and changes for the round-1 audit's ids 11, 21, 32, 33, 40, 54 and 55
+- **hands-off** `TOOL-dTotalRecall-37` — the `.gitattributes` registration of generated code, which that unit narrows to the four rendered workflow scripts (the round-1 audit's id 16). The record is not built (deviation 83), so this unit writes no registration for that unit to narrow
+- **hands-off** `TOOL-dTotalRecall-43` — `code_record.py`'s cache and the `code record` leg's meta-gate rows, which that unit routes through and changes for the round-1 audit's ids 11, 21, 32, 33, 40, 54 and 55. The record is not built (deviation 83), so no `code_record.py`, cache or `code record` leg lands for that unit to change
 
 ## 4. Design
 
@@ -436,6 +441,7 @@ any adopter tree but the planted one; whether a `test` row's definition really t
   spec. The loss route: over 30 s or over 1 MB on either tree loses; the record is not built, this
   unit is retired `WONTDO` by M2's AMEND with its measurement in the deviation it owes, and its
   readers keep `git grep`. widens: none · relaxes: none
+  Taken 2026-11-22: the cold run at the pass base printed `seconds 10.80` and `bytes 10884519`, over the 1 MB line, recorded in `2026-11-22-build-TOOL-dTotalRecall-8-deviation-83`.
 - **F2 — Where are vendored and generated paths registered, when no registry exists today?** Options:
   (a) `.gitattributes`' `linguist-vendored` and `linguist-generated`; (b) each `kit.toml`'s
   `[[generated]]` rows; (c) a new conf or policy key. (b) needs the run-gates kit's token resolution
@@ -507,6 +513,11 @@ any adopter tree but the planted one; whether a `test` row's definition really t
   `docs` leg otherwise reds as `DRAINED`; AC13 observes the row gone, the shape of unit 16 rev-3's
   AC7, and §7 names the `docs` leg and the `drift-audit selftest` leg, whose guard now reaches
   `tools/lexicon/extract_code.py`; S10 carries its drain's **Readers:** clause. No other criterion moved.
+- rev-7 · 2026-11-22 · Status · §3 Edges · §8 F1 · retired `WONTDO` per
+  `2026-11-22-prompt-TOOL-dTotalRecall-8-retire-brief`: AC1 lost at the pass base (deviation 83), so §8
+  F1's loss route is taken; the `closes` list leaves the header, since the record that would answer
+  TOOL-dTotalRecall-102 and TOOL-dTotalRecall-103 is not built; the hands-off bullets to units 37 and
+  43 and the external one say so; F1 gains the line recording the measurement. No other text moved.
 
 ## 10. Reuse audit
 

@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 phase: RUNNING
@@ -46,3 +47,13 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T04:18:44Z brief · item TOOL-dTotalRecall-13 · reason a7baaef45940 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-13-build-brief.md
 
 2026-11-22T04:24:03Z dispatch · item 5a7106e5 TOOL-dTotalRecall-13 · reason tools/lib/extract_code.py tools/lexicon/extract_code.py tools/codebase-map/extract_code.py tools/lexicon/lexicon.py tools/lexicon/selftest.py tools/codebase-map/map_extractors.py tools/codebase-map/map_lib.py tools/codebase-map/selftest.py tools/drift-audit/drift_report.py tools/lib/resolve-python.test.sh tools/govkit/registry.toml tools/gate-legs.json .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-13.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-13-1-acceptance-ledger.md
+
+2026-11-22T05:24:08Z brief · item TOOL-dTotalRecall-8 · reason 98101c289418 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-8-build-brief.md
+
+2026-11-22T05:26:56Z dispatch · item b4137f48 TOOL-dTotalRecall-8 · reason tools/playbook/code_record.py tools/playbook/extract_code.py tools/lib/extract_code.py tools/lexicon/extract_code.py tools/codebase-map/extract_code.py tools/lib/invocation_segments.py tools/runlog/extract.py tools/lib/resolve-python.test.sh tools/memory-tree/record-kinds.toml tools/memory-tree/record_kinds.py tools/memory-tree/README.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt help/reference/policy.md memory/project/docs-undocumented.txt tools/codebase-map/map_lib.py tools/codebase-map/map_diff.py tools/codebase-map/selftest.py memory/map/features/lexicon.md memory/map/features/playbook.md .gitattributes tools/playbook/kit.toml tools/playbook/core-pending.txt tools/playbook/README.md tools/gate-legs.json tools/govkit/subject-pins.tsv tools/run-gates/ceiling-evidence.txt .lexicon.conf tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-8.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-8-1-acceptance-ledger.md
+
+2026-11-22T05:36:59Z rescope · item retire TOOL-dTotalRecall-8 · reason its own re-timing loses (AC1): the cold record measured 10884519 bytes against the clause's 1 MB line (PINNED by cl-dClosedLoop-0219) at b4137f489, so §8 F1's RESOLVED loss route retires it WONTDO and its readers keep git grep; deviation 83
+
+2026-11-22T05:37:01Z decision · item TOOL-dTotalRecall-8 retired WONTDO by its own losing test leaves gap-mem-04 and gap-mem-28 open, asks TOOL-dTotalRecall-102 and -103 unanswered, and the child builds that read the code record (dFurnishedOrders-17, dIndexedDesign-16, dLinkedLibrary) without it · reason options: (a) take §8 F1's resolved loss route, retire it and carry the gaps to the owner; (b) re-scope AC1's 1 MB line (PINNED by cl-dClosedLoop-0219) or the record's row set, which changes the clause cl-dClosedLoop-0219's own losing test (the design, not this run's); (a) taken, (b) refused as a design change; the owner decides whether the code record is re-designed
+
+2026-11-22T05:41:35Z rescope · item retire TOOL-dTotalRecall-37 · reason it narrowed the generated-code registration for TOOL-dTotalRecall-8's code record, the attribute's only reader; with unit 8 retired by its losing test (deviation 83) none of its scope stands, its §8 F4
