@@ -155,3 +155,7 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-22T18:22:29Z brief · item TOOL-dQuietDisk-19 · reason ed0b2238c9c0 memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-19-build-brief.md
 
 2026-11-22T18:24:04Z dispatch · item 7e24d7af TOOL-dQuietDisk-19 · reason memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-19-measurements.md memory/builds/dQuietDisk/spec/2026-11-20-spec-TOOL-dQuietDisk-19.md memory/builds/dQuietDisk/README.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-19-1-acceptance-ledger.md memory/builds/dQuietDisk/build/2026-11-22-build-TOOL-dQuietDisk-19-deviation-1.md memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-22T18:51:15Z review · item dQuietDisk · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 2 · round-minors 9
+
+2026-11-22T18:51:34Z rescope · item add TOOL-dQuietDisk-36 · reason closing diff review round 1 (closing-target highs) confirmed two HIGHs, H1 (the bash template cache runs git under an inherited GIT_DIR) and H2 (the orphan sweep removes the turnstile suite's foreign-repository fixture); the round's fold is this unit, re-reviewed as round 2
