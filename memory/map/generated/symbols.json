@@ -7433,6 +7433,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_marker_repaired",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "check_material",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
