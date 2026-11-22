@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-59 — unit 53's read check folds each `reads` entry through `roles_lib.parse_read_key`, so the tag spelling unit 14 writes passes and the read-key grammar keeps one owner
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -27,7 +27,8 @@ stale-parse class on spec 58 AC5 at MEDIUM, item M9, and id 23 the stale citatio
 item L7; both are `TOOL-dBoundRoles-60`'s.
 
 `TOOL-dBoundRoles-53` S1 has `assert_role_reads` read a role's `reads` through `roles_lib.load_roles` and
-copy the parse `tools/roles/handoff.py:1025` makes at base: split on commas, strip, drop a trailing `?`.
+copy the parse `main` in `tools/roles/handoff.py` made at base `462d20f3`: split on commas, strip, drop a
+trailing `?`.
 `TOOL-dBoundRoles-14` S4 (order 1) makes `roles_lib.parse_read_key` the one read-key parser, and its S7
 rewrites every gov role's `reads:` line to the tag spelling. At order 22 the copy yields
 `field.input.question`, so `assert_role_reads gov-orienter input:question` fails on a correct tree, 53
@@ -60,8 +61,9 @@ it. It repairs `TOOL-dBoundRoles-53` and builds one step after it (order 23).
 ## 3. Non-goals (OUT)
 
 - Lifting the comma split into a `roles_lib` list parser shared by R3, `render_handoff` and the
-  render's read check at `handoff.py:1025`. The grammar that moved is the entry's, which
-  `parse_read_key` owns; those readers sit in files units 14 and 20 edit (§4 "Alternatives rejected").
+  render's read check (`tools/roles/handoff.py@c6d87bbb:1477`). The grammar that moved is the entry's,
+  which `parse_read_key` owns, and unit 14 already folds each of those readers through it (§4
+  "Alternatives rejected").
 - The report's left-shift grep gate over every split of a `reads` value. No clause of this build names
   it; S3 and AC3 are this suite's regression.
 - 58 AC5's raw-prefix read and 52's stale citation: `TOOL-dBoundRoles-60`'s, for ids 22 and 23.
@@ -80,21 +82,22 @@ it. It repairs `TOOL-dBoundRoles-53` and builds one step after it (order 23).
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at HEAD `c93f676e2` on 2026-11-22, unit 14 CLOSED at `7a58950fb`:
 
-- `tools/roles/handoff.py:1025` builds the render's read set as
-  `{x.strip().rstrip("?") for x in keys.get("reads","").split(",")}` inside `main`, and `:1026-1028`
-  call `ap.error` for an unread input other than `prompt`.
-- `tools/roles/roles_lib.py:330-336` `load_roles` returns each role file's raw front-matter keys; it
-  folds nothing.
-- `tools/roles/check_roles.py:198` and `tools/roles/handoff.py:337` split `reads` on commas the same way.
-- `tools/roles/agents/gov-orienter.agent.md:8` reads `input:question, input:prompt?` at base.
-- `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-14.md` S4 adds
-  `parse_read_key(entry)`, returning the native key and its optional flag, and S7 tag-spells the ten
-  lines. 14 AC6 renders `--input spec=` on a migrated line and expects the base `task-sha=`, so the read
-  check at `:1025` folds through `parse_read_key` from order 1 on as well.
-- `tools/roles/adopt-roles.test.sh:60` resolves `$PY` by running each candidate, and `:81` holds
-  `FLOOR_ASSERTIONS=50` with a `+n for arm k (unit)` comment per raise above it.
+- `tools/roles/handoff.py@c6d87bbb:1477` builds the render's read set as
+  `{lib.parse_read_key(x)[0] for x in keys.get("reads", "").split(",") if x.strip()}` inside `main`, and
+  `tools/roles/handoff.py@c6d87bbb:1478-1480` call `ap.error` for an unread input other than `prompt`
+  and the code input. At base `462d20f3` that line stripped a trailing `?` by hand, the parse 53 S1 copies.
+- `tools/roles/roles_lib.py#load_roles` returns each role file's raw front-matter keys; it folds nothing.
+- `tools/roles/check_roles.py@15b68874:242-244` (R3) and `tools/roles/handoff.py@c6d87bbb:595`
+  (`render_handoff`) split `reads` on commas and fold each entry through `parse_read_key`.
+- `tools/roles/agents/gov-orienter.agent.md@fcf461e7:8` reads `field.input.question, field.input.prompt?`,
+  unit 14 S7's line.
+- `tools/roles/roles_lib.py#parse_read_key` returns `(native key, optional)`: one trailing `?` is the
+  flag, and `field.<family>.<name>` folds to `<family>:<name>`.
+- `tools/roles/adopt-roles.test.sh@70af238b:78` resolves `$PY` by running each candidate, and
+  `tools/roles/adopt-roles.test.sh@70af238b:112` holds `FLOOR_ASSERTIONS=85` with a `+n for arm k (unit)`
+  comment per raise above it.
 
 ### The slice
 
@@ -122,7 +125,7 @@ None: no stored data changes.
 
 Live at landing, at order 23, after unit 53 at order 22. `TOOL-dBoundRoles-20` holds order 23 and its
 Files touched names the same suite, so the two passes' declared write sets intersect and `--dispatch`
-refuses the second while the first is open (`tools/unattended/unattended.sh:13421`, M6 condition 1).
+refuses the second while the first is open (`tools/unattended/unattended.sh@7548da57:18789`, M6 condition 1).
 
 ### Files touched (estimate)
 
@@ -131,8 +134,9 @@ refuses the second while the first is open (`tools/unattended/unattended.sh:1342
 
 ### Alternatives rejected
 
-- **A `parse_reads(value)` list parser in `roles_lib`, every reader re-pointed.** It moves three product
-  readers in files units 14 and 20 own at nearby orders, for a comma grammar that has not changed.
+- **A `parse_reads(value)` list parser in `roles_lib`, every reader re-pointed.** Unit 14 already folds
+  the three product readers' entries through `parse_read_key`; this moves them again for a comma grammar
+  that has not changed.
 - **Compare the tag spelling in the test.** It hard-codes 14 S7's spelling in a second place, and a native
   line, which `parse_read_key` still accepts, would fail.
 
@@ -186,15 +190,22 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · the folded read ch
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 52 to 58, id 21
   (HIGH, item H1), on the report's fix.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-61 and TOOL-dBoundRoles-63, the HIGH promotion and the minors batch of the round-1 audit of units 59 and 60; nothing else moved.
+- rev-3 · 2026-11-22 · §1 · §3 · §4 Evidence, Rollout, Alternatives · §10 · re-grounded at `c93f676e2` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-m-brief`: unit 14 landed, so `parse_read_key`, the
+  tag-spelled orienter line and the folds in R3, `render_handoff` and the render's read check are cited
+  at HEAD, the raw `?` strip named as base's; the suite's `$PY`, floor (85, blob-pinned) and `check_arm`
+  lines and the dispatch refusal are re-pointed. Unit 53's `assert_role_reads` and its `handoff.py`
+  citations were checked against unit 53's spec at rev-3 and hold; S1 to S4 and AC1 to AC4 hold.
 
 ## 10. Reuse audit
 
 The seam is `TOOL-dBoundRoles-14`'s `roles_lib.parse_read_key`, the one read-key parser, which the
 helper calls rather than copying, inside unit 53's `assert_role_reads` and the suite's `check_arm`
-(`tools/roles/adopt-roles.test.sh:83`).
+(`tools/roles/adopt-roles.test.sh@70af238b:114`). It landed at `7a58950fb` as
+`tools/roles/roles_lib.py#parse_read_key`, which the suite's arm 22 already calls.
 `python tools/codebase-map/reuse_lookup.py "fold a tag-spelled role reads entry back to its native read key"`
-ranked `read`, `read_text`, `key` and `read_conf_key`, none a read-key parser, because
-`parse_read_key` is minted at unit 14's pass and absent at base; the recall query below found it in
-14 S4. No existing seam fits beyond that function and the helper it serves.
+ranked `read`, `read_text`, `key` and `read_conf_key` at base, none a read-key parser, because
+`parse_read_key` was absent there; the recall query below found it in 14 S4. No existing seam fits
+beyond that function and the helper it serves.
 
 Recall terms used: `python tools/memory-recall/query.py "which function owns parsing a role reads entry after the tag spelling" --terms "parse_read_key reads field tag spelling native key roles_lib assert_role_reads load_roles handoff"`

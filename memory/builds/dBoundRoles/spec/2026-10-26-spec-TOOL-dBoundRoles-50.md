@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-50 — the round-1 audit of units 37 to 44, its 24 roles-code minors: one fence walker per language, fence-aware marker readers, live leg names, waiver and registry rows kept true, and criteria that can fail
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -68,9 +68,13 @@ at two grades, items M13 and L1.
   suite is `spawn-guard self-test`; no leg is named `agent-cap self-test`. Observed by AC2.
 - **S3** — id 5. Dead-path rows for unit 43's lines. The pass runs `bash tools/check-dead-paths.sh
   --list` for `agent-cap.js` and `agent-cap.test.sh` over `tools/govkit/steps/spawn_guard_pack.py` and
-  `tools/govkit/selftest.py` as unit 43 leaves them, and writes or re-keys their rows in
-  `tools/dead-path-waivers.txt` with `TOOL-dBoundRoles-42` S5's two reasons, so no needle line is
-  unwaived and no row is stale. Observed by AC3.
+  `tools/govkit/selftest.py` as unit 43 leaves them, and writes or re-keys their rows in the
+  `dead-path-waivers` ledger, `memory/project/dead-path-waivers.txt`, so no needle line is unwaived and
+  no row is stale. A row there is `<path> TAB <line-text> TAB <count> TAB <sha> TAB <disposition>` and
+  holds no reason (`tools/check-dead-paths.sh@c532a99a:210-216`), so a new key is written by the widen
+  door, `python tools/memory-tree/ratchet.py widen dead-path-waivers --key <path TAB line> --reason
+  <one line> --unit TOOL-dBoundRoles-50` (`tools/memory-tree/ratchet.py#run_widen`), its widen record
+  carrying `TOOL-dBoundRoles-42` S5's reason for that line. Observed by AC3.
 - **S4** — id 6. The account of how 43 and 44 built. The pass records in its ledger the order of unit
   43's and unit 44's pass commits, serial at orders 28 and 29, and the one path both wrote, the build
   README's generated region. Observed by AC4.
@@ -89,36 +93,50 @@ at two grades, items M13 and L1.
 - **S8** — id 26. Unit 41 AC3 across its own change. A handed spec with no grammar span plus a typed
   question renders at the parent of unit 41's pass commit and at that commit, each in a scratch worktree,
   and the two `## Task` sections and task-shas are equal. Observed by AC8.
-- **S9** — id 18. One fence walker per language. `checkBuildable`'s H1 scan
-  (`tools/hooks/scratch-guard.js:887-891`) reads lines through `readUnfencedLines`. `scanMessageLines`
-  (`tools/hooks/format-guard.js:208-216`) derives each row's `fenced` flag from `readUnfencedLines`, which
-  with `read_unfenced_lines` first gains its CommonMark rule: a backtick run whose line also holds a
-  backtick after the run opens no fence (§8 F2). No `fenced = !fenced` toggle is left in the hooks kit.
-  Observed by AC9.
+- **S9** — id 18. One fence walker per language. The H1 scan `checkBuildable` reads, now
+  `readSpecH1Id` (`tools/hooks/scratch-guard.js#readSpecH1Id`), which `readDispatchedUnits` reads too
+  (`tools/hooks/scratch-guard.js@0251d34d:1051`, `@0251d34d:1077`), reads lines through
+  `readUnfencedLines`. `scanMessageLines` (`tools/hooks/format-guard.js#scanMessageLines`) derives each
+  row's `fenced` flag from `readUnfencedLines`, which with `read_unfenced_lines` first gains its
+  CommonMark rule: a backtick run whose line also holds a backtick after the run opens no fence (§8
+  F2). `scanMessageLines` already applies that rule (`tools/hooks/format-guard.js@cbfbcff2:216-224`), so
+  routing it keeps it and adds the length rule. No `fenced = !fenced` toggle is left in the hooks kit;
+  at HEAD `c93f676e` AC9's grep prints two (`tools/hooks/scratch-guard.js@0251d34d:1008`,
+  `tools/hooks/format-guard.js@cbfbcff2:226`). Observed by AC9.
 - **S10** — id 19. Unit 37's agent predicate carries its default. `derive_roles_expected`'s `agents` is
-  the slots whose `keys.get("agent", "true") == "true"`, the rule `tools/roles/render_agents.py:275`
+  the slots whose `keys.get("agent", "true") == "true"`, the rule `tools/roles/render_agents.py@f7385dcf:275`
   renders by, read through the installed kit's `load_roles`. Observed by AC10.
 - **S11** — id 25. Every marker reader is fence-aware. `extract_unfenced_marker(text)` in `tools/roles/roles_lib.py`
-  returns the first `MARKER_RE` line `read_unfenced_lines` yields, or None; `tools/roles/handoff.py:437`,
-  `:834` and `tools/roles/roles_lib.py:553` call it in place of `MARKER_RE.search`. Observed by AC11.
-- **S12** — id 27. The spawn-idiom registry matches the tree. `memory/project/spawn-idiom-sites.txt`
-  carries no row keyed on `tools/hooks/agent-cap.test.sh`, the suite unit 25 deletes, and a row for each
-  registry-class site the moved arms bring into `tools/roles/spawn-guard.test.sh` that the scan finds.
-  Observed by AC12.
+  returns the first `MARKER_RE` line `read_unfenced_lines` yields, or None. `check_handoff`
+  (`tools/roles/handoff.py@c6d87bbb:732`), `print_agent_lines` (`tools/roles/handoff.py@c6d87bbb:1282`),
+  `scan_stand_in_declarations` (`tools/roles/roles_lib.py@5cf7c56f:986`) and the selftest arm
+  `check_ranked_arms` (`tools/roles/render_agents.py@f7385dcf:529`) call it in place of
+  `MARKER_RE.search` (§8 F4). Observed by AC11.
+- **S12** — id 27. The spawn-idiom registry matches the tree. `memory/project/spawn-idiom-sites.txt`,
+  the `spawn-idiom-sites` ledger keyed by path and class, shrink-only (`tools/gate-lint/kit.toml`),
+  carries no row keyed on `tools/hooks/agent-cap.test.sh`, the suite unit 25 deletes
+  (`memory/project/spawn-idiom-sites.txt@a01b0363:93`). It carries a row for each registry-class site the
+  moved arms bring into `tools/roles/spawn-guard.test.sh` that the scan finds, each a gained key the
+  shrink-only ledger admits only as `widened:<record>`, so each is written by the widen door
+  (`tools/memory-tree/ratchet.py#run_widen`) with its widen record. Observed by AC12.
   **Readers:** by name: `tools/gate-lint/sh_hygiene.py`, whose `--spawn-idioms` registry check reds a
   row the scan no longer finds · by value: `tools/gate-lint/sh_hygiene.py`'s per-row count compare.
 - **S13** — id 33. Unit 25's readers derived from both basenames. The pass runs
   `git grep -l -E 'agent-cap\.(js|test\.sh)' -- ':!memory/builds' ':!memory/ledger'` on the built tree
   and records each file it prints with the unit whose disposition answers it, 25, 42, 44 or this one.
   Observed by AC13.
-- **S14** — id 28. Unit 42 AC4's grep admits the registry it writes. The live-carrier grep runs with
-  `':!tools/dead-path-waivers.txt'` beside `':!memory'` and `':!.governance/steps'`, and prints only the
-  files 42 S4 admits. Unit 42's ledger answers AC4 AMENDED, naming this unit. Observed by AC14.
+- **S14** — id 28. Unit 42 AC4's grep admits the registry it writes. At HEAD the registry is
+  `memory/project/dead-path-waivers.txt` (`tools/govkit/registry.toml@2dbc48e9:2663-2671`,
+  TOOL-dWitnessedBar-16), inside the `':!memory'` exclusion the live-carrier grep already carries beside
+  `':!.governance/steps'`, so that grep prints only the files 42 S4 admits with no third pathspec. Unit
+  42's ledger answers AC4 as written where it holds, and AMENDED, naming this unit, where it does not;
+  this unit's ledger records the registry's move as id 28's disposition. Observed by AC14.
 - **S15** — id 37. A waived line is a step's spelling, never a live reference.
   `tools/hooks/kit.toml` holds no `include`, `to` or `version_from` key naming `agent-cap.js` or
   `agent-cap.test.sh`, and `tools/govkit/selftest.py`'s `KIT_DIRS` anchors the hooks kit on a file that exists
-  (`:115`). Where unit 25 left one, this pass rewrites it and re-keys S3's rows. The ledger records each
-  waived row's step row or fixture label. Observed by AC15.
+  (`tools/govkit/selftest.py@c2b02d78:116`, on `agent-cap.js` at HEAD). Where unit 25 left one, this pass
+  rewrites it and re-keys S3's rows. The ledger records each waived row's step row or fixture label.
+  Observed by AC15.
 - **S16** — id 35. The JS walker's length rule is observed. A case in the scratch-guard suite feeds
   `readUnfencedLines` a four-backtick fence holding a three-backtick line and a separate five-backtick
   line; a case in the spawn-guard suite hands
@@ -128,8 +146,8 @@ at two grades, items M13 and L1.
   and S11's `extract_unfenced_marker` return None; the Python `FACT_RE` reader refuses, naming the line;
   `readWorkOrderAllowance` denies the write, naming the line. None raises. Observed by AC17.
 - **S18** — id 38. Unit 40's replay has a bound and a shell. Each `SubagentStop` command runs through
-  `govkit_module().resolve_bash()`, as `check_roles_install` runs check-wiring
-  (`tools/govkit/selftest.py:2828`), with `CLAUDE_PROJECT_DIR` exported, under a 30-second timeout. A
+  `govkit_module().resolve_bash()` (`tools/govkit/upgrade_steps.py#resolve_bash`), as
+  `check_roles_install` runs check-wiring (`tools/govkit/selftest.py@c2b02d78:3223`), with `CLAUDE_PROJECT_DIR` exported, under a 30-second timeout. A
   timeout is red, naming the command. Observed by AC18.
 - **S19** — id 12. Unit 5's `agent_type` exit is reachable again. Two plants join
   `tools/roles/render_agents.py --selftest`: a marked direct-spawn transcript under
@@ -140,7 +158,8 @@ at two grades, items M13 and L1.
   together in its ledger. Observed by AC20.
 - **S21** — id 21. One spelling of the session layout in `handoff.py`. `resolve_subagent_dir(sdir,
   run_id)` returns `sdir / "subagents"`, or with a run id `sdir / "subagents" / "workflows" / run_id`;
-  the `agents` verb (`tools/roles/handoff.py:847`, `:854`, `:885`) and `TOOL-dBoundRoles-39`'s route
+  the `agents` verb's `print_agent_lines` (`tools/roles/handoff.py@c6d87bbb:1295`, `@c6d87bbb:1302`,
+  `@c6d87bbb:1333`) and `TOOL-dBoundRoles-39`'s route
   test read the layout through it. Observed by AC21.
 - **S22** — id 22. Unit 43 S34's rate over one population. Over this build's specs and brief records
   holding a backticked `blob:`, `record:` or `cmd:` span, the ledger records the count of such files, the
@@ -182,9 +201,10 @@ at two grades, items M13 and L1.
 ### Why two units
 
 The minors split into two write sets that meet none of M6's three clauses. This unit writes
-`tools/roles/`, `tools/hooks/`, `tools/govkit/selftest.py`, `tools/dead-path-waivers.txt` and
-`memory/project/spawn-idiom-sites.txt`. `TOOL-dBoundRoles-51` writes the memory-recall Skill's template
-and render and, where a build commit wrote it, `.governance/policy.json`. Every item whose criterion reads
+`tools/roles/`, `tools/hooks/`, `tools/govkit/selftest.py`, the two ledgers
+`memory/project/dead-path-waivers.txt` and `memory/project/spawn-idiom-sites.txt`, and the widen records
+the door writes for their gained keys. `TOOL-dBoundRoles-51` writes the memory-recall Skill's template
+and render and, where a build commit left it other than its render, `.governance/policy.json`. Every item whose criterion reads
 a file this unit writes is here: S3 and S14 read lines of `selftest.py` that S15 may rewrite, S13 and S12
 read the suites this unit edits, and S22 renders through `handoff.py`. Unit 51's criteria read
 `memory/` records, two ledgers, the commit log and its own files. Neither unit edits a generator, writes a
@@ -199,7 +219,7 @@ built tree's end state, and the pass does what is missing or records that a land
 ### Inventory
 
 Minted: `extract_unfenced_marker` and `resolve_subagent_dir` (`py.function`), the two plants of S19, the waiver rows
-of S3 and S15, and the registry rows of S12. Each function name is asked of
+of S3 and S15, the registry rows of S12, and the widen records the door writes for them. Each function name is asked of
 `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass.
 
 ### Migration
@@ -226,8 +246,9 @@ Live at landing, at order 30, after every unit it repairs and beside `TOOL-dBoun
 - `tools/hooks/kit.toml`
 - `tools/hooks/README.md`
 - `tools/govkit/selftest.py`
-- `tools/dead-path-waivers.txt`
+- `memory/project/dead-path-waivers.txt`
 - `memory/project/spawn-idiom-sites.txt`
+- `memory/builds/dBoundRoles/build/`, the widen records of S3, S12 and S15
 
 ### Alternatives rejected
 
@@ -244,7 +265,9 @@ Live at landing, at order 30, after every unit it repairs and beside `TOOL-dBoun
 - perf / scale — greps, probes, a few renders, one dead-path listing and one replay bound.
 - error / empty / loading states — S17 gives every reader of the open-fence yield a stated result.
 - observability — the ledger records S4, S13, S15, S20 and S22.
-- risks — S1 depends on unit 25's pass reading its edge; this pass makes any bump still missing.
+- risks — S1 depends on unit 25's pass reading its edge; this pass makes any bump still missing. The
+  widen door refuses a key holding a backtick (`tools/memory-tree/ratchet.py#run_widen`), so a needle
+  line S3 or S15 must waive that holds one is returned to the main loop rather than hand-written.
 - testing — AC1 to AC24 by probe, render, payload, grep and checker listing; the arms of §7 at the close.
 - migration — none.
 - user docs — none under `help/`; the READMEs by S23 and S24.
@@ -289,7 +312,7 @@ Live at landing, at order 30, after every unit it repairs and beside `TOOL-dBoun
   Red when: a row names the deleted suite, or a moved site has no row.
 - **AC13** — When S13's `git grep` runs on the built tree, every file it prints has a line in this unit's
   ledger naming its disposition. Red when: a reader of either basename is unanswered.
-- **AC14** — When `git grep -l -F 'agent-cap.js' -- ':!memory' ':!.governance/steps' ':!tools/dead-path-waivers.txt'`
+- **AC14** — When `git grep -l -F 'agent-cap.js' -- ':!memory' ':!.governance/steps'`
   runs, it prints only the files 42 S4 admits. Red when: an unadmitted live carrier names the hook.
 - **AC15** — When `grep -nE '^(include|to|version_from)\b.*agent-cap\.(js|test\.sh)' tools/hooks/kit.toml`
   and `grep -nF '("hooks", "agent-cap.js")' tools/govkit/selftest.py` run, both print nothing. Red when:
@@ -341,11 +364,22 @@ New arm: tools/roles/spawn-guard.test.sh · covers AC16 · spec 13's handoff pip
   leaves two rules in one kit, one of which closes a long fence on a short run; (a) satisfies the report's
   grep over every walker. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the more feature-rich.
   widens: none · relaxes: none
+  At HEAD `scanMessageLines` already carries the info-string rule (`tools/hooks/format-guard.js@cbfbcff2:216-224`)
+  and still closes on any run, so (b)'s second rule stands and the pick holds.
 - **F3 — Who renames the leg in the live §7 lines (ids 4, 29)?** Options: (a) unit 25's pass, which makes
   the rename, carried by its edge; (b) this pass at order 30. Under (b), `--dispatch` runs the spec-token
   checker over the live tree before each pass from order 27 on and reds on the stale name. RESOLVED
   (agent, 2026-10-26, delegated): (a), rung 3, the one survivor; S1 makes any bump (a) missed.
   widens: none · relaxes: none
+- **F4 — At HEAD a fourth file reads `MARKER_RE.search`: does S11 move it, or does AC11 skip it?**
+  `check_ranked_arms`, the selftest arm PLAY-dOrderedCharter-5 added, re-stamps a planted handoff's
+  marker through `handoff.MARKER_RE.search` (`tools/roles/render_agents.py@f7385dcf:529`), so AC11's
+  grep prints its line beside `extract_unfenced_marker`'s on a build of S11's three readers alone.
+  Options: (a) S11 moves it onto `extract_unfenced_marker` too, the plant's marker being its first,
+  unfenced line, so the arm's result is unchanged; (b) AC11's grep excludes `render_agents.py`. (b)
+  narrows a criterion so that it no longer sees a reader the class holds. RESOLVED (agent, 2026-11-22,
+  delegated): (a), rung 3, the one survivor, in a file §4 Files touched already names.
+  widens: S11's reader list by `check_ranked_arms` · relaxes: none
 
 ## 9. Revision log
 
@@ -357,14 +391,27 @@ New arm: tools/roles/spawn-guard.test.sh · covers AC16 · spec 13's handoff pip
 - rev-5 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
   `tools/roles/roles_lib.py` that §4 Files touched names, by
   `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
+- rev-6 · 2026-11-22 · S3 · S9 · S10 · S11 · S12 · S14 · S15 · S18 · S21 · §4 · §5 · AC14 · §8 F2 F4 ·
+  §10 · re-grounded at HEAD `c93f676e` by `2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-brief`. The
+  dead-path waivers are the `dead-path-waivers` ledger under `memory/project/`, so S3 and S15 write a
+  gained key through the widen door, and S12's gained spawn-idiom keys go the same way. S14 and AC14
+  lose the third pathspec, the registry now sitting under the `':!memory'` exclusion. S9 names
+  `readSpecH1Id`, the scan `checkBuildable` and `readDispatchedUnits` share, and records that
+  `scanMessageLines` already carries the info-string rule. S11 gains `check_ranked_arms` (F4). Every
+  line citation is re-pointed to a symbol or a blob-pinned line. Unit 25's leg rename and suite, unit
+  37's `derive_roles_expected`, unit 38's walkers and unit 42 S4's and S5's text were checked against
+  their specs, not HEAD.
 
 ## 10. Reuse audit
 
 The seams are `TOOL-dBoundRoles-38`'s two walkers, which S9, S11 and S17 extend rather than copy; the
-dead-path waiver registry (`tools/dead-path-waivers.txt`, whose `<path>\t<ordinal>\t<line-text>\t<reason>`
-grammar S3 and S15 write); the spawn-idiom registry check (`tools/gate-lint/sh_hygiene.py`); govkit's
-`resolve_bash` (`tools/govkit/selftest.py:2828`); and `handoff.py`'s own session layout (`:847`, `:854`,
-`:885`), which S21 lifts before citing any other kit.
+dead-path waiver ledger (`memory/project/dead-path-waivers.txt`, whose `<path> TAB <line-text> TAB
+<count> TAB <sha> TAB <disposition>` grammar `tools/check-dead-paths.sh@c532a99a:210-216` states) and the
+widen door S3, S12 and S15 write gained keys through (`tools/memory-tree/ratchet.py#run_widen`); the
+spawn-idiom registry check (`tools/gate-lint/sh_hygiene.py`); govkit's `resolve_bash`
+(`tools/govkit/upgrade_steps.py#resolve_bash`, called at `tools/govkit/selftest.py@c2b02d78:3223`); and
+`handoff.py`'s own session layout (`tools/roles/handoff.py@c6d87bbb:1295`, `@c6d87bbb:1302`,
+`@c6d87bbb:1333`), which S21 lifts before citing any other kit.
 `python tools/codebase-map/reuse_lookup.py "skip lines inside a fenced code block when reading a document line by line"`
 ranked `read`, `read_text`, `skip` and `read_conf`, none a fence walker, so no seam fits beyond 38's
 walkers.

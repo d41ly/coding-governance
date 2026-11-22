@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-52 — unit 47's cross-unit render pair runs on a role that reads both of its inputs: `gov-orienter`, the span typed in `input:question` and handed in `input:prompt`
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -26,12 +26,15 @@ finding **id 13 at HIGH**, report item **H1**. Id 30 shares the item at HIGH and
 `TOOL-dBoundRoles-53`; ids 2 and 39 report the same defect at MEDIUM, item M1, and are
 `TOOL-dBoundRoles-58`'s.
 
-Id 13 is the grounding face of the item. `TOOL-dBoundRoles-47` S1 renders `--role gov-builder` with
-`--input spec=` and `--input question=`. `tools/roles/agents/gov-builder.agent.md:7` reads
-`input:spec, card:route?, brief:non-goals?`, and `tools/roles/handoff.py:1025-1028` calls `ap.error` for
-any input other than `prompt` that the role does not read, before `render_handoff` or `check_anchors`
-runs. Both renders exit 2 with a usage error, so 47 AC1 and AC2 cannot pass on a correct build, and the
-easy green is to widen `gov-builder`'s `reads`, which no spec authorizes.
+Id 13 is the grounding face of the item. `TOOL-dBoundRoles-47` S1 at rev-2 rendered `--role gov-builder`
+with `--input spec=` and `--input question=`. `tools/roles/agents/gov-builder.agent.md@2081c590:7` reads
+`field.input.spec, field.card.route?, field.brief.non-goals?`, which `parse_read_key`
+(`tools/roles/roles_lib.py#parse_read_key`) folds to `input:spec`, `card:route` and `brief:non-goals`,
+and `tools/roles/handoff.py@c6d87bbb:1477-1480` calls `ap.error` for any input other than `prompt` and
+`code` that the role does not read, before `render_handoff` or `check_anchors` runs. Both renders exit
+2 with a usage error, so 47 AC1 and AC2 as rev-2 wrote them cannot pass on a correct build, and the
+easy green is to widen `gov-builder`'s `reads`, which no spec authorizes. Spec 47 rev-3 carries this
+unit's restatement already (its §8 F2), so this unit's pass verifies it (§8 F4).
 
 This unit moves the render pair onto a role whose `reads` hold one typed input and one handed path
 input, and restates unit 47's criteria for it. It repairs `TOOL-dBoundRoles-47` and builds one step
@@ -43,18 +46,21 @@ after it (order 22).
   renders `--role gov-orienter`. Its typed input is `--input question=`, holding the span
   `record:TOOL-tFix-9@000000000000`; its handed input is `--input prompt=`, naming a scratch file inside
   the fixture repository whose prose quotes the same span. `gov-orienter` reads
-  `input:question, input:prompt?` (`tools/roles/agents/gov-orienter.agent.md:8`), and `prompt` is in
-  `PATH_INPUTS` (`tools/roles/handoff.py:99`), so `TOOL-dBoundRoles-38` fences it as handed content and
+  `field.input.question, field.input.prompt?` (`tools/roles/agents/gov-orienter.agent.md@fcf461e7:8`),
+  the tag spelling `TOOL-dBoundRoles-14` S7 wrote, folded by `parse_read_key` to `input:question` and
+  `input:prompt` without changing what it reads, and `prompt` is in `PATH_INPUTS`
+  (`tools/roles/handoff.py#PATH_INPUTS`), so `TOOL-dBoundRoles-38` fences it as handed content and
   `TOOL-dBoundRoles-45` §4 "The one answer" lists it among the fenced blocks. The refusal render exits
   non-zero naming the span once; the plain-words render exits 0 and writes its prompt file. Observed by
   AC1.
 - **S2** — Seen accepted before relied on. Before editing the case, the pass renders the plain-words
   pair on the tree unit 47 left and records the command, its exit 0 and the written file in this unit's
   acceptance ledger. Observed by AC2.
-- **S3** — Unit 47's spec follows the case. The pass bumps `TOOL-dBoundRoles-47`'s spec with S1, AC1,
-  AC2 and its `New arm:` line restated for `gov-orienter` and `input:prompt`, and a §9 line naming this
-  unit, before it edits the case (BUILD-METHOD M2, READY). Unit 47's ledger answers AC1 and AC2
-  `amended rev-<n>`, naming that revision. Observed by AC3.
+- **S3** — Unit 47's spec follows the case. `TOOL-dBoundRoles-47`'s spec carries S1, AC1, AC2 and its
+  `New arm:` line restated for `gov-orienter` and `input:prompt`, with a §9 line naming this unit, at
+  rev-3 (§8 F4). The pass checks that it does, and bumps that spec only for a part rev-3 does not
+  restate, before it edits the case (BUILD-METHOD M2, READY). Where unit 47's pass landed the case on
+  `gov-orienter`, this pass edits no line of it and records that in its ledger. Observed by AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -76,13 +82,16 @@ after it (order 22).
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at base `462d20f3` on 2026-10-26, and again at HEAD `c93f676e2` on 2026-11-22:
 
-- `tools/roles/agents/*.agent.md` `reads:` lines: no role reads both `input:spec` and `input:question`;
-  the four that read `input:question` are `gov-orienter`, `gov-researcher`, `gov-reuse-scout` and
-  `gov-session`, and only `gov-orienter` also reads a path input.
-- `tools/roles/handoff.py:1027` exempts `prompt` from the reads check; `:331-336` resolves a path input
-  to a repository file.
+- `tools/roles/agents/*.agent.md` `reads:` lines, read through `parse_read_key`: five roles read
+  `input:question` at HEAD (DERIVED: `grep -n 'field.input.question' tools/roles/agents/*.agent.md`),
+  `gov-orienter`, `gov-researcher`, `gov-reuse-scout`, `gov-session` and `gov-tester`. `gov-tester`,
+  which TOOL-dWitnessedBar-23 added after base, reads `input:spec` beside an optional `input:question`
+  (`tools/roles/agents/gov-tester.agent.md@bf7f7f59:7`); of the four the base held, only `gov-orienter`
+  also reads a path input (§8 F3).
+- `tools/roles/handoff.py@c6d87bbb:1479` exempts `prompt` and `code` from the reads check;
+  `tools/roles/handoff.py@c6d87bbb:556-561` resolves a path input to a repository file.
 - `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md` §4 "The roster" keeps
   `gov-orienter`, and no spec of this build changes its `reads`.
 
@@ -103,14 +112,18 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 22, after unit 47 at order 21. `TOOL-dBoundRoles-26` holds order 22 and writes
-no file this unit writes; `TOOL-dBoundRoles-53` shares the order, consumes from this unit and writes the
-same suite, so `--dispatch` holds it until this unit is CLOSED.
+Live at landing, at order 22, after unit 47 at order 21. `TOOL-dBoundRoles-26` holds order 22 and also
+writes `tools/roles/adopt-roles.test.sh` (its §4 Files touched), so `--dispatch` refuses the second of
+the two declarations of that suite while the first pass's group is open
+(`tools/unattended/unattended.sh#verb_dispatch`), and the two passes run one after the other;
+`TOOL-dBoundRoles-53` shares the order, consumes from this unit and writes the same suite, so
+`--dispatch` holds it until this unit is CLOSED.
 
 ### Files touched (estimate)
 
 - `tools/roles/adopt-roles.test.sh`
-- the spec of TOOL-dBoundRoles-47, a rev bump (S3), named here for the dispatch write set
+- the spec of TOOL-dBoundRoles-47, a rev bump only for a part its rev-3 does not restate (S3), named
+  here for the dispatch write set
 
 ### Alternatives rejected
 
@@ -172,6 +185,20 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 · the re-roled render pa
   (agent, 2026-10-26, delegated): (a), rung 3, the report's first sound option. widens: none ·
   relaxes: none
 
+- **F3 — `gov-tester` reads `input:spec` and `input:question` at HEAD, the pair rev-2 of spec 47 wrote.
+  Does the case move to it instead of `gov-orienter`?** Options: (a) `gov-orienter`, as F2 resolved;
+  (b) `gov-tester`, keeping 47's own `--input spec=`. (b) re-roles a case that `TOOL-dBoundRoles-53`
+  S2 and AC2, `TOOL-dBoundRoles-58`'s control map, `TOOL-dBoundRoles-60` S25 and `TOOL-dBoundRoles-64`'s
+  fixture each spec on `gov-orienter` and `input:prompt`, so it fails their criteria as written, veto 1.
+  RESOLVED (agent, 2026-11-22, delegated): (a), the one survivor. options: (a) > (b) · pick: (a) ·
+  admitted-by: principle.p18 · widens: none · relaxes: none
+- **F4 — Spec 47 rev-3 already restates S1, AC1, AC2 and its `New arm:` line for `gov-orienter`. What
+  does S3 do?** Options: (a) check the restatement and bump spec 47 only for a part it lacks; (b) bump
+  spec 47 again regardless. (b) writes a revision that changes no claim. RESOLVED (agent, 2026-11-22,
+  delegated): (a), the option no veto refuses with fewer open questions; AC3 is unchanged and holds over
+  spec 47's rev-3 line. options: (a) > (b) · pick: (a) · admitted-by: principle.p18 · widens: none ·
+  relaxes: S3's bump, made at spec 47 rev-3 by the re-ground
+
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 45 to 51, id 13
@@ -179,6 +206,14 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 · the re-roled render pa
   first sound fix.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-60, the minors batch of the round-1 audit of units 52 to 58; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
+
+- rev-4 · 2026-11-22 · §1 · S1 · S3 · §4 · §8 F3 F4 · re-grounded at HEAD `c93f676e2` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-11-reground-l-brief`. The `reads:` lines are tag-spelled since
+  `TOOL-dBoundRoles-14` S7 (CLOSED) and folded by `parse_read_key`, and the read check exempts `code`
+  beside `prompt`; every bare line citation re-points to a symbol or a blob-pinned line. The Evidence
+  bullet counts five `input:question` readers, `gov-tester` among them, which reads `input:spec` too
+  (F3). Spec 47 rev-3 carries this unit's restatement, checked against that spec, so S3 checks it (F4).
+  §4 Rollout: unit 26 writes the same suite, so the order-22 passes run in sequence.
 
 ## 10. Reuse audit
 

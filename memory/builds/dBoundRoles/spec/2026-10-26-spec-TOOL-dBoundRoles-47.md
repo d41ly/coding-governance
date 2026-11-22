@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-47 — one criterion across the fence, the strip and the graded text: with units 38, 45, 24 and 41 landed, an anchor planted in a typed `--input` value is refused
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -32,17 +32,22 @@ every arm while the anchor check stops grading the text the order authors.
 
 This unit adds the cross-unit criterion the report's fix asks for: a render with 38, 45, 24 and 41
 landed plants a backticked `record:` anchor in `--input question=`, sees it refused, and is seen red
-against a render that fences the value. It repairs `TOOL-dBoundRoles-41` and builds one step after it
+against a render that fences the value. The render pair runs on `gov-orienter`, typed `input:question`
+beside handed `input:prompt`, the pair `TOOL-dBoundRoles-52` S1 states, since `gov-builder` reads no
+`input:question` and the render refuses such an input before any check runs (§8 F2). It repairs `TOOL-dBoundRoles-41` and builds one step after it
 (order 21).
 
 ## 2. Scope (IN)
 
-- **S1** — The case, in `tools/roles/adopt-roles.test.sh`, one render pair. A `--role gov-builder`
-  render hands `--input spec=` a scratch spec whose prose quotes the backticked span
-  `record:TOOL-tFix-9@000000000000`, and passes `--input question=` holding the same span. It exits
+- **S1** — The case, in `tools/roles/adopt-roles.test.sh`, one render pair. A `--role gov-orienter`
+  render hands `--input prompt=` a scratch file inside the fixture repository whose prose quotes the
+  backticked span `record:TOOL-tFix-9@000000000000`, and passes `--input question=` holding the same
+  span. `gov-orienter` reads `field.input.question, field.input.prompt?`
+  (`tools/roles/agents/gov-orienter.agent.md@fcf461e7:8`), and `prompt` is in `PATH_INPUTS`
+  (`tools/roles/handoff.py#PATH_INPUTS`), so `TOOL-dBoundRoles-38` fences it as handed content. It exits
   non-zero, names the span once, and writes no file. The same render
   with the question holding plain words exits 0 and writes its prompt file, so the span inside the
-  handed spec is not graded. Observed by AC1.
+  handed file is not graded. Observed by AC1.
 - **S2** — The staged break. A scratch copy of the roles kit whose `render_handoff` wraps the typed value
   in `render_handed_fence`, as `TOOL-dBoundRoles-38` S2 first specified, renders S1's first case with
   exit 0: the planted span is stripped and the arm reads red. The pass makes this observation once, by
@@ -75,14 +80,21 @@ against a render that fences the value. It repairs `TOOL-dBoundRoles-41` and bui
   authored block whole, and §3 says the unit does not lean on the fence.
 - `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-24.md` S2 strips fenced blocks before
   the scan, and its AC2 plants a `record:` anchor in `--input question=`.
-- `tools/roles/handoff.py:380-386` appends a typed value as one more `reads` block, so the render's
-  treatment of it is the only thing that separates it from a handed one.
+- `tools/roles/handoff.py@c6d87bbb:646-650` appends a typed value as one more `reads` block, so the
+  render's treatment of it is the only thing that separates it from a handed one. A path input's block
+  holds its path at HEAD (`tools/roles/handoff.py@c6d87bbb:556-561`); `TOOL-dBoundRoles-13` S3 hands its
+  content (checked against that spec).
+- `tools/roles/handoff.py@c6d87bbb:1477-1480` refuses, with `ap.error` and exit 2, any `--input` other
+  than `prompt` and `code` that the role's `reads` does not hold, before `render_handoff` runs.
+  `gov-builder` reads `field.input.spec, field.card.route?, field.brief.non-goals?`
+  (`tools/roles/agents/gov-builder.agent.md@2081c590:7`), so a `gov-builder` render passing `--input
+  question=` exits 2 with a usage error and never reaches `check_anchors`.
 
 ### What each producer contributes
 
 | Unit | Fact the case reads |
 |---|---|
-| `TOOL-dBoundRoles-38` | handed content is fenced, so the spec's span sits in a fence |
+| `TOOL-dBoundRoles-38` | handed content is fenced, so the handed file's span sits in a fence |
 | `TOOL-dBoundRoles-45` | a typed value is written raw |
 | `TOOL-dBoundRoles-24` | `check_anchors` refuses an anchor the order does not hand, and skips fenced spans |
 | `TOOL-dBoundRoles-41` | the graded text leaves a handed block's content out and keeps a typed value |
@@ -100,8 +112,11 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 21. `TOOL-dBoundRoles-11` holds order 21 and writes no file this unit writes;
-this unit's two producers are at orders 12 and 20.
+Live at landing, at order 21. `TOOL-dBoundRoles-11` holds order 21 and also writes
+`tools/roles/adopt-roles.test.sh` (its §4 Files touched), so `--dispatch` refuses the second of the two
+declarations of that suite while the first pass's group is open
+(`tools/unattended/unattended.sh#verb_dispatch`), and the two passes run one after the other. This
+unit's two producers are at orders 12 and 20.
 
 ### Files touched (estimate)
 
@@ -130,13 +145,16 @@ this unit's two producers are at orders 12 and 20.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the roles adopter fixture runs S1's two renders of `handoff.py render --role gov-builder`,
-  the first exits non-zero, its stderr names `record:TOOL-tFix-9@000000000000` once, and no prompt
-  file is written; the second exits 0 and writes its prompt file.
-  Red when: the typed value's span passes, or the handed spec's span refuses.
+- **AC1** — When the roles adopter fixture runs S1's two renders of `handoff.py render --role gov-orienter
+  --build tFix`, the pair `TOOL-dBoundRoles-52` S1 states, with `--input question=` and `--input prompt=`
+  naming the scratch file, the first exits non-zero, its stderr names `record:TOOL-tFix-9@000000000000`
+  once, and no prompt file is written; the second exits 0 and writes its prompt file.
+  Red when: the role refuses an input at argument parsing, the typed value's span passes, or the handed
+  file's span refuses.
   fixture: a scratch repository with the roles kit installed, under `%TEMP%`, short-pathed.
-- **AC2** — When the same first render runs against a scratch copy of `tools/roles/handoff.py` whose
-  `render_handoff` wraps typed values in `render_handed_fence`, it exits 0.
+- **AC2** — When the same first render, `--role gov-orienter` with `--input question=` and `--input
+  prompt=` as `TOOL-dBoundRoles-52` S1 states them, runs against a scratch copy of
+  `tools/roles/handoff.py` whose `render_handoff` wraps typed values in `render_handed_fence`, it exits 0.
   Red when: the case passes against the fence that hides the typed value, so it cannot see the defect.
   fixture: the scratch copy is built under the run's scratch path by the pass.
 - **AC3** — When `grep -n 'TOOL-dBoundRoles-45' tools/roles/adopt-roles.test.sh` runs, it names the case's
@@ -147,7 +165,7 @@ this unit's two producers are at orders 12 and 20.
 
 `roles adopter self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/roles/adopt-roles.test.sh · covers AC1 · S1's render pair, staged by a `render_handoff` that wraps typed values in `render_handed_fence`, which stops the planted span from refusing · none
+New arm: tools/roles/adopt-roles.test.sh · covers AC1 · S1's `gov-orienter` render pair over `input:question` and `input:prompt`, staged by a `render_handoff` that wraps typed values in `render_handed_fence`, which stops the planted span from refusing · none
 
 ## 8. Open questions
 
@@ -156,11 +174,29 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 · S1's render pair, stag
   clause; veto 1 discards (b). RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the precedent
   `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
 
+- **F2 — `gov-builder` reads no `input:question`, so S1's pair as rev-2 wrote it exits 2 at argument
+  parsing and AC1 and AC2 cannot pass on a correct build. Which role does this unit build the pair on?**
+  Options: (a) `gov-orienter`, typed `input:question` and handed `input:prompt`, the pair
+  `TOOL-dBoundRoles-52` S1 states; (b) the pair as rev-2 wrote it, `TOOL-dBoundRoles-52` re-roling it at
+  order 22; (c) `gov-builder` with `input:question?` added. (b) fails this spec's own AC1 and AC2 at its
+  pass, veto 1; (c) widens a write-class role's inputs, veto 3, as 52 §8 F2 found. RESOLVED (agent,
+  2026-11-22, delegated): (a), the one survivor; unit 52's S1 and AC1 then hold over the case this unit
+  lands, and its S3's restatement is this revision. options: (a) > (b) > (c) · pick: (a) ·
+  admitted-by: principle.p18 · widens: none · relaxes: none
+
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 37 to 44, id 9
   (HIGH, item H1, shared with ids 1 and 17), the report's cross-unit criterion.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-52 and -58, promotions of the round-1 audit of units 45 to 51; nothing else moved.
+
+- rev-3 · 2026-11-22 · §1 · S1 · §4 · AC1 · AC2 · §7 · §8 F2 · re-grounded at HEAD `c93f676e2` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-11-reground-l-brief`. S1, AC1, AC2 and the `New arm:` line move
+  the render pair to `gov-orienter` with `input:prompt` (F2), as `TOOL-dBoundRoles-52` S1 states it,
+  checked against that spec: the render refuses an input `gov-builder` does not read, at
+  `tools/roles/handoff.py@c6d87bbb:1477-1480`. The typed-block citation re-points to a blob-pinned line,
+  and the content a handed block carries is `TOOL-dBoundRoles-13` S3's, checked against that spec.
+  §4 Rollout: unit 11 writes the same suite, so the two order-21 passes run in sequence.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-51 — the round-1 audit of units 37 to 44, its 8 records-and-Skills minors: build order verified, the policy mirror's net diff, append-only records observed by class, one owner per ledger verdict, and the recall Skill off a refused tool
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -41,18 +41,22 @@ memory-recall Skill and, where a build commit wrote it, the policy mirror: repor
 
 - **S1** — id 2. Same-order dependencies built in dependency order. Specs 37 to 41 rest a dependency at a
   shared order on "dispatch sorts a tie by id string". The guarantee the tree gives is `--dispatch`'s:
-  its edge refusal holds a consumer until a same-build producer is CLOSED, and it refuses a pass whose
-  write set meets an open one's (`tools/unattended/unattended.sh:13692-13700`); the harness dispatches
-  strictly in sequence (`tools/workflows/unattended-build.js:76-80`). Unit 38's need of unit 3's card
-  binding is declared by no edge, so the pass reads `git log --reverse --format=%s <BASE>..HEAD` and
+  its edge refusal holds a consumer until a same-build producer is CLOSED
+  (`tools/unattended/unattended.sh@7548da57:18521-18530`), and it refuses a pass whose write set meets an
+  open one's (`tools/unattended/unattended.sh@7548da57:17730-17748`); the harness dispatches strictly in
+  sequence (`tools/workflows/unattended-build.js@9da9556b:78-82`). Unit 40 declares a `consumes-from`
+  edge on unit 39 (spec 40 §3), so the edge refusal holds that pair; unit 38's need of unit 3's card
+  binding is declared by no edge. The pass reads `git log --reverse --format=%s <BASE>..HEAD` and
   records in its ledger that unit 3's pass commit precedes unit 38's and unit 39's precedes unit 40's; an
   inversion is returned to the main loop. Observed by AC1.
-- **S2** — id 3. The policy mirror carries no in-branch change, and unit 44's two criteria are answered
-  where they can be. `git diff --quiet <BASE> HEAD -- .governance/policy.json` exits 0 after this pass:
-  where a commit of the build wrote the mirror, this pass writes back its BASE bytes, and the landing
-  regenerates it as `TOOL-dGroundRules-5` S3 gives. Unit 44's ledger answers AC8 AMENDED, observed by
-  that net diff rather than a per-commit log, and AC9 AMENDED, its swap-check half recorded at the close
-  under a `Pass: none` commit, where the swap happens. Observed by AC2.
+- **S2** — id 3. The policy mirror ships as its render, and unit 44's two criteria are answered where
+  they can be. `python tools/policy/policy.py mirror --check` exits 0 after this pass: where a commit of
+  the build left `.governance/policy.json` other than its render at HEAD, this pass regenerates it with
+  `policy.py mirror --write` in a commit of its own, the route the guard admits
+  (`tools/policy/guard.py@a5d4f958:9-12`, TOOL-dGroundRules-19), and the landing re-renders it as
+  `TOOL-dGroundRules-5` S3 gives (§8 F3). Unit 44's ledger answers AC8 by the same check, as that unit's
+  rev-5 states it, and AC9 AMENDED, its swap-check half recorded at the close under a `Pass: none`
+  commit, where the swap happens. Observed by AC2.
 - **S3** — id 7. Unit 42 S2's clause on `memory/builds/` observed as it means. Every file under
   `memory/builds/` outside this build's folder that existed at BASE and names the hook shows zero
   deletions in `git diff --numstat <BASE> HEAD`; this build's own ledgers, specs and renders are written
@@ -73,8 +77,8 @@ memory-recall Skill and, where a build commit wrote it, the policy mirror: repor
   restating it. The pass re-runs unit 44 S3's reader derivation with 42's pathspec, `memory/ledger/`
   excluded beside `memory/builds/`, and records any file the two filters disagree on. Observed by AC7.
 - **S8** — id 31. The memory-recall Skill sends the main loop to shell probes.
-  `tools/memory-recall/SKILL.template.md:15` and `:66` name shell `grep` and `git grep` through Bash where
-  they name the search tools, and `.claude/skills/memory-recall/SKILL.md` is its render. No Skill or
+  `tools/memory-recall/SKILL.template.md@17553715:12` and `@17553715:63` name shell `grep` and `git grep`
+  through Bash where they name the search tools, and `.claude/skills/memory-recall/SKILL.md` is its render. No Skill or
   Skill template in the tree names a tool `TOOL-dBoundRoles-10` refuses to the main loop. Observed by AC8.
 
 ## 3. Non-goals (OUT)
@@ -99,15 +103,23 @@ memory-recall Skill and, where a build commit wrote it, the policy mirror: repor
 
 ### Evidence
 
-- `tools/unattended/unattended.sh:13692-13700` is `--dispatch`'s edge refusal, and
-  `tools/workflows/unattended-build.js:76-80` records that dispatch is strictly sequential within a shared
-  order; `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md` §3 declares no edge to
-  unit 3.
+Read at HEAD `c93f676e` on 2026-11-22:
+
+- `tools/unattended/unattended.sh@7548da57:18521-18530` is `--dispatch`'s edge refusal, and
+  `tools/workflows/unattended-build.js@9da9556b:78-82` records that dispatch is strictly sequential
+  within a shared order; `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md` §3
+  declares no edge to unit 3, and spec 40's §3 declares one to unit 39.
 - `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-21.md` S8 regenerates the mirror with
   `policy.py mirror --write` in a second commit, and id 51 of the first round's audit records that
-  `TOOL-dGroundRules-6` guards `.governance/policy.json`.
-- `tools/memory-recall/SKILL.template.md:15` reads "Grep and Glob own those" and `:66` "fall back to
-  `Grep` over `{{MEMORY_ROOT}}/`"; `skills/session-kickoff/SKILL.md:21` is `TOOL-dBoundRoles-44` S4's.
+  `TOOL-dGroundRules-6` guards `.governance/policy.json` (`tools/policy/guarded-paths.txt@16afba27:6`).
+  The guard admits the mirror whose staged bytes are its render at HEAD
+  (`tools/policy/guard.py@a5d4f958:9-12`). The mirror records the catalogue's and the policy file's blobs
+  (`tools/policy/policy.py@b1894836:930-931`), and the bar refuses a stale one before its first leg
+  (`tools/run-gates/run-gates.sh@2e851a92:1607-1637`), as does the policy leg's parity arm
+  (`tools/policy/check_policy.py#arm_mirror_parity`).
+- `tools/memory-recall/SKILL.template.md@17553715:12` reads "Grep and Glob own those" and `@17553715:63`
+  "fall back to `Grep` over `{{MEMORY_ROOT}}/`"; `skills/session-kickoff/SKILL.md@41dedf1f:22` is
+  `TOOL-dBoundRoles-44` S4's.
 - `git ls-files` lists `memory/guides/MERGE-BAR.md` and no template or renderer for it.
 
 ### How an item closes
@@ -118,11 +130,11 @@ the pass does what is missing or records that a landed unit already left it.
 ### Inventory
 
 Minted: none. The items write ledger lines, one Skill sentence pair and, conditionally, the mirror's
-BASE bytes.
+render.
 
 ### Migration
 
-None: no stored data changes. S2 leaves the mirror at its BASE bytes for the landing to regenerate.
+None: no stored data changes. S2 leaves the mirror at its render at HEAD for the landing to re-render.
 
 ### Rollout
 
@@ -136,39 +148,38 @@ Live at landing, at order 30, after every unit it repairs and beside `TOOL-dBoun
 
 ### Alternatives rejected
 
-- **Forbid the mirror commit from this unit (S2).** It builds at order 30, after unit 21's pass at
-  order 4, so it can only restore the net state; the landing's regeneration is the one writer.
+- **Restore the mirror's BASE bytes (S2), rev-2's pick.** Once a build commit changed the mirror's
+  inputs, its BASE bytes differ from its render at HEAD, which the bar refuses before its first leg;
+  §8 F3.
 - **Zero diff on the backlog shards (S4).** They are generated and lose a line whenever an ask closes;
   regeneration is their observation.
 - **Re-derive unit 44 S1's population unchanged (S6).** At order 30 it is empty by construction.
 
 ## 5. Production-readiness checklist
 
-- security — S8 keeps the main loop off a tool the default refuses; S2 keeps a guarded mirror out of the
-  branch. No new write path.
+- security — S8 keeps the main loop off a tool the default refuses; S2 keeps the guarded mirror equal to
+  its render, never hand-written. No new write path.
 - perf / scale — git log, numstat and grep reads, one re-render.
 - error / empty / loading states — S1 and S6 record an inversion or a file and return it rather than
   pass it.
 - observability — the ledger records S1, S3, S6 and S7.
-- risks — S2's restore is a write to a guarded path; where the guard has landed, unit 21's commit was
-  refused and there is nothing to restore.
+- risks — S2's regeneration is a write to a guarded path, which the guard admits as the mirror's render
+  at HEAD (TOOL-dGroundRules-19); unit 21 S8's second commit takes the same route.
 - testing — AC1 to AC8 by git, grep and the Skill's render check.
 - migration — none.
 - user docs — the memory-recall Skill by S8.
 
 ## 6. Acceptance criteria
 
-Every command runs from the repository root. `policy.json` below is the policy mirror under `.governance/`
-that `TOOL-dGroundRules-5` creates, spelled by bare name as that spec's §6 spells it, because the
-spec-token checker grades a path-shaped token in a criterion against the tracked set and the mirror is not
-tracked at base; a git command naming it runs with the `.governance/` prefix.
+Every command runs from the repository root.
 
 - **AC1** — When `git log --reverse --format=%s <BASE>..HEAD` runs, the first pass commit naming
   `TOOL-dBoundRoles-3` precedes the first naming `TOOL-dBoundRoles-38`, and `-39`'s precedes `-40`'s, as
   this unit's ledger records. Red when: a consumer's pass ran before its producer's.
-- **AC2** — When `git diff --quiet <BASE> HEAD -- policy.json` runs over the mirror it exits 0, and
-  `grep -n 'AC8\|AC9' <unit 44's acceptance ledger>` prints two `amended` lines. Red when: the guarded
-  mirror ships in-branch, or unit 44's two criteria stand unanswered.
+- **AC2** — When `python tools/policy/policy.py mirror --check` runs it exits 0, and
+  `grep -n 'AC8\|AC9' <unit 44's acceptance ledger>` prints an AC8 line naming that check and an
+  `amended` AC9 line. Red when: the guarded mirror ships other than its render, or unit 44's two criteria
+  stand unanswered.
 - **AC3** — When `git diff --numstat <BASE> HEAD` runs over the pre-existing records of other builds
   that name `agent-cap.js`, every deletions figure is 0. Red when: a record of another build is
   rewritten.
@@ -202,19 +213,39 @@ tracked at base; a git command naming it runs with the `.governance/` prefix.
   write back BASE bytes so the net diff is empty; (b) leave it for the landing to overwrite. (b) ships
   the guarded path in the branch's diff, the defect id 51 of the first round exists to stop. RESOLVED
   (agent, 2026-10-26, delegated): (a), rung 3, the one survivor. widens: none · relaxes: none
+  Its premise moved at HEAD; F3 re-decides it.
+- **F3 — At HEAD the in-branch mirror is the landed route: what does S2 leave the mirror at (id 3)?**
+  The guard admits the mirror as its render at HEAD (`tools/policy/guard.py@a5d4f958:9-12`), and the bar
+  and the policy leg's parity arm refuse a mirror that differs from that render
+  (`tools/run-gates/run-gates.sh@2e851a92:1607-1637`, `tools/policy/check_policy.py#arm_mirror_parity`).
+  Once unit 21 S8 changes the catalogue, the mirror's BASE bytes are such a mirror. Options: (a) F2's
+  pick, BASE bytes and an empty net diff; (b) the render at HEAD, regenerated in a commit of its own
+  where a build commit left it otherwise, observed by `policy.py mirror --check`. (a) fails the bar on a
+  correct build. RESOLVED (agent, 2026-11-22, delegated): (b), rung 3, the one survivor, the route
+  `TOOL-dBoundRoles-44` §8 F5 takes for its AC8. widens: none · relaxes: S2 and AC2's empty net diff,
+  now "the mirror is its render at HEAD", and AC2's AC8 line, which unit 44's rev-5 answers as written
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, the records-and-Skills half of the round-1 minors of units 37 to
   44: 4 MEDIUM and 4 LOW, each id its own item.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-57 and -58, promotions of the round-1 audit of units 45 to 51; nothing else moved.
+- rev-3 · 2026-11-22 · S1 · S2 · S8 · §4 · §5 · §6 · AC2 · §8 F2 F3 · §10 · re-grounded at HEAD
+  `c93f676e` by `2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-brief`. S2 and AC2 observe the mirror
+  as its render at HEAD by `policy.py mirror --check`, the route the guard admits and the bar requires,
+  rather than BASE bytes (F3), and §6 drops the bare-name note, the mirror being tracked at HEAD. S1
+  records spec 40's edge on unit 39. Every line citation is re-pointed to a blob-pinned line or a
+  symbol. Unit 21 S8, unit 38 §3, unit 40 §3 and unit 44's S1, S3, S4, AC8 and AC9 were checked against
+  their specs, not HEAD.
 
 ## 10. Reuse audit
 
-The seams are `--dispatch`'s edge refusal (`tools/unattended/unattended.sh:13692-13700`), which S1 names
+The seams are `--dispatch`'s edge refusal (`tools/unattended/unattended.sh@7548da57:18521-18530`), which S1 names
 as the guarantee rather than adding one; the index generator's `--check`
-(`tools/memory-tree/gen_build_index.py`), which observes the generated shards; and the memory-recall
-adopter's `--check`, which keeps the Skill's render tied to its template.
+(`tools/memory-tree/gen_build_index.py`), which observes the generated shards; the memory-recall
+adopter's `--check`, which keeps the Skill's render tied to its template; and the policy kit's
+`policy.py mirror --check`, the `[[generated]]` row's check (`tools/policy/kit.toml@a87393a2:55-61`), which
+S2 runs rather than a diff of its own.
 `python tools/codebase-map/reuse_lookup.py "observe an append-only record by its deletions count rather than a zero diff"`
 ranked `counts`, `records`, `extract_records` and `read_records`, none a deletions observation, so no
 existing seam fits beyond the three named and git's own `--numstat`.

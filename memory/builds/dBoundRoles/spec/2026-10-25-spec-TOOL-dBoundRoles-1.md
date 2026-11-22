@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles
 
-**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-8 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0166@83615023 whole
 
@@ -72,10 +72,20 @@ had no spawn in 60 days and two double up (gap-roles-07), and no check keeps cor
   `layer`, a `layer.<seg>` tag naming a `[[layer]]` row of `tools/playbook/layers.toml`
   (PLAY-dOrderedCharter-16 S1), and `acts-as`, `item` or `cycle`, both required on every role and graded
   by R2 in `tools/roles/check_roles.py`, whose summary line counts the roles per layer and per `acts-as`
-  value. The role kind's factory, `write_role` (`tools/loop/factories.py#write_role`), writes both keys
+  value. Each row is `owner = "gov"`, `required = "every"`, `shape = "text"`: no new shape is added,
+  because no shape grades a value at HEAD. `load_role_schema` checks a row's shape only against
+  `SCHEMA_SHAPES` (`tools/roles/roles_lib.py@5cf7c56f:140-143`), and R2 grades each value by its key, as
+  it grades `writes` against `WRITES` (`tools/roles/check_roles.py@15b68874:233-234`). TOOL-dBoundRoles-43 S8
+  adds its `tag` and `choice` shapes later. `load_role_schema`'s key grammar
+  (`tools/roles/roles_lib.py@5cf7c56f:145-146`) widens from one word, `[A-Za-z][A-Za-z0-9]*`, to a
+  hyphenated word, `[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*`: letters and digits, opening on a letter,
+  with single hyphens between them. A key with a leading, trailing or doubled hyphen keeps its R2 line
+  `field N's key '<key>' is not one word`. The old grammar refuses `acts-as` at import, since
+  `FRONT_MATTER_KEYS` derives from `load_role_schema()` at module level (`@5cf7c56f:158`) (§8 F12).
+  The role kind's factory, `write_role` (`tools/loop/factories.py#write_role`), writes both keys
   from two required flags, `--layer` and `--acts-as`, beside the `never` and `return` flags
-  TOOL-dBoundRoles-2 gives it, and the kind's `usage` row in `tools/playbook/kinds.toml` names them
-  (§8 F8). Observed by AC1 and AC2.
+  TOOL-dBoundRoles-2 gives it, setting `acts-as` by subscript as it sets `return`, and the kind's `usage`
+  row in `tools/playbook/kinds.toml` names them (§8 F8). Observed by AC1 and AC2.
 - **S2** — The core roster, per §4 "### The roster": the four new role files
   `tools/roles/agents/gov-prompt-writer.agent.md`, `gov-planner.agent.md`, `gov-architect.agent.md` and
   `gov-reviewer.agent.md`, each with its body, `never`, `return`, its `BODY_CEILINGS` row and an empty
@@ -299,6 +309,7 @@ Live at landing on the `roles catalogue` leg; the new agent types reach a sessio
 - `tools/roles/house/` (four empty overlays, two leaving, `policy.toml` re-keyed)
 - `tools/roles/kit.toml`
 - `tools/roles/role-schema.toml`
+- `tools/roles/roles_lib.py` (`load_role_schema`'s key grammar, §8 F12)
 - `tools/roles/check_roles.py`
 - `tools/roles/render_agents.py`
 - `tools/roles/workflows.toml`
@@ -359,8 +370,13 @@ Live at landing on the `roles catalogue` leg; the new agent types reach a sessio
   the check is §5's note and prints no R2 line for `layer.nowhere` (§8 F11).
 - **AC2** — When `python check_roles.py` runs in `tools/roles/` over the tree, its summary counts 12
   roles at `layer.roles` and one at `layer.runtime`, and `python handoff.py roster` prints a line for
-  each of `gov-prompt-writer`, `gov-planner`, `gov-architect` and `gov-reviewer`.
-  Red when: a new slot has no workflow entry listing it, so R8 reds it.
+  each of `gov-prompt-writer`, `gov-planner`, `gov-architect` and `gov-reviewer`. In `tools/roles/`,
+  `python -c "import roles_lib; print(roles_lib.FRONT_MATTER_KEYS)"` lists `layer` and `acts-as`. In a
+  scratch folder holding copies of `roles_lib.py` and `role-schema.toml` whose `acts-as` row's key is
+  set in turn to `-actsas`, `actsas-` and `acts--as`, `python -c "import roles_lib"` raises `RolesError`
+  each time, with the R2 line `field <n>'s key '<key>' is not one word` naming that key.
+  Red when: a new slot has no workflow entry listing it, so R8 reds it; or the grammar widens to
+  `[A-Za-z][A-Za-z0-9-]*`, so `actsas-` and `acts--as` load.
   figure: the 12 and the 1 are PINNED from layer-roles `[roster]`, counting `gov-tester`, whose role
   file TOOL-dWitnessedBar-23 has landed at `a01362eb0`; the check derives them.
 - **AC3** — When `git grep -nE 'gov-(spec|diff)-reviewer' -- tools/roles` runs, it prints nothing, and
@@ -488,6 +504,14 @@ New arm: tools/loop/factories.py · covers none · the `role-new` row's argv gai
   today, so AC1 fails and veto 1 discards it. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the
   one survivor.
   widens: none · relaxes: none
+- **F12 — `load_role_schema` refuses a field key that is not one word, `[A-Za-z][A-Za-z0-9]*`
+  (`tools/roles/roles_lib.py@5cf7c56f:145-146`), and does so at import (`@5cf7c56f:158`); how does the
+  `acts-as` row land?** Options: (a) the key grammar widens to a hyphenated word, letters and digits with
+  single hyphens between them, as S1 states, and Files touched gains `tools/roles/roles_lib.py`; (b) the
+  key is renamed to one word throughout. (b) departs from the carried clause's spelling of the key.
+  RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the one survivor that keeps the carried key; each
+  row takes the existing `text` shape, since no shape grades a value at HEAD.
+  widens: §4 Files touched by `tools/roles/roles_lib.py` · relaxes: none
 
 ## 9. Revision log
 
@@ -518,6 +542,10 @@ New arm: tools/loop/factories.py · covers none · the `role-new` row's argv gai
   over `2026-11-22-build-TOOL-dBoundRoles-1-1-builder-return`: AC1's scratch and the arm's fixture hold
   `layers.toml` (F11); Files touched lists the suite, and already named `.claude/roles.json` and
   `help/reference/kinds.md`; nothing else moved.
+- rev-8 · 2026-11-22 · S1 · §4 Files touched · AC2 · §8 F12 · by `2026-11-22-prompt-TOOL-dBoundRoles-1-fix-2-spec-writer`,
+  over `2026-11-22-build-TOOL-dBoundRoles-1-2-builder-return`: `load_role_schema`'s key grammar widens
+  to a hyphenated word so the `acts-as` row loads, each new row takes the `text` shape, AC2 observes the
+  widened grammar, and Files touched gains `tools/roles/roles_lib.py` (F12); nothing else moved.
 
 ## 10. Reuse audit
 

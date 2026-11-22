@@ -6960,7 +6960,6 @@ memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md	6 calls	1	
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-42.md	25 files	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-43.md	300 KB	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-43.md	49152 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-44.md	10240 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-44.md	60120 bytes	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-50.md	40 seconds	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-50.md	7 lines	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

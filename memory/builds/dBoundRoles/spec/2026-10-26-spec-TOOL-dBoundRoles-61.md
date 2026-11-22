@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-61 — unit 59's read check fails on its slice's exit status, so a slice that crashes can no longer pass for a read it never checked
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 24 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 24 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -26,8 +26,8 @@ finding **id 19 at HIGH**, report item **H1**. No other id shares the item. Id 9
 at MEDIUM, item M2, and is `TOOL-dBoundRoles-63`'s.
 
 `TOOL-dBoundRoles-59` §4 "The slice" gives `assert_role_reads` one verdict: an empty printed line means
-every key is read. The slice's exit status is never read, and `tools/roles/adopt-roles.test.sh:51` runs
-under `set -u` alone, so a `$(...)` capture of a slice that crashes comes back empty and the case
+every key is read. The slice's exit status is never read, and `tools/roles/adopt-roles.test.sh@70af238b:69`
+runs under `set -u` alone, so a `$(...)` capture of a slice that crashes comes back empty and the case
 passes. A role slot with no file raises `KeyError`, and malformed front matter raises `RolesError`. In
 each case the check certifies a read it never made.
 
@@ -61,10 +61,11 @@ It repairs `TOOL-dBoundRoles-59` and builds one step after it (order 24).
 - Id 9, the medium face of this defect: `TOOL-dBoundRoles-63` records this unit's closure of it.
 - The report's left-shift checklist entry, "a check whose pass verdict is empty output must also assert
   exit status 0". No clause of this build names it; AC1 is this suite's regression.
-- The suite's other `$(...)` captures. `MR` and `CH` at `tools/roles/adopt-roles.test.sh:67-68` are
-  tested non-empty at `:69`, so a crash there already stops the suite.
-- A `parse_read_key` refusal case. Unit 14 S4 states what the function returns, not what it refuses, so
-  no input can be named here that it is known to refuse; S1's non-zero branch covers it either way.
+- The suite's other `$(...)` captures. `MR` and `CH` at `tools/roles/adopt-roles.test.sh@70af238b:85-86`
+  are tested non-empty on the next line of that blob, so a crash there already stops the suite.
+- A `parse_read_key` refusal case. The landed `tools/roles/roles_lib.py#parse_read_key` refuses no
+  input: it folds a `field.` tag and returns any other entry unchanged, so S1's non-zero branch covers a
+  crash in it and no refusal case exists.
 
 ### Edges
 
@@ -78,18 +79,20 @@ It repairs `TOOL-dBoundRoles-59` and builds one step after it (order 24).
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at HEAD `c93f676e2` on 2026-11-22, the suite at blob `70af238b`:
 
-- `tools/roles/adopt-roles.test.sh:51` is `set -u`, and the file holds no `set -e`. `:60` resolves `$PY`
-  by running each candidate. `:81` holds `FLOOR_ASSERTIONS=50` under the `10, then +<n>` comment of
-  `:73-80`. `:83` defines `check_arm`.
-- `tools/roles/roles_lib.py:306-327` `parse_front_matter` raises `RolesError` on a missing block, an
+- `tools/roles/adopt-roles.test.sh@70af238b:69` is `set -u`, and the file holds no `set -e`.
+  `tools/roles/adopt-roles.test.sh@70af238b:78` resolves `$PY` by running each candidate.
+  `tools/roles/adopt-roles.test.sh@70af238b:112` holds `FLOOR_ASSERTIONS=85` under the `10, then +<n>`
+  comment of lines 91 to 111 of that blob, and `tools/roles/adopt-roles.test.sh@70af238b:114` defines
+  `check_arm`.
+- `tools/roles/roles_lib.py#parse_front_matter` raises `RolesError` naming `R2` on a missing block, an
   indented key, a line with no `:`, an unknown key and a repeated key.
-- `tools/roles/roles_lib.py:330-336` `load_roles` returns a dict keyed by slot, so indexing it with a slot
-  that has no file raises `KeyError`.
+- `tools/roles/roles_lib.py#load_roles` returns a dict keyed by slot, so indexing it with a slot that has
+  no file raises `KeyError`.
 - `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-59.md` §4 "The slice" ends with "An
   empty line means every key is read"; neither its S1 nor its §5 names an exit status.
-- `parse_read_key` is minted by unit 14 S4 and absent at base.
+- `parse_read_key` was absent at base and landed with unit 14 at `7a58950fb`.
 
 ### The capture
 
@@ -106,7 +109,7 @@ fi
 ```
 
 An assignment from a command substitution takes that command's exit status, so `rc` is the slice's.
-The CR strip follows `:67`. The block is the design's shape; the pass fits it to the helper's labels and
+The CR strip follows `tools/roles/adopt-roles.test.sh@70af238b:85`. The block is the design's shape; the pass fits it to the helper's labels and
 argument handling.
 
 ### Inventory
@@ -189,11 +192,17 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · the missing-slot c
   (HIGH, item H1), on the report's fix.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-66, the minors batch of the round-1 audit of unit 64; nothing else moved.
+- rev-4 · 2026-11-22 · §1 · §3 · §4 Evidence, The capture · §10 · re-grounded at `c93f676e2` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-m-brief`: the suite's `set -u`, `$PY`, `MR` and `CH`,
+  floor comment, floor (85) and `check_arm` lines are blob-pinned where they moved; `parse_front_matter`
+  and `load_roles` are cited by symbol, their raises unchanged; the `parse_read_key` non-goal reads the
+  landed function, which refuses no input. Unit 59's slice, S1 and §5 were checked against unit 59's
+  spec at rev-3 and hold, as does spec 19's write set on the same suite; S1 to S5 and AC1 to AC4 hold.
 
 ## 10. Reuse audit
 
 The seam is unit 59's `assert_role_reads` and the suite's `check_arm`
-(`tools/roles/adopt-roles.test.sh:83`), extended by one exit branch rather than a second helper.
+(`tools/roles/adopt-roles.test.sh@70af238b:114`), extended by one exit branch rather than a second helper.
 `python tools/codebase-map/reuse_lookup.py "fail a test case when a python slice it captures exits non-zero with empty output"`
 ranked `fail`, `slice`, `resolve_python` and `read_git_output`, none a capture of a slice's exit status,
 so no existing seam fits beyond the helper and `check_arm`. The recall query's hits include

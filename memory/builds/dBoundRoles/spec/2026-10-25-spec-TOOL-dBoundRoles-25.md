@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-25 — the spawn guard and harness admission moved into the roles pack, admission held to the landed blob, `tools/hooks/agent-cap.js` retired with an upgrade step
 
-**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-8 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0190@03bbbf1e whole
 
@@ -47,11 +47,15 @@ them.
   in `main()`, and every name its `module.exports` carries, each with its importers by
   `git grep -n -F 'agent-cap.js' -- tools skills`. The pass writes the inventory into its acceptance
   ledger before moving anything. A rule or export the disposition table of §4 does not place stops
-  the unit (§8 F6). Observed by AC9.
+  the unit (§8 F6). At HEAD `c93f676e2` the inventory is §4 "Evidence at HEAD": rules 6, 8 and 7, the
+  `--only=` refusal and `checkOptinPackPresent`, and the fourteen names of `module.exports`
+  (`tools/hooks/agent-cap.js@935a910d:1104-1112`). Observed by AC9.
 - **S2** — The pack. `tools/roles/spawn-guard.js` is a `PreToolUse` hook on `Workflow|Agent` holding
-  every rule S1 finds, in `main()`'s order. That is rule 6 as TOOL-dBoundRoles-4, -6, -10, -16, -17 and -20
-  leave it (the handoff spawn guard and `checkHarnessCall`), rule 7 (TOOL-dGroundRules-10 S5's settings
-  check) and any call-time check a parent added beside them. Each deny keeps its bytes after the prefix
+  every rule S1 finds, in `main()`'s order. That is rule 6 as TOOL-dBoundRoles-3, -4, -6, -10, -13, -16, -17,
+  -20, -38, -46 and -48 leave it (the handoff spawn guard and `checkHarnessCall`), rule 8 (TOOL-aGuardedEffort-1's effort
+  level, `checkEffortLevel` with `resolveModelProfile` and `readSessionModel`), rule 7
+  (TOOL-dGroundRules-10 S5's settings check) and any call-time check a parent added beside them,
+  `checkOptinPackPresent` (TOOL-dFairHearing-22) among them. Each deny keeps its bytes after the prefix
   `BLOCKED by spawn-guard:`. Its fragment `tools/roles/spawn-guard.fragment.json` names the event, the
   matcher `Workflow|Agent`, the marker `spawn-guard.js` and the hook path, laid out like
   TOOL-dFairHearing-16 S4's `spec-audit-optin.fragment.json`. Observed by AC1, AC2, AC3, AC7 and AC8.
@@ -59,9 +63,14 @@ them.
   harness is admitted only when the harness file's working-tree blob id equals its blob id at the
   landed revision (§4 "Admission"). A harness absent at that revision is refused as not landed.
   Observed by AC4, AC5 and AC6.
-- **S4** — The helpers' homes (§4 "Disposition", §8 F3). A helper read by one kit moves into that
+- **S4** — The helpers' homes (§4 "Disposition", §8 F3, F7, F8). A helper read by one kit moves into that
   kit. A helper read by two kits moves into `tools/hooks/scratch-guard.js`'s `module.exports`, which
-  the pack already reads for rule 6's index readers. A kit imports no sibling kit (TOOL-dGroundRules-1
+  the pack already reads for rule 6's index readers. At HEAD the hooks kit's own two hooks are such
+  readers: `tools/hooks/format-guard.js` requires `extractHandoffMarker` and `resolveKitDir` from the
+  file (`tools/hooks/format-guard.js@cbfbcff2:430`, `@cbfbcff2:575`), and `tools/hooks/scratch-guard.js`
+  requires `resolveKitDir` and `resolvePolicyHelper` (`tools/hooks/scratch-guard.js@0251d34d:711`,
+  `@0251d34d:1328`, `@0251d34d:1349`, `@0251d34d:1397`, `@0251d34d:1539`), so each moves into
+  scratch-guard.js and its callers read it there. A kit imports no sibling kit (TOOL-dGroundRules-1
   §4), so `tools/roles/kit.toml`'s `requires_if` gains a row naming `agent-cap` whose `why` names
   `spawn-guard.js`'s require of `scratch-guard.js` and the pack's refusal where it does not resolve.
   Observed by AC9.
@@ -94,9 +103,10 @@ them.
   registry id `agent-cap` (§8 F5), and its `version_from` moves to a `KIT_AGENT_CAP_VERSION` constant
   in `tools/hooks/scratch-guard.js` that continues the kit's version sequence. Every reader is
   disposed in the pass's commit (§4 "Readers disposed"). The by-name readers below are what
-  `git grep -l -F 'agent-cap.js'` printed at base `4ed9e567`, re-derived by the same command at the
-  build run's base, and the leg's readers what `git grep -l -F 'agent-cap self-test'` printed.
-  Observed by AC14 and AC16.
+  `git grep -l -F 'agent-cap.js'` printed at base `4ed9e567`, with the readers it adds at HEAD
+  `c93f676e2` outside `memory/`, re-derived by the same command at the build run's base, and the leg's
+  readers what `git grep -l -F 'agent-cap self-test'` printed at HEAD. The `memory/` readers are
+  TOOL-dBoundRoles-42's classes. Observed by AC14 and AC16.
   **Readers:** by name: `tools/hooks/agent-cap.test.sh`, the retired suite, deleted with the file, its
   arms over moved rules carried into S5's suite (AC8); `.claude/rules/product.md`,
   `.claude/settings.json`, `.lexicon.conf`,
@@ -116,23 +126,45 @@ them.
   `tools/workflows/tier2-review.template.js`, `tools/workflows/unattended-build.template.js`,
   `tools/workflows/unattended-build.test.sh`, `memory/guides/MERGE-BAR.md`,
   `memory/guides/REVIEW-PROTOCOL.md`, `memory/map/features/agent-cap.md`,
-  `memory/map/features/review-harnesses.md`, `memory/map/features/unattended.md`; the leg's:
+  `memory/map/features/review-harnesses.md`, `memory/map/features/unattended.md`; added at HEAD:
+  `.governance/install.json`, `tools/hooks/format-guard.test.sh`, `tools/lib/resolve-python.test.sh`,
+  `tools/loop/factories.py`, `tools/loop/loop.toml`, `tools/policy/check_policy.py`,
+  `tools/roles/render_agents.py`, `tools/workflows/check-review-join.js`,
+  `tools/workflows/check-verifier-fanout.js`, `tools/workflows/spec-audit-optin.js`,
+  `tools/workflows/spec-audit-optin.test.sh`, and the renders of the harness templates above; the leg's:
   `tools/gate-legs.json`, `tools/govkit/registry.toml`, `tools/govkit/subject-pins.tsv`,
-  `tools/run-gates/ceiling-evidence.txt`, `tools/run-gates/run-selftests.sh`,
-  `tools/run-gates/selftest-budgets.txt`, `tools/run-gates/windows-only-legs.txt`; and the charter's
+  `tools/run-gates/ceiling-evidence.txt`, `tools/run-gates/pass-leg-evidence.txt`,
+  `tools/run-gates/run-selftests.sh`, `tools/run-gates/selftest-budgets.txt`,
+  `tools/run-gates/windows-only-legs.txt`; and the charter's
   agent-cap line in `coding-governance-agents.template.md`, rendered into `AGENTS.md`
   · by value: `.claude/settings.json`'s wired `Workflow|Agent` command, which runs the file;
   `tools/hooks/kit.toml`'s `version_from`, from which the kit version is read; `tools/check-kit-versions.sh`,
   which compares `KIT_AGENT_CAP_VERSION` with every `gov:kit agent-cap@` marker;
-  `tools/check-playbook-parity.sh`'s rows extracting `MAX_LENSES` and `MAX_VERIFIERS` from the file;
-  every `resolve_kit_dir` call anchoring the hooks kit on `agent-cap.js` (`tools/check-playbook-parity.sh`,
-  `tools/check-kit-versions.sh`, `tools/govkit/selftest.py`'s `KIT_DIRS`, `tools/check-wiring.sh`'s
-  `KIT_FILE_PAIRS`); `tools/govkit/matrix.py`'s settings-merge exit-2 rows; `tools/check-wiring.sh`'s
-  agent-cap arm; the review kit's modules importing the file's exports (TOOL-dFairHearing-16 S1); the
-  `resolveKitDir` slice `tools/lib/resolve-python.test.sh` cuts from the file (TOOL-dFairHearing-32
-  S26); and the charter line, which names the hook as a rule an agent obeys.
+  `tools/check-playbook-parity.sh`'s two rows extracting `MAX_VERIFIERS` from the file
+  (`tools/check-playbook-parity.sh@4d2769db:452-453`), `MAX_LENSES` having left with its last reader
+  (TOOL-dFairHearing-27 S16); every call anchoring the hooks kit on `agent-cap.js`: `resolve_kit_dir` in
+  `tools/check-playbook-parity.sh`, `tools/loop/factories.py`, `tools/policy/check_policy.py`,
+  `tools/roles/adopt-roles.test.sh`, `tools/settings-merge.py`, `tools/workflows/check-review-join.sh`,
+  `tools/workflows/check-verifier-fanout.sh` and nine suites' `HOOKS_DIR` or `HK_DIR` lines (DERIVED at
+  `c93f676e2`: `git grep -l -E '(HOOKS_DIR|HK_DIR)=.*hooks agent-cap\.js' -- '*.test.sh'`), `resolveKitDir` in
+  `tools/workflows/spec-audit-optin.js` (`tools/workflows/spec-audit-optin.js@db8351f4:72`),
+  `resolve_carrier_kit` in `tools/check-kit-versions.sh`, `tools/govkit/selftest.py`'s `KIT_DIRS` and
+  `tools/check-wiring.sh`'s `KIT_FILE_PAIRS`; `tools/govkit/matrix.py`'s settings-merge exit-2 rows;
+  `tools/check-wiring.sh`'s agent-cap arm; the review kit's modules importing the file's exports
+  (TOOL-dFairHearing-16 S1); the hooks kit's own requires of them (S4); `tools/roles/adopt-roles.test.sh`'s
+  arm 20, requiring `resolveModelProfile` (`tools/roles/adopt-roles.test.sh@70af238b:1004`);
+  `tools/policy/check_policy.py`'s `HOOK_FILES` cases, which run rule 7 from a copy of the file
+  (`tools/policy/check_policy.py@6cbdf64b:3543`); `tools/lib/resolve-python.test.sh`'s `resolveKitDir`
+  slices, its compare of the hook's block with the opt-in pack's, its FH48 fixture requiring
+  `readWriterBound` from a copy of the file and its count of rule 7's receipt-footing phrase in it
+  (`tools/lib/resolve-python.test.sh@1498e7db:1170-1212`); `tools/loop/loop.toml`'s `[[hook]]` row keyed
+  `PreToolUse {prefix}/hooks/agent-cap.js` (`tools/loop/loop.toml@9c303e80:1209-1211`), which
+  `tools/loop/stage_coverage.py` joins both ways against the map's harness-hooks inventory; gov's
+  source-mode receipt's row for the file (`.governance/install.json`); and the charter line, which
+  names the hook as a rule an agent obeys.
 - **S9** — The charter line. The `<!-- kit:agent-cap -->` block of `coding-governance-agents.template.md`
-  (`:135-138`) loses its agent-cap hook line. The `<!-- kit:roles -->` block gains one line naming the
+  (`coding-governance-agents.template.md@a6ab4b15:102-105`) loses its agent-cap hook line and keeps its
+  write-gate line. The `<!-- kit:roles -->` block gains one line naming the
   spawn guard and the landed-blob rule, and `AGENTS.md` is re-rendered. Observed by AC15.
 - **S10** — The records. `help/roles.md`'s "What the hooks refuse" names the landed-blob refusal and
   the pack, and `tools/roles/README.md` and `tools/hooks/README.md` say where each moved rule lives.
@@ -171,43 +203,93 @@ them.
 
 ### Evidence at base `4ed9e567`
 
-- Rule 6 is `checkHandoffSpawn` (at `062906ffd` `tools/hooks/agent-cap.js@935a910d:691-750`, :2089-2149 at
-  base) and `checkHarnessCall` (:2157-2188) over `HANDOFF_MARK_RE` (:2044). `main()` runs it at
-  :2269-2295, importing `loadRoleIndex`, `resolveRoleRoot` and `buildComparablePath` from
-  `tools/hooks/scratch-guard.js` (:952, :1396, :166, exported at :1615).
+- Rule 6 is `checkHandoffSpawn` (`tools/hooks/agent-cap.js@e24f0c25:2089-2149` at base) and
+  `checkHarnessCall` (`tools/hooks/agent-cap.js@e24f0c25:2157-2188`) over `HANDOFF_MARK_RE`
+  (`tools/hooks/agent-cap.js@e24f0c25:2044`). `main()` runs it at
+  `tools/hooks/agent-cap.js@e24f0c25:2269-2295`, importing `loadRoleIndex`, `resolveRoleRoot` and
+  `buildComparablePath` from `tools/hooks/scratch-guard.js` (`tools/hooks/scratch-guard.js@e51e708c:952`,
+  `@e51e708c:1396`, `@e51e708c:166`, exported at `@e51e708c:1615`).
 - Admission matches the path only: `checkHarnessCall` resolves `scriptPath` to a root-relative path
-  and compares it with the index's `harnesses` list (:2166-2175). Nothing reads the file's bytes.
-- `main()` is called unguarded at :2427. scratch-guard runs `main()` only as the entry point (:1614).
-- Since base: at `062906ffd` `checkHarnessCall` is `tools/hooks/agent-cap.js@935a910d:759-780` and hands the
-  path compare to `resolveHarnessEntry` (:785-800), which rule 8 shares, admitting the same calls; the
-  file exports through `module.exports` (:1104) and runs `main()` only as the entry point (:1113).
-- The hooks kit's descriptor is registry entry `agent-cap` (`tools/hooks/kit.toml:3`). Its version is
-  `agent-cap.js`'s constant (:6), and the file ships as engine (:21-24).
-- settings-merge wires agent-cap as its built-in default: `HOOK_MARKER` (`tools/settings-merge.py:117`),
-  `AGENT_CAP` (:231-242). Its descriptor's merged region is
-  `hooks.PreToolUse[matcher]/hooks[command~agent-cap.js]`
-  (`tools/govkit/entries/settings-merge.kit.toml:22`). The hooks kit's adopter runs it (`[adopt] via =
-  "settings-merge"`, `tools/hooks/kit.toml:102-116`).
-- Gov's wiring: `.claude/settings.json:4-12`.
+  and compares it with the index's `harnesses` list (`tools/hooks/agent-cap.js@e24f0c25:2166-2175`).
+  Nothing reads the file's bytes.
+- `main()` is called unguarded at `tools/hooks/agent-cap.js@e24f0c25:2427`. scratch-guard runs
+  `main()` only as the entry point (`tools/hooks/scratch-guard.js@e51e708c:1614`).
+- The hooks kit's descriptor is registry entry `agent-cap`. Its version is `agent-cap.js`'s constant,
+  and the file ships as engine.
+- settings-merge wires agent-cap as its built-in default, through `HOOK_MARKER` and `AGENT_CAP`. Its
+  descriptor's merged region is `hooks.PreToolUse[matcher]/hooks[command~agent-cap.js]`. The hooks
+  kit's adopter runs it (`[adopt] via = "settings-merge"`).
 - Parents change the file before this unit runs. TOOL-dGroundRules-10 S4 retires rules 1, 3 and 4 and
   adds rule 7. TOOL-dFairHearing-16 S1 to S4 move rules 0, 2 and 5 and export shared helpers.
-  TOOL-dFairHearing-32 S25 adds `resolveKitDir` and `checkOptinPackPresent`. All are DEFERRED at
-  `4ed9e567`, which is why S1 inventories at the build run's base.
+  TOOL-dFairHearing-32 S25 adds `resolveKitDir`, and TOOL-dFairHearing-22 `checkOptinPackPresent`. All
+  are DEFERRED at `4ed9e567`, which is why S1 inventories at the build run's base.
+
+### Evidence at HEAD `c93f676e2`
+
+Every parent above is landed: `tools/hooks/agent-cap.js` is blob `935a910d`, at HEAD as at `062906ffd`.
+
+- `main()` refuses every `--only=` argument before it reads stdin, then runs rule 6, rule 8
+  (TOOL-aGuardedEffort-1, armed by the index's `effort`), rule 7 and `checkOptinPackPresent`, in that
+  order (`tools/hooks/agent-cap.js@935a910d:1004-1095`). Rules 0 to 5 are gone.
+- Rule 6 is `checkHandoffSpawn` (`tools/hooks/agent-cap.js@935a910d:691-750`) and `checkHarnessCall`
+  (`tools/hooks/agent-cap.js@935a910d:759-780`), which hands the path compare to `resolveHarnessEntry`
+  (`tools/hooks/agent-cap.js@935a910d:785-800`). Rule 8 shares that function, and the calls it
+  admits are unchanged. Admission still matches the path alone.
+- The file exports fourteen names through `module.exports` (`tools/hooks/agent-cap.js@935a910d:1104-1112`)
+  and runs `main()` only as the entry point (`tools/hooks/agent-cap.js@935a910d:1113`). Their readers
+  at HEAD, by `git grep -n -F 'agent-cap.js' -- tools skills`:
+
+| Export | Read by | Kits |
+|---|---|---|
+| `MAX_VERIFIERS`, `renderCodeView`, `renderStrippedView`, `renderBlankedLiterals`, `runBothViews`, `resolveHarnessName` | `check-verifier-fanout.js` and `check-review-join.js` through `--hook` (`tools/workflows/check-verifier-fanout.js#loadHook`, `tools/workflows/check-review-join.js#loadHook`); `MAX_VERIFIERS` also by source line in `tools/check-playbook-parity.sh` | review |
+| `readWriterBound` | `check-verifier-fanout.js`; resolve-python's FH48 fixture | review |
+| `extractWorkflowArgs`, `extractBuildSlug` | `spec-audit-optin.js` (`tools/workflows/spec-audit-optin.js@db8351f4:72-79`); rules 6 and 8 and the opt-in check | review, roles |
+| `resolveModelProfile`, `checkEffortLevel` | rule 8; `tools/roles/adopt-roles.test.sh`'s arm 20 | roles |
+| `extractHandoffMarker` | `format-guard.js`; rule 6 | hooks, roles |
+| `resolveKitDir` | `format-guard.js`, `scratch-guard.js`; rule 7, the opt-in check, `resolveHarnessName`, `resolvePolicyHelper` | hooks, roles, review |
+| `resolvePolicyHelper` | `scratch-guard.js`; rule 7 and `readWriterBound` through `POLICY_HELPER` | hooks, roles, review |
+
+  `boundedK`, `intConsts`, `joinCall` and `topLevelArgs` already live in
+  `tools/workflows/check-verifier-fanout.js`, and `MAX_LENSES` is retired: its one home is that file's
+  `LENS_SLOTS` (TOOL-dFairHearing-27 S16).
+- `tools/hooks/scratch-guard.js` already carries a `gov:kit agent-cap@1.51` marker on its own
+  `KIT_SCRATCH_GUARD_VERSION` (`tools/hooks/scratch-guard.js@0251d34d:173`), and exports through
+  `module.exports` (`tools/hooks/scratch-guard.js@0251d34d:2118`).
+- `tools/workflows/spec-audit-optin.js` carries its own `resolveKitDir` port, because it needs one to
+  find agent-cap.js (TOOL-dFairHearing-43 S4, `tools/workflows/spec-audit-optin.js@db8351f4:30-33`).
+  resolve-python's suite holds that block byte-identical to the hook's and runs both through its
+  truth table (`tools/lib/resolve-python.test.sh@1498e7db:1170-1185`).
+- The hooks kit's descriptor is registry entry `agent-cap` (`tools/hooks/kit.toml@c71e9e28:3`). Its
+  version is `agent-cap.js`'s constant (`tools/hooks/kit.toml@c71e9e28:7`), and the file ships as engine
+  (`tools/hooks/kit.toml@c71e9e28:26-29`). Its adopter runs settings-merge
+  (`tools/hooks/kit.toml@c71e9e28:107-121`).
+- settings-merge's `HOOK_MARKER` is `tools/settings-merge.py@54bc224f:213` and `AGENT_CAP`
+  `tools/settings-merge.py@54bc224f:327-337`; its descriptor's merged region is
+  `tools/govkit/entries/settings-merge.kit.toml@61bd2196:27` and its code-2 outcome
+  `tools/govkit/entries/settings-merge.kit.toml@61bd2196:53-56`.
+- Gov's wiring: `.claude/settings.json@0428723e:4-12`. Gov's receipt is a source-mode receipt, its file
+  rows re-derived from the descriptors by `govkit update --write` on gov's own tree
+  (`tools/govkit/govkit.py#test_source_target`), the run that walks a declared step.
+- The upgrade-step kind, the step gate, the landed-revision reader and the opt-in pack are tracked:
+  `tools/govkit/upgrade_steps.py`, whose before-image writer is
+  `tools/govkit/upgrade_steps.py#write_before_image`; `tools/govkit/step_gate.py`;
+  `tools/policy/policy-mirror.js#readLandedRevision`; `tools/workflows/spec-audit-optin.js`.
 
 ### Disposition
 
 | What S1 finds | Its home |
 |---|---|
-| rule 6, the spawn guard and harness admission, with `HANDOFF_MARK_RE`, the JS copy of `MARKER_RE` (brief I5), whose home TOOL-dBoundRoles-17 leaves to this unit | `tools/roles/spawn-guard.js` |
+| rule 6, the spawn guard and harness admission | `tools/roles/spawn-guard.js` |
+| rule 8, the effort level, with `checkEffortLevel`, `resolveModelProfile` and `readSessionModel`, read by the roles kit alone | `tools/roles/spawn-guard.js`, in `main()`'s order; arm 20 of `tools/roles/adopt-roles.test.sh` requires the pack |
 | rule 7, the settings in force | `tools/roles/spawn-guard.js` (brief D4) |
-| any other check `main()` runs on the call, `checkOptinPackPresent` among them | `tools/roles/spawn-guard.js`, unchanged, in `main()`'s order |
-| `resolveKitDir` and `resolveHarnessName` | `tools/roles/spawn-guard.js`, between the same `// >>> resolveKitDir` markers, so `tools/lib/resolve-python.test.sh` re-points its slice and its truth table runs unchanged |
-| an export only review-kit modules import (the script views, `boundedK`, `intConsts`, `joinCall`, `topLevelArgs`, `MAX_VERIFIERS`, `MAX_LENSES`) | `tools/workflows/script-views.js`, a new review-kit module; `check-verifier-fanout.js` and `check-review-join.js` import it from beside themselves |
-| an export imported by the pack and by a review-kit module (`extractWorkflowArgs`, `extractBuildSlug`) | `tools/hooks/scratch-guard.js`'s `module.exports`, over S4's declared edge |
+| any other check `main()` runs on the call, `checkOptinPackPresent` and the `--only=` refusal among them | `tools/roles/spawn-guard.js`, unchanged, in `main()`'s order |
+| `resolveKitDir` | a port in `tools/roles/spawn-guard.js` and one in `tools/hooks/scratch-guard.js`, exported there, each between the same `// >>> resolveKitDir` markers, so `tools/lib/resolve-python.test.sh` re-points its slices and compare and its truth table runs unchanged (§8 F7) |
+| an export only review-kit modules import (the script views, `runBothViews`, `MAX_VERIFIERS`, `resolveHarnessName`, `readWriterBound`) | `tools/workflows/script-views.js`, a new review-kit module; `check-verifier-fanout.js` and `check-review-join.js` import it from beside themselves, and `readWriterBound` reads its policy helper as §8 F8 gives |
+| an export imported by the pack or the hooks kit and by another kit (`extractWorkflowArgs`, `extractBuildSlug`, `extractHandoffMarker` with `HANDOFF_MARK_RE`, the JS copy of `MARKER_RE` (brief I5) whose home TOOL-dBoundRoles-17 leaves to this unit, and `resolvePolicyHelper`) | `tools/hooks/scratch-guard.js`'s `module.exports`, over S4's declared edge (§8 F7) |
 | an export no file imports | deleted |
 
-The pack and `spec-audit-optin.js` already probe the hooks kit beside their own kit for
-scratch-guard's readers, so the S4 rule adds no new probe. A pack that cannot load scratch-guard's
+`spec-audit-optin.js` already probes the hooks kit beside its own kit for scratch-guard's readers, and
+the pack finds it the same way through its own port, so the S4 rule adds no new probe. A pack that cannot load scratch-guard's
 readers refuses every `Workflow` and `Agent` call, naming the hooks kit and the owner as the remedy's
 actor. A guard that cannot read does not admit.
 
@@ -250,7 +332,7 @@ target installs the roles kit, it runs the target's `settings-merge.py --fragmen
 <roles kit>/spawn-guard.fragment.json` first. Then it runs `settings-merge.py --fragment <tmp> --unwire`,
 where `<tmp>` is a fragment for agent-cap's entry written under `tempfile.mkdtemp`, carrying the
 marker `agent-cap.js` and the hook path the target's receipt records. Wiring first means a killed up
-leaves both hooks wired, never neither. The order is the one `tools/hooks/kit.toml:18-20` records
+leaves both hooks wired, never neither. The order is the one `tools/hooks/kit.toml@c71e9e28:23-25` records
 for a moved security guard. A target without the roles kit loses the guard, which matches what it
 had: rule 6 is armed only by a role index.
 
@@ -266,11 +348,14 @@ The pass re-derives S8's readers at the build run's base. Each is disposed in th
 | Class | Disposition |
 |---|---|
 | the wiring: `.claude/settings.json`, settings-merge and its descriptor | re-pointed to the pack (S6); gov's tree runs S7's up first (P38) |
-| a hooks-kit anchor (`resolve_kit_dir ... hooks agent-cap.js`, `KIT_FILE_PAIRS`, `KIT_DIRS`) | anchored on `scratch-guard.js` |
+| gov's receipt, `.governance/install.json` | re-derived by `govkit update --write` on gov's own tree, the source-mode run that walks S7's step, so its rows follow the descriptors and name no deleted file |
+| a hooks-kit anchor (`resolve_kit_dir ... hooks agent-cap.js`, `resolveKitDir('hooks', 'agent-cap.js', …)`, `resolve_carrier_kit`, `KIT_FILE_PAIRS`, `KIT_DIRS`) | anchored on `scratch-guard.js` |
+| a hooks-kit import of the file's exports (`format-guard.js`, `scratch-guard.js`, `spec-audit-optin.js`) | reads `scratch-guard.js`'s exports, or its own module where the helper moved into it |
 | the version: `version_from`, `tools/check-kit-versions.sh`, the `gov:kit agent-cap@` markers | the constant in `scratch-guard.js`; the checker reads that file |
 | a constant extracted from the file (`tools/check-playbook-parity.sh`) | extracted from the file S4 moved it to |
-| a fixture copying the file (`tools/govkit/selftest.py`, `tools/check-hook-destinations.test.sh`, `tools/check-wiring.test.sh`) | copies `scratch-guard.js`, or the pack where the case is about the spawn guard |
-| the leg and its rows | renamed `spawn-guard self-test` in its declaration and re-rendered (S5), run from the roles kit; its budget, evidence and pin rows re-keyed, its ceiling and budget re-measured at the pass |
+| a fixture copying the file (`tools/govkit/selftest.py`, `tools/check-hook-destinations.test.sh`, `tools/check-wiring.test.sh`, `tools/hooks/format-guard.test.sh`, `tools/policy/check_policy.py`, `tools/lib/resolve-python.test.sh`, `tools/workflows/spec-audit-optin.test.sh`) | copies `scratch-guard.js`, or the pack with `scratch-guard.js` beside its kit where the case is about a moved rule, rule 7 among them |
+| the loop kit's hook-stage row (`tools/loop/loop.toml`) | re-keyed `PreToolUse {prefix}/roles/spawn-guard.js`, its stages unchanged |
+| the leg and its rows | renamed `spawn-guard self-test` in its declaration and re-rendered (S5), run from the roles kit; its budget, evidence, pass-evidence and pin rows re-keyed, its ceiling and budget re-measured at the pass |
 | prose and comments | name the pack, `scratch-guard.js` or the moved rule's new home |
 | a harness template's comment | re-rendered with its template, which moves that harness's blob (§5 risks) |
 | the dossiers | `memory/map/features/agent-cap.md` drops the file; `memory/map/features/roles.md` claims the pack, re-rendered by `python tools/codebase-map/gen_map.py --write` |
@@ -306,12 +391,16 @@ build's own close. The pass records in its acceptance ledger which harnesses thi
 - `tools/roles/spawn-guard.js` (new), `tools/roles/spawn-guard.fragment.json` (new),
   `tools/roles/spawn-guard.test.sh` (new)
 - `tools/roles/kit.toml`, `tools/roles/README.md`, `tools/roles/workflows.toml`,
-  `tools/roles/adopt-roles.test.sh`
+  `tools/roles/adopt-roles.test.sh`, `tools/roles/render_agents.py`
 - `tools/hooks/agent-cap.js` (removed), `tools/hooks/agent-cap.test.sh` (removed)
 - `tools/hooks/scratch-guard.js`, `tools/hooks/scratch-guard.test.sh`, `tools/hooks/format-guard.js`,
-  `tools/hooks/kit.toml`, `tools/hooks/README.md`
+  `tools/hooks/format-guard.test.sh`, `tools/hooks/kit.toml`, `tools/hooks/README.md`
 - `tools/workflows/script-views.js` (new), `tools/workflows/check-verifier-fanout.js`,
-  `tools/workflows/check-review-join.js`, `tools/workflows/spec-audit-optin.js`
+  `tools/workflows/check-review-join.js`, `tools/workflows/spec-audit-optin.js`,
+  `tools/workflows/spec-audit-optin.test.sh`
+- `tools/loop/factories.py`, `tools/loop/loop.toml`
+- `tools/policy/check_policy.py`
+- `.governance/install.json` (re-derived)
 - `tools/workflows/check-verifier-fanout.sh`, `tools/workflows/check-verifier-fanout.test.sh`,
   `tools/workflows/check-review-join.sh`, `tools/workflows/check-review-join.test.sh`,
   `tools/workflows/check-protocol-parity.test.sh`, `tools/workflows/unattended-build.test.sh`
@@ -331,7 +420,8 @@ build's own close. The pass records in its acceptance ledger which harnesses thi
   `tools/check-hook-destinations.test.sh`, `tools/check-agent-cap-restatement.sh`,
   `tools/check-agent-cap-restatement.test.sh`, `tools/lib/resolve-python.test.sh`
 - `tools/gate-legs.json` (rendered), `tools/run-gates/selftest-budgets.txt`, `tools/run-gates/ceiling-evidence.txt`,
-  `tools/run-gates/windows-only-legs.txt`, `tools/run-gates/run-selftests.sh`
+  `tools/run-gates/pass-leg-evidence.txt`, `tools/run-gates/windows-only-legs.txt`,
+  `tools/run-gates/run-selftests.sh`
 - `tools/codebase-map/map_lib.py`, `tools/lexicon/lexicon.py`, `tools/drift-audit/README.md`,
   `.lexicon.conf`
 - `.claude/settings.json`, `.claude/rules/product.md`
@@ -447,7 +537,7 @@ build's own close. The pass records in its acceptance ledger which harnesses thi
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `hook destinations self-test` · `check-wiring self-test` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `verifier fan-out self-test` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `playbook parity selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon naming predicates` · `lexicon selftest` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `run-selftests self-test` · `straggler-guard arms` · `transition-audit arms` · `recall floor` · `recall floor arms` · `roles catalogue` · `roles render wiring` · `playbook render selftest` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `hook destinations self-test` · `check-wiring self-test` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `verifier fan-out self-test` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `playbook parity selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon naming predicates` · `lexicon selftest` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `run-selftests self-test` · `straggler-guard arms` · `transition-audit arms` · `recall floor` · `recall floor arms` · `roles catalogue` · `roles render wiring` · `playbook render selftest` · `policy fixtures` · `routed-commits selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 This pass's files trip the guard of `agent-cap self-test` at the base, so the leg is named, and the
 pass retires it into `spawn-guard self-test`.
@@ -480,10 +570,12 @@ New arm: tools/check-wiring.test.sh · covers AC10 · a scratch settings file wi
   of about a thousand lines into a hook that runs on every Bash and Edit call. The rev-1 pick, (a),
   left the pack's require of `scratch-guard.js` undeclared, which PLAY-dOrderedCharter-7 §4 rules out
   ("A kit may not import a sibling kit"). (d) moves two exports but not rule 6's index readers, which
-  the pack reads from the same file, and the parity loop greps `#` markers in `.sh` and `.py` only
-  (`tools/lib/resolve-python.test.sh:226`). RESOLVED (agent, 2026-10-26, delegated): (a), rung 1,
+  the pack reads from the same file. At base the parity loop also greped `#` markers in `.sh` and
+  `.py` only (`tools/lib/resolve-python.test.sh@641614bb:213-218`); at HEAD it reads `// >>> ` markers in
+  `.js` too (`tools/lib/resolve-python.test.sh@1498e7db:534-540`), so that second objection no longer
+  holds and the first decides. RESOLVED (agent, 2026-10-26, delegated): (a), rung 1,
   naming PLAY-dOrderedCharter-7, the pack's one in-process edge declared as S4's `requires_if` row,
-  the declaration the rule admits (`tools/memory-tree/kit.toml:8`). widens: none · relaxes: none
+  the declaration the rule admits (`tools/memory-tree/kit.toml@f835ca7c:9`). widens: none · relaxes: none
 - **F4 — What does settings-merge wire with no `--fragment` once agent-cap is gone?** Options: (a) the
   roles kit's `spawn-guard.fragment.json`, read from its file; (b) nothing, `--fragment` required;
   (c) a built-in copy of the pack's fragment. (b) breaks the hooks kit's `[adopt] via =
@@ -501,12 +593,37 @@ New arm: tools/check-wiring.test.sh · covers AC10 · a scratch settings file wi
   base, `grep -n 'RULE [0-9]' tools/hooks/agent-cap.js`, `grep -n 'module.exports'` over it, and
   `git ls-files tools/policy/policy-mirror.js tools/govkit/upgrade_steps.py tools/govkit/step_gate.py
   tools/workflows/spec-audit-optin.js`. Observation at `4ed9e567`: the file runs rules 0 to 6, exports
-  nothing, and none of the four files exists. Liveness: TOOL-dGroundRules-10, TOOL-dFairHearing-16,
+  nothing, and none of the four files exists. Observation at HEAD `c93f676e2`: the file runs rules 6, 8
+  and 7 and the opt-in check, exports fourteen names (`tools/hooks/agent-cap.js@935a910d:1104-1112`),
+  and all four files are tracked, so the probe moved as its liveness said. Liveness: TOOL-dGroundRules-10, TOOL-dFairHearing-16,
   TOOL-dGroundRules-5 and TOOL-dSafePassage-1 each name these changes in their Files touched, so the
   probe moves when they land. RESOLVED (agent, 2026-10-25, delegated): the build run re-grounds on each.
   It stops this unit if a rule S1 finds has no row in §4's disposition table, if rules 1, 3, 4, 0, 2
   or 5 are still in the file, or if TOOL-dSafePassage-1 S1-S3 or TOOL-dGroundRules-5 S5 is absent.
   widens: none · relaxes: none
+- **F7 — Where do the helpers the hooks kit's own hooks read from agent-cap.js go?** At HEAD
+  `format-guard.js` and `scratch-guard.js` require `extractHandoffMarker`, `resolveKitDir` and
+  `resolvePolicyHelper` from the file (§4 "Evidence at HEAD"), which rev-7's table placed in the pack.
+  Options: (a) by S4's two-kit rule, each into `scratch-guard.js`'s exports, `HANDOFF_MARK_RE` with
+  `extractHandoffMarker`; the pack also carries its own `resolveKitDir` port, since it must find
+  `scratch-guard.js` before it can read that file's exports, as `spec-audit-optin.js` carries one for
+  the same reason (TOOL-dFairHearing-43 S4); resolve-python's slices and compare hold the three ports
+  alike; (b) a new hooks-kit module for the three; (c) leave them in the pack, so the hooks kit requires
+  the roles kit. (b) adds a module S4's rule does not need. (c) is a sibling-kit import
+  PLAY-dOrderedCharter-7 §4 refuses, and it would cost a hooks-only adopter the write gate's red-fix
+  lane. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the survivor that applies S4's rule as
+  written and the port precedent. widens: none · relaxes: none
+- **F8 — How does `readWriterBound` find the policy helper once it leaves the hook?** At HEAD it reads
+  `POLICY_HELPER`, the hook's own `resolvePolicyHelper()` (`tools/hooks/agent-cap.js@935a910d:431-439`),
+  and only `check-verifier-fanout.js` reads it. Options: (a) `script-views.js`'s `readWriterBound`
+  takes the helper from the `scratch-guard.js` that the fan-out gate's `--hook` names, re-pointed from
+  `agent-cap.js`, over the review kit's declared `requires` of `agent-cap`
+  (`tools/workflows/kit.toml@4b0895f0:11`); the join gate, which then reads nothing from a hook, stops
+  taking `--hook`; (b) `readWriterBound` stays beside `resolvePolicyHelper` in `scratch-guard.js`'s
+  exports, which departs from S4's one-kit rule; (c) `script-views.js` carries a fourth
+  `resolveKitDir` port and finds the policy kit itself. (b) bends S4's rule. (c) adds a port to keep in
+  step. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the survivor that keeps S4's rule and one
+  policy lookup. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -530,23 +647,43 @@ New arm: tools/check-wiring.test.sh · covers AC10 · a scratch settings file wi
   the entry point, by `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else
   moved.
 - rev-7 · 2026-11-22 · §4 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; nothing else moved.
-
+- rev-8 · 2026-11-22 · S1 · S2 · S4 · S8 · S9 · §4 Evidence, Disposition, The step, Readers disposed,
+  Files touched · §7 · §8 F3 F6 F7 F8 · §10 · re-grounded at HEAD `c93f676e2` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-25-reground-n-brief`. The base Evidence cites are pinned to the
+  base blobs, and a new "Evidence at HEAD" block holds the landed parents. `main()` runs rules 6, 8
+  and 7, then the opt-in check, so S2 and the table name rule 8. Fourteen exports are read as that
+  block's table gives. The review-kit row drops `boundedK`, `intConsts`, `joinCall` and `topLevelArgs`,
+  which already live in `check-verifier-fanout.js`, and drops the retired `MAX_LENSES`.
+  `resolveHarnessName` and `readWriterBound` join that row, the pack reading neither. The hooks kit's
+  own imports of `extractHandoffMarker`, `resolveKitDir` and `resolvePolicyHelper` move them into
+  `scratch-guard.js` (F7), and `readWriterBound`'s helper comes through the fan-out gate's `--hook` (F8).
+  S8 gains the readers HEAD adds outside `memory/`, among them gov's receipt, the loop kit's hook row,
+  the policy kit's rule-7 fixtures, resolve-python's FH48 arms and the leg's pass-evidence row. Files
+  touched gains each of them, and §7 gains `routed-commits selftest`, whose guard holds
+  `tools/policy/check_policy.py`. The parity row reads `MAX_VERIFIERS` alone. F3's second objection to (d)
+  no longer holds, and the resolution is unchanged. Every bare line citation is re-pointed or
+  blob-pinned. Rule 6 as the earlier units leave it is checked against their specs, not HEAD: units 3
+  and 13 change `checkHandoffSpawn` too (their S5 and S4), so S2's list names them with -38, -46 and
+  -48, whose edges §3 already carries.
 ## 10. Reuse audit
 
 The seams extended are four. The first is TOOL-dFairHearing-16 S4's hook-pack layout: a `.js` hook
 plus its `.fragment.json`, wired by `tools/settings-merge.py --fragment` and graded by
-`tools/check-wiring.sh`. The second is `tools/hooks/scratch-guard.js`'s export surface (`:1615`), which
-rule 6 already imports. The third is TOOL-dSafePassage-1's upgrade-step kind with its S6 step on the
-same descriptor as precedent. The fourth is TOOL-dGroundRules-5's `readLandedRevision`, the one JS
-reader of the landed revision. Every parent seam is specced and DEFERRED at `4ed9e567`.
+`tools/check-wiring.sh`. The second is `tools/hooks/scratch-guard.js`'s export surface
+(`tools/hooks/scratch-guard.js@0251d34d:2118`), which rule 6 already imports. The third is
+TOOL-dSafePassage-1's upgrade-step kind with its S6 step on the same descriptor as precedent
+(`tools/hooks/kit.toml@c71e9e28:139-149`). The fourth is TOOL-dGroundRules-5's `readLandedRevision`, the one JS
+reader of the landed revision. Every parent seam was specced and DEFERRED at `4ed9e567`, and each is
+landed at HEAD `c93f676e2` (§4 "Evidence at HEAD"). The `resolveKitDir` ports F7 places extend the
+port-and-parity precedent of `spec-audit-optin.js` (TOOL-dFairHearing-43 S4).
 `python tools/codebase-map/reuse_lookup.py "move a PreToolUse guard rule into another kit's hook pack
-and retire the old hook file"` ranked `resolve_kit_dir` (72 installs), the kit-anchor seam the
+and retire the old hook file"` ranked `resolve_kit_dir` (72 installs at `4ed9e567`), the kit-anchor seam the
 readers table re-points, and the three `PreToolUse` hooks of the harness inventory. No ranked name
 compares a harness with a landed blob, so no seam fits that compare beyond `readLandedRevision` plus
-git's own blob id. `blob_oid` (`tools/govkit/govkit.py:6725`, scout C) is Python. The pack is JS and
+git's own blob id. `blob_oid` (`tools/govkit/govkit.py#blob_oid`, scout C) is Python. The pack is JS and
 `git hash-object` applies the clean filters, which a raw hash would not. The recall probe returned
 scout C's row, the night pass two's NT-27 table and `research-agent-cap.md` §5. Scout C read 63 files
-naming `agent-cap`. That count includes the separate `check-agent-cap-restatement` kit and the
+naming `agent-cap` at `4ed9e567`. That count includes the separate `check-agent-cap-restatement` kit and the
 registry id. The file name `agent-cap.js` is spelled by the narrower set S8 lists.
 
 Recall terms used: `python tools/memory-recall/query.py "where does agent-cap's handoff spawn guard and harness admission go when the hook retires" --terms "agent-cap rule 6 spawn guard harness admission landed blob roles pack fragment retire hook upgrade step readers"`

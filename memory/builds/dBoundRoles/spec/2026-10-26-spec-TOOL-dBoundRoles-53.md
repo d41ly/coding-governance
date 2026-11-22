@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-53 — unit 47's case proves its render arguments are read before it relies on them, so neither half can pass or fail on argument parsing
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -26,9 +26,9 @@ finding **id 30 at HIGH**, report item **H1**. Id 13 shares the item at HIGH and
 `TOOL-dBoundRoles-52`; ids 2 and 39 report the same defect at MEDIUM, item M1, and are
 `TOOL-dBoundRoles-58`'s.
 
-Id 30 is the blast-radius face of the item. `tools/roles/handoff.py:1025-1028` refuses an unread input
-with `ap.error`, which exits 2, while a refusal by `check_anchors` raises `RolesError` and returns 1
-(`:1051-1053`). Unit 47's first render expects only "non-zero", so a usage error satisfies its exit
+Id 30 is the blast-radius face of the item. `tools/roles/handoff.py@c6d87bbb:1477-1480` refuses an
+unread input with `ap.error`, which exits 2, while a refusal by `check_anchors` raises `RolesError` and
+returns 1 (`tools/roles/handoff.py@c6d87bbb:1505-1507`). Unit 47's first render expects only "non-zero", so a usage error satisfies its exit
 half, and its second render can never be observed. Nothing in the case says the render pair is
 accepted before its verdict is read, so a role swap that the read check refuses is found only by
 hand, and the cheap repair, widening a role's `reads`, is invisible in the diff of the test.
@@ -40,15 +40,20 @@ repairs `TOOL-dBoundRoles-47` and builds one step after it (order 22), after uni
 ## 2. Scope (IN)
 
 - **S1** — The read check, `assert_role_reads <role> <key>...` in `tools/roles/adopt-roles.test.sh`. It
-  reads the role's `reads` through the installed kit's `roles_lib.load_roles`, the parse
-  `tools/roles/handoff.py:1025-1026` makes (split on commas, strip, drop a trailing `?`), and fails the
+  reads the role's `reads` through the installed kit's `roles_lib.load_roles` and makes the parse the
+  render makes at HEAD (`tools/roles/handoff.py@c6d87bbb:1477`): split on commas, drop an empty entry,
+  and pass each entry to the installed kit's `roles_lib.parse_read_key`
+  (`tools/roles/roles_lib.py#parse_read_key`, TOOL-dBoundRoles-14 S4), which drops a trailing `?` and
+  folds the tag spelling `field.input.question` to `input:question` (§8 F2). It fails the
   case naming the role and the first key it does not read. It checks every key, `input:prompt`
-  included: the render exempts `prompt` from its refusal (`:1027`), but a role that does not read it
-  renders no block for it, so a handed half would pass on absence. Observed by AC1.
-  **Readers:** by name: `tools/roles/handoff.py:1025`, the render's read set, which drops the same
-  trailing question mark and which S1 copies without changing; no name leaves the tree. by value: NO VALUE
-  READERS — the `?` is dropped only from the test's own copy of each key, and the role's `reads` field
-  and what `load_roles` returns keep it.
+  included: the render exempts `prompt` from its refusal (`tools/roles/handoff.py@c6d87bbb:1479`), but a
+  role that does not read it renders no block for it, so a handed half would pass on absence. Observed
+  by AC1.
+  **Readers:** by name: `roles_lib.parse_read_key`, which S1 calls and does not change; its readers at
+  HEAD are `tools/roles/handoff.py`, the render's read set and `reads` list, `tools/roles/check_roles.py`,
+  its R3, and `tools/roles/adopt-roles.test.sh`, this suite's own arms; no name leaves the tree.
+  by value: NO VALUE READERS — the `?` is dropped only from what the call returns to the test, and the
+  role's `reads` field and what `load_roles` returns keep it.
 - **S2** — The case calls it first. Before either render, unit 47's case calls `assert_role_reads` for its
   role and every `input:` key it passes, then runs the plain-words render and requires exit 0 and a
   written prompt file before it runs the refusal render. Observed by AC2.
@@ -75,13 +80,16 @@ repairs `TOOL-dBoundRoles-47` and builds one step after it (order 22), after uni
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at base `462d20f3` on 2026-10-26, and again at HEAD `c93f676e2` on 2026-11-22:
 
-- `tools/roles/handoff.py:1025-1028` builds the read set and calls `ap.error`; argparse exits 2.
-- `tools/roles/handoff.py:1051-1053` catches `RolesError` from the render and returns 1, the exit every
-  `refusals` line produces.
-- `tools/roles/adopt-roles.test.sh:83` defines `check_arm`, the suite's verdict helper, which S1 and S3
-  report through.
+- `tools/roles/handoff.py@c6d87bbb:1477-1480` builds the read set through `parse_read_key` and calls
+  `ap.error`; argparse exits 2.
+- `tools/roles/handoff.py@c6d87bbb:1505-1507` catches `RolesError` from the render and returns 1, the
+  exit every `refusals` line produces.
+- `tools/roles/adopt-roles.test.sh@70af238b:114` defines `check_arm`, the suite's verdict helper, which
+  S1 and S3 report through.
+- Every gov role's `reads:` line is tag-spelled at HEAD (`TOOL-dBoundRoles-14` S7, CLOSED), so a raw
+  split that strips only a `?` yields `field.input.question` and refuses a key the role reads.
 
 ### Why the case checks keys the render does not
 
@@ -101,7 +109,10 @@ None: no stored data changes.
 ### Rollout
 
 Live at landing, at order 22. It consumes from `TOOL-dBoundRoles-52` at the same order and writes the same
-suite, so `--dispatch` holds this pass until unit 52 is CLOSED.
+suite, so `--dispatch` holds this pass until unit 52 is CLOSED. `TOOL-dBoundRoles-26` holds order 22 and
+also writes `tools/roles/adopt-roles.test.sh`, so `--dispatch` refuses the second of the two
+declarations of that suite while the first pass's group is open
+(`tools/unattended/unattended.sh#verb_dispatch`).
 
 ### Files touched (estimate)
 
@@ -153,6 +164,15 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC3 · the read check and
   clause; veto 1 discards (b). RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the precedent
   `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
 
+- **F2 — The `reads:` lines are tag-spelled at HEAD. Does S1 copy a parse, or call the one the render
+  calls?** Options: (a) call the installed kit's `roles_lib.parse_read_key` over each comma-split entry,
+  the fold `TOOL-dBoundRoles-59` S1 states; (b) copy the base parse, strip a `?`, as rev-3 wrote; (c)
+  copy the fold into the suite. (b) refuses `input:question` on `gov-orienter`'s tag-spelled line, so
+  AC2's unmodified case fails on a correct build, veto 1; (c) is a second parse of one grammar, which 59
+  S3 forbids. RESOLVED (agent, 2026-11-22, delegated): (a), the one survivor; unit 59's S4 names this
+  path, a pass of unit 53 that already folds. options: (a) > (c) > (b) · pick: (a) · admitted-by:
+  principle.p18 · widens: none · relaxes: none
+
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 45 to 51, id 30
@@ -160,10 +180,19 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC3 · the read check and
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-59 and TOOL-dBoundRoles-60, the HIGH promotion and the minors batch of the round-1 audit of units 52 to 58; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
 
+- rev-4 · 2026-11-22 · §1 · S1 · §4 · §8 F2 · §10 · re-grounded at HEAD `c93f676e2` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-11-reground-l-brief`. S1 folds each `reads` entry through
+  `parse_read_key` (F2), as `TOOL-dBoundRoles-59` S1 states, checked against that spec, since
+  `TOOL-dBoundRoles-14` S7 tag-spelled every role's line and the render's read set calls that function;
+  its Readers clause names the function's readers at HEAD. The read-check, exit and helper citations
+  re-point to blob-pinned lines, `check_arm` now at line 114. §4 Rollout names unit 26 as a writer of
+  the same suite.
+
 ## 10. Reuse audit
 
-The seams are the suite's `check_arm` (`tools/roles/adopt-roles.test.sh:83`) and the installed kit's
-`roles_lib.load_roles`, the loader `handoff.py` itself reads the roster through.
+The seams are the suite's `check_arm` (`tools/roles/adopt-roles.test.sh@70af238b:114`) and the installed
+kit's `roles_lib.load_roles` and `roles_lib.parse_read_key`, the loader and the read-key parser
+`handoff.py` itself reads the roster through.
 `python tools/codebase-map/reuse_lookup.py "assert a test case's inputs are accepted before relying on its refusal"`
 ranked `before`, `refusal`, `DesignRefusal` and `corpus_inputs`, none a role-reads check, so no existing
 seam fits beyond the loader and the suite's helper.

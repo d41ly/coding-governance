@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-26 — the typed refusal return: its rule, its remedy and the remedy's actor, routed at once and never re-offered
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0191@66acd199 whole
 
@@ -39,9 +39,12 @@ its spent-budget branch: once the build's budget is spent it chooses only among 
 - **S1** — The refusal arm (shared interface I17), declared once in `tools/roles/role-schema.toml`
   (TOOL-dBoundRoles-2's kind file) as an arm every role's `return` template carries: `outcome:
   refused`, `rule` (the refusing rule's name), `remedy` (one line) and `actor`, one of `self`,
-  `producer`, `driver`, `owner` or `build:<slug>`. `render_agent_file` renders it after the role's own
-  template, so every agent file shows it. Observed by AC3.
-- **S2** — The arm validated. `validate_return` (I16, TOOL-dBoundRoles-5) reads a return whose
+  `producer`, `driver`, `owner` or `build:<slug>`. `render_role_fields`
+  (`tools/roles/roles_lib.py#render_role_fields`), which writes each role's `## Return` line from its
+  template at HEAD, renders it after the role's own template, so every agent file `render_agent_file`
+  (`tools/roles/render_agents.py#render_agent_file`) writes through `render_role` shows it. Observed
+  by AC3.
+- **S2** — The arm validated. `check_return` (I16, TOOL-dBoundRoles-5) reads a return whose
   `outcome` is `refused` against S1's arm: an `actor` outside the five forms, a `build:` slug that is
   not slug-shaped, or an empty `rule` or `remedy` is refused naming the field. Observed by AC2.
 - **S3** — The outcome table, `REFUSAL_ROUTES` in `tools/roles/roles_lib.py`, and its one reader
@@ -53,11 +56,17 @@ its spent-budget branch: once the build's budget is spent it chooses only among 
   printing one line `refusal — <actor> · route <route> · re-offer <bounded|never>`, and the record:
   TOOL-dDeclaredLoop-14 S3's `--refused` gains `--rule`, `--remedy` and `--actor`, appended inside the
   line-final reason of its `refusal` row as ` · rule <r> · remedy <m> · actor <a>`, refused on an actor
-  outside the five forms; that unit's `read_refusals` returns the three fields. Observed by AC4.
+  outside the five forms; that unit's `read_refusals` (`tools/loop/position.py#read_refusals`) returns
+  the three fields beside a `reason` holding the text before them, so the position engine's
+  `refusal —` line and its `frontier-refused` plant read as before. `--refused` is `write_refusal`
+  (`tools/unattended/unattended.sh#write_refusal`), which records a row only where the loop kit's
+  position engine holds its item and key. Observed by AC4.
 - **S5** — The owner branch and the spent budget. An `owner` refusal asks `resolve_owner_question`
   (TOOL-dBoundRoles-11) with the new kind `refusal`, answered as a `fork` is. This unit adds one branch
   to that reader: when the build's rework budget is spent, read through TOOL-dDeclaredLoop-30's
-  `tools/loop/budget.py` reporting `exhausted`, a `best-effort-recorded` answer is `choose-ending`,
+  `tools/loop/budget.py`, its `ending` line naming the state `spent` (`tools/loop/budget.py#budget_state`)
+  as the driver's `read_exhausted_ending` reads it (`tools/unattended/unattended.sh#read_exhausted_ending`),
+  a `best-effort-recorded` answer is `choose-ending`,
   naming `park-item`, `park-build` and `stop-run` as the only options, never `resolve`, so best effort
   takes no further lap. The pick is recorded in TOOL-dBoundRoles-11's fork record. Observed by AC5.
 
@@ -77,9 +86,9 @@ its spent-budget branch: once the build's budget is spent it chooses only among 
 ### Edges
 
 - **consumes-from** `TOOL-dBoundRoles-2` — `role-schema.toml`, the kind file the refusal arm is declared in once for every role's `return`; without it the arm has no single home
-- **consumes-from** `TOOL-dBoundRoles-5` — `validate_return`, which reads a refused return against the arm; without it an untyped refusal passes
+- **consumes-from** `TOOL-dBoundRoles-5` — `check_return`, which reads a refused return against the arm; without it an untyped refusal passes
 - **consumes-from** `TOOL-dBoundRoles-11` — `run.on-owner-question` and its reader `resolve_owner_question`, which an `owner` refusal asks and this unit gives the spent-budget branch
-- **consumes-from** external — TOOL-dDeclaredLoop-14's `--refused` verb and `read_refusals`, and TOOL-dDeclaredLoop-30's budget reader, specced and unbuilt at base `4ed9e567`
+- **consumes-from** external — TOOL-dDeclaredLoop-14's `--refused` verb and `read_refusals`, and TOOL-dDeclaredLoop-30's budget reader, each landed at HEAD `c93f676e2`, `read_refusals` in `tools/loop/position.py`
 - **hands-off** `TOOL-dBoundRoles-43` — the refusal arm, which unit 43 composes inside `render_role` and observes on both routes (ids 6, 13 and 36 of the round-1 spec audit)
 
 ## 4. Design
@@ -95,7 +104,11 @@ actors = ["self", "producer", "driver", "owner", "build:<slug>"]
 ```
 
 Declared once, composed into every template: a role file never repeats it, and a role whose `return`
-redeclares `outcome: refused` is refused by the catalogue checker, so the arm cannot drift per role.
+redeclares it, its `outcome` set holding `refused` in TOOL-dBoundRoles-2's template grammar
+(`outcome:<value>|<value>`, `tools/roles/roles_lib.py#parse_return_template`), is refused by the
+catalogue checker, so the arm cannot drift per role. `load_role_schema` reads only the `[kind]` table
+and the `[[field]]` rows (`tools/roles/roles_lib.py#load_role_schema`), so the `[return.refusal]` table
+gains its own reader in `roles_lib.py`.
 The rendered agent file carries it under the role's own return template, which is what the agent reads.
 
 ### The outcome table
@@ -126,19 +139,21 @@ another lap" (the owner's SL-2). Unit 11's reader answers `resolve` for `best-ef
 unit adds the branch before that answer:
 
 ```
-resolve_owner_question(kind, attended, repo, rev, budget_spent=False)
+resolve_owner_question(kind, attended, repo, budget_spent=False)
   ... unit 11's table ...
   value == best-effort-recorded and budget_spent  ->  "choose-ending"   # options: park-item > park-build > stop-run
 ```
 
-`budget_spent` is the caller's, read from `budget.py`'s `exhausted` answer for the build. The driver
+`budget_spent` is the caller's, read from `budget.py`'s `ending` line for the build, state `spent`, the
+answer `read_exhausted_ending` already parses into `_ex_state`; a draw's `exhausted` answer writes a row,
+so it is never the read. The driver
 picks one ending and records it with unit 11's fork record, the ranking `park-item > park-build >
 stop-run` (most work kept first), so the pick is graded like any other fork.
 
 ### The record
 
 `park` writes `<ts> refusal · item <tag> · step <key> · reason <text>` with the reason line-final, and
-two live readers strip a trailing reason (`tools/unattended/unattended.sh:12534-12538`). The three
+two live readers strip a trailing reason (`tools/unattended/unattended.sh@7548da57:15802-15806`). The three
 fields therefore ride inside the reason, after its text, as ` · rule <r> · remedy <m> · actor <a>`:
 no reader of the row's earlier fields moves, and `read_refusals` splits the reason's tail. A remedy
 carrying ` · ` is refused, as `--park` refuses the separator in an item.
@@ -152,32 +167,35 @@ Minted: the `[return.refusal]` table; `REFUSAL_ROUTES`; `route_refusal`; the `ro
 
 ### Migration
 
-Additive. No return at base is typed (gap-roles-04), so no landed return reads as a refusal; the
-arm reaches each agent file at its next render.
+Additive. Returns are typed at HEAD by TOOL-dBoundRoles-2's `return` field, and no role's `outcome`
+set holds `refused` (DERIVED at HEAD `c93f676e2`: `grep -n 'outcome:[^,]*refused'
+tools/roles/agents/*.agent.md` prints nothing), so no landed return reads as a refusal; the arm reaches
+each agent file at its next render.
 
 ### Rollout
 
-Live at landing. The spent-budget branch is inert until TOOL-dDeclaredLoop-30's budget lands, since no
-caller can pass `budget_spent` true before it.
+Live at landing, the spent-budget branch with it: TOOL-dDeclaredLoop-30's budget is landed at HEAD, so a
+caller can pass `budget_spent` true from the first run after this unit.
 
 ### Files touched (estimate)
 
 - `tools/roles/role-schema.toml` (the arm)
-- `tools/roles/roles_lib.py` (`REFUSAL_ROUTES`, `route_refusal`, the reader's branch)
+- `tools/roles/roles_lib.py` (`REFUSAL_ROUTES`, `route_refusal`, the reader's branch, the arm's reader,
+  and the arm rendered under each template by `render_role_fields`)
 - `tools/roles/handoff.py` (the `route-refusal` verb)
-- `tools/roles/render_agents.py` (the arm rendered under each template)
 - `tools/roles/check_roles.py` (a role redeclaring the arm refused)
 - `tools/roles/adopt-roles.test.sh` (the arm of §7)
 - `.claude/agents/*.md` and `.claude/roles.json` (renders, by `tools/roles/render_agents.py`)
 - `tools/unattended/unattended.sh` (`--refused`'s three flags)
 - `tools/unattended/unattended.test.sh` (the arm of §7)
-- `tools/loop/frontier.py` (`read_refusals` returning the three fields)
+- `tools/loop/position.py` (`read_refusals` returning the three fields)
 - `help/roles.md` (a section on what a refused agent returns and where it goes)
 
 ### Alternatives rejected
 
-- **The arm written into each role file.** Twelve copies of one fact; a role that drifts from the arm
-  is a role whose refusals route wrongly.
+- **The arm written into each role file.** One copy of one fact per role file, eleven at HEAD
+  `c93f676e2` (DERIVED: `ls tools/roles/agents/*.agent.md`); a role that drifts from the arm is a role
+  whose refusals route wrongly.
 - **Inferring the actor from the remedy's text.** A remedy is one line of prose; only its writer knows
   who can perform it, so the actor is declared.
 - **A second refusal record.** TOOL-dDeclaredLoop-14's `refusal` row exists for exactly this; the brief's
@@ -208,7 +226,7 @@ caller can pass `budget_spent` true before it.
   Red when: any actor but `self` answers `re-offer bounded`, so the item goes back to the agent that
   refused it.
   fixture: the five returns are written by the arm's setup under the fixture repository.
-- **AC2** — When `validate_return` runs over a refused return whose `actor` is `nobody`, and over one
+- **AC2** — When `check_return` runs over a refused return whose `actor` is `nobody`, and over one
   with an empty `remedy`, each is refused naming the field; a return with `actor: build:dPlanted` and
   both fields set returns no line.
   Red when: an actor outside the five forms validates.
@@ -221,6 +239,9 @@ caller can pass `budget_spent` true before it.
   ending ` · rule r1 · remedy render the handoff · actor driver`; with `--actor nobody` it exits non-zero
   naming the actor and writes no row.
   Red when: the row is written without the actor, or with an actor outside the set.
+  fixture: the position engine's own driver fixture, the item and key its `frontier-refused` plant
+  records (`tools/loop/position.py@710b2d07:173`), since `--refused` refuses a pair the engine does not
+  hold.
 - **AC5** — When `python handoff.py route-refusal --return <owner plant> --budget-spent` runs with the
   key at its default and the owner away, the line names `choose-ending` with `park-item`, `park-build`
   and `stop-run`; without `--budget-spent` it names `resolve`.
@@ -237,7 +258,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC4 · `--refused` with `
 
 - **F1 — Where does the refusal arm live: once in the role kind file, or in each role's template?**
   Options: (a) declared once in `role-schema.toml` and composed into every template; (b) written into
-  each role's `return` field. (b) is twelve copies of one fact and lets one drift. RESOLVED (agent,
+  each role's `return` field. (b) is one copy per role file, eleven at HEAD `c93f676e2` (DERIVED: `ls
+  tools/roles/agents/*.agent.md`), and lets one drift. RESOLVED (agent,
   2026-10-25, delegated): (a), rung 3, the most feature-rich survivor; tie-broken by reuse of unit 2's
   kind file. options: (a) > (b) · pick: (a) · admitted-by: principle.p18 · widens: none · relaxes: none
 - **F2 — How is "a remedy the refused actor cannot perform within its grant" decided?** Options: (a) the
@@ -254,7 +276,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC4 · `--refused` with `
   (b) > (c) · pick: (a) · admitted-by: principle.p18 · widens: none · relaxes: none
 - **F4 — The record's three fields: new `park` fields, or inside the line-final reason?** Options: (a)
   inside the reason; (b) new fields before the reason. (b) moves what two live readers strip
-  (`unattended.sh:12534-12538`). RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, no live reader
+  (`tools/unattended/unattended.sh@7548da57:15802-15806`). RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, no live reader
   moves. options: (a) > (b) · pick: (a) · admitted-by: principle.p18 · widens: none · relaxes: none
 
 ## 9. Revision log
@@ -266,6 +288,18 @@ New arm: tools/unattended/unattended.test.sh · covers AC4 · `--refused` with `
 - rev-3 · 2026-11-22 · §7 · §10 · re-grounded by the live-spec token brief `2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief`: the leg line gains `scratch-guard self-test`, `tier2-review self-test`, `policy fixtures`, as `tools/unattended/unattended.sh` and `tools/roles/roles_lib.py` in Files touched trip their guards; the `tools/hooks/agent-cap.js` cites move from the chain baseline `59ff8f2ac` to HEAD `52f769c24`, where TOOL-dFairHearing-16's move of rules 0, 2 and 5 to the review kit shifted the handoff block 1398 lines up (DERIVED: baseline line 2089 less HEAD line 691) with its behaviour unchanged, so the cites re-point at HEAD, `renderHandoffDeny` now at `tools/hooks/agent-cap.js@935a910d:679-688`; nothing else moved.
 - rev-4 · 2026-11-22 · §9 · §10 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike; each figure the re-ground wrote carries a pin on its line; nothing else moved.
 
+- rev-5 · 2026-11-22 · S1 S2 S4 S5 · §3 · §4 · AC2 AC4 · §8 F1 F4 · §10 · re-grounded at HEAD `c93f676e2`
+  by `2026-11-22-prompt-TOOL-dBoundRoles-11-reground-l-brief`. `validate_return` is `check_return`, the
+  name the lexicon answers, which TOOL-dBoundRoles-5 builds. S1: `## Return` is written by
+  `render_role_fields`, TOOL-dBoundRoles-2's, so the arm renders there and
+  `tools/roles/render_agents.py` leaves Files touched; a role redeclares the arm by holding `refused`
+  in its `outcome` set. S4: `read_refusals` is in `tools/loop/position.py`, which replaces the absent
+  `tools/loop/frontier.py` in Files touched, and AC4's fixture names the pair the engine holds. S5: the
+  spent budget is `budget.py`'s `ending` state `spent`, since its `exhausted` answer is a draw's; the
+  reader's signature drops `rev`, checked against TOOL-dBoundRoles-11's spec rev-5. The external
+  producers are cited as landed, so §4 Rollout loses its inert window, and §4 Migration reads the typed
+  returns of HEAD. The role-file count is pinned, and the `park` citations re-point.
+
 ## 10. Reuse audit
 
 No existing seam fits the outcome table: `python tools/codebase-map/reuse_lookup.py "route a refusal
@@ -273,7 +307,7 @@ remedy to the actor who can perform it"` ranked name stems (`refusal` in `tools/
 `DesignRefusal` in `tools/memory-tree/design_lib.py`, `remedy` in `tools/memory-tree/check-verdict-epoch.sh`,
 the `Refusal` exception classes), each a refusal raised in its own tool, none routing one; scout A's probe
 found `remedy` only as prose in deny strings (`tools/hooks/agent-cap.js@935a910d:679-688`, `renderHandoffDeny`).
-The record extends TOOL-dDeclaredLoop-14 S2's `refusal` row and `park` (`tools/unattended/unattended.sh:12533`);
+The record extends TOOL-dDeclaredLoop-14 S2's `refusal` row and `park` (`tools/unattended/unattended.sh#park`);
 the arm's home is unit 2's kind file; the owner branch extends unit 11's reader. The recall probe returned the
 night-pass instruments' clause text, scout A's row and the as-built view's clause, none disagreeing with
 source. Scout A placed the template in each role file through unit 2's field; §8 F1 moves it to the kind

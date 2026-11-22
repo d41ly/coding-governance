@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-18 — the reviewers' merge as an upgrade step: an adopter's reviewer agents renamed to `gov-reviewer`, the role index re-rendered, every key the merge touches re-keyed
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 25 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 25 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0183@46564bcb whole
 
@@ -43,13 +43,15 @@ its retirement moved to Runtime (the night pass two's point 4, the owner's NT-21
   `tools/govkit/upgrade_steps.py`. Observed by AC1, AC5 and AC9.
 - **S3** — The rename and the re-render. The `up` re-keys the carriers of S4 to S6, then runs the
   target's own `render_agents.py --write`. That render writes `gov-reviewer.md` under `.claude/agents`,
-  unlinks the two old types as stale owned types (`write_rendered`,
-  `tools/roles/render_agents.py:245-259`, the stale set from `check_rendered` at :229-242 over the
-  old index's names, `load_owned_names` at :219), and rewrites `.claude/roles.json` last. Observed by
+  unlinks the two old types as stale owned types (`tools/roles/render_agents.py#write_rendered`, the
+  stale set from `tools/roles/render_agents.py#check_rendered` over the old index's names,
+  `tools/roles/render_agents.py#load_owned_names`), and rewrites `.claude/roles.json` last. Observed by
   AC1.
 - **S4** — Effort preserved per stage. For every workflow stage whose role is an old stem, the level
   `resolve_stage_efforts` gives after the step equals the level it gave before, in each carrier that
-  holds a level: the house file's `[effort.roles]` and `[effort.stages.<workflow>]` tables, and
+  holds a level: the house file's `[effort.roles]` and `[effort.stages.<workflow>]` tables, each
+  `[effort.profiles.<name>]` table's `roles` and `stages.<workflow>` tables, which
+  `tools/roles/roles_lib.py#resolve_stage_efforts` reads for a model that profile matches, and
   `.governance/policy.toml`'s `roles.effort.<role>` and `roles.effort.<workflow>.<stage>` keys
   (§4 "Effort", §8 F2). Observed by AC2 and AC3.
 - **S5** — Every other key under a `<role>` placeholder. A policy key whose catalogue name carries a
@@ -60,8 +62,11 @@ its retirement moved to Runtime (the night pass two's point 4, the owner's NT-21
   and AC4.
 - **S6** — Overlay values. Every string value in `.governance/instructions.toml` equal to
   `role.gov-spec-reviewer` or `role.gov-diff-reviewer` becomes `role.gov-reviewer`. That covers a
-  level-5 `[[unit]]` row's `select` (brief I22) and a `[[role]]` or `[[workflow]]` table's
-  `amends` or `supersedes`. Where an old stem's house text file is still present under
+  level-5 `[[unit]]` row's `scope`, the landed selection field (brief I22). A `[[role]]` or
+  `[[workflow]]` row carries its edge as `edges = "amends=<tag>@<hash8>"` or `supersedes=`
+  (`tools/playbook/overlay_rows.py#derive_row_composition`), a string no old tag equals and a pin over
+  the old row, so an edge naming an old tag stops the `up`, exit 1, naming the row and the remedy, to
+  re-pin it on `role.gov-reviewer`, and writes no byte (§8 F6). Where an old stem's house text file is still present under
   `<prefix>/roles/house/`, because TOOL-dBoundRoles-19's step is absent at the build run's base, its
   text is appended to `house/gov-reviewer.md` under one line naming its source stem, spec reviewer
   first. Observed by AC6.
@@ -136,7 +141,8 @@ nothing. Otherwise:
    any old stem's house text file with `house/gov-reviewer.md`, and the two old role files under
    `<prefix>/roles/agents/`.
 3. It re-keys the house file, the policy file and the overlay, and carries any old house text (S6).
-   The policy file goes through `render_policy_text`, gaining an unset mode in this unit, and the
+   The policy file goes through `tools/govkit/upgrade_steps.py#render_policy_text`, which only sets a
+   key today and gains an unset mode in this unit, and the
    overlay through the value edit below.
 4. It removes the two old role files from `<prefix>/roles/agents/` where an update left them for a
    later withdrawal. They are engine files gov no longer ships, and the render would otherwise render
@@ -153,10 +159,12 @@ definition.
 
 ### Effort
 
-The house file today maps each slot to a level (`tools/roles/house/policy.toml:8-15`, `gov-spec-reviewer
-= "medium"`, `gov-diff-reviewer = "high"`). `resolve_stage_efforts` (`tools/roles/roles_lib.py:571-576`)
-gives each stage its `[effort.stages.<workflow>]` entry, else its slot's level. The shipped seeds
-already differ, so one role entry would move one stage's level on every default install.
+The house file maps each slot to a level (`tools/roles/house/policy.toml@339f54fa:10-17`), the shipped
+seed holding `gov-spec-reviewer = "medium"` and `gov-diff-reviewer = "medium"` (lines 13 and 15 of
+that blob; at base `4ed9e567` the diff reviewer was `high`). `resolve_stage_efforts`
+(`tools/roles/roles_lib.py#resolve_stage_efforts`) gives each stage its `stages.<workflow>` entry in
+the level table the model takes, else its slot's level there. An adopter's two levels may differ, and
+then one role entry would move one stage's level.
 
 Per carrier, the `up` applies the rule TOOL-dBoundRoles-1 §4 "The merge" applies to gov's seed, so
 an adopter's file ends in the shape a new install receives:
@@ -164,19 +172,21 @@ an adopter's file ends in the shape a new install receives:
 1. it records, for every workflow entry and every stage whose role is an old stem, the level that
    carrier's resolution gives it;
 2. it removes the old stems' role entries or keys, and, where no `gov-reviewer` entry exists, writes
-   one at the higher of the two old levels by `EFFORT_LEVELS` order (`tools/roles/roles_lib.py:45`);
+   one at the higher of the two old levels by `EFFORT_LEVELS` order (`tools/roles/roles_lib.py#EFFORT_LEVELS`);
 3. it resolves every such stage again with the stage now mapped to `gov-reviewer`, and writes a stage
    entry with the recorded level wherever the two differ and no stage entry was set.
 
 The house file gains `[effort.stages.<workflow>]` rows, and the policy file gains
-`roles.effort.<workflow>.<stage>` keys (brief I9). Over the old seed the result is TOOL-dBoundRoles-1's:
-`gov-reviewer = "high"`, with `specFinder = "medium"` under `spec-review` and `spec-write`. A direct
-spawn of `gov-reviewer` takes the role entry.
+`roles.effort.<workflow>.<stage>` keys (brief I9). Over the shipped seed the result is
+TOOL-dBoundRoles-1's §4 "The merge": one `gov-reviewer = "medium"` row and no stage row. Over a file
+setting the diff reviewer `high`, it is `gov-reviewer = "high"`, with `specFinder = "medium"` under
+`spec-review` and `spec-write`. A direct spawn of `gov-reviewer` takes the role entry.
 
 ### Re-keying the other keys
 
 The `<role>` families are read from `tools/policy/catalogue.toml`: every catalogue `name` holding a
-`<role>` segment, through TOOL-dGroundRules-2 S4's `read_catalogue_row`, so a family a later build adds
+`<role>` segment, four at blob `25076c3d` (PINNED: `roles.effort`, `roles.model`, `roles.harness` and
+`roles.auth`), through `tools/policy/policy.py#read_catalogue_row`, so a family a later build adds
 is re-keyed without an edit here. The catalogue's other placeholders are kept as they are. Values are
 compared as parsed TOML, never as text.
 
@@ -262,12 +272,13 @@ loaded until it restarts. The harness reads `.claude/agents` at session start
   withdrawal.
   Red when: the render is skipped, or the old role files are left so the render writes both old
   types again and the index still lists them.
-- **AC2** — When `python handoff.py stage-efforts <workflow>` runs in that target for `spec-review`,
-  `spec-write` and `closing-review`, before and after the `up`, it prints the same level for every
-  stage: `specFinder` medium and `diffFinder` high. The house file then holds `gov-reviewer = "high"`
-  and `specFinder = "medium"` under both spec tables, the rows TOOL-dBoundRoles-1 writes into gov's
-  seed. A second target whose house file sets both old stems to `medium` ends with one
-  `gov-reviewer = "medium"` row and no added stage row.
+- **AC2** — When that target's house file sets `gov-diff-reviewer = "high"` over the shipped seed and
+  `python handoff.py stage-efforts <workflow>` runs in it for `spec-review`, `spec-write` and
+  `closing-review`, before and after the `up`, it prints the same level for every stage: `specFinder`
+  medium and `diffFinder` high. The house file then holds `gov-reviewer = "high"` and
+  `specFinder = "medium"` under both spec tables. A second target holding the shipped seed, both old
+  stems at `medium`, ends with one `gov-reviewer = "medium"` row and no added stage row, the row
+  TOOL-dBoundRoles-1 writes into gov's seed.
   Red when: the `up` writes the role entry and no stage entry, so the spec stages move to high.
 - **AC3** — When the target's policy file, `policy.toml` under `.governance`, sets
   `roles.effort.gov-diff-reviewer = "xhigh"`
@@ -276,7 +287,8 @@ loaded until it restarts. The harness reads `.claude/agents` at session start
   roles.model.gov-reviewer.<harness>` prints that model. No `gov-spec-reviewer` or
   `gov-diff-reviewer` key remains.
   Red when: an old key remains, or the stage reads the default.
-  fixture: needs TOOL-dGroundRules-2's reader and TOOL-dBoundRoles-21's keys at the build run's base.
+  fixture: the reader and the catalogue keys are landed; the roles kit reads the keys once
+  TOOL-dBoundRoles-21 lands, at order 4.
 - **AC4** — When the house file's `[gates]` holds `gov-diff-reviewer = ["memory hygiene"]` and no
   `gov-spec-reviewer` row, the `up` exits 1 naming both stems, the `[gates]` key and the remedy, and
   `git status --porcelain` in the target prints nothing, before-image included. Two equal rows move
@@ -288,12 +300,14 @@ loaded until it restarts. The harness reads `.claude/agents` at session start
   `.claude/roles.json` was edited after the `up`, the down exits 1 naming it and changes nothing.
   Red when: a byte differs after a down, or the edited file is overwritten.
 - **AC6** — When the target's overlay, `instructions.toml` under `.governance`, holds a level-5
-  `[[unit]]` whose `select` is `role.gov-spec-reviewer` and a comment line spelling it, the `up`
-  leaves `select = "role.gov-reviewer"` and the comment unchanged. The witness exits 1 while any
-  value still equals an old tag. A second target whose copy of `tools/roles/house/gov-diff-reviewer.md`
+  `[[unit]]` whose `scope` is `["role.gov-spec-reviewer"]` and a comment line spelling it, the `up`
+  leaves `scope = ["role.gov-reviewer"]` and the comment unchanged. The witness exits 1 while any
+  value still equals an old tag. An overlay `[[role]]` row whose `edges` is
+  `amends=role.gov-spec-reviewer@<hash8>` stops the `up`, exit 1, naming that row, with no byte written. A second target whose copy of `tools/roles/house/gov-diff-reviewer.md`
   is non-empty ends with that text in the merged role's house text file, `gov-reviewer.md` beside it,
   and the old file gone.
-  Red when: the comment is rewritten, a value is left, or the house text is lost.
+  Red when: the comment is rewritten, a value is left, the house text is lost, or an old-tag edge is
+  re-keyed under its old pin.
 - **AC7** — When the `up` argv runs on gov's tree at the pass, it exits 0 and `git status --porcelain`
   prints nothing, and the `witness` argv exits 0. After the commit,
   `git grep -l -E 'gov-(spec|diff)-reviewer' -- ':!memory'` prints only `tools/roles/kit.toml`,
@@ -305,7 +319,7 @@ loaded until it restarts. The harness reads `.claude/agents` at session start
 - **AC8** — When `python step_gate.py --base <the pass's parent sha>` runs on the committed tree, no
   `RED` line names `gov-spec-reviewer` or `gov-diff-reviewer`.
   Red when: the S1 row's `surfaces` drops a member, so the vanished role file reds.
-  fixture: needs TOOL-dSafePassage-10's gate at the build run's base.
+  fixture: TOOL-dSafePassage-10's gate is landed, `tools/govkit/step_gate.py`, and takes `--base`.
 - **AC9** — When `python upgrade_steps.py list` runs, `roles/reviewers-to-gov-reviewer` follows every
   other row of `tools/roles/kit.toml`. A second `up` on an applied target exits 0 and changes no byte.
   Red when: the row sits before TOOL-dBoundRoles-19's, or the second run rewrites a file.
@@ -315,10 +329,10 @@ loaded until it restarts. The harness reads `.claude/agents` at session start
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `policy fixtures` · `step-rows-frozen` · `step-gate` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-The pass adds no leg. Once their builds land, the two legs TOOL-dSafePassage-1 and -10 add grade
-this unit's row: `step-rows-frozen` and `step-gate`.
+The pass adds no leg. `step-rows-frozen` and `step-gate`, the legs TOOL-dSafePassage-1 and -10
+landed, grade this unit's row.
 
 New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC9 · each `reviewer-merge-` case staged by its own scratch target: two old types and their index, the shipped seed, one differing `[gates]` row, one overlay `select`, one edit after the up · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by the measured count of new refusal sites
 
@@ -336,9 +350,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC9 · each 
 - **F2 — How do two reviewer efforts become one role's?** Options: (a) a role entry at the higher
   level plus stage entries for every stage whose level would move, TOOL-dBoundRoles-1's rule for gov's
   seed; (b) stage entries only, with no role entry where the two differ; (c) one role entry at the
-  higher level and nothing else; (d) stop the step. The shipped seeds differ
-  (`tools/roles/house/policy.toml:11`, `:13`), so (d) stops every default install, which fails P38's
-  "keeps working". (c) raises the spec reviewer's stages with no owner write. (b) keeps every stage's
+  higher level and nothing else; (d) stop the step. The seed at base differed, so (d) stopped every
+  default install; at HEAD both are `medium` (`tools/roles/house/policy.toml@339f54fa:13`), and (d)
+  still stops every adopter whose two levels differ, which fails P38's "keeps working". (c) raises the spec reviewer's stages with no owner write. (b) keeps every stage's
   level too, but ends an adopter's file in a different shape from the seed a new install receives.
   RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, tie-broken by agreement with
   TOOL-dBoundRoles-1. widens: none · relaxes: none
@@ -362,11 +376,23 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC9 · each 
   base, `git ls-files tools/govkit/upgrade_steps.py tools/govkit/step_gate.py tools/policy/policy.py
   tools/policy/catalogue.toml`, plus `grep -n 'def render_policy_text\|def write_before_image'` over
   the first. Observation at `4ed9e567`: none exists, since TOOL-dSafePassage-1, -2 and -10 and
-  TOOL-dGroundRules-2 are DEFERRED. Liveness: each file is named by a landed parent's Files touched,
+  TOOL-dGroundRules-2 are DEFERRED. Observation at `c93f676e2`: all four files exist, and both
+  functions are defined in `tools/govkit/upgrade_steps.py`. Liveness: each file is named by a landed parent's Files touched,
   so the probe prints it once that parent lands. RESOLVED (agent, 2026-10-25, delegated): the build
   run re-grounds on each section, and stops this unit if TOOL-dSafePassage-1 S1-S3 is still absent.
   An absent TOOL-dGroundRules-2, TOOL-dBoundRoles-19, -20 or -21 carrier is skipped as §3 says, and
   its criterion is recorded unobservable in the acceptance ledger. widens: none · relaxes: none
+- **F6 — What does the `up` do with an overlay row whose edge names an old reviewer tag?** The landed
+  row grammar spells an edge `amends=<tag>@<hash8>`, its pin over the old row's canonical form, and
+  the composer re-points a renamed target only through a change record naming a successor
+  (`tools/playbook/overlay_rows.py#derive_row_composition`); TOOL-dBoundRoles-1 writes no such record
+  for the merge. Options: (a) stop the `up`, exit 1, naming the row and the remedy, re-pin it on
+  `role.gov-reviewer`, writing no byte; (b) rewrite the tag inside the edge and keep its pin; (c)
+  rewrite the tag and the pin to `role.gov-reviewer`'s. (b) names a pin no row holds, so the
+  composition refuses it; (c) certifies a patch the adopter never read against the merged row,
+  bypassing the pin's stale check, which widens the overlay's write surface past this unit's tier
+  (veto 3). RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, as F3 stops on a conflicting key.
+  options: (a) > (b) > (c) · pick: (a) · admitted-by: principle.p18 · widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -377,21 +403,32 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC9 · each 
 - rev-3 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
   `tools/govkit/upgrade_steps.py` that §4 Files touched names, by
   `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
+- rev-4 · 2026-11-22 · S3 · S4 · S6 · §4 Effort, Re-keying, The program · §7 · AC2 · AC3 · AC6 · AC8 ·
+  §8 F2 F5 F6 · §10 · re-grounded at `c93f676e2` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-m-brief`: the step kind, the step gate, the policy
+  reader and catalogue landed, so §7 names `step-rows-frozen` and `step-gate` and AC3's and AC8's
+  fixture lines and F5 read them; the shipped seed now holds both reviewers at `medium`, so §4 Effort,
+  AC2's first target and F2's evidence move, F2's pick unchanged; S4 adds the effort profile tables
+  TOOL-aProfiledEffort landed; S6 and AC6 read the landed `scope` field and the `edges` grammar,
+  whose old-tag edge F6 stops on; moved cites re-point to symbols or blob-pinned lines.
+  TOOL-dBoundRoles-1's merge table, its `gov-reviewer = "medium"` row and its four-to-two house
+  change were checked against unit 1's spec at rev-7 and hold; TOOL-dBoundRoles-19's `scope` row is
+  that spec's rev-7.
 
 ## 10. Reuse audit
 
-The seam extended is TOOL-dSafePassage-1's upgrade-step kind: an `[[upgrade]]` row in a kit
-descriptor, a program under `tools/govkit/steps/`, and the before-image and policy-text helpers in
-`tools/govkit/upgrade_steps.py`, whose S6 step on `tools/hooks/kit.toml` is the precedent copied. All of
-it is specced and DEFERRED. The rename itself reuses the renderer's stale-type unlink
-(`tools/roles/render_agents.py:229-259`), which already removes an owned type the index lists and the
-catalogue no longer holds, and the kit's `[[regenerate]]` argv (`tools/roles/kit.toml:72-73`).
+The seam extended is TOOL-dSafePassage-1's landed upgrade-step kind: an `[[upgrade]]` row in a kit
+descriptor, a program under `tools/govkit/steps/`, and the before-image and policy-text helpers
+`tools/govkit/upgrade_steps.py#write_before_image`, `#write_from_before_image` and
+`#render_policy_text`, with `tools/govkit/steps/fanout_cap.py` the hooks kit's precedent. The rename
+itself reuses the renderer's stale-type unlink (`tools/roles/render_agents.py#check_rendered` and
+`#write_rendered`), which already removes an owned type the index lists and the catalogue no longer
+holds, and the kit's `[[regenerate]]` argv (`tools/roles/kit.toml@b9102919:75-76`).
 `python tools/codebase-map/reuse_lookup.py "rename an adopter's installed agent types and re-key their
-settings in an upgrade step"` ranked name stems only (`key`, `adopt`, `step`, and `derive_rename_map` in
-`tools/govkit/govkit.py:8793`). That last is gov's source-rename map for receipt rows, which pairs a
-moved engine file and does not re-key a value, so no seam fits the re-keying beyond the step kind. The
-recall probe returned this build's brief and scout A's row, and dSafePassage-10's class table. Scout A
-cited the renderer's unlink at `:238-259`; the source puts `check_rendered`'s stale branch at :229-242
-and `write_rendered` at :245-259, and those are the lines cited here.
+settings in an upgrade step"` ranked name stems only (`key`, `adopt`, `step`, and
+`tools/govkit/govkit.py#derive_rename_map`). That last is gov's source-rename map for receipt rows,
+which pairs a moved engine file and does not re-key a value, so no seam fits the re-keying beyond the
+step kind. The recall probe returned this build's brief and scout A's row, and dSafePassage-10's class
+table.
 
 Recall terms used: `python tools/memory-recall/query.py "how does an upgrade step rename an adopter's role agents when two roles merge into one" --terms "upgrade step retired successor rename agent role index render stale owned reviewer merge house policy effort"`

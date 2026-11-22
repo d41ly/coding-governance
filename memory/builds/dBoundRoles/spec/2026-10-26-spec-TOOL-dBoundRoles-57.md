@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-57 — the memory-recall kit's description invariant follows the Skill off the refused tools: augments shell `grep` and `git grep`, and names neither search tool
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 31 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 31 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -22,13 +22,15 @@ The round-1 spec audit of the seven promoted specs 45 to 51
 (`memory/builds/dBoundRoles/reviews/2026-10-26-review-TOOL-dBoundRoles-45-spec-audit-round1.md`) confirmed
 finding **id 29 at HIGH**, report item **H4**. No other id shares the item.
 
-`TOOL-dBoundRoles-51` S8 rewords `tools/memory-recall/SKILL.template.md:15` and `:66` from the search
-tools to shell `grep` and `git grep`, and its AC8 requires `grep -nwE 'Grep|Glob'` over the Skills to
-print nothing. `tools/memory-recall/selftest.py:1619`, in `test_skill_description_invariants`, asserts
-`Grep`, `Glob`, `ordinary code search` and `ADDS retrieval` are in the rendered description, the kit's
-pin that the Skill augments code search and never intercepts it. 51's Files touched names neither the
-selftest nor `tools/memory-recall/README.md:184`, which still says the Skill "augments Grep and Glob",
-and its §7 omits the `memory-recall kit selftest` leg. Built as written, 51 AC8 greens and the kit's
+`TOOL-dBoundRoles-51` S8 rewords `tools/memory-recall/SKILL.template.md@17553715:12` and `@17553715:63`
+from the search tools to shell `grep` and `git grep`, and its AC8 requires `grep -nwE 'Grep|Glob'` over
+the Skills to print nothing. `test_skill_description_invariants`
+(`tools/memory-recall/selftest.py#test_skill_description_invariants`) asserts `Grep`, `Glob`,
+`ordinary code search` and `ADDS retrieval` are in the rendered description
+(`tools/memory-recall/selftest.py@6474907c:1726-1727`), the kit's pin that the Skill augments code
+search and never intercepts it. 51's Files touched names neither the selftest nor
+`tools/memory-recall/README.md@fe57282c:187`, which still says the Skill "augments Grep and Glob", and its
+§7 omits the `memory-recall kit selftest` leg. Built as written, 51 AC8 greens and the kit's
 self-test reds, and the builder's only way to green it is to delete an invariant 51 never scoped.
 
 This unit rewrites the invariant to the new wording and keeps what it protects. It repairs
@@ -40,9 +42,10 @@ This unit rewrites the invariant to the new wording and keeps what it protects. 
   `tools/memory-recall/selftest.py` asserts the rendered description holds `git grep`,
   `ordinary code search` and `ADDS retrieval`, the tokens of the wording 51 S8 writes, and holds neither
   word `Grep` nor `Glob`. The comment over check 1 says the Skill augments shell `grep` and `git grep`
-  and never replaces or intercepts them; the comment at `:1644` says a miss falls back to shell `grep`.
-  Observed by AC1.
-- **S2** — The README follows. `tools/memory-recall/README.md:184` says the description augments shell
+  and never replaces or intercepts them; the comment over check 4
+  (`tools/memory-recall/selftest.py@6474907c:1751`) says a miss falls back to shell `grep`. Observed by
+  AC1.
+- **S2** — The README follows. `tools/memory-recall/README.md@fe57282c:187` says the description augments shell
   `grep` and `git grep` rather than replacing them, and that `selftest.py` pins it. Observed by AC2.
 - **S3** — The leg is named. This spec's §7 names `memory-recall kit selftest`, the leg whose suite holds
   S1, so the close runs it over 51's and this unit's changes together. Observed by AC1.
@@ -66,15 +69,16 @@ This unit rewrites the invariant to the new wording and keeps what it protects. 
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at HEAD `c93f676e` on 2026-11-22:
 
-- `tools/memory-recall/SKILL.template.md:15` reads "Grep and Glob own those, they are correct, and this
-  skill neither replaces nor intercepts them: it ADDS retrieval".
-- `tools/memory-recall/selftest.py:1598` defines `test_skill_description_invariants`; `:1617-1620` loop
-  over the four tokens; `:1644` says the guidance falls back to Grep.
-- `tools/memory-recall/README.md:182-186` describes the three pinned properties.
+- `tools/memory-recall/SKILL.template.md@17553715:12` reads "Grep and Glob own those, and this skill
+  never replaces them: it ADDS retrieval".
+- `tools/memory-recall/selftest.py#test_skill_description_invariants` renders the Skill in a scratch
+  adopter and reads its front matter; `@6474907c:1724-1727` comment check 1 and loop over the four
+  tokens; `@6474907c:1751` says the guidance falls back to Grep.
+- `tools/memory-recall/README.md@fe57282c:186-190` describes the three pinned properties.
 - `tools/gate-legs.json`'s `memory-recall kit selftest` runs `python3 {prefix}/memory-recall/selftest.py`
-  and guards `{prefix}/memory-recall/`.
+  and guards `{prefix}/memory-recall/` among its seven paths.
 
 ### What the invariant protects
 
@@ -150,10 +154,15 @@ New arm: tools/memory-recall/selftest.py · covers AC1 · the description invari
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 45 to 51, id 29
   (HIGH, item H4), on the report's fix.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-60, the minors batch of the round-1 audit of units 52 to 58; nothing else moved.
+- rev-3 · 2026-11-22 · §1 · S1 · S2 · §4 · §10 · re-grounded at HEAD `c93f676e` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-brief`. Every line citation is re-pointed to a
+  symbol or a blob-pinned line: the template's lines are 12 and 63, the token loop 1726, the check-4
+  comment 1751 and the README's line 187. The template's line 12 is re-quoted, its wording having
+  moved. Unit 51 S8, its AC8, Files touched and §7 were checked against its spec, not HEAD.
 
 ## 10. Reuse audit
 
-The seam is `test_skill_description_invariants` (`tools/memory-recall/selftest.py:1598`), whose token
+The seam is `test_skill_description_invariants` (`tools/memory-recall/selftest.py#test_skill_description_invariants`), whose token
 loop S1 re-words and extends rather than adding a second check.
 `python tools/codebase-map/reuse_lookup.py "a skill description invariant asserted by a selftest token tuple"`
 ranked `resolve_prefix_token`, `read_attribution_tokens`, `build_id_token_re` and `demand_safe_token`,

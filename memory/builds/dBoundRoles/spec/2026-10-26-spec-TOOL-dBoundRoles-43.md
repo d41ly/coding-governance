@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-43 — the round-1 audit's 46 roles-code minors: one grammar each for returns, shapes and slots, one reader and writer each, bounded readers, resumable steps, and the registries they feed
 
-**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-8 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -44,7 +44,9 @@ id is its own item, even where the report merged two; ids 47 and 53 are the MEDI
   `tools/roles/roles_lib.py` reads `type := … | value ("|" value)*`; R2 refuses an empty set and a value named
   twice, not a set of one. The five one-value templates of unit 2 §4 (`gov-spec-writer` `done`,
   `gov-skeptic` `judged`, `gov-synthesizer` `reported`, `gov-orienter` `oriented`, `gov-session` `sent`) pass,
-  and the grammar line in `tools/roles/README.md` says so. Observed by AC1.
+  and the grammar line in `tools/roles/README.md` says so. At HEAD the parser already reads a bare word
+  as a set of one (`tools/roles/roles_lib.py#parse_return_template`), as unit 2 built it, so the pass
+  records that end state. Observed by AC1.
 - **S2** — id 2. No unit builds a shape refusal (unit 16 §8 F3; unit 25 §3 moves
   each rule unchanged), so a rev bump of unit 25's spec, its §9 line naming id 2 and this unit, made by its
   pass or else this one, amends AC3 to the moved `checkHarnessCall` refusing a `roles` value naming no
@@ -55,7 +57,8 @@ id is its own item, even where the report merged two; ids 47 and 53 are the MEDI
   tree (§8 F5). Observed by AC5.
   **Readers:** by name: `tools/roles/handoff.py` (unit 4 S3's refusal) and `tools/roles/check_roles.py` (unit
   26's no-redeclaration rule); READER NOT IN TREE: the role file, which unit 4 adds after base · by value:
-  `validate_return`, which reads a refused return against unit 26's arm.
+  `check_return` (unit 5's, `validate_return` in its spec until that rename), which reads a refused
+  return against unit 26's arm.
 - **S6** — id 7. `render_agent_file` and `render_handoff`,
   both `render_role` callers, pass the legs of the role's `gates` field, the house `[gates]` row as
   fallback, through the `check_gate_names` path unit 21 S6 gives `render_roles_index`, so each rendered
@@ -76,9 +79,12 @@ id is its own item, even where the report merged two; ids 47 and 53 are the MEDI
   selecting `role.gov-reviewer` through `write_overlay_units` by S23's route, tagged
   `repo.house.gov-reviewer.<stem>`, not an append to `house/gov-reviewer.md`, which unit 19's render no
   longer reads; unit 18's ledger answers AC6 AMENDED. Observed by AC10.
-  **Readers:** by name: `tools/roles/roles_lib.py:584` (`render_role`), `tools/roles/check_roles.py:340` (R10)
-  and `tools/roles/kit.toml:36-39` (the seed include); READER NOT IN TREE: the merged role's house file, unit
-  1's · by value: `render_role`, rendering the text (`roles_lib.py:591`), and R10, counting it (`:342`).
+  **Readers:** by name: `tools/roles/roles_lib.py` (`render_role`), `tools/roles/check_roles.py` (R10)
+  and `tools/roles/kit.toml` (the seed include); READER NOT IN TREE: the merged role's house file, unit
+  1's · by value: `render_role`, rendering the text (`tools/roles/roles_lib.py@5cf7c56f:1040-1047`),
+  and R10, counting its bytes (`tools/roles/check_roles.py@15b68874:433`) in the overlay walk at
+  `tools/roles/check_roles.py@15b68874:430-442`, over the files the seed include names
+  (`tools/roles/kit.toml@b9102919:38-42`).
 - **S11** — id 11. The slot is the overlay row's bare `<name>`: the
   index key, the agent file stem and the actor id `role:<name>` spell it, and the tag `role.adopter.<name>`
   maps to it by one stated rule in `roles_lib.py`. The composition refuses a repository role named as a gov
@@ -97,15 +103,20 @@ id is its own item, even where the report merged two; ids 47 and 53 are the MEDI
 - **S15** — id 24. `memory/project/method-carriers.txt` holds
   no row for `.claude/agents/gov-spec-reviewer.md` or `.claude/agents/gov-diff-reviewer.md`. Observed by AC15.
 - **S16** — id 46. Each `.claude/agents/*.md` naming
-  `BUILD-METHOD.md` has one `<path> · <why>` row in `method-carriers.txt`. Observed by AC16.
+  `BUILD-METHOD.md` has one row in `method-carriers.txt`, a declared-set ledger keyed by path whose rows
+  are `<path>\t<count>\t<sha>\t<disposition>` (`memory/project/method-carriers.txt@eb65744f:1`); a
+  gained row's reason is its record's (§8 F18). Observed by AC16.
 - **S17** — id 25. `tools/govkit/steps/reviewer_merge.py`'s up
   replaces every row of the target's `<memory root>/project/method-carriers.txt` naming either old type with
-  one `.claude/agents/gov-reviewer.md` row, de-duplicated, the file in its before-image and its down; govkit case
+  one `.claude/agents/gov-reviewer.md` row, de-duplicated, in that ledger's grammar and carrying the
+  disposition §8 F18 gives, the file in its before-image and its down; govkit case
   `reviewer-merge-carriers` holds it. Observed by AC17.
 - **S19** — id 27. Over `tools/hooks/scratch-guard.js`
   and `tools/roles/spawn-guard.js`, the hooks reading the three keys after unit 25,
   `git grep -n -E "policy\.toml|\.governance/"` prints only the `readPolicy` import and locator lines.
-  Observed by AC19.
+  At HEAD it prints none in `scratch-guard.js` and one locator line in the hook, the receipt comment of
+  its `resolveKitDir` port (`tools/hooks/agent-cap.js@935a910d:1187`), which unit 25's §8 F7 carries
+  into both hooks. Observed by AC19.
 - **S21** — id 31. `read_policy_setting` (unit 21 S1) is the one
   runner of `policy.py get`, the seam PLAY-dOrderedCharter-7 §4 gives a sibling kit: unit 15's
   `instructions.task-charter` read (`None` meaning `when-not-static`), unit 10's `roles.no-spawn`, unit 11's
@@ -114,7 +125,8 @@ id is its own item, even where the report merged two; ids 47 and 53 are the MEDI
   Observed by AC21.
 - **S22** — id 35. `WRITE_FOLDERS` has one home, `roles_lib.py`: `render_role`,
   `derive_allowance` and `check_roles.py`, as `lib.WRITE_FOLDERS`, read it, and `roles_lib.py` imports
-  nothing from `check_roles.py`. Observed by AC22.
+  nothing from `check_roles.py`. `check_roles.py`'s alias line `WRITE_FOLDERS = lib.WRITE_FOLDERS`
+  (`tools/roles/check_roles.py@15b68874:137`) goes, so its readers spell `lib.WRITE_FOLDERS`. Observed by AC22.
 - **S23** — id 37. `reviewer_merge.py`'s value edit of
   `.governance/instructions.toml` goes through `write_overlay_units` in `tools/playbook/overlay.py`, given a
   re-key mode mapping old tag values to new, so the one writer keeps its ordering and its byte-identical
@@ -134,26 +146,40 @@ id is its own item, even where the report merged two; ids 47 and 53 are the MEDI
   holds no `tools/hooks/agent-cap.test.sh` row, and `tools/roles/spawn-guard.test.sh` prints
   `PASS (<n> assertions)` against a pinned `FLOOR_ASSERTIONS`, the form the count check reads, so it needs
   no row. Observed by AC27.
-  **Readers:** by name: `memory/project/testsuite-count-waivers.txt` (row 10) and
-  `tools/check-testsuite-counts.sh:45` · by value: `tools/check-testsuite-counts.sh:145`, which reds a waiver
-  naming a suite the manifest does not run.
+  **Readers:** by name: `memory/project/testsuite-count-waivers.txt` and `tools/check-testsuite-counts.sh`
+  · by value: `tools/check-testsuite-counts.sh@d4bad437:145`, which reds a waiver naming a suite the
+  manifest does not run, read from the register its `WAIVERS` line names
+  (`tools/check-testsuite-counts.sh@d4bad437:45`), whose row for the suite is
+  `memory/project/testsuite-count-waivers.txt@99516f65:9`.
 - **S28** — id 45. Citations of deleted files are waived where they cannot move.
   `memory/project/spec-token-waivers.txt` gains one row each for `tools/hooks/agent-cap.js` and
   `tools/hooks/agent-cap.test.sh`, its reason naming `aDeclaredBound-4` and every live dBoundRoles spec citing
   them at the pass, and one row for `tools/roles/house/gov-diff-reviewer.md`, its reason naming unit 18 AC6,
-  never a basename (§8 F16). Observed by AC28.
+  never a basename (§8 F16). The register is a shrink-only ledger keyed by token, and a row holds no
+  reason (`tools/check-spec-tokens.py#read_waivers`). A gained key is admitted only as
+  `widened:<record>` (`tools/memory-tree/legacy_ledger.py@eca5d963:491-497`), so each reason is a widen
+  record's, written with its row by `python tools/memory-tree/ratchet.py widen spec-token-waivers --key
+  <token> --reason <reason> --unit TOOL-dBoundRoles-43`, one call per reason, under the catalogue
+  default `retrofit.widen = "record-reason"`. Observed by AC28.
   **Readers:** by name: the live specs citing the paths, listed at the pass by git grep,
   `memory/builds/aDeclaredBound/spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md` among them at base, and
   `memory/project/spec-token-waivers.txt` · by value: `tools/check-spec-tokens.py`, which reds an untracked
-  citation, reads the registry (`:256`) and reds a stale row (`:1666`).
+  citation, reads the registry (`tools/check-spec-tokens.py#read_waivers`) and reds a stale row
+  (`tools/check-spec-tokens.py@a9fc9498:2579-2582`); and `ratchet.py never-gains`, which grades each
+  `widened:` row against its record (`tools/memory-tree/ratchet.py@8ee6db8a:37-39`).
 - **S29** — id 47. `check_roles_install`'s docstring
-  (`tools/govkit/selftest.py:2769`) says the case expects one agent type per agent-true role and every seeded
-  house overlay, as `TOOL-dBoundRoles-37`'s `derive_roles_expected` computes, with no number. Observed by
-  AC29.
+  (`tools/govkit/selftest.py#check_roles_install`) says the case expects one agent type per agent-true role and every seeded
+  house overlay, as `TOOL-dBoundRoles-37`'s `derive_roles_expected` computes, with no number. At HEAD it
+  already types none, its counts read from the source kit (TOOL-dWitnessedBar-23 S6), so the pass names
+  `derive_roles_expected` there. Observed by AC29.
 - **S32** — id 50. `print_stage_efforts` and every `.get("stages")` reader
-  at the build run's base (`tools/roles/handoff.py:463`, `:484`; `tools/roles/roles_lib.py:443`, `:576`;
-  `tools/roles/check_roles.py:297`) read unit 22's rows through `load_workflows` and `derive_stage_map`.
-  Observed by AC32.
+  at the build run's base read unit 22's rows through `load_workflows` and `derive_stage_map`. At HEAD
+  `c93f676e2` those are `print_harness_args` and `print_stage_efforts` (`tools/roles/handoff.py@c6d87bbb:797`,
+  `@c6d87bbb:818`), `load_policy` and `resolve_stage_efforts` (`tools/roles/roles_lib.py@5cf7c56f:840`,
+  `@5cf7c56f:1030`), `check_roles` and `print_tag_rows` (`tools/roles/check_roles.py@15b68874:372`,
+  `@15b68874:521`), `derive_effort_index` (`tools/roles/render_agents.py@f7385dcf:267`) and the
+  adopter suite's staged-workflow probe (`tools/roles/adopt-roles.test.sh@70af238b:332`), which AC32's
+  pathspec also reads. Observed by AC32.
 - **S34** — id 53. The pass counts the tracked specs and
   brief records under `memory/builds/` holding a backticked `blob:`, `record:` or `cmd:` span, renders a
   builder work order handing each such file of this build as `input:spec` through `TOOL-dBoundRoles-41`'s
@@ -171,9 +197,10 @@ id is its own item, even where the report merged two; ids 47 and 53 are the MEDI
 - **S38** — id 58. `house_overlays_to_instructions.py`'s up
   skips a file whose unit already holds a byte-equal text, removes that file, and refuses only on a tag
   holding different text (§8 F12). Observed by AC38.
-  **Readers:** by name: S10's three overlay readers and `tools/roles/render_agents.py:323-329`, whose
-  self-test fixture writes one; READER NOT IN TREE: the step program, unit 19's · by value: S10's
-  `render_role` read, until unit 19 re-points it to the level-5 unit.
+  **Readers:** by name: S10's three overlay readers and `tools/roles/render_agents.py`, whose self-test
+  fixture writes one; READER NOT IN TREE: the step program, unit 19's · by value: S10's
+  `render_role` read, until unit 19 re-points it to the level-5 unit; the fixture's write,
+  `tools/roles/render_agents.py@f7385dcf:404-410`.
 - **S39** — id 59. `readWorkOrderAllowance` reads the transcript's
   first JSONL line whole up to 8 MiB, denying past it, and denies a typed agent whose first record does not
   parse rather than fall back to the class verdict. Unit 13's ledger answers its Migration's assumption of specs
@@ -185,9 +212,10 @@ id is its own item, even where the report merged two; ids 47 and 53 are the MEDI
   target with the policy kit and no roles kit, exits non-zero naming the roles kit as rule 7's home and its
   install command, leaving `agent-cap.js` wired; its witness checks the same; a govkit case holds it.
   Observed by AC41.
-  **Readers:** by name: `.claude/settings.json:9`, `tools/settings-merge.py:117` (`HOOK_MARKER`),
+  **Readers:** by name: `.claude/settings.json`, `tools/settings-merge.py` (`HOOK_MARKER`),
   `tools/hooks/kit.toml` and the rest unit 25 S8 lists; READER NOT IN TREE: the step program, unit 25's
-  · by value: `.claude/settings.json`'s `Workflow|Agent` matcher, which runs the wired hook and rule 7.
+  · by value: `.claude/settings.json`'s `Workflow|Agent` matcher (`.claude/settings.json@0428723e:9`),
+  which runs the wired hook and rule 7, and `HOOK_MARKER` (`tools/settings-merge.py@54bc224f:213`).
 - **S43** — id 64. `tools/loop/placement.py place --return <file>`
   takes `--agent <agent-id>` and refuses unless the file equals that agent's last assistant text and its
   `.meta.json` names `gov-orienter`, both printed by S56's `handoff.py agent-return`, run as a subprocess
@@ -215,22 +243,24 @@ id is its own item, even where the report merged two; ids 47 and 53 are the MEDI
   negative. Observed by AC52.
 - **S53** — id 30. `derive_fact_key`'s `blob12` for a file equals the
   first 12 hex digits `git hash-object` prints for its LF bytes, the call `verb_brief` makes at
-  `tools/unattended/unattended.sh:13029`. Observed by AC53.
+  `tools/unattended/unattended.sh@7548da57:16915`. Observed by AC53.
 - **S54** — id 34. `TASK_FIELDS` is `lib.READ_FAMILIES["task"]`,
   and `INPUT_NAMES` is `READ_FAMILIES["input"]` less a named tuple of render-filled inputs,
   `RENDER_FILLED_INPUTS`, holding `work-order`. Observed by AC54.
-- **S55** — id 39. `load_agent_transcript` (`tools/roles/handoff.py:616`) also returns
+- **S55** — id 39. `load_agent_transcript` (`tools/roles/handoff.py#load_agent_transcript`) also returns
   the first `user` record's text and the last assistant text; `check-return` reads through it, reads the
   marker with `extract_prompt_marker` and checks ids with `PATH_ID_RE`, and walks no JSONL of its own.
   Observed by AC55.
 - **S56** — id 40. `resolve_agent_transcript(session_dir, agent_id)` is a
-  module-level function of `handoff.py` in place of the closure `read_transcript` (`handoff.py:825-828`), and
+  module-level function of `handoff.py` in place of the closure `read_transcript`
+  (`tools/roles/handoff.py@c6d87bbb:1273-1276`, inside `print_agent_lines`), and
   `print_agent_lines`, `--framed-by` and the verb `agent-return --agent <id> [--session <file>]` call it; the
   verb finds the session as `agents` does and prints one JSON object, the agent's last assistant text (S55)
   and its meta `agentType`, for S43. Observed by AC56.
 - **S57** — id 41. `RUN_ID_RE`, `WORKFLOW_RUNS_DIR` and the session
   directory's derivation sit in `scratch-guard.js`'s exports; `format-guard.js` imports them in
-  place of its own (`format-guard.js:101-103`), and `readWorkOrderAllowance` uses them. Observed by AC57.
+  place of its own (`tools/hooks/format-guard.js@cbfbcff2:113-115`), and `readWorkOrderAllowance` uses them.
+  Observed by AC57.
 
 ## 3. Non-goals (OUT)
 
@@ -299,7 +329,7 @@ tag role.<slot>          a gov role, slot = the role file's stem
 tag role.adopter.<name>  a repository role, slot = <name>; refused where <name> is a gov slot
 ```
 
-A slot is an agent type and reaches paths, so it satisfies `PATH_ID_RE` (`tools/roles/handoff.py:121`),
+A slot is an agent type and reaches paths, so it satisfies `PATH_ID_RE` (`tools/roles/handoff.py@c6d87bbb:181`),
 which a dot fails.
 
 ### Inventory
@@ -348,6 +378,7 @@ Live at landing, at order 28, after every unit it repairs.
 - `memory/project/method-carriers.txt`
 - `memory/project/testsuite-count-waivers.txt`
 - `memory/project/spec-token-waivers.txt`
+- `memory/builds/dBoundRoles/build/<date>-build-TOOL-dBoundRoles-43-widen-<n>.md` (new, S28 and §8 F18)
 - `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-25.md`
 
 ### Alternatives rejected
@@ -425,7 +456,8 @@ from the repo root: one govkit case function, no suite.
   and `FAILURES` prints empty.
   Red when: the adopter's registry keeps a row for a deleted type.
 - **AC19** — When `git grep -n -E "policy\.toml|\.governance/"` runs over `tools/hooks/scratch-guard.js` and
-  the roles pack's spawn guard, it prints only `readPolicy`'s import and locator lines; over a scratch copy
+  the roles pack's spawn guard, it prints only `readPolicy`'s import and locator lines, the resolver port's
+  receipt comment among them; over a scratch copy
   that reads the policy file with `fs` it prints that line too.
   Red when: a hook parses the policy file beside the reader.
 - **AC21** — When `git grep -n -E "policy\.py.*get|from policy import|import policy" -- 'tools/roles/*.py'`
@@ -448,7 +480,8 @@ from the repo root: one govkit case function, no suite.
   the pack's suite holds a `PASS ($n assertions)` line beside its `FLOOR_ASSERTIONS`.
   Red when: the waiver names a suite no leg runs, or the new suite prints no count.
 - **AC28** — When `memory/project/spec-token-waivers.txt` is read, it holds one row per retired hook path
-  and one for the old diff reviewer's house file, each reason naming the citing specs.
+  and one for the old diff reviewer's house file, each `widened:` to a record whose Reason names the
+  citing specs.
   Red when: a live spec's citation of a deleted file has no row.
 - **AC29** — When `grep -n -E 'nine agent types|ten seeded' tools/govkit/selftest.py` runs it prints nothing.
   Red when: the docstring keeps the counts the code no longer types.
@@ -494,7 +527,7 @@ from the repo root: one govkit case function, no suite.
 - **AC45** — When `handoff.py render --role gov-researcher --input work-order=x` runs, it exits non-zero
   naming `work-order`.
   Red when: the driver can retype the work order.
-- **AC46** — When `validate_return("gov-orienter", text)` checks a return carrying `outcome`, `card` and the
+- **AC46** — When `check_return("gov-orienter", text)` checks a return carrying `outcome`, `card` and the
   four placement keys, it returns no defect, and `parse_return_template` over the role's `return` lists all
   six.
   Red when: the template drops `outcome` or `card`.
@@ -589,6 +622,16 @@ F9 and F14 moved to `TOOL-dBoundRoles-44` with S31 and S42.
   and -49 S11's steps; S10, S23 and AC23 wait on it. Recommendation (a). RESOLVED (owner, 2026-11-05): (a). The ask its build run files
   in dOrderedCharter's `BACKLOG.md` is "PLAY-dOrderedCharter-32 S8: an `overlay.py` verb writing rows through `write_overlay_units`, re-key mode
   included, for govkit step programs".
+- **F18 — What disposition does a gained method-carriers row carry (S16, S17)?** At HEAD the register
+  is a declared-set ledger, so a gained row is admitted under any disposition the factory reads
+  (`tools/memory-tree/legacy_ledger.py@eca5d963:140`). Its reason is a record's, never the row's.
+  Options: (a) in gov's tree, `ratchet.py widen method-carriers --key <path> --reason <why> --unit
+  TOOL-dBoundRoles-43`, as `memory/project/method-carriers.txt@eb65744f:45` records a widened row; in
+  an adopter's tree, the step's merged row keeps the sha and disposition of the first row it replaces
+  in file order, since it declares the same pointer under the merged name; (b) `seeded` at the pass's
+  sha in both trees; (c) the widen door in both. (b) claims a seed that never ran. (c) writes a record
+  naming a gov unit into an adopter's memory. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3,
+  the survivor. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -606,6 +649,17 @@ F9 and F14 moved to `TOOL-dBoundRoles-44` with S31 and S42.
 - rev-7 · 2026-11-22 · §7 · the leg line gains `policy fixtures`, whose guard holds
   `tools/roles/roles_lib.py` that §4 Files touched names, by
   `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
+- rev-8 · 2026-11-22 · S1 · S5 · S10 · S16 · S17 · S19 · S22 · S27 · S28 · S29 · S32 · S38 · S41 · S53 ·
+  S55 · S56 · S57 · §4 · §4 Files touched · AC19 · AC28 · AC46 · §8 F18 · re-grounded at HEAD `c93f676e2`
+  by `2026-11-22-prompt-TOOL-dBoundRoles-25-reground-n-brief`. Every bare line citation is a symbol or
+  a blob-pinned line. The spec-token and method-carriers registers are ledgers now. S28's rows are
+  gained through `ratchet.py widen`, the one door for a shrink-only gain, their reasons in widen records,
+  and AC28 is reworded to that form. S16 and S17 state the ledger grammar, and F18 resolves the
+  disposition a gained carrier row takes. S32 names the eight `.get("stages")` readers at HEAD, the
+  adopter suite's probe among them, which AC32's pathspec reads. S19 and AC19 name the resolver port's
+  receipt comment as a locator line. S22 names the alias line that goes. The end states of S1 and S29
+  already hold at HEAD. `validate_return` is renamed `check_return`, the name the lexicon answers, which
+  unit 5 builds; that and unit 25's pack, port and step are checked against those units' specs, not HEAD.
 
 ## 10. Reuse audit
 
