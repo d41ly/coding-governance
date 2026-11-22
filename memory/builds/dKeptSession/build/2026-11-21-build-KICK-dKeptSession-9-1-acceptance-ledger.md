@@ -4,8 +4,8 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on win32
 at the pass's base `7f53e589` by probes under the host temp directory: one builds the runlog arm's own
-fixture through `selftest.py`'s builders, without running any arm, and runs `python
-tools/runlog/runlog.py extract --orient` over it once per committed policy file; one builds the
+fixture through `selftest.py`'s builders, without running any arm, and runs the kit's
+`runlog.py extract --orient` over it once per committed policy file; one builds the
 `orient-calls` census plant under `warn`, `refuse` and `zero` through `check_policy.py`'s own
 `run_cap_mode`, the function the case calls, without running the case. `python tools/lexicon/lexicon.py`
 exited 1 on its verb-offender pin, 1432 offenders over a pin of 1421 (DERIVED, that run), the count
