@@ -20,7 +20,12 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every roster spec was re-grounded on HEAD before this dispatch, so its citations hold at HEAD or name the earlier
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
-- This is the second dispatch. The first builder (run `wf_1aee65de-95e`) found a positional `MARKER_RE` reader in
+- This is the third dispatch. The second builder (run `wf_25370bd3-656`) found the help page and usage row the docs
+  rule owes, the kickoff manifest re-stamp, a render route a builder may not run, the return predicate's two readings
+  and readers with no field record; rev-7 folds all five (§8 F6 for the predicate). The pass edits only
+  `tools/memory-tree/HYGIENE.template.md`: the main loop renders `memory/HYGIENE.md` in a follow-up commit, so do not
+  write it. The pass re-stamps the kickoff manifest `memory/guides/SESSION-KICKOFF.md`.
+- Earlier: this was the second dispatch. The first builder (run `wf_1aee65de-95e`) found a positional `MARKER_RE` reader in
   `tools/roles/render_agents.py`, a seeded file only a later unit admitted, and one stale count; rev-6 folds all three,
   and this unit now admits `F:work-order-legacy.txt` in hygiene check 3 itself (§8 F5), its guide row rendered into
   `memory/HYGIENE.md` by `kit-dogfood-parity.test.sh --render`.

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-17 — every work order's marker carrying `item=`, every return naming the work order it `answers`, today's population seeded
 
-**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 8 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 8 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0182@0cc5ed88 whole
 
@@ -47,16 +47,25 @@ it arms (the memory plan's `[sites]` work-order row and its `[gates]` "work orde
   (`tools/hooks/agent-cap.js@935a910d:646`) both take `item=` as an optional field between `unit=` and
   `path=`, so a marker written before this unit still parses, and both move to named groups. Observed
   by AC1 and AC2.
-- **S2** — Every reader reads by name, never by position: `check_handoff`
-  (`tools/roles/handoff.py#check_handoff`, today groups 4, 5 and 6), `print_agent_lines`
-  (`tools/roles/handoff.py#print_agent_lines`, groups 1 to 4), `scan_stand_in_declarations`
-  (`tools/roles/roles_lib.py#scan_stand_in_declarations`, groups 1 to 3), `read_handoff_edges`
-  (`tools/playbook/edge_grammar.py#read_handoff_edges`, groups 3 and 2, the work-order `serves`
-  edge PLAY-dOrderedCharter-28 S5 built, which imports `MARKER_RE` from the roles kit found by
-  `resolve_kit_dir`) and `extractHandoffMarker` (`tools/hooks/agent-cap.js@935a910d:651-658`, `m[1]` to
-  `m[6]`), each returning an `item` beside the fields it returned before; and the selftest handoff arm
-  of `tools/roles/render_agents.py` (`tools/roles/render_agents.py@299502fa:537-538`, groups 5 and 6),
-  which rewrites a planted marker's two shas and moves to the `role_sha` and `task_sha` groups, since
+- **S2** — Every reader reads by name, never by position. One reader returns `item`:
+  `extractHandoffMarker` (`tools/hooks/agent-cap.js@935a910d:651-658`, `m[1]` to `m[6]` today), each
+  object it returns gaining `item` beside the fields it returned before, as `{ line, role, build,
+  unit, item, path, taskSha }`, `item` the field's string, `-` included, or `null` when the marker
+  carries none; TOOL-dBoundRoles-3 S5's spawn check reads it. In Python a `MARKER_RE` match's
+  `group("item")` is the string or `None`, and R16 reads it there. Every other reader returns what it
+  returned before and reads no `item`:
+
+  | Reader | Reads by name | Returns, unchanged | What it does with `item` |
+  |---|---|---|---|
+  | `check_handoff` (`tools/roles/handoff.py#check_handoff`, today groups 4, 5 and 6) | `path`, `role_sha`, `task_sha` | `(ok, lines)`, check lines | nothing: R16 grades its presence and the writer its shape |
+  | `print_agent_lines` (`tools/roles/handoff.py#print_agent_lines`, groups 1 to 4) | `role`, `build`, `unit`, `path` | the governing doc's `agent` and `returned` lines | nothing: neither line's shape holds an item field |
+  | `scan_stand_in_declarations` (`tools/roles/roles_lib.py#scan_stand_in_declarations`, groups 1 to 3) | `role`, `build`, `unit` | `{"path", "role", "build", "unit"}` per declaration | nothing: R15 in `tools/roles/check_roles.py#check_roles`, its one caller, reads `build` and `role` |
+  | `read_handoff_edges` (`tools/playbook/edge_grammar.py#read_handoff_edges`, groups 3 and 2) | `unit`, `build` | the work-order `serves` edges | nothing: reading `item=` as an edge is PLAY-dOrderedCharter-28's adapter table (§3) |
+
+  `read_handoff_edges` is the edge PLAY-dOrderedCharter-28 S5 built, which imports `MARKER_RE` from
+  the roles kit found by `resolve_kit_dir`. The selftest handoff arm
+  of `tools/roles/render_agents.py` (`tools/roles/render_agents.py@299502fa:537-538`, groups 5 and 6)
+  rewrites a planted marker's two shas and moves to the `role_sha` and `task_sha` groups, since
   by number it would rewrite the path and the role-sha and still pass on the envelope defect alone
   (the two lines are that file's only positional group reads at `299502fa`, PINNED). `readHandoffVia` in
   `tools/hooks/format-guard.js` reads `extractHandoffMarker`'s `path` field by name and is unchanged;
@@ -85,8 +94,11 @@ it arms (the memory plan's `[sites]` work-order row and its `[gates]` "work orde
   `task-sha` differs from that work order's marker. Each is one `roles: <path>: R16 — <what>` line.
   A path the legacy home lists is skipped. Observed by AC3, AC4 and AC5.
 - **S6** — The legacy population, seeded once through `test.seed`: `python check_roles.py
-  --legacy-rows --out <path>` writes every path R16 would refuse, one per line under a `#` header, and
-  the pass runs TOOL-dWitnessedBar-15 S4's unregistered form, `legacy_ledger.py seed --home
+  --legacy-rows --out <path>` writes every path R16 would refuse, one per line under a `#` header
+  naming the commit it was seeded at. The seed's argv carries no sha, so `--legacy-rows` reads the
+  head itself, `git -C <root> rev-parse --verify --quiet HEAD^{commit}`, and stamps the full sha it
+  prints; where that prints no commit it exits 2 naming git's line and writes nothing. The pass runs
+  TOOL-dWitnessedBar-15 S4's unregistered form, `legacy_ledger.py seed --home
   <MEMORY_ROOT>/project/work-order-legacy.txt -- python <roles kit>/check_roles.py --legacy-rows --out
   {out}`, committing the home it writes. `adopt-roles.sh` runs the same seed in an adopter, through the
   memory-tree kit's copy found by `resolve_kit_dir`, absent-only. With no home, R16 prints one
@@ -95,13 +107,29 @@ it arms (the memory plan's `[sites]` work-order row and its `[gates]` "work orde
   named case `F:work-order-legacy.txt` beside `F:role-stand-in-waiver.txt`
   (`tools/memory-tree/check-memory-hygiene.sh@c2fc4073:1104`), with a comment naming the roles kit as
   its shipper; `tools/memory-tree/HYGIENE.template.md` gains its registry row in the kit-shipped
-  shape of `pass-order-waiver.txt`'s (`tools/memory-tree/HYGIENE.template.md@4ca9528c:168`);
-  `memory/HYGIENE.md` is re-rendered by `bash tools/memory-tree/kit-dogfood-parity.test.sh --render`
-  (`tools/memory-tree/kit-dogfood-parity.test.sh@ddb1994d:6`); and `.memory-tree.conf`'s
-  `PROJECT_REGISTRY_EXTRA` does not carry it. Observed by AC5, AC6 and AC7.
+  shape of `pass-order-waiver.txt`'s (`tools/memory-tree/HYGIENE.template.md@4ca9528c:168`); and
+  `.memory-tree.conf`'s `PROJECT_REGISTRY_EXTRA` does not carry it. The pass edits only the template:
+  `memory/HYGIENE.md` is rendered from it by `bash tools/memory-tree/kit-dogfood-parity.test.sh
+  --render` (`tools/memory-tree/kit-dogfood-parity.test.sh@ddb1994d:6`), a `.test.sh` file a builder
+  may not run, so the main loop runs it in a follow-up commit whose subject names
+  `TOOL-dBoundRoles-17`, the route TOOL-dBoundRoles-21's mirror took. Since
+  `tools/memory-tree/check-memory-hygiene.sh` is on the `watch:` list of the kickoff manifest
+  `memory/guides/SESSION-KICKOFF.md`, the pass commit re-stamps that manifest's `last-audit:` line,
+  its datetime advanced and its sha `HEAD` at the stamp, as the manifest's stamp rule says, with a
+  delta line in the commit message. Observed by AC5, AC6 and AC7.
 - **S7** — The docs: `tools/roles/README.md`'s handoff section and the marker paragraph of
   `tools/hooks/README.md` spell the marker with `item=`, the `**Answers:**` line and R16; the R-list
-  in `check_roles.py`'s docstring gains R16. Observed by AC7.
+  in `check_roles.py`'s docstring gains R16. The user page `help/roles.md` gains, in step 3 of "How a
+  task reaches an agent", the `--item <tag>` flag and the marker's `item=`, and one paragraph saying a
+  research return records `**Answers:** <work order path> task-sha=<12hex>` beside its `**Serves:**`
+  line and that `check_roles.py`'s R16 refuses a work order without `item=` and a return without a
+  matching line, except the paths `work-order-legacy.txt` lists. The render verb's `[[usage]]` row in
+  `tools/govkit/usage.toml` (`tools/govkit/usage.toml@6e4174d5:113`) gains `--item=` after `--unit=`
+  in its authored `flags` list, and the page's anchor for that row
+  (`help/roles.md@951d353a:114`, today `1e3b1deb`) moves to the fingerprint
+  `tools/govkit/docs_leg.py#derive_usage_fingerprint` gives the new row, `caf8a37a` (DERIVED at
+  writing from the row at `6e4174d5` with `--item=` inserted and `{prefix}` resolved to `tools`, as
+  `tools/govkit/docs_leg.py#read_usage_rows` resolves it). Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -136,14 +164,15 @@ Measured over gov at `4283cb44` on 2026-10-25 (PINNED; the pass re-derives each 
 | Population | Predicate | Today | Graded |
 |---|---|---|---|
 | handoffs | a file `<MEMORY_ROOT>/builds/<slug>/prompts/<date>-prompt-<id>-<n>-<tail>[-<suffix>].md` whose `<tail>` is a catalogue role's slot without `gov-`, the name `derive_prompt_name` (`tools/roles/handoff.py#derive_prompt_name`) writes | 536 of 1297 prompt records; all 536 marked, none with `item=` | marker present, `item=` present |
-| returns | a record under `<MEMORY_ROOT>/builds/<slug>/build/` whose `**Serves:**` kind is `research` and whose text names exactly one handoff's path | 213; none with `**Answers:**` | `**Answers:**` naming that handoff, its `task-sha` equal to the handoff marker's |
+| returns | a record under `<MEMORY_ROOT>/builds/<slug>/build/` whose `**Serves:**` kind is `research` and whose text, its own `**Answers:**` line set aside, names exactly one handoff: one handoff's file name appears in it, in whatever path cites it, repo-relative, `../prompts/` or bare (§8 F6) | 213; none with `**Answers:**` | `**Answers:**` naming that handoff, its `task-sha` equal to the handoff marker's |
 
 The other 761 prompt records are mandates, packets and briefs (`build-brief` 239, `spec-brief` 33,
 `revision` 33, the packet 22, `run-mandate` 21 among them), handed to a harness or written by the owner;
 a `build/` record naming two or more handoffs (21 today) is a synthesis, not a return; 56 deviation records and
 3 acceptance ledgers name one handoff and are not `research`. What the predicates do not see: a
 handoff written under another name, a return recorded under another kind or naming its work order
-by no path, and a return that names the wrong one of two work orders it cites.
+by no path, a return that names the wrong one of two work orders it cites, and a return whose only
+naming of its work order is its `**Answers:**` line, which is then no return and its line not graded.
 
 ### The marker regex
 
@@ -210,8 +239,10 @@ Live at landing on the `roles catalogue` leg, which runs `check_roles.py`.
 - `tools/playbook/edge_grammar.py` (`read_handoff_edges`, by name)
 - `memory/project/work-order-legacy.txt` (written by the seed)
 - `tools/memory-tree/check-memory-hygiene.sh` (check 3's named case, §8 F5)
-- `tools/memory-tree/HYGIENE.template.md` (the registry row)
-- `memory/HYGIENE.md` (its render)
+- `tools/memory-tree/HYGIENE.template.md` (the registry row; its render is the main loop's follow-up, S6)
+- `memory/guides/SESSION-KICKOFF.md` (the `last-audit:` re-stamp, S6)
+- `help/roles.md` (the user page, S7)
+- `tools/govkit/usage.toml` (the render verb's `flags`, S7)
 
 ### Alternatives rejected
 
@@ -233,7 +264,10 @@ Live at landing on the `roles catalogue` leg, which runs `check_roles.py`.
   was run over the real tree before it was chosen.
 - testing — AC1 to AC7 by a pass; the arms of §7 at the close.
 - migration — as §4 says.
-- user docs — none owed: no page under `help/` describes handoffs; the two READMEs change by S7.
+- user docs — owed: `help/roles.md` describes `handoff.py render` in its steps and anchors the
+  render verb's usage row, so S7 gives it `--item`, the `**Answers:**` obligation and the R16
+  refusal, and moves the anchor with `tools/govkit/usage.toml`'s flag list; the `docs` leg grades the
+  anchor. The two READMEs change by S7.
 
 ## 6. Acceptance criteria
 
@@ -265,23 +299,33 @@ Live at landing on the `roles catalogue` leg, which runs `check_roles.py`.
   pass's seed, the home under `memory/project/` lists every path it prints, and `python
   check_roles.py` reports no R16 defect over gov; with the home committed, `bash
   tools/memory-tree/check-memory-hygiene.sh --only 3` names no finding for it, and `grep -n
-  'work-order-legacy' .memory-tree.conf` prints nothing.
+  'work-order-legacy' .memory-tree.conf` prints nothing; the home's `#` header names a full 40-hex
+  sha that `git cat-file -t` reads as a commit; and `git show <pass commit> --
+  memory/guides/SESSION-KICKOFF.md` shows its `last-audit:` line moved to a datetime later than the
+  one the pass commit's parent carries.
   Red when: the seed misses a legacy path, so today's tree reds, or check 3 refuses the home, or
-  admits it through `PROJECT_REGISTRY_EXTRA`.
+  admits it through `PROJECT_REGISTRY_EXTRA`, or the header names no commit, or the pass edits the
+  watched `check-memory-hygiene.sh` and leaves the manifest's stamp.
   figure: the counts are DERIVED at observation; 536 and 213 are PINNED, measured 2026-10-25.
 - **AC6** — When the home is removed from the AC3 fixture, `python check_roles.py` prints one
   `roles: note: R16 unarmed` line naming the seed command and its summary counts no graded handoff.
   Red when: an absent home reads as a clean pass, or as 749 defects.
 - **AC7** — When `grep -n 'item=' README.md` runs in `tools/roles/` and in `tools/hooks/`, each names
   the field in the marker it documents, and `grep -n 'R16' check_roles.py` names the rule in the
-  docstring's list; `grep -n 'work-order-legacy' tools/memory-tree/HYGIENE.template.md
-  memory/HYGIENE.md` names the registry row in each.
+  docstring's list; `grep -n 'work-order-legacy' tools/memory-tree/HYGIENE.template.md` names the
+  registry row at the pass commit, and the same grep over `memory/HYGIENE.md` names it at the main
+  loop's follow-up render commit (S6), which this half of the criterion is observed at. `grep -n -e
+  '--item' -e 'Answers:' -e 'R16' help/roles.md` names each; and a `python -c` passing the render
+  verb's `[[usage]]` row of `tools/govkit/usage.toml`, its `entry` prefix resolved to `tools`, to
+  `docs_leg.derive_usage_fingerprint` prints the eight hex the page's usage anchor for that row
+  carries, and the row's `flags` hold `--item=`.
   Red when: a README still spells the six-field marker as the whole grammar, or the hygiene guide
-  omits the admitted registry.
+  omits the admitted registry, or the help page omits the flag, the line or the rule, or its render
+  anchor still carries `1e3b1deb` after the flag list moved.
 
 ## 7. Gates
 
-`roles catalogue` · `roles adopter self-test` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `playbook render selftest` · `govkit acceptance matrix` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `recall floor` · `recall floor arms` · `branch-guard self-test` · `kit/dogfood doc parity` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles adopter self-test` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `playbook render selftest` · `govkit acceptance matrix` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `recall floor` · `recall floor arms` · `branch-guard self-test` · `kit/dogfood doc parity` · `docs` · `govkit selftest` · `govkit refusal join` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC3 AC4 AC6 · a planted unmarked handoff and a planted return with a wrong `task-sha` after the fixture's seed · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC2 · a rule-6 case whose prompt carries the marker with `item=`, beside the existing six-field cases kept as the legacy shape · none
@@ -329,6 +373,26 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC2 · a rule-6 case whose prom
   feature-rich survivor, extending check 3's named-case seam, taken by the main loop on the first
   builder's divergence `2026-11-22-build-TOOL-dBoundRoles-17-1-builder-return`.
   widens: none · relaxes: none
+- **F6 — Which reading of the return predicate, and does the `**Answers:**` line's own path count?**
+  "Names exactly one handoff's path" read two ways: (a) a handoff's repo-relative path string
+  `memory/builds/<slug>/prompts/<name>.md` appears in the text; (b) a handoff's file name appears in
+  any path that cites it, repo-relative, `../prompts/` or bare. Beside either, the record's own
+  `**Answers:**` line (i) counts toward the naming or (ii) is set aside before the count. Probed
+  through git objects, every `.md` under `<MEMORY_ROOT>/builds/*/build/` against the handoffs §4's
+  first row selects: at `4283cb44`, (a) selects 52 research records and (b) 212, (b) also giving
+  exactly the pinned 21 syntheses and 56 deviation records, over the pinned 536 handoffs; at HEAD
+  `2675b020e`, (a) selects 94 and (b) 246, over 1434 handoffs (DERIVED by that probe, 2026-11-22).
+  The pinned 213 is one above (b)'s 212, a one-record difference the probe does not explain
+  (UNVERIFIED). No research record at either tree carries an `**Answers:**` line, so (i) and (ii)
+  select the same at both. (a) cannot reproduce the pin AC5 and AC6 carry. (i) makes the line under
+  grade its own reference: a return answering one handoff while its text names another names two,
+  leaves the population and is never graded, so S5's refusal of a path that is not the work order the
+  text names could fire only on a path naming no handoff; (ii) grades the line against the text's one
+  handoff and refuses it. RESOLVED (agent, 2026-11-22, delegated): (b) with (ii), M3's most
+  feature-rich survivor, (a) discarded by veto 1 against AC5's pinned figure and (i) satisfying less
+  of S5, taken by the main loop on the second builder's divergence
+  `2026-11-22-build-TOOL-dBoundRoles-17-2-builder-return`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -359,6 +423,18 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC2 · a rule-6 case whose prom
   AC5 and AC7 observing it, the unit 44 edge re-worded as that unit consuming it, and the leg line
   gaining `branch-guard self-test` and `kit/dogfood doc parity`, whose guards the new paths trip; S3's
   count of embedded `render_handoff` calls in `adopt-roles.test.sh` corrected from two to three.
+- rev-7 · 2026-11-22 · S2 · S6 · S7 · §4 · §5 · AC5 · AC7 · §7 · §8 F6 · folded
+  `2026-11-22-prompt-TOOL-dBoundRoles-17-spec-fix-2-brief`, handed as
+  `2026-11-22-prompt-TOOL-dBoundRoles-17-fix-2-spec-writer`, on the divergence
+  `2026-11-22-build-TOOL-dBoundRoles-17-2-builder-return`: S2 names `extractHandoffMarker` as the one
+  reader returning `item` and tables what each other reader returns and does with it; S6 has
+  `--legacy-rows` read the head for the home's header sha, re-stamps the kickoff manifest in the pass
+  commit and leaves the `memory/HYGIENE.md` render to the main loop's follow-up commit; S7 and §5 owe
+  `help/roles.md` and the render row of `tools/govkit/usage.toml`; Files touched gains both and the
+  manifest and drops `memory/HYGIENE.md`; AC5 observes the header sha and the re-stamp and AC7 the
+  page, the anchor and the follow-up render; the leg line gains `docs`, and `govkit selftest` and
+  `govkit refusal join`, whose guards `tools/govkit/usage.toml` trips; new F6 fixes the return
+  predicate's reading, probed at `4283cb44` and HEAD `2675b020e`.
 
 ## 10. Reuse audit
 
