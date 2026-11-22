@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-41 — the anchor check grades the text a work order authors, never the content it hands, by the block extents the render assembled
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -167,9 +167,14 @@ Live at landing, at order 20. Dispatch sorts a tie by id string
   `cmd:<command>` and `blob:roles_lib.py@0123456789ab:1-4`, the render exits 0 and writes its prompt file.
   Red when: the render refuses a span inside the handed spec's content.
   fixture: a scratch repository with the roles kit installed, under `%TEMP%`, short-pathed.
-- **AC2** — When the same render also passes `--input question=` holding a backticked `record:` anchor the
-  order does not hand, it exits non-zero naming that anchor and writes no file.
+- **AC2** — When the roles adopter fixture renders `handoff.py render --role gov-orienter` with
+  `--input prompt=` naming AC1's scratch spec and `--input question=` holding a backticked `record:`
+  anchor the order does not hand, it exits non-zero naming that anchor and writes no file.
   Red when: the graded text drops the typed argument, so an anchor to nothing in authored text passes.
+  fixture: `gov-orienter` reads `field.input.question, field.input.prompt?`
+  (`tools/roles/agents/gov-orienter.agent.md@b8554ec7:10`), where `gov-builder` reads no
+  `input:question` (`tools/roles/agents/gov-builder.agent.md@59661aee:9`) and the render refuses an
+  input its role does not read, exit 2 (`tools/roles/handoff.py@c6d87bbb:1477-1480`).
 - **AC3** — When the AC1 render's prompt file is compared with a render of the same inputs before this
   unit's change, its `## Task` bytes and its marker's task-sha are equal.
   Red when: building the graded text changes the hashed section.
@@ -211,6 +216,11 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · a builder render h
   pinned to blob `b6d461b8` and the report's figure carries its pin. The edges to units 4, 23 and 24
   were checked against their specs and hold, unit 24's against its rev-6; every other moved citation
   re-pointed to a symbol or a pinned line.
+- rev-6 · 2026-11-22 · AC2 · folded by `2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief`, item
+  3: AC2's render pair moves to `gov-orienter`, its typed `--input question=` beside a handed
+  `--input prompt=`, since `gov-builder` reads no `input:question` and the render exits 2 on it at
+  HEAD; the pair is the one `TOOL-dBoundRoles-47` §8 F2 and `TOOL-dBoundRoles-52` S1 state, checked
+  against their specs. AC2 keeps its number; nothing else moved.
 
 ## 10. Reuse audit
 

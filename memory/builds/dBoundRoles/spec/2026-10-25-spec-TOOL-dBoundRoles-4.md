@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-4 — the prompt writer composing every role's task from the driver's details
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 17 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 17 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0169@60524f05 whole
 
@@ -63,7 +63,7 @@ bound by hash, with the spawn guard refusing an unframed task while `prompts.aut
   `--session` of the render's own (§8 F6). Its agent type, the `type` `load_agent_transcript`
   (`tools/roles/handoff.py#load_agent_transcript`) reads from the `.meta.json` beside it, must be
   `gov-prompt-writer`; its final return, read as `check-return` reads one (TOOL-dBoundRoles-5 S2), must
-  pass `validate_return` (TOOL-dBoundRoles-5) with `outcome` `framed` and carry `job`
+  pass `check_return` (TOOL-dBoundRoles-5) with `outcome` `framed` and carry `job`
   and `nostop`, and its first record's marker names the prompt writer's work order. The destination's
   `## Task` gains one block per field the return carries, `### framing:job`, `### framing:population`,
   `### framing:added` and `### framing:no-stop`, each holding its field verbatim, appended to the blocks
@@ -102,7 +102,7 @@ bound by hash, with the spawn guard refusing an unframed task while `prompts.aut
 
 - **consumes-from** `TOOL-dBoundRoles-1` — `gov-prompt-writer`, the role file whose fields S2 sets
 - **consumes-from** `TOOL-dBoundRoles-3` — the work order's blocks, its `allowance` among them, which `--for` hands the prompt writer as content
-- **consumes-from** `TOOL-dBoundRoles-5` — `validate_return`, which checks the prompt writer's return before its framing enters a work order
+- **consumes-from** `TOOL-dBoundRoles-5` — `check_return`, which checks the prompt writer's return before its framing enters a work order
 - **consumes-from** `TOOL-dBoundRoles-10` — `prompts.author` and `resolvePromptsAuthor`, the switch under which rule 6 applies S4
 - **hands-off** `TOOL-dBoundRoles-23` — the `### framing:` blocks and the `Framed by:` line, which the default frame places in skeleton order
 - **consumes-from** `TOOL-dBoundRoles-38` — the fence-aware `extractHandoffMarker`, through which S4's exactly-one-marker check reads the prompt writer's file, its `input:work-order` content now fenced (id 52 of the round-1 spec audit)
@@ -217,7 +217,7 @@ sets `requesting-worker-rendered` keeps today's rule 6.
   the task carries `### framing:job` and `### framing:no-stop` holding those texts byte for byte, and one
   `Framed by:` line naming the prompt writer's prompt path and task-sha; a transcript whose return lacks
   `nostop`, or whose agent type is `gov-researcher`, refuses naming the failed condition.
-  Red when: the framing is taken from a return `validate_return` refuses, or from another role.
+  Red when: the framing is taken from a return `check_return` refuses, or from another role.
   fixture: a session file under a fixture `CLAUDE_CONFIG_DIR`, named by `CLAUDE_CODE_SESSION_ID`, with
   the agent's `agent-<id>.jsonl` in its `subagents` folder and its `.meta.json` beside it; the tree
   holds none today.
@@ -249,7 +249,7 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 · its self-test renders
   writer writes; (c) the driver passes it as an `--input` value. (b) gives a role whose job writes
   nothing a write class; (c) puts the framing through the driver's context, the noise RL-4 removes.
   RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the most feature-rich option no veto refuses,
-  tie-broken by reuse of the transcript reader and of `validate_return`. widens: none · relaxes: none
+  tie-broken by reuse of the transcript reader and of `check_return`. widens: none · relaxes: none
 - **F2 — "Every role's task": do harness stage prompts pass through the prompt writer?** Options: (a)
   direct spawns only, harness stages left to the executor that renders their work orders; (b) every
   harness stage spawns a prompt writer first. (b) doubles every harness fan and puts a rendered work
@@ -306,6 +306,10 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 · its self-test renders
   `TOOL-x-1`, and pass the `--input spec=` gov-builder requires; AC4 reads "before this unit lands".
   The edges to units 1, 3, 10 and 38 were checked against their specs and hold; `tools/hooks/agent-cap.js`
   is still blob `935a910d`; every other moved citation re-pointed to a symbol or a pinned line.
+- rev-6 · 2026-11-22 · S3 · §3 · AC2 · §8 F1 · folded by
+  `2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief`, item 1: TOOL-dBoundRoles-5's checker is
+  `check_return`, the name the lexicon answers, as that unit's §8 F7 now resolves, so every spelling
+  of it here is renamed; rev-5's line keeps the old name as written. Nothing else moved.
 
 ## 10. Reuse audit
 

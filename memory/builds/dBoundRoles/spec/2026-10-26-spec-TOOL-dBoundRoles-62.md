@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-62 — the spawn guard's suite carries the floor unit 60's AC15 checks, and AC15 refuses a suite with no floor and names its units suite by suite
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -27,7 +27,8 @@ finding **id 21 at HIGH**, report item **H2**. No other id shares the item. Ids 
 missing floor beside the base-term defect at MEDIUM, item M1, and are `TOOL-dBoundRoles-63`'s.
 
 `TOOL-dBoundRoles-60` S24 and AC15 check "each suite's floor" over two suites. The spawn guard's suite
-has none at base: `grep -c FLOOR_ASSERTIONS tools/hooks/agent-cap.test.sh` prints 0, and unit 25 moves
+has none at base or at HEAD `29acd2d77`: `grep -c FLOOR_ASSERTIONS tools/hooks/agent-cap.test.sh` prints 0
+at both (PINNED, blobs `d8334459` and `97439f99`), and unit 25 moves
 that file to `tools/roles/spawn-guard.test.sh`. Unit 58's arm line on it ends in `none`. Over a suite with
 no `FLOOR_ASSERTIONS` line AC15 has nothing to sum, so it passes vacuously or errors, and it reports the
 suite as covered. AC15 also never says which units must appear in which suite's terms.
@@ -82,17 +83,20 @@ builds one step after it (order 34).
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at base `462d20f3` on 2026-10-26, and each code line re-read at HEAD `29acd2d77` on 2026-11-22 and
+pinned to the blob it was read at:
 
 - `grep -c FLOOR_ASSERTIONS tools/hooks/agent-cap.test.sh` prints 0, while `tools/hooks/scratch-guard.test.sh`
-  prints 3. The agent-cap suite counts `pass` and `fail` and ends `echo "---- $pass passed, $fail failed ----"`.
-- `tools/hooks/scratch-guard.test.sh:1303-1321` is the house shape: a comment whose first line names the
-  pin, a `<total> = <prior> + <added>` history whose later raises were counted by hand because a pass runs
-  no suite (`:1314-1318`), `FLOOR_ASSERTIONS=309`, and `[ "$n" -ge "$FLOOR_ASSERTIONS" ]` failing with the
-  executed count.
-- `tools/check-testsuite-counts.sh:93-98` reads a pinned floor as `^FLOOR_ASSERTIONS=[0-9]+$`, refuses
-  `0`, and requires the file to reference the variable; `:123-126` fails a floored suite that prints no
-  `PASS ($n assertions)` line.
+  prints 3, at base and at HEAD (PINNED, `29acd2d77`). The agent-cap suite counts `pass` and `fail` and
+  ends `echo "---- $pass passed, $fail failed ----"`, at HEAD `tools/hooks/agent-cap.test.sh@97439f99:954`.
+- `tools/hooks/scratch-guard.test.sh@f2a4351c:1303-1321` is the house shape: a comment whose first line
+  names the pin, a `<total> = <prior> + <added>` history whose later raises were counted by hand because a
+  pass runs no suite (`@f2a4351c:1314-1318`), `FLOOR_ASSERTIONS=309`, and `[ "$n" -ge "$FLOOR_ASSERTIONS" ]`
+  failing with the executed count. At HEAD the same shape is `tools/hooks/scratch-guard.test.sh@1bae0749:1856-1906`,
+  its floor 401 (PINNED, `@1bae0749:1905`).
+- `tools/check-testsuite-counts.sh@d4bad437:93-98` reads a pinned floor as `^FLOOR_ASSERTIONS=[0-9]+$`,
+  refuses `0`, and requires the file to reference the variable; `@d4bad437:123-126` fails a floored suite
+  that prints no `PASS ($n assertions)` line. The blob is the same at base and at HEAD.
 - `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-43.md` S27 has the pack's suite print
   `PASS (<n> assertions)` against a pinned `FLOOR_ASSERTIONS`, and its AC27 observes that line. Its
   spawn-guard arm line says only `FLOOR_ASSERTIONS` raised.
@@ -191,12 +195,19 @@ New arm: tools/roles/spawn-guard.test.sh · covers AC1 · the floor comparison, 
   (HIGH, item H2), on the report's fix.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-66, the minors batch of the round-1 audit of unit 64; nothing else moved.
+- rev-4 · 2026-11-22 · §1 · §4 Evidence · §10 · re-grounded at HEAD `29acd2d77` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-brief`. Every code citation is re-pointed to a symbol
+  or a blob-pinned line; the base readings stay on the base blobs, beside the HEAD lines: the agent-cap
+  suite still holds no floor and ends its pass-and-fail line at line 954, and the scratch-guard floor's
+  shape now runs to line 1906 at 401. Unit 25's move of the suite, unit 43's S27 and AC27 and its arm
+  line, unit 58's arm line and unit 60's S24 and AC15 were checked against their specs, not HEAD.
 
 ## 10. Reuse audit
 
 The seam is the suites' shrink-only `FLOOR_ASSERTIONS` convention, in the shape
-`tools/hooks/scratch-guard.test.sh:1303-1321` carries and `tools/check-testsuite-counts.sh:93-126` reads,
-extended to one more suite rather than re-invented.
+`tools/hooks/scratch-guard.test.sh@1bae0749:1856-1906` carries and `tools/check-testsuite-counts.sh#compliant`
+reads (`tools/check-testsuite-counts.sh@d4bad437:86-126`), extended to one more suite rather than
+re-invented.
 `python tools/codebase-map/reuse_lookup.py "a suite pins a shrink-only floor on its executed assertion count"`
 ranked `counts`, `measure_typed_counts`, `check_shrink_row` and `count_never_falls`, none a suite floor,
 so no existing seam fits beyond that convention. The recall query's hits are `TOOL-aWokenSentinel-19`

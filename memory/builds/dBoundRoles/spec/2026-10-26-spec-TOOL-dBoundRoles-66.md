@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-66 — the round-1 audit of unit 64, its 23 minors: skip lines by a pinned predicate, loops swept by class, unit terms tied to their arms, absence checks on joined prose, and the observation's failure path staged
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -55,24 +55,27 @@ less id 11. Each id is its own scope item, even where the report merged several 
 - **S1** — id 2. Spec 64's §4 "The executed-count rule" defines a skip line once. It is a line of a
   floored roles suite matching `^[[:space:]]*(echo|printf) "[Ss][Kk][Ii][Pp] `. Spec 64's AC8 and S33 read
   that predicate in place of "every line printing a skip, case-folded". On the adopter suite it matches
-  the four skip echoes of arms 6 and 11, at base `tools/roles/adopt-roles.test.sh:170`, `:172`, `:432`
-  and `:434`. Observed by AC1.
-- **S2** — id 10. The predicate's should-match set on the spawn guard's suite is its four skip echoes,
-  found by their labels `skip rule0: pair arm`, `skip rule0: MSYS-mount deny arm`,
-  `skip no-regress byte arm` and `skip no-regress property arm`. They sit at base at
-  `tools/hooks/agent-cap.test.sh:891`, `:947`, `:2043` and `:2280`, and unit 25 moved them into
-  `tools/roles/spawn-guard.test.sh`. Spec 64's AC8 asserts all eight lines of both suites on the real
-  files. Observed by AC1.
+  the six skip echoes of arms 6, 11 and 20, at `tools/roles/adopt-roles.test.sh@a8b141b6:239`, `:241`,
+  `:623`, `:625`, `:994` and `:996`. Observed by AC1.
+- **S2** — id 10. The predicate's should-match set on the spawn guard's suite is its skip echo
+  `skip no-regress byte arm`, at `tools/hooks/agent-cap.test.sh@97439f99:589`, which unit 25 moves into
+  `tools/roles/spawn-guard.test.sh` (spec 25's S5). The other three echoes the audit named,
+  `skip rule0: pair arm`, `skip rule0: MSYS-mount deny arm` and `skip no-regress property arm`, left the
+  suite with TOOL-dFairHearing-16, for `tools/workflows/spec-audit-optin.test.sh@fd149d71:381` and
+  `:437` and `tools/workflows/check-verifier-fanout.test.sh@1d211b61:1892`, suites no unit of this build
+  floors. Spec 64's AC8 asserts all seven lines of both suites on the real files. Observed by AC1.
 - **S3** — id 18. Each suite's floor comparison line, the one reading `-ge "$FLOOR_ASSERTIONS"`, is
-  outside the skip-line population, and spec 64's §4 says so by name. At base that line is
-  `tools/roles/adopt-roles.test.sh:714`, which prints "a block of arms was skipped". Spec 64's AC8
-  asserts the predicate matches neither suite's comparison line. Observed by AC1.
+  outside the skip-line population, and spec 64's §4 says so by name. On the adopter suite that line is
+  `tools/roles/adopt-roles.test.sh@a8b141b6:1330`, which prints "a block of arms was skipped". Spec
+  64's AC8 asserts the predicate matches neither suite's comparison line. Observed by AC1.
 - **S4** — id 8. Spec 64's §4 Evidence second bullet states the class, not an instance list. A loop
   counts when it is a `for` or `while` loop of the spawn guard's suite whose body calls an asserting
-  helper or echoes an ok or FAIL line. The asserting helpers are `check`, `js`, `jso`, `msg`,
-  `check_spec_audit`, `check_cap`, `check_spawn` and `run_spawn`. The bullet gives the sweep,
-  `grep -nE '^[[:space:]]*(for|while) '`, then the instances at base: lines 797, 883, 933, 1810, 1816,
-  1898, 1959, 1967, 1970 and 2480. On the built tree the spawn guard's `FLOOR_ASSERTIONS` equals E
+  helper or echoes an ok or FAIL line. The asserting helpers are the suite's six functions whose body
+  raises `pass` or `fail`: `check`, `run_pack`, `run_limit_call`, `run_spawn`, `run_harness` and
+  `run_effort`, read at `29acd2d77` (§4 Evidence). The bullet
+  gives the sweep, `grep -nE '^[[:space:]]*(for|while) '`, then the instances in the suite unit 25
+  moves, at `tools/hooks/agent-cap.test.sh@97439f99`: lines 391, 436, 530 and 716 (PINNED, measured
+  2026-11-22 at `29acd2d77`). On the built tree the spawn guard's `FLOOR_ASSERTIONS` equals E
   re-counted over that class. Where unit 64's pass counted fewer, this pass raises the floor and corrects
   the term that fell short. Observed by AC2.
 - **S5** — id 19. Spec 64's two §7 `New arm:` lines carry the close's independent bound. The printed n
@@ -94,8 +97,9 @@ less id 11. Each id is its own scope item, even where the report merged several 
 - **S8** — id 12. Spec 64's S28 and AC18 search by value, bare token included:
   `git grep -nE '(handoff\.py)?:102[5-8]([^0-9]|$)' -- memory/builds/dBoundRoles/spec`, with the lines of
   specs 63, 64 and 66 set aside. Spec 63's S16 Readers clause accounts for every hit, or says why a hit
-  is not a reader. At HEAD the bare-token hits are spec 53 line 43, spec 59 lines 83 and 92, and spec 52
-  line 81. Observed by AC6.
+  is not a reader. At `29acd2d77`, with those three specs set aside, the grep prints no bare-token hit:
+  its hits are spec 59's S1 bullet and AC lines and spec 69's S16 bullet, each spelled `handoff.py:<n>`
+  (DERIVED, re-run at the pass). Observed by AC6.
 - **S9** — id 16. Spec 60's S24 names `TOOL-dBoundRoles-50` beside unit 58 for the spawn guard's suite.
   It names `TOOL-dBoundRoles-60` and `TOOL-dBoundRoles-61`, with no condition, for the adopter suite. It
   holds no "carries every earlier unit". Spec 64's S1, S16 and S23, its §1 "Lands on" column and its
@@ -119,12 +123,14 @@ less id 11. Each id is its own scope item, even where the report merged several 
   this item writes no second copy. Observed by AC9.
 - **S12** — id 24. Spec 64's §4 states AC8's population and its join key. The population is the lines
   S1's predicate selects. Comments and heredoc or docstring bodies are never skip lines: the adopter
-  suite's comment lines 15, 23, 73, 74, 78, 161, 415 and 595, and the spawn guard's docstring text "is
-  skipped, never followed". The join key: each `# out of the floor: <arm>` line carries the exact label
-  its skip echo prints, up to the echo's em dash, such as `skip rule0: pair arm` or `SKIP arm 11`, and
-  that label is matched as a substring of the echo. Observed by AC1.
+  suite's comment lines 16, 26, 38, 91, 92, 96, 103, 230, 606, 791 and 989
+  (`tools/roles/adopt-roles.test.sh@a8b141b6`), and the spawn guard's heredoc text "is skipped, never
+  followed" (`tools/hooks/agent-cap.test.sh@97439f99:137` and `:249`). The join key: each
+  `# out of the floor: <arm>` line carries the exact label its skip echo prints, up to the echo's em
+  dash, such as `skip no-regress byte arm`, `SKIP arm 11` or `SKIP arm 20`, and that label is matched
+  as a substring of the echo. Observed by AC1.
 - **S13** — id 20. Spec 64's §4 and AC2 name `pass` as the counter the spawn guard's comparison reads,
-  the suite's own counter (`tools/hooks/agent-cap.test.sh:33`). A run that fails an assertion is red on
+  the suite's own counter (`tools/hooks/agent-cap.test.sh@97439f99:43`). A run that fails an assertion is red on
   `fail` already. The synthetic-value half is gone by S6's edit, so one edit closes ids 3 and 20.
   Observed by AC4.
 - **S14** — id 4. Spec 64's AC18 also reads spec 63's S11 bullet and its §4 Evidence bullet about spec 53.
@@ -144,26 +150,33 @@ less id 11. Each id is its own scope item, even where the report merged several 
 - **S18** — id 13. Spec 64's §4 Evidence last bullet reads that spec 59 carries no "How an item closes"
   and that specs 58 and 60 are the route's sources. It holds no "only specs 58 and 60 carry". Observed by
   AC12.
-- **S19** — id 9. Spec 64's §4 Evidence second bullet counts 54 call sites of `check_spec_audit`, with
-  the command `grep -c '^[[:space:]]*check_spec_audit '` at `462d20f3`. Where unit 64's pass counted 53
-  sites, E rises by 2, once per form, and S4's correction carries it. Observed by AC12 and AC2.
+- **S19** — id 9. Spec 64's §4 Evidence second bullet gives the spawn guard's suite no
+  `check_spec_audit` site count. It says the helper and its sites left that suite with
+  TOOL-dFairHearing-16 for `tools/workflows/spec-audit-optin.test.sh`, where
+  `grep -c '^[[:space:]]*check_spec_audit '` counts 54 (PINNED, `29acd2d77`) under its own floor, and that
+  the suite unit 25 moves calls it from no site, so no term of E rests on it (§8 F3). Where unit 64's
+  pass counted `check_spec_audit` sites into the spawn guard's E, S4's correction takes them out.
+  Observed by AC12 and AC2.
 - **S20** — id 14. One form for floor status, by §8 F2. The adopter suite's floor comment above
-  `FLOOR_ASSERTIONS` holds no "Arm 6 is NOT in the floor" and no "arm 11 is out of the floor, as arm 6
-  is". Arm 11 is named on a `# out of the floor: SKIP arm 11` line, and arm 6 keeps the floor lowering
-  on its own skip lines. Spec 64's S12 and S33 state that rewrite, and AC8 gains a half: the floor comment
-  holds no `NOT in the floor|is out of the floor` outside `# out of the floor:` lines. Spec 64's §4
+  `FLOOR_ASSERTIONS` holds no "Arm 6 is NOT in the floor", no "arm 11 is out of the floor, as arm 6
+  is", no "arm 20 and arm 6's added payload are out of the floor" and no "on its SKIP path, out of the
+  floor" (`tools/roles/adopt-roles.test.sh@a8b141b6:91`, `:94`, `:102` and `:103`). Arms 11 and 20 are
+  each named on a `# out of the floor: SKIP arm <n>` line, and arm 6 keeps the floor lowering on its own
+  skip lines. Spec 64's S12 and S33 state that rewrite, and AC8 gains a half: the floor comment holds no
+  `NOT in the floor|out of the floor` outside `# out of the floor:` lines (§8 F4). Spec 64's §4
   Inventory says this build introduces the prefix. Observed by AC13.
 - **S21** — id 15. Spec 64's §8 F2 and §10 cite `TOOL-aWokenSentinel-19` as the static-count precedent:
-  commit `c5a31443a`, `tools/unattended/adopt-unattended.test.sh:695-702`, a lower bound at about ten
-  percent headroom. They say why this unit pins at E with no headroom, citing the hand-counted exact
-  pins at `tools/hooks/scratch-guard.test.sh:1310-1320`. Neither credits `TOOL-aDeferredBar-9`, an open
-  ask, with a floor. F2's pick stands. Observed by AC14.
+  commit `c5a31443a`, `tools/unattended/adopt-unattended.test.sh@cf6bb292:847-854`, a lower bound at
+  about ten percent headroom. They say why this unit pins at E with no headroom, citing the hand-counted
+  exact pins of `tools/hooks/scratch-guard.test.sh#FLOOR_ASSERTIONS`, the running total at
+  `scratch-guard.test.sh@1bae0749:1859-1905`. Neither credits `TOOL-aDeferredBar-9`, an open ask, with a
+  floor. F2's pick stands. Observed by AC14.
 - **S22** — id 17. Spec 62's §7 spawn-guard `New arm:` line names `FLOOR_ASSERTIONS` set to the executed
   count, its comment carrying unit 43's base, the terms of units 50 and 58 and the out-of-floor arms. It
   is staged by an early exit before unit 50's case, and holds no "kept or minted". Observed by AC15.
 - **S23** — id 21. Spec 64's §4 "How an item closes" pins the AMENDED ledger line:
   `- AC<n> — amended rev-<latest> (rev-<a>, rev-<b>) — <observation with a backticked token>`, the latest
-  revision first and directly after the em dash. `LEDGER` in `tools/memory-tree/deviation_join.py:163`
+  revision first and directly after the em dash. `tools/memory-tree/deviation_join.py#LEDGER`
   reads one revision per line, so the join addresses the latest bump only. Each earlier bump stays
   visible through the join's revision arm. Spec 64's AC15 and AC23 run that regex over unit 60's AC15
   line, and this unit's own AMENDED answers take the same grammar. Observed by AC16.
@@ -199,7 +212,7 @@ less id 11. Each id is its own scope item, even where the report merged several 
 M4 admits two units only when the minors split into two disjoint write sets by M6. They do not. Every
 item writes spec 64: S1 to S7, S12, S13 and S16 to S23 restate its own text, and S8 to S11, S14 and S15
 restate the clauses it wrote into specs 60 to 63. M6 clause 1 refuses any split. The suite items S4, S6,
-S16, S19 and S20 also write the two floored suites that S1 to S3 and S12 read as acceptance input, which
+S16 and S20 also write the two floored suites that S1 to S3 and S12 read as acceptance input, which
 clause 2 refuses.
 
 ### How an item closes
@@ -241,30 +254,37 @@ half it replaces, this can fail: a term of 6 over an arm executing 5 floored ass
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26; HEAD equals base for every code file cited here:
+Re-read at HEAD `29acd2d77` on 2026-11-22; each code line is pinned to the blob it was read at:
 
-- `tools/roles/adopt-roles.test.sh:170` and `:172` echo `SKIP arm 6` and lower the floor on the same
-  line. `:432` and `:434` echo `SKIP arm 11` and lower nothing. `:714` is the comparison, whose echo
-  opens `FAIL` and holds "skipped". `:73-80` is the floor comment, opening `# 10, then`, with "Arm 6 is
-  NOT in the floor" at `:73` and "arm 11 is out of the floor, as arm 6 is" at `:76`.
-- `tools/hooks/agent-cap.test.sh:33` is `pass=0; fail=0`. The helpers are defined at `:126` (`check`),
-  `:137` (`js`), `:322` (`jso`), `:795` (`check_spec_audit`), `:1097` (`msg`), `:1925` (`check_cap`),
-  `:1935` (`check_spawn`) and `:2420` (`run_spawn`). `grep -c '^[[:space:]]*check_spec_audit '` prints
-  54. Arms open at `# ---- ` header comments, such as `:147` and `:313`. The skip echoes are at `:891`,
-  `:947`, `:2043` and `:2280`, and `:87` is docstring text.
-- `tools/memory-tree/deviation_join.py:163` is `LEDGER`, `:594-607` is the revision arm and `:608-623`
-  is the ledger arm, one member per matching line.
-- `tools/memory-tree/check-memory-hygiene.sh:3149` classifies a first line holding a backtick as an
-  observation. `memory/HYGIENE.md:697` gives `- AC2 — amended rev-<n> — ...`.
-- `tools/unattended/adopt-unattended.test.sh:695-702` derives its floor of 78 from a static count of 87
-  at about ten percent headroom (`TOOL-aWokenSentinel-19`, commit `c5a31443a`).
-  `tools/hooks/scratch-guard.test.sh:1310-1320` pins 309 by hand-counted raises.
-  `memory/backlog/TOOL.md:63` shows `TOOL-aDeferredBar-9` OPEN.
+- `tools/roles/adopt-roles.test.sh@a8b141b6:239` and `:241` echo `SKIP arm 6` and lower the floor on
+  the same line. `:623` and `:625` echo `SKIP arm 11`, and `:994` and `:996` echo `SKIP arm 20`
+  (TOOL-aGuardedEffort-1), and those four lower nothing. `:1330` is the comparison, whose echo opens
+  `FAIL` and holds "skipped". `:91-112` is the floor comment, opening `# 10, then`, with "Arm 6 is NOT in
+  the floor" at `:91`, "arm 11 is out of the floor, as arm 6 is" at `:94`, "arm 20 and arm 6's added
+  payload are out of the floor" at `:102` and "on its SKIP path, out of the floor" at `:103`;
+  `FLOOR_ASSERTIONS=88` is at `:113`, after the terms of units 14, 2 and 1 of this build.
+- `tools/hooks/agent-cap.test.sh@97439f99:43` is `pass=0; fail=0`. The helpers raising `pass` or
+  `fail` are defined at `:288` (`check`), `:336` (`run_pack`), `:420` (`run_limit_call`), `:661`
+  (`run_spawn`), `:681` (`run_harness`) and `:816` (`run_effort`). `check_spec_audit`, `js`, `jso`,
+  `msg`, `check_cap` and `check_spawn` are not in the file: TOOL-dFairHearing-16 moved rules 0, 2 and 5
+  and their arms to `tools/workflows/`. Arms open at `# ---- ` header comments, such as `:297` and
+  `:319`. The one skip echo is at `:589`, and `:137` and `:249` are heredoc text. Of the sweep's 17
+  lines (PINNED, `29acd2d77`), the shell loops 391, 436, 530 and 716 echo ok or FAIL or call a helper,
+  and 530's body echoes `FAIL` alone.
+- `tools/memory-tree/deviation_join.py#LEDGER` is the regex, `deviation_join.py@bdb5a3d1:588-609` is
+  the revision arm and `:610-620` is the ledger arm, one member per matching line.
+- `tools/memory-tree/check-memory-hygiene.sh@c2fc4073:3643` classifies a first line holding a backtick
+  as an observation. `memory/HYGIENE.md@b76a74c0:814` gives `- AC2 — amended rev-<n> — ...`.
+- `tools/unattended/adopt-unattended.test.sh@cf6bb292:847-854` derives its floor of 78 from a static
+  count of 87 at about ten percent headroom (`TOOL-aWokenSentinel-19`, commit `c5a31443a`).
+  `tools/hooks/scratch-guard.test.sh@1bae0749:1859-1905` is a running total of hand-counted raises,
+  309 at `462d20f3` and 401 at `29acd2d77` (PINNED, `scratch-guard.test.sh@1bae0749:1905`).
+  `memory/backlog/TOOL.md@558bbfee:71` shows `TOOL-aDeferredBar-9` OPEN.
 - At `5906fb79b`, spec 52's Rollout wraps "writes" at line 102 and "no file this unit writes" at line
   103. `### How an item closes` heads specs 43, 44, 50, 51, 58, 60 and 63 there.
-- At HEAD, spec 60's S24 (lines 121-123) names units 52, 53 and 58 and no unit 50, 60 or 61. Spec 62's
-  §7 spawn-guard line (line 170) reads "kept or minted". Spec 63's S12 (lines 83-89) names no `prunable`
-  and no hard kill.
+- At `29acd2d77`, spec 60's S24 names units 52, 53 and 58 and no unit 50, 60 or 61. Spec 62's §7
+  spawn-guard `New arm:` line reads "kept or minted". Spec 63's S12 names no `prunable` and no hard
+  kill. Each is cited by its label, since units 64 and 65 revise those specs before this pass.
 - In a scratch repository on git 2.54, git's forced worktree removal of an entry whose directory was gone
   (porcelain `prunable`) exited 0 and cleared the entry, so S10's recovery needs no global prune.
 
@@ -284,9 +304,9 @@ Files touched names specs 63 and 64 and their ledgers too. The declared write se
 
 ### Files touched (estimate)
 
-- `tools/roles/adopt-roles.test.sh`, the floor comment's out-of-floor lines (S20)
+- `tools/roles/adopt-roles.test.sh`, the floor comment's out-of-floor lines for arms 11 and 20 (S20)
 - `tools/roles/spawn-guard.test.sh`, the floor, its comment's base grammar, its terms and the unit-50 arm
-  header (S4, S6, S16, S19)
+  header (S4, S6, S16; S19 only through S4's correction)
 - the specs of units 50, 60, 61, 62, 63 and 64, rev bumps, named here for the dispatch write set
 - the acceptance ledgers of units 60, 61, 62, 63 and 64 and this unit's own, the AMENDED answers and the
   counts, named here for the dispatch write set
@@ -319,7 +339,8 @@ Files touched names specs 63 and 64 and their ledgers too. The declared write se
 ## 6. Acceptance criteria
 
 - **AC1** — When a `python -c` probe applies §4's `SKIP` predicate to both floored roles suites, it matches
-  the two `SKIP arm 6` echoes, the two `SKIP arm 11` echoes and the four spawn-guard echoes S2 names. It
+  the two `SKIP arm 6` echoes, the two `SKIP arm 11` echoes, the two `SKIP arm 20` echoes and the
+  spawn-guard echo S2 names. It
   matches no comment line, no docstring line and neither comparison line holding `-ge "$FLOOR_ASSERTIONS"`.
   Each matched echo that does not lower `FLOOR_ASSERTIONS` on its own line has its label on exactly one
   `# out of the floor:` line, and each such line's payload is a substring of a matched echo. Spec 64's §4,
@@ -329,8 +350,8 @@ Files touched names specs 63 and 64 and their ledgers too. The declared write se
 - **AC2** — When a `python -c` probe lists each line of the spawn guard's suite matching
   `^[[:space:]]*(for|while) ` whose body, up to its `done`, calls one of S4's helpers or echoes ok or FAIL,
   every listed line appears with its iteration count in this unit's ledger line for AC2, and
-  `FLOOR_ASSERTIONS` equals the E that line records. Spec 64's §4 Evidence holds the sweep command, the
-  ten base instances and the figure 54.
+  `FLOOR_ASSERTIONS` equals the E that line records. Spec 64's §4 Evidence holds the sweep command and
+  the instances S4 lists.
   Red when: an asserting loop is missing from the count, so the floor sits below what the suite executes.
   figure: DERIVED from source at the pass; PINNED in the ledger at that pass's commit.
   cost: a read of each loop's body, minutes.
@@ -379,21 +400,25 @@ Files touched names specs 63 and 64 and their ledgers too. The declared write se
   every `+<n>` term equals the floor. Spec 64's §4 states the grammar.
   Red when: a compliant spelling puts the unit id first, so a first-bare-number read returns 43.
 - **AC12** — When a `python -c` probe reads spec 64's §4 Evidence, it cites spec 52 at `102-103`, holds no
-  "only specs 58 and 60 carry", and names 54 `check_spec_audit` sites.
+  "only specs 58 and 60 carry", names the review kit's spec-audit opt-in suite (its path in S19) as
+  where `check_spec_audit`'s sites went, and gives the spawn guard's suite no `check_spec_audit` site
+  count.
   Red when: an Evidence line a builder re-checks names a wrong line, a false census or a short count.
 - **AC13** — When a `python -c` probe reads the comment block above `FLOOR_ASSERTIONS` in the roles
   adopter suite (its path in S1 and Files touched), it holds a `# out of the floor: SKIP arm 11` line
-  and no match of `NOT in the floor|is out of the floor` outside `# out of the floor:` lines. Spec 64's
+  and a `# out of the floor: SKIP arm 20` line, and no match of `NOT in the floor|out of the floor`
+  outside `# out of the floor:` lines. Spec 64's
   §4 Inventory says this build introduces the prefix.
   Red when: the comment states one arm's floor status two ways.
 - **AC14** — When a `python -c` probe extracts spec 64's §8 F2 and §10, joined, both name
-  `TOOL-aWokenSentinel-19` and `c5a31443a`, F2 cites `scratch-guard.test.sh:1310-1320`, and neither credits
+  `TOOL-aWokenSentinel-19` and `c5a31443a`, F2 cites the hand-counted `FLOOR_ASSERTIONS` of the
+  scratch-guard suite (its path in S21) by a blob-pinned line or by symbol, and neither credits
   `TOOL-aDeferredBar-9` with a floor.
   Red when: a resolved fork rests on a precedent that never happened.
 - **AC15** — When a `python -c` probe reads spec 62's `New arm:` line on the spawn-guard suite unit 25
   adds, it holds no "kept or minted" and names `TOOL-dBoundRoles-50` or "unit 50".
   Red when: spec 62's arm declaration contradicts its own bumped scope.
-- **AC16** — When a `python -c` probe runs `LEDGER` from `tools/memory-tree/deviation_join.py:163` over
+- **AC16** — When a `python -c` probe runs `LEDGER` from `tools/memory-tree/deviation_join.py` over
   unit 60's AC15 ledger line, it matches at the revision whose §9 line names `TOOL-dBoundRoles-64`, with
   any earlier revision in parentheses after it. Spec 64's §4 "How an item closes" states the grammar, and
   its AC15 and AC23 run that regex.
@@ -420,22 +445,56 @@ two `New arm:` lines, carrying the bound S5 adds.
 - **F2 — The adopter suite's floor status: the existing prose form, or the line grammar (id 14)?**
   Options: (a) extend the prose, and have AC8 read arm names from the floor comment's "out of the floor"
   phrases; (b) keep the `# out of the floor: <arm>` lines, rewrite the prose at
-  `tools/roles/adopt-roles.test.sh:73-76` into them, and have AC8 grep for the old form. (a) leaves AC8
+  `tools/roles/adopt-roles.test.sh@a8b141b6:91-103` into them, and have AC8 grep for the old form. (a) leaves AC8
   parsing free prose, where "NOT in the floor" beside "+1 for arm 6" already states arm 6's status two
   ways. (b) gives one form a probe can join to the skip echoes (S12). Both stay in the file S20 writes.
   RESOLVED (agent, 2026-10-26, delegated): (b), rung 3, the most feature-rich survivor. widens: none · relaxes: none
+- **F3 — Id 9's count, once its helper left the suite (S19, AC12)?** TOOL-dFairHearing-16 moved
+  `check_spec_audit` and its sites to `tools/workflows/spec-audit-optin.test.sh`, which carries its own
+  floor, and the suite unit 25 moves calls it from no site (§4 Evidence). Options: (a) S19 has spec
+  64's Evidence give the spawn guard's suite no `check_spec_audit` count and name where the sites went,
+  and AC12 checks both; (b) keep the figure 54 and point it at the review kit's suite; (c) retire S19.
+  (b) books a count of a suite no unit of this build floors into the spawn guard's Evidence, the false
+  census id 9 exists to refuse, and (c) drops an item whose stale claim still sits in spec 64. RESOLVED
+  (agent, 2026-11-22, delegated): (a), rung 3, the survivor that keeps id 9's item and its criterion's
+  number. widens: none · relaxes: AC12 no longer requires the figure 54
+- **F4 — The adopter suite's arm 20, absent at base, states its floor status in prose too (S20,
+  AC13)?** At `29acd2d77` arm 20 skips without lowering the floor, and the comment says "arm 20 and arm
+  6's added payload are out of the floor" and "on its SKIP path, out of the floor", which AC13's
+  `NOT in the floor|is out of the floor` misses. Options: (a) keep that pattern, leaving arm 20's status
+  stated twice and AC13 green on that break; (b) add `are`, catching `:102` but not `:103`; (c)
+  `NOT in the floor|out of the floor` outside `# out of the floor:` lines, catching every prose
+  statement in the block, the form unit 69's S18 later takes to the whole file. (a) keeps AC13 green on
+  the break it names, and (b) leaves one prose statement of arm 6's payload. RESOLVED (agent,
+  2026-11-22, delegated): (c), rung 3, the most feature-rich survivor. widens: S20 rewrites two more
+  prose lines of the same comment and adds the arm-20 line · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, the 11 MEDIUM and 12 LOW findings of the round-1 audit of unit 64,
   each id its own item, in one unit.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-69, the minors batch of the round-1 audit of units 65 and 66; nothing else moved.
+- rev-3 · 2026-11-22 · S1 S2 S3 S4 S8 S12 S13 S19 S20 S21 S23 · §4 · AC1 AC2 AC12 AC13 AC14 AC16 · §8
+  F2 F3 F4 · §10 · re-grounded at HEAD `29acd2d77` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-65-reground-q-brief`. TOOL-dFairHearing-16 moved rules 0, 2 and 5
+  out of `tools/hooks/agent-cap.test.sh`, so its skip echoes fall from four to one (S2), its asserting
+  helpers are `check`, `run_pack`, `run_limit_call`, `run_spawn`, `run_harness` and `run_effort` and its
+  asserting loops 391, 436, 530 and 716 at `@97439f99` (S4), its counter sits at `:43` (S13), and
+  `check_spec_audit`'s sites now live in `tools/workflows/spec-audit-optin.test.sh` (S19, AC12, F3).
+  The adopter suite grew arm 20, a skip with no lowering, so its echoes are six and S20 and AC13 cover
+  arm 20's prose too (F4); its comparison sits at `@a8b141b6:1330` and its floor comment at `:91-112`.
+  S8's grep prints no bare-token hit at HEAD. The Evidence citations are re-pointed to blob-pinned
+  lines: `LEDGER` by symbol, the hygiene classifier at `@c2fc4073:3643`, HYGIENE's line at
+  `@b76a74c0:814`, the adopter e2e floor at `@cf6bb292:847-854`, scratch-guard's running total at
+  `@1bae0749:1859-1905`, and the backlog row at `@558bbfee:71`. `tools/roles/spawn-guard.test.sh`, its
+  floor and its `# out of the floor:` lines are units 25's and 64's, checked against spec 25's S5 and
+  spec 64's S12 and S33, not HEAD; sibling-spec clauses are cited by label.
 
 ## 10. Reuse audit
 
 The seams are the units' own and the tree's: spec 64's "How an item closes" route and executed-count rule,
-the suites' `# ---- ` arm delimiter and `FLOOR_ASSERTIONS` comment, `LEDGER` of
-`tools/memory-tree/deviation_join.py:163`, which AC16 runs rather than re-derives, and
+the suites' `# ---- ` arm delimiter and `FLOOR_ASSERTIONS` comment,
+`tools/memory-tree/deviation_join.py#LEDGER`, which AC16 runs rather than re-derives, and
 `tools/branch-reconcile/branch_reconcile.py`'s `derive_key`, the comparison `TOOL-dBoundRoles-65` adopts,
 which AC8 imports. Each is extended, not rebuilt.
 `python tools/codebase-map/reuse_lookup.py "a criterion predicate selects the skip lines a test suite prints and joins each to a floor comment"`

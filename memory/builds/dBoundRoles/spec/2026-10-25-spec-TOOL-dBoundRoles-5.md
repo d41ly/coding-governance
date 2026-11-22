@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-5 — returns through a schema-forced channel on both routes, residual failures retried by `roles.retries`
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 15 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 15 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0170@d33b224b whole
 **Carries:** node:policy-key.roles.retries
@@ -34,7 +34,7 @@ code reads, the role's `returns` line is prose, and no subagent-stop check exist
 `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md@cd15c089:156`).
 RL-7's reply measured 48 of 48 direct returns free text and 94 of 94 harness returns structured
 (PINNED, `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-roles.md@e29e16d7:363-364`).
-This unit gives the direct route a channel of the same strength: one `validate_return` in the roles
+This unit gives the direct route a channel of the same strength: one `check_return` in the roles
 library checks a direct spawn's final message against its role's typed `return` template at
 `SubagentStop`, and a residual failure, a value that does not resolve, is sent back to the agent up to
 `roles.retries` times. On the harness route the schemas stay as they are, and a single-call stage that
@@ -42,9 +42,9 @@ comes back empty is re-run up to the same count (§8 F4).
 
 ## 2. Scope (IN)
 
-- **S1** — `validate_return(role, text, root=None, work_order=None)` in `tools/roles/roles_lib.py`,
+- **S1** — `check_return(role, text, root=None, work_order=None)` in `tools/roles/roles_lib.py`,
   shared interface I16, the call TOOL-dBoundRoles-12 and TOOL-dBoundRoles-26 make
-  (`validate_return("gov-orienter", text)`), the name kept as §8 F7 resolves: `role` is a slot, whose
+  (`check_return("gov-orienter", text)`), the name §8 F7 resolves: `role` is a slot, whose
   `return` template the function reads through `load_roles` (`tools/roles/roles_lib.py#load_roles`)
   and `parse_return_template` (`tools/roles/roles_lib.py#parse_return_template`, landed by
   TOOL-dBoundRoles-2 S4), which yields `(name, type, optional)` triples, a closed set as a tuple. The
@@ -146,12 +146,12 @@ comes back empty is re-run up to the same count (§8 F4).
 
 ### Edges
 
-- **consumes-from** `TOOL-dBoundRoles-2` — the `return` key and `parse_return_template`, which `validate_return` reads; without them there is no template to check against
-- **consumes-from** `TOOL-dBoundRoles-17` — the `answers` value a return names, `<prompt path> task-sha=<12hex>`, which `validate_return` compares with the work order
-- **hands-off** `TOOL-dBoundRoles-4` — `validate_return`, which checks the prompt writer's return before `--framed-by` takes its framing
-- **hands-off** `TOOL-dBoundRoles-12` — `validate_return`, the typed channel the orientation scout's placement return is bound to
-- **hands-off** `TOOL-dBoundRoles-23` — `validate_return`, which the default frame extends with the bound each `list` field's return contract states
-- **hands-off** `TOOL-dBoundRoles-26` — `validate_return` and the witness record of S3, which the refusal outcome table routes on
+- **consumes-from** `TOOL-dBoundRoles-2` — the `return` key and `parse_return_template`, which `check_return` reads; without them there is no template to check against
+- **consumes-from** `TOOL-dBoundRoles-17` — the `answers` value a return names, `<prompt path> task-sha=<12hex>`, which `check_return` compares with the work order
+- **hands-off** `TOOL-dBoundRoles-4` — `check_return`, which checks the prompt writer's return before `--framed-by` takes its framing
+- **hands-off** `TOOL-dBoundRoles-12` — `check_return`, the typed channel the orientation scout's placement return is bound to
+- **hands-off** `TOOL-dBoundRoles-23` — `check_return`, which the default frame extends with the bound each `list` field's return contract states
+- **hands-off** `TOOL-dBoundRoles-26` — `check_return` and the witness record of S3, which the refusal outcome table routes on
 - **hands-off** `TOOL-dBoundRoles-39` — `check-return` and its first-record read, which unit 39 puts behind the route test so a harness stage's stop is never graded (id 21 of the round-1 spec audit)
 - **hands-off** `TOOL-dBoundRoles-40` — the return check's `SubagentStop` fragment, the first member of the population unit 40 replays a recorded harness stop against (id 56 of the round-1 spec audit)
 - **hands-off** `TOOL-dBoundRoles-43` — `check-return`'s transcript read, which unit 43 routes through `load_agent_transcript`, and its `roles.retries` read, which S4 already makes through `read_policy_setting` and unit 43 holds to it (ids 31 and 39 of the round-1 spec audit)
@@ -165,7 +165,7 @@ SubagentStop payload ──> return-check.sh ──> handoff.py check-return
    agent_type -> role, an agent-true slot of load_roles
    last_assistant_message | agent_transcript_path -> text
    agent transcript, first user record -> MARKER_RE -> work order (path, task-sha)
-   defects = validate_return(role, text, root, work_order)
+   defects = check_return(role, text, root, work_order)
    record  = <git common dir>/return-check/<agent_id>.json   {attempts, valid, defects}
    defects and attempts < roles.retries -> stdout {"decision":"block","reason":…}, attempts += 1
    otherwise                            -> exit 0, the record left as the verdict
@@ -222,7 +222,7 @@ catches the same way.
 
 ### Inventory
 
-Minted: `validate_return`; the verb `check-return`; `tools/roles/return-check.sh`;
+Minted: `check_return`; the verb `check-return`; `tools/roles/return-check.sh`;
 `tools/roles/return-check.fragment.json`; the record folder `return-check/` under the git common dir;
 the harness argument `retries` in each of the three harness files, `ATTEMPTS` and its marked loop in
 each, and `runWithRetries` in the two templates; the fixture plants of §7's arms (`return-valid`,
@@ -230,7 +230,8 @@ each, and `runWithRetries` in the two templates; the fixture plants of §7's arm
 `stop-retry`, `stop-exhausted`, `harness-null-twice`). Each name is asked of
 `python tools/lexicon/lexicon.py --suggest <name>` at the pass, with `--as py.function` or
 `--as js.function`: `runWithRetries` leads with the declared `run`, where `spawn` is no declared verb,
-and `validate_return` is the one name the lexicon refuses, kept as §8 F7 resolves.
+and `check_return` with the declared `check`, which `lexicon.py --suggest check_return --as
+py.function` answered OK on 2026-11-22 (§8 F7).
 
 ### Migration
 
@@ -262,11 +263,10 @@ is inert until a caller passes it, which S7's paragraphs make the default.
 - `tools/workflows/README.md`, whose harness-argument entries list `efforts`
   (`tools/workflows/README.md@1316da7b:825-836`)
 - `tools/unattended/VERBS.template.md` (rendered to `memory/guides/UNATTENDED-VERBS.md`)
-- `.lexicon.conf`, its `VERB_OFFENDER_PIN` re-measured with a comment naming `validate_return` (§8 F7)
 
 ### Alternatives rejected
 
-- **A node hook with its own validator.** A second validator beside `validate_return` is the copy I16
+- **A node hook with its own validator.** A second validator beside `check_return` is the copy I16
   forbids; the launcher keeps one in Python.
 - **Counting retries from `stop_hook_active`.** It is a boolean and cannot bound a count above one.
 - **Re-dispatching from the driver instead of blocking the stop.** It puts the retry in the main
@@ -294,7 +294,7 @@ is inert until a caller passes it, which S7's paragraphs make the default.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `validate_return("gov-builder", text, root)` checks a reply against the builder's
+- **AC1** — When `check_return("gov-builder", text, root)` checks a reply against the builder's
   template `outcome:committed|returned, commit:sha?, why:text?, checks:list`, whose `json` block is
   `{"outcome": "committed", "commit": <a fixture repository's HEAD>, "checks": []}`, it returns no
   defect; with `"commit": "deadbeef"` it returns one naming `commit`; and for `gov-orienter`, a reply
@@ -343,7 +343,7 @@ is inert until a caller passes it, which S7's paragraphs make the default.
 
 `roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `transition-audit arms` · `straggler-guard arms` · `lexicon naming predicates` · `verifier fan-out` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `workflow script syntax` · `recall floor` · `recall floor arms` · `policy fixtures` · `govkit acceptance matrix` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 · its self-test runs `validate_return` and `check-return` over the plants of §4's inventory, staged by a `validate_return` that skips the `sha` rule · none
+New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 · its self-test runs `check_return` and `check-return` over the plants of §4's inventory, staged by a `check_return` that skips the `sha` rule · none
 New arm: tools/workflows/unattended-build.test.sh · covers AC6 AC7 · a stub runtime returns null twice, staged by a re-run loop that returns the first result · none
 
 ## 8. Open questions
@@ -398,13 +398,15 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC6 AC7 · a stub ru
   TOOL-dBoundRoles-40 replays. widens: none · relaxes: none
 - **F7 — Which name does shared interface I16 carry, when `.lexicon.conf` declares `check` "NOT
   `validate`" (`.lexicon.conf@c256a48f:736`) and `lexicon.py --suggest validate_return` answers
-  `use check_return`?** Options: (a) keep `validate_return`, the name TOOL-dBoundRoles-4, -12, -20,
-  -23, -26 and -39 call it by, the pass re-measuring `VERB_OFFENDER_PIN` with a comment naming it, as
-  TOOL-dGroundRules-4 re-measured it when `validate` arrived in `tools/policy/policy.py`, a name its
-  spec set kept over `check` (`.lexicon.conf@c256a48f:315-319`); (b) rename it `check_return`, which
-  leaves those specs, which this batch may not edit, naming a function that does not exist until each is
-  revised. RESOLVED (agent, 2026-11-22, delegated): (a), rung 3, the fewer follow-ups and that
-  precedent. widens: none · relaxes: none
+  `use check_return`?** Options: (a) keep `validate_return`, the pass re-measuring `VERB_OFFENDER_PIN`
+  (`.lexicon.conf@c256a48f:427`) with a comment naming it, as TOOL-dGroundRules-4 re-measured it when
+  `validate` arrived in `tools/policy/policy.py` (`.lexicon.conf@c256a48f:315-319`); (b) rename it
+  `check_return`, the name the lexicon answers, and revise each spec that calls it to that name. (a)
+  raises the verb pin, a declared ceiling, which is the owner's to move (the build method's M3), so no
+  delegated resolver may take it. RESOLVED (agent, 2026-11-22, delegated): (b), rung 1, the ruling of
+  `2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief`, which renames it in TOOL-dBoundRoles-4, -12,
+  -23 and -39 in the same pass, TOOL-dBoundRoles-26 already spelling `check_return`; the pin does not
+  move. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -429,6 +431,12 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC6 AC7 · a stub ru
   TOOL-dBoundRoles-17 S1 and §4 "The answers value" for `MARKER_RE` and the bare `answers` body; unit 2's
   template grammar and every role's template were read at HEAD, where it is CLOSED. §7 gains the
   `verifier fan-out` leg; AC5's fixture names the landed-revision read and AC7 the fan-out rule.
+- rev-6 · 2026-11-22 · §1 · S1 · §3 · §4 · AC1 · §7 · §8 F7 · folded by
+  `2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief`, item 1. F7 re-resolved to (b): the checker is
+  `check_return`, the name the lexicon answers, since raising `VERB_OFFENDER_PIN` moves a declared
+  ceiling, the owner's. `.lexicon.conf` leaves Files touched; no criterion or leg re-measured the pin,
+  and `lexicon naming predicates` stays on the leg line, its guard tripped by `tools/`. The §10 recall
+  terms keep the old name, the arguments as they were passed; nothing else moved.
 
 ## 10. Reuse audit
 

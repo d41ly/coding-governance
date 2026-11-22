@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-60 — the round-1 audit of units 52 to 58, its 37 minors: criteria that can fail and can pass, arms observed where their code lives, one read-key parse, floors moved with their arms, and write sets that name every file a pass writes
 
-**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-8 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -74,13 +74,14 @@ merged several into one item. Id 10 was refuted by the audit and id 21 is unit 5
   control render passes and only S3's exit check can turn the case red. Observed by AC2.
 - **S5** — id 16. 53 §7's arm line states that staging, and 53 S2 says a failed control render stops the
   case, naming that render, before the refusal render runs. Observed by AC2.
-- **S6** — id 3. 46 AC3 names `tools/roles/spawn-guard.js`, where unit 25 moved the guard and 58 S8
-  added `require.main === module`, and order 32; unit 46's ledger answers AC3 `amended rev-<n>`, and 58
+- **S6** — id 3. 46 AC3 names `tools/roles/spawn-guard.js`, where unit 25 moved the guard with the
+  `require.main === module` entry 58 S8 requires, and order 32; unit 46's ledger answers AC3 `amended rev-<n>`, and 58
   S9 says so. Observed by AC3.
 - **S7** — id 4. 52 §4 Rollout names `TOOL-dBoundRoles-26` as a third writer of
   `tools/roles/adopt-roles.test.sh` at order 22. Observed by AC4.
 - **S8** — id 14. That Rollout names the hold that kept the three apart: `--dispatch` refuses a pass whose
-  declared write set intersects an open one (`tools/unattended/unattended.sh:13421`, M6 condition 1). The
+  declared write set intersects an open one (tools/unattended/unattended.sh@7548da57:18789, in
+  `verb_dispatch`, M6 condition 1). The
   ledger shows the three order-22 pass commits never open together. Observed by AC4.
 - **S9** — id 27. 53 §4 Rollout names unit 26 the same way, and neither spec gains an edge to 26, by §8
   F2. Observed by AC4.
@@ -103,7 +104,8 @@ merged several into one item. Id 10 was refuted by the audit and id 21 is unit 5
 - **S17** — id 22. 58 AC5 maps each `reads` entry through `roles_lib.parse_read_key` and asserts no native
   `task:` key and no non-optional `brief:` or `card:` key. Observed by AC9.
 - **S18** — id 25. 56 §4 Files touched names `memory/guides/SESSION-KICKOFF.md`, the last-audit re-stamp
-  the watched `manifest-check.sh` forces into the same commit (C5s, `manifest-check.sh:1589-1597`); its
+  the watched `manifest-check.sh` forces into the same commit (C5s,
+  skills/session-kickoff/manifest-check.sh@b12d3cd4:2765-2779); its
   §7 names `kickoff-manifest ratchet`; and 56 S3 tells the pass to re-check the §B claims that file feeds
   before it re-stamps. Observed by AC10.
 - **S19** — id 28. Unit 19's pass takes `derive_overlay_expected` and its compare out of
@@ -142,12 +144,13 @@ merged several into one item. Id 10 was refuted by the audit and id 21 is unit 5
   holds none, and fixtures 1, 2 and 4 hold a fenced decoy; the admit and refuse checks apply where an id
   or a decoy exists. Observed by AC18.
 - **S29** — id 17. 56 §5's risk line no longer claims the size leg reads `manifest-check.sh`: that leg
-  measures `skills/session-kickoff/SKILL.md` (`tools/gate-legs.json:151-155`). Observed by AC19.
+  measures `skills/session-kickoff/SKILL.md` (tools/gate-legs.json@e07c84d3:2017-2027). Observed by AC19.
 - **S30** — id 31. The risk line names the real effect, the re-stamp of S18, and 56's §7 leg line names
   `kickoff-manifest ratchet` in place of `kickoff engine size <=18KiB`, an unguarded leg over a file 56
   does not touch. Observed by AC19.
 - **S31** — id 18. 56 S2 and §4 Evidence add
-  `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` (`:274`, `:608`) to
+  `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` (@30a1f15b:274 and
+  :608) to
   `parse_spec_h1`'s consumers, state that its pin does not cover the change, and name AC3's
   re-derivation as its observation. Observed by AC20.
 - **S32** — id 20. 53 §5 writes `"$PY" -B -c` and 56 S5 `"$TESTPY" -c`, the launchers the two suites
@@ -223,20 +226,34 @@ pass commit, extracted with `git archive` under `%TEMP%`, short-pathed.
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Read at base `462d20f3` on 2026-10-26, and each code line re-read at HEAD `29acd2d77` on 2026-11-22 and
+pinned to the blob it was read at:
 
 - `git grep -n 'handoff.derive_section_sha' -- tools memory/builds/dBoundRoles/spec` prints specs 46, 48,
   50 and two lines of 58.
-- `tools/roles/handoff.py:359-360` resolves a card for any `card:` key, and `:262-271` runs the kickoff
-  checker when `CLAUDE_CODE_SESSION_ID` is set; `gov-builder.agent.md:7` reads `card:route?`.
-- `tools/roles/kit.toml:6` sets `home = "roles"`; `tools/govkit/govkit.py:322-338` returns `{home}/{s}`.
-- `tools/memory-recall/selftest.py:94-103` runs each check as it is decorated; `:71` fixes `KIT`;
-  `:1615-1618` reads tokens from `desc` only; `SKILL.template.md:66` holds the body's fallback.
-- `memory/guides/SESSION-KICKOFF.md:6` watches `manifest-check.sh` and `tools/gate-legs.json`.
-- `tools/gate-legs.json` guards `scratch-guard self-test` on `{prefix}/hooks/`, `{prefix}/lib/` and
-  `skills/session-kickoff/`, a leg `tools/govkit/registry.toml:555` declares `[[exempt_leg]]`;
-  `kickoff engine size <=18KiB` has no guard.
-- `tools/roles/adopt-roles.test.sh:73-81`: the floor's comment terms sum to `FLOOR_ASSERTIONS=50`.
+- `tools/roles/handoff.py@c6d87bbb:619-620` resolves a card for any `task:` or `card:` key, and
+  `resolve_card_path` (`tools/roles/handoff.py@c6d87bbb:434-441`) runs the kickoff checker when
+  `CLAUDE_CODE_SESSION_ID` is set; `tools/roles/agents/gov-builder.agent.md@59661aee:9` reads
+  `field.card.route?`, which `parse_read_key` folds to `card:route?`.
+- `tools/roles/kit.toml@0aeb4d3e:6` sets `home = "roles"`; `tools/govkit/govkit.py#rule_sources` returns
+  `{home}/{s}` (`tools/govkit/govkit.py@327dd3f6:437`).
+- At base, `tools/memory-recall/selftest.py@25c4ef69:94-103` runs each check as it is decorated,
+  `@25c4ef69:71` fixes `KIT`, `@25c4ef69:1615` assigns `desc` and `@25c4ef69:1619-1620` read the tokens
+  from `desc` only, and `tools/memory-recall/SKILL.template.md@40f10b73:66` holds the body's fallback. At
+  HEAD they are `tools/memory-recall/selftest.py#check`, `@6474907c:71` and
+  `tools/memory-recall/selftest.py#test_skill_description_invariants` (`@6474907c:1722` and
+  `:1726-1727`), and the fallback is `tools/memory-recall/SKILL.template.md@17553715:63`; unit 57's
+  pass rewrites that token loop before this unit's, checked against spec 57, not HEAD.
+- `memory/guides/SESSION-KICKOFF.md@e50f0899:7` watches `manifest-check.sh` and `tools/gate-legs.json`.
+- `tools/gate-legs.json@e07c84d3:3034` guards `scratch-guard self-test` on `{prefix}/hooks/`,
+  `{prefix}/lib/`, `{prefix}/unattended/unattended.sh`, `skills/session-kickoff/` and `{prefix}/policy/`,
+  none of them holding `tree_lib.py`, a leg `tools/govkit/registry.toml@2dbc48e9:1177-1189` declares
+  `[[exempt_leg]]`; `kickoff engine size <=18KiB` (`tools/gate-legs.json@e07c84d3:2017`) has no guard.
+- `tools/roles/adopt-roles.test.sh@3c0fb11c:73-81`: the base 10 plus the thirteen `+<n>` terms of
+  `:73-80` sum to `FLOOR_ASSERTIONS=50` at `:81` (PINNED, the base blob). At HEAD the comment is
+  `tools/roles/adopt-roles.test.sh@a8b141b6:91-112` over `FLOOR_ASSERTIONS=88` at `:113`, and its
+  `:109` restates a merge's running total whose `+6` and `+8` re-count terms above it, which unit 63's
+  sum rule meets (63 §8 F4).
 
 ### Inventory
 
@@ -333,7 +350,7 @@ Live at landing, at order 33, after every unit it repairs and after unit 59.
   Red when: the body can name a refused tool, or the probe needs the module imported.
 - **AC14** — When the archived tree's `derive_overlay_expected` runs on a default target, the seeded side is
   non-empty and the compare passes; a scratch descriptor whose `home` names a directory other than the
-  default (`tools/roles/kit.toml:6`) seeds the `gov-builder` slot's house file under that home, and its row names `gov-builder`; and `grep -n 'ten at base'` over spec 54 prints nothing.
+  default (tools/roles/kit.toml@0aeb4d3e:6) seeds the `gov-builder` slot's house file under that home, and its row names `gov-builder`; and `grep -n 'ten at base'` over spec 54 prints nothing.
   Red when: the two sides compare different path forms.
 - **AC15** — When a `python -c` probe sums the `+<n>` terms above each suite's `FLOOR_ASSERTIONS`, the sum
   equals the floor, and units 52, 53 and 58 each appear in a term.
@@ -417,6 +434,17 @@ S20's guard is not an arm: AC12 observes it directly, red before the edit and gr
 - rev-7 · 2026-11-22 · §7 · the leg line gains `govkit selftest`, `govkit refusal join`, `govkit
   acceptance matrix` and `policy fixtures`, whose guards hold `tools/govkit/registry.toml` that §4 Files
   touched names, by `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
+- rev-8 · 2026-11-22 · S6 · S8 · S18 · S29 · S31 · §4 Evidence · AC14 · re-grounded at HEAD `29acd2d77`
+  by `2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-brief`. Every code citation is re-pointed to a
+  symbol or a blob-pinned line: the dispatch's intersection refusal is in `verb_dispatch` at line 18789,
+  C5s at lines 2765 to 2779, and the size leg at line 2017. S6 no longer says unit 58 adds the entry
+  guard, which `agent-cap.js` already carries (TOOL-dFairHearing-16 S1). §4 Evidence's second, third,
+  fifth and sixth bullets read at HEAD: the card branch now fires for a `task:` key too, the scratch-guard
+  leg's guard holds five entries, and the role line is tag-spelled. Its fourth bullet keeps the base
+  reading on the base blob, `desc` and the token loop on lines of their own, with the HEAD symbols beside
+  it. Its last bullet states the base term, which the base blob bears out, and the HEAD comment's
+  running-total line. Unit 25's move, unit 57's token loop and unit 58's S8 were checked against their
+  specs, not HEAD; the first bullet's spec-grep reading stays for unit 63's S17.
 
 ## 10. Reuse audit
 

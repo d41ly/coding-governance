@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-58 — the 35 minors of auditing units 45 to 51: criteria passable on a correct build, one typed set and one block reader at spawn, one extents record at render, the H1 parity's consumers, and AMENDED answers naming a revision
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 32 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 32 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -67,8 +67,10 @@ where the report merged several into one item.
 
 - **S1** — id 2. A second render, on a typed `diff`. Unit 47's case adds a `--role gov-skeptic` render
   whose `--input diff=` is one line carrying `record:TOOL-tFix-9@000000000000` and whose `--input spec=`
-  names the scratch spec quoting it. `gov-skeptic` reads `input:diff?, input:spec?`
-  (`tools/roles/agents/gov-skeptic.agent.md:7`) and keeps its slot after unit 1. The render refuses
+  names the scratch spec quoting it. `gov-skeptic` reads `field.input.diff?, field.input.spec?`
+  (tools/roles/agents/gov-skeptic.agent.md@0db0ff3c:9), unit 14's tag spelling, which
+  `roles_lib.parse_read_key` folds to `input:diff?` and `input:spec?`, and it keeps its slot after
+  unit 1. The render refuses
   naming the span once; with a plain-words diff it renders. Observed by AC1.
 - **S2** — id 39. The case's role reads both keys, by statement and by check. Every render of 47's case
   calls `TOOL-dBoundRoles-53`'s `assert_role_reads` for its role and keys, S1's included, and its
@@ -80,8 +82,12 @@ where the report merged several into one item.
 - **S4** — id 4. Unit 45 AC1's control render runs on a role that reads `input:spec` with no required
   brief key: the case renders `--role gov-builder --input spec=<scratch spec>` and sees the spec's bytes
   inside a fence. Observed by AC4.
-- **S5** — id 37. The control role reads no `task:` key, so its render resolves no kickoff checker
-  (`tools/roles/handoff.py:340-346`) and needs no card. Observed by AC5.
+- **S5** — id 37. The control role reads no `task:` key, so its render makes no `--task-skeleton` read
+  of the kickoff checker (tools/roles/handoff.py@c6d87bbb:600-617, the `task:` branch of
+  `render_handoff`), and its one card key, `card:route?`, is optional, so it needs no card. With
+  `CLAUDE_CODE_SESSION_ID` set, `resolve_card_path` still asks the kickoff checker for the card's path
+  (tools/roles/handoff.py@c6d87bbb:434-441), the run `TOOL-dBoundRoles-60` S16 takes out of the case.
+  Observed by AC5.
 - **S6** — id 46. Unit 45 AC1 and its fixture line restated: the control render names `gov-builder`, and
   the fixture is the scratch adopter with no brief record and no card. Observed by AC6.
 - **S7** — id 5. Unit 48 AC2 is a balanced flip in the render path. Its staged copy appends one unfenced
@@ -90,8 +96,12 @@ where the report merged several into one item.
   naming the handed block, and with `check_block_fences` reduced to the end of the walk it renders, so
   48's staged break turns this case red. Observed by AC7.
 - **S8** — id 8. The spawn guard's file runs as a program only. `tools/roles/spawn-guard.js`, which
-  unit 25 moves `tools/hooks/agent-cap.js` into, ends with `if (require.main === module) main()`, and its
-  `module.exports` holds `TYPED_INPUTS`. Observed by AC8.
+  unit 25 moves `tools/hooks/agent-cap.js` into, runs `main()` only under
+  `if (require.main === module)`, and its `module.exports` holds `TYPED_INPUTS`. The entry guard and the
+  exports object already stand in `tools/hooks/agent-cap.js` at HEAD
+  (tools/hooks/agent-cap.js@935a910d:1104-1113, TOOL-dFairHearing-16 S1), so the pass records the guard
+  unit 25's move carries, adds it only where the move left none, and adds `TYPED_INPUTS` to the
+  exports. Observed by AC8.
 - **S9** — id 15. Unit 46 AC3 holds through a require: `node -e` requiring the file prints the set and
   exits without reading stdin. 46's §8 F2 names that guard as the precedent it follows. Observed by AC9.
 - **S10** — id 32. The entry change has a case and an inventory line. A spawn-guard suite case pipes a
@@ -128,17 +138,18 @@ where the report merged several into one item.
   into it and deleted, its callers re-pointed. Observed by AC19.
   **Readers:** by name: `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-50.md`, whose
   S21 mints the helper and points its two readers at it, its AC21 greps for it and its inventory lists
-  it; and `tools/roles/handoff.py`, whose `agents` verb (lines 847, 854 and 885) spells the layout
-  inline at this unit's base and calls the helper from unit 50's pass. READER NOT IN TREE for unit 39's
+  it; and `tools/roles/handoff.py`, whose `agents` verb, `print_agent_lines`, spells the layout
+  inline at HEAD (tools/roles/handoff.py@c6d87bbb:1295, :1302 and :1333) and calls the helper from
+  unit 50's pass. READER NOT IN TREE for unit 39's
   route test: it is built in the check-return verb at unit 39's pass, and its own spec never spells the
   helper's name, so spec 50's S21 is the one file that assigns it. by value: NO VALUE READERS — a path
   helper, compared by nobody.
 - **S20** — id 31. Unit 50 AC12 runs the leg's own argv: the `shell hygiene (a fork spent on builtin
   work)` row's of `tools/gate-legs.json`. Observed by AC20.
 - **S21** — id 42. `check_authored_lines` splits a typed value on `\n` only and deletes every `\r` from
-  each line before matching, as `extract_prompt_marker` (`tools/roles/roles_lib.py:252`) and
+  each line before matching, as `extract_prompt_marker` (tools/roles/roles_lib.py@dd1a6c7c:607) and
   `extractHandoffMarker` do. Observed by AC21.
-  **Readers:** by name: `tools/roles/roles_lib.py:252` and `extractHandoffMarker` at tools/hooks/agent-cap.js@935a910d:653, the two
+  **Readers:** by name: `extract_prompt_marker` at tools/roles/roles_lib.py@dd1a6c7c:607 and `extractHandoffMarker` at tools/hooks/agent-cap.js@935a910d:653, the two
   readers that already delete each carriage return and whose split S21 copies, and
   `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-45.md`, whose S2 states the rule
   whose line split S21 fixes; no name leaves the tree. by value: NO VALUE READERS — the carriage return
@@ -168,13 +179,14 @@ where the report merged several into one item.
   file cell. Observed by AC29.
 - **S30** — id 26. `check_block_fences` drops its end-of-walk clause; `TOOL-dBoundRoles-38` S5 stays the
   one owner of that refusal, as 48 §3 says. Observed by AC30.
-  **Readers:** by name: `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-48.md:40-41`,
-  S1's "a walk that ends inside one", the one place the clause is spelled; the function is minted at
+  **Readers:** by name: `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-48.md`, at
+  @4054fb47:45-46, S1's "a walk that ends inside one", the one place the clause is spelled; the function is minted at
   unit 48's pass, so no product file spells it at this unit's base. by value: `tools/roles/handoff.py`,
   whose `render_handoff` joins every refusal line into `refusals` and so the clause's line with it, and
   which still receives 38 S5's line for the same open walk.
 - **S31** — id 27. One seed predicate. A function in `tools/govkit/govkit.py` filters `planned_writes`
-  rows to seed writes, the condition `cmd_plan` inlines today (`:5050-5051`); `cmd_plan` and unit 49's
+  rows to seed writes, the condition `cmd_plan` inlines today (tools/govkit/govkit.py@327dd3f6:5014-5015);
+  `cmd_plan` and unit 49's
   `derive_seed_expected` both call it. Observed by AC31.
 - **S32** — id 28. Unit 51's inversions have a disposition. An order inversion S1 or S6 finds is parked
   with `bash tools/unattended/unattended.sh --park dBoundRoles`, naming both units, and 51 AC1 checks
@@ -249,15 +261,30 @@ into `gov-reviewer`, which is why S4 renders `gov-builder`.
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26:
+Re-read at HEAD `29acd2d77` on 2026-11-22, units 14, 2 and 1 CLOSED; each code line is pinned to the blob
+it was read at:
 
-- `tools/roles/agents/gov-builder.agent.md:7` and `gov-skeptic.agent.md:7` hold the reads S1 and S4
-  rely on; `tools/roles/handoff.py:340-346` resolves a kickoff checker only for a `task:` key.
-- `tools/hooks/agent-cap.js` ends with a bare `main()` and has no `module.exports`; `:2101-2103` denies
-  on the marker count before any block is read; `:2050-2051` strips every `\r` before matching.
-- `tools/check-dead-paths.sh` `--list` exits 0 before `stale_rows` is computed.
-- `tools/govkit/govkit.py:5050-5051` inlines the seed-write condition in `cmd_plan`.
-- `help/roles.md:20-24` lists the renderer's refusals and `:103` heads "What the hooks refuse".
+- `tools/roles/agents/gov-builder.agent.md@59661aee:9` reads
+  `field.input.spec, field.card.route?, field.brief.non-goals?` and
+  `tools/roles/agents/gov-skeptic.agent.md@0db0ff3c:9` reads `field.input.diff?, field.input.spec?`, the
+  tag spelling unit 14 S7 wrote, which `roles_lib.parse_read_key` folds to native keys while
+  `roles_lib.load_roles` returns them raw. `tools/roles/handoff.py@c6d87bbb:600-617` runs the kickoff
+  checker's `--task-skeleton` only for a `task:` key, `:619-620` resolves a card for any `task:` or
+  `card:` key, and `:657-658` refuses a missing key only when it is not optional.
+- `tools/roles/handoff.py@c6d87bbb:132-133` holds `INPUT_NAMES` and `PATH_INPUTS`, so the typed names
+  are `diff` and `question`; `tools/roles/agents/gov-orienter.agent.md@b8554ec7:10` reads
+  `field.input.question`.
+- `tools/hooks/agent-cap.js@935a910d:1104-1112` is `module.exports` and `:1113` is
+  `if (require.main === module) main()`, with function declarations below it; `:704-705` denies on the
+  marker count before any block is read; `:653` strips every `\r` before matching.
+- `tools/roles/render_agents.py@132779e5:535-536` re-stamps a planted handoff through the hash
+  `handoff.py` still defines; unit 6 S4 moves that hash to `roles_lib` and re-points this call, checked
+  against spec 6, not HEAD.
+- `tools/check-dead-paths.sh@c532a99a:470-477` exits 0 in `--list` mode before `:489` computes
+  `stale_rows`.
+- `tools/govkit/govkit.py@327dd3f6:5014-5015` inlines the seed-write condition in `cmd_plan`.
+- `help/roles.md@4383ecb7:25-33` is step 3, which lists the renderer's refusals, and `:213` heads "What
+  the hooks refuse".
 - `memory/HYGIENE.md` "Acceptance ledger" gives the AMENDED form as `amended rev-<n>`, naming the
   revision and its §9 line.
 
@@ -323,8 +350,9 @@ The ledgers below are read block-scoped, as S23 states: from the unit's `**Evide
 - **AC4** — When the fixture renders `--role gov-builder --input spec=<scratch spec>` with no brief record,
   it exits 0 and the spec's bytes sit inside a fence. Red when: the control render refuses for a missing
   brief.
-- **AC5** — When `python -c` reads the `reads` of 45 AC1's control role through `roles_lib.load_roles`, it
-  holds no `task:` key and no required `brief:` key. Red when: the control role needs a card or a brief.
+- **AC5** — When `python -c` reads the `reads` of 45 AC1's control role through `roles_lib.load_roles` and
+  folds each entry through `roles_lib.parse_read_key`, it holds no `task:` key and no required `brief:`
+  key. Red when: the control role needs a card or a brief.
 - **AC6** — When `grep -n 'gov-builder' memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-45.md`
   runs, it prints AC1, and the spec's §9 names `TOOL-dBoundRoles-58`. Red when: AC1 still renders a role
   the fixture cannot satisfy.
@@ -430,6 +458,17 @@ New arm: tools/govkit/selftest.py · covers AC31 · the shared seed predicate, s
   strip in `extractHandoffMarker`, TOOL-dFairHearing-16 having moved rules 0, 2 and 5 out, by
   `2026-11-22-prompt-TOOL-dBoundRoles-20-reground-d-spec-writer`; nothing else moved.
 - rev-5 · 2026-11-22 · §2 · §9 · pinned by `2026-11-22-prompt-TOOL-dBoundRoles-1-pins-brief`: each line citation of tools/hooks/agent-cap.js the re-ground wrote is pinned to the blob it was read at, 935a910d, which HEAD 52f769c24 and 062906ffd hold alike, and S21's **Readers:** by-name half names that reader by its `extractHandoffMarker` with the pin beside it, so the hygiene readers grade still finds a reader spelling that token; nothing else moved.
+- rev-6 · 2026-11-22 · S1 · S5 · S8 · S19 · S21 · S30 · S31 · §4 Evidence · AC5 · re-grounded at HEAD
+  `29acd2d77` by `2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-brief`. Every line citation is
+  re-pointed to a blob-pinned line. The role files are tag-spelled and one line lower, so S1 names
+  `field.input.diff?` folded by `parse_read_key`, and AC5 folds each entry through it, since a raw read
+  of a tag-spelled line cannot go red. S5's claim is narrowed to the `--task-skeleton` read: a set
+  session id still sends `resolve_card_path` to the kickoff checker. S8 records that the entry guard and
+  the exports object already stand in `agent-cap.js` (TOOL-dFairHearing-16 S1). S19's agents verb is
+  `print_agent_lines`, its layout at lines 1295, 1302 and 1333. Unit 6 S4's re-point of
+  `render_agents.py`, unit 25's move and leg rename, unit 46's `TYPED_INPUTS`, unit 50's
+  `resolve_subagent_dir`, unit 43 S56's `resolve_agent_transcript` and unit 51's AC8 population were
+  checked against their specs, not HEAD; 58 AC18's spec-scope is unit 60's S1 to S3.
 
 ## 10. Reuse audit
 

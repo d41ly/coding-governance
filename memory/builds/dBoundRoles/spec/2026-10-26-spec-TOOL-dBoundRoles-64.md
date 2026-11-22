@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-64 — the round-1 audit of units 61 to 63, its 32 minors: floors at the executed count naming every unit, a negative case inverting its verdict, criteria failing on the text they retire, no stray worktree, and an edge per bumped spec
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -75,7 +75,8 @@ the other floored suite, found while grounding them (§8 F4).
   nothing, and requires spec 60's fourth §4 Evidence bullet to name `:1615` and `:1619-1620`. Observed by
   AC4.
 - **S7** — id 10. On the built tree, spec 60's fourth §4 Evidence bullet cites
-  `tools/memory-recall/selftest.py:1615` for `desc` and `:1619-1620` for the token loop. Where unit 63's
+  `tools/memory-recall/selftest.py@25c4ef69:1615`, the base blob, for `desc` and `:1619-1620` for the
+  token loop. Where unit 63's
   pass left the stale range, this pass makes that bump of spec 60. Observed by AC4.
 - **S8** — id 4. Spec 61's S1 and §7 state the in-suite arm of §4 "The inverted negative case": the call
   `assert_role_reads gov-nosuch input:question` runs inside a command substitution, and one outer
@@ -92,10 +93,13 @@ the other floored suite, found while grounding them (§8 F4).
   AC5.
 - **S11** — id 11. Spec 62's S2 counts EXECUTED assertions by §4 "The executed-count rule": a call site in a
   loop counts once per iteration, and a helper that asserts more than once per call counts that many per
-  call, as `check_spec_audit` asserts once per form. On the built tree the spawn guard's floor equals that
+  call, as `check_spec_audit` asserts once per form in `tools/workflows/spec-audit-optin.test.sh`, where
+  TOOL-dFairHearing-16 moved it out of the suite unit 25 moves. On the built tree the spawn guard's floor
+  equals that
   count, and unit 62's ledger records the call-site figure beside the executed figure. Observed by AC7.
 - **S12** — id 31. Spec 62's S2 keeps every arm that can announce a skip out of the floor, the house rule
-  of `tools/roles/adopt-roles.test.sh:73-74`, and its §5 risks line prices both the undercount from call
+  of `tools/roles/adopt-roles.test.sh@a8b141b6:91-92`, and its §5 risks line prices both the undercount
+  from call
   sites and the overcount from a skippable arm. The comment above the spawn guard's floor names each arm it
   leaves out, one `# out of the floor: <arm>` line per arm. Observed by AC8.
 - **S13** — id 12. Spec 62's S1 keeps only the base: where unit 43 pinned a floor, that value is the bare
@@ -158,8 +162,9 @@ the other floored suite, found while grounding them (§8 F4).
 - **S31** — id 27. Spec 62's §3 gains a **consumes-from** bullet for `TOOL-dBoundRoles-58`, naming its
   spawn-guard arms, which S2 floors, and its New arm line, which S4 bumps. Spec 58 gains the mirroring
   **hands-off** bullet, a rev bump with its §9 line. Observed by AC21.
-- **S32** — id 28. Spec 62's §4 Evidence and §10 cite `tools/roles/adopt-roles.test.sh:73-80` as the
-  comment shape S2 wants. They keep `tools/hooks/scratch-guard.test.sh:1303-1321` only as the shape of the
+- **S32** — id 28. Spec 62's §4 Evidence and §10 cite `tools/roles/adopt-roles.test.sh@3c0fb11c:73-80`,
+  the base blob, as the comment shape S2 wants. They keep each pinned `tools/hooks/scratch-guard.test.sh`
+  citation, `@f2a4351c:1303-1321` at base and `@1bae0749:1856-1906` at HEAD, only as the shape of the
   comparison line, and say its running-total comment is not that shape. Observed by AC22.
 - **S33** — no report id; the defect of ids 1 and 19 on the other floored suite (§8 F4). On the built tree,
   `FLOOR_ASSERTIONS` in `tools/roles/adopt-roles.test.sh` equals its executed count by §4's rule. Where its
@@ -269,36 +274,51 @@ labels.
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26 for code, and at the spec commit `5906fb79b` for spec lines:
+Read at base `462d20f3` on 2026-10-26 for code, and at the spec commit `5906fb79b` for spec lines; each
+code line is re-read at HEAD `29acd2d77` on 2026-11-22 and pinned to the blob it was read at:
 
-- `tools/roles/adopt-roles.test.sh:51` is `set -u`, `:71` sets `TMP_ROOT`, `:73-80` is the comment whose
-  first bare number 10 and thirteen terms sum to `FLOOR_ASSERTIONS=50` at `:81`, and `:83` defines a
-  `check_arm` that raises `fail` on any verdict but 1. `:170` and `:172` lower the floor on arm 6's SKIP,
-  `:432` and `:434` print arm 11's SKIP with no lowering, and `:715` prints `PASS ($n assertions)`.
+- At base, `tools/roles/adopt-roles.test.sh@3c0fb11c:51` is `set -u`, `:71` sets `TMP_ROOT`, `:73-80` is
+  the comment whose first bare number 10 and thirteen terms sum to `FLOOR_ASSERTIONS=50` at `:81`, and
+  `:83` defines a `check_arm` that raises `fail` on any verdict but 1. `:170` and `:172` lower the floor
+  on arm 6's SKIP, `:432` and `:434` print arm 11's SKIP with no lowering, and `:715` prints
+  `PASS ($n assertions)`. At HEAD the same lines are `tools/roles/adopt-roles.test.sh@a8b141b6:69`,
+  `:89`, `:91-112` over `FLOOR_ASSERTIONS=88` at `:113`, `:115`, `:239` and `:241`, `:623` and `:625`,
+  and `:1331`. `:994` and `:996` print arm 20's SKIP with no lowering, and the comment's `:109` restates
+  a running total, which spec 63's §8 F4 rewrites.
 - `tools/hooks/agent-cap.test.sh`, the spawn guard's suite before unit 25 moves it, holds no
-  `FLOOR_ASSERTIONS`. It calls `check_spec_audit` from 53 sites, and the helper asserts once per form in
-  `for form in object string` (`:795-797`). Loops assert at `:883` over six kinds and `:933` over four
-  platforms. Skip branches sit at `:891`, `:947`, `:2043` and `:2280`. `:150` prints
-  `PASS (${pass:-1} assertions)` under `FOREIGN_PREFIX_PROBE` only.
-- `tools/check-testsuite-counts.sh:86-99` is `compliant`: an anchored PASS line, a non-zero floor, and a
-  reference to it. The branch below it reds a waiver row naming a suite that complies.
-- `memory/project/testsuite-count-waivers.txt:10` lists `tools/hooks/agent-cap.test.sh`;
-  `tools/gate-legs.json:1645` names the leg `testsuite counts (every bar self-test prints one)`.
-- `tools/hooks/scratch-guard.test.sh:1303-1319` is a running-total comment whose first bare number, 164, is
-  a total; `:1320` pins the floor and `:1321` compares.
+  `FLOOR_ASSERTIONS` at base or at HEAD. At base, `tools/hooks/agent-cap.test.sh@d8334459:795-797`
+  defined `check_spec_audit`, asserting once per form in `for form in object string`, loops asserted at
+  `:883` over six kinds and `:933` over four platforms, skip branches sat at `:891`, `:947`, `:2043` and
+  `:2280`, and `:150` printed `PASS (${pass:-1} assertions)` under `FOREIGN_PREFIX_PROBE` only. At HEAD
+  TOOL-dFairHearing-16 has moved rules 0, 2 and 5 out: `check_spec_audit` and its sites live in
+  `tools/workflows/spec-audit-optin.test.sh` under that suite's own floor, and the suite unit 25 moves
+  calls it from no site. In `tools/hooks/agent-cap.test.sh@97439f99`, the asserting loops sit at `:391`,
+  `:436`, `:530` and `:716`, the one skip echo at `:589`, and `:312` prints the probe's PASS line.
+- `tools/check-testsuite-counts.sh@d4bad437:86-99` is `compliant`, the same blob at base and at HEAD: an
+  anchored PASS line, a non-zero floor, and a reference to it. The branch below it reds a waiver row
+  naming a suite that complies.
+- `memory/project/testsuite-count-waivers.txt@99888898:10` lists `tools/hooks/agent-cap.test.sh`, at HEAD
+  `memory/project/testsuite-count-waivers.txt@99516f65:9`; `tools/gate-legs.json@e07c84d3:704` names the
+  leg `testsuite counts (every bar self-test prints one)`.
+- `tools/hooks/scratch-guard.test.sh@f2a4351c:1303-1319` is a running-total comment whose first bare
+  number, 164, is a total; `:1320` pins the floor and `:1321` compares. At HEAD the comment is
+  `tools/hooks/scratch-guard.test.sh@1bae0749:1856-1904`, its first bare number still 164, and `:1905`
+  pins the floor at 401 and `:1906` compares.
 - Spec 43 line 524 raises the spawn guard's floor; spec 50 line 324 adds a spawn-guard arm, floor field
   `none`; spec 58 line 398 likewise. The build orders are 28, 30 and 32. Spec 62's S2 takes 43's pin as the
   base and its S3 says that base carries every earlier unit.
 - The adopter suite's `New arm:` lines in specs 1, 2, 3, 11, 13, 14, 15, 16, 17, 19, 20, 21, 22, 24, 26,
   38, 41, 43, 45, 47, 48 and 50 name no floor; units 52, 53 and 58 are floored by 60 S24, and units 59, 60
   and 61 name their own raise.
-- Spec 52's lines 101-102 wrap "writes" / "no file this unit writes"; its line 28 cites the read-set parse
-  for `ap.error`. Spec 60's line 222 cites the bare `:1615-1618`. `tools/memory-recall/selftest.py:1615`
-  assigns `desc` and `:1619-1620` hold the token loop.
+- Spec 52's lines 102-103 wrap "writes" / "no file this unit writes"; its line 28 cites the read-set parse
+  for `ap.error`. Spec 60's line 222 cites the bare `:1615-1618`.
+  `tools/memory-recall/selftest.py@25c4ef69:1615` assigns `desc` and `:1619-1620` hold the token loop, at
+  HEAD `tools/memory-recall/selftest.py@6474907c:1722` and `:1726-1727`.
 - Spec 61's §4 "The capture" redirects to `"$TMP_ROOT/reads.err"`, and its AC1 driver defines only
   `check_arm`, `$PY`, `$FX` and `$FXK`. Its S4 permits a branch that edits no code, while its AC4 needs a
   term naming the unit.
-- Spec 63's §10 cites "59's and 60's" route; only specs 58 and 60 carry "How an item closes". Spec 60's §3
+- Spec 63's §10 cites "59's and 60's" route, and spec 59 carries no "How an item closes"; the route's
+  sources are specs 58 and 60. Spec 60's §3
   declares a consumes-from edge for every spec it bumps; spec 63's §3 names units 59 to 62 only, and spec
   62's names units 60, 61 and 63.
 
@@ -443,7 +463,8 @@ Live at landing, at order 36, after every unit it repairs. No other unit holds o
   exit check never meets.
 - **AC18** — When a `python -c` probe runs `git grep -n 'handoff.py:1025' -- memory/builds/dBoundRoles/spec`,
   sets aside the lines of specs 63 and 64, and reads spec 63's S16 Readers clause, the clause names every
-  remaining file's unit and line, spec 52's `ap.error` citation among them.
+  remaining file's unit and line, and names spec 52's `ap.error` citation, which the grep no longer
+  prints at HEAD `29acd2d77`, as one that stays.
   Red when: the inventory reads complete and omits a line the grep prints.
 - **AC19** — When `grep -n "59's and 60's"` runs over spec 63, it prints nothing, and spec 63's §10 names
   `58's and 60's`.
@@ -456,9 +477,9 @@ Live at landing, at order 36, after every unit it repairs. No other unit holds o
   `TOOL-dBoundRoles-58`, and spec 58's holds a `**hands-off**` bullet naming `TOOL-dBoundRoles-62`, with a
   §9 line naming it.
   Red when: the edge graph misses that unit 62 rewrites spec 58.
-- **AC22** — When `grep -n 'adopt-roles.test.sh:73-80'` runs over spec 62, it prints a §4 Evidence line,
-  and a `python -c` probe finds that every line of spec 62 naming `scratch-guard.test.sh:1303` also names
-  the comparison.
+- **AC22** — When `grep -nF 'adopt-roles.test.sh@3c0fb11c:73-80'` runs over spec 62, it prints a §4
+  Evidence line, and a `python -c` probe finds that every line of spec 62 naming a pinned
+  `scratch-guard.test.sh@` citation also names the comparison.
   Red when: the Evidence cites as the shape a comment that fails S2's sum rule.
 - **AC23** — When a `python -c` probe reads the `**Evidences:**` blocks of units 60, 61, 62 and 63, no
   criterion label is answered twice in one block, and each criterion this unit changed answers
@@ -512,12 +533,25 @@ New arm: tools/roles/spawn-guard.test.sh · covers AC2 AC7 AC8 · the floor comp
   named the adopter suite in prose in AC6 and AC14.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-65 and TOOL-dBoundRoles-66, the HIGH promotion and the minors batch of the round-1 audit of unit 64; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-69, the minors batch of the round-1 audit of units 65 and 66; nothing else moved.
+- rev-4 · 2026-11-22 · S7 · S11 · S12 · S32 · §4 Evidence · AC18 · AC22 · §10 · re-grounded at HEAD
+  `29acd2d77` by `2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-brief`. Every code citation is
+  re-pointed to a symbol or a blob-pinned line, each base reading kept on its base blob beside the HEAD
+  lines. TOOL-dFairHearing-16 moved `check_spec_audit` and its sites out of the suite unit 25 moves, so
+  S11's example names `tools/workflows/spec-audit-optin.test.sh`, and the second Evidence bullet gives
+  the spawn guard's suite no site count and its HEAD loops and skip, in the end state unit 66's S19 and
+  AC12 require. The adopter suite's comment now runs to line 112 with a running-total line at 109 and
+  a third SKIP arm, arm 20. Spec 52's wrapped claim sits at lines 102 and 103 at `5906fb79b`, and the
+  route census names spec 59 as carrying no "How an item closes". S32 and AC22 read the pinned
+  citations spec 62's rev-4 writes, and AC18 names spec 52's citation, which the grep no longer prints.
+  Units 25, 43, 50, 58 and 61 to 63 and the floors their passes leave were checked against their specs,
+  not HEAD.
 
 ## 10. Reuse audit
 
 The seams are the units' own: 58's and 60's "How an item closes" route, the suites' shrink-only
-`FLOOR_ASSERTIONS` convention in the comment shape `tools/roles/adopt-roles.test.sh:73-80` carries, the
-`compliant` predicate of `tools/check-testsuite-counts.sh:86-99`, which AC10 calls rather than copies,
+`FLOOR_ASSERTIONS` convention in the comment shape `tools/roles/adopt-roles.test.sh@3c0fb11c:73-80`
+carries, the `compliant` predicate of `tools/check-testsuite-counts.sh#compliant`
+(`tools/check-testsuite-counts.sh@d4bad437:86-99`), which AC10 calls rather than copies,
 the suite's `check_arm` and unit 61's `assert_role_reads`, and git's own worktree, each extended rather
 than rebuilt.
 `python tools/codebase-map/reuse_lookup.py "a suite floor counts executed assertions inside loops and leaves skipping arms out"`

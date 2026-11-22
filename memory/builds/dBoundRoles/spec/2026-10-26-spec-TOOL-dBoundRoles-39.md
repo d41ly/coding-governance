@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-39 — the return check grades a direct spawn only: a stop whose transcript is a harness stage's, or whose first record carries no handoff marker, passes untouched
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -65,7 +65,7 @@ it (order 16).
 
 ## 3. Non-goals (OUT)
 
-- The return grammar, `validate_return`, the retry and its record: `TOOL-dBoundRoles-5`'s, unchanged in
+- The return grammar, `check_return`, the retry and its record: `TOOL-dBoundRoles-5`'s, unchanged in
   what they do to a direct spawn.
 - The gate that replays a recorded harness stop against every `SubagentStop` hook a settings file
   registers: `TOOL-dBoundRoles-40`'s, for id 56.
@@ -193,6 +193,9 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 · the `harness-type
   loop and `runWithRetries`, checked against TOOL-dBoundRoles-5's spec; `extract_prompt_marker` is
   claimed as TOOL-dBoundRoles-17 S1 and TOOL-dBoundRoles-38 S4 leave it, read against their specs. The
   route test, the plants and the criteria are unchanged.
+- rev-6 · 2026-11-22 · §3 · folded by `2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief`, item 1:
+  TOOL-dBoundRoles-5's checker is `check_return`, the name the lexicon answers, as that unit's §8 F7
+  now resolves, so the non-goal naming it is renamed. Nothing else moved.
 
 ## 10. Reuse audit
 

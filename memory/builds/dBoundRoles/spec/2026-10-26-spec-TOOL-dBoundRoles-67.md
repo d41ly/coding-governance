@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-67 — unit 65's leftover sweep also selects the observation's worktrees by what they checked out, so a leftover at an unnamed `%TEMP%` path is found
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -116,21 +116,26 @@ a human pins a worktree, and the `CLOSED` headers prove the observing passes are
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26; HEAD equals base for every code file cited here:
+Re-read at HEAD `29acd2d77` on 2026-11-22; each code line is pinned to the blob it was read at:
 
-- `tools/branch-reconcile/branch_reconcile.py:188-212` is `parse_worktrees`. It keeps `HEAD` as
-  `head` (`:204-205`) and `detached`, `locked` and `prunable` in `flags` (`:208-209`). `:165-172` are
-  `derive_key` and `check_under`, the comparison spec 65's S1 adopts.
-- Spec 63's S12, lines 83-89, names the commit command and says the worktree is checked out at its
-  parent "under a short `%TEMP%` path". Spec 64's S18, lines 116-121, keeps "a short `%TEMP%` prefix".
-  Spec 60's §4 "Where each item lands", line 212, extracts "under `%TEMP%`, short-pathed".
-- `git grep -n derive_overlay_expected -- tools` prints nothing at base: unit 54 adds the function at
-  order 6 and unit 19 takes it out at order 24. So the signature command prints nothing on today's
-  tree, and S1's stop is what keeps a sweep run before order 24 from passing.
-- `git worktree list --porcelain` prints 30 `worktree` lines and one `detached` entry, none under
-  `%TEMP%`. The detached entry's `head` is not a parent of a unit-19 commit, which does not exist yet.
-- `tools/workflows/unattended-unit.js:314-318` has each unit pass set its spec header to `CLOSED` in
-  its own commit, so S3's third condition is readable from the tree at order 38.
+- `tools/branch-reconcile/branch_reconcile.py#parse_worktrees` keeps `HEAD` as `head`
+  (`branch_reconcile.py@4cbbe71c:204-205`) and `detached`, `locked` and `prunable` in `flags`
+  (`:208-209`). `#derive_key` and `#check_under` are the comparison spec 65's S1 adopts. Since base
+  the file moved only its kit version, so these lines did not shift.
+- At `29acd2d77`, spec 63's S12 names the commit command and says the worktree is checked out at its
+  parent "under a short `%TEMP%` path". Spec 64's S18 keeps "a short `%TEMP%` prefix". Spec 60's §4
+  "Where each item lands" extracts "under `%TEMP%`, short-pathed". Each is cited by its label, since
+  units 64 to 66 revise those specs before this pass.
+- `git grep -n derive_overlay_expected -- tools` prints nothing at `29acd2d77`: unit 54 adds the
+  function at order 6 (its S1) and unit 19 takes it out at order 24 (its unit-55 consumes-from edge),
+  checked against those specs. So the signature command prints nothing on today's tree, and S1's stop
+  is what keeps a sweep run before order 24 from passing.
+- `git worktree list --porcelain` prints 64 `worktree` lines and 3 `detached` entries (PINNED,
+  measured 2026-11-22 at `29acd2d77`). Two of the detached entries lie under `%TEMP%`, other runs' base
+  checkouts at `.../Temp/dbr-base` and `.../Temp/dtr-base`, so `TEMP` and `detached` alone would
+  select them; neither `head` is a parent of a unit-19 commit, which does not exist yet.
+- `tools/workflows/unattended-unit.js@3aa27411:412-417` has each unit pass set its spec header to
+  `CLOSED` in its own commit, so S3's third condition is readable from the tree at order 38.
 
 ### Inventory
 
@@ -198,7 +203,7 @@ AC4 here and a new AC6 there, so neither rewrites the other's ledger line.
   resolves empty and the sweep prints nothing.
   figure: DERIVED at observation time.
 - **AC3** — When a `python -c` probe reads unit 65's `**Evidences:**` block, exactly one line answers
-  AC4 and `LEDGER` of `tools/memory-tree/deviation_join.py:163` matches it. The spec-65 revision whose
+  AC4 and `LEDGER` of `tools/memory-tree/deviation_join.py` matches it. The spec-65 revision whose
   §9 line names `TOOL-dBoundRoles-67` is the revision `LEDGER` captures, or one inside the
   parenthesised list after it. The line holds the signature sha and the pre-sweep selections.
   Red when: a second line answers AC4, this unit's revision is missing from the line, or the line
@@ -221,6 +226,14 @@ No suite arm moves. The sweep is a probe of this pass, and it records its readin
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 65 and 66, id 1
   (HIGH, item H1, shared with id 14), on the skeptic's corrected fix.
+- rev-2 · 2026-11-22 · §4 Evidence · AC3 · re-grounded at HEAD `29acd2d77` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-65-reground-q-brief`. `branch_reconcile.py` moved only its kit
+  version, so `parse_worktrees`'s fields hold, cited by symbol and at `@4cbbe71c`. The porcelain census
+  is re-measured: 64 `worktree` lines and 3 detached entries, two of them other runs' base checkouts
+  under `%TEMP%`, which the signature, not `TEMP`, tells apart. The `CLOSED`-header instruction moved to
+  `unattended-unit.js@3aa27411:412-417`. `LEDGER` is cited by symbol, and specs 60, 63 and 64 by label.
+  `derive_overlay_expected`'s arrival and removal are units 54's and 19's, checked against their specs,
+  not HEAD. Nothing a criterion observes changed.
 
 ## 10. Reuse audit
 

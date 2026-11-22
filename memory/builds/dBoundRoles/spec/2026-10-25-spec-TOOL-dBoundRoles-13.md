@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-13 — inputs handed as content, each fact keyed and classed by the executor and re-cut fresh at act launch
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 10 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 10 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0178@f3b0d6ea whole
 
@@ -166,7 +166,27 @@ under 49152 bytes by the spec cap, and its build brief is the build's.
 
 ### Rollout
 
-Live at landing on both routes.
+Live at landing on both routes. S7's `handoff.py facts` line takes the unattended Skill's render past
+its size row, which has no headroom at HEAD `29acd2d77`: the row is 11455 and the render
+`.claude/skills/unattended/SKILL.md` measures 11455 CR-stripped, PINNED on 2026-11-22
+(`tools/template-size-limits.txt@a1600d6f:289`). The build takes the raise the size file's header
+lets a run make (`tools/template-size-limits.txt@a1600d6f:16-28`), on all four of its terms, which
+admit a raise only together:
+
+1. the raise sits in this unit's own commit, whose change takes the render past the row, measured
+   CR-stripped;
+2. the row's comment block reserves no movement to the owner, and the new value is the measured
+   render with no headroom, the rule that block keeps; the line is a rendered command, which the block
+   names as the Skill's own content (`tools/template-size-limits.txt@a1600d6f:188-193`), so no prose
+   is coming back;
+3. the movement is argued in place above the row: `RAISED 11455 -> <the measured render>`, the date,
+   this unit, the figure and why;
+4. this unit's row is recorded in `memory/DECISIONS.md` before or with the raise.
+
+Where the render is within the row at this unit's base, no raise is made; where any term fails, the
+pass trims `tools/unattended/SKILL.template.md` back within the row instead. `TOOL-dBoundRoles-44` S7
+leaves a raise made on these terms standing and names its `memory/DECISIONS.md` row, as its §8 F4
+resolves.
 
 ### Files touched (estimate)
 
@@ -184,6 +204,8 @@ Live at landing on both routes.
 - `tools/workflows/README.md`
 - `tools/unattended/SKILL.template.md`, rendered to `.claude/skills/unattended/SKILL.md`
 - `tools/unattended/VERBS.template.md`
+- `tools/template-size-limits.txt`, the unattended Skill's row raised by §4 "Rollout"
+- `memory/DECISIONS.md`, the raise's row
 
 ### Alternatives rejected
 
@@ -240,7 +262,7 @@ Live at landing on both routes.
 
 ## 7. Gates
 
-`roles adopter self-test` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `workflow script syntax` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles adopter self-test` · `agent-cap self-test` · `format-guard self-test` · `policy fixtures` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `workflow script syntax` · `check-wiring self-test` · `lexicon naming predicates` · `unattended skill size` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/hooks/agent-cap.test.sh · covers AC3 · a rule-6 case whose handed spec changes between render and spawn · none
 New arm: tools/workflows/unattended-build.test.sh · covers AC5 · the unit harness evaluated with no `facts`, and with a `facts` naming another spec path · none
@@ -301,6 +323,13 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC4 · a render and a `fa
   brief record `gov-spec-writer`'s required reads need; F3's order is fixed, and `derive_section_sha`'s
   move into the library is checked against TOOL-dBoundRoles-6's spec; `tools/hooks/agent-cap.js` is
   still blob `935a910d`; every other moved citation re-pointed to a symbol or a pinned line.
+- rev-6 · 2026-11-22 · S7 · §4 · §7 · folded by `2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief`,
+  item 6: S7's Skill line takes the unattended Skill's render past its size row, which has no headroom
+  at HEAD, so §7's leg line gains `unattended skill size`, and §4 "Rollout" states that the build takes
+  the size file's raise on all four of its terms, or trims where one fails, as
+  `TOOL-dBoundRoles-44` §8 F4 puts it, checked against that spec. Files touched gains the size file and
+  `memory/DECISIONS.md` the raise writes, and the leg line the `recall floor` and `recall floor arms`
+  legs whose guard the latter trips. Nothing else moved.
 
 ## 10. Reuse audit
 

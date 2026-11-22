@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-65 — the observation worktree's cleanup check compares normalised paths under a named root, and a positive control proves it sees a leftover
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -81,8 +81,8 @@ after it (order 37).
 - A shared comparison helper in a kit. The comparison is a criterion probe's, and it imports
   `branch_reconcile` rather than copying it. No shipped code reads the observation root.
 - Every other reader of `git worktree list --porcelain` under `tools/`, such as
-  `tools/unattended/resume-tick.sh:430` and `tools/check-wiring.sh:1952`. None compares against a
-  `%TEMP%` prefix.
+  `tools/unattended/resume-tick.sh@4a8a2169:430` and `tools/check-wiring.sh@49c697ec:2135`. None
+  compares against a `%TEMP%` prefix.
 
 ### Edges
 
@@ -109,35 +109,46 @@ def registered_under(root):
             if br.check_under(os.path.realpath(w["path"]), r)]
 ```
 
-`derive_key` folds case and separators through `os.path.normcase(os.path.normpath(os.path.abspath(p)))`.
-`os.path.realpath` expands an 8.3 short name and resolves a junction, so a `%TEMP%` held in short form
+`tools/branch-reconcile/branch_reconcile.py#derive_key` folds case and separators through
+`os.path.normcase(os.path.normpath(os.path.abspath(str(path))))`. `os.path.realpath` expands an 8.3 short name and resolves a junction, so a `%TEMP%` held in short form
 still compares. `check_under` is strict, so the root itself never counts. The root is a directory, not a
 name prefix, so a sibling such as `dbr63obs-x` is not under it. The block shows the design's shape; the
 pass fits it to S12's probe and to S4's control.
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26; HEAD equals base for every code file cited here:
+Re-read at HEAD `29acd2d77` on 2026-11-22; each code line is pinned to the blob it was read at:
 
-- `echo $TEMP` prints `C:\Users\d41ly\AppData\Local\Temp`. `git worktree list --porcelain` prints 30
-  `worktree` lines, all with forward slashes, and none under `%TEMP%`.
-- `tools/branch-reconcile/branch_reconcile.py:165-167` is `derive_key`, `:170-172` is `check_under`, and
-  `:182` compares a worktree with `tempfile.gettempdir()` as `check_under(os.path.realpath(path),
-  os.path.realpath(tempfile.gettempdir()))`. `:188-212` is `parse_worktrees`, which reads the `-z` form
-  and keeps the `prunable` flag. Importing the module runs nothing: `:1223` guards `main`.
-- Measured in a scratch repository under `%TEMP%`: with a worktree at `<root>/1-1`, the comparison given
-  the root as `C:\Users\d41ly\AppData\Local\Temp\dbr65c\root` reported
+- `echo $TEMP` prints `C:\Users\d41ly\AppData\Local\Temp`. At `29acd2d77`, `git worktree list`
+  `--porcelain` prints 64 `worktree` lines (PINNED, measured 2026-11-22 at `29acd2d77`), all with
+  forward slashes. Two of them (PINNED, `29acd2d77`) lie under `%TEMP%`, at
+  `C:/Users/d41ly/AppData/Local/Temp/dbr-base` and `.../Temp/dtr-base`, both detached and neither this
+  build's: other runs' base checkouts, the entries a bare `%TEMP%` root would red on.
+- `tools/branch-reconcile/branch_reconcile.py#derive_key` and `#check_under` are the comparison.
+  `#derive_location` compares a worktree with `tempfile.gettempdir()` as
+  `check_under(os.path.realpath(path), os.path.realpath(tempfile.gettempdir()))`
+  (`branch_reconcile.py@4cbbe71c:183`). `#parse_worktrees` reads the `-z` form and keeps the `prunable`
+  flag. Importing the module runs nothing: `branch_reconcile.py@4cbbe71c:1223` guards `main`. Since
+  base the file moved only its kit version, so these lines did not shift.
+- Measured in a scratch repository under `%TEMP%` on 2026-10-26: with a worktree at `<root>/1-1`, the
+  comparison given the root as `C:\Users\d41ly\AppData\Local\Temp\dbr65c\root` reported
   `C:/Users/d41ly/AppData/Local/Temp/dbr65c/root/1-1`, a raw `startswith` reported nothing, and after
   `git worktree remove --force` the comparison reported nothing.
-- `os.path.realpath("C:/PROGRA~1")` normalises to `c:\program files`.
-- `memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-58-spec-audit-round1.md:238`
-  records `os.path.commonpath` raising `ValueError` across drives on this host.
-- Spec 64's S18 is at lines 115-120 and its AC13 at lines 414-418. Spec 63's S12 is at lines 83-89 and
-  says "under a short `%TEMP%` path"; its §5 security line, line 211, says the worktree "lives under
-  `%TEMP%`".
-- `tools/run-gates/lib-attribute.sh:59` and `:63` are `add_scratch_worktree` and
-  `remove_scratch_worktree`, and `tools/run-gates/post-merge.sh:362-363` pairs them with an EXIT trap.
-  That is the lifecycle S12's probe may source. It holds no comparison.
+- `os.path.realpath("C:/PROGRA~1")` prints `C:\Program Files`, and `derive_key` of it folds the case to
+  `c:\program files`.
+- `memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-58-spec-audit-round1.md@c005c4aa:89`
+  and `:253` record `os.path.commonpath` raising `ValueError` across drives on this host.
+- At `29acd2d77`, spec 64's S18 and AC13 say "a short `%TEMP%` prefix" and "S12's prefix". Spec 63's
+  S12 says "under a short `%TEMP%` path", and its §5 security line says the worktree "lives under
+  `%TEMP%`". Each is cited by its label, because units 64 and 66 revise both specs before this pass.
+- `tools/run-gates/lib-attribute.sh#add_scratch_worktree` and `#remove_scratch_worktree` are the
+  worktree lifecycle, and `tools/run-gates/post-merge.sh@eb32abcc:819-820` pairs them with an EXIT
+  trap. That is the lifecycle S12's probe may source. It holds no comparison.
+- No other reader of the porcelain under `tools/` compares against a temp prefix. A grep for
+  `gettempdir`, `$TEMP`, `%TEMP%` and `TMPDIR` over `tools/unattended/resume-tick.sh`,
+  `tools/check-wiring.sh`, `tools/loop/loop_witness.py`, `tools/playbook/tag_index.py`,
+  `tools/run-gates/run-gates.sh`, `tools/unattended/pass-tree.sh` and `tools/unattended/unattended.sh`
+  finds only `TMPDIR` handling in the bar and the driver, none of it on a porcelain path.
 
 ### Inventory
 
@@ -168,7 +179,7 @@ clauses, and each criterion reads only its own unit's clauses, so either order l
 - **`os.path.commonpath`.** It raises `ValueError` across drives (§4 Evidence), so a worktree on a second
   drive would crash the check instead of passing it.
 - **A new comparison helper.** `branch_reconcile` already compares a worktree with the temp directory
-  this way at `:182`. A second copy would drift from it.
+  this way in `#derive_location`. A second copy would drift from it.
 - **A bare `%TEMP%` as the root.** Other sessions' fixture clones and worktrees live under `%TEMP%`, so
   a normalised check against it reds on their entries. The cleanup clause would then reach entries this
   unit does not own, which is the hazard id 23 names.
@@ -210,7 +221,7 @@ clauses, and each criterion reads only its own unit's clauses, so either order l
   Red when: an observation left a worktree registered under the root.
   figure: DERIVED at observation time.
 - **AC5** — When a `python -c` probe reads unit 64's `**Evidences:**` block, exactly one line answers
-  AC13, and `LEDGER` of `tools/memory-tree/deviation_join.py:163` matches it at the spec-64 revision whose
+  AC13, and `LEDGER` of `tools/memory-tree/deviation_join.py` matches it at the spec-64 revision whose
   §9 line names `TOOL-dBoundRoles-65`. Where unit 63's block answers AC11, the same holds there for
   spec 63.
   Red when: a second line answers the criterion, or the one line names a stale revision.
@@ -240,16 +251,27 @@ No suite arm moves. S4's control is a write probe, so the pass runs it and recor
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of unit 64, id 11 (HIGH, item
   H1), on the report's fix, with branch_reconcile's comparison as the seam.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-67, TOOL-dBoundRoles-68 and TOOL-dBoundRoles-69, the two HIGH promotions and the minors batch of the round-1 audit of units 65 and 66; nothing else moved.
+- rev-3 · 2026-11-22 · §3 · §4 · AC5 · §10 · re-grounded at HEAD `29acd2d77` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-65-reground-q-brief`. `branch_reconcile.py` moved only its kit
+  version since base, so its symbols hold; they are cited as `#derive_key`, `#check_under`,
+  `#derive_location` and `#parse_worktrees`, and the temp comparison is re-pointed from `:182` to
+  `@4cbbe71c:183`, where it always sat. The porcelain census is re-measured: 64 `worktree` lines, two of
+  them other runs' base checkouts under `%TEMP%`. `os.path.realpath("C:/PROGRA~1")` prints
+  `C:\Program Files`, the case folded by `derive_key`. The dWitnessedBar-58 citation moves from `:238`,
+  which never held it, to `@c005c4aa:89` and `:253`. `post-merge.sh`'s trap is at `@eb32abcc:819-820`,
+  `check-wiring.sh`'s porcelain reader at `@49c697ec:2135`, and `LEDGER` is cited by symbol. Specs 63's
+  and 64's clauses are cited by label, not line, since units 64 and 66 revise both before this pass.
+  Nothing a criterion observes changed.
 
 ## 10. Reuse audit
 
 The seam is `tools/branch-reconcile/branch_reconcile.py`: `parse_worktrees`, `derive_key` and
-`check_under`, imported as `derive_location` already uses them for the temp directory at `:182`, rather
-than a second normaliser. `python tools/codebase-map/reuse_lookup.py "compare a windows temp path with git worktree list paths after normalising slashes and case"`
+`check_under`, imported as `branch_reconcile.py#derive_location` already uses them for the temp
+directory, rather than a second normaliser. `python tools/codebase-map/reuse_lookup.py "compare a windows temp path with git worktree list paths after normalising slashes and case"`
 ranked `git`, `run_git`, `read_git_output`, `add_scratch_worktree` and `remove_scratch_worktree`. None
 is a normalised comparison: the last two are the worktree lifecycle S12's probe may source. A
 `git grep -n normcase -- tools` found the branch_reconcile comparison. The recall query's hits include
-`memory/builds/dOrderedCharter/reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md:267`,
+`memory/builds/dOrderedCharter/reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md@d2b648bd:267`,
 which fixed the same class with forward slashes and a case-folded drive. They also include the
 dWitnessedBar finding that `os.path.commonpath` raises across drives, and `TOOL-aProbedUnit-11`, the
 short `%TEMP%` path rule a clone needs.

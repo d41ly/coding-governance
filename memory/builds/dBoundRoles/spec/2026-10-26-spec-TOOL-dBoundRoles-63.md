@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-63 — the round-1 audit of units 59 and 60, its 19 minors: a floor sum that counts its base, criteria that can fail on the text they retire, observations on a tree that imports, and write sets that name every file
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -56,7 +56,8 @@ the audit.
   carries every unit before 58, so unit 58's terms are never asked to equal that floor alone. Observed by
   AC1.
 - **S3** — id 15. 60 §4 Evidence's last bullet reads that the base 10 plus the `+<n>` terms of
-  `tools/roles/adopt-roles.test.sh:73-80` sum to `FLOOR_ASSERTIONS=50`. Observed by AC2.
+  `tools/roles/adopt-roles.test.sh@3c0fb11c:73-80`, the base blob, sum to `FLOOR_ASSERTIONS=50`. Observed
+  by AC2.
 - **S4** — id 22. Before the pass records 60 AC15, it runs S1's sum over the base blob of the adopter suite
   and records the reading in unit 60's ledger: the base term plus the terms print 50, equal to the floor.
   Observed by AC3.
@@ -82,7 +83,9 @@ the audit.
 - **S11** — id 17. 59 AC4 takes the skeptic's corrected form. A probe extracts two bullets of spec 53: S1,
   from `**S1**` through the end of its Readers clause, and the §4 Evidence bullet citing the read set. Each
   names `parse_read_key`, and the S1 bullet holds no match of `handoff\.py:1025($|[^0-9])`. The citations
-  of the `ap.error` refusal at spec 53's lines 26 and 76, and its §1 Goal text, stay. Where unit 59's pass
+  of the `ap.error` refusal in spec 53's §1 Goal and its §4 Evidence, which its rev-4 re-ground re-points
+  to `tools/roles/handoff.py@c6d87bbb:1477-1480`, stay; at HEAD `29acd2d77` both bullets already name
+  `parse_read_key` and hold no match. Where unit 59's pass
   left a match in 53's S1 bullet, this pass makes 59 S4's bump of spec 53. Observed by AC10.
 - **S12** — id 20. 60 §4 "Where each item lands" observes on a detached worktree, not on a `git archive`
   extraction, so govkit's self-test module finds its repository at import. The commit is
@@ -101,16 +104,24 @@ the audit.
   bullet without `gov-builder`, this pass makes that bump. Observed by AC9.
 - **S16** — id 11. 59 AC4 also requires that the Readers line of 53's S1 names no bare
   `handoff.py:1025`, the citation 59 S4 retires there. Observed by AC10.
-  **Readers:** by name: `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-53.md:45`, 53's
-  Readers line, the one spelling this item clears. A git grep for the citation also prints 53's line 41
-  inside the S1 bullet, which S11 clears, its ap.error citations at lines 26 and 76, which S11 keeps, and
-  spec 59's lines 27, 52, 60, 82 and 164, which cite the base or state the retirement and stay. by value: NO VALUE READERS — the item moves a
+  **Readers:** by name: `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-53.md`, 53's
+  Readers line in S1, the one spelling this item clears, which its rev-4 re-ground already re-points to
+  `roles_lib.parse_read_key`. At HEAD 29acd2d77, a git grep of the build's spec folder for
+  handoff.py:1025 prints no line of spec 53 and none of
+  `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-52.md`, whose citation of the read-set
+  parse for the `ap.error` refusal reads tools/roles/handoff.py@c6d87bbb:1477-1480 and stays, as 53's
+  citations of that refusal do. It prints
+  `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-59.md` lines 56 and 171, its S4 and
+  AC4, which state the retirement and stay, beside the lines of specs 63 and 64, which quote it (PINNED,
+  29acd2d77). Spec 66's wider by-value regex also prints
+  `memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-69.md` line 125, a citation of `handoff.py` line 1027
+  naming an old hit of spec 52, which stays. by value: NO VALUE READERS — the item moves a
   citation in a spec's prose, which no code reads; the read-set parse it pointed at stays in
   `tools/roles/handoff.py`, and 53 now cites it through `parse_read_key`.
 - **S17** — id 12. 60 §4 Evidence's first bullet says the grep was read at the spec commit `13ac01368`,
   where it prints spec 46 line 139, 48 line 176, 50 line 265 and 58 lines 117 and 349 beside spec 60's own;
-  its fourth cites `tools/memory-recall/selftest.py:1615` for `desc` and `:1619-1620` for the token loop.
-  Observed by AC14.
+  its fourth cites `tools/memory-recall/selftest.py@25c4ef69:1615`, the base blob, for `desc` and
+  `:1619-1620` for the token loop. Observed by AC14.
 - **S18** — id 14. 59 S4's §10 clause is an addition: 53's §10 names `roles_lib.parse_read_key` (unit 14
   S4) beside `load_roles` and `check_arm` as the seam the read check folds through. 59 AC4 gains a half:
   `grep -n 'parse_read_key'` over spec 53 prints a §10 line. Where unit 59's pass left 53's §10 without
@@ -158,7 +169,9 @@ unit already left it. Where an item changes another unit's criterion or scope it
 unit's spec FIRST with the changed text and a §9 line naming this unit (BUILD-METHOD M2, READY), and that
 unit's ledger answers the criterion `amended rev-<n>`, naming the revision (58 §4 "How an item closes").
 Where S1's sum is red on the built tree because a raise left no term, the pass adds the term to that
-suite's comment.
+suite's comment. Where it is red because a line restates a running total whose `+<n>` figures re-count
+terms above it, the pass rewrites that line's figures without a `+`, leaving the floor and every term as
+they stand (§8 F4).
 
 ### Where each item lands at order 35
 
@@ -167,24 +180,38 @@ Every other unit has built, units 61 and 62 included. Unit 19's pass took `deriv
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26, and at the spec commit `13ac01368` where a line says so:
+Read at base `462d20f3` on 2026-10-26, at the spec commit `13ac01368` where a line says so, and re-read at
+HEAD `29acd2d77` on 2026-11-22 where a line says so; each code line is pinned to the blob it was read at:
 
-- `tools/roles/adopt-roles.test.sh:73` opens `# 10, then +3 for arm 7`; the thirteen `+<n>` terms of
-  `:73-80` sum to 40, and `:81` is `FLOOR_ASSERTIONS=50`.
-- `tools/govkit/selftest.py:34-47` raises `SystemExit` outside a git repository, `:70` finds `GOV_ROOT` by
-  a `.git` entry, and `:195-196` run `rev-parse HEAD` at import. A detached worktree's `.git` file
-  satisfies all three.
-- Spec 52's §4 Rollout reads that `TOOL-dBoundRoles-26` "writes no file this unit writes"; spec 26 lists
-  `tools/roles/adopt-roles.test.sh` under Files touched.
-- Spec 54's AC1 wraps `ten at` and `base` across a line break, so `grep -c 'ten at base'` prints 0 today.
-- Specs 54 and 55 each read `the arm of §7 at the close` in their §5 testing line.
-- Spec 53 cites `handoff.py:1025-1028` at lines 26 and 76, `handoff.py:1025-1026` at line 41, and
-  `tools/roles/handoff.py:1025` in its Readers clause at line 45; its §10 names `check_arm` and
-  `roles_lib.load_roles` only.
+- `tools/roles/adopt-roles.test.sh@3c0fb11c:73` opens `# 10, then +3 for arm 7`; the thirteen `+<n>` terms
+  of `:73-80` sum to 40, and `:81` is `FLOOR_ASSERTIONS=50` (PINNED, the base blob). At HEAD the comment
+  is `tools/roles/adopt-roles.test.sh@a8b141b6:91-112`, opening `# 10, then`, over `FLOOR_ASSERTIONS=88`
+  at `:113`. Its `:109` reads `61 shared, +6 this branch's, +8 main's = 75`, a running total of the lines
+  above it, so S1's rule reads 10 plus 92, 102, against 88, and 88 with that line's two `+` signs dropped
+  (DERIVED by S1's rule at that blob; §8 F4).
+- `tools/govkit/selftest.py@2d4e0cc4:34-47` raises `SystemExit` outside a git repository, `:70` finds
+  `GOV_ROOT` by a `.git` entry, and `:195-196` run `rev-parse HEAD` at import. At HEAD they are
+  `tools/govkit/selftest.py#derive_install_prefix`, `tools/govkit/selftest.py@c2b02d78:71` and
+  `@c2b02d78:209-210`, where `tools/govkit/selftest.py#resolve_gov_pin` also refuses a commit no ref
+  contains. A detached worktree's `.git` file satisfies all three, and the branch a pass commit landed
+  on contains that commit's parent.
+- At base, spec 52's §4 Rollout reads that `TOOL-dBoundRoles-26` "writes no file this unit writes"; spec
+  26 lists `tools/roles/adopt-roles.test.sh` under Files touched. At HEAD spec 52's rev-4 Rollout names
+  unit 26 as a writer of that suite and holds no such phrase.
+- At base, spec 54's AC1 wraps `ten at` and `base` across a line break, so `grep -c 'ten at base'`
+  printed 0. At HEAD its rev-5 AC1 holds no `ten at`, and its joined text still carries a typed count,
+  "eleven at `a01362eb0`", which S7 clears.
+- Specs 54 and 55 each read `the arm of §7 at the close` in their §5 testing line, at base and at HEAD.
+- At base, spec 53 cited the retired `handoff.py:1025` in its §1, its S1 bullet, its Readers clause and
+  its §4 Evidence, and its §10 named `check_arm` and `roles_lib.load_roles` only. At HEAD its rev-4
+  re-ground re-points each to `tools/roles/handoff.py@c6d87bbb:1477-1480` or to
+  `roles_lib.parse_read_key`, and its §10 names `parse_read_key` beside them, so S11, S16 and S18 find
+  their spec-53 halves left.
 - At `13ac01368`, `git grep -n 'handoff.derive_section_sha' -- memory/builds/dBoundRoles/spec` prints spec
   46 line 139, 48 line 176, 50 line 265 and 58 lines 117 and 349, beside spec 60's own lines.
-- `tools/memory-recall/selftest.py:1615` assigns `desc`, `:1617-1618` are comments, and `:1619-1620` are the
-  token loop.
+- `tools/memory-recall/selftest.py@25c4ef69:1615` assigns `desc`, `:1617-1618` are comments, and
+  `:1619-1620` are the token loop. At HEAD they are `tools/memory-recall/selftest.py@6474907c:1722`,
+  `:1724-1725` and `:1726-1727`, in `tools/memory-recall/selftest.py#test_skill_description_invariants`.
 
 ### Inventory
 
@@ -298,6 +325,17 @@ line when it renames the leg. This unit adds no arm: each criterion is a grep or
   `git worktree add --detach` at the parent of the pickaxe's commit; (b) `git archive` plus `git init` and
   one commit. (b) leaves no history for the pickaxe and a repository the module's pin read never saw.
   RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the most feature-rich survivor. widens: none · relaxes: none
+- **F4 — The adopter suite's running-total line: rewritten, or read past?** At HEAD `29acd2d77` the
+  comment above the adopter suite's floor carries the line dDeclaredLoop's reconcile of origin/main wrote,
+  `61 shared, +6 this branch's, +8 main's = 75` (`tools/roles/adopt-roles.test.sh@a8b141b6:109`), whose
+  `+6` and `+8` re-count terms the lines above it already carry. S1's rule then reads 102 against
+  `FLOOR_ASSERTIONS=88` on a tree no unit broke, so AC1 is red on a correct build (§4 Evidence). Options:
+  (a) the pass rewrites that line's figures without a `+`, as "61 shared, 6 this branch's and 8 main's,
+  75 in all", and leaves the floor and every term as they stand; (b) S1's rule skips a line holding `=`;
+  (c) the pass deletes the line. (b) changes the rule AC1 and S4 state, which veto 1 discards, and (c)
+  drops the merge's record of where the terms came from. RESOLVED (agent, 2026-11-22, delegated): (a),
+  rung 3, fewest follow-ups: it edits one comment line of a file §4 Files touched already names, under
+  the rule "How an item closes" applies to a missing term. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -306,6 +344,16 @@ line when it renames the leg. This unit adds no arm: each criterion is a grep or
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-65 and TOOL-dBoundRoles-66, the HIGH promotion and the minors batch of the round-1 audit of unit 64; nothing else moved.
 - rev-4 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-67, TOOL-dBoundRoles-68 and TOOL-dBoundRoles-69, the two HIGH promotions and the minors batch of the round-1 audit of units 65 and 66; nothing else moved.
+- rev-5 · 2026-11-22 · S3 · S11 · S16 · S17 · §4 How an item closes, Evidence · §8 F4 · re-grounded at
+  HEAD `29acd2d77` by `2026-11-22-prompt-TOOL-dBoundRoles-58-reground-p-brief`. Every code citation is
+  re-pointed to a symbol or a blob-pinned line, each base reading kept on its base blob. Spec 53's rev-4
+  re-ground already re-points every retired citation and names `parse_read_key` in S1, its Readers
+  clause, §4 Evidence and §10, so S11 cites its `ap.error` citations by section rather than by line, and
+  S16's Readers clause is re-derived from the grep at HEAD, with spec 52 named in it. Spec 52's Rollout
+  and spec 54's AC1 are re-read at HEAD. The adopter suite's comment now carries a running-total line
+  that reds S1's sum on a correct tree; F4 resolves it, and "How an item closes" states the rewrite.
+  Specs 52, 53, 54 and 55 were read at HEAD, and units 19, 49, 59, 60, 61 and 62 were checked against
+  their specs, not HEAD.
 
 ## 10. Reuse audit
 

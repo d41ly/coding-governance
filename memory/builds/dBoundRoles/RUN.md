@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 phase: RUNNING
@@ -94,3 +95,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T08:14:19Z draw · re-dispatch · TOOL-dBoundRoles-1 · 14/122 · 20261122T081419Z-0a050f
 
 2026-11-22T08:14:19Z dispatch · item 85a3e2b4 TOOL-dBoundRoles-1 · reason tools/roles/agents tools/roles/house tools/roles/kit.toml tools/roles/role-schema.toml tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/render_agents.py tools/roles/workflows.toml tools/roles/README.md tools/roles/adopt-roles.test.sh tools/playbook/layers.toml tools/playbook/check_layers.py tools/playbook/adopt-playbook.sh tools/playbook/kinds.toml tools/loop/loop_items.py tools/loop/loop.toml tools/loop/factories.py tools/workflows/kit.toml help/loop.md help/reference/drive.md AGENTS.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-1-1-acceptance-ledger.md help/reference/kinds.md .governance/instructions.lock tools/govkit/usage.toml memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-1-deviation-13.md memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md
+
+2026-11-22T08:48:53Z decision · item TOOL-dBoundRoles-23 F6: should tools/policy/guard.py stop admitting a live run's own change to the policy file under policy-file.guard = owner-only, so a run's write can never pass as the owner's? · reason options: (a) read a run's change under owner-only as the owner's by the committed mandate - refused, it widens a security surface past the unit's tier (M3 veto 3); (c) a second guard in unit 23 - breaks its AC6; (d) change the guard inside unit 23 - against its section 3 non-goal; (e) keep F3's floor and state the gap as what the floor does not check, a hands-off edge leaving the guard change outside this build - taken, so the gap stays open until the owner rules whether the guard closes it

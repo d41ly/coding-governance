@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-3 — the work order rendered per item, hashed into the spawn marker and bound to its act
 
-**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-8 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0168@abfd5f4f whole
 **Carries:** node:record-kind.work-order
@@ -65,7 +65,8 @@ gap register).
   set), `### inputs`
   (each of the declaration's `inputs` handed as content through TOOL-dBoundRoles-13's
   `derive_fact_key`, one fact line each, a `reads` key spelled as its `field.<family>.<name>` tag,
-  TOOL-dBoundRoles-14's form), `### allowance`, `### return` (the declaration's `returns`, which
+  TOOL-dBoundRoles-14's form, each input a sub-block on a level-3 `### ` heading, §4 "The blocks"),
+  `### allowance`, `### return` (the declaration's `returns`, which
   `resolve_item_declaration` takes from the item row, else from its role's `return` template, §8 F7)
   and `### witness` (the row's witness class and its `by`). Observed
   by AC1.
@@ -165,8 +166,14 @@ history · the unit's commit, its Pass: trailer naming the unit
 ```
 
 The `### inputs` block holds one sub-block per input, each with its fact line (TOOL-dBoundRoles-13's
-grammar). An input the declaration marks optional and the render cannot resolve is named on the task's
-`Not supplied` line, as an optional `reads` key is today (the opening `render_handoff` composes,
+grammar). Each sub-block opens on a level-3 heading, `### ` and the input's key as S2 spells it, the
+level of `### inputs` itself and never a `####` one, with its fact line two lines below the heading
+and its content after that line. That is the shape `TOOL-dBoundRoles-48` S3 admits at spawn,
+checked against that spec: it reads an unfenced fact line only as the line two below an unfenced
+`### ` heading, so a fact line under a `####` sub-heading would be denied. The `### inputs` heading
+carries no fact line, and only blank lines sit between it and its first sub-block. An input the
+declaration marks optional and the render cannot resolve is named on the task's `Not supplied` line,
+as an optional `reads` key is today (the opening `render_handoff` composes,
 `tools/roles/handoff.py#render_handoff`).
 
 `## Role` already closes with the role's `## Return` (`tools/roles/roles_lib.py#render_role_fields`,
@@ -374,6 +381,10 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · an item work order spawn
   gov-builder requires. The 64.5% figure is pinned. `tools/hooks/agent-cap.js` is still blob
   `935a910d`. `item=`, `--item` and `derive_fact_key` were checked against the specs of
   TOOL-dBoundRoles-17 and -13, and the marker writer's hash against TOOL-dBoundRoles-6 S4.
+- rev-8 · 2026-11-22 · S2 · §4 · folded by `2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief`,
+  item 4: S2 and §4 "The blocks" state that each `### inputs` sub-block opens on a level-3 `### `
+  heading with its fact line two below it, so `TOOL-dBoundRoles-48` S3 admits every work order this
+  unit renders, checked against that spec's rev-4. Nothing else moved.
 
 ## 10. Reuse audit
 

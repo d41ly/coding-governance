@@ -303,7 +303,7 @@ loaded until it restarts. The harness reads `.claude/agents` at session start
   `[[unit]]` whose `scope` is `["role.gov-spec-reviewer"]` and a comment line spelling it, the `up`
   leaves `scope = ["role.gov-reviewer"]` and the comment unchanged. The witness exits 1 while any
   value still equals an old tag. An overlay `[[role]]` row whose `edges` is
-  `amends=role.gov-spec-reviewer@<hash8>` stops the `up`, exit 1, naming that row, with no byte written. A second target whose copy of `tools/roles/house/gov-diff-reviewer.md`
+  `amends=role.gov-spec-reviewer@<hash8>` stops the `up`, exit 1, naming that row, with no byte written. A second target whose copy of the diff reviewer's house overlay, which TOOL-dBoundRoles-1 retired from gov,
   is non-empty ends with that text in the merged role's house text file, `gov-reviewer.md` beside it,
   and the old file gone.
   Red when: the comment is rewritten, a value is left, the house text is lost, or an old-tag edge is

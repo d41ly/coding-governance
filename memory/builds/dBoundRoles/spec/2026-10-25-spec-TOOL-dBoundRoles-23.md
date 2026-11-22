@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-23 — the prompt writer's default frame, bounded lists, upstream rows, and the medium effort floor
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 18 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 18 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0188@23b122f8 whole
 
@@ -61,7 +61,7 @@ less.
   line naming how many members it left out and where the full list is; the return contract
   (`return` slot, TOOL-dBoundRoles-3's `### return` block extended) states, for every `list` field of
   the role's `return` template, its bound: the population's size where the work order hands a
-  population, else `FRAME_LIST_BOUND`. `validate_return` (TOOL-dBoundRoles-5) refuses a list field
+  population, else `FRAME_LIST_BOUND`. `check_return` (TOOL-dBoundRoles-5) refuses a list field
   longer than the bound its work order's return contract states. Observed by AC3.
 - **S4** — The upstream rows. Where the item declares `upstream`, TOOL-dDeclaredLoop-29 S5's
   `### upstream:rows` block sits in the `upstream` slot, and the return contract restates its row
@@ -89,8 +89,11 @@ less.
   RAISED line and decision row, the mirror's render, or a live run's branch
   (`tools/loop/guard.py@be997d5a:27-31`, the run admission `tools/policy/guard.py#check_run_mandate`).
   So off a live run's branch an agent, a role's proposal, a scenario and a build's own change cannot
-  carry a level below medium, and on one the run's change lands under the owner's committed mandate
-  (§8 F6). Under `agents-with-reason` it also admits a change touching the policy file alone with a
+  carry a level below medium. A live run's own change to the policy file is no owner's write, and this
+  unit never counts it as one (§8 F6). What the floor does not check: the guard's run admission still
+  lands such a change, and a floor that reads provenance from the file alone cannot tell it from the
+  owner's terminal commit, so closing that path is the guard's, outside this build. Under
+  `agents-with-reason` it also admits a change touching the policy file alone with a
   decision row, so the file no longer tells the owner's level from an agent's. Under either non-default
   value `check_effort_floor` refuses a policy-file level below medium, naming `policy-file.guard`, read
   through `read_policy_setting` from the same file, which no agent change off a live run's branch can
@@ -127,11 +130,12 @@ less.
 
 - **consumes-from** `TOOL-dBoundRoles-3` — the work order's item, inputs, allowance, return template and witness blocks, each of which S1 places in its slot
 - **consumes-from** `TOOL-dBoundRoles-4` — the `### framing:` blocks and the `Framed by:` line, which S2 places in the `role`, `population`, `added` and `no-stop` slots
-- **consumes-from** `TOOL-dBoundRoles-5` — `validate_return`, which S3 extends with the bound a work order's return contract states
+- **consumes-from** `TOOL-dBoundRoles-5` — `check_return`, which S3 extends with the bound a work order's return contract states
 - **consumes-from** `TOOL-dBoundRoles-21` — `roles.effort.default` and the re-pointed `resolve_stage_efforts`, whose steps S5 holds to the floor
 - **hands-off** `TOOL-dBoundRoles-24` — `render_handoff`, with the frame assembled, the one place a work order's task is composed and the point the anchor check runs
 - **consumes-from** external — TOOL-dDeclaredLoop-29 S5's `### upstream:rows` block and its return join `check_upstream_answers`, TOOL-dGroundRules-6's guard `tools/policy/guard.py` and TOOL-dDeclaredLoop-2's verdict `tools/loop/guard.py --staged`, each landed at HEAD `a3efb1d50`
 - **hands-off** `TOOL-dBoundRoles-43` — `check_effort_floor`, which unit 43 applies at unit 22's three steps (id 18 of the round-1 spec audit)
+- **hands-off** external — the guard's run admission, which lands a live run's change to `roles.effort.*` under every `policy-file.guard` value; refusing it is the guard's (§8 F6)
 - **consumes-from** `TOOL-dBoundRoles-48` — `check_block_fences` and its call in `render_handoff`, which runs after this unit's frame places its `### framing:` blocks, so a framing field that leaves a fence open is refused (id 34 of the round-1 audit of units 37 to 44)
 
 ## 4. Design
@@ -162,7 +166,7 @@ which keeps every `reads` block in its role's `reads` order as today.
 (`night-pass-two.md:194-196`, NT-10), the one measured bound a role return carries in the records. A
 population longer than the bound renders its first `FRAME_LIST_BOUND` members by the lister's own order
 and the line `… and <n> more; the full list is <path or command>`. The return contract writes each
-`list` field as `<field>: at most <bound> entries`, and `validate_return` reads that line back from the
+`list` field as `<field>: at most <bound> entries`, and `check_return` reads that line back from the
 work order it already reads for `answers`, so the bound lives in the rendered work order and nowhere
 else.
 
@@ -172,7 +176,7 @@ else.
 check_effort_floor(level, source)
   EFFORT_LEVELS.index(level) >= EFFORT_LEVELS.index(EFFORT_FLOOR) -> pass
   source == policy file (steps 1-3 of the order, read_policy_setting)
-    and policy-file.guard == owner-only -> pass   the owner's write, or a live run's under its mandate (F6)
+    and policy-file.guard == owner-only -> pass   the owner's write; a live run's change is none (F6)
   source == policy file, any other guard value -> RolesError naming policy-file.guard and its value
   otherwise -> RolesError: "<level> from <source> is below the floor medium; only the owner sets a
                lower level, as a roles.effort.* key in the guarded policy file"
@@ -180,7 +184,7 @@ check_effort_floor(level, source)
 
 | Source of a level | Below medium |
 |---|---|
-| `roles.effort.<workflow>.<stage>`, `roles.effort.<role>`, `roles.effort.default` in `.governance/policy.toml` | admitted under `policy-file.guard = owner-only`, where only the owner's terminal commit or a live run's branch writes there (§8 F6); refused under the two other values (S6) |
+| `roles.effort.<workflow>.<stage>`, `roles.effort.<role>`, `roles.effort.default` in `.governance/policy.toml` | admitted under `policy-file.guard = owner-only`, where the owner's terminal commit writes there; a live run's change is no owner's write and its admission is the guard's (§8 F6); refused under the two other values (S6) |
 | the house file's `[effort]` (step 4) | refused, by R12 at load and by S5 at resolve |
 | the role's declared `effort` (step 5) | refused, by R2 |
 | a stage row's own `effort`, a scenario's or an overlay's | refused at resolve, as a declared value |
@@ -189,7 +193,7 @@ check_effort_floor(level, source)
 
 Minted: `FRAME_SLOTS`, `assemble_frame`, `FRAME_LIST_BOUND`, `EFFORT_FLOOR`, `check_effort_floor`; the
 `### row contract` block and the bound lines of the `### return` block; the bound check in
-`validate_return`; the fixture plants of
+`check_return`; the fixture plants of
 §7's arm (`frame-order`, `frame-no-slot`, `frame-no-population`, `population-over-bound`,
 `return-over-bound`, `house-low`, `role-declared-low`, `policy-low-owner`). Each name is asked of
 `python tools/lexicon/lexicon.py --suggest <name>` at the pass.
@@ -254,7 +258,7 @@ own key.
 - **AC3** — When the fixture item's lister yields 30 members, the population block lists 12 and closes
   with a line naming 18 more; the `### return` block states `at most 30 entries` for the builder's
   `checks` list; and when the item hands no population, it states `at most 12 entries`, and
-  `validate_return` refuses a reply whose `checks` holds 13, naming `checks` and the bound.
+  `check_return` refuses a reply whose `checks` holds 13, naming `checks` and the bound.
   Red when: a list renders unbounded, or a return over its stated bound passes.
 - **AC4** — When `load_policy` reads a fixture house file with `[effort.roles] gov-builder = "low"`, it
   raises R12 naming the floor `medium`; when R2 grades a role file declaring `effort: low`, it reports a
@@ -294,7 +298,7 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 AC6 · its self-
 
 - **F1 — How is "every list in the output bounded" read?** Options: (a) every list the frame renders,
   the population above all, capped with an overflow line, and every `list` field of the return held to
-  a bound the return contract states and `validate_return` enforces; (b) the rendered lists only; (c)
+  a bound the return contract states and `check_return` enforces; (b) the rendered lists only; (c)
   the return's lists only. (b) leaves the return unbounded, the half NT-10's "at most twelve seams"
   bounds; (c) leaves the population, P2's "capped with an overflow line", unbounded. RESOLVED (agent,
   2026-10-25, delegated): (a), rung 3, the most feature-rich option. widens: none · relaxes: none
@@ -341,13 +345,17 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 AC6 · its self-
   Options: (a) keep F3's (c), reading a live run's change under `owner-only` as the owner's, by the
   standing mandate the owner committed; (b) as (a), admitting `agents-within-mandate` beside
   `owner-only`, since it admits the same set; (c) refuse a below-medium policy-file level whenever a
-  live run admits the branch; (d) make `roles.effort.*` owner-only even on a live run's branch. (c)
-  reads who wrote a landed value from the run state at resolve time, the second guard §4's
-  alternatives reject, and refuses the owner's own key whenever a run is live, the break AC6 names; (d)
-  changes the guard, against §3's non-goal. (b) admits what F3 refused and rests on the two values
-  staying alike. RESOLVED (agent, 2026-11-22, delegated): (a), the most feature-rich option no veto
-  refuses, with fewer open questions than (b). widens: none · relaxes: S6 and §1's "only by the owner's
-  explicit write", which now include a live run's change under the owner's mandate
+  live run admits the branch; (d) make `roles.effort.*` owner-only even on a live run's branch; (e)
+  keep F3's (c) as written, a run's own change never read as the owner's write, and name the guard's
+  run admission as what the floor does not check. (a) and (b) price a run's write below medium as an
+  admitted path, a security surface wider than this unit's tier priced (M3 veto 3). (c) reads who wrote
+  a landed value from the run state at resolve time, the second guard §4's alternatives reject, and
+  refuses the owner's own key whenever a run is live, the break AC6 names; (d) changes the guard,
+  against §3's non-goal. (e) changes no code against (a); what it changes is that no run's write is
+  counted as the owner's, so S6 and §1 keep "only by the owner's explicit write" and the run admission
+  stands as a named gap, the guard's to close. RESOLVED (agent, 2026-11-22, delegated): (e), rung 1,
+  the ruling of `2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief`, the one option no veto
+  refuses. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -376,6 +384,14 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 AC6 · its self-
   `--build`, the unit `UNIT_RE` admits and the `--input spec=` gov-builder requires. The edges to units
   3, 4, 5 and 21 were checked against their specs and hold; every other moved citation re-pointed to a
   symbol or a pinned line.
+- rev-7 · 2026-11-22 · S3 · S6 · §3 · §4 · AC3 · §8 F1 F6 · folded by
+  `2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief`, items 1 and 2. TOOL-dBoundRoles-5's checker
+  is `check_return`, the name the lexicon answers, as that unit's §8 F7 now resolves, so every spelling
+  of it outside this log is renamed. F6 re-resolved to (e): F3's floor is kept, a live run's own change
+  to the policy file is never read as the owner's write under `owner-only`, and S6, the floor's
+  sketch and its table drop the run's mandate as a path below medium, S6 naming the guard's run
+  admission as what the floor does not check, with a **hands-off** external edge for it; (a) widened a
+  security surface past this unit's tier. §1 keeps its words. Nothing else moved.
 
 ## 10. Reuse audit
 

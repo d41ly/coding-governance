@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-68 — unit 65's AC4 says it is green by construction over `dbr63obs` alone, and a positive control proves the signature selection sees a leftover outside that root
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -96,19 +96,23 @@ block shows the design's shape; the pass fits it to S3's readings.
 
 ### Evidence
 
-Read at base `462d20f3` on 2026-10-26; HEAD equals base for every code file cited here:
+Re-read at HEAD `29acd2d77` on 2026-11-22; each code line is pinned to the blob it was read at:
 
-- Measured in a scratch repository under `%TEMP%` built as S2 says. The selection reported
+- Measured on 2026-10-26 in a scratch repository under `%TEMP%` built as S2 says. The selection reported
   `C:/Users/d41ly/AppData/Local/Temp/d68p/o/1` only. The root comparison against the empty
   `dbr63obs` reported nothing. `git log -1 --format=%H -S dbr68none` printed an empty string. After
   `git worktree remove --force` on `o/1`, three worktrees stayed registered: the main one, `o/2` and
   `o/3`.
-- `tools/branch-reconcile/branch_reconcile.py:188-212` is `parse_worktrees`, keeping `head`
-  (`:204-205`) and the `detached` flag (`:208-209`).
-- Spec 65's AC4, lines 201-204, compares against `<TEMP>/dbr63obs` only. Its S4, lines 54-60, is the
-  control this one is modelled on.
-- `git worktree list --porcelain` of this repository names no path under `%TEMP%`, and no observation
-  has run, so AC4 over `dbr63obs` prints nothing today whatever the tree holds.
+- `tools/branch-reconcile/branch_reconcile.py#parse_worktrees` keeps `head`
+  (`branch_reconcile.py@4cbbe71c:204-205`) and the `detached` flag (`:208-209`). Since base the file
+  moved only its kit version, so these lines did not shift.
+- Spec 65's AC4 compares against `<TEMP>/dbr63obs` only, and its S4 is the control this one is
+  modelled on. Both are cited by label, since unit 67 revises spec 65 at this order.
+- At `29acd2d77`, `git worktree list --porcelain` of this repository names two paths under `%TEMP%`
+  (PINNED, measured 2026-11-22), other runs' base checkouts at `.../Temp/dbr-base` and
+  `.../Temp/dtr-base`, and none under a `dbr63obs` root. No observation has run, since units 60, 63 and
+  64 are unbuilt, so AC4 over `dbr63obs` prints nothing today whatever the tree holds, and S7's
+  statement about the tree at `462d20f3` holds at `29acd2d77` too.
 
 ### Inventory
 
@@ -174,7 +178,7 @@ criterion 67 amends, so neither rewrites the other's ledger line.
   fixture: a scratch repository under `%TEMP%/dbr68c`, short-pathed and cleared after; the tree holds
   none today.
 - **AC3** — When a `python -c` probe reads unit 65's `**Evidences:**` block, exactly one line answers
-  AC6 and `LEDGER` of `tools/memory-tree/deviation_join.py:163` matches it. The spec-65 revision whose
+  AC6 and `LEDGER` of `tools/memory-tree/deviation_join.py` matches it. The spec-65 revision whose
   §9 line names `TOOL-dBoundRoles-68` is the revision `LEDGER` captures, or one inside the
   parenthesised list after it.
   Red when: a second line answers AC6, or the line names no revision of this unit.
@@ -196,6 +200,13 @@ No suite arm moves. S3's control is a write probe, so the pass runs it and recor
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 65 and 66, id 14
   (HIGH, item H1, shared with id 1), on the report's fix, which the skeptic judged sound.
+- rev-2 · 2026-11-22 · §4 Evidence · AC3 · re-grounded at HEAD `29acd2d77` by
+  `2026-11-22-prompt-TOOL-dBoundRoles-65-reground-q-brief`. `branch_reconcile.py` moved only its kit
+  version, so `parse_worktrees`'s fields hold, cited by symbol and at `@4cbbe71c`. The Evidence claim
+  that the porcelain names no path under `%TEMP%` no longer holds: two other runs' base checkouts sit
+  there, neither under `dbr63obs`, so AC4's by-construction silence and S1's `462d20f3` statement still
+  hold. Spec 65's AC4 and S4 are cited by label, and `LEDGER` by symbol. Nothing a criterion observes
+  changed.
 
 ## 10. Reuse audit
 
