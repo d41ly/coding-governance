@@ -110,3 +110,6 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T09:27:30Z dispatch · item 612d66b9 TOOL-dBoundRoles-37 · reason tools/govkit/selftest.py memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-37-1-acceptance-ledger.md memory/map/generated/symbols.json
 
 2026-11-22T09:27:47Z brief · item TOOL-dBoundRoles-37 · reason c24a3c30b562 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-37-build-brief.md
+2026-11-22T09:34:09Z draw · re-dispatch · TOOL-dBoundRoles-37 · 16/122 · 20261122T093409Z-584954
+
+2026-11-22T09:34:09Z dispatch · item b9ee28cf TOOL-dBoundRoles-37 · reason tools/govkit/selftest.py memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-37-1-acceptance-ledger.md memory/map/generated/symbols.json memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-37.md

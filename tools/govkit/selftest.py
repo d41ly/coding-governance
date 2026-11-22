@@ -3158,6 +3158,22 @@ def check_roles_default() -> None:
         derive_listed_role(x) == "project-owned" for x in tests), str({x: derive_listed_role(x) for x in tests}))
 
 
+def derive_roles_expected(kit: pathlib.Path, descriptor: dict) -> tuple[set, set]:
+    """TOOL-dBoundRoles-37 S1: the roster a roles install is graded against, DERIVED, never typed.
+    `agents` is the slot of every `agents/*.agent.md` of `kit` whose front matter does not set
+    `agent: false`, an absent key counting true, read by that kit's own `roles_lib.load_roles` loaded
+    by path, so this carries no second front-matter grammar. `overlays` is every `house/*.md` include
+    of `descriptor`'s `seed` rows, `descriptor` a parsed roles `kit.toml`. Runs no case."""
+    spec = importlib.util.spec_from_file_location("roles_lib_roster", pathlib.Path(kit) / "roles_lib.py")
+    rlib = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rlib)
+    agents = {s for s, r in rlib.load_roles(kit).items() if r["keys"].get("agent", "true") != "false"}
+    seeds = [x for f in descriptor.get("files", []) if f.get("role") == "seed"
+             for x in (f["include"] if isinstance(f["include"], list) else [f["include"]])]
+    overlays = {x for x in seeds if x.startswith("house/") and x.endswith(".md") and x.count("/") == 1}
+    return agents, overlays
+
+
 def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = False) -> None:
     """TOOL-aOrientedCast-8 S10, AC4 and AC6: a DEFAULT apply into a scratch target renders the roles
     kit — the role index, one agent type per agent role, the seeded house overlays and the `/build`
@@ -3227,27 +3243,22 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
               any(("names %s, which is not a file" % doc) in ln and "CHARTER" in ln for ln in _ln),
               p.stdout[-2000:])
         return
-    agents = sorted(p.name for p in (t / ".claude" / "agents").glob("gov-*.md"))
-    check("OC8 AC4 ...renders the role index", (t / ".claude" / "roles.json").is_file(), str(agents))
-    # TOOL-dWitnessedBar-23 S6: the roster is DERIVED from the source kit, never typed beside it — the
-    # agent-true roles of its `agents/*.agent.md`, read by the kit's own loader, and the `house/*.md`
-    # entries of its descriptor's seed list. Both are read from the gov tree, not the target, so the
-    # install is graded against what it was handed.
+    agents_got = {p.stem for p in (t / ".claude" / "agents").glob("gov-*.md")}
+    check("OC8 AC4 ...renders the role index", (t / ".claude" / "roles.json").is_file(), str(sorted(agents_got)))
+    # TOOL-dWitnessedBar-23 S6, TOOL-dBoundRoles-37 S2: the roster is DERIVED from the source kit by
+    # `derive_roles_expected`, never typed beside it. Both wants are read from the gov tree and both
+    # gots from the target, so the install is graded against what it was handed.
     import tomllib  # noqa: PLC0415
-    _rspec = importlib.util.spec_from_file_location("roles_lib_roster", KIT_DIRS["roles"] / "roles_lib.py")
-    _rlib = importlib.util.module_from_spec(_rspec)
-    _rspec.loader.exec_module(_rlib)
-    want_agents = sorted("%s.md" % s for s, r in _rlib.load_roles(KIT_DIRS["roles"]).items()
-                         if r["keys"].get("agent", "true") != "false")
-    _seeds = [x for f in tomllib.loads((KIT_DIRS["roles"] / "kit.toml").read_text(encoding="utf-8"))["files"]
-              if f.get("role") == "seed"
-              for x in (f["include"] if isinstance(f["include"], list) else [f["include"]])]
-    want_house = sorted(x[len("house/"):] for x in _seeds if x.startswith("house/") and x.endswith(".md"))
-    check("OC8 AC4 ...renders one agent type per agent role (%d)" % len(want_agents), agents == want_agents,
-          "rendered %s, agent roles %s" % (agents, want_agents))
-    house = sorted(p.name for p in (kit / "house").glob("*.md"))
-    check("OC8 AC4 ...seeds one house overlay per seed-list entry (%d)" % len(want_house),
-          bool(want_house) and house == want_house, "seeded %s, seed list %s" % (house, want_house))
+    agents_want, overlays_want = derive_roles_expected(KIT_DIRS["roles"], tomllib.loads(
+        (KIT_DIRS["roles"] / "kit.toml").read_text(encoding="utf-8")))
+    check("OC8 AC4 ...renders one agent type per agent role (%d)" % len(agents_want), agents_got == agents_want,
+          "rendered %s, agent roles %s, differing %s" % (sorted(agents_got), sorted(agents_want),
+                                                         sorted(agents_got ^ agents_want)))
+    overlays_got = {"house/" + p.name for p in (kit / "house").glob("*.md")}
+    check("OC8 AC4 ...seeds one house overlay per seed-list entry (%d)" % len(overlays_want),
+          bool(overlays_want) and overlays_got == overlays_want,
+          "seeded %s, seed list %s, differing %s" % (sorted(overlays_got), sorted(overlays_want),
+                                                     sorted(overlays_got ^ overlays_want)))
     check("OC8 AC4 ...and renders the /build Skill", (t / ".claude" / "skills" / "build" / "SKILL.md").is_file(),
           "absent")
     ck = subprocess.run([govkit_module().resolve_bash(), str(kit / "adopt-roles.sh"), "--check"], cwd=str(t),

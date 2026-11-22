@@ -13738,6 +13738,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_roles_expected",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "derive_roles_kit",
       "kind": "function",
       "file": "tools/loop/factories.py"
