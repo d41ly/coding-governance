@@ -52,6 +52,7 @@
 | [2026-11-22-build-TOOL-dWitnessedBar-1-red-fix-161.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-red-fix-161.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md) | widen | — |
 | [2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md) | widen | — |
+| [2026-11-22-build-TOOL-dWitnessedBar-1-widen-34.md](../build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-34.md) | widen | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md) | journal | — |
