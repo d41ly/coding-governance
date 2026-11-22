@@ -349,8 +349,9 @@ ORDER: first, before rule 7. A throw inside the rule refuses.
 **What it does not stop**, said rather than implied: a hook-less or `--bare` run; the agents a running
 harness spawns through its own `agent()`, which is a runtime call and not a tool call; a
 session-to-session message; a hand-written prompt file that agrees with itself and copies the
-index's `role-sha`; an index edited by shell, since the write gate's step 5a refuses a tool write to
-it and the policy kit's commit guard a commit of it, never the shell write itself; a forged name,
+index's `role-sha`; an index edited by the main loop's shell, or by a role agent's in a shape the
+fifth check does not read, since the write gate's step 5a refuses a tool write to it and the policy
+kit's commit guard a commit of it, never that shell write itself; a forged name,
 since any caller can copy the right one; and a harness agent's label, which its script sets inside a
 runtime call no hook sees.
 
@@ -514,9 +515,10 @@ writing a spec need a spec first.
 throw each refuse with the reason named. There is no `agent_id` exemption: a subagent's payload
 carries the parent's `session_id`, so it reads the parent's card and is judged by the same order.
 
-**The ceiling.** A Bash or PowerShell write is never seen — `sed -i`, an interpreter, a redirect —
-and the push-time leg owns that guarantee. A hook-less or `--bare` run fires no hook. A narrowed
-`ROUTED_PATHS` is a conf diff, not a refusal. A hand-written card is read like the writer's. A spec
+**The ceiling.** The main loop's Bash or PowerShell write is never seen — `sed -i`, an interpreter,
+a redirect — and the push-time leg owns that guarantee; a role agent's is held to this gate's verdict
+by the fifth check below, for the shapes it reads, and its other shell writes escape. A hook-less
+or `--bare` run fires no hook. A narrowed `ROUTED_PATHS` is a conf diff, not a refusal. A hand-written card is read like the writer's. A spec
 status flipped to INPROGRESS without the owner's approval admits, because the gate reads a status
 the agent writes: approval is recorded, not proven. The gate stops forgetting, not evasion.
 
@@ -581,7 +583,8 @@ route to such a role: render its handoff with `handoff.py render --role <name> -
 task` and pass the output as the prompt of an `Agent` call whose `subagent_type` is that role, or
 name the role in its harness's `roles` argument. A spec refusal also names the status flip.
 
-**Its ceiling**, beside the gate's: a Bash or PowerShell write is never seen, the renders' included;
+**Its ceiling**, beside the gate's: the main loop's Bash or PowerShell write is never seen, the
+renders' included, and a role agent's meets this arm only through the fifth check below;
 a tree whose index and every rendered agent file were both deleted reads as never adopted; a session
 launched AS a role carries that role's type. The `records` write class alone is declared in the
 index and graded by nothing here: a `records` role writes anywhere outside the spec and product
@@ -784,6 +787,60 @@ an argument as a launched script. Replayed at their commits, the recorded comman
 transcripts held no true gate run the arm admitted. The census instrument is the replay of the
 recorded commands through the exported `checkRoleGate` and `scanCommandHeads`, never a regex of its own.
 
+## scratch-guard's fifth check: a role agent's shell write
+
+`TOOL-dBoundRoles-7`. On a Bash or PowerShell payload carrying an `agent_type`, after the role-gate
+arm, `checkShellWrites` holds every write target the one scanner, `scanWriteTargets`, finds in the
+command to the verdict an `Edit` or `Write` of that target gets, and to the agent's work order's
+allowance where one was handed. The scanner reads, beside the shapes the write-target guard below
+always read:
+
+- the file operands of `sed -i` and `sed --in-place`, and of `perl -i`;
+- the string-literal first argument of an interpreter's write call — `open(<lit>, "w")` (any mode
+  holding `w`, `a`, `x` or `+`), `Path(<lit>).write_text(`, `Path(<lit>).write_bytes(`,
+  `writeFileSync(<lit>` and `appendFileSync(<lit>` — inside a `python`, `python3` or `py` `-c` body,
+  a `node -e` body, or the heredoc a `python -`, `python3 -` or `node` with no script reads, and
+  PowerShell's `[IO.File]::WriteAllText(<lit>`, `WriteAllBytes(<lit>` and `AppendAllText(<lit>`;
+- each path a `git apply` patch names on a `+++ b/<path>` or `rename to <path>` line, read from the
+  patch file (resolved against the payload `cwd`) or from the command's own heredoc; `--check`,
+  `--stat`, `--numstat` and `--summary` write nothing.
+
+Each target is placed against the payload `cwd`. One in no repository, or in one that is not the
+session's, is left to the write-target guard's rules. Every other is judged by `checkRouted` on a
+synthetic `Write` payload carrying the target, the payload's `cwd`, `session_id` and `agent_type`,
+so the route arm, the role arm, step 6b with its `classes` map, the policy file's arm and the
+red-fix lane class it exactly as they class an `Edit`. The synthetic payload carries no content, so
+a shell edit of a spec by a role outside the spec class is refused: the status flip stays the `Edit`
+route. `checkShellWrites`'s comment is the ONE evaluation order.
+
+**The allowance.** `readWorkOrderAllowance` reads the prompt the agent was spawned with, the first
+`user` record of its transcript, `<session dir>/subagents/agent-<agent_id>.jsonl` or
+`<session dir>/subagents/workflows/<run id>/agent-<agent_id>.jsonl`, the session dir being the
+payload's `transcript_path` without `.jsonl` and each id admitted only in the shape
+`[A-Za-z0-9_-]{1,64}`; it reads the transcript's first 256 KB. The `### allowance` block of that
+prompt's `## Task` section, one repo-relative prefix per `- ` bullet, is the allowance: a target
+the class verdict admits is admitted only under one of its entries, matched by `checkRoutedEntry`,
+the one matcher of the `ROUTED_PATHS` grammar the product class reads too. A block reading `none`
+admits no repository write. Only an allowance narrows: a target the class refuses is refused
+whatever the block says. No transcript, no readable first record or no block holds the write to its
+class alone, with one witness line naming `allowance not located` and why.
+
+**The refusal** names the target, the shape that wrote it, the write gate's verdict or the
+allowance it fell outside with the transcript and the work order's marker line, and the remedy's
+actor: the driver, which re-scopes the work order or routes the write to a role whose class covers
+it. A throw inside the check refuses a role agent; the main loop, which carries no `agent_type`, is
+never judged by it and meets only the write-target guard and the orientation check.
+
+**What it does not check.** A write from inside a script file the command runs; a target computed
+at run time (a variable, `os.path.join`, a template literal); a heredoc fed to an interpreter the
+list does not name; a `sed`, `perl`, `git` or interpreter that does not head its simple command
+(`xargs sed -i`); `rm`, `mv` of a file out of a folder, `git checkout`, `git restore`, `git stash`,
+`git merge` and `git am`; a patch read from a pipe, or one whose paths `-p` or `--directory` move,
+its paths placed against the payload `cwd`; and a transcript an agent rewrites, since it lives
+outside the repository. A word such as `install` or `touch` left unquoted as an argument
+(`grep -n install x`) still reads as a write, as the write-target guard reads it; quoting it is the
+agent's remedy. It stops forgetting, not evasion.
+
 ## The authoring rule for kit files
 
 *Here because the charter template had no room for it: it sits within a few hundred bytes of its
@@ -818,8 +875,10 @@ gate cannot see and says so in its header.
 ## scratch-guard — the write-target guard, and what it cannot see
 
 The second hook in this home, wired on `Bash|PowerShell`, reads each tool call's TEXT for write
-targets (redirects, `tee`/`touch`/`mkdir`, the last argument of `cp`/`mv`/`install`/`rsync`, and a
-`TMPDIR=`/`TMP=`/`TEMP=` assignment) and denies one that lands where agent scratch does not belong.
+targets (redirects, `tee`/`touch`/`mkdir`, the last argument of `cp`/`mv`/`install`/`rsync`, a
+`TMPDIR=`/`TMP=`/`TEMP=` assignment, and since `TOOL-dBoundRoles-7` the file operands of `sed -i`
+and `perl -i`, an interpreter's literal write call and the paths a `git apply` patch names, the
+fifth check's list above) and denies one that lands where agent scratch does not belong.
 Deny is stderr plus exit 2; allow prints nothing. The sanctioned roots are DERIVED, never authored:
 `TMPDIR`, `TEMP` and `TMP` at run time, `<home>/.claude`, and the CLI's own scratch base
 `<os.tmpdir()>/claude`. A target under one of those is allowed before any rule runs.
@@ -851,7 +910,9 @@ it, and the upgrade path if they stop being rare is a real tokenizer rather than
   is graded as an unresolved token that misses every rule.
 - A `cd`: `cd /tmp && echo x > y` writes a relative path the hook reads as repo-relative.
 - A heredoc'd script: a Python `open('/tmp/x','w')` inside a `<<EOF` body is blanked before
-  scanning, so nothing inside it is a target.
+  scanning, so nothing inside it is a target, except in the heredoc a `python -`, `python3 -` or
+  `node` with no script reads, or a `git apply` reads (`TOOL-dBoundRoles-7`). A script written to a
+  file and then run is not read.
 - A PowerShell variable spelling: `$env:TEMP\x` opens with `$env:`, which none of the three
   spellings match; the corpus measurement that motivated the rules was Bash-shaped, so this is
   stated rather than closed.

@@ -308,9 +308,23 @@ All of these switch on where `.claude/roles.json` exists. Where it is missing bu
 still holds an agent file the kit rendered, the hooks refuse every spec and product write, every
 other file write from a role agent, every role agent's gate run and every `Agent` and `Workflow` call, naming the index, until
 `render_agents.py --write` restores it. In a repository that never adopted the kit, a missing index
-switches nothing on. They do not see writes made through Bash or PowerShell, `--bare` runs, agents a
-harness spawns internally, session-to-session messages, or a `roles.json` edited by shell and never
-committed.
+switches nothing on.
+
+A role agent's writes made through Bash or PowerShell are held too. A redirect, `tee`, `touch`,
+`mkdir`, `cp`, `mv`, `sed -i`, `perl -i`, `git apply`, or a literal write call inside `python -c`,
+`node -e` or a `python -` heredoc meets the same refusal an `Edit` of that file would. Where the
+agent's work order hands an allowance, the write must also lie under one of its paths; an allowance
+of `none` admits no write in the repository. With no allowance found, the write is held to the
+role's write class alone. The refusal names the file, the shell shape and the allowance, and leaves
+the remedy to whoever dispatched the agent: re-scope the work order, or route the write to a role
+whose class covers it.
+
+The hooks do not see the main session's shell writes, a write made from inside a script file a
+command runs, a path built at run time (a variable or a joined path), `rm`, `git checkout`,
+`git restore`, `git stash`, a patch piped into `git apply`, `--bare` runs, agents a harness spawns
+internally, session-to-session messages, or a `roles.json` the main session edited by shell and
+never committed. A word such as `install` or `touch` left unquoted as an argument, as in
+`grep -n install notes.md`, reads as a write; quote it.
 
 ## In a repository that adopts the kit
 
