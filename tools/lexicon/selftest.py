@@ -23,6 +23,153 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+import atexit
+import pathlib
+import time
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
+# >>> owned_work_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# THE OWNED ROOT A PROCESS SITS IN: the nearest of `path` and its parents named `gate-work.*` and
+# holding an `owner` file, a bar's `$WORK` or a suite's own root (TOOL-dQuietDisk-9 S2).
+def resolve_owned_work(path):
+    """The owned `gate-work.*` directory at or above `path`, a pathlib.Path, or None."""
+    here = pathlib.Path(path).absolute()
+    for d in (here, *here.parents):
+        if d.name.startswith("gate-work.") and (d / "owner").is_file():
+            return d
+    return None
+# <<< owned_work_py
+
+# >>> owned_tempdir_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A PYTHON SUITE'S OWNED ROOT (TOOL-dQuietDisk-9 S2, S9). Nested in an owned root, a bar's or another
+# suite's, it takes that temp dir and makes nothing. Otherwise it sweeps each dead `py:` owner's root
+# of this repository, or of a common dir that names no directory, makes `gate-work.*` with an owner
+# line and `tmp`, points `tempfile` and the `TMPDIR`, `TEMP` and `TMP` its children read there, and
+# removes the whole root at exit. A kill leaves the root with its owner, for the next suite to sweep.
+def read_pid_alive(pid) -> bool:
+    """False only when `pid` is provably gone; any error reads as alive, so a sweep can only keep."""
+    if os.name == "nt":
+        # Never `os.kill` here: signal 0 on Windows is CTRL_C_EVENT, sent to the pid's console group.
+        try:
+            import ctypes
+            k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            k32.OpenProcess.restype = ctypes.c_void_p
+            handle = k32.OpenProcess(0x1000, False, int(pid))  # PROCESS_QUERY_LIMITED_INFORMATION
+            if not handle:
+                return ctypes.get_last_error() != 87  # ERROR_INVALID_PARAMETER: no such process
+            try:
+                code = ctypes.c_ulong()
+                if not k32.GetExitCodeProcess(ctypes.c_void_p(handle), ctypes.byref(code)):
+                    return True
+                return code.value == 259  # STILL_ACTIVE
+            finally:
+                k32.CloseHandle(ctypes.c_void_p(handle))
+        except (OSError, AttributeError, ValueError):
+            return True
+    try:
+        os.kill(int(pid), 0)
+    except ProcessLookupError:
+        return False
+    except (OSError, ValueError):
+        return True
+    return True
+
+
+def scan_dead_scratch(ambient, common) -> list:
+    """Removes each `gate-work.*` directly under `ambient` whose owner names a dead `py:` pid and
+    `common`, or an absolute common dir that names no directory; an empty `common` removes nothing.
+    Returns the roots removed, and says one stderr line per root it sweeps."""
+    removed = []
+    if not common:
+        return removed
+    try:
+        names = sorted(os.listdir(ambient))
+    except OSError:
+        return removed
+    for name in names:
+        root = os.path.join(ambient, name)
+        if not name.startswith("gate-work.") or not os.path.isdir(root):
+            continue
+        try:
+            with open(os.path.join(root, "owner"), encoding="utf-8") as fh:
+                fields = fh.readline().rstrip("\r\n").split("\t")
+        except (OSError, UnicodeDecodeError):
+            continue
+        pid = fields[0][3:] if fields[0].startswith("py:") else ""
+        if len(fields) < 2 or not (pid.isascii() and pid.isdigit()):
+            continue
+        if fields[1] != common and (not os.path.isabs(fields[1]) or os.path.isdir(fields[1])):
+            continue
+        if read_pid_alive(int(pid)):
+            continue
+        print(f"owned-scratch: sweeping the scratch of a dead suite (pid {pid}): {root}", file=sys.stderr)
+        if remove_tree(root):
+            removed.append(root)
+    return removed
+
+
+def init_owned_tempdir() -> str:
+    """The temp dir this process's scratch lands in, owned and removed at exit; see the block's head."""
+    ambient = tempfile.gettempdir()
+    if resolve_owned_work(ambient) is not None:
+        tempfile.tempdir = ambient
+        return ambient
+    try:
+        got = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                             capture_output=True, text=True, encoding="utf-8", errors="replace",
+                             check=False, stdin=subprocess.DEVNULL)
+        common = got.stdout.strip() if got.returncode == 0 else ""
+    except OSError:
+        common = ""
+    scan_dead_scratch(ambient, common)
+    root = tempfile.mkdtemp(prefix="gate-work.", dir=ambient)
+    atexit.register(remove_tree, root)
+    staged = os.path.join(root, f"owner.{os.getpid()}.tmp")
+    with open(staged, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(f"py:{os.getpid()}\t{common}\t{int(time.time())}\n")
+    os.replace(staged, os.path.join(root, "owner"))
+    tmp = os.path.join(root, "tmp")
+    os.mkdir(tmp)
+    tempfile.tempdir = tmp
+    for name in ("TMPDIR", "TEMP", "TMP"):
+        os.environ[name] = tmp
+    return tmp
+# <<< owned_tempdir_py
+
+
+# This suite's scratch lands in an owned root, swept if a kill leaves it (TOOL-dQuietDisk-9 S3).
+init_owned_tempdir()
+
 
 
 def derive_install_prefix() -> str:
@@ -161,44 +308,6 @@ def resolve_bash() -> str:
 
 BASH = resolve_bash()
 
-
-
-@contextlib.contextmanager
-def build_tempdir():
-    """A temp dir whose CLEANUP cannot fail this program.
-
-    WINDOWS, and measured on this repo's own bar: a scanner or a lingering git child can still hold
-    a handle when the block exits, and `TemporaryDirectory` then raises PermissionError
-    [WinError 32] AFTER every arm has already passed. The leg reports exit 1 while its own output
-    says "OK - 80 arm(s)", and at width 8 it blocked a push whose bar had been green in another
-    worktree minutes earlier. A green selftest reported as a red gate is worse than a leaked
-    directory in the OS temp dir, which the OS reclaims.
-
-    `shutil.rmtree(ignore_errors=True)` rather than
-    `TemporaryDirectory(ignore_cleanup_errors=True)`: the latter is newer than some interpreters
-    this kit meets in an adopter's tree, whose floor is not gov's python-floor.txt, and guessing
-    wrong is a TypeError on an adopter first run.
-
-    NOT `ignore_errors=True` itself, though: each dir is a git repo, and git writes its objects
-    READ-ONLY, so on Windows every unlink there raised, was swallowed and the whole tree survived.
-    The hook clears the bit and retries; a refusal it cannot clear is still swallowed.
-    """
-    def set_writable(func, path, _exc):
-        try:
-            os.chmod(path, stat.S_IWRITE)
-            func(path)
-        except OSError:
-            pass
-
-    td = tempfile.mkdtemp()
-    try:
-        yield td
-    finally:
-        # `onexc` replaced `onerror` in 3.12; feature-detected for an adopter's older python.
-        try:
-            shutil.rmtree(td, **{"onexc" if sys.version_info >= (3, 12) else "onerror": set_writable})
-        except OSError:
-            pass
 
 
 KIT = Path(__file__).resolve().parent
@@ -400,7 +509,7 @@ def run_case(files: dict, conf: str | None, waivers: dict | None = None, args: t
     is an ABSENT subject rather than a wrong one. Like `patch`, the deletion is ASSERTED: naming a
     file that is not there would leave the arm grading an untouched kit and scoring a pass.
     """
-    with build_tempdir() as td:
+    with build_scratch_dir() as td:
         root = Path(td)
         shutil.copytree(KIT, root / PFX / KIT_NAME,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
@@ -556,7 +665,7 @@ check("self-containment: ...over a NON-EMPTY population, or the green above mean
 
 # RED — a foreign import. `map_lib` is the real one this rule exists to forbid: `subtokens.py` is a
 # PORT of a `codebase-map` function precisely so this import never has to exist.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _kit = build_kit_copy(Path(_td) / KIT_NAME, {"scaffold_lexicon.py": "\nimport map_lib\n"})
     _probs, _mods, _imps = _lex.check_self_containment(_kit)
     _hit = [x for x in _probs if "NOT SELF-CONTAINED" in x]
@@ -567,7 +676,7 @@ with build_tempdir() as _td:
 
 # THE DEDUPE, and it is a real shape rather than a hypothetical: `_python_defs` emits BOTH `map_lib`
 # and `map_lib._STOPWORDS` for this statement, so an undeduped refusal names one import twice.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _kit = build_kit_copy(Path(_td) / KIT_NAME,
                           {"scaffold_lexicon.py": "\nfrom map_lib import _STOPWORDS\n"})
     _probs, _, _ = _lex.check_self_containment(_kit)
@@ -576,7 +685,7 @@ with build_tempdir() as _td:
 
 # A RELATIVE import cannot leave the directory, so it is not judged. Without this arm the predicate
 # could red every `from . import x` in an adopter's kit and no fixture would say so.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _kit = build_kit_copy(Path(_td) / KIT_NAME,
                           {"scaffold_lexicon.py": "\nfrom . import canon\nimport subprocess\n"})
     _probs, _, _ = _lex.check_self_containment(_kit)
@@ -586,7 +695,7 @@ with build_tempdir() as _td:
 # THE LIVENESS ARM. Zero offenders over zero imports is exactly the clean green a broken probe
 # prints, which is what the deleted `P3 NOT ARMED` refusal was bought to keep distinguishable. Both
 # empty shapes are staged: no modules at all, and modules that yield no imports.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _empty = Path(_td) / "nothing"
     _empty.mkdir()
     _probs, _mods, _imps = _lex.check_self_containment(_empty)
@@ -602,7 +711,7 @@ with build_tempdir() as _td:
 # END TO END, and through BOTH modes. The refusal sits above the `measure_mode` return so `--check`
 # and `--measure` see the same thing; this file's own history has three refusals that landed on the
 # wrong side of it, each armed and unreachable from one mode.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _r = Path(_td)
     build_kit_copy(_r / PFX / KIT_NAME, {"scaffold_lexicon.py": "\nimport map_lib\n"})
     (_r / "core").mkdir(parents=True, exist_ok=True)
@@ -963,7 +1072,7 @@ check("S4: every SEED_SELECTORS row names a known kind, a known literal, a conve
 # refuses went unnoticed: `leading_verb` can return a digit run (`2fa_check` -> `2`) and the conf
 # reader requires an alphabetic verb. A kit whose first command writes a file its second command
 # rejects has no working adoption path at all.
-with build_tempdir() as td:
+with build_scratch_dir() as td:
     root = Path(td)
     shutil.copytree(KIT, root / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
@@ -1286,7 +1395,7 @@ with build_tempdir() as td:
 # block above observes the row PRESENT over a fixture whose `Card` returns an element; this one
 # observes it ABSENT, and an arm with only the first half passes on a seed that emits the row
 # unconditionally.
-with build_tempdir() as td:
+with build_scratch_dir() as td:
     root = Path(td)
     shutil.copytree(KIT, root / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
@@ -1325,7 +1434,7 @@ with build_tempdir() as td:
 # table holds it exactly when the declaration was read. Both revert flavours red here: dropping
 # `declared` leaves `.ts` unarmed, and dropping `sets` alone makes `scan_corpus` refuse `ts-regex` as
 # an unshipped set one line earlier, which is why the NOT EXTRACTED assertion rides along.
-with build_tempdir() as td:
+with build_scratch_dir() as td:
     root = Path(td)
     shutil.copytree(KIT, root / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
@@ -1440,7 +1549,7 @@ check("coverage: a fenced code block in PROSE does not join the denominator",
 
 # S6 — the liveness. What it asserts is AGREEMENT: every file an armed extractor found a definition
 # in must also sniff positive. Staged by blinding the sniffer inside a fixture copy of the kit.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _r = Path(_td)
     shutil.copytree(KIT, _r / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     _eng = _r / PFX / KIT_NAME / "lexicon.py"
@@ -1549,7 +1658,7 @@ check("canon: every row can render a negative",
 # ARM (a) — VOLUME CANNOT PROMOTE. Five hundred sites of a token in no cluster must not enter.
 _many = {"core/a%d.py" % i: "def frobnicate_thing%d():\n    pass\n" % i for i in range(60)}
 _many["core/z.py"] = "def build_it():\n    pass\n"
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _r = Path(_td)
     shutil.copytree(KIT, _r / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     for _rel, _b in _many.items():
@@ -1569,7 +1678,7 @@ with build_tempdir() as _td:
 # live site and `load` has NONE, so a count-based rule proposes get or fetch. The first-element rule
 # proposes `load`, which is in neither file.
 _pol = {"core/a.py": "def get_row():\n    pass\n", "core/b.py": "def fetch_row():\n    pass\n"}
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _r = Path(_td)
     shutil.copytree(KIT, _r / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     for _rel, _b in _pol.items():
@@ -1588,7 +1697,7 @@ with build_tempdir() as _td:
 
 # S8 — `conf` is seeded whether or not the corpus contains one, because the scaffold runs before the
 # file it writes is tracked.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _r = Path(_td)
     shutil.copytree(KIT, _r / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (_r / "core").mkdir(parents=True, exist_ok=True)
@@ -1617,7 +1726,7 @@ with build_tempdir() as _td:
 # ZeroDivisionError, which is the class this file already carries two scars from — a flag taken as a
 # destination and a `CELLS` block nobody emitted. The branch says the share is UNDEFINED rather than
 # printing a reassuring `0.0%`, because zero offenders out of zero definitions is not a clean tree.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _r = Path(_td)
     shutil.copytree(KIT, _r / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (_r / "docs").mkdir(parents=True, exist_ok=True)
@@ -1921,7 +2030,7 @@ _rows = _lc._parse_rows([(5, "a.b  x y"), (7, "c")], Path("x"))
 check("_parse_rows keeps a DOTTED row key and carries the line number",
       _rows == {"a.b": (5, "x y"), "c": (7, "")}, repr(_rows))
 
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _cp = Path(_td) / "c.conf"
 
     # AC1 — the CELLS row parses, and `--print-rows CELLS` emits it.
@@ -2194,7 +2303,7 @@ check("AC10 fall: ...and prints the exact replacement row to paste",
 # one-time measurement -- but its INPUT is a block this arm writes, so it merges clean however dense
 # the tracked declaration becomes and it can never observe a later tidying edit. That hazard is
 # S10's refusal above, over the tracked file, on a leg with no guard.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _r = Path(_td)
     _base = ("CELLS:\n"
              "  py.file  kebab\n\n  py.function  snake\n\n  py.type  pascal\n\n"
@@ -2645,7 +2754,7 @@ for _rows, _label, _needle in (
 
 # AC6, through the CLI the bash adopter uses. One reader, two output shapes — a refusal that only
 # fired on the engine path would leave `adopt-lexicon.sh` green over a declaration the engine reds.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _conf = Path(_td) / ".lexicon.conf"
     _conf.write_text(_TS_BASE + "\nPATTERNS:\n"
                      r"  ts-regex.functions  ^\s*function\s+[A-Za-z_]\w*" "\n", encoding="utf-8")
@@ -2764,7 +2873,7 @@ for _key, _frag in (("py.function+wiggly:load", "a CELLS selector is"),
 # AND the mode, rather than a subset that is empty because nothing could ever fill it.
 _JSCONF = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
                             'LANGS="py:python-ast:parser js:js-regex:probe conf::dark"')
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _cp = Path(_td) / "c.conf"
     _cp.write_text(_JSCONF + "\nCELLS:\n  js.function+decorator:route  camel\n",
                    encoding="utf-8", newline="\n")
@@ -3516,7 +3625,7 @@ if _PREC_PATH.exists():
               "declares already carries a `function` row, so the precedence arm has no cell to ask "
               "through", True)
     elif _DISAGREE:
-        with build_tempdir() as _ptd:
+        with build_scratch_dir() as _ptd:
             _proot = Path(_ptd)
             subprocess.run(["git", "init", "-q", "--template="], cwd=_proot, check=True, capture_output=True)
             (_proot / ".lexicon.conf").write_text(_prec_text, encoding="utf-8", newline="\n")
@@ -3871,7 +3980,7 @@ for _label, _tail in (
         ("stamped", '\ncanon_unfrozen="2026-09-05 node a — our stores are `hydrate`"\n'
                     "\nCANON:\n  load  hydrate\n"),
         ("frozen", "\n")):
-    with build_tempdir() as _td:
+    with build_scratch_dir() as _td:
         _sroot = Path(_td)
         shutil.copytree(KIT, _sroot / PFX / KIT_NAME,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
@@ -4290,7 +4399,7 @@ check("STAGED: dropping the tab strip turns that file into an unterminated hered
 # L3 — `check_self_containment`'s UNJUDGED branch. Every SIBLING branch is staged; this one reads as
 # covered by association and its failing case had never been observed. It decides whether a broken
 # sibling module degrades the walk silently or reds.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _kit = build_kit_copy(Path(_td) / "kitL3")
     _victim = _kit / "subtokens.py"
     _victim.write_text(_victim.read_text(encoding="utf-8") + "\ndef (:\n",
@@ -4302,7 +4411,7 @@ with build_tempdir() as _td:
 # L4 — the `cannot be read as source` refusal, split from the SyntaxError one precisely because the
 # two say different things. Nothing exercised the distinction, so a future edit re-merging them reds
 # nothing. Reachable in the wild: `tracked_files` does not filter for existence.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _rr = Path(_td)
     shutil.copytree(KIT, _rr / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
@@ -4425,7 +4534,7 @@ _ROUTED_CONF = ('BANNED_SUFFIXES="Manager"\n'
                 '  py.file+prefix:check  kebab\n\n'
                 'VERBS:\n'
                 '  build   create a new value and return it - NOT `create`\n')
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _rr = Path(_td)
     shutil.copytree(KIT, _rr / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
@@ -4706,7 +4815,7 @@ check("...and points at the wrapper, which is where --stamp actually lives",
       "adopt-lexicon.sh" in _o, _o)
 
 # ---- the SHELL surface: the guard, the stamp, and the CRLF inversion -----------------------------
-with build_tempdir() as td:
+with build_scratch_dir() as td:
     _root = Path(td)
     shutil.copytree(KIT, _root / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
@@ -4818,7 +4927,7 @@ with build_tempdir() as td:
 # once-refusal's promise of "a visible edit in a tracked file" was false. It is the natural first
 # adoption path — scaffold, curate, expand — and no existing fixture could see it, because every one
 # of them stages the conf.
-with build_tempdir() as td:
+with build_scratch_dir() as td:
     _u = Path(td)
     shutil.copytree(KIT, _u / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
@@ -6006,7 +6115,7 @@ check("AC6: ...and a refusal-blown reading earns `probe` too, so F2 reaches the 
 # committing, WRITES the resolution, and commits — so the resolution is the case, not git's choice.
 # The stub is the rev-4 class: merge `01c22e155` lost `write_ask_views` while a suite stub of the
 # same name stood in another file, and a check clearing by bare name passed it.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _r = Path(_td)
     _git = lambda *a: subprocess.run(["git", *a], cwd=_r, capture_output=True, text=True, encoding="utf-8")  # noqa: E731
     _git("init", "-q", "--template=", "-b", "main")
@@ -6101,7 +6210,7 @@ if _cx_probe.stdout.strip().lower().replace(b"-", b"") in (b"utf8", b"utf_8"):
           f"already {_cx_probe.stdout.strip().decode('ascii', 'replace')} on this host, so "
           "`lexicon_conf.py`'s UTF-8 reconfigure is UNEXERCISED here. One arm unexercised.")
 else:
-    with build_tempdir() as _td:
+    with build_scratch_dir() as _td:
         _cx_conf = Path(_td) / ".lexicon.conf"
         _cx_conf.write_text(BASE_CONF, encoding="utf-8", newline="\n")
         _cx = subprocess.run([sys.executable, str(KIT / "lexicon_conf.py"), "--print-rows", str(_cx_conf)],
@@ -6118,7 +6227,7 @@ else:
 # A kit copy beside a FIXTURE registry whose words are not the live one's: `kit` is no word here, so
 # `layer.kit.x` passing and `practice.repo.x` refusing show the words came from the fixture, and the
 # malformed `a.b` row reaching no word shows it was validated before use.
-with build_tempdir() as _td:
+with build_scratch_dir() as _td:
     _tr = Path(_td)
     (_tr / ".git").mkdir()
     shutil.copytree(KIT, _tr / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))

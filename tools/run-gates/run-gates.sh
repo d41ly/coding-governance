@@ -2384,19 +2384,36 @@ fi
 #             fails `ts_alive`, with the predicate of `ts_sweep_queue`: a live pid only WITHHOLDS the
 #             sweep, so a pid table that errs can only keep a dir, never remove a live bar's. A dir
 #             with no readable owner is never touched, which is also why a bar that predates this
-#             unit, or another repository's, is left alone (the spec's F1 kept the delete surface to
-#             this repository). The owner record is removed LAST, so a sweep that fails part-way
-#             leaves a dir the next bar can still prove dead and retry.
-#   REDIRECTED  `TMPDIR` is exported as `$WORK/tmp` before the first leg dispatches, so every leg's
-#             `mktemp -d` and every Python `tempfile` lands inside the scratch the `cleanup` trap
-#             already removes. The spelling is the one `mktemp -d` returned and never a drive-letter
-#             rewrite, which is what broke four arms of the template-size self-test when an external
-#             root was tried (measured by the aTetheredScratch build).
+#             unit, or another live repository's, is left alone (the spec's F1 kept the delete surface
+#             to this repository). An ORPHAN's is swept too: a dead owner whose absolute common dir
+#             names no directory any more, a fixture repository its suite removed (TOOL-dQuietDisk-9
+#             S9). The owner record is removed LAST, so a sweep that fails part-way leaves a dir the
+#             next bar can still prove dead and retry. The record and the sweep are the `owned_work_sh`
+#             block, which the self-test runner carries too.
+#   REDIRECTED  `TMPDIR`, `TEMP` and `TMP` are exported as `$WORK/tmp` before the first leg
+#             dispatches, so every leg's `mktemp -d`, every Python `tempfile` and a native child's
+#             temp dir, which reads `TEMP` and `TMP` and never `TMPDIR`, land inside the scratch the
+#             `cleanup` trap already removes (TOOL-dQuietDisk-9 S7). The spelling is the one `mktemp -d`
+#             returned and never a drive-letter rewrite, which is what broke four arms of the
+#             template-size self-test when an external root was tried (measured by the aTetheredScratch
+#             build); MSYS converts all three for a native child.
+#   OUTER     an adopter runner that already redirects `TMPDIR` to its own owned scratch exports
+#             `GATE_OUTER_AMBIENT_TMP`, the temp root it was itself started under. Naming a directory,
+#             it is `RG_SWEPT_TMP`, what the count and the sweep read; `WORK` is still made under
+#             `${TMPDIR:-/tmp}`, inside that runner's scratch. Unset or empty, nothing changes; naming
+#             no directory, one NOTE line says so. It is read once and unset before any leg, so a bar
+#             nested inside a leg never inherits it (TOOL-dQuietDisk-9 S8).
 #
 # It runs HERE, after the turnstile, so a bar still queued never sweeps. Every refusal in this block
 # sits ABOVE the `cleanup` trap, the same class as the `mktemp -d` beside it, so each removes what it
 # made before it exits.
 GATE_AMBIENT_TMP=${TMPDIR:-/tmp}
+RG_SWEPT_TMP=$GATE_AMBIENT_TMP
+if [ -n "${GATE_OUTER_AMBIENT_TMP:-}" ]; then
+  if [ -d "$GATE_OUTER_AMBIENT_TMP" ]; then RG_SWEPT_TMP=$GATE_OUTER_AMBIENT_TMP
+  else echo "run-gates: NOTE - GATE_OUTER_AMBIENT_TMP names no directory, so the bar counts and sweeps $GATE_AMBIENT_TMP" >&2; fi
+fi
+unset GATE_OUTER_AMBIENT_TMP
 WORK=$(mktemp -d "$GATE_AMBIENT_TMP/gate-work.XXXXXXXX") || { echo "run-gates: cannot create a scratch dir"; exit 2; }
 # THE COMMON DIR THE OWNER NAMES, the one resolution the turnstile's key also takes, made above the
 # width whether or not the turnstile runs, because the sweep must still know which repository a
@@ -2404,30 +2421,37 @@ WORK=$(mktemp -d "$GATE_AMBIENT_TMP/gate-work.XXXXXXXX") || { echo "run-gates: c
 WORK_COMMON=$RG_COMMON
 [ -n "$RG_HEALTH_LOG" ] || [ -z "$WORK_COMMON" ] || RG_HEALTH_LOG=$(derive_health_log "$WORK_COMMON")
 
-write_work_owner() { # -> $WORK/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
+# >>> owned_work_sh — canonical copy: owned-scratch.sh in gov's lib dir (byte-identical; gated)
+write_work_owner() { # <dir> <common> -> <dir>/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
   local _tp
-  derive_temp_path _tp "$WORK/owner"
-  printf '%s\t%s\t%s\n' "$$" "$WORK_COMMON" "$EPOCHSECONDS" > "$_tp" 2>/dev/null \
-    && mv -f "$_tp" "$WORK/owner" 2>/dev/null
+  derive_temp_path _tp "$1/owner"
+  printf '%s\t%s\t%s\n' "$$" "$2" "$EPOCHSECONDS" > "$_tp" 2>/dev/null \
+    && mv -f "$_tp" "$1/owner" 2>/dev/null
 }
 
-scan_dead_work() { # -> removes each gate-work dir under the ambient TMPDIR that this repo's dead bar owns
+scan_dead_work() { # <ambient> <own dir> <common> <health log> -> removes each gate-work dir under <ambient> a dead bar owns
   local d own pid rest common f
   local -a doomed
   # No common dir, no proof of ownership: sweep nothing rather than match an empty field.
-  [ -n "$WORK_COMMON" ] || return 0
-  for d in "$GATE_AMBIENT_TMP"/gate-work.*; do
+  [ -n "$3" ] || return 0
+  for d in "$1"/gate-work.*; do
     [ -d "$d" ] || continue
     # NEVER OUR OWN, guarded explicitly although our live pid already withholds it — the same belt
     # `ts_sweep_queue` wears, for the same reason: a later edit to the pid test must not reach here.
-    [ "${d##*/}" = "${WORK##*/}" ] && continue
+    [ "${d##*/}" = "${2##*/}" ] && continue
     own=""
     { IFS= read -r own < "$d/owner"; } 2>/dev/null
     own=${own%$'\r'}
     [ -n "$own" ] || continue
     pid=${own%%$'\t'*}; rest=${own#*$'\t'}; common=${rest%%$'\t'*}
     case "$pid" in ''|*[!0-9]*) continue ;; esac
-    [ "$common" = "$WORK_COMMON" ] || continue
+    # THIS REPOSITORY'S, or an ORPHAN's: an absolute common dir that names no directory any more, a
+    # fixture repository its suite removed (TOOL-dQuietDisk-9 S9). Another live repository's root and
+    # a relative common dir are never touched.
+    if [ "$common" != "$3" ]; then
+      case "$common" in /*|[A-Za-z]:[/\\]*) ;; *) continue ;; esac
+      [ -d "$common" ] && continue
+    fi
     ts_alive "$pid" && continue
     printf 'run-gates: sweeping the scratch of a dead bar (pid %s)\n' "$pid" >&2
     doomed=()
@@ -2437,32 +2461,34 @@ scan_dead_work() { # -> removes each gate-work dir under the ambient TMPDIR that
       doomed+=("$f")
     done
     if { [ "${#doomed[@]}" = 0 ] || rm -rf "${doomed[@]}" 2>/dev/null; } && rm -rf "$d" 2>/dev/null; then
-      add_health_event "$RG_HEALTH_LOG" run-gates scratch-swept "dead bar pid $pid"
+      add_health_event "$4" run-gates scratch-swept "dead bar pid $pid"
     else
       printf 'run-gates: NOTE - the scratch of dead bar %s was not removed whole; its owner record stays, so the next bar retries: %s\n' "$pid" "$d" >&2
     fi
   done
   return 0
 }
+# <<< owned_work_sh
 
-write_work_owner \
+write_work_owner "$WORK" "$WORK_COMMON" \
   || echo "run-gates: NOTE - no owner record could be written into $WORK, so if this bar is killed no later bar can prove it dead and sweep its scratch" >&2
 mkdir "$WORK/tmp" 2>/dev/null \
   || { rm -rf "$WORK" 2>/dev/null; echo "run-gates: cannot create the legs' scratch dir under $WORK"; exit 2; }
-scan_dead_work
+scan_dead_work "$RG_SWEPT_TMP" "$WORK" "$WORK_COMMON" "$RG_HEALTH_LOG"
 # THE AMBIENT COUNT, ONCE PER BAR, measured after the sweep and counting this bar's own dir, so two
-# bars over an unchanged ambient print the same figure and a leak reads as growth. A glob rather than
+# bars over an unchanged ambient print the same figure and a leak reads as growth. Under an outer root
+# it counts that root, which this bar's own dir does not sit in, and the same holds. A glob rather than
 # `ls | wc -l`: no process, and no per-entry stat on a directory that may hold tens of thousands.
 _te_ng=0; shopt -q nullglob && _te_ng=1
 _te_dg=0; shopt -q dotglob && _te_dg=1
 shopt -s nullglob dotglob
-_te_all=("$GATE_AMBIENT_TMP"/*)
+_te_all=("$RG_SWEPT_TMP"/*)
 [ "$_te_ng" = 1 ] || shopt -u nullglob
 [ "$_te_dg" = 1 ] || shopt -u dotglob
 TMPDIR_ENTRIES=${#_te_all[@]}
 unset _te_all _te_ng _te_dg
 echo "TMPDIR entries $TMPDIR_ENTRIES"
-export TMPDIR="$WORK/tmp"
+export TMPDIR="$WORK/tmp" TEMP="$WORK/tmp" TMP="$WORK/tmp"
 # THE TRAP COVERS THE SCRATCH DIR AND THE BEACON, AND NOTHING ELSE. That exclusion is load-bearing:
 # the run record below lives under the git dir and is DURABLE, so a trap that swept it would erase
 # the record on every ordinary exit and on every caught signal — which is every path except the

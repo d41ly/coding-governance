@@ -131,6 +131,39 @@ import tempfile
 import time
 import tomllib
 from typing import NamedTuple
+import contextlib
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
 
 HERE = pathlib.Path(__file__).resolve().parent
 # Run as a program, this module is `__main__`; registering it under its own name means govkit,
@@ -1180,7 +1213,7 @@ def read_git_dir(target: pathlib.Path) -> pathlib.Path | None:
     under `build_step_env` as `read_target_repositories` runs it (TOOL-dSafePassage-76 S1); None where
     git names none, a target outside any repository."""
     # ponytail: a target whose git directory moves mid-process reads the old one; no step moves it
-    with tempfile.TemporaryDirectory(prefix="gk-gitdir-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-gitdir-") as td:
         p = subprocess.run(["git", "-C", str(target), "rev-parse", "--absolute-git-dir"], env=build_step_env(td),
                            stdin=subprocess.DEVNULL, capture_output=True)
     out = p.stdout.decode("utf-8", "replace").strip()
@@ -1586,7 +1619,7 @@ def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
     `.gitmodules` maps the name to, or the name and `, by name` where none does (S22). Every git
     call runs under `build_step_env`'s environment; one that fails, or a `Refusal` `read_config`
     raises, returns the call and git's exit as a string, never an empty population."""
-    with tempfile.TemporaryDirectory(prefix="gk-repos-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-repos-") as td:
         env = build_step_env(td)
 
         def run_repo_git(cwd, *args, ok=(0,), reads: str = "") -> str:
@@ -1721,7 +1754,7 @@ def read_target_local_config(target, refused) -> list[tuple[str, str, str | None
     (TOOL-dSafePassage-42 S8). A git dir under the target is passed relative to it, so its origin
     reads `.git/...`. A read that fails returns git's exit and stderr as a string."""
     root, rows = pathlib.Path(target).resolve(), []
-    with tempfile.TemporaryDirectory(prefix="gk-cfg-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-cfg-") as td:
         def read(d: pathlib.Path, via: str) -> bool:
             gd = d.relative_to(root).as_posix() if d.is_relative_to(root) else d.as_posix()
             p = subprocess.run(["git", "-C", str(target), f"--git-dir={gd}", "config", "--list", "--show-scope",
@@ -1859,7 +1892,7 @@ def run_step_isolated(row: StepRow, phase: str, target, gov_root, to: str | None
                       f"or run the step attended")
     gov_root = pathlib.Path(gov_root).resolve()
     ctx = derive_step_context(row, target, gov_root, to if phase == "down" else None)
-    with tempfile.TemporaryDirectory(prefix="gk-step-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-step-") as td:
         for d in ("home", "tmp", STEP_HOOKS_DIR):
             (pathlib.Path(td) / d).mkdir()
         try:
@@ -1936,7 +1969,7 @@ def check_needs_target(row: StepRow, tree, gov_root) -> str:
         print(f"isolation: {row.id} · attended · it declares needs-target = true, so nothing ran")
         return "attended"
     canaries = pathlib.Path(tree) / CANARY_DIR
-    shutil.rmtree(canaries, ignore_errors=True)
+    remove_tree(canaries)
     write_target_plants(tree, canaries)
     failed = None
     for phase in ("up", "witness"):
@@ -3003,7 +3036,7 @@ def run_isolation_fixture(plant: str | None) -> int:
               and k.upper() not in ("GIT_CONFIG_GLOBAL", "GIT_CONFIG_NOSYSTEM")]:
         del os.environ[k]
     try:
-        with tempfile.TemporaryDirectory(prefix="gk-iso-", ignore_cleanup_errors=True) as td:
+        with build_scratch_dir(prefix="gk-iso-") as td:
             return run_isolation_case(pathlib.Path(td), plant)
     finally:
         g.update(saved)
@@ -3460,7 +3493,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             # same size, new mtime: git cannot tell it changed without the clean filter
             (deep / "a.txt").write_text("b\n", encoding="utf-8", newline="\n")
             os.utime(deep / "a.txt", (1, 1))
-        shutil.rmtree(canaries, ignore_errors=True)
+        remove_tree(canaries)
         canaries.mkdir()
         if kind in ("config-malformed", "gitmodules-malformed"):
             broken = target / ".git" / "modules" / "sub" / "config" if kind == "config-malformed" else target / ".gitmodules"
@@ -3980,7 +4013,7 @@ def run_walk_fixture(plant: str | None) -> int:
     """`fixture walk [--plant <case>]` (S9): AC1 to AC5 over a scratch gov and target under the temp
     root. An unmet expectation prints `walk: FAILED`; otherwise the exit is the walk's own,
     `fail-k`'s and `attended`'s 1 by design."""
-    with tempfile.TemporaryDirectory(prefix="gk-walk-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-walk-") as td:
         tmp = pathlib.Path(td)
         gov, sha = build_walk_gov(tmp, plant)
         env = build_fixture_env()
@@ -4272,7 +4305,7 @@ def run_lock_fixture(plant: str) -> int:
     """`fixture lock --plant <case>` (S9): AC7 and AC8, each take a child process calling govkit's
     `take_write_lock` over a scratch target whose lock the plant wrote. An unmet expectation prints
     `lock: FAILED`; otherwise the exit is the take's, the refusing plants' 1 by design."""
-    with tempfile.TemporaryDirectory(prefix="gk-lock-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-lock-") as td:
         tmp = pathlib.Path(td)
         t = tmp / "t"
         gk = load_govkit()
@@ -4546,7 +4579,7 @@ def run_update_fixture(plant: str | None) -> int:
     this checkout's `govkit.py`, `upgrade_steps.py` and the process-monitor census, a `demo` kit, and
     at B the steps `fx/s1` and `fx/s2`; a target installed at A is moved to B. An unmet expectation
     prints `update: FAILED`; otherwise the exit is `update`'s, `update-fail`'s 1 by design."""
-    with tempfile.TemporaryDirectory(prefix="gk-upd-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-upd-") as td:
         tmp = pathlib.Path(td)
         fails: list[str] = []
         gov, targets, sha_a, sha_b, env = build_update_gov(
@@ -4770,7 +4803,7 @@ def run_rollback_fixture(plant: str | None) -> int:
             print("rollback: FAILED · callers · a planted second caller does not read red")
             return 1
         return rc
-    with tempfile.TemporaryDirectory(prefix="gk-rb-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-rb-") as td:
         tmp = pathlib.Path(td)
         gov, sha = build_walk_gov(tmp, plant)
         env = build_fixture_env()
@@ -5077,7 +5110,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
     unmet expectation prints `rollback-update: FAILED`; otherwise the exit is `update`'s, and 1 for
     a refusing plant whose refusal held. `retired-step` (TOOL-dSafePassage-76) lands `fx/s2` at B,
     retires it at C, and rolls back to B, which passes, then to A, which refuses."""
-    with tempfile.TemporaryDirectory(prefix="gk-rbu-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-rbu-") as td:
         tmp = pathlib.Path(td)
         fails: list[str] = []
         schema = plant in ROLLBACK_UPDATE_SCHEMA_PLANTS

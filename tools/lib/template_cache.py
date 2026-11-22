@@ -50,6 +50,51 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import contextlib
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
+# >>> owned_work_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# THE OWNED ROOT A PROCESS SITS IN: the nearest of `path` and its parents named `gate-work.*` and
+# holding an `owner` file, a bar's `$WORK` or a suite's own root (TOOL-dQuietDisk-9 S2).
+def resolve_owned_work(path):
+    """The owned `gate-work.*` directory at or above `path`, a pathlib.Path, or None."""
+    here = pathlib.Path(path).absolute()
+    for d in (here, *here.parents):
+        if d.name.startswith("gate-work.") and (d / "owner").is_file():
+            return d
+    return None
+# <<< owned_work_py
+
 
 # >>> git_env_leaks_py -- canonical copy: git_env_leaks.py in the gov lib dir (byte-identical; gated)
 # The eight location variables git EXPORTS to a hook, which reach any subprocess the hook starts and
@@ -98,11 +143,8 @@ class TemplateCache:
         named = os.environ.get("SELFTEST_TEMPLATE_ROOT") or ""
         found = pathlib.Path(named) if named and os.path.isdir(named) else None
         if found is None:
-            tmp = pathlib.Path(tempfile.gettempdir()).absolute()
-            for d in (tmp, *tmp.parents):
-                if d.name.startswith("gate-work.") and (d / "owner").is_file():
-                    found = d / "templates"
-                    break
+            owned = resolve_owned_work(tempfile.gettempdir())
+            found = owned / "templates" if owned is not None else None
         if found is None and root is None:
             raise ValueError("template-cache: no root: no SELFTEST_TEMPLATE_ROOT, no owned gate-work, "
                              "and no root argument, so a cache would outlive the run")
@@ -143,7 +185,7 @@ class TemplateCache:
         if (home / "ready").is_file():
             return home / "repo"
         stage = self.root / f".stage-{key}-{os.getpid()}"
-        shutil.rmtree(stage, ignore_errors=True)
+        remove_tree(stage)
         repo = stage / "repo"
         repo.mkdir(parents=True)
         try:
@@ -164,12 +206,12 @@ class TemplateCache:
             (stage / "config-pins").write_text("".join(pins), encoding="utf-8", newline="\n")
             (stage / "ready").write_bytes(b"")
         except BaseException:
-            shutil.rmtree(stage, ignore_errors=True)
+            remove_tree(stage)
             raise
         try:
             os.rename(stage, home)
         except OSError:
-            shutil.rmtree(stage, ignore_errors=True)
+            remove_tree(stage)
             if not (home / "ready").is_file():
                 raise
         return home / "repo"

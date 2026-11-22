@@ -600,7 +600,6 @@ Cite ids, never line numbers.
 | [TOOL-dQuietDisk-23](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE REST OF THE G-C STATIC LINT IS UNBUILT. TOOL-dQuietDisk-9 lands… |
 | [TOOL-dQuietDisk-24](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | unattended.test.sh REBUILDS ITS PROLOGUE IN EVERY SHARD (K2). Each of… |
 | [TOOL-dQuietDisk-25](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | check-unattended.test.sh BUILDS A REPOSITORY PER CASE. It has 13 git… |
-| [TOOL-dQuietDisk-27](../builds/dQuietDisk/BACKLOG.md) | INPROGRESS | MED | TOOL-dQuietDisk-9 | 2026-11-20 | THE RUNNER'S OWNED TEMP ROOT REACHES NEITHER NATIVE CHILDREN NOR A… |
 | [TOOL-dQuietDisk-29](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | A HISTORY-STORE HIT NEVER REFRESHES ITS ITEM.… |
 | [TOOL-dQuietDisk-30](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE HELD SELECTION MATCHES A DIRECTORY GUARD AGAINST A FILE OF THE SAME… |
 | [TOOL-dQuietDisk-31](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE RUNNER'S REUSE KEY HASHES GATE_REGEN_CHECK, SO A GOVKIT APPLY'S… |

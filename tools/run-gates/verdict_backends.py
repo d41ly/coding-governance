@@ -76,6 +76,39 @@ TOOL_ROOT = HERE.parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 from leg_factory import resolve_kit_dir  # noqa: E402 - the kit's inline copy of the sibling resolver
+import contextlib
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
 
 SAY = "verdict-backends"
 STATES = ("GREEN", "RED", "NONE", "HELD", "DEAD PROBE")
@@ -702,7 +735,7 @@ def run_verify_peer(remote, repo="."):
                         why = write_peer_tag(repo, sha, {"verdict": v.state, "tree": tree, "run_id": after}, node, remote)
         finally:
             run_git(repo, "worktree", "remove", "--force", str(scratch))
-            shutil.rmtree(scratch.parent, ignore_errors=True)
+            remove_tree(scratch.parent)
         failed += bool(why)
         print(f"{SAY}: verify-peer · {sha[:8]} · " + (f"not published: {why}" if why else
                                                       f"published {VERDICT_REF}{sha[:8]} as node {node}"))
@@ -1323,7 +1356,7 @@ def run_fixture(case):
         print(f"{SAY}: fixture · plant {case} · {held} of {len(out)} scenario(s) held{' · all held' if whole else ''}")
         return out[-1][2] if whole else 3
     finally:
-        shutil.rmtree(top, ignore_errors=True)
+        remove_tree(top)
 
 
 # ------------------------------------------------------------------------------------------ the verbs

@@ -1985,6 +1985,30 @@
     ]
   },
   {
+    "name": "cleanup posture (a tree removal that swallows its error)",
+    "tag": "leg.gov.cleanup-posture-a-tree-removal-that-swallows-its-error",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "catches a tree removal that swallows its error",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/encoding_posture.py",
+      "--cleanup",
+      "memory/project/cleanup-sites.txt",
+      ".",
+      "{prefix}",
+      "skills",
+      ".githooks"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
     "name": "hook destinations self-test",
     "tag": "leg.gov.hook-destinations-self-test",
     "tests": [

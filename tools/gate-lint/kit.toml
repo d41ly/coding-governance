@@ -412,6 +412,16 @@ direction = "ceiling"
 home = "memory/project/fork-ceilings.txt"
 
 [[ledger]]
+population = "cleanup-sites"
+leg = "cleanup posture (a tree removal that swallows its error)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "cleanup-sites"]
+key = "site"
+fields = ["path", "arm"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/cleanup-sites.txt"
+
+[[ledger]]
 population = "location-probe-waivers"
 leg = "shell hygiene (a location probe asked from a moved directory)"
 seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "location-probe-waivers"]

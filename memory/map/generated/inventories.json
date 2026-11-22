@@ -18,6 +18,7 @@
       "charter size",
       "check-arms selftest",
       "check-wiring self-test",
+      "cleanup posture (a tree removal that swallows its error)",
       "cleanup skill wiring",
       "codebase-map adopter e2e",
       "codebase-map coverage + freshness",

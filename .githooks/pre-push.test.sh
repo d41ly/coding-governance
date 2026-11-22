@@ -2073,6 +2073,9 @@ cd "$pfx_home" || exit 2
 #   GATE_ATTRIBUTE GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE — the hook clears the policy pair
 #     and sets all three from R itself (TOOL-dDerivedDocket-23, -24), and attribution is report-only.
 #   GATE_AMBIENT_TMP GATE_HOST_RATIO — assigned in the runner, from TMPDIR and as a source constant.
+#   GATE_OUTER_AMBIENT_TMP — the temp root an outer adopter runner started under, read once and unset
+#     before any leg; it moves only which directory the scratch count and the dead-owner sweep read,
+#     and that sweep needs a dead owner, so it never moves a leg or a verdict (TOOL-dQuietDisk-9 S8).
 #   GATE_DOCS_BASE — the hook clears it for every bar, a STUB included, and sets it only on a doc-only
 #     decision (TOOL-dThriftyLanding-3), as it sets GATE_BASE on the path where that matters.
 #   GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_MEMINFO — the memory pause's threshold, its hold bound and the
@@ -2112,7 +2115,7 @@ cd "$pfx_home" || exit 2
 #     once and unset before any leg; it writes `<i>.rerun.*` beside the attempts and moves no verdict and
 #     no exit code, so it can turn no leg into a PASS or a SKIP (TOOL-dWitnessedBar-8 S1, F6).
 # Classified by TOOL-aSparedSpawn-33 S8.
-BAR_INERT_KNOBS="GATE_BASE_FROM GATE_CAUSE GATE_RERUN GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_SELECTION GATE_HOST_RATIO GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+BAR_INERT_KNOBS="GATE_BASE_FROM GATE_CAUSE GATE_RERUN GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_OUTER_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_SELECTION GATE_HOST_RATIO GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n

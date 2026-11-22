@@ -30,6 +30,147 @@ import sys
 import tempfile
 import time
 import types
+import atexit
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
+# >>> owned_work_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# THE OWNED ROOT A PROCESS SITS IN: the nearest of `path` and its parents named `gate-work.*` and
+# holding an `owner` file, a bar's `$WORK` or a suite's own root (TOOL-dQuietDisk-9 S2).
+def resolve_owned_work(path):
+    """The owned `gate-work.*` directory at or above `path`, a pathlib.Path, or None."""
+    here = pathlib.Path(path).absolute()
+    for d in (here, *here.parents):
+        if d.name.startswith("gate-work.") and (d / "owner").is_file():
+            return d
+    return None
+# <<< owned_work_py
+
+# >>> owned_tempdir_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A PYTHON SUITE'S OWNED ROOT (TOOL-dQuietDisk-9 S2, S9). Nested in an owned root, a bar's or another
+# suite's, it takes that temp dir and makes nothing. Otherwise it sweeps each dead `py:` owner's root
+# of this repository, or of a common dir that names no directory, makes `gate-work.*` with an owner
+# line and `tmp`, points `tempfile` and the `TMPDIR`, `TEMP` and `TMP` its children read there, and
+# removes the whole root at exit. A kill leaves the root with its owner, for the next suite to sweep.
+def read_pid_alive(pid) -> bool:
+    """False only when `pid` is provably gone; any error reads as alive, so a sweep can only keep."""
+    if os.name == "nt":
+        # Never `os.kill` here: signal 0 on Windows is CTRL_C_EVENT, sent to the pid's console group.
+        try:
+            import ctypes
+            k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            k32.OpenProcess.restype = ctypes.c_void_p
+            handle = k32.OpenProcess(0x1000, False, int(pid))  # PROCESS_QUERY_LIMITED_INFORMATION
+            if not handle:
+                return ctypes.get_last_error() != 87  # ERROR_INVALID_PARAMETER: no such process
+            try:
+                code = ctypes.c_ulong()
+                if not k32.GetExitCodeProcess(ctypes.c_void_p(handle), ctypes.byref(code)):
+                    return True
+                return code.value == 259  # STILL_ACTIVE
+            finally:
+                k32.CloseHandle(ctypes.c_void_p(handle))
+        except (OSError, AttributeError, ValueError):
+            return True
+    try:
+        os.kill(int(pid), 0)
+    except ProcessLookupError:
+        return False
+    except (OSError, ValueError):
+        return True
+    return True
+
+
+def scan_dead_scratch(ambient, common) -> list:
+    """Removes each `gate-work.*` directly under `ambient` whose owner names a dead `py:` pid and
+    `common`, or an absolute common dir that names no directory; an empty `common` removes nothing.
+    Returns the roots removed, and says one stderr line per root it sweeps."""
+    removed = []
+    if not common:
+        return removed
+    try:
+        names = sorted(os.listdir(ambient))
+    except OSError:
+        return removed
+    for name in names:
+        root = os.path.join(ambient, name)
+        if not name.startswith("gate-work.") or not os.path.isdir(root):
+            continue
+        try:
+            with open(os.path.join(root, "owner"), encoding="utf-8") as fh:
+                fields = fh.readline().rstrip("\r\n").split("\t")
+        except (OSError, UnicodeDecodeError):
+            continue
+        pid = fields[0][3:] if fields[0].startswith("py:") else ""
+        if len(fields) < 2 or not (pid.isascii() and pid.isdigit()):
+            continue
+        if fields[1] != common and (not os.path.isabs(fields[1]) or os.path.isdir(fields[1])):
+            continue
+        if read_pid_alive(int(pid)):
+            continue
+        print(f"owned-scratch: sweeping the scratch of a dead suite (pid {pid}): {root}", file=sys.stderr)
+        if remove_tree(root):
+            removed.append(root)
+    return removed
+
+
+def init_owned_tempdir() -> str:
+    """The temp dir this process's scratch lands in, owned and removed at exit; see the block's head."""
+    ambient = tempfile.gettempdir()
+    if resolve_owned_work(ambient) is not None:
+        tempfile.tempdir = ambient
+        return ambient
+    try:
+        got = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                             capture_output=True, text=True, encoding="utf-8", errors="replace",
+                             check=False, stdin=subprocess.DEVNULL)
+        common = got.stdout.strip() if got.returncode == 0 else ""
+    except OSError:
+        common = ""
+    scan_dead_scratch(ambient, common)
+    root = tempfile.mkdtemp(prefix="gate-work.", dir=ambient)
+    atexit.register(remove_tree, root)
+    staged = os.path.join(root, f"owner.{os.getpid()}.tmp")
+    with open(staged, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(f"py:{os.getpid()}\t{common}\t{int(time.time())}\n")
+    os.replace(staged, os.path.join(root, "owner"))
+    tmp = os.path.join(root, "tmp")
+    os.mkdir(tmp)
+    tempfile.tempdir = tmp
+    for name in ("TMPDIR", "TEMP", "TMP"):
+        os.environ[name] = tmp
+    return tmp
+# <<< owned_tempdir_py
+
 
 
 def derive_install_prefix() -> str:
@@ -4549,7 +4690,7 @@ def check_staged_copies(tmp: pathlib.Path) -> None:
     # TOOL-dSafePassage-99 S3: a staged copy's own `load_govkit()` writes the copy's engine to the
     # module table, and `govkit_module()` still answers the one engine at GOVKIT afterwards.
     held99 = govkit_module()
-    shutil.rmtree(tmp / "dsp99-copy", ignore_errors=True)
+    remove_tree(tmp / "dsp99-copy")
     spec99 = importlib.util.spec_from_file_location("us99_copy", build_staged_copy(
         tmp / "dsp99-copy", (HERE / "upgrade_steps.py").read_text(encoding="utf-8")))
     us99_copy = importlib.util.module_from_spec(spec99)
@@ -5399,7 +5540,7 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
     anchor94 = 'except (OSError, subprocess.SubprocessError):\n            return "did not run"'
     sentinel94 = "dsp95-sentinel"
     steps94 = types.ModuleType("dsp94_upgrade_steps")
-    shutil.rmtree(tmp / "dsp94-narrowed", ignore_errors=True)  # TOOL-dSafePassage-96: a reused tmp stages afresh
+    remove_tree(tmp / "dsp94-narrowed")  # TOOL-dSafePassage-96: a reused tmp stages afresh
     try:
         spec94 = importlib.util.spec_from_file_location("dsp94_upgrade_steps", build_staged_copy(
             tmp / "dsp94-narrowed", src94.replace(anchor94, 'except ValueError:\n            return "did not run"', 1)))
@@ -5452,7 +5593,7 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
 
     def read_stub_tail(resolve_src: str | None) -> str:
         # TOOL-dSafePassage-94: no shape runs the last one's bytecode, which the stub's loader writes
-        shutil.rmtree(stub92 / "__pycache__", ignore_errors=True)
+        remove_tree(stub92 / "__pycache__")
         if resolve_src is None:
             stand94.unlink(missing_ok=True)
         else:
@@ -5675,7 +5816,7 @@ def check_step_walk() -> None:
     clock = "        now, now_boot = time.time(), read_boot_clock()\n        rows, _counts = census.scan_processes()\n"
     late = "        rows, _counts = census.scan_processes()\n        now, now_boot = time.time(), read_boot_clock()\n"
     src = us_py.read_text(encoding="utf-8")
-    with tempfile.TemporaryDirectory(prefix="gk-judge-", ignore_cleanup_errors=True) as td:
+    with build_scratch_dir(prefix="gk-judge-") as td:
         jd = build_staged_copy(pathlib.Path(td), src.replace(clock, late))
         pm = govkit_module().resolve_kit_dir("process-monitor", "census.py", HERE)
         (pathlib.Path(td) / pm.name).mkdir()
@@ -6425,6 +6566,7 @@ def check_source_mode(tmp: pathlib.Path) -> None:
 
 
 def main() -> int:
+    init_owned_tempdir()
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
     # blew the 600 s ceiling. Off for the whole suite; the probe's own arms drive the function
@@ -17112,7 +17254,7 @@ user_skills = "/tmp/gk-fake-skills"
                   f"got {GK9.outcome_accepted(_rc, _oc5, _dec)!r}")
         check("[-5] R2 LIVENESS the truth table covers both verdicts",
               len({w for _r, _o, _d, w, _x in _k5truth}) == 2, "the table only asserts one answer")
-        __import__("shutil").rmtree(str(_k5r), ignore_errors=True)
+        remove_tree(str(_k5r))
 
         # ---- DEPL-dRetiredFork-6. THE CONTRIBUTION CLASSIFIER ----------------------------------
         # NAMES ARE NAMESPACED `_k6*` BECAUSE THEY ARE NOT IN A FUNCTION OF THEIR OWN.
@@ -17218,7 +17360,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-5] S3 run_kit_check routes its exit code through classify_outcome",
               "classify_outcome(" in _rkc,
               "the probe is still dead code for `check`")
-        _sh5 = __import__("shutil"); _sh5.rmtree(str(_r5), ignore_errors=True)
+        remove_tree(str(_r5))
 
         # ---- DEPL-dRetiredFork-4 S3. A PATHSPEC LARGER THAN THE COMMAND LINE --------------------
         # The argv form died at 32 KiB with WinError 206, AFTER apply's write loop — leaving files
@@ -17262,7 +17404,7 @@ user_skills = "/tmp/gk-fake-skills"
             print("skip [-4] S3 the argv form did not die on this host: its command-line limit is "
                   "above the fixture size, so the RED half is unexercised HERE. It was observed on "
                   "the reporting platform, and the stdin form is asserted above either way.")
-        _sh4 = __import__("shutil"); _sh4.rmtree(_d4, ignore_errors=True)
+        remove_tree(_d4)
 
         check("[-5] D1/M4 the announcement map covers exactly the declared `target` sites",
               set(_D1_ANNOUNCED) == set(_tgt_sites),

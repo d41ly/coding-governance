@@ -889,18 +889,35 @@ produces is proportional to its legs. The runner owns all of it:
 - **Owned.** The run's scratch dir is a named `gate-work.*` directory under the AMBIENT `TMPDIR` —
   `/tmp` when that is unset or empty, where `mktemp -d` itself falls back — and it carries an `owner`
   record: the runner's pid, the resolved git common dir and the start epoch, one TAB-separated line.
-- **Redirected.** Before the first leg dispatches the runner exports `TMPDIR` as that dir's `tmp/`,
-  so every leg's `mktemp -d` and every Python `tempfile` lands inside it and goes when the bar exits.
-  The spelling is the one `mktemp -d` returned and never a drive-letter rewrite.
+- **Redirected.** Before the first leg dispatches the runner exports `TMPDIR`, `TEMP` and `TMP` as
+  that dir's `tmp/`, so every leg's `mktemp -d`, every Python `tempfile` and a native child's temp
+  dir, which reads `TEMP` and `TMP` and never `TMPDIR`, land inside it and go when the bar exits.
+  The spelling is the one `mktemp -d` returned and never a drive-letter rewrite; MSYS converts all
+  three for a native child.
 - **Swept.** A bar killed by signal 9 runs no trap and leaves its whole scratch dir. Each later bar
   removes every `gate-work.*` whose owner names THIS repository's common dir and whose pid is dead,
   and says so on stderr: `run-gates: sweeping the scratch of a dead bar (pid <p>)`. A live pid only
-  withholds the sweep. A dir with no readable owner — every bar's scratch from before this kit
-  version, and another repository's — is never touched.
+  withholds the sweep. An ORPHAN is swept too: a dead owner whose absolute common dir names no
+  directory any more, which is a fixture bar whose suite removed its repository. A dir with no
+  readable owner — every bar's scratch from before this kit version — and another existing
+  repository's, or one whose owner names a relative common dir, is never touched.
+- **The self-test runner owns its scratch the same way.** `run-selftests.sh` makes one `gate-work.*`
+  root at startup, in every mode, writes the same owner line, runs the same sweep before any row, and
+  puts every row's `TMPDIR`, `TEMP` and `TMP` under it, so a killed sweep is swept by the next run.
+  A Python suite run on its own does the same through `init_owned_tempdir()`, with a `py:` owner line
+  each face leaves to the other.
 
 Once per bar, after the sweep, the runner prints `TMPDIR entries <n>`, the count of top-level entries
 in the ambient `TMPDIR`, its own dir included, and writes the same figure to the run record header as
 `tmpdir_entries`. Over an unchanged ambient two bars print the same figure, so a leak reads as growth.
+
+**A bar nested under an adopter runner: `GATE_OUTER_AMBIENT_TMP`.** An adopter runner that already
+redirects `TMPDIR` to its own owned scratch exports `GATE_OUTER_AMBIENT_TMP`, the temp root it was
+itself started under. When it names a directory, the bar counts and sweeps that root instead of the
+outer runner's scratch; its own `gate-work.*` is still made under `TMPDIR`, inside that scratch, so
+the count no longer includes it. Unset or empty, nothing changes; naming no directory, the bar prints
+one `NOTE` line and keeps the ambient `TMPDIR`. The runner reads it once and unsets it before any leg,
+so a bar nested inside a leg never inherits it.
 
 **What the ambient cost before the runner owned it.** Measured on node `a`: 30733 entries, 58 legs,
 and a full bar >10 min and still running, where the same bar finished on a fresh `TMPDIR`. Growth
