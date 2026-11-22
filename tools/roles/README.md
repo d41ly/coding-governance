@@ -89,7 +89,16 @@ renders it under `## Role`, then `## Task`: one block per key of the role's `rea
 order. The charter's blocks ride once, in the role's agent file (described under "The agent types"),
 never in the prompt, and a stand-in, the main loop, holds the whole charter already
 (PLAY-dOrderedCharter-5 S3); the render still grades the role's `rules` tags, and their library notes
-print on stderr as `handoff: note — `. The section order is the work-order
+print on stderr as `handoff: note — `. **The single carry** (TOOL-dBoundRoles-15): the policy key
+`instructions.task-charter` selects whether a task carries the charter blocks, read once per render
+through `read_policy_setting` and checked by `check_single_carry` before any file is written. The
+harness kind is `static` where a file the backend loads carries the charter at spawn: the agent file
+for a spawned type, and the charter file for a `--stand-in` or an `agent: false` render, which the
+main loop does. `inline` is a backend that loads neither file, and only an `inline` task carries the
+blocks; no route of today's one adapter derives it. So `when-not-static`, the default, puts no charter
+in any task, and `always` refuses with exit 1, naming the key, the role and the file carrying its
+charter, since the charter would reach the agent twice. With no policy kit the render prints one
+`instructions.task-charter unread` note and takes `when-not-static`. The section order is the work-order
 template's, `templates/work-order.template.md`, which holds the two headings and the slots `role`,
 `practices`, `opening` and `reads`, each `<!-- slot: <name> -->` on its own line. Where the playbook
 kit's document registry reads, each block sits in the envelope of its level, opened under its section's
@@ -358,8 +367,11 @@ then every role's list is empty, the strict reading.
 `python render_agents.py --write | --check | --selftest` renders each role whose `agent` is true
 into a Claude Code agent type, `.claude/agents/<name>.md` (TOOL-aOrientedCast-3). Its front matter
 is the role's Claude keys, then `omitClaudeMd: true`, then the role's `workflow` and `writes` for
-the hooks to read. Its body is `## Charter` and `render_charter_blocks` for the role
-(TOOL-aOrientedCast-16), then `render_role`'s output. The charter blocks are a `### Charter rules` block holding the
+the hooks to read. Its body is the role's static block, `render_static_block`'s one composition
+(TOOL-dBoundRoles-15): `## Charter` and `render_charter_blocks` for the role
+(TOOL-aOrientedCast-16), then `render_role`'s output. The agent file is the `static` carrier of the
+role's charter, so `instructions.task-charter` keeps the charter out of every task, as "The handoff
+renderer" says, and the checker's R5 measures this whole block against the role's `budget`. The charter blocks are a `### Charter rules` block holding the
 practice lines whose tag the role's `rules` key cites, in charter order, then the charter's
 `## Protocols` and `## Facts` sections whole, each under a `### ` heading. Where the playbook kit's
 document registry reads, the charter part sits in the envelope of the charter's registry row, level 0,
@@ -502,7 +514,11 @@ invoking `/build`.
 the role files, the overlays and the workflow table against each other in both directions, and every
 `rules` tag against the practice tags of the governing doc, which it locates through the
 memory-tree conf's `CHARTER` key; a body or an overlay spelling a protocol's file name reds as R5 or
-R10. A role called mandatory under a workflow whose `enforced-by` names no hook script, without an
+R10. R5 also measures every role's whole static block, `render_static_block`'s bytes with its
+`## Charter`, its granted gate legs and its registry envelopes, against the role's `budget`
+front-matter key, the byte ceiling a role file declares, `agent: false` roles included; a role with no
+`budget` reds by name, and the `role-body` cap's `budgets.enforce` mode makes a breach a defect or a
+`BUDGET WARN` line (TOOL-dBoundRoles-15). The playbook kit's load-set check reads the same `budget`. A role called mandatory under a workflow whose `enforced-by` names no hook script, without an
 `unenforced — <why>` clause, reds as R13, as does a `never` entry naming no enforcer, a script no
 kit holds or a leg the manifest lacks; a writer role whose `output` lacks its class's folder reds
 as R14. The workflow table is joined with the loop definition by workflow name, both ways, as R6: a

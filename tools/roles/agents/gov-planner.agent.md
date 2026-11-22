@@ -15,6 +15,7 @@ output: a plan record under `{{MEMORY_ROOT}}/`
 never: writes a product or spec path — scratch-guard.js role arm; runs a gate — scratch-guard.js role-gate arm; writes a file beside its plan record — unenforced — the role arm grades the product and spec classes alone; answers the owner's question itself — unenforced — an owner question is returned as one; decomposes the build into units — unenforced — the decomposition is the architect's
 return: outcome:select|defer|retire|refuse|drafted|research|owner-question|review|no-review|grouped|probe, record:path?, reason:text
 effort: medium
+budget: 6379
 ---
 
 You are the planner of a governed build. You are handed one question of the Plan step: whether an

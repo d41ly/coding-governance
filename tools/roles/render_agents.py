@@ -11,7 +11,11 @@ keys `roles.effort.<role>` and `roles.effort.default` first, then the kit's `hou
 (TOOL-aOrientedCast-10) with no model named, so a type carries the default tables' level and never a
 profile's (TOOL-aProfiledEffort-1), then the role's declared `effort`, then
 `omitClaudeMd: true`, then gov's `workflow` and
-`writes`, then a body that is `roles_lib.render_role`'s output, which closes the role with its
+`writes`, then the role's static block, `roles_lib.render_static_block`'s one composition, which the
+catalogue checker's R5 measures whole, charter included, against the role's `budget` front-matter key,
+and which the load-set check measures too (TOOL-dBoundRoles-15). The agent file is the `static`
+carrier of its charter, so the policy key `instructions.task-charter` keeps it out of every task. The
+block holds `roles_lib.render_role`'s output, which closes the role with its
 `## Never`, `## Ceiling` and `## Return` sections, the gate legs the merged grant gives it, its
 `gates` field else the house file's `[gates]` row (TOOL-dBoundRoles-21 S6), handed in
 (TOOL-dBoundRoles-2 S6), and, under `## Charter`,
@@ -90,7 +94,7 @@ import roles_lib as lib  # noqa: E402  (the kit's own library, beside this file)
 
 #: Claude Code's own front-matter keys, in the order a rendered type carries them.
 CLAUDE_KEYS = tuple("name description tools model maxTurns".split())
-AGENTS_REL = ".claude/agents"
+AGENTS_REL = lib.AGENTS_REL
 INDEX_REL = ".claude/roles.json"
 NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
 RESTART_LINE = ("render_agents: %d agent type(s) changed — a Claude Code session started before this "
@@ -166,35 +170,18 @@ def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort, 
                       charter_doc="", gates=(), model=None):
     """One agent type's text: Claude keys, its effort, the trim, gov's two keys, then the body. `model`,
     where given, is the `model:` line's value, `roles_lib.resolve_role_model`'s for `claude-code`
-    (TOOL-dBoundRoles-21 S5); else the role's declared one. With
-    `rows`, the document registry, the body is ranked (PLAY-dOrderedCharter-5 S1): `## Charter` and the
-    role's charter blocks first, in the envelope of the charter's row at `charter_doc`, then the rendered
-    role and each `Missing required unit:` line the load-set check printed for it under `warn`, all in the
-    agent file's own envelope. With `rows` None, no playbook kit, the role comes first and the charter
-    after it, unenveloped. A charter that yields no block renders no `## Charter`. `gates` is the role's
-    granted gate legs, which its `## Ceiling` names."""
+    (TOOL-dBoundRoles-21 S5); else the role's declared one. The body is `roles_lib.render_static_block`'s,
+    the one composition R5 measures against the role's `budget` (TOOL-dBoundRoles-15 S1): with `rows`, the
+    document registry, ranked, `## Charter` first in the charter row's envelope, then the rendered role and
+    each `Missing required unit:` line of `missing`, all in the agent file's own envelope; with `rows`
+    None, the role first and the charter after it, unenveloped. `gates` is the role's granted gate legs,
+    which its `## Ceiling` names."""
     keys = dict(role["keys"], **({"model": model} if model is not None else {}))
     head = ["---"] + ["%s: %s" % (k, keys[k]) for k in CLAUDE_KEYS if k in keys]
     head += ["effort: %s" % effort, "omitClaudeMd: true", "workflow: %s" % keys.get("workflow", ""),
              "writes: %s" % keys.get("writes", ""), "---"]
-    body = lib.render_role(kit_dir, slot, memory_root, gates)
-    if missing:
-        body += "\n" + "\n".join(missing) + "\n"
-    blocks = lib.render_charter_blocks(charter, role["path"].as_posix(), keys.get("rules", ""), notes)
-    if blocks and rows is None:
-        body += "\n## Charter\n\n" + blocks
-    elif blocks:
-        blocks = "## Charter\n\n" + blocks
-        row = lib.read_envelope_row(rows, charter_doc, memory_root)
-        if row is not None:
-            blocks = lib.render_envelope(charter_doc, row[0], row[1], blocks)
-        body = blocks + "\n" + body
-    # PLAY-dOrderedCharter-3 S4: the body after the front matter in its envelope, where a registry row names it
-    rel = "%s/%s.md" % (AGENTS_REL, slot)
-    row = lib.read_envelope_row(rows, rel, memory_root)
-    if row is not None:
-        body = lib.render_envelope(rel, row[0], row[1], body)
-    return "\n".join(head) + "\n" + body
+    return "\n".join(head) + "\n" + lib.render_static_block(kit_dir, slot, role, memory_root, charter, notes,
+                                                            gates, missing, rows, charter_doc)
 
 
 def derive_harness_paths(workflows, tool_root, target_root):
@@ -350,20 +337,23 @@ def run_mode(mode, kit_dir, tool_root, target_root):
         agents = [slot for slot, role in cat["roles"].items() if role["keys"].get("agent", "true") == "true"]
         # each role's legs, which its rendered ceiling names: the merged grant, its field else its house row
         granted = cat["policy"].get("gates", {})
-        # PLAY-dOrderedCharter-11 S4: every agent type's load set and role block, ONE check before writing
+        try:
+            rows = lib.load_document_registry(kit_dir)
+        except LookupError as exc:   # no playbook kit: the roles kit does not require it (F4)
+            rows = None
+            cat["notes"].append(lib.UNRANKED_NOTE % exc)
+        # PLAY-dOrderedCharter-11 S4: every agent type's load set and static block, ONE check before writing;
+        # the block is the whole one its `budget` prices, charter included (TOOL-dBoundRoles-15 §8 F7)
         refused, gate = lib.check_load_set(target_root, kit_dir, [
-            (slot, len(lib.render_role(kit_dir, slot, cat["memory_root"], granted.get(slot, ())).encode("utf-8")))
+            (slot, len(lib.render_static_block(kit_dir, slot, cat["roles"][slot], cat["memory_root"],
+                                               cat["charter"], None, granted.get(slot, ()), (), rows,
+                                               cat["charter_doc"]).encode("utf-8")))
             for slot in agents])
         if refused:
             raise lib.RolesError("\n".join(gate))
         missing = {slot: [ln for ln in gate if ln.startswith("Missing required unit:")
                           and ln.endswith(" · role." + slot)] for slot in agents}
         cat["notes"].extend(ln for ln in gate if not ln.startswith("Missing required unit:"))
-        try:
-            rows = lib.load_document_registry(kit_dir)
-        except LookupError as exc:   # no playbook kit: the roles kit does not require it (F4)
-            rows = None
-            cat["notes"].append(lib.UNRANKED_NOTE % exc)
         rendered = {}
         for slot in agents:
             rendered["%s/%s.md" % (AGENTS_REL, slot)] = render_agent_file(

@@ -808,8 +808,9 @@ for a policy key, a `[[key]]` row of its catalogue, the mirror left to the calle
 `check-hook-destinations.sh` for a hook, run with `GIT_INDEX_FILE` naming a throwaway copy of the
 caller's index holding the written files, since it grades tracked fragments only; and the roles kit's
 `check_roles.py`, through its `--write` render, for a role and a workflow, the workflow's loop row also
-graded by `loop_lib.py --check`. A role and a workflow join the two sets the roles kit closes in code,
-`BODY_CEILINGS` and `WORKFLOW_NAMES`, by one anchored insertion each. The preset kind is pending for
+graded by `loop_lib.py --check`. A role carries its `--ceiling` as its `budget` front-matter key, the byte
+ceiling of its whole static block, `## Charter` included, which the roles checker's R5 grades; a workflow
+joins `WORKFLOW_NAMES`, the set the roles kit closes in code, by one anchored insertion. The preset kind is pending for
 dKeptSession, and the stage kind for TOOL-dDeclaredLoop-25's repository stage. `--fixture --plant
 <case>` runs one of thirteen plants, each factory's instance green and a hand-made one red under the same
 gate plus the restore, in a scratch clone of the working tree the policy kit's `build_source_snapshot`

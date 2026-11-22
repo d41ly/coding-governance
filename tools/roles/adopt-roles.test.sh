@@ -122,7 +122,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +6 for arm 29 (TOOL-dBoundRoles-21).
 # +8 for arm 30 (TOOL-dBoundRoles-22).
 # +10 for arm 31 (TOOL-dBoundRoles-16).
-FLOOR_ASSERTIONS=112
+# +8 for arm 32 (TOOL-dBoundRoles-15).
+FLOOR_ASSERTIONS=120
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1672,6 +1673,127 @@ check_arm "arm 31 the rendered role index lists each role's shapes as its file d
 check_arm "arm 31 an orientation naming no unit is one R9 line naming the tag" "$([[ $A31 == *'ac6a 1'* ]] && echo 1 || echo 0)"
 check_arm "arm 31 with no unit reader the join prints unarmed and grades no tag" "$([[ $A31 == *'ac6c 1'* ]] && echo 1 || echo 0)"
 [ "$A31" = $'ac6b 1\nac2 1\nac3a 1\nac3b 1\nac3c 1\nac3d 1\nac4a 1\nac4b 1\nac6a 1\nac6c 1' ] || printf '    %s\n' "${A31//$'\n'/$'\n'    }"
+
+# ---- arm 32 (TOOL-dBoundRoles-15 AC1 AC2 AC3 AC7): the single carry and the budget over the whole static
+# ---- block. The fixture gains the policy kit at the home `policy`, committed on `main` as arm 29 commits it,
+# ---- and the playbook kit's document registry beside its layer register, so a block renders ranked. Under a
+# ---- committed `instructions.task-charter = "always"` the direct render of gov-researcher exits 1 naming the
+# ---- key, the value and the role, writing nothing (ac1); unset, its task holds no `### Charter rules` while its
+# ---- agent type holds one (ac2a), a `--stand-in` render under the owner's waiver row holds none (ac2b) and
+# ---- under `always` refuses naming the charter file (ac2c), and gov-session, an `agent: false` role rendered in
+# ---- process with its reads cut to the families a roles-kit fixture answers, does both (ac2d). With the
+# ---- policy kit moved away the render exits 0 with the note naming the key and `when-not-static` (ac7), and
+# ---- a practice of 1100 bytes, or one byte past gov-reuse-scout's headroom where that is larger, cited by its
+# ---- `rules` is one R5 line naming the role and its budget (ac3a), exit 0 with the rule taken out (ac3b). The
+# ---- failing cases, owed at the close and not observed by the pass that wrote this: the key ignored, so
+# ---- `always` renders (ac1, ac2c, ac2d); a stand-in read as `inline`, its task carrying the charter (ac2b); an
+# ---- absent policy kit read as `always` (ac7); and R5 measuring the base body alone (ac3a). WHAT IT DOES NOT
+# ---- CHECK: the `inline` kind, which no route derives, a reader exit 2, or the `warn` mode's BUDGET WARN line.
+build_fixture; _rc32=$?
+_pk=policy; [[ $FXK == */* ]] && _pk=${FXK%/*}/policy
+mkdir -p "$FX/$_pk" && cp -R "$HERE/../policy"/. "$FX/$_pk"/ || _rc32=2
+cp "$LAYERS_SRC/documents.toml" "$FX/$FXP"/ || _rc32=2
+A32=$("$PY" -B -c 'import os, pathlib, re, shutil, subprocess, sys
+fx, kit, pk, mr, ch = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve(), *sys.argv[3:6]
+env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_") and k != "GOV_DEFAULT_BRANCH"}
+def git(*a):
+    return subprocess.run(["git", "-c", "user.name=fx", "-c", "user.email=fx@fx", "-C", str(fx), *a], env=env,
+                          capture_output=True, text=True).returncode
+def commit(*lines):
+    (fx / ".governance").mkdir(exist_ok=True)
+    (fx / ".governance" / "policy.toml").write_text("".join(ln + "\n" for ln in lines) or "# no key\n", encoding="utf-8")
+    return git("add", "-A") == 0 and git("commit", "-q", "--allow-empty", "-m", "plant") == 0
+def run(cwd, *a):
+    p = subprocess.run([sys.executable, "-B", *a], cwd=str(cwd), env=env, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
+    return p.returncode, p.stdout, p.stderr
+prompts = fx / mr / "builds" / "tFix" / "prompts"
+prompts.mkdir(parents=True, exist_ok=True)
+(fx / mr / "project").mkdir(parents=True, exist_ok=True)
+made = lambda: sorted(p for p in prompts.iterdir())
+render = ["handoff.py", "render", "--role", "gov-researcher", "--build", "tFix", "--unit", "TOOL-tFix-1",
+          "--input", "question=q"]
+always = "instructions.task-charter = \"always\""
+ok = git("symbolic-ref", "HEAD", "refs/heads/main") == 0 and commit(always)
+rc, out, err = run(kit, *render, "--stdout")
+print("ac1 %d" % int(ok and rc == 1 and all(w in err for w in ("instructions.task-charter", "always", "gov-researcher"))
+                     and not made()))
+commit()
+rc, out, err = run(kit, *render, "--stdout")
+agent = (fx / ".claude" / "agents" / "gov-researcher.md").read_text(encoding="utf-8")
+print("ac2a %d" % int(rc == 0 and "### Charter rules" not in out.split("\n## Task\n", 1)[-1]
+                      and len(re.findall(r"(?m)^### Charter rules\r?$", agent)) == 1))
+waiver = fx / mr / "project" / "role-stand-in-waiver.txt"
+waiver.write_text("2026-11-22\towner a\tgov-researcher\ttFix\tthis tool exposes no sub-agent primitive\n", encoding="utf-8")
+commit()
+rc, out, err = run(kit, *render, "--stand-in")
+held = made()
+text = held[0].read_text(encoding="utf-8") if len(held) == 1 else "### Charter rules"
+print("ac2b %d" % int(rc == 0 and "### Charter rules" not in text.split("\n## Task\n", 1)[-1]))
+for p in held:
+    p.unlink()
+commit(always)
+rc, out, err = run(kit, *render, "--stand-in")
+print("ac2c %d" % int(rc == 1 and "instructions.task-charter" in err and ch in err and not made()))
+session = "\n".join(["import pathlib, sys", "import roles_lib as lib, handoff",
+    "fx, mr = pathlib.Path(sys.argv[1]), sys.argv[2]",
+    "keys = dict(lib.load_roles(handoff.KIT_DIR)[\"gov-session\"][\"keys\"], reads=\"field.input.question\")",
+    "try:",
+    "    task = handoff.render_handoff(fx, mr, lib.resolve_charter_path(fx), \"gov-session\", keys, \"tFix\",",
+    "                                  \"TOOL-tFix-1\", None, {\"question\": \"q\"}, None, [])[2]",
+    "    print(\"rendered\", \"### Charter rules\" in task)",
+    "except lib.RolesError as e:",
+    "    print(\"refused\", e)"])
+_rc, refused, _err = run(kit, "-c", session, str(fx), mr)
+commit()
+_rc, rendered, _err = run(kit, "-c", session, str(fx), mr)
+print("ac2d %d" % int(rendered.strip() == "rendered False" and refused.startswith("refused")
+                      and "gov-session" in refused and ch in refused))
+waiver.unlink()
+commit()
+shutil.move(str(fx / pk), str(fx / "policy.away"))
+rc, out, err = run(kit, *render, "--stdout")
+print("ac7 %d" % int(rc == 0 and any("instructions.task-charter" in ln and "when-not-static" in ln for ln in err.splitlines())
+                     and "### Charter rules" not in out.split("\n## Task\n", 1)[-1]))
+sys.path.insert(0, str(kit))
+import roles_lib as lib
+role = kit / "agents" / "gov-reuse-scout.agent.md"
+budget = lib.read_role_budget(lib.load_roles(kit)["gov-reuse-scout"])
+charter, scout = (fx / ch).read_text(encoding="utf-8"), role.read_bytes()
+cat = lib.parse_charter(charter, ch)
+block = lib.render_static_block(kit, "gov-reuse-scout", lib.load_roles(kit)["gov-reuse-scout"], mr, cat, None, (), (),
+                                lib.load_document_registry(kit), ch)
+head = "- [bigrule] "
+rule = head + "y" * (max(1100, budget - len(block.encode("utf-8")) + 1) - len(head)) + "\n"
+at = charter.index("<!-- /one-line -->", charter.index("<!-- gov:practices -->"))
+(fx / ch).write_text(charter[:at] + rule + charter[at:], encoding="utf-8")
+role.write_bytes(re.sub(rb"(?m)^rules: ", b"rules: bigrule, ", scout))
+rc, out, err = run(kit, "check_roles.py", "--root", str(fx))
+r5 = [ln for ln in out.splitlines() if ": R5 — " in ln]
+print("ac3a %d" % int(rc == 1 and len(r5) == 1 and "gov-reuse-scout" in r5[0] and "%d-byte ceiling" % budget in r5[0]))
+(fx / ch).write_text(charter, encoding="utf-8")
+role.write_bytes(scout)
+rc, out, err = run(kit, "check_roles.py", "--root", str(fx))
+print("ac3b %d" % int(rc == 0))
+shutil.move(str(fx / "policy.away"), str(fx / pk))
+' "$FX" "$FX/$FXK" "$_pk" "$MR" "$CH" 2>&1)
+A32=${A32//$'\r'/}
+check_arm "arm 32 under a committed instructions.task-charter always the direct render exits 1 naming the key, the value and the role" \
+   "$([ "$_rc32" = 0 ] && [[ $A32 == *'ac1 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 32 unset, the task carries no charter rules and the agent type carries them once" \
+   "$([[ $A32 == *'ac2a 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 32 a stand-in render under the owner's waiver row carries no charter in its task" \
+   "$([[ $A32 == *'ac2b 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 32 ...and under always refuses naming the charter file, writing nothing" \
+   "$([[ $A32 == *'ac2c 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 32 an agent: false role's render carries no charter, and under always refuses naming the charter file" \
+   "$([[ $A32 == *'ac2d 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 32 with no policy kit the render exits 0 with the note naming the key and when-not-static" \
+   "$([[ $A32 == *'ac7 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 32 a cited rule past gov-reuse-scout's headroom is one R5 line naming the role and its budget" \
+   "$([[ $A32 == *'ac3a 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 32 ...and with the rule taken out the catalogue checks clean" "$([[ $A32 == *'ac3b 1'* ]] && echo 1 || echo 0)"
+[ "$A32" = $'ac1 1\nac2a 1\nac2b 1\nac2c 1\nac2d 1\nac7 1\nac3a 1\nac3b 1' ] || printf '    %s\n' "${A32//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

@@ -42,7 +42,8 @@ read runs the check as `refuse` and prints the reader's line once. `--checks` st
 
 THE BUDGETS (S3), `check_budget`: a load point's bytes, CR stripped, against its cap. A path's cap is the cap
 census row named by that path, read with tomllib from the policy kit's census; a `role.<name>` block's is the
-`role-body` family, its value the roles kit's BODY_CEILINGS read from its source and never copied. One run of
+`role-body` family, its value the role's `budget`, the `budget:` line of its role file in the roles kit, read
+as text and never copied; each caller hands the role's whole static block, `## Charter` included. One run of
 the budgets script's `resolve` verb answers each cap's value and mode; over its cap a load point warns or
 refuses as that mode says, `--budgets-enforce` standing in for the switch where the switch set the mode. A
 file a harness reads whole carries the harness's limit as a second cap, today `AGENTS.md` under Codex's
@@ -64,7 +65,6 @@ Exit 0 green, 1 refused, 2 a usage error.
 from __future__ import annotations
 
 import argparse
-import ast
 import functools
 import os
 import pathlib
@@ -315,17 +315,18 @@ def read_checks_mode(root) -> tuple[str, list]:
 # ---- S3: the budgets ---------------------------------------------------------------------------------------
 
 def read_body_ceiling(role) -> int | None:
-    """BODY_CEILINGS[role] as the roles kit's checker assigns it, read from its source; None with no kit."""
+    """The role's `budget`, the `budget:` line of its `agents/<role>.agent.md` front matter in the roles kit
+    `resolve_kit_dir` finds, read as text since a kit imports no sibling kit (TOOL-dBoundRoles-15 §8 F7);
+    None with no kit, no such file, or no decimal `budget` line."""
     from policy_value import resolve_kit_dir
     try:
-        path = resolve_kit_dir("roles", "check_roles.py", KIT_DIR) / "check_roles.py"
-        tree = ast.parse(path.read_text(encoding="utf-8"))
-    except (LookupError, OSError, SyntaxError):
+        path = resolve_kit_dir("roles", "check_roles.py", KIT_DIR) / "agents" / f"{role}.agent.md"
+        text = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+    except (LookupError, OSError, UnicodeDecodeError):
         return None
-    for node in tree.body:
-        if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "BODY_CEILINGS" for t in node.targets):
-            return ast.literal_eval(node.value).get(role)
-    return None
+    head = re.match(r"---[ \t]*\n(.*?)\n---[ \t]*(?:\n|$)", text, re.S)
+    hit = re.search(r"^budget:[ \t]*([0-9]+)[ \t]*$", head.group(1), re.M) if head else None
+    return int(hit.group(1)) if hit else None
 
 
 def run_budgets(kit, cwd, *args) -> tuple[int, str, str]:
@@ -642,7 +643,7 @@ def run_plant(plant, extra) -> int:
         if plant == "role-block-over":
             ceiling = read_body_ceiling("gov-builder")
             if ceiling is None:
-                print(f"{SAY} — plant role-block-over: no BODY_CEILINGS row for gov-builder")
+                print(f"{SAY} — plant role-block-over: no budget line in gov-builder's role file")
                 return 2
             return main(["check", "--load-point", f"role.gov-builder={ceiling + 10}", *base, *extra])
         rc = main(["check", "--reader", "role.gov-builder", "--units", str(manifest), *base, *extra])
