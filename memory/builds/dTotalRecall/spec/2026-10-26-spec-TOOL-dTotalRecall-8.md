@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built
 
-**Status:** DEFERRED · rev-8 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · advances TOOL-dTotalRecall-27 TOOL-dTotalRecall-109
+**Status:** DEFERRED · rev-9 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 3 · advances TOOL-dTotalRecall-27 TOOL-dTotalRecall-109
 
 **Carries:** cl-dClosedLoop-0219@62a3f369 whole
 **Carries:** node:record-kind.code
@@ -187,16 +187,7 @@ is never built.
 - **consumes-from** `TOOL-dTotalRecall-13` — `extract_code.py`, the primitive, which this unit extends with `extract_ranges` and copies into the playbook-render kit
 - **consumes-from** external — landed and re-grounded at `8b8b1374`: PLAY-dOrderedCharter-19 S4 and S8 (`tag_index.py`'s `load_index`, `derive_index_path` and `read_worktree_trees`; `policy_value.py`), TOOL-dGroundRules-1 S3 and -2 (the catalogue row and `policy.py get`), PLAY-dOrderedCharter-7 S2 and S3 (`enforces` and the meta-check), TOOL-dWitnessedBar-11 S1 to S3 (the leg declaration and `leg_factory.py`)
 - **hands-off** external — dLinkedLibrary retires `symbols.json` and `reuse_lookup.py` onto this record (v2:1775); TOOL-dFurnishedOrders-17's `code` slot reads S14's `neighbourhood` rows (asks TOOL-dTotalRecall-102 and TOOL-dTotalRecall-103). The record is not built (deviation 83), so neither hand-off has a record to read
-- **hands-off** `TOOL-dTotalRecall-16` — the policy read of `memory.map-purpose`: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
-- **hands-off** `TOOL-dTotalRecall-2` — the policy read of `leases.offline`: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
-- **hands-off** `TOOL-dTotalRecall-3` — the policy read of `leases.offline`: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
-- **hands-off** `TOOL-dTotalRecall-4` — the policy read of `builds.agent-root`: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
-- **hands-off** `TOOL-dTotalRecall-5` — the policy read of the three `builds.slug-*` keys: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
-- **hands-off** `TOOL-dTotalRecall-7` — the policy read of `asks.acceptance`: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
-- **hands-off** `TOOL-dTotalRecall-9` — the policy read of the budget and slice keys: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
-- **hands-off** `TOOL-dTotalRecall-19` — the policy read of `memory.legacy-anchors`: this unit mints no `policy_value.py` (§8 F4), so that unit re-grounds onto the memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`
 - **hands-off** `TOOL-dTotalRecall-37` — the `.gitattributes` registration of generated code, which that unit narrows to the four rendered workflow scripts (the round-1 audit's id 16). The record is not built (deviation 83), so this unit writes no registration for that unit to narrow
-- **hands-off** `TOOL-dTotalRecall-43` — `code_record.py`'s cache and the `code record` leg's meta-gate rows, which that unit routes through and changes for the round-1 audit's ids 11, 21, 32, 33, 40, 54 and 55. The record is not built (deviation 83), so no `code_record.py`, cache or `code record` leg lands for that unit to change
 
 ## 4. Design
 
@@ -527,6 +518,10 @@ any adopter tree but the planted one; whether a `test` row's definition really t
   drops the retirement reason, and F1 gains the line saying the loss route's `WONTDO` was superseded,
   because a retired carrier leaves cl-dClosedLoop-0219 and its owned nodes uncarried and hygiene check
   29 refuses the build's INPROGRESS specs. The Carries lines and every other rev-7 change stay.
+- rev-9 · 2026-11-22 · §3 Edges · per `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`: the
+  hands-off bullets to units 2, 3, 4, 5, 7, 9, 16, 19 and 43 are deleted, each the mirror of a
+  `consumes-from` edge those specs drop because this unit mints nothing they take, so every edge stays
+  two-way; the hands-off bullets to TOOL-dTotalRecall-37 and the external one stay. No criterion moved.
 
 ## 10. Reuse audit
 

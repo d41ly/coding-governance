@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0216@f8936b35 whole
 **Carries:** node:policy-key.builds.slug-words
@@ -125,6 +125,15 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
   as `DRAINED` once a page anchors a key. Observed by AC11.
   **Readers:** by name: `tools/govkit/docs_leg.py`, whose `read_legacy_rows` reads each ledger row's
   id · by value: `tools/govkit/docs_leg.py#read_docs_state`, which joins each id to the page anchors
+- **S13** — The id token reads the grammar: `tools/memory-tree/tree_lib.py#build_id_token_re` splices
+  `derive_slug_grammar(root).slug_class` as its `slug` group, replacing the literal `[A-Za-z0-9]+`
+  (§8 F10), through a trailing `root=None` that binds `None` to the default tree as
+  `tools/memory-tree/id_grammar.py#grammar_for` does (§8 F9). `tree_lib` imports `id_grammar` at first
+  call, as `tools/memory-tree/tree_lib.py#read_policy_value` imports `backlog`.
+  `tools/memory-tree/tree_lib.py#_expand_ids` and `tools/memory-tree/tree_lib.py#read_id_pins` take the
+  same `root=None` and pass it on, and `tools/memory-tree/tree_lib.py#read_bindings` passes its own
+  root. A fixture id a suite reads through these functions with a slug the class refuses is
+  re-spelled to the legacy shape. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -154,7 +163,6 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
   before it pushes
 - **hands-off** `TOOL-dTotalRecall-2` — `derive_slug_grammar`, whose `mint_re` and `record` the door's
   `new build-readme` writes against
-- **consumes-from** `TOOL-dTotalRecall-8` — nothing minted: its §8 F4 mints no `policy_value.py` and its rev-7 retires it WONTDO, so this unit reads the three `builds.slug-*` keys through the landed `tools/memory-tree/tree_lib.py#read_policy_value`
 - **consumes-from** external — landed and re-grounded at `8b8b1374`: PLAY-dOrderedCharter-18 S1
   (`tools/memory-tree/id_grammar.py` with `grammar_for`, `build_grammar`, `_eras` and the conf layer),
   TOOL-dGroundRules-1 S3 and -2 (the three catalogue rows and `policy.py get`, which reads the landed
@@ -330,6 +338,7 @@ which TOOL-dTotalRecall-20's upgrade steps may grade.
 - `tools/memory-tree/gen_build_index.py`
 - `tools/memory-tree/backlog.py`
 - `tools/memory-tree/tree_lib.py`
+- `tools/memory-recall/selftest.py` (a fixture id S13 re-spells, where one reads through `_expand_ids`)
 - `tools/memory-tree/row_grammar.py`
 - `tools/memory-tree/merge-rows.py`
 - `tools/memory-tree/migrate_backlog.py`
@@ -471,6 +480,14 @@ The search of §4 "The readers" re-derives this list at the pass; a hit outside 
   `grep -c policy:builds.slug- memory/project/docs-undocumented.txt`, run at the pass tip, each prints
   0, and `grep -c 'usage: policy:builds.slug-' help/reference/policy.md` prints 3.
   Red when: a key stays unsummarised, unanchored, or on the docs ledger once anchored.
+- **AC12** — When a probe in AC4's planted clone calls `build_id_token_re("TOOL", <clone>)` from
+  `tools/memory-tree/tree_lib.py`, it matches `TOOL-d2026-10-26Loop-3` whole with `slug`
+  `d2026-10-26Loop` and `seq` `3`, and matches neither `TOOL-dX-2` nor `TOOL-x-1`; and a probe
+  printing each tracked path's `ids` from `read_bindings` prints the same lines at the pass base and
+  at the tip.
+  Red when: the slug group keeps `[A-Za-z0-9]+`, so the hyphenated id fails and `TOOL-dX-2` matches,
+  or the bound class drops an id the base read.
+  fixture: AC4's clone; the pass makes it.
 
 ## 7. Gates
 
@@ -530,6 +547,23 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--se
   (b) widen the catalogue pattern to admit `<n>`. (b) changes a public surface every adopter's policy
   file is validated against, veto 2. RESOLVED (agent, 2026-11-22, delegated): (a), the one survivor.
   widens: none · relaxes: none
+- **F9 — Which tree's grammar does S13's token bind when its caller holds a root?** Options: (a) the
+  default tree's, the signature kept; (b) a trailing `root=None`, `None` the default tree, each
+  caller holding a root passing it; (c) a required `slug_class` argument. (a) reads this repo's
+  grammar for a fixture or target tree, the failure `grammar_for`'s docstring measured in
+  `corpus_ids.py`; (c) breaks the one-argument calls TOOL-dTotalRecall-54 S1 lands at step 8 and
+  TOOL-dTotalRecall-46 S1 names. RESOLVED (agent, 2026-11-22, delegated): (b), the most feature-rich
+  survivor, `grammar_for`'s own accessor shape. widens: none · relaxes: none
+- **F10 — Does the bound class replace `[A-Za-z0-9]+` or alternate with it?** The literal admits
+  slugs the legacy shape refuses: the fixture ids `TOOL-dX-2`, `FIX-x-1` and `TOOL-x-1` and their
+  siblings, on 13 lines (DERIVED at `0c186915e`) of `tools/memory-tree/gen_build_index.py` and 5 of
+  `tools/memory-recall/selftest.py` (PINNED 2026-11-22 at `0c186915e`). Options: (a) replace it,
+  re-spelling a fixture id a suite reads through it; (b) alternate the literal with the class. (b)
+  keeps the loose tail `tools/memory-tree/id_grammar.py#_eras` refuses as a source of phantom ids,
+  so `parse_id_parts`, built on this token by TOOL-dTotalRecall-54, admits an id `ID_RE` refuses.
+  RESOLVED (agent, 2026-11-22, delegated): (a), the item 3 wording of
+  `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`, and the one reading of an id.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -547,6 +581,13 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--se
   (F8); the placed-build door (S3); the digest fold (S4); the keys' page (S12); the lexicon's names
   `derive_slug_grammar` and `render_label`; `--mint-check`, read by no unit, dropped; populations,
   the census and citations re-derived, Files touched gaining the readers landed since.
+- rev-7 · 2026-11-22 · S13 · §3 Edges · §4 Files touched · AC12 · §8 F9, F10 · per
+  `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`: S13 binds
+  `tree_lib.py#build_id_token_re`'s slug group to `slug_class`, replacing `[A-Za-z0-9]+`, which
+  TOOL-dTotalRecall-38 rev-4's AC4 and TOOL-dTotalRecall-54 rev-3 rest on and which this spec
+  promised only in its edges to units 46 and 54; AC12 observes it; F9 and F10 settle its root and the
+  literal; the `consumes-from TOOL-dTotalRecall-8` bullet, which took nothing, is deleted, S1 already
+  stating the read. No other criterion moved.
 
 ## 10. Reuse audit
 

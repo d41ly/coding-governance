@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-3 — slug claim refs and ask-family counter refs, each commit carrying its claimant, minted by leased compare-and-swap and never pruned
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 11 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 11 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0214@78961f0f whole
 **Carries:** node:record-kind.claim
@@ -61,7 +61,7 @@ slug or an ask family.
 - **S7** — `cmd_new_build` (`gen_build_index.py:4050`) keeps `check_slug_claimed` as its local
   pre-check and then claims the slug through `gov-claim.sh slug`, its claimant the content key of the
   mandate's id list, its offline value read with `read_policy_value("leases.offline", root)` from
-  TOOL-dTotalRecall-8's adapter `tools/memory-tree/policy_value.py`, before any write. Observed by AC4.
+  the landed `tools/memory-tree/tree_lib.py#read_policy_value`, before any write. Observed by AC4.
 - **S8** — The registry row `record-kind.claim` in `tools/memory-tree/record-kinds.toml` (I1), per §4
   "The registry row". Observed by AC7.
 - **S9** — The ids rule, D4: `tools/memory-tree/HYGIENE.template.md`'s line "No reserve-above-a-marker,
@@ -96,8 +96,6 @@ slug or an ask family.
   the door mints under, through `gov-claim.sh`
 - **hands-off** `TOOL-dTotalRecall-19` — `refs/gov/claims/`, the slug claim ref whose claim commit
   stands in as a build's root for the orphan check
-- **consumes-from** `TOOL-dTotalRecall-8` — `policy_value.py`, the memory-tree kit's `read_policy_value`
-  adapter S7 reads `leases.offline` through
 - **consumes-from** external — TOOL-dPlacedRequest-11 S1/S2/S8's `gov_ref_sh` block with
   `write_gov_ref` and `build_gov_commit`; TOOL-dPlacedRequest-1 S10's `leases.offline` and its offline
   queue; `read_policy_value` (I8) over TOOL-dGroundRules-1 S3's `leases.offline` row
@@ -264,7 +262,7 @@ slug is claimed only at its minting.
 
 ## 7. Gates
 
-`memory hygiene` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `tier2-review self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `push-main self-test`
+`memory hygiene` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `tier2-review self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `push-main self-test` · `scratch-guard self-test` · `policy fixtures`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC5 · the `gov_ref_sh` row's population gains `gov-claim.sh`, and its truth table gains the claims-deletion refusal, staged by one byte changed in the memory-tree copy · that suite's assertion count, raised by the copy
 New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC2 AC3 AC4 AC6 · its `--selftest` gains a two-clone fixture over a bare remote: the concurrent slug claim, the parallel counter mints, the replay and the three offline values, staged by replacing the leased push with an unleased one · none
@@ -309,6 +307,12 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC2 AC3 AC4 AC6 · i
   I8, the brief's D4, scout A's row for cl-0214, and `write_claim` read at `fb872a37e`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-11-22 · §3 Edges · S7 · §7 · per
+  `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`: the `consumes-from TOOL-dTotalRecall-8`
+  bullet is deleted, since that unit mints no `policy_value.py`, and S7 reads `leases.offline` through
+  the landed `tree_lib.py#read_policy_value`; the leg line gains `scratch-guard self-test` and
+  `policy fixtures`, whose guards `tools/unattended/unattended.sh` and `tools/memory-tree/kit.toml`
+  trip. No criterion moved.
 
 ## 10. Reuse audit
 

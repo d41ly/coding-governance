@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-19 — every record names its cause: the door's header and edge lines, the causes and orphan checks over a legacy population
 
-**Status:** DEFERRED · rev-7 · 2026-11-05 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-8 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0230@63f11811 whole
 
@@ -49,8 +49,8 @@ and `seed_population` (TOOL-dWitnessedBar-13 S1, S2, S8; -15 S1); the build leas
 `refs/gov/leases/<slug>/build` (TOOL-dPlacedRequest-1 S1); the catalogue row `memory.legacy-anchors`
 with no `summary` or `usage` (TOOL-dGroundRules-1 S3, S6); `TYPED_RECORD_KINDS`
 (PLAY-dOrderedCharter-42 S1); the leg declaration and `leg_factory.py` (TOOL-dWitnessedBar-11 S1-S3);
-and the memory-tree policy adapter
-`read_policy_value` in `policy_value.py` (TOOL-dTotalRecall-8 S10).
+and the memory-tree kit's one policy read, the
+landed `tools/memory-tree/tree_lib.py#read_policy_value` (TOOL-aNimbleMend-8 S7).
 
 - **S1** — One header reader, `read_header_edges(path, text)` in `tools/memory-tree/tree_lib.py`, returning
   the record's `serves` (through `read_bindings`, `:471`), `made-by` and `caused-by` values. For an
@@ -145,8 +145,6 @@ and the memory-tree policy adapter
   heading anchors for the population's section rows
 - **consumes-from** `TOOL-dTotalRecall-18` — `log`, the Serves kind the door writes on a new log record,
   `journal` read as its alias in a legacy one, each kind token compared through `canonical_kind`
-- **consumes-from** `TOOL-dTotalRecall-8` — `policy_value.py`, the memory-tree kit's `read_policy_value`
-  adapter S10 reads `memory.legacy-anchors` through
 - **hands-off** `TOOL-dTotalRecall-20` — `memory.legacy-anchors`, whose `retag` value that unit's upgrade
   step runs under
 - **hands-off** `TOOL-dTotalRecall-9` — `memory.legacy-anchors` through `read_legacy_anchors`, and the
@@ -322,7 +320,7 @@ SHA. An adopter seeds its own at its update, through TOOL-dTotalRecall-20's step
 
 ## 7. Gates
 
-`build-index selftest` · `memory hygiene` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `playbook render selftest` · `govkit acceptance matrix` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `straggler-guard arms` · `transition-audit arms`
+`build-index selftest` · `memory hygiene` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `playbook render selftest` · `govkit acceptance matrix` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `straggler-guard arms` · `transition-audit arms` · `routed-commits selftest` · `scratch-guard self-test` · `policy fixtures`
 
 New arm: tools/memory-tree/record_causes.py · covers AC4 AC6 AC7 AC8 · the `record causes (causes and orphans over the legacy population)` leg and the fixture plants `legacy`, `causeless`, `typed-causeless`, `orphan`, `claim-root` and `none`, staged by the walk seeded from the records instead of the roots · none
 New arm: tools/memory-tree/gov_record.py · covers AC1 AC2 AC3 AC5 · the door's selftest cases for a missing cause, both `Made-by` stand-ins and the three edge-line refusals, staged by the cause refusal cut · none
@@ -396,6 +394,11 @@ New arm: tools/memory-tree/gov_record.py · covers AC1 AC2 AC3 AC5 · the door's
 - rev-7 · 2026-11-05 · S8 · §8 F7 · the owner resolved F7 to (d), by
   `2026-11-05-prompt-TOOL-dTotalRecall-18-owner-forks`: a typed kind declaring no `Caused-by` is
   graded on its Serves unit, and the (c) asks are not filed.
+- rev-8 · 2026-11-22 · §2 preconditions · §3 Edges · §7 · per
+  `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`: the `consumes-from TOOL-dTotalRecall-8`
+  bullet is deleted, since that unit mints no `policy_value.py`, and §2's preconditions name the landed
+  `tree_lib.py#read_policy_value` as S10's read; the leg line gains the three legs whose guards
+  `tools/policy/catalogue.toml` and `tools/memory-tree/kit.toml` trip. No criterion moved.
 
 ## 10. Reuse audit
 

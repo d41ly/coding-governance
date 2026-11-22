@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-4 — the build README's declared front-matter schema, its routing region, the work order as each agent's root, and a design-only build's ids as units
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base c344bdc4 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base c344bdc4 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0215@10676c23 whole
 **Carries:** node:record-kind.build-readme
@@ -114,9 +114,6 @@ nobody, and the README routes a reader to no record by purpose.
 - **consumes-from** `TOOL-dTotalRecall-5` — `derive_slug_grammar`, whose `BUILD_SLUG_RE` types the
   `slugs` keys and whose `parse_slug_grammar` types the `slug-grammar:` key `FRONT_MATTER_KEYS`
   admits, written by both scaffolds since unit 5
-- **consumes-from** `TOOL-dTotalRecall-8` — nothing minted: its §8 F4 mints no `policy_value.py`, so
-  `read_agent_root` reads `builds.agent-root` through the landed
-  `tools/memory-tree/tree_lib.py#read_policy_value`
 - **consumes-from** `TOOL-dTotalRecall-1` — `record-kinds.toml`, the registry the
   `record-kind.build-readme` row lands in
 - **hands-off** `TOOL-dTotalRecall-6` — `FRONT_MATTER_KEYS`, whose relation keys unit 6 parses,
@@ -480,6 +477,9 @@ build's citations, so a cited typo is defined.
   `tree_lib.py#read_policy_value` with a default on refusal; the routes region names two records, the
   cap's measure, its rows `logs` and `card ref` beside the typed `card`; the row gains unit 18's
   columns; AC7's red is staged, not a base run.
+- rev-5 · 2026-11-22 · §3 Edges · per `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`: the
+  `consumes-from TOOL-dTotalRecall-8` bullet, which took nothing, is deleted; §4 "The agent's root"
+  already states the read through `tree_lib.py#read_policy_value`. No criterion moved.
 
 ## 10. Reuse audit
 

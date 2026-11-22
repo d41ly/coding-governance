@@ -101,14 +101,14 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 |---|---|---|---|---|---|
 | [TOOL-dTotalRecall-1 — the record-kind registry, the memory contract's one declaration of every kind](spec/2026-10-26-spec-TOOL-dTotalRecall-1.md) | 1 | 2 | CLOSED | rev-8 | 2026-11-22 |
 | [TOOL-dTotalRecall-13 — the shared extraction primitive in `tools/lib`, which the map and the lexicon each call](spec/2026-10-26-spec-TOOL-dTotalRecall-13.md) | 2 | 2 | CLOSED | rev-3 | 2026-11-22 |
-| [TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built](spec/2026-10-26-spec-TOOL-dTotalRecall-8.md) | 3 | 2 | DEFERRED | rev-8 | 2026-11-22 |
+| [TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built](spec/2026-10-26-spec-TOOL-dTotalRecall-8.md) | 3 | 2 | DEFERRED | rev-9 | 2026-11-22 |
 | [TOOL-dTotalRecall-18 — the kind registry completed: every column declared, readers and writers rendered, the pockets witnessed, and `journal` renamed `log`](spec/2026-10-26-spec-TOOL-dTotalRecall-18.md) | 4 | 2 | CLOSED | rev-7 | 2026-11-22 |
 | [TOOL-dTotalRecall-37 — only the four rendered workflow scripts are `linguist-generated`, held equal to the kits' render rows both ways](spec/2026-10-26-spec-TOOL-dTotalRecall-37.md) | 4 | 2 | DEFERRED | rev-5 | 2026-11-22 |
-| [TOOL-dTotalRecall-16 — the registry's `purpose` field, and every existing node's purpose reviewed as `memory.map-purpose` says](spec/2026-10-26-spec-TOOL-dTotalRecall-16.md) | 5 | 2 | INPROGRESS | rev-5 | 2026-11-22 |
+| [TOOL-dTotalRecall-16 — the registry's `purpose` field, and every existing node's purpose reviewed as `memory.map-purpose` says](spec/2026-10-26-spec-TOOL-dTotalRecall-16.md) | 5 | 2 | INPROGRESS | rev-6 | 2026-11-22 |
 | [TOOL-dTotalRecall-25 — the stream-plan kind, registered so the planner that writes it and the pick that reads it descend from one row](spec/2026-10-26-spec-TOOL-dTotalRecall-25.md) | 6 | 2 | DEFERRED | rev-6 | 2026-11-22 |
-| [TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader](spec/2026-10-26-spec-TOOL-dTotalRecall-5.md) | 7 | 2 | DEFERRED | rev-6 | 2026-11-22 |
-| [TOOL-dTotalRecall-38 — every id reader that splits on a hyphen parses through the grammar, found by the reader census and proved by the flip probe](spec/2026-10-26-spec-TOOL-dTotalRecall-38.md) | 8 | 2 | DEFERRED | rev-4 | 2026-11-22 |
-| [TOOL-dTotalRecall-4 — the build README's declared front-matter schema, its routing region, the work order as each agent's root, and a design-only build's ids as units](spec/2026-10-26-spec-TOOL-dTotalRecall-4.md) | 8 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader](spec/2026-10-26-spec-TOOL-dTotalRecall-5.md) | 7 | 2 | DEFERRED | rev-7 | 2026-11-22 |
+| [TOOL-dTotalRecall-38 — every id reader that splits on a hyphen parses through the grammar, found by the reader census and proved by the flip probe](spec/2026-10-26-spec-TOOL-dTotalRecall-38.md) | 8 | 2 | DEFERRED | rev-5 | 2026-11-22 |
+| [TOOL-dTotalRecall-4 — the build README's declared front-matter schema, its routing region, the work order as each agent's root, and a design-only build's ids as units](spec/2026-10-26-spec-TOOL-dTotalRecall-4.md) | 8 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dTotalRecall-54 — `parse_id_parts` lands on the named-group regex in step 8, ahead of the readers unit 38 re-points onto it](spec/2026-10-26-spec-TOOL-dTotalRecall-54.md) | 8 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-40 — the routing region reads every record kind through `canonical_kind`, so log records written after the rename route under logs](spec/2026-10-26-spec-TOOL-dTotalRecall-40.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-44 — the split census keys on the split's shape, so it lists every id reader whatever its value is named](spec/2026-10-26-spec-TOOL-dTotalRecall-44.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-26 |
@@ -118,14 +118,14 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-63 — unit 46's own pass reds a parser that refuses a cited family, so unit 54's body is held at step 9](spec/2026-10-26-spec-TOOL-dTotalRecall-63.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-64 — unit 46's spec observes unit 54's parser body and designs none of its own](spec/2026-10-26-spec-TOOL-dTotalRecall-64.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-22 — each edge type's cardinality declared per source and per target, mirrored in the kind registry, and checked over the merged tree after every merge](spec/2026-10-26-spec-TOOL-dTotalRecall-22.md) | 10 | 2 | DEFERRED | rev-4 | 2026-10-26 |
-| [TOOL-dTotalRecall-3 — slug claim refs and ask-family counter refs, each commit carrying its claimant, minted by leased compare-and-swap and never pruned](spec/2026-10-26-spec-TOOL-dTotalRecall-3.md) | 11 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing](spec/2026-10-26-spec-TOOL-dTotalRecall-2.md) | 12 | 2 | DEFERRED | rev-8 | 2026-11-03 |
-| [TOOL-dTotalRecall-7 — the ask kind's acceptance at filing, under `asks.acceptance`](spec/2026-10-26-spec-TOOL-dTotalRecall-7.md) | 13 | 2 | DEFERRED | rev-3 | 2026-10-26 |
+| [TOOL-dTotalRecall-3 — slug claim refs and ask-family counter refs, each commit carrying its claimant, minted by leased compare-and-swap and never pruned](spec/2026-10-26-spec-TOOL-dTotalRecall-3.md) | 11 | 2 | DEFERRED | rev-3 | 2026-11-22 |
+| [TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing](spec/2026-10-26-spec-TOOL-dTotalRecall-2.md) | 12 | 2 | DEFERRED | rev-9 | 2026-11-22 |
+| [TOOL-dTotalRecall-7 — the ask kind's acceptance at filing, under `asks.acceptance`](spec/2026-10-26-spec-TOOL-dTotalRecall-7.md) | 13 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dTotalRecall-11 — the shape-run kind, the parsed view of the review-shape line](spec/2026-10-26-spec-TOOL-dTotalRecall-11.md) | 14 | 2 | DEFERRED | rev-5 | 2026-11-05 |
 | [TOOL-dTotalRecall-41 — the ask door refuses a line break or row separator in any value and grades the row it would write, read back](spec/2026-10-26-spec-TOOL-dTotalRecall-41.md) | 14 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-10 — derived anchors suffixed for a repeated heading](spec/2026-10-26-spec-TOOL-dTotalRecall-10.md) | 15 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-42 — the shape-run home is its id-rule's glob, a kind with no record yet is declared `unarmed`, and a record is graded only by the row its Serves kind names](spec/2026-10-26-spec-TOOL-dTotalRecall-42.md) | 15 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [TOOL-dTotalRecall-19 — every record names its cause: the door's header and edge lines, the causes and orphan checks over a legacy population](spec/2026-10-26-spec-TOOL-dTotalRecall-19.md) | 16 | 2 | DEFERRED | rev-7 | 2026-11-05 |
+| [TOOL-dTotalRecall-19 — every record names its cause: the door's header and edge lines, the causes and orphan checks over a legacy population](spec/2026-10-26-spec-TOOL-dTotalRecall-19.md) | 16 | 2 | DEFERRED | rev-8 | 2026-11-22 |
 | [TOOL-dTotalRecall-21 — memory-recall's FTS5 tables moved into the one index file, keyed by blob](spec/2026-10-26-spec-TOOL-dTotalRecall-21.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-36 — every code writer of a record writes its `Caused-by` line, so the causes check stays green on the records written after its seed](spec/2026-10-26-spec-TOOL-dTotalRecall-36.md) | 17 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dTotalRecall-39 — one record-header edge reader: the edge grammar's header site binds `tree_lib.read_header_edges` and defines none of its own](spec/2026-10-26-spec-TOOL-dTotalRecall-39.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-26 |
@@ -134,7 +134,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-49 — the as-built view keeps the pinned instrument's bytes, and its writer is kept off the cause census by a stated reason](spec/2026-10-26-spec-TOOL-dTotalRecall-49.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-50 — the cause census reads the build folders' instruments, and the pinned departures writer is a declared row that drains when its owner repins](spec/2026-10-26-spec-TOOL-dTotalRecall-50.md) | 18 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dTotalRecall-51 — a non-markdown record's cause line wears its Serves line's comment prefix, the header reader reads it, and a bare one is refused](spec/2026-10-26-spec-TOOL-dTotalRecall-51.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [TOOL-dTotalRecall-9 — the memory extractors, `record find` and `record show` over the one index, and the per-item read budget](spec/2026-10-26-spec-TOOL-dTotalRecall-9.md) | 18 | 2 | DEFERRED | rev-3 | 2026-10-26 |
+| [TOOL-dTotalRecall-9 — the memory extractors, `record find` and `record show` over the one index, and the per-item read budget](spec/2026-10-26-spec-TOOL-dTotalRecall-9.md) | 18 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dTotalRecall-23 — the memory legs read the one index's rows for unchanged blobs and re-parse only changed ones](spec/2026-10-26-spec-TOOL-dTotalRecall-23.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-61 — unit 53 keeps the build-folder rows of its two file-keyed constants through its own pass, so no keep it needs lands after it](spec/2026-10-26-spec-TOOL-dTotalRecall-61.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-24 — every landed commit that touches a record appended to the change feed](spec/2026-10-26-spec-TOOL-dTotalRecall-24.md) | 20 | 2 | DEFERRED | rev-1 | 2026-10-26 |
@@ -149,7 +149,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-15 — the map's three-way completeness check and the map leg pack](spec/2026-10-26-spec-TOOL-dTotalRecall-15.md) | 24 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-26 — the atlas under `help/atlas/`: generated Markdown and Mermaid pages from the one index's node table, refused when stale](spec/2026-10-26-spec-TOOL-dTotalRecall-26.md) | 25 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dTotalRecall-12 — the acceptance re-measure: memory bytes per memory-reading agent over every read channel, passing only below 33 KB thirty days after landing](spec/2026-10-26-spec-TOOL-dTotalRecall-12.md) | 26 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [TOOL-dTotalRecall-43 — the round-1 spec audit's 59 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-43.md) | 27 | 2 | DEFERRED | rev-4 | 2026-10-26 |
+| [TOOL-dTotalRecall-43 — the round-1 spec audit's 59 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-43.md) | 27 | 2 | DEFERRED | rev-5 | 2026-11-22 |
 | [TOOL-dTotalRecall-52 — the one legacy registration is keyed by path, section and check, absorbs its second population through a declared base re-key, and leaves no carrier of the old name](spec/2026-10-26-spec-TOOL-dTotalRecall-52.md) | 28 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dTotalRecall-62 — unit 52 judges the merged legacy home at the run's real base and builds no `absorbs` read, so its own pass is green](spec/2026-10-26-spec-TOOL-dTotalRecall-62.md) | 28 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-53 — the round-1 spec audit of units 36 to 43: its 41 minors, batched](spec/2026-10-26-spec-TOOL-dTotalRecall-53.md) | 29 | 2 | DEFERRED | rev-3 | 2026-10-26 |
@@ -192,7 +192,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 277 bound to this build, across 4 record folder(s).
+Records: 280 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

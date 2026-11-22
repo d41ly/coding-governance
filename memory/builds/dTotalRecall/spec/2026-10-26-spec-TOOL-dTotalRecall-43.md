@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-43 — the round-1 spec audit's 59 minors, batched
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -252,6 +252,8 @@ is re-observed here.
 - Editing a landed spec (§2).
 - The report's suggested spec lints (§6 flags, Files touched, §10 seams): the close's left-shift
   step, under `memory/gotchas/` (M8).
+- The items landing on TOOL-dTotalRecall-8's `code_record.py`, S10, S29, S55, S56 and its §4
+  Files-touched row: they wait with that unit on ask TOOL-dTotalRecall-109, for this unit's re-ground.
 
 ### Edges
 
@@ -262,7 +264,6 @@ is re-observed here.
 - **consumes-from** `TOOL-dTotalRecall-5` — `id_grammar.py --readers` and its kept hits
 - **consumes-from** `TOOL-dTotalRecall-6` — `check_relation_cycles`
 - **consumes-from** `TOOL-dTotalRecall-7` — the ask row
-- **consumes-from** `TOOL-dTotalRecall-8` — `policy_value.py` and `code_record.py`
 - **consumes-from** `TOOL-dTotalRecall-9` — `record_extract.py`, the `sections` column and `record_find.py`
 - **consumes-from** `TOOL-dTotalRecall-10` — `derive_anchor` and its callers
 - **consumes-from** `TOOL-dTotalRecall-11` — the shape-run row and leg
@@ -292,7 +293,9 @@ is re-observed here.
 ### How the batch builds
 
 One pass, after every unit is terminal; the items share files, so M6 keeps them one unit. Order:
-registry rows (S1, S3, S4, S9), code items by unit, then S29, S30, S31 and S54.
+registry rows (S1, S3, S4, S9), code items by unit, then S29, S30, S31 and S54. TOOL-dTotalRecall-8
+mints no `policy_value.py`, so the policy read S11, S12 and S50 name is the landed
+`tools/memory-tree/tree_lib.py#read_policy_value`, and this unit's re-ground restates those items on it.
 
 ### Inventory
 
@@ -552,7 +555,7 @@ Criteria are numbered by the item they observe; S32 and S33 carry none.
 
 ## 7. Gates
 
-`memory hygiene` · `build-index selftest` · `build README slot contract` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `verifier fan-out self-test` · `tier2-review self-test` · `review-join self-test` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `govkit refusal join` · `govkit acceptance matrix` · `row-grammar selftest` · `row-keyed merge driver replay` · `row-driver view refusal` · `check-arms selftest` · `harness arms (fail branches armed or pinned)` · `backlog migration selftest` · `routed commits name a specced unit` · `run-gates canary` · `corpus-ids selftest` · `unattended-build self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `drift-audit records` · `runlog record schema` · `runlog selftest` · `lexicon naming predicates` · `lexicon selftest` · `codebase-map kit selftest` · `codebase-map coverage + freshness` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `govkit selfcheck` · `govkit selftest` · `leg ceilings clear their evidenced maximum` · `kickoff-manifest ratchet` · `kit/dogfood doc parity` · `playbook render selftest`
+`memory hygiene` · `build-index selftest` · `build README slot contract` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `verifier fan-out self-test` · `tier2-review self-test` · `review-join self-test` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `govkit refusal join` · `govkit acceptance matrix` · `row-grammar selftest` · `row-keyed merge driver replay` · `row-driver view refusal` · `check-arms selftest` · `harness arms (fail branches armed or pinned)` · `backlog migration selftest` · `routed commits name a specced unit` · `run-gates canary` · `corpus-ids selftest` · `unattended-build self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `drift-audit records` · `runlog record schema` · `runlog selftest` · `lexicon naming predicates` · `lexicon selftest` · `codebase-map kit selftest` · `codebase-map coverage + freshness` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `govkit selfcheck` · `govkit selftest` · `leg ceilings clear their evidenced maximum` · `kickoff-manifest ratchet` · `kit/dogfood doc parity` · `playbook render selftest` · `drift-audit selftest` · `policy fixtures`
 
 New arm: tools/memory-tree/record_kinds.py · covers AC1 AC3 AC5 AC23 AC57 AC58 · the plants `homeless-record`, `row-grammar`, `owner-graded`, `bad-tag`, `bad-field-key` and the three stream plants, staged by cutting each arm in turn · none
 New arm: tools/memory-tree/gov_record.py · covers AC4 AC7 AC37 AC43 · the plants `factory-alias`, `field-newline` and `untracked-draft`, staged by cutting `check_line_break` and the exclusive create · none
@@ -584,6 +587,11 @@ New arm: tools/memory-recall/selftest.py · covers AC38 AC39 · the held write t
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-60, each the other end of an edge a unit the round-1 spec audit of units 44 to 53 promoted wrote; non-criterion prose cut to the size cap.
 - rev-4 · 2026-10-26 · §2 S4, S9, S29 · §4 Files touched · §6 AC4, AC9, AC29 · rows 49 and 50 of
   `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck.md`; prose cut to the size cap.
+- rev-5 · 2026-11-22 · §3 · §4 "How the batch builds" · §7 · per
+  `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`: the `consumes-from TOOL-dTotalRecall-8`
+  bullet is deleted; §3 states that S10, S29, S55, S56 and the `code_record.py` Files-touched row wait
+  with unit 8 on ask TOOL-dTotalRecall-109; §4 names `tree_lib.py#read_policy_value` as the read; the
+  leg line gains the two legs `tools/memory-tree/backlog.py` trips. No criterion moved.
 
 ## 10. Reuse audit
 

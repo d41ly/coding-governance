@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-38 — every id reader that splits on a hyphen parses through the grammar, found by the reader census and proved by the flip probe
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -161,6 +161,7 @@ on 2026-11-22.
 ### Files touched (estimate)
 
 - `tools/memory-tree/id_grammar.py`
+- `tools/memory-recall/selftest.py` (the arm of §7)
 - `tools/memory-tree/backlog.py`
 - `tools/memory-tree/gen_build_index.py`
 - `tools/memory-tree/migrate_backlog.py`
@@ -225,7 +226,9 @@ Each further site S2's census lists at the pass is added here as a rev bump befo
 
 `tier2-review self-test` · `drift-audit selftest` · `drift-audit records` · `backlog migration selftest` · `build-index selftest` · `build README slot contract` · `recall floor` · `recall floor arms` · `memory-recall kit selftest` · `policy fixtures` · `memory hygiene` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e`
 
-New arm: tools/memory-tree/id_grammar.py · covers AC2 AC4 · the `--readers` split plants `py-split`, `sh-cut` and `sh-expansion`, and the flip probe's census check, staged by reverting one re-pointed reader to its split · none
+New arm: tools/memory-recall/selftest.py · covers AC2 AC4 · the `--readers` split plants `py-split`, `sh-cut` and `sh-expansion`, and the flip probe's census check, run in `make_repo`'s throwaway git tree, which carries every memory-tree `*.py`, staged by reverting one re-pointed reader to its split · none
+
+The leg line's `memory-recall kit selftest` runs that suite: `id_grammar.py` has no self-test mode and no leg runs it, as TOOL-dTotalRecall-54 §8 F2 found for its own arm.
 
 ## 8. Open questions
 
@@ -265,6 +268,12 @@ New arm: tools/memory-tree/id_grammar.py · covers AC2 AC4 · the `--readers` sp
   re-derived with every hit's disposition; AC2 names the eight readers the predicate reaches (F2); the
   probe's census check is a differential (F3); §7 gains `memory-recall kit selftest` and `policy
   fixtures`, which `tools/memory-tree/backlog.py`'s guards name.
+- rev-5 · 2026-11-22 · §7 · §4 Files touched · per
+  `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`: the `New arm:` line moves from
+  `tools/memory-tree/id_grammar.py`, which has no self-test mode and which no leg runs, to
+  `tools/memory-recall/selftest.py`, as TOOL-dTotalRecall-54 rev-3's §8 F2 did; the leg line already
+  names `memory-recall kit selftest`, which runs it, and Files touched gains the suite. No criterion
+  moved.
 
 ## 10. Reuse audit
 

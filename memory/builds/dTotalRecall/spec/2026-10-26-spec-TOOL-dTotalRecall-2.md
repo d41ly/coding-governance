@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing
 
-**Status:** DEFERRED · rev-8 · 2026-11-03 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-9 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0213@bfd195a1 whole
 
@@ -127,8 +127,6 @@ P30). Today three scaffolds write records (`gen_build_index.py --new-build` and 
   hook appends to the change feed through `add_feed_event`; the door appends nothing itself
 - **hands-off** `TOOL-dTotalRecall-20` — `gov_record.py`, to which the `--new-build` and `--new-spec`
   shims forward, every flag passed through unchanged
-- **consumes-from** `TOOL-dTotalRecall-8` — `policy_value.py`, the memory-tree kit's `read_policy_value`
-  adapter the door reads `leases.offline` through
 - **consumes-from** external — PLAY-dOrderedCharter-7 S7/S8's `tools/memory-tree/build_records.py`,
   its renderer, `read_record` and `new` verb; TOOL-dPlacedRequest-1's build lease
   `refs/gov/leases/<slug>/build`, read from the remote by `read_claims`, and its holder read through
@@ -204,9 +202,9 @@ its `fleet-tag` and `session` match (:90-92). `read_claims` fetches `refs/gov/le
 remote in one bounded fetch (:76-77), so the lease read is the remote's, never a local-only ref. A
 build with neither, every build opened before TOOL-dTotalRecall-3, mints under the charter's
 per-session rule and prints `minted under the session rule: no claim or lease for <slug>`. The
-offline value passed to `gov-claim.sh` is `read_policy_value("leases.offline", root)` (I8), through
-memory-tree's adapter `tools/memory-tree/policy_value.py`, which TOOL-dTotalRecall-8 creates (its S10)
-and this unit reads.
+offline value passed to `gov-claim.sh` is `read_policy_value("leases.offline", root)` (I8), the
+memory-tree kit's landed `tools/memory-tree/tree_lib.py#read_policy_value`, since TOOL-dTotalRecall-8
+mints no `policy_value.py`.
 
 The content key is the claimant a counter or slug mint passes, so a replayed `new` returns the id the
 first call minted (TOOL-dTotalRecall-3 S4).
@@ -311,7 +309,7 @@ door writes at this pass are read from the registry and named in the pass commit
 
 ## 7. Gates
 
-`memory hygiene` · `build-index selftest` · `verdict epoch (kit version dates the engine)` · `verdict-epoch self-test` · `routed-commits selftest`
+`memory hygiene` · `build-index selftest` · `verdict epoch (kit version dates the engine)` · `verdict-epoch self-test` · `routed-commits selftest` · `policy fixtures`
 
 New arm: tools/memory-tree/build_records.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 · its self-test gains the door's refusals, the replay, the changed-field record, the authority ladder and the counter replay, staged by dropping the key comparison · none
 New arm: tools/memory-tree/gen_build_index.py · covers AC7 · its `--selftest` gains the byte-equality of the two spec writers, staged by a copied skeleton in the door · none
@@ -392,6 +390,11 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC7 · its `--selftest` 
   through TOOL-dPlacedRequest-34 S22's `--lease status build <slug>`, the ask narrows to a seventh TAB
   field holding the `lease`-mode class, the six-field prefix kept, and the ask serves S6 and §4
   "Minting", not S2 and S9.
+- rev-9 · 2026-11-22 · §3 Edges · §4 "Minting" · §7 · per
+  `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`: the `consumes-from TOOL-dTotalRecall-8`
+  bullet is deleted, since that unit mints no `policy_value.py`, and §4 "Minting" names the landed
+  `tree_lib.py#read_policy_value` as the read; the leg line gains `policy fixtures`, whose guard
+  `tools/memory-tree/build_records.py` trips. No criterion moved.
 
 ## 10. Reuse audit
 

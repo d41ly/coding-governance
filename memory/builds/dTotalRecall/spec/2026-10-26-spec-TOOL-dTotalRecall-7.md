@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-7 — the ask kind's acceptance at filing, under `asks.acceptance`
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 13 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 13 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0218@939beda1 whole
 
@@ -93,8 +93,6 @@ read through the memory-tree adapter `policy_value.py` TOOL-dTotalRecall-8 creat
   `check_record_kinds`, which this unit's `ask` row lands in and is graded by
 - **consumes-from** `TOOL-dTotalRecall-2` — `gov_record.py`, the record door whose `new <kind>` verb
   this unit gives the `ask` kind, with the id it mints
-- **consumes-from** `TOOL-dTotalRecall-8` — `policy_value.py`, the memory-tree kit's `read_policy_value`
-  adapter S3 reads `asks.acceptance` through
 - **hands-off** `TOOL-dTotalRecall-41` — the ask handler of `gov_record.py new ask`, whose grade that unit moves onto the parsed row and whose values it refuses (the round-1 audit's id 49)
 - **hands-off** `TOOL-dTotalRecall-43` — the `ask` registry row, which that unit rewrites to the column grammar (the round-1 audit's id 4)
 - **hands-off** `TOOL-dTotalRecall-88` — `gov_record.py new ask`, the door that batch files its ask in `dWitnessedBar`'s backlog through (the round-1 audit of units 71 to 76, id 24)
@@ -139,7 +137,9 @@ playbook kit's `policy_value.py`. It reads through its own thin adapter of the s
 built to PLAY-dOrderedCharter-7 §4 "The policy reads": an inline `resolve_kit_dir` block, then
 `policy.py get <key> --explain` run in `root`. TOOL-dTotalRecall-8 (order 3), the first pass of this
 build that reads a key from the memory-tree kit, creates it (its S10); this unit calls it and never
-creates it (§8 F2).
+creates it (§8 F2). TOOL-dTotalRecall-8 now mints no `policy_value.py` (its §8 F4), so S3's read goes
+through the landed `tools/memory-tree/tree_lib.py#read_policy_value`, and §2's preconditions, this
+subsection and §8 F2, which name the adapter, are restated at this unit's re-ground.
 
 ### The ask row
 
@@ -245,7 +245,7 @@ None. Every landed ask keeps its bytes. V14 and R5 keep their verdicts, so no tr
 
 ## 7. Gates
 
-`build-index selftest` · `memory hygiene` · `memory-hygiene self-test` · `backlog migration selftest` · `row-keyed merge driver replay` · `corpus-ids selftest` · `tier2-review self-test`
+`build-index selftest` · `memory hygiene` · `memory-hygiene self-test` · `backlog migration selftest` · `row-keyed merge driver replay` · `corpus-ids selftest` · `tier2-review self-test` · `routed-commits selftest` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `scratch-guard self-test` · `memory-recall kit selftest` · `policy fixtures`
 
 New arm: tools/memory-tree/gen_build_index.py · covers AC3 · the V14 arms of the build-index selftest kept green through `check_ask_acceptable`, staged by the predicate's `run` test cut so a bare `seen` passes · none
 New arm: tools/memory-tree/gov_record.py · covers AC4 AC5 AC6 AC7 · the `new ask` refuse, file, grade and refused-read cases in the door's own selftest, staged by the predicate call moved after the write · none
@@ -287,6 +287,12 @@ New arm: tools/memory-tree/gov_record.py · covers AC4 AC5 AC6 AC7 · the `new a
   edges of TOOL-dTotalRecall-41, TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-88, each the other end of an edge a
   unit the round-1 spec audit of units 71 to 76 promoted wrote; nothing else moved.
+- rev-4 · 2026-11-22 · §3 Edges · §4 "The policy read" · §7 · per
+  `2026-11-22-prompt-TOOL-dTotalRecall-16-unit8-edges-brief`: the `consumes-from TOOL-dTotalRecall-8`
+  bullet is deleted, since that unit mints no `policy_value.py`, and §4 "The policy read" gains the
+  sentence naming the landed `tree_lib.py#read_policy_value` as S3's read; the leg line gains the
+  seven legs whose guards `tools/memory-tree/backlog.py` and `tools/policy/catalogue.toml` trip. No
+  criterion moved.
 
 ## 10. Reuse audit
 
