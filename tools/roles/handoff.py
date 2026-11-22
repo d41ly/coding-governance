@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """handoff.py — a role and one task's inputs, rendered into one hashed prompt file (TOOL-aOrientedCast-2).
 
-    python handoff.py render --role <name> --build <slug> [--unit <id>] [--card <path>]
+    python handoff.py render --role <name> --build <slug> [--unit <id>] [--item <tag>] [--card <path>]
                              [--input <key>=<value>]... [--upstream <rows file>]
                              [--out <path> | --stdout | --stand-in]
                              [--part full|task]
@@ -50,6 +50,13 @@ the owner's `<MEMORY_ROOT>/project/role-stand-in-waiver.txt` names the role and 
 otherwise writes the derived name with a `-stand-in` tail before `.md`, which the catalogue
 checker's R15 joins with that row. It does not check that the tool truly cannot spawn, nor relax
 any hook or gate.
+The marker is `<!-- gov:handoff role=<slot> build=<slug> unit=<id|-> item=<tag|-> path=<rel> role-sha=<12hex>
+task-sha=<12hex> -->` (TOOL-dBoundRoles-17 S1): `item=` names the item the work order was cut for, `--item`'s
+tag in the `item.<step>.<name>` shape or `-` without it, a malformed tag refused with exit 1 writing nothing;
+the shape alone is checked, never that the loop defines the item. A marker written before `item=` still
+parses, every reader taking its fields by group name. A research return names the work order it answers on
+a `**Answers:** <path> task-sha=<12hex>` line, `roles_lib.derive_answers_value`'s value, which the
+catalogue checker's R16 grades.
 The marker carries two hashes, each the first 12 hex digits of the SHA-256 of one section's bytes
 with CRLF folded to LF: `## Role` up to the byte before the `## Task` line, and `## Task` to the end
 of the file. `check` re-derives both and compares the marker's `path` with the file's own; then every
@@ -553,10 +560,15 @@ def render_card_block(root):
 
 
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
-                   notes=None, tail="", upstream=None):
+                   notes=None, tail="", upstream=None, item=None):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
     The charter library's notes are appended to `notes` when a list is given; `tail` goes before
-    the derived name's `.md`; `upstream` is the rows file `--upstream` names, the `upstream:rows` source."""
+    the derived name's `.md`; `upstream` is the rows file `--upstream` names, the `upstream:rows` source;
+    `item` the item tag the marker's `item=` carries, `-` when None (TOOL-dBoundRoles-17 S3), a tag
+    outside `ITEM_VALUE_RE` refused before anything is read."""
+    if item is not None and not lib.ITEM_VALUE_RE.match(item):
+        raise lib.RolesError("--item '%s' is not an item tag item.<step>.<name>, each segment lowercase "
+                             "letters, digits and '-'" % item)
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
@@ -745,8 +757,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         "role": role_text.strip("\n")
         + ("\n\n### Drive\n\n" + "\n".join(drive) if drive else ""), "opening": opening,
         "reads": "\n\n".join(blocks), "practices": practices}, wraps)
-    marker = "<!-- gov:handoff role=%s build=%s unit=%s path=%s role-sha=%s task-sha=%s -->" % (
-        role, slug, unit or "-", rel, derive_section_sha(role_sec), derive_section_sha(task_sec))
+    marker = "<!-- gov:handoff role=%s build=%s unit=%s item=%s path=%s role-sha=%s task-sha=%s -->" % (
+        role, slug, unit or "-", item or "-", rel, derive_section_sha(role_sec), derive_section_sha(task_sec))
     head = "**Serves:** journal %s\n%s\n# %s handoff — %s\n\n%s\n\n" % (
         unit_id, "".join(g + "\n" for g in gaps), role, unit_id, marker)
     return path, head + role_sec + task_sec, marker + "\n\n" + task_sec
@@ -772,9 +784,9 @@ def check_handoff(root, path):
     role_sha = derive_section_sha(text[role_m.start():task_m.start()])
     task_sha = derive_section_sha(text[task_m.start():])
     bad = ["handoff: %s: %s — the marker says %s, the file gives %s" % (rel, what, said, actual)
-           for what, said, actual in (("role-sha", marker.group(5), role_sha),
-                                      ("task-sha", marker.group(6), task_sha),
-                                      ("path", marker.group(4), rel))
+           for what, said, actual in (("role-sha", marker.group("role_sha"), role_sha),
+                                      ("task-sha", marker.group("task_sha"), task_sha),
+                                      ("path", marker.group("path"), rel))
            if said != actual]
     ranked, levels = check_envelope_order(rel, text, role_m.start(), task_m.start())
     bad += ranked
@@ -1326,13 +1338,13 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
         if not hits:
             raise lib.RolesError("no Agent call in %s opens its prompt with the marker line of %s and has a "
                                  "result naming its agent" % (session.as_posix(), hrel))
-        build, run = marker.group(2), "direct"
+        build, run = marker.group("build"), "direct"
         for c in hits:
             aid = c["result"]["agentId"]
             tr = read_transcript(sdir / "subagents", aid)
-            unit = marker.group(3) if marker.group(3) != "-" else tr["description"]
+            unit = marker.group("unit") if marker.group("unit") != "-" else tr["description"]
             returned = c["id"] in notified or c["result"].get("status") == "completed"
-            agents.append((aid, tr, marker.group(1), unit, (hpath.name, marker.group(4)),
+            agents.append((aid, tr, marker.group("role"), unit, (hpath.name, marker.group("path")),
                            c["result"].get("resolvedModel"), returned,
                            render_outcome(False, notified.get(c["id"]), None, tr["files"])))
     else:
@@ -1414,6 +1426,7 @@ def main(argv):
     r.add_argument("--role", required=True)
     r.add_argument("--build", required=True)
     r.add_argument("--unit")
+    r.add_argument("--item")
     r.add_argument("--card")
     r.add_argument("--input", action="append", default=[])
     r.add_argument("--upstream")
@@ -1538,7 +1551,7 @@ def main(argv):
         notes = []
         path, text, task_part = render_handoff(root, memory_root, charter_path, a.role, keys, a.build,
                                                a.unit, a.card, inputs, out, notes,
-                                               lib.STAND_IN_TAIL if a.stand_in else "", a.upstream)
+                                               lib.STAND_IN_TAIL if a.stand_in else "", a.upstream, item=a.item)
         for line in notes:
             print("handoff: note — %s" % line, file=sys.stderr)
         if not a.stand_in:

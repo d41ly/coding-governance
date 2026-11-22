@@ -2078,13 +2078,15 @@ SLOT_TEMPLATE = "<!-- governance-template: v4.4 -->\n\n# fixture — agent chart
 SLOT_CHARTER = ("<!-- gov:playbook -->\n# fixture — agent charter\n\nMUST answer the subagent.\n"
                 "<!-- /gov:playbook -->\n")
 #: The handoff a kit renders over the case's build, pinned from `render_handoff` before the template held it and
-#: re-pinned to the unranked render once the charter left the task (PLAY-dOrderedCharter-5 S3).
+#: re-pinned to the unranked render once the charter left the task (PLAY-dOrderedCharter-5 S3), and to the
+#: marker's `item=-` once the renderer wrote it (TOOL-dBoundRoles-17 S3); neither sha moves, the marker
+#: sitting outside the role and task sections both hashes are taken over.
 ORDER_ROLE = ("---\nname: gov-fixture\ndescription: A fixture role.\nworkflow: fixture\nreads: {}\nrules: {}\n---\n\n"
               "You are the fixture role of {{{{MEMORY_ROOT}}}}.\n")
 ORDER_CHARTER = ("## 1. Governing practices\n\n- [alpha] The first rule.\n- [beta] The second rule.\n\n"
                  "## Protocols\n\n- A protocol line.\n\n## Facts\n\n- A fact line.\n")
 ORDER_HEAD = ("**Serves:** journal PLAY-fixture-1\n\n# gov-fixture handoff — PLAY-fixture-1\n\n"
-              "<!-- gov:handoff role=gov-fixture build=fixture unit=PLAY-fixture-1 path=memory/builds/fixture/prompts/"
+              "<!-- gov:handoff role=gov-fixture build=fixture unit=PLAY-fixture-1 item=- path=memory/builds/fixture/prompts/"
               "{date}-prompt-PLAY-fixture-1-1-fixture.md role-sha=e883c92f6c96 task-sha=TASK -->\n\n"
               "## Role\n\nYou are the fixture role of memory.\n\n## Task\n\n"
               "This handoff is for build `fixture`, unit `PLAY-fixture-1`.\nNot supplied, optional: `input:spec`, `input:code`.\n")

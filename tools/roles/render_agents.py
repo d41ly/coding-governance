@@ -534,8 +534,8 @@ def check_ranked_arms(state, roles):
             plant = "\n".join(planted)
             m = handoff.MARKER_RE.search(plant)
             r, t = plant.index("\n## Role\n") + 1, plant.index("\n## Task\n") + 1
-            plant = plant.replace(m.group(0), m.group(0).replace(m.group(5), handoff.derive_section_sha(
-                plant[r:t])).replace(m.group(6), handoff.derive_section_sha(plant[t:])))
+            plant = plant.replace(m.group(0), m.group(0).replace(m.group("role_sha"), handoff.derive_section_sha(
+                plant[r:t])).replace(m.group("task_sha"), handoff.derive_section_sha(plant[t:])))
             path.write_text(plant, encoding="utf-8", newline="\n")
             ok, said = handoff.check_handoff(root, rel)
             want = "opens at level 0 after" if name == "reordered" else "has no closer"

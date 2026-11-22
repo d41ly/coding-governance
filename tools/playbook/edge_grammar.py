@@ -431,7 +431,7 @@ def read_handoff_edges(text, path) -> list[dict]:
     edges = []
     for m in MARKER_RE.finditer(text):
         n = text.count("\n", 0, m.start()) + 1
-        targets = [t for t in (m.group(3), m.group(2)) if t != "-"]
+        targets = [t for t in (m.group("unit"), m.group("build")) if t != "-"]
         edges.append({"path": path, "line": n, "type": "serves", "targets": targets, "site": "work-order"})
     return check_site_targets(edges, path)
 

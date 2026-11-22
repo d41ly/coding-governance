@@ -31,6 +31,15 @@ reference; this page is the short version.
    `used`, `bypassed` or `not-applicable` in its return. Without `--upstream` the task names the key as
    not supplied; for a role not reading it, `--upstream` is refused. A required input that is missing
    or still a placeholder refuses by name. The prompt carries no charter text: the charter rides once, in the agent file.
+   Its `gov:handoff` marker line names the item the work order was cut for as `item=`: pass
+   `--item <tag>`, a tag in the `item.<step>.<name>` shape, or the marker reads `item=-`. A tag in
+   any other shape is refused and nothing is written.
+
+   A research return records the work order it answers as `**Answers:** <work order path>
+   task-sha=<12hex>`, beside its `**Serves:**` line, the `task-sha` copied from the work order's
+   marker. `check_roles.py`'s R16 refuses a work order whose marker carries no `item=`, and a return
+   with no such line, one naming another work order or one whose `task-sha` differs. The paths
+   `work-order-legacy.txt` lists, the records written before the rule armed, are not refused.
 4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets. It
    carries the practices its role cites and the charter's Protocols and Facts sections, first.
@@ -111,7 +120,7 @@ refuses the render, naming the key.
   python tools/roles/handoff.py render --role gov-builder --build <slug> --unit <unit-id> --part task
   ```
 
-  Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is <!-- usage: script:tools/roles/handoff.py#render 1e3b1deb -->
+  Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is <!-- usage: script:tools/roles/handoff.py#render caf8a37a -->
   `gov-builder`. An edited prompt is refused. Pass the name it prints on stderr after
   `handoff: description — ` as the call's `description`; any other name is refused.
   That `Agent` call also carries `effort`: the role's value in the JSON

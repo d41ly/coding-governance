@@ -2,7 +2,8 @@
 # adopt-roles.sh — install the role catalogue's project-facing surface: the `/build` Skill, one
 # agent type per agent role under `.claude/agents/`, and the role index `.claude/roles.json`.
 #
-#   <prefix>/roles/adopt-roles.sh --scaffold   # render all three, print each written path and the restart notice
+#   <prefix>/roles/adopt-roles.sh --scaffold   # render all three, print each written path and the restart notice,
+#                                              # then seed the work-order legacy home once, absent-only
 #   <prefix>/roles/adopt-roles.sh --check      # render in memory and byte-compare all three with the files on disk
 #
 # Exit 0 = rendered / in sync · 1 = stale, absent, a surviving token, a stage disagreement or a
@@ -406,5 +407,26 @@ echo "$OUT"
 # Whether a running session lists a Skill written after it started is UNVERIFIED on this CLI; the
 # line states the conservative rule.
 [ -z "$new" ] || echo "roles: a session started before this write may not list /build until it restarts"
+# THE WORK-ORDER LEGACY SEED (TOOL-dBoundRoles-17 S6): the work orders and returns the catalogue
+# checker's R16 would refuse today, seeded ONCE into <MEMORY_ROOT>/project/work-order-legacy.txt by the
+# memory-tree kit's unregistered seed form, its copy found by the library's `resolve_kit_dir`, running
+# `check_roles.py --legacy-rows`. Absent-only: an armed home prints `present` and is never re-seeded
+# over, so every `--scaffold` an update re-runs leaves it as it is. It needs no governing doc. No
+# memory-tree kit, or a failed seed, is one line and no refusal: R16 then prints itself unarmed,
+# naming the seed command, and never reads green.
+if LL_DIR=$("$PY" -B -c 'import sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+try:
+    print(roles_lib.resolve_kit_dir("memory-tree", "legacy_ledger.py", sys.argv[1]).as_posix())
+except LookupError as e:
+    sys.exit(str(e))' "$KIT_DIR" 2>&1); then
+  mkdir -p "$MEMORY_ROOT/project" || exit 2
+  LL_OUT=$("$PY" -B "${LL_DIR%$'\r'}/legacy_ledger.py" seed --home "$MEMORY_ROOT/project/work-order-legacy.txt" \
+    -- python "$KIT_REL/check_roles.py" --legacy-rows --out '{out}' 2>&1)
+  printf '%s\n' "$LL_OUT" | sed 's/^/roles: work-order legacy seed — /'
+else
+  echo "roles: the work-order legacy population is not seeded, so R16 stays unarmed: ${LL_DIR%$'\r'}"
+fi
 [ -z "$nodoc" ] || { echo "$nodoc"; exit 3; }
 exit 0

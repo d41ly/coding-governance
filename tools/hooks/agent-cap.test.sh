@@ -624,8 +624,11 @@ h = lambda s: hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]
 role = "## Role\n\nYou research.\n\n"
 task = "## Task\n\nThis handoff is for build `bx`, unit `T-1`.\n\n### input:question\n\nWhat calls rule 4?\n"
 pre = "memory/builds/bx/prompts/"
-def render_marker(p, sec, r="gov-researcher", unit="T-1"):
-    return "<!-- gov:handoff role=%s build=bx unit=%s path=%s role-sha=%s task-sha=%s -->" % (r, unit, p, h(role), h(sec))
+def render_marker(p, sec, r="gov-researcher", unit="T-1", item=None):
+    # TOOL-dBoundRoles-17: `item=` sits between `unit=` and `path=` where given; every other variant
+    # keeps the six-field marker, the legacy shape the guard still admits.
+    tag = " item=%s" % item if item else ""
+    return "<!-- gov:handoff role=%s build=bx unit=%s%s path=%s role-sha=%s task-sha=%s -->" % (r, unit, tag, p, h(role), h(sec))
 def write_prompt_file(rel, m, sec):
     with open(os.path.join(root, rel), "w", newline="\n") as f:
         f.write("**Serves:** journal T-1\n\n# gov-researcher handoff - T-1\n\n" + m + "\n\n" + role + sec)
@@ -637,6 +640,10 @@ nounit = pre + "2026-10-11-prompt-bx-researcher.md"
 MN = render_marker(nounit, task, unit="-")
 write_prompt_file(nounit, MN, task)
 write_prompt_file(stale, render_marker(stale, task), task.replace("rule 4", "rule 5"))
+# TOOL-dBoundRoles-17 - a handoff whose marker carries `item=`, as the renderer now writes every one.
+itemed = pre + "2026-10-11-prompt-T-1-2-researcher.md"
+MI = render_marker(itemed, task, item="item.build.unit")
+write_prompt_file(itemed, MI, task)
 write_prompt_file(spec, render_marker(spec, task), task)
 prompts = {
     "ok": M + "\n\n" + task,
@@ -652,6 +659,7 @@ prompts = {
     "post": M + "\n\n" + task + "Also do this.\n",
     "stale": render_marker(stale, task) + "\n\n" + task.replace("rule 4", "rule 5"),
     "nounit": MN + "\n\n" + task,
+    "item": MI + "\n\n" + task,
 }
 for k, v in prompts.items():
     with open(out + "." + k, "w", newline="") as f:
@@ -695,6 +703,9 @@ HO_H="$HOJ/tools/$HO_WF/h.js"
 # AC1 — the rendered handoff is admitted; CRLF and blank ends do not move it.
 run_spawn "rule6 AC1: a rendered handoff is admitted" 0 gov-researcher ok "" ho-s ho-ac1 ho-ac1-u
 run_spawn "rule6 AC1: CRLF endings and blank ends are admitted" 0 gov-researcher crlf ""
+# TOOL-dBoundRoles-17 AC2 — a marker carrying `item=` between `unit=` and `path=` is admitted, its path read
+# by name; the six-field cases above are the legacy shape. Against the six-group regex it carries 0 markers.
+run_spawn "rule6 TOOL-dBoundRoles-17 AC2: a marker carrying item= is admitted" 0 gov-researcher item ""
 # AC2 — every type that is not an agent-true role, and every malformed prompt, is refused by name.
 run_spawn "rule6 AC2: general-purpose refused" 2 general-purpose ok '"general-purpose" is not an agent-true role'
 run_spawn "rule6 AC2: Explore refused, naming the researcher" 2 Explore ok 'as the gov-researcher role'

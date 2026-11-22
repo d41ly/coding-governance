@@ -2,6 +2,7 @@
 """check_roles.py — the role files, the workflow table and the governing doc agree (TOOL-aOrientedCast-1).
 
     python check_roles.py [--root <dir>] [--write]
+    python check_roles.py [--root <dir>] --legacy-rows --out <path>
     python check_roles.py --print-tag-rows role|stage < <a role file or workflows.toml>
 
 The kit directory is this script's own directory and the tool root its parent; `--root` defaults to
@@ -9,7 +10,10 @@ the git toplevel of the working directory. One line per defect, `roles: <path>: 
 then one summary line naming every count it graded and each overlay's bytes. Exit 0 clean, 1 on any
 defect, 2 when the check is unarmed. `--write` renders the README's catalogue region and writes it,
 touching nothing else, then grades as usual. `--print-tag-rows` prints the tag index's rows of the
-text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says.
+text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says. `--legacy-rows --out
+<path>` writes every path R16 would refuse, one per line under a `#` header naming HEAD's commit, and
+grades nothing: the seed the memory-tree kit's `legacy_ledger.py seed --home` runs, once, as
+`write_legacy_rows` says (TOOL-dBoundRoles-17 S6).
 
   R0  no `.memory-tree.conf`, no CHARTER key in it, or no file at that path; a blank or absent
       MEMORY_ROOT in it (TOOL-aOrientedCast-19); a governing doc that
@@ -120,6 +124,16 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       build's `prompts/` with no marker, or whose `(build, role)` no row covers; a row covering no
       such declaration (stale). Every valid row prints one `roles: note: stand-in waiver` line
       (TOOL-aOrientedCast-19)
+  R16 a work order, a file under a build's `prompts/` named as `handoff.py render` names one for a
+      catalogue role, whose `gov:handoff` marker is absent or carries no `item=`; a return, a
+      `research` record under a build's `build/` whose text, its `**Answers:**` lines set aside, names
+      exactly one work order's file name, carrying no `**Answers:** <path> task-sha=<12hex>` line, or
+      one naming another path, or whose `task-sha` is not that work order's marker's, as
+      `roles_lib.scan_work_orders` reads them (TOOL-dBoundRoles-17 S5). A path
+      `<MEMORY_ROOT>/project/work-order-legacy.txt` lists, an exact path, is skipped; a row naming a
+      path that no longer offends is counted stale in the summary and never red. With no home, or a
+      failed seed's unarmed one, one `roles: note: R16 unarmed` line names the seed command and
+      nothing is graded
 
 WHAT THIS DOES NOT CHECK, because a structural check reads as a semantic one to everybody who did not
 write it: the MEANING of a body; the truth of an `enforced-by` entry; a `tools:` name, which moves
@@ -141,6 +155,9 @@ nor whether a stage truly takes and hands on the row kinds it names, nor a key a
 seven fields and its `kind`. Nor does it check what a merge or a twin does, which the harnesses own;
 that a listed role of a stage-less entry declares the entry's kind; the value a `twin` key holds; a
 unit's status, so a retired tag still joins; or that an experiment's `cases` file is a case set.
+R16 does not see a work order written under another name, a return recorded under another kind,
+naming its work order by no file name or naming two, nor whether an `item=` tag names an item the
+loop defines; the renderer checks the tag's shape alone.
 """
 import json
 import os
@@ -849,6 +866,12 @@ def check_roles(root, kit_dir, write=False):
         notes.append("roles: note: stand-in waiver %s owner %s %s %s — %s"
                      % (w["date"], w["who"], role, build, w["reason"]))
 
+    # R16 — every work order's marker carries `item=`, every return names the work order it answers
+    # (TOOL-dBoundRoles-17 S5), the paths the legacy home lists skipped.
+    r16_defects, r16_notes, r16_summary = check_work_orders(root, kit_dir, memory_root)
+    defects.extend(r16_defects)
+    notes.extend(r16_notes)
+
     readme = kit_dir / "README.md"
     region = render_catalogue_region(roles, workflows)
     text = lib.load_text(readme) if readme.is_file() else ""
@@ -866,7 +889,7 @@ def check_roles(root, kit_dir, write=False):
                "runtime.agents-in-flight %s, %d reads keys, %d mandatory roles, "
                "%d writer outputs, %d never entries (%d unenforced), %d rule tags and %d protocol file "
                "names against %s, a %s charter; roles by layer %s, by acts-as %s; "
-               "overlay bytes %s; %d stand-in waiver(s), %d stand-in declaration(s); %d defect(s)" % (
+               "overlay bytes %s; %d stand-in waiver(s), %d stand-in declaration(s); %s; %d defect(s)" % (
                    len(files), len(overlays), len(workflows),
                    ", ".join("%s=%d" % kv for kv in sorted(by_kind.items())) or "none",
                    "%d unit tag(s) resolved" % len(named_units) if unit_tags is not None else "units unarmed",
@@ -878,8 +901,73 @@ def check_roles(root, kit_dir, write=False):
                    ", ".join("%s=%d" % kv for kv in sorted(by_layer.items())) or "none",
                    ", ".join("%s=%d" % kv for kv in sorted(by_acts.items())) or "none",
                    ", ".join("%s=%d" % kv for kv in overlays.items()) or "none",
-                   len(waivers), len(declared), len(defects)))
+                   len(waivers), len(declared), r16_summary, len(defects)))
     return defects, notes, summary
+
+
+def derive_legacy_seed_command(root, kit_dir, memory_root):
+    """The one command that seeds the work-order legacy home: the memory-tree kit's unregistered seed
+    form, its copy found by `resolve_kit_dir` beside this kit, running `--legacy-rows` of this script
+    (TOOL-dBoundRoles-17 S6). A memory-tree kit that does not resolve is named by its home."""
+    try:
+        ledger = resolve_display_path(root, lib.resolve_kit_dir("memory-tree", "legacy_ledger.py", kit_dir)
+                                      / "legacy_ledger.py")
+    except LookupError:
+        ledger = "<the memory-tree kit>/legacy_ledger.py"
+    return ("python %s seed --home %s/project/%s -- python %s/check_roles.py --legacy-rows --out {out}"
+            % (ledger, memory_root, lib.WORK_ORDER_LEGACY, resolve_display_path(root, kit_dir)))
+
+
+def check_work_orders(root, kit_dir, memory_root):
+    """`(defects, notes, summary)` of R16 (TOOL-dBoundRoles-17 S5): every offence
+    `roles_lib.scan_work_orders` finds whose path the legacy home does not list, one `roles: <path>: R16
+    — <what>` line each; the summary counts the handoffs and returns graded, the home's rows and its
+    stale rows, a row naming a path that no longer offends, which is counted and never red. With no
+    home, or an unarmed one, one `roles: note: R16 unarmed` line names the seed command and nothing
+    is graded."""
+    rows, why = lib.read_work_order_legacy(root, memory_root)
+    if rows is None:
+        return [], ["roles: note: R16 unarmed — %s, so no work order or return is graded; seed the legacy "
+                    "population once with: %s" % (why, derive_legacy_seed_command(root, kit_dir, memory_root))], \
+            "R16 unarmed, 0 handoff(s) and 0 return(s) graded"
+    slots = sorted(p.name[:-len(".agent.md")] for p in (pathlib.Path(kit_dir) / "agents").glob("*.agent.md"))
+    found, counts = lib.scan_work_orders(root, memory_root, slots)
+    offending = {rel for rel, _what in found}
+    defects = ["roles: %s: R16 — %s" % (rel, what) for rel, what in found if rel not in rows]
+    stale = len(rows - offending)
+    return defects, [], ("R16 %d handoff(s) and %d return(s) graded, %d legacy row(s), %d stale"
+                         % (counts["handoffs"], counts["returns"], len(rows), stale))
+
+
+def write_legacy_rows(root, kit_dir, out):
+    """`--legacy-rows --out <path>` (TOOL-dBoundRoles-17 S6): every path R16 would refuse with no legacy
+    home, one per line, sorted, under one `#` header naming the full sha of the commit HEAD names, read by
+    `git -C <root> rev-parse --verify --quiet HEAD^{commit}`, written to `out` relative to the working
+    directory; exit 0. Where git prints no commit, exit 2 naming git's line and writing nothing; with no
+    MEMORY_ROOT, exit 2. The seed argv carries no sha, so this reads the head itself."""
+    root = pathlib.Path(root)
+    memory_root = lib.read_conf_key(root / ".memory-tree.conf", "MEMORY_ROOT")
+    if not memory_root:
+        print("roles: R0 — %s declares no MEMORY_ROOT key, or a blank one, so no work order is found"
+              % (root / ".memory-tree.conf").as_posix(), file=sys.stderr)
+        return 2
+    g = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet", "HEAD^{commit}"],
+                       capture_output=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+    sha = g.stdout.strip()
+    if g.returncode != 0 or not re.fullmatch(r"[0-9a-f]{40}", sha):
+        said = (g.stderr.strip().splitlines() or g.stdout.strip().splitlines()
+                or ["git rev-parse --verify --quiet HEAD^{commit} exited %d printing no commit" % g.returncode])[0]
+        print("roles: --legacy-rows — HEAD names no commit, so no seed sha is stamped and nothing is written: %s"
+              % said, file=sys.stderr)
+        return 2
+    slots = sorted(p.name[:-len(".agent.md")] for p in (pathlib.Path(kit_dir) / "agents").glob("*.agent.md"))
+    found, _counts = lib.scan_work_orders(root, memory_root, slots)
+    paths = sorted({rel for rel, _what in found})
+    text = ("# work-order legacy population — seeded once by test.seed at %s; never re-seeded over\n" % sha
+            + "".join(p + "\n" for p in paths))
+    with open(out, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(text)
+    return 0
 
 
 def print_tag_rows(mode, text):
@@ -933,25 +1021,35 @@ def print_tag_rows(mode, text):
 
 def main(argv):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    args, root, write = list(argv), None, False
+    args, root, write, legacy, out = list(argv), None, False, False, None
     if args[:1] == ["--print-tag-rows"] and args[1:] in (["role"], ["stage"]):
         return print_tag_rows(args[1], sys.stdin.buffer.read().decode("utf-8", "replace"))
+    usage = ("usage: python check_roles.py [--root <dir>] [--write] | [--root <dir>] --legacy-rows --out <path> "
+             "| --print-tag-rows role|stage")
     while args:
         a = args.pop(0)
         if a == "--write":
             write = True
+        elif a == "--legacy-rows":
+            legacy = True
         elif a == "--root" and args:
             root = args.pop(0)
+        elif a == "--out" and args and out is None:
+            out = args.pop(0)
         else:
-            print("usage: python check_roles.py [--root <dir>] [--write] | --print-tag-rows role|stage",
-                  file=sys.stderr)
+            print(usage, file=sys.stderr)
             return 2
+    if legacy != (out is not None) or (legacy and write):
+        print(usage, file=sys.stderr)
+        return 2
     if root is None:
         r = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, encoding="utf-8")
         if r.returncode != 0 or not r.stdout.strip():
             print("roles: R0 — the working directory is in no git repository; pass --root", file=sys.stderr)
             return 2
         root = r.stdout.strip()
+    if legacy:
+        return write_legacy_rows(root, KIT_DIR, out)
     try:
         defects, notes, summary = check_roles(root, KIT_DIR, write)
     except lib.RolesError as e:

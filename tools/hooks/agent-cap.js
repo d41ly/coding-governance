@@ -643,16 +643,21 @@ function extractWorkflowArgs(data) {
 // roles kit's interface, read here and never written; the renderer is named by its bare file name in
 // every message, because a kit file names no sibling kit by literal.
 const HANDOFF_MARK = 'gov:handoff'
-const HANDOFF_MARK_RE = /^<!-- gov:handoff role=(\S+) build=(\S+) unit=(\S+) path=(\S+) role-sha=([0-9a-f]{12}) task-sha=([0-9a-f]{12}) -->$/
+// The roles kit's `MARKER_RE` spelled again with the same named groups, since a kit imports no sibling
+// kit: `item=` is optional, so a marker written before it still matches (TOOL-dBoundRoles-17 S1).
+const HANDOFF_MARK_RE = /^<!-- gov:handoff role=(?<role>\S+) build=(?<build>\S+) unit=(?<unit>\S+)(?: item=(?<item>\S+))? path=(?<path>\S+) role-sha=(?<roleSha>[0-9a-f]{12}) task-sha=(?<taskSha>[0-9a-f]{12}) -->$/
 
-// Every line of `text`, carriage returns stripped, that is a whole marker line with its six fields in
-// order: `{ line, role, build, unit, path, taskSha }` each.
+// Every line of `text`, carriage returns stripped, that is a whole marker line with its fields in
+// order: `{ line, role, build, unit, item, path, taskSha }` each, read by group name; `item` is the
+// field's string, `-` included, or null for a marker carrying none.
 function extractHandoffMarker(text) {
   const out = []
   for (const raw of String(text).split('\n')) {
     const line = raw.replace(/\r/g, '')
     const m = HANDOFF_MARK_RE.exec(line)
-    if (m) out.push({ line, role: m[1], build: m[2], unit: m[3], path: m[4], taskSha: m[6] })
+    if (!m) continue
+    const g = m.groups
+    out.push({ line, role: g.role, build: g.build, unit: g.unit, item: g.item === undefined ? null : g.item, path: g.path, taskSha: g.taskSha })
   }
   return out
 }
