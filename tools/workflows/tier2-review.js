@@ -211,11 +211,16 @@ function readOutputTokens() {
 //                                         // names; the synthesis takes its key or PLATFORM_TYPE, and the resume probe
 //                                         // its key or Plan (TOOL-dFairHearing-11). Only this kind's finder key is
 //                                         // read. Any judge off PLATFORM_TYPE makes the run not durable.
-//   efforts: { probe, diffFinder, specFinder, skeptic, synthesis } } // TOOL-aOrientedCast-10: each a reasoning
+//   efforts: { probe, diffFinder, specFinder, skeptic, synthesis }, // TOOL-aOrientedCast-10: each a reasoning
 //                                         // effort level, lower-case letters; absent -> {}. A key sets ITS stage's
 //                                         // `effort` option, independent of `roles`; an unnamed stage runs at its
 //                                         // agent type's level, else the session's. The caller passes what
 //                                         // `handoff.py stage-efforts <workflow>` prints.
+//   retries: <integer 0..4> }             // TOOL-dBoundRoles-5 S6: how often a single-call stage, the checklist
+//                                         // agent, the resume probe or the synthesis, is spawned again when it
+//                                         // returns nothing; a finder or skeptic inside its fan is never re-run.
+//                                         // The caller passes what `policy.py get roles.retries` prints; absent -> 0,
+//                                         // logged. Anything but an integer in range refuses before any agent.
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
@@ -582,6 +587,29 @@ const findOpts = renderStageOpts(findType, finderKey)
 const verifyOpts = renderStageOpts(verifyType, 'skeptic')
 const synthOpts = renderStageOpts(synthType, 'synthesis')
 const probeOpts = renderStageOpts(probeType, 'probe')
+// TOOL-dBoundRoles-5 S6 - `retries`, how often a single-call stage whose `agent()` returns null or undefined
+// is spawned again: the checklist agent, the resume probe and the synthesis. Refused before any agent
+// unless an integer from 0 to `ATTEMPTS.length - 1`, so a string is never coerced; absent, it is 0, logged.
+const ATTEMPTS = [0, 1, 2, 3, 4]
+const retries = a.retries === undefined ? 0 : a.retries
+if (typeof retries !== 'number' || !Number.isInteger(retries) || retries < 0 || retries > ATTEMPTS.length - 1)
+  throw new Error('tier2-review: `retries` must be an integer from 0 to ' + (ATTEMPTS.length - 1) + ', how often a ' +
+    'single-call stage returning nothing is spawned again, as `policy.py get roles.retries` prints it. Got ' +
+    JSON.stringify(a.retries) + '. Omit the key and a stage returning nothing is not spawned again.')
+// THE ONE MARKED LOOP OF THIS FILE: a single-call stage's spawn, run once and re-run while it returns
+// nothing. A finder or skeptic keeps its direct `agent()` call inside its fan and is never re-run: a
+// helper called from a fan would hide that fan's `agent()` from the fan-out rule. WHAT THE RULE DOES NOT
+// CHECK: this helper's call sites, so each stage that calls it spawns up to `ATTEMPTS.length` agents.
+async function runWithRetries(prompt, opts) {
+  let r = null
+  for (const n of ATTEMPTS) { // gov:sequential-agents(5)
+    if (n > retries) break
+    r = await agent(prompt, opts)
+    if (r !== null && r !== undefined) break
+    if (n < retries) log(`re-run ${n + 1} of ${retries}: ${(opts && opts.label) || 'a stage'} returned nothing`)
+  }
+  return r
+}
 // TOOL-aMendedFleet-111 S6 - whether the judges' results outlive this run. Under a named type no judge
 // writes its file, so every deferred note says a re-run dispatches every finder and skeptic again, and
 // every return carrying `pending` carries `durable` too, so a caller reads the fact, not the prose.
@@ -751,6 +779,10 @@ for (const k of ['probe', finderKey, 'skeptic', 'synthesis'])
   log(efforts[k] ? `effort ${k}: ${efforts[k]} — efforts.${k}` : `effort ${k}: the agent type's own, else the session's — no efforts.${k}`)
 if (efforts[otherFinderKey] !== undefined)
   log(`effort ${otherFinderKey}: efforts.${otherFinderKey} is not read on a ${kind}`)
+// TOOL-dBoundRoles-5 S6 - the re-run count, said once before the first agent.
+log(a.retries === undefined
+  ? 'retries: 0 — no retries was passed, so a stage returning nothing is not spawned again'
+  : `retries: ${retries} — the checklist agent, the resume probe and the synthesis are spawned again up to ${retries} time(s) while they return nothing`)
 // S7 - the context default is per-kind, and each is wrong if the other kind inherits it.
 const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulative diff landing on main')
 // `byDesign` is RESOLVED below, after the checklist's by-design block is cut out (TOOL-aGraftedHelix-3).
@@ -1542,7 +1574,7 @@ phase('Resume')
 let acquiredChecklist = null
 let checklistWhy = null
 if (!isSpec && a.checklist === undefined) {
-  const res = await agent(
+  const res = await runWithRetries(
     `You are the CHECKLIST AGENT of a Tier-2 review. You run one command and report its output. You judge ` +
       `nothing, review nothing and write nothing.\n\n` +
       `1. Run \`git -C "${repo}" ls-files --error-unmatch tools/memory-tree/gotchas.py\`; when it fails, run ` +
@@ -1710,7 +1742,7 @@ function renderStageShape(at, counts, agents) {
     outTokens: tokensAtStart === null || now === null ? null : now - tokensAtStart, trigger: trigger }, counts))
 }
 // `phase('Resume')` opened above the checklist agent (TOOL-dFairHearing-15 S1).
-const probe = await agent(
+const probe = await runWithRetries(
   `You are the RESUME PROBE of a Tier-2 review. You read files and report them. You judge nothing, ` +
     `review nothing and write nothing.\n\n` +
     `1. Run \`git -C "${repo}" rev-parse --git-common-dir\`. Turn the answer into an ABSOLUTE path with ` +
@@ -2684,7 +2716,7 @@ const preSynthYield = deriveLensYield(ledger, null)
 phase('Synthesize')
 // TOOL-dFairHearing-18 S4/S5 - the walk's red is the harness's computed fact, and the agent states it.
 const walkTableText = isWalk ? renderWalkTable(walk, walkRows) : ''
-const synth = await agent(
+const synth = await runWithRetries(
   `Write the Tier-2 review report for: ${context}\n\n` +
     (walkRed
       ? `WALK GAPS - the harness checked each walker's walk table against its slice, and the walk table has ${walkGaps.length} gap(s): ` +

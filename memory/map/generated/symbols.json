@@ -8673,6 +8673,21 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "check_return",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "check_return_arm",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "check_return_value",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_rev",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -15743,6 +15758,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "extract_return_object",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "extract_role",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -21173,6 +21193,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "read_agent_turns",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "read_agree_field",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -25513,6 +25538,16 @@
       "file": "tools/playbook/gov_tag.py"
     },
     {
+      "id": "read_return_dir",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "read_return_record",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "read_return_section",
       "kind": "function",
       "file": "tools/loop/upstream.py"
@@ -27611,6 +27646,11 @@
       "id": "refuse_wrong_shell",
       "kind": "function",
       "file": "tools/roles/adopt-roles.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/roles/return-check.sh"
     },
     {
       "id": "refuse_wrong_shell",
@@ -32165,6 +32205,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/roles/return-check.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/run-gates/adopt-run-gates.test.sh"
     },
     {
@@ -33181,6 +33226,26 @@
       "id": "runShim",
       "kind": "function",
       "file": "tools/policy/policy-mirror.js"
+    },
+    {
+      "id": "runWithRetries",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "runWithRetries",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "runWithRetries",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "runWithRetries",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
     },
     {
       "id": "run_ac15_witness",
@@ -35991,6 +36056,11 @@
       "id": "run_resolve",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "run_return_check",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "run_reverse_walk",
@@ -43538,6 +43608,16 @@
       "file": "tools/run-gates/verdict_backends.py"
     },
     {
+      "id": "write_return_record",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "write_return_witness",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "write_rev_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -44421,6 +44501,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/roles/return-check.sh"
     },
     {
       "id": "wrong_shell_at",

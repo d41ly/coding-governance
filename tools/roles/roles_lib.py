@@ -18,7 +18,8 @@ one hash of it, so the role index's `role-sha` and a handoff marker's are one va
 `derive_fact_key` is the one key of a handed fact and `derive_fact_class` its one class, written on the
 `FACT_RE` line `render_fact_line` composes (TOOL-dBoundRoles-13). `render_handed_fence` fences each handed
 value and `read_unfenced_lines` is the one fence walker every reader of a fact or marker line walks, so a
-line quoted inside handed content is content (TOOL-dBoundRoles-38). Stdlib only; every text read
+line quoted inside handed content is content (TOOL-dBoundRoles-38). `check_return` is the one checker of a
+direct return against its role's typed `return` template, shared interface I16 (TOOL-dBoundRoles-5). Stdlib only; every text read
 folds CRLF to LF and names its encoding.
 
 The front-matter grammar: a `---` block at line 1, one `key: value` per line at COLUMN 0, values kept
@@ -120,6 +121,9 @@ ITEM_VALUE_RE = re.compile(r"^item(\.[a-z0-9][a-z0-9-]*){2,}$")
 #: value without the key.
 ANSWERS_RE = re.compile(r"^\*\*Answers:\*\* (?P<path>\S+) task-sha=(?P<task_sha>[0-9a-f]{12})$", re.M)
 ANSWERS_KEY = "**Answers:**"
+#: A harness or direct return's `answers` value: `ANSWERS_RE`'s body without its bold key, derived from it
+#: so the two cannot drift (TOOL-dBoundRoles-5 S1, the form TOOL-dBoundRoles-17 §4 grades `answers` by).
+ANSWERS_VALUE_RE = re.compile(ANSWERS_RE.pattern.replace("^" + re.escape(ANSWERS_KEY) + " ", "^", 1))
 #: The work-order legacy population's home under `<MEMORY_ROOT>/project/`, seeded once (R16), and the
 #: line a seed that failed leaves at its head, the memory-tree kit's `legacy_ledger.UNARMED_LEAD`.
 WORK_ORDER_LEGACY = "work-order-legacy.txt"
@@ -232,6 +236,12 @@ RETURN_VALUE_RE = re.compile(r"^[a-z][a-z0-9-]*$")
 RETURN_TYPES = ("text", "sha", "path", "list", "int")
 #: How a rendered `## Return` names each named type.
 RETURN_TYPE_WORDS = {"text": "text", "sha": "a sha", "path": "a path", "list": "a list", "int": "an integer"}
+#: A direct return read against its template (TOOL-dBoundRoles-5 S1): a `sha` value's shape, the fenced
+#: `json` block the return object is read from, the last one of the reply, and a `key: value` line naming
+#: a field in the template's name grammar.
+RETURN_SHA_RE = re.compile(r"^[0-9a-fA-F]{7,40}$")
+RETURN_JSON_FENCE_RE = re.compile(r"^ {0,3}(`{3,})json[ \t]*\n(.*?)^ {0,3}\1[ \t]*$", re.M | re.S)
+RETURN_LINE_RE = re.compile(r"^(%s):[ \t]*(.*?)[ \t]*$" % RETURN_NAME_RE.pattern[1:-1])
 #: A body line carrying a limit, which belongs in `never` (R5's body arm).
 PROHIBITION_RE = re.compile(r"(?i)\b(never|do not|don't|must not)\b")
 
@@ -1380,6 +1390,139 @@ def derive_answers_value(path, task_sha):
     """`<path> task-sha=<task_sha>`, the one value a return's `**Answers:**` line and a harness return's
     `answers` field carry: `path` the work order's repo-relative path, forward-slashed (TOOL-dBoundRoles-17 S4)."""
     return "%s task-sha=%s" % (pathlib.PurePath(str(path).replace("\\", "/")).as_posix(), task_sha)
+
+
+def extract_return_object(text, template):
+    """`(object, why)` of a direct reply read against `template`, `parse_return_template`'s triples
+    (TOOL-dBoundRoles-5 S1): the reply's last fenced `json` block, which must parse as a JSON object;
+    else the whole reply where it parses as one JSON object; else, for a template with no `list` field,
+    the `key: value` lines outside every fence naming the template's fields, the block shape the
+    orientation return takes, the first line naming a field winning and an `int` field's digits read as
+    an integer. `(None, why)` where none of the three holds, `why` saying which."""
+    text = str(text or "").replace("\r\n", "\n")
+    blocks = RETURN_JSON_FENCE_RE.findall(text)
+    if blocks:
+        try:
+            obj = json.loads(blocks[-1][1])
+        except (ValueError, RecursionError):
+            obj = None
+        return (obj, "") if isinstance(obj, dict) else (None, "the reply's last `json` block is no JSON object")
+    try:
+        obj = json.loads(text.strip())
+    except (ValueError, RecursionError):
+        obj = None
+    if isinstance(obj, dict):
+        return obj, ""
+    if any(kind == "list" for _name, kind, _optional in template):
+        return None, ("the reply holds no `json` block and is no JSON object, and a template with a `list` "
+                      "field is read from JSON alone")
+    kinds = {name: kind for name, kind, _optional in template}
+    found = {}
+    for _n, line in read_unfenced_lines(text):
+        m = RETURN_LINE_RE.match((line or "").strip())
+        if m and m.group(1) in kinds and m.group(1) not in found:
+            value = m.group(2)
+            found[m.group(1)] = int(value) if kinds[m.group(1)] == "int" and re.fullmatch(r"-?[0-9]+", value) \
+                else value
+    if found:
+        return found, ""
+    return None, ("the reply holds no `json` block, is no JSON object, and names none of the template's "
+                  "fields on a `key: value` line")
+
+
+def check_return_value(name, kind, value, root):
+    """The defect lines of one return field's value by the value rules of TOOL-dBoundRoles-5 §4: `text`
+    a non-empty string; `sha` 7 to 40 hex digits naming a commit `git cat-file -e <sha>^{commit}`
+    resolves in `root`; `path` a repo-relative string with no `..` segment naming a file under `root`;
+    `list` a JSON array; `int` a JSON integer; a closed set one of its values."""
+    import os
+    import subprocess
+    shown = json.dumps(value, ensure_ascii=False)
+    shown = shown if len(shown) <= 80 else shown[:77] + "..."
+    if isinstance(kind, tuple):
+        if isinstance(value, str) and value in kind:
+            return []
+        return ["%s — %s is outside its set %s" % (name, shown, "|".join(kind))]
+    if kind == "list":
+        ok = isinstance(value, list)
+    elif kind == "int":
+        ok = isinstance(value, int) and not isinstance(value, bool)
+    else:
+        ok = isinstance(value, str) and bool(value.strip())
+    if not ok:
+        return ["%s — %s is not %s" % (name, shown, "a non-empty string" if kind == "text"
+                                        else "a string, as %s is" % RETURN_TYPE_WORDS[kind]
+                                        if kind in ("sha", "path") else RETURN_TYPE_WORDS[kind])]
+    if kind == "sha":
+        if not RETURN_SHA_RE.match(value):
+            return ["%s — %s is not a sha of 7 to 40 hex digits" % (name, shown)]
+        env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        try:
+            p = subprocess.run(["git", "-C", str(root), "cat-file", "-e", value + "^{commit}"],
+                               capture_output=True, stdin=subprocess.DEVNULL, env=env)
+            named = p.returncode == 0
+        except OSError:
+            named = False
+        if not named:
+            return ["%s — %s names no commit in %s" % (name, shown, pathlib.Path(root).as_posix())]
+    if kind == "path":
+        rel = value.replace("\\", "/")
+        if rel.startswith("/") or re.match(r"^[A-Za-z]:", rel) or ".." in rel.split("/"):
+            return ["%s — %s is not a repo-relative path free of `..` segments" % (name, shown)]
+        if not (pathlib.Path(root) / rel).is_file():
+            return ["%s — %s names no file under %s" % (name, shown, pathlib.Path(root).as_posix())]
+    return []
+
+
+def check_return(role, text, root=None, work_order=None):
+    """The defect lines of a direct return checked against its role's typed `return` template, shared
+    interface I16 (TOOL-dBoundRoles-5 S1); an empty list is a valid return. `role` is a slot of
+    `load_roles`, its template read by `parse_return_template`, and the return object is
+    `extract_return_object`'s. Each line names a field, or `return object`, and the rule: no return
+    object; a required field absent; a field the template does not name; a value `check_return_value`
+    refuses, a `sha` naming no commit in `root` and a `path` naming no file under it included; an
+    `answers` value off `ANSWERS_VALUE_RE`; and, with `work_order` a `(path, task_sha)` pair, an
+    `answers` other than `derive_answers_value`'s for it, `answers` then admitted beside the template's
+    fields. `root` defaults to the toplevel of the working directory. RolesError on a slot the catalogue
+    lacks, or a role file or template that does not parse.
+
+    WHAT THIS DOES NOT CHECK: that an `answers` is present where the work order is given, the field's
+    presence being TOOL-dBoundRoles-17's; what a `text` value says; nor which commit a `sha` names."""
+    import subprocess
+    roles = load_roles(pathlib.Path(__file__).absolute().parent)
+    if role not in roles:
+        raise RolesError("no role '%s' in the catalogue; its slots are %s" % (role, ", ".join(roles)))
+    template = parse_return_template(roles[role]["keys"].get("return"))
+    if root is None:
+        try:
+            g = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+            root = g.stdout.strip() if g.returncode == 0 and g.stdout.strip() else "."
+        except OSError:
+            root = "."
+    obj, why = extract_return_object(text, template)
+    if obj is None:
+        return ["return object — %s" % why]
+    kinds = {name: kind for name, kind, _optional in template}
+    defects = []
+    for name, kind, optional in template:
+        if name in obj:
+            defects += check_return_value(name, kind, obj[name], root)
+        elif not optional:
+            defects.append("%s — a required field is absent" % name)
+    admitted = "answers" in kinds or work_order is not None
+    for name in obj:
+        if name not in kinds and not (name == "answers" and admitted):
+            defects.append("%s — a field the template does not name; its fields are %s" % (name, ", ".join(kinds)))
+    if "answers" in obj and admitted:
+        said = obj["answers"]
+        if not isinstance(said, str) or not ANSWERS_VALUE_RE.fullmatch(said):
+            defects.append("answers — %s is not `<work order path> task-sha=<12 hex>`"
+                           % json.dumps(said, ensure_ascii=False)[:80])
+        elif work_order is not None and said != derive_answers_value(*work_order):
+            defects.append("answers — %s is not %s, the work order this agent was handed"
+                           % (json.dumps(said, ensure_ascii=False), derive_answers_value(*work_order)))
+    return defects
 
 
 def scan_work_orders(root, memory_root, slots):

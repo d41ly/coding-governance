@@ -79,7 +79,9 @@ reference; this page is the short version.
    `handoff.py stage-efforts <workflow> --model <id>` prints, where `<id>` is the session's own
    model id as its environment states it. A harness call at another level is refused by the spawn
    guard, which names the stage, both levels and that command; pass what it prints. A stage that
-   neither `roles` nor `efforts` names is refused too.
+   neither `roles` nor `efforts` names is refused too. A harness call also carries `retries`, what
+   `policy.py get roles.retries` prints: a stage outside a fan that returns nothing is spawned again
+   up to that many times, at most 4, and a value that is no integer in that range is refused.
 5. **Each block carries its level.** With the playbook kit installed, every block a subagent gets
    sits in an envelope, `[<doc> · Level <n> · <direction>]` up to `[/<doc>]`, so it ranks them as
    the main session does. The agent file holds the charter at level 0 inside its own level 5. The
@@ -284,6 +286,12 @@ until an owner writes its first row.
   writer. Your own files under `.claude/agents/` are not affected. The policy kit's commit guard also
   admits a commit of these files only as `render_agents.py --write` leaves them.
 - A `Workflow` call that runs anything other than a listed harness with its `roles` argument.
+- A role agent's direct return that fails its role's `return` template: no `json` block or
+  `key: value` fields to read, a required field missing, a field the template does not name, a value
+  of the wrong type or outside its set, a `sha` naming no commit, a `path` naming no file, or an
+  `answers` naming another work order. The stop is sent back to the agent with every defect named, up
+  to `roles.retries` times (3 unless your policy file sets it); after that the stop goes ahead and the
+  record under `.git/return-check/` says the return stayed invalid. A failed check never blocks a stop.
 - A spec write from anything but the spec writer, and a product write from anything but the builder
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
 - Any file write from a role declaring `writes = none`: such a role writes nothing in the repository.

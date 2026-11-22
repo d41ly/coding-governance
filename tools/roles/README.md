@@ -318,6 +318,39 @@ Exit 0 on lines printed, notes or none; 1 on a refusal: no marker in the handoff
 no run journal, a missing shape, an underived placeholder, or two ledgers in one build. Exit 2 with
 no repository, `MEMORY_ROOT`, `CHARTER`, session file or `.claude/roles.json`.
 
+## The return check
+
+A direct spawn's return is checked against its role's typed `return` template at `SubagentStop`
+(TOOL-dBoundRoles-5), the channel a harness stage already has through its schema. `roles_lib.check_return(role,
+text, root=None, work_order=None)` is the one checker, shared interface I16: it reads the role's template
+through `load_roles` and `parse_return_template` and returns a list of defect lines, each naming a field,
+or `return object`, and the rule, an empty list being a valid return. The return object is the reply's last
+fenced `json` block, else the reply itself where it parses as one JSON object, else, for a template with no
+`list` field, the `key: value` lines naming the template's fields. A value passes by its type: `text` a
+non-empty string; `sha` 7 to 40 hex digits that `git cat-file -e <sha>^{commit}` resolves in `root`; `path`
+a repo-relative string with no `..` segment naming a file under `root`; `list` a JSON array; `int` a JSON
+integer; a closed set one of its values. A field the template does not name is a defect, `answers`
+excepted where a work order is given; an `answers` value must read `<work order path> task-sha=<12 hex>`,
+`ANSWERS_RE`'s body without its bold key, and with a work order it must be the value
+`derive_answers_value` writes for it.
+
+The hook is `return-check.sh`, wired by `return-check.fragment.json` (event `SubagentStop`, matcher
+`*`, interpreter `bash`). It resolves a python with the inline resolver and runs `handoff.py
+check-return` with the payload on stdin: the role from `agent_type`, an `agent`-true slot; the return
+from `last_assistant_message`, else the agent transcript's last assistant text; the work order from the
+marker of that transcript's first `user` record. On defects, while the attempts recorded for the agent
+are fewer than the policy key `roles.retries` (default 3, read through `read_policy_setting`), it prints
+a `block` decision whose reason names every defect and the template and asks for one corrected `json`
+block; once they reach it, the stop goes ahead with one stderr line. Each checked stop rewrites
+`<git common dir>/return-check/<agent_id>.json` with `attempts`, `valid` and `defects`, the record a
+driver routes a return that stays invalid on, since a stop hook's exit code is no witness. Every failure
+of the hook or the verb exits 0, so a broken check never blocks a stop.
+
+WHAT IT DOES NOT CHECK: what a `text` value says or which commit a `sha` names; that an `answers` is
+present, which the catalogue checker's R16 grades for a record return; and that the platform continues
+a subagent whose stop was blocked, for which the record still reads one attempt and invalid. A harness
+stage's stop is not yet told apart from a direct spawn's, so a typed harness stage reaches the check too.
+
 ## Standing in for a role
 
 Work goes to its role agent. The one exception is a tool or run that cannot spawn a sub-agent at all:
@@ -556,7 +589,11 @@ agent type or role index is written until the doc exists and `--scaffold` runs a
 
 `check-wiring.sh` reports an install whose render is absent as `UNWIRED  roles`, naming the
 `--scaffold` remedy, a missing governing doc by its path and the `CHARTER` key, and a CRLF agent
-type or role index on its eol line.
+type or role index on its eol line. Once the render is current its roles arm grades the return
+check's `SubagentStop` fragment through the per-fragment grader the scratch arm calls: `ok` where
+`.claude/settings.json` dispatches `return-check.sh`, else `UNWIRED  roles` naming the
+`settings-merge.py --fragment` remedy. govkit's apply and update merge the landed fragment, as they
+merge every kit's; this adopter merges none.
 
 ## The `/build` Skill
 

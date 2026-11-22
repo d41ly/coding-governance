@@ -847,6 +847,18 @@ harness's reserved untyped literal; an untyped stage is spelled by leaving its k
   `<prefix>/roles/handoff.py stage-efforts <workflow> --model <id>`, keyed by WORKFLOW: the review
   harness serves spec review and closing review, which run one role at two levels. What `<id>` is,
   the roles README's "The effort policy" says.
+- **The harnesses' retries** (TOOL-dBoundRoles-5). Each of the three harnesses takes `retries` beside
+  `efforts`: an integer from 0 to 4, how often a single-call stage whose `agent()` returns null or
+  undefined is spawned again, each re-run logged on one line naming the stage and `re-run <n> of <retries>`. The
+  caller passes what `policy.py get roles.retries` prints. A stage inside a fan is never re-run: the build
+  harness's spec writers and the review harness's finders and skeptics keep their direct `agent()` calls,
+  since a helper called from a fan would hide that fan's spawn from the fan-out rule. The re-run is the
+  file's one loop marked `gov:sequential-agents(5)`, over the five-element literal `ATTEMPTS`, the body of
+  `runWithRetries(prompt, opts)` in the two templates and inline around the unit harness's one spawn; so a
+  `retries` above `ATTEMPTS.length - 1`, a negative one or a string refuses before any spawn. Absent, it is
+  0 and one `retries: 0` line says so. The build harness forwards it in `dispatch.args` and in the audit's
+  review call where the caller passed it. What the fan-out rule does not check is the helper's call sites:
+  each stage that calls it spawns up to five agents, a total read off the stages, not off the marker.
 - **The parity arm.** A workflow script cannot import, so each harness that tests an agent type keeps its
   own copy of the shape. The protocol-parity leg's agent-type shape arm compares every copy in this kit
   with the one `tier2-review.template.js` owns, and reds on a difference or on an owner yielding none.

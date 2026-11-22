@@ -137,6 +137,17 @@
           }
         ]
       }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/tools/roles/return-check.sh\""
+          }
+        ]
+      }
     ]
   },
   "env": {

@@ -1,0 +1,8 @@
+{
+  "name": "return-check",
+  "event": "SubagentStop",
+  "matcher": "*",
+  "marker": "return-check.sh",
+  "hook_path": "{kit}/roles/return-check.sh",
+  "interpreter": "bash"
+}
