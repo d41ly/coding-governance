@@ -39,7 +39,7 @@ role = "engine"
 include = ["house/gov-builder.md", "house/gov-diff-reviewer.md", "house/gov-orienter.md",
            "house/gov-researcher.md", "house/gov-reuse-scout.md", "house/gov-session.md",
            "house/gov-skeptic.md", "house/gov-spec-reviewer.md", "house/gov-spec-writer.md",
-           "house/gov-synthesizer.md", "house/policy.toml"]
+           "house/gov-synthesizer.md", "house/gov-tester.md", "house/policy.toml"]
 role = "seed"
 
 # THE ADOPTER'S SELF-TEST IS WITHHELD, by claiming the destination (TOOL-aQuenchedHarness-3): its
@@ -98,31 +98,55 @@ ok = true
 # governing doc and house overlays, so its subject is the adopter's tree, and a broken overlay reds
 # on the adopter's bar before a handoff refuses at run time.
 [[gate_leg]]
+tag = "leg.roles.roles-catalogue"
+tests = ["feature.roles"]
+enforces = ["principle.p16"]
 name = "roles catalogue"
 subject = "repo"
+purpose = "grades role files against the governing doc and overlays"
 argv = ["python", "{kit}/check_roles.py"]
 guard = []
 ceiling = 120
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+
 # THE RENDER'S WIRING LEG SHIPS. One leg grades the agent types, the role index and the Skill
 # together; its subject is the target's own render, which goes stale when an overlay, the conf or the
 # governing doc moves with nobody touching this kit.
 [[gate_leg]]
+tag = "leg.roles.roles-render-wiring"
+tests = ["feature.roles"]
 name = "roles render wiring"
 subject = "repo"
+purpose = "grades the agent types, role index and Skill renders"
 argv = ["bash", "{kit}/adopt-roles.sh", "--check"]
 guard = []
 ceiling = 300
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+guard = []
+chunk = "wiring"
 
 [[gate_leg]]
+tag = "leg.roles.roles-render-selftest"
+tests = ["feature.roles"]
 name = "roles render selftest"
 subject = "kit"
+purpose = "self-tests rendering roles into Claude Code agent types"
 argv = ["python", "{kit}/render_agents.py", "--selftest"]
+unguarded_why = "a guard naming the roles kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
 guard = []
 ceiling = 300
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "selftests"
 
 # THE OUTPUTS ARE A PROGRAM'S. An agent type is a base role, a house overlay and front matter
 # composed by `render_agents.py`, not one template with tokens, so it is declared here and not as a

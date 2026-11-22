@@ -1,6 +1,6 @@
 # PLAY-dConvergedCharter-21 — `tools/roles/house/policy.toml` retired as a seed: a repository's unruled efforts folded into `roles.effort.*` by an upgrade step, and the house-file fallback gone
 
-**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 8 · advances PLAY-dConvergedCharter-24
+**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 0d1c1dda · streams playbook · order 8 · advances PLAY-dConvergedCharter-24
 
 **Carries:** cl-dClosedLoop-0495@53f4c9b2 whole
 
@@ -65,7 +65,7 @@ home mode; and `derive_readers` (unit 11's I1).
   Observed by AC1, AC2, AC3 and AC7.
   **Readers:** by name: `tools/roles/kit.toml:39`, `tools/roles/roles_lib.py:398-411`,
   `tools/roles/check_roles.py:367`, `tools/roles/handoff.py:480`, `tools/roles/render_agents.py:140`,
-  `tools/policy/policy.py:1119` (`HOUSE_ANCHOR`), `tools/policy/legacy-homes.txt` · by value: the
+  `tools/policy/policy.py` (`HOUSE_ANCHOR`), `memory/project/legacy-homes.txt` · by value: the
   fallback order's step 4 in `resolve_stage_efforts` and `resolve_effort` (TOOL-dBoundRoles-21 §4), which
   reads the file's levels where no key is set, and `derive_house_proposals`, which compares each level
   with the role's declared one.
@@ -327,6 +327,7 @@ New arm: tools/roles/render_agents.py · covers AC5 · its fixture with a plante
 - rev-5 · 2026-11-05 · S1 §8 · F4 resolved by the owner to (a),
   `2026-11-05-prompt-PLAY-dConvergedCharter-11-owner-forks`: S1 step (2)'s function is the ask the build
   run files in dShippedRelease's `BACKLOG.md`.
+- rev-6 · 2026-11-22 · S1 · the **Readers:** by name: half re-pointed from `tools/policy/legacy-homes.txt` to `memory/project/legacy-homes.txt`, where TOOL-dWitnessedBar-20 moved it; nothing else moves. From the brief `2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief`. On the re-pointed line, S1 cites `tools/policy/policy.py` by path alone, `HOUSE_ANCHOR` named beside it, since a file:line there would be a new positional citation and neither stable form resolves in a by-name half.
 
 ## 10. Reuse audit
 

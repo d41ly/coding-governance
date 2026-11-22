@@ -4,6 +4,7 @@
     python <kit>/map_diff.py <base> <head>  [--verbose]
     python <kit>/map_diff.py [<base>..<head>] --stale-dossiers [--json]
     python <kit>/map_diff.py --tree
+    python <kit>/map_diff.py --list-empty-decisions
 
 Attributes every changed file to its claiming feature(s) — keyed attributors first (from
 map_extractors.KEYED_ATTRIBUTORS), then dossier path globs, then foundation globs — and rolls
@@ -17,7 +18,14 @@ prints an `undeclared` line instead, and an entry naming no tracked path a DEAD 
 record lines only, no per-feature list. Refused with a range, --stale-dossiers or
 --drop-affordance-exempt (a whole tree would clear every grace).
 
---drop-affordance-exempt (S4a): after attribution, rewrite <MAP_ROOT>/affordance-exempt.toml,
+--list-empty-decisions: one `<feature> TAB 1` row per feature dossier whose `decisions` list is empty,
+the `dossier-decisions-empty` population's seed, graded by `ratchet (both ways)` (TOOL-dWitnessedBar-17
+S1, its section 8 F10 and F12). A dossier's list starts empty and is filled as the ids governing it are
+learned, never guessed, since a guessed id resolves and is worse than a visibly empty list. Prints
+nothing over a tree holding no dossier and writes no file. Takes no range, and is refused beside
+--stale-dossiers, --tree or --drop-affordance-exempt.
+
+--drop-affordance-exempt (S4a): after attribution, rewrite <MAP_ROOT>/affordance-exempt.txt,
 dropping every feature the range TOUCHED (shrink-only). Touching a graced feature's files
 mechanically removes its grace, so the next gate run demands its `## Reuse affordance` block —
 no human remembering. Commit the rewritten file with the change.
@@ -98,6 +106,12 @@ def derive_record_roots(root: Path, conf: dict[str, str]) -> tuple[list[str], st
     return roots, None
 
 
+def measure_empty_decisions(tree) -> list[str]:
+    """The features whose dossier declares an empty `decisions` list, sorted: the
+    `dossier-decisions-empty` population's measurement (TOOL-dWitnessedBar-17 S1)."""
+    return sorted(d.feature for d in tree.dossiers if not d.decisions)
+
+
 def render_coverage_line(label: str, mapped: int, total: int) -> str:
     """``# <label>: mapped <m>/<n> (<p>%)``, or ``n/a (0 files)`` over an empty population."""
     if not total:
@@ -106,17 +120,25 @@ def render_coverage_line(label: str, mapped: int, total: int) -> str:
 
 
 def _drop_affordance_exempt(touched: dict[str, list[str]]) -> None:
-    """S4a: rewrite affordance-exempt.toml, dropping every feature the range touched (shrink-only).
-    Writes only when the set actually shrinks; the dropped dossiers must carry a `## Reuse
-    affordance` block on the next gate run. LF write, matching gen_map's artifact writer."""
+    """S4a: rewrite affordance-exempt.txt, dropping every feature the range touched (shrink-only).
+    Writes only when the set actually shrinks, through the ledger factory's `write_rows`, each kept
+    row with the sha and disposition it carried (TOOL-dWitnessedBar-16); a drain to no row writes the
+    header and the factory's unarmed line. The dropped dossiers must carry a `## Reuse affordance`
+    block on the next gate run."""
     exempt = m.load_affordance_exempt()
     kept = cj.drop_touched_exemptions(exempt, touched)
     dropped = sorted(exempt - kept)
     if not dropped:
         print("\n# affordance-exempt: no touched feature was graced - unchanged")
         return
-    path = m.map_root() / "affordance-exempt.toml"
-    path.write_text(m.render_affordance_exempt(kept), encoding="utf-8", newline="\n")
+    path = m.map_root() / m.AFFORDANCE_FILE
+    rows, _bad = m.LL.read_rows(path, 1)
+    reg = m.derive_list_registration(m.AFFORDANCE_FILE)
+    if kept:
+        m.LL.write_rows(m.map_root(), reg, {k: (r[0], r[1]) for k, r in rows.items() if k[0] in kept})
+    else:
+        sha, why = m.LL.read_head_sha(m.repo_root())
+        m.LL._write_atomic(path, m.render_affordance_exempt((), sha or m.LL.NULL_SHA))
     print(
         f"\n# affordance-exempt: dropped {dropped} (touched) - {len(kept)} still graced. "
         "They must now carry a '## Reuse affordance' block (commit the rewritten file)."
@@ -251,7 +273,35 @@ def main() -> int:
         help="attribute every tracked file instead of a range; prints the header and the code and "
         "record coverage lines only. Takes no range, --stale-dossiers or --drop-affordance-exempt.",
     )
+    parser.add_argument(
+        "--list-empty-decisions",
+        action="store_true",
+        help="print one `<feature> TAB 1` row per dossier declaring no decisions, the "
+        "`dossier-decisions-empty` seed; writes nothing. Takes no range, --stale-dossiers, --tree or "
+        "--drop-affordance-exempt.",
+    )
     args = parser.parse_args()
+
+    if args.list_empty_decisions:
+        if args.range or args.stale_dossiers or args.tree or args.drop_affordance_exempt:
+            parser.error("--list-empty-decisions takes no range, --stale-dossiers, --tree or "
+                         "--drop-affordance-exempt")
+        try:
+            m.require_adopted_root()
+        except m.MapError as exc:
+            print(f"map-diff refused: {exc}", file=sys.stderr)
+            return 2
+        import map_extractors as ext  # project layer — the dossiers need the inventory ids
+
+        try:
+            tree = m.load_map_tree(ext.inventory_ids(), decision_id_re=getattr(
+                ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE))
+        except m.MapError as exc:
+            print(f"map-diff: {exc}", file=sys.stderr)
+            return 1
+        for feature in measure_empty_decisions(tree):
+            print(f"{feature}\t1")
+        return 0
 
     if args.tree:
         if args.range or args.stale_dossiers or args.drop_affordance_exempt:

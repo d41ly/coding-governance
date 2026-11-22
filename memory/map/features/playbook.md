@@ -28,7 +28,7 @@ globs = [
   "tools/template-size-highwater.txt",
   "tools/check-playbook-parity.sh",
   "tools/check-playbook-parity.test.sh",
-  "tools/playbook-kit-waivers.txt",
+  "memory/project/playbook-kit-waivers.txt",
   "tools/template-size-limits.txt",
   "tools/playbook/*",
 ]

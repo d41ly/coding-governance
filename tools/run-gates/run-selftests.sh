@@ -229,6 +229,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 PYBIN=$(resolve_python) || { echo "run-selftests: no usable python"; exit 2; }
 
 print_usage() {
@@ -1026,6 +1044,10 @@ if [ "$MODE" = check ]; then
   fails=0
   # FORWARD: every leg the bar holds carries a row. A suite that arrives without one would be exempt
   # from the budget rule by the act of arriving.
+  # The predicate below is the KIT hold, `held_halves.py#test_held` restated, and it stays: the budget
+  # rule is about the kit-held population a manifest row declares, which is all `derive_hold_source`'s
+  # `kit` word reads, and a `quarantine` or `level` hold is a selection row of one bar, never a budget
+  # population (TOOL-dWitnessedBar-51 S21).
   missing=$("$PYBIN" - "$BUDGETS" "$LEGS" <<'PY'
 import json, sys
 declared = set()

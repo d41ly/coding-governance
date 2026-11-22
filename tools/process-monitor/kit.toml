@@ -78,12 +78,20 @@ probe = { must_exist = ".process-monitor.conf" }
 means = "adopted"
 
 [[gate_leg]]
+tag = "leg.process-monitor.process-monitor-wiring"
+tests = ["feature.process-monitor"]
 name = "process-monitor wiring"
 subject = "repo"
+purpose = "checks the process-monitor kit's wiring has not drifted"
 argv = ["bash", "{kit}/adopt-process-monitor.sh", "--check"]
 guard = []
 doc_reads = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "records"
+ceiling = 180
 
 # THE ONE HOLE, and it is an authoring hole rather than a measurement one: PROCMON_ROOTS is the
 # adopter's own paths and cannot be seeded from this tree. It BLOCKS the gate, because the failure

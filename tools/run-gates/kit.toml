@@ -68,9 +68,11 @@ role = "project-owned"
 # receiving them gets a pin measured on a corpus they do not have. `derive-ceilings.py`
 # itself DOES ship -- it is the tool, and it refuses rather than defaulting when no headroom
 # is declared, which is the announced-unarmed state rather than a silent one.
-# TOOL-aQuenchedHarness-2.
+# TOOL-aQuenchedHarness-2. `bar-wall-evidence.txt` rides the same rule: it carries THIS repo's
+# whole-bar wall seconds per node, and `profile_bar.py --record` writes an adopter its own
+# (TOOL-dWitnessedBar-10 S9).
 [[files]]
-include = ["ceiling-evidence.txt", "ceiling-margin.txt"]
+include = ["ceiling-evidence.txt", "ceiling-margin.txt", "bar-wall-evidence.txt"]
 role = "project-owned"
 
 # AND SO IS THE PASS-LEG EVIDENCE. `pass-leg-evidence.txt` carries THIS repo's recorded reds per
@@ -152,8 +154,9 @@ why_no_regenerate = "the adopter writes nothing, so `update` re-runs no adopter 
 # THE PASS-LEG FIELD IS RE-APPLIED AT EVERY LANDING. TOOL-aNimbleMend-2. `regen.py` makes this staged
 # row an item, so the lander re-derives `pass_leg` over each merged tree and every bar's preflight
 # proves it fresh: a ceiling-evidence refresh that moves the selection is cured by the landing or by
-# one `--regen`, and is never a leg's red. NOT a `[[generated]]` row, because the unattended kit
-# enrols every `[[generated]]` path as a generated index and the manifest is an authored file.
+# one `--regen`, and is never a leg's red. The leg factory's `[[generated]]` row below renders the
+# same field through the same rule at stage 1, so `--apply` over its output changes nothing; this
+# row stays so every caller's command still runs (TOOL-dWitnessedBar-11 §8 F7).
 # Stage 2: the field reads no other generated output, and the codebase map at stage 3 reads the
 # tree after it. The adopter above still writes nothing, which is what its reason states.
 # WHICH FILE THE CHECK GRADES (TOOL-aNimbleMend-15): the manifest BESIDE THIS KIT, under any runner.
@@ -165,6 +168,26 @@ argv = ["bash", "{kit}/run-held-wsl.sh", "--leg", "python", "{kit}/pass_legs.py"
 check = ["bash", "{kit}/run-held-wsl.sh", "--leg", "python", "{kit}/pass_legs.py", "--check"]
 stage = 2
 writes = ["the pass_leg field of the leg manifest"]
+
+# THE LEG MANIFEST IS GENERATED (TOOL-dWitnessedBar-11 S2). Each leg's one declaration, a descriptor's
+# [[gate_leg]] row with its `[gate_leg.gov]` sub-table or a registry [[exempt_leg]] row, renders its
+# manifest row; `--check` here is freshness alone, and the `gate-leg conformance` leg runs `--conform`,
+# whose shape reds `--write` cannot cure (§8 F3). Stage 1: it reads no other generated output. A
+# `[[generated]]` row, so the unattended kit enrols the manifest as a generated index: a run
+# regenerates it rather than merging it. The path is spelled from `{kit}`, the manifest being this kit
+# dir's sibling, because the unattended kit's reader resolves `{kit}` and not `{prefix}`.
+# GOV'S ROW, IN A DESCRIPTOR THAT SHIPS (TOOL-dWitnessedBar-45). The render reads govkit's registry and
+# descriptor readers, and govkit never reaches an adopter, so the `when` holds only where govkit sits:
+# an adopter's `regen.py` skips the row and `--list` names it skipped, rather than its bar refusing at
+# stage 1 on a check that cannot run there.
+[[generated]]
+path = "{kit}/../gate-legs.json"
+generator = "leg_factory.py"
+why = "the leg manifest, rendered from each leg's one declaration (TOOL-dWitnessedBar-11)"
+write = ["python", "{kit}/leg_factory.py", "--write"]
+check = ["python", "{kit}/leg_factory.py", "--check"]
+stage = 1
+when = "exists:{prefix}/govkit/govkit.py"
 
 [check]
 argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]
@@ -179,11 +202,18 @@ means = "adopted"
 # selfcheck at the adding unit's own landing. The count is DERIVED by govkit and is deliberately
 # not written here; the number that used to sit in this sentence was wrong one commit later.
 [[gate_leg]]
+tag = "leg.run-gates.run-gates-wiring"
+tests = ["feature.run-gates"]
 name = "run-gates wiring"
 subject = "repo"
+purpose = "checks the run-gates kit's adopted declaration for drift"
 argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]
 guard = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "wiring"
+ceiling = 300
 
 # THE INTEGRITY HALF OF `check`, ON A BAR THAT NEEDS NO GOV CHECKOUT. `check` answers three
 # questions and two of them — descriptor and provenance — resolve only against gov's own blobs, so
@@ -198,24 +228,59 @@ stage = ["step.test"]
 # owned by this kit's own ceiling evidence, which the runner refreshes, and a number typed beside it
 # in a comment is the copy that rots.
 [[gate_leg]]
+tag = "leg.run-gates.receipt-sync-installed-files-match-the-receipt"
+tests = ["feature.run-gates"]
 name = "receipt sync (installed files match the receipt)"
 subject = "repo"
+purpose = "checks the installed files match the deployer's receipt"
 argv = ["python", "{kit}/check-receipt.py"]
 guard = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 300
 
 # THE SPLIT-TIER COMBINER'S SELF-TEST. TOOL-aSparedSpawn-5, mirroring `review-replay selftest` in the
 # workflows kit. It SHIPS: `held_halves.py` is an engine file under `**`, and `--selftest` builds its
 # own synthetic manifests, halves and git dirs, so a target holding the tool can run it; its one arm
 # over the real manifest announces a skip where the declaration is withheld. `subject = "kit"` puts it
-# under the 2026-08-23 hold. UNGUARDED for the reason `review-replay selftest` gives: a guard naming
-# this kit would make every live spec touching it name the leg, and the self-test costs about a second.
+# under the 2026-08-23 hold. UNGUARDED, for the reason its `unguarded_why` states.
 [[gate_leg]]
+tag = "leg.run-gates.held-halves-selftest"
+tests = ["feature.run-gates"]
 name = "held-halves selftest"
 subject = "kit"
+purpose = "self-tests the split-tier held self-test combiner"
 argv = ["python3", "{kit}/held_halves.py", "--selftest"]
+unguarded_why = "a guard naming this kit would make every live spec touching it name the leg, and the self-test costs about a second"
 guard = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = []
+chunk = "selftests"
+ceiling = 300
+
+# THE PRODUCT-TEST CONTRACT (TOOL-dWitnessedBar-9 S5): the manifest's legs carrying `level` graded
+# against `tests.product`. Gov holds no product suite, so its own `check` would print its zero; gov's
+# row runs the planted cases instead, one scratch repository per value. UNGUARDED: the contract reads
+# the policy, the manifest and every tracked pytest table, and no subset of paths bounds that.
+[[gate_leg]]
+tag = "leg.run-gates.product-test-contract-tests-product"
+tests = ["feature.run-gates"]
+enforces = ["practice.verify"]
+name = "product-test contract (tests.product)"
+subject = "repo"
+purpose = "checks the product-test legs against tests.product"
+argv = ["python3", "{kit}/product_tests.py", "check"]
+guard = []
+stage = ["step.test"]
+
+[gate_leg.gov]
+argv = ["python3", "{kit}/product_tests.py", "check", "--fixture"]
+chunk = "declarations"
+ceiling = 300
 
 # The seed for a target's own [gate_runner] declaration. `cmd_intake` emits this block when this
 # entry is selected (S9), resolving the path tokens ONLY: the runner's own `{name}` placeholder in
@@ -266,3 +331,28 @@ why = "the runner parses it through python with LF-only byte writes, and the can
 [[lf_pin]]
 pattern = "{kit}/gate-profiles.txt"
 why = "the declared profile table is parsed at runtime with a TAB field separator, so a stray CR lands inside the last field and turns a knob value into one the runner refuses"
+
+# THE VERDICT BACKENDS (TOOL-dWitnessedBar-6 S1), read across every descriptor by
+# `verdict_backends.py#read_backends`, a table govkit's install does not read: `[[drive]]` and
+# `[[command]]` are the precedent. The policy key `verdict` names one; an expansion registers its own
+# backend by declaring a row in its own kit, and a name declared twice is refused naming both.
+[[verdict_backend]]
+name = "local-hook"
+reader = "verdict_backends:read_local_verdict"
+off_node = false
+owner = "dWitnessedBar"
+
+[[verdict_backend]]
+name = "peer-node"
+reader = "verdict_backends:read_peer_verdict"
+off_node = true
+owner = "dWitnessedBar"
+
+[[verdict_backend]]
+name = "remote-ci"
+reader = "remote_verdict:read_remote_verdict"
+off_node = true
+owner = "dWitnessedBar"
+workflow = ".github/workflows/remote-ci.yml"
+job = "bar"
+step = "the merge bar, every leg guard ignored, walled inside the job limit"

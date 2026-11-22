@@ -72,6 +72,7 @@ surfaces = []
 needs-target = false
 
 [[gate_leg]]
+tag = "leg.kickoff-manifest.kickoff-manifest-ratchet"
 # TOOL-aScouredKit-12. The PATH IS PASSED, because the engine cannot derive it. `manifest-check.sh`
 # resolves the manifest from a hardcoded two-element list and reads MEMORY_ROOT zero times, while
 # the seed above lands at the target-supplied `{manifest_path}` that nothing validates and intake
@@ -80,11 +81,21 @@ needs-target = false
 # entry is in the registry's DEFAULT selection. The script already accepts and grades a path as $1.
 name = "kickoff-manifest ratchet"
 subject = "repo"
+purpose = "verifies the kickoff manifest against mechanical signals"
 argv = ["bash", "{prefix}/manifest-check.sh", "{manifest_path}"]
+precommit = ["bash", "{prefix}/manifest-check.sh", "--staged", "{manifest_path}"]
 guard = []
 history_depth = "full"
 red_after_land = true
 stage = ["step.build", "step.test"]
+
+[gate_leg.gov]
+argv = ["bash", "skills/session-kickoff/manifest-check.sh"]
+precommit = ["bash", "skills/session-kickoff/manifest-check.sh", "--staged"]
+reads = { history = "it asks `rev-list` and `git log` whether a watched file moved since the last audit (TOOL-aSparedSpawn-13 S3)." }
+guard = []
+chunk = "records"
+ceiling = 640
 
 [[hole]]
 id = "manifest-section-b"

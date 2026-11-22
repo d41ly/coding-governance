@@ -35,7 +35,7 @@ Assert against something declared INDEPENDENTLY of the thing under test.
 
 - A shrink-only COUNT pinned in the project layer (`CORE_FLOOR="6:6"`), while the member NAMES stay
   single-sourced in the kit. Deleting a member drops the count; nothing is spelled twice. This is the
-  shape `ARMS_FLOORS` and `baseline.toml` already use.
+  shape `ARMS_FLOORS` and `baseline.txt` already use.
 - An UNDECLARED pin is its own refusal. Omitting the key is the quietest way to disarm a shrink-only
   floor, and "the pin is absent" must not read as "the pin passed".
 - Where two sets genuinely ARE declared apart, assert across them: every TERMINAL phase must be in

@@ -195,6 +195,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
 # as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
 # which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
@@ -290,7 +308,18 @@ fail=0
 # and arm 14j's three on a refused key read, counted where no policy kit resolves too. Counted by reading.
 # 450 -> 456, TOOL-aMeasuredDrag-12: arm 1m's four, arm 1m2's one and arm 1m3's one, none gated.
 # Counted off the arms; this pass runs no suite.
-FLOOR_ASSERTIONS=456
+# 456 -> 457, TOOL-dWitnessedBar-12: arm 1a's `tag` control. Not gated. Counted by reading.
+# 457 -> 458, TOOL-dWitnessedBar-22: arm 1a's `tests` control. Not gated. Counted by reading.
+# 458 -> 459, TOOL-dWitnessedBar-19: arm 1a's `purpose` control. Not gated. Counted by reading.
+# 459 -> 460, TOOL-dWitnessedBar-10: arm 1a's `precommit` control. Not gated. Counted by reading.
+# 460 -> 461, TOOL-dWitnessedBar-9: arm 1a's `level` control. Not gated. Counted by reading.
+# 461 -> 465, TOOL-dWitnessedBar-8: arm 9n's four, behind the `timeout` gate and counted on a host
+# without one as well (41 -> 45). Counted by reading; this pass runs no suite.
+# 465 -> 468, TOOL-dWitnessedBar-30: arm 3h3r's three, a quarantined leg run outside the verdict. Not
+# gated. Counted by reading; this pass runs no suite.
+# 468 -> 480, TOOL-dWitnessedBar-29: arm 9e3's twelve, a passing leg's size warning shown, seven through
+# the bar and five through the sliced `scan_leg_warnings`. Not gated. Counted by reading; no suite ran.
+FLOOR_ASSERTIONS=480
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -327,6 +356,10 @@ FLOOR_ASSERTIONS=456
 # attribution (exit 143 before any summary with the worktree gone; no orphan line), both counted on
 # either branch of their liveness check, and the one source scan of this kit's signal traps.
 n=0
+# THE MANIFEST'S ONE KEY SET (TOOL-dWitnessedBar-12 S4). Arm 1a and `keyset_probe` both take it as an
+# argument, so a key cannot be admitted by one and refused by the other, and owed_rows.py reads this
+# line. A row key a later unit adds is added here once, with its control pair in arm 1a.
+LEG_KEYS="name argv guard impure reads chunk subject ceiling signature doc_reads pack enforces pass_leg scope_of stage tag tests purpose precommit level"
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `<prefix>/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
 # Normalised through the SAME `cd ... && pwd` chain on both sides: under MSYS `git rev-parse
@@ -388,7 +421,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg", "scope_of", "stage"}
+keys = set(sys.argv[2].split())   # LEG_KEYS, the one key set
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -398,15 +431,15 @@ for l in legs:
     if not isinstance(l, dict):
         print("canary: a leg row is not an object"); sys.exit(1)
     for k in l:
-        if k not in KNOWN:
+        if k not in keys:
             stray.append("%s -> %s" % (l.get("name", "?"), k))
 if stray:
-    print("canary: leg row(s) carry a key outside the pinned set %s: %s"
-          % (sorted(KNOWN), ", ".join(stray)))
+    print("canary: leg row(s) carry a key outside the pinned set LEG_KEYS %s: %s"
+          % (sorted(keys), ", ".join(stray)))
     print("canary: a near-miss spelling of `impure` is exactly what this pin exists to catch —")
     print("canary: the reuse path would find no declaration and reuse a leg that reads a remote.")
     sys.exit(1)
-' "$LEGS_FILE" || fail=1
+' "$LEGS_FILE" "$LEG_KEYS" || fail=1
 
 # ---- 1c. THE PER-LEG CEILING'S BOUND IS A CLOCK, NOT A MESSAGE. TOOL-aBoundedCeiling-1 AC1/AC2.
 #     The message was always the correct half of memory/gotchas/bounded-through-a-pipe-is-unbounded.md,
@@ -809,10 +842,10 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg", "scope_of", "stage"}
+keys = set(sys.argv[2].split())   # LEG_KEYS, the one key set
 legs = json.load(open(sys.argv[1]))
-sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
-' "$1"; }
+sys.exit(1 if any(k not in keys for l in legs for k in l) else 0)
+' "$1" "$LEG_KEYS"; }
 if keyset_probe "$ctl/clean.json" && ! keyset_probe "$ctl/typo.json"; then :
 else
   echo "canary: the manifest key-set predicate is unarmed — it must PASS a manifest with no impure key and FAIL a near-miss spelling; one of the two did not hold"
@@ -847,7 +880,7 @@ else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`reads\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
-# ...and `enforces` (PLAY-dOrderedCharter-50 S1), by the same two halves, in both KNOWN copies before
+# ...and `enforces` (PLAY-dOrderedCharter-50 S1), by the same two halves, in `LEG_KEYS` before
 # the first leg row carries it.
 n=$((n+1))
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"enforces":["r"]}]' > "$ctl/enf.json"
@@ -857,7 +890,7 @@ else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`enforces\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
-# ...and `pass_leg` (TOOL-aNimbleMend-2 S6), by the same two halves, in both KNOWN copies: the field
+# ...and `pass_leg` (TOOL-aNimbleMend-2 S6), by the same two halves, in `LEG_KEYS`: the field
 # `pass_legs.py --apply` derives onto a row, and the near-miss is the plural a hand would type.
 n=$((n+1))
 printf '%s' '[{"name":"a","pass_leg":true,"argv":["bash","x.sh"]}]' > "$ctl/pl.json"
@@ -867,7 +900,7 @@ else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`pass_leg\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
-# ...and `scope_of` (TOOL-aNimbleMend-4 S1), by the same two halves, in both KNOWN copies: the leg a
+# ...and `scope_of` (TOOL-aNimbleMend-4 S1), by the same two halves, in `LEG_KEYS`: the leg a
 # scoped row is a cheap form of, whose reds `pass_legs.py --write` credits it. The near-miss is the
 # kebab spelling.
 n=$((n+1))
@@ -878,7 +911,7 @@ else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`scope_of\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
-# ...and `stage` (TOOL-dDeclaredLoop-56 S24), by the same two halves, in both KNOWN copies: the step tags
+# ...and `stage` (TOOL-dDeclaredLoop-56 S24), by the same two halves, in `LEG_KEYS`: the step tags
 # every leg row carries, and the near-miss is the plural a hand would type.
 n=$((n+1))
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"stage":["step.test"]}]' > "$ctl/st.json"
@@ -886,6 +919,56 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"],"stages":["step.test"]}]' > "$c
 if keyset_probe "$ctl/st.json" && ! keyset_probe "$ctl/sttypo.json"; then :
 else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`stage\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `tag` (TOOL-dWitnessedBar-12 S4), by the same two halves, in `LEG_KEYS`: the leg's tag in the
+# `leg` namespace beside its `name`, and the near-miss is the plural a hand would type.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"tag":"leg.gov.a"}]' > "$ctl/tg.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"tags":"leg.gov.a"}]' > "$ctl/tgtypo.json"
+if keyset_probe "$ctl/tg.json" && ! keyset_probe "$ctl/tgtypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`tag\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `tests` (TOOL-dWitnessedBar-22 S3), by the same two halves, in `LEG_KEYS`: the features a leg
+# tests, beside the `enforces` a row carries with it, and the near-miss is the singular a hand would type.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"tests":["feature.a"],"enforces":["principle.p1"]}]' > "$ctl/ts.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"test":["feature.a"],"enforces":["principle.p1"]}]' > "$ctl/tstypo.json"
+if keyset_probe "$ctl/ts.json" && ! keyset_probe "$ctl/tstypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`tests\` and \`enforces\` and FAIL a near-miss of \`tests\`; one of the two did not hold"
+  fail=1
+fi
+# ...and `purpose` (TOOL-dWitnessedBar-19 S1), by the same two halves, in `LEG_KEYS`: what the leg is
+# for, one line of prose, and the near-miss is the plural a hand would type.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"purpose":"checks a"}]' > "$ctl/pu.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"purposes":"checks a"}]' > "$ctl/putypo.json"
+if keyset_probe "$ctl/pu.json" && ! keyset_probe "$ctl/putypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`purpose\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `precommit` (TOOL-dWitnessedBar-10 S1), by the same two halves, in `LEG_KEYS`: the argv the
+# pre-commit hook runs for the leg, and the near-miss is the hyphenated spelling a hand would type.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"precommit":["bash","x.sh","--staged"]}]' > "$ctl/pc.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"pre-commit":["bash","x.sh","--staged"]}]' > "$ctl/pctypo.json"
+if keyset_probe "$ctl/pc.json" && ! keyset_probe "$ctl/pctypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`precommit\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `level` (TOOL-dWitnessedBar-9 S1), by the same two halves, in `LEG_KEYS`: the product-test
+# level a leg runs, and the near-miss is the plural a hand would type.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"level":"unit"}]' > "$ctl/lv.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"levels":"unit"}]' > "$ctl/lvtypo.json"
+if keyset_probe "$ctl/lv.json" && ! keyset_probe "$ctl/lvtypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`level\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
 rm -rf "$ctl"
@@ -1509,7 +1592,7 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed' \
 # -31 AC2: and it NAMES the held population, or the smaller number is a smaller lie — a bar that
 # shrank with no explanation reads as a bar that shrank for reasons nobody recorded.
 n=$((n+1))
-printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: subject kit or chunk selftests, GATE_SELFTESTS=1 runs them)$' \
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: 3 kit; GATE_SELFTESTS=1 runs the kit ones)$' \
   || { echo "canary: the summary did not name the held population beside the reduced total"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
 # -31 AC3: the RECORDED figure is the printed one. Two call sites computing one number is how they
 # come to disagree, and the record is what a later run and the push boundary read instead of stdout.
@@ -1541,6 +1624,74 @@ o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash $KIT_REL/run-gates
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
   || { echo "canary: with the switch on the total was not the whole manifest, or a stale held note survived"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+
+# HELD BY POLICY (TOOL-dWitnessedBar-5 AC2, AC3). A selection record holding a quarantine row, a row
+# naming a leg the manifest lacks, and a `kit` row naming a repo leg. The quarantined leg is held under
+# GATE_SELFTESTS=1 too, writes no `.leg` row, and is named with its source; the unknown row prints one
+# refusal; the kit row is ignored, so its repo leg RUNS, since a selection honoured as `kit` could hold
+# any leg as a kit self-test; and the run record holds the file byte-equal as `selection`, with one
+# `held.<n>` key per held leg.
+cat > "$S2/sel.tsv" <<'SEL'
+# planted
+held	m repo one	quarantine	flaked 2 of 10
+held	ghost leg	quarantine	no such leg
+held	m repo two	kit	a selection naming the kit class
+SEL
+o=$( cd "$S2" && GATE_SELECTION="$S2/sel.tsv" GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
+vd="$S2/.git/gate-run/$(cat "$S2/.git/gate-run/current" 2>/dev/null)"
+n=$((n+1))
+printf '%s\n' "$o" | grep -qx 'GATE held  m repo one  (quarantine, flaked 2 of 10)' \
+  || { echo "canary: a quarantined leg under GATE_SELFTESTS=1 was not held with its source"; printf '%s\n' "$o" | grep 'm repo one' | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+[ "$(printf '%s\n' "$o" | grep -c 'ghost leg, which the manifest lacks, ignored')" = 1 ] \
+  || { echo "canary: a selection row naming no manifest leg did not print exactly one refusal"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    m repo two' \
+  || { echo "canary: a selection's kit row held a repo leg"; printf '%s\n' "$o" | grep 'm repo two' | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+cmp -s "$vd/selection" "$S2/sel.tsv" \
+  || { echo "canary: the run record does not hold the selection byte-equal"; fail=1; }
+# `m repo one` is manifest index 0, and its sibling `m repo two`, index 1, ran: the control that the
+# record holds `.leg` rows at all, so the absence below is an absence and not an unwritten directory.
+n=$((n+1))
+{ [ ! -e "$vd/0.leg" ] && [ -f "$vd/1.leg" ]; } \
+  || { echo "canary: a held leg wrote a .leg row, or the leg that ran wrote none"; fail=1; }
+n=$((n+1))
+awk -F'\t' '$1=="held" && $2==1 {c=1} $1=="held.1" && $2=="m repo one · quarantine · unrun" {k=1} END{exit !(c && k)}' "$vd/verdict" 2>/dev/null \
+  || { echo "canary: the verdict record lacks the held leg's held.<n> key"; awk -F'\t' '$1 ~ /^held/' "$vd/verdict" 2>/dev/null | sed 's/^/    /'; fail=1; }
+rm -f "$S2/sel.tsv"
+
+# 3h3r. A QUARANTINED LEG IN `run` MODE RUNS OUTSIDE THE VERDICT. TOOL-dWitnessedBar-30 AC1. A selection
+#      row's fifth field `run` executes the leg in its ordinary slot, past the guard that would skip it
+#      on this unmoved tree, so it writes its `.leg` row for the flake record; its red is its `held.1`
+#      result, `fail`, and never a failed leg, so the bar beside one green leg is GREEN.
+S2R="$SCRATCH/heldrun"
+mkdir -p "$S2R/${PFX}${KIT}" "$S2R/fx"
+cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$S2R/${PFX}${KIT}/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$S2R/${PFX}${KIT}/" 2>/dev/null || true
+cp "$SCRATCH/fx/instant.sh" "$S2R/fx/a.sh"
+cp "$SCRATCH/fx/bad.sh" "$S2R/fx/red.sh"
+cat > "$S2R/${PFX}gate-legs.json" <<'JSON'
+[
+  {"name": "r steady", "argv": ["bash", "fx/a.sh"], "subject": "repo"},
+  {"name": "r flaky",  "argv": ["bash", "fx/red.sh"], "subject": "repo", "guard": ["fx/red.sh"]}
+]
+JSON
+( cd "$S2R" && git init -q --template= -b main . \
+  && git add -A && git commit -qm fx ) >/dev/null 2>&1
+printf '# planted\nheld\tr flaky\tquarantine\t2/10, ask ARCH-tFx-1\trun\n' > "$SCRATCH/heldrun.sel"
+o=$( cd "$S2R" && GATE_SELECTION="$SCRATCH/heldrun.sel" GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 ); rc=$?
+vd="$S2R/.git/gate-run/$(cat "$S2R/.git/gate-run/current" 2>/dev/null)"
+n=$((n+1))
+{ [ "$rc" = 0 ] && printf '%s\n' "$o" | grep -q '^gates GREEN'; } \
+  || { echo "canary: a failing quarantined leg in run mode moved the verdict (exit $rc), so a quarantined flake still blocks"; printf '%s\n' "$o" | grep -E '^(gates|GATE)' | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+[ -f "$vd/1.leg" ] \
+  || { echo "canary: a quarantined leg in run mode wrote no .leg row, so no flake record can hold its result"; printf '%s\n' "$o" | grep 'r flaky' | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+awk -F'\t' '$1=="held" && $2==1 {c=1} $1=="held.1" && $2=="r flaky · quarantine · fail" {k=1} END{exit !(c && k)}' "$vd/verdict" 2>/dev/null \
+  || { echo "canary: the verdict record does not read held.1 ending quarantine · fail for the run-mode leg"; awk -F'\t' '$1 ~ /^(held|failed|verdict)/' "$vd/verdict" 2>/dev/null | sed 's/^/    /'; fail=1; }
+rm -f "$SCRATCH/heldrun.sel"
 
 # 3h4. AN ALL-HELD RUN REFUSES. TOOL-dUnstalledConvoy-26 AC10. A repository whose whole manifest is
 #      kit-subject would otherwise print `gates GREEN — 0/0 legs passed` on every run forever while
@@ -2573,7 +2724,7 @@ build_attr_fixture() { # dir — R committed, L in the working tree
   mkdir -p "$d/$KIT_REL" "$d/alt" "$d/chk2" "$d/data" "$d/other"
   for k in off c f; do mkdir -p "$d/sig-$k"; done
   for k in 2 3 5 6 8 9 10 11 12 13 14 15 16; do mkdir -p "$d/fx$k"; done
-  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
+  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
   ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   # THREE SIGNATURE LEGS, each in a directory of its own with its data OUTSIDE it: a checker's
@@ -2720,21 +2871,22 @@ else
   echo "canary: SKIP the three ceiling arms of section 7 — this host has no runnable 'timeout -k', so no ceiling can fire and a CONTENDED verdict cannot be staged here"
 fi
 # AC3's record — one TAB row per red leg, in the declared column order, the full R sha, reason LAST.
-# Nine columns since TOOL-dDerivedDocket-24 inserted age, owner sha8 and owner id before the reason.
+# Nine columns since TOOL-dDerivedDocket-24 inserted age, owner sha8 and owner id before the reason;
+# ten since TOOL-dWitnessedBar-3 inserted `blocks` ninth, which no handed value reads `block` on every row.
 n=$((n+1))
 _a1rec=$(ls -1d "$A1"/.git/gate-run/*/ 2>/dev/null | tail -1)
 _a1sha=$(git -C "$A1" rev-parse HEAD)
 _a1red=$(printf '%s\n' "$a1out" | grep -c '^GATE FAIL  ')
 if [ -f "${_a1rec}attribution" ]; then
   awk -F'\t' -v sha="$_a1sha" -v m="$_a1red" '
-    NF != 9 || $5 != sha || $2 !~ /^(OWN|INHERITED|MIXED|CONTENDED|DEAD PROBE)$/ { bad = 1 }
+    NF != 10 || $5 != sha || $2 !~ /^(OWN|INHERITED|MIXED|CONTENDED|DEAD PROBE)$/ || $9 != "block" { bad = 1 }
     END { exit (bad || NR != m) }' "${_a1rec}attribution" \
-    || { echo "canary: attribution — AC3 the run record's attribution file is not one leg·verdict·inherited·own·R-sha·age·owner·owner-id·reason row per red leg"; head -3 "${_a1rec}attribution" | sed 's/^/    /'; fail=1; }
+    || { echo "canary: attribution — AC3 the run record's attribution file is not one leg·verdict·inherited·own·R-sha·age·owner·owner-id·blocks·reason row per red leg, blocks reading block"; head -3 "${_a1rec}attribution" | sed 's/^/    /'; fail=1; }
 else
   echo "canary: attribution — AC3 the runner printed its GATE attr lines and wrote no attribution record"; fail=1
 fi
 n=$((n+1))
-printf '%s\n' "$a1out" | grep -qE "^attributed [0-9]+ of $_a1red red legs against ${_a1sha:0:8} · DEAD PROBE [0-9]+$" \
+printf '%s\n' "$a1out" | grep -qE "^attributed [0-9]+ of $_a1red red legs against ${_a1sha:0:8} · DEAD PROBE [0-9]+ · verdict.blocks every-red, none handed · $_a1red blocking$" \
   || { echo "canary: attribution — the summary line is missing or does not count every red leg"; fail=1; }
 # The R worktree is gone after the run: a trap that forgot it leaves a registered worktree per bar.
 n=$((n+1))
@@ -2757,14 +2909,14 @@ check_attr_line "$a1d" "same" "OWN · KF3" "AC5 the diff touches the runner"
 git -C "$A1" checkout -q -- "$KIT_REL/run-gates.sh" 2>/dev/null
 # AC3's summary over ONE red leg, driven through a second TRACKED manifest.
 A3="$AT/a3"; mkdir -p "$A3/$KIT_REL"
-cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$A3/$KIT_REL/" 2>/dev/null
+cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$A3/$KIT_REL/" 2>/dev/null
 ( cd "$A3" && git init -q --template= -b main . ) >/dev/null 2>&1
 printf '[\n  {"name": "absent", "argv": ["bash", "fx4/new.sh"]}\n]\n' > "$A3/$ATL"
 ( cd "$A3" && git add -A && git commit -qm R ) >/dev/null 2>&1
 mkdir -p "$A3/fx4"; printf '#!/usr/bin/env bash\necho "FAIL new"\nexit 1\n' > "$A3/fx4/new.sh"
 a3out=$(run_attr_bar "$A3" GATE_ATTRIBUTE=HEAD)
 n=$((n+1))
-printf '%s\n' "$a3out" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{8} · DEAD PROBE 1$' \
+printf '%s\n' "$a3out" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{8} · DEAD PROBE 1 · verdict.blocks every-red, none handed · 1 blocking$' \
   || { echo "canary: attribution — AC3 a leg that cannot run at R did not read \`attributed 0 of 1 red legs\`"; printf '%s\n' "$a3out" | grep -E '^(GATE attr|attributed)' | sed 's/^/    /'; fail=1; }
 
 # AC9 — THE TWO REDS THIS UNIT EXISTS TO CLOSE, replayed from the pairs their records MEASURED rather
@@ -2773,7 +2925,7 @@ printf '%s\n' "$a3out" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{
 build_replay_fixture() { # dir · R's line · L's line
   local d=$1
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
-  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
+  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   printf '#!/usr/bin/env bash\nread c g p < data/lane.txt\necho "verb offenders $c over pin $p ($g graded)"\n[ "$c" -le "$p" ]\n' > "$d/fx/pin.sh"
   printf '[\n  {"name": "lexicon naming predicates", "argv": ["bash", "fx/pin.sh"]}\n]\n' > "$d/$ATL"
@@ -2805,7 +2957,7 @@ check_attr_line "$(run_attr_bar "$AT/rc" GATE_ATTRIBUTE=HEAD)" "lexicon naming p
 # plus 8 s, and R sleeps three walls and a minute, read from a file OUTSIDE the repository so it is
 # set after the measurement without moving R's tree.
 AW="$AT/aw"; mkdir -p "$AW/$KIT_REL" "$AW/fx" "$AW/data"
-cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$AW/$KIT_REL/" 2>/dev/null
+cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$AW/$KIT_REL/" 2>/dev/null
 ( cd "$AW" && git init -q --template= -b main . ) >/dev/null 2>&1
 printf '#!/usr/bin/env bash\ncase "$(cat data/m.txt)" in slow) sleep "$(cat '"'%s'"')";; esac\necho "FAIL w"\nexit 1\n' "$AT/aw.sleep" > "$AW/fx/w.sh"
 printf 'slow\n' > "$AW/data/m.txt"
@@ -2820,7 +2972,7 @@ awout=$(run_attr_bar "$AW" GATE_ATTRIBUTE=HEAD GATE_WALL="$_awwall"); awrc=$?
 _awel=$(( $(date +%s) - _aws ))
 check_attr_line "$awout" "walled" "DEAD PROBE · cut by the wall" "AC15 an R run the wall cuts"
 n=$((n+1))
-printf '%s\n' "$awout" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{8} · DEAD PROBE 1$' \
+printf '%s\n' "$awout" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{8} · DEAD PROBE 1 · verdict.blocks every-red, none handed · 1 blocking$' \
   || { echo "canary: attribution — AC15 the summary did not count the wall-cut leg"; fail=1; }
 n=$((n+1))
 { [ "$awrc" = 1 ] && [ "$_awel" -lt $(( _awsl - 20 )) ]; } \
@@ -2836,7 +2988,7 @@ n=$((n+1))
 build_age_fixture() { # dir · the landing (1..12) the red arrives in · [own] -> sets AGE_R
   local d=$1 at=$2 own=${3:-} i
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
-  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
+  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
   ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   printf '#!/usr/bin/env bash\nif [ -s data/red.txt ]; then cat data/red.txt; exit 1; fi\nexit 0\n' > "$d/fx/r.sh"
@@ -2860,15 +3012,15 @@ build_age_fixture() { # dir · the landing (1..12) the red arrives in · [own] -
 }
 AG="$AT/ag"; build_age_fixture "$AG" 4
 _ag_own=$(git -C "$AG" log --format='%H %s' | awk '/AGE-tFix-4 lands/ { print substr($1, 1, 8); exit }')
-agout=$(run_attr_bar "$AG" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=10)
+agout=$(run_attr_bar "$AG" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended GATE_INHERITED_RED_MAX_AGE=10)
 check_attr_line "$agout" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · age 8 · owner $_ag_own AGE-tFix-4" \
   "AC3 a red that arrived inside the window names the landing that introduced it"
 n=$((n+1))
 _agrec=$(ls -1d "$AG"/.git/gate-run/*/ 2>/dev/null | tail -1)
 awk -F'\t' -v sha="$AGE_R" -v own="$_ag_own" '
-    NF != 9 || $2 != "INHERITED" || $5 != sha || $6 != "8" || $7 != own || $8 != "AGE-tFix-4" { bad = 1 }
+    NF != 10 || $2 != "INHERITED" || $5 != sha || $6 != "8" || $7 != own || $8 != "AGE-tFix-4" || $9 != "pass" { bad = 1 }
     END { exit (bad || NR != 1) }' "${_agrec}attribution" 2>/dev/null \
-  || { echo "canary: attribution — AC3 the row does not carry age 8, the owner and its id before the reason"; head -2 "${_agrec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
+  || { echo "canary: attribution — AC3 the row does not carry age 8, the owner, its id and blocks pass before the reason"; head -2 "${_agrec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
 n=$((n+1))
 { [ -f "$AG/.git/gate-inherited-green" ] \
     && [ "$(awk -F'\t' '$1=="base"{print $2}' "$AG/.git/gate-inherited-green")" = "$AGE_R" ] \
@@ -2879,7 +3031,7 @@ n=$((n+1))
 [ ! -f "$AG/.git/gate-full-green" ] \
   || { echo "canary: attribution — AC4 an inherited-only red bar wrote gate-full-green, which a later push would read as green"; fail=1; }
 AH="$AT/ah"; build_age_fixture "$AH" 1
-ahout=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=10)
+ahout=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended GATE_INHERITED_RED_MAX_AGE=10)
 check_attr_line "$ahout" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · aged at R~10" \
   "AC3 a red already present at R~10 reads aged"
 # FLIPPED by TOOL-dUnstuckLanding-16 from TOOL-dDerivedDocket-24's AC17, which asserted NO stamp: an
@@ -2892,7 +3044,7 @@ n=$((n+1))
 # TOOL-dUnstuckLanding-16 AC1 — red at R and at R~2 with the same offender, under a bound of 2: the
 # row reads `aged`, and the stamp is written naming that leg with `max_age` 2.
 rm -f "$AH/.git/gate-inherited-green"
-ah2out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=2)
+ah2out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended GATE_INHERITED_RED_MAX_AGE=2)
 check_attr_line "$ah2out" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · aged at R~2" \
   "TOOL-dUnstuckLanding-16 AC1 a red already present at R~2 reads aged"
 n=$((n+1))
@@ -2903,15 +3055,46 @@ n=$((n+1))
   || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC1 an aged leg under a bound of 2 wrote no gate-inherited-green naming R, max_age 2 and the leg"; fail=1; }
 # AC2's first clause — no bound handed: the stamp is still written, with an EMPTY `max_age`.
 rm -f "$AH/.git/gate-inherited-green"
-ah3out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land)
+ah3out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended)
 n=$((n+1))
 { [ -f "$AH/.git/gate-inherited-green" ] \
     && [ "$(awk -F'\t' '$1=="max_age"{print "<" $2 ">"}' "$AH/.git/gate-inherited-green")" = "<>" ] \
     && [ "$(awk -F'\t' '$1=="legs"{print $2}' "$AH/.git/gate-inherited-green")" = "aged leg" ]; } \
   || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC2 an INHERITED red with no age bound wrote no gate-inherited-green with an empty max_age"; printf '%s\n' "$ah3out" | grep -E '^(GATE attr|run-gates: inherited)' | sed 's/^/    /'; fail=1; }
+# TOOL-dWitnessedBar-3 AC2 — WHICH RED BLOCKS. The same one-INHERITED-leg bar under `every-red`: its
+# row reads `block`, the attr line ends `· blocks`, and no stamp is written. Under `own-only` the row
+# reads `pass` and the stamp records `blocks own-only`. Then a staged edit of `lib-verdict.sh` against
+# R reads the red OWN by KF3, so a branch editing the table cannot grade itself.
+rm -f "$AH/.git/gate-inherited-green"
+ah4out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=every-red)
+check_attr_line "$ah4out" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · blocks" \
+  "TOOL-dWitnessedBar-3 AC2 an INHERITED red under every-red blocks"
+n=$((n+1))
+_ah4rec=$(ls -1td "$AH"/.git/gate-run/*/ 2>/dev/null | head -1)
+{ [ "$(awk -F'\t' 'NF == 10 { print $9 }' "${_ah4rec}attribution" 2>/dev/null)" = block ] \
+    && [ ! -f "$AH/.git/gate-inherited-green" ] \
+    && printf '%s\n' "$ah4out" | grep -qE '· verdict.blocks every-red · 1 blocking$'; } \
+  || { echo "canary: attribution — TOOL-dWitnessedBar-3 AC2 an INHERITED red under every-red did not read block, wrote a stamp, or the summary did not count it"; head -2 "${_ah4rec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
+ah5out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-only)
+check_attr_line "$ah5out" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · passes" \
+  "TOOL-dWitnessedBar-3 AC2 an INHERITED red under own-only passes"
+n=$((n+1))
+[ "$(awk -F'\t' '$1=="blocks"{print $2}' "$AH/.git/gate-inherited-green" 2>/dev/null)" = own-only ] \
+  || { echo "canary: attribution — TOOL-dWitnessedBar-3 AC2 a bar every red of which passes under own-only wrote no stamp whose blocks reads own-only"; fail=1; }
+rm -f "$AH/.git/gate-inherited-green"
+printf '# an edit of the block table\n' >> "$AH/$KIT_REL/lib-verdict.sh"
+ah6out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-only)
+check_attr_line "$ah6out" "aged leg" "OWN · KF3" \
+  "TOOL-dWitnessedBar-3 AC2 an edit of lib-verdict.sh against R reads the red OWN"
+check_attr_line "$ah6out" "aged leg" "lib-verdict.sh, so this run edited its own grader" \
+  "TOOL-dWitnessedBar-3 AC2 the KF3 reason names lib-verdict.sh"
+n=$((n+1))
+[ ! -f "$AH/.git/gate-inherited-green" ] \
+  || { echo "canary: attribution — TOOL-dWitnessedBar-3 AC2 a bar that edited lib-verdict.sh wrote the inherited-green stamp"; fail=1; }
+git -C "$AH" checkout -q -- "$KIT_REL/lib-verdict.sh"
 # AC2's last clause — a second leg reads OWN: nothing is stamped, at any age.
 AO="$AT/ao"; build_age_fixture "$AO" 1 own
-aoout=$(run_attr_bar "$AO" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=2)
+aoout=$(run_attr_bar "$AO" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended GATE_INHERITED_RED_MAX_AGE=2)
 check_attr_line "$aoout" "own leg" "OWN" "TOOL-dUnstuckLanding-16 AC2 a leg green at R and red at L reads OWN"
 n=$((n+1))
 [ ! -f "$AO/.git/gate-inherited-green" ] \
@@ -2928,7 +3111,7 @@ n=$((n+1))
 build_moved_age_fixture() { # dir -> sets AGE_R
   local d=$1 i k
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
-  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
+  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
   ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   for k in sup cnt ins; do
@@ -2953,7 +3136,7 @@ build_moved_age_fixture() { # dir -> sets AGE_R
 }
 AM="$AT/am"; build_moved_age_fixture "$AM"
 _am_own=$(git -C "$AM" log --format='%H %s' | awk '/AGE-tFix-4 lands/ { print substr($1, 1, 8); exit }')
-amout=$(run_attr_bar "$AM" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=10)
+amout=$(run_attr_bar "$AM" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended GATE_INHERITED_RED_MAX_AGE=10)
 check_attr_line "$amout" "moved superset" "INHERITED · offenders 2 · at ${AGE_R:0:8} · aged at R~10" \
   "F1 an old red a later landing shrank reads aged, not owned by the landing that shrank it"
 check_attr_line "$amout" "moved count" "INHERITED · offenders 2 · at ${AGE_R:0:8} · age unproven" \
@@ -2962,7 +3145,7 @@ check_attr_line "$amout" "moved inside" "INHERITED · offenders 2 · at ${AGE_R:
   "F1 a red that arrived inside the window and shrank later is owned by the landing it arrived in"
 n=$((n+1))
 _amrec=$(ls -1d "$AM"/.git/gate-run/*/ 2>/dev/null | tail -1)
-awk -F'\t' '$1 == "moved count" { seen = 1; if ($6 != "-" || $9 !~ /declares no signature/) bad = 1 }
+awk -F'\t' '$1 == "moved count" { seen = 1; if ($6 != "-" || $10 !~ /declares no signature/) bad = 1 }
     END { exit (bad || !seen) }' "${_amrec}attribution" 2>/dev/null \
   || { echo "canary: attribution — F1 the row for a moved count line carries an age, or a reason not naming the missing signature"; grep '^moved count' "${_amrec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
 # FLIPPED by TOOL-dUnstuckLanding-16 (AC2's middle clause): every leg here reads INHERITED — one
@@ -2977,7 +3160,7 @@ n=$((n+1))
 # R copy ANNOUNCES itself and HOLDS until released, so the TERM lands inside the attribution by
 # construction rather than by a sleep (`fixed-sleep-does-not-place-a-signal`); at L it just fails.
 AX="$AT/ax"; mkdir -p "$AX/$KIT_REL" "$AX/fx" "$AX/data"
-cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$AX/$KIT_REL/" 2>/dev/null
+cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$AX/$KIT_REL/" 2>/dev/null
 cp "$KITDIR/gate-fingerprint.sh" "$AX/$KIT_REL/" 2>/dev/null || true
 ( cd "$AX" && git init -q --template= -b main . ) >/dev/null 2>&1
 { printf '#!/usr/bin/env bash\n'
@@ -3307,7 +3490,7 @@ build_hv_repo() { # dir — a scratch repository carrying this runner and its si
 run_hv_bar() { # dir · manifest · VAR=value… -> HV_OUT (stdout and stderr) and HV_RC
   local d=$1 m=$2; shift 2
   HV_OUT=$( cd "$d" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_SELFTESTS= GATE_ATTRIBUTE= \
-      GATE_INHERITED_RED= GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_JOBS=4 GATE_PROFILE=minimal \
+      GATE_VERDICT_BLOCKS= GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_JOBS=4 GATE_PROFILE=minimal \
       GATE_TURNSTILE=0 GATE_REUSE_SAMPLE=0 GATE_REUSE_PUSH= GATE_LEGS="$m" "$@" bash $KIT_REL/run-gates.sh 2>&1 ); HV_RC=$?
 }
 check_hv_line() { # label · pattern -> one counted assertion that some line of HV_OUT matches the ERE
@@ -3451,6 +3634,49 @@ check_hv_value "S9 the secret the links share still holds its bytes" "$(cmp -s "
 check_hv_value "S9 the bar over the planted links exits 0" "$HV_RC" 0
 check_hv_value "S9 the ledger carries the leg's row" \
   "$(awk -F'\t' '$1 == "plant" { c++ } END { print c + 0 }' "$H9e2/.git/gate-ledger.tsv" 2>/dev/null)" 1
+
+# 9e3. TOOL-dWitnessedBar-29 AC3 AC4 AC6 — A SIZE WARNING A PASSING LEG PRINTS IS SHOWN. The leg prints a
+#      human warning and the `gate-warn` marker after it and exits 0; the bar prints one `GATE warn` line
+#      naming the leg, the subject and the detail, counts it on the closing line and in the summary file,
+#      and writes `warned 1` and a `warn.1` row whose fourth TAB field is the subject, its verdict still
+#      GREEN. The scratch repository carries no memory-tree kit, so the unit reads `-` and names why.
+#      Then the runner's own `scan_leg_warnings`, sliced out, over planted work dirs: a red leg's marker,
+#      a red leg's re-run and a held leg's retry copy are never read; a held leg's passing first attempt is.
+#      Red when the `scan_leg_warnings` call is dropped: no line, no key.
+H9e3="$HV/r9e3"; build_hv_repo "$H9e3"
+printf '%s\n' '#!/usr/bin/env bash' 'echo "TEMPLATE-SIZE WARN — big.md grew past its recorded high-water"' \
+  "printf 'gate-warn\\tsize\\tfx/big.md\\t1 -> 2 (+1) over high-water\\n'" 'exit 0' > "$H9e3/fx/warn.sh"
+printf '[{"name": "sizer", "argv": ["bash", "fx/warn.sh"]}]\n' > "$HV/warn.json"
+( cd "$H9e3" && git add -A && git commit -qm warn ) >/dev/null 2>&1
+run_hv_bar "$H9e3" "$HV/warn.json"
+check_hv_line "dWB29 AC3 AC6 the passing leg's warning is shown, its unit '-' naming the absent kit" \
+  '^GATE warn  sizer  \(fx/big\.md: 1 -> 2 \(\+1\) over high-water; no memory-tree kit to attribute it: .*; grown by -\)$'
+check_hv_line "dWB29 S6 the closing line counts it" '^gates GREEN — 1/1 legs passed \(1 warned\)$'
+check_hv_value "dWB29 S6 the summary file carries it" \
+  "$(grep -c '^GATE warn  sizer  (fx/big.md: ' "$H9e3/.git/gate-last-summary.txt" 2>/dev/null)" 1
+check_hv_value "dWB29 AC4 the bar still exits 0" "$HV_RC" 0
+check_hv_value "dWB29 AC4 its verdict still reads GREEN" "$(read_hv_record "$H9e3" verdict)" GREEN
+check_hv_value "dWB29 AC4 the verdict counts one warning" "$(read_hv_record "$H9e3" warned)" 1
+_hvrec=$(ls -1td "$H9e3"/.git/gate-run/*/ 2>/dev/null | head -1)
+check_hv_value "dWB29 AC4 its warn.1 row names the subject fourth" \
+  "$(awk -F'\t' '$1 == "warn.1" { print $4 }' "${_hvrec}verdict" 2>/dev/null)" fx/big.md
+awk '/^scan_leg_warnings\(\) \{/,/^}/' "$KITDIR/run-gates.sh" > "$HV/scan9e3.sh"
+sed -n '/^RKD_PROGRAM=""/,/^RKD$/p' "$KITDIR/run-gates.sh" > "$HV/rkd9e3.sh"
+mkdir -p "$HV/w9e3" "$HV/nokit9e3"
+run_warn_slice() { # plant, eval'd with W the work dir -> how many `GATE warn` lines the slice prints
+  rm -f "$HV/w9e3"/* 2>/dev/null
+  ( W=$HV/w9e3; eval "$1"
+    WORK=$W; names=(sizer); total=1; KITDIR=$HV/nokit9e3
+    . "$HV/rkd9e3.sh"; . "$HV/scan9e3.sh"; scan_leg_warnings ) 2>/dev/null | grep -c '^GATE warn  sizer  '
+}
+_mk9e3='printf "gate-warn\tsize\tfx/big.md\td\n"'
+check_hv_value "dWB29 AC3 the slice shows a passing leg's marker" "$(run_warn_slice "$_mk9e3 > \$W/0.out; printf 0 > \$W/0.rc")" 1
+check_hv_value "dWB29 AC3 a failed leg's marker is not shown" "$(run_warn_slice "$_mk9e3 > \$W/0.out; printf 1 > \$W/0.rc")" 0
+check_hv_value "dWB29 AC3 a red leg's re-run is not read" "$(run_warn_slice "$_mk9e3 > \$W/0.rerun.out; printf 1 > \$W/0.rc; printf 0 > \$W/0.rerun.rc")" 0
+check_hv_value "dWB29 AC3 a held leg run outside the verdict is read from its passing first attempt" \
+  "$(run_warn_slice "$_mk9e3 > \$W/0.out; printf 0 > \$W/0.rc; : > \$W/0.heldrun")" 1
+check_hv_value "dWB29 AC3 a held leg's retry copy is never read" \
+  "$(run_warn_slice "$_mk9e3 > \$W/0.retry.out; printf 1 > \$W/0.rc; printf 0 > \$W/0.retry.rc; : > \$W/0.heldrun")" 0
 
 if [ "$HAVE_TIMEOUT" = 1 ]; then
   # 9f. AC1 and AC2 — A LEG THAT TIMES OUT ONLY BESIDE A SPINNER. The contended leg waits for the
@@ -3638,8 +3864,27 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
     "$(case "$_hvts$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvts" -lt "$_hvse" ] && echo in-tail || echo after-drain ;; esac)" in-tail
   check_hv_value "aSS3 AC4 the deciding attempt started after the drain ($_hvrs, $_hvse)" \
     "$(case "$_hvrs$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvrs" -ge "$_hvse" ] && echo after-drain || echo in-tail ;; esac)" after-drain
+
+  # 9n. TOOL-dWitnessedBar-8 AC1 — THE SAME-TREE RE-RUN. Under `GATE_RERUN=1` a leg that reds on its first
+  #     run and greens on its second keeps the bar RED, writes `<i>.rerun.leg` reading ok and prints the
+  #     sample's `nondeterministic` line; a leg whose own ceiling fired takes its serial retry and no
+  #     re-run, which is TOOL-dWitnessedBar-30's quiet-host re-run. Gated with the ceiling arms for the
+  #     second half, and counted on a host without one as well (41 -> 45).
+  H16="$HV/r16"; build_hv_repo "$H16"
+  export HV_ONCE="$HV/flaky.flag"; rm -f "$HV_ONCE"
+  printf '#!/usr/bin/env bash\n[ -f "$HV_ONCE" ] && exit 0\n: > "$HV_ONCE"\necho "FAIL the first run"\nexit 1\n' > "$H16/fx/flaky.sh"
+  ( cd "$H16" && git add -A && git commit -qm legs ) >/dev/null 2>&1
+  printf '[{"name": "flaky", "argv": ["bash", "fx/flaky.sh"]},\n {"name": "stall", "argv": ["bash", "fx/hang.sh"], "ceiling": 1}]\n' > "$HV/rerun.json"
+  run_hv_bar "$H16" "$HV/rerun.json" GATE_RERUN=1
+  _hvrec=$(ls -1td "$H16"/.git/gate-run/*/ 2>/dev/null | head -1)
+  check_hv_value "dWB8 AC1 a re-run that greens leaves the bar RED" "$HV_RC" 1
+  check_hv_value "dWB8 AC1 the flaky leg's re-run row reads ok" "$(awk -F'\t' '{ print $2 }' "${_hvrec}0.rerun.leg" 2>/dev/null)" ok
+  check_hv_line "dWB8 AC1 the output names it nondeterministic" '^nondeterministic · flaky$'
+  check_hv_value "dWB8 AC1 the leg whose ceiling fired took its serial retry and no re-run" \
+    "$([ -f "${_hvrec}1.retry.leg" ] && [ ! -f "${_hvrec}1.rerun.leg" ] && echo retried-only)" retried-only
+  unset HV_ONCE
 else
-  n=$((n+41))
+  n=$((n+45))
   echo "canary: SKIP the ceiling arms of section 9 — this host has no runnable 'timeout -k', so no ceiling can fire and nothing can be deferred, retried or read HOST here"
 fi
 rm -rf "$HV" 2>/dev/null || true
@@ -4124,7 +4369,7 @@ write_sc_legs() { # extra JSON fields for the uz row
 write_sc_legs ""
 ( cd "$SCR" && git init -q --template= -b main . && git add -A && git commit -qm base ) >/dev/null 2>&1
 run_sc_bar() { # VAR=value… -> SC_OUT
-  SC_OUT=$( cd "$SCR" && env GATE_FULL=1 GATE_BASE= GATE_REUSE= GATE_WALL= GATE_ATTRIBUTE= GATE_INHERITED_RED= \
+  SC_OUT=$( cd "$SCR" && env GATE_FULL=1 GATE_BASE= GATE_REUSE= GATE_WALL= GATE_ATTRIBUTE= GATE_VERDICT_BLOCKS= \
       GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_JOBS=4 GATE_PROFILE=minimal GATE_TURNSTILE=0 \
       GATE_SELFTESTS_MAX_LAG= GATE_LEGS="$SC/legs.json" "$@" bash $KIT_REL/run-gates.sh 2>&1 )
 }
@@ -4150,7 +4395,7 @@ printf '#!/usr/bin/env bash\n# moved\nexit 0\n' > "$SCR/kx/engine.sh"; write_sc_
 run_sc_bar GATE_SELFTESTS=changed
 check_sc_line "AC1 kx executes when its engine moved" '^run-gates: selftests changed: kx suite runs \(kx/engine.sh moved since [0-9a-f]{8}\)$'
 check_sc_line "AC1 ...and reports ok" '^GATE ok    kx suite$'
-check_sc_line "AC1 ky is held unchanged" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_line "AC1 ky is held unchanged" '^GATE held  ky suite  \(kit, unchanged since [0-9a-f]{8}\)$'
 check_sc_value "AC1 ky does not execute" "$(printf '%s\n' "$SC_OUT" | grep -c '^GATE ok    ky suite$')" 0
 check_sc_line "AC2 the fallback line names the unowned leg" '^run-gates: selftests changed: no kit ships the suite of 1 held leg\(s\), so each selects by its guard plus its suite file: uz suite$'
 SC_OUT=""; [ -f "$SCR/.git/gate-full-green" ] && SC_OUT=$(<"$SCR/.git/gate-full-green")
@@ -4160,7 +4405,7 @@ printf '#!/usr/bin/env bash\n# moved\nexit 0\n' > "$SCR/ky/y.test.sh"; printf 'g
 run_sc_bar GATE_SELFTESTS=changed
 check_sc_line "AC2 ky executes when only its suite file moved" '^run-gates: selftests changed: ky suite runs \(ky/y.test.sh moved since [0-9a-f]{8}\)$'
 check_sc_line "AC2 uz executes when only its guard moved" '^run-gates: selftests changed: uz suite runs \(uz/guarded.txt moved since [0-9a-f]{8}\)$'
-check_sc_line "AC2 kx is held" '^GATE held  kx suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_line "AC2 kx is held" '^GATE held  kx suite  \(kit, unchanged since [0-9a-f]{8}\)$'
 check_sc_value "AC2 the fallback line prints once" "$(printf '%s\n' "$SC_OUT" | grep -c '^run-gates: selftests changed: no kit ships')" 1
 # 13d. AC3 — a deleted record, a non-ancestor sha, a manifest row that changed: each executes.
 rm -f "$SCREC/$SCKX"
@@ -4174,7 +4419,7 @@ check_sc_line "AC3 a changed manifest row executes" '^run-gates: selftests chang
 # 13e. AC4 — eleven first-parent commits with nothing moved: held under a bound of 20, executed under 10.
 for _sck in 1 2 3 4 5 6 7 8 9 10 11; do write_sc_commit "empty $_sck"; done
 run_sc_bar GATE_SELFTESTS=changed GATE_SELFTESTS_MAX_LAG=20
-check_sc_line "AC4 control: an 11-behind record holds under a bound of 20" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_line "AC4 control: an 11-behind record holds under a bound of 20" '^GATE held  ky suite  \(kit, unchanged since [0-9a-f]{8}\)$'
 run_sc_bar GATE_SELFTESTS=changed
 check_sc_line "AC4 an 11-behind record executes under the default bound and names the lag" '^run-gates: selftests changed: ky suite runs \(recorded [0-9a-f]{8} is 11 first-parent commits behind HEAD, beyond the bound 10\)$'
 # 13f. AC5 — a selected leg that reds loses its record; a green on a dirty tree writes none.
@@ -4194,12 +4439,12 @@ check_sc_value "AC5 a dirty-tree green writes no record" "$([ -f "$SCREC/$SCKY" 
 run_sc_bar GATE_SELFTESTS=1
 printf '#!/usr/bin/env bash\nexit 0\n' > "$SCR/ky/extra.sh"; write_sc_commit "a ky file no kit ships"
 run_sc_bar GATE_SELFTESTS=changed
-check_sc_line "AC6 control: with govkit reachable an unshipped ky file holds ky" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_line "AC6 control: with govkit reachable an unshipped ky file holds ky" '^GATE held  ky suite  \(kit, unchanged since [0-9a-f]{8}\)$'
 check_sc_line "PLAY-dOrderedCharter-70 S13 a reachable govkit fills the deployer slot" '^run-gates: selftests changed: slot point.flow.version · filled$'
 run_sc_bar GATE_SELFTESTS=changed GOVKIT_STUB_OFF=1
 check_sc_value "AC6 the unreachable line prints once" "$(printf '%s\n' "$SC_OUT" | grep -c '^run-gates: selftests changed: govkit is not reachable .*, so every held leg selects by its guard plus its suite file$')" 1
 check_sc_line "AC6 ky selects by its guard" '^run-gates: selftests changed: ky suite runs \(ky/extra.sh moved since [0-9a-f]{8}\)$'
-check_sc_line "AC6 kx is held on diff evidence" '^GATE held  kx suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_line "AC6 kx is held on diff evidence" '^GATE held  kx suite  \(kit, unchanged since [0-9a-f]{8}\)$'
 # 13h. PLAY-dOrderedCharter-70 S13 — the stub hidden, so the resolver raises LookupError: the slot reads
 #      not-installed, and the not-reachable line follows it.
 mv "$SCR/${KIT_REL%/*}/$GK/govkit.py" "$SC/govkit.py.hidden"
@@ -4243,7 +4488,7 @@ run_pl_legs() { # VAR=value… -- the adapter's arguments -> PL_OUT (stdout and 
   while [ "$#" -gt 0 ] && [ "$1" != -- ]; do _pl_env+=("$1"); shift; done
   shift
   rm -f "$PL/marks"/* 2>/dev/null
-  PL_OUT=$( cd "$PLR" && env GATE_LEGS= GATE_REUSE= GATE_WALL= GATE_ATTRIBUTE= GATE_INHERITED_RED= \
+  PL_OUT=$( cd "$PLR" && env GATE_LEGS= GATE_REUSE= GATE_WALL= GATE_ATTRIBUTE= GATE_VERDICT_BLOCKS= \
       GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_DOCS_BASE= GATE_JOBS=4 GATE_PROFILE=minimal \
       GATE_TURNSTILE_DIR="$PL/ts" ${_pl_env[@]+"${_pl_env[@]}"} bash $KIT_REL/pass-legs.sh "$@" 2>&1 ); PL_RC=$?
 }

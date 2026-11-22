@@ -92,22 +92,39 @@ means = "adopted"
 # that ADDED each run-state path, and a shallow clone's boundary commit adds every one of them at
 # once, which would give every run of a build one start and red the leg on a history it cannot see.
 [[gate_leg]]
+tag = "leg.runlog.runlog-record-schema"
+tests = ["feature.runlog"]
 name = "runlog record schema"
 subject = "repo"
+purpose = "checks committed run records and run-state history"
 argv = ["python", "{kit}/runlog.py", "check-records"]
 guard = []
 history_depth = "full"
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 180
+
 # THE SKILL'S WIRING LEG SHIPS (TOOL-dLoggedFlight-12), for the reason the memory-recall kit's does:
 # its subject is the target's own rendered Skill, which goes stale when the target's memory root moves
 # or its template is edited, with nobody touching the adopter.
 [[gate_leg]]
+tag = "leg.runlog.runlog-skill-wiring"
+tests = ["feature.runlog"]
 name = "runlog skill wiring"
 subject = "repo"
+purpose = "checks the rendered runlog Skill has not gone stale"
 argv = ["bash", "{kit}/adopt-runlog.sh", "--check"]
 guard = []
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+guard = []
+chunk = "wiring"
+ceiling = 300
 
 # ONE [[lf_pin]], for the rendered Skill, which its own leg byte-compares; the leg strips CR from the
 # working copy too, so the pin keeps the committed bytes deterministic rather than holding the leg up.

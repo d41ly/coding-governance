@@ -187,6 +187,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 
 tmp=$(mktemp -d) || exit 2
 trap 'rm -rf "$tmp"' EXIT
@@ -358,6 +376,7 @@ chmod +x "$tmp/killed-hook/pre-push"
 git commit -q --allow-empty -m sg-ac3
 rm -f "$gcd/unattended-landed"
 git config core.hooksPath "$tmp/killed-hook"
+_bl0=$(grep -c 'decision=bypass' "$gcd/runlog/pushes.log" 2>/dev/null); _bl0=${_bl0:-0}
 outsg=$( ( unset GOV_GATE_CMD_TEST; bash "$lander" 2>&1 ) ); rcsg=$?
 git config core.hooksPath .githooks
 case "$rcsg|$([ -f "$gcd/unattended-landed" ] && echo marker || echo none)|$(git -C "$tmp/remote.git" rev-parse main)" in
@@ -368,6 +387,16 @@ case "$rcsg|$([ -f "$gcd/unattended-landed" ] && echo marker || echo none)|$(git
     esac ;;
   0*) bad "SG AC3 the lander called a push with no hook verdict landed (rc 0): $outsg" ;;
   *) bad "SG AC3 expected rc 4, no marker and the remote at HEAD, got rc $rcsg marker $([ -f "$gcd/unattended-landed" ] && echo yes || echo no): $outsg" ;;
+esac
+# BYP AC2 (TOOL-dWitnessedBar-2) — AND THE UNGATED LANDING IS RECORDED: the journal under the common dir
+#      gains ONE `decision=bypass` line, `bypass=ungated-landing`, naming the pushed sha, the policy and
+#      a `tree_verdict` field (`none` here, where no run-gates kit sits beside the fixture lander), and
+#      stderr carries its `bypass:` line. Red when the UNGATED path prints its line and records nothing.
+_bl=$(grep 'decision=bypass' "$gcd/runlog/pushes.log" 2>/dev/null | tail -1)
+case "$rcsg|$(grep -c 'decision=bypass' "$gcd/runlog/pushes.log" 2>/dev/null)|$_bl|$outsg" in
+  "4|$((_bl0 + 1))|"*$'\tev=once\tdecision=bypass\tbypass=ungated-landing\tsha='"$(git rev-parse HEAD)"$'\tpolicy=allowed\ttree_verdict=none'*"bypass: ungated-landing · "*)
+    ok "BYP AC2 the UNGATED landing writes one bypass line naming the pushed sha, its policy and its tree verdict, and says so on stderr" ;;
+  *) bad "BYP AC2 expected rc 4 and one ungated-landing line naming $(git rev-parse --short HEAD), got rc $rcsg: $_bl | $outsg" ;;
 esac
 # SG re-run (closing review round 1) — NOTHING PUSHED IS NOT UNGATED. The remote now holds HEAD, so git
 #      runs the real hook with no ref lines, it exits as skip-nondefault and writes no allow record, and
@@ -1007,6 +1036,14 @@ d9=$(diff <(read_parser_slice "$HERE/push-main.sh") <(read_parser_slice "$SRC/.g
 [ -z "$d9" ] && [ -n "$(read_parser_slice "$HERE/push-main.sh")" ] && [ -n "$d9b" ] \
   && ok "pm9 read_policy_key is byte-identical to the pre-push hook's, and a staged break shows" \
   || bad "pm9 parity diff: $d9 | break diff empty: $([ -z "$d9b" ] && echo yes || echo no)"
+# BYP S2 (TOOL-dWitnessedBar-2) — the bypass record's writer is byte-identical to the hook's, held as
+#      pm9 holds the parser; a one-byte break in a scratch copy shows.
+read_bypass_slice() { awk '/^write_bypass_line\(\)/,/^}/' "$1"; }
+sed 's/decision=bypass/decision=bypasz/' "$HERE/push-main.sh" > "$tmp/pm-copy.sh"
+d9c=$(diff <(read_bypass_slice "$HERE/push-main.sh") <(read_bypass_slice "$SRC/.githooks/pre-push")); d9d=$(diff <(read_bypass_slice "$tmp/pm-copy.sh") <(read_bypass_slice "$SRC/.githooks/pre-push"))
+[ -z "$d9c" ] && [ -n "$(read_bypass_slice "$HERE/push-main.sh")" ] && [ -n "$d9d" ] \
+  && ok "BYP S2 write_bypass_line is byte-identical to the pre-push hook's, and a staged break shows" \
+  || bad "BYP S2 parity diff: $d9c | break diff empty: $([ -z "$d9d" ] && echo yes || echo no)"
 # 26 — TOOL-aRoutedQuill-3 AC11: the ATTENDED landing's mint commit names the newest unit the pushed
 #      range attributes, `mint: kit versions onto origin/main at <sha8> for <unit>`, and carries a
 #      `Pass: none` trailer, because it touches version carriers under ROUTED_PATHS and the pre-push
@@ -1444,8 +1481,8 @@ case "$out35" in
   *) bad "35 run_gov_first skipped a deployer it could not run, or refused an adopter's landing: $out35" ;;
 esac
 
-# 37 — TOOL-dSafePassage-28: EVERY refusal of cmd_prepare after the gov-first walk leaves a clean
-#      tree, gated as a class. PREPARE_REFUSALS holds one row per `return 1` line of cmd_prepare from
+# 37 — TOOL-dSafePassage-28: EVERY refusal of --prepare's merge path after the gov-first walk leaves a
+#      clean tree, gated as a class. PREPARE_REFUSALS holds one row per `return 1` line of write_prepared_merge from
 #      its `run_gov_first` call to its end, in source order: stage | plant | expect. The arm derives
 #      that count from the lander beside this suite and reds when the table's row count differs, so a
 #      refusal added later joins the table or reds here. A refusal spelled other than `return 1` is
@@ -1466,7 +1503,8 @@ PREPARE_REFUSALS=(
 )
 # TOOL-dSafePassage-42 S12 and S13: the count reads check-arms' blanked lines (`scan_shell_lines`), so
 # a comment or a quoted `return 1` is not counted, from the `if ! run_gov_first` call, never the first
-# mention of the name, to cmd_prepare's closing brace, here-document and continued lines aside.
+# mention of the name, to the closing brace of write_prepared_merge, cmd_prepare's merge path since
+# TOOL-dWitnessedBar-4 S5, here-document and continued lines aside.
 measure37() {  # lander path -> the count on stdout
   "$_py_arms" -c '
 import importlib.util, re, sys
@@ -1474,7 +1512,7 @@ spec = importlib.util.spec_from_file_location("check_arms", sys.argv[1])
 arms = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(arms)
 rows = [r for r in arms.scan_shell_lines(open(sys.argv[2], encoding="utf-8").read()) if r]
-start = next(i for i, r in enumerate(rows) if r[0].startswith("cmd_prepare()"))
+start = next(i for i, r in enumerate(rows) if r[0].startswith("write_prepared_merge()"))
 end = next(i for i in range(start, len(rows)) if rows[i][0].startswith("}"))
 at = next((i for i in range(start, end) if re.match(r"[ \t]*if ! run_gov_first\b", rows[i][1])), end)
 print(sum(1 for raw, code, cont, here in rows[at:end] if not cont and not here and re.search(r"\breturn 1\b", code)))
@@ -1497,8 +1535,8 @@ if [ -n "$_mt_rc" ] && [ -n "$_py_arms" ] && [ -f "$HERE/$_mt_rc/check-arms.py" 
        /^  if ! run_gov_first; then/ { print "    # return 1"; print "    echo \"return 1\" >/dev/null" }' \
     "$HERE/push-main.sh" > "$tmp/lander37-blanked.sh"
   b37=$(measure37 "$tmp/lander37-blanked.sh")
-  # the anchors occur twice in the lander, so the plant's liveness is read inside cmd_prepare: three more lines
-  measure_raw37() { awk '/^cmd_prepare\(\)/,/^}/' "$1" | grep -c -e 'return 1' -e 'run_gov_first'; }
+  # the anchors occur twice in the lander, so the plant's liveness is read inside write_prepared_merge: three more lines
+  measure_raw37() { awk '/^write_prepared_merge\(\)/,/^}/' "$1" | grep -c -e 'return 1' -e 'run_gov_first'; }
   if [ "$d37" -gt 0 ] && [ "$b37" = "$d37" ] && [ "$(measure_raw37 "$tmp/lander37-blanked.sh")" = "$(( $(measure_raw37 "$HERE/push-main.sh") + 3 ))" ]; then
     ok "37 a commented and a quoted return 1, and run_gov_first named above the call, leave the count at $d37"
   else
@@ -1695,6 +1733,78 @@ if [ -n "$_mt_gk" ] && [ -n "$_rg_k" ] && [ -n "$_py_arms" ]; then
 else
   skipped=1; echo "  skip — 41 no govkit deployer or no run-gates kit holding regen.py beside this lander, or no python launcher, so the fold-before-regeneration arm did not run"
 fi
+
+# 42 — TOOL-dWitnessedBar-4 AC7: `verdict.tree` planted as `build-tip`, through a policy reader
+#      committed beside the lander that prints FIX_VERDICT_TREE. --prepare leaves HEAD where it was and
+#      its witness line names build-tip, the tip and its tree; under `prepared-merge` it names the merge
+#      it made. --land on the pinned branch under build-tip then makes the landing merge itself, so the
+#      fixture remote's main is a merge whose first parent is the advertised tip and second the pinned
+#      tip. Its own remote, so the planted reader never reaches another case's branch. Red at the base
+#      lander, which merges at --prepare whatever the value says.
+out42=$(
+  git init -q --template= --bare "$tmp/remote42.git"
+  setup_repo "$tmp/work42" origin "$tmp/remote42.git" >/dev/null
+  git push -q --no-verify origin main && git -C "$tmp/remote42.git" symbolic-ref HEAD refs/heads/main
+  R42=$(git rev-parse HEAD)
+  git checkout -q -b feat
+  pk=policy  # the planted reader's kit directory and file stem, named once
+  mkdir -p "./${KIT_REL}$pk"
+  printf 'import os, sys\nif sys.argv[1:] != ["get", "verdict.tree"]:\n    sys.exit(2)\nprint(os.environ.get("FIX_VERDICT_TREE", "prepared-merge"))\n' > "./${KIT_REL}$pk/$pk.py"
+  echo "u42" > src-u42.txt
+  git add -A && git commit -q -m "TOOL-tFix-42: a unit and the planted verdict.tree reader"
+  T42=$(git rev-parse HEAD)
+  o=$(FIX_VERDICT_TREE=build-tip bash "$lander" --prepare --slug tFix 2>&1); echo "pin-rc=$?"
+  [ "$(git rev-parse HEAD)" = "$T42" ] && echo head-kept=1
+  case "$o" in *"push-main: test.merge build-tip ${T42:0:8} tree $(git rev-parse "$T42^{tree}")"*) echo pin-witness=1 ;; esac
+  git checkout -q -b feat-merge "$T42"
+  o=$(FIX_VERDICT_TREE=prepared-merge bash "$lander" --prepare --slug tFix 2>&1); echo "merge-rc=$?"
+  M42=$(git rev-parse HEAD)
+  [ "$(git rev-parse HEAD^1)" = "$R42" ] && case "$o" in *"push-main: test.merge prepared-merge ${M42:0:8} tree $(git rev-parse "$M42^{tree}")"*) echo merge-witness=1 ;; esac
+  git checkout -q feat
+  o=$(FIX_VERDICT_TREE=build-tip bash "$lander" --land --slug tFix 2>&1); echo "land-rc=$?"
+  L42=$(git -C "$tmp/remote42.git" rev-parse refs/heads/main)
+  [ "$(git -C "$tmp/remote42.git" rev-parse "$L42^1")" = "$R42" ] && [ "$(git -C "$tmp/remote42.git" rev-parse "$L42^2")" = "$T42" ] && echo landed-merge=1
+  printf '%s\n' "$o" | tail -5
+)
+case "$out42" in
+  *"pin-rc=0"*"head-kept=1"*"pin-witness=1"*"merge-rc=0"*"merge-witness=1"*"land-rc=0"*"landed-merge=1"*)
+    ok "42 build-tip pins the tip at --prepare with its witness line, prepared-merge names its merge, and --land makes the landing merge onto the advertised tip" ;;
+  *) bad "42 expected the pinned tip, both witness lines and a landing merge of the pinned tip onto the advertised tip: $out42" ;;
+esac
+
+# 43 — TOOL-dWitnessedBar-6 AC9: under `verdict = "peer-node"` with no peer verdict, the fixture lander
+#      of `verdict_backends.py --fixture --plant lander-peer` publishes refs/gov/candidate/<sha> and
+#      exits 1 naming NONE, its remote's main unmoved. The plant builds the fixture repository and its
+#      bare remote in the system temp dir, beside a copy of THIS lander, and owes its all-held line.
+#      Red at a lander that skips the verdict read before its push and lands on its own hook.
+_vb_k=$(cd "$HERE" && for d in */; do [ -f "$d/verdict_backends.py" ] && { printf '%s' "${d%/}"; break; }; done)
+if [ -n "$_vb_k" ] && [ -n "$_py_arms" ]; then
+  out43=$("$_py_arms" "$HERE/$_vb_k/verdict_backends.py" --fixture --plant lander-peer 2>&1); rc43=$?
+  case "$rc43:$out43" in
+    "0:"*"plant lander-peer · "*"all held"*)
+      ok "43 under peer-node with no peer verdict the lander publishes its candidate, exits 1 naming NONE and lands nothing" ;;
+    *) bad "43 the lander-peer plant exited $rc43 or missed a scenario: $(printf '%s\n' "$out43" | grep -E 'MISSED|not run' | tr '\n' ' ')" ;;
+  esac
+else
+  echo "  skip — 43 no run-gates kit holding verdict_backends.py beside this lander, or no python launcher, so the peer-node landing arm did not run"
+fi
+
+# 44 — TOOL-dWitnessedBar-2 AC5: `off-node --backend local-hook` exits 1 naming peer-node and remote-ci,
+#      and the fixture lander of `verdict_backends.py --fixture --plant lander-refused`, under
+#      `hooks.bypass = "refused"` and `verdict = "local-hook"`, exits 1 before any push naming verdict and
+#      those two off-node names, its remote's refs unchanged. Red at a lander that honours `refused` on
+#      the node it claims to guard, which its own bypass skips.
+if [ -n "$_vb_k" ] && [ -n "$_py_arms" ]; then
+  out44=$("$_py_arms" "$HERE/$_vb_k/verdict_backends.py" --fixture --plant lander-refused 2>&1); rc44=$?
+  case "$rc44:$out44" in
+    "0:"*"plant lander-refused · "*"all held"*)
+      ok "44 under hooks.bypass refused and verdict local-hook the lander refuses before any push, naming the off-node backends" ;;
+    *) bad "44 the lander-refused plant exited $rc44 or missed a scenario: $(printf '%s\n' "$out44" | grep -E 'MISSED|not run' | tr '\n' ' ')" ;;
+  esac
+else
+  echo "  skip — 44 no run-gates kit holding verdict_backends.py beside this lander, or no python launcher, so the refused-bypass landing arm did not run"
+fi
+
 
 # 42-51 — TOOL-dPlacedRequest-15: THE FENCED PUSH. A bare remote and clone A, each push's hook a stub
 #      that writes the allow record `check_push_allow` reads and exits 0, the unattended kit beside

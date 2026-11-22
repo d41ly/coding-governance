@@ -58,7 +58,7 @@ leg. The shape is read from the file, which costs milliseconds against legs that
 tracked suites, 12 printing no count at all, four different spellings among the 15 that did, and 3
 floors. A leg with twelve silent exceptions checks nothing; one with twelve NAMED exceptions
 ratchets, and a row whose suite now complies REDS as stale — the same rule
-`tools/dead-path-waivers.txt` carries, for the same reason.
+`memory/project/dead-path-waivers.txt` carries, for the same reason.
 
 ## Shared seams
 

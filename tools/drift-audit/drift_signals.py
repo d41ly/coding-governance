@@ -1,6 +1,6 @@
 """drift_signals.py — coding-governance's own drift-signal declarations (dogfooding the kit).
 
-gov:kit drift-audit@1.34
+gov:kit drift-audit@1.35
 
 Copied from drift_signals.template.py and filled for THIS repo. The corpus root and disciplines are
 NOT restated here — they come from `.memory-tree.conf`, which the memory-tree kit owns.
@@ -130,29 +130,10 @@ EVIDENCE_GLOBS: list[str] = PRODUCT_GLOBS + [
 ]
 
 # --------------------------------------------------------------------------------------------
-# SHRINK_ONLY — the lists this repo promises will only ever get shorter, with the seed each was
-# measured at. The previous comment here claimed "this repo ships no waiver list of its own", which
-# was false when written and falser since: the lists below are live in `memory/project/`, every one
-# of them load-bearing for a gate. TOOL-aScouredKit-8 removed a count from this sentence — it said
-# "four" against a table of five, and it was wrong by the same act that added a row. The population
-# is the table underneath, and the signal derives and prints its own `of`.
-#
-# `legacy-files.txt` is EXCLUDED, deliberately and in writing rather than by omission: it is the
-# memory-tree kit's permanent grandfather list, not a debt being drained, so a shrink-only assertion
-# over it would be a ratchet nobody intends to turn.
+# THE LISTS THAT PROMISE TO SHRINK are no longer typed here (TOOL-dWitnessedBar-16 S8): they are the
+# `shrink-only` `[[ledger]]` registrations, read through the memory-tree kit's ledger factory, each
+# glossed by its population name, so a converted list joins the signal by being registered.
 # --------------------------------------------------------------------------------------------
-
-SHRINK_ONLY: dict[str, str] = {
-    "memory/project/id-orphan-waiver.txt": "the orphan-id waiver — one row per id cited but not defined",
-    "memory/project/curation-debt.txt": "files exempted from the index caps until they are curated",
-    "memory/project/corpus-path-unresolved.txt": "citations that cannot legally be repaired",
-    # No cardinality in this gloss. It said "empty today and meant to stay so" while the row beside
-    # it printed `entries 3`, so an operator reading the JSON was told the opposite of the derived
-    # value standing next to it (TOOL-aScouredKit-8).
-    "memory/project/unarmed-branches.txt": "fail branches with no arm; drains as each is armed",
-    "memory/project/trace-waiver.txt": "CLOSED specs no TRACE_GLOBS subject can name — signal 6's exemption",
-    "memory/project/docs-undocumented.txt": "user-facing members no help page anchors yet; drains as each is documented",
-}
 
 # --------------------------------------------------------------------------------------------
 # DECLARED_EMPTY — signals whose population is empty ON PURPOSE, so `--check` must not red them for
@@ -253,179 +234,21 @@ HANDKEPT: list[dict] = [
 ]
 
 # --------------------------------------------------------------------------------------------
-# PINS — seeded at MEASURED values, never guessed. Lower each as its population drains; raising one
-# needs the same justification any other ratchet raise does.
+# THE PINS are the rows of the `ceiling` population `drift-pins` (TOOL-dWitnessedBar-16 S8), its home
+# `memory/project/drift-pins.txt`: one row per signal, its count the pin, seeded at MEASURED
+# values and never guessed. A pin of 0 is no row, so the signal keeps its own tolerance of 0. A
+# raise is the `ratchet` pack's widen, which costs a widen record and its reason; each pin's
+# history, written here until this unit, is the conversion record's.
 # --------------------------------------------------------------------------------------------
 
-PINS: dict[str, int] = {
-    # ledger_rows_contradicting_git carries NO pin. Its population is empty by declaration (above),
-    # and a pin of 4 over an empty population is a ratchet that can never turn. If a ledger ever
-    # returns, the default tolerance of 0 is the right bar — not a number measured against rows that
-    # no longer exist.
-    # Main reached the same place from the other side while this branch was building: node `a`
-    # self-pruned its three landed rows and lowered the pin 4 -> 1, leaving node `b`'s single row.
-    # That drain is subsumed — the shards are now frozen under `archive/ledger/` and the signal is
-    # declared empty, so there is no population left for a pin of 1 to ratchet against.
-    # 19 — MEASURED, and re-measured after round 7 corrected the instrument. The first seed was 31
-    # through a skewed one: the blame side read `author-time` as UTC while the spec side is a
-    # hand-typed LOCAL date, so 11 rows were pure +0300 artifacts, and one line naming a token twice
-    # was counted twice. A pin seeded through a broken instrument makes the later fix read as an
-    # improvement, which is why this says so. 19 rows over 7 of 61 build READMEs. Report-only, so it
-    # never blocks a merge; it is here so a non-zero count does not read "out of tolerance" from day
-    # one. Drain it: each row is one README sentence to re-read against the spec revision beside it.
-    #
-    # 19 -> 4, a DRAIN by narrowing, not by re-reading (TOOL-aMendedFleet-51). The signal now grades
-    # only builds with at least one non-terminal spec: 27 of the 31 rows it read at that unit's base
-    # sat in builds whose every spec is CLOSED or WONTDO, frozen records nobody acts on. Re-measured
-    # at that unit's commit: 4 rows over 19 live-build READMEs, in dScaffoldedMirror and
-    # dScriptedRepeat.
-    "readme_mechanism_drift": 4,
-    # 7 — the number of legs in `<prefix>/gate-legs.json` whose script path the charter's gate-suite
-    # section does not cite, measured at 647bfd9. The old seed of 1 was a per-row boolean against a
-    # one-row population, so `value > pin` needed 2 against a ceiling of 1 and the signal could not
-    # fire at all. Its comment claimed "7 of 19" against a manifest that holds 37.
-    #
-    # DRAINED to 0: all seven were SELF-TESTS whose parent gate was cited but whose own script
-    # path was not; the charter now names them in one bullet, so every leg on the bar is spelled there.
-    #
-    # RE-ARMED at 0 over a different population (TOOL-aMendedFleet-52): the charter row is retired,
-    # and the pin now holds the README signal table's names to the names the engine reports, which
-    # agreed on the arming commit. The figures above describe the retired charter row.
-    "handkept_inventories_disagreeing_with_source": 0,
-    # `backlog_rows_outliving_closed_specs` and its pin RETIRED together at the backlog switch-over
-    # (TOOL-dDerivedDocket-34 S10): no backlog status is authored once BACKLOG_MODE is builds, so a
-    # row token compared with its spec's status has nothing left to read. The stance it counted is
-    # superseded in `memory/DECISIONS.md` under that unit's id.
-    # DRAINED to 0 at TOOL-aMendedFleet-47. It was seeded at 3 for the aspirational verbs curation
-    # declared before any definition led with them; every one of them is in use now, and the signal
-    # reads 0 of the declared table. GATEABLE, so a NEW aspirational verb reds `--check` until a
-    # definition uses it, which is the intended price of declaring one.
-    #
-    # It is the DELETION direction that earns the signal: a verb outliving the code that justified it
-    # is the one thing neither the map ratchet nor the lexicon gate can see. Raising this pin to admit
-    # an aspirational verb is the RATCHETS row below, which needs the move written here with a reason.
-    "lexicon_verbs_declared_but_unused": 0,
-    # 0, and it can move: the stamp is a date and the language surface is a commit date, so adding a
-    # LANGS entry without re-ratifying turns this to 1 the same day.
-    # MEASURED at the unit that added the signal, on this corpus, and expected to be small: the
-    # slug discriminator drops every fixture id with no waiver list at all, so what remains is
-    # actionable rather than tolerated. A drain target from the first commit, which is why it is
-    # shrink-only rather than a tolerance — and shrink-only means the RATCHETS row below, not
-    # this sentence.
-    # 2 - MEASURED on this corpus at the unit that added the signal. NO POPULATION FIGURES HERE,
-    # and that is the correction rather than an omission: an earlier revision stated the cited-id
-    # count and it was wrong at the very commit that wrote it, because the count moves whenever a
-    # record or a source file does. The signal derives and PRINTS its own `of`, `known_slugs` and
-    # `scanned_source_files` on every run; read them there. Both
-    # survivors belong to one foreign build whose records were minted and never written, and
-    # both are already filed as a backlog row. Every other dangling citation in the tree is a
-    # fixture id under a slug no record anchors, and the discriminator drops all of them with
-    # NO waiver list - which is the property that makes this population drainable rather than
-    # decorative. A drain target from the first commit.
-    "source_cited_ids_resolving_to_no_record": 2,
-    "lexicon_ratified_older_than_language_surface": 0,
-    # MEASURED at the unit that added the signal, TOOL-dLoggedFlight-13, against local `main`.
-    # Report-only, and it carries NO RATCHETS row on purpose: a sanctioned worktree landing raises
-    # this count through nobody's fault, so a raise needs no reason and holding the pin proves
-    # nothing. What the pin buys is the status column, which reads `ok` at the measured value and
-    # `over pin` once it rises. The records are not named here, for the reason the non-terminal-specs
-    # pin above gives: read the signal's own `detail`.
-    # RE-SEEDED at the drained value by TOOL-aMendedFleet-47, which stopped counting a `LANDING`
-    # record whose landing commit is on the base ref (owner ruling D12-i2, derived LANDED). What
-    # remains is non-`LANDING` records only; the detail's summary line counts the derived ones.
-    "run_records_nonterminal_but_merged": 2,
-    # MEASURED at the unit that added the signal, TOOL-dUnstuckLanding-15, against origin/main: live
-    # LEGACY ABORTED records whose work the content predicate reads landed and which carry no upheld
-    # `work-landed-at`. Report-only with no RATCHETS row, for the reason the pin above gives; it drains
-    # by `--settle` on each listed slug and a commit of what that staged, and is lowered as it does.
-    # Its sibling `discarded_work_landed` carries no pin: no ABORTED record here is dated on or after
-    # HANDOFF_CUTOFF yet, so it reads DEAD, and a pin over a population that does not exist is a guess.
-    # Drained 8 -> 0 by `--settle` on all eight slugs (aec85436), 2026-10-05.
-    "aborted_work_landed": 0,
-    # MEASURED at TOOL-aMendedFleet-15, after the prior unit's five dispositions. It stands in
-    # for check 20's `SEVERITY_UNLABELLED_PIN`, which the backlog switch-over blanked because the
-    # shard census reads a generated view as zero rows; this signal shipped with no pin, so it read
-    # `over pin 0` on every run and a rise moved no number anybody was held to.
-    # The population can only FALL on its own: V12 refuses an ask filed on or after ASK_CUTOFF with
-    # no SEV row, so a new unlabelled ask arrives only as a pre-cutoff row relocated from a stale
-    # branch, or as a terminal ask a REOPEN revives. Report-only, like its sibling above; the
-    # RATCHETS row below is what makes a raise cost a written `<old> -> <new>` reason.
-    "backlog_asks_unlabelled": 447,
-    # MEASURED at TOOL-aMendedFleet-21, which added the signal: every armed `_CUTOFF` key across the
-    # tracked root confs. GATEABLE, so a change that arms a new key reds `drift-audit records` unless
-    # another key stops being armed in the same change. Raising it instead is the RATCHETS row below,
-    # which needs the old and new values written here. The keys are not named: read the detail.
-    # 29 -> 30 at the reconcile of aMendedFleet with origin/main, 2026-10-06: main's dThriftyLanding
-    # handoff verb arrived with its own armed cutoff in .unattended.conf, and no key stopped being armed.
-    # 30 -> 31 at aQuotedBrief's close, 2026-10-09, by owner ruling: TOOL-aQuotedBrief-1 arms
-    # PROMPT_BRIEF_CUTOFF in .unattended.conf, the switch for the brief check and term 7, and no key
-    # stopped being armed.
-    # 31 -> 34 at aRoutedQuill's close, 2026-10-10, by owner ruling: TOOL-aRoutedQuill-3 arms
-    # ROUTED_COMMIT_CUTOFF and TOOL-aRoutedQuill-1 SPEC_TIER1_CUTOFF in .memory-tree.conf, and
-    # TOOL-aRoutedQuill-7 PROMPT_BRIEF_SKELETON_CUTOFF in .unattended.conf; no key stopped being armed.
-    # 34 -> 36 at dTrueNorth's close, 2026-10-22, under decision TOOL-dTrueNorth-28: TOOL-dTrueNorth-1 arms
-    # SPEC_CARRIES_CUTOFF and TOOL-dTrueNorth-5 SPEC_AUDIT_PIN_CUTOFF in .memory-tree.conf; no key stopped being armed.
-    # 36 -> 37 at TOOL-dSafePassage-34's pass, under ER:388 (TOOL-dSafePassage-42 section 8 F1 (a)): it arms
-    # SPEC_AC_ORDER_CUTOFF in .memory-tree.conf; no key stopped being armed.
-    # 37 -> 39 at dFoldedAudit's close, 2026-11-02, under decision TOOL-dFoldedAudit-16, whose 36 -> 38 was
-    # written before this branch took origin/main's 37: TOOL-dFoldedAudit-4 arms SPEC_SUPERSEDE_CUTOFF in
-    # .memory-tree.conf and TOOL-dFoldedAudit-7 SPEC_FOLD_CUTOFF in .unattended.conf, armed at the close; no key
-    # stopped being armed.
-    "cutoff_keys_armed": 39,
-    # 26 - MEASURED at TOOL-aMendedFleet-37, which added the signal, at its own commit: 26 of 27
-    # feature dossiers older than their paths, every one but the codebase-map dossier that unit
-    # refreshed. Report-only; the pin is a declared DRAIN, one dossier re-read at a time, and the
-    # RATCHETS row below makes a raise cost a written `<old> -> <new>` reason. The dossiers are not
-    # named here: read the signal's own detail, which derives them most-behind first.
-    "dossiers_older_than_their_paths": 26,
-}
-
 # --------------------------------------------------------------------------------------------
-# BASELINES — the gateable signals bounded by WHICH offenders they hold rather than how many
-# (TOOL-aMendedFleet-56). A pin bounds a count, so a drained offender and a new one at an equal count
-# read as no change; here a new id reds, a listed id that no longer offends reds until its line is
-# deleted, and the set may never gain an id against the base. There is no escape: each signal below
-# has a remedy that is not an addition. Delete an id the moment `--check` names it stale.
-# Moving a signal out of this dict into PINS is graded too (TOOL-aMendedFleet-110): it may be pinned
-# no higher than the size of the set the base held, so a move cannot buy headroom.
-#
-# Seeded with the offenders the BASE measured, never with ones that arrived on a branch: those red
-# as `new`, naming their id, until their cause is removed.
+# THE BASELINES are the rows of the `shrink-only` population `drift-baselines` (TOOL-dWitnessedBar-16
+# S8), its home `memory/project/drift-baselines.txt`: one row per (signal, offender id), the
+# gateable signals bounded by WHICH offenders they hold rather than how many (TOOL-aMendedFleet-56).
+# A new id reds, a listed id that no longer offends reds until its row is deleted, and the set may
+# never gain an id against the base; a signal moved to `drift-pins` is pinned no higher than the
+# set the base held (TOOL-aMendedFleet-110).
 # --------------------------------------------------------------------------------------------
-
-BASELINES: dict[str, list[str]] = {
-    # THE IDS ARE SPELLED HERE NOW, and that needed an engine change rather than a comment. This
-    # file sits inside EVIDENCE_GLOBS, so spelling an id here used to make it cite itself: measured,
-    # this file was returned in the citation set for both pinned ids, and the old pin could not be
-    # drained by removing the annotations describing it. The engine now excludes the project layer
-    # from signal 2's evidence, so a listed id drains when its real citations do.
-    #
-    # WHAT THE RESIDUAL IS, which is the part worth keeping: each listed spec is INPROGRESS with
-    # its id in tracked kit source, and INPROGRESS means "approved, build underway" — arguably
-    # TRUE of a built-but-unmerged unit. So this is the oracle's known ambiguity rather than
-    # proven rot. Listed rather than gated to zero for exactly that reason; read the detail before
-    # deleting one.
-    #
-    # RE-MEASURED at the unit that took the shipped id grammar and narrowed this signal's globs off
-    # test files. The value did not move, and that is the expected result rather than a failed
-    # change: each listed id keeps non-test product citations that neither the grammar swap nor
-    # the narrowing touches. What DID move is the judgeable population, upward, because the shipped
-    # grammar matches correction-form ids that the old hand-typed one silently declined to judge.
-    "non_terminal_specs_cited_by_product_source": [
-        "TOOL-aBatchedLintel-1",
-    ],
-    # The oracle's known residual. Its build commits are 59b4710 and its siblings, whose subjects
-    # name neither its id nor its slug: it closed on 2026-08-11, hours after the convention it is
-    # judged by landed the same day. Read it before deleting it.
-    #
-    # LISTED, NOT ZERO, and the difference is the whole reason the bound is trustworthy. Counting
-    # merge commits this signal reads 0 — but the only commits naming its slug are two reconcile
-    # merges whose subjects name the branch merged INTO, carrying another build's work. A 0 measured
-    # that way is a number, not a measurement.
-    "closed_specs_with_no_product_commit": [
-        "TOOL-aMooredAnchor-1",
-    ],
-}
 
 # --------------------------------------------------------------------------------------------
 # RATCHETS — the shrink-only NUMBERS whose weakening direction must be justified in place.
@@ -457,37 +280,12 @@ BASELINES: dict[str, list[str]] = {
 # key is discoverable from this file rather than only from the kit's default.
 RATCHET_LOOKBACK = 14
 
-# ONE SPELLING OF THIS FILE'S OWN PATH, not one per row. Every ratchet row below that names this
-# module used to carry the literal again, so adding a row RAISED the carried-literal count and
-# tripped the ban on a kit file spelling paths. The rows need a repo-relative path because the
-# reader resolves it against the repo root, so this is the narrowest honest form: one name, used
-# by every row that names this module, and adding another row costs nothing.
-#
-# DERIVED from this file's own location (TOOL-aRepatriatedFork-29 S6); see `_TOOLS` at the top.
-_THIS_FILE = _HERE.relative_to(_CHECKOUT).as_posix()
-
 RATCHETS: list[dict] = [
-    {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
-    {"file": ".memory-tree.conf", "key": "DEAD_PATH_PIN", "weakens": "up"},
     {"file": ".memory-tree.conf", "key": "UNIVERSAL_BUDGET", "weakens": "up"},
-    {"file": ".memory-tree.conf", "key": "ROW_DUPLICATE_PIN", "weakens": "up"},
-    {"file": _THIS_FILE,
-     "key": "handkept_inventories_disagreeing_with_source", "weakens": "up"},
-    # The signal is report-only, so crossing this pin never blocks a merge. What the row buys is
-    # that RAISING it needs a reason written in place — which is the whole of "shrink-only" for
-    # an ungateable pin, and without it the word is a comment.
-    {"file": _THIS_FILE,
-     "key": "source_cited_ids_resolving_to_no_record", "weakens": "up"},
-    {"file": _THIS_FILE, "key": "backlog_asks_unlabelled", "weakens": "up"},
-    {"file": _THIS_FILE, "key": "cutoff_keys_armed", "weakens": "up"},
-    {"file": _THIS_FILE, "key": "dossiers_older_than_their_paths", "weakens": "up"},
-    # Gateable at 0: without this row, raising it to admit a new aspirational verb would look like
-    # a drain to `--check` (TOOL-aNumeralWarden-3).
-    {"file": _THIS_FILE, "key": "lexicon_verbs_declared_but_unused", "weakens": "up"},
-    # A pin in ANOTHER kit's conf. The ratchet does not care which file a scalar lives in, and
-    # codebase-map has no shrink-only mechanism of its own - so an adopter without drift-audit
-    # gets a declared pin and no enforcement, which the conf example states rather than hides.
-    {"file": ".codebase-map.conf", "key": "DOSSIER_DECISIONS_EMPTY_PIN", "weakens": "up"},
+    # The six rows naming this layer's own pins retired with its `PINS` dict (TOOL-dWitnessedBar-16 S8),
+    # and the four naming conf pins with their keys (TOOL-dWitnessedBar-17 S5): each is a keyed
+    # population now, and its growth is the `ratchet` pack's `never gains` case, which costs a widen
+    # record and its reason where these rows cost an `<old> -> <new>` comment. A budget is no pin.
 ]
 
 CHARTER = "AGENTS.md"

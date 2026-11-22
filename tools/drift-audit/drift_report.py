@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.34
+gov:kit drift-audit@1.35
 
     python <prefix>/drift-audit/drift_report.py            # human table, always exits 0
     python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
     python <prefix>/drift-audit/drift_report.py --check    # exit 1 if a GATEABLE signal is over its pin
     python <prefix>/drift-audit/drift_report.py --escape-ratio 2026-09   # on demand, minutes, never the bar
+    python <prefix>/drift-audit/drift_report.py --gate-health --selection <path> [--write --build <slug> --unit <id>] [--with <flake record>]
+    python <prefix>/drift-audit/drift_report.py --gate-health --fixture differs|lower|short|write|held --selection <path>
 
 WHY THIS KIT EXISTS. A governance repo gates its CODE contracts hard and its RECORD contracts not at
 all: a memory-hygiene gate checks that a spec Status token is spelled legally, never that it is TRUE.
@@ -24,9 +26,12 @@ can still move over a non-empty population, and a dead probe prints DEAD PROBE i
 WHAT IS ENGINE AND WHAT IS PROJECT. The signal implementations are generic over any repo that
 follows the governance playbook (a memory tree, TEMPLATE-SPEC status headers, a per-node in-flight
 ledger, an agent auto-memory directory). Everything genuinely repo-shaped — which paths are product
-source, which lists promise to shrink, which hand-kept inventories mirror a generated one, and the
-PINS — lives in the project layer `drift_signals.py`, copied from `drift_signals.template.py` at
-adoption. Same split as codebase-map's `map_extractors.py`.
+source and which hand-kept inventories mirror a generated one — lives in the project layer
+`drift_signals.py`, copied from `drift_signals.template.py` at adoption. Same split as codebase-map's
+`map_extractors.py`. Three facts are no longer typed there (TOOL-dWitnessedBar-16 S8): the lists that
+promise to shrink are the `shrink-only` `[[ledger]]` registrations, read through the memory-tree kit's
+ledger factory; each signal's pin is a row of the `ceiling` population `drift-pins`; and each id set a
+gateable signal is bounded by is the rows of the `shrink-only` population `drift-baselines`.
 
 NO SECOND CONF. The corpus root and disciplines are read from `.memory-tree.conf`, which the
 memory-tree kit owns. This kit declares no conf of its own and takes no `--memory-root` flag: a
@@ -41,6 +46,7 @@ import argparse
 import ast
 import datetime
 import hashlib
+import importlib
 import json
 import math
 import os
@@ -48,6 +54,58 @@ import pathlib
 import re
 import subprocess
 import sys
+import tempfile
+
+# >>> hold_predicate -- canonical copy: held_halves.py in the gov run-gates kit (byte-identical; gated)
+def test_held(leg):
+    """The runner's kit hold, one statement of it: a manifest row whose `subject` is `kit` or whose
+    `chunk` is `selftests`, the `kit` source of `run-gates.sh#derive_hold_source`. A `quarantine` or
+    `level` hold is a selection row, never a manifest key, so no reader of one row can see it. The
+    drift-audit kit carries this block inline, and `resolve-python.test.sh`'s parity table reds a copy
+    that drifts (TOOL-dWitnessedBar-51 S21)."""
+    return leg.get("subject") == "kit" or leg.get("chunk") == "selftests"
+# <<< hold_predicate
+
+
+# >>> selection_row -- canonical copy: verdict_flow.py in the gov run-gates kit (byte-identical; gated)
+# THE HOLD (TOOL-dWitnessedBar-5). The runner's `HOLD_SOURCES` is `kit` and these two: `kit` it derives
+# from the manifest row itself, so a selection holding a `kit` row is ignored and its leg runs.
+SELECTION_SOURCES = ("quarantine", "level")
+# A selection row's fifth field (TOOL-dWitnessedBar-30 S1): `run` executes the leg outside the verdict.
+SELECTION_MODES = ("hold", "run")
+
+
+def read_selection(text, names=None):
+    """(rows [(leg, source, note, mode)], refusals [line]) of a selection record's text. A row that is
+    not `held` and three or four fields, whose source is outside SELECTION_SOURCES, whose mode is outside
+    SELECTION_MODES, or whose leg `names` lacks is refused and its leg runs; a row with no mode is `hold`
+    (TOOL-dWitnessedBar-30 S1). `#` lines are the header. The drift-audit kit's `drift_report.py`
+    carries this block inline, and `resolve-python.test.sh`'s parity table reds a copy that drifts
+    (TOOL-dWitnessedBar-62 S17)."""
+    rows, refusals = [], []
+    for n, ln in enumerate(text.splitlines(), 1):
+        if not ln.strip() or ln.startswith("#"):
+            continue
+        f = ln.split("\t")
+        if len(f) not in (4, 5) or f[0] != "held" or not f[1]:
+            refusals.append(f"selection row {n} is not `held` · leg · source · note [· mode], ignored")
+        elif f[2] not in SELECTION_SOURCES:
+            refusals.append(f"selection row {n} holds {f[1]} by '{f[2]}', outside "
+                            f"{' '.join(SELECTION_SOURCES)}, ignored: it runs")
+        elif len(f) == 5 and f[4] not in SELECTION_MODES:
+            refusals.append(f"selection row {n} holds {f[1]} in mode '{f[4]}', outside "
+                            f"{' '.join(SELECTION_MODES)}, ignored: it runs")
+        elif names is not None and f[1] not in names:
+            refusals.append(f"selection row {n} holds {f[1]}, which the manifest lacks, ignored")
+        else:
+            rows.append((f[1], f[2], f[3], f[4] if len(f) == 5 else "hold"))
+    return rows, refusals
+# <<< selection_row
+
+
+# The kit homes the gate-health fixture plants its scratch repository with, each named once.
+DRIFT_KIT = "drift-audit"
+TREE_KIT = "memory-tree"
 
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
@@ -92,7 +150,7 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-KIT_DRIFT_AUDIT_VERSION = "1.34"
+KIT_DRIFT_AUDIT_VERSION = "1.35"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -183,6 +241,77 @@ def parse_conf_text(text: str) -> dict[str, str]:
     return conf
 
 
+# THE POPULATIONS DRIFT READS (TOOL-dWitnessedBar-16 S8), through the memory-tree kit's ledger factory,
+# which this kit requires: every `shrink-only` registration is a list that promises to shrink, glossed
+# by its population name; `drift-pins` holds each signal's pin, a row of count 0 never written, so a
+# signal with no row keeps its own tolerance; `drift-baselines` holds the id set a gateable signal is
+# bounded by. A raised pin is the `ratchet` pack's widen case. WHAT THIS DOES NOT CHECK: a registration a
+# kit declares for a population no drift signal reads, which is the ratchet pack's to grade.
+PINS_POPULATION = "drift-pins"
+BASELINES_POPULATION = "drift-baselines"
+
+
+def load_memory_tree(anchor: str, what: str, why: str):
+    """The memory-tree kit's module `anchor`, found through the sibling-kit resolver, never a spelled path,
+    and imported in-process: the one loader of every memory-tree module drift reads (TOOL-dWitnessedBar-1
+    §8 F4). A kit that does not resolve is a DriftError naming `what` is missing and `why` drift reads it."""
+    here = pathlib.Path(__file__).resolve().parent
+    try:
+        kit = resolve_kit_dir("memory-tree", anchor, here)
+    except LookupError as exc:
+        raise DriftError(f"the memory-tree kit's {what} is not found, and {why}: {exc}") from None
+    if str(kit) not in sys.path:
+        sys.path.append(str(kit))
+    return importlib.import_module(pathlib.PurePath(anchor).stem)
+
+
+def load_ledger():
+    """The memory-tree kit's ledger factory, found through the sibling-kit resolver, never a spelled path."""
+    return load_memory_tree("legacy_ledger.py", "ledger factory",
+                            "drift reads its shrink-only lists, pins and baselines through it")
+
+
+def read_drift_populations(root: pathlib.Path):
+    """-> (the factory, every registration, {signal: pin}, {signal: [id, ...]}) at `root`; where no
+    memory-tree factory resolves, (None, [], {}, {}) with one stderr line saying so: no list is read
+    as shrinking, every gateable signal grades at its own tolerance, and that tree is not refused."""
+    try:
+        ledger = load_ledger()
+    except DriftError as exc:
+        print(f"drift-report: no shrink-only list, pin or baseline is read: {exc}", file=sys.stderr)
+        return None, [], {}, {}
+    try:
+        regs = ledger.read_registrations(root)
+    except ValueError as exc:
+        raise DriftError(f"a [[ledger]] registration is refused, so drift's populations cannot be "
+                         f"found:\n{exc}") from None
+    named = {r.population: r for r in regs}
+
+    def read_population(population):
+        reg = named.get(population)
+        if reg is None or not (root / reg.home).is_file():
+            return {}
+        got, bad = ledger.read_ledger(root, reg)
+        if bad:
+            raise DriftError(f"{reg.home}: {ledger.render_malformed(bad[0])}")
+        return got
+
+    pins = {key[0]: row[0] for key, row in read_population(PINS_POPULATION).items()}
+    baselines: dict = {}
+    for sig, ident in read_population(BASELINES_POPULATION):
+        baselines.setdefault(sig, []).append(ident)
+    return ledger, regs, pins, baselines
+
+
+def derive_declared_empty(ctx) -> set:
+    """The signals empty BY DECLARATION: the project layer's `DECLARED_EMPTY`, and the shrink signal
+    wherever no `shrink-only` registration exists, derived and never typed (TOOL-dWitnessedBar-16 S8)."""
+    declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
+    if not ctx.shrink_only:
+        declared.add("shrink_only_lists_not_shrinking")
+    return declared
+
+
 def load_project_layer(root: pathlib.Path):
     """Import the adopter's `drift_signals.py` from beside this file. Absence is a refusal."""
     here = pathlib.Path(__file__).resolve().parent
@@ -195,7 +324,7 @@ def load_project_layer(root: pathlib.Path):
     sys.path.insert(0, str(here))
     import drift_signals  # noqa: E402
 
-    for attr in ("PRODUCT_GLOBS", "SHRINK_ONLY", "HANDKEPT", "PINS"):
+    for attr in ("PRODUCT_GLOBS", "HANDKEPT"):
         if not hasattr(drift_signals, attr):
             raise DriftError(f"drift_signals.py is missing required attribute {attr}")
     return drift_signals
@@ -395,65 +524,70 @@ def build_lang_mode_findings(git: "Git", root: pathlib.Path, path: str = ".lexic
 
 
 # --------------------------------------------------------------------------------------------
-# TOOL-aMendedFleet-56 S6 — BASELINES is shrink-only, read at the base like the two guards above.
+# TOOL-aMendedFleet-56 S6 — the baselines are shrink-only, read at the base like the two guards above,
+# and since TOOL-dWitnessedBar-16 S8 they and the pins are the populations `drift-baselines` and
+# `drift-pins`, read at the base through the ledger factory rather than as a project layer's literals.
 #
 # A pin bounds a COUNT, so a drained offender and a new one at an equal count read as no change; an
 # id set bounds the offenders themselves. This guard keeps the set from growing: an id the base's
 # set did not carry is a finding, and a FIRST seed may not exceed the pin the base held for that
 # signal. There is no escape: each signal has a remedy that is not an addition.
 #
-# TOOL-aMendedFleet-110: nor is MOVING a signal out of the set. Every signal the base's BASELINES
-# held is graded, listed in the working set or not, so a signal leaving BASELINES for PINS may be
-# pinned no higher than the size of the set the base held. Deleting the set and pinning it at any
-# count used to pass, because only the working dict was walked and an empty one returned early.
-# ponytail: the base layer is read with `ast.literal_eval`, so a non-literal BASELINES or PINS at the
-# base is a finding rather than an evaluation; executing the base's code would be the upgrade.
-def build_baseline_findings(git: "Git", path: str, baselines: dict, pins: dict) -> list:
-    """Findings for every signal whose working `BASELINES` set is WEAKER than the base allows."""
-    base = git.run("show", f"{git.base_ref}:{path}")
-    if base.returncode != 0:
-        return []                          # the layer is new on this branch; nothing to compare
-    try:
-        tree = ast.parse(base.stdout)
-    except SyntaxError as exc:
-        return [f"{path}: the project layer at {git.base_ref} does not parse ({exc.msg}, line "
-                f"{exc.lineno}), so BASELINES cannot be compared against the base"]
-    nodes = {}
-    for node in tree.body:
-        if isinstance(node, ast.Assign):
-            names = [t.id for t in node.targets if isinstance(t, ast.Name)]
-        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.value:
-            names = [node.target.id]
-        else:
-            continue
-        for n in names:
-            if n in ("BASELINES", "PINS"):
-                nodes[n] = node.value      # the last assignment wins, as it does on import
-    was = {}
-    for n, v in nodes.items():
-        try:
-            was[n] = ast.literal_eval(v)
-        except ValueError:
-            return [f"{path}: {n} at {git.base_ref} is not a literal, so BASELINES cannot be "
-                    f"compared against the base"]
-    old_sets, old_pins = was.get("BASELINES") or {}, was.get("PINS") or {}
+# TOOL-aMendedFleet-110: nor is MOVING a signal out of the set. Every signal the base's baselines
+# held is graded, listed in the working set or not, so a signal leaving `drift-baselines` for
+# `drift-pins` may be pinned no higher than the size of the set the base held. Deleting the set and
+# pinning it at any count used to pass, because only the working set was walked.
+def read_population_at_base(git: "Git", ledger, reg):
+    """-> (the rows of `reg` at drift's base ref, None where the base holds no home; a finding, or "")."""
+    shown = git.run("show", f"{git.base_ref}:./{reg.home}")
+    if shown.returncode != 0:
+        return None, ""
+    at = tuple(i for i, f in enumerate(reg.fields) if f in reg.verbatim)
+    rows, bad = ledger._parse_rows(shown.stdout.split("\n"), len(reg.fields), ("sha", "disposition"), at)
+    if bad:
+        return None, (f"{reg.home}: at {git.base_ref} it does not parse ({ledger.render_malformed(bad[0])}), "
+                      f"so the baselines cannot be compared against the base")
+    return rows, ""
+
+
+def build_baseline_findings(git: "Git", ledger, regs, baselines: dict, pins: dict) -> list:
+    """Findings for every signal whose working `drift-baselines` set is WEAKER than the base allows."""
+    named = {r.population: r for r in regs}
+    breg, preg = named.get(BASELINES_POPULATION), named.get(PINS_POPULATION)
+    if breg is None or ledger is None:
+        return []
+    old_rows, why = read_population_at_base(git, ledger, breg)
+    if why:
+        return [why]
+    if old_rows is None:
+        return []                          # the population is new on this branch; nothing to compare
+    old_pins = {}
+    if preg is not None:
+        pin_rows, why = read_population_at_base(git, ledger, preg)
+        if why:
+            return [why]
+        old_pins = {key[0]: row[0] for key, row in (pin_rows or {}).items()}
+    old_sets: dict = {}
+    for sig, ident in old_rows:
+        old_sets.setdefault(sig, set()).add(ident)
+    path, pin_path = breg.home, preg.home if preg is not None else PINS_POPULATION
     out = []
     for sig, ids in sorted(baselines.items()):
         if sig in old_sets:
-            for i in sorted(set(ids) - set(old_sets[sig])):
-                out.append(f"{path}: BASELINES[{sig!r}] gained {i} against {git.base_ref}, which "
-                           f"WEAKENS it. The set is shrink-only and has no escape: remove the cause "
-                           f"that makes {i} an offender instead of listing it.")
+            for i in sorted(set(ids) - old_sets[sig]):
+                out.append(f"{path}: {sig!r} gained {i} against {git.base_ref}, which WEAKENS it. The "
+                           f"set is shrink-only and has no escape: remove the cause that makes {i} an "
+                           f"offender instead of listing it.")
         elif len(set(ids)) > old_pins.get(sig, 0):
-            out.append(f"{path}: BASELINES[{sig!r}] is seeded with {len(set(ids))} ids where the "
-                       f"base pins it at {old_pins.get(sig, 0)} in PINS, which WEAKENS it. Seed only "
-                       f"the offenders the base's pin already bounds.")
+            out.append(f"{path}: {sig!r} is seeded with {len(set(ids))} ids where the base pins it at "
+                       f"{old_pins.get(sig, 0)} in {PINS_POPULATION}, which WEAKENS it. Seed only the "
+                       f"offenders the base's pin already bounds.")
     for sig in sorted(set(old_sets) - set(baselines)):
-        size = len(set(old_sets[sig]))
+        size = len(old_sets[sig])
         if sig in pins and pins[sig] > size:
-            out.append(f"{path}: {sig!r} moved from BASELINES to PINS at {pins[sig]} where the "
-                       f"base's set held {size} ids at {git.base_ref}, which WEAKENS it. Pin it no "
-                       f"higher than {size}, the set's size, and drain from there.")
+            out.append(f"{pin_path}: {sig!r} moved from {BASELINES_POPULATION} to {PINS_POPULATION} at "
+                       f"{pins[sig]} where the base's set held {size} ids at {git.base_ref}, which "
+                       f"WEAKENS it. Pin it no higher than {size}, the set's size, and drain from there.")
     return out
 
 
@@ -736,10 +870,11 @@ def signal_spec_status(ctx) -> dict:
         # `-1` was reported with three citations, all of them `-11`'s, on a build whose ids ran
         # past 10. The over-count GROWS with the build: a 30-unit build mis-attributes ids 1, 2
         # and 3 to twenty siblings, each reading as a stale status header nobody can find.
-        # THE LAYER IS NOT EVIDENCE (TOOL-aMendedFleet-56 S10): a `BASELINES` list spelling this id
-        # would otherwise cite it, and a listed id could then never drain.
+        # THE LAYER IS NOT EVIDENCE (TOOL-aMendedFleet-56 S10), nor are drift's two population homes
+        # (TOOL-dWitnessedBar-16 S8): a baselines row spelling this id would otherwise cite it, and a
+        # listed id could then never drain.
         hit = ctx.git.run("grep", "-l", "-w", "-F", own.group(1), "--", *ctx.evidence_globs,
-                          *([f":(exclude){ctx.layer_path}"] if ctx.layer_path else []))
+                          *[f":(exclude){p}" for p in ctx.not_evidence])
         if hit.returncode == 0 and hit.stdout.strip():
             suspect.append({
                 "file": str(p.relative_to(ctx.root)).replace("\\", "/"),
@@ -1138,12 +1273,13 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         elif not (ctx.root / posix).is_file():
             bad_declaration = "names a file that is not there, so nothing it would waive is waived"
     wpath = ctx.root / (declared or f"{ctx.memory_root}/project/trace-waiver.txt")
-    if not bad_declaration and wpath.is_file():
-        for raw_row in wpath.read_text(encoding="utf-8", errors="replace").splitlines():
-            if not raw_row.strip() or raw_row.lstrip().startswith("#"):
-                continue
-            cols = raw_row.split("\t")
-            waived[cols[0].strip()] = cols[-1].strip() if len(cols) > 1 else ""
+    # A ledger population keyed by spec path and unit id (TOOL-dWitnessedBar-16 S4), read through the
+    # factory; a row it refuses waives nothing and is carried as a finding of its own below.
+    refused_rows: list = []
+    if not bad_declaration and wpath.is_file() and ctx.ledger is not None:
+        keyed, refused_rows = ctx.ledger.read_rows(wpath, 2)
+        for spec_path, unit in keyed:
+            waived[spec_path] = unit
     used: set[str] = set()
 
     suspect, checked, unjudged, records_only = [], 0, 0, []
@@ -1193,6 +1329,11 @@ def signal_closed_specs_untraceable(ctx) -> dict:
             "file": rel, "id": "(stale waiver)", "slug": "(stale waiver)", "closed": "",
             "note": "waives a spec that is absent, not terminal, traceable again, or declaring "
                     "records-only in its own status header",
+        })
+    for number, _kind, raw in refused_rows:
+        suspect.append({
+            "file": f"{wpath.name}:{number}", "id": "(refused waiver row)", "slug": "(refused waiver row)",
+            "closed": "", "note": f"not a ledger row, so it waives nothing: {raw.strip()[:120]}",
         })
     if bad_declaration:
         suspect.append({
@@ -2202,7 +2343,7 @@ def build_cutoff_keys_armed(ctx) -> dict:
                 if v.strip():
                     armed.append({"file": f, "key": k, "value": v})
     gateable = name in ctx.pins
-    note = [] if gateable else [{"note": "no budget declared: add a PINS entry"}]
+    note = [] if gateable else [{"note": f"no budget declared: add a {PINS_POPULATION} row"}]
     return {"signal": name, "value": len(armed), "of": of,
             "tolerance": ctx.pins.get(name, 0), "gateable": gateable,
             "live": of > 0, "detail": note + armed + skipped}
@@ -2456,7 +2597,9 @@ def build_backlog_stragglers(ctx) -> dict:
 _RUN_PHASES_TERMINAL = frozenset({"LANDED", "ABORTED"})
 _RUN_PARK_KINDS = frozenset({"decision", "abort", "override", "waiver", "proposal", "rescope",
                              "dispatch", "review", "brief", "hold", "resume", "handoff", "refusal",
-                             "fix-pass"})
+                             "fix-pass", "fix-of"})
+# `fix-of` joined in TOOL-dWitnessedBar-21, `--dispatch --fix-of`'s history row, the red a fix pass is
+# declared against; not owed.
 # `fix-pass` joined in TOOL-dDeclaredLoop-32, `--fix-pass`'s history row, not owed; its hyphen is why
 # `_RUN_ROW` below reads `[a-z][a-z-]*`.
 # `refusal` joined the driver's PARK_KINDS in TOOL-dDeclaredLoop-14, a history row and not owed.
@@ -3552,6 +3695,284 @@ def build_live_builds_without_activity(ctx) -> dict:
             "unjudgeable": unjudgeable, "detail": detail}
 
 
+# --------------------------------------------------------------------------------------------
+# Signal - gate health, the reliability bar measured from the flake records (TOOL-dWitnessedBar-1)
+#
+# `verdict.flakes.entry`'s `measured` value stands for the threshold derived here: once every leg of the
+# bar has thirty verdicts in the flake records, one more than the 90th percentile, by nearest rank (§8 F2),
+# across the bar's legs, of each leg's flakes in its newest ten by `Ended` (cl-dClosedLoop-0339), written
+# `<count>/10`. The bar is every leg of the gate-leg manifest beside this kit's tool root that the kit hold
+# does not hold, read through `test_held`, the run-gates kit's predicate carried inline as the
+# `hold_predicate` block since this kit cannot import that one (TOOL-dWitnessedBar-51 S21), less each leg
+# a `quarantine` or `level` row of the selection record named by `--selection <path>` holds, which
+# `--gate-health` requires, an empty file holding nothing (TOOL-dWitnessedBar-57 S18); the drift report's
+# own `gate_health` signal names no selection and reads none. The records are read
+# through the memory-tree factory, loaded in-process by `load_memory_tree`, and their body through its
+# `read_flake_body` and `derive_flaked`, so the row grammar has one home.
+#
+# REPORT-ONLY, and `n/a` while unarmed: `value` is -1 there and the first detail row names each short
+# leg, so no reader takes an unarmed measurement for a zero. DEAD PROBE only where no factory resolves or
+# no manifest reads. `--gate-health` prints the measurement and, with `--write`, writes it as a
+# `gate-health` record when armed, which `verdict_flow.py flakes` reads as the threshold in force.
+#
+# WHAT IT DOES NOT CHECK: that a flake record's rows are true, which the runner wrote; a leg's release,
+# which bounds a hold and not the bar's health; a window other than ten.
+
+
+SELECTION_HOLDS = ("quarantine", "level")  # the selection sources that hold a leg, the runner's own pair
+
+
+def read_selection_holds(path) -> set:
+    """The legs the selection record at `path` holds: each row the runner's own row reader, the
+    `selection_row` block's `read_selection` carried inline above (TOOL-dWitnessedBar-62 S17), accepts
+    and whose source is in SELECTION_HOLDS, in either mode, since a `run` row too runs outside the
+    verdict (TOOL-dWitnessedBar-57 S18). A row it refuses, a mode outside `hold` and `run` included,
+    holds nothing, as the runner ignores it and the leg runs. An empty file holds nothing. A DriftError
+    where the file does not read."""
+    try:
+        text = pathlib.Path(path).read_bytes().decode("utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise DriftError(f"--selection {path} does not read, so the runner's holds are unknown: {exc}") from None
+    rows, _refused = read_selection(text)
+    return {leg for leg, source, _note, _mode in rows if source in SELECTION_HOLDS}
+
+
+def read_gate_health(root: pathlib.Path, extra: str | None = None, selection=None):
+    """-> (rows, bar, runs, skipped). `rows` is {leg: [(ended, run, flaked), ...]} over every tracked flake
+    record of `root`, read through the factory's `read_records`, plus `extra`, one repo-relative flake record
+    not yet staged (§8 F5); `bar` the manifest's legs the kit hold does not hold, less the legs the
+    `quarantine` and `level` rows of the selection record at `selection` hold (TOOL-dWitnessedBar-57 S18),
+    in manifest order; `runs` the `Run` of every record read, oldest `Ended` first; `skipped` [(path,
+    why)] for each record the factory grades malformed or whose `Ended` does not read. A DriftError where
+    no factory resolves, the manifest or the selection does not read, or the tracked records do not.
+    `selection` None, the drift report's own signal, reads no selection hold."""
+    why = "drift measures gate health from the flake records through it"
+    br = load_memory_tree("build_records.py", "record factory", why)
+    dl = load_memory_tree("design_lib.py", "design library", why)
+    manifest = pathlib.Path(__file__).resolve().parent.parent / "gate-legs.json"
+    selected = read_selection_holds(selection) if selection is not None else set()
+    try:
+        bar = [leg["name"] for leg in json.loads(manifest.read_text(encoding="utf-8"))
+               if not test_held(leg) and leg["name"] not in selected]
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+        raise DriftError(f"the gate-leg manifest {manifest.as_posix()} does not read, so no bar leg is "
+                         f"known: {exc}") from None
+
+    def read_flake(path, text):
+        fields, bad, name = br.read_record(path, text, "flake")
+        return {"path": path, "fields": fields, "rows": br.read_flake_body(text), "malformed": bad,
+                "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None}
+    try:
+        recs = br.read_records(root, dl.read_design_conf(root), "flake", read_flake)
+    except dl.DesignRefusal as exc:
+        raise DriftError(f"the tracked flake records do not read: {exc}") from None
+    if extra and extra not in {r["path"] for r in recs}:
+        recs.append(read_flake(extra, (root / extra).read_bytes().decode("utf-8", "replace")))
+    dated, skipped = [], []
+    for r in recs:
+        try:
+            ended = datetime.datetime.fromisoformat(
+                str(r["fields"].get("Ended", "")).strip().strip("`").replace("Z", "+00:00"))
+        except ValueError:
+            ended = None
+        if r["malformed"]:
+            skipped.append((r["path"], "; ".join(f"{key} {said}" for key, said in r["malformed"])))
+        elif ended is None:
+            skipped.append((r["path"], "its Ended does not read as an instant"))
+        else:
+            utc = datetime.timezone.utc
+            dated.append(((ended if ended.tzinfo else ended.replace(tzinfo=utc)).astimezone(utc), r))
+    dated.sort(key=lambda d: (d[0], d[1]["path"]))
+    rows: dict = {}
+    for ended, r in dated:
+        for leg, first, rerun in r["rows"]:
+            rows.setdefault(leg, []).append((ended, r["fields"]["Run"], br.derive_flaked(first, rerun)))
+    return rows, bar, list(dict.fromkeys(r["fields"]["Run"] for _, r in dated)), skipped
+
+
+def derive_gate_health(rows: dict, bar: list) -> dict:
+    """The measurement over `rows` and the `bar` legs, a pure function: each bar leg's verdicts and its
+    flakes in its newest ten by `Ended`; armed only where every bar leg has thirty verdicts, `value` then one
+    more than the nearest-rank 90th percentile of those flake counts (S3), else -1; `said` the measurement in
+    words, `measured <count>/10 · legs <armed>/<bar legs>` or `unarmed · <leg> <rows>/30 …`."""
+    legs = []
+    for leg in bar:
+        got = sorted(rows.get(leg, ()), key=lambda r: (r[0], r[1]), reverse=True)
+        legs.append({"leg": leg, "verdicts": len(got), "flakes": sum(1 for r in got[:10] if r[2])})
+    short = [d for d in legs if d["verdicts"] < 30]
+    value = -1
+    if legs and not short:
+        counts = sorted(d["flakes"] for d in legs)
+        value = counts[-(-9 * len(counts) // 10) - 1] + 1   # nearest rank: the ceil(0.9 n)-th, in integers
+    said = (f"measured {value}/10 · legs {len(legs)}/{len(legs)}" if value >= 0 else
+            "unarmed · " + (" · ".join(f"{d['leg']} {d['verdicts']}/30" for d in short)
+                            or "the manifest holds no bar leg"))
+    return {"value": value, "armed": len(legs) - len(short), "of": len(legs), "said": said, "legs": legs}
+
+
+def measure_gate_health(ctx) -> dict:
+    """`gate_health`: the reliability bar derived from the flake records, or `unarmed` naming each bar leg
+    short of thirty verdicts; DEAD PROBE only where no factory resolves or no manifest reads."""
+    name = "gate_health"
+    rec = {"signal": name, "value": -1, "of": 0, "armed": 0, "tolerance": ctx.pins.get(name),
+           "gateable": False, "live": False, "detail": []}
+    try:
+        rows, bar, runs, skipped = read_gate_health(ctx.root)
+    except DriftError as exc:
+        rec["detail"] = [{"dead": str(exc)}]
+        return rec
+    got = derive_gate_health(rows, bar)
+    # live: the factory and the manifest both read, since the population moves as verdicts accrue
+    rec.update(value=got["value"], of=got["of"], armed=got["armed"], live=bar is not None)
+    rec["detail"] = ([{"gate_health": got["said"], "verdicts": len(runs)}]
+                     + [{"skipped": path, "why": said} for path, said in skipped] + got["legs"])
+    return rec
+
+
+def run_gate_health_fixture(case: str, selection) -> int:
+    """`--gate-health --fixture <case>` (TOOL-dWitnessedBar-1 AC1 to AC4): a scratch repository holding this
+    kit, the memory-tree factory and a manifest of ten bar legs, one `kit` leg and one `selftests` leg, its
+    flake records planted through the factory and the mode run there as a subprocess, where it finds its
+    root, its factory and its manifest as an install does. `differs`: thirty records whose newest ten hold
+    eight legs at no flake and two at three, and two legs flaked five times in the twenty before them:
+    `measured 4/10`, naming the thirty runs. `lower`: nine legs never flaked and one once: `measured 1/10`.
+    `short`: one row of one leg deleted: `unarmed` naming it at 29/30 and no held leg, and `--write` writes
+    nothing. `write`: `--write` writes one gate-health record the factory's `read` passes; `--with` naming
+    no flake record is refused, writing nothing; with one row deleted `--write` writes nothing; and `--with`
+    naming an unstaged thirtieth verdict arms it. `held` (TOOL-dWitnessedBar-51 AC17): a manifest of one
+    leg whose `subject` is `kit`, one whose `chunk` is `selftests`, one a `quarantine` selection row holds
+    (TOOL-dWitnessedBar-57 AC16) and one unheld, thirty records of the unheld leg: `measured 1/10 · legs
+    1/1`, so only the unheld leg is a bar leg; and the mode run with no `--selection` exits 2 naming the
+    flag. Every run passes `--selection`, a copy of `selection`, the caller's selection record, the `held`
+    case's quarantine row appended to it. Exit 0 when every case reads as planted, 1 naming each that does
+    not, 2 where no factory resolves or `selection` does not read."""
+    try:
+        br = load_memory_tree("build_records.py", "record factory", "the fixture plants its flake records through it")
+        given = pathlib.Path(selection).read_bytes()
+    except (DriftError, OSError) as exc:
+        print(f"drift-report: gate-health fixture {case} refused · {exc}", file=sys.stderr)
+        return 2
+    legs = ["leg 01"] if case == "held" else [f"leg {i:02d}" for i in range(1, 11)]
+    flaked = {"differs": {"leg 09": (20, 23, 26), "leg 10": (20, 23, 26), "leg 01": (0, 3, 6, 9, 12),
+                          "leg 02": (0, 3, 6, 9, 12)},
+              "lower": {"leg 10": (25,)}}.get(case, {})
+    if case in ("short", "write"):
+        flaked = {"leg 09": (20, 23, 26), "leg 10": (20, 23, 26)}
+    build, unit = "tHealth", "ARCH-tHealth-1"
+    env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")}
+    out, bad = [], []
+    with tempfile.TemporaryDirectory(prefix="gatehealth-") as td:
+        repo = pathlib.Path(td, "repo")
+        for home, files, src in (("drift-audit", ("drift_report.py",), pathlib.Path(__file__).resolve().parent),
+                                 ("memory-tree", ("build_records.py", "design_lib.py", "tree_lib.py"),
+                                  pathlib.Path(br.__file__).resolve().parent)):
+            (repo / home).mkdir(parents=True)
+            for f in files:
+                (repo / home / f).write_bytes((src / f).read_bytes())
+        manifest = [{"name": leg, "subject": "repo", "chunk": "product", "argv": ["true"]} for leg in legs]
+        manifest += ([{"name": "kit leg", "subject": "kit", "chunk": "product", "argv": ["true"]},
+                      {"name": "selftests leg", "subject": "repo", "chunk": "selftests", "argv": ["true"]},
+                      {"name": "quarantined leg", "subject": "repo", "chunk": "product", "argv": ["true"]}]
+                     if case == "held" else
+                     [{"name": "kit selftest", "subject": "kit", "chunk": "selftests", "argv": ["true"]},
+                      {"name": "repo selftests", "subject": "repo", "chunk": "selftests", "argv": ["true"]}])
+        (repo / "gate-legs.json").write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8", newline="\n")
+        (repo / ".memory-tree.conf").write_text("MEMORY_ROOT=memory\n", encoding="utf-8", newline="\n")
+        (repo / "memory" / "builds" / build).mkdir(parents=True)
+        sel = pathlib.Path(td, "selection")
+        sel.write_bytes(given + ((b"" if not given or given.endswith(b"\n") else b"\n")
+                                 + b"held\tquarantined leg\tquarantine\t2/10\thold\n" if case == "held" else b""))
+
+        def write_flake(k, rows):
+            return br.write_record(repo, build, unit, "flake", f"run fx-{k:02d}",
+                                   [("Run", f"fx-{k:02d}"), ("Ended", f"2026-{1 + k // 28:02d}-{1 + k % 28:02d}T00:00:00Z"),
+                                    ("Sha", "-"), ("Tree", "-"), ("Legs", str(len(rows)))],
+                                   lines=["```tsv", *rows, "```"])
+        planted = [write_flake(k, [f"{leg}\t1\t0" if k in flaked.get(leg, ()) else f"{leg}\t0\t-" for leg in legs])
+                   for k in range(30)]
+        for args in (("init", "-q"), ("add", "-A")):
+            subprocess.run(["git", "-C", str(repo), *args], capture_output=True, env=env, check=True)
+
+        def run_mode(*flags, selected=True):
+            flags = (*flags, "--selection", str(sel)) if selected else flags
+            p = subprocess.run([sys.executable, str(repo / DRIFT_KIT / "drift_report.py"), "--gate-health", *flags],
+                               cwd=str(repo), capture_output=True, text=True, encoding="utf-8", errors="replace",
+                               env=env, timeout=120)
+            said = [ln for ln in p.stdout.splitlines() if ln.strip()]
+            out.extend(f"{case}: {' '.join(flags) or 'measure'}: rc {p.returncode} · {ln}" for ln in said or ["(nothing)"])
+            out.extend(f"{case}: stderr · {ln}" for ln in p.stderr.splitlines() if ln.strip())
+            return p.returncode, said
+
+        def read_health_records():
+            return sorted(repo.joinpath("memory", "builds", build, "build").glob("*-gate-health-*.md"))
+
+        def remove_row(leg):
+            newest = repo / planted[-1]
+            newest.write_text(newest.read_text(encoding="utf-8").replace(f"{leg}\t0\t-\n", ""),
+                              encoding="utf-8", newline="\n")
+
+        head = "drift-report: gate-health "
+        runs = " ".join(f"fx-{k:02d}" for k in range(30))
+        write = ("--write", "--build", build, "--unit", unit)
+        if case == "differs":
+            rc, said = run_mode()
+            want = [f"{head}measured 4/10 · legs 10/10 · verdicts {runs}"]
+            if rc != 0 or said != want:
+                bad.append(f"differs read rc {rc} {said}, planted {want}")
+        elif case == "lower":
+            rc, said = run_mode()
+            want = [f"{head}measured 1/10 · legs 10/10 · verdicts {runs}"]
+            if rc != 0 or said != want:
+                bad.append(f"lower read rc {rc} {said}, planted {want}")
+        elif case == "held":
+            rc, said = run_mode()
+            want = [f"{head}measured 1/10 · legs 1/1 · verdicts {runs}"]
+            if rc != 0 or said != want:
+                bad.append(f"held read rc {rc} {said}, planted {want}: a held leg was read as a bar leg")
+            n = len(out)
+            rc, said = run_mode(selected=False)
+            if rc != 2 or not any(ln.startswith(f"{case}: stderr · ") and "takes --selection" in ln for ln in out[n:]):
+                bad.append(f"held with no --selection read rc {rc} {said}, planted 2 naming the flag")
+        elif case == "short":
+            remove_row("leg 03")
+            rc, said = run_mode(*write)
+            want = [f"{head}unarmed · leg 03 29/30"]
+            if rc != 0 or said != want or read_health_records():
+                bad.append(f"short read rc {rc} {said} writing {len(read_health_records())} record(s), planted {want} and none")
+        else:
+            rc, said = run_mode(*write)
+            name = f"memory/builds/{build}/build/{datetime.date.today().isoformat()}-build-{unit}-gate-health-1.md"
+            want = [f"{head}measured 4/10 · legs 10/10 · verdicts {runs}", f"drift-report: wrote {name}"]
+            if rc != 0 or said != want or [p.relative_to(repo).as_posix() for p in read_health_records()] != [name]:
+                bad.append(f"armed --write read rc {rc} {said}, planted {want} and that one record")
+            else:
+                p = subprocess.run([sys.executable, str(repo / TREE_KIT / "build_records.py"), "read",
+                                    str(repo / name)], capture_output=True, text=True, encoding="utf-8",
+                                   errors="replace", env=env, timeout=120)
+                out.extend(f"write: build_records.py read: rc {p.returncode} · {ln}" for ln in p.stdout.splitlines())
+                fields = ("Measured: 4/10", f"Verdicts: {runs}", "Legs: 10/10")
+                if p.returncode != 0 or not all(f in p.stdout for f in fields):
+                    bad.append(f"the factory's read of {name} exited {p.returncode}, wanting {fields}: {p.stdout[:300]}")
+            rc, said = run_mode(*write, "--with", "gate-legs.json")
+            if rc != 2 or len(read_health_records()) != 1:
+                bad.append(f"--with naming no flake record exited {rc} with {len(read_health_records())} record(s), planted 2 and one")
+            remove_row("leg 03")
+            rc, said = run_mode(*write)
+            if rc != 0 or said != [f"{head}unarmed · leg 03 29/30"] or len(read_health_records()) != 1:
+                bad.append(f"one row deleted, --write read rc {rc} {said} with {len(read_health_records())} record(s), planted "
+                           f"unarmed and one")
+            extra = write_flake(30, ["leg 03\t0\t-"])
+            rc, said = run_mode("--with", extra)
+            if rc != 0 or said != [f"{head}measured 4/10 · legs 10/10 · verdicts {runs} fx-30"]:
+                bad.append(f"--with naming the unstaged thirtieth verdict read rc {rc} {said}, planted it armed")
+    for ln in out:
+        print(ln)
+    for ln in bad:
+        print(f"drift-report: gate-health fixture {case} FAILED · {ln}", file=sys.stderr)
+    print(f"drift-report: gate-health fixture {case} " + ("FAILED" if bad else "ok"))
+    return 1 if bad else 0
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
@@ -3569,7 +3990,8 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            measure_legs_retried_after_timeout, measure_fleet_over_budget,
            build_remote_ci_red_streak,
            build_stale_dossiers,
-           build_live_builds_without_activity]
+           build_live_builds_without_activity,
+           measure_gate_health]
 
 
 # --------------------------------------------------------------------------------------------
@@ -3616,9 +4038,10 @@ class Ctx:
         # cannot drift apart into two spellings of the same grammar.
         self.id_re = re.compile(_resolve_ident(root, fams))
         self.anchors = _resolve_anchors(root, fams)
-        self.shrink_only = dict(proj.SHRINK_ONLY)
+        # TOOL-dWitnessedBar-16 S8: the shrink-only lists, the pins and the baselines are populations.
+        self.ledger, self.registrations, self.pins, self.baselines = read_drift_populations(root)
+        self.shrink_only = {r.home: r.population for r in self.registrations if r.direction == "shrink-only"}
         self.handkept = list(proj.HANDKEPT)
-        self.pins = dict(proj.PINS)
         # The project layer itself, so a signal can ask for a declaration the kit does
         # not know about — e.g. DECLARED_EMPTY, which an older adopter will not have.
         self.proj = proj
@@ -3629,6 +4052,8 @@ class Ctx:
                 root.resolve()).as_posix()
         except (AttributeError, TypeError, ValueError):
             self.layer_path = None
+        homes = [r.home for r in self.registrations if r.population in (PINS_POPULATION, BASELINES_POPULATION)]
+        self.not_evidence = ([self.layer_path] if self.layer_path else []) + homes
         self.charter = getattr(proj, "CHARTER", None) or self._find_charter()
         # TOOL-aMendedFleet-53. The auto-memory directory signal 5 audits; BLANK or undeclared is
         # NOT ASKED, so an older adopter's project layer keeps importing.
@@ -4266,7 +4691,87 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--escape-ratio", metavar="YYYY-MM", default=None,
                     help="on demand, minutes: the share of that month's product fixes that repaired "
                          "code already on the base; never part of the report or the bar")
+    ap.add_argument("--gate-health", action="store_true",
+                    help="measure the reliability bar from the flake records and print it; a mode of its "
+                         "own, reading the conf, the gate-leg manifest and the records alone")
+    ap.add_argument("--write", action="store_true",
+                    help="with --gate-health: write the measurement as a gate-health record when armed")
+    ap.add_argument("--build", help="with --gate-health --write: the build whose folder the record goes in")
+    ap.add_argument("--unit", help="with --gate-health --write: the unit id the record serves")
+    ap.add_argument("--with", dest="with_path", metavar="PATH",
+                    help="with --gate-health: one flake record not yet staged, counted beside the tracked ones")
+    ap.add_argument("--fixture", choices=("differs", "lower", "short", "write", "held"),
+                    help="with --gate-health: run one planted case over a scratch repository")
+    ap.add_argument("--selection", metavar="PATH",
+                    help="with --gate-health, required: the run's selection record, whose quarantine and level "
+                         "rows hold legs out of the bar; an empty file where the run holds none")
     args = ap.parse_args(argv)
+
+    if (args.gate_health or args.write or args.build or args.unit or args.with_path or args.fixture
+            or args.selection is not None):
+        # TOOL-dWitnessedBar-1 S4: a mode of its own, as --escape-ratio is. It reads the conf through the
+        # factory, the manifest and the records alone: no project layer and no base ref.
+        if not args.gate_health:
+            print("drift-report: --write, --build, --unit, --with, --fixture and --selection are asked of "
+                  "--gate-health alone", file=sys.stderr)
+            return 2
+        if args.selection is None:
+            # TOOL-dWitnessedBar-57 S18: the runner's quarantine and level holds are no manifest key, so a
+            # bar read without the run's selection would count them; its `--fixture` cases included.
+            print("drift-report: --gate-health takes --selection <path>, the run's selection record or an empty "
+                  "file where the run holds none", file=sys.stderr)
+            return 2
+        clash = [f for f, on in (("--check", args.check), ("--offenders", args.offenders),
+                                 ("--delta", args.delta), ("--escape-ratio", args.escape_ratio is not None)) if on]
+        if clash:
+            print(f"drift-report: --gate-health is a mode of its own and does not combine with "
+                  f"{', '.join(clash)}", file=sys.stderr)
+            return 2
+        if args.fixture:
+            if args.write or args.build or args.unit or args.with_path:
+                print("drift-report: --fixture plants its own records and takes no --write, --build, --unit "
+                      "or --with", file=sys.stderr)
+                return 2
+            return run_gate_health_fixture(args.fixture, args.selection)
+        if bool(args.build or args.unit or args.write) and not (args.write and args.build and args.unit):
+            print("drift-report: --write takes --build <slug> and --unit <id>, the record's build and unit, and "
+                  "they are asked of --write alone", file=sys.stderr)
+            return 2
+        try:
+            root = repo_root()
+            br = load_memory_tree("build_records.py", "record factory",
+                                  "drift measures gate health from the flake records through it")
+            extra = None
+            if args.with_path:
+                given = pathlib.Path(args.with_path)
+                path = (given if given.is_absolute() else pathlib.Path.cwd() / given).resolve()
+                try:
+                    extra = path.relative_to(root.resolve()).as_posix()
+                except ValueError:
+                    raise DriftError(f"--with {args.with_path} is outside this repository") from None
+                if not path.is_file() or not br.derive_record_name("flake").search(extra):
+                    raise DriftError(f"--with {args.with_path} is no flake record: a file named "
+                                     f"<date>-build-<unit id>-flake-<n>.md in a build's build/ folder")
+            rows, bar, runs, skipped = read_gate_health(root, extra, args.selection)
+        except DriftError as exc:
+            print(f"drift-report: --gate-health refused, nothing written · {exc}", file=sys.stderr)
+            return 2
+        for path, said in skipped:
+            print(f"drift-report: gate-health skipped {path} · {said}", file=sys.stderr)
+        got = derive_gate_health(rows, bar)
+        armed = got["value"] >= 0
+        print(f"drift-report: gate-health {got['said']}" + (f" · verdicts {' '.join(runs)}" if armed else ""))
+        if args.write and armed:
+            try:
+                rel = br.write_record(root, args.build, args.unit, "gate-health", f"measured {got['value']}/10",
+                                      [("Measured", f"{got['value']}/10"), ("Verdicts", " ".join(runs)),
+                                       ("Legs", f"{got['armed']}/{got['of']}")])
+            except (ValueError, OSError) as exc:
+                print(f"drift-report: --gate-health refused, nothing written · the record factory refused the "
+                      f"record: {exc}", file=sys.stderr)
+                return 2
+            print(f"drift-report: wrote {rel}")
+        return 0
 
     if args.escape_ratio is not None:
         # TOOL-aMendedFleet-50 S1: a mode of its own. Beside `--check` it would put a blame per fix
@@ -4305,17 +4810,13 @@ def main(argv: list[str] | None = None) -> int:
         # --check, which is the run an adopter is told to make first.
         lookback = _read_lookback(proj)
         # TOOL-aMendedFleet-56 S1 and S4: an optional id set per gateable signal, refused before any
-        # signal runs when its shape is wrong or a PINS entry bounds the same signal.
-        baselines = getattr(proj, "BASELINES", None) or {}
-        if not isinstance(baselines, dict) or not all(
-                isinstance(v, (list, tuple)) and all(isinstance(i, str) for i in v)
-                for v in baselines.values()):
-            raise DriftError("drift_signals.py declares BASELINES that is not a dict from a signal "
-                             "name to a list of offender id strings")
-        both = sorted(set(baselines) & set(proj.PINS))
+        # signal runs when a pin bounds the same signal. Both are populations since TOOL-dWitnessedBar-16.
+        _ledger, _regs, pins_now, baselines = read_drift_populations(root)
+        both = sorted(set(baselines) & set(pins_now))
         if both:
-            raise DriftError(f"{', '.join(both)} is declared in both PINS and BASELINES; a signal "
-                             f"takes ONE bound, a count or an id set, so delete one of the two")
+            raise DriftError(f"{', '.join(both)} is declared in both {PINS_POPULATION} and "
+                             f"{BASELINES_POPULATION}; a signal takes ONE bound, a count or an id set, so "
+                             f"delete one of the two")
         dead_limit, dead_filed = _read_dead_keys(proj)
     except DriftError as exc:
         print(f"drift-report: {exc}", file=sys.stderr)
@@ -4365,7 +4866,7 @@ def main(argv: list[str] | None = None) -> int:
     # carries. A record that is not live judges nothing, so both stay empty and DEAD reports it.
     stray = sorted(set(baselines) - {s["signal"] for s in out if s["gateable"]})
     if stray:
-        print(f"drift-report: BASELINES names {', '.join(stray)}, which this report does not "
+        print(f"drift-report: {BASELINES_POPULATION} names {', '.join(stray)}, which this report does not "
               f"produce as a gateable signal; an id set bounds only a gateable one, so delete the "
               f"entry", file=sys.stderr)
         return 2
@@ -4390,11 +4891,10 @@ def main(argv: list[str] | None = None) -> int:
     # is enumerated in the project layer, never inferred.
     ratchets, over, dead = [], [], []
     if args.check or args.offenders:
-        declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
+        declared = derive_declared_empty(ctx)
         ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()), lookback)
         ratchets += build_lang_mode_findings(ctx.git, root, lookback=lookback)
-        if ctx.layer_path:
-            ratchets += build_baseline_findings(ctx.git, ctx.layer_path, baselines, proj.PINS)
+        ratchets += build_baseline_findings(ctx.git, ctx.ledger, ctx.registrations, baselines, ctx.pins)
         over = [s for s in out if s["gateable"] and s["live"] and (
             bool(s["new"] or s["stale"]) if "baseline" in s else s["value"] > s["pin"])]
         dead = [s for s in out if s["gateable"] and not s["live"] and s["signal"] not in declared]
@@ -4439,7 +4939,7 @@ def main(argv: list[str] | None = None) -> int:
                 status = f"not asked — {note or 'this repo does not adopt what the signal reads'}"
             elif not s["live"]:
                 k = s["dead_readings"]
-                if s["signal"] in set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ()):
+                if s["signal"] in derive_declared_empty(ctx):
                     status = "empty by declaration — nothing to measure here yet"
                 elif not s["gateable"] and k is not None and k >= dead_limit:
                     # TOOL-aMendedFleet-90 S3. A gateable dead record keeps its status: `--check` reds it.
@@ -4484,22 +4984,22 @@ def main(argv: list[str] | None = None) -> int:
             # `--check`, so its stdout stays one JSON document; the write never moves the verdict.
             utc = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
             write_drift_history(resolve_history_path(root), build_history_rows(
-                out, set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ()), utc, head_sha, base_ref,
+                out, derive_declared_empty(ctx), utc, head_sha, base_ref,
                 base_sha.stdout.strip()))
         # The populations are computed above, once, for this mode and `--offenders` alike.
         for r in ratchets:
             print(f"\ndrift-report: RATCHET WEAKENED — {r}", file=sys.stderr)
         for s in over:
             if "baseline" in s:
-                print(f"\ndrift-report: {s['signal']} = {s['value']} against BASELINES "
-                      f"({s['baseline']} listed in {ctx.layer_path}) — this set is shrink-only",
+                print(f"\ndrift-report: {s['signal']} = {s['value']} against {BASELINES_POPULATION} "
+                      f"({s['baseline']} listed) — this set is shrink-only",
                       file=sys.stderr)
                 for i in s["new"]:
                     print(f"  new   {i} — an offender the set does not list: remove its cause, "
                           f"never list it", file=sys.stderr)
                 for i in s["stale"]:
-                    print(f"  stale {i} — listed but no longer an offender: delete its line from "
-                          f"BASELINES['{s['signal']}']", file=sys.stderr)
+                    print(f"  stale {i} — listed but no longer an offender: delete its row from "
+                          f"{BASELINES_POPULATION}", file=sys.stderr)
                 continue
             print(f"\ndrift-report: {s['signal']} = {s['value']} (pin {s['pin']}) — this list is shrink-only",
                   file=sys.stderr)

@@ -1,6 +1,6 @@
 # TOOL-bConvergentLodestar-1 — reuse-convergence layer for codebase-map
 
-**Status:** SPECCED · rev-2 · 2026-07-22 · node b · Tier-2 · base 7b01979ad7 · review wf_69de6d2e-926
+**Status:** SPECCED · rev-3 · 2026-11-22 · node b · Tier-2 · base 7b01979ad7 · review wf_69de6d2e-926
 
 <!-- gen:spec-records -->
 
@@ -63,7 +63,7 @@ existing repo.
   on a human remembering, review #5/#32). (b) bounded big-bang: `gen_map.py --seed-affordances --top <N>`
   lists the N highest-fan-in seams no dossier yet declares, as the worklist, so the reinvention-prone
   active surface converges first.
-  - **Readers:** by name: `memory/map/affordance-exempt.toml` is the list,
+  - **Readers:** by name: `memory/map/affordance-exempt.txt` is the list,
     `tools/codebase-map/map_diff.py` drops touched rows from it, `tools/codebase-map/map_lib.py`
     loads it, renders it and states the drop rule, `tools/codebase-map/selftest.py` arms the drop,
     and `tools/memory-tree/check-memory-hygiene.sh` sanctions the file in the map tree. by value:
@@ -275,3 +275,4 @@ metric that hard-fails false-fails on legitimate churn.
   layers; `--converge` is a `map_diff` mode (no forked range-walker); `dead_exports`/`affordance_coverage_%`
   demoted off the convergence claim; ACs rebased on a fixture; +F7 (collision-WARN home) +F8 (collision
   precision).
+- rev-3 · 2026-11-22 · S4 · the **Readers:** by name: half re-pointed from `memory/map/affordance-exempt.toml` to `memory/map/affordance-exempt.txt`, where the `codebase-map/affordance-exempt-to-ledger` step moved it; nothing else moves. From the brief `2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief`.

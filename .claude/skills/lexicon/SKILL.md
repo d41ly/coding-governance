@@ -4,7 +4,7 @@ description: Answer "what should I call this" from THIS repo's declared naming v
 ---
 [.claude/skills/lexicon/SKILL.md · Level 4 · A Skill, followed when its trigger holds; yields to levels 0 to 3]
 
-<!-- gov:kit lexicon@1.29 · RENDERED from this kit's SKILL.template.md — do not edit -->
+<!-- gov:kit lexicon@1.30 · RENDERED from this kit's SKILL.template.md — do not edit -->
 
 # The declared lexicon
 

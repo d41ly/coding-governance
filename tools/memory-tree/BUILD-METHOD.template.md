@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.172 -->
+<!-- gov:kit memory-tree@2.174 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -282,9 +282,9 @@ park, not a waiver, and its unit does not close. Left-shift every confirmed find
 
 **Re-read the build README against the code before closing** — every owner ruling and every sentence naming a shipped mechanism. `readme_mechanism_drift` reports only the pairs that spell it identically; the fold owns the rest.
 
-**Observe the owed arms before the bar.** For each `New arm:` line of the build's specs, the main loop
-observes the arm RED on its staged break and GREEN once restored, and records both in that unit's
-acceptance ledger under a `Pass: none` commit.
+**Observe the owed arms before the bar.** The main loop sees each `New arm:` arm RED on its staged
+break, GREEN restored, and records both as a seen-red line, HYGIENE's grammar, in a `Pass: none`
+commit; `seen_red.py --build <slug>` reads it back.
 
 **Landing** — `land-once-done` and `conflicts-reconciled` between them: merge and push
 authorization, the lander, the bypass ban, additive reconciliation of a shared record, and when a

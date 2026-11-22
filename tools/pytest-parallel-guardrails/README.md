@@ -1,6 +1,6 @@
 # pytest-parallel-guardrails — bounded, attributable parallel test runs
 
-<!-- gov:kit pytest-parallel-guardrails@1.4 -->
+<!-- gov:kit pytest-parallel-guardrails@1.5 -->
 
 Any pytest-xdist suite can wedge forever when a worker dies, and the death leaves no evidence:
 execnet redirects a worker's fd 0/1 to devnull on every platform — on Windows fd 2 as well — so
@@ -22,6 +22,33 @@ records: adopter ic `ARCH-eGuidingConcierge-12/-19`, `ARCH-eVigilantCanary-1/-2`
 | `aiosqlite-seam-conftest.py` | Conftest patch: aiosqlite worker survives closed-loop posts |
 | `aiosqlite_worker_resilience.test-template.py` | Forced-race regression gate (rename to `test_*.py` when copying) |
 | `pytest-parallel-guardrails.test.sh` | Kit self-test (rides the repo gate suite) |
+| `run_level.py` | The runner adapter: `--detect` names your suite's levels, `<level>` runs one with the probe armed |
+
+## The runner adapter — your suite's levels as gate legs
+
+The kit's `kit.toml` declares a `[[test_runner]]` row for pytest: a `detect` argv, the four levels
+`unit`, `integration`, `e2e` and `performance`, and an argv that runs one. Where your policy's
+`tests.product` is `declared-with-runners`, the default, the run-gates kit's leg factory runs
+`detect` in your repository and renders one leg per level it names, tagged `leg.pytest.<level>`,
+carrying `level` and `pack` `product-tests`; under `declared` it renders none and your own legs
+carry `level`, and under `none` no leg may. The run-gates README's "The product-test contract" states
+the three values and what its `product-test contract (tests.product)` leg grades.
+
+Mark your levels in the same `[tool.pytest.ini_options]` table the knobs live in, one marker per
+level, and mark each test with one of them:
+
+```toml
+[tool.pytest.ini_options]
+markers = ["unit: fast, isolated tests", "e2e: the whole service, end to end"]
+```
+
+`python run_level.py --detect` reads every tracked `pyproject.toml` carrying that table and prints
+each of the four levels a `markers` entry declares, exiting 0; it exits 1 where none is declared, so a
+level your suite never declares gains no leg, and 2 where a table does not parse. `python
+run_level.py <level>` puts this kit's directory on `PYTHONPATH` and runs `python -m pytest -p
+crashprobe -m <level>`, so every adapter run carries the probe, and exits with pytest's status. It
+does not check that a test marked `unit` is one, and a declared marker no test carries runs nothing:
+pytest exits 5 saying so.
 
 ## The four knobs (what each honestly does)
 
@@ -87,6 +114,6 @@ multi-loop pattern entirely at the cost of a suite-wide loop-semantics migration
 ## Version
 
 Kit version: `KIT_PYTEST_GUARDRAILS_VERSION = "1.1"` in `crashprobe.py`; the same version rides
-the `gov:kit pytest-parallel-guardrails@1.4` markers in the artifacts adopters keep (this README,
+the `gov:kit pytest-parallel-guardrails@1.5` markers in the artifacts adopters keep (this README,
 the snippet, the seam patch, the test template), because the probe itself is expected to be
 removed after a hunt.

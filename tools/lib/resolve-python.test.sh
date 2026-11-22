@@ -41,6 +41,8 @@ bad() { echo "FAIL $1"; st=1; n=$((n+1)); }
 # rather than a skip that reports success.
 # shellcheck source=/dev/null
 . "$CANON"
+. "$HERE/refuse-wrong-shell.sh"
+refuse_wrong_shell || exit 2
 REALPY=$(resolve_python) || { echo "FAIL no python on this host at all — the arms below cannot run"; exit 2; }
 REALPY_ABS=$(command -v "$REALPY")
 
@@ -305,6 +307,31 @@ out=$(cd "$FQ" && "$REALPY" -I "$KIT_REL/python_floor.py" check 2>&1 | tr -d '\r
 [[ $out == *"note.md:1: needs Python"* ]] || bad "a planted floor statement in a tracked .md was not named: $out"; ok
 [[ $out == *"unmarked.sh:1: an unmarked multi-line definition"* ]] || bad "an unmarked multi-line resolve_python definition was not named: $out"; ok
 
+# ---- 1d2. THE CENSUS, RUN FOR REAL (TOOL-dWitnessedBar-24 S10, AC10) ------------------------------
+# A fixture repository holding a copy of the floor module: a declared floor no interpreter here runs
+# is red naming the floor and its install command, never a skip, so a census that compiled under the
+# RUNNING interpreter instead reds here; at the declared floor, a tracked file that does not compile
+# is red naming it, and a feature whose removal is announced at the floor is red naming it. WHAT THIS
+# DOES NOT CHECK: a node with no interpreter at the declared floor, where every census case but the
+# first reds as that first one does, and every feature of the table but the planted one.
+FC="$TMP/fc"; mkdir -p "$FC/$KIT_REL"
+cp "$HERE/python_floor.py" "$FC/$KIT_REL/"; printf '3.99\n' > "$FC/$KIT_REL/python-floor.txt"
+printf 'x = 1\n' > "$FC/a.py"
+git -C "$FC" init -q && git -C "$FC" add -A
+out=$(cd "$FC" && "$REALPY" -I "$KIT_REL/python_floor.py" census 2>&1); out_rc=$?; out=${out//$'\r'/}
+{ [ "$out_rc" = 1 ] && [[ $out == *"floor 3.99"* ]] && [[ $out == *"uv python install 3.99"* ]]; } \
+  || bad "a census at a floor no interpreter runs did not red naming 3.99 and its install command: rc=$out_rc $out"; ok
+printf '%s\n' "$FLOOR" > "$FC/$KIT_REL/python-floor.txt"
+printf 'def f(:\n' > "$FC/b.py"; git -C "$FC" add -A
+out=$(cd "$FC" && "$REALPY" -I "$KIT_REL/python_floor.py" census 2>&1); out_rc=$?; out=${out//$'\r'/}
+{ [ "$out_rc" = 1 ] && [[ $out == *"b.py"":1:"*"does not compile at the floor $FLOOR"* ]]; } \
+  || bad "a tracked file that does not compile at the floor was not named: rc=$out_rc $out"; ok
+git -C "$FC" rm -q --cached b.py; rm "$FC/b.py"
+printf 'from locale import getdefaultlocale\n' > "$FC/c.py"; git -C "$FC" add -A
+out=$(cd "$FC" && "$REALPY" -I "$KIT_REL/python_floor.py" census 2>&1); out_rc=$?; out=${out//$'\r'/}
+{ [ "$out_rc" = 1 ] && [[ $out == *"locale.getdefaultlocale · removal 3.15 · 1 · RED"* ]]; } \
+  || bad "a feature removed at the floor was not named red: rc=$out_rc $out"; ok
+
 # ---- 1e. THE STEP'S DOWN (TOOL-dSafePassage-11, TOOL-dSafePassage-26 S10 S11) ----------------------
 # A fixture gov carrying the declaration, the floor kit's three files and one copy, downed on its own
 # tree, its source mode: a planted PEP 701 f-string at <to> reds the down, names its file and line
@@ -317,7 +344,7 @@ out=$(cd "$FQ" && "$REALPY" -I "$KIT_REL/python_floor.py" check 2>&1 | tr -d '\r
 # dWitnessedBar's, and any grammar change outside the static mode's eight shapes.
 FD="$TMP/fd"; mkdir -p "$FD/$KIT_REL"
 printf '%s\n' "$FLOOR" > "$FD/$KIT_REL/python-floor.txt"; sed -n '/^# >>> resolve_python/,/^# <<< resolve_python/p' "$CANON" > "$FD/copy.sh"
-cp "$HERE/python-floor.sh" "$HERE/python_floor.py" "$CANON" "$FD/$KIT_REL/"
+cp "$HERE/python-floor.sh" "$HERE/python_floor.py" "$CANON" "$HERE/refuse-wrong-shell.sh" "$FD/$KIT_REL/"
 PF701='c = 1\nv = f"{"X" if c else "y"}"\n'
 printf "$PF701" > "$FD/planted.py"
 run_down_git() { git -C "$FD" -c user.email=t@e -c user.name=t "$@"; }
@@ -394,6 +421,7 @@ remote_ladder_sh|$ROOT/$KIT_REL/resolve-remote.sh|$KIT_REL/resolve-remote
 compare_base_py|$ROOT/$KIT_REL/compare_base.py|$KIT_REL/compare_base
 git_env_leaks_py|$ROOT/$KIT_REL/git_env_leaks.py|$KIT_REL/git_env_leaks
 resolve_bash_py|$ROOT/$KIT_REL/resolve_bash.py|$KIT_REL/resolve_bash
+resolve_bash_js|$ROOT/$KIT_REL/resolve_bash.js|$KIT_REL/resolve_bash
 coverage_join|$ROOT/$KIT_REL/coverage_join.py|$KIT_REL/coverage_join
 common_git_dir|$ROOT/$KIT_REL/common_dir.py|$KIT_REL/common_dir
 render_envelope|$ROOT/$KIT_REL/envelope.py|$KIT_REL/envelope
@@ -405,6 +433,12 @@ needs_graph_py|$ROOT/$KIT_REL/needs_graph.py|$KIT_REL/needs_graph
 run_tree_kill_py|$ROOT/$KIT_REL/run_tree_kill.py|$KIT_REL/run_tree_kill
 guarded_write_py|$ROOT/$KIT_REL/guarded_write.py|$KIT_REL/guarded_write
 read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
+refuse_wrong_shell|$ROOT/$KIT_REL/refuse-wrong-shell.sh|$KIT_REL/refuse-wrong-shell
+legacy_ledger_py|$ROOT/$KIT_REL/legacy_ledger.py|$KIT_REL/legacy_ledger
+acceptance_reader|$ROOT/${KIT_REL%/*}/check-spec-tokens.py|${KIT_REL%/*}/check-spec-tokens
+arm_walk|$ROOT/${KIT_REL%/*}/check-spec-tokens.py|${KIT_REL%/*}/check-spec-tokens
+hold_predicate|$ROOT/$RUNGATES_DIR/held_halves.py|$RUNGATES_DIR/held_halves
+selection_row|$ROOT/$RUNGATES_DIR/verdict_flow.py|$RUNGATES_DIR/verdict_flow
 gov_ref_sh|$ROOT/$KIT_REL/gov-ref.sh|$KIT_REL/gov-ref
 gov_feed_sh|$ROOT/$KIT_REL/gov-feed.sh|$KIT_REL/gov-feed
 home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
@@ -436,8 +470,11 @@ home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
 # compare_base_py (TOOL-dGroundRules-21 S7) is the shrink-only compare base the codebase map and the
 # policy kit both read, and git_env_leaks_py (S9) the git variables the policy reader drops, the
 # memory-tree kit's GIT_ENV_LEAKS member for member; each had a copy with no canonical to drift from.
-# resolve_bash_py (TOOL-dGroundRules-25 S28) is the run-gates kit's bash rule the policy kit's checker
-# carries; the other copies return another shape and are TOOL-dSettledRoster-6's ask.
+# resolve_bash_py (TOOL-dGroundRules-25 S28, rewritten by TOOL-dWitnessedBar-26) is the one bash rule
+# every gov Python file that starts a bash carries, each behind its own adapter, and resolve_bash_js
+# its JavaScript twin, the copy the stop guard and the policy mirror carry between `// >>> ` markers,
+# which is why the extractor and the population grep read that marker and `*.js` too; §2j below holds
+# the two canonicals to one truth table.
 # coverage_join (PLAY-dOrderedCharter-19 S9) is the join factory, compute_coverage and its siblings,
 # moved out of the codebase-map kit so no core build imports it; its one copy is memory-tree's
 # coverage_join.py, which every codebase-map consumer imports. common_git_dir (S10) is the main
@@ -467,25 +504,46 @@ home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
 # policy command each carry it inline.
 # read_open_py (TOOL-aLightenedLoop-3 S3) is the `open` audit event's read filter: the policy kit's
 # guard trace and the spec-token checker's input record each carry it inline, both copy-installed.
+# refuse_wrong_shell (TOOL-dWitnessedBar-27 S1) is the wrong-shell refusal every entry point that
+# carries the resolve_python block carries directly after it; a sourcer of resolve-python.sh sources the
+# canonical instead, and the coverage arm below the loop holds the population to one shape or the other.
+# legacy_ledger_py (TOOL-dWitnessedBar-13 S8) is the baseline ledger factory: the memory-tree kit's
+# copy, which the row-keyed merge driver reads a ledger's header through, and the gate-lint kit's copy,
+# which its two count-ratchet adapters read through. gate-lint requires no kit, so it also carries a
+# coverage_join.py shaped as memory-tree's, whose coverage_join, remote_ladder_py and compare_base_py
+# blocks the existing rows above find by their markers, and a resolve_kit_dir block beside the factory's,
+# through which `seed` finds the policy kit (TOOL-dWitnessedBar-15); part 2o below holds the canonical's CLI.
+# Each kit copy also carries a resolve_bash_py block, through which a seed argv's `bash` head resolves
+# (TOOL-dWitnessedBar-51 S32), and the row of that name reads it.
+# acceptance_reader and arm_walk (TOOL-dWitnessedBar-51 S19, S20) are the spec-token checker's own
+# readers, a canonical in a tool file as kickoff_region's is: the acceptance section by heading text and
+# its backticked tokens, which the unattended kit's fix_keeps.py carries, and the Gates section by
+# heading text and its `New arm:` walk, which the memory-tree kit's seen_red.py carries. hold_predicate
+# (S21) is the run-gates kit's hold predicate, `held_halves.py#test_held`, which drift-audit's
+# drift_report.py carries because that kit cannot import run-gates.
+# selection_row (TOOL-dWitnessedBar-62 S17) is the runner's selection-row reader, `verdict_flow.py#read_selection`
+# with the source and mode tuples it reads, which drift_report.py carries so its gate-health bar holds
+# exactly the legs the runner holds.
 # gov_ref_sh (TOOL-dPlacedRequest-11 S1, S2) is the one compare-and-swap writer of a governance ref
 # and its parented commit: the unattended driver's claim write and post-merge's bar-red ref each carry
-# it inline, and part 2n below holds the canonical to its failed-build contract.
+# it inline, and part 2p below holds the canonical to its failed-build contract.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
 # file — `run-selftests.sh` carries two, one per embedded program — was never compared at all.
-blk() { awk -v s="$1" -v k="${3:-1}" '$0 ~ ("^# >>> " s){i++; if(i==k)f=1} f{print} f && $0 ~ ("^# <<< " s){exit}' "$2" | tr -d '\r'; }
+# A JavaScript copy opens `// >>> ` (TOOL-dWitnessedBar-26 S4), so both read that marker beside `# >>> `.
+blk() { awk -v s="$1" -v k="${3:-1}" '$0 ~ ("^(# |// )>>> " s){i++; if(i==k)f=1} f{print} f && $0 ~ ("^(# |// )<<< " s){exit}' "$2" | tr -d '\r'; }
 while IFS='|' read -r stem canon excl; do
   [ -n "$stem" ] || continue
   want=$(blk "$stem" "$canon")
   [ -n "$want" ] || bad "the canonical block for '$stem' is missing from $canon"; ok
-  copies=$(cd "$ROOT" && git grep -l "^# >>> $stem" -- '*.sh' '*.py' '.githooks/*' WIRE-INTO-PROJECT.md | grep -v "^$excl" || true)
+  copies=$(cd "$ROOT" && git grep -l -E "^(# |// )>>> $stem" -- '*.sh' '*.py' '*.js' '.githooks/*' WIRE-INTO-PROJECT.md | grep -v "^$excl" || true)
   # NON-EMPTY POPULATION IS ITS OWN ARM, per row. A row whose copies all disappeared would otherwise
   # pass by judging nothing, which is the vacuity this whole file refuses.
   [ -n "$copies" ] || bad "no inline copy of '$stem' found — this row would be judging an empty population"; ok
   while IFS= read -r rel; do
     [ -n "$rel" ] || continue
-    nblk=$(grep -c "^# >>> $stem" "$ROOT/$rel")
+    nblk=$(grep -cE "^(# |// )>>> $stem" "$ROOT/$rel")
     k=1
     while [ "$k" -le "$nblk" ]; do
       if [ "$(blk "$stem" "$ROOT/$rel" "$k")" != "$want" ]; then
@@ -495,6 +553,121 @@ while IFS='|' read -r stem canon excl; do
     done
   done <<<"$copies"
 done <<<"$PARITY_ROWS"
+
+# THE WRONG-SHELL REFUSAL'S COVERAGE, BOTH WAYS (TOOL-dWitnessedBar-27 S5). The parity row above holds
+# every inline `refuse_wrong_shell` block to its canonical; this holds the population to the refusal,
+# over sets re-derived at every run from the tracked shell files outside the memory tree, each break
+# naming its file: (1) every inline member, a `# >>> resolve_python` carrier less the library, carries
+# the block and a `refuse_wrong_shell || exit 2` line outside it; (2) every carrier of the block, less
+# its canonical, is a member of the population `derive_rws_population` derives (TOOL-dWitnessedBar-50
+# S1), so the commit hook's inline block, which sits beside no resolve_python block, is admitted;
+# (3) every file sourcing `refuse-wrong-shell.sh` carries the line; (4) every file carrying the line
+# carries the block or that source, and the library carries neither. Each of the five sets must be
+# non-empty, so an empty population reds. Then `refuse-wrong-shell.sh --coverage` holds that derived
+# population, a file sourcing `resolve-python.sh` through a path it derives included, to the block or
+# the source and the call, less its named exclusions, each of which must carry its reason, and the call
+# before the first top-level `resolve_python` call (TOOL-dWitnessedBar-51, the order arm below). WHAT
+# THIS DOES NOT CHECK: that a named exclusion is still selected by the predicate; and a fixture's copy set.
+scan_rws_coverage() {  # <repo root> <library rel> <canonical rel> -> one line per break, then the counts
+  local root=$1 lib=$2 rws=$3 f
+  local -A inl=() blk=() src=() call=() pop=()
+  local ps=('*.sh' '.githooks/*' ':!memory/')
+  while IFS= read -r f; do [ -n "$f" ] && pop[$f]=1; done < <(derive_rws_population "$root" "$lib")
+  while IFS= read -r f; do [ -n "$f" ] && [ "$f" != "$lib" ] && inl[$f]=1; done \
+    < <(cd "$root" && git grep -l '^# >>> resolve_python' -- "${ps[@]}")
+  while IFS= read -r f; do [ -n "$f" ] && [ "$f" != "$rws" ] && blk[$f]=1; done \
+    < <(cd "$root" && git grep -l '^# >>> refuse_wrong_shell' -- "${ps[@]}")
+  while IFS= read -r f; do [ -n "$f" ] && src[$f]=1; done \
+    < <(cd "$root" && git grep -l -E '^[[:space:]]*(\.|source)[[:space:]]+[^[:space:]]*refuse-wrong-shell\.sh' -- "${ps[@]}")
+  while IFS= read -r f; do [ -n "$f" ] && call[$f]=1; done \
+    < <(cd "$root" && git grep -l -E '^[[:space:]]*refuse_wrong_shell \|\| exit 2[[:space:]]*$' -- "${ps[@]}")
+  for f in "${!inl[@]}"; do
+    [ -n "${blk[$f]:-}" ] || echo "(1) $f resolves python and carries no refuse_wrong_shell block"
+    [ -n "${call[$f]:-}" ] || echo "(1) $f resolves python and never calls refuse_wrong_shell || exit 2"
+  done
+  for f in "${!blk[@]}"; do
+    [ -n "${pop[$f]:-}" ] || echo "(2) $f carries a refuse_wrong_shell block and is no member of the derived population"
+  done
+  for f in "${!src[@]}"; do
+    [ -n "${call[$f]:-}" ] || echo "(3) $f sources refuse-wrong-shell.sh and never calls refuse_wrong_shell || exit 2"
+  done
+  for f in "${!call[@]}"; do
+    [ -n "${blk[$f]:-}${src[$f]:-}" ] || [ "$f" = "$rws" ] \
+      || echo "(4) $f calls refuse_wrong_shell and neither carries the block nor sources refuse-wrong-shell.sh"
+  done
+  [ -z "$(cd "$root" && git grep -l -e '^# >>> refuse_wrong_shell' -e 'refuse_wrong_shell || exit 2' -- "$lib")" ] \
+    || echo "(4) $lib, only ever sourced, carries the refuse_wrong_shell block or its call"
+  echo "counts ${#inl[@]} ${#blk[@]} ${#src[@]} ${#call[@]} ${#pop[@]}"
+}
+rws_out=$(scan_rws_coverage "$ROOT" "$KIT_REL/resolve-python.sh" "$KIT_REL/refuse-wrong-shell.sh")
+read -r _ rws_ni rws_nb rws_ns rws_nc rws_np <<<"$(tail -n 1 <<<"$rws_out")"
+echo "resolve-python.test: refuse_wrong_shell coverage over $rws_ni inline members, $rws_np derived"
+{ [ "${rws_ni:-0}" -gt 0 ] && [ "${rws_nb:-0}" -gt 0 ] && [ "${rws_ns:-0}" -gt 0 ] && [ "${rws_nc:-0}" -gt 0 ] && [ "${rws_np:-0}" -gt 0 ]; } \
+  || bad "the refuse_wrong_shell coverage judged an empty set (inline, block, source, call, derived): ${rws_ni:-} ${rws_nb:-} ${rws_ns:-} ${rws_nc:-} ${rws_np:-}"; ok
+rws_breaks=$(sed '$d' <<<"$rws_out" | sort)
+[ -z "$rws_breaks" ] || bad "the refuse_wrong_shell coverage broke:${rws_breaks//$'\n'/; }"; ok
+rws_cov=$(bash "$HERE/refuse-wrong-shell.sh" --coverage 2>&1) \
+  || bad "refuse-wrong-shell.sh --coverage broke over the derived population:${rws_cov//$'\n'/; }"; ok
+grep -q '^refuse_wrong_shell coverage: [1-9][0-9]* members' <<<"$rws_cov" \
+  || bad "refuse-wrong-shell.sh --coverage printed no non-zero member count: ${rws_cov%%$'\n'*}"; ok
+# THE ORDER (TOOL-dWitnessedBar-51 S29, AC25): a scratch repository whose two members source the resolver
+# and the refusal, one calling `refuse_wrong_shell || exit 2` before its first `resolve_python` call and
+# one after it; `--coverage` there exits 1 naming the late one alone, and a call inside a function body
+# defined above the refusal is no call where it stands. RED where the order is not read: exit 0.
+rwo_t=tools  # the fixture tree's tool root, named once
+RWO="$TMP/rws-order"; mkdir -p "$RWO/$rwo_t/lib" "$RWO/$rwo_t/x" "$RWO/$rwo_t/unattended"
+cp "$HERE/refuse-wrong-shell.sh" "$HERE/resolve-python.sh" "$RWO/$rwo_t/lib/"
+for rwo_f in lib-unattended.sh pass-tree.sh pass-tree.test.sh; do : > "$RWO/$rwo_t/unattended/$rwo_f"; done
+rwo_head='#!/usr/bin/env bash
+HERE=$(cd "$(dirname "$0")/../lib" && pwd)
+. "$HERE/resolve-python.sh"
+. "$HERE/refuse-wrong-shell.sh"'
+printf '%s\nlate_py() {\n  py=$(resolve_python)\n}\nrefuse_wrong_shell || exit 2\npy=$(resolve_python)\n' "$rwo_head" > "$RWO/$rwo_t/x/early.sh"
+printf '%s\npy=$(resolve_python)\nrefuse_wrong_shell || exit 2\n' "$rwo_head" > "$RWO/$rwo_t/x/late.sh"
+# TOOL-dWitnessedBar-57 AC1 AC2: `indent.sh` calls resolve_python indented under `if` and never refuses,
+# so it is a member the arm names; `stub.sh` holds an indented stub definition alone, so it is none.
+# RED where the call is read at column 0 alone (indent.sh unnamed), or a definition reads as a call.
+printf '%s\nif [ -n "${X:-}" ]; then\n  resolve_python >/dev/null\nfi\n' "$rwo_head" > "$RWO/$rwo_t/x/indent.sh"
+printf '  resolve_python() { echo bash; }\n' > "$RWO/$rwo_t/x/stub.sh"
+# TOOL-dWitnessedBar-62 AC17 (S26): one file per call spelling unit 57's contexts missed, none refusing,
+# so each is a member the arm names; `hashed.sh` spells the name only after a `#`, so it is none. The
+# name is spelled through `rwo_rp` so this suite's own lines hold no call. RED where the call reader
+# misses `elif`, `while`, a group, a backtick or `$(` and whitespace (that member unnamed), or reads a
+# commented spelling as a call.
+rwo_rp=resolve_python
+printf 'if false; then :\nelif %s >/dev/null; then :\nfi\n' "$rwo_rp" > "$RWO/$rwo_t/x/elif.sh"
+printf 'while %s >/dev/null; do break; done\n' "$rwo_rp" > "$RWO/$rwo_t/x/while.sh"
+printf 'py=$( %s )\n' "$rwo_rp" > "$RWO/$rwo_t/x/dollar.sh"
+printf 'py=`%s`\n' "$rwo_rp" > "$RWO/$rwo_t/x/backtick.sh"
+printf '{ %s; } >/dev/null\n' "$rwo_rp" > "$RWO/$rwo_t/x/group.sh"
+printf '# %s\n: # then %s\n' "$rwo_rp" "$rwo_rp" > "$RWO/$rwo_t/x/hashed.sh"
+(cd "$RWO" && git init -q && git add -A) || bad "the wrong-shell order fixture could not be staged"; ok
+rwo_out=$(cd "$RWO" && bash "$rwo_t/${HERE##*/}/refuse-wrong-shell.sh" --coverage 2>&1); rwo_rc=$?
+{ [ "$rwo_rc" = 1 ] && grep -q '^BREAK tools/x/late.sh refuses only after it resolved python' <<<"$rwo_out" \
+  && ! grep -q 'early.sh' <<<"$rwo_out"; } \
+  || bad "refuse-wrong-shell.sh --coverage did not red the member refusing after its resolve_python call alone (rc $rwo_rc):${rwo_out//$'\n'/; }"; ok
+grep -q '^BREAK tools/x/indent.sh never calls refuse_wrong_shell' <<<"$rwo_out" \
+  || bad "57 AC1: refuse-wrong-shell.sh --coverage did not name the member whose call is indented under if:${rwo_out//$'\n'/; }"; ok
+! grep -q 'stub.sh' <<<"$rwo_out" \
+  || bad "57 AC2: refuse-wrong-shell.sh --coverage read an indented resolve_python() stub as a call:${rwo_out//$'\n'/; }"; ok
+grep -q "^  dropped: $rwo_t/${HERE##*/}/resolve-python.sh (TOOL-dWitnessedBar-27's listed member the predicate excludes: " <<<"$rwo_out" \
+  || bad "57 AC3: refuse-wrong-shell.sh --coverage did not name resolve-python.sh dropped with its reason:${rwo_out//$'\n'/; }"; ok
+for rwo_f in elif while dollar backtick group; do
+  grep -q "^BREAK tools/x/$rwo_f.sh never calls refuse_wrong_shell" <<<"$rwo_out" \
+    || bad "62 AC17: refuse-wrong-shell.sh --coverage did not read the $rwo_f.sh call as a member's:${rwo_out//$'\n'/; }"; ok
+done
+! grep -q 'hashed.sh' <<<"$rwo_out" \
+  || bad "62 AC17: refuse-wrong-shell.sh --coverage read a spelling after a # as a call:${rwo_out//$'\n'/; }"; ok
+# TOOL-dWitnessedBar-57 AC6: the memory-tree kit carries the resolve_bash_py block once, in tree_lib.py,
+# and row_grammar.py and corpus_ids.py import its scan_bash from there. RED where either keeps a copy.
+rbm_d="$ROOT/${PFX}memory-tree"
+rbm_n=$(for rbm_f in tree_lib row_grammar corpus_ids; do grep -c '^# >>> resolve_bash_py' "$rbm_d/$rbm_f.py"; done | tr -d '\r' | tr '\n' ' ')
+[ "$rbm_n" = "1 0 0 " ] \
+  || bad "57 AC6: the resolve_bash_py block is not carried once in tree_lib.py alone (tree_lib, row_grammar, corpus_ids: $rbm_n)"; ok
+for rbm_f in row_grammar corpus_ids; do
+  grep -qE '^from tree_lib import scan_bash( |$)' "$rbm_d/$rbm_f.py" \
+    || bad "57 AC6: $rbm_f.py does not import scan_bash from tree_lib"; ok
+done
 
 # ---- 2a. EVERY gov_feed_sh COPY RUNS ALONE (TOOL-dPlacedRequest-38 S1, S2) -------------------------
 # Parity holds each copy byte-identical to the canonical; a byte-identical copy still dies in a carrier
@@ -839,46 +1012,99 @@ for ck_k in 1 2 3; do
   fi; ok
 done
 
-# ---- 2j. THE TWO BASH RESOLVERS' CANDIDATE ORDER, BEHAVIOUR (TOOL-dGroundRules-82) -----------------
-# Parity holds check_policy.py's copy of resolve_bash to its canonical; this holds the policy kit's JS
-# resolveBash to the canonical's candidate ORDER, which no byte compare can, as TOOL-dGroundRules-81 §4
-# "The order" states it. Each runs with its spawn stubbed, so every candidate fails and each prints all
-# it tried, over a PATH of two fixture directories, each holding the bash name `shutil.which` finds on
-# this host. GOV_BASH first and RB_TAIL last are one order on both sides; in the PATH slot the JS tries
-# every PATH bash and Python the one `which` names. D1 stands for a first PATH bash that cannot see the
-# shim, so D2 in the JS list is the case TOOL-dGroundRules-81 restored. A host with no node prints no
-# list and reds, never skips. WHAT THIS DOES NOT CHECK: which candidate a real host keeps, a repeat
-# tried once, a `bash.exe` before a `bash` in one directory (git-bash opens `bash.exe` when asked to
-# write `bash` beside it), or any resolve_bash copy but the canonical.
+# ---- 2j. THE ONE BASH RESOLVER, ITS TWO CANONICALS OVER ONE TRUTH TABLE (TOOL-dWitnessedBar-26) ----
+# Rewritten from TOOL-dGroundRules-82's order arm. Parity holds every copy of resolve_bash_py and
+# resolve_bash_js to its canonical; this holds the two canonicals, resolve_bash.py's `scan_bash` and
+# resolve_bash.js's `scanBash`, to one truth table, which no byte compare can. Each row runs both with
+# their spawn stubbed, so no bash of this host decides a row: the stub answers `git --exec-path` with
+# the row's Git, or fails to start where it is `none`, and each candidate, keyed by its path under the
+# fixture root F, with the row's `uname -s` line and exit, or fails to start where the row names none.
+# The rows are TOOL-dWitnessedBar-26's AC1 to AC4 in fixture form, a candidate that cannot see the
+# script, a repeat, an empty `uname` line and an absent Git bash; both outputs must equal the row's.
+# A host with no node prints nothing and reds, never skips. WHAT THIS DOES NOT CHECK: a real bash or a
+# real WSL launcher (the spec's AC1 to AC4 staged those on node d), the 20 s bound, or a copy against
+# its canonical, which the parity rows above do.
 POLICY_DIR=$(resolve_kit_dir "$REALPY" policy policy-mirror.js "$HERE") || exit 2
 NODE=$(command -v node)
-case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) RB_B=bash.exe ;; *) RB_B=bash ;; esac
-RB="$TMP/rb"; mkdir -p "$RB/D1" "$RB/D2"
-: > "$RB/D1/$RB_B"; : > "$RB/D2/$RB_B"; chmod +x "$RB/D1/$RB_B" "$RB/D2/$RB_B"
-RB_TAIL="C:/Program Files/Git/bin/bash.exe;C:/Program Files/Git/usr/bin/bash.exe;bash"
-rb_js=$(cd "$RB" && PATH="$RB/D1:$RB/D2" GOV_BASH=GB "$NODE" -e '
-const cp = require("child_process"), path = require("path");
-const root = path.dirname(process.env.PATH.split(path.delimiter)[0]), tried = [];
-cp.spawnSync = (c) => c === "git" ? { status: 0, stdout: process.cwd() + "\n" } : (tried.push(c), { status: 1 });
-try { require(process.argv[1]).readPolicy("runtime.agents-in-flight"); } catch (_e) { /* the refusal is expected */ }
-console.log(tried.map((c) => c.split(root).join("F").split(path.sep).join("/")).join(";"));' "$ROOT/$POLICY_DIR/policy-mirror.js" 2>&1)
-rb_py=$(cd "$RB" && PATH="$RB/D1:$RB/D2" GOV_BASH=GB "$REALPY_ABS" -B -c '
+RB="$TMP/rb"; mkdir -p "$RB/G/bin" "$RB/D1" "$RB/D2" "$RB/sys/system32"
+for rb_f in G/bin/bash.exe D1/bash.exe D2/bash sys/system32/bash.exe; do : > "$RB/$rb_f"; chmod +x "$RB/$rb_f"; done
+RB_GIT_OK=G/mingw64/libexec/git-core
+check_rb_row() {  # <label> <host> <GOV_BASH> <git exec-path under F, or none> <PATH dirs under F> <answers> <want>
+  local rb_path="" rb_d rb_py rb_js
+  for rb_d in $5; do rb_path="${rb_path:+$rb_path:}$RB/$rb_d"; done
+  rb_py=$(cd "$RB" && PATH="$rb_path" GOV_BASH="$3" RB_GIT="$4" RB_ANSWERS="$6" "$REALPY_ABS" -B -c '
 import os, subprocess, sys
 sys.path.insert(0, sys.argv[1])
 import resolve_bash
-root, tried = os.path.dirname(os.environ["PATH"].split(os.pathsep)[0]), []
-subprocess.run = lambda argv, **kw: tried.append(argv[0]) or subprocess.CompletedProcess(argv, 1)
-resolve_bash.resolve_bash("x")
-print(";".join(c.replace(root, "F").replace(os.sep, "/").replace(".EXE", ".exe") for c in tried))' "$HERE" 2>&1 | tr -d '\r')
-[ "$rb_js" = "GB;F/D1/$RB_B;F/D2/$RB_B;$RB_TAIL" ] \
-  || bad "the JS resolveBash order left the one TOOL-dGroundRules-81 states: $rb_js"; ok
-[ "$rb_py" = "GB;F/D1/$RB_B;$RB_TAIL" ] \
-  || bad "the canonical resolve_bash order left the one TOOL-dGroundRules-81 states: $rb_py"; ok
+root = os.getcwd().replace("\\", "/")
+ans = dict(a.split("=", 1) for a in os.environ["RB_ANSWERS"].split(";") if a)
+def run(argv, **kw):
+    c = argv[0].replace("\\", "/")
+    if c == "git":
+        if os.environ["RB_GIT"] == "none":
+            raise OSError("no git")
+        return subprocess.CompletedProcess(argv, 0, (root + "/" + os.environ["RB_GIT"] + "\n").encode(), b"")
+    k = "F/" + c[len(root) + 1:] if c.startswith(root + "/") else c
+    if k not in ans:
+        raise OSError("not a program")
+    u, rc = ans[k].rsplit(":", 1)
+    return subprocess.CompletedProcess(argv, int(rc), (u + "\n").encode() if u else b"", b"")
+subprocess.run = run
+found, tried, refusal = resolve_bash.scan_bash(sys.argv[2], sys.argv[3])
+out = ["tried: " + t for t in tried] + (["bash: " + found] if found else ["refused: " + refusal])
+print(" | ".join(out).replace(root, "F") + " rc=" + ("0" if found else "2"))' "$HERE" x "$2" 2>&1 | tr -d '\r')
+  rb_js=$(cd "$RB" && PATH="$rb_path" GOV_BASH="$3" RB_GIT="$4" RB_ANSWERS="$6" "$NODE" -e '
+const cp = require("child_process"), path = require("path");
+const root = process.cwd().split(path.sep).join("/"), ans = {};
+for (const a of process.env.RB_ANSWERS.split(";").filter(Boolean)) ans[a.slice(0, a.indexOf("="))] = a.slice(a.indexOf("=") + 1);
+cp.spawnSync = (c) => {
+  c = c.split("\\").join("/");
+  if (c === "git") return process.env.RB_GIT === "none" ? { error: new Error("no git"), status: null }
+    : { status: 0, stdout: Buffer.from(root + "/" + process.env.RB_GIT + "\n") };
+  const k = c.startsWith(root + "/") ? "F/" + c.slice(root.length + 1) : c;
+  if (!(k in ans)) return { error: new Error("not a program"), status: null };
+  const i = ans[k].lastIndexOf(":"), u = ans[k].slice(0, i);
+  return { status: Number(ans[k].slice(i + 1)), stdout: Buffer.from(u ? u + "\n" : "") };
+};
+const { found, tried, refusal } = require(process.argv[1]).scanBash({ script: process.argv[2], host: process.argv[3] });
+const out = tried.map((t) => "tried: " + t).concat(found ? ["bash: " + found] : ["refused: " + refusal]);
+console.log(out.join(" | ").split(root).join("F") + " rc=" + (found ? 0 : 2));' "$HERE/resolve_bash.js" x "$2" 2>&1 | tr -d '\r')
+  [ "$rb_py" = "$7" ] || bad "2j $1: resolve_bash.py's scan_bash left the truth table: '$rb_py'"; ok
+  [ "$rb_js" = "$7" ] || bad "2j $1: resolve_bash.js's scanBash left the truth table: '$rb_js'"; ok
+}
+check_rb_row "AC1, Git's bash before PATH, every candidate reported" windows "" "$RB_GIT_OK" "D1 sys/system32" \
+  "F/G/bin/bash.exe=MINGW64_NT-10.0:0;F/D1/bash.exe=Linux:0" \
+  "tried: F/G/bin/bash.exe: runs | tried: F/D1/bash.exe: answered Linux | tried: F/sys/system32/bash.exe: a launcher | bash: F/G/bin/bash.exe rc=0"
+check_rb_row "AC2, no Git and only WSL: a refusal naming every line" windows "" none "D1 sys/system32" \
+  "F/D1/bash.exe=Linux:0" \
+  "tried: git --exec-path: did not run | tried: F/D1/bash.exe: answered Linux | tried: F/sys/system32/bash.exe: a launcher | refused: no bash runs that can see x: git --exec-path: did not run; F/D1/bash.exe: answered Linux; F/sys/system32/bash.exe: a launcher; set GOV_BASH to Git's bash rc=2"
+check_rb_row "AC3, a posix host takes a bash that runs whatever uname answers" posix "" none "D1" \
+  "F/D1/bash.exe=Linux:0" \
+  "tried: git --exec-path: did not run | tried: F/D1/bash.exe: runs | bash: F/D1/bash.exe rc=0"
+check_rb_row "AC4, an unusable GOV_BASH is refused alone" windows GB "$RB_GIT_OK" "D1" \
+  "F/G/bin/bash.exe=MINGW64_NT-10.0:0" \
+  "tried: GB: did not run | refused: GOV_BASH is set to 'GB' and did not run, so nothing after it is tried: an override that is set and unusable is refused, never a fall-through rc=2"
+check_rb_row "AC4, a usable GOV_BASH is taken alone" windows GB "$RB_GIT_OK" "D1" \
+  "GB=MSYS_NT-10.0:0" \
+  "tried: GB: runs | bash: GB rc=0"
+check_rb_row "a bash that cannot see the script, then a later one that can" windows "" "$RB_GIT_OK" "D2" \
+  "F/G/bin/bash.exe=MINGW64_NT-10.0:1;F/D2/bash=MSYS_NT-10.0:0" \
+  "tried: F/G/bin/bash.exe: cannot see x | tried: F/D2/bash: runs | bash: F/D2/bash rc=0"
+check_rb_row "a repeat is tried once" windows "" "$RB_GIT_OK" "G/bin D2" \
+  "F/G/bin/bash.exe=MINGW64_NT-10.0:0;F/D2/bash=MSYS_NT-10.0:0" \
+  "tried: F/G/bin/bash.exe: runs | tried: F/D2/bash: runs | bash: F/G/bin/bash.exe rc=0"
+check_rb_row "an empty uname line did not run, and an absent Git bash is named" posix "" H/x/y/z "D1" \
+  "F/D1/bash.exe=:0" \
+  "tried: F/H/bin/bash.exe: absent | tried: F/D1/bash.exe: did not run | refused: no bash runs that can see x: F/H/bin/bash.exe: absent; F/D1/bash.exe: did not run; set GOV_BASH to Git's bash rc=2"
 # TOOL-dPlacedRequest-34 S28 (AC28): the hooks kit's readCard finds its bash through resolveCardBash, a
-# third port of the same order; with its spawn stubbed over the same two directories it lists what it
-# tried for the checker it is handed, and that list is the JS port's. Staged by a reorder of
-# resolveCardBash's candidates, it differs. WHAT THIS DOES NOT CHECK: the `test -f` each candidate runs,
-# which the hooks kit's own suite drives with a stub bash first on PATH.
+# port of resolve_bash's candidate order as it stood before TOOL-dWitnessedBar-26 put Git's bash first:
+# GOV_BASH, each PATH directory's `bash.exe` then `bash`, Git for Windows' two, the bare name. With its
+# spawn stubbed over this section's D1 and D2 it lists what it tried for the checker it is handed, and
+# that list is the one below. Staged by a reorder of resolveCardBash's candidates, it differs. It no
+# longer equals the canonical's order, which the truth table above holds: the landing merge of
+# dWitnessedBar over dPlacedRequest kept the arm on its own list and filed the port as an ask. WHAT
+# THIS DOES NOT CHECK: the `test -f` each candidate runs, which the hooks kit's own suite drives with
+# a stub bash first on PATH, and the canonical's Git-first order.
 SG_HOOKS_DIR=$(resolve_kit_dir "$REALPY" hooks scratch-guard.js "$HERE") || exit 2
 rb_sg=$(cd "$RB" && PATH="$RB/D1:$RB/D2" GOV_BASH=GB "$NODE" -e '
 const cp = require("child_process"), path = require("path");
@@ -886,8 +1112,8 @@ const root = path.dirname(process.env.PATH.split(path.delimiter)[0]), tried = []
 cp.spawnSync = (c) => (tried.push(c), { status: 1 });
 require(process.argv[1]).readCard(path.join(process.cwd(), ".git"), "s1", "x");
 console.log(tried.map((c) => c.split(root).join("F").split(path.sep).join("/")).join(";"));' "$ROOT/$SG_HOOKS_DIR/scratch-guard.js" 2>&1)
-[ "$rb_sg" = "GB;F/D1/$RB_B;F/D2/$RB_B;$RB_TAIL" ] \
-  || bad "readCard's resolveCardBash order left the canonical resolve_bash order the JS port holds: $rb_sg"; ok
+[ "$rb_sg" = "GB;F/D1/bash.exe;F/D2/bash;C:/Program Files/Git/bin/bash.exe;C:/Program Files/Git/usr/bin/bash.exe;bash" ] \
+  || bad "readCard's resolveCardBash order left the list its port tries: $rb_sg"; ok
 
 # ---- 2k. THE JS KIT RESOLVER PORT, BEHAVIOUR (TOOL-dFairHearing-32 S26) -----------------------------
 # The hooks kit's agent-cap.js and the review kit's spec-audit-optin.js each carry `resolveKitDir`, a JS
@@ -1034,7 +1260,720 @@ except ValueError as e:
 raised: [[retired]] row 1 needs a non-empty string id and successor" ] \
   || bad "the canonical resolve_retired_kits breaks its contract: ${rk_got//$'\n'/ | }"; ok
 
-# ---- 2n. THE GOVERNANCE REF WRITER, A FAILED BUILD (TOOL-dPlacedRequest-11 AC10) --------------------
+# ---- 2n. THE WRONG-SHELL REFUSAL, ITS THREE TWINS OVER ONE TRUTH TABLE (TOOL-dWitnessedBar-27) -------
+# Parity holds every copy to its canonical; this holds the three canonicals to one verdict per row of
+# the spec's §4 table: the shell's `bash refuse-wrong-shell.sh --probe <path>`, its marker staged by
+# WSL_DISTRO_NAME, set or unset, and resolve_bash.py's `wrong_shell_at` and resolve_bash.js's
+# `wrongShellAt` called with the row's path and marker. `1` is a refusal. WSL's interop entry cannot be
+# unstaged, so on a host carrying it (the held WSL mirror) a marker-0 row asks the sourced shell
+# predicate instead of the probe. A host with no node prints nothing and reds, never skips. WHAT THIS
+# DOES NOT CHECK: a real WSL bash over a `/mnt/` checkout, which the spec's AC1, AC4 and AC6 staged on
+# node d, or a resolver copy refusing for its own location, which the parity rows hold to the canonical.
+RWS_ROWS="1|/mnt/c/r/src/x.sh|1
+1|/home/u/mirror.held/s/src/x.sh|0
+0|/mnt/c/r/src/x.sh|0
+0|C:/r/src/x.sh|0
+0|/c/r/src/x.sh|0
+1|/mnt/data/x.sh|0"
+rws_want=$(printf '%s\n' "$RWS_ROWS" | cut -d'|' -f3)
+rws_sh=$(while IFS='|' read -r w p _; do
+  if [ "$w" = 1 ]; then WSL_DISTRO_NAME=staged bash "$HERE/refuse-wrong-shell.sh" --probe "$p" 2>/dev/null
+  elif [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; then bash -c '. "$1"; wrong_shell_at "$2" 0 && exit 2; exit 0' _ "$HERE/refuse-wrong-shell.sh" "$p"
+  else env -u WSL_DISTRO_NAME bash "$HERE/refuse-wrong-shell.sh" --probe "$p" 2>/dev/null; fi
+  case $? in 0) echo 0 ;; 2) echo 1 ;; *) echo "exit $?" ;; esac
+done <<<"$RWS_ROWS")
+rws_py=$(printf '%s\n' "$RWS_ROWS" | "$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); from resolve_bash import wrong_shell_at
+for line in sys.stdin.read().split():
+    w, p, _ = line.split("|"); print(int(wrong_shell_at(p, w == "1")))' "$HERE" | tr -d '\r')
+rws_js=$(printf '%s\n' "$RWS_ROWS" | "${NODE:-node}" -e 'const { wrongShellAt } = require(process.argv[1]);
+for (const line of require("fs").readFileSync(0, "utf8").split("\n").filter(Boolean)) {
+  const [w, p] = line.split("|"); console.log(wrongShellAt(p, w === "1") ? 1 : 0);
+}' "$HERE/resolve_bash.js" 2>&1 | tr -d '\r')
+[ "$(printf '%s\n' "$rws_want" | grep -c .)" = 6 ] || bad "2n: the wrong-shell truth table did not read as six rows"; ok
+[ "$rws_sh" = "$rws_want" ] || bad "2n: refuse-wrong-shell.sh --probe left the truth table: $(printf '%s' "$rws_sh" | tr '\n' ' ')"; ok
+[ "$rws_py" = "$rws_want" ] || bad "2n: resolve_bash.py's wrong_shell_at left the truth table: $(printf '%s' "$rws_py" | tr '\n' ' ')"; ok
+[ "$rws_js" = "$rws_want" ] || bad "2n: resolve_bash.js's wrongShellAt left the truth table: $(printf '%s' "$rws_js" | tr '\n' ' ')"; ok
+
+# ---- 2o. THE BASELINE LEDGER FACTORY, BEHAVIOUR (TOOL-dWitnessedBar-13) ------------------------------
+# Parity holds the two kit copies to the canonical; this holds the canonical's CLI to the spec's AC1 to
+# AC4, AC9 and AC10 over one fixture repo whose `main` sits on a bare remote it has fetched, so
+# `resolve_compare_base` resolves, with every edit made on a branch off it and reset after its arm. Four
+# registrations: `fx-sites` (site, shrink-only) and `fx-refs` (record, append-only, `ref` verbatim) in
+# tools/fx/kit.toml, `fx-keys` (key, declared-set, `ref` verbatim) in the fixture's govkit registry, and
+# `fx-recall` (key, append-only) in scripts/recall/kit.toml, outside the directory holding the other
+# kit. Then AC7: one byte changed in a scratch copy of the gate-lint copy reads as drift through `blk`.
+# WHAT THIS DOES NOT CHECK: a ledger merge, merge-rows.test.sh's group 1l; and AC8, the two scanners'
+# own legs at the pass tip. A registration's `seed` argv is run by the seed cases at this part's end.
+T=$'\t'
+LL="$TMP/ll"; LLR="$LL/repo"; mkdir -p "$LL"
+build_ll_table() { # population key fields direction home [verbatim] -> one [[ledger]] table
+  printf '[[ledger]]\npopulation = "%s"\nleg = "fx leg"\nseed = []\nkey = "%s"\nfields = [%s]\ndrain = "none"\ndirection = "%s"\nhome = "%s"\n' "$1" "$2" "$3" "$4" "$5"
+  [ -z "${6:-}" ] || printf 'verbatim = [%s]\n' "$6"
+  printf '\n'
+}
+build_ll_ledger() { # population key fields-csv direction -> the header the factory renders
+  printf '# ledger · %s · key %s %s · direction %s · drain none\n' "$1" "$2" "$3" "$4"
+}
+run_ll() { # verb population [--measured path] -> the CLI's stdout and stderr, then rc=<exit>
+  (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$HERE/legacy_ledger.py" "$@") 2>&1 | tr -d '\r'
+  echo "rc=${PIPESTATUS[0]}"
+}
+run_ll_reset() { git -C "$LLR" reset -q --hard && git -C "$LLR" clean -qfd; }
+git init -q --bare "$LL/remote.git"
+git init -q -b main "$LLR" && git -C "$LLR" config core.autocrlf false
+LL_DEPLOYER=govkit  # the deployer kit's directory name, spelled once
+LL_GATE_LINT=gate-lint  # the gate-lint kit's directory name, spelled once
+mkdir -p "$LLR/tools/fx" "$LLR/tools/$LL_DEPLOYER" "$LLR/scripts/recall" "$LLR/memory/project"
+{ printf 'id = "fx"\n\n'; build_ll_table fx-sites site '"path", "delimiter"' shrink-only memory/project/fx-sites.txt
+  build_ll_table fx-refs record '"ref", "note"' append-only memory/project/fx-refs.txt '"ref"'; } > "$LLR/tools/fx/kit.toml"
+build_ll_table fx-keys key '"ref"' declared-set memory/project/fx-keys.txt '"ref"' > "$LLR/tools/$LL_DEPLOYER/registry.toml"
+build_ll_table fx-recall key '"name"' append-only memory/project/fx-recall.txt > "$LLR/scripts/recall/kit.toml"
+{ build_ll_ledger fx-sites site path,delimiter shrink-only; printf 'a.sh\tEOF\t2\tabcdef12\tseeded\nc.sh\tEOF\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-sites.txt"
+{ build_ll_ledger fx-refs record ref,note append-only; printf 'y:7\tnote\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-refs.txt"
+{ build_ll_ledger fx-keys key ref declared-set; printf 'x:120\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-keys.txt"
+{ build_ll_ledger fx-recall key name append-only; printf 'alpha\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-recall.txt"
+printf 'echo the a script\n' > "$LLR/a.sh"; printf 'echo the c script\n' > "$LLR/c.sh"
+git -C "$LLR" add -A && git -C "$LLR" -c user.email=t@e -c user.name=t commit -q --no-verify -m fixture \
+  && git -C "$LLR" remote add origin ../remote.git && git -C "$LLR" push -q origin main 2>/dev/null \
+  && git -C "$LLR" fetch -q origin && git -C "$LLR" remote set-head origin main >/dev/null \
+  && git -C "$LLR" checkout -q -b feature || bad "2o: the ledger fixture repo could not be built"; ok
+# AC1 — rows read, then a disagreeing header, a line-number key and a disposition outside the set.
+out=$(run_ll read fx-sites)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "a.sh${T}EOF${T}2${T}abcdef12${T}seeded" <<<"$out" && grep -qxF "c.sh${T}EOF${T}1${T}abcdef12${T}seeded" <<<"$out"; } \
+  || bad "2o AC1: read fx-sites did not print both rows and exit 0: ${out//$'\n'/ | }"; ok
+{ build_ll_ledger fx-sites site path,delimiter append-only; git -C "$LLR" show HEAD:memory/project/fx-sites.txt | tail -n +2; } > "$LL/fx-sites.txt"
+cp "$LL/fx-sites.txt" "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll read fx-sites); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 1: the header' <<<"$out"; } || bad "2o AC1: a header disagreeing with its registration read clean: ${out//$'\n'/ | }"; ok
+printf 'a.sh\t42\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll read fx-sites); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 4: a key field reads as a line number' <<<"$out"; } || bad "2o AC1: a line-number key read clean: ${out//$'\n'/ | }"; ok
+printf 'd.sh\tEOF\t1\tabcdef12\tdone\n' >> "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll read fx-sites); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 4: the disposition' <<<"$out"; } || bad "2o AC1: an invalid disposition read clean: ${out//$'\n'/ | }"; ok
+# AC2 — both ways against a measurement, and a compare given none says so.
+printf 'a.sh\tEOF\t2\nb2.sh\tEOF\t1\n' > "$LL/measured.txt"
+out=$(run_ll compare fx-sites --measured "$LL/measured.txt")
+{ [ "$(grep -c 'undeclared site b2.sh' <<<"$out")" = 1 ] && [ "$(grep -c 'unmeasured row c.sh' <<<"$out")" = 1 ] \
+  && [ "$(grep -cE 'undeclared site|unmeasured row' <<<"$out")" = 2 ] && [ "${out##*$'\n'}" = rc=1 ]; } \
+  || bad "2o AC2: compare --measured did not name one undeclared site and one unmeasured row: ${out//$'\n'/ | }"; ok
+out=$(run_ll compare fx-sites)
+{ ! grep -qE 'undeclared site|unmeasured row' <<<"$out" && grep -q 'both-ways half was not run' <<<"$out"; } \
+  || bad "2o AC2: a compare given no measurement passed as if both ways had been read: ${out//$'\n'/ | }"; ok
+# AC3 — a gain against the base under shrink-only, widened, under declared-set, and with no base.
+printf 'e.sh\tEOF\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll compare fx-sites)
+grep -q "gained e.sh${T}EOF" <<<"$out" || bad "2o AC3: a key the shrink-only ledger gained was not printed gained: ${out//$'\n'/ | }"; ok
+run_ll_reset; printf 'e.sh\tEOF\t1\tabcdef12\twidened:REC-1\n' >> "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll compare fx-sites); run_ll_reset
+{ ! grep -q 'gained' <<<"$out" && [ "${out##*$'\n'}" = rc=0 ]; } || bad "2o AC3: a widened gain was refused: ${out//$'\n'/ | }"; ok
+printf 'z:9\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-keys.txt"
+out=$(run_ll compare fx-keys); run_ll_reset
+{ ! grep -q 'gained' <<<"$out" && [ "${out##*$'\n'}" = rc=0 ]; } || bad "2o AC3: a declared-set ledger's gain was refused: ${out//$'\n'/ | }"; ok
+git -C "$LLR" update-ref -d refs/remotes/origin/main
+out=$(run_ll compare fx-sites); git -C "$LLR" fetch -q origin
+{ grep -q 'unresolved — no origin/main ref to compare against' <<<"$out" && [ "${out##*$'\n'}" = rc=1 ]; } \
+  || bad "2o AC3: a compare with no base did not print unresolved and its reason: ${out//$'\n'/ | }"; ok
+# AC4 — a staged rename carried, then compared clean; an untracked home is never written.
+git -C "$LLR" mv a.sh b.sh
+out=$(run_ll carry fx-sites)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "b.sh${T}EOF${T}2${T}abcdef12${T}seeded" "$LLR/memory/project/fx-sites.txt" \
+  && ! grep -q '^a\.sh' "$LLR/memory/project/fx-sites.txt"; } || bad "2o AC4: carry did not move a.sh's row to b.sh with its count, sha and disposition: ${out//$'\n'/ | }"; ok
+printf 'b.sh\tEOF\t2\nc.sh\tEOF\t1\n' > "$LL/measured.txt"
+out=$(run_ll compare fx-sites --measured "$LL/measured.txt")
+{ ! grep -qE 'gained|unmeasured row|undeclared site' <<<"$out" && [ "${out##*$'\n'}" = rc=0 ]; } \
+  || bad "2o AC4: a carried rename read as a drain and a gain: ${out//$'\n'/ | }"; ok
+run_ll_reset; git -C "$LLR" mv a.sh b.sh && git -C "$LLR" rm -q --cached memory/project/fx-sites.txt
+ll_before=$(cksum < "$LLR/memory/project/fx-sites.txt")
+out=$(run_ll carry fx-sites)
+ll_after=$(cksum < "$LLR/memory/project/fx-sites.txt"); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=2 ] && grep -q 'memory/project/fx-sites.txt is not a tracked home' <<<"$out" \
+  && [ "$ll_before" = "$ll_after" ]; } \
+  || bad "2o AC4: carry over an untracked home did not exit 2 naming it with the file's bytes unchanged: ${out//$'\n'/ | }"; ok
+# AC9 — a population registered only in the govkit registry, one whose kit sits outside the others'
+# parent, and a kit table declaring the first one's home.
+out=$(run_ll read fx-keys)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "x:120${T}1${T}abcdef12${T}seeded" <<<"$out"; } \
+  || bad "2o AC9 AC10: read fx-keys, registered in the govkit registry with ref verbatim, did not print its row and exit 0: ${out//$'\n'/ | }"; ok
+out=$(run_ll read fx-recall)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "alpha${T}1${T}abcdef12${T}seeded" <<<"$out"; } \
+  || bad "2o AC9: read fx-recall, registered in scripts/recall/kit.toml, did not print its row and exit 0: ${out//$'\n'/ | }"; ok
+build_ll_table fx-dup key '"ref"' declared-set memory/project/fx-keys.txt >> "$LLR/tools/fx/kit.toml"
+out=$(run_ll read fx-keys); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=2 ] && grep -q "declare one home memory/project/fx-keys.txt" <<<"$out" \
+  && grep -q "tools/$LL_DEPLOYER/registry.toml: \[\[ledger\]\] 'fx-keys'" <<<"$out" && grep -q "tools/fx/kit.toml: \[\[ledger\]\] 'fx-dup'" <<<"$out"; } \
+  || bad "2o AC9: two tables declaring one home did not exit 2 naming both: ${out//$'\n'/ | }"; ok
+# AC10 — verbatim is per field and per registration: a second population's line-number key, a
+# verbatim registration's other field, and a verbatim entry outside the fields.
+printf 'a.sh\t120\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll read fx-sites); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 4: a key field reads as a line number' <<<"$out"; } \
+  || bad "2o AC10: a site key field 120 with no verbatim read clean: ${out//$'\n'/ | }"; ok
+out=$(run_ll read fx-refs)
+[ "${out##*$'\n'}" = rc=0 ] || bad "2o AC10: read fx-refs over its verbatim ref did not exit 0: ${out//$'\n'/ | }"; ok
+printf 'y:8\tz:9\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-refs.txt"
+out=$(run_ll read fx-refs); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 3: a key field reads as a line number' <<<"$out"; } \
+  || bad "2o AC10: verbatim ref waived the line-number refusal on the note field too: ${out//$'\n'/ | }"; ok
+build_ll_table fx-keys key '"ref"' declared-set memory/project/fx-keys.txt '"nope"' > "$LLR/tools/$LL_DEPLOYER/registry.toml"
+out=$(run_ll read fx-keys); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=2 ] && grep -q "tools/$LL_DEPLOYER/registry.toml: \[\[ledger\]\] 'fx-keys': verbatim names nope, not in its fields" <<<"$out"; } \
+  || bad "2o AC10: a verbatim entry outside the fields was accepted: ${out//$'\n'/ | }"; ok
+# AC7 — the parity cut sees one byte changed in the gate-lint copy.
+sed 's/^KEY_KINDS = /KEY_KINDZ = /' "$ROOT/${PFX}$LL_GATE_LINT/legacy_ledger.py" > "$TMP/ll-drift.py"
+{ [ "$(blk legacy_ledger_py "$ROOT/${PFX}$LL_GATE_LINT/legacy_ledger.py")" = "$(blk legacy_ledger_py "$HERE/legacy_ledger.py")" ] \
+  && [ "$(blk legacy_ledger_py "$TMP/ll-drift.py")" != "$(blk legacy_ledger_py "$HERE/legacy_ledger.py")" ]; } \
+  || bad "2o AC7: the legacy_ledger_py cut did not hold the gate-lint copy identical, or missed one changed byte"; ok
+
+# ---- 2o, the seed (TOOL-dWitnessedBar-15 AC1 to AC6) ---------------------------------------------
+# The same fixture gains `fx-seed` (key `name`, shrink-only, home in memory/project/), whose seed argv
+# prints one `<key> TAB 1` row per word of seed-keys.txt and fails or reports a dead probe on a mode
+# file, and `q`, whose `seed = []`. The argv names this host's interpreter by `sys.executable`, in a TOML
+# literal string so a Windows path's backslashes stay. The policy cases land their policy file on the
+# remote's main, which the reader takes, and run last. WHAT THIS DOES NOT CHECK: the 600 s bound, since
+# no seed here hangs; a killed run, beyond `write_rows`' temp file and `os.replace`.
+run_ll_reset
+LL_EXE=$("$REALPY" -c 'import sys; print(sys.executable)' | tr -d '\r')
+cat > "$LLR/fxseed.py" <<'PY'
+import pathlib, sys
+mode = pathlib.Path("seed-mode.txt")
+said = mode.read_text().strip() if mode.exists() else ""
+if said == "fail":
+    sys.exit(1)
+if said == "dead":
+    print("dead probe: no files")
+    sys.exit(0)
+for word in pathlib.Path("seed-keys.txt").read_text().split():
+    print(word + "\t1")
+PY
+build_ll_seeded() { # population home seed-literal -> one [[ledger]] table with a seed argv
+  printf '[[ledger]]\npopulation = "%s"\nleg = "fx leg"\nseed = %s\nkey = "key"\nfields = ["name"]\ndrain = "none"\ndirection = "shrink-only"\nhome = "%s"\n\n' "$1" "$3" "$2"
+}
+LL_SEEDARGV="['$LL_EXE', 'fxseed.py']"
+{ build_ll_seeded fx-seed memory/project/fx-seed.txt "$LL_SEEDARGV"; build_ll_seeded q memory/project/q.txt '[]'; } >> "$LLR/tools/fx/kit.toml"
+printf 'a\nb\n' > "$LLR/seed-keys.txt"
+write_ll_commit() { git -C "$LLR" add -A && git -C "$LLR" -c user.email=t@e -c user.name=t commit -q --no-verify -m "$1"; }
+write_ll_commit "seed fixture" || bad "2o seed: the seed fixture could not be committed"; ok
+LL_SEEDED="$LLR/memory/project/fx-seed.txt"
+ll_head=$(git -C "$LLR" rev-parse HEAD)
+# AC1 — a first seed writes the header and both rows, each with HEAD's sha and `seeded`.
+out=$(run_ll seed --population fx-seed)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-seed 2" <<<"$out" \
+  && [ "$(head -1 "$LL_SEEDED")" = "$(build_ll_ledger fx-seed key name shrink-only)" ] \
+  && grep -qxF "a${T}1${T}${ll_head}${T}seeded" "$LL_SEEDED" && grep -qxF "b${T}1${T}${ll_head}${T}seeded" "$LL_SEEDED"; } \
+  || bad "2o seed AC1: a first seed did not print armed fx-seed 2 and write two rows stamped $ll_head seeded: ${out//$'\n'/ | }"; ok
+write_ll_commit "seeded" || bad "2o seed: the seeded home could not be committed"; ok
+# AC2 — an offence the seed would now measure, committed: a rerun leaves the armed home byte-identical.
+cp "$LL_SEEDED" "$LL/fx-seed.before"
+printf 'a\nb\nc\n' > "$LLR/seed-keys.txt"; write_ll_commit "planted c" || bad "2o seed: the planted key could not be committed"; ok
+ll_head2=$(git -C "$LLR" rev-parse HEAD)
+out=$(run_ll seed --population fx-seed)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "present fx-seed" <<<"$out" && cmp -s "$LL/fx-seed.before" "$LL_SEEDED"; } \
+  || bad "2o seed AC2: a rerun over an armed home re-seeded it, laundering the planted key: ${out//$'\n'/ | }"; ok
+# AC3 — widened: only the key the home lacks is added, stamped with the new sha and widened:R1.
+out=$(run_ll seed --population fx-seed --widen R1)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "widened fx-seed c" <<<"$out" \
+  && head -3 "$LL_SEEDED" | cmp -s - "$LL/fx-seed.before" \
+  && grep -qxF "c${T}1${T}${ll_head2}${T}widened:R1" "$LL_SEEDED" && [ "$(wc -l < "$LL_SEEDED")" -eq 4 ]; } \
+  || bad "2o seed AC3: --widen R1 did not add c alone, stamped $ll_head2 widened:R1, with the first rows unchanged: ${out//$'\n'/ | }"; ok
+run_ll_reset
+# AC4 — a seed that exits 1, then one reporting a dead probe: the home holds the header and one unarmed
+# line and no row; with the seed repaired, a rerun arms it.
+rm -f "$LL_SEEDED"; printf 'fail\n' > "$LLR/seed-mode.txt"
+out=$(run_ll seed --population fx-seed)
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -qxF "unarmed fx-seed exit 1" <<<"$out" && [ "$(wc -l < "$LL_SEEDED")" -eq 2 ] \
+  && grep -qxF "# unarmed · exit 1 · $ll_head2" "$LL_SEEDED" && ! grep -q "$T" "$LL_SEEDED"; } \
+  || bad "2o seed AC4: a seed exiting 1 did not leave the header and one unarmed line: ${out//$'\n'/ | }"; ok
+printf 'dead\n' > "$LLR/seed-mode.txt"
+out=$(run_ll seed --population fx-seed)
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -qxF "unarmed fx-seed dead probe" <<<"$out" \
+  && grep -qxF "# unarmed · dead probe · $ll_head2" "$LL_SEEDED" && ! grep -q "$T" "$LL_SEEDED"; } \
+  || bad "2o seed AC4: a seed reporting a dead probe read armed or left rows: ${out//$'\n'/ | }"; ok
+rm -f "$LLR/seed-mode.txt"
+out=$(run_ll seed --population fx-seed)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-seed 3" <<<"$out" && ! grep -q '^# unarmed' "$LL_SEEDED"; } \
+  || bad "2o seed AC4: the repaired seed did not re-arm the unarmed home: ${out//$'\n'/ | }"; ok
+run_ll_reset
+# AC5, moved to an absent directory by TOOL-dWitnessedBar-47 (its AC3) — a home under a directory that
+# does not exist is never written and the directory is never created; with the directory made and
+# nothing in it tracked, the same home is seeded, as an adopter seeds into a directory it has just made.
+build_ll_seeded fx-nodir nodir/fx-nodir.txt "$LL_SEEDARGV" >> "$LLR/tools/fx/kit.toml"
+out=$(run_ll seed --population fx-nodir)
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -qxF "unarmed fx-nodir no directory nodir" <<<"$out" && [ ! -e "$LLR/nodir" ]; } \
+  || bad "2o seed AC5: a home under an absent directory was written, read armed, or its directory created: ${out//$'\n'/ | }"; ok
+mkdir -p "$LLR/nodir"
+out=$(run_ll seed --population fx-nodir)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-nodir 3" <<<"$out" && [ -f "$LLR/nodir/fx-nodir.txt" ] \
+  && [ -z "$(git -C "$LLR" ls-files -- nodir)" ]; } \
+  || bad "2o seed 47 AC3: a home under an existing directory holding no tracked file was not seeded: ${out//$'\n'/ | }"; ok
+# TOOL-dWitnessedBar-57 AC10 — a seed home is admitted only inside the work tree, outside its git dir, and
+# where `git check-ignore` does not match it: a relative `..` home, an absolute home outside the tree and
+# a home under an ignored directory each print their reading and write nothing; an absolute home inside
+# the tree is seeded. RED against the directory-exists test alone, which admits all three.
+printf 'tmpl\n' > "$LL/tmpl.txt"; printf 'ign/\n' > "$LLR/.gitignore"; mkdir -p "$LLR/ign" "$LL/outside"
+for ll_case in "../outside/x|outside the tree " "$LL/abs-out.txt|outside the tree " "ign/x.txt|ignored ign/x.txt" \
+    ".git/x.txt|outside the tree "; do
+  out=$(run_ll seed --home "${ll_case%%|*}" --copy "$LL/tmpl.txt")
+  { [ "${out##*$'\n'}" = rc=1 ] && grep -q "^unarmed .* ${ll_case#*|}" <<<"$out" && [ ! -e "$LL/outside/x" ] \
+    && [ ! -e "$LL/abs-out.txt" ] && [ ! -e "$LLR/ign/x.txt" ] && [ ! -e "$LLR/.git/x.txt" ]; } \
+    || bad "57 AC10: the seed home ${ll_case%%|*} was written or not read as ${ll_case#*|}: ${out//$'\n'/ | }"; ok
+done
+out=$(run_ll seed --home "$LLR/nodir/abs.txt" --copy "$LL/tmpl.txt")
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed nodir/abs.txt" <<<"$out" && [ -f "$LLR/nodir/abs.txt" ]; } \
+  || bad "57 AC10: an absolute seed home inside the work tree was not armed: ${out//$'\n'/ | }"; ok
+# TOOL-dWitnessedBar-62 AC18 (S27, S35) — inside a `git worktree add` fixture, whose `.git` is a gitlink
+# FILE naming the common dir, `--home .git` and `--home` naming the git dir of a nested repository each
+# print `outside the tree` and leave the gitlink byte-identical; a relative and an absolute in-tree home
+# each print `armed`. RED against a string-prefix compare (the absolute in-tree home refused) and against
+# a git-dir test alone (the gitlink, no git dir, overwritten).
+LLW="$LL/wt"; rm -rf "${LLW:?}"
+git -C "$LLR" worktree add -q --detach "$LLW" >/dev/null 2>&1 || bad "62 AC18: the linked worktree could not be added"; ok
+mkdir -p "$LLW/wtdir" "$LLW/nested" && git -C "$LLW/nested" init -q && cp "$LLW/.git" "$LL/wt.gitlink"
+run_llw() { (cd "$LLW" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$HERE/legacy_ledger.py" "$@") 2>&1 | tr -d '\r'; echo "rc=${PIPESTATUS[0]}"; }
+for ll_home in .git nested/.git; do
+  out=$(run_llw seed --home "$ll_home" --copy "$LL/tmpl.txt")
+  { [ "${out##*$'\n'}" = rc=1 ] && grep -q "^unarmed .* outside the tree " <<<"$out" && cmp -s "$LL/wt.gitlink" "$LLW/.git"; } \
+    || bad "62 AC18: in a linked worktree the seed home $ll_home was written or not read outside the tree: ${out//$'\n'/ | }"; ok
+done
+for ll_home in wtdir/rel.txt "$LLW/wtdir/abs.txt"; do
+  out=$(run_llw seed --home "$ll_home" --copy "$LL/tmpl.txt")
+  { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed wtdir/${ll_home##*/}" <<<"$out" && [ -f "$LLW/wtdir/${ll_home##*/}" ]; } \
+    || bad "62 AC18: in a linked worktree the in-tree seed home $ll_home was not armed: ${out//$'\n'/ | }"; ok
+done
+git -C "$LLR" worktree remove --force "$LLW" >/dev/null 2>&1; rm -rf "${LLW:?}" "$LL/wt.gitlink"
+rm -rf "$LLR/.gitignore" "$LLR/ign" "$LLR/nodir/abs.txt" "$LL/outside" "$LL/tmpl.txt"
+run_ll_reset
+# TOOL-dWitnessedBar-17 S9, AC11 — a seed argv spelling its program `{prefix}/<kit>/<file>` runs where the
+# token resolves against the tool root above the running copy. A copy of this directory one level under the
+# scratch root's tool root makes that root the prefix, so `{prefix}/fx/fxpfx.py` names the fixture's own file. RED
+# where the token stays literal: the argv then names no file, the seed exits non-zero and reads unarmed.
+PK="$LLR/tools/${HERE##*/}"; mkdir -p "$PK"; cp "$HERE"/*.py "$PK/" 2>/dev/null
+printf 'print("p\\t1")\n' > "$LLR/tools/fx/fxpfx.py"
+build_ll_seeded fx-pfx memory/project/fx-pfx.txt "['$LL_EXE', '{prefix}/fx/fxpfx.py']" >> "$LLR/tools/fx/kit.toml"
+out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$PK/legacy_ledger.py" seed --population fx-pfx) 2>&1 | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-pfx 1" <<<"$out" \
+  && grep -qxF "p${T}1${T}$(git -C "$LLR" rev-parse HEAD)${T}seeded" "$LLR/memory/project/fx-pfx.txt"; } \
+  || bad "2o seed S9: a seed argv's {prefix} did not resolve to the tool root above the running copy: ${out//$'\n'/ | }"; ok
+# TOOL-dWitnessedBar-51 S32, AC28 — a seed argv's head `python3` runs as the running interpreter, never a
+# PATH lookup that can reach the MS-Store stub, with `{prefix}` resolved and the cwd at the root. RED where
+# the head is spelled as written: on a host whose `python3` is the stub the seed exits 9009 and reads
+# unarmed, and on any host the child's interpreter can differ from the parent's.
+printf '%s\n' 'import os, sys' 'print("p\t1")' 'open("argv-run.txt", "w").write(sys.executable + chr(10) + os.getcwd())' > "$LLR/tools/fx/fxrun.py"
+build_ll_seeded fx-run memory/project/fx-run.txt "['python3', '{prefix}/fx/fxrun.py']" >> "$LLR/tools/fx/kit.toml"
+out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$PK/legacy_ledger.py" seed --population fx-run) 2>&1 | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
+ll_parent=$(cd "$LLR" && "$REALPY" -B -c 'import os, sys; print(sys.executable); print(os.getcwd())' | tr -d '\r')
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-run 1" <<<"$out" \
+  && [ "$(tr -d '\r' < "$LLR/argv-run.txt")" = "$ll_parent" ]; } \
+  || bad "2o seed S32: a python3 head did not run as the running interpreter at the root: ${out//$'\n'/ | } / $(tr '\n' ' ' < "$LLR/argv-run.txt" 2>/dev/null)"; ok
+# TOOL-dWitnessedBar-51 S50, AC40 — a registered home that exists and whose first line is no header, a
+# legacy-grammar file, is refused: `refused <population>`, exit 2, the home byte-identical. RED where it
+# reads `present` (an armed home) or is treated as absent and rewritten.
+printf 'p\tthe legacy grammar, a reason column\n' > "$LLR/memory/project/fx-run.txt"; cp "$LLR/memory/project/fx-run.txt" "$LL/fx-run.before"
+out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$PK/legacy_ledger.py" seed --population fx-run) 2>&1 | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
+{ [ "${out##*$'\n'}" = rc=2 ] && grep -q '^refused fx-run header disagrees' <<<"$out" && ! grep -q '^present\|^armed' <<<"$out" \
+  && cmp -s "$LL/fx-run.before" "$LLR/memory/project/fx-run.txt"; } \
+  || bad "2o seed S50: a legacy-grammar home read present or absent, or was written: ${out//$'\n'/ | }"; ok
+rm -f "$LLR/argv-run.txt"
+run_ll_reset
+# AC6 — `seed = []` under the default, under a landed `refuse`, and with no policy kit resolving.
+out=$(run_ll seed --all)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "unarmed q no seed" <<<"$out" && grep -qxF "present fx-seed" <<<"$out"; } \
+  || bad "2o seed AC6: seed --all did not print unarmed q no seed and exit 0: ${out//$'\n'/ | }"; ok
+mkdir -p "$LLR/.governance"; printf '[retrofit]\nunseeded = "refuse"\n' > "$LLR/.governance/policy.toml"
+{ write_ll_commit "refuse" && git -C "$LLR" push -q origin HEAD:main 2>/dev/null && git -C "$LLR" fetch -q origin; } \
+  || bad "2o seed AC6: the refuse policy could not be landed on the fixture's remote"; ok
+out=$(run_ll seed --all)
+{ [ "${out##*$'\n'}" = rc=2 ] && grep -q "retrofit.unseeded is refuse.*: .*\bq\b" <<<"$out" && ! grep -q '^armed\|^present' <<<"$out"; } \
+  || bad "2o seed AC6: retrofit.unseeded = refuse let a seed = [] registration through: ${out//$'\n'/ | }"; ok
+NK="$LL/nokit/lib"; mkdir -p "$NK"; cp "$HERE"/*.py "$HERE"/*.txt "$NK/" 2>/dev/null
+out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$NK/legacy_ledger.py" seed --population q) 2>"$LL/nokit.err" | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "unarmed q no seed" <<<"$out" \
+  && [ "$(grep -c 'retrofit.unseeded' "$LL/nokit.err")" = 1 ] && grep -q 'no policy kit' "$LL/nokit.err"; } \
+  || bad "2o seed AC6: with no policy kit the read was not the default with one stderr line naming retrofit.unseeded: ${out//$'\n'/ | } / $(tr '\n' ' ' < "$LL/nokit.err")"; ok
+[ "$(grep -c 'retrofit\.unseeded' "$ROOT/help/policy.md")" = 1 ] \
+  || bad "2o seed AC6: help/policy.md does not name retrofit.unseeded on one line of its consumer list"; ok
+
+# ---- 2o, the unborn seed (TOOL-dWitnessedBar-61 AC1 AC2) ------------------------------------------
+# A second fixture, a commitless `git init` whose kit table, seed argv and home directory are staged and
+# never committed, so `rev-parse --verify -q HEAD` exits 1 printing nothing: the seed stamps the null SHA
+# and says so, a failed seed's unarmed line carries it, and once committed a rerun leaves the home
+# byte-identical while --widen stamps the new HEAD. Red when the seed takes its sha from a bare HEAD
+# read again. WHAT THIS DOES NOT CHECK: an unborn HEAD in a reftable repository, or under a git release
+# answering the unborn probes otherwise; a broken HEAD is the corrupt-HEAD block's, below.
+LLU="$LL/unborn"; LL_NULL=0000000000000000000000000000000000000000
+mkdir -p "$LLU/tools/fx" "$LLU/memory/project"
+git init -q "$LLU" && git -C "$LLU" config core.autocrlf false
+cp "$LLR/fxseed.py" "$LLU/"; build_ll_seeded p memory/project/p.txt "$LL_SEEDARGV" > "$LLU/tools/fx/kit.toml"
+printf 'a\nb\n' > "$LLU/seed-keys.txt"; : > "$LLU/memory/project/.keep"; git -C "$LLU" add -A
+LL_UHOME="$LLU/memory/project/p.txt"
+out=$(LLR="$LLU" run_ll seed --population p)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed p 2" <<<"$out" && [ "$(grep -c 'HEAD is unborn' <<<"$out")" = 1 ] \
+  && grep -qxF "a${T}1${T}${LL_NULL}${T}seeded" "$LL_UHOME" && grep -qxF "b${T}1${T}${LL_NULL}${T}seeded" "$LL_UHOME"; } \
+  || bad "2o unborn AC1: a seed on an unborn HEAD did not print armed p 2 and HEAD is unborn with two null-SHA rows: ${out//$'\n'/ | }"; ok
+out=$(LLR="$LLU" run_ll read p)
+{ [ "${out##*$'\n'}" = rc=0 ] && [ "$(grep -c "${T}${LL_NULL}${T}seeded" <<<"$out")" = 2 ]; } \
+  || bad "2o unborn AC1: read_rows did not return the two null-SHA rows: ${out//$'\n'/ | }"; ok
+# TOOL-dWitnessedBar-63 AC23 (S32, S33) — the streams read apart, through `run_seed_cli` itself: a symbolic
+# `--sha HEAD` exits 2 naming --sha and writes no home; then on the unborn HEAD every stdout line is a
+# population's and `HEAD is unborn` is on stderr. RED where the unborn line lands on the status stream.
+run_ll_py() { # python source · arg... -> rc=<exit>; at $LLU with legacy_ledger imported as L, stdout and stderr CR-cut into $LL/py.out and $LL/py.err
+  local rc
+  (cd "$LLU" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B -c 'import os, sys; sys.path.insert(0, sys.argv[1]); import legacy_ledger as L
+'"$1" "$HERE" "${@:2}") >"$LL/py.raw" 2>"$LL/py.rawerr"; rc=$?
+  tr -d '\r' < "$LL/py.raw" > "$LL/py.out"; tr -d '\r' < "$LL/py.rawerr" > "$LL/py.err"; echo "rc=$rc"
+}
+rm -f "$LL_UHOME"
+out=$(run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p", "--sha", "HEAD"], "."))')
+{ [ "$out" = rc=2 ] && grep -q -- '--sha' "$LL/py.err" && [ ! -e "$LL_UHOME" ]; } \
+  || bad "63 AC23: seed --sha HEAD did not exit 2 naming --sha with no home written: $out / $(tr '\n' ' ' < "$LL/py.err")"; ok
+out=$(run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p"], "."))')
+{ [ "$out" = rc=0 ] && grep -qxF "armed p 2" "$LL/py.out" && ! grep -qvE '^(armed|present|widened|unarmed) ' "$LL/py.out" \
+  && grep -q 'HEAD is unborn' "$LL/py.err"; } \
+  || bad "63 AC23: on an unborn HEAD a stdout line is no population's or stderr lacks HEAD is unborn: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+rm -f "$LL_UHOME"; printf 'fail\n' > "$LLU/seed-mode.txt"
+out=$(LLR="$LLU" run_ll seed --population p)
+ll_state=$("$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import legacy_ledger as L; print(L.read_home_state(sys.argv[2]))' "$HERE" "$LL_UHOME" | tr -d '\r')
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -qxF "unarmed p exit 1" <<<"$out" && grep -qxF "# unarmed · exit 1 · $LL_NULL" "$LL_UHOME" \
+  && [ "$ll_state" = unarmed ]; } \
+  || bad "2o unborn AC1: a failed seed on an unborn HEAD did not leave an unarmed line carrying the null SHA, read unarmed: ${out//$'\n'/ | } / $ll_state"; ok
+rm -f "$LLU/seed-mode.txt"
+out=$(LLR="$LLU" run_ll seed --population p)
+grep -qxF "armed p 2" <<<"$out" || bad "2o unborn: the repaired seed did not re-arm the unborn home: ${out//$'\n'/ | }"; ok
+git -C "$LLU" add -A && git -C "$LLU" -c user.email=t@e -c user.name=t commit -q --no-verify -m first \
+  || bad "2o unborn AC2: the unborn fixture could not be committed"; ok
+cp "$LL_UHOME" "$LL/p.before"; ll_uhead=$(git -C "$LLU" rev-parse HEAD)
+out=$(LLR="$LLU" run_ll seed --population p)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "present p" <<<"$out" && ! grep -q 'HEAD is unborn' <<<"$out" \
+  && cmp -s "$LL/p.before" "$LL_UHOME"; } \
+  || bad "2o unborn AC2: a seed after the first commit re-dated the null-SHA home: ${out//$'\n'/ | }"; ok
+printf 'a\nb\nc\n' > "$LLU/seed-keys.txt"
+out=$(LLR="$LLU" run_ll seed --population p --widen R1)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "c${T}1${T}${ll_uhead}${T}widened:R1" "$LL_UHOME" \
+  && head -3 "$LL_UHOME" | cmp -s - "$LL/p.before"; } \
+  || bad "2o unborn AC2: --widen R1 did not stamp c at the new HEAD with a and b keeping the null SHA: ${out//$'\n'/ | }"; ok
+
+# ---- 2o, the corrupt HEAD (TOOL-dWitnessedBar-64 AC1) ------------------------------------------------
+# Five fresh `git init`s, each holding the unborn fixture's registration `p` staged and never committed.
+# Four have HEAD broken one way: the branch file holding `garbage`; holding forty `1`s, an object that
+# does not exist; holding `ref: refs/heads/other` while `other` points back; `.git/HEAD` itself holding
+# forty `1`s; the fifth, `chain`, arms (below). Through the CLI's `main`, each of the four broken ones
+# exits 1 with one stdout line `unarmed p no HEAD: <reason>`, that reason and `; nothing written` on
+# stderr, no home, and no file outside `.git` holding
+# the null SHA or the dangling one; the detached fixture's reason is `git symbolic-ref exited 1`. RED
+# against a seed reading a silent rev-parse exit 1 as unborn, or stamping the SHA a bare HEAD read
+# prints. WHAT THIS DOES NOT CHECK: a reftable repository, where no branch file exists to break, and a
+# git release answering these states with other exit codes or words.
+# TOOL-dWitnessedBar-67 S6, AC5: no git config of the machine reshapes a fixture here or below. Each is
+# made by `run_planted_git -c init.defaultBranch=master init -q --ref-format=files`, so it is files-backed by
+# construction and `git rev-parse --show-ref-format` must print `files`; each branch file is `.git/` plus
+# `git symbolic-ref HEAD`'s output, never a literal branch; and every git call to the block's end runs
+# with `GIT_CONFIG_NOSYSTEM=1` and `GIT_CONFIG_GLOBAL` naming an empty scratch file, unset after it.
+# A fifth fixture, `chain`, holds only the branch file `ref: refs/heads/other` with no `other`: a commit
+# would create `other`, so the seed reads it as unborn and arms p at the null SHA (S13, AC11).
+# TOOL-dWitnessedBar-73 S1, S2 (AC1, AC2): the branch flag and the branch-file read are graded apart.
+# Under the plant, each fixture's `git symbolic-ref HEAD`, and `child`'s below, must print
+# `refs/heads/master`, so a builder without `-c init.defaultBranch=master` reds naming the fixture and
+# `refs/heads/main`; and every fixture but `detached`, which writes `.git/HEAD`, must hold a file at
+# `.git/` plus that output after its write, so a literal branch name its HEAD does not name reds.
+LL_DANGLING=1111111111111111111111111111111111111111
+export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL="$LL/fixture-global"; : > "$GIT_CONFIG_GLOBAL"
+# TOOL-dWitnessedBar-71 S1, S2: the hostile git config AC5 names, planted at command scope, which S6's
+# isolation above does not mask. `run_planted_git` prefixes git's environment config pairs to its one
+# call, so the suite's environment after it, a caller's own count and pairs included, is untouched. The
+# in-effect proof: a plain `run_planted_git init -q` must read `reftable` and `refs/heads/main`, or the
+# arm fails naming the plant and grades no AC5 fixture, so a staged break of a fixture's
+# `--ref-format=files` cannot pass for want of a hostile default. WHAT THIS DOES NOT CHECK: a config
+# scope other than command scope, and a git without `--show-ref-format`, which fails the proof rather
+# than passing.
+run_planted_git() {
+  GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=init.defaultRefFormat GIT_CONFIG_VALUE_0=reftable GIT_CONFIG_KEY_1=init.defaultBranch GIT_CONFIG_VALUE_1=main git "$@"
+}
+ll_planted=0; LLP="$LL/planted"
+run_planted_git init -q "$LLP" >/dev/null 2>&1
+ll_pfmt=$(git -C "$LLP" rev-parse --show-ref-format 2>&1 | tr -d '\r'); ll_pref=$(git -C "$LLP" symbolic-ref HEAD 2>&1 | tr -d '\r')
+if [ "$ll_pfmt" = reftable ] && [ "$ll_pref" = refs/heads/main ]; then ll_planted=1
+else bad "resolve-python: the hostile git config is not in effect (71 S2: a planted git init read '$ll_pfmt' and '$ll_pref', not reftable and refs/heads/main)"; fi; ok
+for ll_fx in garbage missing loop detached chain; do
+  LLC="$LL/corrupt-$ll_fx"; mkdir -p "$LLC/tools/fx" "$LLC/memory/project"
+  run_planted_git -c init.defaultBranch=master init -q --ref-format=files "$LLC" && git -C "$LLC" config core.autocrlf false
+  cp "$LLR/fxseed.py" "$LLC/"; build_ll_seeded p memory/project/p.txt "$LL_SEEDARGV" > "$LLC/tools/fx/kit.toml"
+  printf 'a\nb\n' > "$LLC/seed-keys.txt"; : > "$LLC/memory/project/.keep"; git -C "$LLC" add -A
+  ll_fmt=$(git -C "$LLC" rev-parse --show-ref-format 2>&1 | tr -d '\r')
+  [ "$ll_planted" = 0 ] || [ "$ll_fmt" = files ] || bad "67 AC5: the $ll_fx fixture read ref format '$ll_fmt', not files"; ok
+  ll_ref=$(git -C "$LLC" symbolic-ref HEAD | tr -d '\r')
+  [ "$ll_planted" = 0 ] || [ "$ll_ref" = refs/heads/master ] \
+    || bad "73 AC1: the $ll_fx fixture's HEAD names '$ll_ref', not refs/heads/master, so its builder's -c init.defaultBranch=master did not hold under the plant"; ok
+  case $ll_fx in
+    garbage) printf 'garbage\n' > "$LLC/.git/$ll_ref" ;;
+    missing) printf '%s\n' "$LL_DANGLING" > "$LLC/.git/$ll_ref" ;;
+    loop) printf 'ref: refs/heads/other\n' > "$LLC/.git/$ll_ref"; printf 'ref: %s\n' "$ll_ref" > "$LLC/.git/refs/heads/other" ;;
+    detached) printf '%s\n' "$LL_DANGLING" > "$LLC/.git/HEAD" ;;
+    chain) printf 'ref: refs/heads/other\n' > "$LLC/.git/$ll_ref" ;;
+  esac
+  [ "$ll_fx" = detached ] || [ -f "$LLC/.git/$ll_ref" ] \
+    || bad "73 AC2: the $ll_fx fixture wrote no branch file at .git/$ll_ref, the ref its HEAD names"; ok
+  out=$(LLU="$LLC" run_ll_py 'sys.exit(L.main(["legacy_ledger.py", "seed", "--population", "p"]))')
+  if [ "$ll_fx" = chain ]; then
+    { [ "$out" = rc=0 ] && grep -qxF "armed p 2" "$LL/py.out" && ! grep -q Traceback "$LL/py.err" \
+      && grep -qxF "a${T}1${T}${LL_NULL}${T}seeded" "$LLC/memory/project/p.txt" \
+      && grep -qxF "b${T}1${T}${LL_NULL}${T}seeded" "$LLC/memory/project/p.txt" \
+      && [ ! -e "$LLC/.git/refs/heads/other" ]; } \
+      || bad "67 AC11: a seed on the one-file chain, the branch file naming a ref that does not exist yet, did not arm p with two null-SHA rows: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+    continue
+  fi
+  ll_reason=$(sed -n 's/^unarmed p no HEAD: //p' "$LL/py.out")
+  { [ "$out" = rc=1 ] && [ "$(wc -l < "$LL/py.out")" -eq 1 ] && [ -n "$ll_reason" ] \
+    && grep -qxF "legacy_ledger: p: no HEAD: $ll_reason; nothing written" "$LL/py.err" && [ ! -e "$LLC/memory/project/p.txt" ] \
+    && [ -z "$(grep -rl --exclude-dir=.git -e "$LL_NULL" -e "$LL_DANGLING" "$LLC")" ] \
+    && { [ "$ll_fx" != detached ] || [ "$ll_reason" = "git symbolic-ref exited 1" ]; }; } \
+    || bad "64 AC1: a seed on the $ll_fx HEAD did not exit 1 with one no-HEAD line and its reason, or wrote a home or a null or dangling SHA: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+done
+# TOOL-dWitnessedBar-67 AC7 (S8): `seed --all` over two registrations in the `garbage` fixture resolves its
+# root, reads HEAD once and gives each registration its own `unarmed <name> no HEAD: ` line with one
+# reason, writing no home. RED against an `--all` printing nothing where a root resolves, stopping at its
+# first population, or reading HEAD per population.
+LLC="$LL/corrupt-garbage"
+build_ll_seeded x1 memory/project/x1.txt "$LL_SEEDARGV" >> "$LLC/tools/fx/kit.toml"; git -C "$LLC" add -A
+out=$(LLU="$LLC" run_ll_py 'sys.exit(L.run_seed_cli(["--all"], "."))')
+ll_reasons=$(sed -n 's/^unarmed [^ ]* no HEAD: //p' "$LL/py.out" | sort -u)
+{ [ "$out" = rc=1 ] && [ "$(wc -l < "$LL/py.out")" -eq 2 ] && grep -q '^unarmed p no HEAD: .' "$LL/py.out" \
+  && grep -q '^unarmed x1 no HEAD: .' "$LL/py.out" && [ -n "$ll_reasons" ] && [ "$(printf '%s\n' "$ll_reasons" | wc -l)" -eq 1 ] \
+  && [ ! -e "$LLC/memory/project/p.txt" ] && [ ! -e "$LLC/memory/project/x1.txt" ] && ! grep -q Traceback "$LL/py.err"; } \
+  || bad "67 AC7: seed --all over p and x1 on the garbage HEAD did not give each one no-HEAD line with one reason and no home: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+# TOOL-dWitnessedBar-73 S23 (AC21): the same route over no registration. A files-backed `git init` whose
+# branch file holds `garbage`, one file staged and no `kit.toml`: `seed --all` prints nothing on stdout,
+# `seed: no HEAD: <reason>` on stderr, and exits 0, nothing being left unarmed; the populated case above
+# exits 1 after its two lines (§8 F2). RED against an empty case silent on both streams, as it was.
+LLE="$LL/corrupt-empty"; mkdir -p "$LLE"
+{ run_planted_git -c init.defaultBranch=master init -q --ref-format=files "$LLE" && git -C "$LLE" config core.autocrlf false \
+  && printf 'x\n' > "$LLE/f.txt" && git -C "$LLE" add f.txt && ll_eref=$(git -C "$LLE" symbolic-ref HEAD | tr -d '\r') \
+  && printf 'garbage\n' > "$LLE/.git/$ll_eref"; } || bad "73 AC21: the registration-less garbage fixture could not be built"; ok
+out=$(LLU="$LLE" run_ll_py 'sys.exit(L.main(["legacy_ledger.py", "seed", "--all"]))')
+{ [ "$out" = rc=0 ] && [ ! -s "$LL/py.out" ] && grep -q '^seed: no HEAD: .' "$LL/py.err" && ! grep -q Traceback "$LL/py.err"; } \
+  || bad "73 AC21: seed --all on a garbage HEAD with no registration did not exit 0 with stdout empty and seed: no HEAD: on stderr: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+# TOOL-dWitnessedBar-73 S11 (AC11): the later probes' failures, in the unborn `chain`, the one fixture
+# whose seed reaches all three probes. A stand-in for `subprocess.run` raising `TimeoutExpired`, then
+# one raising `OSError`, replaces the call whose argv holds `symbolic-ref`, then the one holding
+# `for-each-ref`, as unit 65 AC7's two replace the `--verify` call: each gives the one no-HEAD line
+# `_run_git`'s exit-127 route reads, `git not runnable: `, and no Traceback. RED against a seed bounding
+# only the `rev-parse` call, so a later probe's failure escapes.
+for ll_fx in symbolic-ref:timeout symbolic-ref:oserror for-each-ref:timeout for-each-ref:oserror; do
+  out=$(LLU="$LL/corrupt-chain" run_ll_py '_run = L.subprocess.run
+def run(argv, **kw):
+    if sys.argv[2] not in argv:
+        return _run(argv, **kw)
+    if sys.argv[3] == "timeout":
+        raise L.subprocess.TimeoutExpired(argv, 60)
+    raise OSError(8, "planted exec failure")
+L.subprocess.run = run
+sys.exit(L.run_seed_cli(["--population", "p"], "."))' "${ll_fx%%:*}" "${ll_fx#*:}")
+  { [ "$out" = rc=1 ] && grep -q '^unarmed p no HEAD: git not runnable: ' "$LL/py.out" && ! grep -q Traceback "$LL/py.err"; } \
+    || bad "73 AC11: seed in the chain fixture under a ${ll_fx#*:} ${ll_fx%%:*} call did not read no HEAD: git not runnable: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+done
+
+# ---- 2o, the bounded git calls, the child-ref reason and the hex-named refs (TOOL-dWitnessedBar-67) ----
+# A one-commit fixture, `child`, built as the corrupt-HEAD block builds its own. AC6 (S7): a stand-in for
+# `subprocess.run` records the `timeout` of every call whose argv opens with `git`, through the seed with
+# `--sha` at its HEAD and the seed in the `missing` fixture: each call carries `timeout=60`. AC16 (S18):
+# after `git branch a/b` and `git symbolic-ref HEAD refs/heads/a`, the seed reads no HEAD with the reason
+# `git for-each-ref listed <row>`, the row naming `refs/heads/a/b`. AC8 (S9): with HEAD back on its branch,
+# a second commit, and branches `deadbeef` and `cafe1234` at HEAD~1, whose sha starts with neither, each
+# `--sha` exits 2 naming --sha and writes no home. RED against a git call with no timeout, a reason
+# reading `exited 0`, and a `--sha` stamped from a ref its hex only names. WHAT THIS DOES NOT CHECK: a
+# git that hangs past the bound, or an exact-match `for-each-ref`, which no seed call runs.
+LLK="$LL/child"; mkdir -p "$LLK/tools/fx" "$LLK/memory/project"
+{ run_planted_git -c init.defaultBranch=master init -q --ref-format=files "$LLK" && git -C "$LLK" config core.autocrlf false \
+  && cp "$LLR/fxseed.py" "$LLK/" && build_ll_seeded p memory/project/p.txt "$LL_SEEDARGV" > "$LLK/tools/fx/kit.toml" \
+  && printf 'a\nb\n' > "$LLK/seed-keys.txt" && : > "$LLK/memory/project/.keep" && git -C "$LLK" add -A \
+  && git -C "$LLK" -c user.email=t@e -c user.name=t commit -q --no-verify -m one; } \
+  || bad "67: the one-commit child fixture could not be built"; ok
+ll_fmt=$(git -C "$LLK" rev-parse --show-ref-format 2>&1 | tr -d '\r')
+[ "$ll_planted" = 0 ] || [ "$ll_fmt" = files ] || bad "67 AC5: the child fixture read ref format '$ll_fmt', not files"; ok
+ll_kref=$(git -C "$LLK" symbolic-ref HEAD | tr -d '\r'); ll_khead=$(git -C "$LLK" rev-parse HEAD | tr -d '\r')
+[ "$ll_planted" = 0 ] || [ "$ll_kref" = refs/heads/master ] \
+  || bad "73 AC1: the child fixture's HEAD names '$ll_kref', not refs/heads/master, so its builder's -c init.defaultBranch=master did not hold under the plant"; ok
+# TOOL-dWitnessedBar-73 S4, S5 (AC4, AC5): the recorder records each call's argv, past `git -C <root>`,
+# beside its `timeout`, one `git call <args> timeout <t>` line each. In `corrupt-missing` the set holds
+# root discovery, `rev-parse --show-toplevel`, and the registration read, `ls-files -z`, each at 60,
+# the calls `_run_git` bounds beside the SHA resolution. Across the `--sha` seed in `child`, the seed in
+# `corrupt-missing` and the seed in the unborn `chain`, the union holds each member unit 67 S7 names:
+# the HEAD probe `rev-parse --verify --quiet HEAD^{commit}`, `symbolic-ref`, `for-each-ref` and the
+# `--sha` resolution `rev-parse --verify --quiet <sha>^{commit}`, and a missing member fails naming it.
+# RED against a `for-each-ref` spawned outside `subprocess.run`. WHAT THIS DOES NOT CHECK: a spawn
+# through a `subprocess` helper that itself calls `run`, such as `check_output`, which records as a call.
+LL_RECORD='_run, _calls = L.subprocess.run, []
+def run(argv, **kw):
+    if argv and argv[0] == "git":
+        _calls.append((list(argv), kw.get("timeout")))
+    return _run(argv, **kw)
+L.subprocess.run = run
+rc = L.run_seed_cli(sys.argv[2:], ".")
+print("git calls %d timeouts %s" % (len(_calls), sorted(set(repr(t) for _, t in _calls))))
+for argv, t in _calls:
+    print("git call %s timeout %r" % (" ".join(argv[3:] if argv[1:2] == ["-C"] else argv[1:]), t))
+sys.exit(rc)'
+ll_union=
+for ll_fx in child corrupt-missing corrupt-chain; do
+  ll_args=(--population p); [ "$ll_fx" != child ] || ll_args+=(--sha "$ll_khead")
+  out=$(LLU="$LL/$ll_fx" run_ll_py "$LL_RECORD" "${ll_args[@]}")
+  { grep -qE "^git calls ([2-9]|[1-9][0-9]+) timeouts \['60'\]$" "$LL/py.out" && ! grep -q Traceback "$LL/py.err"; } \
+    || bad "67 AC6: a git call of the seed ${ll_args[*]} in the $ll_fx fixture ran without timeout=60: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+  ll_union+=$(grep '^git call ' "$LL/py.out")$'\n'
+  [ "$ll_fx" != corrupt-missing ] \
+    || { grep -qxF 'git call rev-parse --show-toplevel timeout 60' "$LL/py.out" && grep -qxF 'git call ls-files -z timeout 60' "$LL/py.out"; } \
+    || bad "73 AC4: the seed in corrupt-missing recorded no rev-parse --show-toplevel or no ls-files -z call at timeout 60: $(grep '^git call ' "$LL/py.out" | tr '\n' '|')"; ok
+done
+[ -n "${ll_union//$'\n'/}" ] || bad "73 AC5: the recorder recorded no git call across child, corrupt-missing and corrupt-chain"; ok
+for ll_m in "HEAD^{commit}:rev-parse --verify --quiet HEAD^{commit} " "symbolic-ref:symbolic-ref " "for-each-ref:for-each-ref " \
+            "--sha ^{commit}:rev-parse --verify --quiet $ll_khead^{commit} "; do
+  grep -qF "git call ${ll_m#*:}" <<<"$ll_union" \
+    || bad "73 AC5: the recorded git calls across child, corrupt-missing and corrupt-chain hold no ${ll_m%%:*} call: ${ll_union//$'\n'/|}"; ok
+done
+rm -f "$LLK/memory/project/p.txt"
+git -C "$LLK" branch a/b && git -C "$LLK" symbolic-ref HEAD refs/heads/a || bad "67 AC16: the child ref could not be planted"; ok
+out=$(LLU="$LLK" run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p"], "."))')
+{ [ "$out" = rc=1 ] && grep -q '^unarmed p no HEAD: git for-each-ref listed .*refs/heads/a/b' "$LL/py.out" \
+  && [ ! -e "$LLK/memory/project/p.txt" ]; } \
+  || bad "67 AC16: a seed whose unborn HEAD for-each-ref matches by prefix did not name the listed refs/heads/a/b: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+git -C "$LLK" symbolic-ref HEAD "$ll_kref" && git -C "$LLK" -c user.email=t@e -c user.name=t commit -q --no-verify --allow-empty -m two \
+  && git -C "$LLK" branch deadbeef HEAD~1 && git -C "$LLK" branch cafe1234 HEAD~1 || bad "67 AC8: the hex-named refs could not be planted"; ok
+for ll_sha in deadbeef cafe1234; do
+  out=$(LLU="$LLK" run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p", "--sha", sys.argv[2]], "."))' "$ll_sha")
+  { [ "$out" = rc=2 ] && grep -q -- '--sha' "$LL/py.err" && [ ! -e "$LLK/memory/project/p.txt" ] \
+    && [ "${ll_khead#"$ll_sha"}" = "$ll_khead" ]; } \
+    || bad "67 AC8: seed --sha $ll_sha, a branch at HEAD~1 $ll_khead, did not exit 2 naming --sha with no home: $out / $(tr '\n' '|' < "$LL/py.err")"; ok
+done
+unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
+
+# ---- 2o, the no-HEAD and cross-drive routes (TOOL-dWitnessedBar-63 AC4 AC6) -------------------------
+# Over the unborn fixture, now committed, through stand-ins: `read_head_sha` answering no sha and
+# `no HEAD: fatal: boom` takes unit 15's refused-home branch whole, the unarmed line on stdout, the reason
+# and `nothing written` on stderr, no home; `_run_git` answering exit 128 with nothing printed reads no
+# sha; `check_home_admitted` under an `os.path.relpath` raising ValueError, as it does across drives on
+# Windows, reads `outside the tree`, and `seed --all` over p, so refused, and x1 still seeds x1; on a
+# Windows host `seed --home` on another drive letter reads outside the tree for real. RED against a seed
+# stamping the null SHA on exit 128, and against a silent no-HEAD path. WHAT THIS DOES NOT CHECK: the
+# other-drive home off Windows, where no path has a drive; a real corrupt HEAD is the corrupt-HEAD
+# block's, above.
+rm -f "$LL_UHOME"
+out=$(run_ll_py 'L.read_head_sha = lambda root: (None, "no HEAD: fatal: boom")
+sys.exit(L.run_seed_cli(["--population", "p"], "."))')
+{ [ "$out" = rc=1 ] && grep -qxF "unarmed p no HEAD: fatal: boom" "$LL/py.out" \
+  && grep -qxF "legacy_ledger: p: no HEAD: fatal: boom; nothing written" "$LL/py.err" && [ ! -e "$LL_UHOME" ]; } \
+  || bad "63 AC4: the no-HEAD seed did not print the unarmed line, name its reason and nothing written on stderr, and write no home: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+out=$(run_ll_py 'L._run_git = lambda root, *a, with_stderr=False: (128, "", "")
+print(repr(L.read_head_sha(".")))')
+{ [ "$out" = rc=0 ] && grep -qxF "(None, 'no HEAD: git rev-parse exited 128')" "$LL/py.out"; } \
+  || bad "63 AC4: a rev-parse exiting 128 with nothing printed did not read as no sha: $out / $(tr '\n' '|' < "$LL/py.out") $(tr '\n' '|' < "$LL/py.err")"; ok
+out=$(run_ll_py 'def relpath(path, start=os.curdir):
+    raise ValueError("path is on mount C:, start on mount Z:")
+os.path.relpath = relpath
+print(L.check_home_admitted(".", "memory/project/p.txt"))')
+{ [ "$out" = rc=0 ] && grep -q '^outside the tree .*p\.txt$' "$LL/py.out" && ! grep -q Traceback "$LL/py.err"; } \
+  || bad "63 AC6: check_home_admitted under a relpath raising ValueError did not read outside the tree: $out / $(tr '\n' '|' < "$LL/py.out") $(tr '\n' '|' < "$LL/py.err")"; ok
+build_ll_seeded x1 memory/project/x1.txt "$LL_SEEDARGV" >> "$LLU/tools/fx/kit.toml"
+out=$(run_ll_py '_rel = os.path.relpath
+def relpath(path, start=os.curdir):
+    if os.path.basename(str(path)) == "p.txt":
+        raise ValueError("path is on mount C:, start on mount Z:")
+    return _rel(path, start)
+os.path.relpath = relpath
+sys.exit(L.run_seed_cli(["--all"], "."))')
+{ [ "$out" = rc=1 ] && grep -q '^unarmed p outside the tree ' "$LL/py.out" && grep -q '^armed x1 ' "$LL/py.out" \
+  && [ ! -e "$LL_UHOME" ] && [ -f "$LLU/memory/project/x1.txt" ] && ! grep -q Traceback "$LL/py.err"; } \
+  || bad "63 AC6: seed --all over a cross-drive first home did not refuse p and seed x1: $out / $(tr '\n' '|' < "$LL/py.out") $(tr '\n' '|' < "$LL/py.err")"; ok
+if [ "$("$REALPY" -c 'import os; print(os.name)' | tr -d '\r')" = nt ]; then
+  ll_drive=$(cd "$LLU" && "$REALPY" -c 'import os; print(os.path.splitdrive(os.getcwd())[0][:1].upper())' | tr -d '\r')
+  ll_other=Z; [ "$ll_drive" != Z ] || ll_other=Y
+  printf 'tmpl\n' > "$LL/tmpl63.txt"
+  out=$(run_ll_py 'sys.exit(L.run_seed_cli(["--home", sys.argv[2], "--copy", sys.argv[3]], "."))' "$ll_other:/x" "$LL/tmpl63.txt")
+  { [ "$out" = rc=1 ] && grep -q '^unarmed .* outside the tree ' "$LL/py.out" && ! grep -q Traceback "$LL/py.err"; } \
+    || bad "63 AC6: seed --home $ll_other:/x from a fixture on $ll_drive: did not read outside the tree: $out / $(tr '\n' '|' < "$LL/py.out") $(tr '\n' '|' < "$LL/py.err")"; ok
+fi
+
+# ---- 2o, no repository, no git and a given --sha (TOOL-dWitnessedBar-65 AC6 AC7 AC8) -----------------
+# A scratch directory under no repository, `GIT_CEILING_DIRECTORIES` its parent: `seed --population p`
+# exits 1 with one `unarmed p no HEAD: ` line, that reason and `nothing written` on stderr and nothing
+# written, and `--all` exits 1 with stdout empty and `seed: no HEAD: ` on stderr, before any registration
+# is read. With `PATH` naming only an empty directory and python run by absolute path, the reason is
+# `git not runnable: `. Over the committed fixture's two registrations, a stand-in for `subprocess.run`
+# on the `--verify` call alone, raising `TimeoutExpired` and then exiting 2 silently, gives each
+# population of `seed --all` its no-HEAD line. Then `--sha`: the null SHA in a repository with commits and
+# a sha naming no commit exit 2 naming --sha with no home; HEAD's first 8 hex characters in upper case,
+# or the shortest longer prefix holding a letter, arm p at HEAD's full lowercase sha; on a commitless
+# `git init` the null SHA arms. RED against the exit-2 work-tree refusal and against a `--sha` stamped
+# without resolving. WHAT THIS DOES NOT CHECK: a git that hangs for real: every seed git call passes
+# `timeout=60` (TOOL-dWitnessedBar-67 S7, its recorder above), and no fixture holds git past that bound
+# to watch the TimeoutExpired route fire; an abbreviation two commits share.
+LLN="$LL/norepo"; mkdir -p "$LLN" "$LL/nopath"
+out=$(LLU="$LLN" GIT_CEILING_DIRECTORIES="$LL" run_ll_py 'sys.exit(L.main(["legacy_ledger.py", "seed", "--population", "p"]))')
+{ [ "$out" = rc=1 ] && [ "$(wc -l < "$LL/py.out")" -eq 1 ] && grep -q '^unarmed p no HEAD: .' "$LL/py.out" \
+  && grep -q '^legacy_ledger: p: no HEAD: .*; nothing written$' "$LL/py.err" && ! grep -q Traceback "$LL/py.err" \
+  && [ -z "$(ls -A "$LLN")" ]; } \
+  || bad "65 AC6: seed --population p outside any repository did not exit 1 with one no-HEAD line and nothing written: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+out=$(LLU="$LLN" GIT_CEILING_DIRECTORIES="$LL" run_ll_py 'sys.exit(L.main(["legacy_ledger.py", "seed", "--all"]))')
+{ [ "$out" = rc=1 ] && [ ! -s "$LL/py.out" ] && grep -q '^seed: no HEAD: .' "$LL/py.err" && ! grep -q Traceback "$LL/py.err" \
+  && [ -z "$(ls -A "$LLN")" ]; } \
+  || bad "65 AC6: seed --all outside any repository did not exit 1 with stdout empty and seed: no HEAD: on stderr: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+(cd "$LLN" && PATH="$LL/nopath" "$FLOORPY" -B "$HERE/legacy_ledger.py" seed --population p) >"$LL/py.raw" 2>"$LL/py.rawerr"; ll_rc=$?
+tr -d '\r' < "$LL/py.raw" > "$LL/py.out"; tr -d '\r' < "$LL/py.rawerr" > "$LL/py.err"
+{ [ "$ll_rc" = 1 ] && grep -q '^unarmed p no HEAD: git not runnable: .' "$LL/py.out" && ! grep -q Traceback "$LL/py.err"; } \
+  || bad "65 AC7: seed with no git on PATH did not read no HEAD: git not runnable: rc=$ll_rc / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+for ll_fx in timeout:'git not runnable: ' silent:'git rev-parse exited 2'; do
+  out=$(run_ll_py '_run = L.subprocess.run
+def run(argv, **kw):
+    if "--verify" not in argv:
+        return _run(argv, **kw)
+    if sys.argv[2] == "timeout":
+        raise L.subprocess.TimeoutExpired(argv, 60)
+    return L.subprocess.CompletedProcess(argv, 2, "", "")
+L.subprocess.run = run
+sys.exit(L.run_seed_cli(["--all"], "."))' "${ll_fx%%:*}")
+  { [ "$out" = rc=1 ] && grep -qF "unarmed p no HEAD: ${ll_fx#*:}" "$LL/py.out" && grep -qF "unarmed x1 no HEAD: ${ll_fx#*:}" "$LL/py.out" \
+    && ! grep -q Traceback "$LL/py.err"; } \
+    || bad "65 AC7: seed --all under a ${ll_fx%%:*} --verify call did not give p and x1 each a no-HEAD line reading ${ll_fx#*:}: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+done
+rm -f "$LL_UHOME"
+for ll_sha in "$LL_NULL" deadbeef; do
+  out=$(run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p", "--sha", sys.argv[2]], "."))' "$ll_sha")
+  { [ "$out" = rc=2 ] && grep -q -- '--sha' "$LL/py.err" && [ ! -e "$LL_UHOME" ] \
+    && ! git -C "$LLU" rev-parse --verify --quiet "$ll_sha^{commit}" >/dev/null; } \
+    || bad "65 AC8: seed --sha $ll_sha in a repository with commits did not exit 2 naming --sha with no home: $out / $(tr '\n' '|' < "$LL/py.err")"; ok
+done
+ll_n=8; while [ "$ll_n" -lt 40 ] && [ -z "$(printf '%s' "${ll_uhead:0:$ll_n}" | tr -d '0-9')" ]; do ll_n=$((ll_n+1)); done
+ll_up=$(printf '%s' "${ll_uhead:0:$ll_n}" | tr a-f A-F)
+out=$(run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p", "--sha", sys.argv[2]], "."))' "$ll_up")
+{ [ "$out" = rc=0 ] && grep -q '^armed p ' "$LL/py.out" && grep -qxF "a${T}1${T}${ll_uhead}${T}seeded" "$LL_UHOME" \
+  && [ "$ll_up" != "${ll_uhead:0:$ll_n}" ]; } \
+  || bad "65 AC8: seed --sha $ll_up did not arm p at HEAD's full lowercase sha $ll_uhead: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+LLZ="$LL/unborn-sha"; mkdir -p "$LLZ/tools/fx" "$LLZ/memory/project"
+git init -q "$LLZ" && git -C "$LLZ" config core.autocrlf false
+cp "$LLR/fxseed.py" "$LLZ/"; build_ll_seeded p memory/project/p.txt "$LL_SEEDARGV" > "$LLZ/tools/fx/kit.toml"
+printf 'a\nb\n' > "$LLZ/seed-keys.txt"; : > "$LLZ/memory/project/.keep"; git -C "$LLZ" add -A
+out=$(LLU="$LLZ" run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p", "--sha", sys.argv[2]], "."))' "$LL_NULL")
+{ [ "$out" = rc=0 ] && grep -qxF "armed p 2" "$LL/py.out" && grep -qxF "a${T}1${T}${LL_NULL}${T}seeded" "$LLZ/memory/project/p.txt"; } \
+  || bad "65 AC8: seed --sha of the null SHA on a commitless git init did not arm p with null-SHA rows: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+
+# ---- 2o, the fresh adopt (TOOL-dWitnessedBar-47 AC1) ---------------------------------------------
+# A third fixture, a `git init` with nothing committed holding this repo's drift-audit kit, its seeded
+# drift_signals.py removed, and the memory-tree kit beside it, whose copy the adopter seeds through,
+# plus the minimum .memory-tree.conf stub the adopter names. One adopt must seed drift_signals.py into
+# the kit directory it was copied to, which holds no tracked file. Red when the seed's home test asks
+# for a tracked file in the home's directory again. WHAT THIS DOES NOT CHECK: the rendered Skill, the
+# drift-audit kit's own leg.
+LLD="$LL/fresh"; LL_DRIFT=drift-audit; LL_MTREE=memory-tree
+mkdir -p "$LLD/tools" && git init -q "$LLD" && git -C "$LLD" config core.autocrlf false \
+  && cp -r "$ROOT/${PFX}$LL_DRIFT" "$ROOT/${PFX}$LL_MTREE" "$LLD/tools/" \
+  && rm -f "$LLD/tools/$LL_DRIFT/drift_signals.py" \
+  && printf 'MEMORY_ROOT=memory\nDISCIPLINES="fx"\n' > "$LLD/.memory-tree.conf" \
+  || bad "2o fresh adopt: the uncommitted drift-audit fixture could not be built"; ok
+out=$( (cd "$LLD" && GOV_PYTHON="$REALPY" bash "tools/$LL_DRIFT/adopt-drift-audit.sh") 2>&1 | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
+{ [ "${out##*$'\n'}" = rc=0 ] && [ -f "$LLD/tools/$LL_DRIFT/drift_signals.py" ] \
+  && grep -qxF "drift-audit: armed tools/$LL_DRIFT/drift_signals.py" <<<"$out" \
+  && ! git -C "$LLD" rev-parse -q --verify HEAD >/dev/null 2>&1; } \
+  || bad "2o fresh adopt AC1: one drift-audit adopt on an uncommitted target did not seed drift_signals.py: ${out//$'\n'/ | }"; ok
+
+# ---- 2p. THE GOVERNANCE REF WRITER, A FAILED BUILD (TOOL-dPlacedRequest-11 AC10) --------------------
 # Parity holds the driver's and post-merge's copies to the canonical; this holds the canonical to the
 # rule that a commit git could not build is never pushed as an empty source, which would delete the
 # lease-protected ref. A scratch clone writes a create and a parented second tip, then a `git`
@@ -1064,7 +2003,7 @@ write=2 why=[no source]
 tip=second
 parent=first" ] || bad "the canonical gov_ref_sh pushed a failed build, or built no parented tip: ${gr_got//$'\n'/ | }"; ok
 
-# ---- 2o. THE FEED WRITER CENSUS (TOOL-dPlacedRequest-13 S9, AC7, AC9, AC11) ------------------------
+# ---- 2q. THE FEED WRITER CENSUS (TOOL-dPlacedRequest-13 S9, AC7, AC9, AC11) ------------------------
 # Parity holds the carriers' `gov_feed_sh` copies to the canonical; this holds every governance ref
 # writer to the feed. The population is every tracked `*.sh` and hook less the suites, read by the
 # canonical census in one awk: a lease-carrying push sits in a function that calls a name on

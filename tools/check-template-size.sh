@@ -18,7 +18,9 @@
 # subject with no row keeps this script's hard default, handed in as `default:`. Whether a breach
 # REFUSES is the switch's: `budgets.enforce` (warn by default) and `budgets.pinned`. Under `warn` a
 # breach prints a `BUDGET WARN` line and exits 0; under `refuse`, or for a pinned subject, it is
-# check 2, naming the rule. The positional limit, the MAX_BYTES environment variable and the
+# check 2, naming the rule. A warned breach, and growth past the high-water, each print the marker
+# `gate-warn<TAB>size<TAB><subject><TAB><detail>` on the line after their own, which the runner reads
+# from a passing leg and shows as `GATE warn` (TOOL-dWitnessedBar-29). The positional limit, the MAX_BYTES environment variable and the
 # limits-path override retired with this script's own parse of the file, and a positional limit or
 # limits path is refused rather than ignored.
 #
@@ -265,6 +267,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
 # table. `resolve_kit_dir <python> <home> <anchor> <here>` prints the kit directory ABSOLUTE, since
@@ -500,6 +520,9 @@ elif ! printf '%s' "$recorded" | grep -qE '^[0-9]+$'; then
   fail 3 "the high-water record holds a non-numeric value for $key in $HIGHWATER: '$recorded'"
 elif [ "$bytes" -gt "$recorded" ]; then
   echo "TEMPLATE-SIZE WARN — $name grew past its recorded high-water: $recorded -> $bytes (+$((bytes - recorded))). Advisory only; re-record with --bump when the growth is intended."
+  # THE MARKER (TOOL-dWitnessedBar-29 S1) on the next line and the same stream, keyed as the row is, so
+  # the runner shows this advisory when the leg passes.
+  printf 'gate-warn\tsize\t%s\t%s -> %s (+%s) over high-water\n' "${key//[$'\t\r\n']/ }" "$recorded" "$bytes" "$((bytes - recorded))"
 fi
 
 # A warned breach has printed its BUDGET WARN line and exits 0 with no OK line: it is not within budget.

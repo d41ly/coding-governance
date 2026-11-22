@@ -1,0 +1,5 @@
+# ledger · path-literal-sites · key site path,class · direction shrink-only · drain hunk
+skills/session-kickoff/manifest-check.test.sh	backslash-path	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/hooks/scratch-guard.test.sh	backslash-path	5	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/run-gates/run-gates.test.sh	backslash-path	1	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/workflows/unattended-build.test.sh	backslash-path	7	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded

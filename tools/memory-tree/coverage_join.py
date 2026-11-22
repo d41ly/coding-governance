@@ -1,10 +1,11 @@
 """coverage_join — the join factory every codebase-map consumer imports (PLAY-dOrderedCharter-19 S9).
 
-`compute_coverage` with its `Coverage`, `drop_touched_exemptions` and `derive_baseline_additions(root,
-base, rel)` live in the core, so no core build imports the optional codebase-map kit or reads its conf:
-nothing here calls that kit's root or conf readers or raises its error type, and a working baseline that does not
-parse propagates `tomllib.TOMLDecodeError` for the caller to name. `resolve_compare_base` rides beside
-them, the merge bar's compare base, with the remote ladder it calls.
+`compute_coverage` with its `Coverage` and `drop_touched_exemptions` live in the core, so no core build
+imports the optional codebase-map kit or reads its conf: nothing here calls that kit's root or conf
+readers or raises its error type. `resolve_compare_base` rides beside them, the merge bar's compare base,
+with the remote ladder it calls. `derive_baseline_additions(root, base, rel)` sits OUTSIDE the blocks, a
+thin adapter over the ledger factory, which imports this module, so it imports the factory in its body
+(TOOL-dWitnessedBar-16 §8 F8).
 
 Each block below is INLINED byte-identically from the canonical copy its marker line names, gov's lib
 dir, which ships nothing; `<prefix>/lib/resolve-python.test.sh`'s parity table reds a copy that drifts.
@@ -13,8 +14,6 @@ re-exports them for an older copy of its gate.
 """
 from __future__ import annotations
 
-import subprocess
-import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -75,39 +74,6 @@ def compute_coverage(
         if lazy := sorted(base & claimed):
             lazy_baseline[inv_id] = lazy
     return Coverage(unclaimed, stale_claims, stale_baseline, lazy_baseline)
-
-
-def _read_git_text(root: Path, *args: str) -> str | None:
-    """stdout of one `git -C root ...` call, or None when git is absent or the call fails."""
-    try:
-        r = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
-                           encoding="utf-8", errors="replace")
-    except (FileNotFoundError, OSError):
-        return None
-    return r.stdout if r.returncode == 0 else None
-
-
-def derive_baseline_additions(root: Path, base: str, rel: str) -> tuple[dict[str, list[str]] | None, str]:
-    """Per inventory id of the WORKING baseline at `root`/`rel` (a root-relative POSIX path), the keys
-    `base`'s baseline did not carry — or None with the reason when there is no comparison to make. A
-    baseline absent at `base`, or one that does not parse there, is NO comparison, never an empty one:
-    read as empty, every key would read as added. An inventory id absent at `base` counts every key as
-    added, so a new inventory cannot open with a baselined key. The note carries both sides' key counts,
-    so a comparison over nothing is visible as such. A WORKING file that does not parse raises its
-    `tomllib.TOMLDecodeError`, which the caller names in its own error."""
-    path = Path(root) / rel
-    text = _read_git_text(root, "show", f"{base}:./{rel}")  # `./`: relative to root, not the git top
-    if text is None:
-        return None, f"no {rel} at {base[:12]}"
-    try:
-        old = tomllib.loads(text)
-    except tomllib.TOMLDecodeError as exc:
-        return None, f"{rel} does not parse at {base[:12]}: {exc}"
-    new = tomllib.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
-    added = {inv: sorted(set(keys) - set(old.get(inv, ()))) for inv, keys in sorted(new.items())}
-    note = (f"base carried {sum(len(v) for v in old.values())} key(s), "
-            f"working carries {sum(len(v) for v in new.values())}")
-    return {inv: keys for inv, keys in added.items() if keys}, note
 # <<< coverage_join
 
 
@@ -202,3 +168,42 @@ def resolve_compare_base(root):
         return mb, "merge-base of HEAD and %s/%s" % (remote, branch)
     return tip, "%s/%s tip" % (remote, branch)
 # <<< compare_base_py
+
+
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
+
+
+def derive_baseline_additions(root: Path, base: str, rel: str) -> tuple[dict[str, list[str]] | None, str]:
+    """Per inventory id of the map baseline the registration homed at `rel` (a root-relative POSIX path)
+    declares, the keys its rows at the compare base did not carry — or None with the reason when there is
+    no comparison to make: no registration homes `rel`, or the factory's `compare_to_base` answers None
+    (no base, no home at the base, a row that does not parse on either side). A thin adapter over that
+    compare (TOOL-dWitnessedBar-16 §8 F8): `base` is kept for the callers' shape and the factory resolves
+    its own, the merge bar's. The note names the compare's own why. WHAT IT DOES NOT CHECK: a key the
+    base held and the working rows dropped, which is a drain and never a refusal here."""
+    import legacy_ledger as LL  # noqa: PLC0415  the factory imports this module, so not at its top
+    try:
+        regs = [r for r in LL.read_registrations(root) if r.home == rel]
+    except ValueError as exc:
+        return None, f"a registration is refused: {str(exc).splitlines()[0]}"
+    if len(regs) != 1:
+        return None, f"no [[ledger]] registration homes {rel} (base {base[:12]} not read)"
+    findings, why = LL.compare_to_base(root, regs[0])
+    if findings is None:
+        return None, why
+    added: dict[str, list[str]] = {}
+    for name, key in findings:
+        if name == "gained":
+            added.setdefault(key[0], []).append(key[1])
+    return {inv: sorted(keys) for inv, keys in sorted(added.items())}, f"compared at {why}"

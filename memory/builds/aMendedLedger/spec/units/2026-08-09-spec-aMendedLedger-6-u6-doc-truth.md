@@ -1,6 +1,6 @@
 # TOOL-aMendedLedger-6 — U6: doc truth, the template edit, the residual sweep and the adopter note
 
-**Status:** SPECCED · rev-2 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling+playbook
+**Status:** SPECCED · rev-3 · 2026-11-22 · node a · Tier-2 · base 663ca427 · streams tooling+playbook
 
 <!-- gen:spec-records -->
 
@@ -61,7 +61,7 @@ hygiene run.
   - **Readers:** by name: `tools/drift-audit/drift_report.py` reads the ledger directory those ten
     lines presented as a deliverable, `WIRE-INTO-PROJECT.md` names the old paths as what its
     migration section moves an adopter off, `tools/check-dead-paths.sh` reds a tracked file spelling
-    the deleted pointer stub, and `tools/dead-path-waivers.txt` waives the two spellings that
+    the deleted pointer stub, and `memory/project/dead-path-waivers.txt` waives the two spellings that
     survive. by value: `signal_ledger` reads the rows the ten lines promised.
 - **S6** `WIRE-INTO-PROJECT.md`: the S6b migration section — the sharded authored ledger is RETIRED
   at **playbook v2.4 / memory-tree kit 1.8**. Two products, two version lines: S11 bumps the
@@ -563,6 +563,7 @@ on an answer from either level.
   3 surviving `FLAT (1.5)` hits, and §4 Alternatives records the reversal. §7 gained a fourth
   coupling forbidding this build's spec id in any `PRODUCT_GLOBS[0]` path U6 edits, and §3 gained the
   `ex7` note now that master rev-4 moved that rewrite out of Non-goals and into U3.
+- rev-3 · 2026-11-22 · S5 · the **Readers:** by name: half re-pointed from `tools/dead-path-waivers.txt` to `memory/project/dead-path-waivers.txt`, where TOOL-dWitnessedBar-16 S14 moved it; nothing else moves. From the brief `2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief`.
 
 ## 10. Reuse audit
 

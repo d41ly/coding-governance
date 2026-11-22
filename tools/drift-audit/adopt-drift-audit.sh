@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # adopt-drift-audit.sh — wire the drift-audit kit into a project.
 #
-# gov:kit drift-audit@1.34
+# gov:kit drift-audit@1.35
 #
 # Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `<prefix>/drift-audit/`.
 # The kit dir's NAME is load-bearing; the one-segment prefix is free and every path below is derived
@@ -242,6 +242,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 DA_PY=$(resolve_python) || exit 2
 KIT_REL="$("$DA_PY" -c "import os,sys;print(os.path.relpath(sys.argv[1],sys.argv[2]).replace(os.sep,'/'))" "$KIT_DIR" "$ROOT")"
 [ -n "$KIT_REL" ] || { echo "drift-audit: could not derive the kit path — refusing to render a Skill with an empty command prefix"; exit 2; }
@@ -370,14 +388,25 @@ if [ "$MODE" = "--check" ]; then
   exit 0
 fi
 
-# Seed the project layer ONCE. Never overwrite: PINS are measured project state, and re-seeding a
-# repo that already tuned them would silently reset every ratchet to the template's zeros.
-if [ -f "$KIT_DIR/drift_signals.py" ]; then
-  echo "drift-audit: drift_signals.py already present — left untouched"
-else
-  cp "$KIT_DIR/drift_signals.template.py" "$KIT_DIR/drift_signals.py"
-  echo "drift-audit: seeded drift_signals.py from the template — FILL IT before trusting the report"
-fi
+# Seed the project layer ONCE. Never overwrite: its pins are measured project state, and re-seeding a
+# repo that already tuned them would silently reset every ratchet to the template's zeros. The
+# absent-only test is the ledger factory's unregistered form (TOOL-dWitnessedBar-15 S5), run from the
+# memory-tree kit's copy, found through drift_report's resolve_kit_dir: it copies the template only
+# over an absent or unarmed home, atomically, and prints `present` otherwise.
+LL_DIR=$("$DA_PY" -c 'import sys
+sys.path.insert(0, sys.argv[1])
+from drift_report import resolve_kit_dir
+try:
+    print(resolve_kit_dir("memory-tree", "legacy_ledger.py", sys.argv[1]).as_posix())
+except LookupError as exc:
+    sys.exit(str(exc))' "$KIT_DIR" 2>&1) || { echo "drift-audit: the memory-tree kit's legacy_ledger.py was not found: $LL_DIR"; exit 2; }
+LL_OUT=$("$DA_PY" "$LL_DIR/legacy_ledger.py" seed --home "$KIT_REL/drift_signals.py" \
+  --copy "$KIT_REL/drift_signals.template.py" 2>&1); LL_RC=$?
+printf '%s\n' "$LL_OUT" | sed 's/^/drift-audit: /'
+[ "$LL_RC" = 0 ] || exit 1
+case "$LL_OUT" in
+  armed*) echo "drift-audit: seeded drift_signals.py from the template — FILL IT before trusting the report" ;;
+esac
 
 mkdir -p "$SKILL_DIR"
 render > "$SKILL_OUT"
@@ -394,6 +423,6 @@ cat <<EOF
 Next:
   1. Fill $KIT_REL/drift_signals.py — PRODUCT_GLOBS at minimum.
   2. Run:  python $KIT_REL/drift_report.py
-  3. Seed PINS at the values you just measured, not at zero, then re-run with --check (expect 0).
+  3. Seed drift-pins rows at the values you just measured, not at zero, then re-run with --check (expect 0).
   4. Wire the --check arm into your gate manifest so a regression reds.
 EOF

@@ -3,7 +3,8 @@
 
     python <kit>/corpus_ids.py --report             # the derived numbers
     python <kit>/corpus_ids.py --check              # checks 13-16 as a gate
-    python <kit>/corpus_ids.py --measure            # print the pins to set in the conf
+    python <kit>/corpus_ids.py --measure            # the rows each waiver home would key
+    python <kit>/corpus_ids.py --list-unbound       # the `unbound-records` seed, asked of the hygiene gate
     python <kit>/corpus_ids.py --print-defined-ids  # the id grammar, then every defined id
     python <kit>/corpus_ids.py --selftest           # fixtures
 
@@ -21,14 +22,17 @@ NOTHING HERE DECLARES A GRAMMAR OR A SET IT DOES NOT OWN.
     checks 1 to 5 ran clean it hands `--print-index-set`'s answer down on stdin under
     `GOV_INDEX_SET_STDIN=1` (TOOL-aHastenedSweep-3).
 
-THE GRAMMAR MODULE IS A LATE IMPORT, and its two states are kept apart: with every pin blank the
-grammar module is never imported and checks 13-16 are simply off, while a pin SET with the module
-absent is a NAMED error — you armed a check whose grammar is not installed. Never a traceback, and
-never the silent pass a bare `try: import` would produce.
+THE GRAMMAR MODULE IS A LATE IMPORT, and its two states are kept apart: with both waiver homes absent
+the grammar module is never imported and checks 13-15 are simply off, while a home PRESENT with the
+module absent is a NAMED error — you armed a check whose grammar is not installed. Never a traceback,
+and never the silent pass a bare `try: import` would produce. A home arms its checks by being present,
+in any state but absent under the ledger factory's `read_home_state`, so an empty zero-bound home arms
+them too (TOOL-dWitnessedBar-17 S4): `id-orphan-waiver.txt` arms 14, `corpus-path-unresolved.txt` 15,
+and either arms 13.
 
   13  id-definition collision   one id claimed by two different build folders
-  14  orphan ids                cited in the present tense but never defined; waiver + pin + stale guard
-  15  dead repo-path citations  registry + four rules, keyed on (file, path), NEVER on a line number
+  14  orphan ids                cited in the present tense but never defined; keyed waiver + stale guard
+  15  dead repo-path citations  keyed registry, both sides and the count, on (file, path), NEVER a line number
   16  read-path accounting      the charter's own read set: every member byte-capped, and present
 """
 from __future__ import annotations
@@ -47,7 +51,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 HYGIENE = HERE / "check-memory-hygiene.sh"
 
 # The grammar is this kit's own `id_grammar.py` (PLAY-dOrderedCharter-18), a sibling imported late
-# so a tree with every pin blank never imports it. GRAMMAR_DIR is a module global so the selftest can
+# so a tree with both waiver homes absent never imports it. GRAMMAR_DIR is a module global so the selftest can
 # point it at a directory holding an absent or an outdated grammar; GRAMMAR_WHERE is the file a
 # refusal names.
 GRAMMAR_DIR = HERE
@@ -96,9 +100,9 @@ WAIVER = "project/id-orphan-waiver.txt"
 # What counts as a repo PATH: rooted at a real top-level directory. That is the only class where
 # "does it exist" is a well-posed question. A loose "backticked token with a slash" measures package
 # specifiers, git refs and bare fragments as dead citations — upstream counted 13 085 of them.
-_ASCII_INT = re.compile(r"\A[0-9]+\Z")
 BACKTICKED = re.compile(r"`([^`\s]+)`")
 MD_LINK_TARGET = re.compile(r"\]\(([^)\s]+)\)")
+FENCE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})")  # a Markdown code fence's opening or closing line
 ELISION = ("...", "…", "<", ">", "*", "{{")
 
 
@@ -126,7 +130,7 @@ from tree_lib import scan_missing_citations  # noqa: E402  the `missing:` citati
 def load_conf(root: str) -> dict:
     conf = {
         "MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": "", "CHARTER": DEFAULT_CHARTER,
-        "DEAD_PATH_PIN": "", "ORPHAN_ID_PIN": "", "READ_PATH_WAIVER": "",
+        "READ_PATH_WAIVER": "",
         "DEAD_PATH_EXCLUDE": ".claude/worktrees/",
     }
     p = os.path.join(root, ".memory-tree.conf")
@@ -157,58 +161,38 @@ def read_declared_keys(root: str) -> set:
     return out
 
 
-def _parse_conf_int(conf: dict, key: str, default=None) -> int:
-    """The integer bound to `key`, or a named Problem — never a raw ValueError traceback.
-
-    The contract is `row_grammar.pin_of`'s, deliberately: EMPTY means the default, because a key
-    an adopter never wrote must not be a refusal, and anything else that is not a decimal integer
-    at or above `minimum` is a named failure. Three call sites here used to parse their own value
-    with a bare `int()`, so a typo in a project conf raised a traceback out of a gate — which the
-    module docstring already forbids. One accessor, four keys.
-
-    The `minimum=` keyword this carried was deleted with its last caller (TOOL-dSpentCeiling-1):
-    it existed for the two retired byte figures, where zero was meaningless. Both surviving callers
-    are COUNT pins, where zero is the strict end and a legal value, so the floor is 0 for everyone,
-    and a parameter nothing varies is the green-by-absence shape one level down.
-    """
-    raw = conf.get(key, "").strip()
-    if raw == "":
-        if default is None:
-            raise Problem(f"corpus_ids: {key} is not declared in .memory-tree.conf")
-        return default
-    # ASCII-only ON PURPOSE: str.isdigit() is True for "\u00b2" and other unicode digit forms that
-    # int() then REJECTS, so gating on it and calling int() on what it admitted escapes as a raw
-    # ValueError past main()'s `except Problem` — the one outcome this module's docstring forbids.
-    if not _ASCII_INT.match(raw):
-        raise Problem(f"corpus_ids: {key} must be a whole number of at least 0, "
-                      f"got {raw!r}")
-    return int(raw)
-
-
-def armed(conf: dict) -> bool:
-    """Any pin set arms checks 13-15. Blank everywhere = off, and the grammar is never imported.
+def armed(root: str, conf: dict) -> frozenset:
+    """-> the checks among 13-15 their waiver homes arm (TOOL-dWitnessedBar-17 S4): 14 where
+    `id-orphan-waiver.txt` is present, 15 where `corpus-path-unresolved.txt` is, 13 where either is,
+    present meaning any state but `absent` under the ledger factory's `read_home_state`. Both absent
+    is off, and the grammar is never imported; an empty home arms its checks, as a zero pin did.
 
     Check 16 is NOT on this switch and has not been since TOOL-dSpentCeiling-1. It was, and that was
-    the defect: a module-wide switch over three pins meant blanking one line silenced a structural
-    citation check, and striking the retired ceiling from this tuple without lifting check 16 out of
-    `checks()` would have silently disarmed 13, 14 and 15 for any adopter whose only set pin was that
-    ceiling — a legal state at the time. `.get` rather than a subscript so a key absent from
-    load_conf's defaults is a False, never a raw KeyError out of a gate.
+    the defect: a module-wide switch meant removing one setting silenced a structural citation check.
+    WHAT IT DOES NOT CHECK: that a present home reads as a ledger; `checks` reads it through the
+    factory and names a row it refuses.
     """
-    return any(conf.get(k) for k in ("DEAD_PATH_PIN", "ORPHAN_ID_PIN"))
+    import legacy_ledger as LL  # noqa: E402  (deliberately late, as the kit's other siblings are)
+    m = conf["MEMORY_ROOT"]
+    on = set()
+    if LL.read_home_state(os.path.join(root, m, WAIVER)) != "absent":
+        on |= {13, 14}
+    if LL.read_home_state(os.path.join(root, m, REGISTRY)) != "absent":
+        on |= {13, 15}
+    return frozenset(on)
 
 
 # ------------------------------------------------------ the sibling kit's grammar, and its refusal
 # THE CAUSE AND THE CURE BELONG TO THE CALLER; the kit-state sentence belongs here. `grammar()`'s own
-# pair is true for the callers the pins gate and false for the anchor route, which no conf value of
-# this kit turns off: a refusal that prescribes blanking two pins the caller never set is a no-op
+# pair is true for the callers the waiver homes gate and false for the anchor route, which no file of
+# this kit turns off: a refusal that prescribes removing two homes the caller never wrote is a no-op
 # wearing the shape of a remedy, and a reader asking only that A remedy be named certifies it as
 # correct. Both of the module's refusal points take the pair, because re-causing only the first would
-# leave the pin cure alive on the second — the path a STALE sibling kit takes.
-_PIN_WHY = "a pin is set in .memory-tree.conf"
-_PIN_CURE_ABSENT = ("Either restore it from the memory-tree kit or blank DEAD_PATH_PIN / "
-                    "ORPHAN_ID_PIN to turn checks 13-15 off.")
-_PIN_CURE_OUTDATED = "update it, or blank the pins to turn checks 13-15 off"
+# leave the home cure alive on the second — the path a STALE sibling kit takes.
+_PIN_WHY = "a waiver home that arms checks 13-15 is present"
+_PIN_CURE_ABSENT = ("Either restore it from the memory-tree kit or remove project/id-orphan-waiver.txt "
+                    "and project/corpus-path-unresolved.txt to turn checks 13-15 off.")
+_PIN_CURE_OUTDATED = "update it, or remove the two waiver homes to turn checks 13-15 off"
 _ROUTE_WHY = "the anchor route was asked for"
 _ROUTE_CURE_ABSENT = ("Restore it from the memory-tree kit; no conf value of this kit turns "
                       "the anchor route off.")
@@ -254,9 +238,9 @@ def grammar(root: str, why: str = _PIN_WHY, cure_absent: str = _PIN_CURE_ABSENT,
     `grammar_for(root)` is the accessor added to the grammar module for exactly this, so there is
     still only ONE grammar.
 
-    The cause and the two cures DEFAULT to the ones the pins make true, and a caller the pins do not
-    gate passes its own — `resolve_anchor` below is that caller, and inheriting these would tell it
-    to blank two pins it never set.
+    The cause and the two cures DEFAULT to the ones the waiver homes make true, and a caller the homes
+    do not gate passes its own — `resolve_anchor` below is that caller, and inheriting these would tell
+    it to remove two homes it never wrote.
     """
     return _check_grammar_installed(why, cure_absent, cure_outdated).grammar_for(root)
 
@@ -348,6 +332,11 @@ def read_backlog_conf(conf: dict):
         raise Problem(f"corpus_ids: {exc}") from None
 
 
+# The `resolve_bash_py` block is carried once in `tree_lib.py` (TOOL-dWitnessedBar-57 S7), and
+# `resolve_bash` below is this module's adapter over its `scan_bash`.
+from tree_lib import scan_bash  # noqa: E402  the kit's one resolve_bash_py block
+
+
 def resolve_bash() -> str:
     """The bash that shares THIS filesystem — not whatever the name `bash` resolves to.
 
@@ -362,37 +351,13 @@ def resolve_bash() -> str:
     mistake one interpreter over that the python side made with the Microsoft Store `python3` stub,
     which answers `command -v` and exits 9009 without executing anything (see
     <prefix>/lib/resolve-python.sh). An override that is SET and unusable is a named failure here too,
-    never a silent fall-through to something else.
+    never a silent fall-through to something else. The rule is the one `resolve_bash_py` block, in
+    `tree_lib.py` (TOOL-dWitnessedBar-26, -57 S7); its refusal is this module's Problem.
     """
-    def runs(cand: str) -> bool:
-        try:
-            return subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0
-        except OSError:
-            return False
-
-    override = os.environ.get("GOV_BASH")
-    if override:
-        if runs(override):
-            return override
-        raise Problem("corpus_ids: GOV_BASH is set to '%s' and does not run. An override that is set "
-                      "and unusable is this failure, not a fall-through — you would believe you had "
-                      "chosen." % override)
-    skipped = []
-    for d in os.environ.get("PATH", "").split(os.pathsep):
-        for name in ("bash.exe", "bash"):
-            cand = os.path.join(d, name)
-            if not os.path.isfile(cand):
-                continue
-            low = cand.replace("\\", "/").lower()
-            if "/system32/" in low or "/windowsapps/" in low:
-                skipped.append(cand)          # a launcher for a different filesystem
-                continue
-            if not runs(cand):
-                skipped.append(cand)          # on disk, cannot execute
-                continue
-            return cand
-    raise Problem("corpus_ids: no usable bash on PATH — set GOV_BASH to one that shares this "
-                  "filesystem" + (" (skipped %s)" % ", ".join(skipped) if skipped else ""))
+    found, _tried, refusal = scan_bash()
+    if not found:
+        raise Problem("corpus_ids: " + refusal)
+    return found
 
 
 def ask_shell(flag: str, root: str) -> str:
@@ -525,7 +490,13 @@ def walk(root: str, conf: dict) -> dict:
         # A live build README is ADMITTED to the path harvest only: no id citation, no check 15 key.
         admitted = not now and p in live_readmes
         sink = dead if now else advisory
+        # A FENCED BLOCK HOLDS NO HEADING: a `#` comment line inside ``` or ~~~ is code, so it is never
+        # an H1 anchor claiming an id for this folder; citations in it still count.
+        fence = ""
         for lineno, line in enumerate(text.split("\n"), 1):
+            opener = FENCE_RE.match(line)
+            if opener and (not fence or (opener.group(1)[0] == fence[0] and len(opener.group(1)) >= len(fence))):
+                fence = "" if fence else opener.group(1)
             # The `missing:` form (TOOL-aMendedFleet-26) is blanked out of the line before anything
             # reads it, so a marked id is neither a citation for check 14 nor an anchor.
             marked, line = scan_missing_citations(line, E.ID_RE)
@@ -535,7 +506,7 @@ def walk(root: str, conf: dict) -> dict:
                     missing_now.setdefault(i, set()).add(p)
             anchor = anchor_of(line)
             if anchor is None:
-                h = h1_re.match(line)
+                h = h1_re.match(line) if not fence else None
                 anchor = h.group(1) if h else None
             if anchor:
                 defs.setdefault(anchor, set()).add(p)
@@ -787,32 +758,36 @@ def _resolve_sink(written: set, bad: list, notes: list, found: list) -> tuple:
 
 
 # ----------------------------------------------------------------------------------------- registry
-def parse_registry(root: str, m: str) -> list:
-    """Rows are `<citing-file>\\t<cited-path>\\t<count>\\t<absent|moved:DEST>`."""
+def parse_registry(root: str, m: str) -> dict:
+    """-> {(citing file, cited path): (count, line)}: the `corpus-path-unresolved` ledger, keyed by
+    `path` and `cited` (TOOL-dWitnessedBar-17 §4), read through the factory this kit carries at arity 2.
+    A refused row, the factory's `duplicate` among them, is a Problem as `parse_waiver` raises one."""
+    import legacy_ledger as LL  # noqa: E402  (deliberately late, as the kit's other siblings are)
     p = os.path.join(root, m, REGISTRY)
-    rows = []
     if not os.path.isfile(p):
-        return rows
-    for i, line in enumerate(read(p).split("\n"), 1):
-        if not line.strip() or line.lstrip().startswith("#"):
-            continue
-        parts = line.split("\t")
-        if len(parts) != 4:
-            raise Problem(f"{m}/{REGISTRY}:{i}: expected 4 tab-separated fields, got {len(parts)}")
-        rows.append((parts[0], parts[1], parts[2], parts[3], i))
-    return rows
+        return {}
+    rows, bad = LL.read_rows(p, 2)
+    if bad:
+        raise Problem(f"{m}/{REGISTRY}: {LL.render_malformed(bad[0])}")
+    return {key: (row[0], row[2]) for key, row in rows.items()}
 
 
 def parse_waiver(root: str, m: str) -> list:
+    """The waived ids: a ledger population keyed by `id` (TOOL-dWitnessedBar-16 S4), read through the
+    factory this kit carries, each row's reason the conversion record's. A refused row is a Problem."""
+    import legacy_ledger as LL  # noqa: E402  (deliberately late, as the kit's other siblings are)
     p = os.path.join(root, m, WAIVER)
     if not os.path.isfile(p):
         return []
-    return [l.strip() for l in read(p).split("\n") if l.strip() and not l.lstrip().startswith("#")]
+    rows, bad = LL.read_rows(p, 1)
+    if bad:
+        raise Problem(f"{m}/{WAIVER}: {LL.render_malformed(bad[0])}")
+    return [key[0] for key in rows]
 
 
 # ------------------------------------------------------------------------------------------- checks
 def checks(w: dict) -> list:
-    conf, m, root, tracked = w["conf"], w["m"], w["root"], w["tracked"]
+    conf, m, root = w["conf"], w["m"], w["root"]
     bad = []
 
     # 13 — one id claimed by two different BUILD FOLDERS. Deliberately NOT "defined twice": a
@@ -822,10 +797,11 @@ def checks(w: dict) -> list:
         if len(slugs) > 1:
             bad.append(f"check 13: id {i} is claimed by {len(slugs)} build folders: {', '.join(sorted(slugs))}")
 
-    # 14 — orphan ids, with a waiver, a shrink-only pin, and a stale-entry guard. `cites` holds the
-    # PRESENT-tense citations only, the population check 15 grades (walk()'s `now`), so this set,
-    # `--report`'s and the pin `--measure` prints are one number.
-    if conf["ORPHAN_ID_PIN"]:
+    # 14 — orphan ids, with a keyed waiver and a stale-entry guard. `cites` holds the PRESENT-tense
+    # citations only, the population check 15 grades (walk()'s `now`), so this set, `--report`'s and the
+    # rows `--measure` prints are one population. The waiver's shrink is `ratchet (never gains)`'s.
+    on = armed(root, conf)
+    if 14 in on:
         waived = parse_waiver(root, m)
         orphans = sorted(set(w["cites"]) - set(w["defs"]))
         for i in orphans:
@@ -842,42 +818,23 @@ def checks(w: dict) -> list:
                 bad.append(f"check 14: {m}/{WAIVER} waives {i}, which now resolves — stale row")
             elif i not in orphans:
                 bad.append(f"check 14: {m}/{WAIVER} waives {i}, which no present-tense file cites — stale row")
-        pin = _parse_conf_int(conf, "ORPHAN_ID_PIN")
-        if len(waived) > pin:
-            bad.append(f"check 14: the orphan waiver holds {len(waived)} rows, pinned at {pin} (shrink-only)")
 
-    # 15 — dead repo-path citations. FOUR rules. The key is (citing file, cited path) with a COUNT,
-    # never a line number: a line number moves whenever anything above the citation is edited, so a
-    # line-keyed registry reds on edits that have nothing to do with it, and a gate whose steady
-    # state is red gets bypassed.
-    if conf["DEAD_PATH_PIN"]:
+    # 15 — dead repo-path citations, both sides and the count. The key is (citing file, cited path)
+    # with a COUNT, never a line number: a line number moves whenever anything above the citation is
+    # edited, so a line-keyed registry reds on edits that have nothing to do with it, and a gate whose
+    # steady state is red gets bypassed. A duplicate row is the factory's refusal, raised by
+    # `parse_registry`; the registry's shrink is `ratchet (never gains)`'s (TOOL-dWitnessedBar-17 §4).
+    if 15 in on:
         rows = parse_registry(root, m)
         measured = {k: v for k, v in w["dead"].items()}
-        seen = {}
-        for f, cited, count, state, ln in rows:
-            key = (f, cited)
-            if key in seen:                                                    # rule 3
-                bad.append(f"check 15 rule 3: {m}/{REGISTRY}:{ln}: duplicate row for {f} -> {cited} (first at line {seen[key]})")
-                continue
-            seen[key] = ln
-            if key not in measured:                                            # rule 1, stale side
-                bad.append(f"check 15 rule 1: {m}/{REGISTRY}:{ln}: {f} -> {cited} no longer resolves to nothing — the citation was repaired; delete the row")
-            elif str(measured[key][0]) != count:
-                bad.append(f"check 15 rule 1: {m}/{REGISTRY}:{ln}: {f} -> {cited} occurs {measured[key][0]} time(s), row says {count}")
-            if state.startswith("moved:"):                                     # rule 4
-                dest = state.split(":", 1)[1]
-                if dest not in tracked:
-                    bad.append(f"check 15 rule 4: {m}/{REGISTRY}:{ln}: destination {dest} is not a tracked file")
-                elif os.path.isdir(os.path.join(root, dest)):
-                    bad.append(f"check 15 rule 4: {m}/{REGISTRY}:{ln}: destination {dest} is a directory, not a file")
-            elif state != "absent":
-                bad.append(f"check 15: {m}/{REGISTRY}:{ln}: state '{state}' is neither 'absent' nor 'moved:<dest>'")
-        for key, (count, ln) in sorted(measured.items()):                      # rule 1, new side
-            if key not in seen:
-                bad.append(f"check 15 rule 1: {key[0]}:{ln} cites {key[1]}, which resolves to nothing and has no row in {m}/{REGISTRY}")
-        pin = _parse_conf_int(conf, "DEAD_PATH_PIN")
-        if len(rows) > pin:                                                    # rule 2
-            bad.append(f"check 15 rule 2: the dead-path registry holds {len(rows)} rows, pinned at {pin} (shrink-only)")
+        for (f, cited), (count, ln) in sorted(rows.items()):
+            if (f, cited) not in measured:
+                bad.append(f"check 15: {m}/{REGISTRY}:{ln}: {f} -> {cited} no longer resolves to nothing — the citation was repaired; delete the row")
+            elif measured[(f, cited)][0] != count:
+                bad.append(f"check 15: {m}/{REGISTRY}:{ln}: {f} -> {cited} occurs {measured[(f, cited)][0]} time(s), row says {count}")
+        for key, (count, ln) in sorted(measured.items()):
+            if key not in rows:
+                bad.append(f"check 15: {key[0]}:{ln} cites {key[1]}, which resolves to nothing and has no row in {m}/{REGISTRY}")
     # 16 lives in check_read_path(), OUTSIDE this function and outside armed(): it needs neither
     # walk() nor the grammar, and putting it here is what tied a structural check to a deletable pin.
     return bad
@@ -913,20 +870,29 @@ def cmd_report(root: str, conf: dict) -> int:
 
 
 def _measure_lines(root: str, conf: dict) -> list:
-    """The pins to WRITE INTO .memory-tree.conf, as strings. Split out from the verb below so the
-    selftest can ASSERT them: the arm helper compares a return value, and a verb that prints and
+    """The rows each waiver home would key, as strings: a `# <home>` line, then each orphan id and its
+    count 1, then the second home's line and each dead citation's `<file> TAB <cited> TAB <count>`
+    (TOOL-dWitnessedBar-17 S4). A `#` line is one the factory skips. Split out from the verb below so
+    the selftest can ASSERT them: the arm helper compares a return value, and a verb that prints and
     returns 0 is unobservable to it — which is why nothing exercised this path for its whole life."""
     w = walk(root, conf)
+    m = conf["MEMORY_ROOT"]
     orphans = sorted(set(w["cites"]) - set(w["defs"]))
-    return [
-        f'ORPHAN_ID_PIN="{len(orphans)}"',
-        f'DEAD_PATH_PIN="{len(w["dead"])}"',
-    ]
+    return ([f"# {m}/{WAIVER}"] + [f"{i}\t1" for i in orphans] + [f"# {m}/{REGISTRY}"]
+            + [f"{f}\t{cited}\t{v[0]}" for (f, cited), v in sorted(w["dead"].items())])
+
+
+def cmd_list_unbound(root: str) -> int:
+    """`--list-unbound`: the `unbound-records` seed (TOOL-dWitnessedBar-17 §8 F6), one `<record> TAB 1` row
+    per unbound record check 21 grades, the hygiene gate's own print mode returned through `ask_shell`,
+    so check 21's population filter keeps its one shell definition and no seed carries a `bash` head."""
+    sys.stdout.write(ask_shell("--list-unbound", root))
+    return 0
 
 
 def cmd_measure(root: str, conf: dict) -> int:
-    """Print the pins to WRITE INTO .memory-tree.conf. Measured against THIS corpus — a pin copied
-    from a larger tree is either vacuous or permanently red."""
+    """Print the rows each waiver home would key. Measured against THIS corpus — a row copied from
+    another tree is either vacuous or permanently red."""
     for line in _measure_lines(root, conf):
         print(line)
     return 0
@@ -972,12 +938,22 @@ def print_defined_ids(root: str, conf: dict) -> int:
 
 
 # ----------------------------------------------------------------------------------------- selftest
-def _scratch(tmp: str, *, pins=True, extra=None):
+# The two waiver homes as a scaffold of the landed tree holds them: the ledger header and the factory's
+# empty-home line, so a fixture's homes arm checks 13-15 exactly as gov's do (TOOL-dWitnessedBar-17 S4).
+_EMPTY_HOMES = {
+    WAIVER: "# ledger · id-orphan-waiver · key record id · direction shrink-only · drain key\n"
+            "# unarmed · dead probe · abcdef12\n",
+    REGISTRY: "# ledger · corpus-path-unresolved · key site path,cited · direction shrink-only · drain hunk\n"
+              "# unarmed · dead probe · abcdef12\n",
+}
+
+
+def _scratch(tmp: str, *, homes=True, extra=None):
     run("git", "init", "-q", "--template=", ".", cwd=tmp)
     conf = ['MEMORY_ROOT=memory', 'DISCIPLINES="arch"', 'FAMILIES="arch:ARCH"', 'CHARTER="AGENTS.md"']
-    if pins:
-        conf += ['ORPHAN_ID_PIN="0"', 'DEAD_PATH_PIN="0"']
     _w(tmp, ".memory-tree.conf", "\n".join(conf) + "\n")
+    for rel, body in (_EMPTY_HOMES.items() if homes else ()):
+        _w(tmp, "memory/" + rel, body)
     _w(tmp, "AGENTS.md", "# charter\n\nRead `memory/README.md` before touching code.\n")
     # A tracked `.claude/` path, so `.claude/` is a REAL top-level directory in the fixture. Without
     # it `_roots()` yields only {memory/} and a `.claude/worktrees/x` citation is never a candidate —
@@ -1090,8 +1066,8 @@ def cmd_selftest() -> int:
                 said.append("off " + ("sees new" if "ARCH-tOne-2" in walk(tm, cm)["defs"] else "misses it"))
                 globals()["_WALK_MEMO"] = {}
                 walk(tm, cm)
-                cm2 = dict(cm, ORPHAN_ID_PIN="7")
-                said.append("conf keyed " + ("yes" if walk(tm, cm2)["conf"]["ORPHAN_ID_PIN"] == "7" else "no"))
+                cm2 = dict(cm, MEMO_PROBE="7")
+                said.append("conf keyed " + ("yes" if walk(tm, cm2)["conf"].get("MEMO_PROBE") == "7" else "no"))
             finally:
                 globals()["_WALK_MEMO"] = None
             return " · ".join(said)
@@ -1206,14 +1182,14 @@ def cmd_selftest() -> int:
              "the id grammar lives in %s/id_grammar.py, which is not installed.",
              "Restore it from the memory-tree kit; no conf value of this kit turns the anchor route "
              "off.",
-             "Either restore it from the memory-tree kit or blank DEAD_PATH_PIN / ORPHAN_ID_PIN to "
-             "turn checks 13-15 off."),
+             "Either restore it from the memory-tree kit or remove project/id-orphan-waiver.txt and "
+             "project/corpus-path-unresolved.txt to turn checks 13-15 off."),
             ("oldkit",
              "# an id_grammar.py that predates grammar_for(root)\n",
              "the installed %s/id_grammar.py predates grammar_for(root);",
              "update it from the memory-tree kit, because no conf value of this kit turns the anchor "
              "route off",
-             "update it, or blank the pins to turn checks 13-15 off"),
+             "update it, or remove the two waiver homes to turn checks 13-15 off"),
         ):
             _d = pathlib.Path(base) / _sub
             if _body is not None:
@@ -1223,13 +1199,12 @@ def cmd_selftest() -> int:
             n_label = "the anchor route's refusal (%s) states ITS cause and ITS cure" % _sub
             arm(n_label, "corpus_ids: the anchor route was asked for, but " + _state_text + " " + _cure,
                 lambda _r=_route: _r)
-            arm("the anchor route's refusal (%s) names neither pin" % _sub, "clean",
-                lambda _r=_route: "clean" if "DEAD_PATH_PIN" not in _r and "ORPHAN_ID_PIN" not in _r
+            arm("the anchor route's refusal (%s) names neither waiver home" % _sub, "clean",
+                lambda _r=_route: "clean" if "id-orphan-waiver" not in _r and "corpus-path-unresolved" not in _r
                 else _r)
-            # The pin caller's cure is VERBATIM from this unit's parent commit, re-typed here rather
-            # than read off the constant it grades; only the cause clause is new at the second point.
-            arm("grammar()'s own refusal (%s) keeps the pin cause and the parent's cure" % _sub,
-                "corpus_ids: a pin is set in .memory-tree.conf, but " + _state_text + " " + _pincure,
+            # The home caller's cure is re-typed here rather than read off the constant it grades.
+            arm("grammar()'s own refusal (%s) keeps the home cause and its cure" % _sub,
+                "corpus_ids: a waiver home that arms checks 13-15 is present, but " + _state_text + " " + _pincure,
                 lambda _p=_pin: _p)
 
         # ---- THE TARGET ROOT'S OWN DECLARATIONS. `grammar_for(root)` refuses with the SIBLING
@@ -1291,6 +1266,15 @@ def cmd_selftest() -> int:
             "memory/builds/tTwo/spec/2026-08-01-spec-tTwo-1.md": "# ARCH-tOne-1 — the same id\n\nbody\n"})
         arm("check 13 catches one id in two build folders", "claimed by 2 build folders",
             lambda: "\n".join(checks(walk(t2, c2))))
+        # ...and its near miss: the same id on a `#` line inside a fenced block is code, no heading.
+        t3 = os.path.join(base, "coll-fenced"); os.makedirs(t3)
+        c3 = _scratch(t3, extra={
+            "memory/builds/tTwo/README.md":
+                "---\nslug: tTwo\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tTwo-1\nstatus: OPEN\n---\n\n# tTwo\n",
+            "memory/builds/tTwo/spec/2026-08-01-spec-tTwo-1.md":
+                "# ARCH-tTwo-1 — its own id\n\n```toml\n# ARCH-tOne-1 in a comment\n```\n"})
+        arm("check 13 reads no heading inside a fenced block", "NONE",
+            lambda: "\n".join(x for x in checks(walk(t3, c3)) if "check 13" in x) or "NONE")
 
         # ---- 13 and 15 UNDER `builds` (TOOL-dDerivedDocket-8). ONE corpus, five confs: an ask filed
         # ---- AFTER the cutoff and an ask filed BEFORE it, each anchored in a second build folder,
@@ -1371,7 +1355,7 @@ def cmd_selftest() -> int:
             lambda: "PRESENT" if "never-filed.md" in "\n".join(checks(walk(tB, cBs)))
             else "ABSENT")
 
-        # 14 — orphan, waiver, stale waiver, pin.
+        # 14 — orphan, keyed waiver, stale waiver.
         t3 = os.path.join(base, "orph"); os.makedirs(t3)
         # PROSE, not a list row: `- <id> ·` IS an anchor, so a backlog row DEFINES its id rather than
         # orphaning it. The first cut of this fixture used a backlog row, produced no orphan at all,
@@ -1379,16 +1363,11 @@ def cmd_selftest() -> int:
         c3 = _scratch(t3, extra={"memory/README.md": "# r\n\nContext lives in ARCH-tGhost-9 upstream.\n"})
         arm("check 14 catches a cited-never-defined id", "ARCH-tGhost-9 is cited but never defined",
             lambda: "\n".join(checks(walk(t3, c3))))
-        _w(t3, "memory/project/id-orphan-waiver.txt", "# waived\nARCH-tGhost-9\n")
+        _w(t3, "memory/project/id-orphan-waiver.txt", "# waived\nARCH-tGhost-9\t1\tabcdef12\tseeded\n")
         run("git", "add", "-A", cwd=t3); run("git", "commit", "-q", "-m", "w", "--no-verify", cwd=t3)
-        c3b = dict(c3); c3b["ORPHAN_ID_PIN"] = "1"
-        arm("a waived orphan passes", None, lambda: checks(walk(t3, c3b)))
-        c3c = dict(c3b); c3c["ORPHAN_ID_PIN"] = "0"
-        arm("the waiver pin is shrink-only", "pinned at 0 (shrink-only)",
-            lambda: "\n".join(checks(walk(t3, c3c))))
+        arm("a waived orphan passes", None, lambda: checks(walk(t3, c3)))
         t4 = os.path.join(base, "stale"); os.makedirs(t4)
-        c4 = _scratch(t4, extra={"memory/project/id-orphan-waiver.txt": "ARCH-tOne-1\n"})
-        c4["ORPHAN_ID_PIN"] = "1"
+        c4 = _scratch(t4, extra={"memory/project/id-orphan-waiver.txt": "ARCH-tOne-1\t1\tabcdef12\tseeded\n"})
         arm("a waiver row that now resolves is stale", "which now resolves — stale row",
             lambda: "\n".join(checks(walk(t4, c4))))
 
@@ -1404,23 +1383,22 @@ def cmd_selftest() -> int:
                 "# d\n\n- ARCH-tOne-1 · a decision\n\nIt cites ARCH-tPast-8 at `memory/gone/logged.md`.\n"})
         arm("check 14 grades present-tense citations only, as check 15 does", None,
             lambda: checks(walk(tN, cN)))
-        arm("...and the pin --measure prints is the count check 14 grades", 'ORPHAN_ID_PIN="0"',
-            lambda: _measure_lines(tN, cN)[0])
+        arm("...and the rows --measure prints are the orphans check 14 grades, none here",
+            "# memory/project/corpus-path-unresolved.txt", lambda: _measure_lines(tN, cN)[1])
         # The waiver is not a citation: a row whose id only the waiver and an archive cite is stale.
         # The 869209ed engine read the waiver's own row as a citation and passed this.
-        _w(tN, "memory/project/id-orphan-waiver.txt", "ARCH-tPast-7\n")
+        _w(tN, "memory/project/id-orphan-waiver.txt", "ARCH-tPast-7\t1\tabcdef12\tseeded\n")
         run("git", "add", "-A", cwd=tN); run("git", "commit", "-q", "-m", "w", "--no-verify", cwd=tN)
-        cN["ORPHAN_ID_PIN"] = "1"
         arm("a waiver row no present-tense file cites is stale", "which no present-tense file cites — stale row",
             lambda: "\n".join(checks(walk(tN, cN))))
-        # AC3's other half: one present-tense orphan beside one past-tense citation. The measured pin
+        # AC3's other half: one present-tense orphan beside one past-tense citation. The measured rows
         # and the graded count are both 1; the 869209ed engine made them both 2.
         tM = os.path.join(base, "tense-pin"); os.makedirs(tM)
         cM = _scratch(tM, extra={
             "memory/README.md": "# r\n\nContext lives in ARCH-tGhost-9 upstream.\n",
             "memory/archive/DECISIONS.2026-08-01.md": "# rotated\n\nUpstream ARCH-tPast-7.\n"})
-        arm("--measure's pin equals check 14's orphan count", "1 == 1",
-            lambda: "%s == %d" % (_measure_lines(tM, cM)[0].split('"')[1],
+        arm("--measure's orphan rows equal check 14's orphan count", "1 == 1",
+            lambda: "%d == %d" % (_measure_lines(tM, cM).index("# memory/project/corpus-path-unresolved.txt") - 1,
                                   sum("never defined" in l for l in checks(walk(tM, cM)))))
 
         # TOOL-aMendedFleet-26 — the `missing:` form. The same undefined id as the orphan arm above,
@@ -1442,37 +1420,62 @@ def cmd_selftest() -> int:
         arm("...and only there: the spec's own marker is a record of a moment", "findings=1;",
             lambda: "findings=%d;" % sum("marked missing" in l for l in checks(walk(tY, cY))))
 
-        # 15 — the four rules.
+        # 15 — both sides and the count, the registry read through the ledger factory
+        # (TOOL-dWitnessedBar-17 §4): rule 2 retired with the pin, rule 3 is the factory's duplicate
+        # refusal, rule 4 and the state refusal retired with the `absent|moved:` column.
         DEAD = "# r\n\nSee `memory/gone/never-existed.md` for detail.\n"
         t5 = os.path.join(base, "dead"); os.makedirs(t5)
         c5 = _scratch(t5, extra={"memory/README.md": DEAD})
-        arm("check 15 rule 1 catches an unregistered dead citation", "has no row in",
+        arm("check 15 catches an unregistered dead citation", "has no row in",
             lambda: "\n".join(checks(walk(t5, c5))))
-        reg = "memory/README.md\tmemory/gone/never-existed.md\t1\tabsent\n"
+        reg = "memory/README.md\tmemory/gone/never-existed.md\t1\tabcdef12\tseeded\n"
         _w(t5, "memory/project/corpus-path-unresolved.txt", reg)
         run("git", "add", "-A", cwd=t5); run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=t5)
-        c5b = dict(c5); c5b["DEAD_PATH_PIN"] = "1"
-        arm("a registered dead citation passes", None, lambda: checks(walk(t5, c5b)))
-        c5c = dict(c5b); c5c["DEAD_PATH_PIN"] = "0"
-        arm("check 15 rule 2 is shrink-only", "pinned at 0 (shrink-only)",
-            lambda: "\n".join(checks(walk(t5, c5c))))
+        arm("a dead citation keyed in the registry passes, its row read through the factory", None,
+            lambda: checks(walk(t5, c5)))
+        _w(t5, "memory/project/corpus-path-unresolved.txt",
+           "memory/README.md\tmemory/gone/never-existed.md\t2\tabcdef12\tseeded\n")
+        run("git", "add", "-A", cwd=t5); run("git", "commit", "-q", "-m", "r1", "--no-verify", cwd=t5)
+        arm("check 15 grades the count too", "occurs 1 time(s), row says 2",
+            lambda: "\n".join(checks(walk(t5, c5))))
         _w(t5, "memory/project/corpus-path-unresolved.txt", reg + reg)
         run("git", "add", "-A", cwd=t5); run("git", "commit", "-q", "-m", "r2", "--no-verify", cwd=t5)
-        c5d = dict(c5b); c5d["DEAD_PATH_PIN"] = "2"
-        arm("check 15 rule 3 catches a duplicate row", "duplicate row for",
-            lambda: "\n".join(checks(walk(t5, c5d))))
-        _w(t5, "memory/project/corpus-path-unresolved.txt",
-           "memory/README.md\tmemory/gone/never-existed.md\t1\tmoved:memory/builds\n")
-        run("git", "add", "-A", cwd=t5); run("git", "commit", "-q", "-m", "r3", "--no-verify", cwd=t5)
-        arm("check 15 rule 4 rejects a directory destination", "is not a tracked file",
-            lambda: "\n".join(checks(walk(t5, c5b))))
-        # rule 1's OTHER direction: the source is repaired, the row survives.
+        arm("a duplicate row is the factory's refusal", "the key is declared twice",
+            lambda: "\n".join(checks(walk(t5, c5))))
+        # the OTHER direction: the source is repaired, the row survives.
         t6 = os.path.join(base, "repaired"); os.makedirs(t6)
         c6 = _scratch(t6, extra={
-            "memory/project/corpus-path-unresolved.txt": "memory/README.md\tmemory/gone/x.md\t1\tabsent\n"})
-        c6["DEAD_PATH_PIN"] = "1"
-        arm("check 15 rule 1 catches a row whose citation was repaired", "the citation was repaired",
+            "memory/project/corpus-path-unresolved.txt": "memory/README.md\tmemory/gone/x.md\t1\tabcdef12\tseeded\n"})
+        arm("check 15 catches a row whose citation was repaired", "the citation was repaired",
             lambda: "\n".join(checks(walk(t6, c6))))
+
+        # THE HOMES ARM THE CHECKS (TOOL-dWitnessedBar-17 S4, AC4). Each home holding its header and the
+        # factory's empty-home line, with NO conf key at all, arms checks 13-15 through `--check`;
+        # with both homes removed the same corpus names none of them. RED against an `armed` that
+        # reads the home's seeded state, which an empty zero-bound home never reaches.
+        tH = os.path.join(base, "homes"); os.makedirs(tH)
+        _scratch(tH, extra={"memory/README.md": DEAD})
+
+        def _check_rc(t):
+            out = subprocess.run([sys.executable, os.path.abspath(__file__), "--check"], cwd=t,
+                                 capture_output=True, text=True, encoding="utf-8")
+            return "rc=%d %s" % (out.returncode, " | ".join(l for l in out.stdout.split("\n") if l))
+        arm("an empty, unarmed home arms check 15 with no conf key", "rc=1 ",
+            lambda: _check_rc(tH))
+        arm("...naming check 15 and the dead path", "HYGIENE check 15: memory/README.md:3 cites memory/gone/never-existed.md",
+            lambda: _check_rc(tH))
+        for _rel in _EMPTY_HOMES:
+            os.remove(os.path.join(tH, "memory", _rel))
+        run("git", "add", "-A", cwd=tH); run("git", "commit", "-q", "-m", "no homes", "--no-verify", cwd=tH)
+        arm("...and with both homes removed it names no check 13 to 15", "NONE",
+            lambda: "NONE" if not any("check 1%d" % n in _check_rc(tH) for n in (3, 4, 5)) else _check_rc(tH))
+        # Each home arms its own check: the orphan waiver alone arms 13 and 14, the registry alone 13 and 15.
+        tW = os.path.join(base, "waiver-only"); os.makedirs(tW)
+        cW = _scratch(tW, homes=False, extra={"memory/" + WAIVER: _EMPTY_HOMES[WAIVER]})
+        tG = os.path.join(base, "registry-only"); os.makedirs(tG)
+        cG = _scratch(tG, homes=False, extra={"memory/" + REGISTRY: _EMPTY_HOMES[REGISTRY]})
+        arm("...and armed() reads each home on its own", "[13, 14] [13, 15]",
+            lambda: "%s %s" % (sorted(armed(tW, cW)), sorted(armed(tG, cG))))
 
         # 15, DIRECTORY citations. The flatten moved every build folder and left four dead directory
         # citations in the live ledger, and the harvest could not see one of them because it required
@@ -1501,7 +1504,6 @@ def cmd_selftest() -> int:
                 "Elided: `memory/builds/<slug>/spec/`. Slashless: `README.md`.\n"
                 "Unrooted: `nosuchroot/x.md`.\n"),
         })
-        cD["DEAD_PATH_PIN"] = "0"
         arm("check 15 catches a dead DIRECTORY citation", "memory/gone/never",
             lambda: "\n".join(checks(walk(tD, cD))))
         arm("...and is silent about a directory that resolves", "[nope]" if False else "",
@@ -1522,7 +1524,6 @@ def cmd_selftest() -> int:
             f"{fx_pfx}{HERE.name}/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
             "memory/HYGIENE.md": f"sentinel\n\nRun `{root_pfx}{HERE.name}/check-memory-hygiene.sh` to lint.\n",
         })
-        cP["DEAD_PATH_PIN"] = "0"
         arm("check 15 catches a kit path written at the WRONG PREFIX",
             f"{root_pfx}{HERE.name}/check-memory-hygiene.sh",
             lambda: "\n".join(checks(walk(tP, cP))))
@@ -1533,7 +1534,6 @@ def cmd_selftest() -> int:
             f"{fx_pfx}{HERE.name}/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
             "memory/HYGIENE.md": f"sentinel\n\nRun `{fx_pfx}{HERE.name}/check-memory-hygiene.sh` to lint.\n",
         })
-        cQ["DEAD_PATH_PIN"] = "0"
         arm("...and the correctly-prefixed spelling of it is silent", None,
             lambda: checks(walk(tQ, cQ)))
         # A link that resolves RELATIVE TO THE CITING FILE is correct and must stay silent. This is
@@ -1543,7 +1543,6 @@ def cmd_selftest() -> int:
         tR = os.path.join(base, "relative"); os.makedirs(tR)
         cR = _scratch(tR, extra={
             "memory/LIVE.md": "# live\n\n- [tOne](builds/tOne/README.md)\n"})
-        cR["DEAD_PATH_PIN"] = "0"
         arm("a link resolving relative to the citing file is not dead", None,
             lambda: checks(walk(tR, cR)))
 
@@ -1552,7 +1551,6 @@ def cmd_selftest() -> int:
         tX = os.path.join(base, "excl"); os.makedirs(tX)
         cX = _scratch(tX, extra={
             "memory/README.md": "# r\n\nThe worktree lives at `.claude/worktrees/whatever/`.\n"})
-        cX["DEAD_PATH_PIN"] = "0"
         arm("an excluded prefix is not classified", None, lambda: checks(walk(tX, cX)))
         cX2 = dict(cX); cX2["DEAD_PATH_EXCLUDE"] = ""
         arm("...and removing the prefix from the conf makes it classified again",
@@ -1569,7 +1567,6 @@ def cmd_selftest() -> int:
             "memory/builds/tOne/README.md":
                 "# tOne\n\nGone: `memory/gone/livedead/`. Kept: `memory/HYGIENE.md:1-2`.\n",
             "memory/builds/tTwo/README.md": "# tTwo\n\nGone: `memory/gone/unlinked/`.\n"})
-        cL["DEAD_PATH_PIN"] = "0"
         wL = walk(tL, cL)
 
         def _check_in(t):
@@ -1589,7 +1586,6 @@ def cmd_selftest() -> int:
             lambda: str([k for k in wL["advisory"] if "tTwo" in k[0]]))
         tL0 = os.path.join(base, "live-empty"); os.makedirs(tL0)
         cL0 = _scratch(tL0, extra={"memory/LIVE.md": "# live\n\n- [tGhost](builds/tGhost/README.md)\n"})
-        cL0["DEAD_PATH_PIN"] = "0"
         arm("a LIVE.md whose build links resolve to no tracked README says the population is empty",
             "the live-README population is empty", lambda: "\n".join(walk(tL0, cL0)["notes"]))
 
@@ -1598,20 +1594,20 @@ def cmd_selftest() -> int:
         # any more. Every arm below rides ONE fixture whose charter cites a tracked, present file the
         # index set does not cap, so the only thing varying is the declaration under test.
         t7 = os.path.join(base, "readpath"); os.makedirs(t7)
-        c7 = _scratch(t7, pins=False, extra={
+        c7 = _scratch(t7, homes=False, extra={
             "AGENTS.md": "# charter\n\nRead `memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md` first.\n"})
 
         def _rp(root, conf):
             b, n = check_read_path(root, conf)
             return "BAD:" + " | ".join(b) + " NOTES:" + " | ".join(n)
 
-        # THE DEFECT THIS UNIT CLOSES, as an arm. With every pin blank the old engine returned 0 from
-        # main() before check 16 could run, so this citation was invisible. `pins=False` is the whole
-        # point of the fixture: an arm that sets a pin would pass against the old code too.
-        arm("rule 3 fires with NO pin set at all — the silence this unit removes",
+        # THE DEFECT THIS UNIT CLOSES, as an arm. With every switch off the old engine returned 0 from
+        # main() before check 16 could run, so this citation was invisible. `homes=False` is the whole
+        # point of the fixture: an arm that writes a home would pass against the old code too.
+        arm("rule 3 fires with NO waiver home at all — the silence this unit removes",
             "which is under", lambda: _rp(t7, c7))
-        arm("...and armed() is False on that same conf, so 13-15 stay off and the grammar unloaded",
-            None, lambda: str(armed(c7)).replace("False", ""))
+        arm("...and armed() is empty on that same tree, so 13-15 stay off and the grammar unloaded",
+            None, lambda: "" if not armed(t7, c7) else str(sorted(armed(t7, c7))))
 
         # THE GRACE. The comparison is the subject, so the arms vary the DECLARED threshold rather
         # than substituting a stand-in for the mechanism: below the flip a finding is a NOTE and the
@@ -1635,7 +1631,7 @@ def cmd_selftest() -> int:
             # only, and a grace nobody has watched decline to fire is not a grace, it is an off switch.
             globals()["READ_PATH_RULES_GATE"] = False
             tD = os.path.join(base, "declared-ceiling"); os.makedirs(tD)
-            cD = _scratch(tD, pins=False, extra={
+            cD = _scratch(tD, homes=False, extra={
                 "AGENTS.md": "# charter\n\nRead `memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md` first.\n"})
             _cp = os.path.join(tD, ".memory-tree.conf")
             with io.open(_cp, "a", encoding="utf-8", newline="") as fh:
@@ -1657,7 +1653,7 @@ def cmd_selftest() -> int:
 
         # A CLEAN CHARTER MUST BE SILENT, or every arm above passes by finding something unrelated.
         t7c = os.path.join(base, "readpath-clean"); os.makedirs(t7c)
-        c7clean = _scratch(t7c, pins=False)
+        c7clean = _scratch(t7c, homes=False)
         arm("a charter citing only CAPPED files produces nothing",
             None, lambda: _rp(t7c, c7clean).replace("BAD: NOTES:", ""))
 
@@ -1665,7 +1661,7 @@ def cmd_selftest() -> int:
         # arm is restricted to builds/*/spec/*.md and index_set() drops absent files before check 6
         # measures, so for a charter-cited guide this is the only detector there is.
         t7a = os.path.join(base, "readpath-absent"); os.makedirs(t7a)
-        c7a = _scratch(t7a, pins=False, extra={
+        c7a = _scratch(t7a, homes=False, extra={
             "AGENTS.md": "# charter\n\nRead `memory/guides/g.md` first.\n",
             "memory/guides/g.md": "# g\n"})
         os.remove(os.path.join(t7a, "memory/guides/g.md"))
@@ -1682,7 +1678,7 @@ def cmd_selftest() -> int:
         for _ki, _k in enumerate(RETIRED_KEYS):
             for _vi, _v in enumerate(('"161120"', '""')):
                 tR = os.path.join(base, "retired%d%d" % (_ki, _vi)); os.makedirs(tR)
-                cR = _scratch(tR, pins=False)
+                cR = _scratch(tR, homes=False)
                 _cp = os.path.join(tR, ".memory-tree.conf")
                 with io.open(_cp, "a", encoding="utf-8", newline="") as fh:
                     fh.write("%s=%s\n" % (_k, _v))
@@ -1694,7 +1690,8 @@ def cmd_selftest() -> int:
                     f"NOTES:check 16: NOTE {_k} is declared",
                     lambda t=tR, c=cR: _rp(t, c))
         arm("a retired key alone does not arm checks 13-15",
-            None, lambda: str(armed(dict(c7clean, READ_PATH_CEILING="161120"))).replace("False", ""))
+            None, lambda: "" if not armed(t7c, dict(c7clean, READ_PATH_CEILING="161120"))
+            else str(sorted(armed(t7c, c7clean))))
 
         # A MIS-SET CHARTER IS THIS CHECK'S OWN FINDING, not a Problem that escapes checks() and
         # replaces every sibling finding in the run with one line.
@@ -1706,7 +1703,7 @@ def cmd_selftest() -> int:
         # no AGENTS.md, so an unconditional check 16 refused every adopter on the day they adopted —
         # measured, as a RED on this repo's own scaffolder arm before this branch was corrected.
         t7y = os.path.join(base, "readpath-young"); os.makedirs(t7y)
-        c7y = _scratch(t7y, pins=False)
+        c7y = _scratch(t7y, homes=False)
         os.remove(os.path.join(t7y, "AGENTS.md"))
         run("git", "rm", "-q", "--cached", "AGENTS.md", cwd=t7y)
         run("git", "commit", "-q", "-m", "no charter", "--no-verify", cwd=t7y)
@@ -1724,8 +1721,9 @@ def cmd_selftest() -> int:
 
         # the off switch, and the armed-without-grammar error.
         t8 = os.path.join(base, "off"); os.makedirs(t8)
-        c8 = _scratch(t8, pins=False)
-        arm("blank pins turn every check off", None, lambda: str(armed(c8)).replace("False", ""))
+        c8 = _scratch(t8, homes=False)
+        arm("absent waiver homes turn every check off", None,
+            lambda: "" if not armed(t8, c8) else str(sorted(armed(t8, c8))))
 
         # resolve_bash accepts a candidate only if it RUNS. A launcher that exists on disk and cannot
         # execute is the same defect one interpreter over as the Microsoft Store `python3` stub, and
@@ -1802,13 +1800,15 @@ def main(argv: list) -> int:
             return cmd_measure(root, conf)
         if mode == "--print-defined-ids":
             return print_defined_ids(root, conf)
+        if mode == "--list-unbound":
+            return cmd_list_unbound(root)
         if mode != "--check":
-            print("usage: corpus_ids.py [--check|--report|--measure|--print-defined-ids|--selftest]")
+            print("usage: corpus_ids.py [--check|--report|--measure|--print-defined-ids|--list-unbound|--selftest]")
             return 2
-        # Check 16 runs ALWAYS. Checks 13-15 stay behind the pins, and the grammar stays unloaded
-        # when they are blank — the cross-kit dependency is still conditional.
+        # Check 16 runs ALWAYS. Checks 13-15 stay behind the waiver homes, and the grammar stays
+        # unloaded when both are absent — the cross-kit dependency is still conditional.
         bad, notes = check_read_path(root, conf)
-        if armed(conf):
+        if armed(root, conf):
             w = walk(root, conf)
             notes += w["notes"]     # non-gating, and printed through the same channel as check 16's
             bad += checks(w)

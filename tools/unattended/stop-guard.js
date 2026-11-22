@@ -3,7 +3,7 @@
  * stop-guard — a `Stop` hook that refuses the turn end of a session bound to a non-terminal
  * unattended run, and continues the conversation with the absent-owner instruction instead.
  *
- * gov:kit unattended@1.133 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.135 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aWokenSentinel-3 under the build folder of that slug.
@@ -110,17 +110,96 @@ const LIVENESS_BOUND_MS = 60000
 const REASONS = ['terminal', 'held', 'elsewhere', 'liveness-unreadable', 'background-tasks',
                  'knob-malformed', 'blocks-exhausted', 'landing-unstamped', 'run-open']
 
+// >>> resolve_bash_js -- canonical copy: resolve_bash.js in the gov lib dir (byte-identical; gated)
+// `{found, tried, refusal}`: resolve_bash.py's `scan_bash`, the same candidates, walk and acceptance.
+// GOV_BASH first, and when set nothing after it is tried; then Git's own `bin/bash.exe`, the third
+// parent of `git --exec-path`; then each PATH directory's `bash.exe` and `bash`, a System32 or
+// WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+// its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+// the answer must start MINGW or MSYS, so WSL's launcher is refused under any name. Past GOV_BASH every
+// candidate is run and reported once; `found` is the first that passed, or "" with `refusal` naming
+// every `tried` line. The bare name `bash` is never returned, and nothing is memoised here. On a
+// `posix` host the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/`
+// returns no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried.
+// `wrongShellAt` is resolve_bash.py's `wrong_shell_at` and the shell block `refuse_wrong_shell`'s:
+// true when `wsl` is set and the path sits under a single-letter `/mnt/<drive>/` (TOOL-dWitnessedBar-27).
+function wrongShellAt(path, wsl) {
+  return Boolean(wsl) && /^\/mnt\/[a-z]\//.test(String(path));
+}
+function scanBash({ script = "", host = "" } = {}) {
+  const cp = require("child_process"), fs = require("fs"), path = require("path");
+  const hostRule = host || (process.platform === "win32" ? "windows" : "posix");
+  if (hostRule === "posix") {
+    const here = path.resolve(__filename);
+    const wsl = Boolean(process.env.WSL_DISTRO_NAME) || fs.existsSync("/proc/sys/fs/binfmt_misc/WSLInterop");
+    if (wrongShellAt(here, wsl)) return { found: "", tried: [], refusal: "WSL is running " + here +
+      " from a Windows checkout under /mnt/; run it with Git's bash (C:/Program Files/Git/bin/bash.exe)" };
+  }
+  const tried = [], seen = new Set();
+  const runProbe = (cand) => {
+    const r = cp.spawnSync(cand, ["-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", String(script)],
+      { stdio: ["ignore", "pipe", "pipe"], timeout: 20000, windowsHide: true });
+    if (r.error || r.status === null) return "did not run";
+    const u = (r.stdout || Buffer.alloc(0)).toString("utf8").replace(/\0/g, "").split("\n")[0].trim();
+    if (!u) return "did not run";
+    if (hostRule === "windows" && !u.startsWith("MINGW") && !u.startsWith("MSYS")) return "answered " + u;
+    return r.status === 0 ? "runs" : "cannot see " + String(script);
+  };
+  const checkCandidate = (cand) => {
+    const key = hostRule === "windows" ? cand.toLowerCase() : cand;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    const low = cand.toLowerCase();
+    const why = low.includes("/system32/") || low.includes("/windowsapps/") ? "a launcher" : runProbe(cand);
+    tried.push(cand + ": " + why);
+    return why === "runs";
+  };
+  const checkFile = (p) => { try { return fs.statSync(p).isFile(); } catch (_e) { return false; } };
+  const gov = process.env.GOV_BASH || "";
+  if (gov) {
+    const why = runProbe(gov);
+    tried.push(gov + ": " + why);
+    if (why === "runs") return { found: gov, tried, refusal: "" };
+    return { found: "", tried, refusal: "GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: " +
+      "an override that is set and unusable is refused, never a fall-through" };
+  }
+  const g = cp.spawnSync("git", ["--exec-path"], { stdio: ["ignore", "pipe", "pipe"], timeout: 20000, windowsHide: true });
+  const ex = !g.error && g.status === 0 ? (g.stdout || Buffer.alloc(0)).toString("utf8").trim().replace(/\\/g, "/") : "";
+  let found = "";
+  if (!ex) {
+    tried.push("git --exec-path: did not run");
+  } else {
+    const cand = ex.replace(/\/+$/, "").split("/").slice(0, -3).join("/") + "/bin/bash.exe";
+    if (!checkFile(cand)) tried.push(cand + ": absent");
+    else if (checkCandidate(cand)) found = cand;
+  }
+  for (const d of (process.env.PATH || "").split(path.delimiter)) {
+    for (const name of ["bash.exe", "bash"]) {
+      const cand = (d.replace(/[/\\]+$/, "") + "/" + name).replace(/\\/g, "/");
+      if (d && checkFile(cand) && checkCandidate(cand)) found = found || cand;
+    }
+  }
+  if (found) return { found, tried, refusal: "" };
+  return { found: "", tried, refusal: "no bash runs" + (script ? " that can see " + String(script) : "") + ": " +
+    tried.join("; ") + "; set GOV_BASH to Git's bash" };
+}
+// <<< resolve_bash_js
+
 /**
  * `bash <kitDir>/unattended.sh --liveness <slug>` with cwd at the root, because the driver sources
  * the conf of the tree it runs in; the driver path is forward-slashed because MSYS mangles a
  * backslash path handed to a shell (charter [cross-os]). Returns `{stdout, ok}` where `ok` is a zero exit
- * within the bound; a spawn error, a non-zero exit or the bound is `ok: false`.
+ * within the bound; a spawn error, a non-zero exit or the bound is `ok: false`, and so is no bash
+ * resolving: the bash is the one `scanBash` finds, never the bare name, which the Windows loader
+ * answers with WSL's launcher (TOOL-dWitnessedBar-26).
  */
 function runLiveness(kitDir, root, slug) {
   const driver = path.join(kitDir, 'unattended.sh').replace(/\\/g, '/')
   const bound = Number(process.env.STOP_GUARD_LIVENESS_BOUND_MS) > 0
     ? Number(process.env.STOP_GUARD_LIVENESS_BOUND_MS) : LIVENESS_BOUND_MS
-  const r = spawnSync('bash', [driver, '--liveness', slug],
+  const bash = scanBash().found
+  if (!bash) return { stdout: '', ok: false }
+  const r = spawnSync(bash, [driver, '--liveness', slug],
                       { cwd: root, encoding: 'utf8', timeout: bound, killSignal: 'SIGKILL',
                         stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true })
   return { stdout: r.stdout || '', ok: !r.error && r.status === 0 }

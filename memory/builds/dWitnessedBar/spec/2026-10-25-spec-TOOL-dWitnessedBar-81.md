@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-81 — the byte check's staged reds are one break per condition, each recorded with the line it printed, so units 74 and 76 close on a red that happened
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 41 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-4 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 41 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,10 +8,17 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
 | [2026-10-25-build-TOOL-dWitnessedBar-81-deviation-811.md](../build/2026-10-25-build-TOOL-dWitnessedBar-81-deviation-811.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-81-deviation-812.md](../build/2026-10-25-build-TOOL-dWitnessedBar-81-deviation-812.md) | deviation | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-81-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-81-1-acceptance-ledger.md) | journal | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-81-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-81-1-builder-return.md) | journal | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-81-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-81-build-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-81-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-81-reground-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-81-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-81-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-79-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-79-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 |
+| [2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md](../reviews/2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md) | diff-review | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
 
 <!-- /gen:spec-records -->
 
@@ -22,13 +29,14 @@ The round-1 spec audit of units 74 to 78
 confirmed finding **id 1 at HIGH**, report item **H1**. Ids 7 and 18 share that item and take
 `TOOL-dWitnessedBar-79` and `TOOL-dWitnessedBar-80`.
 
-`TOOL-dWitnessedBar-74` AC2 stages one break, a `check_cr_reached` whose count reads `-ge 0`, and
-expects the line `(it passed a value that lost its CR)`. Its liveness variant fails both conditions,
-so that break leaves the variant rejected by the tail test and the line never prints. AC2 is red on a
-correct build, and a builder who chases it would take out the tail test. Unit 74's §7 New-arm line
-claims the same break reaches that line, and unit 76 AC2 and its New-arm line repeat the claim for
-`rec_fp`. Without a record of what each break printed, the ledger would show a seen-red that never
-happened.
+`TOOL-dWitnessedBar-74` AC2 at rev-2 staged one break, a `check_cr_reached` whose count reads
+`-ge 0`, and expected the line `(it passed a value that lost its CR)`. Its liveness variant failed
+both conditions, so that break left the variant rejected by the tail test and the line never
+printed. Unit 74 rev-3 §8 F3 replaced the break with a comparison of `true` and left the
+per-condition breaks to this unit. `TOOL-dWitnessedBar-80` S3 then restated the quoted reason as the
+tail reason, so the suite no longer spells `lost its CR` (§4 Evidence). Unit 74's AC2 and §7 New-arm
+line still quote it, and unit 76 AC2 and its New-arm line repeat the claim for `rec_fp`. Without a
+record of what each break printed, the ledger would show a seen-red that never happened.
 
 This unit restates those criteria as one staged break per condition, runs each at the close in a
 scratch clone, and records the line each printed in the ledgers of units 74 and 76. The `-ge 0`
@@ -38,11 +46,13 @@ last-byte test defeats the tail condition and must reach `TOOL-dWitnessedBar-80`
 
 ## 2. Scope (IN)
 
-- **S1** — Two staged breaks, one per condition. At the close, on a Windows node, the main loop runs
-  the arm in two scratch clones. In the first, the suite's `check_cr_reached` compares the byte count
-  with `-ge 0`, its tail test kept. In the second, it keeps the count at forty-one and holds no
-  last-byte test. Observed by AC1.
-- **S2** — Each break reaches its own variant and only it. The first break prints
+- **S1** — Two staged breaks, one per condition of
+  `tools/run-gates/run-gates.gov.test.sh#check_cr_reached`, a count test and a last-byte test joined
+  by `&&`. At the close, on a Windows node, the main loop runs the arm in two scratch clones. In the
+  first, the suite's `check_cr_reached` compares the byte count with `-ge 0`, its tail test kept. In
+  the second, it keeps the count at forty-one and holds no last-byte test. Observed by AC1.
+- **S2** — Each break reaches its own variant and only it, through the per-key loop's two
+  `tools/run-gates/run-gates.gov.test.sh#check_key_variant` calls. The first break prints
   `TOOL-dWitnessedBar-79`'s line, `(the length variant passed a value one byte short)`, for `rec_sha`
   and for `rec_fp`, and no `tail variant` line. The second prints `TOOL-dWitnessedBar-80`'s line,
   `(the tail variant passed a value whose last byte is not CR)`, for both, and no `length variant`
@@ -50,8 +60,9 @@ last-byte test defeats the tail condition and must reach `TOOL-dWitnessedBar-80`
 - **S3** — Unit 74's acceptance ledger beside AC2 records both breaks, each with its printed `rec_sha`
   line, the line it did not print, and the `uname -s` it ran under. The record states that unit 74
   AC2's quoted reason, `it passed a value that lost its CR`, is the one `TOOL-dWitnessedBar-80` S3
-  restates as the tail reason, and that its `-ge 0` break reaches the length reason. It names this
-  unit. Observed by AC2.
+  restates as the tail reason, which the second break reaches. It states that the first break is the
+  `-ge 0` count unit 74 rev-2 staged, which reaches the length reason, and that unit 74 rev-3 AC2's
+  `true` comparison is not restaged (§8 F3). It names this unit. Observed by AC2.
 - **S4** — Unit 76's acceptance ledger beside AC2 records the same two breaks with their printed
   `rec_fp` lines, so unit 76's New-arm claim rests on a red each condition showed for `rec_fp`. It
   names this unit. Observed by AC3.
@@ -63,6 +74,8 @@ last-byte test defeats the tail condition and must reach `TOOL-dWitnessedBar-80`
   ledgers by name, as `TOOL-dWitnessedBar-78` §3 answers units 68 to 73.
 - The ledger's physical-line rule for the other units' records, which is `TOOL-dWitnessedBar-84`'s
   for id 16. This unit's own criteria already require it.
+- Restaging unit 74 rev-3 AC2's own break, a `check_cr_reached` whose comparison is `true`. It
+  defeats both conditions at once, and unit 74's ledger records it red at that unit's pass (§8 F3).
 - The report's left-shift text, that a staged break states which condition it defeats and its
   expected printed line. No clause of this build names it. S1 and S2 are that statement, made for
   this arm.
@@ -81,14 +94,26 @@ last-byte test defeats the tail condition and must reach `TOOL-dWitnessedBar-80`
 
 ### Evidence
 
-- `spec/2026-10-25-spec-TOOL-dWitnessedBar-74.md` §6 AC2 stages the `-ge 0` break and quotes
-  `(it passed a value that lost its CR)`. Its §7 New-arm line claims the same, and `TOOL-dWitnessedBar-76`
-  §6 AC2 quotes that reason for `rec_fp`.
-- The report's skeptics probed the break on a unit-69-shaped loop: with `-ge 0` and the tail test kept,
-  the `${_rg_v%?}` variant's mutant returned 1, so no line printed (ids 1, 7 and 18).
-- `TOOL-dWitnessedBar-79` §4 Evidence and `TOOL-dWitnessedBar-80` §4 Evidence record, on this node, a
-  length variant ending in `\r` at 40 bytes and a tail variant ending in `x` at 41 bytes, each failing
-  one condition. A break that defeats one condition therefore lets exactly one variant pass.
+Read at `2bc0afda9` on 2026-11-21.
+
+- `spec/2026-10-25-spec-TOOL-dWitnessedBar-74.md` rev-3 §6 AC2 stages a `check_cr_reached` whose
+  comparison is `true` and quotes `(it passed a value that lost its CR)`; its §7 New-arm line claims
+  the same, and its §8 F3 records that rev-2's `-ge 0` break printed no line. `TOOL-dWitnessedBar-76`
+  §6 AC2 quotes that reason for `rec_fp`, over a `check_canary_keys` that skips `rec_fp`.
+- The report's skeptics probed the `-ge 0` break on a unit-69-shaped loop: with the tail test kept,
+  the `${_rg_v%?}` variant's mutant returned 1, so no line printed (ids 1, 7 and 18). Unit 74 §4
+  Evidence re-probed it at `552b72210` with the same result.
+- At HEAD the per-key loop calls `check_key_variant` first with `'${_rg_v%?}x'`, label `'tail '` and
+  `the tail variant passed a value whose last byte is not CR`, then with `'${_rg_v:1}'`, label
+  `'length '` and `the length variant passed a value one byte short`.
+  `grep -c 'lost its CR' tools/run-gates/run-gates.gov.test.sh` prints 0 (PINNED 2026-11-21).
+- Unit 79's acceptance ledger records the length variant's mutant reading 40 bytes ending in CR, and
+  unit 80's the tail variant's reading 41 bytes ending in `x` (DERIVED from each builder's probe), each
+  failing one condition. A break that defeats one condition therefore lets exactly one variant pass.
+- Unit 79's ledger beside AC2 records the `-ge 0` break printing the length line for `rec_sha` and
+  `rec_fp` and no tail reason; unit 80's records the break with no last-byte test printing the tail
+  line for both and no length reason. Both ran over a hand-built record, so S1's clone runs over
+  `run_local_plant`'s record are the real observation (DERIVED from each builder's probe).
 - `memory/gotchas/ledger-token-wrapped-across-a-line-joins-nothing.md` records that a ledger grep
   reads one physical line.
 
@@ -104,20 +129,31 @@ None: no stored data changes.
 ### Rollout
 
 At the close, after every unit is terminal. The unit takes order 41 so that it sits beside the
-variants it observes. Dispatch sorts a tie by id string (`tools/workflows/unattended-build.js:608-613`),
-so units 79 and 80 build before it. Its records are written at the close, when the arm runs.
+variants it observes. Dispatch is strictly sequential and sorts a tie by id string
+(`tools/workflows/unattended-build.js@c9500821b:78-82`, `:692-697`), so order 41's units 73, 76, 77,
+79 and 80, CLOSED at `563d828df`, `3596751cf`, `18907b769`, `b9326245e` and `c0310ecd8`, build before
+it, and it closes order 41. `TOOL-dWitnessedBar-87`, at order 42, writes unit 76's ledger and this
+unit's after it. Its records are written at the close, when the arm runs.
 
 ### Files touched (estimate)
 
-- `memory/builds/dWitnessedBar/build/`
+- `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-74-1-acceptance-ledger.md`:
+  S3's break records and statement, beside AC2.
+- `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-76-1-acceptance-ledger.md`:
+  S4's break records, beside AC2.
+- This unit's own acceptance ledger, a new record in the same build directory, named by the pass's
+  date as every builder's ledger is.
+
+No code file and no other record. `TOOL-dWitnessedBar-78`, re-grounded beside this unit, names
+neither ledger.
 
 ### Alternatives rejected
 
 - **One combined break, `-ge 0` with the tail test taken out, the report's smaller alternative.** It
   shows the arm can red, but not that each condition can, so a vacuous count with the tail test kept
   would still land green.
-- **A break that makes `check_cr_reached` return 0 on every value.** Both variants pass it, so the
-  record could not say which condition the arm would have caught.
+- **A break that makes `check_cr_reached` return 0 on every value**, unit 74 rev-3 AC2's own. Both
+  variants pass it, so the record could not say which condition the arm would have caught.
 
 ## 5. Production-readiness checklist
 
@@ -179,6 +215,15 @@ moves none, so it declares no `New arm:` line.
   Red-when, "a vacuous comparison passes with the arm green"; veto 1 discards both. RESOLVED (agent,
   2026-10-25, delegated): (a), rung 3, the one survivor.
   widens: none · relaxes: none
+- **F3 — Does this unit also restage unit 74 rev-3 AC2's break, a comparison of `true`?** Unit 74 rev-3
+  §8 F3 replaced rev-2's `-ge 0` break with it, so S3's record no longer names a break unit 74 AC2
+  stages. Options: (a) no: S1's two breaks stand, and S3's record names the `-ge 0` break as rev-2's
+  and the `true` break as not restaged; (b) a third clone stages the `true` break and S3 records both
+  lines it prints beside 74 AC2. Both meet AC1 to AC3. (b) adds a record outside the two breaks
+  `TOOL-dWitnessedBar-88` S19's platform rule covers, a follow-up left open, and its break is the one
+  §4 Alternatives rejects as naming no condition. RESOLVED (agent, 2026-11-21, delegated): (a), the
+  option leaving fewer follow-ups open.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -190,6 +235,11 @@ moves none, so it declares no `New arm:` line.
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edge of TOOL-dWitnessedBar-89, the minors batch of the round-1 spec audit of units 85 to 88;
   nothing else moved.
+- rev-4 · 2026-11-21 · §1 · S1 to S4 · §3 · §4 · §8 F3 · §10 · re-grounded over units 74, 76, 79 and
+  80 as landed, per 2026-11-19-prompt-TOOL-dWitnessedBar-81-reground-brief. §1 and §4 Evidence read
+  unit 74 rev-3's `true` break and unit 80's restated tail reason; S3's record names the `-ge 0` break
+  as rev-2's, and §8 F3 leaves the `true` break unrestaged. S1 and S2 cite the landed functions.
+  Rollout re-cites dispatch blob-pinned. Files touched lists the two ledgers and this unit's own.
 
 ## 10. Reuse audit
 
@@ -197,7 +247,7 @@ The seam is the acceptance ledger of `memory/HYGIENE.md` "Acceptance ledger", as
 `TOOL-dWitnessedBar-75` S3 uses it to record unit 70's staged reds with their printed lines; this
 unit records two more against the variants of units 79 and 80.
 `python tools/codebase-map/reuse_lookup.py "prove each condition of a two-condition check can fail on its own variant"`
-ranked `check`, `fail`, `checks` and `check_line`, none a record of a staged break, so no existing
-seam fits beyond the ledger named above.
+ranked `check`, `fail`, `checks` and `check_line` (PINNED 2026-11-21), none a record of a staged
+break, so no existing seam fits beyond the ledger named above.
 
 Recall terms used: `python tools/memory-recall/query.py "how is each condition of a canary byte check seen red, and who restates the assertion floor" --terms "canary liveness variant length tail CR byte check FLOOR_ASSERTIONS restated floor owner seen red"`

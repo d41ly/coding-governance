@@ -403,12 +403,25 @@ def check_page_links(root, page, rel: str, tracked: set[str]) -> tuple[int, int,
 
 # ----------------------------------------------------------------------------------- the list
 def read_legacy_rows(root) -> list[str]:
-    """The ids of the shrink-only list, one `<id>\\t<reason>` row each, `#` lines comments."""
+    """The ids of the shrink-only list: a ledger population keyed by `id` (TOOL-dWitnessedBar-16 S4),
+    read through the memory-tree kit's ledger factory, loaded by path from this install as drift-audit
+    is below; a row's reason is the conversion record's or its widen record's, never the row's. A row
+    the factory refuses is a refusal, never a silently unlisted member."""
     p = pathlib.Path(root) / LIST_REL
     if not p.is_file():
         raise Refusal(f"{LIST_REL}: absent, so the undocumented members have no list")
-    return [ln.split("\t", 1)[0].strip() for ln in p.read_text(encoding="utf-8").splitlines()
-            if ln.strip() and not ln.strip().startswith("#")]
+    anchor = "legacy_ledger.py"
+    try:
+        kit = gk.resolve_kit_dir("memory-tree", anchor, HERE)
+        if str(kit) not in sys.path:
+            sys.path.append(str(kit))
+        import legacy_ledger as LL  # noqa: PLC0415  the factory, found through the receipt rung
+    except Exception as e:  # any failure to load is "will not load", named
+        raise Refusal(f"{anchor} will not load: {type(e).__name__}: {e}") from None
+    rows, bad = LL.read_rows(p, 1)
+    if bad:
+        raise Refusal(f"{LIST_REL}: {LL.render_malformed(bad[0])}")
+    return [key[0] for key in rows]
 
 
 def check_legacy_low_water(root, count: int) -> tuple[int | None, list[str]]:
@@ -781,7 +794,8 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
         (root / rel).write_text(text, encoding="utf-8", newline="\n")
     sg.run_git_text(root, "add", "-A")
     sg.write_fixture_commit(root, hooks, "docs fixture: the seed")
-    (root / LIST_REL).write_text("# the fixture's undocumented members\nfx-page:guide\tseed\n", encoding="utf-8", newline="\n")
+    (root / LIST_REL).write_text("# the fixture's undocumented members\nfx-page:guide\t1\tabcdef12\tseeded\n",
+                                 encoding="utf-8", newline="\n")
     sg.run_git_text(root, "add", "-A")
     sg.write_fixture_commit(root, hooks, "docs fixture: fx-key documented, its row drained")
     class_ids = ["fx-verb", "fx-key", "fx-hook", "fx-leg", "fx-page", "fx-none"]
@@ -810,12 +824,13 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
     elif plant == "external-link":
         write_edit(guide, "See [more]", "See [the site](https://example.invalid/x), [more]")
     elif plant == "undocumented":
-        write_edit(LIST_REL, "fx-page:guide\tseed\n", "")
+        write_edit(LIST_REL, "fx-page:guide\t1\tabcdef12\tseeded\n", "")
     elif plant == "drained-row":
         write_edit(more, "## The hook\n", "## The hook\n\n<!-- usage: fx-page:guide -->\n")
     elif plant == "grown-list":
         population.add("fx-page:extra")
-        write_edit(LIST_REL, "fx-page:guide\tseed\n", "fx-page:guide\tseed\nfx-page:extra\tlater\n")
+        write_edit(LIST_REL, "fx-page:guide\t1\tabcdef12\tseeded\n",
+                   "fx-page:guide\t1\tabcdef12\tseeded\nfx-page:extra\t1\tabcdef12\tseeded\n")
         sg.run_git_text(root, "add", "-A")
         sg.write_fixture_commit(root, hooks, "docs fixture: a row added")
     elif plant == "orphan-anchor":
