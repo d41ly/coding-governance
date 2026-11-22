@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-5 — one `git diff --name-only BASE` decides every plain-guarded leg of a bar
 
-**Status:** SPECCED · rev-3 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2
+**Status:** INPROGRESS · rev-3 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,7 @@
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-pins-task.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md) | research | TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-5-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-5-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-5-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-5-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
