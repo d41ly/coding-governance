@@ -155,3 +155,5 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T02:05:07Z brief · item KICK-dKeptSession-37 · reason bbdb9ac9b579 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-37-build-brief.md
 
 2026-11-22T02:06:32Z dispatch · item 020af060 KICK-dKeptSession-37 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-37-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-22T04:53:43Z rescope · item add KICK-dKeptSession-69 · reason origin/main moved 634 commits past BASE (dWitnessedBar landed at 8b8b1374) and the primary tree fast-forwarded, so every commit here ran main's hooks over the pre-main tree and was refused; the reconcile merge ad02f1a6a is this unit's build. A blocker between the run and its landing is a discovery, adopted as this unit.
