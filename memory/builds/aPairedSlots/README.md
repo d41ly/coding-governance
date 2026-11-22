@@ -130,3 +130,16 @@ Ids whose spec moved past its audited revision: none — 0 of 14 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-11-prompt-TOOL-aPairedSlots-1.md`, `2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md` |
+| reviews | `2026-10-12-review-TOOL-aPairedSlots-1-9-diff-review-round1.md` |
+| logs | `2026-10-12-build-TOOL-aPairedSlots-5-two-bar-check-rows.tsv`, `2026-10-12-build-TOOL-aPairedSlots-5-two-bar-check-results.md` and 21 more under build/ |
+| open asks | `BACKLOG.md`, 6 open |
+| card ref | `refs/gov/builds/aPairedSlots/card` |
+<!-- /gen:build-routes -->

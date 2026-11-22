@@ -135,3 +135,16 @@ Ids whose spec moved past its audited revision: none — 0 of 15 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-14-prompt-TOOL-aClearedLedger-16-brief.md`, `2026-11-14-prompt-TOOL-aClearedLedger-16-1-spec-writer.md` and 18 more under prompts/ |
+| reviews | `2026-11-14-review-TOOL-aClearedLedger-14-diff-review-round4.md` (BLOCKED), `2026-11-14-review-TOOL-aClearedLedger-11-diff-review-round2.md` (CLEAN WITH FIXES) and 2 more under reviews/ |
+| red-fix | `2026-11-13-build-TOOL-aClearedLedger-5-red-fix-1.md` |
+| logs | `2026-11-14-build-TOOL-aClearedLedger-16-1-acceptance-ledger.md`, `2026-11-14-build-TOOL-aClearedLedger-15-1-acceptance-ledger.md` and 9 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aClearedLedger/card` |
+<!-- /gen:build-routes -->

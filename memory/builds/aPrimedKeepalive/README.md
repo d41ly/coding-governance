@@ -123,3 +123,15 @@ Ids whose spec moved past its audited revision: none — 0 of 9 unit id(s) carry
 
 - **Child builds:** [aWokenSentinel](../aWokenSentinel/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md` |
+| reviews | `2026-08-27-review-TOOL-aPrimedKeepalive-1-9-closing-diff.md`, `2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round3.md` and 2 more under reviews/ |
+| logs | `2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md` |
+| card ref | `refs/gov/builds/aPrimedKeepalive/card` |
+<!-- /gen:build-routes -->

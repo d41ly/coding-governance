@@ -94,3 +94,15 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-04-prompt-TOOL-aBatchedMinors-6-1-build-brief.md`, `2026-10-04-prompt-TOOL-aBatchedMinors-4-1-build-brief.md` and 3 more under prompts/ |
+| reviews | `2026-10-04-review-TOOL-aBatchedMinors-2-closing-diff-round1.md` |
+| logs | `2026-10-04-build-TOOL-aBatchedMinors-6-1-acceptance-ledger.md`, `2026-10-04-build-TOOL-aBatchedMinors-3-1-acceptance-ledger.md` and 2 more under build/ |
+| card ref | `refs/gov/builds/aBatchedMinors/card` |
+<!-- /gen:build-routes -->

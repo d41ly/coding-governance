@@ -85,3 +85,16 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-02-prompt-TOOL-dEasedEffort-2-round1-fix-brief.md`, `2026-11-02-prompt-TOOL-dEasedEffort-1-brief.md` |
+| reviews | `2026-11-02-review-TOOL-dEasedEffort-1-closing-diff-review-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-11-02-build-TOOL-dEasedEffort-2-1-acceptance-ledger.md`, `2026-11-02-build-TOOL-dEasedEffort-1-hand-attribution.md` and 2 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dEasedEffort/card` |
+<!-- /gen:build-routes -->

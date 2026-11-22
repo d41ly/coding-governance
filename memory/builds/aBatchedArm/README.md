@@ -122,3 +122,15 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-14-prompt-TOOL-aBatchedArm-5-closing-fix-brief.md`, `2026-09-14-prompt-TOOL-aBatchedArm-5-build-brief.md` and 6 more under prompts/ |
+| reviews | `2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round4.md`, `2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round3.md` and 14 more under reviews/ |
+| logs | `2026-09-23-build-TOOL-aBatchedArm-5-4-landing-pass-2.md`, `2026-09-15-build-TOOL-aBatchedArm-5-3-landing-ledger.md` and 7 more under build/ |
+| card ref | `refs/gov/builds/aBatchedArm/card` |
+<!-- /gen:build-routes -->

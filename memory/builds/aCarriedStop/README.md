@@ -96,3 +96,17 @@ Unordered: `TOOL-aCarriedStop-1`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-14-prompt-TOOL-aCarriedStop-9-build-brief.md`, `2026-11-14-prompt-TOOL-aCarriedStop-9-brief.md` and 15 more under prompts/ |
+| reviews | `2026-11-13-review-TOOL-aCarriedStop-1-diff-review-round1.md` (CLEAN WITH FIXES) |
+| research | `2026-11-13-build-TOOL-aCarriedStop-2-promotions.md`, `2026-11-13-build-TOOL-aCarriedStop-1-candidates.md` |
+| logs | `2026-11-14-build-TOOL-aCarriedStop-9-1-acceptance-ledger.md`, `2026-11-14-build-TOOL-aCarriedStop-10-1-acceptance-ledger.md` and 6 more under build/ |
+| open asks | `BACKLOG.md`, 5 open |
+| card ref | `refs/gov/builds/aCarriedStop/card` |
+<!-- /gen:build-routes -->

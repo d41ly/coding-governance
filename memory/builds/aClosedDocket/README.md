@@ -109,3 +109,15 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-08-31-prompt-TOOL-aClosedDocket-1.md` |
+| reviews | `2026-08-31-review-TOOL-aClosedDocket-4-spec-audit-round1.md`, `2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md` and 1 more under reviews/ |
+| logs | `2026-08-31-build-TOOL-aClosedDocket-1-acceptance-ledger.md` |
+| card ref | `refs/gov/builds/aClosedDocket/card` |
+<!-- /gen:build-routes -->

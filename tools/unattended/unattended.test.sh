@@ -16990,6 +16990,12 @@ h9_dir=$(mktemp -d)
     && printf 'HELD_CI_WORKFLOW=""\n' > .unattended.conf && git add -A && git commit -q -m blank --no-verify ) >/dev/null 2>&1
 slice_fn write_held_asks; slice_fn read_policy_key; slice_fn read_roster_family
 readme_of() { _readme="$M/builds/$1/README.md"; printf '%s' "$_readme"; }
+# TOOL-dTotalRecall-4 S3: the roster family is the generator's `--print-front-matter` answer, so the
+# slice's generator is a stub printing the derived keys of the arm's one build.
+printf '%s\n' 'import sys' \
+  'print("node: t\nroster: ARCH\nstreams: arch" if sys.argv[1:] == ["--print-front-matter", "tRun"] else "")' \
+  > "$h9_dir/.git/h9-gen.py"
+resolve_index_generator() { printf '%s\n' "$h9_dir/.git/h9-gen.py"; }
 read_leg_argv() { return 1; }
 derive_ask_seq() { printf '7'; }
 # TOOL-dWitnessedBar-6 S7: the reader is the run-gates kit's `remote_verdict.py held`, so the stub is a
@@ -17036,7 +17042,8 @@ hit  "$out" "h9-rc=0"
 miss "$out" "suite green suite"
 miss "$out" "suite bad"
 n=$((n+1)); [ ! -e "$h9_dir/memory/builds/tRun/BACKLOG.md" ] || { echo "FAIL held: the writer with ASKS_CMD blank wrote a BACKLOG.md"; st=1; }
-unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq resolve_kit_dir run_h9
+unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq resolve_kit_dir \
+  resolve_index_generator run_h9
 unset H9_ROWS H9_CALLS H9_NO_KIT h9_kit
 rm -rf "$h9_dir"
 # TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset

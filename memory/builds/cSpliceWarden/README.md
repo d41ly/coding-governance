@@ -74,7 +74,7 @@ an accident; it is what the documented procedure produces. The evidence is in
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 6 unit(s) · node c · opened 2026-09-12 · streams tooling+playbook
+**Build status:** CLOSED · 6 unit(s) · node c · opened 2026-09-12 · streams tooling
 ids TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-4 TOOL-cSpliceWarden-5 TOOL-cSpliceWarden-6 TOOL-cSpliceWarden-7 TOOL-cSpliceWarden-8
 
 <!-- gen:build-units -->
@@ -113,3 +113,13 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| logs | `2026-09-13-build-TOOL-cSpliceWarden-6-acceptance-ledger.md`, `2026-09-13-build-TOOL-cSpliceWarden-4-archive-forensics.md` and 1 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/cSpliceWarden/card` |
+<!-- /gen:build-routes -->

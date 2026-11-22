@@ -144,3 +144,15 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 
 - **Parent builds:** [aWeighedCanon](../aWeighedCanon/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-09-07-review-TOOL-aJoinedCanon-1-diff-review-round1.md` (CLEAN WITH FIXES), `2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md` and 2 more under reviews/ |
+| logs | `2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 3 open |
+| card ref | `refs/gov/builds/aJoinedCanon/card` |
+<!-- /gen:build-routes -->

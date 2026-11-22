@@ -167,7 +167,7 @@ and every red leg fixed. The prompt, the owner's four answers and the report are
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 109 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
+**Build status:** CLOSED · 109 unit(s) · node a · opened 2026-10-04 · streams kickoff+playbook+tooling
 ids KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 PLAY-aMendedFleet-5 PLAY-aMendedFleet-6 TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4
 ids TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18
 ids TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32
@@ -427,3 +427,16 @@ Ids whose spec moved past its audited revision: none — 0 of 109 unit id(s) car
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-06-prompt-TOOL-aMendedFleet-71-1-build-brief.md`, `2026-10-05-prompt-TOOL-aMendedFleet-33-1-build-brief.md` and 6 more under prompts/ |
+| reviews | `2026-10-06-review-TOOL-aMendedFleet-1-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-10-06-build-TOOL-aMendedFleet-93-run-brief.md`, `2026-10-06-build-TOOL-aMendedFleet-93-reading.md` and 58 more under build/ |
+| open asks | `BACKLOG.md`, 11 open |
+| card ref | `refs/gov/builds/aMendedFleet/card` |
+<!-- /gen:build-routes -->

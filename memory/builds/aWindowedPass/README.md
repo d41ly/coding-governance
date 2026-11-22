@@ -98,3 +98,15 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-04-prompt-TOOL-aWindowedPass-6-2-build-brief.md`, `2026-10-04-prompt-TOOL-aWindowedPass-5-2-build-brief.md` and 5 more under prompts/ |
+| reviews | `2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round2.md` (CLEAN WITH FIXES), `2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md` (BLOCKED) |
+| logs | `2026-10-04-build-TOOL-aWindowedPass-6-1-acceptance-ledger.md`, `2026-10-04-build-TOOL-aWindowedPass-5-1-acceptance-ledger.md` and 4 more under build/ |
+| card ref | `refs/gov/builds/aWindowedPass/card` |
+<!-- /gen:build-routes -->

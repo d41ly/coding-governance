@@ -106,3 +106,15 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round2.md` (CLEAN WITH FIXES), `2026-09-22-review-TOOL-dGatedProse-1-closing-diff-review-round1.md` (CLEAN WITH FIXES) and 1 more under reviews/ |
+| research | `2026-09-21-build-TOOL-dGatedProse-1-dry-run-research.md` |
+| logs | `2026-09-22-build-TOOL-dGatedProse-5-corpus-census.md`, `2026-09-22-build-TOOL-dGatedProse-5-1-acceptance-ledger.md` and 4 more under build/ |
+| open asks | `BACKLOG.md`, 7 open |
+| card ref | `refs/gov/builds/dGatedProse/card` |
+<!-- /gen:build-routes -->

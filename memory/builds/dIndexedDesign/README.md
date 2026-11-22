@@ -192,3 +192,18 @@ Coverage of dIndexedDesign's 16 clause(s) and 28 owned node(s), over 40 spec(s) 
 - **Parent builds:** [dBoundRoles](../dBoundRoles/README.md), [dDeclaredLoop](../dDeclaredLoop/README.md), [dKeptSession](../dKeptSession/README.md), [dLinkedLibrary](../dLinkedLibrary/README.md), [dTotalRecall](../dTotalRecall/README.md)
 - **Child builds:** [dScopedBuild](../dScopedBuild/README.md), [dTendedCadence](../dTendedCadence/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-05-prompt-TOOL-dIndexedDesign-9-1-spec-reviewer.md`, `2026-11-05-prompt-TOOL-dIndexedDesign-8-1-spec-writer.md` and 31 more under prompts/ |
+| reviews | `2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md` (BLOCKED), `2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md` (CLEAN WITH FIXES) and 1 more under reviews/ |
+| deviation | `2026-11-05-build-TOOL-dIndexedDesign-9-deviation-91.md`, `2026-11-05-build-TOOL-dIndexedDesign-8-deviation-82.md` and 53 more under build/ |
+| research | `2026-11-05-build-TOOL-dIndexedDesign-1-reground-returns.md`, `2026-11-05-build-TOOL-dIndexedDesign-1-parents-crosscheck.md` and 10 more under build/ |
+| logs | `2026-10-28-build-TOOL-dIndexedDesign-1-departures-spec.md`, `2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dIndexedDesign/card` |
+<!-- /gen:build-routes -->

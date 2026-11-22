@@ -75,7 +75,7 @@ one build and called it a pattern rather than a coincidence; its population was 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-09-04 · streams tooling+playbook+kickoff+deployer
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-09-04 · streams kickoff+tooling
 ids KICK-aHonedRuleset-1 TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7 TOOL-aHonedRuleset-8 TOOL-aHonedRuleset-9 TOOL-aHonedRuleset-10 TOOL-aHonedRuleset-11 TOOL-aHonedRuleset-12
 ids TOOL-aHonedRuleset-13 TOOL-aHonedRuleset-14 TOOL-aHonedRuleset-15 TOOL-aHonedRuleset-16
 
@@ -115,3 +115,16 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit.md`, `2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit-round3.md` and 4 more under reviews/ |
+| research | `2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py`, `2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md` |
+| logs | `2026-09-06-build-TOOL-aHonedRuleset-8-1-acceptance-ledger.md`, `2026-09-06-build-TOOL-aHonedRuleset-6-1-acceptance-ledger.md` and 4 more under build/ |
+| open asks | `BACKLOG.md`, 7 open |
+| card ref | `refs/gov/builds/aHonedRuleset/card` |
+<!-- /gen:build-routes -->

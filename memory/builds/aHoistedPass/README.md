@@ -84,7 +84,7 @@ Every rule below is argued in the design record; this slot is the index, not the
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 10 unit(s) · node a · opened 2026-09-04 · streams tooling+deployer
+**Build status:** CLOSED · 10 unit(s) · node a · opened 2026-09-04 · streams deployer+tooling
 ids DEPL-aHoistedPass-1 DEPL-aHoistedPass-2 DEPL-aHoistedPass-3 DEPL-aHoistedPass-4 DEPL-aHoistedPass-5 DEPL-aHoistedPass-6 DEPL-aHoistedPass-7 DEPL-aHoistedPass-8 DEPL-aHoistedPass-9 DEPL-aHoistedPass-10 TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4
 ids TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 TOOL-aHoistedPass-10 TOOL-aHoistedPass-11 TOOL-aHoistedPass-12 TOOL-aHoistedPass-13 TOOL-aHoistedPass-14 TOOL-aHoistedPass-15 TOOL-aHoistedPass-16 TOOL-aHoistedPass-17 TOOL-aHoistedPass-18
 ids TOOL-aHoistedPass-19 TOOL-aHoistedPass-20 TOOL-aHoistedPass-21 TOOL-aHoistedPass-22 TOOL-aHoistedPass-23 TOOL-aHoistedPass-24 TOOL-aHoistedPass-25 TOOL-aHoistedPass-26 TOOL-aHoistedPass-27 TOOL-aHoistedPass-28 TOOL-aHoistedPass-29 TOOL-aHoistedPass-30 TOOL-aHoistedPass-31 TOOL-aHoistedPass-32
@@ -131,3 +131,17 @@ Ids whose spec moved past its audited revision: none — 0 of 10 unit id(s) carr
 
 - **Parent builds:** [dBriefedPass](../dBriefedPass/README.md), [dRatifiedSeam](../dRatifiedSeam/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-05-prompt-TOOL-aHoistedPass-9-brief.md`, `2026-09-05-prompt-TOOL-aHoistedPass-8-brief.md` and 10 more under prompts/ |
+| reviews | `2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round2.md`, `2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round1.md` (BLOCKED) and 2 more under reviews/ |
+| research | `2026-09-04-build-TOOL-aHoistedPass-8-recipe-probe.md`, `2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md` |
+| logs | `2026-09-06-build-TOOL-aHoistedPass-1-1-landing.md`, `2026-09-05-build-TOOL-aHoistedPass-9-1-acceptance-ledger.md` and 6 more under build/ |
+| open asks | `BACKLOG.md`, 3 open |
+| card ref | `refs/gov/builds/aHoistedPass/card` |
+<!-- /gen:build-routes -->

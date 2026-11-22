@@ -105,3 +105,15 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-09-prompt-TOOL-aQuotedBrief-6-11-build-brief.md`, `2026-10-09-prompt-TOOL-aQuotedBrief-5-9-build-brief.md` and 4 more under prompts/ |
+| reviews | `2026-10-09-review-TOOL-aQuotedBrief-3-closing-diff-round1.md`, `2026-10-09-review-TOOL-aQuotedBrief-1-closing-diff-round2.md` (CLEAN WITH FIXES) |
+| logs | `2026-10-09-build-TOOL-aQuotedBrief-6-12-acceptance-ledger.md`, `2026-10-09-build-TOOL-aQuotedBrief-5-10-acceptance-ledger.md` and 4 more under build/ |
+| card ref | `refs/gov/builds/aQuotedBrief/card` |
+<!-- /gen:build-routes -->

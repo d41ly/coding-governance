@@ -65,7 +65,7 @@ None. The open forks are each spec's §8.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+deployer
+**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-10-11 · streams deployer+kickoff+tooling
 ids DEPL-aScoutedSeam-1 KICK-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 TOOL-aScoutedSeam-3
 
 <!-- gen:build-units -->
@@ -102,3 +102,13 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-10-19-prompt-TOOL-aScoutedSeam-3-brief-3.md`, `2026-10-19-prompt-TOOL-aScoutedSeam-1-brief-2.md` and 192 more under prompts/ |
+| research | `2026-10-19-build-TOOL-aScoutedSeam-3-3-agent-prompt-principles.md`, `2026-10-18-build-TOOL-aScoutedSeam-3-2-workflow-design-set.md` and 30 more under build/ |
+| card ref | `refs/gov/builds/aScoutedSeam/card` |
+<!-- /gen:build-routes -->

@@ -97,3 +97,15 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-02-prompt-DEPL-aHalvedInstall-5-1-reconstructed-build-brief.md`, `2026-10-02-prompt-DEPL-aHalvedInstall-4-2-build-brief.md` and 4 more under prompts/ |
+| reviews | `2026-10-02-review-DEPL-aHalvedInstall-1-closing-diff-round1.md` |
+| logs | `2026-10-02-build-DEPL-aHalvedInstall-5-1-acceptance-ledger.md`, `2026-10-02-build-DEPL-aHalvedInstall-4-1-acceptance-ledger.md` and 3 more under build/ |
+| card ref | `refs/gov/builds/aHalvedInstall/card` |
+<!-- /gen:build-routes -->

@@ -96,3 +96,16 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-11-prompt-TOOL-dHomedResolver-8-1-build-brief.md`, `2026-10-09-prompt-TOOL-dHomedResolver-5-1-build-brief.md` and 4 more under prompts/ |
+| reviews | `2026-10-09-review-TOOL-dHomedResolver-1-2-3-diff-review-round1.md` |
+| logs | `2026-10-11-build-TOOL-dHomedResolver-8-1-acceptance-ledger.md`, `2026-10-09-build-TOOL-dHomedResolver-5-1-acceptance-ledger.md` and 3 more under build/ |
+| open asks | `BACKLOG.md`, 2 open |
+| card ref | `refs/gov/builds/dHomedResolver/card` |
+<!-- /gen:build-routes -->

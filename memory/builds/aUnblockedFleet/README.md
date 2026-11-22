@@ -152,3 +152,16 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-08-31-prompt-TOOL-aUnblockedFleet-1-1.md` |
+| reviews | `2026-08-31-review-TOOL-aUnblockedFleet-6-specs-round2.md`, `2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md` and 1 more under reviews/ |
+| logs | `2026-08-31-build-TOOL-aUnblockedFleet-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aUnblockedFleet/card` |
+<!-- /gen:build-routes -->

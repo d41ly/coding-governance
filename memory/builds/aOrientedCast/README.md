@@ -98,7 +98,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 33 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
+**Build status:** OPEN · 33 unit(s) · node a · opened 2026-10-11 · streams kickoff+playbook+tooling
 ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9
 ids TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 TOOL-aOrientedCast-22
 ids TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25 TOOL-aOrientedCast-26 TOOL-aOrientedCast-27 TOOL-aOrientedCast-28
@@ -191,3 +191,16 @@ Ids whose spec moved past its audited revision: none — 0 of 33 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-13-prompt-TOOL-aOrientedCast-28-3-spec-writer.md`, `2026-10-13-prompt-TOOL-aOrientedCast-28-2-fold-brief.md` and 36 more under prompts/ |
+| reviews | `2026-10-13-review-TOOL-aOrientedCast-16-closing-diff-round1.md`, `2026-10-12-review-TOOL-aOrientedCast-1-closing-diff-round1.md` |
+| research | `2026-10-11-build-TOOL-aOrientedCast-3-agent-type-rerun.md`, `2026-10-11-build-TOOL-aOrientedCast-3-agent-type-probe.md` and 1 more under build/ |
+| logs | `2026-10-13-build-TOOL-aOrientedCast-27-1-acceptance-ledger.md`, `2026-10-13-build-TOOL-aOrientedCast-26-1-acceptance-ledger.md` and 31 more under build/ |
+| card ref | `refs/gov/builds/aOrientedCast/card` |
+<!-- /gen:build-routes -->

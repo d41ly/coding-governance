@@ -345,3 +345,18 @@ Coverage of dShippedRelease's 31 clause(s) and 60 owned node(s), over 126 spec(s
 - **Parent builds:** [dBoundRoles](../dBoundRoles/README.md), [dFurnishedOrders](../dFurnishedOrders/README.md), [dLinkedLibrary](../dLinkedLibrary/README.md), [dTotalRecall](../dTotalRecall/README.md), [dWellOiledMachine](../dWellOiledMachine/README.md), [dWitnessedBar](../dWitnessedBar/README.md)
 - **Child builds:** [dConvergedCharter](../dConvergedCharter/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-03-prompt-DEPL-dShippedRelease-95-1-spec-reviewer.md`, `2026-11-03-prompt-DEPL-dShippedRelease-78-lease-epoch-surface.md` and 18 more under prompts/ |
+| reviews | `2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md` (BLOCKED), `2026-11-01-review-DEPL-dShippedRelease-126-spec-audit-round1.md` (CLEAN WITH FIXES) and 3 more under reviews/ |
+| deviation | `2026-11-03-build-DEPL-dShippedRelease-78-deviation-781.md`, `2026-11-03-build-DEPL-dShippedRelease-4-deviation-43.md` and 15 more under build/ |
+| research | `2026-11-03-build-DEPL-dShippedRelease-78-lease-epoch-returns.md`, `2026-11-03-build-DEPL-dShippedRelease-1-reground-returns.md` and 19 more under build/ |
+| logs | `2026-11-01-build-DEPL-dShippedRelease-1-departures-spec.md`, `2026-10-30-build-DEPL-dShippedRelease-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dShippedRelease/card` |
+<!-- /gen:build-routes -->

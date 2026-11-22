@@ -120,3 +120,16 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-04-prompt-TOOL-aWeldedTribunal-1.md` |
+| reviews | `2026-09-05-review-TOOL-aWeldedTribunal-1-8-diff-round4.md`, `2026-09-05-review-TOOL-aWeldedTribunal-1-8-diff-round3.md` and 4 more under reviews/ |
+| logs | `2026-09-05-build-TOOL-aWeldedTribunal-2-3-fold-round2.md`, `2026-09-04-build-TOOL-aWeldedTribunal-8-1-acceptance-ledger.md` and 9 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aWeldedTribunal/card` |
+<!-- /gen:build-routes -->

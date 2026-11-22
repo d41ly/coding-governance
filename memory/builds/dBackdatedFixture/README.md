@@ -91,3 +91,13 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-09-16-review-DEPL-dBackdatedFixture-2-spec-audit-round1.md`, `2026-09-16-review-DEPL-dBackdatedFixture-1-spec-audit-round1.md` and 2 more under reviews/ |
+| logs | `2026-09-16-build-DEPL-dBackdatedFixture-1-acceptance-ledger.md` |
+| card ref | `refs/gov/builds/dBackdatedFixture/card` |
+<!-- /gen:build-routes -->

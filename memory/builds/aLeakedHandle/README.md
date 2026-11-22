@@ -96,3 +96,17 @@ Unordered: `TOOL-aLeakedHandle-3`.
 
 - **Child builds:** [aRatifiedRulings](../aRatifiedRulings/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-10-prompt-TOOL-aLeakedHandle-3-1-build-brief.md`, `2026-09-10-prompt-TOOL-aLeakedHandle-2-1-build-brief.md` and 2 more under prompts/ |
+| reviews | `2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md` (BLOCKED), `2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md` (BLOCKED) and 2 more under reviews/ |
+| research | `2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md` |
+| logs | `2026-09-10-build-TOOL-aLeakedHandle-3-1-acceptance-ledger.md`, `2026-09-10-build-TOOL-aLeakedHandle-2-1-acceptance-ledger.md` and 1 more under build/ |
+| open asks | `BACKLOG.md`, 2 open |
+| card ref | `refs/gov/builds/aLeakedHandle/card` |
+<!-- /gen:build-routes -->

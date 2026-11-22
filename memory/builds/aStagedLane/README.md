@@ -109,3 +109,15 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 
 - **Parent builds:** [dBriefedPass](../dBriefedPass/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-09-05-review-TOOL-aStagedLane-1-diff-review-round2.md`, `2026-09-05-review-TOOL-aStagedLane-1-diff-review-round1.md` (BLOCKED) and 4 more under reviews/ |
+| logs | `2026-09-05-build-TOOL-aStagedLane-3-acceptance-ledger.md`, `2026-09-05-build-TOOL-aStagedLane-2-acceptance-ledger.md` and 1 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aStagedLane/card` |
+<!-- /gen:build-routes -->

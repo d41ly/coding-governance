@@ -119,3 +119,18 @@ Ids whose spec moved past its audited revision: none — 0 of 12 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-15-prompt-TOOL-aMeasuredDrag-9-1-builder.md`, `2026-11-15-prompt-TOOL-aMeasuredDrag-8-1-builder.md` and 36 more under prompts/ |
+| reviews | `2026-11-15-review-TOOL-aMeasuredDrag-1-performance.md` (CLEAN WITH FIXES), `2026-11-15-review-TOOL-aMeasuredDrag-1-11-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| red-fix | `2026-11-15-build-TOOL-aMeasuredDrag-5-red-fix-2.md`, `2026-11-15-build-TOOL-aMeasuredDrag-3-red-fix-1.md` and 4 more under build/ |
+| research | `2026-11-15-build-TOOL-aMeasuredDrag-1-verdicts.md`, `2026-11-15-build-TOOL-aMeasuredDrag-1-synthesis-brief.md` and 8 more under build/ |
+| logs | `2026-11-15-build-TOOL-aMeasuredDrag-9-1-acceptance-ledger.md`, `2026-11-15-build-TOOL-aMeasuredDrag-8-1-acceptance-ledger.md` and 10 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aMeasuredDrag/card` |
+<!-- /gen:build-routes -->

@@ -96,3 +96,13 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 - **Child builds:** [aTunedCompass](../aTunedCompass/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| logs | `2026-09-04-build-TOOL-aWeighedCompass-1-findings.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aWeighedCompass/card` |
+<!-- /gen:build-routes -->

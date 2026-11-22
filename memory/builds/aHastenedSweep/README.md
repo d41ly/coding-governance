@@ -96,3 +96,15 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-16-prompt-TOOL-aHastenedSweep-7-brief.md`, `2026-11-16-prompt-TOOL-aHastenedSweep-5-brief.md` and 1 more under prompts/ |
+| reviews | `2026-11-16-review-TOOL-aHastenedSweep-1-2-3-4-diff-review-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-11-16-build-TOOL-aHastenedSweep-7-1-acceptance-ledger.md`, `2026-11-16-build-TOOL-aHastenedSweep-6-1-acceptance-ledger.md` and 5 more under build/ |
+| card ref | `refs/gov/builds/aHastenedSweep/card` |
+<!-- /gen:build-routes -->

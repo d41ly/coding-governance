@@ -98,3 +98,16 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-15-prompt-TOOL-aTwinnedPass-5-pass-brief.md`, `2026-11-15-prompt-TOOL-aTwinnedPass-5-2-builder.md` and 27 more under prompts/ |
+| reviews | `2026-11-15-review-TOOL-aTwinnedPass-4-5-closing-diff-round2.md` (CLEAN WITH FIXES), `2026-11-15-review-TOOL-aTwinnedPass-11-closing-diff-round3.md` (CLEAN WITH FIXES) and 1 more under reviews/ |
+| research | `2026-11-15-build-TOOL-aTwinnedPass-2-measurement.md` |
+| logs | `2026-11-15-build-TOOL-aTwinnedPass-5-1-acceptance-ledger.md`, `2026-11-15-build-TOOL-aTwinnedPass-4-1-acceptance-ledger.md` and 5 more under build/ |
+| open asks | `BACKLOG.md`, 6 open |
+| card ref | `refs/gov/builds/aTwinnedPass/card` |
+<!-- /gen:build-routes -->

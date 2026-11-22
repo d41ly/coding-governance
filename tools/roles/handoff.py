@@ -187,6 +187,13 @@ SESSION_LINE_TOKENS = (b'"Agent"', b'"Workflow"', b"toolUseResult", b"task-notif
 #: session file, and the record's keys, every one checked by read_session_record before use.
 SESSION_CACHE_DIR = "handoff-calls"
 SESSION_RECORD_KEYS = frozenset(("parser", "session", "offset", "prefix", "calls", "notified", "bad"))
+#: TOOL-dTotalRecall-4 S6: `builds.agent-root`'s catalogue default, applied where no reader answers, and
+#: the `## Task` opening's root line per value; `%s` is the build README's path.
+AGENT_ROOT_DEFAULT = "work-order"
+AGENT_ROOT_LINES = {
+    "work-order": "Your root is this work order: read past it only for what your own work produces from.",
+    "readme": "Your root is %s: its routing region names each record by purpose.",
+}
 
 
 def read_git_stdout(repo: pathlib.Path, *args: str) -> str:
@@ -535,6 +542,28 @@ def render_card_block(root):
     return "## Card\n\n%s\n%s\n%s" % (lines[0], route, lines[-1]) if route else ""
 
 
+def read_agent_root(root, notes):
+    """`builds.agent-root` at `root`'s landed revision (TOOL-dTotalRecall-4 S6): `work-order` or `readme`.
+    The memory-tree kit is found by `resolve_kit_dir` beside this kit, as `roles_lib.read_workflow_order`
+    reaches the loop kit, and its `read_policy_value` reads the key. No kit resolving (LookupError, or an
+    ImportError), a reader that refuses (ValueError) or a value outside the catalogue's two applies the
+    catalogue default and appends one note naming why, as `roles_lib.read_cap_answer` falls back."""
+    try:
+        kit = str(lib.resolve_kit_dir("memory-tree", "tree_lib.py", KIT_DIR.parent))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import tree_lib  # the memory-tree kit's policy reader, found above
+        value = tree_lib.read_policy_value("builds.agent-root", root)
+        if value not in AGENT_ROOT_LINES:
+            raise ValueError("builds.agent-root read %r, outside %s" % (value, ", ".join(AGENT_ROOT_LINES)))
+        return value
+    except (LookupError, ImportError, ValueError) as exc:
+        if notes is not None:
+            notes.append("builds.agent-root did not read, so the root is the default %s: %s"
+                         % (AGENT_ROOT_DEFAULT, exc))
+        return AGENT_ROOT_DEFAULT
+
+
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
                    notes=None, tail="", upstream=None):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
@@ -673,6 +702,10 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             notes.append(lib.UNRANKED_NOTE % exc)
     opening = ("This handoff is for build `%s`, unit `%s`." % (slug, unit_id) if unit
                else "This handoff is for build `%s`, and names no single unit." % slug)
+    # TOOL-dTotalRecall-4 S6: the agent's root, by `builds.agent-root`.
+    agent_root = read_agent_root(root, notes)
+    opening += "\n" + (AGENT_ROOT_LINES[agent_root] % ("%s/builds/%s/README.md" % (memory_root, slug))
+                       if agent_root == "readme" else AGENT_ROOT_LINES[agent_root])
     if missing:
         opening += "\n" + "\n".join(missing)
     if absent:

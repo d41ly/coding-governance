@@ -130,3 +130,17 @@ Ids whose spec moved past its audited revision: none — 0 of 12 unit id(s) carr
 - **Parent builds:** [aBoundedCeiling](../aBoundedCeiling/README.md)
 - **Child builds:** [aPooledSweep](../aPooledSweep/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-06-prompt-TOOL-aQuenchedHarness-1.md` |
+| reviews | `2026-09-07-review-TOOL-aQuenchedHarness-7-closing-diff-review.md` (CLEAN WITH FIXES), `2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md` and 1 more under reviews/ |
+| research | `2026-09-08-build-TOOL-aQuenchedHarness-11-probe-design.md`, `2026-09-07-build-TOOL-aQuenchedHarness-7-cost-hypothesis.md` and 3 more under build/ |
+| logs | `2026-09-08-build-TOOL-aQuenchedHarness-13-acceptance-ledger.md`, `2026-09-07-build-TOOL-aQuenchedHarness-8-acceptance-ledger-the-turnstile.md` and 13 more under build/ |
+| open asks | `BACKLOG.md`, 2 open |
+| card ref | `refs/gov/builds/aQuenchedHarness/card` |
+<!-- /gen:build-routes -->

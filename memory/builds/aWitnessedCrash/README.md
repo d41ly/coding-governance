@@ -73,3 +73,13 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-13-prompt-TOOL-aWitnessedCrash-1-brief.md`, `2026-11-13-prompt-TOOL-aWitnessedCrash-1-3-fix-brief.md` and 2 more under prompts/ |
+| logs | `2026-11-13-build-TOOL-aWitnessedCrash-1-acceptance-ledger.md` |
+| card ref | `refs/gov/builds/aWitnessedCrash/card` |
+<!-- /gen:build-routes -->

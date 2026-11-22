@@ -80,7 +80,7 @@ DEPL-2 for PLAY-5, and its five others became TOOL-8. Round 3 converged; its six
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 18 unit(s) · node a · opened 2026-10-09 · streams playbook+tooling+deployer+kickoff
+**Build status:** CLOSED · 18 unit(s) · node a · opened 2026-10-09 · streams deployer+kickoff+playbook+tooling
 ids DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 PLAY-aDistilledCharter-5 PLAY-aDistilledCharter-6 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2
 ids TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9
 
@@ -142,3 +142,14 @@ Ids whose spec moved past its audited revision: none — 0 of 18 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-10-11-prompt-PLAY-aDistilledCharter-6-brief.md` |
+| reviews | `2026-10-09-review-TOOL-aDistilledCharter-8-closing-diff-round3.md` (CLEAN WITH FIXES), `2026-10-09-review-TOOL-aDistilledCharter-7-closing-diff-round2.md` (BLOCKED) and 1 more under reviews/ |
+| logs | `2026-10-12-build-PLAY-aDistilledCharter-6-landing.md`, `2026-10-11-build-PLAY-aDistilledCharter-1-landing.md` and 2 more under build/ |
+| card ref | `refs/gov/builds/aDistilledCharter/card` |
+<!-- /gen:build-routes -->

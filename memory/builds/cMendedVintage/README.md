@@ -222,3 +222,16 @@ Ids whose spec moved past its audited revision: none — 0 of 40 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-19-prompt-DEPL-cMendedVintage-28-2-build-brief.md`, `2026-09-19-prompt-DEPL-cMendedVintage-27-2-build-brief.md` and 40 more under prompts/ |
+| reviews | `2026-09-21-review-DEPL-cMendedVintage-1-diff-review-round3.md`, `2026-09-21-review-DEPL-cMendedVintage-1-diff-review-round2.md` and 2 more under reviews/ |
+| logs | `2026-09-19-build-DEPL-cMendedVintage-28-acceptance-ledger.md`, `2026-09-19-build-DEPL-cMendedVintage-27-acceptance-ledger.md` and 38 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/cMendedVintage/card` |
+<!-- /gen:build-routes -->

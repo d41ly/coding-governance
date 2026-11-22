@@ -124,3 +124,10 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T12:20:08Z draw · re-dispatch · TOOL-dTotalRecall-38 · 13/186 · 20261122T122008Z-5fac8b
 
 2026-11-22T12:20:08Z dispatch · item 7047890d TOOL-dTotalRecall-38 · reason memory/builds/dTotalRecall/README.md
+
+2026-11-22T12:33:40Z brief · item TOOL-dTotalRecall-4 · reason c14fac8bd90d memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-4-build-brief.md
+
+2026-11-22T12:34:53Z dispatch · item 94e17798 TOOL-dTotalRecall-4 · reason tools/memory-tree/gen_build_index.py tools/memory-tree/record-kinds.toml tools/memory-tree/HYGIENE.template.md tools/govkit/registry.toml tools/roles/handoff.py tools/unattended/unattended.sh tools/loop/claim.py tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-4.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-4-1-acceptance-ledger.md
+2026-11-22T12:47:28Z draw · re-dispatch · TOOL-dTotalRecall-4 · 14/186 · 20261122T124728Z-83b08f
+
+2026-11-22T12:47:28Z dispatch · item 94e17798 TOOL-dTotalRecall-4 · reason memory/HYGIENE.md memory/project/build-readme-typed-derived.txt .memory-tree.conf tools/roles/render_agents.py tools/unattended/unattended.test.sh memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-4-deviation-42.md

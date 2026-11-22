@@ -5438,6 +5438,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "check_agent_root_arms",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "check_agentcap",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -6681,6 +6686,11 @@
       "id": "check_fragments",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_front_matter_value",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "check_frozen",
@@ -10418,6 +10428,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "cmd_print_typed_derived",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "cmd_probe",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -11918,6 +11933,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "derive_defined_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "derive_definition_rel",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
@@ -12336,6 +12356,11 @@
       "id": "derive_from_states",
       "kind": "function",
       "file": "tools/loop/loop_table.py"
+    },
+    {
+      "id": "derive_front_matter",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "derive_frontier",
@@ -21253,6 +21278,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "read_agent_root",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "read_agree_field",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -22446,6 +22476,11 @@
       "id": "read_derivation",
       "kind": "function",
       "file": "tools/run-gates/run-gates.gov.test.sh"
+    },
+    {
+      "id": "read_derived_front_matter",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "read_derived_phase",
@@ -27203,6 +27238,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "read_typed_derived_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_unbound_names",
       "kind": "function",
       "file": "tools/run-gates/py_reads.py"
@@ -30086,6 +30126,11 @@
       "id": "render_roles_index",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "render_routes",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "render_row",
@@ -40036,6 +40081,11 @@
       "id": "test_fresh_ac4_three_shapes",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_front_matter_schema",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "test_fts_query_safety",

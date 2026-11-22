@@ -220,11 +220,19 @@ def check_patch_ratified(root, slug):
 
 def read_anchor_unit(root, slug):
     """`<FAMILY>-<slug>-1`, the anchor id a pre-spec disposition record of `slug` carries, the family the first
-    its README's `roster` names; `TOOL-<slug>-1`'s family read as `<FAMILY>` where no roster reads."""
-    path = pathlib.Path(root, resolve_memory_root(root), "builds", slug, "README.md")
-    text = path.read_text(encoding="utf-8") if path.is_file() else ""
-    hit = re.search(r"^roster:\s*([A-Z][A-Z0-9]*)", text, re.M)
-    return "%s-%s-1" % (hit.group(1) if hit else "<FAMILY>", slug)
+    its DERIVED roster names, through the memory-tree kit's `read_derived_front_matter` (TOOL-dTotalRecall-4
+    S3); `TOOL-<slug>-1`'s family read as `<FAMILY>` where no kit resolves or no roster derives."""
+    try:
+        read_memory_tree("gen_build_index.py")
+        import gen_build_index as gbi
+    except (LookupError, ImportError):
+        return "<FAMILY>-%s-1" % slug
+    try:
+        roster = gbi.read_derived_front_matter(str(root), gbi.load_conf(str(root)), slug)["roster"]
+    except gbi.Problem:
+        roster = ""
+    hit = re.match(r"[A-Z][A-Z0-9]*", roster)
+    return "%s-%s-1" % (hit.group(0) if hit else "<FAMILY>", slug)
 
 
 # ------------------------------------------------------------------------------------------ the verbs

@@ -30,6 +30,23 @@ check = "memory hygiene"
 purpose = { text = "its writer is `design.unit-spec`; the spec redesigned as a structured, tagged contract", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:412" }
 
 [[record-kind]]
+name = "build-readme"
+tag = "record.build-readme"
+layer = "layer.memory"
+home = "memory/builds/*/README.md"
+id-rule = "<slug>"
+schema = { form = "header", source = "{prefix}/memory-tree/gen_build_index.py:FRONT_MATTER_KEYS", fields = [
+  "slug", "opened", "ids", "parents", "depends-on", "patches", "amends", "supersedes", "implements",
+  "may", "spec-audit", "authorized-by", "asks", "slug-grammar", "playbook", "pieces", "status", "node",
+  "roster", "streams"] }
+writer = "gen_build_index.py --new-build"
+readers = []
+readers-none = "an agent reads it as its root under builds.agent-root, through no work-order read key"
+lifecycle = "current-state"
+check = "memory hygiene"
+purpose = { text = "the build README's declared front-matter schema, with unknown keys refused; writer item not named", source = "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:467" }
+
+[[record-kind]]
 name = "spec-audit"
 tag = "record.spec-audit"
 layer = "layer.roles"

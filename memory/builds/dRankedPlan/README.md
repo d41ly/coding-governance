@@ -251,3 +251,18 @@ Unordered: `TOOL-dRankedPlan-82`, `TOOL-dRankedPlan-83`.
 - **Parent builds:** [dBoundRoles](../dBoundRoles/README.md), [dDeclaredLoop](../dDeclaredLoop/README.md), [dTotalRecall](../dTotalRecall/README.md)
 - **Child builds:** [dTendedCadence](../dTendedCadence/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-05-prompt-TOOL-dRankedPlan-3-2-spec-writer.md`, `2026-11-05-prompt-TOOL-dRankedPlan-3-1-spec-reviewer.md` and 43 more under prompts/ |
+| reviews | `2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md` (CLEAN WITH FIXES), `2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md` (CLEAN WITH FIXES) and 6 more under reviews/ |
+| deviation | `2026-11-05-build-TOOL-dRankedPlan-3-deviation-32.md`, `2026-10-29-build-TOOL-dRankedPlan-9-deviation-94.md` and 110 more under build/ |
+| research | `2026-11-05-build-TOOL-dRankedPlan-1-reground-returns.md`, `2026-11-05-build-TOOL-dRankedPlan-1-parents-crosscheck.md` and 16 more under build/ |
+| logs | `2026-10-28-build-TOOL-dRankedPlan-82-runlog-9fd80b4b.md`, `2026-10-28-build-TOOL-dRankedPlan-1-departures-spec.md` and 2 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dRankedPlan/card` |
+<!-- /gen:build-routes -->

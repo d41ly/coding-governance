@@ -100,3 +100,17 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 
 - **Child builds:** [aQuenchedHarness](../aQuenchedHarness/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-08-27-prompt-TOOL-aBoundedCeiling-1.md` |
+| reviews | `2026-08-27-review-TOOL-aBoundedCeiling-1-round2.md` (CLEAN WITH FIXES), `2026-08-27-review-TOOL-aBoundedCeiling-1-round1.md` (BLOCKED) and 2 more under reviews/ |
+| research | `2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md` |
+| logs | `2026-08-27-build-TOOL-aBoundedCeiling-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aBoundedCeiling/card` |
+<!-- /gen:build-routes -->

@@ -113,3 +113,13 @@ Ids whose spec moved past its audited revision: none — 0 of 9 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-10-08-review-TOOL-dLadderedRemote-8-closing-diff-round5.md` (CLEAN WITH FIXES), `2026-10-08-review-TOOL-dLadderedRemote-7-closing-diff-round4.md` (CLEAN WITH FIXES) and 3 more under reviews/ |
+| logs | `2026-10-08-build-TOOL-dLadderedRemote-2-1-site-probe.md`, `2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md` |
+| card ref | `refs/gov/builds/dLadderedRemote/card` |
+<!-- /gen:build-routes -->

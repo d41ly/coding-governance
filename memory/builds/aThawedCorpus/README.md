@@ -111,3 +111,15 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-08-27-prompt-TOOL-aThawedCorpus-1-1.md` |
+| reviews | `2026-08-27-review-TOOL-aThawedCorpus-5-spec-audit.md` (BLOCKED), `2026-08-27-review-TOOL-aThawedCorpus-4-diff-round1.md` (BLOCKED) |
+| research | `2026-08-27-build-TOOL-aThawedCorpus-1-per-check-timing.md` |
+| card ref | `refs/gov/builds/aThawedCorpus/card` |
+<!-- /gen:build-routes -->

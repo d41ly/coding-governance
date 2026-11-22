@@ -115,3 +115,15 @@ Ids whose spec moved past its audited revision: none — 0 of 12 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-11-prompt-TOOL-aSmoothedDispatch-22-rev2.md`, `2026-11-11-prompt-TOOL-aSmoothedDispatch-22-reconcile.md` and 21 more under prompts/ |
+| reviews | `2026-11-10-review-TOOL-aSmoothedDispatch-1-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-11-10-build-TOOL-aSmoothedDispatch-1-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 10 open |
+| card ref | `refs/gov/builds/aSmoothedDispatch/card` |
+<!-- /gen:build-routes -->

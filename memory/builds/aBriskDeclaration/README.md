@@ -81,3 +81,16 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-14-prompt-TOOL-aBriskDeclaration-1-forks-brief.md`, `2026-11-14-prompt-TOOL-aBriskDeclaration-1-brief.md` and 4 more under prompts/ |
+| reviews | `2026-11-14-review-TOOL-aBriskDeclaration-1-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| research | `2026-11-14-build-TOOL-aBriskDeclaration-1-analysis.md` |
+| logs | `2026-11-14-build-TOOL-aBriskDeclaration-1-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 3 open |
+| card ref | `refs/gov/builds/aBriskDeclaration/card` |
+<!-- /gen:build-routes -->

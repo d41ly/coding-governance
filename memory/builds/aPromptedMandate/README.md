@@ -153,3 +153,15 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md`, `2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md` (BLOCKED) and 2 more under reviews/ |
+| research | `2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aPromptedMandate/card` |
+<!-- /gen:build-routes -->

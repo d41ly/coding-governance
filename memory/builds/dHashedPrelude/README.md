@@ -112,3 +112,13 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round2.md`, `2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round1.md` and 2 more under reviews/ |
+| logs | `2026-09-28-build-TOOL-dHashedPrelude-1-1-acceptance-ledger.md` |
+| card ref | `refs/gov/builds/dHashedPrelude/card` |
+<!-- /gen:build-routes -->

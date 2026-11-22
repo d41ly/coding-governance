@@ -96,3 +96,12 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| logs | `2026-09-13-build-TOOL-cWidenedNet-1-acceptance-ledger.md` |
+| card ref | `refs/gov/builds/cWidenedNet/card` |
+<!-- /gen:build-routes -->

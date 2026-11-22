@@ -112,3 +112,16 @@ Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry
 
 - **Child builds:** [aHoistedPass](../aHoistedPass/README.md), [aStagedLane](../aStagedLane/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-01-prompt-TOOL-dBriefedPass-3.md`, `2026-09-01-prompt-TOOL-dBriefedPass-2.md` and 1 more under prompts/ |
+| reviews | `2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md` (BLOCKED), `2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md` (BLOCKED) and 3 more under reviews/ |
+| logs | `2026-09-01-build-TOOL-dBriefedPass-5-1-carriers.md`, `2026-09-01-build-TOOL-dBriefedPass-4-1-harness.md` and 3 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dBriefedPass/card` |
+<!-- /gen:build-routes -->

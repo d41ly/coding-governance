@@ -13068,10 +13068,14 @@ read_ask_back() { # ask id · slug · SEV -> 0 when ASKS_CMD reads it back as ON
   return 1
 }
 
-read_roster_family() { # slug -> the first family of the build README's front-matter roster; nothing when none
-  readme_of "$1" >/dev/null
-  awk 'NR == 1 { next } /^---/ { exit } /^roster:/ { v = $0; sub(/^roster:[[:space:]]*/, "", v); print v; exit }' \
-    "$_readme" 2>/dev/null | tr '+, ' '\n\n\n' | grep -m1 -E '^[A-Z]+$'
+read_roster_family() { # slug -> the first family of the build's DERIVED roster; nothing when none
+  # TOOL-dTotalRecall-4 S3: the roster is derived, never typed, so it is the generator's
+  # `--print-front-matter` answer, run on the generator the library resolver names.
+  local py gen
+  py=$(resolve_python 2>/dev/null) && [ -n "$py" ] && gen=$(resolve_index_generator) && [ -f "$gen" ] || return 0
+  "$py" "$gen" --print-front-matter "$1" 2>/dev/null \
+    | awk '/^roster:/ { v = $0; sub(/\r$/, "", v); sub(/^roster:[[:space:]]*/, "", v); print v; exit }' \
+    | tr '+, ' '\n\n\n' | grep -m1 -E '^[A-Z]+$'
 }
 
 # THE BACKUP, THE WRITE, THE READ-BACK AND THE ROLLBACK, one copy for every auto-filer of this

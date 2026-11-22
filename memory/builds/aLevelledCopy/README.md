@@ -59,7 +59,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-10-09 · streams deployer+tooling
 ids DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4 TOOL-aLevelledCopy-5 TOOL-aLevelledCopy-6 TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-8 TOOL-aLevelledCopy-9 TOOL-aLevelledCopy-10 TOOL-aLevelledCopy-11 TOOL-aLevelledCopy-12
 ids TOOL-aLevelledCopy-13 TOOL-aLevelledCopy-14 TOOL-aLevelledCopy-15 TOOL-aLevelledCopy-16 TOOL-aLevelledCopy-17 TOOL-aLevelledCopy-18 TOOL-aLevelledCopy-19 TOOL-aLevelledCopy-20 TOOL-aLevelledCopy-21 TOOL-aLevelledCopy-22 TOOL-aLevelledCopy-23 TOOL-aLevelledCopy-24
 
@@ -98,3 +98,17 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-09-prompt-TOOL-aLevelledCopy-7-1-spec-brief.md`, `2026-10-09-prompt-TOOL-aLevelledCopy-1.md` and 2 more under prompts/ |
+| reviews | `2026-10-09-review-TOOL-aLevelledCopy-1-closing-diff-round1.md` |
+| research | `2026-10-09-build-TOOL-aLevelledCopy-1-m12-probe.md` |
+| logs | `2026-10-10-build-DEPL-aLevelledCopy-1-runlog-9380159b.md`, `2026-10-09-build-TOOL-aLevelledCopy-9-1-acceptance-ledger.md` and 6 more under build/ |
+| open asks | `BACKLOG.md`, 19 open |
+| card ref | `refs/gov/builds/aLevelledCopy/card` |
+<!-- /gen:build-routes -->

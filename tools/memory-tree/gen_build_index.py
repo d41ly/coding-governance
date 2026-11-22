@@ -129,6 +129,8 @@ GEN_REGIONS = (
     ("build-coverage", "<!-- gen:build-coverage -->", "<!-- /gen:build-coverage -->"),
     ("build-order", "<!-- gen:build-order -->", "<!-- /gen:build-order -->"),
     ("build-edges", "<!-- gen:build-edges -->", "<!-- /gen:build-edges -->"),
+    # TOOL-dTotalRecall-4 S5 — the routing region: each record of the build by purpose, bounded.
+    ("build-routes", "<!-- gen:build-routes -->", "<!-- /gen:build-routes -->"),
 )
 # The key that arms the coverage region and `--check-coverage`, and the checker whose join it reads,
 # which sits in this kit directory's PARENT and is loaded by path only while the key is set.
@@ -192,7 +194,8 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
     BIND_HEAD_LINES, BIND_RE, GIT_ENV_LEAKS, HDR_RE, RECORD_KIND_TOKENS, RECORD_KINDS, STATUS_TOKENS, TERMINAL,
-    UNBOUND_RE, _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, derive_constant_charges, kit_rel,
+    TYPED_RECORD_KINDS, UNBOUND_RE, resolve_kind,
+    _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, derive_constant_charges, kit_rel,
     parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at, read_id_pins, read_policy_value,
     read_text, record_paths, scan_missing_citations, unfenced, unfenced_lines,
 )
@@ -219,7 +222,41 @@ H1_RE = re.compile(r"^#\s+(?P<id>[A-Za-z0-9][A-Za-z0-9-]*)\s+—\s+(?P<title>.+?
 ORDER_RE = re.compile(r"·\s*order\s+(\d+)\s*(?=·|$)")
 ORDER_LOOSE_RE = re.compile(r"·\s*order\s+(\S+)")
 SHARD_RE = re.compile(r"^\d{4}-\d{2}\.md$")
-REQUIRED_KEYS = ("slug", "node", "opened", "streams", "roster", "ids")
+# TOOL-dTotalRecall-4 S1 — THE ONE DECLARATION of a build README's front matter: each key with its
+# role, its value type and whether it is required. A pure literal, because the record-kind registry's
+# `build-readme` row lists it by `ast` as its `schema.source`. `authored` keys are typed by an author;
+# `derived` ones `derive_front_matter` answers, typed only on the legacy population; `status` is
+# authored until a spec carries a status header (`derive_status`). The types are graded by
+# `check_front_matter_value`, the tree-free ones in the parser and the tree-bound ones in `collect`.
+FRONT_MATTER_KEYS = {
+    # key:            (role,                   type,        required)
+    "slug":           ("authored",             "slug",      True),
+    "opened":         ("authored",             "date",      True),
+    "ids":            ("authored",             "ids",       True),
+    "parents":        ("authored",             "slugs",     False),   # alias of depends-on (unit 6)
+    "depends-on":     ("authored",             "slugs",     False),
+    "patches":        ("authored",             "ids",       False),
+    "amends":         ("authored",             "ids",       False),
+    "supersedes":     ("authored",             "slugs",     False),
+    "implements":     ("authored",             "tags",      False),
+    "may":            ("authored",             "ids",       False),
+    "spec-audit":     ("authored",             "date",      False),
+    "authorized-by":  ("authored",             "word",      False),
+    "asks":           ("authored",             "id-ranges", False),
+    "slug-grammar":   ("authored",             "grammar",   False),
+    "playbook":       ("authored",             "path",      False),
+    "pieces":         ("authored",             "count",     False),
+    "status":         ("authored-until-spec",  "status",    False),
+    "node":           ("derived",              "word",      False),
+    "roster":         ("derived",              "families",  False),
+    "streams":        ("derived",              "streams",   False),
+}
+REQUIRED_KEYS = tuple(k for k, (role, _type, required) in FRONT_MATTER_KEYS.items()
+                      if role == "authored" and required)
+#: The keys `derive_front_matter` answers, in the declaration's order.
+DERIVED_KEYS = tuple(k for k, (role, _type, _required) in FRONT_MATTER_KEYS.items() if role == "derived")
+#: The types `check_front_matter_value` grades only with a tree in hand (`conf` and the slug grammar).
+TREE_BOUND_TYPES = ("ids", "id-ranges", "slugs", "families", "streams")
 
 
 class Problem(Exception):
@@ -454,6 +491,12 @@ def parse_front_matter(path: str, slug: str) -> dict:
         if ":" not in line:
             raise StaleHeader(path, _extract_region(i + 1), f"line {i + 1}: not 'key: value'")
         k, _, v = line.partition(":")
+        # TOOL-dTotalRecall-4 S2 — A KEY THE SCHEMA DOES NOT NAME IS REFUSED, so a misspelled
+        # `parent:` is a named error rather than a value nobody reads.
+        if k.strip() not in FRONT_MATTER_KEYS:
+            raise StaleHeader(path, _extract_region(i + 1),
+                              f"line {i + 1}: key '{k.strip()}' is not a front-matter key; the declared "
+                              f"set is {' '.join(FRONT_MATTER_KEYS)}")
         fm[k.strip()] = v.strip()
     if end is None:
         raise StaleHeader(path, _extract_region(), "front matter opened at line 1 but never closed with '---'")
@@ -463,12 +506,69 @@ def parse_front_matter(path: str, slug: str) -> dict:
     if fm["slug"] != slug:
         raise StaleHeader(path, _extract_region(end + 1),
                           f"front matter slug '{fm['slug']}' != folder name '{slug}'")
-    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", fm["opened"]):
-        raise StaleHeader(path, _extract_region(end + 1),
-                          f"opened '{fm['opened']}' is not a YYYY-MM-DD date")
-    if "status" in fm and fm["status"] not in STATUS_TOKENS:
-        raise Problem(f"{path}: status '{fm['status']}' is not one of {' '.join(STATUS_TOKENS)}")
+    # The tree-free types, graded here with no tree; `collect` grades the tree-bound ones.
+    for key, value in fm.items():
+        refusal = check_front_matter_value(key, value, None, None)
+        if refusal:
+            raise StaleHeader(path, _extract_region(end + 1), refusal)
     return fm
+
+
+def check_front_matter_value(key: str, value: str, conf: dict | None, grammar, root=None) -> str:
+    """The refusal of `value` under `key`'s declared type, or "" (TOOL-dTotalRecall-4 S2).
+
+    With `conf` and `grammar` None only the tree-free types are graded; with the conf and
+    `read_slug_grammar(root)` the tree-bound ones are too. `root` is the tree the id tokens are
+    matched for, `build_id_token_re`'s own argument. A `slug` is the folder name, which the parser
+    compares; an empty value is admitted wherever the key is optional or a list.
+    """
+    _role, kind, _required = FRONT_MATTER_KEYS[key]
+    say = f"{key} '{value}' is not a {kind} value"
+    if kind == "date":
+        try:
+            ok = bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}", value)) and bool(datetime.date.fromisoformat(value))
+        except ValueError:
+            ok = False
+        return "" if ok else f"{say}: an ISO calendar date, YYYY-MM-DD"
+    if kind == "tags":
+        return "" if not re.search(r"[,\[\](){}]", value) else f"{say}: tokens holding no comma or bracket"
+    if kind == "word":
+        return "" if re.fullmatch(r"[A-Za-z0-9._-]+", value) else f"{say}: one token of [A-Za-z0-9._-]"
+    if kind == "grammar":
+        import id_grammar  # noqa: PLC0415 — deferred exactly as read_slug_grammar's is
+        try:
+            id_grammar.parse_slug_grammar(value, key)
+        except id_grammar.ConfError as exc:
+            return f"{say}: {exc}"
+        return ""
+    if kind == "path":
+        rel = value.replace("\\", "/")
+        ok = bool(rel) and not rel.startswith("/") and ".." not in rel.split("/")
+        return "" if ok else f"{say}: a relative path holding no '..' segment"
+    if kind == "count":
+        ok = value.isascii() and value.isdigit() and int(value) > 0
+        return "" if ok else f"{say}: a positive whole number"
+    if kind == "status":
+        return "" if value in STATUS_TOKENS else f"{say}: one of {' '.join(STATUS_TOKENS)}"
+    if kind not in TREE_BOUND_TYPES or conf is None or grammar is None:
+        return ""
+    if kind in ("ids", "id-ranges"):
+        alt = _id_alternation(conf)
+        if kind == "ids":
+            one = build_id_token_re(alt, root)
+            bad = [t for t in value.split() if not one.match(t)]
+        else:
+            bad = _expand_ids(value, alt, root)[1]
+        return "" if not bad else f"{say}: '{bad[0]}' is no id of the declared families"
+    if kind == "slugs":
+        bad = [t for t in value.split() if not grammar.BUILD_SLUG_RE.match(t)]
+        return "" if not bad else f"{say}: '{bad[0]}' is no build slug, `{grammar.BUILD_SLUG_RE.pattern}`"
+    enum = (set(conf.get("DISCIPLINES", "").split()) if kind == "streams" else
+            {p.split(":", 1)[1] for p in conf.get("FAMILIES", "").split() if ":" in p})
+    bad = [m.strip() for m in value.split("+") if enum and m.strip() not in enum]
+    name = "DISCIPLINES enum" if kind == "streams" else "FAMILIES set"
+    # The words the two enum checks this replaced printed, which the example-family arms read.
+    return "" if not bad else f"{key} value '{bad[0]}' is outside the {name}, the {kind} type"
 
 
 def _parse_order(header: str, path: str):
@@ -730,7 +830,8 @@ def cmd_print_bindings(root: str, conf: dict, resolve=None) -> int:
                   f"date, so no spec-audit record's pin can be graded")
             return 2
     tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
-    defined = spec_ids(root, tracked, conf)
+    # TOOL-dTotalRecall-4 S7 — a design-only build's README `ids:` defines its units beside the spec H1s.
+    defined = derive_defined_ids(root, tracked, conf)
     binds = read_bindings(root, tracked, conf)
     revs = read_spec_revs(root, tracked, conf) if cutoff else {}
     # TOOL-dTrueNorth-13 S4 — WHICH ids of a graded record owe a pin. A graded record is a spec-audit
@@ -1327,8 +1428,13 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
     stale_waived = read_stale_header_waiver(root, m, tracked)
     tolerated: list = []
     slugs = sorted({p.split("/")[2] for p in tracked if p.startswith(m + "/builds/") and p.count("/") >= 3})
-    disciplines = set(conf["DISCIPLINES"].split())
     families = {pair.split(":")[1] for pair in conf["FAMILIES"].split() if ":" in pair}
+    # TOOL-dTotalRecall-4 — the slug grammar the tree-bound types read, and the legacy population
+    # whose READMEs may still type the derived keys, each read once for the walk.
+    grammar = read_slug_grammar(root)
+    legacy, unarmed = read_typed_derived_paths(root)
+    if legacy is None:
+        print(f"front-matter: legacy population unarmed: {unarmed}", file=sys.stderr)
     # Two granularities, as the hygiene engine's own guard does it. The PRECONDITION asks whether the
     # scan recognised anything at all; the per-build POPULATION asks whether this build did. Without
     # the first, a families list bound to the wrong tree renders every roster empty — and an empty
@@ -1388,12 +1494,18 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
                 ) from None
             tolerated.append(readme)
             continue
-        for value in fm["streams"].split("+"):
-            if disciplines and value.strip() not in disciplines:
-                raise Problem(f"{readme}: streams value '{value.strip()}' is outside the DISCIPLINES enum")
-        for value in fm["roster"].split("+"):
-            if families and value.strip() not in families:
-                raise Problem(f"{readme}: roster value '{value.strip()}' is outside the FAMILIES set")
+        # TOOL-dTotalRecall-4 S2 — the tree-bound types, through the parser's own grader, in place of
+        # the two enum checks this loop made of `streams` and `roster`.
+        for key, value in fm.items():
+            refusal = check_front_matter_value(key, value, conf, grammar, root)
+            if refusal:
+                raise Problem(f"{readme}: {refusal}")
+        # S4 — a typed derived key is read on the legacy population and refused on any README after it.
+        typed = [k for k in DERIVED_KEYS if k in fm]
+        if typed and legacy is not None and readme not in legacy:
+            raise Problem(f"{readme}: '{typed[0]}' is a derived front-matter key, answered by "
+                          f"`--print-front-matter {slug}`, and this README is outside the legacy population "
+                          f"that may type it; delete the {', '.join(typed)} line(s)")
         specs = sorted(p for p in by_slug.get(slug, []) if p.startswith(f"{m}/builds/{slug}/spec/") and p.endswith(".md"))
         units = [parse_spec(os.path.join(root, p), _id_alternation(conf)) for p in specs]
         # THE SPEC INDEX THE FOLD READS, built from the parse this loop already performs and keyed
@@ -1433,6 +1545,19 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
                 "status": derive_status(units, fm, readme),
             }
         )
+    # TOOL-dTotalRecall-4 S3, S4 — the derived keys, written over each build's `fm` after the walk so
+    # every reader below and every renderer reads the derivation; `rosters` is each build's roster,
+    # read first, so a parent's is in hand whatever the slug order. A typed value that differs from
+    # the derivation as a set says so on one line, and the derivation wins.
+    held = {b["slug"]: b["roster"] for b in builds}
+    for b in builds:
+        derived = derive_front_matter(b, held, conf)
+        for key in DERIVED_KEYS:
+            typed = b["fm"].get(key)
+            if typed is not None and set(typed.split("+")) - {""} != set(derived[key].split("+")) - {""}:
+                print(f"front-matter: {b['readme']} types {key} {typed}, derived {derived[key]}",
+                      file=sys.stderr)
+        b["fm"].update(derived)
     # UNCONDITIONALLY, including at zero — the ratified F2. A clean run that printed nothing here
     # would be indistinguishable from a check that never consulted the registry at all, and a
     # tolerance that grows silently is the failure this whole mechanism exists to prevent.
@@ -1447,6 +1572,108 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
     if backlog_out is not None:
         backlog_out.update(reading)
     return builds
+
+
+def derive_front_matter(build: dict, rosters: dict, conf: dict) -> dict:
+    """`{node, roster, streams}` of one build, each a string (TOOL-dTotalRecall-4 S3, section 8 F8).
+
+    `node` is the slug's first letter. `roster` is the sorted families of the first non-empty of: the
+    build's roster ids (`collect`'s, its citations or its `ids:`), the ids its `asks:` names, the
+    union of `rosters[p]` for each slug its `parents:` names, and the conf's first `FAMILIES` pair.
+    `streams` is the sorted disciplines `read_discipline_map(conf)` maps those families to. The chain
+    reproduces both scaffolds: `--new-build` types its asks' families, `--placed-build` its origin's
+    roster for a patch and the first pair for a repeat. A family is read as the declared alternation
+    prefixing a token, so no id is split.
+    """
+    disciplines = read_discipline_map(conf)
+    head = re.compile(r"^(" + _id_alternation(conf) + r")-")
+    fm = build["fm"]
+    chain = (list(build["roster"]), fm.get("asks", "").split(),
+             [i for p in fm.get("parents", "").split() for i in rosters.get(p, [])])
+    roster: list = []
+    for tokens in chain:
+        roster = sorted({m.group(1) for m in map(head.match, tokens) if m})
+        if roster:
+            break
+    if not roster and disciplines:
+        roster = [next(iter(disciplines))]
+    streams = sorted({disciplines[f] for f in roster if f in disciplines})
+    return {"node": build["slug"][0], "roster": "+".join(roster), "streams": "+".join(streams)}
+
+
+def read_derived_front_matter(root: str, conf: dict, slug: str) -> dict:
+    """The derived `{node, roster, streams}` of build `slug`, from one `collect` (TOOL-dTotalRecall-4 S3).
+
+    `collect`'s own report lines go to stderr, so a caller's stdout carries only what it prints. A
+    slug with no indexed README is a Problem."""
+    with contextlib.redirect_stdout(sys.stderr):
+        builds = collect(root, conf)
+    hit = next((b for b in builds if b["slug"] == slug), None)
+    if hit is None:
+        raise Problem(f"--print-front-matter: no indexed build README for '{slug}' under "
+                      f"{conf['MEMORY_ROOT']}/builds/")
+    return {k: hit["fm"][k] for k in DERIVED_KEYS}
+
+
+#: The legacy population whose READMEs may type a derived key (TOOL-dTotalRecall-4 S4), registered in
+#: govkit's registry beside `record-kinds-legacy` and read through this kit's ledger copy.
+TYPED_DERIVED = "build-readme-typed-derived"
+
+
+def read_typed_derived_paths(root: str) -> tuple:
+    """`(README paths, note)` of the legacy population; `(None, why)` where the registrations do not
+    read, no table registers it, or its home is absent or holds the unarmed line, so S4 is unarmed
+    and every typed derived key is read, never refused. As `record_kinds.read_legacy_keys` reads."""
+    try:
+        reg = next((r for r in LL.read_registrations(root) if r.population == TYPED_DERIVED), None)
+    except ValueError as exc:
+        return None, f"the ledger registrations do not read: {str(exc).splitlines()[0]}"
+    if reg is None:
+        return None, f"no [[ledger]] table registers {TYPED_DERIVED}"
+    home = pathlib.Path(root, reg.home)
+    if not home.is_file():
+        return None, f"{TYPED_DERIVED}'s home {reg.home} is absent"
+    if LL.read_home_state(home) != "armed":
+        return None, f"{TYPED_DERIVED}'s home {reg.home} holds the unarmed line"
+    rows, _bad = LL.read_ledger(root, reg)
+    return {key[0] for key in rows}, ""
+
+
+def cmd_print_typed_derived(root: str, conf: dict) -> int:
+    """`--print-typed-derived`, the legacy population's seed: `<path> TAB 1` for each tracked build
+    README whose front matter, read with `parse_front_matter`, types `node`, `roster` or `streams`.
+    A README the parser refuses types nothing it reads, and is skipped."""
+    m = conf["MEMORY_ROOT"]
+    for rel in sorted(p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
+                      if p.endswith("/README.md") and p.count("/") == 3):
+        try:
+            fm = parse_front_matter(os.path.join(root, rel), rel.split("/")[2])
+        except Problem:
+            continue
+        if any(k in fm for k in DERIVED_KEYS):
+            print(f"{rel}\t1")
+    return 0
+
+
+def derive_defined_ids(root: str, tracked: list, conf: dict) -> set:
+    """`spec_ids` joined with the `ids:` of every design-only build, one with no tracked file under
+    its `spec/` (TOOL-dTotalRecall-4 S7, section 8 F2): such a build's README defines its units. An id
+    neither a spec nor such a README defines stays undefined."""
+    m = conf["MEMORY_ROOT"]
+    sel = build_spec_path_re(m)
+    specced = {p.split("/")[2] for p in tracked if sel.match(p)}
+    out = spec_ids(root, tracked, conf)
+    alt = _id_alternation(conf)
+    for rel in tracked:
+        parts = rel.split("/")
+        if len(parts) != 4 or rel != f"{m}/builds/{parts[2]}/README.md" or parts[2] in specced:
+            continue
+        try:
+            fm = parse_front_matter(os.path.join(root, rel), parts[2])
+        except Problem:
+            continue
+        out.update(_expand_ids(fm.get("ids", ""), alt, root)[0])
+    return out
 
 
 # ------------------------------------------------------------------------------- the backlog
@@ -2030,6 +2257,59 @@ def render_edges(build: dict) -> str:
     return "\n".join(out)
 
 
+#: A routing row names at most this many records, the newest by filename date, then counts the rest:
+#: two of the longest record filename and the row's frame stay within the build-README entry cap.
+ROUTE_NAMED = 2
+
+
+def render_routes(build: dict) -> str:
+    """The ROUTING region (TOOL-dTotalRecall-4 S5): one table routing a reader to each record of this
+    build by purpose. The typed rows are read from `TYPED_RECORD_KINDS`, one per member that has a
+    record, and every kind from the bindings `plan()` attached (`build["records"]`), never re-parsed;
+    a row renders only where its purpose has a member, save `card ref`, which names the build's card
+    ref and never reads it, so the region's bytes are the same on every node. A purpose with more
+    than `ROUTE_NAMED` records names the newest by filename date and counts the rest under its folder.
+    """
+    mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-routes")
+    pre = build["readme"].rsplit("/", 1)[0] + "/"
+    rows = []
+    if build.get("run_tracked"):
+        rows.append(("run state", "`RUN.md`"))
+    if build["units"]:
+        rows.append(("the units", "the units table above"))
+    in_build = [r for r in build.get("records", []) if r["path"].startswith(pre + "build/")]
+    purposes = [("briefs", "prompts", [p for p in build["docs"] if p.startswith(pre + "prompts/")]),
+                ("reviews", "reviews", [p for p in build["docs"] if p.startswith(pre + "reviews/")])]
+    purposes += [(k, "build", [r["path"] for r in in_build if r.get("kind") == k]) for k in TYPED_RECORD_KINDS]
+    purposes += [("research", "build", [r["path"] for r in in_build if r.get("kind") == "research"]),
+                 ("logs", "build", [r["path"] for r in in_build if resolve_kind(r.get("kind")) == "log"])]
+    for purpose, folder, paths in purposes:
+        if not paths:
+            continue
+        dated = sorted(paths, key=lambda p: ((re.match(r"\d{4}-\d{2}-\d{2}", posixpath.basename(p))
+                                              or re.match("", "")).group(0), posixpath.basename(p)),
+                       reverse=True)
+        names = []
+        for p in dated[:ROUTE_NAMED]:
+            name = f"`{posixpath.basename(p)}`"
+            if folder == "reviews":
+                text = (read_text_or_none(os.path.join(build.get("root") or "", p))[0] or "").split("\n")[:12]
+                # The verdict's TOKEN, its leading upper-case words: an older record runs prose after it.
+                verdict = next((re.match(r"[A-Z]+(?: [A-Z]+)*", ln[len("## Verdict:"):].strip())
+                                for ln in text if ln.startswith("## Verdict:")), None)
+                name += f" ({verdict.group(0)})" if verdict else ""
+            names.append(name)
+        more = len(dated) - len(names)
+        rows.append((purpose, ", ".join(names) + (f" and {more} more under {folder}/" if more else "")))
+    if build.get("backlog_open") is not None:
+        rows.append(("open asks", f"`BACKLOG.md`, {build['backlog_open']} open"))
+    rows.append(("card ref", f"`refs/gov/builds/{build['slug']}/card`"))
+    out = [mo, "", "| Purpose | Read |", "|---|---|"]
+    out += [f"| {purpose} | {cell} |" for purpose, cell in rows]
+    out.append(mc)
+    return "\n".join(out)
+
+
 def render_coverage(build: dict) -> str:
     """TOOL-dTrueNorth-3 S3 — the COVERAGE region: one line naming the build, its clause, owned-node and
     spec counts and the cutoff, then one bullet per field the clause lists, an empty one reading `none`.
@@ -2079,6 +2359,7 @@ REGION_RENDERERS = {
     "build-coverage": render_coverage,
     "build-order": render_order,
     "build-edges": render_edges,
+    "build-routes": render_routes,
 }
 
 # TOOL-dFramedEntrypoint-5 S4c — `strip_records_sentence`, `RECORDS_SENTENCE` and `RECORDS_ANCHOR`
@@ -3006,6 +3287,19 @@ def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> t
         b["root"] = root        # what a record's repo-relative path joins to (TOOL-dFoldedAudit-6 S3)
         b["records"] = [dict(rec, path=p) for p, rec in binds_all.items()
                         if p.startswith(pre) and rec["state"] in ("bound", "unbound")]
+    # TOOL-dTotalRecall-4 S5 — beside the bindings, what the routing region names: whether the run
+    # state is tracked, and the count of the build's own asks the backlog fold reads OPEN, None where
+    # the build tracks no BACKLOG.md.
+    tracked_set = set(tracked_all) if binds_all else {p for p in run("git", "ls-files", "--", m + "/", cwd=root)
+                                                          .split("\n") if p}
+    fold = reading.get("fold")
+    asks_by_path = {f.path: f.asks for f in getattr(reading.get("corpus"), "files", ())}
+    for b in builds:
+        pre = f"{m}/builds/{b['slug']}/"
+        b["run_tracked"] = pre + "RUN.md" in tracked_set
+        bl = pre + "BACKLOG.md"
+        b["backlog_open"] = None if bl not in tracked_set else sum(
+            1 for a in asks_by_path.get(bl, ()) if fold is not None and fold.statuses.get(a.id) == "OPEN")
     # TOOL-dTrueNorth-3 — THE COVERAGE, READ ONCE for the whole render and attached per build before
     # the region loop: a chain build carries its entry, any other build an empty one. Off, no build is
     # a chain build, so no README gains the pair and a held pair renders the off line.
@@ -4428,7 +4722,7 @@ def check_slug_claimed(root: str, conf: dict, slug: str) -> str:
     return ""
 
 
-def render_new_build_readme(slug: str, conf: dict, ids: list, opened: str, at: str, grammar: str) -> str:
+def render_new_build_readme(slug: str, ids: list, opened: str, at: str, grammar: str) -> str:
     """The scaffolded README: front matter, a title, five GENERATED slot bodies, and the pairs.
 
     NO AUTHORED PROSE ANYWHERE. Every line below is derived from the mandate, the conf and the
@@ -4445,18 +4739,15 @@ def render_new_build_readme(slug: str, conf: dict, ids: list, opened: str, at: s
     discovered. Only the first slot names every id, so only it grows with the mandate; a mandate
     large enough to pass that slot's declared ceiling REDS the budget leg by name, which is the
     outcome a scaffold should have — not a README nobody may land.
+
+    NO DERIVED KEY (TOOL-dTotalRecall-4 S3): `node`, `roster` and `streams` are answered by
+    `derive_front_matter`, the roster from the asks below while the build has no id of its own.
     """
-    families = sorted({i.split("-")[0] for i in ids})
-    disciplines = read_discipline_map(conf)
-    streams = sorted({disciplines[f] for f in families if f in disciplines})
     head = [
         "---",
         f"slug: {slug}",
         f"slug-grammar: {grammar}",
-        f"node: {slug[0]}",
         f"opened: {opened}",
-        f"streams: {'+'.join(streams)}",
-        f"roster: {'+'.join(families)}",
         "ids:",
         "status: OPEN",
         f"authorized-by: {AUTHORIZED_BY_SLUG}",
@@ -4586,7 +4877,7 @@ def cmd_new_build(root: str, conf: dict, args: dict) -> int:
                       f"unasked; nothing was written")
     rel = f"{m}/builds/{slug}/README.md"
     opened = datetime.date.today().isoformat()
-    write_text(os.path.join(root, rel), render_new_build_readme(slug, conf, ids, opened, "", grammar.record))
+    write_text(os.path.join(root, rel), render_new_build_readme(slug, ids, opened, "", grammar.record))
     registry = os.path.join(m, CONTRACT_REGISTRY).replace(os.sep, "/")
     add_contract_row(root, conf, rel)
     run("git", "add", "--", rel, registry, cwd=root)
@@ -4597,7 +4888,7 @@ def cmd_new_build(root: str, conf: dict, args: dict) -> int:
 
 # ------------------------------------------------------------------- the placed build's scaffold
 # TOOL-dPlacedRequest-21 S4. A placed `patch` or `repeat` request is claimed before any plan record
-# kind exists, so its derived plan record is this README scaffold: the six required keys and
+# kind exists, so its derived plan record is this README scaffold: the required keys and
 # `status: OPEN`, then on a patch `parents: <origin>`, the key `collect` parses as the originating
 # build, and on a repeat `authorized-by: recipe`, `playbook:` and `pieces:`, the keys the unattended
 # driver's `check_authorization` reads in recipe mode. Its slots cite the request by its content key
@@ -4642,14 +4933,13 @@ def read_placed_build_args(argv: list) -> dict:
     return out
 
 
-def render_placed_build_readme(slug: str, args: dict, roster: str, streams: str, opened: str,
-                               grammar: str) -> str:
+def render_placed_build_readme(slug: str, args: dict, opened: str, grammar: str) -> str:
     """The placed build's README: the front matter of a patch or a repeat, five filled slots and the
-    pairs `--write` renders into. `args` is `read_placed_build_args`'s; no request text is read."""
+    pairs `--write` renders into. `args` is `read_placed_build_args`'s; no request text is read. It
+    types no derived key (TOOL-dTotalRecall-4 S3): a patch's roster derives from its `parents:`, a
+    repeat's from the conf's first `FAMILIES` pair."""
     key = args["request"]
-    head = ["---", f"slug: {slug}", f"slug-grammar: {grammar}", f"node: {slug[0]}", f"opened: {opened}",
-            f"streams: {streams}",
-            f"roster: {roster}", "ids:", "status: OPEN"]
+    head = ["---", f"slug: {slug}", f"slug-grammar: {grammar}", f"opened: {opened}", "ids:", "status: OPEN"]
     if args["origin"]:
         head.append(f"parents: {args['origin']}")
         what = f"a patch of `{args['origin']}`"
@@ -4704,8 +4994,6 @@ def cmd_placed_build(root: str, conf: dict, args: dict) -> int:
         source = os.path.join(root, m, "builds", origin, "README.md")
         if not os.path.isfile(source):
             raise Problem(f"--placed-build: the origin {m}/builds/{origin}/README.md is not in this tree")
-        fm = parse_front_matter(source, origin)
-        roster, streams = fm["roster"], fm["streams"]
     else:
         playbook = args["playbook"].replace("\\", "/")
         if playbook.startswith("/") or ".." in playbook.split("/") or not os.path.isfile(os.path.join(root, playbook)):
@@ -4713,11 +5001,8 @@ def cmd_placed_build(root: str, conf: dict, args: dict) -> int:
         args = dict(args, playbook=playbook)
         if not disciplines:
             raise Problem("--placed-build: the conf declares no FAMILIES pair, so a repeat has no roster")
-        family = next(iter(disciplines))
-        roster, streams = family, disciplines[family]
     opened = datetime.date.today().isoformat()
-    write_text(os.path.join(root, rel), render_placed_build_readme(slug, args, roster, streams, opened,
-                                                                   grammar.record))
+    write_text(os.path.join(root, rel), render_placed_build_readme(slug, args, opened, grammar.record))
     registry = os.path.join(m, CONTRACT_REGISTRY).replace(os.sep, "/")
     add_contract_row(root, conf, rel)
     run("git", "add", "--", rel, registry, cwd=root)
@@ -5867,6 +6152,107 @@ def test_coverage_stub(arm) -> None:
                 sys.modules.pop("design_lib", None)
             else:
                 sys.modules["design_lib"] = slot
+
+
+def test_front_matter_schema(arm) -> None:
+    """TOOL-dTotalRecall-4 — the declared front matter: an unknown key refused by name, line and set; a
+    value outside its type refused, tree-free in the parser and tree-bound in `collect`; the derived
+    keys and their fallback chain; the legacy population read armed and unarmed; the routing region's
+    bound and its typed rows; and the design-only build's `B` row pair. Its RED is the open-world parse
+    restored: a parser storing any `key: value` it reads fails the first arm and every type arm."""
+    with tempfile.TemporaryDirectory() as tmp:
+        conf = _fixture(tmp)
+        readme = os.path.join(tmp, "memory", "builds", "tOne", "README.md")
+        good = read_text(readme)
+        for line, want in (("parent: dTrueNorth", "line 8: key 'parent' is not a front-matter key; the declared "
+                                                  "set is slug opened ids"),
+                           ("pieces: 0", "pieces '0' is not a count value"),
+                           ("spec-audit: 2026-13-45", "spec-audit '2026-13-45' is not a date value")):
+            write_text(readme, good.replace("ids: ARCH-tOne-1", "ids: ARCH-tOne-1\n" + line))
+            arm(f"TOOL-dTotalRecall-4 S2 — the parser refuses `{line}` by name", want,
+                lambda: str(parse_front_matter(readme, "tOne")))
+        write_text(readme, good.replace("opened: 2026-08-01", "opened: 2026-13-45"))
+        # StaleHeader's own message opens `header present but unparseable`, so the type is in the text.
+        arm("TOOL-dTotalRecall-4 AC2 — `opened: 2026-13-45` is refused as a StaleHeader naming the date type",
+            "header present but unparseable — opened '2026-13-45' is not a date value",
+            lambda: str(parse_front_matter(readme, "tOne")))
+        write_text(readme, good.replace("ids: ARCH-tOne-1", "ids: ARCH-tOne-1\ndepends-on: d!bad"))
+        run("git", "add", "-A", cwd=tmp)
+        arm("TOOL-dTotalRecall-4 S2 — collect refuses a tree-bound value outside its type",
+            "depends-on 'd!bad' is not a slugs value",
+            lambda: _read_mode(lambda r, c: collect(r, c) and 0, tmp, conf)[1])
+        # S3 — the chain: ids, then asks, then the parents' rosters, then the conf's first pair.
+        cf = {"FAMILIES": "tool:TOOL arch:ARCH", "DISCIPLINES": "tool arch"}
+        for label, build, rosters_in, want in (
+                ("the ids win", {"slug": "tX", "roster": ["TOOL-tX-1"], "fm": {"asks": "ARCH-tY-1"}}, {}, "TOOL"),
+                ("the asks next", {"slug": "tX", "roster": [], "fm": {"asks": "ARCH-tY-1..2"}}, {}, "ARCH"),
+                ("the parents next", {"slug": "tX", "roster": [], "fm": {"parents": "tY"}}, {"tY": ["ARCH-tY-3"]},
+                 "ARCH"),
+                ("the conf's first pair last", {"slug": "tX", "roster": [], "fm": {}}, {}, "TOOL")):
+            arm(f"TOOL-dTotalRecall-4 S3 — derive_front_matter: {label}", f"'node': 't', 'roster': '{want}', "
+                f"'streams': '{'tool' if want == 'TOOL' else 'arch'}'",
+                lambda b=build, r=rosters_in: str(derive_front_matter(b, r, cf)))
+        # S4 — unarmed (no registration): a typed derived key is read and the unarmed line prints.
+        write_text(readme, good)
+        run("git", "add", "-A", cwd=tmp)
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            got = collect(tmp, conf)
+        arm("TOOL-dTotalRecall-4 S4 — an unregistered population is unarmed, says so, and refuses nothing",
+            "True", lambda: str("front-matter: legacy population unarmed: no [[ledger]] table registers "
+                                "build-readme-typed-derived" in err.getvalue() and got[0]["fm"]["roster"] == "ARCH"))
+        # S4 — armed: tOne is in the population, so its typed key is read and a disagreement prints;
+        # tTwo is written after the seed, so its typed `node` is refused.
+        write_text(os.path.join(tmp, "kit", "kit.toml"),
+                   '[[ledger]]\npopulation = "build-readme-typed-derived"\nleg = "memory hygiene"\nseed = []\n'
+                   'key = "record"\nfields = ["path"]\ndrain = "key"\ndirection = "shrink-only"\n'
+                   'home = "memory/project/build-readme-typed-derived.txt"\n')
+        write_text(os.path.join(tmp, "memory", "project", "build-readme-typed-derived.txt"),
+                   "# ledger · build-readme-typed-derived · key record path · direction shrink-only · drain key\n"
+                   "memory/builds/tOne/README.md\t1\t0123abcd\tseeded\n")
+        write_text(readme, good.replace("streams: arch", "streams: tooling"))
+        run("git", "add", "-A", cwd=tmp)
+        conf_t = dict(conf, DISCIPLINES="arch tooling")
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            got = collect(tmp, conf_t)
+        arm("TOOL-dTotalRecall-4 S4 — armed, a legacy README's typed key is read, its disagreement printed, "
+            "and the derivation renders", "True",
+            lambda: str("front-matter: memory/builds/tOne/README.md types streams tooling, derived arch"
+                        in err.getvalue() and got[0]["fm"]["streams"] == "arch"))
+        write_text(os.path.join(tmp, "memory", "builds", "tTwo", "README.md"),
+                   "---\nslug: tTwo\nnode: t\nopened: 2026-08-01\nids: ARCH-tTwo-1\nstatus: OPEN\n---\n\n# tTwo\n")
+        run("git", "add", "-A", cwd=tmp)
+        arm("TOOL-dTotalRecall-4 S4 — armed, a README outside the population typing `node` is refused",
+            "memory/builds/tTwo/README.md: 'node' is a derived front-matter key",
+            lambda: _read_mode(lambda r, c: collect(r, c) and 0, tmp, conf_t)[1])
+        # S7 — the design-only build: its README's `ids:` defines ARCH-tDesign-1, never ARCH-tDesign-2.
+        run("git", "rm", "-q", "-r", "--cached", "memory/builds/tTwo", cwd=tmp)
+        write_text(os.path.join(tmp, "memory", "builds", "tDesign", "README.md"),
+                   "---\nslug: tDesign\nopened: 2026-08-01\nids: ARCH-tDesign-1\nstatus: OPEN\n---\n\n# tDesign\n")
+        write_text(os.path.join(tmp, "memory", "builds", "tDesign", "build", "2026-08-01-build-ARCH-tDesign-1-n.md"),
+                   "**Serves:** research ARCH-tDesign-1 ARCH-tDesign-2\n\n# n\n")
+        run("git", "add", "-A", "--", "memory/builds/tDesign", cwd=tmp)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            cmd_print_bindings(tmp, conf)
+        b_rows = [ln for ln in out.getvalue().split("\n") if ln.startswith("B\t") and "tDesign" in ln]
+        arm("TOOL-dTotalRecall-4 S7 — a design-only build's ids: defines its units; an unlisted id stays a B row",
+            "['ARCH-tDesign-2']", lambda: str([ln.split("\t")[2].split()[0] for ln in b_rows]))
+    # S5 — the routing region: bounded per purpose, one typed row per member, the card ref always.
+    pre = "memory/builds/tR/"
+    build = {"slug": "tR", "readme": pre + "README.md", "units": [], "root": "",
+             "docs": [pre + f"reviews/2026-08-0{n}-review-ARCH-tR-1-r{n}.md" for n in range(1, 6)],
+             "records": [{"path": pre + f"build/2026-08-01-build-ARCH-tR-1-{k}-1.md", "kind": k}
+                         for k in TYPED_RECORD_KINDS]}
+    region = render_routes(build)
+    arm("TOOL-dTotalRecall-4 S5 — the routes region names the two newest reviews and counts the rest",
+        "| reviews | `2026-08-05-review-ARCH-tR-1-r5.md`, `2026-08-04-review-ARCH-tR-1-r4.md` and 3 more under reviews/ |",
+        lambda: region)
+    arm("TOOL-dTotalRecall-4 S5 — one routing row per member of TYPED_RECORD_KINDS, and the card ref", "True",
+        lambda: str(all(f"| {k} | `2026-08-01-build-ARCH-tR-1-{k}-1.md` |" in region for k in TYPED_RECORD_KINDS)
+                    and "| card ref | `refs/gov/builds/tR/card` |" in region
+                    and max(len(ln) for ln in region.split("\n")) <= 350))
 
 
 def check_expand_contract() -> str:
@@ -8850,8 +9236,7 @@ def cmd_selftest() -> int:
             "[asks: EXMP-aFoo-3..4]",
             lambda: "[" + [x for x in _sc_fm if x.startswith("asks:")][0] + "]")
         arm("the front matter carries the keys a run and the bar both read",
-            "['slug: zFreshDocket', 'slug-grammar: words=1-3 style=humorous date=none', 'node: z', "
-            "'streams: tool', 'roster: EXMP', 'ids:', "
+            "['slug: zFreshDocket', 'slug-grammar: words=1-3 style=humorous date=none', 'ids:', "
             "'status: OPEN', 'authorized-by: slug']",
             lambda: str([x for x in _sc_fm if not x.startswith(("opened:", "asks:"))]))
         arm("the `ids:` line is the RENDER's, which owns it — empty on a build no id names yet",
@@ -9003,7 +9388,7 @@ def cmd_selftest() -> int:
 
         arm("a placed patch's README carries parents: <origin> and its staged registry row", "rc=0 ['slug: zFixPatch', "
             "'slug-grammar: words=1-3 style=humorous date=none', "
-            "'node: z', 'streams: tool', 'roster: EXMP', 'ids:', 'status: OPEN', 'parents: aFoo'] quoted=False",
+            "'ids:', 'status: OPEN', 'parents: aFoo'] quoted=False",
             lambda: _read_placed_fm("zFixPatch", ["--request", "3f9c2a7d01be", "--origin", "aFoo"]))
         arm("a placed repeat's README carries authorized-by: recipe, its playbook and its pieces",
             "'status: OPEN', 'authorized-by: recipe', 'playbook: playbooks/zq-run.md', 'pieces: 3'] quoted=False",
@@ -9563,6 +9948,7 @@ def cmd_selftest() -> int:
         lambda: str((lambda o: o.startswith("backlog.Problem: memory/builds/dXFix/spec/s.md:") and "(ids, bad)" in o)(
             check_expand_contract())))
     test_asbuilt_view(arm)
+    test_front_matter_schema(arm)
 
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it
@@ -9902,12 +10288,13 @@ def main(argv: list) -> int:
     if mode not in ("--check", "--write", "--write-staged", "--check-format", "--print-bindings", "--survey",
                     "--check-asbuilt",
                     "--report", "--bump", "--asks", "--new-build", "--placed-build", "--new-spec", "--doctor",
-                    "--check-coverage"):
+                    "--check-coverage", "--print-front-matter", "--print-typed-derived"):
         print("usage: gen_build_index.py "
               "[--check [--staged|--with-verdicts]|--write|--write-staged|--check-coverage [--staged]|"
               "--check-asbuilt [--staged]|"
               "--check-format|--survey|--report|--bump|"
-              "--print-bindings|--asks|--new-build|--placed-build|--new-spec|--doctor|--selftest]")
+              "--print-bindings|--print-front-matter <slug>|--print-typed-derived|"
+              "--asks|--new-build|--placed-build|--new-spec|--doctor|--selftest]")
         return 2
     # TOOL-dTrueNorth-27 S4: `--with-verdicts` is `--check`'s alone, and never beside `--staged`, whose
     # skip would print no verdict while a full run's checks 29 and 30 read them from these lines.
@@ -9931,6 +10318,21 @@ def main(argv: list) -> int:
         except Problem as exc:
             print(f"build-index: {exc}")
             return 2
+    # TOOL-dTotalRecall-4 S3, S4 — two read-only printers whose stdout is a value a program parses, so
+    # a refusal goes to stderr and exits 2.
+    if mode in ("--print-front-matter", "--print-typed-derived"):
+        try:
+            if mode == "--print-typed-derived":
+                return cmd_print_typed_derived(root, conf)
+            if len(argv) != 3 or argv[2].startswith("--"):
+                raise Problem("usage: gen_build_index.py --print-front-matter <slug>")
+            derived = read_derived_front_matter(root, conf, argv[2])
+        except Problem as exc:
+            print(f"build-index: {exc}", file=sys.stderr)
+            return 2
+        for key, value in derived.items():
+            print(f"{key}: {value}")
+        return 0
     # `--asks` IS DISPATCHED OUTSIDE THE HANDLER BELOW, which prints its message to stdout. That is
     # right for every other mode and wrong for this one, whose stdout is a value a program parses:
     # a refusal printed there is a decode error rather than a refusal. `cmd_asks` owns all of its

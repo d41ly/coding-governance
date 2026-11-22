@@ -333,3 +333,19 @@ Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 102 spec(s) 
 - **Parent builds:** [dFairHearing](../dFairHearing/README.md), [dOrderedCharter](../dOrderedCharter/README.md)
 - **Child builds:** [dBoundRoles](../dBoundRoles/README.md), [dIndexedDesign](../dIndexedDesign/README.md), [dKeptSession](../dKeptSession/README.md), [dPlacedRequest](../dPlacedRequest/README.md), [dRankedPlan](../dRankedPlan/README.md), [dTotalRecall](../dTotalRecall/README.md), [dWitnessedBar](../dWitnessedBar/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-17-prompt-TOOL-dDeclaredLoop-99-reground-brief.md`, `2026-11-17-prompt-TOOL-dDeclaredLoop-99-build-brief.md` and 403 more under prompts/ |
+| reviews | `2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round2.md` (CLEAN WITH FIXES), `2026-11-17-review-TOOL-dDeclaredLoop-1-closing-diff-round1.md` (CLEAN WITH FIXES) and 12 more under reviews/ |
+| deviation | `2026-11-17-build-TOOL-dDeclaredLoop-95-deviation-952.md`, `2026-11-17-build-TOOL-dDeclaredLoop-93-deviation-932.md` and 284 more under build/ |
+| red-fix | `2026-11-18-build-TOOL-dDeclaredLoop-68-red-fix-74.md`, `2026-11-18-build-TOOL-dDeclaredLoop-67-red-fix-72.md` and 78 more under build/ |
+| research | `2026-11-05-build-TOOL-dDeclaredLoop-1-reground-returns.md`, `2026-11-05-build-TOOL-dDeclaredLoop-1-parents-crosscheck.md` and 13 more under build/ |
+| logs | `2026-11-17-build-TOOL-dDeclaredLoop-99-1-acceptance-ledger.md`, `2026-11-17-build-TOOL-dDeclaredLoop-98-1-acceptance-ledger.md` and 134 more under build/ |
+| open asks | `BACKLOG.md`, 15 open |
+| card ref | `refs/gov/builds/dDeclaredLoop/card` |
+<!-- /gen:build-routes -->

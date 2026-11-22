@@ -124,3 +124,16 @@ Ids whose spec moved past its audited revision: none — 0 of 22 unit id(s) carr
 
 - **Parent builds:** [aMeteredSweep](../aMeteredSweep/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-13-prompt-TOOL-aSparedSpawn-34-build-brief.md`, `2026-10-12-prompt-TOOL-aSparedSpawn-33-build-brief.md` and 20 more under prompts/ |
+| reviews | `2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md` |
+| logs | `2026-10-13-build-TOOL-aSparedSpawn-34-acceptance-ledger.md`, `2026-10-12-build-TOOL-aSparedSpawn-9-direct-checks.sh` and 45 more under build/ |
+| open asks | `BACKLOG.md`, 11 open |
+| card ref | `refs/gov/builds/aSparedSpawn/card` |
+<!-- /gen:build-routes -->

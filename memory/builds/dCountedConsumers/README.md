@@ -78,3 +78,13 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-02-prompt-TOOL-dCountedConsumers-2-brief.md`, `2026-11-02-prompt-TOOL-dCountedConsumers-1-brief.md` |
+| logs | `2026-11-02-build-TOOL-dCountedConsumers-2-1-builder-return.md`, `2026-11-02-build-TOOL-dCountedConsumers-1-1-builder-return.md` |
+| card ref | `refs/gov/builds/dCountedConsumers/card` |
+<!-- /gen:build-routes -->

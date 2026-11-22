@@ -107,3 +107,16 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 - **Parent builds:** [aRatifiedRulings](../aRatifiedRulings/README.md)
 - **Child builds:** [aWokenSentinel](../aWokenSentinel/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-14-prompt-TOOL-aProbedUnit-7-1-build-brief.md`, `2026-09-14-prompt-TOOL-aProbedUnit-6-1-build-brief.md` and 7 more under prompts/ |
+| reviews | `2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round2.md` (CLEAN WITH FIXES), `2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md` (BLOCKED) and 3 more under reviews/ |
+| logs | `2026-09-14-build-TOOL-aProbedUnit-7-1-acceptance-ledger.md`, `2026-09-14-build-TOOL-aProbedUnit-6-1-acceptance-ledger.md` and 5 more under build/ |
+| open asks | `BACKLOG.md`, 6 open |
+| card ref | `refs/gov/builds/aProbedUnit/card` |
+<!-- /gen:build-routes -->

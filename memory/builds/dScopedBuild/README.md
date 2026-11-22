@@ -180,3 +180,18 @@ Coverage of dScopedBuild's 15 clause(s) and 23 owned node(s), over 34 spec(s) at
 - **Parent builds:** [dFurnishedOrders](../dFurnishedOrders/README.md), [dIndexedDesign](../dIndexedDesign/README.md), [dWellOiledMachine](../dWellOiledMachine/README.md), [dWitnessedBar](../dWitnessedBar/README.md)
 - **Child builds:** [dConvergedCharter](../dConvergedCharter/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-03-prompt-TOOL-dScopedBuild-1-parents-reground.md`, `2026-11-03-prompt-TOOL-dScopedBuild-1-parents-crosscheck.md` and 19 more under prompts/ |
+| reviews | `2026-11-01-review-TOOL-dScopedBuild-40-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-11-01-review-TOOL-dScopedBuild-36-spec-audit-round1.md` (CLEAN WITH FIXES) and 2 more under reviews/ |
+| deviation | `2026-11-03-build-TOOL-dScopedBuild-1-deviation-13.md`, `2026-11-01-build-TOOL-dScopedBuild-9-deviation-93.md` and 51 more under build/ |
+| research | `2026-11-03-build-TOOL-dScopedBuild-1-reground-returns.md`, `2026-11-03-build-TOOL-dScopedBuild-1-parents-crosscheck.md` and 6 more under build/ |
+| logs | `2026-11-01-build-TOOL-dScopedBuild-1-departures-spec.md`, `2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dScopedBuild/card` |
+<!-- /gen:build-routes -->

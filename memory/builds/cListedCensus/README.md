@@ -77,3 +77,15 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-10-12-prompt-TOOL-cListedCensus-1-brief.md` |
+| reviews | `2026-10-13-review-TOOL-cListedCensus-1-implementation-diff-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-10-13-build-TOOL-cListedCensus-1-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/cListedCensus/card` |
+<!-- /gen:build-routes -->

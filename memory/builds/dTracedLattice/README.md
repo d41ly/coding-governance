@@ -117,3 +117,15 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round2.md`, `2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round1.md` and 3 more under reviews/ |
+| research | `2026-09-06-build-TOOL-dTracedLattice-1-2-s2-s3-measured.md`, `2026-09-05-build-TOOL-dTracedLattice-1-scen-adversarial-seams.md` and 12 more under build/ |
+| logs | `2026-09-06-build-TOOL-dTracedLattice-7-1-acceptance-ledger.md`, `2026-09-06-build-TOOL-dTracedLattice-6-1-acceptance-ledger.md` and 5 more under build/ |
+| card ref | `refs/gov/builds/dTracedLattice/card` |
+<!-- /gen:build-routes -->

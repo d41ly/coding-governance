@@ -2772,6 +2772,20 @@ drain = "key"
 direction = "shrink-only"
 home = "memory/project/record-kinds-legacy.txt"
 
+# The build READMEs that may still type a derived front-matter key (TOOL-dTotalRecall-4 S4, section 8
+# F6): gov's own, beside `record-kinds-legacy`, so it owes no step and an adopter's tree is unarmed.
+# One `<path> 1` row per tracked README typing `node`, `roster` or `streams` at the seed; a README
+# written after it types none, and the generator refuses one that does.
+[[ledger]]
+population = "build-readme-typed-derived"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/gen_build_index.py", "--print-typed-derived"]
+key = "record"
+fields = ["path"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/build-readme-typed-derived.txt"
+
 [[exempt_leg]]
 name = "record-kinds"
 tag = "leg.gov.record-kinds"

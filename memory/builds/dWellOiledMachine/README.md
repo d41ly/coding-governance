@@ -414,3 +414,18 @@ Unordered: `TOOL-dWellOiledMachine-127`.
 - **Parent builds:** [dBoundRoles](../dBoundRoles/README.md), [dKeptSession](../dKeptSession/README.md), [dTotalRecall](../dTotalRecall/README.md)
 - **Child builds:** [dMindYourWords](../dMindYourWords/README.md), [dScopedBuild](../dScopedBuild/README.md), [dShippedRelease](../dShippedRelease/README.md), [dTendedCadence](../dTendedCadence/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-03-prompt-TOOL-dWellOiledMachine-6-owner-fork.md`, `2026-11-03-prompt-TOOL-dWellOiledMachine-6-1-spec-writer.md` and 29 more under prompts/ |
+| reviews | `2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md` (BLOCKED), `2026-10-27-review-TOOL-dWellOiledMachine-95-spec-audit.md` (CLEAN WITH FIXES) and 6 more under reviews/ |
+| deviation | `2026-11-03-build-TOOL-dWellOiledMachine-6-deviation-65.md`, `2026-11-02-build-TOOL-dWellOiledMachine-6-deviation-64.md` and 192 more under build/ |
+| research | `2026-11-03-build-TOOL-dWellOiledMachine-6-owner-fork-returns.md`, `2026-10-28-build-TOOL-dWellOiledMachine-1-reground-returns.md` and 6 more under build/ |
+| logs | `2026-10-28-build-TOOL-dWellOiledMachine-127-runlog-0487772d.md`, `2026-10-28-build-TOOL-dWellOiledMachine-1-departures-spec.md` and 4 more under build/ |
+| open asks | `BACKLOG.md`, 3 open |
+| card ref | `refs/gov/builds/dWellOiledMachine/card` |
+<!-- /gen:build-routes -->

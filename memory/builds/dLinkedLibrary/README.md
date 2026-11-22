@@ -292,3 +292,18 @@ Coverage of dLinkedLibrary's 25 clause(s) and 25 owned node(s), over 91 spec(s) 
 - **Parent builds:** [dTotalRecall](../dTotalRecall/README.md)
 - **Child builds:** [dIndexedDesign](../dIndexedDesign/README.md), [dMindYourWords](../dMindYourWords/README.md), [dShippedRelease](../dShippedRelease/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-05-prompt-TOOL-dLinkedLibrary-8-owner-forks.md`, `2026-11-05-prompt-TOOL-dLinkedLibrary-8-1-spec-writer.md` and 30 more under prompts/ |
+| reviews | `2026-10-27-review-TOOL-dLinkedLibrary-92-spec-audit.md` (BLOCKED), `2026-10-27-review-TOOL-dLinkedLibrary-87-spec-audit.md` (BLOCKED) and 6 more under reviews/ |
+| deviation | `2026-11-05-build-TOOL-dLinkedLibrary-8-deviation-84.md`, `2026-11-05-build-TOOL-dLinkedLibrary-8-deviation-83.md` and 118 more under build/ |
+| research | `2026-11-05-build-TOOL-dLinkedLibrary-1-reground-returns.md`, `2026-11-05-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md` and 13 more under build/ |
+| logs | `2026-10-27-build-TOOL-dLinkedLibrary-1-departures-spec.md`, `2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dLinkedLibrary/card` |
+<!-- /gen:build-routes -->

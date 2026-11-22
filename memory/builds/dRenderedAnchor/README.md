@@ -101,3 +101,15 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-10-19-prompt-TOOL-dRenderedAnchor-7-brief.md`, `2026-10-19-prompt-TOOL-dRenderedAnchor-6-brief.md` and 8 more under prompts/ |
+| reviews | `2026-10-19-review-TOOL-dRenderedAnchor-6-closing-diff-round1.md` (CLEAN WITH FIXES), `2026-10-19-review-TOOL-dRenderedAnchor-4-closing-diff-round4.md` (CLEAN WITH FIXES) and 3 more under reviews/ |
+| research | `2026-10-19-build-TOOL-dRenderedAnchor-1-1-repro.md` |
+| logs | `2026-10-19-build-TOOL-dRenderedAnchor-7-1-acceptance-ledger.md`, `2026-10-19-build-TOOL-dRenderedAnchor-6-1-acceptance-ledger.md` and 5 more under build/ |
+| card ref | `refs/gov/builds/dRenderedAnchor/card` |
+<!-- /gen:build-routes -->

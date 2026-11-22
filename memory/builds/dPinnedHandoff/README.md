@@ -104,3 +104,11 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| card ref | `refs/gov/builds/dPinnedHandoff/card` |
+<!-- /gen:build-routes -->

@@ -260,3 +260,19 @@ Coverage of dPlacedRequest's 21 clause(s) and 37 owned node(s), over 69 spec(s) 
 - **Parent builds:** [dDeclaredLoop](../dDeclaredLoop/README.md)
 - **Child builds:** [dBoundRoles](../dBoundRoles/README.md), [dKeptSession](../dKeptSession/README.md), [dTotalRecall](../dTotalRecall/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-21-prompt-TOOL-dPlacedRequest-46-mark-rewrap-brief.md`, `2026-11-21-prompt-TOOL-dPlacedRequest-46-1-spec-writer.md` and 103 more under prompts/ |
+| reviews | `2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit.md` (CLEAN WITH FIXES), `2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md` (CLEAN WITH FIXES) and 13 more under reviews/ |
+| deviation | `2026-11-21-build-TOOL-dPlacedRequest-99-deviation-734.md`, `2026-11-21-build-TOOL-dPlacedRequest-98-deviation-733.md` and 176 more under build/ |
+| red-fix | `2026-11-21-build-TOOL-dPlacedRequest-99-red-fix-53.md`, `2026-11-21-build-TOOL-dPlacedRequest-99-red-fix-48.md` and 53 more under build/ |
+| research | `2026-11-19-build-TOOL-dPlacedRequest-34-design-notes.md`, `2026-11-19-build-TOOL-dPlacedRequest-1-design-notes.md` and 18 more under build/ |
+| logs | `2026-11-21-build-TOOL-dPlacedRequest-99-1-acceptance-ledger.md`, `2026-11-21-build-TOOL-dPlacedRequest-98-1-acceptance-ledger.md` and 73 more under build/ |
+| open asks | `BACKLOG.md`, 19 open |
+| card ref | `refs/gov/builds/dPlacedRequest/card` |
+<!-- /gen:build-routes -->

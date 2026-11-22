@@ -159,3 +159,16 @@ Ids whose spec moved past its audited revision: none — 0 of 21 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-13-prompt-TOOL-dSweptBranches-9-1-build-brief.md`, `2026-10-13-prompt-TOOL-dSweptBranches-8-1-build-brief.md` and 21 more under prompts/ |
+| reviews | `2026-10-13-review-TOOL-dSweptBranches-19-20-21-closing-diff-round1.md` (CLEAN WITH FIXES), `2026-10-13-review-TOOL-dSweptBranches-1-2-3-4-5-closing-diff-round2.md` and 1 more under reviews/ |
+| logs | `2026-10-13-build-TOOL-dSweptBranches-9-1-acceptance-ledger.md`, `2026-10-13-build-TOOL-dSweptBranches-8-1-acceptance-ledger.md` and 21 more under build/ |
+| open asks | `BACKLOG.md`, 2 open |
+| card ref | `refs/gov/builds/dSweptBranches/card` |
+<!-- /gen:build-routes -->

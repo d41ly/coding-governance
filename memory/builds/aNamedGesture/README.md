@@ -91,3 +91,14 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| reviews | `2026-08-25-review-TOOL-aNamedGesture-1-spec-audit.md` (CLEAN WITH FIXES), `2026-08-25-review-TOOL-aNamedGesture-1-diff-review-round1.md` |
+| logs | `2026-08-25-build-TOOL-aNamedGesture-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aNamedGesture/card` |
+<!-- /gen:build-routes -->

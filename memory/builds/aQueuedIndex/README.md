@@ -78,3 +78,16 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-12-prompt-TOOL-aQueuedIndex-3-spec-brief.md`, `2026-11-12-prompt-TOOL-aQueuedIndex-3-build-brief.md` and 8 more under prompts/ |
+| reviews | `2026-11-12-review-TOOL-aQueuedIndex-2-diff-review-round2.md` (CLEAN WITH FIXES), `2026-11-12-review-TOOL-aQueuedIndex-1-diff-review-round1.md` (BLOCKED) |
+| deviation | `2026-11-12-build-TOOL-aQueuedIndex-1-deviation-11.md` |
+| logs | `2026-11-12-build-TOOL-aQueuedIndex-3-ledger.md`, `2026-11-12-build-TOOL-aQueuedIndex-3-1-builder-return.md` and 6 more under build/ |
+| card ref | `refs/gov/builds/aQueuedIndex/card` |
+<!-- /gen:build-routes -->

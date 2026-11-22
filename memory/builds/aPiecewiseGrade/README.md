@@ -94,3 +94,16 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-16-prompt-TOOL-aPiecewiseGrade-8-review-brief.md`, `2026-11-16-prompt-TOOL-aPiecewiseGrade-8-1-spec-writer.md` and 19 more under prompts/ |
+| reviews | `2026-11-16-review-TOOL-aPiecewiseGrade-5-diff-review-round2.md` (CLEAN WITH FIXES), `2026-11-16-review-TOOL-aPiecewiseGrade-1-diff-review-round1.md` (CLEAN WITH FIXES) |
+| red-fix | `2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-4.md`, `2026-11-15-build-TOOL-aPiecewiseGrade-1-red-fix-3.md` and 2 more under build/ |
+| logs | `2026-11-16-build-TOOL-aPiecewiseGrade-8-1-acceptance-ledger.md`, `2026-11-16-build-TOOL-aPiecewiseGrade-7-1-acceptance-ledger.md` and 9 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aPiecewiseGrade/card` |
+<!-- /gen:build-routes -->

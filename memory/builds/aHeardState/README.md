@@ -99,3 +99,15 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md` |
+| reviews | `2026-10-13-review-TOOL-aHeardState-1-2-closing-diff-review-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-10-13-build-TOOL-aHeardState-1-2-acceptance-ledger.md`, `2026-10-12-build-TOOL-aHeardState-1-runlog-dd96ba88.md` and 1 more under build/ |
+| card ref | `refs/gov/builds/aHeardState/card` |
+<!-- /gen:build-routes -->

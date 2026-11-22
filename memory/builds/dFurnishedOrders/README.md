@@ -235,3 +235,18 @@ Coverage of dFurnishedOrders's 20 clause(s) and 14 owned node(s), over 60 spec(s
 - **Parent builds:** [dBoundRoles](../dBoundRoles/README.md)
 - **Child builds:** [dMindYourWords](../dMindYourWords/README.md), [dScopedBuild](../dScopedBuild/README.md), [dShippedRelease](../dShippedRelease/README.md), [dTendedCadence](../dTendedCadence/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-05-prompt-TOOL-dFurnishedOrders-7-owner-forks.md`, `2026-11-05-prompt-TOOL-dFurnishedOrders-7-1-spec-writer.md` and 29 more under prompts/ |
+| reviews | `2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md` (BLOCKED) and 7 more under reviews/ |
+| deviation | `2026-11-05-build-TOOL-dFurnishedOrders-7-deviation-73.md`, `2026-11-05-build-TOOL-dFurnishedOrders-46-deviation-464.md` and 78 more under build/ |
+| research | `2026-10-28-build-TOOL-dFurnishedOrders-1-reground-returns.md`, `2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck.md` and 12 more under build/ |
+| logs | `2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md`, `2026-10-27-build-TOOL-dFurnishedOrders-1-departures-spec.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dFurnishedOrders/card` |
+<!-- /gen:build-routes -->

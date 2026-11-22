@@ -85,3 +85,13 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| logs | `2026-09-03-build-TOOL-aProbedToolkit-1-synthesis.md`, `2026-09-03-build-TOOL-aProbedToolkit-1-measurements.md` and 1 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aProbedToolkit/card` |
+<!-- /gen:build-routes -->

@@ -144,3 +144,17 @@ Ids whose spec moved past its audited revision: none — 0 of 18 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-02-prompt-TOOL-dFoldedAudit-9-spec-brief.md`, `2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md` and 73 more under prompts/ |
+| reviews | `2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| deviation | `2026-11-01-build-TOOL-dFoldedAudit-8-deviation-81.md` |
+| research | `2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md`, `2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md` and 2 more under build/ |
+| logs | `2026-11-02-build-TOOL-dFoldedAudit-9-ledger.md`, `2026-11-02-build-TOOL-dFoldedAudit-9-4-builder-return.md` and 63 more under build/ |
+| card ref | `refs/gov/builds/dFoldedAudit/card` |
+<!-- /gen:build-routes -->

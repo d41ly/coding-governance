@@ -115,3 +115,16 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-05-prompt-TOOL-dThriftyLanding-9-1-build-brief.md`, `2026-10-05-prompt-TOOL-dThriftyLanding-8-1-build-brief.md` and 10 more under prompts/ |
+| reviews | `2026-10-05-review-TOOL-dThriftyLanding-1-closing-diff-round1.md` |
+| logs | `2026-10-05-build-TOOL-dThriftyLanding-9-1-acceptance-ledger.md`, `2026-10-05-build-TOOL-dThriftyLanding-8-1-acceptance-ledger.md` and 10 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dThriftyLanding/card` |
+<!-- /gen:build-routes -->

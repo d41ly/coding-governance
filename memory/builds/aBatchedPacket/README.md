@@ -84,3 +84,18 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-14-prompt-TOOL-aBatchedPacket-2-1-builder.md`, `2026-11-13-prompt-TOOL-aBatchedPacket-2-brief.md` and 4 more under prompts/ |
+| reviews | `2026-11-13-review-TOOL-aBatchedPacket-1-diff-review-round1.md` (CLEAN WITH FIXES) |
+| override | `2026-11-14-build-TOOL-aBatchedPacket-2-override-1.md` |
+| red-fix | `2026-11-14-build-TOOL-aBatchedPacket-2-red-fix-2.md`, `2026-11-14-build-TOOL-aBatchedPacket-1-red-fix-1.md` |
+| research | `2026-11-13-build-TOOL-aBatchedPacket-1-analysis.md` |
+| logs | `2026-11-14-build-TOOL-aBatchedPacket-2-1-acceptance-ledger.md`, `2026-11-14-build-TOOL-aBatchedPacket-1-1-acceptance-ledger.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aBatchedPacket/card` |
+<!-- /gen:build-routes -->

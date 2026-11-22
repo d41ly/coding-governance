@@ -102,7 +102,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 80 unit(s) · node d · opened 2026-10-21 · streams playbook
+**Build status:** CLOSED · 80 unit(s) · node d · opened 2026-10-21 · streams playbook+tooling
 ids PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12
 ids PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24
 ids PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36
@@ -296,3 +296,19 @@ Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 80 spec(s)
 - **Parent builds:** [dSafePassage](../dSafePassage/README.md)
 - **Child builds:** [dDeclaredLoop](../dDeclaredLoop/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-12-prompt-PLAY-dOrderedCharter-88-spec-brief.md`, `2026-11-12-prompt-PLAY-dOrderedCharter-88-build-brief.md` and 282 more under prompts/ |
+| reviews | `2026-11-05-review-PLAY-dOrderedCharter-1-closing-diff-review-round1.md` (CLEAN WITH FIXES), `2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md` (BLOCKED) and 1 more under reviews/ |
+| deviation | `2026-11-12-build-PLAY-dOrderedCharter-88-deviation-881.md`, `2026-11-12-build-PLAY-dOrderedCharter-84-deviation-841.md` and 194 more under build/ |
+| change | `2026-11-09-build-PLAY-dOrderedCharter-40-change-4.md`, `2026-11-09-build-PLAY-dOrderedCharter-40-change-3.md` and 2 more under build/ |
+| research | `2026-11-09-build-PLAY-dOrderedCharter-34-census.md`, `2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md` and 12 more under build/ |
+| logs | `2026-11-12-build-PLAY-dOrderedCharter-88-ledger.md`, `2026-11-12-build-PLAY-dOrderedCharter-88-1-builder-return.md` and 168 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dOrderedCharter/card` |
+<!-- /gen:build-routes -->

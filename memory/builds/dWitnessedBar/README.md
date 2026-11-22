@@ -313,3 +313,24 @@ Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 93 spec(s) a
 - **Parent builds:** [dDeclaredLoop](../dDeclaredLoop/README.md)
 - **Child builds:** [dBoundRoles](../dBoundRoles/README.md), [dMindYourWords](../dMindYourWords/README.md), [dScopedBuild](../dScopedBuild/README.md), [dShippedRelease](../dShippedRelease/README.md), [dTendedCadence](../dTendedCadence/README.md), [dTotalRecall](../dTotalRecall/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief.md`, `2026-11-22-prompt-TOOL-dWitnessedBar-1-1-spec-writer.md` and 410 more under prompts/ |
+| reviews | `2026-11-21-review-TOOL-dWitnessedBar-106-closing-diff-review-round2.md` (CLEAN WITH FIXES), `2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md` (CLEAN WITH FIXES) and 14 more under reviews/ |
+| deviation | `2026-11-21-build-TOOL-dWitnessedBar-89-deviation-893.md`, `2026-11-21-build-TOOL-dWitnessedBar-71-deviation-712.md` and 147 more under build/ |
+| override | `2026-11-22-build-TOOL-dWitnessedBar-1-override-1.md` |
+| change | `2026-11-20-build-TOOL-dWitnessedBar-3-change-1.md` |
+| red-fix | `2026-11-22-build-TOOL-dWitnessedBar-9-red-fix-159.md`, `2026-11-22-build-TOOL-dWitnessedBar-51-red-fix-163.md` and 160 more under build/ |
+| widen | `2026-11-22-build-TOOL-dWitnessedBar-23-widen-33.md`, `2026-11-22-build-TOOL-dWitnessedBar-1-widen-37.md` and 35 more under build/ |
+| leg-tail | `2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-9.md`, `2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-8.md` and 16 more under build/ |
+| flake | `2026-11-21-build-TOOL-dWitnessedBar-1-flake-1.md` |
+| research | `2026-11-19-build-TOOL-dWitnessedBar-19-purpose-review.md`, `2026-11-19-build-TOOL-dWitnessedBar-11-enforces-review.md` and 26 more under build/ |
+| logs | `2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md`, `2026-11-20-build-TOOL-dWitnessedBar-18-list-conversion.md` and 188 more under build/ |
+| open asks | `BACKLOG.md`, 14 open |
+| card ref | `refs/gov/builds/dWitnessedBar/card` |
+<!-- /gen:build-routes -->

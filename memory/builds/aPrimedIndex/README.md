@@ -66,7 +66,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 11 unit(s) · node a · opened 2026-10-11 · streams tooling+deployer
+**Build status:** CLOSED · 11 unit(s) · node a · opened 2026-10-11 · streams deployer+tooling
 ids DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-5 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8 TOOL-aPrimedIndex-9 TOOL-aPrimedIndex-10 TOOL-aPrimedIndex-11 TOOL-aPrimedIndex-12 TOOL-aPrimedIndex-13
 ids TOOL-aPrimedIndex-14 TOOL-aPrimedIndex-15 TOOL-aPrimedIndex-16
 
@@ -112,3 +112,17 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-12-prompt-TOOL-aPrimedIndex-16-1-build-brief.md`, `2026-10-11-prompt-TOOL-aPrimedIndex-9-1-build-brief.md` and 4 more under prompts/ |
+| reviews | `2026-10-11-review-TOOL-aPrimedIndex-1-4-implementation-diff-round1.md` (CLEAN WITH FIXES) |
+| research | `2026-10-11-build-TOOL-aPrimedIndex-3-m12-probe.md` |
+| logs | `2026-10-11-build-TOOL-aPrimedIndex-8-1-acceptance-ledger.md`, `2026-10-11-build-TOOL-aPrimedIndex-7-1-acceptance-ledger.md` and 6 more under build/ |
+| open asks | `BACKLOG.md`, 5 open |
+| card ref | `refs/gov/builds/aPrimedIndex/card` |
+<!-- /gen:build-routes -->

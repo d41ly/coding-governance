@@ -79,3 +79,15 @@ Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-20-prompt-TOOL-dSkippedRecord-2-promotion-brief.md`, `2026-11-20-prompt-TOOL-dSkippedRecord-2-pass-legs-fix.md` and 2 more under prompts/ |
+| reviews | `2026-11-20-review-TOOL-dSkippedRecord-1-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| red-fix | `2026-11-20-build-TOOL-dSkippedRecord-1-red-fix-5.md`, `2026-11-20-build-TOOL-dSkippedRecord-1-red-fix-4.md` and 3 more under build/ |
+| logs | `2026-11-20-build-TOOL-dSkippedRecord-2-1-acceptance-ledger.md`, `2026-11-20-build-TOOL-dSkippedRecord-1-agent-ledger.md` and 1 more under build/ |
+| card ref | `refs/gov/builds/dSkippedRecord/card` |
+<!-- /gen:build-routes -->

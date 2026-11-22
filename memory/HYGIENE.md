@@ -287,8 +287,13 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
    It REPORTS the number of rows it graded, because its population guard counts shard FILES: a waiver
    over most of the rows otherwise reads as a green check over a population nobody sees.
 9. **build-index drift** — `tools/memory-tree/gen_build_index.py --check` must be clean. The index is
-   DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
-   column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
+   DERIVED from each build's README front matter (`slug opened ids [status]`, at column 0, opening at
+   line 1) plus every `**Status:**` header under its `spec/`. The key set is the generator's
+   `FRONT_MATTER_KEYS`, each key's role, type and requiredness declared once: a key it does not name
+   and a value its type refuses are NAMED errors. `node`, `roster` and `streams` are DERIVED and not
+   typed (`--print-front-matter <slug>` prints them); a README the `build-readme-typed-derived`
+   population lists may still type them, read and never refused, the derivation winning in every
+   render (`TOOL-dTotalRecall-4`). A build with no
    README, an unpaired generated-region marker, or two answers to its own status is a NAMED error.
    Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them. While any
    file under `archive/` is untracked, `--check` and `--write` both REFUSE and name it: the index
@@ -297,8 +302,9 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
    `--check` reports only what `--write` cures: the as-built view DESIGN_VIEW names is one more
    artifact, its byte drift listed under the same `--write` remedy, and its other findings, which
    `--write` cannot cure, are check 30's (`TOOL-dTrueNorth-16`).
-   A build README carries four generated regions, in this order: `<!-- gen:build-index -->`,
-   `<!-- gen:build-coverage -->`, `<!-- gen:build-order -->` and `<!-- gen:build-edges -->`.
+   A build README carries five generated regions, in this order: `<!-- gen:build-index -->`,
+   `<!-- gen:build-coverage -->`, `<!-- gen:build-order -->`, `<!-- gen:build-edges -->` and
+   `<!-- gen:build-routes -->`, the last routing a reader to each record by purpose.
    `--write` creates a missing pair and `--check` never demands one, save the coverage pair: it renders
    the design clauses' coverage from the carries join `SPEC_CARRIES_CUTOFF` arms, every field with an
    explicit none, so `--write` creates it only in a chain build's README, one the design view's Build
@@ -815,11 +821,12 @@ The `Purpose` cell is the row's declared purpose, `—` while it is pending on a
 
 <!-- gen:record-kinds -->
 
-47 kinds · 24 purposes pending
+48 kinds · 24 purposes pending
 
 | Kind | Tag | Home | Writer | Read by | Written by | Check | Purpose |
 |---|---|---|---|---|---|---|---|
 | `spec` | `record.spec` | `memory/builds/*/spec/*.md` | `gen_build_index.py --new-spec` | `gov-builder`, `gov-diff-reviewer`, `gov-skeptic`, `gov-spec-reviewer`, `gov-spec-writer`, `gov-synthesizer`, `gov-tester` | `gov-spec-writer` | `memory hygiene` | its writer is `design.unit-spec`; the spec redesigned as a structured, tagged contract |
+| `build-readme` | `record.build-readme` | `memory/builds/*/README.md` | `gen_build_index.py --new-build` | — | — | `memory hygiene` | the build README's declared front-matter schema, with unknown keys refused; writer item not named |
 | `spec-audit` | `record.spec-audit` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | — | `gov-synthesizer` | `memory hygiene` | — |
 | `diff-review` | `record.diff-review` | `memory/builds/*/reviews/*.md` | `tier2-review.js` | — | `gov-synthesizer` | `memory hygiene` | — |
 | `log` | `record.log` | `memory/builds/*/prompts/*.md` | `hand` | `gov-builder`, `gov-orienter`, `gov-researcher`, `gov-session`, `gov-spec-reviewer`, `gov-spec-writer` | — | `memory hygiene` | the journal grammar moved into the core; writer item not named |

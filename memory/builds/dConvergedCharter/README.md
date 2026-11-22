@@ -182,3 +182,18 @@ Coverage of dConvergedCharter's 23 clause(s) and 1 owned node(s), over 27 spec(s
 
 - **Parent builds:** [dCalibratedLens](../dCalibratedLens/README.md), [dMindYourWords](../dMindYourWords/README.md), [dScopedBuild](../dScopedBuild/README.md), [dShippedRelease](../dShippedRelease/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-05-prompt-PLAY-dConvergedCharter-11-owner-forks.md`, `2026-11-05-prompt-PLAY-dConvergedCharter-11-1-spec-writer.md` and 18 more under prompts/ |
+| reviews | `2026-11-05-review-PLAY-dConvergedCharter-11-chain-spec-audit-round2.md` (CLEAN WITH FIXES), `2026-11-04-review-PLAY-dConvergedCharter-22-spec-audit-round1.md` (CLEAN WITH FIXES) and 3 more under reviews/ |
+| deviation | `2026-11-05-build-PLAY-dConvergedCharter-21-deviation-211.md`, `2026-11-05-build-PLAY-dConvergedCharter-11-deviation-112.md` and 11 more under build/ |
+| research | `2026-11-03-build-PLAY-dConvergedCharter-6-reuse-scout-b.md`, `2026-11-03-build-PLAY-dConvergedCharter-5-reuse-scout-d.md` and 3 more under build/ |
+| logs | `2026-11-04-build-PLAY-dConvergedCharter-22-chain-rounds.md`, `2026-11-04-build-PLAY-dConvergedCharter-11-r4-fold-returns.md` and 2 more under build/ |
+| open asks | `BACKLOG.md`, 4 open |
+| card ref | `refs/gov/builds/dConvergedCharter/card` |
+<!-- /gen:build-routes -->

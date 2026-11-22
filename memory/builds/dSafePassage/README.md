@@ -353,3 +353,18 @@ Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 99 spec(s) at 
 - **Parent builds:** [dGroundRules](../dGroundRules/README.md)
 - **Child builds:** [dFairHearing](../dFairHearing/README.md), [dOrderedCharter](../dOrderedCharter/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-02-prompt-TOOL-dSafePassage-104-spec-brief.md`, `2026-11-02-prompt-TOOL-dSafePassage-104-build-brief.md` and 264 more under prompts/ |
+| reviews | `2026-11-02-review-TOOL-dSafePassage-104-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md` and 27 more under reviews/ |
+| deviation | `2026-10-28-build-TOOL-dSafePassage-53-deviation-1.md`, `2026-10-28-build-TOOL-dSafePassage-51-deviation-182.md` and 126 more under build/ |
+| research | `2026-10-25-build-TOOL-dSafePassage-1-parent-fixes-return.md`, `2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md` |
+| logs | `2026-11-02-build-TOOL-dSafePassage-104-ledger.md`, `2026-11-01-build-TOOL-dSafePassage-99-ledger.md` and 100 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dSafePassage/card` |
+<!-- /gen:build-routes -->

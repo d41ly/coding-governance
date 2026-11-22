@@ -245,3 +245,18 @@ Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 59 spec(s) at 
 - **Parent builds:** [dDeclaredLoop](../dDeclaredLoop/README.md), [dPlacedRequest](../dPlacedRequest/README.md), [dWitnessedBar](../dWitnessedBar/README.md)
 - **Child builds:** [dFurnishedOrders](../dFurnishedOrders/README.md), [dIndexedDesign](../dIndexedDesign/README.md), [dRankedPlan](../dRankedPlan/README.md), [dShippedRelease](../dShippedRelease/README.md), [dWellOiledMachine](../dWellOiledMachine/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-05-prompt-TOOL-dBoundRoles-3-owner-forks.md`, `2026-11-05-prompt-TOOL-dBoundRoles-3-1-spec-writer.md` and 33 more under prompts/ |
+| reviews | `2026-10-26-review-TOOL-dBoundRoles-65-66-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dBoundRoles-64-spec-audit-round1.md` (CLEAN WITH FIXES) and 6 more under reviews/ |
+| deviation | `2026-11-05-build-TOOL-dBoundRoles-6-deviation-63.md`, `2026-11-05-build-TOOL-dBoundRoles-43-deviation-434.md` and 109 more under build/ |
+| research | `2026-10-26-build-TOOL-dBoundRoles-65-round7-fix-return.md`, `2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md` and 14 more under build/ |
+| logs | `2026-10-26-build-TOOL-dBoundRoles-1-departures-spec.md`, `2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 7 open |
+| card ref | `refs/gov/builds/dBoundRoles/card` |
+<!-- /gen:build-routes -->

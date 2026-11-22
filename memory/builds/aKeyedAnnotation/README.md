@@ -114,3 +114,16 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| reviews | `2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md` (BLOCKED), `2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md` (BLOCKED) and 3 more under reviews/ |
+| research | `2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md`, `2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py` |
+| logs | `2026-09-05-build-TOOL-aKeyedAnnotation-4-acceptance.md`, `2026-09-05-build-TOOL-aKeyedAnnotation-3-acceptance.md` and 2 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/aKeyedAnnotation/card` |
+<!-- /gen:build-routes -->

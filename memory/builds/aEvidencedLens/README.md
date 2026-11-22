@@ -141,3 +141,16 @@ Ids whose spec moved past its audited revision: none — 0 of 19 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-10-05-prompt-TOOL-aEvidencedLens-9-2-build-brief.md`, `2026-10-05-prompt-TOOL-aEvidencedLens-8-2-build-brief.md` and 19 more under prompts/ |
+| reviews | `2026-10-05-review-TOOL-aEvidencedLens-18-spec-audit-round1.md`, `2026-10-05-review-TOOL-aEvidencedLens-15-spec-audit-round1.md` and 3 more under reviews/ |
+| logs | `2026-10-05-build-TOOL-aEvidencedLens-9-1-acceptance-ledger.md`, `2026-10-05-build-TOOL-aEvidencedLens-8-1-acceptance-ledger.md` and 19 more under build/ |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/aEvidencedLens/card` |
+<!-- /gen:build-routes -->

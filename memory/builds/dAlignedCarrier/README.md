@@ -81,3 +81,16 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-30-prompt-TOOL-dAlignedCarrier-6-fold2-brief.md`, `2026-09-30-prompt-TOOL-dAlignedCarrier-6-fold-brief.md` and 2 more under prompts/ |
+| reviews | `2026-09-30-review-TOOL-dAlignedCarrier-6-closing-diff-round2.md`, `2026-09-30-review-TOOL-dAlignedCarrier-1-closing-diff-round1.md` |
+| logs | `2026-09-30-build-TOOL-dAlignedCarrier-6-1-acceptance-ledger.md`, `2026-09-30-build-TOOL-dAlignedCarrier-5-1-acceptance-ledger.md` and 4 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dAlignedCarrier/card` |
+<!-- /gen:build-routes -->

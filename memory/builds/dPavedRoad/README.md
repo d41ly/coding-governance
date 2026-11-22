@@ -48,7 +48,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-11-10 · streams tooling
+**Build status:** CLOSED · 4 unit(s) · node d · opened 2026-11-10 · streams tooling
 ids TOOL-dPavedRoad-1 TOOL-dPavedRoad-2 TOOL-dPavedRoad-3 TOOL-dPavedRoad-4
 
 <!-- gen:build-units -->
@@ -83,3 +83,14 @@ Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| the units | the units table above |
+| briefs | `2026-11-10-prompt-TOOL-dPavedRoad-4-bar-fix-brief.md`, `2026-11-10-prompt-TOOL-dPavedRoad-2-token-fix-brief.md` and 6 more under prompts/ |
+| reviews | `2026-11-10-review-TOOL-dPavedRoad-1-closing-diff-round1.md` (CLEAN WITH FIXES) |
+| logs | `2026-11-10-build-TOOL-dPavedRoad-4-ledger.md`, `2026-11-10-build-TOOL-dPavedRoad-3-ledger.md` and 2 more under build/ |
+| card ref | `refs/gov/builds/dPavedRoad/card` |
+<!-- /gen:build-routes -->

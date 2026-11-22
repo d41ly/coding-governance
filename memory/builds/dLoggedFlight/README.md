@@ -199,3 +199,17 @@ Ids whose spec moved past its audited revision: none — 0 of 30 unit id(s) carr
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md`, `2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md` and 1 more under prompts/ |
+| reviews | `2026-09-20-review-TOOL-dLoggedFlight-25-spec-audit-round1.md`, `2026-09-16-review-TOOL-dLoggedFlight-21-spec-audit-round1.md` and 7 more under reviews/ |
+| research | `2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md` |
+| logs | `2026-09-20-build-TOOL-dLoggedFlight-30-1-acceptance-ledger.md`, `2026-09-20-build-TOOL-dLoggedFlight-29-1-acceptance-ledger.md` and 25 more under build/ |
+| open asks | `BACKLOG.md`, 0 open |
+| card ref | `refs/gov/builds/dLoggedFlight/card` |
+<!-- /gen:build-routes -->

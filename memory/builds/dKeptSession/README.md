@@ -87,7 +87,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 64 unit(s) · node d · opened 2026-10-21 · streams kickoff
+**Build status:** DEFERRED · 64 unit(s) · node d · opened 2026-10-21 · streams kickoff+tooling
 ids KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14
 ids KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28
 ids KICK-dKeptSession-29 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42
@@ -248,3 +248,18 @@ Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 64 spec(s) at
 - **Parent builds:** [dDeclaredLoop](../dDeclaredLoop/README.md), [dPlacedRequest](../dPlacedRequest/README.md)
 - **Child builds:** [dIndexedDesign](../dIndexedDesign/README.md), [dWellOiledMachine](../dWellOiledMachine/README.md)
 <!-- /gen:build-edges -->
+
+<!-- gen:build-routes -->
+
+| Purpose | Read |
+|---|---|
+| run state | `RUN.md` |
+| the units | the units table above |
+| briefs | `2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md`, `2026-11-05-prompt-KICK-dKeptSession-1-1-spec-writer.md` and 27 more under prompts/ |
+| reviews | `2026-10-26-review-KICK-dKeptSession-64-spec-audit.md` (CLEAN WITH FIXES), `2026-10-26-review-KICK-dKeptSession-63-spec-audit.md` (CLEAN WITH FIXES) and 4 more under reviews/ |
+| deviation | `2026-11-05-build-KICK-dKeptSession-9-deviation-94.md`, `2026-11-05-build-KICK-dKeptSession-7-deviation-73.md` and 94 more under build/ |
+| research | `2026-10-26-build-KICK-dKeptSession-65-promoted-fix-return.md`, `2026-10-26-build-KICK-dKeptSession-64-promoted-fix-return.md` and 11 more under build/ |
+| logs | `2026-10-26-build-KICK-dKeptSession-1-departures-spec.md`, `2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md` |
+| open asks | `BACKLOG.md`, 1 open |
+| card ref | `refs/gov/builds/dKeptSession/card` |
+<!-- /gen:build-routes -->
