@@ -23,6 +23,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Every roster spec was re-grounded on HEAD before this dispatch, so its citations hold at HEAD or name the earlier
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
+- This is the second dispatch. The first builder (run `wf_44b97275-54b`) stopped on rev-6; the main loop decided its six
+  items in `build/2026-11-22-build-TOOL-dBoundRoles-13-1-main-loop-decision.md`. Build them as stated there and record
+  items 1 to 5 in the one deviation record below. The spec stays at rev-6.
 - Generated outputs are admitted undeclared and belong in the pass commit: `.claude/roles.json`, `.claude/agents/` and
   the rendered `.claude/skills/*/SKILL.md` as their renderers write them, every file `gen_build_index.py --write`
   rewrites, the dClosedLoop as-built view and the map generator's output. `memory/DECISIONS.md` is a shared record a
