@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-7 — one suite template cache: each base repository built once, keyed by its inputs, and cloned per case
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 40def53f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -14,6 +14,7 @@
 | [2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-2-reground-task.md) | research | TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-8 |
 | [2026-11-22-prompt-TOOL-dQuietDisk-7-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-7-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-7-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-7-build-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dQuietDisk-7-divergence-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-7-divergence-task.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -25,8 +26,8 @@ rows G1 and G1b, rework K1 and K2). This unit generalises the two existing templ
 `tools/lib/lib-selftest.sh` and `tools/govkit/fixture_target.py`, into one template cache with a
 bash face and a python face. A base repository is built once per runner invocation and keyed by
 its declared inputs. A mutating case gets a `git clone --shared` of it, and a reading case gets one
-read-only checkout. The unit proves the bash face on `tools/check-line-length.test.sh`, a suite
-`lib-selftest.sh` already serves. Units 10 to 13 move the heavy suites onto it.
+read-only checkout. The unit proves both faces with the harness suite's own arms and the probes of
+section 6. Units 10 to 13, whose suites build a git repository per case, move onto it.
 
 ## 2. Scope (IN)
 
@@ -34,8 +35,11 @@ read-only checkout. The unit proves the bash face on `tools/check-line-length.te
   implemented by both faces. A template is `<cache root>/<key>/repo`, a committed non-bare
   repository, complete when `<cache root>/<key>/ready` exists. A build runs in
   `<cache root>/.stage-<key>-<pid>`, writes `ready` there and renames the directory to
-  `<cache root>/<key>`. When that rename fails because the key exists, the loser cleans up its
-  stage and uses the winner's template. Observed by AC4.
+  `<cache root>/<key>`. The bash face renames with `mv -T <stage> <key dir>`, because a plain `mv`
+  into an existing directory nests the stage inside it rather than failing. The python face renames
+  with `os.rename`, which fails onto the key directory because that directory is never empty. When
+  the rename fails because the key exists, the loser reads it as another run having built it: it
+  cleans up its stage and uses the winner's template. Observed by AC4.
 - **S2** — The cache root, one rule for both faces: `SELFTEST_TEMPLATE_ROOT` when it names a
   directory. Else the nearest ancestor of the process's temp dir named `gate-work.*` and holding an
   `owner` file, which is a bar's owned `$WORK`, with `templates` appended. Else the caller's own
@@ -58,10 +62,13 @@ read-only checkout. The unit proves the bash face on `tools/check-line-length.te
 - **S5** — The clone. A mutating case gets
   `git -c core.autocrlf=false clone --shared --quiet --template= -c <pin>... <template>/repo <dest>`,
   then `git -C <dest> remote remove origin`, so the case's repository carries the template's config
-  and no remote, as a built one does today. The leading `-c core.autocrlf=false` binds the clone
+  and no remote, as the `cp -a` copy it replaces does. Every clone drops the remote, and no caller
+  can keep it. The leading `-c core.autocrlf=false` binds the clone
   process alone. Its checkout writes the committed bytes, as `cp -a` copies them today, whatever
-  the global line-ending setting, and nothing is persisted that the builder did not set. A caller that
-  declares keep-remote skips the second process. Objects are never copied. Observed by AC1 and AC3.
+  the global line-ending setting, and nothing is persisted that the builder did not set. Objects are
+  never copied. Git's trace2 event log records a local clone as `git` and `git-upload-pack`, so a
+  clone and its remote step cost three git processes (PINNED, measured by the builder 2026-11-22).
+  Observed by AC1, AC3 and AC7.
 - **S6** — The bash face, the canonical block `template_cache_sh` in `tools/lib/template-cache.sh`,
   defining `resolve_template_root`, `derive_template_key`, `resolve_template` and
   `build_template_clone`. `tools/lib/lib-selftest.sh` carries it inline, and a `PARITY_ROWS` row in `tools/lib/resolve-python.test.sh` holds the copy to the
@@ -71,8 +78,8 @@ read-only checkout. The unit proves the bash face on `tools/check-line-length.te
   `tools/gate-legs.json` is re-rendered by `python tools/run-gates/leg_factory.py --write`, never
   edited. Observed by AC8 and AC11.
 - **S7** — `lib-selftest.sh` opts in per suite. `build_fixture --template "<inputs>" <builder>`
-  builds through `resolve_template`, and each arm's copy is a `build_template_clone` with
-  keep-remote in place of `cp -a`. A new verb `arm_reading`, with `arm`'s five arguments, declares an arm whose subject
+  builds through `resolve_template`, and each arm's copy is a `build_template_clone` in place of
+  `cp -a`. `--template` is the one option `build_fixture` gains. A new verb `arm_reading`, with `arm`'s five arguments, declares an arm whose subject
   writes nothing. Every such arm runs in one clone, `$SELFTEST_ROOT/read`, made on first use. After
   the run, `run_arms` FAILs the suite when `git -C "$SELFTEST_ROOT/read" status --porcelain
   --untracked-files=all` prints anything, naming the reading arms. Without `--template`,
@@ -80,26 +87,34 @@ read-only checkout. The unit proves the bash face on `tools/check-line-length.te
   Observed by AC1, AC3 and AC6.
 - **S8** — The python face, `tools/lib/template_cache.py`: `TemplateCache(root=None)` with
   `derive_key(builder_id, inputs)`, `resolve_template(builder_id, inputs, build)` and
-  `build_clone(template, dest, keep_remote=False)`. `fixture_target.build_target` gains an optional
+  `build_clone(template, dest)`, whose clone carries no remote, as S5 states, and which takes no
+  option to keep one. `fixture_target.build_target` gains an optional
   `template` keyword. Given a `TemplateCache`, it ensures a base from its `README.md`, its `deploy`
   text and its `files`, and clones it to `tmp/<name>` in place of the eight processes
-  `build_scratch_gov`, its `add` and its commit spend. Without the keyword it builds as today. Observed by AC7.
+  `build_scratch_gov`, its `add` and its commit spend. A cached call costs the clone's three
+  git processes (PINNED, measured by the builder 2026-11-22). Without the keyword it builds as
+  today. Observed by AC7.
 - **S9** — The switch, the policy key `tests.fixture-templates`, read once per cache through
   `policy.py get`. `shared`, the default, is S1 to S8. `per-case` is today: `build_fixture
   --template` copies with `cp -a`, `arm_reading` runs as `arm`, and `build_target` builds per call.
-  An absent policy kit or an unreadable key reads as the default. The key lands with its catalogue
+  The bash face finds its python by sourcing `tools/lib/resolve-python.sh` beside `lib-selftest.sh`
+  and calling `resolve_python`, and a copy-installed suite carries that block inline beside
+  `template_cache_sh`, as the kit rules already require of it. An absent policy kit, an unreadable
+  key or no usable python reads as the default. The key lands with its catalogue
   row in the shape of `tests.history-verdicts`: `allowed = ["shared", "per-case"]`,
   `default = "shared"`, a `summary`, a `usage` and `owner = "dQuietDisk"`. `help/reference/policy.md`
   is re-rendered from it. Observed by AC6.
-- **S10** — `tools/check-line-length.test.sh` builds with `build_fixture --template` naming its
-  gate, its policy files and its prefix as inputs, with keep-remote, and declares its two arms
-  whose setup is `true` with `arm_reading`. Every arm keeps its label, its want-rc and its
-  want-substring. Observed by AC3 and AC9.
+- **S10** — The proof is the harness suite's own. `tools/lib/lib-selftest.test.sh` gains the
+  template mode's arms: a clone that copies objects or keeps its remote, two builders colliding on
+  one key, a racing stage left behind, a reading arm that writes, and one suite run under
+  `--template` in both values of `tests.fixture-templates`. No existing suite moves onto the cache
+  here. Observed by AC3 and AC9.
 - **S11** — The shell-line ledger. `memory/project/shell-role.txt` is shrink-only, read by the
   unguarded leg `portability (shell lines only shrink)`, and a new shell file or a grown one is red
   there. The new `tools/lib/template-cache.sh` has no row. `tools/lib/lib-selftest.sh` grows by the
   inline block and `arm_reading`, and `tools/lib/lib-selftest.test.sh` and
-  `tools/lib/resolve-python.test.sh` grow by their arms and their row. Each key whose measured count
+  `tools/lib/resolve-python.test.sh` grow by their arms and their row. `lib-selftest.sh` also gains
+  the line that sources the resolver. Each key whose measured count
   rises above its row is widened through the ledger factory's door,
   `python tools/memory-tree/ratchet.py widen shell-role --key <path>... --reason <one line> --unit TOOL-dQuietDisk-7`,
   as TOOL-dQuietDisk-1 widened its keys (`2026-11-22-build-TOOL-dQuietDisk-1-widen-2`). The door
@@ -107,13 +122,14 @@ read-only checkout. The unit proves the bash face on `tools/check-line-length.te
   row `widened:<record stem>`, and no row is hand-edited. The Reason gives the lines this unit adds
   per key. It names no base excess, because every one of these rows equals its file's measured count
   at `8688cdbba` (PINNED, `sh_hygiene.py --shell-role --measure`, 2026-11-22). A key that does not
-  grow, `tools/check-line-length.test.sh` included where its edit adds no code line, is not named.
-  Observed by AC10.
+  grow is not named. Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
-- No suite move beyond `tools/check-line-length.test.sh`. `tools/check-wiring.test.sh`, its
-  `NEWREPO_SEED` included, is unit 10's. `tools/govkit/selftest.py` is unit 11's, which passes
+- No existing suite moves onto the cache in this unit. `tools/check-line-length.test.sh` stays on
+  `cp -a`. Its arms copy the fixture and spawn no git, so a clone per arm would add git processes
+  where it spends none: at least 38 against its 20 `cp` (PINNED, the builder's count, 2026-11-22).
+  `tools/check-wiring.test.sh`, its `NEWREPO_SEED` included, is unit 10's. `tools/govkit/selftest.py` is unit 11's, which passes
   `template` to `build_target`. `.githooks/pre-push.test.sh` and the `run-gates*.test.sh` suites
   are units 12 and 13's.
 - No move of `skills/session-kickoff/manifest-check.test.sh`'s local template. TOOL-dQuietDisk-6
@@ -175,10 +191,14 @@ leaking into its neighbours unseen.
 
 ### Why the clone drops its remote
 
-A built fixture has no remote, and subjects such as `check-wiring.sh` and `push-main.sh` read
-remotes. A clone left with `origin` would hand them a state no arm was written against. Only a
-caller that knows its subject reads no remote declares keep-remote. `check-line-length.sh` runs
-`git rev-parse` alone (`tools/check-line-length.sh@a9d37eb4d10f:54` and `:58`), so S10 declares it.
+A built fixture has no remote, and subjects read remotes. `check-wiring.sh` and `push-main.sh`
+read them directly. Every reader of the policy kit reads one through its landed revision, which is
+`refs/remotes/<remote>/<branch>` whenever a remote exists, and the local branch only when none does
+(`tools/policy/policy.py#derive_landed_revision`). A clone left with `origin` would have that
+reader grade the template's commit on the remote ref instead of the case's own commit on `main`.
+A subject that seems to run `git rev-parse` alone can still reach the policy on one branch, as the
+line-length gate does at its first breach (`tools/check-line-length.sh#read_line_mode`). So no caller can safely declare its subject remote-free, and
+every clone drops the remote.
 
 ### Why the clone pins line endings for itself alone
 
@@ -188,12 +208,17 @@ that alone. A `-c` after `clone` would persist `core.autocrlf=false` into every 
 which a bash builder never set. A `-c` before `clone` governs that one process and its checkout,
 and is gone after it.
 
-### Why a committed template is the same fixture for this suite
+### The consumers
 
-`build_repo` in the line-length suite runs `git init` and writes files without committing them.
-The template commits them. The gate reads the top level and the prefix through `rev-parse` and the
-files from disk, never the index, so a committed file and an untracked one with the same bytes
-grade alike. AC3 observes it on every arm.
+The cache saves processes only where a suite builds a git repository per case today, since a clone
+replaces that build. A suite whose arms copy a fixture with `cp -a` and spawn no git spends more
+on the cache, which is why the line-length suite stays off it. The consumers are units 10 to 13:
+
+- TOOL-dQuietDisk-10 moves `tools/check-wiring.test.sh`, folding its `NEWREPO_SEED` onto the bash
+  face;
+- TOOL-dQuietDisk-11 moves `tools/govkit/selftest.py`, passing a `TemplateCache` to `build_target`;
+- TOOL-dQuietDisk-12 moves `.githooks/pre-push.test.sh` onto the bash face;
+- TOOL-dQuietDisk-13 moves the `run-gates*.test.sh` suites onto the bash face.
 
 ### Inventory
 
@@ -217,8 +242,7 @@ shell function above leads with a declared verb, checked by
 ### Files touched (estimate)
 
 `tools/lib/template_cache.py` · `tools/lib/template-cache.sh` · `tools/lib/lib-selftest.sh` ·
-`tools/lib/lib-selftest.test.sh` · `tools/check-line-length.test.sh` ·
-`tools/govkit/fixture_target.py` · `tools/lib/resolve-python.test.sh` ·
+`tools/lib/lib-selftest.test.sh` · `tools/govkit/fixture_target.py` · `tools/lib/resolve-python.test.sh` ·
 `tools/policy/catalogue.toml` · `help/reference/policy.md` · `tools/govkit/registry.toml` ·
 `tools/gate-legs.json` · `memory/guides/SESSION-KICKOFF.md` · `memory/project/shell-role.txt` ·
 `memory/map/generated/symbols.json` ·
@@ -257,8 +281,8 @@ the ledger, they share it with this unit and are sequenced with it too.
 
 - security: the cache lives under the owned scratch of the run that made it and is removed with it.
   No new input crosses a trust boundary; the inputs are the suite's own files.
-- perf / scale: a template costs one build per root. A mutating case costs one `clone`, plus one
-  `remote remove` unless keep-remote. A reading case costs nothing after the first.
+- perf / scale: a template costs one build per root. A mutating case costs one clone and one remote
+  removal, three git processes in all, as S5 states. A reading case costs nothing after the first.
 - error / empty / loading states: a failed build refuses as `build_fixture` refuses today, exit 2
   naming the builder. A failed clone fails that arm with the copy's existing `ERR` line.
 - observability: `build_fixture --template` prints `template: <key8> built` or
@@ -267,9 +291,9 @@ the ledger, they share it with this unit and are sequenced with it too.
   by their timestamps. An arm comparing commit ids across fixtures would read them equal; unit 11
   checks its arms for that. The gotcha `suite-invalidated-by-a-commit-under-it` does not reach the
   cache, because its root dies with the run. A builder that commits a `.gitattributes` with `text`
-  or `eol` rules has each clone checked out through them, where `cp -a` copied bytes. The
-  line-length suite's `build_repo` writes none, and a consuming unit whose builder writes one
-  re-checks its arms.
+  or `eol` rules has each clone checked out through them, where `cp -a` copied bytes. The builders
+  of this unit's own arms write none, and a consuming unit whose builder writes one re-checks its
+  arms.
 - testing: the arms `tools/lib/lib-selftest.test.sh` gains and the probes of section 6.
 - migration: N/A — opt-in per suite; a suite that does not pass `--template` is unchanged.
 - user docs: the policy key's help row is rendered from its catalogue row.
@@ -291,16 +315,12 @@ the ledger, they share it with this unit and are sequenced with it too.
   differ, the four keys are distinct. The same builder and inputs give the same key twice.
   Red when: a key omits the definition or the inputs' blob ids.
 - **AC3** — When a probe script under `%TEMP%/<short-name>` sources `lib-selftest.sh` from
-  `tools/lib/` and runs three arms copied from the line-length suite S10 names, two green and one
-  at the width edge, through `build_fixture --template` naming the gate, its policy files and its
-  prefix as inputs, once with `tests.fixture-templates` at its default and once at `per-case`, both
-  print the same `ok` lines in the same order. With the gate's 450 default changed to 449 in the
-  template's input, the same arm goes red in both modes. When the main loop runs the line-length
-  suite itself at the close in both modes, both print the same 20 `ok` lines in the same order and
-  the same `PASS (20 arms, width <n>)` line, and the same arms go red at 449.
-  Red when: an arm's result differs between the modes, or the red arms differ.
-  permission: a role agent runs no suite, whichever kit holds it (scratch-guard row G3), so the
-  suite's own reading is owed to the main loop; the pass makes the three-arm probe.
+  `tools/lib/` and declares three arms under `build_fixture --template`, whose builder commits an
+  input file and whose subjects read it, two green and one red, it runs once with
+  `tests.fixture-templates` at its default and once at `per-case`. Both runs print the same `ok`
+  lines in the same order, and the same arm goes red. With one byte of the input file changed, the
+  key moves, and in both modes the arm that reads it sees the new bytes.
+  Red when: an arm's result differs between the modes, or a changed input reuses the old template.
 - **AC4** — When two shells run `resolve_template` for the same key at once in one root, one builds and one
   reuses, the root holds one `<key>` directory and no `.stage-*`, and both get the same template.
   Red when: the loser's stage is renamed over the winner or left behind.
@@ -315,25 +335,24 @@ the ledger, they share it with this unit and are sequenced with it too.
 - **AC7** — When a python probe calls `build_target(tmp, deploy, name, files)` with and without a
   `TemplateCache`, the two targets hold the same tracked files, the same `HEAD` subject `base`, the
   same `git config --local` values for `user.email`, `core.autocrlf`, `commit.gpgsign` and
-  `core.hooksPath`, and no remote. With `GIT_TRACE2_EVENT` set, a second cached call costs two
+  `core.hooksPath`, and no remote. With `GIT_TRACE2_EVENT` set, a second cached call costs three
   git processes, against the eight of an uncached call.
   Red when: the cached target differs in a config pin or carries `origin`.
-  figure: DERIVED at observation for the uncached count; PINNED at two for the cached call.
+  figure: DERIVED at observation for the uncached count; PINNED at three for the cached call, measured by the builder 2026-11-22.
 - **AC8** — When the parity table's `blk` awk extracts `template_cache_sh` from `template-cache.sh`
   and from `lib-selftest.sh`, the two compare equal.
   Red when: the inline copy drifts by one byte, which the new `PARITY_ROWS` row then reports.
-- **AC9** — When AC3's probe runs with `TEMP`, `TMP` and `TMPDIR` pointed at an empty directory
-  sampled every 0.5 s, once at the default and once at `per-case`, the default run's peak entry
-  count is lower than the `per-case` run's and the residual is 0 for both. When the main loop runs
-  the line-length suite the same way at the close, in a scratch `git clone --shared` of gov and once
-  more on the base suite, the unit's peak is lower than the base's, the residual is 0 for both, and
-  the unit's run spawns no more processes in total, counted by `GIT_TRACE2_EVENT` for git and by the
-  arm count for `cp`.
-  Red when: the peak does not fall, or a template outlives the run.
-  figure: DERIVED at observation; the analysis's PINNED base reading is 57 git processes and a peak
-  of 1,189 entries, measured 2026-11-20.
-  permission: the suite's own reading is owed to the main loop (scratch-guard row G3); the pass
-  makes the probe's.
+- **AC9** — A bash probe under `%TEMP%/<short-name>` builds the same base for each of a run of
+  cases in two ways. The per-case way runs `git init`, two `git config` calls, `git add` and
+  `git commit` in every case, the shape units 10 to 13 replace. The cached way runs one
+  `resolve_template` and a `build_template_clone` per case. The base commits five files in two
+  directories. Each way runs with `GIT_TRACE2_EVENT` naming its own empty directory and with
+  `TEMP`, `TMP` and `TMPDIR` pointed at an empty directory sampled every 0.5 s. The cached way
+  writes fewer trace files and reaches a lower peak entry count, and the residual is 0 for both
+  once each way's root is removed.
+  Red when: the cached way spends as many git processes or entries as the per-case way, or a
+  template outlives the run.
+  figure: DERIVED at observation, for both process counts and both peaks.
 - **AC10** — When
   `python tools/gate-lint/sh_hygiene.py --shell-role memory/project/shell-role.txt .` runs after
   the widen, it prints `sh-hygiene: OK`. `grep -n -P '^tools/lib/template-cache\.sh\t' memory/project/shell-role.txt`
@@ -352,14 +371,15 @@ the ledger, they share it with this unit and are sequenced with it too.
 
 ## 7. Gates
 
-`selftest harness self-test` · `line-length gate selftest` · `extract-arms self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `gate-leg conformance` · `policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `testsuite counts (every bar self-test prints one)` · `portability (shell lines only shrink)` · `ratchet (never gains)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
+`selftest harness self-test` · `extract-arms self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `gate-leg conformance` · `policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `testsuite counts (every bar self-test prints one)` · `portability (shell lines only shrink)` · `ratchet (never gains)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
 
-New arm: tools/lib/lib-selftest.test.sh · covers AC1 AC2 AC4 AC5 AC6 · the template mode's arms: a clone that copies objects or keeps its remote, two builders colliding on one key, a racing stage left behind, and a reading arm that writes; each failing case is staged by that break in the harness · its FLOOR_ASSERTIONS rises by the arms added
+New arm: tools/lib/lib-selftest.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC9 · the template mode's arms S10 names: a clone that copies objects or keeps its remote, two builders colliding on one key, a racing stage left behind, a reading arm that writes, and a suite whose result differs between the two values of the switch; each failing case is staged by that break in the harness · its FLOOR_ASSERTIONS rises by the arms added
 New arm: tools/lib/resolve-python.test.sh · covers AC8 · the template_cache_sh row; its failing case is staged by one changed byte in the copy lib-selftest.sh carries · none
 
-The bar runs once at the close. The line-length suite's own readings in AC3 and AC9 are the main
-loop's at the close: a role agent runs no suite, whichever kit holds it. The pass makes their probe
-halves.
+The bar runs once at the close. The harness suite's arms are the `New arm:` line's, observed RED
+and then GREEN by the main loop at the close, because a role agent runs no suite, whichever kit
+holds it. The pass makes the probes of AC3 and AC9. The leg line no longer names
+`line-length gate selftest`, because the line-length suite leaves Files touched.
 
 The leg line names `portability (shell lines only shrink)` and `ratchet (never gains)`, which grade
 the ledger S11 widens, and `gate-leg conformance`, which grades the registry row S6 edits. None of
@@ -407,6 +427,17 @@ none
   process alone and AC1 observes the bytes. Files touched also gains the symbol index, and §4
   names the three paths shared at order 2, all with TOOL-dQuietDisk-5. §7 also drops
   `history-store selftest`, which no path of section 4 trips any longer. No goal moved.
+- rev-6 · 2026-11-22 · §1 · S1 · S5 · S7 · S8 · S9 · S10 · S11 · §3 · §4 · §5 · AC3 · AC7 · AC9 · §7 ·
+  under `2026-11-22-prompt-TOOL-dQuietDisk-7-divergence-task`, the first build pass's probe of
+  rev-5, ruled. (1) Every clone drops its remote, and keep-remote is gone: the line-length gate
+  reaches the policy kit, whose landed revision follows the remote. (2) `build_fixture` gains
+  `--template` alone, and `build_clone` takes no keep option. (3) A cached clone costs three git
+  processes, `git-upload-pack` included, in S5, S8 and AC7. (4) The line-length suite stays on
+  `cp -a`, since a clone per arm costs it git processes it does not spend, so it leaves Files
+  touched, scope and §7. S10 is now the harness suite's own proving arms, AC3 and AC9 are probes
+  those arms re-observe, and section 4 names units 10 to 13 as the consumers. (5) S9's bash face finds
+  python by sourcing `tools/lib/resolve-python.sh`. (6) S1's bash rename is `mv -T`. The goal does
+  not move; §1 drops only the line-length suite as its proof.
 
 ## 10. Reuse audit
 

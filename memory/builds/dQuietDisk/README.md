@@ -90,7 +90,7 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 | [TOOL-dQuietDisk-3 — the brief-recorded leg grades only units whose key moved since its last graded tip](spec/2026-11-20-spec-TOOL-dQuietDisk-3.md) | 2 | 2 | CLOSED | rev-5 | 2026-11-22 |
 | [TOOL-dQuietDisk-4 — routed-commits reads only the commits its store does not already hold](spec/2026-11-20-spec-TOOL-dQuietDisk-4.md) | 2 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-dQuietDisk-5 — one `git diff --name-only BASE` decides every plain-guarded leg of a bar](spec/2026-11-20-spec-TOOL-dQuietDisk-5.md) | 2 | 2 | CLOSED | rev-3 | 2026-11-22 |
-| [TOOL-dQuietDisk-7 — one suite template cache: each base repository built once, keyed by its inputs, and cloned per case](spec/2026-11-20-spec-TOOL-dQuietDisk-7.md) | 2 | 2 | INPROGRESS | rev-5 | 2026-11-22 |
+| [TOOL-dQuietDisk-7 — one suite template cache: each base repository built once, keyed by its inputs, and cloned per case](spec/2026-11-20-spec-TOOL-dQuietDisk-7.md) | 2 | 2 | INPROGRESS | rev-6 | 2026-11-22 |
 | [TOOL-dQuietDisk-8 — the whole-tree readers clone without copying objects and check out only what they read](spec/2026-11-20-spec-TOOL-dQuietDisk-8.md) | 2 | 2 | SPECCED | rev-5 | 2026-11-22 |
 | [TOOL-dQuietDisk-10 — `check-wiring.test.sh` takes its scratch repositories from the template cache](spec/2026-11-20-spec-TOOL-dQuietDisk-10.md) | 3 | 2 | SPECCED | rev-3 | 2026-11-22 |
 | [TOOL-dQuietDisk-12 — `pre-push.test.sh` builds each repeated pushed-main fixture once and copies it per arm](spec/2026-11-20-spec-TOOL-dQuietDisk-12.md) | 3 | 2 | SPECCED | rev-2 | 2026-11-22 |
@@ -107,7 +107,7 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 | [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 7 | 1 | SPECCED | rev-4 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 57 bound to this build, across 3 record folder(s).
+Records: 59 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

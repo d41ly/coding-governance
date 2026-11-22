@@ -64,3 +64,13 @@ You build ONE unit from its spec. The spec is the contract. This brief adds only
 - **Record every deviation.** A change the spec did not state is a deviation record in `build/`, named
   `…-TOOL-dQuietDisk-7-deviation-1.md`. Its values are `report` and `author-recorded`.
 
+
+## Second dispatch (after rev-6) — what changed
+
+- **The first pass probed rev-5 and stopped before any edit** (run `wf_696a0780-a50`). The run ruled on each point in
+  `memory/builds/dQuietDisk/prompts/2026-11-22-prompt-TOOL-dQuietDisk-7-divergence-task.md`, and the spec is now
+  rev-6.
+- **The line-length suite is out of scope.** `tools/check-line-length.test.sh` stays on `cp -a`; the cache is proved
+  by the arms `tools/lib/lib-selftest.test.sh` gains and by section 6's probes.
+- **Every clone drops its remote, and a cached clone costs three git processes.** The first pass's probes, under the
+  scratch root as `p7` and `p7g`, show both.
