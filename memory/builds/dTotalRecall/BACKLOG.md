@@ -29,7 +29,7 @@
 - SEV · TOOL-dTotalRecall-28 · LOW · two builds may each build a record-kind factory or each leave it
 - DEFERRED · TOOL-dTotalRecall-28 · until TOOL-dTotalRecall-1 · TOOL-dTotalRecall-1's build run lands `record-kinds.toml` as the record-kind factory per its §8 F1, so the factory has one home there at the latest (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dTotalRecall-29 · MED · a pruned claim ref lets two clones mint one slug
-- DEFERRED · TOOL-dTotalRecall-29 · until TOOL-dTotalRecall-3 · TOOL-dTotalRecall-3's build run lands the refusal and the queue move in the shared block per its deviations 31 and 32, so the specs agree there at the latest (the spec run carries it forward with the unit it waits on)
+- CLOSED · TOOL-dTotalRecall-29 · by TOOL-dTotalRecall-3 · `tools/lib/gov-ref.sh#remove_gov_ref` refuses any ref under `refs/gov/claims/`, in every carried copy of the block — closed by TOOL-dTotalRecall-3 (`f8b950c13`)
 - SEV · TOOL-dTotalRecall-30 · LOW · a record write that skips the feed passes the census
 - DEFERRED · TOOL-dTotalRecall-30 · until TOOL-dTotalRecall-24 · TOOL-dTotalRecall-24's build run extends `scan_feed_writers` and `check_feed` to record commits, so the two specs agree there at the latest (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dTotalRecall-31 · LOW · the README's relation keys sit outside the edge registry that types them
