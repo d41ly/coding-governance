@@ -170,7 +170,11 @@ that quotes a fact line, a heading-then-fact pair or a marker is handed whole an
 practices block, the `## Card` block and the work-order blocks other than `### inputs`' sub-blocks are no
 handed value and are not fenced. A task section whose walk ends inside a fence refuses at render, naming
 the block and the line the fence opened at, and writes no file. A handoff rendered before this unit
-carries unfenced content, whose lines are read as before; a re-render fences it.
+carries unfenced content, whose lines are read as before; a re-render fences it. But a typed input is authored
+(TOOL-dBoundRoles-45): `input:question` and `input:diff`, `handoff.py`'s `TYPED_INPUTS`, are written unfenced, a
+render is refused naming `input:<name>` and the line when a line of the value would read as a heading, a fact line, a
+marker line or a `Framed by:` line, or when a fence it opens never closes (`roles_lib.check_authored_lines`), and
+the anchor check grades the value whole.
 
 The file is written under the build's `prompts/` folder as
 `<date>-prompt-<id>-<n>-<role without gov->.md`, and its `gov:handoff` marker line carries a hash of

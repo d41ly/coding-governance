@@ -133,7 +133,9 @@ Every value is handed as content (TOOL-dBoundRoles-13): its block opens with a f
 backticks one longer than its longest backtick run and at least three, `roles_lib.render_handed_fence`'s, so a
 fact or marker line the content quotes is content to every reader, each of which walks
 `roles_lib.read_unfenced_lines` (TOOL-dBoundRoles-38); a task section that ends inside a fence refuses,
-naming the block and the line, and writes nothing. The key is
+naming the block and the line, and writes nothing. A typed input, `TYPED_INPUTS`, is authored text and
+is written unfenced: a line of it that reads as a heading, a fact line, a marker line or a `Framed by:`
+line, or a fence it never closes, refuses naming `input:<name>` and the line (TOOL-dBoundRoles-45). The key is
 `roles_lib.derive_fact_key`'s: `record:<path>@<sha12>` for `input:spec`, `input:prompt`, a brief value and the
 `upstream:rows` file, `record:card/<session id>` for a card value (a `--card` inside the repository keys by
 its own path, else `card/<stem>`), `blob:<path>@<blob12>:1-<n>` for `input:code`, and `cmd:<argv12>:<out12>`
@@ -186,6 +188,10 @@ TASK_FIELDS = ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gat
 #: The typed names are the library's `ARGUMENT_INPUTS`, which `derive_fact_class` reads (TOOL-dBoundRoles-13).
 INPUT_NAMES = ("spec",) + lib.ARGUMENT_INPUTS + ("prompt", "code")
 PATH_INPUTS = ("spec", "prompt", "code")
+#: The typed inputs (TOOL-dBoundRoles-45 S1): the names whose value is the caller's argument, derived from the two
+#: constants above and never typed a third time. Each is authored text, written unfenced under the
+#: authored-line rule, `lib.check_authored_lines`.
+TYPED_INPUTS = tuple(n for n in INPUT_NAMES if n not in PATH_INPUTS)
 #: Every role's `code` slot (PLAY-dOrderedCharter-27): derived for each role, never written into its `reads`,
 #: so its key is read as optional and the CLI admits it for any role; its block holds the file's text.
 CODE_INPUT = "code"
@@ -801,9 +807,15 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         v = BLANK_EDGES_RE.sub("", values.get(key, ""))
         if not check_placeholder(v):
             # TOOL-dBoundRoles-13 S3: the fact line, then the content, under the `reads` key's heading; the content
-            # inside a fence no line of it can close, the fact line outside it (TOOL-dBoundRoles-38 S2)
+            # inside a fence no line of it can close, the fact line outside it (TOOL-dBoundRoles-38 S2); a typed
+            # input is authored text, written unfenced and refused where a line would stand as an executor line
+            # or its fence never closes (TOOL-dBoundRoles-45 S1 S2)
             fact = fact_keys.get(key) or fact_keys[key.split(":")[0]]
-            blocks.append("### %s\n\n%s\n\n%s" % (key, lib.render_fact_line(fact, root), lib.render_handed_fence(v)))
+            typed = key.startswith("input:") and key[6:] in TYPED_INPUTS
+            if typed:
+                refusals += lib.check_authored_lines(v, key)
+            blocks.append("### %s\n\n%s\n\n%s" % (key, lib.render_fact_line(fact, root),
+                                                  v if typed else lib.render_handed_fence(v)))
             continue
         src, path = sources[key.split(":")[0]]
         what = ("no %s: %s" % (src, why[src])) if why.get(src) else (

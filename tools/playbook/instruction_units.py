@@ -2082,7 +2082,8 @@ SLOT_CHARTER = ("<!-- gov:playbook -->\n# fixture — agent charter\n\nMUST answ
 #: marker's `item=-` once the renderer wrote it (TOOL-dBoundRoles-17 S3); neither sha moves, the marker
 #: sitting outside the role and task sections both hashes are taken over. The handed case's block carries
 #: its fact line since TOOL-dBoundRoles-13 S3, the typed argument keyed `cmd:` and classed `claimed`, so its
-#: task-sha moved with it, and again once the value sat inside its fence (TOOL-dBoundRoles-38 S2).
+#: task-sha moved with it, again once the value sat inside its fence (TOOL-dBoundRoles-38 S2), and back out of it
+#: once a typed input was written unfenced as authored text (TOOL-dBoundRoles-45 S1).
 ORDER_ROLE = ("---\nname: gov-fixture\ndescription: A fixture role.\nworkflow: fixture\nreads: {}\nrules: {}\n---\n\n"
               "You are the fixture role of {{{{MEMORY_ROOT}}}}.\n")
 ORDER_CHARTER = ("## 1. Governing practices\n\n- [alpha] The first rule.\n- [beta] The second rule.\n\n"
@@ -2095,8 +2096,8 @@ ORDER_HEAD = ("**Serves:** journal PLAY-fixture-1\n\n# gov-fixture handoff — P
 ORDER_CASES = (
     # (case, reads, rules, charter, --input, the bytes it pins)
     ("every slot", "input:question, input:spec?", "alpha", ORDER_CHARTER, ["--input", "question=why"],
-     ORDER_HEAD.replace("TASK", "03e173260766") + "\n### input:question\n\n"
-     "<!-- gov:fact key=cmd:379a5c6efebc:2be23c585f15 class=claimed -->\n\n```\nwhy\n```\n"),
+     ORDER_HEAD.replace("TASK", "cad635aee1d1") + "\n### input:question\n\n"
+     "<!-- gov:fact key=cmd:379a5c6efebc:2be23c585f15 class=claimed -->\n\nwhy\n"),
     ("two slots with nothing to fill", "input:spec?", "", "## §1 — Practices\n\n- A pre-tag rule.\n", [],
      ORDER_HEAD.replace("TASK", "d6544825734a")),
 )
