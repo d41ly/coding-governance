@@ -567,10 +567,21 @@ def write_role(top, kit_rel, slot, workflow, writes, description, reads, never, 
     role = roles / "agents" / ("%s.agent.md" % slot)
     if role.exists():
         raise Refused("%s exists; the factory writes a new role" % role.relative_to(top).as_posix())
+    # TOOL-dBoundRoles-16 §8 F8: the role's `shapes` is the kind of the entry it joins, read before any write,
+    # since it joins that entry and no stage row; an entry with no kind is refused rather than given one
+    try:
+        entry = next((w for w in roles_lib.load_workflows(roles) if w.get("name") == workflow), None)
+    except roles_lib.RolesError as exc:
+        raise Refused("--workflow %r: the workflow table does not read, so no kind gives the role its shapes: %s"
+                      % (workflow, exc))
+    kind = entry.get("kind") if entry is not None else None
+    if not isinstance(kind, str) or not kind:
+        raise Refused("--workflow %r names no workflows.toml entry carrying a kind, so the role's shapes has no "
+                      "value" % workflow)
     table, checker = roles / "workflows.toml", roles / "check_roles.py"
     values = dict(name=slot, description=description, tools=ROLE_TOOLS, model=ROLE_MODEL, workflow=workflow,
                   layer=layer, reads=reads, writes=writes, rules="", mandatory="no", output=output, never=never,
-                  effort=ROLE_EFFORT)
+                  effort=ROLE_EFFORT, shapes=kind)
     values["return"] = template   # `return` is a Python keyword, so the key is set by subscript
     values["acts-as"] = acts_as   # a hyphenated key, so it is set by subscript as `return` is
     body = "You are the %s role of the %s workflow; what it does beyond its front matter is its author's to write.\n" % (
@@ -593,8 +604,11 @@ def write_workflow(top, kit_rel, name, driver, harness, roles_csv, enforced_by, 
     roles = derive_roles_kit(top, kit_rel)
     table, checker, loop = roles / "workflows.toml", roles / "check_roles.py", top / kit_rel / "loop.toml"
     by = json.dumps(enforced_by, ensure_ascii=False)
-    row = "[[workflow]]\nname = %s\ndriver = %s\nharness = %s\nroles = [%s]\nenforced-by = %s\ntrigger = %s\n" % (
-        json.dumps(name), json.dumps(driver), json.dumps(harness), ", ".join(json.dumps(s) for s in slots),
+    # TOOL-dBoundRoles-16 §8 F8: an entry listing a slot owes its shape, written `single` with no checklist and
+    # no orientation, whose `none` merge and `never` twin then apply; one listing none carries none of the three
+    shape = 'kind = "single"\nchecklist = "none"\norientation = "none"\n' if slots else ""
+    row = "[[workflow]]\nname = %s\ndriver = %s\nharness = %s\nroles = [%s]\n%senforced-by = %s\ntrigger = %s\n" % (
+        json.dumps(name), json.dumps(driver), json.dumps(harness), ", ".join(json.dumps(s) for s in slots), shape,
         by if enforced_by.startswith("none — ") else "[%s]" % by, json.dumps(trigger, ensure_ascii=False))
     placed = "[[workflow]]\nname = %s\norder = %d\nstep = %s\n" % (json.dumps(name), order, json.dumps(step))
     names = render_closed_set(read_text_exact(checker), "WORKFLOW_NAMES = (", ")", ", %s" % json.dumps(name))

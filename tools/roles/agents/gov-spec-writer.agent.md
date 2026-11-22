@@ -6,6 +6,7 @@ model: inherit
 workflow: spec-write
 layer: layer.roles
 acts-as: item
+shapes: per-unit
 reads: field.brief.prompt, field.brief.goal, field.brief.items, field.brief.acceptance, field.brief.gates, field.brief.non-goals, field.input.spec?, field.task.reuse?, field.card.route?
 writes: spec
 rules: yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security

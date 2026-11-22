@@ -30,7 +30,8 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       (TOOL-dBoundRoles-2); a `layer` that is no `layer.<seg>` tag or names no `[[layer]]` row of the
       playbook kit's `layers.toml`, joined only where that register resolves and a `roles: note:`
       otherwise; an `acts-as` other than `item` or `cycle`. The summary counts the roles per layer
-      and per `acts-as` value (TOOL-dBoundRoles-1)
+      and per `acts-as` value (TOOL-dBoundRoles-1). A `shapes` value that is no list of distinct
+      kinds of `roles_lib.WORKFLOW_KINDS` (TOOL-dBoundRoles-16 S5)
   R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` or `upstream:rows` without `?`,
       each entry read through `parse_read_key`, so `task:title` and its tag `field.task.title` are one key
   R4  a `rules` entry that is not a lowercase tag optionally ending in `?`, a tag named twice, or a
@@ -47,7 +48,9 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       an unknown `driver`, or a `trigger` carrying a newline; a workflow no `[[workflow]]` row of
       the loop definition places, a loop row naming no workflow here, or a loop definition that
       does not read, one line (TOOL-dDeclaredLoop-1): a workflow's order and step are the loop
-      definition's, so a `stage` or `step` key here is an unknown key
+      definition's, so a `stage` or `step` key here is an unknown key. An entry may omit
+      `stages`, `merge`, `twin`, `of` and `experiment`, and one listing no role `kind`, `checklist`
+      and `orientation` too (TOOL-dBoundRoles-16 S2)
   R7  a role whose `workflow` names no entry, or whose entry does not list it
   R8  a `roles` entry naming no role file; an agent or workflow driver with no role; a role file no
       entry lists
@@ -61,7 +64,21 @@ text on stdin and grades nothing (TOOL-dBoundRoles-14), as `print_tag_rows` says
       stage. The row kinds are what the loop kit's `upstream.py kinds` prints; where it does not
       answer, each entry is graded by the `seg` shape alone and one `roles: note:` says so. With no
       policy kit the cap arm prints one `roles: note:` calling it unarmed and grades no cap. A
-      well-formed harness the tree does not hold prints one `roles: note:`
+      well-formed harness the tree does not hold prints one `roles: note:`. THE SHAPES
+      (TOOL-dBoundRoles-16): a `[[kind]]` row naming no kind of the five, a kind no row names, a
+      row's unknown key, a `fan` or `cap` that is not an integer of at least 1 (on the `experiment`
+      row, present at all), a `merge` outside its four values, a `twin` neither `never` nor a dotted
+      policy key, and a `cap` above the agent limit; an entry's or a row's `kind` naming no row; a
+      `checklist` or `orientation` neither `none` nor a `unit.<seg>` tag, or a tag the playbook
+      kit's `read_units` holds no unit of, a `roles: note:` calling the join unarmed where that kit
+      does not resolve; an entry's `merge` or `twin` as the row's; a `twin` entry whose `of` names
+      no other entry, and `of` on any other; a `[workflow.experiment]` table on a non-experiment
+      entry, or an experiment entry's table missing or breaking one of its rules, as
+      `check_experiment_table` lists them; and one line per role and kind naming every stage whose
+      kind, its row's else its entry's, the role's `shapes` does not declare. A row's `fan` and
+      `cap` are graded after its kind's defaults, and a cap above the limit at the row only where
+      the row sets it, since its kind's row is graded once. The summary counts the entries per kind
+      and the unit tags resolved
   R10 a house overlay naming no role, or carrying a `# `/`## ` line, a token other than
       {{MEMORY_ROOT}}, or the file name of a protocol the charter's Protocols section names
   R11 the README's catalogue region absent, or different from a fresh render
@@ -116,7 +133,9 @@ reason says anything, whether a marker's build matches its folder, an inline sta
 declared, or a declared stand-in that was in fact spawned, which is harmless overstatement. R9 does
 not compare a stage row's `fan` or `cap` with the harness literal it states, nor `cap` with `fan`,
 nor whether a stage truly takes and hands on the row kinds it names, nor a key a row adds beside its
-seven fields.
+seven fields and its `kind`. Nor does it check what a merge or a twin does, which the harnesses own;
+that a listed role of a stage-less entry declares the entry's kind; the value a `twin` key holds; a
+unit's status, so a retired tag still joins; or that an experiment's `cases` file is a case set.
 """
 import json
 import os
@@ -145,7 +164,21 @@ BODY_CEILINGS = {
 }
 WORKFLOW_NAMES = ("orient", "research", "reuse", "handoff", "spec-write", "spec-review", "build",
                   "closing-review", "gate-bar", "bookkeeping", "plan", "design")
-WORKFLOW_KEYS = ("name", "driver", "harness", "roles", "stages", "enforced-by", "trigger")
+WORKFLOW_KEYS = ("name", "driver", "harness", "roles", "stages", "enforced-by", "trigger",
+                 "kind", "checklist", "orientation", "merge", "twin", "of", "experiment")
+#: The entry keys R6 lets every entry omit: its stage rows, the two its kind defaults, and the two only a
+#: `twin` or an `experiment` entry carries (TOOL-dBoundRoles-16 S2).
+OPTIONAL_WORKFLOW_KEYS = ("stages", "merge", "twin", "of", "experiment")
+#: The shape keys an entry listing no role may omit, as `bookkeeping` carries none (TOOL-dBoundRoles-16 S2).
+SHAPE_KEYS = ("kind", "checklist", "orientation")
+#: A `[[kind]]` row's keys, an entry's `merge` values and its `[workflow.experiment]` table's keys (S1, S4).
+KIND_ROW_KEYS = ("kind", "fan", "cap", "merge", "twin")
+MERGES = ("none", "concat", "synth", "defect-map")
+EXPERIMENT_KEYS = ("cases", "variants", "fan", "scorer", "judge", "reruns")
+#: A `checklist` or `orientation` tag's shape, the `unit` namespace's; R9 then joins it to a declared unit.
+UNIT_TAG_RE = re.compile(r"^unit(\.[a-z0-9][a-z0-9-]*)+$")
+#: A `twin` value other than `never`: a dotted policy key, whose value this kit never reads (S2).
+POLICY_KEY_RE = re.compile(r"^[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*)+$")
 DRIVERS = ("agent", "workflow", "program", "main-loop")
 WRITES = ("none", "spec", "product", "review", "records")
 #: The two `acts-as` values (TOOL-dBoundRoles-1 S1): a role acting in an item, or one serving the cycle.
@@ -232,6 +265,109 @@ def read_layer_tags(kit_dir):
     return {r.get("tag") for r in rows if isinstance(r, dict) and isinstance(r.get("tag"), str)}, ""
 
 
+def read_unit_tags(root, kit_dir):
+    """`(tags, "")`, the tag of every instruction unit the playbook kit's `read_units` reads in the
+    repository at `root`, the kit found from `kit_dir` through `resolve_kit_dir` and its reader
+    imported, as `read_cap_answer` reaches the policy kit; `(None, why)` where it does not resolve,
+    import or read, so R9's unit join is a note and never a pass (TOOL-dBoundRoles-16 S6)."""
+    try:
+        kit = str(lib.resolve_kit_dir("playbook", "instruction_units.py", kit_dir))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import instruction_units  # the playbook kit's unit reader, found above
+        return {u.tag for u in instruction_units.read_units(root) if u.tag}, ""
+    except LookupError as e:
+        return None, str(e)
+    except ImportError as e:
+        return None, "the playbook kit's unit reader does not import: %s" % e
+    except ValueError as e:   # its UnitRowError and LevelError, a row or a git read it refuses
+        return None, "the instruction units do not read: %s" % str(e).split("\n", 1)[0]
+
+
+def read_scorer_instances(kit_dir):
+    """`(keys, "")`, the `INSTANCES` keys of the workflows kit's `replay_scorer.py`, found from `kit_dir`
+    through `resolve_kit_dir` and imported (TOOL-dFairHearing-12 S1); `(None, why)` where it does not
+    resolve or import, so an experiment's scorer is a note and never a pass (TOOL-dBoundRoles-16 S4)."""
+    try:
+        kit = str(lib.resolve_kit_dir("workflows", "replay_scorer.py", kit_dir))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import replay_scorer  # the workflows kit's scorer factory, found above
+        return set(replay_scorer.INSTANCES), ""
+    except LookupError as e:
+        return None, str(e)
+    except (ImportError, AttributeError, SyntaxError) as e:
+        return None, "the scorer factory does not import: %s" % e
+
+
+def check_tracked_path(root, path):
+    """True where `path`, repository-relative and forward-slashed, names one file git tracks at `root`."""
+    if not isinstance(path, str) or not path.strip():
+        return False
+    p = subprocess.run(["git", "-C", str(root), "ls-files", "--", path], capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL,
+                       env={k: v for k, v in os.environ.items() if not k.startswith("GIT_")})
+    return p.returncode == 0 and p.stdout.splitlines() == [path]
+
+
+def check_experiment_table(table, limit, root, kit_dir, notes):
+    """What is wrong with an `experiment` entry's `[workflow.experiment]` table (TOOL-dBoundRoles-16 S4),
+    one string per rule it breaks: `cases` a tracked file; `variants` a non-empty list of distinct
+    `seg` words; `fan` an integer from 1 to `limit`, the agent limit, or from 1 where None; exactly one
+    of `scorer`, an `INSTANCES` key of `replay_scorer.py`, and `judge`, a tracked label-key file; and
+    every `reruns` key `<variant>.<level>` of a listed variant and an effort level, its value an integer
+    of at least 1, each variant keyed at least once. A scorer factory that does not resolve appends one
+    line to `notes` instead."""
+    if not isinstance(table, dict):
+        return ["declares no [workflow.experiment] table, which an experiment entry owes"]
+    bad = ["experiment holds the unknown key '%s'" % k for k in table if k not in EXPERIMENT_KEYS]
+    if not check_tracked_path(root, table.get("cases")):
+        bad.append("experiment cases %r names no tracked file" % (table.get("cases"),))
+    variants = table.get("variants")
+    if (not isinstance(variants, list) or not variants or len(set(map(str, variants))) != len(variants)
+            or not all(isinstance(v, str) and ROW_KIND_SEG_RE.match(v) for v in variants)):
+        bad.append("experiment variants %r is not a non-empty list of distinct seg words" % (variants,))
+        variants = [v for v in variants if isinstance(v, str)] if isinstance(variants, list) else []
+    fan = table.get("fan")
+    if not isinstance(fan, int) or isinstance(fan, bool) or fan < 1 or (limit is not None and fan > limit):
+        bad.append("experiment fan %r is not an integer from 1 to %s" % (
+            fan, "runtime.agents-in-flight %d" % limit if limit is not None else "the agent limit"))
+    if "scorer" in table and "judge" in table:
+        bad.append("experiment names both scorer and judge; it names exactly one")
+    elif "scorer" not in table and "judge" not in table:
+        bad.append("experiment names neither scorer nor judge; it names exactly one")
+    elif "scorer" in table:
+        held, why = read_scorer_instances(kit_dir)
+        if held is None:
+            notes.append("roles: note: no scorer factory answers, so an experiment's scorer %r is not joined to "
+                         "an INSTANCES key: %s" % (table["scorer"], why))
+        elif table["scorer"] not in held:
+            bad.append("experiment scorer %r is no INSTANCES key of replay_scorer.py, whose keys are %s"
+                       % (table["scorer"], ", ".join(sorted(held))))
+    elif not check_tracked_path(root, table["judge"]):
+        bad.append("experiment judge %r names no tracked label-key file" % (table["judge"],))
+    reruns = table.get("reruns")
+    if not isinstance(reruns, dict) or not reruns:
+        bad.append("experiment reruns %r is not a table keyed <variant>.<level>" % (reruns,))
+        return bad
+    keyed = set()
+    for key, value in reruns.items():
+        variant, _dot, level = key.rpartition(".")
+        if variant not in variants:
+            bad.append("experiment reruns key %r names the variant %r, which variants does not list" % (key, variant))
+        elif level not in lib.EFFORT_LEVELS:
+            bad.append("experiment reruns key %r names the level %r, not one of %s"
+                       % (key, level, " ".join(lib.EFFORT_LEVELS)))
+        else:
+            keyed.add(variant)
+        if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+            bad.append("experiment reruns %r is %r, not an integer of at least 1" % (key, value))
+    unkeyed = [v for v in variants if v not in keyed]
+    if unkeyed:
+        bad.append("experiment reruns keys no level of the variant(s) %s" % ", ".join(unkeyed))
+    return bad
+
+
 def check_roles(root, kit_dir, write=False):
     """`(defects, notes, summary)`; raises RolesError when the check is unarmed (R0)."""
     root, kit_dir = pathlib.Path(root), pathlib.Path(kit_dir)
@@ -292,6 +428,12 @@ def check_roles(root, kit_dir, write=False):
             by_acts[acts] = by_acts.get(acts, 0) + 1
             if acts not in ACTS_AS:
                 add_defect(p, "R2", "acts-as '%s' is not one of %s" % (acts, " ".join(ACTS_AS)))
+        # TOOL-dBoundRoles-16 S5: the kinds the role runs in, each one of the five, none named twice
+        shapes = lib.parse_role_shapes(keys.get("shapes"))
+        off = [s for s in shapes if s not in lib.WORKFLOW_KINDS]
+        if off or len(set(shapes)) != len(shapes):
+            add_defect(p, "R2", "shapes '%s' is not a list of distinct kinds of %s"
+                       % (keys["shapes"], " ".join(lib.WORKFLOW_KINDS)))
         if keys.get("agent", "true") not in ("true", "false"):
             add_defect(p, "R2", "agent '%s' is not true or false" % keys["agent"])
         if keys.get("agent", "true") == "true":
@@ -396,6 +538,12 @@ def check_roles(root, kit_dir, write=False):
         workflows = []
     if not workflows:
         add_defect(table, "R1", "DEAD PROBE: no workflow entry, so this check graded nothing")
+    kind_rows = {}
+    if workflows:
+        try:
+            kind_rows = lib.load_workflow_kinds(kit_dir)
+        except lib.RolesError as e:
+            defects.append("roles: %s" % e)
     # THE STAGE ROWS' TWO OUTSIDE READS (TOOL-dBoundRoles-22 S4, S5), each once per run: the agent limit a
     # `cap` is graded against, and the loop kit's closed set of row kinds, by its `kinds` verb.
     limit, limit_why = None, None
@@ -424,6 +572,43 @@ def check_roles(root, kit_dir, write=False):
         kinds_why = str(e)
     except (OSError, subprocess.SubprocessError) as e:
         kinds_why = "its upstream.py kinds did not run: %s" % e
+    # THE KINDS (TOOL-dBoundRoles-16 S1, S3): each of the five named by one row, its keys known, its fan and
+    # cap integers of at least 1, the cap at or under the agent limit, and `experiment`'s taken from its
+    # entry's table; a cap a row takes from its kind is bounded here, once, and never again per row.
+    def check_twin_value(at, value):
+        if value != "never" and not (isinstance(value, str) and POLICY_KEY_RE.match(value)):
+            add_defect(table, "R9", "%s twin %r is neither never nor a dotted policy key" % (at, value))
+    for name, row in kind_rows.items():
+        at = "kind row '%s'" % name
+        if name not in lib.WORKFLOW_KINDS:
+            add_defect(table, "R9", "%s names no kind of %s" % (at, " ".join(lib.WORKFLOW_KINDS)))
+        for k in row:
+            if k not in KIND_ROW_KEYS:
+                add_defect(table, "R9", "%s has an unknown key '%s'" % (at, k))
+        for field in ("fan", "cap"):
+            v = row.get(field)
+            if name == "experiment":
+                if field in row:
+                    add_defect(table, "R9", "%s carries %s; an experiment takes both from its entry's table's fan"
+                               % (at, field))
+            elif not isinstance(v, int) or isinstance(v, bool) or v < 1:
+                add_defect(table, "R9", "%s: %s %r is not an integer of at least 1" % (at, field, v))
+        if row.get("merge") not in MERGES:
+            add_defect(table, "R9", "%s merge %r is not one of %s" % (at, row.get("merge"), " ".join(MERGES)))
+        check_twin_value(at, row.get("twin"))
+        cap = row.get("cap")
+        if limit is not None and isinstance(cap, int) and not isinstance(cap, bool) and cap > limit:
+            add_defect(table, "R9", "%s caps %d agents, above runtime.agents-in-flight %d" % (at, cap, limit))
+    for name in lib.WORKFLOW_KINDS:
+        if workflows and name not in kind_rows:
+            add_defect(table, "R9", "no [[kind]] row declares the kind '%s'" % name)
+    unit_tags, unit_why = read_unit_tags(root, kit_dir)
+    if unit_tags is None:
+        notes.append("roles: note: the unit join is unarmed — no playbook kit reads the instruction units, so "
+                     "no checklist or orientation tag is joined to a declared unit: %s" % unit_why)
+    named_units, by_kind = set(), {}
+    stage_kinds = {}   # (slot, kind) -> the stages a role runs in under a kind its `shapes` does not declare
+    table_names = {w.get("name") for w in workflows}
     n_stage_rows, kinds_noted = 0, False
     by_name = {}
     for i, w in enumerate(workflows, 1):
@@ -431,8 +616,9 @@ def check_roles(root, kit_dir, write=False):
         for k in w:
             if k not in WORKFLOW_KEYS:
                 add_defect(table, "R6", "%s has an unknown key '%s'" % (where, k))
+        lists_role = isinstance(w.get("roles"), list) and bool(w["roles"])
         for k in WORKFLOW_KEYS:
-            if k != "stages" and k not in w:
+            if k not in OPTIONAL_WORKFLOW_KEYS and (lists_role or k not in SHAPE_KEYS) and k not in w:
                 add_defect(table, "R6", "%s is missing key '%s'" % (where, k))
         name = w.get("name")
         if name not in WORKFLOW_NAMES:
@@ -457,6 +643,40 @@ def check_roles(root, kit_dir, write=False):
                 add_defect(table, "R8", "%s lists '%s', which names no role file" % (where, slot))
         if w.get("driver") in ("agent", "workflow") and not listed:
             add_defect(table, "R8", "%s is driven by '%s' and names no role" % (where, w["driver"]))
+        # THE SHAPE (TOOL-dBoundRoles-16 S2, S4, S6): the kind a row of the kinds, each unit tag a declared
+        # unit, the merge and twin rule, `of` on a twin entry alone, the experiment table on an experiment's.
+        kind = w.get("kind")
+        if "kind" in w:
+            if not isinstance(kind, str) or kind not in kind_rows:
+                add_defect(table, "R9", "%s kind %r names no [[kind]] row" % (where, kind))
+            else:
+                by_kind[kind] = by_kind.get(kind, 0) + 1
+        for field in ("checklist", "orientation"):
+            tag = w.get(field)
+            if field not in w or tag == "none":
+                continue
+            if not isinstance(tag, str) or not UNIT_TAG_RE.match(tag):
+                add_defect(table, "R9", "%s %s %r is neither none nor a unit.<seg> tag" % (where, field, tag))
+            elif unit_tags is not None and tag not in unit_tags:
+                add_defect(table, "R9", "%s %s '%s' names no declared unit of the instruction units"
+                           % (where, field, tag))
+            elif unit_tags is not None:
+                named_units.add(tag)
+        if "merge" in w and w["merge"] not in MERGES:
+            add_defect(table, "R9", "%s merge %r is not one of %s" % (where, w["merge"], " ".join(MERGES)))
+        if "twin" in w:
+            check_twin_value(where, w["twin"])
+        if kind == "twin":
+            if not isinstance(w.get("of"), str) or w["of"] not in table_names or w["of"] == w.get("name"):
+                add_defect(table, "R9", "%s is a twin entry and its of %r names no other entry"
+                           % (where, w.get("of")))
+        elif "of" in w:
+            add_defect(table, "R9", "%s carries of on a %r entry; only a twin entry runs another twice" % (where, kind))
+        if kind == "experiment":
+            for what in check_experiment_table(w.get("experiment"), limit, root, kit_dir, notes):
+                add_defect(table, "R9", "%s %s" % (where, what))
+        elif "experiment" in w:
+            add_defect(table, "R9", "%s carries a [workflow.experiment] table on a %r entry" % (where, kind))
         if w.get("driver") == "workflow":
             harness = w.get("harness", "")
             if not isinstance(harness, str) or not JS_HARNESS_RE.match(harness):
@@ -476,7 +696,7 @@ def check_roles(root, kit_dir, write=False):
             add_defect(table, "R9", "%s stages is not a non-empty array of [[workflow.stages]] tables" % where)
         else:
             seen_keys = set()
-            for row in stages:
+            for raw, row in zip(stages, lib.derive_stage_rows(w, kind_rows)):
                 n_stage_rows += 1
                 key = row.get("key")
                 stage = "%s stage %s" % (where, key if isinstance(key, str) else repr(key))
@@ -490,6 +710,15 @@ def check_roles(root, kit_dir, write=False):
                     add_defect(table, "R9", "%s maps to %r, which its roles do not list" % (stage, slot))
                 elif slot in roles and roles[slot]["keys"].get("agent", "true") == "false":
                     add_defect(table, "R9", "%s maps to '%s', an agent: false role" % (stage, slot))
+                # TOOL-dBoundRoles-16 S2, S5: the row's kind, its own else its entry's, is a kind its role
+                # declares; a role that declares none is R2's, so it is named once
+                row_kind = row.get("kind")
+                if "kind" in raw and (not isinstance(raw["kind"], str) or raw["kind"] not in kind_rows):
+                    add_defect(table, "R9", "%s: kind %r names no [[kind]] row" % (stage, raw["kind"]))
+                elif (isinstance(row_kind, str) and row_kind in kind_rows and slot in listed and slot in roles
+                      and roles[slot]["keys"].get("shapes")
+                      and row_kind not in lib.parse_role_shapes(roles[slot]["keys"]["shapes"])):
+                    stage_kinds.setdefault((slot, row_kind), []).append("%s.%s" % (w.get("name"), key))
                 for field in ("fan", "cap"):
                     v = row.get(field)
                     if not isinstance(v, int) or isinstance(v, bool) or v < 1:
@@ -511,9 +740,12 @@ def check_roles(root, kit_dir, write=False):
                         add_defect(table, "R9", "%s: %s holds %s, outside the row kinds %s" % (
                             stage, field, ", ".join(repr(x) for x in off),
                             " ".join(kinds) if kinds is not None else "(the seg shape %s)" % ROW_KIND_SEG_RE.pattern))
-                cap = row.get("cap")
+                cap = raw.get("cap")   # a cap the row's kind gives it is bounded at its [[kind]] row
                 if limit is not None and isinstance(cap, int) and not isinstance(cap, bool) and cap > limit:
                     add_defect(table, "R9", "%s caps %d agents, above runtime.agents-in-flight %d" % (stage, cap, limit))
+    for (slot, kind), at in stage_kinds.items():
+        add_defect(roles[slot]["path"], "R9", "shapes '%s' does not declare the kind '%s', which its stage(s) %s "
+                   "run in" % (roles[slot]["keys"]["shapes"], kind, ", ".join(at)))
     for name in WORKFLOW_NAMES:
         if workflows and name not in by_name:
             add_defect(table, "R6", "the workflow '%s' has no entry" % name)
@@ -609,12 +841,15 @@ def check_roles(root, kit_dir, write=False):
     if problem:
         add_defect(readme, "R11", problem)
 
-    summary = ("roles: graded %d roles, %d overlays, %d workflows, %d stage rows against "
+    summary = ("roles: graded %d roles, %d overlays, %d workflows (by kind %s; %s), %d stage rows against "
                "runtime.agents-in-flight %s, %d reads keys, %d mandatory roles, "
                "%d writer outputs, %d never entries (%d unenforced), %d rule tags and %d protocol file "
                "names against %s, a %s charter; roles by layer %s, by acts-as %s; "
                "overlay bytes %s; %d stand-in waiver(s), %d stand-in declaration(s); %d defect(s)" % (
-                   len(files), len(overlays), len(workflows), n_stage_rows,
+                   len(files), len(overlays), len(workflows),
+                   ", ".join("%s=%d" % kv for kv in sorted(by_kind.items())) or "none",
+                   "%d unit tag(s) resolved" % len(named_units) if unit_tags is not None else "units unarmed",
+                   n_stage_rows,
                    limit if limit is not None else limit_why, n_reads, n_mandatory, n_outputs, n_never,
                    n_unenforced, n_rules,
                    len(protocol_files), doc,

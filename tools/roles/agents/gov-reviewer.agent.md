@@ -6,6 +6,7 @@ model: inherit
 workflow: closing-review
 layer: layer.roles
 acts-as: item
+shapes: panel, twin
 reads: field.input.spec?, field.input.diff?, field.brief.goal?, field.brief.non-goals?
 writes: none
 rules: spec?, verify, gate, class, docs, left-shift, security, risk, portable

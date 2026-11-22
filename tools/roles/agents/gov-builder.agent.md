@@ -6,6 +6,7 @@ model: inherit
 workflow: build
 layer: layer.roles
 acts-as: item
+shapes: per-unit
 reads: field.input.spec, field.card.route?, field.brief.non-goals?
 writes: product
 rules: yagni, reuse, core, derive, verify, gate, docs, security, portable, tools

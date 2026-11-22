@@ -6,6 +6,7 @@ model: inherit
 workflow: reuse
 layer: layer.roles
 acts-as: item
+shapes: single, experiment
 reads: field.input.question, field.task.in?, field.card.reuse?
 writes: none
 rules: reuse

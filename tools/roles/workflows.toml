@@ -12,23 +12,83 @@
 #   enforced-by  what refuses a bypass, by description, or the one string "none — <why>"
 #   trigger      one line saying when it runs
 #
+# THE SHAPE (TOOL-dBoundRoles-16), on every entry that lists a role; R6 names an absent one and R9
+# grades each value:
+#
+#   kind         one of the five `[[kind]]` rows below, whose values the entry and its rows default to
+#   checklist    `none`, or the tag of the instruction unit naming the bug-class checklist it runs
+#   orientation  `none`, or the tag of the instruction unit orienting its agents
+#   merge        optional, `none`, `concat`, `synth` or `defect-map`; its kind's where absent
+#   twin         optional, `never` or the policy key whose value decides a second run; its kind's
+#   of           on a `twin` entry only, the entry it runs twice
+#
+# An `experiment` entry carries a `[workflow.experiment]` table, refused on any other: `cases` a
+# tracked file, `variants` a list of distinct words, `fan` from 1 to the agent limit, exactly one of
+# `scorer` (an `INSTANCES` key of the workflows kit's replay_scorer.py) and `judge` (a tracked label-key
+# file), and `reruns` keyed `<variant>.<level>`, each variant at least once.
+#
 # A `workflow` driver, and no other, carries its STAGES as ordered `[[workflow.stages]]` rows after
-# its keys (TOOL-dBoundRoles-22), every row holding all seven fields; R9 grades each:
+# its keys (TOOL-dBoundRoles-22); R9 grades each:
 #
 #   key          the harness's stage key, unique in its entry
-#   role         the slot the stage spawns as, one the entry's `roles` lists
-#   fan          the most agents the stage spawns in one call, an integer of at least 1
-#   cap          the most of them in flight at once, at most `runtime.agents-in-flight`
+#   role         the slot the stage spawns as, one the entry's `roles` lists, whose `shapes` declares
+#                the stage's kind
+#   kind         optional, the stage's kind where it differs from its entry's
+#   fan          the most agents the stage spawns in one call, an integer of at least 1; its kind's
+#                where absent
+#   cap          the most of them in flight at once, at most `runtime.agents-in-flight`; its kind's
 #   effort       the stage's declared level, read after the policy keys and the house file and
 #                before the role's own `effort`
 #   receives     the row kinds the stage takes, from the loop kit's closed set (its upstream.py)
 #   returns      the row kinds the stage hands on, the same set; either list empty where none
+#
+# THE KINDS sit above every `[[workflow]]` entry, keyed `kind`, never `name`, and are read through
+# roles_lib.py's `load_workflow_kinds`; `derive_stage_rows` is the one place a default is applied. No
+# harness reads them yet: `panel`'s 5 is tier2-review's MAX_VERIFIERS, and `per-unit`'s 5 sits at or
+# under SPEC_WRITERS, the render of `runtime.agents-in-flight`. The `experiment` row takes its fan and
+# cap from its entry's table.
+
+[[kind]]
+kind = "single"
+fan = 1
+cap = 1
+merge = "none"
+twin = "never"
+
+[[kind]]
+kind = "per-unit"
+fan = 5
+cap = 5
+merge = "none"
+twin = "never"
+
+[[kind]]
+kind = "panel"
+fan = 5
+cap = 5
+merge = "synth"
+twin = "review.twin"
+
+[[kind]]
+kind = "twin"
+fan = 2
+cap = 2
+merge = "defect-map"
+twin = "never"
+
+[[kind]]
+kind = "experiment"
+merge = "none"
+twin = "never"
 
 [[workflow]]
 name = "orient"
 driver = "main-loop"
 harness = "/session-kickoff"
 roles = ["gov-orienter"]
+kind = "single"
+checklist = "none"
+orientation = "none"
 enforced-by = ["manifest-check.sh --card --append"]
 trigger = "once per session, at kickoff, before the first work-unit is opened"
 
@@ -37,6 +97,9 @@ name = "reuse"
 driver = "agent"
 harness = "none"
 roles = ["gov-reuse-scout"]
+kind = "single"
+checklist = "none"
+orientation = "none"
 enforced-by = "none — the scout's trigger is the kickoff opt-in that aScoutedSeam owns"
 trigger = "before a new behaviour is designed, when kickoff asks for a scout"
 
@@ -45,6 +108,9 @@ name = "spec-write"
 driver = "workflow"
 harness = "{prefix}/workflows/unattended-build.js"
 roles = ["gov-spec-writer", "gov-builder", "gov-reviewer", "gov-skeptic", "gov-synthesizer"]
+kind = "per-unit"
+checklist = "unit.checklist.for-paths"
+orientation = "unit.orient.producer"
 enforced-by = ["scratch-guard.js role arm"]
 trigger = "once per build, after orientation, for every unit whose spec is missing or thin"
 
@@ -78,6 +144,7 @@ returns = ["repair"]
 [[workflow.stages]]
 key = "specFinder"
 role = "gov-reviewer"
+kind = "panel"
 fan = 5
 cap = 5
 effort = "medium"
@@ -87,6 +154,7 @@ returns = ["finding"]
 [[workflow.stages]]
 key = "skeptic"
 role = "gov-skeptic"
+kind = "panel"
 fan = 5
 cap = 5
 effort = "medium"
@@ -96,6 +164,7 @@ returns = ["finding"]
 [[workflow.stages]]
 key = "synthesis"
 role = "gov-synthesizer"
+kind = "panel"
 fan = 1
 cap = 1
 effort = "medium"
@@ -107,6 +176,9 @@ name = "spec-review"
 driver = "workflow"
 harness = "{prefix}/workflows/tier2-review.js"
 roles = ["gov-reviewer", "gov-skeptic", "gov-synthesizer"]
+kind = "panel"
+checklist = "none"
+orientation = "unit.orient.verifier-cold"
 enforced-by = ["agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys"]
 trigger = "after the spec set is written, where the build or its project declares a spec audit"
 
@@ -142,6 +214,9 @@ name = "build"
 driver = "workflow"
 harness = "{prefix}/workflows/unattended-unit.js"
 roles = ["gov-builder"]
+kind = "per-unit"
+checklist = "unit.checklist.for-paths"
+orientation = "unit.orient.producer"
 enforced-by = ["scratch-guard.js role arm", "routed commits name a specced unit"]
 trigger = "once per unit, in stage order, after its spec is READY"
 
@@ -159,6 +234,9 @@ name = "closing-review"
 driver = "workflow"
 harness = "{prefix}/workflows/tier2-review.js"
 roles = ["gov-reviewer", "gov-skeptic", "gov-synthesizer"]
+kind = "panel"
+checklist = "unit.checklist.for-diff"
+orientation = "unit.orient.verifier-cold"
 enforced-by = ["agent-cap.js spawn guard"]
 trigger = "once per build, after the last unit is terminal, over the cumulative diff"
 
@@ -194,6 +272,9 @@ name = "gate-bar"
 driver = "program"
 harness = "bash {prefix}/run-gates/run-gates.sh"
 roles = ["gov-tester"]
+kind = "single"
+checklist = "unit.checklist.for-diff"
+orientation = "unit.orient.verifier-cold"
 enforced-by = ["the pre-push hook"]
 trigger = "once, after the closing review, at the close or the push boundary"
 
@@ -202,6 +283,9 @@ name = "research"
 driver = "agent"
 harness = "none"
 roles = ["gov-researcher"]
+kind = "single"
+checklist = "none"
+orientation = "none"
 enforced-by = ["agent-cap.js spawn guard"]
 trigger = "any time a design must choose between candidates that no existing seam decides"
 
@@ -210,6 +294,9 @@ name = "handoff"
 driver = "program"
 harness = "python {prefix}/roles/handoff.py render"
 roles = ["gov-prompt-writer", "gov-session"]
+kind = "single"
+checklist = "none"
+orientation = "none"
 enforced-by = "none — a session-to-session message is no tool call the spawn guard sees"
 trigger = "any time work passes to another session of this repository"
 
@@ -226,6 +313,9 @@ name = "plan"
 driver = "agent"
 harness = "none"
 roles = ["gov-planner"]
+kind = "single"
+checklist = "unit.checklist.for-paths"
+orientation = "unit.orient.producer"
 enforced-by = ["agent-cap.js spawn guard"]
 trigger = "any time a build's plan is drafted, judged or recorded, before its specs are written"
 
@@ -234,5 +324,8 @@ name = "design"
 driver = "agent"
 harness = "none"
 roles = ["gov-architect"]
+kind = "single"
+checklist = "unit.checklist.for-paths"
+orientation = "unit.orient.producer"
 enforced-by = ["agent-cap.js spawn guard"]
 trigger = "any time a build's scope is inventoried or decomposed into units, before its specs are written"

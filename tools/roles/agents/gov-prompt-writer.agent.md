@@ -6,6 +6,7 @@ model: inherit
 workflow: handoff
 layer: layer.roles
 acts-as: cycle
+shapes: single
 reads: field.input.question, field.brief.goal?, field.card.route?
 writes: none
 rules: small, ids, tokens
