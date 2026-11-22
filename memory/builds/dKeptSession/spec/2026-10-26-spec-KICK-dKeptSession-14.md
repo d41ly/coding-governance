@@ -1,6 +1,6 @@
 # KICK-dKeptSession-14 — what a session does as its window fills, by `context.on-full` and `context.threshold`
 
-**Status:** INPROGRESS · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 12 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 12 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0152@da455c7f whole
 **Carries:** node:policy-key.context.on-full
@@ -24,6 +24,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-14-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-14-build-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-15-orders-11-12-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-15-orders-11-12-reground-brief.md) | research | KICK-dKeptSession-15 |
 | [2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md) | research | KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-30 KICK-dKeptSession-9 |
+| [2026-11-22-prompt-KICK-dKeptSession-14-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-14-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-KICK-dKeptSession-14-divergence-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-14-divergence-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -67,7 +69,11 @@ to go fresh there, by `context.on-full` and `context.threshold`.
   Both rows stand in the landed catalogue, owner dKeptSession, defaults `fresh-at-boundary` and
   `60%` (`tools/policy/catalogue.toml`, rows `context.on-full` and `context.threshold`); this unit
   writes their `summary` and `usage` and drains them from `tools/policy/unsummarised-keys.txt` by
-  `policy.py lists --write`. Observed by AC5, AC8.
+  `policy.py lists --write`. With both fields written, `help/reference/policy.md`, which
+  `tools/playbook/render_playbook.py#render_reference_page` renders from the catalogue and whose `## Not yet
+  summarised` list holds a row lacking either field, is re-rendered in the same commit by `python
+  tools/playbook/render_playbook.py --reference`, never edited by hand, after S9's anchors stand.
+  Observed by AC5, AC8, AC11.
 - **S3** — The boundary act. `run_context_boundary`, inside KICK-dKeptSession-13 S6's `--card
   --boundary` verb, after `derive_item_boundary` reports a crossing and with the payload's
   `transcript_path` passed as `--transcript`: under `fresh-at-boundary`, a fill at or past the
@@ -126,7 +132,16 @@ to go fresh there, by `context.on-full` and `context.threshold`.
   window; `tools/runlog/README.md`'s transcript-extractor block gains the `context` command. The help
   page shows no `runlog.py` command: `runlog.py` has no `[[usage]]` row, and the `docs` leg reds a
   page command naming a tracked entrypoint with none as `UNROWED`
-  (`tools/govkit/docs_leg.py#check_page_command`). Observed by AC9.
+  (`tools/govkit/docs_leg.py#check_page_command`). That paragraph carries the keys' usage anchors,
+  `<!-- usage: policy:context.on-full <fp> -->` and `<!-- usage: policy:context.threshold <fp> -->`,
+  as the page's `card.pointers` paragraph carries that key's, each `<fp>` the key's fingerprint as
+  `python tools/govkit/docs_leg.py --fingerprints` prints it at build time, after S2's fields are
+  written, since the fingerprint hashes the row's fields (`tools/govkit/docs_leg.py#derive_usage_fingerprint`). S2's
+  re-render then shows each key as `Documented on` a link to `help/orientation-card.md`,
+  and the same commit takes the rows `policy:context.on-full` and `policy:context.threshold` off
+  `memory/project/docs-undocumented.txt`, since `read_docs_state` reds a listed row a page anchors as
+  `DRAINED`. The re-render also carries `card.pointers` off the page's `## Not yet summarised` list,
+  the stale row recorded in §4's Evidence. Observed by AC9, AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -175,6 +190,11 @@ to go fresh there, by `context.on-full` and `context.threshold`.
   or not a policy file names a preset; `policy.py get` printed `fresh-at-boundary` and `60%` here at
   `79144f3f`.
 - The harness on this node accepts `additionalContext` in a PreToolUse hook's output (F1).
+- `help/reference/policy.md` is stale at this unit's base: it lists `card.pointers` under `## Not yet
+  summarised` although its catalogue row carries both fields and `help/orientation-card.md` anchors it,
+  since KICK-dKeptSession-69's reconcile merge dropped KICK-dKeptSession-13's re-render (PINNED
+  2026-11-22, builder run `wf_b7427991-64d`). An observation, not a clause: S2's re-render carries it
+  to its `Documented on` section with the two `context.*` keys.
 
 ### The lines
 
@@ -234,7 +254,11 @@ card routing a build.
   `gen_map.py --write`, which the bar's codebase-map leg grades
 - `tools/policy/catalogue.toml`: the two rows' `summary` and `usage`
 - `tools/policy/unsummarised-keys.txt`: drained by `lists --write`
-- `help/orientation-card.md`: S9
+- `help/orientation-card.md`: S9, its paragraph and the two keys' usage anchors
+- `help/reference/policy.md`: S2, re-rendered by `render_playbook.py --reference` once S9's anchors
+  stand, never hand-edited
+- `memory/project/docs-undocumented.txt`: S9, the rows `policy:context.on-full` and
+  `policy:context.threshold` taken off
 
 ### Alternatives rejected
 
@@ -263,7 +287,7 @@ card routing a build.
   the verb finishes, so a session that makes no further call that turn reads it at its next one.
 - testing — S7's plants and S8's case, red and green.
 - migration — none.
-- user docs — `help/orientation-card.md`, S9.
+- user docs — `help/orientation-card.md`, S9; `help/reference/policy.md`, re-rendered by S2.
 
 ## 6. Acceptance criteria
 
@@ -305,10 +329,18 @@ card routing a build.
   `CARD_CONTEXT_BOUND` the plant lowers, the output carries `context — skipped: runlog.py did not
   answer within` and still ends with its `now —` line.
   Red when: a slow parse prints nothing, or holds the replay past its bound.
+- **AC11** — When `python tools/playbook/render_playbook.py --reference --check` runs at the unit's
+  commit it exits 0; `grep -n -A1 'context\.on-full\|context\.threshold' help/reference/policy.md`
+  shows each key's section followed by a line opening with the fixed string `Documented on
+  [help/orientation-card.md]`, and no `- ` row naming it; `grep -cP
+  '^policy:context\.' memory/project/docs-undocumented.txt` prints `0`; and the two keys' rows of
+  `python tools/govkit/docs_leg.py --fingerprints` name `help/orientation-card.md` as their page.
+  Red when: the reference page differs from its render, a key stays unsummarised there, or a
+  `policy:context.*` row stays listed.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `policy fixtures` · `routed-commits selftest` · `runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `policy fixtures` · `routed-commits selftest` · `runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `docs` · `help reference pages`
 
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC3 AC4 AC5 AC6 AC10 · the boundary act and the replay line of the `fill-*` plants of `card-store.fixture.sh` over the stub runlog and policy kits, run by the suite's card-store block, the failing case a crossing past the threshold that prints nothing · `FLOOR_ASSERTIONS`, raised by one per new plant
 
@@ -377,6 +409,13 @@ New arm: tools/runlog/selftest.py · covers AC1 · the fill over the `context-fi
   re-grounded on KICK-dKeptSession-1's presets; the kickoff manifest's re-stamp, both suites'
   floor raises and `symbols.json` added, the version bump left to the lander, and the plant arm
   homed in the suite that runs it.
+- rev-6 · 2026-11-22 · S2 · S9 · §4 · §5 · AC11 · §7 · the builder's divergence resolved under
+  `2026-11-22-prompt-KICK-dKeptSession-14-divergence-brief`: the two keys' usage anchors homed in
+  S9's paragraph of `help/orientation-card.md`, their fingerprints taken at build time; the
+  reference page re-rendered by S2 and the two `policy:context.*` rows of
+  `memory/project/docs-undocumented.txt` drained by S9, both added to Files touched and observed by
+  AC11; the stale `card.pointers` row kept in §4's Evidence as an observation; `docs` and `help reference
+  pages` named.
 
 ## 10. Reuse audit
 
