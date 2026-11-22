@@ -142,6 +142,11 @@ build_template_clone() { # <template repo> <dest> -> a --shared clone carrying t
   git -c core.autocrlf=false clone --shared --quiet --template= ${_tc_p[@]+"${_tc_p[@]}"} "$1" "$2" \
     && git -C "$2" remote remove origin
 }
+read_template_mode() { # <python> <policy.py> -> per-case or shared: tests.fixture-templates, shared unless the reader says per-case
+  local _tc_v
+  if [ -n "${1:-}" ] && [ -f "${2:-}" ] && _tc_v=$("$1" "$2" get tests.fixture-templates 2>/dev/null) \
+     && [ "${_tc_v%$'\r'}" = per-case ]; then echo per-case; else echo shared; fi
+}
 # <<< template_cache_sh
 
 # ---------------------------------------------------------------------------------------------
@@ -171,15 +176,12 @@ build_fixture() {
   SELFTEST_ROOT=$(mktemp -d) || { echo "lib-selftest: cannot create a scratch root" >&2; return 2; }
   SELFTEST_SNAPSHOT="$SELFTEST_ROOT/snapshot"
   if [ "$_st_on" = 1 ] && [ -z "$_st_tmode" ]; then
-    _st_tmode=shared
     . "$_st_lib/resolve-python.sh"
     . "$_st_lib/refuse-wrong-shell.sh"
     refuse_wrong_shell || exit 2
     _st_pk=policy; _st_x=$_st_lib/../$_st_pk/$_st_pk.py
-    if [ -f "$_st_x" ] && _st_r=$(resolve_python 2>/dev/null); then
-      _st_x=$("$_st_r" "$_st_x" get tests.fixture-templates 2>/dev/null) && [ "${_st_x%$'\r'}" = per-case ] \
-        && _st_tmode=per-case
-    fi
+    _st_r=""; [ ! -f "$_st_x" ] || _st_r=$(resolve_python 2>/dev/null) || _st_r=""
+    _st_tmode=$(read_template_mode "$_st_r" "$_st_x")
   fi
   if [ "$_st_on" = 1 ] && [ "$_st_tmode" = shared ]; then
     local -a _st_in=(); local _st_f=$-

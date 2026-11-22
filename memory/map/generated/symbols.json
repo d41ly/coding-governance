@@ -26473,6 +26473,16 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "read_template_mode",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "read_template_mode",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
+    },
+    {
       "id": "read_terminal_set",
       "kind": "function",
       "file": "tools/loop/loop_table.py"

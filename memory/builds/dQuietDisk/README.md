@@ -77,7 +77,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 21 unit(s) · node d · opened 2026-11-20 · streams tooling
+**Build status:** SPECCED · 21 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16
 ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30 TOOL-dQuietDisk-31
 ids TOOL-dQuietDisk-32
@@ -95,7 +95,7 @@ ids TOOL-dQuietDisk-32
 | [TOOL-dQuietDisk-8 — the whole-tree readers clone without copying objects and check out only what they read](spec/2026-11-20-spec-TOOL-dQuietDisk-8.md) | 2 | 2 | CLOSED | rev-5 | 2026-11-22 |
 | [TOOL-dQuietDisk-10 — `check-wiring.test.sh` builds its wired copies from one captured config, with no per-copy git](spec/2026-11-20-spec-TOOL-dQuietDisk-10.md) | 3 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-dQuietDisk-12 — `pre-push.test.sh` builds each repeated pushed-main fixture once and copies it per arm](spec/2026-11-20-spec-TOOL-dQuietDisk-12.md) | 3 | 2 | SPECCED | rev-3 | 2026-11-22 |
-| [TOOL-dQuietDisk-13 — the run-gates suites build each repeated scratch repository once and clone it per arm, where a clone saves](spec/2026-11-20-spec-TOOL-dQuietDisk-13.md) | 3 | 2 | INPROGRESS | rev-4 | 2026-11-22 |
+| [TOOL-dQuietDisk-13 — the run-gates suites build each repeated scratch repository once and clone it per arm, where a clone saves](spec/2026-11-20-spec-TOOL-dQuietDisk-13.md) | 3 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-dQuietDisk-18 — `govkit apply` reads both of its verdict maps through the target's reuse cache](spec/2026-11-20-spec-TOOL-dQuietDisk-18.md) | 3 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-dQuietDisk-28 — the history store's bash face resolves the switch and the git dirs once per calling shell](spec/2026-11-22-spec-TOOL-dQuietDisk-28.md) | 3 | 2 | CLOSED | rev-1 | 2026-11-22 |
 | [TOOL-dQuietDisk-6 — the manifest check's pickaxe diffs only the commits whose stamp moved](spec/2026-11-20-spec-TOOL-dQuietDisk-6.md) | 3 | 2 | WONTDO | rev-5 | 2026-11-22 |
@@ -108,7 +108,7 @@ ids TOOL-dQuietDisk-32
 | [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 7 | 1 | SPECCED | rev-4 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 82 bound to this build, across 3 record folder(s).
+Records: 85 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

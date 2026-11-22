@@ -59,7 +59,7 @@ tools/lib/gov-ref.sh	48	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11
 tools/lib/health-log.sh	35	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/history-store.sh	61	d9c6b61ae11133aabe0688eba33821d925bdd480	widened:2026-11-22-build-TOOL-dQuietDisk-28-widen-8
 tools/lib/kit-rel.sh	18	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/lib/lib-selftest.sh	243	95c5ddd3b324b4693f904e8f223e64121048a6ea	widened:2026-11-22-build-TOOL-dQuietDisk-7-widen-7
+tools/lib/lib-selftest.sh	245	8b97526feb37e849ac2ef31468b208102bb27be9	widened:2026-11-22-build-TOOL-dQuietDisk-13-widen-10
 tools/lib/lib-selftest.test.sh	221	95c5ddd3b324b4693f904e8f223e64121048a6ea	widened:2026-11-22-build-TOOL-dQuietDisk-7-widen-7
 tools/lib/pyrun.sh	7	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/python-floor.sh	24	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
@@ -113,7 +113,7 @@ tools/run-gates/run-gates.gov.test.sh	853	d7c4a67399ed2dbeaad06ad17bf622a1588162
 tools/run-gates/run-gates.runlog.test.sh	994	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/run-gates.sh	3770	393d9289d1a830a650404d4aa93624ac61fb3912	widened:2026-11-22-build-TOOL-dQuietDisk-5-widen-6
 tools/run-gates/run-gates.test.sh	3220	393d9289d1a830a650404d4aa93624ac61fb3912	widened:2026-11-22-build-TOOL-dQuietDisk-5-widen-6
-tools/run-gates/run-gates.turnstile.test.sh	1185	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/run-gates/run-gates.turnstile.test.sh	1206	8b97526feb37e849ac2ef31468b208102bb27be9	widened:2026-11-22-build-TOOL-dQuietDisk-13-widen-10
 tools/run-gates/run-held-wsl.sh	307	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/run-gates/run-selftests.sh	1542	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
 tools/run-gates/run-selftests.test.sh	1003	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-36
@@ -151,4 +151,4 @@ tools/workflows/check-verifier-fanout.test.sh	1443	ea0c6868d78283c542daa710e6678
 tools/workflows/spec-audit-optin.test.sh	474	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/tier2-review.test.sh	3682	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/unattended-build.test.sh	2878	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/lib/template-cache.sh	64	95c5ddd3b324b4693f904e8f223e64121048a6ea	widened:2026-11-22-build-TOOL-dQuietDisk-7-widen-7
+tools/lib/template-cache.sh	69	8b97526feb37e849ac2ef31468b208102bb27be9	widened:2026-11-22-build-TOOL-dQuietDisk-13-widen-10

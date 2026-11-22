@@ -12,6 +12,7 @@
 #   key=$(derive_template_key <builder> <input file>...) || exit 2
 #   t=$(resolve_template "$root" "$key" <builder> [<arg>...]) || exit 2   # <root>/<key>/repo
 #   build_template_clone "$t" <dest> || exit 2           # a --shared clone, no remote
+#   mode=$(read_template_mode <python> <policy.py>)      # tests.fixture-templates: per-case or shared
 #
 # resolve_template says `template: <key8> built` or `template: <key8> reused` once on stderr, and
 # its builder's own output goes there too, so stdout carries the template path alone. Every call
@@ -85,5 +86,10 @@ build_template_clone() { # <template repo> <dest> -> a --shared clone carrying t
   while IFS= read -r _tc_l; do [ -n "$_tc_l" ] && _tc_p+=(-c "$_tc_l"); done < "${1%/*}/config-pins" || return 2
   git -c core.autocrlf=false clone --shared --quiet --template= ${_tc_p[@]+"${_tc_p[@]}"} "$1" "$2" \
     && git -C "$2" remote remove origin
+}
+read_template_mode() { # <python> <policy.py> -> per-case or shared: tests.fixture-templates, shared unless the reader says per-case
+  local _tc_v
+  if [ -n "${1:-}" ] && [ -f "${2:-}" ] && _tc_v=$("$1" "$2" get tests.fixture-templates 2>/dev/null) \
+     && [ "${_tc_v%$'\r'}" = per-case ]; then echo per-case; else echo shared; fi
 }
 # <<< template_cache_sh

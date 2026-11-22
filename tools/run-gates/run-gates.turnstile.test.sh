@@ -296,6 +296,19 @@ export GATE_TURNSTILE_DIR="$tmp/gate-turnstile"
 # THE SLOT COUNT IS THIS SUITE'S OWN TOO (TOOL-aPairedSlots-15): one, whatever the caller exported, so
 # an arm that names no count runs at the kit default and an operator's two-slot shell reds nothing.
 export GATE_TURNSTILE_SLOTS=1
+# THE FIXTURE TEMPLATES (TOOL-dQuietDisk-13). Each builder `mk_repo` names is built once per run
+# under the cache root and every fresh destination gets a `--shared` clone of it. Every input is
+# named under $ROOT, because `git hash-object --stdin-paths` refuses an MSYS `/c/...` path, and the
+# suite file is one so that `_build_mk_repo`'s text moves the docs builder's key too.
+. "$ROOT/$LIB_DIR/template-cache.sh" || { echo "turnstile-test: cannot source the template cache"; exit 2; }
+TS_TEMPLATE_ROOT=$(SELFTEST_ROOT=$tmp resolve_template_root) || exit 2
+TS_TEMPLATE_INPUTS=()
+for _ts_f in "$ROOT/$KIT_REL/run-gates.sh" "$ROOT/$KIT_REL/gate-profiles.txt" "$ROOT/$KIT_REL/gate-fingerprint.sh" \
+             "$ROOT/$LIB_DIR/resolve-python.sh" "$ROOT/$KIT_REL/${0##*/}"; do
+  [ ! -f "$_ts_f" ] || TS_TEMPLATE_INPUTS+=("$_ts_f")
+done
+_ts_pd=$(resolve_kit_dir "$_rkd_py" policy policy.py "$HERE" 2>/dev/null) || _ts_pd=""
+TS_TEMPLATES=$(read_template_mode "$_rkd_py" "${_ts_pd:+$ROOT/$_ts_pd/policy.py}")
 bad=0
 # An EXECUTED assertion count with a floor, carried at birth: a suite that prints a hardcoded total
 # is a suite whose count stops tracking its arms the first time somebody deletes one.
@@ -339,10 +352,23 @@ hdrkey() {
   awk -F'\t' -v k="$k" '$1==k{print $2; exit}' "$d/.git/gate-run/$id/header" 2>/dev/null
 }
 
-# mk_repo <dir> — a scratch repository carrying the runner and its table.
+# mk_repo <dir> [<builder>] — a scratch repository carrying the runner and its table: a `--shared`
+# clone of the builder's template, or the builder itself under `per-case` and onto a destination
+# that already holds a repository, which a clone cannot take.
 mk_repo() {
-  local d=$1
+  local d=$1 b=${2:-_build_mk_repo} v k t
   rm -rf "$GATE_TURNSTILE_DIR"/gate-bar-beacon "$GATE_TURNSTILE_DIR"/gate-bar-beacon.* "$GATE_TURNSTILE_DIR/gate-bar-queue" 2>/dev/null
+  if [ "$TS_TEMPLATES" != shared ] || [ -e "$d/.git" ]; then "$b" "$d"; return; fi
+  v=TS_TEMPLATE$b; t=${!v:-}
+  if [ -z "$t" ]; then
+    k=$(derive_template_key "$b" ${TS_TEMPLATE_INPUTS[@]+"${TS_TEMPLATE_INPUTS[@]}"}) \
+      && t=$(resolve_template "$TS_TEMPLATE_ROOT" "$k" "$b" .) || return 1
+    printf -v "$v" '%s' "$t"
+  fi
+  build_template_clone "$t" "$d" >/dev/null 2>&1
+}
+_build_mk_repo() { # <dir> — the repository mk_repo hands out, built in place
+  local d=$1
   mkdir -p "$d/${PFX}${KIT}" "$d/${PFX}${LIB}" "$d/fx"
   cp "$HERE/run-gates.sh" "$HERE/gate-profiles.txt" "$d/${PFX}${KIT}/" || return 1
   cp "$HERE/gate-fingerprint.sh" "$d/${PFX}${KIT}/" 2>/dev/null || true
@@ -1542,8 +1568,9 @@ done
 # A doc-only bar is one whose GATE_DOCS_BASE resolves, with GATE_FULL unset. Each fixture repository
 # gets a second commit touching a doc path, so `GATE_DOCS_BASE=HEAD~1` names a real base. The non-doc
 # holder below runs at the kit default of one slot, so a doc-only bar that queued would wait behind it.
-build_docs_repo() { # <dir> — mk_repo plus a second commit, so HEAD~1 resolves
-  mk_repo "$1" || return 1
+build_docs_repo() { mk_repo "$1" _build_docs_repo; } # <dir> — its own template, so HEAD~1 resolves
+_build_docs_repo() { # <dir> — _build_mk_repo plus a second commit
+  _build_mk_repo "$1" || return 1
   printf 'doc\n' > "$1/NOTES.md"; ( cd "$1" && git add -A && git commit -qm doc ) >/dev/null 2>&1
 }
 # run_docs_bar <repo> <out> [VAR=value…] — a doc-only bar in the foreground
