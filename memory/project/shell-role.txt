@@ -59,14 +59,14 @@ tools/lib/gov-ref.sh	48	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11
 tools/lib/health-log.sh	35	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/history-store.sh	59	1270e5ae593d414ac6697bb0050218759aa91c69	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-2
 tools/lib/kit-rel.sh	18	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/lib/lib-selftest.sh	126	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/lib/lib-selftest.test.sh	115	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/lib/lib-selftest.sh	243	95c5ddd3b324b4693f904e8f223e64121048a6ea	widened:2026-11-22-build-TOOL-dQuietDisk-7-widen-7
+tools/lib/lib-selftest.test.sh	221	95c5ddd3b324b4693f904e8f223e64121048a6ea	widened:2026-11-22-build-TOOL-dQuietDisk-7-widen-7
 tools/lib/pyrun.sh	7	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/python-floor.sh	24	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/refuse-wrong-shell.sh	119	60ca5ed4d6d66b8c8f0715ee8b1d6d4ee6cab066	widened:2026-11-20-build-TOOL-dWitnessedBar-62-widen-5
 tools/lib/render-doc.sh	205	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/lib/resolve-python.sh	133	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
-tools/lib/resolve-python.test.sh	1559	1270e5ae593d414ac6697bb0050218759aa91c69	widened:2026-11-22-build-TOOL-dQuietDisk-1-widen-2
+tools/lib/resolve-python.test.sh	1560	95c5ddd3b324b4693f904e8f223e64121048a6ea	widened:2026-11-22-build-TOOL-dQuietDisk-7-widen-7
 tools/lib/resolve-remote.sh	33	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/loop/adopt-loop.sh	147	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/memory-recall/adopt-memory-recall.sh	239	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
@@ -151,3 +151,4 @@ tools/workflows/check-verifier-fanout.test.sh	1443	ea0c6868d78283c542daa710e6678
 tools/workflows/spec-audit-optin.test.sh	474	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/tier2-review.test.sh	3682	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
 tools/workflows/unattended-build.test.sh	2878	85a1c45076fd9093f1b9a08a2d720c8146aa1acf	seeded
+tools/lib/template-cache.sh	64	95c5ddd3b324b4693f904e8f223e64121048a6ea	widened:2026-11-22-build-TOOL-dQuietDisk-7-widen-7

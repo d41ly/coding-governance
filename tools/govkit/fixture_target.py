@@ -57,12 +57,9 @@ def build_scratch_gov(g: pathlib.Path) -> pathlib.Path:
     return g
 
 
-def build_target(tmp: pathlib.Path, deploy: str | None, name: str = "target",
-                 files: dict | None = None) -> pathlib.Path:
-    """`tmp/<name>`, a repository holding `README.md`, the `deploy` text at
-    `.governance/deploy.toml` where given, and `files` ({path: text or bytes}), committed once as
-    `base`."""
-    t = build_scratch_gov(tmp / name)
+def write_target_files(t: pathlib.Path, deploy: str | None, files: dict | None) -> None:
+    """`t` made a scratch gov holding `README.md`, the `deploy` text and `files`, nothing committed."""
+    build_scratch_gov(t)
     (t / "README.md").write_text("target\n", encoding="utf-8")
     if deploy is not None:
         gov = t / ".governance"
@@ -71,6 +68,25 @@ def build_target(tmp: pathlib.Path, deploy: str | None, name: str = "target",
     for rel, body in (files or {}).items():
         (t / rel).parent.mkdir(parents=True, exist_ok=True)
         (t / rel).write_bytes(body if isinstance(body, bytes) else body.encode("utf-8"))
+
+
+def build_target(tmp: pathlib.Path, deploy: str | None, name: str = "target",
+                 files: dict | None = None, template=None) -> pathlib.Path:
+    """`tmp/<name>`, a repository holding `README.md`, the `deploy` text at
+    `.governance/deploy.toml` where given, and `files` ({path: text or bytes}), committed once as
+    `base`. Given `template`, a `TemplateCache` (TOOL-dQuietDisk-7 S8) whose switch reads `shared`,
+    the base is built once per cache root, keyed by those inputs and this module's own bytes as the
+    builder's definition, and `tmp/<name>` is its `--shared` clone with no remote: three git
+    processes for a cached call, against the eight of a build."""
+    if template is not None and template.mode == "shared":
+        inputs = {"README.md": "target\n", "deploy": deploy,
+                  "definition": pathlib.Path(__file__).read_bytes()}
+        inputs.update({"files/" + rel: body for rel, body in (files or {}).items()})
+        base = template.resolve_template("fixture_target.build_target", inputs,
+                                         lambda repo: write_target_files(repo, deploy, files))
+        return template.build_clone(base, tmp / name)
+    t = tmp / name
+    write_target_files(t, deploy, files)
     run_git(t, "add", "-A")
     run_git(t, "commit", "-qm", "base")
     return t

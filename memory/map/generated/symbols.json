@@ -668,6 +668,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "TemplateCache",
+      "kind": "class",
+      "file": "tools/lib/template_cache.py"
+    },
+    {
       "id": "Terminal",
       "kind": "class",
       "file": "tools/playbook/instructions_edit.py"
@@ -1886,6 +1891,11 @@
       "id": "arm_reader_coverage",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "arm_reading",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
     },
     {
       "id": "arm_record",
@@ -4556,6 +4566,16 @@
       "id": "build_tempdir",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "build_template_clone",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "build_template_clone",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
     },
     {
       "id": "build_texts_with",
@@ -14546,6 +14566,16 @@
       "id": "derive_temp_path",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_template_key",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "derive_template_key",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
     },
     {
       "id": "derive_template_rel",
@@ -32583,9 +32613,29 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "resolve_template",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "resolve_template",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
+    },
+    {
       "id": "resolve_template_path",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "resolve_template_root",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "resolve_template_root",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
     },
     {
       "id": "resolve_tip",
@@ -34291,6 +34341,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/lib/template_cache.py"
     },
     {
       "id": "run_git",
@@ -43861,6 +43916,11 @@
       "id": "write_table_plant",
       "kind": "function",
       "file": "tools/loop/loop_table.py"
+    },
+    {
+      "id": "write_target_files",
+      "kind": "function",
+      "file": "tools/govkit/fixture_target.py"
     },
     {
       "id": "write_target_plants",

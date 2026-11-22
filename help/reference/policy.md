@@ -299,6 +299,14 @@ Whether a history leg keeps each item's verdict in a store under the git common 
 tests.history-verdicts = "regraded"
 ```
 
+## `tests.fixture-templates`
+<!-- usage: policy:tests.fixture-templates 5d36c962 -->
+Whether a self-test that opts into the template cache builds each base repository once per run, keyed by its builder and its inputs, and gives each case a shared clone of it, or builds and copies a fixture per case as before the cache.
+
+```text
+tests.fixture-templates = "per-case"
+```
+
 ## Not yet summarised (226)
 - `preset`
 - `design.forks`

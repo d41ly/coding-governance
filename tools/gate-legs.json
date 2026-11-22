@@ -3782,7 +3782,9 @@
     ],
     "guard": [
       "{prefix}/lib/lib-selftest.sh",
-      "{prefix}/lib/lib-selftest.test.sh"
+      "{prefix}/lib/lib-selftest.test.sh",
+      "{prefix}/lib/template-cache.sh",
+      "{prefix}/lib/template_cache.py"
     ],
     "chunk": "selftests",
     "subject": "kit",

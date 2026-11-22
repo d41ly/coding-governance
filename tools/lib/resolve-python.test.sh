@@ -444,6 +444,7 @@ gov_feed_sh|$ROOT/$KIT_REL/gov-feed.sh|$KIT_REL/gov-feed
 home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
 history_store_py|$ROOT/$KIT_REL/history_store.py|$KIT_REL/history_store
 history_store_sh|$ROOT/$KIT_REL/history-store.sh|$KIT_REL/history-store
+template_cache_sh|$ROOT/$KIT_REL/template-cache.sh|$KIT_REL/template-cache
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -532,6 +533,8 @@ history_store_sh|$ROOT/$KIT_REL/history-store.sh|$KIT_REL/history-store
 # history_store_py and history_store_sh (TOOL-dQuietDisk-1 S10) are the history verdict store and its
 # `cat-file --batch` reader, and their bash face: the unattended kit's and the memory-tree kit's
 # history_store.py are the module whole, and the unattended kit's lib-unattended.sh carries the face.
+# template_cache_sh (TOOL-dQuietDisk-7 S6) is the suite template cache's bash face, which the shared
+# self-test harness lib-selftest.sh carries inline, so a copy-installed suite can carry it too.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
