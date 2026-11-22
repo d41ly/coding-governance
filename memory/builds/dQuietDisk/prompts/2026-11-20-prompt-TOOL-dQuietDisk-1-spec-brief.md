@@ -107,7 +107,7 @@ It lives under the git common dir, beside the reuse cache. That way every worktr
 it is never a ref.
 
 It comes with one reader: a `git cat-file --batch` coprocess helper in `tools/lib/`, one per leg run, which units 2
-to 4 call instead of a spawn per question. `routed_commits.py:454` and `tools/lexicon/lexicon.py@fbc2677e:4241-4292` already
+to 4 call instead of a spawn per question. `tools/memory-tree/routed_commits.py@7ef53bccab4f:454` and `tools/lexicon/lexicon.py@a4787e4f4051:4241-4292` already
 hold coprocesses. Fold the shape into one helper rather than writing a third, and find whether `tools/lib/` already
 has one.
 
@@ -170,8 +170,8 @@ Each case gets one of two things:
 - a mutating case: a `git clone --shared` (objects not copied), or `git worktree add --detach`;
 - a reading case: a path to one read-only checkout.
 
-Fold in the local templates: `tools/check-wiring.test.sh@8d0af8c9:40-52` `NEWREPO_SEED` and
-`skills/session-kickoff/manifest-check.test.sh@c9fc270e:60-70`. Moving the suites onto the factory is units 10 to 13, not
+Fold in the local templates: `tools/check-wiring.test.sh@214f029f82db:40-52` `NEWREPO_SEED` and
+`skills/session-kickoff/manifest-check.test.sh@3eaf707dd66e:60-70`. Moving the suites onto the factory is units 10 to 13, not
 this one. This unit proves the factory on one small consumer of `lib-selftest.sh` that it already serves.
 
 ### 8 — one tree snapshot per bar (K3) · order 2 · dWitnessedBar, dSafePassage

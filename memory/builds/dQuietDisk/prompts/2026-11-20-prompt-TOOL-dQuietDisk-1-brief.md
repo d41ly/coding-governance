@@ -6,6 +6,8 @@ The prompt arrived as the first message of a session started from another sessio
 owner's instruction. Its bytes are quoted whole below. The report it names is not durable where it lives, so it is
 copied whole into `build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`.
 
+Editorial pins, marked here and nowhere else: each `file:line` citation the quoted text carries is rewritten to its blob-pinned form `path@<blob>:<line>` at the commit the text was written against (gov `608aa364c`, incms `b4850abfb`, nicocares `bb2e6543`), so the citation names the bytes it meant and cannot drift. Nothing else in the quote changed.
+
 ## The prompt
 
 ```text
@@ -33,19 +35,19 @@ READ FIRST: the full report, `C:\Users\d41ly\AppData\Local\Claude-Data\claude_pz
 
 **Fix 1 — history checks cache their answers and batch git (K5 + K6).**
 - `check-pass-order.sh`, `check-brief-recorded.sh` and `routed_commits.py` currently regrade all of history on every commit.
-  - Their cache key includes HEAD: `tools/run-gates/run-gates.sh@db46050c:3370`, `head $RG_HEAD` for legs declaring history.
-  - They launch git once per question: `lib-unattended.sh:1323`, `check-pass-order.sh:475-531, 599-630`, `check-brief-recorded.sh:520-619`, `routed_commits.py:353, 410-413`.
+  - Their cache key includes HEAD: `tools/run-gates/run-gates.sh@a1ea1e57d8fa:3370`, `head $RG_HEAD` for legs declaring history.
+  - They launch git once per question: `tools/unattended/lib-unattended.sh@1c5ed3436d86:1323`, `tools/unattended/check-pass-order.sh@7a0e27e6ea1e:475-531, 599-630`, `tools/unattended/check-brief-recorded.sh@ffb59f089e03:520-619`, `tools/memory-tree/routed_commits.py@7ef53bccab4f:353, 410-413`.
 - Cache each unit/commit verdict under the commit and blob ids it reads, and grade only new units (`rev-list <last-graded>..HEAD`).
-- Use one `git cat-file --batch` coprocess per leg. `routed_commits.py:454` and `lexicon.py:4241-4292` already do this.
-- Run one `git diff --name-only BASE` for all guarded legs instead of one per leg (`run-gates.sh:3249-3295`).
-- Scope the pickaxe in `skills/session-kickoff/manifest-check.sh@b12d3cd4:1971`.
+- Use one `git cat-file --batch` coprocess per leg. `tools/memory-tree/routed_commits.py@7ef53bccab4f:454` and `tools/lexicon/lexicon.py@a4787e4f4051:4241-4292` already do this.
+- Run one `git diff --name-only BASE` for all guarded legs instead of one per leg (`tools/run-gates/run-gates.sh@a1ea1e57d8fa:3249-3295`).
+- Scope the pickaxe in `skills/session-kickoff/manifest-check.sh@0784ef8f1b4b:1971`.
 
 **Fix 2 — fixtures built once per suite (K1 + K2 + K3 + K12).**
 - Generalise `tools/lib/lib-selftest.sh` and `tools/govkit/fixture_target.py` into one template cache, keyed by kit tree hash, under the runner's owned `$WORK`.
 - Each test case gets a `git clone --shared` or a worktree of the template.
 - Arms that only read share one read-only checkout. Arms that mutate get a `--shared` clone.
 - Build ONE shared sparse no-checkout snapshot for:
-  - `foreign-prefix.gov.test.sh:453`, `chain-packet.test.sh:295`, `check_policy.py:1270-1290` / `loop/factories.py`, `govkit/selftest.py:5867`, `matrix.py:976` and `upgrade_walk.py:230`.
+  - `tools/run-gates/foreign-prefix.gov.test.sh@cd32e4001f65:453`, `tools/chain-packet.test.sh@6b7a4d274a6f:295`, `tools/policy/check_policy.py@ddd97c3bb21b:1270-1290` / `loop/factories.py`, `tools/govkit/selftest.py@0862f3954625:5867`, `tools/govkit/matrix.py@8bb81dbe52f9:976` and `tools/govkit/upgrade_walk.py@aea8e1c7386b:230`.
 - Build the `unattended.test.sh` prologue once as a bundle, not once per shard.
 - Put every scratch path under one owned, swept root. Replace `rmtree(ignore_errors=True)` and `ignore_cleanup_errors=True` with a chmod-and-retry handler.
 - Biggest targets: `unattended/unattended.test.sh`, `check-unattended.test.sh`, `govkit/selftest.py`, `.githooks/pre-push.test.sh`, `run-gates*.test.sh`, `check-wiring.test.sh`.
@@ -53,14 +55,14 @@ READ FIRST: the full report, `C:\Users\d41ly\AppData\Local\Claude-Data\claude_pz
 
 **Fix 3 — adopters stop re-running gov's kit selftests; govkit stops redoing work (K4 + K7 + K8).**
 - Add a content-addressed attestation: "kit tree <hash> passed its selftests". Adopter bars (incms `scripts/gov-bar.sh`, nicocares `scripts/nc-bar.sh`) check it and run the selftests only when the vendored kit tree hash is unattested.
-- `govkit update`: pass the existing `blob_at(..., batch=)` handle (`upgrade_steps.py:2628`; callers at `govkit.py:9993, 9244-9245, 9481, 9490`), and run each `adopt-*.sh --check` once (`govkit.py:11169` and `:12507`).
-- `govkit apply`: the before/after maps (`read_gate_verdicts`, `govkit.py:6239`, `:7763`, `:8465`) come from the target's reuse cache, and only legs whose guards intersect the written files are re-run.
+- `govkit update`: pass the existing `blob_at(..., batch=)` handle (`tools/govkit/upgrade_steps.py@89c3c58a02b2:2628`; callers at `tools/govkit/govkit.py@1ac058b76254:9993, 9244-9245, 9481, 9490`), and run each `adopt-*.sh --check` once (`tools/govkit/govkit.py@1ac058b76254:11169` and `:12507`).
+- `govkit apply`: the before/after maps (`read_gate_verdicts`, `tools/govkit/govkit.py@1ac058b76254:6239`, `:7763`, `:8465`) come from the target's reuse cache, and only legs whose guards intersect the written files are re-run.
 
 **Fix 4 — incms and nicocares tests (P1 + P2 + P4 + P5).**
-- nicocares `tests/v3_harness.py:191-264`: seed `v3_seeded` once per session, then copy the template DB per test (`sqlite3` `backup()` or `copyfile`).
-- Set `STORAGE_LOCAL_PATH` to a per-session temp dir in nicocares `tests/conftest.py`, incms `scripts/check-vendor-suite.sh`, `scripts/run-core-venv.sh` and the e2e `run.sh`. The default is repo-relative: `services/api/app/core/config.py:1078`.
-- incms `scripts/gate.sh` gets the owned, swept `TMPDIR` / `--basetemp` block from `run-gates.sh:2333-2358`. It also stops leaking its `mktemp` table files (`:121, :126`).
-- incms `web-build` (`apps/web/build-check.sh:34`) goes through the turbo cache, with no `standalone` output in the gate.
+- nicocares `tests/v3_harness.py@fad7dc0a42a6:191-264`: seed `v3_seeded` once per session, then copy the template DB per test (`sqlite3` `backup()` or `copyfile`).
+- Set `STORAGE_LOCAL_PATH` to a per-session temp dir in nicocares `tests/conftest.py`, incms `scripts/check-vendor-suite.sh`, `scripts/run-core-venv.sh` and the e2e `run.sh`. The default is repo-relative: `services/api/app/core/config.py@4cc111fec6b1:1078`.
+- incms `scripts/gate.sh` gets the owned, swept `TMPDIR` / `--basetemp` block from `tools/run-gates/run-gates.sh@a1ea1e57d8fa:2333-2358`. It also stops leaking its `mktemp` table files (`:121, :126`).
+- incms `web-build` (`apps/web/build-check.sh@a0c8fab37655:34`) goes through the turbo cache, with no `standalone` output in the gate.
 - Fix 4 lands in the nicocares repo (`C:\projects\nicocares\main`, remote d41ly/nc) and in incms (`C:\projects\incms\main`), each under its own governance (`/unattended` there), followed by the incms submodule pin bump.
 - You may start your own side sessions in those folders for it.
 
@@ -170,8 +172,8 @@ pass.
 
 ### Reuse
 - The reuse cache in `tools/run-gates/run-gates.sh` (the `REUSE_CACHE` block, TOOL-aSparedSpawn-13) and the held self-test last-run records (`gate-selftest-last/`) are the stores to extend before adding one. dWitnessedBar's `verdict_flow.py` `select` owns which legs a bar holds, so an attested leg is a selection source there.
-- `tools/lib/lib-selftest.sh` and `tools/govkit/fixture_target.py` are the template seams. `check-wiring.test.sh:40-52` `NEWREPO_SEED` and `manifest-check.test.sh:60-70` are local templates to fold in.
-- `routed_commits.py:454` and `lexicon.py:4241-4292` already hold `cat-file --batch` coprocesses. `upgrade_steps.py:2628` `blob_at(..., batch=)` already takes a handle.
+- `tools/lib/lib-selftest.sh` and `tools/govkit/fixture_target.py` are the template seams. `tools/check-wiring.test.sh@214f029f82db:40-52` `NEWREPO_SEED` and `skills/session-kickoff/manifest-check.test.sh@3eaf707dd66e:60-70` are local templates to fold in.
+- `tools/memory-tree/routed_commits.py@7ef53bccab4f:454` and `tools/lexicon/lexicon.py@a4787e4f4051:4241-4292` already hold `cat-file --batch` coprocesses. `tools/govkit/upgrade_steps.py@89c3c58a02b2:2628` `blob_at(..., batch=)` already takes a handle.
 - TOOL-dUnstuckLanding-17 ("history legs grade the run's own range") is prior art for scoping history legs.
 - `reuse_lookup.py` returned only name-token neighbours for the four behaviours probed (`build_fixture`, `run_fixture_git`, `remove_tree`); each spec's §10 runs its own probe.
 
