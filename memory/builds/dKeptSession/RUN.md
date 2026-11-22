@@ -171,3 +171,6 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-22T05:27:36Z hold · item host-owner-action · reason until owner · reaped f586eb4e · resume none(owner)
 
 2026-11-22T12:58:57Z resume · item dKeptSession · reason held · keepalive 64fde974 · manual
+2026-11-22T13:03:51Z draw · re-dispatch · KICK-dKeptSession-37 · 11/132 · 20261122T130351Z-321a17
+
+2026-11-22T13:03:51Z dispatch · item bfc2a0b0 KICK-dKeptSession-37 · reason skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-37-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
