@@ -185,3 +185,10 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T18:05:03Z draw · re-dispatch · TOOL-dTotalRecall-3 · 20/186 · 20261122T180503Z-607022
 
 2026-11-22T18:05:03Z dispatch · item e1ae60af TOOL-dTotalRecall-3 · reason memory/HYGIENE.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-3-deviation-33.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-3-deviation-34.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-3-deviation-35.md memory/builds/dTotalRecall/README.md
+
+2026-11-22T18:37:24Z brief · item TOOL-dTotalRecall-2 · reason 8c4a0f2bcce1 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-build-brief.md
+
+2026-11-22T18:40:37Z dispatch · item a3d6f917 TOOL-dTotalRecall-2 · reason tools/memory-tree/gov_record.py tools/memory-tree/build_records.py tools/memory-tree/gen_build_index.py tools/loop/placement.py tools/memory-tree/record-kinds.toml tools/memory-tree/HYGIENE.template.md tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/README.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-2.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-2-1-acceptance-ledger.md
+2026-11-22T18:55:45Z draw · re-dispatch · TOOL-dTotalRecall-2 · 21/186 · 20261122T185545Z-8b6541
+
+2026-11-22T18:55:45Z dispatch · item a3d6f917 TOOL-dTotalRecall-2 · reason memory/HYGIENE.md

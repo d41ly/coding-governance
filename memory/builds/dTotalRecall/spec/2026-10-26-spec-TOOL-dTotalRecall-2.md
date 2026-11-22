@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing
 
-**Status:** INPROGRESS · rev-12 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-13 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0213@bfd195a1 whole
 
@@ -19,6 +19,7 @@
 | [2026-11-02-build-TOOL-dTotalRecall-2-deviation-24.md](../build/2026-11-02-build-TOOL-dTotalRecall-2-deviation-24.md) | deviation | — |
 | [2026-11-03-build-TOOL-dTotalRecall-2-deviation-25.md](../build/2026-11-03-build-TOOL-dTotalRecall-2-deviation-25.md) | deviation | — |
 | [2026-11-03-build-TOOL-dTotalRecall-2-owner-fork-returns.md](../build/2026-11-03-build-TOOL-dTotalRecall-2-owner-fork-returns.md) | research | TOOL-dTotalRecall-1 |
+| [2026-11-22-build-TOOL-dTotalRecall-2-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-2-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-2-fold-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-2-fold-return.md) | research | — |
 | [2026-11-22-build-TOOL-dTotalRecall-2-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-2-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
@@ -35,6 +36,8 @@
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-carries-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-fold-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-fold-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-fold-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-fold-spec-writer.md) | log | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-2-mark-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-mark-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-2-mark-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-mark-spec-writer.md) | log | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-2-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-2-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -418,7 +421,7 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC3 AC
   (a) the owner's 2026-11-03 pick, a seventh `mine`/foreign field, which nothing prints or asks for;
   (b) split `read_build_lease`'s body into `read_lease_class`, answering `free`, `mine` or the fact;
   (c) `read_build_lease` as is, refusing a lease holder over another's claim; (d) a second copy.
-  RESOLVED (agent, 2026-11-22, delegated by `2026-11-22-prompt-TOOL-dTotalRecall-2-fold-brief`): (b),
+  RESOLVED (agent, 2026-11-22, delegated): (b), per `2026-11-22-prompt-TOOL-dTotalRecall-2-fold-brief`,
   the landed comparison kept one with no new field and no ask, meeting the need (a) served.
   widens: none · relaxes: none
 - **F7 — Does the door write a kind whose writer is a factory door?** At HEAD six rows name
@@ -483,6 +486,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC3 AC
   AC6 · §7 · §8 F6 · per `2026-11-22-prompt-TOOL-dTotalRecall-2-fold-brief`: F6 re-decided to (b), so no
   seventh field and no ask; the claim's `session` read from its cache ref; a remote-less `local`
   answer, per TOOL-dTotalRecall-3 as built, mints an ask by `derive_ask_seq` instead of refusing.
+- rev-13 · 2026-11-22 · §8 F6 · per `2026-11-22-prompt-TOOL-dTotalRecall-2-mark-brief`: F6's mark
+  rewritten to the canonical `RESOLVED (agent, 2026-11-22, delegated)`, the fold brief cited after it;
+  the other F-items' marks already conform. No decision moved.
 
 ## 10. Reuse audit
 
