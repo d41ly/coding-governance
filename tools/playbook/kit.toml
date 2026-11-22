@@ -24,6 +24,8 @@ requires = ["playbook", "memory-tree", "policy"]
 optional = [
   { part = "gov_tag.py", point = "point.instruction.name-check", fallback = "the shape check stands alone" },
   { part = "render_playbook.py", point = "point.runtime.install-target", fallback = "--reference refuses naming the absent docs leg; the reference pages are gov's own" },
+  { part = "instruction_units.py", point = "point.memory.record-home", fallback = "its fixture writes a scratch deployer registry of its own; no installed deployer kit is read" },
+  { part = "writing_practice.py", point = "point.memory.record-home", fallback = "its fixture writes a scratch deployer registry of its own; no installed deployer kit is read" },
 ]
 
 [[files]]
