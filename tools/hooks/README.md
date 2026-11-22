@@ -310,6 +310,11 @@ re-cut. `extractHandoffMarker`, which the format guard's `readHandoffVia` also c
 way. A file whose `## Task` section ends inside a fence would hide every later fact line, so it is
 refused, naming the line of the file the fence opened at. A handoff rendered before the fence carries
 unfenced content, read as before.
+A typed input's block is authored text (TOOL-dBoundRoles-46): in a `### input:<name>` block whose name
+is in `TYPED_INPUTS`, `question` and `diff`, `handoff.py`'s `INPUT_NAMES` less its `PATH_INPUTS`, a
+fact, marker or `Framed by:` line after the block's own fact line, fenced or not, or a fence the block
+leaves open, denies the spawn, naming the block and the line of the file; the section is split into
+blocks at each line beginning `### `.
 Then the card check (TOOL-dBoundRoles-3 S5): a marker whose `item=` is a tag, a work order cut for one
 item, is admitted only when the payload session's orientation card routes the marker's `unit=`. The card
 is read through scratch-guard's `readCard`, its path the kickoff checker's `--card --path --session <sid>`

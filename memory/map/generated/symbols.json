@@ -5208,6 +5208,11 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "checkTypedBlocks",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkUnarmed",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"

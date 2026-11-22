@@ -29,7 +29,9 @@
  * section of the file the marker's `path` names under `builds/<build>/prompts/`, that file holding the
  * same single marker and a section whose SHA-256 prefix is the marker's `task-sha` and whose walk ends
  * outside every fence (TOOL-dBoundRoles-38 S5: a marker or fact line inside a fence is handed content,
- * counted and re-cut by no step, every line read through the sibling's `readUnfencedLines`), the marker's
+ * counted and re-cut by no step, every line read through the sibling's `readUnfencedLines`), no typed
+ * input's `### input:<name>` block holding a fact, marker or `Framed by:` line, fenced or not, or leaving a
+ * fence open (TOOL-dBoundRoles-46 S2: a typed value is authored text, `TYPED_INPUTS`), the marker's
  * `role-sha` the one the index holds for that role, the hash of the role text its agent type was
  * rendered from (TOOL-dBoundRoles-6 S6: an index holding none refuses naming the index's re-render, a
  * differing one naming both values and the handoff's re-render), every `gov:fact` line of the section
@@ -704,6 +706,44 @@ function buildTaskDigest(section) {
 // `derive_fact_class` gave it, written atop each `reads` block of the `## Task` section.
 const FACT_RE = /^<!-- gov:fact key=(?<key>\S+) class=(?<class>witnessed|decided|claimed) -->$/
 const FACT_SOURCE_RE = /^(?<form>blob|record):(?<ref>.+)@(?<sha>[0-9a-f]{12})(?::[0-9]+-[0-9]+)?$/
+// TOOL-dBoundRoles-46 S1 - the typed inputs: `handoff.py`'s `INPUT_NAMES` less its `PATH_INPUTS`, which this
+// set equals, spelled again since a kit imports no sibling kit. A typed value is authored text, not handed
+// content, so its block is held at the spawn to the line rule the renderer applies (`checkTypedBlocks`).
+const TYPED_INPUTS = ['question', 'diff']
+
+// TOOL-dBoundRoles-46 S2 - a typed block held to the authored-line rule. The section is split into blocks at
+// each line beginning `### `, fenced or not: a heading is a boundary and is not graded, and a forged one
+// opens a block the other steps read. In a `### input:<name>` block whose <name> is in TYPED_INPUTS, every
+// line after the block's own fact line (its first non-blank line, when that is a `FACT_RE` line) is read,
+// inside a fence or out: a `FACT_RE` line, a `HANDOFF_MARK_RE` line or a `Framed by:` line refuses, and so
+// does a block whose own walk by the sibling's `readUnfencedLines` ends on its open-fence yield. `lead` is
+// the count of the file's lines before the section, so each refusal names the line of the file. null to
+// admit, else the refusal naming the block and the line.
+function checkTypedBlocks(section, lead) {
+  const sg = require(require('path').join(__dirname, 'scratch-guard.js'))
+  const lines = String(section).split('\n')
+  const remedy = 'a typed input\'s block is authored text, so it may hold no fact, marker or `Framed by:` line and must close every fence it opens; correct the value and re-render with handoff.py render.'
+  for (let i = 0; i < lines.length; i++) {
+    const h = /^### input:(\S+)[ \t\r]*$/.exec(lines[i])
+    if (!h || !TYPED_INPUTS.includes(h[1])) continue
+    let end = i + 1
+    while (end < lines.length && !lines[end].startsWith('### ')) end++
+    const body = lines.slice(i + 1, end).map((l) => l.replace(/\r/g, ''))
+    let k = 0
+    while (k < body.length && body[k].trim() === '') k++
+    k = k < body.length && FACT_RE.test(body[k]) ? k + 1 : 0
+    for (let j = k; j < body.length; j++) {
+      if (FACT_RE.test(body[j]) || HANDOFF_MARK_RE.test(body[j]) || /^Framed by:/.test(body[j])) {
+        return `input:${h[1]}: line ${lead + i + 2 + j} of the file reads ${JSON.stringify(body[j].slice(0, 120))}, an executor line inside a typed block; ${remedy}`
+      }
+    }
+    for (const [n, line] of sg.readUnfencedLines(body.join('\n'))) {
+      if (line === null) return `input:${h[1]}: the block leaves a fence opened at line ${lead + i + 1 + n} of the file unclosed; ${remedy}`
+    }
+    i = end - 1
+  }
+  return null
+}
 
 // The first twelve hex digits of the git blob id of `buf` with CRLF folded to LF: the roles kit's
 // `derive_fact_key` over the same bytes, so a fact keys one way on every checkout.
@@ -835,6 +875,11 @@ function checkHandoffSpawn(data, index, root) {
     const fileLine = text.replace(/\r\n/g, '\n').slice(0, at).split('\n').length + open - 1
     return renderHandoffDeny('Agent', `${m.path}'s \`## Task\` section ends inside a fence opened at line ${fileLine} of the file, so every fact line after it would be read as content; close it in the value that opened it and re-render with handoff.py render.`, index)
   }
+  // TOOL-dBoundRoles-46 S2 - each typed input's block held to the authored-line rule, after the section's own
+  // fence walk and before the role text and the fact re-cut, so a forged fact line is named here first.
+  const lead = text.replace(/\r\n/g, '\n').slice(0, text.replace(/\r\n/g, '\n').length - section.length).split('\n').length - 1
+  const typed = checkTypedBlocks(section, lead)
+  if (typed) return renderHandoffDeny('Agent', `${m.path}'s ${typed}`, index)
   // TOOL-dBoundRoles-6 S6 - the role text: the marker's role-sha against the one the index carries for
   // the type, the hash of the `## Role` section the renderer composes, so a handoff rendered from role
   // text the agent type was not rendered from is refused. After the digest, before the description.
@@ -1228,6 +1273,8 @@ module.exports = {
   resolveKitDir, extractHandoffMarker,
   // TOOL-aNimbleMend-8 S4: scratch-guard.js finds the policy kit's mirror reader for the red-fix lane's key.
   resolvePolicyHelper,
+  // TOOL-dBoundRoles-46 S1: the typed inputs, read by the agent-cap suite against handoff.py's split.
+  TYPED_INPUTS,
 }
 if (require.main === module) main()
 
