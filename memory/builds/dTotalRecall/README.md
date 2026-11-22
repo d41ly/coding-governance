@@ -86,7 +86,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 91 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 91 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14
 ids TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27 TOOL-dTotalRecall-28
 ids TOOL-dTotalRecall-29 TOOL-dTotalRecall-30 TOOL-dTotalRecall-31 TOOL-dTotalRecall-32 TOOL-dTotalRecall-33 TOOL-dTotalRecall-34 TOOL-dTotalRecall-35 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42
@@ -124,7 +124,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-11 — the shape-run kind, the parsed view of the review-shape line](spec/2026-10-26-spec-TOOL-dTotalRecall-11.md) | 14 | 2 | CLOSED | rev-7 | 2026-11-22 |
 | [TOOL-dTotalRecall-41 — the ask door refuses a line break or row separator in any value and grades the row it would write, read back](spec/2026-10-26-spec-TOOL-dTotalRecall-41.md) | 14 | 2 | CLOSED | rev-4 | 2026-11-22 |
 | [TOOL-dTotalRecall-10 — derived anchors suffixed for a repeated heading](spec/2026-10-26-spec-TOOL-dTotalRecall-10.md) | 15 | 2 | CLOSED | rev-3 | 2026-11-23 |
-| [TOOL-dTotalRecall-42 — the shape-run home is its id-rule's glob, a typed kind's unarmed reason sits on its row, and a record is graded only by the row its Serves kind names](spec/2026-10-26-spec-TOOL-dTotalRecall-42.md) | 15 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dTotalRecall-42 — the shape-run home is its id-rule's glob, a typed kind's unarmed reason sits on its row, and a record is graded only by the row its Serves kind names](spec/2026-10-26-spec-TOOL-dTotalRecall-42.md) | 15 | 2 | INPROGRESS | rev-4 | 2026-11-22 |
 | [TOOL-dTotalRecall-19 — every record names its cause: the door's header and edge lines, the causes and orphan checks over a legacy population](spec/2026-10-26-spec-TOOL-dTotalRecall-19.md) | 16 | 2 | DEFERRED | rev-9 | 2026-11-22 |
 | [TOOL-dTotalRecall-21 — memory-recall's FTS5 tables moved into the one index file, keyed by path and blob](spec/2026-10-26-spec-TOOL-dTotalRecall-21.md) | 17 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-36 — every code writer of a record writes its `Caused-by` line, so the causes check stays green on the records written after its seed](spec/2026-10-26-spec-TOOL-dTotalRecall-36.md) | 17 | 2 | DEFERRED | rev-4 | 2026-11-22 |
@@ -139,7 +139,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-61 — unit 53 keeps the build-folder rows of its two file-keyed constants through its own pass, so no keep it needs lands after it](spec/2026-10-26-spec-TOOL-dTotalRecall-61.md) | 19 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-24 — every landed commit that touches a record appended to the change feed](spec/2026-10-26-spec-TOOL-dTotalRecall-24.md) | 20 | 2 | DEFERRED | rev-2 | 2026-11-23 |
 | [TOOL-dTotalRecall-67 — unit 61's amendments to units 55, 56 and 57 are read by their own text at step 20, and any it left unwritten is written before those units build](spec/2026-10-26-spec-TOOL-dTotalRecall-67.md) | 20 | 2 | DEFERRED | rev-3 | 2026-11-22 |
-| [TOOL-dTotalRecall-20 — this build's own upgrade steps: the journal alias, the scaffold verbs forwarded to record, the front matter graded, and the retag](spec/2026-10-26-spec-TOOL-dTotalRecall-20.md) | 21 | 2 | DEFERRED | rev-4 | 2026-11-05 |
+| [TOOL-dTotalRecall-20 — this build's own upgrade steps: the journal alias, the scaffold verbs forwarded to record, the front matter graded, and the retag](spec/2026-10-26-spec-TOOL-dTotalRecall-20.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-23 |
 | [TOOL-dTotalRecall-71 — unit 57's edge to unit 56 is certified at step 21 by a probe proven live on a copy without it, and unit 67's false reading is recorded](spec/2026-10-26-spec-TOOL-dTotalRecall-71.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-23 |
 | [TOOL-dTotalRecall-72 — unit 57's edge to unit 56 is read at step 21 by a probe no shell quotes, and written with its mirror before unit 57 builds if absent](spec/2026-10-26-spec-TOOL-dTotalRecall-72.md) | 21 | 2 | DEFERRED | rev-3 | 2026-11-23 |
 | [TOOL-dTotalRecall-17 — the map's losing test: the coherence and reuse lenses replayed with the map and without, before any map code is built](spec/2026-10-26-spec-TOOL-dTotalRecall-17.md) | 22 | 2 | DEFERRED | rev-2 | 2026-10-26 |
@@ -192,7 +192,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 529 bound to this build, across 4 record folder(s).
+Records: 531 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -298,12 +298,12 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 |---|---|
 | run state | `RUN.md` |
 | the units | the units table above |
-| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-brief.md` and 221 more under prompts/ |
+| briefs | `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-spec-writer.md`, `2026-11-22-prompt-TOOL-dTotalRecall-9-reground-brief.md` and 222 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
 | deviation | `2026-11-22-build-TOOL-dTotalRecall-8-deviation-83.md`, `2026-11-22-build-TOOL-dTotalRecall-6-deviation-63.md` and 136 more under build/ |
 | red-fix | `2026-11-22-build-TOOL-dTotalRecall-6-red-fix-13.md`, `2026-11-22-build-TOOL-dTotalRecall-5-red-fix-9.md` and 12 more under build/ |
 | widen | `2026-11-22-build-TOOL-dTotalRecall-8-widen-1.md`, `2026-11-22-build-TOOL-dTotalRecall-7-widen-4.md` and 2 more under build/ |
-| research | `2026-11-22-build-TOOL-dTotalRecall-9-reground-return.md`, `2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md` and 93 more under build/ |
+| research | `2026-11-22-build-TOOL-dTotalRecall-9-reground-return.md`, `2026-11-22-build-TOOL-dTotalRecall-8-retire-return.md` and 94 more under build/ |
 | logs | `2026-11-22-build-TOOL-dTotalRecall-7-2-builder-return.md`, `2026-11-22-build-TOOL-dTotalRecall-7-2-acceptance-ledger.md` and 44 more under build/ |
 | open asks | `BACKLOG.md`, 10 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
