@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader
 
-**Status:** DEFERRED · rev-7 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-8 · 2026-11-22 · node d · Tier-2 · base 8b8b1374 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0216@f8936b35 whole
 **Carries:** node:policy-key.builds.slug-words
@@ -173,6 +173,7 @@ hyphenated date ten (`research-memory-builds.md:92`), and the one setting that e
 - **hands-off** `TOOL-dTotalRecall-46` — `tree_lib.build_id_token_re` with its slug class bound from the grammar, on which that unit rebuilds `parse_id_parts` (the round-1 audit of units 36 to 43, id 22)
 - **hands-off** `TOOL-dTotalRecall-54` — `id_grammar.py` with `grammar_for`, and `tree_lib.build_id_token_re` with its slug class bound from the grammar, on which that unit lands `parse_id_parts` in step 8 (the round-1 audit of units 44 to 53, id 1)
 - **hands-off** `TOOL-dTotalRecall-66` — `BUILD_SLUG_RE`, which that unit's `--backfill --build` validation reads (the round-1 audit of units 54 to 60, id 45)
+- **hands-off** `TOOL-dTotalRecall-45` — branch-reconcile's `resolve_kit_dir` copy and `slug_legacy_py` block (S8), the grammar-bound id matches of `ID_RE`, `cmd_new_spec` and `row_grammar.py#id_pattern`, and the flipped clone of §4 "The flips", on which that unit's four readers and their criteria run at step 9
 
 ## 4. Design
 
@@ -588,6 +589,10 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC9 · its `--se
   promised only in its edges to units 46 and 54; AC12 observes it; F9 and F10 settle its root and the
   literal; the `consumes-from TOOL-dTotalRecall-8` bullet, which took nothing, is deleted, S1 already
   stating the read. No other criterion moved.
+- rev-8 · 2026-11-22 · §3 Edges · per `2026-11-22-prompt-TOOL-dTotalRecall-45-reground-brief`: the
+  Edges block gains the hands-off mirror of TOOL-dTotalRecall-45, whose re-ground consumes
+  branch-reconcile's route to `id_grammar`, the grammar-bound id matches and the flipped clone;
+  nothing else moved.
 
 ## 10. Reuse audit
 

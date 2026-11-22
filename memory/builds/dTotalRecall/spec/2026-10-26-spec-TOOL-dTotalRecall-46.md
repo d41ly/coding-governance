@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-46 — `parse_id_parts` reads the named groups of `tree_lib.build_id_token_re`, and a correction suffix parses
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 9 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base c2143acf · streams tooling · order 9 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,9 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-46-deviation-461.md](../build/2026-10-26-build-TOOL-dTotalRecall-46-deviation-461.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-46-deviation-462.md](../build/2026-10-26-build-TOOL-dTotalRecall-46-deviation-462.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-46-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-46-reground-return.md) | research | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-46-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-46-reground-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-46-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-46-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 |
 
 <!-- /gen:spec-records -->
@@ -20,19 +23,21 @@
 The round-1 spec audit of units 36 to 43
 (`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md`)
 confirmed finding **id 22 at HIGH**, its item **H3**, alone in that item. `TOOL-dTotalRecall-38` S1
-builds `parse_id_parts` by reading `m.group("family")`, `m.group("slug")` and `m.group("seq")` from
-`grammar_for(root).ID_RE`. That regex is built from unnamed alternations (`tools/memory-recall/extract.py:163-169`),
-and `TOOL-dTotalRecall-5` S4 names none, so every call raises `IndexError: no such group`. Its
-`int(seq)` also raises on a correction id such as `TOOL-aDrainedSluice-9b`, which the session era
-admits (`extract.py:165`). The named groups already exist: `build_id_token_re` (`tools/memory-tree/tree_lib.py:428-432`)
-carries `fam`, `slug`, `seq` and `rev`, and unit 5 re-points its slug class to the grammar. This unit
-rebuilds the parser on that regex. It repairs `TOOL-dTotalRecall-38`.
+at base `462d20f3` built `parse_id_parts` by reading `m.group("family")`, `m.group("slug")` and
+`m.group("seq")` from `grammar_for(root).ID_RE`. That regex is built from unnamed alternations
+(`tools/memory-tree/id_grammar.py#build_grammar` over `tools/memory-tree/id_grammar.py#_eras`, where
+PLAY-dOrderedCharter-18 moved them out of `extract.py`), and `TOOL-dTotalRecall-5` S4 names none, so
+every call raises `IndexError: no such group`. Its `int(seq)` also raises on a correction id such as
+`TOOL-aDrainedSluice-9b`, which the session era's `[a-z]*` tail admits (`#_eras`). The named groups
+already exist: `tools/memory-tree/tree_lib.py#build_id_token_re` carries `fam`, `slug`, `seq` and
+`rev`, and unit 5 S13 binds its slug class to the grammar at step 7. This unit rebuilds the parser on
+that regex. It repairs `TOOL-dTotalRecall-38`.
 
 ## 2. Scope (IN)
 
 - **S1** — `parse_id_parts(ident, root)` in `tools/memory-tree/id_grammar.py` matches `ident` whole with
   `tree_lib.build_id_token_re(alt)`, `alt` being the family alternation `tree_lib._id_alternation` builds
-  from the root's conf, as `gen_build_index.py:580` builds it. It returns `(family, slug, seq)` from the
+  from the root's conf, as `tools/memory-tree/gen_build_index.py#read_spec_revs` builds it. It returns `(family, slug, seq)` from the
   groups `fam`, `slug` and `seq`, `seq` an integer. `ID_RE` is not read, and the shared era
   alternation gains no group. Observed by AC1.
 - **S2** — A correction suffix parses. Before the match the parser strips one trailing run of
@@ -80,16 +85,19 @@ def parse_id_parts(ident: str, root) -> tuple:
     return m.group("fam"), m.group("slug"), int(m.group("seq"))
 ```
 
-`read_root_conf` stands for the conf read `grammar_for(root)` already makes, `tree_lib.parse_conf`
-(`tools/memory-tree/tree_lib.py:135`) over the root's `.memory-tree.conf`; the pass reuses that read
-and mints no reader of its own. A pinned token `X-y-1@rev-2` is refused, because an id reader
+`read_root_conf` names no function at HEAD (`git grep -nw read_root_conf -- tools` prints nothing).
+It stands for the conf read `grammar_for(root)` already makes, `tools/memory-tree/id_grammar.py#load_conf`
+over the root's `.memory-tree.conf`, called from `tools/memory-tree/id_grammar.py#resolve`; its dict
+carries the `FAMILIES` key `_id_alternation` reads, and the pass mints no reader of its own.
+`TOOL-dTotalRecall-64` replaces this block before this pass (§8 F2). A pinned token `X-y-1@rev-2` is refused, because an id reader
 receives an id and a pin is `read_id_pins`' to read.
 
 ### Inventory
 
-Minted: `SUFFIX_RE` in `tools/memory-tree/id_grammar.py`. Naming cell: none; the lexicon declares
-`py.function`, `py.type`, `js.function` and `sh.function` and no constant cell
-(`python tools/lexicon/lexicon.py --suggest SUFFIX_RE --as py.constant` says so).
+Minted: `SUFFIX_RE` in `tools/memory-tree/id_grammar.py`, which `TOOL-dTotalRecall-54` §4 Inventory
+also mints at step 8 (§8 F2). Naming cell: none; the lexicon declares `js.function`, `js.type`,
+`py.function`, `py.type` and `sh.function` and no constant cell
+(`python tools/lexicon/lexicon.py --suggest SUFFIX_RE --as py.constant` says so, exiting 2 at `c2143acf`).
 
 ### Files touched (estimate)
 
@@ -131,7 +139,7 @@ Minted: `SUFFIX_RE` in `tools/memory-tree/id_grammar.py`. Naming cell: none; the
 
 ## 7. Gates
 
-`memory hygiene` · `lexicon naming predicates` · `tier2-review self-test` · `recall floor` · `recall floor arms` · `build-index selftest`
+`memory hygiene` · `lexicon naming predicates` · `tier2-review self-test` · `recall floor` · `recall floor arms` · `build-index selftest` · `memory-recall kit selftest` · `drift-audit selftest` · `playbook render selftest` · `policy fixtures`
 
 New arm: tools/memory-tree/id_grammar.py · covers AC1 AC2 AC3 · the parser cases plain, suffixed, flat, node-scoped and pinned, staged by reading `ID_RE`'s groups again · none
 
@@ -143,6 +151,14 @@ New arm: tools/memory-tree/id_grammar.py · covers AC1 AC2 AC3 · the parser cas
   carry of `TOOL-dTotalRecall-5`'s clause, which would split a clause that unit carries whole. (b)
   reds the parts join; veto 1 discards it. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the
   precedent `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
+- **F2 — Does the re-ground fold units 63's and 64's amendments into this spec?** At HEAD no
+  `parse_id_parts` exists; `TOOL-dTotalRecall-54` lands it at step 8 on `grammar_for(root).families`,
+  and `TOOL-dTotalRecall-64` S1 to S4 rewrite this spec's S1, §4, §5, §7 New arm line, §10 and the
+  edge to unit 38 to observe that body, with `TOOL-dTotalRecall-63` S1 adding AC1's cited case, both
+  in their own order-9 passes ahead of this one. Options: (a) fold both now; (b) re-ground only what
+  the landed tree moved and leave the rewrite to those passes. (a) does their passes' work, so their
+  AC1 greps could never be seen red (veto 1), and changes Scope intent the re-ground brief bars.
+  RESOLVED (agent, 2026-11-22, delegated): (b), the one survivor. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -150,14 +166,20 @@ New arm: tools/memory-tree/id_grammar.py · covers AC1 AC2 AC3 · the parser cas
   (HIGH, item H3).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-54, TOOL-dTotalRecall-60, each the other end of an edge a unit the round-1 spec audit of units 44 to 53 promoted wrote; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-63, TOOL-dTotalRecall-64, each the other end of an edge a unit the round-1 spec audit of units 54 to 60 promoted wrote; nothing else moved.
+- rev-4 · 2026-11-22 · §1 S1 §4 §7 §8 §10 · re-grounded at base `c2143acf` per
+  `2026-11-22-prompt-TOOL-dTotalRecall-46-reground-brief`: §1 and §10 cite `build_grammar`, `_eras`,
+  `build_id_token_re` and `_id_alternation` as `path#symbol`; S1 cites `read_spec_revs`; §4's conf
+  read is `id_grammar.py#load_conf`, not `tree_lib.parse_conf`, and its Inventory names unit 54's
+  `SUFFIX_RE` and the five declared lexicon cells; §7 names the four further legs guarding
+  `id_grammar.py`; F2 leaves units 63's and 64's amendments to their passes.
 
 ## 10. Reuse audit
 
-The seam extended is `tree_lib.build_id_token_re` (`tools/memory-tree/tree_lib.py:428`), the one
-named-group id regex, which `_expand_ids` and `read_id_pins` already match through, with
-`tree_lib._id_alternation` (`:416`) for its families. `TOOL-dTotalRecall-38` §10 said no id parser
+The seam extended is `tools/memory-tree/tree_lib.py#build_id_token_re`, the one named-group id regex,
+which `_expand_ids` and `read_id_pins` already match through, with
+`tools/memory-tree/tree_lib.py#_id_alternation` for its families. `TOOL-dTotalRecall-38` §10 said no id parser
 exists to extend; that held for a parser function, and the regex this unit reads was missed there.
 `python tools/codebase-map/reuse_lookup.py "parse a unit id into family slug and sequence"` ranked
-name-stem neighbours and not this regex, which is why the probe missed it.
+name-stem neighbours and not this regex at base `462d20f3`, which is why the probe missed it.
 
 Recall terms used: `python tools/memory-recall/query.py "which readers split a unit id on a hyphen and break under a hyphenated slug" --terms "split hyphen slug reader census id_grammar readers flip-probe parse_id_parts kept predicate"`

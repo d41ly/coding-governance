@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-63 — unit 46's own pass reds a parser that refuses a cited family, so unit 54's body is held at step 9
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 9 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base c2143acf · streams tooling · order 9 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,9 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-63-deviation-631.md](../build/2026-10-26-build-TOOL-dTotalRecall-63-deviation-631.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-63-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-63-reground-return.md) | research | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-63-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-63-reground-brief.md) | journal | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-63-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-63-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-64 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 |
 
 <!-- /gen:spec-records -->
@@ -20,15 +23,15 @@ The round-1 spec audit of units 54 to 60
 (`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md`)
 confirmed finding **id 3 at HIGH**. It shares item **H3** with id 22, which `TOOL-dTotalRecall-64`
 closes. `TOOL-dTotalRecall-54` §3 says unit 46's pass "builds nothing this unit has built", and its
-§4 rejects `tree_lib._id_alternation` because it reads conf `FAMILIES` only (`tree_lib.py:416-418`)
-and omits cited families. Nothing observes that claim at unit 46's pass. Unit 46's AC1 to AC3 plant
-no cited family, unit 54's AC4 is observed at unit 38's tip only, and unit 54's arm, which does plant
+§4 rejects `tree_lib._id_alternation` because it reads conf `FAMILIES` only and omits cited
+families (`tools/memory-tree/tree_lib.py#_id_alternation`). Nothing observes that claim at unit 46's
+pass. Unit 46's AC1 to AC3 plant no cited family, unit 54's AC4 is observed at unit 38's tip only, and unit 54's arm, which does plant
 one, runs at the close with the bar. So a unit-46 pass that rebuilds the body onto
 `_id_alternation` passes its own criteria at step 9, and every cited-family id then raises
 `ValueError` in the readers units 38 and 45 re-point, surfacing only at the close.
 
 Unit 64 corrects what unit 46 designs. This unit makes unit 46's own pass observe the cited family,
-so a rebuild is red at step 9 and not at order 31: unit 46's AC1 gains unit 54's cited case, and
+so a rebuild is red at step 9 and not at the close: unit 46's AC1 gains unit 54's cited case, and
 unit 54's claim is observed at unit 46's tip. It repairs `TOOL-dTotalRecall-54`.
 
 ## 2. Scope (IN)
@@ -60,22 +63,24 @@ unit 54's claim is observed at unit 46's tip. It repairs `TOOL-dTotalRecall-54`.
 
 ### The amendment to unit 46
 
-AC1 of `TOOL-dTotalRecall-46` reads, after its present first sentence:
+AC1 of `TOOL-dTotalRecall-46` gains, after its present first sentence, the clause and fixture below,
+and its present Red-when line, which names `IndexError` alone, gives way to the one quoted:
 
 > In a scratch tree whose `.memory-tree.conf` declares `RECALL_CITED_FAMILIES` with `ZED`, the call on
 > `ZED-aFoo-2` returns `("ZED", "aFoo", 2)`. Red when: the parser reads a group `ID_RE` lacks, or
 > refuses a cited family. fixture: the scratch tree under the run's scratch directory; the pass makes
 > it.
 
-The rev bump's §9 line reads `rev-<N> · <date> · AC1 · the cited-family case, added by
-TOOL-dTotalRecall-63 (id 3, item H3 shared with id 22)`.
+The rev bump's §9 line, one line, reads
+`rev-<N> · <date> · AC1 · the cited-family case, added by TOOL-dTotalRecall-63 (id 3, item H3 shared with id 22)`.
 
 ### Why this catches the rebuild
 
 `_id_alternation(conf)` builds its alternation from `FAMILIES` alone, so a body built on it refuses
 `ZED-aFoo-2` with `ValueError` while unit 54's `"|".join(grammar_for(root).families)` admits it,
-`grammar_for` reading `conf.families + conf.cited_families` (`extract.py:599`). The case therefore
-separates the two bodies by behaviour, and the source count of AC2 names which one stands.
+`grammar_for` building through `conf.families + conf.cited_families`
+(`tools/memory-tree/id_grammar.py#build_grammar`, where PLAY-dOrderedCharter-18 moved it out of
+`extract.py`). The case therefore separates the two bodies by behaviour, and the source count of AC2 names which one stands.
 
 ### Order inside step 9
 
@@ -113,10 +118,10 @@ Minted: nothing in code. Amended: unit 46's AC1.
 
 - **AC1** — When `grep -n "ZED-aFoo-2"` runs over
   `memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-46.md` at this pass's tip it
-  prints the AC1 line, and `grep -c TOOL-dTotalRecall-63` over that spec's §9 prints at least 1.
-  Red when: unit 46's AC1 plants no cited family.
-- **AC2** — When unit 46's pass tip is reached, a `python -c` probe in the scratch tree of §4 prints
-  `("ZED", "aFoo", 2)` for `parse_id_parts("ZED-aFoo-2", tree)`, the probe
+  prints the AC1 line, and `grep -c "added by TOOL-dTotalRecall-63"` over that spec prints at least 1.
+  Red when: unit 46's AC1 plants no cited family, or its §9 carries no amendment line.
+- **AC2** — When unit 46's pass tip is reached, a `python -c` probe in the scratch tree of §4 finds
+  `parse_id_parts("ZED-aFoo-2", tree)` returns `("ZED", "aFoo", 2)`, the probe
   `python -c "import inspect, id_grammar; print(inspect.getsource(id_grammar.parse_id_parts).count('_id_alternation'))"`
   run from `tools/memory-tree/` prints `0`, and `git log --format=%s` lists unit 54's pass commit
   before unit 46's.
@@ -127,8 +132,8 @@ Minted: nothing in code. Amended: unit 46's AC1.
 
 `memory hygiene` · `recall floor` · `recall floor arms`
 
-No new arm: unit 54's arm already plants the cited case at the close; this unit moves its observation
-into unit 46's pass.
+No new arm: unit 54's arm in `tools/memory-recall/selftest.py` (its §7, §8 F2) already plants the
+cited case at the close; this unit moves its observation into unit 46's pass.
 
 ## 8. Open questions
 
@@ -144,11 +149,17 @@ into unit 46's pass.
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 54 to 60, id 3
   (HIGH, item H3 shared with id 22).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-70, the other end of an edge a unit the round-1 spec audit of units 61 to 66 promoted wrote; nothing else moved.
+- rev-3 · 2026-11-22 · §1 §4 §6 §7 §10 · re-grounded at base `c2143acf` per
+  `2026-11-22-prompt-TOOL-dTotalRecall-63-reground-brief`: `_id_alternation` and `build_grammar`
+  (moved to `id_grammar.py` by PLAY-dOrderedCharter-18) cited as `path#symbol`; §1 names the close, not a
+  stale order number; §4 replaces unit 46's rev-4 `IndexError` Red-when and keeps the §9 line on one line;
+  AC1 greps the amendment's own form, as unit 46's rev-3 edge-fold line already held the bare id; AC2's
+  tuple is returned, not printed; §7 homes unit 54's arm in `tools/memory-recall/selftest.py`.
 
 ## 10. Reuse audit
 
 The seam is unit 54's cited-family fixture (`TOOL-dTotalRecall-54` AC1) and the family read it rests
-on, `grammar_for(root).families` (`tools/memory-recall/extract.py:599`), moved into the criterion of
+on, `grammar_for(root).families` (`tools/memory-tree/id_grammar.py#build_grammar`), moved into the criterion of
 the pass that could break it. `python tools/codebase-map/reuse_lookup.py "amend a sibling spec before its unit builds"`
 ranked name-stem neighbours and no seam for sequencing an observation, so no existing seam fits
 beyond the fixture named here.
