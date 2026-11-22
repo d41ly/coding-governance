@@ -25,6 +25,7 @@ chain-packet self-test	kit	selftests
 charter size	repo	product
 check-arms selftest	kit	selftests
 check-wiring self-test	kit	selftests
+cleanup posture (a tree removal that swallows its error)	repo	product
 cleanup skill wiring	repo	wiring
 codebase-map adopter e2e	kit	e2e
 codebase-map coverage + freshness	repo	declarations
