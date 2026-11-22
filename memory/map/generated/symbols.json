@@ -5253,6 +5253,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "checkWriteClass",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "check_absent",
       "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"
@@ -18241,11 +18246,6 @@
       "id": "marker_pair",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "matchWriteClass",
-      "kind": "function",
-      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "match_expr",

@@ -109,7 +109,7 @@
  * write classes (TOOL-dBoundRoles-9): `spec` and `product` above, and, on a target in neither, step
  * 6b's two: a role declaring `writes = none` writes nothing in the repository, and one declaring
  * `writes = review` writes only under the review class's folder, which the index's `classes` map
- * spells from the roles kit's one table (`matchWriteClass`, `checkRoleClass`); with no map, that
+ * spells from the roles kit's one table (`checkWriteClass`, `checkRoleClass`); with no map, that
  * role's write refuses naming the re-render. The main loop and an agent type the index does not
  * name are not read there; a role agent's write there meets the absent and broken verdicts above.
  * `records` alone is declared in the index and read by nothing here.
@@ -1343,7 +1343,7 @@ const SLUG_PLACEHOLDER = '<slug>'
  * class the map does not spell, or no map, matches nothing. Never asked about `product`, whose value
  * names the conf key holding its paths: step 6 places a product target through `ROUTED_PATHS`.
  */
-function matchWriteClass(rel, cls, index, memRoot) {
+function checkWriteClass(rel, cls, index, memRoot) {
   const folder = index && index.classes && typeof index.classes[cls] === 'string' ? index.classes[cls] : ''
   if (!folder) return false
   const mem = buildComparablePath(String(memRoot || '').trim()).replace(/^\.\//, '')
@@ -1594,7 +1594,7 @@ function checkPolicyFile(tool, target, top) {
  *  6. the target's CLASS: product when it falls under a ROUTED_PATHS entry; spec when its path
  *     opens `<MEMORY_ROOT>/builds/<one segment>/spec/`; else neither → step 6b.
  * 6b. neither (TOOL-dBoundRoles-9 S5): no `agent_type` → null, the main loop reading no index; else
- *     checkRoleWrite over loadRoleIndex(top), the class `review` where matchWriteClass places the
+ *     checkRoleWrite over loadRoleIndex(top), the class `review` where checkWriteClass places the
  *     target in the index's `classes.review` folder, else `other`: absent → null, or deny where the
  *     tree is governed; broken → deny; a type the index does not name, or names `agent: false` →
  *     null; a `review` role and no `classes.review` → deny naming the re-render; else
@@ -1701,7 +1701,7 @@ function checkRouted(data, env) {
       // Step 6b (TOOL-dBoundRoles-9 S5): neither product nor spec. The main loop reads no index.
       if (!agentType) return null
       const index = loadRoleIndex(top)
-      const cls = index.state === 'ok' && matchWriteClass(rel, 'review', index, memRoot) ? 'review' : 'other'
+      const cls = index.state === 'ok' && checkWriteClass(rel, 'review', index, memRoot) ? 'review' : 'other'
       return checkRoleWrite(cls, index, { tool, ti, native: target, target: targetC, agentType, slug: '', routed: [], top, memRoot })
     }
     // The slug keeps its case: the same segment of the target's own spelling.
@@ -2331,4 +2331,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, matchWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines }

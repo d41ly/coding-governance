@@ -539,7 +539,7 @@ Four write classes are graded:
 - **review** — a role with `agent: true` and `writes = review` writes only under the review class's
   folder, `<MEMORY_ROOT>/builds/<slug>/reviews/`, `<slug>` one path segment. The folder is read from
   the index's `classes` map, which the roles kit renders from its one table `WRITE_FOLDERS`, so the
-  hook spells no class folder of its own (`matchWriteClass(rel, cls, index, memRoot)`). Any other
+  hook spells no class folder of its own (`checkWriteClass(rel, cls, index, memRoot)`). Any other
   target outside the spec and product classes refuses, the review harness's default `reviewDir`
   included: the refusal names the caller's remedy, a `reviewDir` under that folder. An index with no
   `classes` map, rendered before the key existed, refuses every such write of a `review` role,
@@ -548,7 +548,7 @@ Four write classes are graded:
 Step 6b reads the index only for a payload carrying an `agent_type`. The main loop, an agent type
 the index does not name and a `spec`, `product` or `records` role write outside the spec and product
 classes exactly as before. `checkRoleClass(writes, cls)` is the one predicate the spec, product and
-6b steps share, exported beside `matchWriteClass` for the shell arm. A 6b refusal names the target,
+6b steps share, exported beside `checkWriteClass` for the shell arm. A 6b refusal names the target,
 its class, the role and its `writes`, and the driver's remedy: route the write to a role whose class
 covers it.
 
