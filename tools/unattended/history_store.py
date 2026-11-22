@@ -715,10 +715,10 @@ def test_resolved(repo, scratch, check_arm) -> None:
     text = fresh.stdout.decode("utf-8").rstrip("\n")
     real_run, spawned = subprocess.run, []
 
-    def count_run(*args, **kwargs):
+    def measure_run(*args, **kwargs):
         spawned.append(args)
         return real_run(*args, **kwargs)
-    subprocess.run = count_run
+    subprocess.run = measure_run
     try:
         again = resolve_store(repo, "selftest-held", code, parse_resolved(text, repo))
         quiet = len(spawned)
