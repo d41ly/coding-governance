@@ -32000,6 +32000,11 @@
     {
       "id": "resolve_remote",
       "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
+      "id": "resolve_remote",
+      "kind": "function",
       "file": "tools/runlog/model.py"
     },
     {

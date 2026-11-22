@@ -76,6 +76,61 @@ class RefuseRedirect(urllib.request.HTTPRedirectHandler):
 OPENER = urllib.request.build_opener(RefuseRedirect)
 
 
+# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
+def resolve_remote(root):
+    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+
+    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
+              Several remotes and none chosen, or a chosen name that is not a remote here, is a
+              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
+              keeps its own no-remote fallback.
+    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
+              only CROSS-CHECKS the observation reads this one.
+    branch    GOV_DEFAULT_BRANCH, else observed, else "".
+    A refusal empties the other three, so no caller can pick a remote the ladder refused.
+    """
+    import os
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    names = read("remote").split()
+    listed = " ".join(names) or "none"
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
+    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
+    if not remote and cur:
+        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
+        if remote == ".":
+            remote = ""
+    if not remote and len(names) == 1:
+        remote = names[0]
+    if not remote and len(names) > 1:
+        where = "branch " + cur if cur else "a detached HEAD"
+        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
+                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
+                            % (where, len(names), listed))
+    if remote and remote not in names:
+        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
+                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
+    observed = ""
+    if remote:
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
+    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
+# <<< remote_ladder_py
+
+
 def derive_response_name(path):
     """The canned file `--responses` answers `path` from: the path after `/repos/<owner>/<repo>/`, query
     included, every character outside [A-Za-z0-9._-] an underscore, then `.json`."""
@@ -238,7 +293,8 @@ def read_remote_verdict(backend, sha, tree, repo=".", responses=None):
         trust, _scope, pin = keys
         if trust != "app-only" and not pin:
             return check_pin_source(backend, sha, keys, repo)
-        rc, url = run_git(repo, "remote", "get-url", os.environ.get("GOV_REMOTE") or "origin")
+        remote, _branch, _observed, refusal = resolve_remote(repo)
+        rc, url = run_git(repo, "remote", "get-url", remote) if remote else (1, refusal)
         owner, name = read_anchor(url if rc == 0 else "")
         workflow = backend.get("workflow") or ".github/workflows/remote-ci.yml"
         base = f"/repos/{owner}/{name}"
