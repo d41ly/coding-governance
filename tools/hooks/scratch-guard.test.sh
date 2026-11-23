@@ -1923,7 +1923,7 @@ for sgib_i in 1 2 3 4 5 6 7 8; do [ -f "$sgib/done-stale" ] && [ -f "$sgib/done-
 # WHAT THIS DOES NOT CHECK: the real policy reader, the real kickoff checker, or a card file the card
 # engine wrote; rule 9's spawn rows are agent-cap.test.sh's.
 sgaf="$TMP/sgaf"; mkdir -p "$sgaf"
-for sgaf_p in probes-none probes-item reads-none anything-none no-pointers no-route other-owner throw no-helper refusal; do
+for sgaf_p in probes-none probes-item reads-none anything-none no-pointers no-route other-owner throw no-helper refusal item-skipped item-malformed; do
   bash "$HERE/actions-free.fixture.sh" --plant "$sgaf_p" > "$sgaf/$sgaf_p" 2>&1
 done
 # check_free_line <name> <case> <value> <call> <what follows the call: exit <code>, or the log's count> [needle ...]:
@@ -1963,6 +1963,12 @@ check_free_line "KICK-dKeptSession-8 AC6 pointers owned by another session admit
 check_free_line "KICK-dKeptSession-8 AC6 a card file that does not read refuses, naming the arm" throw read-only-probes 'echo x > f' "exit 2" 'the actions.free arm threw'
 check_free_line "KICK-dKeptSession-8 AC7 no policy reader reads the default, refusing with one NOTE" no-helper '(no policy reader)' 'echo x > f' "exit 2" 'actions.free (read-only-probes) refuses this Bash write' 'NOTE — no policy kit resolves beside this hook, so actions.free reads read-only-probes'
 check_free_line "KICK-dKeptSession-8 AC7 a refused read reads the default, refusing with one NOTE" refusal '(a PolicyRefusal)' 'echo x > f' "exit 2" 'actions.free (read-only-probes) refuses this Bash write' 'NOTE — actions.free could not be read (' ', so it reads read-only-probes'
+# KICK-dKeptSession-43 AC1-AC3: the card engine's `item — skipped: <why> · at <sha8>` line leaves the arm
+# unarmed and says so, and any other line refuses naming it. Staged against KICK-dKeptSession-8's arm,
+# which parses the skipped line as malformed, the two skipped rows exit 2 and red.
+check_free_line "KICK-dKeptSession-43 AC1 echo x > f at a skipped item pointer admits with the unarmed line" item-skipped read-only-probes 'echo x > f' "exit 0" 'scratch-guard: actions.free unarmed — item pointer skipped: no loop kit position.py resolves in this tree'
+check_free_line "KICK-dKeptSession-43 AC2 git commit at a skipped item pointer admits with the unarmed line" item-skipped read-only-probes 'git commit -m x' "exit 0" 'scratch-guard: actions.free unarmed — item pointer skipped: no loop kit position.py resolves in this tree'
+check_free_line "KICK-dKeptSession-43 AC3 a malformed item pointer refuses, naming the line" item-malformed read-only-probes 'echo x > f' "exit 2" 'the actions.free arm threw' 'item pointer malformed: item — ???'
 
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
@@ -2015,8 +2021,10 @@ n=$((pass+fail))
 # AC28's MSYS-fold row runs on a MINGW, MSYS or CYGWIN host alone, and its skip elsewhere keeps it out.
 # 430 = 401 + the 29 check_free_line rows KICK-dKeptSession-8 added (5 for AC1, 12 for AC2, 3 for AC3,
 # 3 for AC4, 4 for AC6 and 2 for AC7), counted by hand under the same rule.
+# 433 = 430 + the 3 check_free_line rows KICK-dKeptSession-43 added (1 each for AC1, AC2 and AC3),
+# counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=430
+FLOOR_ASSERTIONS=433
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

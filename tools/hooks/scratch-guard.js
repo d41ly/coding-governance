@@ -170,13 +170,16 @@
  * the default would refuse to `gov-free-actions.log` under the git common dir. The class is
  * `deriveActClass`'s, strongest first: push, commit, write, spawn, read. No card file, or one with no
  * `## pointers`, adds no arm and prints nothing; a card with pointers owned by another session or
- * routing no build admits with one `actions.free unarmed` line; armed, a missing or malformed `item —`
- * line, an unreadable card file and every throw refuse. rule 9 of agent-cap.js runs the same check on
+ * routing no build admits with one `actions.free unarmed` line, and so does an armed card whose
+ * `item —` line reads `skipped: <why>`, the engine's line when its position read does not answer, the
+ * line `item pointer skipped: <why>` (KICK-dKeptSession-43); armed, a missing `item —` line, any other
+ * line that is neither an instance key nor `none`, which refuses as `item pointer malformed: <line>`,
+ * an unreadable card file and every throw refuse. rule 9 of agent-cap.js runs the same check on
  * every `Agent` and `Workflow` call. THE CEILING: the class reads the command line as text, so a write,
  * commit or push made through an interpreter, a script, an alias or the lander passes as a read, and
  * the push-time leg keeps that guarantee; a hand-edited card file is read like the engine's; between
- * a commit and the boundary verb's rewrite the pointer still names the item just finished; and an
- * `item — skipped:` line reads as malformed and refuses until KICK-dKeptSession-43 reads it.
+ * a commit and the boundary verb's rewrite the pointer still names the item just finished; and a
+ * skipped line disarms the check for as long as the engine prints it, saying so on every call.
  *
  * THE THIRD EVENT: SUBAGENTSTART (TOOL-aRoutedQuill-4). A subagent inherits the hooks but not the
  * parent's card, so it would meet the write gate blind. Wired by `scratch-guard-subagent.fragment.json`
@@ -2079,8 +2082,10 @@ function renderRouteText(data, top, common, reserve) {
  * ''; `build` the route's `- build:` (extractRouteUnits); `pointers` whether a `## pointers` heading
  * stands; `item` the section's first `item —` line, the section ended at the next `## ` heading or the
  * READY line, parsed into `{ key, at }` for an instance key `<item tag>@<pass>#<8 hex>`, `{ none: true,
- * at }` for `none`, `{ malformed: <line>, at }` for any other value, or null with no such line. `at` is
- * the line's ` · at <hex|unborn>` tail, or null. No spawn: one file read. checkItemBoundary and the
+ * at }` for `none`, `{ skipped: <why>, at }` for `skipped: ` and a non-empty why, the card engine's
+ * line when its position read does not answer (KICK-dKeptSession-43), the why running to the line's
+ * last ` · at` tail, `{ malformed: <line>, at }` for any other value, or null with no such line. `at`
+ * is the line's ` · at <hex|unborn>` tail, or null. No spawn: one file read. checkItemBoundary and the
  * actions.free arm read the line here, and nowhere else.
  */
 function readItemPointer(top) {
@@ -2105,7 +2110,9 @@ function readItemPointer(top) {
     const m = / · at ([0-9a-f]+|unborn)$/.exec(l)
     const value = l.slice('item — '.length, m ? m.index : l.length)
     const at = m ? m[1] : null
-    item = /^[^\s@#]+@[^\s@#]+#[0-9a-f]{8}$/.test(value) ? { key: value, at } : value === 'none' ? { none: true, at } : { malformed: l, at }
+    const skip = /^skipped: (.+)$/.exec(value)
+    item = /^[^\s@#]+@[^\s@#]+#[0-9a-f]{8}$/.test(value) ? { key: value, at } : value === 'none' ? { none: true, at }
+      : skip && skip[1].trim() ? { skipped: skip[1], at } : { malformed: l, at }
   }
   return { owner: owner ? owner[1] : '', build: extractRouteUnits(text).build, pointers, item }
 }
@@ -2206,7 +2213,9 @@ function deriveActClass(data) {
  *  2. readItemPointer: no card file, or no `## pointers` heading → null; a card file that exists and
  *     does not read throws
  *  3. a `card-owner —` line naming another session, or none, or a route naming no build → unarmed
- *  4. ARMED. No `item —` line, or a malformed one → throw; an instance key → null, under every value
+ *  4. ARMED. No `item —` line, or a malformed one → throw, its message `item pointer malformed:
+ *     <line>`; a skipped one → unarmed, `item pointer skipped: <why>` (KICK-dKeptSession-43); an
+ *     instance key → null, under every value
  *  5. `item — none`: readPolicyValue('actions.free'); absent or refused reads read-only-probes, noted
  *  6. read-only-probes admits a `read`; item-reads-only admits a `read` whose every simple command's
  *     head is in BOUNDARY_HEADS; recorded-anything admits every act, appending one line to
@@ -2224,7 +2233,8 @@ function checkFreeAction(data, env) {
   if (!ptr.owner || ptr.owner !== sid) return { unarmed: `the card file ${shown} names card-owner ${ptr.owner || '(none)'}, and this call's session is ${sid || '(none)'}` }
   if (!/^[A-Za-z0-9]+$/.test(ptr.build)) return { unarmed: `the card file ${shown} routes no build` }
   if (!ptr.item) throw new Error(`the ## pointers of ${shown} carry no item — line`)
-  if (ptr.item.malformed !== undefined) throw new Error(`the ## pointers of ${shown} read ${ptr.item.malformed}, neither an instance key nor none`)
+  if (ptr.item.skipped !== undefined) return { unarmed: `item pointer skipped: ${ptr.item.skipped}` }
+  if (ptr.item.malformed !== undefined) throw new Error(`item pointer malformed: ${ptr.item.malformed}`)
   if (ptr.item.key) return null
   const read = readPolicyValue('actions.free', top)
   const value = read.absent || read.refused !== undefined ? 'read-only-probes' : read.value

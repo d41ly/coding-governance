@@ -78,9 +78,10 @@
  * `item —` instance key admits; at `item — none` the policy key `actions.free` decides, and only
  * `recorded-anything` admits a spawn, appending one line to `gov-free-actions.log` under the git common
  * dir. A refusal prints the check's two lines after `BLOCKED by agent-cap: rule 9 (KICK-dKeptSession-8)
- * refused this <tool> call — `; a card with pointers that does not arm prints one `agent-cap: rule 9
- * unarmed — <why>` line; a value read as the default, its key absent or refused, prints one NOTE; a
- * throw refuses. No card file, or one with no `## pointers`, adds no rule and prints nothing.
+ * refused this <tool> call — `; a card with pointers that does not arm, or an armed one whose `item —`
+ * line reads `skipped: <why>`, prints one `agent-cap: rule 9 unarmed — <why>` line, the skipped one's
+ * `<why>` reading `item pointer skipped: <why>` (KICK-dKeptSession-43); a value read as the default,
+ * its key absent or refused, prints one NOTE; a throw refuses, a malformed `item —` line's naming it. No card file, or one with no `## pointers`, adds no rule and prints nothing.
  * WHAT IT DOES NOT CHECK: the agents a running harness spawns through its own `agent()`, which reach
  * no hook; whether the spawn serves the item named, since any spawn passes while an item is in flight;
  * and a hand-edited card file, read like the engine's.

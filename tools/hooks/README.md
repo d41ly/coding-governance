@@ -709,8 +709,9 @@ dir, one line per recorded act: `<iso> · <session> · <class> · <tool> · item
 the three refuses, naming it. An absent policy kit, or a key read that refuses, reads the default
 `read-only-probes` and prints one `NOTE —` line saying which.
 
-The refusal, from scratch-guard; rule 9 prints the same two lines with `BLOCKED by agent-cap: rule 9
-(KICK-dKeptSession-8) refused this <tool> call — ` in place of `BLOCKED by scratch-guard: `:
+The refusal, from scratch-guard; rule 9 prints the same two lines with
+`BLOCKED by agent-cap: rule 9 (KICK-dKeptSession-8) refused this <tool> call — ` in place of
+`BLOCKED by scratch-guard: `:
 
 ```
 BLOCKED by scratch-guard: actions.free (item-reads-only) refuses this Bash read — the card of tFix reads item — none.
@@ -719,17 +720,24 @@ Run the act inside the item that owns it, or file it as an intake.
 
 No card file, or one with no `## pointers`, adds no check and prints nothing. A card that carries
 pointers and does not arm, owned by another session or routing no build, admits with one line:
-`scratch-guard: actions.free unarmed — <why>`, or `agent-cap: rule 9 unarmed — <why>`. Once armed, a
-missing or malformed `item —` line refuses, and so does every throw: scratch-guard's `the
-actions.free arm threw`, and rule 9's `threw`. A card file that exists and cannot be read refuses too.
+`scratch-guard: actions.free unarmed — <why>`, or `agent-cap: rule 9 unarmed — <why>`. An armed card
+whose `item —` line reads `skipped: <why> · at <sha8|unborn>`, the line the card engine prints when
+its position read does not answer, admits the same way, its why read whole to the line's last
+` · at` tail (`KICK-dKeptSession-43`):
+`scratch-guard: actions.free unarmed — item pointer skipped: <why>`, or
+`agent-cap: rule 9 unarmed — item pointer skipped: <why>`, so a missing loop kit never blocks the
+commit that installs it. Once armed, a missing `item —` line refuses, and so does any
+other line that is neither an instance key nor `none`, as `item pointer malformed: <line>`, and every
+throw: scratch-guard's `the actions.free arm threw`, and rule 9's `threw`. A card file that exists
+and cannot be read refuses too.
 
 **Its ceiling.** The class reads the command line as text, so a write, commit or push made through
 an interpreter, a script, an alias or the lander passes as a read, and the push-time leg keeps that
 guarantee. The `Read`, `Grep` and `Glob` tools never reach it. A hand-edited card file is read like
 the engine's. Between a commit and the boundary verb's rewrite the pointer still names the item just
 finished, so acts pass under it; a role agent still running when the pointer moves to `none` is
-refused under the default. An `item — skipped:` line reads as malformed and refuses every act of an
-armed session until `KICK-dKeptSession-43` reads it. It stops forgetting, not evasion.
+refused under the default. A skipped `item —` line disarms the check for as long as the engine
+prints it, saying so on every call. It stops forgetting, not evasion.
 
 ## The authoring rule for kit files
 
