@@ -11,7 +11,7 @@
 ```
 refusal pin rows : 0 read, 0 not read
 unbudgeted gates (3, no REFUSAL_CEILINGS token): tools/gate-a.sh tools/gate-b.sh tools/gate-c.sh
-ERROR tools/gate-a.sh:2: check 1 branch 1 has no literal run long enough to assert on ('') — reword the message or the arm cannot name it
+ERROR tools/gate-a.sh line 2: check 1 branch 1 has no literal run long enough to assert on ('') — reword the message or the arm cannot name it
 arm ok    ...and the same test quoting the whole signature reads ARMED with no STRANDED token
 arm ok    S5+S6: a sidecar pin and a local-suite arm leave the gate green
 arm ok    ...and --report names the sidecar that pinned the branch
