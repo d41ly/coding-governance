@@ -3722,6 +3722,29 @@ else
   echo "skip the record door's lease and counter arms: no unattended kit beside this one, so its 9 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+9))
 fi
 
+# --- TOOL-dTotalRecall-9 (AC3, AC4, AC5, AC7, AC8, AC9) — the record finder and the read budget, each plant of
+# --- `record_find.py --fixture --plant <case>` a scratch repository with this kit, the playbook-render, memory-recall
+# --- and policy kits copy-installed, run through its own door: a 41-record build prints 40 rows and a total line
+# --- naming --kind (AC4); a question whose only answer is an archived decision returns its key, and with a
+# --- successor beside it only the successor prints (AC5); a blob no tree holds is read from git and sectioned
+# --- (AC7); an over-cap read set under each `memory.over-budget` value (AC8); a superseded decision handed to a
+# --- builder refused, then marked (AC9); and the door's `new spec` over a skeleton lacking `## 6. Acceptance
+# --- criteria` refused by tag, no file written (AC3). Red on the cap line cut, on `memory.superseded-slices`
+# --- read and ignored, and on `check_sections` skipped.
+run_find_plant() { out=$("$_PY" "$HERE/record_find.py" --fixture --plant "$1" 2>&1); }
+run_find_plant cap; hit '41 rows match; narrow with --kind, --build or --paths'; hit 'record-find: fixture cap · exit 0'
+out_rows=$(grep -c ' · deviation · bFix · ' <<<"$out"); n=$((n+1)); [ "$out_rows" = 40 ] || { echo "FAIL record find printed $out_rows rows, not 40"; st=1; }
+run_find_plant archive; hit 'DEC-tFix-1 · - · - · '; hit 'memory/archive/2025-01-01-decisions.md:3'
+run_find_plant superseded; hit 'DEC-tFix-2 · - · - · '; miss 'DEC-tFix-1 · '
+run_find_plant unheld-blob; hit 'the second'; miss 'the third'; hit 'record-find: fixture unheld-blob · exit 0'
+run_find_plant over-report; hit 'memory over budget: gov-builder 130000 B > 96000 B'; hit 'record-find: fixture over-report · exit 0'
+run_find_plant over-refuse; hit 'refused budget: memory over budget: gov-builder 130000 B > 96000 B'; hit 'record-find: fixture over-refuse · exit 2'
+run_find_plant over-off; hit 'read 2026-01-01-build-TOOL-bFix-1-deviation-big 130000 B'; miss 'memory over budget'; hit 'fixture over-off · exit 0'
+run_find_plant superseded-refuse; hit 'refused budget: DEC-tFix-1 is superseded by DEC-tFix-2'; hit 'fixture superseded-refuse · exit 2'
+run_find_plant superseded-mark; hit 'read DEC-tFix-1 '; hit ' B superseded-by DEC-tFix-2'; hit 'fixture superseded-mark · exit 0'
+run_find_plant missing-section; hit 'lacks the required section(s) section.acceptance-criteria; nothing was written'
+hit 'record-find: fixture missing-section · spec files 0'; hit 'record-find: fixture missing-section · exit 2'
+
 # --- TOOL-dTotalRecall-19 (AC1 to AC8) — every record names its cause. The door's header plant: a `log` with
 # --- no `--caused-by` refused naming `Caused-by`, nothing written; an undefined cause refused; `Made-by`
 # --- `owner` and, under this session's build lease, `lease-<slug>`, each read back by `read_header_edges`;

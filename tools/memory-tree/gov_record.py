@@ -9,6 +9,9 @@
     python <prefix>/memory-tree/gov_record.py new ask --build <slug> --family <FAMILY> --text <text> --sev <LEVEL> <why>
                                               [--clause <label> <value>]... [--unit] [--pointer <path>]
     python <prefix>/memory-tree/gov_record.py new shape-run --review <path>
+    python <prefix>/memory-tree/gov_record.py find [<question> --terms <words>] [--kind <k>] [--tag <t>] [--build <slug>] [--paths <glob>]
+    python <prefix>/memory-tree/gov_record.py show <key>[#<tag>][@<blob>]
+    python <prefix>/memory-tree/gov_record.py budget --role <role> <key>...
 
 It stands in for `gov record` the way `gov_tag.py` stands in for `gov tag`, and runs in the repository at
 the current directory. A kind is written here only where its `[[record-kind]]` row in `record-kinds.toml`
@@ -39,7 +42,10 @@ parses, and writes its fields through `write_new_record` (TOOL-dTotalRecall-11).
 
 Exit and stdout: 0 `wrote <path> key <content key>` · 0 `exists <path> key <content key>` · 2 `refused
 <kind>: <why>` · 4 `waiting offline <ref>`, nothing written. A handler prints its scaffold's lines.
-WHAT IT DOES NOT CHECK: the verbs `find` and `show` (TOOL-dTotalRecall-9); whether a cause is reached
+The read verbs write nothing in the tree (TOOL-dTotalRecall-9): `find` lists at most 40 records, never
+their content, `show` prints one record or one section of it, and `budget` sums a role's read set against
+`memory.item-budget`; `record_find.py` beside this door holds all three and says what each prints.
+WHAT IT DOES NOT CHECK: whether a cause is reached
 from a root, which `record_causes.py --check` grades; whether two builds hold a `--name` record of one stem and one content key, which
 the listing reads as one write.
 """
@@ -331,7 +337,47 @@ def print_written(word, said, key, lines):
 KIND_HANDLERS = {"build-readme": run_build_readme, "spec": run_spec, "ask": write_new_ask, "shape-run": run_shape_run}
 
 
+def run_read_verb(root, verb, argv):
+    """`find`, `show` and `budget` (TOOL-dTotalRecall-9 S3, S5, S6): `record_find`'s, printed; a refusal
+    exits 2 naming what refused."""
+    import record_find  # noqa: E402  the finder, beside this door
+    ap = argparse.ArgumentParser(prog=f"gov_record.py {verb}", allow_abbrev=False)
+    if verb == "find":
+        ap.add_argument("question", nargs="?")
+        ap.add_argument("--terms", action="append", default=[])
+        for flag in ("--kind", "--tag", "--build", "--paths"):
+            ap.add_argument(flag)
+    elif verb == "show":
+        ap.add_argument("address")
+    else:
+        ap.add_argument("--role", required=True)
+        ap.add_argument("keys", nargs="+")
+    a = ap.parse_args(argv)
+    try:
+        if verb == "find":
+            terms = [t for spelled in a.terms for t in spelled.split()]
+            lines, rc = record_find.run_find(root, a.question, terms, kind=a.kind, tag=a.tag, build=a.build,
+                                             paths=a.paths), 0
+        elif verb == "show":
+            sec = record_find.read_section(root, a.address)
+            lines, rc = [sec["text"]], 0
+        else:
+            rc, lines = record_find.check_read_set(root, a.role, a.keys)
+    except record_find.FindError as exc:
+        print(f"refused {verb}: {exc}")
+        return 2
+    for line in lines:
+        print(line)
+    return rc
+
+
 def main(argv):
+    if argv[:1] in (["find"], ["show"], ["budget"]):
+        p = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8")
+        if p.returncode != 0:
+            print(f"refused {argv[0]}: the working directory is in no git repository")
+            return 2
+        return run_read_verb(pathlib.Path(p.stdout.strip()), argv[0], argv[1:])
     if len(argv) < 2 or argv[0] != "new" or argv[1].startswith("-"):
         print(__doc__.split("\n\n")[1], file=sys.stderr)
         return 2

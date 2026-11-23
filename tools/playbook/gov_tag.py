@@ -102,6 +102,26 @@ def run_bundle_verb(con, root, kit_rel, address, aliases, *, sets, opts, as_json
                                  under=opts.get("under"), as_json=as_json)
 
 
+def run_record_show(root, address, as_json) -> int:
+    """`show <id>#<tag>` (TOOL-dTotalRecall-9 S5): the section memory-tree's `record_find.read_section`
+    slices, the reader `record show` runs, printed as `show` prints a row."""
+    ti.load_memory_tree()  # puts memory-tree, the finder's kit, on the path
+    import record_find
+    try:
+        sec = record_find.read_section(root, address)
+    except record_find.FindError as exc:
+        print(f"tags: {address} resolves to no row ({exc})")
+        return 1
+    if as_json:
+        print(json.dumps([{k: sec[k] for k in ("key", "tag", "path", "line", "end_line", "text")}], indent=2,
+                         sort_keys=True))
+        return 0
+    print(f"tags: {address} · {sec['path']}:{sec['line']}-{sec['end_line']} · section")
+    for ln in sec["text"].splitlines():
+        print(f"tags:   {ln}")
+    return 0
+
+
 def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel=None, opts=None) -> int:
     kit_rel = kit_rel or derive_kit_rel(root)
     opts = opts or {}
@@ -116,6 +136,9 @@ def run_kit_verb(root, verb, address, *, sets, as_json=False, base=None, kit_rel
         if verb in ("show", "where", "refs", "bundle") and not address:
             print(f"tags: {verb} needs an address", file=sys.stderr)
             return 2
+        head, hashed, _seg = address.partition("#") if verb == "show" else ("", "", "")
+        if hashed and ti.parse_tag(head, {r["ns"] for r in ctx["namespaces"]})[1] is not None:
+            return run_record_show(root, address, as_json)
         if verb == "show":
             slice_ = read_key("tags.slice", root, sets, lambda: read_policy_value("tags.slice", root)[0][0])
             rows = (ti.resolve_address(con, address, slice_, aliases)
@@ -397,7 +420,36 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
           "positional-spec-revbump", "positional-bulk-move", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
-          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "repeat-heading")
+          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "repeat-heading", "memory-records")
+#: TOOL-dTotalRecall-9's `memory-records`: a build record whose untagged `## Findings` repeats, a legacy spec, a class
+#: record, a marker, and a guide citing a pocket kind no record file holds; `feature` declares nothing
+MEMORY_BUILD = "memory/builds/bFix"
+MEMORY_RECORD = "2026-01-01-build-TOOL-bFix-1-research-1"
+MEMORY_FILES = {
+    f"{MEMORY_BUILD}/README.md": "# bFix\n",
+    f"{MEMORY_BUILD}/build/{MEMORY_RECORD}.md": ("# research\n\n**Serves:** research TOOL-bFix-1\n\n## Findings\n\n"
+                                                "the first findings\n\n## Findings\n\nthe second findings\n"),
+    f"{MEMORY_BUILD}/spec/2026-01-01-spec-TOOL-bFix-1.md": ("# TOOL-bFix-1 — a fixture spec\n\n## 1. Goal\n\nthe goal\n\n"
+                                                           "## 2. Scope (IN)\n\nthe scope\n"),
+    "memory/gotchas/fixture-class.md": "---\nname: fixture-class\ndescription: a planted class\nkind: class\n---\n# c\n",
+    "tools/corekit/marked.py": "# gov:fixture-mark\nx = 1\n",
+}
+
+
+def derive_memory_files() -> tuple[dict, str]:
+    """`memory-records`' files: the plant's records and memory-tree's record-kind registry at the fixture's
+    tool root, and the five memory namespace rows read from this kit's own registry (TOOL-dTotalRecall-9 S1)."""
+    tree_lib, _ = ti.load_memory_tree()
+    mt = pathlib.Path(tree_lib.__file__).parent
+    text = (KIT_DIR / "namespaces.toml").read_bytes().decode("utf-8").replace("\r\n", "\n")
+    rows = ["[[namespace]]" + r for r in text.split("[[namespace]]")[1:] if 'extractor = "record_extract:' in r]
+    rows = [r.split("\n# ")[0].rstrip("\n") + "\n" for r in rows]
+    files = dict(MEMORY_FILES)
+    files[instruction_units.derive_tool_rel(mt.name, "record-kinds.toml")] = (
+        (mt / "record-kinds.toml").read_bytes().decode("utf-8").replace("\r\n", "\n"))
+    return files, "\n" + "\n".join(rows)
+
+
 #: TOOL-dTotalRecall-10 S4's `repeat-heading`: one H2 repeated, then a heading whose own fold is the repeat's suffix
 REPEAT_GUIDE = ("# Repeat\n\n## Findings\n\nthe first findings\n\n## Findings\n\nthe second findings\n\n"
                 "## Findings 2\n\nthe third findings\n")
@@ -639,6 +691,12 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         files["memory/guides/BETA.md"] = GUIDE
     if plant == "repeat-heading":
         files["memory/guides/REPEAT.md"] = REPEAT_GUIDE
+    if plant == "memory-records":
+        extra, rows = derive_memory_files()
+        files.update(extra)
+        files[f"{kit}/namespaces.toml"] += rows
+        files[".memory-tree.conf"] += 'FAMILIES="tooling:TOOL"\n'
+        files["memory/guides/ALPHA.md"] = GUIDE + "\nthe pocket `record.witness` holds no record file\n"
     if plant == "unclosed-fence":
         files["memory/guides/ALPHA.md"] = GUIDE + UNCLOSED
     if plant == "unclosed-record":
@@ -1113,6 +1171,25 @@ def run_plant(root, top, plant, sets) -> int:
         same = print_equal(read_dump(root), read_cold_dump())
         rc = run_verb(root, "where", "doc.alpha#intro", sets=sets)
         return 0 if same and rc == 0 else 1
+    if plant == "memory-records":  # TOOL-dTotalRecall-9 AC1, AC2: the five namespaces over the fixture's records
+        run_verb(root, "rebuild", None, sets=sets)
+        con = ti.load_index(root)
+        try:
+            ti.load_view(con, root, ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml"))
+            state = ti.derive_namespace_state(con, ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml"))
+            goal = [r[1] for r in ti.read_rows(con, ("section",), tag="section.goal")]
+            keyed = [f"{t}={x}" for t, x in con.execute(
+                "SELECT p.tag, b.text " + ti.VIEW_JOIN + " JOIN blob_row b ON b.blob=p.blob AND b.extractor=p.extractor "
+                "AND b.version=p.version AND b.kind=p.kind AND b.line=p.line WHERE p.kind='record' AND p.path LIKE ?",
+                (f"{MEMORY_BUILD}/build/%",))]
+        finally:
+            con.close()
+        say("state", *(f"{ns} {state.get(ns, 0)}" for ns in ("record", "section", "feature", "class", "marker")))
+        say("section.goal", *goal)
+        say("record rows", *keyed)
+        rc = run_verb(root, "show", f"{MEMORY_RECORD}#section.findings-2", sets=sets)
+        rc |= run_verb(root, "show", "record.witness", sets=sets)
+        return rc | run_verb(root, "check", None, sets=sets)
     if plant == "repeat-heading":  # TOOL-dTotalRecall-10 S4: each repeat its own address, none graded unique
         run_verb(root, "rebuild", None, sets=sets)
         con = ti.load_index(root)

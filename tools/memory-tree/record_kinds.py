@@ -443,6 +443,10 @@ def check_row(row: dict, n: int, legs: set, root, tool_rel: str) -> list[str]:
         reds.append(f"{at}: `readers` names keys and `readers-none` says no role reads the kind: keep one")
     if "purpose" in row:
         reds += check_purpose_cell(row["purpose"], at, root)
+    try:
+        read_sections(row)
+    except RecordKindsError as e:
+        reds.append(f"{at}: {e}")
     schema = row.get("schema")
     if "schema" not in row:
         return reds
@@ -522,6 +526,59 @@ def read_leg_names(root, tool_rel: str) -> set | None:
     except (OSError, ValueError):
         return None
     return {leg.get("name") for leg in legs if isinstance(leg, dict)} if isinstance(legs, list) else None
+
+
+#: TOOL-dTotalRecall-9 S2: the keys of one `sections` entry, and the tag each names
+SECTION_KEYS = ("tag", "required", "heading")
+SECTION_TAG_RE = re.compile(r"section\.[a-z0-9][a-z0-9-]*")
+#: a heading's leading `<n>. `, stripped before its title is matched against a `heading` cell
+SECTION_NUMBER_RE = re.compile(r"^\d+\.\s*")
+
+
+def read_sections(row: dict) -> list[dict]:
+    """TOOL-dTotalRecall-9 S2: the row's `sections` cell, `[{tag, required, heading}]`, or [] where the
+    row has none, so a kind with no cell maps no heading and requires none. RecordKindsError naming the
+    kind where the cell is not a list of such tables: each `tag` a `section.<seg>`, `required` a boolean,
+    `heading` a non-empty title, no tag twice."""
+    cell = row.get("sections")
+    if cell is None:
+        return []
+    name = row.get("name", "?")
+    if not isinstance(cell, list):
+        raise RecordKindsError(f"kind {name}: `sections` is not a list of {{ tag, required, heading }} tables")
+    seen = set()
+    for i, entry in enumerate(cell, 1):
+        if not isinstance(entry, dict) or sorted(entry) != sorted(SECTION_KEYS):
+            raise RecordKindsError(f"kind {name}: `sections` entry {i} is not a {{ tag, required, heading }} table")
+        if not (isinstance(entry["tag"], str) and SECTION_TAG_RE.fullmatch(entry["tag"])):
+            raise RecordKindsError(f"kind {name}: `sections` entry {i} tag {entry['tag']!r} is not section.<seg>")
+        if not isinstance(entry["required"], bool):
+            raise RecordKindsError(f"kind {name}: `sections` entry {i} required {entry['required']!r} is not a boolean")
+        if not (isinstance(entry["heading"], str) and entry["heading"].strip()):
+            raise RecordKindsError(f"kind {name}: `sections` entry {i} heading is empty")
+        if entry["tag"] in seen:
+            raise RecordKindsError(f"kind {name}: `sections` names {entry['tag']} twice")
+        seen.add(entry["tag"])
+    return cell
+
+
+def read_section_tag(sections: list[dict], heading: str) -> str | None:
+    """The tag `sections` maps one heading's title to, its leading `<n>. ` stripped; None where unmapped."""
+    title = SECTION_NUMBER_RE.sub("", heading.strip())
+    return next((s["tag"] for s in sections if s["heading"] == title), None)
+
+
+def check_sections(row: dict, text: str) -> list[str]:
+    """TOOL-dTotalRecall-9 S2: the tags of the row's required sections no `##` heading of `text` maps to,
+    in the cell's order; [] for a kind with no cell. RecordKindsError where the cell is malformed."""
+    sections = read_sections(row)
+    found = set()
+    for line in text.replace("\r\n", "\n").split("\n"):
+        if line.startswith("## "):
+            tag = read_section_tag(sections, line[3:])
+            if tag:
+                found.add(tag)
+    return [s["tag"] for s in sections if s["required"] and s["tag"] not in found]
 
 
 # -------------------------------------------------------------------------------- the population

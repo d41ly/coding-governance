@@ -323,3 +323,16 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T05:48:41Z draw · re-dispatch · TOOL-dTotalRecall-50 · 42/186 · 20261123T054841Z-d973bf
 
 2026-11-23T05:48:41Z dispatch · item 4c50b60e TOOL-dTotalRecall-50 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dClosedLoop/README.md memory/builds/dTotalRecall/README.md
+
+2026-11-23T06:06:50Z brief · item TOOL-dTotalRecall-9 · reason 286a86e7f0ff memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-9-build-brief.md
+
+2026-11-23T06:10:46Z dispatch · item e1321ce7 TOOL-dTotalRecall-9 · reason tools/playbook/record_extract.py tools/playbook/namespaces.toml tools/playbook/edge_grammar.py tools/playbook/gov_tag.py tools/playbook/adopt-playbook.sh tools/playbook/memory_index.py tools/playbook/README.md tools/memory-tree/record_find.py tools/memory-tree/gov_record.py tools/memory-tree/record-kinds.toml tools/memory-tree/record_kinds.py tools/memory-tree/gen_build_index.py tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/README.md tools/memory-recall/query.py tools/memory-recall/check-recall.py tools/memory-recall/selftest.py tools/memory-recall/test_recall_floor.py tools/roles/handoff.py skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md tools/policy/caps.toml tools/policy/check_policy.py tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt tools/govkit/registry.toml tools/gate-legs.json help/tags.md help/size-caps.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-9.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-9-1-acceptance-ledger.md
+2026-11-23T06:54:10Z draw · re-dispatch · TOOL-dTotalRecall-9 · 43/186 · 20261123T065410Z-eda3cc
+
+2026-11-23T06:54:10Z dispatch · item e1321ce7 TOOL-dTotalRecall-9 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-9-deviation-92.md .governance/policy.json tools/memory-recall/selftest.py tools/playbook/README.md
+2026-11-23T06:58:20Z draw · re-dispatch · TOOL-dTotalRecall-9 · 44/186 · 20261123T065820Z-9babfb
+
+2026-11-23T06:58:20Z dispatch · item e1321ce7 TOOL-dTotalRecall-9 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-9-deviation-1006.md
+2026-11-23T07:03:28Z draw · re-dispatch · TOOL-dTotalRecall-9 · 45/186 · 20261123T070328Z-252972
+
+2026-11-23T07:03:28Z dispatch · item e1321ce7 TOOL-dTotalRecall-9 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dTotalRecall/README.md

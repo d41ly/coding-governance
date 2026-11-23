@@ -183,6 +183,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.sh"
     },
     {
+      "id": "FindError",
+      "kind": "class",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "Fixture",
       "kind": "class",
       "file": "tools/memory-tree/deviation_join.py"
@@ -396,6 +401,11 @@
       "id": "Ranked",
       "kind": "class",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "ReadRefused",
+      "kind": "class",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "ReapRefused",
@@ -3186,6 +3196,11 @@
       "id": "build_fixture",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "build_fixture",
@@ -7588,6 +7603,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "check_memory_reads",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "check_merge_arm",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
@@ -8458,6 +8478,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "check_read_set",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "check_reader_coverage",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -8521,6 +8546,11 @@
       "id": "check_record_data",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "check_record_file",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
     },
     {
       "id": "check_record_glob",
@@ -8641,6 +8671,11 @@
       "id": "check_registry",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "check_registry_path",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
     },
     {
       "id": "check_regrammared_at_base",
@@ -9043,6 +9078,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "check_sections",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "check_seed_plant",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
@@ -9273,6 +9313,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_spec_file",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
+    },
+    {
       "id": "check_spec_run",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -9426,6 +9471,11 @@
       "id": "check_superseded",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_superseded",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "check_surfaces",
@@ -13013,6 +13063,11 @@
       "file": "tools/playbook/overlay_rows.py"
     },
     {
+      "id": "derive_kind_row",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
+    },
+    {
       "id": "derive_kit_command",
       "kind": "function",
       "file": "tools/loop/policy_edit.py"
@@ -13356,6 +13411,11 @@
       "id": "derive_memory_disciplines",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_memory_files",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "derive_memory_line",
@@ -14698,6 +14758,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "derive_slice",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "derive_slot_units",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
@@ -14890,7 +14955,7 @@
     {
       "id": "derive_supersession_order",
       "kind": "function",
-      "file": "tools/memory-recall/query.py"
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "derive_table",
@@ -15768,6 +15833,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "extract_class",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
+    },
+    {
       "id": "extract_clause_tokens",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
@@ -15831,6 +15901,11 @@
       "id": "extract_families",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "extract_feature",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
     },
     {
       "id": "extract_files_touched",
@@ -15928,6 +16003,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "extract_marker",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
+    },
+    {
       "id": "extract_message_lines",
       "kind": "function",
       "file": "tools/lib/commit_trailers.py"
@@ -16023,6 +16103,11 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "extract_record",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
+    },
+    {
       "id": "extract_records",
       "kind": "function",
       "file": "tools/memory-tree/id_grammar.py"
@@ -16061,6 +16146,11 @@
       "id": "extract_section",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "extract_section",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
     },
     {
       "id": "extract_section_ref",
@@ -17313,6 +17403,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "load_memory_modules",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
+    },
+    {
       "id": "load_memory_tree",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -17408,6 +17503,11 @@
       "file": "tools/run-gates/py_reads.py"
     },
     {
+      "id": "load_recall_kit",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "load_records_at",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -17466,6 +17566,11 @@
       "id": "load_scenarios",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "load_served",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "load_served_index",
@@ -17568,6 +17673,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "load_tag_index",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "load_text",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -17606,6 +17716,11 @@
       "id": "load_upgrade_steps",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "load_view",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "load_view",
@@ -18216,6 +18331,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/memory-tree/record_causes.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "main",
@@ -21160,7 +21280,7 @@
     {
       "id": "query_expr",
       "kind": "function",
-      "file": "tools/memory-recall/query.py"
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "queue",
@@ -21611,6 +21731,11 @@
       "id": "read_anchor",
       "kind": "function",
       "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
+      "id": "read_anchor_mode",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
     },
     {
       "id": "read_anchor_unit",
@@ -23613,6 +23738,11 @@
       "file": "tools/run-gates/held_halves.py"
     },
     {
+      "id": "read_git_blob",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "read_git_dir",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -24088,6 +24218,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "read_item_cap",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "read_item_members",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
@@ -24191,6 +24326,11 @@
       "id": "read_kind_row",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "read_kind_rows",
+      "kind": "function",
+      "file": "tools/playbook/record_extract.py"
     },
     {
       "id": "read_kind_rows",
@@ -25418,6 +25558,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_policy",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "read_policy_at",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
@@ -26483,6 +26628,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "read_section",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "read_section_edges",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
@@ -26491,6 +26641,16 @@
       "id": "read_section_rows",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "read_section_tag",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
+      "id": "read_sections",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
     },
     {
       "id": "read_seed_policy",
@@ -27091,6 +27251,11 @@
       "id": "read_superseded",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_supersession_map",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "read_surface_classes",
@@ -27886,6 +28051,11 @@
       "id": "read_view_state",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "read_view_texts",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "read_visit_facts",
@@ -33820,7 +33990,7 @@
     {
       "id": "rrf",
       "kind": "function",
-      "file": "tools/memory-recall/query.py"
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "rrow",
@@ -34908,6 +35078,16 @@
       "file": "tools/push-main.test.sh"
     },
     {
+      "id": "run_find",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
+      "id": "run_find_plant",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
       "id": "run_fix_pass",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -34995,6 +35175,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/memory-tree/record_kinds.py"
     },
     {
@@ -35073,6 +35258,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "run_fixture_cli",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "run_fixture_command",
       "kind": "function",
       "file": "tools/loop/guard.py"
@@ -35111,6 +35301,11 @@
       "id": "run_fixture_git",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "run_fixture_git",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "run_fixture_git",
@@ -35255,7 +35450,7 @@
     {
       "id": "run_fusion",
       "kind": "function",
-      "file": "tools/memory-recall/query.py"
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "run_fx_card",
@@ -36758,6 +36953,11 @@
       "file": "tools/run-gates/verdict_backends.py"
     },
     {
+      "id": "run_read_verb",
+      "kind": "function",
+      "file": "tools/memory-tree/gov_record.py"
+    },
+    {
       "id": "run_reader_carried",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -36816,6 +37016,11 @@
       "id": "run_record_door",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "run_record_show",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
     },
     {
       "id": "run_refusal_plant",
@@ -36975,7 +37180,7 @@
     {
       "id": "run_rollup",
       "kind": "function",
-      "file": "tools/memory-recall/query.py"
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "run_rot24_gate",
@@ -38668,6 +38873,11 @@
       "file": "tools/gate-lint/encoding_posture.py"
     },
     {
+      "id": "scan_question",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
+    },
+    {
       "id": "scan_quoting_file",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -38691,6 +38901,11 @@
       "id": "scan_record_rows",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_records",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "scan_records",
@@ -39055,7 +39270,7 @@
     {
       "id": "search",
       "kind": "function",
-      "file": "tools/memory-recall/query.py"
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "sections",
@@ -40614,6 +40829,11 @@
     },
     {
       "id": "test_floor_reds_alone",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_floor_runs_record_find_fusion",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
     },
@@ -43351,6 +43571,11 @@
       "id": "write_fixture_commit",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "write_fixture_file",
+      "kind": "function",
+      "file": "tools/memory-tree/record_find.py"
     },
     {
       "id": "write_fixture_files",

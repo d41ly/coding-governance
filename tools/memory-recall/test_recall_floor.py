@@ -589,6 +589,25 @@ def test_served_set_leaves_untracked_out():
     return f"graded {len(got['graded'])} path(s), served {len(got['served'])}; the untracked one only served"
 
 
+@check("the floor ranks through record_find's one fusion, and no copy of it is left in this kit")
+def test_floor_runs_record_find_fusion():
+    """TOOL-dTotalRecall-9 S4: the served floor grades `record_find.run_fusion`, the fusion `record find`
+    runs, never a copy beside it. Read from the sources, so a second fusion definition left in `query.py`
+    reds here even when the two copies rank alike today; and `query.run_fusion` IS the finder's, so the
+    CLI's own ranking is the graded one."""
+    sys.path.insert(0, str(KIT))
+    import query  # noqa: PLC0415
+    import record_find  # noqa: PLC0415  memory-tree's, on the path `extract` put that kit on
+    copies = [f.name for f in sorted(KIT.glob("*.py"))
+              if re.search(r"^def (run_fusion|query_expr)\(", f.read_text(encoding="utf-8"), re.M)]
+    assert not copies, f"a fusion copy is defined in this kit beside record_find.py's: {copies}"
+    assert query.run_fusion is record_find.run_fusion, "query.run_fusion is not record_find.run_fusion"
+    src = CHECK.read_text(encoding="utf-8")
+    for name in ("record_find.query_expr(", "record_find.run_fusion("):
+        assert name in src, f"check-recall.py does not grade through {name[:-1]}"
+    return f"one fusion, in {pathlib.Path(record_find.__file__).name}; check-recall grades it"
+
+
 @check("a question with no `query` REFUSES by index, not KeyError three branches later")
 def test_malformed_question_refuses():
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="recallfx-"))

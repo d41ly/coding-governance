@@ -301,6 +301,14 @@ the key, read in process through `policy_value.read_declared_keys`; `check` prin
 `join policy · families` line, and a refused policy read declares nothing. What the family join does not
 check: what a placeholder stands for, so `policy.review.<anything>` is declared by `review.<stage>`.
 
+TOOL-dTotalRecall-9 registers the memory layer's five, their extractors in `record_extract.py` beside the
+registry, reaching memory-tree's modules through `tag_index.load_memory_tree`: `record` (each `[[record-kind]]`
+row of memory-tree's `record-kinds.toml` at its row, and one `record` row per record under the memory root, keyed
+by its id or its file stem, a kind no definition counts), `section` (each heading of a build record or a spec,
+its tag authored, mapped by its kind's `sections` table, or derived as `memory.legacy-anchors` admits),
+`feature` (each feature-tag anchor of tracked code, `unarmed` until one is written), `class` (each gotcha
+record of kind `class`) and `marker` (each `gov` marker word of tracked text, once per file).
+
 The later namespaces are not registered, so their tags red until the build that arms each adds its row:
 
 | Namespace | Armed by |
@@ -418,5 +426,6 @@ given twice one refusal), `read_section_edges`,
 `MARKER_RE`) and `read_carries_edges` (`design_lib.parse_binding_lines`, the carries line's one parser).
 `resolve_edge` resolves one target; `--check [--base <rev>]` runs every adapter over the tree and the
 trailers since the compare base, and is the `edges` leg of the `tags` pack. It does not grade an edge's
-`from`, since no source namespace is registered, nor resolve an `id#tag` target, `unarmed` until
-dTotalRecall arms the record namespace; a `serves` id no spec defines is counted, check 21's verdict.
+`from`, since no source namespace is registered; an `id#tag` target resolves through the section
+reader `record show` runs, memory-tree's `record_find.read_section` (TOOL-dTotalRecall-9 S5), and `gov_tag.py
+show <id>#<tag>` prints the same section; a `serves` id no spec defines is counted, check 21's verdict.

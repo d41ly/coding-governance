@@ -1561,18 +1561,24 @@ owner = "dLinkedLibrary"
 name = "memory.load-budget"
 allowed = ["4k", "8k", "16k"]
 default = "8k"
+summary = "The bytes the default load's memory share may take at session start, the card and the auto-memory index each measured against it as its own figure on the card's memory cell, a k being 1,000 bytes."
+usage = 'memory.load-budget = "16k"'
 owner = "dTotalRecall"
 
 [[key]]
 name = "memory.item-budget"
 allowed = { type = "enum", of = ["measured", 96, 128], registry = "KB per role (each role's cap the owner's to adjust)" }
 default = "measured"
+summary = "The KB of memory slices one work order may hand a role, summed over its read keys: measured reads 96 for every role until 30 sliced work orders per role are measured, or 96 or 128 for every role."
+usage = 'memory.item-budget = 128'
 owner = "dTotalRecall"
 
 [[key]]
 name = "memory.over-budget"
 allowed = ["refuse", "report", "off"]
 default = "report"
+summary = "What a work order's memory slices over memory.item-budget do, outside budgets.enforce: refuse the render naming role, bytes and cap, report one line and render, or off, render with nothing said."
+usage = 'memory.over-budget = "refuse"'
 owner = "dTotalRecall"
 
 [[key]]
@@ -1625,6 +1631,8 @@ owner = "dTotalRecall"
 name = "memory.superseded-slices"
 allowed = ["refuse", "mark"]
 default = "refuse"
+summary = "What a read key whose record another supersedes does: refuse the render naming its successor, or mark, the key handed with a superseded-by line naming it."
+usage = 'memory.superseded-slices = "mark"'
 owner = "dTotalRecall"
 
 [[key]]

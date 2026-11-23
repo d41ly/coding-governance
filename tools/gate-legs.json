@@ -2204,7 +2204,8 @@
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/policy/budgets.py",
       "{prefix}/policy/policy.py",
-      "{prefix}/memory-tree/backlog.py"
+      "{prefix}/memory-tree/backlog.py",
+      "{prefix}/memory-tree/record_find.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -2232,7 +2233,8 @@
       "{prefix}/memory-tree/tree_lib.py",
       "{prefix}/policy/budgets.py",
       "{prefix}/policy/policy.py",
-      "{prefix}/memory-tree/backlog.py"
+      "{prefix}/memory-tree/backlog.py",
+      "{prefix}/memory-tree/record_find.py"
     ],
     "chunk": "selftests",
     "subject": "repo",

@@ -1802,6 +1802,10 @@ def test_one_walk_two_callers():
 # (Since TOOL-aGraftedHelix-4, `render` and `emit` also print the supersession tag, `query.py`'s
 # eighth forked construct; the arms below were written against the unforked bodies and still drive
 # everything else in them.)
+# (Since TOOL-dTotalRecall-9, `query_expr`, `rrf`, `run_rollup`, `derive_supersession_order` and the
+# fusion live in memory-tree's `record_find.py`, the record finder's own ranking, and `query.py` imports
+# them back, so every `QRY.<name>` below still drives them. Their bodies are adopter ic's bar one module
+# prefix: the term rules are read from `id_grammar`, the module `bench` re-exports them from.)
 #
 # WHAT WAS REPATHED, and it is only ever one of three things: adopter ic's `_throwaway_repo()` becomes
 # gov's `make_repo()` plus `run()` over the fixture's own copy of the kit, for every arm that drives

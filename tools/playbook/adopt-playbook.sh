@@ -298,7 +298,10 @@ fi
 # next six rows are PLAY-dOrderedCharter-70's: a TOML row placed on its own `tag =` line, a staged rename
 # serving the new name alone, and a charter moved by a committed and by an uncommitted conf edit; between
 # them, PLAY-dOrderedCharter-49's two: a dirty row leaves with its reverted edit, and a worktree re-created at
-# a gone one's path inherits none of its rows. The last two rows are TOOL-dTotalRecall-10's `repeat-heading`: a
+# a gone one's path inherits none of its rows. The last six rows are TOOL-dTotalRecall-9's `memory-records`:
+# the five memory namespaces over a fixture build record whose untagged `## Findings` repeats, a legacy spec
+# whose `## 1. Goal` maps to `section.goal`, a pocket kind's `record.<kind>` citation resolved by its
+# registry row and an empty `feature` namespace printed unarmed. The two rows before them are TOOL-dTotalRecall-10's `repeat-heading`: a
 # repeated `##` heading derives `-2`, a later heading folding to that suffix searches past it to `-2-2`, the
 # second section serves its own text, and `check` grades no derived anchor for uniqueness. What they do not
 # check: a repeat across `##` and `###`, which the `doc` namespace does not derive.
@@ -420,6 +423,12 @@ reference-no-h1 $_tk|1|member doc.reference.fixture (|resolves to no row
 reference-no-h1 $_tk|1|/references.toml) lacks h1
 repeat-heading $_tk|0|tags: plant repeat-heading · sections findings findings-2 findings-2-2
 repeat-heading $_tk|0|tags: green · 0 red|doc.repeat#findings
+memory-records $_tk|0|section 4 feature 0 class 1 marker 1
+memory-records $_tk|0|tags: plant memory-records · record rows record.research=2026-01-01-build-TOOL-bFix-1-research-1
+memory-records $_tk|0|tags: plant memory-records · section.goal memory/builds/bFix/spec/2026-01-01-spec-TOOL-bFix-1.md
+memory-records $_tk|0|tags:   the second findings|tags:   the first findings
+memory-records $_tk|0|tags: record.witness · |resolves to no row
+memory-records $_tk|0|tags: unarmed feature (0 not graded)
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf tag-resolver arm(s) failed"; exit 1; fi
 echo "PASS — the tag resolver's plants"

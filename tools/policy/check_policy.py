@@ -4287,6 +4287,17 @@ def derive_outside_probe_plant(cap):
     if cap.name == "orientation-card":
         return derive_manifest_plant(cap, body="", env={key: "1"}, argv_tail=(
             "--card", "--write", "--session", "00000000-0000-4000-8000-000000000000")) | {"warn": "over the 1-byte cap"}
+    if cap.name == "memory-slices":  # TOOL-dTotalRecall-9 AC10: an over-cap read set, reported under either mode
+        kit_dir, tool_dir = posixpath.dirname(rel), posixpath.dirname(posixpath.dirname(rel))
+        record = "2026-01-01-build-TOOL-bFix-1-deviation-1"
+        body = "# big\n\n**Serves:** deviation TOOL-bFix-1\n\n" + ("x" * 99 + "\n") * 1300
+        return {"files": {".memory-tree.conf": 'MEMORY_ROOT="memory"\nFAMILIES="tooling:TOOL"\n',
+                          "memory/README.md": "# r\n", "memory/builds/bFix/README.md": "# bFix\n",
+                          f"memory/builds/bFix/build/{record}.md": body},
+                "copies": (kit_dir, *(posixpath.join(tool_dir, k) for k in ("playbook", "memory-recall")),
+                           budgets.derive_kit_rel().rstrip("/")),
+                "argv": [sys.executable, posixpath.join(kit_dir, "gov_record.py"), "budget", "--role", "gov-builder", record],
+                "warn": "memory over budget: gov-builder"}
     src = derive_enforcer_path(cap)
     if cap.name == "cited-file-cap":  # a waiver list, no number: a charter cites a file no cap covers
         return {"files": {".memory-tree.conf": HYGIENE_CONF + "CHARTER=AGENTS.md\n", "memory/README.md": "# r\n",
@@ -4345,6 +4356,7 @@ CAP_CASES = {
     "orientation-card": derive_outside_probe_plant, "cited-file-cap": derive_outside_probe_plant,
     "codex-instructions": derive_outside_probe_plant, "runlog-record": derive_outside_probe_plant,
     "feature-card": derive_outside_probe_plant, "hook-context": derive_outside_probe_plant,
+    "memory-slices": derive_outside_probe_plant,
 }
 
 

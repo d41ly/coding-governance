@@ -10814,6 +10814,17 @@ def cmd_new_spec(root: str, conf: dict, args: dict) -> int:
     rows = [r for r in conf.get("READINESS_ROWS", "").split("|") if r]
     text = render_spec_skeleton(template, template_rel, spec_id, args["tier"], base, today,
                                 disciplines[family], args["order"], rows, slug=slug)
+    # TOOL-dTotalRecall-9 S2: a required section the kind's `sections` cell declares and the skeleton
+    # lacks refuses by tag, before any byte is written
+    import record_kinds  # noqa: E402  this kit's registry reader, imported at the one call that needs it
+    try:
+        kinds = record_kinds.read_record_kinds(root) or []
+        missing = record_kinds.check_sections(next((r for r in kinds if r.get("name") == "spec"), {}), text)
+    except record_kinds.RecordKindsError as exc:
+        raise Problem(f"--new-spec: {exc}; nothing was written") from None
+    if missing:
+        raise Problem(f"--new-spec: {template_rel}'s Tier-{args['tier']} skeleton lacks the required "
+                      f"section(s) {', '.join(missing)}; nothing was written")
     write_text(os.path.join(root, rel), text)
     print(f"build-index: wrote {rel} carrying {text.count(FILL_MARKER)} fill slot(s); check 12 "
           f"refuses it until every `{FILL_MARKER} …>` is filled. Then: git add {rel} && "

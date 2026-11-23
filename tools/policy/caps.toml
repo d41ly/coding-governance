@@ -8,7 +8,8 @@
 #   class     `switch`: a breach warns or refuses as `budgets.enforce` and `budgets.pinned` say;
 #             `consumer`: a limit its consumer enforces by dropping what is over, outside the switch;
 #             `correctness`: a check of correctness, outside the switch; `exempt`: outside the switch
-#             and never pinnable. No `exempt` row exists today; the schema refuses one in `pinned`.
+#             and never pinnable, the schema refusing one in `pinned`: the memory slices a work order
+#             hands, answered by `memory.over-budget` alone (TOOL-dTotalRecall-9 S8).
 #   unit      `bytes`, `lines`, `chars` or `count`.
 #   enforcer  the file that measures the cap, `{prefix}`-relative as gate-legs.json spells one.
 #   home      where the value is declared today: `limits:<row key>` (a row of the template-size limits
@@ -397,3 +398,14 @@ family = false
 research = 24
 kit = "agent-cap"
 installed = "{prefix}/hooks/scratch-guard.js"
+
+[[cap]]
+name = "memory-slices"
+class = "exempt"
+unit = "bytes"
+enforcer = "{prefix}/memory-tree/record_find.py"
+home = "policy:memory.item-budget"
+family = true
+research = 0
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/record_find.py"

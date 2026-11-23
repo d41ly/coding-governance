@@ -138,14 +138,6 @@ CLI = "python3 " + _self_path()
 __doc__ = (__doc__ or "").replace("{cli}", CLI)
 
 CHUNK_MAX = 600  # pinned by the parent spec: 2400 and 300 both measured worse
-# How deep the chunk arm reads before it is rolled up to `k`. MIRRORS the `k * 8` literal inside
-# `bench.run_rollup` (the sibling module, imported here as `B`), which is the instrument this serving
-# path is being aligned with -- named rather than re-derived, because the two must agree and
-# `bench.py` is byte-pinned in `verbatim.json` so the literal there cannot move to meet this one.
-# (It is FORKED rather than verbatim since `TOOL-dTracedLattice-7`; the pin still holds it still.)
-# Collapsing several hits from one parent leaves fewer than `k` distinct parents from a `k`-deep
-# read, which is the whole reason the arm reads deeper than it returns.
-ROLLUP_DEPTH = 8
 CACHE_VERSION = 5  # bump when extraction changes: it is in every row's digest, so old rows are never served
 # 4 -> 5 at TOOL-aGraftedHelix-4: the manifest carries the `superseded` map, and a cache built
 # without it would be served with no supersession label and no order step, saying nothing.
@@ -158,7 +150,6 @@ CACHE_VERSION = 5  # bump when extraction changes: it is in every row's digest, 
 # such key, and the dead-alias diagnosis reads the manifest -- without the bump a warm cache
 # would keep the very silence this fix removes.
 WINDOW = 400  # chars of the head fallback, matching union.py's SNIPPET accounting
-SNIPPET_TOKENS = 64  # FTS5's documented maximum; a larger value is silently clamped
 # The default is the MEASURED cost of the shipped configuration: union.py reports 19 606 B for
 # records:fts5+chunks:fts5 at k=20 PER SOURCE, which is ~40 hits, not 20.
 DEFAULT_BUDGET = 20_000
@@ -284,12 +275,21 @@ CREATE TABLE IF NOT EXISTS fts_supersession(path TEXT, blob TEXT, digest TEXT, o
     kind TEXT, pattern TEXT);
 CREATE TABLE IF NOT EXISTS fts_digest(worktree TEXT PRIMARY KEY, digest TEXT);
 """
-# The document set a hit names -> the FTS5 table holding it.
-RECALL_SETS = {"records": "fts_record", "chunks": "fts_chunk"}
-# The join every read of recall's rows makes: this call's served pairs, at this call's digest. CROSS,
-# so the FTS5 table is always the outer loop: it has no index on the UNINDEXED key columns, and a
-# plan probing it once per served pair would scan it once per pair.
-SERVED_JOIN = "CROSS JOIN recall_view v ON f.path = v.path AND f.blob = v.blob AND f.digest = v.digest"
+# The fusion and its constants live in memory-tree's `record_find.py`, the record finder's own ranking
+# (TOOL-dTotalRecall-9 S3), on the path `extract` put that kit on; imported here, never copied, so this
+# CLI and a `query.<name>` caller rank through the one fusion `record find` runs.
+from record_find import (  # noqa: E402,F401  re-exported: every reader of this module keeps its spelling
+    RECALL_SETS,
+    ROLLUP_DEPTH,
+    SERVED_JOIN,
+    SNIPPET_TOKENS,
+    derive_supersession_order,
+    query_expr,
+    rrf,
+    run_fusion,
+    run_rollup,
+    search,
+)
 
 
 def alias_digest() -> str:
@@ -523,182 +523,12 @@ def dead_alias_diagnosis(aliases: dict) -> str | None:
 # ---------------------------------------------------------------------------------- querying
 
 
-def query_expr(question: str, extra_terms: list[str] | None = None) -> str | None:
-    """The FTS5 MATCH expression, or None when nothing searchable survives.
-
-    ``bench.match_expr`` falls back to ``'"the"'`` on an empty term set, which turns "how do I do
-    this?" into five arbitrary records presented as answers. The caller refuses instead.
-
-    Ids are added as quoted PHRASES: the ``unicode61`` tokenizer splits ``ARCH-169`` into ``arch``
-    and ``169``, so ``"arch 169"`` is how the pair is matched adjacently.
-    """
-    extra_terms = extra_terms or []
-    parts: list[str] = []
-    base_terms = B.terms(question)
-    if base_terms:
-        parts.append(B.match_expr(question))
-    for t in extra_terms:
-        cleaned = t.replace('"', " ").strip()
-        if cleaned:
-            parts.append(f'"{cleaned}"')
-    for found in dict.fromkeys(E.ID_RE.findall(question + " " + " ".join(extra_terms))):
-        parts.append('"' + found.replace("-", " ").lower() + '"')
-    if not parts:
-        return None
-    return " OR ".join(parts)
-
-
-def search(con, name: str, expr: str, k: int) -> list[dict]:
-    """The top ``k`` of document set ``name`` (`RECALL_SETS`) for ``expr``, over the served rows only.
-
-    The ranking is today's -- ``bm25`` with the alias column down-weighted -- over the FTS5 table,
-    joined to `recall_view` so a row of another worktree's tree or another digest is never a hit.
-    A MATCH the FTS5 grammar refuses is a miss, never a crash."""
-    t = RECALL_SETS[name]  # MATCH, snippet() and bm25() take the table's hidden column, never the alias
-    try:
-        rows = con.execute(
-            "SELECT f.rowid, f.id, f.path, f.line, "
-            f"snippet({t}, 1, '', '', '…', {SNIPPET_TOKENS}), f.body "
-            f"FROM {t} f {SERVED_JOIN} "
-            f"WHERE {t} MATCH ? ORDER BY bm25({t}, 1.0, 1.0, {B.ALIAS_WEIGHT}) LIMIT ?",
-            (expr, k),
-        ).fetchall()
-    except sqlite3.OperationalError:
-        return []
-    return [
-        {
-            "set": name,
-            "rowid": r[0],
-            "id": r[1],
-            "path": r[2],
-            "line": r[3],
-            "snippet": r[4],
-            "text": r[5],
-        }
-        for r in rows
-    ]
-
-
-def rrf(rankings: list[list[dict]]) -> list[dict]:
-    """Reciprocal rank fusion at ``bench.RRF_K``, the instrument's own constant.
-
-    Keyed on (path, line) rather than rowid: the same passage can surface from both sets, and two
-    sets' rowids are unrelated integers.
-    """
-    scored: dict[tuple, list] = {}
-    for ranked in rankings:
-        for rank, hit in enumerate(ranked, 1):
-            key = (hit["path"], hit["line"], (hit.get("text") or "")[:60])
-            slot = scored.setdefault(key, [0.0, hit])
-            slot[0] += 1.0 / (B.RRF_K + rank)
-            # Prefer the record-level view of the same passage: it carries the id.
-            if hit["set"] == "records":
-                slot[1] = hit
-    return [h for _, (_, h) in sorted(scored.items(), key=lambda kv: -kv[1][0])]
-
-
-def run_rollup(hits: list[dict], k: int) -> list[dict]:
-    """Keep the best hit per PARENT, in rank order, capped at ``k``.
-
-    ``bench.run_rollup`` does the same thing over its own in-memory ``docs`` list and a
-    ``bench.build_fts_rows`` connection; this one serves the dictionaries ``search()`` returns, read
-    from the index's own ``id`` column. The two cannot be one function -- different inputs,
-    different connections -- so what is shared is the PARENT KEY, and the two spellings are NOT
-    identical: ``bench.parent_of`` is ``rec or id or path`` while this is ``id or path``. They agree
-    only because ``build_fts_rows`` folds the two into one column -- it writes ``id`` as
-    ``d.get("id") or d.get("rec")`` -- so a chunk row arrives here with its parent record id
-    already IN ``id``. That fold is the load-bearing step and it is named here because nothing
-    else names it and no arm tests it: change that column and this rollup silently becomes a
-    per-path cap for the anchored 0.6% as well.
-
-    THE PARENT KEY IS THE PATH FOR ALMOST EVERYTHING, and calling this a per-record rollup would be
-    wrong. ``extract_chunks`` sets a chunk's ``rec`` only when a HEADING LINE itself defines a record
-    id, and the heading pattern requires ``#{2,6}``, so an H1, a bold-list anchor and a table anchor
-    all leave it unset. Measured over the tracked corpus: 129 of 20056 chunk documents carry a
-    ``rec`` -- 0.6%. For the other 99.4% this is a per-PATH cap, at most one hit per file, which is
-    exactly what the duplicate-slot problem needs. The per-record behaviour is the rare case, and
-    both branches carry a self-test arm because an arm on the 0.6% certifies nothing about the rest.
-    """
-    best: dict = {}
-    for hit in hits:
-        key = hit.get("id") or hit["path"]
-        if key not in best:
-            best[key] = hit
-        if len(best) >= k:
-            break
-    return list(best.values())[:k]
-
-
-def derive_supersession_order(hits: list[dict], smap: dict) -> list[dict]:
-    """Annotate every hit from the supersession map, and move a WHOLE-superseded hit under its
-    successor when that successor is listed below it.
-
-    ``supersession`` is ``whole``, ``partial`` or None; ``superseded_by`` lists the whole
-    successors, or the partial ones when there is no whole edge. A whole-superseded hit moves to sit
-    directly after the LOWEST-ranked of its listed successors; a partial hit, and one whose
-    successor is absent or ranks above it, keeps its rank, and every other hit keeps its relative
-    order. Not a score multiplier: spec §4 shows one sinks the label far from the successor it names.
-    A hit only ever moves DOWN, and only past its own successor.
-    """
-    last: dict[str, int] = {}
-    for i, h in enumerate(hits):
-        edges = smap.get(h.get("id") or "", [])
-        whole = [n for n, kind in edges if kind == "whole"]
-        h["supersession"] = "whole" if whole else ("partial" if edges else None)
-        h["superseded_by"] = whole or [n for n, _ in edges]
-        if h.get("id"):
-            last[h["id"]] = i
-    after: dict[int, list[int]] = collections.defaultdict(list)
-    for i, h in enumerate(hits):
-        if h["supersession"] == "whole":
-            j = max((last[n] for n in h["superseded_by"] if n in last), default=-1)
-            if j > i:
-                after[j].append(i)
-    moved = {i for v in after.values() for i in v}
-    out: list[dict] = []
-
-    def add_hit(i: int) -> None:
-        # Recursion terminates: a hit is only ever hung after a STRICTLY later one.
-        out.append(hits[i])
-        for d in after.get(i, ()):
-            add_hit(d)
-
-    for i in range(len(hits)):
-        if i not in moved:
-            add_hit(i)
-    return out
-
-
 def render_supersession_tag(hit: dict) -> str:
     """The header tag for a superseded hit, or "" — one spelling for both renderers."""
     if not hit.get("superseded_by"):
         return ""
     part = "partly " if hit.get("supersession") == "partial" else ""
     return f"  [{part}superseded by {', '.join(hit['superseded_by'])}]"
-
-
-def run_fusion(con, expr: str, k: int, smap: dict | None = None) -> list[dict]:
-    """The served fusion: the records arm as-is, the chunk arm rolled up to one hit per parent.
-
-    ONE call site, deliberately. This was two identical expressions -- the first attempt and the
-    rebuild after a ``sqlite3.DatabaseError`` -- and a rollup applied to only one of them would make
-    the served shape depend on whether the cache happened to be healthy, surfacing only on a
-    corrupted cache in a live session. Every acceptance arm runs the healthy path, so the
-    duplication was unobservable by construction; deleting it is smaller than gating it.
-
-    The chunk arm pulls ``k * ROLLUP_DEPTH`` before rolling up, because collapsing several hits from
-    one parent leaves fewer than ``k`` distinct parents from a ``k``-deep read. The records arm is
-    untouched: ``bench.parent_of`` returns a record's own id there, so the rollup is a no-op and the
-    extra depth would be paid for nothing.
-
-    The supersession order step runs HERE for the same reason the rollup does: one call site, so
-    no caller can serve a different order. ``smap`` is `derive_served_supersessions`'s map; an
-    empty one annotates every hit as current and moves nothing. ``con`` is `load_served_set`'s.
-    """
-    return derive_supersession_order(rrf([
-        search(con, "records", expr, k),
-        run_rollup(search(con, "chunks", expr, k * ROLLUP_DEPTH), k),
-    ]), smap or {})
 
 
 # ---------------------------------------------------------------------------------- emission

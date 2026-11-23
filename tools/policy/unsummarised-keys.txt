@@ -107,15 +107,11 @@ memory.code-enrich
 memory.code-languages
 memory.code-roles
 memory.default-load
-memory.item-budget
-memory.load-budget
 memory.map-budget
 memory.map-overflow
 memory.map-unfold
 memory.mirror
-memory.over-budget
 memory.project-map
-memory.superseded-slices
 notices.record
 notify.channel
 notify.owner

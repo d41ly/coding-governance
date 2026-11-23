@@ -30,7 +30,8 @@ there is nothing to divide, and printing that beats a 0/0 or a silent skip.
 
 TWO PIN HEADS. `<set>:<substrate>:<metric>@<k>` ranks the bare question over one extracted set
 through `bench.rank_with` -- a configuration no session is served. `served:<metric>@<k>` ranks
-through the CLI's own `query.query_expr` and `query.run_fusion` over the rows
+through `record find`'s own `record_find.query_expr` and `record_find.run_fusion` (memory-tree's,
+which the CLI imports; TOOL-dTotalRecall-9 S4) over the rows
 `query.load_served_set(root, untracked=False)` serves from the node's tag index, so a change to the
 expression, the rollup or the fusion moves the floor. Under it every question owes two term lists,
 and a graded ROW is one (question, slice) pair: `h`, `R` and the ceiling count rows, and each
@@ -92,6 +93,7 @@ import bench  # noqa: E402
 import extract  # noqa: E402
 import query  # noqa: E402
 import recall_conf  # noqa: E402
+import record_find  # noqa: E402  memory-tree's finder, on the path `extract` put that kit on
 
 KIT = pathlib.Path(__file__).resolve().parent
 FIXTURE_NAME = "recall-fixture.json"
@@ -111,7 +113,7 @@ PIN_RE = re.compile(
     r"^(?P<set>[a-z0-9]+):(?P<sub>[a-z0-9]+):(?P<metric>[a-z]+)@(?P<k>\d+)>=(?P<value>\d*\.?\d+)$"
 )
 # The `served` head: no set and no substrate, because the CLI's fused ranking is neither one set nor
-# one `bench` substrate. Under it the floor ranks through `query.query_expr` and `query.run_fusion`.
+# one `bench` substrate. Under it the floor ranks through `record_find.query_expr` and `record_find.run_fusion`.
 SERVED_RE = re.compile(r"^served:(?P<metric>[a-z]+)@(?P<k>\d+)>=(?P<value>\d*\.?\d+)$")
 # The two term lists a question carries under a `served` pin, each one graded ROW: `terms` is the
 # rewrite a session writes after reading the corpus, `naive_terms` one written from the question
@@ -342,8 +344,8 @@ def measure_served(con, queries: list[dict], pin: dict, slices: tuple = SLICES) 
         declared = [i.strip() for i in q.get("expected_ids", []) if i.strip()]
         unresolved.extend(i for i in declared if i not in targets)
         for s in slices:
-            expr = query.query_expr(q["query"], q[s])
-            fused = query.run_fusion(con, expr, pin["k"]) if expr else []
+            expr = record_find.query_expr(q["query"], q[s])
+            fused = record_find.run_fusion(con, expr, pin["k"]) if expr else []
             judged = [{k: v for k, v in h.items() if k != "id" or v} for h in fused]
             want = bench.expected_by_target(judged, q, anchors)
             # `and targets`: a row that cannot resolve is outside R, so it may not count toward h.

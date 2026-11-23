@@ -586,7 +586,7 @@ read_memory_root() {
   printf '%s' "${v%$'\r'}"
 }
 render_card() {
-  local verb="$1" registry="" memroot live body
+  local verb="$1" registry="" memroot live
   [ -n "$MF" ] && [ -f "$MF" ] && { BLOCK=$(read_block "$MF"); getval 'registry' registry; }
   derive_head_state
   if ! memroot=$(read_memory_root); then
@@ -602,7 +602,10 @@ render_card() {
   fi
   # The cells below the header first, so the `keys —` cell's remote key is taken after the `claims —`
   # read has fetched; then the header, that cell and the cells, in that order (TOOL-dDeclaredLoop-8 S5).
-  body=$(
+  # The `memory —` cell is derived last, over the byte count of every other cell, and printed in its
+  # place after `live —` (TOOL-dTotalRecall-9 S9).
+  local above below head memory
+  above=$(
     derive_node_tag "$registry"
     derive_cli_line
     render_tree_cell
@@ -610,16 +613,20 @@ render_card() {
     derive_drift_line
     derive_overlaps_line
     printf '%s\n' "$live"
-    derive_memory_line
+  )
+  below=$(
     derive_claims_line "$verb"
     render_health_cell
     printf 'recent —\n'
     git log --oneline -5 2>/dev/null
     printf 'READY — none yet\n'
   )
-  printf 'orientation — %s · written %s · by %s --card --%s\n' "$CARD_SID" "$(date +%Y-%m-%dT%H:%M:%S%z)" "${0##*/}" "$verb"
-  render_keys_cell
-  printf '%s\n' "$body"
+  head=$(
+    printf 'orientation — %s · written %s · by %s --card --%s\n' "$CARD_SID" "$(date +%Y-%m-%dT%H:%M:%S%z)" "${0##*/}" "$verb"
+    render_keys_cell
+  )
+  memory=$(derive_memory_line "$(printf '%s\n%s\n%s\n' "$head" "$above" "$below" | LC_ALL=C wc -c | tr -d '[:space:]')")
+  printf '%s\n%s\n%s\n%s\n' "$head" "$above" "$memory" "$below"
 }
 
 # The `keys —` cell (TOOL-dDeclaredLoop-8 S5): the loop kit's `claims.py card-keys` over this tree, found
@@ -687,7 +694,9 @@ derive_overlaps_line() {
 # measure`, found as every sibling is by `resolve_kit_file` and bounded as the `overlaps —` cell bounds
 # its read: a kill into a scratch file under the card dir, never a `$( )` capture, stdin /dev/null. The
 # measure derives the index's place itself, so this script spells no second project key; `--home` hands
-# it this shell's `~`. Its first line prints on exit 0, and every failure is one `memory — skipped:` line.
+# it this shell's `~`; `$1`, the byte count of the card's other cells, is handed as `--card-bytes`, so the
+# cell names the card and the index each against the budget (TOOL-dTotalRecall-9 S9). Its first line
+# prints on exit 0, and every failure is one `memory — skipped:` line.
 # WHAT THIS DOES NOT CHECK: the line's figures, which are the measure's to derive and bound.
 derive_memory_line() {
   local mi py sf rc
@@ -698,7 +707,7 @@ derive_memory_line() {
     || { printf 'memory — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
   sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.memory.XXXXXX") \
     || { printf 'memory — skipped: no scratch file under %s to capture the measure in\n' "$CARD_DIR"; return 0; }
-  timeout -k 2 "$CARD_MEMORY_BOUND" "$py" "$mi" measure ${HOME:+--home "$HOME"} </dev/null >"$sf" 2>/dev/null; rc=$?
+  timeout -k 2 "$CARD_MEMORY_BOUND" "$py" "$mi" measure ${HOME:+--home "$HOME"} ${1:+--card-bytes "$1"} </dev/null >"$sf" 2>/dev/null; rc=$?
   case "$rc" in
     0) LC_ALL=C awk '{ sub(/\r$/, "") } NR == 1 { print; f = 1 }
          END { if (!f) print "memory — skipped: the measure exited 0 and printed nothing" }' "$sf" ;;

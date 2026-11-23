@@ -50,7 +50,8 @@ unreadable registry or a failed `--print-relations`.
 
 Every other line opens `edges:`. Exit 0 green, 1 red or a malformed edge line, 2 an unreadable registry.
 What it does not check: an edge's source against its row's `from`, since no source namespace (record,
-commit, act) is registered; an `id#tag` target, `unarmed` until dTotalRecall arms the record namespace;
+commit, act) is registered (an `id#tag` target resolves through memory-tree's `record_find.read_section`,
+the reader `record show` runs, TOOL-dTotalRecall-9 S5);
 an id whose class is not registered, `unarmed`; a `serves` target no spec defines, which check 21
 reds, so `--check` counts it as unresolved and adds no second verdict; and two leg-row marks, each
 `unarmed` and counted on an `edges: leg rows` line: a `tests` target whose namespace no registry row
@@ -609,8 +610,15 @@ def resolve_edge(target, rc) -> tuple[str, str]:
     import design_lib
     form, ns = parse_edge_target(target)
     base, _, pin = target.partition("@")
-    if form == "id#tag":
-        return "unarmed", "an id#tag target resolves once dTotalRecall arms the record namespace"
+    if form == "id#tag":   # TOOL-dTotalRecall-9 S5: the one section reader `record show` runs
+        ti.load_memory_tree()  # puts memory-tree, the finder's kit, on the path
+        import record_find
+        try:
+            sec = record_find.read_section(rc["root"], target)
+        except record_find.FindError as exc:
+            return "red", str(exc)
+        first = sec["text"].splitlines()[0] if sec["text"] else ""
+        return "resolved", f"{target} · {sec['path']}:{sec['line']}-{sec['end_line']} · {first}"
     if ns is not None:
         rows = read_tag_rows(rc, base)
         if not rows:
