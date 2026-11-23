@@ -3375,7 +3375,7 @@ async function runLensYieldArms() {
 // logged. A green arm here says the routing, the prompt variants and the key follow the argument; no
 // live agent of a rendered role type is spawned, so nothing here proves the platform runs one.
 async function runRolesArms() {
-  const FULL = { diffFinder: 'gov-diff-reviewer', specFinder: 'gov-spec-reviewer', skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' }
+  const FULL = { diffFinder: 'gov-reviewer', specFinder: 'gov-reviewer', skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' }
   const ABSW = Object.assign({}, DIFF); delete ABSW.workerType
   const scanStage = (run, p) => run.trace.filter((t) => t.label.indexOf(p) === 0)
   const scanTypes = (run, p) => scanStage(run, p).map((t) => t.agentType)
@@ -3393,13 +3393,15 @@ async function runRolesArms() {
   // ---- S3: each stage spawns as the type its key names, and the probe as Plan when no key names it.
   r = await runReview(Object.assign({}, ABSW, { roles: FULL }), ALL_OK)
   if (checkNoThrow(r, 'roles full diff')) {
-    ck(checkAll(scanTypes(r, 'find:'), 'gov-diff-reviewer') && checkAll(scanTypes(r, 'verify:'), 'gov-skeptic') &&
+    ck(checkAll(scanTypes(r, 'find:'), 'gov-reviewer') && checkAll(scanTypes(r, 'verify:'), 'gov-skeptic') &&
       checkAll(scanTypes(r, 'synth'), 'gov-synthesizer') && checkAll(scanTypes(r, 'resume:probe'), 'Plan'),
       'roles: a full diff set spawns finders, skeptics and the synthesis as their roles, and the probe as Plan')
   }
-  const rsf = await runReview(Object.assign({}, SPEC, { roles: FULL }), ALL_OK)
+  // the merged roster gives both finder keys one role, so the spec run sets diffFinder apart: a harness reading
+  // the wrong kind's key spawns 'gov-other-reviewer' and the arm reds (TOOL-dBoundRoles-44 S2)
+  const rsf = await runReview(Object.assign({}, SPEC, { roles: Object.assign({}, FULL, { diffFinder: 'gov-other-reviewer' }) }), ALL_OK)
   if (checkNoThrow(rsf, 'roles full spec'))
-    ck(checkAll(scanTypes(rsf, 'find:'), 'gov-spec-reviewer') && checkAll(scanTypes(rsf, 'verify:'), 'gov-skeptic'),
+    ck(checkAll(scanTypes(rsf, 'find:'), 'gov-reviewer') && checkAll(scanTypes(rsf, 'verify:'), 'gov-skeptic'),
       'roles: a spec audit spawns its finders as specFinder, never diffFinder')
   const rsk = await runReview(Object.assign({}, ABSW, { roles: { skeptic: 'gov-skeptic' } }), ALL_OK)
   if (checkNoThrow(rsk, 'roles skeptic only'))
@@ -3410,13 +3412,13 @@ async function runRolesArms() {
     ck(checkAll(scanTypes(rsy, 'find:'), 'general-purpose') && checkAll(scanTypes(rsy, 'verify:'), 'general-purpose') && checkAll(scanTypes(rsy, 'synth'), 'gov-synthesizer'),
       'roles: a synthesis key under workerType none moves the synthesis alone')
   // ---- S4: a roled judge makes the whole run not durable; a synthesis role does not.
-  const rdf = await runReview(Object.assign({}, DIFF, { roles: { diffFinder: 'gov-diff-reviewer' } }), ALL_OK)
+  const rdf = await runReview(Object.assign({}, DIFF, { roles: { diffFinder: 'gov-reviewer' } }), ALL_OK)
   if (checkNoThrow(rdf, 'roles finder only')) {
     const judges = scanStage(rdf, 'find:').concat(scanStage(rdf, 'verify:'))
     ck(judges.length === 10 && judges.every((t) => t.prompt.indexOf('Write no file') !== -1 && t.prompt.indexOf('DURABILITY') === -1),
       'roles: under a finder role, every finder and every untyped skeptic is told to write no file')
   }
-  r = await runReview(Object.assign({}, DIFF, { roles: { diffFinder: 'gov-diff-reviewer' } }), buildStubs({ 'find:': null }))
+  r = await runReview(Object.assign({}, DIFF, { roles: { diffFinder: 'gov-reviewer' } }), buildStubs({ 'find:': null }))
   if (checkNoThrow(r, 'roles finder only, lenses dead'))
     ck(r.result.durable === false && r.result.note.indexOf('dispatches every finder and skeptic again') !== -1,
       'roles: a finder role with every lens dead returns durable false, and the note re-dispatches every judge')
@@ -3451,7 +3453,7 @@ async function runRolesArms() {
   const kAbsent = await deriveRolesKey(undefined)
   const kEmpty = await deriveRolesKey({})
   const kSynth = await deriveRolesKey({ synthesis: 'gov-synthesizer' })
-  const kOther = await deriveRolesKey({ specFinder: 'gov-spec-reviewer' })
+  const kOther = await deriveRolesKey({ specFinder: 'gov-reviewer' })
   const kSkeptic = await deriveRolesKey({ skeptic: 'gov-skeptic' })
   const kFullA = await deriveRolesKey(FULL)
   const kFullB = await deriveRolesKey(Object.assign({}, FULL, { diffFinder: 'gov-other-reviewer' }))

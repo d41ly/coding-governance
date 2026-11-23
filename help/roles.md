@@ -125,7 +125,10 @@ reference; this page is the short version.
    upstream rows handed, `### return` repeats the rule for answering them under `## Upstream`. An
    item's task framed by a prompt writer whose return carries no `population` is refused, naming
    `framing:population`: no item lists its own population, so the prompt writer's steps for finding
-   it are the population.
+   it are the population. A backticked span opening `blob:`, `record:` or `cmd:` is an anchor, a
+   pointer at a handed fact by its key: the render refuses a work order whose framing or other
+   authored text points at a fact it does not hand, or spells an anchor malformed, one
+   `anchor <span>` line each, and writes nothing. Handed content itself is never graded.
 6. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets, held to
    the floor `medium` that only your own policy key goes below (see "The effort floor" below). It

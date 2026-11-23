@@ -56,3 +56,8 @@ loop runs each at its landed bytes, `git show <L>:<rel>` over the working-tree f
 - AC16 — `step_gate.py` — OWED: the step gate over the pass's parent at the close; the row's `surfaces` name the retired file as `installable:` and `file:`.
 - AC17 — `landed` — `grep -n 'landed' help/roles.md` prints the bullet under "What the hooks refuse" naming a harness not at its landed blob, beside its usage anchor `hook:spawn-guard`.
 - AC18 — `spawn-guard self-test` — `leg_factory.py --list` printed `spawn-guard self-test` declared in `tools/govkit/registry.toml` and no `agent-cap self-test`; `--check` exited 0, and the rendered row of `tools/gate-legs.json` carries `enforces = ["practice.gate"]`.
+
+## Amended by TOOL-dBoundRoles-44
+
+- S1 of TOOL-dBoundRoles-44, amended — the `memory/` half of the reader grep above, `git grep -l -F 'agent-cap.js' 8b8b1374c -- memory ':!memory/builds' ':!memory/ledger'` at the build run's base, prints only files a class of `TOOL-dBoundRoles-42`'s table takes, its population `TOOL-dBoundRoles-42` S4. Each is listed with its class in `memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-44-2-acceptance-ledger.md`, and none stands outside a class.
+- S9 of TOOL-dBoundRoles-44, amended — the close's swap check: a harness this build edited runs at its landed bytes only under the build README's trap-guarded swap, and the exit of `git diff --quiet -- <rel>` after the restore is recorded here, one line per swapped harness, at the close under a `Pass: none` commit, where the swap happens (`TOOL-dBoundRoles-51` S2). At TOOL-dBoundRoles-44's pass commit no harness has been swapped: this session's spawn hook runs from the primary tree, which holds no spawn guard of this run.

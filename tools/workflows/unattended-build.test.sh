@@ -3299,8 +3299,8 @@ hasnt_ "GH35 ...and no WARNING prints" "$o" "$GH35_WARN"
 # ---- and its untyped `has` twin cannot both pass by the text going missing. Every typed, refusal and
 # ---- hand-back arm read RED against the harnesses before roles, which spawn every stage untyped and
 # ---- tell the builder to edit its spec.
-OC_ROLES='{"specWriter":"gov-spec-writer","committer":"gov-x","disposal":"gov-spec-writer","builder":"gov-builder","specFinder":"gov-spec-reviewer","skeptic":"gov-skeptic","synthesis":"gov-synthesizer"}'
-OC_NOB='{"specWriter":"gov-spec-writer","committer":"gov-x","disposal":"gov-spec-writer","specFinder":"gov-spec-reviewer","skeptic":"gov-skeptic","synthesis":"gov-synthesizer"}'
+OC_ROLES='{"specWriter":"gov-spec-writer","committer":"gov-x","disposal":"gov-spec-writer","builder":"gov-builder","specFinder":"gov-reviewer","skeptic":"gov-skeptic","synthesis":"gov-synthesizer"}'
+OC_NOB='{"specWriter":"gov-spec-writer","committer":"gov-x","disposal":"gov-spec-writer","specFinder":"gov-reviewer","skeptic":"gov-skeptic","synthesis":"gov-synthesizer"}'
 OC_NOSUB=$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##')
 OC_A=("$UNITS" "$OC_NOSUB" "$UNITS")
 review_out 0 >/dev/null; rec CONVERGED >/dev/null
@@ -3348,7 +3348,7 @@ has    "OC4 AC1 untyped: the spec prompt keeps the criterion craft" "$OC_P" "sta
 has    "OC4 AC1 untyped: ...and the no-code order" "$OC_P" "DO NOT WRITE PRODUCT CODE"
 has    "OC4 AC1 untyped: the disposal prompt keeps the edge join's rationale" "$(printf '%s' "$OC_UNTYPED" | grep '^prompt:dispose:')" "the whole reason that join exists"
 hasnt_ "OC4 AC1 untyped: no prompt carries a role stamp" "$(printf '%s' "$OC_UNTYPED" | grep '^prompt:')" "This stage runs as the"
-same   "OC4 AC2 typed: the audit forwards its three review roles" "$(printf '%s' "$OC_TYPED" | grep '^wfroles:' | sort -u)" 'wfroles:{"skeptic":"gov-skeptic","specFinder":"gov-spec-reviewer","synthesis":"gov-synthesizer"}'
+same   "OC4 AC2 typed: the audit forwards its three review roles" "$(printf '%s' "$OC_TYPED" | grep '^wfroles:' | sort -u)" 'wfroles:{"skeptic":"gov-skeptic","specFinder":"gov-reviewer","synthesis":"gov-synthesizer"}'
 has    "OC4 AC2 typed: ...beside workerType none" "$(printf '%s' "$OC_TYPED" | grep '^wargs:' | head -1)" '"workerType":"none"'
 has    "OC4 AC2 typed: the builder type travels to the child" "$(printf '%s\n' "$OC_T0" | grep '^RESULT')" '"roles":{"builder":"gov-builder"}'
 has    "OC4 AC2 typed: the log names each typed stage" "$OC_T0" "log:roles: specWriter spawns as the gov-spec-writer agent type"

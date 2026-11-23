@@ -19,9 +19,9 @@ commands, tier rules) comes from the **project layer**: the repo's kickoff manif
 Precedence on conflicts: **project `CLAUDE.md` > project manifest > this skill** — follow the
 winner and flag the conflict so it gets fixed.
 
-Posture: do the mechanical checks yourself (shell/Read/Grep), ask the user ONLY for what you
-can't derive, use `AskUserQuestion` for genuine forks. Keep it tight — this is a launchpad,
-not a meeting.
+Posture: do the mechanical checks yourself (`grep` and `git grep` through Bash, and `Read`), ask
+the user ONLY for what you can't derive, use `AskUserQuestion` for genuine forks. Keep it tight —
+this is a launchpad, not a meeting.
 
 **Efficiency rules (non-negotiable):**
 - Run the whole of Step 1 as **ONE batched shell command**, not a call per check.
