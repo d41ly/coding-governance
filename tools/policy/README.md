@@ -386,14 +386,16 @@ then this kit's preset store `presets.toml`, which the preset step reads (KICK-d
 the kit's prefix in its repository as the catalogue is, `derive_mirror_inputs` in `policy.py`, each
 to its blob id at the rendered revision or null. The helper takes the inputs it compares from its
 own code (KICK-dKeptSession-49): beside the policy file and the catalogue, every name of
-`MIRROR_KIT_INPUTS` in `policy-mirror.js` by the kit's prefix, then every other key the mirror
-records, and reads STALE a mirror whose recorded id differs at L, that lacks an expected key, or
-that carries no `legacy_blobs`, so a landing that changes the conf alone is never read through a
-mirror holding the old limit, and a mirror rendered before the store joined reads stale. THE RULE: a
-unit adding a repository-relative resolution input adds its path to `LEGACY_INPUTS`, so its blob
-joins this map; a unit adding a kit-relative input adds its name to `derive_mirror_inputs` in
-`policy.py` and to `MIRROR_KIT_INPUTS` in `policy-mirror.js`, and
-`python check_policy.py --fixture mirror-input-parity` (KICK-dKeptSession-59) reds the two lists apart.
+`MIRROR_KIT_INPUTS` in `policy-mirror.js` by the kit's prefix, then every path of its
+`MIRROR_LEGACY_INPUTS`, a copy of `LEGACY_INPUTS` (KICK-dKeptSession-62), never the keys the mirror
+records, and reads STALE a mirror whose recorded id differs at L, that lacks an expected key, a
+legacy input's included, or that carries no `legacy_blobs`, so a landing that changes the conf alone
+is never read through a mirror holding the old limit, and a mirror rendered before the store joined
+reads stale. THE RULE: a unit adding a repository-relative resolution input adds its path to
+`LEGACY_INPUTS`, so its blob joins this map, and to `MIRROR_LEGACY_INPUTS` in `policy-mirror.js`; a
+unit adding a kit-relative input adds its name to `derive_mirror_inputs` in `policy.py` and to
+`MIRROR_KIT_INPUTS` in `policy-mirror.js`; and `python check_policy.py --fixture mirror-input-parity`
+(KICK-dKeptSession-59, KICK-dKeptSession-62) reds either pair of lists apart.
 
 `keys` holds every catalogue name with no `*` or `<...>` segment, and every key the file sets that a
 pattern row matches, each with its `Resolution`. The bytes are sorted, two-space indented, ASCII and

@@ -24618,6 +24618,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "read_mirror_literal",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "read_missing_landed_facts",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
