@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-14 — the level-0 project map: its renderer and gov map, derived from the one index, held to its budget without losing a node
 
-**Status:** DEFERRED · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 23 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 23 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0225@db15491d whole
 **Carries:** node:system.project-map
@@ -171,7 +171,6 @@ reaches the playbook kit's modules through `backlog.py#resolve_kit_dir`, the rou
 - **consumes-from** `TOOL-dTotalRecall-9` — the `record`, `feature` and `marker` namespace rows, whose `map` field this unit sets and whose `record.<kind>` rows are the record-kind nodes S3 reads a purpose for
 - **hands-off** `TOOL-dTotalRecall-15` — `gov_map.py`, its rendered lines, its header and its `--fixture` plants, which the completeness checks and the `map` leg pack read
 - **hands-off** `TOOL-dTotalRecall-26` — `gov_map.py`, its node-table derivation `derive_nodes`, which every atlas page renders from, and the namespace row's `map` field
-- **hands-off** `TOOL-dTotalRecall-43` — `gov_map.py`, its policy reads and its cache, which that unit changes and observes for the round-1 audit's ids 11, 15, 33 and 58
 
 ## 4. Design
 
@@ -380,6 +379,9 @@ New arm: tools/memory-tree/gov_map.py · covers AC2 AC3 AC4 AC5 AC6 AC8 AC11 · 
   policy kit (F7); `fit_map` renamed `render_fitted_map` under the VERBS table; AC7 reads stdout's
   bytes (unit 43 id 15); AC9 reads the catalogue and the mirror; the `docs` page rows; unit 9's
   edge; the leg line gains seven legs.
+- rev-4 · 2026-11-23 · §3 · per `2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-brief`:
+  the Edges block's hands-off bullet to TOOL-dTotalRecall-43 is deleted, that unit having moved
+  its items on `gov_map.py` to its §3 under ask TOOL-dTotalRecall-111 (its §8 F5); nothing else moved.
 
 ## 10. Reuse audit
 

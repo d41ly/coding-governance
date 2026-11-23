@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-43 — the round-1 spec audit's 59 minors, batched
 
-**Status:** DEFERRED · rev-6 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-7 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,12 +14,15 @@
 | [2026-10-26-build-TOOL-dTotalRecall-43-deviation-432.md](../build/2026-10-26-build-TOOL-dTotalRecall-43-deviation-432.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-43-deviation-433.md](../build/2026-10-26-build-TOOL-dTotalRecall-43-deviation-433.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-43-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-43-reground-return.md) | research | — |
+| [2026-11-23-build-TOOL-dTotalRecall-43-map-lost-fold-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-43-map-lost-fold-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 |
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-50 TOOL-dTotalRecall-61 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
 | [2026-11-22-prompt-TOOL-dTotalRecall-43-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-43-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-43-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-43-reground-spec-writer.md) | log | — |
+| [2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-brief.md) | journal | — |
+| [2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-36 TOOL-dTotalRecall-39 |
 
 <!-- /gen:spec-records -->
@@ -66,14 +69,10 @@ item a landed unit met is a re-observation: its criterion runs at the pass, noth
 - **S9** — id 10. Met by unit 25: `stream-plan` is in `tree_lib.py#TYPED_RECORD_KINDS`, so its record
   classifies under `read_bindings`. Re-observed by AC9.
 - **S10** — id 11. The `playbook-render` `requires_if` row of `tools/memory-tree/kit.toml` names
-  `gov_map.py`, `gen_atlas.py` and `record_find.py`, each exiting 2 naming the kit where
-  `tag_index.py` does not resolve; a `memory-recall` row names `record_find.py`'s reach into
-  `query.py#load_served_set`. `record_extract.py` sits in the playbook kit (unit 9 §8 F7). Observed by
-  AC10.
-- **S11** — id 32. Met by unit 26 S5: `gen_atlas.py` reads `help.atlas` through
-  `tree_lib.py#read_policy_value`. Re-observed by AC11.
-- **S12** — id 33. Met by unit 14 S6: `gov_map.py` reads its two keys through the same reader.
-  Re-observed by AC12.
+  `record_find.py`, which exits 2 naming the kit where `tag_index.py` does not resolve
+  (`record_find.py#load_tag_index`, `gov_record.py#run_read_verb`); a `memory-recall` row names its
+  reach into `query.py#load_served_set`. `record_extract.py` sits in the playbook kit (unit 9 §8 F7).
+  The map's two modules ride with the held units (§3). Observed by AC10.
 - **S13** — id 12. Met by unit 9 S1: `tools/playbook/record_extract.py`'s `record` extractor takes a
   record's kind from `derive_record_kind`. Re-observed by AC13.
 - **S14** — id 13. A census hit kept on purpose carries `# slug-grammar: kept <reason>`, which
@@ -134,10 +133,10 @@ item a landed unit met is a re-observation: its criterion runs at the pass, noth
 - **S28** — id 39. A fixture README under `tools/` types only the keys unit 4's schema admits, but
   for plants staging that refusal: four files under `tools/unattended/` (DERIVED 2026-11-23,
   `git grep -lE '^(node|roster|streams): ' -- tools`). Observed by AC28.
-- **S29** — id 40. Every leg units 1, 11, 19, 22 and 26 added has a leg row with a non-empty
+- **S29** — id 40. Every leg units 1, 11, 19 and 22 added has a leg row with a non-empty
   `enforces`, a `tools/govkit/subject-pins.tsv` row, a `tools/run-gates/ceiling-evidence.txt` line and
-  a `gate-legs` dossier claim; the four landed legs hold all four, and this pass writes unit 26's
-  `atlas selftest` pin row (`govkit.py selfcheck --write`) and dossier claim. Observed by AC29.
+  a `gate-legs` dossier claim; the four landed legs hold all four. Unit 26's leg rides with it (§3).
+  Observed by AC29.
 - **S30** — id 41. `memory/map/generated/` is regenerated by `python tools/codebase-map/gen_map.py
   --write` at this pass, after every unit that minted or renamed a symbol. Observed by AC30.
 - **S31** — id 42. Every name the units' Inventory lines mint is asked of the lexicon at this pass,
@@ -169,8 +168,6 @@ item a landed unit met is a re-observation: its criterion runs at the pass, noth
 - **S41** — id 57. `record_kinds.py#GIT_OWN`, a name set, becomes a pattern set adding `*.lock`,
   `MERGE_MSG`, `MERGE_MODE`, `AUTO_MERGE`, `REBASE_HEAD`, `rebase-merge/`, `rebase-apply/`,
   `sequencer/`, `BISECT_*`, `rr-cache/`, `gc.pid` and `lfs/`. Observed by AC41.
-- **S42** — id 58. Met by unit 14 S7: the map cache stamps the body's byte length, and a body of
-  another length re-renders. Re-observed by AC42.
 - **S43** — id 60. The mint counts the files on disk and opens with `open(path, "x")`
   (`build_records.py#write_record`); left: a `FileExistsError` there takes the next `<n>`, never a
   traceback. Observed by AC43.
@@ -179,11 +176,8 @@ item a landed unit met is a re-observation: its criterion runs at the pass, noth
   by AC44.
 - **S45** — id 63. Met by unit 22: `edge_grammar.py#check_edge_cardinality` first calls
   `load_memory_tree`, whose `TagError` exits 2 before any count. Re-observed by AC45.
-- **S46** — id 64. `gen_atlas.py` emits each Mermaid node as `id["<label>"]`, `"` encoded `#quot;`,
-  and escapes `|` as `\|` and each backtick in a table cell. Observed by AC46.
 - **S47** — id 65. `record_kinds.py --purpose-review --write` refuses a write into a path a
   `[[generated]]` or `rendered` row owns, drafting an ask; `--writes` names each file. Observed by AC47.
-- **S48** — id 15. Met by unit 14 AC7, which reads `gov_map.py`'s stdout length. Re-observed by AC48.
 - **S49** — id 20. Overtaken: `tools/playbook/kit.toml` `requires` memory-tree. Re-observed by AC49.
 - **S50** — id 21. `tree_lib.py#read_policy_value`'s docstring says "since a kit imports no
   sibling"; it states instead that memory-tree's `requires` is empty, so a missing policy kit is a
@@ -221,6 +215,11 @@ item a landed unit met is a re-observation: its criterion runs at the pass, noth
 - The items landing on TOOL-dTotalRecall-8's `code_record.py`, S55, S56 and unit 8's legs in S29:
   they wait with that unit on ask TOOL-dTotalRecall-109.
 - S19's triple key, the declared base re-key and the old name's carriers: `TOOL-dTotalRecall-52`.
+- The items on `gov_map.py`, its cache and `gen_atlas.py`, held unbuilt with units 14 and 26: they
+  ride with those units under ask TOOL-dTotalRecall-111 (§8 F5). By report id: 11, S10's map and
+  atlas modules · 32, S11's `help.atlas` read · 33, S12's map policy reads · 40, S29's `atlas selftest`
+  pin row and dossier claim · 58, S42's cache length stamp · 64, S46's Mermaid and table-cell
+  escaping · 15, S48's map byte budget. AC11, AC12, AC42, AC46 and AC48 go with them.
 
 ### Edges
 
@@ -236,7 +235,6 @@ item a landed unit met is a re-observation: its criterion runs at the pass, noth
 - **consumes-from** `TOOL-dTotalRecall-11` — the shape-run row and leg
 - **consumes-from** `TOOL-dTotalRecall-12` — `memory_measure.py`'s path match and byte counter
 - **consumes-from** `TOOL-dTotalRecall-13` — `BUILTIN_ARMED` and `read_defs_at`
-- **consumes-from** `TOOL-dTotalRecall-14` — `gov_map.py` and its cache
 - **consumes-from** `TOOL-dTotalRecall-16` — the purpose review
 - **consumes-from** `TOOL-dTotalRecall-17` — `measure_bytes_before_act`
 - **consumes-from** `TOOL-dTotalRecall-18` — the column grammar, `resolve_kind`, `GIT_OWN`, the rename's prose
@@ -246,7 +244,6 @@ item a landed unit met is a re-observation: its criterion runs at the pass, noth
 - **consumes-from** `TOOL-dTotalRecall-22` — `edge_grammar.py --cardinality` and its leg
 - **consumes-from** `TOOL-dTotalRecall-23` — `leg_row` and `LEG_READERS`
 - **consumes-from** `TOOL-dTotalRecall-25` — `check_stream_plan` and the stream-plan token
-- **consumes-from** `TOOL-dTotalRecall-26` — `gen_atlas.py` and its leg
 - **consumes-from** `TOOL-dTotalRecall-38` — the widened `--readers` split shapes
 - **consumes-from** `TOOL-dTotalRecall-40` — the alias census
 - **consumes-from** `TOOL-dTotalRecall-41` — `check_row_value`
@@ -259,8 +256,8 @@ item a landed unit met is a re-observation: its criterion runs at the pass, noth
 
 ### How the batch builds
 
-One pass, after every unit is terminal; the items share files, so M6 keeps them one unit. Order:
-registry rows (S1, S19), code items by unit, then S29, S30, S31 and S54. A re-observation reading
+One pass, after every unit it consumes from is terminal; the items share files, so M6 keeps them
+one unit. Order: registry rows (S1, S19), code items by unit, then S29, S30, S31 and S54. A re-observation reading
 red is a finding against the unit that met it, fixed here. The policy read is the landed
 `tree_lib.py#read_policy_value`; unit 8 mints no adapter.
 
@@ -274,7 +271,7 @@ Minted: arm `homeless records`; `check_line_break` (S37); ledger field `check`;
 
 - `tools/memory-tree/record-kinds.toml`, `tools/memory-tree/record_kinds.py`
 - `tools/memory-tree/tree_lib.py`, `tools/memory-tree/build_records.py`, `tools/memory-tree/backlog.py`
-- `tools/memory-tree/gen_build_index.py`, `tools/memory-tree/kit.toml`, `tools/memory-tree/gen_atlas.py`
+- `tools/memory-tree/gen_build_index.py`, `tools/memory-tree/kit.toml`
 - `tools/memory-tree/record_causes.py`, `tools/memory-tree/id_grammar.py`, `tools/memory-tree/gov-claim.sh`
 - `tools/memory-tree/corpus_ids.py`, `tools/memory-tree/gov_record.py`
 - `tools/govkit/registry.toml`, `memory/project/record-kinds-legacy.txt` (S19)
@@ -302,13 +299,15 @@ Minted: arm `homeless records`; `check_line_break` (S37); ledger field `check`;
 - error / empty / loading states — S26 names a missing kit; S43 retakes a collided `<n>`.
 - observability — S39's freed rows; S1's homeless paths; each refusal's argument.
 - risks — a row S19's merge loses reds a legacy record; AC19 counts both homes.
-- testing — AC1 to AC59 by the pass, S32 and S33 excepted, S55 and S56 parked; §7's arms at the close.
+- testing — AC1 to AC59 by the pass, S32 and S33 excepted, S55 and S56 parked, §3's held items out;
+  §7's arms at the close.
 - migration — S19's ledger merge and S28's fixture edits, inside the tree.
 - user docs — S26's runbook lines; no `help/` page covers these internals.
 
 ## 6. Acceptance criteria
 
-Numbered by the item each observes; S32 and S33 carry none. A re-observation runs unchanged.
+Numbered by the item each observes; S32 and S33 carry none. A re-observation runs unchanged. The
+criteria AC11, AC12, AC42, AC46 and AC48 left with their items (§3), the rest keeping their numbers.
 
 - **AC1** — When `python record_kinds.py --check` runs in a scratch copy with a planted
   `memory/notes/` file opening `**Serves:** research X-a-1` on line 2, it exits 1 naming it under
@@ -342,16 +341,11 @@ Numbered by the item each observes; S32 and S33 carry none. A re-observation run
   `-stream-plan-1.md` record opening `**Serves:** stream-plan X-a-1`, it classifies `stream-plan` and
   marks nothing malformed.
   Red when: the record reads as malformed.
-- **AC10** — When `python gov_map.py` runs in a scratch copy without `tools/playbook`, it exits 2
-  naming that kit; a `tomllib` probe of `tools/memory-tree/kit.toml` reads the `playbook-render`
-  row naming the three modules, and a `memory-recall` row naming `record_find.py`.
-  Red when: a module crashes on import, runs with no index, or a reach is undeclared.
-- **AC11** — When `git grep -nE "import policy_value|policy_value import" -- '*gen_atlas.py'` runs at
-  the tip it prints nothing, and `git grep -n "read_policy_value(" -- '*gen_atlas.py'` names `help.atlas`.
-  Red when: the atlas imports the playbook kit's reader.
-- **AC12** — When the same two greps run over `'*gov_map.py'`, the first prints nothing and the second
-  names `memory.map-budget` and `memory.map-overflow`.
-  Red when: the map reads its keys through the playbook kit.
+- **AC10** — When `python tools/memory-tree/gov_record.py find --kind log` runs in a scratch copy
+  without `tools/playbook`, it exits 2 naming that kit; a `tomllib` probe of
+  `tools/memory-tree/kit.toml` reads the `playbook-render` row naming `record_find.py`, and a
+  `memory-recall` row naming it.
+  Red when: the finder crashes on import, runs with no index, or a reach is undeclared.
 - **AC13** — When `record_extract.py`'s `record` extractor runs over a fixture `build/` folder holding a
   log, a research, a deviation and a shape-run record, each row's tag is `record.<its Serves kind>`.
   Red when: two records under one folder take one kind.
@@ -442,9 +436,6 @@ Numbered by the item each observes; S32 and S33 carry none. A re-observation run
 - **AC41** — When the pockets check runs with a planted `index.lock` and `MERGE_MSG` in a scratch
   clone's common dir, it names neither.
   Red when: git's transient state reds the leg.
-- **AC42** — When a map cache file truncated after its stamp line sits at
-  `<git-common-dir>/gov/map/<tree>.map`, `python gov_map.py` re-renders and does not serve it.
-  Red when: a partial body behind a valid stamp is printed.
 - **AC43** — When an untracked `-deviation-1.md` draft sits in a fixture build's `build/` folder, the
   door writes `-deviation-2.md`, the draft byte-identical; the plant `mint-collision`, creating `<n>`
   between count and create, makes it write `<n+1>`.
@@ -455,15 +446,9 @@ Numbered by the item each observes; S32 and S33 carry none. A re-observation run
 - **AC45** — When `python edge_grammar.py --cardinality` runs in a scratch copy with
   `tools/memory-tree` absent, it exits 2 naming memory-tree and prints no count.
   Red when: it prints `0 violations` over nothing counted.
-- **AC46** — When `python gen_atlas.py --plant` renders a key holding `(x)` and `|`, its node reads
-  `id["… (x) …"]` and its table cell carries `\|`.
-  Red when: a label or a cell is emitted raw.
 - **AC47** — When `record_kinds.py --purpose-review --write` meets a member whose purpose sits in a
   rendered file in a scratch copy, it writes nothing there and drafts an ask naming the member.
   Red when: the review writes into a file its next render reverts.
-- **AC48** — When `python gov_map.py | wc -c` runs at the tip, it prints at most `32768`.
-  Red when: the map overruns its budget.
-  figure: DERIVED at observation.
 - **AC49** — When `grep -n "^requires" tools/playbook/kit.toml` runs, it prints a line naming
   `memory-tree`.
   Red when: the reach is undeclared.
@@ -531,6 +516,13 @@ New arm: tools/memory-recall/selftest.py · covers AC26 AC39 · the absent playb
   (veto 2). RESOLVED (agent, 2026-11-23, delegated): (a), the one survivor; S19 states what it does
   not check. Brief: `2026-11-22-prompt-TOOL-dTotalRecall-43-reground-brief`. widens: none · relaxes:
   none
+- **F5 — TOOL-dTotalRecall-17 closed `lose · recall` and holds units 14, 15 and 26 unbuilt under ask
+  TOOL-dTotalRecall-111; what becomes of this unit's items on the map and the atlas?** Options: (a)
+  those items ride with units 14 and 26 (§3), and the rest builds over HEAD; (b) hold all of this unit
+  and its 39 live dependants, 43 units with the three held (DERIVED 2026-11-23 over the roster's
+  consumes-from edges), for a dependency confined to those items.
+  RESOLVED (agent, 2026-11-23, delegated): (a), the dependency is confined to those items. Brief:
+  `2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-brief`. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -549,6 +541,12 @@ New arm: tools/memory-recall/selftest.py · covers AC26 AC39 · the absent playb
   `e1321ce78`: items a landed unit met are re-observations, S4, S35 and S49 overtaken, S10, S26,
   S27, S29, S37, S39, S43 and S57 narrowed to what is left, S19 on the registry (§8 F4), S50 on
   `read_policy_value`, S55 and S56 parked with unit 8; code cited by symbol or pinned; ACs re-aimed.
+- rev-7 · 2026-11-23 · §2 S10 · S11 · S12 · S29 · S42 · S46 · S48 · §3 · §4 · §5 · §6 AC10 · AC11 ·
+  AC12 · AC42 · AC46 · AC48 · §8 F5 added · per `2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-brief`:
+  TOOL-dTotalRecall-17's verdict holds units 14 and 26 under ask TOOL-dTotalRecall-111, so the
+  consumes-from edges to them are deleted and S10's map half, S11, S12, S29's atlas rows, S42, S46
+  and S48 with their criteria move to §3 (F5); AC10 observes the finder through its door; §4's pass
+  waits only on the units consumed. No other item moved.
 
 ## 10. Reuse audit
 

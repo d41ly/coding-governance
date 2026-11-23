@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-26 — the atlas under `help/atlas/`: generated Markdown and Mermaid pages from the one index's node table, refused when stale
 
-**Status:** DEFERRED · rev-4 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 25 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 25 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0237@0c51b12a whole
 **Carries:** node:policy-key.help.atlas
@@ -171,7 +171,6 @@ TOOL-dWitnessedBar-11's, and the `enforces` meta-check is `leg_factory.py#check_
 
 - **consumes-from** `TOOL-dTotalRecall-14` — `gov_map.py`, the node derivation `derive_nodes` every namespace page renders, each node carrying its defining row's path and line, and the `map` row field; without it the atlas has no node table to read
 - **consumes-from** external — PLAY-dOrderedCharter-19's index and `namespaces.toml`; PLAY-dOrderedCharter-22's chain registry; PLAY-dOrderedCharter-37's `render_reference_pages`; TOOL-dSafePassage-13's `docs_leg.py` and `check_page_links`; PLAY-dOrderedCharter-76's `check_unit_lines`; TOOL-dGroundRules-1's catalogue and `lists` verb; TOOL-dWitnessedBar-11's leg declaration and `leg_factory.py`; PLAY-dOrderedCharter-7's `enforces` meta-check, each CLOSED
-- **hands-off** `TOOL-dTotalRecall-43` — `gen_atlas.py`, its policy read, its escaping and its leg's meta-gate rows, which that unit changes for the round-1 audit's ids 32, 40 and 64
 
 ## 4. Design
 
@@ -495,6 +494,9 @@ New arm: tools/unattended/unattended.test.sh · covers AC9 · a fixture descript
   (F10); the row applies where the playbook kit exists (F11); the leg's `practice.verify` becomes
   `practice.gate`, TOOL-dWitnessedBar-51 S12 having left scope; the authored pages' back links, the
   usage row and the docs list join Files touched; the leg line gains seventeen legs.
+- rev-5 · 2026-11-23 · §3 · per `2026-11-23-prompt-TOOL-dTotalRecall-43-map-lost-fold-brief`:
+  the Edges block's hands-off bullet to TOOL-dTotalRecall-43 is deleted, that unit having moved
+  its items on `gen_atlas.py` to its §3 under ask TOOL-dTotalRecall-111 (its §8 F5); nothing else moved.
 
 ## 10. Reuse audit
 
