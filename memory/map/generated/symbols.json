@@ -42413,6 +42413,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "write_consumed_acks",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "write_content_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"

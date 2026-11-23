@@ -597,7 +597,24 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   `--mail read <slug>`. A message addressed to the build, or to one of its units, that is neither
   answered, acknowledged nor past its deadline holds the move: it prints `refused — <slug> · mail open <id> …` naming
   every open message and exits 1 writing nothing, so answer or acknowledge each (`--mail answer
-  <slug> <id> <body file>` for a question, `--mail ack <slug> <id>`) and record the move again. A mailbox that is not read passes with one
+  <slug> <id> <body file>` for a question, `--mail ack <slug> <id>`) and record the move again. Before
+  that refusal, the move first acknowledges each notice it has consumed, posting `--mail ack <slug> <id>`
+  for it, so a parent's notice never holds your build until its deadline; an acknowledged notice no longer
+  holds the move, and your build's next move disposes of it. A failed ack prints
+  `mail — ack not posted <id> · rc <n>` (`rc -` where the driver could not be launched or did not answer
+  in time) on stderr and
+  leaves the notice open, so the move is refused on it:
+
+  | Kind addressed to your build | Acknowledged by | When |
+  |---|---|---|
+  | `landed`, `superseded`, `withdrawn` | your build's own move | at its next move |
+  | `confirmed`, `changed`, current | your build's own move | at its next move, once the parent's interfaces check names it current |
+  | `confirmed`, `changed`, seen strictly before the current one | the same | with the current one |
+  | `changed`, not current | nobody here | the re-entry that consumes it, or its deadline |
+
+  A check of the parent's interfaces that cannot be read prints
+  `mail — interfaces <parent> unread · <why>` on stderr and acknowledges nothing from that parent. A
+  `question`, an `intake` or an `overlap` is never acknowledged for you. A mailbox that is not read passes with one
   `loop: mail · unarmed · <why>` line: `RUN_CLAIMS` off, no unattended driver beside the loop kit, or
   a repository with no `.unattended.conf`. A read that cannot answer, no bash that can run the driver,
   no answer within its 30 s (PINNED) or a failed read with no row, is `loop: unanswered · mail unknown:
@@ -643,8 +660,14 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   build naming `tFix` in `parents:`: the move out of Design posts it one `confirmed` keyed over the
   spec listing at the move's commit, and a second exit from Design posts `changed`, never a second
   `confirmed`), `notices-two-dependents` (two dependents and three exits from Design: each reads one
-  `confirmed` and two `changed`, passes `1`, `2` and `3`) and `notices-refused` (the post to one
-  dependent refused: the move still records and prints the refusal's line). `check --selftest` runs every case, and gov's own
+  `confirmed` and two `changed`, passes `1`, `2` and `3`), `notices-refused` (the post to one
+  dependent refused: the move still records and prints the refusal's line), `acks-landed` (a parent's
+  `landed` the move acknowledges, then records), `acks-confirmed` (a `confirmed` whose key recomputes at
+  the parent lease's witness, acknowledged over the real interfaces check), `acks-superseded` (a
+  `confirmed` and the later `changed` the check names current, both acknowledged; then another parent's
+  pair the check does not confirm, refusing the next move) and `acks-failed` (one ack across two moves,
+  then a refused ack and one whose launch fails, each printing `mail — ack not posted`, refusing the third
+  move). `check --selftest` runs every case, and gov's own
   `loop transition record` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
@@ -1117,9 +1140,9 @@ Under `confirmed-interfaces` the dependent reads the parent's lease witness with
 fetching it once where it is missing, and runs Build only where a `confirmed` or `changed` message
 from the parent carries that key: the key decides, never the order the messages arrived in. A moved witness that no message's key
 matches reads `awaiting confirmed` again; a check that cannot be read reads `confirmation unread`
-with one `position: NOTE · interfaces <parent> unread: <line>`, never as unconfirmed. Until a
-dependent acknowledges a notice with `--mail ack`, it is open mail addressed to it, and the mailbox's
-guard holds the dependent's own moves on it. Nothing here re-enters a dependent's units on a
+with one `position: NOTE · interfaces <parent> unread: <line>`, never as unconfirmed. The
+dependent's next move acknowledges each notice it has consumed; a `changed` it has not consumed holds its
+moves until the re-entry or its deadline. Nothing here re-enters a dependent's units on a
 `changed`, and no request for confirmation is answered for you: the parent's session answers one by
 hand with `--mail post --kind confirmed --answers <id> --interface <file>`.
 
