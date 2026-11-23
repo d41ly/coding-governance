@@ -23,3 +23,18 @@ skills/session-kickoff/manifest-check.test.sh	mkdir -p "$mm_dir" && printf -- '-
 {prefix}/playbook/render_playbook.py	with open(d / 'MEMORY.md', 'a', encoding='utf-8', newline='') as fh:	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 {prefix}/govkit/registry.toml	"file:{prefix}/agent-instructions/adopt-agent-instructions.sh",	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 {prefix}/govkit/registry.toml	"installable:{prefix}/agent-instructions/adopt-agent-instructions.sh",	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+memory/gotchas/amendment-leaves-its-other-half-standing.md	and adoption records; and the replaced fates of `agent-cap.js` and `gotchas.py`. dGroundRules also never carried the	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+memory/gotchas/inline-marker-breaks-a-line-continuation.md	1 failed`. The third was caught by reading, not by a suite: `agent-cap.test.sh` reported	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"{prefix}/hooks/agent-cap.js",	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	".claude/hooks/agent-cap.js"	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"{prefix}/hooks/agent-cap.test.sh",	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	".claude/hooks/agent-cap.test.sh"	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"path": ".claude/hooks/agent-cap.js",	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"source": "{prefix}/hooks/agent-cap.js"	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"path": ".claude/hooks/agent-cap.test.sh",	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	"source": "{prefix}/hooks/agent-cap.test.sh"	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/steps/spawn_guard_pack.py	THE UP. No command in the target's `.claude/settings.json` naming `agent-cap.js`: exit 0, nothing written.	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/steps/spawn_guard_pack.py	written under `tempfile.mkdtemp`: the marker `agent-cap.js`, the group's event and matcher, and the hook	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/steps/spawn_guard_pack.py	THE WITNESS exits 0 when no command naming `agent-cap.js` is wired and, where the roles kit is installed,	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/govkit/steps/spawn_guard_pack.py	OLD_MARKER = "agent-cap.js"	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25
+{prefix}/hooks/kit.toml	surfaces = ["installable:{prefix}/hooks/agent-cap.js", "file:{prefix}/hooks/agent-cap.js"]	1	00a96bb43724180a06b480c167a8c81eb0967f24	carried:TOOL-dBoundRoles-25

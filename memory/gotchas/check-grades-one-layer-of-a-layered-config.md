@@ -24,7 +24,7 @@ which no single file answers.
 
 dGroundRules, the spec run's closing diff review, item H3, 2026-10-23
 (`memory/builds/dGroundRules/reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md`).
-Rule 7 of `tools/hooks/agent-cap.js` read the settings file the way `settings_json` in
+Rule 7 of `tools/roles/spawn-guard.js` read the settings file the way `settings_json` in
 `tools/check-wiring.sh` resolves it: the file `GOV_SETTINGS_JSON` names, in the project file's place.
 With the variable set, a value above the agent limit in `.claude/settings.json` was never compared
 with the limit, and the case written for the variable planted no project file beside the declared one.
@@ -45,5 +45,5 @@ TOOL-dGroundRules-61 made rule 7 read every layer it can and bound each one that
 
 Rule 7's instance is gated by the `policy fixtures` leg, through the `limit-settings-elsewhere`,
 `limit-settings-elsewhere-project-over` and `limit-settings-declared-absent` cases of
-`tools/policy/check_policy.py`, and by the rule-7 arms of `tools/hooks/agent-cap.test.sh`. The class
+`tools/policy/check_policy.py`, and by the rule-7 arms of `tools/roles/spawn-guard.test.sh`. The class
 in general has no machine gate: no check can tell which layers an arbitrary consumer applies.

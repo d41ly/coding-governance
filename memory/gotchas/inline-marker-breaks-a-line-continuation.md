@@ -40,7 +40,7 @@ continued lines:
 
 - `tools/check-wiring.test.sh` — the `for rel in …` dependency list, truncated to its first line.
 - `tools/check-wiring.test.sh` — the AC10 launcher assertion, whose `&&` clause became a new command.
-- `tools/hooks/agent-cap.test.sh` — the last-resort `git ls-files` fallback for locating the hook.
+- `tools/roles/spawn-guard.test.sh` — the last-resort `git ls-files` fallback for locating the hook.
 
 The first two were caught because `check-wiring.test.sh` went from 92 arms passing to `91 passed,
 1 failed`. The third was caught by reading, not by a suite: `agent-cap.test.sh` reported

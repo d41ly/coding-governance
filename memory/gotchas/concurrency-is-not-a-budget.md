@@ -41,7 +41,7 @@ const MAX_VERIFIERS = 5
 const batches = chunk(items, Math.ceil(items.length / MAX_VERIFIERS)) // gov:fixed-verifiers
 ```
 
-Gated by `tools/hooks/agent-cap.js`, which denies an `agent(` reached through an iteration construct whose
+Gated by `tools/roles/spawn-guard.js`, which denies an `agent(` reached through an iteration construct whose
 receiver it cannot see is bounded — a marked bounded split, or an array literal small enough to count
 in the source. `tools/workflows/check-verifier-fanout.sh` applies the same predicate to the committed
 harnesses by delegating to that hook.
@@ -53,7 +53,7 @@ source actually passes through.
 
 ## The bound is a file constant, and the cap hook is the first of two
 
-`tools/hooks/agent-cap.js` is wired on `Workflow|Agent`, the exact pair — `Workflow` alone leaves
+`tools/roles/spawn-guard.js` is wired on `Workflow|Agent`, the exact pair — `Workflow` alone leaves
 direct spawns unguarded. Its bound is a FILE CONSTANT: an `AGENT_CAP` environment override is
 refused, not honoured, so the only way to move the number is a change to the file the bar
 compares. Its rule count is owned by the kit's own README under `tools/hooks/` and restated nowhere, because the copy

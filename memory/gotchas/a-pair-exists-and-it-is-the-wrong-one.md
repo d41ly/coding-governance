@@ -22,7 +22,7 @@ mispairing needs two.
 
 ## Where it bit
 
-`tools/hooks/agent-cap.js`, the hook enforcing this repo's agent fan-out cap, in three of its string
+`tools/roles/spawn-guard.js`, the hook enforcing this repo's agent fan-out cap, in three of its string
 views at once and defeating four of its five rules:
 
 - rule 1 admitted a raw `parallel(` — `const re = /won't/; const r = await parallel([() => agent('a'), () => agent('b')])` exited 0
@@ -67,7 +67,7 @@ Two consequences worth carrying into any scanner of this shape:
 
 Provenance: `TOOL-dMispairedQuote-1` and `TOOL-dMispairedQuote-3`, 2026-09-01.
 
-Gated by `tools/hooks/agent-cap.test.sh`. The class arms are the ones named `mispaired quote: …`,
+Gated by `tools/roles/spawn-guard.test.sh`. The class arms are the ones named `mispaired quote: …`,
 each carrying TWO quotes on the fan-out line and each with a control that removes the apostrophe;
 `mispaired quote: SAME LINE is the load-bearing part` is the one that names the placement, because
 the arm this class slipped past for a release put its single apostrophe on the line above. The

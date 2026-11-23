@@ -20,7 +20,7 @@ shape a review reported and none pins the axis.
 
 ## Where it bit
 
-`tools/hooks/agent-cap.js`, the fan-out cap hook — the only mechanical control this repo has against
+`tools/roles/spawn-guard.js`, the fan-out cap hook — the only mechanical control this repo has against
 an agent burst — over four rounds of one closing review, `aWeldedTribunal`, 2026-09-04/05.
 
 | round | reported | the fix | what the fix bought |
@@ -52,7 +52,7 @@ property rather than a bug someone will later "fix" and reopen the whole sequenc
 
 ## The gate
 
-**Gated at `tools/hooks/agent-cap.test.sh`** by the frozen deny corpus this class produced — and the
+**Gated at `tools/roles/spawn-guard.test.sh`** by the frozen deny corpus this class produced — and the
 general form is a **documented check**, because no static predicate separates "this fix moved the
 blind spot" from "this fix closed it".
 
