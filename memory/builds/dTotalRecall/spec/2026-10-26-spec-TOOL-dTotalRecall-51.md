@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-51 — a non-markdown record's cause line wears its Serves line's comment prefix, the header reader reads it, and a bare one is refused
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 18 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 18 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
