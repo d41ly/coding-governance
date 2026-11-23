@@ -55,7 +55,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   S4's actor refusal in `--refused` adds one site, so the main loop already landed the `TOOL-dBoundRoles-26` row in
   `memory/DECISIONS.md` (write no row there yourself). Route every check the three new flags carry through that one
   refusal site, raise the driver's `REFUSAL_CEILINGS` token in `.memory-tree.conf` to
-  `tools/unattended/unattended.sh:349:2026-11-23:TOOL-dBoundRoles-26`, keep the single space that separates it from
+  the driver's path, ceiling `349`, date `2026-11-23` and `TOOL-dBoundRoles-26`, colon-joined, keep the single space that separates it from
   the next gate's token, and move the matching `.memory-tree.conf` row of `memory/project/positional-refs.txt` from 348
   to 349, its tab-separated fields intact. Both files are in the write set, and `.memory-tree.conf` sits on the
   kickoff manifest's `watch:` list, so re-stamp `memory/guides/SESSION-KICKOFF.md` in the same commit. If the census
