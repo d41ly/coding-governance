@@ -72,5 +72,6 @@ None at this stage. The main loop's commit runs the pre-commit hooks, and the fu
 
 ### Non-goals
 
+- No pass worktree of your own: the merge of `origin/main` 525f3ab97 is already in progress, uncommitted, in the run worktree C:/projects/coding-governance/.claude/worktrees/unattended-dkeptsession-a0567a. Work there, resolve by the spec's §4 and regenerate by its S4, write and stage the acceptance ledger and the CLOSED flip, and leave `MERGE_HEAD` and every resolution staged for the main loop's commit.
 - No commit, no push, no `git merge --abort` and no `git reset`.
 - No edit to any spec but KICK-dKeptSession-80's status cell and what its generator renders.
