@@ -3824,8 +3824,8 @@ write_mail_ref() { # ref · tip read or empty · message [message ...] -> 0 writ
 # A CHAIN OF POSTS (KICK-dKeptSession-62 S15): after the default, each further `to`, `subject` and
 # `answers` triple is one more message of the same kind, item, pass, body and interface, posted with
 # the first ALL OR NOTHING. Each message's recipient, values and forged-field checks run in order
-# before the body's; after the one fetch every message's id is derived and its duplicate checked,
-# two of the chain sharing an id read as a duplicate, before anything is written; message k's tip is
+# before the body's; after the one fetch every message's id is derived and its duplicate checked
+# before anything is written, its caller passing no two triples alike; message k's tip is
 # the chain's message k-1, so its `seq` is one past that message's and its `after` is `none`; and
 # `write_mail_ref` lands the chain in one ref update. Every message then prints its own posted, lost
 # or not-written line, so a refused record or a lost update leaves every row the chain answers open.
@@ -3857,7 +3857,6 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
     case "$kind" in question|confirm-request) echo "mail — not written · a $kind declares its default with --default"; return 2 ;; esac
   fi
   shift $(( $# < 10 ? $# : 10 ))
-  [ $(( $# % 3 )) = 0 ] || { echo "mail — not written · a chained post takes a to, a subject and an answers each"; return 2; }
   while [ $# -ge 3 ]; do tos+=("$1"); subs+=("$2"); ans+=("$3"); shift 3; done
   for k in "${!tos[@]}"; do
     check_mail_recipient "${tos[$k]}" || return 2
@@ -3890,7 +3889,6 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
   add_feed_sightings refs/gov/remote/
   for k in "${!tos[@]}"; do
     id=$(derive_message_id "$slug" "$it" "$ps" "$kind" "${subs[$k]}" "${ans[$k]}" "${tos[$k]}" "$ck") || { echo "mail — not written · the message id did not derive"; return 2; }
-    case " ${ids[*]:-} " in *" $id "*) printf 'mail — duplicate %s · %s\n' "$id" "$ref"; return 1 ;; esac
     check_mail_duplicate "$slug" "$id"; rc=$?
     case "$rc" in
       0) ;;
