@@ -35,7 +35,8 @@
 #                                         # --session written into that session's card too
 #   manifest-check.sh --card --boundary --build <slug> --session <sid> [--transcript <path>] [--out <file>]
 #                                         # the item boundary, I12: the card's `item —` line moved to
-#                                         # HEAD, and a crossing written and published as card.pointers says
+#                                         # HEAD, and a crossing written and published as card.pointers says,
+#                                         # and the build's open mail as `interrupt — mailbox` lines, as mailbox.reads says
 #   manifest-check.sh --card --fixture-run <scratch-dir>   # run card-compaction.fixture.sh there and
 #                                         # record its verdict in <git-common-dir>/orientation/card-fixture.verdict
 #   manifest-check.sh --brief-skeleton   # the brief record's skeleton and the card's `## route`
@@ -2592,7 +2593,8 @@ run_card_boundary() { # slug -> the verb's lines on stdout; 0, or 2 with no sess
       else
         printf 'card — skipped: card.pointers refused: %s\n' "${mode%%$'\n'*}"
       fi
-      run_context_boundary ;;
+      run_context_boundary
+      run_mail_interrupts "$slug" ;;
     *)
       printf 'boundary — skipped: %s\n' "$b"
       write_card_pointers "$slug" ;;
@@ -2855,6 +2857,35 @@ render_context_line() { # [boundary] -> one context — line on stdout at a repl
 # lines to its `--out` file, which the hook hands the session at its next shell call.
 run_context_boundary() { # -> the fresh-now line or nothing on stdout; 0 always
   render_context_line boundary
+}
+
+# The boundary verb's step after a crossing (KICK-dKeptSession-10 S1): the loop kit's `position.py <slug>
+# --mail-interrupts [--local]`, which reads `mailbox.reads` and the build's open mail, run with stdin closed
+# under CARD_CLAIMS_BOUND, the bound `render_mail_line` gives the same driver read. On exit 0 each line
+# opening `interrupt — mailbox · ` is printed, CRs stripped, and no other; every failure is one
+# `interrupt — mailbox · unarmed · <why>` line: an engine, a Python or a `timeout -k` that does not resolve,
+# the bound passed, or another exit with the read's first non-empty line, cut to 160 bytes as
+# `run_item_boundary` cuts. `--local` reads the node's cache with no fetch. WHAT THIS DOES NOT CHECK: a
+# message posted after the read; the lines are as fresh as the crossing that ran it.
+run_mail_interrupts() { # slug · [--local] -> the interrupt — mailbox lines on stdout; 0 always
+  local pos py rc f="$CARD_TMP/mail.interrupts"
+  pos=$(resolve_kit_file loop position.py)
+  [ -n "$pos" ] || { printf 'interrupt — mailbox · unarmed · no loop kit position.py resolves in this tree\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'interrupt — mailbox · unarmed · no Python resolves on this node\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'interrupt — mailbox · unarmed · this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  timeout -k 2 "$CARD_CLAIMS_BOUND" "$py" "$pos" "$1" --mail-interrupts ${2:+"$2"} </dev/null > "$f" 2>&1; rc=$?
+  case "$rc" in
+    0) tr -d '\r' < "$f" | grep '^interrupt — mailbox · ' ;;
+    124|137) printf 'interrupt — mailbox · unarmed · the read passed its %ss bound\n' "$CARD_CLAIMS_BOUND" ;;
+    *) LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+         NF && f == "" { f = $0 }
+         END { if (f == "") f = "printed nothing"
+               if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+               print "interrupt — mailbox · unarmed · position.py --mail-interrupts exited " rc ": " f }' "$f" ;;
+  esac
+  rm -f "$f"
+  return 0
 }
 
 if [ -n "$CARD" ]; then

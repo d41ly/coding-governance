@@ -984,12 +984,13 @@ def write_foreign_lease(root, build):
     write_fixture_gov_ref(root, "refs/gov/leases/%s/build" % build, msg)
 
 
-def write_fixture_gov_ref(root, ref, msg):
-    """One parentless commit over the empty tree, its message `msg`, pushed to `ref` on the fixture's remote."""
+def write_fixture_gov_ref(root, ref, msg, remote=FIXTURE_REMOTE):
+    """One parentless commit over the empty tree, its message `msg`, pushed to `ref` on the fixture's remote,
+    `remote` naming it, as the position engine's mail plants pass their own (KICK-dKeptSession-10)."""
     tree = subprocess.run(["git", "mktree"], cwd=str(root), input="", capture_output=True, text=True, encoding="utf-8", check=True,
                           env=read_clean_env()).stdout.strip()
     sha = run_fixture_git(root, "commit-tree", tree, "-m", msg)
-    run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "%s:%s" % (sha, ref))
+    run_fixture_git(root, "push", "-q", remote, "%s:%s" % (sha, ref))
 
 
 def read_fleet_user():

@@ -43,6 +43,9 @@ hooks.bypass = "refused"
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
 
+## `mailbox.reads`
+Documented on [help/loop.md](../loop.md).
+
 ## `context.on-full`
 Documented on [help/orientation-card.md](../orientation-card.md).
 
@@ -300,7 +303,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (223)
+## Not yet summarised (222)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -386,7 +389,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `run.on-owner-silence`
 - `run.on-owner-question`
 - `deps.landing`
-- `mailbox.reads`
 - `mailbox.notice`
 - `mailbox.fetch-seconds`
 - `review.follow-up`

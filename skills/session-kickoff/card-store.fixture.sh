@@ -14,8 +14,10 @@
 # planted values from a file outside the repository, a stub playbook kit whose `pockets` verb
 # prints one fact, and the copied loop kit's `position.py` replaced by a stub answering from a second
 # planted file, CARD_STUB_POSITION, so no case runs the real engine (KICK-dKeptSession-13 S9): `<slug>
-# --boundary <pointer>` the planted `key`, `answer` and `forked` units, and `<slug> --json` the planted
-# `json` and `rc`, each after the planted `delay`; and its `budget.py` replaced by a stub answering `state
+# --boundary <pointer>` the planted `key`, `answer` and `forked` units, `<slug> --json` the planted
+# `json` and `rc`, each after the planted `delay`, and `<slug> --mail-interrupts [--local]` the planted
+# `mail` line after the planted `mail-delay`, its arguments appended to `$CARD_STUB_POSITION.log`
+# (KICK-dKeptSession-10 S1); and its `budget.py` replaced by a stub answering `state
 # --build <slug>` with the planted `budget` from that same file, `open 0/4` where none is planted, so no case
 # runs the real module either (KICK-dKeptSession-26 S4); and the runlog kit's `runlog.py`, at the path the
 # engine's resolver finds it, as a stub answering `context <path>` with the planted `fill` from that same file
@@ -48,7 +50,7 @@ fixture-cli-path-differs fixture-cli-unknown pointers-render pointers-boundary p
 budget-open budget-spent budget-unfrozen budget-omitted budget-no-kit
 position-act position-awaiting position-disagrees position-skips lead-compact lead-resume
 fill-fresh-past fill-under fill-compact fill-replay fill-slow
-mail-open mail-none mail-off"
+mail-open mail-none mail-off mail-boundary"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
 BRIEF=memory/builds/tFix/prompts/2026-01-01-prompt-TOOL-tFix-1-brief.md
@@ -92,7 +94,8 @@ set_card_policy() {
   grep -v "^$1=" "$CARD_STUB_POLICY" > "$t" 2>/dev/null; mv -f "$t" "$CARD_STUB_POLICY"
   printf '%s=%s\n' "$1" "$2" >> "$CARD_STUB_POLICY"
 }
-# set_card_position <key|answer|forked|json|rc|delay> <value> — the stub position engine's planted answer.
+# set_card_position <key|answer|forked|json|rc|delay|mail|mail-delay> <value> — the stub position engine's
+# planted answer, `mail` and `mail-delay` its `--mail-interrupts` line and sleep (KICK-dKeptSession-10).
 set_card_position() {
   local t; t=$(mktemp "$CARD_STUB_POSITION.XXXXXXXX") || exit 2
   grep -v "^$1=" "$CARD_STUB_POSITION" > "$t" 2>/dev/null; mv -f "$t" "$CARD_STUB_POSITION"
@@ -161,7 +164,13 @@ write_card_fixture() {
     'if len(sys.argv) == 3 and sys.argv[2] == "--json":' \
     '    print(vals.get("json") or "{}")' \
     '    sys.exit(int(vals.get("rc") or 0))' \
-    'sys.exit("stub position: <slug> --boundary <pointer> or <slug> --json, and was asked %s" % sys.argv[1:])' > "$f"
+    'if len(sys.argv) in (3, 4) and sys.argv[2] == "--mail-interrupts" and sys.argv[3:] in ([], ["--local"]):' \
+    '    open(os.environ["CARD_STUB_POSITION"] + ".log", "a", encoding="utf-8").write(" ".join(sys.argv[1:]) + "\n")' \
+    '    time.sleep(float(vals.get("mail-delay") or 0))' \
+    '    if vals.get("mail"):' \
+    '        print(vals["mail"])' \
+    '    sys.exit(0)' \
+    'sys.exit("stub position: <slug> --boundary <pointer>, <slug> --json or <slug> --mail-interrupts [--local], and was asked %s" % sys.argv[1:])' > "$f"
   # The stub rework budget over the copied one (KICK-dKeptSession-26 S4): no card path imports a name from it.
   f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file loop budget.py); [ -n "$f" ] || return 1
   f="$R/${f#"$GOVROOT"/}"; [ -f "$f" ] || return 1
@@ -909,5 +918,30 @@ case "$PLANT" in
     run_card_engine "$R" --card --pointers --build tFix --session t1
     print_card_held "AC8 the session card's pointers section carries $want" \
       "$(read_card_section "$R/.git/orientation/t1.md" | grep -qxF "$want"; echo $?)" ;;
+  mail-boundary)
+    # KICK-dKeptSession-10 AC2: the card moved to K1 by a first crossing, then the stub engine answering K2
+    # and its planted `mail` line; then the key held, no crossing; then a crossing back to K1 with the
+    # stub's `mail-delay` past a lowered CARD_CLAIMS_BOUND. Staged against the step run with no crossing,
+    # the second row reds; against a crossing that reads no mail, the first.
+    run_card_append; set_card_position key "$K1"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    mail='interrupt — mailbox · m1 question from fy'
+    set_card_position key "$K2"; set_card_position mail "$mail"
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    at=$(tr -d '\r' < "$OUT" | awk -v b="boundary — $K1 → $K2" -v m="$mail" '$0 == b && !x { x = NR } $0 == m && !y { y = NR }
+      END { print x + 0, y + 0 }')
+    read -r l1 l2 <<<"$at"
+    print_card_held "AC2 a crossing prints boundary — K1 → K2 and then the planted mailbox line, at lines $at" \
+      "$([ "$l1" -gt 0 ] && [ "$l1" -lt "$l2" ]; echo $?)"
+    n=$(grep -c -- '--mail-interrupts' "$CARD_STUB_POSITION.log" 2>/dev/null)
+    run_card_engine "$R" --card --boundary --build tFix --session t1
+    print_card_held "AC2 no crossing prints no mailbox line and the stub's log gains no --mail-interrupts row" \
+      "$(grep -qxF "boundary — none crossed · item $K2" "$OUT" && ! grep -q '^interrupt — mailbox' "$OUT" \
+        && [ "$(grep -c -- '--mail-interrupts' "$CARD_STUB_POSITION.log" 2>/dev/null)" = "$n" ]; echo $?)"
+    set_card_position key "$K1"; set_card_position mail-delay 5
+    CARD_CLAIMS_BOUND=2 run_card_engine "$R" --card --boundary --build tFix --session t1
+    set_card_position mail-delay 0
+    print_card_held "AC2 a crossing past CARD_CLAIMS_BOUND=2 prints the read passed its 2s bound" \
+      "$(grep -qxF "boundary — $K2 → $K1" "$OUT" && tr -d '\r' < "$OUT" | grep -qxF 'interrupt — mailbox · unarmed · the read passed its 2s bound'; echo $?)" ;;
 esac
 exit "$MISSED"

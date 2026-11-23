@@ -158,7 +158,6 @@ policy:lexicon.packs	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:lexicon.pin	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:mailbox.fetch-seconds	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:mailbox.notice	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:mailbox.reads	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:maintain.cadence	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:maintain.dead-after	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:maintain.events	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded

@@ -7498,6 +7498,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_mail_plant",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "check_mail_recipient",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -24273,6 +24278,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "read_mail_interrupts",
+      "kind": "function",
+      "file": "tools/loop/position.py"
+    },
+    {
       "id": "read_mail_kinds",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
@@ -35276,6 +35286,11 @@
       "id": "run_mail_arm",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_mail_interrupts",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "run_main",

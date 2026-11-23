@@ -459,13 +459,15 @@ class MailHeld(TransitionRefused):
                                  "answered, acknowledged or past its deadline" % (build, " ".join(ids)))
 
 
-def read_mail_rows(root, build):
+def read_mail_rows(root, build, local=False):
     """The build's mailbox as the unattended driver's `--mail read <build>` prints it, run in `root` with stdin
     closed, under `read_clean_env()` and `MAIL_GUARD_SECONDS`, the bash `resolve_bash`'s, as `write_card_follow`
     runs the engine: `(rows, unarmed)`, each row a dict of `MAIL_COLUMNS`, `unarmed` why the mailbox was not
     read or None. Unarmed: the driver's locator answering LookupError, a `root` with no `.unattended.conf`,
     which launches nothing, and `mail — off`. ValueError, `mail unknown: ...`, for a driver no bash sees, a
-    read silent within the bound, and any other non-zero read with no row: unknown, never none."""
+    read silent within the bound, and any other non-zero read with no row: unknown, never none. `local`
+    appends `--local`, a read of the node's cache with no fetch, which the position engine's
+    `read_mail_interrupts` passes for its `--local` (KICK-dKeptSession-10); the transition guard passes none."""
     import subprocess
     import loop_witness
     from loop_lib import resolve_kit_dir
@@ -479,7 +481,8 @@ def read_mail_rows(root, build):
     if bash is None:
         raise ValueError("mail unknown: no bash that can see %s" % driver.as_posix())
     try:
-        p = subprocess.run([bash, driver.as_posix(), "--mail", "read", build], cwd=str(root), stdin=subprocess.DEVNULL,
+        p = subprocess.run([bash, driver.as_posix(), "--mail", "read", build, *(["--local"] if local else [])],
+                           cwd=str(root), stdin=subprocess.DEVNULL,
                            capture_output=True, encoding="utf-8", errors="replace", timeout=MAIL_GUARD_SECONDS,
                            env=loop_witness.read_clean_env())
     except subprocess.TimeoutExpired:
