@@ -330,3 +330,12 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T05:25:29Z dispatch · item 1d6abb15 TOOL-dBoundRoles-47 · reason tools/roles/adopt-roles.test.sh memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-47-deviation-472.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-47-1-acceptance-ledger.md memory/map/generated/symbols.json
 
 2026-11-23T05:25:30Z brief · item TOOL-dBoundRoles-47 · reason bd7e823ec7fa memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-47-build-brief.md
+
+2026-11-23T05:48:27Z dispatch · item e0abe395 TOOL-dBoundRoles-26 · reason tools/roles/role-schema.toml tools/roles/roles_lib.py tools/roles/handoff.py tools/roles/check_roles.py tools/roles/adopt-roles.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/loop/position.py help/roles.md help/unattended.md .memory-tree.conf memory/project/positional-refs.txt memory/project/docs-undocumented.txt memory/guides/SESSION-KICKOFF.md memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-26-deviation-262.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-26-1-acceptance-ledger.md memory/map/generated/symbols.json
+
+2026-11-23T05:48:28Z brief · item TOOL-dBoundRoles-26 · reason d9103861f99c memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-26-build-brief.md
+2026-11-23T05:52:11Z draw · re-dispatch · TOOL-dBoundRoles-26 · 40/122 · 20261123T055211Z-de4a8c
+
+2026-11-23T05:52:11Z dispatch · item e0abe395 TOOL-dBoundRoles-26 · reason tools/roles/role-schema.toml tools/roles/roles_lib.py tools/roles/handoff.py tools/roles/check_roles.py tools/roles/adopt-roles.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/loop/position.py help/roles.md help/loop.md .memory-tree.conf memory/project/positional-refs.txt memory/project/docs-undocumented.txt memory/guides/SESSION-KICKOFF.md memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-26-deviation-262.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-26-1-acceptance-ledger.md memory/map/generated/symbols.json
+
+2026-11-23T05:52:20Z brief · item TOOL-dBoundRoles-26 · reason e29c7d679609 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-26-build-brief.md
