@@ -483,15 +483,34 @@ write_card_fixture_verdict() { # scratch dir -> the line it wrote; 2 with nothin
   printf '%s\n' "$line"
 }
 
+# Two dotted versions compared field by field as integers, a missing field read as 0
+# (KICK-dKeptSession-56 S22): the one compare `derive_cli_line` and `read_card_fixture_verdict` ask, so
+# a recorded `cli 2.1` and a session's `2.1.0` are one version (S37). It assigns the variable its third
+# argument names by `printf -v`, as `read_session_cli_version` does, so no caller forks a subshell; that
+# name is never one of the locals here, which `printf -v` would write instead. Both versions are the
+# readers' own, two to four integers each, so no field is anything but digits.
+derive_version_order() { # a · b · VAR -> VAR set to -1 (a older than b), 0 (equal) or 1 (a newer)
+  local _vo=0 _vi
+  local -a _va _vb
+  _va=(${1//./ }); _vb=(${2//./ })
+  for _vi in 0 1 2 3; do
+    (( 10#${_va[_vi]:-0} == 10#${_vb[_vi]:-0} )) && continue
+    if (( 10#${_va[_vi]:-0} < 10#${_vb[_vi]:-0} )); then _vo=-1; else _vo=1; fi
+    break
+  done
+  printf -v "$3" '%s' "$_vo"
+}
+
 # The verdict's reader, which `derive_resume_lines`' `always-resume` arm asks: `pass` only while the
 # recorded verdict is `pass`, its blob is the installed fixture's now, and its version is both PATH's
 # `claude`'s now, `read_claude_version`'s, and the session's now, `read_session_cli_version`'s
-# (KICK-dKeptSession-38 S1); otherwise one `red: <why>` line. The tests run in that order and the first
+# (KICK-dKeptSession-38 S1), each equality `derive_version_order`'s `0`, the field-wise compare, so a
+# recorded `cli 2.1` equals a `2.1.0` (KICK-dKeptSession-56 S22, S37); otherwise one `red: <why>` line. The tests run in that order and the first
 # that fails answers, so a recorded red keeps its own reason and a verdict that is no pass spawns no
 # `claude --version`. An unknown version on any side is red, never an equality (S2). A line off the
 # writer's grammar reads as no run, so the override can only fail towards recommending a fresh session.
 read_card_fixture_verdict() { # -> pass, or red: <why>; one line on stdout, 0 always
-  local l="" v old8 oldv blob p="" s=""
+  local l="" v old8 oldv blob p="" s="" c=0
   local re='^card-fixture — (pass|absent|red [A-Za-z0-9 ]+) · fixture ([0-9a-f]{8}) · cli ([0-9]+(\.[0-9]+){1,3}|unknown) · [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[+-][0-9]{4}$'
   [ -f "$CARD_FIXTURE" ] || { echo "red: no fixture installed"; return 0; }
   [ -f "$CARD_DIR/$CARD_FIXTURE_VERDICT" ] && IFS= read -r l < "$CARD_DIR/$CARD_FIXTURE_VERDICT"
@@ -504,8 +523,10 @@ read_card_fixture_verdict() { # -> pass, or red: <why>; one line on stdout, 0 al
   [ "$oldv" != unknown ] || { echo "red: cli version unknown · recorded"; return 0; }
   p=$(read_claude_version) || { echo "red: cli version unknown · PATH"; return 0; }
   read_session_cli_version s || { echo "red: cli version unknown · session"; return 0; }
-  [ "$p" = "$oldv" ] || { echo "red: recorded under cli $oldv, PATH now $p"; return 0; }
-  [ "$s" = "$oldv" ] || { echo "red: fixture ran cli $oldv, this session runs $s"; return 0; }
+  derive_version_order "$p" "$oldv" c
+  [ "$c" = 0 ] || { echo "red: recorded under cli $oldv, PATH now $p"; return 0; }
+  derive_version_order "$s" "$oldv" c
+  [ "$c" = 0 ] || { echo "red: fixture ran cli $oldv, this session runs $s"; return 0; }
   echo pass
 }
 
@@ -635,19 +656,13 @@ derive_node_tag() {
 # The `cli —` cell (KICK-aMendedFleet-4): PATH's `claude --version` against the running session's
 # version. The session's is `read_session_cli_version`'s, the one reader of `AI_AGENT`, and PATH's
 # `read_claude_version`'s, the one read of that binary, whose `unknown:` reason is the `skipped:` line.
-# Fields compare as integers, a missing one as 0; every failure is its own `skipped:` line, and none
-# moves the card's exit.
+# The two compare through `derive_version_order`, field by field as integers, a missing one as 0
+# (KICK-dKeptSession-56 S22); every failure is its own `skipped:` line, and none moves the card's exit.
 derive_cli_line() {
-  local s="" p="" c=0 i
-  local -a a b
+  local s="" p="" c=0
   read_session_cli_version s || { printf 'cli — skipped: AI_AGENT names no Claude Code version\n'; return 0; }
   p=$(read_claude_version) || { printf 'cli — skipped: %s\n' "${p#unknown: }"; return 0; }
-  a=(${p//./ }); b=(${s//./ })
-  for i in 0 1 2 3; do
-    (( 10#${a[i]:-0} == 10#${b[i]:-0} )) && continue
-    if (( 10#${a[i]:-0} < 10#${b[i]:-0} )); then c=-1; else c=1; fi
-    break
-  done
+  derive_version_order "$p" "$s" c
   case "$c" in
     0) printf 'cli — %s · PATH claude matches this session\n' "$s" ;;
     -1) printf "cli — NOTE: PATH claude %s is older than this session's %s, so a session started from PATH runs the older CLI\n" "$p" "$s" ;;

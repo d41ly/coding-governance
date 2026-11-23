@@ -274,7 +274,9 @@ minutes, then writes and prints one line such as `card-fixture — pass · fixtu
 binary the fixture launches. A pass counts only while the fixture file is still the one it names and
 the tested version is both PATH's `claude` now and the version of the session reading it, so editing
 the fixture, upgrading the CLI on PATH, or starting a session whose harness runs another version
-makes it stale, and the override returns until you run the fixture again. The reason names the two
+makes it stale, and the override returns until you run the fixture again. Versions compare field by
+field as numbers, a missing field read as 0, so a recorded `cli 2.1` and a `2.1.0` are one version,
+and `2.1.10` is newer than `2.1.9`. The reason names the two
 versions that differ: `recorded under cli <old>, PATH now <new>` or `fixture ran cli <x>, this
 session runs <y>`. A version that cannot be read on any side, the recorded one, PATH's or the
 session's, is red too, as `cli version unknown` with the side named. A machine whose IDE harness and
