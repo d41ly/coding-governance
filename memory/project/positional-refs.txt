@@ -33312,8 +33312,14 @@ memory/builds/dTotalRecall/build/2026-10-26-build-TOOL-dTotalRecall-97-deviation
 memory/builds/dTotalRecall/build/2026-10-26-build-TOOL-dTotalRecall-98-deviation-981.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/build/2026-10-26-build-TOOL-dTotalRecall-99-deviation-991.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/build/2026-11-05-build-TOOL-dTotalRecall-1-parents-crosscheck.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-36-1-acceptance-ledger.md	planted/writer.py:2	1	7ffe749aaf3510c6b087269597432efb930ad644	widened:2026-11-23-build-TOOL-dTotalRecall-36-widen-5
+memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-36-1-acceptance-ledger.md	tools/roles/handoff.py:1245	1	7ffe749aaf3510c6b087269597432efb930ad644	widened:2026-11-23-build-TOOL-dTotalRecall-36-widen-5
 memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-7-widen-3.md	.governance/policy.toml:1	1	4993aec724ec91248c3dfa0837c952fb5bad2dd3	widened:2026-11-22-build-TOOL-dTotalRecall-7-widen-4
 memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-7-widen-4.md	.governance/policy.toml:1	1	4993aec724ec91248c3dfa0837c952fb5bad2dd3	widened:2026-11-22-build-TOOL-dTotalRecall-7-widen-4
+memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-36-widen-5.md	planted/writer.py:2	1	7ffe749aaf3510c6b087269597432efb930ad644	widened:2026-11-23-build-TOOL-dTotalRecall-36-widen-6
+memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-36-widen-5.md	tools/roles/handoff.py:1245	1	7ffe749aaf3510c6b087269597432efb930ad644	widened:2026-11-23-build-TOOL-dTotalRecall-36-widen-6
+memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-36-widen-6.md	planted/writer.py:2	1	7ffe749aaf3510c6b087269597432efb930ad644	widened:2026-11-23-build-TOOL-dTotalRecall-36-widen-6
+memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-36-widen-6.md	tools/roles/handoff.py:1245	1	7ffe749aaf3510c6b087269597432efb930ad644	widened:2026-11-23-build-TOOL-dTotalRecall-36-widen-6
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-6-spec-writer.md	tools/govkit/registry.toml:380	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-6-spec-writer.md	tools/memory-tree/kit.toml:8	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-owner-review-stop.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -33539,22 +33545,8 @@ memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-100.md	skills/
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-100.md	tools/memory-tree/deviation_join.py:284-291	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-100.md	tools/run-gates/lib-attribute.sh:59	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-11.md	BUILD-METHOD M2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	tools/runlog/extract.py:308	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	tools/runlog/extract.py:532-536	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	tools/runlog/extract.py:94-95	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	tools/runlog/extract.py:95	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	tools/runlog/runlog.py:543	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	tools/runlog/runlog_lib.py:393	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md	tools/runlog/selftest.py:1462	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-19.md	BUILD-METHOD M2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-21.md	BUILD-METHOD M2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-26.md	design_lib.py:592-611	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-26.md	tools/codebase-map/kit.toml:148-156	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-26.md	tools/lib/resolve-python.test.sh:168	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-26.md	tools/memory-tree/design_lib.py:182	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-26.md	tools/memory-tree/deviation_join.py:268	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-26.md	tools/run-gates/regen.py:48	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-26.md	tools/unattended/lib-unattended.sh:838	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-43.md	tools/lexicon/lexicon.py:117-119	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-43.md	tools/memory-recall/selftest.py:1688-1708	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-43.md	tools/memory-recall/selftest.py:1906	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -37468,6 +37460,7 @@ tools/memory-tree/check-arms.py	gate-c.test.sh:1	1	9e21ac760dc0a43d6ed0073969227
 tools/memory-tree/check-arms.py	gate-gone.sh:9	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/memory-tree/check-arms.py	kit/g.sh:2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/memory-tree/check-arms.py	kit/g.sh:3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+tools/memory-tree/check-memory-hygiene.test.sh	planted/writer.py:2	1	7ffe749aaf3510c6b087269597432efb930ad644	widened:2026-11-23-build-TOOL-dTotalRecall-36-widen-5
 tools/memory-tree/corpus_ids.py	corpus_ids.py:0	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/memory-tree/design_lib.py	asbuilt.py:33	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/memory-tree/design_lib.py	carries.py:104	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
