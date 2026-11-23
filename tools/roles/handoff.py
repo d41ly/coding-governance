@@ -955,7 +955,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     False renders every block unranked, as with no playbook kit, and prints no note of it. The `reads` fill is
     the frame, `lib.derive_frame` over every block's slot (TOOL-dBoundRoles-23 S1): an item's return states its
     list bounds, a population adds `### row contract`, and `item` with `framed_by` refuses a framing with no
-    `population` (S2)."""
+    `population` (S2). Every anchor of the composed `## Task` section, `lib.check_anchors`', resolves to the key of
+    a fact this work order hands, or the render refuses naming each one (TOOL-dBoundRoles-24 S3)."""
     if item is not None and not lib.ITEM_VALUE_RE.match(item):
         raise lib.RolesError("--item '%s' is not an item tag item.<step>.<name>, each segment lowercase "
                              "letters, digits and '-'" % item)
@@ -1136,7 +1137,8 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     # TOOL-dBoundRoles-48 S2: each block is `(slot, text, handed)`, `handed` the `(line offset, fence)` of each
     # handed block it holds, so the extents are the render's own; a block with None is checked as authored. Its
     # slot is the frame's (TOOL-dBoundRoles-23 S1), and the role's parsed return template feeds slots 6 and 9.
-    blocks, absent, reasons = [], [], []
+    # TOOL-dBoundRoles-24 S3: the keys of the facts this work order hands, each added where its block is placed
+    blocks, absent, reasons, handed_keys = [], [], [], set()
     try:
         template = lib.parse_return_template(keys.get("return"))
     except lib.RolesError:   # the catalogue checker's R2 names it; the frame then states no bound and no set
@@ -1150,6 +1152,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             # input is authored text, written unfenced and refused where a line would stand as an executor line
             # or its fence never closes (TOOL-dBoundRoles-45 S1 S2)
             fact = fact_keys.get(key) or fact_keys[key.split(":")[0]]
+            handed_keys.add(fact)
             typed = key.startswith("input:") and key[6:] in TYPED_INPUTS
             if typed:
                 refusals += lib.check_authored_lines(v, key)
@@ -1180,6 +1183,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
             v = BLANK_EDGES_RE.sub("", values.get(key, ""))
             fact = fact_keys.get(key) or fact_keys.get(key.split(":")[0])
             if fact and not check_placeholder(v):
+                handed_keys.add(fact)
                 fences.append(lib.render_handed_fence(v))
                 subs.append("### %s\n\n%s\n\n%s" % (head, lib.render_fact_line(fact, root), fences[-1]))
             elif not k.endswith("?"):
@@ -1246,6 +1250,11 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     fenced = lib.check_block_fences(task_sec, derive_block_extents(task_sec, lead, opening, blocks, handed))
     if fenced:
         raise lib.RolesError("\n".join(fenced))
+    # TOOL-dBoundRoles-24 S3: every anchor the composed section points at resolves to a fact this work order hands,
+    # raised as a list of its own, since the refusals above are raised before the section is assembled (§8 F4)
+    unresolved = lib.check_anchors(task_sec, handed_keys)
+    if unresolved:
+        raise lib.RolesError("\n".join(unresolved))
     marker ="<!-- gov:handoff role=%s build=%s unit=%s item=%s path=%s role-sha=%s task-sha=%s -->" % (
         role, slug, unit or "-", item if item is not None and for_role is None else "-", rel,
         lib.derive_section_sha(role_sec), lib.derive_section_sha(task_sec))

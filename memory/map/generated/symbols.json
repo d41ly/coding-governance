@@ -5508,6 +5508,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "check_anchors",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_anomaly_sources",
       "kind": "function",
       "file": "tools/runlog/model.py"

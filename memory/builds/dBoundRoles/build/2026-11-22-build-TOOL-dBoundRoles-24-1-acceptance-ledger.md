@@ -1,0 +1,18 @@
+**Serves:** journal TOOL-dBoundRoles-24
+
+# TOOL-dBoundRoles-24 — acceptance ledger
+
+Each criterion of section 6, read by the pass that built the unit with a probe of the code it changed, on the
+worktree before the pass commit at base `9b168d4ef`. The library probes called `tools/roles/roles_lib.py` in
+process from `tools/roles/`; the render probes ran `tools/roles/handoff.py render` in a git fixture repository under
+the host temp folder, holding a copy of this tree's tools with the policy kit removed, the roles kit scaffolded by its
+adopter, and a build folder `tFix`. No gate, suite or bar ran in the pass: arm 39 of
+`tools/roles/adopt-roles.test.sh`, the arm the spec's `New arm:` line declares, its RED-first observation, and the
+legs its gate line lists are owed to the main loop at the close.
+
+**Evidences:** TOOL-dBoundRoles-24
+- AC1 — `resolves to no fact this work order hands` — `python -c "import roles_lib as r; print(r.check_anchors(open('anchor-nothing.md').read(), set()))"` over a scratch file holding the backticked span `blob:roles_lib.py@0123456789ab:1-4` printed the one line ``anchor `blob:roles_lib.py@0123456789ab:1-4` — resolves to no fact this work order hands``, and with that key in the set printed `[]`. The seam is `tools/roles/roles_lib.py#check_anchors`. OWED: arm 39's AC1 assertion at the close.
+- AC2 — `--input question=` — in the fixture, `render --role gov-researcher --build tFix --unit TOOL-tFix-1` with a question carrying the backticked `record:memory/nowhere.md@0123456789ab` exited 1, its stderr naming ``handoff: anchor `record:memory/nowhere.md@0123456789ab` — resolves to no fact this work order hands``, and the prompts folder held no new file; with the anchor removed the same render exited 0 and wrote `2026-11-23-prompt-TOOL-tFix-1-1-researcher.md`. The skeptic's render with `--input spec=<scratch spec>` and a typed diff anchoring that spec's `record:` key exited 0, and a key one hex digit off exited 1 naming it. A scratch copy of `handoff.py` with `check_anchors`'s result replaced by `[]` rendered the planted question with exit 0, the arm's staged break. The call is in `tools/roles/handoff.py#render_handoff`. OWED: arm 39's AC2 assertions and their RED-first observation, the `check_anchors` call removed from `render_handoff`, at the close.
+- AC3 — `ANCHOR_RE` — keys `derive_fact_key` returned for a `blob:` of a whole file and of an excerpt, `record:` keys of `memory/DECISIONS.md`, `.governance/policy.toml`, a spec path and `card/<id>`, and `cmd:` keys over `--input question` and `--for gov-builder`, spanning the classes `claimed`, `decided` and `witnessed` by `derive_fact_class`, each fullmatched `ANCHOR_RE` backticked with its `key` group equal to the key; `check_anchors` over a text citing them all with `handed` holding them printed `[]`, and with an empty `handed` named each as resolving to no handed fact. The grammar is `tools/roles/roles_lib.py#ANCHOR_RE`. OWED: no arm of section 7's `New arm:` line covers AC3; the probe above is its observation.
+- AC4 — `malformed` — `check_anchors` over a text holding the backticked span `blob:nothing` and, inside a three-backtick fence, the span `cmd:000000000000:000000000000` returned the one line ``anchor `blob:nothing` — malformed: blob:<path>@<12 hex>:<lo>-<hi>, lo <= hi, both positive integers`` and nothing for the fenced span; `blob:a@0123456789ab:5-4`, `record:x@0123456789AB` and `cmd:short` were each named malformed too. OWED: arm 39's AC4 assertion at the close.
+- AC5 — `grep -n "check_anchors" tools/roles/README.md` — printed line 191 of the README (DERIVED, at the pass's working tree), inside the paragraph **Anchors resolve to handed facts** that states the grammar, the refusal and what the check does not see.
