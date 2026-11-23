@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-21 — memory-recall's FTS5 tables moved into the one index file, keyed by path and blob
 
-**Status:** INPROGRESS · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-4 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0232@94a25816 whole
 
@@ -13,12 +13,17 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-21-deviation-211.md](../build/2026-10-26-build-TOOL-dTotalRecall-21-deviation-211.md) | deviation | — |
+| [2026-11-22-build-TOOL-dTotalRecall-21-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-21-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-21-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-21-reground-return.md) | research | — |
+| [2026-11-23-build-TOOL-dTotalRecall-21-divergence-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-21-divergence-return.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief-2.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief-2.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-21-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-21-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-21-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-21-reground-spec-writer.md) | log | — |
+| [2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-brief.md) | journal | — |
+| [2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
 <!-- /gen:spec-records -->
@@ -135,6 +140,18 @@ stats)` for the HEAD tree and `build_overlay`, filling `tree_path` and this work
   Observed by AC7.
 - **S9** — The index line reads `index <n> records + <m> chunks · superseded … (tree <tree8>, extracted
   <k> blob(s) in <s>s)`, `k` the pairs this call extracted, never a rebuild cause. Observed by AC3.
+- **S10** — The tag index's reset tolerates FTS5 tables. `tag_index.py#load_index`, under `reset` or a
+  stale stamp, first drops every table `sqlite_master` lists with `sql LIKE 'CREATE VIRTUAL TABLE%'`, each
+  drop removing that table's shadow tables, then reads the list again and drops every table it still
+  names, then creates `SCHEMA`'s tables as today, all in its one `BEGIN IMMEDIATE` transaction and the
+  file never unlinked. Recall's tables come back at recall's next open (S2), and its next query
+  re-extracts every served pair. The module docstring names recall's `fts_*` tables beside the
+  extractors' rows, written by memory-recall on the same file (F5), and states the drop order.
+  Departure from PLAY-dOrderedCharter-55@rev-7 S16: F8. Observed by AC8.
+  **Readers:** by name: `tools/playbook/gov_tag.py` (`remove_index`, the one `reset=True` caller, and
+  `run_plant`, whose `held-open` plant opens a stale-stamped file through `load_index`) · by value:
+  `tools/playbook/gov_tag.py#run_plant`'s `held-open` plant, which counts `blob_row` rows and reads
+  `user_version` after the reset.
 
 ## 3. Non-goals (OUT)
 
@@ -174,8 +191,12 @@ CREATE TABLE IF NOT EXISTS fts_digest(worktree TEXT PRIMARY KEY, digest TEXT);
 
 `id` and `line` replace today's `meta` table, which joined by rowid. A row carries its path because the
 extraction reads it: `head` holds the path, and `_parse_spec_h1` decides a spec's H1 by path (F6). The
-worktree key is `tag_index.py#derive_worktree_key`'s, from `ctx["worktree"]`. `load_index`'s schema reset
-drops these tables with its own; the next open creates them and the next query re-extracts.
+worktree key is `tag_index.py#derive_worktree_key`'s, from `ctx["worktree"]`. At HEAD `load_index`'s
+schema reset drops a list of every `sqlite_master` table name read once, so an FTS5 table's drop removes
+its shadow tables and the next DROP refuses `no such table: fts_record_data`, and the reset, and
+`gov_tag.py#remove_index` with it, refuses for good (the builder return of pass 1). S10 drops virtual
+tables first and re-reads the list (F8); the next open creates recall's tables and the next query
+re-extracts.
 
 ### The flow
 
@@ -213,6 +234,7 @@ because the old cache's freshness is the clause's defect.
 
 - `tools/memory-tree/id_grammar.py`
 - `tools/memory-tree/row_grammar.py`
+- `tools/playbook/tag_index.py` (`load_index` and its module docstring, S10)
 - `tools/memory-tree/.memory-tree.conf.example`
 - `tools/memory-recall/query.py`
 - `tools/memory-recall/check-recall.py`
@@ -229,7 +251,11 @@ because the old cache's freshness is the clause's defect.
 - `tools/memory-recall/kit.toml`
 - `tools/lib/common_dir.py`
 - `.memory-tree.conf`
+- `memory/guides/SESSION-KICKOFF.md`, its `last-audit` re-stamped with a delta line, since `.memory-tree.conf`
+  is on the manifest's `watch:` line
 - `memory/project/legacy-homes.txt`
+- `memory/builds/dTotalRecall/build/`, the two deviation records F5 and F8 name, each written by
+  `python tools/memory-tree/gov_record.py new deviation` with `--caused-by TOOL-dTotalRecall-21`
 - `memory/map/features/row-grammar.md`
 - `memory/map/features/memory-recall.md`
 - `memory/map/generated/symbols.json`, regenerated by the codebase-map kit's generator
@@ -244,6 +270,8 @@ because the old cache's freshness is the clause's defect.
 - **Drop untracked notes from recall.** A session's records are untracked until its commit and are the
   ones most often asked for; S3 keeps them.
 - **Write the rows inside `tag_index.build_index`.** F5.
+- **Recall drops its own tables before a reset.** `gov_tag.py#remove_index` and the stale-stamp branch
+  never call recall, so any reset that misses recall's tables still refuses on the shared file; F8.
 
 ## 5. Production-readiness checklist
 
@@ -261,7 +289,8 @@ because the old cache's freshness is the clause's defect.
 - observability — the index line names the tree and the pairs extracted (S9).
 - risks — the recall kit now requires the playbook kit; an adopter installing recall alone is refused by
   govkit's `requires` join, which §8 F3 accepts under the grant. A second worktree's untracked pairs are
-  swept by the next call that extracts and re-extracted at that worktree's next query.
+  swept by the next call that extracts and re-extracted at that worktree's next query. A tag-index reset
+  now drops recall's rows with the playbook kit's, so the next query pays one full extraction (S10).
 - testing — AC1 to AC7 by a pass; the arms of §7 at the close.
 - migration — one cold extraction, as §4 says.
 - user docs — `tools/memory-recall/README.md` loses the cache and budget sections and states the index,
@@ -282,13 +311,15 @@ because the old cache's freshness is the clause's defect.
   `recall/cache/`.
   Red when: the restriction to the served set drops or duplicates a row, so a hit moves.
   cost: one cold extraction per kit over one clone, under two minutes.
-- **AC3** — When one tracked memory file of that clone is edited, a query reads `extracted 1 blob(s)`; when
+- **AC3** — When one tracked record of that clone carrying a `**Caused-by:**` line, deviation 211's, is
+  edited, a query reads `extracted 1 blob(s)`; when
   it is then committed, the next query reads `extracted 0 blob(s)`; when a family is added to `FAMILIES` in
   the clone's conf, the next query's count equals the number of paths `corpus_inputs(include_untracked=True)`
   lists.
   Red when: freshness is a whole-corpus hash, so the first count is the corpus size, or the digest omits
   the conf, so the last is 0.
-- **AC4** — When an untracked record is written in worktree A of the clone, a `query.py` run from A returns it and
+- **AC4** — When an untracked record carrying the line `**Caused-by:** TOOL-dTotalRecall-21`, an id the
+  clone's corpus defines, is written in worktree A of the clone, a `query.py` run from A returns it and
   the same query from worktree B does not; after A's commit lands on B's branch, B returns it.
   Red when: an untracked pair is served across worktrees, or untracked files are dropped from the corpus.
 - **AC5** — When the clone's index file has its leading SQLite header overwritten with zero bytes
@@ -302,12 +333,18 @@ because the old cache's freshness is the clause's defect.
   its per-id, cell and slice lines equal those "old/tools/memory-recall/check-recall.py" prints over the
   same clone, and `--data-dir` naming the clone's index file prints the same lines.
   Red when: the served sets read a different corpus, such as untracked files, so a row's hit changes.
+- **AC8** — When `python tools/playbook/gov_tag.py --rebuild` runs in that clone after a query, then a
+  query runs, then `--rebuild` runs again, each rebuild exits 0, `sqlite_master` lists no `fts_` name after
+  the first, and the query between them reads a nonzero `extracted <k> blob(s)`.
+  Red when: the reset drops a list of names read once, so the first DROP of an FTS5 table removes its
+  shadow tables, the next DROP refuses `no such table: fts_record_data`, and the second reset refuses as
+  the first did.
 
 ## 7. Gates
 
-`memory-recall kit selftest` · `recall floor` · `recall floor arms` · `memory-recall skill wiring` · `row-grammar selftest` · `hook destinations self-test` · `row-keyed merge driver replay` · `govkit acceptance matrix` · `playbook render selftest` · `kit/dogfood doc parity` · `straggler-guard arms` · `transition-audit arms` · `python resolver (behaviour + inline parity + idiom ban)` · `policy check` · `policy fixtures` · `check-wiring self-test` · `lexicon naming predicates`
+`memory-recall kit selftest` · `recall floor` · `recall floor arms` · `memory-recall skill wiring` · `row-grammar selftest` · `hook destinations self-test` · `row-keyed merge driver replay` · `govkit acceptance matrix` · `playbook render selftest` · `kit/dogfood doc parity` · `straggler-guard arms` · `transition-audit arms` · `python resolver (behaviour + inline parity + idiom ban)` · `policy check` · `policy fixtures` · `check-wiring self-test` · `lexicon naming predicates` · `tags (the resolver's checks)` · `kickoff-manifest ratchet` · `record causes (causes and orphans over the legacy population)`
 
-New arm: tools/memory-recall/selftest.py · covers AC3 AC4 AC5 · the cache arms replaced by index arms: one-pair re-extraction, the conf digest, the worktree's untracked pair and the refused corrupt file, staged by a whole-corpus digest reinstated as the freshness rule · none
+New arm: tools/memory-recall/selftest.py · covers AC3 AC4 AC5 AC8 · the cache arms replaced by index arms: one-pair re-extraction, the conf digest, the worktree's untracked pair, the refused corrupt file and two resets over recall's tables, staged by a whole-corpus digest reinstated as the freshness rule and by `load_index`'s drop list read once · none
 New arm: tools/memory-recall/test_recall_floor.py · covers AC7 · the floor arms over the index's served set, staged by `load_served_set` reading untracked files under `untracked=False` · none
 
 ## 8. Open questions
@@ -354,6 +391,17 @@ New arm: tools/memory-recall/test_recall_floor.py · covers AC7 · the floor arm
   check's population, a CLOSED parent's surface. RESOLVED (agent, 2026-11-22, delegated): (a), F2's (a) on
   the landed overlay, AC4 holding it. Brief: `2026-11-22-prompt-TOOL-dTotalRecall-21-reground-brief`.
   widens: none · relaxes: none
+- **F8 — The landed reset, `tag_index.py#load_index` under `reset` or a stale stamp, refuses once the
+  index file holds an FTS5 table; what stops a reset bricking the shared file?** Options: (a) drop the
+  virtual tables first, then re-read the list and drop what it still names; (b) re-read the list at each
+  step; (c) `DROP TABLE IF EXISTS` over the list read once; (d) recall drops its own tables before a
+  reset. (b) and (c) drop a shadow table by name when the list orders it before its virtual table, which
+  SQLite refuses under `SQLITE_DBCONFIG_DEFENSIVE` ("may not be dropped", PINNED 2026-11-23, this spec's
+  probe); (d) is never called by `gov_tag.py#remove_index` or the stale-stamp branch. RESOLVED (agent,
+  2026-11-23, delegated): (a), the one option that never names a shadow table, AC8 holding it. The pass
+  records the departure from PLAY-dOrderedCharter-55@rev-7 S16 (the reset's drop loop, a CLOSED parent's
+  surface) as a deviation through the record factory, beside F5's. Brief:
+  `2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-brief`. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -371,6 +419,13 @@ New arm: tools/memory-recall/test_recall_floor.py · covers AC7 · the floor arm
   call S4 makes; AC2 and AC7 compare against the start commit's kit; AC5 corrupts the header, since a
   zero-byte file opens as an empty database; AC6 scopes `common_git_dir` to the recall kit, which other modules
   define too; every reader is cited by symbol; the leg line gains `policy check` and `policy fixtures`.
+- rev-4 · 2026-11-23 · §2 · §4 · §5 · §6 · §7 · §8 · §10 · per
+  `2026-11-23-prompt-TOOL-dTotalRecall-21-divergence-brief` and
+  `2026-11-22-build-TOOL-dTotalRecall-21-1-builder-return`: §4's claim that `load_index`'s reset drops
+  recall's tables is false at HEAD, so S10 makes the reset FTS5-tolerant (F8), observed by AC8 and the
+  selftest arm; Files touched gains `tag_index.py`, the kickoff manifest and the deviation records; AC3
+  and AC4 write records naming a resolving cause; the leg line gains the tags, kickoff-manifest and
+  record-causes legs.
 
 ## 10. Reuse audit
 
@@ -378,7 +433,8 @@ The seams extended are `id_grammar.py#build_index`, the one FTS5 builder, rename
 `query.py#_write_set`, whose `meta` join the `id` and `line` columns absorb; `query.py#_docs`, re-shaped per
 path; and the playbook kit's index, reached through `tag_index.py#load_index`, `#derive_context`,
 `#load_view`, `#read_worktree_trees` and `#common_git_dir`, its `tree_path` and `dirty_path` rows the served
-set's source. The lookup, `python tools/codebase-map/reuse_lookup.py "write full-text search rows keyed by
+set's source; `tag_index.py#load_index`'s reset loop is extended in place for FTS5 tables (S10), no second
+reset beside it. The lookup, `python tools/codebase-map/reuse_lookup.py "write full-text search rows keyed by
 path and blob into the shared sqlite tag index"`, ranked generic `row`, `key` and `write` stems, `search`
 (`query.py`), `read_rows` (`tag_index.py`) and `read_blobs_at` (`tree_lib.py`); `git grep -l "import
 sqlite3" -- tools` names `bench.py`, `check-recall.py`, `query.py`, `id_grammar.py`, `gov_tag.py` and
@@ -386,7 +442,8 @@ sqlite3" -- tools` names `bench.py`, `check-recall.py`, `query.py`, `id_grammar.
 places the freshness clauses at fixed lines, which have moved; read them in `query.py#ensure_cache`; the gap
 register's 478 MB is 1803 MB for four worktrees today (PINNED 2026-11-22). PLAY-dOrderedCharter-19 S5
 plans an overlay of tracked edits, and `build_overlay` landed it so, so F2's dirty rows cannot hold
-untracked files (F7). The recall probe returned the brief's row, scout B's row, this spec's rev-2 and
+untracked files (F7). rev-3 read `load_index`'s reset as dropping recall's tables; the builder's probe
+showed it refuses on an FTS5 table's shadow tables (F8). The recall probe returned the brief's row, scout B's row, this spec's rev-2 and
 PLAY-dOrderedCharter-19's reuse audit, and rebuilt the per-worktree cache, cause `corpus digest`, the defect
 this unit retires.
 
