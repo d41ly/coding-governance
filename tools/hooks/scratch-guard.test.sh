@@ -2132,7 +2132,7 @@ got = sg.checkBuildable({ unit: "TOOL-bX-1", spec: "mem/builds/bX/spec/2026-11-2
 say("BR50-AC9 checkBuildable: an H1 quoted inside a four-backtick fence holding a three-backtick line is content, the real H1 admits",
     got === "", got)
 fs.writeFileSync(path.join(dir, "sess.jsonl"), "{}\n")
-const prompt = ["<!-- gov:handoff role=gov-builder -->", "## Task", "", "### allowance", "", "- tools/a.py", "", "### input:spec", "", fence(4), "open"].join("\n")
+const prompt = ["<!-- gov:handoff role=gov-builder -->", "## Task", "", "### allowance", "", "- src/a.py", "", "### input:spec", "", fence(4), "open"].join("\n")
 fs.writeFileSync(path.join(dir, "sess", "subagents", "agent-br50.jsonl"), JSON.stringify({ type: "user", message: { role: "user", content: prompt } }) + "\n")
 try { got = sg.readWorkOrderAllowance({ transcript_path: path.join(dir, "sess.jsonl"), agent_id: "br50" }) } catch (e) { got = { threw: String(e) } }
 say("BR50-AC17 readWorkOrderAllowance: a prompt ending inside a fence denies the write, naming the line it opened at, and throws nothing",

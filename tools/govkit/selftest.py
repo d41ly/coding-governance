@@ -3190,7 +3190,7 @@ def check_agent_default(tmp: pathlib.Path) -> None:
     it gains exactly that slot beside the source kit's. Staged against a predicate that needs an explicit
     `agent: true`, the slot is missing and the case reds. WHAT IT DOES NOT CHECK: an `agent:` value other
     than `true` or `false`, which the catalogue checker's R0 refuses before any render."""
-    kit = tmp / "agent-default" / "roles"
+    kit = tmp / "agent-default" / KIT_DIRS["roles"].name
     shutil.copytree(KIT_DIRS["roles"], kit, ignore=shutil.ignore_patterns("__pycache__"))
     slot = "gov-zz-fixture"
     text = (kit / "agents" / "gov-researcher.agent.md").read_text(encoding="utf-8")
