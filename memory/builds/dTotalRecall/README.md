@@ -193,7 +193,7 @@ ids TOOL-dTotalRecall-112
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 693 bound to this build, across 4 record folder(s).
+Records: 694 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -305,7 +305,7 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 | red-fix | `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-20.md`, `2026-11-23-build-TOOL-dTotalRecall-9-red-fix-19.md` and 21 more under build/ |
 | widen | `2026-11-23-build-TOOL-dTotalRecall-9-widen-10.md`, `2026-11-23-build-TOOL-dTotalRecall-51-widen-7.md` and 13 more under build/ |
 | research | `2026-11-23-build-TOOL-dTotalRecall-62-1-writer-return.md`, `2026-11-23-build-TOOL-dTotalRecall-52-divergence-fold-return.md` and 111 more under build/ |
-| logs | `2026-11-23-build-TOOL-dTotalRecall-52-2-acceptance-ledger.md`, `2026-11-23-build-TOOL-dTotalRecall-43-2-acceptance-ledger.md` and 94 more under build/ |
+| logs | `2026-11-23-build-TOOL-dTotalRecall-52-2-acceptance-ledger.md`, `2026-11-23-build-TOOL-dTotalRecall-43-2-acceptance-ledger.md` and 95 more under build/ |
 | open asks | `BACKLOG.md`, 15 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->

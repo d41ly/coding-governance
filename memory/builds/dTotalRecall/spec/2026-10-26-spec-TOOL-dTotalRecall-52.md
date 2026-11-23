@@ -12,6 +12,7 @@
 | [2026-10-26-build-TOOL-dTotalRecall-52-deviation-521.md](../build/2026-10-26-build-TOOL-dTotalRecall-52-deviation-521.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-52-deviation-522.md](../build/2026-10-26-build-TOOL-dTotalRecall-52-deviation-522.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-52-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-52-1-builder-return.md) | journal | — |
+| [2026-11-22-build-TOOL-dTotalRecall-52-2-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-52-2-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-52-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-52-reground-return.md) | research | — |
 | [2026-11-23-build-TOOL-dTotalRecall-52-2-acceptance-ledger.md](../build/2026-11-23-build-TOOL-dTotalRecall-52-2-acceptance-ledger.md) | log | — |
 | [2026-11-23-build-TOOL-dTotalRecall-52-divergence-fold-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-52-divergence-fold-return.md) | research | — |
