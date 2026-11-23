@@ -146,8 +146,8 @@ mail — 6299617af701
   no loop kit`, which hides the budget rather than showing it as zero.
 - `mail —` names each open message addressed to the build or one of its units, by id, the unattended
   driver's `--mail read <slug> --open --ids`, or `none`. An open message holds the build's moves until
-  it is answered or acknowledged ([the loop's moves](loop.md)). With `RUN_CLAIMS` off it reads
-  `mail — skipped: RUN_CLAIMS is off`, never `none`.
+  it is answered, acknowledged or past its deadline ([the loop's moves](loop.md)). With `RUN_CLAIMS`
+  off it reads `mail — skipped: RUN_CLAIMS is off`, never `none`.
 
 A line whose source does not answer reads `<word> — skipped: <why>`. `manifest-check.sh --card
 --check` refuses a stored section missing one of its lines and names `--card --pointers`, which

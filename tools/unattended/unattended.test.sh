@@ -307,8 +307,8 @@ add_claim_sighting() { # clone dir · ref · tree · commit · seen-utc
   printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$((${s:-0} + 1))" "$2" "$k" "$3" "$4" "$5" >>"$f"
 }
 # A MAIL MESSAGE PLANTED ON A REMOTE (KICK-dKeptSession-5): one commit over the empty tree under the
-# `gov-claim` identity, its message as `--mail post` records it, set on <ref> of the bare <git dir> by
-# `update-ref`, so no post and no push writes it.
+# `gov-claim` identity, its message as `KICK-dKeptSession-5`'s post recorded it, with no deadline, set on
+# <ref> of the bare <git dir> by `update-ref`, so no post and no push writes it.
 seed_mail_at() { # git dir · ref · build · id · to · kind · answers -> the commit
   local t c
   t=$(git --git-dir="$1" mktree </dev/null)
@@ -19083,7 +19083,7 @@ remove_claim_refs; reset_tree
 # kit's conf keys and `USERNAME=daily-agent`, fleet tag `a`. Policy values are planted as the landed
 # revision, committed and pushed, because the policy reader takes that revision. A lost race is
 # staged by a git shim that answers a fetch of the lease namespace with nothing, never a sleep; the
-# question witness's mailbox by exported stubs standing in for dKeptSession's two functions; the
+# question witness's mailbox by a mail commit on the origin, read by the driver's own mailbox; the
 # remote's absence by renaming it away. Waived by README rule 8; AC12's direct probe observes it at
 # landing. WHAT THIS DOES NOT DRIVE: the policy kit hidden (AC17's second half), which needs a copy of
 # two kits in a checkout of their own.
@@ -19236,27 +19236,21 @@ for la_row in "bogus build tFix|the act is acquire, renew, release, take-over or
 done
 same "DPR1 ...and none of them wrote" "$(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .)" "$la_n"
 # ---- AC11 and AC12: an open question to tFix witnesses a renewal at every renew; a closed one renews
-# ---- nothing and keeps the prior witness; with no deadline stub, or a sha the clone lacks, it exits 2.
-# ---- The question is a mail commit to build:tFix on the origin, read by the driver's own `read_mailbox`
-# ---- (KICK-dKeptSession-5 S6), and closed by tFix's `ack` where a stub once said expired; the stub is
-# ---- `check_mail_deadline` alone, dKeptSession's deadline, which has not landed.
+# ---- nothing and keeps the prior witness; a sha the clone lacks exits 2. The question is a mail commit
+# ---- to build:tFix on the origin, read by the driver's own `read_mailbox` (KICK-dKeptSession-5 S6), and
+# ---- closed by tFix's `ack`; it carries no deadline, so `check_mail_deadline` (KICK-dKeptSession-24)
+# ---- keeps it open until then.
 la_q=$(seed_mail_at "$LF/origin.git" refs/gov/mail/fy/b/t1 fy a00000000001 build:tFix question none)
-cat > "$LF/stubs.sh" <<EOF
-check_mail_deadline() { return 1; }
-export -f check_mail_deadline
-EOF
-la_got=$( . "$LF/stubs.sh"
+la_got=$(
   run_lease_arm renew build tFix --witness "$la_q" >/dev/null; printf '%s %s;' "$(read_lease_field tFix/build renews)" "$(read_lease_field tFix/build witness)"
   run_lease_arm renew build tFix --witness "$la_q" >/dev/null; printf '%s %s;' "$(read_lease_field tFix/build renews)" "$(read_lease_field tFix/build witness)"
   seed_mail_at "$LF/origin.git" refs/gov/mail/tFix/a/s1 tFix b00000000001 build:fy ack a00000000001 >/dev/null
   run_lease_arm renew build tFix --witness "$la_q" >/dev/null; printf '%s %s %s;' "$?" "$(read_lease_field tFix/build renews)" "$(read_lease_field tFix/build witness)"
   run_lease_arm renew build tFix --witness 0123456789012345678901234567890123456789 >/dev/null; printf '%s' "$?" )
-same "DPR1 AC11 an open question renews twice, an expired one renews nothing, an absent sha exits 2" "$la_got" \
+same "DPR1 AC11 an open question renews twice, an acknowledged one renews nothing, an absent sha exits 2" "$la_got" \
   "yes $la_q;yes $la_q;0 no $la_q;2"
-run_lease_arm renew build tFix --witness "$la_q" >/dev/null
-same "DPR1 AC11 with dKeptSession's functions absent the question exits 2" "$?" "2"
 la_q=$(seed_mail_at "$LF/origin.git" refs/gov/mail/fy/b/t2 fy a00000000002 build:tFix question none)
-la_got=$( . "$LF/stubs.sh"; ( cd "$LF/c1" && set +u && . "$SCRIPT" && load_driver_conf >/dev/null 2>&1 && check_lease_witness tFix "$la_q"; printf ' %s;' "$?" ) 2>/dev/null
+la_got=$( ( cd "$LF/c1" && set +u && . "$SCRIPT" && load_driver_conf >/dev/null 2>&1 && check_lease_witness tFix "$la_q"; printf ' %s;' "$?" ) 2>/dev/null
   seed_mail_at "$LF/origin.git" refs/gov/mail/tFix/a/s2 tFix b00000000002 build:fy ack a00000000002 >/dev/null
   run_lease_arm renew build tFix --witness "$la_q" >/dev/null; printf '%s %s' "$?" "$(read_lease_field tFix/build renews)" )
 same "DPR1 AC12 the probe reads question, and the renewal after the question closed writes renews: no" "$la_got" "question 0;0 no"
@@ -20681,11 +20675,11 @@ run_mail_arm() { # clone · session · args -> the driver's output and exit
   local c=$1 s=$2; shift 2
   ( cd "$mb_d/$c" && GOV_NODE=$(printf '%s' "$c" | tr AB ab) CLAUDE_CODE_SESSION_ID=$s GOV_RUNLOG=0 bash "$SCRIPT" --mail "$@" 2>&1 )
 }
-read_mail_refs() { git --git-dir="$mb_d/o.git" for-each-ref refs/gov | grep -c .; }
+read_mail_refs() { git --git-dir="${1:-$mb_d/o.git}" for-each-ref refs/gov | grep -c .; } # [bare remote, the mailbox fixture's]
 # ---- AC1
-run_mail_arm A s1 post fx --to build:fy --kind question --subject one "$mb_d/body.txt" >/dev/null
-run_mail_arm A s1 post fx --to build:fy --kind question --subject two "$mb_d/body.txt" >/dev/null
-run_mail_arm A s2 post fx --to build:fy --kind question --subject three --item 'item.plan.x@1#00' --pass 1 "$mb_d/body.txt" >/dev/null
+run_mail_arm A s1 post fx --to build:fy --kind question --subject one --default no "$mb_d/body.txt" >/dev/null
+run_mail_arm A s1 post fx --to build:fy --kind question --subject two --default no "$mb_d/body.txt" >/dev/null
+run_mail_arm A s2 post fx --to build:fy --kind question --subject three --item 'item.plan.x@1#00' --pass 1 --default no "$mb_d/body.txt" >/dev/null
 same "KDS5 AC1 s1's ref holds a first-parent chain of two, the first parentless, and s2's ref one" \
   "$(git --git-dir="$mb_d/o.git" rev-list --first-parent --count refs/gov/mail/fx/a/s1 2>&1) $(git --git-dir="$mb_d/o.git" rev-list --first-parent --count refs/gov/mail/fx/a/s2 2>&1) [$(git --git-dir="$mb_d/o.git" log --first-parent --format=%P refs/gov/mail/fx/a/s1 2>/dev/null | tail -n 1)]" "2 1 []"
 same "KDS5 AC1 each of the three commits' subject is gov-mail fx/<id>" \
@@ -20717,7 +20711,7 @@ git --git-dir="$mb_d/o.git" log -1 --format=%B 'refs/gov/problems/a%20subject/e5
 same "KDS5 AC3 --register's decision and problem records on the remote are the base driver's bytes" \
   "$(cmp -s "$mb_d/want-decision.msg" "$mb_d/reg-decision.msg" && echo equal) $(cmp -s "$mb_d/want-problem.msg" "$mb_d/reg-problem.msg" && echo equal)" "equal equal"
 # ---- AC4
-mb_q=$(run_mail_arm B t1 post fy --to build:fx --kind question --subject 'q to fx' "$mb_d/body.txt" | sed -n 's/^mail — posted \([0-9a-f]*\) · .*/\1/p')
+mb_q=$(run_mail_arm B t1 post fy --to build:fx --kind question --subject 'q to fx' --default no "$mb_d/body.txt" | sed -n 's/^mail — posted \([0-9a-f]*\) · .*/\1/p')
 mb_out=$(run_mail_arm A s1 read fx)
 same "KDS5 AC4 B's question reads one open row in A's mailbox, its reply -" \
   "$(grep -c . <<<"$mb_out") $(cut -f1,2,4,11 <<<"$mb_out" | tr '\t' ' ')" "1 $mb_q question open -"
@@ -20785,14 +20779,14 @@ printf 'a message body\n' > "$mb_d/body.txt"
 mf_log="$mb_d/A/.git/gov-feed.log"
 # ---- AC1
 mf_r=$(read_mail_refs); mf_n=$(cat "$mf_log" 2>/dev/null | grep -c .)
-run_mail_arm A s1 post fx --to build:fy --kind question --subject one "$mb_d/body.txt" >/dev/null
+run_mail_arm A s1 post fx --to build:fy --kind question --subject one --default no "$mb_d/body.txt" >/dev/null
 mf_tip=$(git --git-dir="$mb_d/o.git" rev-parse --verify -q refs/gov/mail/fx/a/s1)
 same "KDS23 AC1 a post to a remote holding no mail ref is one feed line: the remote mail ref, kind mail, the empty tree, the remote tip" \
   "$mf_r $(tail -n +$((mf_n + 1)) "$mf_log" 2>/dev/null | cut -f2-5 | tr '\t' ' ' | tr '\n' ';')" \
   "0 refs/gov/mail/fx/a/s1 mail 4b825dc642cb6eb9a060e54bf8d69288fbee4904 $mf_tip;"
 # ---- AC2
 mf_n=$(cat "$mf_log" 2>/dev/null | grep -c .)
-mf_out=$(run_mail_arm A s1 post fx --to build:fy --kind question --subject one "$mb_d/body.txt"); mf_rc=$?
+mf_out=$(run_mail_arm A s1 post fx --to build:fy --kind question --subject one --default no "$mb_d/body.txt"); mf_rc=$?
 same "KDS23 AC2 the retried post is refused as a duplicate, exit 1, and the feed gains no line" \
   "$mf_rc $(grep -c '^mail — duplicate [0-9a-f]* · refs/gov/remote/mail/fx/a/s1$' <<<"$mf_out") $(cat "$mf_log" 2>/dev/null | grep -c .)" "1 1 $mf_n"
 mf_git=$(command -v git); mkdir -p "$mb_d/bin"
@@ -20804,7 +20798,7 @@ exec "$mf_git" "\$@"
 EOF
 chmod +x "$mb_d/bin/git"
 mf_n=$(cat "$mf_log" 2>/dev/null | grep -c .)
-mf_out=$(PATH="$mb_d/bin:$PATH" run_mail_arm A s3 post fx --to build:fy --kind question --subject lost "$mb_d/body.txt"); mf_rc=$?
+mf_out=$(PATH="$mb_d/bin:$PATH" run_mail_arm A s3 post fx --to build:fy --kind question --subject lost --default no "$mb_d/body.txt"); mf_rc=$?
 same "KDS23 AC2 the post that lost its compare-and-swap exits 1 printing mail — lost, the racer on the remote ref" \
   "$mf_rc $(grep -c '^mail — lost [0-9a-f]* · refs/gov/mail/fx/a/s3 · lost the race on the lease: ' <<<"$mf_out") $(git --git-dir="$mb_d/o.git" rev-parse --verify -q refs/gov/mail/fx/a/s3)" \
   "1 1 $mf_racer"
@@ -20815,7 +20809,7 @@ same "KDS23 AC2 the lost commit is neither on the remote nor in A's feed, and no
   "$([[ $mf_l =~ ^[0-9a-f]{40}$ ]] && ! git --git-dir="$mb_d/o.git" cat-file -e "$mf_l" 2>/dev/null && echo absent) $(cut -f5 "$mf_log" 2>/dev/null | grep -cx "${mf_l:-none}") $mf_x" \
   "absent 0 0"
 # ---- AC5
-run_mail_arm B t1 post fy --to build:fx --kind question --subject 'q to fx' "$mb_d/body.txt" >/dev/null
+run_mail_arm B t1 post fy --to build:fx --kind question --subject 'q to fx' --default no "$mb_d/body.txt" >/dev/null
 mf_c=$(git --git-dir="$mb_d/o.git" rev-parse --verify -q refs/gov/mail/fy/b/t1)
 mf_n=$(cat "$mf_log" 2>/dev/null | grep -c .)
 run_mail_arm A s1 read fx >/dev/null
@@ -20863,17 +20857,17 @@ printf 'interface one\n' > "$mb_d/i1.txt"; printf 'interface two\n' > "$mb_d/i2.
 mq_log="$mb_d/A/.git/gov-feed.log"
 mq_pid='s/^mail — posted \([0-9a-f]*\) · .*/\1/p'
 # ---- AC1, after AC2's first post
-mq_0=$(run_mail_arm A s0 post fx --to build:fy --kind question --subject zero "$mb_d/body.txt" | sed -n "$mq_pid")
-mq_1=$(run_mail_arm A s1 post fx --to build:fy --kind question --subject one "$mb_d/body.txt" | sed -n "$mq_pid")
-mq_2=$(run_mail_arm A s1 post fx --to build:fy --kind question --subject two "$mb_d/body.txt" | sed -n "$mq_pid")
+mq_0=$(run_mail_arm A s0 post fx --to build:fy --kind question --subject zero --default no "$mb_d/body.txt" | sed -n "$mq_pid")
+mq_1=$(run_mail_arm A s1 post fx --to build:fy --kind question --subject one --default no "$mb_d/body.txt" | sed -n "$mq_pid")
+mq_2=$(run_mail_arm A s1 post fx --to build:fy --kind question --subject two --default no "$mb_d/body.txt" | sed -n "$mq_pid")
 same "KDS27 AC1 s1's two posts read seq 1 and 2 in column 12" \
   "$(run_mail_arm A s1 read fy | awk -F'\t' -v a="${mq_1:-none}" -v b="${mq_2:-none}" '$1 == a { x = $12 } $1 == b { y = $12 } END { print x, y }')" "1 2"
 # ---- AC2
 mq_c=$(git --git-dir="$mb_d/o.git" rev-parse --verify -q refs/gov/mail/fx/a/s0)
 awk -F'\t' -v OFS='\t' -v c="$mq_c" '$2 == "refs/gov/mail/fx/a/s0" && $5 == c { $6 = "2026-01-01T00:00:00Z" } 1' "$mq_log" > "$mq_log.new" \
   && mv "$mq_log.new" "$mq_log"
-mq_3=$(run_mail_arm A s2 post fx --to build:fy --kind question --subject three "$mb_d/body.txt" | sed -n "$mq_pid")
-mq_4=$(run_mail_arm A s2 post fx --to build:fy --kind question --subject four "$mb_d/body.txt" | sed -n "$mq_pid")
+mq_3=$(run_mail_arm A s2 post fx --to build:fy --kind question --subject three --default no "$mb_d/body.txt" | sed -n "$mq_pid")
+mq_4=$(run_mail_arm A s2 post fx --to build:fy --kind question --subject four --default no "$mb_d/body.txt" | sed -n "$mq_pid")
 same "KDS27 AC2 column 13 reads s1's second id on s2's first message, none on s2's second and on s0's, the build's first" \
   "$(run_mail_arm A s1 read fy | awk -F'\t' -v a="${mq_3:-none}" -v b="${mq_4:-none}" -v z="${mq_0:-none}" '$1 == a { x = $13 } $1 == b { y = $13 } $1 == z { w = $13 } END { print x, y, w }')" \
   "${mq_2:-unposted} none none"
@@ -20885,7 +20879,7 @@ same "KDS27 AC3 the confirmed post's record carries derive_gov_id's key over the
   "$(git --git-dir="$mb_d/o.git" log -1 --format=%B refs/gov/mail/fx/a/s3 2>/dev/null | sed -n 's/^content-key: //p') $mq_i" "$mq_k $mq_w"
 mq_n=$(read_mail_refs)
 mq_out=$(run_mail_arm A s4 post fx --to build:fy --kind changed --subject x "$mb_d/body.txt"); mq_got="$? [$mq_out];"
-mq_out=$(run_mail_arm A s4 post fx --to build:fy --kind question --subject x --interface "$mb_d/i1.txt" "$mb_d/body.txt"); mq_got="$mq_got$? [$mq_out];"
+mq_out=$(run_mail_arm A s4 post fx --to build:fy --kind question --subject x --interface "$mb_d/i1.txt" --default no "$mb_d/body.txt"); mq_got="$mq_got$? [$mq_out];"
 mq_out=$(run_mail_arm A s4 post fx --to build:fy --kind confirmed --subject x --interface "$mb_d/absent.txt" "$mb_d/body.txt"); mq_got="$mq_got$? [$mq_out];"
 same "KDS27 AC3 a changed with no --interface, a question naming one and a confirmed naming an absent file each exit 2 with S3's line, the remote unmoved" \
   "$mq_got $(read_mail_refs)" \
@@ -20914,6 +20908,138 @@ mq_out=$( cd "$mb_d/B" || exit 1; set +u; . "$SCRIPT" >/dev/null 2>&1; load_driv
   GOV_RUNLOG=0 check_interface_notice fy I16 "$mb_d/i2.txt" 2>/dev/null; echo "rc $?" )
 same "KDS27 AC5 RUN_CLAIMS off prints interface — off, exit 2" "$(tr '\n' ' ' <<<"$mq_out")" "interface — off rc 2 "
 rm -rf "$mb_d"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
+# KICK-dKeptSession-24 — A MAIL DEADLINE JUDGED BY THE OBSERVER CLOCK. The lease fixture's clone c1,
+# RUN_CLAIMS on and USERNAME daily-agent, so its fleet tag is `a`, and c2, a second clone of the same
+# origin whose posts c1 has not sighted until a line is planted in c1's feed by `add_claim_sighting`;
+# a policy value lands through `write_lease_policy`, and c2 fetches it before it posts. AC1: c1's
+# question with `--default no` under `wait-ceiling = 30` records `deadline: 30` and `default: no`; one
+# with no `--default` exits 2 with S2's line, the remote unmoved; a `landed` post and an ack record
+# `default: ack`; under `preset = "strict"` alone a post records what `policy.py get` answers in c1.
+# AC2: c2's question, `deadline: 30`, sighted in c1 31 hours ago reads `expired` with `default` `no`
+# and `--open --ids` prints `none`; a second sighted an hour ago reads `open` and is the one id. AC3:
+# c2's question committed 25 hours back, `deadline: 24`, sighted a minute ago reads `open`; a scratch
+# copy of the driver whose `check_mail_deadline` ages `now - %ct` reads it `expired`, the RED a
+# judgment by the sender's stamp is. AC4: `check_mail_deadline` sourced over planted ages, a malformed
+# deadline, a fraction of an hour and the cache spelling of the ref; a message under `deadline: 0`
+# that c1 cached by a plain fetch and reads with the remote away, so never sighted, reads `open`. AC5: a scratch copy with the
+# loop and playbook kits beside it and no policy kit records `deadline: 72` under one NOTE; a fresh
+# fixture whose first policy revision does not parse refuses the post, exit 2, the remote unmoved.
+# WHAT THIS BLOCK DOES NOT DRIVE: the transition an expiry releases, the loop kit's `mail-expired`
+# plant's (AC2); the guide, help and docstring texts (AC6, AC8), probed in the unit's acceptance ledger.
+# ==================================================================================================
+LF=$(mktemp -d); write_lease_fixture
+git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null && git -C "$LF/c2" config user.email t@t.test \
+  && git -C "$LF/c2" config user.name t && git -C "$LF/c2" config core.autocrlf false
+printf 'a message body\n' > "$LF/body.txt"
+dl_pid='s/^mail — posted \([0-9a-f]*\) · .*/\1/p'
+run_deadline_arm() { # clone · session · --mail args -> the driver's output and exit; DL_SCRIPT names a scratch driver
+  local c=$1 s=$2; shift 2
+  ( cd "$LF/$c" && USERNAME=daily-agent CLAUDE_CODE_SESSION_ID=$s GOV_RUNLOG=0 bash "${DL_SCRIPT:-$SCRIPT}" --mail "$@" 2>&1 )
+}
+read_deadline_keys() { git --git-dir="$LF/origin.git" log -1 --format=%B "$1" -- 2>/dev/null | sed -n 's/^\(deadline\|default\): //p' | tr '\n' ' '; }
+dl_pk=$(resolve_kit_dir "$_rkd_py" policy policy.py "$HERE" 2>/dev/null) || dl_pk=""
+[ -z "$dl_pk" ] || [ -f "$dl_pk/policy.py" ] || dl_pk="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$dl_pk"
+# ---- AC1
+write_lease_policy '[flow]
+wait-ceiling = 30'
+run_deadline_arm c1 d1 post tFix --to build:fy --kind question --subject 'q one' --default no "$LF/body.txt" >/dev/null
+same "KDS24 AC1 a question posted with --default no records deadline: 30 and default: no" "$(read_deadline_keys refs/gov/mail/tFix/a/d1)" "30 no "
+dl_n=$(read_mail_refs "$LF/origin.git")
+dl_out=$(run_deadline_arm c1 d2 post tFix --to build:fy --kind question --subject 'q two' "$LF/body.txt"); dl_rc=$?
+same "KDS24 AC1 a question with no --default exits 2 naming the flag, and the remote gains no ref" "$dl_rc [$dl_out] $(read_mail_refs "$LF/origin.git")" \
+  "2 [mail — not written · a question declares its default with --default] $dl_n"
+seed_mail_at "$LF/origin.git" refs/gov/mail/fy/b/t1 fy a00000000001 build:tFix question none >/dev/null
+run_deadline_arm c1 d3 post tFix --to build:fy --kind landed --subject landed "$LF/body.txt" >/dev/null
+run_deadline_arm c1 d4 ack tFix a00000000001 >/dev/null
+same "KDS24 AC1 a landed post and an ack each record default: ack" \
+  "$(read_deadline_keys refs/gov/mail/tFix/a/d3)$(read_deadline_keys refs/gov/mail/tFix/a/d4)" "30 ack 30 ack "
+write_lease_policy 'preset = "strict"'
+dl_v=$( cd "$LF/c1" && "$_rkd_py" "$dl_pk/policy.py" get flow.wait-ceiling 2>&1 ); dl_v=${dl_v//$'\r'/}
+run_deadline_arm c1 d5 post tFix --to build:fy --kind landed --subject strict "$LF/body.txt" >/dev/null
+same "KDS24 AC1 with the file landed as preset = strict alone, a post records the deadline get answers, 168" \
+  "$(read_deadline_keys refs/gov/mail/tFix/a/d5)$dl_v" "168 ack 168"
+# ---- AC2
+write_lease_policy '[flow]
+wait-ceiling = 30'
+git -C "$LF/c2" fetch -q origin 2>/dev/null
+dl_q1=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q expired' --default no "$LF/body.txt" | sed -n "$dl_pid")
+dl_c=$(git --git-dir="$LF/origin.git" rev-parse --verify -q refs/gov/mail/fy/a/q1)
+dl_t=$(git --git-dir="$LF/origin.git" mktree </dev/null)
+add_claim_sighting "$LF/c1" refs/gov/mail/fy/a/q1 "$dl_t" "$dl_c" "$(derive_claim_ago $((31 * 3600)))"
+same "KDS24 AC2 a question first sighted 31 hours ago, its deadline 30, reads expired with its default no" \
+  "$(run_deadline_arm c1 r1 read tFix | awk -F'\t' -v q="${dl_q1:-unposted}" '$1 == q { print $4, $15, $16 }')" "expired 30 no"
+same "KDS24 AC2 ...and --open --ids prints none" "$(run_deadline_arm c1 r1 read tFix --open --ids)" "none"
+dl_q2=$(run_deadline_arm c2 q2 post fy --to build:tFix --kind question --subject 'q open' --default no "$LF/body.txt" | sed -n "$dl_pid")
+dl_c=$(git --git-dir="$LF/origin.git" rev-parse --verify -q refs/gov/mail/fy/a/q2)
+add_claim_sighting "$LF/c1" refs/gov/mail/fy/a/q2 "$dl_t" "$dl_c" "$(derive_claim_ago 3600)"
+same "KDS24 AC2 a question first sighted an hour ago reads open, and --open --ids prints its id alone" \
+  "$(run_deadline_arm c1 r1 read tFix | awk -F'\t' -v q="${dl_q2:-unposted}" '$1 == q { print $4 }') $(run_deadline_arm c1 r1 read tFix --open --ids)" \
+  "open ${dl_q2:-unposted}"
+# ---- AC3
+write_lease_policy '[flow]
+wait-ceiling = 24'
+git -C "$LF/c2" fetch -q origin 2>/dev/null
+dl_q3=$(GIT_COMMITTER_DATE="@$(( $(date -u +%s) - 25 * 3600 )) +0000" \
+  run_deadline_arm c2 q3 post fy --to build:tFix --kind question --subject 'q behind' --default no "$LF/body.txt" | sed -n "$dl_pid")
+dl_c=$(git --git-dir="$LF/origin.git" rev-parse --verify -q refs/gov/mail/fy/a/q3)
+add_claim_sighting "$LF/c1" refs/gov/mail/fy/a/q3 "$dl_t" "$dl_c" "$(derive_claim_ago 60)"
+same "KDS24 AC3 a question its holder stamped 25 hours back, its deadline 24, sighted here a minute ago, reads open" \
+  "$(run_deadline_arm c1 r1 read tFix | awk -F'\t' -v q="${dl_q3:-unposted}" '$1 == q { print $4, $15 }')" "open 24"
+mkdir -p "$LF/red"; cp "$HERE/lib-unattended.sh" "$LF/red/"
+awk -v old='  check_deadline_passed "$r" "${2:-}" "$DB_VALUE"' \
+  -v new='  local ct; ct=$(git log -1 --format=%ct "${2:-}" 2>/dev/null) || return 2; [ $(( $(date -u +%s) - ct )) -gt "$DB_VALUE" ]' \
+  '$0 == old { print new; next } 1' "$SCRIPT" > "$LF/red/unattended.sh"
+same "KDS24 AC3 RED: a scratch driver whose check_mail_deadline ages now - %ct reads the same question expired" \
+  "$(DL_SCRIPT="$LF/red/unattended.sh" run_deadline_arm c1 r1 read tFix | awk -F'\t' -v q="${dl_q3:-unposted}" '$1 == q { print $4 }')" "expired"
+# ---- AC4
+dl_s1=1111111111111111111111111111111111111111; dl_s2=2222222222222222222222222222222222222222
+dl_s3=3333333333333333333333333333333333333333; dl_s4=4444444444444444444444444444444444444444
+add_claim_sighting "$LF/c1" refs/gov/mail/fy/a/k4 "$dl_t" "$dl_s1" "$(derive_claim_ago 7200)"
+add_claim_sighting "$LF/c1" refs/gov/mail/fy/a/k4 "$dl_t" "$dl_s2" "$(derive_claim_ago 60)"
+add_claim_sighting "$LF/c1" refs/gov/mail/fy/a/k4 "$dl_t" "$dl_s3" "$(derive_claim_ago 5000)"
+dl_got=$( cd "$LF/c1" || exit 1; set +u; . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  for dl_a in "$dl_s1 1" "$dl_s2 1" "$dl_s4 1" "$dl_s1 x" "$dl_s1 1.5" "$dl_s3 1.5"; do
+    check_mail_deadline refs/gov/mail/fy/a/k4 ${dl_a% *} "${dl_a#* }"; printf '%s ' "$?"
+  done
+  check_mail_deadline refs/gov/remote/mail/fy/a/k4 "$dl_s1" 1; printf '%s ' "$?"
+  check_mail_deadline refs/gov/remote/mail/fy/a/k4 "$dl_s2" 1; printf '%s' "$?" )
+same "KDS24 AC4 7200 s, 60 s, unsighted and x over 1 hour, then 7200 s and 5000 s over 1.5, then the cache spelling over 7200 s and 60 s" \
+  "$dl_got" "0 1 2 2 0 1 0 1"
+dl_m=$(git --git-dir="$LF/origin.git" log -1 --format=%B refs/gov/mail/fy/a/q1 -- 2>/dev/null)
+dl_m=${dl_m//${dl_q1:-unposted}/eeeeeeeeeeee}; dl_m=${dl_m/deadline: 30/deadline: 0}
+git --git-dir="$LF/origin.git" update-ref refs/gov/mail/fy/a/u1 \
+  "$(git --git-dir="$LF/origin.git" -c user.name=t -c user.email=t@t.test commit-tree "$dl_t" -m "$dl_m")"
+git -C "$LF/c1" fetch -q origin '+refs/gov/mail/*:refs/gov/remote/mail/*' 2>/dev/null
+mv "$LF/origin.git" "$LF/origin.away"
+same "KDS24 AC4 a message cached by a plain fetch and read with the remote away, never sighted, under deadline: 0 reads open" \
+  "$(run_deadline_arm c1 r1 read tFix | awk -F'\t' '$1 == "eeeeeeeeeeee" { print $4, $5, $15 }')" "open - 0"
+mv "$LF/origin.away" "$LF/origin.git"
+# ---- AC5
+# the copy is a repository of its own, so the kit resolver answers its kits repo-relative, as it does for
+# `write_switch_fixture`'s copies
+mkdir -p "$LF/np/u"; git init -q "$LF/np"; cp "$SCRIPT" "$HERE/lib-unattended.sh" "$LF/np/u/"
+for dl_k in "loop loop_lib.py" "playbook render_playbook.py"; do
+  dl_d=$(resolve_kit_dir "$_rkd_py" ${dl_k% *} "${dl_k#* }" "$HERE" 2>/dev/null) || dl_d=""
+  [ -z "$dl_d" ] || [ -f "$dl_d/${dl_k#* }" ] || dl_d="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$dl_d"
+  [ -z "$dl_d" ] || cp -r "$dl_d" "$LF/np/${dl_k% *}"
+done
+dl_out=$(DL_SCRIPT="$LF/np/u/unattended.sh" run_deadline_arm c1 d6 post tFix --to build:fy --kind landed --subject bare "$LF/body.txt")
+same "KDS24 AC5 with no policy kit beside the driver a post records deadline: 72 under one NOTE naming flow.wait-ceiling" \
+  "$(read_deadline_keys refs/gov/mail/tFix/a/d6)$(grep -c 'NOTE - no policy kit resolves beside this kit' <<<"$dl_out") $(grep -c 'NOTE - no policy kit .*flow.wait-ceiling' <<<"$dl_out")" \
+  "72 ack 1 1"
+write_lease_fixture
+write_lease_policy '[flow]
+wait-ceiling = 30
+this line does not parse'
+dl_n=$(read_mail_refs "$LF/origin.git")
+dl_out=$(run_deadline_arm c1 d7 post tFix --to build:fy --kind landed --subject refused "$LF/body.txt"); dl_rc=$?
+same "KDS24 AC5 an unparsable first policy revision refuses the post, exit 2 with the refusal, and the remote gains no ref" \
+  "$dl_rc $(grep -c '^mail — not written · .' <<<"$dl_out") $(read_mail_refs "$LF/origin.git")" "2 1 $dl_n"
+rm -rf "$LF"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
@@ -24403,7 +24529,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4100 -> 4108 by KICK-dKeptSession-27 on 2026-11-23: the session-order block's 8 region-eight
 # `same` (AC1 1, AC2 1, AC3 2, AC4 1, AC5 3), each unconditional and outside any loop, off the diff's
 # own lines; no skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4108
+# RAISED 4108 -> 4120 by KICK-dKeptSession-24 on 2026-11-23: the deadline block's 13 region-eight `same`
+# (AC1 4, AC2 3, AC3 2, AC4 2, AC5 2), each unconditional and outside any loop, off the diff's own
+# lines, less DPR1 AC11's retired absent-functions `same`; no skip branch. No suite ran, and its
+# RED-first observation is the close's.
+FLOOR_ASSERTIONS=4120
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24693,7 +24823,8 @@ FLOOR_SHARD_7=311
 # RAISED 1308 -> 1312 by KICK-dKeptSession-31: the same 4 region-eight eight-field id assertions, see FLOOR_ASSERTIONS.
 # RAISED 1312 -> 1317 by KICK-dKeptSession-23: the same 5 region-eight mail-feed assertions, see FLOOR_ASSERTIONS.
 # RAISED 1317 -> 1325 by KICK-dKeptSession-27: the same 8 region-eight session-order assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1325
+# RAISED 1325 -> 1337 by KICK-dKeptSession-24: the same 13 region-eight deadline assertions less 1 retired, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1337
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

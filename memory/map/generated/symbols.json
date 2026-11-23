@@ -7488,6 +7488,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_mail_deadline",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_mail_duplicate",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -11521,6 +11526,11 @@
       "id": "derive_bomless_text",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_bound_seconds",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_boundaries",
@@ -22336,6 +22346,11 @@
       "id": "read_deadline_keys",
       "kind": "function",
       "file": "tools/loop/termination.py"
+    },
+    {
+      "id": "read_deadline_keys",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "read_debt_gloss",
@@ -33911,6 +33926,11 @@
       "id": "run_cov29_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "run_deadline_arm",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_deadline_patch",

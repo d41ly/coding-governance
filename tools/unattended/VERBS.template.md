@@ -592,23 +592,28 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   ever deleted or rewritten. It takes no slug.
 - `--mail` — the mailbox per build, three verbs. `--mail post <slug> --to <recipient> --kind <kind>
   --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>]
-  <body file>` appends ONE message to this session's own ref, `refs/gov/mail/<slug>/<fleet
-  tag>/<session>`, the slug the sender's build, so writers never contend: one commit per post on the
+  [--default <text>] <body file>` appends ONE message to this session's own ref,
+  `refs/gov/mail/<slug>/<fleet tag>/<session>`, the slug the sender's build, so writers never
+  contend: one commit per post on the
   ref's previous tip under the `gov-claim` identity, a session's first post parentless, written by
   compare-and-swap. The kind is one of the loop kit's closed `[mail]` set, `confirm-request`,
   `confirmed`, `changed`, `overlap`, `takeover`, `landed`, `question`, `answer`, `ack`, `intake`,
   `withdrawn` and `superseded`, as its `loop_lib.py --mail-kinds` prints them; the recipient is one
   of four forms, `build:<slug>`, `unit:<id>`, `node:<fleet tag>` or the bare word `project`. A
   `confirmed` or `changed` post names the file of the interface it announces with `--interface`,
-  and no other kind names one; each refusal exits 2 before the remote is read. The id is
-  `derive_message_id` called over eight fields in order: the build, the item's instance key, the
+  and no other kind names one. A `question` or a `confirm-request` declares the answer it takes if
+  nobody answers in time with `--default`; any other kind may, and records `ack` where it does not.
+  Every message records as its `deadline` the hours `flow.wait-ceiling` reads at the post, through
+  the driver's one policy reader, a refused read writing nothing. Each refusal exits 2 before the
+  remote is read. The id is `derive_message_id` called over eight fields in order: the build, the item's instance key, the
   pass, the kind, the subject, the id it answers, the recipient and the content key, each absent one
   `none`; no session and no time is a field, so a retried post carries the id of the post it retries
   and is refused as a duplicate across the build's session refs. An act, once dWellOiledMachine's
   Runtime mints one, joins as the ninth field, after the recipient and the content key. The record
   is `gov-mail <slug>/<id>`, a blank line, the keys `id`, `build`, `from-tag`, `from-session`, `to`,
-  `kind`, `item`, `pass`, `subject`, `answers`, `seq`, `after` and `content-key`, a blank line and
-  the body. `seq` is the message's place on its session's ref, 1 for the first; `after`, on a
+  `kind`, `item`, `pass`, `subject`, `answers`, `seq`, `after`, `content-key`, `deadline` and
+  `default`, a blank line and the body; neither `deadline` nor `default` is a field of the id.
+  `seq` is the message's place on its session's ref, 1 for the first; `after`, on a
   session's first message, the id of the newest tip of the build's other session refs by this
   node's first sighting, so a take-over names the last message its predecessor wrote, and `none`
   otherwise; `content-key` the 12 hex digits `derive_gov_id --file` prints over the interface file,
@@ -621,19 +626,22 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   as `build:<slug>`, or one of the recipient forms: one bounded, pruned fetch of every build's mail
   refs into this node's cache, then one TAB row per message addressed to `<who>`, a build reading
   its units' messages too: `id`, `kind`, `to`, `state`, `first-seen`, `from-build`, `subject`,
-  `answers`, `ref`, `commit`, `reply`, `seq`, `after` and `content-key`, the last three `-` on a
-  record that carries none, one id held on two refs shown once at its earliest sighting. A
+  `answers`, `ref`, `commit`, `reply`, `seq`, `after`, `content-key`, `deadline` and `default`, the
+  last five `-` on a record that carries none, one id held on two refs shown once at its earliest
+  sighting. A
   dependent acts on the `confirmed` or `changed` row whose `content-key` equals the key it
   recomputes from the interface's text, the lesser id where two do, never on arrival order, so a
-  lost or reordered relay costs latency and never correctness. The four states: `reply` for an `answer` or an `ack`, which never waits; `answered`
-  where an `answer` names the id; `acked` where an `ack` does and no `answer`; `open` otherwise;
+  lost or reordered relay costs latency and never correctness. The five states: `reply` for an `answer` or an `ack`, which never waits; `answered`
+  where an `answer` names the id; `acked` where an `ack` does and no `answer`; `expired` for an
+  `open` message this node first saw more than its `deadline` hours ago, by its own clock, its
+  `default` the answer, a message this node has not sighted never expiring; `open` otherwise;
   `reply` names the message that decided the state. `--open` prints only the open rows and `--ids`
   their ids on one line, or `none`. A failed fetch prints `mail — local copy: <why>` and reads the
   cache (exit 0); a refused read exits 2. `--mail ack <slug> <id>` posts an `ack` from `<slug>`
   answering `<id>` to its sender's build, with its subject and an empty body, exit 2 where `<id>` is
   no row addressed to `<slug>`, else the post's exits. A build's transition is refused while a
-  message addressed to it reads `open`, and the move disposes each answered or acknowledged message
-  once (the loop kit's `loop_transition.py`). Dark behind `RUN_CLAIMS`: a post or an ack prints
+  message addressed to it reads `open`, and the move disposes each answered, acknowledged or expired
+  message once (the loop kit's `loop_transition.py`). Dark behind `RUN_CLAIMS`: a post or an ack prints
   `mail — off` and exits 2, a read prints it and exits 0.
 - `--card-ref` — `--card-ref write <slug> --message <file>`, the build card's ref on the remote,
   written for the kickoff engine's `remote-ref` card store, which calls it bounded with the commit

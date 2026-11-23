@@ -247,8 +247,9 @@ read_card_section() {
 read_card_budget() {
   read_card_section "$1" | awk 'i { print; exit } /^item — / { i = 1 }'
 }
-# write_card_mail <ref> <build> <id> <to> <kind> <answers> — one mail commit over the empty tree, as the driver's
-# `--mail post` records it, set on the bare remote's <ref> by `update-ref` (KICK-dKeptSession-5 S13).
+# write_card_mail <ref> <build> <id> <to> <kind> <answers> — one mail commit over the empty tree, as
+# `KICK-dKeptSession-5`'s post recorded it, with no deadline, set on the bare remote's <ref> by `update-ref`
+# (KICK-dKeptSession-5 S13).
 write_card_mail() {
   local t c m
   printf -v m 'gov-mail %s/%s\n\nid: %s\nbuild: %s\nfrom-tag: z\nfrom-session: s-other\nto: %s\nkind: %s\nitem: none\npass: none\nsubject: the fixture'"'"'s question\nanswers: %s\n\nthe fixture'"'"'s message' \
