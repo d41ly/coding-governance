@@ -408,11 +408,17 @@ and every such row of the parent it supersedes, one whose `content-key` equals t
 which `derive_mail_chain` places before it (KICK-dKeptSession-53): the chain is read off the parent's
 rows of the one read, a row preceding a later `seq` on its ref and, through the `after` of the ref's
 `seq` 1 row, every row of the session it took over, transitively, never by `first-seen` or arrival, and
-a row the chain places after the current one or cannot place stays open; each consumed id is posted once as the
-unattended kit's `--mail ack <slug> <id>` through `breakpoints.py`'s `run_sourced`, a failed ack
-printing `mail — ack not posted <id> · rc <n|->` on stderr and a check that does not read `mail —
-interfaces <parent> unread · <why>`. A `question`, `intake` or `overlap` is never acknowledged, nor a
-`changed` the check does not name. A row still reading `open`, a message addressed to the
+a row the chain places after the current one or cannot place stays open. The acks are all or nothing
+(KICK-dKeptSession-55): the consumed ids are computed first, posting nothing, and posted only where every
+`open` row of the read is consumed; otherwise none is posted and the refusal names every open row, so a
+consumed `withdrawn` beside an open `question` stays open and is never acknowledged unread. Each
+consumed id is posted once as the
+unattended kit's `--mail ack <slug> <id>` through `breakpoints.py`'s `run_sourced`, a posted ack
+printing `mail — acked <kind> <id> from build:<parent>` on stderr as it happens, so a move refused
+after the acks still shows it, a failed ack `mail — ack not posted <id> · rc <n|->` there, and a check
+that does not read `mail — interfaces <parent> unread · <why>`. A `question`, `intake` or `overlap` is
+never acknowledged, nor a `confirmed` or `changed` the check neither names nor finds superseded. A row
+still reading `open`, a message addressed to the
 build or one of its units neither answered, acknowledged nor past its deadline, raises `MailHeld`, a
 `TransitionRefused` printed `refused — <slug> · mail open <id> …`, exit 1, writing nothing; a row
 acknowledged here is disposed by the build's next move; `claim.py`
@@ -487,7 +493,7 @@ two dependents and three exits from Design, back through B21 between them, each 
 to the first dependent rebound to exit 1, the move still recording and printing its `notice — not
 posted` line; `notices-repeat-key`, one dependent and three exits from Design, the spec edited after
 the first exit alone, so the third repeats the second's listing, kind and key, its pass `3` alone
-telling it apart, and every notice still posted; and the six over `write_consumed_acks`, each rebinding the launcher to record every ack
+telling it apart, and every notice still posted; and the eight over `write_consumed_acks`, each rebinding the launcher to record every ack
 and restoring it: `acks-landed`, a parent's `landed` acknowledged by the move that records past it;
 `acks-confirmed`, a `confirmed` keyed over the parent's listing at its lease's witness, acknowledged
 over the real chain; `acks-superseded`, `check_parent_interfaces` stood in, a `confirmed` and the later
@@ -496,9 +502,12 @@ refusing B5; `acks-failed`, one ack across B4 and B5, then an ack exiting 1 and 
 `LookupError`, each on stderr, refusing B7; `acks-takeover`, a take-over's `changed` naming its
 predecessor in `after`, keyed over the parent's listing and sighted before that predecessor's
 `confirmed`, both acknowledged over the real chain and the chain read the same with their `first-seen`
-swapped; and `acks-later-key`, the check stood in naming the take-over's `changed` current and a later
+swapped; `acks-later-key`, the check stood in naming the take-over's `changed` current and a later
 `changed` pushed onto its ref as `seq` 2, through `placement.py`'s `write_fixture_gov_ref` and its
-`parent`, left open and refusing B4; and the five over `notify.owner`: `notify-micro`,
+`parent`, left open, so B4 posts no ack and is refused naming all three; `acks-withdrawn`, a parent's lone
+`withdrawn` acknowledged by B4, which records, its `mail — acked` line read off stderr; and
+`acks-withdrawn-question`, a `withdrawn` beside another parent's open `question`, B4 posting no ack and
+refused naming both, the `withdrawn` read `open` after it; and the five over `notify.owner`: `notify-micro`,
 `notify-park-landing`, `notify-every` and `notify-park-only`, B4 under that value, `NOTIFY_SETS`
 committing it and `notify-micro` none, then a park and a landing run through `progress`, each printing
 `loop: fixture · progress <n>`, the progress lines the three printed, and `notify-shape`, an `AGENTS.md`

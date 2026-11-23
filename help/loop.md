@@ -600,15 +600,18 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   <slug> <id> <body file>` for a question, `--mail ack <slug> <id>`) and record the move again. Before
   that refusal, the move first acknowledges each notice it has consumed, posting `--mail ack <slug> <id>`
   for it, so a parent's notice never holds your build until its deadline; an acknowledged notice no longer
-  holds the move, and your build's next move disposes of it. A failed ack prints
+  holds the move, and your build's next move disposes of it. The acknowledgements are all or nothing: the
+  move acknowledges the notices it has consumed only when no other message is open, and prints
+  `mail — acked <kind> <id> from build:<parent>` for each; otherwise it acknowledges none, and the refusal
+  names every open message. A failed ack prints
   `mail — ack not posted <id> · rc <n>` (`rc -` where the driver could not be launched or did not answer
   in time) on stderr and
   leaves the notice open, so the move is refused on it:
 
   | Kind addressed to your build | Acknowledged by | When |
   |---|---|---|
-  | `landed`, `superseded`, `withdrawn` | your build's own move | at its next move |
-  | `confirmed`, `changed`, current | your build's own move | at its next move, once the parent's interfaces check names it current |
+  | `landed`, `superseded`, `withdrawn` | your build's own move | at its next move with no other message open |
+  | `confirmed`, `changed`, current | your build's own move | at its next move with no other message open, once the parent's interfaces check names it current |
   | `confirmed`, `changed`, superseded by the current one by content key or by the session chain | the same | with the current one |
   | `confirmed`, `changed`, neither current nor superseded | nobody here | the re-entry that consumes it, or its deadline |
 
@@ -699,8 +702,11 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   then a refused ack and one whose launch fails, each printing `mail — ack not posted`, refusing the third
   move), `acks-takeover` (a take-over's `changed` seen before the `confirmed` of the session it took
   over: both acknowledged over the real interfaces check, and the chain reads the same with their
-  first sightings swapped) and `acks-later-key` (a later `changed` on the take-over's own ref stays
-  open and refuses the move), `notify-micro`, `notify-park-landing`, `notify-every` and `notify-park-only` (one move under
+  first sightings swapped), `acks-later-key` (a later `changed` on the take-over's own ref stays
+  open, so the move acknowledges nothing and is refused naming every open notice), `acks-withdrawn` (a
+  parent's lone `withdrawn` acknowledged, printing its `mail — acked` line, and the move recorded) and
+  `acks-withdrawn-question` (a `withdrawn` beside an open `question`: neither acknowledged, the move
+  refused naming both, and the `withdrawn` still open after it), `notify-micro`, `notify-park-landing`, `notify-every` and `notify-park-only` (one move under
   that `notify.owner` value, `notify-micro` setting none, then a park and a landing reported, printing
   `loop: fixture · progress <n>`, the progress lines the value let through) and `notify-shape` (an
   `AGENTS.md` whose `progress` definition drops ` · <detail>`, so the check owes one finding). `check --selftest` runs every case, and gov's own
@@ -1177,8 +1183,8 @@ fetching it once where it is missing, and runs Build only where a `confirmed` or
 from the parent carries that key: the key decides, never the order the messages arrived in. A moved witness that no message's key
 matches reads `awaiting confirmed` again; a check that cannot be read reads `confirmation unread`
 with one `position: NOTE · interfaces <parent> unread: <line>`, never as unconfirmed. The
-dependent's next move acknowledges each notice it has consumed; a `changed` it has not consumed holds its
-moves until the re-entry or its deadline. Nothing here re-enters a dependent's units on a
+dependent's next move with no other message open acknowledges each notice it has consumed; a `changed`
+it has not consumed holds its moves until the re-entry or its deadline. Nothing here re-enters a dependent's units on a
 `changed`, and no request for confirmation is answered for you: the parent's session answers one by
 hand with `--mail post --kind confirmed --answers <id> --interface <file>`.
 
