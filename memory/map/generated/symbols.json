@@ -7458,6 +7458,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "check_line_definition",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "check_link_target",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -9519,11 +9524,6 @@
     },
     {
       "id": "check_transition_channels",
-      "kind": "function",
-      "file": "tools/loop/loop_transition.py"
-    },
-    {
-      "id": "check_transition_definition",
       "kind": "function",
       "file": "tools/loop/loop_transition.py"
     },
@@ -13461,6 +13461,11 @@
       "id": "derive_owned_engine_refusals",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_owner_events",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "derive_page_link",
@@ -20613,6 +20618,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "print_progress",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_pw_out",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -25141,6 +25151,11 @@
       "id": "read_policy_value",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "read_policy_value",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "read_policy_value",
@@ -29941,6 +29956,11 @@
       "id": "render_prof_line",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "render_progress_line",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "render_proposal",

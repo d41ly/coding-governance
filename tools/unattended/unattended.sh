@@ -9903,6 +9903,19 @@ check_keepalive_reaped() { # slug · run-state file -> 0 read back or announced 
   return 0
 }
 
+# THE OWNER'S PROGRESS LINE (KICK-dKeptSession-11 S5): the loop kit's `progress` verb, run through the
+# one runner above, prints `progress — <slug> · <event> · <detail>` where the policy key `notify.owner`
+# selects the event and nothing otherwise. Where python or the loop kit does not resolve it prints
+# nothing; otherwise whatever the verb printed, its `loop: unanswered` or `loop: unarmed` refusal too, so
+# a key that does not read is said and never read as the default, each carriage return a Windows python
+# writes dropped. `verb_park` calls it after a park that wrote, and `verb_landed` at each success exit,
+# ahead of the landed notices. Returns 0 on every path.
+print_progress() { # slug · event · detail -> 0, the verb's line, its refusal or nothing
+  run_loop_verb loop_transition.py progress "--build=$1" "--event=$2" "--detail=$3" || return 0
+  [ -z "$_bd_out" ] || printf '%s\n' "${_bd_out//$'\r'/}"
+  return 0
+}
+
 # THE LANDED NOTICE (KICK-dKeptSession-7 S5): at both of `verb_landed`'s success exits, one `landed`
 # message to each build whose README's `parents:` names <slug>, as the loop kit's
 # `loop_transition.py dependents` lists them, kind `landed`, subject `landing <slug>`, its body the
@@ -10017,6 +10030,7 @@ WTS
       write_landed_observation "$slug" "$DP_LANDING" "$DP_AREF" "$DP_TIP" \
         || echo "unattended: NOTE — the landed log could not be appended, so this landing reads FINISHED-UNSTAMPED to every reader until --landed is re-run: $(resolve_landed_log "$slug" 2>/dev/null)"
       echo "unattended: phase LANDED (derived: ${DP_LANDING:0:8} on $DP_AREF at ${DP_TIP:0:8}) · observed, not written: under in-place landing the record the push carried is the terminal, and the next --preflight of $slug retires it"
+      print_progress "$slug" landing "${DP_LANDING:0:8}"
       # TOOL-dDerivedDocket-28 S11 - the in-place landing writes no terminal until a rotation that
       # may never come, so the ledger goes HERE, beside the one write this verb makes.
       remove_procs_ledger "$slug"
@@ -10285,6 +10299,7 @@ WTS
   else
     fact "$rel" branch-ref >/dev/null; echo "unattended: phase LANDED · witness $head · anchor LOCAL · $_fact is merged into refs/heads/$lbranch, which the remote has not seen · unpushed on local $lbranch: $unp"
   fi
+  print_progress "$slug" landing "${head:0:8}"
   write_landed_notices "$slug" "$head"
   return 0
 }
@@ -17499,6 +17514,7 @@ PARKED
   if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
   stage_or_fail "$rel" || return 1
   echo "unattended: decision parked — $item"
+  print_progress "$slug" park "item $item"
   return 0
 }
 

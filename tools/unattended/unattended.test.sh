@@ -18171,6 +18171,38 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# KICK-dKeptSession-11 AC3 — PROGRESS AT A PARK AND A LANDING, AS `notify.owner` SELECTS. tRun's
+# fixture commits `[notify]` `owner = "park-only"`: `--park tRun --item q --reason r` prints
+# `progress — tRun · park · item q` after its `decision parked — q` line, and the same park again
+# prints `already parked, unchanged` and no progress line. Under `park-and-landing`, the claim
+# block's LANDING fixture's `--landed tRun` prints `progress — tRun · landing · <sha8>` after its
+# `phase LANDED · witness <sha>` line, <sha8> that witness's first eight hex. STAGED: the base driver,
+# which reports no progress; RED, observed at the close. WHAT THIS BLOCK DOES NOT DRIVE: the in-place
+# exit, whose call is the same function, and a key that does not read, which the loop kit's plants hold.
+# ==================================================================================================
+reset_tree
+printf '\n[notify]\nowner = "park-only"\n' >> .governance/policy.toml; fixture
+run --preflight tRun --keepalive-id k1 >/dev/null
+kd11_out=$(run --park tRun --item q --reason r); kd11_rc=$?
+same "KDS11 AC3 a park under park-only exits 0 and prints its progress line after the parked line" \
+  "$kd11_rc|$(grep -E '^(unattended: decision parked — |progress — )' <<<"$kd11_out" | tr '\n' '|')" \
+  "0|unattended: decision parked — q|progress — tRun · park · item q|"
+kd11_out=$(run --park tRun --item q --reason r)
+same "KDS11 AC3 the same park again prints already parked, unchanged and no progress line" \
+  "$(grep -c 'already parked, unchanged' <<<"$kd11_out") $(grep -c '^progress — ' <<<"$kd11_out")" "1 0"
+build_claim_landing
+printf '\n[notify]\nowner = "park-and-landing"\n' >> .governance/policy.toml; fixture; git push -q -f origin HEAD:main
+kd11_head=$(git rev-parse HEAD)
+kd11_out=$(run --landed tRun); kd11_rc=$?
+same "KDS11 AC3 a --landed under park-and-landing prints its landing progress line after phase LANDED" \
+  "$kd11_rc|$(grep -E '^(unattended: phase LANDED · witness |progress — )' <<<"$kd11_out" | sed 's/ · anchor .*//' | tr '\n' '|')" \
+  "0|unattended: phase LANDED · witness $kd11_head|progress — tRun · landing · ${kd11_head:0:8}|"
+remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"; reset_tree
+
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-13 — THE CHANGE FEED. One subshell drives the `gov_feed_sh` block the driver
 # carries, sourced above with it, over the suite's bare origin and a second clone of it: GOVFEED_DIR
 # names a fresh scratch dir, so no earlier arm's claim write is in the feed, and the cache namespace is
@@ -25009,7 +25041,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4170 -> 4173 by KICK-dKeptSession-35 on 2026-11-23: the re-landing block's 3 region-eight `same`
 # (AC2 3), each unconditional and outside any loop, off the diff's own lines; no skip branch. No suite
 # ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4173
+# RAISED 4173 -> 4176 by KICK-dKeptSession-11 on 2026-11-23: the progress block's 3 region-eight `same`
+# (AC3 3), each unconditional and outside any loop, off the diff's own lines; no skip branch. No suite
+# ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4176
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25305,7 +25340,8 @@ FLOOR_SHARD_7=311
 # RAISED 1373 -> 1379 by KICK-dKeptSession-6: the same 6 region-eight ring assertions, see FLOOR_ASSERTIONS.
 # RAISED 1379 -> 1387 by KICK-dKeptSession-7: the same 8 region-eight landed-notice and witness-read assertions, see FLOOR_ASSERTIONS.
 # RAISED 1387 -> 1390 by KICK-dKeptSession-35: the same 3 region-eight re-landing assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1390
+# RAISED 1390 -> 1393 by KICK-dKeptSession-11: the same 3 region-eight progress assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1393
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
