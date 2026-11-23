@@ -345,3 +345,8 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T07:51:23Z dispatch · item 7fa604e1 TOOL-dTotalRecall-23 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-23-deviation-1007.md memory/builds/dTotalRecall/README.md
 
 2026-11-23T08:00:30Z brief · item TOOL-dTotalRecall-61 · reason 5fc5097ebe46 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-61-build-brief.md
+
+2026-11-23T08:12:40Z dispatch · item b7c987a3 TOOL-dTotalRecall-61 · reason memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-53.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-55.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-56.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-57.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-61.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-61-1-acceptance-ledger.md
+2026-11-23T08:19:46Z draw · re-dispatch · TOOL-dTotalRecall-61 · 47/186 · 20261123T081946Z-8bab92
+
+2026-11-23T08:19:46Z dispatch · item b7c987a3 TOOL-dTotalRecall-61 · reason memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-61-build-spec-writer.md

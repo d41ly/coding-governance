@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-55 — the cause census keeps the build folders' scripts by a path-keyed row held outside their bytes
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -42,7 +42,9 @@ bytes, in one path-keyed table the census reads. It repairs `TOOL-dTotalRecall-5
 - **S2** — The cause census reads it. `check_cause_writers` in `tools/memory-tree/record_causes.py`
   keeps a hit in a file under `memory/builds/*/build/` only when `read_kept_path` answers for it, and
   prints `kept <reason>`. Such a hit is red otherwise. The departures instrument stays under
-  `CAUSE_WRITER_PINNED` (`TOOL-dTotalRecall-50` S2) and takes no row here. Observed by AC1.
+  `CAUSE_WRITER_PINNED` (`TOOL-dTotalRecall-50` S2) and takes no row here. The eight rows move out of
+  `CAUSE_WRITER_KEPT`, whose last rows they are after unit 53, so the constant ends at this pass.
+  Observed by AC1.
 - **S3** — The eight rows. `asbuilt.py` and `packet.py` carry the reason `pinned instrument`, being
   in the packet's `INSTRUMENTS`. The other six carry `outside the write set`. Each row is written
   from the census's output at the pass base, and the pass commit's `Decided:` trailer names the
@@ -63,8 +65,8 @@ bytes, in one path-keyed table the census reads. It repairs `TOOL-dTotalRecall-5
 
 ### Edges
 
-- **consumes-from** `TOOL-dTotalRecall-53` — S34's retirement of `CAUSE_WRITER_KEPT` and its marker,
-  which leaves the build-folder hits this unit keeps with no keep path
+- **consumes-from** `TOOL-dTotalRecall-53` — S34's marker, which leaves `CAUSE_WRITER_KEPT` holding only
+  the build-folder rows this unit moves
 - **consumes-from** `TOOL-dTotalRecall-50` — the census widened to `memory/builds/*/build/*.py` and
   `CAUSE_WRITER_PINNED`, whose eight other hits this unit disposes
 - **hands-off** `TOOL-dTotalRecall-56` — `CENSUS_KEPT_PATHS` and `read_kept_path`, which the alias
@@ -141,7 +143,8 @@ sequences the four passes, this one first, since two of them read its table.
 
 - **AC1** — When `python record_causes.py --check` runs from `tools/memory-tree/` at the pass tip,
   its census lists each of the eight files of §1 as `kept` with its row's reason, lists
-  `deviations.py` under `CAUSE_WRITER_PINNED`, and reds none of the nine.
+  `deviations.py` under `CAUSE_WRITER_PINNED`, and reds none of the nine, and
+  `git grep -n CAUSE_WRITER_KEPT -- tools` prints nothing.
   Red when: a build-folder hit is red, unlisted, or kept by a marker in its own bytes.
 - **AC2** — When `python record_causes.py --fixture --plant kept-row-drained` runs from
   `tools/memory-tree/` and builds a fixture whose kept build-folder script spells no `**Serves:** `
@@ -169,6 +172,10 @@ New arm: tools/memory-tree/record_causes.py · covers AC2 · the plant `kept-row
   (HIGH, item H1 shared with ids 4, 15 and 24).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-61, TOOL-dTotalRecall-65, TOOL-dTotalRecall-66, each the other end of an edge a unit the round-1 spec audit of units 54 to 60 promoted wrote; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-67, the other end of an edge a unit the round-1 spec audit of units 61 to 66 promoted wrote; nothing else moved.
+- rev-4 · 2026-11-23 · S2 AC1 §3 · amended by TOOL-dTotalRecall-61 (id 1, item H1) per
+  `2026-11-22-prompt-TOOL-dTotalRecall-61-build-spec-writer`: the eight rows move out of
+  `CAUSE_WRITER_KEPT`, its last after unit 53, so the constant ends at this pass; AC1 reads it gone, and
+  the consumes-from line to unit 53 says S34 leaves only these rows in it.
 
 ## 10. Reuse audit
 

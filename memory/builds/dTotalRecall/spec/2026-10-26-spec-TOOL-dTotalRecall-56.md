@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-56 — the alias census keeps the pinned departures instrument's `journal` compare by its path-keyed row, never by a marker in its bytes
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -40,7 +40,8 @@ that hit by the path-keyed row `TOOL-dTotalRecall-55` mints. It repairs `TOOL-dT
 - **S2** — The row. `CENSUS_KEPT_PATHS` gains
   `("check_alias_compares", "<the deviations.py path>", "pinned instrument")`. The ask S22 files in
   `memory/builds/dClosedLoop/BACKLOG.md`, asking the owner to compare through `canonical_kind` and
-  repin, stands as written. Observed by AC1.
+  repin, stands as written. The row moves out of `ALIAS_COMPARE_KEPT`, whose last row it is after
+  unit 53, so the constant ends at this pass. Observed by AC1 and AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -56,6 +57,7 @@ that hit by the path-keyed row `TOOL-dTotalRecall-55` mints. It repairs `TOOL-dT
 - **consumes-from** `TOOL-dTotalRecall-55` — `CENSUS_KEPT_PATHS` and `read_kept_path`; without them the
   hit has no keep outside the file's bytes
 - **consumes-from** `TOOL-dTotalRecall-61` — S2 as that unit amends it in step 19, so this pass moves the last row of `ALIAS_COMPARE_KEPT` into the table (the round-1 audit of units 54 to 60, id 1)
+- **hands-off** `TOOL-dTotalRecall-57` — S2's end of `ALIAS_COMPARE_KEPT`, since that unit's AC2 reads both constants gone (the round-1 audit of units 54 to 60, id 1)
 - **hands-off** `TOOL-dTotalRecall-65` — the alias row, which moves into that unit's registry (the round-1 audit of units 54 to 60, id 27)
 - **hands-off** `TOOL-dTotalRecall-66` — AC1, AC3 and the alias row's drain, which that unit re-observes and adds (the round-1 audit of units 54 to 60, ids 11, 13, 24 and 41)
 - **consumes-from** `TOOL-dTotalRecall-67` — S2, its added criterion and its hands-off to unit 57 as unit 61 amends them, read by their own text at step 20 and written there if absent (the round-1 audit of units 61 to 66, id 1)
@@ -97,7 +99,7 @@ sequences the passes; this one follows unit 55.
 - error / empty / loading states — an unkept build-folder compare is red and named.
 - observability — the kept hit prints `pinned instrument`.
 - risks — the row stands until the owner repins; S22's ask carries the change that drains it.
-- testing — AC1 to AC3 by the pass; the arm of §7 at the close.
+- testing — AC1 to AC4 by the pass; the arm of §7 at the close.
 - migration — none.
 - user docs — none under `help/`.
 
@@ -114,6 +116,8 @@ sequences the passes; this one follows unit 55.
 - **AC3** — When `git hash-object` runs on the deviations instrument at the pass tip, it prints
   `30a1f15bf67566aeaf5b7e1628483c630b23b416`, the packet's pin.
   Red when: the pass wrote into the pinned file.
+- **AC4** — When `git grep -n ALIAS_COMPARE_KEPT -- tools` runs at the pass tip it prints nothing.
+  Red when: the constant survives.
 
 ## 7. Gates
 
@@ -137,6 +141,10 @@ New arm: tools/memory-tree/record_kinds.py · covers AC2 · the plant `unkept-bu
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-61, TOOL-dTotalRecall-65, TOOL-dTotalRecall-66, each the other end of an edge a unit the round-1 spec audit of units 54 to 60 promoted wrote; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-67, the other end of an edge a unit the round-1 spec audit of units 61 to 66 promoted wrote; nothing else moved.
 - rev-4 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-72, the other end of an edge a unit the round-1 spec audit of units 67 to 70 promoted wrote; nothing else moved.
+- rev-5 · 2026-11-23 · S2 AC4 §3 §5 · amended by TOOL-dTotalRecall-61 (id 1, item H1) per
+  `2026-11-22-prompt-TOOL-dTotalRecall-61-build-spec-writer`: the row moves out of `ALIAS_COMPARE_KEPT`,
+  its last after unit 53, so the constant ends at this pass; AC4 observes it gone, §3 gains the hands-off
+  to unit 57, and §5's testing line counts AC4.
 
 ## 10. Reuse audit
 

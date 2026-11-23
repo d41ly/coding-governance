@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-57 — a path-keyed keep row is admitted only for a file no pass may edit, so every editable file is kept by the one marker
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -53,6 +53,7 @@ the files the marker cannot reach and re-observes AC34 under that carve-out. It 
   unit bounds
 - **consumes-from** `TOOL-dTotalRecall-53` — S34's marker and AC34's retirement of the two constants,
   which this unit re-observes under the carve-out
+- **consumes-from** `TOOL-dTotalRecall-56` — S2's end of `ALIAS_COMPARE_KEPT`, since AC2 reads both constants gone (the round-1 audit of units 54 to 60, id 1)
 - **consumes-from** `TOOL-dTotalRecall-61` — the edge to unit 56 that unit writes in step 19, since AC2 reads both constants gone (the round-1 audit of units 54 to 60, id 1)
 - **hands-off** `TOOL-dTotalRecall-65` — `KEPT_PATH_DOMAIN`, which that unit keeps over its registry's rows (the round-1 audit of units 54 to 60, id 27)
 - **hands-off** `TOOL-dTotalRecall-66` — `KEPT_PATH_DOMAIN` and its refusal, which that unit derives from the memory root, anchors by segment and reports in the alias census (the round-1 audit of units 54 to 60, ids 5, 8, 14, 18, 29 and 42)
@@ -88,7 +89,7 @@ Minted: `KEPT_PATH_DOMAIN` in `tools/memory-tree/tree_lib.py`; the fixture plant
 - `tools/memory-tree/record_causes.py`
 
 `TOOL-dTotalRecall-55`, `-56` and `-58` also write these modules at order 30, so BUILD-METHOD M6
-sequences the passes; this one follows unit 55.
+sequences the passes; this one follows units 55 and 56.
 
 ### Alternatives rejected
 
@@ -142,6 +143,10 @@ New arm: tools/memory-tree/record_causes.py · covers AC1 · the plant `kept-row
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-61, TOOL-dTotalRecall-65, TOOL-dTotalRecall-66, each the other end of an edge a unit the round-1 spec audit of units 54 to 60 promoted wrote; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-67, the other end of an edge a unit the round-1 spec audit of units 61 to 66 promoted wrote; nothing else moved.
 - rev-4 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-72, the other end of an edge a unit the round-1 spec audit of units 67 to 70 promoted wrote; nothing else moved.
+- rev-5 · 2026-11-23 · §3 §4 · amended by TOOL-dTotalRecall-61 (id 1, item H1) per
+  `2026-11-22-prompt-TOOL-dTotalRecall-61-build-spec-writer`: §3 gains the consumes-from edge to unit 56,
+  whose pass ends `ALIAS_COMPARE_KEPT` that AC2 reads gone, and §4's sequencing line follows units 55
+  and 56.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-53 — the round-1 spec audit of units 36 to 43: its 41 minors, batched
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -95,8 +95,9 @@ and is not edited.
   `tree_lib.read_bindings` (`tools/memory-tree/tree_lib.py:471`) classified, read once, and no Serves
   line is parsed inside the function. Observed by AC21.
 - **S22** — id 36 (M15). The alias census reads `memory/builds/*/build/*.py` below each file's binding
-  head; the pinned `deviations.py` `!= "journal"` (`:380`) is kept with the reason `pinned instrument`,
-  and one ask row in `memory/builds/dClosedLoop/BACKLOG.md` asks its owner to compare through
+  head; the pinned `deviations.py` `!= "journal"` (`:380`) is kept by an `ALIAS_COMPARE_KEPT` row keyed
+  by its repository path with the reason `pinned instrument`, never by a marker in its bytes, until
+  `TOOL-dTotalRecall-56` moves that row to the path-keyed table, and one ask row in `memory/builds/dClosedLoop/BACKLOG.md` asks its owner to compare through
   `canonical_kind` and repin. Observed by AC22.
 - **S23** — id 49 (M16). The `homeless records` arm (`TOOL-dTotalRecall-43` S1) selects every tracked
   file under the memory root outside `builds/` that no registry row homes and no declared non-record
@@ -127,9 +128,12 @@ and is not edited.
 - **S33** — id 26 (L8). `tools/runlog/memory_measure.py`'s path match calls `model.derive_path_key` on
   the word and on each worktree root, and spells no fold of its own. Observed by AC33.
 - **S34** — id 29 (L9). One keep marker for the three code censuses, `# census: kept <census> <reason>`
-  on the kept line: the slug census's marker is its `slug-grammar` census, and the file-keyed
-  constants `ALIAS_COMPARE_KEPT` and `CAUSE_WRITER_KEPT` give way to it, each kept file's lines marked
-  with the reason the constant held. Observed by AC34.
+  on the kept line: the slug census's marker is its `slug-grammar` census. The file-keyed constants
+  `ALIAS_COMPARE_KEPT` and `CAUSE_WRITER_KEPT` give way to it for every file under the tool root, each
+  such kept line marked with the reason the constant held. A row naming a file under
+  `memory/builds/*/build/` stays in its constant at this pass, because no pass may write that file's
+  bytes: unit 50 §4's eight cause rows and S22's alias row. `TOOL-dTotalRecall-55` and
+  `TOOL-dTotalRecall-56` move them to the path-keyed table, and each constant ends there. Observed by AC34.
   **Readers:** by name: READER NOT IN TREE — both constants are minted by `TOOL-dTotalRecall-40` and
   `TOOL-dTotalRecall-36` in this build and are absent at base · by value: `check_alias_compares` and
   `check_cause_writers` read the markers, and unit 49's legacy test reads the reason, after this item.
@@ -185,8 +189,8 @@ and is not edited.
 - **consumes-from** `TOOL-dTotalRecall-50` — the widened census and `CAUSE_WRITER_PINNED`
 - **consumes-from** `TOOL-dTotalRecall-51` — the comment-prefixed cause form
 - **consumes-from** `TOOL-dTotalRecall-52` — the triple-keyed `record-kinds-legacy` registration
-- **hands-off** `TOOL-dTotalRecall-55` — S34's retirement of `CAUSE_WRITER_KEPT` for the build-folder scripts, which S34 does not mark and that unit keeps by a path-keyed row (the round-1 audit of units 44 to 53, id 37)
-- **hands-off** `TOOL-dTotalRecall-56` — S22's keep of the pinned `deviations.py:380`, which S34 does not mark and that unit keeps by a path-keyed row (the round-1 audit of units 44 to 53, id 15)
+- **hands-off** `TOOL-dTotalRecall-55` — S34's retirement of `CAUSE_WRITER_KEPT` for the build-folder scripts, which S34 leaves in `CAUSE_WRITER_KEPT` and that unit keeps by a path-keyed row (the round-1 audit of units 44 to 53, id 37)
+- **hands-off** `TOOL-dTotalRecall-56` — S22's keep of the pinned `deviations.py:380`, which S34 leaves in `ALIAS_COMPARE_KEPT` and that unit keeps by a path-keyed row (the round-1 audit of units 44 to 53, id 15)
 - **hands-off** `TOOL-dTotalRecall-57` — AC34's retirement of the file-keyed constants, which that unit re-observes with the path-keyed rows bounded to the build folders (the round-1 audit of units 44 to 53, id 4)
 - **hands-off** `TOOL-dTotalRecall-58` — S34's marker reader, which that unit bounds to the tool root, and the instruments' bytes it holds (the round-1 audit of units 44 to 53, id 24)
 - **hands-off** `TOOL-dTotalRecall-60` — S5's view parity, S2 and S16's marker spelling, S20's govkit block, S27's order line, S30's figure and §1's count, which that unit settles (the round-1 audit of units 44 to 53, ids 3, 5, 9, 11, 14, 21, 27, 33, 34 and 35)
@@ -318,9 +322,11 @@ cells: no new function is minted; a flag or plant name has no lexicon cell.
   `[[lf_pin]]` line, it names that pattern. Red when: an `eol` gap passes.
 - **AC33** — When `grep -c derive_path_key memory_measure.py` runs in the runlog kit at the tip, it prints
   at least 1, and the file spells no `/c/` fold. Red when: a second fold exists.
-- **AC34** — When `git grep -nE "ALIAS_COMPARE_KEPT|CAUSE_WRITER_KEPT" -- tools` runs at the tip, it
-  prints nothing, and an unmarked writer added to a kept file reds `record_causes.py --check`.
-  Red when: a file-keyed exemption remains.
+- **AC34** — When a `python -c` probe reads `CAUSE_WRITER_KEPT` and `ALIAS_COMPARE_KEPT` at the tip, every row
+  names a file under `memory/builds/*/build/`, and `git grep -c "census: kept"` over those files
+  prints nothing; an unmarked writer added to a kept file under the tool root reds
+  `record_causes.py --check`. Red when: a row naming a file under the tool root survives, or a
+  build-folder file carries the marker.
 - **AC35** — When `python record_causes.py --cause-writers` runs at the tip, every census file prints
   with a disposition. Red when: a file prints with none.
 - **AC36** — When `grep -c "Caused-by" memory/guides/BUILD-METHOD.md` runs at the tip, it prints at least
@@ -338,7 +344,7 @@ cells: no new function is minted; a flag or plant name has no lexicon cell.
 
 ## 7. Gates
 
-`memory hygiene` · `build-index selftest` · `backlog migration selftest` · `row-grammar selftest` · `tier2-review self-test` · `review-replay selftest` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `kit/dogfood doc parity` · `build-method size` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `gotchas selftest` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e`
+`memory hygiene` · `build-index selftest` · `backlog migration selftest` · `row-grammar selftest` · `tier2-review self-test` · `review-replay selftest` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `kit/dogfood doc parity` · `build-method size` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `gotchas selftest` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `drift-audit selftest` · `memory-recall kit selftest` · `policy fixtures`
 
 New arm: tools/memory-tree/record_causes.py · covers AC4 AC9 AC11 AC34 · the plants `literal-without-cause`, `duplicate-cause` and `unmarked-writer`, staged by restoring the file-keyed rule · none
 New arm: tools/memory-tree/record_kinds.py · covers AC14 AC19 AC39 · the plants `unarmed-on-disallowed-form`, `awk-regex-alias` and `alias-constant`, staged by the line-level quoted predicate · none
@@ -367,6 +373,13 @@ New arm: tools/runlog/selftest.py · covers AC24 · the three path plants, stage
   minors batched (24 MEDIUM, 17 LOW).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-55, TOOL-dTotalRecall-56, TOOL-dTotalRecall-57, TOOL-dTotalRecall-58, TOOL-dTotalRecall-60, each the other end of an edge a unit the round-1 spec audit of units 44 to 53 promoted wrote; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-61, TOOL-dTotalRecall-66, each the other end of an edge a unit the round-1 spec audit of units 54 to 60 promoted wrote; nothing else moved.
+- rev-4 · 2026-11-23 · S34 S22 AC34 §3 §7 · amended by TOOL-dTotalRecall-61 (id 1, item H1) per
+  `2026-11-22-prompt-TOOL-dTotalRecall-61-build-spec-writer`: each row naming a file under
+  `memory/builds/*/build/` stays in `CAUSE_WRITER_KEPT` or `ALIAS_COMPARE_KEPT` through this pass, S22's
+  row keyed by repository path, and units 55 and 56 end the constants; the hands-off lines to those
+  units say so. §7's leg line gains `drift-audit selftest`, `memory-recall kit selftest` and
+  `policy fixtures`, the guards `check-spec-tokens.py --spec` names for §4's `backlog.py` and
+  `gen_build_index.py`.
 
 ## 10. Reuse audit
 
