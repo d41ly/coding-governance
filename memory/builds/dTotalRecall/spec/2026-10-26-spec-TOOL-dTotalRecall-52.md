@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-52 — the one legacy registration is keyed by path, section and check, judged at the run's real base, and leaves no carrier of the old name
 
-**Status:** INPROGRESS · rev-7 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-7 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dTotalRecall-52-deviation-522.md](../build/2026-10-26-build-TOOL-dTotalRecall-52-deviation-522.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-52-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-52-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-52-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-52-reground-return.md) | research | — |
+| [2026-11-23-build-TOOL-dTotalRecall-52-2-acceptance-ledger.md](../build/2026-11-23-build-TOOL-dTotalRecall-52-2-acceptance-ledger.md) | log | — |
 | [2026-11-23-build-TOOL-dTotalRecall-52-divergence-fold-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-52-divergence-fold-return.md) | research | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-52-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-52-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-52-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-52-reground-brief.md) | journal | — |

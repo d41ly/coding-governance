@@ -3770,7 +3770,7 @@ hit 'record causes: orphans · memory/builds/fRoot/build/2026-01-02-build-TOOL-f
 hit 'record causes: orphans · memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1-cycle-b.md'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant claim-root 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant none 2>&1)   # AC8's none
-hit 'record causes: legacy-records · 2 record row(s) (-), 0 section row(s) · memory.legacy-anchors none'; miss 'findings 1'
+hit 'record causes: record-kinds-legacy · 2 record row(s) (-), 0 section row(s) · memory.legacy-anchors none'; miss 'findings 1'
 # --- TOOL-dTotalRecall-36 AC6 — the writer census: a code file under the fixture's tool root spelling a Serves
 # --- literal and no cause is red at its line, and the legacy plant's census holds no file. Red on
 # --- `check_cause_writers` cut from `--check`.

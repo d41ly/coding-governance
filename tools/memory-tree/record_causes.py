@@ -2,7 +2,7 @@
 """record_causes.py — every record names its cause (TOOL-dTotalRecall-19).
 
     python <prefix>/memory-tree/record_causes.py --check               # the causes and orphan checks
-    python <prefix>/memory-tree/record_causes.py --measure             # the legacy-records seed's rows
+    python <prefix>/memory-tree/record_causes.py --measure             # the legacy population's causes rows
     python <prefix>/memory-tree/record_causes.py --print-stand-ins     # the made-by-stand-in class's members
     python <prefix>/memory-tree/record_causes.py --print-record-keys   # the record-key class's members
     python <prefix>/memory-tree/record_causes.py --backfill            # write the cause line the causes check lacks
@@ -17,9 +17,9 @@ and each non-Markdown member whose first Serves line wears a comment prefix (`tr
 whose cause line wears the same prefix. A non-Markdown record whose Serves line is bare, or that has none, is
 not graded, and record keys stay Markdown stems.
 
-THE CAUSES CHECK (`check_causes`). A graded record with no `<path> -` row of the `legacy-records`
-population, whose kind's `record-kinds.toml` row is not `root = true`, is red when it carries no
-`Caused-by` or one that does not resolve: a target resolves when it is a family id the corpus defines
+THE CAUSES CHECK (`check_causes`). A graded record with no `<path> -` row of the `record-kinds-legacy`
+population's `causes` slice, whose kind's `record-kinds.toml` row is not `root = true`, is red when it
+carries no `Caused-by` or one that does not resolve: a target resolves when it is a family id the corpus defines
 (`corpus_ids.py`'s defined-id set) or a record key, the stem of a tracked Markdown record. A record of a
 typed kind whose row's `schema.fields` hold no `Caused-by`, written by its parent's own command, is graded
 on its Serves units instead, each of which must resolve. A legacy record is never red.
@@ -37,9 +37,9 @@ excepted, that spells a `**Serves:** ` literal and no `Caused-by` is red unless 
 with a reason, so the next writer that omits the cause line is red at its own pass, before the record it
 writes is. A file kept as rendering a pinned instrument's bytes (`KEPT_INSTRUMENT`, TOOL-dTotalRecall-49
 S3) is red where that stops being true: where `design_lib.read_design_keys` reads the design keys off or
-refuses them, or where the record `DESIGN_VIEW` names has no `<path> -` row of the `legacy-records`
-population. Then the build folders' scripts (TOOL-dTotalRecall-50 S1), every tracked `*.py`, `*.sh` or `*.js`
-file under `<memory root>/builds/*/build/`, test-named files excepted, read past their `BIND_HEAD_LINES`
+refuses them, or where the record `DESIGN_VIEW` names has no `<path> -` row of the `record-kinds-legacy`
+population's `causes` slice. Then the build folders' scripts (TOOL-dTotalRecall-50 S1), every tracked
+`*.py`, `*.sh` or `*.js` file under `<memory root>/builds/*/build/`, test-named files excepted, read past their `BIND_HEAD_LINES`
 binding window by both tests, so a file's own binding is never a hit; each census file is kept by its
 repository path in `CAUSE_WRITER_KEPT` or is the instrument of a `CAUSE_WRITER_PINNED` row, and its count
 line counts them apart.
@@ -51,11 +51,14 @@ each row with its ask id and the records its glob reads, red where the instrumen
 `BACKLOG.md` of the build its id names. While a row stands, a new record its glob reads that carries no
 `Caused-by` is read as caused by its first Serves id, by the causes and orphan checks alike.
 
-THE LEGACY POPULATION. `--measure` prints one TAB row `<path> - 1` per tracked Markdown record and, under
-`memory.legacy-anchors` `derived`, one `<path> <anchor> 1` row per untagged `##` or `###` heading, its
-anchor the playbook kit's `derive_anchor`; `legacy_ledger.py seed --population legacy-records` writes them
-to the population's home. `read_legacy_anchors` is the one reader of the key: `derived` (the default)
-derives anchors for untagged headings and reads a legacy record's Serves lines as its cause; `none`
+THE LEGACY POPULATION. `record-kinds-legacy`, keyed by path, section and check (TOOL-dTotalRecall-52);
+this check reads its `causes` slice alone (`read_legacy_paths`), and `record_kinds.py` its `kind-schema`
+slice. `--measure` prints one TAB row `<path> - causes 1` per tracked Markdown record and, under
+`memory.legacy-anchors` `derived`, one `<path> <anchor> causes 1` row per untagged `##` or `###` heading,
+its anchor the playbook kit's `derive_anchor`: the `causes` slice the population's one seed,
+`record_kinds.py --seed-legacy`, prints beside its `kind-schema` slice, and `legacy_ledger.py seed
+--population record-kinds-legacy` writes both to the population's home. `read_legacy_anchors` is the one
+reader of the key: `derived` (the default) derives anchors for untagged headings and reads a legacy record's Serves lines as its cause; `none`
 derives none and reads a legacy record as reached; `retag` reads the authored tags alone,
 `## [section.<anchor>] <heading>`, the form TOOL-dTotalRecall-20's retag step writes.
 
@@ -93,7 +96,7 @@ if str(KIT) not in sys.path:
 import tree_lib  # noqa: E402  the record population, its bindings and its header reader
 
 SAY = "record causes"
-POPULATION = "legacy-records"
+POPULATION = "record-kinds-legacy"
 ANCHOR_VALUES = ("derived", "none", "retag")
 ANCHOR_DEFAULT = "derived"   # the catalogue default, which holds where no policy kit resolves
 LEGACY_SECTION = "-"   # a population row's section cell naming the record itself
@@ -337,7 +340,7 @@ def read_legacy_anchors(root, path, text=None, value=None) -> list:
 
 
 def derive_population_rows(root, value=None) -> list:
-    """`[(path, section)]`, the `legacy-records` rows of the tree at `root`: `(path, "-")` per Markdown
+    """`[(path, section)]`, the `causes` rows of the tree at `root`: `(path, "-")` per Markdown
     record, then `(path, anchor)` per anchor `read_legacy_anchors` admits."""
     value = read_anchor_value(root) if value is None else value
     rows = []
@@ -352,7 +355,9 @@ def derive_population_rows(root, value=None) -> list:
 
 
 def read_legacy_paths(root) -> tuple:
-    """`(paths, note)`: the paths of the population's `-` rows, or None and why the check is unarmed."""
+    """`(paths, note)`: the paths of the `-` rows of the population's `causes` slice, the rows whose
+    `check` field is `causes`, or None and why the check is unarmed. ValueError for a registration keyed
+    by no `check` field, whose slices do not read apart."""
     import legacy_ledger as ll   # noqa: E402  the ledger factory
     try:
         reg = next((r for r in ll.read_registrations(root) if r.population == POPULATION), None)
@@ -364,9 +369,13 @@ def read_legacy_paths(root) -> tuple:
     state = ll.read_home_state(home)
     if state != "armed":
         return None, f"{POPULATION}'s home {reg.home} is {state}"
+    if "check" not in reg.fields:
+        raise ValueError(f"{reg.source}: [[ledger]] {POPULATION!r} is keyed {','.join(reg.fields)}, no check")
     rows, bad = ll.read_ledger(root, reg)
     if bad:
         raise ValueError(f"{reg.home}: {ll.render_malformed(bad[0])}")
+    at = reg.fields.index("check")
+    rows = [k for k in rows if k[at] == "causes"]
     paths = {k[0] for k in rows if k[1] == LEGACY_SECTION}
     if not paths:
         return None, f"{POPULATION}'s home {reg.home} holds no record row"
@@ -772,9 +781,9 @@ def render_pinned_instrument(drained) -> str:
 
 def write_fixture(top, plant) -> pathlib.Path:
     """The plant's repository under `top`: a conf, a three-row registry (`log`, `research`, `card`), a govkit
-    registry holding the `legacy-records` table as gov registers it, the build `fRoot` (README, a spec, a
-    log record and a research record repeating `## Findings`), committed; the population seeded; then the
-    plant's new records and refs, committed. `none` commits `memory.legacy-anchors = "none"` first."""
+    registry holding the `record-kinds-legacy` table keyed as gov keys it, its seed the `causes` slice, the
+    build `fRoot` (README, a spec, a log record and a research record repeating `## Findings`), committed;
+    the population seeded; then the plant's new records and refs, committed. `none` commits `memory.legacy-anchors = "none"` first."""
     import json
     import legacy_ledger as ll   # noqa: E402  the seed, run as `seed` runs it
     import record_kinds   # noqa: E402  the kit's path inside a repository
@@ -812,7 +821,7 @@ def write_fixture(top, plant) -> pathlib.Path:
     write_file(f"{tool_rel}/{sibling}" if tool_rel else sibling,
                f'[[ledger]]\npopulation = "{POPULATION}"\nleg = "record causes"\n'
                f'seed = {json.dumps(["python", f"{prefix}/{kit_rel[len(tool_rel) + 1:] if tool_rel else kit_rel}/record_causes.py", "--measure"])}\n'
-               'key = "record"\nfields = ["path", "section"]\nverbatim = ["section"]\ndrain = "key"\n'
+               'key = "record"\nfields = ["path", "section", "check"]\nverbatim = ["section"]\ndrain = "key"\n'
                f'direction = "shrink-only"\nhome = "memory/project/{POPULATION}.txt"\n')
     write_file("memory/project/README.md", "the fixture's project registry\n")
     write_file("memory/builds/fRoot/README.md", f"---\nslug: fRoot\nopened: 2026-01-01\nids: {FIXTURE_UNIT}\n---\n\n# fRoot\n")
@@ -1027,7 +1036,7 @@ def main(argv) -> int:
         except ValueError as exc:
             print(f"{SAY}: refused · {exc}")
             return 2
-        lines, rc = [f"{p}\t{s}\t1" for p, s in rows], 0
+        lines, rc = [f"{p}\t{s}\tcauses\t1" for p, s in rows], 0
     elif argv == ["--backfill"]:
         lines, rc = write_missing_causes(root)
     elif argv == ["--print-stand-ins"]:

@@ -11,7 +11,7 @@
                                                 (--field <Key>... | --form fence --validator <module>:<function>)
     python <prefix>/memory-tree/record_kinds.py --purpose-review [--from <path>] [--write [--ask <id>]]
     python <prefix>/memory-tree/record_kinds.py --print-purpose-pending   # the purpose-pending seed
-    python <prefix>/memory-tree/record_kinds.py --seed-legacy       # the record-kinds-legacy seed
+    python <prefix>/memory-tree/record_kinds.py --seed-legacy       # the record-kinds-legacy seed, both slices
     python <prefix>/memory-tree/record_kinds.py --print-gap-keys    # the gap-key native class's members
     python <prefix>/memory-tree/record_kinds.py --fixture [--plant <case>]
     python <prefix>/memory-tree/record_kinds.py --selftest
@@ -60,8 +60,8 @@ the row's `fields` both ways; a member of the typed kind list (`tree_lib.TYPED_R
 row, and a factory row (its `source` the factory's `KINDS.<kind>.required`) naming no member. It
 grades each `fields` row's population: every tracked record its `home` matches carries each field as
 a `**Key:**` line, bare or a `- **Key:**` bullet, in the row's order, except a record the
-`record-kinds-legacy` ledger lists against that row, each ledger row's section read through
-`tree_lib.resolve_kind`, so the rows keyed `journal` stand for the `log` row with their bytes kept.
+`record-kinds-legacy` ledger's `kind-schema` slice lists against that row, each such row's section read
+through `tree_lib.resolve_kind`, so the rows keyed `journal` stand for the `log` row with their bytes kept.
 A typed kind's row grades only the paths its name grammar (`build_records.derive_record_name`) also
 matches, and a path a typed grammar matches is graded by that kind's row alone. An untyped row grades a
 path its home admits unless `derive_record_kind` names another row, the row of the record's Serves kind
@@ -661,7 +661,7 @@ def scan_legacy_records(root, rows: list[dict], typed_kinds, other_kind: dict | 
     or an `…-acceptance-ledger.md` its glob matches falls to the untyped rows. An untyped row keeps a path
     only where `derive_record_kind` returns that row or None (TOOL-dTotalRecall-42 S5), each path it drops
     listed under the row's name in `other_kind` where the caller passes one. The population S4 grades
-    before the legacy ledger takes its rows out, and what `--seed-legacy` prints."""
+    before the legacy ledger takes its rows out, and the `kind-schema` slice `--seed-legacy` prints."""
     from build_records import derive_record_name
     grammars = {k: derive_record_name(k) for k in typed_kinds}
     decided = {}   # path -> its Serves kind's admitting row, one head read per path across the rows
@@ -856,8 +856,9 @@ def check_plan_units(uids: list[str], path: str, root) -> list[str]:
 
 
 def read_legacy_keys(root) -> tuple[set, str]:
-    """`({(path, row name)}, note)` of the `record-kinds-legacy` ledger; an empty set and a note saying
-    why where it is unregistered or its home is absent."""
+    """`({(path, row name)}, note)` of the `record-kinds-legacy` ledger's `kind-schema` slice, the rows
+    whose `check` field is `kind-schema` (TOOL-dTotalRecall-52); an empty set and a note saying why where
+    it is unregistered, keyed by no `check` field, or its home is absent."""
     import legacy_ledger as ll
     try:
         reg = next((r for r in ll.read_registrations(root) if r.population == LEGACY), None)
@@ -867,8 +868,11 @@ def read_legacy_keys(root) -> tuple[set, str]:
         return set(), f"no [[ledger]] table registers {LEGACY}"
     if not pathlib.Path(root, reg.home).is_file():
         return set(), f"{LEGACY}'s home {reg.home} is absent"
+    if "check" not in reg.fields:
+        return set(), f"{LEGACY} is keyed {','.join(reg.fields)}, no check, so its kind-schema slice does not read"
     rows, _bad = ll.read_ledger(root, reg)
-    return set(rows), ""
+    at = reg.fields.index("check")
+    return {(k[0], k[1]) for k in rows if k[at] == "kind-schema"}, ""
 
 
 def check_owner_fields(kind: str, path: str, text: str) -> list[tuple[str, str]]:
@@ -2064,7 +2068,8 @@ def build_fixture(tmp, plant: str | None = None):
     sibling = "/".join(("govkit", "registry.toml"))   # spelled in parts: the install-prefix ban reads a kit path
     write_fixture_file(f"{tool_rel}/{sibling}" if tool_rel else sibling,
         f'[[ledger]]\npopulation = "{LEGACY}"\nleg = "{SAY}"\nseed = ["python", "{prefix}/{kit_rel[len(tool_rel) + 1:] if tool_rel else kit_rel}/record_kinds.py", "--seed-legacy"]\n'
-        'key = "record"\nfields = ["path", "section"]\ndrain = "key"\ndirection = "shrink-only"\n'
+        'key = "record"\nfields = ["path", "section", "check"]\nverbatim = ["section"]\ndrain = "key"\n'
+        'direction = "shrink-only"\n'
         f'home = "memory/project/{LEGACY}.txt"\n' + (   # value-ledger registers the population, its seed this file
             f'\n[[ledger]]\npopulation = "{PURPOSE_PENDING}"\nleg = "{SAY}"\nseed = ["python", '
             f'{json.dumps((KIT / "record_kinds.py").as_posix())}, "--print-purpose-pending"]\nkey = "key"\n'
@@ -2087,8 +2092,8 @@ def build_fixture(tmp, plant: str | None = None):
     old = f"{build}/2026-01-01-build-{unit}-deviation-1.md"
     new = f"{build}/2026-01-02-build-{unit}-deviation-2.md"
     legacy_rows = [(old, "deviation")] + ([(new, "deviation")] if plant == "field-missing-legacy" else [])
-    write_fixture_file(f"memory/project/{LEGACY}.txt", f"# ledger · {LEGACY} · key record path,section · direction shrink-only · drain key\n"
-        + "".join(f"{p}\t{s}\t1\t{'0' * 40}\tseeded\n" for p, s in legacy_rows))
+    write_fixture_file(f"memory/project/{LEGACY}.txt", f"# ledger · {LEGACY} · key record path,section,check · direction shrink-only · drain key\n"
+        + "".join(f"{p}\t{s}\tkind-schema\t1\t{'0' * 40}\tseeded\n" for p, s in legacy_rows))
     write_fixture_file(old, f"# {unit} deviation 1 — an old form\n\n**Serves:** deviation {unit}\n\n- **Reason:** kept as it was\n")
     follow = "gap gap-mem-99" if plant == "gap-unresolved" else "gap gap-mem-01"
     values = {f: "the fixture" for f in dev}
@@ -2406,12 +2411,20 @@ def main(argv: list[str], root=None) -> int:
                 return 2
             sys.stdout.write(text)
             return 0
-        elif argv == ["--seed-legacy"]:
+        elif argv == ["--seed-legacy"]:   # both slices, keyed by path, section and check (TOOL-dTotalRecall-52)
             from tree_lib import TYPED_RECORD_KINDS
+            import record_causes   # the causes slice's one derivation
             pop = scan_legacy_records(root, read_record_kinds(root) or [], TYPED_RECORD_KINDS)
             for name, paths in pop.items():
                 for p in paths:
-                    print(f"{p}\t{name}\t1")
+                    print(f"{p}\t{name}\tkind-schema\t1")
+            try:
+                rows = record_causes.derive_population_rows(root)
+            except ValueError as e:
+                print(f"{SAY}: refused · {e}")
+                return 2
+            for p, s in rows:
+                print(f"{p}\t{s}\tcauses\t1")
             return 0
         elif argv == ["--print-gap-keys"]:
             return print_gap_keys(root)
