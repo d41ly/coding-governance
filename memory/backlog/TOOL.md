@@ -439,6 +439,7 @@ Cite ids, never line numbers.
 | [TOOL-dBoundRoles-74](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE plan WORKFLOW HAS NO LOOP ROW. TOOL-dBoundRoles-1 S4 adds the plan… |
 | [TOOL-dBoundRoles-75](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE BREAKER'S BUDGET DRAW HAS NO DRAWER. cl-dClosedLoop-0327 has an act… |
 | [TOOL-dBoundRoles-76](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE. TOOL-dWitnessedBar-84 S9 put… |
+| [TOOL-dBoundRoles-77](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | TOOL-dTotalRecall-17's map replay lost on recall, so the map renderer… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | DEFERRED | MED | TOOL-dCalibratedLens-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
@@ -450,6 +451,7 @@ Cite ids, never line numbers.
 | [TOOL-dCalibratedLens-54](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite unattended driver selftest shard 4/8 red at 2c50ab31 on… |
 | [TOOL-dCalibratedLens-55](../builds/dCalibratedLens/BACKLOG.md) | OPEN | HIGH | — | 2026-11-03 | held red: suite unattended runlog-writer selftest red at 2c50ab31 on… |
 | [TOOL-dCalibratedLens-56](../builds/dCalibratedLens/BACKLOG.md) | OPEN | LOW | — | 2026-11-02 | run the losing test of each of the six opt-in review lenses… |
+| [TOOL-dCalibratedLens-57](../builds/dCalibratedLens/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | TOOL-dTotalRecall-17's map replay lost on recall, so no map is built:… |
 | [TOOL-dCarriedReceipt-1](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review's convergence predicate is scoped to ONE run's run-state file… |
 | [TOOL-dCarriedReceipt-2](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review makes CONVERGED terminal for a subject (unattended.sh:3135,… |
 | [TOOL-dCarriedReceipt-3](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a FOLD pass legitimately spans many units, and the dispatch machinery… |
@@ -673,7 +675,7 @@ Cite ids, never line numbers.
 | [TOOL-dTieredTribunal-22](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the uncounted filter(Boolean) predicate, the follow-up… |
 | [TOOL-dTieredTribunal-23](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the protocol gate arm TOOL-dTieredTribunal-13's F1 resolved to record… |
 | [TOOL-dTieredTribunal-24](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | two mechanical arms for the amendment-leaves-its-other-half-standing… |
-| [TOOL-dTotalRecall-27](../builds/dTotalRecall/BACKLOG.md) | INPROGRESS | MED | TOOL-dTotalRecall-17 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dTotalRecall-27](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | MED | TOOL-dTotalRecall-100 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dTotalRecall-28](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE RECORD-KIND FACTORY HAS TWO OWNERS ON PAPER. TOOL-dPlacedRequest-1… |
 | [TOOL-dTotalRecall-33](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | TWO FUNCTIONS ARE NAMED build_index. PLAY-dOrderedCharter-18 moves… |
 | [TOOL-dTotalRecall-34](../builds/dTotalRecall/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SHIM KINDS HAVE NO VERB. TOOL-dTotalRecall-20 forwards --new-build… |
@@ -721,6 +723,7 @@ Cite ids, never line numbers.
 | [TOOL-dWellOiledMachine-128](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE PERIOD KEY HAS NO MONTH AND NO LANDING COUNT. derive_period knows… |
 | [TOOL-dWellOiledMachine-129](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | TWO STALL AND LOOP CLASSES HAVE NO WRITER. cl-dClosedLoop-0473 trends… |
 | [TOOL-dWellOiledMachine-130](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE PRE-PUSH HOOK. TOOL-dWitnessedBar-73 S6 put… |
+| [TOOL-dWellOiledMachine-961](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-23 | TOOL-dTotalRecall-17's map replay lost on recall, so no map is built:… |
 | [TOOL-dWitnessedBar-31](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-28 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dWitnessedBar-32](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | THE enforces EDGE ROW OMITS principle. PLAY-dOrderedCharter-7 S2 admits… |
 | [TOOL-dWitnessedBar-33](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | THE DOSSIERS' gate-legs CLAIMS AND THE LEGS' tests EDGES ARE ONE FACT… |

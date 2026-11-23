@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-17 — the map's losing test: the coherence and reuse lenses replayed with the map and without, before any map code is built
 
-**Status:** INPROGRESS · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-3 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0228@fcc9ca71 whole
 
@@ -15,6 +15,8 @@
 | [2026-11-22-build-TOOL-dTotalRecall-17-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-17-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-17-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-17-reground-return.md) | research | — |
 | [2026-11-23-build-TOOL-dTotalRecall-17-deviation-1009.md](../build/2026-11-23-build-TOOL-dTotalRecall-17-deviation-1009.md) | deviation | — |
+| [2026-11-23-build-TOOL-dTotalRecall-17-map-replay-manifest.json](../build/2026-11-23-build-TOOL-dTotalRecall-17-map-replay-manifest.json) | research | — |
+| [2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict.md](../build/2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-11-22-prompt-TOOL-dTotalRecall-17-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-17-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-17-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-17-reground-brief.md) | journal | — |
