@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-61 — unit 53 keeps the build-folder rows of its two file-keyed constants through its own pass, so no keep it needs lands after it
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 19 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 19 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-26-prompt-TOOL-dTotalRecall-61-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-61-1-spec-writer.md) | journal | TOOL-dTotalRecall-1 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-61-round4-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-61-round4-fix-brief.md) | research | — |
 | [2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-19 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-50 TOOL-dTotalRecall-70 TOOL-dTotalRecall-89 |
+| [2026-11-22-prompt-TOOL-dTotalRecall-61-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-61-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-61-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-61-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-61-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-61-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-62 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 |
