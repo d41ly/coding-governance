@@ -572,7 +572,7 @@ def check_ranked_arms(state, roles):
         for name, planted in (("reordered", lines[:o0] + lines[c0 + 1:-1] + lines[o0:c0 + 1] + [""]),
                               ("unclosed", lines[:c0] + lines[c0 + 1:])):
             plant = "\n".join(planted)
-            m = handoff.MARKER_RE.search(plant)
+            m = lib.extract_unfenced_marker(plant)
             r, t = plant.index("\n## Role\n") + 1, plant.index("\n## Task\n") + 1
             plant = plant.replace(m.group(0), m.group(0).replace(m.group("role_sha"), lib.derive_section_sha(
                 plant[r:t])).replace(m.group("task_sha"), lib.derive_section_sha(plant[t:])))
@@ -694,6 +694,19 @@ def check_return_arm(state):
                 ("unmarked-stop", "u1", write_transcript(subagents / "agent-u1.jsonl", "Build it."))):
             rc, out, err = run_verb({"agent_type": "gov-builder", "agent_id": aid, "agent_transcript_path": transcript,
                                      "last_assistant_message": "Committed it; the checks ran."})
+            left = sorted(p.name for p in record_dir.iterdir()) if record_dir.is_dir() else []
+            check_arm(state, 22, rc == 0 and out == "" and err == "" and left == [],
+                      "%s exited %d printing %r and %r with %r under %s, not 0, nothing and no record"
+                      % (plant, rc, out, err, left, read_return_dir()))
+        # TOOL-dBoundRoles-50 S19: a marked direct spawn under the direct layout passes the route test, so unit 5
+        # S2's agent_type exit is what stops `untyped-marked-stop`, with no agent_type, and `unagent-marked-stop`,
+        # typed `gov-session`, which the catalogue holds `agent: false`. Each prints nothing on either stream and
+        # leaves no record; with that exit removed the first writes a witness and the second blocks.
+        for plant, aid, typed in (("untyped-marked-stop", "t1", {}),
+                                  ("unagent-marked-stop", "t2", {"agent_type": "gov-session"})):
+            transcript = write_transcript(subagents / ("agent-%s.jsonl" % aid), marker + "\n\nBuild it.")
+            rc, out, err = run_verb(dict(typed, agent_id=aid, agent_transcript_path=transcript,
+                                         last_assistant_message="Committed it; the checks ran."))
             left = sorted(p.name for p in record_dir.iterdir()) if record_dir.is_dir() else []
             check_arm(state, 22, rc == 0 and out == "" and err == "" and left == [],
                       "%s exited %d printing %r and %r with %r under %s, not 0, nothing and no record"
@@ -879,6 +892,8 @@ def check_framing_arm(state):
                                    ("pw3", handoff.PROMPT_WRITER, {"outcome": "framed", "job": job, "nostop": nostop,
                                                                    "extra": "x"}),
                                    ("pw4", handoff.PROMPT_WRITER, {"outcome": "framed", "job": forged, "nostop": nostop}),
+                                   ("pw5", handoff.PROMPT_WRITER, {"outcome": "framed", "job": "Build it.\n````",
+                                                                   "nostop": nostop}),
                                    ("rs1", "gov-researcher", {"outcome": "framed", "job": job, "nostop": nostop})):
                 write_agent_transcript(sub, aid, kind, task, ret)
             rc, out, said = run_render("--role", "gov-builder", "--input", "spec=spec.md", "--framed-by", "pw1",
@@ -892,6 +907,9 @@ def check_framing_arm(state):
             for plant, aid, want in (("framed-invalid-return", "pw2", "lacks nostop"),
                                      ("framed-invalid-return", "pw3", "extra — a field the template does not name"),
                                      ("framed-forged", "pw4", "job — line 2 reads as a heading"),
+                                     # TOOL-dBoundRoles-50 S6: a framing:job opening a fence it never closes
+                                     ("framed-open-fence", "pw5", "job — a fence opened at line 2 of the value is "
+                                                                  "never closed"),
                                      ("framed-wrong-role", "rs1", "type is gov-researcher")):
                 rc, out, said = run_render("--role", "gov-builder", "--input", "spec=spec.md", "--framed-by", aid,
                                            "--stdout")

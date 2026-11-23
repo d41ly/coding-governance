@@ -320,7 +320,12 @@ marker count and the fact re-cut read only the lines scratch-guard's exported `r
 the roles kit's `read_unfenced_lines` spelled again,
 so a fact line or marker line inside a fence is content: a spec that quotes either is never counted or
 re-cut. `extractHandoffMarker`, which the format guard's `readHandoffVia` also calls, walks it the same
-way. A file whose `## Task` section ends inside a fence would hide every later fact line, so it is
+way. Since handed content is fenced, `readUnfencedLines` is the hooks kit's one fence walker
+(TOOL-dBoundRoles-50): the H1 scan `checkBuildable` and the dispatched-unit fallback share,
+`readSpecH1Id`, and the format guard's `scanMessageLines` read their lines through it, so a short run
+inside a long fence closes nothing, a backtick run whose line holds a backtick after it opens no fence,
+and a work order's allowance read by `readWorkOrderAllowance` from a prompt the walk ends inside a fence
+denies the write, naming the line. A file whose `## Task` section ends inside a fence would hide every later fact line, so it is
 refused, naming the line of the file the fence opened at. A handoff rendered before the fence carries
 unfenced content, read as before.
 A typed input's block is authored text (TOOL-dBoundRoles-46): in a `### input:<name>` block whose name

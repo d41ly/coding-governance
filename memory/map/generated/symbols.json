@@ -5543,6 +5543,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "check_agent_default",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_agent_return",
       "kind": "function",
       "file": "tools/loop/placement.py"
@@ -16166,6 +16171,11 @@
       "id": "extract_text",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extract_unfenced_marker",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "extract_unit",
@@ -33451,6 +33461,11 @@
       "id": "resolve_step_argv",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "resolve_subagent_dir",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "resolve_table",

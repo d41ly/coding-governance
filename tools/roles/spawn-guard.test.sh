@@ -634,6 +634,11 @@ printf '## route\n- build: bx\n- unit: T-1 · spec memory/builds/bx/spec/x.md\n'
 printf '## route\n- build: bx\n- unit: T-2 · spec memory/builds/bx/spec/x.md\n' > "$HOREPO/cards/ho-c2.md"
 HO_CWD=""
 HO_PROJECT=""
+# TOOL-dBoundRoles-50 S16: spec 13 of the tree this suite runs in, the one `write_handoff` hands whole as its
+# `s13` variant; its build is spelled from parts, and the memory root is the tree's own conf's.
+_b50=dBound; _b50=${_b50}Roles
+SG50_MR=$(sed -n 's/^MEMORY_ROOT=//p' "$ROOTDIR/.memory-tree.conf" 2>/dev/null | tr -d '\r' | head -n 1)
+SG50_S13=$(ls "$ROOTDIR/${SG50_MR:-memory}/builds/$_b50/spec/"*"-spec-TOOL-$_b50-13.md" 2>/dev/null | head -n 1)
 write_roles() { # the index body, or `none` to remove it
   if [ "$1" = none ]; then rm -f "$HOREPO/.claude/roles.json"; else printf '%s' "$1" > "$HOREPO/.claude/roles.json"; fi
 }
@@ -752,6 +757,26 @@ for k, name in enumerate(("fflip", "fwrap", "fwrapx")):
                                                                rel if name == "fwrap" else pre + "other.md"))
     flips[name] = (render_marker(rel, sec), sec)
     write_prompt_file(rel, *flips[name])
+# TOOL-dBoundRoles-50 S16 - spec 13 of the tree this suite runs in, handed whole as the render hands a spec: its
+# bytes, CRLF folded, copied into the checkout and keyed by their blob, inside a fence one backtick longer than
+# the longest run they hold and at least three, the rule of render_handed_fence. The spec quotes a three-backtick
+# fence holding a fact line, so its fence is four long. The variant is written only where argv names the spec.
+s13 = {}
+if len(sys.argv) > 3 and sys.argv[3] and os.path.isfile(sys.argv[3]):
+    import re
+    with open(sys.argv[3], "rb") as f:
+        sraw = f.read().replace(b"\r\n", b"\n")
+    sspec = "memory/builds/bx/spec/s13.md"
+    with open(os.path.join(root, sspec), "wb") as f:
+        f.write(sraw)
+    stext = sraw.decode("utf-8")
+    sbar = bar(max([3] + [len(run) + 1 for run in re.findall(bar(1) + "+", stext)]))
+    stask = task + "\n### input:spec\n\n<!-- gov:fact key=record:%s@%s class=claimed -->\n\n%s\n%s%s%s\n" % (
+        sspec, hashlib.sha1(b"blob %d\0" % len(sraw) + sraw).hexdigest()[:12], sbar, stext,
+        "" if stext.endswith("\n") else "\n", sbar)
+    srel = pre + "2026-11-23-prompt-T-1-40-researcher.md"
+    s13["s13"] = render_marker(srel, stask) + "\n\n" + stask
+    write_prompt_file(srel, render_marker(srel, stask), stask)
 prompts = {
     "ok": M + "\n\n" + task,
     "crlf": ("\n\n" + M + "\n\n" + task + "\n\n").replace("\n", "\r\n"),
@@ -777,10 +802,11 @@ prompts = {
 
 prompts.update({name: typed[name] + "\n\n" + sec for name, sec in tvars.items()})
 prompts.update({name: mark + "\n\n" + sec for name, (mark, sec) in flips.items()})
+prompts.update(s13)
 for k, v in prompts.items():
     with open(out + "." + k, "w", newline="") as f:
         f.write(v)
-' "$HOREPO" "$TMP/ho"
+' "$HOREPO" "$TMP/ho" "${SG50_S13:-}"
 }
 run_spawn() { # name expected_exit subagent_type(- for none) prompt-variant needle(empty for an allow) [session prompt tool_use_id]
   # HO_CWD moves the payload cwd off $HOJ/sub; HO_PROJECT, when set, is the hook's CLAUDE_PROJECT_DIR.
@@ -909,6 +935,16 @@ run_spawn "rule6 BR13 AC3: ...and the handoff re-rendered after the move admitte
 run_spawn "rule6 BR38 AC3: a handoff whose fenced content quotes a marker and a fact line is admitted" 0 gov-researcher fenced ""
 run_spawn "rule6 BR38 AC3: the quoted marker hand-moved outside the fence refused, naming 2 marker lines" 2 gov-researcher moved "carries 2 gov:handoff marker lines"
 run_spawn "rule6 BR38 AC4: a task section ending inside a fence refused, naming the line it opened at" 2 gov-researcher open "ends inside a fence opened at line 23 of the file"
+# ---- TOOL-dBoundRoles-50 AC16 (S16): spec 13 handed whole, through the length rule -------------------------
+# The `s13` handoff hands this tree's spec 13, which quotes a three-backtick fence holding a fact line, inside
+# the four-backtick fence the render writes for it, and is admitted: no line inside is read. Against a
+# readUnfencedLines that closes a fence on any run of three, the quoted fact line is re-cut and the spawn
+# refused. A tree holding no spec 13 reds the row, since the variant is then never written.
+if [ -n "$SG50_S13" ] && [ -f "$TMP/ho.s13" ]; then
+  run_spawn "rule6 BR50 AC16: a handoff handing spec 13 whole inside its four-backtick fence is admitted" 0 gov-researcher s13 ""
+else
+  echo "FAIL rule6 BR50 AC16: no spec 13 under ${SG50_MR:-memory}/builds of $ROOTDIR, so the s13 handoff was not written"; fail=$((fail+1))
+fi
 # TOOL-dBoundRoles-46 AC1 AC2 - a typed block is authored text at the spawn. The `t*` handoffs carry the question
 # block under its fact line, its value fenced: a plain value is admitted; a forged fact line, a whole marker line
 # or a `Framed by:` line inside it is refused naming input:question and the line of the file, fenced or not; a
