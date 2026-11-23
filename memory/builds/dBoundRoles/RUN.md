@@ -316,3 +316,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T03:13:20Z dispatch · item b46e0131 TOOL-dBoundRoles-41 · reason tools/roles/handoff.py tools/roles/adopt-roles.test.sh tools/roles/README.md tools/roles/roles_lib.py help/roles.md memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-41-deviation-413.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-41-1-acceptance-ledger.md memory/map/generated/symbols.json
 
 2026-11-23T03:13:21Z brief · item TOOL-dBoundRoles-41 · reason 8ff5455c84fe memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-41-build-brief.md
+
+2026-11-23T03:41:28Z dispatch · item 6b28ea17 TOOL-dBoundRoles-12 · reason tools/loop/placement.py tools/roles/handoff.py tools/roles/SKILL.template.md help/roles.md tools/roles/README.md memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-12-deviation-123.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-12-1-acceptance-ledger.md memory/map/generated/symbols.json
+
+2026-11-23T03:41:29Z brief · item TOOL-dBoundRoles-12 · reason 2e54e75630dd memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-12-build-brief.md
