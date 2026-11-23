@@ -1,6 +1,6 @@
 # KICK-dKeptSession-44 — the round-1 spec audit's 42 minor findings, closed after every unit they land on is built
 
-**Status:** INPROGRESS · rev-7 · 2026-11-23 · node a · Tier-2 · base 6a7a6a05 · streams kickoff · order 30 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-8 · 2026-11-23 · node a · Tier-2 · base 6a7a6a05 · streams kickoff · order 30 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -22,6 +22,8 @@
 | [2026-11-22-prompt-KICK-dKeptSession-44-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-44-reground-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-44-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-44-1-spec-writer.md) | journal | — |
 | [2026-11-23-prompt-KICK-dKeptSession-44-2-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-44-2-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-44-3-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-44-3-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-44-divergence-2-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-44-divergence-2-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-44-divergence-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-44-divergence-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 |
 
@@ -31,55 +33,53 @@
 
 The round-1 spec audit of this build's spec set
 (`memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md`)
-confirmed 33 findings at MEDIUM and 9 at LOW. BUILD-METHOD M4 promotes them into one batch, and this
-is it. Each finding is its own §2 item, S1 to S42, named by report id beside its report item.
+confirmed 33 findings at MEDIUM and 9 at LOW, which BUILD-METHOD M4 promotes into this one batch,
+each its own §2 item, S1 to S42, named by report id beside its report item.
 
-Ids 7 and 34 are the defect of id 45 at HIGH, item H8, which `KICK-dKeptSession-41` fixes; their
-items here observe that fix. The minors land on many units, so this unit is one write set and takes
-the order past every unit of the build (order 30): each item amends code its unit has built, and the
-three close-time records, the refusal census, the kickoff re-stamp and the map, are written once,
-after the last driver, watched file and symbol has moved. Where an item supersedes a sibling spec's
-text or answers a sibling's criterion, it does so by name here, and this unit's own acceptance
-ledger, `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-44-1-acceptance-ledger.md`,
-quotes that text and answers it (F3); no sibling's spec or ledger is written.
+Ids 7 and 34 are the defect of id 45 at HIGH, item H8, which `KICK-dKeptSession-41` fixes and their
+items observe. The minors land on many units, so this is one write set ordered past every unit
+(order 30): each item amends built code, and the three close-time records, the refusal census, the
+kickoff re-stamp and the map, are written once, after the last driver, watched file and symbol
+moved. An item superseding a sibling's text or answering its criterion names it here, and this
+unit's own acceptance ledger,
+`memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-44-1-acceptance-ledger.md`,
+quotes and answers it (F3); no sibling's spec or ledger is written.
 
 ## 2. Scope (IN)
 
 - **S1** — id 3, M1. Met by `KICK-dKeptSession-1`: `arm_presets`' row-named half
   (`tools/policy/check_policy.py#check_preset_loads`) prints `presets-core-only · not graded ·
   TOOL-dDeclaredLoop-2 S8 admits after-release-verifies` and counts no finding; unit 1's ledger
-  answers its AC6 and AC9, and this unit observes the line. Observed by AC1.
-- **S2** — id 5, M2. Withdrawn: TOOL-dPlacedRequest-1 landed the renewal, retiring its premise,
-  and `KICK-dKeptSession-25` keeps AC4 on its own arm's covers list, as its hands-off edge states;
-  nothing is struck or answered here. Observed by AC2.
+  answers its AC6 and AC9. Observed by AC1.
+- **S2** — id 5, M2. Withdrawn: TOOL-dPlacedRequest-1 landed the renewal, retiring its premise, and
+  `KICK-dKeptSession-25` keeps AC4 on its own arm's covers list. Observed by AC2.
 - **S3** — id 6, M3. Met by `KICK-dKeptSession-21` S2, which parses `--local` once on `--mail read`,
   and by unit 10's landed `tools/loop/loop_transition.py#read_mail_rows`, which appends it. Unit 10
   AC2's stub is superseded by AC3's real-driver read. Observed by AC3.
-- **S4** — id 7, M4. Met by `KICK-dKeptSession-41` S4, whose ledger answers units 8, 11 and 17's
-  ACs 8, 6 and 7 by the summaries its S1 writes; this unit observes them and answers none again.
-  Observed by AC4.
+- **S4** — id 7, M4. Met by `KICK-dKeptSession-41` S4, whose ledger answers units 8, 11 and 17's ACs
+  8, 6 and 7 by the summaries its S1 writes; this unit only observes them. Observed by AC4.
 - **S5** — id 34, M4. The same defect by the reuse lens: this unit's ledger cites, for each of units
   8, 11 and 17, the standing row by its `name` line in `tools/policy/catalogue.toml` and its drain
   from `unsummarised-keys.txt`. Observed by AC4.
-- **S6** — id 8, M5. One platform fact, one owner. `tools/unattended/mail-notice.js`'s header states
-  that PreToolUse carries `additionalContext` (`KICK-dKeptSession-13` S7 owns that channel) and that
-  this PostToolUse registration exists only to cover the tools scratch-guard's matcher does not route.
-  Unit 21 §8 F1 already names that channel, so none of its text is superseded. Observed by AC5.
+- **S6** — id 8, M5. `tools/unattended/mail-notice.js`'s header states that PreToolUse carries
+  `additionalContext` (`KICK-dKeptSession-13` S7 owns that channel) and that this PostToolUse
+  registration exists only to cover the tools scratch-guard's matcher does not route. Unit 21 §8 F1
+  already names that channel. Observed by AC5.
 - **S7** — id 37, M5. The fact re-probed at the build: `grep -a -c 'hookName:\`PreToolUse:'` over the
   `claude` on PATH and the `cli-version` `memory/builds/dKeptSession/RUN.md` pins, each count recorded
   with its version in this unit's ledger; read 2026-11-23, 2.1.319 counts 5 and the pin is 2.1.326
   (PINNED). Observed by AC5.
 - **S8** — id 9, M6. Met by `KICK-dKeptSession-13`: `--card --boundary` moves the card's `at` to
-  HEAD before any step, and `checkItemBoundary` starts it detached without waiting, none at an
-  unchanged HEAD. Observed by AC6.
+  HEAD first, and `checkItemBoundary` starts it detached. Observed by AC6.
 - **S9** — id 10, M7. `mail-notice.js` binds its build with no spawn, as
   `tools/hooks/scratch-guard.js#checkItemBoundary` does: the tree's card at `CARD_FILE_REL` whose
   `card-owner —` line names the session, its build `extractRouteUnits(text).build`, else unit 21's
-  `resolveLease`. The function and constant are carried inline, never required: a kit imports no
-  sibling kit (TOOL-dGroundRules-1 §4), and `tools/unattended/kit.toml`'s `requires` names no hooks
-  kit. `#readCard` is not carried, since its `resolveCardBash` spawns each bash candidate and the
-  engine, which AC16 and unit 21 AC5 refuse; `KICK-dKeptSession-56` S23 names it wrongly. Unit 21
-  S9's hook sentence in `help/loop.md` and the `--mail` entry gain the card binding. Observed by AC7.
+  `resolveLease`. The function and constant are carried inline, never required, since a kit imports
+  no sibling kit (TOOL-dGroundRules-1 §4) and `tools/unattended/kit.toml`'s `requires` names no
+  hooks kit. `#readCard` is not carried, since its `resolveCardBash` spawns each bash candidate and
+  the engine, which AC16 and unit 21 AC5 refuse; `KICK-dKeptSession-56` S23 names it wrongly. Unit
+  21 S9's hook sentence in `help/loop.md` and the `--mail` entry gain the card binding. Observed by
+  AC7.
 - **S10** — id 11, M8. Met by `KICK-dKeptSession-13` S6 and `KICK-dKeptSession-8` §8 F3 (b): unit
   8's arm reads the tree's card at `CARD_FILE_REL`, which
   `skills/session-kickoff/manifest-check.sh#write_pointers` re-renders by `write_card_file` at every
@@ -90,14 +90,16 @@ quotes that text and answers it (F3); no sibling's spec or ledger is written.
   `budgets.enforce = "refuse"`, and `orient-pinned`, `orient-calls` in `budgets.pinned`, each under
   its AC5 case's `orient.budget = "owner-ceiling"` and `"orient-calls" = 30`, with a row past 30.
   Observed by AC9.
-- **S12** — id 19, M10. Met by `KICK-dKeptSession-2`, which rewrote the preset step's reason; AC10's
-  class grep finds no "not applied" text in the policy kit or under `help/`. Observed by AC10.
-- **S13** — id 20, M11. `adopt-policy.sh --scaffold`'s write branch, where no policy file exists,
-  runs `policy.py scaffold --preset <name>` with its stderr sent to `/dev/null` and turns any failure
-  into `the scaffold could not be written` and exit 1; read 2026-11-23, `--preset lax` prints that
-  line and exits 1, the scaffold alone exiting 2. It passes the scaffold's exit 2 and stderr through
-  as the kept-file branch's `exit "$RC"` does (`KICK-dKeptSession-4` S3), a form `check-arms.py
-  --report` counts no site for, keeping exit 1 for a write failure. Observed by AC11.
+- **S12** — id 19, M10. Met by `KICK-dKeptSession-2`, which rewrote the preset step's reason.
+  Observed by AC10.
+- **S13** — id 20, M11. `adopt-policy.sh --scaffold`'s no-file branch turns any failure of
+  `policy.py scaffold --preset <name>`, its stderr sent to `/dev/null`, into
+  `the scaffold could not be written` and exit 1 (read 2026-11-23). It passes the scaffold's exit 2
+  and stderr through as the kept-file branch's `exit "$RC"` does (`KICK-dKeptSession-4` S3), a form
+  `check-arms.py --report` counts no site for, keeping exit 1 for a write failure. The same commit
+  re-arms block 4b's `--preset lax` line of `tools/policy/adopt-policy.test.sh` in place: exit 2,
+  `policy: scaffold refused · preset · `. The block's no-policy-file check stays, and block 2's
+  no-mv arm keeps the `exit 1` site armed. Observed by AC11.
 - **S14** — id 21, M12. Met by `KICK-dKeptSession-9`: `tools/policy/caps.toml`'s `orient-calls` row
   carries `research = 0`, `kit` and `installed`, and `tools/policy/check_policy.py#CAP_CASES` its
   plant. Observed by AC12.
@@ -117,8 +119,8 @@ quotes that text and answers it (F3); no sibling's spec or ledger is written.
 - **S19** — id 33, M16. The build files one ask in `memory/builds/dDeclaredLoop/BACKLOG.md`, target
   TOOL-dDeclaredLoop-7 S4, widening unit 10 §8 F3's `TOOL-dDeclaredLoop-103`: `derive_interrupts`'
   default prints no mail line once `position.py --mail-interrupts` is the one mail reader. Unit 10
-  AC1's "the same plant's plain engine call prints" is answered against it in this unit's ledger.
-  Observed by AC17 and AC38.
+  AC1's "the same plant's plain engine call prints" is answered in this unit's ledger. Observed by
+  AC17 and AC38.
 - **S20** — id 35, M17. `tools/loop/loop_transition.py#read_dependents` reads the parent README's
   rendered `<!-- gen:build-edges -->` region by `tools/memory-tree/gen_build_index.py#GEN_REGIONS`'s
   markers, its slugs the link texts of the "Child builds" line `render_edges` writes, which inverts
@@ -141,10 +143,10 @@ quotes that text and answers it (F3); no sibling's spec or ledger is written.
 - **S22** — id 40, M19. The `records —` line `KICK-dKeptSession-13` S5 prints names only the base
   kinds: its one source, `tools/memory-tree/gen_build_index.py#cmd_latest_records`, keeps
   `RECORD_KIND_TOKENS` less `TYPED_RECORD_KINDS` (`tools/memory-tree/tree_lib.py`), so typed kinds
-  never lengthen it; today it prints `red-fix` and `widen` rows. Its docstring, the module's usage
-  line, the section comment above `run_item_boundary` and `help/orientation-card.md`'s `records —`
-  bullet read "each base kind". Unit 13's `pointers-cap` plant gains one record of every typed kind.
-  Observed by AC20.
+  never lengthen it; today it prints `deviation`, `red-fix` and `widen` rows. Its docstring, the
+  module's usage line, the section comment above `run_item_boundary` and
+  `help/orientation-card.md`'s `records —` bullet read "each base kind". Unit 13's `pointers-cap`
+  plant gains one record of every typed kind. Observed by AC20.
 - **S23** — id 48, M20. The driver's refusal census, read once after every driver unit by `python
   tools/memory-tree/check-arms.py --report`, 347/347 at this base (PINNED 2026-11-23). A census past
   its `REFUSAL_CEILINGS` row stops the builder, since `fail 49` in
@@ -156,10 +158,11 @@ quotes that text and answers it (F3); no sibling's spec or ledger is written.
   `last-audit` is re-stamped after this unit's last edit to a `watch:` path, with its delta line, as
   TOOL-dGroundRules-86 did; `KICK-dKeptSession-56` and later units re-stamp for their own edits.
   Observed by AC22.
-- **S25** — id 50, M22. The claim is met by `KICK-dKeptSession-21` S5, adding `PostToolUse
-  tools/unattended/mail-notice.js` to the `harness-hooks` list of `memory/map/features/unattended.md`.
-  This unit regenerates the map once, by `map_lib.regen_cmd()`'s `python
-  tools/codebase-map/gen_map.py --write`, moving `memory/map/generated/symbols.json`. Observed by AC23.
+- **S25** — id 50, M22. Met by `KICK-dKeptSession-21` S5, adding
+  `PostToolUse tools/unattended/mail-notice.js` to the `harness-hooks` list of
+  `memory/map/features/unattended.md`. This unit regenerates the map once, by
+  `map_lib.regen_cmd()`'s `python tools/codebase-map/gen_map.py --write`, rewriting the four renders
+  §4 names, as unit 21's did (`e356c0e35`). Observed by AC23.
 - **S26** — id 51, M23. Met by `KICK-dKeptSession-12` S1 and §8 F4: `tools/govkit/registry.toml`
   exempts `card-compaction.fixture.sh`, unshipped by PLAY-dOrderedCharter-77 S7, and an adopter's
   engine reads its absence as `red: no fixture installed`
@@ -176,8 +179,8 @@ quotes that text and answers it (F3); no sibling's spec or ledger is written.
   `help/loop.md`'s `--mail post` paragraph state the refusal; no usage row, so no anchor, moves.
   Observed by AC25.
 - **S29** — id 59, M26. Met by `KICK-dKeptSession-5` S9: a non-zero read with no row raises
-  `ValueError`, which `record` prints after `loop: unanswered`, exit 2. This unit observes it with one
-  plant, `mail-read-crash`, whose planted reader exits 3 with no output. Observed by AC26.
+  `ValueError`, which `record` prints after `loop: unanswered`, exit 2. This unit observes it with
+  one plant, `mail-read-crash`. Observed by AC26.
 - **S30** — id 60, M27. Met by `KICK-dKeptSession-5`: `tools/unattended/unattended.sh#write_mail_post`
   returns 2 naming a failed or timed-out fetch before any commit; no arm reads it, so AC27's is
   added. Observed by AC27.
@@ -197,8 +200,7 @@ quotes that text and answers it (F3); no sibling's spec or ledger is written.
   progress not emitted: <why>` in place of unit 11 S5's lines and never moves the verb's exit or
   lines. Observed by AC30.
 - **S34** — id 12, L1. Met by `KICK-dKeptSession-18`: its AC5 observes the route by path on
-  `help/loop.md`, and its AC3 prints the filed ask, `TOOL-dIndexedDesign-19`. This unit observes the
-  page. Observed by AC31.
+  `help/loop.md`, and its AC3 prints the filed ask, `TOOL-dIndexedDesign-19`. Observed by AC31.
 - **S35** — id 13, L2. Unit 14 AC7 is withdrawn; its S6 cites `KICK-dKeptSession-13` AC5, which
   observes the `agent_type` skip. NOT OBSERVED here: the criterion moves to the unit owning the
   check, and this unit's ledger answers it by quoting unit 14 §8 F4's "AC7 withdrawn and S6 citing
@@ -223,20 +225,22 @@ quotes that text and answers it (F3); no sibling's spec or ledger is written.
   `tools/policy/presets.py#check_pairs`, runs in `check_presets` and in the `pairs` verb
   (`tools/policy/presets.py#run_pairs`) that `tools/loop/scenario.py` runs as a subprocess;
   `check_repo_presets` judges no pair (unit 1 §8 F10). Observed by AC36.
-- **S42** — id 53, L8. No `subject-pins.tsv` regen is written: units 6, 7, 21, 24 and 25's Files
-  touched lines naming it are superseded, as spec 5 rev-1 already says. Observed by AC37.
+- **S42** — id 53, L8. No `subject-pins.tsv` regen is written: `tools/govkit/govkit.py#selfcheck`
+  pins the manifest, `tools/gate-legs.json`, rendered from the kits' `[[gate_leg]]` descriptors, and
+  no leg moves here or in units 6, 7, 21, 24 and 25, so their Files touched lines naming it are
+  superseded, as spec 5 rev-1 says. Observed by AC37.
 
 ## 3. Non-goals (OUT)
 
 - The fixes of ids 45, 1, 2, 4, 16, 17, 22, 26, 32, 47, 54, 55, 57 and 58: units 30 to 43.
 - The report's left-shift checklist entries and lints: no clause of this build names the bug-class
   checklist; where an item's criterion is the class arm, it says so.
-- S23, S24 and S25 take no edge: they are close-time renders over whatever the earlier units left,
-  sequenced by order 30, and nothing in them breaks if an earlier unit wrote less.
+- S23, S24 and S25 take no edge: close-time renders over whatever earlier units left, ordered by §1,
+  none breaking if an earlier unit wrote less.
 
 ### Edges
 
-- **consumes-from** `KICK-dKeptSession-1` — `check_repo_presets`, which S32 amends, and `arm_presets`, the presets comment and `check_pairs`, which S1, S38 and S41 observe
+- **consumes-from** `KICK-dKeptSession-1` — `check_repo_presets`, `arm_presets`, the presets comment and `check_pairs`, S1, S32, S38 and S41
 - **consumes-from** `KICK-dKeptSession-2` — the rewritten reason text, which S12 observes
 - **consumes-from** `KICK-dKeptSession-4` — `adopt-policy.sh --scaffold`'s refusal path, S13
 - **consumes-from** `KICK-dKeptSession-5` — `--mail post`, its fetch refusal and the transition guard, S28 to S30
@@ -262,12 +266,13 @@ quotes that text and answers it (F3); no sibling's spec or ledger is written.
 
 ### Evidence
 
-Each item's evidence is the audit's appendix row for its id, re-read on 2026-10-26 and re-checked
-at `ff2654fc` on 2026-11-23, units 7, 8, 11, 13, 18, 21, 25 and 41 read as landed; S20, S23, S31,
-S32, AC29, AC30 and §7's floors were re-read at `6a7a6a05` the same day. `SESSION-KICKOFF.md`'s `watch:`
-line names `manifest-check.sh` and `.memory-tree.conf`; `tools/unattended/kit.toml`'s `requires`
-names five kits (PINNED 2026-11-23), not `playbook-render`; `REMOTE_BOUND`, 60 seconds, is too long
-for a lander's note.
+Each item's evidence is the audit's appendix row for its id, re-read on 2026-10-26 and re-checked at
+`ff2654fc` on 2026-11-23, units 7, 8, 11, 13, 18, 21, 25 and 41 read as landed; S20, S23, S31, S32,
+AC29, AC30 and §7's floors were re-read at `6a7a6a05` the same day, and S13, S22, S25 and AC37 at
+`4423f5ff`, no product path moved since. `SESSION-KICKOFF.md`'s `watch:` line names
+`manifest-check.sh` and `.memory-tree.conf`; `tools/unattended/kit.toml`'s `requires` names five
+kits (PINNED 2026-11-23), not `playbook-render`; `REMOTE_BOUND`, 60 seconds, is too long for a
+lander's note.
 
 The ceiling holds: S28 refuses through `_rl_rc=2`, S33's bound returns through `run_loop_verb`'s
 code, and no item adds a `fail`, `exit 1` or `status=1` site.
@@ -283,29 +288,28 @@ code, and no item adds a `fail`, `exit 1` or `status=1` site.
 
 ### Migration
 
-The re-stamp S24 writes is an additive record, as is the decision row the main loop writes where
-S23's census stops the builder. No stored state changes shape.
+S24's re-stamp and S23's decision row are additive records; no stored state changes shape.
 
 ### Files touched (estimate)
 
-- `tools/policy/check_policy.py`, `tools/policy/adopt-policy.sh`, `tools/policy/presets.py`,
-  `help/policy.md`: S13, S32 and the `presets-repo` case
-- `tools/loop/loop_transition.py`, `tools/loop/README.md`: S20's `read_dependents` re-pointed with
-  its verb's help and the two notices paragraphs, `write_transition_plant`'s notices plants gaining
-  the parent's region, and S29's `mail-read-crash` plant, a branch of `run_transition_fixture`
+- `tools/policy/check_policy.py`, `tools/policy/adopt-policy.sh`, `tools/policy/adopt-policy.test.sh`,
+  `tools/policy/presets.py`, `help/policy.md`: S13 with its block 4b, S32 and the `presets-repo` case
+- `tools/loop/loop_transition.py`, `tools/loop/README.md`: S20, and S29's `mail-read-crash` plant, a
+  branch of `run_transition_fixture`
 - `tools/run-gates/selftest-budgets.txt`: the `loop transition record` row's one `plants=` token
   raised in place to `len(PLANTS)` (DERIVED), its note re-read; `runlog selftest` and `unattended
   driver selftest shard 8/8` re-priced by their arms' direct readings
 - `tools/unattended/unattended.sh`, `tools/unattended/unattended.test.sh`,
   `tools/unattended/mail-notice.js`, `tools/unattended/kit.toml`,
   `tools/unattended/VERBS.template.md`, `memory/guides/UNATTENDED-VERBS.md`, `help/loop.md`: S6, S9,
-  S20's comment, limit and `write_landed_dependent`, S27, S28, S33
+  S20, S27, S28, S33
 - `tools/memory-tree/gen_build_index.py`, `skills/session-kickoff/manifest-check.sh`,
   `skills/session-kickoff/card-store.fixture.sh`, `help/orientation-card.md`: S10, S22
 - `tools/runlog/runlog.py`, `tools/runlog/extract.py`, `tools/runlog/selftest.py`: S11, S40
 - `memory/guides/SESSION-KICKOFF.md`: S24
-- `memory/map/features/unattended.md`, `memory/map/generated/symbols.json` and the rest of
-  `memory/map/generated/`: S25's render
+- `memory/map/features/unattended.md`, `memory/map/generated/symbols.json`,
+  `memory/map/generated/MAP.md`, `memory/map/generated/CARDS.md`,
+  `memory/map/generated/inventories.json`: S25's render
 - `memory/builds/dDeclaredLoop/BACKLOG.md`: S19's ask row
 - `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-44-1-acceptance-ledger.md`:
   every answer §1 and the items name, beside the criteria observed
@@ -317,8 +321,7 @@ Texts that stay true: `help/loop.md`'s `--mail post` refusing any other kind, an
 
 - **Two batches.** S10 and S28 each cross kits, and S23 to S25 read every other item's output, so no
   two write sets are disjoint by M6's clauses.
-- **Placing the batch beside each unit it lands on.** A batch is one unit with one order; past the
-  last unit is the one place every item's code exists.
+- **Placing the batch beside each unit it lands on.** A batch has one order, set in §1.
 
 ## 5. Production-readiness checklist
 
@@ -328,8 +331,7 @@ Texts that stay true: `help/loop.md`'s `--mail post` refusing any other kind, an
 - error / empty / loading states — S29, S30 and S33 name every non-zero exit they meet.
 - observability — S1's line names what the arm does not grade; S33's `NOTE` names a progress line not
   emitted.
-- risks — S23 may need a raise, which stops the builder; the main loop's decision row records the
-  review that admits it.
+- risks — S23 may need a raise, which stops the builder for the main loop's review.
 - testing — the criteria of §6 and the arms of §7.
 - migration — §4.
 - user docs — `help/policy.md`, `help/orientation-card.md` and `help/loop.md`, by S9, S20, S22, S28
@@ -449,8 +451,9 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
   `python scenario.py --fixture --plant slot-refused` in the loop kit prints its `held` line, its
   `pair` row a slot's broken pair refused by `presets.py pairs` naming the pair. Red when: a second
   evaluation of the rule exists.
-- **AC37** — When `git log --format=%h 462d20f3..HEAD -- tools/govkit/subject-pins.tsv` runs, each
-  commit it prints also touches `tools/gate-legs.json`. Red when: a no-op regen is committed.
+- **AC37** — When `git log --format=%h 462d20f3..HEAD -- tools/govkit/subject-pins.tsv` runs,
+  `git show --name-only --format= <h> -- tools/gate-legs.json 'tools/*kit.toml'` prints a path for
+  each commit it prints. Red when: a no-op regen is committed, moving no manifest or descriptor.
 - **AC38** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c` prints `1`
   for each of "the same plant's plain engine call prints" and "AC7 withdrawn and S6 citing
   KICK-dKeptSession-13 AC5", the two sibling passages this unit still answers; and `git diff
@@ -465,6 +468,7 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
 New arm: tools/unattended/unattended.test.sh · covers AC25 AC27 AC30 · a third build's ack and a sleeping progress verb against the base, an unreachable origin by a scratch copy reading a failed fetch as 0 · `FLOOR_ASSERTIONS` 4180 and `FLOOR_SHARD_8` 1397 (DERIVED: the last `FLOOR_ASSERTIONS=` and `FLOOR_SHARD_8=` assignments in the suite at `6a7a6a05`, re-read at the build) rise by the arms' count
 New arm: tools/loop/loop_transition.py · covers AC18 AC26 · the `mail-read-crash` plant, staged by a scratch guard reading a crashed read as zero rows, and the notices plants, staged by a scratch `write_transition_plant` writing the dependents' `parents:` without the parent's region · the `plants=<n>` token rises by one
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC8 AC20 · the two `pointers-` plants' new rows, staged by scratch copies skipping `write_card_file` or keeping typed kinds · none, one ok row per plant
+New arm: tools/policy/adopt-policy.test.sh · covers AC11 · block 4b's lax line, staged against the base adopter's generic line, run by `policy fixtures`' `adopter-suite` case · none
 New arm: tools/policy/check_policy.py · covers AC29 · a `[presets.strict]` scenario in `presets-repo` asserting exit 2 and the `policy: refused` stderr line naming `strict`, against the base · none
 New arm: tools/runlog/selftest.py · covers AC9 · the two orient cases, staged by a copy reading `budgets.enforce` as `warn` · `ASSERTION_FLOOR` 1630 (DERIVED: its last assignment) rises by the counted checks
 
@@ -492,11 +496,10 @@ New arm: tools/runlog/selftest.py · covers AC9 · the two orient cases, staged 
   installing an engine whose read file is absent. Options: (a) a `[[files]]` row in
   `kickoff-manifest.kit.toml`, removing the registry's `[[exempt]]` row; (b) no row: the exemption
   stands and the engine's landed verdict names the absence. (a) reverses PLAY-dOrderedCharter-77 S7, a
-  decision of another build, and ships a fixture that spends minutes of model time on a target with
-  no build card to prove; (b) leaves no silent read, since `read_card_fixture_verdict` answers `red: no
+  decision of another build, and ships a fixture spending model minutes on a target with no build
+  card; (b) leaves no silent read, since `read_card_fixture_verdict` answers `red: no
   fixture installed` (`KICK-dKeptSession-12` S1). Recommendation (b). RESOLVED (agent, 2026-11-21,
-  delegated): (b), rung 3; the absence is already read and named, and the exemption is another
-  build's recorded decision. widens: none · relaxes: none
+  delegated): (b), rung 3. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -516,24 +519,27 @@ New arm: tools/runlog/selftest.py · covers AC9 · the two orient cases, staged 
   under `2026-11-22-prompt-KICK-dKeptSession-44-reground-brief`: items met by units 5, 7, 9, 10, 14
   and 21 reduced; S9, S10, S22, S28 and S33 re-seamed.
 - rev-7 · 2026-11-23 · S20 · S23 · S31 · S32 · §1 · §4 · §5 · AC18 · AC29 · AC30 · §7 · §9 · §10 ·
-  base `6a7a6a05`, under `2026-11-23-prompt-KICK-dKeptSession-44-divergence-brief`: AC29 exit 2; S20
-  re-points the landed `read_dependents`; S31 met; floors and AC30's bound derived; S23's decision
-  row left to the main loop; §1's id list and rev-4 to rev-6 condensed for the live-spec size cap.
+  base `6a7a6a05`, under `2026-11-23-prompt-KICK-dKeptSession-44-divergence-brief`: AC29 exit 2, S20
+  re-pointed, S31 met, figures derived, S23's row left to the main loop, size condensed.
+- rev-8 · 2026-11-23 · S1 · S2 · S4 · S6 · S8 · S9 · S12 · S13 · S19 · S22 · S25 · S29 · S34 · S42 ·
+  §1 · §3 · §4 · §5 · AC37 · §7 · §8 F4 · §9 · §10 · under
+  `2026-11-23-prompt-KICK-dKeptSession-44-divergence-2-brief`: block 4b re-armed, AC37 admits a
+  descriptor, the map renders named, S22's `deviation` rows, repeats condensed.
 
 ## 10. Reuse audit
 
-Every item extends the seam its repaired unit names, and the cross-cutting ones extend existing
-mechanisms: `fail` and the retirement review for S23 (`tools/memory-tree/README.md` "The ceiling"),
-the re-stamp of TOOL-dGroundRules-86 for S24, `map_lib.regen_cmd()` for S25
+Each item extends its repaired unit's seam; the cross-cutting ones extend: the kept-file branch's
+`exit "$RC"` for S13, `fail` and the retirement review for S23 (`tools/memory-tree/README.md` "The
+ceiling"), the re-stamp of TOOL-dGroundRules-86 for S24, `map_lib.regen_cmd()` for S25
 (`tools/codebase-map/map_lib.py#regen_cmd`), `checkItemBoundary`'s card read and `extractRouteUnits`
 for S9, carried inline as `tools/unattended/gate-guard.js#buildHeredocView` carries its copy of a
 `scratch-guard.js` function, `run_loop_verb` and `run_bounded` for S33, `_derive_quartiles` for S40,
-and the index generator's inversion of `parents:` for S20, read through its own `GEN_REGIONS`
-markers and held to `render_edges` by fixtures rendering through it. `python
-tools/codebase-map/reuse_lookup.py "resolve the bash that shares this filesystem by running each
-candidate"` ranked the `resolve_bash` copies, which S16 and S17 observe in `loop_witness.py`. At rev-6
-`reuse_lookup.py` over S9's and S33's seams ranked only name-token seams, so both were read in code.
-No item mints a mechanism where one of these fits.
+and the index generator's `parents:` inversion for S20, read by its `GEN_REGIONS` markers and held
+to `render_edges` by fixtures rendering through it. `python tools/codebase-map/reuse_lookup.py
+"resolve the bash that shares this filesystem by running each candidate"` ranked the `resolve_bash`
+copies, which S16 and S17 observe in `loop_witness.py`. At rev-6 `reuse_lookup.py` over S9's and
+S33's seams ranked only name-token seams, so both were read in code. No item mints a mechanism where
+one of these fits.
 
 Recall terms used: `python tools/memory-recall/query.py "how are a spec audit's confirmed findings
 promoted into repair units placed after the unit they repair" --terms "spec-audit promoted repair unit
