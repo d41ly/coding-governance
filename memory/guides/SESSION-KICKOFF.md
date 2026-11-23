@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-23T16:27:20+02:00 @ 808e322aa511cf74828d3185e81a7b4efcb308aa
+last-audit: 2026-11-23T16:41:04+02:00 @ 95a4a1188a65ed95efba0d40c5624b38b8e2b3c1
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: a347e56f6467ffa40c18041f19af632af93a83ff
+last-body-change: 95a4a1188a65ed95efba0d40c5624b38b8e2b3c1
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -123,6 +123,9 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 - 2026-11-22 · `GATE_ATTRIBUTE=<rev>` over `pass-legs.sh` · it attributes no red there: every red reads `DEAD PROBE`, its
   bound 0s (DERIVED: run-gates' `attributing red legs` line, the sum of the red legs' R ceilings), so a pass's red is told inherited only by running that leg at the pass base
   by hand and comparing its findings (dKeptSession) · prune when a pass leg's red reads OWN or INHERITED under it.
+- 2026-11-23 · `unattended.sh --audit` over a harnessed unit · it reads the run tree's writes, so a builder
+  committing in its pass worktree reads STALLED while it works; read that worktree's log before stopping it
+  (dKeptSession) · prune when the audit reads the pass branch.
 
 
 ### Environment traps worth front-loading
