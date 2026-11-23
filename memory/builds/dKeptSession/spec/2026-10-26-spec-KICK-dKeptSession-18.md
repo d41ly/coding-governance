@@ -1,6 +1,6 @@
 # KICK-dKeptSession-18 — the `repeat` disposition and its `none` row, joined both ways to what the claim admits
 
-**Status:** DEFERRED · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 28 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-6 · 2026-11-23 · node a · Tier-2 · base bfc0a4e4 · streams kickoff · order 28 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0156@c935df77 whole
 
@@ -21,6 +21,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-26 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-11 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-17 KICK-dKeptSession-61 |
 | [2026-11-21-prompt-KICK-dKeptSession-17-orders-27-29-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-17-orders-27-29-reground-brief.md) | research | KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-41 |
 | [2026-11-21-prompt-KICK-dKeptSession-61-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-61-precheck-brief.md) | research | KICK-dKeptSession-61 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 |
+| [2026-11-22-prompt-KICK-dKeptSession-18-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-18-reground-brief.md) | research | — |
+| [2026-11-23-prompt-KICK-dKeptSession-18-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-18-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 |
 
 <!-- /gen:spec-records -->
@@ -48,43 +50,75 @@ lands, a `repeat` routes onto a playbook by its path, and the hand-over stands f
 - **S1** — The admitted set, spelled once: met at base. `FIRST_MOVES` in `tools/loop/claim.py` maps
   `new`, `repeat` and `patch` to their first move from `none`, `(item, outcome)`, and the claim's refusal
   reads it (`disposition not in FIRST_MOVES`). This unit mints no second constant: the arm reads
-  `FIRST_MOVES`, and `tools/loop/loop_table.py` spells no disposition. Observed by AC4.
+  `FIRST_MOVES`, and its body in `tools/loop/loop_table.py` spells no disposition. Observed by AC4.
 - **S2** — The arm, `check_entry_rows(rows, members, first_moves)` in `tools/loop/loop_table.py`,
-  called from `check_transition_tables` (`tools/loop/loop_table.py#check_transition_tables`) over the
-  build rows whose `from` is `none`, the `[dispositions]` set and `FIRST_MOVES`. That function imports
-  `FIRST_MOVES` inside its body, since `claim.py` imports `loop_parents.py`, which imports this module
-  at its top. Forward, each key of `FIRST_MOVES` is a member of the set, and exactly one build row from
-  `none` fires its first move: the row's `item` and `outcome` are the move's, and its `disposition`, where
-  the row carries one, is that key. Backward, every build row from `none` fires the first move of a key
-  whose name its `disposition`, where it carries one, spells. A miss is one refusal, `entry rows ·
-  <disposition> · forward: <why>` or `entry rows · <disposition> · backward: <why>`, naming the row's
-  item, which `main` prints after `loop: refused · ` with the table's other refusals, `check` exiting
-  1. The head is this arm's own: the landed table check already refuses a `disposition` outside the
-  set ("no member of [dispositions]") and two rows on one move ("matched by two rows"), and a planted
-  break may trip those too, so a plant is read by its `entry rows · ` line alone. An import of
-  `claim.py` that fails is one `entry rows · FIRST_MOVES unread: <why>` refusal, never a pass.
-  Observed by AC1 and AC2.
+  returning `(line, refusals)`. `check_transition_tables` (`tools/loop/loop_table.py#check_transition_tables`)
+  calls it after its route join over `rows`, the `(n, row)` pairs of its graded build rows whose
+  expanded `from` holds `ENTRY` (`tools/loop/loop_table.py#ENTRY`, the word `none`), so a row it already
+  refused for a missing key is never read twice; `members`, the `[dispositions]` set `check_loop` returns;
+  and `first_moves`, `FIRST_MOVES`, which `check_transition_tables` imports inside its body, since
+  `claim.py` imports `loop_parents.py`, which imports this module at its top
+  (`tools/loop/loop_parents.py@13072a1e:65`). It appends the
+  line to its `lines` and the refusals to its `refusals`. Forward, each key of `first_moves` is a
+  member of `members`, and exactly one row fires its first move: the row's `item` and `outcome` are
+  the move's, and its `disposition`, where the row carries one, is that key. Backward, every row fires
+  the first move of a key its `disposition`, where it carries one, spells. Each key and each row draws
+  at most one refusal, the first that applies of:
+  - `entry rows · <key> · forward: no member of [dispositions]`;
+  - `entry rows · <key> · forward: no build row from none fires <item> · <outcome>`;
+  - `entry rows · <key> · forward: <k> build rows from none fire <item> · <outcome>: rows <n>, <m>`,
+    `<k>` the count and the row numbers comma-joined;
+  - `entry rows · <disposition> · backward: build row <n> (<item> · <outcome>) fires no first move
+    of FIRST_MOVES`, `<disposition>` the row's, or `-` where it carries none.
+
+  `main` prints each after `loop: refused · ` with the table's other refusals, `check` exiting 1. The
+  head is this arm's own: the landed table check already refuses a `disposition` outside the set ("no
+  member of [dispositions]") and two rows on one move ("matched by two rows"), and a planted break may
+  trip those too, so a plant is read by its `entry rows · ` line alone. Any exception the import of
+  `claim.py` raises is the one refusal `entry rows · FIRST_MOVES unread: <exception>` and no line,
+  never a pass. Observed by AC1 and AC2.
 - **S3** — The observation line: `python tools/loop/loop_table.py check` prints
-  `loop: entry rows · new → planning · patch → designing · repeat → designing`, each admitted
-  disposition with its row's `to`, sorted by name and read from the rows, never typed. Observed by AC1.
+  `loop: entry rows · new → planning · patch → designing · repeat → designing`, each key of
+  `FIRST_MOVES` with the `to` of the row firing it, sorted by key and read from the rows, never typed;
+  a key no single row fires prints `?` for its `to`. `check --selftest` gains the case `entry rows`,
+  `["check"]`, exit 0, opening with that whole line, beside its landed `check` case. Observed by AC1.
 - **S4** — The plants of `python tools/loop/loop_table.py --fixture --plant <case>`, made in memory by
-  `write_table_plant` and listed in `PLANTS` as `(description, needle)` pairs, the needle S2's
-  refusal text: `entry-row-missing` (the `repeat` row taken out), `entry-set-missing` (`repeat`
-  taken out of the set), `entry-row-extra` (a build row from `none` on `item.entry.claim` `claimed`
-  carrying `ask`, into `planning`) and `entry-row-twice` (the `repeat` row written twice). Each exits
-  1, and `check --selftest` holds each, as it holds every plant, to exit 1 and a line opening `loop:
-  refused · ` that holds its needle (`tools/loop/loop_lib.py#run_selftest_cases`). The plants are
-  branches of `write_table_plant`, so they add no module-level symbol; `check_entry_rows` is the one
-  the module gains. `loop transition tables` is a declarations leg with no row in
-  `tools/run-gates/selftest-budgets.txt`, so no `plants=<n>` token moves. Observed by AC2.
+  `write_table_plant` and listed in `PLANTS` as `(description, needle)` pairs, each needle S2's text:
+  | Plant | The break | Needle |
+  |---|---|---|
+  | `entry-row-missing` | the build row from `none` carrying `repeat` taken out | `entry rows · repeat · forward: no build row` |
+  | `entry-set-missing` | `repeat` taken out of `data["dispositions"]["set"]` | `entry rows · repeat · forward: no member` |
+  | `entry-row-extra` | a build row from `none` on `item.entry.claim` `claimed` carrying `ask`, into `planning` | `entry rows · ask · backward: ` |
+  | `entry-row-twice` | the row carrying `repeat` appended a second time | `entry rows · repeat · forward: 2 build rows` |
+
+  Each exits 1, and `check --selftest` holds each, as it builds a case for every key of `PLANTS`, to
+  exit 1 and a line opening `loop: refused · ` that holds its needle
+  (`tools/loop/loop_lib.py#run_selftest_cases`). `PLANTS` holds 19 keys at `bfc0a4e4` and 23 after
+  (DERIVED: `len(PLANTS)`). The plants are branches of `write_table_plant`; they name `repeat` and
+  `ask` as the instances they break, which the arm itself never spells (AC4). `check_entry_rows` is
+  the one symbol the module gains. `loop transition tables` is a declarations leg with no row in
+  `tools/run-gates/selftest-budgets.txt` (DERIVED: `grep -c '^loop transition tables' selftest-budgets.txt`
+  prints 0), so no `plants=<n>` token moves and no budget row is re-priced. Observed by AC2.
 - **S5** — The stand-in for the playbook record kind is the path the parents already resolve, met at
   base: a `repeat` names its playbook by a repo-relative path, held by
   `tools/loop/placement.py#check_disposition_fact` and followed by the driver's recipe mode
   (`tools/unattended/unattended.sh#check_authorization`). The hand-over to dIndexedDesign is the ask of
   §8 F2, filed as `TOOL-dIndexedDesign-19` in `memory/builds/dIndexedDesign/BACKLOG.md`. Observed by
   AC3.
-- **S6** — The page `help/loop.md` gains, in its "Transition tables" section, the entry rows' join and
-  its line, and that a `repeat` names its playbook by path until the record kind lands. Observed by AC5.
+- **S6** — The page `help/loop.md`, section "Transition tables". Its "Check the tables" bullet gains
+  the entry rows' join, both halves, and its `loop: entry rows · ` line, and the sentence that a
+  `repeat` names its playbook by path until the playbook record kind lands; its "See a refusal" bullet
+  names the four S4 plants with their breaks; and its closing paragraph, which says what the tables do
+  not judge, adds an entry row's `to`. Its two anchors there, `script:tools/loop/loop_table.py#check`
+  and `script:tools/loop/loop_table.py`, keep their fingerprints: each is the hash of its
+  `tools/govkit/usage.toml` row less its `id` (`tools/govkit/docs_leg.py#derive_usage_fingerprint`),
+  and this unit adds no flag or verb, so neither row moves; the builder confirms both against
+  `python tools/govkit/docs_leg.py --fingerprints` at build time. Observed by AC5.
+- **S7** — The kit's own texts. The module docstring of `tools/loop/loop_table.py` gains, after its
+  route join paragraph (S7 of TOOL-dDeclaredLoop-13), a paragraph for the entry rows' join, its line
+  and its refusal head, and its WHAT THIS DOES NOT CHECK paragraph adds an entry row's `to`. The
+  "The transition tables" section of `tools/loop/README.md` gains, in its `check` paragraph, the join
+  and its line, and in its plant list the four S4 plants. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -108,15 +142,19 @@ lands, a `repeat` routes onto a playbook by its path, and the hand-over stands f
 
 ```
 first   = FIRST_MOVES                             # tools/loop/claim.py: {disposition: (item, outcome)}
-entry   = [r for r in build rows if r.from == ["none"]]
+entry   = [(n, r) for n, r, f in build if ENTRY in f]   # check_transition_tables' graded build rows
 fires(r, d) = (r.item, r.outcome) == first[d] and r.get("disposition", d) == d
-for d in first:  d in [dispositions].set, and exactly one r in entry with fires(r, d)
-for r in entry:  some d in first with fires(r, d)
+for d in sorted(first):  d in members, and exactly one (n, r) in entry with fires(r, d)
+for (n, r) in entry:     some d in first with fires(r, d)
 ```
 
-At base the three rows from `none` are `item.entry.claim` `claimed` with `new` into `planning`,
-`item.plan.dedupe` `patch` with no disposition into `designing`, and `item.entry.claim` `claimed` with
-`repeat` into `designing`, and each fires one key's first move. Both halves are the class, not the
+At `bfc0a4e4` the build rows from `none` are B1, B2 and B3 of `tools/loop/loop.toml`, three (PINNED: a
+`tomllib` read of `tools/loop/loop.toml` at `bfc0a4e4`, its `level = "build"` rows from `none`): `item.entry.claim` `claimed` with `new` into
+`planning`, `item.plan.dedupe` `patch` with no disposition into `designing`, and `item.entry.claim`
+`claimed` with `repeat` into `designing`, and each fires one key's first move. The units landing before
+this one add no transition row and no `[dispositions]` member: KICK-dKeptSession-25's
+`item.entry.mailbox-answer` is an `[[item]]` row whose routes name a stand-in and itself, and
+KICK-dKeptSession-17's `[[attendance]]` rows are no table this check reads. Both halves are the class, not the
 `repeat` row alone: a disposition the claim admits with no row is a request claimed into no state, and
 a row no claim fires is dead. `repeat` is one instance of each half, and the plants see it on both.
 
@@ -126,7 +164,27 @@ The row's `to`. P20 puts `repeat` at Design, and its row says so; the arm prints
 and leaves the value to the table's own source rows
 (`memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md@d73cb002:735`). Nor
 does it read a row from `none` that no claim ever fires for another reason: every such row is refused,
-so a future entry that is no claim answers this arm in its own landing.
+so a future entry that is no claim answers this arm in its own landing. Nor the feature and unit
+tables' rows from `none`, which no claim fires.
+
+### The shipped texts
+
+Grepped at `bfc0a4e4` for `loop_table`, `transition tables`, `FIRST_MOVES`, `entry row` and `repeat`
+over `help/`, `tools/`, `memory/guides/`, `WIRE-INTO-PROJECT.md` and `.governance/`:
+
+| Text | Disposition |
+|---|---|
+| `help/loop.md`, "Transition tables": the "Check the tables" and "See a refusal" bullets and the closing paragraph | false by omission: S6 |
+| `help/loop.md`, the anchors `script:tools/loop/loop_table.py#check` and `script:tools/loop/loop_table.py` | stay: no `usage.toml` row moves (S6) |
+| `tools/loop/loop_table.py` module docstring, the `check` and route join paragraphs and WHAT THIS DOES NOT CHECK | false by omission: S7 |
+| `tools/loop/README.md`, "The transition tables", its `check` paragraph and plant list | false by omission: S7 |
+| `help/loop.md`, the `--entry-claim` paragraph and "The check" paragraph's "the playbook is in the tree for `repeat`" | stay: the arm changes neither the claim nor the placement check |
+| `help/loop.md`, "A row with a `disposition` takes `disposition`" | stays: the move's fact is unchanged |
+| `tools/loop/claim.py`, the comment above `FIRST_MOVES` | stays: the dict is read, never changed |
+| `tools/loop/kit.toml`, "loop_table.py … reads this kit's definition alone, and the playbook kit's layer tags" | stays: the sentence counts the kits the command reaches, and `claim.py` is this kit's own module, so no edge is added |
+| `tools/loop/kit.toml` and `tools/gate-legs.json`, the leg's `purpose` | stays: it still checks the tables every mover reads |
+| `WIRE-INTO-PROJECT.md`, the loop kit's legs; `.governance/instructions.toml`, the loop kit's one-concern-per-module text | stay: no leg is added or moved |
+| `tools/policy/catalogue.toml`, `.governance/policy.json` | stay: no policy key is read or summarised, so the mirror does not move |
 
 ### Inventory
 
@@ -146,9 +204,14 @@ Live at landing, inside `check_transition_tables`, so the `loop transition table
 
 ### Files touched (estimate)
 
-- `tools/loop/loop_table.py`: the arm, its line and its plants
-- `memory/map/generated/symbols.json`: `check_entry_rows` added, the commit hook's regeneration
-- `help/loop.md`: S6's sentences in "Transition tables"
+- `tools/loop/loop_table.py`: the arm, its line, its plants, its selftest case and its docstring (S2 to S4, S7)
+- `tools/loop/README.md`: S7
+- `memory/map/generated/symbols.json`: `check_entry_rows` added, re-rendered by the codebase-map
+  kit's generator with `--write`, never hand-edited
+- `help/loop.md`: S6, its anchors unchanged
+
+The unattended driver is not touched, so no refusal site is added and its harness-arms ceiling is
+not read.
 
 ### Alternatives rejected
 
@@ -164,7 +227,10 @@ Live at landing, inside `check_transition_tables`, so the `loop transition table
 ## 5. Production-readiness checklist
 
 - security — N/A — a read-only check over committed rows; no write path.
-- perf / scale — one pass over the build rows from `none`.
+- perf / scale — one pass over the build rows from `none`; the leg gains five in-process cases, the
+  four plants and `entry rows`, each one re-read of the definition as the landed plants are, under
+  its unchanged `ceiling` of 120 s (PINNED: `tools/gate-legs.json` at `bfc0a4e4`), which no budget
+  row prices.
 - error / empty / loading states — an empty `entry` list reds every admitted disposition, so an absent
   table is never green; an import of `claim.py` that fails is one refusal naming why, never a pass.
 - observability — the `loop: entry rows ·` line on every `check`.
@@ -172,39 +238,51 @@ Live at landing, inside `check_transition_tables`, so the `loop transition table
   `FIRST_MOVES` or answers the arm.
 - testing — the plants by a pass; the arm in §7 observed RED then GREEN by the main loop.
 - migration — none.
-- user docs — `help/loop.md`.
+- user docs — `help/loop.md`, S6; the kit's README and the module docstring, S7.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python loop_table.py check` runs over the shipped definition, it exits 0 and prints
+- **AC1** — When `python loop_table.py check` runs in the loop kit's directory over the shipped
+  definition, it exits 0 and prints
   `loop: entry rows · new → planning · patch → designing · repeat → designing`.
   Red when: an admitted disposition prints with no row, or the line is typed rather than read.
 - **AC2** — When `python loop_table.py --fixture --plant entry-row-missing` runs in the loop kit's
-  directory, it exits 1 printing `loop: refused · entry rows · repeat · forward: ` naming
-  `item.entry.claim`; `entry-set-missing` exits 1 printing `entry rows · repeat · forward: ` naming
-  the set; `entry-row-extra` exits 1 printing `entry rows · ask · backward: ` naming a disposition the
-  claim refuses; `entry-row-twice` exits 1 printing `entry rows · repeat · forward: ` naming two rows.
+  directory, it exits 1 printing `loop: refused · entry rows · repeat · forward: no build row from none
+  fires item.entry.claim · claimed`; `entry-set-missing` exits 1 printing `loop: refused · entry rows ·
+  repeat · forward: no member of [dispositions]`; `entry-row-extra` exits 1 printing `loop: refused ·
+  entry rows · ask · backward: build row ` naming `item.entry.claim`; `entry-row-twice` exits 1 printing
+  `loop: refused · entry rows · repeat · forward: 2 build rows from none fire item.entry.claim ·
+  claimed: rows `.
   Red when: a planted break on either half of the join passes, or is refused only by the landed
-  table check's own lines, as `entry-set-missing` and `entry-row-twice` are at the base module.
+  table check's own lines, as `entry-set-missing` and `entry-row-twice` are at the base module (a
+  probe of `check_transition_tables` over each break, made on a copy of the parsed definition at
+  `bfc0a4e4`, returned only the "no member of [dispositions]" and "matched by two rows" refusals for
+  those two, and none for the other two).
 - **AC3** — When `python gen_build_index.py --asks --build dIndexedDesign` runs in the memory-tree kit,
   it prints the `TOOL-dIndexedDesign-19` row, the ask of §8 F2, `DEFERRED`, its blocker cell
   `TOOL-dIndexedDesign-10`, the record kind's unit, and its text opening `THE repeat ROUTE READS A
   PLAYBOOK BY PATH`.
   Red when: the hand-over to the record kind is filed nowhere.
-  fixture: the ask stands filed at `c2a407b0`, so this criterion is met at base; AC5 observes the
-  build.
+  fixture: the ask stands filed at `bfc0a4e4`, the row read by that command at writing time, so this
+  criterion is met at base; AC5 observes the build.
 - **AC4** — When `grep -c 'FIRST_MOVES' loop_table.py` runs in the loop kit's directory it prints at
-  least 1, and `grep -cE '"(new|patch|repeat)"' loop_table.py` prints 0.
-  Red when: the admitted set is spelled in two modules.
-- **AC5** — When `grep -c 'entry rows' loop.md` and `grep -c 'by path' loop.md` run in `help/`, each
-  prints at least 1, the second on the sentence that a `repeat` names its playbook by path.
-  Red when: the page omits the entry rows' join or the path stand-in.
+  least 1, and `sed -n '/^def check_entry_rows/,/^def /p' loop_table.py | grep -cE '"(new|patch|repeat)"'`
+  prints 0.
+  Red when: the arm spells an admitted disposition, a second spelling of the claim's set; the plants
+  in `write_table_plant` name the instances they break and are not read.
+- **AC5** — When `grep -c 'entry rows' loop.md`, `grep -c 'by path' loop.md` and
+  `grep -c 'entry-row-twice' loop.md` run in `help/`, each prints at least 1, the second on the
+  sentence that a `repeat` names its playbook by path.
+  Red when: the page omits the entry rows' join, its plants or the path stand-in.
+- **AC6** — When `python -c "import loop_table; print(loop_table.__doc__.count('entry rows'))"` and
+  `grep -c 'entry-row-missing' README.md` run in the loop kit's directory, each prints at least 1.
+  Red when: the module's docstring or the kit's README omits the join or its plants.
 
 ## 7. Gates
 
-`loop transition tables` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop transition tables` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/loop_table.py · covers AC1 AC2 · the four `entry-*` plants and the `check` case under `check --selftest`, staged against the base module, which has no entry-row join · none
+New arm: tools/loop/loop_table.py · covers AC1 AC2 · the four `entry-*` plants and the `entry rows` case under `check --selftest`, staged against the base module, which has no entry-row join · none
 
 ## 8. Open questions
 
@@ -253,19 +331,28 @@ New arm: tools/loop/loop_table.py · covers AC1 AC2 · the four `entry-*` plants
   the row the index prints; AC5 observes the route by path on the page, the build's own observation;
   `check_entry_rows` moves `memory/map/generated/symbols.json`, whose path trips the two `recall
   floor` legs; they and `policy fixtures`, whose guard holds `tools/loop/`, join §7's line.
+- rev-6 · 2026-11-23 · S2 · S3 · S4 · S6 · S7 · §4 · §4 Files touched · §5 · AC1 · AC2 · AC4 · AC5 · AC6 ·
+  §7 · §10 · re-grounded on the tree at `bfc0a4e4` by `2026-11-22-prompt-KICK-dKeptSession-18-reground-brief`,
+  the units landing first read as landed: S2 reads the graded build rows whose expanded `from` holds
+  `ENTRY` and spells its four refusals, S3 adds the `entry rows` selftest case §7's arm names, S4
+  gives each plant its needle; AC4 reads the arm's body, since the plants must name `repeat`; S7 and
+  AC6 add the module docstring and the kit README the arm made false by omission, and §4 lists the
+  shipped texts; `policy fixtures` leaves §7, its guard holding no `tools/loop/` path.
 
 ## 10. Reuse audit
 
 The seam extended is the landed `check_transition_tables`
 (`tools/loop/loop_table.py#check_transition_tables`), which already reds a disposition outside the set and
 two rows matching one move, with its in-memory plants (`tools/loop/loop_table.py#write_table_plant`) and
-their `check --selftest` cases. The admitted set is the claim's own `FIRST_MOVES`
-(`tools/loop/claim.py`), read rather than copied. The route join of TOOL-dDeclaredLoop-13 S7 joins an
+their `check --selftest` cases, and its graded `build` list, which the arm reads rather than re-grading
+the rows; the entry word is the module's `ENTRY`. The admitted set is the claim's own `FIRST_MOVES`
+(`tools/loop/claim.py@69388f20:88`), read rather than copied. The route join of TOOL-dDeclaredLoop-13 S7 joins an
 item's outcomes to rows, never the `disposition` those rows carry, so the join of S2 is still owed. The
 path stand-in rides on `tools/loop/placement.py#check_disposition_fact` and the driver's
-`tools/unattended/unattended.sh#check_authorization`, all read at `c2a407b0`.
+`tools/unattended/unattended.sh#check_authorization`, all read at `bfc0a4e4`; no spec landing before
+this unit names `loop_table.py` as a file it touches.
 `python tools/codebase-map/reuse_lookup.py "check every placement disposition that opens a build has its
-entry transition row"` ranked `rows`, `row`, `check` and `build` by name stem, none a transition join,
+entry transition row"` ranked `rows`, `row`, `check` and `build` by name stem at `bfc0a4e4` as at `c2a407b0`, none a transition join,
 so no further seam fits.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a repeat request route onto a playbook before the playbook record kind exists" --terms "repeat disposition playbook recipe mode none row entry.claim FIRST_MOVES designing dIndexedDesign ask stand-in"`
