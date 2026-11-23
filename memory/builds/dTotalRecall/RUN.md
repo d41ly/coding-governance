@@ -252,3 +252,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-22T23:44:47Z draw · re-dispatch · TOOL-dTotalRecall-19 · 31/186 · 20261122T234447Z-929549
 
 2026-11-22T23:44:47Z dispatch · item 9d7afdc6 TOOL-dTotalRecall-19 · reason memory/map/features/memory-tree-hygiene.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/map/generated/MAP.md memory/map/generated/inventories.json
+
+2026-11-23T00:04:15Z brief · item TOOL-dTotalRecall-21 · reason 71f5fc050ac9 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief.md
