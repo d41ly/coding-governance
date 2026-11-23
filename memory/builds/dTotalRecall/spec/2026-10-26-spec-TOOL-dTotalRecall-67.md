@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-67 — unit 61's amendments to units 55, 56 and 57 are read by their own text at step 20, and any it left unwritten is written before those units build
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-11-22-build-TOOL-dTotalRecall-67-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-67-reground-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-67-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-67-1-spec-writer.md) | journal | TOOL-dTotalRecall-1 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-67-round5-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-67-round5-fix-brief.md) | research | — |
+| [2026-11-22-prompt-TOOL-dTotalRecall-67-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-67-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-67-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-67-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-67-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-67-reground-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-67-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-67-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 |
