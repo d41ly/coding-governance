@@ -121,10 +121,16 @@ sha256 of the bytes it consumed, so a later call parses only the lines appended 
 record is a miss and a read from byte 0, and deleting the folder clears it (TOOL-aTrimmedWait-7).
 
 `check-return` is the direct route's return check (TOOL-dBoundRoles-5 S2, S3), run by the `SubagentStop`
-hook `return-check.sh` with the hook payload on stdin. Its role is the payload's `agent_type`, an
-`agent`-true slot of `roles_lib.load_roles`; a payload naming none prints nothing. Its return is the
-payload's `last_assistant_message`, else the last assistant text of `agent_transcript_path`, and its work
-order the marker of that transcript's first `user` record, read by `roles_lib.extract_prompt_marker`.
+hook `return-check.sh` with the hook payload on stdin. It grades a direct spawn's return only, by a route
+test run first, before the role is loaded or any record is read (TOOL-dBoundRoles-39 S1): the payload's
+`agent_transcript_path`, separators folded to `/`, holds no `/subagents/workflows/` pair, the harness
+layout, and that transcript's first `user` record opens with a marker line `roles_lib.extract_prompt_marker`
+parses. Any other stop, a harness stage's whose return its stage schema grades, a stop with no transcript
+path or an unreadable first record included, exits 0 printing nothing and writing no record, so it never
+reaches the retry count. Its role is the payload's `agent_type`, an `agent`-true slot of
+`roles_lib.load_roles`; a payload naming none prints nothing. Its return is the payload's
+`last_assistant_message`, else the last assistant text of that transcript, and its work order the
+marker the route test read.
 `roles_lib.check_return` grades the return; on defects, while the attempts recorded for the agent are
 fewer than the policy key `roles.retries`, read by `roles_lib.read_policy_setting` with its catalogue
 default, it prints `{"decision": "block", "reason": …}`, the reason naming every defect, the role's
@@ -1471,7 +1477,18 @@ def run_return_check(stdin_text):
     except (ValueError, RecursionError):
         write_return_witness("the hook payload is no JSON, so no return was checked")
         return 0
-    slot = payload.get("agent_type") if isinstance(payload, dict) else None
+    # The route test (TOOL-dBoundRoles-39 S1), before the role is loaded or any record read: a direct spawn's
+    # transcript sits outside the harness layout `<session dir>/subagents/workflows/<run id>/`, and its first
+    # `user` record opens with a marker line. Any other stop is not this check's, a harness stage's return
+    # being graded by its stage schema, and passes silent, leaving no record and holding no attempt.
+    transcript = payload.get("agent_transcript_path") if isinstance(payload, dict) else None
+    if not isinstance(transcript, str) or not transcript or "/subagents/workflows/" in transcript.replace("\\", "/"):
+        return 0
+    first, last = read_agent_turns(transcript)
+    marker = lib.extract_prompt_marker(first) if first else None
+    if marker is None:
+        return 0
+    slot = payload.get("agent_type")
     if not isinstance(slot, str) or not slot.strip():
         return 0
     try:
@@ -1493,16 +1510,13 @@ def run_return_check(stdin_text):
                              % agent_id)
         return 0
     root = pathlib.Path(g.stdout.strip())
-    transcript = payload.get("agent_transcript_path")
-    first, last = read_agent_turns(transcript) if isinstance(transcript, str) and transcript else (None, None)
     text = payload.get("last_assistant_message")
     text = text if isinstance(text, str) and text.strip() else last
     if text is None:
         write_return_witness("%s %s left no last_assistant_message and no readable transcript text, so its "
                              "return was not checked" % (slot, agent_id))
         return 0
-    marker = lib.extract_prompt_marker(first) if first else None
-    work_order = (marker.group("path"), marker.group("task_sha")) if marker else None
+    work_order = (marker.group("path"), marker.group("task_sha"))
     try:
         defects = lib.check_return(slot, text, root, work_order)
     except lib.RolesError as e:
