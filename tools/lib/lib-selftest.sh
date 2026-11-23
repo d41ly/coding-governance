@@ -411,7 +411,7 @@ run_arms() {
   # A READING ARM THAT WROTE fails the suite here, rather than leaking into its neighbours unseen.
   if [ -n "$rd" ]; then
     local wrote names=""
-    wrote=$(git -C "$rd" status --porcelain --untracked-files=all 2>&1) || wrote=${wrote:-git status failed}
+    wrote=$(git -C "$rd" status --porcelain --untracked-files=all 2>/dev/null) || wrote=${wrote:-git status failed}
     if [ -n "$wrote" ]; then
       for j in "${!_st_reading[@]}"; do [ "$j" -lt "$_st_n" ] && names+="${names:+; }${_st_labels[$j]}"; done
       fails=$((fails + 1))
