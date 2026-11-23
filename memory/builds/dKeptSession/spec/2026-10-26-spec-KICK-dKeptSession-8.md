@@ -1,6 +1,6 @@
 # KICK-dKeptSession-8 — `actions.free` at the tool call: every write, spawn, commit or push belongs to the item in flight
 
-**Status:** DEFERRED · rev-6 · 2026-11-23 · node a · Tier-2 · base 64e146d9 · streams kickoff · order 25 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-7 · 2026-11-23 · node a · Tier-2 · base 64e146d9 · streams kickoff · order 25 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0146@a9c32df5 whole
 **Carries:** node:policy-key.actions.free
@@ -24,6 +24,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-8-orders-25-26-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-8-orders-25-26-reground-brief.md) | research | KICK-dKeptSession-11 KICK-dKeptSession-43 |
 | [2026-11-22-prompt-KICK-dKeptSession-8-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-8-reground-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-8-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-8-1-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-8-2-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-8-2-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-8-edge-fix-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-8-edge-fix-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -192,7 +194,7 @@ finish does not admit.` Rule 8
 - **consumes-from** external — dGroundRules' `readPolicy` (`tools/policy/policy-mirror.js#readPolicy`, TOOL-dGroundRules-5), found through agent-cap's `resolvePolicyHelper` (TOOL-aNimbleMend-8 S4); the card file and its `card-owner —` line, rendered by `write_card_file` (`skills/session-kickoff/manifest-check.sh#write_card_file`)
 - **hands-off** `KICK-dKeptSession-41` — S1's standing `actions.free` row, whose `summary` and `usage` that unit writes (id 45)
 - **hands-off** `KICK-dKeptSession-43` — `readItemPointer` and `checkFreeAction`, whose pointer parse that unit closes over the `skipped:` form (id 57)
-- **hands-off** `KICK-dKeptSession-44` — the `actions.free` plants, run under both `card.pointers` values by the batch's S10 (id 11)
+- **hands-off** `KICK-dKeptSession-44` — §8 F3 (b)'s read of the tree's card file, which that unit's S10 observes by a row of the `pointers-at-transitions` plant (id 11)
 
 ## 4. Design
 
@@ -508,6 +510,11 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · rule 9 on an `Agent` pay
   6, 8 and 7 and the fail-closed exceptions, observed by AC11; the budgets clause is S11; the
   scratch-guard suite's floor raised to 430; the `skipped:` window before KICK-dKeptSession-43 named
   as a risk.
+- rev-7 · 2026-11-23 · §3 Edges · by `2026-11-23-prompt-KICK-dKeptSession-8-2-spec-writer`: the
+  hands-off to KICK-dKeptSession-44 names what its rev-6 consumes, §8 F3 (b)'s card-file read that its
+  S10 observes, since S8's policy stub answers no `card.pointers`; S3's sentence on unit 13 stays, true
+  of `skills/session-kickoff/manifest-check.sh#write_pointers`, and AC2, AC6 and AC10 write the
+  pointer line directly, under neither value.
 
 ## 10. Reuse audit
 
