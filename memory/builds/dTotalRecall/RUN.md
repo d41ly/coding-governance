@@ -350,3 +350,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T08:19:46Z draw · re-dispatch · TOOL-dTotalRecall-61 · 47/186 · 20261123T081946Z-8bab92
 
 2026-11-23T08:19:46Z dispatch · item b7c987a3 TOOL-dTotalRecall-61 · reason memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-61-build-spec-writer.md
+
+2026-11-23T08:30:19Z brief · item TOOL-dTotalRecall-67 · reason b56fa1cefa46 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-67-build-brief.md
+
+2026-11-23T08:31:36Z dispatch · item c2368995 TOOL-dTotalRecall-67 · reason memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-55.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-56.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-57.md memory/builds/dTotalRecall/build tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-67.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-67-1-acceptance-ledger.md
