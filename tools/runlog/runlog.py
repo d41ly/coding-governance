@@ -13,6 +13,8 @@
     python <this kit>/runlog.py record <slug> [--run <n>] [--write] [--journals <dir>] [--transcripts <dir>]
     python <this kit>/runlog.py verify <record> [--journals <dir>]
     python <this kit>/runlog.py check-records
+    python <this kit>/runlog.py memory [--from <utc>] [--to <utc>] | --landed <rev> [--transcripts <dir>]
+    python <this kit>/runlog.py memory --fixture --plant <case>
 
 `check-records` is the schema leg (TOOL-dLoggedFlight-10): it grades every committed run record's
 STAGED bytes against the closed schema and every tracked run's start and window from git alone, prints
@@ -25,6 +27,12 @@ subject naming the slug and no unit id. Without `--write` it prints the record a
 that served no spec-defined unit gets a `no spec-defined unit` line, no file, and exit 0. `verify`
 recomputes a record's journal commitment on this machine: exit 0 when it matches or the record commits
 `none`, 1 when the journal changed after the render, 2 when the record or its journals cannot be read.
+
+`memory` is the acceptance re-measure (TOOL-dTotalRecall-12): memory bytes per memory-reading agent
+over every read channel, per agent type and pooled, every figure derived at the run, and with
+`--landed` the verdict over the thirty days from that commit, exit 0 `pass`, 1 `fail`, 3 a state that
+is no verdict, 2 a refused argument. It prints counts only and writes nothing; `memory_measure.py`
+states what it counts and what it does not check.
 
 `extract` writes one structural extract per session to the user-profile store and prints one JSON
 object per session on stdout; `--measure` and `--ready` write nothing and print a report. `narration` prints a
@@ -65,6 +73,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import extract as ex  # noqa: E402
+import memory_measure as mm  # noqa: E402
 import model as mdl  # noqa: E402
 import prose as pr  # noqa: E402
 import record as rec  # noqa: E402
@@ -487,6 +496,44 @@ def cmd_check_records(_args) -> int:
     return rc
 
 
+def cmd_memory(args) -> int:
+    """The re-measure (TOOL-dTotalRecall-12 S6, S7): the fixture's planted root, or this clone's
+    transcripts over a window by agent start; the verdict line under `--landed` alone."""
+    if args.fixture:
+        return mm.print_memory_fixture(args.plant)
+    t_from = t_to = None
+    if args.t_from is not None and (t_from := ex.parse_time(args.t_from)) is None:
+        print("runlog: --from takes an ISO-8601 stamp or epoch seconds", file=sys.stderr)
+        return 2
+    if args.t_to is not None and (t_to := ex.parse_time(args.t_to)) is None:
+        print("runlog: --to takes an ISO-8601 stamp or epoch seconds", file=sys.stderr)
+        return 2
+    try:
+        root = mdl.resolve_repo_root()
+        memory_root = rl.resolve_memory_root(root)
+        main_worktree = rl.resolve_journal_root(root).parent.parent
+        projects = ex.resolve_projects_root(override=args.transcripts)
+        if args.landed is not None:
+            t_from = mm.resolve_landed_time(args.landed, root)
+            t_to = t_from + mm.WINDOW_DAYS * mm.DAY_SECONDS
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    window = (t_from, t_to)
+    if not projects.is_dir():
+        print("memory: no transcripts root resolves on this machine; pass --transcripts")
+    population = mm.measure_memory_population(projects, main_worktree, memory_root, window,
+                                              mm.read_slice_bytes)
+    verdict = None
+    if args.landed is not None:
+        agents = population["agents"]
+        totals = [mm.derive_total(c) for _t, c in agents if mm.derive_total(c) > 0]
+        verdict = mm.derive_memory_verdict(totals, time.time(), window, mm.check_slice_armed(agents))
+    sys.stdout.write("\n".join(mm.render_memory_report(population, window, verdict)) + "\n")
+    sys.stdout.flush()
+    return verdict[1] if verdict else 0
+
+
 def main(argv=None) -> int:
     # A path or a refusal reason can carry a character the console's code page lacks, and a print
     # that raises on it would turn a report into a traceback. Narration is transcript text, so stdout
@@ -542,7 +589,25 @@ def main(argv=None) -> int:
     pv.add_argument("--journals", help="the journal directory to read instead of this clone's own")
     sub.add_parser("check-records", help="the schema leg: grade every staged run record and every run's "
                    "start and window")
+    pmem = sub.add_parser("memory", help="memory bytes per memory-reading agent over every read channel, "
+                          "and the verdict under --landed; writes nothing")
+    pmem.add_argument("--from", dest="t_from", help="the window's start, by agent start (UTC)")
+    pmem.add_argument("--to", dest="t_to", help="the window's end, by agent start (UTC)")
+    pmem.add_argument("--landed", metavar="REV", help="the window is the thirty days from this commit, "
+                      "and the verdict prints")
+    pmem.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
+    pmem.add_argument("--fixture", action="store_true", help="measure a planted scratch root instead")
+    pmem.add_argument("--plant", choices=mm.FIXTURE_CASES, help="with --fixture: the case to plant")
     args = ap.parse_args(argv)
+    if args.cmd == "memory":
+        if args.fixture != bool(args.plant):
+            ap.error("memory --fixture and --plant are given together or not at all")
+        if args.fixture and (args.t_from or args.t_to or args.landed or args.transcripts):
+            ap.error("memory --fixture measures its planted root alone and takes no --from, --to, "
+                     "--landed or --transcripts")
+        if args.landed is not None and (args.t_from or args.t_to):
+            ap.error("memory --landed sets the window itself and takes no --from or --to")
+        return cmd_memory(args)
     if args.cmd == "check-records":
         return cmd_check_records(args)
     if args.cmd == "model":

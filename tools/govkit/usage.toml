@@ -889,3 +889,10 @@ shape = "verb"
 entry = "{prefix}/memory-tree/ratchet.py"
 verb = "widen"
 flags = ["--key=", "--reason=", "--unit="]
+
+[[usage]]
+id = "script:{prefix}/runlog/runlog.py#memory"
+shape = "verb"
+entry = "{prefix}/runlog/runlog.py"
+verb = "memory"
+flags = ["--from=", "--to=", "--landed=", "--transcripts=", "--fixture", "--plant="]

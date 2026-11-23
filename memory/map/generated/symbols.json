@@ -3298,6 +3298,11 @@
       "file": "tools/workflows/check_by_design_parity.py"
     },
     {
+      "id": "build_fixture_agent",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
       "id": "build_fixture_base",
       "kind": "function",
       "file": "tools/loop/factories.py"
@@ -3336,6 +3341,11 @@
       "id": "build_fixture_repo",
       "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
+    },
+    {
+      "id": "build_fixture_result",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "build_fixtures",
@@ -7275,6 +7285,11 @@
     {
       "id": "check_in_window",
       "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
+      "id": "check_in_window",
+      "kind": "function",
       "file": "tools/runlog/model.py"
     },
     {
@@ -7666,6 +7681,11 @@
       "id": "check_memory_tree_steps",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_memory_word",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "check_merge_arm",
@@ -8543,6 +8563,11 @@
       "file": "tools/memory-tree/record_find.py"
     },
     {
+      "id": "check_read_verb",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
       "id": "check_reader_coverage",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -9291,6 +9316,11 @@
       "id": "check_skill_install",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_slice_armed",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "check_slot_table",
@@ -10621,6 +10651,11 @@
       "id": "cmd_measure_relations",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "cmd_memory",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
     },
     {
       "id": "cmd_merge_tree",
@@ -13538,6 +13573,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_memory_verdict",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
       "id": "derive_merged_subclass",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -13943,6 +13983,11 @@
       "file": "tools/run-gates/product_tests.py"
     },
     {
+      "id": "derive_project_dirs",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
       "id": "derive_project_name",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -13978,6 +14023,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "derive_quantile",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
       "id": "derive_quarantine_at",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
@@ -14006,6 +14056,11 @@
       "id": "derive_read_by",
       "kind": "function",
       "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
+      "id": "derive_read_channel",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "derive_read_path",
@@ -14331,6 +14386,11 @@
       "id": "derive_response_name",
       "kind": "function",
       "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
+      "id": "derive_result_bytes",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "derive_resume_lines",
@@ -15276,6 +15336,11 @@
       "id": "derive_tool_root",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "derive_total",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "derive_tracked",
@@ -19008,6 +19073,11 @@
       "file": "tools/workflows/orient-counterfactual.js"
     },
     {
+      "id": "measure_agent_memory",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
       "id": "measure_answer_used",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -19271,6 +19341,11 @@
       "id": "measure_map_experiment",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "measure_memory_population",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "measure_mode_carry",
@@ -21108,6 +21183,11 @@
       "file": "tools/runlog/runlog.py"
     },
     {
+      "id": "print_memory_fixture",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
       "id": "print_merge_witness",
       "kind": "function",
       "file": "tools/push-main.sh"
@@ -21961,6 +22041,16 @@
       "id": "read_agent_root",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "read_agent_start",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
+      "id": "read_agent_type",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "read_agree_field",
@@ -25213,6 +25303,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_memory_cell",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_memory_root",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -25236,6 +25331,11 @@
       "id": "read_memory_root",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "read_memory_rows",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "read_memory_tree",
@@ -27191,6 +27291,11 @@
       "id": "read_skill_section",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_slice_bytes",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "read_slot_mode",
@@ -30468,6 +30573,11 @@
       "file": "tools/run-gates/keep_tails.py"
     },
     {
+      "id": "render_figure",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
       "id": "render_finding",
       "kind": "function",
       "file": "tools/loop/termination.py"
@@ -30801,6 +30911,11 @@
       "id": "render_memory_line",
       "kind": "function",
       "file": "tools/playbook/memory_index.py"
+    },
+    {
+      "id": "render_memory_report",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "render_mirror",
@@ -31518,6 +31633,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "render_type_row",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
       "id": "render_unarmed_line",
       "kind": "function",
       "file": "tools/memory-tree/record_kinds.py"
@@ -31551,6 +31671,11 @@
       "id": "render_unresolved",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "render_utc",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "render_value",
@@ -32971,6 +33096,11 @@
       "id": "resolve_landed_ref",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "resolve_landed_time",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "resolve_lander_kit",
@@ -36586,6 +36716,11 @@
       "id": "run_measure_cutoffs",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_memory_plant",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "run_merge_pair",
@@ -41518,6 +41653,41 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_memory_ac1_read_channel",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac2_shell_channel",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac3_unarmed",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac4_population",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac6_verdict",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac7_states",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_memory_ac9_privacy",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_miss_predictor_verdict_needs_enough_misses",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -44008,6 +44178,11 @@
       "file": "tools/loop/placement.py"
     },
     {
+      "id": "write_fixture_lines",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
+    },
+    {
       "id": "write_fixture_pass",
       "kind": "function",
       "file": "tools/unattended/pass-tree.test.sh"
@@ -44631,6 +44806,11 @@
       "id": "write_memory_fixture",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "write_memory_fixture",
+      "kind": "function",
+      "file": "tools/runlog/memory_measure.py"
     },
     {
       "id": "write_merge_driver",

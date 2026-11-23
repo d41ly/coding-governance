@@ -233,6 +233,38 @@ hook's suite holds the two to one verdict. A charter with no fence prints `pair 
 zero. A session with no transcript exits 2. It cannot know whether a turn ran under a routed build,
 so the pair count covers every final message.
 
+## The memory re-measure
+
+```bash
+python <this kit>/runlog.py memory [--from <utc>] [--to <utc>] | --landed <rev> [--transcripts <dir>]
+python <this kit>/runlog.py memory --fixture --plant <case>
+```
+
+Memory bytes per memory-reading agent over every read channel (`TOOL-dTotalRecall-12`), printed and
+never written. `memory_measure.py` holds it, reading transcripts through `extract.py`'s reader and
+keeping counts only. Three channels: `read`, the result bytes of a call `TOOL_CLASSES` classes `read`
+whose `file_path`, `notebook_path` or `path` names a memory path; `shell`, the output of a shell call
+naming a memory path in any word or running a read verb (`READ_VERBS`: `record show`, `record find`,
+`gov tag`, `gov_record.py show` and `find`, `gov_tag.py`, and the memory-recall kit's `query.py`);
+and `slice`, the work order's inlined slices, read by the stand-in `read_slice_bytes`, which returns
+None and so prints `unarmed` until the executor that writes the slice manifest gives it a body. A
+memory path is a word that, `\` folded to `/`, starts `<root>/` or carries `/<root>/`, the root
+`resolve_memory_root`'s.
+
+The population is every subagent transcript, direct and workflow, under the project directories the
+harness names for this clone's main worktree and its `.claude/worktrees/` children; an agent is in the
+window by its first timestamp, typed by its `.meta.json`'s `agentType`, and reads memory when its total
+is above zero. The report prints a window line with the session, agent, torn-line and unreadable
+counts, then per agent type and pooled the agents, the agents reading memory, the median and p90 of the
+total and of each channel, and each channel's bytes. `--landed` makes the window the thirty days from
+that commit's committer time, refusing a commit that is no ancestor of `HEAD`, and prints the verdict:
+`pass` (0) only when the window has closed, the slice channel is armed and the median, the
+`[ms2-instrument]`'s `sorted(v)[min(len(v) - 1, int(len(v) * 0.5))]`, is below 33,000 B; `fail` (1)
+when the first two hold and it is not; else `not-due`, `unarmed` or `empty`, exit 3. Exit 2 refuses an
+argument. `--fixture --plant <case>` plants one case's transcripts in a scratch root and measures it,
+the only caller that hands the measure a slice reader returning bytes. The module docstring states what
+it does not check; the user page is `help/memory-measure.md` in gov's checkout.
+
 ## The run model
 
 `model.py` joins every source of ONE unattended run into one model: the run-state file, the three

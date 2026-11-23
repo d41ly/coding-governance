@@ -336,7 +336,14 @@ from collections import Counter  # noqa: E402
 # `unknown` pair line. The figures arm's mixed scenario now carries a two-block message and a
 # sidechain record, which move its pinned narration line and add no check.
 # 1 + 1 = 2
-ASSERTION_FLOOR = 1580
+# RAISED 1580 -> 1633 by TOOL-dTotalRecall-12, the memory re-measure: SEVEN new arms over the `memory
+# --fixture` plants, each aimed at its own scratch — AC1's read channel with 8 checks (read-memory's bytes,
+# its zero shell bytes and its torn line; grep-memory's bytes and zero shell; read-other's zero, its agent
+# and its zero readers), AC2's shell channel with 7 (record-show's bytes and zero Read total, gov-tag,
+# recall-query and shell-path, shell-other's zero and its agent), AC3 with 3, AC4 with 4, AC6 with 4, AC7
+# with 4 and AC9 with 2. Their decoy checks move it by 21, and the three helpers they arrive with carry none.
+# 8 + 7 + 3 + 4 + 4 + 4 + 2 + 21 = 53
+ASSERTION_FLOOR = 1633
 
 PASS = []
 FAIL = []
@@ -8888,6 +8895,122 @@ def test_prose_ac4_ac5_refusals():
     check("prose AC5: a session with no transcript exits 2", r.returncode, 2)
     check_true("prose AC5: ...naming the projects root it searched", pathlib.Path(projects).as_posix() in r.stderr,
                r.stderr)
+
+
+# ---------------------------------------------------------------------------------- memory (TOOL-dTotalRecall-12)
+
+# The report's columns after the type label, typed here rather than imported, so a moved column reds.
+MEMORY_COLUMNS = ("agents", "reading", "median B", "p90 B", "read med", "read p90", "shell med", "shell p90",
+                  "slice med", "slice p90", "read B", "shell B", "slice B")
+
+
+def run_memory_plant(case, prefix):
+    """`memory --fixture --plant <case>` under an arm's own scratch and roots: (rc, rows, lines, output)."""
+    base, _projects = build_projects(prefix)
+    r = run_runlog(["memory", "--fixture", "--plant", case], base, build_arm_env(base))
+    lines = r.stdout.splitlines()
+    return r.returncode, read_memory_rows(lines), lines, r.stdout + r.stderr
+
+
+def read_memory_rows(lines):
+    """`{label: {column: cell}}` for each type row, the pooled row included; a figure's commas dropped."""
+    rows = {}
+    for ln in lines:
+        if not ln.startswith("memory: ") or ln.startswith(("memory: window", "memory: verdict", "memory: no ")):
+            continue
+        label, cells = ln[8:28].strip(), ln[28:].split()
+        if label == "agent type" or len(cells) != len(MEMORY_COLUMNS):
+            continue
+        rows[label] = {k: (int(v.replace(",", "")) if v.replace(",", "").isdigit() else v)
+                       for k, v in zip(MEMORY_COLUMNS, cells)}
+    return rows
+
+
+def read_memory_cell(rows, column):
+    return rows.get("all, pooled", {}).get(column)
+
+
+def test_memory_ac1_read_channel():
+    rc, rows, lines, _out = run_memory_plant("read-memory", "runlog-mem-ac1-")
+    check("memory AC1: a Read under the memory root carries its result's bytes on the read channel",
+          read_memory_cell(rows, "read B"), 1200)
+    check("memory AC1: ...and none on the shell channel", read_memory_cell(rows, "shell B"), 0)
+    check_true("memory AC1: ...and the planted torn line is counted on the window line",
+               any(ln.startswith("memory: window ") and "· torn 1 ·" in ln for ln in lines), "\n".join(lines))
+    _rc, rows, _lines, _out = run_memory_plant("grep-memory", "runlog-mem-ac1g-")
+    check("memory AC1: a Grep under the memory root counts its text items' bytes the same way",
+          read_memory_cell(rows, "read B"), 700)
+    check("memory AC1: ...and none on the shell channel", read_memory_cell(rows, "shell B"), 0)
+    _rc, rows, _lines, _out = run_memory_plant("read-other", "runlog-mem-ac1o-")
+    check("memory AC1: a Read outside the memory root, a kit dir named memory-something included, counts zero",
+          read_memory_cell(rows, "read B"), 0)
+    check("memory AC1 liveness: ...over an agent the measure did read", read_memory_cell(rows, "agents"), 1)
+    check("memory AC1: ...which reads no memory", read_memory_cell(rows, "reading"), 0)
+
+
+def test_memory_ac2_shell_channel():
+    _rc, rows, _lines, _out = run_memory_plant("record-show", "runlog-mem-ac2-")
+    check("memory AC2: a `gov_record.py show` call carries its result's bytes on the shell channel",
+          read_memory_cell(rows, "shell B"), 1500)
+    check("memory AC2: ...and the Read-only total is zero", read_memory_cell(rows, "read B"), 0)
+    for case, want in (("gov-tag", 700), ("recall-query", 800), ("shell-path", 800)):
+        _rc, rows, _lines, _out = run_memory_plant(case, "runlog-mem-ac2-")
+        check(f"memory AC2: the {case} plant counts its results on the shell channel",
+              read_memory_cell(rows, "shell B"), want)
+    _rc, rows, _lines, _out = run_memory_plant("shell-other", "runlog-mem-ac2o-")
+    check("memory AC2: a shell call naming no memory path and no read verb counts zero",
+          read_memory_cell(rows, "shell B"), 0)
+    check("memory AC2 liveness: ...over an agent the measure did read", read_memory_cell(rows, "agents"), 1)
+
+
+def test_memory_ac3_unarmed():
+    rc, _rows, lines, _out = run_memory_plant("unarmed", "runlog-mem-ac3-")
+    body = [ln for ln in lines if not ln.startswith("memory: agent type")]
+    check("memory AC3: the stand-in slice reader exits 3", rc, 3)
+    check_true("memory AC3: ...its verdict line reads unarmed",
+               bool(body) and body[-1].startswith("memory: verdict unarmed · "), "\n".join(lines))
+    check_true("memory AC3: ...and every report line shows the slice channel unarmed, never zero bytes",
+               len(body) >= 4 and all("unarmed" in ln for ln in body), "\n".join(lines))
+
+
+def test_memory_ac4_population():
+    _rc, rows, _lines, _out = run_memory_plant("foreign-dir", "runlog-mem-ac4-")
+    check("memory AC4: an agent under another project's directory is not in the population",
+          read_memory_cell(rows, "agents"), 1)
+    check("memory AC4: ...and its bytes are not counted", read_memory_cell(rows, "read B"), 600)
+    _rc, rows, _lines, _out = run_memory_plant("outside-window", "runlog-mem-ac4w-")
+    check("memory AC4: an agent that started before the window is not in the population",
+          read_memory_cell(rows, "agents"), 1)
+    check("memory AC4: ...and its bytes are not counted", read_memory_cell(rows, "read B"), 600)
+
+
+def test_memory_ac6_verdict():
+    rc, _rows, lines, _out = run_memory_plant("median-under", "runlog-mem-ac6-")
+    check("memory AC6: a planted median of 32,000 B passes with exit 0", rc, 0)
+    check_true("memory AC6: ...its verdict line reading pass over that median",
+               bool(lines) and lines[-1].startswith("memory: verdict pass · median 32000 B · target 33000 B"),
+               "\n".join(lines))
+    rc, _rows, lines, _out = run_memory_plant("median-over", "runlog-mem-ac6o-")
+    check("memory AC6: a planted median of 34,000 B fails with exit 1", rc, 1)
+    check_true("memory AC6: ...its verdict line reading fail over that median",
+               bool(lines) and lines[-1].startswith("memory: verdict fail · median 34000 B · target 33000 B"),
+               "\n".join(lines))
+
+
+def test_memory_ac7_states():
+    for case in ("not-due", "empty"):
+        rc, _rows, lines, _out = run_memory_plant(case, "runlog-mem-ac7-")
+        check(f"memory AC7: the {case} plant exits 3, no verdict", rc, 3)
+        check_true(f"memory AC7: ...its verdict line reads {case}",
+                   bool(lines) and lines[-1].startswith(f"memory: verdict {case} · "), "\n".join(lines))
+
+
+def test_memory_ac9_privacy():
+    _rc, rows, _lines, out = run_memory_plant("privacy", "runlog-mem-ac9-")
+    check("memory AC9: no planted command, path or result text reaches the output",
+          "TOTALRECALL-12-MARKER" in out, False)
+    check("memory AC9 liveness: ...over an agent whose planted calls were counted",
+          read_memory_cell(rows, "reading"), 1)
 
 
 def _set_writable(func, path, _exc):

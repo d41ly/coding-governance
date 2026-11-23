@@ -412,3 +412,13 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T13:47:47Z rescope · item defer TOOL-dTotalRecall-15 · reason held under spec 17 section 8 F5: the map lost its replay on recall (verdict record 2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict); owner ask TOOL-dTotalRecall-111 decides retire or re-run
 
 2026-11-23T13:47:49Z rescope · item defer TOOL-dTotalRecall-26 · reason held under spec 17 section 8 F5: the map lost its replay on recall (verdict record 2026-11-23-build-TOOL-dTotalRecall-17-map-replay-verdict); owner ask TOOL-dTotalRecall-111 decides retire or re-run
+
+2026-11-23T13:57:28Z brief · item TOOL-dTotalRecall-12 · reason e90b81c83f4f memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-12-build-brief.md
+
+2026-11-23T14:00:35Z dispatch · item 9bc501b0 TOOL-dTotalRecall-12 · reason tools/runlog/memory_measure.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/README.md tools/govkit/usage.toml help/memory-measure.md help/README.md memory/builds/dTotalRecall/BACKLOG.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-12.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-12-1-acceptance-ledger.md
+2026-11-23T14:14:25Z draw · re-dispatch · TOOL-dTotalRecall-12 · 56/186 · 20261123T141425Z-fbcc17
+
+2026-11-23T14:14:26Z dispatch · item 9bc501b0 TOOL-dTotalRecall-12 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-12-deviation-1010.md
+2026-11-23T14:20:20Z draw · re-dispatch · TOOL-dTotalRecall-12 · 57/186 · 20261123T142020Z-f3e25d
+
+2026-11-23T14:20:20Z dispatch · item 9bc501b0 TOOL-dTotalRecall-12 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
