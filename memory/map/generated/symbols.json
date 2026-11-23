@@ -4003,6 +4003,11 @@
       "file": "tools/playbook/fixtures/row_kind.py"
     },
     {
+      "id": "build_render_env",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "build_render_pathspec",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -7293,6 +7298,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_key_conflicts",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "check_key_read",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -8776,6 +8786,11 @@
       "id": "check_reviewed_file",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "check_reviewer_merge",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_revision",
@@ -10283,6 +10298,11 @@
       "file": "tools/govkit/steps/review_rounds.py"
     },
     {
+      "id": "cmd_down",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "cmd_emit_floors",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -10663,6 +10683,11 @@
       "file": "tools/govkit/steps/review_rounds.py"
     },
     {
+      "id": "cmd_up",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "cmd_update",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -10716,6 +10741,11 @@
       "id": "cmd_witness",
       "kind": "function",
       "file": "tools/govkit/steps/review_rounds.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
       "id": "cmd_write",
@@ -12088,6 +12118,11 @@
       "file": "tools/roles/render_agents.py"
     },
     {
+      "id": "derive_effort_writes",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "derive_ending",
       "kind": "function",
       "file": "tools/loop/budget.py"
@@ -12236,6 +12271,11 @@
       "id": "derive_family_tags",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "derive_family_writes",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
       "id": "derive_farm_row",
@@ -12668,6 +12708,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "derive_house_text",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "derive_hygiene_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -12871,6 +12916,11 @@
       "id": "derive_key_line",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_key_spellings",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
       "id": "derive_kickoff_home",
@@ -13231,6 +13281,11 @@
       "id": "derive_memory_root",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_merged_stages",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
       "id": "derive_merged_subclass",
@@ -13861,6 +13916,11 @@
       "id": "derive_rename_map",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_render_after",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
       "id": "derive_render_key",
@@ -14583,6 +14643,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "derive_stage_levels",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "derive_stage_map",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -14981,6 +15046,11 @@
       "id": "derive_usage_fingerprint",
       "kind": "function",
       "file": "tools/govkit/docs_leg.py"
+    },
+    {
+      "id": "derive_value_spellings",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
       "id": "derive_vanished_members",
@@ -16923,6 +16993,11 @@
       "file": "tools/govkit/steps/review_rounds.py"
     },
     {
+      "id": "load_conf_to_policy",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "load_conversion",
       "kind": "function",
       "file": "tools/govkit/steps/conf_pins_to_ledger.py"
@@ -17343,6 +17418,11 @@
       "file": "tools/govkit/steps/registry_to_ledger.py"
     },
     {
+      "id": "load_target_module",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "load_text",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -17666,6 +17746,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/steps/review_rounds.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
       "id": "main",
@@ -21818,6 +21903,11 @@
       "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
+      "id": "read_bytes",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "read_bytes_as_text",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
@@ -23673,6 +23763,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "read_index_roles",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "read_index_rows",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -24611,6 +24706,16 @@
       "id": "read_offer_tip",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_old_edges",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
+      "id": "read_old_spellings",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
       "id": "read_one_line_cap",
@@ -25768,6 +25873,11 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "read_roles_kit",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "read_roles_tag_rows",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -26806,6 +26916,11 @@
       "id": "read_token",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_toml",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
       "id": "read_toml_field",
@@ -29273,6 +29388,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_edits",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "render_empty_spine_diagnosis",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -29846,6 +29966,11 @@
       "id": "render_policy_trailer",
       "kind": "function",
       "file": "tools/loop/guard.py"
+    },
+    {
+      "id": "render_policy_unset",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "render_population",
@@ -31506,6 +31631,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -43316,6 +43446,11 @@
       "id": "write_overlay_units",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "write_overlay_values",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
     },
     {
       "id": "write_override",
