@@ -9318,6 +9318,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_stop_replay",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_sub_context",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
