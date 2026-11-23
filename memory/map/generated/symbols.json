@@ -8733,6 +8733,11 @@
       "file": "tools/roles/render_agents.py"
     },
     {
+      "id": "check_return_file",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "check_return_value",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -8996,6 +9001,11 @@
       "id": "check_scope_plant",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "check_scout_return",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "check_scratch_guard",
@@ -29293,9 +29303,19 @@
       "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
+      "id": "render_fixture_return",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "render_fixture_row",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "render_fixture_work_order",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "render_for_work_order",
