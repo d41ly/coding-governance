@@ -31,7 +31,7 @@
 - SEV · TOOL-dTotalRecall-29 · MED · a pruned claim ref lets two clones mint one slug
 - CLOSED · TOOL-dTotalRecall-29 · by TOOL-dTotalRecall-3 · `tools/lib/gov-ref.sh#remove_gov_ref` refuses any ref under `refs/gov/claims/`, in every carried copy of the block — closed by TOOL-dTotalRecall-3 (`f8b950c13`)
 - SEV · TOOL-dTotalRecall-30 · LOW · a record write that skips the feed passes the census
-- DEFERRED · TOOL-dTotalRecall-30 · until TOOL-dTotalRecall-24 · TOOL-dTotalRecall-24's build run extends `scan_feed_writers` and `check_feed` to record commits, so the two specs agree there at the latest (the spec run carries it forward with the unit it waits on)
+- CLOSED · TOOL-dTotalRecall-30 · by TOOL-dTotalRecall-24 · `check_feed` grades record events as a set and the census's landing arm grades every default-branch push, so a commit touching a record path is in both — closed by TOOL-dTotalRecall-24 (`5d632d67d`)
 - SEV · TOOL-dTotalRecall-31 · LOW · the README's relation keys sit outside the edge registry that types them
 - CLOSED · TOOL-dTotalRecall-31 · by TOOL-dTotalRecall-6 · the README's relation keys are typed by the `[[front-matter]]` table in `tools/playbook/edges.toml`, with `implements`, `amends` and `supersedes` taking a build and `patches` a family id — closed by TOOL-dTotalRecall-6 (`ce198f660`); its deviation 62 states the rows
 - SEV · TOOL-dTotalRecall-32 · LOW · an edge type with no declared cardinality is never checked after a merge

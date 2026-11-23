@@ -33599,7 +33599,6 @@ memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-60.md	tools/ru
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-60.md	tools/runlog/record.py:1461-1478	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-60.md	tools/runlog/record.py:176-181	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-61.md	deviations.py:380	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-62.md	tools/codebase-map/map_lib.py:1502	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-63.md	BUILD-METHOD M6	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-64.md	BUILD-METHOD M6	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-65.md	BUILD-METHOD M6	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
@@ -37521,3 +37520,6 @@ tools/workflows/tier2-review.test.sh	p.js:9	1	9e21ac760dc0a43d6ed007396922722cce
 tools/workflows/tier2-review.test.sh	security.js:1	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh32-pathless.js:3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 tools/workflows/unattended-build.test.sh	gh36-mid.js:2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
+tools/lib/resolve-python.test.sh	fw/land.sh:2	1	be084a5f523ca75407c0bcd0e15561712ee68d8c	widened:2026-11-23-build-TOOL-dTotalRecall-24-widen-11
+memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-24-widen-11.md	fw/land.sh:2	1	be084a5f523ca75407c0bcd0e15561712ee68d8c	widened:2026-11-23-build-TOOL-dTotalRecall-24-widen-12
+memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-24-widen-12.md	fw/land.sh:2	1	be084a5f523ca75407c0bcd0e15561712ee68d8c	widened:2026-11-23-build-TOOL-dTotalRecall-24-widen-12
