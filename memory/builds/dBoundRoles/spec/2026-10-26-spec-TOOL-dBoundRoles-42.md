@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-42 — the retired hook's readers under `memory/` classed, append-only records left as written, and the live-carrier check scoped to what a reader can still be misled by
 
-**Status:** DEFERRED · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-4 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -17,6 +17,7 @@
 | [2026-10-26-prompt-TOOL-dBoundRoles-37-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-37-round1-fix-brief.md) | research | TOOL-dBoundRoles-37 TOOL-dBoundRoles-40 TOOL-dBoundRoles-43 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-64-round6-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-64-round6-fix-brief.md) | research | TOOL-dBoundRoles-64 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-25-reground-n-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-25-reground-n-brief.md) | journal | TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 |
+| [2026-11-22-prompt-TOOL-dBoundRoles-42-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-42-build-brief.md) | journal | — |
 | [2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 |
 
 <!-- /gen:spec-records -->

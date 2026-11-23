@@ -422,7 +422,7 @@ Cite ids, never line numbers.
 | [TOOL-cTracedPromise-4](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | check-memory-hygiene.test.sh printed an AUTHORED assertion count, stuck… |
 | [TOOL-cTracedPromise-5](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | an adopter who fills TRACE_CUTOFF before closing any spec after it reds… |
 | [TOOL-cTracedPromise-7](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | the unset-TRACE_CUTOFF row prints DEAD PROBE though --check ignores it:… |
-| [TOOL-dBoundRoles-27](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | MED | TOOL-dBoundRoles-42 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dBoundRoles-27](../builds/dBoundRoles/BACKLOG.md) | INPROGRESS | MED | TOOL-dBoundRoles-42 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dBoundRoles-28](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE MARKER'S item= HAS NO WRITER IN THE SPEC WHO IS HANDED IT.… |
 | [TOOL-dBoundRoles-29](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | PLAY-dOrderedCharter-36's KIND SCHEMA HAS NO ROW-SCOPED fixed-by. A… |
 | [TOOL-dBoundRoles-30](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | PLAY-dOrderedCharter-11 S3 AND S4 READ A TABLE THIS BUILD DELETES. They… |
