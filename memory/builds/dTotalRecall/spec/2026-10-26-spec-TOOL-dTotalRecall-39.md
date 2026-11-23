@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-39 — one record-header edge reader: the edge grammar's header site calls `tree_lib.read_header_edges` and defines none of its own
 
-**Status:** DEFERRED · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
+**Status:** INPROGRESS · rev-3 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
