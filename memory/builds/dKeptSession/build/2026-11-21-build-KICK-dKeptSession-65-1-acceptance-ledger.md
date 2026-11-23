@@ -20,8 +20,8 @@ landed, the last merges unit 64's at `337608fc0`. What the build found and how i
   state column of one `soft` read, and `#write_mail_post` binding `MAIL_DUPLICATE` so the ack turns a
   duplicate's exit 1 into 2. This pass replaces the skip's predicate and the read's mode as S1 and S12
   state and keeps unit 64's exits: `tools/unattended/unattended.sh#write_mail_ack` now returns 0 on an
-  empty list before any read, reads `read_mailbox <slug> strict` once and `read_mailbox <slug> local
-  sent` once, and skips an id some `sent` row of kind `ack` answers.
+  empty list before any read, reads `read_mailbox <slug> strict` once and
+  `read_mailbox <slug> local sent` once, and skips an id some `sent` row of kind `ack` answers.
 - The driver suite's effective floors read `FLOOR_ASSERTIONS` 4212 and `FLOOR_SHARD_8` 1429 at this base
   (DERIVED, the last assignment of each at `1a6873936`), not the spec's 4137 and 1354 (PINNED, the
   spec's §4 at `f5beae3d`); the SHADOWED pin reads 675 (DERIVED, the same read). The runlog suite's
@@ -43,8 +43,8 @@ landed, the last merges unit 64's at `337608fc0`. What the build found and how i
   left is a message under the ack's own id that is no ack of that id.
 - `python tools/codebase-map/gen_map.py --write` rewrote `memory/map/generated/symbols.json` alone,
   gaining `test_gov_remote_scrub`, `read_main_scrub` and `GOV_SCRUB_VARS`.
-- S20's ids: no minting verb prints a next id, so the ids were derived, not typed: `python
-  tools/memory-tree/corpus_ids.py --print-defined-ids` read the family's highest defined id as
+- S20's ids: no minting verb prints a next id, so the ids were derived, not typed:
+  `python tools/memory-tree/corpus_ids.py --print-defined-ids` read the family's highest defined id as
   `KICK-dKeptSession-69` at `1a6873936`, so the nine rows take `-70` to `-78`.
 - S26 and the spec's `memory/builds/dKeptSession/spec/` row: no reconcile ran in this pass, so no spec's
   leg line moved; the rule is observed by AC6's fixture.
@@ -86,8 +86,8 @@ write.
   exited 2 landing nothing.
 - AC2 — observed. B's session t5 acked i as fx and pushed; A's `--mail ack fx i` through the same copy
   printed `FETCH` first, `mail — already acked i` and no `DUPCHECK` line, exit 0, the tip unmoved. With
-  A's origin URL set to an absent directory the same call printed `FETCH` and `mail — not read · the
-  remote did not answer, git fetch exited 128` followed by the URL, exit 2, the tip unmoved. RED probe,
+  A's origin URL set to an absent directory the same call printed `FETCH` and
+  `mail — not read · the remote did not answer, git fetch exited 128` followed by the URL, exit 2, the tip unmoved. RED probe,
   the base driver: that call printed `mail — local copy` and exited 0.
 - AC3 — observed. `grep -c -F -- "--mail ack <slug> [<id> ...]"` printed `1` over the template, the
   verbs guide and the usage row's line of the driver; `--mail ack fx` with no ids exited 0, printing
@@ -100,12 +100,12 @@ write.
   no default and a pop after the `try` as not.
 - AC5 — observed over the scratch repository: unit 64's copy at status OPEN with `policy fixtures` off
   its leg line and a tracked stub at the workflow template printed the `[guards]` hit
-  `policy fixtures <- tools/workflows/unattended-build.template.js` and no `SPEC_GUARD_LEGS_CUTOFF
-  blank (arm off)` line; with the name on the leg line, no `[guards]` hit. RED: with the manifest
+  `policy fixtures <- tools/workflows/unattended-build.template.js` and no
+  `SPEC_GUARD_LEGS_CUTOFF blank (arm off)` line; with the name on the leg line, no `[guards]` hit. RED: with the manifest
   declaring the directory guard alone, no `[guards]` hit printed.
 - AC6 — observed over the same repository, `planted leg <- tools/loop/loop_transition.py`: the name sets
-  of the two manifests compared to `added ['planted leg'] dropped []`; unit 61's copy, stubs at its two loop paths, printed `planted leg <-
-  tools/loop/loop_transition.py` and no `[path]` hit under `tools/loop/`, and after the step no `[guards]`
+  of the two manifests compared to `added ['planted leg'] dropped []`; unit 61's copy, stubs at its two loop paths, printed
+  that hit and no `[path]` hit under `tools/loop/`, and after the step no `[guards]`
   hit. The rename compared to `added ['real leg two'] dropped ['real leg']`; the copy naming `real leg`
   printed its `[leg]` hit, and after the step, the old name off, neither a `[leg]` hit naming it nor a
   `[guards]` hit. RED: the add-only step left the `[leg]` hit for `real leg` standing.
@@ -114,8 +114,8 @@ write.
   (DERIVED, the diff's five added `same` calls, each unconditional and outside any loop, none taken out),
   each with a `RAISED` line; the block sits in region 8, so no other shard line moves.
 - AC8 — observed. The `git grep` printed nothing (exit 1), and `grep -n "sent=True"` over the loop kit's
-  transition module printed the parent's chain read in `write_consumed_acks`, `read_mail_rows(root,
-  parent, local=True, sent=True)`.
+  transition module printed the parent's chain read in `write_consumed_acks`,
+  `read_mail_rows(root, parent, local=True, sent=True)`.
 - AC9 — observed. `grep -c -E "KICK-dKeptSession-6[345]"` over dPlacedRequest's BACKLOG printed `0`; over
   the `gov_ref_sh` block, comment lines dropped, the `git log` or `rev-list` count printed `0`, and `1`
   without the filter (DERIVED, at `1a6873936`).
@@ -123,9 +123,9 @@ write.
   pass base and `12` after the edit (DERIVED, both read at the pass), nine more; each new id has its ask
   row under `## Asks`.
 - AC11 — observed. `git diff 6123f4611^ HEAD` over the workflow template and over its render printed the
-  same changed lines once CRs are stripped, two each (DERIVED, that diff), and `grep -c 'candidates for one
-  parallel group'` printed `1` over each; this spec's §7 line names `review-protocol parity (kit vs
-  dogfood)`, the leg the close runs over the render unit 64 left.
+  same changed lines once CRs are stripped, two each (DERIVED, that diff), and
+  `grep -c 'candidates for one parallel group'` printed `1` over each; this spec's §7 line names
+  `review-protocol parity (kit vs dogfood)`, the leg the close runs over the render unit 64 left.
 - AC12 — observed. `blk s` over a scratch file holding `// >>> s`, two lines, `// <<< s` and two trailing
   lines printed the block and no trailing line; the RED copy whose closer reads `^# <<< ` alone ran to
   the end of the file.
@@ -149,8 +149,8 @@ batch lands only the ids not skipped, in one `write_mail_ref`, and exits as that
 KICK-dKeptSession-65 S3: it holds for an id answered and then acked (AC1).
 
 `KICK-dKeptSession-64` S7 reads: "This unit's own ledger carries the lines of units 58 to 61 by that
-rule". Answered by KICK-dKeptSession-65 S7: the population is derived by `python
-tools/check-spec-tokens.py --legs-for` over each unit's Files touched, never lines fixed in advance;
+rule". Answered by KICK-dKeptSession-65 S7: the population is derived by
+`python tools/check-spec-tokens.py --legs-for` over each unit's Files touched, never lines fixed in advance;
 unit 64 is a member by its workflow template, which trips `policy fixtures`, so its line is a leg list
 naming it.
 
@@ -211,8 +211,8 @@ in-process `resolve_remote` over a remote-less scratch repository in a process s
 `GOV_REMOTE=planted`". Answered by KICK-dKeptSession-65 S5: two processes, one with both variables
 planted and one with neither, this unit's `test_gov_remote_scrub`; unit 64's arm keeps its own fact.
 
-`KICK-dKeptSession-64` §7's leg line names `policy fixtures` and no `review-protocol parity (kit vs
-dogfood)`. Answered by KICK-dKeptSession-65 S21: this unit's §7 carries the parity leg, which the close
+`KICK-dKeptSession-64` §7's leg line names `policy fixtures` and no
+`review-protocol parity (kit vs dogfood)`. Answered by KICK-dKeptSession-65 S21: this unit's §7 carries the parity leg, which the close
 runs over the render unit 64 left.
 
 ## The unit 63 text answered (AC13)
@@ -253,6 +253,6 @@ Units 61, 63 and 64 are CLOSED, so no spec or ledger of theirs is written (F4, (
 - The two `New arm:` lines' RED-first observations: the driver block in region 8 staged red by a scratch
   `unattended.sh` whose skip reads the state column and whose read is `soft`, and `test_gov_remote_scrub`
   staged red by a copy whose scrub is a bare `del`.
-- Every §7 leg, the shard 8 row and the runlog suite whole, and `shell hygiene (a loop fed by a command
-  substitution)`, which the scratch-guard refused this pass.
+- Every §7 leg, the shard 8 row and the runlog suite whole, and
+  `shell hygiene (a loop fed by a command substitution)`, which the scratch-guard refused this pass.
 - AC14's re-render read after the commit, and the budget rows above.
