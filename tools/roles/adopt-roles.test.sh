@@ -58,7 +58,8 @@
 # and `handoff.py facts` cutting it to the same key (arm 34); and the work order rendered per item, its five blocks,
 # its allowance by class, a wrong role, no allowance, an unrouted one, an undeclared item, no loop kit and a missing
 # block refused (arm 35); and a house text file moved by the house step into the overlay, rendered between the
-# marked pair, and R10 over a level-5 unit selecting no role file and over one carrying a heading (arm 47).
+# marked pair, and R10 over a level-5 unit selecting no role file and over one carrying a heading (arm 47); and a
+# builder work order handing unit 24's spec, and a CLI `--input work-order=` refused (arm 48).
 # Every arm is a self-contained block below the prologue, so a
 # slice of the prologue and one block runs that arm alone; arm 20 reads arm 19's fixture, and arm 25
 # arm 9's writer and lines.
@@ -146,7 +147,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +2 for arm 45, the missing slot and the refused front matter (TOOL-dBoundRoles-61).
 # +23 for arm 46, twenty-one over the composed fixture and two over the adopter's harness list (TOOL-dBoundRoles-20).
 # +6 for arm 47, five verdicts over the house fixture and its line count (TOOL-dBoundRoles-19).
-FLOOR_ASSERTIONS=218
+# +1 for arm 32's stand-in with roles.no-spawn unset and +2 for arm 48 (TOOL-dBoundRoles-43).
+FLOOR_ASSERTIONS=221
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -1794,14 +1796,20 @@ print("ac2a %d" % int(rc == 0 and "### Charter rules" not in out.split("\n## Tas
                       and len(re.findall(r"(?m)^### Charter rules\r?$", agent)) == 1))
 waiver = fx / mr / "project" / "role-stand-in-waiver.txt"
 waiver.write_text("2026-11-22\towner a\tgov-researcher\ttFix\tthis tool exposes no sub-agent primitive\n", encoding="utf-8")
+# TOOL-dBoundRoles-43 S12: the stand-in case sets the key that admits a stand-in, and its sibling, the key unset,
+# expects the default `executor-role-session` refusal naming the key, writing nothing
+stand_in = "roles.no-spawn = \"recorded-stand-in\""
 commit()
+rc, out, err = run(kit, *render, "--stand-in")
+print("ac12 %d" % int(rc != 0 and "roles.no-spawn" in err and not made()))
+commit(stand_in)
 rc, out, err = run(kit, *render, "--stand-in")
 held = made()
 text = held[0].read_text(encoding="utf-8") if len(held) == 1 else "### Charter rules"
 print("ac2b %d" % int(rc == 0 and "### Charter rules" not in text.split("\n## Task\n", 1)[-1]))
 for p in held:
     p.unlink()
-commit(always)
+commit(always, stand_in)
 rc, out, err = run(kit, *render, "--stand-in")
 print("ac2c %d" % int(rc == 1 and "instructions.task-charter" in err and ch in err and not made()))
 session = "\n".join(["import pathlib, sys", "import roles_lib as lib, handoff",
@@ -1851,7 +1859,9 @@ check_arm "arm 32 under a committed instructions.task-charter always the direct 
    "$([ "$_rc32" = 0 ] && [[ $A32 == *'ac1 1'* ]] && echo 1 || echo 0)"
 check_arm "arm 32 unset, the task carries no charter rules and the agent type carries them once" \
    "$([[ $A32 == *'ac2a 1'* ]] && echo 1 || echo 0)"
-check_arm "arm 32 a stand-in render under the owner's waiver row carries no charter in its task" \
+check_arm "arm 32 a stand-in render with roles.no-spawn unset refuses naming the key, writing nothing (TOOL-dBoundRoles-43 AC12)" \
+   "$([[ $A32 == *'ac12 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 32 a stand-in render under recorded-stand-in and the owner's waiver row carries no charter in its task" \
    "$([[ $A32 == *'ac2b 1'* ]] && echo 1 || echo 0)"
 check_arm "arm 32 ...and under always refuses naming the charter file, writing nothing" \
    "$([[ $A32 == *'ac2c 1'* ]] && echo 1 || echo 0)"
@@ -1862,7 +1872,7 @@ check_arm "arm 32 with no policy kit the render exits 0 with the note naming the
 check_arm "arm 32 a cited rule past gov-reuse-scout's headroom is one R5 line naming the role and its budget" \
    "$([[ $A32 == *'ac3a 1'* ]] && echo 1 || echo 0)"
 check_arm "arm 32 ...and with the rule taken out the catalogue checks clean" "$([[ $A32 == *'ac3b 1'* ]] && echo 1 || echo 0)"
-[ "$A32" = $'ac1 1\nac2a 1\nac2b 1\nac2c 1\nac2d 1\nac7 1\nac3a 1\nac3b 1' ] || printf '    %s\n' "${A32//$'\n'/$'\n'    }"
+[ "$A32" = $'ac1 1\nac2a 1\nac12 1\nac2b 1\nac2c 1\nac2d 1\nac7 1\nac3a 1\nac3b 1' ] || printf '    %s\n' "${A32//$'\n'/$'\n'    }"
 
 # ---- arm 33 (TOOL-dBoundRoles-17 AC1 AC3 AC4 AC6): the work order's `item=` and the return's `**Answers:**`
 # ---- line, graded as R16 after the fixture's seed. The fixture gains the memory-tree kit's `legacy_ledger.py`
@@ -2932,6 +2942,28 @@ for _ln in "${_l47[@]}"; do
   check_arm "arm 47 ${_ln%% *} (TOOL-dBoundRoles-19)" "${_w%% *}"
   [ "${_w%% *}" = 1 ] || printf '    %s\n' "$_ln"
 done
+
+# ---- arm 48 (TOOL-dBoundRoles-43 AC34 AC45): a builder work order handing unit 24's spec, its backticked
+# ---- `blob:`, `record:` and `cmd:` spans among its text, renders, its spec copied into the fixture from this
+# ---- repository's tree; and a CLI `--input work-order=` exits 2 naming the key, which only `render --for`
+# ---- fills. The failing cases, owed at the close and not observed by the pass that wrote this: a render whose
+# ---- anchor check grades the handed spec's own spans, which refuses the first; and an `--input` admission
+# ---- reading `work-order` as a typed input, which writes the driver's text as the work order.
+build_fixture
+_b48=dBound; _b48=${_b48}Roles
+_s48=$(cd "$REPO" && ls "$MR/builds/$_b48/spec/"*"-spec-TOOL-$_b48-24.md" 2>/dev/null | head -n 1)
+mkdir -p "$FX/$MR/builds/tFix/spec" "$FX/$MR/builds/tFix/prompts"
+A48S="$MR/builds/tFix/spec/${_s48##*/}"
+[ -n "$_s48" ] && cp "$REPO/$_s48" "$FX/$A48S"
+(cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-builder --build tFix --unit TOOL-tFix-1 \
+   --input "spec=$A48S" --stdout) > "$TMP_ROOT/a48.out" 2>"$TMP_ROOT/a48.err"; rc=$?
+check_arm "arm 48 a builder work order handing unit 24's spec renders, exit 0" \
+   "$([ -n "$_s48" ] && [ "$rc" = 0 ] && grep -qF '### input:spec' "$TMP_ROOT/a48.out" && echo 1 || echo 0)"
+[ "$rc" = 0 ] || sed 's/^/    /' "$TMP_ROOT/a48.err"
+(cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build tFix --input "work-order=x" \
+   --stdout) > /dev/null 2>"$TMP_ROOT/a48w.err"; rc=$?
+check_arm "arm 48 --input work-order=x exits 2 naming work-order, which only render --for fills" \
+   "$([ "$rc" = 2 ] && grep -qF 'work-order' "$TMP_ROOT/a48w.err" && echo 1 || echo 0)"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

@@ -46,8 +46,9 @@ before stage 3, and it wins any difference. The stages below are the workflows o
 ## Stage 1 — orient
 
 `/session-kickoff` ran it. When you spawned the orientation scout, `gov-orienter`, from a rendered work order to
-place a request and it returned `outcome: placed`, write its return unchanged to the request's return file, `<file>`, then record it:
-`python {{TOOL_ROOT}}loop/placement.py place --request <content key> --return <file>`, then check it:
+place a request and it returned `outcome: placed`, write its return unchanged to the request's return file, `<file>`, then record it,
+bound to the scout's agent id its call returned, so a file that is not the scout's own last text is refused:
+`python {{TOOL_ROOT}}loop/placement.py place --request <content key> --return <file> --agent <agent id>`, then check it:
 `python {{TOOL_ROOT}}loop/placement.py check --request <content key>`.
 Act only on a check that passes. A refusal of either routes back to the scout, spawned again from its work order,
 never to a placement of your own.

@@ -230,13 +230,15 @@ UNIT_TAG_RE = re.compile(r"^unit(\.[a-z0-9][a-z0-9-]*)+$")
 POLICY_KEY_RE = re.compile(r"^[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*)+$")
 DRIVERS = ("agent", "workflow", "program", "main-loop")
 WRITES = ("none", "spec", "product", "review", "records")
-#: The two `acts-as` values (TOOL-dBoundRoles-1 S1): a role acting in an item, or one serving the cycle.
-ACTS_AS = ("item", "cycle")
-#: A `layer` value's shape, the playbook register's tag grammar; R2 joins it to a row of that register.
-LAYER_TAG_RE = re.compile(r"^layer(\.[a-z][a-z0-9-]*)+$")
 #: The keys every role carries and those only an agent role must, and the required keys that may be
 #: empty: derived from the role schema's rows, never typed (TOOL-dBoundRoles-2 S1).
 _SCHEMA = lib.load_role_schema()
+#: The two `acts-as` values (TOOL-dBoundRoles-1 S1): a role acting in an item, or one serving the cycle,
+#: read from the `choice` row's `values` (TOOL-dBoundRoles-43 S8), never typed here.
+ACTS_AS = next(r["values"] for r in _SCHEMA if r["key"] == "acts-as")
+#: A `layer` value's shape, the playbook register's tag grammar, its word the `tag` row's `ns`; R2 joins
+#: it to a row of that register.
+LAYER_TAG_RE = re.compile(r"^%s(\.[a-z][a-z0-9-]*)+$" % next(r["ns"] for r in _SCHEMA if r["key"] == "layer"))
 REQUIRED_ROLE_KEYS = tuple(r["key"] for r in _SCHEMA if r["required"] == "every")
 AGENT_ROLE_KEYS = tuple(r["key"] for r in _SCHEMA if r["required"] == "agent")
 EMPTY_ROLE_KEYS = frozenset(r["key"] for r in _SCHEMA if r["empty"])
@@ -806,6 +808,13 @@ def check_roles(root, kit_dir, write=False, scenario=None, composed=None):
                 if row.get("effort") not in lib.EFFORT_LEVELS:
                     add_defect(table, "R9", "%s: effort %r is not one of %s"
                                % (stage, row.get("effort"), " ".join(lib.EFFORT_LEVELS)))
+                else:
+                    # TOOL-dBoundRoles-43 S49: the stage row's own level, step 5 of the effort order, held to
+                    # the floor as the house file's (R12) and the role's declared level (R2) are
+                    try:
+                        lib.check_effort_floor(row["effort"], "the stage row %s's own effort" % stage)
+                    except lib.RolesError as e:
+                        add_defect(table, "R9", str(e))
                 for field in ("receives", "returns"):
                     v = row.get(field)
                     if not isinstance(v, list) or not all(isinstance(x, str) for x in v):

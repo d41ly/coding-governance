@@ -196,7 +196,7 @@ class RolesError(Exception):
 #: each row's three graded keys.
 ROLE_SCHEMA = "role-schema.toml"
 SCHEMA_OWNERS = ("claude", "gov")
-SCHEMA_SHAPES = ("slot", "text", "list", "class", "bool", "entries", "template")
+SCHEMA_SHAPES = ("slot", "text", "list", "class", "bool", "entries", "template", "int", "tag", "choice")
 SCHEMA_REQUIRED = ("every", "agent", "optional")
 #: A row's key: a hyphenated word, letters and digits opening on a letter, single hyphens between them
 #: (TOOL-dBoundRoles-1 S1), so `acts-as` loads and `-x`, `x-` and `x--y` do not.
@@ -205,7 +205,9 @@ SCHEMA_KEY_RE = r"[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*"
 
 def load_role_schema():
     """The `[[field]]` rows of `role-schema.toml` beside this file, in file order, each a dict holding
-    `key`, `owner`, `shape`, `required` and `empty` (False unless the row says true). An absent file, one
+    `key`, `owner`, `shape`, `required` and `empty` (False unless the row says true); a `tag` row also its
+    namespace word `ns`, and a `choice` row its closed set `values`, a list of strings or the name of a
+    tuple constant of this module, read as that tuple (TOOL-dBoundRoles-43 S8). An absent file, one
     that is not TOML, a `[kind]` whose name is not `role`, or a row with a missing, repeated or
     out-of-set value raises RolesError naming the file, R2."""
     path = pathlib.Path(__file__).absolute().parent / ROLE_SCHEMA
@@ -236,8 +238,22 @@ def load_role_schema():
         if not isinstance(r.get("empty", False), bool):
             raise RolesError("%s: R2 — field '%s' empty is not true or false" % (where, key))
         seen.add(key)
-        out.append({"key": key, "owner": r["owner"], "shape": r["shape"], "required": r["required"],
-                    "empty": r.get("empty", False)})
+        row = {"key": key, "owner": r["owner"], "shape": r["shape"], "required": r["required"],
+               "empty": r.get("empty", False)}
+        if r["shape"] == "tag":
+            if not isinstance(r.get("ns"), str) or not re.fullmatch(r"[a-z][a-z0-9-]*", r["ns"]):
+                raise RolesError("%s: R2 — field '%s' is shaped tag and its ns %r is no namespace word"
+                                 % (where, key, r.get("ns")))
+            row["ns"] = r["ns"]
+        if r["shape"] == "choice":
+            values = r.get("values")
+            if isinstance(values, str):
+                values = globals().get(values) if re.fullmatch(r"[A-Z][A-Z0-9_]*", values) else None
+            if not isinstance(values, (list, tuple)) or not values or not all(isinstance(v, str) for v in values):
+                raise RolesError("%s: R2 — field '%s' is shaped choice and its values %r name no list of strings "
+                                 "nor a constant of roles_lib.py holding one" % (where, key, r.get("values")))
+            row["values"] = tuple(values)
+        out.append(row)
     return out
 
 

@@ -445,7 +445,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "positional-spec-revbump", "positional-bulk-move", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
           "ns-word-leaf", "leg-rows", "pack-rows", "check-rows", "role-rows", "role-binding", "field-rows",
-          "workflow-rows")
+          "workflow-rows", "role-rows-adopter")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -576,6 +576,12 @@ SHAPE_PLANTS = {
     "workflow-rows": (derive_fixture_row("workflow", "tag_index:extract_workflow"), {
         ti.OVERLAY_PATH: '[[workflow]]\ntag = "workflow.adopter.triage"\nname = "triage"\n',
         "memory/guides/ALPHA.md": "+\nsee `workflow.spec-write` and `workflow.spec-wrte`\n"}),
+    # TOOL-dBoundRoles-43 S24 S25: one gov role file beside an overlay holding one repository role row, and an
+    # actor patch's citation of that row's tag; the run then takes the overlay row out
+    "role-rows-adopter": (derive_fixture_row("role", "tag_index:extract_role", "selects"), {
+        f"{FIXTURE_AGENTS}/gov-builder.agent.md": derive_role_file("gov-builder", "verify"),
+        ti.OVERLAY_PATH: '[[role]]\ntag = "role.adopter.' + 'triager"\nname = "triager"\n',
+        "memory/guides/ALPHA.md": "+\nthe actor patch cites `role.adopter." + "triager`\n"}),
 }
 #: PLAY-dOrderedCharter-22's registry plants: each edits the base registry's first row, `doc`'s
 PURPOSE_PLANTS = {
@@ -1270,6 +1276,20 @@ def run_plant(root, top, plant, sets) -> int:
         checked = run_verb(root, "check", None, sets=sets)
         say(f"where: rc={rc}, check: rc={checked}")
         return 1 if rc or checked else 0
+    if plant == "role-rows-adopter":  # TOOL-dBoundRoles-43 AC24 AC25: the overlay row a member, the citation green,
+        adopter = "role.adopter." + "triager"  # then the row taken out and the citation red naming its path and line
+        con = ti.load_index(root)
+        try:
+            ti.load_view(con, root, ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml"))
+            members = sorted({r[0] for r in ti.read_rows(con, ("tag",), like="role.%")})
+        finally:
+            con.close()
+        checked = run_verb(root, "check", None, sets=sets)
+        say(f"members {' '.join(members)}, check: rc={checked}")
+        write_commit(root, {ti.OVERLAY_PATH: "# no repository role\n"}, "the overlay row taken out")
+        removed = run_verb(root, "check", None, sets=sets)
+        say(f"with the overlay row taken out: rc={removed}")
+        return 1 if adopter not in members or checked or not removed else 0
     if plant == "role-binding":  # TOOL-dBoundRoles-14 AC2: both directions red, then gov-builder citing yagni alone
         rc = run_verb(root, "check", None, sets=sets)
         write_commit(root, {f"{FIXTURE_AGENTS}/gov-builder.agent.md": derive_role_file("gov-builder", "yagni")},

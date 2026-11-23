@@ -554,12 +554,18 @@ def extract_role(ctx, path, text=None):
     """The `role` namespace: `role.<name>` for each role file, `{prefix}/roles/agents/*.agent.md` under
     the tool root, `<name>` its front matter's `name`, at the `name:` line, its text the raw `rules`
     value, which the role binding join reads (TOOL-dBoundRoles-14 S2). The grammar is the roles kit's
-    `parse_front_matter`, reached by `read_roles_tag_rows`."""
+    `parse_front_matter`, reached by `read_roles_tag_rows`. And each `[[role]]` row's `tag` in the overlay,
+    `OVERLAY_PATH`, a repository's role, `role.adopter.<name>` (TOOL-dBoundRoles-43 S24), as `extract_workflow`
+    reads the overlay's `[[workflow]]` rows; a file that does not parse names nothing."""
     if text is None:
+        if path == OVERLAY_PATH:
+            return ""
         troot = pathlib.PurePosixPath(ctx["kit"]).parent.as_posix()
         agents = resolve_prefix_token("{prefix}/roles/agents", troot)
         name = path[len(agents) + 1:] if path.startswith(agents + "/") else ""
         return "" if fnmatch.fnmatchcase(name, "*.agent.md") and "/" not in name else None
+    if path == OVERLAY_PATH:
+        return derive_tag_rows(text, "role")
     return read_roles_tag_rows("role", path, text)
 
 

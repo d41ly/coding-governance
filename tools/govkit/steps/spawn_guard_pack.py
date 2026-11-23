@@ -17,12 +17,16 @@ converges on the first image. Then, where the target installs the roles kit, it 
 --fragment <tmp> --unwire` once per group carrying the old command, `<tmp>` a fragment for that entry
 written under `tempfile.mkdtemp`: the marker `agent-cap.js`, the group's event and matcher, and the hook
 path the target's receipt records. Wiring first means a killed up leaves both hooks wired, never neither,
-the order the hooks kit's descriptor records for a moved security guard. A target without the roles kit
-loses the guard, which matches what it had: rule 6 is armed only by a role index. The settings file then
+the order the hooks kit's descriptor records for a moved security guard. A target with neither the roles
+kit nor the policy kit loses the guard, which matches what it had: rule 6 is armed only by a role index and
+rule 7 only by the policy kit. A target installing the policy kit and no roles kit is refused before any
+write, exit 1, naming the roles kit as rule 7's home and govkit's command installing it, the old hook left
+wired, since the move would drop the agent limit (TOOL-dBoundRoles-43 S41). The settings file then
 holds the image's after-bytes, or the up refuses naming the drift.
 
 THE WITNESS exits 0 when no command naming `agent-cap.js` is wired and, where the roles kit is installed,
-the `Workflow|Agent` group of `PreToolUse` carries a command naming `spawn-guard.js`; 1 otherwise. It reads
+the `Workflow|Agent` group of `PreToolUse` carries a command naming `spawn-guard.js`; 1 otherwise, the
+not-applied line naming rule 7's home and its install command where the up would refuse. It reads
 the working tree and runs no target code.
 
 THE DOWN restores `.claude/settings.json` from the before-image (`write_from_before_image`): byte-identical,
@@ -50,6 +54,9 @@ OLD_MARKER = "agent-cap.js"
 NEW_MARKER = "spawn-guard.js"
 FRAGMENT = "spawn-guard.fragment.json"
 ROLES_HOME = "roles"
+POLICY_HOME = "policy"
+POLICY_ANCHOR = "policy.py"
+GOVKIT = pathlib.Path(__file__).resolve().parents[1]  # gov's govkit kit, whose `apply` installs a kit
 MERGER = "settings-merge.py"
 EVENT = "PreToolUse"
 MATCHER = "Workflow|Agent"
@@ -158,11 +165,36 @@ def run_merges(target: pathlib.Path, merger: pathlib.Path, settings: pathlib.Pat
                           f"{p.returncode}: {tail}")
 
 
+def read_policy_kit(target: pathlib.Path, prefix: str) -> pathlib.Path | None:
+    """The policy kit's directory in `target` under `prefix`, None where none is: the kit that arms rule 7."""
+    try:
+        kit = STEPS.resolve_kit_dir(POLICY_HOME, POLICY_ANCHOR, target / prefix)
+    except LookupError:
+        return None
+    return kit if target in kit.parents else None
+
+
+def check_rule_home(target: pathlib.Path, prefix: str) -> str | None:
+    """None where the move keeps every rule the retired hook ran, else why it would drop one (TOOL-dBoundRoles-43
+    S41): a target installing the policy kit, which arms rule 7, the agent limit, and no roles kit, rule 7's
+    home after the move, would lose the rule, so the line names that home and its install command."""
+    if read_policy_kit(target, prefix) is None or read_fragment(target, prefix) is not None:
+        return None
+    install = GOVKIT / "govkit.py"
+    return (f"the target installs the {POLICY_HOME} kit, which arms rule 7, the agent limit, and no {ROLES_HOME} kit, "
+            f"rule 7's home once the retired hook goes, so the move would drop the rule; remedy: install the "
+            f"{ROLES_HOME} kit, `python {install.as_posix()} apply --target {target.as_posix()} --kits {ROLES_HOME}`, "
+            f"then re-run the step")
+
+
 def cmd_up(target: pathlib.Path, prefix: str) -> int:
     path = target / SETTINGS
     if not read_groups(read_settings(path.read_bytes() if path.is_file() else None), OLD_MARKER):
         print(f"{SAY}: up · no command in {SETTINGS} names {OLD_MARKER}, so there is nothing to move")
         return 0
+    why = check_rule_home(target, prefix)
+    if why:
+        raise Refusal(f"{SETTINGS}: left as it is, the retired hook still wired: {why}")
     merger = read_merger(target, prefix)
     fragment = read_fragment(target, prefix)
     old_path = read_receipt_path(target, OLD_MARKER) or OLD_MARKER
@@ -199,7 +231,8 @@ def cmd_witness(target: pathlib.Path, prefix: str) -> int:
     path = target / SETTINGS
     doc = read_settings(path.read_bytes() if path.is_file() else None)
     if read_groups(doc, OLD_MARKER):
-        print(f"{SAY}: witness · {SETTINGS} still wires {OLD_MARKER}: not applied")
+        why = check_rule_home(target, prefix)
+        print(f"{SAY}: witness · {SETTINGS} still wires {OLD_MARKER}: not applied" + (f" — {why}" if why else ""))
         return 1
     if read_fragment(target, prefix) is not None and (EVENT, MATCHER) not in read_groups(doc, NEW_MARKER):
         print(f"{SAY}: witness · the roles kit is installed and the {EVENT} {MATCHER} group of {SETTINGS} carries no "

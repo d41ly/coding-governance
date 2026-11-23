@@ -19,7 +19,9 @@ playbook kit's unit grammar admits an `adopter-rule` at that level under that bu
 THE UP. No roles kit under `<prefix>`, or one holding no house text file: exit 0, nothing written. It
 refuses, exit 1 and nothing written, the before-image included: a body that is not UTF-8, a body over the
 budget's bytes, each naming the file, and rows the instruction-unit grammar or the overlay reader refuses.
-A tag the overlay already holds is the writer's own refusal, exit 2, both files left byte-identical. The
+A tag the overlay already holds at the `role` level with a byte-equal text is skipped and its file still
+removed, so a re-run over an up killed between the two converges (TOOL-dBoundRoles-43 S38, §8 F12); a held
+tag carrying other text is the writer's own refusal, exit 2, naming it, both files left byte-identical. The
 rows are placed by `derive_overlay_text`, the function `write_overlay_units` writes through, so a re-run
 over a killed up recomputes the before-image's after-state and converges. An empty file is removed and
 writes no unit. The overlay is written first and the house files removed LAST, so the witness changes last.
@@ -133,6 +135,19 @@ def derive_house_rows(bodies: dict, iu) -> list[dict]:
     return rows
 
 
+def remove_held_rows(rows: list[dict], overlay: str, iu) -> list[dict]:
+    """`rows` less each whose tag the overlay text `overlay` already holds at the ladder's `role` level with a
+    byte-equal text (TOOL-dBoundRoles-43 S38, §8 F12): a unit a killed up already wrote, whose house file the
+    up still removes, so a re-run converges on its own partial state. A row whose held tag carries other
+    text, or sits at another level, is kept, so the writer's duplicate-tag refusal names the tag, exit 2,
+    nothing written."""
+    if not overlay.strip():
+        return rows
+    held = {u.tag: u.text for u in iu.parse_unit_rows(overlay, OVERLAY)[0]
+            if u.level == iu.LEVELS.index(LEVEL_NAME)}
+    return [r for r in rows if held.get(r["tag"]) != r["text"]]
+
+
 def cmd_up(target: pathlib.Path, prefix: str) -> int:
     kit = read_roles_kit(target, prefix)
     rels = read_house_files(target, kit)
@@ -151,6 +166,7 @@ def cmd_up(target: pathlib.Path, prefix: str) -> int:
 
         house = [rel for rel in (sorted(before) if before is not None else rels) if rel != OVERLAY]
         rows = derive_house_rows({rel: read(rel) or b"" for rel in house}, ov.iu)
+        rows = remove_held_rows(rows, (read(OVERLAY) or b"").decode("utf-8"), ov.iu)
         written.update(r["tag"] for r in rows)
         after = dict.fromkeys(house)
         if rows:

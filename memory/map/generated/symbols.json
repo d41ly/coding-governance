@@ -5543,6 +5543,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "check_agent_return",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "check_alias_copies",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -8968,6 +8973,11 @@
       "file": "tools/playbook/row_checks.py"
     },
     {
+      "id": "check_rule_home",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
+    },
+    {
       "id": "check_rule_tags",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -11823,6 +11833,11 @@
       "file": "tools/loop/composition.py"
     },
     {
+      "id": "derive_carrier_rows",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "derive_carries_coverage",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -14666,6 +14681,11 @@
       "id": "derive_serves",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_session_dir",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "derive_set_plan",
@@ -20433,6 +20453,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "print_agent_return",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "print_asbuilt_verdicts",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -21591,11 +21616,6 @@
       "id": "read_agent_members",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
-    },
-    {
-      "id": "read_agent_turns",
-      "kind": "function",
-      "file": "tools/roles/handoff.py"
     },
     {
       "id": "read_agree_field",
@@ -24750,6 +24770,11 @@
     {
       "id": "read_memory_root",
       "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
+      "id": "read_memory_root",
+      "kind": "function",
       "file": "tools/playbook/positional.py"
     },
     {
@@ -25376,6 +25401,11 @@
       "id": "read_policy_key",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_policy_kit",
+      "kind": "function",
+      "file": "tools/govkit/steps/spawn_guard_pack.py"
     },
     {
       "id": "read_policy_kit",
@@ -28528,6 +28558,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "remove_held_rows",
+      "kind": "function",
+      "file": "tools/govkit/steps/house_overlays_to_instructions.py"
+    },
+    {
       "id": "remove_home_graded",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -31113,6 +31148,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "resolveSessionDir",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "resolveSpecEntry",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
@@ -31156,6 +31196,11 @@
       "id": "resolve_adopter_argv",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_agent_transcript",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "resolve_alias",
@@ -43408,6 +43453,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_image_back",
+      "kind": "function",
+      "file": "tools/govkit/steps/reviewer_merge.py"
+    },
+    {
       "id": "write_inherited_asks",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -44676,6 +44726,11 @@
       "id": "write_su_record",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_sw7_prompt",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_sw7_transcript",

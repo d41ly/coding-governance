@@ -18,8 +18,12 @@ reference; this page is the short version.
    to place, the orientation scout, `gov-orienter`, returns `outcome: placed`, the `disposition`,
    `reason`, `evidence` and `observations` lines of its placement, and an `answers` line naming the
    work order it was handed. You place nothing yourself. Write the return to a file, record it with
-   the loop kit's `placement.py place --request <content key> --return <file>`, then run
-   `placement.py check --request <content key>`, and act only on a check that passes. Before it reads
+   the loop kit's `placement.py place --request <content key> --return <file> --agent <agent id>`, the
+   agent id the scout's call returned, then run `placement.py check --request <content key>`, and act
+   only on a check that passes. With `--agent`, `place` first runs the roles kit's
+   `handoff.py agent-return --agent <agent id>`, which prints the agent's type and its last text as
+   one JSON object, and refuses a file that is not that text byte for byte, or an agent that is not
+   `gov-orienter`, so text you typed is never recorded as the scout's placement. Before it reads
    a line, `place` runs the roles kit's `handoff.py check-return-file --role gov-orienter --file <file>`:
    a return missing a field its template requires, `outcome` among them, naming no work order, or
    answering a work order whose marker names another role is refused, one

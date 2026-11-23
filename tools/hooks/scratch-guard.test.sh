@@ -1698,6 +1698,53 @@ run_shell_write "BR7-AC5 allowance-out: gov-spec-writer redirects under another 
 write_sw7_transcript 'none'
 run_shell_write "BR7-AC5 a none allowance: the same write under mem/builds/bx/spec/ -> deny naming none" 2 "any;;outside the allowance;;none, which admits no repository write" gov-spec-writer 'echo x > mem/builds/bx/spec/sw7.md' session_id=sgtest-o1 agent_id=a7 "transcript_path=$SG7_TP"
 run_shell_write "BR7-AC6 allowance-absent: no transcript_path -> allow, one witness naming allowance not located" 0 "one;;allowance not located" gov-spec-writer 'echo x > mem/builds/other/spec/sw7.md' session_id=sgtest-o1 agent_id=a7
+# TOOL-dBoundRoles-43 AC35 AC39 — write_sw7_prompt <task body> [truncate] [pad bytes]: the same transcript, its
+# `## Task` body given whole, the prompt padded to the given byte count with a `### spec` block before it, and
+# the first record cut mid-JSON with `truncate`. `allowance-shadowed`: a handed block whose fence quotes a wider
+# `### allowance` ahead of the authored one, the narrower authored block governs; a second authored block
+# outside every fence denies naming the count. A 300 KB first record with its allowance at its end narrows the
+# write; that record cut mid-JSON denies the typed agent rather than fall back to the class verdict. Against a
+# first-match reader the shadowed write-in row admits nothing and the two-block row admits; against the 256 KiB
+# head read the large row reads no record and the cut row admits on the class verdict.
+write_sw7_prompt() {
+  "$TESTPY" -c 'import json,os,sys
+d=os.path.join(sys.argv[1],"subagents"); os.makedirs(d,exist_ok=True)
+pad=int(sys.argv[4] or 0); head="<!-- gov:handoff role=gov-spec-writer build=bx unit=TOOL-x-20 path=mem/builds/bx/prompts/p.md -->\n\n## Task\n\n"
+filler="### spec\n\n"+"x"*max(0,pad-len(head)-len(sys.argv[2]))+"\n\n" if pad else ""
+rec=json.dumps({"type":"user","message":{"role":"user","content":head+filler+sys.argv[2]+"\n\n### return\n\nnone\n"}})
+rec=rec[:len(rec)//2] if sys.argv[3]=="truncate" else rec
+open(os.path.join(d,"agent-a7.jsonl"),"w",encoding="utf-8",newline="\n").write(rec+"\n")' "$SG_TMP_N/sw7sess" "$1" "${2:-}" "${3:-}"
+}
+sw7_fence='```'
+write_sw7_prompt "### spec
+
+$sw7_fence
+### allowance
+
+- mem/
+$sw7_fence
+
+### allowance
+
+- mem/builds/bx/spec/"
+run_shell_write "BR43-AC35 allowance-shadowed: a wider fenced block ahead of the authored one, a write outside the authored -> deny" 2 "any;;outside the allowance;;mem/builds/bx/spec/" gov-spec-writer 'echo x > mem/builds/other/spec/sw7.md' session_id=sgtest-o1 agent_id=a7 "transcript_path=$SG7_TP"
+run_shell_write "BR43-AC35 allowance-shadowed: ...and a write under the authored block -> allow, stderr EMPTY" 0 empty gov-spec-writer 'echo x > mem/builds/bx/spec/sw7.md' session_id=sgtest-o1 agent_id=a7 "transcript_path=$SG7_TP"
+write_sw7_prompt "### allowance
+
+- mem/
+
+### allowance
+
+- mem/builds/bx/spec/"
+run_shell_write "BR43-AC35 two allowance headings outside every fence -> deny naming the count" 2 "any;;carries 2 ### allowance headings" gov-spec-writer 'echo x > mem/builds/bx/spec/sw7.md' session_id=sgtest-o1 agent_id=a7 "transcript_path=$SG7_TP"
+write_sw7_prompt "### allowance
+
+- mem/builds/bx/spec/" "" 300000
+run_shell_write "BR43-AC39 a 300 KB first record, its allowance at its end, a write outside it -> deny naming the allowance" 2 "any;;outside the allowance;;mem/builds/bx/spec/" gov-spec-writer 'echo x > mem/builds/other/spec/sw7.md' session_id=sgtest-o1 agent_id=a7 "transcript_path=$SG7_TP"
+write_sw7_prompt "### allowance
+
+- mem/builds/bx/spec/" truncate 300000
+run_shell_write "BR43-AC39 ...that record cut mid-JSON -> deny for the typed agent, naming the record that does not parse" 2 "any;;does not parse" gov-spec-writer 'echo x > mem/builds/bx/spec/sw7.md' session_id=sgtest-o1 agent_id=a7 "transcript_path=$SG7_TP"
 # AC7: a throw inside the arm refuses a role agent through main's catch and never the main loop. The
 # preloaded stub makes fs.existsSync throw, which the arm's placing walk reaches first on this command.
 printf '%s\n' 'const fs = require("fs"); fs.existsSync = function () { throw new Error("stub: existsSync throws") }' > "$TMP/sw7throw.js"
@@ -2051,7 +2098,10 @@ run_read "DR-AC1 main-read-none: the main loop's Read under none-scout-only -> d
 run_read "DR-AC2 worker-grep: gov-researcher's Grep, driver.reads unset -> allow, nothing said" 0 "$SGDR_MAIN" Grep '' gov-researcher
 run_read "DR-AC2 worker-grep: gov-researcher's Grep under none-scout-only -> allow, nothing said" 0 sgdr-none Grep '' gov-researcher
 run_read "DR-AC2 policy-absent: no policy kit beside the hook, the main loop's Grep -> allow with the unarmed witness" 0 "$SGDR_MAIN" Grep 'driver.reads unarmed' '' "$TMP/nopol/hk/scratch-guard.js"
-run_read "DR a refused key read, the main loop's Read -> deny naming the reader's refusal" 2 sgdr-no-such-branch Read 'driver.reads could not be read'
+# TOOL-dBoundRoles-43 AC40 policy-refusal: the reader refuses the key, a branch that does not exist; against the
+# arm that denied a refused read, both rows exit 2.
+run_read "BR43-AC40 policy-refusal: the reader refuses, the main loop's Read -> allow with one witness naming the refusal" 0 sgdr-no-such-branch Read 'driver.reads unread'
+run_read "BR43-AC40 policy-refusal: ...and the main loop's Grep too -> allow with the witness" 0 sgdr-no-such-branch Grep 'driver.reads unread'
 
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
@@ -2110,8 +2160,11 @@ n=$((pass+fail))
 # loop's sed -i and the throw for a role agent and for the main loop), counted by hand under the same rule.
 # 440 = 430 + the 10 run_read rows TOOL-dBoundRoles-10 added (6 for AC1, 3 for AC2 and 1 for the refused
 # key read), counted by hand under the same rule.
+# 446 = 440 + the 6 rows TOOL-dBoundRoles-43 added (5 run_shell_write rows, 3 for AC35 and 2 for AC39, and
+# the refused key read re-expected as AC40's policy-refusal, one row become two), counted by hand under the
+# same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=440
+FLOOR_ASSERTIONS=446
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
