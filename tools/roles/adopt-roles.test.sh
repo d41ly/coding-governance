@@ -137,7 +137,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +5 for arm 39 (TOOL-dBoundRoles-24).
 # +3 for arm 40 (TOOL-dBoundRoles-41).
 # +4 for arm 41 (TOOL-dBoundRoles-11).
-FLOOR_ASSERTIONS=170
+# +2 for arm 42 (TOOL-dBoundRoles-47).
+FLOOR_ASSERTIONS=172
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -2342,6 +2343,35 @@ check_arm "arm 41 AC5 a ratification, an owner write and an attended fork print 
 check_arm "arm 41 AC5 an unknown kind exits 2 naming it" \
    "$([[ $A41 == *'unknown 1'* ]] && echo 1 || echo 0)"
 [ "$A41" = $'default 1\nvalue 1\nowner 1\nunknown 1' ] || printf '    %s\n' "${A41//$'\n'/$'\n'    }"
+
+# ---- arm 42 (TOOL-dBoundRoles-47 AC1): one criterion across the fence, the strip and the graded text. One backticked
+# ---- `record:` span the order does not hand, planted in a typed `--input question=` and in the prose of the scratch
+# ---- spec the orienter's render hands as `--input prompt=`: the render exits non-zero, names the span once and writes
+# ---- no file, and with the question in plain words it exits 0 and writes its prompt file. Its producers, read
+# ---- together: TOOL-dBoundRoles-38 fences handed content, TOOL-dBoundRoles-45 writes a typed value raw,
+# ---- TOOL-dBoundRoles-24 refuses an anchor the order does not hand and skips fenced spans, TOOL-dBoundRoles-41 keeps
+# ---- a typed value in the graded text and leaves a handed block's content out. A refusal naming the span once is the
+# ---- typed copy graded; a clean second render is the handed copy not graded. The failing case, owed at the close
+# ---- and not observed by the pass that wrote this: a `render_handoff` that wraps the typed value in
+# ---- `render_handed_fence`, as TOOL-dBoundRoles-38 S2 first specified, under which the planted render exits 0. WHAT
+# ---- IT DOES NOT CHECK: a typed diff on another role, or an anchor that resolves, which arm 39 grades.
+build_fixture; _rc42=$?
+A42P="$FX/$MR/builds/tFix/prompts"; A42S="$MR/builds/tFix/spec/2026-11-23-spec-TOOL-tFix-1.md"; A42E="$TMP_ROOT/a42.err"
+A42K="record:TOOL-tFix-9@$(printf '%012d' 0)"
+mkdir -p "$A42P" "$FX/$MR/builds/tFix/spec" \
+  && printf '# TOOL-tFix-1\n\nThe spec quotes `%s` in its prose.\n' "$A42K" > "$FX/$A42S"
+_ls=$(ls -A "$A42P")
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-orienter --build tFix --unit TOOL-tFix-1 --input "prompt=$A42S" \
+   --input "question=which seam fits; see \`$A42K\`" >/dev/null 2>"$A42E"); _rc=$?
+check_arm "arm 42 AC1 the orienter's span planted in its typed question and its handed prompt exits non-zero naming it once" \
+   "$([ "$_rc42" = 0 ] && [ "$_rc" != 0 ] && [ "$(grep -oF -- "$A42K" "$A42E" | wc -l | tr -d ' ')" = 1 ] \
+      && [ "$(ls -A "$A42P")" = "$_ls" ] && echo 1 || echo 0)"
+[ "$_rc" != 0 ] || { printf '    exit %s, want non-zero\n' "$_rc"; sed 's/^/    /' "$A42E"; }
+(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-orienter --build tFix --unit TOOL-tFix-1 --input "prompt=$A42S" \
+   --input 'question=which seam fits' >/dev/null 2>"$A42E"); _rc=$?
+check_arm "arm 42 AC1 ...and with the question in plain words it exits 0 and writes its prompt file" \
+   "$([ "$_rc" = 0 ] && [ -z "$_ls" ] && [ -n "$(ls -A "$A42P")" ] && echo 1 || echo 0)"
+[ "$_rc" = 0 ] || sed 's/^/    /' "$A42E"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
