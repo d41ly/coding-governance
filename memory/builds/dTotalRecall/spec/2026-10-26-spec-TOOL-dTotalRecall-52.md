@@ -17,6 +17,7 @@
 | [2026-11-22-prompt-TOOL-dTotalRecall-52-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-52-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-52-reground-brief.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-52-reground-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dTotalRecall-52-reground-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dTotalRecall-52-reground-spec-writer.md) | log | — |
+| [2026-11-23-prompt-TOOL-dTotalRecall-52-build-2-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-52-build-2-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-52-divergence-fold-brief.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-52-divergence-fold-brief.md) | journal | — |
 | [2026-11-23-prompt-TOOL-dTotalRecall-52-divergence-fold-spec-writer.md](../prompts/2026-11-23-prompt-TOOL-dTotalRecall-52-divergence-fold-spec-writer.md) | log | — |
 | [2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 |
