@@ -50,9 +50,16 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   unit that changes them. Still verify each claim the spec makes about current code against source before your first
   write, and hand a claim that no longer holds back as a divergence rather than building around it.
 - This unit edits `tools/unattended/unattended.sh`, `lib-unattended.sh` and `check-pass-order.sh`, the driver this run
-  dispatches through. Set `FORK_RECORD_CUTOFF` at or after today, as §4's migration says, so no spec of this build
-  (their filenames are dated before it) is graded FORKED and no later dispatch of this run is held. Say in your
+  dispatches through. `FORK_RECORD_CUTOFF` sits after every spec filename date, as §4's migration says, so no spec of
+  this build is graded FORKED and no later dispatch of this run is held. Say in your
   return the value you set and that a `--plan dBoundRoles` probe in your pass tree still lists the remaining units.
+- A first builder (run `wf_4e23c012-8e3`) diverged and wrote nothing. The main loop settled its items in
+  `build/2026-11-23-build-TOOL-dBoundRoles-11-1-main-loop-decision.md`: read it WHOLE before your first write. It
+  binds over the spec where they differ: the driver's `REFUSAL_CEILINGS` token rises 347 -> 348 under the
+  `TOOL-dBoundRoles-11` row the main loop already landed in `memory/DECISIONS.md` (write no row there yourself), every
+  FORKED answer refuses through one shared `fail 49`, `plan_state` checks the `admitted-by` tag's shape only, AC4 runs
+  over INPROGRESS specs, AC6 observes check 49, a missing roles kit reads the key's default with a NOTE line, and the
+  `park-build` row names the build slug. Set `FORK_RECORD_CUTOFF` to `2026-11-24`. Record each in the deviation record.
 - TOOL-dBoundRoles-21 landed `read_policy_setting` (the policy reader `resolve_owner_question` reads through), and
   TOOL-dBoundRoles-23 rewrote `gov-builder`'s and the effort floor's parts of the roles kit; TOOL-dBoundRoles-24 and
   -41 added arms 39 and 40 to `tools/roles/adopt-roles.test.sh` with `FLOOR_ASSERTIONS` at 166. Read each at HEAD
