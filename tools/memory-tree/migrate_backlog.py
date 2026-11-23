@@ -949,7 +949,7 @@ def render_worksheet(kind: str, columns: tuple, rows: list, unit_id: str, head: 
 
 def render_census(unit_id: str, head: str, summary: dict) -> str:
     """The census, as markdown prose. Deliberately NOT a table keyed on ids, for the reason above."""
-    out = [f"**Serves:** log {unit_id}", "",
+    out = [f"**Serves:** log {unit_id}", f"**Caused-by:** {unit_id}", "",   # TOOL-dTotalRecall-36 S8
            f"# The backlog migration census — {unit_id}", "",
            f"Computed by `migrate_backlog.py --plan` at {head}. Every figure below is DERIVED at "
            f"run time; none of them is authored anywhere, here or in a spec.", ""]

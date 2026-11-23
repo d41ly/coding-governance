@@ -382,6 +382,18 @@ arm('pin: a pinned subject proceeds', { kind: 'spec-audit', round: 1, subjects: 
   ck(rendered === '**Serves:** spec-audit TOOL-xFix-1@rev-3 TOOL-xFix-2@rev-1',
     'pin: renderAuditBinding pins each subject in subject order: ' + JSON.stringify(rendered))
 }
+// ---- TOOL-dTotalRecall-36 AC1 — the cause line is the harness's render too, beside the binding: the
+// first id, bare, its pin cut. Against a harness returning the pinned id this reds.
+{
+  let cause = null
+  try {
+    const rcl = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn renderCauseLine')(
+      Object.assign({}, base, { kind: 'spec-audit', round: 1, subjects: [{ path: 'memory/builds/dXFix/spec/a.md', blob: BLOB, id: 'TOOL-xFix-1', rev: 2 }] }), () => {}, null, null, null)
+    cause = rcl(['TOOL-xFix-1@rev-2', 'TOOL-xFix-2'])
+  } catch (e) { cause = 'threw: ' + e.message }
+  ck(cause === '**Caused-by:** TOOL-xFix-1',
+    'cause: renderCauseLine names the first id, bare, its pin cut: ' + JSON.stringify(cause))
+}
 // ---- TOOL-dTrueNorth-20 AC13 (S14) — THE PRODUCER PINS THE READER'S LITERAL. The memory-tree kit's
 // gen_build_index.py exempts a spec-audit record whose harness, at its adding commit, defines no function
 // named by its AUDIT_WRITER_MARK constant, its one spelling of it. This arm reads that constant out of the
@@ -816,7 +828,7 @@ async function runWholeScriptArms() {
   const pinRun = await runReview(Object.assign({}, SPEC, { subjects: [{ path: 'memory/builds/dXFix/spec/m.md', blob: 'abc1234', id: 'TOOL-xFix-1', rev: 3 }, { path: 'memory/builds/dXFix/spec/u.md', blob: 'abc9999', id: 'TOOL-xFix-2', rev: 1 }] }), ALL_OK)
   if (checkNoThrow(pinRun, 'pin: spec-audit synthesis')) {
     const pinSynth = pinRun.trace.filter((t) => t.label === 'synth').map((t) => t.prompt)
-    ck(pinSynth.length === 1 && pinSynth[0].indexOf('<<<SERVES\n**Serves:** spec-audit TOOL-xFix-1@rev-3 TOOL-xFix-2@rev-1\nSERVES>>>') !== -1 &&
+    ck(pinSynth.length === 1 && pinSynth[0].indexOf('<<<SERVES\n**Serves:** spec-audit TOOL-xFix-1@rev-3 TOOL-xFix-2@rev-1\n**Caused-by:** TOOL-xFix-1\nSERVES>>>') !== -1 &&
       pinSynth[0].indexOf('the reviewed spec set defines') === -1,
       'pin: the spec-audit synthesis prompt carries the rendered, pinned binding line and no composing sentence: ' + pinSynth.length + ' synthesis prompt(s)')
     // TOOL-dTrueNorth-13 AC2 — the subjects line is rendered too, between its own markers, and the
@@ -829,7 +841,7 @@ async function runWholeScriptArms() {
   const designRun = await runReview(Object.assign({}, SPEC, { subjects: [DESIGN_A, DESIGN_B] }), ALL_OK)
   if (checkNoThrow(designRun, 'design: spec-audit synthesis')) {
     const ds = designRun.trace.filter((t) => t.label === 'synth').map((t) => t.prompt)
-    ck(ds.length === 1 && ds[0].indexOf('<<<SERVES\n**Serves:** spec-audit PLAY-dXFix-1\nSERVES>>>') !== -1 &&
+    ck(ds.length === 1 && ds[0].indexOf('<<<SERVES\n**Serves:** spec-audit PLAY-dXFix-1\n**Caused-by:** PLAY-dXFix-1\nSERVES>>>') !== -1 &&
       ds[0].indexOf('<<<REVIEWED\nReviewed: memory/builds/dXFix/build/a.md@abc1234, memory/builds/dXFix/build/b.md@def5678\nREVIEWED>>>') !== -1,
       'design: a design audit runs whole, its synthesis copying the bare id and both design subjects: ' + ds.length + ' synthesis prompt(s)')
   }

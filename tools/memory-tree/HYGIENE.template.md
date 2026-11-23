@@ -730,6 +730,12 @@ carry it too:
 - The check REFUSES when that report exits non-zero or prints no `N` row. The report is the only
   thing check 21 reads, so a report that did not run would otherwise look exactly like a clean
   corpus. An adopter whose generator is a fork must carry the mode, or this check names that first.
+- A record written after the causes seed also carries `**Caused-by:** <target>` within those first
+  unfenced lines (`tree_lib.py`'s `BIND_HEAD_LINES`), directly under its Serves line: `<target>` is a
+  family id the corpus defines or a record key, bare, never pinned `@rev-N` and never an `N..M` run.
+  `gov_record.py new <kind> --caused-by <target>` is the door that writes it. `record_causes.py --check`
+  reds a new record that names none (`TOOL-dTotalRecall-19`), and its writer census reds a code file
+  that spells a Serves line and no cause (`TOOL-dTotalRecall-36`).
 
 **Deviation records.** A departure from the frozen design, or from a spec once its code has started,
 is a `deviation` record named `<date>-build-<unit id>-deviation-<n>.md` in the departing build's

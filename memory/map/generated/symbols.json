@@ -5908,7 +5908,17 @@
       "file": "tools/roles/check_roles.py"
     },
     {
+      "id": "check_cause_line",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "check_cause_target",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
+      "id": "check_cause_writers",
       "kind": "function",
       "file": "tools/memory-tree/record_causes.py"
     },
@@ -22448,6 +22458,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "read_code_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/record_kinds.py"
+    },
+    {
       "id": "read_code_slot",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
@@ -29048,6 +29063,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderCauseLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderCauseLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "renderCell",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -29656,6 +29681,11 @@
       "id": "render_catalogue_region",
       "kind": "function",
       "file": "tools/roles/check_roles.py"
+    },
+    {
+      "id": "render_cause_line",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "render_cell",
@@ -41339,6 +41369,11 @@
     },
     {
       "id": "test_record_ac8_cost",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_cause_line",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

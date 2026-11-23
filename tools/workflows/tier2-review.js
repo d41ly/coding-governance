@@ -655,6 +655,12 @@ function renderAuditBinding(subjects) {
     return Object.prototype.hasOwnProperty.call(pins, id) ? id + '@rev-' + pins[id] : id
   }).join(' ')
 }
+// TOOL-dTotalRecall-36 S1 - the record's CAUSE line, the second line under the binding: the first id,
+// bare, its `@rev-<n>` pin cut, since a cause resolves as a family id or a record key and a pinned
+// token is neither. The memory tree's causes check reds a new record that names no resolving cause.
+function renderCauseLine(ids) {
+  return '**Caused-by:** ' + String(ids[0]).replace(/@rev-\d+$/, '')
+}
 // TOOL-dTrueNorth-13 S3 - the record's SUBJECTS line, rendered here too, so its reader has one spelling
 // to read: `Reviewed: <path>@<blob>, ...` in subject order. The memory tree's pin grading reads which
 // paths a spec audit reviewed off this line, and the corpus spelled it three ways while an agent
@@ -2916,8 +2922,11 @@ const synth = await agent(
     // S4b - the token set is READ from the carrier that ENFORCES it on a diff-review record, which
     // is hygiene check 22 in check-memory-hygiene.sh (gated by REVIEW_VERDICT_CUTOFF). It is not a
     // new rule invented here, and the build method is not the enforcing carrier for this kind.
-    `THE RECORD'S OPENING IS ORDERED, and these four things precede the body, in this order. ` +
-    `First the \`**Serves:**\` binding line described below. Then the report's title and provenance. ` +
+    // TOOL-dTotalRecall-36 S1 - the cause line is counted here, the second of the five, directly under
+    // the binding line, so both sit inside the memory tree's header window.
+    `THE RECORD'S OPENING IS ORDERED, and these five things precede the body, in this order. ` +
+    `First the \`**Serves:**\` binding line described below. Directly under it the \`**Caused-by:**\` ` +
+    `cause line described below. Then the report's title and provenance. ` +
     `Then the range line named above. Then, as a heading of its own, the literal \`## Verdict: \` ` +
     `followed by exactly ONE token from the CLOSED set CLEAN, CLEAN WITH FIXES, BLOCKED. ` +
     `The set is closed: no fourth token, no tally appended to the line, no qualifier on it. ` +
@@ -2938,12 +2947,16 @@ const synth = await agent(
     // synthesis (the TOOL-dMergedTally-1 note below). The diff kind keeps its sentence.
     (isSpec
       ? `The report's FIRST line must be the record's binding line, which the harness rendered from each ` +
-        `subject's pinned revision: copy the line between the two marker lines below VERBATIM, alone on its ` +
-        `own line, neither marker line copied, and add, drop or reorder no id on it.\n` +
-        `<<<SERVES\n${renderAuditBinding(subjects)}\nSERVES>>>\n`
+        `subject's pinned revision, and its SECOND line the record's \`**Caused-by:**\` cause line, rendered ` +
+        `from the first subject's id: copy the two lines between the two marker lines below VERBATIM, each ` +
+        `alone on its own line and in this order, neither marker line copied, and add, drop or reorder no id ` +
+        `on either.\n` +
+        `<<<SERVES\n${renderAuditBinding(subjects)}\n${renderCauseLine(subjects.map(function (x) { return x.id }))}\nSERVES>>>\n`
       : `The report's FIRST line must be the record's binding line, exactly: **Serves:** ${kind} ` +
         `followed by every unit id in the diff, space-separated. A kind with no id is malformed under the ` +
-        `project's record-binding grammar, so never emit the kind alone. `) +
+        `project's record-binding grammar, so never emit the kind alone. Its SECOND line must be the ` +
+        `record's cause line, exactly: **Caused-by:** followed by the FIRST unit id of that binding line, ` +
+        `bare, with no @rev pin, so the record names a cause the project's causes check resolves. `) +
     // TOOL-dMergedTally-1 - THE AGENT RETURNS IDS AND THIS FILE COUNTS THEM. TOOL-dTieredTribunal-1
     // S5 defined `blockers` and `highs` as the CONFIRMED findings at each severity and had the agent
     // type both integers, and its own note said the agreement was a property of this prompt and not

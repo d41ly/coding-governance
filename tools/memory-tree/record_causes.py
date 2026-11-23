@@ -25,6 +25,12 @@ is, its `Caused-by` target or, for a legacy record, its Serves units, the walk a
 roots outward, so two new records caused by each other are reached by neither and both are orphans. A
 new record no root reaches is red.
 
+THE WRITER CENSUS (`check_cause_writers`, TOOL-dTotalRecall-36 S7). Every tracked `*.py`, `*.sh` or `*.js`
+file under the tool root, the alias census's walk (`record_kinds.read_code_paths`), test-named files
+excepted, that spells a `**Serves:** ` literal and no `Caused-by` is red unless `CAUSE_WRITER_KEPT` keys it
+with a reason, so the next writer that omits the cause line is red at its own pass, before the record it
+writes is.
+
 THE LEGACY POPULATION. `--measure` prints one TAB row `<path> - 1` per tracked Markdown record and, under
 `memory.legacy-anchors` `derived`, one `<path> <anchor> 1` row per untagged `##` or `###` heading, its
 anchor the playbook kit's `derive_anchor`; `legacy_ledger.py seed --population legacy-records` writes them
@@ -36,7 +42,8 @@ derives none and reads a legacy record as reached; `retag` reads the authored ta
 Exit: 0 green or unarmed (no registration, an absent or unarmed home, an empty population), 1 a red, 2 a
 refused read, `memory.legacy-anchors` named. `--print-*` exit 3 where the class has no member here.
 WHAT IT DOES NOT CHECK: a record that is not Markdown, which carries no header; whether a `Made-by`
-names who really wrote it; the edge grammar of a header's targets, which `edge_grammar.py --check` grades.
+names who really wrote it; the edge grammar of a header's targets, which `edge_grammar.py --check` grades;
+whether a census file that spells `Caused-by` writes the line at run time, since the census grades spelling.
 """
 from __future__ import annotations
 
@@ -63,8 +70,28 @@ STAND_IN_RE = re.compile(r"owner|lease-[A-Za-z0-9][A-Za-z0-9_-]*")
 HEADING_RE = re.compile(r"#{2,3} (?P<text>.*\S)")
 #: an authored heading tag, the `[section.<anchor>]` TOOL-dTotalRecall-20's retag step writes
 AUTHORED_TAG_RE = re.compile(r"\[section\.(?P<seg>[a-z0-9][a-z0-9-]*)\](?:[ \t]|$)")
-PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "none")
+PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "none", "writer-without-cause")
 CLAIM_NS = "refs/gov/claims/"
+#: TOOL-dTotalRecall-36 S7: the writer census's kept files, `{<path under the tool root>: <reason>}`, each
+#: whose `**Serves:** ` literals are fixture, instruction or reader-prefix text only, so it writes no
+#: record. Each key is spelled in parts: the install-prefix ban reads a kit path.
+CAUSE_WRITER_KEPT = {
+    "/".join(("loop", "placement.py")): "fixture: the disposition record its fixture reads back",
+    "/".join(("memory-tree", "seen_red.py")): "fixture: the acceptance ledger its fixture plants",
+    "/".join(("playbook", "instruction_units.py")): "fixture: the handoff head its fixture plants",
+    "/".join(("policy", "check_policy.py")): "fixture: the handoff record its fixture plants",
+    "/".join(("memory-tree", "adopt-memory-tree.sh")): "instruction: the binding grammar its next steps print",
+    "/".join(("workflows", "replay_scorer.py")): "reader-prefix: SERVES_PREFIX and SPEC_SERVES_PREFIX, beside "
+                                                 "fixture heads",
+    "/".join(("workflows", "review_replay.py")): "reader-prefix: the spec mode's binding prefix, beside its "
+                                                 "docstring and fixture records",
+}
+#: the census's test-named files, never census members: `*.test.sh`, `selftest.py`, `test_*.py`
+CAUSE_WRITER_TEST_RE = re.compile(r"(?:^|/)(?:[^/]*\.test\.sh|selftest\.py|test_[^/]*\.py)$")
+SERVES_LITERAL = "**Serves:** "
+CAUSE_LITERAL = "Caused-by"
+#: the writer plant's code file, under the fixture's tool root; its red line names it by line
+CAUSE_WRITER_PLANT = "planted/writer.py"
 
 
 def run_git(root, *args) -> subprocess.CompletedProcess:
@@ -361,6 +388,37 @@ def check_orphans(root, g=None) -> list:
             if p not in reached and p not in g["legacy"]]
 
 
+def check_cause_writers(root) -> tuple:
+    """S7's writer census: `(lines, reds)` over the alias census's population, every tracked `*.py`, `*.sh`
+    and `*.js` file under the tool root (`record_kinds.read_code_paths`), test-named files excepted. A census
+    file spells a `**Serves:** ` literal and no `Caused-by`, and is red unless `CAUSE_WRITER_KEPT` keys it by
+    its path under the tool root, then printed `kept <reason>`; one line per census file at its first Serves
+    literal, then a count line. It grades spelling, never whether the file writes the line at run time."""
+    import record_kinds   # noqa: E402  the tool root and the code census's one walk
+    tool_rel = record_kinds.derive_tool_rel(record_kinds.derive_kit_rel())
+    try:
+        paths = [p for p in record_kinds.read_code_paths(root, tool_rel) if not CAUSE_WRITER_TEST_RE.search(p)]
+    except record_kinds.RecordKindsError as exc:
+        raise ValueError(str(exc)) from None
+    lines, reds, kept = [], [], 0
+    for path in paths:
+        text = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace")
+        if SERVES_LITERAL not in text or CAUSE_LITERAL in text:
+            continue
+        n = next(i for i, ln in enumerate(text.splitlines(), 1) if SERVES_LITERAL in ln)
+        key = path[len(tool_rel) + 1:] if tool_rel else path
+        if key in CAUSE_WRITER_KEPT:
+            kept += 1
+            lines.append(f"cause-writer · {path}:{n} · kept {CAUSE_WRITER_KEPT[key]}")
+            continue
+        lines.append(f"cause-writer · {path}:{n} · red")
+        reds.append(f"cause-writer {path}:{n}: spells a Serves line and no Caused-by; write the cause line under "
+                    f"its Serves line, or key the file in CAUSE_WRITER_KEPT with its reason")
+    lines.append(f"cause-writer · {len(paths)} code files under {tool_rel or '.'} · {kept + len(reds)} census "
+                 f"file(s) · {kept} kept · {len(reds)} red")
+    return lines, reds
+
+
 def run_check(root) -> tuple:
     """`--check`: `(lines, exit)`."""
     try:
@@ -370,11 +428,16 @@ def run_check(root) -> tuple:
     if g["legacy"] is None:
         return [f"{SAY}: unarmed · {g['note']}"], 0
     causes, orphans = check_causes(root, g), check_orphans(root, g)
+    try:
+        writer_lines, writer_reds = check_cause_writers(root)
+    except ValueError as exc:
+        return [f"{SAY}: refused · {exc}"], 2
     lines = [f"{SAY}: {POPULATION} · {g['note']} · memory.legacy-anchors {g['value']}",
              f"{SAY}: {len(g['texts'])} Markdown record(s) · {len(g['legacy'] & set(g['texts']))} legacy"]
     lines += causes + orphans
+    lines += [f"{SAY}: {ln}" for ln in writer_lines] + [f"{SAY}: RED {r}" for r in writer_reds]
     lines.append(f"{SAY}: {len(causes)} causeless · {len(orphans)} orphan(s)")
-    red = bool(causes or orphans)
+    red = bool(causes or orphans or writer_reds)
     lines.append(f"{SAY}: {'RED' if red else 'green'}")
     return lines, 1 if red else 0
 
@@ -457,9 +520,12 @@ def write_fixture(top, plant) -> pathlib.Path:
     elif plant == "claim-root":
         write_file(f"memory/builds/fClaim/build/2026-01-02-build-{FIXTURE_CLAIM}-claimed.md",
                    f"# Claimed\n\n**Serves:** research {FIXTURE_CLAIM}\n**Made-by:** owner\n**Caused-by:** {FIXTURE_CLAIM}\n")
-    else:   # legacy and none: a new record caused by a unit, beside the legacy tree
+    else:   # legacy, none and the writer plant: a new record caused by a unit, beside the legacy tree
         write_file(f"{build}/2026-01-02-build-{FIXTURE_UNIT}-caused.md",
                    f"# Caused\n\n**Serves:** research {FIXTURE_UNIT}\n**Made-by:** owner\n**Caused-by:** {FIXTURE_UNIT}\n")
+    if plant == "writer-without-cause":   # TOOL-dTotalRecall-36 S7: a code file spelling a Serves literal, no cause
+        write_file(f"{tool_rel}/{CAUSE_WRITER_PLANT}" if tool_rel else CAUSE_WRITER_PLANT,
+                   f'"""A record writer."""\nHEAD = "{SERVES_LITERAL}log {FIXTURE_UNIT}\\n"\n')
     run_commit(f"record-causes fixture: {plant}")
     if plant == "claim-root":
         p = run_git(root, "update-ref", f"{CLAIM_NS}fClaim", run_git(root, "rev-parse", "HEAD").stdout.strip())

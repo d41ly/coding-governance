@@ -979,6 +979,13 @@ def check_serves_aliases(root, kit_rel: str, tool_rel: str) -> tuple[str, list[s
     return f"alias · {rel} · SERVES_ALIASES {', '.join(got)} · held to KIND_ALIASES", []
 
 
+def read_code_paths(root, tool_rel: str) -> list[str]:
+    """Every tracked `*.py`, `*.sh` and `*.js` file under the tool root, sorted: the code census's one walk,
+    read by the alias census here and the writer census of `record_causes.py` (TOOL-dTotalRecall-36 S7)."""
+    return sorted({p for ext in ("py", "sh", "js")
+                   for p in read_tracked(root, f"{tool_rel}/**/*.{ext}" if tool_rel else f"**/*.{ext}")})
+
+
 def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
     """TOOL-dTotalRecall-40 S2's alias census: `(lines, reds)` over every tracked `*.py`, `*.sh` and `*.js`
     file under the tool root, each line spelling a `tree_lib.KIND_ALIASES` key as a quoted literal that is
@@ -990,8 +997,7 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
     operands = (re.compile(rf"(?:==|!=)=?\s*{quoted}"), re.compile(rf"{quoted}\s*(?:==|!=)"))
     member, token = re.compile(r" in [(\[]([^)\]]*)"), re.compile(quoted)
     case = re.compile(r"^\s*\(?([^()]*)\)")
-    paths = sorted({p for ext in ("py", "sh", "js")
-                    for p in read_tracked(root, f"{tool_rel}/**/*.{ext}" if tool_rel else f"**/*.{ext}")})
+    paths = read_code_paths(root, tool_rel)
     lines, reds, kept = [], [], 0
     for path in paths:
         key = path[len(tool_rel) + 1:] if tool_rel else path

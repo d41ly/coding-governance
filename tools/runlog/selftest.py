@@ -7085,6 +7085,22 @@ def test_record_duration_derived_mark():
           (marked, rl_record.check_record_lines(bare.split("\n"), checks, FX_SLUG, own)), ([], []))
 
 
+def test_record_cause_line():
+    """TOOL-dTotalRecall-36 AC4: the run record's cause is the first served id, bare and never a run, and
+    its check reds a cut cause line and an unserved cause."""
+    ids = [f"X-{FX_SLUG}-2", f"X-{FX_SLUG}-1"]
+    check("cause AC4: render_cause_line names the first served id, bare",
+          rl_record.render_cause_line(ids), f"**Caused-by:** X-{FX_SLUG}-1")
+    check("cause AC4 liveness: render_serves writes the same ids as a run",
+          rl_record.render_serves(ids), f"X-{FX_SLUG}-1..2")
+    served = sorted(ids)
+    check("cause AC4: check_cause_line passes a served cause",
+          rl_record.check_cause_line(4, f"**Caused-by:** X-{FX_SLUG}-1", served), [])
+    check("cause AC4: check_cause_line reds a cut cause line and an unserved cause, one finding each",
+          [[f[:2] for f in rl_record.check_cause_line(4, line, served)]
+           for line in ("", f"**Caused-by:** X-{FX_SLUG}-9")], [[(4, "cause")], [(4, "cause")]])
+
+
 
 # ======================================================= the window's closer (TOOL-dLoggedFlight-25)
 #

@@ -3748,6 +3748,12 @@ hit 'record causes: orphans · memory/builds/fRoot/build/2026-01-02-build-TOOL-f
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant claim-root 2>&1); hit 'record causes: 0 causeless · 0 orphan(s)'
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant none 2>&1)   # AC8's none
 hit 'record causes: legacy-records · 2 record row(s) (-), 0 section row(s) · memory.legacy-anchors none'; miss 'findings 1'
+# --- TOOL-dTotalRecall-36 AC6 — the writer census: a code file under the fixture's tool root spelling a Serves
+# --- literal and no cause is red at its line, and the legacy plant's census holds no file. Red on
+# --- `check_cause_writers` cut from `--check`.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant writer-without-cause 2>&1)
+hit 'planted/writer.py:2 · red'; hit '1 census file(s) · 0 kept · 1 red'; hit 'record causes: RED'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant legacy 2>&1); hit '0 census file(s) · 0 kept · 0 red'
 out=$("$_PY" - "$HERE" 2>&1 <<'PY'
 import sys
 sys.path.insert(0, sys.argv[1])

@@ -17368,7 +17368,8 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
     mkdir -p "${rec%/*}" 2>/dev/null || print_env_failure 118 "cannot create the build's record folder, so no round was written: ${rec%/*}"
   fi
   {
-    [ -n "$_chain_rec" ] || printf '# %s — the spec-audit chain'\''s rounds\n\n**Serves:** log %s\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\n' "$slug" "$named"
+    # TOOL-dTotalRecall-36 S8: the cause line under the Serves line, the id the record names
+    [ -n "$_chain_rec" ] || printf '# %s — the spec-audit chain'\''s rounds\n\n**Serves:** log %s\n**Caused-by:** %s\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\n' "$slug" "$named" "$named"
     printf '%s' "$rows"
   } >> "$rec" || print_env_failure 118 "cannot append to the record, so this round is not recorded: $rec"
   stage_runmd "$rec" || print_env_failure 118 "the round is written and git could not stage it, so the next call cannot find the record: $rec"
@@ -17397,7 +17398,8 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
 # would read as R5, and step 2 answers a clean round first anyway. POSIX awk, for the reason `spec_facts`
 # gives, so the lists sort by hand, as strings. A row outside the grammar was hand-edited: the file is
 # append-only, so one no reader can parse is a fault to name, never a question for the owner. A blank
-# line is skipped anywhere and the three header lines only before the first row, so a body row wearing a
+# line is skipped anywhere and the four header lines, the cause line among them (TOOL-dTotalRecall-36
+# S8), only before the first row, so a body row wearing a
 # header's prefix reaches that fault instead of leaving the sets (TOOL-dFoldedAudit-15 S4).
 derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -> 0 with _cv_* set, else check 118 and 1
   local out
@@ -17429,7 +17431,7 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
     }
     { sub(/\r$/, "") }
     /^$/ { next }
-    !body && (/^# / || /^\*\*Serves:\*\* (log|journal) / || /^Appended by /) { next }
+    !body && (/^# / || /^\*\*Serves:\*\* (log|journal) / || /^\*\*Caused-by:\*\* / || /^Appended by /) { next }
     {
       body = 1
       k = split($0, f, " · "); c = split(f[1], w, " ")

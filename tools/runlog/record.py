@@ -760,6 +760,14 @@ def render_serves(ids) -> str:
     return " ".join(out)
 
 
+def render_cause_line(serves) -> str:
+    """The run record's cause line (TOOL-dTotalRecall-36 S4): `**Caused-by:** <the first served id>`, the
+    first of `serves` in `derive_unit_key` order, as `render_serves` sorts them, and bare, never an `N..M`
+    run, since a cause resolves as a family id or a record key and a run is neither. Wired into no
+    writer here: `TOOL-dTotalRecall-48` writes it from the render."""
+    return f"**Caused-by:** {sorted(serves, key=derive_unit_key)[0]}"
+
+
 def render_id_run(run) -> str:
     fam, slug, lo = run[0]
     hi = run[-1][2]
@@ -1474,6 +1482,18 @@ def scan_forbidden(lines) -> list:
             if m:
                 out.append((ln, rule, f"a forbidden shape at column {m.start() + 1}"))
     return out
+
+
+def check_cause_line(ln, line, served) -> list:
+    """The head's cause line (TOOL-dTotalRecall-36 S4), `check_serves_line`'s sibling and finding shape:
+    `**Caused-by:** <target>`, the target one of `served`, the served ids, bare. Wired into no reader
+    here: `TOOL-dTotalRecall-48` calls it from `check_record_lines` over a head that admits the line."""
+    m = re.fullmatch(r"\*\*Caused-by:\*\* (\S+)", line or "")
+    if m is None:
+        return [(ln, "cause", "the line is not `**Caused-by:** <target>`")]
+    if m.group(1) not in set(served):
+        return [(ln, "cause", f"the cause `{m.group(1)}` is no unit the record serves")]
+    return []
 
 
 def check_serves_line(ln, line, slug, own_ids) -> list:

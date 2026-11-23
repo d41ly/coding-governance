@@ -3263,7 +3263,10 @@ if (cleanRound && !attended) {
     '` and `specs-audited` refuses every one of those units at --close. Author `' + reviewDir +
     '/<date>-review-' + owed[0] + '-spec-audit-round' + (roundNo - subjectRound + 1) +
     '.md` in this order, which is the order the callee\'s own synthesis writes and hygiene check 22 ' +
-    'reads: line 1 exactly `' + pinnedLine + '`; a title line; a line that is exactly `' + reviewedLine +
+    // TOOL-dTotalRecall-36 S2 - line 2 is the record's cause, the first owed unit, bare: the memory
+    // tree's causes check reds a new record naming no resolving cause.
+    'reads: line 1 exactly `' + pinnedLine + '`; line 2 exactly `**Caused-by:** ' + owed[0] +
+    '`, the cause line; a title line; a line that is exactly `' + reviewedLine +
     '`, with nothing added to it; a line stating the round; then a heading that is exactly ' +
     '`## Verdict: CLEAN`; then the body quoting the callee (the callee said: ' +
     (typeof auRaw.note === 'string' ? auRaw.note : 'no note') + '). ' +
