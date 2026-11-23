@@ -67,6 +67,17 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   24 plants move to the arm's fields), the producer route reads the answered work order's first upstream row and
   prints it as a trailing `item` field, `route_refusal` takes `repo` and `budget_spent` beside `role` and `build`, and
   AC4's arm uses the `tRun` fixture's own pair. Record each in the deviation record.
+- A second builder (run `wf_3a91c48e-d75`) built and probed the whole unit, then committed nothing, because
+  `check_roles.py --write` must rewrite the catalogue region of `tools/roles/README.md` and that path was outside the
+  set. The set now holds it. Its work is saved as a binary patch against `4a7ae9c64`:
+  `C:/Users/d41ly/AppData/Local/Temp/claude/bf1faa02b154e3ee/b48c5b81-0c25-4457-90e8-da811a25e0e9/scratchpad/TOOL-dBoundRoles-26-wip.patch`.
+  Start from it: `git apply --index` it, read every hunk against the spec and the decision record, and keep what
+  holds. Then run `python tools/roles/check_roles.py --write` for the README region, re-stamp
+  `memory/guides/SESSION-KICKOFF.md` at the real clock (the patch's stamp sits ahead of it), and write the deviation
+  record, the acceptance ledger, the index and map renders, and the pass commit. The patch names the reader
+  `resolve_refusal_route`, because the naming lexicon declares no `route` verb; keep that name and record it in the
+  deviation record. The `route-refusal` verb keeps its spec name. Arm 24 of `tools/roles/render_agents.py` holds no
+  `refused` plant at HEAD, so that file stays unwritten unless the patch's render shows otherwise.
 - TOOL-dBoundRoles-11 landed `resolve_owner_question` and the `owner-question` verb, which S5's owner branch asks, and
   TOOL-dBoundRoles-5 and -23 `check_return`, which S2 extends. TOOL-dBoundRoles-24, -41, -11 and -47 added arms 39 to
   42 to `tools/roles/adopt-roles.test.sh`, with `FLOOR_ASSERTIONS` at 172. Read each at HEAD and build on it; record
