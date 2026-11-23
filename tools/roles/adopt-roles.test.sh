@@ -141,7 +141,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +11 for arm 43 (TOOL-dBoundRoles-26).
 # +1 for arm 42's read check (TOOL-dBoundRoles-53).
 # +3 for arm 44 (TOOL-dBoundRoles-59).
-FLOOR_ASSERTIONS=187
+# +2 for arm 45, the missing slot and the refused front matter (TOOL-dBoundRoles-61).
+FLOOR_ASSERTIONS=189
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -198,19 +199,24 @@ check_role_reads() { # <role> <key>... -> one check_arm; rc 0 when the fixture's
   # each entry through the kit's `roles_lib.parse_read_key`, which drops a trailing `?` and folds the tag spelling
   # `field.input.question` to `input:question`. Every key is checked, `input:prompt` included: the render exempts it
   # from its refusal, but a role that does not read it renders no block for it, so a handed half would pass on absence.
-  local _miss _rcr
+  # Three verdicts, the slice's stdout, stderr and exit status read apart (TOOL-dBoundRoles-61 S1): a non-zero exit
+  # fails naming the role, the exit and the slice's last stderr line, so a slot the kit holds no file for (its
+  # `KeyError`) or front matter `parse_front_matter` refuses (its `R2`) is never read as every key read; exit 0 with a
+  # key printed fails naming the role and that key; exit 0 with nothing printed passes.
+  local _miss _rcr _err="$TMP_ROOT/reads.err"
   _miss=$("$PY" -B -c 'import pathlib, sys
 kit = pathlib.Path(sys.argv[1]); sys.path.insert(0, str(kit))
 import roles_lib as lib
-role = lib.load_roles(kit).get(sys.argv[2])
-read = {lib.parse_read_key(x)[0] for x in (role["keys"].get("reads", "") if role else "").split(",") if x.strip()}
-print(next((k for k in sys.argv[3:] if k not in read), ""))' "$FX/$FXK" "$@" 2>&1); _rcr=$?
+role = lib.load_roles(kit)[sys.argv[2]]
+read = {lib.parse_read_key(x)[0] for x in role["keys"].get("reads", "").split(",") if x.strip()}
+print(next((k for k in sys.argv[3:] if k not in read), ""))' "$FX/$FXK" "$@" 2>"$_err"); _rcr=$?
   _miss=${_miss//$'\r'/}
-  check_arm "the role $1 reads ${*:2}, every key its case passes, before any render runs" \
-     "$([ "$_rcr" = 0 ] && [ -z "$_miss" ] && echo 1 || echo 0)"
-  [ "$_rcr" = 0 ] && [ -z "$_miss" ] && return 0
-  if [ "$_rcr" = 0 ]; then echo "    $1 does not read $_miss"; else printf '    %s\n' "${_miss//$'\n'/$'\n'    }"; fi
-  return 1
+  if [ "$_rcr" != 0 ]; then
+    check_arm "the role $1 reads ${*:2}: $1 — reads slice exit $_rcr: $(tail -n 1 "$_err" | tr -d '\r')" 0; return 1
+  elif [ -n "$_miss" ]; then
+    check_arm "the role $1 reads ${*:2}: $1 does not read $_miss" 0; return 1
+  fi
+  check_arm "the role $1 reads ${*:2}, every key its case passes, before any render runs" 1
 }
 # THE CITED HARNESS PAIRS, read by this suite and never through `roles_lib` (TOOL-dRenderedAnchor-3
 # S5): the `harness` of each `[[workflow]]` entry of `<kit>/workflows.toml` whose `driver` is
@@ -2530,6 +2536,36 @@ check_arm "arm 44 AC2 ...and from its native-spelled line" \
 check_arm "arm 44 AC2 ...and with field.input.prompt? cut from the tag-spelled line it fails naming input:prompt" \
    "$([[ $A44 == *'cut 1 FAIL '*'gov-orienter does not read input:prompt'* ]] && echo 1 || echo 0)"
 [[ $A44 == *'tag 0 ok '*'native 0 ok '*'cut 1 FAIL '*'does not read input:prompt'* ]] || printf '    %s\n' "${A44//$'\n'/$'\n'    }"
+
+# ---- arm 45 (TOOL-dBoundRoles-61 AC1 AC2): `check_role_reads` reads its slice's exit status beside its stdout, so a
+# ---- slice that crashes fails the call rather than passing on the empty line it printed. Each call runs in a
+# ---- subshell, so its own assertion is read here by one outer `check_arm`, never counted: the call over a slot the
+# ---- fixture's kit holds no file for prints a FAIL line naming `gov-nosuch` and `KeyError`, and the call over the
+# ---- fixture's gov-orienter, its `reads:` key indented so `roles_lib.parse_front_matter` refuses it, a FAIL line
+# ---- naming `gov-orienter` and `R2`, then, the file restored, an ok line. The failing case, owed at the close and
+# ---- not observed by the pass that wrote this: the helper staged back to reading stdout alone, under which both
+# ---- crashed calls print ok. WHAT IT DOES NOT CHECK: a slice that warns on stderr and exits 0, which passes by
+# ---- design, or which of the slice's own lines crashed.
+build_fixture; _rc45=$?
+A45F="$FX/$FXK/agents/gov-orienter.agent.md"; A45B="$TMP_ROOT/a45.bak"
+_o=$(check_role_reads gov-nosuch input:question); _r=$?  # TOOL-dBoundRoles-61 AC1: the missing slot
+_o=${_o//$'\r'/}
+check_arm "arm 45 AC1 the read check over a slot the kit holds no file for fails naming gov-nosuch and KeyError" \
+   "$([ "$_rc45" = 0 ] && [ "$_r" = 1 ] && [[ ${_o%%$'\n'*} == 'FAIL '*gov-nosuch*KeyError* ]] && echo 1 || echo 0)"
+[[ ${_o%%$'\n'*} == 'FAIL '*gov-nosuch*KeyError* ]] || printf '    %s\n' "exit $_r" "${_o//$'\n'/$'\n'    }"
+_o=""; _r=unset; _k=""
+if cp "$A45F" "$A45B" && "$PY" -B -c 'import pathlib, re, sys
+path = pathlib.Path(sys.argv[1]); text = path.read_bytes().decode("utf-8")
+text, hits = re.subn(r"(?m)^reads:", " reads:", text, count=1)
+path.write_bytes(text.encode("utf-8")); sys.exit(0 if hits == 1 else 1)' "$A45F"; then
+  _o=$(check_role_reads gov-orienter input:question); _r=$?  # TOOL-dBoundRoles-61 AC2: the refused front matter
+  cp "$A45B" "$A45F" && _k=$(check_role_reads gov-orienter input:question)
+fi
+_o=${_o//$'\r'/}; _k=${_k//$'\r'/}
+check_arm "arm 45 AC2 ...and over gov-orienter with its reads key indented fails naming R2, then restored reads ok" \
+   "$([ "$_r" = 1 ] && [[ ${_o%%$'\n'*} == 'FAIL '*gov-orienter*R2* ]] && [[ $_k == 'ok '* ]] && echo 1 || echo 0)"
+[ "$_r" = 1 ] && [[ ${_o%%$'\n'*} == 'FAIL '*gov-orienter*R2* ]] && [[ $_k == 'ok '* ]] \
+   || printf '    %s\n' "exit $_r" "${_o//$'\n'/$'\n'    }" "restored: ${_k//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
