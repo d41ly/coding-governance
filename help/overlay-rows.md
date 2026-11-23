@@ -123,9 +123,11 @@ Each gov row's state is one of `unchanged`, `amended`, `replaced`, `excluded`, `
 A kind's schema says, field by field, what your rows may touch. A field is **open** when it declares
 `widens`, the direction that widens it: `add` on a permission set such as `grants`, `remove` on a
 constraint set such as `needs`, or an ordered list on a scalar such as `ceiling = ["low", "mid", "high"]`,
-where a later value is wider. Every other field is **fixed**: one whose `fixed-by` names what fixes it (a
-principle, a floor item, or a parser of gov's tools), and one that declares neither, which reads fixed
-by default. A schema may also list whole fixed rows under `[[fixed-row]]`. Nobody types the class: a
+where a later value is wider, or on a numeric scalar the direction `widens = "rises-only"`, under which
+your patch may raise the field's number and never lower it. A whole number or a string of decimal
+digits is a number, so `"8212"` and `8212` are one value; a sign or a decimal point makes no number.
+Every other field is **fixed**: one whose `fixed-by` names what fixes it (a principle, a floor item, or
+a parser of gov's tools), and one that declares neither, which reads fixed by default. A schema may also list whole fixed rows under `[[fixed-row]]`. Nobody types the class: a
 schema writing `class` is refused.
 
 Update refuses the composition, naming the row, the field and what fixes it, when your overlay:
@@ -134,7 +136,9 @@ Update refuses the composition, naming the row, the field and what fixes it, whe
 - amends or supersedes a fixed row, the refusal saying `a widening` when the patch would widen it;
 - supersedes a row with a fixed field changed or dropped;
 - excludes a fixed row;
-- sets an ordered scalar to a value outside its order.
+- sets an ordered scalar to a value outside its order;
+- lowers a `rises-only` scalar below gov's number, by `amends` or `supersedes`, the refusal saying
+  `never lowered`, or sets it to a value that is no number.
 
 An exclusion is also refused while something still relies on the excluded tag: another active row of any
 kind holding it in a field whose schema `ref` role is `needs`, `actor` or `grants` (the refusal names the
@@ -144,6 +148,7 @@ drops it from `needs`.
 
 Every patch operation the composition applies is classified `widens` or `narrows` from the field's
 declared direction alone; a value equal to gov's is no operation. Where gov's own value sits outside
-the field's order, any listed value reads `widens`. The composition lists each widening with its row,
+the field's order, any listed value reads `widens`, and where it is no number on a `rises-only` field,
+any number does. The composition lists each widening with its row,
 field, operation and gov's value, the one list the update's delta report prints, so what your
 repository widened is never a guess.

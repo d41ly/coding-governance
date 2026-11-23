@@ -1,0 +1,15 @@
+# TOOL-dBoundRoles-82 deviation 821 — the builder's departures from the rises-only spec
+
+**Serves:** deviation TOOL-dBoundRoles-82
+
+- **Departs from:** `TOOL-dBoundRoles-82@rev-1` [S2, S3, AC2, §4]
+- **Hand-off:** spec-to-code
+- **Before:** §4 "Inventory" mints the fixture field `reach` and the plants `rises-raise`, `rises-text`, `rises-lower`, `rises-word` and `rises-unknown`, and AC2 asks that a `supersedes` writing `reach = 2` refuse as the `rises-lower` amends does, without naming the plant that writes it; §4 "The classifier's new arm" places the `rises-only` arm in `derive_patch_class` "before the order arm" and opens it with its own equality test over the numbers read.
+- **After:** `reach` is a field of the fixture schema in every plant, `widens = "rises-only"`, and no row of gov's default pack carries it, so every earlier plant composes as before. The rises plants share one builder, `tools/playbook/fixtures/row_kind.py#build_rise_plant`, under which gov's `fixture.beta` carries `reach` (the integer 4, or the string `"4"` for `rises-text`) and gov's `fixture.gamma` carries `reach = 4`. `rises-lower` writes both of AC2's edges side by side: an `amends` of `fixture.beta` and a `supersedes` of `fixture.gamma` that repeats every gamma field but `reach`, each writing `reach = 2`, so the plant prints a `row-checks: red · widens` line for each edge and no further plant is minted. The selftest row in the row-kind loop of `tools/playbook/render_playbook.py#run_selftest` names both edges and counts the `never lowered` lines at exactly the pair. In `tools/playbook/row_checks.py#derive_patch_class` the new arm sits after the scalar's existing `value == gov_value` test and before the order test, so a value identical to gov's is no operation before any number is read, and the arm's own number compare makes `"4"` and `4` one value. The red of `tools/playbook/overlay_rows.py#read_field_decl` keeps its text and appends `or by one of` and the words of `SCALAR_DIRECTIONS`. A TOML float reads as no number through `derive_number`, as "anything else" in S2 says. The help page also says, in its classification paragraph, that a gov value that is no number reads below every number.
+- **Cause:** builder discovery
+- **Reason:** the spec's inventory names the plants without saying which writes the `supersedes` half of AC2, and a second gov row carrying the field lets one plant observe both edges; the existing equality test already answers "a scalar equal to gov's" for every direction, so the arm needs no second copy of it for identical values.
+- **Evidence:** the build brief `memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-82-build-brief.md` and the acceptance ledger `memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-82-1-acceptance-ledger.md`.
+- **Risk:** additive
+- **Approver:** author, the gov-builder pass of the unattended run, under the build README's `author-recorded` value; reported by the `report` value
+- **Follow-through:** none
+- **Caused-by:** TOOL-dBoundRoles-82

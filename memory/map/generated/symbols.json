@@ -4093,6 +4093,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "build_rise_plant",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/row_kind.py"
+    },
+    {
       "id": "build_role_pair",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
@@ -13406,6 +13411,11 @@
       "id": "derive_node_tag",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "derive_number",
+      "kind": "function",
+      "file": "tools/playbook/row_checks.py"
     },
     {
       "id": "derive_one_line_rule_plant",
