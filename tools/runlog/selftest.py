@@ -378,7 +378,13 @@ from collections import Counter  # noqa: E402
 # moves, and two checks land in `test_extract_orient` — the owner-ceiling case under
 # `budgets.enforce = "refuse"` and with the cap in `budgets.pinned`, each refusing the 40-call row (AC9).
 # 2 + 0 = 2
-ASSERTION_FLOOR = 1632
+# RAISED 1632 -> 1643 by KICK-dKeptSession-62, the minors batch: TWO new arms with 2 checks each —
+# `test_extract_main_transcripts_inside`'s raw glob listing a linked transcript and
+# `derive_main_transcripts` omitting it (AC17), and `test_extract_env_reads`'s variables all aimed or
+# dropped and a planted read named (AC24) — and one check in `test_extract_context_window_compact`'s
+# loop, the main-file sidechain compaction left at 75% (AC10). Their decoy checks move it by 6.
+# 1 + 2 + 2 + 6 = 11
+ASSERTION_FLOOR = 1643
 
 PASS = []
 FAIL = []
@@ -1555,6 +1561,22 @@ def build_projects(prefix):
     return base, projects
 
 
+def build_dir_link(target, link):
+    """A directory link at `link` naming `target`: a symlink, else a junction where a symlink needs a
+    privilege this node lacks. -> `symlink`, `junction`, or '' where the node makes neither, which its
+    caller announces as a skip."""
+    try:
+        os.symlink(target, link, target_is_directory=True)
+        return "symlink"
+    except (OSError, NotImplementedError):
+        try:
+            import _winapi
+            _winapi.CreateJunction(str(target), str(link))
+            return "junction"
+        except (ImportError, OSError, AttributeError):
+            return ""
+
+
 def build_arm_env(base):
     """The CLI's environment for one arm: EVERY root it resolves aimed under the arm's own scratch."""
     env = dict(os.environ)
@@ -1724,18 +1746,7 @@ def test_extract_ac1_session_ids():
     # nodes lack, so a junction is the fallback, and a node offering neither says so.
     outside = base / "outside"
     sid_e = build_scenario(outside, "order", project="linked-target")
-    link = projects / "linked"
-    made_link = ""
-    try:
-        os.symlink(outside / "linked-target", link, target_is_directory=True)
-        made_link = "symlink"
-    except (OSError, NotImplementedError):
-        try:
-            import _winapi
-            _winapi.CreateJunction(str(outside / "linked-target"), str(link))
-            made_link = "junction"
-        except (ImportError, OSError, AttributeError):
-            made_link = ""
+    made_link = build_dir_link(outside / "linked-target", projects / "linked")
     if not made_link:
         print("  skip extract AC1 containment: this node can make neither a symlink nor a junction, "
               "so the escape arm is UNEXERCISED here")
@@ -2143,13 +2154,19 @@ def test_extract_context_window():
 def test_extract_context_window_compact():
     """KICK-dKeptSession-47 AC1 and AC2: a compaction joins a model's observation only when the newest
     main usage before it in its transcript is on that model, so another model's 900000-token compaction
-    leaves the 150000-token turn on the 200000 rung, and the model's own lifts it to the 1000000 rung."""
+    leaves the 150000-token turn on the 200000 rung, and the model's own lifts it to the 1000000 rung.
+    KICK-dKeptSession-62 AC10: the same compaction on an `isSidechain` record of the main file, read as
+    `agent`, joins no model, so the turn stays at 75%."""
     for name, want in (("context-window-compact-other",
                         ("AC1: another model's 900000 compaction leaves the 150000-token turn at 75%",
                          (0, "75%", "context: window 200000 · observed 150000 on fixture-model"))),
                        ("context-window-compact-own",
                         ("AC2: the model's own 900000 compaction lifts the 150000-token turn to 15%",
-                         (0, "15%", "context: window 1000000 · observed 900000 on fixture-model")))):
+                         (0, "15%", "context: window 1000000 · observed 900000 on fixture-model"))),
+                       ("context-window-compact-sidechain",
+                        ("KICK-dKeptSession-62 AC10: a 900000 compaction on a main-file sidechain record "
+                         "leaves the 150000-token turn at 75%",
+                         (0, "75%", "context: window 200000 · observed 150000 on fixture-model")))):
         base, projects = build_projects("runlog-window-compact-")
         sid = build_scenario(projects, "context-window")
         build_scenario(projects, name)
@@ -2201,6 +2218,77 @@ def test_extract_context_window_root():
           (rc, got[0] if isinstance(got, tuple) else got,
            isinstance(got, tuple) and got[1].startswith("no root: runlog: no transcripts root resolves")),
           (0, 200000, True))
+
+
+def test_extract_main_transcripts_inside():
+    """KICK-dKeptSession-62 AC17: `derive_main_transcripts`, the one population the window scan and
+    `scan_preflights` read, omits a transcript under a project directory linked from outside the root,
+    so the window reads the root's own 150000-token turn and never the linked 900000. The raw glob
+    listing the linked transcript is the liveness that the link was made and is walked."""
+    base, projects = build_projects("runlog-inside-")
+    sid = build_scenario(projects, "context-window")
+    outside = base / "outside"
+    far = build_scenario(outside, "context-window-sibling", project="linked-target")
+    made_link = build_dir_link(outside / "linked-target", projects / "linked")
+    if not made_link:
+        print("  skip extract KICK-dKeptSession-62 AC17: this node can make neither a symlink nor a junction, "
+              "so the linked-transcript arm is UNEXERCISED here")
+        return
+    check(f"extract KICK-dKeptSession-62 AC17 liveness: the raw glob lists the {made_link}ed transcript beside "
+          "the root's own", sorted(p.name[:-len(".jsonl")] for p in projects.glob("*/*.jsonl")), sorted([sid, far]))
+    check(f"extract KICK-dKeptSession-62 AC17: derive_main_transcripts omits the {made_link}ed transcript, so "
+          "the window reads the root's own 150000-token turn",
+          ([p.name[:-len(".jsonl")] for p in rx.derive_main_transcripts(projects)],
+           rx.derive_context_window("fixture-model", root=projects)),
+          ([sid], (200000, "observed 150000 on fixture-model")))
+
+
+# A variable read by name: `env.get("X")`, `env["X"]`, `os.environ.get("X")`, `os.environ["X"]` or
+# `os.getenv("X")`, the forms the extractor reads its roots and its window variable through.
+ENV_READ_RE = re.compile(r"""(?:\benv|\bos\.environ)(?:\.get\(|\[)\s*["']([A-Za-z_][A-Za-z0-9_]*)["']"""
+                         r"""|\bos\.getenv\(\s*["']([A-Za-z_][A-Za-z0-9_]*)["']""")
+
+
+def read_env_reads(text):
+    """Every variable name `text` reads by a literal name through ENV_READ_RE's forms, sorted."""
+    return sorted({a or b for a, b in ENV_READ_RE.findall(text)})
+
+
+def read_arm_guarded():
+    """The names no arm inherits from the machine, read off this suite's own source by `ast`: each
+    DECOY_VARS root, each `env["<name>"]` `build_arm_env` sets, and each `os.environ.pop("<name>", ...)`
+    `main` makes before the `try` its arms run in."""
+    tree = ast.parse(HERE.joinpath("selftest.py").read_text(encoding="utf-8"))
+    funcs = {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
+    names = {var for var, _sub in DECOY_VARS}
+    for node in ast.walk(funcs["build_arm_env"]):
+        if isinstance(node, ast.Assign):
+            names.update(t.slice.value for t in node.targets if isinstance(t, ast.Subscript)
+                         and isinstance(t.slice, ast.Constant) and isinstance(t.slice.value, str))
+    for stmt in funcs["main"].body:
+        if isinstance(stmt, ast.Try):
+            break
+        names.update(node.args[0].value for node in ast.walk(stmt)
+                     if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                     and node.func.attr == "pop" and ast.unparse(node.func.value) == "os.environ"
+                     and node.args and isinstance(node.args[0], ast.Constant))
+    return names
+
+
+def test_extract_env_reads():
+    """KICK-dKeptSession-62 AC24, the class of KICK-dKeptSession-30's popped window variable: every
+    variable `extract.py` reads by name is a DECOY_VARS root, set by `build_arm_env` or popped by `main`
+    before any arm runs, so no case reads it from the machine. The same reader over a copy of the source
+    adding `env.get("RUNLOG_PLANTED")` names that variable, the arm's own liveness."""
+    text = (HERE / "extract.py").read_text(encoding="utf-8")
+    guarded = read_arm_guarded()
+    reads = read_env_reads(text)
+    check("extract KICK-dKeptSession-62 AC24: every variable extract.py reads by name is aimed or dropped "
+          "before any arm runs, over a population of at least the decoy roots",
+          (len(reads) >= len(DECOY_VARS), [v for v in reads if v not in guarded]), (True, []))
+    planted = text + '\n_PLANTED = env.get("RUNLOG_PLANTED")\n'
+    check("extract KICK-dKeptSession-62 AC24: a copy adding env.get(\"RUNLOG_PLANTED\") reds naming that "
+          "variable", [v for v in read_env_reads(planted) if v not in guarded], ["RUNLOG_PLANTED"])
 
 
 # KICK-dKeptSession-9: the orientation report's fixture. Each design session starts between the two

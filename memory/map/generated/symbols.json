@@ -3028,6 +3028,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "build_dir_link",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_discarded_work_landed",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -21458,6 +21463,11 @@
       "file": "tools/loop/factories.py"
     },
     {
+      "id": "read_arm_guarded",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_arm_lines",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -22811,6 +22821,11 @@
       "id": "read_entry_members",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "read_env_reads",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "read_envelope",
@@ -40208,9 +40223,19 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_extract_env_reads",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_extract_failure_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_extract_main_transcripts_inside",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_extract_orient",

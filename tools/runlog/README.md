@@ -256,9 +256,10 @@ own gate passes and never for a first-party model, so the figure is the owner's 
 window the harness enforces (KICK-dKeptSession-56 S14); else
 the smallest `CONTEXT_WINDOW_RUNGS` rung at or above the largest context the node has observed for
 that model, source `observed <n> on <model>`: the largest main `usage` sum on the model and the
-largest `preTokens` of a compaction whose newest earlier main usage in the same transcript is on that
-model (KICK-dKeptSession-47), across the newest `CONTEXT_WINDOW_SCAN` main transcripts under the
-read transcript's own projects root, each parsed as its main file alone, the read transcript's own
+largest `preTokens` of a main compaction whose newest earlier main usage in the same transcript is on
+that model (KICK-dKeptSession-47), a sidechain record in the main file read as `agent` and joining no
+model (KICK-dKeptSession-62), across the newest `CONTEXT_WINDOW_SCAN` main transcripts under the
+read transcript's own projects root, none linked from outside it, each parsed as its main file alone, the read transcript's own
 parse standing in for its file; else the bottom rung, source `no observation`. An observation past
 the top rung is its own window. No transcript record names the window a session runs, so every
 session of a model observed past 200000 under the root reads the 1M rung, a 200k session of that
