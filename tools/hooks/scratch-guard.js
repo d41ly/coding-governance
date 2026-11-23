@@ -1000,8 +1000,10 @@ function resolveComparableCommon(start) {
  * `## ` heading or READY line, backticks stripped. `{ build, units: [{ unit, spec }] }`, `spec` ''
  * when the line names none. The `- brief:` line is not read here. `lines` is every non-blank line of
  * those sections, the heading included, as the card holds it, each with the unit it names or null —
- * what the subagent context copies.
+ * what the subagent context copies. The unattended kit's mail-notice.js carries the function inline
+ * between the markers (KICK-dKeptSession-62 S21).
  */
+// >>> extract_route_units_js -- canonical copy: the hooks kit's scratch-guard.js (byte-identical; gated)
 function extractRouteUnits(text) {
   let inRoute = false
   let build = ''
@@ -1022,6 +1024,7 @@ function extractRouteUnits(text) {
   }
   return { seen, build, units, lines }
 }
+// <<< extract_route_units_js
 
 /** The status header's first cell and its `Tier-<n>` cell: `{ status, tier }`, '(none)' and '' when absent. */
 function readStatusCells(text) {
@@ -1951,7 +1954,9 @@ function checkRoleGate(cmd, data, env) {
 /** The harness's cap on a hook's additionalContext, in characters (Claude Code's documentation). */
 const ROUTE_CONTEXT_CAP = 10000
 /** The card file the card engine renders into each session tree, ignored by every clone (PLAY-dOrderedCharter-8). */
+// >>> card_file_rel_js -- canonical copy: the hooks kit's scratch-guard.js (byte-identical; gated)
 const CARD_FILE_REL = '.claude/orientation-card.md'
+// <<< card_file_rel_js
 const WRITE_TOOLS_PROSE = 'an Edit, Write, MultiEdit or NotebookEdit'
 
 /**

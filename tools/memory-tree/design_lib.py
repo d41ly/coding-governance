@@ -562,7 +562,11 @@ def read_spec_edges(text, verb):
     backticked token after the verb, else its leading run of `[A-Za-z0-9_-]`, and the text is the
     bullet's line with each continuation line indented two spaces under it (TOOL-dGroundRules-32 S17).
     The build-order render's consumes read and the spec-token checker's hands-off join both read
-    edges here, so neither holds a grammar of its own."""
+    edges here, so neither holds a grammar of its own. Beside check 12's extractor it must agree with
+    the dispatcher's reader, `read_consumes_from` in the unattended kit's lib-unattended.sh, on every
+    id-shaped consumes-from target, which that kit's driver suite holds in its `edges-agreement` case
+    (KICK-dKeptSession-62 S16, S17). Their one departure is a bare id run: this reads it as the target,
+    and `read_consumes_from` reports it unreadable, so `--dispatch` refuses the spec."""
     out, in3, edges, cur = [], False, False, None
     for line in text.replace("\r", "").split("\n"):
         if cur is not None and line.startswith("  "):

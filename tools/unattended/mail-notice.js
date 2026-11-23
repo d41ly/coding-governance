@@ -54,12 +54,16 @@ const NOTICE_EVERY_CALL = 'every-tool-call'
 const SLUG_RE = /^[A-Za-z][A-Za-z0-9-]*$/
 const ID_RE = /^[0-9a-f]{12}$/
 /** The tree's card file, the hooks kit scratch-guard's CARD_FILE_REL, carried inline (S9). */
+// >>> card_file_rel_js -- canonical copy: the hooks kit's scratch-guard.js (byte-identical; gated)
 const CARD_FILE_REL = '.claude/orientation-card.md'
+// <<< card_file_rel_js
 
 /**
  * The card's `## route` section: `{ seen, build, units, lines }`, carried inline byte for byte from the
- * hooks kit scratch-guard's `extractRouteUnits` (S9), of which this hook reads `build` alone.
+ * hooks kit scratch-guard's `extractRouteUnits` (S9), of which this hook reads `build` alone. Its
+ * parity is gated between the markers (KICK-dKeptSession-62 S21).
  */
+// >>> extract_route_units_js -- canonical copy: the hooks kit's scratch-guard.js (byte-identical; gated)
 function extractRouteUnits(text) {
   let inRoute = false
   let build = ''
@@ -80,6 +84,7 @@ function extractRouteUnits(text) {
   }
   return { seen, build, units, lines }
 }
+// <<< extract_route_units_js
 
 /**
  * S9: the build the tree's card file at `<root>/` CARD_FILE_REL binds `sid` to — its route's build where

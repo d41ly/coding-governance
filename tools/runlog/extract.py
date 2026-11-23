@@ -1036,17 +1036,16 @@ def scan_preflights(projects_root, slug=None) -> list:
     """`(sid, slug)` for every local session whose main file RUNS `unattended.sh --preflight <slug>`.
 
     Only a shell call's input counts: a mention in a tool's output or in narration is not a run.
-    The attribution is a heuristic and every consumer is told so.
+    The attribution is a heuristic and every consumer is told so. The sessions read are
+    `derive_main_transcripts`', so a transcript linked from outside the root is never read
+    (KICK-dKeptSession-62 S18).
     """
     root = pathlib.Path(projects_root)
     if not root.is_dir():
         return []
-    inside = root.resolve()
     out = set()
-    for path in sorted(root.glob("*/*.jsonl")):
+    for path in derive_main_transcripts(root):
         sid = path.name[:-len(".jsonl")]
-        if SID_RE.fullmatch(sid) is None or not _check_inside(path, inside):
-            continue
         try:
             fh = open(path, "rb")
         except OSError:
@@ -1175,9 +1174,13 @@ def _read_peak_bytes() -> int | None:
 def derive_main_transcripts(root) -> list:
     """The main session transcripts under a projects root, sorted: each `<project>/<session id>.jsonl`
     whose stem `SID_RE` fullmatches, so an agent file or a stray name is never one (KICK-dKeptSession-56
-    S21). The one population `measure_tree`, `measure_ready_tree` and `derive_context_window` read;
-    `scan_preflights` keeps its own `_check_inside` walk. Reads no file."""
-    return sorted(p for p in pathlib.Path(root).glob("*/*.jsonl") if SID_RE.fullmatch(p.name[:-len(".jsonl")]))
+    S21), and which `_check_inside` places under the resolved root, so a transcript linked from outside
+    it is omitted (KICK-dKeptSession-62 S19). The one population `measure_tree`, `measure_ready_tree`,
+    `derive_context_window` and `scan_preflights` read (S18). Reads no file."""
+    root = pathlib.Path(root)
+    inside = root.resolve()
+    return sorted(p for p in root.glob("*/*.jsonl")
+                  if SID_RE.fullmatch(p.name[:-len(".jsonl")]) and _check_inside(p, inside))
 
 
 def measure_tree(root) -> dict:
@@ -1320,8 +1323,10 @@ def derive_context_window(model, root=None, held=None) -> tuple:
     does; KICK-dKeptSession-45 S1), source `observed <n> on <model>`; else the bottom rung, source
     `no observation`, or `no root: <why>` where no root resolves (S2), never a raise. A transcript's
     observation is its largest main `usage` sum on `model` and the largest integer `pre_tokens` of a
-    compaction whose newest earlier main usage in the same transcript is on `model`
-    (KICK-dKeptSession-47 S1); a compaction with no main usage before it joins no model. Each is
+    main compaction whose newest earlier main usage in the same transcript is on `model`
+    (KICK-dKeptSession-47 S1); a compaction with no main usage before it joins no model, and nor does one
+    whose own `src` is not `main`, a sidechain record `extract_session` relabels `agent` (KICK-dKeptSession-62
+    S12). Each is
     parsed as a tree holding its main file alone, and `held`, `(path, events)`, stands in for that
     path's parse where it is among them. An unreadable transcript is skipped. No transcript record
     names the window, so every session of a model observed past 200000 under the root reads the 1M
@@ -1365,7 +1370,8 @@ def derive_context_window(model, root=None, held=None) -> tuple:
                 if not on_model:
                     continue
                 tokens = derive_context_tokens(ev)
-            elif ev["kind"] == "compact" and on_model and type(ev.get("pre_tokens")) is int:
+            elif (ev["kind"] == "compact" and ev["src"] == "main" and on_model
+                  and type(ev.get("pre_tokens")) is int):
                 tokens = ev["pre_tokens"]
             else:
                 continue

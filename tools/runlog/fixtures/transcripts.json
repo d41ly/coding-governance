@@ -210,6 +210,14 @@
         {"type": "assistant", "uuid": "wn-a1", "timestamp": "2026-09-13T12:00:05.000Z", "version": "9.9.1", "requestId": "req-wn1", "message": {"id": "msg-req-wn1", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Reading the own model's notes."}], "usage": {"input_tokens": 1000, "output_tokens": 10, "cache_read_input_tokens": 40000, "cache_creation_input_tokens": 9000}}},
         {"type": "system", "subtype": "compact_boundary", "uuid": "wn-s1", "timestamp": "2026-09-13T12:00:10.000Z", "version": "9.9.1", "content": "Conversation compacted", "compactMetadata": {"trigger": "auto", "preTokens": 900000}}
       ]
+    },
+    "context-window-compact-sidechain": {
+      "about": "KICK-dKeptSession-62 AC10. context-window-compact-own with its compaction on an isSidechain record of the main file, which the extractor reads as agent: it joins no model, so beside context-window the 150000-token turn still reads 75% of the 200000 rung.",
+      "main": [
+        {"type": "user", "uuid": "wc-u0", "timestamp": "2026-09-13T12:00:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Start the sidechain fixture work."}, "origin": {"kind": "human"}},
+        {"type": "assistant", "uuid": "wc-a1", "timestamp": "2026-09-13T12:00:05.000Z", "version": "9.9.1", "requestId": "req-wc1", "message": {"id": "msg-req-wc1", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Reading the sidechain fixture notes."}], "usage": {"input_tokens": 1000, "output_tokens": 10, "cache_read_input_tokens": 40000, "cache_creation_input_tokens": 9000}}},
+        {"type": "system", "subtype": "compact_boundary", "uuid": "wc-s1", "isSidechain": true, "timestamp": "2026-09-13T12:00:10.000Z", "version": "9.9.1", "content": "Conversation compacted", "compactMetadata": {"trigger": "auto", "preTokens": 900000}}
+      ]
     }
   }
 }

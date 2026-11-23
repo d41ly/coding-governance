@@ -3028,6 +3028,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "build_dir_link",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_discarded_work_landed",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -21458,6 +21463,11 @@
       "file": "tools/loop/factories.py"
     },
     {
+      "id": "read_arm_guarded",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_arm_lines",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -22813,6 +22823,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "read_env_reads",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_envelope",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -23888,6 +23903,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_kd62_field",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_key",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
@@ -24601,6 +24621,11 @@
       "id": "read_mint_unit",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "read_mirror_literal",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "read_missing_landed_facts",
@@ -35208,6 +35233,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_kd62_landed",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_keep",
       "kind": "function",
       "file": "tools/run-gates/keep_tails.py"
@@ -40208,9 +40238,19 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_extract_env_reads",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_extract_failure_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_extract_main_transcripts_inside",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_extract_orient",

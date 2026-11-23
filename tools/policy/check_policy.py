@@ -111,7 +111,8 @@ policy-mirror.js and policy-shim.sh into the kit copy, pushes a landed revision 
 and asserts what the helper, the hooks kit's agent-cap.js and `arm_mirror_landed` answer there.
 `mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in six ladder states.
 `mirror-input-parity` (KICK-dKeptSession-59) holds policy-mirror.js's `MIRROR_KIT_INPUTS` literal,
-each name spelled by `derive_kit_rel`, to `derive_mirror_inputs` less `LEGACY_INPUTS`.
+each name spelled by `derive_kit_rel`, to `derive_mirror_inputs` less `LEGACY_INPUTS`, and its
+`MIRROR_LEGACY_INPUTS` literal to `LEGACY_INPUTS` (KICK-dKeptSession-62).
 `mirror-commit-rewrite` (TOOL-dGroundRules-65) commits the mirror rendered at its parent, rewrites
 that commit with `git commit-tree` as the lander does, and reds a `mirror --check` that is not fresh
 at either commit, or a helper reading the rewrite that leaves the render's `{rev}` unfilled.
@@ -2871,7 +2872,10 @@ def run_mirror_landed(name):
     under `last-valid` and, pushed as L, a mirror rendered at HEAD with the store's key taken out of
     `legacy_blobs`, as a render before the store joined writes it: the helper reads it stale and
     answers `refused` with the store unchanged, then `allowed` once strict's `hooks.bypass` is set so
-    in the store alone and pushed. A failed git step is a WRONG naming the step."""
+    in the store alone and pushed. `mirror-legacy-expected` (KICK-dKeptSession-62 S24): the same policy
+    file and, pushed as L, a mirror rendered at HEAD with `.agent-cap.conf`'s key taken out of
+    `legacy_blobs`: the helper reads it stale, never fresh, and answers `refused` through the reader.
+    A failed git step is a WRONG naming the step."""
     rows = policy.load_catalogue(KIT)
     repo, kit, bare = build_landed_repo(rows)
     try:
@@ -3054,6 +3058,25 @@ def run_mirror_landed(name):
                 checks.append(check_run(f"{at_l}, {store}", "policy-mirror.js get hooks.bypass --explain", bypass,
                                         lambda rc, o, e, value=value, at=at: rc == 0 and o == f"{value}\n"
                                         and f"policy: hooks.bypass · preset · mirror stale at {at}; " in e))
+        elif name == "mirror-legacy-expected":
+            # KICK-dKeptSession-62 S24: the repository-relative inputs are the reader's own list too. A
+            # mirror whose `legacy_blobs` lacks `.agent-cap.conf` reads stale with nothing changed since its
+            # render; a reader comparing only the keys the mirror records reads it fresh.
+            write_policy(repo, 'preset = "strict"\n' + LANDED_POLICY.format(on="last-valid", n=3))
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "-m", "a policy file naming strict")
+            doc = json.loads(policy.render_mirror(repo, "HEAD"))
+            del doc["legacy_blobs"][policy.LEGACY_FANOUT]
+            Path(repo, *MIRROR_FILE).write_bytes(
+                (json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii"))
+            run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+            run_fixture_git(repo, "commit", "-q", "-m", "a mirror missing its .agent-cap.conf key")
+            run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+            at = run_fixture_git(repo, "rev-parse", "HEAD")[:8]
+            bypass = ["node", str(kit / "policy-mirror.js"), "get", "hooks.bypass", "--repo", str(repo), "--explain"]
+            checks.append(check_run(at_l, "policy-mirror.js get hooks.bypass --explain", bypass,
+                                    lambda rc, o, e: rc == 0 and o == "refused\n"
+                                    and f"policy: hooks.bypass · preset · mirror stale at {at}; " in e))
         elif name == "mirror-shim-exit-one":
             # TOOL-dGroundRules-21 S16: every shim outcome but exit 0 and its own refusal is a PolicyRefusal
             # naming the status, never an undefined value or another throw.
@@ -3208,36 +3231,59 @@ def run_mirror_upgrade(name):
 
 
 MIRROR_KIT_INPUTS_RX = re.compile(r"MIRROR_KIT_INPUTS\s*=\s*(\[[^\]]*\])")  # spans newlines inside the brackets
+MIRROR_LEGACY_INPUTS_RX = re.compile(r"MIRROR_LEGACY_INPUTS\s*=\s*(\[[^\]]*\])")
+
+
+def read_mirror_literal(text, const, rx):
+    """`(names, seen)`: the one `<const> = [...]` literal `rx` takes from policy-mirror.js's `text`,
+    parsed as JSON, or `(None, <why>)` where it is absent, doubled, unparseable or no list of names."""
+    found = rx.findall(text)
+    if len(found) != 1:
+        return None, f"policy-mirror.js holds {len(found)} {const} = [...] literal(s), not one"
+    try:
+        names = json.loads(found[0])
+    except ValueError as exc:  # a JSONDecodeError is a ValueError
+        return None, f"policy-mirror.js's {const} did not read: {type(exc).__name__}: {exc}"
+    if not isinstance(names, list) or not all(isinstance(n, str) for n in names):
+        return None, f"policy-mirror.js's {const} literal is no list of names: {found[0]}"
+    return names, ""
 
 
 def run_mirror_input_parity(name):
     """`mirror-input-parity` (KICK-dKeptSession-59 S1): the one `MIRROR_KIT_INPUTS = [...]` literal of
     this kit's policy-mirror.js, taken by regex and parsed as JSON, each name spelled by
-    `policy.derive_kit_rel`, against `policy.derive_mirror_inputs()` less `policy.LEGACY_INPUTS`, both
-    read live from the kit's own policy.py. A literal absent, unparseable or no list of names, or a
-    name `derive_kit_rel` refuses, is a WRONG and never a pass; unequal sets are a WRONG naming each
-    input on one side only. The repository-relative inputs are KICK-dKeptSession-62's widening."""
-    what = "MIRROR_KIT_INPUTS against derive_mirror_inputs less LEGACY_INPUTS"
+    `policy.derive_kit_rel`, against `policy.derive_mirror_inputs()` less `policy.LEGACY_INPUTS`; and
+    beside it the one `MIRROR_LEGACY_INPUTS = [...]` literal, the repository-relative inputs, against
+    `policy.LEGACY_INPUTS` (KICK-dKeptSession-62 S24), every list read live from the kit's own
+    policy.py. A literal absent, unparseable or no list of names, or a name `derive_kit_rel` refuses,
+    is a WRONG and never a pass; unequal sets are a WRONG naming each input on one side only."""
     try:
-        found = MIRROR_KIT_INPUTS_RX.findall((KIT / "policy-mirror.js").read_text(encoding="utf-8"))
-        names = json.loads(found[0]) if len(found) == 1 else None
+        text = (KIT / "policy-mirror.js").read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        return print_checks(name, [("the JS literals", "policy-mirror.js read", False,
+                                    f"policy-mirror.js did not read: {type(exc).__name__}: {exc}")])
+    checks = []
+    for const, rx, base in (("MIRROR_KIT_INPUTS", MIRROR_KIT_INPUTS_RX, "derive_mirror_inputs less LEGACY_INPUTS"),
+                            ("MIRROR_LEGACY_INPUTS", MIRROR_LEGACY_INPUTS_RX, "LEGACY_INPUTS")):
+        what = f"{const} against {base}"
+        names, seen = read_mirror_literal(text, const, rx)
         if names is None:
-            seen = f"policy-mirror.js holds {len(found)} MIRROR_KIT_INPUTS = [...] literal(s), not one"
-        elif not isinstance(names, list) or not all(isinstance(n, str) for n in names):
-            seen, names = f"policy-mirror.js's MIRROR_KIT_INPUTS literal is no list of names: {found[0]}", None
-        else:
-            js = {policy.derive_kit_rel(n) for n in names}
-            want = set(policy.derive_mirror_inputs()) - set(policy.LEGACY_INPUTS)
-    except (OSError, UnicodeDecodeError, ValueError) as exc:  # a JSONDecodeError is a ValueError
-        names, seen = None, f"policy-mirror.js's MIRROR_KIT_INPUTS did not read: {type(exc).__name__}: {exc}"
-    except policy.Refusal as exc:
-        names, seen = None, f"derive_kit_rel refused: {exc}"
-    if names is None:
-        return print_checks(name, [("the JS literal", what, False, seen)])
-    only = [f"{r} in derive_mirror_inputs alone" for r in sorted(want - js)]
-    only += [f"{r} in MIRROR_KIT_INPUTS alone" for r in sorted(js - want)]
-    seen = "; ".join(only) or f"{len(js)} input(s) on each side: {', '.join(sorted(js)) or '(none)'}"
-    return print_checks(name, [("the kit's two lists", what, not only, seen)])
+            checks.append(("the JS literal", what, False, seen))
+            continue
+        try:
+            if const == "MIRROR_KIT_INPUTS":
+                js = {policy.derive_kit_rel(n) for n in names}
+                want = set(policy.derive_mirror_inputs()) - set(policy.LEGACY_INPUTS)
+            else:
+                js, want = set(names), set(policy.LEGACY_INPUTS)
+        except policy.Refusal as exc:
+            checks.append(("the JS literal", what, False, f"derive_kit_rel refused: {exc}"))
+            continue
+        only = [f"{r} in {base.split()[0]} alone" for r in sorted(want - js)]
+        only += [f"{r} in {const} alone" for r in sorted(js - want)]
+        seen = "; ".join(only) or f"{len(js)} input(s) on each side: {', '.join(sorted(js)) or '(none)'}"
+        checks.append(("the kit's two lists", what, not only, seen))
+    return print_checks(name, checks)
 
 
 # ---- the minimal guard (TOOL-dGroundRules-6) ----------------------------------------------------
@@ -6864,6 +6910,7 @@ CASES = [
     ("mirror-stale-legacy", None, run_mirror_landed),
     ("mirror-presets-stale", None, run_mirror_landed),  # the preset store a recorded input (KICK-dKeptSession-40)
     ("mirror-pre-unit-stale", None, run_mirror_landed),  # the reader's own expected inputs (KICK-dKeptSession-49)
+    ("mirror-legacy-expected", None, run_mirror_landed),  # the repository-relative inputs expected too (KICK-dKeptSession-62)
     ("mirror-shim-exit-one", None, run_mirror_landed),
     ("mirror-absent-adopter", None, run_mirror_absent_adopter),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
