@@ -302,7 +302,7 @@ enforces = ["practice.portable.paths"]
 name = "shell hygiene (a backslashed path handed to bash)"
 subject = "repo"
 purpose = "catches a backslashed Windows path handed to bash"
-argv = ["python3", "{kit}/sh_hygiene.py", "--path-literals"]
+argv = ["python3", "{kit}/sh_hygiene.py", "--path-literals", "", ".", ":!memory"]
 guard = []
 stage = ["step.test"]
 
@@ -320,7 +320,7 @@ enforces = ["practice.portable.quoting"]
 name = "shell hygiene (a quoting hazard)"
 subject = "repo"
 purpose = "catches a heredoc writing source and a tab-IFS read"
-argv = ["python3", "{kit}/sh_hygiene.py", "--quoting"]
+argv = ["python3", "{kit}/sh_hygiene.py", "--quoting", "", ".", ":!memory"]
 guard = []
 stage = ["step.test"]
 
@@ -340,7 +340,7 @@ enforces = ["practice.portable.language-roles"]
 name = "portability (shell lines only shrink)"
 subject = "repo"
 purpose = "holds each shell file's code lines on a shrink-only ledger"
-argv = ["python3", "{kit}/sh_hygiene.py", "--shell-role"]
+argv = ["python3", "{kit}/sh_hygiene.py", "--shell-role", "", ".", ":!memory"]
 guard = []
 stage = ["step.test"]
 
@@ -389,11 +389,13 @@ ceiling = 300
 
 # THE CONVERTED REGISTRIES (TOOL-dWitnessedBar-16): each list a check of this kit reads, converted in place
 # onto the ledger grammar, its direction the one its old header declared. Every seed is the conversion
-# program's `read-back`, which prints the home's own rows: no reader prints keyed rows of its own.
+# program's `read-back`, which prints the home's own rows, but `encoding-posture-sites`'s: its reader
+# measures keyed rows now, as its `--stdout` and `--js` siblings do, so an adopter that never held the
+# legacy registry seeds it too (TOOL-aFlattenedSeed-3).
 [[ledger]]
 population = "encoding-posture-sites"
 leg = "encoding posture (text IO names its encoding)"
-seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "encoding-posture-sites"]
+seed = ["python", "{prefix}/gate-lint/encoding_posture.py", "--measure", ".", "{prefix}", "skills"]
 key = "site"
 fields = ["path", "arm"]
 drain = "hunk"
