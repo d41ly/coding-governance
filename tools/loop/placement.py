@@ -478,9 +478,9 @@ def check_agent_return(root, path, agent_id):
     except (OSError, UnicodeDecodeError) as e:
         raise PlacementRefused("the return %s cannot be read: %s" % (path, e)) from None
 
-    def fold(s):
+    def derive_lf_text(s):
         return str(s or "").replace("\r\n", "\n").strip("\n")
-    if fold(text) != fold(got.get("text")):
+    if derive_lf_text(text) != derive_lf_text(got.get("text")):
         raise PlacementRefused("the return %s differs byte for byte from agent %s's last text, so it is no placement "
                                "that agent wrote" % (path, agent_id))
 
