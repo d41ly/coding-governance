@@ -24,3 +24,4 @@ skills/session-kickoff/manifest-check.test.sh	mkdir -p "$mm_dir" && printf -- '-
 {prefix}/govkit/registry.toml	"installable:{prefix}/agent-instructions/adopt-agent-instructions.sh",	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 {prefix}/playbook/memory_index.py	figures = f"MEMORY.md {measured['bytes']} B {side} its {measured['budget']} B budget"	1	5e2d1518349963196976e16ced5dd6b182722afe	widened:2026-11-23-build-TOOL-dTotalRecall-9-widen-10
 {prefix}/playbook/memory_index.py	figures = (f"card {measured['card']} B {card_side} · MEMORY.md {measured['bytes']} B {side} · "	1	5e2d1518349963196976e16ced5dd6b182722afe	widened:2026-11-23-build-TOOL-dTotalRecall-9-widen-10
+{prefix}/runlog/memory_measure.py	("Read", {"file_path": "C:\\Users\\u\\.claude\\projects\\p\\memory\\MEMORY.md"}, 700)], 0)]},	1	b9b6e584a4812d37e37c2e18296f42a960c4a476	widened:2026-11-23-build-TOOL-dTotalRecall-43-widen-13
