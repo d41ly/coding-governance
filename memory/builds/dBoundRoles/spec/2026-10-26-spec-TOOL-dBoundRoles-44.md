@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-44 — the round-1 audit's 11 docs-and-records minors: memory readers re-derived, frozen receipt waived, gotcha pages re-pointed, two Skills fitted, legacy registry named, workflow suites re-keyed and the close's harness swap checked
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-26-build-TOOL-dBoundRoles-44-deviation-441.md](../build/2026-10-26-build-TOOL-dBoundRoles-44-deviation-441.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-44-deviation-442.md](../build/2026-10-26-build-TOOL-dBoundRoles-44-deviation-442.md) | deviation | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-20-spec-tokens-d-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-20-spec-tokens-d-brief.md) | journal | TOOL-dBoundRoles-20 TOOL-dBoundRoles-19 TOOL-dBoundRoles-18 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-50 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 |
+| [2026-11-22-prompt-TOOL-dBoundRoles-44-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-44-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-44-fix-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-44-fix-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-brief.md) | journal | TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-44-reground-o-spec-writer.md) | journal | — |
