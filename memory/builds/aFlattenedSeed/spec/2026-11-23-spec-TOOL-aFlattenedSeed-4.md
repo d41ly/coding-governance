@@ -1,6 +1,6 @@
 # TOOL-aFlattenedSeed-4 — the positional and encoding ledgers leave frozen records alone
 
-**Status:** CLOSED · rev-1 · 2026-11-23 · node a · Tier-1 · base 4b5054df · streams tooling
+**Status:** CLOSED · rev-2 · 2026-11-23 · node a · Tier-1 · base 4b5054df · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -71,7 +71,7 @@ filter keeps an argument equal to the mode flag only when the mode is the defaul
 
 ## 6. Gates
 
-`tags positional selftest` · `encoding posture (text IO names its encoding)` · `policy fixtures` · `ratchet (seed laundering)` · `memory hygiene` · `line length` · `spec tokens (a spec's own names resolve)`
+`tags positional selftest` · `playbook render selftest` · `govkit acceptance matrix` · `shell-hygiene selftest` · `encoding posture (text IO names its encoding)` · `policy fixtures` · `ratchet (seed laundering)` · `memory hygiene` · `line length` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/playbook/positional.py · covers AC1 · the `positional-archived` plant; staged red with `archive/` removed from S1 · none
 New arm: tools/gate-lint/encoding_posture.py · covers AC2 · `--selftest` runs the default mode with an empty registry argument over a pathspec; staged red against the base filter · none
@@ -83,3 +83,5 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-23 · initial draft.
+- rev-2 · 2026-11-23 · §6 · the bar's spec-tokens guards join: the gates line names the three legs whose
+  guards the touched files trip.
