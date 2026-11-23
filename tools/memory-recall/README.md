@@ -2,9 +2,11 @@
 
 <!-- gov:kit memory-recall@1.37 -->
 
-A project-agnostic kit that turns a memory-tree corpus into two derived FTS5 indexes — one document
+A project-agnostic kit that turns a memory-tree corpus into two derived FTS5 tables — one row
 per anchored record, one per heading-bounded chunk — fuses them with reciprocal rank fusion, and
-emits a byte-budgeted ranked list. Standard library only, offline, no model files, no network.
+emits a byte-budgeted ranked list. Standard library only, offline, no model files, no network. The
+tables live in the playbook kit's tag index, so the kit `requires` `playbook-render`, the govkit entry
+that ships `tag_index.py`, beside memory-tree; through it, `playbook` and `policy` install too.
 
 It declares **no config of its own**. It reads the memory-tree kit's `.memory-tree.conf` — two keys,
 `MEMORY_ROOT` and `FAMILIES` — so the corpus root and the id grammar are declared once, in the file
@@ -21,7 +23,7 @@ Ported from adopter ic's `scripts/recall/` implementation at `5318064`.
 | `recall_conf.py` | the project layer — reads `.memory-tree.conf`, exposes `MEMORY_ROOT`, `FAMILIES`, the node-tag class, and `Conf.digest()`; carries `KIT_MEMORY_RECALL_VERSION`. Run it directly to print the resolved values (or the refusal). |
 | `query.py` | the CLI. **Forked** from upstream — see Maintenance. |
 | `extract.py` | record + chunk extraction and the alias join. **Forked**. |
-| `bench.py` | the FTS5 index builder and the retrieval-substrate harness. **Forked** — one delta, see Maintenance. |
+| `bench.py` | the retrieval-substrate harness, re-exporting memory-tree's FTS5 row builder `build_fts_rows`. **Forked** — one delta, see Maintenance. |
 | `union.py` | the two-source ensemble scorer. **Verbatim** upstream. |
 | `selftest.py` | the kit's contract gate. Every arm runs inside a throwaway git repo, and the run's own summary line reports how many checks it made — no count is written here, because a count typed beside the thing it counts is wrong on the next commit. |
 | `adopt-memory-recall.sh` | renders the Skill from the conf (`--scaffold`), and reds when it drifts (`--check`). |
@@ -56,7 +58,7 @@ never falls back silently. Running this kit's `recall_conf.py` prints what each 
 | `RECALL_EXCLUDE` | nothing excluded | space-separated, repo-relative glob patterns the corpus walk leaves out (`*` spans a slash), for superseded copies such as versioned snapshots under an archive. Blank is the same as absent; a pattern matching no corpus path is announced with one line on stderr |
 
 `RECALL_NODE_TAG_CLASS` and `RECALL_CITED_FAMILIES` change which strings are ids, so they are in
-`Conf.digest()` and editing one rebuilds the cache. `RECALL_EXCLUDE` is in it too, because it
+`Conf.digest()` and editing one re-extracts every served file. `RECALL_EXCLUDE` is in it too, because it
 changes which documents exist. The export and cutoff keys change neither, and are not.
 
 ## Use
@@ -65,7 +67,7 @@ changes which documents exist. The export and cutoff keys change neither, and ar
 python3 <prefix>/memory-recall/query.py "why did the gate start refusing my push" \
     --terms "pre-push dirty tree porcelain untracked submodule refusal predicate gatepost"
 python3 <prefix>/memory-recall/query.py --opened <rank> --qid <N>  # record which hit answered it
-python3 <prefix>/memory-recall/query.py "<question>" --rebuild     # force a cache rebuild
+python3 <prefix>/memory-recall/query.py "<question>" --rebuild     # re-extract every served file
 python3 <prefix>/memory-recall/query.py --export --tag a           # aggregate the log, outside the tree
 python3 <prefix>/memory-recall/query.py --used                     # was each answer cited? writes nothing
 ```
@@ -109,13 +111,13 @@ when it is listed.
 
 ## What it writes — nothing inside your worktree
 
-The cache (`records.db`, `chunks.db`, `manifest.json`) and the append-only query log
-(`queries.jsonl`) live under `<common-git-dir>/recall/`, keyed by a digest of the worktree path.
-Each query row carries its `worktree` path and `head`, the sha HEAD named at query time (`null` on
-an unborn HEAD), so the row stays attributable after `git worktree remove` takes the reflog.
-`--export`'s aggregate is written beside the log, not into the tree, so no free-text question ever
-reaches a tracked file. The one exception is one you declare: `RECALL_EXPORT_DIR` puts it in the
-tree, and the file carries counts only.
+The rows live in the node's ONE tag index, `<common-git-dir>/gov/index-s<n>.db`, the file the
+playbook kit's tag verbs keep (`tag_index.derive_index_path`), and the append-only query log
+(`queries.jsonl`) under `<common-git-dir>/recall/`. Each query row carries its `worktree` path and
+`head`, the sha HEAD named at query time (`null` on an unborn HEAD), so the row stays attributable
+after `git worktree remove` takes the reflog. `--export`'s aggregate is written beside the log, not
+into the tree, so no free-text question ever reaches a tracked file. The one exception is one you
+declare: `RECALL_EXPORT_DIR` puts it in the tree, and the file carries counts only.
 
 That property is asserted **by path**, not by a clean `git status`: a status is also clean when a
 write was merely hidden by an ignore rule. `sys.dont_write_bytecode = True` sits above the
@@ -123,29 +125,41 @@ write was merely hidden by an ignore rule. `sys.dont_write_bytecode = True` sits
 it, importing the sibling modules drops `__pycache__` next to the source, inside the adopter's tree.
 An adopter therefore needs **no** `.gitignore` entry from this kit.
 
-The cache is not small: it runs to more than twice the corpus it indexes, and upstream keeps its
-measured size beside `RECALL_CACHE_BUDGET_MB` in its `.memory-tree.conf`. Only
-37.9% of a 552.6 MB tree was evictable by liveness alone — which is why the budget is a size, not an
-age. Two passes run after a successful build, never before (a cache is replaceable only once its
-replacement exists):
+**The index, and what keeps it fresh.** Five tables beside the tag index's own: `fts_record` and
+`fts_chunk` (FTS5, the row builder's `head`, `body` and `alias` columns, with `path`, `blob`,
+`digest`, `id` and `line` unindexed), `fts_blob` naming each (path, blob) pair extracted at a digest,
+`fts_supersession` holding each pair's supersession edges, and `fts_digest` naming the digest each
+worktree last queried under. The digest is the SHA-1 of the extraction inputs: `CACHE_VERSION`, the
+kit version, `CHUNK_MAX`, `Conf.digest()` and the alias file's digest. Each query maps every corpus
+path to the blob it holds — this worktree's uncommitted edit, else the HEAD tree's blob from the tag
+index, else, for an untracked file, its `git hash-object` — and extracts only the pairs the index
+lacks at the digest. So one edited file costs one extraction, its commit costs none, a conf or alias
+edit re-extracts every pair once, and every worktree shares the rows. An untracked note's pair lives
+in recall's rows alone, served to the worktree that hashed it. A call that extracted drops the rows
+no tree, dirty row or served set holds and the digests no live worktree names. The index line says
+what happened: `(tree <tree8>, extracted <k> blob(s) in <s>s)`.
 
-1. **dead-worktree eviction**, unconditional and free: a sibling whose recorded `worktree` no longer
-   exists, or exists as an empty husk holding no `.git` entry (what `git worktree remove` leaves on
-   Windows while a process holds the directory), goes. A cache with **no readable manifest** is
-   never evicted — that is the shape of a sibling mid-first-build. A directory that cannot be
-   removed is reported `could NOT evict` and keeps its manifest for a later pass.
-2. **the byte budget**, `RECALL_CACHE_BUDGET_MB` in `.memory-tree.conf`. **Absent** = the kit's
-   default, 512 MB; **blank** = uncapped. Eviction is least-recently-queried first: a cache's age is
-   the newer of its worktree's last `query` row in `queries.jsonl` and its `built_at`, ties broken by
-   `built_at`, so a sibling queried all day from a warm cache outlives one rebuilt once and
-   abandoned. It stops the moment the tree is under budget. Three directories are never candidates: the current
-   worktree's cache (evicting it makes the budget a rebuild loop), one that is **mid-build** — a
-   database newer than its manifest, which is true during a *re*build too, when the previous manifest
-   is still readable — and one whose manifest has no `built_at`. When the budget cannot be met
-   without reaching past them, the shortfall is reported and **nothing** is deleted.
+A tag-index reset (`gov_tag.py --rebuild`, or a schema stamp moving) drops recall's tables with the
+tag rows, and the next query re-extracts every pair. An index file that cannot be opened or read
+refuses with exit 2 naming the file: it is shared, so the query deletes nothing, and removing it by
+hand costs one rebuild of the tag index and of recall's rows. A repository with no commit has no HEAD tree to serve, so a query there exits 2 naming the missing
+commit: make a first commit and ask again.
 
-Every eviction prints one line naming the worktree, its last query (`never` when no row names it) and
-its `built_at`. A cache that vanishes silently is indistinguishable from one that was never built.
+**Upgrading from the per-worktree cache.** The kit kept a cache per worktree under
+`<common-git-dir>/recall/cache/` until TOOL-dTotalRecall-21, with an eviction pass and a byte-budget
+conf key. Nothing reads either now: the first query extracts the HEAD tree's pairs
+once and deletes nothing by itself. Remove the old tree when you are ready, from any worktree:
+
+```bash
+rm -rf "$(git rev-parse --git-common-dir)/recall/cache"
+```
+
+A conf still setting that budget key is inert; drop the line at your next edit.
+
+The kit now requires `playbook-render`. An adopter whose receipt claims memory-recall without it is
+refused at govkit's `update`, which names the unmet edge and an `apply --kits` route;
+`apply --kits memory-recall,playbook-render,playbook,policy` installs the whole closure (a kit the
+receipt already claims may be left out).
 
 `RECALL_EXTRA_SOURCES` — space-separated, repo-RELATIVE files whose `KEY=value` declarations join
 the corpus as chunks, each carrying the comment block above it. Blank or absent is the pre-widening
@@ -209,7 +223,7 @@ program imports its scoring functions and edits nothing.
 ```bash
 python check-recall.py                  # the merge-bar leg
 python check-recall.py --audit-fixture  # per-question homes, hits and overlap, plus the derivation
-python check-recall.py --data-dir DIR   # grade an already-built dir: extract.py's under a single-pair pin, build_cache's under served
+python check-recall.py --data-dir PATH  # grade an already-built set: an extract.py dir under a single-pair pin, an index file under served
 python check-recall.py --spec-probes    # a REPORT, no floor: hit@10 over the probes every spec's section 10 records
 ```
 
@@ -231,7 +245,9 @@ RECALL_FLOOR="served:r@5>=0.86"
 
 **Why `served` is the default.** It ranks every question through this CLI's own `query_expr` and
 `run_fusion` — the records arm and the rolled-up chunk arm, fused by `rrf` — over sets
-`query.build_cache` builds, so a change to the expression, the rollup or the fusion moves the floor.
+`query.load_served_set(root, untracked=False)` serves from the tag index, so a change to the
+expression, the rollup or the fusion moves the floor. `--data-dir` under it names an index file,
+opened read-only, whose served pairs are its HEAD tree's at the current digest.
 The older single-pair head, `records:fts5:r@5>=0.81`, still parses: it ranks the bare question over
 one set through `bench.rank_with`, a configuration no session is served, because the CLI refuses a
 question without `--terms`. Under `served` every fixture question carries two term lists: `terms`,
@@ -308,10 +324,10 @@ measures their own value.
 ## Notes
 
 - **No alias data ships.** The alias *mechanism* does: `extract.load_aliases` treats an absent
-  default as a legal alias-free corpus, and `bench.build_index` writes an empty third FTS5 column.
+  default as a legal alias-free corpus, and `bench.build_fts_rows` writes an empty third FTS5 column.
   Upstream's `aliases.json` is 915,515 bytes of questions authored against *its* corpus and joined by
   id, so none of it transfers. Drop your own `aliases.json` in this directory and it is picked up
-  with no config edit — the cache rebuilds on the digest change.
+  with no config edit — the next query re-extracts on the digest change.
 - **Zero records is diagnosed, never reported as success.** The chunk arm is family-blind and works
   with no configuration; the record arm is the only consumer of the id grammar. Point `FAMILIES` at a
   corpus it does not describe and the un-forked upstream prints `index 0 records + N chunks` and
@@ -323,4 +339,5 @@ measures their own value.
   ranked list. Adopt it for the ranking, not the clock. The corpus is not sized here, because a
   size typed beside the thing it measures is stale on the next edit: every query prints an
   `index <records> records + <chunks> chunks` line, and `--stats` given beside a question prints
-  the whole cache manifest, file count included. Alone, `--stats` exits 2 with no question given.
+  the served set: its tree, digest, counts, alias join and supersession counts. Alone, `--stats`
+  exits 2 with no question given.

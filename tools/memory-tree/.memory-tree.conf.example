@@ -274,11 +274,6 @@ UNIVERSAL_BUDGET="3"
 # fallback from the hooks kit: blank, its lane opens on that manifest and stays closed with none.
 LEG_MANIFEST=""
 
-# memory-recall only (safe to delete if that kit is not adopted): the cache budget over the whole
-# `<git-common-dir>/recall/cache/` tree, in megabytes. ABSENT = the kit's default (512 MB);
-# BLANK = uncapped.
-RECALL_CACHE_BUDGET_MB="512"
-
 # memory-recall only (safe to delete if that kit is not adopted): the optional keys below.
 # `id_grammar.py` in this kit is their reader, and the memory-recall kit's README owns the full text.
 #

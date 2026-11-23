@@ -6,8 +6,10 @@ document section is `doc.<name>#<seg>`, its `<seg>` the `##` heading folded by `
 a repeat suffixed by `derive_anchor`.
 
 THE INDEX is `<git-common-dir>/gov/index-s<INDEX_SCHEMA>.db`, `derive_index_path`'s, one file per node
-that every worktree of the repository shares, written by the extractors alone through `build_index`, never committed: deleting it costs one
-rebuild. Its tables, keyed by blob or by path and blob so a later build can add its own beside them:
+that every worktree of the repository shares, its tag rows written by the extractors through `build_index`, never committed: deleting it costs one
+rebuild. memory-recall writes its own `fts_*` tables on the same file (TOOL-dTotalRecall-21 F5): two FTS5
+tables, `fts_record` and `fts_chunk`, and `fts_blob`, `fts_supersession` and `fts_digest` beside them,
+created at recall's next open after a reset. Its tables, keyed by blob or by path and blob so a later build can add its own beside them:
 
   tree_path(tree, path, blob)                               the paths a built tree holds
   blob_row(blob, extractor, version, tag, kind, line, end_line, text)  what a blob holds, at any path
@@ -24,7 +26,9 @@ reads old blobs. A `parsed` path row marks a (path, blob, extractor, version) qu
 stamped `PRAGMA user_version = INDEX_SCHEMA`, and the schema is in its name, so two schemas never share one
 file; a file of another stamp is rebuilt in place, its tables dropped and created again inside one
 `BEGIN IMMEDIATE` transaction and the file never unlinked, so a reader holding it keeps it
-(PLAY-dOrderedCharter-55 S16).
+(PLAY-dOrderedCharter-55 S16). The drop order: every virtual table first, each drop removing its shadow
+tables, then the table list read again and every name it still holds dropped (TOOL-dTotalRecall-21 S10),
+so a reset never names an FTS5 shadow table.
 
 EACH VERSION'S ROWS STAND APART (PLAY-dOrderedCharter-51). Every worktree shares the file and two of them
 can carry different extractor bytes, so a build never deletes a row of another version: the rows of two
@@ -669,6 +673,11 @@ def load_index(root, reset=False) -> sqlite3.Connection:
             try:
                 old = con.execute("PRAGMA user_version").fetchone()[0]  # read again under the write lock
                 if reset or old != INDEX_SCHEMA:
+                    # virtual tables first, each drop taking its shadow tables, then the list read again
+                    # (TOOL-dTotalRecall-21 S10): a shadow table is never named, so none is dropped twice
+                    for (name,) in con.execute("SELECT name FROM sqlite_master WHERE type='table' "
+                                               "AND sql LIKE 'CREATE VIRTUAL TABLE%'").fetchall():
+                        con.execute(f'DROP TABLE "{name}"')
                     for (name,) in con.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall():
                         con.execute(f'DROP TABLE "{name}"')
                     for statement in SCHEMA.split(";"):

@@ -74,19 +74,23 @@ dossier's `harness-hooks` claim.
   `shown_paths` falls 0.467 to 0.369 over four questions.
 - **There is ONE fusion call site, `run_fusion`.** It was two identical expressions, the first attempt and the
   rebuild after a `sqlite3.DatabaseError`, so a change applied to one and not the other made the
-  served shape depend on whether the cache was healthy — a state every acceptance arm misses,
+  served shape depend on whether the index was healthy — a state every acceptance arm misses,
   because they all run the healthy path.
 - **A superseded record is LABELLED and MOVED, never scored down** (`TOOL-aGraftedHelix-4`). The
   index build derives a supersession map from three spellings in the corpus's own prose and keeps
-  it in the cache manifest; `run_fusion` then moves a WHOLE-superseded hit to sit directly after
+  it as `fts_supersession` rows beside the records; `run_fusion` then moves a WHOLE-superseded hit to sit directly after
   its listed successor, and a partial one keeps its rank. A score multiplier was rejected by
   arithmetic over `RRF_K`: it sinks every single-source superseded hit below every other one, far
   from the successor its label names. The recall floor cannot see this step, because it grades
   `bench.py`'s records path, which never calls `run_fusion`.
-- **A rebuild NAMES its cause.** `conf_digest` moving is a kit-version or conf edit and costs one
-  rebuild per node; a corpus digest moving is routine. Until the line said which, a criterion about
-  caching could only assert that a rebuild happened, and one in this build asserted the opposite of
-  what its own kit bump forces.
+- **The rows live in the ONE tag index per node, keyed by path and blob** (`TOOL-dTotalRecall-21`).
+  The per-worktree cache, rebuilt whole whenever an mtime-and-size digest over the corpus moved, is
+  retired with its eviction pass and byte budget. `query.py#load_served_set` maps each corpus path to
+  the blob this worktree serves and `write_recall_rows` extracts only the pairs the index lacks at the
+  extraction digest, so one edit costs one extraction, a commit none, and a conf or alias edit every
+  pair once. The index line names the pairs extracted (`extracted <k> blob(s)`), never a rebuild
+  cause. The kit therefore `requires` `playbook-render`, the govkit entry shipping `tag_index.py`,
+  and a corrupt index or an unborn HEAD refuses with exit 2, deleting nothing: the file is shared.
 - **The graded corpus is the SERVED corpus.** `extract.CHUNK_MAX` is 2400 and the live index is built
   at 600, so `check-recall.py` imports `query.CHUNK_MAX` rather than restating it — grading at the
   extractor's default would pin a substrate no session is served.
@@ -140,8 +144,8 @@ dossier's `harness-hooks` claim.
   became 96% self-inflicted refusals. `check()` runs each arm at decoration time and `main()`
   took the baseline afterwards, so the row could not fail. `TOOL-dHashedPrelude-1` moved the
   baseline above the arms and `-2` gated the ordering. What the guard still cannot see is in
-  its own comment: a concurrent writer in another session on the same repo, the cache directory
-  beside the log, a log absent at both readings, and a write reverted before the compare.
+  its own comment: a concurrent writer in another session on the same repo, the tag index the
+  rows live in, a log absent at both readings, and a write reverted before the compare.
 
 ## Reuse affordance
 

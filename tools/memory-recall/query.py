@@ -8,25 +8,27 @@ Eight constructs are edited and the rest is upstream's byte for byte, so a re-pu
 from ``__file__`` and launches ``python3``, and the ``--terms`` refusal's worked example is a
 generic one rather than the source project's domain vocabulary; (4) ``--export`` writes beside the
 log under the common git dir, or under the conf's ``RECALL_EXPORT_DIR``, and requires ``--tag``;
-(5) the cache manifest carries ``conf_digest`` and ``worktree``, which drive freshness and
-eviction; (6) an empty record arm, an empty corpus, or an alias layer that joins to nothing is
-diagnosed out loud, and the manifest carries the join counts the third one reads; (7) the served
+(5) the rows live in the playbook kit's one index file per node, keyed by path, blob and an
+extraction digest folding ``conf_digest`` (TOOL-dTotalRecall-21), where upstream kept a cache per
+worktree; (6) an empty record arm, an empty corpus, or an alias layer that joins to nothing is
+diagnosed out loud, from counts over the served rows; (7) the served
 chunk arm is ROLLED UP through ``run_rollup`` and the two fusion call sites are collapsed into one
-``run_fusion()``, so a rollup cannot be applied to the healthy path and not the cache-rebuild path;
-(8) supersession (TOOL-aGraftedHelix-4): the manifest carries the map ``extract`` derives,
+``run_fusion()``, so no caller can serve a different shape;
+(8) supersession (TOOL-aGraftedHelix-4): the map ``extract`` derives is read from the served rows,
 ``derive_supersession_order`` runs inside ``run_fusion``, ``render``, ``render_pointer`` and
 ``emit`` tag a superseded hit's header, and ``main`` prints ``EVIDENCE_BANNER`` once per answer.
 
-Standard library only. Two derived FTS5 indexes -- one per anchored record, one per 600-char
-heading-bounded chunk -- cached under the COMMON git directory and rebuilt when the corpus moves.
-The QUERY PATH writes nothing inside the worktree, and neither does ``--export`` unless the conf's
-``RECALL_EXPORT_DIR`` declares a repo-relative destination: otherwise both write only under the
-common git dir.
+Standard library only. Two FTS5 tables -- one row per anchored record, one per 600-char
+heading-bounded chunk -- in the tag index under the COMMON git directory, every worktree sharing
+them: a call extracts only the (path, blob) pairs it serves that the index lacks, so after one edit
+it extracts that one file (``load_served_set``). The QUERY PATH writes nothing inside the worktree,
+and neither does ``--export`` unless the conf's ``RECALL_EXPORT_DIR`` declares a repo-relative
+destination: otherwise both write only under the common git dir.
 
 Usage:
   {cli} "<question>" --terms "<8-14 coined words>" [--k 20] [--budget N]
   {cli} "<question>" --no-terms      # the un-rewritten baseline, logged
-  {cli} "<question>" --rebuild       # force a cache rebuild, ignoring the freshness manifest
+  {cli} "<question>" --rebuild       # re-extract every served file, ignoring the rows already held
   {cli} --opened <rank> [--qid N]    # record which hit you actually read
   {cli} --export --tag <letter>      # aggregate the log beside itself, outside the worktree
   {cli} --used                       # was each answer cited by its worktree's next commit? writes nothing
@@ -73,7 +75,6 @@ import hashlib
 import json
 import os
 import pathlib
-import shutil
 import sqlite3
 import statistics
 import subprocess
@@ -101,6 +102,19 @@ except recall_conf.ConfError as _e:
 
 import bench as B  # noqa: E402
 import extract as E  # noqa: E402
+
+
+def load_tag_index():
+    """The playbook kit's `tag_index`, the one index file recall writes its rows into, reached through
+    the inlined resolver `extract` carries (TOOL-dTotalRecall-21 S4): the kit `requires` playbook."""
+    kit = str(E.resolve_kit_dir("playbook", "tag_index.py", pathlib.Path(__file__).resolve().parent))
+    if kit not in sys.path:
+        sys.path.append(kit)
+    import tag_index
+    return tag_index
+
+
+T = load_tag_index()
 
 
 def _self_path() -> str:
@@ -132,11 +146,7 @@ CHUNK_MAX = 600  # pinned by the parent spec: 2400 and 300 both measured worse
 # Collapsing several hits from one parent leaves fewer than `k` distinct parents from a `k`-deep
 # read, which is the whole reason the arm reads deeper than it returns.
 ROLLUP_DEPTH = 8
-# The reason the last rebuild happened, for the line that reports it. A list because it is written
-# inside `ensure_cache` and read by `main`, and a module global keeps the function signature that
-# three callers already use.
-REBUILD_CAUSE: list[str] = []
-CACHE_VERSION = 5  # bump when extraction or schema changes, so an old cache is never queried
+CACHE_VERSION = 5  # bump when extraction changes: it is in every row's digest, so old rows are never served
 # 4 -> 5 at TOOL-aGraftedHelix-4: the manifest carries the `superseded` map, and a cache built
 # without it would be served with no supersession label and no order step, saying nothing.
 # 3 -> 4 at the backlog switch-over (TOOL-dDerivedDocket-34 S9): `DURABLE` gained the per-build
@@ -148,16 +158,6 @@ CACHE_VERSION = 5  # bump when extraction or schema changes, so an old cache is 
 # such key, and the dead-alias diagnosis reads the manifest -- without the bump a warm cache
 # would keep the very silence this fix removes.
 WINDOW = 400  # chars of the head fallback, matching union.py's SNIPPET accounting
-# A build in flight announces itself. The mtime-based test below it can only see the WRITE half of a
-# build — measured, 31% of a build of this repo's corpus is extraction, during which both databases
-# are the PREVIOUS build's and older than the previous manifest. The marker covers the whole window,
-# including the sub-second gap where `_write_set` has unlinked a database and not yet recreated it,
-# which is the single most inconsistent instant a build has.
-BUILD_MARKER = "building"
-# Bounds an ABANDONED build: a crashed process leaves the marker behind, and without a TTL that
-# directory would be protected from eviction forever. 900 s is ~7700x the 0.117 s measured for this
-# repo's corpus, so it cannot expire under a slow-but-live build on a far larger one.
-BUILD_TTL_S = 900.0
 SNIPPET_TOKENS = 64  # FTS5's documented maximum; a larger value is silently clamped
 # The default is the MEASURED cost of the shipped configuration: union.py reports 19 606 B for
 # records:fts5+chunks:fts5 at k=20 PER SOURCE, which is ~40 hits, not 20.
@@ -245,20 +245,6 @@ def git(repo: pathlib.Path, *args: str) -> str:
 # resolver this kit has.
 
 
-# >>> common_git_dir -- canonical copy: common_dir.py in the gov lib dir (byte-identical; gated)
-def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
-    """The MAIN repository's git directory, shared by every worktree.
-
-    ``--git-dir`` in a linked worktree is ``.git/worktrees/<name>``, which ``git worktree remove``
-    deletes outright -- taking the query log with it. It is also RELATIVE (bare ``.git``) when run
-    at the repo root and absolute elsewhere, so the raw value is not a usable path either way.
-    """
-    raw = git(repo, "rev-parse", "--git-common-dir").strip()
-    p = pathlib.Path(raw)
-    return p.resolve() if p.is_absolute() else (repo / raw).resolve()
-# <<< common_git_dir
-
-
 def read_worktree_head(repo: pathlib.Path) -> str | None:
     """The sha HEAD names in this worktree, or None on an unborn HEAD or any git failure.
 
@@ -279,55 +265,250 @@ def read_worktree_head(repo: pathlib.Path) -> str | None:
 # serves both callers, with `include_untracked=True` the one thing this path asks for.
 
 
-def corpus_digest(repo: pathlib.Path, files: list[str]) -> str:
-    h = hashlib.sha1()
-    for p in files:
-        try:
-            st = (repo / p).stat()
-        except OSError:
-            continue
-        h.update(f"{p}\0{st.st_mtime_ns}\0{st.st_size}\0".encode())
-    return h.hexdigest()
-
-
-def cache_dir(repo: pathlib.Path) -> pathlib.Path:
-    """Per-worktree cache under the common git dir.
-
-    Sub-keyed by the worktree path because two worktrees of one repo hold DIFFERENT corpus content;
-    one shared cache would answer a question about one tree from the other.
-    """
-    key = hashlib.sha1(str(repo).encode()).hexdigest()[:12]
-    return common_git_dir(repo) / "recall" / "cache" / key
-
-
 def log_path(repo: pathlib.Path) -> pathlib.Path:
-    return common_git_dir(repo) / "recall" / "queries.jsonl"
+    return T.common_git_dir(repo) / "recall" / "queries.jsonl"
 
 
-# ---------------------------------------------------------------------------------- index build
+# ---------------------------------------------------------------------------------- the rows
+#
+# TOOL-dTotalRecall-21. Recall's rows live in the ONE index file the playbook kit keeps per node,
+# `tag_index.derive_index_path`'s, keyed by (path, blob) and the extraction digest: a commit
+# re-extracts only the files it changed, and every worktree shares the rows. The tag index's HEAD
+# tree and this worktree's dirty rows say which blob each corpus path holds; an untracked corpus
+# file is hashed here and lives in no table but recall's own, so no other worktree is served it.
+
+# The three plain tables; the two FTS5 tables are `build_fts_rows`'s own spelling, created on open.
+RECALL_SCHEMA = """
+CREATE TABLE IF NOT EXISTS fts_blob(path TEXT, blob TEXT, digest TEXT, PRIMARY KEY (path, blob, digest));
+CREATE TABLE IF NOT EXISTS fts_supersession(path TEXT, blob TEXT, digest TEXT, old TEXT, new TEXT,
+    kind TEXT, pattern TEXT);
+CREATE TABLE IF NOT EXISTS fts_digest(worktree TEXT PRIMARY KEY, digest TEXT);
+"""
+# The document set a hit names -> the FTS5 table holding it.
+RECALL_SETS = {"records": "fts_record", "chunks": "fts_chunk"}
+# The join every read of recall's rows makes: this call's served pairs, at this call's digest. CROSS,
+# so the FTS5 table is always the outer loop: it has no index on the UNINDEXED key columns, and a
+# plan probing it once per served pair would scan it once per pair.
+SERVED_JOIN = "CROSS JOIN recall_view v ON f.path = v.path AND f.blob = v.blob AND f.digest = v.digest"
 
 
 def alias_digest() -> str:
-    """Content digest of the committed alias layer, for the cache manifest.
+    """Content digest of the committed alias layer, one input of `derive_recall_digest`.
 
-    The freshness manifest keys on `corpus_digest(repo, files)`, and `files` is `memory/` only, so
-    an edit to `aliases.json` would otherwise leave a stale cache serving un-joined results with no
-    signal at all.
+    The corpus is `memory/` and the declared sources only, so an edit to `aliases.json` changes no
+    served blob: without this a row extracted before the edit would keep serving un-joined text
+    with no signal at all.
     """
     return E.load_aliases()[2]
 
 
-def dead_alias_diagnosis(man: dict) -> str | None:
+def derive_recall_digest() -> str:
+    """The SHA-1 of the five inputs every row is extracted under (TOOL-dTotalRecall-21 S2).
+
+    `CACHE_VERSION`, the kit's version, `CHUNK_MAX`, `CONF.digest()` and `alias_digest()`: a
+    grammar, alias, chunking or extraction change re-extracts every served pair once, and a
+    worktree whose conf differs keeps its own rows rather than overwriting another's.
+    """
+    blob = "\0".join((str(CACHE_VERSION), recall_conf.KIT_MEMORY_RECALL_VERSION, str(CHUNK_MAX),
+                      CONF.digest(), alias_digest()))
+    return hashlib.sha1(blob.encode("utf-8")).hexdigest()
+
+
+def derive_served_pairs(repo: pathlib.Path, con, ctx: dict, tree: str, paths: list[str]
+                        ) -> list[tuple[str, str]]:
+    """``[(path, blob)]`` for each corpus path, in corpus order.
+
+    This worktree's `dirty_path` blob for a tracked file with uncommitted edits (blob ``""``, a
+    file gone from the working tree, is not served), else its `tree_path` blob in the HEAD tree,
+    else, for an untracked file, the blob ONE `git hash-object` call prints over the untracked
+    paths, read from stdin so the paths never meet a command-line length limit.
+    """
+    dirty = dict(con.execute("SELECT path, blob FROM dirty_path WHERE worktree=?", (ctx["worktree"],)))
+    held = dict(con.execute("SELECT path, blob FROM tree_path WHERE tree=?", (tree,)))
+    loose = [p for p in paths if p not in dirty and p not in held]
+    hashed: dict[str, str] = {}
+    if loose:
+        out = subprocess.run(["git", "-C", str(repo), "hash-object", "--stdin-paths"],
+                             input="\n".join(loose) + "\n", capture_output=True, text=True,
+                             encoding="utf-8", errors="replace")
+        if out.returncode != 0:
+            raise T.TagError(f"`git hash-object` over {len(loose)} untracked corpus file(s) failed: "
+                             f"{out.stderr.strip()}")
+        hashed = dict(zip(loose, out.stdout.split()))
+    pairs = []
+    for p in dict.fromkeys(paths):
+        blob = dirty[p] if p in dirty else held.get(p) or hashed.get(p, "")
+        if blob:
+            pairs.append((p, blob))
+    return pairs
+
+
+def remove_recall_pairs(con, keys) -> None:
+    """Delete every row of recall's five-table set keyed by one of ``keys``' (path, blob, digest).
+
+    Through a temp table and ONE scan per FTS5 table, by rowid: an FTS5 table has no index on an
+    UNINDEXED column, so a delete per key would scan the table once per key."""
+    con.execute("CREATE TEMP TABLE IF NOT EXISTS recall_drop(path TEXT, blob TEXT, digest TEXT, "
+                "PRIMARY KEY (path, blob, digest))")
+    con.execute("DELETE FROM recall_drop")
+    con.executemany("INSERT OR IGNORE INTO recall_drop VALUES (?,?,?)", keys)
+    for table in RECALL_SETS.values():
+        con.execute(f"DELETE FROM {table} WHERE rowid IN (SELECT f.rowid FROM {table} f CROSS JOIN recall_drop k "
+                    "ON f.path = k.path AND f.blob = k.blob AND f.digest = k.digest)")
+    for table in ("fts_supersession", "fts_blob"):
+        con.execute(f"DELETE FROM {table} WHERE EXISTS (SELECT 1 FROM recall_drop k WHERE k.path = "
+                    f"{table}.path AND k.blob = {table}.blob AND k.digest = {table}.digest)")
+    con.execute("DELETE FROM recall_drop")
+
+
+def remove_unheld_recall_rows(con, repo: pathlib.Path) -> int:
+    """Drop the rows of pairs no tree, dirty row or this call's served set holds, and of digests no
+    live worktree's `fts_digest` row names; returns the pairs dropped.
+
+    Run inside the transaction of a call that extracted. A worktree `git worktree list` no longer
+    names loses its digest row first. Another live worktree's untracked pairs are held by nothing
+    here, so they go too, and that worktree re-extracts them at its next query.
+    """
+    _trees, tops = T.read_worktree_trees(repo)
+    for (wt,) in con.execute("SELECT worktree FROM fts_digest").fetchall():
+        if wt not in tops:
+            con.execute("DELETE FROM fts_digest WHERE worktree=?", (wt,))
+    dead = con.execute(
+        "SELECT path, blob, digest FROM fts_blob b WHERE b.digest NOT IN (SELECT digest FROM fts_digest) "
+        "OR (NOT EXISTS (SELECT 1 FROM tree_path t WHERE t.blob = b.blob AND t.path = b.path) "
+        "AND NOT EXISTS (SELECT 1 FROM dirty_path d WHERE d.blob = b.blob AND d.path = b.path) "
+        "AND NOT EXISTS (SELECT 1 FROM recall_view v WHERE v.path = b.path AND v.blob = b.blob "
+        "AND v.digest = b.digest))").fetchall()
+    if dead:
+        remove_recall_pairs(con, dead)
+    return len(dead)
+
+
+def write_recall_rows(con, repo: pathlib.Path, worktree: str, pairs: list[tuple[str, str]],
+                      declared: list[str], digest: str, *, rebuild: bool = False) -> int:
+    """Extract each served pair `fts_blob` lacks at ``digest`` (every pair under ``rebuild``), all
+    inside ONE `BEGIN IMMEDIATE` transaction; returns the pairs extracted.
+
+    Today's record, chunk, declaration and alias extraction, per path, reading the path's working
+    bytes: a pair is a tracked blob only when those bytes are its blob. Records, their supersession
+    edges and chunks for a corpus file; declaration chunks for a declared source. The worktree's
+    `fts_digest` row is written on every call; any call that extracted then sweeps the rows nothing
+    holds (`remove_unheld_recall_rows`).
+    """
+    declared_set = set(declared)
+    try:
+        with con:
+            con.execute("BEGIN IMMEDIATE")
+            con.execute("INSERT OR REPLACE INTO fts_digest VALUES (?,?)", (worktree, digest))
+            held = set() if rebuild else set(
+                con.execute("SELECT path, blob FROM fts_blob WHERE digest=?", (digest,)))
+            todo = [pr for pr in pairs if pr not in held]
+            if not todo:
+                return 0
+            if rebuild:
+                remove_recall_pairs(con, [(p, b, digest) for p, b in todo])
+            by_id, _src, _ = E.load_aliases()
+            for path, blob in todo:
+                try:
+                    text = (repo / path).read_text(encoding="utf-8", errors="replace")
+                except OSError:
+                    text = ""
+                records, chunks, edges = [], [], []
+                if text and path not in declared_set:
+                    records = E.extract_records(path, text)
+                    edges = E.extract_supersessions(path, text, records)
+                    chunks = E.extract_chunks(path, text, CHUNK_MAX)
+                if path in declared_set:
+                    chunks += E.extract_declarations(path, text)
+                E.join_aliases(records, by_id)
+                B.build_fts_rows(con, RECALL_SETS["records"], records, path=path, blob=blob, digest=digest)
+                B.build_fts_rows(con, RECALL_SETS["chunks"], chunks, path=path, blob=blob, digest=digest)
+                con.executemany("INSERT INTO fts_supersession VALUES (?,?,?,?,?,?,?)",
+                                [(path, blob, digest, *e) for e in edges])
+                con.execute("INSERT OR REPLACE INTO fts_blob VALUES (?,?,?)", (path, blob, digest))
+            remove_unheld_recall_rows(con, repo)
+    except sqlite3.OperationalError as exc:
+        raise T.TagError(f"the tag index {T.derive_index_path(repo).as_posix()} is locked or "
+                         f"unwritable: {exc}") from None
+    return len(todo)
+
+
+class UnbornHeadError(RuntimeError):
+    """HEAD names no commit, so the served set has no tree (TOOL-dTotalRecall-21 S4): the remedy is a
+    first commit, never the index file's removal."""
+
+
+def load_served_set(repo: pathlib.Path, *, untracked: bool = True, rebuild: bool = False) -> dict:
+    """Open the node's index, bring this worktree's view up to date, and fill `recall_view`.
+
+    `tag_index.load_view` once, for the HEAD tree and this worktree's tracked edits; then each path
+    `corpus_inputs(repo, include_untracked=untracked)` lists mapped to its blob
+    (`derive_served_pairs`); then `write_recall_rows`. Recall's five tables are created when absent,
+    so they come back at the first open after a tag-index reset. ``rebuild`` re-extracts every
+    served pair at the digest, the `--rebuild` escape hatch.
+
+    Returns ``{"con", "tree", "digest", "pairs", "extracted", "seconds"}``; the caller closes
+    ``con``. Raises `tag_index.TagError` or `sqlite3.DatabaseError`, each naming the file, and
+    `UnbornHeadError` BEFORE the index is opened when HEAD names no commit: `load_view` reads the
+    HEAD tree, and a repository with no commit has none, which no removal of the file mends.
+    """
+    t0 = time.time()
+    if read_worktree_head(repo) is None:  # `git rev-parse --verify -q HEAD`
+        raise UnbornHeadError(f"{repo.as_posix()} has no commit, so there is no HEAD tree to serve; "
+                              "make a first commit (`git commit`) and ask again")
+    con = T.load_index(repo)
+    try:
+        con.executescript(RECALL_SCHEMA)
+        for table in RECALL_SETS.values():
+            B.build_fts_rows(con, table, [])
+        ctx = T.derive_context(repo, T.KIT_DIR / "namespaces.toml")
+        view = T.load_view(con, repo, ctx)
+        files, declared = E.corpus_inputs(repo, include_untracked=untracked)
+        pairs = derive_served_pairs(repo, con, ctx, view["tree"], files + declared)
+        digest = derive_recall_digest()
+        con.execute("CREATE TEMP TABLE IF NOT EXISTS recall_view(path TEXT, blob TEXT, digest TEXT, "
+                    "PRIMARY KEY (path, blob, digest))")
+        con.execute("DELETE FROM recall_view")
+        con.executemany("INSERT OR IGNORE INTO recall_view VALUES (?,?,?)", [(p, b, digest) for p, b in pairs])
+        extracted = write_recall_rows(con, repo, ctx["worktree"], pairs, declared, digest, rebuild=rebuild)
+    except BaseException:
+        con.close()
+        raise
+    return {"con": con, "tree": view["tree"], "digest": digest, "pairs": pairs,
+            "extracted": extracted, "seconds": round(time.time() - t0, 2)}
+
+
+def read_served_counts(con) -> dict:
+    """``{"records", "chunks", "joined"}`` over the served rows, `joined` the records an alias
+    reached: the figures the index line and both diagnoses read."""
+    rec, joined = con.execute(f"SELECT COUNT(*), COALESCE(SUM(f.alias != ''), 0) FROM fts_record f "
+                              f"{SERVED_JOIN}").fetchone()
+    (chunks,) = con.execute(f"SELECT COUNT(*) FROM fts_chunk f {SERVED_JOIN}").fetchone()
+    return {"records": rec, "chunks": chunks, "joined": joined}
+
+
+def derive_served_supersessions(con, pairs: list[tuple[str, str]]) -> tuple[dict, dict]:
+    """`extract.derive_supersession_map` over the served pairs' `fts_supersession` edges, in corpus
+    order, with every served record id as defined: the map and counts the manifest carried."""
+    order = {p: i for i, (p, _b) in enumerate(pairs)}
+    rows = con.execute("SELECT f.path, f.old, f.new, f.kind, f.pattern FROM fts_supersession f "
+                       f"{SERVED_JOIN} ORDER BY f.rowid").fetchall()
+    rows.sort(key=lambda r: order.get(r[0], len(order)))
+    defined = {i for (i,) in con.execute(f"SELECT f.id FROM fts_record f {SERVED_JOIN} WHERE f.id != ''")}
+    return E.derive_supersession_map([r[1:] for r in rows], defined)
+
+
+def dead_alias_diagnosis(aliases: dict) -> str | None:
     """An alias layer that loaded ids and joined to NOT ONE of them, named out loud.
 
     The zero-record class one layer in. The alias column is a down-weighted ranking aid, so an
     alias file authored against another id family is 100% dead with no symptom beyond slightly
-    worse ranking -- `--stats` carried only `alias_digest`, which is a content hash and says
-    nothing about coverage. Counts come from the MANIFEST, so this fires identically on a fresh
-    build and on a cache hit. Silent on a partial join: some ids resolving is the normal state of
-    an alias file written ahead of the records it names.
+    worse ranking -- a content hash says nothing about coverage. ``aliases`` is
+    ``{"ids", "joined", "src"}``, `joined` counted from the SERVED rows, so this fires identically
+    on a call that extracted and on one that extracted nothing. Silent on a partial join: some ids
+    resolving is the normal state of an alias file written ahead of the records it names.
     """
-    a = man.get("aliases") or {}
+    a = aliases or {}
     if not a.get("ids") or a.get("joined"):
         return None
     return (
@@ -337,425 +518,6 @@ def dead_alias_diagnosis(man: dict) -> str | None:
         "  Not one of those ids names a record in this corpus, so the alias column is empty and\n"
         "  the only symptom is slightly worse ranking. Check the ids are this corpus's own."
     )
-
-
-def _docs(repo: pathlib.Path, files: list[str], declared: list[str]
-          ) -> tuple[list[dict], list[dict], dict, dict]:
-    records, chunks, sup_edges = [], [], []
-    for path in files:
-        try:
-            text = (repo / path).read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-        if not text:
-            continue
-        recs = E.extract_records(path, text)
-        records.extend(recs)
-        sup_edges += E.extract_supersessions(path, text, recs)
-        chunks.extend(E.extract_chunks(path, text, CHUNK_MAX))
-    # After the walk, because an edge is kept only when BOTH its ends are anchored somewhere in it.
-    smap, sup_counts = E.derive_supersession_map(sup_edges, {r["id"] for r in records})
-    # The DECLARED extra sources, handed in by the ONE enumerator rather than re-derived here.
-    # Re-deriving is what let the digest pair disagree about what the corpus was.
-    for path in declared:
-        try:
-            text = (repo / path).read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-        chunks.extend(E.extract_declarations(path, text))
-    # The SECOND call site of the alias join, and the one the merge bar cannot see
-    # (ARCH-aGrittedFlagstone-3). Under a `records:` pin `check_recall.py` grades a SUBPROCESS of
-    # `extract.py` (the `served:` pin builds through `build_cache` and does reach it); this CLI
-    # never runs that entry point and never reads its output dir -- it re-extracts here and indexes
-    # the result. A join written only there ships a query index with an empty alias column while
-    # every recall floor stays green, which is the dead-plumbing class arriving through the door
-    # marked "the gate already covers it".
-    #
-    # The int return is CARRIED, not discarded (closing review F7): join_aliases documents it as
-    # `how many were augmented`, extract.py's own path prints it, and the CLI -- the path every
-    # session actually uses -- reported it nowhere. Same class again, one layer in.
-    by_id, alias_src, _ = E.load_aliases()
-    joined = E.join_aliases(records, by_id)
-    return (records, chunks, {"ids": len(by_id), "joined": joined, "src": alias_src},
-            {"edges": smap, "counts": sup_counts})
-
-
-def _write_set(dirp: pathlib.Path, name: str, docs: list[dict]) -> None:
-    db_file = dirp / f"{name}.db"
-    if db_file.exists():
-        db_file.unlink()
-    db = B.build_index(docs, db_path=str(db_file))
-    db.execute("CREATE TABLE meta(rowid INTEGER PRIMARY KEY, id TEXT, path TEXT, line INTEGER)")
-    db.executemany(
-        "INSERT INTO meta(rowid, id, path, line) VALUES (?,?,?,?)",
-        [(i, d.get("id") or d.get("rec") or "", d["path"], d["line"]) for i, d in enumerate(docs)],
-    )
-    db.commit()
-    db.close()
-
-
-def build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str], declared: list[str]) -> dict:
-    """Build the cache, announcing the build FIRST so a sibling's eviction pass can see it.
-
-    The mkdir moved ABOVE `_docs` and the marker is written before the first read: the extraction
-    phase is part of the build, and a rule that starts watching only when bytes hit the databases
-    leaves the longest phase unprotected. The marker comes off in a `finally`, so a raised build
-    releases it and the TTL is only needed for a killed process.
-    """
-    t0 = time.time()
-    dirp.mkdir(parents=True, exist_ok=True)
-    marker = dirp / BUILD_MARKER
-    marker.write_text(str(os.getpid()), encoding="utf-8")
-    try:
-        return _build_cache(repo, dirp, files, declared, t0)
-    finally:
-        # ONLY IF IT IS STILL OURS. Two builders can target one cache directory — last writer wins,
-        # which the atomic manifest makes survivable — but an unconditional unlink means the first to
-        # finish releases the SECOND one's protection, and the eviction pass then sees an unprotected
-        # directory that is still being written. The pid is written for this reason; a marker that is
-        # no longer ours is somebody else's to remove.
-        try:
-            if marker.read_text(encoding="utf-8").strip() == str(os.getpid()):
-                marker.unlink()
-        except OSError:
-            pass
-
-
-def _build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str],
-                 declared: list[str], t0: float) -> dict:
-    records, chunks, aliases, superseded = _docs(repo, files, declared)
-    _write_set(dirp, "records", records)
-    _write_set(dirp, "chunks", chunks)
-    man = {
-        "version": CACHE_VERSION,
-        # PLAY-dOrderedCharter-49 S28: the kit's version, so a recall-only bump rebuilds a warm cache
-        "kit_version": recall_conf.KIT_MEMORY_RECALL_VERSION,
-        "chunk_max": CHUNK_MAX,
-        "n_files": len(files),
-        "counts": {"records": len(records), "chunks": len(chunks)},
-        # The declared sources join the digest: their COMMENT BLOCKS are corpus content, and
-        # `CONF.digest()` deliberately hashes resolved conf VALUES rather than file bytes — so
-        # without this a justification edit in a declared conf leaves a warm cache serving prose
-        # that no longer exists. The list is the one the WALK returned: computing it here while
-        # `ensure_cache` compared a digest over `files` alone is what made the cache unhittable.
-        "digest": corpus_digest(repo, files + declared),
-        "alias_digest": alias_digest(),
-        # The join COUNTS beside the source digest: the digest keys freshness and cannot tell a
-        # joined alias layer from a dead one. Here so the diagnosis fires on a cache hit too.
-        "aliases": aliases,
-        # The supersession map and its counts (TOOL-aGraftedHelix-4). In the manifest rather than a
-        # file beside the databases: it is read on every query already, and written atomically.
-        "superseded": superseded,
-        # FORKED. The port moves the id grammar and the corpus root OUT of source and into a
-        # conf at the repo root -- which makes an adopter-editable value a COLD input to a HOT
-        # cache. The corpus digest is mtime+size over the tree's .md files, so a FAMILIES edit
-        # never enters it: without this field, fixing a mis-declared grammar is a silent no-op
-        # against a warm cache, in BOTH directions (spec F1). Same reason alias_digest is here.
-        "conf_digest": CONF.digest(),
-        # The worktree this cache was built for, so a later build can evict a cache whose tree is
-        # gone. Absolute: cache directories are keyed by a hash of this path, which is one-way.
-        "worktree": str(repo),
-        "built_s": round(time.time() - t0, 2),
-        "built_at": datetime.now(UTC).isoformat(timespec="seconds"),
-    }
-    # Manifest LAST, and atomically: an interrupted build must leave a stale-or-absent manifest and
-    # rebuild, never certify a half-written index.
-    tmp = dirp / "manifest.json.tmp"
-    tmp.write_text(json.dumps(man, indent=1), encoding="utf-8", newline="\n")
-    os.replace(tmp, dirp / "manifest.json")
-    return man
-
-
-def check_dead_worktree(wt: str) -> bool:
-    """Is the recorded worktree gone? True when the path does not exist OR holds no ``.git`` entry.
-
-    A primary tree holds a ``.git`` directory and a linked worktree a ``.git`` file; the empty husk
-    `git worktree remove` leaves on Windows (a live process holding it as cwd) holds neither, and
-    under existence alone it kept its ~113 MB cache forever (TOOL-aMendedFleet-32, F2).
-    """
-    p = pathlib.Path(wt)
-    return not p.exists() or not (p / ".git").exists()
-
-
-def evict_dead_siblings(keep: pathlib.Path) -> list[str]:
-    """Delete sibling caches whose recorded ``worktree`` is dead (`check_dead_worktree`). Returns
-    what went; a directory that could not be removed is reported on stderr and is not in the list.
-
-    ONE predicate, read in two directions: an unreadable manifest means REBUILD MINE, NEVER DELETE
-    THEIRS. The builder writes both .db files BEFORE the manifest, deliberately and atomically, so
-    a directory with no readable manifest is exactly the shape of a sibling mid-first-build --
-    evicting it destroys a live cache while its builder is still writing. A pre-fork manifest with
-    no ``worktree`` key is kept for the same reason: absence of evidence.
-
-    Deletes through `_remove_cache_dir`, manifest last, for the reason its docstring measures.
-    """
-    gone: list[str] = []
-    parent = keep.parent
-    try:
-        siblings = sorted(p for p in parent.iterdir() if p.is_dir())
-    except OSError:
-        return gone
-    for d in siblings:
-        if d == keep:
-            continue
-        man = read_manifest(d)
-        if man is None:                      # never-evict: no readable manifest
-            continue
-        wt = man.get("worktree")
-        if not wt or not check_dead_worktree(wt):
-            continue
-        if _remove_cache_dir(d):
-            gone.append(wt)
-        else:
-            print(f"could NOT evict the cache of dead worktree {wt} — something in it is still "
-                  "open; its manifest was left in place so a later pass can retry", file=sys.stderr)
-    return gone
-
-
-def _dir_bytes(d: pathlib.Path) -> int:
-    total = 0
-    for f in d.rglob("*"):
-        try:
-            if f.is_file():
-                total += f.stat().st_size
-        except OSError:
-            pass
-    return total
-
-
-def _mid_build(d: pathlib.Path) -> bool:
-    """Is a build in flight in this directory?
-
-    TWO tests, because the second one alone was measurably wrong for most of a rebuild.
-
-    (1) THE MARKER. `build_cache` writes `building` before it reads a single file and removes it in a
-    `finally`. This is the test that actually covers the build: measured phase-by-phase against a
-    real rebuild, the mtime test below is False during extraction (31% of the build), False in the
-    window where `_write_set` has unlinked a database and not yet recreated it, and False for the
-    ENTIRE build on a filesystem with 1 s or 2 s mtime granularity when the build starts in the same
-    tick the previous manifest was written. A concurrent run reproduced the consequence: a sibling's
-    rebuild was evicted mid-write and died with `unable to open database file`.
-
-    A marker older than BUILD_TTL_S is an ABANDONED build — a killed process cannot run its
-    `finally` — and stops protecting the directory. Absence of a marker is not evidence of absence
-    of a build: a cache written by an older kit has none, which is why (2) stays.
-
-    (2) EITHER DATABASE NEWER THAN THE MANIFEST — the original test, kept verbatim.
-
-    The obvious predicate, "no readable manifest", is reasoned from a FIRST build only. On a REBUILD
-    `_write_set` unlinks and recreates both databases while the PREVIOUS manifest sits on disk
-    untouched, so a rebuilding sibling has a perfectly readable manifest and is precisely the
-    directory this rule means to protect. Absence of a manifest keeps its own separate never-evict
-    rule (`evict_dead_siblings`); this one is about a build in flight.
-    """
-    try:
-        age = time.time() - (d / BUILD_MARKER).stat().st_mtime
-    except OSError:
-        pass
-    else:
-        if age < BUILD_TTL_S:
-            return True
-    try:
-        mt = (d / "manifest.json").stat().st_mtime
-    except OSError:
-        return True
-    for name in ("records.db", "chunks.db"):
-        try:
-            if (d / name).stat().st_mtime > mt:
-                return True
-        except OSError:
-            continue
-    return False
-
-
-def _remove_cache_dir(d: pathlib.Path) -> bool:
-    """Delete a cache directory, MANIFEST LAST, and verify it is gone.
-
-    NOT `shutil.rmtree(ignore_errors=True)`. Measured on win32, the platform this repo runs on: over
-    a directory holding an OPEN sqlite database it removes `manifest.json`, KEEPS `records.db`, and
-    leaves the directory in place — strictly worse than not deleting at all, because a manifest-less
-    directory is exactly what the never-evict rule protects, so the tree accumulates rubble no later
-    pass will ever clear.
-
-    So: everything else first, and if ANY of it fails the manifest STAYS, leaving the directory in a
-    state a later pass can still read, judge and retry. A failure is reported, never retried here.
-    """
-    man = d / "manifest.json"
-    entries = sorted((p for p in d.rglob("*") if p != man), key=lambda p: -len(p.parts))
-    for p in entries:
-        try:
-            if p.is_dir():
-                p.rmdir()
-            else:
-                p.unlink()
-        except OSError:
-            return False                      # manifest untouched: the directory stays judgeable
-    try:
-        man.unlink()
-    except FileNotFoundError:
-        pass
-    except OSError:
-        return False
-    try:
-        d.rmdir()
-    except OSError:
-        return False
-    return not d.exists()
-
-
-def load_last_queries(log: pathlib.Path) -> dict[str, str]:
-    """``worktree`` -> the newest ``at`` of its ``query`` rows in the query log, read once.
-
-    A missing or unreadable log is an EMPTY map, never an error: eviction then falls back to
-    ``built_at`` order. Malformed lines and non-``query`` rows are skipped — an ``opened`` row
-    follows a ``query`` row of the same worktree, so it would move no order anyway.
-    """
-    last: dict[str, str] = {}
-    try:
-        with log.open(encoding="utf-8") as fh:
-            for line in fh:
-                try:
-                    row = json.loads(line)
-                except ValueError:
-                    continue
-                if not isinstance(row, dict) or row.get("type") != "query":
-                    continue
-                wt, at = row.get("worktree"), row.get("at")
-                # both sides are `isoformat(timespec="seconds")` in UTC, so text order is time order
-                if isinstance(wt, str) and isinstance(at, str) and at > last.get(wt, ""):
-                    last[wt] = at
-    except (OSError, UnicodeError):
-        return {}
-    return last
-
-
-def evict_over_budget(keep: pathlib.Path, budget_mb: float | None,
-                      last_queries: dict[str, str] | None = None) -> list[str]:
-    """Bring `recall/cache/` under its byte budget by evicting LEAST-RECENTLY-QUERIED first.
-
-    A cache's age is the newer of its last logged query (`last_queries`, from `load_last_queries`)
-    and its ``built_at``, ties broken by ``built_at``. Build time ALONE evicted a sibling queried all
-    day from a warm cache ahead of one rebuilt once and abandoned (TOOL-aMendedFleet-32). An empty
-    map is exactly the old least-recently-built order.
-
-    THE WHOLE PLAN IS COMPUTED BEFORE ANYTHING IS DELETED. Greedy oldest-first eviction and "when
-    the budget cannot be met, delete nothing" are incompatible otherwise: a greedy loop deletes until
-    it runs out of candidates and only THEN discovers it cannot finish, having already destroyed
-    work for no benefit.
-
-    Three directories are never candidates, each for its own reason: the CURRENT one (evicting it
-    makes the budget a rebuild loop), one that is MID-BUILD, and one whose manifest carries no
-    `built_at` (absence of evidence is not evidence of age). When the budget cannot be met without
-    reaching past them, the shortfall is REPORTED and the tree is left alone — a cap that deletes the
-    running session's own cache to satisfy itself turns a size problem into a rebuild loop.
-    """
-    out: list[str] = []
-    if not budget_mb:
-        return out                            # blank/absent/0 = uncapped, the kit's usual convention
-    budget = int(budget_mb * 1024 * 1024)
-    parent = keep.parent
-    try:
-        dirs = sorted(p for p in parent.iterdir() if p.is_dir())
-    except OSError:
-        return out
-    sizes = {d: _dir_bytes(d) for d in dirs}
-    total = sum(sizes.values())
-    if total <= budget:
-        return out
-
-    last_queries = last_queries or {}
-    candidates = []
-    for d in dirs:
-        if d == keep or _mid_build(d):
-            continue
-        man = read_manifest(d)
-        if man is None or not man.get("built_at"):
-            continue
-        wt = man.get("worktree") or "?"
-        candidates.append((man["built_at"], d, wt, last_queries.get(wt)))
-    # oldest of (last query, built_at) first; ties by built_at
-    candidates.sort(key=lambda t: (max(t[3] or "", t[0]), t[0]))
-
-    plan, projected = [], total
-    for built_at, d, wt, last in candidates:
-        if projected <= budget:
-            break
-        plan.append((built_at, d, wt, last))
-        projected -= sizes[d]
-    if projected > budget:
-        out.append(
-            "recall cache is %.1f MB over its %.0f MB budget and cannot be brought under it without "
-            "evicting a protected cache (the current one, one mid-build, or one with no built_at). "
-            "Nothing was deleted. Raise RECALL_CACHE_BUDGET_MB, or remove a stale worktree."
-            % ((total - budget) / 1048576, budget_mb)
-        )
-        return out
-    for built_at, d, wt, last in plan:
-        # RE-CHECK AT THE MOMENT OF DELETION. The plan is a proposal made from a snapshot; a sibling
-        # can start a build between the snapshot and this loop, and a plan is not a licence to delete
-        # something that has become live since it was made.
-        if _mid_build(d):
-            out.append("did NOT evict %s: a build started in it after the plan was made" % wt)
-            continue
-        if _remove_cache_dir(d):
-            out.append("evicted the least-recently-queried cache: %s (last query %s, built %s, %.1f MB)"
-                       % (wt, last or "never", built_at, sizes[d] / 1048576))
-        else:
-            out.append("could NOT evict %s (built %s) — something in it is still open; its manifest "
-                       "was left in place so a later pass can retry" % (wt, built_at))
-    return out
-
-
-def read_manifest(dirp: pathlib.Path) -> dict | None:
-    try:
-        return json.loads((dirp / "manifest.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return None
-
-
-def ensure_cache(repo: pathlib.Path, force: bool = False) -> tuple[pathlib.Path, dict, bool]:
-    dirp = cache_dir(repo)
-    files, declared = E.corpus_inputs(repo, include_untracked=True)
-    man = read_manifest(dirp)
-    # ONE derivation of freshness AND of the reason, as an ordered list of (clause, name). The
-    # first FAILING name is the cause and `fresh` is "no clause failed", so the two cannot drift
-    # apart and a new clause is impossible to add to one side only.
-    #
-    # It was two hand-kept spellings for about an hour: a boolean `and`-chain and an `elif` ladder
-    # repeating every clause. Worse, the ladder ran BEFORE the early return, so a warm cache paid
-    # `corpus_digest` -- a walk of the whole corpus -- TWICE on the exact path the cache exists to
-    # make fast. Both halves are the same mistake: a second reader of one fact.
-    #
-    # Laziness matters here: the tuple is built with the cheap clauses first, and `corpus_digest`
-    # is called AT MOST ONCE because the generator stops at the first failure.
-    def _derive_clauses():
-        yield (not force, "forced")
-        yield (man is not None, "no manifest")
-        if man is not None:
-            yield (man.get("version") == CACHE_VERSION, "CACHE_VERSION")
-            yield (man.get("kit_version") == recall_conf.KIT_MEMORY_RECALL_VERSION, "KIT_MEMORY_RECALL_VERSION")
-            yield (man.get("chunk_max") == CHUNK_MAX, "chunk_max")
-            yield (man.get("conf_digest") == CONF.digest(), "conf_digest")
-            yield (man.get("alias_digest") == alias_digest(), "alias_digest")
-            yield ((dirp / "records.db").exists(), "a missing database")
-            yield ((dirp / "chunks.db").exists(), "a missing database")
-            yield (man.get("digest") == corpus_digest(repo, files + declared), "corpus digest")
-
-    cause = next((name for ok, name in _derive_clauses() if not ok), None)
-    fresh = cause is None
-    if fresh:
-        return dirp, man, False
-    REBUILD_CAUSE.append(cause)
-    built = build_cache(repo, dirp, files, declared)
-    # Dead-worktree eviction FIRST and unconditionally — it is free correctness. The budget is a
-    # second pass over whatever survives, and both run only AFTER a successful build: a cache is
-    # replaceable only once its replacement exists.
-    for wt in evict_dead_siblings(dirp):
-        print(f"evicted the cache of a worktree that no longer exists or holds no .git: {wt}",
-              file=sys.stderr)
-    for line in evict_over_budget(dirp, CONF.cache_budget_mb, load_last_queries(log_path(repo))):
-        print(line, file=sys.stderr)
-    return dirp, built, True
 
 
 # ---------------------------------------------------------------------------------- querying
@@ -786,20 +548,23 @@ def query_expr(question: str, extra_terms: list[str] | None = None) -> str | Non
     return " OR ".join(parts)
 
 
-def search(dirp: pathlib.Path, name: str, expr: str, k: int) -> list[dict]:
-    db = sqlite3.connect(f"file:{dirp / f'{name}.db'}?mode=ro", uri=True)
+def search(con, name: str, expr: str, k: int) -> list[dict]:
+    """The top ``k`` of document set ``name`` (`RECALL_SETS`) for ``expr``, over the served rows only.
+
+    The ranking is today's -- ``bm25`` with the alias column down-weighted -- over the FTS5 table,
+    joined to `recall_view` so a row of another worktree's tree or another digest is never a hit.
+    A MATCH the FTS5 grammar refuses is a miss, never a crash."""
+    t = RECALL_SETS[name]  # MATCH, snippet() and bm25() take the table's hidden column, never the alias
     try:
-        rows = db.execute(
-            "SELECT d.rowid, m.id, m.path, m.line, "
-            f"snippet(d, 1, '', '', '…', {SNIPPET_TOKENS}), d.body "
-            "FROM d JOIN meta m ON m.rowid = d.rowid "
-            f"WHERE d MATCH ? ORDER BY bm25(d, 1.0, 1.0, {B.ALIAS_WEIGHT}) LIMIT ?",
+        rows = con.execute(
+            "SELECT f.rowid, f.id, f.path, f.line, "
+            f"snippet({t}, 1, '', '', '…', {SNIPPET_TOKENS}), f.body "
+            f"FROM {t} f {SERVED_JOIN} "
+            f"WHERE {t} MATCH ? ORDER BY bm25({t}, 1.0, 1.0, {B.ALIAS_WEIGHT}) LIMIT ?",
             (expr, k),
         ).fetchall()
     except sqlite3.OperationalError:
         return []
-    finally:
-        db.close()
     return [
         {
             "set": name,
@@ -836,15 +601,15 @@ def run_rollup(hits: list[dict], k: int) -> list[dict]:
     """Keep the best hit per PARENT, in rank order, capped at ``k``.
 
     ``bench.run_rollup`` does the same thing over its own in-memory ``docs`` list and a
-    ``bench.build_index`` connection; this one serves the dictionaries ``search()`` returns, joined
-    against the cache's own ``meta`` table. The two cannot be one function -- different inputs,
+    ``bench.build_fts_rows`` connection; this one serves the dictionaries ``search()`` returns, read
+    from the index's own ``id`` column. The two cannot be one function -- different inputs,
     different connections -- so what is shared is the PARENT KEY, and the two spellings are NOT
     identical: ``bench.parent_of`` is ``rec or id or path`` while this is ``id or path``. They agree
-    only because ``_write_set`` folds the two into one column -- it writes ``meta.id`` as
+    only because ``build_fts_rows`` folds the two into one column -- it writes ``id`` as
     ``d.get("id") or d.get("rec")`` -- so a chunk row arrives here with its parent record id
     already IN ``id``. That fold is the load-bearing step and it is named here because nothing
-    else names it and no arm tests it: change ``_write_set``'s column and this rollup silently
-    becomes a per-path cap for the anchored 0.6% as well.
+    else names it and no arm tests it: change that column and this rollup silently becomes a
+    per-path cap for the anchored 0.6% as well.
 
     THE PARENT KEY IS THE PATH FOR ALMOST EVERYTHING, and calling this a per-record rollup would be
     wrong. ``extract_chunks`` sets a chunk's ``rec`` only when a HEADING LINE itself defines a record
@@ -912,7 +677,7 @@ def render_supersession_tag(hit: dict) -> str:
     return f"  [{part}superseded by {', '.join(hit['superseded_by'])}]"
 
 
-def run_fusion(dirp: pathlib.Path, expr: str, k: int, smap: dict | None = None) -> list[dict]:
+def run_fusion(con, expr: str, k: int, smap: dict | None = None) -> list[dict]:
     """The served fusion: the records arm as-is, the chunk arm rolled up to one hit per parent.
 
     ONE call site, deliberately. This was two identical expressions -- the first attempt and the
@@ -927,12 +692,12 @@ def run_fusion(dirp: pathlib.Path, expr: str, k: int, smap: dict | None = None) 
     extra depth would be paid for nothing.
 
     The supersession order step runs HERE for the same reason the rollup does: one call site, so
-    the healthy path and the rebuild path cannot serve different orders. ``smap`` is the manifest's
-    ``superseded.edges``; an empty one annotates every hit as current and moves nothing.
+    no caller can serve a different order. ``smap`` is `derive_served_supersessions`'s map; an
+    empty one annotates every hit as current and moves nothing. ``con`` is `load_served_set`'s.
     """
     return derive_supersession_order(rrf([
-        search(dirp, "records", expr, k),
-        run_rollup(search(dirp, "chunks", expr, k * ROLLUP_DEPTH), k),
+        search(con, "records", expr, k),
+        run_rollup(search(con, "chunks", expr, k * ROLLUP_DEPTH), k),
     ]), smap or {})
 
 
@@ -1311,7 +1076,7 @@ def export(repo: pathlib.Path, tag: str) -> int:
     # free-text question into version control; moving it keeps the reader and closes the path.
     # An adopter that WANTS the aggregate tracked declares `RECALL_EXPORT_DIR`, which
     # `recall_conf.resolve()` has already refused if it escapes the root (TOOL-aRepatriatedFork-12).
-    dest = (repo / CONF.export_dir if CONF.export_dir else common_git_dir(repo) / "recall") \
+    dest = (repo / CONF.export_dir if CONF.export_dir else T.common_git_dir(repo) / "recall") \
         / f"recall-traffic-{tag}.md"
     if cap and size > cap and mode == "warn":
         # THE SWITCH (TOOL-dGroundRules-9): under `warn` the export writes, and says it is over.
@@ -1407,7 +1172,7 @@ def measure_answer_used(repo: pathlib.Path) -> int:
     if not log.exists():
         print(f"no query log at {log.as_posix()} — answer-used not measured", file=sys.stderr)
         return 2
-    common = common_git_dir(repo)
+    common = T.common_git_dir(repo)
     rows = [r for r in read_log(repo) if r.get("type") == "query"]
     reflogs: dict[str, list[tuple[int, str]] | None] = {}  # worktree -> commit entries, None = no reflog
     no_id = unattributed = no_commit = by_head = ambiguous = 0
@@ -1657,8 +1422,6 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
 
-    dirp, man, rebuilt = ensure_cache(repo, force="--rebuild" in flags)
-
     expr = query_expr(question, terms)
     if expr is None:
         log_event(repo, {"type": "refused", "reason": "no-searchable-term", "query": question})
@@ -1669,41 +1432,49 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
 
+    # The index file is SHARED by every worktree of this node, so a failure to open or read it is a
+    # refusal naming the file and never a delete (TOOL-dTotalRecall-21 S4): another worktree, or the
+    # tag verbs, may be holding it.
+    served = None
     try:
-        hits = run_fusion(dirp, expr, k, man["superseded"]["edges"])
-    except sqlite3.DatabaseError:
-        shutil.rmtree(dirp, ignore_errors=True)
-        dirp, man, rebuilt = ensure_cache(repo, force=True)
-        hits = run_fusion(dirp, expr, k, man["superseded"]["edges"])
-
-    live_files = len(E.corpus_files(repo, include_untracked=True))
-    notices = []
-    if man.get("n_files") != live_files:
-        notices.append(f"index covers {man.get('n_files')} files, corpus now has {live_files}")
-    for name in ("records", "chunks"):
-        if not (dirp / f"{name}.db").exists():
-            notices.append(f"document set {name!r} is MISSING from the cache")
-    if notices:
-        print("PARTIAL RECALL — " + "; ".join(notices))
+        served = load_served_set(repo, rebuild="--rebuild" in flags)
+        con = served["con"]
+        counts = read_served_counts(con)
+        smap, sc = derive_served_supersessions(con, served["pairs"])
+        hits = run_fusion(con, expr, k, smap)
+    except UnbornHeadError as exc:
+        print(f"refused: {exc}", file=sys.stderr)
+        return 2
+    except (T.TagError, sqlite3.DatabaseError) as exc:
+        print(f"refused: {exc}\n  the index file is {T.derive_index_path(repo).as_posix()}; removing it "
+              "costs one rebuild of the tag index and of recall's rows. Nothing was deleted.",
+              file=sys.stderr)
+        return 2
+    finally:
+        if served is not None:
+            served["con"].close()
+    by_id, alias_src, _ = E.load_aliases()
+    aliases = {"ids": len(by_id), "joined": counts["joined"], "src": alias_src}
 
     if "--stats" in flags:
-        print(json.dumps(man, indent=1))
-    sc = man["superseded"]["counts"]
+        print(json.dumps({"tree": served["tree"], "digest": served["digest"],
+                          "counts": {"records": counts["records"], "chunks": counts["chunks"]},
+                          "aliases": aliases, "superseded": sc}, indent=1))
     print(
-        f"index {man['counts']['records']} records + {man['counts']['chunks']} chunks "
+        f"index {counts['records']} records + {counts['chunks']} chunks "
         f"· superseded {sc['ids']} ({sc['whole']} whole, {sc['partial']} partial) "
-        f"({'rebuilt ' + str(man['built_s']) + 's, cause ' + (REBUILD_CAUSE[-1] if REBUILD_CAUSE else '?') if rebuilt else 'cached ' + man['built_at']})"
+        f"(tree {served['tree'][:8]}, extracted {served['extracted']} blob(s) in {served['seconds']}s)"
     )
-    # AFTER the index line and on EVERY path that can produce it -- the counts come from the
-    # manifest, so this fires identically on a fresh build and on a cache hit. Upstream printed the
-    # line above and stopped, so a corpus whose ids the grammar does not describe returned chunks,
-    # zero records, and exit 0 (spec S7).
+    # AFTER the index line and on EVERY path that can produce it -- the counts come from the served
+    # rows, so this fires identically on a call that extracted and one that extracted nothing.
+    # Upstream printed the line above and stopped, so a corpus whose ids the grammar does not
+    # describe returned chunks, zero records, and exit 0 (spec S7).
     diag = E.zero_record_diagnosis(
-        man["counts"]["records"], man["counts"]["chunks"], rebuild_hint=f"`{CLI} --rebuild`"
+        counts["records"], counts["chunks"], rebuild_hint=f"`{CLI} --rebuild`"
     )
     if diag:
         print(diag, file=sys.stderr)
-    dead = dead_alias_diagnosis(man)
+    dead = dead_alias_diagnosis(aliases)
     if dead:
         print(dead, file=sys.stderr)
     print(f"{len(hits)} hits for: {question}\n{EVIDENCE_BANNER}\n")

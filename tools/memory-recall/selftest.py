@@ -7,8 +7,10 @@ What this gates is the KIT CONTRACT, not a recall floor. No adopter has a graded
 floor re-derived from the run it grades cannot fail, so there is no honest threshold to pin. What
 IS pinned: the parser-versus-bash parity, the no-conf refusal and its stub, the empty-alias path,
 the write-nothing-in-the-worktree property BY PATH, the conf-digest freshness in both directions,
-the zero-record diagnosis, cache eviction including the never-evict branch, the interpreter
-fallback, and that every invocation the CLI prints resolves to a file that exists.
+the zero-record diagnosis, the index rows' freshness (one edit extracts one pair, a conf edit
+re-extracts every pair), an untracked record served to its own worktree only, a corrupt index
+file refused and kept, two tag-index resets over recall's tables, the interpreter fallback, and
+that every invocation the CLI prints resolves to a file that exists.
 
 Every arm runs inside a throwaway git repo built from scratch. Upstream's selftest appended a
 synthetic `refused` row to the shared query log on every run — 471 of 489 refusals in the live log
@@ -80,9 +82,10 @@ CORPUS = """# Tooling decisions
 Q = ("why was the frobnicator chosen", "--terms", "frobnicator quibbler leaks snark boojum")
 
 # The `superseded` clause is REQUIRED by the pattern, not skipped over: an index line without it is
-# a manifest without the map (TOOL-aGraftedHelix-4), and every arm reading the line would say so.
+# a served set without the map (TOOL-aGraftedHelix-4), and every arm reading the line would say so.
+# The last group is the pairs the call EXTRACTED (TOOL-dTotalRecall-21 S9), never a rebuild cause.
 INDEX_RE = re.compile(r"index (\d+) records \+ (\d+) chunks · superseded \d+ \(\d+ whole, \d+ "
-                      r"partial\) \((rebuilt|cached)")
+                      r"partial\) \(tree [0-9a-f]{8}, extracted (\d+) blob\(s\) in ")
 # `python3?` on purpose: every launcher this kit prints is resolved python3-first, so a pattern
 # anchored on bare `python ` silently matched nothing on a python3 host — the arm below would then
 # have folded an empty set and passed vacuously.
@@ -244,7 +247,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 88
+SELFTEST_ARMS = 81
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -304,6 +307,14 @@ SELFTEST_ARMS = 88
 #   census check - `--readers` lists the `py-split`, `sh-cut` and `sh-expansion` plants and not a
 #   control, and `--flip-probe` over a clone reverting a re-pointed reader to its split exits 1
 #   naming the reverted line on every flip, where the unreverted clone names no census failure.
+# 88 -> 81 on 2026-11-23 (TOOL-dTotalRecall-21): the per-worktree cache retired, so its TWELVE
+#   eviction, budget and build-marker arms went (`test_eviction`, `test_budget_lru`,
+#   `test_budget_protections`, `test_build_marker_lifecycle`, `test_budget_build_in_flight`,
+#   `test_budget_marker_ttl`, `test_budget_cannot_satisfy`, `test_budget_recheck_before_delete`,
+#   `test_budget_blank`, `test_budget_orders_by_last_query`, `test_eviction_husk` and
+#   `test_last_queries_and_empty_log`), and FIVE index arms came: one edit re-extracts one pair, an untracked record stays in its worktree,
+#   a corrupt index file is refused and kept, an unborn HEAD is refused naming the first commit, and two
+#   tag-index resets over recall's tables.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -383,6 +394,14 @@ def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str |
     (root / mt_name).mkdir()
     for src in sorted(tree_src.glob("*.py")):
         shutil.copyfile(src, root / mt_name / src.name)
+    # The playbook kit, which this kit `requires` since TOOL-dTotalRecall-21: the rows live in its
+    # tag index, and `query.py` reaches `tag_index.py` through the same resolver. Its top-level
+    # modules and data files, by the NAME its directory has here; its fixtures are no import's.
+    tag_src = E.resolve_kit_dir("playbook", "tag_index.py", KIT)
+    (root / tag_src.name).mkdir()
+    for src in sorted(tag_src.iterdir()):
+        if src.is_file() and src.suffix in (".py", ".toml", ".txt"):
+            shutil.copyfile(src, root / tag_src.name / src.name)
     (root / ".memory-tree.conf").write_text(conf, encoding="utf-8", newline="\n")
     # `flat` writes <root>/DECISIONS.md, which is the layout the memory-tree kit's own adopter
     # creates; the default writes <root>/<discipline>/DECISIONS.md, which is upstream's. `DURABLE`
@@ -397,9 +416,13 @@ def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str |
     (disc / "DECISIONS.md").write_text(CORPUS, encoding="utf-8", newline="\n")
     if gitignore is not None:
         (root / ".gitignore").write_text(gitignore, encoding="utf-8", newline="\n")
-    # Staged, not committed: `git ls-files` reads the INDEX, and extract.py's corpus_files is
-    # tracked-only on purpose (it is the measurement path). Without this it sees an empty corpus.
+    # Staged AND committed: `git ls-files` reads the INDEX, and extract.py's corpus_files is
+    # tracked-only on purpose (it is the measurement path); and the query path serves the HEAD
+    # tree's blobs from the tag index, which an unborn HEAD does not have (TOOL-dTotalRecall-21).
     subprocess.run(["git", "-C", str(root), "add", "-A"], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t",
+                    "-c", "core.autocrlf=false", "commit", "-q", "--no-verify", "-m", "seed"],
+                   check=True, capture_output=True)
     return root, kitdir
 
 
@@ -410,10 +433,11 @@ def run(root: pathlib.Path, kitdir: pathlib.Path, *args: str, script: str = "que
     )
 
 
-def index_of(proc) -> tuple[int, int, str]:
+def index_of(proc) -> tuple[int, int, int]:
+    """(records, chunks, pairs extracted) from a query's index line."""
     m = INDEX_RE.search(proc.stdout)
     assert m, f"no index header in output:\n{proc.stdout}\n{proc.stderr}"
-    return int(m.group(1)), int(m.group(2)), m.group(3)
+    return int(m.group(1)), int(m.group(2)), int(m.group(3))
 
 
 def git_common_dir(root: pathlib.Path) -> pathlib.Path:
@@ -434,9 +458,17 @@ def tree(base: pathlib.Path, skip=(".git",)) -> set[str]:
     return out
 
 
-def cache_of(root: pathlib.Path) -> pathlib.Path:
-    key = hashlib.sha1(str(root).encode()).hexdigest()[:12]
-    return git_common_dir(root) / "recall" / "cache" / key
+def resolve_index_file(root: pathlib.Path) -> pathlib.Path:
+    """The node's tag index, which holds recall's rows: `tag_index.derive_index_path`'s spelling."""
+    return git_common_dir(root) / "gov" / f"index-s{query.T.INDEX_SCHEMA}.db"
+
+
+def read_stats(proc) -> dict:
+    """The `--stats` JSON block a query printed above its index line."""
+    out = proc.stdout
+    a = out.index("{\n")
+    b = out.index("\n}\n", a)
+    return json.loads(out[a:b + 2])
 
 
 # Every root `cleanup()` was ASKED to remove. The final arm re-checks them, because the defect
@@ -454,8 +486,7 @@ def _set_writable(func, path, _exc):
     4,905 by 2026-08-20. `.git` is the only read-only thing in these fixtures, which is why the
     same idiom works for the plain-JSONL scratch dirs and fails only here.
 
-    Same shape as `query.py:_remove_cache_dir`, which carries the measured argument against
-    `ignore_errors=True` on this platform: a failure is reported, never silently absorbed.
+    A failure is reported, never silently absorbed.
     """
     try:
         os.chmod(path, stat.S_IWRITE)
@@ -486,8 +517,8 @@ def cleanup(root: pathlib.Path) -> None:
 #     this repository, so a row another session appends while this suite runs is indistinguishable
 #     from a row an arm wrote. That cuts both ways: it can red an innocent run and it can mask a
 #     guilty one. Measured: rows arrived here mid-run during this unit's own build.
-#   * THE CACHE. Only `recall/queries.jsonl` is bracketed. The `recall/cache/` tree beside it is
-#     written by ordinary queries and by eviction, and nothing here looks at it.
+#   * THE INDEX. Only `recall/queries.jsonl` is bracketed. The tag index under `gov/`, which holds
+#     recall's rows, is written by ordinary queries, and nothing here looks at it.
 #   * A LOG ABSENT AT BOTH ENDS. Two absent readings compare equal, so a tree with no log at all
 #     reports exactly like a tree whose log was protected.
 #   * A WRITE THAT IS REVERTED. Only the endpoints are read. An arm that appends a row and removes
@@ -681,8 +712,8 @@ def test_empty_alias():
     try:
         proc = run(root, kitdir, *Q)
         assert proc.returncode == 0, proc.stderr
-        n_rec, n_chunk, state = index_of(proc)
-        assert (n_rec, state) == (2, "rebuilt"), f"{n_rec} records, {state}"
+        n_rec, n_chunk, extracted = index_of(proc)
+        assert (n_rec, extracted) == (2, 1), f"{n_rec} records, {extracted} pair(s) extracted"
         assert n_chunk >= 1, f"{n_chunk} chunks"
         assert " hits for: " in proc.stdout and "[1] " in proc.stdout, "empty ranked list"
         # TOOL-aGraftedHelix-32 S13: the evidence banner, ONCE and directly under the hits line — the
@@ -693,11 +724,11 @@ def test_empty_alias():
             f"the evidence banner is not the line directly under the hits line: {lines[:4]!r}"
         assert lines.count(query.EVIDENCE_BANNER) == 1, \
             f"the evidence banner printed {lines.count(query.EVIDENCE_BANNER)} times, not once"
-        man = json.loads((cache_of(root) / "manifest.json").read_text(encoding="utf-8"))
-        assert man["alias_digest"] == "", f"alias digest {man['alias_digest']!r} with no alias file"
+        stats = read_stats(run(root, kitdir, *Q, "--stats"))
+        assert stats["aliases"]["ids"] == 0, f"alias ids {stats['aliases']} with no alias file"
         assert "ZERO RECORDS" not in proc.stderr, "false diagnosis on a healthy corpus"
         assert "DEAD ALIAS LAYER" not in proc.stderr, "dead-alias fired with NO alias file"
-        return f"{n_rec} records + {n_chunk} chunks, alias digest empty, ranked list non-empty"
+        return f"{n_rec} records + {n_chunk} chunks, no alias ids, ranked list non-empty"
     finally:
         cleanup(root)
 
@@ -917,29 +948,31 @@ def test_empty_corpus_names_memory_root():
         cleanup(root)
 
 
-@check("conf_digest joins freshness: a FAMILIES edit rebuilds, and the repair rebuilds back")
+@check("conf_digest joins freshness: a FAMILIES edit re-extracts every pair, and the repair does again")
 def test_conf_digest_both_directions():
-    """The blocker. The corpus digest is mtime+size over the tree's .md files, so a conf edit never
-    enters it; without conf_digest in the manifest the S7 remediation is a silent no-op in BOTH
-    directions — the diagnosis fires, the adopter fixes the conf, and the cache keeps answering.
-    Asserting the message alone is insufficient: both directions must MOVE the count.
+    """The blocker, on the index rows (TOOL-dTotalRecall-21 AC3). A conf edit changes no corpus blob,
+    so without `CONF.digest()` in the rows' digest the S7 remediation is a silent no-op in BOTH
+    directions -- the diagnosis fires, the adopter fixes the conf, and the old rows keep answering.
+    Asserting the message alone is insufficient: both directions must MOVE the count, and each
+    re-extracts exactly the pairs `corpus_inputs` lists.
     """
+    import extract as E
     root, kitdir = make_repo()
     conf = root / ".memory-tree.conf"
     try:
+        paths = sum(map(len, E.corpus_inputs(root, include_untracked=True)))
         first = index_of(run(root, kitdir, *Q))
-        assert first == (2, first[1], "rebuilt"), first
+        assert first[0] == 2 and first[2] == paths, first
         warm = index_of(run(root, kitdir, *Q))
-        assert warm[2] == "cached", f"second run did not hit the cache: {warm}"
+        assert warm[2] == 0, f"a second run re-extracted: {warm}"
         conf.write_text('MEMORY_ROOT=memory\nFAMILIES="tooling:ZZZZ"\n', encoding="utf-8", newline="\n")
         broken = index_of(run(root, kitdir, *Q))
-        assert broken[2] == "rebuilt", f"a FAMILIES edit did not invalidate the cache: {broken}"
+        assert broken[2] == paths, f"a FAMILIES edit re-extracted {broken[2]} of {paths} pair(s): {broken}"
         assert broken[0] == 0, f"records did not move to zero: {broken}"
         conf.write_text(CONF, encoding="utf-8", newline="\n")
         fixed = index_of(run(root, kitdir, *Q))
-        assert fixed[2] == "rebuilt", f"the repair did not invalidate the cache: {fixed}"
         assert fixed[0] == 2, f"records did not come back: {fixed}"
-        return f"{first[0]} -> cached -> {broken[0]} (rebuilt) -> {fixed[0]} (rebuilt)"
+        return f"{first[0]} -> {broken[0]} ({broken[2]} of {paths} re-extracted) -> {fixed[0]}"
     finally:
         cleanup(root)
 
@@ -992,39 +1025,39 @@ def test_writes_nothing_in_worktree():
         assert not any("__pycache__" in p for p in after), "bytecode landed in the worktree"
         created = tree(git_common_dir(root) / "recall")
         assert created, "the query created nothing under the common git dir either"
+        assert resolve_index_file(root).is_file(), f"no tag index at {resolve_index_file(root).as_posix()}"
+        assert not (git_common_dir(root) / "recall" / "cache").exists(), "a per-worktree cache was built"
         status = subprocess.run(
             ["git", "-C", str(root), "status", "--porcelain"], capture_output=True, text=True,
         ).stdout
-        return f"{len(created)} files, all under <gitdir>/recall; worktree unchanged; status {len(status.splitlines())} rows"
+        return (f"{len(created)} file(s) under <gitdir>/recall, the rows in <gitdir>/gov; worktree "
+                f"unchanged; status {len(status.splitlines())} rows")
     finally:
         cleanup(root)
 
 
-@check("an alias file dropped in the kit dir rebuilds the cache and lands in the manifest")
+@check("an alias file dropped in the kit dir re-extracts the rows and joins on the next query")
 def test_alias_rebuild():
     root, kitdir = make_repo()
     try:
-        run(root, kitdir, *Q)
-        before = json.loads((cache_of(root) / "manifest.json").read_text(encoding="utf-8"))
-        assert before["alias_digest"] == ""
+        before = read_stats(run(root, kitdir, *Q, "--stats"))
+        assert before["aliases"]["ids"] == 0, before["aliases"]
         (kitdir / "aliases.json").write_text(
             json.dumps([{"id": "TOOL-aFoo-1", "questions": ["how do I pick a frobnicator"]}]),
             encoding="utf-8", newline="\n",
         )
-        proc = run(root, kitdir, *Q)
-        n_rec, _, state = index_of(proc)
-        assert state == "rebuilt", "an alias edit did not invalidate the cache"
-        after = json.loads((cache_of(root) / "manifest.json").read_text(encoding="utf-8"))
-        assert after["alias_digest"], "the manifest did not record the new alias digest"
+        proc = run(root, kitdir, *Q, "--stats")
+        n_rec, _, extracted = index_of(proc)
+        assert extracted > 0, "an alias edit did not re-extract the rows"
+        after = read_stats(proc)
+        assert after["digest"] != before["digest"], "the alias digest is not in the rows' digest"
         assert n_rec == 2, n_rec
-        # The join that WORKS: counted in the manifest, and silent. A diagnosis that also
+        # The join that WORKS: counted over the served rows, and silent. A diagnosis that also
         # fires here would be a gate that reds the terminal success state.
         assert after["aliases"]["joined"] == 1, after["aliases"]
         assert "DEAD ALIAS LAYER" not in proc.stderr, "dead-alias fired on a LIVE alias layer"
-        return (
-            f"alias digest '' -> {after['alias_digest']}, "
-            f"{after['aliases']['joined']}/{after['aliases']['ids']} joined, silent"
-        )
+        return (f"digest {before['digest'][:8]} -> {after['digest'][:8]}, "
+                f"{after['aliases']['joined']}/{after['aliases']['ids']} joined, silent")
     finally:
         cleanup(root)
 
@@ -1034,8 +1067,8 @@ def test_dead_alias_is_loud():
     """`query.py` discarded `join_aliases`' return, so a 100%-dead alias column was reported
     NOWHERE — the dead-plumbing class one layer inside the tool built to close it. An adopter
     authoring aliases against the wrong id family gets a silently empty third FTS5 column whose
-    only symptom is slightly worse ranking, and `--stats` carried a content hash that says nothing
-    about coverage. The record and chunk arms are unaffected, which is why nothing else can see it.
+    only symptom is slightly worse ranking. The record and chunk arms are unaffected, which is why
+    nothing else can see it.
     """
     root, kitdir = make_repo()
     try:
@@ -1043,7 +1076,7 @@ def test_dead_alias_is_loud():
             json.dumps([{"id": "ZZZZ-aFoo-1", "questions": ["how do I pick a frobnicator"]}]),
             encoding="utf-8", newline="\n",
         )
-        proc = run(root, kitdir, *Q)
+        proc = run(root, kitdir, *Q, "--stats")
         assert proc.returncode == 0, proc.stderr
         n_rec, n_chunk, _ = index_of(proc)
         assert (n_rec, n_chunk > 0) == (2, True), f"{n_rec} records / {n_chunk} chunks — wrong fixture"
@@ -1051,415 +1084,162 @@ def test_dead_alias_is_loud():
         assert "DEAD ALIAS LAYER" in err, f"a 100%-dead alias column stayed silent:\n{err}"
         assert "aliases.json" in err, "the diagnosis does not name the alias source"
         assert "TOOL" in err, "the diagnosis does not name the resolved families"
-        man = json.loads((cache_of(root) / "manifest.json").read_text(encoding="utf-8"))
-        assert (man["aliases"]["ids"], man["aliases"]["joined"]) == (1, 0), man["aliases"]
-        # ...and on a CACHE HIT, which is the state a session is actually in: the counts come from
-        # the manifest for exactly this reason, and a re-run must not go quiet.
+        a = read_stats(proc)["aliases"]
+        assert (a["ids"], a["joined"]) == (1, 0), a
+        # ...and on a call that extracts NOTHING, which is the state a session is usually in: the
+        # counts come from the served rows for exactly this reason, and a re-run must not go quiet.
         again = run(root, kitdir, *Q)
-        assert index_of(again)[2] == "cached", "fixture did not reach the cached path"
-        assert "DEAD ALIAS LAYER" in again.stderr, "the diagnosis is fresh-build-only"
-        # ...and a cache built BEFORE this fix carries no alias counts at all, so the manifest the
-        # diagnosis reads is empty of them. The CACHE_VERSION bump is the whole of what stops such
-        # a cache from keeping the very silence this fix removes: doctor a manifest into that shape
-        # and the next query must REBUILD and diagnose, not serve the pre-fix index.
-        mf = cache_of(root) / "manifest.json"
-        stale = json.loads(mf.read_text(encoding="utf-8"))
-        stale.pop("aliases")
-        stale["version"] = 2
-        mf.write_text(json.dumps(stale, indent=1), encoding="utf-8", newline="\n")
-        third = run(root, kitdir, *Q)
-        assert index_of(third)[2] == "rebuilt", "a pre-fix manifest was served from cache"
-        assert "DEAD ALIAS LAYER" in third.stderr, "a pre-fix cache kept the silence"
-        return "1 alias id, 0 joined -> diagnosed on rebuild, on cache hit, and past a pre-fix cache"
+        assert index_of(again)[2] == 0, "fixture did not reach the no-extraction path"
+        assert "DEAD ALIAS LAYER" in again.stderr, "the diagnosis is extraction-only"
+        return "1 alias id, 0 joined -> diagnosed on extraction and on a call that extracted nothing"
     finally:
         cleanup(root)
 
 
-@check("cache eviction: dead worktree evicted, live worktree kept, no-manifest NEVER evicted")
-def test_eviction():
-    """One predicate read in two directions: rebuild MINE, never delete THEIRS.
-
-    The builder writes both .db files BEFORE the manifest, deliberately and atomically, so a
-    directory with no readable manifest is exactly the shape of a sibling mid-first-build. Evicting
-    it deletes a live cache while its builder is still writing.
-    """
-    root, kitdir = make_repo()
-    try:
-        run(root, kitdir, *Q)
-        caches = cache_of(root).parent
-        dead, live, mid = caches / "deadcache", caches / "livecache", caches / "midbuild"
-        for d in (dead, live, mid):
-            d.mkdir(parents=True)
-            (d / "records.db").write_bytes(b"")
-            (d / "chunks.db").write_bytes(b"")
-        (dead / "manifest.json").write_text(
-            json.dumps({"worktree": str(root / "no" / "such" / "tree")}), encoding="utf-8"
-        )
-        (live / "manifest.json").write_text(json.dumps({"worktree": str(root)}), encoding="utf-8")
-        # `mid` gets NO manifest at all — the reachable third case.
-        proc = run(root, kitdir, *Q, "--rebuild")
-        assert proc.returncode == 0, proc.stderr
-        assert not dead.exists(), "a cache for a vanished worktree survived"
-        assert live.exists(), "a cache for a LIVE worktree was evicted"
-        assert mid.exists(), "a mid-first-build cache (no readable manifest) was evicted"
-        assert "evicted" in proc.stderr, "the eviction was silent"
-        return "dead evicted, live kept, no-manifest kept"
-    finally:
-        cleanup(root)
-
-
-# ---------------------------------------------------------------- the cache byte budget (V6)
+# ------------------------------------------------- the index rows (TOOL-dTotalRecall-21)
 #
-# EVERY ARM BELOW RUNS AGAINST A BUDGET THE FIXTURE ACTUALLY EXCEEDS. A selftest-shaped cache is
-# ~57 KB, so under any plausible megabyte budget the pass never runs at all and "X survives" is true
-# for the wrong reason — three survival arms passing by finding nothing. The siblings are therefore
-# PADDED to known sizes and the budget is set between them, so each run has a real decision to make
-# and each survival is asserted alongside an eviction that did happen.
+# The per-worktree cache, its eviction and its byte budget are retired: the rows live in the ONE
+# tag index per node, keyed by (path, blob) and the extraction digest. These five arms replace the
+# cache arms. Each is RED against its staged break: a whole-corpus digest reinstated as the
+# freshness rule (every pair re-extracted on one edit), an untracked pair served across worktrees,
+# a corrupt file deleted rather than refused, `load_served_set`'s HEAD check removed, and
+# `load_index`'s drop list read once.
+
+SECOND_RECORD = "# Notes\n\n## TOOL-aFoo-5 — a second home\n\nthe boojum harness traps snarks\n"
+FRESH_Q = ("where is the zorblax quuxly note", "--terms", "zorblax quuxly")
 
 
-def _sib(caches, name, *, kb, built_at=None, worktree=None, mid=False,
-         marker_age=None, db_absent=False):
-    """A sibling cache of a known size, with a manifest this pass will actually read.
-
-    `marker_age` plants a `building` marker aged that many seconds; `db_absent` removes records.db.
-    Both exist because the mtime test alone could not see the states they produce — see the state
-    table arm below, where three of them were judged evictable by the shipped predicate.
-    """
-    d = caches / name
-    d.mkdir(parents=True, exist_ok=True)
-    (d / "records.db").write_bytes(b"\0" * (kb * 1024))
-    (d / "chunks.db").write_bytes(b"")
-    man = {"worktree": worktree}
-    if built_at is not None:
-        man["built_at"] = built_at
-    (d / "manifest.json").write_text(json.dumps(man), encoding="utf-8")
-    if db_absent:
-        (d / "records.db").unlink()
-    if marker_age is not None:
-        m = d / "building"
-        m.write_text("12345", encoding="utf-8")
-        t = os.path.getmtime(m) - marker_age
-        os.utime(m, (t, t))
-    if mid:
-        # MID-BUILD is "a database is NEWER than the manifest", which is true during any build —
-        # including a REBUILD, where the previous manifest sits on disk perfectly readable. That is
-        # the case the obvious "no readable manifest" predicate gets wrong.
-        later = os.path.getmtime(d / "manifest.json") + 60
-        os.utime(d / "records.db", (later, later))
-    return d
-
-
-def _budget_conf(mb: str) -> str:
-    return CONF + f'RECALL_CACHE_BUDGET_MB="{mb}"\n'
-
-
-@check("the cache budget evicts the oldest first and stops at the budget")
-def test_budget_lru():
-    root, kitdir = make_repo(conf=_budget_conf("0.4"))
+@check("one edited record re-extracts ONE pair, and its commit re-extracts none")
+def test_one_edit_extracts_one_pair():
+    """AC3's first half. Two corpus files, so a whole-corpus freshness rule reads 2 where the rows'
+    (path, blob) key reads 1; the commit lands the edited blob in the next tree, whose rows exist."""
+    root, kitdir = make_repo()
+    git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t", "-c", "core.autocrlf=false"]
     try:
-        run(root, kitdir, *Q)
-        caches = cache_of(root).parent
-        old = _sib(caches, "oldest", kb=400, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
-        new = _sib(caches, "newer", kb=100, built_at="2021-01-01T00:00:00+00:00", worktree=str(root))
-        proc = run(root, kitdir, *Q, "--rebuild")
-        assert proc.returncode == 0, proc.stderr
-        assert not old.exists(), "the oldest cache survived an over-budget run"
-        assert new.exists(), "eviction did not STOP once the tree was under budget"
-        assert cache_of(root).exists(), "the CURRENT worktree's cache was evicted"
-        assert "evicted the least-recently-queried cache" in proc.stderr, "the eviction was silent"
-        assert "2020-01-01" in proc.stderr, "the report does not name what went"
-        return "oldest gone, newer kept, current kept, reported"
+        second = root / resolve_memory_root() / "tooling" / "notes.md"
+        second.write_text(SECOND_RECORD, encoding="utf-8", newline="\n")
+        subprocess.run([*git, "add", "-A"], check=True, capture_output=True)
+        subprocess.run([*git, "commit", "-q", "--no-verify", "-m", "second"], check=True, capture_output=True)
+        cold = index_of(run(root, kitdir, *Q))
+        assert cold[2] == 2, f"a cold index extracted {cold[2]} pair(s), not both files: {cold}"
+        assert index_of(run(root, kitdir, *Q))[2] == 0, "a warm query re-extracted"
+        corpus = root / resolve_memory_root() / "tooling" / "DECISIONS.md"
+        with corpus.open("a", encoding="utf-8", newline="\n") as fh:
+            fh.write("- TOOL-aFoo-6 · an edit to one record\n")
+        edited = index_of(run(root, kitdir, *Q))
+        assert edited[2] == 1, f"one edited file re-extracted {edited[2]} pair(s): {edited}"
+        assert edited[0] == cold[0] + 1, f"the edit's record is not served: {edited}"
+        subprocess.run([*git, "commit", "-q", "--no-verify", "-am", "edit"], check=True, capture_output=True)
+        committed = index_of(run(root, kitdir, *Q))
+        assert committed[2] == 0, f"the commit of an extracted blob re-extracted {committed[2]}: {committed}"
+        return f"cold {cold[2]}, edit {edited[2]}, commit {committed[2]}"
     finally:
         cleanup(root)
 
 
-@check("a mid-build and a built_at-less cache survive a run that DID evict something")
-def test_budget_protections():
-    root, kitdir = make_repo(conf=_budget_conf("0.5"))
+@check("an untracked record is served to its own worktree only, and to another once committed there")
+def test_untracked_pair_stays_in_its_worktree():
+    """AC4. The untracked pair lives in recall's rows alone, joined to the served set of the
+    worktree that hashed it; a linked worktree serves it only once the commit reaches its branch."""
+    root, kitdir = make_repo()
+    wt = root.parent / (root.name + "-wt")
+    git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t", "-c", "core.autocrlf=false"]
     try:
-        run(root, kitdir, *Q)
-        caches = cache_of(root).parent
-        old = _sib(caches, "oldest", kb=300, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
-        mid = _sib(caches, "midbuild", kb=100, built_at="2019-01-01T00:00:00+00:00",
-                   worktree=str(root), mid=True)
-        ageless = _sib(caches, "ageless", kb=100, worktree=str(root))
-        proc = run(root, kitdir, *Q, "--rebuild")
-        assert proc.returncode == 0, proc.stderr
-        # the eviction that proves the pass RAN — without it the three survivals below are vacuous
-        assert not old.exists(), "the pass did not run: nothing was evicted on an over-budget tree"
-        assert mid.exists(), "a MID-BUILD cache was evicted (and it was the oldest by built_at)"
-        assert ageless.exists(), "a cache with no built_at was evicted"
-        return "mid-build and ageless kept while the oldest evictable one went"
+        subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
+        fresh = root / resolve_memory_root() / "tooling" / "fresh.md"
+        fresh.write_text("# Fresh\n\n## TOOL-aFoo-7 — fresh\n\nthe zorblax quuxly note\n",
+                         encoding="utf-8", newline="\n")
+        mine = run(root, kitdir, *FRESH_Q)
+        assert mine.returncode == 0 and "TOOL-aFoo-7" in mine.stdout, \
+            f"the worktree holding the untracked record is not served it:\n{mine.stdout}{mine.stderr}"
+        theirs = run(wt, wt / kitdir.name, *FRESH_Q)
+        assert theirs.returncode == 0, theirs.stderr
+        assert "TOOL-aFoo-7" not in theirs.stdout, f"another worktree was served the untracked pair:\n{theirs.stdout}"
+        subprocess.run([*git, "add", "-A"], check=True, capture_output=True)
+        subprocess.run([*git, "commit", "-q", "--no-verify", "-m", "fresh"], check=True, capture_output=True)
+        subprocess.run(["git", "-C", str(wt), "merge", "-q", "--ff-only", "main"], check=True, capture_output=True)
+        landed = run(wt, wt / kitdir.name, *FRESH_Q)
+        assert "TOOL-aFoo-7" in landed.stdout, f"the committed record is not served once it landed:\n{landed.stdout}"
+        return "served to its own worktree, not the other, and to the other after the merge"
     finally:
+        cleanup(wt)  # a SIBLING of root, so both go, as in test_repo_root_linked_worktree
         cleanup(root)
 
 
-@check("a real build WRITES the marker and removes it when it finishes")
-def test_build_marker_lifecycle():
-    """THE PRODUCER, armed. Every other marker arm plants the file by hand, so replacing
-    `marker.write_text(...)` with `pass` left the whole suite green — the consumer was covered and the
-    thing that feeds it was not. Both halves are asserted from ONE real build: the marker exists while
-    `_docs` is running, and it is gone once the build returns.
-    """
+@check("a corrupt index file refuses with exit 2 naming the file and its removal, and is still there")
+def test_corrupt_index_refuses_and_survives():
+    """AC5. The file is SHARED by every worktree of the node and by the tag verbs, so the query
+    deletes nothing: a cache directory was `rmtree`d on a DatabaseError, the index file never is."""
     root, kitdir = make_repo()
     try:
-        probe = kitdir / "_markerprobe.py"
-        probe.write_text(
-            "import pathlib, sys\n"
-            "sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))\n"
-            "import query\n"
-            "seen = {}\n"
-            "orig = query._docs\n"
-            "def spy(repo, files, declared=()):\n"
-            "    seen['during'] = (query.cache_dir(repo) / query.BUILD_MARKER).exists()\n"
-            "    return orig(repo, files, declared)\n"
-            "query._docs = spy\n"
-            "import extract\n"
-            "repo = pathlib.Path('.').resolve()\n"
-            "d = query.cache_dir(repo)\n"
-            "query.build_cache(repo, d, *extract.corpus_inputs(repo, include_untracked=True))\n"
-            "print('during=%s after=%s' % (seen.get('during'), (d / query.BUILD_MARKER).exists()))\n",
-            encoding="utf-8", newline="\n")
-        proc = run(root, kitdir, script="_markerprobe.py")
-        assert proc.returncode == 0, proc.stderr
-        assert "during=True" in proc.stdout, \
-            "no marker while the build was READING — the unprotected phase is back: " + proc.stdout
-        assert "after=False" in proc.stdout, \
-            "the marker outlived the build; every later eviction pass would skip this cache: " + proc.stdout
-        return proc.stdout.strip()
+        assert run(root, kitdir, *Q).returncode == 0
+        idx = resolve_index_file(root)
+        assert idx.is_file(), f"no index file at {idx.as_posix()}"
+        with idx.open("r+b") as fh:
+            fh.write(b"\0" * 16)  # the leading SQLite header: a zero-byte file opens as an empty database
+        proc = run(root, kitdir, *Q)
+        assert proc.returncode == 2, f"exit {proc.returncode}, want 2:\n{proc.stdout}{proc.stderr}"
+        assert idx.as_posix() in proc.stderr, f"the refusal does not name the file:\n{proc.stderr}"
+        assert "removing it" in proc.stderr, f"the refusal does not name the remedy:\n{proc.stderr}"
+        assert "Traceback" not in proc.stderr, proc.stderr
+        assert idx.is_file(), "the query deleted the shared index file"
+        return "exit 2 naming the file and its removal; the file is still there"
     finally:
         cleanup(root)
 
 
-@check("a build in flight survives, in every phase the mtime test cannot see")
-def test_budget_build_in_flight():
-    """THE STATE TABLE. The mtime predicate is True only from the first new database byte until the
-    manifest is replaced. Measured phase-by-phase against a real rebuild, it is FALSE during
-    extraction (31% of the build), FALSE in the window where _write_set has unlinked a database and
-    not yet recreated it, and FALSE for the whole build on a filesystem whose mtime granularity puts
-    the rebuild inside the previous manifest's tick. A concurrent reproduction killed a sibling's
-    build with `unable to open database file`.
-
-    Each survivor is asserted ALONGSIDE an eviction that DID happen, so none of them is true merely
-    because the tree was under budget.
-    """
-    root, kitdir = make_repo(conf=_budget_conf("0.3"))
-    try:
-        run(root, kitdir, *Q)
-        caches = cache_of(root).parent
-        old = _sib(caches, "oldest", kb=300, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
-        # extraction: dbs are the PREVIOUS build's, older than the manifest, marker fresh
-        extracting = _sib(caches, "extracting", kb=100, built_at="2019-01-01T00:00:00+00:00",
-                          worktree=str(root), marker_age=0.0)
-        # the unlink window: a manifest certifying record counts for a database that is not there
-        unlinked = _sib(caches, "unlinked", kb=100, built_at="2019-02-01T00:00:00+00:00",
-                        worktree=str(root), marker_age=0.0, db_absent=True)
-        proc = run(root, kitdir, *Q, "--rebuild")
-        assert proc.returncode == 0, proc.stderr
-        assert not old.exists(), "the pass did not run: nothing was evicted on an over-budget tree"
-        assert extracting.exists(), "a cache MID-EXTRACTION was evicted (the mtime test cannot see it)"
-        assert unlinked.exists(), "a cache with its database unlinked mid-write was evicted"
-        return "extraction and unlink windows both survive while the oldest evictable cache goes"
-    finally:
-        cleanup(root)
-
-
-@check("an ABANDONED build stops protecting its directory")
-def test_budget_marker_ttl():
-    """Without a TTL a killed builder's marker would protect that directory forever, and the budget
-    would quietly stop being a budget. The two siblings differ ONLY in marker age."""
-    root, kitdir = make_repo(conf=_budget_conf("0.3"))
-    try:
-        run(root, kitdir, *Q)
-        caches = cache_of(root).parent
-        stale = _sib(caches, "abandoned", kb=300, built_at="2020-01-01T00:00:00+00:00",
-                     worktree=str(root), marker_age=100000.0)
-        live = _sib(caches, "live", kb=100, built_at="2019-01-01T00:00:00+00:00",
-                    worktree=str(root), marker_age=0.0)
-        proc = run(root, kitdir, *Q, "--rebuild")
-        assert proc.returncode == 0, proc.stderr
-        assert not stale.exists(), "a marker past its TTL still protected an abandoned build"
-        assert live.exists(), "a FRESH marker did not protect a live build"
-        return "expired marker evicted, fresh marker kept — the TTL is the only difference"
-    finally:
-        cleanup(root)
-
-
-@check("an unsatisfiable budget reports the shortfall and deletes NOTHING")
-def test_budget_cannot_satisfy():
-    root, kitdir = make_repo(conf=_budget_conf("0.3"))
-    try:
-        run(root, kitdir, *Q)
-        caches = cache_of(root).parent
-        old = _sib(caches, "oldest", kb=100, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
-        huge = _sib(caches, "ageless-huge", kb=800, worktree=str(root))   # protected, and the bulk
-        proc = run(root, kitdir, *Q, "--rebuild")
-        assert proc.returncode == 0, proc.stderr
-        assert old.exists(), "an unsatisfiable budget still deleted an evictable cache"
-        assert huge.exists(), "an unsatisfiable budget reached past a protected cache"
-        assert "cannot be brought under it" in proc.stderr, "the shortfall was not reported"
-        assert "Nothing was deleted" in proc.stderr, "the report does not say the tree was left alone"
-        return "shortfall reported, tree untouched"
-    finally:
-        cleanup(root)
-
-
-@check("a build that starts AFTER the plan is made is not deleted by it")
-def test_budget_recheck_before_delete():
-    """THE DELETION-TIME RE-CHECK, actually reached.
-
-    The first cut planted the marker before the run, which excludes the directory at the CANDIDATE
-    FILTER — so it never entered the plan, the deletion loop never saw it, and deleting the re-check
-    entirely left the arm green. That is the branch this arm exists for, covering nothing.
-
-    The race cannot be produced from a fixture (it needs a sibling to start building between the
-    snapshot and the loop, sub-millisecond apart), so this drives `evict_over_budget` IN PROCESS with
-    a `_mid_build` that answers the way a real racer would: False when the plan is made, True by the
-    time the deletion loop asks.
-    """
-    root, kitdir = make_repo(conf=_budget_conf("0.4"))
-    try:
-        run(root, kitdir, *Q)
-        caches = cache_of(root).parent
-        _sib(caches, "racer", kb=400, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
-        probe = kitdir / "_raceprobe.py"
-        probe.write_text(
-            "import pathlib, sys\n"
-            "sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))\n"
-            "import query\n"
-            "repo = pathlib.Path('.').resolve()\n"
-            "keep = query.cache_dir(repo)\n"
-            "target = keep.parent / 'racer'\n"
-            "calls = {}\n"
-            "def racing(d):\n"
-            "    if d != target:\n"
-            "        return False\n"
-            "    calls[d] = calls.get(d, 0) + 1\n"
-            "    return calls[d] > 1   # not building when the plan is made; building when it is deleted\n"
-            "query._mid_build = racing\n"
-            "for line in query.evict_over_budget(keep, 0.4):\n"
-            "    print(line)\n"
-            "print('survived=%s calls=%s' % (target.exists(), calls.get(target, 0)))\n",
-            encoding="utf-8", newline="\n")
-        proc = run(root, kitdir, script="_raceprobe.py")
-        assert proc.returncode == 0, proc.stderr
-        assert "calls=2" in proc.stdout, \
-            "_mid_build was asked once, not twice — the deletion loop does not re-check: " + proc.stdout
-        assert "survived=True" in proc.stdout, \
-            "a cache that started building after the plan was made was deleted anyway: " + proc.stdout
-        assert "did NOT evict" in proc.stdout, \
-            "the skip was silent; a cache that survives for a reason must say the reason: " + proc.stdout
-        return proc.stdout.strip().splitlines()[-1]
-    finally:
-        cleanup(root)
-
-
-@check("a blank RECALL_CACHE_BUDGET_MB runs no size-based eviction at all")
-def test_budget_blank():
-    root, kitdir = make_repo(conf=_budget_conf(""))
-    try:
-        run(root, kitdir, *Q)
-        caches = cache_of(root).parent
-        old = _sib(caches, "oldest", kb=900, built_at="2020-01-01T00:00:00+00:00", worktree=str(root))
-        proc = run(root, kitdir, *Q, "--rebuild")
-        assert proc.returncode == 0, proc.stderr
-        assert old.exists(), "a blank budget still evicted by size"
-        assert "least-recently-queried" not in proc.stderr, "the size pass ran with a blank budget"
-        # ...and the SAME tree under a real budget does evict it, so the arm above is not passing
-        # because the fixture is under budget anyway.
-        (root / ".memory-tree.conf").write_text(_budget_conf("0.4"), encoding="utf-8", newline="\n")
-        proc2 = run(root, kitdir, *Q, "--rebuild")
-        assert not old.exists(), "the same tree under a real budget did not evict — the blank arm is vacuous"
-        assert "least-recently-queried" in proc2.stderr
-        return "blank = uncapped, and the same tree evicts once a budget is set"
-    finally:
-        cleanup(root)
-
-
-# ------------------------------------------ last-query order and husk worktrees (TOOL-aMendedFleet-32)
-
-
-@check("the cache budget evicts least-recently-QUERIED first: an old build in use outlives an idle one")
-def test_budget_orders_by_last_query():
-    """Three LIVE siblings built A, B, C oldest first, last queried A newest. Build order alone
-    evicts A, the one in use; the last-query order evicts B and names its last query."""
-    root, kitdir = make_repo(conf=_budget_conf("0.4"))
-    try:
-        run(root, kitdir, *Q)
-        caches = cache_of(root).parent
-        # A live worktree is a directory holding a `.git` entry. Under the fixture's own .git, so
-        # cleanup(root) takes them and no corpus walk ever sees them.
-        trees = {}
-        for n in "ABC":
-            t = git_common_dir(root) / "wt" / n
-            t.mkdir(parents=True)
-            (t / ".git").write_text("gitdir: nowhere\n", encoding="utf-8")
-            trees[n] = str(t)
-        sib = {n: _sib(caches, n, kb=150, built_at=f"2020-0{i}-01T00:00:00+00:00", worktree=trees[n])
-               for i, n in enumerate("ABC", 1)}
-        rows = (("A", "2022-01-01T00:00:00+00:00"), ("B", "2020-06-01T00:00:00+00:00"),
-                ("C", "2021-01-01T00:00:00+00:00"), ("A", "2020-07-01T00:00:00+00:00"))
-        log = git_common_dir(root) / "recall" / "queries.jsonl"
-        with log.open("a", encoding="utf-8", newline="\n") as fh:
-            for n, at in rows:
-                fh.write(json.dumps({"type": "query", "at": at, "worktree": trees[n]}) + "\n")
-        proc = run(root, kitdir, *Q, "--rebuild")
-        assert proc.returncode == 0, proc.stderr
-        assert sib["A"].exists(), "A, built first and queried last, was evicted: build order still rules"
-        assert not sib["B"].exists(), "B, the least-recently-queried cache, survived an over-budget run"
-        assert sib["C"].exists(), "eviction did not STOP once the tree was under budget"
-        assert "last query 2020-06-01" in proc.stderr, "the line does not name B's last query"
-        return "A kept on its last query, B evicted and named by it, C kept"
-    finally:
-        cleanup(root)
-
-
-@check("cache eviction: a husk worktree (exists, no .git) goes with a vanished one; a live one stays")
-def test_eviction_husk():
+@check("a repository with no commit refuses with exit 2 naming the first commit, never the index's removal")
+def test_unborn_head_refuses():
+    """AC5's second half. `load_view` reads the HEAD tree, and an unborn HEAD has none: read as a
+    corrupt index, the refusal would send the caller to delete a shared file that is not the fault.
+    The kits and one record stay, untracked, in a fresh `git init`."""
     root, kitdir = make_repo()
     try:
-        run(root, kitdir, *Q)
-        caches = cache_of(root).parent
-        husk = git_common_dir(root) / "husk"
-        husk.mkdir()
-        gone = _sib(caches, "gone", kb=1, worktree=str(root / "no" / "such" / "tree"))
-        hsk = _sib(caches, "husk", kb=1, worktree=str(husk))
-        live = _sib(caches, "live", kb=1, worktree=str(root))
-        proc = run(root, kitdir, *Q, "--rebuild")
-        assert proc.returncode == 0, proc.stderr
-        assert not gone.exists(), "a cache for a vanished worktree survived"
-        assert not hsk.exists(), "a cache for an empty husk worktree survived"
-        assert live.exists(), "a cache for a LIVE worktree was evicted"
-        assert str(husk) in proc.stderr, "the husk eviction was silent"
-        return "vanished and husk evicted and reported, live kept"
+        key = 'onexc' if sys.version_info >= (3, 12) else 'onerror'
+        shutil.rmtree(root / ".git", **{key: _set_writable})
+        subprocess.run(["git", "-c", "init.defaultBranch=main", "init", "-q", str(root)],
+                       check=True, capture_output=True)
+        proc = run(root, kitdir, *Q)
+        assert proc.returncode == 2, f"exit {proc.returncode}, want 2:\n{proc.stdout}{proc.stderr}"
+        assert "first commit" in proc.stderr, f"the refusal does not name the missing commit:\n{proc.stderr}"
+        assert "remov" not in proc.stderr, f"an unborn HEAD read as a corrupt index:\n{proc.stderr}"
+        assert "Traceback" not in proc.stderr, proc.stderr
+        return "exit 2 naming the first commit, and no removal remedy"
     finally:
         cleanup(root)
 
 
-@check("load_last_queries keeps each worktree's newest query row; an empty map is built_at order")
-def test_last_queries_and_empty_log():
-    scratch = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-lq-")).resolve()
+@check("two tag-index resets drop recall's FTS5 tables whole, and the query between them re-extracts")
+def test_two_resets_over_recall_tables():
+    """AC8. `gov_tag.py --rebuild` resets the shared file in place. A drop list read once names an
+    FTS5 table's shadow tables after the table's own drop removed them, so the reset refused and
+    every later reset refused the same way."""
+    import extract as E
+    root, kitdir = make_repo()
+    gov_tag = root / E.resolve_kit_dir("playbook", "tag_index.py", KIT).name / "gov_tag.py"
+
+    def run_reset_and_list():
+        p = subprocess.run([sys.executable, str(gov_tag), "--rebuild"], cwd=str(root),
+                           capture_output=True, text=True, encoding="utf-8")
+        assert p.returncode == 0, f"--rebuild exited {p.returncode}:\n{p.stdout}{p.stderr}"
+        import sqlite3
+        con = sqlite3.connect(str(resolve_index_file(root)))
+        try:
+            return [n for (n,) in con.execute("SELECT name FROM sqlite_master WHERE name LIKE 'fts_%'")]
+        finally:
+            con.close()
+
     try:
-        log = scratch / "queries.jsonl"
-        rows = ({"type": "query", "at": "2021-01-01T00:00:00+00:00", "worktree": "W"},
-                {"type": "opened", "at": "2023-01-01T00:00:00+00:00", "worktree": "W"},
-                {"type": "query", "at": "2020-01-01T00:00:00+00:00", "worktree": "W"})
-        log.write_text("{not json\n" + "".join(json.dumps(r) + "\n" for r in rows),
-                       encoding="utf-8", newline="\n")
-        got = query.load_last_queries(log)
-        assert got == {"W": "2021-01-01T00:00:00+00:00"}, f"wrong map: {got}"
-        assert query.load_last_queries(scratch / "absent.jsonl") == {}, "an absent log is not empty"
-        caches = scratch / "cache"
-        keep = caches / "keep"
-        keep.mkdir(parents=True)
-        old = _sib(caches, "old", kb=300, built_at="2020-01-01T00:00:00+00:00", worktree="X")
-        new = _sib(caches, "new", kb=100, built_at="2021-01-01T00:00:00+00:00", worktree="Y")
-        out = query.evict_over_budget(keep, 0.3, {})
-        assert not old.exists() and new.exists(), f"an empty map left built_at order: {out}"
-        assert any("last query never" in line for line in out), f"no `never` in {out}"
-        return "newest query row kept, opened and malformed skipped, absent log empty, empty map = built_at"
+        assert index_of(run(root, kitdir, *Q))[2] > 0, "the first query extracted nothing"
+        left = run_reset_and_list()
+        assert not left, f"the first reset left recall's tables: {left}"
+        between = index_of(run(root, kitdir, *Q))
+        assert between[2] > 0 and between[0] == 2, f"the query after a reset did not re-extract: {between}"
+        left = run_reset_and_list()
+        assert not left, f"the second reset left recall's tables: {left}"
+        return f"two resets exit 0 with no fts_ table left; the query between extracted {between[2]}"
     finally:
-        cleanup(scratch)
+        cleanup(root)
 
 
 def copy_extra(kitdir: pathlib.Path, *names: str) -> None:
@@ -1877,15 +1657,15 @@ def test_declared_sources_reach_the_corpus():
         'WIDGET_CEILING="4242"\n', encoding="utf-8", newline="\n")
     try:
         base = index_of(run(root, kitdir, *Q))
-        assert base[2] == "rebuilt", base
+        assert base[2] > 0, base
         conf.write_text(CONF + '\nRECALL_EXTRA_SOURCES="extra.conf"\n', encoding="utf-8", newline="\n")
         wide = index_of(run(root, kitdir, *Q))
-        assert wide[2] == "rebuilt", f"declaring a source did not invalidate the cache: {wide}"
+        assert wide[2] > 0, f"declaring a source re-extracted nothing: {wide}"
         assert wide[1] > base[1], f"chunks did not grow: {base[1]} -> {wide[1]}"
         assert wide[0] == base[0], f"records MOVED; declarations must be chunks only: {wide[0]}"
         conf.write_text(CONF, encoding="utf-8", newline="\n")
         back = index_of(run(root, kitdir, *Q))
-        assert back[2] == "rebuilt", f"un-declaring did not invalidate the cache: {back}"
+        assert back[2] > 0, f"un-declaring re-extracted nothing: {back}"
         assert back[1] == base[1], f"the corpus did not return to its pre-widening size: {back[1]}"
         return f"chunks {base[1]} -> {wide[1]} -> {back[1]}, records held at {base[0]}"
     finally:
@@ -1905,7 +1685,7 @@ def test_declared_source_absent_is_skipped():
                         encoding="utf-8", newline="\n")
         proc = run(root, kitdir, *Q)
         got = index_of(proc)
-        assert got[2] in ("rebuilt", "cached"), got
+        assert proc.returncode == 0, proc.stderr
         # The skip goes to STDERR: it is a diagnostic about the corpus, not part of an answer.
         assert "absent, skipped" in proc.stderr, f"the skip was silent: {proc.stderr[:400]}"
         return f"index built with an absent declared source ({got[1]} chunks)"
@@ -2170,8 +1950,9 @@ def test_full_at_k_counts_targets_not_documents():
 
 @check("bench: FTS5 punctuation is query SYNTAX — a hostile question is a miss, never a crash")
 def test_fts_query_safety():
+    import sqlite3
     import bench as B
-    db = B.build_index([
+    db = B.build_fts_rows(sqlite3.connect(":memory:"), "d", [
         {"id": "TOOL-1", "path": "a.md", "text": 'a missing "use client" directive breaks it'},
         {"id": "TOOL-2", "path": "b.md", "text": "unrelated content about pagination"},
     ])
@@ -2189,16 +1970,18 @@ def test_alias_column_is_separate_and_downweighted():
     to inline at every k. What the column buys is an independent WEIGHT, and the sweep put the
     useful range well below 1.0: at 1.0 the layer costs r@10 a point, at 16.0 it costs six.
     """
+    import sqlite3
     import bench as B
     assert 0 < B.ALIAS_WEIGHT < 1.0, f"alias weight {B.ALIAS_WEIGHT} outside measured-good range"
     docs = [
         {"id": "TOOL-1", "path": "a.md", "text": "sanitize at every write path"},
         {"id": "TOOL-2", "path": "b.md", "text": "unrelated pagination content"},
     ]
-    assert B.run_fts(B.build_index(docs), "sanitize write path", 5, False) == [0]
+    assert B.run_fts(B.build_fts_rows(sqlite3.connect(":memory:"), "d", docs), "sanitize write path", 5,
+                     False) == [0]
     # the same corpus with an alias block must still retrieve, now also by the bridge text
     docs[1] = {**docs[1], "alias": "why does my saved markup come back mangled"}
-    db2 = B.build_index(docs)
+    db2 = B.build_fts_rows(sqlite3.connect(":memory:"), "d", docs)
     assert 1 in B.run_fts(db2, "saved markup mangled", 5, False), "alias column is not searchable"
     assert B.run_fts(db2, "sanitize write path", 5, False)[0] == 0, "alias displaced a body hit"
     return f"ALIAS_WEIGHT={B.ALIAS_WEIGHT}, searchable, and it does not displace a body hit"
@@ -2245,6 +2028,7 @@ def test_substrate_dispatch_is_total():
 
 @check("bench: rollup keeps ONE chunk per parent, and a chunk with no record rolls up to its file")
 def test_rollup_dedupes_by_parent():
+    import sqlite3
     import bench as B
     docs = [
         {"path": "a.md", "rec": "TOOL-1", "text": "alpha beta"},
@@ -2254,27 +2038,32 @@ def test_rollup_dedupes_by_parent():
     ]
     assert B.parent_of(docs[0]) == "TOOL-1"
     assert B.parent_of(docs[3]) == "b.md", "a chunk with no record must roll up to its file"
-    rolled = B.run_rollup(B.build_index(docs), docs, "alpha", 4)
+    rolled = B.run_rollup(B.build_fts_rows(sqlite3.connect(":memory:"), "d", docs), docs, "alpha", 4)
     parents = [B.parent_of(docs[i]) for i in rolled]
     assert len(parents) == len(set(parents)), f"rollup returned duplicate parents: {parents}"
     assert len(parents) == 3, f"expected 3 distinct parents, got {parents}"
     return "4 chunks, 3 distinct parents"
 
 
-@check("bench.build_index still defaults db_path to ':memory:' for its benchmark callers")
-def test_build_index_default_stays_in_memory():
-    """`query.py` gave `build_index` a `db_path`; benchmark callers must keep `:memory:`.
-
-    If the default ever changes, every bench/union run starts writing a file somewhere and the
-    measured numbers silently start describing a different thing. Asserted on the SIGNATURE, not on
-    behaviour, because a behavioural test would pass on a default of "some other in-memory name".
-    """
+@check("bench.build_fts_rows writes on the connection it is handed, a fresh table numbered from 0")
+def test_fts_rows_number_from_zero_on_the_handed_connection():
+    """Every benchmark substrate reads a hit back as an index into its `docs` list, so a fresh table
+    must number its rows 0..n-1 in order, on the connection the caller handed -- an in-memory one for
+    every bench and union run. A second call appends after the highest rowid, which is how the
+    shared index's tables take one pair's rows after another's (TOOL-dTotalRecall-21 S1), and the
+    `id` column folds a chunk's `rec` in, the key `query.run_rollup` reads."""
+    import sqlite3
     import bench as B
-    sig = inspect.signature(B.build_index)
-    assert sig.parameters["db_path"].default == ":memory:", (
-        f"build_index db_path default is {sig.parameters['db_path'].default!r}, must be ':memory:'"
-    )
-    return "signature default held at ':memory:'"
+    con = sqlite3.connect(":memory:")
+    docs = [{"id": "TOOL-1", "path": "a.md", "line": 3, "text": "alpha"},
+            {"rec": "TOOL-2", "path": "a.md", "line": 9, "text": "alpha beta"}]
+    assert B.build_fts_rows(con, "d", docs) is con, "the builder did not return the connection it was handed"
+    assert [r for (r,) in con.execute("SELECT rowid FROM d ORDER BY rowid")] == [0, 1]
+    B.build_fts_rows(con, "d", docs[:1], path="b.md", blob="b1", digest="g1")
+    rows = con.execute("SELECT rowid, path, blob, digest, id, line FROM d ORDER BY rowid").fetchall()
+    assert rows == [(0, "a.md", "", "", "TOOL-1", 3), (1, "a.md", "", "", "TOOL-2", 9),
+                    (2, "b.md", "b1", "g1", "TOOL-1", 3)], rows
+    return "rowids 0, 1 then 2 on the handed connection; the key columns and the rec fold held"
 
 
 @check("query_expr refuses an all-stopword question and phrases an id adjacently")
@@ -2752,17 +2541,16 @@ def test_alias_join_reaches_the_query_index():
     """End to end through the CLI's OWN index — the half a recall floor cannot see.
 
     Under a `records:` pin `check-recall.py` grades a SUBPROCESS of `extract.py` (the `served:` pin
-    builds through `query.build_cache` and does reach the join). `query.py` never runs that entry point
-    and never reads its output dir: it re-extracts in process and indexes that. So every recall
-    floor stays green with the query-side join deleted, and the shipped product indexes an empty
-    alias column. The search expression is built ONLY from alias vocabulary that appears nowhere in
-    the record body, so a body hit cannot fake it.
+    reads `query.load_served_set`'s rows and does reach the join). `query.py` never runs that entry
+    point and never reads its output dir: it re-extracts per (path, blob) pair and writes the rows.
+    So every recall floor stays green with the query-side join deleted, and the shipped product
+    indexes an empty alias column. The question and terms are built ONLY from alias vocabulary
+    that appears nowhere in the record body, so a body hit cannot fake it; the fixture's own kit
+    runs it, its alias file beside it, so this tree's query log is never touched.
 
-    Mutation: delete the `join_aliases` call in `query._docs` -> this reds while the two arms
-    either side of it stay green.
+    Mutation: delete the `join_aliases` call in `query.write_recall_rows` -> this reds while the
+    two arms either side of it stay green.
     """
-    import extract as E
-    import query as QRY
     rel = f"{resolve_memory_root()}/tooling/NOTE2.md"
     body = "the latch closes on flush"
     # Every probe word is in the alias block and in NOTHING the record itself indexes — not the
@@ -2773,24 +2561,18 @@ def test_alias_join_reaches_the_query_index():
     assert all(w not in f"{body} {rel} TOOL-777".lower() for w in probe.split()), probe
     assert all(any(w in q for q in ALIAS_Q) for w in probe.split()), probe
 
-    root, _ = make_repo()
+    root, kitdir = make_repo()
     try:
         (root / rel).write_text(
             f"# Note\n\n## TOOL-777 — the aliased record\n\n{body}\n",
             encoding="utf-8", newline="\n",
         )
-        orig = E.ALIASES_DEFAULT
-        try:
-            E.ALIASES_DEFAULT = write_alias_fixture(root)
-            dirp, _, _ = QRY.ensure_cache(root, force=True)
-            expr = QRY.query_expr(probe)
-            assert expr
-            hits = QRY.search(dirp, "records", expr, 10)
-        finally:
-            E.ALIASES_DEFAULT = orig
-        assert any(h["id"] == "TOOL-777" for h in hits), (
-            "the query index carries no alias column — the CLI ships without the layer, "
-            f"got {[h['id'] for h in hits]}")
+        shutil.copyfile(write_alias_fixture(root), kitdir / "aliases.json")
+        proc = run(root, kitdir, probe, "--terms", probe)
+        assert proc.returncode == 0, proc.stderr
+        hits = [ln for ln in proc.stdout.splitlines() if re.match(r"^\[\d+\] ", ln)]
+        assert any("TOOL-777 · " in ln for ln in hits), (
+            f"the query index carries no alias column — the CLI ships without the layer, got {hits}")
         return "a query built only from bridge vocabulary reached the aliased record"
     finally:
         cleanup(root)
@@ -2882,7 +2664,6 @@ def test_repo_root_linked_worktree():
     wt = root.parent / (root.name + "-wt")
     try:
         git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t"]
-        subprocess.run([*git, "commit", "-qm", "seed"], check=True, capture_output=True)
         subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
         gitdir = subprocess.run(
             ["git", "-C", str(wt), "rev-parse", "--absolute-git-dir"],
@@ -3367,7 +3148,6 @@ def test_used_joins_answers_to_the_next_commit():
         assert p.returncode == 2 and log.as_posix() in p.stderr, (
             f"an absent log did not exit 2 naming {log.as_posix()}: {p.returncode} {p.stderr}")
         git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t"]
-        subprocess.run([*git, "commit", "-qm", "seed"], check=True, capture_output=True)
         subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
         log.parent.mkdir(parents=True, exist_ok=True)
         gone = root.parent / (root.name + "-gone")
@@ -3417,7 +3197,6 @@ def run_used_after_worktree_removed(twin: bool):
     wt = root.parent / (root.name + "-wt")
     try:
         git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t"]
-        subprocess.run([*git, "commit", "-qm", "seed"], check=True, capture_output=True)
         subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
         head = query.read_worktree_head(wt)
         log = git_common_dir(root) / "recall" / "queries.jsonl"
@@ -3741,12 +3520,11 @@ def main() -> int:
         test_empty_spine_is_loud,
         test_zero_records_is_loud, test_empty_corpus_names_memory_root,
         test_conf_digest_both_directions, test_digest_covers_grammar_epoch, test_writes_nothing_in_worktree,
-        test_alias_rebuild, test_dead_alias_is_loud, test_eviction, test_printed_invocations_resolve,
-        test_budget_lru, test_budget_protections, test_build_marker_lifecycle,
-        test_budget_build_in_flight, test_budget_marker_ttl,
-        test_budget_cannot_satisfy, test_budget_recheck_before_delete, test_budget_blank,
-        # TOOL-aMendedFleet-32: last-query order, husk worktrees, the log reader
-        test_budget_orders_by_last_query, test_eviction_husk, test_last_queries_and_empty_log,
+        test_alias_rebuild, test_dead_alias_is_loud,
+        # TOOL-dTotalRecall-21: the index rows replace the cache, its eviction and its budget
+        test_one_edit_extracts_one_pair, test_untracked_pair_stays_in_its_worktree,
+        test_corrupt_index_refuses_and_survives, test_two_resets_over_recall_tables,
+        test_printed_invocations_resolve,
         test_python3_only,
         test_scaffold_converges, test_skill_drift_reds, test_crlf_working_copy_is_not_drift,
         test_skill_description_invariants, test_hook_test,
@@ -3759,7 +3537,7 @@ def main() -> int:
         test_chunk_matching, test_scoring, test_full_at_k_counts_targets_not_documents,
         test_fts_query_safety, test_alias_column_is_separate_and_downweighted,
         test_ensemble_arg_grammar, test_substrate_dispatch_is_total, test_rollup_dedupes_by_parent,
-        test_build_index_default_stays_in_memory, test_query_expr_refuses_empty_and_phrases_ids,
+        test_fts_rows_number_from_zero_on_the_handed_connection, test_query_expr_refuses_empty_and_phrases_ids,
         test_rrf_is_rank_based_not_score_based, test_rrf_key_separates_two_windows_of_one_section,
         test_budget_bounds_emission_and_beats_full_documents,
         test_snippet_share_bounds_the_head_and_pointers_keep_the_rest,

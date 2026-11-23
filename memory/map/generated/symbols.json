@@ -678,6 +678,11 @@
       "file": "tools/loop/loop_transition.py"
     },
     {
+      "id": "UnbornHeadError",
+      "kind": "class",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
       "id": "Unit",
       "kind": "class",
       "file": "tools/playbook/instruction_units.py"
@@ -2888,11 +2893,6 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
-      "id": "build_cache",
-      "kind": "function",
-      "file": "tools/memory-recall/query.py"
-    },
-    {
       "id": "build_cap_repo",
       "kind": "function",
       "file": "tools/check-template-size.test.sh"
@@ -3323,6 +3323,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_fts_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
       "id": "build_gaps_fixture",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -3506,11 +3511,6 @@
       "id": "build_ih_policy",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
-    },
-    {
-      "id": "build_index",
-      "kind": "function",
-      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "build_index",
@@ -4318,9 +4318,9 @@
       "file": "tools/runlog/selftest.py"
     },
     {
-      "id": "build_served_dir",
+      "id": "build_served_fixture",
       "kind": "function",
-      "file": "tools/memory-recall/check-recall.py"
+      "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
       "id": "build_session_events",
@@ -4756,16 +4756,6 @@
       "id": "c6run",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
-    },
-    {
-      "id": "cache_dir",
-      "kind": "function",
-      "file": "tools/memory-recall/query.py"
-    },
-    {
-      "id": "cache_of",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "canonical_ctx",
@@ -6226,11 +6216,6 @@
       "id": "check_cutoff_value",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
-    },
-    {
-      "id": "check_dead_worktree",
-      "kind": "function",
-      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "check_deadline_passed",
@@ -10885,11 +10870,6 @@
     {
       "id": "common_git_dir",
       "kind": "function",
-      "file": "tools/memory-recall/query.py"
-    },
-    {
-      "id": "common_git_dir",
-      "kind": "function",
       "file": "tools/memory-tree/record_kinds.py"
     },
     {
@@ -10976,11 +10956,6 @@
       "id": "core_of",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
-    },
-    {
-      "id": "corpus_digest",
-      "kind": "function",
-      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "corpus_files",
@@ -11720,7 +11695,7 @@
     {
       "id": "derive_bullet_placeholders",
       "kind": "function",
-      "file": "tools/govkit/matrix.py"
+      "file": "tools/govkit/fixture_target.py"
     },
     {
       "id": "derive_byte_cut",
@@ -13863,6 +13838,11 @@
       "file": "tools/runlog/extract.py"
     },
     {
+      "id": "derive_recall_digest",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
       "id": "derive_recall_export_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -14606,6 +14586,16 @@
       "id": "derive_self_rel",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "derive_served_pairs",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "derive_served_supersessions",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "derive_serves",
@@ -15488,11 +15478,6 @@
       "file": "tools/memory-tree/transition-audit.test.sh"
     },
     {
-      "id": "ensure_cache",
-      "kind": "function",
-      "file": "tools/memory-recall/query.py"
-    },
-    {
       "id": "entry_members",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -15516,16 +15501,6 @@
       "id": "eol_population",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "evict_dead_siblings",
-      "kind": "function",
-      "file": "tools/memory-recall/query.py"
-    },
-    {
-      "id": "evict_over_budget",
-      "kind": "function",
-      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "exempt_leg",
@@ -17248,6 +17223,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "load_index_file",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
       "id": "load_kit_conf",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -17256,11 +17236,6 @@
       "id": "load_kit_module",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
-    },
-    {
-      "id": "load_last_queries",
-      "kind": "function",
-      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "load_ledger",
@@ -17458,6 +17433,16 @@
       "file": "tools/codebase-map/rank_harness.py"
     },
     {
+      "id": "load_served_index",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "load_served_set",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
       "id": "load_session_calls",
       "kind": "function",
       "file": "tools/roles/handoff.py"
@@ -17541,6 +17526,11 @@
       "id": "load_steps",
       "kind": "function",
       "file": "tools/govkit/steps/registry_to_ledger.py"
+    },
+    {
+      "id": "load_tag_index",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "load_text",
@@ -24685,11 +24675,6 @@
     {
       "id": "read_manifest",
       "kind": "function",
-      "file": "tools/memory-recall/query.py"
-    },
-    {
-      "id": "read_manifest",
-      "kind": "function",
       "file": "tools/run-gates/leg_factory.py"
     },
     {
@@ -26508,6 +26493,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_served_counts",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
       "id": "read_serves_ids",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -26961,6 +26951,11 @@
       "id": "read_state_listing",
       "kind": "function",
       "file": "tools/lib/extract_code.py"
+    },
+    {
+      "id": "read_stats",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "read_stderr_tail",
@@ -28748,6 +28743,11 @@
       "file": "tools/loop/claims.py"
     },
     {
+      "id": "remove_recall_pairs",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
       "id": "remove_red_ref",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
@@ -28871,6 +28871,11 @@
       "id": "remove_tree",
       "kind": "function",
       "file": "tools/unattended/fix_keeps.py"
+    },
+    {
+      "id": "remove_unheld_recall_rows",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "remove_unheld_rows",
@@ -29775,7 +29780,7 @@
     {
       "id": "render_deploy_tail",
       "kind": "function",
-      "file": "tools/govkit/matrix.py"
+      "file": "tools/govkit/fixture_target.py"
     },
     {
       "id": "render_dirt",
@@ -31831,6 +31836,11 @@
       "id": "resolve_index_command",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "resolve_index_file",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "resolve_index_generator",
@@ -40083,22 +40093,7 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
-      "id": "test_budget_blank",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
       "id": "test_budget_bounds_emission_and_beats_full_documents",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "test_budget_build_in_flight",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "test_budget_cannot_satisfy",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
@@ -40106,41 +40101,6 @@
       "id": "test_budget_cut_shows_first_and_names_the_rest",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "test_budget_lru",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "test_budget_marker_ttl",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "test_budget_orders_by_last_query",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "test_budget_protections",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "test_budget_recheck_before_delete",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "test_build_index_default_stays_in_memory",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "test_build_marker_lifecycle",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_build_qid_cutoff_is_read_from_conf",
@@ -40226,6 +40186,11 @@
       "id": "test_continuation_rows_are_rejected_and_counted",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_corrupt_index_refuses_and_survives",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_coverage_directions",
@@ -40438,16 +40403,6 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
-      "id": "test_eviction",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "test_eviction_husk",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
       "id": "test_evidence_globs_exclude_test_templates",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -40633,6 +40588,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_fts_rows_number_from_zero_on_the_handed_connection",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_full_at_k_counts_targets_not_documents",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -40796,11 +40756,6 @@
       "id": "test_lang_mode_ratchet",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
-    },
-    {
-      "id": "test_last_queries_and_empty_log",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_launch_failure",
@@ -41151,6 +41106,11 @@
       "id": "test_nostore",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
+      "id": "test_one_edit_extracts_one_pair",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_one_retirement_is_free",
@@ -41688,6 +41648,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "test_served_set_leaves_untracked_out",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "test_served_term_lists_refuse",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -42008,9 +41973,19 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "test_two_resets_over_recall_tables",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_unaddressable_row_is_reported_not_claimed",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_unborn_head_refuses",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_undeclared_file_stays_out",
@@ -42031,6 +42006,11 @@
       "id": "test_unreadable_input_is_not_a_clean_report",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_untracked_pair_stays_in_its_worktree",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_up_unrecorded",
@@ -44376,6 +44356,11 @@
       "id": "write_readers_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_recall_rows",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "write_receipt",

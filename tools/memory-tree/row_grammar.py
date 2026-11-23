@@ -74,6 +74,7 @@ are registered unseeded populations now (TOOL-dWitnessedBar-17 S2). Measurements
 """
 import os
 import re
+import sqlite3
 import subprocess
 import sys
 
@@ -919,7 +920,7 @@ def load_index_builder():
     except Exception as exc:  # noqa: BLE001 — a traceback here would be the finding
         raise Problem(f"row-grammar: check {RELATION_CHECK} could not import this kit's "
                       f"id_grammar.py from {here}: {type(exc).__name__}: {exc}") from None
-    missing = [n for n in ("build_index", "match_expr", "terms", "ALIAS_WEIGHT")
+    missing = [n for n in ("build_fts_rows", "match_expr", "terms", "ALIAS_WEIGHT")
                if not hasattr(id_grammar, n)]
     if missing:
         raise Problem(f"row-grammar: check {RELATION_CHECK} is armed by {RELATION_KEY}, but this "
@@ -931,11 +932,12 @@ def load_index_builder():
 def derive_relation_successors(root):
     """-> `{old id: [[new id, 'whole'|'partial'], ...]}`, the map `TOOL-aGraftedHelix-4` serves.
 
-    That unit's two functions and no third, called the way its cache builder in `query.py` calls
-    them: `extract_supersessions` over every file `id_grammar.corpus_inputs` lists, then one
-    `derive_supersession_map` with every anchored id as defined. Read directly rather than from the
-    query cache's manifest, because `query.ensure_cache` rebuilds that cache whenever the corpus
-    moved, and a hygiene leg must not write a shared cache as a side effect of grading.
+    That unit's two functions and no third, called the way `query.py`'s row writer calls them:
+    `extract_supersessions` over every file `id_grammar.corpus_inputs` lists, then one
+    `derive_supersession_map` with every anchored id as defined. Read directly rather than from
+    recall's rows in the shared tag index, because `query.load_served_set` writes those rows for any
+    pair it has not extracted, and a hygiene leg must not write a shared index as a side effect of
+    grading.
 
     `id_grammar` binds its default grammar to the repository this kit is INSTALLED in, which is the
     audited one on every real run (`grammar-bound-to-the-wrong-root`). The self-test's arms that
@@ -1196,8 +1198,9 @@ def check_relations(root, conf, base, gate, ig):
     stats = {"graded": len(added), "base": len(eligible), "near": 0, "satisfied": 0, "own": 0}
     if not added:
         return [], stats
-    db = ig.build_index([{"id": r["ident"] if r["kind"] == "row" else "", "path": r["path"],
-                             "text": r["summary"]} for r in recs])
+    db = ig.build_fts_rows(sqlite3.connect(":memory:"), "d", [
+        {"id": r["ident"] if r["kind"] == "row" else "", "path": r["path"], "text": r["summary"]}
+        for r in recs])
     tsets = [set(ig.terms(r["summary"])) for r in recs]
     pos = {id(r): i for i, r in enumerate(recs)}
     ok = {pos[id(r)] for r in eligible}
@@ -1310,8 +1313,9 @@ def cmd_measure_relations(root, conf, floor=None, base=None):
                     and "/" not in line[len(gdir):]:
                 times.setdefault(("gotcha", os.path.basename(line)[:-3]), cur)
     t = [times.get((r["kind"], r["ident"])) for r in recs]
-    db = ig.build_index([{"id": r["ident"] if r["kind"] == "row" else "", "path": r["path"],
-                             "text": r["summary"]} for r in recs])
+    db = ig.build_fts_rows(sqlite3.connect(":memory:"), "d", [
+        {"id": r["ident"] if r["kind"] == "row" else "", "path": r["path"], "text": r["summary"]}
+        for r in recs])
     tsets = [set(ig.terms(r["summary"])) for r in recs]
     pairs, graded, own, smap = [], 0, 0, None
     for i, r in enumerate(recs):
@@ -2663,7 +2667,7 @@ def cmd_selftest():
         with open(stub, "w", encoding="utf-8") as fh:
             fh.write("ALIAS_WEIGHT = 0.4\n")
         arm("check 27: an id_grammar.py that predates the index builder refuses by name",
-            "predates build_index, match_expr, terms", lambda: run_fixture(f2, "--check-relations", b2))
+            "predates build_fts_rows, match_expr, terms", lambda: run_fixture(f2, "--check-relations", b2))
         with open(stub, "w", encoding="utf-8") as fh:
             fh.write("raise RuntimeError('half-installed')\n")
         arm("check 27: an id_grammar.py that cannot be imported refuses by name",

@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-21 — memory-recall's FTS5 tables moved into the one index file, keyed by path and blob
 
-**Status:** INPROGRESS · rev-6 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-6 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0232@94a25816 whole
 
@@ -16,7 +16,10 @@
 | [2026-11-22-build-TOOL-dTotalRecall-21-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-21-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-21-2-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-21-2-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-21-3-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-21-3-builder-return.md) | journal | — |
+| [2026-11-22-build-TOOL-dTotalRecall-21-4-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dTotalRecall-21-4-acceptance-ledger.md) | log | — |
 | [2026-11-22-build-TOOL-dTotalRecall-21-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-21-reground-return.md) | research | — |
+| [2026-11-23-build-TOOL-dTotalRecall-21-deviation-1003.md](../build/2026-11-23-build-TOOL-dTotalRecall-21-deviation-1003.md) | deviation | — |
+| [2026-11-23-build-TOOL-dTotalRecall-21-deviation-1004.md](../build/2026-11-23-build-TOOL-dTotalRecall-21-deviation-1004.md) | deviation | — |
 | [2026-11-23-build-TOOL-dTotalRecall-21-divergence-2-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-21-divergence-2-return.md) | journal | — |
 | [2026-11-23-build-TOOL-dTotalRecall-21-divergence-3-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-21-divergence-3-return.md) | journal | — |
 | [2026-11-23-build-TOOL-dTotalRecall-21-divergence-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-21-divergence-return.md) | journal | — |

@@ -126,7 +126,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-10 — derived anchors suffixed for a repeated heading](spec/2026-10-26-spec-TOOL-dTotalRecall-10.md) | 15 | 2 | CLOSED | rev-3 | 2026-11-23 |
 | [TOOL-dTotalRecall-42 — the shape-run home is its id-rule's glob, a typed kind's unarmed reason sits on its row, and a record is graded only by the row its Serves kind names](spec/2026-10-26-spec-TOOL-dTotalRecall-42.md) | 15 | 2 | CLOSED | rev-4 | 2026-11-23 |
 | [TOOL-dTotalRecall-19 — every record names its cause: the door's header and edge lines, the causes and orphan checks over a legacy population](spec/2026-10-26-spec-TOOL-dTotalRecall-19.md) | 16 | 2 | CLOSED | rev-9 | 2026-11-23 |
-| [TOOL-dTotalRecall-21 — memory-recall's FTS5 tables moved into the one index file, keyed by path and blob](spec/2026-10-26-spec-TOOL-dTotalRecall-21.md) | 17 | 2 | INPROGRESS | rev-6 | 2026-11-23 |
+| [TOOL-dTotalRecall-21 — memory-recall's FTS5 tables moved into the one index file, keyed by path and blob](spec/2026-10-26-spec-TOOL-dTotalRecall-21.md) | 17 | 2 | CLOSED | rev-6 | 2026-11-23 |
 | [TOOL-dTotalRecall-36 — every code writer of a record writes its `Caused-by` line, so the causes check stays green on the records written after its seed](spec/2026-10-26-spec-TOOL-dTotalRecall-36.md) | 17 | 2 | INPROGRESS | rev-5 | 2026-11-23 |
 | [TOOL-dTotalRecall-39 — one record-header edge reader: the edge grammar's header site calls `tree_lib.read_header_edges` and defines none of its own](spec/2026-10-26-spec-TOOL-dTotalRecall-39.md) | 17 | 2 | DEFERRED | rev-3 | 2026-11-22 |
 | [TOOL-dTotalRecall-47 — the cause backfill is a verb run at the tip after the step-17 group, so no record written between the seed and the writers' change stays causeless](spec/2026-10-26-spec-TOOL-dTotalRecall-47.md) | 18 | 2 | DEFERRED | rev-3 | 2026-11-22 |
@@ -192,7 +192,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 574 bound to this build, across 4 record folder(s).
+Records: 577 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -300,11 +300,11 @@ Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 91 spec(s) at
 | the units | the units table above |
 | briefs | `2026-11-23-prompt-TOOL-dTotalRecall-36-fold-spec-writer.md`, `2026-11-23-prompt-TOOL-dTotalRecall-36-fold-brief.md` and 246 more under prompts/ |
 | reviews | `2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md` (CLEAN WITH FIXES), `2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md` (CLEAN WITH FIXES) and 7 more under reviews/ |
-| deviation | `2026-11-23-build-TOOL-dTotalRecall-19-deviation-1002.md`, `2026-11-22-build-TOOL-dTotalRecall-8-deviation-83.md` and 137 more under build/ |
+| deviation | `2026-11-23-build-TOOL-dTotalRecall-21-deviation-1004.md`, `2026-11-23-build-TOOL-dTotalRecall-21-deviation-1003.md` and 139 more under build/ |
 | red-fix | `2026-11-23-build-TOOL-dTotalRecall-19-red-fix-16.md`, `2026-11-23-build-TOOL-dTotalRecall-19-red-fix-15.md` and 14 more under build/ |
 | widen | `2026-11-22-build-TOOL-dTotalRecall-8-widen-1.md`, `2026-11-22-build-TOOL-dTotalRecall-7-widen-4.md` and 2 more under build/ |
 | research | `2026-11-23-build-TOOL-dTotalRecall-36-fold-return.md`, `2026-11-22-build-TOOL-dTotalRecall-9-reground-return.md` and 100 more under build/ |
-| logs | `2026-11-23-build-TOOL-dTotalRecall-21-divergence-return.md`, `2026-11-23-build-TOOL-dTotalRecall-21-divergence-3-return.md` and 54 more under build/ |
-| open asks | `BACKLOG.md`, 10 open |
+| logs | `2026-11-23-build-TOOL-dTotalRecall-21-divergence-return.md`, `2026-11-23-build-TOOL-dTotalRecall-21-divergence-3-return.md` and 55 more under build/ |
+| open asks | `BACKLOG.md`, 11 open |
 | card ref | `refs/gov/builds/dTotalRecall/card` |
 <!-- /gen:build-routes -->

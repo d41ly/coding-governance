@@ -78,7 +78,6 @@ if _GRAMMAR_KIT not in sys.path:
 
 from id_grammar import (  # noqa: E402,F401 — re-exported: every recall reader keeps its spelling
     CONF_NAME,
-    DEFAULT_CACHE_BUDGET_MB,
     NODE_TAG_CLASS,
     Conf,
     ConfError,

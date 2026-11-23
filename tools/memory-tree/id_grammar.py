@@ -129,23 +129,6 @@ def refusal(root: pathlib.Path, why: str) -> str:
 
 _FAMILY_RE = re.compile(r"^[A-Z][A-Z0-9]*$")
 
-# The default cache budget, in MB. Blank in the conf = uncapped; absent = this.
-DEFAULT_CACHE_BUDGET_MB = 512.0
-
-
-def _budget(raw: str | None) -> float | None:
-    """`RECALL_CACHE_BUDGET_MB` -> megabytes, or None for uncapped. Blank or unparseable is uncapped."""
-    if raw is None:
-        return DEFAULT_CACHE_BUDGET_MB
-    raw = raw.strip()
-    if not raw:
-        return None
-    try:
-        val = float(raw)
-    except ValueError:
-        return None
-    return val if val > 0 else None
-
 
 def derive_grammar_epoch() -> str:
     """The SHA-1 of THIS FILE's bytes, CRLF folded to LF, cut to 12: the grammar's own epoch.
@@ -161,11 +144,10 @@ def derive_grammar_epoch() -> str:
 class Conf:
     """The RESOLVED values every grammar and recall reader reads."""
 
-    __slots__ = ("root", "path", "memory_root", "families", "node_tag_class", "cache_budget_mb",
+    __slots__ = ("root", "path", "memory_root", "families", "node_tag_class",
                  "extra_sources", "cited_families", "build_qid_cutoff", "export_dir", "exclude")
 
     def __init__(self, root: pathlib.Path, memory_root: str, families: tuple[str, ...],
-                 cache_budget_mb: float | None = DEFAULT_CACHE_BUDGET_MB,
                  extra_sources: tuple[str, ...] = (), node_tag_class: str = NODE_TAG_CLASS,
                  cited_families: tuple[str, ...] = (),
                  build_qid_cutoff: dict[str, int] | None = None, export_dir: str | None = None,
@@ -180,8 +162,6 @@ class Conf:
         # Neither of these two changes which strings are ids, so neither is in digest().
         self.build_qid_cutoff = dict(build_qid_cutoff or {})
         self.export_dir = export_dir
-        # None = uncapped. Not part of digest(): a size limit is not a corpus input.
-        self.cache_budget_mb = cache_budget_mb
         # DECLARED extra corpus sources, repo-relative. Empty is the pre-widening corpus exactly.
         self.extra_sources = extra_sources
         # `RECALL_EXCLUDE`: repo-relative glob patterns the ONE corpus walk leaves out.
@@ -190,9 +170,9 @@ class Conf:
     def digest(self) -> str:
         """A hash of the RESOLVED values, not of the conf file's bytes.
 
-        The recall manifest keys freshness on this (query.ensure_cache) and the transition audit's
-        cache key folds it, so an id-grammar or corpus-root edit invalidates a warm cache. Hashing
-        the file's bytes instead would force a full rebuild for a comment edit.
+        Recall's row digest folds this (query.derive_recall_digest) and the transition audit's
+        cache key folds it, so an id-grammar or corpus-root edit re-extracts every served pair. Hashing
+        the file's bytes instead would force a full re-extraction for a comment edit.
 
         THE GRAMMAR'S EPOCH IS IN THE BLOB: the eras are the other half of the id grammar and live
         in this module's code, so a widening of an era reaches none of the project values. Measured
@@ -270,7 +250,7 @@ def resolve(root: pathlib.Path | None = None) -> Conf:
         if pathlib.PurePath(export_dir).is_absolute() or not dest.is_relative_to(base.resolve()):
             raise ConfError(refused.format("RECALL_EXPORT_DIR", export_dir,
                                            "a repo-relative directory inside the root"))
-    out = Conf(base, memory_root, families, _budget(conf.get("RECALL_CACHE_BUDGET_MB")),
+    out = Conf(base, memory_root, families,
                tuple(conf.get("RECALL_EXTRA_SOURCES", "").split()), tag_class, cited, cutoff,
                export_dir, tuple(conf.get("RECALL_EXCLUDE", "").split()))
     if root is None:
@@ -814,24 +794,43 @@ def terms(text: str) -> list[str]:
 ALIAS_WEIGHT = 0.4
 
 
-def build_index(
-    docs: list[dict], crumb: bool = False, db_path: str = ":memory:"
+_FTS_TABLE_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def build_fts_rows(
+    db: sqlite3.Connection, table: str, docs: list[dict], *, path: str = "", blob: str = "",
+    digest: str = "", crumb: bool = False,
 ) -> sqlite3.Connection:
-    """FTS5 index over three columns: ``head``, ``body`` and ``alias``.
+    """Write ``docs`` into the FTS5 table ``table`` on ``db``, creating it when absent; returns ``db``.
+
+    Three indexed columns, ``head``, ``body`` and ``alias``, then ``path``, ``blob``, ``digest``,
+    ``id`` and ``line`` UNINDEXED, so a row carries the (path, blob) pair and the extraction digest it
+    was written under (TOOL-dTotalRecall-21 S1): memory-recall's rows in the shared tag index are
+    joined to a worktree's served pairs by them, and a benchmark caller hands a
+    ``sqlite3.connect(":memory:")`` and the table ``d``. ``path`` defaults to each doc's own.
+
+    Rowids continue from the table's highest, so a fresh table numbers ``docs`` from 0 in order --
+    the index every benchmark substrate reads a hit back by.
 
     ``crumb=True`` folds each chunk's heading ancestry into the searchable head. ``alias`` is its OWN
     column rather than text concatenated onto the body, because BM25 divides by document length:
     appending alias text to a record cost it roughly a third of the weight of its own terms.
-    ``db_path`` defaults to ``":memory:"``; ``query.py`` passes a file so the CLI's cache is built by
-    the SAME builder the measurement uses.
     """
-    db = sqlite3.connect(db_path)
-    db.execute("CREATE VIRTUAL TABLE d USING fts5(head, body, alias, tokenize='unicode61')")
+    if not _FTS_TABLE_RE.match(table):
+        raise ValueError(f"build_fts_rows: {table!r} is not a table name")
+    db.execute(f"CREATE VIRTUAL TABLE IF NOT EXISTS {table} USING fts5(head, body, alias, "
+               "path UNINDEXED, blob UNINDEXED, digest UNINDEXED, id UNINDEXED, line UNINDEXED, "
+               "tokenize='unicode61')")
+    if not docs:
+        return db
+    top = db.execute(f"SELECT rowid FROM {table} ORDER BY rowid DESC LIMIT 1").fetchone()
+    base = top[0] + 1 if top else 0
     db.executemany(
-        "INSERT INTO d(rowid, head, body, alias) VALUES (?,?,?,?)",
+        f"INSERT INTO {table}(rowid, head, body, alias, path, blob, digest, id, line) "
+        "VALUES (?,?,?,?,?,?,?,?,?)",
         [
             (
-                i,
+                base + i,
                 " ".join(
                     x
                     for x in (
@@ -844,6 +843,11 @@ def build_index(
                 ),
                 r["text"],
                 r.get("alias", ""),
+                path or r["path"],
+                blob,
+                digest,
+                r.get("id") or r.get("rec") or "",
+                r.get("line", 0),
             )
             for i, r in enumerate(docs)
         ],

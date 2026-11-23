@@ -107,7 +107,7 @@ reason, since swallowing it would silence the announcement.
 `--check-relations [<base>]` is hygiene check 27, `TOOL-aGraftedHelix-9`. `scan_records` enumerates
 the population once: every decision row the grammar keys, then every gotcha under `gotchas/`. The
 records whose identity is absent at the mainline merge-base are ranked with the memory-recall kit's
-own `bench.build_index`. The base is `origin/<branch>`, then `<branch>`, read the way
+own `bench.build_fts_rows`. The base is `origin/<branch>`, then `<branch>`, read the way
 `check-verdict-epoch.sh` reads it. A top hit clearing `NEAR_MATCH_GATE`'s floor that shares a
 four-character term must be named, have a named successor, or be answered with a relation token.
 The predicate is pinned rather than tuned, because the floor was measured with exactly this

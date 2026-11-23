@@ -713,6 +713,7 @@ def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
 
 sys.path.insert(0, str(HERE))
 from fixture_target import build_scratch_gov, build_target  # noqa: E402 — TOOL-dSafePassage-5 S12, -26 S19: the factories
+from fixture_target import INSTALL_ANSWERS, render_deploy_tail  # noqa: E402 — TOOL-dTotalRecall-21 S11
 
 
 DEPLOY_FULL = f"""gov_source = "local"
@@ -8362,14 +8363,20 @@ user_skills = "/tmp/gk-fake-skills"
 
         # ===== unit 6, the pin block =====
         NLp = chr(10)
+        # --- TOOL-dTotalRecall-21 S4: recall requires `playbook-render`, whose own `requires` names
+        # --- `playbook`, `memory-tree` and `policy`, so `apply` refuses any recall selection short of
+        # --- that closure, and `playbook-render`'s adopter refuses DEPLOY_FULL's answers alone (F9).
+        # --- Every apply below names the closure over ONE deploy text: DEPLOY_FULL's `gov_source`
+        # --- and `prefix` lines, then the stub tail the playbook entry's placeholder rows derive.
+        RECALL_CLOSURE = "memory-recall,memory-tree,playbook-render,playbook,policy"
+        deploy_recall = ("".join(ln for ln in DEPLOY_FULL.splitlines(keepends=True)
+                                 if ln.startswith(("gov_source = ", "prefix = ")))
+                         + render_deploy_tail(RECALL_CLOSURE.split(","), INSTALL_ANSWERS))
 
         def pin_target(name: str, ga: bytes | None) -> pathlib.Path:
             g = tmp / name
             (g / ".governance").mkdir(parents=True, exist_ok=True)
-            (g / ".governance" / "deploy.toml").write_text(
-                'gov_source = "l"' + NLp + f'prefix = "{PFX[:-1]}"' + NLp +
-                'kits = ["memory-recall"]' + NLp + "[answers]" + NLp +
-                'memory_root = "memory"' + NLp, encoding="utf-8", newline=NLp)
+            (g / ".governance" / "deploy.toml").write_text(deploy_recall, encoding="utf-8", newline=NLp)
             (g / "README.md").write_text("t" + NLp, encoding="utf-8", newline=NLp)
             if ga is not None:
                 (g / ".gitattributes").write_bytes(ga)
@@ -8387,10 +8394,14 @@ user_skills = "/tmp/gk-fake-skills"
         # --- CLI it never wrote (DEPL-dGaugedVintage-3). The kit declares no forked rule now, so a
         # --- fresh target receives all three. The INCOMPLETE report that existed for that state is
         # --- graded over the synthetic `demo` fork in the DEPL-dCarriedReceipt-10 block below.
-        inc = build_target(tmp / "incomplete", DEPLOY_FULL)
-        p = run("apply", "--target", str(inc), "--kits", "memory-recall,memory-tree")
+        # --- TOOL-dTotalRecall-21 S4: every apply here names the closure over `deploy_recall`, the
+        # --- block's one deploy text, and the exit-0 checks are what let `run` write a receipt pin.
+        inc = build_target(tmp / "incomplete", deploy_recall)
+        p = run("apply", "--target", str(inc), "--kits", RECALL_CLOSURE)
         out = p.stdout + p.stderr
         _mr = inc / PFX / KIT_NAMES["memory-recall"]
+        check("[aRF-36] the closure's apply over the playbook entry's stubs exits 0",
+              p.returncode == 0, out[-900:])
         check("[aRF-36] apply lands memory-recall's CLI and extractor on a fresh target",
               all((_mr / f).is_file() for f in ("query.py", "extract.py")), out[-900:])
         check("[aRF-36] ...and reports no entry INCOMPLETE", "INCOMPLETE" not in out, out[-900:])
@@ -8401,13 +8412,15 @@ user_skills = "/tmp/gk-fake-skills"
         check("[aRF-36] rev-3 ...and the skip names the key that takes it",
               f"SKIPPED [opt-in       ] {PFX}{KIT_NAMES['memory-recall']}/recall-opened.js" in out
               and "with_hook" in out, out[-900:])
-        _optin = build_target(tmp / "optin36", DEPLOY_FULL + "\n[kit.memory-recall]\nwith_hook = \"yes\"\n")
-        _po = run("apply", "--target", str(_optin), "--kits", "memory-recall,memory-tree")
+        _optin = build_target(tmp / "optin36", deploy_recall + "\n[kit.memory-recall]\nwith_hook = \"yes\"\n")
+        _po = run("apply", "--target", str(_optin), "--kits", RECALL_CLOSURE)
+        check("[aRF-36] rev-3 the opt-in target's closure apply exits 0", _po.returncode == 0,
+              (_po.stdout + _po.stderr)[-900:])
         check("[aRF-36] rev-3 a target declaring [kit.memory-recall] with_hook = \"yes\" gets the hook",
               (_optin / PFX / KIT_NAMES["memory-recall"] / "recall-opened.js").is_file(),
               (_po.stdout + _po.stderr)[-900:])
-        _all = build_target(tmp / "optall36", DEPLOY_FULL + "\n[kit.memory-recall]\nopt_in_all = \"yes\"\n")
-        _pa = run("apply", "--target", str(_all), "--kits", "memory-recall,memory-tree")
+        _all = build_target(tmp / "optall36", deploy_recall + "\n[kit.memory-recall]\nopt_in_all = \"yes\"\n")
+        _pa = run("apply", "--target", str(_all), "--kits", RECALL_CLOSURE)
         check("[aRF-36] rev-3 a target spelling the canonical ctx's reserved key is refused by name",
               _pa.returncode != 0 and "reserved" in (_pa.stdout + _pa.stderr)
               and not (_all / PFX / KIT_NAMES["memory-recall"] / "recall-opened.js").exists(),
@@ -8418,7 +8431,9 @@ user_skills = "/tmp/gk-fake-skills"
               (_pr.stdout + _pr.stderr)[-900:])
 
         pg = pin_target("u6p1", b"*.sh text eol=lf")          # deliberately no trailing newline
-        run("apply", "--target", str(pg), "--kits", "memory-recall,memory-tree")
+        _p1 = run("apply", "--target", str(pg), "--kits", RECALL_CLOSURE)
+        check("the pin target's closure apply exits 0", _p1.returncode == 0,
+              (_p1.stdout + _p1.stderr)[-900:])
         lines = (pg / ".gitattributes").read_text(encoding="utf-8").split(NLp)
         check("an append to an attributes file with no trailing newline does not join two lines",
               lines[0] == "*.sh text eol=lf", str(lines[:2]))
@@ -8434,7 +8449,9 @@ user_skills = "/tmp/gk-fake-skills"
         # The block is written EARLY and the renormalize runs LAST. On a first install the pinned
         # population does not exist yet, so a one-phase design either refuses every install or
         # reports success over nothing.
-        pa = run("apply", "--target", str(pin_target("u6p2", None)), "--kits", "memory-recall,memory-tree")
+        pa = run("apply", "--target", str(pin_target("u6p2", None)), "--kits", RECALL_CLOSURE)
+        check("the virgin pin target's closure apply exits 0", pa.returncode == 0,
+              (pa.stdout + pa.stderr)[-900:])
         idx_att = pa.stdout.index("/ATTRIBUTES]")
         check("the ATTRIBUTES step runs before LAND", idx_att < pa.stdout.index("/LAND]"), pa.stdout)
         check("and the RENORMALIZE step runs after CONFIGURE",

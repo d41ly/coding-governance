@@ -274,3 +274,14 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T01:19:56Z draw · re-dispatch · TOOL-dTotalRecall-21 · 35/186 · 20261123T011956Z-b2fc51
 
 2026-11-23T01:19:56Z dispatch · item 426dd9db TOOL-dTotalRecall-21 · reason .claude/skills/memory-recall/SKILL.md
+
+2026-11-23T01:48:59Z brief · item TOOL-dTotalRecall-21 · reason 84730cc25ee5 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-21-build-brief-4.md
+2026-11-23T01:52:09Z draw · re-dispatch · TOOL-dTotalRecall-21 · 36/186 · 20261123T015209Z-caf382
+
+2026-11-23T01:52:09Z dispatch · item f9713282 TOOL-dTotalRecall-21 · reason tools/memory-tree/id_grammar.py tools/memory-tree/row_grammar.py tools/playbook/tag_index.py tools/memory-tree/.memory-tree.conf.example tools/memory-recall/query.py tools/memory-recall/check-recall.py tools/memory-recall/bench.py tools/memory-recall/union.py tools/memory-recall/verbatim.json tools/memory-recall/extract.py tools/memory-recall/recall_conf.py tools/memory-recall/selftest.py tools/memory-recall/test_recall_floor.py tools/memory-recall/README.md tools/memory-recall/SKILL.template.md tools/memory-recall/kit.toml tools/govkit/selftest.py tools/govkit/fixture_target.py tools/lib/common_dir.py .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/project/legacy-homes.txt memory/builds/dTotalRecall/build memory/map/features/row-grammar.md memory/map/features/memory-recall.md memory/map/generated/symbols.json help/tags.md tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-21.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-21-4-acceptance-ledger.md
+2026-11-23T01:56:52Z draw · re-dispatch · TOOL-dTotalRecall-21 · 37/186 · 20261123T015652Z-d4c17e
+
+2026-11-23T01:56:52Z dispatch · item f9713282 TOOL-dTotalRecall-21 · reason tools/govkit/matrix.py .claude/skills/memory-recall/SKILL.md
+2026-11-23T02:08:45Z draw · re-dispatch · TOOL-dTotalRecall-21 · 38/186 · 20261123T020845Z-970a0c
+
+2026-11-23T02:08:45Z dispatch · item f9713282 TOOL-dTotalRecall-21 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
