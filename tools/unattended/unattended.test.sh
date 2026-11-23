@@ -18282,7 +18282,72 @@ same "KDS56 AC21 ...and is at most PROGRESS_BOUND + 10 s slower than AC30's stub
   "$(( ${kd56_t:-999} - ${kd44_t0:-0} <= PROGRESS_BOUND + 10 ))" "1"
 same "KDS56 AC21 with GATE_BOUND_LIVE=0 a stub exiting 0 still has its progress line printed" \
   "$(grep -c '^rc 0 took ' <<<"$kd56_plain") $(grep -c '^progress — tRun · landing · kd56 stub$' <<<"$kd56_plain")" "1 1"
-remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"; rm -rf "$kd56_stub"; reset_tree
+remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"
+
+# ==================================================================================================
+# KICK-dKeptSession-62 AC11 (S13) — AC21'S UNBOUNDED HALF, STAGED WHERE THE DRIVER DECIDES IT.
+# `load_driver_conf` re-derives GATE_BOUND_LIVE from the source-time probe's REMOTE_BOUND_LIVE, so the
+# `GATE_BOUND_LIVE=0` above never reaches `init_bounded`'s unbounded branch. Here the driver is sourced
+# again inside the subshell with a stub `timeout` exiting 1 first on PATH, so its own probe sets
+# REMOTE_BOUND_LIVE=0 and the conf carries it into GATE_BOUND_LIVE: the run names the GATE_BOUND bound
+# inert, exits 0 and prints AC21's plain stub's line, and with the grandchild stub it exits 0 printing
+# the line at most AC30's PROGRESS_BOUND + 10 s slower than AC30's stub sleeping 0. RED, observed at
+# the close: a driver whose unbounded `init_bounded` branch waits on what the grandchild holds open.
+# WHAT THIS BLOCK DOES NOT DRIVE: the executed driver's own call of `load_driver_conf`, the same line.
+# ==================================================================================================
+kd62_shim=$(mktemp -d)
+printf '#!/bin/sh\nexit 1\n' > "$kd62_shim/timeout"; chmod +x "$kd62_shim/timeout"
+run_kd62_landed() { # grandchild|plain -> the --landed output of the driver sourced again under a failing `timeout`, then `rc <n> took <s>`
+  local s=$EPOCHSECONDS out rc
+  printf '%s' "$1" > "$kd56_stub/loop_transition.py.s"
+  out=$( ( PATH="$kd62_shim:$PATH"; . "$SCRIPT" || exit 2
+           resolve_position_engine() { # the stub for loop_transition.py, the real engine for every other script
+             if [ "${1:-}" = loop_transition.py ]; then PE_PY=$_rkd_py; PE_PATH=$kd56_stub/loop_transition.py; return 0; fi
+             resolve_kd44_engine "$@"; }
+           load_driver_conf && main --landed tRun ) 2>&1 ); rc=$?
+  printf '%s\nrc %s took %s\n' "$out" "$rc" "$((EPOCHSECONDS - s))"
+}
+build_claim_landing
+kd62_plain=$(run_kd62_landed plain)
+remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"
+build_claim_landing
+kd62_held=$(run_kd62_landed grandchild)
+kd62_t=$(sed -n 's/^rc [0-9]* took \([0-9]*\)$/\1/p' <<<"$kd62_held")
+same "KDS62 AC11 a failing timeout first on PATH: the run names the GATE_BOUND bound inert, exits 0 and prints the plain stub's line" \
+  "$(grep -qF "unattended: NOTE - this node has no working 'timeout -k', so the GATE_BOUND wall-clock bound" <<<"$kd62_plain" && echo 1 || echo 0) $(grep -c '^rc 0 took ' <<<"$kd62_plain") $(grep -c '^progress — tRun · landing · kd56 stub$' <<<"$kd62_plain")" "1 1 1"
+same "KDS62 AC11 ...and under it a progress stub backgrounding a 30 s grandchild exits 0 printing its line" \
+  "$(grep -c '^rc 0 took ' <<<"$kd62_held") $(grep -c '^progress — tRun · landing · kd56 stub$' <<<"$kd62_held")" "1 1"
+same "KDS62 AC11 ...at most PROGRESS_BOUND + 10 s slower than AC30's stub sleeping 0, never waiting on the grandchild" \
+  "$(( ${kd62_t:-999} - ${kd44_t0:-0} <= PROGRESS_BOUND + 10 ))" "1"
+remove_claim_landing; remove_claim_refs; git remote set-url origin "$ORIGIN"; rm -rf "$kd56_stub" "$kd62_shim"; reset_tree
+
+# ==================================================================================================
+# KICK-dKeptSession-62 AC15 (S17) — THE TWO EDGES READERS AGREE ON EVERY ID. One fixture spec whose
+# Edges block holds four consumes-from bullets: a backticked id, a `none` bullet wrapping a backticked
+# id onto its continuation line, an `external` edge and an id-less payload. The memory-tree kit's
+# `read_spec_edges(text, "consumes-from")`, its id-shaped targets, and this kit's
+# `read_consumes_from --scan`, its ids, print one set, and that set is the backticked id alone, so
+# the agreement is over a read that found an edge. RED, observed at the close: a copy of the Python
+# reader taking a wrapped `none` bullet's id as an edge. WHAT THIS BLOCK DOES NOT DRIVE: a bare id
+# run, their one declared departure, which `read_spec_edges`' docstring names.
+# ==================================================================================================
+kd62_e=$(mktemp -d)
+printf '%s\n' '# KICK-tFix-9 — edges' '' '## 3. Non-goals (OUT)' '' '- nothing' '' '### Edges' '' \
+  '- **consumes-from** `KICK-tFix-1` — a backticked id' \
+  '- **consumes-from** none until the reader of' '  `KICK-tFix-2` lands' \
+  '- **consumes-from** external — a fact outside the build' \
+  '- **consumes-from** the reader names no id' '' '## 4. Design' '' '- d' > "$kd62_e/spec.md"
+kd62_py=$("$_rkd_py" -c 'import re, sys
+sys.path.insert(0, sys.argv[1])
+import design_lib
+text = open(sys.argv[2], encoding="utf-8").read()
+ids = {t for t, _b in design_lib.read_spec_edges(text, "consumes-from") if re.fullmatch(r"[A-Z]+-[A-Za-z0-9]+-[0-9]+", t)}
+print(" ".join(sorted(ids)))' "$HERE/../$MT_KIT" "$kd62_e/spec.md" 2>&1 | tr -d '\r')
+kd62_sh=$(read_consumes_from --scan "$kd62_e/spec.md" | awk -F'\t' '$2 != "" { print $2 }' | sort -u | tr '\n' ' ')
+same "KDS62 AC15 edges-agreement: read_spec_edges and read_consumes_from --scan read one id set over the four Edges bullets" \
+  "$kd62_py " "$kd62_sh"
+same "KDS62 AC15 ...and that set is the backticked id alone" "$kd62_sh" "KICK-tFix-1 "
+rm -rf "$kd62_e"
 
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -21163,7 +21228,7 @@ same "KDS61 AC8 --mail read build:fx --sent exits 2 with S1's refusal" "$ms_rc [
   "2 [mail — not read · --sent reads one build's own mail refs, and 'build:fx' is no build's slug]"
 ms_out=$(run_mail_arm A s1 ack fx "${ms_1:-unposted1}" --sent); ms_rc=$?
 same "KDS61 AC8 --mail ack with --sent exits 2 printing the ack's form" "$ms_rc [$ms_out]" \
-  "2 [mail — not written · the form is --mail ack <slug> <id>]"
+  "2 [mail — not written · the form is --mail ack <slug> <id> [<id> ...]]"
 rm -rf "$mb_d"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -21403,6 +21468,39 @@ mv "$LF/origin.gone" "$LF/origin.git"
 same "KDS44 AC27 an unreachable origin refuses the post, exit 2 naming the fetch, and no mail ref of the session stands" \
   "$kd44_rc $(grep -c '^mail — not written · the remote did not answer, git fetch exited ' <<<"$kd44_out") $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/mail/tFix/a/x3 | grep -c .) $(git -C "$LF/c1" for-each-ref refs/gov | grep -c '/x3$')" \
   "2 1 0 0"
+rm -rf "$LF"
+
+# ==================================================================================================
+# KICK-dKeptSession-62 AC13 (S15) — SEVERAL ACKS LAND TOGETHER OR NOT AT ALL. Unit 24's lease fixture
+# again, c2 asking as fy. a and b posted to build:tFix and a's ack posted by c1's session x1: `--mail
+# ack tFix a b` from x2 prints `mail — duplicate`, exits 1 and posts nothing, so b still reads open.
+# Then c and d posted, neither acked: `--mail ack tFix c d` from x3 prints two `mail — posted` lines
+# and exits 0, the session ref's tip the ack of d, parented on the ack of c, its `seq` one past. RED,
+# observed at the close: a driver posting each id in its own `write_mail_post`, under which b reads
+# acked. WHAT THIS BLOCK DOES NOT DRIVE: a lost ref update, whose line is the one-id post's branch.
+# ==================================================================================================
+LF=$(mktemp -d); write_lease_fixture
+git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null && git -C "$LF/c2" config user.email t@t.test \
+  && git -C "$LF/c2" config user.name t && git -C "$LF/c2" config core.autocrlf false
+printf 'a question body\n' > "$LF/body.txt"
+kd62_pid='s/^mail — posted \([0-9a-f]*\) · .*/\1/p'
+kd62_a=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q a' --default no "$LF/body.txt" | sed -n "$kd62_pid")
+kd62_b=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q b' --default no "$LF/body.txt" | sed -n "$kd62_pid")
+run_deadline_arm c1 x1 ack tFix "${kd62_a:-unposted}" >/dev/null
+kd62_out=$(run_deadline_arm c1 x2 ack tFix "${kd62_a:-unposted}" "${kd62_b:-unposted}"); kd62_rc=$?
+same "KDS62 AC13 with a's ack already posted, --mail ack tFix a b prints mail — duplicate and exits 1, posting nothing" \
+  "$kd62_rc $(grep -c '^mail — duplicate ' <<<"$kd62_out") $(grep -c '^mail — posted ' <<<"$kd62_out")" "1 1 0"
+same "KDS62 AC13 ...and --mail read tFix shows b open" \
+  "$(run_deadline_arm c1 r1 read tFix | awk -F'\t' -v q="${kd62_b:-unposted}" '$1 == q { print $4 }')" "open"
+kd62_c=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q c' --default no "$LF/body.txt" | sed -n "$kd62_pid")
+kd62_d=$(run_deadline_arm c2 q1 post fy --to build:tFix --kind question --subject 'q d' --default no "$LF/body.txt" | sed -n "$kd62_pid")
+kd62_out=$(run_deadline_arm c1 x3 ack tFix "${kd62_c:-unposted}" "${kd62_d:-unposted}"); kd62_rc=$?
+read_kd62_field() { git --git-dir="$LF/origin.git" log -1 --format=%B "$1" -- 2>/dev/null | sed -n "s/^$2: //p"; } # rev · key -> the value its message records
+same "KDS62 AC13 with neither acked, --mail ack tFix c d prints two mail — posted lines and exits 0" \
+  "$kd62_rc $(grep -c '^mail — posted ' <<<"$kd62_out")" "0 2"
+same "KDS62 AC13 ...the session ref's tip answers d, its parent answers c, and its seq is one past the parent's" \
+  "$(read_kd62_field refs/gov/mail/tFix/a/x3 answers) $(read_kd62_field 'refs/gov/mail/tFix/a/x3^' answers) $(read_kd62_field refs/gov/mail/tFix/a/x3 seq) $(read_kd62_field 'refs/gov/mail/tFix/a/x3^' seq)" \
+  "${kd62_d:-unposted} ${kd62_c:-unposted} 2 1"
 rm -rf "$LF"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -25223,7 +25321,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4187 -> 4190 by KICK-dKeptSession-56 on 2026-11-23: the grandchild-progress block's 3
 # region-eight `same` (AC21 3), each unconditional and outside any loop, off the diff's own lines; no
 # skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4190
+# RAISED 4190 -> 4199 by KICK-dKeptSession-62 on 2026-11-23: the unbounded-progress block's 3, the
+# edges-agreement block's 2 and the chained-ack block's 4 region-eight `same` (AC11 3, AC15 2, AC13 4),
+# each unconditional and outside any loop, off the diff's own lines; the KDS61 ack-form arm re-armed
+# for `[<id> ...]` adds none. No skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4199
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25523,7 +25625,8 @@ FLOOR_SHARD_7=311
 # RAISED 1393 -> 1397 by KICK-dKeptSession-61: the same 4 region-eight sent-read assertions, see FLOOR_ASSERTIONS.
 # RAISED 1397 -> 1404 by KICK-dKeptSession-44: the same 7 region-eight reply-verb, fetch and progress assertions, see FLOOR_ASSERTIONS.
 # RAISED 1404 -> 1407 by KICK-dKeptSession-56: the same 3 region-eight grandchild-progress assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1407
+# RAISED 1407 -> 1416 by KICK-dKeptSession-62: the same 9 region-eight unbounded-progress, edges-agreement and chained-ack assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1416
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

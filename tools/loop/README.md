@@ -453,11 +453,12 @@ the build's own read; a chain read that does not answer prints `mail — interfa
 <why>` and acknowledges nothing from that parent. The acks are all or nothing
 (KICK-dKeptSession-55): the consumed ids are computed first, posting nothing, and posted only where every
 `open` row of the read is consumed; otherwise none is posted and the refusal names every open row, so a
-consumed `withdrawn` beside an open `question` stays open and is never acknowledged unread. Each
-consumed id is posted once as the
-unattended kit's `--mail ack <slug> <id>` through `breakpoints.py`'s `run_sourced`, a posted ack
-printing `mail — acked <kind> <id> from build:<parent>` on stderr as it happens, so a move refused
-after the acks still shows it, a failed ack `mail — ack not posted <id> · rc <n|->` there, and a check
+consumed `withdrawn` beside an open `question` stays open and is never acknowledged unread. The
+consumed ids are posted in one call of the
+unattended kit's `--mail ack <slug> <id> [<id> ...]` through `breakpoints.py`'s `run_sourced`, which
+lands every ack in one ref update or none (KICK-dKeptSession-62), a posted call printing `mail — acked
+<kind> <id> from build:<parent>` per id on stderr as it happens, so a move refused after the acks
+still shows it, a failed call `mail — ack not posted <id> · rc <n|->` there per id, and a check
 that does not read `mail — interfaces <parent> unread · <why>`. A `question`, `intake` or `overlap` is
 never acknowledged, nor a `confirmed` or `changed` the check neither names nor finds superseded. A row
 still reading `open`, a message addressed to the

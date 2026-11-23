@@ -51,7 +51,7 @@
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
 #   unattended.sh --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] [--default <text>] <body file>   # one message on this session's own mail ref; 0 posted, 1 duplicate or lost, 2 not written; `mail — off` exit 2 while RUN_CLAIMS is not on
 #   unattended.sh --mail read <who> [--open] [--ids] [--local] [--sent]   # the mailbox of a build or a recipient, one TAB row per message; --open the open rows, --ids their ids on one line or none, --local the node's cache with no fetch, --sent a build's own sent messages, whoever they were addressed to
-#   unattended.sh --mail ack <slug> <id>                           # an ack of a message addressed to <slug>, posted to its sender's build; the post's exits
+#   unattended.sh --mail ack <slug> <id> [<id> ...]                # an ack of each message addressed to <slug>, posted to its sender's build, every ack landing in one ref update or none; the post's exits
 #   unattended.sh --mail answer <slug> <question id> <body file> [--cite <path>@<sha>]...   # an answer to a question addressed to <slug>, posted to its asker's build; 1 the question no longer open, else the post's exits
 #   unattended.sh --mail notice <slug> [--item <instance key>] [--local] [--ring <ref> <id>]   # the build's unread mail as mailbox.notice says, one line, its stamp rewritten after a fetch; 0 shown, off or the local copy, 2 not read
 #   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
@@ -3779,11 +3779,17 @@ derive_mail_ref() { # slug · tag · session -> the ref on stdout and in MAIL_RE
 # cache ref. Its caller has resolved the remote (check 24). THE HAND-OVER (§8 F4): the mailbox writes
 # through `write_gov_ref` until dTotalRecall's record door lands, its door row in the playbook kit's
 # door list reading `pending = "dTotalRecall"`; that door replaces this function, the one mail-ref
-# writer, and the verbs below keep calling it by this name.
-write_mail_ref() { # ref · tip read or empty · message -> 0 written, 1 lost, 2 not completed with GOVREF_WHY
-  local c
+# writer, and the verbs below keep calling it by this name. SEVERAL MESSAGES (KICK-dKeptSession-62
+# S15) land as one chain: the first commit parented on the tip read, each later one on the commit
+# before it, and the last written by ONE `write_gov_ref` against that tip, so all land or none does.
+write_mail_ref() { # ref · tip read or empty · message [message ...] -> 0 written, 1 lost, 2 not completed with GOVREF_WHY
+  local c="${2:-}" m
+  local -a msgs=("${@:3}")
   GOVREF_WHY=""
-  c=$(build_gov_commit "${2:-}" "${3:-}") || { GOVREF_WHY="the commit could not be built in this clone"; return 2; }
+  [ "${#msgs[@]}" -gt 0 ] || msgs=("")
+  for m in "${msgs[@]}"; do
+    c=$(build_gov_commit "$c" "$m") || { GOVREF_WHY="the commit could not be built in this clone"; return 2; }
+  done
   [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
   GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
   write_gov_ref "${1:-}" "${2:-}" "$c"
@@ -3815,11 +3821,20 @@ write_mail_ref() { # ref · tip read or empty · message -> 0 written, 1 lost, 2
 # `kind`, `item`, `pass`, `subject`, `answers`, `seq`, `after`, `content-key`, `deadline` and
 # `default`, each absent one `none`, a blank line and the body. Neither `seq`, `deadline` nor `default`
 # is a field of the id, so a retried post keeps its id, whatever default it names.
+# A CHAIN OF POSTS (KICK-dKeptSession-62 S15): after the default, each further `to`, `subject` and
+# `answers` triple is one more message of the same kind, item, pass, body and interface, posted with
+# the first ALL OR NOTHING. Each message's recipient, values and forged-field checks run in order
+# before the body's; after the one fetch every message's id is derived and its duplicate checked,
+# two of the chain sharing an id read as a duplicate, before anything is written; message k's tip is
+# the chain's message k-1, so its `seq` is one past that message's and its `after` is `none`; and
+# `write_mail_ref` lands the chain in one ref update. Every message then prints its own posted, lost
+# or not-written line, so a refused record or a lost update leaves every row the chain answers open.
 # WHAT THIS DOES NOT CHECK: the body for secrets (gap-rt-44); that the recipient exists.
-write_mail_post() { # slug · to · kind · subject · item · pass · answers · body file · interface file or none · [default] -> 0 posted, 1 duplicate or lost, 2 not written
+write_mail_post() { # slug · to · kind · subject · item · pass · answers · body file · interface file or none · [default] · [to · subject · answers]... -> 0 posted, 1 duplicate or lost, 2 not written
   local slug="${1:-}" to="${2:-}" kind="${3:-}" sub="${4:-}" it="${5:-none}" ps="${6:-none}" an="${7:-none}" f="${8:-}" ifc="${9:-none}"
-  local sid="${CLAUDE_CODE_SESSION_ID:-}" tag py d kinds n v id tip rc ref ck=none seq=1 aft=none t dl df=ack
+  local sid="${CLAUDE_CODE_SESSION_ID:-}" tag py d kinds n v id tip rc ref ck=none seq=1 aft=none t dl df=ack k
   local forged='^[[:space:]]*[*][*][A-Za-z][A-Za-z-]*( [a-z]+)?:[*][*]'
+  local -a tos=("$to") subs=("$sub") ans=("$an") ids=() msgs=()
   [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 2; }
   check_slug_shape "$slug" || { echo "mail — not written · the build is no build-folder name: $slug"; return 2; }
   [ -n "$sid" ] || { echo "mail — not written: no session id"; return 2; }
@@ -3841,12 +3856,17 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
   else
     case "$kind" in question|confirm-request) echo "mail — not written · a $kind declares its default with --default"; return 2 ;; esac
   fi
-  check_mail_recipient "$to" || return 2
-  build_gov_message "gov-mail $slug/pending" "$f" subject "$sub" item "$it" pass "$ps" answers "$an" default "$df" \
-    || { echo "mail — not written · $GOVMSG_WHY"; return 2; }
-  for n in subject item pass answers; do
-    case "$n" in subject) v=$sub ;; item) v=$it ;; pass) v=$ps ;; *) v=$an ;; esac
-    [[ ! $v =~ $forged ]] || { echo "mail — not written · the $n opens **<Word>:**, which a disposed record would read as a field"; return 2; }
+  shift $(( $# < 10 ? $# : 10 ))
+  [ $(( $# % 3 )) = 0 ] || { echo "mail — not written · a chained post takes a to, a subject and an answers each"; return 2; }
+  while [ $# -ge 3 ]; do tos+=("$1"); subs+=("$2"); ans+=("$3"); shift 3; done
+  for k in "${!tos[@]}"; do
+    check_mail_recipient "${tos[$k]}" || return 2
+    build_gov_message "gov-mail $slug/pending" "$f" subject "${subs[$k]}" item "$it" pass "$ps" answers "${ans[$k]}" default "$df" \
+      || { echo "mail — not written · $GOVMSG_WHY"; return 2; }
+    for n in subject item pass answers; do
+      case "$n" in subject) v=${subs[$k]} ;; item) v=$it ;; pass) v=$ps ;; *) v=${ans[$k]} ;; esac
+      [[ ! $v =~ $forged ]] || { echo "mail — not written · the $n opens **<Word>:**, which a disposed record would read as a field"; return 2; }
+    done
   done
   n=$(LC_ALL=C awk '$0 == "~~~~" || /^[[:space:]]*[*][*][A-Za-z][A-Za-z-]*( [a-z]+)?:[*][*]/ || /^- [*][*][A-Z][a-z-]+( [a-z]+)?:[*][*] ./ { print NR; exit }' "$f")
   [ -z "$n" ] || { echo "mail — not written · the body's line $n would read as a record field or its fence once the message is disposed: $f"; return 2; }
@@ -3868,13 +3888,17 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
     *) echo "mail — not written · the remote did not answer, git fetch exited $rc: $CR_URL"; return 2 ;;
   esac
   add_feed_sightings refs/gov/remote/
-  id=$(derive_message_id "$slug" "$it" "$ps" "$kind" "$sub" "$an" "$to" "$ck") || { echo "mail — not written · the message id did not derive"; return 2; }
-  check_mail_duplicate "$slug" "$id"; rc=$?
-  case "$rc" in
-    0) ;;
-    1) return 1 ;;
-    *) echo "mail — not written · the mail cache could not be read, so a retried post cannot be told apart"; return 2 ;;
-  esac
+  for k in "${!tos[@]}"; do
+    id=$(derive_message_id "$slug" "$it" "$ps" "$kind" "${subs[$k]}" "${ans[$k]}" "${tos[$k]}" "$ck") || { echo "mail — not written · the message id did not derive"; return 2; }
+    case " ${ids[*]:-} " in *" $id "*) printf 'mail — duplicate %s · %s\n' "$id" "$ref"; return 1 ;; esac
+    check_mail_duplicate "$slug" "$id"; rc=$?
+    case "$rc" in
+      0) ;;
+      1) return 1 ;;
+      *) echo "mail — not written · the mail cache could not be read, so a retried post cannot be told apart"; return 2 ;;
+    esac
+    ids+=("$id")
+  done
   tip=$(GIT rev-parse --verify -q "refs/gov/remote/${ref#refs/gov/}^{commit}" 2>/dev/null) || tip=""; tip=${tip%$'\r'}
   if [ -n "$tip" ]; then
     seq=$(GIT rev-list --first-parent --count "$tip" 2>/dev/null) && seq=${seq%$'\r'} && [[ $seq =~ ^[0-9]+$ ]] \
@@ -3894,15 +3918,22 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
         if (b == "" || k > bk || (k == bk && $1 < br)) { b = $3; bk = k; br = $1 } }
       END { print (b == "" ? "none" : b) }' <<<"$t")
   fi
-  build_gov_message "gov-mail $slug/$id" "$f" id "$id" build "$slug" from-tag "$tag" from-session "$sid" to "$to" \
-    kind "$kind" item "$it" pass "$ps" subject "$sub" answers "$an" seq "$seq" after "${aft:-none}" content-key "$ck" \
-    deadline "$dl" default "$df" || { echo "mail — not written · $GOVMSG_WHY"; return 2; }
-  write_mail_ref "$ref" "$tip" "$GOVMSG"; rc=$?
-  case "$rc" in
-    0) echo "mail — posted $id · $ref"; run_mail_ring "$ref" "$id"; return 0 ;;
-    1) echo "mail — lost $id · $ref · $GOVREF_WHY"; return 1 ;;
-    *) echo "mail — not written $id · $ref · $GOVREF_WHY"; return 2 ;;
-  esac
+  for k in "${!tos[@]}"; do
+    id=${ids[$k]}
+    build_gov_message "gov-mail $slug/$id" "$f" id "$id" build "$slug" from-tag "$tag" from-session "$sid" to "${tos[$k]}" \
+      kind "$kind" item "$it" pass "$ps" subject "${subs[$k]}" answers "${ans[$k]}" seq "$((seq + k))" after "${aft:-none}" \
+      content-key "$ck" deadline "$dl" default "$df" || { echo "mail — not written · $GOVMSG_WHY"; return 2; }
+    msgs+=("$GOVMSG"); aft=none
+  done
+  write_mail_ref "$ref" "$tip" "${msgs[@]}"; rc=$?
+  for id in "${ids[@]}"; do
+    case "$rc" in
+      0) echo "mail — posted $id · $ref"; run_mail_ring "$ref" "$id" ;;
+      1) echo "mail — lost $id · $ref · $GOVREF_WHY" ;;
+      *) echo "mail — not written $id · $ref · $GOVREF_WHY" ;;
+    esac
+  done
+  case "$rc" in 0|1) return "$rc" ;; *) return 2 ;; esac
 }
 
 # THE RING POINT (KICK-dKeptSession-6 S1 to S4, coordination item 7): live delivery after the mailbox.
@@ -4073,20 +4104,30 @@ read_mailbox() { # who · soft|strict|local · [sent] -> 0 with one TAB row per 
 # holds, else `mail — not written · <id> is no message addressed to <slug>`, exit 2; the ack is then a
 # post of kind `ack` from <slug>, answering <id>, to `build:<from-build>` of that row, with its subject
 # and an empty body, so the post's exits are the ack's. Dark while RUN_CLAIMS is not `on`.
-write_mail_ack() { # slug · id -> the post's exits
-  local slug="${1:-}" id="${2:-}" rows fb="" sub="" f rc line
-  local -a row=() lines=()
+# SEVERAL IDS (KICK-dKeptSession-62 S15), `<id> [<id> ...]`: the mailbox is read once and every id
+# must name one of its rows before anything is written, an id named twice acked once; the acks are
+# then ONE chained post, `write_mail_post`'s, all landing in one ref update or none, so a duplicate, a
+# refused record or a lost update leaves every row open. One id prints exactly the lines it did.
+write_mail_ack() { # slug · id [id ...] -> the post's exits
+  local slug="${1:-}" id rows fb sub f rc line
+  local -a row=() lines=() posts=() seen=() want=("${@:2}")
+  [ "${#want[@]}" -gt 0 ] || want=("")
   [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 2; }
   rows=$(read_mailbox "$slug" soft) || { printf '%s\n' "$rows"; return 2; }
   mapfile -t lines <<<"$rows"
-  for line in "${lines[@]}"; do
-    IFS=$'\t' read -r -a row <<<"$line"
-    [ "${row[0]:-}" = "$id" ] || continue
-    fb=${row[5]:-}; sub=${row[6]:-}; break
+  for id in "${want[@]}"; do
+    case " ${seen[*]:-} " in *" $id "*) continue ;; esac
+    fb=""; sub=""
+    for line in "${lines[@]}"; do
+      IFS=$'\t' read -r -a row <<<"$line"
+      [ "${row[0]:-}" = "$id" ] || continue
+      fb=${row[5]:-}; sub=${row[6]:-}; break
+    done
+    [ -n "$fb" ] || { echo "mail — not written · $id is no message addressed to $slug"; return 2; }
+    seen+=("$id"); posts+=("build:$fb" "$sub" "$id")
   done
-  [ -n "$fb" ] || { echo "mail — not written · $id is no message addressed to $slug"; return 2; }
   f=$(mktemp) || { echo "mail — not written · no scratch file for the ack's empty body"; return 2; }
-  write_mail_post "$slug" "build:$fb" ack "$sub" none none "$id" "$f"; rc=$?
+  write_mail_post "$slug" "${posts[0]}" ack "${posts[1]}" none none "${posts[2]}" "$f" none ack ${posts[3]+"${posts[@]:3}"}; rc=$?
   rm -f "$f"
   return "$rc"
 }
@@ -20318,9 +20359,9 @@ while [ $# -gt 0 ]; do
                       elif [ "$MV_LOCAL" = 1 ]; then print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS" local "$MV_SENT"; _rl_rc=$?
                       else print_mailbox "${MV_POS[0]}" "$MV_OPEN" "$MV_IDS" soft "$MV_SENT"; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = ack ]; then
-                      if [ "${#MV_POS[@]}" != 2 ] || [ -n "${MV_FLAGS// /}" ]; then
-                        echo "mail — not written · the form is --mail ack <slug> <id>"; _rl_rc=2
-                      else write_mail_ack "${MV_POS[0]}" "${MV_POS[1]}"; _rl_rc=$?; fi
+                      if [ "${#MV_POS[@]}" -lt 2 ] || [ -n "${MV_FLAGS// /}" ]; then
+                        echo "mail — not written · the form is --mail ack <slug> <id> [<id> ...]"; _rl_rc=2
+                      else write_mail_ack "${MV_POS[@]}"; _rl_rc=$?; fi
                     elif [ "$MV_ACT" = answer ]; then
                       if [ "${#MV_POS[@]}" != 3 ] || [ -n "${MV_FLAGS// --cite/}" ]; then
                         echo "mail — not written · the form is --mail answer <slug> <question id> <body file> [--cite <path>@<sha>]..."; _rl_rc=2

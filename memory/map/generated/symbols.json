@@ -23903,6 +23903,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_kd62_field",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_key",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
@@ -35224,6 +35229,11 @@
     },
     {
       "id": "run_kd56_landed",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_kd62_landed",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
     },
