@@ -3276,8 +3276,10 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
     """TOOL-aOrientedCast-8 S10, AC4 and AC6: a DEFAULT apply into a scratch target renders the roles
     kit — the role index, one agent type per agent role, no house text file and the `/build`
     Skill — its `--check` reads fresh, and the target's own wiring checker reads `ok` for roles, then
-    `UNWIRED` once the index is gone. Both roster counts are the source kit's, read rather than typed
-    (TOOL-dWitnessedBar-23 S6). The target holds a governing doc at the path the memory-tree seed writes
+    `UNWIRED` once the index is gone. The case expects one agent type per agent-true role, as
+    `derive_roles_expected` computes them from the source kit, and no house text file, since the house
+    overlays left the seed list with TOOL-dBoundRoles-19; no number is typed here (TOOL-dWitnessedBar-23 S6,
+    TOOL-dBoundRoles-43 S29). The target holds a governing doc at the path the memory-tree seed writes
     as `CHARTER`, copied from gov's own `AGENTS.md`, because the shape lands the playbook elsewhere.
     With `charter=False` it holds none, and this asserts AC13 instead: the apply still exits 0 through
     the adopter's accepted exit 3, the Skill alone is rendered, and check-wiring names the doc.
@@ -4463,6 +4465,51 @@ def check_reviewer_merge(tmp: pathlib.Path) -> None:
           and stems[1] in (house_dir / (merged + ".md")).read_text(encoding="utf-8")
           and not (house_dir / (stems[1] + ".md")).exists(), up.stdout + up.stderr)
 
+    # ---- TOOL-dBoundRoles-43 AC17, `reviewer-merge-carriers`: the method-carriers ledger naming both old types
+    # ends holding one row for the merged type's agent file, the first replaced row's sha and disposition kept,
+    # and the down restores it byte-identical. Red against an up that leaves the ledger alone.
+    agents_rel = pathlib.PurePosixPath(".claude", "agents").as_posix()
+    carriers_rel = pathlib.PurePosixPath("memory", "project", "method-carriers.txt").as_posix()
+    ledger = ("# ledger · method-carriers · key site path · direction declared-set · drain hunk\n"
+              + "AGENTS.md\t1\t%s\tseeded\n" % ("a" * 40)
+              + "".join("%s/%s.md\t1\t%s\t%s\n" % (agents_rel, s, c * 40, d)
+                        for s, c, d in zip(stems, "bc", ("seeded", "widened:fx"))))
+    t = build_merge_target("rm-carriers", render=True, files={carriers_rel: ledger})
+    pre = read_tree(t)
+    up = run_step("up", t)
+    rows = [ln.split("\t") for ln in (t / carriers_rel).read_text(encoding="utf-8").splitlines() if "\t" in ln]
+    w1 = run_step("witness", t)
+    down = run_step("down", t)
+    check("reviewer-merge-carriers the up leaves one row for %s.md, carrying the first replaced row's sha and "
+          "disposition, and none for either old type, and the witness exits 0" % merged,
+          up.returncode == 0 and w1.returncode == 0 and [r[0] for r in rows] == ["AGENTS.md", "%s/%s.md" % (agents_rel, merged)]
+          and rows[1][2:] == ["b" * 40, "seeded"], up.stdout + up.stderr + str(rows))
+    check("reviewer-merge-carriers ...and the down restores the ledger byte-identical",
+          down.returncode == 0 and read_tree(t) == pre, down.stdout + down.stderr)
+
+    # ---- TOOL-dBoundRoles-43 AC37: the atomic up. The target's render_agents.py stubbed to exit 1 when run as
+    # `--write`, its module unchanged, so the up fails after its before-image is written: every path the image
+    # recorded is byte-identical and the up exits 1; a re-run without the stub completes. Red against an up that
+    # leaves the target half-migrated, the carriers re-keyed and the render refused.
+    t = build_merge_target("rm-atomic", render=True, texts={stems[1]: "Read each changed caller.\n"})
+    renderer = t / PFX / rk_name / "render_agents.py"
+    real = renderer.read_text(encoding="utf-8")
+    main_line = 'if __name__ == "__main__":'
+    renderer.write_text(real.replace(main_line, main_line + "\n    raise SystemExit(1)", 1), encoding="utf-8",
+                        newline="\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    left = read_tree(t)
+    check("reviewer-merge-AC37 a render failing after the before-image is written: the up exits 1 and every "
+          "path is byte-identical, the image gone",
+          up.returncode == 1 and left == pre and not (t / image_rel).exists(),
+          up.stdout + up.stderr + " differing %s" % sorted(k for k in set(left) | set(pre) if left.get(k) != pre.get(k)))
+    renderer.write_text(real, encoding="utf-8", newline="\n")
+    up = run_step("up", t)
+    w1 = run_step("witness", t)
+    check("reviewer-merge-AC37 ...and a re-run without the stub completes, the witness exiting 0",
+          up.returncode == 0 and w1.returncode == 0, up.stdout + up.stderr + w1.stdout)
+
 
 def check_house_step(tmp: pathlib.Path) -> None:
     """TOOL-dBoundRoles-19 AC1 and AC2, the `house-step-` cases — `steps/house_overlays_to_instructions.py`'s
@@ -4548,6 +4595,19 @@ def check_house_step(tmp: pathlib.Path) -> None:
     up = run_step("up", t)
     check("house-step a tag the overlay already holds refuses the up, exit 2, both files byte-identical",
           up.returncode == 2 and tag in up.stderr and read_tree(t) == before, up.stdout + up.stderr)
+    # ---- TOOL-dBoundRoles-43 AC38: an up killed after writing the unit and before removing its file, its image
+    # gone, is the overlay holding the unit with the file's own text beside the file: the re-run skips the
+    # byte-equal unit, removes the file and the witness exits 0. The held unit with other text is the row above.
+    # Red against an up that refuses its own partial state as a duplicate tag.
+    t = build_house_target("hs-killed", files={ov_rel: (held % (tag, slot)).replace('"held"', '"%s"' % line)})
+    ov_before = (t / ov_rel).read_bytes()
+    up = run_step("up", t)
+    w1 = run_step("witness", t)
+    left = sorted(p.name for p in (t / PFX / rk_name / "house").glob("*.md"))
+    check("house-step-AC38 a re-run over a killed up skips the byte-equal unit, removes every house text file, "
+          "leaves the overlay as it was, and the witness exits 0",
+          up.returncode == 0 and w1.returncode == 0 and not left and (t / ov_rel).read_bytes() == ov_before,
+          up.stdout + up.stderr + w1.stdout + " left %s" % left)
 
 
 def check_spawn_guard_step(tmp: pathlib.Path) -> None:
@@ -4640,6 +4700,21 @@ def check_spawn_guard_step(tmp: pathlib.Path) -> None:
     check("spawn-step- a target with no roles kit loses the old command and wires nothing in its place",
           up.returncode == 0 and w1.returncode == 0 and not any(old in c or pack in c for c in read_wired(t)),
           up.stdout + up.stderr)
+    # ---- TOOL-dBoundRoles-43 AC41: the policy kit installed, which arms rule 7, and no roles kit, rule 7's home
+    # after the move: the up exits 1 naming the roles kit and govkit's install command, the settings still wire
+    # the retired hook byte for byte, and the witness exits 1 naming the same. Red against the up that unwires.
+    pk = KIT_NAMES["policy"]
+    t = build_wired("sg-policy-noroles", roles=False)
+    (t / PFX / pk).mkdir(parents=True, exist_ok=True)
+    (t / PFX / pk / "policy.py").write_bytes((KIT_DIRS["policy"] / "policy.py").read_bytes())
+    pre = (t / sj).read_bytes()
+    up, w1 = run_step("up", t), run_step("witness", t)
+    check("spawn-step-AC41 a target with the policy kit and no roles kit refuses the up, exit 1, naming the %s kit "
+          "and its install command, the retired hook still wired" % rk,
+          up.returncode == 1 and rk in up.stderr and "apply" in up.stderr and "--kits" in up.stderr
+          and (t / sj).read_bytes() == pre and any(old in c for c in read_wired(t)), up.stdout + up.stderr)
+    check("spawn-step-AC41 ...and the witness exits 1 naming the same",
+          w1.returncode == 1 and "--kits" in w1.stdout, w1.stdout + w1.stderr)
 
     # ---- the up's refusals write nothing: settings that do not parse, and no settings-merge.py in the target.
     t = build_wired("sg-broken", settings='{"hooks": "%s"' % old)

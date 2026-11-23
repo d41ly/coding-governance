@@ -18,6 +18,7 @@
     python handoff.py check-return-file --role <slot> --file <return file>
     python handoff.py owner-question --kind <fork|owner-gate|ratification|owner-write|refusal> [--attended]
     python handoff.py route-refusal --return <return file> [--budget-spent]
+    python handoff.py agent-return --agent <agent id> [--session <file>]
 
 THE CATALOGUE `render`, `harness-args`, `stage-efforts`, `role-efforts` and `roster` read their roles and
 workflow entries from is the COMPOSITION (TOOL-dBoundRoles-20 S3), `load_composition`: gov's roles and table with the overlay's `[[role]]` and
@@ -141,6 +142,12 @@ is `Optional` for a `mandatory` of `no`, `Optional, <text>` for `no — <text>`,
 <value>`, `{{MEMORY_ROOT}}` is the conf's value, and the order is the workflow table's; a line past
 200 characters, a missing key or an empty catalogue refuses with nothing printed. It reads no
 charter (TOOL-aOrientedCast-17).
+
+`agent-return --agent <id>` prints one JSON object, `{"agent", "type", "text"}`: the agent's id, its
+`.meta.json` `agentType` and its last assistant text, its transcript `subagents/agent-<id>.jsonl` beside the
+session `agents` finds, the id reaching a path only in `PATH_ID_RE`'s shape; exit 1 naming the id, the
+session or the transcript it does not find (TOOL-dBoundRoles-43 S56). The loop kit's `placement.py place
+--agent` runs it, so a placement is bound to the orientation scout's own words.
 
 `agents` prints the governing doc's `agent` line for each agent its selector names, then its
 `returned` line once it has returned, each shape read from the doc's micro-format fence and filled
@@ -285,18 +292,24 @@ import roles_lib as lib  # noqa: E402  (the kit's own library, beside this file)
 
 #: The build's interface 6: the `task:` field keys, in order. Their card labels are NOT typed here:
 #: each render reads them off the kickoff checker's `--task-skeleton` and zips them with these
-#: (TOOL-aOrientedCast-15 S3), so the checker that grades a card is the one source of its labels.
-TASK_FIELDS = ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates")
-#: The typed names are the library's `ARGUMENT_INPUTS`, which `derive_fact_class` reads (TOOL-dBoundRoles-13).
-INPUT_NAMES = ("spec",) + lib.ARGUMENT_INPUTS + ("prompt", "code")
-PATH_INPUTS = ("spec", "prompt", "code")
+#: (TOOL-aOrientedCast-15 S3), so the checker that grades a card is the one source of its labels. The keys
+#: are the `task` family of the closed `reads` vocabulary, never typed here (TOOL-dBoundRoles-43 S54).
+TASK_FIELDS = lib.READ_FAMILIES["task"]
+#: The inputs only a render fills, which no `--input` supplies: `work-order`, `render --for`'s
+#: (TOOL-dBoundRoles-43 S45, S54).
+RENDER_FILLED_INPUTS = ("work-order",)
+#: Every role's `code` slot (PLAY-dOrderedCharter-27): derived for each role, never written into its `reads`,
+#: so its key is read as optional and the CLI admits it for any role; its block holds the file's text.
+CODE_INPUT = "code"
+#: The `--input` names: the `input` family of the `reads` vocabulary less the render-filled ones, then the
+#: `code` slot, which no `reads` value names. The typed names are the library's `ARGUMENT_INPUTS`, which
+#: `derive_fact_class` reads (TOOL-dBoundRoles-13).
+INPUT_NAMES = tuple(n for n in lib.READ_FAMILIES["input"] if n not in RENDER_FILLED_INPUTS) + (CODE_INPUT,)
+PATH_INPUTS = ("spec", "prompt", CODE_INPUT)
 #: The typed inputs (TOOL-dBoundRoles-45 S1): the names whose value is the caller's argument, derived from the two
 #: constants above and never typed a third time. Each is authored text, written unfenced under the
 #: authored-line rule, `lib.check_authored_lines`.
 TYPED_INPUTS = tuple(n for n in INPUT_NAMES if n not in PATH_INPUTS)
-#: Every role's `code` slot (PLAY-dOrderedCharter-27): derived for each role, never written into its `reads`,
-#: so its key is read as optional and the CLI admits it for any role; its block holds the file's text.
-CODE_INPUT = "code"
 #: The `upstream:rows` key (TOOL-dDeclaredLoop-29): its block is the rows file `--upstream` names, then this
 #: contract, so the return answers exactly the ids the block lists.
 UPSTREAM_KEY = lib.UPSTREAM_ROWS_KEY
@@ -909,8 +922,9 @@ def read_framing(root, slug, agent_id):
     with no `--session` (§8 F6), the id admitted only in `PATH_ID_RE`'s shape, as `print_agent_lines` finds one;
     its type, the `.meta.json` `agentType` `load_agent_transcript` reads, `gov-prompt-writer`; its first `user`
     record opening with the marker of a `gov-prompt-writer` work order of build `slug`, read by
-    `lib.extract_prompt_marker`; and its last assistant text, `read_agent_turns`', passing `lib.check_return`
-    against that work order with `outcome` `framed` and both `job` and `nostop`. `fields` is the return object,
+    `lib.extract_prompt_marker`; and its last assistant text, `load_agent_transcript`'s `last`, passing
+    `lib.check_return` against that work order with `outcome` `framed` and both `job` and `nostop`, no framing
+    field holding a line `lib.check_authored_lines` refuses (TOOL-dBoundRoles-43 S36). `fields` is the return object,
     `framed_by` the `<prompt path> task-sha=<12hex>` of that marker, and the third item the agent transcript's
     path, where a bounded population's full list stays (TOOL-dBoundRoles-23 S3). RolesError naming each failed
     condition."""
@@ -920,16 +934,16 @@ def read_framing(root, slug, agent_id):
     if session is None:
         raise lib.RolesError("--framed-by %s: no session transcript to find the prompt writer in — %s"
                              % (agent_id, why))
-    sdir = session.with_name(session.name[:-len(".jsonl")] if session.name.endswith(".jsonl") else session.stem)
-    path = sdir / "subagents" / ("agent-%s.jsonl" % agent_id)
+    path = resolve_agent_transcript(derive_session_dir(session), agent_id)
     if not path.is_file():
         raise lib.RolesError("--framed-by %s: no agent transcript %s; spawn the prompt writer in this session "
                              "first and pass the agent id its call returned" % (agent_id, path.as_posix()))
-    kind = load_agent_transcript(path)["type"]
+    turns = load_agent_transcript(path)
+    kind = turns["type"]
     if kind != PROMPT_WRITER:
         raise lib.RolesError("--framed-by %s: the agent's type is %s, not %s; only the prompt writer's return "
                              "frames a task" % (agent_id, kind or "unknown, its .meta.json naming none", PROMPT_WRITER))
-    first, last = read_agent_turns(path)
+    first, last = turns["first"], turns["last"]
     marker = lib.extract_prompt_marker(first) if first else None
     if marker is None or marker.group("role") != PROMPT_WRITER:
         raise lib.RolesError("--framed-by %s: the transcript's first record opens with no gov:handoff marker of a "
@@ -957,6 +971,14 @@ def read_framing(root, slug, agent_id):
     if lacking:
         raise lib.RolesError("--framed-by %s: the prompt writer's framed return lacks %s, which every framing "
                              "carries" % (agent_id, " and ".join(lacking)))
+    # TOOL-dBoundRoles-43 S36: a framing field is placed unfenced in the hashed task, so before any is placed a
+    # line an executor reads as a heading, a fact line, a marker line or a framing line refuses, naming the field
+    # and the line, through the authored-line rule a typed input meets
+    forged = [ln for field, _head in FRAMING_FIELDS if field in fields
+              for ln in lib.check_authored_lines(str(fields[field]).replace("\r\n", "\n"), field)]
+    if forged:
+        raise lib.RolesError("--framed-by %s: the prompt writer's return places an executor-shaped line in the task, "
+                             "so nothing is rendered:\n%s" % (agent_id, "\n".join(forged)))
     return fields, lib.derive_answers_value(*work_order), path.as_posix()
 
 
@@ -1696,15 +1718,61 @@ def load_session_calls(path, cache_dir=None):
     return state["calls"], state["notified"], state["bad"]
 
 
+def resolve_agent_transcript(session_dir, agent_id, run_id=None):
+    """The path of one agent's transcript under a session's directory (TOOL-dBoundRoles-43 S56):
+    `<session_dir>/subagents/agent-<agent_id>.jsonl` for a direct spawn, else under
+    `subagents/workflows/<run_id>/` for a harness run's agent; None where `agent_id`, or a given `run_id`,
+    is off `PATH_ID_RE`'s shape, since only an id in that shape reaches a path. Whether the file exists is
+    the caller's to read. `print_agent_lines`, `--framed-by` and `agent-return` all resolve through here."""
+    if not isinstance(agent_id, str) or not PATH_ID_RE.match(agent_id):
+        return None
+    folder = pathlib.Path(session_dir) / "subagents"
+    if run_id is not None:
+        if not isinstance(run_id, str) or not PATH_ID_RE.match(run_id):
+            return None
+        folder = folder / "workflows" / run_id
+    return folder / ("agent-%s.jsonl" % agent_id)
+
+
+def derive_session_dir(session):
+    """The directory beside a session transcript holding its `subagents` folder: the file's path without
+    its `.jsonl` suffix."""
+    session = pathlib.Path(session)
+    return session.with_name(session.name[:-len(".jsonl")] if session.name.endswith(".jsonl") else session.stem)
+
+
+def print_agent_return(root, session_arg, agent_id):
+    """The `agent-return` verb (TOOL-dBoundRoles-43 S56): one JSON object, `{"agent", "type", "text"}`, the
+    agent's id, its `.meta.json` `agentType` and its last assistant text, both read by `load_agent_transcript`,
+    for the loop kit's `placement.py place --agent` to bind a placement to the agent's own words. The session
+    is found as `agents` finds it, `resolve_session_file`, and the transcript by `resolve_agent_transcript`.
+    RolesError naming the id off its shape, no session, or no transcript."""
+    session, why = resolve_session_file(root, session_arg)
+    if session is None:
+        raise lib.RolesError("agent-return %s: no session transcript to find the agent in — %s" % (agent_id[:80], why))
+    path = resolve_agent_transcript(derive_session_dir(session), agent_id)
+    if path is None:
+        raise lib.RolesError("agent-return '%s' is not an agent id of letters, digits, '_' and '-'" % agent_id[:80])
+    if not path.is_file():
+        raise lib.RolesError("agent-return %s: no agent transcript %s" % (agent_id, path.as_posix()))
+    got = load_agent_transcript(path)
+    print(json.dumps({"agent": agent_id, "type": got["type"], "text": got["last"]}, ensure_ascii=False))
+
+
 def load_agent_transcript(path):
     """What one agent's transcript and the `.meta.json` beside it record, each None when nothing does:
     `type` and `description` from the meta; `effort` and `model`, the last `assistant` record's
     carrying one; `wall`, the seconds from the transcript's first `timestamp` to its last; `tokens`,
     the sum over distinct `message.id` values of the largest `output_tokens`, because one response
     is split into records each carrying its usage as it streamed, which is the run-log kit's
-    per-request rule; and `files`, the set of distinct paths its WRITE_TOOLS uses name."""
-    out = dict.fromkeys(("type", "description", "effort", "model", "wall", "tokens"))
+    per-request rule; `files`, the set of distinct paths its WRITE_TOOLS uses name; and `first` and `last`
+    (TOOL-dBoundRoles-43 S55), the text of its first `user` record, the prompt the agent was handed, and of
+    its last `assistant` record carrying any, a record's text its `message.content` string or the `text` of
+    its content blocks of type `text` joined by newlines. The one walk of an agent transcript: every reader,
+    `check-return`, `--framed-by` and `agent-return` among them, takes its fields from here."""
+    out = dict.fromkeys(("type", "description", "effort", "model", "wall", "tokens", "first", "last"))
     out["files"] = set()
+    path = pathlib.Path(path)
     try:
         with open(path.with_name(path.name[:-len(".jsonl")] + ".meta.json"), encoding="utf-8") as fh:
             meta = json.load(fh)
@@ -1731,6 +1799,14 @@ def load_agent_transcript(path):
         except (KeyError, AttributeError, TypeError, ValueError):
             pass
         msg = rec.get("message")
+        content = msg.get("content") if isinstance(msg, dict) else None
+        if isinstance(content, list):
+            content = "\n".join(b["text"] for b in content if isinstance(b, dict) and b.get("type") == "text"
+                                and isinstance(b.get("text"), str))
+        if isinstance(content, str) and rec.get("type") == "user" and out["first"] is None:
+            out["first"] = content
+        elif isinstance(content, str) and rec.get("type") == "assistant" and content.strip():
+            out["last"] = content
         if rec.get("type") != "assistant" or not isinstance(msg, dict):
             continue
         if isinstance(rec.get("effort"), str) and rec["effort"]:
@@ -1754,38 +1830,6 @@ def load_agent_transcript(path):
     if per_id:
         out["tokens"] = sum(per_id.values())
     return out
-
-
-def read_agent_turns(path):
-    """`(first user text, last assistant text)` of one agent transcript (TOOL-dBoundRoles-5 S2): the text
-    of its first `user` record, the prompt the agent was handed, and of its last `assistant` record
-    carrying any, each None where no record does or the file does not read. A record's text is its
-    `message.content` string, or the `text` of its content blocks of type `text`, joined by newlines."""
-    first, last = None, None
-    try:
-        with open(path, "rb") as fh:
-            raw_lines = fh.read().split(b"\n")
-    except (OSError, TypeError, ValueError):
-        return None, None
-    for raw in raw_lines:
-        try:
-            rec = json.loads(raw) if raw.strip() else None
-        except (ValueError, RecursionError):
-            rec = None
-        if not isinstance(rec, dict) or rec.get("type") not in ("user", "assistant"):
-            continue
-        content = rec.get("message").get("content") if isinstance(rec.get("message"), dict) else None
-        if isinstance(content, list):
-            content = "\n".join(b["text"] for b in content if isinstance(b, dict) and b.get("type") == "text"
-                                and isinstance(b.get("text"), str))
-        if not isinstance(content, str):
-            continue
-        if rec["type"] == "user":
-            if first is None:
-                first = content
-        elif content.strip():
-            last = content
-    return first, last
 
 
 def read_return_record(path):
@@ -1831,7 +1875,8 @@ def run_return_check(stdin_text):
     transcript = payload.get("agent_transcript_path") if isinstance(payload, dict) else None
     if not isinstance(transcript, str) or not transcript or "/subagents/workflows/" in transcript.replace("\\", "/"):
         return 0
-    first, last = read_agent_turns(transcript)
+    turns = load_agent_transcript(transcript)   # TOOL-dBoundRoles-43 S55: the one transcript walk
+    first, last = turns["first"], turns["last"]
     marker = lib.extract_prompt_marker(first) if first else None
     if marker is None:
         return 0
@@ -2119,17 +2164,17 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
         cache_dir = None
     calls, notified, bad = load_session_calls(session, cache_dir)
     notes = ["%s: %d line(s) did not parse as JSON and were skipped" % (session.as_posix(), bad)] if bad else []
-    sdir = session.with_name(session.name[:-len(".jsonl")] if session.name.endswith(".jsonl") else session.stem)
+    sdir = derive_session_dir(session)
 
     def resolve_repo_path(value, need_file):
         p = pathlib.Path(os.path.normpath(root / value)) if isinstance(value, str) and value else None
         ok = p is not None and root in p.parents and (p.is_file() or not need_file)
         return p.relative_to(root).as_posix() if ok else None
 
-    def read_transcript(folder, aid):  # an agent id reaches a path only in PATH_ID_RE's shape
-        if PATH_ID_RE.match(aid):
-            return load_agent_transcript(folder / ("agent-%s.jsonl" % aid))
-        return dict(dict.fromkeys(("type", "description", "effort", "model", "wall", "tokens")), files=set())
+    def load_resolved(aid, run=None):  # TOOL-dBoundRoles-43 S56: the module's one resolver, then the one walk
+        p = resolve_agent_transcript(sdir, aid, run)
+        return load_agent_transcript(p) if p is not None else dict(
+            dict.fromkeys(("type", "description", "effort", "model", "wall", "tokens", "first", "last")), files=set())
 
     agents = []  # (agent id, transcript, role fallback, unit, prompt path, model fallback, returned, outcome)
     if handoff_arg is not None:
@@ -2148,7 +2193,7 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
         build, run = marker.group("build"), "direct"
         for c in hits:
             aid = c["result"]["agentId"]
-            tr = read_transcript(sdir / "subagents", aid)
+            tr = load_resolved(aid)
             unit = marker.group("unit") if marker.group("unit") != "-" else tr["description"]
             returned = c["id"] in notified or c["result"].get("status") == "completed"
             agents.append((aid, tr, marker.group("role"), unit, (hpath.name, marker.group("path")),
@@ -2186,7 +2231,7 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
             notes.append("run %s has started no agent yet" % run_id)
         run = run_id
         for e in started:
-            tr = read_transcript(sdir / "subagents" / "workflows" / run_id, e["id"])
+            tr = load_resolved(e["id"], run_id)
             unit = extract_label_unit(e["label"]) or e["label"] or tr["description"]
             agents.append((e["id"], tr, None, unit, (prompt.rsplit("/", 1)[-1], prompt) if prompt else (None, None),
                            None, e["returned"], render_outcome(e["failed"], None, e["result"], tr["files"])))
@@ -2272,6 +2317,9 @@ def main(argv):
     rr = sub.add_parser("route-refusal")
     rr.add_argument("--return", dest="return_file", required=True)
     rr.add_argument("--budget-spent", action="store_true")
+    ar = sub.add_parser("agent-return")
+    ar.add_argument("--agent", required=True)
+    ar.add_argument("--session")
     a = ap.parse_args(argv)
     if a.verb == "check-return":
         # TOOL-dBoundRoles-5 S5 - a broken return check never blocks a stop: every failure exits 0.
@@ -2309,6 +2357,9 @@ def main(argv):
     if a.verb in ("render", "facts"):
         for item in a.input:
             name, eq, value = item.partition("=")
+            if name in RENDER_FILLED_INPUTS:   # TOOL-dBoundRoles-43 S45: only `render --for <role>` fills it
+                ap.error("--input %s: input:%s is filled only by render --for <role>, from that role's resolved "
+                         "work order, so no --input supplies it" % (item[:80], name))
             if not eq or name not in INPUT_NAMES or name in inputs:
                 ap.error("--input %s: the name must be one of %s, given once as <name>=<value>; '%s' is not"
                          % (item, ", ".join(INPUT_NAMES), name))
@@ -2341,6 +2392,14 @@ def main(argv):
         if lines:
             sys.stdout.buffer.write(("\n".join(lines) + "\n").encode("utf-8"))
         return 1 if lines else 0
+    if a.verb == "agent-return":
+        # TOOL-dBoundRoles-43 S56: one agent's last text and type, for a caller binding a file to the agent
+        try:
+            print_agent_return(root, a.session, a.agent)
+        except lib.RolesError as e:
+            print("handoff: %s" % e, file=sys.stderr)
+            return 1
+        return 0
     if a.verb == "owner-question":
         # TOOL-dBoundRoles-11 S5: the shell door of `resolve_owner_question`, printing its answer and
         # holding no rule of its own; a refusal, an unknown kind included, exits 2 naming it.

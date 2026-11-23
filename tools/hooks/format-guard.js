@@ -96,7 +96,9 @@
 const fs = require('fs')
 const path = require('path')
 const { spawnSync } = require('child_process')
-const { readCard, extractRouteUnits, readConfKey, resolveToplevel, resolveCommonDir } = require('./scratch-guard.js')
+// The session layout, RUN_ID_RE, WORKFLOW_RUNS_DIR and resolveSessionDir, has one home, scratch-guard.js's
+// exports (TOOL-dBoundRoles-43 S57), so it is typed once.
+const { readCard, extractRouteUnits, readConfKey, resolveToplevel, resolveCommonDir, RUN_ID_RE, WORKFLOW_RUNS_DIR, resolveSessionDir } = require('./scratch-guard.js')
 
 const CHARTER_FILE = 'AGENTS.md'
 const CONF_FILE = '.memory-tree.conf'
@@ -110,9 +112,6 @@ const HANDOFF_BOUND_MS = 20000
 // resolve_python's launcher order, after GOV_PYTHON.
 const PYTHON_LAUNCHERS = ['python3', 'python', 'py']
 const AGENT_HEADS = ['agent', 'returned']
-const RUN_ID_RE = /^[A-Za-z0-9_-]{1,64}$/
-// The Claude Code session directory holding one subdirectory per Workflow run, not the review-harness kit.
-const WORKFLOW_RUNS_DIR = 'workflows'
 
 function readStdin() {
   try {
@@ -660,7 +659,7 @@ function checkStop(data) {
       witnesses.push(`format-guard: the transcript ${tp} is unreadable (${scan.error}), so no agent line is required`)
     } else {
       if (scan.skipped) witnesses.push(`format-guard: ${scan.skipped} line(s) of this turn in ${tp} did not parse and were skipped`)
-      const got = extractTurnAgents(scan.records, scan.text, tp.replace(/\.jsonl$/i, ''))
+      const got = extractTurnAgents(scan.records, scan.text, resolveSessionDir(tp))
       witnesses.push(...got.witnesses)
       const missing = AGENT_HEADS.filter((h) => !shapes[h])
       if (got.required.length && missing.length) {

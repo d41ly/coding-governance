@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """placement.py — a disposition for every request, recorded with its reason, its facts re-checked (TOOL-dPlacedRequest-4).
 
-    python placement.py place --request <key> --return <file> [--reenters <unit id>#<F-id>]
+    python placement.py place --request <key> --return <file> [--agent <agent id>] [--reenters <unit id>#<F-id>]
     python placement.py place --request <key> --declared <word> [<build>] [--return <file>] [--reenters <item>]
     python placement.py place --request <key> --owner <disposition record> [--return <file>]
     python placement.py check --request <key>
@@ -44,6 +44,13 @@ and its `answers` line must name a work order whose marker carries `role=gov-ori
 the verb's first stderr line, and a roles kit that does not resolve exits 2 naming the three places looked, so
 no return is ever read unchecked. The return's `outcome` line, which must read `placed`, and its `answers` line
 are then admitted beside its block keys and written to no block.
+
+THE AGENT BINDING (TOOL-dBoundRoles-43 S43). `--agent <agent id>` binds the `--return` file to the scout that
+wrote it: before the typed channel, `place` runs the roles kit's `handoff.py agent-return --agent <id>`, found
+by `resolve_kit_dir` and run as a subprocess, and refuses, exit 1 and no block written, unless that agent's
+`.meta.json` names `gov-orienter` and the file equals its last assistant text, CRLF folded and the edge
+newlines cut, naming the byte mismatch; with no roles kit `--agent` exits 2 naming it, and `--agent` with no
+`--return` is a usage error. Without `--agent` the file is read as the driver hands it.
 
 CHECK. `check` re-evaluates the newest block's facts from their sources, never from the scout's text, and
 writes its verdict into that block's `check:` line: `continue` and `amend` a build that exists, is not
@@ -124,6 +131,7 @@ transcript; and anything outside this node, the record being node-local.
 import argparse
 import datetime
 import functools
+import json
 import os
 import pathlib
 import re
@@ -435,6 +443,48 @@ def check_scout_return(root, path):
                                                                    for ln in lines))
 
 
+def check_agent_return(root, path, agent_id):
+    """The return at `path` bound to the agent `agent_id` that wrote it (TOOL-dBoundRoles-43 S43, §8 F15): the
+    roles kit's `handoff.py agent-return --agent <id>`, found by `resolve_kit_dir` and run as a subprocess in
+    `root`, prints the agent's `.meta.json` type and its last assistant text, and the file must equal that text,
+    CRLF folded and the edge newlines cut, from an agent typed `SCOUT_ROLE`. PlacementRefused naming the byte
+    mismatch, the type, or the verb's exit and first stderr line; LookupError naming the roles kit and the
+    places looked where it does not resolve, so `--agent` never binds a file it cannot read the agent for."""
+    try:
+        handoff = resolve_kit_dir("roles", "handoff.py", KIT) / "handoff.py"
+    except LookupError as e:
+        raise LookupError("--agent reads the agent's own return through the roles kit, and %s" % e) from None
+    try:
+        p = subprocess.run([sys.executable, str(handoff), "agent-return", "--agent", agent_id], cwd=str(root),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           env=read_clean_env(PYTHONIOENCODING="utf-8"), timeout=VERB_BOUND)
+        rc, out, err = p.returncode, p.stdout, p.stderr
+    except subprocess.TimeoutExpired:
+        rc, out, err = None, "", "it did not answer within %ds" % VERB_BOUND
+    got = None
+    if rc == 0:
+        try:
+            got = json.loads(out)
+        except ValueError:
+            got = None
+    if not isinstance(got, dict):
+        raise PlacementRefused("--agent %s: agent-return exited %s: %s" % (agent_id, rc, next(
+            (ln.strip() for ln in err.splitlines() if ln.strip()), "it printed no JSON object")))
+    if got.get("type") != SCOUT_ROLE:
+        raise PlacementRefused("--agent %s is typed %s, not %s, so its text is no orientation return"
+                               % (agent_id, got.get("type") or "unknown", SCOUT_ROLE))
+    try:
+        text = pathlib.Path(path).read_bytes().decode("utf-8-sig")
+    except (OSError, UnicodeDecodeError) as e:
+        raise PlacementRefused("the return %s cannot be read: %s" % (path, e)) from None
+
+    def fold(s):
+        return str(s or "").replace("\r\n", "\n").strip("\n")
+    if fold(text) != fold(got.get("text")):
+        raise PlacementRefused("the return %s differs byte for byte from agent %s's last text, so it is no placement "
+                               "that agent wrote" % (path, agent_id))
+
+
 def read_scout_return(path):
     """`{key: value}` of the scout's return at `path`, its keys among `RETURN_KEYS`. The typed channel's two
     fields, `TYPED_RETURN_KEYS`, are admitted once each and left out of the result, `outcome` only where it
@@ -525,6 +575,10 @@ def write_placement(args, root, store):
     """The `place` verb: one block written by the value of `placement`, or the owner item printed."""
     value = read_placement_policy(root, "placement", "probe.observations")
     mode, observe = value["placement"], value["probe.observations"]
+    if args.agent and not args.ret:
+        raise PlacementRefused("--agent binds a --return file to the agent that wrote it, and no --return is given", 2)
+    if args.ret and args.agent:
+        check_agent_return(root, args.ret, args.agent)
     if args.ret:
         check_scout_return(root, args.ret)
     fields = read_scout_return(args.ret) if args.ret else {}
@@ -1667,6 +1721,7 @@ def main(argv):
     pl = sub.add_parser("place", help="write one placement block")
     pl.add_argument("--request", required=True)
     pl.add_argument("--return", dest="ret")
+    pl.add_argument("--agent")
     pl.add_argument("--declared", nargs="+")
     pl.add_argument("--owner")
     pl.add_argument("--reenters")

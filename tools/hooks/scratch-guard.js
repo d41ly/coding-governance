@@ -1978,24 +1978,37 @@ function checkRouted(data, env) {
 
 // ---- the shell-write arm (TOOL-dBoundRoles-7) ---------------------------------------------------
 
-/** The shape an agent id and a Workflow run id must hold to reach a path: format-guard.js's RUN_ID_RE. */
-const TRANSCRIPT_ID_RE = /^[A-Za-z0-9_-]{1,64}$/
-/** The bound on the agent transcript's head the allowance read takes, in bytes. */
-const TRANSCRIPT_READ_BOUND = 256 * 1024
+/**
+ * The shape an agent id and a Workflow run id must hold to reach a path, the Claude Code session directory's
+ * folder of Workflow runs, and that directory's derivation (TOOL-dBoundRoles-43 S57): ONE home each, which
+ * format-guard.js imports and readWorkOrderAllowance reads, so the layout is typed once.
+ */
+const RUN_ID_RE = /^[A-Za-z0-9_-]{1,64}$/
+const WORKFLOW_RUNS_DIR = 'workflows'
+/** The session directory beside a session transcript: its path, native form, without the `.jsonl` suffix. */
+function resolveSessionDir(transcriptPath) {
+  return buildNativePath(String(transcriptPath).replace(/\.jsonl$/i, ''))
+}
+/** The bound on the agent transcript's first record the allowance read takes, in bytes (TOOL-dBoundRoles-43 S39). */
+const TRANSCRIPT_READ_BOUND = 8 * 1024 * 1024
 
 /**
  * S4: the allowance of the work order a role agent was spawned with, read from its transcript, where
  * spawn-guard.js's rule 6 verified the prompt against its prompt file byte for byte. The transcript is
  * `<session dir>/subagents/agent-<agent_id>.jsonl`, else `<session dir>/subagents/workflows/<run id>/
- * agent-<agent_id>.jsonl` for the first run id in name order holding one, the session dir being the
- * payload's `transcript_path` without `.jsonl`; `agent_id` and each run id reach a path only in
- * TRANSCRIPT_ID_RE's shape. Its first TRANSCRIPT_READ_BOUND bytes are read, and its first record must
- * parse; the first `user` record's content is the prompt. The allowance is the `### allowance` block
- * inside the prompt's `## Task` section, read up to the next heading: each `- <prefix>` bullet one
- * entry, a backtick pair around it stripped, and a body reading `none` the empty list.
+ * agent-<agent_id>.jsonl` for the first run id in name order holding one, the session dir being
+ * resolveSessionDir's; `agent_id` and each run id reach a path only in RUN_ID_RE's shape. Its first JSONL
+ * line is read whole, up to TRANSCRIPT_READ_BOUND bytes, and must parse as a `user` record, whose content is
+ * the prompt (TOOL-dBoundRoles-43 S39). The allowance is the one `### allowance` heading of the prompt's
+ * `## Task` section, both read outside every fence by readUnfencedLines, so a heading quoted in a handed
+ * block's fence is content (S35): its block runs up to the next heading, each `- <prefix>` bullet one entry,
+ * a backtick pair around it stripped, and a body reading `none` the empty list.
  * `{ entries, from, marker }` when found, `from` the transcript and `marker` the prompt's first line
- * where it is the `gov:handoff` marker; `{ why }` when no transcript, no readable first record, no
- * `## Task` section or no block is found. Reads no other file and never throws on a missing one.
+ * where it is the `gov:handoff` marker; `{ deny }` for a typed agent's work order that cannot be trusted to
+ * narrow, rather than fall back to the class verdict: a first record past the bound or one that does not
+ * parse (S39), and two or more `### allowance` headings outside every fence, naming the count (S35);
+ * `{ why }` when no transcript, no user first record, no `## Task` section or no block is found. Reads no
+ * other file and never throws on a missing one.
  */
 function readWorkOrderAllowance(data) {
   const fs = require('fs')
@@ -2003,51 +2016,58 @@ function readWorkOrderAllowance(data) {
   const tp = typeof data.transcript_path === 'string' ? data.transcript_path : ''
   if (!tp.endsWith('.jsonl')) return { why: 'the payload carries no transcript_path naming a .jsonl file' }
   const aid = typeof data.agent_id === 'string' ? data.agent_id : ''
-  if (!TRANSCRIPT_ID_RE.test(aid)) return { why: `the payload's agent_id ${JSON.stringify(aid.slice(0, 80))} is not in the shape ${TRANSCRIPT_ID_RE}` }
-  const sub = path.join(buildNativePath(tp.slice(0, -'.jsonl'.length)), 'subagents')
+  if (!RUN_ID_RE.test(aid)) return { why: `the payload's agent_id ${JSON.stringify(aid.slice(0, 80))} is not in the shape ${RUN_ID_RE}` }
+  const sub = path.join(resolveSessionDir(tp), 'subagents')
   const name = `agent-${aid}.jsonl`
   let runs = []
-  try { runs = fs.readdirSync(path.join(sub, 'workflows')).filter((r) => TRANSCRIPT_ID_RE.test(r)).sort() } catch { runs = [] }
-  const file = [path.join(sub, name), ...runs.map((r) => path.join(sub, 'workflows', r, name))].find((f) => fs.existsSync(f))
+  try { runs = fs.readdirSync(path.join(sub, WORKFLOW_RUNS_DIR)).filter((r) => RUN_ID_RE.test(r)).sort() } catch { runs = [] }
+  const file = [path.join(sub, name), ...runs.map((r) => path.join(sub, WORKFLOW_RUNS_DIR, r, name))].find((f) => fs.existsSync(f))
   if (!file) return { why: `no agent transcript ${name} under ${buildComparablePath(sub)}` }
   const from = buildComparablePath(file)
-  let head = ''
+  const parts = []
   let fd = null
+  let read = 0
+  let whole = false
   try {
     fd = fs.openSync(file, 'r')
-    const buf = Buffer.alloc(TRANSCRIPT_READ_BOUND)
-    head = buf.toString('utf8', 0, fs.readSync(fd, buf, 0, TRANSCRIPT_READ_BOUND, 0))
+    const chunk = Buffer.alloc(1024 * 1024)
+    while (read <= TRANSCRIPT_READ_BOUND) {
+      const n = fs.readSync(fd, chunk, 0, chunk.length, read)
+      if (n === 0) { whole = true; break }
+      const nl = chunk.subarray(0, n).indexOf(0x0a)
+      parts.push(Buffer.from(chunk.subarray(0, nl === -1 ? n : nl)))
+      read += nl === -1 ? n : nl
+      if (nl !== -1) { whole = true; break }
+    }
   } catch (e) {
     return { why: `the agent transcript ${from} cannot be read (${(e && e.code) || e})` }
   } finally {
     if (fd !== null) fs.closeSync(fd)
   }
-  let prompt = null
-  for (const line of head.split('\n')) {
-    if (line.trim() === '') continue
-    let d
-    try { d = JSON.parse(line) } catch { return { why: `the agent transcript ${from} holds no readable first record within its first ${TRANSCRIPT_READ_BOUND} bytes` } }
-    if (!d || d.type !== 'user') continue
-    const c = d.message && d.message.content
-    prompt = typeof c === 'string' ? c
-      : Array.isArray(c) ? c.filter((b) => b && b.type === 'text' && typeof b.text === 'string').map((b) => b.text).join('\n') : ''
-    break
-  }
-  if (prompt === null) return { why: `the agent transcript ${from} holds no user record` }
-  const lines = prompt.split(/\r?\n/)
-  const task = lines.indexOf('## Task')
-  if (task === -1) return { why: `the prompt in ${from} holds no ## Task section` }
-  const end = lines.findIndex((l, i) => i > task && /^## /.test(l))
-  const at = lines.findIndex((l, i) => i > task && (end === -1 || i < end) && l.trim() === '### allowance')
-  if (at === -1) return { why: `the ## Task section of the prompt in ${from} carries no ### allowance block` }
+  if (!whole || read > TRANSCRIPT_READ_BOUND) return { deny: `the first record of the agent transcript ${from} runs past ${TRANSCRIPT_READ_BOUND} bytes, so the work order's allowance is not read and no write of this typed agent is admitted on its class verdict alone` }
+  let d
+  try { d = JSON.parse(Buffer.concat(parts).toString('utf8')) } catch { d = undefined }
+  if (d === undefined) return { deny: `the first record of the agent transcript ${from} does not parse, so the work order's allowance is not read and no write of this typed agent is admitted on its class verdict alone` }
+  if (!d || d.type !== 'user') return { why: `the first record of the agent transcript ${from} is no user record` }
+  const c = d.message && d.message.content
+  const prompt = typeof c === 'string' ? c
+    : Array.isArray(c) ? c.filter((b) => b && b.type === 'text' && typeof b.text === 'string').map((b) => b.text).join('\n') : ''
+  const lines = [...readUnfencedLines(prompt)].filter(([, l]) => l !== null).map(([n, l]) => [n, l.replace(/\r$/, '')])
+  const task = lines.findIndex(([, l]) => l === '## Task')
+  if (task === -1) return { why: `the prompt in ${from} holds no ## Task section outside a fence` }
+  const end = lines.findIndex(([, l], i) => i > task && /^## /.test(l))
+  const heads = lines.map(([, l], i) => i).filter((i) => i > task && (end === -1 || i < end) && lines[i][1].trim() === '### allowance')
+  if (heads.length === 0) return { why: `the ## Task section of the prompt in ${from} carries no ### allowance block` }
+  if (heads.length > 1) return { deny: `the ## Task section of the prompt in ${from} carries ${heads.length} ### allowance headings outside every fence, and a work order holds one, so no write of this typed agent is admitted` }
   const entries = []
-  for (const raw of lines.slice(at + 1)) {
+  for (const [, raw] of lines.slice(heads[0] + 1)) {
     const l = raw.trim()
     if (/^#{1,6}\s/.test(l)) break
     const b = /^- (.+)$/.exec(l)
     if (b) entries.push(b[1].trim().replace(/^`(.*)`$/, '$1'))
   }
-  return { entries, from, marker: lines[0].startsWith('<!-- gov:handoff') ? lines[0].trim() : '' }
+  const first = prompt.split(/\r?\n/)[0]
+  return { entries, from, marker: first.startsWith('<!-- gov:handoff') ? first.trim() : '' }
 }
 
 /** S7: a shell-write refusal — the command's target, the shape that wrote it, why, and the remedy's actor. */
@@ -2073,9 +2093,10 @@ function renderShellDeny(tool, t, shown, reason) {
  *     b. checkRouted on a synthetic `Write` payload carrying the target as `tool_input.file_path` and
  *        the payload's `cwd`, `session_id` and `agent_type`: a deny → deny, renderShellDeny around
  *        it; a witness is kept
- *     c. readWorkOrderAllowance(data), read once per call: found, and checkRoutedEntry places the
- *        target's repo-relative path under none of its entries → deny naming the allowance and the
- *        work order; an empty list admits no target
+ *     c. readWorkOrderAllowance(data), read once per call: its `deny` (a first record past the bound or
+ *        not parsing, two allowance headings outside every fence) → deny naming it (TOOL-dBoundRoles-43
+ *        S35, S39); found, and checkRoutedEntry places the target's repo-relative path under none of
+ *        its entries → deny naming the allowance and the work order; an empty list admits no target
  *  4. the witnesses step 3b kept, and, where step 3c read no allowance, one naming why, joined on one
  *     line → witness; else null
  * The synthetic payload carries no `content`, so no status-only flip is proven and a shell edit of a
@@ -2110,6 +2131,7 @@ function checkShellWrites(cmd, data, env) {
     if (verdict && verdict.deny) return { deny: renderShellDeny(tool, t, shown, `The write gate refuses that Write:\n\n${verdict.deny.trimEnd()}`) }
     if (verdict && verdict.witness && !witnesses.includes(verdict.witness)) witnesses.push(verdict.witness)
     if (allowance === null) allowance = readWorkOrderAllowance(data)
+    if (allowance.deny) return { deny: renderShellDeny(tool, t, shown, `The work order's allowance is not read: ${allowance.deny}.`) }
     if (!allowance.entries) continue
     const rel = shown.slice(buildComparablePath(mine.hit.toplevel).length + 1)
     if (checkRoutedEntry(rel, allowance.entries) === undefined) {
@@ -2619,8 +2641,8 @@ const READ_TOOLS = ['Read', 'Grep', 'Glob']
  *  3. no policy kit resolves beside this hook (this file's resolvePolicyHelper) -> witness,
  *     `driver.reads unarmed`.
  *  4. `readPolicy('driver.reads')` at the toplevel, the landed revision's value, never the working
- *     tree's: a refused read denies, naming the reader's line, since an arm that cannot read its key
- *     does not admit.
+ *     tree's: a reader that throws or refuses -> witness naming the reader's line, the read admitted,
+ *     since the reads that repair a broken policy mirror are the driver's (TOOL-dBoundRoles-43 S40).
  *  5. `read-only-probes` -> null; `state-reads-only` and a `Read` -> null; any other value and tool,
  *     `state-reads-only`'s `Grep` and `Glob` and every read under `none-scout-only` -> deny.
  * Each refusal names the key, its value, the driver's remedy, a scout dispatched through a rendered
@@ -2643,7 +2665,9 @@ function checkDriverRead(data, env) {
   try {
     v = require(helper).readPolicy('driver.reads', { repo: hit.toplevel }).value
   } catch (e) {
-    return { deny: `BLOCKED by scratch-guard: the main loop's ${tool} is refused — driver.reads could not be read, and a read arm that cannot read its key does not admit (TOOL-dBoundRoles-10). Clear the policy reader's refusal, which names its cause:\n  ${String((e && e.message) || e).split(/\r?\n/)[0]}\n` }
+    // TOOL-dBoundRoles-43 S40 (§8 F13): a broken policy mirror is no fault of the driver's, and the reads that
+    // repair it are the driver's own, so a throw or a refusal of the reader admits the read with one witness
+    return { witness: `driver.reads unread — the policy reader refused (${String((e && e.message) || e).split(/\r?\n/)[0]}), so the main loop's ${tool} is admitted while the policy is repaired (TOOL-dBoundRoles-43)` }
   }
   if (v === 'read-only-probes' || (v === 'state-reads-only' && tool === 'Read')) return null
   const why = v === 'state-reads-only'
@@ -2876,4 +2900,4 @@ function resolveKitDir(home, anchor, here) {
 // <<< resolveKitDir
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines, scanWriteTargets, checkShellWrites, readWorkOrderAllowance, checkRoutedEntry, checkDriverRead, KIT_AGENT_CAP_VERSION, extractBuildSlug, extractWorkflowArgs, HANDOFF_MARK_RE, extractHandoffMarker, resolvePolicyHelper, resolveKitDir }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines, scanWriteTargets, checkShellWrites, readWorkOrderAllowance, checkRoutedEntry, checkDriverRead, RUN_ID_RE, WORKFLOW_RUNS_DIR, resolveSessionDir, KIT_AGENT_CAP_VERSION, extractBuildSlug, extractWorkflowArgs, HANDOFF_MARK_RE, extractHandoffMarker, resolvePolicyHelper, resolveKitDir }

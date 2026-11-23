@@ -13,7 +13,11 @@ THE CARRIERS. The roles kit's house file `house/policy.toml`: each level table, 
 `.governance/policy.toml`: `roles.effort.<role>`, `roles.effort.<workflow>.<stage>`, and every other key whose
 catalogue name holds a `<role>` segment, read through the policy kit's `read_catalogue_row` by its `scan_keys`.
 The overlay `.governance/instructions.toml`: every string value equal to `role.gov-spec-reviewer` or
-`role.gov-diff-reviewer`. And each old stem's house text file, `house/<stem>.md`.
+`role.gov-diff-reviewer`. Each old stem's house text file, `house/<stem>.md`. And the method-carriers
+ledger `<memory root>/project/method-carriers.txt`, the root the target's `.memory-tree.conf` names
+(TOOL-dBoundRoles-43 S17): every row naming either old agent type is replaced by one row for
+`.claude/agents/gov-reviewer.md`, where the first replaced row stood and carrying its count, sha and
+disposition (§8 F18), and none is added where the ledger already holds that row.
 
 THE UP. No old stem in any carrier, no old type under `.claude/agents`, no old role file in the kit and an
 index naming neither: exit 0, nothing written. Otherwise it reads every carrier and computes every write
@@ -36,6 +40,9 @@ write. Then the before-image (`write_before_image`) covers every path, the carri
 role files removed, and `render_agents.py --write` runs in the target: it unlinks the two old types as stale
 owned types and writes `gov-reviewer.md`, then the index last. An old type the index does not list is no
 type the render owns, so the step removes it before the render. The render's result is held to the image.
+The up is ATOMIC (TOOL-dBoundRoles-43 S37, §8 F11): any failure after the before-image is written, the
+render's exit or its bytes included, restores every path the image records to its before bytes and removes
+the image (`write_image_back`), exit 1, so a re-run starts from the target as it stood.
 
 THE DOWN restores every path from the before-image (`write_from_before_image`): a path edited since the up
 refuses the whole down, exit 1, naming it, and nothing is restored.
@@ -46,6 +53,7 @@ the target installs the roles kit and holds an index, the index lists `gov-revie
 Exit 0 done, 1 refused naming why, 2 a usage error.
 """
 
+import base64
 import importlib.util
 import json
 import os
@@ -70,6 +78,10 @@ POLICY = ".governance/policy.toml"
 OVERLAY = ".governance/instructions.toml"
 AGENTS = ".claude/agents"
 INDEX = ".claude/roles.json"
+# The method-carriers ledger under the target's memory root (S17), its conf and the seed's root.
+CONF = ".memory-tree.conf"
+MEMORY_DEFAULT = "memory"
+CARRIERS = "project/method-carriers.txt"
 ROLE_SEGMENT = "<role>"
 EFFORT_FAMILY = ["roles", "effort", ROLE_SEGMENT]  # S4's family; S5 re-keys every other <role> family
 BOM = chr(0xFEFF)
@@ -264,6 +276,10 @@ def read_old_spellings(target: pathlib.Path, kit: pathlib.Path | None) -> list[s
     out += [f"{OVERLAY} {k}" for k in derive_value_spellings(overlay)] + read_old_edges(overlay)
     out += [f"{AGENTS}/{stem}.md" for stem in OLD if (target / AGENTS / f"{stem}.md").is_file()]
     out += [f"{INDEX} roles.{stem}" for stem in OLD if stem in (read_index_roles(target) or [])]
+    carriers = f"{read_memory_root(target)}/{CARRIERS}"
+    data = read_bytes(target, carriers)
+    if data is not None and derive_carrier_rows(data.decode("utf-8", "replace")) is not None:
+        out.append(f"{carriers} names a retired reviewer's agent type")
     return out
 
 
@@ -447,6 +463,65 @@ def derive_house_text(merged: str, stem: str, body: str) -> str:
     return f"{lead}From the {stem} house overlay, carried by {STEP_ID}:\n\n{body}\n"
 
 
+def read_memory_root(target: pathlib.Path) -> str:
+    """The target's memory root, the last `MEMORY_ROOT=` assignment of its `.memory-tree.conf`, a quote pair
+    around it stripped; `memory`, the seed's, where the file or the key is absent or the value leaves the
+    target. Read as text, so the witness runs no target code."""
+    data = read_bytes(target, CONF)
+    value = None
+    for line in (data or b"").decode("utf-8", "replace").splitlines():
+        head, eq, rest = line.strip().removeprefix("export ").partition("=")
+        if eq and head.strip() == "MEMORY_ROOT":
+            value = rest.split(" #", 1)[0].strip().strip("\"'")
+    return STEPS.derive_contained_rel(value) if value and STEPS.derive_contained_rel(value) else MEMORY_DEFAULT
+
+
+def derive_carrier_rows(text: str) -> str | None:
+    """The method-carriers ledger `text` with every row naming either old agent type replaced by one row for
+    the merged type's agent file (S17, §8 F18): placed where the first replaced row stood, carrying that row's
+    count, sha and disposition, since it declares the same pointer under the merged name, and none added where
+    the ledger already holds a row for the merged file. Each row is `<path>\\t<count>\\t<sha>\\t<disposition>`;
+    a comment or blank line is kept as it is. None where no row names an old type."""
+    old = {f"{AGENTS}/{stem}.md" for stem in OLD}
+    merged = f"{AGENTS}/{MERGED}.md"
+    lines = text.split("\n")
+    keys = [ln.split("\t", 1)[0] for ln in lines]
+    if not old & set(keys):
+        return None
+    out, held = [], merged in keys
+    for ln, key in zip(lines, keys):
+        if key not in old:
+            out.append(ln)
+        elif not held:
+            out.append("\t".join([merged] + ln.split("\t")[1:]))
+            held = True
+    return "\n".join(out)
+
+
+def write_image_back(target: pathlib.Path) -> list[str]:
+    """Restore every path the step's before-image records to its before bytes, then remove the image (S37,
+    §8 F11): the atomic up's own recovery, run on a failure after the image is written, so a half-migrated
+    target goes back whole whatever the failed write left in a path. Returns the paths restored."""
+    image = STEPS.derive_image_path(target, STEP_ID)
+    if not image.is_file():
+        return []
+    held = json.loads(image.read_text(encoding="utf-8"))["paths"]
+    for rel, v in sorted(held.items()):
+        cur = STEPS.check_contained(target, rel)
+        if v["before"] is None:
+            cur.unlink(missing_ok=True)
+        else:
+            cur.parent.mkdir(parents=True, exist_ok=True)
+            cur.write_bytes(base64.b64decode(v["before"]))
+    image.unlink()
+    for d in (image.parent, image.parent.parent):
+        try:
+            d.rmdir()
+        except OSError:
+            break  # not empty: another step's image is there
+    return sorted(held)
+
+
 def build_render_env() -> dict:
     """The environment a render runs under: the caller's, less every `GIT_` name, so git answers for
     the target alone."""
@@ -508,6 +583,7 @@ def cmd_up(target: pathlib.Path, prefix: str) -> int:
     house_rel = f"{kit_rel}/house/policy.toml"
     texts = {stem: f"{kit_rel}/house/{stem}.md" for stem in (*OLD, MERGED)}
     role_files = [f"{kit_rel}/agents/{stem}.agent.md" for stem in OLD]
+    carriers_rel = f"{read_memory_root(target)}/{CARRIERS}"
 
     def derive_after(before):
         def read(rel):
@@ -558,6 +634,10 @@ def cmd_up(target: pathlib.Path, prefix: str) -> int:
             conflicts += read_old_edges(doc)
             if derive_value_spellings(doc) and not conflicts:
                 after[OVERLAY] = write_overlay_values(data.decode("utf-8")).encode("utf-8")
+        data = read(carriers_rel)
+        carried_rows = derive_carrier_rows(data.decode("utf-8")) if data is not None else None
+        if carried_rows is not None:   # S17: the ledger re-keyed to the merged type's agent file
+            after[carriers_rel] = carried_rows.encode("utf-8")
         if conflicts:
             raise Refusal("\n".join(conflicts))
         merged = (read(texts[MERGED]) or b"").decode("utf-8")
@@ -585,35 +665,42 @@ def cmd_up(target: pathlib.Path, prefix: str) -> int:
     old_types = [f"{AGENTS}/{stem}.md" for stem in OLD]
     unowned = {f"{AGENTS}/{stem}.md" for stem in OLD if stem not in (read_index_roles(target) or [])}
     after = STEPS.write_before_image(target, STEP_ID, derive_after)
-    rendered = {rel for rel in after if rel == INDEX or rel.startswith(AGENTS + "/")}
-    for rel, data in sorted(after.items()):
-        if rel in rendered and rel not in unowned:
-            continue
-        if data is None:
-            (target / rel).unlink(missing_ok=True)
-        else:
-            (target / rel).parent.mkdir(parents=True, exist_ok=True)
-            (target / rel).write_bytes(data)
-    for rel in (house_rel, POLICY, OVERLAY, *texts.values(), *role_files):
-        done = ("removed" if after[rel] is None else "carries the old house text" if rel == texts[MERGED]
-                else "re-keyed") if rel in after else None
-        print(f"{SAY}: up · {rel} " + (done or ("spells no retired reviewer, so it is skipped"
-                                               if (target / rel).is_file() else "is absent, so it is skipped")))
-    p = subprocess.run([sys.executable, "-I", str(kit / "render_agents.py"), "--write"], cwd=str(target),
-                       env=build_render_env(), stdin=subprocess.DEVNULL, capture_output=True, text=True,
-                       encoding="utf-8", errors="replace")
-    if p.returncode != 0:
-        tail = " / ".join((p.stderr or p.stdout).strip().splitlines()[-3:])
-        raise Refusal(f"{kit_rel}/render_agents.py --write exited {p.returncode} after the carriers were written: "
-                      f"{tail}; remedy: run the step's down, which restores them")
-    moved = {ln.split(" ", 2)[2] for ln in p.stdout.splitlines()
-             if ln.startswith(("render_agents: wrote ", "render_agents: unlinked "))}
-    off = sorted(rel for rel in rendered | moved if rel not in after or (
-        (read_bytes(target, rel) or b"").replace(b"\r", b"") != after[rel] if after[rel] is not None
-        else (target / rel).exists()))
-    if off:
-        raise Refusal(f"{', '.join(off)}: the render wrote other bytes than the before-image records; remedy: "
-                      f"run render_agents.py --check, and the step's down, which names each path it cannot restore")
+    # THE ATOMIC UP (S37, §8 F11): from here on any failure restores every path the image records to its
+    # before bytes and removes the image, exit 1, so a target is never left half-migrated and a re-run starts over
+    try:
+        rendered = {rel for rel in after if rel == INDEX or rel.startswith(AGENTS + "/")}
+        for rel, data in sorted(after.items()):
+            if rel in rendered and rel not in unowned:
+                continue
+            if data is None:
+                (target / rel).unlink(missing_ok=True)
+            else:
+                (target / rel).parent.mkdir(parents=True, exist_ok=True)
+                (target / rel).write_bytes(data)
+        for rel in (house_rel, POLICY, OVERLAY, carriers_rel, *texts.values(), *role_files):
+            done = ("removed" if after[rel] is None else "carries the old house text" if rel == texts[MERGED]
+                    else "re-keyed") if rel in after else None
+            print(f"{SAY}: up · {rel} " + (done or ("spells no retired reviewer, so it is skipped"
+                                                   if (target / rel).is_file() else "is absent, so it is skipped")))
+        p = subprocess.run([sys.executable, "-I", str(kit / "render_agents.py"), "--write"], cwd=str(target),
+                           env=build_render_env(), stdin=subprocess.DEVNULL, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+        if p.returncode != 0:
+            tail = " / ".join((p.stderr or p.stdout).strip().splitlines()[-3:])
+            raise Refusal(f"{kit_rel}/render_agents.py --write exited {p.returncode} after the carriers were "
+                          f"written: {tail}")
+        moved = {ln.split(" ", 2)[2] for ln in p.stdout.splitlines()
+                 if ln.startswith(("render_agents: wrote ", "render_agents: unlinked "))}
+        off = sorted(rel for rel in rendered | moved if rel not in after or (
+            (read_bytes(target, rel) or b"").replace(b"\r", b"") != after[rel] if after[rel] is not None
+            else (target / rel).exists()))
+        if off:
+            raise Refusal(f"{', '.join(off)}: the render wrote other bytes than the before-image records; remedy: "
+                          f"run render_agents.py --check")
+    except Exception as e:  # noqa: BLE001 - the atomic up's one recovery boundary
+        restored = write_image_back(target)
+        raise Refusal(f"{e}; every path the before-image records was restored ({', '.join(restored)}), so the "
+                      f"target is as it was before the up; remedy: clear the cause and re-run the step") from None
     print(f"{SAY}: up · {kit_rel}/render_agents.py --write · "
           + ", ".join(f"{rel} {'unlinked' if after[rel] is None else 'written'}" for rel in sorted(rendered)))
     return 0

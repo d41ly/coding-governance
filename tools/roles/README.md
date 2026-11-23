@@ -31,7 +31,20 @@ file still there (TOOL-dBoundRoles-19).
 The `mandatory` and `output` keys ride the base file, as `writes` does, so an overlay cannot change
 them, and so do `never` and `return` (TOOL-dBoundRoles-2). The keys a role file may carry, and which
 each role must, are the rows of `role-schema.toml`, which `roles_lib.load_role_schema` reads; a
-later key is one row there.
+later key is one row there. Each row's `shape` is one of this closed table (TOOL-dBoundRoles-43 S7, S8):
+
+| shape | a value is |
+|---|---|
+| `slot` | the role's slot, its file stem |
+| `text` | free text on one line |
+| `list` | comma-separated entries |
+| `class` | one write class |
+| `bool` | `true` or `false` |
+| `entries` | `;`-separated `<limit> — <enforcer>` entries |
+| `template` | the typed return template |
+| `int` | a non-negative decimal integer |
+| `tag` | a tag of the namespace the row's `ns` key names |
+| `choice` | one value of the list the row's `values` key holds, or of the `roles_lib.py` constant it names |
 
 - `never` holds the role's limits, `;`-separated, each `<limit> — <enforcer>`. The enforcer is a
   script whose first word names a `.js`, `.py` or `.sh` file in the tool root or one directory
