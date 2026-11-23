@@ -579,7 +579,7 @@ def test_served_set_leaves_untracked_out():
     root = build_served_fixture()
     kit = root / KIT.name
     p = subprocess.run([sys.executable, "-c", _SERVED_PROBE % {"kit": str(kit), "root": str(root)}],
-                       capture_output=True, text=True, cwd=str(root))
+                       capture_output=True, text=True, encoding="utf-8", cwd=str(root))
     assert p.returncode == 0, f"the served-set probe failed:\n{p.stdout}{p.stderr[-900:]}"
     got = json.loads(p.stdout.strip().splitlines()[-1])
     fresh = "memory/tooling/fresh.md"
