@@ -21062,6 +21062,52 @@ kd64_out=$(run_mail_arm A s3 ack fx "${kd64_e:-unposted}"); kd64_rc=$?
 same "KDS64 S2 e's ack id planted on a landed message, --mail ack fx e prints mail — duplicate and exits 2, the tip unmoved" \
   "$kd64_rc $(grep -c "^mail — duplicate ${kd64_id:-underived} · refs/gov/remote/mail/fx/b/t9$" <<<"$kd64_out") $(git --git-dir="$mb_d/o.git" rev-parse --verify -q "$kd64_r")" \
   "2 1 $kd64_t1"
+# ---- KICK-dKeptSession-65 AC1 AC2 (S1, S3, S12) - THE SKIP READS THE ACKS <slug> SENT, AFTER A STRICT
+# ---- FETCH. fy, from B, posts g, h and i to build:fx. AC1: A's session s4 answers g by `--mail answer`
+# ---- and then acks it, so g's row reads `answered` with fx's ack of it beside it; through a scratch
+# ---- driver whose `check_mail_duplicate` prints `DUPCHECK <id>` and whose `read_mailbox` prints FETCH
+# ---- on stderr at its fetch, `--mail ack fx g` prints FETCH and `mail — already acked g` and no
+# ---- DUPCHECK line, exits 0, s4's tip unmoved, and `--mail ack fx g h` names g already acked, reaches
+# ---- no `DUPCHECK g` and lands one commit. AC2: B's session t5 acks i as fx and pushes; A, which has
+# ---- not fetched since, runs `--mail ack fx i` through the same copy, its first line FETCH, then
+# ---- `mail — already acked i` and no DUPCHECK line, exit 0, the tip unmoved; with origin's URL
+# ---- pointed at an absent directory the same call prints `mail — not read · the remote did not
+# ---- answer`, exits 2, the tip unmoved. RED, observed at the close: a scratch driver whose skip reads
+# ---- the state column and whose first read is `soft`, under which the second ack of g exits 2 with
+# ---- `mail — duplicate` and the unreachable remote prints `mail — not written`. WHAT THIS DOES NOT
+# ---- DRIVE: a `local sent` read returning 2, which only a cache git cannot log reaches.
+kd65_cut='    observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+refs/gov/mail/*:'
+kd65_src=$(<"$mb_d/kd64-dupcheck.sh")
+printf '%s\n' "${kd65_src/"$kd65_cut"/"    echo FETCH >&2;$kd65_cut"}" > "$mb_d/kd65-fetch.sh"
+kd65_g=$(run_mail_arm B t2 post fy --to build:fx --kind question --subject 'q g' --default no "$mb_d/body.txt" | sed -n "$kd64_pid")
+kd65_h=$(run_mail_arm B t2 post fy --to build:fx --kind question --subject 'q h' --default no "$mb_d/body.txt" | sed -n "$kd64_pid")
+kd65_i=$(run_mail_arm B t2 post fy --to build:fx --kind question --subject 'q i' --default no "$mb_d/body.txt" | sed -n "$kd64_pid")
+kd65_r=refs/gov/mail/fx/a/s4
+run_mail_arm A s4 answer fx "${kd65_g:-unposted}" "$mb_d/body.txt" >/dev/null
+kd65_out=$(run_mail_arm A s4 ack fx "${kd65_g:-unposted}"); kd65_rc=$?
+same "KDS65 AC1 g answered, then acked by fx, the ack exits 0 posting one, and g's row reads answered" \
+  "$kd65_rc $(grep -c '^mail — posted ' <<<"$kd65_out") $(run_mail_arm A s4 read fx | awk -F'\t' -v q="${kd65_g:-unposted}" '$1 == q { print $4 }')" "0 1 answered"
+kd65_t0=$(git --git-dir="$mb_d/o.git" rev-parse --verify -q "$kd65_r")
+kd65_out=$(SCRIPT="$mb_d/kd65-fetch.sh" run_mail_arm A s4 ack fx "${kd65_g:-unposted}"); kd65_rc=$?
+same "KDS65 AC1 a second --mail ack fx g prints FETCH and mail — already acked g and no DUPCHECK line, exits 0, the tip unmoved" \
+  "$kd65_rc [$kd65_out] $(git --git-dir="$mb_d/o.git" rev-parse --verify -q "$kd65_r")" \
+  "0 [FETCH"$'\n'"mail — already acked ${kd65_g:-unposted}] $kd65_t0"
+kd65_out=$(SCRIPT="$mb_d/kd65-fetch.sh" run_mail_arm A s4 ack fx "${kd65_g:-unposted}" "${kd65_h:-unposted}"); kd65_rc=$?
+kd65_t1=$(git --git-dir="$mb_d/o.git" rev-parse --verify -q "$kd65_r")
+same "KDS65 AC1 --mail ack fx g h exits 0 naming g already acked, no DUPCHECK g, and lands one commit" \
+  "$kd65_rc $(grep -c "^mail — already acked ${kd65_g:-unposted}$" <<<"$kd65_out") $(grep -c "^DUPCHECK ${kd65_g:-unposted}$" <<<"$kd65_out") $(git --git-dir="$mb_d/o.git" rev-list --count "$kd65_t0..$kd65_t1" 2>&1)" \
+  "0 1 0 1"
+run_mail_arm B t5 ack fx "${kd65_i:-unposted}" >/dev/null
+kd65_out=$(SCRIPT="$mb_d/kd65-fetch.sh" run_mail_arm A s4 ack fx "${kd65_i:-unposted}"); kd65_rc=$?
+same "KDS65 AC2 B's ack of i pushed, A's --mail ack fx i fetches first, names i already acked, no DUPCHECK line, exits 0, the tip unmoved" \
+  "$kd65_rc $(head -n 1 <<<"$kd65_out") $(grep -c "^mail — already acked ${kd65_i:-unposted}$" <<<"$kd65_out") $(grep -c '^DUPCHECK ' <<<"$kd65_out") $(git --git-dir="$mb_d/o.git" rev-parse --verify -q "$kd65_r")" \
+  "0 FETCH 1 0 $kd65_t1"
+git -C "$mb_d/A" remote set-url origin "$mb_d/absent.git"
+kd65_out=$(SCRIPT="$mb_d/kd65-fetch.sh" run_mail_arm A s4 ack fx "${kd65_i:-unposted}"); kd65_rc=$?
+git -C "$mb_d/A" remote set-url origin "$mb_d/o.git"
+same "KDS65 AC2 origin pointed at an absent directory, the same --mail ack fx i prints mail — not read · the remote did not answer, exits 2, the tip unmoved" \
+  "$kd65_rc $(grep -c '^mail — not read · the remote did not answer' <<<"$kd65_out") $(git --git-dir="$mb_d/o.git" rev-parse --verify -q "$kd65_r")" \
+  "2 1 $kd65_t1"
 rm -rf "$mb_d"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -25425,7 +25471,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4206 -> 4212 by KICK-dKeptSession-64 on 2026-11-23: the ack batch's order-and-exits block's 6
 # region-eight `same` (AC1 2, AC3 3, S2 1), each unconditional and outside any loop, off the diff's own
 # lines, in the mailbox block. No skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4212
+# RAISED 4212 -> 4217 by KICK-dKeptSession-65 on 2026-11-23: the sent-ack skip and strict-fetch block's 5
+# region-eight `same` (AC1 3, AC2 2), each unconditional and outside any loop, off the diff's own lines,
+# in the mailbox block; it takes none out. No skip branch. No suite ran, and its RED-first observation
+# is the close's.
+FLOOR_ASSERTIONS=4217
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25728,7 +25778,8 @@ FLOOR_SHARD_7=311
 # RAISED 1407 -> 1416 by KICK-dKeptSession-62: the same 9 region-eight unbounded-progress, edges-agreement and chained-ack assertions, see FLOOR_ASSERTIONS.
 # RAISED 1416 -> 1423 by KICK-dKeptSession-63: the same 7 region-eight chained-ack list assertions, see FLOOR_ASSERTIONS.
 # RAISED 1423 -> 1429 by KICK-dKeptSession-64: the same 6 region-eight ack-batch order-and-exits assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1429
+# RAISED 1429 -> 1434 by KICK-dKeptSession-65: the same 5 region-eight sent-ack skip and strict-fetch assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1434
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

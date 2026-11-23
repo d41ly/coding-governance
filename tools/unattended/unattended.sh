@@ -4117,36 +4117,50 @@ read_mailbox() { # who · soft|strict|local · [sent] -> 0 with one TAB row per 
 # post of kind `ack` from <slug>, answering <id>, to `build:<from-build>` of that row, with its subject
 # and an empty body, so the post's lines are the ack's, and its exits are but for a duplicate (S2
 # below). Dark while RUN_CLAIMS is not `on`.
-# SEVERAL IDS (KICK-dKeptSession-62 S15), `[<id> ...]`: the mailbox is read once and every id must
-# name one of its rows before anything is written; the acks are then ONE chained post,
+# SEVERAL IDS (KICK-dKeptSession-62 S15), `[<id> ...]`: the mailbox's strict read runs once and every
+# id must name one of its rows before anything is written; the acks are then ONE chained post,
 # `write_mail_post`'s, every id's message id and duplicate check derived before any commit is built,
 # all landing in one ref update or none, so a duplicate, a refused record or a lost update leaves
 # every row open. THE BATCH'S OWN LIST (KICK-dKeptSession-63 S15): an id named twice is acked once,
-# the first kept; and a list given empty, or emptied by the skip, exits 0 and writes nothing. THE
-# ORDER PER ID (KICK-dKeptSession-64 S1): the addressed-to check on the id's row of the one read;
-# then that row's state, the fourth column, and one reading `acked` is skipped, named on stderr as
-# `mail — already acked <id>`, with no second read; only an id not skipped reaches the post's
-# `derive_message_id` and `check_mail_duplicate`. THE ACK'S EXITS (S2), for this verb alone: 0 every
-# ack posted, or no id left; 1 a lost write, so a caller reading any non-zero exit as "not posted"
-# reads it unchanged; 2 a refusal, an id addressed to no row, a record refused and an rc 1 of
-# `check_mail_duplicate` on an id not read as acked among them, the post's duplicate exit 1 read here
-# as 2. One open id prints exactly the lines it did.
-write_mail_ack() { # slug · [id ...] -> 0 posted or no id left, writing nothing; 1 lost; 2 refused, a duplicate among them
-  local slug="${1:-}" id rows fb sub st f rc line
-  local -a row=() lines=() posts=() seen=() want=("${@:2}")
+# the first kept; and a list given empty exits 0 before anything is read, as one emptied by the skip
+# exits 0, each writing nothing. THE READS (KICK-dKeptSession-65 S1, S12): `read_mailbox <slug>
+# strict` once, one bounded fetch of every mail ref, so a remote that does not answer prints `mail —
+# not read · <why>` and refuses the batch, exit 2, nothing built; then `read_mailbox <slug> local
+# sent` once, no fetch, over the cache that fetch filled, its rc 2 refusing the batch the same way.
+# THE ORDER PER ID (KICK-dKeptSession-64 S1, 65 S1): the addressed-to check on the id's row of the
+# strict read; then the skip, an id some row of the `sent` read answers, its kind (column 2) `ack`
+# and its `answers` (column 8) the id, whatever its state, named on stderr as `mail — already acked
+# <id>`. The skip never reads the state column: a row both answered and acked reads `answered`
+# (KICK-dKeptSession-5 S7). Only an id not skipped reaches the post's `derive_message_id` and
+# `check_mail_duplicate`, which read the cache the strict read's fetch filled. THE ACK'S EXITS (S2),
+# for this verb alone: 0 every ack posted, or no id left; 1 a lost write, so a caller reading any
+# non-zero exit as "not posted" reads it unchanged; 2 a refusal, an unreachable remote, an id
+# addressed to no row, a record refused and an rc 1 of `check_mail_duplicate` on an id no ack from
+# <slug> answers among them, the post's duplicate exit 1 read here as 2. One open id prints exactly
+# the lines it did.
+write_mail_ack() { # slug · [id ...] -> 0 posted or no id left, writing nothing; 1 lost; 2 refused, an unreachable remote and a duplicate among them
+  local slug="${1:-}" id rows sent fb sub f rc line acked
+  local -a row=() lines=() sends=() posts=() seen=() want=("${@:2}")
   [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 2; }
-  rows=$(read_mailbox "$slug" soft) || { printf '%s\n' "$rows"; return 2; }
+  [ "${#want[@]}" -gt 0 ] || return 0
+  rows=$(read_mailbox "$slug" strict) || { printf '%s\n' "$rows"; return 2; }
+  sent=$(read_mailbox "$slug" local sent) || { printf '%s\n' "$sent"; return 2; }
   mapfile -t lines <<<"$rows"
-  for id in ${want[@]+"${want[@]}"}; do
+  mapfile -t sends <<<"$sent"
+  for id in "${want[@]}"; do
     case " ${seen[*]:-} " in *" $id "*) continue ;; esac
-    seen+=("$id"); fb=""; sub=""; st=""
+    seen+=("$id"); fb=""; sub=""; acked=""
     for line in "${lines[@]}"; do
       IFS=$'\t' read -r -a row <<<"$line"
       [ "${row[0]:-}" = "$id" ] || continue
-      st=${row[3]:-}; fb=${row[5]:-}; sub=${row[6]:-}; break
+      fb=${row[5]:-}; sub=${row[6]:-}; break
     done
     [ -n "$fb" ] || { echo "mail — not written · $id is no message addressed to $slug"; return 2; }
-    [ "$st" != acked ] || { echo "mail — already acked $id" >&2; continue; }
+    for line in "${sends[@]}"; do
+      IFS=$'\t' read -r -a row <<<"$line"
+      if [ "${row[1]:-}" = ack ] && [ "${row[7]:-}" = "$id" ]; then acked=y; break; fi
+    done
+    [ -z "$acked" ] || { echo "mail — already acked $id" >&2; continue; }
     posts+=("build:$fb" "$sub" "$id")
   done
   [ "${#posts[@]}" -gt 0 ] || return 0
