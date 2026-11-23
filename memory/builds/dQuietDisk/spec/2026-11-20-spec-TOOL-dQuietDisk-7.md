@@ -13,6 +13,7 @@
 | [2026-11-22-build-TOOL-dQuietDisk-7-red-fix-6.md](../build/2026-11-22-build-TOOL-dQuietDisk-7-red-fix-6.md) | red-fix | — |
 | [2026-11-22-build-TOOL-dQuietDisk-7-widen-18.md](../build/2026-11-22-build-TOOL-dQuietDisk-7-widen-18.md) | widen | — |
 | [2026-11-22-build-TOOL-dQuietDisk-7-widen-7.md](../build/2026-11-22-build-TOOL-dQuietDisk-7-widen-7.md) | widen | — |
+| [2026-11-23-build-TOOL-dQuietDisk-1-runlog-c9768b47.md](../build/2026-11-23-build-TOOL-dQuietDisk-1-runlog-c9768b47.md) | journal | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-16 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 TOOL-dQuietDisk-28 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37 |
 | [2026-11-23-build-TOOL-dQuietDisk-7-red-fix-15.md](../build/2026-11-23-build-TOOL-dQuietDisk-7-red-fix-15.md) | red-fix | — |
 | [2026-11-23-build-TOOL-dQuietDisk-7-red-fix-16.md](../build/2026-11-23-build-TOOL-dQuietDisk-7-red-fix-16.md) | red-fix | — |
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
