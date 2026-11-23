@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-23-build-KICK-dKeptSession-79-widen-3.md](../build/2026-11-23-build-KICK-dKeptSession-79-widen-3.md) | widen | — |
 | [2026-11-23-prompt-KICK-dKeptSession-79-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-79-1-spec-writer.md) | journal | — |
 | [2026-11-23-prompt-KICK-dKeptSession-79-spec-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-79-spec-brief.md) | research | — |
 

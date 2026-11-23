@@ -81,7 +81,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `6184e5717b5909ebff84695a6d317548b6ab2ff5` at `ca1c5a7824d93143367edefa64f3d876dc03c080` by an owner at a console, over memory/builds/dKeptSession/RUN.md (phase HELD); memory/builds/dWitnessedBar/RUN.md (phase HELD)
-- rendered at: `ca1c5a7824d93143367edefa64f3d876dc03c080`
+- rendered at: `fa29d20cf78ea130347d8a0ec28991279ee9fe3b`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -217,7 +217,7 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dKeptSession`:
 
-Coverage of dKeptSession's 28 clauses and 16 owned nodes, over 66 specs:
+Coverage of dKeptSession's 28 clauses and 16 owned nodes, over 67 specs:
 - carried whole: 28; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: none; ambiguous: none
