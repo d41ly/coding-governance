@@ -380,17 +380,20 @@ def write_pre_placement_plant(memory_root="memory", opened=("memory/builds/tPre/
         raise
 
 
-def run_sourced(repo, script, driver=None):
+def run_sourced(repo, script, driver=None, *, args=(), timeout=900):
     """`(exit, output)` of `script` run by bash in `repo` after the unattended `driver` is sourced, this
-    tree's where None; LookupError where the driver or a bash to run it does not resolve."""
+    tree's where None; LookupError where the driver or a bash to run it does not resolve. `args` are passed
+    to `script` as `$2` onward, never interpolated into it, and `timeout` bounds the run in seconds,
+    `subprocess.TimeoutExpired` a run past it; the dependency gate's reads and notices pass the mail guard's
+    bound (KICK-dKeptSession-7)."""
     driver = driver or resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
     bash = resolve_bash(driver)
     if bash is None:
         raise LookupError("no bash can run %s" % driver.as_posix())
     env = {k: v for k, v in read_clean_env().items() if k not in ("GOV_POSITION_STATES", "GOV_DEFAULT_BRANCH")}
-    p = subprocess.run([bash, "-c", '. "$1" || exit 2; ' + script, "_", driver.as_posix()],
+    p = subprocess.run([bash, "-c", '. "$1" || exit 2; ' + script, "_", driver.as_posix(), *[str(a) for a in args]],
                        cwd=str(repo), capture_output=True, text=True, encoding="utf-8", errors="replace", env=env,
-                       timeout=900)
+                       timeout=timeout)
     return p.returncode, p.stdout + p.stderr
 
 
