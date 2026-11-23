@@ -85,7 +85,7 @@ dossier's `harness-hooks` claim.
   `bench.py`'s records path, which never calls `run_fusion`.
 - **The rows live in the ONE tag index per node, keyed by path and blob** (`TOOL-dTotalRecall-21`).
   The per-worktree cache, rebuilt whole whenever an mtime-and-size digest over the corpus moved, is
-  retired with its eviction pass and byte budget. `query.py#load_served_set` maps each corpus path to
+  retired with its eviction pass and byte budget. `tools/memory-recall/query.py#load_served_set` maps each corpus path to
   the blob this worktree serves and `write_recall_rows` extracts only the pairs the index lacks at the
   extraction digest, so one edit costs one extraction, a commit none, and a conf or alias edit every
   pair once. The index line names the pairs extracted (`extracted <k> blob(s)`), never a rebuild
