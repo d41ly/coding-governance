@@ -8,7 +8,7 @@
  * flight and knows when each one ends, which a PreToolUse hook cannot. What a call-time check CAN see
  * is the settings files the harness started from, and RULE 7 holds them to the landed limit.
  *
- * THE RULES IT KEEPS, in the order `main()` runs them: rule 6, then rule 8, then rule 7, then the call is admitted.
+ * THE RULES IT KEEPS, in the order `main()` runs them: rule 6, then rule 8, then rule 7, then rule 9, then the call is admitted.
  * Rules 0, 2 and 5 left for the review kit (TOOL-dFairHearing-16, the owner's NT-27): the verify-stage
  * total and the loop markers are its `check-verifier-fanout.js`, the ref-keyed verdict join ban its
  * `check-review-join.js`, both run by the merge bar's gates beside them over every committed harness,
@@ -70,13 +70,28 @@
  * Its location rests on the working-tree receipt, so a forged row chooses the code this rule runs
  * (TOOL-dFairHearing-48 F1).
  *
+ * RULE 9 (KICK-dKeptSession-8) — a spawn belongs to the item in flight. Every `Agent` and `Workflow`
+ * call is the act class `spawn` of scratch-guard.js's fifth check, `actions.free`, run through its
+ * exported `checkFreeAction`, required from beside this file as rule 6 requires `loadRoleIndex`. Armed
+ * where the card file `.claude/orientation-card.md` at the payload's checkout root carries
+ * `## pointers`, a `card-owner —` line naming the payload's session and a route naming a build: an
+ * `item —` instance key admits; at `item — none` the policy key `actions.free` decides, and only
+ * `recorded-anything` admits a spawn, appending one line to `gov-free-actions.log` under the git common
+ * dir. A refusal prints the check's two lines after `BLOCKED by agent-cap: rule 9 (KICK-dKeptSession-8)
+ * refused this <tool> call — `; a card with pointers that does not arm prints one `agent-cap: rule 9
+ * unarmed — <why>` line; a value read as the default, its key absent or refused, prints one NOTE; a
+ * throw refuses. No card file, or one with no `## pointers`, adds no rule and prints nothing.
+ * WHAT IT DOES NOT CHECK: the agents a running harness spawns through its own `agent()`, which reach
+ * no hook; whether the spawn serves the item named, since any spawn passes while an item is in flight;
+ * and a hand-edited card file, read like the engine's.
+ *
  * Wiring (per project): run `python <prefix>/settings-merge.py` (idempotent) — it merges the block
  * below into .claude/settings.json; or merge it by hand:
  *   "hooks": { "PreToolUse": [ { "matcher": "Workflow|Agent",
  *     "hooks": [ { "type": "command",
  *       "command": "node \"${CLAUDE_PROJECT_DIR}/<path>/agent-cap.js\"" } ] } ] }
  * The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression.
- * `Workflow` is a harness call rules 6, 8 and 7 judge; `Agent` is a direct spawn they judge too.
+ * `Workflow` is a harness call rules 6, 8, 7 and 9 judge; `Agent` is a direct spawn they judge too.
  * main() exits 0 on any other tool_name.
  * Blocks via exit 2 + stderr (version-robust; no JSON-schema dependency).
  *
@@ -1015,7 +1030,7 @@ function main() {
       `agent-cap: ${onlyArg} is refused — this hook runs no script rule since TOOL-dFairHearing-16. ` +
         `The verifier total and the loop markers run from the review kit's check-verifier-fanout.js, ` +
         `and the ref-keyed join ban from its check-review-join.js, each given this hook as --hook. ` +
-        `Omit the flag to run this hook's rules 6, 8 and 7.\n`,
+        `Omit the flag to run this hook's rules 6, 8, 7 and 9.\n`,
     )
     process.exit(2)
   }
@@ -1089,6 +1104,26 @@ function main() {
     }
   }
 
+  // RULE 9 (KICK-dKeptSession-8) — `actions.free` at the spawn: scratch-guard.js's fifth check, read
+  // through its checkFreeAction as rule 6 reads loadRoleIndex. A refusal prints the check's two lines
+  // after this rule's own prefix; an unarmed card or a defaulted value prints one line; a throw refuses.
+  {
+    let deny = null
+    try {
+      const { checkFreeAction } = require(require('path').join(__dirname, 'scratch-guard.js'))
+      const free = checkFreeAction(data, process.env)
+      if (free && free.deny) deny = `BLOCKED by agent-cap: rule 9 (KICK-dKeptSession-8) refused this ${data.tool_name} call — ${free.deny}${free.note ? `${free.note}\n` : ''}`
+      else if (free && free.unarmed) process.stderr.write(`agent-cap: rule 9 unarmed — ${free.unarmed}\n`)
+      if (!deny && free && free.note) process.stderr.write(`agent-cap: rule 9 ${free.note}\n`)
+    } catch (e) {
+      deny = `BLOCKED by agent-cap: rule 9 (KICK-dKeptSession-8) threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.\n`
+    }
+    if (deny) {
+      process.stderr.write(deny)
+      process.exit(2)
+    }
+  }
+
   // Last, the spec-audit opt-in pack's presence (TOOL-dFairHearing-22), defined below main(); the opt-in itself is the pack's.
   { const deny = checkOptinPackPresent(data); if (deny) { process.stderr.write(deny); process.exit(2) } }
   process.exit(0)
@@ -1145,7 +1180,7 @@ function readSettingsLayers(root) {
   })
 }
 
-// TOOL-dFairHearing-22 — THE OPT-IN PACK'S PRESENCE, after rules 6, 8 and 7. The spec-audit opt-in left
+// TOOL-dFairHearing-22 — THE OPT-IN PACK'S PRESENCE, after rules 6, 8, 7 and 9. The spec-audit opt-in left
 // this hook for the review kit's spec-audit-optin.js (TOOL-dFairHearing-16), and a partial update
 // that names this kit alone lands the hook without it: the hooks kit cannot require the review kit,
 // which requires it back, a cycle govkit refuses. So a Workflow call carrying the opt-in's own

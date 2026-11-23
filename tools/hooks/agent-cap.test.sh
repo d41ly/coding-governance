@@ -298,7 +298,7 @@ check() { # name expected_exit json
 # TOOL-dFairHearing-16: rules 0, 2 and 5 left this hook for the review kit, and their arms went with
 # them, each keeping its label, its payload and its verdict: rule 2's to the kit's
 # check-verifier-fanout.test.sh, rule 5's to check-review-join.test.sh, rule 0's to
-# spec-audit-optin.test.sh. What stays is what the hook still judges, rules 6, 8 and 7, and the readers
+# spec-audit-optin.test.sh. What stays is what the hook still judges, rules 6, 8, 7 and 9, and the readers
 # it EXPORTS to those homes. This arm requires the hook as a module: were `main()` to run on require it
 # would read the empty stdin and exit before the line printed, and a reader missing from the exports
 # prints `undefined` in its place.
@@ -950,6 +950,29 @@ run_effort "rule8 GE2 item 9: an effort holding three of its four keys refuses a
 write_roles "${HO_ROLES%\}},\"effort\":{\"default\":[],\"profiles\":{},\"harnesses\":{},\"unset\":{}}}"
 run_effort "rule8 GE2 item 9: an effort whose default is a list refuses as a broken index" 2 Agent "$E8_T" '{"effort":"medium"}' 'effort is not'
 write_roles none
+
+# ---- rule 9: a spawn belongs to the item in flight (KICK-dKeptSession-8 AC5) ----------------------
+# actions-free.fixture.sh, beside this file, builds a scratch repository holding copies of this kit's
+# hooks, a card file whose ## pointers the case writes, stubs of the policy reader and the kickoff
+# checker and settings rule 7 admits, and pipes one Agent payload to agent-cap.js, printing
+# `<case> · <value> · Agent · exit <code> · <stderr>`. Staged against the base hook, which has no
+# rule 9, the spawn-none row exits 0 and reds. WHAT THIS DOES NOT CHECK: a Workflow payload, which the
+# same rule judges through the same call, and the real policy reader.
+for ac9_p in spawn-none spawn-item; do
+  ac9_line=$(bash "$HERE/actions-free.fixture.sh" --plant "$ac9_p" 2>&1 | grep -F -- "$ac9_p · read-only-probes · Agent · " | head -n 1)
+  case $ac9_p in
+    spawn-none) case $ac9_line in
+        *' · exit 2 · BLOCKED by agent-cap: rule 9 (KICK-dKeptSession-8) refused this Agent call — actions.free (read-only-probes) refuses this Agent spawn'*'item — none'*)
+          echo "ok   rule9 AC5: a spawn at item none under read-only-probes is refused, naming actions.free and the class spawn"; pass=$((pass+1)) ;;
+        *) echo "FAIL rule9 AC5: a spawn at item none under read-only-probes is refused: ${ac9_line:-no line}"; fail=$((fail+1)) ;;
+      esac ;;
+    spawn-item) case $ac9_line in
+        *' · exit 0 · '*actions.free*|'') echo "FAIL rule9 AC5: a spawn inside the item in flight passes with no actions.free line: ${ac9_line:-no line}"; fail=$((fail+1)) ;;
+        *' · exit 0 · '*) echo "ok   rule9 AC5: a spawn inside the item in flight passes with no actions.free line"; pass=$((pass+1)) ;;
+        *) echo "FAIL rule9 AC5: a spawn inside the item in flight passes with no actions.free line: $ac9_line"; fail=$((fail+1)) ;;
+      esac ;;
+  esac
+done
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

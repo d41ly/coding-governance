@@ -173,6 +173,21 @@ The verb's lines are reported to the session at the shell call after it finishes
 A card the section would push past `CARD_CAP_BYTES` is not written and prints `card — pointers not
 written: <n> bytes over the cap`.
 
+**With no item in flight.** While your session's card file reads `item — none`, the hooks hold each
+tool call to the `actions.free` policy key: <!-- usage: policy:actions.free c5786fdc -->
+
+- `read-only-probes` (the default): a read is admitted; a write, a commit, a push or an agent spawn
+  is refused.
+- `item-reads-only`: every call is refused except the two commands that move the session to its next
+  item, the loop kit's position engine (`position.py <slug> --boundary <pointer>`) and the kickoff
+  checker (`manifest-check.sh --card --boundary`).
+- `recorded-anything`: every call is admitted, and each one the default would refuse is written as one
+  line to `gov-free-actions.log` in the repository's git directory.
+
+Once the line names an item, every call is admitted under all three values. A refusal names the
+value, the call and the build, and gives the remedy: run the act inside the item that owns it, or
+file it as an intake. A card file with no `## pointers` section holds no call to the key.
+
 ## Finding the card on another session or machine
 
 `manifest-check.sh --card --lookup --build <slug> --session <sid>` reads the build's card from the

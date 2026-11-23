@@ -73,6 +73,12 @@ to = "{prefix}/hooks/scratch-guard.js"
 include = ["scratch-guard.test.sh"]
 role = "project-owned"
 
+# WITHHELD, as the two suites that run it are (KICK-dKeptSession-8): the actions.free fixture copies
+# both hooks beside it into a scratch repository, so its subject is the hooks and it ships nowhere.
+[[files]]
+include = ["actions-free.fixture.sh"]
+role = "project-owned"
+
 [[files]]
 include = ["scratch-guard.fragment.json"]
 role = "engine"

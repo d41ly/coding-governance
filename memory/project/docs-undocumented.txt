@@ -72,7 +72,6 @@ hook:scratch-guard	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 hook:scratch-guard-subagent	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 hook:stall-recorder	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 hook:stop-guard	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-policy:actions.free	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:annotations.delivery	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:annotations.grammar	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 policy:annotations.lookup	1	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
