@@ -390,7 +390,12 @@ from collections import Counter  # noqa: E402
 # graded over that population; and `test_extract_main_transcripts_inside`'s two measures counting the
 # linked session out (AC23), behind the arm's own link-or-skip branch as its AC17 checks are.
 # 2 + 1 + 0 = 3
-ASSERTION_FLOOR = 1646
+# RAISED 1646 -> 1651 by KICK-dKeptSession-64, the minors batch: ONE new arm with 2 checks —
+# `test_extract_env_dropped`'s child started under GOV_REMOTE and GOV_DEFAULT_BRANCH planted, whose run
+# of `main` resolves a remote-less repository to no remote and no refusal (AC10), and the same call with
+# `model` imported alone refusing naming GOV_REMOTE (liveness). Its decoy checks move it by 3.
+# 2 + 3 = 5
+ASSERTION_FLOOR = 1651
 
 PASS = []
 FAIL = []
@@ -2325,6 +2330,46 @@ def test_extract_env_reads():
         check(f"extract KICK-dKeptSession-62 AC24 KICK-dKeptSession-63 AC14: a copy of {mod}.py adding a read of "
               "RUNLOG_PLANTED reds naming that variable",
               [v for v in read_env_reads(planted) if v not in guarded], ["RUNLOG_PLANTED"])
+
+
+def test_extract_env_dropped():
+    """KICK-dKeptSession-64 S10, AC10: `main` drops `GOV_REMOTE` and `GOV_DEFAULT_BRANCH` ahead of its
+    arm loop, so an in-process `rl_model.resolve_remote` never reads the machine's choice. A child
+    process started under both planted runs this module's own `main` over one injected arm, which
+    resolves a remote-less scratch repository in-process: no remote, no branch, no refusal. The
+    liveness: the same call in a child importing `model` alone, the plant in place, refuses naming
+    GOV_REMOTE. WHAT THIS DOES NOT CHECK: a variable `main` never names, which the import-graph arm
+    above reads."""
+    base = pathlib.Path(tempfile.mkdtemp(prefix="runlog-envdrop-"))
+    SCRATCH.append(base)
+    repo = base / "repo"
+    repo.mkdir()
+    run_git(["init", "-q"], repo)
+    env = dict(os.environ, GOV_REMOTE="planted", GOV_DEFAULT_BRANCH="planted", PYTHONIOENCODING="utf-8")
+    via_main = ("import importlib.util, sys\n"
+                "spec = importlib.util.spec_from_file_location('runlog_selftest_child', sys.argv[1])\n"
+                "m = importlib.util.module_from_spec(spec)\n"
+                "spec.loader.exec_module(m)\n"
+                "for k in [k for k in vars(m) if k.startswith('test_')]:\n"
+                "    delattr(m, k)\n"
+                "m.test_planted = lambda: print('RESOLVED %r' % (m.rl_model.resolve_remote(sys.argv[2]),))\n"
+                "m.ASSERTION_FLOOR = 0\n"
+                "sys.exit(m.main())\n")
+    alone = ("import sys\n"
+             "sys.path.insert(0, sys.argv[1])\n"
+             "import model\n"
+             "print('RESOLVED %r' % (model.resolve_remote(sys.argv[2]),))\n")
+    got = {}
+    for name, code, target in (("main", via_main, HERE / "selftest.py"), ("alone", alone, HERE)):
+        r = subprocess.run([sys.executable, "-c", code, str(target), str(repo)], cwd=str(base),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
+        got[name] = (r.returncode, [ln for ln in r.stdout.splitlines() if ln.startswith("RESOLVED ")])
+    check("extract KICK-dKeptSession-64 AC10: a child started under GOV_REMOTE and GOV_DEFAULT_BRANCH planted "
+          "runs main, whose arm resolves a remote-less repository to no remote, no branch and no refusal",
+          got["main"], (0, ["RESOLVED ('', '', '', '')"]))
+    check("extract KICK-dKeptSession-64 AC10 liveness: model imported alone under the same plant refuses "
+          "naming GOV_REMOTE",
+          [ln.startswith("RESOLVED ('', '', '', 'GOV_REMOTE names planted,") for ln in got["alone"][1]], [True])
 
 
 # KICK-dKeptSession-9: the orientation report's fixture. Each design session starts between the two

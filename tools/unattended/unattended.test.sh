@@ -7801,8 +7801,8 @@ hit "$o" "fix-of: PASS light-profile"
 o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant writes-fixture 2>&1)
 hit "$o" "fix-of: PASS writes-fixture"
 
-# ---- TOOL-dTrueNorth-16 S2 - THE EDGE REFUSAL. Two units at ONE order are one parallel group, which
-# ---- the order gate never blocks, so the consumer ARCH-tRun-2 declaring `consumes-from` ARCH-tRun-1
+# ---- TOOL-dTrueNorth-16 S2 - THE EDGE REFUSAL. Two units at ONE order are candidates for one parallel group,
+# ---- which the order gate never blocks, so the consumer ARCH-tRun-2 declaring `consumes-from` ARCH-tRun-1
 # ---- is refused while that producer is OPEN, even though its pass was dispatched just above, and
 # ---- proceeds once the producer's spec is CLOSED. Its own path, so condition 1 finds no overlap with
 # ---- the producer's open pass. RED-first: the driver before this unit declared the consumer.
@@ -21020,6 +21020,48 @@ mb_out=$( cd "$mb_d/A" && GOV_NODE=a GOV_RUNLOG=0 env -u CLAUDE_CODE_SESSION_ID 
 same "KDS5 AC9 with no session id the post prints mail — not written: no session id, exit 2" "$mb_rc [$mb_out]" "2 [mail — not written: no session id]"
 same "KDS5 AC9 the namespace is spelled off comment lines by derive_mail_ref's line and the two fetch refspecs alone" \
   "$(grep -n 'refs/gov/mail/' "$SCRIPT" | grep -v '^[0-9]*:[[:space:]]*#' | awk '{ if (/MAIL_REF="refs\/gov\/mail\//) d++; else if (/"\+refs\/gov\/mail\//) f++; else o++ } END { print d + 0, f + 0, o + 0 }')" "1 2 0"
+# ---- KICK-dKeptSession-64 AC1 AC3 (S1 to S3) - THE ACK BATCH'S ORDER AND EXITS. fy, from B, posts a,
+# ---- c and e to build:fx, and A acks from session s3 through a scratch copy of the driver whose
+# ---- `check_mail_duplicate` prints `DUPCHECK <id>` on stderr. AC1: the first `--mail ack fx a`
+# ---- prints one DUPCHECK line, the copy's liveness; the second prints `mail — already acked a` and
+# ---- no DUPCHECK line, exits 0, and s3's ref tip is where the first put it. AC3: `--mail ack fx a c`
+# ---- exits 0 and lands one commit, fy's mailbox reading one ack of each; `--mail ack fx a a` exits 0,
+# ---- the tip unmoved. S2: e's ack id planted on a message of fx's that is no ack, so e reads open
+# ---- while the post's duplicate check answers rc 1, and `--mail ack fx e` prints `mail — duplicate`
+# ---- and exits 2. RED, observed at the close: a scratch driver running `check_mail_duplicate` before
+# ---- the state read, under which the second ack of a exits 2 with `mail — duplicate`. WHAT THIS
+# ---- DOES NOT DRIVE: a lost write's exit 1, the post's own branch.
+kd64_src=$(<"$SCRIPT")
+kd64_cut='KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"'
+kd64_src=${kd64_src/"$kd64_cut"/"KIT_DIR=\"$HERE\""}
+kd64_cut='check_mail_duplicate() {'
+printf '%s\n' "${kd64_src/"$kd64_cut"/"$kd64_cut echo \"DUPCHECK \${2:-}\" >&2;"}" > "$mb_d/kd64-dupcheck.sh"
+kd64_pid='s/^mail — posted \([0-9a-f]*\) · .*/\1/p'
+kd64_a=$(run_mail_arm B t2 post fy --to build:fx --kind question --subject 'q a' --default no "$mb_d/body.txt" | sed -n "$kd64_pid")
+kd64_c=$(run_mail_arm B t2 post fy --to build:fx --kind question --subject 'q c' --default no "$mb_d/body.txt" | sed -n "$kd64_pid")
+kd64_e=$(run_mail_arm B t2 post fy --to build:fx --kind question --subject 'q e' --default no "$mb_d/body.txt" | sed -n "$kd64_pid")
+kd64_r=refs/gov/mail/fx/a/s3
+kd64_out=$(SCRIPT="$mb_d/kd64-dupcheck.sh" run_mail_arm A s3 ack fx "${kd64_a:-unposted}"); kd64_rc=$?
+kd64_t0=$(git --git-dir="$mb_d/o.git" rev-parse --verify -q "$kd64_r")
+same "KDS64 AC1 the scratch driver's first --mail ack fx a posts, exit 0, printing one DUPCHECK line, its liveness" \
+  "$kd64_rc $(grep -c '^mail — posted ' <<<"$kd64_out") $(grep -c '^DUPCHECK ' <<<"$kd64_out")" "0 1 1"
+kd64_out=$(SCRIPT="$mb_d/kd64-dupcheck.sh" run_mail_arm A s3 ack fx "${kd64_a:-unposted}"); kd64_rc=$?
+same "KDS64 AC1 a second --mail ack fx a prints mail — already acked a and no DUPCHECK line, exits 0, the tip unmoved" \
+  "$kd64_rc [$kd64_out] $(git --git-dir="$mb_d/o.git" rev-parse --verify -q "$kd64_r")" "0 [mail — already acked ${kd64_a:-unposted}] $kd64_t0"
+kd64_out=$(SCRIPT="$mb_d/kd64-dupcheck.sh" run_mail_arm A s3 ack fx "${kd64_a:-unposted}" "${kd64_c:-unposted}"); kd64_rc=$?
+kd64_t1=$(git --git-dir="$mb_d/o.git" rev-parse --verify -q "$kd64_r")
+same "KDS64 AC3 --mail ack fx a c, a acked, exits 0 naming a already acked, and lands one commit" \
+  "$kd64_rc $(grep -c "^mail — already acked ${kd64_a:-unposted}$" <<<"$kd64_out") $(git --git-dir="$mb_d/o.git" rev-list --count "$kd64_t0..$kd64_t1" 2>&1)" "0 1 1"
+same "KDS64 AC3 ...and fy's mailbox reads one ack of a and one of c" \
+  "$(run_mail_arm B t2 read fy | awk -F'\t' -v a="${kd64_a:-unposted}" -v c="${kd64_c:-unposted}" '$2 == "ack" && $8 == a { na++ } $2 == "ack" && $8 == c { nc++ } END { print na + 0, nc + 0 }')" "1 1"
+kd64_out=$(SCRIPT="$mb_d/kd64-dupcheck.sh" run_mail_arm A s3 ack fx "${kd64_a:-unposted}" "${kd64_a:-unposted}"); kd64_rc=$?
+same "KDS64 AC3 --mail ack fx a a exits 0, the tip unmoved" "$kd64_rc $(git --git-dir="$mb_d/o.git" rev-parse --verify -q "$kd64_r")" "0 $kd64_t1"
+kd64_id=$( set +u; . "$SCRIPT" >/dev/null 2>&1; derive_message_id fx none none ack 'q e' "${kd64_e:-unposted}" build:fy none )
+seed_mail_at "$mb_d/o.git" refs/gov/mail/fx/b/t9 fx "${kd64_id:-underived}" build:fy landed none >/dev/null
+kd64_out=$(run_mail_arm A s3 ack fx "${kd64_e:-unposted}"); kd64_rc=$?
+same "KDS64 S2 e's ack id planted on a landed message, --mail ack fx e prints mail — duplicate and exits 2, the tip unmoved" \
+  "$kd64_rc $(grep -c "^mail — duplicate ${kd64_id:-underived} · refs/gov/remote/mail/fx/b/t9$" <<<"$kd64_out") $(git --git-dir="$mb_d/o.git" rev-parse --verify -q "$kd64_r")" \
+  "2 1 $kd64_t1"
 rm -rf "$mb_d"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -25380,7 +25422,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # region-eight `same` (AC12 2, AC16 1, AC15 4), each unconditional and outside any loop, off the diff's
 # own lines; the KDS62 AC13 pair re-armed for the skip and the KDS61 ack-form arm re-armed for
 # `<slug> [<id> ...]` add none. No skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4206
+# RAISED 4206 -> 4212 by KICK-dKeptSession-64 on 2026-11-23: the ack batch's order-and-exits block's 6
+# region-eight `same` (AC1 2, AC3 3, S2 1), each unconditional and outside any loop, off the diff's own
+# lines, in the mailbox block. No skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4212
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -25682,7 +25727,8 @@ FLOOR_SHARD_7=311
 # RAISED 1404 -> 1407 by KICK-dKeptSession-56: the same 3 region-eight grandchild-progress assertions, see FLOOR_ASSERTIONS.
 # RAISED 1407 -> 1416 by KICK-dKeptSession-62: the same 9 region-eight unbounded-progress, edges-agreement and chained-ack assertions, see FLOOR_ASSERTIONS.
 # RAISED 1416 -> 1423 by KICK-dKeptSession-63: the same 7 region-eight chained-ack list assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1423
+# RAISED 1423 -> 1429 by KICK-dKeptSession-64: the same 6 region-eight ack-batch order-and-exits assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1429
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

@@ -51,7 +51,7 @@
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
 #   unattended.sh --mail post <slug> --to <recipient> --kind <kind> --subject <text> [--item <instance key>] [--pass <pass>] [--answers <id>] [--interface <file>] [--default <text>] <body file>   # one message on this session's own mail ref; 0 posted, 1 duplicate or lost, 2 not written; `mail — off` exit 2 while RUN_CLAIMS is not on
 #   unattended.sh --mail read <who> [--open] [--ids] [--local] [--sent]   # the mailbox of a build or a recipient, one TAB row per message; --open the open rows, --ids their ids on one line or none, --local the node's cache with no fetch, --sent a build's own sent messages, whoever they were addressed to
-#   unattended.sh --mail ack <slug> [<id> ...]                     # an ack of each message addressed to <slug>, posted to its sender's build, every ack landing in one ref update or none; an already-acked id skipped on stderr, an empty list 0 writing nothing; else the post's exits
+#   unattended.sh --mail ack <slug> [<id> ...]                     # an ack of each message addressed to <slug>, posted to its sender's build, every ack landing in one ref update or none; an already-acked id skipped on stderr; 0 posted, or no id left and nothing written; 1 a lost write; 2 a refusal, a duplicate among them
 #   unattended.sh --mail answer <slug> <question id> <body file> [--cite <path>@<sha>]...   # an answer to a question addressed to <slug>, posted to its asker's build; 1 the question no longer open, else the post's exits
 #   unattended.sh --mail notice <slug> [--item <instance key>] [--local] [--ring <ref> <id>]   # the build's unread mail as mailbox.notice says, one line, its stamp rewritten after a fetch; 0 shown, off or the local copy, 2 not read
 #   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
@@ -3840,12 +3840,15 @@ write_mail_ref() { # ref · tip read or empty · message [message ...] -> 0 writ
 # the chain's message k-1, so its `seq` is one past that message's and its `after` is `none`; and
 # `write_mail_ref` lands the chain in one ref update. Every message then prints its own posted, lost
 # or not-written line, so a refused record or a lost update leaves every row the chain answers open.
+# A duplicate's exit 1 also binds MAIL_DUPLICATE to its id, empty on every other exit, so
+# `write_mail_ack` tells it from a lost write (KICK-dKeptSession-64 S2).
 # WHAT THIS DOES NOT CHECK: the body for secrets (gap-rt-44); that the recipient exists.
 write_mail_post() { # slug · to · kind · subject · item · pass · answers · body file · interface file or none · [default] · [to · subject · answers]... -> 0 posted, 1 duplicate or lost, 2 not written
   local slug="${1:-}" to="${2:-}" kind="${3:-}" sub="${4:-}" it="${5:-none}" ps="${6:-none}" an="${7:-none}" f="${8:-}" ifc="${9:-none}"
   local sid="${CLAUDE_CODE_SESSION_ID:-}" tag py d kinds n v id tip rc ref ck=none seq=1 aft=none t dl df=ack k
   local forged='^[[:space:]]*[*][*][A-Za-z][A-Za-z-]*( [a-z]+)?:[*][*]'
   local -a tos=("$to") subs=("$sub") ans=("$an") ids=() msgs=()
+  MAIL_DUPLICATE=""
   [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 2; }
   check_slug_shape "$slug" || { echo "mail — not written · the build is no build-folder name: $slug"; return 2; }
   [ -n "$sid" ] || { echo "mail — not written: no session id"; return 2; }
@@ -3903,7 +3906,7 @@ write_mail_post() { # slug · to · kind · subject · item · pass · answers �
     check_mail_duplicate "$slug" "$id"; rc=$?
     case "$rc" in
       0) ;;
-      1) return 1 ;;
+      1) MAIL_DUPLICATE=$id; return 1 ;;
       *) echo "mail — not written · the mail cache could not be read, so a retried post cannot be told apart"; return 2 ;;
     esac
     ids+=("$id")
@@ -4112,16 +4115,23 @@ read_mailbox() { # who · soft|strict|local · [sent] -> 0 with one TAB row per 
 # --mail ack, AN ACKNOWLEDGEMENT (KICK-dKeptSession-5 S8): <id> must be a row the mailbox of <slug>
 # holds, else `mail — not written · <id> is no message addressed to <slug>`, exit 2; the ack is then a
 # post of kind `ack` from <slug>, answering <id>, to `build:<from-build>` of that row, with its subject
-# and an empty body, so the post's exits are the ack's. Dark while RUN_CLAIMS is not `on`.
+# and an empty body, so the post's lines are the ack's, and its exits are but for a duplicate (S2
+# below). Dark while RUN_CLAIMS is not `on`.
 # SEVERAL IDS (KICK-dKeptSession-62 S15), `[<id> ...]`: the mailbox is read once and every id must
 # name one of its rows before anything is written; the acks are then ONE chained post,
 # `write_mail_post`'s, every id's message id and duplicate check derived before any commit is built,
 # all landing in one ref update or none, so a duplicate, a refused record or a lost update leaves
 # every row open. THE BATCH'S OWN LIST (KICK-dKeptSession-63 S15): an id named twice is acked once,
-# the first kept; an id whose row already reads `acked` is skipped, named on stderr as `mail — already
-# acked <id>`, before the addressed-to check of the others; and a list given empty, or emptied by the
-# skip, exits 0 and writes nothing. One open id prints exactly the lines it did.
-write_mail_ack() { # slug · [id ...] -> the post's exits; 0 with nothing written where no id is left to ack
+# the first kept; and a list given empty, or emptied by the skip, exits 0 and writes nothing. THE
+# ORDER PER ID (KICK-dKeptSession-64 S1): the addressed-to check on the id's row of the one read;
+# then that row's state, the fourth column, and one reading `acked` is skipped, named on stderr as
+# `mail — already acked <id>`, with no second read; only an id not skipped reaches the post's
+# `derive_message_id` and `check_mail_duplicate`. THE ACK'S EXITS (S2), for this verb alone: 0 every
+# ack posted, or no id left; 1 a lost write, so a caller reading any non-zero exit as "not posted"
+# reads it unchanged; 2 a refusal, an id addressed to no row, a record refused and an rc 1 of
+# `check_mail_duplicate` on an id not read as acked among them, the post's duplicate exit 1 read here
+# as 2. One open id prints exactly the lines it did.
+write_mail_ack() { # slug · [id ...] -> 0 posted or no id left, writing nothing; 1 lost; 2 refused, a duplicate among them
   local slug="${1:-}" id rows fb sub st f rc line
   local -a row=() lines=() posts=() seen=() want=("${@:2}")
   [ "$RUN_CLAIMS" = on ] || { echo "mail — off"; return 2; }
@@ -4135,14 +4145,15 @@ write_mail_ack() { # slug · [id ...] -> the post's exits; 0 with nothing writte
       [ "${row[0]:-}" = "$id" ] || continue
       st=${row[3]:-}; fb=${row[5]:-}; sub=${row[6]:-}; break
     done
-    [ "$st" != acked ] || { echo "mail — already acked $id" >&2; continue; }
     [ -n "$fb" ] || { echo "mail — not written · $id is no message addressed to $slug"; return 2; }
+    [ "$st" != acked ] || { echo "mail — already acked $id" >&2; continue; }
     posts+=("build:$fb" "$sub" "$id")
   done
   [ "${#posts[@]}" -gt 0 ] || return 0
   f=$(mktemp) || { echo "mail — not written · no scratch file for the ack's empty body"; return 2; }
   write_mail_post "$slug" "${posts[0]}" ack "${posts[1]}" none none "${posts[2]}" "$f" none ack ${posts[3]+"${posts[@]:3}"}; rc=$?
   rm -f "$f"
+  [ "$rc" != 1 ] || [ -z "${MAIL_DUPLICATE:-}" ] || rc=2
   return "$rc"
 }
 
@@ -19320,9 +19331,10 @@ verb_dispatch() { # slug · unit · writes...
   _d_spec=$_cu_spec
   # ------------------------------------------------------------------------------ THE ORDER GATE
   # A unit may not be dispatched while an EARLIER step still holds a unit that is neither terminal
-  # nor already dispatched. Units sharing an `order` value are the parallel group and do not block
-  # each other, and a unit carrying NO order verb is unordered and blocks nothing — the verb is
-  # PERMITTED rather than required, so an absent one may not become a refusal here.
+  # nor already dispatched. Units sharing an `order` value are candidates for one parallel group and
+  # this gate never blocks one on another, though the edge refusal below can still sequence them; a
+  # unit carrying NO order verb is unordered and blocks nothing — the verb is PERMITTED rather than
+  # required, so an absent one may not become a refusal here.
   #
   # THE ORDER IS READ FROM THE SPEC HEADERS, which is where `gen_build_index.py` reads it from too,
   # so this and the rendered build-order region cannot disagree about what step a unit is on.
@@ -19372,8 +19384,8 @@ verb_dispatch() { # slug · unit · writes...
     echo "unattended: dispatch — $unit is ${SPEC_ST[$_d_spec]}, so this declaration reserves nothing against a sibling; set its spec back to INPROGRESS for it to" >&2 ;;
   esac
   # --------------------------------------------------- TOOL-dTrueNorth-16 S2, THE EDGE REFUSAL
-  # The order gate's blind spot: units sharing an order are one parallel group and never block each
-  # other, so a consumer and its producer at one order dispatch in either sequence, and the consumer
+  # The order gate's blind spot: units sharing an order are candidates for one parallel group and the
+  # gate never blocks one on another, so a consumer and its producer at one order dispatch in either sequence, and the consumer
   # builds against code that does not exist yet. So the dispatched unit's own `consumes-from` edges,
   # read by `read_consumes_from`, refuse it while a producer that is a unit of this build is neither
   # CLOSED nor WONTDO, its status read as the order gate reads it. A producer that is DISPATCHED but
