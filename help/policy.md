@@ -219,8 +219,9 @@ that count when it runs, as it did before presets existed.
   "leases.expiry-hours" = 12
   ```
 
-  `python tools/policy/policy.py check` refuses an `extends` naming no shipped preset and a key
-  presets may not set.
+  `python tools/policy/policy.py check` refuses an `extends` naming no shipped preset, a key
+  presets may not set, and a table named after a shipped preset, such as `[presets.strict]`, at
+  its line, so your preset never shadows one.
 - **The charter's preset section:** `python tools/policy/policy.py preset --diff` prints the preset <!-- usage: script:tools/policy/policy.py#preset 657bb54f -->
   your file names, `standard (the default)` when it names none, then one line per key whose value
   is not that preset's, such as `hooks.bypass` set to `allowed` under `strict`, or `- no key differs`. A

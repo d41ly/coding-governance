@@ -6455,12 +6455,16 @@ def run_presets_pairs(name):
 def run_presets_repo(name):
     """`presets-repo` (AC5): a `[presets.ours]` table extending `strict` with one override, named by
     `preset`, reads valid; committed alone extending `lax`, or setting a key presets never touch, it is
-    refused naming the key."""
+    refused naming the key; and a `[presets.strict]` table, a shipped name, is refused at its line
+    naming `strict` (KICK-dKeptSession-44 S32, AC29)."""
     ours = 'preset = "ours"\n\n[presets.ours]\nextends = "{base}"\n{key} = {value}\n'
     cases = (("extends-strict", ours.format(base="strict", key='"leases.expiry-hours"', value="12"), 0, "is valid"),
              ("extends-lax", ours.format(base="lax", key='"leases.expiry-hours"', value="12"), 2, "presets.ours.extends"),
              ("never-key", ours.format(base="strict", key='"policy-file.guard"', value='"owner-only"'), 2,
-              'presets.ours."policy-file.guard"'))
+              'presets.ours."policy-file.guard"'),
+             ("shipped-name", ours.replace("ours", "strict").format(base="standard", key='"leases.expiry-hours"',
+                                                                    value="12"), 2,
+              f'{POLICY_REL}:3 · presets.strict: "strict" is a shipped preset'))
     t = Path(tempfile.mkdtemp(prefix="pol-"))
     checks = []
     try:

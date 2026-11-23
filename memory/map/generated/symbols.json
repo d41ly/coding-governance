@@ -14653,6 +14653,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_spent_tokens",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "derive_splice_rows",
       "kind": "function",
       "file": "tools/loop/splice.py"

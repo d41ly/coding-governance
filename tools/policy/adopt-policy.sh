@@ -8,7 +8,8 @@
 #
 # `--scaffold` writes the starter file `policy.py scaffold --preset <name>` prints, and ONLY when no
 # file is there; with no file and no `--preset` it refuses, exit 2, since nobody chose a posture
-# (KICK-dKeptSession-4 S2). A policy file is the repository's own from its first write, so an
+# (KICK-dKeptSession-4 S2), and a preset the scaffold refuses passes its exit 2 and its stderr through,
+# writing nothing (KICK-dKeptSession-44 S13). A policy file is the repository's own from its first write, so an
 # existing one is kept byte for byte and the script says "kept"; with `--preset`, `policy.py scaffold
 # --preset <name> --kept <file>` prints one line where the file's preset is not the answer, and its
 # non-zero exit, an unknown name, ends the script (S3). Then, kept or written, it renders the harness's two concurrency
@@ -25,8 +26,8 @@
 # kit is installed. Its refusals are armed by `adopt-policy.test.sh` beside it.
 #
 #   Exit 0 = written, kept or green · 1 = red, or a write failed · 2 = wrong invocation, no
-#   repository, no python, no `--preset` where no policy file is, a preset no catalogue row admits
-#   over a kept file, or an invalid policy file on install day.
+#   repository, no python, no `--preset` where no policy file is, a preset no catalogue row admits,
+#   or an invalid policy file on install day.
 set -u
 
 HERE=.; [[ $0 == */* ]] && HERE=${0%/*}; HERE="$(cd "$HERE" && pwd)" || exit 2
@@ -268,7 +269,16 @@ else
     exit 1
   fi
   _tmp=$(mktemp -u "$FILE.XXXXXXXX")
-  if ! { "$PY" -B "$HERE/policy.py" scaffold --preset "$PRESET" > "$_tmp" && mv "$_tmp" "$FILE"; } 2>/dev/null; then
+  # KICK-dKeptSession-44 S13: the scaffold's own refusal, exit 2 for a name the catalogue does not hold,
+  # passes through with its stderr as the kept-file branch's does; any other failure, the write's
+  # included, is the generic line below, exit 1.
+  _err=$({ "$PY" -B "$HERE/policy.py" scaffold --preset "$PRESET" > "$_tmp"; } 2>&1); RC=$?
+  if [ "$RC" = 2 ]; then
+    rm -f "$_tmp" 2>/dev/null
+    printf '%s\n' "$_err" >&2
+    exit "$RC"
+  fi
+  if [ "$RC" != 0 ] || ! mv "$_tmp" "$FILE" 2>/dev/null; then
     rm -f "$_tmp" 2>/dev/null
     echo "policy: the scaffold could not be written to $FILE"
     exit 1

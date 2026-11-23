@@ -30,7 +30,8 @@ policy kit's `arm_presets` grades it.
 
 THE REPOSITORY SIDE, `check_repo_presets(doc, text, rows)`, which `validate` imports and calls after
 `budgets.check_budgets` only for a policy file holding a top-level `presets` table: each
-`[presets.<name>]` table declares a repository preset whose `extends` names a shipped preset and
+`[presets.<name>]` table declares a repository preset under a name no shipped preset holds, a
+shipped name refused at the table's line (KICK-dKeptSession-44 S32), whose `extends` names a shipped preset and
 whose other keys are presettable, each value admitted; and the file's `preset` value names a shipped
 or a declared preset. Each problem sits at the line `policy.derive_key_line` finds. It judges no pair:
 the pair rules judge the store alone, and a repository file's round count above its ceiling stays the
@@ -308,7 +309,8 @@ def check_presets(rows, presets):
 
 def check_repo_presets(doc, text, rows):
     """[policy.Problem] for the preset half of a parsed policy file `doc`, each at the line of `text`
-    that `policy.derive_key_line` finds: a `[presets.<name>]` table whose `extends` names no shipped
+    that `policy.derive_key_line` finds: a `[presets.<name>]` table whose name is a shipped preset's,
+    refused at its own line naming it (KICK-dKeptSession-44 S32), whose `extends` names no shipped
     preset or that sets a key no preset may, and a `preset` value naming neither a shipped nor a
     declared preset. `validate` calls it only for a file holding the `presets` table, and it judges no
     pair (§8 F10). A store that does not read is one problem."""
@@ -328,6 +330,11 @@ def check_repo_presets(doc, text, rows):
         base = (REPO_TABLE, name)
         if not isinstance(t, dict):
             out.append(policy.Problem(line(base), policy.render_dotted(base), "is not a table"))
+            continue
+        if name in shipped:   # KICK-dKeptSession-44 S32: a declared name never shadows a shipped one
+            out.append(policy.Problem(line(base), policy.render_dotted(base),
+                                      f"{policy.render_json(name)} is a shipped preset's name: a repository "
+                                      f"preset takes a name none of {policy.render_json(sorted(shipped))} holds"))
             continue
         if not (isinstance(t.get("extends"), str) and t["extends"] in shipped):
             out.append(policy.Problem(line(base + ("extends",)), policy.render_dotted(base + ("extends",)),
