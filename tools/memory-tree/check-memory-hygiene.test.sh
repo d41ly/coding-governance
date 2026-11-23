@@ -3805,6 +3805,23 @@ out=$("$_PY" "$HERE/record_causes.py" --fixture --plant script-cause-bare 2>&1) 
 hit "record causes: causes · $_scr.sh · its header is refused: $_scr.sh: Caused-by line 2"
 out=$("$_PY" "$HERE/record_causes.py" --fixture --plant script-causeless 2>&1)   # AC3
 hit "record causes: causes · $_scr.sh · names no Caused-by"; miss 'atlas.html'
+# --- TOOL-dTotalRecall-47 (AC1 AC3) — the cause backfill, `record_causes.py --backfill`: over a seeded legacy
+# --- population it writes the cause line into the causeless new record only, leaving the legacy records, the
+# --- root kind's record, a `.sh` record and a no-id record, the last two listed `not backfilled`; `--check`
+# --- then names exactly those two and a second run writes nothing. A typed `-deviation-1.md` record and one
+# --- whose Serves line is the head window's last line are refused, the fixture's status clean. Red on the
+# --- verb writing a legacy record and on it writing a typed record.
+_bfr='memory/builds/fRoot/build/2026-01-02-build-TOOL-fRoot-1'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant backfill-selection 2>&1); _brc=$?   # AC1
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant backfill-selection exited $_brc, expected 0"; st=1; }
+hit "backfill 1 · record causes: backfilled · $_bfr-new.md · Caused-by TOOL-fRoot-1"
+hit "backfill 1 · record causes: not backfilled · $_bfr-probe.sh · not markdown"
+hit "backfill 1 · record causes: not backfilled · $_bfr-unbound.md · no id"
+hit 'backfill 2 · record causes: 0 backfilled'; hit 'record causes: fixture backfill-selection · PASS'
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant backfill-refusals 2>&1); _brc=$?   # AC3
+n=$((n+1)); [ "$_brc" = 0 ] || { echo "FAIL record_causes.py --fixture --plant backfill-refusals exited $_brc, expected 0"; st=1; }
+hit "not backfilled · $_bfr-deviation-1.md · typed kind"; hit "not backfilled · $_bfr-late.md · head window"
+miss 'fixture backfill-refusals · status'; hit 'record causes: fixture backfill-refusals · PASS'
 
 # --- TOOL-dTotalRecall-7 (AC4 AC5 AC6 AC7 AC10 AC11 AC12) — the ask door, `gov_record.py new ask`: the plant
 # --- runs the refuse, undeclared-family, file, replay, grade, refused-read and refused-filing-on-a-remote

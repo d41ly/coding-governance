@@ -5,6 +5,7 @@
     python <prefix>/memory-tree/record_causes.py --measure             # the legacy-records seed's rows
     python <prefix>/memory-tree/record_causes.py --print-stand-ins     # the made-by-stand-in class's members
     python <prefix>/memory-tree/record_causes.py --print-record-keys   # the record-key class's members
+    python <prefix>/memory-tree/record_causes.py --backfill            # write the cause line the causes check lacks
     python <prefix>/memory-tree/record_causes.py --fixture --plant <case>
 
 A record's header names what made it and why it exists: `**Made-by:**` and `**Caused-by:**` after its
@@ -49,6 +50,16 @@ refused read, `memory.legacy-anchors` named. `--print-*` exit 3 where the class 
 WHAT IT DOES NOT CHECK: a non-Markdown record whose head is not a comment; whether a `Made-by`
 names who really wrote it; the edge grammar of a header's targets, which `edge_grammar.py --check` grades;
 whether a census file that spells `Caused-by` writes the line at run time, since the census grades spelling.
+
+THE BACKFILL (`write_missing_causes`, TOOL-dTotalRecall-47). `--backfill` keeps the causes check's findings
+whose rule is the absent cause (`ABSENT_CAUSE`), so it selects what the check reds and never a copy of the
+selection, and writes `**Caused-by:** <first Serves id>` on the line after the record's first Serves line,
+in the file's own line ending, printing each path it wrote and a count. It refuses to guess, listing under
+`not backfilled` with its reason and leaving byte-identical: a record that is not Markdown (its cause line
+wears its Serves line's comment prefix, TOOL-dTotalRecall-51), one a typed kind's name grammar matches (its
+cause is a `- **Caused-by:**` field its kind's writer writes), one whose Serves line names no id, and one
+whose Serves line is the last line of the head window, where a cause line would fall outside what
+`read_header_edges` reads. A second run writes nothing. Exit 0, a refused read 2.
 """
 from __future__ import annotations
 
@@ -76,7 +87,37 @@ HEADING_RE = re.compile(r"#{2,3} (?P<text>.*\S)")
 #: an authored heading tag, the `[section.<anchor>]` TOOL-dTotalRecall-20's retag step writes
 AUTHORED_TAG_RE = re.compile(r"\[section\.(?P<seg>[a-z0-9][a-z0-9-]*)\](?:[ \t]|$)")
 PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "none", "writer-without-cause",
-          "bulleted-cause", "bulleted-twice", "script-cause-prefixed", "script-cause-bare", "script-causeless")
+          "bulleted-cause", "bulleted-twice", "script-cause-prefixed", "script-cause-bare", "script-causeless",
+          "backfill-selection", "backfill-refusals")
+#: TOOL-dTotalRecall-47 S1: the causes check's absent-cause rule, the one finding `--backfill` selects
+ABSENT_CAUSE = "names no Caused-by, and its kind is no root"
+#: TOOL-dTotalRecall-47 AC1 AC3: each backfill plant's new records, `{<path>: <text>}`, `{build}` the fixture's
+#: build folder, `{unit}` its unit. The selection plant: a causeless record the verb writes, a record of the
+#: kind the plant's registry marks root, a `.sh` record and a record whose Serves line names no id; the
+#: refusals plant: a typed record with no `Caused-by` field and a record whose Serves line is the head
+#: window's last unfenced line
+BACKFILL_PLANTS = {
+    "backfill-selection": {
+        "{build}/2026-01-02-build-{unit}-new.md": "# New\n\n**Serves:** research {unit}\n",
+        "memory/builds/fRoot/reviews/2026-01-02-review-{unit}-audit.md": "**Serves:** spec-audit {unit}\n\n# An audit\n",
+        "{build}/2026-01-02-build-{unit}-probe.sh": "# **Serves:** log {unit}\necho probe\n",
+        "{build}/2026-01-02-build-{unit}-unbound.md": "# Unbound\n\n**Serves:** research\n",
+    },
+    "backfill-refusals": {
+        "{build}/2026-01-02-build-{unit}-deviation-1.md": "# {unit} deviation 1 — no cause field\n\n"
+                                                         "**Serves:** deviation {unit}\n\n- **Summary:** a departure\n",
+        "{build}/2026-01-02-build-{unit}-late.md": "# Late\n" + "a line of the head\n" * 10
+                                                   + "**Serves:** research {unit}\n",
+    },
+}
+#: each backfill plant's expected first `--backfill`: `({<path>: <reason token>} not backfilled, [paths written])`
+BACKFILL_EXPECTED = {
+    "backfill-selection": ({"{build}/2026-01-02-build-{unit}-probe.sh": "not markdown",
+                            "{build}/2026-01-02-build-{unit}-unbound.md": "no id"},
+                           ["{build}/2026-01-02-build-{unit}-new.md"]),
+    "backfill-refusals": ({"{build}/2026-01-02-build-{unit}-deviation-1.md": "typed kind",
+                           "{build}/2026-01-02-build-{unit}-late.md": "head window"}, []),
+}
 #: TOOL-dTotalRecall-39 AC2 AC3: the plants whose typed record's cause is a bulleted field, each the number of
 #: `- **Caused-by:**` fields it writes; both checks read the record, the causes check and the edge walk
 BULLETED_PLANTS = {"bulleted-cause": 1, "bulleted-twice": 2}
@@ -353,7 +394,7 @@ def check_causes(root, g=None) -> list:
             out.append(f"{SAY}: causes · {path} · {finding}")
         elif not targets:
             out.append(f"{SAY}: causes · {path} · " + ("serves no unit, its kind's cause" if how == "serves"
-                                                       else "names no Caused-by, and its kind is no root"))
+                                                       else ABSENT_CAUSE))
         for t in targets:
             why = check_cause_target(root, t, g["keys"], g["ids"])
             if why:
@@ -478,6 +519,61 @@ def run_check(root) -> tuple:
     return lines, 1 if red else 0
 
 
+def write_missing_causes(root) -> tuple:
+    """`--backfill` (TOOL-dTotalRecall-47 S1 S2): `(lines, exit)`. Writes `**Caused-by:** <first Serves id>`
+    under the first Serves line of each record the causes check names with `ABSENT_CAUSE`, in the file's own
+    line ending, and lists each record S2 refuses under `not backfilled` with its reason, byte-identical."""
+    import build_records   # noqa: E402  the typed kinds' name grammar
+    try:
+        g = read_grading(root)
+    except ValueError as exc:
+        return [f"{SAY}: refused · {exc}"], 2
+    if g["legacy"] is None:
+        return [f"{SAY}: unarmed · {g['note']}", f"{SAY}: 0 backfilled · 0 not backfilled"], 0
+
+    def derive_backfill_refusal(path):
+        """`(reason, Serves line number, target)` of one selected record, `reason` None where S2 admits it."""
+        if not path.endswith(".md"):
+            return "not markdown: its cause line wears its Serves line's comment prefix", 0, None
+        if any(build_records.derive_record_name(k).search(path) for k in tree_lib.TYPED_RECORD_KINDS):
+            return "typed kind: its cause is a `- **Caused-by:**` field its kind's writer writes", 0, None
+        ids = (g["bindings"].get(path) or {}).get("ids") or []
+        head = [(n, ln) for n, ln in tree_lib.unfenced_lines(g["texts"][path]) if ln is not None]
+        at = next((i for i, (_n, ln) in enumerate(head[:tree_lib.BIND_HEAD_LINES])
+                   if (mo := tree_lib.BIND_RE.match(ln)) and mo.group("key") == "Serves"
+                   and mo.group("rest").split("<!--", 1)[0].strip()), None)
+        if not ids or at is None:
+            return "no id: its Serves line names no unit", 0, None
+        if at == tree_lib.BIND_HEAD_LINES - 1:
+            return (f"head window: its Serves line is unfenced line {tree_lib.BIND_HEAD_LINES}, the head's last, "
+                    "so a cause line under it would not be read"), 0, None
+        return None, head[at][0], ids[0]
+
+    lines, written, refused = [], 0, 0
+    for finding in check_causes(root, g):
+        _rule, path, why = finding.split(" · ", 2)
+        if why != ABSENT_CAUSE:
+            continue
+        reason, n, target = derive_backfill_refusal(path)
+        if reason:
+            refused += 1
+            lines.append(f"{SAY}: not backfilled · {path} · {reason}")
+            continue
+        file = pathlib.Path(root, path)
+        raw = file.read_bytes().decode("utf-8")
+        eol, parts, cause = "\r\n" if "\r\n" in raw else "\n", raw.split("\n"), f"**Caused-by:** {target}"
+        if n < len(parts):   # a line follows the Serves line: the cause goes between, ended as the file ends lines
+            parts.insert(n, cause + eol[:-1])
+            raw = "\n".join(parts)
+        else:   # the Serves line ends the file unterminated, and so does the cause line after it
+            raw += eol + cause
+        file.write_bytes(raw.encode("utf-8"))
+        written += 1
+        lines.append(f"{SAY}: backfilled · {path} · Caused-by {target}")
+    lines.append(f"{SAY}: {written} backfilled · {refused} not backfilled")
+    return lines, 0
+
+
 # ------------------------------------------------------------------------------------------ the fixture
 FIXTURE_UNIT = "TOOL-fRoot-1"
 FIXTURE_CLAIM = "TOOL-fClaim-1"
@@ -510,12 +606,16 @@ def write_fixture(top, plant) -> pathlib.Path:
 
     rows = {"log": ("memory/builds/*/prompts/*.md", '["Serves"]'), "research": ("memory/builds/*/build/*.md", '["Serves"]'),
             "card": ("memory/builds/*/build/*-build-*-card-*.md", '["Build", "Step", "Ref"]')}
-    if plant in BULLETED_PLANTS:   # a typed kind whose fields hold `Caused-by`, so its bulleted cause is read
+    if plant in BULLETED_PLANTS or plant == "backfill-refusals":   # a typed kind whose fields hold `Caused-by`
         rows["deviation"] = ("memory/builds/*/build/*-build-*-deviation-*.md", '["Serves", "Caused-by"]')
+    roots = set()
+    if plant == "backfill-selection":   # TOOL-dTotalRecall-47 AC1: a kind the registry marks root
+        rows["spec-audit"] = ("memory/builds/*/reviews/*.md", '["Serves"]')
+        roots.add("spec-audit")
     write_file(".memory-tree.conf", 'MEMORY_ROOT="memory"\nFAMILIES="tooling:TOOL"\n')
     write_file(f"{kit_rel}/{record_kinds.REGISTRY}", "".join(
-        f'[[record-kind]]\nname = "{n}"\nhome = "{h}"\nschema = {{ form = "fields", fields = {f} }}\n\n'
-        for n, (h, f) in rows.items()))
+        f'[[record-kind]]\nname = "{n}"\nhome = "{h}"\nschema = {{ form = "fields", fields = {f} }}\n'
+        + ("root = true\n" if n in roots else "") + "\n" for n, (h, f) in rows.items()))
     sibling = "/".join(("govkit", "registry.toml"))   # spelled in parts: the install-prefix ban reads a kit path
     write_file(f"{tool_rel}/{sibling}" if tool_rel else sibling,
                f'[[ledger]]\npopulation = "{POPULATION}"\nleg = "record causes"\n'
@@ -563,6 +663,9 @@ def write_fixture(top, plant) -> pathlib.Path:
     elif plant in SCRIPT_PLANTS:   # TOOL-dTotalRecall-51 AC1 to AC3: non-Markdown records, their heads comments
         for name, text in SCRIPT_PLANTS[plant].items():
             write_file(f"{build}/2026-01-02-build-{FIXTURE_UNIT}-{name}", text.format(unit=FIXTURE_UNIT))
+    elif plant in BACKFILL_PLANTS:   # TOOL-dTotalRecall-47 AC1 AC3: what the backfill selects and refuses
+        for rel, text in BACKFILL_PLANTS[plant].items():
+            write_file(rel.format(build=build, unit=FIXTURE_UNIT), text.format(unit=FIXTURE_UNIT))
     elif plant == "claim-root":
         write_file(f"memory/builds/fClaim/build/2026-01-02-build-{FIXTURE_CLAIM}-claimed.md",
                    f"# Claimed\n\n**Serves:** research {FIXTURE_CLAIM}\n**Made-by:** owner\n**Caused-by:** {FIXTURE_CLAIM}\n")
@@ -608,6 +711,36 @@ def check_plant_walk(root, plant, lines, rc) -> tuple:
     return out, ok
 
 
+def check_backfill_plant(root, plant) -> tuple:
+    """TOOL-dTotalRecall-47 AC1 AC3: `--backfill` over a backfill plant's `root`, then, for the selection
+    plant, `--check` and `--backfill` again. -> `(lines, ok)`: each run's lines, then one PASS or FAIL line.
+    It passes when the first run writes exactly BACKFILL_EXPECTED's paths and lists exactly its refusals,
+    each under its reason, `git status --porcelain` names only what it wrote, and, for the selection plant,
+    the check names exactly the refused records under `causes` and the second run prints `0 backfilled`."""
+    build = "memory/builds/fRoot/build"
+    want, wrote = BACKFILL_EXPECTED[plant]
+    want = {k.format(build=build, unit=FIXTURE_UNIT): v for k, v in want.items()}
+    wrote = [p.format(build=build, unit=FIXTURE_UNIT) for p in wrote]
+    first, _rc = write_missing_causes(root)
+    out = [f"{SAY}: fixture {plant} · backfill 1 · {ln}" for ln in first]
+    refused = {ln.split(" · ")[1]: ln.split(" · ")[2] for ln in first if ln.startswith(f"{SAY}: not backfilled · ")}
+    done = [ln.split(" · ")[1] for ln in first if ln.startswith(f"{SAY}: backfilled · ")]
+    status = sorted(ln[3:] for ln in run_git(root, "status", "--porcelain").stdout.splitlines())
+    out += [f"{SAY}: fixture {plant} · status · {ln}" for ln in status]
+    ok = done == wrote and status == sorted(wrote) and set(refused) == set(want) \
+        and all(refused[p].startswith(r) for p, r in want.items())
+    if plant == "backfill-selection":
+        lines, _rc = run_check(root)
+        second, _rc = write_missing_causes(root)
+        out += [f"{SAY}: fixture {plant} · check · {ln}" for ln in lines]
+        out += [f"{SAY}: fixture {plant} · backfill 2 · {ln}" for ln in second]
+        named = {ln.split(" · ")[1] for ln in lines if ln.startswith(f"{SAY}: causes · ")}
+        ok = ok and named == set(want) and second[-1].startswith(f"{SAY}: 0 backfilled")
+    out.append(f"{SAY}: fixture {plant} · {'PASS' if ok else 'FAIL'} · the backfill writes what the causes check "
+               "lacks and refuses to guess")
+    return out, ok
+
+
 def run_fixture(plant) -> tuple:
     """`--fixture --plant <case>`: the plant's repository under the system temp directory, its population's
     rows printed, then `--check` run there. -> `(lines, exit)`."""
@@ -621,6 +754,9 @@ def run_fixture(plant) -> tuple:
             home = root / "memory/project" / f"{POPULATION}.txt"
             rows = [ln for ln in home.read_bytes().decode("utf-8").split("\n")[1:] if ln]
             head = [f"{SAY}: fixture {plant} · row · " + " ".join(ln.split("\t")[:3]).replace(str(root), "") for ln in rows]
+            if plant in BACKFILL_PLANTS:
+                lines, ok = check_backfill_plant(root, plant)
+                return head + lines, 0 if ok else 1
             lines, rc = run_check(root)
             if plant in BULLETED_PLANTS:
                 walk, ok = check_plant_walk(root, plant, lines, rc)
@@ -645,6 +781,8 @@ def main(argv) -> int:
             print(f"{SAY}: refused · {exc}")
             return 2
         lines, rc = [f"{p}\t{s}\t1" for p, s in rows], 0
+    elif argv == ["--backfill"]:
+        lines, rc = write_missing_causes(root)
     elif argv == ["--print-stand-ins"]:
         lines, rc = sorted(read_stand_ins(root)), 0
     elif argv == ["--print-record-keys"]:

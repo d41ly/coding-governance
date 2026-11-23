@@ -5643,6 +5643,11 @@
       "file": "tools/run-gates/verdict_backends.py"
     },
     {
+      "id": "check_backfill_plant",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
+    },
+    {
       "id": "check_backlog_mode_shift",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -43976,6 +43981,11 @@
       "id": "write_method_entry",
       "kind": "function",
       "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "write_missing_causes",
+      "kind": "function",
+      "file": "tools/memory-tree/record_causes.py"
     },
     {
       "id": "write_model_copy",
