@@ -382,3 +382,7 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T10:25:41Z brief · item TOOL-dTotalRecall-71 · reason 2c6739518998 memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-71-build-brief.md
 
 2026-11-23T10:29:08Z dispatch · item 8d065b63 TOOL-dTotalRecall-71 · reason memory/builds/dTotalRecall/build tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-71.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-71-1-acceptance-ledger.md
+
+2026-11-23T10:32:22Z brief · item TOOL-dTotalRecall-81 · reason 66f4baf28e7b memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-81-build-brief.md
+
+2026-11-23T10:35:45Z dispatch · item 2391d5a5 TOOL-dTotalRecall-81 · reason memory/builds/dTotalRecall/build tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dTotalRecall/README.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-81.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-81-1-acceptance-ledger.md
