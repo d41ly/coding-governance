@@ -1367,7 +1367,7 @@ def check_handoff(root, path):
             text = fh.read().decode("utf-8").replace("\r\n", "\n")
     except (OSError, UnicodeDecodeError) as e:
         return False, ["handoff: %s: cannot be read as UTF-8 — %s" % (rel, e)]
-    marker = MARKER_RE.search(text)
+    marker = lib.extract_unfenced_marker(text)   # TOOL-dBoundRoles-50 S11: a fenced marker is content
     role_m = ROLE_HEAD_RE.search(text, marker.end()) if marker else None
     task_m = TASK_HEAD_RE.search(text, role_m.end()) if role_m else None
     if not task_m:
@@ -1729,12 +1729,19 @@ def resolve_agent_transcript(session_dir, agent_id, run_id=None):
     the caller's to read. `print_agent_lines`, `--framed-by` and `agent-return` all resolve through here."""
     if not isinstance(agent_id, str) or not PATH_ID_RE.match(agent_id):
         return None
-    folder = pathlib.Path(session_dir) / "subagents"
-    if run_id is not None:
-        if not isinstance(run_id, str) or not PATH_ID_RE.match(run_id):
-            return None
-        folder = folder / WORKFLOW_RUNS_DIR / run_id
-    return folder / ("agent-%s.jsonl" % agent_id)
+    if run_id is not None and (not isinstance(run_id, str) or not PATH_ID_RE.match(run_id)):
+        return None
+    return resolve_subagent_dir(pathlib.Path(session_dir), run_id) / ("agent-%s.jsonl" % agent_id)
+
+
+def resolve_subagent_dir(sdir, run_id=None):
+    """The folder a session's agents sit under (TOOL-dBoundRoles-50 S21): `sdir / "subagents"`, or with a run
+    id that run's folder below it, `WORKFLOW_RUNS_DIR` between the two. The one spelling of the session
+    layout in this file: `resolve_agent_transcript`, the `agents` verb's journal and the return check's route
+    test all read it here. `sdir` keeps its own path class, so a `PurePosixPath` yields the layout's
+    forward-slashed form; nothing is read or checked."""
+    folder = sdir / "subagents"
+    return folder if run_id is None else folder / WORKFLOW_RUNS_DIR / run_id
 
 
 def derive_session_dir(session):
@@ -1876,7 +1883,8 @@ def run_return_check(stdin_text):
     # `user` record opens with a marker line. Any other stop is not this check's, a harness stage's return
     # being graded by its stage schema, and passes silent, leaving no record and holding no attempt.
     transcript = payload.get("agent_transcript_path") if isinstance(payload, dict) else None
-    if not isinstance(transcript, str) or not transcript or "/subagents/workflows/" in transcript.replace("\\", "/"):
+    harness = resolve_subagent_dir(pathlib.PurePosixPath("/"), "-").parent.as_posix() + "/"  # TOOL-dBoundRoles-50 S21
+    if not isinstance(transcript, str) or not transcript or harness in transcript.replace("\\", "/"):
         return 0
     turns = load_agent_transcript(transcript)   # TOOL-dBoundRoles-43 S55: the one transcript walk
     first, last = turns["first"], turns["last"]
@@ -2183,7 +2191,7 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
     if handoff_arg is not None:
         hpath = pathlib.Path(os.path.normpath(root / handoff_arg))
         hrel = hpath.relative_to(root).as_posix() if root in hpath.parents else hpath.as_posix()
-        marker = MARKER_RE.search(lib.load_text(hpath))
+        marker = lib.extract_unfenced_marker(lib.load_text(hpath))
         if not marker:
             raise lib.RolesError("%s carries no gov:handoff marker line, so no Agent call can be matched to "
                                  "it" % hrel)
@@ -2203,7 +2211,7 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
                            c["result"].get("resolvedModel"), returned,
                            render_outcome(False, notified.get(c["id"]), None, tr["files"])))
     else:
-        journal = sdir / "subagents" / "workflows" / run_id / "journal.jsonl"
+        journal = resolve_subagent_dir(sdir, run_id) / "journal.jsonl"
         if not journal.is_file():
             raise lib.RolesError("run %s has no journal: %s is absent" % (run_id, journal.as_posix()))
         started = load_run_journal(journal)

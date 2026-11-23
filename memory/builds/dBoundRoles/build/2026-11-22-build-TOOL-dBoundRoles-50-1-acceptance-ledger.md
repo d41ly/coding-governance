@@ -1,0 +1,80 @@
+**Serves:** journal TOOL-dBoundRoles-50
+
+# TOOL-dBoundRoles-50 — acceptance ledger
+
+Each criterion of section 6, read by the pass that built the unit with a probe of the code it changed, on its worktree
+before the pass commit at base `05838767d`. The render probes ran `tools/roles/handoff.py render` in git fixture
+repositories under the host temp folder, short-pathed, each holding copies of a tree's roles, loop, playbook and lib kits,
+the session-kickoff kit, the charter, the memory-tree conf and a build folder `tFix`. No gate, suite or bar ran in the
+pass: the `New arm:` arms the spec declares, their RED-first observations, and the legs its gate line lists are owed to
+the main loop at the close. The departures from the spec are the deviation record of this unit,
+`memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-50-deviation-503.md`.
+
+## S4 — how units 43 and 44 built
+
+`TOOL-dBoundRoles-43`'s pass commit `6e009daf8` precedes `TOOL-dBoundRoles-44`'s `d61ead82e` on the run's branch
+(`git merge-base --is-ancestor` exits 0), serial at orders 28 and 29, never built together. The paths both commits wrote,
+from `git show --name-only` of each: the build README `memory/builds/dBoundRoles/README.md` in its generated region,
+and beside it the generated `memory/LIVE.md`, `memory/backlog/TOOL.md` and dClosedLoop as-built view, and `help/roles.md`.
+
+## S13 — the readers of the retired hook's two basenames
+
+`git grep -l -E 'agent-cap\.(js|test\.sh)' -- ':!memory/builds' ':!memory/ledger'` on the built tree, each file with the
+unit whose disposition answers it:
+
+| File | Disposition |
+|---|---|
+| `memory/DECISIONS.md` | `TOOL-dBoundRoles-42` S2, an append-only record kept as written |
+| `memory/archive/DECISIONS.2026-08-10.md` | `TOOL-dBoundRoles-42` S2, an append-only record kept as written |
+| `memory/archive/parallel-coding-governance.template-v-2-1.md` | `TOOL-dBoundRoles-42` S2, archived, kept as written |
+| `memory/archive/parallel-coding-governance.template-v-2-2.md` | `TOOL-dBoundRoles-42` S2, archived, kept as written |
+| `memory/archive/parallel-coding-governance.template-v-2-3.md` | `TOOL-dBoundRoles-42` S2, archived, kept as written |
+| `memory/archive/parallel-coding-governance.template-v-2-4.md` | `TOOL-dBoundRoles-42` S2, archived, kept as written |
+| `memory/archive/parallel-coding-governance.template-v-2-5.md` | `TOOL-dBoundRoles-42` S2, archived, kept as written |
+| `memory/archive/parallel-coding-governance.template-v-2-6.md` | `TOOL-dBoundRoles-42` S2, archived, kept as written |
+| `memory/archive/parallel-coding-governance.template-v-2-7.md` | `TOOL-dBoundRoles-42` S2, archived, kept as written |
+| `memory/backlog/TOOL.md` | `TOOL-dBoundRoles-42` S2, its rows naming the hook historical, the shard the index generator's |
+| `memory/project/dead-path-waivers.txt` | `TOOL-dBoundRoles-42` S5 and `TOOL-dBoundRoles-44`, the step's and the frozen receipt's waived rows |
+| `memory/project/positional-refs.txt` | `TOOL-dBoundRoles-42`, registry rows keyed by citing files that do not change |
+| `memory/project/spec-token-waivers.txt` | `TOOL-dBoundRoles-25`, its carried path rows for the retired hook's two files, which live specs still cite |
+| `tools/govkit/fixtures/adopter-ic-2cff5855.receipt.json` | `TOOL-dBoundRoles-44`, a frozen receipt's rows waived by widen record 13 |
+| `tools/govkit/steps/spawn_guard_pack.py` | `TOOL-dBoundRoles-25` and `TOOL-dBoundRoles-42` S5, the upgrade step's own spellings waived by widen record 8 |
+| `tools/hooks/kit.toml` | `TOOL-dBoundRoles-25` and `TOOL-dBoundRoles-42` S5, the step row's `surfaces` line waived by widen record 8 |
+
+`memory/project/spawn-idiom-sites.txt` printed at base and prints no more: this unit's S12 dropped its deleted-suite row.
+
+## S15 — each waived row's step row or fixture label
+
+`bash tools/check-dead-paths.sh --list` on the built tree marks every line it prints for the two basenames waived. The
+`surfaces` line of `tools/hooks/kit.toml@4955f398:163` belongs to the `[[upgrade]]` step row
+`agent-cap/spawn-guard-to-roles-pack`; the `OLD_MARKER` line and the three docstring lines (DERIVED) of
+`tools/govkit/steps/spawn_guard_pack.py` are that step program's own spellings; the eight receipt rows of
+`tools/govkit/fixtures/adopter-ic-2cff5855.receipt.json` (DERIVED) carry the fixture label `adopter-ic-2cff5855`.
+
+## Criteria
+
+**Evidences:** TOOL-dBoundRoles-50
+- AC1 — `tools/gate-legs.json` — AMENDED, by the main loop's decision `memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-43-1-main-loop-decision.md`: the `python -c` probe over the leg line of every non-terminal spec's gates section printed nine specs naming `agent-cap self-test` (DERIVED), units 50, 56, 58, 60, 62, 63, 64, 66 and 69, and no other name outside the manifest. The run reads the old name as `spawn-guard self-test`; each spec's rename is spec text, owed to `gov-spec-writer` at the close, and this pass writes no spec text but its own status cell.
+- AC2 — `spawn-guard self-test` — `python -c` over `tools/gate-legs.json` printed `['spawn-guard self-test']` as the one row whose `argv` names `tools/roles/spawn-guard.test.sh`, and no row named `agent-cap self-test`, so unit 43's arm runs under the leg that exists.
+- AC3 — `bash tools/check-dead-paths.sh --list` — on the built tree it printed every hit in `tools/govkit/steps/spawn_guard_pack.py` waived, four lines (DERIVED), and none in govkit's self-test module, and named no stale row; this pass wrote no dead-path row. The unwaived hits it printed sit in `.governance/install.json`, `.governance/steps/roles/` and `tools/roles/kit.toml`, the reviewer-merge and house-overlay steps' spellings, which no line of this unit touches. OWED: the `dead-path carriers (deleted files still named)` leg at the close.
+- AC4 — `TOOL-dBoundRoles-43` — the pass commit of TOOL-dBoundRoles-43, `6e009daf8`, precedes that of TOOL-dBoundRoles-44, `d61ead82e`, serial at orders 28 and 29; the path both wrote is the build README's generated region, `memory/builds/dBoundRoles/README.md`, beside the generated `memory/LIVE.md`, backlog shard and as-built view and `help/roles.md` (section S4 above).
+- AC5 — `gen_build_index.py --check` — run after the pass's `gen_build_index.py --write` on the staged tree it exited 0; the units region the main loop's rev bump of spec 25 would move is the generator's. OWED: the `memory hygiene` leg at the close.
+- AC6 — `--input question=` — in the fixture `w50` holding this tree's kits, `render --role gov-researcher --input question=` whose second line is four backticks exited 1 naming `input:question — a fence opened at line 2 of the value is never closed`, and the prompts folder held no file before or after; the `framing:job` half, a prompt writer's return whose `job` is `Build it.` and a four-backtick line, read by `tools/roles/roles_lib.py#check_authored_lines` as `read_framing` reads it, returned the refusal naming `job` and line 2, the return itself parsing clean. OWED: arm 37's `open` case of `tools/roles/adopt-roles.test.sh` and the render self-test's `framed-open-fence` plant, RED first with the authored-line check skipped, at the close.
+- AC7 — `handoff.derive_section_sha` — in `w50`, a `gov-architect` render handing a span-free spec and a typed question, `render_work_order_section` spied: the call whose output plus one newline equals the written `## Task` was composed from the `opening`, `practices` and `reads` parts `render_handoff` appended, each placed in the section, and `derive_section_sha` of the written section read `dec145851a00`, the marker's task-sha; the graded composition differs and is shorter.
+- AC8 — `## Task` — the kits at `cf8515f98` and at its parent `fe9b73c83`, exported by `git archive` and swapped into one fixture repository `w41a` under the host temp folder, rendered the same `gov-architect` inputs, spec 1 of this build handed as a span-free spec and the question `which mechanism fits`, to equal `## Task` bytes and the equal task-sha `f907a5631c66`. Renders in separate fixtures differ only by the fixture path the `Not supplied` line names, so the comparison runs in one. Both fixtures were removed after.
+- AC9 — `fenced = !fenced` — `grep -n 'fenced = !fenced' tools/hooks/*.js` printed nothing, exit 1. `node -e` over `tools/hooks/scratch-guard.js#checkBuildable` with a scratch spec whose `# TOOL-bX-9` line sits inside a four-backtick fence holding a three-backtick line returned admission for `TOOL-bX-1` and named `TOOL-bX-1` for a route naming `TOOL-bX-9`; `tools/hooks/format-guard.js#checkPair` over `scanMessageLines` of a pair after a three-backtick line inside a four-backtick fence returned the two rule r1 defects (DERIVED), and an inline triple-backtick span left the pair bare. OWED: the `BR50-AC9` rows of `tools/hooks/scratch-guard.test.sh` and `tools/hooks/format-guard.test.sh`, RED first with the toggle restored, at the close.
+- AC10 — `selftest.derive_roles_expected` — `python -c` over a scratch copy of `tools/roles/` carrying `agents/gov-zz-fixture.agent.md`, a renamed copy of `gov-researcher` whose front matter names no `agent:`, printed the gained set `['gov-zz-fixture']`, the predicate `keys.get("agent", "true") == "true"` at `tools/govkit/selftest.py@a15fd719:3184`. OWED: the `[dBR-50 AC10]` case of `tools/govkit/selftest.py#check_agent_default`, RED first with an explicit-true predicate, at the close.
+- AC11 — `MARKER_RE.search` — `grep -n 'MARKER_RE.search' tools/roles/*.py` printed one line, `tools/roles/roles_lib.py@ae740ad4:1085` inside `extract_unfenced_marker`; `roles_lib.scan_stand_in_declarations` over a scratch tree whose `-researcher-stand-in.md` prompt holds its only marker inside a three-backtick fence returned the R15 defect `carries no gov:handoff marker line`. OWED: arm 49 of `tools/roles/adopt-roles.test.sh`, RED first with the reader calling a bare marker search, at the close.
+- AC12 — `agent-cap.test` — `grep -c 'agent-cap.test' memory/project/spawn-idiom-sites.txt` printed 0. `python tools/gate-lint/sh_hygiene.py --spawn-idioms memory/project/spawn-idiom-sites.txt` printed `registered` for `tools/roles/spawn-guard.test.sh` at `cat-file` six and `path-subst` four (DERIVED), the rows widen record 15 opened, and no finding naming either suite; it exits 1 on findings this unit does not touch, in scripts under `memory/builds/`, BANNED sites of other suites' kits and the undeclared sites of `tools/roles/adopt-roles.test.sh` that predate this pass. OWED: the `shell hygiene (a fork spent on builtin work)` leg, whose pathspecs exclude `memory/`, at the close.
+- AC13 — `git grep` — S13's command printed sixteen files (DERIVED), each with its disposition in section S13 above.
+- AC14 — `agent-cap.js` — `git grep -l -F 'agent-cap.js' -- ':!memory' ':!.governance/steps'` printed `tools/govkit/fixtures/adopter-ic-2cff5855.receipt.json`, `tools/govkit/steps/spawn_guard_pack.py` and `tools/hooks/kit.toml`, the files 42 S4 admits; id 28's disposition is the registry's move to `memory/project/dead-path-waivers.txt` (TOOL-dWitnessedBar-16), inside the `':!memory'` exclusion, so the grep needs no third pathspec and unit 42's AC4 holds as written.
+- AC15 — `tools/hooks/kit.toml` — `grep -nE '^(include|to|version_from)\b.*agent-cap\.(js|test\.sh)' tools/hooks/kit.toml` and `grep -nF '("hooks", "agent-cap.js")' tools/govkit/selftest.py` printed nothing, `KIT_DIRS` anchoring the hooks kit on `scratch-guard.js`; each waived row's step row or fixture label is section S15 above.
+- AC16 — `readUnfencedLines` — `node -e` over `tools/hooks/scratch-guard.js#readUnfencedLines` of a four-backtick fence holding a three-backtick line, then a separate five-backtick fence, yielded only the three lines outside both (DERIVED); spec 13 fenced by `roles_lib.render_handed_fence`, a four-backtick fence, walked by both walkers yielded no line from inside it, and the suite's `s13` fence is spelled by the same rule. OWED: the `rule6 BR50 AC16` row of `tools/roles/spawn-guard.test.sh` piping that handoff to the guard, and the `BR50-AC16` row of the scratch-guard suite, RED first with a walker closing on a run of three, at the close.
+- AC17 — `extract_unfenced_marker` — `python -c` over a marker, a task section and a four-backtick line nothing closes returned None from `extract_prompt_marker` and from `extract_unfenced_marker`, and `check_block_fences`, the Python reader of the section's fact lines, returned its refusal naming line 7 of the section, none raising; `node -e` over `tools/hooks/scratch-guard.js#readWorkOrderAllowance` of such a prompt returned `deny` naming `a fence opened at line 10`, no throw. OWED: the `BR50-AC17` row of the scratch-guard suite at the close.
+- AC18 — `SubagentStop` — the replay runs each command through `govkit_module().resolve_bash()` with `CLAUDE_PROJECT_DIR` exported under `STOP_REPLAY_TIMEOUT`, as `tools/govkit/selftest.py#check_stop_replay` held at base; `python -c` running `sleep 40` that way raised the timeout after 40.5s, and the timeout branch labels it `a timeout after 30s`, naming the command. OWED: the `[dBR-50 AC18]` case, RED first under an unbounded replay, at the close.
+- AC19 — `agent_type` — `handoff.py check-return` in a scratch git repository over a marked direct-spawn transcript under `subagents/agent-t1.jsonl` with no `agent_type` and over `agent-t2.jsonl` typed `gov-session` each exited 0 printing nothing on either stream and wrote no record, while the control typed `gov-builder` reached the grade and wrote `t3.json`. OWED: the `untyped-marked-stop` and `unagent-marked-stop` plants of `tools/roles/render_agents.py --selftest`, RED first with unit 5 S2's exit removed, at the close.
+- AC20 — `derive_roles_expected` — `grep -n 'def derive_roles_expected' tools/govkit/selftest.py` printed the definition's line, `tools/govkit/selftest.py@a15fd719:3178`, and 37 AC3's grep, `grep -nE 'len\(agents\) == [0-9]' tools/govkit/selftest.py`, printed nothing, exit 1: the derivation is present and the literal absent.
+- AC21 — `"subagents" / "workflows"` — `grep -n '"subagents" / "workflows"' tools/roles/handoff.py` printed nothing: `tools/roles/handoff.py#resolve_subagent_dir` spells the layout once, its run folder through `WORKFLOW_RUNS_DIR` as the brief rules, and `resolve_agent_transcript`, the `agents` verb's journal and the return check's route test read it there.
+- AC22 — `refused` — over this build's specs and brief records holding a backticked `blob:`, `record:` or `cmd:` span, files 13, rendered 13, refused 0 (DERIVED): the population printed by `git grep -l -E` over `memory/builds/dBoundRoles/spec/*.md` and `memory/builds/dBoundRoles/prompts/*brief*.md`, and the rendered and refused counts printed by one probe script rendering `handoff.py render --role gov-builder --input spec=` for each file in the fixture `w50`.
+- AC23 — `handed content is fenced` — `grep -n` printed one line in `tools/roles/README.md@39b2320f:209` and one in `tools/hooks/README.md@d813c3e0:323`, the rule-6 README.
+- AC24 — `grades a direct spawn` — `grep -n 'grades a direct spawn' tools/roles/README.md` printed one line, on the `check-return` paragraph at `tools/roles/README.md@39b2320f:457`, written by `TOOL-dBoundRoles-39` and held here.

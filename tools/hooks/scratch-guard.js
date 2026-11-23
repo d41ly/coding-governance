@@ -1202,7 +1202,10 @@ function readStatusCells(text) {
  * most three spaces of indent and then three or more backticks or three or more tildes, and closes only on a
  * line of the same character whose run is at least as long, with nothing after it but whitespace; a fence
  * line is yielded by neither end. So a shorter run inside a longer fence is content, and a fact or marker
- * line quoted inside handed content is read as neither.
+ * line quoted inside handed content is read as neither. CommonMark's info-string rule holds too
+ * (TOOL-dBoundRoles-50 S9): a backtick run whose line holds a backtick after the run opens no fence, so an
+ * inline span of three backticks is a line of text. The hooks kit holds no other walker: the H1 scan
+ * `readSpecH1Id` and format-guard's `scanMessageLines` both read their lines here.
  */
 function * readUnfencedLines(text) {
   let fence = ''
@@ -1211,7 +1214,7 @@ function * readUnfencedLines(text) {
   for (let i = 0; i < lines.length; i++) {
     const m = /^ {0,3}(`{3,}|~{3,})([\s\S]*)$/.exec(lines[i])
     if (!fence) {
-      if (m) { fence = m[1]; openedAt = i + 1; continue }
+      if (m && !(m[1][0] === '`' && m[2].includes('`'))) { fence = m[1]; openedAt = i + 1; continue }
       yield [i + 1, lines[i]]
     } else if (m && m[1][0] === fence[0] && m[1].length >= fence.length && /^[ \t\r]*$/.test(m[2])) {
       fence = ''
@@ -1223,13 +1226,13 @@ function * readUnfencedLines(text) {
 /**
  * A spec's H1 id, '' when it has none — the H1 read R4 and tree_lib.parse_spec_h1 make (S8): the
  * first UNFENCED `#` line, its first token with backticks and asterisks stripped and trailing `:.,;`
- * dropped. checkBuildable and readDispatchedUnits both read it here (TOOL-aSmoothedDispatch-6 S4).
+ * dropped. checkBuildable and readDispatchedUnits both read it here (TOOL-aSmoothedDispatch-6 S4), its lines
+ * those `readUnfencedLines` yields, so a short run inside a long fence closes nothing (TOOL-dBoundRoles-50 S9).
  */
 function readSpecH1Id(text) {
-  let fenced = false
-  for (const l of String(text || '').split(/\r?\n/)) {
-    if (/^ ? ? ?(```|~~~)/.test(l)) { fenced = !fenced; continue }
-    if (fenced || !/^#[ \t]/.test(l)) continue
+  for (const [, raw] of readUnfencedLines(String(text || ''))) {
+    const l = raw === null ? '' : raw.replace(/\r$/, '')
+    if (!/^#[ \t]/.test(l)) continue
     return (l.split(/[ \t]+/)[1] || '').replace(/[`*]/g, '').replace(/[:.,;]+$/, '')
   }
   return ''
@@ -2052,7 +2055,11 @@ function readWorkOrderAllowance(data) {
   const c = d.message && d.message.content
   const prompt = typeof c === 'string' ? c
     : Array.isArray(c) ? c.filter((b) => b && b.type === 'text' && typeof b.text === 'string').map((b) => b.text).join('\n') : ''
-  const lines = [...readUnfencedLines(prompt)].filter(([, l]) => l !== null).map(([n, l]) => [n, l.replace(/\r$/, '')])
+  const walked = [...readUnfencedLines(prompt)]
+  // TOOL-dBoundRoles-50 S17: a prompt the walk ends inside a fence holds no allowance anyone can read
+  const open = walked.find(([, l]) => l === null)
+  if (open) return { deny: `a fence opened at line ${open[0]} of the prompt in ${from} is never closed, so its allowance block cannot be read outside a fence and no write of this typed agent is admitted` }
+  const lines = walked.map(([n, l]) => [n, l.replace(/\r$/, '')])
   const task = lines.findIndex(([, l]) => l === '## Task')
   if (task === -1) return { why: `the prompt in ${from} holds no ## Task section outside a fence` }
   const end = lines.findIndex(([, l], i) => i > task && /^## /.test(l))

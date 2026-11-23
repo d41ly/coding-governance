@@ -961,12 +961,14 @@ def read_unfenced_lines(text):
     indent and then three or more backticks or three or more tildes, and closes only on a line of the
     same character whose run is at least as long, with nothing after it but whitespace; a fence line is
     yielded by neither end. The hooks kit's `readUnfencedLines` is the same walker. `tree_lib.unfenced_lines`'
-    shape, copied with the length rule: a shorter run inside a longer fence is content."""
+    shape, copied with the length rule: a shorter run inside a longer fence is content. CommonMark's info-string
+    rule holds too (TOOL-dBoundRoles-50 S9): a backtick run whose line holds a backtick after the run opens no
+    fence, so an inline span of three backticks is a line of text."""
     fence, opened_at = "", 0
     for n, line in enumerate(str(text).split("\n"), 1):
         m = re.match(r" {0,3}(`{3,}|~{3,})(.*)", line, re.S)
         if not fence:
-            if m:
+            if m and not (m.group(1)[0] == "`" and "`" in m.group(2)):
                 fence, opened_at = m.group(1), n
                 continue
             yield n, line
@@ -1057,12 +1059,31 @@ def extract_prompt_marker(prompt):
     kit's spawn guard reads it (its rule 6): exactly one line outside every fence, carriage returns
     removed, is a whole marker line, and it is the prompt's first line once CRLF is folded, the two ends
     trimmed and that line's trailing whitespace dropped. None otherwise (TOOL-aOrientedCast-25); a marker
-    line inside a fence is handed content and is not counted (TOOL-dBoundRoles-38 S4)."""
+    line inside a fence is handed content and is not counted (TOOL-dBoundRoles-38 S4). A prompt the walk
+    ends inside a fence is None too, since its lines after the fence's opening read as neither
+    (TOOL-dBoundRoles-50 S17)."""
     text = str(prompt)
-    marks = [ln for ln in (raw.replace("\r", "") for _n, raw in read_unfenced_lines(text) if raw is not None)
-             if MARKER_RE.fullmatch(ln)]
+    walked = list(read_unfenced_lines(text))
+    if any(raw is None for _n, raw in walked):
+        return None
+    marks = [ln for ln in (raw.replace("\r", "") for _n, raw in walked) if MARKER_RE.fullmatch(ln)]
     first = text.replace("\r\n", "\n").strip().split("\n")[0].rstrip()
     return MARKER_RE.fullmatch(first) if len(marks) == 1 and first == marks[0] else None
+
+
+def extract_unfenced_marker(text):
+    """The `MARKER_RE` match, over `text` itself, of the first marker line `read_unfenced_lines` yields, so a
+    marker quoted inside a fence is content and never the file's own (TOOL-dBoundRoles-50 S11); None where no
+    unfenced line is a marker line, or where the walk ends inside a fence (S17). Every reader of a file's own
+    marker reads it here: `check_handoff`, `print_agent_lines`, `scan_stand_in_declarations`,
+    `scan_work_orders` and the render self-test's `check_ranked_arms`."""
+    text, found = str(text), None
+    starts = [0] + [m.end() for m in re.finditer("\n", text)]
+    for n, line in read_unfenced_lines(text):
+        if line is None:
+            return None
+        found = found or MARKER_RE.search(text, starts[n - 1], starts[n - 1] + len(line))
+    return found
 
 
 def check_rule_tags(charter, value):
@@ -1578,7 +1599,7 @@ def scan_stand_in_declarations(root, memory_root):
     for p in sorted((root / memory_root / "builds").glob("*/prompts/*%s.md" % STAND_IN_TAIL)):
         rel = p.relative_to(root).as_posix()
         try:
-            m = MARKER_RE.search(load_text(p))
+            m = extract_unfenced_marker(load_text(p))
         except (RolesError, UnicodeDecodeError) as e:
             defects.append("%s: R15 — the stand-in declaration cannot be read as UTF-8 — %s" % (rel, e))
             continue
@@ -1919,7 +1940,7 @@ def scan_work_orders(root, memory_root, slots):
             continue
         rel = p.relative_to(root).as_posix()
         try:
-            m = MARKER_RE.search(load_text(p))
+            m = extract_unfenced_marker(load_text(p))
         except (RolesError, UnicodeDecodeError) as e:
             found.append((rel, "the work order cannot be read as UTF-8 — %s" % e))
             handoffs[p.name] = (rel, None)

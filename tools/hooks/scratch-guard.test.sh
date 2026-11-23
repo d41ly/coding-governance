@@ -2103,6 +2103,50 @@ run_read "DR-AC2 policy-absent: no policy kit beside the hook, the main loop's G
 run_read "BR43-AC40 policy-refusal: the reader refuses, the main loop's Read -> allow with one witness naming the refusal" 0 sgdr-no-such-branch Read 'driver.reads unread'
 run_read "BR43-AC40 policy-refusal: ...and the main loop's Grep too -> allow with the witness" 0 sgdr-no-such-branch Grep 'driver.reads unread'
 
+# ---- TOOL-dBoundRoles-50 AC9 AC16 AC17 (S9, S16, S17): the hooks kit's one fence walker. `readUnfencedLines`
+# over a four-backtick fence holding a three-backtick line, then a separate five-backtick fence, yields only
+# the lines outside both; a line opening with three backticks that holds a backtick after the run is text,
+# CommonMark's info-string rule. `checkBuildable` over a spec whose quoted `# TOOL-bX-9` line sits inside
+# a four-backtick fence holding a three-backtick line reads the real H1 after it, `TOOL-bX-1`.
+# `readWorkOrderAllowance` over a prompt whose walk ends inside a fence denies the write, naming the line
+# the fence opened at, and throws nothing. The failing case, owed at the close and not observed by the
+# pass that wrote this: a walker that closes a fence on any run of three, under which the first, third and
+# fourth rows red. WHAT IT DOES NOT CHECK: a tilde fence holding backticks, which the walker never
+# closes on a backtick run whatever its length.
+SGBR50="$TMP/sgbr50"
+mkdir -p "$SGBR50/mem/builds/bX/spec" "$SGBR50/sess/subagents"
+printf '%s\n' '````' '```' '# TOOL-bX-9 — the quoted one' '```' '````' '# TOOL-bX-1 — the real one' '' \
+  '**Status:** INPROGRESS · rev-1 · 2026-11-23 · Tier-2' > "$SGBR50/mem/builds/bX/spec/2026-11-23-spec-TOOL-bX-1.md"
+node -e '
+const fs = require("fs"), path = require("path")
+const sg = require(process.argv[1]), dir = process.argv[2], tick = "`"
+const fence = (n) => tick.repeat(n)
+const say = (name, ok, got) => console.log((ok ? "ok   " : "FAIL ") + name + (ok ? "" : " — got " + JSON.stringify(got)))
+let got = [...sg.readUnfencedLines(["a", fence(4), "in", fence(3), "still in", fence(4), "b", fence(5), "x", fence(5), "c"].join("\n"))]
+say("BR50-AC16 readUnfencedLines: a three-backtick line inside a four-backtick fence closes nothing, and a five-backtick fence yields nothing from inside",
+    JSON.stringify(got) === JSON.stringify([[1, "a"], [7, "b"], [11, "c"]]), got)
+got = [...sg.readUnfencedLines(["a", fence(3) + "run " + tick + "x" + tick, "b"].join("\n"))]
+say("BR50-AC9 readUnfencedLines: a three-backtick run whose line holds a backtick after it opens no fence",
+    got.length === 3 && got.every(([, l]) => l !== null), got)
+got = sg.checkBuildable({ unit: "TOOL-bX-1", spec: "mem/builds/bX/spec/2026-11-23-spec-TOOL-bX-1.md" }, "bX", dir, "mem", Buffer.from(""))
+say("BR50-AC9 checkBuildable: an H1 quoted inside a four-backtick fence holding a three-backtick line is content, the real H1 admits",
+    got === "", got)
+fs.writeFileSync(path.join(dir, "sess.jsonl"), "{}\n")
+const prompt = ["<!-- gov:handoff role=gov-builder -->", "## Task", "", "### allowance", "", "- tools/a.py", "", "### input:spec", "", fence(4), "open"].join("\n")
+fs.writeFileSync(path.join(dir, "sess", "subagents", "agent-br50.jsonl"), JSON.stringify({ type: "user", message: { role: "user", content: prompt } }) + "\n")
+try { got = sg.readWorkOrderAllowance({ transcript_path: path.join(dir, "sess.jsonl"), agent_id: "br50" }) } catch (e) { got = { threw: String(e) } }
+say("BR50-AC17 readWorkOrderAllowance: a prompt ending inside a fence denies the write, naming the line it opened at, and throws nothing",
+    typeof got.deny === "string" && got.deny.includes("a fence opened at line 10") && !got.entries, got)
+' "$HOOK" "$SGBR50" > "$TMP/br50.out" 2>&1
+while IFS= read -r sgbr50_l; do
+  case $sgbr50_l in
+    ok\ *) echo "$sgbr50_l"; pass=$((pass+1)) ;;
+    FAIL\ *) echo "$sgbr50_l"; fail=$((fail+1)) ;;
+    *) echo "FAIL BR50 the walker program printed: $sgbr50_l"; fail=$((fail+1)) ;;
+  esac
+done < "$TMP/br50.out"
+[ "$(grep -c '^ok   BR50-' "$TMP/br50.out")" = 4 ] || { echo "FAIL BR50 the walker program printed $(grep -c '^ok   BR50-' "$TMP/br50.out") ok rows of 4"; fail=$((fail+1)); }
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
@@ -2163,8 +2207,10 @@ n=$((pass+fail))
 # 446 = 440 + the 6 rows TOOL-dBoundRoles-43 added (5 run_shell_write rows, 3 for AC35 and 2 for AC39, and
 # the refused key read re-expected as AC40's policy-refusal, one row become two), counted by hand under the
 # same rule.
+# 450 = 446 + the 4 BR50 rows TOOL-dBoundRoles-50 added (2 walker rows, 1 checkBuildable row and 1
+# allowance row; its count row prints only on a red), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=446
+FLOOR_ASSERTIONS=450
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

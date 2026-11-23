@@ -449,6 +449,13 @@ check_contains "AC7 the edited shape is the one quoted" "$TMP/out" '· x <y>'
 # M3: an inline triple-backtick span is not a fence, so the pair after it stays bare.
 seed_repo "$TMP/charter.md"
 run_stop "TOOL-aHeardState-8 an inline backtick span leaves the pair bare" allow "$TMP/inline.md"
+# TOOL-dBoundRoles-50 AC9: the rows read through scratch-guard's one walker, so a three-backtick line inside a
+# four-backtick fence closes nothing and the pair after it is still fenced. The failing case, owed at the close
+# and not observed by the pass that wrote this: the toggle the walker replaced, under which the short run
+# closes the fence and the pair reads bare, so the message allows.
+write_message longfence "$FENCE$BT" "$FENCE" "- $B" "- $S" "$FENCE$BT"
+run_stop "BR50-AC9 a pair after a short run inside a long fence is fenced and blocks" block "$TMP/longfence.md"
+check_contains "BR50-AC9 the long-fence reason names rule r1" "$TMP/out" "rule r1"
 # M6: a payload without last_assistant_message allows, with a witness.
 run_stop "TOOL-aHeardState-8 a payload with no message allows" allow "$TMP/none.md" '{"last_assistant_message":null}'
 check_contains "TOOL-aHeardState-8 the witness names the missing message" "$TMP/err" "no last_assistant_message"
@@ -728,9 +735,9 @@ n=$((pass+fail))
 # 73 + TOOL-aOrientedCast-21's 28 agent-line assertions; 129 = 101 + TOOL-aOrientedCast-24's 28: 4 quoted,
 # 1 headless, 9 in the three-record loop, 2 tick, 6 in the two-route loop, 3 foreground-run, 3 torn;
 # 149 = 129 + TOOL-dPavedRoad-2's 20 PR2 assertions: 8 marked agent, 2 allow, 3 run, 3 failing stub,
-# 4 commit.
+# 4 commit; 151 = 149 + TOOL-dBoundRoles-50's 2 BR50-AC9 long-fence assertions.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=149
+FLOOR_ASSERTIONS=151
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

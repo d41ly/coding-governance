@@ -98,7 +98,7 @@ const path = require('path')
 const { spawnSync } = require('child_process')
 // The session layout, RUN_ID_RE, WORKFLOW_RUNS_DIR and resolveSessionDir, has one home, scratch-guard.js's
 // exports (TOOL-dBoundRoles-43 S57), so it is typed once.
-const { readCard, extractRouteUnits, readConfKey, resolveToplevel, resolveCommonDir, RUN_ID_RE, WORKFLOW_RUNS_DIR, resolveSessionDir } = require('./scratch-guard.js')
+const { readCard, extractRouteUnits, readConfKey, resolveToplevel, resolveCommonDir, RUN_ID_RE, WORKFLOW_RUNS_DIR, resolveSessionDir, readUnfencedLines } = require('./scratch-guard.js')
 
 const CHARTER_FILE = 'AGENTS.md'
 const CONF_FILE = '.memory-tree.conf'
@@ -212,19 +212,17 @@ function readCharterShapes(top) {
 }
 
 /**
- * Each line of the message with whether it sits inside a fenced block. A backtick run whose line
- * closes it again (an inline span such as three backticks around a command) is not a fence: in
- * CommonMark a backtick fence's info string carries no backtick.
+ * Each line of the message with whether it sits inside a fenced block: a row is unfenced exactly when
+ * scratch-guard's `readUnfencedLines`, the hooks kit's one fence walker, yields its line, so a fence line,
+ * a line inside a fence and every line after a fence left open read fenced (TOOL-dBoundRoles-50 S9). The
+ * walker carries CommonMark's two rules: a backtick run whose line holds a backtick after it is an inline
+ * span and opens no fence, and a shorter run inside a longer fence is content.
  */
 function scanMessageLines(message) {
-  let fenced = false
-  return String(message).split(/\r?\n/).map((text) => {
-    const m = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(text)
-    const fence = !!m && !(m[1][0] === '`' && m[2].includes('`'))
-    const row = { text, fenced: fenced || fence }
-    if (fence) fenced = !fenced
-    return row
-  })
+  const raw = String(message).split('\n')
+  const unfenced = new Set()
+  for (const [n, line] of readUnfencedLines(String(message))) if (line !== null) unfenced.add(n)
+  return raw.map((line, i) => ({ text: line.replace(/\r$/, ''), fenced: !unfenced.has(i + 1) }))
 }
 
 /** The pair defects of one message: missing, not bare, not adjacent, or off-shape. */

@@ -3179,8 +3179,27 @@ def derive_roles_expected(kit: pathlib.Path) -> set:
     """TOOL-dBoundRoles-37 S1: the roster a roles install is graded against, DERIVED, never typed: the
     slot of every `agents/*.agent.md` of `kit` whose front matter does not set `agent: false`, an absent
     key counting true, read through `load_kit_roster`. The house overlays it also derived left the seed
-    list with TOOL-dBoundRoles-19, which moved a role's own rules into the overlay. Runs no case."""
-    return {s for s, r in load_kit_roster(kit).items() if r["keys"].get("agent", "true") != "false"}
+    list with TOOL-dBoundRoles-19, which moved a role's own rules into the overlay. The predicate is the
+    renderer's own, `keys.get("agent", "true") == "true"` (TOOL-dBoundRoles-50 S10). Runs no case."""
+    return {s for s, r in load_kit_roster(kit).items() if r["keys"].get("agent", "true") == "true"}
+
+
+def check_agent_default(tmp: pathlib.Path) -> None:
+    """TOOL-dBoundRoles-50 AC10: a scratch copy of the roles kit under `tmp`, carrying one more role file whose
+    front matter names no `agent:` key, a copy of `gov-researcher`'s renamed, and `derive_roles_expected` over
+    it gains exactly that slot beside the source kit's. Staged against a predicate that needs an explicit
+    `agent: true`, the slot is missing and the case reds. WHAT IT DOES NOT CHECK: an `agent:` value other
+    than `true` or `false`, which the catalogue checker's R0 refuses before any render."""
+    kit = tmp / "agent-default" / "roles"
+    shutil.copytree(KIT_DIRS["roles"], kit, ignore=shutil.ignore_patterns("__pycache__"))
+    slot = "gov-zz-fixture"
+    text = (kit / "agents" / "gov-researcher.agent.md").read_text(encoding="utf-8")
+    (kit / "agents" / (slot + ".agent.md")).write_text(text.replace("name: gov-researcher", "name: " + slot),
+                                                       encoding="utf-8", newline="\n")
+    held, got = derive_roles_expected(KIT_DIRS["roles"]), derive_roles_expected(kit)
+    check("[dBR-50 AC10] a role file whose front matter omits agent: is an agent slot of derive_roles_expected",
+          "agent:" not in text.split("\n---", 1)[0] and got - held == {slot} and held <= got,
+          "gained %s over the source kit's %s" % (sorted(got - held), sorted(held)))
 
 
 def derive_seed_expected(target: pathlib.Path, descs: dict, selection: list[str]) -> list[dict]:
@@ -3210,6 +3229,7 @@ def check_stop_replay(t: pathlib.Path) -> None:
     resolved bash, the payload on stdin, `t` the working directory and `CLAUDE_PROJECT_DIR`, under
     `STOP_REPLAY_TIMEOUT` seconds: red on a non-zero exit, any stdout byte, a timeout, or a new path under
     `t`'s `<git common dir>/return-check/`, the label naming the command, the payload and what it printed.
+    A staged command sleeping ten seconds past that bound is read red, naming it (TOOL-dBoundRoles-50 AC18).
     WHAT THIS DOES NOT CHECK: `SubagentStart` hooks (§3), stderr, which reaches no agent on exit 0, a
     hook wired by hand outside every kit's fragment, or a direct spawn's stop, which the return check's
     own plants grade."""
@@ -3251,25 +3271,39 @@ def check_stop_replay(t: pathlib.Path) -> None:
     common = subprocess.run(["git", "-C", str(t), "rev-parse", "--git-common-dir"], capture_output=True,
                             text=True, encoding="utf-8", env=env).stdout.strip()
     records_dir = (t / common if common else t / ".git") / "return-check"
+
+    def run_stop_command(cmd, name, payload):
+        """`(red, label, stderr)` of one command over one payload, run through the resolved bash with
+        `CLAUDE_PROJECT_DIR` exported under `STOP_REPLAY_TIMEOUT` seconds (TOOL-dBoundRoles-50 S18): red on a
+        non-zero exit, a timeout, any stdout byte or a new return-check record, the label naming the command."""
+        held = set(records_dir.rglob("*")) if records_dir.is_dir() else set()
+        try:
+            p = subprocess.run([govkit_module().resolve_bash(), "-c", cmd], cwd=str(t), env=env,
+                               input=json.dumps(payload, ensure_ascii=False), capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", timeout=STOP_REPLAY_TIMEOUT)
+            rc, out, err = p.returncode, p.stdout, p.stderr
+        except subprocess.TimeoutExpired as e:
+            rc = "a timeout after %ds" % STOP_REPLAY_TIMEOUT
+            out, err = (x.decode("utf-8", "replace") if isinstance(x, bytes) else (x or "")
+                        for x in (e.stdout, e.stderr))
+        left = sorted(x.relative_to(records_dir).as_posix() for x in
+                      (set(records_dir.rglob("*")) if records_dir.is_dir() else set()) - held)
+        red = rc != 0 or bool(out) or bool(left)
+        said = " — it exited %s, printed %r and left %s" % (rc, out[:600], left or "nothing") if red else ""
+        return red, ("SubagentStop command %s over the %s payload exits 0, prints nothing on stdout and leaves no "
+                     "return-check record" % (cmd, name) + said), err
+
     for cmd in commands:
         for name, payload in payloads:
-            held = set(records_dir.rglob("*")) if records_dir.is_dir() else set()
-            try:
-                p = subprocess.run([govkit_module().resolve_bash(), "-c", cmd], cwd=str(t), env=env,
-                                   input=json.dumps(payload, ensure_ascii=False), capture_output=True, text=True,
-                                   encoding="utf-8", errors="replace", timeout=STOP_REPLAY_TIMEOUT)
-                rc, out, err = p.returncode, p.stdout, p.stderr
-            except subprocess.TimeoutExpired as e:
-                rc = "a timeout after %ds" % STOP_REPLAY_TIMEOUT
-                out, err = (x.decode("utf-8", "replace") if isinstance(x, bytes) else (x or "")
-                            for x in (e.stdout, e.stderr))
-            left = sorted(x.relative_to(records_dir).as_posix() for x in
-                          (set(records_dir.rglob("*")) if records_dir.is_dir() else set()) - held)
-            red = rc != 0 or bool(out) or bool(left)
-            check("[dBR-40 S3] SubagentStop command %s over the %s payload exits 0, prints nothing on stdout and "
-                  "leaves no return-check record" % (cmd, name)
-                  + (" — it exited %s, printed %r and left %s" % (rc, out[:600], left or "nothing") if red else ""),
-                  not red, err[-1000:])
+            red, label, err = run_stop_command(cmd, name, payload)
+            check("[dBR-40 S3] " + label, not red, err[-1000:])
+    # TOOL-dBoundRoles-50 AC18: a staged hook that sleeps past the bound is red, naming the command, never
+    # recorded as named but passing; staged against an unbounded replay, the plant exits 0 and this reds
+    hung = "sleep %d" % (STOP_REPLAY_TIMEOUT + 10)
+    red, label, _err = run_stop_command(hung, payloads[0][0], payloads[0][1])
+    check("[dBR-50 AC18] a SubagentStop command that sleeps %ds is red under the %ds bound, naming it"
+          % (STOP_REPLAY_TIMEOUT + 10, STOP_REPLAY_TIMEOUT),
+          red and hung in label and "a timeout after %ds" % STOP_REPLAY_TIMEOUT in label, label)
 
 
 def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = False) -> None:
@@ -11186,6 +11220,7 @@ user_skills = "/tmp/gk-fake-skills"
             # ---- rendered, or, with no governing doc, arrives with its Skill and names the doc.
             # ---- Module-level functions, so a slice reaches each without this block.
             check_roles_default()
+            check_agent_default(tmp3)
             check_requires_vintage(tmp3)
             check_gained_prune_vintage(tmp3)
             check_roles_install(tmp3)

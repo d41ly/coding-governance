@@ -90,7 +90,6 @@ tools/drift-audit/adopt-drift-audit.sh	pure-fn-subst	2	ef4d5554d8e7475fc1fe2e78a
 tools/drift-audit/adopt-drift-audit.sh	var-pipe	1	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-37
 tools/gate-lint/fork-count.sh	path-subst	1	ea0c6868d78283c542daa710e6678851292b9c86	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-37
 tools/govkit/census.test.sh	path-subst	5	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
-tools/hooks/agent-cap.test.sh	path-subst	4	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/hooks/scratch-guard.test.sh	cat-file	11	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/hooks/scratch-guard.test.sh	path-subst	5	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/hooks/scratch-guard.test.sh	printf-subst	2	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
@@ -302,3 +301,5 @@ tools/workflows/unattended-build.test.sh	path-subst	6	ef4d5554d8e7475fc1fe2e78af
 tools/workflows/unattended-build.test.sh	printf-subst	83	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/workflows/unattended-build.test.sh	pure-fn-subst	36	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
 tools/workflows/unattended-build.test.sh	var-pipe	64	ef4d5554d8e7475fc1fe2e78af0a2fbf83a53d84	seeded
+tools/roles/spawn-guard.test.sh	cat-file	6	05838767dd02e24b6538d9195887dacd9b0f6502	widened:2026-11-23-build-TOOL-dBoundRoles-50-widen-15
+tools/roles/spawn-guard.test.sh	path-subst	4	05838767dd02e24b6538d9195887dacd9b0f6502	widened:2026-11-23-build-TOOL-dBoundRoles-50-widen-15

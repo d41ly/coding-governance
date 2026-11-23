@@ -205,7 +205,12 @@ of either walks `roles_lib.read_unfenced_lines`, the one fence walker (a fence o
 spaces of indent and three or more backticks or tildes, and closes only on a run of the same character at
 least as long with nothing after it but whitespace), as `extract_prompt_marker` and the playbook kit's
 `read_handoff_edges` do, and this kit's spawn guard walks its copy, `readUnfencedLines`. So a spec
-that quotes a fact line, a heading-then-fact pair or a marker is handed whole and read as text. The
+that quotes a fact line, a heading-then-fact pair or a marker is handed whole and read as text. Because
+handed content is fenced, a reader of a file's own marker takes the first marker line outside every fence,
+`roles_lib.extract_unfenced_marker`, which `check_handoff`, the `agents` verb, R15 and R16 all call, and a
+text the walk ends inside a fence has no marker at all, there or in `extract_prompt_marker`
+(TOOL-dBoundRoles-50). Both walkers keep CommonMark's info-string rule: a backtick run whose line holds a
+backtick after it is an inline span and opens no fence. The
 practices block, the `## Card` block and the work-order blocks other than `### inputs`' sub-blocks are no
 handed value and are not fenced. The section is checked block by block (TOOL-dBoundRoles-48): every block
 opens outside a fence, and a handed block's heading and fact line lie outside every fence and its content
@@ -452,6 +457,7 @@ The hook is `return-check.sh`, wired by `return-check.fragment.json` (event `Sub
 check-return` with the payload on stdin. `check-return` grades a direct spawn's return only
 (TOOL-dBoundRoles-39), by two tests run first, before the role is loaded or any record is read:
 a direct spawn's `agent_transcript_path`, separators folded to `/`, holds no `/subagents/workflows/` pair,
+the harness folder `handoff.resolve_subagent_dir` spells, the file's one spelling of the session layout,
 and a direct spawn's first `user` record opens with a marker line `roles_lib.extract_prompt_marker` parses.
 A harness stage's return is graded by its stage schema instead: its stop, and any stop failing either test,
 one with no transcript path or an unreadable first record included, exits 0 printing nothing, writes no

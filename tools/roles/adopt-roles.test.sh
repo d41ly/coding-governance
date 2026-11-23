@@ -148,7 +148,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +23 for arm 46, twenty-one over the composed fixture and two over the adopter's harness list (TOOL-dBoundRoles-20).
 # +6 for arm 47, five verdicts over the house fixture and its line count (TOOL-dBoundRoles-19).
 # +1 for arm 32's stand-in with roles.no-spawn unset and +2 for arm 48 (TOOL-dBoundRoles-43).
-FLOOR_ASSERTIONS=221
+# +2 for arm 49 (TOOL-dBoundRoles-50).
+FLOOR_ASSERTIONS=223
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -2964,6 +2965,28 @@ check_arm "arm 48 a builder work order handing unit 24's spec renders, exit 0" \
    --stdout) > /dev/null 2>"$TMP_ROOT/a48w.err"; rc=$?
 check_arm "arm 48 --input work-order=x exits 2 naming work-order, which only render --for fills" \
    "$([ "$rc" = 2 ] && grep -qF 'work-order' "$TMP_ROOT/a48w.err" && echo 1 || echo 0)"
+
+# ---- arm 49 (TOOL-dBoundRoles-50 AC11): a file's own marker is the first one outside every fence. A stand-in
+# ---- declaration whose only gov:handoff marker line sits inside a three-backtick fence, as a quoted example
+# ---- would, names no role: the shipped checker's R15 reports it as carrying no marker line, naming the file. The
+# ---- failing case, owed at the close and not observed by the pass that wrote this: `scan_stand_in_declarations`
+# ---- reading the file through a bare `MARKER_RE` search, under which the quoted marker is read as the file's own
+# ---- and R15 instead names a declaration no waiver row covers. The AC6 render half is arm 37's `open` case and
+# ---- the render self-test's `framed-open-fence` plant. WHAT IT DOES NOT CHECK: the other marker readers, which
+# ---- read through the same `extract_unfenced_marker`.
+build_fixture
+A49P="$FX/$MR/builds/tFix/prompts"; A49R="$TMP_ROOT/a49.out"
+A49D="$MR/builds/tFix/prompts/2026-11-23-prompt-TOOL-tFix-1-researcher-stand-in.md"
+mkdir -p "$A49P"
+printf '%s\n' '# A quoted declaration' '' '```' \
+  "<!-- gov:handoff role=gov-researcher build=tFix unit=TOOL-tFix-1 item=- path=$A49D role-sha=0123456789ab task-sha=0123456789ab -->" \
+  '```' > "$FX/$A49D"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A49R" 2>&1); rc=$?
+check_arm "arm 49 AC11 a stand-in declaration whose only marker is fenced is one R15 line, carrying no marker line" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R15 — ' "$A49R")" = 1 ] && grep ': R15 — ' "$A49R" | grep -qF 'carries no gov:handoff marker line' && echo 1 || echo 0)"
+check_arm "arm 49 AC11 ...and that R15 line names the declaration's file" \
+   "$(grep ': R15 — ' "$A49R" | grep -qF "$A49D" && echo 1 || echo 0)"
+[ "$rc" = 1 ] && grep -qF 'carries no gov:handoff marker line' "$A49R" || sed 's/^/    /' "$A49R"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
