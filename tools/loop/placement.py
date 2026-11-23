@@ -36,6 +36,15 @@ record naming `item.entry.place-owner` is the placement. Where the return names 
 --cause observation --at item.entry.place` before it writes, and a probe record already holding a verdict is
 added to the evidence instead.
 
+THE TYPED CHANNEL (TOOL-dBoundRoles-12). Before it reads a key of any `--return`, `place` runs the roles kit's
+`handoff.py check-return-file --role gov-orienter --file <file>`, found by `resolve_kit_dir` and run as a
+subprocess: the return must pass the orientation scout's typed `return` template, a closed `outcome` among it,
+and its `answers` line must name a work order whose marker carries `role=gov-orienter`. Each line it prints is
+`placement: refused — return — <line>`, exit 1, and no block is written; any other exit is refused naming it and
+the verb's first stderr line, and a roles kit that does not resolve exits 2 naming the three places looked, so
+no return is ever read unchecked. The return's `outcome` line, which must read `placed`, and its `answers` line
+are then admitted beside its block keys and written to no block.
+
 CHECK. `check` re-evaluates the newest block's facts from their sources, never from the scout's text, and
 writes its verdict into that block's `check:` line: `continue` and `amend` a build that exists, is not
 terminal by the memory-tree kit's `derive_status`, and whose build lease the unattended driver's `--lease
@@ -108,8 +117,9 @@ WHAT THIS DOES NOT CHECK: that the scout's reason is true, which is why `check` 
 request facts the scout read but `entry` are the request's, `check` re-running the predicates over them as
 written, so a predicate on a fact the scout never supplies never admits; that a
 stand-in's later item has landed, its row being deleted by the build that lands it; that a session's own
-consent was typed rather than relayed into `--request`, the driver's predicate's own limit; and anything
-outside this node, the record being node-local.
+consent was typed rather than relayed into `--request`, the driver's predicate's own limit; that the agent
+which wrote a `--return` file was spawned from the work order its `answers` names, the file carrying no
+transcript; and anything outside this node, the record being node-local.
 """
 import argparse
 import datetime
@@ -145,6 +155,12 @@ SPARSE_KEYS = ("breakpoint", "reenters")
 #: The keys a scout's return may carry.
 RETURN_KEYS = ("disposition", "build", "breakpoint", "playbook", "reason", "evidence", "observations", "scenarios",
                "facts")
+#: The typed channel (TOOL-dBoundRoles-12): the role whose return `place --return` admits, the two fields of its
+#: return that are no block key, each read once the roles kit's `check-return-file` graded the return, and the
+#: one `outcome` that carries a placement.
+SCOUT_ROLE = "gov-orienter"
+TYPED_RETURN_KEYS = ("outcome", "answers")
+PLACED_OUTCOME = "placed"
 #: Shared interface I20: the `entry` fact each disposition that selects scenarios derives; the rest select none.
 ENTRY_FACTS = {"new": "feature", "amend": "amendment", "patch": "patch", "repeat": "playbook-run"}
 #: The mark a selection carries where no scenario admits the request and the default places it.
@@ -214,9 +230,18 @@ PLANTS = {"each-disposition": "one request placed per member of the set, each wi
                      "breakpoint through the prompt; over an unchecked block it is refused",
           "declare-held": "breakpoint on a build another node's lease holds refused live-holder, writing no record",
           "past-position": "a spec audit declared in designing fires nothing; declared in building, the stub driver "
-                           "records one --trigger with cause placement"}
+                           "records one --trigger with cause placement",
+          "return-untyped": "a return lacking outcome refused at place naming outcome's check_return line, and one "
+                            "reading oriented refused, no block written; with outcome placed one block appended",
+          "return-wrong-role": "a typed return answering a gov-researcher work order refused naming gov-researcher, "
+                               "then one answering a file with no marker and one naming no work order, no block "
+                               "written; re-pointed at a gov-orienter work order one block appended"}
 #: The fixture's session, whose `.typed` line a breakpoint plant writes as the owner's own words.
 FX_SESSION = "s-fx"
+#: The fixture's rendered work orders (TOOL-dBoundRoles-12): the orientation scout's, whose return `place`
+#: admits, and a researcher's, whose return it refuses; and the task-sha their markers and the returns carry.
+FX_ORDER_ROLES = (SCOUT_ROLE, "gov-researcher")
+FX_TASK_SHA = "0f1e2d3c4b5a"
 
 
 class PlacementRefused(ValueError):
@@ -384,24 +409,57 @@ def add_placement(store, key, fields, placer, reenters=None, before=None):
     return block
 
 
+def check_scout_return(root, path):
+    """The return at `path` held to the orientation scout's typed channel before `place` reads a key
+    (TOOL-dBoundRoles-12 S2): the roles kit's `handoff.py check-return-file --role gov-orienter`, found by
+    `resolve_kit_dir` and run as a subprocess in `root`, since a kit imports no sibling kit. PlacementRefused
+    whose line is one `placement: refused — return — <line>` per line the verb prints on its exit 1, or one
+    naming the exit and the verb's first stderr line on any other exit but 0; LookupError naming the three
+    places looked where the roles kit does not resolve, so no return is read unchecked."""
+    handoff = resolve_kit_dir("roles", "handoff.py", KIT) / "handoff.py"
+    try:
+        p = subprocess.run([sys.executable, str(handoff), "check-return-file", "--role", SCOUT_ROLE, "--file",
+                            str(pathlib.Path(path).absolute())], cwd=str(root), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=read_clean_env(PYTHONIOENCODING="utf-8"),
+                           timeout=VERB_BOUND)
+        rc, out, err = p.returncode, p.stdout, p.stderr
+    except subprocess.TimeoutExpired:
+        rc, out, err = None, "", "it did not answer within %ds" % VERB_BOUND
+    if rc == 0:
+        return
+    lines = [ln.strip() for ln in out.splitlines() if ln.strip()] if rc == 1 else []
+    if not lines:
+        lines = ["check-return-file exited %s: %s" % (rc, next((ln.strip() for ln in err.splitlines() if ln.strip()),
+                                                               "it printed nothing on stderr"))]
+    raise PlacementRefused("the return is refused", line="\n".join("%s: refused — return — %s" % (SAY, ln)
+                                                                   for ln in lines))
+
+
 def read_scout_return(path):
-    """`{key: value}` of the scout's return at `path`, its keys among `RETURN_KEYS`. PlacementRefused for an
-    unreadable file, a line that is no `key: value`, a key outside them or one given twice."""
+    """`{key: value}` of the scout's return at `path`, its keys among `RETURN_KEYS`. The typed channel's two
+    fields, `TYPED_RETURN_KEYS`, are admitted once each and left out of the result, `outcome` only where it
+    reads `placed` (TOOL-dBoundRoles-12 §8 F5). PlacementRefused for an unreadable file, a line that is no
+    `key: value`, a key outside them, one given twice or another `outcome`."""
     try:
         text = pathlib.Path(path).read_bytes().decode("utf-8-sig").replace("\r\n", "\n")
     except (OSError, UnicodeDecodeError) as e:
         raise PlacementRefused("the return %s cannot be read: %s" % (path, e)) from None
-    fields = {}
+    fields, typed = {}, {}
     for n, line in enumerate(text.split("\n"), 1):
         if not line.strip():
             continue
         key, sep, value = line.partition(":")
         key = key.strip()
-        if not sep or key not in RETURN_KEYS:
-            raise PlacementRefused("the return's line %d is no key: value of %s" % (n, " ".join(RETURN_KEYS)))
-        if key in fields:
+        if not sep or key not in RETURN_KEYS + TYPED_RETURN_KEYS:
+            raise PlacementRefused("the return's line %d is no key: value of %s"
+                                   % (n, " ".join(RETURN_KEYS + TYPED_RETURN_KEYS)))
+        held = typed if key in TYPED_RETURN_KEYS else fields
+        if key in held:
             raise PlacementRefused("the return gives %s twice" % key)
-        fields[key] = value.strip()
+        held[key] = value.strip()
+    if typed.get("outcome", PLACED_OUTCOME) != PLACED_OUTCOME:
+        raise PlacementRefused("the return's outcome is %s, not %s, so it carries no placement"
+                               % (typed["outcome"], PLACED_OUTCOME))
     return fields
 
 
@@ -467,6 +525,8 @@ def write_placement(args, root, store):
     """The `place` verb: one block written by the value of `placement`, or the owner item printed."""
     value = read_placement_policy(root, "placement", "probe.observations")
     mode, observe = value["placement"], value["probe.observations"]
+    if args.ret:
+        check_scout_return(root, args.ret)
     fields = read_scout_return(args.ret) if args.ret else {}
     if mode == "owner-places" and not args.owner:
         for k in RETURN_KEYS:
@@ -951,7 +1011,8 @@ def write_placement_fixture(top, policy="", driver=False, remote=False, scenario
     files = {".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tool:TOOL"\nBACKLOG_MODE=builds\n',
              ".governance/policy.toml": policy, "memory/project/stale-header-waiver.txt": "",
              "memory/builds/%s/BACKLOG.md" % FX_LIVE: "# %s — asks\n\n## Asks\n\n- TOOL-%s-9 · filed 2026-11-01 · an "
-                                                      "ask filed against the live build\n" % (FX_LIVE, FX_LIVE)}
+                                                      "ask filed against the live build\n" % (FX_LIVE, FX_LIVE),
+             **dict(render_fixture_work_order(r) for r in FX_ORDER_ROLES)}
     for build, status in ((FX_LIVE, "INPROGRESS"), (FX_DONE, "CLOSED")):
         files["memory/builds/%s/README.md" % build] = fm % (build, build, build)
         files["memory/builds/%s/spec/2026-11-01-spec-TOOL-%s-1.md" % (build, build)] = spec % (build, status)
@@ -972,6 +1033,26 @@ def write_placement_fixture(top, policy="", driver=False, remote=False, scenario
         run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "main")
         run_fixture_git(root, "fetch", "-q", FIXTURE_REMOTE)
     return root
+
+
+def render_fixture_work_order(role):
+    """`(repo-relative path, text)` of the fixture's work order for `role`, its marker line naming `role` and
+    `FX_TASK_SHA` in the grammar the roles kit's `MARKER_RE` reads, after its `**Serves:**` line as
+    `handoff.py render` writes one (TOOL-dBoundRoles-12)."""
+    rel = "orders/%s.md" % role
+    marker = "<!-- gov:handoff role=%s build=%s unit=%s item=- path=%s role-sha=%s task-sha=%s -->" % (
+        role, FX_LIVE, FX_UNIT, rel, "a" * 12, FX_TASK_SHA)
+    return rel, "**Serves:** journal %s\n\n%s\n\n## Role\n\nthe role\n\n## Task\n\nplace the request\n" % (FX_UNIT, marker)
+
+
+def render_fixture_return(fields, outcome=PLACED_OUTCOME, role=SCOUT_ROLE):
+    """An orientation return's text (TOOL-dBoundRoles-12): `outcome: <outcome>` unless `outcome` is None, an
+    `answers` line naming the fixture's work order of `role` unless `role` is None, then each of `fields` as a
+    `key: value` line, in its order."""
+    head = [("outcome", outcome)] if outcome is not None else []
+    if role is not None:
+        head.append(("answers", "%s task-sha=%s" % (render_fixture_work_order(role)[0], FX_TASK_SHA)))
+    return "".join("%s: %s\n" % kv for kv in head + list(fields.items()))
 
 
 def write_foreign_lease(root, build):
@@ -1040,7 +1121,8 @@ def write_audit_request_fixture(top, policy):
         "memory/builds/tRun/RUN.md": "# tRun — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n"
                                      "## Mandate\n<!-- run:mandate -->\nThe owner authorizes build tRun to merge "
                                      "to main and to push.\n<!-- /run:mandate -->\n\n## Run facts\n\n## Parked\n",
-        "memory/guides/BUILD-METHOD.md": "# build method (stub)\n\n## M1\n\nExistence is what the driver tests.\n"})
+        "memory/guides/BUILD-METHOD.md": "# build method (stub)\n\n## M1\n\nExistence is what the driver tests.\n",
+        **dict([render_fixture_work_order(SCOUT_ROLE)])})
     run_fixture_git(repo, "add", "-A")
     run_fixture_git(repo, "commit", "-q", "-m", "base")
     run_fixture_git(repo, "commit", "-q", "--allow-empty", "-m", "move\n\nGov-Transition: planning -> designing · "
@@ -1056,8 +1138,9 @@ def write_audit_request_fixture(top, policy):
     store = pathlib.Path(run_fixture_git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "requests"
     key = write_typed_request(repo, store, "audit the specs\n")
     ret = top / "return.txt"
-    ret.write_text("disposition: breakpoint\nbuild: tRun\nbreakpoint: spec audit\nreason: the owner asked for the "
-                   "specs to be audited before building\n", encoding="utf-8", newline="\n")
+    ret.write_text(render_fixture_return({"disposition": "breakpoint", "build": "tRun", "breakpoint": "spec audit",
+                                          "reason": "the owner asked for the specs to be audited before building"}),
+                   encoding="utf-8", newline="\n")
     said = []
     for verb, argv in (("place", ("place", "--request", key, "--return", str(ret))),
                        ("check", ("check", "--request", key)), ("breakpoint", ("breakpoint", "--request", key))):
@@ -1157,9 +1240,9 @@ def check_placement_plant(case, top, seen, bad):
         """The request's local text, as the driver's `--request` keeps it."""
         write_fixture_files(store, {"%s.md" % FX_KEY: "make it so\n"})
 
-    def write_return(name, **fields):
+    def write_return(name, outcome=PLACED_OUTCOME, role=SCOUT_ROLE, **fields):
         path = rets / ("%s.txt" % name)
-        path.write_text("".join("%s: %s\n" % kv for kv in fields.items()), encoding="utf-8", newline="\n")
+        path.write_text(render_fixture_return(fields, outcome, role), encoding="utf-8", newline="\n")
         return str(path)
 
     def check_case(what, got, rc, *needles):
@@ -1337,7 +1420,7 @@ def check_placement_plant(case, top, seen, bad):
         ret = rets / "odd.txt"
         for what, text, owed in (("odd line", "a sentence with no key\n", "is no key: value"),
                                  ("twice", "reason: a\nreason: b\n", "gives reason twice")):
-            ret.write_text(text, encoding="utf-8")
+            ret.write_text(render_fixture_return({}) + text, encoding="utf-8")
             check_case(what, run_placement_command(root, "place", "--request", FX_KEY, "--return", str(ret)), 1, owed)
         check_case("slug", run_placed_return(disposition="new", build="../x", reason="r"), 1, "is no build slug")
         check_case("playbook", run_placed_return(disposition="repeat", playbook="../etc/pb.md", reason="r"), 1,
@@ -1550,6 +1633,28 @@ def check_placement_plant(case, top, seen, bad):
         if rc != 1 or "trigger refused — %s · UNATTENDED check 37 FAILED" % FX_LIVE not in " / ".join(lines) \
                 or len(list(folder.glob("*-disposition-*.md"))) != kept + 1:
             bad.append("a refused trigger exited %d, the record not kept: %s" % (rc, " / ".join(lines)))
+    elif case in ("return-untyped", "return-wrong-role"):   # TOOL-dBoundRoles-12 AC1, AC2
+        fields = {"disposition": "continue", "build": FX_LIVE, "reason": "the scout read it as continue"}
+        said = "placement: refused — return — "
+        if case == "return-untyped":
+            rows = (("untyped", {"outcome": None}, said + "outcome — a required field is absent"),
+                    ("oriented", {"outcome": "oriented"}, "the return's outcome is oriented, not placed"))
+        else:
+            rows = (("researcher's", {"role": "gov-researcher"}, said + "answers — the return answers a "
+                     "gov-researcher work order"),
+                    ("no marker", {"role": None, "answers": ".memory-tree.conf task-sha=%s" % FX_TASK_SHA},
+                     said + "answers — .memory-tree.conf carries no gov:handoff marker line"),
+                    ("unanswered", {"role": None}, said + "answers — the return names no work order it answers"))
+        for n, (what, how, owed) in enumerate(rows):
+            check_case(what, run_placement_command(root, "place", "--request", FX_KEY, "--return",
+                                                   write_return("r%d" % n, **dict(fields, **how))), 1, owed)
+        if (store / ("%s.placement" % FX_KEY)).exists():
+            bad.append("a refused return wrote a block")
+        check_case("typed", run_placement_command(root, "place", "--request", FX_KEY, "--return",
+                                                  write_return("typed", **fields)), 0, "placement: placed — continue")
+        got = parse_placement_blocks(store / ("%s.placement" % FX_KEY))
+        if len(got) != 1 or "outcome" in got[0] or "answers" in got[0]:
+            bad.append("the typed return wrote %d block(s), owed one holding no typed field: %s" % (len(got), got))
 
 
 def main(argv):

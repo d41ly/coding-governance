@@ -45,7 +45,12 @@ before stage 3, and it wins any difference. The stages below are the workflows o
 
 ## Stage 1 — orient
 
-`/session-kickoff` ran it; nothing runs here.
+`/session-kickoff` ran it. When you spawned the orientation scout, `gov-orienter`, from a rendered work order to
+place a request and it returned `outcome: placed`, write its return unchanged to the request's return file, `<file>`, then record it:
+`python tools/loop/placement.py place --request <content key> --return <file>`, then check it:
+`python tools/loop/placement.py check --request <content key>`.
+Act only on a check that passes. A refusal of either routes back to the scout, spawned again from its work order,
+never to a placement of your own.
 
 ## Stage 2 — reuse
 

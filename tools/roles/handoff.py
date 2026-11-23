@@ -15,6 +15,7 @@
     python handoff.py roster
     python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]
     python handoff.py check-return < <SubagentStop hook payload>
+    python handoff.py check-return-file --role <slot> --file <return file>
 
 `render` fills the work-order template, `templates/work-order.template.md` in this kit, whose slots are
 `role`, `roles_lib.render_role`'s output, closing with the role's `## Never`, `## Ceiling` and `## Return`
@@ -172,6 +173,19 @@ only in `PATH_ID_RE`'s shape, is rewritten on every checked stop with `attempts`
 path, a role file that does not parse, an unreadable transcript and an id off the shape included, so a
 broken check never blocks a stop.
 
+`check-return-file` is the same check read from a file (TOOL-dBoundRoles-12 S2, S3), for a caller in another
+kit, which runs it as a subprocess since a kit imports no sibling kit: the loop kit's `placement.py place
+--return` runs it with `--role gov-orienter` before it reads a key. It prints each line of
+`roles_lib.check_return(<slot>, <the file's text>)`, handed as its work order the pair a well-formed `answers`
+names, so a JSON return may carry the field, then the answered work order's: the return's `answers`
+value, read off the return object as `check_return` reads it, must name a file under the repository root
+whose first marker line outside a fence, `roles_lib.MARKER_RE`'s, carries `role=<slot>`. A return naming no
+work order, an answered file that does not read or carries no marker, and one answering another role's work
+order each print one `answers — ` line naming what was found, so no other role's return and no text a driver
+typed passes as the slot's. A relative `--file` is read from the repository root. Exit 0 printing nothing
+for a return passing both, 1 with a line per defect, an unreadable return file one, and 2 on a slot the
+catalogue lacks or outside a repository.
+
 Sources, by key family: `task:` the card's `## task` field, read by the kickoff checker's grammar
 (stated above its `check_card_task`, and ported here because that one is shell) under the labels
 that checker's `--task-skeleton` prints, so a skeleton that does not yield eight refuses; `card:` the lines
@@ -226,7 +240,9 @@ the caller types it, and an id no profile matches answers the default levels wit
 `--allowance`: that a granted path exists or is the unit's dispatched write set, since the caller passes it,
 so a caller granting a whole `ROUTED_PATHS` entry is admitted. For `--framed-by`: whether the framing says
 anything the work order supports, a heading, fact or marker line inside a framing field, which only the fence
-walk reads, and whether the session read is the one that spawned the prompt writer.
+walk reads, and whether the session read is the one that spawned the prompt writer. For `check-return-file`:
+that the return's `task-sha` is the answered marker's, and that the agent which wrote the file was spawned
+from the work order it names, since the file carries no transcript.
 """
 import argparse
 import datetime
@@ -1842,6 +1858,56 @@ def run_return_check(stdin_text):
     return 0
 
 
+def check_return_file(root, slot, path):
+    """`check-return-file`'s defect lines for the return in the file `path`, read from `root` when relative
+    (TOOL-dBoundRoles-12 S2, S3): each line `lib.check_return(slot, text, root, work_order)` gives, `work_order`
+    the pair a well-formed `answers` value names and else None, then the answered work order's, as the module
+    doc states; `[]` for a return passing both. RolesError on a slot the catalogue lacks or a role file that
+    does not parse."""
+    root = pathlib.Path(root)
+    roles = lib.load_roles(KIT_DIR)
+    if slot not in roles:
+        raise lib.RolesError("no role '%s' in the catalogue; its slots are %s" % (slot, ", ".join(roles)))
+    template = lib.parse_return_template(roles[slot]["keys"].get("return"))
+    p = pathlib.Path(path)
+    p = p if p.is_absolute() else root / p
+    try:
+        text = p.read_bytes().decode("utf-8-sig").replace("\r\n", "\n")
+    except (OSError, UnicodeDecodeError) as e:
+        return ["return object — %s cannot be read as UTF-8: %s" % (p.as_posix(), getattr(e, "strerror", None) or e)]
+    # the `answers` field is read off the same return object `check_return` grades, whichever shape it took; a
+    # well-formed one is the work order `check_return` is handed, so a JSON return may carry it beside the template
+    obj, _why = lib.extract_return_object(text, [t for t in template if t[0] != "answers"]
+                                          + [("answers", "text", True)])
+    said = obj.get("answers") if isinstance(obj, dict) else None
+    m = lib.ANSWERS_VALUE_RE.fullmatch(said) if isinstance(said, str) else None
+    defects = lib.check_return(slot, text, root, (m.group("path"), m.group("task_sha")) if m else None)
+    if said is None:
+        return defects + ["answers — the return names no work order it answers, so no %s work order stands "
+                          "behind it; the agent answers the marker's path and task-sha of the work order it "
+                          "was handed" % slot]
+    if not m:
+        return defects + ["answers — %s is not `<work order path> task-sha=<12 hex>`"
+                          % json.dumps(said, ensure_ascii=False)[:80]]
+    rel = m.group("path")
+    if rel.startswith("/") or re.match(r"^[A-Za-z]:", rel) or ".." in rel.split("/"):
+        return defects + ["answers — %s is not a repo-relative path free of `..` segments" % rel]
+    try:
+        order = (root / rel).read_bytes().decode("utf-8").replace("\r\n", "\n")
+    except (OSError, UnicodeDecodeError) as e:
+        return defects + ["answers — the work order %s cannot be read under %s: %s"
+                          % (rel, root.as_posix(), getattr(e, "strerror", None) or e)]
+    marker = next((mk for _n, line in lib.read_unfenced_lines(order) if line is not None
+                   for mk in [MARKER_RE.fullmatch(line)] if mk), None)
+    if marker is None:
+        return defects + ["answers — %s carries no gov:handoff marker line outside a fence, so it is no rendered "
+                          "work order and names no role" % rel]
+    if marker.group("role") != slot:
+        return defects + ["answers — the return answers a %s work order, %s, not a %s one"
+                          % (marker.group("role"), rel, slot)]
+    return defects
+
+
 def load_run_journal(path):
     """One harness run's agents from its `journal.jsonl`, one per `started` entry in journal order, as
     `{"id", "label", "returned", "failed", "result"}`: `returned` once a `result` or `failed` entry
@@ -2132,6 +2198,9 @@ def main(argv):
     ag.add_argument("--session")
     ag.add_argument("--write", action="store_true")
     sub.add_parser("check-return")
+    cf = sub.add_parser("check-return-file")
+    cf.add_argument("--role", required=True)
+    cf.add_argument("--file", required=True)
     a = ap.parse_args(argv)
     if a.verb == "check-return":
         # TOOL-dBoundRoles-5 S5 - a broken return check never blocks a stop: every failure exits 0.
@@ -2191,6 +2260,15 @@ def main(argv):
         ok, lines = check_handoff(root, a.file)
         sys.stdout.buffer.write(("\n".join(lines) + "\n").encode("utf-8"))
         return 0 if ok else 1
+    if a.verb == "check-return-file":
+        try:
+            lines = check_return_file(root, a.role, a.file)
+        except lib.RolesError as e:
+            print("\n".join("handoff: " + ln for ln in str(e).split("\n")), file=sys.stderr)
+            return 2
+        if lines:
+            sys.stdout.buffer.write(("\n".join(lines) + "\n").encode("utf-8"))
+        return 1 if lines else 0
     conf = root / ".memory-tree.conf"
     memory_root = lib.read_conf_key(conf, "MEMORY_ROOT") if conf.is_file() else None
     try:

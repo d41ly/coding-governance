@@ -432,6 +432,19 @@ present, which the catalogue checker's R16 grades for a record return; and that 
 a subagent whose stop was blocked, for which the record still reads one attempt and invalid; and a spawn whose
 prompt was written by hand with no marker, which goes ungraded, though the spawn guard's rule 6 refuses it.
 
+**A return read from a file** (TOOL-dBoundRoles-12). `python handoff.py check-return-file --role <slot> --file
+<file>` is the same checker for a caller in another kit, which runs it as a subprocess since a kit imports no
+sibling kit: the loop kit's `placement.py place --return` runs it with `--role gov-orienter` before it reads a
+key, so no placement block is written from an untyped return. It prints each line of `check_return(<slot>,
+<text>, root, work_order)`, `work_order` the pair a well-formed `answers` names, then the answered work order's:
+the return names a work order in its `answers` field, that file reads under the repository root, and its first
+`MARKER_RE` line outside a fence carries `role=<slot>`. A return naming none, a file that does not read or
+carries no marker, and one answering another role's work order each print one `answers — ` line, so neither
+another role's return nor text a driver typed passes as the slot's. Exit 0 printing nothing, 1 with a line
+per defect, 2 on a slot the catalogue lacks or outside a repository. WHAT IT DOES NOT CHECK: that the
+return's `task-sha` is the answered marker's, or that the agent which wrote the file was spawned from that
+work order, since a file carries no transcript.
+
 ## Standing in for a role
 
 Work goes to its role agent. The one exception is a tool or run that cannot spawn a sub-agent at all:
@@ -703,7 +716,10 @@ and the owner's go (KICK-aOrientedCast-2). It walks this catalogue's workflows i
 points at the carriers `/unattended` already follows (the build method, the verbs guide, the two
 build harnesses' attended mode, the review harness) instead of restating them; every agent it orders
 is spawned from a `handoff.py render` and every harness call carries `handoff.py harness-args` and
-`handoff.py stage-efforts <workflow> --model <id>`.
+`handoff.py stage-efforts <workflow> --model <id>`. Its Stage 1 is the driver's one orientation step
+(TOOL-dBoundRoles-12 S4): an orientation scout's `placed` return is recorded with the loop kit's `placement.py
+place --request <content key> --return <file>`, then `placement.py check --request <content key>`, and a refusal
+of either routes back to the scout.
 
 The render substitutes three tokens literally: `{{KIT_DIR}}` and `{{TOOL_ROOT}}`, derived by the
 same `.git` walk the unattended adopter uses, and `{{MEMORY_ROOT}}`, read from `.memory-tree.conf`.

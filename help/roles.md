@@ -14,7 +14,19 @@ reference; this page is the short version.
 
 1. **Kickoff writes the card.** Its `## task` block carries the goal, scope, cut-line, To-do, Reuse,
    acceptance check and gates.
-2. **A role supplies the constant part.** Each role is one file under `<prefix>/roles/agents/`: its
+2. **The orientation scout places a request; you record its placement and check it.** Handed a request
+   to place, the orientation scout, `gov-orienter`, returns `outcome: placed`, the `disposition`,
+   `reason`, `evidence` and `observations` lines of its placement, and an `answers` line naming the
+   work order it was handed. You place nothing yourself. Write the return to a file, record it with
+   the loop kit's `placement.py place --request <content key> --return <file>`, then run
+   `placement.py check --request <content key>`, and act only on a check that passes. Before it reads
+   a line, `place` runs the roles kit's `handoff.py check-return-file --role gov-orienter --file <file>`:
+   a return missing a field its template requires, `outcome` among them, naming no work order, or
+   answering a work order whose marker names another role is refused, one
+   `placement: refused — return — <defect>` line each, and nothing is recorded. A refusal of either
+   command goes back to the scout, spawned again from its work order. The `/build` Skill's Stage 1
+   states this step.
+3. **A role supplies the constant part.** Each role is one file under `<prefix>/roles/agents/`: its
    instructions, the inputs it reads, the file class it may write and the tags of the charter's
    practices it needs, under `rules`. It also says when the role is mandatory, under `mandatory`, and
    where its output goes, under `output`. Its limits are under `never`, each paired with the hook,
@@ -22,7 +34,7 @@ reference; this page is the short version.
    `return`, which always holds a closed `outcome`. Its agent carries those rule lines and the
    charter's Protocols and Facts sections whole, and its role text closes with `## Never`,
    `## Ceiling` (its tools, its write class and the gate legs it may run) and `## Return`.
-3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
+4. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
    `prompts/` folder, with `## Role` and then `## Task`, filled from the card, the build's brief and
    any `--input` values. A spec writer's task also carries the brief's `## The prompt`, the owner's
    own words, as its `brief:prompt` block. A role reading `upstream:rows?` is handed, beside any
@@ -72,7 +84,7 @@ reference; this page is the short version.
    marker. `check_roles.py`'s R16 refuses a work order whose marker carries no `item=`, and a return
    with no such line, one naming another work order or one whose `task-sha` differs. The paths
    `work-order-legacy.txt` lists, the records written before the rule armed, are not refused.
-4. **The prompt writer frames the task: render it with `--for`, spawn it, render the role with `--framed-by`.**
+5. **The prompt writer frames the task: render it with `--for`, spawn it, render the role with `--framed-by`.**
    While the policy key `prompts.author` is `prompt-writer`, its default, a direct spawn of any role
    takes these three calls. First `handoff.py render --role gov-prompt-writer --for <role> --build <slug>
    --unit <id> --input question=<your details>`, adding the `--input` values the role reads, and spawn
@@ -109,7 +121,7 @@ reference; this page is the short version.
    item's task framed by a prompt writer whose return carries no `population` is refused, naming
    `framing:population`: no item lists its own population, so the prompt writer's steps for finding
    it are the population.
-5. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
+6. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets, held to
    the floor `medium` that only your own policy key goes below (see "The effort floor" below). It
    carries the practices its role cites and the charter's Protocols and Facts sections, first.
@@ -120,7 +132,7 @@ reference; this page is the short version.
    neither `roles` nor `efforts` names is refused too. A harness call also carries `retries`, what
    `policy.py get roles.retries` prints: a stage outside a fan that returns nothing is spawned again
    up to that many times, at most 4, and a value that is no integer in that range is refused.
-6. **Each block carries its level.** With the playbook kit installed, every block a subagent gets
+7. **Each block carries its level.** With the playbook kit installed, every block a subagent gets
    sits in an envelope, `[<doc> · Level <n> · <direction>]` up to `[/<doc>]`, so it ranks them as
    the main session does. The agent file holds the charter at level 0 inside its own level 5. The
    task part holds the practices at its step at level 0, then the task at level 6.
@@ -290,7 +302,7 @@ separate spec and diff reviewer roles, and both review stages spawn it. It write
 
 The `gov-prompt-writer` role frames the task a role agent is handed. It is a cycle role: the
 driver calls it around an item, and no checklist item names it as its actor. It writes nothing: the
-prompt writer's route, `--for`, its spawn, then `--framed-by`, is step 4 of "How a task reaches an agent".
+prompt writer's route, `--for`, its spawn, then `--framed-by`, is step 5 of "How a task reaches an agent".
 <!-- usage: agent:gov-prompt-writer -->
 
 The `gov-planner` role drafts and judges a build's plan, and the `gov-architect` role inventories a
