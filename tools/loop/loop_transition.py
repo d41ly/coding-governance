@@ -6,6 +6,7 @@
     python loop_transition.py check --build <slug> [--root <path>]
     python loop_transition.py check --selftest
     python loop_transition.py dependents --build <slug> [--root <path>]
+    python loop_transition.py progress --build <slug> --event <park|landing|transition> --detail <text> [--root <path>]
     python loop_transition.py --fixture --plant <case>
 
 THE CHANNELS. The policy key `transitions.record`, read through the policy kit's `resolve` at one
@@ -43,7 +44,8 @@ does not record (TOOL-dDeclaredLoop-28), and where a state row reads `applied` h
 applies, its scenarios and applied changes at HEAD, to `termination.py`'s check, refusing the move on a
 finding or a program `check_program` refuses, naming it (TOOL-dDeclaredLoop-33); back-fills, writes this move's record, commits the records, or an empty commit, as
 `loop transition(<slug>): <from> -> <to>` with the trailer where selected, prints
-`loop: recorded · <from> -> <to> · <direction> · commit <sha8>`, and prints the line where selected. A
+`loop: recorded · <from> -> <to> · <direction> · commit <sha8>`, and prints the transition line where
+`micro-format` is selected, after the progress line THE PROGRESS below names where `notify.owner` selects it. A
 set storing neither the trailer nor the log writes no commit. A backward move, testing to building say,
 goes through this one writer, its channels and its fields as a forward move does: the direction is
 `loop_table`'s `derive_direction`, derived on every print and read, and never stored. The rework budget
@@ -58,8 +60,9 @@ none, a route-back is refused naming the build and the freeze writes nothing.
 
 `check` (`check_transition_channels`) holds each channel to the trailer: per trailer whose commit's set
 holds `log`, one record with equal `**Key:**` fields; no record left over where its adding commit's set
-holds `trailer`; and the `transition` definition of the micro-format fence of `AGENTS.md` at `--root`
-equal to `TRANSITION_LINE`. A record whose adding commit's set lacks `trailer` is its move's source.
+holds `trailer`; and the `transition` and `progress` definitions of the micro-format fence of `AGENTS.md`
+at `--root` equal to `TRANSITION_LINE` and `PROGRESS_LINE`, each found by its head word
+(`check_line_definition`). A record whose adding commit's set lacks `trailer` is its move's source.
 It prints each finding as `loop: transition · ...`, naming the commit, the channel and the field;
 `pending — <n> move(s) before the build's first spec` while trailers wait on a spec; `unstored — ...`
 where the set at HEAD stores nothing; then its summary. `read_transitions(build, repo)` is the build's
@@ -106,10 +109,27 @@ neither fails the move. `--fixture --plant deps-notices` holds both notices' key
 scratch, `notices-two-dependents` six posts to two dependents over three Design exits, their passes 1, 2
 and 3, and `notices-refused` the refused post's line under a move that still records.
 
+THE PROGRESS (KICK-dKeptSession-11). The policy key `notify.owner`, read in process at HEAD through
+`read_policy_value`, the read `read_record_channels` makes of its own key, selects the events an owner
+hears of as `progress — <slug> · <event> · <detail>`, `PROGRESS_LINE`, which `render_progress_line`
+alone fills: `NOTIFY_OWNER_EVENTS` maps `turn-micro-formats`, the default, to none, `park-and-landing` to
+`park` and `landing`, `every-transition` to those and `transition`, and `park-only` to `park`. No value
+pushes anything. `progress --build <slug> --event <e> --detail <text>` prints the line where the value
+selects the event and nothing otherwise, exit 0; an event other than `park`, `landing` or `transition`
+is refused before any read. `record` reads the key once beside the set; where it selects `transition`,
+the move's line, detail `<from> → <to> · <item tag>`, is the last of its order lines, and a key that
+does not resolve is one `loop: progress · unread · <why>` line there that never refuses the move.
+`--fixture --plant notify-micro`, `notify-park-landing`, `notify-every` and `notify-park-only` each
+record B4 under one value, `NOTIFY_SETS` committing it and `notify-micro` committing none, then run
+`progress` for a park and a landing and print `loop: fixture · progress <n>`, the lines the three
+printed; `notify-shape`'s `AGENTS.md` drops ` · <detail>` from the progress definition, owing `check`
+one finding.
+
 Exit: `record` 0 recorded, 1 refused by the table or held by open mail; `check` 0 clean, 1 on a finding, `pending` or
-`unstored`; `dependents` 0 with one slug per line. Both exit 2 printing `loop: unanswered · <why>` on a value outside its grammar, a witness
+`unstored`; `dependents` 0 with one slug per line; `progress` 0, its line printed or not. Each exits 2 printing `loop: unanswered · <why>` on a value outside its grammar, a witness
 that is not HEAD or its ancestor, a staged index, or a policy refusal naming `transitions.record`, an
-empty set with no valid revision before it among them, or, for `dependents`, a README that does not read;
+empty set with no valid revision before it among them, or, for `dependents`, a README that does not read,
+or, for `progress`, an event outside the three or a policy refusal naming `notify.owner`;
 and 2 printing `loop: unarmed · <why>` where the policy or memory-tree kit does not resolve, never a default. The loop kit takes no edge to the policy
 kit, which is why.
 
@@ -118,7 +138,7 @@ kit, which is why.
 as its last verb. `field` records a `colour=red` move and a `composition=3f9c2a71` move, each refused,
 then a plain move carrying its derived `composition`. `backward-rows` and `skip-backward` record `BACKWARD_MOVES`, three moves forward and
 three back; the first prints every trailer and read with its direction, the second deletes the newest
-record and owes its move's finding. `check --selftest` holds the definition of `AGENTS.md` in the
+record and owes its move's finding. `check --selftest` holds both definitions of `AGENTS.md` in the
 current directory, then runs every plant through `run_selftest_cases`, each plant once however many
 cases read it.
 
@@ -126,6 +146,7 @@ WHAT THIS DOES NOT CHECK: that a witness holds beyond resolving; a record's line
 feature- or unit-level move; a charter other than the one `AGENTS.md`; an old move's direction against
 the definition at its commit, since it is derived from today's. A record pairs with a trailer by
 order, the n-th owing trailer with the n-th such record, so two records swapped read as two drifts.
+`progress` never checks that the event it is told of happened: it renders what its caller names.
 """
 import argparse
 import contextlib
@@ -147,6 +168,8 @@ from loop_witness import FIXTURE_REMOTE, read_git, remove_tree, resolve_commit, 
 
 SAY = "loop"
 KEY = "transitions.record"
+#: The key selecting the events an owner hears of as a `progress —` line (KICK-dKeptSession-11 S2).
+NOTIFY_KEY = "notify.owner"
 TRAILER_KEY = "Gov-Transition"
 KIND = "transition"
 #: The rework budget's fields (`budget.py`, TOOL-dDeclaredLoop-48), `budget=frozen@<units>@<total>` and
@@ -180,6 +203,11 @@ TREE_HASH = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 DERIVED_SCENARIO_FIELDS = ("scenario", "scenario-settled")
 #: The micro-format definition `render_transition_line` fills, held equal to `AGENTS.md`'s by `check`.
 TRANSITION_LINE = "transition — <slug> · <from> → <to> · <item tag> · <sha>"
+#: The owner's progress line `render_progress_line` fills, held equal to `AGENTS.md`'s by `check` too, and
+#: the events each `notify.owner` value reports on it, the default none (KICK-dKeptSession-11 S2).
+PROGRESS_LINE = "progress — <slug> · <event> · <detail>"
+NOTIFY_OWNER_EVENTS = {"turn-micro-formats": (), "park-and-landing": ("park", "landing"),
+                       "every-transition": ("park", "landing", "transition"), "park-only": ("park",)}
 #: Each placeholder of `TRANSITION_LINE` and the field that fills it.
 LINE_FIELDS = (("<slug>", "build"), ("<from>", "from"), ("<to>", "to"), ("<item tag>", "item"), ("<sha>", "sha"))
 #: The fields every trailer carries after its head, in this order.
@@ -234,7 +262,13 @@ PLANTS = {"default": "the default set, one B4 move with its witness",
           "acks-superseded": "the interfaces check stood in: fy's confirmed sighted, then fy's changed it names "
                              "current, B4 acking both; then fz's pair under an unconfirmed check, B5 refused",
           "acks-failed": "one landed, B4 acking it and B5 posting nothing; then two landed whose acks exit 1 and "
-                         "raise LookupError, B7 refused naming both, each failure on stderr"}
+                         "raise LookupError, B7 refused naming both, each failure on stderr",
+          "notify-micro": "no policy file, so notify.owner reads its default: B4, then progress park and landing, "
+                          "no progress line",
+          "notify-park-landing": "notify.owner = park-and-landing: B4, then progress park and landing, two lines",
+          "notify-every": "notify.owner = every-transition: B4's progress line, then park and landing, three lines",
+          "notify-park-only": "notify.owner = park-only: B4, then progress park and landing, the park line alone",
+          "notify-shape": "an AGENTS.md whose progress definition drops <detail>: one B4 move, then the check"}
 #: The mail plants' messages, each `(ref, build, id, to, kind, subject, answers)`, put straight on the fixture's
 #: remote; `mail-disposed` adds the ack. `mail-expired` writes the question with `FX_DEADLINE`'s two keys and
 #: its first sighting `FX_SIGHTED_HOURS` back in the fixture's feed, past the 30-hour deadline.
@@ -251,6 +285,10 @@ BACKWARD_MOVES = (("--from", "planning", "--item", "item.plan.exit", "--outcome"
                   ("--from", "designing", "--item", "item.design.decompose", "--outcome", "goal-fork"))
 #: The plants' policy values, committed as `.governance/policy.toml`; a plant not here commits none.
 PLANT_SETS = {"subset-trailer-line": '["trailer", "micro-format"]', "subset-log": '["log"]', "empty-set": "[]"}
+#: The notify plants' `notify.owner` values, committed as `.governance/policy.toml` `[notify]`; `notify-micro`
+#: commits none, so the catalogue default answers (KICK-dKeptSession-11 S9).
+NOTIFY_SETS = {"notify-park-landing": "park-and-landing", "notify-every": "every-transition",
+               "notify-park-only": "park-only"}
 FX_BUILD = "tFix"
 FX_UNIT = "TOOL-tFix-1"
 FX_SPEC = "memory/builds/tFix/spec/2026-01-01-spec-%s.md" % FX_UNIT
@@ -309,9 +347,23 @@ def render_record_key(name):
     return name[:1].upper() + name[1:]
 
 
-def check_transition_definition(root):
-    """The findings of the `transition` definition in the micro-format fence of `AGENTS.md` at `root`
-    against `TRANSITION_LINE`: none where one definition equals it."""
+def render_progress_line(slug, event, detail):
+    """The owner's progress line, the one producer: `PROGRESS_LINE` with its three placeholders filled."""
+    return PROGRESS_LINE.replace("<slug>", slug).replace("<event>", event).replace("<detail>", detail)
+
+
+def derive_owner_events(value):
+    """The events a `notify.owner` value reports, from `NOTIFY_OWNER_EVENTS`. ValueError on a value the
+    map does not hold."""
+    if value not in NOTIFY_OWNER_EVENTS:
+        raise ValueError("%s reads %r, which names no events: %s" % (NOTIFY_KEY, value, " ".join(NOTIFY_OWNER_EVENTS)))
+    return NOTIFY_OWNER_EVENTS[value]
+
+
+def check_line_definition(root, line):
+    """The findings of the definition of `line`, found by its head word, in the micro-format fence of
+    `AGENTS.md` at `root` against `line`: none where one definition equals it."""
+    head = line.split(" ", 1)[0]
     try:
         text = (pathlib.Path(root) / "AGENTS.md").read_bytes().decode("utf-8", "replace")
     except OSError as e:
@@ -319,27 +371,32 @@ def check_transition_definition(root):
     lines = [ln.rstrip() for ln in text.replace("\r\n", "\n").split("\n")]
     if FENCE[0] not in lines or FENCE[1] not in lines[lines.index(FENCE[0]):]:
         return ["definition · AGENTS.md holds no %s fence, so the renderer's %s is defined nowhere" % (
-            FENCE[0], TRANSITION_LINE)]
+            FENCE[0], line)]
     start = lines.index(FENCE[0])
     held = [ln[3:-1] for ln in lines[start:lines.index(FENCE[1], start)]
-            if ln.startswith("- `transition — ") and ln.endswith("`")]
+            if ln.startswith("- `%s — " % head) and ln.endswith("`")]
     if not held:
-        return ["definition · the micro-format fence of AGENTS.md defines no transition line; the renderer "
-                "writes %s" % TRANSITION_LINE]
-    return ["definition · AGENTS.md reads %s, while the renderer writes %s" % (d, TRANSITION_LINE)
-            for d in held if d != TRANSITION_LINE]
+        return ["definition · the micro-format fence of AGENTS.md defines no %s line; the renderer "
+                "writes %s" % (head, line)]
+    return ["definition · AGENTS.md reads %s, while the renderer writes %s" % (d, line)
+            for d in held if d != line]
 
 
 # ------------------------------------------------------------------------------------------ the reads
+def read_policy_value(root, key, rev):
+    """The value the policy key `key` resolves to at `rev`. ValueError naming the key on a policy refusal;
+    LookupError where the policy kit does not resolve."""
+    policy, _guard = read_policy_kit()
+    try:
+        return policy.resolve(key, str(root), rev).value
+    except policy.Refusal as e:
+        raise ValueError("%s does not resolve at %s: %s" % (key, rev, e)) from None
+
+
 def read_record_channels(root, rev):
     """The channel set `transitions.record` selects at `rev`, a frozenset. ValueError naming the key on a
     policy refusal; LookupError where the policy kit does not resolve."""
-    policy, _guard = read_policy_kit()
-    try:
-        value = policy.resolve(KEY, str(root), rev).value
-    except policy.Refusal as e:
-        raise ValueError("%s does not resolve at %s: %s" % (KEY, rev, e)) from None
-    return frozenset(value)
+    return frozenset(read_policy_value(root, KEY, rev))
 
 
 def read_cached_channels(root, rev, cache):
@@ -814,7 +871,9 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     carrying `--pass <n>`, `<n>` one plus the moves from designing to building in `before` (KICK-dKeptSession-35
     S1), then a `notice — not posted <kind> to build:<dependent> · rc <n> · <its first line>` line where the
     post exits non-zero, or its `loop: notice · unread` line (`write_dependency_notices`, KICK-dKeptSession-7
-    S4). TransitionRefused where no row holds the move, `MailHeld` where a message addressed to the
+    S4), then, where `notify.owner` at HEAD selects `transition`, the move's `progress — <slug> · transition ·
+    <from> → <to> · <item tag>` line, or one `loop: progress · unread · <why>` line where that key does not
+    resolve, which never refuses the move (KICK-dKeptSession-11 S4). TransitionRefused where no row holds the move, `MailHeld` where a message addressed to the
     build is still open once `write_consumed_acks` has acknowledged the notices the move consumed, a
     `landed`, `superseded` or `withdrawn` row and a `confirmed` or `changed` its parent's interfaces check
     names current or supersedes (KICK-dKeptSession-42), each failed ack a `mail — ack not posted` line on
@@ -824,6 +883,12 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     from scenario import derive_move_scenarios   # it imports this module through composition.py, so here
     cache = {}
     chosen = read_cached_channels(root, "HEAD", cache)
+    # the owner's progress (KICK-dKeptSession-11 S4): `notify.owner` read once at HEAD, a refusal said as one
+    # `unread` line and never refusing the move
+    try:
+        events, unread = derive_owner_events(read_policy_value(root, NOTIFY_KEY, "HEAD")), None
+    except ValueError as e:
+        events, unread = (), str(e)
     # the mail guard (KICK-dKeptSession-5 S9): one read of the build's mailbox, its open rows refusing the
     # move before any write and its answered and acknowledged rows disposed below; an unarmed mailbox is a line.
     # Between the read and the refusal the move acknowledges each notice it has consumed, a landed, superseded
@@ -1016,6 +1081,11 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     if (state, to) == ("designing", "building"):
         ordinal = 1 + sum((m.get("from"), m.get("to")) == ("designing", "building") for m in before)
         said += write_dependency_notices(root, build, commit or "HEAD", ordinal)
+    # the owner's progress line, last, where the value selects the move's event (KICK-dKeptSession-11 S4)
+    if unread:
+        said.append("%s: progress · unread · %s" % (SAY, unread))
+    elif "transition" in events:
+        said.append(render_progress_line(build, "transition", "%s → %s · %s" % (state, to, item)))
     return move, commit, wrote, render_transition_line(move) if "micro-format" in chosen else None, said
 
 
@@ -1067,12 +1137,12 @@ def write_card_follow(root, build, state, terminal):
 
 # ------------------------------------------------------------------------------------------ the check
 def check_transition_channels(build, root):
-    """`(lines, findings)` of the build's channels held to its trailers, and the definition held to
-    `TRANSITION_LINE`: `lines` the `pending` or `unstored` line and the summary. ValueError or OSError
-    where a read is refused; LookupError where a kit does not resolve."""
+    """`(lines, findings)` of the build's channels held to its trailers, and the two definitions held to
+    `TRANSITION_LINE` and `PROGRESS_LINE`: `lines` the `pending` or `unstored` line and the summary.
+    ValueError or OSError where a read is refused; LookupError where a kit does not resolve."""
     cache = {}
     head = read_cached_channels(root, "HEAD", cache)
-    findings = check_transition_definition(root)
+    findings = [f for line in (TRANSITION_LINE, PROGRESS_LINE) for f in check_line_definition(root, line)]
     if not head & {"trailer", "log"}:
         return derive_floor_report(root, [
             "unstored — %s · %s selects %s at HEAD, which stores no move" % (build, KEY, " ".join(sorted(head))),
@@ -1123,14 +1193,18 @@ def write_transition_plant(top, case):
                        ("core.autocrlf", "false")):
         run_fixture_git(top, "config", key, value)
     line = TRANSITION_LINE.replace(" · <item tag>", "") if case == "line-drift" else TRANSITION_LINE
+    # the progress definition after it (KICK-dKeptSession-11 S9), `notify-shape`'s dropping ` · <detail>`
+    progress = PROGRESS_LINE.replace(" · <detail>", "") if case == "notify-shape" else PROGRESS_LINE
     files = {".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tool:TOOL"\n',
-             "AGENTS.md": "# AGENTS.md\n\n%s\n- `committed — <sha> · <branch> · <subject>`\n- `%s`\n%s\n" % (
-                 FENCE[0], line, FENCE[1]),
+             "AGENTS.md": "# AGENTS.md\n\n%s\n- `committed — <sha> · <branch> · <subject>`\n- `%s`\n- `%s`\n%s\n" % (
+                 FENCE[0], line, progress, FENCE[1]),
              "memory/builds/%s/README.md" % FX_BUILD: "# %s\n" % FX_BUILD}
     if case != "pre-spec":
         files[FX_SPEC] = "# %s — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01\n" % FX_UNIT
     if case in PLANT_SETS:
         files[".governance/policy.toml"] = "[transitions]\nrecord = %s\n" % PLANT_SETS[case]
+    if case in NOTIFY_SETS:
+        files[".governance/policy.toml"] = '[notify]\nowner = "%s"\n' % NOTIFY_SETS[case]
     if case == "descope-spent":
         files[".governance/policy.toml"] = "[flow]\nrework-budget = 0\n"
     notices = case == "deps-notices" or case.startswith("notices-")
@@ -1493,6 +1567,16 @@ def run_transition_fixture(case):
                                           *checks) if not ok]
             print("%s: fixture · %s · %s" % (SAY, case, "held" if not misses else "MISSED " + "; ".join(misses)))
             return 0 if not misses else 1
+        if case.startswith("notify-") and case != "notify-shape":   # KICK-dKeptSession-11 AC1, AC2: B4, then a
+            # park and a landing reported, the progress lines the three print counted on a line a case can hold
+            out, rcs = io.StringIO(), []
+            with contextlib.redirect_stdout(out):
+                rcs.append(run_verb(b4))
+                for event, detail in (("park", "item fx-fork"), ("landing", witness[:8])):
+                    rcs.append(run_verb(["progress", *at, "--event", event, "--detail", detail]))
+            sys.stdout.write(out.getvalue())
+            print("%s: fixture · progress %d" % (SAY, sum(ln.startswith("progress — ") for ln in out.getvalue().splitlines())))
+            return max(rcs)
         if case == "mail-open":   # KICK-dKeptSession-5 AC6: the open question refuses B4, writing nothing
             before = read_count()
             rc = run_verb(b4)
@@ -1642,7 +1726,8 @@ def run_selftest():
             out = io.StringIO()
             with contextlib.redirect_stdout(out):
                 if key == ("definition",):
-                    found = check_transition_definition(pathlib.Path(".").absolute())
+                    found = [f for line in (TRANSITION_LINE, PROGRESS_LINE)
+                             for f in check_line_definition(pathlib.Path(".").absolute(), line)]
                     for why in found:
                         print("%s: transition · %s" % (SAY, why))
                     print("%s: transition definition · AGENTS.md · %s" % (SAY, "refused" if found else "held"))
@@ -1742,7 +1827,22 @@ def run_selftest():
              ("acks-superseded refused", fx("acks-superseded"), 0, "refused — %s · mail open " % FX_BUILD, ""),
              ("acks-failed", fx("acks-failed"), 0, "%s: fixture · acks-failed · held" % SAY, ""),
              ("acks-failed stderr", fx("acks-failed"), 0, "%s: fixture · stderr · mail — ack not posted " % SAY,
-              " · rc -")]
+              " · rc -"),
+             ("notify-micro", fx("notify-micro"), 0, "%s: fixture · progress 0" % SAY, ""),
+             ("notify-every", fx("notify-every"), 0, "%s: fixture · progress 3" % SAY, ""),
+             ("notify-every transition", fx("notify-every"), 0, render_progress_line(
+                 FX_BUILD, "transition", "planning → designing · item.plan.exit"), ""),
+             ("notify-every landing", fx("notify-every"), 0, "progress — %s · landing · " % FX_BUILD, ""),
+             ("notify-park-landing", fx("notify-park-landing"), 0, "%s: fixture · progress 2" % SAY, ""),
+             ("notify-park-landing park", fx("notify-park-landing"), 0, "progress — %s · park · item fx-fork" % FX_BUILD,
+              ""),
+             ("notify-park-only", fx("notify-park-only"), 0, "%s: fixture · progress 1" % SAY, ""),
+             ("notify-park-only park", fx("notify-park-only"), 0, "progress — %s · park · item fx-fork" % FX_BUILD, ""),
+             ("progress unknown event", ["progress", "--build", FX_BUILD, "--event", "lunch", "--detail", "x"], 2,
+              "%s: unanswered · the event lunch is none of park, landing, transition" % SAY, ""),
+             ("notify-shape", fx("notify-shape"), 1, "%s: transition · definition · AGENTS.md reads %s, " % (
+                 SAY, PROGRESS_LINE.replace(" · <detail>", "")), "while the renderer writes %s" % PROGRESS_LINE),
+             ("notify-shape check", fx("notify-shape"), 1, check, "· 1 finding(s)")]
     return run_selftest_cases(run_cached_case, cases, "%s: transition selftest" % SAY)
 
 
@@ -1766,13 +1866,18 @@ def main(argv):
     dep = sub.add_parser("dependents", help="the builds whose README's parents: names --build, one per line")
     dep.add_argument("--build", required=True)
     dep.add_argument("--root", default=".")
+    pro = sub.add_parser("progress", help="print the owner's progress line where notify.owner selects the event")
+    pro.add_argument("--build", required=True)
+    pro.add_argument("--event", required=True, help="park, landing or transition")
+    pro.add_argument("--detail", required=True)
+    pro.add_argument("--root", default=".")
     args = ap.parse_args(argv)
     if args.fixture != bool(args.plant) or (args.fixture and args.verb):
         ap.error("--fixture takes --plant <case> and no verb")
     if args.fixture:
         return run_transition_fixture(args.plant)
     if args.verb is None:
-        ap.error("a verb, record, check or dependents, or --fixture --plant <case>")
+        ap.error("a verb, record, check, dependents or progress, or --fixture --plant <case>")
     if args.verb == "check" and args.selftest != (args.build is None):
         ap.error("check takes --build <slug>, or --selftest alone")
     if args.verb == "check" and args.selftest:
@@ -1790,6 +1895,13 @@ def main(argv):
         if args.verb == "dependents":   # KICK-dKeptSession-7 S9: the builds a landing or Design's exit notifies
             for slug in read_dependents(root, args.build):
                 print(slug)
+            return 0
+        if args.verb == "progress":   # KICK-dKeptSession-11 S3: the event checked before any policy read
+            known = tuple(dict.fromkeys(e for events in NOTIFY_OWNER_EVENTS.values() for e in events))
+            if args.event not in known:
+                raise ValueError("the event %s is none of %s" % (args.event, ", ".join(known)))
+            if args.event in derive_owner_events(read_policy_value(root, NOTIFY_KEY, "HEAD")):
+                print(render_progress_line(args.build, args.event, args.detail))
             return 0
         if args.verb == "record":
             move, commit, wrote, line, said = write_transition(root, args.build, getattr(args, "from"), args.item,

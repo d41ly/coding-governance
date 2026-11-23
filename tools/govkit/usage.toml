@@ -447,6 +447,13 @@ verb = "dependents"
 flags = ["--build=", "--root="]
 
 [[usage]]
+id = "script:{prefix}/loop/loop_transition.py#progress"
+shape = "verb"
+entry = "{prefix}/loop/loop_transition.py"
+verb = "progress"
+flags = ["--build=", "--event=", "--detail=", "--root="]
+
+[[usage]]
 id = "script:{prefix}/loop/policy_edit.py#set"
 shape = "verb"
 entry = "{prefix}/loop/policy_edit.py"

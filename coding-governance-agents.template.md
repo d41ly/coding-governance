@@ -55,6 +55,7 @@
 - `BUILD — <slug> · Tier-<n> · <done>/<total> <step> · left <ids|none|unspecced>`
 - `SPEC — [<unit-id>](<path>) · review <ids|none>[ · open <ids|none>]`
 - `transition — <slug> · <from> → <to> · <item tag> · <sha>`
+- `progress — <slug> · <event> · <detail>`
 <!-- kit:roles -->
 - `agent — <role> · effort <level> · model <model> · <unit-id|label> · prompt [<name>](<path>) · writes <class> · gates <legs|none> · run <run-id|direct>/<agent-id>`
 - `returned — <role> · <outcome> · <wall> · <tokens> out · run <run-id|direct>/<agent-id>`
@@ -65,7 +66,7 @@
 
 <!-- one-line -->
 - [never-omit] Every final message ends with the state block, short answers and conversation included; repeating it is not saying a thing twice, and omitting it is a defect.
-- [events] Each event in the turn gets its shape: a commit `committed`, a push `pushed`, a merge `merged`, a bar run `gates` or `skipped`, a server `up`, a kickoff `READY`, a long run `⏳`.
+- [events] Each event gets its shape: a commit `committed`, a push `pushed`, a merge `merged`, a bar run `gates` or `skipped`, a server `up`, a kickoff `READY`, progress `progress`, a long run `⏳`.
 <!-- kit:roles -->
 - [agents] Every agent a turn dispatches gets its `agent` line and every agent it receives its `returned` line, both derived by the roles kit and never typed.
 <!-- /kit:roles -->

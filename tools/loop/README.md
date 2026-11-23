@@ -388,7 +388,8 @@ The trailer is the source. The log record is the memory-tree kit's typed `transi
 through its `write_record` under the lowest unit id a spec H1 under the build defines; a move made
 before the build's first spec writes none, and the next move after it back-fills one per earlier
 trailer. The micro-format line is printed, never stored, by `render_transition_line` from
-`TRANSITION_LINE`, and the charter's micro-format block defines it. An extension field's name is one of
+`TRANSITION_LINE`, and the charter's micro-format block defines it, the owner's progress line
+`PROGRESS_LINE` defined beside it. An extension field's name is one of
 `TRANSITION_FIELDS`, which holds `stand-in`, written where the item has a `[[stand-in]]` row,
 `composition`, the pin the writer derives on every move and refuses from a `--field` (`composition.py`),
 and `scenario` and `scenario-settled`, the build's scenarios and any conflict settled between them, which
@@ -437,12 +438,26 @@ the same `notice — not posted` line for a refused post. The position engine's 
 reads the notices back through `check_parent_interfaces`, the confirmation that lets a dependent's Build
 run under `deps.early-build`'s default.
 
+**The progress** (KICK-dKeptSession-11). The policy key `notify.owner`, read in process at HEAD by
+`read_policy_value`, the read `read_record_channels` makes of `transitions.record`, picks the events the
+owner hears of as `progress — <slug> · <event> · <detail>`, `PROGRESS_LINE`, which
+`render_progress_line` alone fills. `NOTIFY_OWNER_EVENTS` maps `turn-micro-formats`, the default, to no
+event, `park-and-landing` to `park` and `landing`, `every-transition` to those and `transition`, and
+`park-only` to `park`; `derive_owner_events` reads it. No value pushes anything. `loop_transition.py
+progress --build <slug> --event <e> --detail <text>` prints the line where the value selects the event,
+nothing otherwise, exit 0; an event outside the three is refused before any read, exit 2. `record`
+reads the key once beside the set and, where it selects `transition`, appends the move's line, detail
+`<from> → <to> · <item tag>`, after every other order line; a key that does not resolve is one `loop:
+progress · unread · <why>` line there and never refuses the move. The unattended kit's `--park` and
+`--landed` run the verb at a park that wrote and at each landing.
+
 `record` (`write_transition`) answers the move by `derive_move` first, so a move no row holds prints
 `refused` and writes nothing; it resolves the witness to HEAD or its ancestor, refuses a staged index,
 and commits the records, or an empty commit, as `loop transition(<slug>): <from> -> <to>` with the
 trailer where selected. `check` (`check_transition_channels`) holds each record to its trailer field by
 field, names a record no trailer backs, prints `pending` while moves wait on the first spec and
-`unstored` where the set stores nothing, and holds the definition in `AGENTS.md` to `TRANSITION_LINE`.
+`unstored` where the set stores nothing, and holds the two definitions in `AGENTS.md` to `TRANSITION_LINE`
+and `PROGRESS_LINE`, each found by its head word (`check_line_definition`).
 `read_transitions(build, repo)` returns the build's moves newest first, each with its `direction`
 derived on read by `derive_direction` over this kit's definition. A backward move goes through the same
 writer, channels and fields as a forward one, and `record` prints its direction on its
@@ -472,12 +487,17 @@ and restoring it: `acks-landed`, a parent's `landed` acknowledged by the move th
 over the real chain; `acks-superseded`, `check_parent_interfaces` stood in, a `confirmed` and the later
 `changed` it names current both acknowledged, then another parent's pair under an unconfirmed check
 refusing B5; and `acks-failed`, one ack across B4 and B5, then an ack exiting 1 and one raising
-`LookupError`, each on stderr, refusing B7. `check --selftest` holds the tree's own definition, then runs every plant, and
-is gov's `loop transition record` leg.
+`LookupError`, each on stderr, refusing B7; and the five over `notify.owner`: `notify-micro`,
+`notify-park-landing`, `notify-every` and `notify-park-only`, B4 under that value, `NOTIFY_SETS`
+committing it and `notify-micro` none, then a park and a landing run through `progress`, each printing
+`loop: fixture · progress <n>`, the progress lines the three printed, and `notify-shape`, an `AGENTS.md`
+whose progress definition drops ` · <detail>`, owing the check one finding. `check --selftest` holds the
+tree's own two definitions, then runs every plant, and is gov's `loop transition record` leg.
 
 ```bash
 python <prefix>/loop/loop_transition.py record --build <slug> --from <state> --item <tag> --outcome <o> --witness <sha>
 python <prefix>/loop/loop_transition.py check --build <slug> [--root <path>]
+python <prefix>/loop/loop_transition.py progress --build <slug> --event <event> --detail <text>
 python <prefix>/loop/loop_transition.py --fixture --plant default
 python <prefix>/loop/loop_transition.py check --selftest
 ```

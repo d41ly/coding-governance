@@ -632,8 +632,8 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   trailer or the record.
 
 - **Check a build's moves:** `check --build <slug>` holds each log record to its move's trailer, names <!-- usage: script:tools/loop/loop_transition.py#check 53beaa6b -->
-  a record no trailer backs, and holds the `transition` definition in your `AGENTS.md` to the line the
-  writer prints. It exits 0 clean and 1 on a finding, printing
+  a record no trailer backs, and holds the `transition` and `progress` definitions in your `AGENTS.md` to
+  the lines the writer prints. It exits 0 clean and 1 on a finding, printing
   `pending — <n> move(s) before the build's first spec` while moves wait on a spec, or `unstored`
   where the set stores nothing. Both
   verbs exit 2 when `transitions.record` does not resolve, and 2 `unarmed` where the policy kit is not
@@ -642,6 +642,27 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries a placeholder the shell reads as a redirect -->
   ```bash
   python tools/loop/loop_transition.py check --build <slug>
+  ```
+
+- **Report progress to the owner:** the policy key `notify.owner` picks the events you hear of as a <!-- usage: script:tools/loop/loop_transition.py#progress 0eca9616 -->
+  `progress — <slug> · <event> · <detail>` line in the final message. `turn-micro-formats`, the default,
+  reports none, so you hear through the micro-formats that end each turn as before; `park-and-landing`
+  reports a parked decision and a landing; `every-transition` reports those and every recorded move;
+  `park-only` reports a parked decision alone. No value pushes anything anywhere: the line is printed,
+  never sent. `python tools/loop/loop_transition.py progress --build <slug> --event <event> --detail <text>`
+  prints the line where the value picks `park`, `landing` or `transition`, and nothing otherwise,
+  exit 0; any other event exits 2. The unattended driver's `--park` and `--landed` run it for you, and
+  `record` prints the move's line itself under `every-transition`. A value that does not resolve is said
+  as `loop: unanswered`, and inside a move as one `loop: progress · unread` line that never refuses it.
+
+  ```toml
+  [notify]
+  owner = "park-and-landing"
+  ```
+
+  <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and carries placeholders the shell reads as redirects -->
+  ```bash
+  python tools/loop/loop_transition.py progress --build <slug> --event park --detail "item <tag>"
   ```
 
 - **See it on a scratch repository:** `--fixture --plant <case>` builds a scratch repository holding <!-- usage: script:tools/loop/loop_transition.py 930359dc -->
@@ -667,7 +688,10 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   `confirmed` and the later `changed` the check names current, both acknowledged; then another parent's
   pair the check does not confirm, refusing the next move) and `acks-failed` (one ack across two moves,
   then a refused ack and one whose launch fails, each printing `mail — ack not posted`, refusing the third
-  move). `check --selftest` runs every case, and gov's own
+  move), `notify-micro`, `notify-park-landing`, `notify-every` and `notify-park-only` (one move under
+  that `notify.owner` value, `notify-micro` setting none, then a park and a landing reported, printing
+  `loop: fixture · progress <n>`, the progress lines the value let through) and `notify-shape` (an
+  `AGENTS.md` whose `progress` definition drops ` · <detail>`, so the check owes one finding). `check --selftest` runs every case, and gov's own
   `loop transition record` gate runs it.
 
   <!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter -->
