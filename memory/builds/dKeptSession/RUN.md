@@ -345,3 +345,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T11:13:13Z brief · item KICK-dKeptSession-18 · reason 635a80244df0 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-18-build-brief.md
 
 2026-11-23T11:16:08Z dispatch · item 76ed28fd KICK-dKeptSession-18 · reason tools/loop/loop_table.py tools/loop/README.md memory/map/generated/symbols.json help/loop.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-18-1-acceptance-ledger.md
+
+2026-11-23T11:36:13Z brief · item KICK-dKeptSession-41 · reason 175f33441401 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-41-build-brief.md
+
+2026-11-23T11:39:08Z dispatch · item 64e2edcc KICK-dKeptSession-41 · reason tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json help/reference/policy.md memory/project/docs-undocumented.txt memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-41-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
