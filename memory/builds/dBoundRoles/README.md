@@ -86,7 +86,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
@@ -131,7 +131,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-11 — every fork resolved by the role that meets it with its full record, or held as `run.on-owner-question` says](spec/2026-10-25-spec-TOOL-dBoundRoles-11.md) | 21 | 2 | CLOSED | rev-5 | 2026-11-23 |
 | [TOOL-dBoundRoles-47 — one criterion across the fence, the strip and the graded text: with units 38, 45, 24 and 41 landed, an anchor planted in a typed `--input` value is refused](spec/2026-10-26-spec-TOOL-dBoundRoles-47.md) | 21 | 2 | CLOSED | rev-3 | 2026-11-23 |
 | [TOOL-dBoundRoles-26 — the typed refusal return: its rule, its remedy and the remedy's actor, routed at once and never re-offered](spec/2026-10-25-spec-TOOL-dBoundRoles-26.md) | 22 | 2 | CLOSED | rev-5 | 2026-11-23 |
-| [TOOL-dBoundRoles-52 — unit 47's cross-unit render pair runs on a role that reads both of its inputs: `gov-orienter`, the span typed in `input:question` and handed in `input:prompt`](spec/2026-10-26-spec-TOOL-dBoundRoles-52.md) | 22 | 2 | INPROGRESS | rev-4 | 2026-10-26 |
+| [TOOL-dBoundRoles-52 — unit 47's cross-unit render pair runs on a role that reads both of its inputs: `gov-orienter`, the span typed in `input:question` and handed in `input:prompt`](spec/2026-10-26-spec-TOOL-dBoundRoles-52.md) | 22 | 2 | CLOSED | rev-4 | 2026-11-23 |
 | [TOOL-dBoundRoles-53 — unit 47's case proves its render arguments are read before it relies on them, so neither half can pass or fail on argument parsing](spec/2026-10-26-spec-TOOL-dBoundRoles-53.md) | 22 | 2 | DEFERRED | rev-4 | 2026-10-26 |
 | [TOOL-dBoundRoles-20 — a repository's roles and workflow entries composed beside gov's, with the role kind's fixed set, widening directions and step-gate classes](spec/2026-10-25-spec-TOOL-dBoundRoles-20.md) | 23 | 2 | DEFERRED | rev-7 | 2026-11-22 |
 | [TOOL-dBoundRoles-59 — unit 53's read check folds each `reads` entry through `roles_lib.parse_read_key`, so the tag spelling unit 14 writes passes and the read-key grammar keeps one owner](spec/2026-10-26-spec-TOOL-dBoundRoles-59.md) | 23 | 2 | DEFERRED | rev-3 | 2026-11-22 |
@@ -158,7 +158,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 400 bound to this build, across 4 record folder(s).
+Records: 401 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
