@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-41 — the anchor check grades the text a work order authors, never the content it hands, by the block extents the render assembled
 
-**Status:** DEFERRED · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
+**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-26-build-TOOL-dBoundRoles-41-deviation-411.md](../build/2026-10-26-build-TOOL-dBoundRoles-41-deviation-411.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-41-deviation-412.md](../build/2026-10-26-build-TOOL-dBoundRoles-41-deviation-412.md) | deviation | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-4-reground-k-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-4-reground-k-brief.md) | journal | TOOL-dBoundRoles-4 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-12 |
+| [2026-11-22-prompt-TOOL-dBoundRoles-41-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-41-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief.md) | journal | TOOL-dBoundRoles-5 TOOL-dBoundRoles-4 TOOL-dBoundRoles-12 TOOL-dBoundRoles-23 TOOL-dBoundRoles-39 TOOL-dBoundRoles-3 TOOL-dBoundRoles-24 TOOL-dBoundRoles-13 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-spec-tokens-c-brief.md) | journal | TOOL-dBoundRoles-5 TOOL-dBoundRoles-10 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-4 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-12 TOOL-dBoundRoles-11 TOOL-dBoundRoles-26 |
 | [2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 |
