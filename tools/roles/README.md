@@ -376,7 +376,7 @@ for the same build and role is a defect naming the line it repeats.
 `python handoff.py render --role <role> --build <slug> ... --stand-in` and follows it, so the role's
 text reaches it exactly as it would reach an agent. Before the registry is read, the render reads the
 policy key `roles.no-spawn` through `roles_lib.read_policy_setting`, with its catalogue default
-(TOOL-dBoundRoles-10, `tools/roles/handoff.py#check_no_spawn`). `refuse` exits 1, naming the key, and writes
+(TOOL-dBoundRoles-10, `check_no_spawn` in `handoff.py`). `refuse` exits 1, naming the key, and writes
 nothing. `executor-role-session`, the default, exits 1 too, naming the route that is always open, the
 role spawned through an `Agent` call or a listed harness, and the executor role session that is
 dWellOiledMachine's. `recorded-stand-in`, or no policy kit, goes on to the registry, so a waiver row
