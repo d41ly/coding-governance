@@ -475,6 +475,36 @@ else
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"3","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"3"}}\n' > "$R7D"
   GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared at 3, the project file at 2 -> deny, naming the declared file" 2 "$R7_WF" "$R7_HOOKS/agent-cap.js" 'r7-declared.json: env.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS is 3'
 fi
+# ---- TOOL-dBoundRoles-10 AC4 (S3): rule 6 reads prompts.author, and its refusal names the value --------
+# A real repository, the hook copy beside a copy of the policy kit, as rule 7's armed section builds it,
+# and a role index with one agent-true role. Its primary branch `main` commits a policy file setting
+# prompts.author to requesting-worker-rendered; `pa-unset`, which GOV_DEFAULT_BRANCH names for two rows,
+# commits none, so the key reads its default. The author-requesting plant is a freeform Agent prompt piped
+# to the hook from the fixture, refused by rule 6, the refusal naming the key and the value in force. Staged
+# against a rule 6 that reads no key, the author-requesting row and its unset twin red: no such line.
+# WHAT THIS DOES NOT CHECK: the prompt writer's framing under prompt-writer, which is TOOL-dBoundRoles-4's.
+if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
+  echo "FAIL prompts.author: no policy kit beside this hooks kit, so rule 6 has no key to read"; fail=$((fail+1))
+else
+  PA="$TMP/pa"; PA_HOOKS="$PA/kits/hooks"; mkdir -p "$PA/.governance" "$PA_HOOKS" "$PA/kits/policy" "$PA/.claude"
+  cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$PA_HOOKS/"
+  for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$PA/kits/policy/"; done
+  printf '[prompts]\nauthor = "requesting-worker-rendered"\n' > "$PA/.governance/policy.toml"
+  printf '%s\n' '{"roles":{"gov-researcher":{"agent":true,"workflow":"research","writes":"none"}},"harnesses":[]}' > "$PA/.claude/roles.json"
+  ( cd "$PA" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
+      && git config user.name t && git add -A && git commit -qm author --no-verify \
+      && git update-ref refs/heads/pa-unset "$(git commit-tree "$(git mktree </dev/null)" -m 'no policy file')" )
+  pa_got=$(cd "$TMP" && GOV_DEFAULT_BRANCH=pa-unset node -e 'console.log(require(process.argv[1]).resolvePromptsAuthor(process.argv[2]))' "$NODEDIR/pa/kits/hooks/agent-cap.js" "$NODEDIR/pa" 2>&1)
+  if [ "$pa_got" = prompt-writer ]; then echo "ok   AC4 resolvePromptsAuthor with prompts.author unset reads prompt-writer"; pass=$((pass+1))
+  else echo "FAIL AC4 resolvePromptsAuthor with prompts.author unset read: $pa_got"; fail=$((fail+1)); fi
+  pa_got=$(cd "$TMP" && node -e 'console.log(require(process.argv[1]).resolvePromptsAuthor(process.argv[2]))' "$NODEDIR/pa/kits/hooks/agent-cap.js" "$NODEDIR/pa" 2>&1)
+  if [ "$pa_got" = requesting-worker-rendered ]; then echo "ok   AC4 resolvePromptsAuthor reads the landed requesting-worker-rendered"; pass=$((pass+1))
+  else echo "FAIL AC4 resolvePromptsAuthor with prompts.author set read: $pa_got"; fail=$((fail+1)); fi
+  PA_FREE='{"tool_name":"Agent","cwd":"'"$NODEDIR/pa"'","session_id":"pa","tool_input":{"subagent_type":"gov-researcher","prompt":"Research this freely.","description":"x"}}'
+  run_limit_call "AC4 author-requesting: a freeform prompt under requesting-worker-rendered -> deny by rule 6" 2 "$PA_FREE" "$PA_HOOKS/agent-cap.js" 'rule 6 (TOOL-aOrientedCast-7) refused'
+  run_limit_call "AC4 author-requesting: ...naming prompts.author and the value in force" 2 "$PA_FREE" "$PA_HOOKS/agent-cap.js" 'prompts.author is requesting-worker-rendered'
+  GOV_DEFAULT_BRANCH=pa-unset run_limit_call "AC4 a freeform prompt with prompts.author unset -> deny naming the default prompt-writer" 2 "$PA_FREE" "$PA_HOOKS/agent-cap.js" 'prompts.author is prompt-writer'
+fi
 # ---- the two copies ------------------------------------------------------------------------------
 # `.claude/hooks/agent-cap.js` is the WIRED copy and `<prefix>/hooks/agent-cap.js` is the kit's. Nothing
 # gated them: check-wiring.sh asserts the hook is wired, never that the wired one is this one. A

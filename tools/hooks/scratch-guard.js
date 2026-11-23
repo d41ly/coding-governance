@@ -2603,6 +2603,56 @@ function renderRouteText(data, top, common, reserve) {
   return out.join('\n')
 }
 
+// The three read tools the main-loop read arm judges (TOOL-dBoundRoles-10 S2); `main` routes them to
+// checkDriverRead and exits, so a read never reaches checkRouted or the Bash checks.
+const READ_TOOLS = ['Read', 'Grep', 'Glob']
+
+/**
+ * THE MAIN-LOOP READ ARM (TOOL-dBoundRoles-10 S1): the policy key `driver.reads` over a `Read`,
+ * `Grep` or `Glob` payload, first match wins. null admits, `{ witness }` admits with one line,
+ * `{ deny }` refuses.
+ *  1. the payload carries an `agent_type` -> null: a worker keeps its read-only probes (RL-5).
+ *  2. the payload `cwd`, else `env.CLAUDE_PROJECT_DIR`, lies in no repository -> null, not this arm's.
+ *  3. no policy kit resolves beside this hook (agent-cap.js's resolvePolicyHelper) -> witness,
+ *     `driver.reads unarmed`.
+ *  4. `readPolicy('driver.reads')` at the toplevel, the landed revision's value, never the working
+ *     tree's: a refused read denies, naming the reader's line, since an arm that cannot read its key
+ *     does not admit.
+ *  5. `read-only-probes` -> null; `state-reads-only` and a `Read` -> null; any other value and tool,
+ *     `state-reads-only`'s `Grep` and `Glob` and every read under `none-scout-only` -> deny.
+ * Each refusal names the key, its value, the driver's remedy, a scout dispatched through a rendered
+ * handoff, and the owner's, another value set through the policy file's one door (S6). WHAT IT DOES
+ * NOT CHECK: which file a `Read` names, since no record says what the driver was handed (§8 F1); and
+ * the main loop's `grep`, `find` or `cat` run through Bash, which this arm never sees.
+ */
+function checkDriverRead(data, env) {
+  if (data && typeof data.agent_type === 'string' && data.agent_type !== '') return null
+  const fs = require('fs')
+  const tool = data.tool_name
+  const start = (typeof data.cwd === 'string' && data.cwd !== '') ? data.cwd : ((env && env.CLAUDE_PROJECT_DIR) || '')
+  const hit = start ? resolveToplevel(start) : null
+  if (!hit) return null
+  const helper = require('./agent-cap.js').resolvePolicyHelper()
+  if (!helper || !fs.existsSync(helper)) {
+    return { witness: `driver.reads unarmed — no policy kit resolves beside this hook, so the main loop's ${tool} is admitted (TOOL-dBoundRoles-10)` }
+  }
+  let v
+  try {
+    v = require(helper).readPolicy('driver.reads', { repo: hit.toplevel }).value
+  } catch (e) {
+    return { deny: `BLOCKED by scratch-guard: the main loop's ${tool} is refused — driver.reads could not be read, and a read arm that cannot read its key does not admit (TOOL-dBoundRoles-10). Clear the policy reader's refusal, which names its cause:\n  ${String((e && e.message) || e).split(/\r?\n/)[0]}\n` }
+  }
+  if (v === 'read-only-probes' || (v === 'state-reads-only' && tool === 'Read')) return null
+  const why = v === 'state-reads-only'
+    ? `driver.reads is state-reads-only, under which the main loop reads cheap state only: a Read of one named file, \`next\`, a short git state command; every ${tool} is a search, and anything exploratory is a scout's task`
+    : v === 'none-scout-only'
+      ? 'driver.reads is none-scout-only, under which every read the main loop would make is a scout\'s task'
+      : `driver.reads reads ${JSON.stringify(v)}, none of none-scout-only, state-reads-only and read-only-probes, so no read is admitted under it`
+  return { deny: `BLOCKED by scratch-guard: the main loop's ${tool} is refused (TOOL-dBoundRoles-10) — ${why}.\n` +
+    'The driver\'s remedy: dispatch a scout, the gov-researcher role, through a rendered handoff, `handoff.py render --role gov-researcher --build <slug> --part task` passed unchanged as an Agent call\'s prompt, and read what it returns.\n' +
+    'The owner\'s: set another value of driver.reads, read-only-probes to admit the main loop\'s searches, through the policy file\'s one door, the loop kit\'s policy_edit.py.\n' }
+}
+
 function main() {
   let data
   try {
@@ -2621,6 +2671,22 @@ function main() {
     }
     if (text) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'SubagentStart', additionalContext: text } }) + '\n')
     return
+  }
+  if (data && READ_TOOLS.includes(data.tool_name)) {
+    // The main-loop read arm (TOOL-dBoundRoles-10 S2). It FAILS CLOSED for the main loop, as the write
+    // gate does: a throw that admitted would be a silent off. A worker returns at step 1 and is never refused.
+    let read
+    try {
+      read = checkDriverRead(data, process.env)
+    } catch (e) {
+      read = data.agent_type ? null : { deny: `BLOCKED by scratch-guard: the main-loop read arm threw (${(e && e.message) || e}) and fails closed on a ${data.tool_name} (TOOL-dBoundRoles-10).\n` }
+    }
+    if (read && read.deny) {
+      process.stderr.write(read.deny)
+      process.exit(2)
+    }
+    if (read && read.witness) process.stderr.write(`scratch-guard: ${read.witness}\n`)
+    process.exit(0)
   }
   if (data && WRITE_TOOLS.includes(data.tool_name)) {
     // FAILS CLOSED, unlike the two Bash checks below: a write gate that throws and admits is the
@@ -2702,4 +2768,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines, scanWriteTargets, checkShellWrites, readWorkOrderAllowance, checkRoutedEntry }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, checkRoleGoverned, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, checkWriteClass, checkRoleClass, checkPollWait, scanCommandHeads, resolveRoleRoot, RUN_STATE_FILE, readDispatchedUnits, readOpenReds, checkRedLane, readUnfencedLines, scanWriteTargets, checkShellWrites, readWorkOrderAllowance, checkRoutedEntry, checkDriverRead }

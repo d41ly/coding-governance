@@ -48,7 +48,11 @@ spawn's name `<build> · <unit> · <workflow>`, the unit part left out with no `
 call passes it as `description`, and the hooks kit's spawn guard derives the same name and refuses
 any other (TOOL-aOrientedCast-27). stdout is unchanged by it in every mode.
 `--stand-in` declares that the main loop does the role's work itself, because its tool cannot spawn
-a sub-agent (TOOL-aOrientedCast-19): it refuses with exit 1, writing nothing, unless a valid row of
+a sub-agent (TOOL-aOrientedCast-19). First it reads the policy key `roles.no-spawn` through
+`roles_lib.read_policy_setting` (TOOL-dBoundRoles-10 S4): `refuse` and the default `executor-role-session`
+refuse with exit 1, writing nothing, the latter naming the `Agent` route and the executor role session
+that is dWellOiledMachine's; `recorded-stand-in`, or no policy kit, goes on. Then it refuses with exit 1,
+writing nothing, unless a valid row of
 the owner's `<MEMORY_ROOT>/project/role-stand-in-waiver.txt` names the role and the build, and
 otherwise writes the derived name with a `-stand-in` tail before `.md`, which the catalogue
 checker's R15 joins with that row. It does not check that the tool truly cannot spawn, nor relax
@@ -269,6 +273,9 @@ SESSION_RECORD_KEYS = frozenset(("parser", "session", "offset", "prefix", "calls
 #: and the policy key bounding how often a failed return is sent back.
 RETURN_CHECK_DIR = "return-check"
 RETRIES_KEY = "roles.retries"
+#: TOOL-dBoundRoles-10 S4: the policy key saying what an item a role must perform becomes when no agent
+#: can be spawned, read before `--stand-in`'s waiver check.
+NO_SPAWN_KEY = "roles.no-spawn"
 
 
 def read_git_stdout(repo: pathlib.Path, *args: str) -> str:
@@ -300,6 +307,32 @@ def check_placeholder(value):
     v = " ".join(value.split())
     return (v.lower() in PLACEHOLDERS or not v.replace(".", "").replace("…", "")
             or re.fullmatch(r"<[^<>]*>", v) is not None)
+
+
+def check_no_spawn(root):
+    """None where `--stand-in` may go on to its waiver check, else the refusal naming the policy key
+    `roles.no-spawn`, its value and the remedy with its actor (TOOL-dBoundRoles-10 S4, S6). The value is
+    read through `roles_lib.read_policy_setting` with its catalogue default, the landed revision's: none
+    where no policy kit answers, and `recorded-stand-in`, keep today's waiver-backed stand-in; `refuse`
+    refuses every stand-in; `executor-role-session`, the default, refuses it too, naming the route that
+    is always open, a role spawned through `Agent` or a listed harness, and the executor that starts a
+    role session for the item, which is dWellOiledMachine's (§8 F3). A refused read raises RolesError."""
+    value = lib.read_policy_setting(NO_SPAWN_KEY, root, with_default=True)
+    if value in (None, "recorded-stand-in"):
+        return None
+    owner = ("or the owner sets %s = \"recorded-stand-in\" through the policy file's one door, the loop "
+             "kit's policy_edit.py, after which a waiver row admits a stand-in" % NO_SPAWN_KEY)
+    spawn = ("the driver spawns the role through an Agent call or a listed harness, the route that is "
+             "always open")
+    if value == "refuse":
+        return ("--stand-in: %s is refuse, so no stand-in is rendered and no role's work is done inline: %s; "
+                "%s" % (NO_SPAWN_KEY, spawn, owner))
+    if value == "executor-role-session":
+        return ("--stand-in: %s is executor-role-session, so an item no agent can take goes to a role session "
+                "the executor starts, which is dWellOiledMachine's and not yet built, and no inline stand-in "
+                "is rendered: %s; %s" % (NO_SPAWN_KEY, spawn, owner))
+    return ("--stand-in: %s reads %r, none of executor-role-session, recorded-stand-in and refuse, so no "
+            "stand-in is rendered: %s; %s" % (NO_SPAWN_KEY, value, spawn, owner))
 
 
 def render_spawn_name(slug, unit, workflow):
@@ -1903,6 +1936,10 @@ def main(argv):
             ap.error("--out %s is not under %s, the only folder the spawn guard admits a marker in"
                      % (a.out, prompts.relative_to(root).as_posix()))
         if a.stand_in:
+            # TOOL-dBoundRoles-10 S4 - roles.no-spawn is read, and its refusal made, before the waiver check.
+            refusal = check_no_spawn(root)
+            if refusal:
+                raise lib.RolesError(refusal)
             waivers, bad = lib.load_stand_in_waivers(root, memory_root, roles)
             if (a.build, a.role) not in waivers:
                 raise lib.RolesError("\n".join([

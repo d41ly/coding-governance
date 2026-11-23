@@ -679,6 +679,60 @@ def check_return_arm(state):
                   "return-answers-mismatch read off the transcript printed %r, not a block naming answers" % out)
 
 
+#: Arm 23's plants (TOOL-dBoundRoles-10 AC5): each a `roles.no-spawn` value the stand-in render reads, and
+#: the text its refusal must carry, None for the value under which the waiver row admits the stand-in.
+NO_SPAWN_PLANTS = (("nospawn-refuse", "refuse", "roles.no-spawn is refuse"),
+                   ("nospawn-executor", "executor-role-session", "dWellOiledMachine"),
+                   ("nospawn-recorded", "recorded-stand-in", None))
+
+
+def check_no_spawn_arm(state, roles):
+    """Arm 23 (TOOL-dBoundRoles-10 AC5): `handoff.py render --stand-in` run in process over a git fixture whose
+    waiver registry holds a valid row for `r-one` in build `fx`, `lib.read_policy_setting` bound to answer each
+    plant's `roles.no-spawn`. `nospawn-refuse` exits 1 naming the key and writes nothing; `nospawn-executor`, the
+    catalogue default, exits 1 naming the `Agent` route and dWellOiledMachine and writes nothing, though the
+    row would admit it; `nospawn-recorded` writes the `-stand-in` file as before the key. Staged against a
+    render that skips the key, the first two write the file. WHAT IT DOES NOT CHECK: the real reader over a
+    committed policy file, nor a reader that answers no policy kit, which reads as `recorded-stand-in` does."""
+    import handoff
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+        root = pathlib.Path(tmp)
+        subprocess.run(["git", "init", "-q", str(root)], capture_output=True, text=True, encoding="utf-8",
+                       env=env, stdin=subprocess.DEVNULL)
+        kit, _tool_root = build_fixture(root, {"r-one": roles["r-one"]})
+        (root / "spec.md").write_text("spec\n", encoding="utf-8")
+        registry = root / "mem" / "project" / lib.STAND_IN_WAIVER
+        registry.parent.mkdir(parents=True)
+        registry.write_text("2026-11-23\towner fx\tr-one\tfx\tthe arm's tool cannot spawn\n", encoding="utf-8")
+        prompts = root / "mem" / "builds" / "fx" / "prompts"
+        prompts.mkdir(parents=True)
+        saved = (handoff.KIT_DIR, handoff.WORK_ORDER, lib.read_policy_setting, os.getcwd())
+        handoff.KIT_DIR, handoff.WORK_ORDER = kit, KIT_DIR / "templates" / "work-order.template.md"
+        try:
+            os.chdir(root)
+            for plant, value, want in NO_SPAWN_PLANTS:
+                lib.read_policy_setting = (lambda key, at, with_default=False, v=value:
+                                           v if key == handoff.NO_SPAWN_KEY else None)
+                out = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
+                err = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                    rc = handoff.main(["render", "--role", "r-one", "--build", "fx", "--unit", "PLAY-fx-1",
+                                       "--input", "spec=spec.md", "--stand-in"])
+                    sys.stderr.flush()
+                said = err.buffer.getvalue().decode("utf-8")
+                files = sorted(p.name for p in prompts.glob("*.md")) if prompts.is_dir() else []
+                if want is None:
+                    ok = rc == 0 and len(files) == 1 and files[0].endswith(lib.STAND_IN_TAIL + ".md")
+                else:
+                    ok = rc == 1 and handoff.NO_SPAWN_KEY in said and want in said and not files
+                check_arm(state, 23, ok, "%s exited %d with %r and wrote %r, not %s" % (
+                    plant, rc, said, files, "the -stand-in file" if want is None else "1 naming %r and nothing" % want))
+        finally:
+            os.chdir(saved[3])
+            handoff.KIT_DIR, handoff.WORK_ORDER, lib.read_policy_setting = saved[:3]
+
+
 def read_return_dir():
     """The record folder `handoff.py check-return` writes under the git common dir, read from that file so
     the arm names no second literal of it."""
@@ -1101,6 +1155,7 @@ def run_selftest():
                 "19e: a refused profile holding %r moved a file under .claude" % (lines,))
     check_fields_arm(state)
     check_return_arm(state)
+    check_no_spawn_arm(state, roles)
     lib.read_policy_setting = own_reader
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)

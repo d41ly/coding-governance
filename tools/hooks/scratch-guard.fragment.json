@@ -1,7 +1,7 @@
 {
   "name": "scratch-guard",
   "event": "PreToolUse",
-  "matcher": "Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit",
+  "matcher": "Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit|Read|Grep|Glob",
   "marker": "scratch-guard.js",
   "hook_path": "{kit}/hooks/scratch-guard.js"
 }
