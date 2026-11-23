@@ -49,7 +49,10 @@ binding window by both tests, so a file's own binding is never a hit; each censu
 a `CAUSE_WRITER_PINNED` row or is kept by its path-keyed row of `tree_lib.CENSUS_KEPT_PATHS`
 (TOOL-dTotalRecall-55 S2), held outside its bytes because no pass may edit it, and its count line counts them
 apart. A row cannot outlive its hit (S4): a row whose file the build-folder walk reads and which spells no
-Serves literal past its binding window is red, named `CENSUS_KEPT_PATHS` and its path: drain the row.
+Serves literal past its binding window is red, named `CENSUS_KEPT_PATHS` and its path: drain the row. A
+row may name only a build folder's file (`tree_lib.KEPT_PATH_DOMAIN`, TOOL-dTotalRecall-57 S1): a table
+holding any other row is red naming it, an editable file being kept by its census marker, and the walk then
+reads every hit unkept.
 
 THE PINNED WRITERS (`CAUSE_WRITER_PINNED`, TOOL-dTotalRecall-50 S2 S3). One `(instrument, glob, ask id)` row
 per pinned instrument that writes a record with no cause, whose owner alone moves its pin. `--check` prints
@@ -116,7 +119,8 @@ AUTHORED_TAG_RE = re.compile(r"\[section\.(?P<seg>[a-z0-9][a-z0-9-]*)\](?:[ \t]|
 PLANTS = ("legacy", "causeless", "typed-causeless", "orphan", "claim-root", "none", "writer-without-cause",
           "bulleted-cause", "bulleted-twice", "script-cause-prefixed", "script-cause-bare", "script-causeless",
           "backfill-selection", "backfill-refusals", "kept-instrument-not-legacy", "pinned-writer-drained",
-          "departures-pinned", "literal-without-cause", "duplicate-cause", "unmarked-writer", "kept-row-drained")
+          "departures-pinned", "literal-without-cause", "duplicate-cause", "unmarked-writer", "kept-row-drained",
+          "kept-row-editable")
 #: TOOL-dTotalRecall-47 S1: the causes check's absent-cause rule, the one finding `--backfill` selects;
 #: TOOL-dTotalRecall-53 S4: it names its remedy, and stays the one spelling the backfill selects by
 ABSENT_CAUSE = "names no Caused-by, and its kind is no root; run record_causes.py --backfill"
@@ -626,7 +630,8 @@ def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED, kept=tree_lib.CENSUS_K
     each pinned row is printed with its ask id and the records its glob reads, and is red where its
     instrument is untracked or spells `Caused-by` past the window, or its ask is not filed. A `kept` row whose
     file the walk reads and which spells no Serves literal past the window is red, drained (S4); then the
-    build folders' own count line."""
+    build folders' own count line. A `kept` table holding a row outside `tree_lib.KEPT_PATH_DOMAIN` is one red
+    naming the row, and the walk reads every hit unkept (TOOL-dTotalRecall-57 S1)."""
     import record_kinds   # noqa: E402  the tool root and the code census's one walk
     tool_rel = record_kinds.derive_tool_rel(record_kinds.derive_kit_rel())
     try:
@@ -682,6 +687,11 @@ def check_cause_writers(root, pinned=CAUSE_WRITER_PINNED, kept=tree_lib.CENSUS_K
                      f"{len(records[glob])} record(s)")
         if why:
             reds.append(f"cause-writer CAUSE_WRITER_PINNED {instrument} (ask {ask}): {why}")
+    try:   # TOOL-dTotalRecall-57 S1: a row naming an editable file is red, and the walk reads every hit unkept
+        tree_lib.read_kept_rows("check_cause_writers", kept)
+    except ValueError as exc:
+        reds.append(f"cause-writer {exc}")
+        kept = ()
     b_kept = b_pinned = b_red = 0
     serving = set()   # S4: the walked files spelling a Serves literal past their binding window
     for path in build_paths:
@@ -813,6 +823,9 @@ PINNED_BACKLOG = "memory/builds/fRoot/BACKLOG.md"
 #: literal, and the one `check_cause_writers` row keeping it, which S4 reds as a row with no hit behind it
 KEPT_SCRIPT = f"memory/builds/fRoot/build/2026-01-01-build-{FIXTURE_UNIT}-kept.py"
 FIXTURE_KEPT = (("check_cause_writers", KEPT_SCRIPT, "outside the write set"),)
+#: TOOL-dTotalRecall-57 AC1: the editable plant's one `check_cause_writers` row, a Python file in the `planted`
+#: folder under the fixture's tool root, which S1 reds as a row outside `tree_lib.KEPT_PATH_DOMAIN`
+EDITABLE_KEPT_PLANT = "planted/editable.py"
 
 
 def render_pinned_instrument(drained) -> str:
@@ -1089,6 +1102,11 @@ def run_fixture(plant) -> tuple:
                 return head + lines, 0 if ok else 1
             if plant == "kept-row-drained":   # TOOL-dTotalRecall-55 AC2: the plant's own row; the rest read the default
                 lines, rc = run_check(root, (), FIXTURE_KEPT)
+            elif plant == "kept-row-editable":   # TOOL-dTotalRecall-57 AC1: a row naming an editable file
+                import record_kinds   # noqa: E402  the fixture's tool root
+                tool_rel = record_kinds.derive_tool_rel(record_kinds.derive_kit_rel())
+                row = f"{tool_rel}/{EDITABLE_KEPT_PLANT}" if tool_rel else EDITABLE_KEPT_PLANT
+                lines, rc = run_check(root, (), (("check_cause_writers", row, "outside the write set"),))
             else:
                 lines, rc = run_check(root, ())
             if plant in BULLETED_PLANTS:

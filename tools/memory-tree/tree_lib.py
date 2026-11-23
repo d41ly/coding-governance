@@ -18,6 +18,7 @@ The module name follows the codebase-map kit's `map_lib.py` and the runlog kit's
 """
 from __future__ import annotations
 
+import fnmatch
 import itertools
 import json
 import os
@@ -676,8 +677,20 @@ CENSUS_KEPT_PATHS = (
 )
 
 
+#: TOOL-dTotalRecall-57 S1: the files a row may keep, the build folders' files no pass of a build may edit;
+#: every other file keeps its hit by the census marker on its line
+KEPT_PATH_DOMAIN = "memory/builds/*/build/*"
+
+
 def read_kept_rows(census, table=CENSUS_KEPT_PATHS) -> dict:
-    """`{path: reason}`: the rows of `table` naming `census`; the table's one reader (TOOL-dTotalRecall-55 S1)."""
+    """`{path: reason}`: the rows of `table` naming `census`; the table's one reader (TOOL-dTotalRecall-55 S1).
+    ValueError naming the row where any row of the whole table, whatever census asked, names a path outside
+    `KEPT_PATH_DOMAIN` (TOOL-dTotalRecall-57 S1). It does not check that a row's file exists, is tracked or is
+    pinned, nor that a row is filed under the right census."""
+    for _census, path, _reason in table:
+        if not fnmatch.fnmatchcase(path, KEPT_PATH_DOMAIN):
+            raise ValueError(f"CENSUS_KEPT_PATHS row {path}: is no file under {KEPT_PATH_DOMAIN}, and an editable "
+                             "file is kept by its census marker: mark the kept line `# census: kept <census> <reason>`")
     return {path: reason for c, path, reason in table if c == census}
 
 

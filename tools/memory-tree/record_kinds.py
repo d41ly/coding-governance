@@ -93,7 +93,8 @@ parenthesized regex alternation, a key quoted on a module constant's assignment,
 reader. A listed line is red unless the census marker on its line, `# census: kept alias-compare <reason>`
 (`//` in JavaScript, `id_grammar.read_kept_reason`), keeps it, printed `kept <reason>`. Then the build
 folders' Python scripts, each below its binding head, a hit kept only by its file's path-keyed row of
-`tree_lib.CENSUS_KEPT_PATHS`; a count line closes each walk. THE PENDING RULE reads `memory.map-purpose`
+`tree_lib.CENSUS_KEPT_PATHS`, a table holding a row outside `tree_lib.KEPT_PATH_DOMAIN` red naming it and
+read as no row (TOOL-dTotalRecall-57 S1); a count line closes each walk. THE PENDING RULE reads `memory.map-purpose`
 once through `tree_lib.read_policy_value` and grades each `pending` row by it: under `review` an open
 ask, a row of a tracked `<memory root>/builds/*/BACKLOG.md` no `CLOSED` or `WONTDO` row names; under
 `ledger` `purpose-pending` and the node a row of that `[[ledger]]` population, a listed node now
@@ -1253,7 +1254,7 @@ def derive_alias_hit(ln: str, shell: bool, constant: bool = True) -> bool:
     return bool(m and any(re.fullmatch(quoted, alt.strip()) or alt.strip() in aliases for alt in m[1].split("|")))
 
 
-def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
+def check_alias_compares(root, tool_rel: str, kept=None) -> tuple[list[str], list[str]]:
     """TOOL-dTotalRecall-40 S2's alias census: `(lines, reds)` over every tracked `*.py`, `*.sh` and `*.js`
     file under the tool root, each line `derive_alias_hit` reads as a comparison of a retired kind token. A
     hit is red unless the census marker on its line, `# census: kept alias-compare <reason>` (`//` in
@@ -1261,11 +1262,15 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
     Then the build folders' Python scripts, `<memory root>/builds/*/build/*.py`, each read below its
     `BIND_HEAD_LINES` binding head (TOOL-dTotalRecall-53 S22) by every form but the module constant, a hit
     kept only where `tree_lib.read_kept_path` answers for its file's row of `CENSUS_KEPT_PATHS`, census
-    `check_alias_compares` (TOOL-dTotalRecall-56 S1). A count line closes each walk. It reads, never writes."""
+    `check_alias_compares` (TOOL-dTotalRecall-56 S1), the rows read from `kept`, `tree_lib.CENSUS_KEPT_PATHS`
+    where None. A `kept` table holding a row outside `tree_lib.KEPT_PATH_DOMAIN` is one red naming the row, and
+    the walk reads every hit unkept (TOOL-dTotalRecall-57 S1 S3). A count line closes each walk. It reads,
+    never writes."""
     from id_grammar import read_kept_reason
-    from tree_lib import BIND_HEAD_LINES, read_kept_path
+    from tree_lib import BIND_HEAD_LINES, CENSUS_KEPT_PATHS, read_kept_path, read_kept_rows
+    kept = CENSUS_KEPT_PATHS if kept is None else kept
     paths = read_code_paths(root, tool_rel)
-    lines, reds, kept = [], [], 0
+    lines, reds, n_kept = [], [], 0
     for path in paths:
         text = pathlib.Path(root, path).read_bytes().decode("utf-8", "replace")
         for n, ln in enumerate(text.splitlines(), 1):
@@ -1273,15 +1278,20 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
                 continue
             reason = read_kept_reason(ln, ALIAS_COMPARE_CENSUS)
             if reason:
-                kept += 1
+                n_kept += 1
                 lines.append(f"alias-compare · {path}:{n} · kept {reason}")
                 continue
             lines.append(f"alias-compare · {path}:{n} · red")
             reds.append(f"alias-compare {path}:{n}: compares a retired kind token raw, {ln.strip()[:120]!r}; read "
                         f"the kind through tree_lib.resolve_kind, or mark the line "
                         f"`# census: kept {ALIAS_COMPARE_CENSUS} <reason>`")
-    lines.append(f"alias-compare · {len(paths)} code files under {tool_rel or '.'} · {kept + len(reds)} hits · "
-                 f"{kept} kept · {len(reds)} red")
+    lines.append(f"alias-compare · {len(paths)} code files under {tool_rel or '.'} · {n_kept + len(reds)} hits · "
+                 f"{n_kept} kept · {len(reds)} red")
+    try:   # TOOL-dTotalRecall-57 S1: a row naming an editable file is red, and the walk reads every hit unkept
+        read_kept_rows("check_alias_compares", kept)
+    except ValueError as exc:
+        reds.append(f"alias-compare {exc}")
+        kept = ()
     folder = f"{read_memory_root(root)}/builds/*/build"
     scripts, b_kept, b_red = read_tracked(root, f"{folder}/*.py"), 0, 0
     for path in scripts:
@@ -1289,7 +1299,7 @@ def check_alias_compares(root, tool_rel: str) -> tuple[list[str], list[str]]:
         for n, ln in enumerate(body[BIND_HEAD_LINES:], BIND_HEAD_LINES + 1):
             if not derive_alias_hit(ln, False, constant=False):   # a script's word list is no alias table
                 continue
-            reason = read_kept_path("check_alias_compares", path)
+            reason = read_kept_path("check_alias_compares", path, kept)
             if reason:
                 b_kept += 1
                 lines.append(f"alias-compare · {path}:{n} · kept {reason}")

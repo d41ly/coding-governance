@@ -3876,6 +3876,14 @@ n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL record_causes.py --fixture --plant k
 hit "record causes: cause-writer · kept row · $_krd · red · drained"
 hit "record causes: RED cause-writer CENSUS_KEPT_PATHS $_krd: spells no Serves line past its binding window"
 n=$((n+1)); [ "$(grep -c 'record causes: RED ' <<<"$out")" = 1 ] || { echo "FAIL kept-row-drained: want exactly one red"; st=1; }
+# --- TOOL-dTotalRecall-57 AC1 — a keep row may name only a build folder's file: a table whose one row names a
+# --- Python file in the `planted` folder under the fixture's tool root is one red naming that path and the
+# --- census marker, and the run exits 1. Red on the domain match skipped, which reads the row as a keep and
+# --- exits the plant 0.
+out=$("$_PY" "$HERE/record_causes.py" --fixture --plant kept-row-editable 2>&1); _brc=$?   # AC1
+n=$((n+1)); [ "$_brc" = 1 ] || { echo "FAIL record_causes.py --fixture --plant kept-row-editable exited $_brc, expected 1"; st=1; }
+hit "record causes: RED cause-writer CENSUS_KEPT_PATHS row "
+n=$((n+1)); [ "$(grep 'record causes: RED ' <<<"$out" | grep '/editable.py' | grep -c 'census: kept')" = 1 ] || { echo "FAIL kept-row-editable: want exactly one red naming the row and the marker"; st=1; }
 
 # --- TOOL-dTotalRecall-7 (AC4 AC5 AC6 AC7 AC10 AC11 AC12) — the ask door, `gov_record.py new ask`: the plant
 # --- runs the refuse, undeclared-family, file, replay, grade, refused-read and refused-filing-on-a-remote
