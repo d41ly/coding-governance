@@ -18,5 +18,8 @@ build's own `BACKLOG.md` as `TOOL-dBoundRoles-77`, `TOOL-dBoundRoles-78` and `TO
 schema's in dDeclaredLoop's as `TOOL-dDeclaredLoop-120`, each with its severity row. Option (b), building those behaviours in the two sibling kits here, is the one F8
 refused, and the README's writes rule keeps this run's writes outside its own folder to ask rows. So unit 20 is
 not dispatched, and neither are TOOL-dBoundRoles-25 and TOOL-dBoundRoles-43, whose specs consume from it. The
-run builds every other unit in order, and its close hands the three back to the owner as one parked decision
-rather than deferring them, which the build-level rules refuse a build run. widens: none · relaxes: none.
+driver holds every later order until unit 20 is terminal or deferred, so the three are deferred with `--rescope
+--act defer` under the carry-forward rule of `memory/guides/UNATTENDED-VERBS.md` for a roster unit waiting on an
+open ask this build filed: each header still advances `TOOL-dBoundRoles-27`, and each defer act is owed to the
+owner at the wrap-up beside the parked decision. The run builds every other unit in order. widens: none · relaxes:
+none.

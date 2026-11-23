@@ -86,7 +86,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 59 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
@@ -136,7 +136,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-20 — a repository's roles and workflow entries composed beside gov's, with the role kind's fixed set, widening directions and step-gate classes](spec/2026-10-25-spec-TOOL-dBoundRoles-20.md) | 23 | 2 | DEFERRED | rev-7 | 2026-11-22 |
 | [TOOL-dBoundRoles-59 — unit 53's read check folds each `reads` entry through `roles_lib.parse_read_key`, so the tag spelling unit 14 writes passes and the read-key grammar keeps one owner](spec/2026-10-26-spec-TOOL-dBoundRoles-59.md) | 23 | 2 | CLOSED | rev-3 | 2026-11-23 |
 | [TOOL-dBoundRoles-19 — the roles kit's house text files moved into the overlay as level-5 units selecting their role, by their own upgrade step](spec/2026-10-25-spec-TOOL-dBoundRoles-19.md) | 24 | 2 | DEFERRED | rev-7 | 2026-11-22 |
-| [TOOL-dBoundRoles-61 — unit 59's read check fails on its slice's exit status, so a slice that crashes can no longer pass for a read it never checked](spec/2026-10-26-spec-TOOL-dBoundRoles-61.md) | 24 | 2 | DEFERRED | rev-4 | 2026-11-22 |
+| [TOOL-dBoundRoles-61 — unit 59's read check fails on its slice's exit status, so a slice that crashes can no longer pass for a read it never checked](spec/2026-10-26-spec-TOOL-dBoundRoles-61.md) | 24 | 2 | INPROGRESS | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-18 — the reviewers' merge as an upgrade step: an adopter's reviewer agents renamed to `gov-reviewer`, the role index re-rendered, every key the merge touches re-keyed](spec/2026-10-25-spec-TOOL-dBoundRoles-18.md) | 25 | 2 | DEFERRED | rev-4 | 2026-11-22 |
 | [TOOL-dBoundRoles-25 — the spawn guard and harness admission moved into the roles pack, admission held to the landed blob, `tools/hooks/agent-cap.js` retired with an upgrade step](spec/2026-10-25-spec-TOOL-dBoundRoles-25.md) | 26 | 2 | DEFERRED | rev-8 | 2026-11-22 |
 | [TOOL-dBoundRoles-42 — the retired hook's readers under `memory/` classed, append-only records left as written, and the live-carrier check scoped to what a reader can still be misled by](spec/2026-10-26-spec-TOOL-dBoundRoles-42.md) | 27 | 2 | DEFERRED | rev-4 | 2026-11-22 |
@@ -158,7 +158,7 @@ ids TOOL-dBoundRoles-72 TOOL-dBoundRoles-73 TOOL-dBoundRoles-74 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-69 — the round-1 audit of units 65 and 66, its 18 minors: ledger criteria read through the revision arm, one root source, printed operands, one cleanup rule, loops swept by a pinned class, and a hard kill recovered](spec/2026-10-26-spec-TOOL-dBoundRoles-69.md) | 39 | 2 | DEFERRED | rev-2 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 409 bound to this build, across 4 record folder(s).
+Records: 410 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

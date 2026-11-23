@@ -365,3 +365,13 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T07:42:43Z brief · item TOOL-dBoundRoles-59 · reason 4d9d417b0aa8 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-59-build-brief.md
 
 2026-11-23T08:04:03Z decision · item TOOL-dBoundRoles-20, -25 and -43 wait on asks TOOL-dBoundRoles-77 to -79 and TOOL-dDeclaredLoop-120 · reason options: build the four row-mechanism gaps in the playbook and loop kits here, or land them in their own builds first; unit 20 section 8 F8 picked the asks, and the build-level rules refuse a deferral
+
+2026-11-23T08:10:21Z brief · item TOOL-dBoundRoles-61 · reason 8050751d70c7 memory/builds/dBoundRoles/prompts/2026-11-22-prompt-TOOL-dBoundRoles-61-build-brief.md
+
+2026-11-23T08:11:30Z rescope · item defer TOOL-dBoundRoles-20 · reason its section 8 F8 waits on the four row-mechanism asks TOOL-dBoundRoles-77 to -79 and TOOL-dDeclaredLoop-120, each gap still open at HEAD
+
+2026-11-23T08:11:31Z rescope · item defer TOOL-dBoundRoles-25 · reason its spec consumes from TOOL-dBoundRoles-20, which waits on asks TOOL-dBoundRoles-77 to -79 and TOOL-dDeclaredLoop-120
+
+2026-11-23T08:11:32Z rescope · item defer TOOL-dBoundRoles-43 · reason its spec consumes from TOOL-dBoundRoles-20, which waits on asks TOOL-dBoundRoles-77 to -79 and TOOL-dDeclaredLoop-120
+
+2026-11-23T08:14:43Z dispatch · item c918856c TOOL-dBoundRoles-61 · reason tools/roles/adopt-roles.test.sh memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-59-1-acceptance-ledger.md memory/builds/dBoundRoles/build/2026-11-23-build-TOOL-dBoundRoles-61-deviation-613.md memory/builds/dBoundRoles/build/2026-11-22-build-TOOL-dBoundRoles-61-1-acceptance-ledger.md memory/map/generated/symbols.json
