@@ -1518,9 +1518,11 @@ def build_source_snapshot(source_root):
         run("add", *(("-c", f"core.excludesFile={xf}") if xf else ()), "add", "-A", cwd=source, **env)
         tree = run("write-tree", "write-tree", **env)
         commit = run("commit-tree", "commit-tree", tree, "-p", "HEAD", "-m", "the working tree under test", **env)
-        # TOOL-dQuietDisk-8 S3: sparse, leaving out memory/builds/, which a --fixture case printed the same
-        # lines without; set after commit-tree, so the snapshot's tree is the working tree's, every path in it
-        run("sparse", "-C", s.as_posix(), "sparse-checkout", "set", "--no-cone", "/*", "!/memory/builds/")
+        # TOOL-dQuietDisk-8 S3: sparse, leaving out memory/builds/ but each build's README.md, which the loop
+        # gate reads for a DOD_CORE list row's build, and its red-fix records, which the red-fix join reads;
+        # set after commit-tree, so the snapshot's tree is the working tree's, every path in it
+        run("sparse", "-C", s.as_posix(), "sparse-checkout", "set", "--no-cone", "/*", "!/memory/builds/*/*",
+            "/memory/builds/*/README.md", "/memory/builds/*/build/*-red-fix-*.md")
         run("checkout", "-C", s.as_posix(), "checkout", "--quiet", "--detach", commit)
         links = [{ln.split("\t", 1)[1] for ln in run(step, "-C", repo.as_posix(), *argv).splitlines()
                   if ln.startswith("160000 ")} for step, repo, argv in
@@ -5661,7 +5663,7 @@ def run_pass_lane_case(name):
 
         def write_lane_commit(why, *more):
             """Everything in the target committed under `why` and each further paragraph -> its sha."""
-            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "add", "-A", "--sparse")  # the snapshot is sparse over memory/builds/ (TOOL-dQuietDisk-8)
             run_fixture_git(t, "commit", "-q", "-m", why, *(a for m in more for a in ("-m", m)))
             return run_fixture_git(t, "rev-parse", "HEAD")
 
