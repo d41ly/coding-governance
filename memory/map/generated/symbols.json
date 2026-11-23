@@ -28,6 +28,26 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "BatchReader",
+      "kind": "class",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "BatchReader",
+      "kind": "class",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "BatchReader",
+      "kind": "class",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
+      "id": "BlobBatch",
+      "kind": "class",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "BoundsRefused",
       "kind": "class",
       "file": "tools/loop/review_bounds.py"
@@ -211,6 +231,21 @@
       "id": "Grammar",
       "kind": "class",
       "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
+      "id": "HistoryStore",
+      "kind": "class",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "HistoryStore",
+      "kind": "class",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "HistoryStore",
+      "kind": "class",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "Invocation",
@@ -638,6 +673,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "TemplateCache",
+      "kind": "class",
+      "file": "tools/lib/template_cache.py"
+    },
+    {
       "id": "Terminal",
       "kind": "class",
       "file": "tools/playbook/instructions_edit.py"
@@ -921,6 +961,11 @@
       "id": "add_health_event",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "add_health_event",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
     },
     {
       "id": "add_health_event",
@@ -1856,6 +1901,11 @@
       "id": "arm_reader_coverage",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "arm_reading",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
     },
     {
       "id": "arm_record",
@@ -2823,6 +2873,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "build_bg_tree",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "build_big_model",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -2831,6 +2886,11 @@
       "id": "build_blanked",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "build_blob_batch",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "build_blob_request",
@@ -3061,6 +3121,11 @@
       "id": "build_docs_repo",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "build_docs_tree",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "build_document",
@@ -3484,6 +3549,11 @@
     },
     {
       "id": "build_ir_fixture",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "build_ir_tree",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
     },
@@ -3913,6 +3983,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "build_pushed_fixture",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "build_reader_coverage_repo",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -4233,6 +4308,221 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/govkit/fixture_target.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/lib/owned_scratch.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/lib/template_cache.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
+      "id": "build_scratch_dir",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
       "id": "build_scratch_gov",
       "kind": "function",
       "file": "tools/govkit/fixture_target.py"
@@ -4241,6 +4531,21 @@
       "id": "build_scratch_repo",
       "kind": "function",
       "file": "tools/check-template-size.test.sh"
+    },
+    {
+      "id": "build_scratch_repo",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "build_scratch_repo",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "build_scratch_repo",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "build_scratch_tree",
@@ -4508,9 +4813,19 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
-      "id": "build_tempdir",
+      "id": "build_template_clone",
       "kind": "function",
-      "file": "tools/lexicon/selftest.py"
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "build_template_clone",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "build_template_clone",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
     },
     {
       "id": "build_texts_with",
@@ -5643,6 +5958,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "check_blob_batch",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_blob_reader",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -6743,6 +7063,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_gm_line",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "check_gone_blob",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
@@ -7193,6 +7518,11 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "check_kit_attestations",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_kit_cites",
       "kind": "function",
       "file": "tools/lib/render-doc.sh"
@@ -7371,6 +7701,11 @@
       "id": "check_list",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "check_listed",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
     },
     {
       "id": "check_live_header",
@@ -7986,6 +8321,11 @@
       "id": "check_placement_scenarios",
       "kind": "function",
       "file": "tools/loop/placement.py"
+    },
+    {
+      "id": "check_plain_guard",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "check_plan_line",
@@ -9619,6 +9959,11 @@
     },
     {
       "id": "check_widen_admitted",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "check_widen_rewrite",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
     },
@@ -11588,6 +11933,21 @@
       "file": "tools/run-gates/py_reads.py"
     },
     {
+      "id": "derive_code_digest",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "derive_code_digest",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "derive_code_digest",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
       "id": "derive_code_files",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -12230,7 +12590,22 @@
     {
       "id": "derive_git_env",
       "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "derive_git_env",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "derive_git_env",
+      "kind": "function",
       "file": "tools/run-gates/product_tests.py"
+    },
+    {
+      "id": "derive_git_env",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "derive_gov_root",
@@ -12346,6 +12721,11 @@
       "id": "derive_health_log",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "derive_health_log",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
     },
     {
       "id": "derive_health_log",
@@ -12618,6 +12998,11 @@
       "file": "tools/playbook/overlay_rows.py"
     },
     {
+      "id": "derive_kit_attestations",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_kit_command",
       "kind": "function",
       "file": "tools/loop/policy_edit.py"
@@ -12781,6 +13166,11 @@
       "id": "derive_leg_rows",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "derive_leg_state",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_leg_tag",
@@ -14460,7 +14850,27 @@
     {
       "id": "derive_temp_path",
       "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "derive_temp_path",
+      "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_template_key",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "derive_template_key",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "derive_template_key",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
     },
     {
       "id": "derive_template_rel",
@@ -16098,6 +16508,16 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "init_bh",
+      "kind": "function",
+      "file": "tools/lib/history-store.sh"
+    },
+    {
+      "id": "init_bh",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
       "id": "init_bounded",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -16111,6 +16531,121 @@
       "id": "init_dl_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "init_hs",
+      "kind": "function",
+      "file": "tools/lib/history-store.sh"
+    },
+    {
+      "id": "init_hs",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/lib/owned_scratch.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "init_owned_tempdir",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "init_pl_fixture",
@@ -17340,6 +17875,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/lib/legacy_ledger.py"
     },
     {
@@ -17591,6 +18131,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
     },
     {
       "id": "main",
@@ -17896,6 +18441,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "main",
@@ -19298,6 +19848,21 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "parse_escaped",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "parse_escaped",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "parse_escaped",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
       "id": "parse_fact_bullets",
       "kind": "function",
       "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
@@ -19391,6 +19956,21 @@
       "id": "parse_iso_epoch",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "parse_item",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "parse_item",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "parse_item",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "parse_json_pairs",
@@ -19531,6 +20111,21 @@
       "id": "parse_request",
       "kind": "function",
       "file": "tools/policy/budgets.py"
+    },
+    {
+      "id": "parse_resolved",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "parse_resolved",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "parse_resolved",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "parse_retirement",
@@ -21108,6 +21703,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "read_base_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "read_base_population",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -21128,6 +21728,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "read_baseline_mode",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "read_baseline_rows",
       "kind": "function",
       "file": "tools/memory-tree/convert_registry.py"
@@ -21146,6 +21751,26 @@
       "id": "read_bg_marks",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_bh_blob",
+      "kind": "function",
+      "file": "tools/lib/history-store.sh"
+    },
+    {
+      "id": "read_bh_blob",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_bh_info",
+      "kind": "function",
+      "file": "tools/lib/history-store.sh"
+    },
+    {
+      "id": "read_bh_info",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
     },
     {
       "id": "read_bindings",
@@ -23148,6 +23773,26 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_hs_items",
+      "kind": "function",
+      "file": "tools/lib/history-store.sh"
+    },
+    {
+      "id": "read_hs_items",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_hs_tip",
+      "kind": "function",
+      "file": "tools/lib/history-store.sh"
+    },
+    {
+      "id": "read_hs_tip",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
       "id": "read_hv_record",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -23773,6 +24418,16 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "read_listed_attr",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "read_listed_attrs",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
       "id": "read_listing",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -24373,6 +25028,111 @@
       "file": "tools/loop/loop_table.py"
     },
     {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/lib/owned_scratch.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_pid_alive",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
       "id": "read_pid_and_swap",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
@@ -24566,6 +25326,21 @@
       "id": "read_policy_members",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "read_policy_mode",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "read_policy_mode",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "read_policy_mode",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "read_policy_module",
@@ -25161,6 +25936,21 @@
       "id": "read_requires_at",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "read_resolved",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "read_resolved",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "read_resolved",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "read_result_fa5",
@@ -26198,6 +26988,21 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "read_template_mode",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_template_mode",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "read_template_mode",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
+    },
+    {
       "id": "read_terminal_set",
       "kind": "function",
       "file": "tools/loop/loop_table.py"
@@ -26466,6 +27271,11 @@
       "id": "read_tree_fingerprint",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "read_tree_listing",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
     },
     {
       "id": "read_tree_modes",
@@ -27488,6 +28298,16 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "remove_bh",
+      "kind": "function",
+      "file": "tools/lib/history-store.sh"
+    },
+    {
+      "id": "remove_bh",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
       "id": "remove_census_watcher",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -27568,6 +28388,21 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "remove_git_env_leaks",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "remove_git_env_leaks",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "remove_git_env_leaks",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
+    },
+    {
       "id": "remove_gov_queue_hold",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -27638,11 +28473,6 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
-      "id": "remove_readonly_path",
-      "kind": "function",
-      "file": "tools/loop/claims.py"
-    },
-    {
       "id": "remove_red_ref",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
@@ -27675,11 +28505,6 @@
     {
       "id": "remove_scratch",
       "kind": "function",
-      "file": "tools/branch-reconcile/selftest.py"
-    },
-    {
-      "id": "remove_scratch",
-      "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
     },
     {
@@ -27691,11 +28516,6 @@
       "id": "remove_scratch",
       "kind": "function",
       "file": "tools/run-gates/run-held-wsl.sh"
-    },
-    {
-      "id": "remove_scratch",
-      "kind": "function",
-      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "remove_scratch",
@@ -27735,7 +28555,67 @@
     {
       "id": "remove_tree",
       "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/govkit/fixture_target.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/lib/owned_scratch.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/lib/template_cache.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
     },
     {
       "id": "remove_tree",
@@ -27745,7 +28625,47 @@
     {
       "id": "remove_tree",
       "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
     },
     {
       "id": "remove_tree",
@@ -27755,12 +28675,102 @@
     {
       "id": "remove_tree",
       "kind": "function",
+      "file": "tools/playbook/check_layers.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/playbook/fixtures/composition.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/playbook/load_sets.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/run-gates/owed_rows.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
       "file": "tools/run-gates/product_tests.py"
     },
     {
       "id": "remove_tree",
       "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
       "file": "tools/unattended/fix_keeps.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "remove_unheld_rows",
@@ -28750,7 +29760,22 @@
     {
       "id": "render_escaped",
       "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "render_escaped",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "render_escaped",
+      "kind": "function",
       "file": "tools/run-gates/keep_tails.py"
+    },
+    {
+      "id": "render_escaped",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "render_fact",
@@ -29411,6 +30436,21 @@
       "id": "render_report",
       "kind": "function",
       "file": "tools/process-monitor/classify.py"
+    },
+    {
+      "id": "render_resolved",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "render_resolved",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "render_resolved",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "render_retired_edited_line",
@@ -30610,6 +31650,11 @@
     {
       "id": "resolve_health_log",
       "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "resolve_health_log",
+      "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
@@ -30900,6 +31945,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
     },
     {
@@ -30946,6 +31996,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -31081,6 +32136,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -31346,6 +32406,116 @@
       "id": "resolve_owned_rows",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/lib/owned_scratch.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/lib/template_cache.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "resolve_owned_work",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "resolve_pattern_sets",
@@ -32333,6 +33503,21 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "resolve_store",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "resolve_store",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "resolve_store",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
       "id": "resolve_table",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -32343,9 +33528,39 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "resolve_template",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "resolve_template",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "resolve_template",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
+    },
+    {
       "id": "resolve_template_path",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "resolve_template_root",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "resolve_template_root",
+      "kind": "function",
+      "file": "tools/lib/lib-selftest.sh"
+    },
+    {
+      "id": "resolve_template_root",
+      "kind": "function",
+      "file": "tools/lib/template-cache.sh"
     },
     {
       "id": "resolve_tip",
@@ -34045,7 +35260,17 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/lib/template_cache.py"
     },
     {
       "id": "run_git",
@@ -34076,6 +35301,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
     },
     {
       "id": "run_git",
@@ -34151,6 +35381,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/unattended/commit_trailers.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "run_git_bytes",
@@ -35810,6 +37045,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/loop/adapt.py"
     },
     {
@@ -35895,6 +37135,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
@@ -35941,6 +37186,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/run-gates/py_reads.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "run_selftest",
@@ -36286,6 +37536,11 @@
       "id": "run_transition_fixture",
       "kind": "function",
       "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "run_tree_in_stage",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "run_tree_kill",
@@ -36958,9 +38213,124 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/lib/owned_scratch.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/loop/claims.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_dead_scratch",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
+      "id": "scan_dead_work",
+      "kind": "function",
+      "file": "tools/lib/owned-scratch.sh"
+    },
+    {
       "id": "scan_dead_work",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "scan_dead_work",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
     },
     {
       "id": "scan_decisions",
@@ -37261,6 +38631,11 @@
       "id": "scan_produced_destinations",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_python_cleanup",
+      "kind": "function",
+      "file": "tools/gate-lint/encoding_posture.py"
     },
     {
       "id": "scan_python_stdout",
@@ -38838,6 +40213,21 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_cli",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "test_cli",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "test_cli",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
       "id": "test_clis_refuse_an_unadopted_root",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -39908,6 +41298,21 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_prune",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "test_prune",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "test_prune",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
       "id": "test_python3_only",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -39951,6 +41356,21 @@
       "id": "test_read_roots_is_last_wins",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_reader",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "test_reader",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "test_reader",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "test_readme_mechanism_drift",
@@ -40176,6 +41596,21 @@
       "id": "test_resolution_disabled",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "test_resolved",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "test_resolved",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "test_resolved",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "test_result_cap_keeps_the_true_hit_count",
@@ -40513,6 +41948,21 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "test_store",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "test_store",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "test_store",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
       "id": "test_substrate_dispatch_is_total",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -40551,6 +42001,21 @@
       "id": "test_sweep_logs_one_tree_killed_per_target_and_none_dry",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_switch",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "test_switch",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "test_switch",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "test_symbol_extractors_fail_closed",
@@ -40708,6 +42173,21 @@
       "file": "tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py"
     },
     {
+      "id": "test_worktree_tips",
+      "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "test_worktree_tips",
+      "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "test_worktree_tips",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
+    },
+    {
       "id": "test_write_atomic_temp",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -40786,6 +42266,11 @@
       "id": "ts_alive",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "ts_alive",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
     },
     {
       "id": "ts_drop_ticket",
@@ -42138,6 +43623,11 @@
       "file": "tools/loop/guard.py"
     },
     {
+      "id": "write_guard_slices",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "write_guarded",
       "kind": "function",
       "file": "tools/lib/guarded_write.py"
@@ -42206,6 +43696,16 @@
       "id": "write_hooks",
       "kind": "function",
       "file": ".githooks/straggler-guard.test.sh"
+    },
+    {
+      "id": "write_hs_items",
+      "kind": "function",
+      "file": "tools/lib/history-store.sh"
+    },
+    {
+      "id": "write_hs_items",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
     },
     {
       "id": "write_ih_asks",
@@ -43400,12 +44900,27 @@
     {
       "id": "write_staged",
       "kind": "function",
+      "file": "tools/lib/history_store.py"
+    },
+    {
+      "id": "write_staged",
+      "kind": "function",
       "file": "tools/loop/guard.py"
     },
     {
       "id": "write_staged",
       "kind": "function",
+      "file": "tools/memory-tree/history_store.py"
+    },
+    {
+      "id": "write_staged",
+      "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "write_staged",
+      "kind": "function",
+      "file": "tools/unattended/history_store.py"
     },
     {
       "id": "write_staged_change",
@@ -43476,6 +44991,11 @@
       "id": "write_table_plant",
       "kind": "function",
       "file": "tools/loop/loop_table.py"
+    },
+    {
+      "id": "write_target_files",
+      "kind": "function",
+      "file": "tools/govkit/fixture_target.py"
     },
     {
       "id": "write_target_plants",
@@ -43610,7 +45130,17 @@
     {
       "id": "write_work_owner",
       "kind": "function",
+      "file": "tools/lib/owned-scratch.sh"
+    },
+    {
+      "id": "write_work_owner",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "write_work_owner",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
     },
     {
       "id": "write_workflow",

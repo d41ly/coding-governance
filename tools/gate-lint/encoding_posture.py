@@ -6,7 +6,8 @@ Project-agnostic. Run over any repo:
     python <this file> [registry-path] [root] [pathspec ...]   # exit 0 clean, 1 findings, 2 refusal
     python <this file> --stdout [registry-path] [root] [pathspec ...]   # the stdout arm, Python
     python <this file> --js [registry-path] [root] [pathspec ...]       # the JavaScript arm
-    python <this file> [--stdout | --js] --measure [root] [pathspec ...]   # each key's fields, its count
+    python <this file> --cleanup [registry-path] [root] [pathspec ...]  # the tree-removal arm, Python
+    python <this file> [--stdout | --js | --cleanup] --measure [root] [pathspec ...]   # each key, its count
     python <this file> --selftest                               # prove every arm in BOTH directions
 
 `--measure` grades nothing: it prints one `<path> TAB <arm> TAB <count>` line per measured key, the
@@ -28,6 +29,15 @@ to its closing parenthesis, names neither `'utf8'`, `'utf-8'` nor an `encoding` 
 either is no call, and an argument list's strings are read for the encoding. WHAT IT DOES NOT CHECK: a
 call through an alias (`const r = fs.readFileSync; r(p)`), an encoding held in a variable, which is
 graded as none, and a binary read that wants a Buffer, which is graded as a site and declared.
+
+THE CLEANUP ARM, `--cleanup` (TOOL-dQuietDisk-9 S6). A call named `rmtree` with the keyword
+`ignore_errors` set to a true constant, or `TemporaryDirectory` with `ignore_cleanup_errors` set to
+one, read by AST and so across lines, is one site keyed `<path>` `cleanup`: git writes its objects
+read-only, an unlink of one raises on Windows, and the swallowed error leaves the whole tree in the
+temp folder. The remedy is the `remove_tree_py` block, `remove_tree` and `build_scratch_dir`, which
+clear the bit and retry. WHAT IT DOES NOT CHECK: a keyword held in a variable or passed through
+`**kwargs`, a call through an alias, and a plain `TemporaryDirectory()`, whose own cleanup already
+resets permissions and retries; and whether a removal that is not swallowed is ever retried.
 
 THE CLASS. A text-mode read or subprocess with no `encoding=` decodes with the platform default:
 cp1251 or cp1252 on a Windows node, UTF-8 in CI. An unencoded read of a UTF-8 file therefore raises
@@ -87,6 +97,9 @@ from sh_hygiene import derive_default_registry  # the kit's one default-registry
 ARMS = ("file-io", "subprocess")
 STDOUT_ARMS = ("stdout",)
 JS_ARMS = ("js-io",)
+CLEANUP_ARMS = ("cleanup",)
+# The removal calls that swallow their error, and the keyword that makes each swallow it.
+CLEANUP_FLAGS = {"rmtree": "ignore_errors", "TemporaryDirectory": "ignore_cleanup_errors"}
 # The JavaScript calls whose text decoding or encoding falls to a default when no encoding is named.
 JS_IO_CALL = re.compile(r"\b(readFileSync|writeFileSync|appendFileSync|spawnSync|execFileSync|execSync)\s*\(")
 JS_ENCODING = re.compile(r"""['"]utf-?8['"]|\bencoding\b""")
@@ -100,7 +113,10 @@ TEXT_MODE_FLAGS = ("text", "universal_newlines")
 #: with the arms; it may never be lowered to fit a regression.
 #: RAISED 26 -> 41 by TOOL-dWitnessedBar-24: seven stdout rows, six JavaScript rows and the two
 #: per-mode arm-set rows, 15 executed, every one unconditional.
-FLOOR_ASSERTIONS = 42
+#: RAISED 41 -> 49 by TOOL-dQuietDisk-9: six cleanup rows, the cleanup arm set's registry row and the
+#: fixture tree's row, 8 executed, every one unconditional.
+#: RAISED 49 -> 50 on the merge with TOOL-aFlattenedSeed-3's default-home row.
+FLOOR_ASSERTIONS = 50
 
 
 def read_kwarg(call: ast.Call, name: str) -> ast.expr | None:
@@ -263,14 +279,30 @@ def scan_python_stdout(text: str) -> list[tuple[int, int, str, str]]:
     return scan_stdout(ast.parse(text))
 
 
+def scan_python_cleanup(text: str) -> list[tuple[int, int, str, str]]:
+    """(line, col, `cleanup`, description) for every tree removal that swallows its error (S6)."""
+    found = []
+    for node in ast.walk(ast.parse(text)):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        name = func.attr if isinstance(func, ast.Attribute) else func.id if isinstance(func, ast.Name) else ""
+        flag = CLEANUP_FLAGS.get(name)
+        value = read_kwarg(node, flag) if flag else None
+        if isinstance(value, ast.Constant) and bool(value.value):
+            found.append((node.lineno, node.col_offset, "cleanup", f"{name}(..., {flag}=True)"))
+    return found
+
+
 # Each mode: (the population's suffix, the per-file scan over its text, the registry's closed arm set).
 #: Each mode's ledger home under `<MEMORY_ROOT>/project/`, read when no registry argument is given.
 DEFAULT_HOMES = {"": "encoding-posture-sites.txt", "--stdout": "encoding-stdout-sites.txt",
-                 "--js": "encoding-js-sites.txt"}
+                 "--js": "encoding-js-sites.txt", "--cleanup": "cleanup-sites.txt"}
 MODES = {
     "": (".py", scan_python_text_io, ARMS),
     "--stdout": (".py", scan_python_stdout, STDOUT_ARMS),
     "--js": (".js", scan_js_io, JS_ARMS),
+    "--cleanup": (".py", scan_python_cleanup, CLEANUP_ARMS),
 }
 
 
@@ -362,7 +394,10 @@ def check_registry(measured: dict[tuple[str, str], int],
     problems = []
     for finding, key, have, want in compare_counts(measured, declared, "shrink-only"):
         rel, arm = key
-        if finding == "undeclared site":
+        if finding == "undeclared site" and arm == "cleanup":
+            problems.append(f"{rel}: {have} tree removal(s) that swallow their error [{arm}] and no registry "
+                            f"row declares them — call remove_tree, the remove_tree_py block")
+        elif finding == "undeclared site":
             fix = "make stdout UTF-8 before the first print" if arm == "stdout" else "pass encoding=\"utf-8\""
             problems.append(f"{rel}: {have} unencoded [{arm}] call(s) and no registry row declares "
                             f"them — {fix}")
@@ -446,6 +481,19 @@ def run_selftest() -> int:
     check("js: 'utf8' in a comment inside the call does not clear it",
           scan_js_arms("writeFileSync(p, d /* 'utf8' */)\n"), ["js-io"])
 
+    # THE CLEANUP ARM (TOOL-dQuietDisk-9 S6): each swallowing form, read across lines, and its twin.
+    def scan_cleanup_arms(source: str) -> list[str]:
+        return [arm for _l, _c, arm, _w in scan_python_cleanup(source)]
+
+    check("cleanup: a swallowing rmtree split over two lines is named",
+          scan_cleanup_arms("shutil.rmtree(p,\n              ignore_errors=True)\n"), ["cleanup"])
+    check("cleanup: an rmtree that raises its error clears", scan_cleanup_arms("shutil.rmtree(p)\n"), [])
+    check("cleanup: ignore_errors=False clears", scan_cleanup_arms("shutil.rmtree(p, ignore_errors=False)\n"), [])
+    check("cleanup: a bare rmtree name is named", scan_cleanup_arms("rmtree(p, ignore_errors=True)\n"), ["cleanup"])
+    check("cleanup: TemporaryDirectory with ignore_cleanup_errors is named",
+          scan_cleanup_arms("tempfile.TemporaryDirectory(\n    prefix='x', ignore_cleanup_errors=True)\n"), ["cleanup"])
+    check("cleanup: a plain TemporaryDirectory clears", scan_cleanup_arms("tempfile.TemporaryDirectory()\n"), [])
+
     measured = {("a.py", "file-io"): 1}
     check("an undeclared measured site fails", len(check_registry(measured, {})), 1)
     check("a declared measured site passes", check_registry(measured, {("a.py", "file-io"): 1}), [])
@@ -470,6 +518,21 @@ def run_selftest() -> int:
         check("a mode's own arm set grades its registry", resolve_declaration(str(reg), STDOUT_ARMS),
               ({("a.py", "stdout"): 1}, []))
         check("another mode's arm is malformed there", len(resolve_declaration(str(reg))[1]), 1)
+        reg.write_text("a.py\tcleanup\t1\tabcdef12\twidened:2026-01-01-build-TOOL-dFix-1-widen-1\n", encoding="utf-8")
+        check("the cleanup arm set grades its registry", resolve_declaration(str(reg), CLEANUP_ARMS),
+              ({("a.py", "cleanup"): 1}, []))
+        # The two planted forms staged in a fixture tree, through the mode's own population walk.
+        tree = pathlib.Path(scratch) / "cleanup-tree"
+        tree.mkdir()
+        (tree / "a.py").write_text("import shutil, tempfile\nshutil.rmtree(p,\n              ignore_errors=True)\n"
+                                   "tempfile.TemporaryDirectory(ignore_cleanup_errors=True)\n", encoding="utf-8")
+        (tree / "b.py").write_text("import shutil\nshutil.rmtree(p)\n", encoding="utf-8")
+        staged = subprocess.run(["git", "init", "-q", str(tree)], capture_output=True, check=False).returncode == 0 \
+            and subprocess.run(["git", "-C", str(tree), "add", "a.py", "b.py"], capture_output=True,
+                               check=False).returncode == 0
+        got = build_measured(scan_tree(tree, [], "--cleanup")[0]) if staged else "the fixture tree did not stage"
+        check("cleanup: the fixture tree's two planted removals are measured, the raising one is not",
+              got, {("a.py", "cleanup"): 2})
         # TOOL-aFlattenedSeed-3: an adopter's row names no registry, so the run reads the mode's home under
         # <MEMORY_ROOT>/project/ and a seeded site is declared there, not undeclared.
         import os  # noqa: PLC0415  the one arm that runs from a planted root
@@ -531,15 +594,21 @@ def main(argv: list[str]) -> int:
         print(f"encoding-posture: OK — {scanned} tracked *{suffix} graded, {sum(declared.values())} "
               f"declared site(s) in {len(declared)} row(s), no undeclared {'/'.join(arms)} site")
         return 0
-    remedy = ("call sys.stdout.reconfigure(encoding=\"utf-8\") before the first print" if mode == "--stdout"
-              else "name the encoding")
-    print(f"encoding-posture: {len(problems)} finding(s) over {scanned} tracked *{suffix}. Text IO with no "
-          f"named encoding uses the platform default, which is cp1251/cp1252 on a Windows node: {remedy}.")
+    if mode == "--cleanup":
+        print(f"encoding-posture: {len(problems)} finding(s) over {scanned} tracked *{suffix}. A tree removal "
+              f"that swallows its error leaves git's read-only objects in the temp folder on Windows: call "
+              f"remove_tree, the remove_tree_py block, which clears the bit and retries.")
+    else:
+        remedy = ("call sys.stdout.reconfigure(encoding=\"utf-8\") before the first print" if mode == "--stdout"
+                  else "name the encoding")
+        print(f"encoding-posture: {len(problems)} finding(s) over {scanned} tracked *{suffix}. Text IO with no "
+              f"named encoding uses the platform default, which is cp1251/cp1252 on a Windows node: {remedy}.")
     for problem in problems:
         print(f"  {problem}")
     for rel, line, col, arm, what in hits:
         if (rel, arm) not in declared:
-            print(f"  - [{arm}] {rel}:{line}:{col + 1} — {what} names no encoding")
+            print(f"  - [{arm}] {rel}:{line}:{col + 1} — {what} "
+                  f"{'swallows its error' if arm == 'cleanup' else 'names no encoding'}")
     return 1
 
 

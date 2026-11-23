@@ -183,6 +183,39 @@ HERE = pathlib.Path(os.path.abspath(__file__)).parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 from leg_factory import resolve_kit_dir  # noqa: E402 - the kit's inline copy of the sibling resolver
+import contextlib
+
+
+# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir (byte-identical; gated)
+# A TREE REMOVAL THAT NEVER SWALLOWS A READ-ONLY FILE (TOOL-dQuietDisk-9 S1). git writes its objects
+# read-only, and on Windows an unlink of one raises, so `rmtree(..., ignore_errors=True)` left every
+# fixture repository's objects in the temp folder. The hook clears the bit on the failing path and
+# retries it once; a removal that still fails raises nothing and answers False, as `ignore_errors` did.
+def remove_tree(path) -> bool:
+    """`path` removed, read-only files included; True when it is gone. Never raises."""
+    def set_writable(func, failed, _exc):
+        try:
+            os.chmod(failed, 0o700)
+            func(failed)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(path, onexc=set_writable)
+    except OSError:
+        pass
+    return not os.path.lexists(path)
+
+
+@contextlib.contextmanager
+def build_scratch_dir(prefix=None):
+    """A fresh `tempfile.mkdtemp` directory for the `with` block, removed by `remove_tree` on exit."""
+    made = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield made
+    finally:
+        remove_tree(made)
+# <<< remove_tree_py
+
 
 SAY = "verdict-flow"
 BOUND = 120  # seconds, each subprocess
@@ -600,7 +633,7 @@ def run_quiet_leg(run, row, n, top):
         except (OSError, subprocess.TimeoutExpired) as e:
             return "-", f"quiet-rerun  {leg}  the alone-run did not answer within {bound}s: {e}"
     finally:
-        shutil.rmtree(root, ignore_errors=True)
+        remove_tree(root)
     rec = run.parent / rid
     verdict = read_keys(rec / "verdict").get("verdict")
     if verdict == "GREEN":
@@ -745,7 +778,7 @@ def read_asks_at(repo, sha, then=None):
         return asks if then is None else then(wt, asks)
     finally:
         run_git(repo, "worktree", "remove", "--force", str(wt))
-        shutil.rmtree(root, ignore_errors=True)
+        remove_tree(root)
 
 
 def read_flaky_asks(asks, status):

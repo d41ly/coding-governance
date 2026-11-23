@@ -1,5 +1,5 @@
 {
-  "catalogue_blob": "25076c3d890d3b979769ff6ca302c478ecf5f6dc",
+  "catalogue_blob": "3c136d9f8dbe0a179056ed235d568cc7e5886673",
   "keys": {
     "actions.free": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -358,6 +358,11 @@
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
       "value": "allowed"
+    },
+    "install.baseline": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "reuse"
     },
     "install.deprecation-window": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -1230,6 +1235,16 @@
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
       "value": "leaf"
+    },
+    "tests.fixture-templates": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "shared"
+    },
+    "tests.history-verdicts": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "stored"
     },
     "tests.landing-levels": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",

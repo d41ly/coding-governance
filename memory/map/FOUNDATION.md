@@ -8,7 +8,7 @@ streams = ["architecture"]
 decisions = []
 
 [claims]
-gate-legs = ["run-gates evidence"]
+gate-legs = ["run-gates evidence", "history-store selftest"]
 kits = []
 git-hooks = []
 harness-hooks = ["SessionStart tools/check-wiring.sh"]
