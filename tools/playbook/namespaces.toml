@@ -10,6 +10,11 @@
 # assigns it) or `#<field>` (each member's own file carries it, `h1` a Markdown member's first `# ` line). A source
 # not in the view yet prints `pending` and grades once it lands. A path spells the tool root `{prefix}/`, which the
 # arm resolves against this registry's own tool root (PLAY-dOrderedCharter-72 S7).
+#
+# One optional key (TOOL-dBoundRoles-81): `rows`, a `<module>:<function>` resolved as `extractor` is, the reader
+# overlay_rows.py's compose verb calls once per blob of a row-kind's `source` to turn it into the kind's rows; a
+# `source` holding `*` or `?` names every blob it matches one segment under its directory. A row with no `rows`
+# key has its source read as `[[<kind>]]` tables.
 
 [[namespace]]
 ns = "doc"
@@ -196,6 +201,7 @@ ns = "role"
 owner = "dBoundRoles"
 layer = "layer.roles"
 source = "{prefix}/roles/agents/*.agent.md"
+rows = "tag_index:read_roles_rows"
 extractor = "tag_index:extract_role"
 role = "selects"
 purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md"

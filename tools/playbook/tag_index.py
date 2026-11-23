@@ -517,6 +517,35 @@ def read_roles_tag_rows(mode, path, text) -> list:
     return rows
 
 
+def read_roles_rows(ns, path, text) -> list | None:
+    """The `rows` reader of the `role` and `workflow` namespace rows (TOOL-dBoundRoles-81 S4):
+    `check_roles.py --print-rows <ns>` over `text`, the blob at `path`, on stdin through
+    `resolve_roles_verb` by subprocess, never an import; one row dict per JSON line it prints. None where
+    the roles kit does not resolve, so the composer leaves the kind unarmed; TagError naming `path` and the
+    verb's stderr line where it refuses the blob, does not answer, or prints a line that is no row."""
+    verb = resolve_roles_verb()
+    if verb is None:
+        return None
+    try:
+        done = subprocess.run([sys.executable, "-B", str(verb), "--print-rows", ns], input=text,
+                              capture_output=True, encoding="utf-8", errors="replace", timeout=120)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise TagError(f"{path} · check_roles.py --print-rows {ns} did not answer: {exc}") from None
+    if done.returncode:
+        why = done.stderr.strip() or f"exit {done.returncode}"
+        raise TagError(f"{path} · check_roles.py --print-rows {ns} refused it: {why}")
+    rows = []
+    for line in done.stdout.splitlines():
+        try:
+            row = json.loads(line)
+        except ValueError:
+            row = None
+        if not isinstance(row, dict) or not isinstance(row.get("tag"), str):
+            raise TagError(f"{path} · check_roles.py --print-rows {ns} printed a line that is no row: {line}")
+        rows.append(row)
+    return rows
+
+
 def extract_role(ctx, path, text=None):
     """The `role` namespace: `role.<name>` for each role file, `{prefix}/roles/agents/*.agent.md` under
     the tool root, `<name>` its front matter's `name`, at the `name:` line, its text the raw `rules`

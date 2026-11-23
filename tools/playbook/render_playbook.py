@@ -3184,7 +3184,20 @@ def run_selftest() -> int:
                                   'reach', 'row-checks: red · widens · fixture.adopter.gamma-own supersedes '
                                   'fixture.gamma · field reach', 'never lowered']),
             (['rises-word'], 1, ['field reach', 'is no number']),
-            (['rises-unknown'], 1, ['field reach', 'declares no direction', 'rises-only'])]:
+            (['rises-unknown'], 1, ['field reach', 'declares no direction', 'rises-only']),
+            # TOOL-dBoundRoles-81 — gov's role files under a glob and its `[[workflow]]` entries read as rows
+            # by the namespace row's reader; a role file the grammar refuses refuses the composition naming
+            # it, and a glob matching no file leaves the kind unarmed.
+            (['front-matter-rows'], 0, ['"origin": "role", "source": "', 'agents/gov-alpha.agent.md", "tag": '
+                                        '"role.gov-alpha"', 'agents/gov-beta.agent.md", "tag": "role.gov-beta"',
+                                        '"origin": "repository", "source": ".governance/instructions.toml", "tag": '
+                                        '"role.adopter.triager"', '"origin": "workflow", "roles": [',
+                                        'workflows.toml", "tag": "workflow.triage"',
+                                        'workflows.toml", "tag": "workflow.sweep"']),
+            (['front-matter-refused'], 1, ['gov-alpha.agent.md · check_roles.py --print-rows role refused it',
+                                           'R2 — front-matter key is indented']),
+            (['front-matter-unarmed'], 2, ['row-kind: unarmed · kind role · HEAD holds no ', '/*.agent.md, its '
+                                           'namespace source'])]:
         done = subprocess.run([sys.executable, str(row_kind), '--plant', *argv], capture_output=True, text=True,
                               encoding='utf-8', errors='replace', stdin=subprocess.DEVNULL, timeout=600)
         said = done.stdout + done.stderr
@@ -3208,6 +3221,9 @@ def run_selftest() -> int:
             ok = ok and 'row-checks: red · exclude' not in said
         if argv == ['rises-lower']:
             ok = ok and len(re.findall(r'· field reach · .*never lowered$', said, re.M)) == 2
+        if argv == ['front-matter-rows']:
+            ok = ok and len(re.findall(r'^row-kind: row role\.', done.stdout, re.M)) == 3 \
+                and len(re.findall(r'^row-kind: row workflow\.', done.stdout, re.M)) == 2
         if argv == ['clean']:
             counts = re.findall(r'^row-kind: check (\w+) · read (\d+)$', done.stdout, re.M)
             ok = ok and len(counts) == 4 and all(int(n) > 0 for _, n in counts)

@@ -37,13 +37,22 @@ schema file is absent from `root`, so a target without the kit that ships it com
 and where HEAD is unborn or holds no blob at the `source`, so a first install's render, its rows staged and
 not committed, composes none either. `render_playbook.read_kind_rows` calls it per kind.
 
+THE SOURCE'S FORM (TOOL-dBoundRoles-81). `read_kind_source` reads a `source` holding no `*` or `?` as one
+blob and a glob as every blob HEAD holds one segment under its directory that it matches, a glob matching
+none unarmed. A namespace row may name `rows`, a `<module>:<function>` reader loaded as the tag index loads
+an extractor and called `(kind, path, text)` once per blob for that blob's rows: `role` names the tag
+index's `read_roles_rows`, the roles kit's `check_roles.py --print-rows` by subprocess, which turns a role
+file's front matter and a `[[workflow]]` entry into rows tagged from their names. A row with no `rows` key
+reads its blob's `[[<kind>]]` tables as before. A reader answering None leaves the kind unarmed naming it,
+and one refusing a blob refuses the composition naming the blob's path.
+
     python overlay_rows.py compose --kind <kind> [--rows -]
 
 composes the repository at the working directory and prints one JSON object: `rows`, `states`, `held`,
 `stale`, `operations` (the row checks' classified patch operations) and `pins`, each gov row's eight-hex
 pin over its canonical form. Exit 0; 1 with each red line of a refusal; 2 naming `unarmed` and the path
-where the kind is not registered with a schema, its schema file is absent, or HEAD holds no blob at its
-`source`, and on a usage error. `--rows -` reads a JSON array of rows on standard input, the rows the
+where the kind is not registered with a schema, its schema file is absent, HEAD holds no blob at its
+`source` or none its glob matches, or its reader answers None, and on a usage error. `--rows -` reads a JSON array of rows on standard input, the rows the
 scenarios a build was placed under activate (TOOL-dDeclaredLoop-27): each joins after the overlay's own
 rows as the repository's, keeping its `source`, and meets every refusal an overlay row meets; a row that
 is no object or types `origin` is refused, exit 1. Any other `--rows` value is a usage error. One more
@@ -54,6 +63,7 @@ name `instructions.exclude`.
 """
 from __future__ import annotations
 
+import fnmatch
 import json
 import os
 import pathlib
@@ -363,32 +373,69 @@ def derive_row_composition(kind, schema, gov_rows, overlay_rows, exclude, stale_
     return composed, states, held, stale, orders, checks
 
 
+def read_source_paths(root, source_rel) -> list:
+    """TOOL-dBoundRoles-81 S3: the tree paths a namespace `source` names at HEAD under `root`: itself, or,
+    where it carries `*` or `?`, every path HEAD holds that its last segment matches one segment deep under
+    its directory, as `tag_index.extract_role` matches a role file, sorted; empty where the glob matches none."""
+    if not any(c in source_rel for c in "*?"):
+        return [source_rel]
+    folder, _, glob = source_rel.rpartition("/")
+    listed = iu.run_git(root, "ls-tree", "-r", "--name-only", "-z", "HEAD", "--", folder or ".").split("\0")
+    names = [(p, p[len(folder) + 1:] if folder else p) for p in listed if p]
+    return sorted(p for p, name in names if "/" not in name and fnmatch.fnmatchcase(name, glob)
+                  and (not folder or p.startswith(folder + "/")))
+
+
 def read_kind_source(root, kind) -> tuple:
-    """`(schema path, source path, gov rows)` of the registered `kind` under `root`, both paths tree-relative:
-    gov's rows read at HEAD from the namespace row's `source`, each carrying `origin` and `source`; None for
-    the rows where the schema file is absent from `root`, or HEAD is unborn or holds no blob at the `source`.
-    A namespace row naming no `source` reads no gov row. OverlayRefused where the kind is not registered."""
-    from tag_index import resolve_prefix_token
+    """`(schema path, source path, gov rows, why)` of the registered `kind` under `root`, both paths
+    tree-relative: gov's rows read at HEAD from the namespace row's `source`, each carrying `origin`; None
+    for the rows, `why` naming the cause, where the schema file is absent from `root`, HEAD is unborn or
+    holds no blob at the `source`, or the row's reader answers None. A namespace row naming no `source`
+    reads no gov row. TOOL-dBoundRoles-81: a `source` carrying `*` or `?` names every blob
+    `read_source_paths` finds, a glob matching none unarmed; a row naming `rows`, a `<module>:<function>`
+    loaded as `tag_index.load_extractors` loads an extractor, has it called `(kind, path, text)` once per
+    blob for that blob's rows, its TagError refusing; a row read through a reader or a glob carries
+    `source` its blob's path, a plain TOML source's row the namespace row's `source` as it is spelled.
+    OverlayRefused where the kind is not registered, or a reader does not load or refuses a blob."""
+    from tag_index import TagError, load_extractors, resolve_prefix_token
     row = next((r for r in pins.read_row_kinds(root) if r.get("tag") == f"kind.{kind}"), None)
     if row is None:
         check_reds([f"{SAY}: red · kind {kind} · the kinds register lists no such kind with a `schema`"])
     prefix = iu.derive_kit_prefix()
     schema_rel = resolve_prefix_token(row["schema"], prefix)
-    names = tomllib.loads(iu.derive_kit_file(root, "namespaces.toml").read_text(encoding="utf-8"))
-    source = next((r.get("source") for r in names.get("namespace") or [] if r.get("ns") == kind), None)
+    registry = iu.derive_kit_file(root, "namespaces.toml")
+    names = tomllib.loads(registry.read_text(encoding="utf-8"))
+    ns = next((r for r in names.get("namespace") or [] if r.get("ns") == kind), {})
+    source, reader = ns.get("source"), ns.get("rows")
     source_rel = resolve_prefix_token(source, prefix) if source else ""
     if not (pathlib.Path(root) / schema_rel).is_file():
-        return schema_rel, source_rel, None
+        return schema_rel, source_rel, None, f"{schema_rel}, its schema, is absent"
     if not source:
-        return schema_rel, source_rel, []
+        return schema_rel, source_rel, [], None
+    absent = f"HEAD holds no {source_rel}, its namespace source"
     if not ov.check_born(root):
-        return schema_rel, source_rel, None
+        return schema_rel, source_rel, None, absent
+    paths = read_source_paths(root, source_rel)
     iu.load_memory_tree_path()
     from tree_lib import read_blobs_at
-    text = read_blobs_at(root, [("HEAD", source_rel)])[("HEAD", source_rel)]
-    if text is None:
-        return schema_rel, source_rel, None
-    return schema_rel, source_rel, [{**r, "origin": kind, "source": source} for r in tomllib.loads(text).get(kind, [])]
+    texts = read_blobs_at(root, [("HEAD", p) for p in paths])
+    if not paths or any(texts[("HEAD", p)] is None for p in paths):
+        return schema_rel, source_rel, None, absent
+    if reader is None and paths == [source_rel]:
+        text = texts[("HEAD", source_rel)]
+        return schema_rel, source_rel, [{**r, "origin": kind, "source": source}
+                                        for r in tomllib.loads(text).get(kind, [])], None
+    try:
+        read = load_extractors([{"extractor": reader}], registry.parent)[reader] if reader else None
+        rows = []
+        for p in paths:
+            got = read(kind, p, texts[("HEAD", p)]) if read else tomllib.loads(texts[("HEAD", p)]).get(kind, [])
+            if got is None:
+                return schema_rel, source_rel, None, f"its namespace reader {reader} cannot read {p}"
+            rows += [{**r, "origin": kind, "source": p} for r in got]
+    except TagError as exc:
+        check_reds([f"{SAY}: red · kind {kind} · namespace reader {reader} · {exc}"])
+    return schema_rel, source_rel, rows, None
 
 
 def read_leg_names(root) -> dict:
@@ -413,11 +460,11 @@ def read_leg_names(root) -> dict:
 def derive_kind_composition(root, kind, exclude, records, extra=None):
     """What `derive_row_composition` returns for `kind` composed at HEAD under `root`, or None where the
     kind's schema file is absent from `root`, or HEAD is unborn or holds no blob at its namespace `source`
-    (TOOL-dDeclaredLoop-24 S3, section 8 F9). The overlay and the exclusions are read at HEAD as well.
+    (TOOL-dDeclaredLoop-24 S3, section 8 F9), or its namespace reader answers None (TOOL-dBoundRoles-81). The overlay and the exclusions are read at HEAD as well.
     `extra`, rows a placed scenario activates, joins after the overlay's own rows and meets every refusal
     an overlay row meets (TOOL-dDeclaredLoop-27 S6)."""
     from policy_value import read_tag_policy
-    _schema_rel, _source_rel, gov = read_kind_source(root, kind)
+    _schema_rel, _source_rel, gov, _why = read_kind_source(root, kind)
     if gov is None:
         return None
     schema = read_kind_schema(root, kind)
@@ -461,11 +508,9 @@ def run_compose(argv) -> int:
             print(f"{SAY}: unarmed · kind {kind} · {iu.derive_kit_file(root, 'kinds.toml').relative_to(root).as_posix()} "
                   f"lists no such kind with a `schema`")
             return 2
-        schema_rel, source_rel, gov = read_kind_source(root, kind)
+        _schema_rel, _source_rel, gov, why = read_kind_source(root, kind)
         if gov is None:
-            absent = not (root / schema_rel).is_file()
-            print(f"{SAY}: unarmed · kind {kind} · " + (f"{schema_rel}, its schema, is absent" if absent else
-                                                       f"HEAD holds no {source_rel}, its namespace source"))
+            print(f"{SAY}: unarmed · kind {kind} · {why}")
             return 2
         got = derive_kind_composition(root, kind, ov.read_excluded_tags(root) | excluded, iu.read_change_records(root),
                                       extra)

@@ -14,9 +14,12 @@ classified patch operation, each widening and the rows each row check read. `--e
 `instructions.exclude` in the tree's policy file; `--stale` is `instructions.stale`; `--policy` sets a
 tag-valued policy key's one member over what `read_tag_policy` read. Where an exclusion is set the leg
 manifest's names are read by `read_leg_names` and handed on (TOOL-dBoundRoles-83); the `exclude-leg-`
-plants commit a manifest of LEG_ROWS.
+plants commit a manifest of LEG_ROWS. The `front-matter-` plants (TOOL-dBoundRoles-81) register the `role`
+and `workflow` kinds instead, each namespace row naming the reader READER, and compose both at HEAD through
+`overlay_rows.derive_kind_composition`, so gov's rows are read from role files under a glob and from
+`[[workflow]]` entries by the roles kit's `check_roles.py --print-rows`.
 
-Exit 0 the composition held · 1 it was refused · 2 usage or a plant that could not be built.
+Exit 0 the composition held · 1 it was refused · 2 usage, a plant that could not be built, or a kind unarmed.
 """
 from __future__ import annotations
 
@@ -229,6 +232,61 @@ def build_rise_plant(top, reach, gov_reach=4, replace=False, schema=None):
     build_tree(top, gov=[GOV[0], beta, gamma], overlay="\n".join(over), schema=schema)
 
 
+FRONT_MATTER = "front-matter-"
+READER = "tag_index:read_roles_rows"
+FM_SOURCES = {"role": iu.derive_tool_rel(KIND, "agents", "*.agent.md"),
+              "workflow": iu.derive_tool_rel(KIND, "workflows.toml")}
+FM_FIELDS = {"role": (("name", "scalar"), ("tools", "set"), ("writes", "set")),
+             "workflow": (("name", "scalar"), ("driver", "scalar"), ("roles", "set"))}
+FM_ROLES = ("gov-alpha", "gov-beta")
+FM_FLOWS = "".join(f'[[workflow]]\nname = "{n}"\ndriver = "{d}"\nroles = {render_value(r)}\n\n'
+                   for n, d, r in (("triage", "agent", list(FM_ROLES)), ("sweep", "program", [])))
+TRIAGER = {"tag": f"role.{orows.ADOPTER}.triager", "name": "triager", "tools": ["Read"], "writes": ["product"]}
+
+
+def render_role_file(name, indent="") -> str:
+    """One role file's front matter for the `role` kind's reader, its `tools` key indented by `indent`."""
+    return (f"---\nname: {name}\n{indent}tools: Read, Grep\nwrites: product\ngates: lexicon naming predicates?\n"
+            f"never: a limit — a.js; another — b.js\nbudget: 4096\n---\n\nThe {name} role.\n")
+
+
+def build_front_matter_plant(top, roles=FM_ROLES, indent=""):
+    """TOOL-dBoundRoles-81: the `role` and `workflow` kinds registered with fixture schemas, their namespace
+    rows naming the reader READER, `role`'s source a glob; one role file per name of `roles`, the first
+    one's `tools` key indented by `indent`, a workflows file of two entries, and the overlay row TRIAGER."""
+    schema = {k: iu.derive_tool_rel(KIND, f"{k}-schema.toml") for k in FM_SOURCES}
+    more = {iu.derive_kit_file(".", "namespaces.toml").as_posix(): "".join(
+                f'[[namespace]]\nns = "{k}"\nowner = "{BUILD}"\nsource = "{s}"\nrows = "{READER}"\n\n'
+                for k, s in FM_SOURCES.items()),
+            iu.derive_kit_file(".", "kinds.toml").as_posix(): "".join(
+                f'[[kind]]\ntag = "kind.{k}"\nowner = "{BUILD}"\nschema = "{{prefix}}/{KIND}/{k}-schema.toml"\n\n'
+                for k in FM_SOURCES),
+            FM_SOURCES["workflow"]: FM_FLOWS}
+    for k, fields in FM_FIELDS.items():
+        more[schema[k]] = f'[kind]\nname = "{k}"\nowner-seat = 1\n' + "".join(
+            f'\n[[field]]\nname = "{n}"\nshape = "{s}"\n' for n, s in fields)
+    for i, name in enumerate(roles):
+        more[iu.derive_tool_rel(KIND, "agents", f"{name}.agent.md")] = render_role_file(name, indent if not i else "")
+    overlay = "[[role]]\n" + "".join(f"{k} = {render_value(v)}\n" for k, v in TRIAGER.items())
+    build_tree(top, overlay=overlay, more=more)
+
+
+def run_front_matter_plant(top, out) -> tuple[list, list, int]:
+    """TOOL-dBoundRoles-81: compose `role`, then `workflow`, at HEAD through `overlay_rows`, each gov row read
+    by its namespace reader: one `row` line per composed row, its `origin` and `source` shown; an unarmed
+    kind exits 2 naming why, a refusal 1."""
+    try:
+        for kind in FM_SOURCES:
+            got = orows.derive_kind_composition(top, kind, set(), iu.read_change_records(top))
+            if got is None:
+                why = orows.read_kind_source(top, kind)[3]
+                return out + [f"{SAY}: unarmed · kind {kind} · {why}", f"{SAY}: exit 2"], [], 2
+            out += [f"{SAY}: row {r['tag']} · {json.dumps(r, sort_keys=True, ensure_ascii=False)}" for r in got[0]]
+    except ov.OverlayRefused as exc:
+        return out + str(exc).splitlines() + [f"{SAY}: exit 1"], [], 1
+    return out + [f"{SAY}: exit 0"], [], 0
+
+
 def build_states_plant(top):
     delta, zeta = STATE_GOV[3], STATE_GOV[5]
     over = "\n".join([render_amend(), render_replace(),
@@ -331,6 +389,13 @@ PLANTS = {
                    lambda top, a: build_rise_plant(top, "wide")),
     "rises-unknown": (1, "refused: the schema's reach declares widens = \"falls\", no direction",
                       lambda top, a: build_rise_plant(top, 8, schema=render_schema(reach={"widens": "falls"}))),
+    "front-matter-rows": (0, "two role rows read through the glob and role.adopter.triager from the overlay, then "
+                             "two workflow rows, each gov row's origin its kind and source its file",
+                          lambda top, a: build_front_matter_plant(top)),
+    "front-matter-refused": (1, "refused, naming the role file whose tools key is indented and R2",
+                             lambda top, a: build_front_matter_plant(top, indent="  ")),
+    "front-matter-unarmed": (2, "unarmed, naming the glob no role file matches",
+                             lambda top, a: build_front_matter_plant(top, roles=())),
     "pin-reordered": (0, "no edge stale: gov's row reordered and re-wrapped keeps its pin", build_reordered_plant),
     "pin-no-at": (1, "refused, naming the edge with no pin",
                   lambda top, a: build_tree(top, overlay=render_amend().replace(f"@{derive_pin(GOV[0])}", ""))),
@@ -364,6 +429,8 @@ def run_plant(top, args) -> tuple[list, list, int]:
         want = 1
     out, err = [f"{SAY}: plant {args.plant} · stale {args.stale} · expects exit {want}: {what}"], []
     build(top, args)
+    if args.plant.startswith(FRONT_MATTER):
+        return run_front_matter_plant(top, out)
     try:
         schema = orows.read_kind_schema(top, KIND)
         gov = [{**r, "origin": KIND, "source": PACK} for r in
