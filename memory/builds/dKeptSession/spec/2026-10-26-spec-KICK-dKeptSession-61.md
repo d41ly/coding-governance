@@ -1,6 +1,6 @@
 # KICK-dKeptSession-61 — the session chain read over every row on the parent's refs, so a parent with two dependents is placed
 
-**Status:** DEFERRED · rev-8 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 27 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-9 · 2026-11-23 · node a · Tier-2 · base bfc0a4e4 · streams kickoff · order 27 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -18,6 +18,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md) | research | KICK-dKeptSession-50 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-53 KICK-dKeptSession-55 |
 | [2026-11-21-prompt-KICK-dKeptSession-61-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-61-precheck-brief.md) | research | KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-11-22-prompt-KICK-dKeptSession-61-1-spec-writer.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-61-1-spec-writer.md) | journal | — |
+| [2026-11-22-prompt-KICK-dKeptSession-61-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-61-reground-brief.md) | research | — |
+| [2026-11-23-prompt-KICK-dKeptSession-61-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-61-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-KICK-dKeptSession-57-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-57-spec-audit.md) | spec-audit | KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-57 KICK-dKeptSession-62 |
 
 <!-- /gen:spec-records -->
@@ -29,77 +31,98 @@ The spec audit of this build's twelve round-2 promotions
 confirmed finding **id 31 at HIGH**, report item **H4**, which no other id shares.
 
 `KICK-dKeptSession-53` S1 runs `derive_mail_chain` over one parent's rows of `read_mail_rows`' one
-read, and `KICK-dKeptSession-5` S6 filters that read to the rows addressed to the dependent. The
-`after` link the chain follows (`KICK-dKeptSession-27` S2) names the sender's newest message to any
-recipient. With two dependents, which dKeptSession itself has, a take-over's `seq` 1 `after` usually
-names the predecessor's row to the other dependent, absent from the filtered rows, so the
-predecessor's `confirmed` is never placed, stays open, and the guard refuses until
-`flow.wait-ceiling`: the stall unit 53 exists to remove. This unit gives the chain every row on the
-parent's refs, read through the one mail reader, and keeps the rows it acks the filtered ones. It
-repairs `KICK-dKeptSession-53` and builds one step after it (order 27).
+read, and that read is the dependent's mailbox: `read_mailbox` keeps only the rows whose `to`
+addresses the dependent (`tools/unattended/unattended.sh#read_mailbox`). The `after` link the chain
+follows names the newest tip of the sender's other session refs, whoever it was addressed to
+(`KICK-dKeptSession-27` S2). With two dependents, which dKeptSession itself has, a take-over's
+`seq` 1 `after` usually names the predecessor's row to the other dependent. That row is absent from
+the filtered rows, so the predecessor's `confirmed` is never placed and stays open. Under unit 55's
+all-or-nothing acks the move then acks nothing and the guard refuses until `flow.wait-ceiling`: the
+stall unit 53 exists to remove. This unit gives the chain every row on the parent's refs, read
+through the one mail reader, and keeps the rows it acks the dependent's own. It repairs
+`KICK-dKeptSession-53` and builds one step after it (order 27).
 
 ## 2. Scope (IN)
 
 - **S1** — id 31. The chain read, a selection of the one reader. `read_mailbox <who>
-  soft|strict|local [sent]` in `tools/unattended/unattended.sh` (`KICK-dKeptSession-5` S6, with
-  `KICK-dKeptSession-21` S2's `local` mode) gains `sent`: the same one `git log --first-parent
-  --source` and the same one `awk`, over the cached refs `refs/gov/remote/mail/<who>/*` alone and with
-  `check_mail_addressed` not applied, so it prints one row per message the build `<who>` wrote,
-  whoever it was addressed to. The row is the reader's own, every column and the collapse rule
-  unchanged. The verb is `--mail read <slug> --sent`, beside `--open` and `--ids`; under `--local` it
-  reads the cache the dependent's own read has just fetched, with no fetch. Under `--sent` the `<who>`
-  must pass `check_slug_shape`, the refs being one build's; a recipient form exits 2 before any
-  fetch. The verb's usage-header row gains `[--sent]`, which moves the `verb:unattended.sh:--mail`
-  row's fingerprint (`tools/govkit/docs_leg.py#read_verb_usage` reads its flags), so the `--mail`
-  paragraph unit 5 S14 writes into `help/loop.md` names `--sent` and carries the fingerprint
-  `python tools/govkit/docs_leg.py --fingerprints` prints, and `memory/guides/UNATTENDED-VERBS.md`
-  is re-rendered from the verbs guide. No `read_mail_chain` and no `--mail chain` is minted
-  (`KICK-dKeptSession-63` S11, §8 F1). Observed by AC1, AC3 and AC6.
+  soft|strict|local [sent]` (`KICK-dKeptSession-5` S6, with `KICK-dKeptSession-21` S2's `local`
+  mode) gains the selection `sent`. It runs the same one `git log --first-parent --source` over every
+  cached mail ref and the same `awk`, so each row's every column, its state and the collapse rule
+  are the reader's own. Only the last loop changes: under `sent` it keeps the rows whose `ref`,
+  column 9, lies under `refs/gov/mail/<who>/`, where `check_mail_addressed` keeps the rows addressed
+  to `<who>` otherwise. So it prints one row per message the build `<who>` wrote, whoever it was
+  addressed to. Under `sent` the `<who>` must pass `check_slug_shape`: a recipient form prints
+  `mail — not read · --sent reads one build's own mail refs, and '<who>' is no build's slug` and
+  returns 2, before the remote is read. The verb is `--mail read <slug> --sent`, beside `--open`,
+  `--ids` and unit 21's `--local`, with which it composes; `print_mailbox` passes the selection
+  after unit 21's mode. The arm's unknown-flag refusal names `--sent`, the `read` form refusal and
+  the usage-header row gain `[--sent]`, and `post`, `ack` and unit 21's `notice` refuse it by their
+  form refusals. No `read_mail_chain` and no `--mail chain` is minted (`KICK-dKeptSession-63` S11,
+  §8 F1). Observed by AC3, AC7 and AC8.
 - **S2** — id 31. The placement. `derive_mail_chain(rows, chain)` in `tools/loop/loop_transition.py`,
-  `chain` required and with no default, answers whether R precedes C by `KICK-dKeptSession-53` S1's
-  rule applied over `chain`. `write_consumed_acks(root, build, rows)` (`KICK-dKeptSession-42` S1) reads,
-  for each parent it judges, that parent's `chain` through `KICK-dKeptSession-5` S9's
-  `read_mail_rows(root, build)`, which gains the keyword `sent=False`: called with the parent and
-  `sent=True` it runs `--mail read <parent> --local --sent` under the same launcher, bound and
-  environment as the one read, the bash `resolve_bash` answers and the driver `resolve_kit_dir`
-  locates (`KICK-dKeptSession-36` S2); and it picks the rows it acks from `rows`, the dependent's
-  filtered read, as unit 53 S2 states. The chain read keeps unit 5 S9's refusals unchanged: a read
-  exiting non-zero with no row, or answering nothing within the bound, raises its `ValueError`, which
-  `record` prints after `loop: unanswered` and exits 2 on, never an empty chain that would leave every
-  row open and name `mail open` for the wrong reason. Every caller of `derive_mail_chain` passes
-  `chain`, unit 53's plants included; `read_mail_rows`' other callers, unit 5's guard and
-  `KICK-dKeptSession-7`'s notices, pass no keyword and read as before. Observed by AC1 and AC2.
-- **S3** — id 31. The sibling text superseded by name. `KICK-dKeptSession-53` S1's "over one parent's
-  rows of `read_mail_rows`' one read" reads as S2 here: the order is read over every row the parent
-  wrote, the ack set over the rows addressed to the dependent. Answered in this unit's own
-  acceptance ledger,
+  `chain` required and with no default, returns the `(earlier id, later id)` pairs among the ids of
+  `rows` that `KICK-dKeptSession-53` S1's rule, applied over the rows of `chain`, places. It stays
+  pure. `read_mail_rows(root, build)` gains the keyword `sent=False`, appending `--sent` to its argv
+  after unit 10's `--local` where true; its launch, bound, environment and refusals are unit 5 S9's.
+  `write_consumed_acks(root, build, rows)` (`KICK-dKeptSession-42` S1, as unit 55 S1 rewrites it)
+  reads a parent's chain only where `check_parent_interfaces` answers `rc` 0 naming an `open` row of
+  `rows`: `read_mail_rows(root, <parent>, local=True, sent=True)`, `--mail read <parent> --local
+  --sent`, the cache the guard's read has just fetched. It then runs `derive_mail_chain` over that
+  parent's rows of `rows` with that `chain`, so the rows it acks stay the dependent's own, as unit
+  53 S3 states. A chain read that raises its `ValueError`, or answers unarmed, takes unit 42 S2's
+  path for a call that raises: `mail — interfaces <parent> unread · <why>` on stderr and nothing
+  acknowledged from that parent. So `write_consumed_acks` still never raises (unit 42 S1), and the
+  guard then refuses naming the open rows, the cause on stderr. Every caller of
+  `derive_mail_chain` passes `chain`: unit 53's `acks-takeover` plant passes its read's rows as
+  both arguments, since one dependent's read there holds every row the parent wrote. Unit 5's guard,
+  unit 7's notices and unit 10's interrupts call `read_mail_rows` with no `sent` and read as before.
+  Observed by AC1 and AC2.
+- **S3** — id 31. The sibling texts superseded by name. `KICK-dKeptSession-53` S1's "over one
+  parent's rows of `read_mail_rows`' one read" reads as S2 here: the order is read over every row
+  the parent wrote, the ack set over the rows addressed to the dependent. `KICK-dKeptSession-55` S1's
+  "It makes no read of its own" reads as S2 too: the one read of the dependent's mailbox is kept,
+  and S2 adds one cache read per parent judged. Answered in this unit's own acceptance ledger,
   `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-61-1-acceptance-ledger.md`,
-  which quotes that passage of unit 53's spec and states S2 supersedes it. Unit 53 builds at order 26
-  and is CLOSED when this unit builds, so neither its spec nor its ledger is written (F2).
+  which quotes both passages and states S2 supersedes them. Units 53 and 55 build at order 26 and
+  are CLOSED when this unit builds, so neither spec nor ledger of theirs is written (F2).
   `KICK-dKeptSession-63` AC20 still reads this answer in unit 53's ledger; that unbuilt spec is
-  re-pointed by its own revision, not here. Observed by AC1 and AC4.
+  re-pointed by its own revision, not here. Observed by AC4.
 - **S4** — id 31. The plant `chain-two-dependents` of `python tools/loop/loop_transition.py --fixture
-  --plant <case>`, in `PLANTS` and run by `run_transition_fixture`: unit 53's scratch repository with a
-  second dependent, §6's fixture. Through `run_verb` it prints `loop: fixture · record · exit <rc>`
-  for `dA`'s and then `dB`'s `record`; then one `loop: fixture · mail <dependent> · <id> · <state>`
-  line per row of `--mail read dA` and `--mail read dB`, and `loop: fixture · sent <parent> · <n>
-  row(s) · <columns> column(s)` over `--mail read <parent> --local --sent`, the fewest columns any
-  row carries; and last its verdict, `loop: fixture · chain-two-dependents · held`, exit 0, or `MISSED
-  <why>`, exit 1, as `descope-spent` prints its own. `run_selftest`'s case table gains one row per
-  line AC1 and AC3 read. The plant is a branch of `run_transition_fixture`, and S1 and S2 add no
-  function, so no module-level symbol is added and `memory/map/generated/symbols.json` does not move.
-  It moves the `plants=<n>` token of the `loop transition record` row in
-  `tools/run-gates/selftest-budgets.txt`, re-priced as §4's budget row states. Observed by AC1 to AC3
-  and AC5.
+  --plant <case>`, in `PLANTS` and run by `run_transition_fixture`, §4 "The plant". It prints `loop:
+  fixture · record · exit <rc>` for `tFix`'s and then `tTwo`'s B4 through `run_verb`; one `loop:
+  fixture · chain tFix · <a1> precedes <a2> · sent <yes|no> · filtered <yes|no>` line; one `loop:
+  fixture · sent fy · <n> row(s) · seq and after on <k>` line, `<k>` the rows carrying neither as
+  `-`, and one `loop: fixture · state <id> · <state>` line per row of that read; one `loop: fixture · sent build:fy · refused · <why>` line;
+  and last its verdict, `loop: fixture · chain-two-dependents · held`, exit 0, or `MISSED <why>`,
+  exit 1, as `descope-spent` prints its own. `run_selftest`'s case table gains one row per line AC1
+  to AC3 read. `tools/loop/placement.py#write_fixture_gov_ref` gains `parent=None`, the commit's one
+  parent where given, and returns the commit's sha, so a plant lands a second message on a ref after
+  the first; its callers pass none and ignore the sha. The plant is a branch of
+  `run_transition_fixture` and S1 and S2 add no function, so `memory/map/generated/symbols.json`
+  does not move. It moves the `plants=<n>` token of the `loop transition record` row in
+  `tools/run-gates/selftest-budgets.txt`, re-priced as §4's budget row states. Observed by AC1 to
+  AC3 and AC5.
+- **S5** — The texts this unit makes false, each rewritten as §4 "The shipped texts" states. The
+  `--mail` entry of `tools/unattended/VERBS.template.md` names `--sent`, and
+  `memory/guides/UNATTENDED-VERBS.md`, the kit's placeholder-free `rendered` row, is its byte-equal
+  copy, copied whole. `help/loop.md` names `--sent` in its `--mail` paragraph, whose
+  `verb:unattended.sh:--mail` anchor is re-stamped with the fingerprint `python
+  tools/govkit/docs_leg.py --fingerprints` prints at build time, since `read_verb_usage` hashes the
+  flags of the usage-header row (`tools/govkit/docs_leg.py#read_verb_usage`). Its guard paragraph
+  gains one sentence, after unit 55's: "To order a parent's notices the move also reads every
+  message that parent wrote, with `--mail read <parent> --local --sent`, from the copy its first
+  read fetched." Its fixture-cases sentence names the plant. The loop kit's `README.md` and the
+  module docstring of `tools/loop/loop_transition.py` gain the same sentence in their mail-guard
+  paragraphs and name the plant where they list plants. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
-- What a row supersedes and when acks post: unit 53 S2 and `KICK-dKeptSession-55`, unchanged.
-- A second fetch. S1 under `local` reads the cache the dependent's read filled, so the chain and the ack
-  set come from one fetch.
+- What a row supersedes and when acks post: unit 53 S3 and `KICK-dKeptSession-55`, unchanged.
+- A second fetch. S2 reads the cache the guard's read filled, so the chain and the ack set come from
+  one fetch.
 - A second mode for a cache read: `KICK-dKeptSession-21` S2's `local` is that mode.
 - The report's left-shift checklist entry, that a per-recipient reader's fixture has two recipients.
-  No clause of this build names that checklist; AC1 is its arm here.
+  No clause of this build names that checklist; AC1 and AC7 are its arms here.
 
 ### Edges
 
@@ -112,28 +135,44 @@ repairs `KICK-dKeptSession-53` and builds one step after it (order 27).
 
 ### Evidence
 
-- spec-5 rev-9 S6: `read_mailbox <who> soft|strict` prints one row per message "whose `to` passes
-  `check_mail_addressed <to> <who>`", after one bounded fetch, one `git log --first-parent --source`
-  over every cached mail ref and one `awk`; S9's `read_mail_rows(root, build)` runs `--mail read
-  <build>`, and F9 makes that one read serve the guard and the disposal.
-- spec-21 rev-4 S2: `local`, a third mode that reads the cache with no fetch, selected by `--local` on
-  `--mail read`.
-- spec-27 rev-5 S2: `after` names "the newest message on any other cached ref under
-  `refs/gov/remote/mail/<slug>/`", whoever it was addressed to.
-- spec-35 posts one notice per dependent, so a parent with two dependents writes two rows per notice.
-- The row's columns, which the chain reads by position: 9 `ref`, 12 `seq`, 13 `after` (spec-5 rev-9,
-  spec-27 rev-5), beside 11 `reply` and 14 to 16 `content-key`, `deadline`, `default`.
-- The fixture's plants are `PLANTS` members of `tools/loop/loop_transition.py`, run by
-  `tools/loop/loop_transition.py#run_transition_fixture`; no mail code is in the tree at `c2a407b0`.
+Read at `bfc0a4e4` (2026-11-23), past units 22, 5, 31, 23, 36, 39, 51, 27 and 24's landings, with
+the specs of units 10, 25, 21, 6, 7, 35, 42, 8, 11, 43, 52, 53, 55 and 17 read as landed first.
+
+- `tools/unattended/unattended.sh#read_mailbox` takes `<who> soft|strict`, fetches every build's
+  mail refs once, runs one `git log` over every cached mail ref and one `awk`, and prints sixteen
+  TAB columns, `ref` 9, `seq` 12, `after` 13, `deadline` 15 (DERIVED: its last `printf`). Its last
+  loop keeps a row where `check_mail_addressed` passes column 3. Unit 21 S2 adds `local`, a cache
+  read with no fetch, and `--local` on `--mail read`.
+- `tools/unattended/unattended.sh#print_mailbox` calls `read_mailbox "$1" soft` and selects `--open`
+  and `--ids`; the `--mail` arm parses `--open` and `--ids` and refuses any other flag naming the
+  ten it takes. The header row reads `--mail read <who> [--open] [--ids]`.
+- `tools/loop/loop_transition.py#read_mail_rows` launches `--mail read <build>` and zips each row
+  with `MAIL_COLUMNS`, eleven names (DERIVED: the tuple). Unit 10 adds `local=False`, unit 53 S2
+  zips `MAIL_ORDER_COLUMNS` after them; a `mail — off` or absent conf answers `([], why)`, any other
+  non-zero read with no row raises `ValueError`.
+- spec-53 rev-8: `derive_mail_chain(rows)` returns the `(earlier id, later id)` pairs; S3 acks the
+  current row and every open interface row of the parent with its key or placed before it; its
+  `acks-takeover` plant prints a chain line over its read's rows and a `first-seen`-swapped copy.
+- spec-42 rev-5 S1: `write_consumed_acks` never raises; S2 calls `check_parent_interfaces(root,
+  build, parent)` once per parent and, on a call that raises, writes `mail — interfaces <parent>
+  unread · <line or why>` to stderr and acks nothing from that parent.
+- spec-55 rev-6 S1, S2: the writer computes every id it would consume before posting and posts only
+  when that is every open row, else none; S3 prints `mail — acked <kind> <id> from build:<parent>`.
+- `tools/loop/placement.py#write_fixture_gov_ref` pushes one parentless commit and returns nothing,
+  and git refuses a parentless commit pushed onto a ref that already holds one as a non-fast-forward,
+  so the helper cannot put a second message on a ref.
+- `tools/unattended/check-unattended.sh@e0df840ab6e8:5138`, check 26 of the kit gate: a flag the
+  driver parses that no non-comment line of `tools/unattended/unattended.test.sh` carries reds the
+  gate. `--sent` is on none at `bfc0a4e4` (DERIVED: `grep -c -- --sent` over the suite).
 
 ### The two-dependent case
 
 ```
-ref s1:  seq 1 confirmed K1 to dA (a1) · seq 2 confirmed K1 to dB (b1)
-ref s2:  seq 1 changed   K2 to dA (a2) after: b1 · seq 2 changed K2 to dB (b2)
-dA's filtered rows: a1, a2          -> b1 absent: a1 unplaced, stays open (unit 53)
-chain rows (S1):    a1, b1, a2, b2  -> a1 precedes b1 (s1, seq), b1 is a2's after -> a1 precedes a2
-dA acks a2 and a1; dB acks b2 and b1
+ref fy/z/s1:  seq 1 confirmed K1 to tFix (a1) · seq 2 confirmed K1 to tTwo (b1)
+ref fy/z/s2:  seq 1 changed   K2 to tFix (a2) after: b1 · seq 2 changed K2 to tTwo (b2)
+tFix's rows: a1, a2          -> b1 absent: a1 unplaced, stays open, nothing acked (units 53, 55)
+sent rows (S1): a1, b1, a2, b2 -> a1 precedes b1 (s1, seq), b1 is a2's after -> a1 precedes a2
+tFix acks a2 and a1; tTwo acks b2 and b1
 ```
 
 ### Inventory
@@ -142,57 +181,128 @@ dA acks a2 and a1; dB acks b2 and b1
 |---|---|---|
 | `sent` | selection of `read_mailbox`, `tools/unattended/unattended.sh` | none |
 | `--sent` | flag of `--mail read`, `tools/unattended/unattended.sh` | none |
+| `sent` | keyword of `read_mail_rows`, `tools/loop/loop_transition.py` | none |
+| `chain` | argument of `derive_mail_chain`, `tools/loop/loop_transition.py` | none |
+| `parent` | keyword of `write_fixture_gov_ref`, `tools/loop/placement.py` | none |
 | `chain-two-dependents` | `PLANTS` case of `loop_transition.py --fixture` | none |
+
+### The plant
+
+It extends unit 53's `acks-takeover` branch of `write_transition_plant`: the driver's conf with
+`RUN_CLAIMS` on, a bare remote inside the git dir, `fy`'s spec and lease, K2 the key over the
+listing at the lease's `witness` and K1 a key no listing derives, and the fleet user and session id
+set as unit 42's plants set them. A second build `tTwo` is staged as `FX_BUILD` is, its README and
+an INPROGRESS spec. The four messages of §4's case go from `fy` with the subject `interfaces fy`,
+each by `render_fixture_mail` with `content_key`, `seq` and `after`, `none` for every `after` but
+`a2`'s. `a1` and `a2` are each their ref's first commit; `b1` and `b2` are pushed by
+`write_fixture_gov_ref` with `parent` the sha it returned for `a1` and `a2`. Then `tFix`'s B4, and
+the same argv with `--build tTwo`, the plant's witness an ancestor of HEAD; the chain line, over
+`tFix`'s rows of one `read_mail_rows(top, "tFix")` and the rows of `read_mail_rows(top, "fy",
+sent=True)`, then over those `tFix` rows as both arguments; that sent read's lines, fetched so it
+holds every ack; and `read_mail_rows(top, "build:fy", sent=True)`, whose `ValueError` it prints.
 
 ### Migration
 
 None: no notice exists before `KICK-dKeptSession-7`.
 
+### The shipped texts
+
+Found by `git grep -n -E "mail read|read_mailbox|check_mail_addressed|derive_mail_chain|write_fixture_gov_ref"`
+over `tools`, `skills`, `help` and `memory/guides` at `bfc0a4e4`, with the specs of units 21, 42,
+53 and 55 for the texts they land.
+
+| Text | Verdict |
+|---|---|
+| `tools/unattended/unattended.sh`, the `--mail read` usage-header row | false by omission: S1 |
+| `tools/unattended/unattended.sh`, THE ONE MAILBOX READER comment and `read_mailbox`'s signature comment, one row per message whose `to` passes | false: S1 |
+| `tools/unattended/unattended.sh`, `print_mailbox`'s comment, and the arm's two refusals naming its flags | false by omission: S1 |
+| `tools/unattended/unattended.sh`, `check_lease_witness`'s and THE ONE CLAIM-LINE READER comments | stays |
+| `tools/unattended/VERBS.template.md`, `memory/guides/UNATTENDED-VERBS.md`, the `--mail` entry | false by omission: S5 |
+| `help/loop.md`, the `--mail` paragraph and its `verb:unattended.sh:--mail` anchor | false by omission: S5 |
+| `help/loop.md`, the guard paragraph, with units 42 and 55's sentences | false by omission: S5 |
+| `help/loop.md`, unit 42's table "Who acknowledges what", as unit 53 S4 writes it | stays |
+| `help/loop.md`, the loop kit's `README.md`, the module docstring: each sentence listing the plants | false by omission: S5 |
+| `tools/loop/loop_transition.py`, the docstrings of `read_mail_rows`, `derive_mail_chain` and `write_consumed_acks` | false: S2, each naming `sent`, `chain` and the chain read |
+| `tools/loop/loop_transition.py`, the comment above `MAIL_COLUMNS` (unit 53) | stays |
+| `tools/loop/placement.py#write_fixture_gov_ref`, its docstring | false: S4 |
+| `help/orientation-card.md`, `skills/session-kickoff/manifest-check.sh` and `tools/unattended/SKILL.template.md`, the `--open --ids` reads | stays |
+| `tools/policy/catalogue.toml`, the `mailbox.` and `deps.` rows | stays |
+
+The two driver comments that stay describe a caller of `read_mailbox <slug> soft` and the shared
+`read_kv` split, neither of which moves. Unit 42's table says a row is superseded by content key or
+by the session chain, which this unit widens in rows and keeps in rule. The comment above
+`MAIL_COLUMNS` names the zip, which S2 does not move. The card, the kickoff engine and the skill read
+`--open --ids`, never `--sent`. No catalogue row moves, so `.governance/policy.json` does not. The
+fixture sentence's `script:tools/loop/loop_transition.py` anchor fingerprints the `--fixture` and
+`--plant=` flags of `tools/govkit/usage.toml` alone (`tools/govkit/docs_leg.py#derive_usage_fingerprint`),
+so naming a plant re-stamps none. The loop and unattended kit versions are the lander's to mint.
+
+### The refusal ceiling
+
+The driver's refusal sites read `347/347` (DERIVED: `python tools/memory-tree/check-arms.py
+--report`'s `ceiling tools/unattended/unattended.sh` row at `bfc0a4e4`). S1 adds no `fail`, `exit 1`
+or `status=1` site: its refusal is an `echo` and `return 2` in `read_mailbox`, and the arm's refusals
+set `_rl_rc=2`, none of which `tools/memory-tree/check-arms.py` counts, so the ceiling is met
+unmoved. The suite arm sits in region eight of `tools/unattended/unattended.test.sh`, opened by `if
+in_shard 8; then` past a seam as the mail blocks there are. The effective `FLOOR_ASSERTIONS`, 4120,
+and `FLOOR_SHARD_8`, 1337, at `bfc0a4e4` (DERIVED: the last assignment of each) are raised first by
+the units ordered before this one, then each over its value at build time by the block's four
+`same` assertions (DERIVED: AC7 and AC8), each with its `RAISED` line. The `unattended driver
+selftest shard 8/8` row is not re-priced: it is an ESTIMATE by region share with no `plants=` token,
+left by units 5, 27 and 24's landed blocks. The block makes eight driver calls (DERIVED: AC7, AC8).
+
 ### The budget row
 
 `check_plant_tokens` holds the `plants=<n>` token of each loop-kit row equal to `len(PLANTS)` of the
-module its argv runs, once imported (`tools/run-gates/run-selftests.sh#check_plant_tokens`). The
-`loop transition record` row runs `loop_transition.py check --selftest`. Units ordered
-before this one add twenty-three plants, KICK-dKeptSession-5's two, -36's three, -24's one, -7's
-one, -35's two, -42's four, -11's five, -52's one, -53's two and -55's two. So S4 moves the token
-from 36 to 37 (DERIVED: `len(PLANTS)` read at 7df6a1dac, 13, plus those units' plants). The builder
-re-reads the count at the unit's base and sets the token one above it.
+module its argv runs, once imported, and refuses a note carrying two tokens
+(`tools/run-gates/run-selftests.sh#check_plant_tokens`). The `loop transition record` row runs
+`loop_transition.py check --selftest` and carries `plants=19` and a budget of 71 (DERIVED:
+`len(PLANTS)` and the row, read at `bfc0a4e4`). Units 7, 35, 42, 11, 52, 53 and 55 add one, two,
+four, five, one, two and two before this unit, so S4 moves the token from 36 to 37 (DERIVED: 19
+plus those plants). The builder re-reads the count at the unit's base and moves the one token in
+place, one above it.
 
 | Figure | `loop transition record` |
 |---|---|
-| proxy `r` at this tree, the row's note (PINNED 2026-11-21) | 33.4 s over 13 plants |
-| the earlier units' plants, estimates (PINNED 2026-11-22) | 18 times 9 s and 5 times 3 s |
-| this unit's plant, an estimate (PINNED 2026-11-22) | 9 s |
-| `r` after this unit (PINNED 2026-11-22, the sum) | 219.4 s |
-| budget, max of the row's value and 1.5 `r` | 330 |
-| the leg's ceiling in `tools/gate-legs.json` | 120, under the 210.4 s base |
+| `r` before this unit, as spec-55 rev-6 sums it (PINNED 2026-11-23) | 209.1 s |
+| S2's chain read in four landed plants, an estimate (PINNED 2026-11-23) | 4 times 2 s |
+| this unit's plant, an estimate (PINNED 2026-11-23) | 31 s |
+| `r` after this unit (PINNED 2026-11-23, the sum) | 248.1 s |
+| budget, max of the row's value at the base and 1.5 `r` (PINNED 2026-11-23) | 373 |
+| the leg's ceiling in `tools/gate-legs.json` (PINNED 2026-11-23) | 120, passed at step 25 |
 
-The 3 s plants (PINNED 2026-11-22) are unit 11's five `notify-*` plants, as unit 11's spec states.
-By these estimates the row's `r` passes the leg's 120 s ceiling at step 25 (PINNED 2026-11-22),
-before this unit, so the stop below holds against the ceiling the leg carries at the unit's base.
-
-The estimates are the `backward-rows` plant's 8.2 s, the module's slowest, rounded up, read alone
-by direct CLI on the run's node at 7df6a1dac, since each plant builds a scratch repository with a
-second build or a bare origin. The builder reads each new plant alone by direct CLI and appends
-`Then re-read by KICK-dKeptSession-61 as PINNED proxy r <s>` to the row's note, with the budget the
-row's value or 1.5 `r` rounded up, whichever is higher. The leg has no row in
-`tools/run-gates/ceiling-evidence.txt`, so no evidenced maximum moves. A declared ceiling is the
-owner's to move (`memory/guides/BUILD-METHOD.md`, M3): where the builder's reading takes `r` to the
-leg's ceiling, the unit stops before it lands and names the raise for the owner, and it never edits
+This unit adds 39 s to the leg (PINNED 2026-11-23, the estimates' sum). The estimates price 2 s a
+driver call and 1 s a scratch repository (PINNED 2026-11-23), unit 42's basis, from the row's note,
+where `mail-open`, one move and one read over a bare remote, reads 2.0 s (PINNED 2026-11-23). The
+four landed plants whose move reaches a current interface row, unit 42's `acks-confirmed` and
+`acks-superseded` and unit 53's two, each gain one chain read. The plant makes fifteen calls: per
+dependent the guard's read, the lease read and the check inside `check_parent_interfaces`, the
+chain read and two acks; then `tFix`'s read, the sent read and the refused read (DERIVED: §4 "The
+plant"). The builder reads each plant alone by direct CLI and appends `Then re-read by
+KICK-dKeptSession-61 as PINNED proxy r <s>` to the row's note, the budget the row's value or 1.5
+`r` rounded up, whichever is higher. The leg has no row in `tools/run-gates/ceiling-evidence.txt`,
+so no evidenced maximum moves.
+The ceiling is parked for the owner, since unit 42's pricing passes it, and is the owner's to move
+(`memory/guides/BUILD-METHOD.md`, M3): where the builder's reading takes `r` past the ceiling the
+leg carries at the unit's base, the unit stops before it lands, names the raise, and never edits
 `tools/gate-legs.json`.
 
 ### Files touched (estimate)
 
-- `tools/unattended/unattended.sh`: S1, the `sent` selection and `--sent`
-- `tools/loop/loop_transition.py`: S2 in `derive_mail_chain`, `write_consumed_acks` and
-  `read_mail_rows`, and S4's plant
+- `tools/unattended/unattended.sh`: S1, the `sent` selection, its refusal, `print_mailbox`'s pass,
+  the arm's flag and refusals, the usage-header row and the comments of §4 "The shipped texts"
+- `tools/unattended/unattended.test.sh`: the block of AC7 and AC8 in region eight, and the two
+  floors' `RAISED` lines
+- `tools/loop/loop_transition.py`: S2 in `derive_mail_chain`, `read_mail_rows` and
+  `write_consumed_acks`, unit 53's plant call, S4's plant and its `run_selftest` cases, and S5's
+  docstring sentences
+- `tools/loop/placement.py`: S4, `write_fixture_gov_ref`'s `parent` and its return
+- `tools/loop/README.md`: S5, the guard sentence and the plant
 - `tools/run-gates/selftest-budgets.txt`: S4, the `loop transition record` row's `plants=` token 36
-  to 37 and its note's re-read (DERIVED: `len(PLANTS)` at the unit's base), the token moved in
-  place: the check refuses a note carrying two `plants=` tokens
-- `tools/unattended/VERBS.template.md`: the `--mail` section's `--sent` flag
-- `memory/guides/UNATTENDED-VERBS.md`: its render
-- `help/loop.md`: the `--mail` paragraph names `--sent`, its `verb:unattended.sh:--mail` anchor
-  re-stamped with the fingerprint the new flag moves
+  to 37 and its note's re-read (DERIVED: `len(PLANTS)` at the unit's base), the token moved in place
+- `tools/unattended/VERBS.template.md`, `memory/guides/UNATTENDED-VERBS.md`: S5, the entry and its copy
+- `help/loop.md`: S5, the `--mail` paragraph and its re-stamped anchor, the guard sentence and the
+  fixture-cases sentence
 - `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-61-1-acceptance-ledger.md`:
   S3's answer beside the criteria observed
 
@@ -205,67 +315,92 @@ leg's ceiling, the unit stops before it lands and names the raise for the owner,
   wrote to it last.
 - **A separate `read_mail_chain` and `--mail chain`**, as rev-4 wrote. A second walk of the same refs,
   which `KICK-dKeptSession-63` S11 rules is never minted and `KICK-dKeptSession-64` S5 would remove.
+- **`sent` walking only `refs/gov/remote/mail/<who>/`.** The acks sit on the dependents' refs, so
+  every row would read `open` and the row would no longer be the reader's own.
+- **The chain read's `ValueError` raised out of `write_consumed_acks`**, as rev-8 wrote. Unit 42 S1
+  makes the writer never raise and S2 names the path a raising call takes, which keeps the refusal
+  and names its cause.
 
 ## 5. Production-readiness checklist
 
-- security — none: one more read of refs the node already fetched; nothing is written.
-- perf / scale — one `git log` and one `awk` over one build's refs per parent judged, no fetch.
+- security — none: one more read of refs the node already fetched; nothing new is written.
+- perf / scale — one `git log` and one `awk` per parent judged, no fetch.
 - error / empty / loading states — an empty cache prints no row, so the chain places nothing and the
-  guard names the open row, failing closed as unit 53 §5 states.
+  guard names the open row, failing closed as unit 53 §5 states; a refused chain read is named on
+  stderr.
 - observability — `--mail read <parent> --local --sent` prints the rows the placement read.
 - risks — a cache older than the dependent's fetch cannot occur, since S2 reads the chain after that
   fetch in the same transition.
-- testing — the criteria of §6 and the arm in §7.
+- testing — the criteria of §6 and the arms in §7.
 - migration — none.
-- user docs — the `--mail` section of `tools/unattended/VERBS.template.md` (unit 5's), rendered to
-  `memory/guides/UNATTENDED-VERBS.md`, and the `--mail` paragraph of `help/loop.md` name `--sent`
-  beside `--open`, `--ids` and `--local`.
+- user docs — the `--mail` entry of `tools/unattended/VERBS.template.md` and its copy, and the
+  `--mail` and guard paragraphs of `help/loop.md`, name `--sent` (S5).
 
 ## 6. Acceptance criteria
 
-The fixture is S4's plant: `KICK-dKeptSession-53`'s scratch repository under `%TEMP%`, with two
-dependents `dA` and `dB`; session `s1` posts `confirmed` K1 to `dA` then `dB`, and a take-over session
-`s2` posts `changed` K2 to `dA` then `dB`.
+The loop fixture is S4's plant, §4 "The plant": dependents `tFix` and `tTwo`, session `s1` posting
+`confirmed` K1 to each and the take-over `s2` posting `changed` K2 to each.
 
-- **AC1** — When `python tools/loop/loop_transition.py --fixture --plant chain-two-dependents` has `dA`
-  and then `dB` each run one `record`, it prints `loop: fixture · record · exit 0` twice, four `loop:
-  fixture · mail <dependent> · <id> · acked` lines, two per dependent, and `loop: fixture ·
-  chain-two-dependents · held`, and exits 0.
-  Red when: a copy chaining only over the filtered rows leaves `s1`'s `confirmed` to `dA` open, so
-  `dA`'s `record` exits 1 printing `refused — dA · mail open <id>` and the plant prints `MISSED`.
-- **AC2** — When a probe calls `derive_mail_chain` with `dA`'s filtered rows and the parent's sent
-  rows, it answers that `s1`'s row to `dA` precedes `s2`'s; with the sent rows replaced by the
-  filtered rows it answers that it cannot place it.
-  Red when: the two calls answer alike, so the chain read added nothing.
-- **AC3** — When the plant runs `bash unattended.sh --mail read <parent> --local --sent` in its
-  scratch repository, it prints `loop: fixture · sent <parent> · 4 row(s) · <c> column(s)`, `<c>` at
-  least 13, so each row carries `seq` and `after` in columns 12 and 13.
-  Red when: a row addressed to the other dependent is missing, as the filtered read's two rows show.
+- **AC1** — When `python tools/loop/loop_transition.py --fixture --plant chain-two-dependents` runs,
+  it prints `loop: fixture · record · exit 0` twice, `loop: fixture · state <id> · acked` for each
+  of the four rows of its sent read, and `loop: fixture · chain-two-dependents · held`, and exits 0.
+  Red when: a copy of `derive_mail_chain` reading `rows` in place of `chain` leaves `a1` unplaced, so
+  `tFix`'s record acks nothing, prints `refused — tFix · mail open` naming `a1` and `a2` and exits
+  1, and the plant prints `MISSED`.
+- **AC2** — When the same plant prints its chain line, it reads `<a1> precedes <a2> · sent yes ·
+  filtered no`.
+  Red when: the two calls answer alike, as that copy prints `sent no`, so the chain read added
+  nothing.
+- **AC3** — When the same plant reads `fy`'s sent rows, it prints `loop: fixture · sent fy · 4
+  row(s) · seq and after on 4`, and `loop: fixture · sent build:fy · refused · ` naming `exited 2`
+  and `is no build's slug`.
+  Red when: the sent read keeps the address filter, as a scratch `unattended.sh` doing so prints
+  `0 row(s)`, no message being addressed to `build:fy`.
 - **AC4** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c "over one
-  parent's rows of"` prints `1`; and `git diff --name-only <pass base> HEAD --` over unit 53's spec
-  and its acceptance ledger prints nothing.
-  Red when: S3's answer lands in a record of unit 53, or this unit's ledger does not quote the
+  parent's rows of"` prints `1`, and into `grep -c "It makes no read of its own"` prints `1`; and
+  `git diff --name-only <pass base> HEAD --` over the specs of units 53 and 55 and their acceptance
+  ledgers prints nothing.
+  Red when: S3's answer lands in a record of unit 53 or 55, or this unit's ledger does not quote a
   passage it supersedes.
 - **AC5** — When, at the unit's commit,
   `python -I -c "import sys; sys.path.insert(0, 'tools/loop'); import loop_transition as m; print(len(m.PLANTS))"`
   runs, it prints the number that
   `grep -oP '^loop transition record\t.*\Kplants=\d+' tools/run-gates/selftest-budgets.txt`
   prints after `plants=`, and `chain-two-dependents` is among the keys of `PLANTS`.
-  Red when: the row still carries the count from before this unit's plants.
-  figure: PINNED 2026-11-22 at `7df6a1dac`, the probe prints `13` and the grep `plants=13`, before
-  the units ordered ahead of this one land.
+  Red when: the row still carries the count from before this unit's plant.
+  figure: PINNED 2026-11-23 at `bfc0a4e4`, the probe prints `19` and the grep `plants=19`, before
+  units 7, 35, 42, 11, 52, 53 and 55 take both to 36 (DERIVED: their plants).
 - **AC6** — When `python tools/govkit/docs_leg.py --fingerprints` runs at the unit's commit, the
   fingerprint its `verb:unattended.sh:--mail` row prints is the one `grep -o 'usage:
-  verb:unattended.sh:--mail [0-9a-f]*' help/loop.md` prints, and `grep -c -- '--sent' help/loop.md`
-  prints at least 1.
+  verb:unattended.sh:--mail [0-9a-f]*' help/loop.md` prints; `grep -c -- '--sent' help/loop.md
+  tools/unattended/VERBS.template.md tools/loop/README.md` prints at least 1 for each;
+  `chain-two-dependents` is in `help/loop.md`; and `cmp tools/unattended/VERBS.template.md
+  memory/guides/UNATTENDED-VERBS.md` prints nothing.
   Red when: the usage row gains `--sent` and the page's anchor keeps the fingerprint from before it,
   which the `docs` leg reads as stale.
+  figure: PINNED 2026-11-23 at `bfc0a4e4`, the row prints `9ed486eb`, before unit 21 re-stamps it.
+- **AC7** — When the suite's block has build `fx`'s session `s1` post to `build:fy` then to
+  `build:fz`, and `s2` do the same, `--mail read fy` on that clone prints two rows, and `--mail read
+  fx --local --sent` then prints the four posts' ids, column 13 of `s2`'s first naming `s1`'s post to
+  `build:fz`, a row `--mail read fy` does not print.
+  Red when: a scratch `unattended.sh` whose `read_mailbox` keeps the address filter under `sent`
+  prints no row, no post being addressed to `build:fx`.
+- **AC8** — When the block runs `--mail read build:fx --sent`, it exits 2 printing `mail — not read
+  · --sent reads one build's own mail refs, and 'build:fx' is no build's slug`; and `--mail ack fx
+  <id> --sent` exits 2 printing the ack's form refusal.
+  Red when: a recipient form reads a mailbox under `--sent`, or `ack` passes the flag.
 
 ## 7. Gates
 
-`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `loop transition record` · `every held leg is budgeted, every budget row resolves` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `loop transition record` · `loop placement fixtures` · `loop claim fixtures` · `kit epoch (shipped bytes move, the version moves)` · `every held leg is budgeted, every budget row resolves` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 · the two-dependent take-over plant, staged red by a copy of `derive_mail_chain` reading only the dependent's filtered rows · the `loop transition record` row's `plants=<n>` token rises by one
+New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 · the two-dependent take-over plant, staged red by a copy of `derive_mail_chain` reading `rows` in place of `chain` and one of `read_mailbox` keeping the address filter under `sent` · the `loop transition record` row's `plants=<n>` token rises by one
+New arm: tools/unattended/unattended.test.sh · covers AC7 AC8 · one build's two sessions posting to two dependents, read sent and cached, and two refused forms, staged red by a scratch `unattended.sh` whose `read_mailbox` keeps the address filter under `sent` · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8` rise by four
+
+`loop placement fixtures` and `loop claim fixtures` run the plants that call
+`write_fixture_gov_ref` with no `parent`. Check 26 of `unattended kit gate` reads `--sent` on the
+suite's block. The arms do not check two parents writing to one dependent, a chain read whose cache
+lags a fetch, or a `--sent` read of a build with no mail ref, which prints no row.
 
 ## 8. Open questions
 
@@ -315,7 +450,6 @@ New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 · the two-dependen
   `check_plant_tokens` grades, so S4 and AC5 observe it, `tools/run-gates/selftest-budgets.txt` joins
   Files touched, §4 states the row's re-price over the earlier units' plants and the stop at the
   leg's ceiling, and §7 names the budget leg.
-
 - rev-8 · 2026-11-22 · S1 · S2 · S4 · §4 Files touched · §5 · AC1 · AC3 · AC6 · checked for
   behaviour by `2026-11-21-prompt-KICK-dKeptSession-61-precheck-brief`: `--sent` moves the
   `--mail` verb's fingerprint, so `help/loop.md`'s anchor and the verbs guide's render join Files
@@ -323,18 +457,31 @@ New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 · the two-dependen
   S9's refusals for the chain read; the plant's lines, verdict and exit spelled as the fixture prints
   them, so AC1 and AC3 read what the plant prints in its scratch repository; `symbols.json` stated
   unmoved; the `plants=` token moved in place.
+- rev-9 · 2026-11-23 · §1 · S1 to S5 · §3 · §4 · §5 · AC1 to AC8 · §7 · §10 · re-grounded at
+  `bfc0a4e4` under `2026-11-22-prompt-KICK-dKeptSession-61-reground-brief`, with units 10 to 55 and
+  17 read as landed: S1's `sent` keeps the one `git log` over every cached ref and selects by the
+  `ref` column, so each row's state is the reader's own; S2 states `derive_mail_chain(rows, chain)`'s
+  pairs, the chain read only for a parent with a current row, and its refusal on unit 42 S2's
+  stderr path in place of rev-8's raise, which unit 42 S1 rules out; S3 also supersedes unit 55
+  S1's "no read of its own"; S4's plant names `tTwo`, prints the sent read's states, and lands two
+  messages per ref through `write_fixture_gov_ref`'s new `parent`; S5 lists the texts made false,
+  §4 their verdicts; the suite arm AC7 and AC8, which check 26 of the kit gate owes `--sent`, with
+  its two floors; the refusal ceiling met unmoved; the budget re-priced over 19 landed plants,
+  adding 39 s (PINNED 2026-11-23, an estimate); §7 gains the two fixture legs and `kit epoch`.
 
 ## 10. Reuse audit
 
 The seam extended is the one mail reader, `read_mailbox`'s one `git log` and one `awk`
 (`KICK-dKeptSession-5` S6), given a selection rather than a second walk, read under
 `KICK-dKeptSession-21` S2's `local` mode rather than a second cache mode; the Python side reuses
-`read_mail_rows`' one launch (`KICK-dKeptSession-5` S9) and unit 53's `derive_mail_chain`, given a wider
-row set rather than a new rule; the plant joins the landed fixture
-`tools/loop/loop_transition.py#run_transition_fixture`. `python tools/codebase-map/reuse_lookup.py
-"order mailbox rows across every session ref of one build"` ranked `rows`, `row`, `build` and
-`build_records` by name stem only; no mail code is in the tree at `c2a407b0`, so no existing seam in
-the tree fits and the sibling specs are the seams.
+`read_mail_rows`' one launch (`KICK-dKeptSession-5` S9) and unit 53's `derive_mail_chain`, given a
+wider row set rather than a new rule; the plant joins the landed fixture
+`tools/loop/loop_transition.py#run_transition_fixture` and extends unit 53's branch, and its second
+message per ref extends `tools/loop/placement.py#write_fixture_gov_ref` rather than copying its
+three git calls. `python tools/codebase-map/reuse_lookup.py "read every message one build sent
+across its mail refs"` and `"push a fixture commit onto a ref after a parent commit"` ranked
+`read_text`, `read`, `fixture` and `run_fixture_git` by name stem only; no existing seam in the tree
+selects a mailbox by sender, so the one reader and the sibling specs are the seams.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a promoted unit placed when it
 repairs an earlier unit's pass" --terms "promoted order pass commit ledger superseded batch minors
