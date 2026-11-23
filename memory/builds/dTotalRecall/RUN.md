@@ -9,10 +9,18 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at 9024276e
+resume-owed: none · owner
+held-at: 2026-11-23T20:53:03Z
+hold-reason: the owner moves the run to node a (2026-11-23); resume there from memory/builds/dTotalRecall/prompts/2026-11-23-prompt-TOOL-dTotalRecall-58-node-a-resume-session.md
+hold-until: owner
+hold-code: host-owner-action
+held-from: RUNNING
 refreshed-at: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
-phase: RUNNING
+witness: 9024276e335603927483bb4f978c986e7b258b89
+phase: HELD
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dtotalrecall-ae256e
@@ -499,3 +507,5 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T20:35:21Z draw · re-dispatch · TOOL-dTotalRecall-57 · 70/186 · 20261123T203521Z-38e3db
 
 2026-11-23T20:35:21Z dispatch · item c736ff00 TOOL-dTotalRecall-57 · reason tools/memory-tree/check-memory-hygiene.test.sh
+
+2026-11-23T20:53:05Z hold · item host-owner-action · reason until owner · reaped 5a8cd3c4 · resume none(owner)
