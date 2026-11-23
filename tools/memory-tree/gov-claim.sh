@@ -41,7 +41,7 @@
 # takes over the same namespace: `refuse` exits 2, `warn` and `follow-leases` exit 4.
 #
 # WHAT THIS DOES NOT CHECK: an id a build's run minted on a branch no remote holds yet, which the floor
-# cannot see; a replay older than the 64 first-parent commits it reads; and whether the remote's
+# cannot see; a replay on a history the cache ref's first parents do not reach; and whether the remote's
 # default branch is the one the caller lands on, which the remote ladder answers.
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -966,7 +966,8 @@ check_claim_args() { # argv -> 0 with GC_VERB GC_FAMILY GC_SLUG GC_KEY GC_OFFLIN
   return 0
 }
 
-# A replay is read from the cache ref's first-parent history, newest first and at most 64 commits:
+# A replay is read from the cache ref's WHOLE first-parent history in one `git log` spawn, newest first
+# (TOOL-dTotalRecall-43 S59: a bounded window let a claimant's replay past it mint a second id):
 # GC_HIT is the newest commit carrying `claimant-key: <key>` and GC_SEQ its `seq`, GC_HOLDER the oldest
 # claimant key read, the claim's own on a slug ref, and GC_TIP_SEQ the tip's `seq`. The log goes to a
 # FILE and the loop reads the file, never a here-string of a command substitution.
@@ -975,7 +976,7 @@ read_claim_replay() { # cache ref · key -> 0 with GC_HIT and GC_SEQ where the k
   local f line sha="" k="" s="" n=0
   GC_HIT=""; GC_SEQ=""; GC_HOLDER=""; GC_TIP_SEQ=""
   f=$(mktemp) || return 1
-  git log --first-parent -n 64 --format='%x01%H%n%B' "$1" -- >"$f" 2>/dev/null || { rm -f "$f"; return 1; }
+  git log --first-parent --format='%x01%H%n%B' "$1" -- >"$f" 2>/dev/null || { rm -f "$f"; return 1; }
   while IFS= read -r line || [ -n "$line" ]; do
     line=${line%$'\r'}
     case "$line" in

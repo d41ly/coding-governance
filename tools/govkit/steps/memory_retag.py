@@ -6,7 +6,8 @@
 
 Its row is the memory-tree descriptor's `[[upgrade]]`. A record's untagged `##` heading is read under
 an anchor derived from its text (TOOL-dTotalRecall-10, -19); the retag writes that anchor into the
-record as the heading's authored tag, `## [<anchor>] <heading>`, and only where the adopter's own
+record as the heading's authored tag, `## [section.<anchor>] <heading>` (TOOL-dTotalRecall-43 S6), the
+grammar `record_extract.py`'s section extractor and `record_causes.py` read, and only where the adopter's own
 committed `memory.legacy-anchors` is `retag`.
 
 THE KEY. Each verb first reads the target's `memory.legacy-anchors` through govkit's
@@ -28,7 +29,7 @@ heading remains, so an adopter that sets `retag` after the walk applied the step
 `update`.
 
 THE CONSERVATION (S6), before the write and again after it: each rewritten record equals its earlier
-bytes once every inserted `[<anchor>] ` is cut, every heading planned is then tagged, and no other
+bytes once every inserted `[section.<anchor>] ` is cut, every heading planned is then tagged, and no other
 byte moves. A breach before the write exits 1 writing nothing; one after it exits 1 naming the file,
 the before-image kept for `down`.
 
@@ -48,6 +49,8 @@ from memory_journal_alias import run_index_mode  # noqa: E402  the steps' one re
 
 STEP_ID = "memory-tree/legacy-anchors-retag"
 KEY = "memory.legacy-anchors"
+#: the namespace an authored section tag carries, `[section.<anchor>]` (TOOL-dTotalRecall-9 S1)
+SECTION = "section."
 VERBS = ("plan", "up", "down", "witness")
 
 
@@ -79,26 +82,26 @@ def read_heading_anchors(target: pathlib.Path, rel: str) -> list[tuple[int, str]
 
 
 def derive_retag(text: str, tags: list[tuple[int, str]]) -> str:
-    """`text` with `[<anchor>] ` inserted after the `## ` of each planned line, numbered as the anchors
+    """`text` with `[section.<anchor>] ` inserted after the `## ` of each planned line, numbered as the anchors
     verb numbers them, through `str.splitlines`, every other character kept."""
     lines = text.splitlines(keepends=True)
     for n, anchor in tags:
-        lines[n - 1] = lines[n - 1][:3] + f"[{anchor}] " + lines[n - 1][3:]
+        lines[n - 1] = lines[n - 1][:3] + f"[{SECTION}{anchor}] " + lines[n - 1][3:]
     return "".join(lines)
 
 
 def check_conservation(before: str, after: str, tags: list[tuple[int, str]]) -> list[str]:
-    """S6 over one record: each planned line of `after` holds its `## [<anchor>] ` at the heading's
+    """S6 over one record: each planned line of `after` holds its `## [section.<anchor>] ` at the heading's
     start, and cutting every inserted tag gives `before` back, no other character moved. One line per
     breach."""
     lines = after.splitlines(keepends=True)
     bad = []
     for n, anchor in tags:
         line = lines[n - 1] if n - 1 < len(lines) else ""
-        if not line.startswith(f"## [{anchor}] "):
-            bad.append(f"line {n} does not carry [{anchor}]")
+        if not line.startswith(f"## [{SECTION}{anchor}] "):
+            bad.append(f"line {n} does not carry [{SECTION}{anchor}]")
         else:
-            lines[n - 1] = line[:3] + line[3 + len(anchor) + 3:]
+            lines[n - 1] = line[:3] + line[3 + len(SECTION) + len(anchor) + 3:]
     if "".join(lines) != before:
         bad.append("its bytes with every inserted tag cut differ from its earlier bytes")
     return bad
@@ -123,7 +126,7 @@ def print_plan(plan: dict) -> None:
     for rel, (_data, text, _after, tags) in plan.items():
         lines = text.splitlines()
         for n, anchor in tags:
-            print(f"{STEP_ID}: plan · {rel}:{n} · ## [{anchor}] {lines[n - 1][3:].strip()}")
+            print(f"{STEP_ID}: plan · {rel}:{n} · ## [{SECTION}{anchor}] {lines[n - 1][3:].strip()}")
     print(f"{STEP_ID}: plan · {sum(len(v[3]) for v in plan.values())} heading(s) in {len(plan)} record(s)")
 
 

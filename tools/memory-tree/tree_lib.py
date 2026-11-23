@@ -18,7 +18,6 @@ The module name follows the codebase-map kit's `map_lib.py` and the runlog kit's
 """
 from __future__ import annotations
 
-import hashlib
 import itertools
 import json
 import os
@@ -223,9 +222,10 @@ def derive_constant_charges(tree, module, is_needle) -> list:
 
 
 def read_policy_value(key, root):
-    """`key` at `root`'s landed revision, through the policy kit's `policy.py get`, found beside this
-    kit since a kit imports no sibling. LookupError where no policy kit resolves; ValueError, the
-    reader's last line in it, where the reader refuses. The kit's one policy read
+    """`key` at `root`'s landed revision, through the policy kit's `policy.py get`, run as a process and
+    found beside this kit by the inline resolver: memory-tree's `requires` is empty, so the policy kit may
+    be absent, and that is a LookupError its caller degrades on (TOOL-dTotalRecall-43 S50); ValueError,
+    the reader's last line in it, where the reader refuses. The kit's one policy read
     (TOOL-aNimbleMend-8 S7): each caller passes the key as a literal first argument."""
     import sys
     from backlog import resolve_kit_dir   # noqa: E402  the kit's inline copy of the sibling resolver
@@ -953,7 +953,8 @@ def load_leg_module(mod_name):
 
 def load_leg_reader(name, root) -> tuple:
     """`(reader, arg, version)` for the `LEG_READERS` row `name` at `root`: the version is
-    `derive_leg_version`'s, the closure's bytes hashed once per process and the params' key after them."""
+    `derive_leg_version`'s, `import_walk.derive_closure_version` over the module's closure keyed by the
+    params' key, once per process per key."""
     spelled, params = LEG_READERS[name]
     mod_name, _, fn_name = spelled.partition(":")
     fn = getattr(load_leg_module(mod_name), fn_name)
@@ -962,20 +963,16 @@ def load_leg_reader(name, root) -> tuple:
         p_mod, _, p_fn = params.partition(":")
         key, arg = getattr(load_leg_module(p_mod), p_fn)(root)
     src = os.path.join(os.path.dirname(os.path.abspath(__file__)), mod_name + ".py")
-    if src not in _LEG_CLOSURES:
-        import import_walk  # noqa: E402  this kit's closure rule, the tag index's version rule
-        digest = hashlib.sha256()
-        for path in import_walk.derive_module_closure(src, [os.path.dirname(src)]):
-            digest.update(pathlib.Path(path).read_bytes())
-        _LEG_CLOSURES[src] = digest
-    digest = _LEG_CLOSURES[src].copy()
-    digest.update(key.encode("utf-8"))
-    return fn, arg, digest.hexdigest()[:12]
+    if (src, key) not in _LEG_CLOSURES:
+        import import_walk  # noqa: E402  the one closure-version rule, the tag index's (TOOL-dTotalRecall-43 S21)
+        _LEG_CLOSURES[(src, key)] = import_walk.derive_closure_version([src], [os.path.dirname(src)], key)
+    return fn, arg, _LEG_CLOSURES[(src, key)]
 
 
 def derive_leg_version(name, root) -> str:
     """The reader's version, DERIVED (S2): the first 12 hex of the SHA-256 over the bytes of every module
-    of its module's closure under `import_walk.derive_module_closure`, in path order, then its params' key."""
+    of its module's closure under `import_walk.derive_module_closure`, in path order, then its params' key:
+    `import_walk.derive_closure_version`, the one rule (TOOL-dTotalRecall-43 S21)."""
     return load_leg_reader(name, root)[2]
 
 

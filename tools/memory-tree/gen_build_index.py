@@ -486,6 +486,7 @@ def parse_front_matter(path: str, slug: str) -> dict:
         return "\n".join(lines[: (upto if upto is not None else min(len(lines), 40))])
 
     fm: dict = {}
+    at: dict = {}
     end = None
     for i, line in enumerate(lines[1:], start=1):
         if line.strip() == "---":
@@ -503,11 +504,17 @@ def parse_front_matter(path: str, slug: str) -> dict:
             raise StaleHeader(path, _extract_region(i + 1), f"line {i + 1}: not 'key: value'")
         k, _, v = line.partition(":")
         # TOOL-dTotalRecall-4 S2 — A KEY THE SCHEMA DOES NOT NAME IS REFUSED, so a misspelled
-        # `parent:` is a named error rather than a value nobody reads.
-        if k.strip() not in FRONT_MATTER_KEYS:
+        # `parent:` is a named error rather than a value nobody reads; graded by the one grader
+        # `collect` and the findings mode read too (TOOL-dTotalRecall-43 S20).
+        if check_front_matter(k.strip(), path, None) == "unknown":
             raise StaleHeader(path, _extract_region(i + 1),
                               f"line {i + 1}: key '{k.strip()}' is not a front-matter key; the declared "
                               f"set is {' '.join(FRONT_MATTER_KEYS)}")
+        # TOOL-dTotalRecall-43 S40 — a key given twice is refused, never the last value silently winning.
+        if k.strip() in at:
+            raise StaleHeader(path, _extract_region(i + 1),
+                              f"line {i + 1}: key '{k.strip()}' is given twice, at lines {at[k.strip()]} and {i + 1}")
+        at[k.strip()] = i + 1
         fm[k.strip()] = v.strip()
     if end is None:
         raise StaleHeader(path, _extract_region(), "front matter opened at line 1 but never closed with '---'")
@@ -523,6 +530,20 @@ def parse_front_matter(path: str, slug: str) -> dict:
         if refusal:
             raise StaleHeader(path, _extract_region(end + 1), refusal)
     return fm
+
+
+def check_front_matter(key: str, readme: str, legacy) -> str:
+    """The one grader of a front-matter KEY (TOOL-dTotalRecall-43 S20): `unknown` for a key
+    `FRONT_MATTER_KEYS` does not name, `derived` for a key of `DERIVED_KEYS` on a README outside the
+    legacy population `legacy` (`read_typed_derived_paths`' set), else "". `legacy` None is that
+    population unarmed, where every typed derived key is read and none is refused. Called by
+    `parse_front_matter`, `collect` and `cmd_print_front_matter_findings`, so the legacy exception
+    holds identically in all three."""
+    if key not in FRONT_MATTER_KEYS:
+        return "unknown"
+    if key in DERIVED_KEYS and legacy is not None and readme not in legacy:
+        return "derived"
+    return ""
 
 
 def check_front_matter_value(key: str, value: str, conf: dict | None, grammar, root=None) -> str:
@@ -1544,8 +1565,8 @@ def collect(root: str, conf: dict, backlog_out: dict | None = None) -> list:
             if refusal:
                 raise Problem(f"{readme}: {refusal}")
         # S4 — a typed derived key is read on the legacy population and refused on any README after it.
-        typed = [k for k in DERIVED_KEYS if k in fm]
-        if typed and legacy is not None and readme not in legacy:
+        typed = [k for k in DERIVED_KEYS if k in fm and check_front_matter(k, readme, legacy) == "derived"]
+        if typed:
             raise Problem(f"{readme}: '{typed[0]}' is a derived front-matter key, answered by "
                           f"`--print-front-matter {slug}`, and this README is outside the legacy population "
                           f"that may type it; delete the {', '.join(typed)} line(s)")
@@ -1735,10 +1756,9 @@ def cmd_print_front_matter_findings(root: str, conf: dict) -> int:
             if ":" not in line:
                 continue
             key = line.partition(":")[0].strip()
-            if key not in FRONT_MATTER_KEYS:
-                print(f"{rel}: {key} unknown")
-            elif key in DERIVED_KEYS and legacy is not None and rel not in legacy:
-                print(f"{rel}: {key} derived")
+            finding = check_front_matter(key, rel, legacy)
+            if finding:
+                print(f"{rel}: {key} {finding}")
     return 0
 
 

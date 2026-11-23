@@ -1259,22 +1259,12 @@ def read_transcript_calls(path):
     transcript holding no record is refused naming the path, never read as a zero."""
     ex = resolve_runlog_extract()
     path = pathlib.Path(path)
-    coverage, records, events = {}, 0, []
-    for _src, _file, _line, rec in ex.read_records(ex.SessionTree(sid=path.stem, main=path), coverage):
-        records += 1
-        msg = rec.get("message")
-        content = msg.get("content") if isinstance(msg, dict) else None
-        for block in content if isinstance(content, list) else ():
-            if not isinstance(block, dict):
-                continue
-            if block.get("type") == "tool_use":
-                events.append(("use", block.get("id"), block.get("name"), block.get("input") if isinstance(block.get("input"), dict) else {}))
-            elif block.get("type") == "tool_result":
-                body = block.get("content")
-                size = (len(body.encode("utf-8")) if isinstance(body, str) else
-                        sum(len(b["text"].encode("utf-8")) for b in body if isinstance(b, dict) and isinstance(b.get("text"), str))
-                        if isinstance(body, list) else 0)
-                events.append(("result", block.get("tool_use_id"), None, size))
+    coverage = {}
+    records = [rec for _src, _file, _line, rec in ex.read_records(ex.SessionTree(sid=path.stem, main=path), coverage)]
+    # TOOL-dTotalRecall-43 S53: runlog's one tool-result byte counter, shared with the memory measure
+    events = [(kind, tid, name, value if kind == "result" or isinstance(value, dict) else {})
+              for kind, tid, name, value in ex.read_result_bytes(records)]
+    records = len(records)
     if coverage.get("unreadable") or coverage.get("torn"):
         raise Refusal(f"transcript {path.as_posix()}: {coverage.get('unreadable', 0)} unreadable file(s) and "
                       f"{coverage.get('torn', 0)} torn line(s) in its coverage")

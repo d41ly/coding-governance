@@ -24,7 +24,7 @@ Ported from adopter ic's `scripts/recall/` implementation at `5318064`.
 | `query.py` | the CLI. **Forked** from upstream — see Maintenance. |
 | `extract.py` | record + chunk extraction and the alias join. **Forked**. |
 | `bench.py` | the retrieval-substrate harness, re-exporting memory-tree's FTS5 row builder `build_fts_rows`. **Forked** — one delta, see Maintenance. |
-| `union.py` | the two-source ensemble scorer. **Verbatim** upstream. |
+| `union.py` | the two-source ensemble scorer. **Forked, one delta** — it calls `B.build_fts_rows` where upstream calls `B.build_index` (TOOL-dTotalRecall-21's rename); see Maintenance. |
 | `selftest.py` | the kit's contract gate. Every arm runs inside a throwaway git repo, and the run's own summary line reports how many checks it made — no count is written here, because a count typed beside the thing it counts is wrong on the next commit. |
 | `adopt-memory-recall.sh` | renders the Skill from the conf (`--scaffold`), and reds when it drifts (`--check`). |
 | `SKILL.template.md` | the agent-facing Skill, with the project values as placeholders. Rendered, never copied. |
@@ -129,15 +129,19 @@ An adopter therefore needs **no** `.gitignore` entry from this kit.
 `fts_chunk` (FTS5, the row builder's `head`, `body` and `alias` columns, with `path`, `blob`,
 `digest`, `id` and `line` unindexed), `fts_blob` naming each (path, blob) pair extracted at a digest,
 `fts_supersession` holding each pair's supersession edges, and `fts_digest` naming the digest each
-worktree last queried under. The digest is the SHA-1 of the extraction inputs: `CACHE_VERSION`, the
-kit version, `CHUNK_MAX`, `Conf.digest()` and the alias file's digest. Each query maps every corpus
+worktree last queried under. The digest is memory-tree's one closure-version rule,
+`import_walk.derive_closure_version`, over `extract.py`, `bench.py` and every module they import, keyed
+by the kit version, `CHUNK_MAX`, `Conf.digest()` and the alias file's digest, so an extraction edit
+re-extracts with no constant to bump; an edit to `query.py`'s own row writer alone re-extracts
+nothing. Each query maps every corpus
 path to the blob it holds — this worktree's uncommitted edit, else the HEAD tree's blob from the tag
 index, else, for an untracked file, its `git hash-object` — and extracts only the pairs the index
 lacks at the digest. So one edited file costs one extraction, its commit costs none, a conf or alias
 edit re-extracts every pair once, and every worktree shares the rows. An untracked note's pair lives
 in recall's rows alone, served to the worktree that hashed it. A call that extracted drops the rows
 no tree, dirty row or served set holds and the digests no live worktree names. The index line says
-what happened: `(tree <tree8>, extracted <k> blob(s) in <s>s)`.
+what happened: `(tree <tree8>, extracted <k> blob(s), freed <f> in <s>s)`, `<f>` the pairs that drop
+freed.
 
 A tag-index reset (`gov_tag.py --rebuild`, or a schema stamp moving) drops recall's tables with the
 tag rows, and the next query re-extracts every pair. An index file that cannot be opened or read
@@ -302,12 +306,13 @@ measures their own value.
 
 ## Maintenance — three categories, three different stories
 
-- **Verbatim** — `union.py`. Zero coupling on the query path, so it is re-pulled **wholesale** from
-  upstream on any fix and never merged. Two caveats, stated rather than patched out, because
-  patching them would end the wholesale re-pull: its usage string names the *upstream* script path,
-  and `union.main()` is the upstream benchmark harness, which is **inert here** — it needs a graded
-  `fixture.json` that this kit deliberately does not ship. `selftest.py` pins its digest, so an edit
-  reds.
+- **Verbatim but for one call** — `union.py`. Zero coupling on the query path. Its one delta is the
+  row builder's name: it calls `B.build_fts_rows` where upstream calls `B.build_index`, the rename
+  TOOL-dTotalRecall-21 made and TOOL-dTotalRecall-43 S27 records, so a re-pull is the wholesale file
+  with that one call re-applied, never the upstream bytes alone. Two caveats, stated rather than
+  patched out: its usage string names the *upstream* script path, and `union.main()` is the upstream
+  benchmark harness, which is **inert here** — it needs a graded `fixture.json` that this kit
+  deliberately does not ship. `selftest.py` pins its digest, so an edit reds.
 - **Forked, one delta** — `bench.py`. It WAS verbatim and is not any more: `TOOL-dTracedLattice-7`
   made `run_rm3`'s expansion-term selection independent of `PYTHONHASHSEED`, because `rm3` is a
   legal `RECALL_FLOOR` substrate and a project pinned to it had a gate whose verdict moved between

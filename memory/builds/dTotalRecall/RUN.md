@@ -426,3 +426,23 @@ base: 8b8b1374c4fc89be2ae3a5aae88dafd74e6acd8e
 2026-11-23T14:35:49Z brief · item TOOL-dTotalRecall-43 · reason 4eaeb47a5cbf memory/builds/dTotalRecall/prompts/2026-11-22-prompt-TOOL-dTotalRecall-43-build-brief.md
 
 2026-11-23T14:39:03Z dispatch · item f41d86c4 TOOL-dTotalRecall-43 · reason tools/memory-tree/record-kinds.toml tools/memory-tree/tree_lib.py tools/memory-tree/gen_build_index.py tools/memory-tree/record_causes.py tools/memory-tree/corpus_ids.py tools/govkit/registry.toml tools/lib/extract_code.py tools/runlog/memory_measure.py tools/playbook/tag_index.py tools/memory-recall/query.py tools/govkit/steps/memory_retag.py tools/govkit/subject-pins.tsv tools/unattended/check-brief-recorded.test.sh tools/unattended/check-unattended.test.sh WIRE-INTO-PROJECT.md memory/map/features tools/memory-tree/record_kinds.py tools/memory-tree/build_records.py tools/memory-tree/backlog.py tools/memory-tree/kit.toml tools/memory-tree/id_grammar.py tools/memory-tree/gov-claim.sh tools/memory-tree/gov_record.py memory/project/record-kinds-legacy.txt tools/lexicon/extract_code.py tools/codebase-map/extract_code.py tools/runlog/extract.py tools/workflows/replay_scorer.py tools/playbook/record_extract.py tools/memory-recall/selftest.py tools/memory-recall/README.md tools/govkit/steps/memory_front_matter.py tools/codebase-map/scen-adversarial.json tools/unattended/check-pass-order.test.sh tools/unattended/unattended.test.sh memory/guides/SESSION-KICKOFF.md memory/map/generated tools/gate-legs.json tools/govkit/registry.toml .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-43.md memory/builds/dTotalRecall/build/2026-11-22-build-TOOL-dTotalRecall-43-1-acceptance-ledger.md
+
+2026-11-23T15:05:14Z brief · item TOOL-dTotalRecall-43 · reason b710bc294346 memory/builds/dTotalRecall/prompts/2026-11-23-prompt-TOOL-dTotalRecall-43-build-2-brief.md
+2026-11-23T15:08:36Z draw · re-dispatch · TOOL-dTotalRecall-43 · 58/186 · 20261123T150836Z-3ae693
+
+2026-11-23T15:08:36Z dispatch · item e2704082 TOOL-dTotalRecall-43 · reason tools/memory-tree/record-kinds.toml tools/memory-tree/record_kinds.py tools/memory-tree/tree_lib.py tools/memory-tree/build_records.py tools/memory-tree/backlog.py tools/memory-tree/gen_build_index.py tools/memory-tree/kit.toml tools/memory-tree/record_causes.py tools/memory-tree/id_grammar.py tools/memory-tree/gov-claim.sh tools/memory-tree/corpus_ids.py tools/memory-tree/gov_record.py tools/memory-tree/import_walk.py tools/lib/extract_code.py tools/lexicon/extract_code.py tools/codebase-map/extract_code.py tools/runlog/memory_measure.py tools/runlog/extract.py tools/workflows/replay_scorer.py tools/playbook/tag_index.py tools/playbook/record_extract.py tools/memory-recall/query.py tools/memory-recall/selftest.py tools/memory-recall/README.md tools/govkit/steps/memory_retag.py tools/govkit/steps/memory_front_matter.py tools/govkit/subject-pins.tsv tools/codebase-map/scen-adversarial.json tools/unattended/check-brief-recorded.test.sh tools/unattended/check-pass-order.test.sh tools/unattended/check-unattended.test.sh tools/unattended/unattended.test.sh memory/guides/SESSION-KICKOFF.md memory/map/features memory/map/generated tools/playbook/gov_tag.py tools/gate-legs.json .lexicon.conf memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dTotalRecall/BACKLOG.md memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-43.md memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-43-2-acceptance-ledger.md
+2026-11-23T15:21:04Z draw · re-dispatch · TOOL-dTotalRecall-43 · 59/186 · 20261123T152104Z-577ac6
+
+2026-11-23T15:21:04Z dispatch · item e2704082 TOOL-dTotalRecall-43 · reason tools/govkit/selftest.py
+2026-11-23T15:25:44Z draw · re-dispatch · TOOL-dTotalRecall-43 · 60/186 · 20261123T152544Z-1801ba
+
+2026-11-23T15:25:44Z dispatch · item e2704082 TOOL-dTotalRecall-43 · reason tools/lexicon/selftest.py tools/runlog/selftest.py
+2026-11-23T15:29:09Z draw · re-dispatch · TOOL-dTotalRecall-43 · 61/186 · 20261123T152909Z-c51cfe
+
+2026-11-23T15:29:09Z dispatch · item e2704082 TOOL-dTotalRecall-43 · reason tools/memory-tree/ratchet.py
+2026-11-23T15:47:33Z draw · re-dispatch · TOOL-dTotalRecall-43 · 62/186 · 20261123T154733Z-f0e496
+
+2026-11-23T15:47:33Z dispatch · item e2704082 TOOL-dTotalRecall-43 · reason memory/builds/dTotalRecall/build/2026-11-23-build-TOOL-dTotalRecall-43-deviation-1011.md
+2026-11-23T15:53:06Z draw · re-dispatch · TOOL-dTotalRecall-43 · 63/186 · 20261123T155306Z-67d036
+
+2026-11-23T15:53:06Z dispatch · item e2704082 TOOL-dTotalRecall-43 · reason WIRE-INTO-PROJECT.md

@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-43 — the round-1 spec audit's 59 minors, batched
 
-**Status:** INPROGRESS · rev-8 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
+**Status:** CLOSED · rev-8 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,8 @@
 | [2026-10-26-build-TOOL-dTotalRecall-43-deviation-433.md](../build/2026-10-26-build-TOOL-dTotalRecall-43-deviation-433.md) | deviation | — |
 | [2026-11-22-build-TOOL-dTotalRecall-43-1-builder-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-43-1-builder-return.md) | journal | — |
 | [2026-11-22-build-TOOL-dTotalRecall-43-reground-return.md](../build/2026-11-22-build-TOOL-dTotalRecall-43-reground-return.md) | research | — |
+| [2026-11-23-build-TOOL-dTotalRecall-43-2-acceptance-ledger.md](../build/2026-11-23-build-TOOL-dTotalRecall-43-2-acceptance-ledger.md) | log | — |
+| [2026-11-23-build-TOOL-dTotalRecall-43-deviation-1011.md](../build/2026-11-23-build-TOOL-dTotalRecall-43-deviation-1011.md) | deviation | — |
 | [2026-11-23-build-TOOL-dTotalRecall-43-divergence-fold-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-43-divergence-fold-return.md) | research | — |
 | [2026-11-23-build-TOOL-dTotalRecall-43-map-lost-fold-return.md](../build/2026-11-23-build-TOOL-dTotalRecall-43-map-lost-fold-return.md) | research | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |

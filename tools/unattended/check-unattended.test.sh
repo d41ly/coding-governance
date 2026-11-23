@@ -278,10 +278,7 @@ build() { # slug
   cat > "memory/builds/$1/README.md" <<EOF
 ---
 slug: $1
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-$1-1
 ---
 
@@ -361,10 +358,7 @@ mkdir -p memory/builds/tPlanOk/spec
 cat > memory/builds/tPlanOk/README.md <<'PLANOK'
 ---
 slug: tPlanOk
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-tPlanOk-1
 ---
 
@@ -2770,10 +2764,7 @@ mkdir -p memory/builds/tWaive
 cat > memory/builds/tWaive/README.md <<'RM'
 ---
 slug: tWaive
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-tWaive-1
 ---
 

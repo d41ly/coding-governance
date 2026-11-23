@@ -1525,7 +1525,8 @@ GEN_REGION_RE = re.compile(r"<!-- (/?)gen:(\S+) -->")
 def print_heading_anchors(path) -> int:
     """`anchors <path>` (TOOL-dTotalRecall-20 §4): one `tags: anchor <line> <anchor>` line per unfenced `##`
     heading of the file at `path` outside a generated region whose text opens no `[<tag>] `, its anchor the
-    one `derive_anchor` gives it with one `seen` set over every unfenced `##` heading in document order, as
+    one `derive_anchor` gives it with one `seen` set, seeded with the authored `[section.<seg>]` tags'
+    anchors (TOOL-dTotalRecall-43 S44), over every unfenced `##` heading in document order, as
     `extract_doc` walks them, so a repeated heading takes `-2` and `-3`. It opens no index and reads no
     policy key. Exit 0, or 2 with a `tags: refused` line where the path does not read."""
     try:
@@ -1533,7 +1534,9 @@ def print_heading_anchors(path) -> int:
     except (OSError, UnicodeDecodeError) as exc:
         print(f"tags: refused · anchors {path}: {exc}", file=sys.stderr)
         return 2
-    seen, region = set(), None
+    # TOOL-dTotalRecall-43 S44: the authored tags' anchors seed `seen` before any heading derives one
+    seen = ti.read_authored_anchors(line[3:].strip() for _n, line in ti.scan_unfenced(text) if line.startswith("## "))
+    region = None
     for n, line in ti.scan_unfenced(text):
         hit = GEN_REGION_RE.fullmatch(line.strip())
         if hit and region is None and not hit[1]:

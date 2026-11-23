@@ -1585,10 +1585,23 @@ def check_row_value(label: str, value: str) -> None:
     `ARROW`. ValueError naming `label` and the character class (TOOL-dTotalRecall-41 S1). Called by the
     write door on each value it was handed, never by a renderer, whose other callers already validate.
     WHAT IT DOES NOT CHECK: an empty value, or a value whose bytes read as a clause label."""
-    for bad, name in (("\r", "a carriage return"), ("\n", "a line feed"), (SEP, "the row separator"),
-                      (ARROW, "the pointer arrow")):
+    broken = check_line_break(label, value)
+    if broken:
+        raise ValueError(f"{broken}, which would split the row it is written into")
+    for bad, name in ((SEP, "the row separator"), (ARROW, "the pointer arrow")):
         if bad in value:
             raise ValueError(f"{label} holds {name}, which would split the row it is written into")
+
+
+def check_line_break(label: str, value: str) -> str:
+    """The memory-tree kit's ONE line-break rule (TOOL-dTotalRecall-43 S37): `"<label> holds a carriage
+    return"` or `"... a line feed"` where `value` carries one, else "". Every writer that takes a value onto
+    one line asks it: `check_row_value`, the record factory's field and line checks, the door's `--title`,
+    `--field` and cause, and each `--edge`."""
+    for bad, name in (("\r", "a carriage return"), ("\n", "a line feed")):
+        if bad in (value or ""):
+            return f"{label} holds {name}"
+    return ""
 
 
 def render_clauses(clauses) -> str:

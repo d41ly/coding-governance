@@ -78,6 +78,7 @@ whose Serves line is the last line of the head window, where a cause line would 
 """
 from __future__ import annotations
 
+import itertools
 import os
 import pathlib
 import re
@@ -312,8 +313,12 @@ def read_legacy_anchors(root, path, text=None, value=None) -> list:
         kit = resolve_kit_dir("playbook", "tag_index.py", KIT)
         if str(kit) not in sys.path:
             sys.path.append(str(kit))
-        from tag_index import derive_anchor   # noqa: E402  the one anchor rule (TOOL-dTotalRecall-10)
+        from tag_index import derive_anchor, read_authored_anchors   # noqa: E402  the one anchor rule (TOOL-dTotalRecall-10)
     out, seen = [], set()
+    if value == "derived":   # TOOL-dTotalRecall-43 S44: the authored tags' anchors seed `seen` first
+        seen = read_authored_anchors(
+            m.group("text") for _n, line in itertools.takewhile(lambda nl: nl[1] is not None, tree_lib.unfenced_lines(text))
+            for m in [HEADING_RE.fullmatch(line.rstrip())] if m)
     for _n, line in tree_lib.unfenced_lines(text):
         if line is None:
             break

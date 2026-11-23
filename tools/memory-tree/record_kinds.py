@@ -159,6 +159,8 @@ KIT = pathlib.Path(os.path.abspath(__file__)).parent
 if str(KIT) not in sys.path:   # the step gate loads this file by path, so its siblings resolve from here
     sys.path.insert(0, str(KIT))
 
+from backlog import check_line_break  # noqa: E402  the kit's one line-break rule (TOOL-dTotalRecall-43 S37)
+
 SAY = "record-kinds"
 REGISTRY = "record-kinds.toml"
 TEMPLATE = "HYGIENE.template.md"
@@ -184,10 +186,14 @@ LIFECYCLES = ("append-only", "current-state", "frozen", "generated", "out")
 LAYER_RE = re.compile(r"layer\.[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)*")
 COMMON_DIR_HOME = "<git-common-dir>/"
 REF_HOME = "refs/gov/"
-#: Git's own entries of a common dir, never a pocket (TOOL-dTotalRecall-18 S6).
-GIT_OWN = frozenset(("HEAD", "ORIG_HEAD", "FETCH_HEAD", "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD",
-                     "COMMIT_EDITMSG", "config", "description", "hooks", "index", "info", "logs", "objects",
-                     "packed-refs", "refs", "worktrees", "modules", "lost-found", "shallow", "gc.log"))
+#: Git's own entries of a common dir, never a pocket (TOOL-dTotalRecall-18 S6): `fnmatch` patterns over an
+#: entry's name, its transient state included (TOOL-dTotalRecall-43 S41), a lock, a merge, rebase, sequencer
+#: or bisect in flight, rerere's cache, a running gc and git-lfs's store.
+GIT_OWN = ("HEAD", "ORIG_HEAD", "FETCH_HEAD", "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD",
+           "COMMIT_EDITMSG", "config", "description", "hooks", "index", "info", "logs", "objects",
+           "packed-refs", "refs", "worktrees", "modules", "lost-found", "shallow", "gc.log",
+           "*.lock", "MERGE_MSG", "MERGE_MODE", "AUTO_MERGE", "REBASE_HEAD", "rebase-merge", "rebase-apply",
+           "sequencer", "BISECT_*", "rr-cache", "gc.pid", "lfs")
 UNARMED = "unarmed"
 FORMS = ("fields", "header", "rows", "generated", "fence")
 SCHEMA_KEYS = ("form", "fields", "source", "validator")
@@ -198,6 +204,8 @@ VALIDATOR_RE = re.compile(r"(?P<module>[A-Za-z_][A-Za-z0-9_]*):(?P<function>[A-Z
 #: its own constant since the kits do not import each other
 TOML_FENCE_RE = re.compile(r"^```toml[ \t]*\r?$(.*?)^```[ \t]*\r?$", re.MULTILINE | re.DOTALL)
 NAME_RE = re.compile(r"[a-z][a-z0-9-]*")
+#: the characters `new` refuses in a `--field` key beside a line break (TOOL-dTotalRecall-43 S57)
+FIELD_KEY_BANNED = "*:\"'\\"
 FACTORY_SOURCE = re.compile(r"(?:^|/)build_records\.py:KINDS\.([^.]+)\.required$")
 GAP_KEY_RE = re.compile(r"gap-[a-z]+-\d{2,3}")
 FOLLOW_GAP = re.compile(r"^gap (\S+)")
@@ -501,7 +509,7 @@ def check_purpose_cell(purpose, at: str, root) -> list[str]:
     text, source = purpose.get("text"), purpose.get("source")
     if not (isinstance(text, str) and text.strip()):
         reds.append(f"{at}: `purpose.text` is empty or missing: say what the kind is for in one line")
-    elif "\n" in text or "\r" in text:
+    elif check_line_break("`purpose.text`", text):   # the kit's one line-break rule (S37)
         reds.append(f"{at}: `purpose.text` holds a newline: a purpose is one line")
     elif len(text.encode("utf-8")) > PURPOSE_BYTES:
         reds.append(f"{at}: `purpose.text` is {len(text.encode('utf-8'))} bytes, past PURPOSE_BYTES {PURPOSE_BYTES}")
@@ -566,6 +574,39 @@ def read_section_tag(sections: list[dict], heading: str) -> str | None:
     """The tag `sections` maps one heading's title to, its leading `<n>. ` stripped; None where unmapped."""
     title = SECTION_NUMBER_RE.sub("", heading.strip())
     return next((s["tag"] for s in sections if s["heading"] == title), None)
+
+
+#: the canonical spec sections check 12 does not require of a Tier-1 spec, its tier rule's two exceptions
+#: (`check-memory-hygiene.sh`, the `t1mi` arm of the Tier-1 micro-spec sections)
+SPEC_OPTIONAL = ("Production-readiness checklist", "Reuse audit")
+
+
+def check_spec_sections(rows: list[dict]) -> list[str]:
+    """S25's parity arm: the reds of the `spec` row's `sections` cell against the canon,
+    `gen_build_index.SPEC_TITLE_NUMBERS`: the cell's headings are the canon's titles in number order, and
+    each is `required` unless check 12's tier rule makes it optional (`SPEC_OPTIONAL`). A registry with
+    no `spec` row, or a `spec` row with no cell, maps no section and is not graded here."""
+    from gen_build_index import SPEC_TITLE_NUMBERS
+    row = next((r for r in rows if r.get("name") == "spec"), None)
+    if row is None or row.get("sections") is None:
+        return []
+    try:
+        cell = read_sections(row)
+    except RecordKindsError as e:
+        return [f"sections parity: {e}"]
+    want = [t for t, _n in sorted(SPEC_TITLE_NUMBERS.items(), key=lambda kv: kv[1])]
+    have = {s["heading"]: s["required"] for s in cell}
+    reds = [f"sections parity: the canon's section {t!r} has no entry in the spec row's `sections`" for t in want
+            if t not in have]
+    reds += [f"sections parity: the spec row's section {h!r} is no title of SPEC_TITLE_NUMBERS" for h in have
+             if h not in SPEC_TITLE_NUMBERS]
+    reds += [f"sections parity: section {t!r} is required = {have[t]}, and check 12's tier rule makes it "
+             f"{'optional' if t in SPEC_OPTIONAL else 'required'}" for t in want
+             if t in have and have[t] != (t not in SPEC_OPTIONAL)]
+    order = [s["heading"] for s in cell if s["heading"] in SPEC_TITLE_NUMBERS]
+    if not reds and order != want:
+        reds.append(f"sections parity: the spec row's `sections` run {order}, out of the canon's number order")
+    return reds
 
 
 def check_sections(row: dict, text: str) -> list[str]:
@@ -701,7 +742,9 @@ def resolve_validator(spelled):
 
 def check_fence_records(root, rows: list[dict], typed_kinds) -> tuple[list[str], list[str]]:
     """S4's grading arm: `(reds, unarmed)`. Each `fence` row whose validator resolves runs it over every record
-    `scan_fence_records` keeps for it, each red it returns prefixed `row <kind>: <path>:`; a row whose
+    `scan_fence_records` keeps for it, called `(text, path=<the record's path>, root=<the tree>)` so a
+    validator may join the record to its tree (TOOL-dTotalRecall-43 S58), each red it returns prefixed
+    `row <kind>: <path>:`; a row whose
     validator does not resolve is `check_row`'s red alone, skipped here. A typed row matching no record is
     `unarmed`, its line `render_unarmed_line`'s; any other empty population reds."""
     reds, unarmed = [], []
@@ -721,7 +764,7 @@ def check_fence_records(root, rows: list[dict], typed_kinds) -> tuple[list[str],
         for p in paths:
             text = pathlib.Path(root, p).read_bytes().decode("utf-8", "replace")
             try:
-                got = fn(text)
+                got = fn(text, path=p, root=root)
             except Exception as e:   # noqa: BLE001 — a validator that raises grades nothing, and says so
                 got = [f"its validator raised {type(e).__name__}: {e}"]
             reds += [f"row {name}: {p}: {r}" for r in got]
@@ -735,16 +778,22 @@ def render_unarmed_line(row: dict) -> str:
     return f"{row.get('name')}: {UNARMED} — no record yet" + (f"; {why}" if isinstance(why, str) and why.strip() else "")
 
 
-def check_stream_plan(text: str) -> list[str]:
+def check_stream_plan(text: str, path: str | None = None, root=None) -> list[str]:
     """S3: the reds of one stream-plan record, its one TOML fence of `[[stream]]` tables, each a `name` of
     `build_records.SEG`'s shape and `units`, a non-empty list of `{ id, order }`: a missing or unparseable
-    fence, a stream with no units, a unit with no `order`, an `order` that is no `int` above zero matched
-    whole by the spec header verb's grammar (`gen_build_index.ORDER_RE`), and a unit id named twice."""
+    fence, a second fence, a stream with no units or named twice, a unit with no `order`, an `order` that
+    is no `int` above zero matched whole by the spec header verb's grammar (`gen_build_index.ORDER_RE`),
+    and a unit id named twice (TOOL-dTotalRecall-43 S58 adds the second fence and the stream named twice).
+    Given the record's `path` under the tree at `root`, a unit id `id_grammar.grammar_for(root).ID_RE`
+    does not match whole, or that the `ids:` of its build's README does not hold, is red too."""
     from build_records import SEG
     from gen_build_index import ORDER_RE
+    fences = TOML_FENCE_RE.findall(text)
     m = TOML_FENCE_RE.search(text)
     if m is None:
         return ["no ```toml fence: a stream plan is one TOML fence of [[stream]] tables"]
+    if len(fences) > 1:
+        return [f"{len(fences)} ```toml fences: a stream plan is ONE TOML fence of [[stream]] tables"]
     try:
         data = tomllib.loads(m.group(1))
     except tomllib.TOMLDecodeError as e:
@@ -778,7 +827,32 @@ def check_stream_plan(text: str) -> list[str]:
                             f"header's `· order <n>` is read by")
     reds += [f"unit {uid} is named in {' and '.join(ats)}: a unit sits in one stream"
              for uid, ats in seen.items() if len(ats) > 1]
+    names = [s.get("name") for s in streams if isinstance(s.get("name"), str)]
+    reds += [f"stream {n} is named {names.count(n)} times: a stream is one [[stream]] table"
+             for n in dict.fromkeys(names) if names.count(n) > 1]
+    if path is not None and root is not None:
+        reds += check_plan_units(list(seen), path, root)
     return reds
+
+
+def check_plan_units(uids: list[str], path: str, root) -> list[str]:
+    """S58: the reds of a stream plan's unit ids against its tree: an id the tree's id grammar
+    (`id_grammar.grammar_for(root).ID_RE`) does not match whole, and an id the `ids:` of the plan's build
+    README (`<memory root>/builds/<slug>/README.md`, read by `gen_build_index.parse_front_matter`) lacks."""
+    from gen_build_index import Problem, parse_front_matter
+    from id_grammar import grammar_for
+    id_re = grammar_for(root).ID_RE
+    reds = [f"unit {u} is no id of this tree's grammar" for u in uids if not id_re.fullmatch(u)]
+    segs = path.split("/")
+    slug = segs[segs.index("builds") + 1] if "builds" in segs[:-1] else None
+    if slug is None:
+        return reds + [f"{path} sits in no build folder, so no README's ids: lists its units"]
+    readme = pathlib.Path(root, *segs[:segs.index("builds") + 2], "README.md")
+    try:
+        ids = set(parse_front_matter(str(readme), slug).get("ids", "").split())
+    except (Problem, OSError) as e:
+        return reds + [f"the build README {readme.name} of {slug} does not read: {str(e).splitlines()[0]}"]
+    return reds + [f"unit {u} is not in the ids: of build {slug}'s README" for u in uids if u not in ids]
 
 
 def read_legacy_keys(root) -> tuple[set, str]:
@@ -795,6 +869,20 @@ def read_legacy_keys(root) -> tuple[set, str]:
         return set(), f"{LEGACY}'s home {reg.home} is absent"
     rows, _bad = ll.read_ledger(root, reg)
     return set(rows), ""
+
+
+def check_owner_fields(kind: str, path: str, text: str) -> list[tuple[str, str]]:
+    """S23: `[(field, why)]` of one record of a kind whose `schema.source` names its owner, the factory's
+    `KINDS.<kind>.required`, graded by that owner's reader: `deviation_join.read_record` for a deviation,
+    `build_records.read_record` for every other typed kind, so the gate never grades the fields with a
+    grammar of its own."""
+    if kind == "deviation":
+        import deviation_join
+        return list(deviation_join.read_record(path, text)["malformed"])
+    import build_records
+    if kind not in build_records.KINDS or "required" not in build_records.KINDS[kind]:
+        return []
+    return list(build_records.read_record(path, text, kind)[1])
 
 
 def derive_field_lines(text: str, fields: list[str]) -> tuple[list[str], list[str]]:
@@ -1001,7 +1089,7 @@ def check_pockets(root, rows: list[dict]) -> tuple[list[str], list[str]]:
              for g in derive_home_globs(r.get("home")) if g.startswith(COMMON_DIR_HOME)]
     lines, reds, own = [], [], 0
     for entry in entries:
-        if entry in GIT_OWN:
+        if any(fnmatch.fnmatchcase(entry, pat) for pat in GIT_OWN):
             own += 1
             continue
         hit = sorted({str(n) for n, seg in globs if fnmatch.fnmatchcase(entry, seg)})
@@ -1014,6 +1102,51 @@ def check_pockets(root, rows: list[dict]) -> tuple[list[str], list[str]]:
     lines.append(f"pocket · {len(entries)} entries of {common.as_posix()} · {own} git's own · "
                  f"{len(entries) - own - len(reds)} matched · {len(reds)} unmatched")
     return lines, reds
+
+
+HOMELESS = "homeless records"
+
+
+def check_glob_path(glob: str, path: str) -> bool:
+    """Whether one tracked-path glob admits `path` as `:(glob)` reads it: segment by segment under
+    `fnmatch.fnmatchcase`, a `**` segment standing for any number of segments, so `*` never crosses a `/`."""
+    parts, segs = glob.split("/"), path.split("/")
+    if "**" not in parts:
+        return len(parts) == len(segs) and all(fnmatch.fnmatchcase(s, p) for s, p in zip(segs, parts))
+    k = parts.index("**")
+    head, tail = parts[:k], parts[k + 1:]
+    if len(segs) < len(head) + len(tail) + (0 if tail else 1):
+        return False
+    if not all(fnmatch.fnmatchcase(s, p) for s, p in zip(segs, head)):
+        return False
+    return not tail or check_glob_path("/".join(tail), "/".join(segs[len(segs) - len(tail):]))
+
+
+def check_homeless_records(root, rows: list[dict]) -> tuple[list[str], list[str]]:
+    """S1 (gap-mem-16), the arm `homeless records`: `(lines, reds)` over every tracked file under the memory
+    root and outside its `builds/` whose first `tree_lib.BIND_HEAD_LINES` unfenced lines carry a
+    `**Serves:**` binding. Each is matched against every row's tracked-path home globs; one no row's home
+    admits is red, named by path. A file that is not UTF-8 binds nothing and is not read as a record."""
+    import itertools
+    from tree_lib import BIND_HEAD_LINES, BIND_RE, unfenced
+    mr = read_memory_root(root)
+    globs = [g for r in rows for g in derive_home_globs(r.get("home")) if not g.startswith((COMMON_DIR_HOME, REF_HOME))]
+    bound, reds = 0, []
+    for path in read_tracked(root, f"{mr}/**"):
+        if path.startswith(f"{mr}/builds/"):
+            continue
+        try:
+            text = pathlib.Path(root, path).read_bytes().decode("utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        head = itertools.islice(unfenced(text.replace("\r\n", "\n")), BIND_HEAD_LINES)
+        if not any((m := BIND_RE.match(ln)) and m.group("key") == "Serves" for ln in head):
+            continue
+        bound += 1
+        if not any(check_glob_path(g, path) for g in globs):
+            reds.append(f"{HOMELESS}: {path} carries a **Serves:** binding and no row's home admits it: give its "
+                        f"kind a row whose `home` glob matches it, or move it under its kind's home")
+    return [f"{HOMELESS} · {bound} bound file(s) under {mr}/ outside builds/ · {len(reds)} homeless"], reds
 
 
 def check_serves_aliases(root, kit_rel: str, tool_rel: str) -> tuple[str, list[str]]:
@@ -1154,9 +1287,14 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
         graded_paths[name] = new
         tail = f" {len(other_kind[name])} other-kind" if name in other_kind else ""
         counts.append(f"{name} {len(new)} graded {len(old)} legacy{tail}")
+        owner = FACTORY_SOURCE.search(str(schema.get("source") or ""))
         for p in new:
-            missing, order = derive_field_lines(pathlib.Path(root, p).read_bytes().decode("utf-8", "replace"),
-                                                schema.get("fields", []))
+            text = pathlib.Path(root, p).read_bytes().decode("utf-8", "replace")
+            if owner and owner[1] == name:   # S23: the owner's reader grades its kind, never this gate's grammar
+                reds += [f"row {name}: {p} carries no **{f}:** line" if why == "is missing" else f"row {name}: {p}: {f} {why}"
+                         for f, why in check_owner_fields(name, p, text)]
+                continue
+            missing, order = derive_field_lines(text, schema.get("fields", []))
             reds += [f"row {name}: {p} carries no **{f}:** line" for f in missing]
             if order:
                 reds.append(f"row {name}: {p} carries {', '.join(order)} out of the row's order")
@@ -1187,6 +1325,9 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
                         f"writes from the registry and a fresh read of the roles and items; run --write")
     pocket_lines, pocket_reds = check_pockets(root, rows)
     reds += pocket_reds
+    homeless_lines, homeless_reds = check_homeless_records(root, rows)
+    reds += homeless_reds
+    reds += check_spec_sections(rows)
     alias_line, alias_reds = check_serves_aliases(root, kit_rel, tool_rel)
     reds += alias_reds
     compare_lines, compare_reds = check_alias_compares(root, tool_rel)
@@ -1205,7 +1346,7 @@ def check_record_kinds(root, typed_kinds=None, kit_rel: str | None = None) -> tu
         return UNARMED if joins["unarmed"] else ", ".join(names) or "—"
     lines += [f"{SAY}: view · {r.get('name')} · read by {render_view_names(derive_read_by(r, joins))} · written by "
               f"{render_view_names(derive_written_by(r, joins))}" for r in rows]
-    lines += [f"{SAY}: {ln}" for ln in pocket_lines + [alias_line] + compare_lines]
+    lines += [f"{SAY}: {ln}" for ln in pocket_lines + homeless_lines + [alias_line] + compare_lines]
     lines += [f"{SAY}: RED {r}" for r in reds]
     lines.append(f"{SAY}: {'red' if reds else 'green'}")
     return lines, 1 if reds else 0
@@ -1268,6 +1409,10 @@ def add_record_kind(root, a, kit_rel: str | None = None) -> int:
             bad.append("--validator is refused on a `fields` row: only a `fence` row names a validator")
         if not a.field or not all(f.strip() for f in a.field):
             bad.append("--field is required, one per **Key:** line the kind carries")
+        # S57: a key is the bold span of a `**Key:**` line, so it holds no `*`, `:`, quote, backslash or line break
+        bad += [f"--field {f!r} holds {c!r}: a key is the text of one **Key:** line" for f in a.field or []
+                for c in [next((c for c in f if c in FIELD_KEY_BANNED), None)
+                          or ("a line break" if check_line_break("--field", f) else None)] if c]
     if a.check not in legs:
         bad.append(f"--check {a.check!r} names no leg of {LEGS}")
     if not LAYER_RE.fullmatch(a.layer or ""):
@@ -1290,7 +1435,7 @@ def add_record_kind(root, a, kit_rel: str | None = None) -> int:
     purpose = a.purpose or ""
     if not purpose.strip():
         bad.append("--purpose <text> is required: one line saying what the kind is for")
-    elif "\n" in purpose or "\r" in purpose:
+    elif check_line_break("--purpose", purpose):
         bad.append("--purpose holds a newline: a purpose is one line")
     elif len(purpose.encode("utf-8")) > PURPOSE_BYTES:
         bad.append(f"--purpose is {len(purpose.encode('utf-8'))} bytes, past PURPOSE_BYTES {PURPOSE_BYTES}")
@@ -1580,6 +1725,34 @@ def write_purpose_line(text: str, table: str, key: str, value: str, line: str) -
     raise RecordKindsError(f"no [[{table}]] row holds {want}, so its purpose has no line to take")
 
 
+def read_owned_paths(root) -> dict:
+    """S47: `{path: owner}` of every file a kit renders, read from each tracked `kit.toml` under the tool root:
+    a `[[generated]]` row's `path`, `{memory_root}` filled from the conf, and a `[[files]]` row's `to` where
+    its `role` is `rendered`; `owner` names the kit and the row. A descriptor that does not parse owns nothing."""
+    tool_rel = derive_tool_rel(derive_kit_rel())
+    memory_root = read_memory_root(root)
+    out = {}
+    for desc in read_tracked(root, f"{tool_rel}/*/kit.toml" if tool_rel else "*/kit.toml"):
+        try:
+            data = tomllib.loads(pathlib.Path(root, desc).read_bytes().decode("utf-8"))
+        except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError):
+            continue
+        kit = pathlib.PurePosixPath(desc).parent.name
+        for row in data.get("generated") or []:
+            if isinstance(row, dict) and isinstance(row.get("path"), str):
+                out.setdefault(row["path"].replace("{memory_root}", memory_root).strip("/"), f"{kit}'s [[generated]] row")
+        for row in data.get("files") or []:
+            if isinstance(row, dict) and row.get("role") == "rendered" and isinstance(row.get("to"), str):
+                out.setdefault(row["to"].strip("/"), f"{kit}'s rendered [[files]] row")
+    return out
+
+
+def check_owned_path(rel: str, owned: dict) -> str | None:
+    """The owner of `rel` in `read_owned_paths`' map, a path or a directory holding it; None where none owns it."""
+    rel = (rel or "").replace("\\", "/").strip("/")
+    return next((o for p, o in owned.items() if rel and (rel == p or rel.startswith(p + "/"))), None)
+
+
 def write_purposes(root, kit_rel: str, nodes: list[dict], value: str, ask: str | None, chain_rel: str) -> int:
     """S5 and S6: each derived purpose written into its node's own field, the registry row's `purpose` table
     and the chain row's `purpose` string, and each `none` registry row's pending by `value`: `--ask`'s id
@@ -1625,10 +1798,23 @@ def write_purposes(root, kit_rel: str, nodes: list[dict], value: str, ask: str |
         raise RecordKindsError(f"the purpose write would leave a file that does not parse: {e}") from None
     if any(got.get(k) != v for k, v in reg_want.items()) or any(got_chain.get(k) != v for k, v in chain_want.items()):
         raise RecordKindsError("the purpose write did not read back as written; nothing written")
+    # S47: a file a kit's `[[generated]]` or `rendered` row owns is re-rendered over any write, so nothing is
+    # written there: its members' purposes go to an ask draft naming each, and every other file is written.
+    owned = read_owned_paths(root)
+    for rel, want, ns in ((f"{kit_rel}/{REGISTRY}", reg_want, REGISTRY_NS), (chain_rel, chain_want, CHAIN_NS)):
+        owner = check_owned_path(rel, owned) if want else None
+        if owner:
+            print(f"{SAY}: refused · {rel} is owned by {owner}, so its next render reverts a purpose written there; "
+                  f"nothing written to it")
+            print(f"ask {ns} · " + "; ".join(f"{ns}:{name} (its purpose sits in {rel}, which {owner} renders)"
+                                            for name in want))
+            want.clear()
     if reg_want:
         reg_path.write_bytes(reg_text.encode("utf-8"))
+        print(f"{SAY}: purpose · writes {kit_rel}/{REGISTRY}")
     if chain_want:
         chain_path.write_bytes(chain_text.encode("utf-8"))
+        print(f"{SAY}: purpose · writes {chain_rel}")
     print(f"{SAY}: purpose · wrote {len(reg_want)} registry rows, {sum(1 for v in reg_want.values() if 'pending' in v)} "
           f"of them pending, and {len(chain_want)} chain rows")
     if reg_want and pathlib.Path(root, kit_rel, TEMPLATE).is_file():
@@ -1723,7 +1909,9 @@ PLANTS = ("writer-missing", "check-unknown", "source-drift", "factory-kind-unrow
           "pending-closed", "value-refuse", "value-derive", "value-ledger", "value-ledger-unregistered",
           "value-refused", "stream-unordered", "stream-empty", "stream-order-text", "stream-unit-twice",
           "stream-fence-missing", "stream-validator-missing", "raw-alias-compare", "alias-compare-kept",
-          "unarmed-reason", "unarmed-with-record", "unarmed-untyped", "home-slash", "home-directory", "shared-home")
+          "unarmed-reason", "unarmed-with-record", "unarmed-untyped", "home-slash", "home-directory", "shared-home",
+          "homeless-record", "owner-graded", "bad-field-key", "stream-name-twice", "stream-foreign-unit",
+          "stream-two-fences")
 #: TOOL-dTotalRecall-42's fixture: the `unarmed` plants' key, each its row, the directory homes the deviation
 #: row takes, and the record serving `log` that `shared-home` plants under the research row's home
 FIXTURE_UNARMED = "the fixture's planner arms it"
@@ -1739,7 +1927,17 @@ FIXTURE_STREAM_EDITS = {"stream-unordered": (f'{{ id = "TOOL-{FIXTURE_BUILD}-2",
                         "stream-empty": (f'[{{ id = "TOOL-{FIXTURE_BUILD}-3", order = 1 }}]', "[]"),
                         "stream-order-text": ("order = 2 }", 'order = "2" }'),
                         "stream-unit-twice": (f'"TOOL-{FIXTURE_BUILD}-3"', f'"TOOL-{FIXTURE_BUILD}-2"'),
-                        "stream-fence-missing": (FIXTURE_FENCE, "")}
+                        "stream-fence-missing": (FIXTURE_FENCE, ""),
+                        # TOOL-dTotalRecall-43 S58's three
+                        "stream-name-twice": ('name = "memory"', 'name = "tooling"'),
+                        "stream-foreign-unit": (f'"TOOL-{FIXTURE_BUILD}-3"', f'"TOOL-{FIXTURE_BUILD}-9"'),
+                        "stream-two-fences": (FIXTURE_FENCE, FIXTURE_FENCE + "\n" + FIXTURE_FENCE)}
+#: TOOL-dTotalRecall-43's fixture: the deviation values its owner's reader admits (S23), the homeless record
+#: S1 plants outside builds/, and the `--field` key S57 refuses
+FIXTURE_DEVIATION_VALUES = {"Departs from": f"TOOL-{FIXTURE_BUILD}-1@rev-1", "Hand-off": "spec-to-code",
+                            "Cause": "builder discovery", "Risk": "additive"}
+FIXTURE_HOMELESS = "memory/notes/2026-01-01-note.md"
+FIXTURE_BAD_FIELD = 'a"b'
 #: TOOL-dTotalRecall-16's fixture: its open and closed asks, the plants whose registry holds the review's three
 #: purposeless rows, each plant's `memory.map-purpose` value, the `--from` record and the review's two chain builds.
 FIXTURE_OPEN_ASK, FIXTURE_CLOSED_ASK = f"TOOL-{FIXTURE_BUILD}-101", f"TOOL-{FIXTURE_BUILD}-102"
@@ -1894,6 +2092,10 @@ def build_fixture(tmp, plant: str | None = None):
     write_fixture_file(old, f"# {unit} deviation 1 — an old form\n\n**Serves:** deviation {unit}\n\n- **Reason:** kept as it was\n")
     follow = "gap gap-mem-99" if plant == "gap-unresolved" else "gap gap-mem-01"
     values = {f: "the fixture" for f in dev}
+    values.update(FIXTURE_DEVIATION_VALUES)   # S23: the owner's reader grades these, its closed sets included
+    values["Caused-by"] = unit
+    if plant == "owner-graded":   # a value only the owner's closed set refuses
+        values["Risk"] = "unbounded"
     values["Follow-through"] = follow
     body = [f"# {unit} deviation 2 — the fixture", "", f"**Serves:** deviation {unit}", ""]
     body += [f"- **{f}:** {values[f]}" for f in dev if not (f == "Caused-by" and plant in ("field-missing", "field-missing-legacy"))]
@@ -1907,6 +2109,11 @@ def build_fixture(tmp, plant: str | None = None):
                        f"**Serves:** log {unit}\n\nthe fixture's brief\n")
     if plant == "shared-home":
         write_fixture_file(FIXTURE_SHARED, f"**Serves:** log {unit}\n\na log record under the research row's home\n")
+    if plant == "homeless-record":   # S1: a bound record outside builds/ that no row's home admits
+        write_fixture_file(FIXTURE_HOMELESS, f"# a note\n**Serves:** research {unit}\n\na record with no home\n")
+    write_fixture_file(f"memory/builds/{FIXTURE_BUILD}/README.md",   # S58: the ids a stream plan's units join
+                       f"---\nslug: {FIXTURE_BUILD}\nopened: 2026-01-01\nids: "
+                       + " ".join(f"TOOL-{FIXTURE_BUILD}-{n}" for n in (1, 2, 3)) + f"\n---\n\n# {FIXTURE_BUILD}\n")
     if plant in ("raw-alias-compare", "alias-compare-kept"):   # TOOL-dTotalRecall-40: the census's plant, its
         from tree_lib import KIND_ALIASES                        # token read off the alias table, so no hit here
         planted = ALIAS_COMPARE_PLANT if plant == "raw-alias-compare" else sorted(ALIAS_COMPARE_KEPT)[0]
@@ -1956,6 +2163,13 @@ def run_fixture(plant: str | None) -> tuple[list[str], int]:
         if plant == "new-purpose":
             row = next((r for r in read_record_kinds(tmp) or [] if r.get("name") == "widget"), {})
             head.append(f"{SAY}: fixture new-purpose · widget · source {(row.get('purpose') or {}).get('source')}")
+        if plant == "bad-field-key":   # S57: `new` with a key holding a quote, refused with the registry kept
+            reg = pathlib.Path(tmp, derive_kit_rel(), REGISTRY)
+            before = reg.read_bytes()
+            argv = [FIXTURE_BAD_FIELD if i and FIXTURE_NEW[i - 1] == "--field" else a for i, a in enumerate(FIXTURE_NEW)]
+            head, rc = run_captured(argv, tmp, head)
+            return head + [f"{SAY}: fixture bad-field-key · new exit {rc} · registry "
+                           f"{'unchanged' if reg.read_bytes() == before else 'changed'}"], rc
         review = ["--purpose-review", "--from", FIXTURE_FROM]
         if plant == "review":
             return run_captured(review, tmp, head)
@@ -2032,8 +2246,13 @@ def run_selftest() -> int:
             "stream-validator-missing": ("row stream-plan", "record_kinds:no_such_check"),
             "raw-alias-compare": ("alias-compare", f"{ALIAS_COMPARE_PLANT}:2"),
             "unarmed-with-record": ("row stream-plan", f"`{UNARMED}`"), "unarmed-untyped": ("row research", f"`{UNARMED}`"),
-            "home-slash": ("row deviation", "names a directory"), "home-directory": ("row deviation", "names a directory")}
-    refusals = {"value-ledger-unregistered": PURPOSE_PENDING, "value-refused": "memory.map-purpose"}
+            "home-slash": ("row deviation", "names a directory"), "home-directory": ("row deviation", "names a directory"),
+            "homeless-record": (HOMELESS, FIXTURE_HOMELESS), "owner-graded": ("row deviation", "Risk", "unbounded"),
+            "stream-name-twice": (FIXTURE_PLAN, "stream tooling is named 2 times"),
+            "stream-foreign-unit": (FIXTURE_PLAN, f"unit TOOL-{FIXTURE_BUILD}-9 is not in the ids:"),
+            "stream-two-fences": (FIXTURE_PLAN, "2 ```toml fences")}
+    refusals = {"value-ledger-unregistered": PURPOSE_PENDING, "value-refused": "memory.map-purpose",
+                "bad-field-key": "registry unchanged"}
 
     def test_pipe_cell(lines):
         row = next((ln.split(" · region · ", 1)[1] for ln in lines if " · region · " in ln), "")

@@ -6041,6 +6041,38 @@ check("read_defs_at: a blob holding a syntax error maps its path to the EMPTY tr
       f"{(_rd['worktree'] or {}).get('bad.py')} {(_rd['HEAD'] or {}).get('bad.py')}")
 
 
+# ---- TOOL-dTotalRecall-43 S15, S36: the armed set's parity and the worktree's ids -----------------
+#
+# S15: the shared block's `BUILTIN_ARMED` mirrors `KNOWN_EXTS`, `js` the `js-regex` probe; the staged
+# break arms `js` under `ts-tokens`. S36: under `core.autocrlf=true` with a CRLF checkout, each worktree
+# id is `git hash-object <path>`'s, not the raw bytes' sha1; a tracked path deleted on disk is counted
+# `missing`; a mode-120000 entry, checked out as its link text, is that text's blob.
+_armed = sys.modules["extract_code"].BUILTIN_ARMED   # the block lexicon.py imports its reader from
+check("BUILTIN_ARMED mirrors KNOWN_EXTS, js armed as the js-regex probe (dTR-43 S15)",
+      _armed == lex.KNOWN_EXTS and _armed.get("js") == ("js-regex", "probe"), f"{_armed} {lex.KNOWN_EXTS}")
+with build_tempdir() as _td:
+    _r = Path(_td)
+    _git = lambda *a, **k: subprocess.run(["git", *a], cwd=_r, capture_output=True, **k)  # noqa: E731
+    _git("init", "-q", "--template=")
+    for _k, _v in (("core.autocrlf", "true"), ("user.email", "selftest@example.invalid"), ("user.name", "selftest")):
+        _git("config", _k, _v)
+    (_r / "a.py").write_bytes(b"def f():\r\n    return 1\r\n")
+    (_r / "gone.py").write_bytes(b"def g():\r\n    return 2\r\n")
+    _git("add", "-A")
+    _link = _git("hash-object", "-w", "--stdin", input=b"a.py").stdout.decode().strip()
+    _git("update-index", "--add", "--cacheinfo", f"120000,{_link},link.py")
+    _git("commit", "-qm", "head")
+    (_r / "link.py").write_bytes(b"a.py")
+    (_r / "gone.py").unlink()
+    _missing = []
+    _wt = lex.read_defs_at(_r, "worktree", missing=_missing) or {}
+    _wt_hash = _git("hash-object", "a.py").stdout.decode().strip()
+check("read_defs_at: under core.autocrlf=true a CRLF worktree file's id is `git hash-object`'s (dTR-43 S36)",
+      _wt.get("a.py", (None,))[0] == _wt_hash and [_n for _n, _ln in _wt["a.py"][1][0]] == ["f"], f"{_wt} {_wt_hash}")
+check("read_defs_at: a tracked path deleted on disk is counted missing, and a symlink reads as its link text's blob",
+      _missing == ["gone.py"] and _wt.get("link.py", (None,))[0] == _link, f"{_missing} {_wt.get('link.py')} {_link}")
+
+
 # ---- TOOL-aMendedFleet-3: `--merge-losses`, a merge that LOSES a definition a parent carried ------
 #
 # ONE fixture history, several resolutions of the same conflicting merge. The base defines `fa`,

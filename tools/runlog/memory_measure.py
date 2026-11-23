@@ -14,10 +14,13 @@ and `slice`, the bytes of a work order's inlined slices, read by `read_slice_byt
 returns None until the build writing the slice manifest gives it a body. A None reads as the channel
 `unarmed`, never as zero bytes.
 
-A MEMORY PATH is a word that, every `\\` folded to `/`, starts `<root>/` or carries `/<root>/`, the
-root `runlog_lib.py#resolve_memory_root` returns; so a kit directory whose name merely begins with the
-root's name never matches. A PowerShell command is folded before it is split, because `\\` is no escape
-character there.
+A MEMORY PATH is a word of THIS clone's memory tree (TOOL-dTotalRecall-43 S16, S17), the root
+`runlog_lib.py#resolve_memory_root` returns. The word is folded, every `\\` to `/`, an MSYS `/c/` to
+`c:/` and a drive letter lower-cased; an absolute word counts only when it starts with the main worktree,
+or a `.claude/worktrees/<name>` worktree of it, then `/<root>/`, so the harness's auto-memory directory
+and another repository's `memory/` never count; a relative word counts when it starts `<root>/` or is
+`<root>` alone, so a kit directory whose name merely begins with the root's name never matches. A
+PowerShell command is folded before it is split, because `\\` is no escape character there.
 
 THE POPULATION. Every subagent transcript, direct and workflow, under the project directories the
 harness names for this clone: its main worktree, the parent of the git common dir, each character
@@ -41,8 +44,8 @@ WHAT IT DOES NOT CHECK. The shell channel is an upper bound: a command naming a 
 more than memory. A command nested in `bash -c`, `eval` or `$(...)` is not descended into, as
 `extract_segments` states. The harness's project-directory encoding is observed, not documented; a
 changed encoding reads as `empty`, never `pass`. An agent whose transcript was last written before the
-window opens is not read. The byte counter is this unit's own; TOOL-dTotalRecall-43 S53 folds it with
-replay_scorer's `measure_bytes_before_act` into one shared counter.
+window opens is not read. The byte counter is `extract.py#read_result_bytes`, shared with
+replay_scorer's `measure_bytes_before_act` (TOOL-dTotalRecall-43 S53).
 """
 import datetime
 import json
@@ -77,6 +80,10 @@ DAY_SECONDS = 86400
 VERDICT_EXITS = {"pass": 0, "fail": 1, "not-due": 3, "unarmed": 3, "empty": 3}
 PROJECT_NAME_RE = re.compile(r"[^A-Za-z0-9-]")
 WORKTREE_INFIX = "--claude-worktrees-"
+# The folder a linked worktree of this clone sits in under its main worktree, the harness's own layout.
+WORKTREES_DIR = ".claude/worktrees"
+MSYS_ROOT_RE = re.compile(r"^/([A-Za-z])/")
+DRIVE_RE = re.compile(r"^[A-Za-z]:/")
 # The harness's folder for a Workflow run's agent transcripts under a session's `subagents/`: a transcript
 # layout name, not a kit, so the fixture names it once here.
 HARNESS_RUN_DIR = "workflows"
@@ -86,12 +93,39 @@ UNKNOWN_TYPE = "unknown"
 
 # ---------------------------------------------------------------------------------- one tool call
 
-def check_memory_word(word, memory_root) -> bool:
-    """Whether one word names a memory path: `<root>/` at its start or `/<root>/` inside it."""
+def derive_folded_path(word) -> str:
+    """One path word folded for comparison (TOOL-dTotalRecall-43 S16): every `\\` to `/`, an MSYS root
+    `/<letter>/` to `<letter>:/`, and a drive letter lower-cased."""
+    folded = word.replace("\\", "/")
+    msys = MSYS_ROOT_RE.match(folded)
+    if msys:
+        folded = f"{msys.group(1)}:/{folded[msys.end():]}"
+    if DRIVE_RE.match(folded):
+        folded = folded[0].lower() + folded[1:]
+    return folded
+
+
+def check_memory_word(word, memory_root, main_worktree=None) -> bool:
+    """Whether one word names a memory path of THIS clone, folded by `derive_folded_path`
+    (TOOL-dTotalRecall-43 S16, S17). An absolute word counts only when it starts with the main worktree,
+    or a `.claude/worktrees/<name>` worktree of it, then `/<root>/`; so the harness's own auto-memory
+    directory and another repository's `memory/` never count, and with no main worktree known no
+    absolute word does. A relative word counts when it starts with `<root>/` or is `<root>` alone."""
     if not isinstance(word, str):
         return False
-    folded = word.replace("\\", "/")
-    return folded.startswith(memory_root + "/") or ("/" + memory_root + "/") in folded
+    folded = derive_folded_path(word)
+    if not (folded.startswith("/") or DRIVE_RE.match(folded)):
+        return folded.startswith(memory_root + "/") or folded == memory_root
+    if main_worktree is None:
+        return False
+    main = derive_folded_path(str(main_worktree)).rstrip("/")
+    if folded.startswith(f"{main}/{memory_root}/"):
+        return True
+    lead = f"{main}/{WORKTREES_DIR}/"
+    if not folded.startswith(lead):
+        return False
+    name, _sep, rest = folded[len(lead):].partition("/")
+    return bool(name) and rest.startswith(memory_root + "/")
 
 
 def check_read_verb(words) -> bool:
@@ -110,8 +144,9 @@ def check_read_verb(words) -> bool:
     return False
 
 
-def derive_read_channel(name, tool_input, memory_root):
-    """`read`, `shell` or None for one tool call, decided from its input in memory and keeping none of it."""
+def derive_read_channel(name, tool_input, memory_root, main_worktree=None):
+    """`read`, `shell` or None for one tool call, decided from its input in memory and keeping none of it;
+    a path word is matched by `check_memory_word` against this clone's `main_worktree`."""
     if not isinstance(tool_input, dict):
         return None
     if name in ex.SHELL_TOOLS:
@@ -121,24 +156,13 @@ def derive_read_channel(name, tool_input, memory_root):
         if name == "PowerShell":
             command = command.replace("\\", "/")
         for words, _sep in ex.extract_segments(command):
-            if check_read_verb(words) or any(check_memory_word(w, memory_root) for w in words):
+            if check_read_verb(words) or any(check_memory_word(w, memory_root, main_worktree) for w in words):
                 return "shell"
         return None
     if ex.TOOL_CLASSES.get(name) == "read":
-        if any(check_memory_word(tool_input.get(key), memory_root) for key in PATH_INPUTS):
+        if any(check_memory_word(tool_input.get(key), memory_root, main_worktree) for key in PATH_INPUTS):
             return "read"
     return None
-
-
-def derive_result_bytes(block) -> int:
-    """The UTF-8 bytes of one `tool_result`'s content: a string, or the text items of a list."""
-    content = block.get("content")
-    if isinstance(content, str):
-        return len(content.encode("utf-8", "surrogatepass"))
-    if isinstance(content, list):
-        return sum(len(item["text"].encode("utf-8", "surrogatepass")) for item in content
-                   if isinstance(item, dict) and isinstance(item.get("text"), str))
-    return 0
 
 
 # ---------------------------------------------------------------------------------- one agent
@@ -149,29 +173,27 @@ def read_slice_bytes(agent_path):
     return None
 
 
-def measure_agent_memory(path, memory_root, read_slice, coverage=None) -> dict:
+def measure_agent_memory(path, memory_root, read_slice, coverage=None, main_worktree=None) -> dict:
     """`{"slice": int | None, "read": int, "shell": int}` for one agent transcript, walked through
-    `read_records` over a one-file tree; torn lines and an unreadable file are counted into `coverage`."""
+    `read_records` over a one-file tree and `extract.py#read_result_bytes`, the one result-byte counter;
+    torn lines and an unreadable file are counted into `coverage`. A path word counts against this
+    clone's `main_worktree` (`check_memory_word`)."""
     path = pathlib.Path(path)
     tree = ex.SessionTree(sid=path.stem, main=path)
     totals = {"read": 0, "shell": 0}
     pending = {}
-    for _src, _file_no, _lineno, rec in ex.read_records(tree, coverage):
-        msg = rec.get("message")
-        content = msg.get("content") if isinstance(msg, dict) else None
-        if not isinstance(content, list):
+    records = (rec for _src, _file_no, _lineno, rec in ex.read_records(tree, coverage))
+    for kind, tid, name, value in ex.read_result_bytes(records):
+        if not isinstance(tid, str):
             continue
-        for block in content:
-            if not isinstance(block, dict):
-                continue
-            if block.get("type") == "tool_use" and isinstance(block.get("id"), str):
-                channel = derive_read_channel(block.get("name"), block.get("input"), memory_root)
-                if channel:
-                    pending[block["id"]] = channel
-            elif block.get("type") == "tool_result" and isinstance(block.get("tool_use_id"), str):
-                channel = pending.pop(block["tool_use_id"], None)
-                if channel:
-                    totals[channel] += derive_result_bytes(block)
+        if kind == "use":
+            channel = derive_read_channel(name, value, memory_root, main_worktree)
+            if channel:
+                pending[tid] = channel
+        else:
+            channel = pending.pop(tid, None)
+            if channel:
+                totals[channel] += value
     return {"slice": read_slice(path), **totals}
 
 
@@ -248,7 +270,7 @@ def measure_memory_population(projects_root, main_worktree, memory_root, window,
                     continue
                 seen = True
                 agents.append((read_agent_type(path),
-                               measure_agent_memory(path, memory_root, read_slice, coverage)))
+                               measure_agent_memory(path, memory_root, read_slice, coverage, main_worktree)))
             sessions += seen
     return {"sessions": sessions, "agents": agents, "coverage": coverage}
 
@@ -368,10 +390,13 @@ def resolve_landed_time(rev, root):
 
 FIXTURE_CASES = ("read-memory", "read-other", "grep-memory", "shell-path", "record-show", "gov-tag",
                  "recall-query", "shell-other", "foreign-dir", "outside-window", "median-under",
-                 "median-over", "not-due", "unarmed", "empty", "privacy")
+                 "median-over", "not-due", "unarmed", "empty", "privacy",
+                 "harness-memory", "msys-path", "foreign-memory-path", "bare-root")
 FIXTURE_CLOCK = "2026-12-15T00:00:00Z"
-FIXTURE_MAIN = "/fx/main-tree"  # the scratch main worktree the planted project directories encode
-FIXTURE_FOREIGN = "/fx/other-tree"
+# The scratch main worktree the planted project directories encode, and every planted absolute memory path
+# sits under (TOOL-dTotalRecall-43 S16): the memory measure counts this clone's tree alone.
+FIXTURE_MAIN = "C:/fx/repo"
+FIXTURE_FOREIGN = "C:/fx/other-tree"
 FIXTURE_MARKER = "TOTALRECALL-12-MARKER"
 FX_MEMORY_FILE = "C:\\fx\\repo\\memory\\builds\\b\\RUN.md"
 FX_KIT_FILE = "C:\\fx\\repo\\tools\\memory-tree\\README.md"
@@ -401,7 +426,18 @@ FIXTURE_PLANTS = {
     "shell-other": {"agents": [("main", "gov-builder", 1, [
         ("Bash", {"command": "git log --oneline -5"}, 300),
         ("Bash", {"command": 'grep -rn ask "C:\\fx\\repo\\tools\\memory-recall"'}, 200),
-        ("Bash", {"command": "python -c 'print(1)' memory"}, 100)], 0)]},
+        ("Bash", {"command": "python -c 'print(1)' memories"}, 100)], 0)]},
+    # TOOL-dTotalRecall-43 S16, S17: the harness's own auto-memory directory and another repository's
+    # memory/ count zero; this clone's memory/ spelled from its MSYS root, and the bare root, count.
+    "harness-memory": {"agents": [("main", "gov-builder", 1, [
+        ("Read", {"file_path": "C:\\Users\\u\\.claude\\projects\\p\\memory\\MEMORY.md"}, 700)], 0)]},
+    "msys-path": {"agents": [("main", "gov-builder", 1, [
+        ("Read", {"file_path": "/c/fx/repo/memory/LIVE.md"}, 450),
+        ("Read", {"file_path": "/c/fx/repo/.claude/worktrees/side/memory/LIVE.md"}, 50)], 0)]},
+    "foreign-memory-path": {"agents": [("main", "gov-builder", 1, [
+        ("Read", {"file_path": "C:\\fx\\other-tree\\memory\\DECISIONS.md"}, 800),
+        ("Bash", {"command": "cat /c/fx/other-tree/memory/LIVE.md"}, 200)], 0)]},
+    "bare-root": {"agents": [("main", "gov-builder", 1, [("Bash", {"command": "ls memory"}, 350)], 0)]},
     "foreign-dir": {"agents": [("main", "gov-builder", 1, [("Read", {"file_path": FX_MEMORY_FILE}, 600)], 0),
                                ("foreign", "gov-builder", 1, [("Read", {"file_path": FX_MEMORY_FILE}, 5000)], 0)]},
     "outside-window": {"agents": [("main", "gov-builder", 1, [("Read", {"file_path": FX_MEMORY_FILE}, 600)], 0),

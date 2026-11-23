@@ -30,6 +30,7 @@ after the first read in a process, which keys no extractor version.
 from __future__ import annotations
 
 import functools
+import itertools
 import os
 import pathlib
 import re
@@ -46,7 +47,7 @@ import tag_index as ti  # noqa: E402
 FILE_RECORD_RE = r"/builds/[^/]+/(?:build|reviews|prompts)/[^/]+$"
 SPEC_RE = r"/builds/[^/]+/spec/[^/]+\.md$"
 HEADING_RE = re.compile(r"(?P<hashes>#{2,6}) (?P<text>.*\S)")
-AUTHORED_RE = re.compile(r"\[section\.(?P<seg>[a-z0-9][a-z0-9-]*)\](?:[ \t]|$)")
+AUTHORED_RE = ti.AUTHORED_SECTION_RE   # the one authored-tag grammar, the anchor seed's (TOOL-dTotalRecall-43 S44)
 FEATURE_RE = re.compile(r"\bgov:feature[ \t]+`?(feature(?:\." + ti.SEG + r")+)")
 MARKER_RE = re.compile(r"\bgov:(" + ti.SEG + r")")
 
@@ -144,7 +145,11 @@ def extract_section(ctx, path, text=None):
     except record_kinds.RecordKindsError:
         sections = []
     lines = text.splitlines()
-    heads, seen = [], set()
+    # TOOL-dTotalRecall-43 S44: the authored tags' anchors seed `seen` before any heading derives one
+    heads, seen = [], ti.read_authored_anchors(
+        m.group("text") for _n, line in itertools.takewhile(lambda nl: nl[1] is not None,
+                                                            tree_lib.unfenced_lines("\n".join(lines)))
+        for m in [HEADING_RE.fullmatch(line.rstrip())] if m)
     for n, line in tree_lib.unfenced_lines("\n".join(lines)):
         if line is None:
             break
@@ -182,13 +187,15 @@ def extract_feature(ctx, path, text=None):
 
 
 def extract_class(ctx, path, text=None):
-    """The `class` namespace: each gotcha record whose front matter reads kind `class` (S1)."""
+    """The `class` namespace: each gotcha record `gotchas.py#build_record` reads as kind `class` (S1), the
+    catalogue's own record builder, so a record with no `kind:` key reads as `gotchas.py` reads it
+    (TOOL-dTotalRecall-43 S52)."""
     mr = ctx["memory_root"]
     if text is None:
         return "" if re.fullmatch(re.escape(mr) + r"/gotchas/[^/]+\.md", path) else None
     _t, _i, _r, gotchas = load_memory_modules()
     try:
-        fm = gotchas.parse_front_matter(path, text)
+        fm = gotchas.build_record(path, text.replace("\r\n", "\n"))
     except gotchas.Problem:
         return []
     tag = f"class.{fm['name']}"

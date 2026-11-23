@@ -430,10 +430,7 @@ readme() { # slug
   cat > "memory/builds/$1/README.md" <<EOF
 ---
 slug: $1
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-$1-1
 ---
 
@@ -13194,10 +13191,7 @@ SUC
     cat > "memory/builds/$su_s/README.md" <<SUR
 ---
 slug: $su_s
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-$su_s-1
 ---
 
@@ -14231,10 +14225,7 @@ IPC
   cat > memory/builds/tRun/README.md <<'IPR'
 ---
 slug: tRun
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-tRun-1
 ---
 
@@ -16095,10 +16086,7 @@ DLC
     cat > "memory/builds/$dl_s/README.md" <<DLR
 ---
 slug: $dl_s
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-$dl_s-1
 ---
 
@@ -16586,10 +16574,7 @@ IHC
   cat > memory/builds/tRun/README.md <<'IHR'
 ---
 slug: tRun
-node: a
 opened: 2026-08-01
-streams: architecture
-roster: ARCH
 ids: ARCH-tRun-1
 ---
 

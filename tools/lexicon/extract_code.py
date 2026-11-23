@@ -4,7 +4,7 @@
 # to it, so a change is made in the canonical and copied here whole.
 # >>> extract_code — canonical copy: extract_code.py in gov's lib dir (byte-identical; gated)
 import ast
-import hashlib
+import os
 import re
 import subprocess
 
@@ -2023,14 +2023,14 @@ def _identifier_tokens(source: str, suffix: str = "") -> set[str]:
     return set(_IDENT_TOKEN_RE.findall("".join(out)))
 
 
-#: The armed set `read_defs_at` reads when its caller names none: the four shipped parsers, keyed by
-#: the extensions each reads, every one under `parser`. A caller holding a declaration, the lexicon's
+#: The armed set `read_defs_at` reads when its caller names none: the shipped extractors, keyed by
+#: the extensions each reads. A caller holding a declaration, the lexicon's
 #: `LANGS`, passes its own `armed` in this same `{extension: (pattern-set id, mode)}` shape.
-BUILTIN_ARMED = {"py": ("python-ast", "parser"),
-                 "sh": ("shell-tokens", "parser"), "bash": ("shell-tokens", "parser"),
-                 "js": ("ts-tokens", "parser"), "mjs": ("ts-tokens", "parser"),
-                 "cjs": ("ts-tokens", "parser"), "ts": ("ts-tokens", "parser"),
-                 "tsx": ("tsx-tokens", "parser"), "jsx": ("tsx-tokens", "parser")}
+#: It MIRRORS the lexicon's `KNOWN_EXTS` (TOOL-dTotalRecall-43 S15): `js` is the `js-regex` probe, and
+#: no extension the lexicon does not know is armed; the lexicon self-test's parity arm holds the two equal.
+BUILTIN_ARMED = {"py": ("python-ast", "parser"), "js": ("js-regex", "probe"),
+                 "sh": ("shell-tokens", "parser"), "ts": ("ts-tokens", "parser"),
+                 "tsx": ("tsx-tokens", "parser")}
 
 
 def read_state_listing(root, state):
@@ -2087,7 +2087,21 @@ def read_blob_batch(root, blobs):
     return out
 
 
-def read_defs_at(root, state, paths=None, cache=None, *, armed=None, sets=None):
+def read_worktree_blobs(root, rels):
+    """`{path: blob id}` for tracked working-tree paths present on disk, from ONE `git hash-object
+    --stdin-paths` spawn, so each id is the one `git hash-object <path>` prints: the clean filters and
+    `core.autocrlf` applied, a symlink hashed as its link text. `None` when git failed."""
+    if not rels:
+        return {}
+    got = subprocess.run(["git", "hash-object", "--stdin-paths"], cwd=root, capture_output=True,
+                         input="".join(rel + "\n" for rel in rels).encode("utf-8"))
+    ids = got.stdout.decode("ascii", errors="replace").split()
+    if got.returncode != 0 or len(ids) != len(rels):
+        return None
+    return dict(zip(rels, ids))
+
+
+def read_defs_at(root, state, paths=None, cache=None, *, armed=None, sets=None, missing=None):
     """`{path: (blob, (functions, types, imports))}` for every path whose extension `armed` maps, read
     from `state`: `worktree`, each tracked file's bytes on disk; `index`, the staging index's stage-0
     entries; anything else, a revision. Restricted to `paths` when given. `None` when a git call
@@ -2096,9 +2110,11 @@ def read_defs_at(root, state, paths=None, cache=None, *, armed=None, sets=None):
 
     AT MOST TWO SPAWNS PER READ: one listing and one `git cat-file --batch` over the blobs not in
     `cache`, because on Windows a per-file read is spawn-bound. The worktree spawns no batch: its
-    blob id is git's own, `sha1(b"blob <size>\\0" + bytes)`, computed here over the bytes on disk,
-    so a blob unchanged since the index or a revision shares their cache entry. A tracked path absent
-    from disk yields no worktree entry.
+    blob ids come from ONE `git hash-object --stdin-paths` (`read_worktree_blobs`, TOOL-dTotalRecall-43
+    S36), git's own id of the path with its filters and `core.autocrlf` applied, so a blob unchanged
+    since the index or a revision shares their cache entry, and its text is the bytes on disk, a
+    symlink's (mode `120000`) its link text. A tracked path absent from disk yields no worktree entry
+    and is appended to `missing` where the caller passes a list.
 
     `armed` maps an extension to `(pattern-set id, mode)` and defaults to `BUILTIN_ARMED`; `sets` is
     `extract_text`'s. `cache` maps `(blob, extension)` to the triple, so a blob shared by two states
@@ -2112,20 +2128,32 @@ def read_defs_at(root, state, paths=None, cache=None, *, armed=None, sets=None):
     listing = read_state_listing(root, state)
     if listing is None:
         return None
-    want, disk = [], {}
+    want, disk, loose = [], {}, {}
     for blob, rel in listing:
         ext = ext_of(rel)
         if ext not in armed or (paths is not None and rel not in paths):
             continue
         if blob is None:
+            full = f"{root}/{rel}"
             try:
-                with open(f"{root}/{rel}", "rb") as fh:
-                    data = fh.read()
+                if os.path.islink(full):
+                    data = os.fsencode(os.readlink(full))
+                else:
+                    with open(full, "rb") as fh:
+                        data = fh.read()
             except OSError:
+                if missing is not None:
+                    missing.append(rel)
                 continue
-            blob = hashlib.sha1(b"blob %d\0" % len(data) + data, usedforsecurity=False).hexdigest()
-            disk[blob] = data
+            loose[rel] = data
+            continue
         want.append(((blob, ext), rel))
+    ids = read_worktree_blobs(root, list(loose))
+    if ids is None:
+        return None
+    for rel, data in loose.items():
+        disk[ids[rel]] = data
+        want.append(((ids[rel], ext_of(rel)), rel))
     todo = sorted({key for key, _ in want if key not in cache})
     texts = read_blob_batch(root, sorted({blob for blob, _ext in todo if blob not in disk}))
     if texts is None:

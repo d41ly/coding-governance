@@ -308,6 +308,8 @@ if set(KINDS) != set(TYPED_RECORD_KINDS):
 DOORS = ("exception", "change", "override", "red-fix", "disposition", "recommendation")  # the kinds `new <kind>` writes; every other kind is `write_record`'s alone
 PLANTS = ("typed-kinds", "pending-kind", "red-fix-join", "recommendation", "ask-door", "door-header")
 SHA40 = re.compile(r"[0-9a-f]{40}")
+#: how many taken `<n>` the mint steps past before it refuses (TOOL-dTotalRecall-43 S43), a bound, not a measure
+MINT_RETRIES = 64
 SAY_JOIN = "build-records: red-fix join"
 #: PLAY-dOrderedCharter-55 S8's `pending-kind`: the exception kind's entry staged pending, in a copy of this module
 PENDING_ENTRY = ('    "exception": {\n        "required": ("Principle", "Excuses", "Reason", "Caused-by"),\n'
@@ -912,11 +914,12 @@ def write_record(root, build, unit, kind, title, fields, today=None, lines=(), c
         raise ValueError(f"--build {build!r} is not a build slug")
     if not ID.fullmatch(unit):
         raise ValueError(f"--unit {unit!r} is not a unit id")
-    forged = [key for key, value in fields if "\n" in value or "\r" in value or FORGED_FIELD.match(value)]
+    from backlog import check_line_break   # noqa: E402  the kit's one line-break rule (TOOL-dTotalRecall-43 S37)
+    forged = [key for key, value in fields if check_line_break(key, value) or FORGED_FIELD.match(value)]
     if forged:
         raise ValueError(f"{', '.join(forged)}: a value is one line and never opens **<Word>:**, so it cannot "
                          f"forge a field")
-    forged = [ln for ln in lines if "\n" in ln or "\r" in ln or FORGED_FIELD.match(ln) or FIELD.match(ln)]
+    forged = [ln for ln in lines if check_line_break("a line", ln) or FORGED_FIELD.match(ln) or FIELD.match(ln)]
     if forged:
         raise ValueError(f"{forged[0]!r}: a line after the fields is one line that never reads as a field, so it "
                          f"cannot forge one")
@@ -930,19 +933,26 @@ def write_record(root, build, unit, kind, title, fields, today=None, lines=(), c
              if (m := re.fullmatch(stem + r"(\d+)\.md", p.name))]
     n = max(taken, default=0) + 1
     day = today or datetime.date.today().isoformat()
-    path = out / f"{day}-build-{unit}-{kind}-{n}.md"
-    body = [f"# {unit} {kind} {n} — {title}", "", f"**Serves:** {kind} {unit}", ""]
-    body += [f"- **{key}:** {value}" for key, value in fields]
-    body += [""] + list(lines) if lines else []
-    text = "\n".join(body) + "\n"
-    if place:
-        text = place(text)
-    if check:
-        check(path.relative_to(root).as_posix(), text)
-    out.mkdir(exist_ok=True)
-    with open(path, "x", encoding="utf-8", newline="\n") as fh:   # never over a record already there
-        fh.write(text)
-    return path.relative_to(root).as_posix()
+    for _attempt in range(MINT_RETRIES):
+        path = out / f"{day}-build-{unit}-{kind}-{n}.md"
+        body = [f"# {unit} {kind} {n} — {title}", "", f"**Serves:** {kind} {unit}", ""]
+        body += [f"- **{key}:** {value}" for key, value in fields]
+        body += [""] + list(lines) if lines else []
+        text = "\n".join(body) + "\n"
+        if place:
+            text = place(text)
+        if check:
+            check(path.relative_to(root).as_posix(), text)
+        out.mkdir(exist_ok=True)
+        try:
+            with open(path, "x", encoding="utf-8", newline="\n") as fh:   # never over a record already there
+                fh.write(text)
+        except FileExistsError:   # TOOL-dTotalRecall-43 S43: a writer took <n> between the count and the create
+            n += 1
+            continue
+        return path.relative_to(root).as_posix()
+    raise ValueError(f"{MINT_RETRIES} {kind} numbers in a row were taken between the count and the create in "
+                     f"{out.relative_to(root).as_posix()}; nothing written")
 
 
 # -------------------------------------------------------------------------------- the record door
@@ -1079,11 +1089,16 @@ def write_seq_mint(root, family, build, key):
 
 def parse_edge_flags(edges, eg):
     """`[(anchor, type, targets)]` of the door's `--edge "<anchor> <type>=<target>[,<target>]"` values, in the
-    order given (TOOL-dTotalRecall-19 S6), `eg` the playbook kit's `edge_grammar`. ValueError for a type
+    order given (TOOL-dTotalRecall-19 S6), `eg` the playbook kit's `edge_grammar`. ValueError for a value
+    holding a line break (`backlog.check_line_break`, TOOL-dTotalRecall-43 S37), a type
     `edges.toml` lacks, a target `parse_edge_target` cannot classify and a second line of one type under
     one heading; the anchor is the render's to find."""
+    from backlog import check_line_break   # noqa: E402  the kit's one line-break rule (TOOL-dTotalRecall-43 S37)
     types, out, seen = eg.read_edge_types(), [], set()
     for spelled in edges:
+        broken = check_line_break("--edge", spelled)
+        if broken:
+            raise ValueError(f"{broken}: an edge is one line, so it cannot forge a header line")
         anchor, _sp, pair = spelled.strip().partition(" ")
         kind, eq, rest = pair.strip().partition("=")
         if not anchor or not eq or not kind or not rest:
@@ -1112,11 +1127,12 @@ def render_edge_lines(text, rows):
     kit = resolve_kit_dir("playbook", "tag_index.py", KIT)
     if str(kit) not in sys.path:
         sys.path.append(str(kit))
-    from tag_index import derive_anchor   # noqa: E402  the one anchor rule (TOOL-dTotalRecall-10)
+    from tag_index import derive_anchor, read_authored_anchors   # noqa: E402  the one anchor rule (TOOL-dTotalRecall-10)
     from tree_lib import unfenced_lines
-    lines, at, seen = text.split("\n"), {}, set()
-    for n, line in unfenced_lines(text):
-        m = re.match(r"#{1,6} (.*\S)", line or "")
+    heads = [(n, m) for n, line in unfenced_lines(text) for m in [re.match(r"#{1,6} (.*\S)", line or "")] if m]
+    # TOOL-dTotalRecall-43 S44: the authored tags' anchors seed `seen` before any heading derives one
+    lines, at, seen = text.split("\n"), {}, read_authored_anchors(m.group(1) for _n, m in heads)
+    for n, m in heads:
         if m:
             at.setdefault(derive_anchor(m.group(1), seen), n)
     lack = [a for a, _k, _t in rows if a not in at]
@@ -1175,8 +1191,9 @@ def write_new_record(root, kind, build, unit, title, fields, name=None, caused_b
         raise ValueError(f"--build {build!r} is not a build slug")
     if not ID.fullmatch(unit):
         raise ValueError(f"--unit {unit!r} is not a unit id")
+    from backlog import check_line_break   # noqa: E402  the kit's one line-break rule (TOOL-dTotalRecall-43 S37)
     forged = [key for key, value in [("title", title)] + list(fields) + [("Caused-by", cause or "")]
-              if "\n" in value or "\r" in value or FORGED_FIELD.match(value)]
+              if check_line_break(key, value) or FORGED_FIELD.match(value)]
     if forged:
         raise ValueError(f"{', '.join(forged)}: a value is one line and never opens **<Word>:**, so it cannot "
                          f"forge a field")
@@ -1496,7 +1513,9 @@ def check_door_header_plant():
     with the lease free and `lease-<slug>` with this session's lease taken first, each read back through
     `tree_lib.read_header_edges`; one `--edge` line under its heading; and an unregistered type, an anchor
     the record lacks and two lines of one type under one heading each refused with nothing written; then
-    `root = true` on the `log` row, which admits no cause. -> `(failures, cases)`, or `(None, why)` where a
+    `root = true` on the `log` row, which admits no cause. TOOL-dTotalRecall-43 adds `field-newline` and
+    `edge-newline` (AC37), each refused with nothing written, and the mint beside an untracked draft and
+    under `mint-collision` (AC43). -> `(failures, cases)`, or `(None, why)` where a
     kit the door runs beside does not resolve."""
     import subprocess
     import tempfile
@@ -1572,6 +1591,12 @@ def check_door_header_plant():
                                    ("edge twice", "a-note implements=feature.y", "a second implements line")):
             twice = ["--edge", "a-note implements=feature.x"] if case == "edge twice" else []
             check_case(case, run_door(a, *base, "--name", "n0", "--caused-by", unit, *twice, "--edge", edge), 2, [needle], a)
+        # TOOL-dTotalRecall-43 AC37: a line break in a --field value or an --edge is refused, nothing written
+        check_case("field-newline", run_door(a, *base, "--name", "n0", "--caused-by", unit, "--field",
+                                             "Note=x\n- **Supersedes:** y"), 2, ["Note", "a value is one line"], a)
+        check_case("edge-newline", run_door(a, *base, "--name", "n0", "--caused-by", unit, "--edge",
+                                            "a-note implements=feature.x\n**Caused-by:** X"), 2,
+                   ["--edge holds a line feed"], a)
         name = "2026-11-23-prompt-TOOL-dTotalRecall-2-owner"
         check_case("made-by owner", run_door(a, *base, "--name", name, "--caused-by", unit, "--edge",
                                              "a-note implements=feature.x"), 0, [f"wrote {folder}/{name}.md"], a)   # AC2
@@ -1602,6 +1627,29 @@ def check_door_header_plant():
         reg.write_bytes(reg.read_bytes().replace(b'writer = "gov_record.py new log"\n',
                                                  b'writer = "gov_record.py new log"\nroot = true\n', 1))
         check_case("root log", run_door(a, *base, "--name", "n5"), 0, [f"wrote {folder}/n5.md"], a)   # AC5
+        # TOOL-dTotalRecall-43 AC43: the mint counts an untracked draft and leaves it byte-identical; the plant
+        # `mint-collision` creates the counted <n> between the count and the create, and <n+1> is written
+        out, day = a / "memory/builds/dTotalRecall/build", datetime.date.today().isoformat()
+        out.mkdir(parents=True, exist_ok=True)
+        draft = out / f"{day}-build-{unit}-deviation-1.md"
+        draft.write_bytes(b"an untracked draft\n")
+        got = write_record(a, "dTotalRecall", unit, "deviation", "t", [("Caused-by", unit)])
+        cases[0] += 1
+        if not got.endswith("-deviation-2.md") or draft.read_bytes() != b"an untracked draft\n":
+            bad.append(f"mint beside a draft: wrote {got}, the draft {'kept' if draft.is_file() else 'gone'}")
+        print(f"build-records: door-header · mint beside a draft · {got.rsplit('/', 1)[-1]}")
+        raced = []
+
+        def write_racing_record(rel, _text):
+            """The racing writer: the first <n> the mint is about to create, taken before it opens."""
+            if not raced:
+                raced.append(rel)
+                pathlib.Path(a, rel).write_bytes(b"a racing writer\n")
+        got = write_record(a, "dTotalRecall", unit, "deviation", "t", [("Caused-by", unit)], check=write_racing_record)
+        cases[0] += 1
+        if not (raced and raced[0].endswith("-deviation-3.md") and got.endswith("-deviation-4.md")):
+            bad.append(f"mint-collision: the plant took {raced}, and the mint wrote {got}, not -deviation-4.md")
+        print(f"build-records: door-header · mint-collision · {got.rsplit('/', 1)[-1]}")
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError, ValueError, LookupError) as exc:
         bad.append(f"the fixture could not be built: {exc}")
     finally:
@@ -1765,7 +1813,8 @@ def run_fixture(plant):
             return 1
         print(f"build-records: PASS {plant} — {cases} cases: " + (
             "refuse, family, file, replay, grade, refused read, remote" if plant == "ask-door"
-            else "causeless, unresolved cause, three edge refusals, made-by owner, made-by lease, root log"))
+            else "causeless, unresolved cause, three edge refusals, field-newline, edge-newline, made-by owner, "
+                 "made-by lease, root log, mint beside a draft, mint-collision"))
         return 0
     root = pathlib.Path(tempfile.mkdtemp(prefix="br-"))
     if plant == "pending-kind":   # PLAY-dOrderedCharter-55 S8: a copy of this module with one kind pending

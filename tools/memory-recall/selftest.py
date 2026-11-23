@@ -85,7 +85,7 @@ Q = ("why was the frobnicator chosen", "--terms", "frobnicator quibbler leaks sn
 # a served set without the map (TOOL-aGraftedHelix-4), and every arm reading the line would say so.
 # The last group is the pairs the call EXTRACTED (TOOL-dTotalRecall-21 S9), never a rebuild cause.
 INDEX_RE = re.compile(r"index (\d+) records \+ (\d+) chunks · superseded \d+ \(\d+ whole, \d+ "
-                      r"partial\) \(tree [0-9a-f]{8}, extracted (\d+) blob\(s\) in ")
+                      r"partial\) \(tree [0-9a-f]{8}, extracted (\d+) blob\(s\), freed (\d+) in ")
 # `python3?` on purpose: every launcher this kit prints is resolved python3-first, so a pattern
 # anchored on bare `python ` silently matched nothing on a python3 host — the arm below would then
 # have folded an empty set and passed vacuously.
@@ -977,6 +977,55 @@ def test_conf_digest_both_directions():
         cleanup(root)
 
 
+@check("a twice-changed FAMILIES keeps one corpus copy, and the second run's index line reports the freed rows")
+def test_conf_change_frees_the_old_copy():
+    """TOOL-dTotalRecall-43 AC39. Each conf edit moves the digest, so the run after it extracts a whole
+    copy at the new digest; `remove_unheld_recall_rows` drops the copy no live worktree's digest names,
+    and the freed count reaches the index line through `write_recall_rows`. The staged break drops the
+    count, which reads 0 here where the sweep freed a copy.
+    """
+    import sqlite3
+    root, kitdir = make_repo()
+    conf = root / ".memory-tree.conf"
+    try:
+        paths = index_of(run(root, kitdir, *Q))[2]   # one corpus copy: the pairs the cold run extracts
+        assert paths > 0, "the cold run extracted nothing, so no copy is there to free"
+        conf.write_text('MEMORY_ROOT=memory\nFAMILIES="tooling:ZZZZ"\n', encoding="utf-8", newline="\n")
+        run(root, kitdir, *Q)
+        conf.write_text('MEMORY_ROOT=memory\nFAMILIES="tooling:YYYY"\n', encoding="utf-8", newline="\n")
+        second = run(root, kitdir, *Q)
+        m = INDEX_RE.search(second.stdout)
+        assert m and int(m.group(3)) == paths and int(m.group(4)) == paths, (
+            f"the second conf change extracted/freed {m and m.groups()}, not {paths} each: {second.stdout[-400:]}")
+        con = sqlite3.connect(str(resolve_index_file(root)))
+        try:
+            (held,) = con.execute("SELECT COUNT(*) FROM fts_blob").fetchone()
+        finally:
+            con.close()
+        assert held == paths, f"fts_blob holds {held} pair(s) after two conf changes, not one copy of {paths}"
+        return f"{paths} pair(s) extracted and {m.group(4)} freed on the second change; one copy held"
+    finally:
+        cleanup(root)
+
+
+@check("with no playbook kit, query.py exits 2 with one line naming it and no traceback")
+def test_query_without_playbook_kit_refuses():
+    """TOOL-dTotalRecall-43 AC26. Recall's rows live in the playbook kit's tag index, so a copy with no
+    playbook kit beside memory-recall refuses by name; the staged break lets `LookupError` escape the
+    import of `query.py`, which prints a traceback and exits 1.
+    """
+    import extract as E
+    root, kitdir = make_repo()
+    try:
+        shutil.rmtree(root / E.resolve_kit_dir("playbook", "tag_index.py", KIT).name)
+        p = run(root, kitdir, "x", "--terms", "a b c d e f g h")
+        assert p.returncode == 2, f"exit {p.returncode}, not 2: {p.stderr[-400:]}"
+        assert "playbook" in p.stderr and "Traceback" not in p.stderr, p.stderr[-400:]
+        return p.stderr.strip().splitlines()[-1][:120]
+    finally:
+        cleanup(root)
+
+
 @check("the GRAMMAR EPOCH is inside conf_digest, so a grammar edit cannot leave a cache warm")
 def test_digest_covers_grammar_epoch():
     """`digest()`'s docstring promises "an id-grammar or corpus-root edit invalidates a warm cache".
@@ -1582,7 +1631,9 @@ def test_verbatim_files():
     """Not a diff against upstream (no adopter has that repo) — a diff against the recorded digest.
 
     `union.py` carries no coupling on the query path, so it is re-pulled WHOLESALE on an upstream
-    fix rather than merged. An unexplained edit there means somebody forked it without saying so.
+    fix rather than merged, with its ONE recorded fork re-applied: it calls `B.build_fts_rows` where
+    upstream calls `B.build_index`, TOOL-dTotalRecall-21's rename (TOOL-dTotalRecall-43 S27). Any other
+    unexplained edit there means somebody forked it without saying so.
 
     **`bench.py` IS forked, by one hunk.** `TOOL-dTracedLattice-7` made `run_rm3`'s expansion-term
     selection independent of `PYTHONHASHSEED`; the file's own header says so. So a red here on
@@ -1796,7 +1847,8 @@ def test_one_walk_two_callers():
 # WHY THIS BLOCK EXISTS. `bench.py` and `union.py` are byte-identical between the two trees and
 # `verbatim.json` pins both by digest, so `t_verbatim_files` proves the bytes have not moved and
 # NOTHING here proved they still behave. Same for the half of `query.py` that has not forked:
-# `emit`, `parse`, `query_expr`, `rrf` and `render` diff to ZERO changed lines against adopter ic's copy.
+# `emit`, `parse` and `render`, and `query_expr` and `rrf`, now memory-tree's `record_find.py`'s
+# (TOOL-dTotalRecall-43 S34), diff to ZERO changed lines against adopter ic's copy.
 # A digest is not a check of behaviour; these are. Every arm below either drives a verbatim file or
 # drives a query.py function that is byte-identical to the one it was written against.
 # (Since TOOL-aGraftedHelix-4, `render` and `emit` also print the supersession tag, `query.py`'s

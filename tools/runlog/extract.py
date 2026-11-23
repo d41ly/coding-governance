@@ -330,6 +330,29 @@ def read_records(tree: SessionTree, coverage=None):
                     cov["torn"] = cov.get("torn", 0) + 1
 
 
+def read_result_bytes(records):
+    """Yield `(kind, id, name, value)` for every tool event of `records`, transcript records in file
+    order: `use` per `tool_use` block, its value the call's input as written; `result` per
+    `tool_result` block, its value the UTF-8 bytes of its content, a string or the text items of a
+    list. The ONE tool-result byte counter (TOOL-dTotalRecall-43 S53), walked by the memory measure's
+    `measure_agent_memory` and replay_scorer's `measure_bytes_before_act`."""
+    for rec in records:
+        msg = rec.get("message") if isinstance(rec, dict) else None
+        content = msg.get("content") if isinstance(msg, dict) else None
+        for block in content if isinstance(content, list) else ():
+            if not isinstance(block, dict):
+                continue
+            if block.get("type") == "tool_use":
+                yield "use", block.get("id"), block.get("name"), block.get("input")
+            elif block.get("type") == "tool_result":
+                body = block.get("content")
+                size = (len(body.encode("utf-8", "surrogatepass")) if isinstance(body, str) else
+                        sum(len(item["text"].encode("utf-8", "surrogatepass")) for item in body
+                            if isinstance(item, dict) and isinstance(item.get("text"), str))
+                        if isinstance(body, list) else 0)
+                yield "result", block.get("tool_use_id"), None, size
+
+
 def _read_json_file(path, coverage) -> dict | None:
     try:
         return parse_record(pathlib.Path(path).read_bytes())

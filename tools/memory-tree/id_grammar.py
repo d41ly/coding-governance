@@ -886,11 +886,17 @@ _READER_SPLIT_SHAPE = re.compile(
     r"|\$\{[A-Za-z_]+(?:%%?-\*|##?\*-)\}")
 
 
+#: The marker a census hit kept on purpose carries on its own line, `# slug-grammar: kept <reason>` (`//` in
+#: JavaScript), which `--readers` never prints (TOOL-dTotalRecall-43 S14).
+READER_KEPT = re.compile(r"(?:#|//) slug-grammar: kept\b")
+
+
 def scan_readers(root) -> list[str]:
     """`path:line:text` for every line of a tracked `*.py`, `*.sh` or `*.js` file under `tools/` and
     `skills/`, and of every tracked file under `.githooks/`, that spells a slug or id shape or splits
     a value on a hyphen in a shape that reads past the family (`_READER_SPLIT_SHAPE`), outside the
-    grammar's own entry points: this module and every `slug_legacy_*` block."""
+    grammar's own entry points: this module and every `slug_legacy_*` block, and never a line carrying
+    the kept marker `READER_KEPT` (TOOL-dTotalRecall-43 S14)."""
     root = pathlib.Path(root)
     tool_root = pathlib.Path(__file__).resolve().parent.parent
     try:  # the tool root as this tree places it, so an adopter's install prefix is the one scanned
@@ -921,8 +927,10 @@ def scan_readers(root) -> list[str]:
             if mark:
                 inside = mark.group(1) == ">>>"
                 continue
-            if not inside and (_READER_ID_SHAPE.search(line) or _READER_SLUG_SHAPE.search(line)
-                               or _READER_SPLIT_SHAPE.search(line)):
+            if inside or READER_KEPT.search(line):   # S14: a hit kept on purpose says so on its line
+                continue
+            if (_READER_ID_SHAPE.search(line) or _READER_SLUG_SHAPE.search(line)
+                    or _READER_SPLIT_SHAPE.search(line)):
                 hits.append(f"{rel}:{n}:{line}")
     return hits
 

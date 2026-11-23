@@ -315,10 +315,7 @@ CONF
     cat > memory/builds/tOrder/README.md <<'RM'
 ---
 slug: tOrder
-node: t
 opened: 2026-06-01
-streams: tooling
-roster: ARCH
 ids: ARCH-tOrder-1
 ---
 # tOrder
@@ -419,10 +416,7 @@ SPEC
       cat > memory/builds/tOrder/README.md <<'RM2'
 ---
 slug: tOrder
-node: t
 opened: 2026-06-01
-streams: tooling
-roster: ARCH
 ids: ARCH-tOrder-1
 ---
 # tOrder
@@ -446,10 +440,7 @@ RM2
       cat > memory/builds/tOrder/README.md <<'RM3'
 ---
 slug: tOrder
-node: t
 opened: 2026-06-01
-streams: tooling
-roster: ARCH
 ids: ARCH-tOrder-1
 ---
 # tOrder

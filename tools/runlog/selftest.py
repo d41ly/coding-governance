@@ -9005,6 +9005,17 @@ def test_memory_ac7_states():
                    bool(lines) and lines[-1].startswith(f"memory: verdict {case} · "), "\n".join(lines))
 
 
+def test_memory_dtr43_paths():
+    # TOOL-dTotalRecall-43 S16, S17: the match counts this clone's memory tree alone, an MSYS spelling and
+    # a linked worktree of it included; the staged break matches any `/memory/`, which counts the first two.
+    for case, column, want in (("harness-memory", "read B", 0), ("foreign-memory-path", "read B", 0),
+                               ("foreign-memory-path", "shell B", 0), ("msys-path", "read B", 500),
+                               ("bare-root", "shell B", 350)):
+        _rc, rows, _lines, _out = run_memory_plant(case, "runlog-mem-dtr43-")
+        check(f"memory dTR-43: the {case} plant counts {want} on {column}", read_memory_cell(rows, column), want)
+        check(f"memory dTR-43 liveness: ...over the {case} plant's one agent", read_memory_cell(rows, "agents"), 1)
+
+
 def test_memory_ac9_privacy():
     _rc, rows, _lines, out = run_memory_plant("privacy", "runlog-mem-ac9-")
     check("memory AC9: no planted command, path or result text reaches the output",

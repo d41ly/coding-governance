@@ -4214,14 +4214,14 @@ def check_memory_tree_steps(tmp: pathlib.Path) -> None:
     settle(t, "retag")
     pre = read_tree(t)
     dry = run_step("retag", "up", t, "--dry-run")
-    check("[dTR-20 AC5] under `retag`, up --dry-run prints the plan, the second `## Notes` as [notes-2], and the "
-          "conservation table, and writes nothing",
-          dry.returncode == 0 and f"{MT_RECORD}:13 · ## [notes-2] Notes" in dry.stdout
-          and f"{MT_RECORD}:5 · ## [notes] Notes" in dry.stdout and f"conservation · {MT_RECORD} · 3 ·" in dry.stdout
+    check("[dTR-20 AC5] under `retag`, up --dry-run prints the plan, the second `## Notes` as [section.notes-2] "
+          "(dTR-43 S6), and the conservation table, and writes nothing",
+          dry.returncode == 0 and f"{MT_RECORD}:13 · ## [section.notes-2] Notes" in dry.stdout
+          and f"{MT_RECORD}:5 · ## [section.notes] Notes" in dry.stdout and f"conservation · {MT_RECORD} · 3 ·" in dry.stdout
           and read_tree(t) == pre, dry.stdout + dry.stderr)
     up = run_step("retag", "up", t)
-    want = MT_FILES[MT_RECORD].replace("## Notes\n\nx", "## [notes] Notes\n\nx").replace(
-        "## Findings", "## [findings] Findings").replace("## Notes\n\ny", "## [notes-2] Notes\n\ny")
+    want = MT_FILES[MT_RECORD].replace("## Notes\n\nx", "## [section.notes] Notes\n\nx").replace(
+        "## Findings", "## [section.findings] Findings").replace("## Notes\n\ny", "## [section.notes-2] Notes\n\ny")
     wit = run_step("retag", "witness", t)
     check("[dTR-20 AC5] up writes those bytes, the planted spec untouched, and the witness then exits 0",
           up.returncode == 0 and (t / MT_RECORD).read_text(encoding="utf-8") == want

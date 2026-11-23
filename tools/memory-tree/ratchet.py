@@ -686,12 +686,13 @@ def run_widen(root, args):
         raise ValueError("%d registrations name %r; widen names exactly one" % (len(regs), population))
     reg = regs[0]
     build = derive_build_slug(unit)
-    if not reason.strip() or "\n" in reason or "\r" in reason:
+    from backlog import check_line_break  # noqa: E402  the kit's one line-break rule (TOOL-dTotalRecall-43 S37)
+    if not reason.strip() or check_line_break("--reason", reason):
         raise ValueError("--reason is one non-empty line")
     parsed = []
     for k in keys:
         key = tuple(f.strip() for f in k.split("\t"))
-        if len(key) != len(reg.fields) or not all(key) or "`" in k or "\n" in k or "\r" in k:
+        if len(key) != len(reg.fields) or not all(key) or "`" in k or check_line_break("--key", k):
             raise ValueError("--key %r is not %d TAB-separated fields (%s) with no backtick"
                              % (k, len(reg.fields), ", ".join(reg.fields)))
         parsed.append(key)

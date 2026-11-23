@@ -200,11 +200,8 @@ def derive_extractor_versions(namespaces, registry_dir) -> dict:
     for name, ns in [(CITATIONS, "")] + [(r["extractor"], r["ns"]) for r in namespaces]:
         src = resolve_extractor_module(name.partition(":")[0], registry_dir)
         if src not in by_file:
-            try:
-                digest = hashlib.sha256()
-                for path in import_walk.derive_module_closure(str(src), [str(src.parent), mt]):
-                    digest.update(pathlib.Path(path).read_bytes())
-                by_file[src] = digest.hexdigest()[:12]
+            try:   # memory-tree's one closure-version rule (TOOL-dTotalRecall-43 S21), no key
+                by_file[src] = import_walk.derive_closure_version([str(src)], [str(src.parent), mt])
             except (OSError, SyntaxError, ValueError) as exc:
                 raise TagError(f"namespace '{ns}' extractor {name}: its module {src.as_posix()} or a module it "
                                f"imports is unreadable: {getattr(exc, 'strerror', None) or exc}") from None
@@ -255,10 +252,22 @@ def derive_heading_seg(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
 
 
+#: an authored section tag opening a heading's text, `[section.<seg>] ` (TOOL-dTotalRecall-9 S1)
+AUTHORED_SECTION_RE = re.compile(r"\[section\.(?P<seg>[a-z0-9][a-z0-9-]*)\](?:[ \t]|$)")
+
+
+def read_authored_anchors(headings) -> set:
+    """The `<seg>` of every heading text in `headings` that opens an authored `[section.<seg>] ` tag: the set
+    each caller of `derive_anchor` seeds its `seen` with before deriving any heading (TOOL-dTotalRecall-43 S44)."""
+    return {m.group("seg") for h in headings for m in [AUTHORED_SECTION_RE.match(h or "")] if m}
+
+
 def derive_anchor(heading: str, seen: set) -> str:
-    """One heading's derived anchor in one document. `seen` holds the anchors derived before it, and this
-    extends it: a repeat of a fold takes `-2`, `-3`, the search running past a natural suffix another heading
-    already took; an empty fold is returned empty and never recorded (TOOL-dTotalRecall-10 S1)."""
+    """One heading's derived anchor in one document. `seen` holds, first, the anchors the document's authored
+    `[section.<seg>]` tags already take (`read_authored_anchors`, every caller seeding it before its first
+    heading, TOOL-dTotalRecall-43 S44), then the anchors derived before this heading, and this extends it: a
+    repeat of a fold takes `-2`, `-3`, the search running past a natural suffix another heading or an authored
+    tag already took; an empty fold is returned empty and never recorded (TOOL-dTotalRecall-10 S1)."""
     base = derive_heading_seg(heading)
     if not base:
         return ""
@@ -313,7 +322,7 @@ def extract_doc(ctx, path, text=None):
     lines = text.splitlines()
     heads = [(n, line[3:].strip()) for n, line in scan_unfenced(text) if line.startswith("## ")]
     rows = [("", "doc", 1, len(lines), lines[0] if lines else "")]
-    seen = set()
+    seen = read_authored_anchors(h for _n, h in heads)
     for i, (n, head) in enumerate(heads):
         end = heads[i + 1][0] - 1 if i + 1 < len(heads) else len(lines)
         seg = derive_anchor(head, seen)
@@ -1484,7 +1493,8 @@ def check_namespace_purpose(con, ctx, chain_rows) -> tuple[list, dict]:
 def check_chain_registry(root, conf, chain_rows, chain_rel) -> tuple[list, dict | None]:
     """S3 and S4 of PLAY-dOrderedCharter-22: the registry's slugs joined both ways with the design view's
     builds, and a row with no `purpose` legal only for a build of v2's `[chain]` at the design baseline,
-    printed as awaiting PM-5's review. `conf`'s DESIGN_* keys all blank is no chain to read, (reds, None);
+    printed as awaiting PM-5's review, and never where `memory.map-purpose` is `refuse`
+    (TOOL-dTotalRecall-43 S24). `conf`'s DESIGN_* keys all blank is no chain to read, (reds, None);
     a half-declared design is a TagError. -> (reds, {"rows", "builds", "awaiting": [slug]})."""
     load_memory_tree()
     import design_lib
@@ -1507,13 +1517,26 @@ def check_chain_registry(root, conf, chain_rows, chain_rel) -> tuple[list, dict 
             for s in slugs if s not in builds]
     reds += [f"tags: {chain_rel} · purpose · chain build '{b}' of the design view has no registry row"
              for b in sorted(builds - set(slugs))]
+    # TOOL-dTotalRecall-43 S24: `memory.map-purpose` drives the arm. Under `refuse` the baseline's awaiting
+    # exemption ends, so a purposeless row reds there too; where no policy kit resolves, the catalogue default
+    # `review` keeps the exemption. A refused read is the TagError of the read.
+    tree_lib, _ = load_memory_tree()
+    try:
+        value = tree_lib.read_policy_value("memory.map-purpose", root)
+    except LookupError:
+        value = "review"
+    except ValueError as exc:
+        raise TagError(f"the chain registry's purpose arm cannot read memory.map-purpose: {exc}") from None
     awaiting = []
     for row in chain_rows:
         purpose = row.get("purpose")
         if isinstance(purpose, str) and purpose.strip():
             continue
-        if row["slug"] in baseline:
+        if row["slug"] in baseline and value != "refuse":
             awaiting.append(row["slug"])
+        elif row["slug"] in baseline:
+            reds.append(f"tags: {chain_rel} · purpose · registry row '{row['slug']}' carries no purpose, and "
+                        "memory.map-purpose is refuse, which ends the baseline's awaiting exemption")
         else:
             reds.append(f"tags: {chain_rel} · purpose · registry row '{row['slug']}' carries no purpose, and no "
                         "baseline [chain] row names it")

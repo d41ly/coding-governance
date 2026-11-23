@@ -71,7 +71,6 @@ Why the ranking looks the way it does, in one place so it cannot drift from the 
 from __future__ import annotations
 
 import collections
-import hashlib
 import json
 import os
 import pathlib
@@ -114,7 +113,14 @@ def load_tag_index():
     return tag_index
 
 
-T = load_tag_index()
+try:
+    T = load_tag_index()
+except LookupError as _e:
+    # TOOL-dTotalRecall-43 S26: recall's rows live in the playbook kit's tag index, so with no such kit
+    # beside this one the CLI refuses in one line naming it, never a traceback.
+    print(f"refused: recall reads the playbook kit's tag index and no playbook kit resolves beside "
+          f"memory-recall: {' '.join(str(_e).split())}; copy <prefix>/playbook/ in beside it", file=sys.stderr)
+    raise SystemExit(2) from None
 
 
 def _self_path() -> str:
@@ -138,17 +144,9 @@ CLI = "python3 " + _self_path()
 __doc__ = (__doc__ or "").replace("{cli}", CLI)
 
 CHUNK_MAX = 600  # pinned by the parent spec: 2400 and 300 both measured worse
-CACHE_VERSION = 5  # bump when extraction changes: it is in every row's digest, so old rows are never served
-# 4 -> 5 at TOOL-aGraftedHelix-4: the manifest carries the `superseded` map, and a cache built
-# without it would be served with no supersession label and no order step, saying nothing.
-# 3 -> 4 at the backlog switch-over (TOOL-dDerivedDocket-34 S9): `DURABLE` gained the per-build
-# `builds/<slug>/BACKLOG.md` arm and the backlog archives were deleted, so a warm cache would serve
-# anchors from files that no longer exist and miss every migrated ask's new durable home.
-# 1 -> 2 on 2026-08-02 (ARCH-aGrittedFlagstone-3): records now carry the committed alias layer, so
-# every cache built before the join must rebuild rather than keep serving an alias-free index.
-# 2 -> 3 on 2026-08-03: the manifest carries the alias JOIN counts. A pre-bump manifest has no
-# such key, and the dead-alias diagnosis reads the manifest -- without the bump a warm cache
-# would keep the very silence this fix removes.
+# The extraction modules whose closure versions recall's rows (TOOL-dTotalRecall-43 S22): an edit to
+# either, or to a module they import, re-extracts every served pair, with no hand-bumped constant.
+EXTRACTION_MODULES = ("extract.py", "bench.py")
 WINDOW = 400  # chars of the head fallback, matching union.py's SNIPPET accounting
 # The default is the MEASURED cost of the shipped configuration: union.py reports 19 606 B for
 # records:fts5+chunks:fts5 at k=20 PER SOURCE, which is ~40 hits, not 20.
@@ -303,15 +301,19 @@ def alias_digest() -> str:
 
 
 def derive_recall_digest() -> str:
-    """The SHA-1 of the five inputs every row is extracted under (TOOL-dTotalRecall-21 S2).
-
-    `CACHE_VERSION`, the kit's version, `CHUNK_MAX`, `CONF.digest()` and `alias_digest()`: a
-    grammar, alias, chunking or extraction change re-extracts every served pair once, and a
-    worktree whose conf differs keeps its own rows rather than overwriting another's.
+    """The version every row is extracted under (TOOL-dTotalRecall-21 S2), memory-tree's one closure-version
+    rule (`import_walk.derive_closure_version`, TOOL-dTotalRecall-43 S22): the bytes of `EXTRACTION_MODULES`
+    and every module they import, found in this kit's directory then memory-tree's, keyed by the kit's
+    version, `CHUNK_MAX`, `CONF.digest()` and `alias_digest()`. An extraction, grammar, alias or chunking
+    change re-extracts every served pair once, and a worktree whose conf differs keeps its own rows rather
+    than overwriting another's. NOT CHECKED: `write_recall_rows`' own edit, which no closure here reaches,
+    re-extracts nothing.
     """
-    blob = "\0".join((str(CACHE_VERSION), recall_conf.KIT_MEMORY_RECALL_VERSION, str(CHUNK_MAX),
-                      CONF.digest(), alias_digest()))
-    return hashlib.sha1(blob.encode("utf-8")).hexdigest()
+    tree_lib, _ = T.load_memory_tree()
+    import import_walk  # noqa: E402  memory-tree's, on the path load_memory_tree put it on
+    here, mt = pathlib.Path(__file__).resolve().parent, pathlib.Path(tree_lib.__file__).resolve().parent
+    key = "\0".join((recall_conf.KIT_MEMORY_RECALL_VERSION, str(CHUNK_MAX), CONF.digest(), alias_digest()))
+    return import_walk.derive_closure_version([str(here / m) for m in EXTRACTION_MODULES], [str(here), str(mt)], key)
 
 
 def derive_served_pairs(repo: pathlib.Path, con, ctx: dict, tree: str, paths: list[str]
@@ -385,9 +387,10 @@ def remove_unheld_recall_rows(con, repo: pathlib.Path) -> int:
 
 
 def write_recall_rows(con, repo: pathlib.Path, worktree: str, pairs: list[tuple[str, str]],
-                      declared: list[str], digest: str, *, rebuild: bool = False) -> int:
+                      declared: list[str], digest: str, *, rebuild: bool = False) -> tuple[int, int]:
     """Extract each served pair `fts_blob` lacks at ``digest`` (every pair under ``rebuild``), all
-    inside ONE `BEGIN IMMEDIATE` transaction; returns the pairs extracted.
+    inside ONE `BEGIN IMMEDIATE` transaction; returns ``(extracted, freed)``, the pairs extracted and
+    the pairs `remove_unheld_recall_rows` dropped, which the index line reports (TOOL-dTotalRecall-43 S39).
 
     Today's record, chunk, declaration and alias extraction, per path, reading the path's working
     bytes: a pair is a tracked blob only when those bytes are its blob. Records, their supersession
@@ -404,7 +407,7 @@ def write_recall_rows(con, repo: pathlib.Path, worktree: str, pairs: list[tuple[
                 con.execute("SELECT path, blob FROM fts_blob WHERE digest=?", (digest,)))
             todo = [pr for pr in pairs if pr not in held]
             if not todo:
-                return 0
+                return 0, 0
             if rebuild:
                 remove_recall_pairs(con, [(p, b, digest) for p, b in todo])
             by_id, _src, _ = E.load_aliases()
@@ -426,11 +429,11 @@ def write_recall_rows(con, repo: pathlib.Path, worktree: str, pairs: list[tuple[
                 con.executemany("INSERT INTO fts_supersession VALUES (?,?,?,?,?,?,?)",
                                 [(path, blob, digest, *e) for e in edges])
                 con.execute("INSERT OR REPLACE INTO fts_blob VALUES (?,?,?)", (path, blob, digest))
-            remove_unheld_recall_rows(con, repo)
+            freed = remove_unheld_recall_rows(con, repo)
     except sqlite3.OperationalError as exc:
         raise T.TagError(f"the tag index {T.derive_index_path(repo).as_posix()} is locked or "
                          f"unwritable: {exc}") from None
-    return len(todo)
+    return len(todo), freed
 
 
 class UnbornHeadError(RuntimeError):
@@ -447,7 +450,7 @@ def load_served_set(repo: pathlib.Path, *, untracked: bool = True, rebuild: bool
     so they come back at the first open after a tag-index reset. ``rebuild`` re-extracts every
     served pair at the digest, the `--rebuild` escape hatch.
 
-    Returns ``{"con", "tree", "digest", "pairs", "extracted", "seconds"}``; the caller closes
+    Returns ``{"con", "tree", "digest", "pairs", "extracted", "freed", "seconds"}``; the caller closes
     ``con``. Raises `tag_index.TagError` or `sqlite3.DatabaseError`, each naming the file, and
     `UnbornHeadError` BEFORE the index is opened when HEAD names no commit: `load_view` reads the
     HEAD tree, and a repository with no commit has none, which no removal of the file mends.
@@ -470,12 +473,12 @@ def load_served_set(repo: pathlib.Path, *, untracked: bool = True, rebuild: bool
                     "PRIMARY KEY (path, blob, digest))")
         con.execute("DELETE FROM recall_view")
         con.executemany("INSERT OR IGNORE INTO recall_view VALUES (?,?,?)", [(p, b, digest) for p, b in pairs])
-        extracted = write_recall_rows(con, repo, ctx["worktree"], pairs, declared, digest, rebuild=rebuild)
+        extracted, freed = write_recall_rows(con, repo, ctx["worktree"], pairs, declared, digest, rebuild=rebuild)
     except BaseException:
         con.close()
         raise
     return {"con": con, "tree": view["tree"], "digest": digest, "pairs": pairs,
-            "extracted": extracted, "seconds": round(time.time() - t0, 2)}
+            "extracted": extracted, "freed": freed, "seconds": round(time.time() - t0, 2)}
 
 
 def read_served_counts(con) -> dict:
@@ -1293,7 +1296,8 @@ def main(argv: list[str] | None = None) -> int:
     print(
         f"index {counts['records']} records + {counts['chunks']} chunks "
         f"· superseded {sc['ids']} ({sc['whole']} whole, {sc['partial']} partial) "
-        f"(tree {served['tree'][:8]}, extracted {served['extracted']} blob(s) in {served['seconds']}s)"
+        f"(tree {served['tree'][:8]}, extracted {served['extracted']} blob(s), freed {served['freed']} "
+        f"in {served['seconds']}s)"
     )
     # AFTER the index line and on EVERY path that can produce it -- the counts come from the served
     # rows, so this fires identically on a call that extracted and one that extracted nothing.
