@@ -506,6 +506,73 @@ else
   run_limit_call "AC4 author-requesting: ...naming prompts.author and the value in force" 2 "$PA_FREE" "$PA_HOOKS/agent-cap.js" 'prompts.author is requesting-worker-rendered'
   GOV_DEFAULT_BRANCH=pa-unset run_limit_call "AC4 a freeform prompt with prompts.author unset -> deny naming the default prompt-writer" 2 "$PA_FREE" "$PA_HOOKS/agent-cap.js" 'prompts.author is prompt-writer'
 fi
+# ---- TOOL-dBoundRoles-4 AC3 (S4): under prompts.author = prompt-writer a spawn carries the prompt writer's framing
+# A real repository, the hook copy beside a copy of the policy kit, as the section above builds it; its main branch
+# commits prompts.author = requesting-worker-rendered, and `pf-unset`, which GOV_DEFAULT_BRANCH names for the
+# default's rows, commits no policy file. Its settings hold the default agent limit, so rule 7 admits, and its index
+# carries no `effort`, so rule 8 adds no rule. The prompt files under memory/builds/bx/prompts/ are written as the
+# renderer defines them, each section hashed as `roles_lib.derive_section_sha` hashes it: the prompt writer's work
+# order, a researcher's, and three builder tasks, one with no framing and two whose `### framing:job` block closes
+# with a `Framed by:` line naming the first or the second. The plants: `spawn-unframed`, denied under the default
+# naming the key and the route and admitted under requesting-worker-rendered; `spawn-framed`, admitted;
+# `spawn-framed-by-researcher`, denied naming the researcher's role; `spawn-prompt-writer`, admitted unframed.
+# Staged against a rule 6 whose framing check is cut, `spawn-unframed` and `spawn-framed-by-researcher` are admitted
+# under the default and their rows red. WHAT THIS DOES NOT CHECK: that the framing is the prompt writer's return,
+# which `handoff.py render --framed-by` reads and the roles kit's render self-test holds.
+if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
+  echo "FAIL prompt framing: no policy kit beside this hooks kit, so rule 6 has no prompts.author to read"; fail=$((fail+1))
+else
+  PF="$TMP/pf"; PF_HOOKS="$PF/kits/hooks"; mkdir -p "$PF/.governance" "$PF_HOOKS" "$PF/kits/policy" "$PF/.claude" "$PF/memory/builds/bx/prompts"
+  cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$PF_HOOKS/"
+  for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$PF/kits/policy/"; done
+  printf '[prompts]\nauthor = "requesting-worker-rendered"\n' > "$PF/.governance/policy.toml"
+  printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$PF/.claude/settings.json"
+  "$TESTPY" -c '
+import hashlib, json, os, sys
+root, cwd, out = sys.argv[1], sys.argv[2], sys.argv[3]
+h = lambda s: hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]
+pre = "memory/builds/bx/prompts/"
+role = {r: "## Role\n\nYou are %s.\n\n" % r for r in ("gov-builder", "gov-prompt-writer", "gov-researcher")}
+opening = "## Task\n\nThis handoff is for build `bx`, unit `T-1`.\n"
+def write_prompt_file(rel, r, task):
+    m = "<!-- gov:handoff role=%s build=bx unit=T-1 item=- path=%s role-sha=%s task-sha=%s -->" % (r, rel, h(role[r]), h(task))
+    with open(os.path.join(root, rel), "w", newline="\n", encoding="utf-8") as f:
+        f.write("**Serves:** journal T-1\n\n# %s handoff - T-1\n\n%s\n\n%s%s" % (r, m, role[r], task))
+    return m, h(task)
+pw = pre + "2026-11-23-prompt-T-1-1-prompt-writer.md"
+rs = pre + "2026-11-23-prompt-T-1-2-researcher.md"
+pw_mark, pw_sha = write_prompt_file(pw, "gov-prompt-writer", opening + "\n### input:question\n\nWhat does T-1 build?\n")
+_m, rs_sha = write_prompt_file(rs, "gov-researcher", opening + "\n### input:question\n\nWhich seam fits?\n")
+def framed(path, sha):
+    return opening + "\n### framing:job\n\nBuild T-1 as its spec says.\n\nFramed by: %s task-sha=%s\n\n### framing:no-stop\n\nStop once it is committed.\n" % (path, sha)
+plants = {"spawn-unframed": ("gov-builder", opening, "build"),
+          "spawn-framed": ("gov-builder", framed(pw, pw_sha), "build"),
+          "spawn-framed-by-researcher": ("gov-builder", framed(rs, rs_sha), "build")}
+index = {"roles": {r: {"agent": True, "role-sha": h(role[r]), "workflow": w, "writes": c} for r, w, c in (
+    ("gov-builder", "build", "product"), ("gov-prompt-writer", "handoff", "none"), ("gov-researcher", "research", "none"))},
+    "harnesses": []}
+with open(os.path.join(root, ".claude", "roles.json"), "w", newline="\n", encoding="utf-8") as f:
+    json.dump(index, f)
+calls = {}
+for k, (name, (r, task, wf)) in enumerate(plants.items()):
+    m, _s = write_prompt_file(pre + "2026-11-23-prompt-T-1-%d-builder.md" % (3 + k), r, task)
+    calls[name] = (r, m + "\n\n" + task, wf)
+calls["spawn-prompt-writer"] = ("gov-prompt-writer", pw_mark + "\n\n" + opening + "\n### input:question\n\nWhat does T-1 build?\n", "handoff")
+for name, (r, prompt, wf) in calls.items():
+    with open(os.path.join(out, name + ".json"), "w", encoding="utf-8") as f:
+        json.dump({"tool_name": "Agent", "cwd": cwd, "session_id": "pf", "tool_input": {
+            "subagent_type": r, "prompt": prompt, "description": "bx · T-1 · " + wf}}, f)
+' "$PF" "$NODEDIR/pf" "$TMP"
+  ( cd "$PF" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
+      && git config user.name t && git add -A && git commit -qm framing --no-verify \
+      && git update-ref refs/heads/pf-unset "$(git commit-tree "$(git mktree </dev/null)" -m 'no policy file')" )
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-unframed: a builder task with no framing:job under the default prompt-writer -> deny naming prompts.author" 2 "$(cat "$TMP/spawn-unframed.json")" "$PF_HOOKS/agent-cap.js" 'prompts.author is prompt-writer, so a gov-builder task carries the prompt writer'"'"'s framing'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-unframed: ...naming the three-call route, --for then --framed-by" 2 "$(cat "$TMP/spawn-unframed.json")" "$PF_HOOKS/agent-cap.js" '--for gov-builder --build bx --unit T-1'
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-framed: its Framed by: line names the prompt writer's work order and task-sha -> allow" 0 "$(cat "$TMP/spawn-framed.json")" "$PF_HOOKS/agent-cap.js"
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-framed-by-researcher: its Framed by: line names a role=gov-researcher work order -> deny" 2 "$(cat "$TMP/spawn-framed-by-researcher.json")" "$PF_HOOKS/agent-cap.js" 'marker names role=gov-researcher, not gov-prompt-writer'
+  run_limit_call "rule6 BR4 AC3 spawn-unframed: under requesting-worker-rendered the unframed builder task -> allow" 0 "$(cat "$TMP/spawn-unframed.json")" "$PF_HOOKS/agent-cap.js"
+  GOV_DEFAULT_BRANCH=pf-unset run_limit_call "rule6 BR4 AC3 spawn-prompt-writer: the prompt writer's own task, unframed, under the default -> allow" 0 "$(cat "$TMP/spawn-prompt-writer.json")" "$PF_HOOKS/agent-cap.js"
+fi
 # ---- the two copies ------------------------------------------------------------------------------
 # `.claude/hooks/agent-cap.js` is the WIRED copy and `<prefix>/hooks/agent-cap.js` is the kit's. Nothing
 # gated them: check-wiring.sh asserts the hook is wired, never that the wired one is this one. A

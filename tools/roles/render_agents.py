@@ -763,6 +763,103 @@ def check_no_spawn_arm(state, roles):
             handoff.KIT_DIR, handoff.WORK_ORDER, lib.read_policy_setting = saved[:3]
 
 
+def check_framing_arm(state):
+    """Arm 24 (TOOL-dBoundRoles-4 AC1, AC2): `handoff.py render --for` and `--framed-by` run in process over a git
+    fixture whose kit holds a `gov-prompt-writer` carrying the kit's own `return` template and a `gov-builder`
+    writing `product`. `for-builder`: the prompt writer's render for the builder hands `### input:question` and one
+    `### input:work-order` block holding the builder's `### allowance` and `### return` with its template, and with
+    no `--for` refuses naming it. The session is a fixture `CLAUDE_CONFIG_DIR` named by `CLAUDE_CODE_SESSION_ID`,
+    each agent's `agent-<id>.jsonl` under its `subagents` folder, its first record the prompt writer's rendered
+    task and its last the return, its `.meta.json` beside it. `framed-valid`: the builder's task carries
+    `### framing:job` and `### framing:no-stop` holding the return's `job` and `nostop` byte for byte and one
+    `Framed by:` line naming the prompt writer's work order and task-sha. `framed-invalid-return`, a return lacking
+    `nostop` and one carrying a field the template does not name, and `framed-wrong-role`, an agent typed
+    `gov-researcher`, each refuse naming the failed condition. Staged against a render that ignores
+    `--framed-by`, `framed-valid` reds. WHAT IT DOES NOT CHECK: a live session's transcript layout, nor the spawn
+    guard's framing check, which the hooks kit's suite holds."""
+    import handoff
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    template = lib.load_roles(KIT_DIR)[handoff.PROMPT_WRITER]["keys"]["return"]
+    roles = {handoff.PROMPT_WRITER: ("workflow: w4\nreads: input:question, input:work-order\nwrites: none\n"
+                                     "return: %s\n" % template, ""),
+             "gov-builder": ("workflow: w1\nreads: input:spec\nwrites: product\n"
+                             "return: outcome:committed|returned, checks:list\n", "")}
+    sid = "0123abcd-0000-4000-8000-00000000f4f4"
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+        root = pathlib.Path(tmp)
+        subprocess.run(["git", "init", "-q", str(root)], capture_output=True, text=True, encoding="utf-8",
+                       env=env, stdin=subprocess.DEVNULL)
+        kit, _tool_root = build_fixture(root, roles)
+        (root / "spec.md").write_text("The fixture spec.\n", encoding="utf-8")
+        (root / "mem" / "builds" / "fx" / "prompts").mkdir(parents=True)
+        saved = (handoff.KIT_DIR, handoff.WORK_ORDER, os.getcwd(),
+                 {k: os.environ.get(k) for k in ("CLAUDE_CONFIG_DIR", "CLAUDE_CODE_SESSION_ID")})
+        handoff.KIT_DIR, handoff.WORK_ORDER = kit, KIT_DIR / lib.WORK_ORDER_REL
+
+        def run_render(*args):
+            out = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
+            err = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                rc = handoff.main(["render", "--build", "fx", "--unit", "PLAY-fx-1"] + list(args))
+                sys.stdout.flush()
+                sys.stderr.flush()
+            return rc, out.buffer.getvalue().decode("utf-8"), err.buffer.getvalue().decode("utf-8")
+
+        try:
+            os.chdir(root)
+            os.environ["CLAUDE_CONFIG_DIR"], os.environ["CLAUDE_CODE_SESSION_ID"] = str(root / "cfg"), sid
+            rc, task, said = run_render("--role", handoff.PROMPT_WRITER, "--for", "gov-builder", "--input",
+                                        "question=q", "--input", "spec=spec.md", "--part", "task")
+            lines = task.split("\n")
+            order = task[task.find("### input:work-order"):]
+            check_arm(state, 24, rc == 0 and "### input:question" in lines and lines.count("### input:work-order") == 1
+                      and "\n### allowance\n" in order and "\n### return\n\noutcome:committed|returned, checks:list\n"
+                      in order, "for-builder exited %d with %r, not one work-order block holding the builder's "
+                      "allowance and return template" % (rc, said or task[-400:]))
+            rc, _out, said = run_render("--role", handoff.PROMPT_WRITER, "--input", "question=q", "--stdout")
+            check_arm(state, 24, rc == 1 and "input:work-order" in said and "--for" in said,
+                      "for-builder with no --for exited %d with %r, not 1 naming input:work-order and --for" % (rc, said))
+            marker = lib.extract_prompt_marker(task)
+            sub = root / "cfg" / "projects" / "p" / sid / "subagents"
+            sub.mkdir(parents=True)
+            (sub.parent.parent / (sid + ".jsonl")).write_text("{}\n", encoding="utf-8")
+            job, nostop = "Build PLAY-fx-1 as the spec says.", "Stop once it is committed."
+            for aid, kind, ret in (("pw1", handoff.PROMPT_WRITER, {"outcome": "framed", "job": job, "nostop": nostop}),
+                                   ("pw2", handoff.PROMPT_WRITER, {"outcome": "framed", "job": job}),
+                                   ("pw3", handoff.PROMPT_WRITER, {"outcome": "framed", "job": job, "nostop": nostop,
+                                                                   "extra": "x"}),
+                                   ("rs1", "gov-researcher", {"outcome": "framed", "job": job, "nostop": nostop})):
+                (sub / ("agent-%s.jsonl" % aid)).write_text("\n".join(json.dumps(r) for r in (
+                    {"type": "user", "message": {"role": "user", "content": task}},
+                    {"type": "assistant", "message": {"content": [{"type": "text", "text":
+                                                                   "```json\n%s\n```" % json.dumps(ret)}]}})) + "\n",
+                    encoding="utf-8")
+                (sub / ("agent-%s.meta.json" % aid)).write_text(json.dumps({"agentType": kind}), encoding="utf-8")
+            rc, out, said = run_render("--role", "gov-builder", "--input", "spec=spec.md", "--framed-by", "pw1",
+                                       "--stdout")
+            framed_by = "Framed by: %s task-sha=%s" % (marker.group("path"), marker.group("task_sha")) if marker else "?"
+            check_arm(state, 24, rc == 0 and "\n### framing:job\n\n%s\n\n%s\n" % (job, framed_by) in out
+                      and "\n### framing:no-stop\n\n%s\n" % nostop in out
+                      and out.split("\n").count(framed_by) == 1,
+                      "framed-valid exited %d with %r, not the job and no-stop blocks and one Framed by: line"
+                      % (rc, said or out[-400:]))
+            for plant, aid, want in (("framed-invalid-return", "pw2", "lacks nostop"),
+                                     ("framed-invalid-return", "pw3", "extra — a field the template does not name"),
+                                     ("framed-wrong-role", "rs1", "type is gov-researcher")):
+                rc, out, said = run_render("--role", "gov-builder", "--input", "spec=spec.md", "--framed-by", aid,
+                                           "--stdout")
+                check_arm(state, 24, rc == 1 and want in said and not out,
+                          "%s (%s) exited %d with %r, not 1 naming %r" % (plant, aid, rc, said, want))
+        finally:
+            os.chdir(saved[2])
+            handoff.KIT_DIR, handoff.WORK_ORDER = saved[:2]
+            for k, v in saved[3].items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
+
+
 def read_return_dir():
     """The record folder `handoff.py check-return` writes under the git common dir, read from that file so
     the arm names no second literal of it."""
@@ -1186,6 +1283,7 @@ def run_selftest():
     check_fields_arm(state)
     check_return_arm(state)
     check_no_spawn_arm(state, roles)
+    check_framing_arm(state)
     lib.read_policy_setting = own_reader
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)

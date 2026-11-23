@@ -22,10 +22,15 @@ before stage 3, and it wins any difference. The stages below are the workflows o
   hand-out's `nextAction` orders them. Merge and push each wait for the owner's explicit ask.
 - A fork goes to the owner through `AskUserQuestion`, never to a park: no mandate delegates it (M3).
 - You write no freeform agent prompt. A direct spawn is an `Agent` call whose `subagent_type` is the
-  role, whose `prompt` is the output of this line, unchanged, and whose `description` is the name
-  the line prints on stderr after `handoff: description — `; the spawn guard refuses any other:
-  `python tools/roles/handoff.py render --role <role> --build <slug> --unit <id> --input <key>=<value> --part task`
-  That `Agent` call also carries `effort`: its role's value in the JSON
+  role rendered, whose `prompt` is the render's output, unchanged, and whose `description` is the name
+  the render prints on stderr after `handoff: description — `; the spawn guard refuses any other.
+  While `prompts.author` is `prompt-writer`, its default, a direct spawn is the prompt writer's three
+  calls: render the prompt writer with `--for`, spawn it, render the role with `--framed-by` and spawn that:
+  `python tools/roles/handoff.py render --role gov-prompt-writer --for <role> --build <slug> --unit <id> --input question=<your details> --input <key>=<value> --part task`
+  `python tools/roles/handoff.py render --role <role> --build <slug> --unit <id> --input <key>=<value> --framed-by <the prompt writer's agent id> --part task`
+  The second render reads the prompt writer's return from its transcript, so you retype none of it.
+  Under `requesting-worker-rendered` the second line alone, with no `--framed-by`, is the spawn.
+  Each `Agent` call also carries `effort`: its role's value in the JSON
   `handoff.py role-efforts --model <id>` prints, on every direct spawn and for any model.
   Every harness call carries `roles`, the JSON `handoff.py harness-args <harness>` prints, and
   `efforts`, the JSON `handoff.py stage-efforts <workflow> --model <id>` prints for the workflow that

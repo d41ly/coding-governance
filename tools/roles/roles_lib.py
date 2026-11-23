@@ -47,7 +47,9 @@ KIT_ROLES_VERSION = "1.25"
 READ_FAMILIES = {"task": ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates"),
                  "card": ("route", "records", "classes", "read", "open", "reuse"),
                  "brief": ("prompt", "goal", "items", "acceptance", "gates", "non-goals"),
-                 "input": ("spec", "diff", "question", "prompt"),
+                 # `work-order`, the destination's resolved work order, is filled only by `handoff.py render
+                 # --for <role>`, never by an `--input` (TOOL-dBoundRoles-4 S1)
+                 "input": ("spec", "diff", "question", "prompt", "work-order"),
                  # the rows an item's upstream items established, handed on by `handoff.py render --upstream`,
                  # legal only optional since only an item naming upstream items has them (TOOL-dDeclaredLoop-29)
                  "upstream": ("rows",)}

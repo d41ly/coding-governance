@@ -72,7 +72,27 @@ reference; this page is the short version.
    marker. `check_roles.py`'s R16 refuses a work order whose marker carries no `item=`, and a return
    with no such line, one naming another work order or one whose `task-sha` differs. The paths
    `work-order-legacy.txt` lists, the records written before the rule armed, are not refused.
-4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
+4. **The prompt writer frames the task: render it with `--for`, spawn it, render the role with `--framed-by`.**
+   While the policy key `prompts.author` is `prompt-writer`, its default, a direct spawn of any role
+   takes these three calls. First `handoff.py render --role gov-prompt-writer --for <role> --build <slug>
+   --unit <id> --input question=<your details>`, adding the `--input` values the role reads, and spawn
+   the prompt writer with that task and the name it prints. `--for` hands it your details under
+   `input:question` and the role's whole work order under `input:work-order`: its role text, every input
+   it reads, its allowance and its return template. Only `--for` fills that input, and
+   `--input work-order=` is refused. The prompt writer writes nothing. It returns `framed` with `job` and
+   `nostop`, and `population` and `added` where it has them, or `refused` with `why`. Then
+   `handoff.py render --role <role> ... --framed-by <the prompt writer's agent id>` reads that return
+   from the prompt writer's own transcript in your session, so you retype none of it, and you spawn the
+   role with that task. The agent must be typed `gov-prompt-writer`, its first message a prompt writer's
+   work order of the same build, and its return must pass the return check with `outcome` `framed`,
+   `job` and `nostop`; anything else is refused, naming what failed. The role's task then ends with one
+   block per field, `### framing:job`, `### framing:population`, `### framing:added` and
+   `### framing:no-stop`, each holding the field as the prompt writer wrote it, and the job block closes
+   with `Framed by: <the prompt writer's prompt path> task-sha=<12hex>`. The blocks sit inside the bytes
+   the task-sha covers. The prompt writer's own task is your details as you gave them, and is never
+   framed. Under `requesting-worker-rendered` you render the role's task yourself, with no
+   `--framed-by`. A handoff to another session, `gov-session`, takes no prompt writer.
+5. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
    which starts without the full charter and at the reasoning effort the policy file sets. It
    carries the practices its role cites and the charter's Protocols and Facts sections, first.
    The dispatcher passes the level for the model in use: a harness call carries `efforts`, the JSON
@@ -82,7 +102,7 @@ reference; this page is the short version.
    neither `roles` nor `efforts` names is refused too. A harness call also carries `retries`, what
    `policy.py get roles.retries` prints: a stage outside a fan that returns nothing is spawned again
    up to that many times, at most 4, and a value that is no integer in that range is refused.
-5. **Each block carries its level.** With the playbook kit installed, every block a subagent gets
+6. **Each block carries its level.** With the playbook kit installed, every block a subagent gets
    sits in an envelope, `[<doc> · Level <n> · <direction>]` up to `[/<doc>]`, so it ranks them as
    the main session does. The agent file holds the charter at level 0 inside its own level 5. The
    task part holds the practices at its step at level 0, then the task at level 6.
@@ -240,8 +260,9 @@ The `gov-reviewer` role reviews a spec set or a diff through one lens, read-only
 separate spec and diff reviewer roles, and both review stages spawn it. It writes nothing.
 <!-- usage: agent:gov-reviewer -->
 
-The `gov-prompt-writer` role composes the task a role agent is handed. It is a cycle role: the
-driver calls it around an item, and no checklist item names it as its actor. It writes nothing.
+The `gov-prompt-writer` role frames the task a role agent is handed. It is a cycle role: the
+driver calls it around an item, and no checklist item names it as its actor. It writes nothing: the
+prompt writer's route, `--for`, its spawn, then `--framed-by`, is step 4 of "How a task reaches an agent".
 <!-- usage: agent:gov-prompt-writer -->
 
 The `gov-planner` role drafts and judges a build's plan, and the `gov-architect` role inventories a
@@ -276,6 +297,11 @@ until an owner writes its first row.
   such refusal ends by naming the policy key `prompts.author` and its value: `prompt-writer`, the
   default, or `requesting-worker-rendered`. Under both, the prompt must be a handoff that
   `handoff.py render` produced.
+- An unframed spawn under `prompt-writer`: an `Agent` call of any role but `gov-prompt-writer` whose
+  task carries no single `### framing:job` block, no single `Framed by:` line inside it, or a
+  `Framed by:` line naming anything but a prompt writer's work order under the build's `prompts/`
+  folder whose marker holds that task-sha. The refusal names the key, its value and the prompt
+  writer's three calls: render it with `--for`, spawn it, render the role with `--framed-by`.
 - A misnamed spawn: an `Agent` call whose `description` is not the name `handoff.py render` printed.
 - A stale handoff: an `Agent` call whose handoff was rendered from role text other than the text its
   agent type was rendered from. The marker's `role-sha` must equal the `role-sha` the role index
