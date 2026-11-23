@@ -363,3 +363,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T13:49:23Z brief · item KICK-dKeptSession-56 · reason 601fd3b6779d memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-56-build-brief.md
 
 2026-11-23T13:52:01Z dispatch · item b9b73f4a KICK-dKeptSession-56 · reason tools/loop/loop_transition.py tools/loop/claim.py tools/loop/README.md tools/run-gates/selftest-budgets.txt tools/runlog/extract.py tools/runlog/selftest.py tools/runlog/README.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json tools/policy/presets.py tools/policy/check_policy.py tools/unattended/unattended.test.sh help/orientation-card.md help/loop.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-56-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T14:43:44Z brief · item KICK-dKeptSession-57 · reason 79d7930e2f42 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-57-build-brief.md
+
+2026-11-23T14:46:39Z dispatch · item 4580ab42 KICK-dKeptSession-57 · reason .governance/policy.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-57-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
