@@ -682,7 +682,10 @@ log record is the source; with only `micro-format` selected, nothing is stored a
   spec listing at the move's commit, and a second exit from Design posts `changed`, never a second
   `confirmed`), `notices-two-dependents` (two dependents and three exits from Design: each reads one
   `confirmed` and two `changed`, passes `1`, `2` and `3`), `notices-refused` (the post to one
-  dependent refused: the move still records and prints the refusal's line), `acks-landed` (a parent's
+  dependent refused: the move still records and prints the refusal's line), `notices-repeat-key` (one
+  dependent and three exits from Design, the spec unchanged between the last two: the third repeats
+  the second's spec listing, and every notice is still posted, its pass `3` telling it apart),
+  `acks-landed` (a parent's
   `landed` the move acknowledges, then records), `acks-confirmed` (a `confirmed` whose key recomputes at
   the parent lease's witness, acknowledged over the real interfaces check), `acks-superseded` (a
   `confirmed` and the later `changed` the check names current, both acknowledged; then another parent's
