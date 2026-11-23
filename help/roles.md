@@ -331,6 +331,8 @@ the waiver row decides, as before the key. A waiver never admits a write the hoo
 row grammar, read the roles README's "Standing in for a role" section; no tree holds the registry
 until an owner writes its first row.
 
+A fork a role meets while you are away is answered by the policy key `run.on-owner-question`, which `handoff.py owner-question --kind fork` prints: under the default, `best-effort-recorded`, it prints `resolve`, and the role resolves the fork by `principle.p18` and writes its record in the spec's open-questions item, `options: <o1> > <o2> · pick: <o1> · admitted-by: principle.<tag>`; `park-item`, `park-build` and `stop-run` print themselves. `--kind owner-gate` reads the same key, while `--kind ratification`, `--kind owner-write` and `--attended` always print `owner`, and an unknown kind exits 2. `unattended.sh --dispatch` refuses a FORKED unit with check 49 under every answer: `resolve` names the record each open fork owes, `park-item` parks the unit as a decision row naming its open forks, `park-build` parks the build as one decision row naming every FORKED unit, and `stop-run` names `--abort` as the next verb. <!-- usage: policy:run.on-owner-question c89d20e3 -->
+
 ## What the hooks refuse
 
 - An `Agent` call whose type is not a `gov-*` role, or whose prompt is not a rendered handoff. Each

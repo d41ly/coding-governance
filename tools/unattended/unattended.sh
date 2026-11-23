@@ -7134,9 +7134,18 @@ refuse_if_terminal() { # run-state file · verb · [--recorded]
 # fork read is this grammar and never a second section-8 parser: `check_mark`'s shape narrowed to `agent` and
 # `delegated`, over each F-item span at or after the cutoff and over the whole section before it, code and
 # quoted spans removed as `check_span_mark` removes them. It prints DELEGATED or NONE, THIN or not.
-plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off · [delegated] -> prints the M2 state, or DELEGATED or NONE
+# TOOL-dBoundRoles-11 S3 - THE FORK RECORD, a FOURTH argument, the memory kit's FORK_RECORD_CUTOFF that
+# `load_fork_cutoff` reads through the same library reader, blank meaning off. At or after it, inside the
+# per-item reading, an F-item span an `agent` mark resolves carries `options: <o1> > <o2> · pick: <o1> ·
+# admitted-by: principle.<seg>`, and a span whose record is absent, picks outside its options, picks
+# other than the first, or names a tag of another shape grades FORKED, as check 12 grades it. The tag's
+# SHAPE only: this driver reads no playbook kit, so a well-shaped tag the registry lacks reds check 12
+# and reads READY here. An `owner` mark is never graded. The `delegated` mode ignores the record; the
+# `open` mode prints the ids of the F-items the per-item reading leaves open, mark or record, space-
+# separated and possibly none, for `--dispatch`'s FORKED hold to name.
+plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off · [delegated|open] · [FORK_RECORD_CUTOFF, blank = off] -> prints the M2 state, or DELEGATED or NONE, or the open F-item ids
   local _psb="${1##*/}"
-  awk -v icut="${2:-}" -v fbase="$_psb" -v mode="${3:-}" '
+  awk -v icut="${2:-}" -v fbase="$_psb" -v mode="${3:-}" -v frcut="${4:-}" '
     BEGIN { fdate = ""
             if (match(fbase, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/)) fdate = substr(fbase, RSTART, RLENGTH) }
     # THE SECTION-8 GRAMMAR, ONCE for this program: the documented mark, the F-item opener, and a
@@ -7146,6 +7155,29 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off · [delegated] -> pr
     function check_fitem_open(s) { return (s ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || s ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) }
     function check_span_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return check_mark(s) }
     function check_delegated_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return (s ~ /RESOLVED \(agent, [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9], delegated\)/) }
+    # THE FORK RECORD (TOOL-dBoundRoles-11), the hygiene engine`s two functions spelled the same way: an
+    # `agent` mark, and the record read from the span with code and quoted spans removed, the LAST
+    # `options: ` before the first ` · pick: ` opening it. `ok<TAB>tag` holds; anything else does not.
+    function check_agent_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return (s ~ /RESOLVED \(agent, [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) }
+    function check_fork_record(s,    p, k, o, pre, opts, rest, pick, tag, n, i, hit, opt) {
+      gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s)
+      p = index(s, " · pick: "); if (p == 0) return "none"
+      pre = substr(s, 1, p - 1); o = 0
+      while ((k = index(substr(pre, o + 1), "options: ")) > 0) o += k
+      if (o == 0) return "none"
+      opts = substr(pre, o + length("options: ")); rest = substr(s, p + length(" · pick: "))
+      k = index(rest, " · admitted-by: "); if (k == 0) return "none"
+      pick = substr(rest, 1, k - 1); tag = substr(rest, k + length(" · admitted-by: ")); sub(/ .*/, "", tag)
+      if (index(opts, " · ") || index(pick, " > ") || pick == "" || tag == "") return "none"
+      n = split(opts, opt, / > /)
+      for (i = 1; i <= n; i++) if (opt[i] == "") return "none"
+      hit = 0; for (i = 1; i <= n; i++) if (opt[i] == pick) hit = 1
+      if (!hit) return "out\t" pick
+      if (opt[1] != pick) return "first\t" pick "\t" opt[1]
+      if (tag !~ /^principle\.[a-z0-9][a-z0-9-]*$/) return "tag\t" tag
+      return "ok\t" tag
+    }
+    function check_span_record(s) { return (frcut == "" || fdate == "" || fdate < frcut || !check_agent_mark(s) || substr(check_fork_record(s), 1, 3) == "ok\t") }
     # TOOL-dBriefedPass-1 - KEYED ON THE HEADING TITLE, NOT ON THE ORDINAL. A TIER-1 SPEC LEGITIMATELY
     # DROPS `## 5. Production-readiness checklist`, so every section from five onward renumbers: the
     # ordinal form read a Tier-1 spec`s GATES as its acceptance criteria, its OPEN QUESTIONS as its
@@ -7193,6 +7225,17 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off · [delegated] -> pr
         else found = check_delegated_mark(dblob)
         print (found ? "DELEGATED" : "NONE"); exit
       }
+      if (mode == "open") {
+        ofi = 0; oids = ""
+        if (icut != "" && fdate != "" && fdate >= icut) {
+          for (i = 1; i <= nf; i++) {
+            if (check_fitem_open(fr[i])) { ospan[++ofi] = fl[i]; oid[ofi] = (match(fr[i], /F[0-9]+/) ? substr(fr[i], RSTART, RLENGTH) : "F?") }
+            else if (ofi > 0) ospan[ofi] = ospan[ofi] " " fl[i]
+          }
+          for (k = 1; k <= ofi; k++) if (!check_span_mark(ospan[k]) || !check_span_record(ospan[k])) oids = oids (oids == "" ? "" : " ") oid[k]
+        }
+        print oids; exit
+      }
       thin = (seen["scope"] == "" || seen["acc"] == "" || seen["gates"] == "")
       # M2 orders the checks and the FIRST match wins, so THIN is decided before FORKED.
       if (thin) { print "THIN"; exit }
@@ -7235,7 +7278,7 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off · [delegated] -> pr
         # finding, and so is any bullet or sub-head before the first F-item.
         if (nfi == 0 && items == 0) { if (lf ~ /^none/ || lf ~ /^n\/a/) print "READY"; else print "FORKED"; exit }
         if (nfi == 0 || plain > 0) { print "FORKED"; exit }
-        for (k = 1; k <= nfi; k++) if (!check_span_mark(span[k])) { print "FORKED"; exit }
+        for (k = 1; k <= nfi; k++) if (!check_span_mark(span[k]) || !check_span_record(span[k])) { print "FORKED"; exit }
         print "READY"; exit
       }
       # AN EMPTY SECTION IS A REFUSAL, not a pass — the ratified fork, and TEMPLATE-SPEC names both
@@ -7261,14 +7304,20 @@ plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off · [delegated] -> pr
 # the file as TEXT: this driver never sources a second kit's conf. Every `plan_state` caller here
 # passes FORK_CUTOFF, so a caller that forgot the load would pass blank and grade section-wide, which
 # the marker-contract harness's call-site count is there to catch.
-FORK_CUTOFF=""
-load_fork_cutoff() { # -> sets FORK_CUTOFF; rc 1 after a numbered refusal
-  local _fc
-  if ! _fc=$(read_fork_cutoff "$ROOT/.memory-tree.conf"); then
-    fail 86 "the memory tree's FORK_ITEM_CUTOFF cannot be read as text, so section 8 would be graded here under a cutoff the hygiene gate does not use: $_fc"
-    return 1
+# TOOL-dBoundRoles-11 S3: the fork record's FORK_RECORD_CUTOFF is loaded beside it, through the same reader
+# given the key's name, and every caller passes it as `plan_state`'s fourth argument; either key unread is
+# the one check 86, so the record adds no refusal site.
+FORK_CUTOFF=""; FORK_RECORD_CUTOFF=""
+load_fork_cutoff() { # -> sets FORK_CUTOFF and FORK_RECORD_CUTOFF; rc 1 after a numbered refusal
+  local _fc _frc="" _fwhy
+  if ! _fc=$(read_fork_cutoff "$ROOT/.memory-tree.conf"); then _fwhy=$_fc
+  elif ! _frc=$(read_fork_cutoff "$ROOT/.memory-tree.conf" FORK_RECORD_CUTOFF); then _fwhy=$_frc
+  else
+    FORK_CUTOFF="$_fc"; FORK_RECORD_CUTOFF="$_frc"
+    return 0
   fi
-  FORK_CUTOFF="$_fc"
+  fail 86 "the memory tree's FORK_ITEM_CUTOFF or FORK_RECORD_CUTOFF cannot be read as text, so section 8 would be graded here under a cutoff the hygiene gate does not use: $_fwhy"
+  return 1
 }
 # TOOL-dDeclaredLoop-19 S5 - A FORK THE AGENT RESOLVED UNDER DELEGATION, read by `plan_state`'s `delegated`
 # mode over each tracked spec of the build, one awk pass per spec. No fork record carries a class, so every
@@ -7276,7 +7325,7 @@ load_fork_cutoff() { # -> sets FORK_CUTOFF; rc 1 after a numbered refusal
 check_delegated_fork() { # slug -> 0 where a tracked spec of the build carries one; FORK_CUTOFF loaded by the caller
   local _df
   for _df in $(git ls-files "$M/builds/$1/spec/*.md" 2>/dev/null | drop_working_specs); do
-    [ "$(plan_state "$_df" "$FORK_CUTOFF" delegated)" = DELEGATED ] && return 0
+    [ "$(plan_state "$_df" "$FORK_CUTOFF" delegated "$FORK_RECORD_CUTOFF")" = DELEGATED ] && return 0
   done
   return 1
 }
@@ -8934,7 +8983,7 @@ verb_plan() { # slug
     # the S6 pass above and cannot reach here: a row exists in the region only for a spec whose status
     # header parsed, so this branch grades a file already known to be a unit.
     st="${SPEC_ST[$spec]:-}"
-    state=$(plan_state "$spec" "$FORK_CUTOFF")
+    state=$(plan_state "$spec" "$FORK_CUTOFF" "" "$FORK_RECORD_CUTOFF")
     # The grade is printed BESIDE `DONE`, never in place of it. This line USED to overwrite it, so a
     # unit closed against a spec stating no acceptance criterion read exactly like one closed against
     # a complete spec, and the one predicate that knew otherwise was discarded at the moment the
@@ -10832,7 +10881,7 @@ derive_review_signals() { # slug · stage -> sets _rs_why _rs_tier2 _rs_anchor; 
     return 0
   fi
   for _rs_sp in $(git ls-files "$M/builds/$1/spec/*.md" 2>/dev/null | drop_working_specs); do
-    [ "$(plan_state "$_rs_sp" "$FORK_CUTOFF")" = FORKED ] || continue
+    [ "$(plan_state "$_rs_sp" "$FORK_CUTOFF" "" "$FORK_RECORD_CUTOFF")" = FORKED ] || continue
     _rs_why="${_rs_why:+$_rs_why, }a spec grading FORKED"; break
   done
   return 0
@@ -15020,7 +15069,7 @@ $_bcopen"
         if ! printf '%s\n%s\n' "$SPEC_THIN_CUTOFF" "$_bcdate" | sort -C; then
           _bcskip="$_bcskip · $_bcid (dated $_bcdate, before the declared cutoff $SPEC_THIN_CUTOFF)"; continue
         fi
-        [ "$(plan_state "$_bcsp" "$FORK_CUTOFF")" = THIN ] && _bcthin="$_bcthin $_bcid"
+        [ "$(plan_state "$_bcsp" "$FORK_CUTOFF" "" "$FORK_RECORD_CUTOFF")" = THIN ] && _bcthin="$_bcthin $_bcid"
       done
       if [ -n "$_bcthin" ]; then
         DOD_OUT="a unit is CLOSED against a spec the kit's own predicate grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing ever stated what done meant for it:$_bcthin"
@@ -18287,10 +18336,12 @@ run_spec_token_check() { # slug -> 0 admitted or skipped, 1 refused under check 
 # Both read the `SPEC_PATH` map their caller loaded. The texts moved verbatim, and each message keeps
 # its value in a NAMED variable after the sentence, because check-arms reads a branch's signature up
 # to its first interpolation.
-_cu_spec=""; _cu_ord=""
-check_unit_spec() { # unit -> 0, or 1 after check 49 (86 from load_fork_cutoff); sets _cu_spec, _cu_ord
+# `_cu_state` is the M2 state `plan_state` graded, exposed for `--dispatch`'s FORKED hold (TOOL-dBoundRoles-11
+# S6, §8 F7), which acts in that verb alone: `--check-specs` has no run-state file to park in.
+_cu_spec=""; _cu_ord=""; _cu_state=""
+check_unit_spec() { # unit -> 0, or 1 after check 49 (86 from load_fork_cutoff); sets _cu_spec, _cu_ord, _cu_state
   local unit="$1" _d_spec _d_state _d_ord
-  _cu_spec=""; _cu_ord=""
+  _cu_spec=""; _cu_ord=""; _cu_state=""
   _d_spec="${SPEC_PATH[$unit]:-}"
   if [ -z "$_d_spec" ]; then
     fail 49 "--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last: $unit"
@@ -18298,7 +18349,8 @@ check_unit_spec() { # unit -> 0, or 1 after check 49 (86 from load_fork_cutoff);
   fi
   _cu_spec=$_d_spec
   load_fork_cutoff || return 1
-  _d_state=$(plan_state "$_d_spec" "$FORK_CUTOFF")
+  _d_state=$(plan_state "$_d_spec" "$FORK_CUTOFF" "" "$FORK_RECORD_CUTOFF")
+  _cu_state=$_d_state
   case "$_d_state" in
     THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
   esac
@@ -18308,6 +18360,38 @@ check_unit_spec() { # unit -> 0, or 1 after check 49 (86 from load_fork_cutoff);
     return 1 ;;
   esac
   _cu_ord=$_d_ord
+}
+# TOOL-dBoundRoles-11 S5 S6 - THE ANSWER TO AN OWNER QUESTION, asked of the roles kit's one reader of
+# `run.on-owner-question`, `resolve_owner_question`, through its shell door `handoff.py owner-question`,
+# found by `resolve_kit_dir` as `read_lease_policy` finds the policy kit. The rule lives in that reader;
+# this holds no table of its own. Where no roles kit resolves, the key's catalogue default
+# `best-effort-recorded` is read as `resolve`, with one NOTE line naming the absent kit: the reader being
+# absent is no reason to admit what it would hold. The answer is the door's one stdout line in the closed
+# set; anything else, a refusal included, returns 1 with the door's words in OQ_VALUE. Called directly,
+# never in a substitution, so OQ_VALUE is kept.
+read_owner_question() { # kind -> OQ_VALUE: resolve|park-item|park-build|stop-run|owner; 1 with the refusal in OQ_VALUE
+  local py d out
+  OQ_VALUE=""
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" roles handoff.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    echo "unattended: NOTE - no roles kit resolves beside this kit, so run.on-owner-question takes its catalogue default, best-effort-recorded, read as resolve." >&2
+    OQ_VALUE=resolve; return 0
+  fi
+  [ -f "$d/handoff.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  if ! out=$("$py" -B "$d/handoff.py" owner-question --kind "$1" 2>&1); then
+    OQ_VALUE=${out//$'\r'/}; OQ_VALUE=${OQ_VALUE//$'\n'/ }; return 1
+  fi
+  out=${out//$'\r'/}
+  case $'\n'"$out"$'\n' in
+    *$'\n'resolve$'\n'*) OQ_VALUE=resolve ;;
+    *$'\n'park-item$'\n'*) OQ_VALUE=park-item ;;
+    *$'\n'park-build$'\n'*) OQ_VALUE=park-build ;;
+    *$'\n'stop-run$'\n'*) OQ_VALUE=stop-run ;;
+    *$'\n'owner$'\n'*) OQ_VALUE=owner ;;
+  esac
+  [ -n "$OQ_VALUE" ] && return 0
+  OQ_VALUE="handoff.py owner-question printed no answer in its closed set: ${out//$'\n'/ }"
+  return 1
 }
 check_edge_shape() { # unit spec ... -> 0, or 1 after check 49
   local _c_kind _c_what _c_bad="" _c_cycle=""
@@ -18464,6 +18548,48 @@ verb_dispatch() { # slug · unit · writes...
   load_spec_facts $(GIT ls-files -- "$MEMORY_ROOT/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1 || true
   check_unit_spec "$unit" || return 1
   _d_spec=$_cu_spec
+  # ------------------------------------------------------------------ TOOL-dBoundRoles-11 S6, THE HOLD
+  # M2 sends a FORKED unit to M3 before any code, and this verb admitted one. The state is the one
+  # `check_unit_spec` graded, with the fork record past its cutoff, so the hold sees what check 12 sees.
+  # Here and not in `check_unit_spec` (§8 F7): `park-item` and `park-build` write the run-state file,
+  # which `--check-specs` runs without. The owner question is asked once per dispatch, as kind `fork`,
+  # never attended: a dispatch has a run-state file. Every answer refuses, through this one check 49.
+  if [ "$_cu_state" = FORKED ]; then
+    local _fk_ids _fk_list _fk_why _fk_id _fk_sp _fk_all=""
+    _fk_ids=$(plan_state "$_d_spec" "$FORK_CUTOFF" open "$FORK_RECORD_CUTOFF")
+    _fk_list=${_fk_ids// /, }; [ -n "$_fk_list" ] || _fk_list="section 8 as a whole"
+    if ! read_owner_question fork; then
+      _fk_why="the reader of run.on-owner-question refused, so nothing answers for the owner: $OQ_VALUE"
+    else
+      case "$OQ_VALUE" in
+        resolve)
+          _fk_why="run.on-owner-question answers resolve: resolve each open F-item by principle.p18, the most feature-rich and then the most expandable option the core admits, and write its record in its span, options: <o1> > <o2> · pick: <o1> · admitted-by: principle.<tag>, then dispatch again; $unit ($_d_spec) holds $_fk_list" ;;
+        park-item)
+          park "$rel" decision "$unit" "open fork $_fk_list held by run.on-owner-question" || return 1
+          stage_or_fail "$rel" || return 1
+          _fk_why="run.on-owner-question answers park-item, so $unit is parked as a decision row naming $_fk_list, for the owner at the close" ;;
+        park-build)
+          # every tracked spec of the build `load_spec_facts` loaded above, by its unit id, in id order
+          for _fk_id in $(printf '%s\n' "${!SPEC_PATH[@]}" | sort); do
+            _fk_sp="${SPEC_PATH[$_fk_id]}"
+            case "${SPEC_ST[$_fk_sp]:-}" in CLOSED|WONTDO) continue ;; esac
+            [ "$(plan_state "$_fk_sp" "$FORK_CUTOFF" "" "$FORK_RECORD_CUTOFF")" = FORKED ] || continue
+            _fk_ids=$(plan_state "$_fk_sp" "$FORK_CUTOFF" open "$FORK_RECORD_CUTOFF")
+            _fk_ids=${_fk_ids// /, }
+            _fk_all="${_fk_all:+$_fk_all, }$_fk_id (${_fk_ids:-section 8 as a whole})"
+          done
+          park "$rel" decision "$slug" "open forks in $_fk_all held by run.on-owner-question" || return 1
+          stage_or_fail "$rel" || return 1
+          _fk_why="run.on-owner-question answers park-build, so build $slug is parked as one decision row naming every FORKED unit: $_fk_all" ;;
+        stop-run)
+          _fk_why="run.on-owner-question answers stop-run, so the run stops here: the next verb is --abort $slug, and $unit holds $_fk_list" ;;
+        *)
+          _fk_why="run.on-owner-question answers $OQ_VALUE, so the owner decides $unit's $_fk_list" ;;
+      esac
+    fi
+    fail 49 "--dispatch declares a build pass for a unit whose spec grades FORKED, a section 8 fork that no conforming mark or fork record closes, and run.on-owner-question holds it before any code is written: $_fk_why"
+    return 1
+  fi
   # ------------------------------------------------------------------------------ THE ORDER GATE
   # A unit may not be dispatched while an EARLIER step still holds a unit that is neither terminal
   # nor already dispatched. Units sharing an `order` value are the parallel group and do not block

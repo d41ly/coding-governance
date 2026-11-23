@@ -21,7 +21,7 @@
 # WHAT IT HOLDS: `GIT` and its two pins; `resolve_sidecar_dir`, the one derivation of the sidecar
 # root the driver and the resume tick both read; `read_bound_key`, the one reader of a bound conf
 # key both of them call; `read_fork_cutoff`, the one TEXT read of the memory kit's FORK_ITEM_CUTOFF
-# the driver and the pass-order leg share; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
+# and FORK_RECORD_CUTOFF the driver and the pass-order leg share; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
 # of "which node, which process" the lease writer and both pid probes share; `read_user_name`,
 # `resolve_landing_tag` and `scan_landing_nodes`, the one reading of which node may land, the driver
 # and the gate leg both ask; `parse_gate_profile` and
@@ -311,10 +311,13 @@ read_bound_key() { # NAME · DEFAULT · UNIT · NOTE — the caller sourced the 
 # assignment inside a conditional, a value followed by a command — and a resolved value that is
 # neither blank nor a date. An absent file, or one that never names the key, resolves blank.
 # It takes the conf PATH, so the memory kit's file name is spelled by each caller, not here.
-read_fork_cutoff() { # conf file -> the cutoff on stdout, blank when off; rc 2 with the reason on stdout
+# TOOL-dBoundRoles-11 S3 - THE KEY IS THE OPTIONAL SECOND ARGUMENT, FORK_ITEM_CUTOFF by default, so the
+# fork RECORD's cutoff, FORK_RECORD_CUTOFF, is read by this same re-parse under the same guards and the
+# same test-time comparison with sourcing, never by a second reader.
+read_fork_cutoff() { # conf file · [key, FORK_ITEM_CUTOFF] -> the cutoff on stdout, blank when off; rc 2 with the reason on stdout
   [ -f "$1" ] || return 0
-  awk -v sq="'" -v conf="$1" '
-    BEGIN { key = "FORK_ITEM_CUTOFF"; kl = length(key); val = ""; bad = 0; badtxt = "" }
+  awk -v sq="'" -v conf="$1" -v want="${2:-FORK_ITEM_CUTOFF}" '
+    BEGIN { key = want; kl = length(key); val = ""; bad = 0; badtxt = "" }
     { line = $0 }
     line ~ /^[ \t]*#/ { next }
     substr(line, 1, kl + 1) == key "=" {
@@ -348,7 +351,7 @@ read_fork_cutoff() { # conf file -> the cutoff on stdout, blank when off; rc 2 w
     }
     END {
       if (bad) {
-        printf "%s names %s on line %d in a spelling this text reader does not resolve: %s -- resolving it blank would turn per-item fork grading OFF on the planning side while the hygiene engine, which sources the file, keeps its own value\n", conf, key, bad, badtxt
+        printf "%s names %s on line %d in a spelling this text reader does not resolve: %s -- resolving it blank would turn its fork grading OFF on the planning side while the hygiene engine, which sources the file, keeps its own value\n", conf, key, bad, badtxt
         exit 2
       }
       if (val != "" && val !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/) {

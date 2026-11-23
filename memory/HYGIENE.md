@@ -353,6 +353,12 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
     section-wide reading there: at a terminal status, on either tier, each F-item's span carries its
     own mark, quoted marks not counting; a Tier-2 §8 of any other shape reds at ANY status and under
     `--staged`. The grammar is `TEMPLATE-SPEC.md`'s, and a zero population is announced likewise.
+    Once the filename date also reaches `FORK_RECORD_CUTOFF`, an F-item an `agent` mark resolves
+    carries its fork record in its span, `options:` ranked, `pick:` and `admitted-by:`: a terminal
+    spec reds on a missing record, a pick outside its options, a pick not the first of them, and an
+    `admitted-by` that is not a `principle.<seg>` tag or not one the playbook kit's principle registry
+    holds; an `owner` mark is not graded. With no registry the tag's shape alone is graded, and one
+    note line says so. A zero population is announced likewise.
     A Tier-1 spec takes the micro-spec profile once the filename date reaches `SPEC_TIER1_CUTOFF`:
     every `##` heading is a canonical title, the eight required titles are present, the titles run
     in canonical order, and no section body is empty. Sections are found by heading TEXT, so the

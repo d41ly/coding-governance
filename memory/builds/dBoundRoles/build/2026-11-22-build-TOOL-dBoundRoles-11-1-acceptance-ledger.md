@@ -1,0 +1,24 @@
+**Serves:** journal TOOL-dBoundRoles-11
+
+# TOOL-dBoundRoles-11 — acceptance ledger
+
+Each criterion of section 6, read by the pass that built the unit with a probe of the code it changed, on the
+worktree before the pass commit at base `786b71aeb`. The check 12 probe ran this tree's
+`tools/memory-tree/check-memory-hygiene.sh --only 12` in a fixture repository under the host temp folder whose conf
+arms `FORK_ITEM_CUTOFF` and `FORK_RECORD_CUTOFF` and whose one spec, at `**Status:** CLOSED`, holds one F-item per
+case; the planning probes sliced `tools/unattended/unattended.sh#plan_state` out of this tree and ran it over an
+`INPROGRESS` copy of that spec; the reader probes ran `tools/roles/handoff.py owner-question` in a fixture repository
+holding copies of the roles and policy kits with its policy committed on `main` and no remote; the dispatch probes
+ran this tree's driver, `unattended.sh --dispatch tFk --pass ARCH-tFk-1 --writes x`, as a process in a fixture
+repository holding a run-state file, the policy under test committed on `main`, and one spec whose agent-resolved
+F1 picks the second of its options. No gate, suite or bar ran in the pass: the four `New arm:` arms the spec's gate
+line declares, their RED-first observations and the legs that line lists are owed to the main loop at the close.
+
+**Evidences:** TOOL-dBoundRoles-11
+- AC1 — `pick (c) is not an admitted option` — check 12 exited 1 printing `F1 fork record, at/after FORK_RECORD_CUTOFF 2026-09-15): pick (c) is not an admitted option` for `options: (a) > (b) · pick: (c) · admitted-by: principle.p18`; the F-item holding `options: (a) · pick: (a) · admitted-by: principle.p18 · widens: none · relaxes: none` drew no line, and with the cutoff blank no record line printed. OWED: the arm in `tools/memory-tree/check-memory-hygiene.test.sh` and its RED-first observation at the close.
+- AC2 — `pick (b) is not the first of its ranking (a)` — the F-item holding `options: (a) > (b) · pick: (b) · admitted-by: principle.p18` drew `F4 fork record, at/after FORK_RECORD_CUTOFF 2026-09-15): pick (b) is not the first of its ranking (a)` in the same run. OWED: as AC1.
+- AC3 — `practice.small` — an agent-marked F-item with no record drew `F2 carries an agent mark and no fork record`, the owner-marked F-item with none drew no line, `admitted-by: practice.small` drew `admitted-by practice.small is not a principle.<seg> tag`, `admitted-by: principle.p99` drew `is no tag the principle registry holds`, and a record in backticks drew the no-record line. OWED: as AC1.
+- AC4 — `FORKED` — the sliced `plan_state` over the `INPROGRESS` copy, both cutoffs armed, printed FORKED, and its `open` mode printed `F1 F2 F4 F5 F8`; a copy holding only the out-of-set F1 printed FORKED and READY with the record cutoff past its date; copies holding only the owner F3, the registry-less F6 or the one-option F7 printed READY. OWED: the record rows of `tools/memory-tree/marker-contract.test.sh` and the `--plan` arm of `tools/unattended/unattended.test.sh`, their RED-first observation at the close.
+- AC5 — `park-item` — with `run.on-owner-question = "park-item"` committed, `--kind fork` and `--kind owner-gate` printed `park-item`, `--kind ratification`, `--kind owner-write` and `--kind fork --attended` printed `owner`; in this tree, with no key set, `--kind fork` printed `resolve`; `--kind nonsense` exited 2 printing `the question kind 'nonsense' is none of fork, owner-gate, ratification, owner-write`. OWED: arm 41 of `tools/roles/adopt-roles.test.sh` and its RED-first observation at the close.
+- AC6 — `--abort` — under `park-item` the driver printed `UNATTENDED check 49 FAILED` naming `ARCH-tFk-1 is parked as a decision row naming F1` and the run-state file gained `decision · item ARCH-tFk-1 · reason open fork F1 held by run.on-owner-question`; under `stop-run` it named `the next verb is --abort tFk` and parked nothing; under `park-build` it parked `decision · item tFk · reason open forks in ARCH-tFk-1 (F1) held by run.on-owner-question`; with no key it named the record owed, `options: <o1> > <o2> · pick: <o1> · admitted-by: principle.<tag>`, and the decision rows stayed at their count; with the pick moved to the first option the same dispatch was declared. The process exits 1 on check 49, as the main loop's decision reads AC6. OWED: the hold arm of `tools/unattended/unattended.test.sh` and its RED-first observation at the close.
+- AC7 — `options:` — `grep -n "options:" SPEC-TEMPLATE.template.md` in `tools/memory-tree/` names `tools/memory-tree/SPEC-TEMPLATE.template.md@a8bddd0d:574`, the section 8 paragraph headed **The fork record.**, rendered into `memory/TEMPLATE-SPEC.md` by `adopt-memory-tree.sh --render`; `grep -n "owner-question"` names `tools/roles/agents/gov-spec-writer.agent.md@e20dff81:52` and `tools/roles/agents/gov-builder.agent.md@f2204de2:30`, one line in each.

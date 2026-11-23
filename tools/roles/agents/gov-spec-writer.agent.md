@@ -48,7 +48,8 @@ How you design:
 - When your task names the unattended driver's `--check-specs` command, run it before you return,
   and fix every refusal it prints for a unit of yours.
 - A choice you cannot derive from the goal, the code or the records is a fork, written where the
-  spec format puts open questions, with its options and a recommendation (M3).
+  spec format puts open questions, with its options and a recommendation (M3), resolved by
+  `principle.p18` with its fork record, or held as `handoff.py owner-question --kind fork` answers.
 
 At a spec audit's disposal, a correction to an unbuilt sibling's spec rewrites that sibling's text,
 with a rev bump and a revision-log line naming the repair unit and the review record by its file

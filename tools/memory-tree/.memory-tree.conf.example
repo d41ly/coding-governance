@@ -181,6 +181,14 @@ FORK_MARK_CUTOFF=""
 # TEXT, so keep it a plain column-0 assignment: an `export` prefix or an indent is refused there.
 FORK_ITEM_CUTOFF=""
 
+# Fork-record ratchet (check 12): at or after this date an F-item resolved by an `agent` mark carries
+# its fork record in its span, `options: <o1> > <o2> · pick: <o1> · admitted-by: principle.<tag>`: the
+# pick one of the options and the first of them, the tag one the principle registry holds. An
+# `owner` mark is not graded. It is read inside the F-item reading above, so it reaches only specs that
+# key reaches too. Blank = never required. The planning verb reads this line as TEXT, as it reads the
+# key above, so keep it a plain column-0 assignment.
+FORK_RECORD_CUTOFF=""
+
 # Review-verdict ratchet (check 22): a review record whose FILENAME date is on or after this must
 # open with one `## Verdict: <member>` line from the closed set. Blank = never required. Same
 # grandfathering rule; the wrap-up derivation reads these verdicts, so a corpus without them makes

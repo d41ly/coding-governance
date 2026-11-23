@@ -326,6 +326,12 @@ if ! FORK_CUTOFF=$(read_fork_cutoff "$ROOT/.memory-tree.conf"); then
   echo "pass-order: the memory tree's FORK_ITEM_CUTOFF cannot be read as text, so the sliced classifier would grade section 8 under a cutoff the hygiene gate does not use: $FORK_CUTOFF"
   exit 2
 fi
+# TOOL-dBoundRoles-11 S3 - the classifier's fourth argument, the fork record's FORK_RECORD_CUTOFF, read by
+# the same library reader given the key's name, for the same reason: what the driver grades, this grades.
+if ! FORK_RECORD_CUTOFF=$(read_fork_cutoff "$ROOT/.memory-tree.conf" FORK_RECORD_CUTOFF); then
+  echo "pass-order: the memory tree's FORK_RECORD_CUTOFF cannot be read as text, so the sliced classifier would grade section 8's fork records under a cutoff the hygiene gate does not use: $FORK_RECORD_CUTOFF"
+  exit 2
+fi
 
 # ------------------------------------------------------------------------------- THE LIVENESS PROBE
 # A PROBE THAT CANNOT MOVE SAYS SO. The classifier must return a real token on a real spec before a
@@ -336,7 +342,7 @@ fi
 # PROBE guard — the one whose job is to say the leg graded nothing — skipped silently.
 _probe=$(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/null | grep -E "/spec/.*\.md$" | head -1)
 if [ -n "$_probe" ]; then
-  case "$(plan_state "$_probe" "$FORK_CUTOFF")" in
+  case "$(plan_state "$_probe" "$FORK_CUTOFF" "" "$FORK_RECORD_CUTOFF")" in
     MISSING|THIN|FORKED|READY) ;;
     *) echo "pass-order: DEAD PROBE — the sliced classifier returned no known state on $_probe, so no verdict below would mean anything"; exit 2 ;;
   esac
@@ -703,7 +709,7 @@ $1" ;;
       # carries none. One directory for the whole walk also costs one spawn fewer per unit.
       tmp="$PS_DIR/${sp##*/}"
       printf '%s\n' "$blob" > "$tmp"
-      state=$(plan_state "$tmp" "$FORK_CUTOFF"); rm -f "$tmp"
+      state=$(plan_state "$tmp" "$FORK_CUTOFF" "" "$FORK_RECORD_CUTOFF"); rm -f "$tmp"
       found="$sp"; break
     done
     # EVERY VIOLATION ROUTES THROUGH THE WAIVER, and one helper does it so a future violation class

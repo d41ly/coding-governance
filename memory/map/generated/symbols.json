@@ -16078,6 +16078,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "fk_rows",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "fkspec",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -24668,6 +24673,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "read_owner_question",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_owner_record",
       "kind": "function",
       "file": "tools/loop/placement.py"
@@ -31946,6 +31956,11 @@
       "id": "resolve_owned_rows",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_owner_question",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "resolve_pattern_sets",

@@ -16,6 +16,7 @@
     python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]
     python handoff.py check-return < <SubagentStop hook payload>
     python handoff.py check-return-file --role <slot> --file <return file>
+    python handoff.py owner-question --kind <fork|owner-gate|ratification|owner-write> [--attended]
 
 `render` fills the work-order template, `templates/work-order.template.md` in this kit, whose slots are
 `role`, `roles_lib.render_role`'s output, closing with the role's `## Never`, `## Ceiling` and `## Return`
@@ -2201,6 +2202,9 @@ def main(argv):
     cf = sub.add_parser("check-return-file")
     cf.add_argument("--role", required=True)
     cf.add_argument("--file", required=True)
+    oq = sub.add_parser("owner-question")
+    oq.add_argument("--kind", required=True)
+    oq.add_argument("--attended", action="store_true")
     a = ap.parse_args(argv)
     if a.verb == "check-return":
         # TOOL-dBoundRoles-5 S5 - a broken return check never blocks a stop: every failure exits 0.
@@ -2269,6 +2273,15 @@ def main(argv):
         if lines:
             sys.stdout.buffer.write(("\n".join(lines) + "\n").encode("utf-8"))
         return 1 if lines else 0
+    if a.verb == "owner-question":
+        # TOOL-dBoundRoles-11 S5: the shell door of `resolve_owner_question`, printing its answer and
+        # holding no rule of its own; a refusal, an unknown kind included, exits 2 naming it.
+        try:
+            print(lib.resolve_owner_question(a.kind, a.attended, root))
+        except lib.RolesError as e:
+            print("handoff: owner-question: %s" % e, file=sys.stderr)
+            return 2
+        return 0
     conf = root / ".memory-tree.conf"
     memory_root = lib.read_conf_key(conf, "MEMORY_ROOT") if conf.is_file() else None
     try:

@@ -4677,6 +4677,60 @@ out_fi=$(cd "$FI" && bash "$SCRIPT" --staged 2>/dev/null)
 n=$((n+1))
 grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape arm fired with FORK_ITEM_CUTOFF BLANK, the declared off state every adopter ships with"; st=1; }
 
+# ---- TOOL-dBoundRoles-11 AC1 AC2 AC3 — THE FORK RECORD ARM, in a tree of its own so no verdict above
+# ---- moves. One CLOSED Tier-2 spec dated past FORK_ITEM_CUTOFF and FORK_RECORD_CUTOFF whose §8 holds one
+# ---- F-item per case: a pick outside its options (F1), an agent mark with no record (F2), an owner mark
+# ---- with no record (F3, silent), a pick that is not the first (F4), an `admitted-by` of another shape
+# ---- (F5), a well-shaped tag the registry lacks (F6), a one-option record that holds (F7, silent) and a
+# ---- record in backticks (F8, no record). The control re-grades the same bytes with FORK_RECORD_CUTOFF
+# ---- blank. The failing case, owed at the close: the record predicate removed from check 12, under which
+# ---- F1, F2, F4, F5, F6 and F8 draw no line. WHAT IT DOES NOT CHECK: the absent-registry note, since the
+# ---- engine under test resolves the playbook kit beside it; where none resolves, F6 reads that note.
+FR=$TMP/frecord
+mkdir -p "$FR/memory/builds/tRec/spec"
+good10 | sed 's/^\*\*Status:\*\* SPECCED/**Status:** CLOSED/; s/2026-08-10/2026-09-20/g; /^## 8\. Open questions$/,/^## 9\./{/^none$/d}' \
+  | awk '{ print } /^## 8\. Open questions$/ { getline; print
+      print "- **F1 — which way?** two ways. RESOLVED (agent, 2026-09-20, delegated): (c)."
+      print "  options: (a) > (b) · pick: (c) · admitted-by: principle.p18"
+      print "- **F2 — which other way?** RESOLVED (agent, 2026-09-20, delegated): (a), and no record."
+      print "- **F3 — the owner way?** RESOLVED (owner, 2026-09-20): (b), and no record."
+      print "- **F4 — a third way?** RESOLVED (agent, 2026-09-20, delegated): (b)."
+      print "  options: (a) > (b) · pick: (b) · admitted-by: principle.p18"
+      print "- **F5 — a fourth way?** RESOLVED (agent, 2026-09-20, delegated): (a)."
+      print "  options: (a) > (b) · pick: (a) · admitted-by: practice.small"
+      print "- **F6 — a fifth way?** RESOLVED (agent, 2026-09-20, delegated): (a)."
+      print "  options: (a) > (b) · pick: (a) · admitted-by: principle.p0"
+      print "- **F7 — a held way?** RESOLVED (agent, 2026-09-20, delegated): (a)."
+      print "  options: (a) · pick: (a) · admitted-by: principle.p18 · widens: none · relaxes: none"
+      print "- **F8 — a quoted way?** RESOLVED (agent, 2026-09-20, delegated): (a)."
+      print "  `options: (a) > (b) · pick: (a) · admitted-by: principle.p18`" }' \
+  > "$FR/memory/builds/tRec/spec/2026-09-20-spec-ARCH-tRec-1.md"
+( cd "$FR" && git init -q --template= .
+  mkdir -p memory && printf 'sentinel\n' > memory/HYGIENE.md
+  git add -A && git commit -q -m frecord --no-verify ) >/dev/null 2>&1
+FR_CONF='MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nFORK_ITEM_CUTOFF="2026-09-10"\n'
+printf "${FR_CONF}FORK_RECORD_CUTOFF=\"2026-09-15\"\n" > "$FR/.memory-tree.conf"
+out_fr=$(cd "$FR" && bash "$SCRIPT" --only 12 2>&1)
+FR_AT='2026-09-20-spec-ARCH-tRec-1.md (terminal Status, §8 '
+n=$((n+1)); grep -qF "${FR_AT}F1 fork record, at/after FORK_RECORD_CUTOFF 2026-09-15): pick (c) is not an admitted option" <<<"$out_fr" \
+  || { echo "FAIL [fork-record AC1] a pick outside its options drew no line naming F1"; st=1; }
+n=$((n+1)); grep -qF "${FR_AT}F4 fork record, at/after FORK_RECORD_CUTOFF 2026-09-15): pick (b) is not the first of its ranking (a)" <<<"$out_fr" \
+  || { echo "FAIL [fork-record AC2] a pick that is not the first drew no line naming F4 and both options"; st=1; }
+n=$((n+1)); grep -qF "${FR_AT}F2 carries an agent mark and no fork record" <<<"$out_fr" \
+  || { echo "FAIL [fork-record AC3] an agent mark with no record drew no line naming F2"; st=1; }
+n=$((n+1)); grep -qF "${FR_AT}F3 " <<<"$out_fr" && { echo "FAIL [fork-record AC3] an owner mark with no record was graded"; st=1; }
+n=$((n+1)); grep -qF "${FR_AT}F5 fork record, at/after FORK_RECORD_CUTOFF 2026-09-15): admitted-by practice.small is not a principle.<seg> tag" <<<"$out_fr" \
+  || { echo "FAIL [fork-record AC3] an admitted-by of another shape drew no line naming the tag"; st=1; }
+n=$((n+1)); grep -qF "${FR_AT}F6 fork record, at/after FORK_RECORD_CUTOFF 2026-09-15): admitted-by principle.p0 is no tag the principle registry holds" <<<"$out_fr" \
+  || grep -qF 'because no principle registry was read' <<<"$out_fr" \
+  || { echo "FAIL [fork-record S2] a tag the registry lacks drew neither its line nor the absent-registry note"; st=1; }
+n=$((n+1)); grep -qF "${FR_AT}F7 " <<<"$out_fr" && { echo "FAIL [fork-record AC1] a one-option record whose pick is its first drew a line"; st=1; }
+n=$((n+1)); grep -qF "${FR_AT}F8 carries an agent mark and no fork record" <<<"$out_fr" \
+  || { echo "FAIL [fork-record S1] a record quoted in backticks recorded something"; st=1; }
+printf "${FR_CONF}FORK_RECORD_CUTOFF=\"\"\n" > "$FR/.memory-tree.conf"
+out_fr=$(cd "$FR" && bash "$SCRIPT" --only 12 2>&1)
+n=$((n+1)); grep -qF 'fork record' <<<"$out_fr" && { echo "FAIL [fork-record] the record arm fired with FORK_RECORD_CUTOFF BLANK, the declared off state"; st=1; }
+
 # ---- TOOL-aRoutedQuill-1 AC1-AC5 — THE TIER-1 MICRO-SPEC ARM, in a tree of its own so no verdict
 # ---- above moves, and under --staged because that is the commit-time grade the write gate trusts.
 # ---- The base engine passes the header-and-revision-log spec of the first arm, which is the red.
@@ -5315,7 +5369,10 @@ done
 # seed-across arm become one scaffold, so the after-commit FOO_PIN assertion is made once (-1), and the
 # arm gains the listing run's armed set and the null-then-HEAD SHA and fixture-compared assertion (+2),
 # each one top-level `n=$((n+1))`, never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=797
+# RAISED 797 -> 806 by TOOL-dBoundRoles-11 on 2026-11-23: the fork record arm's nine `n=$((n+1))`, eight
+# over the armed fixture and one over its blank-cutoff control, each top-level and never skipped.
+# Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=806
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

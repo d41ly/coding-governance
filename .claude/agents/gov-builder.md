@@ -58,7 +58,8 @@ running any gate either: gates are the main session's, at the merge or push thre
 Read the spec whole before you touch code, and the brief your task names. Where the code and the
 spec disagree, the spec is not yours to rewrite: return without a commit, naming what in the spec is
 wrong and what you found, and whoever dispatched you has the spec revised. A divergence is reported,
-and the spec stays as you found it.
+and the spec stays as you found it. A fork you meet is resolved by `principle.p18` with its fork
+record, or held as `handoff.py owner-question --kind fork` answers.
 
 Before your first product edit, check that the spec can be built as written, and spend minutes on
 it, not the pass. Probe each claim it makes about current code against the tree: every path,

@@ -305,7 +305,9 @@ else
   # ahead of every landed spec so nothing ratified goes retroactively red. FORK_ITEM_CUTOFF sits
   # BETWEEN the two fixture eras: the 2026-08-09 rows keep the section-wide reading, the 2026-09-20
   # rows are graded per F-item.
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nFORK_MARK_CUTOFF="2026-08-01"\nFORK_ITEM_CUTOFF="2026-09-15"\n' > .memory-tree.conf
+  # FORK_RECORD_CUTOFF (TOOL-dBoundRoles-11) sits past the 2026-09-20 F-item rows, whose agent marks carry
+  # no record, so only the 2026-10-05 record rows are graded for one.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nFORK_MARK_CUTOFF="2026-08-01"\nFORK_ITEM_CUTOFF="2026-09-15"\nFORK_RECORD_CUTOFF="2026-10-01"\n' > .memory-tree.conf
   printf 'sentinel\n' > memory/HYGIENE.md 2>/dev/null || { mkdir -p memory && printf 'sentinel\n' > memory/HYGIENE.md; }
 ) >/dev/null 2>&1
 
@@ -441,6 +443,30 @@ options, unmarked.' "$PD"
 mark_case "spelling: fact-question prefix"       red FORKED '- **FACT-QUESTION · F1 — does X hold?** a probe decides it, unmarked.' "$PD"
 mark_case "item: none, zero items"          silent READY  'none - no forks here.' "$PD"
 
+# ---- TOOL-dBoundRoles-11 - THE FORK RECORD ROWS, dated past FORK_RECORD_CUTOFF as well. An F-item an
+# ---- `agent` mark resolves carries `options: <o1> > <o2> · pick: <o1> · admitted-by: principle.<seg>` in
+# ---- its span; both readers grade a missing record, a pick outside the options or not the first, and a
+# ---- tag of another shape, and neither grades an `owner` mark. Not a row: a well-shaped tag the
+# ---- registry lacks, which the hygiene side reds where the playbook kit is installed and the planning
+# ---- side, reading no registry, never does; the hygiene suite's record arm grades that half.
+RD=2026-10-05
+mark_case "record: holds"                    silent READY  '- **F1 — which way?** RESOLVED (agent, 2026-10-05, delegated): (a).
+  options: (a) > (b) · pick: (a) · admitted-by: principle.p18 · widens: none · relaxes: none' "$RD"
+mark_case "record: one option"               silent READY  '- **F1 — which way?** RESOLVED (agent, 2026-10-05, delegated): (a).
+  options: (a) · pick: (a) · admitted-by: principle.p18' "$RD"
+mark_case "record: wrapped across lines"     silent READY  '- **F1 — which way?** RESOLVED (agent, 2026-10-05, delegated): (a). options: (a) > (b) · pick:
+  (a) · admitted-by: principle.p18' "$RD"
+mark_case "record: pick outside its options" red    FORKED '- **F1 — which way?** RESOLVED (agent, 2026-10-05, delegated): (c).
+  options: (a) > (b) · pick: (c) · admitted-by: principle.p18' "$RD"
+mark_case "record: pick not the first"       red    FORKED '- **F1 — which way?** RESOLVED (agent, 2026-10-05, delegated): (b).
+  options: (a) > (b) · pick: (b) · admitted-by: principle.p18' "$RD"
+mark_case "record: absent, agent mark"       red    FORKED '- **F1 — which way?** RESOLVED (agent, 2026-10-05, delegated): (a).' "$RD"
+mark_case "record: absent, owner mark"       silent READY  '- **F1 — which way?** RESOLVED (owner, 2026-10-05): (a).' "$RD"
+mark_case "record: tag of another shape"     red    FORKED '- **F1 — which way?** RESOLVED (agent, 2026-10-05, delegated): (a).
+  options: (a) > (b) · pick: (a) · admitted-by: practice.small' "$RD"
+mark_case "record: only in backticks"        red    FORKED '- **F1 — which way?** RESOLVED (agent, 2026-10-05, delegated): (a).
+  `options: (a) > (b) · pick: (a) · admitted-by: principle.p18`' "$RD"
+
 ( cd "$FT" && git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m fx --no-verify ) >/dev/null 2>&1
 hyg_out=$( cd "$FT" && bash "$HYG" 2>&1 )
 # THE PLANNING SIDE'S CUTOFF, read from the SAME fixture conf through the reader the planning callers
@@ -449,6 +475,10 @@ hyg_out=$( cd "$FT" && bash "$HYG" 2>&1 )
 ITEM_CUT=$(r_cutoff "$FT/.memory-tree.conf")
 ncase=$((ncase+1))
 [ "$ITEM_CUT" = "2026-09-15" ] || { echo "FAIL [item/cutoff] the planning reader read [$ITEM_CUT] from the fixture conf, which declares 2026-09-15"; st=1; }
+# ...and the fork record's, through the same reader given the key's name (TOOL-dBoundRoles-11).
+REC_CUT=$(r_cutoff "$FT/.memory-tree.conf" FORK_RECORD_CUTOFF)
+ncase=$((ncase+1))
+[ "$REC_CUT" = "2026-10-01" ] || { echo "FAIL [record/cutoff] the planning reader read [$REC_CUT] for FORK_RECORD_CUTOFF from the fixture conf, which declares 2026-10-01"; st=1; }
 
 i=0
 for want_h in $MARK_WANT_HYG; do
@@ -467,7 +497,7 @@ for want_p in $MARK_WANT_PLAN; do
   i=$((i+1))
   nm=${MARK_NAMES[i-1]}
   ncase=$((ncase+1))
-  got_p=$(r_plan "$T/${MARK_DATES[i-1]}-plan-$i.md" "$ITEM_CUT")
+  got_p=$(r_plan "$T/${MARK_DATES[i-1]}-plan-$i.md" "$ITEM_CUT" "" "$REC_CUT")
   [ "$got_p" = "$want_p" ] || { echo "FAIL [mark/$nm] plan_state said $got_p, contract says $want_p"; st=1; }
 done
 
@@ -513,17 +543,19 @@ fi
 # ---- section as a whole, so it would plan READY on an unmarked F2 below a marked F1 while every row
 # ---- above stayed green: the table grades the classifier, and this grades who calls it. Enumerated
 # ---- by grep over the driver and the pass-order leg, comment lines dropped; the COUNT is printed and
-# ---- a zero is a dead probe, never a clean one.
+# ---- a zero is a dead probe, never a clean one. TOOL-dBoundRoles-11 §8 F6: each also passes the fork
+# ---- record's cutoff as its FOURTH argument, after the mode, `""`, `delegated` or `open`, so a caller
+# ---- that forgot it would plan READY on a record check 12 reds.
 _pcs=$(grep -nE 'plan_state "' "$U" "$PO" 2>/dev/null | grep -vE '^[^:]+:[0-9]+:[[:space:]]*#')
 _pcs_n=$(printf '%s\n' "$_pcs" | grep -c . || true)
-_pcs_bad=$(printf '%s\n' "$_pcs" | grep . | grep -vE 'plan_state "[^"]+" "\$FORK_CUTOFF"' || true)
+_pcs_bad=$(printf '%s\n' "$_pcs" | grep . | grep -vE 'plan_state "[^"]+" "\$FORK_CUTOFF" ("[^"]*"|[a-z]+) "\$FORK_RECORD_CUTOFF"' || true)
 ncase=$((ncase+1))
 if [ "${_pcs_n:-0}" -eq 0 ]; then
   echo "FAIL [item/callers] DEAD PROBE: no plan_state call site was found in $U or $PO, so no caller was graded"; st=1
 elif [ -n "$_pcs_bad" ]; then
-  echo "FAIL [item/callers] a plan_state call site does not pass the cutoff as its second argument:"; printf '%s\n' "$_pcs_bad"; st=1
+  echo "FAIL [item/callers] a plan_state call site does not pass FORK_CUTOFF second and FORK_RECORD_CUTOFF fourth:"; printf '%s\n' "$_pcs_bad"; st=1
 else
-  echo "marker-contract: $_pcs_n plan_state call site(s) in the driver and the pass-order leg, each passing the cutoff"
+  echo "marker-contract: $_pcs_n plan_state call site(s) in the driver and the pass-order leg, each passing both cutoffs"
 fi
 
 # ---- THE TWO READINGS OF ONE LINE, compared at TEST time. The engine SOURCES the conf; the planning
@@ -556,6 +588,14 @@ check_reader_pair "not a date"               'FORK_ITEM_CUTOFF=2026-09-15x' refu
 check_reader_pair "export prefix"            'export FORK_ITEM_CUTOFF="2026-09-15"' refuse
 check_reader_pair "indented"                 '  FORK_ITEM_CUTOFF="2026-09-15"' refuse
 check_reader_pair "inside a conditional"     'if true; then FORK_ITEM_CUTOFF="2026-09-15"; fi' refuse
+# ...and the fork record's key, the reader given its name (TOOL-dBoundRoles-11): it reads that key and not
+# the item key on the line above it, and agrees with a sourced read.
+printf 'FORK_ITEM_CUTOFF="2026-09-15"\nFORK_RECORD_CUTOFF="2026-10-01"  # note\n' > "$CF"
+_t=$(r_cutoff "$CF" FORK_RECORD_CUTOFF); _trc=$?
+_s=$( . "$CF" >/dev/null 2>&1; printf '%s' "${FORK_RECORD_CUTOFF-}" )
+ncase=$((ncase+1))
+[ "$_trc" = 0 ] && [ "$_t" = "$_s" ] && [ "$_t" = 2026-10-01 ] \
+  || { echo "FAIL [reader/record-key] the text reader returned rc=$_trc [$_t] for FORK_RECORD_CUTOFF, a sourced read [$_s]"; st=1; }
 
 
 # =============================================================================================
@@ -581,5 +621,5 @@ elif [ "$_cv_drv" != "$_cv_hyg" ]; then
 fi
 
 
-[ "$st" = 0 ] && echo "PASS ($ncase cases across 3 contracts, marker-region, section-8 mark with its F-item cutoff, and review verdicts, held)"
+[ "$st" = 0 ] && echo "PASS ($ncase cases across 3 contracts, marker-region, section-8 mark with its F-item and fork-record cutoffs, and review verdicts, held)"
 exit $st

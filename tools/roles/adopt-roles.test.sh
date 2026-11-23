@@ -136,7 +136,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +4 for arm 38 (TOOL-dBoundRoles-48).
 # +5 for arm 39 (TOOL-dBoundRoles-24).
 # +3 for arm 40 (TOOL-dBoundRoles-41).
-FLOOR_ASSERTIONS=166
+# +4 for arm 41 (TOOL-dBoundRoles-11).
+FLOOR_ASSERTIONS=170
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -2290,6 +2291,57 @@ check_arm "arm 40 AC2 the orienter's typed question planting an anchor the order
    "$([ "$_rc" != 0 ] && grep -qF -- 'anchor `record:memory/nowhere.md@0123456789ab` — resolves to no fact' "$A40E" \
       && [ "$(ls -A "$A40P")" = "$_ls" ] && echo 1 || echo 0)"
 [ "$_rc" != 0 ] || { printf '    exit %s, want non-zero\n' "$_rc"; sed 's/^/    /' "$A40E"; }
+
+# ---- arm 41 (TOOL-dBoundRoles-11 AC5): `handoff.py owner-question`, the shell door of `resolve_owner_question`, which
+# ---- reads `run.on-owner-question` through `read_policy_setting`. The fixture gains a copy of the policy kit beside the
+# ---- roles kit, as arm 29's does, and commits each plant's `.governance/policy.toml` on `main`, the landed revision
+# ---- `policy.py get` reads in a clone with no remote. With no key a fork prints `resolve`; under each of the four
+# ---- values a fork and an owner gate print the value, `best-effort-recorded` as `resolve`; a ratification, an
+# ---- owner write and an attended fork print `owner` under every value; an unknown kind exits 2 naming it. The
+# ---- failing case, owed at the close and not observed by the pass that wrote this: the reader answering the key's
+# ---- value for a ratification, under which the owner row reds. WHAT IT DOES NOT CHECK: a refused policy read, or
+# ---- no policy kit beside the roles kit, each a RolesError the door prints and exits 2 on.
+build_fixture; _rc41=$?
+_pk=policy; [[ $FXK == */* ]] && _pk=${FXK%/*}/policy
+mkdir -p "$FX/$_pk" && cp -R "$HERE/../policy"/. "$FX/$_pk"/ || _rc41=2
+A41=$("$PY" -B -c 'import os, pathlib, subprocess, sys
+fx, kit = pathlib.Path(sys.argv[1]).resolve(), pathlib.Path(sys.argv[2]).resolve()
+env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_") and k != "GOV_DEFAULT_BRANCH"}
+def git(*a):
+    return subprocess.run(["git", "-c", "user.name=fx", "-c", "user.email=fx@fx", "-C", str(fx), *a], env=env,
+                          capture_output=True, text=True).returncode
+def commit(*lines):
+    (fx / ".governance").mkdir(exist_ok=True)
+    (fx / ".governance" / "policy.toml").write_text("".join(ln + "\n" for ln in lines) or "# no key\n", encoding="utf-8")
+    return git("add", "-A") == 0 and git("commit", "-q", "--allow-empty", "-m", "plant") == 0
+def ask(*a):
+    p = subprocess.run([sys.executable, "-B", "handoff.py", "owner-question", *a], cwd=str(kit), env=env,
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return p.returncode, p.stdout.strip(), p.stderr
+ok = git("symbolic-ref", "HEAD", "refs/heads/main") == 0 and commit()
+print("default %d" % int(ok and ask("--kind", "fork")[:2] == (0, "resolve") and ask("--kind", "owner-gate")[1] == "resolve"))
+held, owner = [], []
+for value, want in (("park-item", "park-item"), ("park-build", "park-build"), ("stop-run", "stop-run"),
+                    ("best-effort-recorded", "resolve")):
+    planted = commit("run.on-owner-question = \"%s\"" % value)
+    held.append(planted and ask("--kind", "fork")[1] == want and ask("--kind", "owner-gate")[1] == want)
+    owner.append(planted and [ask("--kind", k)[1] for k in ("ratification", "owner-write")] == ["owner", "owner"]
+                 and ask("--kind", "fork", "--attended")[1] == "owner")
+print("value %d" % int(all(held)))
+print("owner %d" % int(all(owner)))
+rc, out, err = ask("--kind", "nonsense")
+print("unknown %d" % int(rc == 2 and out == "" and "nonsense" in err))
+' "$FX" "$FX/$KREL" 2>&1)
+A41=${A41//$'\r'/}
+check_arm "arm 41 AC5 with no run.on-owner-question set, a fork and an owner gate each print resolve" \
+   "$([ "$_rc41" = 0 ] && [[ $A41 == *'default 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 41 AC5 under each value a fork and an owner gate print it, best-effort-recorded as resolve" \
+   "$([[ $A41 == *'value 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 41 AC5 a ratification, an owner write and an attended fork print owner under every value" \
+   "$([[ $A41 == *'owner 1'* ]] && echo 1 || echo 0)"
+check_arm "arm 41 AC5 an unknown kind exits 2 naming it" \
+   "$([[ $A41 == *'unknown 1'* ]] && echo 1 || echo 0)"
+[ "$A41" = $'default 1\nvalue 1\nowner 1\nunknown 1' ] || printf '    %s\n' "${A41//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
