@@ -1,6 +1,6 @@
 # KICK-dKeptSession-64 — the round-4 minors batch's audit's 20 minor findings, closed after the batch they land on is built
 
-**Status:** DEFERRED · rev-4 · 2026-11-23 · node a · Tier-2 · base ab9f0545 · streams kickoff · order 35 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-23 · node a · Tier-2 · base ab9f0545 · streams kickoff · order 35 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -19,6 +19,8 @@
 | [2026-11-21-prompt-KICK-dKeptSession-57-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-57-precheck-brief.md) | research | KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-65 |
 | [2026-11-22-prompt-KICK-dKeptSession-64-reground-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-64-reground-brief.md) | research | — |
 | [2026-11-23-prompt-KICK-dKeptSession-64-1-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-64-1-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-64-2-spec-writer.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-64-2-spec-writer.md) | journal | — |
+| [2026-11-23-prompt-KICK-dKeptSession-64-ac18-fix-brief.md](../prompts/2026-11-23-prompt-KICK-dKeptSession-64-ac18-fix-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-64-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -448,8 +450,11 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
   Red when: a superseded text has no line, or an answer lands in a record of the unit it names.
   figure: DERIVED, each passage's presence read off 63's spec at the pass.
 - **AC18** — When `grep -c -e "git log" -e "rev-list"` runs over the `gov_ref_sh` block of
-  `tools/lib/gov-ref.sh`, read by the same `sed` range, it prints `0`, and the block's
-  `write_gov_ref` calls `add_feed_event` over its trailing arguments before `write_feed_success`.
+  `tools/lib/gov-ref.sh`, read by the same `sed` range, with its comment lines dropped by
+  `grep -v -E '^[[:space:]]*#'`, it prints `0`, and the block's `write_gov_ref` calls
+  `add_feed_event` over its trailing arguments before `write_feed_success`. Its header comment
+  spells `git log <ref>`, so the count without that filter is `1` and with it `0` (DERIVED at
+  `ab9f0545` and `c18b223b`, 2026-11-23).
   Red when: the success exit walks the ref's history to find the chain.
 - **AC19** — When this unit's ledger answer to 63's AC13, whose `--legs-for` population S19
   withdraws, is read, it names the `spec tokens (a spec's own names resolve)` leg's `guards` hits as
@@ -520,6 +525,10 @@ New arm: tools/runlog/selftest.py · covers AC10 · an in-process `resolve_remot
   line; §4 gains the shipped texts and the driver's ceiling, met unraised; AC8 and AC9 copy specs
   whose paths trip the guard;
   S10's pop sits in `main` ahead of the arms, the place 63 rev-5 S14 names, and AC10 reads it.
+- rev-5 · 2026-11-23 · AC18 · its count drops the block's comment lines first, as
+  `KICK-dKeptSession-65` rev-3 AC9 does, since the header comment's `git log <ref>` made it print
+  `1`, under `2026-11-23-prompt-KICK-dKeptSession-64-ac18-fix-brief`; AC13 diffs the block and
+  counts nothing, so it stands.
 
 ## 10. Reuse audit
 
