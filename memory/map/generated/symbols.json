@@ -8793,6 +8793,11 @@
       "file": "tools/govkit/matrix.py"
     },
     {
+      "id": "check_role_reads",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
       "id": "check_roles",
       "kind": "function",
       "file": "tools/check-wiring.sh"

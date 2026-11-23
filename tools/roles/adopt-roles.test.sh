@@ -139,7 +139,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # +4 for arm 41 (TOOL-dBoundRoles-11).
 # +2 for arm 42 (TOOL-dBoundRoles-47).
 # +11 for arm 43 (TOOL-dBoundRoles-26).
-FLOOR_ASSERTIONS=183
+# +1 for arm 42's read check (TOOL-dBoundRoles-53).
+FLOOR_ASSERTIONS=184
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 # THE LOOP KIT (TOOL-dDeclaredLoop-1): the adopter and the catalogue checker read each workflow's order
@@ -190,6 +191,26 @@ print("\n".join(sorted(held)))' "$HERE") || return 2
   (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1)
 }
 run_adopter() { (cd "$FX" && bash "$FXK/adopt-roles.sh" "$@" 2>&1); }
+check_role_reads() { # <role> <key>... -> one check_arm; rc 0 when the fixture's installed roles kit holds the role
+  # and its `reads` admits every key given, else rc 1 with a line naming the role and the first key it does not read
+  # (TOOL-dBoundRoles-53 S1). The parse is the render's own: the `reads` line split on commas, an empty entry dropped,
+  # each entry through the kit's `roles_lib.parse_read_key`, which drops a trailing `?` and folds the tag spelling
+  # `field.input.question` to `input:question`. Every key is checked, `input:prompt` included: the render exempts it
+  # from its refusal, but a role that does not read it renders no block for it, so a handed half would pass on absence.
+  local _miss _rcr
+  _miss=$("$PY" -B -c 'import pathlib, sys
+kit = pathlib.Path(sys.argv[1]); sys.path.insert(0, str(kit))
+import roles_lib as lib
+role = lib.load_roles(kit).get(sys.argv[2])
+read = {lib.parse_read_key(x)[0] for x in (role["keys"].get("reads", "") if role else "").split(",") if x.strip()}
+print(next((k for k in sys.argv[3:] if k not in read), ""))' "$FX/$FXK" "$@" 2>&1); _rcr=$?
+  _miss=${_miss//$'\r'/}
+  check_arm "the role $1 reads ${*:2}, every key its case passes, before any render runs" \
+     "$([ "$_rcr" = 0 ] && [ -z "$_miss" ] && echo 1 || echo 0)"
+  [ "$_rcr" = 0 ] && [ -z "$_miss" ] && return 0
+  if [ "$_rcr" = 0 ]; then echo "    $1 does not read $_miss"; else printf '    %s\n' "${_miss//$'\n'/$'\n'    }"; fi
+  return 1
+}
 # THE CITED HARNESS PAIRS, read by this suite and never through `roles_lib` (TOOL-dRenderedAnchor-3
 # S5): the `harness` of each `[[workflow]]` entry of `<kit>/workflows.toml` whose `driver` is
 # `workflow`, split after a literal `{prefix}/` into home and file, kept when `<kit>/SKILL.template.md`
@@ -2356,23 +2377,38 @@ check_arm "arm 41 AC5 an unknown kind exits 2 naming it" \
 # ---- and not observed by the pass that wrote this: a `render_handoff` that wraps the typed value in
 # ---- `render_handed_fence`, as TOOL-dBoundRoles-38 S2 first specified, under which the planted render exits 0. WHAT
 # ---- IT DOES NOT CHECK: a typed diff on another role, or an anchor that resolves, which arm 39 grades.
+# ---- TOOL-dBoundRoles-53: the case checks its own arguments before it reads a verdict. `check_role_reads` first, over
+# ---- the role and every `input:` key the case passes, and on a miss neither render runs and both arms fail, so a role
+# ---- swap the read check refuses is named rather than graded; then the plain-words control render, which must exit 0
+# ---- and write its prompt file; then the refusal render, whose verdict is the anchor check's alone: exit 1, the span
+# ---- named once, no `does not read` in stderr and no file written, and exit 2 fails it named as a usage error. The
+# ---- failing cases, owed at the close and not observed by the pass that wrote this: the case re-roled to
+# ---- `gov-builder`, under which the read check fails naming `input:question` before any render runs, and a
+# ---- `handoff.py` that calls `ap.error` on every render, under which the refusal arm fails naming the usage error.
 build_fixture; _rc42=$?
+A42R=gov-orienter
 A42P="$FX/$MR/builds/tFix/prompts"; A42S="$MR/builds/tFix/spec/2026-11-23-spec-TOOL-tFix-1.md"; A42E="$TMP_ROOT/a42.err"
 A42K="record:TOOL-tFix-9@$(printf '%012d' 0)"
 mkdir -p "$A42P" "$FX/$MR/builds/tFix/spec" \
   && printf '# TOOL-tFix-1\n\nThe spec quotes `%s` in its prose.\n' "$A42K" > "$FX/$A42S"
-_ls=$(ls -A "$A42P")
-(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-orienter --build tFix --unit TOOL-tFix-1 --input "prompt=$A42S" \
-   --input "question=which seam fits; see \`$A42K\`" >/dev/null 2>"$A42E"); _rc=$?
-check_arm "arm 42 AC1 the orienter's span planted in its typed question and its handed prompt exits non-zero naming it once" \
-   "$([ "$_rc42" = 0 ] && [ "$_rc" != 0 ] && [ "$(grep -oF -- "$A42K" "$A42E" | wc -l | tr -d ' ')" = 1 ] \
-      && [ "$(ls -A "$A42P")" = "$_ls" ] && echo 1 || echo 0)"
-[ "$_rc" != 0 ] || { printf '    exit %s, want non-zero\n' "$_rc"; sed 's/^/    /' "$A42E"; }
-(cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role gov-orienter --build tFix --unit TOOL-tFix-1 --input "prompt=$A42S" \
-   --input 'question=which seam fits' >/dev/null 2>"$A42E"); _rc=$?
-check_arm "arm 42 AC1 ...and with the question in plain words it exits 0 and writes its prompt file" \
-   "$([ "$_rc" = 0 ] && [ -z "$_ls" ] && [ -n "$(ls -A "$A42P")" ] && echo 1 || echo 0)"
-[ "$_rc" = 0 ] || sed 's/^/    /' "$A42E"
+check_role_reads "$A42R" input:question input:prompt; _rr42=$?
+_ls=$(ls -A "$A42P"); _rc=unread
+[ "$_rr42" = 0 ] && { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role "$A42R" --build tFix --unit TOOL-tFix-1 \
+   --input "prompt=$A42S" --input 'question=which seam fits' >/dev/null 2>"$A42E"); _rc=$?; }
+check_arm "arm 42 AC1 the orienter's render with the question in plain words exits 0 and writes its prompt file" \
+   "$([ "$_rc42" = 0 ] && [ "$_rc" = 0 ] && [ -z "$_ls" ] && [ -n "$(ls -A "$A42P")" ] && echo 1 || echo 0)"
+case $_rc in 0) ;; unread) echo "    not run: $A42R does not read a key the case passes" ;; *) sed 's/^/    /' "$A42E" ;; esac
+_ls=$(ls -A "$A42P"); _rc=unread
+[ "$_rr42" = 0 ] && { (cd "$FX" && "$PY" -B "$FXK/handoff.py" render --role "$A42R" --build tFix --unit TOOL-tFix-1 \
+   --input "prompt=$A42S" --input "question=which seam fits; see \`$A42K\`" >/dev/null 2>"$A42E"); _rc=$?; }
+_v42=$([ "$_rc" = 1 ] && [ "$(grep -oF -- "$A42K" "$A42E" | wc -l | tr -d ' ')" = 1 ] && ! grep -qF -- 'does not read' "$A42E" \
+      && [ "$(ls -A "$A42P")" = "$_ls" ] && echo 1 || echo 0)
+check_arm "arm 42 AC1 ...and with its span planted in the typed question and the handed prompt it exits 1 naming it once, the anchor check's refusal" "$_v42"
+[ "$_v42" = 1 ] || case $_rc in
+  2) echo "    exit 2: a usage error, not the anchor check's refusal"; sed 's/^/    /' "$A42E" ;;
+  unread) echo "    not run: $A42R does not read a key the case passes" ;;
+  *) printf '    exit %s, want 1 naming the span once, no does-not-read line and no file written\n' "$_rc"; sed 's/^/    /' "$A42E" ;;
+esac
 
 # ---- arm 43 (TOOL-dBoundRoles-26 AC1 AC2 AC3 AC5): the typed refusal. The fixture gains the policy kit, as arm
 # ---- 41's does, with no run.on-owner-question set on `main`. AC3: every scaffolded agent file counts one
