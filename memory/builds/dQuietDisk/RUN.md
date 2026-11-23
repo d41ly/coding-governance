@@ -9,7 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: a0ae4dcac415bfab8de7cce5da6423311a25a39e · park · 0 touching
+gates-run: unattended-179540992358805920005-2030153 87fdd849
+refreshed-at: a315474f499e99df0c72b9df9204ed01194bf57b · park · 4 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: a19951cd998524932e849650675c48b18729b0b8
 phase: VERIFYING
@@ -175,3 +176,17 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 2026-11-22T20:29:17Z draw · re-dispatch · TOOL-dQuietDisk-37 · 10/44 · 20261122T202917Z-8d1a7e
 
 2026-11-22T20:29:17Z dispatch · item 3403c380 TOOL-dQuietDisk-37 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-11-23T10:44:16Z decision · item brief item 6: the manifest-check pickaxe scoped by path and range · reason TOOL-dQuietDisk-6 is WONTDO by its fork F1: its re-ground measured today's pickaxe stopping at its first valid match, so scoping it saves nothing measurable
+
+2026-11-23T10:44:18Z decision · item brief item 9: the unattended.test.sh prologue built once as a bundle · reason the owner's standing rule of 2026-08-23 forbids running the unattended kit's suites, so this run cannot observe the change; ask TOOL-dQuietDisk-24 carries it
+
+2026-11-23T10:44:19Z decision · item brief item 15: check-unattended.test.sh on the template cache · reason the same owner rule as item 9 forbids running it; ask TOOL-dQuietDisk-25 carries it
+
+2026-11-23T10:44:21Z decision · item brief item 17: an adopter's kit self-test leg held when its vendored tree hash is attested · reason TOOL-dQuietDisk-15 is DEFERRED by its fork F1; the attestation it reads (TOOL-dQuietDisk-14, 37) and its unknown-hash fallback are built, the held-leg reader waits on the adopters' kit update
+
+2026-11-23T10:44:23Z decision · item brief item 19: govkit update runs each adopt-*.sh --check once · reason TOOL-dQuietDisk-17 is WONTDO by its fork F2 (c): the in-run reuse fires only on a run that fails by construction or wrote nothing
+
+2026-11-23T10:44:25Z decision · item brief item 22: fix 4 in nicocares and incms, with the incms pin bump · reason it lands in those repositories under their own governance through side sessions, never by hand edits here
+
+2026-11-23T10:44:27Z decision · item brief item 23: the R1 to R8 design rules and the G-A and G-B budgets · reason they change governance carriers a run may not change (BUILD-METHOD M3 veto 2); filed as asks TOOL-dQuietDisk-20 and the G-A/G-B asks for the owner

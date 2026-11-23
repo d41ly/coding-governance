@@ -5,7 +5,7 @@ opened: 2026-11-20
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30 TOOL-dQuietDisk-31 TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37 TOOL-dQuietDisk-38 TOOL-dQuietDisk-39 TOOL-dQuietDisk-40 TOOL-dQuietDisk-41
+ids: TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30 TOOL-dQuietDisk-31 TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37 TOOL-dQuietDisk-38 TOOL-dQuietDisk-39 TOOL-dQuietDisk-40 TOOL-dQuietDisk-41 TOOL-dQuietDisk-42 TOOL-dQuietDisk-43 TOOL-dQuietDisk-44 TOOL-dQuietDisk-45 TOOL-dQuietDisk-46 TOOL-dQuietDisk-47 TOOL-dQuietDisk-48 TOOL-dQuietDisk-49 TOOL-dQuietDisk-50 TOOL-dQuietDisk-51 TOOL-dQuietDisk-52
 ---
 
 # dQuietDisk — gov's bars and suites stop churning the disk
@@ -82,7 +82,8 @@ none
 **Build status:** DEFERRED · 23 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16
 ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27 TOOL-dQuietDisk-28 TOOL-dQuietDisk-29 TOOL-dQuietDisk-30 TOOL-dQuietDisk-31
-ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37 TOOL-dQuietDisk-38 TOOL-dQuietDisk-39 TOOL-dQuietDisk-40 TOOL-dQuietDisk-41
+ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 TOOL-dQuietDisk-36 TOOL-dQuietDisk-37 TOOL-dQuietDisk-38 TOOL-dQuietDisk-39 TOOL-dQuietDisk-40 TOOL-dQuietDisk-41 TOOL-dQuietDisk-42 TOOL-dQuietDisk-43 TOOL-dQuietDisk-44 TOOL-dQuietDisk-45 TOOL-dQuietDisk-46
+ids TOOL-dQuietDisk-47 TOOL-dQuietDisk-48 TOOL-dQuietDisk-49 TOOL-dQuietDisk-50 TOOL-dQuietDisk-51 TOOL-dQuietDisk-52
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -112,7 +113,7 @@ ids TOOL-dQuietDisk-32 TOOL-dQuietDisk-33 TOOL-dQuietDisk-34 TOOL-dQuietDisk-35 
 | [TOOL-dQuietDisk-37 — the closing review's MEDIUM and LOW findings: the missing arms, the template key's builder arguments, the CR guard on batch names, and the serial runner's owned temp root](spec/2026-11-22-spec-TOOL-dQuietDisk-37.md) | 9 | 2 | CLOSED | rev-1 | 2026-11-22 |
 <!-- /gen:build-units -->
 
-Records: 153 bound to this build, across 4 record folder(s).
+Records: 194 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

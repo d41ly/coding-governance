@@ -611,6 +611,17 @@ Cite ids, never line numbers.
 | [TOOL-dQuietDisk-39](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-22 | THE HISTORY-STORE ARMS CANNOT TELL A STORE THAT SERVES HITS FROM ONE… |
 | [TOOL-dQuietDisk-40](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | THE CLOSING REVIEW'S TWO LEFT-SHIFT GATES ARE UNBUILT. Round 1 of the… |
 | [TOOL-dQuietDisk-41](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-22 | derive_kit_attestations SENDS A NAME HOLDING A CR TO ITS BATCH READ.… |
+| [TOOL-dQuietDisk-42](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite check-arms selftest red at 35d0dc3f on the daily held… |
+| [TOOL-dQuietDisk-43](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite loop splice check red at 35d0dc3f on the daily held… |
+| [TOOL-dQuietDisk-44](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite dead-path carriers self-test red at 35d0dc3f on the… |
+| [TOOL-dQuietDisk-45](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite loop item kind red at 35d0dc3f on the daily held job,… |
+| [TOOL-dQuietDisk-46](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite loop budget fixtures red at 35d0dc3f on the daily held… |
+| [TOOL-dQuietDisk-47](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite branch-guard self-test red at 35d0dc3f on the daily… |
+| [TOOL-dQuietDisk-48](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite drift-audit selftest red at 35d0dc3f on the daily held… |
+| [TOOL-dQuietDisk-49](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite roles adopter self-test red at 35d0dc3f on the daily… |
+| [TOOL-dQuietDisk-50](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite row-keyed merge driver replay red at 35d0dc3f on the… |
+| [TOOL-dQuietDisk-51](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite run-gates adopter e2e red at 35d0dc3f on the daily held… |
+| [TOOL-dQuietDisk-52](../builds/dQuietDisk/BACKLOG.md) | OPEN | HIGH | — | 2026-11-23 | held red: suite run-gates evidence red at 35d0dc3f on the daily held… |
 | [TOOL-dRankedPlan-17](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dRankedPlan-18](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-6 | 2026-10-26 | A PLAN REVIEW'S FINDINGS HAVE NO DISPOSAL ROUTE. review.dispose… |
 | [TOOL-dRemeasuredRender-2](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the location-probe scanner does not see a probe whose cd <dir> carries… |

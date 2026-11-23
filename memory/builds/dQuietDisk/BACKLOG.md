@@ -20,24 +20,75 @@
 - TOOL-dQuietDisk-39 · filed 2026-11-22 · THE HISTORY-STORE ARMS CANNOT TELL A STORE THAT SERVES HITS FROM ONE THAT NEVER HITS. The closing review's round 1 confirmed it as M3 (finding 8): the warm-against-cold equality arms of `tools/unattended/check-pass-order.test.sh` and `tools/unattended/check-brief-recorded.test.sh` pass when the warm run never served a hit. The review's fix: add a warm-run hit assertion to each suite. The run did not build it: both are unattended-kit suites, which the owner's standing rule of 2026-08-23 forbids this run to run, so the arms could never be seen red first. · seen `tools/unattended/check-pass-order.test.sh` matching `warm` run `python tools/memory-tree/gen_build_index.py --asks --build dQuietDisk` · accept each suite's warm run asserts a store hit, seen red first with the store's get forced to miss
 - TOOL-dQuietDisk-40 · filed 2026-11-22 · THE CLOSING REVIEW'S TWO LEFT-SHIFT GATES ARE UNBUILT. Round 1 of the closing diff review named a gate for each HIGH. For H1: a check that every git call in a copy-installed bash face whose Python twin drops GIT_ENV_LEAKS runs under the same scrub, red on a bare `git -C`. For H2: a change under `scan_dead_work` names the turnstile suite as a must-run row in its unit's acceptance, so an OWED observation cannot stand for it. TOOL-dQuietDisk-36 fixed both instances and their arms; neither class gate is built. · seen `tools/lib/template-cache.sh` matching `remove_git_env_leaks` run `python tools/memory-tree/gen_build_index.py --asks --build dQuietDisk` · accept a planted bare `git -C` in a copy-installed bash face reds a leg, and a unit touching scan_dead_work without the turnstile row is refused, each seen red first
 - TOOL-dQuietDisk-41 · filed 2026-11-22 · derive_kit_attestations SENDS A NAME HOLDING A CR TO ITS BATCH READ. TOOL-dQuietDisk-37's spec-writer found the class of the closing review's L1 in `derive_kit_attestations` in `tools/govkit/govkit.py`: a name ending in CR reaches `cat-file --batch`, which strips it and answers for another path. No arm can prove it on this node: NTFS holds no file name with a CR. · seen `tools/govkit/govkit.py` matching `derive_kit_attestations` run `python tools/memory-tree/gen_build_index.py --asks --build dQuietDisk` · accept the reader routes a CR-holding name off the batch handle, seen red first on a POSIX node's fixture
+- TOOL-dQuietDisk-42 · filed 2026-11-23 · held red: suite check-arms selftest red at 35d0dc3f on the daily held job, run 45023650426 · seen `{prefix}/memory-tree/check-arms.py`@35d0dc3f run `python3 {prefix}/memory-tree/check-arms.py --selftest` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dQuietDisk-43 · filed 2026-11-23 · held red: suite loop splice check red at 35d0dc3f on the daily held job, run 45023650426 · seen `{prefix}/loop/splice.py`@35d0dc3f run `python {prefix}/loop/splice.py check --selftest` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dQuietDisk-44 · filed 2026-11-23 · held red: suite dead-path carriers self-test red at 35d0dc3f on the daily held job, run 45023650426 · seen `{prefix}/check-dead-paths.test.sh`@35d0dc3f run `bash {prefix}/check-dead-paths.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dQuietDisk-45 · filed 2026-11-23 · held red: suite loop item kind red at 35d0dc3f on the daily held job, run 45023650426 · seen `{prefix}/loop/loop_items.py`@35d0dc3f run `python {prefix}/loop/loop_items.py check --selftest` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dQuietDisk-46 · filed 2026-11-23 · held red: suite loop budget fixtures red at 35d0dc3f on the daily held job, run 45023650426 · seen `{prefix}/loop/budget.py`@35d0dc3f run `python {prefix}/loop/budget.py --selftest` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dQuietDisk-47 · filed 2026-11-23 · held red: suite branch-guard self-test red at 35d0dc3f on the daily held job, run 45023650426 · seen `.githooks/pre-commit.test.sh`@35d0dc3f run `bash .githooks/pre-commit.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dQuietDisk-48 · filed 2026-11-23 · held red: suite drift-audit selftest red at 35d0dc3f on the daily held job, run 45023650426 · seen `{prefix}/drift-audit/selftest.py`@35d0dc3f run `python {prefix}/drift-audit/selftest.py` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dQuietDisk-49 · filed 2026-11-23 · held red: suite roles adopter self-test red at 35d0dc3f on the daily held job, run 45023650426 · seen `{prefix}/roles/adopt-roles.test.sh`@35d0dc3f run `bash {prefix}/roles/adopt-roles.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dQuietDisk-50 · filed 2026-11-23 · held red: suite row-keyed merge driver replay red at 35d0dc3f on the daily held job, run 45023650426 · seen `{prefix}/memory-tree/merge-rows.test.sh`@35d0dc3f run `bash {prefix}/memory-tree/merge-rows.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dQuietDisk-51 · filed 2026-11-23 · held red: suite run-gates adopter e2e red at 35d0dc3f on the daily held job, run 45023650426 · seen `{prefix}/run-gates/adopt-run-gates.test.sh`@35d0dc3f run `bash {prefix}/run-gates/adopt-run-gates.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dQuietDisk-52 · filed 2026-11-23 · held red: suite run-gates evidence red at 35d0dc3f on the daily held job, run 45023650426 · seen `{prefix}/run-gates/run-gates.evidence.test.sh`@35d0dc3f run `bash {prefix}/run-gates/run-gates.evidence.test.sh` · accept the suite is green on the daily held job at the default branch's tip
 
 ## Dispositions
 
 - SEV · TOOL-dQuietDisk-20 · MED · the next spec author rebuilds a fixture per case or a cache keyed on HEAD, with nothing written to stop it
+- KEEP · TOOL-dQuietDisk-20 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-21 · MED · a suite that strands temp or storms the directory index reads green
+- KEEP · TOOL-dQuietDisk-21 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-22 · MED · a leg that regresses to one git process per question reads green while it costs seconds
+- KEEP · TOOL-dQuietDisk-22 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-23 · LOW · the churn shapes this build removes can return one site at a time
+- KEEP · TOOL-dQuietDisk-23 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-24 · MED · every unattended-kit self-test run rebuilds the same prologue eight times
+- KEEP · TOOL-dQuietDisk-24 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-25 · MED · one of the six heaviest suites keeps building a repository per case
+- KEEP · TOOL-dQuietDisk-25 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-27 · MED · a bar's node legs and every nested adopter bar keep writing to and stranding in the ambient temp dir
+- KEEP · TOOL-dQuietDisk-27 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-29 · LOW · every history leg regrades cold once per prune window though nothing it reads moved
+- KEEP · TOOL-dQuietDisk-29 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-30 · LOW · a file named like a directory guard runs a held leg the runner's own slice would not
+- KEEP · TOOL-dQuietDisk-30 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-31 · LOW · every govkit apply reruns its whole before bar though an ordinary bar on the same tree already graded it
+- KEEP · TOOL-dQuietDisk-31 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-32 · LOW · every cached case still pays three git processes for its clone
+- KEEP · TOOL-dQuietDisk-32 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-33 · LOW · no run saves anything until a bar is handed a selection; adopters' default bars already hold gov kit self-tests
+- KEEP · TOOL-dQuietDisk-33 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-34 · LOW · every re-run of govkit update over an unchanged target re-runs every kit check
+- KEEP · TOOL-dQuietDisk-34 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-35 · LOW · a held run spends one kit check per held kit on a result nothing reads but the printed exits
+- KEEP · TOOL-dQuietDisk-35 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-38 · MED · a suite run with GIT_DIR exported can commit a fixture onto the operator's real branch
+- KEEP · TOOL-dQuietDisk-38 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-39 · MED · a history store that never serves a hit passes both suites' warm arms
+- KEEP · TOOL-dQuietDisk-39 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-40 · LOW · the next copy-installed bash face or sweep predicate can repeat H1 or H2 with nothing to stop it
+- KEEP · TOOL-dQuietDisk-40 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
 - SEV · TOOL-dQuietDisk-41 · LOW · on a POSIX adopter a CR-ending kit path is attested against another file's bytes
+- KEEP · TOOL-dQuietDisk-41 · a follow-up this run files for the owner, outside what the run may build or decide; open for the owner
+- SEV · TOOL-dQuietDisk-42 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dQuietDisk-42 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dQuietDisk-43 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dQuietDisk-43 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dQuietDisk-44 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dQuietDisk-44 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dQuietDisk-45 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dQuietDisk-45 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dQuietDisk-46 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dQuietDisk-46 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dQuietDisk-47 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dQuietDisk-47 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dQuietDisk-48 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dQuietDisk-48 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dQuietDisk-49 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dQuietDisk-49 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dQuietDisk-50 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dQuietDisk-50 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dQuietDisk-51 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dQuietDisk-51 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dQuietDisk-52 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dQuietDisk-52 · filed by an unattended run for the owning build; outside this build's goal
