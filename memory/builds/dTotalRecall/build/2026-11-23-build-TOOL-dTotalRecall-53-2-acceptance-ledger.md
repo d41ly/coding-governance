@@ -30,7 +30,7 @@ TOOL-dTotalRecall-113 (§8 F2), so their criteria are not built here.
 - AC18 — `git ls-files` — `tools/playbook/edge_grammar.py` is tracked at the pass base, so S18 files nothing.
 - AC19 — `awk-regex-alias` — the plant lists its `awk` alternation and its bare `case` pattern red; at the tip `check-memory-hygiene.sh`'s awk line is listed kept, `both tokens`.
 - AC21 — `written_kind` — `derive_record_kind(path, written_kind, rows)`; a planted record `read_bindings` calls malformed reads `None` through `read_written_kinds` and gets `None`; `scan_legacy_records` classifies the tree as the base did, every row's population and other-kind set equal.
-- AC22 — `pinned instrument` — the tip's census lists `deviations.py:380` kept `pinned instrument`; `grep -c resolve_kind` over `memory/builds/dClosedLoop/BACKLOG.md` prints 1, ask PLAY-dClosedLoop-1003.
+- AC22 — `pinned instrument` — the tip's census lists `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py@30a1f15b:380` kept `pinned instrument`; `grep -c resolve_kind` over `memory/builds/dClosedLoop/BACKLOG.md` prints 1, ask PLAY-dClosedLoop-1003.
 - AC23 — `homeless-empty` — the tip's line reads `309 file(s) under memory/ outside builds/ · 113 homed · 196 not records · 0 homeless` (DERIVED 2026-11-23, `check_record_kinds`); `homeless-record` names its file and `homeless-empty` reds `the arm selects nothing`.
 - AC24 — `msys-d-drive` — `runlog.py memory --fixture --plant` counted `msys-d-drive` 450, `dot-relative` 300 and `parent-relative` 250 bytes (DERIVED 2026-11-23, each plant's pooled row); `test_memory_dtr53_paths` holds them in the runlog selftest, owed to the close.
 - AC25 — `VIEW_HEAD.format` — the call returns no `Caused-by`; it holds at HEAD.
