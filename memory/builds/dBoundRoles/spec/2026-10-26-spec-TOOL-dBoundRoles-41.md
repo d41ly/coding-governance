@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-41 — the anchor check grades the text a work order authors, never the content it hands, by the block extents the render assembled
 
-**Status:** INPROGRESS · rev-6 · 2026-11-22 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
+**Status:** CLOSED · rev-6 · 2026-11-23 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,8 @@
 | [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-10-26-build-TOOL-dBoundRoles-41-deviation-411.md](../build/2026-10-26-build-TOOL-dBoundRoles-41-deviation-411.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-41-deviation-412.md](../build/2026-10-26-build-TOOL-dBoundRoles-41-deviation-412.md) | deviation | — |
+| [2026-11-22-build-TOOL-dBoundRoles-41-1-acceptance-ledger.md](../build/2026-11-22-build-TOOL-dBoundRoles-41-1-acceptance-ledger.md) | journal | — |
+| [2026-11-23-build-TOOL-dBoundRoles-41-deviation-413.md](../build/2026-11-23-build-TOOL-dBoundRoles-41-deviation-413.md) | deviation | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-4-reground-k-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-4-reground-k-brief.md) | journal | TOOL-dBoundRoles-4 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-12 |
 | [2026-11-22-prompt-TOOL-dBoundRoles-41-build-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-41-build-brief.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief.md](../prompts/2026-11-22-prompt-TOOL-dBoundRoles-5-crossunit-brief.md) | journal | TOOL-dBoundRoles-5 TOOL-dBoundRoles-4 TOOL-dBoundRoles-12 TOOL-dBoundRoles-23 TOOL-dBoundRoles-39 TOOL-dBoundRoles-3 TOOL-dBoundRoles-24 TOOL-dBoundRoles-13 |

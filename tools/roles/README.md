@@ -191,13 +191,24 @@ opens with `blob:`, `record:` or `cmd:`, and a well-formed anchor is the whole k
 `roles_lib.check_anchors(text, handed)` returns one line per anchor span that is malformed,
 ``anchor `<span>` — malformed: <form expected>``, or names no key in `handed`, ``anchor `<span>` — resolves to no
 fact this work order hands``, each span once in first-seen order, and writes nothing. `render_handoff` calls it over
-the whole composed `## Task` section, after the fence check and before the marker is hashed, `handed` the keys of
-the facts that work order hands, so a planted anchor to nothing refuses the render with exit 1, naming every such
-anchor, and no file is written; the key refusals raise first, before the section is assembled. A handed block's own
-fact line is no backticked span, so a correct order refuses nothing. WHAT THIS DOES NOT SEE: a reference without the
-key shape, such as "see the spec's §4", which is prose; whether the fact behind a resolving anchor says what the task
-claims of it; the `## Role` section, the role's static text; a span inside a fenced block, read by
-`read_unfenced_lines`, so an example key belongs in a fence; and a span whose closing backtick is not on its line.
+the graded text, after the fence check and before the marker is hashed, `handed` the keys of the facts that work
+order hands, so a planted anchor to nothing refuses the render with exit 1, naming every such anchor, and no file is
+written; the key refusals raise first, before the section is assembled. The graded text is the `## Task` section
+composed a second time from the same parts the render appended (TOOL-dBoundRoles-41), never cut from the composed
+bytes: the authored text is graded, the opening, every `### framing:` block, the upstream rows block, the item's
+blocks around their inputs, and the value of every typed `--input`, so a grammar span quoted in a typed value such as
+`--input diff=` is graded and refuses, since that value is authored for the order; its remedy is to hand the file as
+`input:spec` or to fence the quotation. The handed content is left out of the graded text, each handed block keeping
+its `### <key>` heading and its fact line: the content of a path input (`spec`, `prompt`, `code`), of a card `task:`
+or `card:` value, of a `brief:` section, of every excerpt an item's `### inputs` block holds, of `input:work-order`,
+and the practices and card blocks that lead the task, each kept as its heading alone. A handed spec quoting the key
+grammar in its prose therefore renders, whether or not its fence parses. The marker still hashes the whole section.
+A handed block's own fact line is no backticked span, so a correct order refuses nothing. WHAT THIS DOES NOT SEE: a
+reference without the key shape, such as "see the spec's §4", which is prose; whether the fact behind a resolving
+anchor says what the task claims of it; an anchor written inside handed content, which is not the order's to author;
+the `## Role` section, the role's static text; a span inside a fenced block, read by `read_unfenced_lines`, so an
+example key belongs in a fence, and so the upstream rows, inside their fence, are not graded either; and a span whose
+closing backtick is not on its line.
 
 The file is written under the build's `prompts/` folder as
 `<date>-prompt-<id>-<n>-<role without gov->.md`, and its `gov:handoff` marker line carries a hash of
