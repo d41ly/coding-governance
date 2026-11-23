@@ -333,3 +333,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-23T09:41:13Z brief · item KICK-dKeptSession-55 · reason c129c3d823ad memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-55-build-brief.md
 
 2026-11-23T09:43:55Z dispatch · item 636b709c KICK-dKeptSession-55 · reason tools/loop/loop_transition.py tools/loop/README.md help/loop.md tools/run-gates/selftest-budgets.txt memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-55-1-acceptance-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-23T10:05:09Z brief · item KICK-dKeptSession-17 · reason f2b112f593c1 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-17-build-brief.md
+
+2026-11-23T10:08:17Z dispatch · item 476a9dd9 KICK-dKeptSession-17 · reason tools/loop/loop.toml tools/loop/loop_lib.py memory/map/generated/symbols.json tools/loop/breakpoints.py tools/loop/kit.toml tools/loop/README.md tools/run-gates/selftest-budgets.txt help/loop.md memory/project/docs-undocumented.txt tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-17-1-acceptance-ledger.md
